@@ -14,17 +14,139 @@
 @synthesize managedObjectModel = _managedObjectModel;
 @synthesize managedObjectContext = _managedObjectContext;
 
+static AppDelegate *_static_shared_ref;
++(AppDelegate *)shared { return _static_shared_ref; }
+
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-	// Insert code here to initialize your application
+	_static_shared_ref = self;
+
+	NSStatusBar *statusBar = [NSStatusBar systemStatusBar];
+	self.statusItem = [statusBar statusItemWithLength:statusBar.thickness];
+
+	NSImage *newImage = [[NSImage alloc] initWithSize:CGSizeMake(statusBar.thickness, statusBar.thickness)];
+    [newImage lockFocus];
+	NSImage *oldImage = [NSImage imageNamed:NSImageNameApplicationIcon];
+	[oldImage drawInRect:CGRectMake(0, 0, statusBar.thickness, statusBar.thickness)
+				fromRect:NSZeroRect
+			   operation:NSCompositeSourceOver
+				fraction:1.0];
+    [newImage unlockFocus];
+	[newImage setTemplate:YES];
+
+	self.statusItem.image = newImage;
+	self.statusItem.highlightMode = YES;
+	self.statusItem.menu = self.statusBarMenu;
+
+	self.api = [[API alloc] init];
+	[self.githubToken setStringValue:self.api.authToken];
+	[self controlTextDidChange:nil];
+
+	self.projectsTable.alphaValue = 0.5;
+
+	self.api = [[API alloc] init];
+
+	if(!self.githubToken)
+	{
+		[self preferencesSelected:nil];
+	}
 }
+
+- (IBAction)refreshSelected:(NSButton *)sender {
+
+	NSUserDefaults *d = [NSUserDefaults standardUserDefaults];
+	[d setObject:[self.githubToken stringValue] forKey:GITHUB_TOKEN_KEY];
+
+	[self.activityDisplay startAnimation:self];
+	self.refreshButton.enabled = NO;
+	self.projectsTable.alphaValue = 0.5;
+
+	[Repo unTouchEverythingInMoc:self.managedObjectContext];
+	[Org unTouchEverythingInMoc:self.managedObjectContext];
+
+	[self.api fetchRepositoriesAndCallback:^(BOOL success) {
+		[self.activityDisplay stopAnimation:self];
+		self.refreshButton.enabled = YES;
+
+		NSArray *allRepos = [Repo allItemsOfType:@"Repo" inMoc:self.managedObjectContext];
+		NSLog(@"now monitoring %lu repos",allRepos.count);
+
+		if(!success)
+		{
+            NSError *error = [NSError errorWithDomain:@"YOUR_ERROR_DOMAIN"
+												 code:101
+											 userInfo:@{NSLocalizedDescriptionKey:@"Error while fetching data from GitHub, please check that the token you have provided is correct and that you have a working network connection"}];
+            [[NSApplication sharedApplication] presentError:error];
+		}
+		else
+		{
+			[Repo nukeUntouchedItemsInMoc:self.managedObjectContext];
+			[Org nukeUntouchedItemsInMoc:self.managedObjectContext];
+			[self.managedObjectContext save:nil];
+			[self.projectsTable reloadData];
+		}
+	}];
+}
+
+-(void)controlTextDidChange:(NSNotification *)obj
+{
+	self.refreshButton.enabled = ([self.githubToken stringValue].length!=0);
+}
+
+- (IBAction)preferencesSelected:(NSMenuItem *)sender {
+	[self.preferencesWindow setLevel:NSFloatingWindowLevel];
+	NSWindowController *c = [[NSWindowController alloc] initWithWindow:self.preferencesWindow];
+	[c showWindow:self];
+}
+
+- (IBAction)createTokenSelected:(NSButton *)sender {
+	NSWorkspace * ws = [NSWorkspace sharedWorkspace];
+	[ws openURL:[NSURL URLWithString:@"https://github.com/settings/tokens/new"]];
+}
+
+- (IBAction)viewExistingTokensSelected:(NSButton *)sender {
+	NSWorkspace * ws = [NSWorkspace sharedWorkspace];
+	[ws openURL:[NSURL URLWithString:@"https://github.com/settings/applications"]];
+}
+
+/////////////////////////////////// Repo table
+
+-(id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+{
+	//TODO: very inefficient, fix
+	NSArray *allRepos = [Repo allReposSortedByField:@"fullName" inMoc:self.managedObjectContext];
+	Repo *r = allRepos[row];
+
+	NSButtonCell *cell = [tableColumn dataCellForRow:row];
+	cell.title = r.fullName;
+	if(r.active.boolValue)
+	{
+		cell.state = NSOnState;
+	}
+	else
+	{
+		cell.state = NSOffState;
+	}
+	return cell;
+}
+
+-(NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
+{
+	//TODO: very inefficient, fix
+	NSArray *allRepos = [Repo allReposSortedByField:@"fullName" inMoc:self.managedObjectContext];
+	return allRepos.count;
+}
+
+/////////////////////////////////// Core Data
 
 // Returns the directory the application uses to store the Core Data store file. This code uses a directory named "com.housetrip.Trailer" in the user's Application Support directory.
 - (NSURL *)applicationFilesDirectory
 {
     NSFileManager *fileManager = [NSFileManager defaultManager];
     NSURL *appSupportURL = [[fileManager URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject];
-    return [appSupportURL URLByAppendingPathComponent:@"com.housetrip.Trailer"];
+    appSupportURL = [appSupportURL URLByAppendingPathComponent:@"com.housetrip.Trailer"];
+	NSLog(@"Files in %@",appSupportURL);
+	return appSupportURL;
 }
 
 // Creates if necessary and returns the managed object model for the application.

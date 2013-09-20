@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		16075A9717EC7492000D86FD /* API.m in Sources */ = {isa = PBXBuildFile; fileRef = 16075A9617EC7492000D86FD /* API.m */; };
+		16075A9817EC7492000D86FD /* API.m in Sources */ = {isa = PBXBuildFile; fileRef = 16075A9617EC7492000D86FD /* API.m */; };
 		168BC6AE17EC2DF000BC4584 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 168BC6AD17EC2DF000BC4584 /* Cocoa.framework */; };
 		168BC6B817EC2DF000BC4584 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 168BC6B617EC2DF000BC4584 /* InfoPlist.strings */; };
 		168BC6BA17EC2DF000BC4584 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 168BC6B917EC2DF000BC4584 /* main.m */; };
@@ -19,6 +21,15 @@
 		168BC6D117EC2DF000BC4584 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 168BC6AD17EC2DF000BC4584 /* Cocoa.framework */; };
 		168BC6D917EC2DF000BC4584 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 168BC6D717EC2DF000BC4584 /* InfoPlist.strings */; };
 		168BC6DB17EC2DF000BC4584 /* TrailerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 168BC6DA17EC2DF000BC4584 /* TrailerTests.m */; };
+		16B9553117EC89520005118F /* Org.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B9553017EC89520005118F /* Org.m */; };
+		16B9553217EC89520005118F /* Org.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B9553017EC89520005118F /* Org.m */; };
+		16B9553617EC89B50005118F /* DataItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B9553517EC89B50005118F /* DataItem.m */; };
+		16B9553717EC89B50005118F /* DataItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B9553517EC89B50005118F /* DataItem.m */; };
+		16B9553A17EC93DE0005118F /* Repo.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B9553917EC93DE0005118F /* Repo.m */; };
+		16B9553B17EC93DE0005118F /* Repo.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B9553917EC93DE0005118F /* Repo.m */; };
+		16EC79E617ECA18000F7EB44 /* HTTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 16EC79E517ECA18000F7EB44 /* HTTextField.m */; };
+		16EC79E717ECA18000F7EB44 /* HTTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 16EC79E517ECA18000F7EB44 /* HTTextField.m */; };
+		4324160CC3FE4872BB66D231 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F84D40248D404F1D8BF71AF2 /* libPods.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -32,6 +43,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		16075A9517EC7492000D86FD /* API.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = API.h; sourceTree = "<group>"; };
+		16075A9617EC7492000D86FD /* API.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = API.m; sourceTree = "<group>"; };
 		168BC6AA17EC2DF000BC4584 /* Trailer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Trailer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		168BC6AD17EC2DF000BC4584 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		168BC6B017EC2DF000BC4584 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -52,6 +65,16 @@
 		168BC6D617EC2DF000BC4584 /* TrailerTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TrailerTests-Info.plist"; sourceTree = "<group>"; };
 		168BC6D817EC2DF000BC4584 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		168BC6DA17EC2DF000BC4584 /* TrailerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TrailerTests.m; sourceTree = "<group>"; };
+		16B9552F17EC89520005118F /* Org.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Org.h; sourceTree = "<group>"; };
+		16B9553017EC89520005118F /* Org.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Org.m; sourceTree = "<group>"; };
+		16B9553417EC89B50005118F /* DataItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataItem.h; sourceTree = "<group>"; };
+		16B9553517EC89B50005118F /* DataItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataItem.m; sourceTree = "<group>"; };
+		16B9553817EC93DE0005118F /* Repo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Repo.h; sourceTree = "<group>"; };
+		16B9553917EC93DE0005118F /* Repo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Repo.m; sourceTree = "<group>"; };
+		16EC79E417ECA18000F7EB44 /* HTTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HTTextField.h; sourceTree = "<group>"; };
+		16EC79E517ECA18000F7EB44 /* HTTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HTTextField.m; sourceTree = "<group>"; };
+		20041A0D334347FC907AC67E /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = "<group>"; };
+		F84D40248D404F1D8BF71AF2 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +83,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				168BC6AE17EC2DF000BC4584 /* Cocoa.framework in Frameworks */,
+				4324160CC3FE4872BB66D231 /* libPods.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -82,6 +106,7 @@
 				168BC6D417EC2DF000BC4584 /* TrailerTests */,
 				168BC6AC17EC2DF000BC4584 /* Frameworks */,
 				168BC6AB17EC2DF000BC4584 /* Products */,
+				20041A0D334347FC907AC67E /* Pods.xcconfig */,
 			);
 			sourceTree = "<group>";
 		};
@@ -100,6 +125,7 @@
 				168BC6AD17EC2DF000BC4584 /* Cocoa.framework */,
 				168BC6CF17EC2DF000BC4584 /* XCTest.framework */,
 				168BC6AF17EC2DF000BC4584 /* Other Frameworks */,
+				F84D40248D404F1D8BF71AF2 /* libPods.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -117,11 +143,14 @@
 		168BC6B317EC2DF000BC4584 /* Trailer */ = {
 			isa = PBXGroup;
 			children = (
+				16EC79E317ECA16C00F7EB44 /* Extensions */,
+				16B9552E17EC86D10005118F /* Data */,
+				16075A9517EC7492000D86FD /* API.h */,
+				16075A9617EC7492000D86FD /* API.m */,
 				168BC6BF17EC2DF000BC4584 /* AppDelegate.h */,
 				168BC6C017EC2DF000BC4584 /* AppDelegate.m */,
 				168BC6C217EC2DF000BC4584 /* MainMenu.xib */,
 				168BC6C817EC2DF000BC4584 /* Images.xcassets */,
-				168BC6C517EC2DF000BC4584 /* Trailer.xcdatamodeld */,
 				168BC6B417EC2DF000BC4584 /* Supporting Files */,
 			);
 			path = Trailer;
@@ -157,6 +186,29 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		16B9552E17EC86D10005118F /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				168BC6C517EC2DF000BC4584 /* Trailer.xcdatamodeld */,
+				16B9553817EC93DE0005118F /* Repo.h */,
+				16B9553917EC93DE0005118F /* Repo.m */,
+				16B9552F17EC89520005118F /* Org.h */,
+				16B9553017EC89520005118F /* Org.m */,
+				16B9553417EC89B50005118F /* DataItem.h */,
+				16B9553517EC89B50005118F /* DataItem.m */,
+			);
+			name = Data;
+			sourceTree = "<group>";
+		};
+		16EC79E317ECA16C00F7EB44 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				16EC79E417ECA18000F7EB44 /* HTTextField.h */,
+				16EC79E517ECA18000F7EB44 /* HTTextField.m */,
+			);
+			name = Extensions;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -164,9 +216,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 168BC6DE17EC2DF000BC4584 /* Build configuration list for PBXNativeTarget "Trailer" */;
 			buildPhases = (
+				9D624E1629B44822A097A7BC /* Check Pods Manifest.lock */,
 				168BC6A617EC2DF000BC4584 /* Sources */,
 				168BC6A717EC2DF000BC4584 /* Frameworks */,
 				168BC6A817EC2DF000BC4584 /* Resources */,
+				B041E47297154F70B16E8AC0 /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -250,13 +304,51 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		9D624E1629B44822A097A7BC /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		B041E47297154F70B16E8AC0 /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Pods-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		168BC6A617EC2DF000BC4584 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				16B9553A17EC93DE0005118F /* Repo.m in Sources */,
+				16B9553117EC89520005118F /* Org.m in Sources */,
 				168BC6C117EC2DF000BC4584 /* AppDelegate.m in Sources */,
 				168BC6BA17EC2DF000BC4584 /* main.m in Sources */,
+				16075A9717EC7492000D86FD /* API.m in Sources */,
+				16EC79E617ECA18000F7EB44 /* HTTextField.m in Sources */,
+				16B9553617EC89B50005118F /* DataItem.m in Sources */,
 				168BC6C717EC2DF000BC4584 /* Trailer.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -265,6 +357,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				16B9553B17EC93DE0005118F /* Repo.m in Sources */,
+				16EC79E717ECA18000F7EB44 /* HTTextField.m in Sources */,
+				16B9553217EC89520005118F /* Org.m in Sources */,
+				16075A9817EC7492000D86FD /* API.m in Sources */,
+				16B9553717EC89B50005118F /* DataItem.m in Sources */,
 				168BC6DB17EC2DF000BC4584 /* TrailerTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -385,6 +482,7 @@
 		};
 		168BC6DF17EC2DF000BC4584 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 20041A0D334347FC907AC67E /* Pods.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -398,6 +496,7 @@
 		};
 		168BC6E017EC2DF000BC4584 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 20041A0D334347FC907AC67E /* Pods.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -468,6 +567,7 @@
 				168BC6E017EC2DF000BC4584 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		168BC6E117EC2DF000BC4584 /* Build configuration list for PBXNativeTarget "TrailerTests" */ = {
 			isa = XCConfigurationList;
@@ -476,6 +576,7 @@
 				168BC6E317EC2DF000BC4584 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 

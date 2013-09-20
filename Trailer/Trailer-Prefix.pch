@@ -6,4 +6,15 @@
 
 #ifdef __OBJC__
 	#import <Cocoa/Cocoa.h>
+	#import <SystemConfiguration/SystemConfiguration.h>
+	#import <CoreServices/CoreServices.h>
+	#import <AFHTTPRequestOperationLogger/AFHTTPRequestOperationLogger.h>
+	#import <AFNetworking/AFNetworking.h>
+	#import <Foundation/Foundation.h>
+	#import <CoreData/CoreData.h>
+	#import "API.h"
+	#import "DataItem.h"
+	#import "Org.h"
+	#import "Repo.h"
+	#import "AppDelegate.h"
 #endif
