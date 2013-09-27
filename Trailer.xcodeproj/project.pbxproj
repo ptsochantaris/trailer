@@ -9,6 +9,12 @@
 /* Begin PBXBuildFile section */
 		16075A9717EC7492000D86FD /* API.m in Sources */ = {isa = PBXBuildFile; fileRef = 16075A9617EC7492000D86FD /* API.m */; };
 		16075A9817EC7492000D86FD /* API.m in Sources */ = {isa = PBXBuildFile; fileRef = 16075A9617EC7492000D86FD /* API.m */; };
+		161CA3C617F5A55300F4AF6C /* PullRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 161CA3C517F5A55300F4AF6C /* PullRequest.m */; };
+		161CA3C717F5A55300F4AF6C /* PullRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 161CA3C517F5A55300F4AF6C /* PullRequest.m */; };
+		161CA3CA17F5B1F300F4AF6C /* PRComment.m in Sources */ = {isa = PBXBuildFile; fileRef = 161CA3C917F5B1F300F4AF6C /* PRComment.m */; };
+		161CA3CB17F5B1F300F4AF6C /* PRComment.m in Sources */ = {isa = PBXBuildFile; fileRef = 161CA3C917F5B1F300F4AF6C /* PRComment.m */; };
+		161CA3CE17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m in Sources */ = {isa = PBXBuildFile; fileRef = 161CA3CC17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m */; };
+		161CA3CF17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m in Sources */ = {isa = PBXBuildFile; fileRef = 161CA3CC17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m */; };
 		168BC6AE17EC2DF000BC4584 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 168BC6AD17EC2DF000BC4584 /* Cocoa.framework */; };
 		168BC6B817EC2DF000BC4584 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 168BC6B617EC2DF000BC4584 /* InfoPlist.strings */; };
 		168BC6BA17EC2DF000BC4584 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 168BC6B917EC2DF000BC4584 /* main.m */; };
@@ -45,6 +51,12 @@
 /* Begin PBXFileReference section */
 		16075A9517EC7492000D86FD /* API.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = API.h; sourceTree = "<group>"; };
 		16075A9617EC7492000D86FD /* API.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = API.m; sourceTree = "<group>"; };
+		161CA3C417F5A55300F4AF6C /* PullRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PullRequest.h; sourceTree = "<group>"; };
+		161CA3C517F5A55300F4AF6C /* PullRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PullRequest.m; sourceTree = "<group>"; };
+		161CA3C817F5B1F300F4AF6C /* PRComment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PRComment.h; sourceTree = "<group>"; };
+		161CA3C917F5B1F300F4AF6C /* PRComment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PRComment.m; sourceTree = "<group>"; };
+		161CA3CC17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+NSDictionary_OFK.m"; sourceTree = "<group>"; };
+		161CA3CD17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+NSDictionary_OFK.h"; sourceTree = "<group>"; };
 		168BC6AA17EC2DF000BC4584 /* Trailer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Trailer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		168BC6AD17EC2DF000BC4584 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		168BC6B017EC2DF000BC4584 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -190,6 +202,10 @@
 			isa = PBXGroup;
 			children = (
 				168BC6C517EC2DF000BC4584 /* Trailer.xcdatamodeld */,
+				161CA3C817F5B1F300F4AF6C /* PRComment.h */,
+				161CA3C917F5B1F300F4AF6C /* PRComment.m */,
+				161CA3C417F5A55300F4AF6C /* PullRequest.h */,
+				161CA3C517F5A55300F4AF6C /* PullRequest.m */,
 				16B9553817EC93DE0005118F /* Repo.h */,
 				16B9553917EC93DE0005118F /* Repo.m */,
 				16B9552F17EC89520005118F /* Org.h */,
@@ -205,6 +221,8 @@
 			children = (
 				16EC79E417ECA18000F7EB44 /* HTTextField.h */,
 				16EC79E517ECA18000F7EB44 /* HTTextField.m */,
+				161CA3CC17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m */,
+				161CA3CD17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.h */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
@@ -343,7 +361,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				16B9553A17EC93DE0005118F /* Repo.m in Sources */,
+				161CA3CE17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m in Sources */,
+				161CA3C617F5A55300F4AF6C /* PullRequest.m in Sources */,
 				16B9553117EC89520005118F /* Org.m in Sources */,
+				161CA3CA17F5B1F300F4AF6C /* PRComment.m in Sources */,
 				168BC6C117EC2DF000BC4584 /* AppDelegate.m in Sources */,
 				168BC6BA17EC2DF000BC4584 /* main.m in Sources */,
 				16075A9717EC7492000D86FD /* API.m in Sources */,
@@ -360,9 +381,12 @@
 				16B9553B17EC93DE0005118F /* Repo.m in Sources */,
 				16EC79E717ECA18000F7EB44 /* HTTextField.m in Sources */,
 				16B9553217EC89520005118F /* Org.m in Sources */,
+				161CA3CF17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m in Sources */,
 				16075A9817EC7492000D86FD /* API.m in Sources */,
 				16B9553717EC89B50005118F /* DataItem.m in Sources */,
 				168BC6DB17EC2DF000BC4584 /* TrailerTests.m in Sources */,
+				161CA3C717F5A55300F4AF6C /* PullRequest.m in Sources */,
+				161CA3CB17F5B1F300F4AF6C /* PRComment.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

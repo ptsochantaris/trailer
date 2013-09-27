@@ -6,8 +6,6 @@
 //  Copyright (c) 2013 HouseTrip. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-
 #define GITHUB_TOKEN_KEY @"GITHUB_AUTH_TOKEN"
 
 @interface API : NSObject
@@ -15,5 +13,6 @@
 @property (nonatomic,readonly) NSString *authToken;
 
 -(void)fetchRepositoriesAndCallback:(void(^)(BOOL success))callback;
+-(void)fetchPullRequestsForActiveReposAndCallback:(void(^)(BOOL success))callback;
 
 @end

@@ -27,19 +27,11 @@
 	return [moc executeFetchRequest:f error:nil];
 }
 
-+(void)nukeUntouchedItemsInMoc:(NSManagedObjectContext *)moc
++(NSArray *)activeReposInMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"Repo"];
-	f.predicate = [NSPredicate predicateWithFormat:@"touched = NO"];
-	NSArray *untouchedItems = [moc executeFetchRequest:f error:nil];
-	for(DataItem *i in untouchedItems) [moc deleteObject:i];
-	NSLog(@"Nuked %lu Repos",untouchedItems.count);
-}
-
-+(void)unTouchEverythingInMoc:(NSManagedObjectContext *)moc
-{
-	NSArray *allItems = [self allItemsOfType:@"Repo" inMoc:moc];
-	for(DataItem *i in allItems) i.touched = @NO;
+	f.predicate = [NSPredicate predicateWithFormat:@"active = YES"];
+	return [moc executeFetchRequest:f error:nil];
 }
 
 @end

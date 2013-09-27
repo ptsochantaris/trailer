@@ -41,6 +41,63 @@
 	NSLog(@"Failed to fetch %@",errorString);
 }
 
+-(void)fetchCommentsForCurrentPullRequestsAndCallback:(void (^)(BOOL))callback
+{
+	NSManagedObjectContext *moc = [AppDelegate shared].managedObjectContext;
+	NSMutableArray *prs1 = [[DataItem newOrUpdatedItemsOfType:@"PullRequest" inMoc:moc] mutableCopy];
+	[self _fetchCommentsForPullRequests:prs1 forIssues:YES andCallback:^(BOOL success) {
+		if(success)
+		{
+			NSMutableArray *prs2 = [[DataItem newOrUpdatedItemsOfType:@"PullRequest" inMoc:moc] mutableCopy];
+			[self _fetchCommentsForPullRequests:prs2 forIssues:NO andCallback:^(BOOL success) {
+				if(callback) callback(success);
+			}];
+		}
+		else
+		{
+			if(callback) callback(NO);
+		}
+	}];
+}
+
+-(void)_fetchCommentsForPullRequests:(NSMutableArray *)prs forIssues:(BOOL)issues andCallback:(void(^)(BOOL success))callback
+{
+	if(!prs.count)
+	{
+		if(callback) callback(YES);
+		return;
+	}
+	PullRequest *p = [prs objectAtIndex:0];
+	[prs removeObjectAtIndex:0];
+	NSString *link;
+	if(issues)
+	{
+		link = p.issueCommentLink;
+	}
+	else
+	{
+		link = p.reviewCommentLink;
+	}
+	[self getPagedDataInPath:link
+					  params:nil
+			 perPageCallback:^(id data, BOOL lastPage) {
+				 NSArray *pageOfComments = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+				 for(NSDictionary *info in pageOfComments)
+				 {
+					 [PRComment commentWithInfo:info moc:[AppDelegate shared].managedObjectContext];
+				 }
+			 } finalCallback:^(BOOL success) {
+				 if(success)
+				 {
+					 [self _fetchCommentsForPullRequests:prs forIssues:issues andCallback:callback];
+				 }
+				 else
+				 {
+					 if(callback) callback(NO);
+				 }
+			 }];
+}
+
 -(void)fetchRepositoriesAndCallback:(void(^)(BOOL success))callback
 {
 	[self syncOrgsAndCallback:^(BOOL success) {
@@ -63,7 +120,10 @@
 					{
 						[self syncReposForUserAndCallback:^(BOOL success) {
 							if(ok) ok = success;
-							if(callback) callback(ok);
+							if(callback)
+							{
+								callback(ok);
+							}
 						}];
 					}
 				}];
@@ -72,13 +132,62 @@
 	}];
 }
 
+-(void)fetchPullRequestsForActiveReposAndCallback:(void(^)(BOOL success))callback
+{
+	NSManagedObjectContext *moc = [AppDelegate shared].managedObjectContext;
+	[DataItem unTouchItemsOfType:@"PullRequest" inMoc:moc];
+	NSMutableArray *activeRepos = [[Repo activeReposInMoc:moc] mutableCopy];
+	[self _fetchPullRequestsForRepos:activeRepos andCallback:^(BOOL success) {
+		if(success)
+		{
+			[self fetchCommentsForCurrentPullRequestsAndCallback:^(BOOL success) {
+				[DataItem nukeUntouchedItemsOfType:@"PullRequest" inMoc:moc];
+				if(callback) callback(success);
+			}];
+		}
+		else if(callback) callback(NO);
+	}];
+}
+
+-(void)_fetchPullRequestsForRepos:(NSMutableArray *)repos andCallback:(void(^)(BOOL success))callback
+{
+	if(!repos.count)
+	{
+		if(callback) callback(YES);
+		return;
+	}
+	Repo *r = [repos objectAtIndex:0];
+	[repos removeObjectAtIndex:0];
+	[self getPagedDataInPath:[NSString stringWithFormat:@"/repos/%@/pulls",r.fullName]
+					  params:nil
+			 perPageCallback:^(id data, BOOL lastPage) {
+				 NSArray *pageOfPRs = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+				 for(NSDictionary *info in pageOfPRs)
+				 {
+					 [PullRequest pullRequestWithInfo:info moc:[AppDelegate shared].managedObjectContext];
+				 }
+			 } finalCallback:^(BOOL success) {
+				 if(success)
+				 {
+					 [self _fetchPullRequestsForRepos:repos andCallback:callback];
+				 }
+				 else
+				 {
+					 if(callback) callback(NO);
+				 }
+			 }];
+}
+
 -(void)syncReposForUserAndCallback:(void(^)(BOOL success))callback
 {
 	[self getPagedDataInPath:@"/user/repos"
 					  params:nil
 			 perPageCallback:^(id data, BOOL lastPage) {
 				 NSArray *pageOfRepos = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-				 for(NSDictionary *info in pageOfRepos) [Repo repoWithInfo:info moc:[AppDelegate shared].managedObjectContext];
+				 for(NSDictionary *info in pageOfRepos)
+				 {
+					 [Repo repoWithInfo:info moc:[AppDelegate shared].managedObjectContext];
+				 }
 			 } finalCallback:^(BOOL success) {
 				 if(callback) callback(success);
 			 }];
@@ -90,11 +199,13 @@
 					  params:nil
 			 perPageCallback:^(id data, BOOL lastPage) {
 				 NSArray *pageOfRepos = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-				 for(NSDictionary *info in pageOfRepos) [Repo repoWithInfo:info moc:[AppDelegate shared].managedObjectContext];
+				 for(NSDictionary *info in pageOfRepos)
+				 {
+					 [Repo repoWithInfo:info moc:[AppDelegate shared].managedObjectContext];
+				 }
 			 } finalCallback:^(BOOL success) {
 				 if(callback) callback(success);
 			 }];
-
 }
 
 -(void)syncOrgsAndCallback:(void(^)(BOOL success))callback
@@ -124,12 +235,16 @@
 		while(keepGoing)
 		{
 			mparams[@"page"] = @(page);
+			mparams[@"per_page"] = @100;
 			[self getDataInPath:path
 						 params:mparams
 					andCallback:^(id data, BOOL lastPage) {
 						if(data)
 						{
-							if(pageCallback) pageCallback(data,lastPage);
+							if(pageCallback)
+							{
+								pageCallback(data,lastPage);
+							}
 							keepGoing = !lastPage;
 							page++;
 						}
@@ -142,7 +257,12 @@
 					}];
 			dispatch_semaphore_wait(s, DISPATCH_TIME_FOREVER);
 		}
-		if(finalCallback) finalCallback(ok);
+		if(finalCallback)
+		{
+			dispatch_sync(dispatch_get_main_queue(), ^{
+				finalCallback(ok);
+			});
+		}
 	});
 }
 
@@ -152,7 +272,9 @@
 	AFHTTPRequestOperation *o = [client HTTPRequestOperationWithRequest:request
 																success:^(AFHTTPRequestOperation *operation, id responseObject) {
 																	NSDictionary *data = [NSJSONSerialization JSONObjectWithData:responseObject options:0 error:nil];
-																	NSLog(@"Success: %@",data);
+																	NSString *requestsRemaining = [operation.response allHeaderFields][@"X-RateLimit-Remaining"];
+																	NSLog(@"Success %@",data);
+																	NSLog(@"Remaining requests: %@",requestsRemaining);
 																	if(callback) callback(responseObject, [API lastPage:operation.response]);
 																} failure:^(AFHTTPRequestOperation *operation, NSError *error) {
 																	NSLog(@"Failed: %@",error);

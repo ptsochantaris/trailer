@@ -12,9 +12,12 @@
 	#import <AFNetworking/AFNetworking.h>
 	#import <Foundation/Foundation.h>
 	#import <CoreData/CoreData.h>
+	#import "NSDictionary+NSDictionary_OFK.h"
 	#import "API.h"
 	#import "DataItem.h"
+	#import "PRComment.h"
 	#import "Org.h"
 	#import "Repo.h"
+	#import "PullRequest.h"
 	#import "AppDelegate.h"
 #endif

@@ -21,28 +21,11 @@ static AppDelegate *_static_shared_ref;
 {
 	_static_shared_ref = self;
 
-	NSStatusBar *statusBar = [NSStatusBar systemStatusBar];
-	self.statusItem = [statusBar statusItemWithLength:statusBar.thickness];
-
-	NSImage *newImage = [[NSImage alloc] initWithSize:CGSizeMake(statusBar.thickness, statusBar.thickness)];
-    [newImage lockFocus];
-	NSImage *oldImage = [NSImage imageNamed:NSImageNameApplicationIcon];
-	[oldImage drawInRect:CGRectMake(0, 0, statusBar.thickness, statusBar.thickness)
-				fromRect:NSZeroRect
-			   operation:NSCompositeSourceOver
-				fraction:1.0];
-    [newImage unlockFocus];
-	[newImage setTemplate:YES];
-
-	self.statusItem.image = newImage;
-	self.statusItem.highlightMode = YES;
-	self.statusItem.menu = self.statusBarMenu;
+	[self updateStatusItem];
 
 	self.api = [[API alloc] init];
 	[self.githubToken setStringValue:self.api.authToken];
 	[self controlTextDidChange:nil];
-
-	self.projectsTable.alphaValue = 0.5;
 
 	self.api = [[API alloc] init];
 
@@ -52,19 +35,21 @@ static AppDelegate *_static_shared_ref;
 	}
 }
 
-- (IBAction)refreshSelected:(NSButton *)sender {
+- (IBAction)refreshReposSelected:(NSButton *)sender {
 
 	NSUserDefaults *d = [NSUserDefaults standardUserDefaults];
 	[d setObject:[self.githubToken stringValue] forKey:GITHUB_TOKEN_KEY];
 
 	[self.activityDisplay startAnimation:self];
 	self.refreshButton.enabled = NO;
-	self.projectsTable.alphaValue = 0.5;
 
-	[Repo unTouchEverythingInMoc:self.managedObjectContext];
-	[Org unTouchEverythingInMoc:self.managedObjectContext];
+	[DataItem unTouchItemsOfType:@"Repo" inMoc:self.managedObjectContext];
+	[DataItem unTouchItemsOfType:@"Org" inMoc:self.managedObjectContext];
 
 	[self.api fetchRepositoriesAndCallback:^(BOOL success) {
+
+		NSAssert([NSThread isMainThread], @"Should be main thread!");
+
 		[self.activityDisplay stopAnimation:self];
 		self.refreshButton.enabled = YES;
 
@@ -80,8 +65,8 @@ static AppDelegate *_static_shared_ref;
 		}
 		else
 		{
-			[Repo nukeUntouchedItemsInMoc:self.managedObjectContext];
-			[Org nukeUntouchedItemsInMoc:self.managedObjectContext];
+			[DataItem nukeUntouchedItemsOfType:@"Repo" inMoc:self.managedObjectContext];
+			[DataItem nukeUntouchedItemsOfType:@"Org" inMoc:self.managedObjectContext];
 			[self.managedObjectContext save:nil];
 			[self.projectsTable reloadData];
 		}
@@ -113,7 +98,6 @@ static AppDelegate *_static_shared_ref;
 
 -(id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-	//TODO: very inefficient, fix
 	NSArray *allRepos = [Repo allReposSortedByField:@"fullName" inMoc:self.managedObjectContext];
 	Repo *r = allRepos[row];
 
@@ -132,9 +116,16 @@ static AppDelegate *_static_shared_ref;
 
 -(NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-	//TODO: very inefficient, fix
+	return [DataItem countItemsOfType:@"Repo" inMoc:self.managedObjectContext];
+}
+
+-(void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+{
 	NSArray *allRepos = [Repo allReposSortedByField:@"fullName" inMoc:self.managedObjectContext];
-	return allRepos.count;
+	Repo *r = allRepos[row];
+	r.active = @([object boolValue]);
+	NSLog(@"Repo %@ is %@",r.fullName,r.active);
+	[self.managedObjectContext save:nil];
 }
 
 /////////////////////////////////// Core Data
@@ -223,12 +214,12 @@ static AppDelegate *_static_shared_ref;
     
     NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
     if (!coordinator) {
-        NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-        [dict setValue:@"Failed to initialize the store" forKey:NSLocalizedDescriptionKey];
-        [dict setValue:@"There was an error building up the data file." forKey:NSLocalizedFailureReasonErrorKey];
-        NSError *error = [NSError errorWithDomain:@"YOUR_ERROR_DOMAIN" code:9999 userInfo:dict];
-        [[NSApplication sharedApplication] presentError:error];
-        return nil;
+
+		NSFileManager *fm = [NSFileManager defaultManager];
+		NSURL *applicationFilesDirectory = [self applicationFilesDirectory];
+		NSURL *url = [applicationFilesDirectory URLByAppendingPathComponent:@"Trailer.storedata"];
+		[fm removeItemAtURL:url error:nil];
+        return self.managedObjectContext;
     }
     _managedObjectContext = [[NSManagedObjectContext alloc] init];
     [_managedObjectContext setPersistentStoreCoordinator:coordinator];
@@ -298,8 +289,129 @@ static AppDelegate *_static_shared_ref;
             return NSTerminateCancel;
         }
     }
-
     return NSTerminateNow;
+}
+
+-(void)windowWillClose:(NSNotification *)notification
+{
+	[self startRefresh];
+}
+
+- (IBAction)refreshNowSelected:(NSMenuItem *)sender
+{
+	NSArray *activeRepos = [Repo activeReposInMoc:self.managedObjectContext];
+	if(activeRepos.count==0)
+	{
+		[self preferencesSelected:nil];
+		return;
+	}
+	[self startRefresh];
+}
+
+-(void)startRefresh
+{
+	NSArray *activeRepos = [Repo activeReposInMoc:self.managedObjectContext];
+	if(activeRepos.count==0) return;
+
+	id oldTarget = self.refreshNow.target;
+	SEL oldAction = self.refreshNow.action;
+	[self.refreshButton setEnabled:NO];
+	[self.projectsTable setEnabled:NO];
+	[self.selectAll setEnabled:NO];
+	[self.clearAll setEnabled:NO];
+	[self.activityDisplay startAnimation:nil];
+	[self.refreshNow setAction:nil];
+	[self.refreshNow setTarget:nil];
+	[self updateStatusItem];
+	[self.api fetchPullRequestsForActiveReposAndCallback:^(BOOL success) {
+		NSArray *pullRequests = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.managedObjectContext];
+		for(PullRequest *r in pullRequests)
+		{
+			NSLog(@"PR '%@' has %ld comments",r.title,[PRComment countCommentsForPullRequestUrl:r.url inMoc:self.managedObjectContext]);
+		}
+		NSLog(@"Done with %ld PRs: %d",pullRequests.count,success);
+		[self.managedObjectContext save:nil];
+		[self.projectsTable reloadData];
+		[self.refreshNow setTarget:oldTarget];
+		[self.refreshNow setAction:oldAction];
+		[self.refreshButton setEnabled:YES];
+		[self.projectsTable setEnabled:YES];
+		[self.selectAll setEnabled:YES];
+		[self.clearAll setEnabled:YES];
+		[self.activityDisplay stopAnimation:nil];
+		[self updateStatusItem];
+	}];
+}
+
+-(void)updateStatusItem
+{
+	NSArray *pullRequests = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.managedObjectContext];
+	NSString *countString;
+	if(self.refreshNow.target)
+	{
+		countString = [NSString stringWithFormat:@"%ld",pullRequests.count];
+	}
+	else
+	{
+		countString = @"...";
+	}
+	NSLog(@"Updating status item with %@ total PRs",countString);
+
+	NSDictionary *attributes = @{
+								 NSFontAttributeName: [NSFont systemFontOfSize:11.0],
+								 NSForegroundColorAttributeName: [NSColor blackColor],
+								 };
+	CGFloat width = [countString sizeWithAttributes:attributes].width;
+
+	CGFloat padding = 3.0;
+	NSStatusBar *statusBar = [NSStatusBar systemStatusBar];
+	CGFloat H = statusBar.thickness;
+	CGFloat length = H+width+padding*3;
+	if(!self.statusItem)
+	{
+		self.statusItem = [statusBar statusItemWithLength:length];
+	}
+	else
+	{
+		self.statusItem.length = length;
+	}
+
+	NSImage *newImage = [[NSImage alloc] initWithSize:CGSizeMake(self.statusItem.length, H)];
+    [newImage lockFocus];
+	NSImage *oldImage = [NSImage imageNamed:NSImageNameApplicationIcon];
+	[oldImage drawInRect:CGRectMake(padding, 0, H, H)
+				fromRect:NSZeroRect
+			   operation:NSCompositeSourceOver
+				fraction:1.0];
+	[countString drawInRect:CGRectMake(H+padding, -5, width, H) withAttributes:attributes];
+    [newImage unlockFocus];
+	[newImage setTemplate:YES];
+
+	self.statusItem.image = newImage;
+	self.statusItem.highlightMode = YES;
+	self.statusItem.menu = self.statusBarMenu;
+}
+
+- (IBAction)selectAllSelected:(NSButton *)sender
+{
+	NSArray *allRepos = [Repo allReposSortedByField:@"fullName" inMoc:self.managedObjectContext];
+	for(Repo *r in allRepos)
+	{
+		r.active = @YES;
+	}
+	[self.managedObjectContext save:nil];
+	[self.projectsTable reloadData];
+}
+
+- (IBAction)clearallSelected:(NSButton *)sender
+{
+	NSArray *allRepos = [Repo allReposSortedByField:@"fullName" inMoc:self.managedObjectContext];
+	for(Repo *r in allRepos)
+	{
+		r.active = @NO;
+	}
+	[self.managedObjectContext save:nil];
+	[self.projectsTable reloadData];
 }
 
 @end

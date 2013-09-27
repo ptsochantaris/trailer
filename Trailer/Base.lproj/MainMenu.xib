@@ -13,16 +13,17 @@
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application"/>
         <window title="Trailer Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="371">
-            <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
-            <rect key="contentRect" x="335" y="390" width="618" height="430"/>
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" resizable="YES"/>
+            <rect key="contentRect" x="335" y="390" width="623" height="433"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1058"/>
+            <value key="minSize" type="size" width="618" height="300"/>
             <view key="contentView" id="372">
-                <rect key="frame" x="0.0" y="0.0" width="618" height="430"/>
+                <rect key="frame" x="0.0" y="0.0" width="623" height="433"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" id="89t-uF-tda" customClass="HTTextField">
-                        <rect key="frame" x="20" y="340" width="583" height="45"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <rect key="frame" x="20" y="343" width="583" height="45"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Paste your GitHub personal access token in here.  Use the links below if you need to view or create one." drawsBackground="YES" id="ZEE-fM-gtZ">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -33,8 +34,8 @@
                         </connections>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="h6W-VN-VYP">
-                        <rect key="frame" x="22" y="393" width="261" height="17"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <rect key="frame" x="22" y="396" width="579" height="17"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="GitHub Personal Access Token" id="0E1-UY-RId">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -42,8 +43,8 @@
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="NVW-TD-xYo">
-                        <rect key="frame" x="22" y="309" width="246" height="17"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <rect key="frame" x="22" y="292" width="579" height="17"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Detected Projects" id="8nI-sT-uHC">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -51,98 +52,124 @@
                         </textFieldCell>
                     </textField>
                     <button verticalHuggingPriority="750" id="GSU-db-DTi">
-                        <rect key="frame" x="273" y="313" width="145" height="19"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="roundRect" title="Create a Token" bezelStyle="roundedRect" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="wKg-tH-ucd">
+                        <rect key="frame" x="273" y="318" width="145" height="17"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="inline" title="Create a Token" bezelStyle="inline" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="wKg-tH-ucd">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="cellTitle"/>
+                            <font key="font" metaFont="smallSystemBold"/>
                         </buttonCell>
                         <connections>
                             <action selector="createTokenSelected:" target="494" id="BZK-PQ-Xt2"/>
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" id="Fq5-gr-JH8">
-                        <rect key="frame" x="426" y="313" width="172" height="19"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="roundRect" title="View Existing Tokens" bezelStyle="roundedRect" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="0Om-2C-nnU">
+                        <rect key="frame" x="426" y="318" width="172" height="17"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="inline" title="View Existing Tokens" bezelStyle="inline" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="0Om-2C-nnU">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="cellTitle"/>
+                            <font key="font" metaFont="smallSystemBold"/>
                         </buttonCell>
                         <connections>
                             <action selector="viewExistingTokensSelected:" target="494" id="tEi-ys-zP0"/>
                         </connections>
                     </button>
-                    <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="81b-Al-upG">
-                        <rect key="frame" x="20" y="46" width="583" height="255"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <clipView key="contentView" id="MfV-1b-a3s">
-                            <rect key="frame" x="1" y="1" width="581" height="253"/>
+                    <button verticalHuggingPriority="750" id="yOJ-6Q-uTn">
+                        <rect key="frame" x="438" y="13" width="171" height="32"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                        <buttonCell key="cell" type="push" title="Refresh Project List" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="yqJ-r5-bjF">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="refreshReposSelected:" target="494" id="AXH-Ry-Hxt"/>
+                        </connections>
+                    </button>
+                    <progressIndicator horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" id="Lax-cU-vqe">
+                        <rect key="frame" x="420" y="22" width="16" height="16"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                    </progressIndicator>
+                    <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="yLA-OX-5oO">
+                        <rect key="frame" x="20" y="46" width="583" height="238"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <clipView key="contentView" id="xVQ-Jm-WCh">
+                            <rect key="frame" x="1" y="1" width="581" height="236"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="firstColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" id="UQe-ld-ZHk">
-                                    <rect key="frame" x="0.0" y="0.0" width="585" height="253"/>
+                                <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="firstColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" id="eB0-Bq-YR9">
+                                    <rect key="frame" x="0.0" y="0.0" width="581" height="236"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                    <tableViewGridLines key="gridStyleMask" vertical="YES"/>
                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                     <tableColumns>
-                                        <tableColumn editable="NO" width="582" minWidth="10" maxWidth="3.4028234663852886e+38" id="t3P-gE-UYH">
-                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Project">
+                                        <tableColumn width="578" minWidth="40" maxWidth="1000" id="BfG-Q4-Cru">
+                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" white="0.33333298560000002" alpha="1" colorSpace="calibratedWhite"/>
                                             </tableHeaderCell>
-                                            <buttonCell key="dataCell" type="check" title="Check" bezelStyle="regularSquare" imagePosition="left" inset="2" id="tHK-Ys-gqM">
+                                            <buttonCell key="dataCell" type="check" title="Check" bezelStyle="regularSquare" imagePosition="left" inset="2" id="tjv-bA-Rv4">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
-                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
+                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                         </tableColumn>
                                     </tableColumns>
                                     <connections>
-                                        <outlet property="dataSource" destination="494" id="HTF-sM-zZp"/>
-                                        <outlet property="delegate" destination="494" id="jTB-Tr-IYr"/>
+                                        <outlet property="dataSource" destination="494" id="7rk-iw-jCK"/>
+                                        <outlet property="delegate" destination="494" id="QvO-HA-XrK"/>
                                     </connections>
                                 </tableView>
                             </subviews>
                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </clipView>
-                        <scroller key="horizontalScroller" verticalHuggingPriority="750" id="HHf-Yf-GNS">
-                            <rect key="frame" x="1" y="238" width="581" height="16"/>
+                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" id="7GP-vt-nA3">
+                            <rect key="frame" x="1" y="119" width="223" height="15"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
-                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" id="bys-Qw-4Xt">
-                            <rect key="frame" x="-15" y="1" width="16" height="0.0"/>
+                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" id="ykC-8P-IkG">
+                            <rect key="frame" x="224" y="17" width="15" height="102"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
-                    <button verticalHuggingPriority="750" id="yOJ-6Q-uTn">
-                        <rect key="frame" x="522" y="13" width="82" height="32"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="push" title="Refresh" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="yqJ-r5-bjF">
+                    <button verticalHuggingPriority="750" id="2jy-CL-3Vb">
+                        <rect key="frame" x="20" y="19" width="86" height="23"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <buttonCell key="cell" type="smallSquare" title="Select All" bezelStyle="smallSquare" imagePosition="overlaps" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Oae-is-B8W">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="system"/>
+                            <font key="font" metaFont="smallSystem"/>
                         </buttonCell>
                         <connections>
-                            <action selector="refreshSelected:" target="494" id="6bh-8A-i12"/>
+                            <action selector="selectAllSelected:" target="494" id="igy-6z-eBu"/>
                         </connections>
                     </button>
-                    <progressIndicator horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" id="Lax-cU-vqe">
-                        <rect key="frame" x="504" y="22" width="16" height="16"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    </progressIndicator>
+                    <button verticalHuggingPriority="750" id="5Sj-ma-EM3">
+                        <rect key="frame" x="114" y="19" width="86" height="23"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <buttonCell key="cell" type="smallSquare" title="Clear All" bezelStyle="smallSquare" imagePosition="overlaps" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="rEk-uE-pmd">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="smallSystem"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="clearallSelected:" target="494" id="hnN-DO-FeG"/>
+                        </connections>
+                    </button>
                 </subviews>
             </view>
+            <connections>
+                <outlet property="delegate" destination="494" id="wwK-Xp-Xzn"/>
+            </connections>
         </window>
         <customObject id="494" customClass="AppDelegate">
             <connections>
                 <outlet property="activityDisplay" destination="Lax-cU-vqe" id="jxh-1P-ph0"/>
+                <outlet property="clearAll" destination="5Sj-ma-EM3" id="4Lh-JS-ceA"/>
                 <outlet property="githubToken" destination="89t-uF-tda" id="6wu-ad-Od5"/>
                 <outlet property="preferencesWindow" destination="371" id="uYB-yu-610"/>
-                <outlet property="projectTable" destination="81b-Al-upG" id="6L6-Zp-AlR"/>
-                <outlet property="projectsTable" destination="UQe-ld-ZHk" id="fh7-Ax-OFx"/>
+                <outlet property="projectsTable" destination="eB0-Bq-YR9" id="kuh-DJ-Kls"/>
                 <outlet property="refreshButton" destination="yOJ-6Q-uTn" id="TDk-eM-0Yi"/>
+                <outlet property="refreshNow" destination="asb-Mc-b5c" id="aSx-vn-F0X"/>
+                <outlet property="selectAll" destination="2jy-CL-3Vb" id="2lW-dU-CAb"/>
                 <outlet property="statusBarMenu" destination="6Oo-9b-EZK" id="hGN-O1-h3u"/>
                 <outlet property="tokenHolder" destination="89t-uF-tda" id="FrU-nv-0AM"/>
             </connections>
@@ -150,6 +177,11 @@
         <customObject id="420" customClass="NSFontManager"/>
         <menu title="Trailer" id="6Oo-9b-EZK">
             <items>
+                <menuItem title="Refresh Now" keyEquivalent="r" id="asb-Mc-b5c">
+                    <connections>
+                        <action selector="refreshNowSelected:" target="494" id="AiB-dg-t4e"/>
+                    </connections>
+                </menuItem>
                 <menuItem title="Preferences" keyEquivalent="," id="ema-aQ-DlW">
                     <connections>
                         <action selector="preferencesSelected:" target="494" id="9b1-6c-3Wx"/>

@@ -6,7 +6,8 @@
 //  Copyright (c) 2013 HouseTrip. All rights reserved.
 //
 
-@interface AppDelegate : NSObject <NSApplicationDelegate,NSTableViewDelegate,NSTableViewDataSource>
+@interface AppDelegate : NSObject <NSApplicationDelegate,
+NSTableViewDelegate, NSTableViewDataSource, NSWindowDelegate>
 
 @property (readonly, strong, nonatomic) NSPersistentStoreCoordinator *persistentStoreCoordinator;
 @property (readonly, strong, nonatomic) NSManagedObjectModel *managedObjectModel;
@@ -21,6 +22,9 @@
 @property (weak) IBOutlet NSTextField *tokenHolder;
 @property (weak) IBOutlet NSProgressIndicator *activityDisplay;
 @property (weak) IBOutlet NSTableView *projectsTable;
+@property (weak) IBOutlet NSMenuItem *refreshNow;
+@property (weak) IBOutlet NSButton *clearAll;
+@property (weak) IBOutlet NSButton *selectAll;
 
 +(AppDelegate*)shared;
 
