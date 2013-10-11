@@ -272,9 +272,20 @@
 	AFHTTPRequestOperation *o = [client HTTPRequestOperationWithRequest:request
 																success:^(AFHTTPRequestOperation *operation, id responseObject) {
 																	NSDictionary *data = [NSJSONSerialization JSONObjectWithData:responseObject options:0 error:nil];
-																	NSString *requestsRemaining = [operation.response allHeaderFields][@"X-RateLimit-Remaining"];
+																	long long requestsRemaining = [[operation.response allHeaderFields][@"X-RateLimit-Remaining"] longLongValue];
+																	long long requestLimit = [[operation.response allHeaderFields][@"X-RateLimit-Limit"] longLongValue];
+																	long long epochSeconds = [[operation.response allHeaderFields][@"X-RateLimit-Reset"] longLongValue];
+																	NSDate *date = [NSDate dateWithTimeIntervalSince1970:epochSeconds];
+																	NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+																	formatter.dateStyle = NSDateFormatterMediumStyle;
+																	formatter.timeStyle = NSDateFormatterMediumStyle;
+																	self.resetDate = [formatter stringFromDate:date];
 																	NSLog(@"Success %@",data);
-																	NSLog(@"Remaining requests: %@",requestsRemaining);
+																	NSLog(@"Remaining requests: %lld/%lld",requestsRemaining,requestLimit);
+																	[[NSNotificationCenter defaultCenter] postNotificationName:RATE_UPDATE_NOTIFICATION
+																														object:nil
+																													  userInfo:@{ RATE_UPDATE_NOTIFICATION_LIMIT_KEY: @(requestLimit),
+																																  RATE_UPDATE_NOTIFICATION_REMAINING_KEY: @(requestsRemaining) }];
 																	if(callback) callback(responseObject, [API lastPage:operation.response]);
 																} failure:^(AFHTTPRequestOperation *operation, NSError *error) {
 																	NSLog(@"Failed: %@",error);

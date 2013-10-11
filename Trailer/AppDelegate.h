@@ -6,6 +6,8 @@
 //  Copyright (c) 2013 HouseTrip. All rights reserved.
 //
 
+#define LOW_API_WARNING 1000
+
 @interface AppDelegate : NSObject <NSApplicationDelegate,
 NSTableViewDelegate, NSTableViewDataSource, NSWindowDelegate>
 
@@ -25,6 +27,7 @@ NSTableViewDelegate, NSTableViewDataSource, NSWindowDelegate>
 @property (weak) IBOutlet NSMenuItem *refreshNow;
 @property (weak) IBOutlet NSButton *clearAll;
 @property (weak) IBOutlet NSButton *selectAll;
+@property (weak) IBOutlet NSProgressIndicator *apiLoad;
 
 +(AppDelegate*)shared;
 

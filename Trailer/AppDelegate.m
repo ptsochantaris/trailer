@@ -29,10 +29,23 @@ static AppDelegate *_static_shared_ref;
 
 	self.api = [[API alloc] init];
 
+	[self.apiLoad setIndeterminate:YES];
+	[self.apiLoad stopAnimation:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(apiUsageUpdate:) name:RATE_UPDATE_NOTIFICATION object:nil];
+
 	if(!self.githubToken)
 	{
 		[self preferencesSelected:nil];
 	}
+}
+
+- (void)apiUsageUpdate:(NSNotification *)n
+{
+	[self.apiLoad setIndeterminate:NO];
+	long long remaining = [n.userInfo[RATE_UPDATE_NOTIFICATION_REMAINING_KEY] longLongValue];
+	long long limit = [n.userInfo[RATE_UPDATE_NOTIFICATION_LIMIT_KEY] longLongValue];
+	self.apiLoad.maxValue = limit;
+	self.apiLoad.doubleValue = limit-remaining;
 }
 
 - (IBAction)refreshReposSelected:(NSButton *)sender {
@@ -164,7 +177,7 @@ static AppDelegate *_static_shared_ref;
         NSLog(@"%@:%@ No model to generate a store from", [self class], NSStringFromSelector(_cmd));
         return nil;
     }
-    
+
     NSFileManager *fileManager = [NSFileManager defaultManager];
     NSURL *applicationFilesDirectory = [self applicationFilesDirectory];
     NSError *error = nil;
@@ -299,6 +312,22 @@ static AppDelegate *_static_shared_ref;
 
 - (IBAction)refreshNowSelected:(NSMenuItem *)sender
 {
+	if(self.apiLoad.maxValue-self.apiLoad.doubleValue==0)
+	{
+        NSAlert *alert = [[NSAlert alloc] init];
+        [alert setMessageText:@"Your API request usage is over the limit!"];
+        [alert setInformativeText:[NSString stringWithFormat:@"Your request cannot be completed until GitHub resets your hourly API allowance at %@.  If you get this error often, try to make fewer manual refreshes or reducing the number of repos you are monitoring.  You can check your API usage at any time from the bottom of the preferences pane.",self.api.resetDate]];
+        [alert addButtonWithTitle:@"OK"];
+		return;
+	}
+	// TODO: need to initialize this in the API when the app launches / preferences screen is opened
+	if((self.apiLoad.maxValue-self.apiLoad.doubleValue)<LOW_API_WARNING)
+	{
+        NSAlert *alert = [[NSAlert alloc] init];
+        [alert setMessageText:@"Your API request usage is getting very high"];
+        [alert setInformativeText:[NSString stringWithFormat:@"Try to make fewer manual refreshes or reducing the number of repos you are monitoring.  Your allowance will be reset at %@, and you can check your API usage from the bottom of the preferences pane.",self.api.resetDate]];
+        [alert addButtonWithTitle:@"OK"];
+	}
 	NSArray *activeRepos = [Repo activeReposInMoc:self.managedObjectContext];
 	if(activeRepos.count==0)
 	{

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="4510" systemVersion="12F37" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="4510" systemVersion="12F45" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment defaultVersion="1080" identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="4510"/>
@@ -14,15 +14,15 @@
         <customObject id="-3" userLabel="Application"/>
         <window title="Trailer Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="371">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" resizable="YES"/>
-            <rect key="contentRect" x="335" y="390" width="623" height="433"/>
+            <rect key="contentRect" x="335" y="390" width="623" height="463"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1058"/>
             <value key="minSize" type="size" width="618" height="300"/>
             <view key="contentView" id="372">
-                <rect key="frame" x="0.0" y="0.0" width="623" height="433"/>
+                <rect key="frame" x="0.0" y="0.0" width="623" height="463"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" id="89t-uF-tda" customClass="HTTextField">
-                        <rect key="frame" x="20" y="343" width="583" height="45"/>
+                        <rect key="frame" x="20" y="373" width="583" height="45"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Paste your GitHub personal access token in here.  Use the links below if you need to view or create one." drawsBackground="YES" id="ZEE-fM-gtZ">
                             <font key="font" metaFont="system"/>
@@ -34,7 +34,7 @@
                         </connections>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="h6W-VN-VYP">
-                        <rect key="frame" x="22" y="396" width="579" height="17"/>
+                        <rect key="frame" x="22" y="426" width="579" height="17"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="GitHub Personal Access Token" id="0E1-UY-RId">
                             <font key="font" metaFont="system"/>
@@ -43,7 +43,7 @@
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="NVW-TD-xYo">
-                        <rect key="frame" x="22" y="292" width="579" height="17"/>
+                        <rect key="frame" x="22" y="322" width="579" height="17"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Detected Projects" id="8nI-sT-uHC">
                             <font key="font" metaFont="system"/>
@@ -52,7 +52,7 @@
                         </textFieldCell>
                     </textField>
                     <button verticalHuggingPriority="750" id="GSU-db-DTi">
-                        <rect key="frame" x="273" y="318" width="145" height="17"/>
+                        <rect key="frame" x="273" y="348" width="145" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="inline" title="Create a Token" bezelStyle="inline" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="wKg-tH-ucd">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -63,7 +63,7 @@
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" id="Fq5-gr-JH8">
-                        <rect key="frame" x="426" y="318" width="172" height="17"/>
+                        <rect key="frame" x="426" y="348" width="172" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="inline" title="View Existing Tokens" bezelStyle="inline" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="0Om-2C-nnU">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -74,9 +74,9 @@
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" id="yOJ-6Q-uTn">
-                        <rect key="frame" x="438" y="13" width="171" height="32"/>
+                        <rect key="frame" x="438" y="43" width="171" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                        <buttonCell key="cell" type="push" title="Refresh Project List" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="yqJ-r5-bjF">
+                        <buttonCell key="cell" type="push" title="Load Project List" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="yqJ-r5-bjF">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
@@ -85,11 +85,11 @@
                         </connections>
                     </button>
                     <progressIndicator horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" id="Lax-cU-vqe">
-                        <rect key="frame" x="420" y="22" width="16" height="16"/>
+                        <rect key="frame" x="420" y="52" width="16" height="16"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                     </progressIndicator>
                     <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="yLA-OX-5oO">
-                        <rect key="frame" x="20" y="46" width="583" height="238"/>
+                        <rect key="frame" x="20" y="76" width="583" height="238"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="xVQ-Jm-WCh">
                             <rect key="frame" x="1" y="1" width="581" height="236"/>
@@ -133,7 +133,7 @@
                         </scroller>
                     </scrollView>
                     <button verticalHuggingPriority="750" id="2jy-CL-3Vb">
-                        <rect key="frame" x="20" y="19" width="86" height="23"/>
+                        <rect key="frame" x="20" y="49" width="86" height="23"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <buttonCell key="cell" type="smallSquare" title="Select All" bezelStyle="smallSquare" imagePosition="overlaps" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Oae-is-B8W">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -144,7 +144,7 @@
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" id="5Sj-ma-EM3">
-                        <rect key="frame" x="114" y="19" width="86" height="23"/>
+                        <rect key="frame" x="114" y="49" width="86" height="23"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <buttonCell key="cell" type="smallSquare" title="Clear All" bezelStyle="smallSquare" imagePosition="overlaps" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="rEk-uE-pmd">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -154,8 +154,22 @@
                             <action selector="clearallSelected:" target="494" id="hnN-DO-FeG"/>
                         </connections>
                     </button>
+                    <progressIndicator maxValue="100" style="bar" id="U6L-MC-3fm">
+                        <rect key="frame" x="440" y="6" width="177" height="20"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                    </progressIndicator>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="zJk-LE-3Vm">
+                        <rect key="frame" x="5" y="9" width="430" height="14"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="GitHub API allowance for this hour:" id="W7K-PJ-GMI">
+                            <font key="font" size="11" name="LucidaGrande"/>
+                            <color key="textColor" name="windowFrameTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
                 </subviews>
             </view>
+            <contentBorderThickness minY="32"/>
             <connections>
                 <outlet property="delegate" destination="494" id="wwK-Xp-Xzn"/>
             </connections>
@@ -163,6 +177,7 @@
         <customObject id="494" customClass="AppDelegate">
             <connections>
                 <outlet property="activityDisplay" destination="Lax-cU-vqe" id="jxh-1P-ph0"/>
+                <outlet property="apiLoad" destination="U6L-MC-3fm" id="oYJ-81-Ywn"/>
                 <outlet property="clearAll" destination="5Sj-ma-EM3" id="4Lh-JS-ceA"/>
                 <outlet property="githubToken" destination="89t-uF-tda" id="6wu-ad-Od5"/>
                 <outlet property="preferencesWindow" destination="371" id="uYB-yu-610"/>
