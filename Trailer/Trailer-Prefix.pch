@@ -19,5 +19,6 @@
 	#import "Org.h"
 	#import "Repo.h"
 	#import "PullRequest.h"
+	#import "PRItemView.h"
 	#import "AppDelegate.h"
 #endif

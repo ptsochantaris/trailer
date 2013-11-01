@@ -29,14 +29,87 @@ static AppDelegate *_static_shared_ref;
 
 	self.api = [[API alloc] init];
 
-	[self.apiLoad setIndeterminate:YES];
-	[self.apiLoad stopAnimation:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(apiUsageUpdate:) name:RATE_UPDATE_NOTIFICATION object:nil];
+	[self startRateLimitHandling];
 
 	if(!self.githubToken)
 	{
 		[self preferencesSelected:nil];
 	}
+
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(defaultsUpdated)
+												 name:NSUserDefaultsDidChangeNotification
+											   object:nil];
+}
+
+- (IBAction)myPrTitleSelected:(NSMenuItem *)sender {}
+
+- (NSInteger)buildPrMenuItems
+{
+	NSInteger newCount = 0;
+	if(!self.prMenuItems)
+	{
+		self.prMenuItems = [NSMutableArray array];
+	}
+	else
+	{
+		for(NSMenuItem *i in self.prMenuItems)
+		{
+			[self.statusBarMenu removeItem:i];
+		}
+		[self.prMenuItems removeAllObjects];
+	}
+
+	NSArray *pullRequests = [PullRequest sortedPullRequestsInMoc:self.managedObjectContext];
+	NSInteger index=6;
+	for(PullRequest *r in pullRequests)
+	{
+		NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:r.title action:@selector(prSelected:) keyEquivalent:@""];
+		PRItemView *itemView = [[PRItemView alloc] initWithFrame:CGRectZero];
+		[itemView setPullRequest:r];
+		newCount += [r unreadCommentCount];
+		item.view = itemView;
+		[self.statusBarMenu insertItem:item atIndex:index++];
+		[self.prMenuItems addObject:item];
+	}
+	return newCount;
+}
+
+- (void)prSelected:(NSMenuItem *)item
+{
+	NSArray *pullRequests = [PullRequest sortedPullRequestsInMoc:self.managedObjectContext];
+	NSInteger index = [self.prMenuItems indexOfObject:item];
+	PullRequest *r = [pullRequests objectAtIndex:index];
+	NSWorkspace *ws = [NSWorkspace sharedWorkspace];
+	[ws openURL:[NSURL URLWithString:r.webUrl]];
+	[r catchUpWithComments];
+	[self updateStatusItem];
+}
+
+- (void)defaultsUpdated
+{
+	if(self.api.localUser)
+		self.userNameLabel.stringValue = self.api.localUser;
+	else
+		self.userNameLabel.stringValue = @"...";
+}
+
+- (void)startRateLimitHandling
+{
+	[self.apiLoad setIndeterminate:YES];
+	[self.apiLoad stopAnimation:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(apiUsageUpdate:) name:RATE_UPDATE_NOTIFICATION object:nil];
+	[self.api getRateLimitAndCallback:^(long long remaining, long long limit, long long reset) {
+		if(reset>=0)
+		{
+			[[NSNotificationCenter defaultCenter] postNotificationName:RATE_UPDATE_NOTIFICATION
+																object:nil
+															  userInfo:@{
+																		 RATE_UPDATE_NOTIFICATION_LIMIT_KEY:@(limit),
+																		 RATE_UPDATE_NOTIFICATION_REMAINING_KEY:@(remaining)
+																		 }];
+		}
+	}];
 }
 
 - (void)apiUsageUpdate:(NSNotification *)n
@@ -312,6 +385,18 @@ static AppDelegate *_static_shared_ref;
 
 - (IBAction)refreshNowSelected:(NSMenuItem *)sender
 {
+	[self checkApiUsage];
+	NSArray *activeRepos = [Repo activeReposInMoc:self.managedObjectContext];
+	if(activeRepos.count==0)
+	{
+		[self preferencesSelected:nil];
+		return;
+	}
+	[self startRefresh];
+}
+
+- (void)checkApiUsage
+{
 	if(self.apiLoad.maxValue-self.apiLoad.doubleValue==0)
 	{
         NSAlert *alert = [[NSAlert alloc] init];
@@ -320,7 +405,6 @@ static AppDelegate *_static_shared_ref;
         [alert addButtonWithTitle:@"OK"];
 		return;
 	}
-	// TODO: need to initialize this in the API when the app launches / preferences screen is opened
 	if((self.apiLoad.maxValue-self.apiLoad.doubleValue)<LOW_API_WARNING)
 	{
         NSAlert *alert = [[NSAlert alloc] init];
@@ -328,13 +412,6 @@ static AppDelegate *_static_shared_ref;
         [alert setInformativeText:[NSString stringWithFormat:@"Try to make fewer manual refreshes or reducing the number of repos you are monitoring.  Your allowance will be reset at %@, and you can check your API usage from the bottom of the preferences pane.",self.api.resetDate]];
         [alert addButtonWithTitle:@"OK"];
 	}
-	NSArray *activeRepos = [Repo activeReposInMoc:self.managedObjectContext];
-	if(activeRepos.count==0)
-	{
-		[self preferencesSelected:nil];
-		return;
-	}
-	[self startRefresh];
 }
 
 -(void)startRefresh
@@ -374,7 +451,7 @@ static AppDelegate *_static_shared_ref;
 
 -(void)updateStatusItem
 {
-	NSArray *pullRequests = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.managedObjectContext];
+	NSArray *pullRequests = [PullRequest sortedPullRequestsInMoc:self.managedObjectContext];
 	NSString *countString;
 	if(self.refreshNow.target)
 	{
@@ -386,10 +463,24 @@ static AppDelegate *_static_shared_ref;
 	}
 	NSLog(@"Updating status item with %@ total PRs",countString);
 
-	NSDictionary *attributes = @{
-								 NSFontAttributeName: [NSFont systemFontOfSize:11.0],
-								 NSForegroundColorAttributeName: [NSColor blackColor],
-								 };
+	NSInteger newCommentCount = [self buildPrMenuItems];
+
+	NSDictionary *attributes;
+	if(newCommentCount)
+	{
+		attributes = @{
+					   NSFontAttributeName: [NSFont systemFontOfSize:11.0],
+					   NSForegroundColorAttributeName: [NSColor blackColor],
+					   };
+	}
+	else
+	{
+		attributes = @{
+					   NSFontAttributeName: [NSFont systemFontOfSize:11.0],
+					   NSForegroundColorAttributeName: [NSColor blackColor],
+					   };
+	}
+
 	CGFloat width = [countString sizeWithAttributes:attributes].width;
 
 	CGFloat padding = 3.0;

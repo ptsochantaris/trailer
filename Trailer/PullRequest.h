@@ -18,7 +18,15 @@
 @property (nonatomic, retain) NSDate * updatedAt;
 @property (nonatomic, retain) NSNumber * serverId;
 @property (nonatomic, retain) NSNumber * touched;
+@property (nonatomic, retain) NSString * webUrl;
+@property (nonatomic, retain) NSNumber * userId;
+@property (nonatomic, retain) NSDate * latestReadCommentDate;
 
 +(PullRequest *)pullRequestWithInfo:(NSDictionary*)info moc:(NSManagedObjectContext *)moc;
++(PullRequest *)pullRequestWithUrl:(NSString *)url moc:(NSManagedObjectContext *)moc;
++(NSArray *)sortedPullRequestsInMoc:(NSManagedObjectContext *)moc;
++(NSArray *)userPullRequestsInMoc:(NSManagedObjectContext *)moc;
+-(NSInteger)unreadCommentCount;
+-(void)catchUpWithComments;
 
 @end

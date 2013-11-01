@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="4510" systemVersion="12F45" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="4514" systemVersion="13A603" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment defaultVersion="1080" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="4510"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="4514"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -34,7 +34,7 @@
                         </connections>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="h6W-VN-VYP">
-                        <rect key="frame" x="22" y="426" width="579" height="17"/>
+                        <rect key="frame" x="22" y="426" width="245" height="17"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="GitHub Personal Access Token" id="0E1-UY-RId">
                             <font key="font" metaFont="system"/>
@@ -123,11 +123,11 @@
                             </subviews>
                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </clipView>
-                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" id="7GP-vt-nA3">
+                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="7GP-vt-nA3">
                             <rect key="frame" x="1" y="119" width="223" height="15"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
-                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" id="ykC-8P-IkG">
+                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="ykC-8P-IkG">
                             <rect key="frame" x="224" y="17" width="15" height="102"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
@@ -167,6 +167,15 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="VGc-Yu-S5G">
+                        <rect key="frame" x="271" y="426" width="334" height="17"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" id="amf-71-XJB">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
                 </subviews>
             </view>
             <contentBorderThickness minY="32"/>
@@ -187,6 +196,7 @@
                 <outlet property="selectAll" destination="2jy-CL-3Vb" id="2lW-dU-CAb"/>
                 <outlet property="statusBarMenu" destination="6Oo-9b-EZK" id="hGN-O1-h3u"/>
                 <outlet property="tokenHolder" destination="89t-uF-tda" id="FrU-nv-0AM"/>
+                <outlet property="userNameLabel" destination="VGc-Yu-S5G" id="Mza-Jv-2Ra"/>
             </connections>
         </customObject>
         <customObject id="420" customClass="NSFontManager"/>
@@ -197,15 +207,23 @@
                         <action selector="refreshNowSelected:" target="494" id="AiB-dg-t4e"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Preferences" keyEquivalent="," id="ema-aQ-DlW">
+                <menuItem isSeparatorItem="YES" id="oLo-7b-4X9"/>
+                <menuItem title="Preferences..." keyEquivalent="," id="ema-aQ-DlW">
                     <connections>
                         <action selector="preferencesSelected:" target="494" id="9b1-6c-3Wx"/>
                     </connections>
                 </menuItem>
-                <menuItem isSeparatorItem="YES" id="tmV-pE-4oW"/>
                 <menuItem title="Quit" keyEquivalent="q" id="xhW-2g-EH2">
                     <connections>
                         <action selector="terminate:" target="-3" id="gtT-oj-rNC"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="Dp3-UA-4lw"/>
+                <menuItem title="My Pull Requests" id="Jee-zJ-Hxd">
+                    <attributedString key="attributedTitle"/>
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="myPrTitleSelected:" target="494" id="cQz-u3-sCg"/>
                     </connections>
                 </menuItem>
             </items>

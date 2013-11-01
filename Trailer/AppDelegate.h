@@ -28,6 +28,9 @@ NSTableViewDelegate, NSTableViewDataSource, NSWindowDelegate>
 @property (weak) IBOutlet NSButton *clearAll;
 @property (weak) IBOutlet NSButton *selectAll;
 @property (weak) IBOutlet NSProgressIndicator *apiLoad;
+@property (weak) IBOutlet NSTextField *userNameLabel;
+
+@property (strong) NSMutableArray *prMenuItems;
 
 +(AppDelegate*)shared;
 
