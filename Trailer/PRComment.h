@@ -9,7 +9,7 @@
 @interface PRComment : DataItem
 
 @property (nonatomic, retain) NSNumber * serverId;
-@property (nonatomic, retain) NSNumber * touched;
+@property (nonatomic, retain) NSNumber * postSyncAction;
 @property (nonatomic, retain) NSDate * updatedAt;
 @property (nonatomic, retain) NSNumber * position;
 @property (nonatomic, retain) NSString * body;
@@ -17,6 +17,7 @@
 @property (nonatomic, retain) NSString * path;
 @property (nonatomic, retain) NSString * url;
 @property (nonatomic, retain) NSString * pullRequestUrl;
+@property (nonatomic, retain) NSNumber * userId;
 
 +(PRComment *)commentWithInfo:(NSDictionary *)info moc:(NSManagedObjectContext *)moc;
 

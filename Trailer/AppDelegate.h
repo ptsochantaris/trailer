@@ -7,21 +7,28 @@
 //
 
 #define LOW_API_WARNING 1000
+#define REFRESH_PERIOD 60.0
+
+typedef enum {
+	kNewComment,
+	kNewPr,
+	kPrMerged
+} PRNotificationType;
 
 @interface AppDelegate : NSObject <NSApplicationDelegate,
-NSTableViewDelegate, NSTableViewDataSource, NSWindowDelegate>
+NSTableViewDelegate, NSTableViewDataSource, NSWindowDelegate,
+NSUserNotificationCenterDelegate, NSMenuDelegate>
 
 @property (readonly, strong, nonatomic) NSPersistentStoreCoordinator *persistentStoreCoordinator;
 @property (readonly, strong, nonatomic) NSManagedObjectModel *managedObjectModel;
 @property (readonly, strong, nonatomic) NSManagedObjectContext *managedObjectContext;
 @property (unsafe_unretained) IBOutlet NSWindow *preferencesWindow;
 
-@property (nonatomic) NSStatusItem *statusItem;
 @property (nonatomic) API *api;
+@property (nonatomic) NSStatusItem *statusItem;
 @property (weak) IBOutlet NSButton *refreshButton;
-@property (weak) IBOutlet NSTextField *githubToken;
+@property (weak) IBOutlet NSTextField *githubTokenHolder;
 @property (weak) IBOutlet NSMenu *statusBarMenu;
-@property (weak) IBOutlet NSTextField *tokenHolder;
 @property (weak) IBOutlet NSProgressIndicator *activityDisplay;
 @property (weak) IBOutlet NSTableView *projectsTable;
 @property (weak) IBOutlet NSMenuItem *refreshNow;
@@ -29,9 +36,15 @@ NSTableViewDelegate, NSTableViewDataSource, NSWindowDelegate>
 @property (weak) IBOutlet NSButton *selectAll;
 @property (weak) IBOutlet NSProgressIndicator *apiLoad;
 @property (weak) IBOutlet NSTextField *userNameLabel;
+@property (weak) IBOutlet NSTextField *versionNumber;
+@property (weak) NSTimer *refreshTimer;
+@property (weak) IBOutlet NSButton *launchAtStartup;
 
 @property (strong) NSMutableArray *prMenuItems;
+@property (strong) NSDate *lastSuccessfulRefresh;
 
 +(AppDelegate*)shared;
+
+-(void)postNotificationOfType:(PRNotificationType)type forPr:(PullRequest*)pullRequest infoText:(NSString*)infoText;
 
 @end

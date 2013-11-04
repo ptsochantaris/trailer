@@ -14,15 +14,15 @@
         <customObject id="-3" userLabel="Application"/>
         <window title="Trailer Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="371">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" resizable="YES"/>
-            <rect key="contentRect" x="335" y="390" width="623" height="463"/>
+            <rect key="contentRect" x="335" y="390" width="623" height="480"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1058"/>
             <value key="minSize" type="size" width="618" height="300"/>
             <view key="contentView" id="372">
-                <rect key="frame" x="0.0" y="0.0" width="623" height="463"/>
+                <rect key="frame" x="0.0" y="0.0" width="623" height="480"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" id="89t-uF-tda" customClass="HTTextField">
-                        <rect key="frame" x="20" y="373" width="583" height="45"/>
+                        <rect key="frame" x="20" y="390" width="583" height="45"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Paste your GitHub personal access token in here.  Use the links below if you need to view or create one." drawsBackground="YES" id="ZEE-fM-gtZ">
                             <font key="font" metaFont="system"/>
@@ -34,7 +34,7 @@
                         </connections>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="h6W-VN-VYP">
-                        <rect key="frame" x="22" y="426" width="245" height="17"/>
+                        <rect key="frame" x="22" y="443" width="245" height="17"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="GitHub Personal Access Token" id="0E1-UY-RId">
                             <font key="font" metaFont="system"/>
@@ -43,7 +43,7 @@
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="NVW-TD-xYo">
-                        <rect key="frame" x="22" y="322" width="579" height="17"/>
+                        <rect key="frame" x="22" y="334" width="579" height="17"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Detected Projects" id="8nI-sT-uHC">
                             <font key="font" metaFont="system"/>
@@ -52,7 +52,7 @@
                         </textFieldCell>
                     </textField>
                     <button verticalHuggingPriority="750" id="GSU-db-DTi">
-                        <rect key="frame" x="273" y="348" width="145" height="17"/>
+                        <rect key="frame" x="273" y="365" width="145" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="inline" title="Create a Token" bezelStyle="inline" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="wKg-tH-ucd">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -63,7 +63,7 @@
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" id="Fq5-gr-JH8">
-                        <rect key="frame" x="426" y="348" width="172" height="17"/>
+                        <rect key="frame" x="426" y="365" width="172" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="inline" title="View Existing Tokens" bezelStyle="inline" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="0Om-2C-nnU">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -74,7 +74,7 @@
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" id="yOJ-6Q-uTn">
-                        <rect key="frame" x="438" y="43" width="171" height="32"/>
+                        <rect key="frame" x="438" y="79" width="171" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                         <buttonCell key="cell" type="push" title="Load Project List" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="yqJ-r5-bjF">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -85,18 +85,18 @@
                         </connections>
                     </button>
                     <progressIndicator horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" id="Lax-cU-vqe">
-                        <rect key="frame" x="420" y="52" width="16" height="16"/>
+                        <rect key="frame" x="420" y="88" width="16" height="16"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                     </progressIndicator>
                     <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="yLA-OX-5oO">
-                        <rect key="frame" x="20" y="76" width="583" height="238"/>
+                        <rect key="frame" x="20" y="115" width="583" height="211"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" id="xVQ-Jm-WCh">
-                            <rect key="frame" x="1" y="1" width="581" height="236"/>
+                            <rect key="frame" x="1" y="1" width="581" height="209"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="firstColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" id="eB0-Bq-YR9">
-                                    <rect key="frame" x="0.0" y="0.0" width="581" height="236"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="581" height="209"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -133,7 +133,7 @@
                         </scroller>
                     </scrollView>
                     <button verticalHuggingPriority="750" id="2jy-CL-3Vb">
-                        <rect key="frame" x="20" y="49" width="86" height="23"/>
+                        <rect key="frame" x="20" y="85" width="86" height="23"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <buttonCell key="cell" type="smallSquare" title="Select All" bezelStyle="smallSquare" imagePosition="overlaps" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Oae-is-B8W">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -144,7 +144,7 @@
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" id="5Sj-ma-EM3">
-                        <rect key="frame" x="114" y="49" width="86" height="23"/>
+                        <rect key="frame" x="114" y="85" width="86" height="23"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <buttonCell key="cell" type="smallSquare" title="Clear All" bezelStyle="smallSquare" imagePosition="overlaps" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="rEk-uE-pmd">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -163,12 +163,12 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="GitHub API allowance for this hour:" id="W7K-PJ-GMI">
                             <font key="font" size="11" name="LucidaGrande"/>
-                            <color key="textColor" name="windowFrameTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="VGc-Yu-S5G">
-                        <rect key="frame" x="271" y="426" width="334" height="17"/>
+                        <rect key="frame" x="271" y="443" width="334" height="17"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" id="amf-71-XJB">
                             <font key="font" metaFont="system"/>
@@ -176,6 +176,26 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="SrS-Tc-X7C">
+                        <rect key="frame" x="10" y="5" width="228" height="17"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Version" id="hkc-v6-9Jd">
+                            <font key="font" size="11" name="LucidaGrande"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <button id="qqE-Ib-sQ9">
+                        <rect key="frame" x="18" y="50" width="587" height="18"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <buttonCell key="cell" type="check" title="Start Trailer Automatically at Login" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="yY0-OR-yEh">
+                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="launchAtStartSelected:" target="494" id="VGh-YQ-O2f"/>
+                        </connections>
+                    </button>
                 </subviews>
             </view>
             <contentBorderThickness minY="32"/>
@@ -188,7 +208,8 @@
                 <outlet property="activityDisplay" destination="Lax-cU-vqe" id="jxh-1P-ph0"/>
                 <outlet property="apiLoad" destination="U6L-MC-3fm" id="oYJ-81-Ywn"/>
                 <outlet property="clearAll" destination="5Sj-ma-EM3" id="4Lh-JS-ceA"/>
-                <outlet property="githubToken" destination="89t-uF-tda" id="6wu-ad-Od5"/>
+                <outlet property="githubTokenHolder" destination="89t-uF-tda" id="XIm-D3-9YE"/>
+                <outlet property="launchAtStartup" destination="qqE-Ib-sQ9" id="brX-S8-Ge0"/>
                 <outlet property="preferencesWindow" destination="371" id="uYB-yu-610"/>
                 <outlet property="projectsTable" destination="eB0-Bq-YR9" id="kuh-DJ-Kls"/>
                 <outlet property="refreshButton" destination="yOJ-6Q-uTn" id="TDk-eM-0Yi"/>
@@ -197,23 +218,26 @@
                 <outlet property="statusBarMenu" destination="6Oo-9b-EZK" id="hGN-O1-h3u"/>
                 <outlet property="tokenHolder" destination="89t-uF-tda" id="FrU-nv-0AM"/>
                 <outlet property="userNameLabel" destination="VGc-Yu-S5G" id="Mza-Jv-2Ra"/>
+                <outlet property="versionNumber" destination="SrS-Tc-X7C" id="RSu-YF-jmY"/>
             </connections>
         </customObject>
         <customObject id="420" customClass="NSFontManager"/>
         <menu title="Trailer" id="6Oo-9b-EZK">
             <items>
-                <menuItem title="Refresh Now" keyEquivalent="r" id="asb-Mc-b5c">
+                <menuItem title="Refresh" id="asb-Mc-b5c">
+                    <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="refreshNowSelected:" target="494" id="AiB-dg-t4e"/>
                     </connections>
                 </menuItem>
-                <menuItem isSeparatorItem="YES" id="oLo-7b-4X9"/>
-                <menuItem title="Preferences..." keyEquivalent="," id="ema-aQ-DlW">
+                <menuItem title="Preferences..." id="ema-aQ-DlW">
+                    <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="preferencesSelected:" target="494" id="9b1-6c-3Wx"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Quit" keyEquivalent="q" id="xhW-2g-EH2">
+                <menuItem title="Quit" id="xhW-2g-EH2">
+                    <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="terminate:" target="-3" id="gtT-oj-rNC"/>
                     </connections>
@@ -222,9 +246,10 @@
                 <menuItem title="My Pull Requests" id="Jee-zJ-Hxd">
                     <attributedString key="attributedTitle"/>
                     <modifierMask key="keyEquivalentModifierMask"/>
-                    <connections>
-                        <action selector="myPrTitleSelected:" target="494" id="cQz-u3-sCg"/>
-                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="Tj9-mi-KRl"/>
+                <menuItem title="All Pull Requests" id="kOK-Ep-UgN">
+                    <modifierMask key="keyEquivalentModifierMask"/>
                 </menuItem>
             </items>
         </menu>

@@ -9,7 +9,8 @@
 @implementation DataItem
 
 @dynamic serverId;
-@dynamic touched;
+@dynamic postSyncAction;
+@dynamic createdAt;
 @dynamic updatedAt;
 
 static NSDateFormatter *_syncDateFormatter;
@@ -50,32 +51,33 @@ static NSDateFormatter *_syncDateFormatter;
 		NSLog(@"Creating new %@: %@",type,serverId);
 		existingItem = [NSEntityDescription insertNewObjectForEntityForName:type inManagedObjectContext:moc];
 		existingItem.serverId = serverId;
-		existingItem.touched = @(kTouchedNew);
+		existingItem.createdAt = [_syncDateFormatter dateFromString:info[@"created_at"]];
+		existingItem.postSyncAction = @(kTouchedNew);
 	}
 	else if([updatedDate compare:existingItem.updatedAt]==NSOrderedDescending)
 	{
 		NSLog(@"Updating existing %@: %@",type,serverId);
-		existingItem.touched = @(kTouchedUpdated);
+		existingItem.postSyncAction = @(kTouchedUpdated);
 	}
 	else
 	{
 		NSLog(@"Skipping %@: %@",type,serverId);
-		existingItem.touched = @(kTouchedSkipped);
+		existingItem.postSyncAction = @(kTouchedNone);
 	}
 	existingItem.updatedAt = updatedDate;
 	return existingItem;
 }
 
-+(NSArray*)itemsOfType:(NSString *)type touched:(BOOL)touched inMoc:(NSManagedObjectContext *)moc
++(NSArray*)itemsOfType:(NSString *)type surviving:(BOOL)survivingItems inMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:type];
-	if(touched)
+	if(survivingItems)
 	{
-		f.predicate = [NSPredicate predicateWithFormat:@"touched != %d",kTouchedNo];
+		f.predicate = [NSPredicate predicateWithFormat:@"postSyncAction != %d",kTouchedDelete];
 	}
 	else
 	{
-		f.predicate = [NSPredicate predicateWithFormat:@"touched = %d",kTouchedNo];
+		f.predicate = [NSPredicate predicateWithFormat:@"postSyncAction = %d",kTouchedDelete];
 	}
 	return [moc executeFetchRequest:f error:nil];
 }
@@ -83,14 +85,21 @@ static NSDateFormatter *_syncDateFormatter;
 +(NSArray*)newOrUpdatedItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:type];
-	f.predicate = [NSPredicate predicateWithFormat:@"touched = %d or touched = %d",kTouchedNew,kTouchedUpdated];
+	f.predicate = [NSPredicate predicateWithFormat:@"postSyncAction = %d or postSyncAction = %d",kTouchedNew,kTouchedUpdated];
 	return [moc executeFetchRequest:f error:nil];
 }
 
-+(void)nukeUntouchedItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
++(NSArray *)newItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
 {
-	NSArray *untouchedItems = [self itemsOfType:type touched:NO inMoc:moc];
-	for(Org *i in untouchedItems)
+	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:type];
+	f.predicate = [NSPredicate predicateWithFormat:@"postSyncAction = %d",kTouchedNew];
+	return [moc executeFetchRequest:f error:nil];
+}
+
++(void)nukeDeletedItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
+{
+	NSArray *untouchedItems = [self itemsOfType:type surviving:NO inMoc:moc];
+	for(DataItem *i in untouchedItems)
 	{
 		NSLog(@"Nuking %@: %@",type,i.serverId);
 		[moc deleteObject:i];
@@ -98,16 +107,43 @@ static NSDateFormatter *_syncDateFormatter;
 	NSLog(@"Nuked %lu %@ items",untouchedItems.count,type);
 }
 
-+(void)unTouchItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
++(void)assumeWilldeleteItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
 {
-	NSArray *touchedItems = [self itemsOfType:type touched:YES inMoc:moc];
-	for(DataItem *i in touchedItems) i.touched = @(kTouchedNo);
+	NSArray *touchedItems = [self itemsOfType:type surviving:YES inMoc:moc];
+	for(DataItem *i in touchedItems) i.postSyncAction = @(kTouchedDelete);
 }
 
 +(NSUInteger)countItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:type];
 	return [moc countForFetchRequest:f error:nil];
+}
+
++ (void)deleteAllObjectsInContext:(NSManagedObjectContext *)context
+                       usingModel:(NSManagedObjectModel *)model
+{
+    NSArray *entities = model.entities;
+    for (NSEntityDescription *entityDescription in entities) {
+        [self deleteAllObjectsWithEntityName:entityDescription.name
+                                   inContext:context];
+    }
+}
+
++ (void)deleteAllObjectsWithEntityName:(NSString *)entityName
+                             inContext:(NSManagedObjectContext *)context
+{
+    NSFetchRequest *fetchRequest =
+	[NSFetchRequest fetchRequestWithEntityName:entityName];
+    fetchRequest.includesPropertyValues = NO;
+    fetchRequest.includesSubentities = NO;
+
+    NSError *error;
+    NSArray *items = [context executeFetchRequest:fetchRequest error:&error];
+
+    for (NSManagedObject *managedObject in items) {
+        [context deleteObject:managedObject];
+        NSLog(@"Deleted %@", entityName);
+    }
 }
 
 @end

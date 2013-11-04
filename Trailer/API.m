@@ -26,7 +26,6 @@
 		client = [AFHTTPClient clientWithBaseURL:[NSURL URLWithString:@"https://api.github.com"]];
 		[client setDefaultHeader:@"User-Agent" value:@"Trailer"];
 		[client setDefaultHeader:@"Content-Type" value:@"application/x-www-form-urlencoded"];
-		[client setDefaultHeader:@"Authorization" value:[@"token " stringByAppendingString:self.authToken]];
     }
     return self;
 }
@@ -58,7 +57,7 @@
 	for(PullRequest *r in prs1)
 	{
 		NSArray *comments = [PRComment commentsForPullRequestUrl:r.url inMoc:moc];
-		for(PRComment *c in comments) c.touched = @(kTouchedNo);
+		for(PRComment *c in comments) c.postSyncAction = @(kTouchedDelete);
 	}
 
 	[self _fetchCommentsForPullRequests:prs1 forIssues:YES andCallback:^(BOOL success) {
@@ -66,7 +65,7 @@
 		{
 			NSMutableArray *prs2 = [[DataItem newOrUpdatedItemsOfType:@"PullRequest" inMoc:moc] mutableCopy];
 			[self _fetchCommentsForPullRequests:prs2 forIssues:NO andCallback:^(BOOL success) {
-				[DataItem nukeUntouchedItemsOfType:@"PRComment" inMoc:moc];
+				[DataItem nukeDeletedItemsOfType:@"PRComment" inMoc:moc];
 				if(callback) callback(success);
 			}];
 		}
@@ -105,7 +104,7 @@
 					 if(!c.pullRequestUrl) c.pullRequestUrl = p.url;
 
 					 // check if we're assigned to a new pull request, in which case we want to "fast forward" its latest comment dates to our own if we're newer
-					 if(p.touched.integerValue == kTouchedNew)
+					 if(p.postSyncAction.integerValue == kTouchedNew)
 					 {
 						 if(!p.latestReadCommentDate || [p.latestReadCommentDate compare:c.updatedAt]==NSOrderedAscending)
 							 p.latestReadCommentDate = c.updatedAt;
@@ -170,13 +169,13 @@
 		if(success)
 		{
 			NSManagedObjectContext *moc = [AppDelegate shared].managedObjectContext;
-			[DataItem unTouchItemsOfType:@"PullRequest" inMoc:moc];
+			[DataItem assumeWilldeleteItemsOfType:@"PullRequest" inMoc:moc];
 			NSMutableArray *activeRepos = [[Repo activeReposInMoc:moc] mutableCopy];
 			[self _fetchPullRequestsForRepos:activeRepos andCallback:^(BOOL success) {
 				if(success)
 				{
 					[self fetchCommentsForCurrentPullRequestsAndCallback:^(BOOL success) {
-						[DataItem nukeUntouchedItemsOfType:@"PullRequest" inMoc:moc];
+						[DataItem nukeDeletedItemsOfType:@"PullRequest" inMoc:moc];
 						if(callback) callback(success);
 					}];
 				}
@@ -202,7 +201,6 @@
 				 NSArray *pageOfPRs = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
 				 for(NSDictionary *info in pageOfPRs)
 				 {
-
 					 [PullRequest pullRequestWithInfo:info moc:[AppDelegate shared].managedObjectContext];
 				 }
 			 } finalCallback:^(BOOL success) {
@@ -269,6 +267,7 @@
 					NSDictionary *userRecord = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
 					[[NSUserDefaults standardUserDefaults] setObject:[userRecord ofk:@"login"] forKey:USER_NAME_KEY];
 					[[NSUserDefaults standardUserDefaults] setObject:[userRecord ofk:@"id"] forKey:USER_ID_KEY];
+					[[NSUserDefaults standardUserDefaults] synchronize];
 					if(callback) callback(YES);
 				}
 				else if(callback) callback(NO);
@@ -323,6 +322,7 @@
 
 -(void)getDataInPath:(NSString*)path params:(NSDictionary*)params andCallback:(void(^)(id data, BOOL lastPage))callback
 {
+	[client setDefaultHeader:@"Authorization" value:[@"token " stringByAppendingString:self.authToken]];
 	NSMutableURLRequest *request = [client requestWithMethod:@"GET" path:path parameters:params];
 	AFHTTPRequestOperation *o = [client HTTPRequestOperationWithRequest:request
 																success:^(AFHTTPRequestOperation *operation, id responseObject) {
@@ -346,11 +346,13 @@
 																	NSLog(@"Failed: %@",error);
 																	if(callback) callback(nil,NO);
 																}];
+	o.threadPriority = 0.1;
 	[client.operationQueue addOperation:o];
 }
 
 -(void)getRateLimitAndCallback:(void (^)(long long, long long, long long))callback
 {
+	[client setDefaultHeader:@"Authorization" value:[@"token " stringByAppendingString:self.authToken]];
 	NSMutableURLRequest *request = [client requestWithMethod:@"GET" path:@"/rate_limit" parameters:nil];
 	AFHTTPRequestOperation *o = [client HTTPRequestOperationWithRequest:request
 																success:^(AFHTTPRequestOperation *operation, id responseObject) {
@@ -361,6 +363,7 @@
 																} failure:^(AFHTTPRequestOperation *operation, NSError *error) {
 																	if(callback) callback(-1, -1, -1);
 																}];
+	o.threadPriority = 0.1;
 	[client.operationQueue addOperation:o];
 }
 

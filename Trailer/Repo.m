@@ -34,4 +34,15 @@
 	return [moc executeFetchRequest:f error:nil];
 }
 
+-(void)prepareForDeletion
+{
+	for(PullRequest *r in [PullRequest allItemsOfType:@"PullRequest" inMoc:self.managedObjectContext])
+	{
+		if([r.repoId isEqualToNumber:self.serverId])
+		{
+			[self.managedObjectContext deleteObject:r];
+		}
+	}
+}
+
 @end

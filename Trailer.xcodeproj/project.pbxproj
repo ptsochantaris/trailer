@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		16075A9717EC7492000D86FD /* API.m in Sources */ = {isa = PBXBuildFile; fileRef = 16075A9617EC7492000D86FD /* API.m */; };
 		16075A9817EC7492000D86FD /* API.m in Sources */ = {isa = PBXBuildFile; fileRef = 16075A9617EC7492000D86FD /* API.m */; };
+		161AB0261827AE5600E6702A /* bell.caf in Resources */ = {isa = PBXBuildFile; fileRef = 161AB0251827AE5600E6702A /* bell.caf */; };
 		161CA3C617F5A55300F4AF6C /* PullRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 161CA3C517F5A55300F4AF6C /* PullRequest.m */; };
 		161CA3C717F5A55300F4AF6C /* PullRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 161CA3C517F5A55300F4AF6C /* PullRequest.m */; };
 		161CA3CA17F5B1F300F4AF6C /* PRComment.m in Sources */ = {isa = PBXBuildFile; fileRef = 161CA3C917F5B1F300F4AF6C /* PRComment.m */; };
@@ -52,6 +53,7 @@
 /* Begin PBXFileReference section */
 		16075A9517EC7492000D86FD /* API.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = API.h; sourceTree = "<group>"; };
 		16075A9617EC7492000D86FD /* API.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = API.m; sourceTree = "<group>"; };
+		161AB0251827AE5600E6702A /* bell.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = bell.caf; sourceTree = "<group>"; };
 		161CA3C417F5A55300F4AF6C /* PullRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PullRequest.h; sourceTree = "<group>"; };
 		161CA3C517F5A55300F4AF6C /* PullRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PullRequest.m; sourceTree = "<group>"; };
 		161CA3C817F5B1F300F4AF6C /* PRComment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PRComment.h; sourceTree = "<group>"; };
@@ -167,6 +169,7 @@
 				16FA683A1823CF4600401E9B /* PRItemView.m */,
 				168BC6C217EC2DF000BC4584 /* MainMenu.xib */,
 				168BC6C817EC2DF000BC4584 /* Images.xcassets */,
+				161AB0251827AE5600E6702A /* bell.caf */,
 				168BC6B417EC2DF000BC4584 /* Supporting Files */,
 			);
 			path = Trailer;
@@ -311,6 +314,7 @@
 				168BC6B817EC2DF000BC4584 /* InfoPlist.strings in Resources */,
 				168BC6C917EC2DF000BC4584 /* Images.xcassets in Resources */,
 				168BC6C417EC2DF000BC4584 /* MainMenu.xib in Resources */,
+				161AB0261827AE5600E6702A /* bell.caf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -9,7 +9,7 @@
 @implementation PRComment
 
 @dynamic serverId;
-@dynamic touched;
+@dynamic postSyncAction;
 @dynamic updatedAt;
 @dynamic position;
 @dynamic body;
@@ -17,6 +17,7 @@
 @dynamic path;
 @dynamic pullRequestUrl;
 @dynamic url;
+@dynamic userId;
 
 +(PRComment *)commentWithInfo:(NSDictionary *)info moc:(NSManagedObjectContext *)moc
 {
@@ -28,6 +29,7 @@
 	c.path = info[@"path"];
 	c.url = info[@"url"];
 	c.userName = info[@"user"][@"userName"];
+	c.userId = info[@"user"][@"id"];
 	c.url = info[@"_links"][@"self"][@"href"];
 	c.pullRequestUrl = info[@"_links"][@"pull_request"][@"href"];
 

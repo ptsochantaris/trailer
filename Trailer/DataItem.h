@@ -6,16 +6,16 @@
 //  Copyright (c) 2013 HouseTrip. All rights reserved.
 //
 
-#define kTouchedNo 0
+#define kTouchedDelete 0
 #define kTouchedNew 1
 #define kTouchedUpdated 2
-#define kTouchedSkipped 3
+#define kTouchedNone 3
 
 @interface DataItem : NSManagedObject
 
 @property (nonatomic, retain) NSNumber * serverId;
-@property (nonatomic, retain) NSNumber * touched;
-@property (nonatomic, retain) NSDate * updatedAt;
+@property (nonatomic, retain) NSNumber * postSyncAction;
+@property (nonatomic, retain) NSDate * updatedAt, * createdAt;
 
 +(id)itemOfType:(NSString*)type serverId:(NSNumber*)serverId moc:(NSManagedObjectContext*)moc;
 
@@ -23,12 +23,19 @@
 
 +(id)itemWithInfo:(NSDictionary*)info type:(NSString*)type moc:(NSManagedObjectContext*)moc;
 
-+(void)unTouchItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc;
++(void)assumeWilldeleteItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc;
 
-+(void)nukeUntouchedItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc;
++(void)nukeDeletedItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc;
 
 +(NSUInteger)countItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc;
 
 +(NSArray*)newOrUpdatedItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc;
 
++(NSArray*)newItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc;
+
++ (void)deleteAllObjectsInContext:(NSManagedObjectContext *)context
+                       usingModel:(NSManagedObjectModel *)model;
+
++ (void)deleteAllObjectsWithEntityName:(NSString *)entityName
+                             inContext:(NSManagedObjectContext *)context;
 @end

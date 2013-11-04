@@ -37,7 +37,7 @@
 								  };
 		_commentCountAttributes = @{
 								 NSFontAttributeName:[NSFont boldSystemFontOfSize:9.0],
-								 NSForegroundColorAttributeName:[NSColor whiteColor],
+								 NSForegroundColorAttributeName:[NSColor blackColor],
 								 NSParagraphStyleAttributeName:p,
 								 };
 		_commentAlertAttributes = @{
@@ -65,7 +65,7 @@
 	{
 		[[NSColor redColor] set];
 
-		CGRect countRect = CGRectMake((27.0-badgeSize)*0.5, (self.bounds.size.height-badgeSize)*0.5, badgeSize, badgeSize);
+		CGRect countRect = CGRectMake((26.0-badgeSize)*0.5, (self.bounds.size.height-badgeSize)*0.5, badgeSize, badgeSize);
 		CGContextFillEllipseInRect(context, countRect);
 
 		countRect = CGRectOffset(countRect, 0, -2.0);
@@ -77,9 +77,11 @@
 
 	if(_commentsTotal)
 	{
-		[[NSColor lightGrayColor] set];
+		[[NSColor colorWithRed:0.9 green:0.9 blue:0.9 alpha:1.0] set];
 
-		CGRect countRect = CGRectMake(23.0+(25.0-badgeSize)*0.5, (self.bounds.size.height-badgeSize)*0.5, badgeSize, badgeSize);
+		CGFloat offset = 24.0;
+		if(_commentsNew==0) offset=15.0;
+		CGRect countRect = CGRectMake(offset+(25.0-badgeSize)*0.5, (self.bounds.size.height-badgeSize)*0.5, badgeSize, badgeSize);
 		CGContextFillEllipseInRect(context, countRect);
 
 		countRect = CGRectOffset(countRect, 0, -2.0);
@@ -103,7 +105,15 @@
 - (void)setPullRequest:(PullRequest *)pullRequest
 {
 	_commentsTotal = [PRComment countCommentsForPullRequestUrl:pullRequest.url inMoc:[AppDelegate shared].managedObjectContext];
-	_commentsNew = [pullRequest unreadCommentCount];
+	if(pullRequest.isMine)
+	{
+		_commentsNew = [pullRequest unreadCommentCount];
+		_commentsTotal -= _commentsNew;
+	}
+	else
+	{
+		_commentsNew = 0;
+	}
 	_title = pullRequest.title;
 	CGRect titleSize = [_title boundingRectWithSize:CGSizeMake(450, FLT_MAX)
 											options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
