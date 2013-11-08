@@ -53,7 +53,8 @@
 	Repo *parent = [Repo itemOfType:@"Repo" serverId:self.repoId moc:self.managedObjectContext];
 	if(parent && parent.postSyncAction.integerValue!=kTouchedDelete && self.isMine)
 	{
-		[[AppDelegate shared] postNotificationOfType:kPrMerged forPr:self infoText:nil];
+		// closed (assuming merged, since we don't have any more info about it)
+		[[AppDelegate shared] postNotificationOfType:kPrMerged forItem:self];
 	}
 	[PRComment removeCommentsWithPullRequestURL:self.url inMoc:self.managedObjectContext];
 }
@@ -65,7 +66,13 @@
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
 	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestUrl == %@ and updatedAt > %@",self.url,self.latestReadCommentDate];
 	NSArray *res = [self.managedObjectContext executeFetchRequest:f error:nil];
-	return res.count;
+
+	NSInteger unreadCount = 0;
+	for(PRComment *c in res)
+		if(!c.isMine)
+			unreadCount++;
+
+	return unreadCount;
 }
 
 +(PullRequest *)pullRequestWithUrl:(NSString *)url moc:(NSManagedObjectContext *)moc
@@ -92,13 +99,16 @@
 
 -(BOOL)isMine
 {
-	long long localUserId = [AppDelegate shared].api.localUserId.longLongValue;
-	if(self.userId.longLongValue == localUserId) return YES;
+	return [self.userId.stringValue isEqualToString:[AppDelegate shared].api.localUserId];
+}
+
+-(BOOL)commentedByMe
+{
 	for(PRComment *c in [PRComment commentsForPullRequestUrl:self.url inMoc:self.managedObjectContext])
-	{
-		if(c.userId.longLongValue == localUserId) return YES;
-	}
+		if(c.isMine)
+			return YES;
 	return NO;
+
 }
 
 @end

@@ -29,5 +29,6 @@
 -(NSInteger)unreadCommentCount;
 -(void)catchUpWithComments;
 -(BOOL)isMine;
+-(BOOL)commentedByMe;
 
 @end

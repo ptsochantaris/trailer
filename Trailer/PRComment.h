@@ -17,6 +17,7 @@
 @property (nonatomic, retain) NSString * path;
 @property (nonatomic, retain) NSString * url;
 @property (nonatomic, retain) NSString * pullRequestUrl;
+@property (nonatomic, retain) NSString * webUrl;
 @property (nonatomic, retain) NSNumber * userId;
 
 +(PRComment *)commentWithInfo:(NSDictionary *)info moc:(NSManagedObjectContext *)moc;
@@ -26,5 +27,7 @@
 +(NSInteger)countCommentsForPullRequestUrl:(NSString *)url inMoc:(NSManagedObjectContext *)moc;
 
 +(NSArray *)commentsForPullRequestUrl:(NSString *)url inMoc:(NSManagedObjectContext *)moc;
+
+-(BOOL)isMine;
 
 @end

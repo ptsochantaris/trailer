@@ -230,6 +230,12 @@
                         <action selector="refreshNowSelected:" target="494" id="AiB-dg-t4e"/>
                     </connections>
                 </menuItem>
+                <menuItem title="Check for Updates..." id="Et1-0X-3Hd">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="checkForUpdates:" target="vff-Bf-GFU" id="rl2-3O-Pjc"/>
+                    </connections>
+                </menuItem>
                 <menuItem title="Preferences..." id="ema-aQ-DlW">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
@@ -248,10 +254,15 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="Tj9-mi-KRl"/>
+                <menuItem title="Participated Pull Requests" id="hSi-Ya-PqL">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="CKy-ko-PSY"/>
                 <menuItem title="All Pull Requests" id="kOK-Ep-UgN">
                     <modifierMask key="keyEquivalentModifierMask"/>
                 </menuItem>
             </items>
         </menu>
+        <customObject id="vff-Bf-GFU" customClass="SUUpdater"/>
     </objects>
 </document>

@@ -26,8 +26,6 @@ static AppDelegate *_static_shared_ref;
 
 	self.api = [[API alloc] init];
 
-	[self controlTextDidChange:nil];
-
 	[self updateStatusItem];
 
 	[self startRateLimitHandling];
@@ -69,6 +67,9 @@ static AppDelegate *_static_shared_ref;
 	return YES;
 }
 
+#define PULL_REQUEST_ID_KEY @"pullRequestIdKey"
+#define COMMENT_ID_KEY @"commentIdKey"
+
 -(void)userNotificationCenter:(NSUserNotificationCenter *)center didActivateNotification:(NSUserNotification *)notification
 {
 	switch (notification.activationType)
@@ -77,10 +78,25 @@ static AppDelegate *_static_shared_ref;
 		{
 			[[NSUserNotificationCenter defaultUserNotificationCenter] removeDeliveredNotification:notification];
 
-			PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:notification.userInfo[@"serverId"] moc:self.managedObjectContext];
-			NSWorkspace *ws = [NSWorkspace sharedWorkspace];
-			[ws openURL:[NSURL URLWithString:r.webUrl]];
-			[r catchUpWithComments];
+			NSString *urlToOpen = nil;
+			NSNumber *itemId = notification.userInfo[PULL_REQUEST_ID_KEY];
+			PullRequest *pullRequest = nil;
+			if(itemId) // it's a pull request
+			{
+				pullRequest = [PullRequest itemOfType:@"PullRequest" serverId:itemId moc:self.managedObjectContext];
+				urlToOpen = pullRequest.webUrl;
+			}
+			else // it's a comment
+			{
+				itemId = notification.userInfo[COMMENT_ID_KEY];
+				PRComment *c = [PRComment itemOfType:@"PRComment" serverId:itemId moc:self.managedObjectContext];
+				urlToOpen = c.webUrl;
+				pullRequest = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:self.managedObjectContext];
+			}
+
+			[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlToOpen]];
+			[pullRequest catchUpWithComments];
+
 			[self updateStatusItem];
 
 			break;
@@ -89,32 +105,39 @@ static AppDelegate *_static_shared_ref;
 	}
 }
 
--(void)postNotificationOfType:(PRNotificationType)type forPr:(PullRequest*)pullRequest infoText:(NSString*)infoText
+-(void)postNotificationOfType:(PRNotificationType)type forItem:(id)item
 {
 	NSUserNotification *notification = [[NSUserNotification alloc] init];
-	switch (type) {
+
+	switch (type)
+	{
 		case kNewComment:
 		{
 			notification.title = @"New PR Comment";
-			// info text should have the comment text
+			notification.informativeText = [item body];
+			PullRequest *associatedRequest = [PullRequest pullRequestWithUrl:[item pullRequestUrl]
+																		 moc:self.managedObjectContext];
+			notification.subtitle = associatedRequest.title;
+			notification.userInfo = @{COMMENT_ID_KEY:[item serverId]};
 			break;
 		}
 		case kNewPr:
 		{
 			notification.title = @"New PR";
+			notification.userInfo = @{PULL_REQUEST_ID_KEY:[item serverId]};
+			notification.subtitle = [item title];
 			break;
 		}
 		case kPrMerged:
 		{
 			notification.title = @"PR Merged!";
+			notification.userInfo = @{PULL_REQUEST_ID_KEY:[item serverId]};
+			notification.subtitle = [item title];
 			break;
 		}
 	}
 
-	notification.subtitle = pullRequest.title;
-	notification.informativeText = infoText;
     notification.soundName = @"bell.caf";
-	notification.userInfo = @{@"serverId":pullRequest.serverId};
     [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
 }
 
@@ -137,7 +160,7 @@ static AppDelegate *_static_shared_ref;
 	}
 
 	NSArray *pullRequests = [PullRequest sortedPullRequestsInMoc:self.managedObjectContext];
-	NSInteger allIndex=7, myIndex=5;
+	NSInteger myIndex=6, commentedIndex = 8, allIndex=10;
 	for(PullRequest *r in pullRequests)
 	{
 		NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:r.title action:@selector(prSelected:) keyEquivalent:@""];
@@ -147,6 +170,12 @@ static AppDelegate *_static_shared_ref;
 		if(r.isMine)
 		{
 			[self.statusBarMenu insertItem:item atIndex:myIndex++];
+			newCount += [r unreadCommentCount];
+			commentedIndex++;
+		}
+		else if(r.commentedByMe)
+		{
+			[self.statusBarMenu insertItem:item atIndex:commentedIndex++];
 			newCount += [r unreadCommentCount];
 		}
 		else
@@ -164,8 +193,7 @@ static AppDelegate *_static_shared_ref;
 	NSArray *pullRequests = [PullRequest sortedPullRequestsInMoc:self.managedObjectContext];
 	NSInteger index = [self.prMenuItems indexOfObject:item];
 	PullRequest *r = [pullRequests objectAtIndex:index];
-	NSWorkspace *ws = [NSWorkspace sharedWorkspace];
-	[ws openURL:[NSURL URLWithString:r.webUrl]];
+	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:r.webUrl]];
 	[r catchUpWithComments];
 	[self updateStatusItem];
 }
@@ -210,22 +238,13 @@ static AppDelegate *_static_shared_ref;
 
 - (IBAction)refreshReposSelected:(NSButton *)sender
 {
+	[self prepareForRefresh];
 	[self controlTextDidChange:nil];
-	[self.activityDisplay startAnimation:self];
-	self.refreshButton.enabled = NO;
 
 	[DataItem assumeWilldeleteItemsOfType:@"Repo" inMoc:self.managedObjectContext];
 	[DataItem assumeWilldeleteItemsOfType:@"Org" inMoc:self.managedObjectContext];
 
 	[self.api fetchRepositoriesAndCallback:^(BOOL success) {
-
-		NSAssert([NSThread isMainThread], @"Should be main thread!");
-
-		[self.activityDisplay stopAnimation:self];
-		self.refreshButton.enabled = YES;
-
-		NSArray *allRepos = [Repo allItemsOfType:@"Repo" inMoc:self.managedObjectContext];
-		NSLog(@"now monitoring %lu repos",allRepos.count);
 
 		if(!success)
 		{
@@ -238,29 +257,42 @@ static AppDelegate *_static_shared_ref;
 		{
 			[DataItem nukeDeletedItemsOfType:@"Repo" inMoc:self.managedObjectContext];
 			[DataItem nukeDeletedItemsOfType:@"Org" inMoc:self.managedObjectContext];
-			[self.managedObjectContext save:nil];
-			[self.projectsTable reloadData];
 		}
+		[self completeRefresh];
 	}];
 }
 
 -(void)controlTextDidChange:(NSNotification *)obj
 {
-	NSUserDefaults *d = [NSUserDefaults standardUserDefaults];
-	if([self.githubTokenHolder stringValue].length>0)
+	NSString *newToken = [self.githubTokenHolder.stringValue stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	NSString *oldToken = self.api.authToken;
+	if(newToken.length>0)
 	{
 		self.refreshButton.enabled = YES;
-		[d setObject:self.githubTokenHolder.stringValue forKey:GITHUB_TOKEN_KEY];
+		self.api.authToken = newToken;
 	}
 	else
 	{
 		self.refreshButton.enabled = NO;
-		[d removeObjectForKey:GITHUB_TOKEN_KEY];
+		self.api.authToken = nil;
 	}
-	[d synchronize];
+	if(newToken && oldToken && ![newToken isEqualToString:oldToken])
+	{
+		[self reset];
+	}
 }
 
-- (IBAction)preferencesSelected:(NSMenuItem *)sender {
+- (void)reset
+{
+	self.lastSuccessfulRefresh = nil;
+	[DataItem deleteAllObjectsInContext:self.managedObjectContext
+							 usingModel:self.managedObjectModel];
+	[self.projectsTable reloadData];
+	[self updateStatusItem];
+}
+
+- (IBAction)preferencesSelected:(NSMenuItem *)sender
+{
 	[self.refreshTimer invalidate];
 	self.refreshTimer = nil;
 
@@ -274,14 +306,14 @@ static AppDelegate *_static_shared_ref;
 	[c showWindow:self];
 }
 
-- (IBAction)createTokenSelected:(NSButton *)sender {
-	NSWorkspace * ws = [NSWorkspace sharedWorkspace];
-	[ws openURL:[NSURL URLWithString:@"https://github.com/settings/tokens/new"]];
+- (IBAction)createTokenSelected:(NSButton *)sender
+{
+	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://github.com/settings/tokens/new"]];
 }
 
-- (IBAction)viewExistingTokensSelected:(NSButton *)sender {
-	NSWorkspace * ws = [NSWorkspace sharedWorkspace];
-	[ws openURL:[NSURL URLWithString:@"https://github.com/settings/applications"]];
+- (IBAction)viewExistingTokensSelected:(NSButton *)sender
+{
+	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://github.com/settings/applications"]];
 }
 
 /////////////////////////////////// Repo table
@@ -411,7 +443,8 @@ static AppDelegate *_static_shared_ref;
 		[fm removeItemAtURL:url error:nil];
         return self.managedObjectContext;
     }
-    _managedObjectContext = [[NSManagedObjectContext alloc] init];
+    _managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
+	_managedObjectContext.undoManager = nil;
     [_managedObjectContext setPersistentStoreCoordinator:coordinator];
 
     return _managedObjectContext;
@@ -519,53 +552,59 @@ static AppDelegate *_static_shared_ref;
 	}
 }
 
--(void)startRefresh
+-(void)prepareForRefresh
 {
 	[self.refreshTimer invalidate];
 	self.refreshTimer = nil;
 
-	id oldTarget = self.refreshNow.target;
-	SEL oldAction = self.refreshNow.action;
 	[self.refreshButton setEnabled:NO];
 	[self.projectsTable setEnabled:NO];
 	[self.selectAll setEnabled:NO];
 	[self.clearAll setEnabled:NO];
 	[self.githubTokenHolder setEnabled:NO];
 	[self.activityDisplay startAnimation:nil];
-	self.refreshNow.title = @"Refreshing...";
+	[self updateStatusItem];
+}
+
+-(void)completeRefresh
+{
+	[self.refreshButton setEnabled:YES];
+	[self.projectsTable setEnabled:YES];
+	[self.selectAll setEnabled:YES];
+	[self.githubTokenHolder setEnabled:YES];
+	[self.clearAll setEnabled:YES];
+	[self.activityDisplay stopAnimation:nil];
+	[self.managedObjectContext save:nil];
+	[self.projectsTable reloadData];
+	[self updateStatusItem];
+}
+
+-(void)startRefresh
+{
+	[self prepareForRefresh];
+	id oldTarget = self.refreshNow.target;
+	SEL oldAction = self.refreshNow.action;
+
+	if(self.api.localUser)
+		self.refreshNow.title = [NSString stringWithFormat:@"Refreshing %@...",self.api.localUser];
+	else
+		self.refreshNow.title = @"Refreshing...";
+
 	[self.refreshNow setAction:nil];
 	[self.refreshNow setTarget:nil];
-	[self updateStatusItem];
 	[self.api fetchPullRequestsForActiveReposAndCallback:^(BOOL success) {
-		NSArray *pullRequests = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.managedObjectContext];
-		for(PullRequest *r in pullRequests)
-		{
-			NSLog(@"PR '%@' has %ld comments",r.title,[PRComment countCommentsForPullRequestUrl:r.url inMoc:self.managedObjectContext]);
-		}
-		NSLog(@"Done with %ld PRs: %d",pullRequests.count,success);
-		[self.managedObjectContext save:nil];
-		[self.projectsTable reloadData];
-		[self.refreshNow setTarget:oldTarget];
-		[self.refreshNow setAction:oldAction];
-		[self.refreshButton setEnabled:YES];
-		[self.projectsTable setEnabled:YES];
-		[self.selectAll setEnabled:YES];
-		[self.githubTokenHolder setEnabled:YES];
-		[self.clearAll setEnabled:YES];
-		[self.activityDisplay stopAnimation:nil];
-		[self updateStatusItem];
-		[self sendNotifications];
-		if(success)
-		{
-			self.lastSuccessfulRefresh = [NSDate date];
-		}
-		else
-		{
-			self.refreshNow.title = @"Refresh (last update failed)";
-		}
+		self.refreshNow.target = oldTarget;
+		self.refreshNow.action = oldAction;
+		self.lastUpdateFailed = !success;
+		if(success) self.lastSuccessfulRefresh = [NSDate date];
+		[self completeRefresh];
 		self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:REFRESH_PERIOD target:self selector:@selector(refreshIfApplicable) userInfo:nil repeats:NO];
+		[self sendNotifications];
+		NSLog(@"Refresh done: %d",success);
 	}];
 }
+
+
 
 -(void)refreshIfApplicable
 {
@@ -581,7 +620,7 @@ static AppDelegate *_static_shared_ref;
 	NSArray *latestPrs = [PullRequest newItemsOfType:@"PullRequest" inMoc:self.managedObjectContext];
 	for(PullRequest *r in latestPrs)
 	{
-		[self postNotificationOfType:kNewPr forPr:r infoText:nil];
+		[self postNotificationOfType:kNewPr forItem:r];
 		r.postSyncAction = @(kTouchedNone);
 	}
 
@@ -589,9 +628,12 @@ static AppDelegate *_static_shared_ref;
 	for(PRComment *c in latestComments)
 	{
 		PullRequest *r = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:self.managedObjectContext];
-		if(r.isMine)
+		if(r.isMine || r.commentedByMe)
 		{
-			[self postNotificationOfType:kNewComment forPr:r infoText:c.body];
+			if(![c.userId.stringValue isEqualToString:self.api.localUserId])
+			{
+				[self postNotificationOfType:kNewComment forItem:c];
+			}
 		}
 		c.postSyncAction = @(kTouchedNone);
 	}
@@ -658,11 +700,31 @@ static AppDelegate *_static_shared_ref;
 {
 	if(self.refreshNow.target)
 	{
-		long ago = (long)[[NSDate date] timeIntervalSinceDate:self.lastSuccessfulRefresh];
-		if(ago<10)
-			self.refreshNow.title = @"Refresh (just updated)";
+		NSString *prefix;
+		if(self.api.localUser)
+		{
+			prefix = [NSString stringWithFormat:@"Refresh %@",self.api.localUser];
+		}
 		else
-			self.refreshNow.title = [NSString stringWithFormat:@"Refresh (updated %ld seconds ago)",(long)ago];
+		{
+			prefix = @"Refresh";
+		}
+		if(self.lastUpdateFailed)
+		{
+			self.refreshNow.title = [prefix stringByAppendingString:@" (last update failed!)"];
+		}
+		else
+		{
+			long ago = (long)[[NSDate date] timeIntervalSinceDate:self.lastSuccessfulRefresh];
+			if(ago<10)
+			{
+				self.refreshNow.title = [prefix stringByAppendingString:@" (just updated)"];
+			}
+			else
+			{
+				self.refreshNow.title = [NSString stringWithFormat:@"%@ (updated %ld seconds ago)",prefix,(long)ago];
+			}
+		}
 	}
 }
 
@@ -737,6 +799,7 @@ static AppDelegate *_static_shared_ref;
 			//Resolve the item with URL
 			if (LSSharedFileListItemResolve(itemRef, 0, (CFURLRef*) &url, NULL) == noErr) {
 				NSURL *uu = (__bridge NSURL*)url;
+				NSLog(@"comparing: %@ %@",uu,appPath);
 				if ([[uu path] compare:appPath] == NSOrderedSame){
 					return YES;
 				}

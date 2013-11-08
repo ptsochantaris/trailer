@@ -20,6 +20,7 @@
         <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="userId" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
         <attribute name="userName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="webUrl" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <entity name="PullRequest" representedClassName="PullRequest" syncable="YES">
         <attribute name="body" optional="YES" attributeType="String" syncable="YES"/>

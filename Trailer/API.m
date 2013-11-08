@@ -26,33 +26,45 @@
 		client = [AFHTTPClient clientWithBaseURL:[NSURL URLWithString:@"https://api.github.com"]];
 		[client setDefaultHeader:@"User-Agent" value:@"Trailer"];
 		[client setDefaultHeader:@"Content-Type" value:@"application/x-www-form-urlencoded"];
+		[client setDefaultHeader:@"Authorization" value:[@"token " stringByAppendingString:self.authToken]];
+		client.operationQueue.maxConcurrentOperationCount = 8;
     }
     return self;
 }
 
--(NSString*)authToken
+-(void)storeDefaultValue:(id)value forKey:(NSString *)key
 {
-	return [[NSUserDefaults standardUserDefaults] stringForKey:GITHUB_TOKEN_KEY];
+	NSUserDefaults *d = [NSUserDefaults standardUserDefaults];
+	if(value)
+		[d setObject:value forKey:key];
+	else
+		[d removeObjectForKey:key];
+	[d synchronize];
 }
 
--(NSString *)localUser
+#define GITHUB_TOKEN_KEY @"GITHUB_AUTH_TOKEN"
+-(NSString*)authToken { return [[NSUserDefaults standardUserDefaults] stringForKey:GITHUB_TOKEN_KEY]; }
+-(void)setAuthToken:(NSString *)authToken
 {
-	return [[NSUserDefaults standardUserDefaults] stringForKey:USER_NAME_KEY];
+	[self storeDefaultValue:authToken forKey:GITHUB_TOKEN_KEY];
+	if(authToken) [client setDefaultHeader:@"Authorization" value:[@"token " stringByAppendingString:authToken]];
 }
 
--(NSString *)localUserId
-{
-	return [[NSUserDefaults standardUserDefaults] stringForKey:USER_ID_KEY];
-}
+#define USER_NAME_KEY @"USER_NAME_KEY"
+-(NSString *)localUser { return [[NSUserDefaults standardUserDefaults] stringForKey:USER_NAME_KEY]; }
+-(void)setLocalUser:(NSString *)localUser { [self storeDefaultValue:localUser forKey:USER_NAME_KEY]; }
+
+#define USER_ID_KEY @"USER_ID_KEY"
+-(NSString *)localUserId { return [[NSUserDefaults standardUserDefaults] stringForKey:USER_ID_KEY]; }
+-(void)setLocalUserId:(NSString *)localUserId { [self storeDefaultValue:localUserId forKey:USER_ID_KEY]; }
 
 -(void)error:(NSString*)errorString
 {
 	NSLog(@"Failed to fetch %@",errorString);
 }
 
--(void)fetchCommentsForCurrentPullRequestsAndCallback:(void (^)(BOOL))callback
+-(void)fetchCommentsForCurrentPullRequestsToMoc:(NSManagedObjectContext *)moc andCallback:(void (^)(BOOL))callback
 {
-	NSManagedObjectContext *moc = [AppDelegate shared].managedObjectContext;
 	NSMutableArray *prs1 = [[DataItem newOrUpdatedItemsOfType:@"PullRequest" inMoc:moc] mutableCopy];
 	for(PullRequest *r in prs1)
 	{
@@ -60,67 +72,73 @@
 		for(PRComment *c in comments) c.postSyncAction = @(kTouchedDelete);
 	}
 
-	[self _fetchCommentsForPullRequests:prs1 forIssues:YES andCallback:^(BOOL success) {
-		if(success)
+	NSInteger totalOperations = 2;
+	__block NSInteger succeded = 0;
+	__block NSInteger failed = 0;
+
+	typedef void (^completionBlockType)(BOOL);
+
+	completionBlockType completionCallback = ^(BOOL success){
+		if(success) succeded++; else failed++;
+		if(succeded+failed==totalOperations)
 		{
-			NSMutableArray *prs2 = [[DataItem newOrUpdatedItemsOfType:@"PullRequest" inMoc:moc] mutableCopy];
-			[self _fetchCommentsForPullRequests:prs2 forIssues:NO andCallback:^(BOOL success) {
-				[DataItem nukeDeletedItemsOfType:@"PRComment" inMoc:moc];
-				if(callback) callback(success);
-			}];
+			[DataItem nukeDeletedItemsOfType:@"PRComment" inMoc:moc];
+			if(callback) callback(success);
 		}
-		else
-		{
-			if(callback) callback(NO);
-		}
-	}];
+	};
+
+	[self _fetchCommentsForPullRequestIssues:YES toMoc:moc andCallback:completionCallback];
+
+	[self _fetchCommentsForPullRequestIssues:NO toMoc:moc andCallback:completionCallback];
+
 }
 
--(void)_fetchCommentsForPullRequests:(NSMutableArray *)prs forIssues:(BOOL)issues andCallback:(void(^)(BOOL success))callback
+-(void)_fetchCommentsForPullRequestIssues:(BOOL)issues toMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
 {
+	NSArray *prs = [DataItem newOrUpdatedItemsOfType:@"PullRequest" inMoc:moc];
 	if(!prs.count)
 	{
 		if(callback) callback(YES);
 		return;
 	}
-	PullRequest *p = [prs objectAtIndex:0];
-	[prs removeObjectAtIndex:0];
-	NSString *link;
-	if(issues)
-	{
-		link = p.issueCommentLink;
-	}
-	else
-	{
-		link = p.reviewCommentLink;
-	}
-	[self getPagedDataInPath:link
-					  params:nil
-			 perPageCallback:^(id data, BOOL lastPage) {
-				 NSArray *pageOfComments = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-				 for(NSDictionary *info in pageOfComments)
-				 {
-					 PRComment *c = [PRComment commentWithInfo:info moc:[AppDelegate shared].managedObjectContext];
-					 if(!c.pullRequestUrl) c.pullRequestUrl = p.url;
 
-					 // check if we're assigned to a new pull request, in which case we want to "fast forward" its latest comment dates to our own if we're newer
-					 if(p.postSyncAction.integerValue == kTouchedNew)
+	NSInteger total = prs.count;
+	__block NSInteger succeeded = 0;
+	__block NSInteger failed = 0;
+
+	for(PullRequest *p in prs)
+	{
+		NSString *link;
+		if(issues)
+			link = p.issueCommentLink;
+		else
+			link = p.reviewCommentLink;
+
+		[self getPagedDataInPath:link
+						  params:nil
+				 perPageCallback:^(id data, BOOL lastPage) {
+					 NSArray *pageOfComments = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+					 for(NSDictionary *info in pageOfComments)
 					 {
-						 if(!p.latestReadCommentDate || [p.latestReadCommentDate compare:c.updatedAt]==NSOrderedAscending)
-							 p.latestReadCommentDate = c.updatedAt;
-					 }
+						 PRComment *c = [PRComment commentWithInfo:info moc:moc];
+						 if(!c.pullRequestUrl) c.pullRequestUrl = p.url;
 
-				 }
-			 } finalCallback:^(BOOL success) {
-				 if(success)
-				 {
-					 [self _fetchCommentsForPullRequests:prs forIssues:issues andCallback:callback];
-				 }
-				 else
-				 {
-					 if(callback) callback(NO);
-				 }
-			 }];
+						 // check if we're assigned to a new pull request, in which case we want to "fast forward" its latest comment dates to our own if we're newer
+						 if(p.postSyncAction.integerValue == kTouchedNew)
+						 {
+							 if(!p.latestReadCommentDate || [p.latestReadCommentDate compare:c.updatedAt]==NSOrderedAscending)
+								 p.latestReadCommentDate = c.updatedAt;
+						 }
+
+					 }
+				 } finalCallback:^(BOOL success) {
+					 if(success) succeeded++; else failed++;
+					 if(succeeded+failed==total)
+					 {
+						 callback(failed==0);
+					 }
+				 }];
+	}
 }
 
 -(void)fetchRepositoriesAndCallback:(void(^)(BOOL success))callback
@@ -128,7 +146,11 @@
 	[self syncUserDetailsAndCallback:^(BOOL success) {
 		if(success)
 		{
-			[self syncOrgsAndCallback:^(BOOL success) {
+			NSManagedObjectContext *syncContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
+			syncContext.parentContext = [AppDelegate shared].managedObjectContext;
+			syncContext.undoManager = nil;
+
+			[self syncOrgsToMoc:syncContext andCallback:^(BOOL success) {
 				if(!success)
 				{
 					[self error:@"orgs"];
@@ -136,20 +158,21 @@
 				}
 				else
 				{
-					NSArray *orgs = [Org allItemsOfType:@"Org" inMoc:[AppDelegate shared].managedObjectContext];
+					NSArray *orgs = [Org allItemsOfType:@"Org" inMoc:syncContext];
 					__block NSInteger count=orgs.count;
 					__block BOOL ok = YES;
 					for(Org *r in orgs)
 					{
-						[self syncReposForOrg:r.login andCallback:^(BOOL success) {
+						[self syncReposForOrg:r.login toMoc:syncContext andCallback:^(BOOL success) {
 							count--;
 							if(ok) ok = success;
 							if(count==0)
 							{
-								[self syncReposForUserAndCallback:^(BOOL success) {
+								[self syncReposForUserToMoc:syncContext andCallback:^(BOOL success) {
 									if(ok) ok = success;
 									if(callback)
 									{
+										if(ok) [syncContext save:nil];
 										callback(ok);
 									}
 								}];
@@ -168,14 +191,18 @@
 	[self syncUserDetailsAndCallback:^(BOOL success) {
 		if(success)
 		{
-			NSManagedObjectContext *moc = [AppDelegate shared].managedObjectContext;
-			[DataItem assumeWilldeleteItemsOfType:@"PullRequest" inMoc:moc];
-			NSMutableArray *activeRepos = [[Repo activeReposInMoc:moc] mutableCopy];
-			[self _fetchPullRequestsForRepos:activeRepos andCallback:^(BOOL success) {
+			NSManagedObjectContext *syncContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSConfinementConcurrencyType];
+			syncContext.parentContext = [AppDelegate shared].managedObjectContext;
+			syncContext.undoManager = nil;
+
+			[DataItem assumeWilldeleteItemsOfType:@"PullRequest" inMoc:syncContext];
+			NSMutableArray *activeRepos = [[Repo activeReposInMoc:syncContext] mutableCopy];
+			[self _fetchPullRequestsForRepos:activeRepos toMoc:syncContext andCallback:^(BOOL success) {
 				if(success)
 				{
-					[self fetchCommentsForCurrentPullRequestsAndCallback:^(BOOL success) {
-						[DataItem nukeDeletedItemsOfType:@"PullRequest" inMoc:moc];
+					[self fetchCommentsForCurrentPullRequestsToMoc:syncContext andCallback:^(BOOL success) {
+						[DataItem nukeDeletedItemsOfType:@"PullRequest" inMoc:syncContext];
+						if(success) [syncContext save:nil];
 						if(callback) callback(success);
 					}];
 				}
@@ -186,36 +213,37 @@
 	}];
 }
 
--(void)_fetchPullRequestsForRepos:(NSMutableArray *)repos andCallback:(void(^)(BOOL success))callback
+-(void)_fetchPullRequestsForRepos:(NSMutableArray *)repos toMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
 {
 	if(!repos.count)
 	{
 		if(callback) callback(YES);
 		return;
 	}
-	Repo *r = [repos objectAtIndex:0];
-	[repos removeObjectAtIndex:0];
-	[self getPagedDataInPath:[NSString stringWithFormat:@"/repos/%@/pulls",r.fullName]
-					  params:nil
-			 perPageCallback:^(id data, BOOL lastPage) {
-				 NSArray *pageOfPRs = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-				 for(NSDictionary *info in pageOfPRs)
-				 {
-					 [PullRequest pullRequestWithInfo:info moc:[AppDelegate shared].managedObjectContext];
-				 }
-			 } finalCallback:^(BOOL success) {
-				 if(success)
-				 {
-					 [self _fetchPullRequestsForRepos:repos andCallback:callback];
-				 }
-				 else
-				 {
-					 if(callback) callback(NO);
-				 }
-			 }];
+	NSInteger total = repos.count;
+	__block NSInteger succeeded = 0;
+	__block NSInteger failed = 0;
+	for(Repo *r in repos)
+	{
+		[self getPagedDataInPath:[NSString stringWithFormat:@"/repos/%@/pulls",r.fullName]
+						  params:nil
+				 perPageCallback:^(id data, BOOL lastPage) {
+					 NSArray *pageOfPRs = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+					 for(NSDictionary *info in pageOfPRs)
+					 {
+						 [PullRequest pullRequestWithInfo:info moc:moc];
+					 }
+				 } finalCallback:^(BOOL success) {
+					 if(success) succeeded++; else failed++;
+					 if(succeeded+failed==total)
+					 {
+						 callback(failed==0);
+					 }
+				 }];
+	}
 }
 
--(void)syncReposForUserAndCallback:(void(^)(BOOL success))callback
+-(void)syncReposForUserToMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
 {
 	[self getPagedDataInPath:@"/user/repos"
 					  params:nil
@@ -223,14 +251,14 @@
 				 NSArray *pageOfRepos = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
 				 for(NSDictionary *info in pageOfRepos)
 				 {
-					 [Repo repoWithInfo:info moc:[AppDelegate shared].managedObjectContext];
+					 [Repo repoWithInfo:info moc:moc];
 				 }
 			 } finalCallback:^(BOOL success) {
 				 if(callback) callback(success);
 			 }];
 }
 
--(void)syncReposForOrg:(NSString*)orgLogin andCallback:(void(^)(BOOL success))callback
+-(void)syncReposForOrg:(NSString*)orgLogin toMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
 {
 	[self getPagedDataInPath:[NSString stringWithFormat:@"/orgs/%@/repos",orgLogin]
 					  params:nil
@@ -238,20 +266,20 @@
 				 NSArray *pageOfRepos = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
 				 for(NSDictionary *info in pageOfRepos)
 				 {
-					 [Repo repoWithInfo:info moc:[AppDelegate shared].managedObjectContext];
+					 [Repo repoWithInfo:info moc:moc];
 				 }
 			 } finalCallback:^(BOOL success) {
 				 if(callback) callback(success);
 			 }];
 }
 
--(void)syncOrgsAndCallback:(void(^)(BOOL success))callback
+-(void)syncOrgsToMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
 {
 	[self getPagedDataInPath:@"/user/orgs"
 					  params:nil
 			 perPageCallback:^(id data, BOOL lastPage) {
 				 NSArray *pageOfOrgs = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-				 for(NSDictionary *info in pageOfOrgs) [Org orgWithInfo:info moc:[AppDelegate shared].managedObjectContext];
+				 for(NSDictionary *info in pageOfOrgs) [Org orgWithInfo:info moc:moc];
 			 } finalCallback:^(BOOL success) {
 				 if(callback) callback(success);
 			 }];
@@ -322,11 +350,9 @@
 
 -(void)getDataInPath:(NSString*)path params:(NSDictionary*)params andCallback:(void(^)(id data, BOOL lastPage))callback
 {
-	[client setDefaultHeader:@"Authorization" value:[@"token " stringByAppendingString:self.authToken]];
 	NSMutableURLRequest *request = [client requestWithMethod:@"GET" path:path parameters:params];
 	AFHTTPRequestOperation *o = [client HTTPRequestOperationWithRequest:request
 																success:^(AFHTTPRequestOperation *operation, id responseObject) {
-																	NSDictionary *data = [NSJSONSerialization JSONObjectWithData:responseObject options:0 error:nil];
 																	long long requestsRemaining = [[operation.response allHeaderFields][@"X-RateLimit-Remaining"] longLongValue];
 																	long long requestLimit = [[operation.response allHeaderFields][@"X-RateLimit-Limit"] longLongValue];
 																	long long epochSeconds = [[operation.response allHeaderFields][@"X-RateLimit-Reset"] longLongValue];
@@ -335,15 +361,16 @@
 																	formatter.dateStyle = NSDateFormatterMediumStyle;
 																	formatter.timeStyle = NSDateFormatterMediumStyle;
 																	self.resetDate = [formatter stringFromDate:date];
-																	NSLog(@"Success %@",data);
-																	NSLog(@"Remaining requests: %lld/%lld",requestsRemaining,requestLimit);
+																	//NSDictionary *data = [NSJSONSerialization JSONObjectWithData:responseObject options:0 error:nil];
+																	//NSLog(@"Success %@",data);
+																	//NSLog(@"Remaining requests: %lld/%lld",requestsRemaining,requestLimit);
 																	[[NSNotificationCenter defaultCenter] postNotificationName:RATE_UPDATE_NOTIFICATION
 																														object:nil
 																													  userInfo:@{ RATE_UPDATE_NOTIFICATION_LIMIT_KEY: @(requestLimit),
 																																  RATE_UPDATE_NOTIFICATION_REMAINING_KEY: @(requestsRemaining) }];
 																	if(callback) callback(responseObject, [API lastPage:operation.response]);
 																} failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-																	NSLog(@"Failed: %@",error);
+																	NSLog(@"Failure: %@",error);
 																	if(callback) callback(nil,NO);
 																}];
 	o.threadPriority = 0.1;
@@ -352,7 +379,6 @@
 
 -(void)getRateLimitAndCallback:(void (^)(long long, long long, long long))callback
 {
-	[client setDefaultHeader:@"Authorization" value:[@"token " stringByAppendingString:self.authToken]];
 	NSMutableURLRequest *request = [client requestWithMethod:@"GET" path:@"/rate_limit" parameters:nil];
 	AFHTTPRequestOperation *o = [client HTTPRequestOperationWithRequest:request
 																success:^(AFHTTPRequestOperation *operation, id responseObject) {

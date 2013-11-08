@@ -27,6 +27,10 @@
 		168BC6D117EC2DF000BC4584 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 168BC6AD17EC2DF000BC4584 /* Cocoa.framework */; };
 		168BC6D917EC2DF000BC4584 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 168BC6D717EC2DF000BC4584 /* InfoPlist.strings */; };
 		168BC6DB17EC2DF000BC4584 /* TrailerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 168BC6DA17EC2DF000BC4584 /* TrailerTests.m */; };
+		16B94067182D051700F32061 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16B94066182D051700F32061 /* Sparkle.framework */; };
+		16B94068182D051F00F32061 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16B94066182D051700F32061 /* Sparkle.framework */; };
+		16B9406B182D078C00F32061 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 16B94066182D051700F32061 /* Sparkle.framework */; };
+		16B94072182D136700F32061 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 16B94070182D136700F32061 /* dsa_pub.pem */; };
 		16B9553117EC89520005118F /* Org.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B9553017EC89520005118F /* Org.m */; };
 		16B9553217EC89520005118F /* Org.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B9553017EC89520005118F /* Org.m */; };
 		16B9553617EC89B50005118F /* DataItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B9553517EC89B50005118F /* DataItem.m */; };
@@ -49,6 +53,19 @@
 			remoteInfo = Trailer;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		16B9406A182D076E00F32061 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				16B9406B182D078C00F32061 /* Sparkle.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		16075A9517EC7492000D86FD /* API.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = API.h; sourceTree = "<group>"; };
@@ -79,6 +96,9 @@
 		168BC6D617EC2DF000BC4584 /* TrailerTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TrailerTests-Info.plist"; sourceTree = "<group>"; };
 		168BC6D817EC2DF000BC4584 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		168BC6DA17EC2DF000BC4584 /* TrailerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TrailerTests.m; sourceTree = "<group>"; };
+		16B94066182D051700F32061 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
+		16B9406F182D136700F32061 /* dsa_priv.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_priv.pem; sourceTree = "<group>"; };
+		16B94070182D136700F32061 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
 		16B9552F17EC89520005118F /* Org.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Org.h; sourceTree = "<group>"; };
 		16B9553017EC89520005118F /* Org.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Org.m; sourceTree = "<group>"; };
 		16B9553417EC89B50005118F /* DataItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataItem.h; sourceTree = "<group>"; };
@@ -99,6 +119,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				168BC6AE17EC2DF000BC4584 /* Cocoa.framework in Frameworks */,
+				16B94067182D051700F32061 /* Sparkle.framework in Frameworks */,
 				4324160CC3FE4872BB66D231 /* libPods.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -108,6 +129,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				168BC6D117EC2DF000BC4584 /* Cocoa.framework in Frameworks */,
+				16B94068182D051F00F32061 /* Sparkle.framework in Frameworks */,
 				168BC6D017EC2DF000BC4584 /* XCTest.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -138,6 +160,7 @@
 		168BC6AC17EC2DF000BC4584 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				16B94066182D051700F32061 /* Sparkle.framework */,
 				168BC6AD17EC2DF000BC4584 /* Cocoa.framework */,
 				168BC6CF17EC2DF000BC4584 /* XCTest.framework */,
 				168BC6AF17EC2DF000BC4584 /* Other Frameworks */,
@@ -178,6 +201,7 @@
 		168BC6B417EC2DF000BC4584 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				16B9406E182D135D00F32061 /* Sparkle signing fiiles */,
 				168BC6B517EC2DF000BC4584 /* Trailer-Info.plist */,
 				168BC6B617EC2DF000BC4584 /* InfoPlist.strings */,
 				168BC6B917EC2DF000BC4584 /* main.m */,
@@ -202,6 +226,15 @@
 				168BC6D717EC2DF000BC4584 /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		16B9406E182D135D00F32061 /* Sparkle signing fiiles */ = {
+			isa = PBXGroup;
+			children = (
+				16B9406F182D136700F32061 /* dsa_priv.pem */,
+				16B94070182D136700F32061 /* dsa_pub.pem */,
+			);
+			name = "Sparkle signing fiiles";
 			sourceTree = "<group>";
 		};
 		16B9552E17EC86D10005118F /* Data */ = {
@@ -245,6 +278,7 @@
 				168BC6A717EC2DF000BC4584 /* Frameworks */,
 				168BC6A817EC2DF000BC4584 /* Resources */,
 				B041E47297154F70B16E8AC0 /* Copy Pods Resources */,
+				16B9406A182D076E00F32061 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -282,6 +316,9 @@
 				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = HouseTrip;
 				TargetAttributes = {
+					168BC6A917EC2DF000BC4584 = {
+						DevelopmentTeam = 47UMK8NJEK;
+					};
 					168BC6CD17EC2DF000BC4584 = {
 						TestTargetID = 168BC6A917EC2DF000BC4584;
 					};
@@ -312,6 +349,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				168BC6B817EC2DF000BC4584 /* InfoPlist.strings in Resources */,
+				16B94072182D136700F32061 /* dsa_pub.pem in Resources */,
 				168BC6C917EC2DF000BC4584 /* Images.xcassets in Resources */,
 				168BC6C417EC2DF000BC4584 /* MainMenu.xib in Resources */,
 				161AB0261827AE5600E6702A /* bell.caf in Resources */,
@@ -510,6 +548,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/ptsochantaris/Desktop/Trailer,
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Trailer/Trailer-Prefix.pch";
 				INFOPLIST_FILE = "Trailer/Trailer-Info.plist";
@@ -524,6 +566,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/ptsochantaris/Desktop/Trailer,
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Trailer/Trailer-Prefix.pch";
 				INFOPLIST_FILE = "Trailer/Trailer-Info.plist";
@@ -540,6 +586,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 					"$(inherited)",
+					/Users/ptsochantaris/Desktop/Trailer,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Trailer/Trailer-Prefix.pch";
@@ -562,6 +609,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 					"$(inherited)",
+					/Users/ptsochantaris/Desktop/Trailer,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Trailer/Trailer-Prefix.pch";

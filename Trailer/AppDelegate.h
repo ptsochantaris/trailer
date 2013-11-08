@@ -39,12 +39,13 @@ NSUserNotificationCenterDelegate, NSMenuDelegate>
 @property (weak) IBOutlet NSTextField *versionNumber;
 @property (weak) NSTimer *refreshTimer;
 @property (weak) IBOutlet NSButton *launchAtStartup;
+@property (nonatomic) BOOL lastUpdateFailed;
 
 @property (strong) NSMutableArray *prMenuItems;
 @property (strong) NSDate *lastSuccessfulRefresh;
 
 +(AppDelegate*)shared;
 
--(void)postNotificationOfType:(PRNotificationType)type forPr:(PullRequest*)pullRequest infoText:(NSString*)infoText;
+-(void)postNotificationOfType:(PRNotificationType)type forItem:(id)item;
 
 @end

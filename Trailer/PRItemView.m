@@ -105,7 +105,7 @@
 - (void)setPullRequest:(PullRequest *)pullRequest
 {
 	_commentsTotal = [PRComment countCommentsForPullRequestUrl:pullRequest.url inMoc:[AppDelegate shared].managedObjectContext];
-	if(pullRequest.isMine)
+	if(pullRequest.isMine || pullRequest.commentedByMe)
 	{
 		_commentsNew = [pullRequest unreadCommentCount];
 		_commentsTotal -= _commentsNew;

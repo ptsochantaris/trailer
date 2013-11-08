@@ -18,6 +18,7 @@
 @dynamic pullRequestUrl;
 @dynamic url;
 @dynamic userId;
+@dynamic webUrl;
 
 +(PRComment *)commentWithInfo:(NSDictionary *)info moc:(NSManagedObjectContext *)moc
 {
@@ -32,8 +33,15 @@
 	c.userId = info[@"user"][@"id"];
 	c.url = info[@"_links"][@"self"][@"href"];
 	c.pullRequestUrl = info[@"_links"][@"pull_request"][@"href"];
+	c.webUrl = info[@"html_url"];
+	if(!c.webUrl) c.webUrl = info[@"_links"][@"html"][@"href"];
 
 	return c;
+}
+
+-(BOOL)isMine
+{
+	return [self.userId.stringValue isEqualToString:[AppDelegate shared].api.localUserId];
 }
 
 +(void)removeCommentsWithPullRequestURL:(NSString *)url inMoc:(NSManagedObjectContext *)moc
