@@ -13,6 +13,7 @@
 @interface API : NSObject
 
 @property (nonatomic) NSString *authToken, *localUser, *localUserId, *resetDate;
+@property (nonatomic) float refreshPeriod;
 
 - (void) fetchRepositoriesAndCallback:(void(^)(BOOL success))callback;
 

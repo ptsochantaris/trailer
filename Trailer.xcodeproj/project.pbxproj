@@ -27,7 +27,6 @@
 		168BC6D117EC2DF000BC4584 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 168BC6AD17EC2DF000BC4584 /* Cocoa.framework */; };
 		168BC6D917EC2DF000BC4584 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 168BC6D717EC2DF000BC4584 /* InfoPlist.strings */; };
 		168BC6DB17EC2DF000BC4584 /* TrailerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 168BC6DA17EC2DF000BC4584 /* TrailerTests.m */; };
-		16B94067182D051700F32061 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16B94066182D051700F32061 /* Sparkle.framework */; };
 		16B94068182D051F00F32061 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16B94066182D051700F32061 /* Sparkle.framework */; };
 		16B9406B182D078C00F32061 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 16B94066182D051700F32061 /* Sparkle.framework */; };
 		16B94072182D136700F32061 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 16B94070182D136700F32061 /* dsa_pub.pem */; };
@@ -37,6 +36,7 @@
 		16B9553717EC89B50005118F /* DataItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B9553517EC89B50005118F /* DataItem.m */; };
 		16B9553A17EC93DE0005118F /* Repo.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B9553917EC93DE0005118F /* Repo.m */; };
 		16B9553B17EC93DE0005118F /* Repo.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B9553917EC93DE0005118F /* Repo.m */; };
+		16EAA972182D897E0018018B /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16B94066182D051700F32061 /* Sparkle.framework */; };
 		16EC79E617ECA18000F7EB44 /* HTTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 16EC79E517ECA18000F7EB44 /* HTTextField.m */; };
 		16EC79E717ECA18000F7EB44 /* HTTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 16EC79E517ECA18000F7EB44 /* HTTextField.m */; };
 		16FA683B1823CF4600401E9B /* PRItemView.m in Sources */ = {isa = PBXBuildFile; fileRef = 16FA683A1823CF4600401E9B /* PRItemView.m */; };
@@ -118,8 +118,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				16EAA972182D897E0018018B /* Sparkle.framework in Frameworks */,
 				168BC6AE17EC2DF000BC4584 /* Cocoa.framework in Frameworks */,
-				16B94067182D051700F32061 /* Sparkle.framework in Frameworks */,
 				4324160CC3FE4872BB66D231 /* libPods.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -550,7 +550,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					/Users/ptsochantaris/Desktop/Trailer,
+					/Users/ptsochantaris/Documents/Trailer,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Trailer/Trailer-Prefix.pch";
@@ -568,7 +568,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					/Users/ptsochantaris/Desktop/Trailer,
+					/Users/ptsochantaris/Documents/Trailer,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Trailer/Trailer-Prefix.pch";

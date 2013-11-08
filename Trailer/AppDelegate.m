@@ -22,6 +22,8 @@ static AppDelegate *_static_shared_ref;
 	//NSString *appDomain = [[NSBundle mainBundle] bundleIdentifier];
 	//[[NSUserDefaults standardUserDefaults] removePersistentDomainForName:appDomain];
 
+	[NSThread setThreadPriority:0.0];
+
 	_static_shared_ref = self;
 
 	self.api = [[API alloc] init];
@@ -300,6 +302,9 @@ static AppDelegate *_static_shared_ref;
 		[self.launchAtStartup setIntegerValue:1];
 	else
 		[self.launchAtStartup setIntegerValue:0];
+
+	[self.refreshDurationStepper setFloatValue:self.api.refreshPeriod];
+	[self refreshDurationChanged:nil];
 
 	[self.preferencesWindow setLevel:NSFloatingWindowLevel];
 	NSWindowController *c = [[NSWindowController alloc] initWithWindow:self.preferencesWindow];
@@ -598,13 +603,18 @@ static AppDelegate *_static_shared_ref;
 		self.lastUpdateFailed = !success;
 		if(success) self.lastSuccessfulRefresh = [NSDate date];
 		[self completeRefresh];
-		self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:REFRESH_PERIOD target:self selector:@selector(refreshIfApplicable) userInfo:nil repeats:NO];
+		self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:self.api.refreshPeriod target:self selector:@selector(refreshIfApplicable) userInfo:nil repeats:NO];
 		[self sendNotifications];
-		NSLog(@"Refresh done: %d",success);
+		NSLog(@"Refresh done: %d at priority %f, next refresh in %f seconds",success,[NSThread mainThread].threadPriority,self.api.refreshPeriod);
 	}];
 }
 
 
+- (IBAction)refreshDurationChanged:(NSStepper *)sender
+{
+	self.api.refreshPeriod = self.refreshDurationStepper.floatValue;
+	[self.refreshDurationLabel setStringValue:[NSString stringWithFormat:@"Automatically refresh every %ld seconds",(long)self.refreshDurationStepper.integerValue]];
+}
 
 -(void)refreshIfApplicable
 {
@@ -799,7 +809,6 @@ static AppDelegate *_static_shared_ref;
 			//Resolve the item with URL
 			if (LSSharedFileListItemResolve(itemRef, 0, (CFURLRef*) &url, NULL) == noErr) {
 				NSURL *uu = (__bridge NSURL*)url;
-				NSLog(@"comparing: %@ %@",uu,appPath);
 				if ([[uu path] compare:appPath] == NSOrderedSame){
 					return YES;
 				}

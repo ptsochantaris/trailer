@@ -7,7 +7,6 @@
 //
 
 #define LOW_API_WARNING 1000
-#define REFRESH_PERIOD 60.0
 
 typedef enum {
 	kNewComment,
@@ -40,6 +39,8 @@ NSUserNotificationCenterDelegate, NSMenuDelegate>
 @property (weak) NSTimer *refreshTimer;
 @property (weak) IBOutlet NSButton *launchAtStartup;
 @property (nonatomic) BOOL lastUpdateFailed;
+@property (weak) IBOutlet NSTextField *refreshDurationLabel;
+@property (weak) IBOutlet NSStepper *refreshDurationStepper;
 
 @property (strong) NSMutableArray *prMenuItems;
 @property (strong) NSDate *lastSuccessfulRefresh;

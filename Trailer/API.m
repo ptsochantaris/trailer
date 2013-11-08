@@ -26,7 +26,7 @@
 		client = [AFHTTPClient clientWithBaseURL:[NSURL URLWithString:@"https://api.github.com"]];
 		[client setDefaultHeader:@"User-Agent" value:@"Trailer"];
 		[client setDefaultHeader:@"Content-Type" value:@"application/x-www-form-urlencoded"];
-		[client setDefaultHeader:@"Authorization" value:[@"token " stringByAppendingString:self.authToken]];
+		if(self.authToken) [client setDefaultHeader:@"Authorization" value:[@"token " stringByAppendingString:self.authToken]];
 		client.operationQueue.maxConcurrentOperationCount = 8;
     }
     return self;
@@ -41,6 +41,19 @@
 		[d removeObjectForKey:key];
 	[d synchronize];
 }
+
+#define REFRESH_PERIOD_KEY @"REFRESH_PERIOD_KEY"
+-(float)refreshPeriod
+{
+	float period = [[NSUserDefaults standardUserDefaults] floatForKey:REFRESH_PERIOD_KEY];
+	if(period==0)
+	{
+		period = 60.0;
+		self.refreshPeriod = period;
+	}
+	return period;
+}
+-(void)setRefreshPeriod:(float)refreshPeriod { [[NSUserDefaults standardUserDefaults] setFloat:refreshPeriod forKey:REFRESH_PERIOD_KEY]; }
 
 #define GITHUB_TOKEN_KEY @"GITHUB_AUTH_TOKEN"
 -(NSString*)authToken { return [[NSUserDefaults standardUserDefaults] stringForKey:GITHUB_TOKEN_KEY]; }
@@ -172,7 +185,7 @@
 									if(ok) ok = success;
 									if(callback)
 									{
-										if(ok) [syncContext save:nil];
+										if(ok && syncContext.hasChanges) [syncContext save:nil];
 										callback(ok);
 									}
 								}];
@@ -202,7 +215,7 @@
 				{
 					[self fetchCommentsForCurrentPullRequestsToMoc:syncContext andCallback:^(BOOL success) {
 						[DataItem nukeDeletedItemsOfType:@"PullRequest" inMoc:syncContext];
-						if(success) [syncContext save:nil];
+						if(success && syncContext.hasChanges) [syncContext save:nil];
 						if(callback) callback(success);
 					}];
 				}
@@ -373,7 +386,7 @@
 																	NSLog(@"Failure: %@",error);
 																	if(callback) callback(nil,NO);
 																}];
-	o.threadPriority = 0.1;
+	o.threadPriority = 0.0;
 	[client.operationQueue addOperation:o];
 }
 
@@ -389,7 +402,7 @@
 																} failure:^(AFHTTPRequestOperation *operation, NSError *error) {
 																	if(callback) callback(-1, -1, -1);
 																}];
-	o.threadPriority = 0.1;
+	o.threadPriority = 0.0;
 	[client.operationQueue addOperation:o];
 }
 
