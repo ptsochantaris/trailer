@@ -38,7 +38,7 @@ NSUserNotificationCenterDelegate, NSMenuDelegate>
 @property (weak) IBOutlet NSTextField *versionNumber;
 @property (weak) NSTimer *refreshTimer;
 @property (weak) IBOutlet NSButton *launchAtStartup;
-@property (nonatomic) BOOL lastUpdateFailed;
+@property (nonatomic) BOOL lastUpdateFailed, preferencesDirty;
 @property (weak) IBOutlet NSTextField *refreshDurationLabel;
 @property (weak) IBOutlet NSStepper *refreshDurationStepper;
 

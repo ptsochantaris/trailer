@@ -8,8 +8,6 @@
 	#import <Cocoa/Cocoa.h>
 	#import <SystemConfiguration/SystemConfiguration.h>
 	#import <CoreServices/CoreServices.h>
-	#import <AFHTTPRequestOperationLogger/AFHTTPRequestOperationLogger.h>
-	#import <AFNetworking/AFNetworking.h>
 	#import <Foundation/Foundation.h>
 	#import <CoreData/CoreData.h>
 	#import "NSDictionary+NSDictionary_OFK.h"

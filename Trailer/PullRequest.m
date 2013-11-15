@@ -50,12 +50,6 @@
 
 -(void)prepareForDeletion
 {
-	Repo *parent = [Repo itemOfType:@"Repo" serverId:self.repoId moc:self.managedObjectContext];
-	if(parent && parent.postSyncAction.integerValue!=kTouchedDelete && self.isMine)
-	{
-		// closed (assuming merged, since we don't have any more info about it)
-		[[AppDelegate shared] postNotificationOfType:kPrMerged forItem:self];
-	}
 	[PRComment removeCommentsWithPullRequestURL:self.url inMoc:self.managedObjectContext];
 }
 

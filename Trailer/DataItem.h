@@ -6,10 +6,10 @@
 //  Copyright (c) 2013 HouseTrip. All rights reserved.
 //
 
-#define kTouchedDelete 0
-#define kTouchedNew 1
-#define kTouchedUpdated 2
-#define kTouchedNone 3
+#define kTouchedNone 0
+#define kTouchedDelete 1
+#define kTouchedNew 2
+#define kTouchedUpdated 3
 
 @interface DataItem : NSManagedObject
 

@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegate.h"
+#import <Sparkle/Sparkle.h>
 
 @implementation AppDelegate
 
@@ -21,6 +22,13 @@ static AppDelegate *_static_shared_ref;
 {
 	//NSString *appDomain = [[NSBundle mainBundle] bundleIdentifier];
 	//[[NSUserDefaults standardUserDefaults] removePersistentDomainForName:appDomain];
+
+	SUUpdater *s = [SUUpdater sharedUpdater];
+	if(!s.updateInProgress)
+	{
+		[s checkForUpdatesInBackground];
+	}
+	s.automaticallyChecksForUpdates = YES;
 
 	[NSThread setThreadPriority:0.0];
 
@@ -51,6 +59,10 @@ static AppDelegate *_static_shared_ref;
 	{
 		[self preferencesSelected:nil];
 	}
+
+	// To test notifications
+	//PullRequest *r = [[PullRequest allItemsOfType:@"PullRequest" inMoc:self.managedObjectContext] lastObject];
+	//[self postNotificationOfType:kNewPr forItem:r];
 }
 
 - (IBAction)launchAtStartSelected:(NSButton *)sender {
@@ -71,33 +83,38 @@ static AppDelegate *_static_shared_ref;
 
 #define PULL_REQUEST_ID_KEY @"pullRequestIdKey"
 #define COMMENT_ID_KEY @"commentIdKey"
+#define NOTIFICATION_URL_KEY @"urlKey"
 
 -(void)userNotificationCenter:(NSUserNotificationCenter *)center didActivateNotification:(NSUserNotification *)notification
 {
 	switch (notification.activationType)
 	{
+		case NSUserNotificationActivationTypeActionButtonClicked:
 		case NSUserNotificationActivationTypeContentsClicked:
 		{
 			[[NSUserNotificationCenter defaultUserNotificationCenter] removeDeliveredNotification:notification];
 
-			NSString *urlToOpen = nil;
-			NSNumber *itemId = notification.userInfo[PULL_REQUEST_ID_KEY];
-			PullRequest *pullRequest = nil;
-			if(itemId) // it's a pull request
+			NSString *urlToOpen = notification.userInfo[NOTIFICATION_URL_KEY];
+			if(!urlToOpen)
 			{
-				pullRequest = [PullRequest itemOfType:@"PullRequest" serverId:itemId moc:self.managedObjectContext];
-				urlToOpen = pullRequest.webUrl;
-			}
-			else // it's a comment
-			{
-				itemId = notification.userInfo[COMMENT_ID_KEY];
-				PRComment *c = [PRComment itemOfType:@"PRComment" serverId:itemId moc:self.managedObjectContext];
-				urlToOpen = c.webUrl;
-				pullRequest = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:self.managedObjectContext];
+				NSNumber *itemId = notification.userInfo[PULL_REQUEST_ID_KEY];
+				PullRequest *pullRequest = nil;
+				if(itemId) // it's a pull request
+				{
+					pullRequest = [PullRequest itemOfType:@"PullRequest" serverId:itemId moc:self.managedObjectContext];
+					urlToOpen = pullRequest.webUrl;
+				}
+				else // it's a comment
+				{
+					itemId = notification.userInfo[COMMENT_ID_KEY];
+					PRComment *c = [PRComment itemOfType:@"PRComment" serverId:itemId moc:self.managedObjectContext];
+					urlToOpen = c.webUrl;
+					pullRequest = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:self.managedObjectContext];
+				}
+				[pullRequest catchUpWithComments];
 			}
 
 			[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlToOpen]];
-			[pullRequest catchUpWithComments];
 
 			[self updateStatusItem];
 
@@ -109,6 +126,8 @@ static AppDelegate *_static_shared_ref;
 
 -(void)postNotificationOfType:(PRNotificationType)type forItem:(id)item
 {
+	if(self.preferencesDirty) return;
+
 	NSUserNotification *notification = [[NSUserNotification alloc] init];
 
 	switch (type)
@@ -117,10 +136,9 @@ static AppDelegate *_static_shared_ref;
 		{
 			notification.title = @"New PR Comment";
 			notification.informativeText = [item body];
-			PullRequest *associatedRequest = [PullRequest pullRequestWithUrl:[item pullRequestUrl]
-																		 moc:self.managedObjectContext];
-			notification.subtitle = associatedRequest.title;
+			PullRequest *associatedRequest = [PullRequest pullRequestWithUrl:[item pullRequestUrl] moc:self.managedObjectContext];
 			notification.userInfo = @{COMMENT_ID_KEY:[item serverId]};
+			notification.subtitle = associatedRequest.title;
 			break;
 		}
 		case kNewPr:
@@ -133,13 +151,12 @@ static AppDelegate *_static_shared_ref;
 		case kPrMerged:
 		{
 			notification.title = @"PR Merged!";
-			notification.userInfo = @{PULL_REQUEST_ID_KEY:[item serverId]};
+			notification.userInfo = @{NOTIFICATION_URL_KEY:[item webUrl]};
 			notification.subtitle = [item title];
 			break;
 		}
 	}
 
-    notification.soundName = @"bell.caf";
     [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
 }
 
@@ -215,18 +232,23 @@ static AppDelegate *_static_shared_ref;
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(apiUsageUpdate:) name:RATE_UPDATE_NOTIFICATION object:nil];
 	if(self.api.authToken.length)
 	{
-		[self.api getRateLimitAndCallback:^(long long remaining, long long limit, long long reset) {
-			if(reset>=0)
-			{
-				[[NSNotificationCenter defaultCenter] postNotificationName:RATE_UPDATE_NOTIFICATION
-																	object:nil
-																  userInfo:@{
-																			 RATE_UPDATE_NOTIFICATION_LIMIT_KEY:@(limit),
-																			 RATE_UPDATE_NOTIFICATION_REMAINING_KEY:@(remaining)
-																			 }];
-			}
-		}];
+		[self updateLimitFromServer];
 	}
+}
+
+- (void)updateLimitFromServer
+{
+	[self.api getRateLimitAndCallback:^(long long remaining, long long limit, long long reset) {
+		if(reset>=0)
+		{
+			[[NSNotificationCenter defaultCenter] postNotificationName:RATE_UPDATE_NOTIFICATION
+																object:nil
+															  userInfo:@{
+																		 RATE_UPDATE_NOTIFICATION_LIMIT_KEY:@(limit),
+																		 RATE_UPDATE_NOTIFICATION_REMAINING_KEY:@(remaining)
+																		 }];
+		}
+	}];
 }
 
 - (void)apiUsageUpdate:(NSNotification *)n
@@ -286,6 +308,7 @@ static AppDelegate *_static_shared_ref;
 
 - (void)reset
 {
+	self.preferencesDirty = YES;
 	self.lastSuccessfulRefresh = nil;
 	[DataItem deleteAllObjectsInContext:self.managedObjectContext
 							 usingModel:self.managedObjectModel];
@@ -297,6 +320,8 @@ static AppDelegate *_static_shared_ref;
 {
 	[self.refreshTimer invalidate];
 	self.refreshTimer = nil;
+
+	[self updateLimitFromServer];
 
 	if([self isAppLoginItem])
 		[self.launchAtStartup setIntegerValue:1];
@@ -351,8 +376,8 @@ static AppDelegate *_static_shared_ref;
 	NSArray *allRepos = [Repo allReposSortedByField:@"fullName" inMoc:self.managedObjectContext];
 	Repo *r = allRepos[row];
 	r.active = @([object boolValue]);
-	NSLog(@"Repo %@ is %@",r.fullName,r.active);
 	[self.managedObjectContext save:nil];
+	self.preferencesDirty = YES;
 }
 
 /////////////////////////////////// Core Data
@@ -523,7 +548,38 @@ static AppDelegate *_static_shared_ref;
 -(void)windowWillClose:(NSNotification *)notification
 {
 	[self controlTextDidChange:nil];
-	if(self.api.authToken.length) [self startRefresh];
+	if(self.api.authToken.length && self.preferencesDirty)
+	{
+		[self startRefresh];
+	}
+	else
+	{
+		if(!self.refreshTimer && self.api.refreshPeriod>0.0)
+		{
+			if(self.lastSuccessfulRefresh)
+			{
+				NSTimeInterval howLongAgo = [[NSDate date] timeIntervalSinceDate:self.lastSuccessfulRefresh];
+				if(howLongAgo>self.api.refreshPeriod)
+				{
+					[self startRefresh];
+				}
+				else
+				{
+					NSTimeInterval howLongUntilNextSync = self.api.refreshPeriod-howLongAgo;
+					NSLog(@"Will refresh in %f",howLongUntilNextSync);
+					self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:howLongUntilNextSync
+																		 target:self
+																	   selector:@selector(refreshIfApplicable)
+																	   userInfo:nil
+																		repeats:NO];
+				}
+			}
+			else
+			{
+				[self startRefresh];
+			}
+		}
+	}
 }
 
 - (IBAction)refreshNowSelected:(NSMenuItem *)sender
@@ -597,15 +653,19 @@ static AppDelegate *_static_shared_ref;
 
 	[self.refreshNow setAction:nil];
 	[self.refreshNow setTarget:nil];
+
+	[self updateStatusItem];
+
 	[self.api fetchPullRequestsForActiveReposAndCallback:^(BOOL success) {
 		self.refreshNow.target = oldTarget;
 		self.refreshNow.action = oldAction;
 		self.lastUpdateFailed = !success;
 		if(success) self.lastSuccessfulRefresh = [NSDate date];
 		[self completeRefresh];
-		self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:self.api.refreshPeriod target:self selector:@selector(refreshIfApplicable) userInfo:nil repeats:NO];
 		[self sendNotifications];
+		if(success) self.preferencesDirty = NO;
 		NSLog(@"Refresh done: %d at priority %f, next refresh in %f seconds",success,[NSThread mainThread].threadPriority,self.api.refreshPeriod);
+		self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:self.api.refreshPeriod target:self selector:@selector(refreshIfApplicable) userInfo:nil repeats:NO];
 	}];
 }
 
@@ -659,11 +719,26 @@ static AppDelegate *_static_shared_ref;
 	NSInteger newCommentCount = [self buildPrMenuItems];
 
 	NSDictionary *attributes;
-	if(newCommentCount)
+	if(self.lastUpdateFailed)
+	{
+		countString = @"X";
+		attributes = @{
+					   NSFontAttributeName: [NSFont boldSystemFontOfSize:11.0],
+					   NSForegroundColorAttributeName: [NSColor colorWithRed:0.8 green:0.0 blue:0.0 alpha:1.0],
+					   };
+	}
+	else if(newCommentCount)
 	{
 		attributes = @{
 					   NSFontAttributeName: [NSFont systemFontOfSize:11.0],
-					   NSForegroundColorAttributeName: [NSColor blackColor],
+					   NSForegroundColorAttributeName: [NSColor colorWithRed:0.8 green:0.0 blue:0.0 alpha:1.0],
+					   };
+	}
+	else if(!self.refreshNow.target) // refreshing
+	{
+		attributes = @{
+					   NSFontAttributeName: [NSFont systemFontOfSize:11.0],
+					   NSForegroundColorAttributeName: [NSColor grayColor],
 					   };
 	}
 	else
@@ -690,6 +765,7 @@ static AppDelegate *_static_shared_ref;
 	}
 
 	NSImage *newImage = [[NSImage alloc] initWithSize:CGSizeMake(self.statusItem.length, H)];
+
     [newImage lockFocus];
 	NSImage *oldImage = [NSImage imageNamed:NSImageNameApplicationIcon];
 	[oldImage drawInRect:CGRectMake(padding, 0, H, H)
@@ -698,7 +774,6 @@ static AppDelegate *_static_shared_ref;
 				fraction:1.0];
 	[countString drawInRect:CGRectMake(H+padding, -5, width, H) withAttributes:attributes];
     [newImage unlockFocus];
-	[newImage setTemplate:YES];
 
 	self.statusItem.image = newImage;
 	self.statusItem.highlightMode = YES;
@@ -706,8 +781,14 @@ static AppDelegate *_static_shared_ref;
 	self.statusItem.menu.delegate = self;
 }
 
+-(void)menuDidClose:(NSMenu *)menu
+{
+	[self.statusItem.image setTemplate:NO];
+}
+
 -(void)menuWillOpen:(NSMenu *)menu
 {
+	[self.statusItem.image setTemplate:YES];
 	if(self.refreshNow.target)
 	{
 		NSString *prefix;
@@ -747,6 +828,7 @@ static AppDelegate *_static_shared_ref;
 	}
 	[self.managedObjectContext save:nil];
 	[self.projectsTable reloadData];
+	self.preferencesDirty = YES;
 }
 
 - (IBAction)clearallSelected:(NSButton *)sender
@@ -758,6 +840,7 @@ static AppDelegate *_static_shared_ref;
 	}
 	[self.managedObjectContext save:nil];
 	[self.projectsTable reloadData];
+	self.preferencesDirty = YES;
 }
 
 //////////////// launch at startup from: http://cocoatutorial.grapewave.com/tag/lssharedfilelistitemresolve/

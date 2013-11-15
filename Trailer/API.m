@@ -8,7 +8,7 @@
 
 @interface API ()
 {
-	AFHTTPClient *client;
+	NSOperationQueue *requestQueue;
 	NSDateFormatter *dateFormatter;
 }
 @end
@@ -20,15 +20,9 @@
     self = [super init];
     if (self) {
 		dateFormatter = [[NSDateFormatter alloc] initWithDateFormat:@"YYYY-MM-DDTHH:MM:SSZ" allowNaturalLanguage:NO];
-
-		[[AFHTTPRequestOperationLogger sharedLogger] startLogging];
-
-		client = [AFHTTPClient clientWithBaseURL:[NSURL URLWithString:@"https://api.github.com"]];
-		[client setDefaultHeader:@"User-Agent" value:@"Trailer"];
-		[client setDefaultHeader:@"Content-Type" value:@"application/x-www-form-urlencoded"];
-		if(self.authToken) [client setDefaultHeader:@"Authorization" value:[@"token " stringByAppendingString:self.authToken]];
-		client.operationQueue.maxConcurrentOperationCount = 8;
-    }
+		requestQueue = [[NSOperationQueue alloc] init];
+		requestQueue.maxConcurrentOperationCount = 8;
+	}
     return self;
 }
 
@@ -60,7 +54,6 @@
 -(void)setAuthToken:(NSString *)authToken
 {
 	[self storeDefaultValue:authToken forKey:GITHUB_TOKEN_KEY];
-	if(authToken) [client setDefaultHeader:@"Authorization" value:[@"token " stringByAppendingString:authToken]];
 }
 
 #define USER_NAME_KEY @"USER_NAME_KEY"
@@ -128,10 +121,10 @@
 			link = p.reviewCommentLink;
 
 		[self getPagedDataInPath:link
+				startingFromPage:1
 						  params:nil
 				 perPageCallback:^(id data, BOOL lastPage) {
-					 NSArray *pageOfComments = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-					 for(NSDictionary *info in pageOfComments)
+					 for(NSDictionary *info in data)
 					 {
 						 PRComment *c = [PRComment commentWithInfo:info moc:moc];
 						 if(!c.pullRequestUrl) c.pullRequestUrl = p.url;
@@ -199,6 +192,48 @@
 	}];
 }
 
+-(void)detectMergedPullRequestsInMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
+{
+	NSArray *pullRequests = [PullRequest allItemsOfType:@"PullRequest" inMoc:moc];
+	NSMutableArray *prsToCheck = [NSMutableArray array];
+	for(PullRequest *r in pullRequests)
+	{
+		Repo *parent = [Repo itemOfType:@"Repo" serverId:r.repoId moc:moc];
+		if(r.postSyncAction.integerValue==kTouchedDelete && parent && (parent.postSyncAction.integerValue!=kTouchedDelete) && (r.isMine || r.commentedByMe))
+		{
+			[prsToCheck addObject:r]; // possibly merged
+		}
+	}
+	[self _detectMergedPullRequests:prsToCheck andCallback:callback];
+}
+
+-(void)_detectMergedPullRequests:(NSMutableArray *)prsToCheck andCallback:(void(^)(BOOL success))callback
+{
+	if(prsToCheck.count==0)
+	{
+		callback(YES);
+		return;
+	}
+	PullRequest *r = [prsToCheck objectAtIndex:0];
+	[prsToCheck removeObjectAtIndex:0];
+
+	Repo *parent = [Repo itemOfType:@"Repo" serverId:r.repoId moc:r.managedObjectContext];
+	NSString *owner = [parent.fullName copy];
+
+	NSManagedObjectID *oid = r.objectID;
+	[self get:[NSString stringWithFormat:@"/repos/%@/pulls/%@/merge",owner,r.number]
+   parameters:nil
+	  success:^(NSHTTPURLResponse *response, id data) {
+		  // merged indeed
+		  PullRequest *R = (PullRequest *)[[AppDelegate shared].managedObjectContext existingObjectWithID:oid error:nil];
+		  [[AppDelegate shared] postNotificationOfType:kPrMerged forItem:R];
+		  [self _detectMergedPullRequests:prsToCheck andCallback:callback];
+	  } failure:^(NSError *error) {
+		  // not merged
+		  [self _detectMergedPullRequests:prsToCheck andCallback:callback];
+	  }];
+}
+
 -(void)fetchPullRequestsForActiveReposAndCallback:(void(^)(BOOL success))callback
 {
 	[self syncUserDetailsAndCallback:^(BOOL success) {
@@ -214,9 +249,17 @@
 				if(success)
 				{
 					[self fetchCommentsForCurrentPullRequestsToMoc:syncContext andCallback:^(BOOL success) {
-						[DataItem nukeDeletedItemsOfType:@"PullRequest" inMoc:syncContext];
-						if(success && syncContext.hasChanges) [syncContext save:nil];
-						if(callback) callback(success);
+						if(success)
+						{
+							[self detectMergedPullRequestsInMoc:syncContext andCallback:^(BOOL success) {
+								if(success)
+								{
+									[DataItem nukeDeletedItemsOfType:@"PullRequest" inMoc:syncContext];
+									if(success && syncContext.hasChanges) [syncContext save:nil];
+									if(callback) callback(success);
+								}
+							}];
+						}
 					}];
 				}
 				else if(callback) callback(NO);
@@ -239,10 +282,10 @@
 	for(Repo *r in repos)
 	{
 		[self getPagedDataInPath:[NSString stringWithFormat:@"/repos/%@/pulls",r.fullName]
+				startingFromPage:1
 						  params:nil
 				 perPageCallback:^(id data, BOOL lastPage) {
-					 NSArray *pageOfPRs = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-					 for(NSDictionary *info in pageOfPRs)
+					 for(NSDictionary *info in data)
 					 {
 						 [PullRequest pullRequestWithInfo:info moc:moc];
 					 }
@@ -259,10 +302,10 @@
 -(void)syncReposForUserToMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
 {
 	[self getPagedDataInPath:@"/user/repos"
+			startingFromPage:1
 					  params:nil
 			 perPageCallback:^(id data, BOOL lastPage) {
-				 NSArray *pageOfRepos = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-				 for(NSDictionary *info in pageOfRepos)
+				 for(NSDictionary *info in data)
 				 {
 					 [Repo repoWithInfo:info moc:moc];
 				 }
@@ -274,10 +317,10 @@
 -(void)syncReposForOrg:(NSString*)orgLogin toMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
 {
 	[self getPagedDataInPath:[NSString stringWithFormat:@"/orgs/%@/repos",orgLogin]
+			startingFromPage:1
 					  params:nil
 			 perPageCallback:^(id data, BOOL lastPage) {
-				 NSArray *pageOfRepos = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-				 for(NSDictionary *info in pageOfRepos)
+				 for(NSDictionary *info in data)
 				 {
 					 [Repo repoWithInfo:info moc:moc];
 				 }
@@ -289,10 +332,10 @@
 -(void)syncOrgsToMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
 {
 	[self getPagedDataInPath:@"/user/orgs"
+			startingFromPage:1
 					  params:nil
 			 perPageCallback:^(id data, BOOL lastPage) {
-				 NSArray *pageOfOrgs = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-				 for(NSDictionary *info in pageOfOrgs) [Org orgWithInfo:info moc:moc];
+				 for(NSDictionary *info in data) [Org orgWithInfo:info moc:moc];
 			 } finalCallback:^(BOOL success) {
 				 if(callback) callback(success);
 			 }];
@@ -305,9 +348,8 @@
 			andCallback:^(id data, BOOL lastPage) {
 				if(data)
 				{
-					NSDictionary *userRecord = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-					[[NSUserDefaults standardUserDefaults] setObject:[userRecord ofk:@"login"] forKey:USER_NAME_KEY];
-					[[NSUserDefaults standardUserDefaults] setObject:[userRecord ofk:@"id"] forKey:USER_ID_KEY];
+					[[NSUserDefaults standardUserDefaults] setObject:[data ofk:@"login"] forKey:USER_NAME_KEY];
+					[[NSUserDefaults standardUserDefaults] setObject:[data ofk:@"id"] forKey:USER_ID_KEY];
 					[[NSUserDefaults standardUserDefaults] synchronize];
 					if(callback) callback(YES);
 				}
@@ -316,94 +358,82 @@
 }
 
 -(void)getPagedDataInPath:(NSString*)path
+		 startingFromPage:(NSInteger)page
 				   params:(NSDictionary*)params
 		  perPageCallback:(void(^)(id data, BOOL lastPage))pageCallback
 			finalCallback:(void(^)(BOOL success))finalCallback
 {
-	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		__block NSInteger page = 1;
-		__block BOOL keepGoing = YES;
-		__block BOOL ok = YES;
-		dispatch_semaphore_t s = dispatch_semaphore_create(0);
-		NSMutableDictionary *mparams = [params mutableCopy];
-		if(!mparams) mparams = [NSMutableDictionary dictionaryWithCapacity:2];
-		while(keepGoing)
-		{
-			mparams[@"page"] = @(page);
-			mparams[@"per_page"] = @100;
-			[self getDataInPath:path
-						 params:mparams
-					andCallback:^(id data, BOOL lastPage) {
-						if(data)
-						{
-							if(pageCallback)
-							{
-								pageCallback(data,lastPage);
-							}
-							keepGoing = !lastPage;
-							page++;
-						}
-						else
-						{
-							ok = NO;
-							keepGoing = NO;
-						}
-						dispatch_semaphore_signal(s);
-					}];
-			dispatch_semaphore_wait(s, DISPATCH_TIME_FOREVER);
-		}
-		if(finalCallback)
-		{
-			dispatch_sync(dispatch_get_main_queue(), ^{
-				finalCallback(ok);
-			});
-		}
-	});
+	NSMutableDictionary *mparams;
+	if(params) mparams = [params mutableCopy];
+	else mparams = [NSMutableDictionary dictionaryWithCapacity:2];
+	mparams[@"page"] = @(page);
+	mparams[@"per_page"] = @100;
+	[self getDataInPath:path
+				 params:mparams
+			andCallback:^(id data, BOOL lastPage) {
+				if(data)
+				{
+					if(pageCallback)
+					{
+						pageCallback(data,lastPage);
+					}
+
+					if(lastPage)
+					{
+						finalCallback(YES);
+					}
+					else
+					{
+						[self getPagedDataInPath:path
+								startingFromPage:page+1
+										  params:params
+								 perPageCallback:pageCallback
+								   finalCallback:finalCallback];
+					}
+				}
+				else
+				{
+					finalCallback(NO);
+				}
+			}];
 }
 
 -(void)getDataInPath:(NSString*)path params:(NSDictionary*)params andCallback:(void(^)(id data, BOOL lastPage))callback
 {
-	NSMutableURLRequest *request = [client requestWithMethod:@"GET" path:path parameters:params];
-	AFHTTPRequestOperation *o = [client HTTPRequestOperationWithRequest:request
-																success:^(AFHTTPRequestOperation *operation, id responseObject) {
-																	long long requestsRemaining = [[operation.response allHeaderFields][@"X-RateLimit-Remaining"] longLongValue];
-																	long long requestLimit = [[operation.response allHeaderFields][@"X-RateLimit-Limit"] longLongValue];
-																	long long epochSeconds = [[operation.response allHeaderFields][@"X-RateLimit-Reset"] longLongValue];
-																	NSDate *date = [NSDate dateWithTimeIntervalSince1970:epochSeconds];
-																	NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-																	formatter.dateStyle = NSDateFormatterMediumStyle;
-																	formatter.timeStyle = NSDateFormatterMediumStyle;
-																	self.resetDate = [formatter stringFromDate:date];
-																	//NSDictionary *data = [NSJSONSerialization JSONObjectWithData:responseObject options:0 error:nil];
-																	//NSLog(@"Success %@",data);
-																	//NSLog(@"Remaining requests: %lld/%lld",requestsRemaining,requestLimit);
-																	[[NSNotificationCenter defaultCenter] postNotificationName:RATE_UPDATE_NOTIFICATION
-																														object:nil
-																													  userInfo:@{ RATE_UPDATE_NOTIFICATION_LIMIT_KEY: @(requestLimit),
-																																  RATE_UPDATE_NOTIFICATION_REMAINING_KEY: @(requestsRemaining) }];
-																	if(callback) callback(responseObject, [API lastPage:operation.response]);
-																} failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-																	NSLog(@"Failure: %@",error);
-																	if(callback) callback(nil,NO);
-																}];
-	o.threadPriority = 0.0;
-	[client.operationQueue addOperation:o];
+	[self get:path
+   parameters:params
+	  success:^(NSHTTPURLResponse *response, id data) {
+		  long long requestsRemaining = [[response allHeaderFields][@"X-RateLimit-Remaining"] longLongValue];
+		  long long requestLimit = [[response allHeaderFields][@"X-RateLimit-Limit"] longLongValue];
+		  long long epochSeconds = [[response allHeaderFields][@"X-RateLimit-Reset"] longLongValue];
+		  NSDate *date = [NSDate dateWithTimeIntervalSince1970:epochSeconds];
+		  NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+		  formatter.dateStyle = NSDateFormatterMediumStyle;
+		  formatter.timeStyle = NSDateFormatterMediumStyle;
+		  self.resetDate = [formatter stringFromDate:date];
+		  [[NSNotificationCenter defaultCenter] postNotificationName:RATE_UPDATE_NOTIFICATION
+															  object:nil
+															userInfo:@{ RATE_UPDATE_NOTIFICATION_LIMIT_KEY: @(requestLimit),
+																		RATE_UPDATE_NOTIFICATION_REMAINING_KEY: @(requestsRemaining) }];
+		  if(callback) callback(data, [API lastPage:response]);
+	  } failure:^(NSError *error) {
+		  NSLog(@"Failure: %@",error);
+		  if(callback) callback(nil,NO);
+	  }];
 }
 
 -(void)getRateLimitAndCallback:(void (^)(long long, long long, long long))callback
 {
-	NSMutableURLRequest *request = [client requestWithMethod:@"GET" path:@"/rate_limit" parameters:nil];
-	AFHTTPRequestOperation *o = [client HTTPRequestOperationWithRequest:request
-																success:^(AFHTTPRequestOperation *operation, id responseObject) {
-																	long long requestsRemaining = [[operation.response allHeaderFields][@"X-RateLimit-Remaining"] longLongValue];
-																	long long requestLimit = [[operation.response allHeaderFields][@"X-RateLimit-Limit"] longLongValue];
-																	long long epochSeconds = [[operation.response allHeaderFields][@"X-RateLimit-Reset"] longLongValue];
-																	if(callback) callback(requestsRemaining,requestLimit,epochSeconds);
-																} failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-																	if(callback) callback(-1, -1, -1);
-																}];
-	o.threadPriority = 0.0;
-	[client.operationQueue addOperation:o];
+	[self get:@"/rate_limit"
+	  parameters:nil
+		 success:^(NSHTTPURLResponse *response, id data) {
+			 long long requestsRemaining = [[response allHeaderFields][@"X-RateLimit-Remaining"] longLongValue];
+			 long long requestLimit = [[response allHeaderFields][@"X-RateLimit-Limit"] longLongValue];
+			 long long epochSeconds = [[response allHeaderFields][@"X-RateLimit-Reset"] longLongValue];
+			 if(callback) callback(requestsRemaining,requestLimit,epochSeconds);
+		 } failure:^(NSError *error) {
+			 if(callback) callback(-1, -1, -1);
+		 }];
 }
 
 +(BOOL)lastPage:(NSHTTPURLResponse*)response
@@ -412,5 +442,69 @@
 	if(!linkHeader) return YES;
 	return ([linkHeader rangeOfString:@"rel=\"next\""].location==NSNotFound);
 }
+
+-(NSOperation *)get:(NSString *)path parameters:(NSDictionary *)params success:(void(^)(NSHTTPURLResponse *response, id data))successCallback failure:(void(^)(NSError *error))failureCallback
+{
+	NSString *authToken = self.authToken;
+	NSBlockOperation *o = [NSBlockOperation blockOperationWithBlock:^{
+
+		NSString *expandedPath;
+		if([path rangeOfString:@"/"].location==0) expandedPath = [@"https://api.github.com" stringByAppendingString:path];
+		else expandedPath = path;
+
+		if(params.count)
+		{
+			expandedPath = [expandedPath stringByAppendingString:@"?"];
+			NSMutableArray *pairs = [NSMutableArray arrayWithCapacity:params.count];
+			for(NSString *key in params)
+			{
+				[pairs addObject:[NSString stringWithFormat:@"%@=%@", key, params[key]]];
+			}
+			expandedPath = [expandedPath stringByAppendingString:[pairs componentsJoinedByString:@"&"]];
+		}
+
+		NSMutableURLRequest *r = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:expandedPath]
+															  cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
+														  timeoutInterval:60.0];
+		[r setValue:@"Trailer" forHTTPHeaderField:@"User-Agent"];
+		[r setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
+		if(authToken) [r setValue:[@"token " stringByAppendingString:authToken] forHTTPHeaderField:@"Authorization"];
+
+		NSError *error;
+		NSHTTPURLResponse *response;
+		NSData *data = [NSURLConnection sendSynchronousRequest:r returningResponse:&response error:&error];
+		if(!error && response.statusCode>299)
+		{
+			error = [NSError errorWithDomain:@"Error response received" code:response.statusCode userInfo:nil];
+		}
+		if(error)
+		{
+			NSLog(@"GET %@ - FAILED: %@",expandedPath,error);
+			if(failureCallback)
+			{
+				dispatch_async(dispatch_get_main_queue(), ^{
+					failureCallback(error);
+				});
+			}
+		}
+		else
+		{
+			NSLog(@"GET %@ - RESULT: %ld",expandedPath,(long)response.statusCode);
+			if(successCallback)
+			{
+				id parsedData = nil;
+				if(data.length) parsedData = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+				dispatch_async(dispatch_get_main_queue(), ^{
+					successCallback(response,parsedData);
+				});
+			}
+		}
+	}];
+	o.threadPriority = 0.0;
+	[requestQueue addOperation:o];
+	return o;
+}
+
+
 
 @end
