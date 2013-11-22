@@ -12,52 +12,79 @@
 {
 	NSString *_title;
 	NSInteger _commentsTotal, _commentsNew;
-	NSDictionary *_titleAttributes, *_titleBoldAttributes, *_commentCountAttributes, *_commentAlertAttributes;
+	NSButton *unpin;
 }
 @end
+
+static NSDictionary *_titleAttributes, *_titleBoldAttributes, *_commentCountAttributes, *_commentAlertAttributes;
+static NSNumberFormatter *formatter;
 
 @implementation PRItemView
 
 - (id)initWithFrame:(NSRect)frame
 {
     self = [super initWithFrame:frame];
-    if (self) {
+    if (self)
+	{
+		static dispatch_once_t onceToken;
+		dispatch_once(&onceToken, ^{
+			formatter = [[NSNumberFormatter alloc] init];
+			formatter.numberStyle = NSNumberFormatterDecimalStyle;
 
-		NSMutableParagraphStyle *p = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-		p.alignment = NSCenterTextAlignment;
+			NSMutableParagraphStyle *p = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+			p.alignment = NSCenterTextAlignment;
 
-		_titleAttributes = @{
-							 NSFontAttributeName:[NSFont systemFontOfSize:12.0],
-							 NSForegroundColorAttributeName:[NSColor blackColor]
-							 };
-		_titleBoldAttributes = @{
+			_titleAttributes = @{
 								 NSFontAttributeName:[NSFont systemFontOfSize:12.0],
-								 NSForegroundColorAttributeName:[NSColor blueColor],
-								 NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle)
-								  };
-		_commentCountAttributes = @{
-								 NSFontAttributeName:[NSFont boldSystemFontOfSize:9.0],
 								 NSForegroundColorAttributeName:[NSColor blackColor],
-								 NSParagraphStyleAttributeName:p,
 								 };
-		_commentAlertAttributes = @{
-								 NSFontAttributeName:[NSFont boldSystemFontOfSize:9.0],
-								 NSForegroundColorAttributeName:[NSColor whiteColor],
-								 NSParagraphStyleAttributeName:p,
-								 };
+			_titleBoldAttributes = @{
+									 NSFontAttributeName:[NSFont systemFontOfSize:12.0],
+									 NSForegroundColorAttributeName:[NSColor blueColor],
+									 NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle),
+									 };
+			_commentCountAttributes = @{
+										NSFontAttributeName:[NSFont boldSystemFontOfSize:9.0],
+										NSForegroundColorAttributeName:[NSColor blackColor],
+										NSParagraphStyleAttributeName:p,
+										};
+			_commentAlertAttributes = @{
+										NSFontAttributeName:[NSFont boldSystemFontOfSize:9.0],
+										NSForegroundColorAttributeName:[NSColor whiteColor],
+										NSParagraphStyleAttributeName:p,
+										};
+		});
+		unpin = [[NSButton alloc] initWithFrame:CGRectZero];
+		[unpin setTitle:@"Remove"];
+		[unpin setTarget:self];
+		[unpin setAction:@selector(unPinSelected:)];
+		[unpin setHidden:YES];
+		[unpin setButtonType:NSMomentaryLightButton];
+		[unpin setBezelStyle:NSRoundRectBezelStyle];
+		[unpin setFont:[NSFont systemFontOfSize:10.0]];
+		[self addSubview:unpin];
     }
     return self;
 }
 
+- (void)unPinSelected:(NSButton *)button
+{
+	[self.delegate unPinSelectedFrom:[self enclosingMenuItem]];
+}
+
+#define REMOVE_BUTTON_WIDTH 80.0
+#define LEFTPADDING 50.0
+#define ORIGINAL_WIDTH 500.0
+
 - (void)drawRect:(NSRect)dirtyRect
 {
 	CGContextRef context = (CGContextRef) [[NSGraphicsContext currentContext] graphicsPort];
-    CGContextSetRGBFillColor(context, 0.0, 0.0, 0.0, 0.0);
 
-	NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
-	formatter.numberStyle = NSNumberFormatterDecimalStyle;
+	[[NSColor blackColor] setFill];
 
 	CGFloat badgeSize = 18.0;
+	CGFloat W = ORIGINAL_WIDTH-LEFTPADDING;
+	if(!unpin.isHidden) W -= REMOVE_BUTTON_WIDTH;
 
 	//////////////////// New count
 
@@ -91,14 +118,13 @@
 
 	//////////////////// Title
 
-	CGFloat L = 50;
 	if([[self enclosingMenuItem] isHighlighted])
 	{
-		[_title drawInRect:CGRectMake(L, -4.0, self.bounds.size.width-L, self.bounds.size.height) withAttributes:_titleBoldAttributes];
+		[_title drawInRect:CGRectMake(LEFTPADDING, -4.0, W, self.bounds.size.height) withAttributes:_titleBoldAttributes];
 	}
 	else
 	{
-		[_title drawInRect:CGRectMake(L, -4.0, self.bounds.size.width-L, self.bounds.size.height) withAttributes:_titleAttributes];
+		[_title drawInRect:CGRectMake(LEFTPADDING, -4.0, W, self.bounds.size.height) withAttributes:_titleAttributes];
 	}
 }
 
@@ -115,14 +141,17 @@
 		_commentsNew = 0;
 	}
 	_title = pullRequest.title;
-	CGRect titleSize = [_title boundingRectWithSize:CGSizeMake(450, FLT_MAX)
+
+	[unpin setHidden:!pullRequest.merged.boolValue];
+
+	CGFloat W = ORIGINAL_WIDTH-LEFTPADDING;
+	if(!unpin.isHidden) W -= REMOVE_BUTTON_WIDTH;
+
+	CGRect titleSize = [_title boundingRectWithSize:CGSizeMake(W, FLT_MAX)
 											options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
 										 attributes:_titleAttributes];
-	self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, 500, titleSize.size.height+10.0);
-}
-
--(void)mouseUp:(NSEvent *)theEvent
-{
+	self.frame = CGRectMake(0, 0, ORIGINAL_WIDTH, titleSize.size.height+10.0);
+	unpin.frame = CGRectMake(LEFTPADDING+W, (self.bounds.size.height-24.0)*0.5, REMOVE_BUTTON_WIDTH-10.0, 24.0);
 }
 
 - (void)mouseDown:(NSEvent*) event

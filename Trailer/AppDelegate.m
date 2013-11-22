@@ -60,12 +60,25 @@ static AppDelegate *_static_shared_ref;
 		[self preferencesSelected:nil];
 	}
 
-	// To test notifications
-	//PullRequest *r = [[PullRequest allItemsOfType:@"PullRequest" inMoc:self.managedObjectContext] lastObject];
-	//[self postNotificationOfType:kNewPr forItem:r];
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(networkStateChanged)
+												 name:kReachabilityChangedNotification
+											   object:nil];
+
+	//PullRequest *pr = [[PullRequest allItemsOfType:@"PullRequest" inMoc:self.managedObjectContext] lastObject];
+	//pr.merged = @(YES);
 }
 
-- (IBAction)launchAtStartSelected:(NSButton *)sender {
+
+- (IBAction)hidePrsSelected:(NSButton *)sender
+{
+	BOOL show = (sender.integerValue==1);
+	self.api.shouldHideUncommentedRequests = show;
+	[self updateStatusItem];
+}
+
+- (IBAction)launchAtStartSelected:(NSButton *)sender
+{
 	if(sender.integerValue==1)
 	{
 		[self addAppAsLoginItem];
@@ -162,12 +175,28 @@ static AppDelegate *_static_shared_ref;
 
 - (IBAction)myPrTitleSelected:(NSMenuItem *)sender {}
 
+- (void)prSelected:(NSMenuItem *)item
+{
+	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:item.representedObject moc:self.managedObjectContext];
+	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:r.webUrl]];
+	[r catchUpWithComments];
+	[self updateStatusItem];
+}
+
+- (void)unPinSelectedFrom:(NSMenuItem *)item
+{
+	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:item.representedObject moc:self.managedObjectContext];
+	[self.managedObjectContext deleteObject:r];
+	[self saveDB];
+	[self updateStatusItem];
+}
+
 - (NSInteger)buildPrMenuItems
 {
 	NSInteger newCount = 0;
 	if(!self.prMenuItems)
 	{
-		self.prMenuItems = [NSMutableArray array];
+		self.prMenuItems = [NSMutableSet set];
 	}
 	else
 	{
@@ -179,42 +208,45 @@ static AppDelegate *_static_shared_ref;
 	}
 
 	NSArray *pullRequests = [PullRequest sortedPullRequestsInMoc:self.managedObjectContext];
-	NSInteger myIndex=6, commentedIndex = 8, allIndex=10;
+	NSInteger myIndex=6, commentedIndex = 8, mergedIndex = 10, allIndex=12;
 	for(PullRequest *r in pullRequests)
 	{
-		NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:r.title action:@selector(prSelected:) keyEquivalent:@""];
-		PRItemView *itemView = [[PRItemView alloc] initWithFrame:CGRectZero];
+		if(self.api.shouldHideUncommentedRequests)
+			if((!r.isMine) || (r.unreadCommentCount==0))
+				continue;
+
+		NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@"" action:@selector(prSelected:) keyEquivalent:@""];
+		item.representedObject = r.serverId;
+		PRItemView *itemView = [[PRItemView alloc] init];
+		itemView.delegate = self;
 		[itemView setPullRequest:r];
 		item.view = itemView;
-		if(r.isMine)
+		if(r.merged.boolValue)
+		{
+			[self.statusBarMenu insertItem:item atIndex:mergedIndex++];
+		}
+		else if(r.isMine)
 		{
 			[self.statusBarMenu insertItem:item atIndex:myIndex++];
 			newCount += [r unreadCommentCount];
 			commentedIndex++;
+			mergedIndex++;
 		}
 		else if(r.commentedByMe)
 		{
 			[self.statusBarMenu insertItem:item atIndex:commentedIndex++];
 			newCount += [r unreadCommentCount];
+			mergedIndex++;
 		}
-		else
+		else // all other pull requests
 		{
 			[self.statusBarMenu insertItem:item atIndex:allIndex];
 		}
 		allIndex++;
 		[self.prMenuItems addObject:item];
 	}
-	return newCount;
-}
 
-- (void)prSelected:(NSMenuItem *)item
-{
-	NSArray *pullRequests = [PullRequest sortedPullRequestsInMoc:self.managedObjectContext];
-	NSInteger index = [self.prMenuItems indexOfObject:item];
-	PullRequest *r = [pullRequests objectAtIndex:index];
-	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:r.webUrl]];
-	[r catchUpWithComments];
-	[self updateStatusItem];
+	return newCount;
 }
 
 - (void)defaultsUpdated
@@ -328,6 +360,11 @@ static AppDelegate *_static_shared_ref;
 	else
 		[self.launchAtStartup setIntegerValue:0];
 
+	if(self.api.shouldHideUncommentedRequests)
+		[self.hideUncommentedPrs setIntegerValue:1];
+	else
+		[self.hideUncommentedPrs setIntegerValue:0];
+
 	[self.refreshDurationStepper setFloatValue:self.api.refreshPeriod];
 	[self refreshDurationChanged:nil];
 
@@ -376,7 +413,7 @@ static AppDelegate *_static_shared_ref;
 	NSArray *allRepos = [Repo allReposSortedByField:@"fullName" inMoc:self.managedObjectContext];
 	Repo *r = allRepos[row];
 	r.active = @([object boolValue]);
-	[self.managedObjectContext save:nil];
+	[self saveDB];
 	self.preferencesDirty = YES;
 }
 
@@ -486,20 +523,6 @@ static AppDelegate *_static_shared_ref;
     return [[self managedObjectContext] undoManager];
 }
 
-// Performs the save action for the application, which is to send the save: message to the application's managed object context. Any encountered errors are presented to the user.
-- (IBAction)saveAction:(id)sender
-{
-    NSError *error = nil;
-    
-    if (![[self managedObjectContext] commitEditing]) {
-        NSLog(@"%@:%@ unable to commit editing before saving", [self class], NSStringFromSelector(_cmd));
-    }
-    
-    if (![[self managedObjectContext] save:&error]) {
-        [[NSApplication sharedApplication] presentError:error];
-    }
-}
-
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
 {
     // Save changes in the application's managed object context before the application terminates.
@@ -516,33 +539,15 @@ static AppDelegate *_static_shared_ref;
     if (![[self managedObjectContext] hasChanges]) {
         return NSTerminateNow;
     }
-    
-    NSError *error = nil;
-    if (![[self managedObjectContext] save:&error]) {
 
-        // Customize this code block to include application-specific recovery steps.              
-        BOOL result = [sender presentError:error];
-        if (result) {
-            return NSTerminateCancel;
-        }
-
-        NSString *question = NSLocalizedString(@"Could not save changes while quitting. Quit anyway?", @"Quit without saves error question message");
-        NSString *info = NSLocalizedString(@"Quitting now will lose any changes you have made since the last successful save", @"Quit without saves error question info");
-        NSString *quitButton = NSLocalizedString(@"Quit anyway", @"Quit anyway button title");
-        NSString *cancelButton = NSLocalizedString(@"Cancel", @"Cancel button title");
-        NSAlert *alert = [[NSAlert alloc] init];
-        [alert setMessageText:question];
-        [alert setInformativeText:info];
-        [alert addButtonWithTitle:quitButton];
-        [alert addButtonWithTitle:cancelButton];
-
-        NSInteger answer = [alert runModal];
-        
-        if (answer == NSAlertAlternateReturn) {
-            return NSTerminateCancel;
-        }
-    }
+	[self saveDB];
     return NSTerminateNow;
+}
+
+- (void)saveDB
+{
+	if(self.managedObjectContext.hasChanges)
+		[self.managedObjectContext save:nil];
 }
 
 -(void)windowWillClose:(NSNotification *)notification
@@ -556,35 +561,48 @@ static AppDelegate *_static_shared_ref;
 	{
 		if(!self.refreshTimer && self.api.refreshPeriod>0.0)
 		{
-			if(self.lastSuccessfulRefresh)
-			{
-				NSTimeInterval howLongAgo = [[NSDate date] timeIntervalSinceDate:self.lastSuccessfulRefresh];
-				if(howLongAgo>self.api.refreshPeriod)
-				{
-					[self startRefresh];
-				}
-				else
-				{
-					NSTimeInterval howLongUntilNextSync = self.api.refreshPeriod-howLongAgo;
-					NSLog(@"Will refresh in %f",howLongUntilNextSync);
-					self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:howLongUntilNextSync
-																		 target:self
-																	   selector:@selector(refreshIfApplicable)
-																	   userInfo:nil
-																		repeats:NO];
-				}
-			}
-			else
-			{
-				[self startRefresh];
-			}
+			[self startRefreshIfItIsDue];
 		}
+	}
+}
+
+- (void)networkStateChanged
+{
+	if([self.api.reachability currentReachabilityStatus]!=NotReachable)
+	{
+		NSLog(@"Network is back");
+		[self startRefreshIfItIsDue];
+	}
+}
+
+- (void)startRefreshIfItIsDue
+{
+	if(self.lastSuccessfulRefresh)
+	{
+		NSTimeInterval howLongAgo = [[NSDate date] timeIntervalSinceDate:self.lastSuccessfulRefresh];
+		if(howLongAgo>self.api.refreshPeriod)
+		{
+			[self startRefresh];
+		}
+		else
+		{
+			NSTimeInterval howLongUntilNextSync = self.api.refreshPeriod-howLongAgo;
+			NSLog(@"No need to refresh yet, will refresh in %f",howLongUntilNextSync);
+			self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:howLongUntilNextSync
+																 target:self
+															   selector:@selector(refreshTimerDone)
+															   userInfo:nil
+																repeats:NO];
+		}
+	}
+	else
+	{
+		[self startRefresh];
 	}
 }
 
 - (IBAction)refreshNowSelected:(NSMenuItem *)sender
 {
-	[self checkApiUsage];
 	NSArray *activeRepos = [Repo activeReposInMoc:self.managedObjectContext];
 	if(activeRepos.count==0)
 	{
@@ -600,16 +618,18 @@ static AppDelegate *_static_shared_ref;
 	{
         NSAlert *alert = [[NSAlert alloc] init];
         [alert setMessageText:@"Your API request usage is over the limit!"];
-        [alert setInformativeText:[NSString stringWithFormat:@"Your request cannot be completed until GitHub resets your hourly API allowance at %@.  If you get this error often, try to make fewer manual refreshes or reducing the number of repos you are monitoring.  You can check your API usage at any time from the bottom of the preferences pane.",self.api.resetDate]];
+        [alert setInformativeText:[NSString stringWithFormat:@"Your request cannot be completed until GitHub resets your hourly API allowance at %@.\n\nIf you get this error often, try to make fewer manual refreshes or reducing the number of repos you are monitoring.\n\nYou can check your API usage at any time from the bottom of the preferences pane at any time.",self.api.resetDate]];
         [alert addButtonWithTitle:@"OK"];
+		[alert runModal];
 		return;
 	}
-	if((self.apiLoad.maxValue-self.apiLoad.doubleValue)<LOW_API_WARNING)
+	else if((self.apiLoad.doubleValue/self.apiLoad.maxValue)>LOW_API_WARNING)
 	{
         NSAlert *alert = [[NSAlert alloc] init];
-        [alert setMessageText:@"Your API request usage is getting very high"];
-        [alert setInformativeText:[NSString stringWithFormat:@"Try to make fewer manual refreshes or reducing the number of repos you are monitoring.  Your allowance will be reset at %@, and you can check your API usage from the bottom of the preferences pane.",self.api.resetDate]];
+        [alert setMessageText:@"Your API request usage is close to full"];
+        [alert setInformativeText:[NSString stringWithFormat:@"Try to make fewer manual refreshes, increasing the automatic refresh time, or reducing the number of repos you are monitoring.\n\nYour allowance will be reset by Github on %@.\n\nYou can check your API usage from the bottom of the preferences pane.",self.api.resetDate]];
         [alert addButtonWithTitle:@"OK"];
+		[alert runModal];
 	}
 }
 
@@ -635,13 +655,22 @@ static AppDelegate *_static_shared_ref;
 	[self.githubTokenHolder setEnabled:YES];
 	[self.clearAll setEnabled:YES];
 	[self.activityDisplay stopAnimation:nil];
-	[self.managedObjectContext save:nil];
+	[self saveDB];
 	[self.projectsTable reloadData];
 	[self updateStatusItem];
+	[self checkApiUsage];
+	[self sendNotifications];
+}
+
+-(BOOL)isRefreshing
+{
+	return self.refreshNow.target==nil;
 }
 
 -(void)startRefresh
 {
+	if(self.isRefreshing) return;
+	NSLog(@"Starting refresh");
 	[self prepareForRefresh];
 	id oldTarget = self.refreshNow.target;
 	SEL oldAction = self.refreshNow.action;
@@ -660,12 +689,18 @@ static AppDelegate *_static_shared_ref;
 		self.refreshNow.target = oldTarget;
 		self.refreshNow.action = oldAction;
 		self.lastUpdateFailed = !success;
-		if(success) self.lastSuccessfulRefresh = [NSDate date];
 		[self completeRefresh];
-		[self sendNotifications];
-		if(success) self.preferencesDirty = NO;
-		NSLog(@"Refresh done: %d at priority %f, next refresh in %f seconds",success,[NSThread mainThread].threadPriority,self.api.refreshPeriod);
-		self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:self.api.refreshPeriod target:self selector:@selector(refreshIfApplicable) userInfo:nil repeats:NO];
+		if(success)
+		{
+			self.lastSuccessfulRefresh = [NSDate date];
+			self.preferencesDirty = NO;
+		}
+		self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:self.api.refreshPeriod
+															 target:self
+														   selector:@selector(refreshTimerDone)
+														   userInfo:nil
+															repeats:NO];
+		NSLog(@"Refresh done");
 	}];
 }
 
@@ -676,11 +711,10 @@ static AppDelegate *_static_shared_ref;
 	[self.refreshDurationLabel setStringValue:[NSString stringWithFormat:@"Automatically refresh every %ld seconds",(long)self.refreshDurationStepper.integerValue]];
 }
 
--(void)refreshIfApplicable
+-(void)refreshTimerDone
 {
 	if(self.api.localUserId && self.api.authToken.length)
 	{
-		NSLog(@"Starting refresh");
 		[self startRefresh];
 	}
 }
@@ -707,7 +741,7 @@ static AppDelegate *_static_shared_ref;
 		}
 		c.postSyncAction = @(kTouchedNone);
 	}
-	[self.managedObjectContext save:nil];
+	[self saveDB];
 }
 
 -(void)updateStatusItem
@@ -734,7 +768,7 @@ static AppDelegate *_static_shared_ref;
 					   NSForegroundColorAttributeName: [NSColor colorWithRed:0.8 green:0.0 blue:0.0 alpha:1.0],
 					   };
 	}
-	else if(!self.refreshNow.target) // refreshing
+	else if(self.isRefreshing)
 	{
 		attributes = @{
 					   NSFontAttributeName: [NSFont systemFontOfSize:11.0],
@@ -762,6 +796,8 @@ static AppDelegate *_static_shared_ref;
 	else
 	{
 		self.statusItem = [statusBar statusItemWithLength:length];
+		self.statusItem.menu = self.statusBarMenu;
+		self.statusItem.menu.delegate = self;
 	}
 
 	NSImage *newImage = [[NSImage alloc] initWithSize:CGSizeMake(self.statusItem.length, H)];
@@ -775,21 +811,30 @@ static AppDelegate *_static_shared_ref;
 	[countString drawInRect:CGRectMake(H+padding, -5, width, H) withAttributes:attributes];
     [newImage unlockFocus];
 
+	[newImage setTemplate:self.menuIsOpen];
 	self.statusItem.image = newImage;
 	self.statusItem.highlightMode = YES;
-	self.statusItem.menu = self.statusBarMenu;
-	self.statusItem.menu.delegate = self;
+}
+
+- (void)setMenuIsOpen:(BOOL)menuIsOpen
+{
+	[self.statusItem.image setTemplate:menuIsOpen];
+}
+
+- (BOOL)menuIsOpen
+{
+	return self.statusItem.image.isTemplate;
 }
 
 -(void)menuDidClose:(NSMenu *)menu
 {
-	[self.statusItem.image setTemplate:NO];
+	self.menuIsOpen = NO;
 }
 
 -(void)menuWillOpen:(NSMenu *)menu
 {
-	[self.statusItem.image setTemplate:YES];
-	if(self.refreshNow.target)
+	self.menuIsOpen = YES;
+	if(!self.isRefreshing)
 	{
 		NSString *prefix;
 		if(self.api.localUser)
@@ -826,7 +871,7 @@ static AppDelegate *_static_shared_ref;
 	{
 		r.active = @YES;
 	}
-	[self.managedObjectContext save:nil];
+	[self saveDB];
 	[self.projectsTable reloadData];
 	self.preferencesDirty = YES;
 }
@@ -838,7 +883,7 @@ static AppDelegate *_static_shared_ref;
 	{
 		r.active = @NO;
 	}
-	[self.managedObjectContext save:nil];
+	[self saveDB];
 	[self.projectsTable reloadData];
 	self.preferencesDirty = YES;
 }

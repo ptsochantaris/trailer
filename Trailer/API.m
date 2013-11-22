@@ -22,6 +22,8 @@
 		dateFormatter = [[NSDateFormatter alloc] initWithDateFormat:@"YYYY-MM-DDTHH:MM:SSZ" allowNaturalLanguage:NO];
 		requestQueue = [[NSOperationQueue alloc] init];
 		requestQueue.maxConcurrentOperationCount = 8;
+		self.reachability = [Reachability reachabilityWithHostName:API_SERVER];
+		[self.reachability startNotifier];
 	}
     return self;
 }
@@ -63,6 +65,10 @@
 #define USER_ID_KEY @"USER_ID_KEY"
 -(NSString *)localUserId { return [[NSUserDefaults standardUserDefaults] stringForKey:USER_ID_KEY]; }
 -(void)setLocalUserId:(NSString *)localUserId { [self storeDefaultValue:localUserId forKey:USER_ID_KEY]; }
+
+#define HIDE_PRS_KEY @"HIDE_UNCOMMENTED_PRS_KEY"
+-(void)setShouldHideUncommentedRequests:(BOOL)shouldHideUncommentedRequests { [self storeDefaultValue:@(shouldHideUncommentedRequests) forKey:HIDE_PRS_KEY]; }
+-(BOOL)shouldHideUncommentedRequests { return [[[NSUserDefaults standardUserDefaults] stringForKey:HIDE_PRS_KEY] boolValue]; }
 
 -(void)error:(NSString*)errorString
 {
@@ -199,7 +205,10 @@
 	for(PullRequest *r in pullRequests)
 	{
 		Repo *parent = [Repo itemOfType:@"Repo" serverId:r.repoId moc:moc];
-		if(r.postSyncAction.integerValue==kTouchedDelete && parent && (parent.postSyncAction.integerValue!=kTouchedDelete) && (r.isMine || r.commentedByMe))
+		if(r.postSyncAction.integerValue==kTouchedDelete &&
+		   parent && (parent.postSyncAction.integerValue!=kTouchedDelete) &&
+		   (r.isMine || r.commentedByMe) &&
+		   (!r.merged.boolValue))
 		{
 			[prsToCheck addObject:r]; // possibly merged
 		}
@@ -220,16 +229,17 @@
 	Repo *parent = [Repo itemOfType:@"Repo" serverId:r.repoId moc:r.managedObjectContext];
 	NSString *owner = [parent.fullName copy];
 
-	NSManagedObjectID *oid = r.objectID;
 	[self get:[NSString stringWithFormat:@"/repos/%@/pulls/%@/merge",owner,r.number]
    parameters:nil
 	  success:^(NSHTTPURLResponse *response, id data) {
 		  // merged indeed
-		  PullRequest *R = (PullRequest *)[[AppDelegate shared].managedObjectContext existingObjectWithID:oid error:nil];
-		  [[AppDelegate shared] postNotificationOfType:kPrMerged forItem:R];
+		  r.postSyncAction = @(kTouchedNone); // don't delete this
+		  r.merged = @(YES); // pin it so it sticks around
+		  [[AppDelegate shared] postNotificationOfType:kPrMerged forItem:r];
 		  [self _detectMergedPullRequests:prsToCheck andCallback:callback];
 	  } failure:^(NSError *error) {
 		  // not merged
+		  if(error) r.postSyncAction = @(kTouchedNone); // don't delete this, we couldn't check, play it safe
 		  [self _detectMergedPullRequests:prsToCheck andCallback:callback];
 	  }];
 }
@@ -449,7 +459,7 @@
 	NSBlockOperation *o = [NSBlockOperation blockOperationWithBlock:^{
 
 		NSString *expandedPath;
-		if([path rangeOfString:@"/"].location==0) expandedPath = [@"https://api.github.com" stringByAppendingString:path];
+		if([path rangeOfString:@"/"].location==0) expandedPath = [[@"https://" stringByAppendingString:API_SERVER] stringByAppendingString:path];
 		else expandedPath = path;
 
 		if(params.count)

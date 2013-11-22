@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="4514" systemVersion="13A603" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
-        <deployment defaultVersion="1080" identifier="macosx"/>
+        <deployment defaultVersion="1090" identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="4514"/>
     </dependencies>
     <objects>
@@ -43,7 +43,7 @@
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="NVW-TD-xYo">
-                        <rect key="frame" x="22" y="343" width="579" height="17"/>
+                        <rect key="frame" x="22" y="343" width="253" height="17"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Detected Projects" id="8nI-sT-uHC">
                             <font key="font" metaFont="system"/>
@@ -168,7 +168,7 @@
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="VGc-Yu-S5G">
-                        <rect key="frame" x="271" y="452" width="364" height="17"/>
+                        <rect key="frame" x="271" y="452" width="369" height="17"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" id="amf-71-XJB">
                             <font key="font" metaFont="system"/>
@@ -194,6 +194,17 @@
                         </buttonCell>
                         <connections>
                             <action selector="launchAtStartSelected:" target="494" id="VGh-YQ-O2f"/>
+                        </connections>
+                    </button>
+                    <button id="c6m-8a-CRl">
+                        <rect key="frame" x="282" y="342" width="352" height="18"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="check" title="Ony list my own PRs with new comments" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="djW-U3-Ae9">
+                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="hidePrsSelected:" target="494" id="aUd-Sw-LSr"/>
                         </connections>
                     </button>
                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="Tbh-2L-zvn">
@@ -226,6 +237,7 @@
                 <outlet property="apiLoad" destination="U6L-MC-3fm" id="oYJ-81-Ywn"/>
                 <outlet property="clearAll" destination="5Sj-ma-EM3" id="4Lh-JS-ceA"/>
                 <outlet property="githubTokenHolder" destination="89t-uF-tda" id="XIm-D3-9YE"/>
+                <outlet property="hideUncommentedPrs" destination="c6m-8a-CRl" id="N1u-BD-gDF"/>
                 <outlet property="launchAtStartup" destination="qqE-Ib-sQ9" id="brX-S8-Ge0"/>
                 <outlet property="preferencesWindow" destination="371" id="uYB-yu-610"/>
                 <outlet property="projectsTable" destination="eB0-Bq-YR9" id="kuh-DJ-Kls"/>
@@ -241,7 +253,7 @@
             </connections>
         </customObject>
         <customObject id="420" customClass="NSFontManager"/>
-        <menu title="Trailer" id="6Oo-9b-EZK">
+        <menu title="Trailer" autoenablesItems="NO" id="6Oo-9b-EZK">
             <items>
                 <menuItem title="Refresh" id="asb-Mc-b5c">
                     <modifierMask key="keyEquivalentModifierMask"/>
@@ -274,6 +286,10 @@
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="Tj9-mi-KRl"/>
                 <menuItem title="Participated Pull Requests" id="hSi-Ya-PqL">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="E6s-Xr-WBe"/>
+                <menuItem title="Recently Merged Pull Requests" id="haR-sk-k7o">
                     <modifierMask key="keyEquivalentModifierMask"/>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="CKy-ko-PSY"/>

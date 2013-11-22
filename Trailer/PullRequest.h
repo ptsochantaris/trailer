@@ -22,6 +22,7 @@
 @property (nonatomic, retain) NSNumber * userId;
 @property (nonatomic, retain) NSDate * latestReadCommentDate;
 @property (nonatomic, retain) NSNumber *repoId;
+@property (nonatomic, retain) NSNumber *merged;
 
 +(PullRequest *)pullRequestWithInfo:(NSDictionary*)info moc:(NSManagedObjectContext *)moc;
 +(PullRequest *)pullRequestWithUrl:(NSString *)url moc:(NSManagedObjectContext *)moc;

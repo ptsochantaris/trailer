@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		16075A9717EC7492000D86FD /* API.m in Sources */ = {isa = PBXBuildFile; fileRef = 16075A9617EC7492000D86FD /* API.m */; };
 		16075A9817EC7492000D86FD /* API.m in Sources */ = {isa = PBXBuildFile; fileRef = 16075A9617EC7492000D86FD /* API.m */; };
+		1617BEEA183F538100E89BB2 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 1617BEE9183F538100E89BB2 /* Reachability.m */; };
+		1617BEEB183F538100E89BB2 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 1617BEE9183F538100E89BB2 /* Reachability.m */; };
+		1617BEED183F543600E89BB2 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1617BEEC183F543600E89BB2 /* SystemConfiguration.framework */; };
 		161CA3C617F5A55300F4AF6C /* PullRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 161CA3C517F5A55300F4AF6C /* PullRequest.m */; };
 		161CA3C717F5A55300F4AF6C /* PullRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 161CA3C517F5A55300F4AF6C /* PullRequest.m */; };
 		161CA3CA17F5B1F300F4AF6C /* PRComment.m in Sources */ = {isa = PBXBuildFile; fileRef = 161CA3C917F5B1F300F4AF6C /* PRComment.m */; };
@@ -68,6 +71,10 @@
 /* Begin PBXFileReference section */
 		16075A9517EC7492000D86FD /* API.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = API.h; sourceTree = "<group>"; };
 		16075A9617EC7492000D86FD /* API.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = API.m; sourceTree = "<group>"; };
+		1617BEE8183F538100E89BB2 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
+		1617BEE9183F538100E89BB2 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
+		1617BEEC183F543600E89BB2 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		1617BEEE183F9C4F00E89BB2 /* Trailer 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Trailer 2.xcdatamodel"; sourceTree = "<group>"; };
 		161CA3C417F5A55300F4AF6C /* PullRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PullRequest.h; sourceTree = "<group>"; };
 		161CA3C517F5A55300F4AF6C /* PullRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PullRequest.m; sourceTree = "<group>"; };
 		161CA3C817F5B1F300F4AF6C /* PRComment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PRComment.h; sourceTree = "<group>"; };
@@ -115,6 +122,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1617BEED183F543600E89BB2 /* SystemConfiguration.framework in Frameworks */,
 				16EAA972182D897E0018018B /* Sparkle.framework in Frameworks */,
 				168BC6AE17EC2DF000BC4584 /* Cocoa.framework in Frameworks */,
 			);
@@ -133,6 +141,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1617BEE7183F537500E89BB2 /* Reachability */ = {
+			isa = PBXGroup;
+			children = (
+				1617BEE8183F538100E89BB2 /* Reachability.h */,
+				1617BEE9183F538100E89BB2 /* Reachability.m */,
+			);
+			name = Reachability;
+			sourceTree = "<group>";
+		};
 		168BC6A117EC2DF000BC4584 = {
 			isa = PBXGroup;
 			children = (
@@ -156,6 +173,7 @@
 		168BC6AC17EC2DF000BC4584 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1617BEEC183F543600E89BB2 /* SystemConfiguration.framework */,
 				16B94066182D051700F32061 /* Sparkle.framework */,
 				168BC6AD17EC2DF000BC4584 /* Cocoa.framework */,
 				168BC6CF17EC2DF000BC4584 /* XCTest.framework */,
@@ -178,6 +196,7 @@
 		168BC6B317EC2DF000BC4584 /* Trailer */ = {
 			isa = PBXGroup;
 			children = (
+				1617BEE7183F537500E89BB2 /* Reachability */,
 				16EC79E317ECA16C00F7EB44 /* Extensions */,
 				16B9552E17EC86D10005118F /* Data */,
 				16075A9517EC7492000D86FD /* API.h */,
@@ -363,6 +382,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1617BEEA183F538100E89BB2 /* Reachability.m in Sources */,
 				16B9553A17EC93DE0005118F /* Repo.m in Sources */,
 				161CA3CE17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m in Sources */,
 				161CA3C617F5A55300F4AF6C /* PullRequest.m in Sources */,
@@ -385,6 +405,7 @@
 				16B9553B17EC93DE0005118F /* Repo.m in Sources */,
 				16EC79E717ECA18000F7EB44 /* HTTextField.m in Sources */,
 				16B9553217EC89520005118F /* Org.m in Sources */,
+				1617BEEB183F538100E89BB2 /* Reachability.m in Sources */,
 				161CA3CF17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m in Sources */,
 				16075A9817EC7492000D86FD /* API.m in Sources */,
 				16FA683C1823CF4600401E9B /* PRItemView.m in Sources */,
@@ -464,7 +485,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 			};
@@ -496,7 +517,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -613,9 +634,10 @@
 		168BC6C517EC2DF000BC4584 /* Trailer.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				1617BEEE183F9C4F00E89BB2 /* Trailer 2.xcdatamodel */,
 				168BC6C617EC2DF000BC4584 /* Trailer.xcdatamodel */,
 			);
-			currentVersion = 168BC6C617EC2DF000BC4584 /* Trailer.xcdatamodel */;
+			currentVersion = 1617BEEE183F9C4F00E89BB2 /* Trailer 2.xcdatamodel */;
 			path = Trailer.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

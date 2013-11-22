@@ -8,7 +8,15 @@
 
 #import <Cocoa/Cocoa.h>
 
+@protocol PRItemViewDelegate <NSObject>
+
+- (void)unPinSelectedFrom:(NSMenuItem *)item;
+
+@end
+
 @interface PRItemView : NSView
+
+@property (nonatomic,weak) id<PRItemViewDelegate> delegate;
 
 - (void) setPullRequest:(PullRequest *)pullRequest;
 

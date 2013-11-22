@@ -22,6 +22,7 @@
 @dynamic userId;
 @dynamic latestReadCommentDate;
 @dynamic repoId;
+@dynamic merged;
 
 +(PullRequest *)pullRequestWithInfo:(NSDictionary *)info moc:(NSManagedObjectContext *)moc
 {

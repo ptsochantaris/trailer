@@ -27,7 +27,9 @@
         <attribute name="createdAt" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="issueCommentLink" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="latestReadCommentDate" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="merged" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="number" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="pinned" optional="YES" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
         <attribute name="postSyncAction" optional="YES" attributeType="Integer 16" syncable="YES"/>
         <attribute name="repoId" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
         <attribute name="reviewCommentLink" optional="YES" attributeType="String" syncable="YES"/>
