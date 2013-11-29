@@ -70,6 +70,22 @@
 -(void)setShouldHideUncommentedRequests:(BOOL)shouldHideUncommentedRequests { [self storeDefaultValue:@(shouldHideUncommentedRequests) forKey:HIDE_PRS_KEY]; }
 -(BOOL)shouldHideUncommentedRequests { return [[[NSUserDefaults standardUserDefaults] stringForKey:HIDE_PRS_KEY] boolValue]; }
 
+#define SHOW_COMMENTS_EVERYWHERE_KEY @"SHOW_COMMENTS_EVERYWHERE_KEY"
+-(BOOL)showCommentsEverywhere { return [[[NSUserDefaults standardUserDefaults] stringForKey:SHOW_COMMENTS_EVERYWHERE_KEY] boolValue]; }
+-(void)setShowCommentsEverywhere:(BOOL)showCommentsEverywhere { [self storeDefaultValue:@(showCommentsEverywhere) forKey:SHOW_COMMENTS_EVERYWHERE_KEY]; }
+
+#define SORT_ORDER_KEY @"SORT_ORDER_KEY"
+-(BOOL)sortDescending { return [[[NSUserDefaults standardUserDefaults] stringForKey:SORT_ORDER_KEY] boolValue]; }
+-(void)setSortDescending:(BOOL)sortDescending { [self storeDefaultValue:@(sortDescending) forKey:SORT_ORDER_KEY]; }
+
+#define SHOW_UPDATED_KEY @"SHOW_UPDATED_KEY"
+-(BOOL)showCreatedInsteadOfUpdated { return [[[NSUserDefaults standardUserDefaults] stringForKey:SHOW_UPDATED_KEY] boolValue]; }
+-(void)setShowCreatedInsteadOfUpdated:(BOOL)showCreatedInsteadOfUpdated { [self storeDefaultValue:@(showCreatedInsteadOfUpdated) forKey:SHOW_UPDATED_KEY]; }
+
+#define SORT_METHOD_KEY @"SORT_METHOD_KEY"
+-(NSInteger)sortMethod { return [[[NSUserDefaults standardUserDefaults] objectForKey:SORT_METHOD_KEY] integerValue]; }
+-(void)setSortMethod:(NSInteger)sortMethod { [self storeDefaultValue:@(sortMethod) forKey:SORT_METHOD_KEY]; }
+
 -(void)error:(NSString*)errorString
 {
 	NSLog(@"Failed to fetch %@",errorString);
@@ -81,7 +97,7 @@
 	for(PullRequest *r in prs1)
 	{
 		NSArray *comments = [PRComment commentsForPullRequestUrl:r.url inMoc:moc];
-		for(PRComment *c in comments) c.postSyncAction = @(kTouchedDelete);
+		for(PRComment *c in comments) c.postSyncAction = @(kPostSyncDelete);
 	}
 
 	NSInteger totalOperations = 2;
@@ -95,14 +111,13 @@
 		if(succeded+failed==totalOperations)
 		{
 			[DataItem nukeDeletedItemsOfType:@"PRComment" inMoc:moc];
-			if(callback) callback(success);
+			if(callback) callback(failed==0);
 		}
 	};
 
 	[self _fetchCommentsForPullRequestIssues:YES toMoc:moc andCallback:completionCallback];
 
 	[self _fetchCommentsForPullRequestIssues:NO toMoc:moc andCallback:completionCallback];
-
 }
 
 -(void)_fetchCommentsForPullRequestIssues:(BOOL)issues toMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
@@ -135,13 +150,12 @@
 						 PRComment *c = [PRComment commentWithInfo:info moc:moc];
 						 if(!c.pullRequestUrl) c.pullRequestUrl = p.url;
 
-						 // check if we're assigned to a new pull request, in which case we want to "fast forward" its latest comment dates to our own if we're newer
-						 if(p.postSyncAction.integerValue == kTouchedNew)
+						 // check if we're assigned to a just created pull request, in which case we want to "fast forward" its latest comment dates to our own if we're newer
+						 if(p.postSyncAction.integerValue == kPostSyncNoteNew)
 						 {
 							 if(!p.latestReadCommentDate || [p.latestReadCommentDate compare:c.updatedAt]==NSOrderedAscending)
 								 p.latestReadCommentDate = c.updatedAt;
 						 }
-
 					 }
 				 } finalCallback:^(BOOL success) {
 					 if(success) succeeded++; else failed++;
@@ -205,9 +219,9 @@
 	for(PullRequest *r in pullRequests)
 	{
 		Repo *parent = [Repo itemOfType:@"Repo" serverId:r.repoId moc:moc];
-		if(r.postSyncAction.integerValue==kTouchedDelete &&
-		   parent && (parent.postSyncAction.integerValue!=kTouchedDelete) &&
-		   (r.isMine || r.commentedByMe) &&
+		if(r.postSyncAction.integerValue==kPostSyncDelete &&
+		   parent.active.boolValue && (parent.postSyncAction.integerValue!=kPostSyncDelete) &&
+		   ([AppDelegate shared].api.showCommentsEverywhere || r.isMine || r.commentedByMe) &&
 		   (!r.merged.boolValue))
 		{
 			[prsToCheck addObject:r]; // possibly merged
@@ -233,13 +247,13 @@
    parameters:nil
 	  success:^(NSHTTPURLResponse *response, id data) {
 		  // merged indeed
-		  r.postSyncAction = @(kTouchedNone); // don't delete this
+		  r.postSyncAction = @(kPostSyncDoNothing); // don't delete this
 		  r.merged = @(YES); // pin it so it sticks around
 		  [[AppDelegate shared] postNotificationOfType:kPrMerged forItem:r];
 		  [self _detectMergedPullRequests:prsToCheck andCallback:callback];
-	  } failure:^(NSError *error) {
+	  } failure:^(NSHTTPURLResponse *response, NSError *error) {
 		  // not merged
-		  if(error) r.postSyncAction = @(kTouchedNone); // don't delete this, we couldn't check, play it safe
+		  if(response.statusCode!=404) r.postSyncAction = @(kPostSyncDoNothing); // don't delete this, we couldn't check, play it safe
 		  [self _detectMergedPullRequests:prsToCheck andCallback:callback];
 	  }];
 }
@@ -253,7 +267,10 @@
 			syncContext.parentContext = [AppDelegate shared].managedObjectContext;
 			syncContext.undoManager = nil;
 
-			[DataItem assumeWilldeleteItemsOfType:@"PullRequest" inMoc:syncContext];
+			NSArray *prs = [PullRequest itemsOfType:@"PullRequest" surviving:YES inMoc:syncContext];
+			for(PullRequest *r in prs)
+				if(!r.merged.boolValue)
+					r.postSyncAction = @(kPostSyncDelete);
 			NSMutableArray *activeRepos = [[Repo activeReposInMoc:syncContext] mutableCopy];
 			[self _fetchPullRequestsForRepos:activeRepos toMoc:syncContext andCallback:^(BOOL success) {
 				if(success)
@@ -426,7 +443,7 @@
 															userInfo:@{ RATE_UPDATE_NOTIFICATION_LIMIT_KEY: @(requestLimit),
 																		RATE_UPDATE_NOTIFICATION_REMAINING_KEY: @(requestsRemaining) }];
 		  if(callback) callback(data, [API lastPage:response]);
-	  } failure:^(NSError *error) {
+	  } failure:^(NSHTTPURLResponse *response, NSError *error) {
 		  NSLog(@"Failure: %@",error);
 		  if(callback) callback(nil,NO);
 	  }];
@@ -441,7 +458,7 @@
 			 long long requestLimit = [[response allHeaderFields][@"X-RateLimit-Limit"] longLongValue];
 			 long long epochSeconds = [[response allHeaderFields][@"X-RateLimit-Reset"] longLongValue];
 			 if(callback) callback(requestsRemaining,requestLimit,epochSeconds);
-		 } failure:^(NSError *error) {
+		 } failure:^(NSHTTPURLResponse *response, NSError *error) {
 			 if(callback) callback(-1, -1, -1);
 		 }];
 }
@@ -453,7 +470,9 @@
 	return ([linkHeader rangeOfString:@"rel=\"next\""].location==NSNotFound);
 }
 
--(NSOperation *)get:(NSString *)path parameters:(NSDictionary *)params success:(void(^)(NSHTTPURLResponse *response, id data))successCallback failure:(void(^)(NSError *error))failureCallback
+-(NSOperation *)get:(NSString *)path parameters:(NSDictionary *)params
+			success:(void(^)(NSHTTPURLResponse *response, id data))successCallback
+			failure:(void(^)(NSHTTPURLResponse *response, NSError *error))failureCallback
 {
 	NSString *authToken = self.authToken;
 	NSBlockOperation *o = [NSBlockOperation blockOperationWithBlock:^{
@@ -493,7 +512,7 @@
 			if(failureCallback)
 			{
 				dispatch_async(dispatch_get_main_queue(), ^{
-					failureCallback(error);
+					failureCallback(response, error);
 				});
 			}
 		}

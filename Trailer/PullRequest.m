@@ -42,10 +42,17 @@
 	return p;
 }
 
-+(NSArray *)sortedPullRequestsInMoc:(NSManagedObjectContext *)moc
++(NSArray *)pullRequestsSortedByField:(NSString *)fieldName ascending:(BOOL)ascending inMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PullRequest"];
-	f.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"createdAt" ascending:NO]];
+	if([fieldName isEqualToString:@"title"])
+	{
+		f.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:fieldName ascending:ascending selector:@selector(caseInsensitiveCompare:)]];
+	}
+	else
+	{
+		f.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:fieldName ascending:ascending]];
+	}
 	return [moc executeFetchRequest:f error:nil];
 }
 
@@ -56,7 +63,7 @@
 
 -(NSInteger)unreadCommentCount
 {
-	if(!self.latestReadCommentDate) return [PRComment countCommentsForPullRequestUrl:self.url inMoc:self.managedObjectContext];
+	if(!self.latestReadCommentDate) self.latestReadCommentDate = [NSDate distantPast];
 	
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
 	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestUrl == %@ and updatedAt > %@",self.url,self.latestReadCommentDate];
@@ -64,7 +71,7 @@
 
 	NSInteger unreadCount = 0;
 	for(PRComment *c in res)
-		if(!c.isMine)
+		if(!c.isMine) // don't count my comments
 			unreadCount++;
 
 	return unreadCount;

@@ -20,9 +20,13 @@
 	return r;
 }
 
-+(NSArray*)allReposSortedByField:(NSString*)fieldName inMoc:(NSManagedObjectContext*)moc
++(NSArray*)allReposSortedByField:(NSString*)fieldName withTitleFilter:(NSString *)titleFilterOrNil inMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"Repo"];
+	if(titleFilterOrNil.length)
+	{
+		f.predicate = [NSPredicate predicateWithFormat:@"fullName contains [cd] %@",titleFilterOrNil];
+	}
 	f.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:fieldName ascending:YES]];
 	return [moc executeFetchRequest:f error:nil];
 }

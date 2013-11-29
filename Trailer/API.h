@@ -15,9 +15,10 @@
 @interface API : NSObject
 
 @property (nonatomic) NSString *authToken, *localUser, *localUserId, *resetDate;
+@property (nonatomic) NSInteger sortMethod;
 @property (nonatomic) float refreshPeriod;
 @property (nonatomic) Reachability *reachability;
-@property (nonatomic) BOOL shouldHideUncommentedRequests;
+@property (nonatomic) BOOL shouldHideUncommentedRequests, showCommentsEverywhere, sortDescending, showCreatedInsteadOfUpdated;
 
 - (void) fetchRepositoriesAndCallback:(void(^)(BOOL success))callback;
 

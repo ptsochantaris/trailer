@@ -25,11 +25,17 @@
 @property (nonatomic, retain) NSNumber *merged;
 
 +(PullRequest *)pullRequestWithInfo:(NSDictionary*)info moc:(NSManagedObjectContext *)moc;
+
 +(PullRequest *)pullRequestWithUrl:(NSString *)url moc:(NSManagedObjectContext *)moc;
-+(NSArray *)sortedPullRequestsInMoc:(NSManagedObjectContext *)moc;
+
++(NSArray *)pullRequestsSortedByField:(NSString *)fieldName ascending:(BOOL)ascending inMoc:(NSManagedObjectContext *)moc;
+
 -(NSInteger)unreadCommentCount;
+
 -(void)catchUpWithComments;
+
 -(BOOL)isMine;
+
 -(BOOL)commentedByMe;
 
 @end

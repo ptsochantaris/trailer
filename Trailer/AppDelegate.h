@@ -14,6 +14,12 @@ typedef enum {
 	kPrMerged
 } PRNotificationType;
 
+typedef enum {
+	kCreationDate=0,
+	kRecentActivity=1,
+	kTitle=2
+} PRSortingMethod;
+
 @interface AppDelegate : NSObject <
 	NSApplicationDelegate,
 	NSTableViewDelegate,
@@ -40,12 +46,17 @@ typedef enum {
 @property (weak) IBOutlet NSButton *clearAll;
 @property (weak) IBOutlet NSButton *selectAll;
 @property (weak) IBOutlet NSProgressIndicator *apiLoad;
-@property (weak) IBOutlet NSTextField *userNameLabel;
 @property (weak) IBOutlet NSTextField *versionNumber;
 @property (weak) IBOutlet NSButton *launchAtStartup;
 @property (weak) IBOutlet NSTextField *refreshDurationLabel;
 @property (weak) IBOutlet NSStepper *refreshDurationStepper;
 @property (weak) IBOutlet NSButton *hideUncommentedPrs;
+@property (weak) IBOutlet NSTextField *repoFilter;
+@property (weak) IBOutlet NSButton *showAllComments;
+@property (weak) IBOutlet NSBox *githubDetailsBox;
+@property (weak) IBOutlet NSButton *sortingOrder;
+@property (weak) IBOutlet NSPopUpButton *sortModeSelect;
+@property (weak) IBOutlet NSButton *showCreationDates;
 
 // Globals
 @property (nonatomic) API *api;

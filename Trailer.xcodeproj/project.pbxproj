@@ -74,7 +74,7 @@
 		1617BEE8183F538100E89BB2 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		1617BEE9183F538100E89BB2 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		1617BEEC183F543600E89BB2 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
-		1617BEEE183F9C4F00E89BB2 /* Trailer 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Trailer 2.xcdatamodel"; sourceTree = "<group>"; };
+		1617BEEE183F9C4F00E89BB2 /* Trailer 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 2.xcdatamodel"; sourceTree = "<group>"; };
 		161CA3C417F5A55300F4AF6C /* PullRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PullRequest.h; sourceTree = "<group>"; };
 		161CA3C517F5A55300F4AF6C /* PullRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PullRequest.m; sourceTree = "<group>"; };
 		161CA3C817F5B1F300F4AF6C /* PRComment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PRComment.h; sourceTree = "<group>"; };

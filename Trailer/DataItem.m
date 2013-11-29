@@ -52,17 +52,17 @@ static NSDateFormatter *_syncDateFormatter;
 		existingItem = [NSEntityDescription insertNewObjectForEntityForName:type inManagedObjectContext:moc];
 		existingItem.serverId = serverId;
 		existingItem.createdAt = [_syncDateFormatter dateFromString:info[@"created_at"]];
-		existingItem.postSyncAction = @(kTouchedNew);
+		existingItem.postSyncAction = @(kPostSyncNoteNew);
 	}
 	else if([updatedDate compare:existingItem.updatedAt]==NSOrderedDescending)
 	{
 		NSLog(@"Updating existing %@: %@",type,serverId);
-		existingItem.postSyncAction = @(kTouchedUpdated);
+		existingItem.postSyncAction = @(kPostSyncNoteUpdated);
 	}
 	else
 	{
 		NSLog(@"Skipping %@: %@",type,serverId);
-		existingItem.postSyncAction = @(kTouchedNone);
+		existingItem.postSyncAction = @(kPostSyncDoNothing);
 	}
 	existingItem.updatedAt = updatedDate;
 	return existingItem;
@@ -73,11 +73,11 @@ static NSDateFormatter *_syncDateFormatter;
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:type];
 	if(survivingItems)
 	{
-		f.predicate = [NSPredicate predicateWithFormat:@"postSyncAction != %d",kTouchedDelete];
+		f.predicate = [NSPredicate predicateWithFormat:@"postSyncAction != %d",kPostSyncDelete];
 	}
 	else
 	{
-		f.predicate = [NSPredicate predicateWithFormat:@"postSyncAction = %d",kTouchedDelete];
+		f.predicate = [NSPredicate predicateWithFormat:@"postSyncAction = %d",kPostSyncDelete];
 	}
 	return [moc executeFetchRequest:f error:nil];
 }
@@ -85,14 +85,14 @@ static NSDateFormatter *_syncDateFormatter;
 +(NSArray*)newOrUpdatedItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:type];
-	f.predicate = [NSPredicate predicateWithFormat:@"postSyncAction = %d or postSyncAction = %d",kTouchedNew,kTouchedUpdated];
+	f.predicate = [NSPredicate predicateWithFormat:@"postSyncAction = %d or postSyncAction = %d",kPostSyncNoteNew,kPostSyncNoteUpdated];
 	return [moc executeFetchRequest:f error:nil];
 }
 
 +(NSArray *)newItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:type];
-	f.predicate = [NSPredicate predicateWithFormat:@"postSyncAction = %d",kTouchedNew];
+	f.predicate = [NSPredicate predicateWithFormat:@"postSyncAction = %d",kPostSyncNoteNew];
 	return [moc executeFetchRequest:f error:nil];
 }
 
@@ -105,12 +105,6 @@ static NSDateFormatter *_syncDateFormatter;
 		[moc deleteObject:i];
 	}
 	NSLog(@"Nuked %lu %@ items",untouchedItems.count,type);
-}
-
-+(void)assumeWilldeleteItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
-{
-	NSArray *touchedItems = [self itemsOfType:type surviving:YES inMoc:moc];
-	for(DataItem *i in touchedItems) i.postSyncAction = @(kTouchedDelete);
 }
 
 +(NSUInteger)countItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc

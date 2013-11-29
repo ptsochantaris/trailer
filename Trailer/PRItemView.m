@@ -10,14 +10,15 @@
 
 @interface PRItemView ()
 {
-	NSString *_title;
+	NSString *_title, *_dates;
 	NSInteger _commentsTotal, _commentsNew;
 	NSButton *unpin;
 }
 @end
 
-static NSDictionary *_titleAttributes, *_titleBoldAttributes, *_commentCountAttributes, *_commentAlertAttributes;
+static NSDictionary *_titleAttributes, *_titleBoldAttributes, *_commentCountAttributes, *_commentAlertAttributes, *_createdAttributes;
 static NSNumberFormatter *formatter;
+static NSDateFormatter *dateFormatter;
 
 @implementation PRItemView
 
@@ -31,27 +32,39 @@ static NSNumberFormatter *formatter;
 			formatter = [[NSNumberFormatter alloc] init];
 			formatter.numberStyle = NSNumberFormatterDecimalStyle;
 
-			NSMutableParagraphStyle *p = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-			p.alignment = NSCenterTextAlignment;
+			dateFormatter = [[NSDateFormatter alloc] init];
+			dateFormatter.dateStyle = NSDateFormatterLongStyle;
+			dateFormatter.timeStyle = NSDateFormatterMediumStyle;
+			dateFormatter.doesRelativeDateFormatting = YES;
+
+			NSMutableParagraphStyle *pCenter = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+			pCenter.alignment = NSCenterTextAlignment;
 
 			_titleAttributes = @{
-								 NSFontAttributeName:[NSFont systemFontOfSize:12.0],
+								 NSFontAttributeName:[NSFont systemFontOfSize:13.0],
 								 NSForegroundColorAttributeName:[NSColor blackColor],
+								 NSBackgroundColorAttributeName:[NSColor clearColor],
+								 };
+			_createdAttributes = @{
+								 NSFontAttributeName:[NSFont systemFontOfSize:10.0],
+								 NSForegroundColorAttributeName:[NSColor grayColor],
+								 NSBackgroundColorAttributeName:[NSColor clearColor],
 								 };
 			_titleBoldAttributes = @{
-									 NSFontAttributeName:[NSFont systemFontOfSize:12.0],
+									 NSFontAttributeName:[NSFont systemFontOfSize:13.0],
 									 NSForegroundColorAttributeName:[NSColor blueColor],
 									 NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle),
+									 NSBackgroundColorAttributeName:[NSColor clearColor],
 									 };
 			_commentCountAttributes = @{
 										NSFontAttributeName:[NSFont boldSystemFontOfSize:9.0],
 										NSForegroundColorAttributeName:[NSColor blackColor],
-										NSParagraphStyleAttributeName:p,
+										NSParagraphStyleAttributeName:pCenter,
 										};
 			_commentAlertAttributes = @{
 										NSFontAttributeName:[NSFont boldSystemFontOfSize:9.0],
 										NSForegroundColorAttributeName:[NSColor whiteColor],
-										NSParagraphStyleAttributeName:p,
+										NSParagraphStyleAttributeName:pCenter,
 										};
 		});
 		unpin = [[NSButton alloc] initWithFrame:CGRectZero];
@@ -75,6 +88,7 @@ static NSNumberFormatter *formatter;
 #define REMOVE_BUTTON_WIDTH 80.0
 #define LEFTPADDING 50.0
 #define ORIGINAL_WIDTH 500.0
+#define DATE_PADDING 22.0
 
 - (void)drawRect:(NSRect)dirtyRect
 {
@@ -118,27 +132,38 @@ static NSNumberFormatter *formatter;
 
 	//////////////////// Title
 
+	CGFloat offset = -3.0;
 	if([[self enclosingMenuItem] isHighlighted])
 	{
-		[_title drawInRect:CGRectMake(LEFTPADDING, -4.0, W, self.bounds.size.height) withAttributes:_titleBoldAttributes];
+		[_title drawInRect:CGRectMake(LEFTPADDING, offset+DATE_PADDING, W, self.bounds.size.height-DATE_PADDING) withAttributes:_titleBoldAttributes];
 	}
 	else
 	{
-		[_title drawInRect:CGRectMake(LEFTPADDING, -4.0, W, self.bounds.size.height) withAttributes:_titleAttributes];
+		[_title drawInRect:CGRectMake(LEFTPADDING, offset+DATE_PADDING, W, self.bounds.size.height-DATE_PADDING) withAttributes:_titleAttributes];
 	}
+
+	CGRect dateRect = CGRectMake(LEFTPADDING, offset, W, DATE_PADDING);
+	[_dates drawInRect:CGRectInset(dateRect, 0, 1.0) withAttributes:_createdAttributes];
 }
 
 - (void)setPullRequest:(PullRequest *)pullRequest
 {
 	_commentsTotal = [PRComment countCommentsForPullRequestUrl:pullRequest.url inMoc:[AppDelegate shared].managedObjectContext];
-	if(pullRequest.isMine || pullRequest.commentedByMe)
+	if([AppDelegate shared].api.showCommentsEverywhere || pullRequest.isMine || pullRequest.commentedByMe)
 	{
 		_commentsNew = [pullRequest unreadCommentCount];
-		_commentsTotal -= _commentsNew;
 	}
 	else
 	{
 		_commentsNew = 0;
+	}
+	if([AppDelegate shared].api.showCreatedInsteadOfUpdated)
+	{
+		_dates = [dateFormatter stringFromDate:pullRequest.createdAt];
+	}
+	else
+	{
+		_dates = [dateFormatter stringFromDate:pullRequest.updatedAt];
 	}
 	_title = pullRequest.title;
 
@@ -150,7 +175,7 @@ static NSNumberFormatter *formatter;
 	CGRect titleSize = [_title boundingRectWithSize:CGSizeMake(W, FLT_MAX)
 											options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
 										 attributes:_titleAttributes];
-	self.frame = CGRectMake(0, 0, ORIGINAL_WIDTH, titleSize.size.height+10.0);
+	self.frame = CGRectMake(0, 0, ORIGINAL_WIDTH, titleSize.size.height+DATE_PADDING);
 	unpin.frame = CGRectMake(LEFTPADDING+W, (self.bounds.size.height-24.0)*0.5, REMOVE_BUTTON_WIDTH-10.0, 24.0);
 }
 

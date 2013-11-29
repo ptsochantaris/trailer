@@ -6,10 +6,12 @@
 //  Copyright (c) 2013 HouseTrip. All rights reserved.
 //
 
-#define kTouchedNone 0
-#define kTouchedDelete 1
-#define kTouchedNew 2
-#define kTouchedUpdated 3
+enum PostSyncAction {
+	kPostSyncDoNothing = 0,
+	kPostSyncDelete = 1,
+	kPostSyncNoteNew = 2,
+	kPostSyncNoteUpdated = 3
+	};
 
 @interface DataItem : NSManagedObject
 
@@ -23,8 +25,6 @@
 
 +(id)itemWithInfo:(NSDictionary*)info type:(NSString*)type moc:(NSManagedObjectContext*)moc;
 
-+(void)assumeWilldeleteItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc;
-
 +(void)nukeDeletedItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc;
 
 +(NSUInteger)countItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc;
@@ -32,6 +32,8 @@
 +(NSArray*)newOrUpdatedItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc;
 
 +(NSArray*)newItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc;
+
++(NSArray*)itemsOfType:(NSString *)type surviving:(BOOL)survivingItems inMoc:(NSManagedObjectContext *)moc;
 
 + (void)deleteAllObjectsInContext:(NSManagedObjectContext *)context
                        usingModel:(NSManagedObjectModel *)model;

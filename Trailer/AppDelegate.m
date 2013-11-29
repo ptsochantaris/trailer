@@ -36,6 +36,8 @@ static AppDelegate *_static_shared_ref;
 
 	self.api = [[API alloc] init];
 
+	[self setupSortMethodMenu];
+
 	[self updateStatusItem];
 
 	[self startRateLimitHandling];
@@ -69,6 +71,25 @@ static AppDelegate *_static_shared_ref;
 	//pr.merged = @(YES);
 }
 
+- (void)setupSortMethodMenu
+{
+	NSMenu *m = [[NSMenu alloc] initWithTitle:@"Sorting"];
+	if(self.api.sortDescending)
+	{
+		[m addItemWithTitle:@"Newest First" action:@selector(sortMethodChanged:) keyEquivalent:@""];
+		[m addItemWithTitle:@"Most Recently Active" action:@selector(sortMethodChanged:) keyEquivalent:@""];
+		[m addItemWithTitle:@"Reverse Alphabetically" action:@selector(sortMethodChanged:) keyEquivalent:@""];
+	}
+	else
+	{
+		[m addItemWithTitle:@"Oldest First" action:@selector(sortMethodChanged:) keyEquivalent:@""];
+		[m addItemWithTitle:@"Inactive For Longest" action:@selector(sortMethodChanged:) keyEquivalent:@""];
+		[m addItemWithTitle:@"Alphabetically" action:@selector(sortMethodChanged:) keyEquivalent:@""];
+	}
+	self.sortModeSelect.menu = m;
+	[self.sortModeSelect selectItemAtIndex:self.api.sortMethod];
+}
+
 
 - (IBAction)hidePrsSelected:(NSButton *)sender
 {
@@ -76,6 +97,35 @@ static AppDelegate *_static_shared_ref;
 	self.api.shouldHideUncommentedRequests = show;
 	[self updateStatusItem];
 }
+
+- (IBAction)showAllCommentsSelected:(NSButton *)sender
+{
+	BOOL show = (sender.integerValue==1);
+	self.api.showCommentsEverywhere = show;
+	[self updateStatusItem];
+}
+
+- (IBAction)sortOrderSelected:(NSButton *)sender
+{
+	BOOL descending = (sender.integerValue==1);
+	self.api.sortDescending = descending;
+	[self setupSortMethodMenu];
+	[self updateStatusItem];
+}
+
+- (IBAction)sortMethodChanged:(id)sender
+{
+	self.api.sortMethod = self.sortModeSelect.indexOfSelectedItem;
+	[self updateStatusItem];
+}
+
+- (IBAction)showCreationSelected:(NSButton *)sender
+{
+	BOOL show = (sender.integerValue==1);
+	self.api.showCreatedInsteadOfUpdated = show;
+	[self updateStatusItem];
+}
+
 
 - (IBAction)launchAtStartSelected:(NSButton *)sender
 {
@@ -191,7 +241,9 @@ static AppDelegate *_static_shared_ref;
 	[self updateStatusItem];
 }
 
-- (NSInteger)buildPrMenuItems
+
+
+- (NSInteger)buildPrMenuItemsFromList:(NSArray *)pullRequests
 {
 	NSInteger newCount = 0;
 	if(!self.prMenuItems)
@@ -207,12 +259,11 @@ static AppDelegate *_static_shared_ref;
 		[self.prMenuItems removeAllObjects];
 	}
 
-	NSArray *pullRequests = [PullRequest sortedPullRequestsInMoc:self.managedObjectContext];
-	NSInteger myIndex=6, commentedIndex = 8, mergedIndex = 10, allIndex=12;
+	NSInteger myIndex=4, commentedIndex = 6, mergedIndex = 8, allIndex=10;
 	for(PullRequest *r in pullRequests)
 	{
 		if(self.api.shouldHideUncommentedRequests)
-			if((!r.isMine) || (r.unreadCommentCount==0))
+			if(r.unreadCommentCount==0)
 				continue;
 
 		NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@"" action:@selector(prSelected:) keyEquivalent:@""];
@@ -241,6 +292,8 @@ static AppDelegate *_static_shared_ref;
 		else // all other pull requests
 		{
 			[self.statusBarMenu insertItem:item atIndex:allIndex];
+			if([AppDelegate shared].api.showCommentsEverywhere)
+				newCount += [r unreadCommentCount];
 		}
 		allIndex++;
 		[self.prMenuItems addObject:item];
@@ -252,9 +305,9 @@ static AppDelegate *_static_shared_ref;
 - (void)defaultsUpdated
 {
 	if(self.api.localUser)
-		self.userNameLabel.stringValue = self.api.localUser;
+		self.githubDetailsBox.title = [NSString stringWithFormat:@"Repositories for %@",self.api.localUser];
 	else
-		self.userNameLabel.stringValue = @"...";
+		self.githubDetailsBox.title = @"Your Repositories";
 }
 
 - (void)startRateLimitHandling
@@ -297,8 +350,11 @@ static AppDelegate *_static_shared_ref;
 	[self prepareForRefresh];
 	[self controlTextDidChange:nil];
 
-	[DataItem assumeWilldeleteItemsOfType:@"Repo" inMoc:self.managedObjectContext];
-	[DataItem assumeWilldeleteItemsOfType:@"Org" inMoc:self.managedObjectContext];
+	NSArray *items = [PullRequest itemsOfType:@"Repo" surviving:YES inMoc:self.managedObjectContext];
+	for(DataItem *i in items) i.postSyncAction = @(kPostSyncDelete);
+
+	items = [PullRequest itemsOfType:@"Org" surviving:YES inMoc:self.managedObjectContext];
+	for(DataItem *i in items) i.postSyncAction = @(kPostSyncDelete);
 
 	[self.api fetchRepositoriesAndCallback:^(BOOL success) {
 
@@ -320,21 +376,28 @@ static AppDelegate *_static_shared_ref;
 
 -(void)controlTextDidChange:(NSNotification *)obj
 {
-	NSString *newToken = [self.githubTokenHolder.stringValue stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-	NSString *oldToken = self.api.authToken;
-	if(newToken.length>0)
+	if(obj.object==self.githubTokenHolder)
 	{
-		self.refreshButton.enabled = YES;
-		self.api.authToken = newToken;
+		NSString *newToken = [self.githubTokenHolder.stringValue stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+		NSString *oldToken = self.api.authToken;
+		if(newToken.length>0)
+		{
+			self.refreshButton.enabled = YES;
+			self.api.authToken = newToken;
+		}
+		else
+		{
+			self.refreshButton.enabled = NO;
+			self.api.authToken = nil;
+		}
+		if(newToken && oldToken && ![newToken isEqualToString:oldToken])
+		{
+			[self reset];
+		}
 	}
-	else
+	else if(obj.object==self.repoFilter)
 	{
-		self.refreshButton.enabled = NO;
-		self.api.authToken = nil;
-	}
-	if(newToken && oldToken && ![newToken isEqualToString:oldToken])
-	{
-		[self reset];
+		[self.projectsTable reloadData];
 	}
 }
 
@@ -348,12 +411,21 @@ static AppDelegate *_static_shared_ref;
 	[self updateStatusItem];
 }
 
+- (IBAction)markAllReadSelected:(NSMenuItem *)sender
+{
+	for(PullRequest *r in [self pullRequestList])
+		[r catchUpWithComments];
+	[self updateStatusItem];
+}
+
 - (IBAction)preferencesSelected:(NSMenuItem *)sender
 {
 	[self.refreshTimer invalidate];
 	self.refreshTimer = nil;
 
 	[self updateLimitFromServer];
+
+	[self.sortModeSelect selectItemAtIndex:self.api.sortMethod];
 
 	if([self isAppLoginItem])
 		[self.launchAtStartup setIntegerValue:1];
@@ -364,6 +436,21 @@ static AppDelegate *_static_shared_ref;
 		[self.hideUncommentedPrs setIntegerValue:1];
 	else
 		[self.hideUncommentedPrs setIntegerValue:0];
+
+	if(self.api.showCommentsEverywhere)
+		[self.showAllComments setIntegerValue:1];
+	else
+		[self.showAllComments setIntegerValue:0];
+
+	if(self.api.sortDescending)
+		[self.sortingOrder setIntegerValue:1];
+	else
+		[self.sortingOrder setIntegerValue:0];
+
+	if(self.api.showCreatedInsteadOfUpdated)
+		[self.showCreationDates setIntegerValue:1];
+	else
+		[self.showCreationDates setIntegerValue:0];
 
 	[self.refreshDurationStepper setFloatValue:self.api.refreshPeriod];
 	[self refreshDurationChanged:nil];
@@ -385,9 +472,17 @@ static AppDelegate *_static_shared_ref;
 
 /////////////////////////////////// Repo table
 
--(id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+- (NSArray *)getFileterdRepos
 {
-	NSArray *allRepos = [Repo allReposSortedByField:@"fullName" inMoc:self.managedObjectContext];
+	NSArray *allRepos = [Repo allReposSortedByField:@"fullName"
+									withTitleFilter:self.repoFilter.stringValue
+											  inMoc:self.managedObjectContext];
+	return allRepos;
+}
+
+- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+{
+	NSArray *allRepos = [self getFileterdRepos];
 	Repo *r = allRepos[row];
 
 	NSButtonCell *cell = [tableColumn dataCellForRow:row];
@@ -403,14 +498,14 @@ static AppDelegate *_static_shared_ref;
 	return cell;
 }
 
--(NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-	return [DataItem countItemsOfType:@"Repo" inMoc:self.managedObjectContext];
+	return [self getFileterdRepos].count;
 }
 
--(void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+- (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-	NSArray *allRepos = [Repo allReposSortedByField:@"fullName" inMoc:self.managedObjectContext];
+	NSArray *allRepos = [self getFileterdRepos];
 	Repo *r = allRepos[row];
 	r.active = @([object boolValue]);
 	[self saveDB];
@@ -725,32 +820,46 @@ static AppDelegate *_static_shared_ref;
 	for(PullRequest *r in latestPrs)
 	{
 		[self postNotificationOfType:kNewPr forItem:r];
-		r.postSyncAction = @(kTouchedNone);
+		r.postSyncAction = @(kPostSyncDoNothing);
 	}
 
 	NSArray *latestComments = [PRComment newItemsOfType:@"PRComment" inMoc:self.managedObjectContext];
 	for(PRComment *c in latestComments)
 	{
 		PullRequest *r = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:self.managedObjectContext];
-		if(r.isMine || r.commentedByMe)
+		if(self.api.showCommentsEverywhere || r.isMine || r.commentedByMe)
 		{
 			if(![c.userId.stringValue isEqualToString:self.api.localUserId])
 			{
 				[self postNotificationOfType:kNewComment forItem:c];
 			}
 		}
-		c.postSyncAction = @(kTouchedNone);
+		c.postSyncAction = @(kPostSyncDoNothing);
 	}
 	[self saveDB];
 }
 
--(void)updateStatusItem
+- (NSArray *)pullRequestList
 {
-	NSArray *pullRequests = [PullRequest sortedPullRequestsInMoc:self.managedObjectContext];
-	NSString *countString = [NSString stringWithFormat:@"%ld",pullRequests.count];
-	NSLog(@"Updating status item with %@ total PRs",countString);
+	NSString *sortCriterion;
+	switch (self.api.sortMethod) {
+		case kCreationDate: sortCriterion = @"createdAt"; break;
+		case kRecentActivity: sortCriterion = @"updatedAt"; break;
+		case kTitle: sortCriterion = @"title"; break;
+	}
+	NSArray *pullRequests = [PullRequest pullRequestsSortedByField:sortCriterion
+														 ascending:!self.api.sortDescending
+															 inMoc:self.managedObjectContext];
+	return pullRequests;
+}
 
-	NSInteger newCommentCount = [self buildPrMenuItems];
+- (void)updateStatusItem
+{
+	NSArray *pullRequests = [self pullRequestList];
+	NSString *countString = [NSString stringWithFormat:@"%ld",pullRequests.count];
+	NSInteger newCommentCount = [self buildPrMenuItemsFromList:pullRequests];
+
+	NSLog(@"Updating status item with %@ total PRs",countString);
 
 	NSDictionary *attributes;
 	if(self.lastUpdateFailed)
@@ -866,7 +975,7 @@ static AppDelegate *_static_shared_ref;
 
 - (IBAction)selectAllSelected:(NSButton *)sender
 {
-	NSArray *allRepos = [Repo allReposSortedByField:@"fullName" inMoc:self.managedObjectContext];
+	NSArray *allRepos = [self getFileterdRepos];
 	for(Repo *r in allRepos)
 	{
 		r.active = @YES;
@@ -878,7 +987,7 @@ static AppDelegate *_static_shared_ref;
 
 - (IBAction)clearallSelected:(NSButton *)sender
 {
-	NSArray *allRepos = [Repo allReposSortedByField:@"fullName" inMoc:self.managedObjectContext];
+	NSArray *allRepos = [self getFileterdRepos];
 	for(Repo *r in allRepos)
 	{
 		r.active = @NO;
