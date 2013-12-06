@@ -18,7 +18,7 @@
 @property (nonatomic) NSInteger sortMethod;
 @property (nonatomic) float refreshPeriod;
 @property (nonatomic) Reachability *reachability;
-@property (nonatomic) BOOL shouldHideUncommentedRequests, showCommentsEverywhere, sortDescending, showCreatedInsteadOfUpdated;
+@property (nonatomic) BOOL shouldHideUncommentedRequests, showCommentsEverywhere, sortDescending, showCreatedInsteadOfUpdated, dontKeepMyPrs;
 
 - (void) fetchRepositoriesAndCallback:(void(^)(BOOL success))callback;
 

@@ -86,6 +86,10 @@
 -(NSInteger)sortMethod { return [[[NSUserDefaults standardUserDefaults] objectForKey:SORT_METHOD_KEY] integerValue]; }
 -(void)setSortMethod:(NSInteger)sortMethod { [self storeDefaultValue:@(sortMethod) forKey:SORT_METHOD_KEY]; }
 
+#define DONT_KEEP_MY_PRS_KEY @"DONT_KEEP_MY_PRS_KEY"
+-(void)setDontKeepMyPrs:(BOOL)dontKeepMyPrs { [self storeDefaultValue:@(dontKeepMyPrs) forKey:DONT_KEEP_MY_PRS_KEY]; }
+-(BOOL)dontKeepMyPrs { return [[[NSUserDefaults standardUserDefaults] stringForKey:DONT_KEEP_MY_PRS_KEY] boolValue]; }
+
 -(void)error:(NSString*)errorString
 {
 	NSLog(@"Failed to fetch %@",errorString);
@@ -243,17 +247,39 @@
 	Repo *parent = [Repo itemOfType:@"Repo" serverId:r.repoId moc:r.managedObjectContext];
 	NSString *owner = [parent.fullName copy];
 
-	[self get:[NSString stringWithFormat:@"/repos/%@/pulls/%@/merge",owner,r.number]
+	[self get:[NSString stringWithFormat:@"/repos/%@/pulls/%@",owner,r.number]
    parameters:nil
 	  success:^(NSHTTPURLResponse *response, id data) {
-		  // merged indeed
-		  r.postSyncAction = @(kPostSyncDoNothing); // don't delete this
-		  r.merged = @(YES); // pin it so it sticks around
-		  [[AppDelegate shared] postNotificationOfType:kPrMerged forItem:r];
+
+		  NSString *title = r.title;
+		  NSDictionary *mergeInfo = [data objectForKey:@"merged_by"];
+		  if(mergeInfo)
+		  {
+			  NSLog(@"detected merged PR: %@",title);
+			  API *api = [AppDelegate shared].api;
+			  NSString *mergeUserId = [[mergeInfo  objectForKey:@"id"] stringValue];
+			  NSLog(@"merged by user id: %@, our id is: %@",mergeUserId,api.localUserId);
+			  BOOL mergedByMyself = [mergeUserId isEqualToString:api.localUserId];
+			  if(!(api.dontKeepMyPrs && mergedByMyself)) // someone else merged
+			  {
+				  NSLog(@"announcing merged PR: %@",title);
+				  r.postSyncAction = @(kPostSyncDoNothing); // don't delete this
+				  r.merged = @(YES); // pin it so it sticks around
+				  [[AppDelegate shared] postNotificationOfType:kPrMerged forItem:r];
+			  }
+			  else
+			  {
+				  NSLog(@"will not announce merged PR: %@",title);
+			  }
+		  }
+		  else
+		  {
+			  NSLog(@"detected closed PR: %@",title);
+		  }
 		  [self _detectMergedPullRequests:prsToCheck andCallback:callback];
+
 	  } failure:^(NSHTTPURLResponse *response, NSError *error) {
-		  // not merged
-		  if(response.statusCode!=404) r.postSyncAction = @(kPostSyncDoNothing); // don't delete this, we couldn't check, play it safe
+		  r.postSyncAction = @(kPostSyncDoNothing); // don't delete this, we couldn't check, play it safe
 		  [self _detectMergedPullRequests:prsToCheck andCallback:callback];
 	  }];
 }

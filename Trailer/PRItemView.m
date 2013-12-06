@@ -16,15 +16,15 @@
 }
 @end
 
-static NSDictionary *_titleAttributes, *_titleBoldAttributes, *_commentCountAttributes, *_commentAlertAttributes, *_createdAttributes;
+static NSDictionary *_titleAttributes, *_commentCountAttributes, *_commentAlertAttributes, *_createdAttributes;
 static NSNumberFormatter *formatter;
 static NSDateFormatter *dateFormatter;
 
 @implementation PRItemView
 
-- (id)initWithFrame:(NSRect)frame
+- (id)init
 {
-    self = [super initWithFrame:frame];
+    self = [super init];
     if (self)
 	{
 		static dispatch_once_t onceToken;
@@ -41,28 +41,22 @@ static NSDateFormatter *dateFormatter;
 			pCenter.alignment = NSCenterTextAlignment;
 
 			_titleAttributes = @{
-								 NSFontAttributeName:[NSFont systemFontOfSize:13.0],
+								 NSFontAttributeName:[NSFont menuFontOfSize:13.0],
 								 NSForegroundColorAttributeName:[NSColor blackColor],
 								 NSBackgroundColorAttributeName:[NSColor clearColor],
 								 };
 			_createdAttributes = @{
-								 NSFontAttributeName:[NSFont systemFontOfSize:10.0],
+								 NSFontAttributeName:[NSFont menuFontOfSize:10.0],
 								 NSForegroundColorAttributeName:[NSColor grayColor],
 								 NSBackgroundColorAttributeName:[NSColor clearColor],
 								 };
-			_titleBoldAttributes = @{
-									 NSFontAttributeName:[NSFont systemFontOfSize:13.0],
-									 NSForegroundColorAttributeName:[NSColor blueColor],
-									 NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle),
-									 NSBackgroundColorAttributeName:[NSColor clearColor],
-									 };
 			_commentCountAttributes = @{
-										NSFontAttributeName:[NSFont boldSystemFontOfSize:9.0],
+										NSFontAttributeName:[NSFont menuFontOfSize:9.0],
 										NSForegroundColorAttributeName:[NSColor blackColor],
 										NSParagraphStyleAttributeName:pCenter,
 										};
 			_commentAlertAttributes = @{
-										NSFontAttributeName:[NSFont boldSystemFontOfSize:9.0],
+										NSFontAttributeName:[NSFont menuFontOfSize:9.0],
 										NSForegroundColorAttributeName:[NSColor whiteColor],
 										NSParagraphStyleAttributeName:pCenter,
 										};
@@ -87,26 +81,30 @@ static NSDateFormatter *dateFormatter;
 
 #define REMOVE_BUTTON_WIDTH 80.0
 #define LEFTPADDING 50.0
-#define ORIGINAL_WIDTH 500.0
 #define DATE_PADDING 22.0
 
 - (void)drawRect:(NSRect)dirtyRect
 {
 	CGContextRef context = (CGContextRef) [[NSGraphicsContext currentContext] graphicsPort];
 
-	[[NSColor blackColor] setFill];
-
 	CGFloat badgeSize = 18.0;
-	CGFloat W = ORIGINAL_WIDTH-LEFTPADDING;
+	CGFloat W = MENU_WIDTH-LEFTPADDING;
 	if(!unpin.isHidden) W -= REMOVE_BUTTON_WIDTH;
+
+	if([[self enclosingMenuItem] isHighlighted])
+	{
+		[[NSColor colorWithWhite:0.95 alpha:1.0] setFill];
+		CGContextFillRect(context, dirtyRect);
+	}
+	[[NSColor blackColor] setFill];
 
 	//////////////////// New count
 
 	if(_commentsNew)
 	{
-		[[NSColor redColor] set];
+		[[NSColor colorWithRed:1.0 green:0.5 blue:0.5 alpha:1.0] set];
 
-		CGRect countRect = CGRectMake((26.0-badgeSize)*0.5, (self.bounds.size.height-badgeSize)*0.5, badgeSize, badgeSize);
+		CGRect countRect = CGRectMake((28.0-badgeSize)*0.5, (self.bounds.size.height-badgeSize)*0.5, badgeSize, badgeSize);
 		CGContextFillEllipseInRect(context, countRect);
 
 		countRect = CGRectOffset(countRect, 0, -2.0);
@@ -121,7 +119,7 @@ static NSDateFormatter *dateFormatter;
 		[[NSColor colorWithRed:0.9 green:0.9 blue:0.9 alpha:1.0] set];
 
 		CGFloat offset = 24.0;
-		if(_commentsNew==0) offset=15.0;
+		if(_commentsNew==0) offset=14.0;
 		CGRect countRect = CGRectMake(offset+(25.0-badgeSize)*0.5, (self.bounds.size.height-badgeSize)*0.5, badgeSize, badgeSize);
 		CGContextFillEllipseInRect(context, countRect);
 
@@ -133,14 +131,7 @@ static NSDateFormatter *dateFormatter;
 	//////////////////// Title
 
 	CGFloat offset = -3.0;
-	if([[self enclosingMenuItem] isHighlighted])
-	{
-		[_title drawInRect:CGRectMake(LEFTPADDING, offset+DATE_PADDING, W, self.bounds.size.height-DATE_PADDING) withAttributes:_titleBoldAttributes];
-	}
-	else
-	{
-		[_title drawInRect:CGRectMake(LEFTPADDING, offset+DATE_PADDING, W, self.bounds.size.height-DATE_PADDING) withAttributes:_titleAttributes];
-	}
+	[_title drawInRect:CGRectMake(LEFTPADDING, offset+DATE_PADDING, W, self.bounds.size.height-DATE_PADDING) withAttributes:_titleAttributes];
 
 	CGRect dateRect = CGRectMake(LEFTPADDING, offset, W, DATE_PADDING);
 	[_dates drawInRect:CGRectInset(dateRect, 0, 1.0) withAttributes:_createdAttributes];
@@ -169,14 +160,14 @@ static NSDateFormatter *dateFormatter;
 
 	[unpin setHidden:!pullRequest.merged.boolValue];
 
-	CGFloat W = ORIGINAL_WIDTH-LEFTPADDING;
+	CGFloat W = MENU_WIDTH-LEFTPADDING;
 	if(!unpin.isHidden) W -= REMOVE_BUTTON_WIDTH;
 
 	CGRect titleSize = [_title boundingRectWithSize:CGSizeMake(W, FLT_MAX)
 											options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
 										 attributes:_titleAttributes];
-	self.frame = CGRectMake(0, 0, ORIGINAL_WIDTH, titleSize.size.height+DATE_PADDING);
-	unpin.frame = CGRectMake(LEFTPADDING+W, (self.bounds.size.height-24.0)*0.5, REMOVE_BUTTON_WIDTH-10.0, 24.0);
+	self.frame = CGRectMake(0, 0, MENU_WIDTH, titleSize.size.height+DATE_PADDING);
+	unpin.frame = CGRectMake(LEFTPADDING+W, floorf((self.bounds.size.height-24.0)*0.5), REMOVE_BUTTON_WIDTH-10.0, 24.0);
 }
 
 - (void)mouseDown:(NSEvent*) event
@@ -186,7 +177,7 @@ static NSDateFormatter *dateFormatter;
     [menu performActionForItemAtIndex:[menu indexOfItem:self.enclosingMenuItem]];
 }
 
--(BOOL)acceptsFirstMouse:(NSEvent *)theEvent
+- (BOOL)acceptsFirstMouse:(NSEvent *)theEvent
 {
 	return YES;
 }

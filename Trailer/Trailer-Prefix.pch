@@ -5,6 +5,9 @@
 //
 
 #ifdef __OBJC__
+
+	#define MENU_WIDTH 500.0
+
 	#import <Cocoa/Cocoa.h>
 	#import <SystemConfiguration/SystemConfiguration.h>
 	#import <CoreServices/CoreServices.h>
@@ -19,5 +22,6 @@
 	#import "Repo.h"
 	#import "PullRequest.h"
 	#import "PRItemView.h"
+	#import "SectionHeader.h"
 	#import "AppDelegate.h"
 #endif

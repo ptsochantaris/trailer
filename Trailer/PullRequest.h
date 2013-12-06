@@ -24,18 +24,22 @@
 @property (nonatomic, retain) NSNumber *repoId;
 @property (nonatomic, retain) NSNumber *merged;
 
-+(PullRequest *)pullRequestWithInfo:(NSDictionary*)info moc:(NSManagedObjectContext *)moc;
++ (PullRequest *)pullRequestWithInfo:(NSDictionary*)info moc:(NSManagedObjectContext *)moc;
 
-+(PullRequest *)pullRequestWithUrl:(NSString *)url moc:(NSManagedObjectContext *)moc;
++ (PullRequest *)pullRequestWithUrl:(NSString *)url moc:(NSManagedObjectContext *)moc;
 
-+(NSArray *)pullRequestsSortedByField:(NSString *)fieldName ascending:(BOOL)ascending inMoc:(NSManagedObjectContext *)moc;
++ (NSArray *)pullRequestsSortedByField:(NSString *)fieldName ascending:(BOOL)ascending inMoc:(NSManagedObjectContext *)moc;
 
--(NSInteger)unreadCommentCount;
++ (NSArray *)allMergedRequestsInMoc:(NSManagedObjectContext *)moc;
 
--(void)catchUpWithComments;
++ (NSUInteger)countUnmergedRequestsInMoc:(NSManagedObjectContext *)moc;
 
--(BOOL)isMine;
+- (NSInteger)unreadCommentCount;
 
--(BOOL)commentedByMe;
+- (void)catchUpWithComments;
+
+- (BOOL)isMine;
+
+- (BOOL)commentedByMe;
 
 @end

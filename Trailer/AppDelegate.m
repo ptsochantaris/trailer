@@ -28,6 +28,7 @@ static AppDelegate *_static_shared_ref;
 	{
 		[s checkForUpdatesInBackground];
 	}
+	[s setUpdateCheckInterval:28800.0]; // 8 hours
 	s.automaticallyChecksForUpdates = YES;
 
 	[NSThread setThreadPriority:0.0];
@@ -35,6 +36,15 @@ static AppDelegate *_static_shared_ref;
 	_static_shared_ref = self;
 
 	self.api = [[API alloc] init];
+
+	SectionHeader *header = [[SectionHeader alloc] initWithRemoveAllDelegate:nil];
+	self.menuAllHeader.view = header;
+	header = [[SectionHeader alloc] initWithRemoveAllDelegate:self];
+	self.menuMergedHeader.view = header;
+	header = [[SectionHeader alloc] initWithRemoveAllDelegate:nil];
+	self.menuMyHeader.view = header;
+	header = [[SectionHeader alloc] initWithRemoveAllDelegate:nil];
+	self.menuParticipatedHeader.view = header;
 
 	[self setupSortMethodMenu];
 
@@ -90,6 +100,11 @@ static AppDelegate *_static_shared_ref;
 	[self.sortModeSelect selectItemAtIndex:self.api.sortMethod];
 }
 
+- (IBAction)dontKeepMyPrsSelected:(NSButton *)sender
+{
+	BOOL dontKeep = (sender.integerValue==1);
+	self.api.dontKeepMyPrs = dontKeep;
+}
 
 - (IBAction)hidePrsSelected:(NSButton *)sender
 {
@@ -233,6 +248,35 @@ static AppDelegate *_static_shared_ref;
 	[self updateStatusItem];
 }
 
+- (void)sectionHeaderRemoveSelected:(NSMenuItem *)item
+{
+	[self.statusBarMenu cancelTracking];
+
+	double delayInSeconds = 0.1;
+	dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+	dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+		NSAlert *alert = [[NSAlert alloc] init];
+		[alert setMessageText:@"Clear all merged PRs?"];
+		[alert setInformativeText:[NSString stringWithFormat:@"This will clear all the merged PRs from your list.  This action cannot be undone, are you sure?"]];
+		[alert addButtonWithTitle:@"No"];
+		[alert addButtonWithTitle:@"Yes"];
+		NSInteger selected = [alert runModal];
+		if(selected==NSAlertSecondButtonReturn)
+		{
+			[self removeAllMergedRequests];
+		}
+	});
+}
+
+- (void)removeAllMergedRequests
+{
+	NSArray *mergedRequests = [PullRequest allMergedRequestsInMoc:self.managedObjectContext];
+	for(PullRequest *r in mergedRequests)
+		[self.managedObjectContext deleteObject:r];
+	[self saveDB];
+	[self updateStatusItem];
+}
+
 - (void)unPinSelectedFrom:(NSMenuItem *)item
 {
 	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:item.representedObject moc:self.managedObjectContext];
@@ -241,25 +285,22 @@ static AppDelegate *_static_shared_ref;
 	[self updateStatusItem];
 }
 
-
-
 - (NSInteger)buildPrMenuItemsFromList:(NSArray *)pullRequests
 {
-	NSInteger newCount = 0;
-	if(!self.prMenuItems)
-	{
-		self.prMenuItems = [NSMutableSet set];
-	}
-	else
-	{
-		for(NSMenuItem *i in self.prMenuItems)
-		{
-			[self.statusBarMenu removeItem:i];
-		}
-		[self.prMenuItems removeAllObjects];
-	}
+	while(self.statusBarMenu.numberOfItems>1)
+		[self.statusBarMenu removeItemAtIndex:1];
 
-	NSInteger myIndex=4, commentedIndex = 6, mergedIndex = 8, allIndex=10;
+	[self.statusBarMenu addItem:self.menuMyHeader];
+	[self.statusBarMenu addItem:self.menuParticipatedHeader];
+	[self.statusBarMenu addItem:self.menuMergedHeader];
+	[self.statusBarMenu addItem:self.menuAllHeader];
+
+	NSInteger unreadCommentCount = 0;
+	NSInteger myIndex = 2, myCount = 0;
+	NSInteger participatedIndex = myIndex+1, participatedCount = 0;
+	NSInteger mergedIndex = participatedIndex+1, mergedCount = 0;
+	NSInteger allIndex = mergedIndex+1, allCount = 0;
+
 	for(PullRequest *r in pullRequests)
 	{
 		if(self.api.shouldHideUncommentedRequests)
@@ -274,32 +315,52 @@ static AppDelegate *_static_shared_ref;
 		item.view = itemView;
 		if(r.merged.boolValue)
 		{
+			mergedCount++;
 			[self.statusBarMenu insertItem:item atIndex:mergedIndex++];
 		}
 		else if(r.isMine)
 		{
+			myCount++;
 			[self.statusBarMenu insertItem:item atIndex:myIndex++];
-			newCount += [r unreadCommentCount];
-			commentedIndex++;
+			unreadCommentCount += [r unreadCommentCount];
+			participatedIndex++;
 			mergedIndex++;
 		}
 		else if(r.commentedByMe)
 		{
-			[self.statusBarMenu insertItem:item atIndex:commentedIndex++];
-			newCount += [r unreadCommentCount];
+			participatedCount++;
+			[self.statusBarMenu insertItem:item atIndex:participatedIndex++];
+			unreadCommentCount += [r unreadCommentCount];
 			mergedIndex++;
 		}
 		else // all other pull requests
 		{
+			allCount++;
 			[self.statusBarMenu insertItem:item atIndex:allIndex];
 			if([AppDelegate shared].api.showCommentsEverywhere)
-				newCount += [r unreadCommentCount];
+				unreadCommentCount += [r unreadCommentCount];
 		}
 		allIndex++;
-		[self.prMenuItems addObject:item];
 	}
 
-	return newCount;
+	if(!myCount)
+	{
+		[self.statusBarMenu removeItem:self.menuMyHeader];
+	}
+	if(!mergedCount)
+	{
+		[self.statusBarMenu removeItem:self.menuMergedHeader];
+	}
+	if(!participatedCount)
+	{
+		[self.statusBarMenu removeItem:self.menuParticipatedHeader];
+	}
+	if(!allCount)
+	{
+		[self.statusBarMenu removeItem:self.menuAllHeader];
+	}
+
+	return unreadCommentCount;
 }
 
 - (void)defaultsUpdated
@@ -436,6 +497,11 @@ static AppDelegate *_static_shared_ref;
 		[self.hideUncommentedPrs setIntegerValue:1];
 	else
 		[self.hideUncommentedPrs setIntegerValue:0];
+
+	if(self.api.dontKeepMyPrs)
+		[self.dontKeepMyPrs setIntegerValue:1];
+	else
+		[self.dontKeepMyPrs setIntegerValue:0];
 
 	if(self.api.showCommentsEverywhere)
 		[self.showAllComments setIntegerValue:1];
@@ -856,7 +922,7 @@ static AppDelegate *_static_shared_ref;
 - (void)updateStatusItem
 {
 	NSArray *pullRequests = [self pullRequestList];
-	NSString *countString = [NSString stringWithFormat:@"%ld",pullRequests.count];
+	NSString *countString = [NSString stringWithFormat:@"%ld",[PullRequest countUnmergedRequestsInMoc:self.managedObjectContext]];
 	NSInteger newCommentCount = [self buildPrMenuItemsFromList:pullRequests];
 
 	NSLog(@"Updating status item with %@ total PRs",countString);

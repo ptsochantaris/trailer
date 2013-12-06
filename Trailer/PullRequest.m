@@ -56,6 +56,20 @@
 	return [moc executeFetchRequest:f error:nil];
 }
 
++ (NSArray *)allMergedRequestsInMoc:(NSManagedObjectContext *)moc
+{
+	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PullRequest"];
+	f.predicate = [NSPredicate predicateWithFormat:@"merged == YES"];
+	return [moc executeFetchRequest:f error:nil];
+}
+
++ (NSUInteger)countUnmergedRequestsInMoc:(NSManagedObjectContext *)moc
+{
+	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PullRequest"];
+	f.predicate = [NSPredicate predicateWithFormat:@"merged != YES"];
+	return [moc countForFetchRequest:f error:nil];
+}
+
 -(void)prepareForDeletion
 {
 	[PRComment removeCommentsWithPullRequestURL:self.url inMoc:self.managedObjectContext];

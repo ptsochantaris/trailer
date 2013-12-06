@@ -18,6 +18,8 @@
 		161CA3CB17F5B1F300F4AF6C /* PRComment.m in Sources */ = {isa = PBXBuildFile; fileRef = 161CA3C917F5B1F300F4AF6C /* PRComment.m */; };
 		161CA3CE17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m in Sources */ = {isa = PBXBuildFile; fileRef = 161CA3CC17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m */; };
 		161CA3CF17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m in Sources */ = {isa = PBXBuildFile; fileRef = 161CA3CC17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m */; };
+		16583E481851F082003A7A55 /* SectionHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 16583E471851F082003A7A55 /* SectionHeader.m */; };
+		16583E491851F082003A7A55 /* SectionHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 16583E471851F082003A7A55 /* SectionHeader.m */; };
 		168BC6AE17EC2DF000BC4584 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 168BC6AD17EC2DF000BC4584 /* Cocoa.framework */; };
 		168BC6B817EC2DF000BC4584 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 168BC6B617EC2DF000BC4584 /* InfoPlist.strings */; };
 		168BC6BA17EC2DF000BC4584 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 168BC6B917EC2DF000BC4584 /* main.m */; };
@@ -81,6 +83,8 @@
 		161CA3C917F5B1F300F4AF6C /* PRComment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PRComment.m; sourceTree = "<group>"; };
 		161CA3CC17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+NSDictionary_OFK.m"; sourceTree = "<group>"; };
 		161CA3CD17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+NSDictionary_OFK.h"; sourceTree = "<group>"; };
+		16583E461851F082003A7A55 /* SectionHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SectionHeader.h; sourceTree = "<group>"; };
+		16583E471851F082003A7A55 /* SectionHeader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SectionHeader.m; sourceTree = "<group>"; };
 		168BC6AA17EC2DF000BC4584 /* Trailer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Trailer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		168BC6AD17EC2DF000BC4584 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		168BC6B017EC2DF000BC4584 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -150,6 +154,17 @@
 			name = Reachability;
 			sourceTree = "<group>";
 		};
+		16583E411851E5C6003A7A55 /* MenuItems */ = {
+			isa = PBXGroup;
+			children = (
+				16FA68391823CF4600401E9B /* PRItemView.h */,
+				16FA683A1823CF4600401E9B /* PRItemView.m */,
+				16583E461851F082003A7A55 /* SectionHeader.h */,
+				16583E471851F082003A7A55 /* SectionHeader.m */,
+			);
+			name = MenuItems;
+			sourceTree = "<group>";
+		};
 		168BC6A117EC2DF000BC4584 = {
 			isa = PBXGroup;
 			children = (
@@ -196,6 +211,7 @@
 		168BC6B317EC2DF000BC4584 /* Trailer */ = {
 			isa = PBXGroup;
 			children = (
+				16583E411851E5C6003A7A55 /* MenuItems */,
 				1617BEE7183F537500E89BB2 /* Reachability */,
 				16EC79E317ECA16C00F7EB44 /* Extensions */,
 				16B9552E17EC86D10005118F /* Data */,
@@ -203,8 +219,6 @@
 				16075A9617EC7492000D86FD /* API.m */,
 				168BC6BF17EC2DF000BC4584 /* AppDelegate.h */,
 				168BC6C017EC2DF000BC4584 /* AppDelegate.m */,
-				16FA68391823CF4600401E9B /* PRItemView.h */,
-				16FA683A1823CF4600401E9B /* PRItemView.m */,
 				168BC6C217EC2DF000BC4584 /* MainMenu.xib */,
 				168BC6C817EC2DF000BC4584 /* Images.xcassets */,
 				168BC6B417EC2DF000BC4584 /* Supporting Files */,
@@ -390,6 +404,7 @@
 				16B9553117EC89520005118F /* Org.m in Sources */,
 				161CA3CA17F5B1F300F4AF6C /* PRComment.m in Sources */,
 				168BC6C117EC2DF000BC4584 /* AppDelegate.m in Sources */,
+				16583E481851F082003A7A55 /* SectionHeader.m in Sources */,
 				168BC6BA17EC2DF000BC4584 /* main.m in Sources */,
 				16075A9717EC7492000D86FD /* API.m in Sources */,
 				16EC79E617ECA18000F7EB44 /* HTTextField.m in Sources */,
@@ -406,6 +421,7 @@
 				16EC79E717ECA18000F7EB44 /* HTTextField.m in Sources */,
 				16B9553217EC89520005118F /* Org.m in Sources */,
 				1617BEEB183F538100E89BB2 /* Reachability.m in Sources */,
+				16583E491851F082003A7A55 /* SectionHeader.m in Sources */,
 				161CA3CF17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m in Sources */,
 				16075A9817EC7492000D86FD /* API.m in Sources */,
 				16FA683C1823CF4600401E9B /* PRItemView.m in Sources */,

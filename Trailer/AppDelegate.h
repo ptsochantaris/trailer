@@ -9,15 +9,15 @@
 #define LOW_API_WARNING 0.90
 
 typedef enum {
-	kNewComment,
-	kNewPr,
-	kPrMerged
+	kNewComment = 0,
+	kNewPr = 1,
+	kPrMerged = 2
 } PRNotificationType;
 
 typedef enum {
-	kCreationDate=0,
-	kRecentActivity=1,
-	kTitle=2
+	kCreationDate = 0,
+	kRecentActivity = 1,
+	kTitle= 2
 } PRSortingMethod;
 
 @interface AppDelegate : NSObject <
@@ -27,7 +27,8 @@ typedef enum {
 	NSWindowDelegate,
 	NSUserNotificationCenterDelegate,
 	NSMenuDelegate,
-	PRItemViewDelegate
+	PRItemViewDelegate,
+	SectionHeaderDelegate
 >
 
 // Core Data
@@ -57,12 +58,19 @@ typedef enum {
 @property (weak) IBOutlet NSButton *sortingOrder;
 @property (weak) IBOutlet NSPopUpButton *sortModeSelect;
 @property (weak) IBOutlet NSButton *showCreationDates;
+@property (weak) IBOutlet NSButton *dontKeepMyPrs;
+
+// Menu sections
+@property (strong) IBOutlet NSMenuItem *menuMyHeader;
+@property (strong) IBOutlet NSMenuItem *menuParticipatedHeader;
+@property (strong) IBOutlet NSMenuItem *menuMergedHeader;
+@property (strong) IBOutlet NSMenuItem *menuAllHeader;
+@property (weak) IBOutlet NSMenuItem *menuOptions;
 
 // Globals
 @property (nonatomic) API *api;
 @property (weak) NSTimer *refreshTimer;
 @property (nonatomic) NSStatusItem *statusItem;
-@property (strong) NSMutableSet *prMenuItems;
 @property (strong) NSDate *lastSuccessfulRefresh;
 @property (nonatomic) BOOL lastUpdateFailed, preferencesDirty;
 @property (nonatomic, readonly) BOOL isRefreshing, menuIsOpen;
