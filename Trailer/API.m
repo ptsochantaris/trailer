@@ -252,12 +252,12 @@
 	  success:^(NSHTTPURLResponse *response, id data) {
 
 		  NSString *title = r.title;
-		  NSDictionary *mergeInfo = [data objectForKey:@"merged_by"];
+		  NSDictionary *mergeInfo = [data ofk:@"merged_by"];
 		  if(mergeInfo)
 		  {
 			  NSLog(@"detected merged PR: %@",title);
 			  API *api = [AppDelegate shared].api;
-			  NSString *mergeUserId = [[mergeInfo  objectForKey:@"id"] stringValue];
+			  NSString *mergeUserId = [[mergeInfo  ofk:@"id"] stringValue];
 			  NSLog(@"merged by user id: %@, our id is: %@",mergeUserId,api.localUserId);
 			  BOOL mergedByMyself = [mergeUserId isEqualToString:api.localUserId];
 			  if(!(api.dontKeepMyPrs && mergedByMyself)) // someone else merged
@@ -491,7 +491,7 @@
 
 +(BOOL)lastPage:(NSHTTPURLResponse*)response
 {
-	NSString *linkHeader = [[response allHeaderFields] objectForKey:@"Link"];
+	NSString *linkHeader = [[response allHeaderFields] ofk:@"Link"];
 	if(!linkHeader) return YES;
 	return ([linkHeader rangeOfString:@"rel=\"next\""].location==NSNotFound);
 }
