@@ -161,7 +161,7 @@
 								 p.latestReadCommentDate = c.updatedAt;
 						 }
 					 }
-				 } finalCallback:^(BOOL success) {
+				 } finalCallback:^(BOOL success, NSInteger resultCode) {
 					 if(success) succeeded++; else failed++;
 					 if(succeeded+failed==total)
 					 {
@@ -307,6 +307,7 @@
 							[self detectMergedPullRequestsInMoc:syncContext andCallback:^(BOOL success) {
 								if(success)
 								{
+									[DataItem nukeDeletedItemsOfType:@"Repo" inMoc:syncContext];
 									[DataItem nukeDeletedItemsOfType:@"PullRequest" inMoc:syncContext];
 									if(success && syncContext.hasChanges) [syncContext save:nil];
 									if(callback) callback(success);
@@ -342,8 +343,23 @@
 					 {
 						 [PullRequest pullRequestWithInfo:info moc:moc];
 					 }
-				 } finalCallback:^(BOOL success) {
-					 if(success) succeeded++; else failed++;
+				 } finalCallback:^(BOOL success, NSInteger resultCode) {
+					 if(success)
+					 {
+						 succeeded++;
+					 }
+					 else
+					 {
+						 if(resultCode==404) // 404 is an acceptable answer, it means the repo is gone
+						 {
+							 succeeded++;
+							 r.postSyncAction = @(kPostSyncDelete);
+						 }
+						 else
+						 {
+							 failed++;
+						 }
+					 }
 					 if(succeeded+failed==total)
 					 {
 						 callback(failed==0);
@@ -362,7 +378,7 @@
 				 {
 					 [Repo repoWithInfo:info moc:moc];
 				 }
-			 } finalCallback:^(BOOL success) {
+			 } finalCallback:^(BOOL success, NSInteger resultCode) {
 				 if(callback) callback(success);
 			 }];
 }
@@ -377,7 +393,7 @@
 				 {
 					 [Repo repoWithInfo:info moc:moc];
 				 }
-			 } finalCallback:^(BOOL success) {
+			 } finalCallback:^(BOOL success, NSInteger resultCode) {
 				 if(callback) callback(success);
 			 }];
 }
@@ -389,7 +405,7 @@
 					  params:nil
 			 perPageCallback:^(id data, BOOL lastPage) {
 				 for(NSDictionary *info in data) [Org orgWithInfo:info moc:moc];
-			 } finalCallback:^(BOOL success) {
+			 } finalCallback:^(BOOL success, NSInteger resultCode) {
 				 if(callback) callback(success);
 			 }];
 }
@@ -398,7 +414,7 @@
 {
 	[self getDataInPath:@"/user"
 				 params:nil
-			andCallback:^(id data, BOOL lastPage) {
+			andCallback:^(id data, BOOL lastPage, NSInteger resultCode) {
 				if(data)
 				{
 					[[NSUserDefaults standardUserDefaults] setObject:[data ofk:@"login"] forKey:USER_NAME_KEY];
@@ -414,7 +430,7 @@
 		 startingFromPage:(NSInteger)page
 				   params:(NSDictionary*)params
 		  perPageCallback:(void(^)(id data, BOOL lastPage))pageCallback
-			finalCallback:(void(^)(BOOL success))finalCallback
+			finalCallback:(void(^)(BOOL success, NSInteger resultCode))finalCallback
 {
 	NSMutableDictionary *mparams;
 	if(params) mparams = [params mutableCopy];
@@ -423,7 +439,7 @@
 	mparams[@"per_page"] = @100;
 	[self getDataInPath:path
 				 params:mparams
-			andCallback:^(id data, BOOL lastPage) {
+			andCallback:^(id data, BOOL lastPage, NSInteger resultCode) {
 				if(data)
 				{
 					if(pageCallback)
@@ -433,7 +449,7 @@
 
 					if(lastPage)
 					{
-						finalCallback(YES);
+						finalCallback(YES, resultCode);
 					}
 					else
 					{
@@ -446,12 +462,12 @@
 				}
 				else
 				{
-					finalCallback(NO);
+					finalCallback(NO, resultCode);
 				}
 			}];
 }
 
--(void)getDataInPath:(NSString*)path params:(NSDictionary*)params andCallback:(void(^)(id data, BOOL lastPage))callback
+-(void)getDataInPath:(NSString*)path params:(NSDictionary*)params andCallback:(void(^)(id data, BOOL lastPage, NSInteger resultCode))callback
 {
 	[self get:path
    parameters:params
@@ -468,10 +484,10 @@
 															  object:nil
 															userInfo:@{ RATE_UPDATE_NOTIFICATION_LIMIT_KEY: @(requestLimit),
 																		RATE_UPDATE_NOTIFICATION_REMAINING_KEY: @(requestsRemaining) }];
-		  if(callback) callback(data, [API lastPage:response]);
+		  if(callback) callback(data, [API lastPage:response], response.statusCode);
 	  } failure:^(NSHTTPURLResponse *response, NSError *error) {
 		  NSLog(@"Failure: %@",error);
-		  if(callback) callback(nil,NO);
+		  if(callback) callback(nil, NO, response.statusCode);
 	  }];
 }
 
