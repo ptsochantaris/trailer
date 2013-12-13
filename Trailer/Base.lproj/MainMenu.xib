@@ -336,11 +336,7 @@
                 <outlet property="githubTokenHolder" destination="89t-uF-tda" id="XIm-D3-9YE"/>
                 <outlet property="hideUncommentedPrs" destination="c6m-8a-CRl" id="N1u-BD-gDF"/>
                 <outlet property="launchAtStartup" destination="qqE-Ib-sQ9" id="brX-S8-Ge0"/>
-                <outlet property="menuAllHeader" destination="kOK-Ep-UgN" id="fFa-q0-0vw"/>
-                <outlet property="menuMergedHeader" destination="haR-sk-k7o" id="7cH-Zg-WGQ"/>
-                <outlet property="menuMyHeader" destination="Jee-zJ-Hxd" id="QO0-5f-qPi"/>
-                <outlet property="menuOptions" destination="wKE-p6-ntF" id="ZZb-vY-ROm"/>
-                <outlet property="menuParticipatedHeader" destination="hSi-Ya-PqL" id="giM-pk-0PH"/>
+                <outlet property="mainMenu" destination="b2W-dJ-ldg" id="8t8-8X-oYH"/>
                 <outlet property="preferencesWindow" destination="371" id="uYB-yu-610"/>
                 <outlet property="projectsTable" destination="eB0-Bq-YR9" id="kuh-DJ-Kls"/>
                 <outlet property="refreshButton" destination="yOJ-6Q-uTn" id="TDk-eM-0Yi"/>
@@ -348,73 +344,53 @@
                 <outlet property="refreshDurationStepper" destination="Tbh-2L-zvn" id="Sq1-ai-4BZ"/>
                 <outlet property="refreshNow" destination="asb-Mc-b5c" id="aSx-vn-F0X"/>
                 <outlet property="repoFilter" destination="pEa-FD-K1R" id="bxl-Ii-j5p"/>
+                <outlet property="scrollView" destination="1jc-DF-1GW" id="s80-hg-cQv"/>
                 <outlet property="selectAll" destination="2jy-CL-3Vb" id="2lW-dU-CAb"/>
                 <outlet property="showAllComments" destination="CPe-TS-qPS" id="gmg-D0-MUO"/>
                 <outlet property="showCreationDates" destination="AEB-MY-2H6" id="i7b-Cv-Tgf"/>
                 <outlet property="sortModeSelect" destination="geS-Jc-8P2" id="L5a-K5-3PH"/>
                 <outlet property="sortingOrder" destination="B8S-t3-bHc" id="K24-7i-FqU"/>
-                <outlet property="statusBarMenu" destination="6Oo-9b-EZK" id="hGN-O1-h3u"/>
                 <outlet property="tokenHolder" destination="89t-uF-tda" id="FrU-nv-0AM"/>
                 <outlet property="versionNumber" destination="SrS-Tc-X7C" id="RSu-YF-jmY"/>
             </connections>
         </customObject>
         <customObject id="420" customClass="NSFontManager"/>
-        <menu title="Trailer" autoenablesItems="NO" id="6Oo-9b-EZK">
+        <customObject id="vff-Bf-GFU" customClass="SUUpdater"/>
+        <menu title="Options" id="WiK-b2-YYk">
             <items>
-                <menuItem title="Options" id="wKE-p6-ntF">
+                <menuItem title="Refresh" id="asb-Mc-b5c">
                     <modifierMask key="keyEquivalentModifierMask"/>
-                    <menu key="submenu" title="Options" id="WiK-b2-YYk">
-                        <items>
-                            <menuItem title="Refresh" id="asb-Mc-b5c">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="refreshNowSelected:" target="494" id="AiB-dg-t4e"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Mark All As Read" id="HVf-zs-7iK">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="markAllReadSelected:" target="494" id="vWk-YR-lXO"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Check for Updates..." id="gYG-gS-tKD">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="checkForUpdates:" target="vff-Bf-GFU" id="s8k-Dl-cTy"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Preferences..." id="IyB-CB-sO1">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="preferencesSelected:" target="494" id="APu-P9-9A4"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Quit" id="eNw-Iw-Fkg">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="terminate:" target="-3" id="VcX-PJ-RoB"/>
-                                </connections>
-                            </menuItem>
-                        </items>
-                    </menu>
+                    <connections>
+                        <action selector="refreshNowSelected:" target="494" id="AiB-dg-t4e"/>
+                    </connections>
                 </menuItem>
-                <menuItem title="Mine" id="Jee-zJ-Hxd">
-                    <attributedString key="attributedTitle"/>
+                <menuItem title="Mark All As Read" id="HVf-zs-7iK">
                     <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="markAllReadSelected:" target="494" id="vWk-YR-lXO"/>
+                    </connections>
                 </menuItem>
-                <menuItem title="Participated" id="hSi-Ya-PqL">
+                <menuItem title="Check for Updates..." id="gYG-gS-tKD">
                     <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="checkForUpdates:" target="vff-Bf-GFU" id="s8k-Dl-cTy"/>
+                    </connections>
                 </menuItem>
-                <menuItem title="Recently Merged" id="haR-sk-k7o">
+                <menuItem title="Preferences..." id="IyB-CB-sO1">
                     <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="preferencesSelected:" target="494" id="APu-P9-9A4"/>
+                    </connections>
                 </menuItem>
-                <menuItem title="All Pull Requests" id="kOK-Ep-UgN">
+                <menuItem title="Quit" id="eNw-Iw-Fkg">
                     <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="terminate:" target="-3" id="VcX-PJ-RoB"/>
+                    </connections>
                 </menuItem>
             </items>
         </menu>
-        <customObject id="vff-Bf-GFU" customClass="SUUpdater"/>
-        <menu id="C3j-gX-xqj">
+        <menu title="Sorting" id="C3j-gX-xqj">
             <items>
                 <menuItem title="Creation Date" id="Xna-g1-LEI">
                     <modifierMask key="keyEquivalentModifierMask"/>
@@ -427,5 +403,61 @@
                 </menuItem>
             </items>
         </menu>
+        <window title="Trailer Menu" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="none" id="b2W-dJ-ldg">
+            <windowStyleMask key="styleMask" titled="YES"/>
+            <windowCollectionBehavior key="collectionBehavior" transient="YES" ignoresCycle="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+            <rect key="contentRect" x="196" y="213" width="376" height="243"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1080"/>
+            <view key="contentView" appearanceType="lightContent" id="pz7-Cu-3Sm">
+                <rect key="frame" x="0.0" y="0.0" width="376" height="243"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <searchField verticalHuggingPriority="750" id="gaD-Aj-14T">
+                        <rect key="frame" x="5" y="216" width="243" height="22"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                        <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" placeholderString="Filter..." usesSingleLineMode="YES" bezelStyle="round" id="vvd-HC-Usx">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </searchFieldCell>
+                    </searchField>
+                    <button verticalHuggingPriority="750" id="6kq-8h-aAF">
+                        <rect key="frame" x="256" y="214" width="115" height="25"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="roundTextured" title="More..." bezelStyle="texturedRounded" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="qD0-BF-L72">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                    </button>
+                    <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="1jc-DF-1GW">
+                        <rect key="frame" x="0.0" y="0.0" width="376" height="208"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <clipView key="contentView" id="e4g-XR-7jB">
+                            <rect key="frame" x="0.0" y="0.0" width="376" height="208"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <view id="lMY-YH-Amm">
+                                    <rect key="frame" x="0.0" y="0.0" width="376" height="208"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                </view>
+                            </subviews>
+                            <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </clipView>
+                        <scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="jNH-CK-1Qp">
+                            <rect key="frame" x="0.0" y="192" width="376" height="16"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                        <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="vQq-6N-Tac">
+                            <rect key="frame" x="360" y="0.0" width="16" height="208"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                    </scrollView>
+                </subviews>
+            </view>
+            <connections>
+                <outlet property="delegate" destination="494" id="jEY-vW-iEx"/>
+            </connections>
+        </window>
     </objects>
 </document>

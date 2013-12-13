@@ -576,6 +576,4 @@
 	return o;
 }
 
-
-
 @end

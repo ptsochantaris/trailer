@@ -6,9 +6,6 @@
 //  Copyright (c) 2013 HouseTrip. All rights reserved.
 //
 
-#import "AppDelegate.h"
-#import <Sparkle/Sparkle.h>
-
 @implementation AppDelegate
 
 @synthesize persistentStoreCoordinator = _persistentStoreCoordinator;
@@ -36,15 +33,6 @@ static AppDelegate *_static_shared_ref;
 	_static_shared_ref = self;
 
 	self.api = [[API alloc] init];
-
-	SectionHeader *header = [[SectionHeader alloc] initWithRemoveAllDelegate:nil];
-	self.menuAllHeader.view = header;
-	header = [[SectionHeader alloc] initWithRemoveAllDelegate:self];
-	self.menuMergedHeader.view = header;
-	header = [[SectionHeader alloc] initWithRemoveAllDelegate:nil];
-	self.menuMyHeader.view = header;
-	header = [[SectionHeader alloc] initWithRemoveAllDelegate:nil];
-	self.menuParticipatedHeader.view = header;
 
 	[self setupSortMethodMenu];
 
@@ -238,19 +226,69 @@ static AppDelegate *_static_shared_ref;
     [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
 }
 
-- (IBAction)myPrTitleSelected:(NSMenuItem *)sender {}
-
-- (void)prSelected:(NSMenuItem *)item
+- (void)prItemSelected:(PRItemView *)item
 {
-	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:item.representedObject moc:self.managedObjectContext];
+	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:item.userInfo moc:self.managedObjectContext];
 	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:r.webUrl]];
 	[r catchUpWithComments];
 	[self updateStatusItem];
 }
 
-- (void)sectionHeaderRemoveSelected:(NSMenuItem *)item
+- (void)statusItemTapped:(StatusItem *)statusItem
 {
-	[self.statusBarMenu cancelTracking];
+	self.statusItemView.highlighted = YES;
+	if(!self.isRefreshing)
+	{
+		NSString *prefix;
+		if(self.api.localUser)
+		{
+			prefix = [NSString stringWithFormat:@"Refresh %@",self.api.localUser];
+		}
+		else
+		{
+			prefix = @"Refresh";
+		}
+		if(self.lastUpdateFailed)
+		{
+			self.refreshNow.title = [prefix stringByAppendingString:@" (last update failed!)"];
+		}
+		else
+		{
+			long ago = (long)[[NSDate date] timeIntervalSinceDate:self.lastSuccessfulRefresh];
+			if(ago<10)
+			{
+				self.refreshNow.title = [prefix stringByAppendingString:@" (just updated)"];
+			}
+			else
+			{
+				self.refreshNow.title = [NSString stringWithFormat:@"%@ (updated %ld seconds ago)",prefix,(long)ago];
+			}
+		}
+	}
+
+	NSScreen *screen = [NSScreen mainScreen];
+	NSWindow *window = [[[NSApplication sharedApplication] currentEvent] window];
+	CGFloat H = screen.visibleFrame.size.height;
+	CGFloat X = [window frame].origin.x;
+	CGFloat rightSide = screen.visibleFrame.origin.x+screen.visibleFrame.size.width;
+	CGFloat overflow = (X+MENU_WIDTH)-rightSide;
+	if(overflow>0) X -= overflow;
+	// TODO: trim height if list is shorter
+
+	CGRect frame = CGRectMake(X, H, MENU_WIDTH, H);
+	[self.mainMenu setLevel:NSFloatingWindowLevel];
+	[self.mainMenu setFrame:frame display:YES];
+	[self.mainMenu makeKeyAndOrderFront:self];
+}
+
+- (void)closeMenu
+{
+	self.statusItemView.highlighted = NO;
+}
+
+- (void)sectionHeaderRemoveSelectedFrom:(SectionHeader *)header
+{
+	[self closeMenu];
 
 	double delayInSeconds = 0.1;
 	dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
@@ -287,16 +325,22 @@ static AppDelegate *_static_shared_ref;
 
 - (NSInteger)buildPrMenuItemsFromList:(NSArray *)pullRequests
 {
-	while(self.statusBarMenu.numberOfItems>1)
-		[self.statusBarMenu removeItemAtIndex:1];
+	NSMutableArray *menuItems = [NSMutableArray array];
 
-	[self.statusBarMenu addItem:self.menuMyHeader];
-	[self.statusBarMenu addItem:self.menuParticipatedHeader];
-	[self.statusBarMenu addItem:self.menuMergedHeader];
-	[self.statusBarMenu addItem:self.menuAllHeader];
+	// above it have a single view with search and options
+
+	SectionHeader *myHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:nil title:@"Mine"];
+	SectionHeader *participatedHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:nil title:@"Participated"];
+	SectionHeader *mergedHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:self title:@"Recently Merged"];
+	SectionHeader *allHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:nil title:@"All Pull Requests"];
+
+	[menuItems addObject:myHeader];
+	[menuItems addObject:participatedHeader];
+	[menuItems addObject:mergedHeader];
+	[menuItems addObject:allHeader];
 
 	NSInteger unreadCommentCount = 0;
-	NSInteger myIndex = 2, myCount = 0;
+	NSInteger myIndex = 1, myCount = 0;
 	NSInteger participatedIndex = myIndex+1, participatedCount = 0;
 	NSInteger mergedIndex = participatedIndex+1, mergedCount = 0;
 	NSInteger allIndex = mergedIndex+1, allCount = 0;
@@ -307,21 +351,19 @@ static AppDelegate *_static_shared_ref;
 			if(r.unreadCommentCount==0)
 				continue;
 
-		NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@"" action:@selector(prSelected:) keyEquivalent:@""];
-		item.representedObject = r.serverId;
-		PRItemView *itemView = [[PRItemView alloc] init];
-		itemView.delegate = self;
-		[itemView setPullRequest:r];
-		item.view = itemView;
+		PRItemView *item = [[PRItemView alloc] init];
+		item.userInfo = r.serverId;
+		item.delegate = self;
+		[item setPullRequest:r];
 		if(r.merged.boolValue)
 		{
 			mergedCount++;
-			[self.statusBarMenu insertItem:item atIndex:mergedIndex++];
+			[menuItems insertObject:item atIndex:mergedIndex++];
 		}
 		else if(r.isMine)
 		{
 			myCount++;
-			[self.statusBarMenu insertItem:item atIndex:myIndex++];
+			[menuItems insertObject:item atIndex:myIndex++];
 			unreadCommentCount += [r unreadCommentCount];
 			participatedIndex++;
 			mergedIndex++;
@@ -329,36 +371,36 @@ static AppDelegate *_static_shared_ref;
 		else if(r.commentedByMe)
 		{
 			participatedCount++;
-			[self.statusBarMenu insertItem:item atIndex:participatedIndex++];
+			[menuItems insertObject:item atIndex:participatedIndex++];
 			unreadCommentCount += [r unreadCommentCount];
 			mergedIndex++;
 		}
 		else // all other pull requests
 		{
 			allCount++;
-			[self.statusBarMenu insertItem:item atIndex:allIndex];
+			[menuItems insertObject:item atIndex:allIndex];
 			if([AppDelegate shared].api.showCommentsEverywhere)
 				unreadCommentCount += [r unreadCommentCount];
 		}
 		allIndex++;
 	}
 
-	if(!myCount)
+	if(!myCount) [menuItems removeObject:myHeader];
+	if(!participatedCount) [menuItems removeObject:participatedHeader];
+	if(!mergedCount) [menuItems removeObject:mergedHeader];
+	if(!allCount) [menuItems removeObject:allHeader];
+
+	CGFloat top = 0;
+	NSClipView *clip = [[NSClipView alloc] initWithFrame:CGRectZero];
+	for(NSView *v in menuItems)
 	{
-		[self.statusBarMenu removeItem:self.menuMyHeader];
+		CGFloat H = v.frame.size.height;
+		v.frame = CGRectMake(0, top, MENU_WIDTH, H);
+		top += H;
+		[clip addSubview:v];
 	}
-	if(!mergedCount)
-	{
-		[self.statusBarMenu removeItem:self.menuMergedHeader];
-	}
-	if(!participatedCount)
-	{
-		[self.statusBarMenu removeItem:self.menuParticipatedHeader];
-	}
-	if(!allCount)
-	{
-		[self.statusBarMenu removeItem:self.menuAllHeader];
-	}
+	clip.frame = CGRectMake(0, 0, MENU_WIDTH, top);
+	self.scrollView.contentView = clip;
 
 	return unreadCommentCount;
 }
@@ -522,8 +564,7 @@ static AppDelegate *_static_shared_ref;
 	[self refreshDurationChanged:nil];
 
 	[self.preferencesWindow setLevel:NSFloatingWindowLevel];
-	NSWindowController *c = [[NSWindowController alloc] initWithWindow:self.preferencesWindow];
-	[c showWindow:self];
+	[self.preferencesWindow makeKeyAndOrderFront:self];
 }
 
 - (IBAction)createTokenSelected:(NSButton *)sender
@@ -678,12 +719,6 @@ static AppDelegate *_static_shared_ref;
     return _managedObjectContext;
 }
 
-// Returns the NSUndoManager for the application. In this case, the manager returned is that of the managed object context for the application.
-- (NSUndoManager *)windowWillReturnUndoManager:(NSWindow *)window
-{
-    return [[self managedObjectContext] undoManager];
-}
-
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
 {
     // Save changes in the application's managed object context before the application terminates.
@@ -711,18 +746,42 @@ static AppDelegate *_static_shared_ref;
 		[self.managedObjectContext save:nil];
 }
 
+- (void)windowDidBecomeKey:(NSNotification *)notification
+{
+	
+}
+
+- (void)windowDidResignKey:(NSNotification *)notification
+{
+	if([notification object]==self.mainMenu)
+	{
+		[self closeMenu];
+	}
+}
+
+- (void)windowDidResignMain:(NSNotification *)notification
+{
+	if([notification object]==self.mainMenu)
+	{
+		[self closeMenu];
+	}
+}
+
 -(void)windowWillClose:(NSNotification *)notification
 {
-	[self controlTextDidChange:nil];
-	if(self.api.authToken.length && self.preferencesDirty)
+	if([notification object]==self.preferencesWindow)
 	{
-		[self startRefresh];
-	}
-	else
-	{
-		if(!self.refreshTimer && self.api.refreshPeriod>0.0)
+		[self controlTextDidChange:nil];
+		if(self.api.authToken.length && self.preferencesDirty)
 		{
-			[self startRefreshIfItIsDue];
+			[self startRefresh];
+		}
+		else
+		{
+			if(!self.refreshTimer && self.api.refreshPeriod>0.0)
+			{
+				[self startRefreshIfItIsDue];
+			}
 		}
 	}
 }
@@ -960,83 +1019,17 @@ static AppDelegate *_static_shared_ref;
 
 	CGFloat width = [countString sizeWithAttributes:attributes].width;
 
-	CGFloat padding = 3.0;
 	NSStatusBar *statusBar = [NSStatusBar systemStatusBar];
 	CGFloat H = statusBar.thickness;
-	CGFloat length = H+width+padding*3;
-	if(self.statusItem)
-	{
-		self.statusItem.length = length;
-	}
-	else
-	{
-		self.statusItem = [statusBar statusItemWithLength:length];
-		self.statusItem.menu = self.statusBarMenu;
-		self.statusItem.menu.delegate = self;
-	}
+	CGFloat length = H+width+STATUSITEM_PADDING*3;
+	if(!self.statusItem) self.statusItem = [statusBar statusItemWithLength:NSVariableStatusItemLength];
 
-	NSImage *newImage = [[NSImage alloc] initWithSize:CGSizeMake(self.statusItem.length, H)];
-
-    [newImage lockFocus];
-	NSImage *oldImage = [NSImage imageNamed:NSImageNameApplicationIcon];
-	[oldImage drawInRect:CGRectMake(padding, 0, H, H)
-				fromRect:NSZeroRect
-			   operation:NSCompositeSourceOver
-				fraction:1.0];
-	[countString drawInRect:CGRectMake(H+padding, -5, width, H) withAttributes:attributes];
-    [newImage unlockFocus];
-
-	[newImage setTemplate:self.menuIsOpen];
-	self.statusItem.image = newImage;
+	self.statusItemView = [[StatusItem alloc] initWithFrame:CGRectMake(0, 0, length, H)
+													  label:countString
+												 attributes:attributes
+												   delegate:self];
+	self.statusItem.view = self.statusItemView;
 	self.statusItem.highlightMode = YES;
-}
-
-- (void)setMenuIsOpen:(BOOL)menuIsOpen
-{
-	[self.statusItem.image setTemplate:menuIsOpen];
-}
-
-- (BOOL)menuIsOpen
-{
-	return self.statusItem.image.isTemplate;
-}
-
--(void)menuDidClose:(NSMenu *)menu
-{
-	self.menuIsOpen = NO;
-}
-
--(void)menuWillOpen:(NSMenu *)menu
-{
-	self.menuIsOpen = YES;
-	if(!self.isRefreshing)
-	{
-		NSString *prefix;
-		if(self.api.localUser)
-		{
-			prefix = [NSString stringWithFormat:@"Refresh %@",self.api.localUser];
-		}
-		else
-		{
-			prefix = @"Refresh";
-		}
-		if(self.lastUpdateFailed)
-		{
-			self.refreshNow.title = [prefix stringByAppendingString:@" (last update failed!)"];
-		}
-		else
-		{
-			long ago = (long)[[NSDate date] timeIntervalSinceDate:self.lastSuccessfulRefresh];
-			if(ago<10)
-			{
-				self.refreshNow.title = [prefix stringByAppendingString:@" (just updated)"];
-			}
-			else
-			{
-				self.refreshNow.title = [NSString stringWithFormat:@"%@ (updated %ld seconds ago)",prefix,(long)ago];
-			}
-		}
-	}
 }
 
 - (IBAction)selectAllSelected:(NSButton *)sender

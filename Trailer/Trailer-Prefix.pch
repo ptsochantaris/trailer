@@ -23,5 +23,7 @@
 	#import "PullRequest.h"
 	#import "PRItemView.h"
 	#import "SectionHeader.h"
+	#import <Sparkle/Sparkle.h>
+	#import "StatusItem.h"
 	#import "AppDelegate.h"
 #endif

@@ -6,16 +6,12 @@
 //  Copyright (c) 2013 HouseTrip. All rights reserved.
 //
 
-
-#import <Cocoa/Cocoa.h>
-
-
 @class SectionHeader;
 
 
 @protocol SectionHeaderDelegate <NSObject>
 
-- (void)sectionHeaderRemoveSelected:(NSMenuItem *)item;
+- (void)sectionHeaderRemoveSelectedFrom:(SectionHeader *)item;
 
 @end
 
@@ -24,6 +20,6 @@
 
 @property (nonatomic,weak) id<SectionHeaderDelegate> delegate;
 
-- (id)initWithRemoveAllDelegate:(id<SectionHeaderDelegate>)delegate;
+- (id)initWithRemoveAllDelegate:(id<SectionHeaderDelegate>)delegate title:(NSString *)title;
 
 @end

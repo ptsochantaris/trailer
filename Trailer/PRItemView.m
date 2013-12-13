@@ -6,8 +6,6 @@
 //  Copyright (c) 2013 HouseTrip. All rights reserved.
 //
 
-#import "PRItemView.h"
-
 @interface PRItemView ()
 {
 	NSString *_title, *_dates;
@@ -76,7 +74,7 @@ static NSDateFormatter *dateFormatter;
 
 - (void)unPinSelected:(NSButton *)button
 {
-	[self.delegate unPinSelectedFrom:[self enclosingMenuItem]];
+	[self.delegate unPinSelectedFrom:self];
 }
 
 #define REMOVE_BUTTON_WIDTH 80.0
@@ -91,7 +89,7 @@ static NSDateFormatter *dateFormatter;
 	CGFloat W = MENU_WIDTH-LEFTPADDING;
 	if(!unpin.isHidden) W -= REMOVE_BUTTON_WIDTH;
 
-	if([[self enclosingMenuItem] isHighlighted])
+	if(self.highlighted)
 	{
 		[[NSColor colorWithWhite:0.95 alpha:1.0] setFill];
 		CGContextFillRect(context, dirtyRect);
@@ -172,9 +170,7 @@ static NSDateFormatter *dateFormatter;
 
 - (void)mouseDown:(NSEvent*) event
 {
-    NSMenu *menu = self.enclosingMenuItem.menu;
-    [menu cancelTracking];
-    [menu performActionForItemAtIndex:[menu indexOfItem:self.enclosingMenuItem]];
+	[self.delegate prItemSelected:self];
 }
 
 - (BOOL)acceptsFirstMouse:(NSEvent *)theEvent

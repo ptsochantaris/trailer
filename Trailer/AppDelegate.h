@@ -26,21 +26,20 @@ typedef enum {
 	NSTableViewDataSource,
 	NSWindowDelegate,
 	NSUserNotificationCenterDelegate,
-	NSMenuDelegate,
 	PRItemViewDelegate,
-	SectionHeaderDelegate
+	SectionHeaderDelegate,
+	StatusItemDelegate
 >
 
 // Core Data
 @property (readonly, strong, nonatomic) NSPersistentStoreCoordinator *persistentStoreCoordinator;
 @property (readonly, strong, nonatomic) NSManagedObjectModel *managedObjectModel;
 @property (readonly, strong, nonatomic) NSManagedObjectContext *managedObjectContext;
-@property (unsafe_unretained) IBOutlet NSWindow *preferencesWindow;
 
 // Preferences window
+@property (unsafe_unretained) IBOutlet NSWindow *preferencesWindow;
 @property (weak) IBOutlet NSButton *refreshButton;
 @property (weak) IBOutlet NSTextField *githubTokenHolder;
-@property (weak) IBOutlet NSMenu *statusBarMenu;
 @property (weak) IBOutlet NSProgressIndicator *activityDisplay;
 @property (weak) IBOutlet NSTableView *projectsTable;
 @property (weak) IBOutlet NSMenuItem *refreshNow;
@@ -60,17 +59,15 @@ typedef enum {
 @property (weak) IBOutlet NSButton *showCreationDates;
 @property (weak) IBOutlet NSButton *dontKeepMyPrs;
 
-// Menu sections
-@property (strong) IBOutlet NSMenuItem *menuMyHeader;
-@property (strong) IBOutlet NSMenuItem *menuParticipatedHeader;
-@property (strong) IBOutlet NSMenuItem *menuMergedHeader;
-@property (strong) IBOutlet NSMenuItem *menuAllHeader;
-@property (weak) IBOutlet NSMenuItem *menuOptions;
+// Menu
+@property (nonatomic) NSStatusItem *statusItem;
+@property (nonatomic) StatusItem *statusItemView;
+@property (unsafe_unretained) IBOutlet NSWindow *mainMenu;
+@property (weak) IBOutlet NSScrollView *scrollView;
 
 // Globals
 @property (nonatomic) API *api;
 @property (weak) NSTimer *refreshTimer;
-@property (nonatomic) NSStatusItem *statusItem;
 @property (strong) NSDate *lastSuccessfulRefresh;
 @property (nonatomic) BOOL lastUpdateFailed, preferencesDirty;
 @property (nonatomic, readonly) BOOL isRefreshing, menuIsOpen;

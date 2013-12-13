@@ -6,17 +6,22 @@
 //  Copyright (c) 2013 HouseTrip. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+@class PRItemView;
+
 
 @protocol PRItemViewDelegate <NSObject>
 
-- (void)unPinSelectedFrom:(NSMenuItem *)item;
+- (void)unPinSelectedFrom:(PRItemView *)item;
+- (void)prItemSelected:(PRItemView *)item;
 
 @end
+
 
 @interface PRItemView : NSView
 
 @property (nonatomic,weak) id<PRItemViewDelegate> delegate;
+@property (nonatomic) BOOL highlighted;
+@property (nonatomic) id userInfo;
 
 - (void) setPullRequest:(PullRequest *)pullRequest;
 
