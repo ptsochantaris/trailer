@@ -284,7 +284,7 @@ static AppDelegate *_static_shared_ref;
 	if(overflow>0) menuLeft -= overflow;
 
 	CGFloat screenHeight = screen.visibleFrame.size.height;
-	CGFloat menuHeight = 28.0+[self.scrollView.documentView frame].size.height;
+	CGFloat menuHeight = 28.0+[self.mainMenu.scrollView.documentView frame].size.height;
 	CGFloat top = screenHeight;
 	if(menuHeight<screenHeight)
 	{
@@ -293,7 +293,7 @@ static AppDelegate *_static_shared_ref;
 	}
 	else
 	{
-		menuHeight = screenHeight;
+		menuHeight = screenHeight+4.0;
 	}
 
 	CGRect frame = CGRectMake(menuLeft, top, MENU_WIDTH, menuHeight);
@@ -423,9 +423,9 @@ static AppDelegate *_static_shared_ref;
 	}
 	menuContents.frame = CGRectMake(0, 0, MENU_WIDTH, top);
 
-	CGPoint lastPos = self.scrollView.contentView.documentVisibleRect.origin;
-	self.scrollView.documentView = menuContents;
-	[self.scrollView.documentView scrollPoint:lastPos];
+	CGPoint lastPos = self.mainMenu.scrollView.contentView.documentVisibleRect.origin;
+	self.mainMenu.scrollView.documentView = menuContents;
+	[self.mainMenu.scrollView.documentView scrollPoint:lastPos];
 
 	return unreadCommentCount;
 }
@@ -786,7 +786,8 @@ static AppDelegate *_static_shared_ref;
 
 - (void)scrollToTop
 {
-	[self.scrollView.documentView scrollPoint:CGPointMake(0, [self.scrollView.documentView frame].size.height-self.scrollView.contentView.bounds.size.height)];
+	NSScrollView *scrollView = self.mainMenu.scrollView;
+	[scrollView.documentView scrollPoint:CGPointMake(0, [scrollView.documentView frame].size.height-scrollView.contentView.bounds.size.height)];
 }
 
 - (void)windowDidBecomeKey:(NSNotification *)notification
@@ -822,6 +823,14 @@ static AppDelegate *_static_shared_ref;
 				[self startRefreshIfItIsDue];
 			}
 		}
+	}
+}
+
+- (void)windowDidResize:(NSNotification *)notification
+{
+	if([notification object]==self.mainMenu)
+	{
+		[self.mainMenu layout];
 	}
 }
 

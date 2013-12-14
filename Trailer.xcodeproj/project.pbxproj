@@ -22,6 +22,8 @@
 		161CA3CF17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m in Sources */ = {isa = PBXBuildFile; fileRef = 161CA3CC17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m */; };
 		16583E481851F082003A7A55 /* SectionHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 16583E471851F082003A7A55 /* SectionHeader.m */; };
 		16583E491851F082003A7A55 /* SectionHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 16583E471851F082003A7A55 /* SectionHeader.m */; };
+		1675AC1D185CF80C00ADD213 /* PRScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1675AC1C185CF80C00ADD213 /* PRScrollView.m */; };
+		1675AC1E185CF80C00ADD213 /* PRScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1675AC1C185CF80C00ADD213 /* PRScrollView.m */; };
 		168A5C77185BBA2F00CB6B02 /* MenuWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 168A5C76185BBA2F00CB6B02 /* MenuWindow.m */; };
 		168A5C78185BBA2F00CB6B02 /* MenuWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 168A5C76185BBA2F00CB6B02 /* MenuWindow.m */; };
 		168A5C7B185C922300CB6B02 /* HTPopTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = 168A5C7A185C922300CB6B02 /* HTPopTimer.m */; };
@@ -93,6 +95,8 @@
 		161CA3CD17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+NSDictionary_OFK.h"; sourceTree = "<group>"; };
 		16583E461851F082003A7A55 /* SectionHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SectionHeader.h; sourceTree = "<group>"; };
 		16583E471851F082003A7A55 /* SectionHeader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SectionHeader.m; sourceTree = "<group>"; };
+		1675AC1B185CF80C00ADD213 /* PRScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PRScrollView.h; sourceTree = "<group>"; };
+		1675AC1C185CF80C00ADD213 /* PRScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PRScrollView.m; sourceTree = "<group>"; };
 		168A5C75185BBA2F00CB6B02 /* MenuWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MenuWindow.h; sourceTree = "<group>"; };
 		168A5C76185BBA2F00CB6B02 /* MenuWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MenuWindow.m; sourceTree = "<group>"; };
 		168A5C79185C922300CB6B02 /* HTPopTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HTPopTimer.h; sourceTree = "<group>"; };
@@ -186,6 +190,8 @@
 				168A5C7A185C922300CB6B02 /* HTPopTimer.m */,
 				161BED23185B5368005C00F7 /* StatusItemView.h */,
 				161BED24185B5368005C00F7 /* StatusItemView.m */,
+				1675AC1B185CF80C00ADD213 /* PRScrollView.h */,
+				1675AC1C185CF80C00ADD213 /* PRScrollView.m */,
 			);
 			name = Display;
 			sourceTree = "<group>";
@@ -425,6 +431,7 @@
 				1617BEEA183F538100E89BB2 /* Reachability.m in Sources */,
 				16B9553A17EC93DE0005118F /* Repo.m in Sources */,
 				161CA3CE17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m in Sources */,
+				1675AC1D185CF80C00ADD213 /* PRScrollView.m in Sources */,
 				161CA3C617F5A55300F4AF6C /* PullRequest.m in Sources */,
 				16FA683B1823CF4600401E9B /* PRItemView.m in Sources */,
 				16B9553117EC89520005118F /* Org.m in Sources */,
@@ -451,6 +458,7 @@
 				16B9553217EC89520005118F /* Org.m in Sources */,
 				1617BEEB183F538100E89BB2 /* Reachability.m in Sources */,
 				16583E491851F082003A7A55 /* SectionHeader.m in Sources */,
+				1675AC1E185CF80C00ADD213 /* PRScrollView.m in Sources */,
 				161CA3CF17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m in Sources */,
 				168A5C7C185C922300CB6B02 /* HTPopTimer.m in Sources */,
 				16075A9817EC7492000D86FD /* API.m in Sources */,

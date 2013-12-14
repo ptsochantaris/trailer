@@ -62,10 +62,8 @@ typedef enum {
 // Menu
 @property (nonatomic) NSStatusItem *statusItem;
 @property (nonatomic) StatusItemView *statusItemView;
-@property (unsafe_unretained) IBOutlet NSWindow *mainMenu;
-@property (weak) IBOutlet NSScrollView *scrollView;
+@property (unsafe_unretained) IBOutlet MenuWindow *mainMenu;
 @property (weak) IBOutlet NSSearchField *mainMenuFilter;
-@property (weak) IBOutlet NSPopUpButton *optionsMenu;
 @property (nonatomic) HTPopTimer *filterTimer;
 
 // Globals
