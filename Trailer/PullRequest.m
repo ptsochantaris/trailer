@@ -42,9 +42,16 @@
 	return p;
 }
 
-+(NSArray *)pullRequestsSortedByField:(NSString *)fieldName ascending:(BOOL)ascending inMoc:(NSManagedObjectContext *)moc
++(NSArray *)pullRequestsSortedByField:(NSString *)fieldName
+							   filter:(NSString *)filter
+							ascending:(BOOL)ascending
+								inMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PullRequest"];
+	if(filter.length)
+	{
+		f.predicate = [NSPredicate predicateWithFormat:@"title contains[cd] %@",filter];
+	}
 	if([fieldName isEqualToString:@"title"])
 	{
 		f.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:fieldName ascending:ascending selector:@selector(caseInsensitiveCompare:)]];

@@ -28,7 +28,10 @@
 
 + (PullRequest *)pullRequestWithUrl:(NSString *)url moc:(NSManagedObjectContext *)moc;
 
-+ (NSArray *)pullRequestsSortedByField:(NSString *)fieldName ascending:(BOOL)ascending inMoc:(NSManagedObjectContext *)moc;
++ (NSArray *)pullRequestsSortedByField:(NSString *)fieldName
+								filter:(NSString *)filter
+							 ascending:(BOOL)ascending
+								 inMoc:(NSManagedObjectContext *)moc;
 
 + (NSArray *)allMergedRequestsInMoc:(NSManagedObjectContext *)moc;
 

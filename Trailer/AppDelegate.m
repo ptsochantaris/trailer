@@ -20,6 +20,10 @@ static AppDelegate *_static_shared_ref;
 	//NSString *appDomain = [[NSBundle mainBundle] bundleIdentifier];
 	//[[NSUserDefaults standardUserDefaults] removePersistentDomainForName:appDomain];
 
+	self.mainMenu.backgroundColor = [NSColor whiteColor];
+
+	self.filterTimer = [[HTPopTimer alloc] initWithTimeInterval:0.25 target:self selector:@selector(filterTimerPopped)];
+
 	SUUpdater *s = [SUUpdater sharedUpdater];
 	if(!s.updateInProgress)
 	{
@@ -64,9 +68,6 @@ static AppDelegate *_static_shared_ref;
 											 selector:@selector(networkStateChanged)
 												 name:kReachabilityChangedNotification
 											   object:nil];
-
-	//PullRequest *pr = [[PullRequest allItemsOfType:@"PullRequest" inMoc:self.managedObjectContext] lastObject];
-	//pr.merged = @(YES);
 }
 
 - (void)setupSortMethodMenu
@@ -234,19 +235,24 @@ static AppDelegate *_static_shared_ref;
 	[self updateStatusItem];
 }
 
-- (void)statusItemTapped:(StatusItem *)statusItem
+- (void)statusItemTapped:(StatusItemView *)statusItem
 {
+	if(self.statusItemView.highlighted)
+	{
+		[self closeMenu];
+		return;
+	}
 	self.statusItemView.highlighted = YES;
 	if(!self.isRefreshing)
 	{
 		NSString *prefix;
 		if(self.api.localUser)
 		{
-			prefix = [NSString stringWithFormat:@"Refresh %@",self.api.localUser];
+			prefix = [NSString stringWithFormat:@" Refresh %@",self.api.localUser];
 		}
 		else
 		{
-			prefix = @"Refresh";
+			prefix = @" Refresh";
 		}
 		if(self.lastUpdateFailed)
 		{
@@ -266,44 +272,60 @@ static AppDelegate *_static_shared_ref;
 		}
 	}
 
-	NSScreen *screen = [NSScreen mainScreen];
-	NSWindow *window = [[[NSApplication sharedApplication] currentEvent] window];
-	CGFloat H = screen.visibleFrame.size.height;
-	CGFloat X = [window frame].origin.x;
-	CGFloat rightSide = screen.visibleFrame.origin.x+screen.visibleFrame.size.width;
-	CGFloat overflow = (X+MENU_WIDTH)-rightSide;
-	if(overflow>0) X -= overflow;
-	// TODO: trim height if list is shorter
+	[self sizeMenuAndShow:YES];
+}
 
-	CGRect frame = CGRectMake(X, H, MENU_WIDTH, H);
-	[self.mainMenu setLevel:NSFloatingWindowLevel];
-	[self.mainMenu setFrame:frame display:YES];
-	[self.mainMenu makeKeyAndOrderFront:self];
+- (void)sizeMenuAndShow:(BOOL)show
+{
+	NSScreen *screen = [NSScreen mainScreen];
+	CGFloat menuLeft = self.statusItemView.window.frame.origin.x;
+	CGFloat rightSide = screen.visibleFrame.origin.x+screen.visibleFrame.size.width;
+	CGFloat overflow = (menuLeft+MENU_WIDTH)-rightSide;
+	if(overflow>0) menuLeft -= overflow;
+
+	CGFloat screenHeight = screen.visibleFrame.size.height;
+	CGFloat menuHeight = 28.0+[self.scrollView.documentView frame].size.height;
+	CGFloat top = screenHeight;
+	if(menuHeight<screenHeight)
+	{
+		top = screenHeight-menuHeight;
+		top += 4.0;
+	}
+	else
+	{
+		menuHeight = screenHeight;
+	}
+
+	CGRect frame = CGRectMake(menuLeft, top, MENU_WIDTH, menuHeight);
+	[self.mainMenu setFrame:frame display:YES animate:NO];
+
+	if(show)
+	{
+		[self.mainMenu makeKeyAndOrderFront:self];
+		[NSApp activateIgnoringOtherApps:YES];
+	}
 }
 
 - (void)closeMenu
 {
 	self.statusItemView.highlighted = NO;
+	[self.mainMenu orderOut:nil];
 }
 
 - (void)sectionHeaderRemoveSelectedFrom:(SectionHeader *)header
 {
-	[self closeMenu];
+	NSArray *mergedRequests = [PullRequest allMergedRequestsInMoc:self.managedObjectContext];
 
-	double delayInSeconds = 0.1;
-	dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
-	dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-		NSAlert *alert = [[NSAlert alloc] init];
-		[alert setMessageText:@"Clear all merged PRs?"];
-		[alert setInformativeText:[NSString stringWithFormat:@"This will clear all the merged PRs from your list.  This action cannot be undone, are you sure?"]];
-		[alert addButtonWithTitle:@"No"];
-		[alert addButtonWithTitle:@"Yes"];
-		NSInteger selected = [alert runModal];
-		if(selected==NSAlertSecondButtonReturn)
-		{
-			[self removeAllMergedRequests];
-		}
-	});
+	NSAlert *alert = [[NSAlert alloc] init];
+	[alert setMessageText:[NSString stringWithFormat:@"Clear %ld merged PRs?",mergedRequests.count]];
+	[alert setInformativeText:[NSString stringWithFormat:@"This will clear %ld merged PRs from your list.  This action cannot be undone, are you sure?",mergedRequests.count]];
+	[alert addButtonWithTitle:@"No"];
+	[alert addButtonWithTitle:@"Yes"];
+	NSInteger selected = [alert runModal];
+	if(selected==NSAlertSecondButtonReturn)
+	{
+		[self removeAllMergedRequests];
+	}
 }
 
 - (void)removeAllMergedRequests
@@ -315,9 +337,9 @@ static AppDelegate *_static_shared_ref;
 	[self updateStatusItem];
 }
 
-- (void)unPinSelectedFrom:(NSMenuItem *)item
+- (void)unPinSelectedFrom:(PRItemView *)item
 {
-	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:item.representedObject moc:self.managedObjectContext];
+	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:item.userInfo moc:self.managedObjectContext];
 	[self.managedObjectContext deleteObject:r];
 	[self saveDB];
 	[self updateStatusItem];
@@ -390,17 +412,20 @@ static AppDelegate *_static_shared_ref;
 	if(!mergedCount) [menuItems removeObject:mergedHeader];
 	if(!allCount) [menuItems removeObject:allHeader];
 
-	CGFloat top = 0;
-	NSClipView *clip = [[NSClipView alloc] initWithFrame:CGRectZero];
-	for(NSView *v in menuItems)
+	CGFloat top = 10.0;
+	NSView *menuContents = [[NSView alloc] initWithFrame:CGRectZero];
+	for(NSView *v in [menuItems reverseObjectEnumerator])
 	{
 		CGFloat H = v.frame.size.height;
 		v.frame = CGRectMake(0, top, MENU_WIDTH, H);
 		top += H;
-		[clip addSubview:v];
+		[menuContents addSubview:v];
 	}
-	clip.frame = CGRectMake(0, 0, MENU_WIDTH, top);
-	self.scrollView.contentView = clip;
+	menuContents.frame = CGRectMake(0, 0, MENU_WIDTH, top);
+
+	CGPoint lastPos = self.scrollView.contentView.documentVisibleRect.origin;
+	self.scrollView.documentView = menuContents;
+	[self.scrollView.documentView scrollPoint:lastPos];
 
 	return unreadCommentCount;
 }
@@ -447,6 +472,7 @@ static AppDelegate *_static_shared_ref;
 	self.apiLoad.maxValue = limit;
 	self.apiLoad.doubleValue = limit-remaining;
 }
+
 
 - (IBAction)refreshReposSelected:(NSButton *)sender
 {
@@ -502,6 +528,16 @@ static AppDelegate *_static_shared_ref;
 	{
 		[self.projectsTable reloadData];
 	}
+	else if(obj.object==self.mainMenuFilter)
+	{
+		[self.filterTimer push];
+	}
+}
+
+- (void)filterTimerPopped
+{
+	[self updateStatusItem];
+	[self scrollToTop];
 }
 
 - (void)reset
@@ -513,6 +549,8 @@ static AppDelegate *_static_shared_ref;
 	[self.projectsTable reloadData];
 	[self updateStatusItem];
 }
+
+
 
 - (IBAction)markAllReadSelected:(NSMenuItem *)sender
 {
@@ -746,20 +784,21 @@ static AppDelegate *_static_shared_ref;
 		[self.managedObjectContext save:nil];
 }
 
-- (void)windowDidBecomeKey:(NSNotification *)notification
+- (void)scrollToTop
 {
-	
+	[self.scrollView.documentView scrollPoint:CGPointMake(0, [self.scrollView.documentView frame].size.height-self.scrollView.contentView.bounds.size.height)];
 }
 
-- (void)windowDidResignKey:(NSNotification *)notification
+- (void)windowDidBecomeKey:(NSNotification *)notification
 {
 	if([notification object]==self.mainMenu)
 	{
-		[self closeMenu];
+		[self scrollToTop];
+		[self.mainMenuFilter becomeFirstResponder];
 	}
 }
 
-- (void)windowDidResignMain:(NSNotification *)notification
+- (void)windowDidResignKey:(NSNotification *)notification
 {
 	if([notification object]==self.mainMenu)
 	{
@@ -896,9 +935,9 @@ static AppDelegate *_static_shared_ref;
 	SEL oldAction = self.refreshNow.action;
 
 	if(self.api.localUser)
-		self.refreshNow.title = [NSString stringWithFormat:@"Refreshing %@...",self.api.localUser];
+		self.refreshNow.title = [NSString stringWithFormat:@" Refreshing %@...",self.api.localUser];
 	else
-		self.refreshNow.title = @"Refreshing...";
+		self.refreshNow.title = @" Refreshing...";
 
 	[self.refreshNow setAction:nil];
 	[self.refreshNow setTarget:nil];
@@ -973,6 +1012,7 @@ static AppDelegate *_static_shared_ref;
 		case kTitle: sortCriterion = @"title"; break;
 	}
 	NSArray *pullRequests = [PullRequest pullRequestsSortedByField:sortCriterion
+															filter:self.mainMenuFilter.stringValue
 														 ascending:!self.api.sortDescending
 															 inMoc:self.managedObjectContext];
 	return pullRequests;
@@ -1024,12 +1064,14 @@ static AppDelegate *_static_shared_ref;
 	CGFloat length = H+width+STATUSITEM_PADDING*3;
 	if(!self.statusItem) self.statusItem = [statusBar statusItemWithLength:NSVariableStatusItemLength];
 
-	self.statusItemView = [[StatusItem alloc] initWithFrame:CGRectMake(0, 0, length, H)
+	self.statusItemView = [[StatusItemView alloc] initWithFrame:CGRectMake(0, 0, length, H)
 													  label:countString
 												 attributes:attributes
 												   delegate:self];
+	self.statusItemView.highlighted = [self.mainMenu isVisible];
 	self.statusItem.view = self.statusItemView;
-	self.statusItem.highlightMode = YES;
+
+	[self sizeMenuAndShow:NO];
 }
 
 - (IBAction)selectAllSelected:(NSButton *)sender

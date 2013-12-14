@@ -11,6 +11,7 @@
 	NSString *_title, *_dates;
 	NSInteger _commentsTotal, _commentsNew;
 	NSButton *unpin;
+	NSTrackingArea *trackingArea;
 }
 @end
 
@@ -89,7 +90,7 @@ static NSDateFormatter *dateFormatter;
 	CGFloat W = MENU_WIDTH-LEFTPADDING;
 	if(!unpin.isHidden) W -= REMOVE_BUTTON_WIDTH;
 
-	if(self.highlighted)
+	if(_highlighted)
 	{
 		[[NSColor colorWithWhite:0.95 alpha:1.0] setFill];
 		CGContextFillRect(context, dirtyRect);
@@ -168,9 +169,43 @@ static NSDateFormatter *dateFormatter;
 	unpin.frame = CGRectMake(LEFTPADDING+W, floorf((self.bounds.size.height-24.0)*0.5), REMOVE_BUTTON_WIDTH-10.0, 24.0);
 }
 
+- (void)setHighlighted:(BOOL)highlighted
+{
+	_highlighted = highlighted;
+	[self setNeedsDisplay:YES];
+}
+
+- (void)mouseEntered:(NSEvent *)theEvent
+{
+	self.highlighted = YES;
+}
+
+- (void)mouseExited:(NSEvent *)theEvent
+{
+	self.highlighted = NO;
+}
+
 - (void)mouseDown:(NSEvent*) event
 {
 	[self.delegate prItemSelected:self];
+}
+
+- (void)updateTrackingAreas
+{
+	if(trackingArea) [self removeTrackingArea:trackingArea];
+	trackingArea = [ [NSTrackingArea alloc] initWithRect:[self bounds]
+												 options:NSTrackingMouseEnteredAndExited | NSTrackingActiveInKeyWindow
+												   owner:self
+												userInfo:nil];
+	[self addTrackingArea:trackingArea];
+
+	NSPoint mouseLocation = [[self window] mouseLocationOutsideOfEventStream];
+    mouseLocation = [self convertPoint: mouseLocation fromView: nil];
+
+    if (NSPointInRect(mouseLocation, [self bounds]))
+		[self mouseEntered: nil];
+	else
+		[self mouseExited: nil];
 }
 
 - (BOOL)acceptsFirstMouse:(NSEvent *)theEvent

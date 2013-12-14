@@ -6,7 +6,7 @@
 //  Copyright (c) 2013 HouseTrip. All rights reserved.
 //
 
-@class StatusItem;
+@class StatusItemView;
 
 
 #define STATUSITEM_PADDING 3.0
@@ -14,12 +14,12 @@
 
 @protocol StatusItemDelegate <NSObject>
 
-- (void)statusItemTapped:(StatusItem *)statusItem;
+- (void)statusItemTapped:(StatusItemView *)statusItem;
 
 @end
 
 
-@interface StatusItem : NSView
+@interface StatusItemView : NSView
 
 - (id)initWithFrame:(NSRect)frame label:(NSString *)label attributes:(NSDictionary *)attributes delegate:(id<StatusItemDelegate>)delegate;
 

@@ -24,6 +24,8 @@
 	#import "PRItemView.h"
 	#import "SectionHeader.h"
 	#import <Sparkle/Sparkle.h>
-	#import "StatusItem.h"
+	#import "StatusItemView.h"
+	#import "MenuWindow.h"
+	#import "HTPopTimer.h"
 	#import "AppDelegate.h"
 #endif
