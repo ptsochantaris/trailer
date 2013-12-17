@@ -49,7 +49,7 @@
 	self.scrollView.ignoreWheel = YES;
 	scrollUp =(theEvent.trackingArea==topArea);
 	scrollDistance = 0.0;
-	scrollTimer = [NSTimer scheduledTimerWithTimeInterval:0.02 target:self selector:@selector(scrollStep) userInfo:nil repeats:YES];
+	scrollTimer = [NSTimer scheduledTimerWithTimeInterval:0.01 target:self selector:@selector(scrollStep) userInfo:nil repeats:YES];
 }
 
 - (void)mouseExited:(NSEvent *)theEvent
@@ -72,7 +72,7 @@
 	{
 		scrollDistance = (bottomRectangle.size.height-(mouseLocation.y-bottomRectangle.origin.y));
 	}
-	scrollDistance *= 0.1;
+	scrollDistance *= 0.14;
 	scrollDistance = MAX(1.0,scrollDistance*scrollDistance);
 }
 

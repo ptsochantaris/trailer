@@ -297,6 +297,7 @@ static AppDelegate *_static_shared_ref;
 	}
 
 	CGRect frame = CGRectMake(menuLeft, top, MENU_WIDTH, menuHeight);
+	NSLog(@"Will show menu at %f, %f - %f x %f",frame.origin.x,frame.origin.y,frame.size.width,frame.size.height);
 	[self.mainMenu setFrame:frame display:YES animate:NO];
 
 	if(show)
