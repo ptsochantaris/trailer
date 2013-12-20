@@ -20,6 +20,8 @@
 		161CA3CB17F5B1F300F4AF6C /* PRComment.m in Sources */ = {isa = PBXBuildFile; fileRef = 161CA3C917F5B1F300F4AF6C /* PRComment.m */; };
 		161CA3CE17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m in Sources */ = {isa = PBXBuildFile; fileRef = 161CA3CC17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m */; };
 		161CA3CF17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m in Sources */ = {isa = PBXBuildFile; fileRef = 161CA3CC17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m */; };
+		164976251864985500C13A6B /* RemoteImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 164976241864985500C13A6B /* RemoteImageView.m */; };
+		164976261864985500C13A6B /* RemoteImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 164976241864985500C13A6B /* RemoteImageView.m */; };
 		16583E481851F082003A7A55 /* SectionHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 16583E471851F082003A7A55 /* SectionHeader.m */; };
 		16583E491851F082003A7A55 /* SectionHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 16583E471851F082003A7A55 /* SectionHeader.m */; };
 		1675AC1D185CF80C00ADD213 /* PRScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1675AC1C185CF80C00ADD213 /* PRScrollView.m */; };
@@ -93,6 +95,9 @@
 		161CA3C917F5B1F300F4AF6C /* PRComment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PRComment.m; sourceTree = "<group>"; };
 		161CA3CC17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+NSDictionary_OFK.m"; sourceTree = "<group>"; };
 		161CA3CD17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+NSDictionary_OFK.h"; sourceTree = "<group>"; };
+		164976221864935200C13A6B /* Trailer 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Trailer 3.xcdatamodel"; sourceTree = "<group>"; };
+		164976231864985500C13A6B /* RemoteImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RemoteImageView.h; sourceTree = "<group>"; };
+		164976241864985500C13A6B /* RemoteImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RemoteImageView.m; sourceTree = "<group>"; };
 		16583E461851F082003A7A55 /* SectionHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SectionHeader.h; sourceTree = "<group>"; };
 		16583E471851F082003A7A55 /* SectionHeader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SectionHeader.m; sourceTree = "<group>"; };
 		1675AC1B185CF80C00ADD213 /* PRScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PRScrollView.h; sourceTree = "<group>"; };
@@ -192,6 +197,8 @@
 				161BED24185B5368005C00F7 /* StatusItemView.m */,
 				1675AC1B185CF80C00ADD213 /* PRScrollView.h */,
 				1675AC1C185CF80C00ADD213 /* PRScrollView.m */,
+				164976231864985500C13A6B /* RemoteImageView.h */,
+				164976241864985500C13A6B /* RemoteImageView.m */,
 			);
 			name = Display;
 			sourceTree = "<group>";
@@ -442,6 +449,7 @@
 				16583E481851F082003A7A55 /* SectionHeader.m in Sources */,
 				168BC6BA17EC2DF000BC4584 /* main.m in Sources */,
 				16075A9717EC7492000D86FD /* API.m in Sources */,
+				164976251864985500C13A6B /* RemoteImageView.m in Sources */,
 				16EC79E617ECA18000F7EB44 /* HTTextField.m in Sources */,
 				161BED25185B5368005C00F7 /* StatusItemView.m in Sources */,
 				16B9553617EC89B50005118F /* DataItem.m in Sources */,
@@ -454,6 +462,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				16B9553B17EC93DE0005118F /* Repo.m in Sources */,
+				164976261864985500C13A6B /* RemoteImageView.m in Sources */,
 				16EC79E717ECA18000F7EB44 /* HTTextField.m in Sources */,
 				16B9553217EC89520005118F /* Org.m in Sources */,
 				1617BEEB183F538100E89BB2 /* Reachability.m in Sources */,
@@ -690,10 +699,11 @@
 		168BC6C517EC2DF000BC4584 /* Trailer.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				164976221864935200C13A6B /* Trailer 3.xcdatamodel */,
 				1617BEEE183F9C4F00E89BB2 /* Trailer 2.xcdatamodel */,
 				168BC6C617EC2DF000BC4584 /* Trailer.xcdatamodel */,
 			);
-			currentVersion = 1617BEEE183F9C4F00E89BB2 /* Trailer 2.xcdatamodel */;
+			currentVersion = 164976221864935200C13A6B /* Trailer 3.xcdatamodel */;
 			path = Trailer.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

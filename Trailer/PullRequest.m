@@ -23,6 +23,8 @@
 @dynamic latestReadCommentDate;
 @dynamic repoId;
 @dynamic merged;
+@dynamic userAvatarUrl;
+@dynamic userLogin;
 
 +(PullRequest *)pullRequestWithInfo:(NSDictionary *)info moc:(NSManagedObjectContext *)moc
 {
@@ -35,6 +37,8 @@
 	p.title = info[@"title"];
 	p.body = info[@"body"];
 	p.userId = info[@"user"][@"id"];
+	p.userLogin = info[@"user"][@"login"];
+	p.userAvatarUrl = info[@"user"][@"avatar_url"];
 	p.repoId = info[@"base"][@"repo"][@"id"];
 
 	p.issueCommentLink = info[@"_links"][@"comments"][@"href"];
@@ -50,7 +54,7 @@
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PullRequest"];
 	if(filter.length)
 	{
-		f.predicate = [NSPredicate predicateWithFormat:@"title contains[cd] %@",filter];
+		f.predicate = [NSPredicate predicateWithFormat:@"title contains[cd] %@ or userLogin contains[cd] %@",filter,filter];
 	}
 	if([fieldName isEqualToString:@"title"])
 	{

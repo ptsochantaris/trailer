@@ -6,10 +6,8 @@
 //  Copyright (c) 2013 HouseTrip. All rights reserved.
 //
 
-@interface MenuWindow : NSPanel
+@interface MenuWindow : NSWindow
 
 @property (weak) IBOutlet PRScrollView *scrollView;
-
-- (void)layout;
 
 @end

@@ -12,6 +12,7 @@
 	NSInteger _commentsTotal, _commentsNew;
 	NSButton *unpin;
 	NSTrackingArea *trackingArea;
+	RemoteImageView *userImage;
 }
 @end
 
@@ -81,6 +82,7 @@ static NSDateFormatter *dateFormatter;
 #define REMOVE_BUTTON_WIDTH 80.0
 #define LEFTPADDING 50.0
 #define DATE_PADDING 22.0
+#define IMAGE_PADDING 8.0
 
 - (void)drawRect:(NSRect)dirtyRect
 {
@@ -89,6 +91,7 @@ static NSDateFormatter *dateFormatter;
 	CGFloat badgeSize = 18.0;
 	CGFloat W = MENU_WIDTH-LEFTPADDING;
 	if(!unpin.isHidden) W -= REMOVE_BUTTON_WIDTH;
+	if(userImage) W -= AVATAR_SIZE;
 
 	if(_highlighted)
 	{
@@ -130,9 +133,16 @@ static NSDateFormatter *dateFormatter;
 	//////////////////// Title
 
 	CGFloat offset = -3.0;
-	[_title drawInRect:CGRectMake(LEFTPADDING, offset+DATE_PADDING, W, self.bounds.size.height-DATE_PADDING) withAttributes:_titleAttributes];
-
+	CGRect titleRect = CGRectMake(LEFTPADDING, offset+DATE_PADDING, W, self.bounds.size.height-DATE_PADDING);
 	CGRect dateRect = CGRectMake(LEFTPADDING, offset, W, DATE_PADDING);
+
+	if(userImage)
+	{
+		dateRect = CGRectOffset(dateRect, AVATAR_SIZE, 0);
+		titleRect = CGRectOffset(titleRect, AVATAR_SIZE, 0);
+	}
+
+	[_title drawInRect:titleRect withAttributes:_titleAttributes];
 	[_dates drawInRect:CGRectInset(dateRect, 0, 1.0) withAttributes:_createdAttributes];
 }
 
@@ -155,18 +165,35 @@ static NSDateFormatter *dateFormatter;
 	{
 		_dates = [dateFormatter stringFromDate:pullRequest.updatedAt];
 	}
+
+	if(pullRequest.userLogin.length)
+	{
+		_dates = [NSString stringWithFormat:@"%@ - %@",pullRequest.userLogin,_dates];
+	}
+
 	_title = pullRequest.title;
 
 	[unpin setHidden:!pullRequest.merged.boolValue];
 
 	CGFloat W = MENU_WIDTH-LEFTPADDING;
 	if(!unpin.isHidden) W -= REMOVE_BUTTON_WIDTH;
+	if(pullRequest.userAvatarUrl.length) W -= AVATAR_SIZE;
 
 	CGRect titleSize = [_title boundingRectWithSize:CGSizeMake(W, FLT_MAX)
 											options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
 										 attributes:_titleAttributes];
 	self.frame = CGRectMake(0, 0, MENU_WIDTH, titleSize.size.height+DATE_PADDING);
-	unpin.frame = CGRectMake(LEFTPADDING+W, floorf((self.bounds.size.height-24.0)*0.5), REMOVE_BUTTON_WIDTH-10.0, 24.0);
+
+	if(pullRequest.userAvatarUrl.length && ![AppDelegate shared].api.hideAvatars)
+	{
+		userImage = [[RemoteImageView alloc] initWithFrame:CGRectMake(LEFTPADDING, (self.bounds.size.height-AVATAR_SIZE+IMAGE_PADDING)*0.5, AVATAR_SIZE-IMAGE_PADDING, AVATAR_SIZE-IMAGE_PADDING) url:pullRequest.userAvatarUrl];
+		[self addSubview:userImage];
+		unpin.frame = CGRectMake(LEFTPADDING+W+AVATAR_SIZE, floorf((self.bounds.size.height-24.0)*0.5), REMOVE_BUTTON_WIDTH-10.0, 24.0);
+	}
+	else
+	{
+		unpin.frame = CGRectMake(LEFTPADDING+W, floorf((self.bounds.size.height-24.0)*0.5), REMOVE_BUTTON_WIDTH-10.0, 24.0);
+	}
 }
 
 - (void)setHighlighted:(BOOL)highlighted

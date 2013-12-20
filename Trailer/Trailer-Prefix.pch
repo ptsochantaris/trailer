@@ -21,6 +21,7 @@
 	#import "Org.h"
 	#import "Repo.h"
 	#import "PullRequest.h"
+	#import "RemoteImageView.h"
 	#import "PRItemView.h"
 	#import "SectionHeader.h"
 	#import <Sparkle/Sparkle.h>

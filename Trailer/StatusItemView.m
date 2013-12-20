@@ -9,7 +9,7 @@
 @interface StatusItemView ()
 {
 	NSDictionary *_attributes;
-	NSMutableDictionary *_templateAttributes;
+	NSMutableDictionary *_templateAttributes, *_grayAttributes;
 	NSString *_label;
 	__weak id<StatusItemDelegate> _delegate;
 }
@@ -26,8 +26,16 @@
 		_attributes = attributes;
 		_templateAttributes = [attributes mutableCopy];
 		_templateAttributes[NSForegroundColorAttributeName] = [NSColor whiteColor];
+		_grayAttributes = [attributes mutableCopy];
+		_grayAttributes[NSForegroundColorAttributeName] = [NSColor lightGrayColor];
     }
     return self;
+}
+
+- (void)setGrayOut:(BOOL)grayOut
+{
+	_grayOut = grayOut;
+	[self setNeedsDisplay:YES];
 }
 
 - (void)drawRect:(NSRect)dirtyRect
@@ -54,8 +62,16 @@
 				   operation:NSCompositeSourceOver
 					fraction:1.0];
 
-		[_label drawInRect:CGRectMake(self.bounds.size.height+STATUSITEM_PADDING, -5, self.bounds.size.width, self.bounds.size.height)
-			withAttributes:_attributes];
+		if(_grayOut)
+		{
+			[_label drawInRect:CGRectMake(self.bounds.size.height+STATUSITEM_PADDING, -5, self.bounds.size.width, self.bounds.size.height)
+				withAttributes:_grayAttributes];
+		}
+		else
+		{
+			[_label drawInRect:CGRectMake(self.bounds.size.height+STATUSITEM_PADDING, -5, self.bounds.size.width, self.bounds.size.height)
+				withAttributes:_attributes];
+		}
 	}
 }
 

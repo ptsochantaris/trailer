@@ -38,8 +38,8 @@ static NSDictionary *_titleAttributes;
 		});
 		if(delegate)
 		{
-			_unpin = [[NSButton alloc] initWithFrame:CGRectMake(MENU_WIDTH-110, -4.0, 100, self.bounds.size.height)];
-			[_unpin setTitle:@"Remove All..."];
+			_unpin = [[NSButton alloc] initWithFrame:CGRectMake(MENU_WIDTH-100, -4.0, 90, self.bounds.size.height)];
+			[_unpin setTitle:@"Remove All"];
 			[_unpin setTarget:self];
 			[_unpin setAction:@selector(unPinSelected:)];
 			[_unpin setButtonType:NSMomentaryLightButton];
@@ -57,7 +57,14 @@ static NSDictionary *_titleAttributes;
 	[[NSColor colorWithWhite:0.92 alpha:1.0] setFill];
 	CGContextRef context = (CGContextRef) [[NSGraphicsContext currentContext] graphicsPort];
 	CGContextFillRect(context, CGRectMake(1.0, self.bounds.size.height-5.0, MENU_WIDTH-2.0, 1.0));
-	[_title drawInRect:CGRectMake(50, -16.0, MENU_WIDTH-170, self.bounds.size.height) withAttributes:_titleAttributes];
+	if([AppDelegate shared].api.hideAvatars)
+	{
+		[_title drawInRect:CGRectMake(50, -16.0, MENU_WIDTH-170, self.bounds.size.height) withAttributes:_titleAttributes];
+	}
+	else
+	{
+		[_title drawInRect:CGRectMake(50+AVATAR_SIZE, -16.0, MENU_WIDTH-170-AVATAR_SIZE, self.bounds.size.height) withAttributes:_titleAttributes];
+	}
 }
 
 - (void)unPinSelected:(NSButton *)button

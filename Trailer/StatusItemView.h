@@ -23,6 +23,6 @@
 
 - (id)initWithFrame:(NSRect)frame label:(NSString *)label attributes:(NSDictionary *)attributes delegate:(id<StatusItemDelegate>)delegate;
 
-@property (nonatomic) BOOL highlighted;
+@property (nonatomic) BOOL highlighted, grayOut;
 
 @end

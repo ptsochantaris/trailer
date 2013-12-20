@@ -22,7 +22,7 @@ static AppDelegate *_static_shared_ref;
 
 	self.mainMenu.backgroundColor = [NSColor whiteColor];
 
-	self.filterTimer = [[HTPopTimer alloc] initWithTimeInterval:0.25 target:self selector:@selector(filterTimerPopped)];
+	self.filterTimer = [[HTPopTimer alloc] initWithTimeInterval:0.2 target:self selector:@selector(filterTimerPopped)];
 
 	SUUpdater *s = [SUUpdater sharedUpdater];
 	if(!s.updateInProgress)
@@ -40,7 +40,7 @@ static AppDelegate *_static_shared_ref;
 
 	[self setupSortMethodMenu];
 
-	[self updateStatusItem];
+	[self updateMenu];
 
 	[self startRateLimitHandling];
 
@@ -95,18 +95,25 @@ static AppDelegate *_static_shared_ref;
 	self.api.dontKeepMyPrs = dontKeep;
 }
 
+- (IBAction)hideAvatarsSelected:(NSButton *)sender
+{
+	BOOL hide = (sender.integerValue==1);
+	self.api.hideAvatars = hide;
+	[self updateMenu];
+}
+
 - (IBAction)hidePrsSelected:(NSButton *)sender
 {
 	BOOL show = (sender.integerValue==1);
 	self.api.shouldHideUncommentedRequests = show;
-	[self updateStatusItem];
+	[self updateMenu];
 }
 
 - (IBAction)showAllCommentsSelected:(NSButton *)sender
 {
 	BOOL show = (sender.integerValue==1);
 	self.api.showCommentsEverywhere = show;
-	[self updateStatusItem];
+	[self updateMenu];
 }
 
 - (IBAction)sortOrderSelected:(NSButton *)sender
@@ -114,20 +121,20 @@ static AppDelegate *_static_shared_ref;
 	BOOL descending = (sender.integerValue==1);
 	self.api.sortDescending = descending;
 	[self setupSortMethodMenu];
-	[self updateStatusItem];
+	[self updateMenu];
 }
 
 - (IBAction)sortMethodChanged:(id)sender
 {
 	self.api.sortMethod = self.sortModeSelect.indexOfSelectedItem;
-	[self updateStatusItem];
+	[self updateMenu];
 }
 
 - (IBAction)showCreationSelected:(NSButton *)sender
 {
 	BOOL show = (sender.integerValue==1);
 	self.api.showCreatedInsteadOfUpdated = show;
-	[self updateStatusItem];
+	[self updateMenu];
 }
 
 
@@ -183,7 +190,7 @@ static AppDelegate *_static_shared_ref;
 
 			[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlToOpen]];
 
-			[self updateStatusItem];
+			[self updateMenu];
 
 			break;
 		}
@@ -232,7 +239,7 @@ static AppDelegate *_static_shared_ref;
 	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:item.userInfo moc:self.managedObjectContext];
 	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:r.webUrl]];
 	[r catchUpWithComments];
-	[self updateStatusItem];
+	[self updateMenu];
 }
 
 - (void)statusItemTapped:(StatusItemView *)statusItem
@@ -285,25 +292,26 @@ static AppDelegate *_static_shared_ref;
 
 	CGFloat screenHeight = screen.visibleFrame.size.height;
 	CGFloat menuHeight = 28.0+[self.mainMenu.scrollView.documentView frame].size.height;
-	CGFloat top = screenHeight;
+	CGFloat bottom = screen.visibleFrame.origin.y;
 	if(menuHeight<screenHeight)
 	{
-		top = screenHeight-menuHeight;
-		top += 4.0;
+		bottom += screenHeight-menuHeight;
 	}
 	else
 	{
-		menuHeight = screenHeight+4.0;
+		menuHeight = screenHeight;
 	}
 
-	CGRect frame = CGRectMake(menuLeft, top, MENU_WIDTH, menuHeight);
-	NSLog(@"Will show menu at %f, %f - %f x %f",frame.origin.x,frame.origin.y,frame.size.width,frame.size.height);
-	[self.mainMenu setFrame:frame display:YES animate:NO];
+	CGRect frame = CGRectMake(menuLeft, bottom, MENU_WIDTH, menuHeight);
+	//NSLog(@"Will show menu at %f, %f - %f x %f",frame.origin.x,frame.origin.y,frame.size.width,frame.size.height);
+	[self.mainMenu setFrame:frame display:NO animate:NO];
 
 	if(show)
 	{
+		self.opening = YES;
 		[self.mainMenu makeKeyAndOrderFront:self];
 		[NSApp activateIgnoringOtherApps:YES];
+		self.opening = NO;
 	}
 }
 
@@ -335,7 +343,7 @@ static AppDelegate *_static_shared_ref;
 	for(PullRequest *r in mergedRequests)
 		[self.managedObjectContext deleteObject:r];
 	[self saveDB];
-	[self updateStatusItem];
+	[self updateMenu];
 }
 
 - (void)unPinSelectedFrom:(PRItemView *)item
@@ -343,7 +351,7 @@ static AppDelegate *_static_shared_ref;
 	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:item.userInfo moc:self.managedObjectContext];
 	[self.managedObjectContext deleteObject:r];
 	[self saveDB];
-	[self updateStatusItem];
+	[self updateMenu];
 }
 
 - (NSInteger)buildPrMenuItemsFromList:(NSArray *)pullRequests
@@ -537,7 +545,7 @@ static AppDelegate *_static_shared_ref;
 
 - (void)filterTimerPopped
 {
-	[self updateStatusItem];
+	[self updateMenu];
 	[self scrollToTop];
 }
 
@@ -548,7 +556,7 @@ static AppDelegate *_static_shared_ref;
 	[DataItem deleteAllObjectsInContext:self.managedObjectContext
 							 usingModel:self.managedObjectModel];
 	[self.projectsTable reloadData];
-	[self updateStatusItem];
+	[self updateMenu];
 }
 
 
@@ -557,7 +565,7 @@ static AppDelegate *_static_shared_ref;
 {
 	for(PullRequest *r in [self pullRequestList])
 		[r catchUpWithComments];
-	[self updateStatusItem];
+	[self updateMenu];
 }
 
 - (IBAction)preferencesSelected:(NSMenuItem *)sender
@@ -578,6 +586,11 @@ static AppDelegate *_static_shared_ref;
 		[self.hideUncommentedPrs setIntegerValue:1];
 	else
 		[self.hideUncommentedPrs setIntegerValue:0];
+
+	if(self.api.hideAvatars)
+		[self.hideAvatars setIntegerValue:1];
+	else
+		[self.hideAvatars setIntegerValue:0];
 
 	if(self.api.dontKeepMyPrs)
 		[self.dontKeepMyPrs setIntegerValue:1];
@@ -726,7 +739,16 @@ static AppDelegate *_static_shared_ref;
     
     NSURL *url = [applicationFilesDirectory URLByAppendingPathComponent:@"Trailer.storedata"];
     NSPersistentStoreCoordinator *coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:mom];
-    if (![coordinator addPersistentStoreWithType:NSXMLStoreType configuration:nil URL:url options:nil error:&error]) {
+
+	NSDictionary *m = [NSPersistentStoreCoordinator metadataForPersistentStoreOfType:NSXMLStoreType URL:url error:&error];
+	self.justMigrated = ![mom isConfiguration:nil compatibleWithStoreMetadata:m];
+
+    if (![coordinator addPersistentStoreWithType:NSXMLStoreType
+								   configuration:nil
+											 URL:url
+										 options:@{ NSMigratePersistentStoresAutomaticallyOption: @YES,
+												    NSInferMappingModelAutomaticallyOption: @YES }
+										   error:&error]) {
         [[NSApplication sharedApplication] presentError:error];
         return nil;
     }
@@ -744,7 +766,6 @@ static AppDelegate *_static_shared_ref;
     
     NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
     if (!coordinator) {
-
 		NSFileManager *fm = [NSFileManager defaultManager];
 		NSURL *applicationFilesDirectory = [self applicationFilesDirectory];
 		NSURL *url = [applicationFilesDirectory URLByAppendingPathComponent:@"Trailer.storedata"];
@@ -802,9 +823,12 @@ static AppDelegate *_static_shared_ref;
 
 - (void)windowDidResignKey:(NSNotification *)notification
 {
-	if([notification object]==self.mainMenu)
+	if(!self.opening)
 	{
-		[self closeMenu];
+		if([notification object]==self.mainMenu)
+		{
+			[self closeMenu];
+		}
 	}
 }
 
@@ -824,14 +848,6 @@ static AppDelegate *_static_shared_ref;
 				[self startRefreshIfItIsDue];
 			}
 		}
-	}
-}
-
-- (void)windowDidResize:(NSNotification *)notification
-{
-	if([notification object]==self.mainMenu)
-	{
-		[self.mainMenu layout];
 	}
 }
 
@@ -913,7 +929,14 @@ static AppDelegate *_static_shared_ref;
 	[self.clearAll setEnabled:NO];
 	[self.githubTokenHolder setEnabled:NO];
 	[self.activityDisplay startAnimation:nil];
-	[self updateStatusItem];
+	self.statusItemView.grayOut = YES;
+	if(self.justMigrated)
+	{
+		NSLog(@"FORCING ALL PRS TO BE REFRETCHED");
+		NSArray *prs = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.managedObjectContext];
+		for(PullRequest *r in prs) r.updatedAt = [NSDate distantPast];
+		self.justMigrated = NO;
+	}
 }
 
 -(void)completeRefresh
@@ -926,7 +949,7 @@ static AppDelegate *_static_shared_ref;
 	[self.activityDisplay stopAnimation:nil];
 	[self saveDB];
 	[self.projectsTable reloadData];
-	[self updateStatusItem];
+	[self updateMenu];
 	[self checkApiUsage];
 	[self sendNotifications];
 }
@@ -951,8 +974,6 @@ static AppDelegate *_static_shared_ref;
 
 	[self.refreshNow setAction:nil];
 	[self.refreshNow setTarget:nil];
-
-	[self updateStatusItem];
 
 	[self.api fetchPullRequestsForActiveReposAndCallback:^(BOOL success) {
 		self.refreshNow.target = oldTarget;
@@ -1028,13 +1049,13 @@ static AppDelegate *_static_shared_ref;
 	return pullRequests;
 }
 
-- (void)updateStatusItem
+- (void)updateMenu
 {
 	NSArray *pullRequests = [self pullRequestList];
 	NSString *countString = [NSString stringWithFormat:@"%ld",[PullRequest countUnmergedRequestsInMoc:self.managedObjectContext]];
 	NSInteger newCommentCount = [self buildPrMenuItemsFromList:pullRequests];
 
-	NSLog(@"Updating status item with %@ total PRs",countString);
+	NSLog(@"Updating menu, %@ total PRs",countString);
 
 	NSDictionary *attributes;
 	if(self.lastUpdateFailed)
@@ -1050,13 +1071,6 @@ static AppDelegate *_static_shared_ref;
 		attributes = @{
 					   NSFontAttributeName: [NSFont systemFontOfSize:11.0],
 					   NSForegroundColorAttributeName: [NSColor colorWithRed:0.8 green:0.0 blue:0.0 alpha:1.0],
-					   };
-	}
-	else if(self.isRefreshing)
-	{
-		attributes = @{
-					   NSFontAttributeName: [NSFont systemFontOfSize:11.0],
-					   NSForegroundColorAttributeName: [NSColor grayColor],
 					   };
 	}
 	else
@@ -1079,6 +1093,7 @@ static AppDelegate *_static_shared_ref;
 												 attributes:attributes
 												   delegate:self];
 	self.statusItemView.highlighted = [self.mainMenu isVisible];
+	self.statusItemView.grayOut = self.isRefreshing;
 	self.statusItem.view = self.statusItemView;
 
 	[self sizeMenuAndShow:NO];

@@ -35,21 +35,21 @@
 
 - (void)push
 {
-    NSLog(@"%@ pushed",self.debugName);
+    //NSLog(@"%@ pushed",self.debugName);
     if(popTimer) [popTimer invalidate];
     popTimer = [NSTimer scheduledTimerWithTimeInterval:_timeInterval target:self selector:@selector(popped) userInfo:nil repeats:NO];
 }
 
 - (void)invalidate
 {
-    NSLog(@"%@ invalidated",self.debugName);
+    //NSLog(@"%@ invalidated",self.debugName);
     [popTimer invalidate];
     popTimer = nil;
 }
 
 - (void)popped
 {
-    NSLog(@"%@ popped",self.debugName);
+    //NSLog(@"%@ popped",self.debugName);
     [self invalidate];
 
 	NSMethodSignature *methodSig = [[_target class] instanceMethodSignatureForSelector:_selector];

@@ -19,9 +19,16 @@
 {
     self = [super init];
     if (self) {
+
+		NSURLCache *cache = [[NSURLCache alloc] initWithMemoryCapacity:1024*1024*4
+														  diskCapacity:1024*1024*128
+															  diskPath:nil];
+		[NSURLCache setSharedURLCache:cache];
+
 		dateFormatter = [[NSDateFormatter alloc] initWithDateFormat:@"YYYY-MM-DDTHH:MM:SSZ" allowNaturalLanguage:NO];
 		requestQueue = [[NSOperationQueue alloc] init];
 		requestQueue.maxConcurrentOperationCount = 8;
+
 		self.reachability = [Reachability reachabilityWithHostName:API_SERVER];
 		[self.reachability startNotifier];
 	}
@@ -89,6 +96,10 @@
 #define DONT_KEEP_MY_PRS_KEY @"DONT_KEEP_MY_PRS_KEY"
 -(void)setDontKeepMyPrs:(BOOL)dontKeepMyPrs { [self storeDefaultValue:@(dontKeepMyPrs) forKey:DONT_KEEP_MY_PRS_KEY]; }
 -(BOOL)dontKeepMyPrs { return [[[NSUserDefaults standardUserDefaults] stringForKey:DONT_KEEP_MY_PRS_KEY] boolValue]; }
+
+#define HIDE_AVATARS_KEY @"HIDE_AVATARS_KEY"
+-(void)setHideAvatars:(BOOL)hideAvatars { [self storeDefaultValue:@(hideAvatars) forKey:HIDE_AVATARS_KEY]; }
+-(BOOL)hideAvatars { return [[[NSUserDefaults standardUserDefaults] stringForKey:HIDE_AVATARS_KEY] boolValue]; }
 
 -(void)error:(NSString*)errorString
 {
@@ -512,7 +523,8 @@
 	return ([linkHeader rangeOfString:@"rel=\"next\""].location==NSNotFound);
 }
 
--(NSOperation *)get:(NSString *)path parameters:(NSDictionary *)params
+-(NSOperation *)get:(NSString *)path
+		 parameters:(NSDictionary *)params
 			success:(void(^)(NSHTTPURLResponse *response, id data))successCallback
 			failure:(void(^)(NSHTTPURLResponse *response, NSError *error))failureCallback
 {
@@ -535,8 +547,8 @@
 		}
 
 		NSMutableURLRequest *r = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:expandedPath]
-															  cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
-														  timeoutInterval:60.0];
+															  cachePolicy:NSURLRequestUseProtocolCachePolicy
+														  timeoutInterval:NETWORK_TIMEOUT];
 		[r setValue:@"Trailer" forHTTPHeaderField:@"User-Agent"];
 		[r setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
 		if(authToken) [r setValue:[@"token " stringByAppendingString:authToken] forHTTPHeaderField:@"Authorization"];
@@ -567,6 +579,52 @@
 				if(data.length) parsedData = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
 				dispatch_async(dispatch_get_main_queue(), ^{
 					successCallback(response,parsedData);
+				});
+			}
+		}
+	}];
+	o.threadPriority = 0.1;
+	[requestQueue addOperation:o];
+	return o;
+}
+
+- (NSOperation *)getImage:(NSString *)path
+				  success:(void(^)(NSHTTPURLResponse *response, NSImage *image))successCallback
+				  failure:(void(^)(NSHTTPURLResponse *response, NSError *error))failureCallback
+{
+	NSBlockOperation *o = [NSBlockOperation blockOperationWithBlock:^{
+
+		NSMutableURLRequest *r = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:path]
+															  cachePolicy:NSURLRequestUseProtocolCachePolicy
+														  timeoutInterval:NETWORK_TIMEOUT];
+		[r setValue:@"Trailer" forHTTPHeaderField:@"User-Agent"];
+
+		NSError *error;
+		NSHTTPURLResponse *response;
+		NSData *data = [NSURLConnection sendSynchronousRequest:r returningResponse:&response error:&error];
+		if(!error && response.statusCode>299)
+		{
+			error = [NSError errorWithDomain:@"Error response received" code:response.statusCode userInfo:nil];
+		}
+		if(error)
+		{
+			//NSLog(@"GET IMAGE %@ - FAILED: %@",path,error);
+			if(failureCallback)
+			{
+				dispatch_async(dispatch_get_main_queue(), ^{
+					failureCallback(response, error);
+				});
+			}
+		}
+		else
+		{
+			//NSLog(@"GET IMAGE %@ - RESULT: %ld",path,(long)response.statusCode);
+			if(successCallback)
+			{
+				NSImage *returnedImage = nil;
+				if(data.length) returnedImage = [[NSImage alloc] initWithData:data];
+				dispatch_async(dispatch_get_main_queue(), ^{
+					successCallback(response,returnedImage);
 				});
 			}
 		}

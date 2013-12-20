@@ -20,6 +20,8 @@
 @property (nonatomic, retain) NSNumber * postSyncAction;
 @property (nonatomic, retain) NSString * webUrl;
 @property (nonatomic, retain) NSNumber * userId;
+@property (nonatomic, retain) NSString * userAvatarUrl;
+@property (nonatomic, retain) NSString * userLogin;
 @property (nonatomic, retain) NSDate * latestReadCommentDate;
 @property (nonatomic, retain) NSNumber *repoId;
 @property (nonatomic, retain) NSNumber *merged;

@@ -58,6 +58,10 @@ typedef enum {
 @property (weak) IBOutlet NSPopUpButton *sortModeSelect;
 @property (weak) IBOutlet NSButton *showCreationDates;
 @property (weak) IBOutlet NSButton *dontKeepMyPrs;
+@property (weak) IBOutlet NSButton *hideAvatars;
+
+// Used to track action state
+@property (nonatomic) BOOL opening, justMigrated;
 
 // Menu
 @property (nonatomic) NSStatusItem *statusItem;

@@ -6,6 +6,9 @@
 //  Copyright (c) 2013 HouseTrip. All rights reserved.
 //
 
+#define AVATAR_SIZE 34.0
+
+
 @class PRItemView;
 
 
