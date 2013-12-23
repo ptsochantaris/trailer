@@ -6,180 +6,194 @@
 //  Copyright (c) 2013 HouseTrip. All rights reserved.
 //
 
-#import "PRItemView.h"
-
 @interface PRItemView ()
 {
-	NSString *_title, *_dates;
-	NSInteger _commentsTotal, _commentsNew;
-	NSButton *unpin;
+	BOOL _highlighted;
+	NSTrackingArea *trackingArea;
 }
 @end
 
-static NSDictionary *_titleAttributes, *_commentCountAttributes, *_commentAlertAttributes, *_createdAttributes;
-static NSNumberFormatter *formatter;
+static NSDictionary *_titleAttributes, *_createdAttributes;
 static NSDateFormatter *dateFormatter;
+static CGColorRef _highlightColor;
 
 @implementation PRItemView
 
-- (id)init
+#define REMOVE_BUTTON_WIDTH 80.0
+#define DATE_PADDING 16.0
+#define CELL_PADDING 4.0
+
++ (void)initialize
+{
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+
+		dateFormatter = [[NSDateFormatter alloc] init];
+		dateFormatter.dateStyle = NSDateFormatterLongStyle;
+		dateFormatter.timeStyle = NSDateFormatterMediumStyle;
+		dateFormatter.doesRelativeDateFormatting = YES;
+
+		_highlightColor = CGColorCreateCopy([NSColor colorWithWhite:0.95 alpha:1.0].CGColor);
+
+		_titleAttributes = @{
+							 NSFontAttributeName:[NSFont menuFontOfSize:13.0],
+							 NSForegroundColorAttributeName:[NSColor blackColor],
+							 NSBackgroundColorAttributeName:[NSColor clearColor],
+							 };
+		_createdAttributes = @{
+							   NSFontAttributeName:[NSFont menuFontOfSize:10.0],
+							   NSForegroundColorAttributeName:[NSColor grayColor],
+							   NSBackgroundColorAttributeName:[NSColor clearColor],
+							   };
+	});
+}
+
+#define AVATAR_PADDING 8.0
+
+- (instancetype)initWithPullRequest:(PullRequest *)pullRequest userInfo:(id)userInfo delegate:(id<PRItemViewDelegate>)delegate
 {
     self = [super init];
     if (self)
 	{
-		static dispatch_once_t onceToken;
-		dispatch_once(&onceToken, ^{
-			formatter = [[NSNumberFormatter alloc] init];
-			formatter.numberStyle = NSNumberFormatterDecimalStyle;
+		_delegate = delegate;
+		_userInfo = userInfo;
 
-			dateFormatter = [[NSDateFormatter alloc] init];
-			dateFormatter.dateStyle = NSDateFormatterLongStyle;
-			dateFormatter.timeStyle = NSDateFormatterMediumStyle;
-			dateFormatter.doesRelativeDateFormatting = YES;
+		NSInteger _commentsNew=0;
+		NSInteger _commentsTotal = [PRComment countCommentsForPullRequestUrl:pullRequest.url inMoc:[AppDelegate shared].managedObjectContext];
+		if([AppDelegate shared].api.showCommentsEverywhere || pullRequest.isMine || pullRequest.commentedByMe)
+		{
+			_commentsNew = [pullRequest unreadCommentCount];
+		}
 
-			NSMutableParagraphStyle *pCenter = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-			pCenter.alignment = NSCenterTextAlignment;
+		NSString *_dates, *_title;
+		if([AppDelegate shared].api.showCreatedInsteadOfUpdated)
+		{
+			_dates = [dateFormatter stringFromDate:pullRequest.createdAt];
+		}
+		else
+		{
+			_dates = [dateFormatter stringFromDate:pullRequest.updatedAt];
+		}
 
-			_titleAttributes = @{
-								 NSFontAttributeName:[NSFont menuFontOfSize:13.0],
-								 NSForegroundColorAttributeName:[NSColor blackColor],
-								 NSBackgroundColorAttributeName:[NSColor clearColor],
-								 };
-			_createdAttributes = @{
-								 NSFontAttributeName:[NSFont menuFontOfSize:10.0],
-								 NSForegroundColorAttributeName:[NSColor grayColor],
-								 NSBackgroundColorAttributeName:[NSColor clearColor],
-								 };
-			_commentCountAttributes = @{
-										NSFontAttributeName:[NSFont menuFontOfSize:9.0],
-										NSForegroundColorAttributeName:[NSColor blackColor],
-										NSParagraphStyleAttributeName:pCenter,
-										};
-			_commentAlertAttributes = @{
-										NSFontAttributeName:[NSFont menuFontOfSize:9.0],
-										NSForegroundColorAttributeName:[NSColor whiteColor],
-										NSParagraphStyleAttributeName:pCenter,
-										};
-		});
-		unpin = [[NSButton alloc] initWithFrame:CGRectZero];
-		[unpin setTitle:@"Remove"];
-		[unpin setTarget:self];
-		[unpin setAction:@selector(unPinSelected:)];
-		[unpin setHidden:YES];
-		[unpin setButtonType:NSMomentaryLightButton];
-		[unpin setBezelStyle:NSRoundRectBezelStyle];
-		[unpin setFont:[NSFont systemFontOfSize:10.0]];
-		[self addSubview:unpin];
+		if(pullRequest.userLogin.length)
+		{
+			_dates = [NSString stringWithFormat:@"%@ - %@",pullRequest.userLogin,_dates];
+		}
+
+		_title = pullRequest.title;
+
+		CGFloat W = MENU_WIDTH-LEFTPADDING;
+		BOOL showUnpin = pullRequest.merged.boolValue;
+		if(showUnpin) W -= REMOVE_BUTTON_WIDTH;
+
+		BOOL showAvatar = pullRequest.userAvatarUrl.length && ![AppDelegate shared].api.hideAvatars;
+		if(showAvatar) W -= (AVATAR_SIZE+AVATAR_PADDING);
+		else W += 4.0;
+
+		CGRect titleSize = [_title boundingRectWithSize:CGSizeMake(W, FLT_MAX)
+												options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
+											 attributes:_titleAttributes];
+		CGFloat H = titleSize.size.height;
+		self.frame = CGRectMake(0, 0, MENU_WIDTH, H+DATE_PADDING+CELL_PADDING);
+		CGRect titleRect = CGRectMake(LEFTPADDING, DATE_PADDING+CELL_PADDING*0.5, W, H);
+		CGRect dateRect = CGRectMake(LEFTPADDING, CELL_PADDING*0.5, W, DATE_PADDING);
+		CGRect pinRect = CGRectMake(LEFTPADDING+W, floorf((self.bounds.size.height-24.0)*0.5), REMOVE_BUTTON_WIDTH-10.0, 24.0);
+
+		if(showAvatar)
+		{
+			RemoteImageView *userImage = [[RemoteImageView alloc] initWithFrame:CGRectMake(LEFTPADDING, (self.bounds.size.height-AVATAR_SIZE)*0.5, AVATAR_SIZE, AVATAR_SIZE) url:pullRequest.userAvatarUrl];
+			[self addSubview:userImage];
+
+			CGFloat shift = AVATAR_PADDING+AVATAR_SIZE;
+			pinRect = CGRectOffset(pinRect, shift, 0);
+			dateRect = CGRectOffset(dateRect, shift, 0);
+			titleRect = CGRectOffset(titleRect, shift, 0);
+		}
+		else
+		{
+			CGFloat shift = -4.0;
+			pinRect = CGRectOffset(pinRect, shift, 0);
+			dateRect = CGRectOffset(dateRect, shift, 0);
+			titleRect = CGRectOffset(titleRect, shift, 0);
+		}
+
+		if(showUnpin)
+		{
+			NSButton *unpin = [[NSButton alloc] initWithFrame:pinRect];
+			[unpin setTitle:@"Remove"];
+			[unpin setTarget:self];
+			[unpin setAction:@selector(unPinSelected:)];
+			[unpin setButtonType:NSMomentaryLightButton];
+			[unpin setBezelStyle:NSRoundRectBezelStyle];
+			[unpin setFont:[NSFont systemFontOfSize:10.0]];
+			[self addSubview:unpin];
+		}
+
+		CenteredTextField *title = [[CenteredTextField alloc] initWithFrame:titleRect];
+		title.attributedStringValue = [[NSAttributedString alloc] initWithString:_title attributes:_titleAttributes];
+		[self addSubview:title];
+
+		CenteredTextField *subtitle = [[CenteredTextField alloc] initWithFrame:dateRect];
+		subtitle.attributedStringValue = [[NSAttributedString alloc] initWithString:_dates attributes:_createdAttributes];
+		[self addSubview:subtitle];
+
+		CommentCounts *commentCounts = [[CommentCounts alloc] initWithFrame:CGRectMake(0, 0, LEFTPADDING, self.bounds.size.height)
+																unreadCount:_commentsNew
+																 totalCount:_commentsTotal];
+		[self addSubview:commentCounts];
     }
     return self;
 }
 
 - (void)unPinSelected:(NSButton *)button
 {
-	[self.delegate unPinSelectedFrom:[self enclosingMenuItem]];
+	[self.delegate unPinSelectedFrom:self];
 }
-
-#define REMOVE_BUTTON_WIDTH 80.0
-#define LEFTPADDING 50.0
-#define DATE_PADDING 22.0
 
 - (void)drawRect:(NSRect)dirtyRect
 {
-	CGContextRef context = (CGContextRef) [[NSGraphicsContext currentContext] graphicsPort];
-
-	CGFloat badgeSize = 18.0;
-	CGFloat W = MENU_WIDTH-LEFTPADDING;
-	if(!unpin.isHidden) W -= REMOVE_BUTTON_WIDTH;
-
-	if([[self enclosingMenuItem] isHighlighted])
+	[super drawRect:dirtyRect];
+	if(_highlighted)
 	{
-		[[NSColor colorWithWhite:0.95 alpha:1.0] setFill];
-		CGContextFillRect(context, dirtyRect);
+		CGContextRef context = (CGContextRef) [[NSGraphicsContext currentContext] graphicsPort];
+		CGContextSetFillColorWithColor(context, _highlightColor);
+		CGContextFillRect(context, CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height));
 	}
-	[[NSColor blackColor] setFill];
-
-	//////////////////// New count
-
-	if(_commentsNew)
-	{
-		[[NSColor colorWithRed:1.0 green:0.5 blue:0.5 alpha:1.0] set];
-
-		CGRect countRect = CGRectMake((28.0-badgeSize)*0.5, (self.bounds.size.height-badgeSize)*0.5, badgeSize, badgeSize);
-		CGContextFillEllipseInRect(context, countRect);
-
-		countRect = CGRectOffset(countRect, 0, -2.0);
-		NSString *countString = [formatter stringFromNumber:@(_commentsNew)];
-		[countString drawInRect:countRect withAttributes:_commentAlertAttributes];
-	}
-
-	//////////////////// PR count
-
-	if(_commentsTotal)
-	{
-		[[NSColor colorWithRed:0.9 green:0.9 blue:0.9 alpha:1.0] set];
-
-		CGFloat offset = 24.0;
-		if(_commentsNew==0) offset=14.0;
-		CGRect countRect = CGRectMake(offset+(25.0-badgeSize)*0.5, (self.bounds.size.height-badgeSize)*0.5, badgeSize, badgeSize);
-		CGContextFillEllipseInRect(context, countRect);
-
-		countRect = CGRectOffset(countRect, 0, -2.0);
-		NSString *countString = [formatter stringFromNumber:@(_commentsTotal)];
-		[countString drawInRect:countRect withAttributes:_commentCountAttributes];
-	}
-
-	//////////////////// Title
-
-	CGFloat offset = -3.0;
-	[_title drawInRect:CGRectMake(LEFTPADDING, offset+DATE_PADDING, W, self.bounds.size.height-DATE_PADDING) withAttributes:_titleAttributes];
-
-	CGRect dateRect = CGRectMake(LEFTPADDING, offset, W, DATE_PADDING);
-	[_dates drawInRect:CGRectInset(dateRect, 0, 1.0) withAttributes:_createdAttributes];
 }
 
-- (void)setPullRequest:(PullRequest *)pullRequest
+- (void)mouseEntered:(NSEvent *)theEvent
 {
-	_commentsTotal = [PRComment countCommentsForPullRequestUrl:pullRequest.url inMoc:[AppDelegate shared].managedObjectContext];
-	if([AppDelegate shared].api.showCommentsEverywhere || pullRequest.isMine || pullRequest.commentedByMe)
-	{
-		_commentsNew = [pullRequest unreadCommentCount];
-	}
-	else
-	{
-		_commentsNew = 0;
-	}
-	if([AppDelegate shared].api.showCreatedInsteadOfUpdated)
-	{
-		_dates = [dateFormatter stringFromDate:pullRequest.createdAt];
-	}
-	else
-	{
-		_dates = [dateFormatter stringFromDate:pullRequest.updatedAt];
-	}
-	_title = pullRequest.title;
+	_highlighted = YES;
+	[self setNeedsDisplay:YES];
+}
 
-	[unpin setHidden:!pullRequest.merged.boolValue];
-
-	CGFloat W = MENU_WIDTH-LEFTPADDING;
-	if(!unpin.isHidden) W -= REMOVE_BUTTON_WIDTH;
-
-	CGRect titleSize = [_title boundingRectWithSize:CGSizeMake(W, FLT_MAX)
-											options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
-										 attributes:_titleAttributes];
-	self.frame = CGRectMake(0, 0, MENU_WIDTH, titleSize.size.height+DATE_PADDING);
-	unpin.frame = CGRectMake(LEFTPADDING+W, floorf((self.bounds.size.height-24.0)*0.5), REMOVE_BUTTON_WIDTH-10.0, 24.0);
+- (void)mouseExited:(NSEvent *)theEvent
+{
+	_highlighted = NO;
+	[self setNeedsDisplay:YES];
 }
 
 - (void)mouseDown:(NSEvent*) event
 {
-    NSMenu *menu = self.enclosingMenuItem.menu;
-    [menu cancelTracking];
-    [menu performActionForItemAtIndex:[menu indexOfItem:self.enclosingMenuItem]];
+	[self.delegate prItemSelected:self];
 }
 
-- (BOOL)acceptsFirstMouse:(NSEvent *)theEvent
+- (void)updateTrackingAreas
 {
-	return YES;
+	if(trackingArea) [self removeTrackingArea:trackingArea];
+	trackingArea = [ [NSTrackingArea alloc] initWithRect:[self bounds]
+												 options:NSTrackingMouseEnteredAndExited | NSTrackingActiveInKeyWindow
+												   owner:self
+												userInfo:nil];
+	[self addTrackingArea:trackingArea];
+
+	NSPoint mouseLocation = [[self window] mouseLocationOutsideOfEventStream];
+    mouseLocation = [self convertPoint: mouseLocation fromView: nil];
+
+    if (NSPointInRect(mouseLocation, [self bounds]))
+		[self mouseEntered: nil];
+	else
+		[self mouseExited: nil];
 }
 
 @end

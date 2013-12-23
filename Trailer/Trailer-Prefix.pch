@@ -21,7 +21,16 @@
 	#import "Org.h"
 	#import "Repo.h"
 	#import "PullRequest.h"
+	#import "RemoteImageView.h"
+	#import "CenteredTextFieldCell.h"
+	#import "CenteredTextField.h"
+	#import "CommentCounts.h"
 	#import "PRItemView.h"
 	#import "SectionHeader.h"
+	#import <Sparkle/Sparkle.h>
+	#import "StatusItemView.h"
+	#import "MenuScrollView.h"
+	#import "MenuWindow.h"
+	#import "HTPopTimer.h"
 	#import "AppDelegate.h"
 #endif

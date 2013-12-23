@@ -26,21 +26,20 @@ typedef enum {
 	NSTableViewDataSource,
 	NSWindowDelegate,
 	NSUserNotificationCenterDelegate,
-	NSMenuDelegate,
 	PRItemViewDelegate,
-	SectionHeaderDelegate
+	SectionHeaderDelegate,
+	StatusItemDelegate
 >
 
 // Core Data
 @property (readonly, strong, nonatomic) NSPersistentStoreCoordinator *persistentStoreCoordinator;
 @property (readonly, strong, nonatomic) NSManagedObjectModel *managedObjectModel;
 @property (readonly, strong, nonatomic) NSManagedObjectContext *managedObjectContext;
-@property (unsafe_unretained) IBOutlet NSWindow *preferencesWindow;
 
 // Preferences window
+@property (unsafe_unretained) IBOutlet NSWindow *preferencesWindow;
 @property (weak) IBOutlet NSButton *refreshButton;
 @property (weak) IBOutlet NSTextField *githubTokenHolder;
-@property (weak) IBOutlet NSMenu *statusBarMenu;
 @property (weak) IBOutlet NSProgressIndicator *activityDisplay;
 @property (weak) IBOutlet NSTableView *projectsTable;
 @property (weak) IBOutlet NSMenuItem *refreshNow;
@@ -59,18 +58,21 @@ typedef enum {
 @property (weak) IBOutlet NSPopUpButton *sortModeSelect;
 @property (weak) IBOutlet NSButton *showCreationDates;
 @property (weak) IBOutlet NSButton *dontKeepMyPrs;
+@property (weak) IBOutlet NSButton *hideAvatars;
 
-// Menu sections
-@property (strong) IBOutlet NSMenuItem *menuMyHeader;
-@property (strong) IBOutlet NSMenuItem *menuParticipatedHeader;
-@property (strong) IBOutlet NSMenuItem *menuMergedHeader;
-@property (strong) IBOutlet NSMenuItem *menuAllHeader;
-@property (weak) IBOutlet NSMenuItem *menuOptions;
+// Used to track action state
+@property (nonatomic) BOOL opening, justMigrated;
+
+// Menu
+@property (nonatomic) NSStatusItem *statusItem;
+@property (nonatomic) StatusItemView *statusItemView;
+@property (unsafe_unretained) IBOutlet MenuWindow *mainMenu;
+@property (weak) IBOutlet NSSearchField *mainMenuFilter;
+@property (nonatomic) HTPopTimer *filterTimer;
 
 // Globals
 @property (nonatomic) API *api;
 @property (weak) NSTimer *refreshTimer;
-@property (nonatomic) NSStatusItem *statusItem;
 @property (strong) NSDate *lastSuccessfulRefresh;
 @property (nonatomic) BOOL lastUpdateFailed, preferencesDirty;
 @property (nonatomic, readonly) BOOL isRefreshing, menuIsOpen;

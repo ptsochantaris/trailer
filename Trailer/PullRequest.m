@@ -23,6 +23,8 @@
 @dynamic latestReadCommentDate;
 @dynamic repoId;
 @dynamic merged;
+@dynamic userAvatarUrl;
+@dynamic userLogin;
 
 +(PullRequest *)pullRequestWithInfo:(NSDictionary *)info moc:(NSManagedObjectContext *)moc
 {
@@ -35,6 +37,8 @@
 	p.title = info[@"title"];
 	p.body = info[@"body"];
 	p.userId = info[@"user"][@"id"];
+	p.userLogin = info[@"user"][@"login"];
+	p.userAvatarUrl = info[@"user"][@"avatar_url"];
 	p.repoId = info[@"base"][@"repo"][@"id"];
 
 	p.issueCommentLink = info[@"_links"][@"comments"][@"href"];
@@ -42,9 +46,16 @@
 	return p;
 }
 
-+(NSArray *)pullRequestsSortedByField:(NSString *)fieldName ascending:(BOOL)ascending inMoc:(NSManagedObjectContext *)moc
++(NSArray *)pullRequestsSortedByField:(NSString *)fieldName
+							   filter:(NSString *)filter
+							ascending:(BOOL)ascending
+								inMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PullRequest"];
+	if(filter.length)
+	{
+		f.predicate = [NSPredicate predicateWithFormat:@"title contains[cd] %@ or userLogin contains[cd] %@",filter,filter];
+	}
 	if([fieldName isEqualToString:@"title"])
 	{
 		f.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:fieldName ascending:ascending selector:@selector(caseInsensitiveCompare:)]];
@@ -66,7 +77,7 @@
 + (NSUInteger)countUnmergedRequestsInMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PullRequest"];
-	f.predicate = [NSPredicate predicateWithFormat:@"merged != YES"];
+	f.predicate = [NSPredicate predicateWithFormat:@"merged == NO or merged == nil"];
 	return [moc countForFetchRequest:f error:nil];
 }
 
