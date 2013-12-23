@@ -595,7 +595,7 @@
 	NSBlockOperation *o = [NSBlockOperation blockOperationWithBlock:^{
 
 		NSMutableURLRequest *r = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:path]
-															  cachePolicy:NSURLRequestUseProtocolCachePolicy
+															  cachePolicy:NSURLRequestReturnCacheDataElseLoad
 														  timeoutInterval:NETWORK_TIMEOUT];
 		[r setValue:@"Trailer" forHTTPHeaderField:@"User-Agent"];
 
@@ -622,10 +622,19 @@
 			if(successCallback)
 			{
 				NSImage *returnedImage = nil;
-				if(data.length) returnedImage = [[NSImage alloc] initWithData:data];
-				dispatch_async(dispatch_get_main_queue(), ^{
-					successCallback(response,returnedImage);
-				});
+				if(data.length)
+				{
+					returnedImage = [[NSImage alloc] initWithData:data];
+					dispatch_async(dispatch_get_main_queue(), ^{
+						successCallback(response,returnedImage);
+					});
+				}
+				else
+				{
+					dispatch_async(dispatch_get_main_queue(), ^{
+						failureCallback(response, error);
+					});
+				}
 			}
 		}
 	}];

@@ -12,7 +12,6 @@ typedef void (^HTBackgroundExpirationHandler)();
 
 @property (nonatomic,readonly) BOOL isRunning;
 @property (nonatomic) id userInfo;
-@property (nonatomic) NSString *debugName;
 @property (nonatomic) NSTimeInterval timeInterval;
 @property (nonatomic,copy) HTBackgroundExpirationHandler backgroundExpirationHandler;
 

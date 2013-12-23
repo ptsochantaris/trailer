@@ -6,8 +6,8 @@
 //  Copyright (c) 2013 HouseTrip. All rights reserved.
 //
 
-#define AVATAR_SIZE 34.0
-
+#define AVATAR_SIZE 26.0
+#define LEFTPADDING 44.0
 
 @class PRItemView;
 
@@ -23,9 +23,8 @@
 @interface PRItemView : NSView
 
 @property (nonatomic,weak) id<PRItemViewDelegate> delegate;
-@property (nonatomic) BOOL highlighted;
 @property (nonatomic) id userInfo;
 
-- (void) setPullRequest:(PullRequest *)pullRequest;
+- (instancetype)initWithPullRequest:(PullRequest *)pullRequest userInfo:(id)userInfo delegate:(id<PRItemViewDelegate>)delegate;
 
 @end

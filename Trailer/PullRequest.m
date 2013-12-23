@@ -77,7 +77,7 @@
 + (NSUInteger)countUnmergedRequestsInMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PullRequest"];
-	f.predicate = [NSPredicate predicateWithFormat:@"merged != YES"];
+	f.predicate = [NSPredicate predicateWithFormat:@"merged == NO or merged == nil"];
 	return [moc countForFetchRequest:f error:nil];
 }
 

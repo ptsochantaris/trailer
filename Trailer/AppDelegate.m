@@ -382,10 +382,7 @@ static AppDelegate *_static_shared_ref;
 			if(r.unreadCommentCount==0)
 				continue;
 
-		PRItemView *item = [[PRItemView alloc] init];
-		item.userInfo = r.serverId;
-		item.delegate = self;
-		[item setPullRequest:r];
+		PRItemView *item = [[PRItemView alloc] initWithPullRequest:r userInfo:r.serverId delegate:self];
 		if(r.merged.boolValue)
 		{
 			mergedCount++;
@@ -703,10 +700,7 @@ static AppDelegate *_static_shared_ref;
     }
     
     NSManagedObjectModel *mom = [self managedObjectModel];
-    if (!mom) {
-        NSLog(@"%@:%@ No model to generate a store from", [self class], NSStringFromSelector(_cmd));
-        return nil;
-    }
+	NSPersistentStoreCoordinator *coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:mom];
 
     NSFileManager *fileManager = [NSFileManager defaultManager];
     NSURL *applicationFilesDirectory = [self applicationFilesDirectory];
@@ -736,25 +730,67 @@ static AppDelegate *_static_shared_ref;
             return nil;
         }
     }
-    
-    NSURL *url = [applicationFilesDirectory URLByAppendingPathComponent:@"Trailer.storedata"];
-    NSPersistentStoreCoordinator *coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:mom];
 
-	NSDictionary *m = [NSPersistentStoreCoordinator metadataForPersistentStoreOfType:NSXMLStoreType URL:url error:&error];
-	self.justMigrated = ![mom isConfiguration:nil compatibleWithStoreMetadata:m];
+	NSURL *sqlStore = [applicationFilesDirectory URLByAppendingPathComponent:@"Trailer.sqlite"];
 
-    if (![coordinator addPersistentStoreWithType:NSXMLStoreType
-								   configuration:nil
-											 URL:url
-										 options:@{ NSMigratePersistentStoresAutomaticallyOption: @YES,
-												    NSInferMappingModelAutomaticallyOption: @YES }
-										   error:&error]) {
-        [[NSApplication sharedApplication] presentError:error];
-        return nil;
-    }
+	// migrate to SQLite if needed
+    NSURL *xmlStore = [applicationFilesDirectory URLByAppendingPathComponent:@"Trailer.storedata"];
+	if([fileManager fileExistsAtPath:xmlStore.path])
+	{
+		NSLog(@"MIGRATING TO SQLITE");
+		[self removeDatabaseFiles];
+
+		NSPersistentStore *xml = [coordinator addPersistentStoreWithType:NSXMLStoreType
+														   configuration:nil
+																	 URL:xmlStore
+																 options:@{ NSMigratePersistentStoresAutomaticallyOption: @YES,
+																			NSInferMappingModelAutomaticallyOption: @YES }
+																   error:nil];
+
+		if([coordinator migratePersistentStore:xml
+										 toURL:sqlStore
+									   options:nil
+									  withType:NSSQLiteStoreType
+										 error:nil])
+		{
+			[fileManager removeItemAtURL:xmlStore error:nil];
+			NSLog(@"Deleted old XML store");
+		}
+		self.justMigrated = YES;
+	}
+	else
+	{
+		NSDictionary *m = [NSPersistentStoreCoordinator metadataForPersistentStoreOfType:NSSQLiteStoreType URL:sqlStore error:&error];
+		self.justMigrated = ![mom isConfiguration:nil compatibleWithStoreMetadata:m];
+
+		if (![coordinator addPersistentStoreWithType:NSSQLiteStoreType
+									   configuration:nil
+												 URL:sqlStore
+											 options:@{ NSMigratePersistentStoresAutomaticallyOption: @YES,
+														NSInferMappingModelAutomaticallyOption: @YES }
+											   error:&error]) {
+			[[NSApplication sharedApplication] presentError:error];
+			return nil;
+		}
+	}
     _persistentStoreCoordinator = coordinator;
     
     return _persistentStoreCoordinator;
+}
+
+- (void)removeDatabaseFiles
+{
+    NSFileManager *fm = [NSFileManager defaultManager];
+    NSString *documentsDirectory = [self applicationFilesDirectory].path;
+    NSArray *files = [fm contentsOfDirectoryAtPath:documentsDirectory error:nil];
+    for(NSString *file in files)
+    {
+        if([file rangeOfString:@"Trailer.sqlite"].location!=NSNotFound)
+        {
+            NSLog(@"Removing old database file: %@",file);
+            [fm removeItemAtPath:[documentsDirectory stringByAppendingPathComponent:file] error:nil];
+        }
+    }
 }
 
 // Returns the managed object context for the application (which is already bound to the persistent store coordinator for the application.) 

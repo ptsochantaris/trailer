@@ -392,7 +392,7 @@
                 <rect key="frame" x="0.0" y="0.0" width="376" height="710"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <scrollView focusRingType="none" borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="1jc-DF-1GW" customClass="PRScrollView">
+                    <scrollView focusRingType="none" borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="1jc-DF-1GW" customClass="MenuScrollView">
                         <rect key="frame" x="0.0" y="0.0" width="376" height="682"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="e4g-XR-7jB">
@@ -426,7 +426,7 @@
                         <color key="fillColor" name="controlLightHighlightColor" catalog="System" colorSpace="catalog"/>
                     </box>
                     <searchField focusRingType="none" verticalHuggingPriority="750" id="gaD-Aj-14T">
-                        <rect key="frame" x="49" y="683" width="313" height="22"/>
+                        <rect key="frame" x="42" y="683" width="324" height="22"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" focusRingType="none" placeholderString="Filter..." usesSingleLineMode="YES" bezelStyle="round" id="vvd-HC-Usx">
                             <font key="font" metaFont="cellTitle"/>
@@ -438,7 +438,7 @@
                         </connections>
                     </searchField>
                     <popUpButton appearanceType="lightContent" horizontalHuggingPriority="750" verticalHuggingPriority="750" id="pTb-UR-Euf">
-                        <rect key="frame" x="15" y="681" width="22" height="26"/>
+                        <rect key="frame" x="11" y="681" width="22" height="26"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <popUpButtonCell key="cell" type="disclosure" bezelStyle="roundedDisclosure" imagePosition="only" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" id="j86-0c-T7i">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>

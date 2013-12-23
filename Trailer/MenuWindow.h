@@ -8,6 +8,6 @@
 
 @interface MenuWindow : NSWindow
 
-@property (weak) IBOutlet PRScrollView *scrollView;
+@property (weak) IBOutlet MenuScrollView *scrollView;
 
 @end

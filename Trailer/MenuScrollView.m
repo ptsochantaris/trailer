@@ -6,7 +6,7 @@
 //  Copyright (c) 2013 HouseTrip. All rights reserved.
 //
 
-@implementation PRScrollView
+@implementation MenuScrollView
 
 - (void)scrollWheel:(NSEvent *)theEvent
 {

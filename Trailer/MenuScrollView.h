@@ -6,7 +6,7 @@
 //  Copyright (c) 2013 HouseTrip. All rights reserved.
 //
 
-@interface PRScrollView : NSScrollView
+@interface MenuScrollView : NSScrollView
 
 @property (nonatomic) BOOL ignoreWheel;
 
