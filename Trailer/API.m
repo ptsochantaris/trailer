@@ -103,7 +103,7 @@
 
 -(void)error:(NSString*)errorString
 {
-	NSLog(@"Failed to fetch %@",errorString);
+	DLog(@"Failed to fetch %@",errorString);
 }
 
 -(void)fetchCommentsForCurrentPullRequestsToMoc:(NSManagedObjectContext *)moc andCallback:(void (^)(BOOL))callback
@@ -255,37 +255,37 @@
 	PullRequest *r = [prsToCheck objectAtIndex:0];
 	[prsToCheck removeObjectAtIndex:0];
 
-	Repo *parent = [Repo itemOfType:@"Repo" serverId:r.repoId moc:r.managedObjectContext];
-	NSString *owner = [parent.fullName copy];
+	DLog(@"Checking closed PR to see if it was merged: %@",r.title);
 
-	[self get:[NSString stringWithFormat:@"/repos/%@/pulls/%@",owner,r.number]
+	Repo *parent = [Repo itemOfType:@"Repo" serverId:r.repoId moc:r.managedObjectContext];
+
+	[self get:[NSString stringWithFormat:@"/repos/%@/pulls/%@",parent.fullName,r.number]
    parameters:nil
 	  success:^(NSHTTPURLResponse *response, id data) {
 
-		  NSString *title = r.title;
 		  NSDictionary *mergeInfo = [data ofk:@"merged_by"];
 		  if(mergeInfo)
 		  {
-			  NSLog(@"detected merged PR: %@",title);
+			  DLog(@"detected merged PR: %@",r.title);
 			  API *api = [AppDelegate shared].api;
 			  NSString *mergeUserId = [[mergeInfo  ofk:@"id"] stringValue];
-			  NSLog(@"merged by user id: %@, our id is: %@",mergeUserId,api.localUserId);
+			  DLog(@"merged by user id: %@, our id is: %@",mergeUserId,api.localUserId);
 			  BOOL mergedByMyself = [mergeUserId isEqualToString:api.localUserId];
 			  if(!(api.dontKeepMyPrs && mergedByMyself)) // someone else merged
 			  {
-				  NSLog(@"announcing merged PR: %@",title);
+				  DLog(@"announcing merged PR: %@",r.title);
 				  r.postSyncAction = @(kPostSyncDoNothing); // don't delete this
 				  r.merged = @(YES); // pin it so it sticks around
 				  [[AppDelegate shared] postNotificationOfType:kPrMerged forItem:r];
 			  }
 			  else
 			  {
-				  NSLog(@"will not announce merged PR: %@",title);
+				  DLog(@"will not announce merged PR: %@",r.title);
 			  }
 		  }
 		  else
 		  {
-			  NSLog(@"detected closed PR: %@",title);
+			  DLog(@"detected closed PR: %@",r.title);
 		  }
 		  [self _detectMergedPullRequests:prsToCheck andCallback:callback];
 
@@ -497,7 +497,7 @@
 																		RATE_UPDATE_NOTIFICATION_REMAINING_KEY: @(requestsRemaining) }];
 		  if(callback) callback(data, [API lastPage:response], response.statusCode);
 	  } failure:^(NSHTTPURLResponse *response, NSError *error) {
-		  NSLog(@"Failure: %@",error);
+		  DLog(@"Failure: %@",error);
 		  if(callback) callback(nil, NO, response.statusCode);
 	  }];
 }
@@ -562,7 +562,7 @@
 		}
 		if(error)
 		{
-			NSLog(@"GET %@ - FAILED: %@",expandedPath,error);
+			DLog(@"GET %@ - FAILED: %@",expandedPath,error);
 			if(failureCallback)
 			{
 				dispatch_async(dispatch_get_main_queue(), ^{
@@ -572,7 +572,7 @@
 		}
 		else
 		{
-			NSLog(@"GET %@ - RESULT: %ld",expandedPath,(long)response.statusCode);
+			DLog(@"GET %@ - RESULT: %ld",expandedPath,(long)response.statusCode);
 			if(successCallback)
 			{
 				id parsedData = nil;
@@ -608,7 +608,7 @@
 		}
 		if(error)
 		{
-			//NSLog(@"GET IMAGE %@ - FAILED: %@",path,error);
+			DLog(@"GET IMAGE %@ - FAILED: %@",path,error);
 			if(failureCallback)
 			{
 				dispatch_async(dispatch_get_main_queue(), ^{
@@ -618,7 +618,7 @@
 		}
 		else
 		{
-			//NSLog(@"GET IMAGE %@ - RESULT: %ld",path,(long)response.statusCode);
+			DLog(@"GET IMAGE %@ - RESULT: %ld",path,(long)response.statusCode);
 			if(successCallback)
 			{
 				NSImage *returnedImage = nil;

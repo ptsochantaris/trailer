@@ -50,7 +50,7 @@
 	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestUrl = %@",url];
 	for(PRComment *c in [moc executeFetchRequest:f error:nil])
 	{
-		NSLog(@"  Deleting comment ID %@",c.serverId);
+		DLog(@"  Deleting comment ID %@",c.serverId);
 		[moc deleteObject:c];
 	}
 }

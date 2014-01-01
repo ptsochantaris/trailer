@@ -48,7 +48,7 @@ static NSDateFormatter *_syncDateFormatter;
 	DataItem *existingItem = [DataItem itemOfType:type serverId:serverId moc:moc];
 	if(!existingItem)
 	{
-		NSLog(@"Creating new %@: %@",type,serverId);
+		DLog(@"Creating new %@: %@",type,serverId);
 		existingItem = [NSEntityDescription insertNewObjectForEntityForName:type inManagedObjectContext:moc];
 		existingItem.serverId = serverId;
 		existingItem.createdAt = [_syncDateFormatter dateFromString:info[@"created_at"]];
@@ -56,12 +56,12 @@ static NSDateFormatter *_syncDateFormatter;
 	}
 	else if([updatedDate compare:existingItem.updatedAt]==NSOrderedDescending)
 	{
-		NSLog(@"Updating existing %@: %@",type,serverId);
+		DLog(@"Updating existing %@: %@",type,serverId);
 		existingItem.postSyncAction = @(kPostSyncNoteUpdated);
 	}
 	else
 	{
-		NSLog(@"Skipping %@: %@",type,serverId);
+		DLog(@"Skipping %@: %@",type,serverId);
 		existingItem.postSyncAction = @(kPostSyncDoNothing);
 	}
 	existingItem.updatedAt = updatedDate;
@@ -101,10 +101,10 @@ static NSDateFormatter *_syncDateFormatter;
 	NSArray *untouchedItems = [self itemsOfType:type surviving:NO inMoc:moc];
 	for(DataItem *i in untouchedItems)
 	{
-		NSLog(@"Nuking %@: %@",type,i.serverId);
+		DLog(@"Nuking %@: %@",type,i.serverId);
 		[moc deleteObject:i];
 	}
-	NSLog(@"Nuked %lu %@ items",untouchedItems.count,type);
+	DLog(@"Nuked %lu %@ items",untouchedItems.count,type);
 }
 
 +(NSUInteger)countItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
@@ -136,7 +136,7 @@ static NSDateFormatter *_syncDateFormatter;
 
     for (NSManagedObject *managedObject in items) {
         [context deleteObject:managedObject];
-        NSLog(@"Deleted %@", entityName);
+        DLog(@"Deleted %@", entityName);
     }
 }
 

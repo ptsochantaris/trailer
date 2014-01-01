@@ -64,7 +64,7 @@
 
 - (void)layout
 {
-	//NSLog(@"layout");
+	//DLog(@"layout");
 
 	[topArrow removeFromSuperview];
 	[bottomArrow removeFromSuperview];
@@ -123,7 +123,7 @@
 {
 	if(!scrollTimer)
 	{
-		//NSLog(@"scroll timer on");
+		//DLog(@"scroll timer on");
 		self.scrollView.ignoreWheel = YES;
 		scrollUp =(theEvent.trackingArea==topArea);
 		scrollDistance = 0.0;
@@ -144,7 +144,7 @@
 {
 	if(scrollTimer)
 	{
-		//NSLog(@"scroll timer off");
+		//DLog(@"scroll timer off");
 		self.scrollView.ignoreWheel = NO;
 		[scrollTimer invalidate];
 		scrollTimer = nil;

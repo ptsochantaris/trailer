@@ -303,12 +303,13 @@ static AppDelegate *_static_shared_ref;
 	}
 
 	CGRect frame = CGRectMake(menuLeft, bottom, MENU_WIDTH, menuHeight);
-	//NSLog(@"Will show menu at %f, %f - %f x %f",frame.origin.x,frame.origin.y,frame.size.width,frame.size.height);
+	//DLog(@"Will show menu at %f, %f - %f x %f",frame.origin.x,frame.origin.y,frame.size.width,frame.size.height);
 	[self.mainMenu setFrame:frame display:NO animate:NO];
 
 	if(show)
 	{
 		self.opening = YES;
+		[self.mainMenu setLevel:NSFloatingWindowLevel];
 		[self.mainMenu makeKeyAndOrderFront:self];
 		[NSApp activateIgnoringOtherApps:YES];
 		self.opening = NO;
@@ -676,7 +677,7 @@ static AppDelegate *_static_shared_ref;
     NSFileManager *fileManager = [NSFileManager defaultManager];
     NSURL *appSupportURL = [[fileManager URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject];
     appSupportURL = [appSupportURL URLByAppendingPathComponent:@"com.housetrip.Trailer"];
-	NSLog(@"Files in %@",appSupportURL);
+	DLog(@"Files in %@",appSupportURL);
 	return appSupportURL;
 }
 
@@ -737,7 +738,7 @@ static AppDelegate *_static_shared_ref;
     NSURL *xmlStore = [applicationFilesDirectory URLByAppendingPathComponent:@"Trailer.storedata"];
 	if([fileManager fileExistsAtPath:xmlStore.path])
 	{
-		NSLog(@"MIGRATING TO SQLITE");
+		DLog(@"MIGRATING TO SQLITE");
 		[self removeDatabaseFiles];
 
 		NSPersistentStore *xml = [coordinator addPersistentStoreWithType:NSXMLStoreType
@@ -754,7 +755,7 @@ static AppDelegate *_static_shared_ref;
 										 error:nil])
 		{
 			[fileManager removeItemAtURL:xmlStore error:nil];
-			NSLog(@"Deleted old XML store");
+			DLog(@"Deleted old XML store");
 		}
 		self.justMigrated = YES;
 	}
@@ -787,7 +788,7 @@ static AppDelegate *_static_shared_ref;
     {
         if([file rangeOfString:@"Trailer.sqlite"].location!=NSNotFound)
         {
-            NSLog(@"Removing old database file: %@",file);
+            DLog(@"Removing old database file: %@",file);
             [fm removeItemAtPath:[documentsDirectory stringByAppendingPathComponent:file] error:nil];
         }
     }
@@ -824,7 +825,7 @@ static AppDelegate *_static_shared_ref;
     }
     
     if (![[self managedObjectContext] commitEditing]) {
-        NSLog(@"%@:%@ unable to commit editing to terminate", [self class], NSStringFromSelector(_cmd));
+        DLog(@"%@:%@ unable to commit editing to terminate", [self class], NSStringFromSelector(_cmd));
         return NSTerminateCancel;
     }
     
@@ -891,7 +892,7 @@ static AppDelegate *_static_shared_ref;
 {
 	if([self.api.reachability currentReachabilityStatus]!=NotReachable)
 	{
-		NSLog(@"Network is back");
+		DLog(@"Network is back");
 		[self startRefreshIfItIsDue];
 	}
 }
@@ -908,7 +909,7 @@ static AppDelegate *_static_shared_ref;
 		else
 		{
 			NSTimeInterval howLongUntilNextSync = self.api.refreshPeriod-howLongAgo;
-			NSLog(@"No need to refresh yet, will refresh in %f",howLongUntilNextSync);
+			DLog(@"No need to refresh yet, will refresh in %f",howLongUntilNextSync);
 			self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:howLongUntilNextSync
 																 target:self
 															   selector:@selector(refreshTimerDone)
@@ -968,7 +969,7 @@ static AppDelegate *_static_shared_ref;
 	self.statusItemView.grayOut = YES;
 	if(self.justMigrated)
 	{
-		NSLog(@"FORCING ALL PRS TO BE REFRETCHED");
+		DLog(@"FORCING ALL PRS TO BE REFRETCHED");
 		NSArray *prs = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.managedObjectContext];
 		for(PullRequest *r in prs) r.updatedAt = [NSDate distantPast];
 		self.justMigrated = NO;
@@ -998,7 +999,7 @@ static AppDelegate *_static_shared_ref;
 -(void)startRefresh
 {
 	if(self.isRefreshing) return;
-	NSLog(@"Starting refresh");
+	DLog(@"Starting refresh");
 	[self prepareForRefresh];
 	id oldTarget = self.refreshNow.target;
 	SEL oldAction = self.refreshNow.action;
@@ -1026,7 +1027,7 @@ static AppDelegate *_static_shared_ref;
 														   selector:@selector(refreshTimerDone)
 														   userInfo:nil
 															repeats:NO];
-		NSLog(@"Refresh done");
+		DLog(@"Refresh done");
 	}];
 }
 
@@ -1091,7 +1092,7 @@ static AppDelegate *_static_shared_ref;
 	NSString *countString = [NSString stringWithFormat:@"%ld",[PullRequest countUnmergedRequestsInMoc:self.managedObjectContext]];
 	NSInteger newCommentCount = [self buildPrMenuItemsFromList:pullRequests];
 
-	NSLog(@"Updating menu, %@ total PRs",countString);
+	DLog(@"Updating menu, %@ total PRs",countString);
 
 	NSDictionary *attributes;
 	if(self.lastUpdateFailed)
