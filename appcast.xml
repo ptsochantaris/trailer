@@ -8,6 +8,23 @@
 
 
 		<item>
+	            <title>Version 1.0.1</title>
+				<description><![CDATA[<font face="sans-serif" size="3"><ul>
+<li>Added new 'About' box</li>
+<li>Changed updater URLs for hosting on Github pages</li>
+<li>Updated copyright and licesing for release</li>
+</ul></font>]]></description>
+	            <pubDate>Fri, 3 Jan 2014 12:00:00 +0000</pubDate>
+	            <enclosure 
+	url="http://dev.housetrip.com/trailer/trailer101.zip"
+	sparkle:version="1010"
+	sparkle:shortVersionString="1.0.1"
+	sparkle:dsaSignature="MCwCFEWpHV5IDHdj6AD5h66qh8dpG8PTAhRd4XH2gvsUnFIUODoUkqOV74mfwg=="
+	type="application/octet-stream"/>
+			</item>
+
+
+		<item>
 	            <title>Version 1.0.0</title>
 				<description><![CDATA[<font face="sans-serif" size="3"><ul>
 <li>Version 1.0!</li>
@@ -21,6 +38,7 @@
 	sparkle:dsaSignature="MC0CFQCblFitqFh2DyStsGAydchcY1e+FwIUcQa53y3jwUuu/D3cBm2pU0Hujdg="
 	type="application/octet-stream"/>
 			</item>
+			
 			
 	</channel>
 </rss>
