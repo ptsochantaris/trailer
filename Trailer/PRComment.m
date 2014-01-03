@@ -1,10 +1,3 @@
-//
-//  Comment.m
-//  Trailer
-//
-//  Created by Paul Tsochantaris on 27/09/2013.
-//  Copyright (c) 2013 HouseTrip. All rights reserved.
-//
 
 @implementation PRComment
 

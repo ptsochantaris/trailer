@@ -138,7 +138,6 @@
 		168BC6D817EC2DF000BC4584 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		168BC6DA17EC2DF000BC4584 /* TrailerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TrailerTests.m; sourceTree = "<group>"; };
 		16B94066182D051700F32061 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
-		16B9406F182D136700F32061 /* dsa_priv.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_priv.pem; sourceTree = "<group>"; };
 		16B94070182D136700F32061 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
 		16B9552F17EC89520005118F /* Org.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Org.h; sourceTree = "<group>"; };
 		16B9553017EC89520005118F /* Org.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Org.m; sourceTree = "<group>"; };
@@ -286,7 +285,7 @@
 		168BC6B417EC2DF000BC4584 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				16B9406E182D135D00F32061 /* Sparkle signing fiiles */,
+				16B94070182D136700F32061 /* dsa_pub.pem */,
 				168BC6B517EC2DF000BC4584 /* Trailer-Info.plist */,
 				168BC6B617EC2DF000BC4584 /* InfoPlist.strings */,
 				168BC6B917EC2DF000BC4584 /* main.m */,
@@ -311,15 +310,6 @@
 				168BC6D717EC2DF000BC4584 /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		16B9406E182D135D00F32061 /* Sparkle signing fiiles */ = {
-			isa = PBXGroup;
-			children = (
-				16B9406F182D136700F32061 /* dsa_priv.pem */,
-				16B94070182D136700F32061 /* dsa_pub.pem */,
-			);
-			name = "Sparkle signing fiiles";
 			sourceTree = "<group>";
 		};
 		16B9552E17EC86D10005118F /* Data */ = {

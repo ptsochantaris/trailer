@@ -340,6 +340,7 @@
         </window>
         <customObject id="494" customClass="AppDelegate">
             <connections>
+                <outlet property="aboutVersion" destination="S57-NF-ZQw" id="Rsc-c3-NPJ"/>
                 <outlet property="activityDisplay" destination="Lax-cU-vqe" id="jxh-1P-ph0"/>
                 <outlet property="apiLoad" destination="U6L-MC-3fm" id="oYJ-81-Ywn"/>
                 <outlet property="clearAll" destination="5Sj-ma-EM3" id="4Lh-JS-ceA"/>
@@ -457,16 +458,16 @@
                                             <action selector="markAllReadSelected:" target="494" id="vWk-YR-lXO"/>
                                         </connections>
                                     </menuItem>
-                                    <menuItem title=" Check for Updates..." id="gYG-gS-tKD">
-                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                        <connections>
-                                            <action selector="checkForUpdates:" target="vff-Bf-GFU" id="s8k-Dl-cTy"/>
-                                        </connections>
-                                    </menuItem>
                                     <menuItem title=" Preferences..." id="IyB-CB-sO1">
                                         <modifierMask key="keyEquivalentModifierMask"/>
                                         <connections>
                                             <action selector="preferencesSelected:" target="494" id="APu-P9-9A4"/>
+                                        </connections>
+                                    </menuItem>
+                                    <menuItem title=" About..." id="gYG-gS-tKD">
+                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                        <connections>
+                                            <action selector="makeKeyAndOrderFront:" target="jQi-BK-oDc" id="ryq-zX-bJb"/>
                                         </connections>
                                     </menuItem>
                                     <menuItem title=" Quit" id="eNw-Iw-Fkg">
@@ -486,5 +487,122 @@
                 <outlet property="scrollView" destination="1jc-DF-1GW" id="3OM-0g-ri5"/>
             </connections>
         </window>
+        <window allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="jQi-BK-oDc" userLabel="About">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
+            <windowCollectionBehavior key="collectionBehavior" transient="YES" ignoresCycle="YES"/>
+            <rect key="contentRect" x="196" y="207" width="620" height="373"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1058"/>
+            <view key="contentView" id="xlg-hR-tYX">
+                <rect key="frame" x="0.0" y="0.0" width="620" height="373"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <box autoresizesSubviews="NO" title="Box" boxType="custom" borderType="line" titlePosition="noTitle" id="IdG-V0-Unp">
+                        <rect key="frame" x="-1" y="46" width="626" height="328"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <view key="contentView">
+                            <rect key="frame" x="1" y="1" width="624" height="326"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" id="wje-6l-eSq">
+                                    <rect key="frame" x="15" y="15" width="187" height="246"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="NSApplicationIcon" id="zsh-8U-DFq"/>
+                                </imageView>
+                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="6gc-I9-FuB">
+                                    <rect key="frame" x="208" y="279" width="394" height="31"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Trailer" id="eX7-r0-5Jg">
+                                        <font key="font" size="26" name="LucidaGrande-Bold"/>
+                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                    </textFieldCell>
+                                </textField>
+                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="S57-NF-ZQw">
+                                    <rect key="frame" x="208" y="257" width="394" height="17"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Version X.X" id="u7z-rG-0GT">
+                                        <font key="font" metaFont="systemBold"/>
+                                        <color key="textColor" name="controlShadowColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                    </textFieldCell>
+                                </textField>
+                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Vhv-zE-b1i">
+                                    <rect key="frame" x="208" y="15" width="394" height="231"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" id="QyU-WN-WeW">
+                                        <font key="font" size="9" name="LucidaGrande"/>
+                                        <mutableString key="title">Copyright (c) 2013-2014 HouseTrip Ltd.
+
+Released under the terms of the MIT licence:
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.</mutableString>
+                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                    </textFieldCell>
+                                </textField>
+                                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" id="qYv-O5-KeZ">
+                                    <rect key="frame" x="16" y="269" width="82" height="42"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="htLogo" id="KpQ-AW-sNf"/>
+                                </imageView>
+                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="5vr-fx-ivU">
+                                    <rect key="frame" x="14" y="255" width="86" height="17"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Team Octopus" id="7Mc-yk-hkr">
+                                        <font key="font" size="9" name="LucidaGrande-Bold"/>
+                                        <color key="textColor" name="controlShadowColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                    </textFieldCell>
+                                </textField>
+                            </subviews>
+                        </view>
+                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                        <color key="fillColor" name="controlLightHighlightColor" catalog="System" colorSpace="catalog"/>
+                    </box>
+                    <button verticalHuggingPriority="750" id="Arp-ze-WY7">
+                        <rect key="frame" x="442" y="6" width="172" height="32"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="push" title="Check For Updates" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="O97-mQ-lfK">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="checkForUpdates:" target="vff-Bf-GFU" id="wnm-47-b1P"/>
+                        </connections>
+                    </button>
+                    <button verticalHuggingPriority="750" id="9Bj-W3-TaP">
+                        <rect key="frame" x="270" y="6" width="172" height="32"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="push" title="Trailer on Github" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="pxq-Lv-b66">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="aboutLinkSelected:" target="494" id="Iwo-Mt-E6j"/>
+                        </connections>
+                    </button>
+                </subviews>
+            </view>
+        </window>
     </objects>
+    <resources>
+        <image name="NSApplicationIcon" width="128" height="128"/>
+        <image name="htLogo" width="200" height="108"/>
+    </resources>
 </document>

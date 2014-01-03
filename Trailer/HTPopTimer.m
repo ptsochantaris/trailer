@@ -1,9 +1,3 @@
-//
-//  HTPopTimer.m
-//
-//  Created by Paul Tsochantaris on 09/05/2013.
-//  Copyright (c) 2013 HouseTrip. All rights reserved.
-//
 
 @interface HTPopTimer ()
 {

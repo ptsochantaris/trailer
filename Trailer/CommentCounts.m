@@ -1,10 +1,3 @@
-//
-//  CommentCounts.m
-//  Trailer
-//
-//  Created by Paul Tsochantaris on 23/12/13.
-//  Copyright (c) 2013 HouseTrip. All rights reserved.
-//
 
 static NSDictionary *_commentCountAttributes, *_commentAlertAttributes;
 static NSNumberFormatter *formatter;

@@ -1,10 +1,3 @@
-//
-//  StatusItem.h
-//  Trailer
-//
-//  Created by Paul Tsochantaris on 13/12/2013.
-//  Copyright (c) 2013 HouseTrip. All rights reserved.
-//
 
 @class StatusItemView;
 

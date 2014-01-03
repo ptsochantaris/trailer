@@ -1,10 +1,3 @@
-//
-//  AppDelegate.m
-//  Trailer
-//
-//  Created by Paul Tsochantaris on 20/09/2013.
-//  Copyright (c) 2013 HouseTrip. All rights reserved.
-//
 
 @implementation AppDelegate
 
@@ -17,6 +10,7 @@ static AppDelegate *_static_shared_ref;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+	// Useful snippet for resetting prefs when testing
 	//NSString *appDomain = [[NSBundle mainBundle] bundleIdentifier];
 	//[[NSUserDefaults standardUserDefaults] removePersistentDomainForName:appDomain];
 
@@ -52,7 +46,9 @@ static AppDelegate *_static_shared_ref;
 	[[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate:self];
 
 	NSString *currentAppVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+	currentAppVersion = [@"Version " stringByAppendingString:currentAppVersion];
 	[self.versionNumber setStringValue:currentAppVersion];
+	[self.aboutVersion setStringValue:currentAppVersion];
 
 	if(self.api.authToken.length)
 	{
@@ -149,6 +145,13 @@ static AppDelegate *_static_shared_ref;
 		[self deleteAppFromLoginItem];
 	}
 }
+
+- (IBAction)aboutLinkSelected:(NSButton *)sender
+{
+	NSString *urlToOpen = TRAILER_GITHUB_REPO;
+	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlToOpen]];
+}
+
 
 -(BOOL)userNotificationCenter:(NSUserNotificationCenter *)center shouldPresentNotification:(NSUserNotification *)notification
 {
@@ -969,7 +972,7 @@ static AppDelegate *_static_shared_ref;
 	self.statusItemView.grayOut = YES;
 	if(self.justMigrated)
 	{
-		DLog(@"FORCING ALL PRS TO BE REFRETCHED");
+		DLog(@"FORCING ALL PRS TO BE REFETCHED");
 		NSArray *prs = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.managedObjectContext];
 		for(PullRequest *r in prs) r.updatedAt = [NSDate distantPast];
 		self.justMigrated = NO;

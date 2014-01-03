@@ -1,10 +1,3 @@
-//
-//  SectionHeader.m
-//  Trailer
-//
-//  Created by Paul Tsochantaris on 06/12/2013.
-//  Copyright (c) 2013 HouseTrip. All rights reserved.
-//
 
 @implementation SectionHeader
 

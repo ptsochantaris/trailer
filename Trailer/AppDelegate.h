@@ -1,11 +1,5 @@
-//
-//  AppDelegate.h
-//  Trailer
-//
-//  Created by Paul Tsochantaris on 20/09/2013.
-//  Copyright (c) 2013 HouseTrip. All rights reserved.
-//
 
+#define TRAILER_GITHUB_REPO @"http://dev.housetrip.com/trailer/"
 #define LOW_API_WARNING 0.90
 
 typedef enum {
@@ -59,6 +53,10 @@ typedef enum {
 @property (weak) IBOutlet NSButton *showCreationDates;
 @property (weak) IBOutlet NSButton *dontKeepMyPrs;
 @property (weak) IBOutlet NSButton *hideAvatars;
+
+// About window
+@property (weak) IBOutlet NSTextField *aboutVersion;
+
 
 // Used to track action state
 @property (nonatomic) BOOL opening, justMigrated;
