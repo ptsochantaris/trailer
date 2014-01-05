@@ -33,7 +33,6 @@
 	[[AppDelegate shared] startRefresh];
 }
 
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -52,6 +51,51 @@
 											 selector:@selector(refreshEnded)
 												 name:REFRESH_ENDED_NOTIFICATION
 											   object:nil];
+
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(localNotification:)
+												 name:RECEIVED_NOTIFICATION_KEY
+											   object:nil];
+}
+
+- (void)localNotification:(NSNotification *)notification
+{
+	//DLog(@"local notification: %@",notification.userInfo);
+
+	NSManagedObjectContext *mainMoc = [AppDelegate shared].dataManager.managedObjectContext;
+
+	NSString *urlToOpen = notification.userInfo[NOTIFICATION_URL_KEY];
+	if(!urlToOpen)
+	{
+		NSNumber *itemId = notification.userInfo[PULL_REQUEST_ID_KEY];
+		PullRequest *pullRequest = nil;
+		if(itemId) // it's a pull request
+		{
+			pullRequest = [PullRequest itemOfType:@"PullRequest" serverId:itemId moc:mainMoc];
+			urlToOpen = pullRequest.webUrl;
+		}
+		else // it's a comment
+		{
+			itemId = notification.userInfo[COMMENT_ID_KEY];
+			PRComment *c = [PRComment itemOfType:@"PRComment" serverId:itemId moc:mainMoc];
+			urlToOpen = c.webUrl;
+			pullRequest = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:mainMoc];
+		}
+		double delayInSeconds = 0.1;
+		dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+		dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+			[pullRequest catchUpWithComments];
+			[[AppDelegate shared] updateBadge];
+		});
+
+		NSIndexPath *ip = [_fetchedResultsController indexPathForObject:pullRequest];
+		if(ip)
+		{
+			[self.tableView selectRowAtIndexPath:ip animated:YES scrollPosition:UITableViewScrollPositionMiddle];
+		}
+	}
+
+	if(urlToOpen) self.detailViewController.detailItem = [NSURL URLWithString:urlToOpen];
 }
 
 - (void)dealloc
@@ -95,7 +139,13 @@
 {
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
         PullRequest *object = [[self fetchedResultsController] objectAtIndexPath:indexPath];
-        self.detailViewController.detailItem = object;
+        self.detailViewController.detailItem = [NSURL URLWithString:object.webUrl];
+		double delayInSeconds = 0.1;
+		dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+		dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+			[object catchUpWithComments];
+			[[AppDelegate shared] updateBadge];
+		});
     }
 }
 
@@ -108,9 +158,12 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     PullRequest *pr = [self.fetchedResultsController objectAtIndexPath:indexPath];
-	return [pr.title sizeWithFont:[UIFont boldSystemFontOfSize:[UIFont labelFontSize]]
-				constrainedToSize:CGSizeMake(225, 5000)
-					lineBreakMode:NSLineBreakByWordWrapping].height+38;
+	CGFloat w = 208;
+	if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) w = 227;
+
+	return [pr.title sizeWithFont:[UIFont systemFontOfSize:[UIFont labelFontSize]]
+				constrainedToSize:CGSizeMake(w, 5000)
+					lineBreakMode:NSLineBreakByWordWrapping].height+40;
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
@@ -141,7 +194,7 @@
     if ([[segue identifier] isEqualToString:@"showDetail"]) {
         NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
         PullRequest *object = [[self fetchedResultsController] objectAtIndexPath:indexPath];
-        [[segue destinationViewController] setDetailItem:object];
+        [[segue destinationViewController] setDetailItem:[NSURL URLWithString:object.webUrl]];
     }
 }
 

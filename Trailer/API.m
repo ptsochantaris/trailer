@@ -3,6 +3,9 @@
 {
 	NSOperationQueue *requestQueue;
 	NSDateFormatter *dateFormatter;
+#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
+	NSInteger networkIndicationCount;
+#endif
 }
 @end
 
@@ -574,6 +577,8 @@
 			success:(void(^)(NSHTTPURLResponse *response, id data))successCallback
 			failure:(void(^)(NSHTTPURLResponse *response, NSError *error))failureCallback
 {
+	[self networkIndicationStart];
+
 	NSString *authToken = self.authToken;
 	NSBlockOperation *o = [NSBlockOperation blockOperationWithBlock:^{
 
@@ -628,6 +633,8 @@
 				});
 			}
 		}
+
+		[self networkIndicationEnd];
 	}];
 	o.queuePriority = NSOperationQueuePriorityVeryHigh;
 	[requestQueue addOperation:o];
@@ -638,6 +645,12 @@
 				  success:(void(^)(NSHTTPURLResponse *response, NSData *imageData))successCallback
 				  failure:(void(^)(NSHTTPURLResponse *response, NSError *error))failureCallback
 {
+	double delayInSeconds = 0.5;
+	dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+	dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+		[self networkIndicationStart];
+	});
+
 	NSBlockOperation *o = [NSBlockOperation blockOperationWithBlock:^{
 
 		NSMutableURLRequest *r = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:path]
@@ -681,10 +694,32 @@
 				}
 			}
 		}
+
+		[self networkIndicationEnd];
 	}];
 	o.queuePriority = NSOperationQueuePriorityVeryLow;
 	[requestQueue addOperation:o];
 	return o;
+}
+
+- (void)networkIndicationStart
+{
+#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
+	dispatch_async(dispatch_get_main_queue(), ^{
+		if(++networkIndicationCount==1)
+			[UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+	});
+#endif
+}
+
+- (void)networkIndicationEnd
+{
+#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
+	dispatch_async(dispatch_get_main_queue(), ^{
+		if(--networkIndicationCount==0)
+			[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+	});
+#endif
 }
 
 @end

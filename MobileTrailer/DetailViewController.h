@@ -9,7 +9,7 @@
 @interface DetailViewController : UIViewController
 <UISplitViewControllerDelegate, UIWebViewDelegate, UIActionSheetDelegate>
 
-@property (strong, nonatomic) PullRequest *detailItem;
+@property (strong, nonatomic) NSURL *detailItem;
 
 @property (strong, nonatomic) UIPopoverController *masterPopoverController;
 @property (weak, nonatomic) IBOutlet UIWebView *web;

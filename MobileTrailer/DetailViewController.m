@@ -36,9 +36,9 @@ static DetailViewController *_detail_shared_ref;
 {
 	if (self.detailItem)
 	{
-		DLog(@"will load: %@",self.detailItem.webUrl);
+		DLog(@"will load: %@",self.detailItem.absoluteString);
 		self.navigationItem.rightBarButtonItem.enabled = YES;
-		[self.web loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:self.detailItem.webUrl]]];
+		[self.web loadRequest:[NSURLRequest requestWithURL:self.detailItem]];
 		self.statusLabel.text = @"";
 		self.statusLabel.hidden = YES;
 	}
@@ -93,7 +93,7 @@ static DetailViewController *_detail_shared_ref;
 	[self.spinner stopAnimating];
 	self.statusLabel.hidden = YES;
 	self.web.hidden = NO;
-	self.title = self.detailItem.title;
+	self.title = [self.web stringByEvaluatingJavaScriptFromString:@"document.title"];
 }
 
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error

@@ -199,8 +199,8 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="VJR-YC-WkL">
-                                <rect key="frame" x="20" y="684" width="984" height="45"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <rect key="frame" x="505" y="684" width="519" height="45"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMinY="YES"/>
                                 <state key="normal" title="Load Repository List">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
@@ -236,6 +236,16 @@
                                     <outlet property="delegate" destination="qtb-G3-HJM" id="piT-8d-9Dg"/>
                                 </connections>
                             </tableView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="GM9-Ft-PUf">
+                                <rect key="frame" x="0.0" y="684" width="497" height="45"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <state key="normal" title="Advanced">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <segue destination="BEe-T2-ZWj" kind="push" id="bGE-Rg-Toq"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
@@ -264,7 +274,23 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="2dF-YS-pAX" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1678" y="1299"/>
+            <point key="canvasLocation" x="1616" y="1299"/>
+        </scene>
+        <!--Advanced Settings View Controller - Advanced-->
+        <scene sceneID="Tib-Wz-fPj">
+            <objects>
+                <viewController id="BEe-T2-ZWj" customClass="AdvancedSettingsViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="4px-eB-YfR">
+                        <rect key="frame" x="0.0" y="0.0" width="1024" height="768"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="Advanced" id="4PS-AR-Kha"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="eIw-wJ-M8v" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2771" y="1299"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="iMa-Ee-G8n">

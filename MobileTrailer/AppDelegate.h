@@ -28,4 +28,6 @@ typedef void (^backgroundFetchCompletionCallback)(UIBackgroundFetchResult result
 
 - (void)forcePreferences;
 
+- (void)updateBadge;
+
 @end

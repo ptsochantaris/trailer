@@ -736,7 +736,7 @@ static AppDelegate *_static_shared_ref;
 
 - (void)checkApiUsage
 {
-	if(self.apiLoad.maxValue-self.apiLoad.doubleValue==0)
+	if(self.api.requestsRemaining==0)
 	{
         NSAlert *alert = [[NSAlert alloc] init];
         [alert setMessageText:@"Your API request usage is over the limit!"];
@@ -745,7 +745,7 @@ static AppDelegate *_static_shared_ref;
 		[alert runModal];
 		return;
 	}
-	else if((self.apiLoad.doubleValue/self.apiLoad.maxValue)>LOW_API_WARNING)
+	else if((self.api.requestsRemaining/self.api.requestsLimit)<LOW_API_WARNING)
 	{
         NSAlert *alert = [[NSAlert alloc] init];
         [alert setMessageText:@"Your API request usage is close to full"];
@@ -789,7 +789,7 @@ static AppDelegate *_static_shared_ref;
 	[self updateMenu];
 	[self checkApiUsage];
 	[self.dataManager sendNotifications];
-	[dataManager saveDB];
+	[self.dataManager saveDB];
 }
 
 -(BOOL)isRefreshing

@@ -79,6 +79,7 @@
 		168BC6D117EC2DF000BC4584 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 168BC6AD17EC2DF000BC4584 /* Cocoa.framework */; };
 		168BC6D917EC2DF000BC4584 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 168BC6D717EC2DF000BC4584 /* InfoPlist.strings */; };
 		168BC6DB17EC2DF000BC4584 /* TrailerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 168BC6DA17EC2DF000BC4584 /* TrailerTests.m */; };
+		169CEB9C1879D5BB0083A068 /* AdvancedSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 169CEB9B1879D5BB0083A068 /* AdvancedSettingsViewController.m */; };
 		16B94068182D051F00F32061 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16B94066182D051700F32061 /* Sparkle.framework */; };
 		16B9406B182D078C00F32061 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 16B94066182D051700F32061 /* Sparkle.framework */; };
 		16B94072182D136700F32061 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 16B94070182D136700F32061 /* dsa_pub.pem */; };
@@ -205,6 +206,8 @@
 		168BC6D817EC2DF000BC4584 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		168BC6DA17EC2DF000BC4584 /* TrailerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TrailerTests.m; sourceTree = "<group>"; };
 		169CEB99187988D00083A068 /* Trailer 4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Trailer 4.xcdatamodel"; sourceTree = "<group>"; };
+		169CEB9A1879D5BB0083A068 /* AdvancedSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdvancedSettingsViewController.h; sourceTree = "<group>"; };
+		169CEB9B1879D5BB0083A068 /* AdvancedSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdvancedSettingsViewController.m; sourceTree = "<group>"; };
 		16B94066182D051700F32061 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		16B94070182D136700F32061 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
 		16B9552F17EC89520005118F /* Org.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Org.h; sourceTree = "<group>"; };
@@ -289,6 +292,8 @@
 				1628A6D018789E73005EDA69 /* MasterViewController.m */,
 				1628A6D218789E73005EDA69 /* DetailViewController.h */,
 				1628A6D318789E73005EDA69 /* DetailViewController.m */,
+				169CEB9A1879D5BB0083A068 /* AdvancedSettingsViewController.h */,
+				169CEB9B1879D5BB0083A068 /* AdvancedSettingsViewController.m */,
 				1628A6FA1878B64E005EDA69 /* PreferencesViewController.h */,
 				1628A6FB1878B64E005EDA69 /* PreferencesViewController.m */,
 				1628A6D518789E73005EDA69 /* Images.xcassets */,
@@ -709,6 +714,7 @@
 				1628A7051878BC18005EDA69 /* Org.m in Sources */,
 				1628A7041878BC18005EDA69 /* Repo.m in Sources */,
 				1628A70B1878D2B2005EDA69 /* NSDictionary+NSDictionary_OFK.m in Sources */,
+				169CEB9C1879D5BB0083A068 /* AdvancedSettingsViewController.m in Sources */,
 				1628A6D418789E73005EDA69 /* DetailViewController.m in Sources */,
 				1628A6D118789E73005EDA69 /* MasterViewController.m in Sources */,
 				1628A7081878BC32005EDA69 /* Reachability.m in Sources */,

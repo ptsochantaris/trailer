@@ -79,6 +79,15 @@ CGFloat GLOBAL_SCREEN_SCALE;
     return YES;
 }
 
+- (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification
+{
+	if(notification)
+	{
+		[[NSNotificationCenter defaultCenter] postNotificationName:RECEIVED_NOTIFICATION_KEY object:nil userInfo:notification.userInfo];
+		[[UIApplication sharedApplication] cancelLocalNotification:notification];
+	}
+}
+
 - (void)setupUI
 {
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
@@ -273,7 +282,7 @@ CGFloat GLOBAL_SCREEN_SCALE;
 -(void)postNotificationOfType:(PRNotificationType)type forItem:(id)item
 {
 	if(self.preferencesDirty) return;
-	//if([UIApplication sharedApplication].applicationState==UIApplicationStateActive) return;
+
 	UILocalNotification *notification = [[UILocalNotification alloc] init];
 
 	switch (type)
