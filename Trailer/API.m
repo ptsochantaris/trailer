@@ -355,7 +355,13 @@
 								{
 									[DataItem nukeDeletedItemsOfType:@"Repo" inMoc:syncContext];
 									[DataItem nukeDeletedItemsOfType:@"PullRequest" inMoc:syncContext];
-									if(success && syncContext.hasChanges) [syncContext save:nil];
+
+									[self updateSectionIndexesInMoc:syncContext];
+
+									if(success && syncContext.hasChanges)
+									{
+										[syncContext save:nil];
+									}
 									if(callback) callback(success);
 								}
 							}];
@@ -367,6 +373,12 @@
 		}
 		else if(callback) callback(NO);
 	}];
+}
+
+- (void)updateSectionIndexesInMoc:(NSManagedObjectContext *)moc
+{
+	NSArray *prs = [PullRequest itemsOfType:@"PullRequest" surviving:YES inMoc:moc];
+	for(PullRequest *r in prs) [r updateSectionIndex];
 }
 
 -(void)_fetchPullRequestsForRepos:(NSMutableArray *)repos toMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
@@ -617,7 +629,7 @@
 			}
 		}
 	}];
-	o.threadPriority = 0.1;
+	o.queuePriority = NSOperationQueuePriorityVeryHigh;
 	[requestQueue addOperation:o];
 	return o;
 }
@@ -670,7 +682,7 @@
 			}
 		}
 	}];
-	o.threadPriority = 0.0;
+	o.queuePriority = NSOperationQueuePriorityVeryLow;
 	[requestQueue addOperation:o];
 	return o;
 }

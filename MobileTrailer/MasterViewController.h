@@ -6,15 +6,15 @@
 //  Copyright (c) 2014 HouseTrip. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#define REFRESH_STARTED_NOTIFICATION @"RefreshStartedNotification"
+#define REFRESH_ENDED_NOTIFICATION @"RefreshEndedNotification"
 
 @class DetailViewController;
-
-#import <CoreData/CoreData.h>
 
 @interface MasterViewController : UITableViewController <NSFetchedResultsControllerDelegate>
 
 @property (strong, nonatomic) DetailViewController *detailViewController;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *refreshButton;
 
 @property (strong, nonatomic) NSFetchedResultsController *fetchedResultsController;
 @property (strong, nonatomic) NSManagedObjectContext *managedObjectContext;

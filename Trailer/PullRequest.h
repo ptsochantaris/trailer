@@ -1,4 +1,11 @@
 
+#define kPullRequestSectionMine 0
+#define kPullRequestSectionMerged 1
+#define kPullRequestSectionParticipated 2
+#define kPullRequestSectionAll 3
+
+#define kPullRequestSectionNames @[@"Mine", @"Recently Merged", @"Participated", @"All Pull Requests"]
+
 @interface PullRequest : DataItem
 
 @property (nonatomic, retain) NSString * url;
@@ -18,6 +25,9 @@
 @property (nonatomic, retain) NSDate * latestReadCommentDate;
 @property (nonatomic, retain) NSNumber *repoId;
 @property (nonatomic, retain) NSNumber *merged;
+
+@property (nonatomic, retain) NSNumber *sectionIndex;
+@property (nonatomic, readonly) NSString *sectionName;
 
 + (PullRequest *)pullRequestWithInfo:(NSDictionary*)info moc:(NSManagedObjectContext *)moc;
 
@@ -39,5 +49,7 @@
 - (BOOL)isMine;
 
 - (BOOL)commentedByMe;
+
+- (void)updateSectionIndex;
 
 @end

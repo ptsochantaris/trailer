@@ -18,6 +18,7 @@
 @dynamic merged;
 @dynamic userAvatarUrl;
 @dynamic userLogin;
+@dynamic sectionIndex;
 
 +(PullRequest *)pullRequestWithInfo:(NSDictionary *)info moc:(NSManagedObjectContext *)moc
 {
@@ -36,7 +37,21 @@
 
 	p.issueCommentLink = info[@"_links"][@"comments"][@"href"];
 	p.reviewCommentLink = info[@"_links"][@"review_comments"][@"href"];
+
 	return p;
+}
+
+- (void)updateSectionIndex
+{
+	if(self.isMine) self.sectionIndex = @kPullRequestSectionMine;
+	else if(self.merged.boolValue) self.sectionIndex = @kPullRequestSectionMerged;
+	else if(self.commentedByMe) self.sectionIndex = @kPullRequestSectionParticipated;
+	else self.sectionIndex = @kPullRequestSectionAll;
+}
+
+- (NSString *)sectionName
+{
+	return [kPullRequestSectionNames objectAtIndex:self.sectionIndex.integerValue];
 }
 
 +(NSArray *)pullRequestsSortedByField:(NSString *)fieldName
@@ -53,7 +68,7 @@
 	{
 		f.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:fieldName ascending:ascending selector:@selector(caseInsensitiveCompare:)]];
 	}
-	else
+	else if(fieldName.length)
 	{
 		f.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:fieldName ascending:ascending]];
 	}

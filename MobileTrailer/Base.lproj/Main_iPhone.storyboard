@@ -69,7 +69,15 @@
                                 <segue destination="Bxt-3e-UBi" kind="push" id="PHN-4t-rCA"/>
                             </connections>
                         </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" systemItem="refresh" id="fce-Re-WeY">
+                            <connections>
+                                <action selector="ipadRefreshSelected:" destination="pGg-6v-bdr" id="rSU-3E-QlK"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
+                    <connections>
+                        <outlet property="refreshButton" destination="fce-Re-WeY" id="Rtm-IP-iAu"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="6Cn-md-YlS" sceneMemberID="firstResponder"/>
             </objects>
@@ -100,7 +108,7 @@
                                 <rect key="frame" x="20" y="532" width="132" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="13"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="GitHub API usage" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="ZbX-vD-h6i">
@@ -150,12 +158,19 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
-                    <navigationItem key="navigationItem" title="Settings" id="KE8-kL-te2"/>
+                    <navigationItem key="navigationItem" title="Settings" id="KE8-kL-te2">
+                        <barButtonItem key="rightBarButtonItem" title="Select/Clear" id="HSG-NR-1y5">
+                            <connections>
+                                <action selector="iphoneSelection:" destination="Bxt-3e-UBi" id="2MA-RE-CtL"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="apiLoad" destination="oci-na-Ebb" id="43L-2w-JSY"/>
                         <outlet property="githubApiToken" destination="7cz-hD-3Vj" id="kX3-xC-c74"/>
                         <outlet property="refreshRepoList" destination="enZ-M6-lcx" id="GWF-NE-pw3"/>
                         <outlet property="repositories" destination="HZb-VF-reB" id="fpa-3E-Mds"/>
+                        <outlet property="selectionButton" destination="HSG-NR-1y5" id="lKO-VB-Xrm"/>
                         <outlet property="versionNumber" destination="0pe-ax-dhU" id="hUj-9u-Zpd"/>
                     </connections>
                 </viewController>
@@ -171,18 +186,39 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <webView contentMode="scaleToFill" id="B99-yS-DsE">
+                            <webView contentMode="scaleToFill" scalesPageToFit="YES" suppressesIncrementalRendering="YES" id="B99-yS-DsE">
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <connections>
+                                    <outlet property="delegate" destination="Ah7-4n-0Wa" id="Uye-eB-tDU"/>
+                                </connections>
                             </webView>
+                            <activityIndicatorView opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="gray" id="gdY-Aq-EIj">
+                                <rect key="frame" x="150" y="274" width="20" height="20"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                            </activityIndicatorView>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Status" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="cns-eJ-KZ9">
+                                <rect key="frame" x="20" y="14" width="280" height="534"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
                     <navigationItem key="navigationItem" title="Detail" id="cra-N8-TIN">
-                        <barButtonItem key="rightBarButtonItem" systemItem="action" id="95G-PH-vyC"/>
+                        <barButtonItem key="rightBarButtonItem" systemItem="action" id="95G-PH-vyC">
+                            <connections>
+                                <action selector="iphoneShareButtonSelected:" destination="Ah7-4n-0Wa" id="SNK-Tl-AYm"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
+                        <outlet property="shareButton" destination="95G-PH-vyC" id="jtz-UP-8vK"/>
+                        <outlet property="spinner" destination="gdY-Aq-EIj" id="XbL-WL-zH8"/>
+                        <outlet property="statusLabel" destination="cns-eJ-KZ9" id="w9J-8o-LDP"/>
                         <outlet property="web" destination="B99-yS-DsE" id="IXP-2F-cxP"/>
                     </connections>
                 </viewController>

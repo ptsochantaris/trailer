@@ -788,7 +788,8 @@ static AppDelegate *_static_shared_ref;
 	[self.projectsTable reloadData];
 	[self updateMenu];
 	[self checkApiUsage];
-	[self sendNotifications];
+	[self.dataManager sendNotifications];
+	[dataManager saveDB];
 }
 
 -(BOOL)isRefreshing
@@ -844,33 +845,6 @@ static AppDelegate *_static_shared_ref;
 	{
 		[self startRefresh];
 	}
-}
-
--(void)sendNotifications
-{
-	DataManager *dataManager = self.dataManager;
-
-	NSArray *latestPrs = [PullRequest newItemsOfType:@"PullRequest" inMoc:dataManager.managedObjectContext];
-	for(PullRequest *r in latestPrs)
-	{
-		[self postNotificationOfType:kNewPr forItem:r];
-		r.postSyncAction = @(kPostSyncDoNothing);
-	}
-
-	NSArray *latestComments = [PRComment newItemsOfType:@"PRComment" inMoc:dataManager.managedObjectContext];
-	for(PRComment *c in latestComments)
-	{
-		PullRequest *r = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:dataManager.managedObjectContext];
-		if(self.api.showCommentsEverywhere || r.isMine || r.commentedByMe)
-		{
-			if(![c.userId.stringValue isEqualToString:self.api.localUserId])
-			{
-				[self postNotificationOfType:kNewComment forItem:c];
-			}
-		}
-		c.postSyncAction = @(kPostSyncDoNothing);
-	}
-	[dataManager saveDB];
 }
 
 - (NSArray *)pullRequestList

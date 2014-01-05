@@ -20,7 +20,10 @@
 	{
 		f.predicate = [NSPredicate predicateWithFormat:@"fullName contains [cd] %@",titleFilterOrNil];
 	}
-	f.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:fieldName ascending:YES]];
+	if(fieldName)
+	{
+		f.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:fieldName ascending:YES]];
+	}
 	return [moc executeFetchRequest:f error:nil];
 }
 

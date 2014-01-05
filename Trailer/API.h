@@ -29,7 +29,8 @@ typedef enum {
 @property (nonatomic) NSInteger sortMethod;
 @property (nonatomic) float refreshPeriod, requestsLimit, requestsRemaining;
 @property (nonatomic) Reachability *reachability;
-@property (nonatomic) BOOL shouldHideUncommentedRequests, showCommentsEverywhere, sortDescending, showCreatedInsteadOfUpdated, dontKeepMyPrs, hideAvatars;
+@property (nonatomic) BOOL shouldHideUncommentedRequests, showCommentsEverywhere,
+sortDescending, showCreatedInsteadOfUpdated, dontKeepMyPrs, hideAvatars;
 
 - (void)updateLimitFromServer;
 

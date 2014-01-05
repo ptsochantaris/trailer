@@ -13,6 +13,12 @@ static AppDelegate *_static_shared_ref;
 
 CGFloat GLOBAL_SCREEN_SCALE;
 
+- (void)applicationDidReceiveMemoryWarning:(UIApplication *)application
+{
+	DLog(@"Memory warning");
+	[[NSURLCache sharedURLCache] removeAllCachedResponses];
+}
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
 	_static_shared_ref = self;
@@ -23,7 +29,7 @@ CGFloat GLOBAL_SCREEN_SCALE;
 
 	GLOBAL_SCREEN_SCALE = [UIScreen mainScreen].scale;
 
-	self.filterTimer = [[HTPopTimer alloc] initWithTimeInterval:0.2 target:self selector:@selector(filterTimerPopped)];
+	self.filterTimer = [[HTPopTimer alloc] initWithTimeInterval:0.4 target:self selector:@selector(filterTimerPopped)];
 
 	self.dataManager = [[DataManager alloc] init];
 	self.api = [[API alloc] init];
@@ -39,8 +45,15 @@ CGFloat GLOBAL_SCREEN_SCALE;
 
 	if(self.api.authToken.length)
 	{
-		//[self.githubTokenHolder setStringValue:self.api.authToken];
-		[self startRefresh];
+		NSArray *activeRepos = [Repo activeReposInMoc:self.dataManager.managedObjectContext];
+		if(activeRepos.count==0)
+		{
+			[self forcePreferences];
+		}
+		else
+		{
+			[self startRefresh];
+		}
 	}
 	else
 	{
@@ -51,6 +64,17 @@ CGFloat GLOBAL_SCREEN_SCALE;
 											 selector:@selector(networkStateChanged)
 												 name:kReachabilityChangedNotification
 											   object:nil];
+
+	[[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:600.0];
+
+// ONLY FOR DEBUG!
+/*
+	NSArray *allPRs = [PullRequest pullRequestsSortedByField:nil
+													  filter:nil
+												   ascending:NO
+													   inMoc:self.dataManager.managedObjectContext];
+	if(allPRs.count) [allPRs[0] setMerged:@YES];
+*/
 
     return YES;
 }
@@ -83,11 +107,6 @@ CGFloat GLOBAL_SCREEN_SCALE;
 }
 
 - (void)forcePreferences
-{
-	// TODO
-}
-
-- (void)sendNotifications
 {
 	// TODO
 }
@@ -127,28 +146,29 @@ CGFloat GLOBAL_SCREEN_SCALE;
 	}
 }
 
-
-
-
-
-
-
-
-
-
-- (IBAction)refreshNowSelected
+-(void)application:(UIApplication *)application performFetchWithCompletionHandler:(backgroundFetchCompletionCallback)completionHandler
 {
-	NSArray *activeRepos = [Repo activeReposInMoc:self.dataManager.managedObjectContext];
-	if(activeRepos.count==0)
-	{
-		[self forcePreferences];
-		return;
-	}
+	self.backgroundCallback = completionHandler;
 	[self startRefresh];
+}
+
+- (void)updateBadge
+{
+	NSArray *allPRs = [PullRequest pullRequestsSortedByField:nil
+													  filter:nil
+												   ascending:NO
+													   inMoc:self.dataManager.managedObjectContext];
+	NSInteger count = 0;
+	for(PullRequest *r in allPRs)
+		if(!r.merged.boolValue)
+			count += [r unreadCommentCount];
+	
+	[UIApplication sharedApplication].applicationIconBadgeNumber = count;
 }
 
 - (void)checkApiUsage
 {
+	if(self.api.authToken.length==0) return;
 	if(self.api.requestsRemaining==0)
 	{
 		[[[UIAlertView alloc] initWithTitle:@"Your API request usage is over the limit!"
@@ -184,26 +204,49 @@ CGFloat GLOBAL_SCREEN_SCALE;
 
 -(void)completeRefresh
 {
-	[self.dataManager saveDB];
 	[self checkApiUsage];
-	[self sendNotifications];
+	[self updateBadge];
 	self.isRefreshing = NO;
+	[[NSNotificationCenter defaultCenter] postNotificationName:REFRESH_ENDED_NOTIFICATION object:nil];
+	[self.dataManager sendNotifications];
+	[self.dataManager saveDB];
 }
 
 -(void)startRefresh
 {
 	if(self.isRefreshing) return;
 	self.isRefreshing = YES;
+	[[NSNotificationCenter defaultCenter] postNotificationName:REFRESH_STARTED_NOTIFICATION object:nil];
 	DLog(@"Starting refresh");
 	[self prepareForRefresh];
 
 	[self.api fetchPullRequestsForActiveReposAndCallback:^(BOOL success) {
 		self.lastUpdateFailed = !success;
+		BOOL hasNewData = (success && self.dataManager.managedObjectContext.hasChanges);
 		[self completeRefresh];
 		if(success)
 		{
 			self.lastSuccessfulRefresh = [NSDate date];
 			self.preferencesDirty = NO;
+		}
+		if(self.backgroundCallback)
+		{
+			if(hasNewData)
+			{
+				DLog(@">> got new data!");
+				self.backgroundCallback(UIBackgroundFetchResultNewData);
+			}
+			else if(success)
+			{
+				DLog(@"no new data");
+				self.backgroundCallback(UIBackgroundFetchResultNoData);
+			}
+			else
+			{
+				DLog(@"background refresh failed");
+				self.backgroundCallback(UIBackgroundFetchResultFailed);
+			}
+			self.backgroundCallback = nil;
 		}
 		self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:self.api.refreshPeriod
 															 target:self
@@ -230,7 +273,7 @@ CGFloat GLOBAL_SCREEN_SCALE;
 -(void)postNotificationOfType:(PRNotificationType)type forItem:(id)item
 {
 	if(self.preferencesDirty) return;
-
+	//if([UIApplication sharedApplication].applicationState==UIApplicationStateActive) return;
 	UILocalNotification *notification = [[UILocalNotification alloc] init];
 
 	switch (type)

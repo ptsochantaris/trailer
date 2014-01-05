@@ -17,5 +17,6 @@
 @property (weak, nonatomic) IBOutlet UIButton *refreshRepoList;
 
 @property (strong, nonatomic) NSFetchedResultsController *fetchedResultsController;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *selectionButton;
 
 @end

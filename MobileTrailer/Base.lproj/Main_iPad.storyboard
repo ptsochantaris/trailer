@@ -27,20 +27,41 @@
                         <rect key="frame" x="0.0" y="0.0" width="703" height="768"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <webView contentMode="scaleToFill" id="5u8-Lo-ZoT">
+                            <webView contentMode="scaleToFill" scalesPageToFit="YES" suppressesIncrementalRendering="YES" id="5u8-Lo-ZoT">
                                 <rect key="frame" x="0.0" y="0.0" width="703" height="768"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <connections>
+                                    <outlet property="delegate" destination="JEX-9P-axG" id="l2G-VH-hFF"/>
+                                </connections>
                             </webView>
+                            <activityIndicatorView opaque="NO" contentMode="center" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="gray" id="iCz-7v-EPc">
+                                <rect key="frame" x="341" y="374" width="20" height="20"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                            </activityIndicatorView>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Status" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="JEI-RV-Ntc">
+                                <rect key="frame" x="187" y="20" width="328" height="728"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     </view>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" id="mOI-FS-AaM">
-                        <barButtonItem key="rightBarButtonItem" systemItem="action" id="49c-8N-huw"/>
+                        <barButtonItem key="rightBarButtonItem" systemItem="action" id="49c-8N-huw">
+                            <connections>
+                                <action selector="ipadShareButtonSelected:" destination="JEX-9P-axG" id="hxq-ys-upI"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
+                        <outlet property="shareButton" destination="49c-8N-huw" id="RU2-Fh-IgY"/>
+                        <outlet property="spinner" destination="iCz-7v-EPc" id="mqi-Fb-lib"/>
+                        <outlet property="statusLabel" destination="JEI-RV-Ntc" id="FXH-WF-SUZ"/>
                         <outlet property="web" destination="5u8-Lo-ZoT" id="VrS-Xw-ody"/>
                     </connections>
                 </viewController>
@@ -114,7 +135,15 @@
                                 </segue>
                             </connections>
                         </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" systemItem="refresh" id="vlQ-6x-FuM">
+                            <connections>
+                                <action selector="phoneRefreshSelected:" destination="7bK-jq-Zjz" id="Vwd-s6-rP9"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
+                    <connections>
+                        <outlet property="refreshButton" destination="vlQ-6x-FuM" id="BOB-KG-GBV"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Rux-fX-hf1" sceneMemberID="firstResponder"/>
             </objects>
@@ -135,7 +164,7 @@
             </objects>
             <point key="canvasLocation" x="-366" y="248"/>
         </scene>
-        <!--Preferences View Controller - Preferences-->
+        <!--Preferences View Controller - Settings-->
         <scene sceneID="8yv-cf-BQa">
             <objects>
                 <viewController id="qtb-G3-HJM" customClass="PreferencesViewController" sceneMemberID="viewController">
@@ -151,7 +180,7 @@
                                 <rect key="frame" x="20" y="737" width="403" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="13"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="GitHub personal access token" textAlignment="center" minimumFontSize="17" id="gm0-vf-klI">
@@ -211,10 +240,15 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     </view>
-                    <navigationItem key="navigationItem" title="Preferences" id="XM6-pw-CgJ">
-                        <barButtonItem key="rightBarButtonItem" style="done" systemItem="done" id="mYI-Lo-soT">
+                    <navigationItem key="navigationItem" title="Settings" id="XM6-pw-CgJ">
+                        <barButtonItem key="leftBarButtonItem" style="done" systemItem="done" id="mYI-Lo-soT">
                             <connections>
                                 <action selector="ipadDone:" destination="qtb-G3-HJM" id="9jG-ZJ-lnI"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" title="Select/Clear" id="97J-Hs-P99">
+                            <connections>
+                                <action selector="ipadSelection:" destination="qtb-G3-HJM" id="4O2-mz-XZN"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -224,6 +258,7 @@
                         <outlet property="githubApiToken" destination="gm0-vf-klI" id="kzE-I3-6Ap"/>
                         <outlet property="refreshRepoList" destination="VJR-YC-WkL" id="9aB-N7-KdY"/>
                         <outlet property="repositories" destination="2NG-2o-yHF" id="dWS-92-Q17"/>
+                        <outlet property="selectionButton" destination="97J-Hs-P99" id="FJ0-yy-q4P"/>
                         <outlet property="versionNumber" destination="8QF-eU-pd6" id="Uim-oP-pR5"/>
                     </connections>
                 </viewController>

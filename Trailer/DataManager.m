@@ -12,6 +12,30 @@
 @synthesize managedObjectModel = _managedObjectModel;
 @synthesize managedObjectContext = _managedObjectContext;
 
+-(void)sendNotifications
+{
+	NSArray *latestPrs = [PullRequest newItemsOfType:@"PullRequest" inMoc:self.managedObjectContext];
+	for(PullRequest *r in latestPrs)
+	{
+		[[AppDelegate shared] postNotificationOfType:kNewPr forItem:r];
+		r.postSyncAction = @(kPostSyncDoNothing);
+	}
+
+	NSArray *latestComments = [PRComment newItemsOfType:@"PRComment" inMoc:self.managedObjectContext];
+	for(PRComment *c in latestComments)
+	{
+		PullRequest *r = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:self.managedObjectContext];
+		if([AppDelegate shared].api.showCommentsEverywhere || r.isMine || r.commentedByMe)
+		{
+			if(![c.userId.stringValue isEqualToString:[AppDelegate shared].api.localUserId])
+			{
+				[[AppDelegate shared] postNotificationOfType:kNewComment forItem:c];
+			}
+		}
+		c.postSyncAction = @(kPostSyncDoNothing);
+	}
+}
+
 // Returns the directory the application uses to store the Core Data store file. This code uses a directory named "com.housetrip.Trailer" in the user's Application Support directory.
 - (NSURL *)applicationFilesDirectory
 {

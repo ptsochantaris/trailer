@@ -204,6 +204,7 @@
 		168BC6D617EC2DF000BC4584 /* TrailerTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TrailerTests-Info.plist"; sourceTree = "<group>"; };
 		168BC6D817EC2DF000BC4584 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		168BC6DA17EC2DF000BC4584 /* TrailerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TrailerTests.m; sourceTree = "<group>"; };
+		169CEB99187988D00083A068 /* Trailer 4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Trailer 4.xcdatamodel"; sourceTree = "<group>"; };
 		16B94066182D051700F32061 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		16B94070182D136700F32061 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
 		16B9552F17EC89520005118F /* Org.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Org.h; sourceTree = "<group>"; };
@@ -621,6 +622,11 @@
 				TargetAttributes = {
 					1628A6B018789E73005EDA69 = {
 						DevelopmentTeam = 47UMK8NJEK;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+						};
 					};
 					1628A6DA18789E73005EDA69 = {
 						TestTargetID = 168BC6A917EC2DF000BC4584;
@@ -1112,6 +1118,7 @@
 				1628A6EB18789E74005EDA69 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		1628A6EF18789E74005EDA69 /* Build configuration list for PBXNativeTarget "MobileTrailerTests" */ = {
 			isa = XCConfigurationList;
@@ -1120,6 +1127,7 @@
 				1628A6ED18789E74005EDA69 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		168BC6A517EC2DF000BC4584 /* Build configuration list for PBXProject "Trailer" */ = {
 			isa = XCConfigurationList;
@@ -1155,10 +1163,11 @@
 			isa = XCVersionGroup;
 			children = (
 				164976221864935200C13A6B /* Trailer 3.xcdatamodel */,
+				169CEB99187988D00083A068 /* Trailer 4.xcdatamodel */,
 				1617BEEE183F9C4F00E89BB2 /* Trailer 2.xcdatamodel */,
 				168BC6C617EC2DF000BC4584 /* Trailer.xcdatamodel */,
 			);
-			currentVersion = 164976221864935200C13A6B /* Trailer 3.xcdatamodel */;
+			currentVersion = 169CEB99187988D00083A068 /* Trailer 4.xcdatamodel */;
 			path = Trailer.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

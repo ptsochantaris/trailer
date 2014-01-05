@@ -8,17 +8,21 @@
 
 #import "PreferencesViewController.h"
 
-@interface PreferencesViewController () <UITextFieldDelegate, NSFetchedResultsControllerDelegate>
-{
-	BOOL thereWereChanges;
-}
+@interface PreferencesViewController () <UITextFieldDelegate,
+NSFetchedResultsControllerDelegate, UINavigationControllerDelegate,
+UIActionSheetDelegate>
 @end
 
 @implementation PreferencesViewController
 
 - (IBAction)ipadDone:(UIBarButtonItem *)sender {
 	[[self valueForKey:@"popoverController"] dismissPopoverAnimated:YES];
-	if(thereWereChanges)
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+	[super viewWillDisappear:animated];
+	if([AppDelegate shared].preferencesDirty)
 	{
 		[[AppDelegate shared] startRefresh];
 	}
@@ -29,7 +33,7 @@
     [super viewDidLoad];
 
 	self.apiLoad.progress = 0.0;
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(apiUsageUpdate:) name:RATE_UPDATE_NOTIFICATION object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(apiUsageUpdate) name:RATE_UPDATE_NOTIFICATION object:nil];
 
 	NSString *currentAppVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
 	currentAppVersion = [@"Version " stringByAppendingString:currentAppVersion];
@@ -38,6 +42,10 @@
 	self.githubApiToken.text = [AppDelegate shared].api.authToken;
 	self.refreshRepoList.enabled = ([AppDelegate shared].api.authToken.length>0);
 	[self.repositories reloadData];
+
+	self.navigationController.delegate = self;
+
+	[self apiUsageUpdate];
 }
 
 - (void)dealloc
@@ -45,7 +53,7 @@
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (void)apiUsageUpdate:(NSNotification *)n
+- (void)apiUsageUpdate
 {
 	API *api = [AppDelegate shared].api;
 	[self.apiLoad setProgress:(api.requestsLimit-api.requestsRemaining)/api.requestsRemaining];
@@ -55,12 +63,42 @@
 {
 	if([string isEqualToString:@"\n"])
 	{
-		[AppDelegate shared].api.authToken = [self.githubApiToken.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-		self.refreshRepoList.enabled = ([AppDelegate shared].api.authToken.length>0);
-		[textField resignFirstResponder];
+		[self commitToken];
 		return NO;
 	}
+	else
+	{
+		[AppDelegate shared].preferencesDirty = YES;
+		[self resetData];
+		return YES;
+	}
+}
+
+- (void)commitToken
+{
+	[AppDelegate shared].api.authToken = [self.githubApiToken.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	self.refreshRepoList.enabled = ([AppDelegate shared].api.authToken.length>0);
+	[self.githubApiToken resignFirstResponder];
+}
+
+- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
+{
+	self.repositories.hidden = YES;
 	return YES;
+}
+
+-(void)textFieldDidEndEditing:(UITextField *)textField
+{
+	self.repositories.hidden = NO;
+}
+
+- (void)resetData
+{
+	[AppDelegate shared].preferencesDirty = YES;
+	[AppDelegate shared].lastSuccessfulRefresh = nil;
+	[DataItem deleteAllObjectsInContext:[AppDelegate shared].dataManager.managedObjectContext
+							 usingModel:[AppDelegate shared].dataManager.managedObjectModel];
+	[[AppDelegate shared].dataManager saveDB];
 }
 
 - (IBAction)ipadLoadRepositories:(UIButton *)sender {
@@ -71,6 +109,11 @@
 }
 - (void)updateRepositories
 {
+	if(self.githubApiToken.isFirstResponder)
+	{
+		[self commitToken];
+	}
+
 	NSString *originalName = [self.refreshRepoList titleForState:UIControlStateNormal];
 	[self.refreshRepoList setTitle:@"Loading..." forState:UIControlStateNormal];
 	self.refreshRepoList.enabled = NO;
@@ -84,12 +127,12 @@
 		self.repositories.hidden = NO;
 		self.githubApiToken.hidden = NO;
 
-		thereWereChanges = YES;
+		[AppDelegate shared].preferencesDirty = YES;
 
 		if(!success)
 		{
 			[[[UIAlertView alloc] initWithTitle:@"Error"
-										message:@"Could not refresh repository list, please try again later"
+										message:@"Could not refresh repository list, please ensure that the token you are using is valid"
 									   delegate:nil
 							  cancelButtonTitle:@"OK"
 							  otherButtonTitles:nil] show];
@@ -123,7 +166,7 @@
 	repo.active = @(!repo.active.boolValue);
 	[[AppDelegate shared].dataManager saveDB];
 	[tableView deselectRowAtIndexPath:indexPath animated:NO];
-	thereWereChanges = YES;
+	[AppDelegate shared].preferencesDirty = YES;
 }
 
 #pragma mark - Fetched results controller
@@ -224,6 +267,32 @@
 		cell.accessoryType = UITableViewCellAccessoryCheckmark;
 	else
 		cell.accessoryType = UITableViewCellAccessoryNone;
+}
+
+- (IBAction)iphoneSelection:(UIBarButtonItem *)sender
+{
+	[[self selectionSheet] showInView:self.view];
+}
+- (IBAction)ipadSelection:(UIBarButtonItem *)sender
+{
+	[[self selectionSheet] showFromBarButtonItem:sender animated:NO];
+}
+- (UIActionSheet *)selectionSheet
+{
+	return [[UIActionSheet alloc] initWithTitle:self.title
+									   delegate:self
+							  cancelButtonTitle:@"Cancel"
+						 destructiveButtonTitle:nil
+							  otherButtonTitles:@"Select All", @"Unselect All", nil];
+}
+
+- (void)actionSheet:(UIActionSheet *)actionSheet willDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+	if(buttonIndex==2) return;
+	NSNumber *selection = @(buttonIndex==0);
+	NSArray *allRepos = [Repo allReposSortedByField:nil withTitleFilter:nil inMoc:[AppDelegate shared].dataManager.managedObjectContext];
+	for(Repo *r in allRepos) r.active = selection;
+	[AppDelegate shared].preferencesDirty = YES;
 }
 
 @end

@@ -16,4 +16,6 @@
 
 - (BOOL)saveDB;
 
+- (void)sendNotifications;
+
 @end
