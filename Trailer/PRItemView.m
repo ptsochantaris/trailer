@@ -52,7 +52,7 @@ static CGColorRef _highlightColor;
 		_userInfo = userInfo;
 
 		NSInteger _commentsNew=0;
-		NSInteger _commentsTotal = [PRComment countCommentsForPullRequestUrl:pullRequest.url inMoc:[AppDelegate shared].managedObjectContext];
+		NSInteger _commentsTotal = [PRComment countCommentsForPullRequestUrl:pullRequest.url inMoc:[AppDelegate shared].dataManager.managedObjectContext];
 		if([AppDelegate shared].api.showCommentsEverywhere || pullRequest.isMine || pullRequest.commentedByMe)
 		{
 			_commentsNew = [pullRequest unreadCommentCount];

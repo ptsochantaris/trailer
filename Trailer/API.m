@@ -8,17 +8,27 @@
 
 @implementation API
 
+#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
+	#define CACHE_MEMORY 1024*1024*4
+	#define CACHE_DISK 1024*1024*128
+#else
+	#define CACHE_MEMORY 1024*1024*2
+	#define CACHE_DISK 0
+#endif
+
 - (id)init
 {
     self = [super init];
     if (self) {
 
-		NSURLCache *cache = [[NSURLCache alloc] initWithMemoryCapacity:1024*1024*4
-														  diskCapacity:1024*1024*128
+		NSURLCache *cache = [[NSURLCache alloc] initWithMemoryCapacity:CACHE_MEMORY
+														  diskCapacity:CACHE_DISK
 															  diskPath:nil];
 		[NSURLCache setSharedURLCache:cache];
 
-		dateFormatter = [[NSDateFormatter alloc] initWithDateFormat:@"YYYY-MM-DDTHH:MM:SSZ" allowNaturalLanguage:NO];
+		dateFormatter = [[NSDateFormatter alloc] init];
+		dateFormatter.dateFormat = @"YYYY-MM-DDTHH:MM:SSZ";
+
 		requestQueue = [[NSOperationQueue alloc] init];
 		requestQueue.maxConcurrentOperationCount = 8;
 
@@ -97,6 +107,20 @@
 -(void)error:(NSString*)errorString
 {
 	DLog(@"Failed to fetch %@",errorString);
+}
+
+- (void)updateLimitFromServer
+{
+	[self getRateLimitAndCallback:^(long long remaining, long long limit, long long reset) {
+		self.requestsRemaining = remaining;
+		self.requestsLimit = limit;
+		if(reset>=0)
+		{
+			[[NSNotificationCenter defaultCenter] postNotificationName:RATE_UPDATE_NOTIFICATION
+																object:nil
+															  userInfo:nil];
+		}
+	}];
 }
 
 -(void)fetchCommentsForCurrentPullRequestsToMoc:(NSManagedObjectContext *)moc andCallback:(void (^)(BOOL))callback
@@ -181,8 +205,14 @@
 		if(success)
 		{
 			NSManagedObjectContext *syncContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
-			syncContext.parentContext = [AppDelegate shared].managedObjectContext;
+			syncContext.parentContext = [AppDelegate shared].dataManager.managedObjectContext;
 			syncContext.undoManager = nil;
+
+			NSArray *items = [PullRequest itemsOfType:@"Repo" surviving:YES inMoc:syncContext];
+			for(DataItem *i in items) i.postSyncAction = @(kPostSyncDelete);
+
+			items = [PullRequest itemsOfType:@"Org" surviving:YES inMoc:syncContext];
+			for(DataItem *i in items) i.postSyncAction = @(kPostSyncDelete);
 
 			[self syncOrgsToMoc:syncContext andCallback:^(BOOL success) {
 				if(!success)
@@ -206,6 +236,18 @@
 									if(ok) ok = success;
 									if(callback)
 									{
+										if(ok)
+										{
+											[DataItem nukeDeletedItemsOfType:@"Repo" inMoc:syncContext];
+											[DataItem nukeDeletedItemsOfType:@"Org" inMoc:syncContext];
+										}
+										else
+										{
+											NSError *error = [NSError errorWithDomain:@"YOUR_ERROR_DOMAIN"
+																				 code:101
+																			 userInfo:@{NSLocalizedDescriptionKey:@"Error while fetching data from GitHub, please check that the token you have provided is correct and that you have a working network connection"}];
+											DLog(@"%@",error);
+										}
 										if(ok && syncContext.hasChanges) [syncContext save:nil];
 										callback(ok);
 									}
@@ -294,7 +336,7 @@
 		if(success)
 		{
 			NSManagedObjectContext *syncContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSConfinementConcurrencyType];
-			syncContext.parentContext = [AppDelegate shared].managedObjectContext;
+			syncContext.parentContext = [AppDelegate shared].dataManager.managedObjectContext;
 			syncContext.undoManager = nil;
 
 			NSArray *prs = [PullRequest itemsOfType:@"PullRequest" surviving:YES inMoc:syncContext];
@@ -476,9 +518,9 @@
 	[self get:path
    parameters:params
 	  success:^(NSHTTPURLResponse *response, id data) {
-		  long long requestsRemaining = [[response allHeaderFields][@"X-RateLimit-Remaining"] longLongValue];
-		  long long requestLimit = [[response allHeaderFields][@"X-RateLimit-Limit"] longLongValue];
-		  long long epochSeconds = [[response allHeaderFields][@"X-RateLimit-Reset"] longLongValue];
+		  self.requestsRemaining = [[response allHeaderFields][@"X-RateLimit-Remaining"] floatValue];
+		  self.requestsLimit = [[response allHeaderFields][@"X-RateLimit-Limit"] floatValue];
+		  float epochSeconds = [[response allHeaderFields][@"X-RateLimit-Reset"] floatValue];
 		  NSDate *date = [NSDate dateWithTimeIntervalSince1970:epochSeconds];
 		  NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
 		  formatter.dateStyle = NSDateFormatterMediumStyle;
@@ -486,8 +528,7 @@
 		  self.resetDate = [formatter stringFromDate:date];
 		  [[NSNotificationCenter defaultCenter] postNotificationName:RATE_UPDATE_NOTIFICATION
 															  object:nil
-															userInfo:@{ RATE_UPDATE_NOTIFICATION_LIMIT_KEY: @(requestLimit),
-																		RATE_UPDATE_NOTIFICATION_REMAINING_KEY: @(requestsRemaining) }];
+															userInfo:nil];
 		  if(callback) callback(data, [API lastPage:response], response.statusCode);
 	  } failure:^(NSHTTPURLResponse *response, NSError *error) {
 		  DLog(@"Failure: %@",error);
@@ -582,7 +623,7 @@
 }
 
 - (NSOperation *)getImage:(NSString *)path
-				  success:(void(^)(NSHTTPURLResponse *response, NSImage *image))successCallback
+				  success:(void(^)(NSHTTPURLResponse *response, NSData *imageData))successCallback
 				  failure:(void(^)(NSHTTPURLResponse *response, NSError *error))failureCallback
 {
 	NSBlockOperation *o = [NSBlockOperation blockOperationWithBlock:^{
@@ -614,12 +655,10 @@
 			DLog(@"GET IMAGE %@ - RESULT: %ld",path,(long)response.statusCode);
 			if(successCallback)
 			{
-				NSImage *returnedImage = nil;
 				if(data.length)
 				{
-					returnedImage = [[NSImage alloc] initWithData:data];
 					dispatch_async(dispatch_get_main_queue(), ^{
-						successCallback(response,returnedImage);
+						successCallback(response, data);
 					});
 				}
 				else

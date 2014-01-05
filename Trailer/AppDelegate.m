@@ -1,10 +1,6 @@
 
 @implementation AppDelegate
 
-@synthesize persistentStoreCoordinator = _persistentStoreCoordinator;
-@synthesize managedObjectModel = _managedObjectModel;
-@synthesize managedObjectContext = _managedObjectContext;
-
 static AppDelegate *_static_shared_ref;
 +(AppDelegate *)shared { return _static_shared_ref; }
 
@@ -30,6 +26,7 @@ static AppDelegate *_static_shared_ref;
 
 	_static_shared_ref = self;
 
+	self.dataManager = [[DataManager alloc] init];
 	self.api = [[API alloc] init];
 
 	[self setupSortMethodMenu];
@@ -158,10 +155,6 @@ static AppDelegate *_static_shared_ref;
 	return YES;
 }
 
-#define PULL_REQUEST_ID_KEY @"pullRequestIdKey"
-#define COMMENT_ID_KEY @"commentIdKey"
-#define NOTIFICATION_URL_KEY @"urlKey"
-
 -(void)userNotificationCenter:(NSUserNotificationCenter *)center didActivateNotification:(NSUserNotification *)notification
 {
 	switch (notification.activationType)
@@ -178,15 +171,15 @@ static AppDelegate *_static_shared_ref;
 				PullRequest *pullRequest = nil;
 				if(itemId) // it's a pull request
 				{
-					pullRequest = [PullRequest itemOfType:@"PullRequest" serverId:itemId moc:self.managedObjectContext];
+					pullRequest = [PullRequest itemOfType:@"PullRequest" serverId:itemId moc:self.dataManager.managedObjectContext];
 					urlToOpen = pullRequest.webUrl;
 				}
 				else // it's a comment
 				{
 					itemId = notification.userInfo[COMMENT_ID_KEY];
-					PRComment *c = [PRComment itemOfType:@"PRComment" serverId:itemId moc:self.managedObjectContext];
+					PRComment *c = [PRComment itemOfType:@"PRComment" serverId:itemId moc:self.dataManager.managedObjectContext];
 					urlToOpen = c.webUrl;
-					pullRequest = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:self.managedObjectContext];
+					pullRequest = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:self.dataManager.managedObjectContext];
 				}
 				[pullRequest catchUpWithComments];
 			}
@@ -213,7 +206,7 @@ static AppDelegate *_static_shared_ref;
 		{
 			notification.title = @"New PR Comment";
 			notification.informativeText = [item body];
-			PullRequest *associatedRequest = [PullRequest pullRequestWithUrl:[item pullRequestUrl] moc:self.managedObjectContext];
+			PullRequest *associatedRequest = [PullRequest pullRequestWithUrl:[item pullRequestUrl] moc:self.dataManager.managedObjectContext];
 			notification.userInfo = @{COMMENT_ID_KEY:[item serverId]};
 			notification.subtitle = associatedRequest.title;
 			break;
@@ -239,7 +232,7 @@ static AppDelegate *_static_shared_ref;
 
 - (void)prItemSelected:(PRItemView *)item
 {
-	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:item.userInfo moc:self.managedObjectContext];
+	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:item.userInfo moc:self.dataManager.managedObjectContext];
 	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:r.webUrl]];
 	[r catchUpWithComments];
 	[self updateMenu];
@@ -250,39 +243,47 @@ static AppDelegate *_static_shared_ref;
 	if(self.statusItemView.highlighted)
 	{
 		[self closeMenu];
-		return;
 	}
-	self.statusItemView.highlighted = YES;
-	if(!self.isRefreshing)
+	else
 	{
-		NSString *prefix;
-		if(self.api.localUser)
+		self.statusItemView.highlighted = YES;
+		[self sizeMenuAndShow:YES];
+	}
+}
+
+-(void)menuWillOpen:(NSMenu *)menu
+{
+    if([[menu title] isEqualToString:@"Options"])
+	{
+		if(!self.isRefreshing)
 		{
-			prefix = [NSString stringWithFormat:@" Refresh %@",self.api.localUser];
-		}
-		else
-		{
-			prefix = @" Refresh";
-		}
-		if(self.lastUpdateFailed)
-		{
-			self.refreshNow.title = [prefix stringByAppendingString:@" (last update failed!)"];
-		}
-		else
-		{
-			long ago = (long)[[NSDate date] timeIntervalSinceDate:self.lastSuccessfulRefresh];
-			if(ago<10)
+			NSString *prefix;
+			if(self.api.localUser)
 			{
-				self.refreshNow.title = [prefix stringByAppendingString:@" (just updated)"];
+				prefix = [NSString stringWithFormat:@" Refresh %@",self.api.localUser];
 			}
 			else
 			{
-				self.refreshNow.title = [NSString stringWithFormat:@"%@ (updated %ld seconds ago)",prefix,(long)ago];
+				prefix = @" Refresh";
+			}
+			if(self.lastUpdateFailed)
+			{
+				self.refreshNow.title = [prefix stringByAppendingString:@" (last update failed!)"];
+			}
+			else
+			{
+				long ago = (long)[[NSDate date] timeIntervalSinceDate:self.lastSuccessfulRefresh];
+				if(ago<10)
+				{
+					self.refreshNow.title = [prefix stringByAppendingString:@" (just updated)"];
+				}
+				else
+				{
+					self.refreshNow.title = [NSString stringWithFormat:@"%@ (updated %ld seconds ago)",prefix,(long)ago];
+				}
 			}
 		}
-	}
-
-	[self sizeMenuAndShow:YES];
+    }
 }
 
 - (void)sizeMenuAndShow:(BOOL)show
@@ -327,7 +328,7 @@ static AppDelegate *_static_shared_ref;
 
 - (void)sectionHeaderRemoveSelectedFrom:(SectionHeader *)header
 {
-	NSArray *mergedRequests = [PullRequest allMergedRequestsInMoc:self.managedObjectContext];
+	NSArray *mergedRequests = [PullRequest allMergedRequestsInMoc:self.dataManager.managedObjectContext];
 
 	NSAlert *alert = [[NSAlert alloc] init];
 	[alert setMessageText:[NSString stringWithFormat:@"Clear %ld merged PRs?",mergedRequests.count]];
@@ -343,18 +344,20 @@ static AppDelegate *_static_shared_ref;
 
 - (void)removeAllMergedRequests
 {
-	NSArray *mergedRequests = [PullRequest allMergedRequestsInMoc:self.managedObjectContext];
+	DataManager *dataManager = self.dataManager;
+	NSArray *mergedRequests = [PullRequest allMergedRequestsInMoc:dataManager.managedObjectContext];
 	for(PullRequest *r in mergedRequests)
-		[self.managedObjectContext deleteObject:r];
-	[self saveDB];
+		[dataManager.managedObjectContext deleteObject:r];
+	[dataManager saveDB];
 	[self updateMenu];
 }
 
 - (void)unPinSelectedFrom:(PRItemView *)item
 {
-	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:item.userInfo moc:self.managedObjectContext];
-	[self.managedObjectContext deleteObject:r];
-	[self saveDB];
+	DataManager *dataManager = self.dataManager;
+	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:item.userInfo moc:dataManager.managedObjectContext];
+	[dataManager.managedObjectContext deleteObject:r];
+	[dataManager saveDB];
 	[self updateMenu];
 }
 
@@ -455,32 +458,15 @@ static AppDelegate *_static_shared_ref;
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(apiUsageUpdate:) name:RATE_UPDATE_NOTIFICATION object:nil];
 	if(self.api.authToken.length)
 	{
-		[self updateLimitFromServer];
+		[self.api updateLimitFromServer];
 	}
-}
-
-- (void)updateLimitFromServer
-{
-	[self.api getRateLimitAndCallback:^(long long remaining, long long limit, long long reset) {
-		if(reset>=0)
-		{
-			[[NSNotificationCenter defaultCenter] postNotificationName:RATE_UPDATE_NOTIFICATION
-																object:nil
-															  userInfo:@{
-																		 RATE_UPDATE_NOTIFICATION_LIMIT_KEY:@(limit),
-																		 RATE_UPDATE_NOTIFICATION_REMAINING_KEY:@(remaining)
-																		 }];
-		}
-	}];
 }
 
 - (void)apiUsageUpdate:(NSNotification *)n
 {
 	[self.apiLoad setIndeterminate:NO];
-	long long remaining = [n.userInfo[RATE_UPDATE_NOTIFICATION_REMAINING_KEY] longLongValue];
-	long long limit = [n.userInfo[RATE_UPDATE_NOTIFICATION_LIMIT_KEY] longLongValue];
-	self.apiLoad.maxValue = limit;
-	self.apiLoad.doubleValue = limit-remaining;
+	self.apiLoad.maxValue = self.api.requestsLimit;
+	self.apiLoad.doubleValue = self.api.requestsLimit-self.api.requestsRemaining;
 }
 
 
@@ -489,26 +475,7 @@ static AppDelegate *_static_shared_ref;
 	[self prepareForRefresh];
 	[self controlTextDidChange:nil];
 
-	NSArray *items = [PullRequest itemsOfType:@"Repo" surviving:YES inMoc:self.managedObjectContext];
-	for(DataItem *i in items) i.postSyncAction = @(kPostSyncDelete);
-
-	items = [PullRequest itemsOfType:@"Org" surviving:YES inMoc:self.managedObjectContext];
-	for(DataItem *i in items) i.postSyncAction = @(kPostSyncDelete);
-
 	[self.api fetchRepositoriesAndCallback:^(BOOL success) {
-
-		if(!success)
-		{
-            NSError *error = [NSError errorWithDomain:@"YOUR_ERROR_DOMAIN"
-												 code:101
-											 userInfo:@{NSLocalizedDescriptionKey:@"Error while fetching data from GitHub, please check that the token you have provided is correct and that you have a working network connection"}];
-            [[NSApplication sharedApplication] presentError:error];
-		}
-		else
-		{
-			[DataItem nukeDeletedItemsOfType:@"Repo" inMoc:self.managedObjectContext];
-			[DataItem nukeDeletedItemsOfType:@"Org" inMoc:self.managedObjectContext];
-		}
 		[self completeRefresh];
 	}];
 }
@@ -554,13 +521,11 @@ static AppDelegate *_static_shared_ref;
 {
 	self.preferencesDirty = YES;
 	self.lastSuccessfulRefresh = nil;
-	[DataItem deleteAllObjectsInContext:self.managedObjectContext
-							 usingModel:self.managedObjectModel];
+	[DataItem deleteAllObjectsInContext:self.dataManager.managedObjectContext
+							 usingModel:self.dataManager.managedObjectModel];
 	[self.projectsTable reloadData];
 	[self updateMenu];
 }
-
-
 
 - (IBAction)markAllReadSelected:(NSMenuItem *)sender
 {
@@ -574,7 +539,7 @@ static AppDelegate *_static_shared_ref;
 	[self.refreshTimer invalidate];
 	self.refreshTimer = nil;
 
-	[self updateLimitFromServer];
+	[self.api updateLimitFromServer];
 
 	[self.sortModeSelect selectItemAtIndex:self.api.sortMethod];
 
@@ -636,7 +601,7 @@ static AppDelegate *_static_shared_ref;
 {
 	NSArray *allRepos = [Repo allReposSortedByField:@"fullName"
 									withTitleFilter:self.repoFilter.stringValue
-											  inMoc:self.managedObjectContext];
+											  inMoc:self.dataManager.managedObjectContext];
 	return allRepos;
 }
 
@@ -668,182 +633,14 @@ static AppDelegate *_static_shared_ref;
 	NSArray *allRepos = [self getFileterdRepos];
 	Repo *r = allRepos[row];
 	r.active = @([object boolValue]);
-	[self saveDB];
+	[self.dataManager saveDB];
 	self.preferencesDirty = YES;
-}
-
-/////////////////////////////////// Core Data
-
-// Returns the directory the application uses to store the Core Data store file. This code uses a directory named "com.housetrip.Trailer" in the user's Application Support directory.
-- (NSURL *)applicationFilesDirectory
-{
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSURL *appSupportURL = [[fileManager URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject];
-    appSupportURL = [appSupportURL URLByAppendingPathComponent:@"com.housetrip.Trailer"];
-	DLog(@"Files in %@",appSupportURL);
-	return appSupportURL;
-}
-
-// Creates if necessary and returns the managed object model for the application.
-- (NSManagedObjectModel *)managedObjectModel
-{
-    if (_managedObjectModel) {
-        return _managedObjectModel;
-    }
-	
-    NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"Trailer" withExtension:@"momd"];
-    _managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
-    return _managedObjectModel;
-}
-
-// Returns the persistent store coordinator for the application. This implementation creates and return a coordinator, having added the store for the application to it. (The directory for the store is created, if necessary.)
-- (NSPersistentStoreCoordinator *)persistentStoreCoordinator
-{
-    if (_persistentStoreCoordinator) {
-        return _persistentStoreCoordinator;
-    }
-    
-    NSManagedObjectModel *mom = [self managedObjectModel];
-	NSPersistentStoreCoordinator *coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:mom];
-
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSURL *applicationFilesDirectory = [self applicationFilesDirectory];
-    NSError *error = nil;
-    
-    NSDictionary *properties = [applicationFilesDirectory resourceValuesForKeys:@[NSURLIsDirectoryKey] error:&error];
-    
-    if (!properties) {
-        BOOL ok = NO;
-        if ([error code] == NSFileReadNoSuchFileError) {
-            ok = [fileManager createDirectoryAtPath:[applicationFilesDirectory path] withIntermediateDirectories:YES attributes:nil error:&error];
-        }
-        if (!ok) {
-            [[NSApplication sharedApplication] presentError:error];
-            return nil;
-        }
-    } else {
-        if (![properties[NSURLIsDirectoryKey] boolValue]) {
-            // Customize and localize this error.
-            NSString *failureDescription = [NSString stringWithFormat:@"Expected a folder to store application data, found a file (%@).", [applicationFilesDirectory path]];
-            
-            NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-            [dict setValue:failureDescription forKey:NSLocalizedDescriptionKey];
-            error = [NSError errorWithDomain:@"YOUR_ERROR_DOMAIN" code:101 userInfo:dict];
-            
-            [[NSApplication sharedApplication] presentError:error];
-            return nil;
-        }
-    }
-
-	NSURL *sqlStore = [applicationFilesDirectory URLByAppendingPathComponent:@"Trailer.sqlite"];
-
-	// migrate to SQLite if needed
-    NSURL *xmlStore = [applicationFilesDirectory URLByAppendingPathComponent:@"Trailer.storedata"];
-	if([fileManager fileExistsAtPath:xmlStore.path])
-	{
-		DLog(@"MIGRATING TO SQLITE");
-		[self removeDatabaseFiles];
-
-		NSPersistentStore *xml = [coordinator addPersistentStoreWithType:NSXMLStoreType
-														   configuration:nil
-																	 URL:xmlStore
-																 options:@{ NSMigratePersistentStoresAutomaticallyOption: @YES,
-																			NSInferMappingModelAutomaticallyOption: @YES }
-																   error:nil];
-
-		if([coordinator migratePersistentStore:xml
-										 toURL:sqlStore
-									   options:nil
-									  withType:NSSQLiteStoreType
-										 error:nil])
-		{
-			[fileManager removeItemAtURL:xmlStore error:nil];
-			DLog(@"Deleted old XML store");
-		}
-		self.justMigrated = YES;
-	}
-	else
-	{
-		NSDictionary *m = [NSPersistentStoreCoordinator metadataForPersistentStoreOfType:NSSQLiteStoreType URL:sqlStore error:&error];
-		self.justMigrated = ![mom isConfiguration:nil compatibleWithStoreMetadata:m];
-
-		if (![coordinator addPersistentStoreWithType:NSSQLiteStoreType
-									   configuration:nil
-												 URL:sqlStore
-											 options:@{ NSMigratePersistentStoresAutomaticallyOption: @YES,
-														NSInferMappingModelAutomaticallyOption: @YES }
-											   error:&error]) {
-			[[NSApplication sharedApplication] presentError:error];
-			return nil;
-		}
-	}
-    _persistentStoreCoordinator = coordinator;
-    
-    return _persistentStoreCoordinator;
-}
-
-- (void)removeDatabaseFiles
-{
-    NSFileManager *fm = [NSFileManager defaultManager];
-    NSString *documentsDirectory = [self applicationFilesDirectory].path;
-    NSArray *files = [fm contentsOfDirectoryAtPath:documentsDirectory error:nil];
-    for(NSString *file in files)
-    {
-        if([file rangeOfString:@"Trailer.sqlite"].location!=NSNotFound)
-        {
-            DLog(@"Removing old database file: %@",file);
-            [fm removeItemAtPath:[documentsDirectory stringByAppendingPathComponent:file] error:nil];
-        }
-    }
-}
-
-// Returns the managed object context for the application (which is already bound to the persistent store coordinator for the application.) 
-- (NSManagedObjectContext *)managedObjectContext
-{
-    if (_managedObjectContext) {
-        return _managedObjectContext;
-    }
-    
-    NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
-    if (!coordinator) {
-		NSFileManager *fm = [NSFileManager defaultManager];
-		NSURL *applicationFilesDirectory = [self applicationFilesDirectory];
-		NSURL *url = [applicationFilesDirectory URLByAppendingPathComponent:@"Trailer.storedata"];
-		[fm removeItemAtURL:url error:nil];
-        return self.managedObjectContext;
-    }
-    _managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
-	_managedObjectContext.undoManager = nil;
-    [_managedObjectContext setPersistentStoreCoordinator:coordinator];
-
-    return _managedObjectContext;
 }
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
 {
-    // Save changes in the application's managed object context before the application terminates.
-    
-    if (!_managedObjectContext) {
-        return NSTerminateNow;
-    }
-    
-    if (![[self managedObjectContext] commitEditing]) {
-        DLog(@"%@:%@ unable to commit editing to terminate", [self class], NSStringFromSelector(_cmd));
-        return NSTerminateCancel;
-    }
-    
-    if (![[self managedObjectContext] hasChanges]) {
-        return NSTerminateNow;
-    }
-
-	[self saveDB];
+	[self.dataManager saveDB];
     return NSTerminateNow;
-}
-
-- (void)saveDB
-{
-	if(self.managedObjectContext.hasChanges)
-		[self.managedObjectContext save:nil];
 }
 
 - (void)scrollToTop
@@ -928,7 +725,7 @@ static AppDelegate *_static_shared_ref;
 
 - (IBAction)refreshNowSelected:(NSMenuItem *)sender
 {
-	NSArray *activeRepos = [Repo activeReposInMoc:self.managedObjectContext];
+	NSArray *activeRepos = [Repo activeReposInMoc:self.dataManager.managedObjectContext];
 	if(activeRepos.count==0)
 	{
 		[self preferencesSelected:nil];
@@ -970,12 +767,12 @@ static AppDelegate *_static_shared_ref;
 	[self.githubTokenHolder setEnabled:NO];
 	[self.activityDisplay startAnimation:nil];
 	self.statusItemView.grayOut = YES;
-	if(self.justMigrated)
+	if(self.dataManager.justMigrated)
 	{
 		DLog(@"FORCING ALL PRS TO BE REFETCHED");
-		NSArray *prs = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.managedObjectContext];
+		NSArray *prs = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.dataManager.managedObjectContext];
 		for(PullRequest *r in prs) r.updatedAt = [NSDate distantPast];
-		self.justMigrated = NO;
+		self.dataManager.justMigrated = NO;
 	}
 }
 
@@ -987,7 +784,7 @@ static AppDelegate *_static_shared_ref;
 	[self.githubTokenHolder setEnabled:YES];
 	[self.clearAll setEnabled:YES];
 	[self.activityDisplay stopAnimation:nil];
-	[self saveDB];
+	[self.dataManager saveDB];
 	[self.projectsTable reloadData];
 	[self updateMenu];
 	[self checkApiUsage];
@@ -1051,17 +848,19 @@ static AppDelegate *_static_shared_ref;
 
 -(void)sendNotifications
 {
-	NSArray *latestPrs = [PullRequest newItemsOfType:@"PullRequest" inMoc:self.managedObjectContext];
+	DataManager *dataManager = self.dataManager;
+
+	NSArray *latestPrs = [PullRequest newItemsOfType:@"PullRequest" inMoc:dataManager.managedObjectContext];
 	for(PullRequest *r in latestPrs)
 	{
 		[self postNotificationOfType:kNewPr forItem:r];
 		r.postSyncAction = @(kPostSyncDoNothing);
 	}
 
-	NSArray *latestComments = [PRComment newItemsOfType:@"PRComment" inMoc:self.managedObjectContext];
+	NSArray *latestComments = [PRComment newItemsOfType:@"PRComment" inMoc:dataManager.managedObjectContext];
 	for(PRComment *c in latestComments)
 	{
-		PullRequest *r = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:self.managedObjectContext];
+		PullRequest *r = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:dataManager.managedObjectContext];
 		if(self.api.showCommentsEverywhere || r.isMine || r.commentedByMe)
 		{
 			if(![c.userId.stringValue isEqualToString:self.api.localUserId])
@@ -1071,7 +870,7 @@ static AppDelegate *_static_shared_ref;
 		}
 		c.postSyncAction = @(kPostSyncDoNothing);
 	}
-	[self saveDB];
+	[dataManager saveDB];
 }
 
 - (NSArray *)pullRequestList
@@ -1085,14 +884,14 @@ static AppDelegate *_static_shared_ref;
 	NSArray *pullRequests = [PullRequest pullRequestsSortedByField:sortCriterion
 															filter:self.mainMenuFilter.stringValue
 														 ascending:!self.api.sortDescending
-															 inMoc:self.managedObjectContext];
+															 inMoc:self.dataManager.managedObjectContext];
 	return pullRequests;
 }
 
 - (void)updateMenu
 {
 	NSArray *pullRequests = [self pullRequestList];
-	NSString *countString = [NSString stringWithFormat:@"%ld",[PullRequest countUnmergedRequestsInMoc:self.managedObjectContext]];
+	NSString *countString = [NSString stringWithFormat:@"%ld",[PullRequest countUnmergedRequestsInMoc:self.dataManager.managedObjectContext]];
 	NSInteger newCommentCount = [self buildPrMenuItemsFromList:pullRequests];
 
 	DLog(@"Updating menu, %@ total PRs",countString);
@@ -1146,7 +945,7 @@ static AppDelegate *_static_shared_ref;
 	{
 		r.active = @YES;
 	}
-	[self saveDB];
+	[self.dataManager saveDB];
 	[self.projectsTable reloadData];
 	self.preferencesDirty = YES;
 }
@@ -1158,7 +957,7 @@ static AppDelegate *_static_shared_ref;
 	{
 		r.active = @NO;
 	}
-	[self saveDB];
+	[self.dataManager saveDB];
 	[self.projectsTable reloadData];
 	self.preferencesDirty = YES;
 }

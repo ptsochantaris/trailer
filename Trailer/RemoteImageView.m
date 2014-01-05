@@ -19,8 +19,8 @@
 		patienceTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(startSpinner) userInfo:nil repeats:NO];
 
 		[[AppDelegate shared].api getImage:urlPath
-								   success:^(NSHTTPURLResponse *response, NSImage *image) {
-									   self.image = image;
+								   success:^(NSHTTPURLResponse *response, NSData *imageData) {
+									   self.image = [[NSImage alloc] initWithData:imageData];
 									   [self done];
 								   } failure:^(NSHTTPURLResponse *response, NSError *error) {
 									   [self done];

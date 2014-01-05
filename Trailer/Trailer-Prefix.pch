@@ -4,6 +4,8 @@
 //  The contents of this file are implicitly included at the beginning of every source file.
 //
 
+#import <Availability.h>
+
 #ifdef __OBJC__
 
 	#define MENU_WIDTH 500.0
@@ -12,8 +14,6 @@
 	#define DLog(...)
 
 	#import <Cocoa/Cocoa.h>
-	#import <SystemConfiguration/SystemConfiguration.h>
-	#import <CoreServices/CoreServices.h>
 	#import <Foundation/Foundation.h>
 	#import <CoreData/CoreData.h>
 	#import "NSDictionary+NSDictionary_OFK.h"
@@ -35,5 +35,6 @@
 	#import "MenuScrollView.h"
 	#import "MenuWindow.h"
 	#import "HTPopTimer.h"
+	#import "DataManager.h"
 	#import "AppDelegate.h"
 #endif

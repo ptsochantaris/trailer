@@ -1,0 +1,35 @@
+//
+//  Prefix header
+//
+//  The contents of this file are implicitly included at the beginning of every source file.
+//
+
+#import <Availability.h>
+
+#ifdef __OBJC__
+
+#define DLog(fmt, ...) NSLog(fmt, ##__VA_ARGS__)
+//#define DLog(...)
+
+#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
+#import <CoreData/CoreData.h>
+
+#import "NSDictionary+NSDictionary_OFK.h"
+#import "Reachability.h"
+#import "API.h"
+#import "DataItem.h"
+#import "PRComment.h"
+#import "Org.h"
+#import "Repo.h"
+#import "PullRequest.h"
+#import "HTPopTimer.h"
+#import "DataManager.h"
+#import "ImageFunctions.h"
+#import "UIImage+Scale.h"
+#import "MasterViewController.h"
+#import "DetailViewController.h"
+#import "PreferencesViewController.h"
+#import "AppDelegate.h"
+
+#endif
