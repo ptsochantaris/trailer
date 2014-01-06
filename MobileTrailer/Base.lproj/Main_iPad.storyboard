@@ -187,7 +187,7 @@
                                 <rect key="frame" x="20" y="80" width="984" height="30"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits"/>
+                                <textInputTraits key="textInputTraits" returnKeyType="done"/>
                                 <connections>
                                     <outlet property="delegate" destination="qtb-G3-HJM" id="g0H-hI-7Ji"/>
                                 </connections>

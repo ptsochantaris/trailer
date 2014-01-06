@@ -1,7 +1,11 @@
 
-@interface MasterViewController ()
+@interface MasterViewController () <UITextFieldDelegate>
 {
 	NSDateFormatter *itemDateFormatter;
+
+    // Filtering
+    UITextField *searchField;
+    HTPopTimer *searchTimer;
 }
 
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
@@ -29,6 +33,23 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
+    searchTimer = [[HTPopTimer alloc] initWithTimeInterval:0.5 target:self selector:@selector(searchTimerPopped)];
+
+    searchField = [[UITextField alloc] initWithFrame:CGRectMake(10, 10, 300, 31)];
+	searchField.placeholder = @"Filter...";
+	searchField.returnKeyType = UIReturnKeySearch;
+	searchField.font = [UIFont systemFontOfSize:18.0];
+	searchField.borderStyle = UITextBorderStyleRoundedRect;
+	searchField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
+	searchField.clearButtonMode = UITextFieldViewModeAlways;
+	searchField.autocapitalizationType = UITextAutocapitalizationTypeNone;
+	searchField.autocorrectionType = UITextAutocorrectionTypeNo;
+    searchField.delegate = self;
+
+    UIView *searchHolder = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 50)];
+	[searchHolder addSubview:searchField];
+	self.tableView.tableHeaderView = searchHolder;
 
 	self.detailViewController = (DetailViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
 	itemDateFormatter = [[NSDateFormatter alloc] init];
@@ -203,6 +224,9 @@
     // Edit the entity name as appropriate.
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"PullRequest" inManagedObjectContext:self.managedObjectContext];
     [fetchRequest setEntity:entity];
+
+    if(searchField.text.length)
+        [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"title CONTAINS [cd] %@ OR userLogin CONTAINS [cd] %@",searchField.text,searchField.text]];
     
     // Set the batch size to a suitable number.
     [fetchRequest setFetchBatchSize:20];
@@ -230,11 +254,6 @@
     
     return _fetchedResultsController;
 }    
-
-/*- (void)controllerDidChangeContent:(NSFetchedResultsController *)controller
-{
-	[self.tableView reloadData];
-}*/
 
 - (void)controllerWillChangeContent:(NSFetchedResultsController *)controller
 {
@@ -306,6 +325,43 @@
 									   cell.imageView.image = nil;
 								   }];
 	}
+}
+
+///////////////////////////// filtering
+
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
+{
+    if(searchField.isFirstResponder)
+    {
+        [searchField resignFirstResponder];
+    }
+}
+
+- (BOOL)textFieldShouldClear:(UITextField *)textField
+{
+    textField.text = nil;
+    _fetchedResultsController = nil;
+    [self.tableView reloadData];
+    return NO;
+}
+
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
+{
+	if([string isEqualToString:@"\n"])
+	{
+		[textField resignFirstResponder];
+	}
+	else
+	{
+        [searchTimer push];
+	}
+	return YES;
+}
+
+- (void)searchTimerPopped
+{
+    _fetchedResultsController = nil;
+    [self.tableView reloadData];
 }
 
 @end
