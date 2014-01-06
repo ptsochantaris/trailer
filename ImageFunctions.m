@@ -1,10 +1,3 @@
-//
-//  ImageFunctions.m
-//  MyCommute
-//
-//  Created by Paul Tsochantaris on 9/2/13.
-//  Copyright (c) 2013 Paul Tsochantaris. All rights reserved.
-//
 
 const double		kRadPerDeg	= 0.0174532925199433;	// pi / 180
 

@@ -1,10 +1,3 @@
-//
-//  ImageFunctions.h
-//  MyCommute
-//
-//  Created by Paul Tsochantaris on 9/2/13.
-//  Copyright (c) 2013 Paul Tsochantaris. All rights reserved.
-//
 
 extern const CGBitmapInfo kDefaultCGBitmapInfo;
 extern const CGBitmapInfo kDefaultCGBitmapInfoNoAlpha;

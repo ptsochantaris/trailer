@@ -30,6 +30,7 @@
 #import "MasterViewController.h"
 #import "DetailViewController.h"
 #import "PreferencesViewController.h"
+#import "AdvancedSettingsViewController.h"
 #import "AppDelegate.h"
 
 #endif
