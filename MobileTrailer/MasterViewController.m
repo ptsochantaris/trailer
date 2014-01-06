@@ -102,6 +102,9 @@
 			[[AppDelegate shared] updateBadge];
 		});
 
+        searchField.text = nil;
+        _fetchedResultsController = nil;
+        [self.tableView reloadData];
 		NSIndexPath *ip = [_fetchedResultsController indexPathForObject:pullRequest];
 		if(ip)
 		{
