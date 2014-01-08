@@ -316,19 +316,21 @@
     cell.textLabel.text = pr.title;
 	cell.textLabel.numberOfLines = 0;
 	cell.detailTextLabel.text = [NSString stringWithFormat:@"%@ - %@",pr.userLogin,[itemDateFormatter stringFromDate:pr.updatedAt]];
-	cell.imageView.image = [UIImage imageNamed:@"avatarPlaceHolder"];
 	cell.detailTextLabel.textColor = [UIColor grayColor];
 	NSString *imagePath = pr.userAvatarUrl;
 	if(imagePath)
 	{
-		[[AppDelegate shared].api getImage:imagePath
-								   success:^(NSHTTPURLResponse *response, NSData *imageData) {
-									   cell.imageView.image = [[UIImage imageWithData:imageData] scaleToFillSize:CGSizeMake(40, 40)];
-									   [cell setNeedsLayout];
-									   [cell setNeedsDisplay];
-								   } failure:^(NSHTTPURLResponse *response, NSError *error) {
-									   cell.imageView.image = nil;
-								   }];
+        if(![[AppDelegate shared].api haveCachedImage:imagePath
+                                              forSize:CGSizeMake(40, 40)
+                                   tryLoadAndCallback:^(id image) {
+                                       if(image)
+                                           cell.imageView.image = image;
+                                       else
+                                           cell.imageView.image = [UIImage imageNamed:@"avatarPlaceHolder"];
+                                   }])
+        {
+            cell.imageView.image = [UIImage imageNamed:@"avatarPlaceHolder"];
+        }
 	}
 }
 

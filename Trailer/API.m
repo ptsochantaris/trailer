@@ -3,6 +3,7 @@
 {
 	NSOperationQueue *requestQueue;
 	NSDateFormatter *dateFormatter;
+    NSString *cacheDirectory;
 #ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
 	NSInteger networkIndicationCount;
 #endif
@@ -37,6 +38,16 @@
 
 		self.reachability = [Reachability reachabilityWithHostName:API_SERVER];
 		[self.reachability startNotifier];
+
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        NSURL *appSupportURL = [[fileManager URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] lastObject];
+        appSupportURL = [appSupportURL URLByAppendingPathComponent:@"com.housetrip.Trailer"];
+        cacheDirectory = appSupportURL.path;
+
+        if([fileManager fileExistsAtPath:cacheDirectory])
+            [self clearImageCache];
+        else
+            [fileManager createDirectoryAtPath:cacheDirectory withIntermediateDirectories:YES attributes:nil error:nil];
 	}
     return self;
 }
@@ -641,6 +652,7 @@
 	return o;
 }
 
+// warning: now calls back on thread!!
 - (NSOperation *)getImage:(NSString *)path
 				  success:(void(^)(NSHTTPURLResponse *response, NSData *imageData))successCallback
 				  failure:(void(^)(NSHTTPURLResponse *response, NSError *error))failureCallback
@@ -670,9 +682,7 @@
 			DLog(@"GET IMAGE %@ - FAILED: %@",path,error);
 			if(failureCallback)
 			{
-				dispatch_async(dispatch_get_main_queue(), ^{
-					failureCallback(response, error);
-				});
+                failureCallback(response, error);
 			}
 		}
 		else
@@ -682,15 +692,11 @@
 			{
 				if(data.length)
 				{
-					dispatch_async(dispatch_get_main_queue(), ^{
-						successCallback(response, data);
-					});
+                    successCallback(response, data);
 				}
 				else
 				{
-					dispatch_async(dispatch_get_main_queue(), ^{
-						failureCallback(response, error);
-					});
+                    failureCallback(response, error);
 				}
 			}
 		}
@@ -720,6 +726,100 @@
 			[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 	});
 #endif
+}
+
+- (void)clearImageCache
+{
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSArray *files = [fileManager contentsOfDirectoryAtPath:cacheDirectory error:nil];
+    for(NSString *f in files)
+    {
+        if([f rangeOfString:@"imgcache-"].location==0)
+        {
+            NSString *path = [cacheDirectory stringByAppendingPathComponent:f];
+            [fileManager removeItemAtPath:path error:nil];
+        }
+    }
+}
+
+- (void)expireOldEntries
+{
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSArray *files = [fileManager contentsOfDirectoryAtPath:cacheDirectory error:nil];
+    for(NSString *f in files)
+    {
+        NSDate *now = [NSDate date];
+        if([f rangeOfString:@"imgcache-"].location==0)
+        {
+            NSString *path = [cacheDirectory stringByAppendingPathComponent:f];
+            NSError *error;
+            NSDictionary *attributes = [fileManager attributesOfItemAtPath:path error:&error];
+            NSDate *date = attributes[NSFileCreationDate];
+            if([now timeIntervalSinceDate:date]>(3600.0*24))
+                [fileManager removeItemAtPath:path error:nil];
+        }
+    }
+}
+
+- (BOOL)haveCachedImage:(NSString *)path
+                forSize:(CGSize)imageSize
+     tryLoadAndCallback:(void (^)(id image))callbackOrNil
+{
+    // mix image path, size, and app version into one md5
+	NSString *currentAppVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+    NSString *imageKey = [[NSString stringWithFormat:@"%@ %f %f %@",
+                           path,
+                           imageSize.width,
+                           imageSize.height,
+                           currentAppVersion] md5hash];
+    NSString *imagePath = [cacheDirectory stringByAppendingPathComponent:[@"imgcache-" stringByAppendingString:imageKey]];
+
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    if([fileManager fileExistsAtPath:imagePath])
+    {
+        id ret;
+#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
+        ret = [UIImage imageWithContentsOfFile:imagePath];
+#else
+        ret = [[NSImage alloc] initWithContentsOfFile:imagePath];
+#endif
+        if(ret)
+        {
+            if(callbackOrNil) callbackOrNil(ret);
+            return YES;
+        }
+        else
+        {
+            [fileManager removeItemAtPath:imagePath error:nil];
+        }
+    }
+
+    if(callbackOrNil)
+    {
+        [self getImage:path
+               success:^(NSHTTPURLResponse *response, NSData *imageData) {
+                   id image = nil;
+                   if(imageData)
+                   {
+#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
+                       image = [[UIImage imageWithData:imageData] scaleToFillPixelSize:imageSize];
+                       [UIImagePNGRepresentation(image) writeToFile:imagePath atomically:YES];
+#else
+                       image = [[[NSImage alloc] initWithData:imageData] scaleToFillSize:imageSize];
+                       [[image TIFFRepresentation] writeToFile:imagePath atomically:YES];
+#endif
+                   }
+                   dispatch_async(dispatch_get_main_queue(), ^{
+                       callbackOrNil(image);
+                   });
+               } failure:^(NSHTTPURLResponse *response, NSError *error) {
+                   dispatch_async(dispatch_get_main_queue(), ^{
+                       callbackOrNil(nil);
+                   });
+               }];
+    }
+
+    return NO;
 }
 
 @end

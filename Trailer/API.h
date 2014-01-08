@@ -40,8 +40,12 @@ sortDescending, showCreatedInsteadOfUpdated, dontKeepMyPrs, hideAvatars;
 
 - (void) getRateLimitAndCallback:(void(^)(long long remaining, long long limit, long long reset))callback;
 
-- (NSOperation *)getImage:(NSString *)path
-				  success:(void(^)(NSHTTPURLResponse *response, NSData *imageData))successCallback
-				  failure:(void(^)(NSHTTPURLResponse *response, NSError *error))failureCallback;
+- (void)expireOldEntries;
+
+- (void)clearImageCache;
+
+- (BOOL)haveCachedImage:(NSString *)path
+                forSize:(CGSize)imageSize
+     tryLoadAndCallback:(void(^)(id image))callbackOrNil;
 
 @end

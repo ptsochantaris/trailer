@@ -195,6 +195,12 @@ CGFloat GLOBAL_SCREEN_SCALE;
 	[self.refreshTimer invalidate];
 	self.refreshTimer = nil;
 
+    self.isRefreshing = YES;
+	[[NSNotificationCenter defaultCenter] postNotificationName:REFRESH_STARTED_NOTIFICATION object:nil];
+	DLog(@"Starting refresh");
+
+    [self.api expireOldEntries];
+
 	if(self.dataManager.justMigrated)
 	{
 		DLog(@"FORCING ALL PRS TO BE REFETCHED");
@@ -217,9 +223,6 @@ CGFloat GLOBAL_SCREEN_SCALE;
 -(void)startRefresh
 {
 	if(self.isRefreshing) return;
-	self.isRefreshing = YES;
-	[[NSNotificationCenter defaultCenter] postNotificationName:REFRESH_STARTED_NOTIFICATION object:nil];
-	DLog(@"Starting refresh");
 	[self prepareForRefresh];
 
 	[self.api fetchPullRequestsForActiveReposAndCallback:^(BOOL success) {

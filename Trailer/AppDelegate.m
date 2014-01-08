@@ -805,6 +805,8 @@ static AppDelegate *_static_shared_ref;
 	id oldTarget = self.refreshNow.target;
 	SEL oldAction = self.refreshNow.action;
 
+    [self.api expireOldEntries];
+
 	if(self.api.localUser)
 		self.refreshNow.title = [NSString stringWithFormat:@" Refreshing %@...",self.api.localUser];
 	else

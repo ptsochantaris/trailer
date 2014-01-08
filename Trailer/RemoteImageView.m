@@ -2,7 +2,6 @@
 @interface RemoteImageView ()
 {
 	NSProgressIndicator *spinner;
-	NSTimer *patienceTimer;
 }
 @end
 
@@ -14,18 +13,18 @@
 	if(self)
 	{
 		self.imageAlignment = NSImageAlignCenter;
-		self.imageScaling = NSImageScaleProportionallyUpOrDown;
+		self.imageScaling = NSImageScaleNone;
 
-		patienceTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(startSpinner) userInfo:nil repeats:NO];
-
-		[[AppDelegate shared].api getImage:urlPath
-								   success:^(NSHTTPURLResponse *response, NSData *imageData) {
-									   self.image = [[NSImage alloc] initWithData:imageData];
-									   [self done];
-								   } failure:^(NSHTTPURLResponse *response, NSError *error) {
-									   [self done];
-								   }];
-	}
+        if(![[AppDelegate shared].api haveCachedImage:urlPath
+                                              forSize:CGSizeMake(frameRect.size.width, frameRect.size.height)
+                                   tryLoadAndCallback:^(id image) {
+                                       self.image = image;
+                                       [self done];
+                                   }])
+        {
+            [self startSpinner];
+        }
+    }
 	return self;
 }
 
@@ -39,9 +38,6 @@
 
 - (void)done
 {
-	[patienceTimer invalidate];
-	patienceTimer = nil;
-
 	[spinner stopAnimation:self];
 	[spinner removeFromSuperview];
 	spinner = nil;

@@ -14,8 +14,10 @@
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
+#import <CommonCrypto/CommonCrypto.h>
 
 #import "NSDictionary+NSDictionary_OFK.h"
+#import "NSString+Extensions.h"
 #import "Reachability.h"
 #import "API.h"
 #import "DataItem.h"
