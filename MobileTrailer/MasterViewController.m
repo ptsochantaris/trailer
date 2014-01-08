@@ -51,6 +51,8 @@
 	[searchHolder addSubview:searchField];
 	self.tableView.tableHeaderView = searchHolder;
 
+    self.tableView.contentOffset = CGPointMake(0, 50);
+
 	self.detailViewController = (DetailViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
 	itemDateFormatter = [[NSDateFormatter alloc] init];
 	itemDateFormatter.dateStyle = NSDateFormatterShortStyle;
