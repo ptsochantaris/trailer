@@ -11,4 +11,6 @@
 
 - (void)sendNotifications;
 
+- (NSDictionary *)infoForType:(PRNotificationType)type item:(id)item;
+
 @end

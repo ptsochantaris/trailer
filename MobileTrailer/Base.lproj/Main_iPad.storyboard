@@ -135,7 +135,7 @@
                                 </segue>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" systemItem="refresh" id="vlQ-6x-FuM">
+                        <barButtonItem key="rightBarButtonItem" systemItem="action" id="vlQ-6x-FuM">
                             <connections>
                                 <action selector="phoneRefreshSelected:" destination="7bK-jq-Zjz" id="Vwd-s6-rP9"/>
                             </connections>

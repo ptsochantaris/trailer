@@ -199,6 +199,7 @@ static AppDelegate *_static_shared_ref;
 	if(self.preferencesDirty) return;
 
 	NSUserNotification *notification = [[NSUserNotification alloc] init];
+	notification.userInfo = [self.dataManager infoForType:type item:item];
 
 	switch (type)
 	{
@@ -207,21 +208,18 @@ static AppDelegate *_static_shared_ref;
 			notification.title = @"New PR Comment";
 			notification.informativeText = [item body];
 			PullRequest *associatedRequest = [PullRequest pullRequestWithUrl:[item pullRequestUrl] moc:self.dataManager.managedObjectContext];
-			notification.userInfo = @{COMMENT_ID_KEY:[item serverId]};
 			notification.subtitle = associatedRequest.title;
 			break;
 		}
 		case kNewPr:
 		{
 			notification.title = @"New PR";
-			notification.userInfo = @{PULL_REQUEST_ID_KEY:[item serverId]};
 			notification.subtitle = [item title];
 			break;
 		}
 		case kPrMerged:
 		{
 			notification.title = @"PR Merged!";
-			notification.userInfo = @{NOTIFICATION_URL_KEY:[item webUrl]};
 			notification.subtitle = [item title];
 			break;
 		}

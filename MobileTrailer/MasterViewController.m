@@ -1,5 +1,5 @@
 
-@interface MasterViewController () <UITextFieldDelegate>
+@interface MasterViewController () <UITextFieldDelegate, UIActionSheetDelegate>
 {
 	NSDateFormatter *itemDateFormatter;
 
@@ -24,10 +24,54 @@
 }
 
 - (IBAction)phoneRefreshSelected:(UIBarButtonItem *)sender {
-	[[AppDelegate shared] startRefresh];
+	[self showAction];
 }
 - (IBAction)ipadRefreshSelected:(id)sender {
-	[[AppDelegate shared] startRefresh];
+	[self showAction];
+}
+
+- (void)showAction
+{
+	UIActionSheet *a = [[UIActionSheet alloc] initWithTitle:@"Action"
+												   delegate:self
+										  cancelButtonTitle:@"Cancel"
+									 destructiveButtonTitle:@"Mark all as read"
+										  otherButtonTitles:@"Refresh Now", nil];
+	[a showFromBarButtonItem:self.navigationItem.rightBarButtonItem animated:YES];
+}
+
+- (void)actionSheet:(UIActionSheet *)actionSheet willDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+	if(buttonIndex==0)
+	{
+		[self markAllAsRead];
+	}
+	else if(buttonIndex==1)
+	{
+		[self tryRefresh];
+	}
+}
+
+- (void)tryRefresh
+{
+	if([[AppDelegate shared].api.reachability currentReachabilityStatus]==NotReachable)
+	{
+		[[[UIAlertView alloc] initWithTitle:@"No Network"
+									message:@"There is no network connectivity, please try again later"
+								   delegate:nil
+						  cancelButtonTitle:@"OK"
+						  otherButtonTitles:nil] show];
+	}
+	else
+	{
+		[[AppDelegate shared] startRefresh];
+	}
+}
+
+- (void)markAllAsRead
+{
+	for(PullRequest *p in self.fetchedResultsController.fetchedObjects) [p catchUpWithComments];
+	[[AppDelegate shared] updateBadge];
 }
 
 - (void)viewDidLoad

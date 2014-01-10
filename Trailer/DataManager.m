@@ -185,4 +185,19 @@
 	return YES;
 }
 
+- (NSDictionary *)infoForType:(PRNotificationType)type item:(id)item
+{
+	switch (type)
+	{
+		case kNewComment:
+			return @{COMMENT_ID_KEY:[item serverId]};
+		case kNewPr:
+			return @{PULL_REQUEST_ID_KEY:[item serverId]};
+		case kPrMerged:
+			return @{NOTIFICATION_URL_KEY:[item webUrl]};
+		default:
+			return nil;
+	}
+}
+
 @end

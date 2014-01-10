@@ -223,43 +223,59 @@ CGFloat GLOBAL_SCREEN_SCALE;
 -(void)startRefresh
 {
 	if(self.isRefreshing) return;
-	[self prepareForRefresh];
 
-	[self.api fetchPullRequestsForActiveReposAndCallback:^(BOOL success) {
-		self.lastUpdateFailed = !success;
-		BOOL hasNewData = (success && self.dataManager.managedObjectContext.hasChanges);
-		[self completeRefresh];
-		if(success)
-		{
-			self.lastSuccessfulRefresh = [NSDate date];
-			self.preferencesDirty = NO;
-		}
-		if(self.backgroundCallback)
-		{
-			if(hasNewData)
+	BOOL reachable = [[AppDelegate shared].api.reachability currentReachabilityStatus]!=NotReachable;
+
+	if(reachable)
+	{
+		[self prepareForRefresh];
+
+		[self.api fetchPullRequestsForActiveReposAndCallback:^(BOOL success) {
+			self.lastUpdateFailed = !success;
+			BOOL hasNewData = (success && self.dataManager.managedObjectContext.hasChanges);
+			[self completeRefresh];
+			if(success)
 			{
-				DLog(@">> got new data!");
-				self.backgroundCallback(UIBackgroundFetchResultNewData);
+				self.lastSuccessfulRefresh = [NSDate date];
+				self.preferencesDirty = NO;
 			}
-			else if(success)
+			if(self.backgroundCallback)
 			{
-				DLog(@"no new data");
-				self.backgroundCallback(UIBackgroundFetchResultNoData);
+				if(hasNewData)
+				{
+					DLog(@">> got new data!");
+					self.backgroundCallback(UIBackgroundFetchResultNewData);
+				}
+				else if(success)
+				{
+					DLog(@"no new data");
+					self.backgroundCallback(UIBackgroundFetchResultNoData);
+				}
+				else
+				{
+					DLog(@"background refresh failed");
+					self.backgroundCallback(UIBackgroundFetchResultFailed);
+				}
+				self.backgroundCallback = nil;
 			}
-			else
+
+			if(!success && [UIApplication sharedApplication].applicationState==UIApplicationStateActive)
 			{
-				DLog(@"background refresh failed");
-				self.backgroundCallback(UIBackgroundFetchResultFailed);
+				[[[UIAlertView alloc] initWithTitle:@"Refresh failed"
+											message:@"Loading the latest data from Github failed"
+										   delegate:nil
+								  cancelButtonTitle:@"OK"
+								  otherButtonTitles:nil] show];
 			}
-			self.backgroundCallback = nil;
-		}
-		self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:self.api.refreshPeriod
-															 target:self
-														   selector:@selector(refreshTimerDone)
-														   userInfo:nil
-															repeats:NO];
-		DLog(@"Refresh done");
-	}];
+
+			self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:self.api.refreshPeriod
+																 target:self
+															   selector:@selector(refreshTimerDone)
+															   userInfo:nil
+																repeats:NO];
+			DLog(@"Refresh done");
+		}];
+	}
 }
 
 -(void)refreshTimerDone
@@ -280,6 +296,7 @@ CGFloat GLOBAL_SCREEN_SCALE;
 	if(self.preferencesDirty) return;
 
 	UILocalNotification *notification = [[UILocalNotification alloc] init];
+	notification.userInfo = [self.dataManager infoForType:type item:item];
 
 	switch (type)
 	{
@@ -287,19 +304,16 @@ CGFloat GLOBAL_SCREEN_SCALE;
 		{
 			PullRequest *associatedRequest = [PullRequest pullRequestWithUrl:[item pullRequestUrl] moc:self.dataManager.managedObjectContext];
 			notification.alertBody = [NSString stringWithFormat:@"Comment for '%@': %@",associatedRequest.title,[item body]];
-			notification.userInfo = @{COMMENT_ID_KEY:[item serverId]};
 			break;
 		}
 		case kNewPr:
 		{
 			notification.alertBody = [NSString stringWithFormat:@"New PR: %@",[item title]];
-			notification.userInfo = @{PULL_REQUEST_ID_KEY:[item serverId]};
 			break;
 		}
 		case kPrMerged:
 		{
 			notification.alertBody = [NSString stringWithFormat:@"PR Merged: %@",[item title]];
-			notification.userInfo = @{NOTIFICATION_URL_KEY:[item webUrl]};
 			break;
 		}
 	}
