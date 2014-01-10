@@ -2,12 +2,12 @@
 @interface PRCell ()
 {
 	UILabel *unreadCount, *readCount;
+    NSString *failedToLoadImage;
 }
 @end
 
 static NSDateFormatter *itemDateFormatter;
 static NSNumberFormatter *itemCountFormatter;
-
 
 @implementation PRCell
 
@@ -42,6 +42,25 @@ static NSNumberFormatter *itemCountFormatter;
 		itemCountFormatter = [[NSNumberFormatter alloc] init];
 		itemCountFormatter.numberStyle = NSNumberFormatterDecimalStyle;
 	});
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(networkStateChanged)
+												 name:kReachabilityChangedNotification
+											   object:nil];
+}
+
+- (void)networkStateChanged
+{
+    if(!failedToLoadImage) return;
+    if([[AppDelegate shared].api.reachability currentReachabilityStatus]!=NotReachable)
+	{
+        [self loadImageAtPath:failedToLoadImage];
+	}
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)setPullRequest:(PullRequest *)pullRequest
@@ -63,19 +82,31 @@ static NSNumberFormatter *itemCountFormatter;
 	self.detailTextLabel.text = [NSString stringWithFormat:@"%@ - %@",pullRequest.userLogin,[itemDateFormatter stringFromDate:pullRequest.updatedAt]];
 	NSString *imagePath = pullRequest.userAvatarUrl;
 	if(imagePath)
-	{
-        if(![[AppDelegate shared].api haveCachedImage:imagePath
-                                              forSize:CGSizeMake(40, 40)
-                                   tryLoadAndCallback:^(id image) {
-                                       if(image)
-                                           self.imageView.image = image;
-                                       else
-                                           self.imageView.image = [UIImage imageNamed:@"avatarPlaceHolder"];
-                                   }])
-        {
-            self.imageView.image = [UIImage imageNamed:@"avatarPlaceHolder"];
-        }
-	}
+        [self loadImageAtPath:imagePath];
+    else
+        failedToLoadImage = nil;
+}
+
+- (void)loadImageAtPath:(NSString *)imagePath
+{
+    if(![[AppDelegate shared].api haveCachedImage:imagePath
+                                          forSize:CGSizeMake(40, 40)
+                               tryLoadAndCallback:^(id image) {
+                                   if(image)
+                                   {
+                                       self.imageView.image = image;
+                                       failedToLoadImage = nil;
+                                   }
+                                   else
+                                   {
+                                       self.imageView.image = [UIImage imageNamed:@"avatarPlaceHolder"];
+                                       failedToLoadImage = imagePath;
+                                   }
+                               }])
+    {
+        self.imageView.image = [UIImage imageNamed:@"avatarPlaceHolder"];
+        failedToLoadImage = nil;
+    }
 }
 
 - (void)layoutSubviews

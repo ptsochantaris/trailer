@@ -72,6 +72,11 @@ CGFloat GLOBAL_SCREEN_SCALE;
     return YES;
 }
 
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 - (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification
 {
 	if(notification)

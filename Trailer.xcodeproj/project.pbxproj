@@ -306,10 +306,10 @@
 				169CEB9B1879D5BB0083A068 /* AdvancedSettingsViewController.m */,
 				1628A6FA1878B64E005EDA69 /* PreferencesViewController.h */,
 				1628A6FB1878B64E005EDA69 /* PreferencesViewController.m */,
-				1628A6D518789E73005EDA69 /* Images.xcassets */,
-				1628A6BB18789E73005EDA69 /* Supporting Files */,
 				16FDD6DB18804470008D2223 /* PRCell.h */,
 				16FDD6DC18804470008D2223 /* PRCell.m */,
+				1628A6D518789E73005EDA69 /* Images.xcassets */,
+				1628A6BB18789E73005EDA69 /* Supporting Files */,
 			);
 			path = MobileTrailer;
 			sourceTree = "<group>";
