@@ -25,6 +25,7 @@
 #import "Org.h"
 #import "Repo.h"
 #import "PullRequest.h"
+#import "PRCell.h"
 #import "HTPopTimer.h"
 #import "DataManager.h"
 #import "ImageFunctions.h"

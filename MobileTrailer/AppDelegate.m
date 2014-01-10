@@ -224,58 +224,57 @@ CGFloat GLOBAL_SCREEN_SCALE;
 {
 	if(self.isRefreshing) return;
 
-	BOOL reachable = [[AppDelegate shared].api.reachability currentReachabilityStatus]!=NotReachable;
+	if([[AppDelegate shared].api.reachability currentReachabilityStatus]==NotReachable) return;
 
-	if(reachable)
-	{
-		[self prepareForRefresh];
+	if(self.api.authToken.length==0) return;
 
-		[self.api fetchPullRequestsForActiveReposAndCallback:^(BOOL success) {
-			self.lastUpdateFailed = !success;
-			BOOL hasNewData = (success && self.dataManager.managedObjectContext.hasChanges);
-			[self completeRefresh];
-			if(success)
+	[self prepareForRefresh];
+
+	[self.api fetchPullRequestsForActiveReposAndCallback:^(BOOL success) {
+		self.lastUpdateFailed = !success;
+		BOOL hasNewData = (success && self.dataManager.managedObjectContext.hasChanges);
+		[self completeRefresh];
+		if(success)
+		{
+			self.lastSuccessfulRefresh = [NSDate date];
+			self.preferencesDirty = NO;
+		}
+		if(self.backgroundCallback)
+		{
+			if(hasNewData)
 			{
-				self.lastSuccessfulRefresh = [NSDate date];
-				self.preferencesDirty = NO;
+				DLog(@">> got new data!");
+				self.backgroundCallback(UIBackgroundFetchResultNewData);
 			}
-			if(self.backgroundCallback)
+			else if(success)
 			{
-				if(hasNewData)
-				{
-					DLog(@">> got new data!");
-					self.backgroundCallback(UIBackgroundFetchResultNewData);
-				}
-				else if(success)
-				{
-					DLog(@"no new data");
-					self.backgroundCallback(UIBackgroundFetchResultNoData);
-				}
-				else
-				{
-					DLog(@"background refresh failed");
-					self.backgroundCallback(UIBackgroundFetchResultFailed);
-				}
-				self.backgroundCallback = nil;
+				DLog(@"no new data");
+				self.backgroundCallback(UIBackgroundFetchResultNoData);
 			}
-
-			if(!success && [UIApplication sharedApplication].applicationState==UIApplicationStateActive)
+			else
 			{
-				[[[UIAlertView alloc] initWithTitle:@"Refresh failed"
-											message:@"Loading the latest data from Github failed"
-										   delegate:nil
-								  cancelButtonTitle:@"OK"
-								  otherButtonTitles:nil] show];
+				DLog(@"background refresh failed");
+				self.backgroundCallback(UIBackgroundFetchResultFailed);
 			}
+			self.backgroundCallback = nil;
+		}
 
-			self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:self.api.refreshPeriod
-																 target:self
-															   selector:@selector(refreshTimerDone)
-															   userInfo:nil
-																repeats:NO];
-			DLog(@"Refresh done");
-		}];
-	}
+		if(!success && [UIApplication sharedApplication].applicationState==UIApplicationStateActive)
+		{
+			[[[UIAlertView alloc] initWithTitle:@"Refresh failed"
+										message:@"Loading the latest data from Github failed"
+									   delegate:nil
+							  cancelButtonTitle:@"OK"
+							  otherButtonTitles:nil] show];
+		}
+
+		self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:self.api.refreshPeriod
+															 target:self
+														   selector:@selector(refreshTimerDone)
+														   userInfo:nil
+															repeats:NO];
+		DLog(@"Refresh done");
+	}];
 }
 
 -(void)refreshTimerDone

@@ -1,8 +1,6 @@
 
 @interface MasterViewController () <UITextFieldDelegate, UIActionSheetDelegate>
 {
-	NSDateFormatter *itemDateFormatter;
-
     // Filtering
     UITextField *searchField;
     HTPopTimer *searchTimer;
@@ -98,9 +96,6 @@
     self.tableView.contentOffset = CGPointMake(0, 50);
 
 	self.detailViewController = (DetailViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
-	itemDateFormatter = [[NSDateFormatter alloc] init];
-	itemDateFormatter.dateStyle = NSDateFormatterShortStyle;
-	itemDateFormatter.timeStyle = NSDateFormatterShortStyle;
 
 	[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(refreshStarted)
@@ -357,25 +352,7 @@
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath
 {
     PullRequest *pr = [self.fetchedResultsController objectAtIndexPath:indexPath];
-    cell.textLabel.text = pr.title;
-	cell.textLabel.numberOfLines = 0;
-	cell.detailTextLabel.text = [NSString stringWithFormat:@"%@ - %@",pr.userLogin,[itemDateFormatter stringFromDate:pr.updatedAt]];
-	cell.detailTextLabel.textColor = [UIColor grayColor];
-	NSString *imagePath = pr.userAvatarUrl;
-	if(imagePath)
-	{
-        if(![[AppDelegate shared].api haveCachedImage:imagePath
-                                              forSize:CGSizeMake(40, 40)
-                                   tryLoadAndCallback:^(id image) {
-                                       if(image)
-                                           cell.imageView.image = image;
-                                       else
-                                           cell.imageView.image = [UIImage imageNamed:@"avatarPlaceHolder"];
-                                   }])
-        {
-            cell.imageView.image = [UIImage imageNamed:@"avatarPlaceHolder"];
-        }
-	}
+	[((PRCell *)cell) setPullRequest:pr];
 }
 
 ///////////////////////////// filtering
