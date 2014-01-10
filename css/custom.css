@@ -1,0 +1,28 @@
+body {
+	background: #EFEFEF;
+}
+
+header p {
+	font-size: 18px;
+}
+
+h1 {
+	font-size: 4.0em;
+	font-weight: bold;
+}
+
+h2 {
+	margin-bottom: 15px;
+}
+
+.call-to-action {
+	background: #333;
+	padding: 20px 0;
+	margin: 10px 0;
+}
+
+.trailer-menu {
+	z-index: 50;
+	margin-top: -16px;
+	margin-left: 10px;
+}
