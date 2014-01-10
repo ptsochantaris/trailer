@@ -2,7 +2,7 @@ body {
 	background: #EFEFEF;
 }
 
-header p {
+p.large {
 	font-size: 18px;
 }
 
@@ -25,4 +25,8 @@ h2 {
 	z-index: 50;
 	margin-top: -16px;
 	margin-left: 10px;
+}
+
+.housetrip {
+	margin-top: 40px;
 }
