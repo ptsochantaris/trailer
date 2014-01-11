@@ -54,25 +54,28 @@
 	return [kPullRequestSectionNames objectAtIndex:self.sectionIndex.integerValue];
 }
 
-+(NSArray *)pullRequestsSortedByField:(NSString *)fieldName
-							   filter:(NSString *)filter
-							ascending:(BOOL)ascending
-								inMoc:(NSManagedObjectContext *)moc
++ (NSFetchRequest *)requestForPullRequestsSortedByField:(NSString *)fieldName
+												 filter:(NSString *)filter
+											  ascending:(BOOL)ascending
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PullRequest"];
 	if(filter.length)
 	{
 		f.predicate = [NSPredicate predicateWithFormat:@"title contains[cd] %@ or userLogin contains[cd] %@",filter,filter];
 	}
+
+	NSMutableArray *sortDescriptors = [NSMutableArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"sectionIndex" ascending:YES]];
 	if([fieldName isEqualToString:@"title"])
 	{
-		f.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:fieldName ascending:ascending selector:@selector(caseInsensitiveCompare:)]];
+		[sortDescriptors addObject:[NSSortDescriptor sortDescriptorWithKey:fieldName ascending:ascending selector:@selector(caseInsensitiveCompare:)]];
 	}
 	else if(fieldName.length)
 	{
-		f.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:fieldName ascending:ascending]];
+		[sortDescriptors addObject:[NSSortDescriptor sortDescriptorWithKey:fieldName ascending:ascending]];
 	}
-	return [moc executeFetchRequest:f error:nil];
+
+	f.sortDescriptors = sortDescriptors;
+	return f;
 }
 
 + (NSArray *)allMergedRequestsInMoc:(NSManagedObjectContext *)moc
@@ -134,7 +137,7 @@
 
 -(BOOL)isMine
 {
-	return [self.userId.stringValue isEqualToString:[AppDelegate shared].api.localUserId];
+	return [self.userId.stringValue isEqualToString:[Settings shared].localUserId];
 }
 
 -(BOOL)commentedByMe

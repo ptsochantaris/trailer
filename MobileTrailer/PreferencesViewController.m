@@ -2,6 +2,10 @@
 @interface PreferencesViewController () <UITextFieldDelegate,
 NSFetchedResultsControllerDelegate, UINavigationControllerDelegate,
 UIActionSheetDelegate>
+{
+	NSString *targetUrl;
+	BOOL refreshStartedWithEmpty;
+}
 @end
 
 @implementation PreferencesViewController
@@ -30,13 +34,26 @@ UIActionSheetDelegate>
 	currentAppVersion = [@"Version " stringByAppendingString:currentAppVersion];
 	self.versionNumber.text = currentAppVersion;
 
-	self.githubApiToken.text = [AppDelegate shared].api.authToken;
-	self.refreshRepoList.enabled = ([AppDelegate shared].api.authToken.length>0);
+	self.githubApiToken.text = [Settings shared].authToken;
+	self.refreshRepoList.enabled = ([Settings shared].authToken.length>0);
+	self.repositories.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
+
 	[self.repositories reloadData];
 
 	self.navigationController.delegate = self;
 
 	[self apiUsageUpdate];
+
+	[self instructionMode:(self.fetchedResultsController.fetchedObjects.count==0
+						   || self.githubApiToken.text.length==0)];
+}
+
+- (void)instructionMode:(BOOL)instructionMode
+{
+	self.repositories.hidden = instructionMode;
+	self.instructionLabel.hidden = !instructionMode;
+	self.createTokenButton.hidden = !instructionMode;
+	self.viewTokensButton.hidden = !instructionMode;
 }
 
 - (void)dealloc
@@ -48,6 +65,18 @@ UIActionSheetDelegate>
 {
 	API *api = [AppDelegate shared].api;
 	[self.apiLoad setProgress:(api.requestsLimit-api.requestsRemaining)/api.requestsRemaining];
+}
+
+- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
+{
+	self.repositories.hidden = YES;
+	return YES;
+}
+
+-(void)textFieldDidEndEditing:(UITextField *)textField
+{
+	[self instructionMode:(self.fetchedResultsController.fetchedObjects.count==0
+						   || self.githubApiToken.text.length==0)];
 }
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
@@ -67,20 +96,9 @@ UIActionSheetDelegate>
 
 - (void)commitToken
 {
-	[AppDelegate shared].api.authToken = [self.githubApiToken.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-	self.refreshRepoList.enabled = ([AppDelegate shared].api.authToken.length>0);
+	[Settings shared].authToken = [self.githubApiToken.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	self.refreshRepoList.enabled = ([Settings shared].authToken.length>0);
 	[self.githubApiToken resignFirstResponder];
-}
-
-- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
-{
-	self.repositories.hidden = YES;
-	return YES;
-}
-
--(void)textFieldDidEndEditing:(UITextField *)textField
-{
-	self.repositories.hidden = NO;
 }
 
 - (void)resetData
@@ -105,13 +123,21 @@ UIActionSheetDelegate>
 		[self commitToken];
 	}
 
+	refreshStartedWithEmpty = (self.fetchedResultsController.fetchedObjects.count==0);
+
 	NSString *originalName = [self.refreshRepoList titleForState:UIControlStateNormal];
 	[self.refreshRepoList setTitle:@"Loading..." forState:UIControlStateNormal];
+	[self instructionMode:NO];
 	self.refreshRepoList.enabled = NO;
 	self.repositories.hidden = YES;
 	self.githubApiToken.hidden = YES;
 
 	[[AppDelegate shared].api fetchRepositoriesAndCallback:^(BOOL success) {
+
+		if(refreshStartedWithEmpty)
+			for(Repo *r in self.fetchedResultsController.fetchedObjects)
+				r.active = @YES;
+
 		[self.repositories reloadData];
 		[self.refreshRepoList setTitle:originalName forState:UIControlStateNormal];
 		self.refreshRepoList.enabled = YES;
@@ -119,6 +145,9 @@ UIActionSheetDelegate>
 		self.githubApiToken.hidden = NO;
 
 		[AppDelegate shared].preferencesDirty = YES;
+
+		[self instructionMode:(self.fetchedResultsController.fetchedObjects.count==0
+							   || self.githubApiToken.text.length==0)];
 
 		if(!success)
 		{
@@ -158,6 +187,12 @@ UIActionSheetDelegate>
 	[[AppDelegate shared].dataManager saveDB];
 	[tableView deselectRowAtIndexPath:indexPath animated:NO];
 	[AppDelegate shared].preferencesDirty = YES;
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+	if([Settings shared].localUser) return [Settings shared].localUser;
+	return nil;
 }
 
 #pragma mark - Fetched results controller
@@ -266,7 +301,7 @@ UIActionSheetDelegate>
 }
 - (IBAction)ipadSelection:(UIBarButtonItem *)sender
 {
-	[[self selectionSheet] showFromBarButtonItem:sender animated:NO];
+	[[self selectionSheet] showFromBarButtonItem:sender animated:YES];
 }
 - (UIActionSheet *)selectionSheet
 {
@@ -284,6 +319,40 @@ UIActionSheetDelegate>
 	NSArray *allRepos = [Repo allReposSortedByField:nil withTitleFilter:nil inMoc:[AppDelegate shared].dataManager.managedObjectContext];
 	for(Repo *r in allRepos) r.active = selection;
 	[AppDelegate shared].preferencesDirty = YES;
+}
+
+- (IBAction)iphoneCreateToken:(UIButton *)sender {
+	[self createToken];
+}
+- (IBAction)iphoneVieTokens:(UIButton *)sender {
+	[self viewTokens];
+}
+- (IBAction)ipadCreateToken:(UIButton *)sender {
+	[self createToken];
+}
+- (IBAction)ipadViewTokens:(UIButton *)sender {
+	[self viewTokens];
+}
+
+- (void)viewTokens
+{
+	targetUrl = @"https://github.com/settings/applications";
+	[self performSegueWithIdentifier:@"openGithub" sender:self];
+}
+
+- (void)createToken
+{
+	targetUrl = @"https://github.com/settings/tokens/new";
+	[self performSegueWithIdentifier:@"openGithub" sender:self];
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+	if([segue.destinationViewController isKindOfClass:[GithubViewController class]])
+	{
+		((GithubViewController *)segue.destinationViewController).pathToLoad = targetUrl;
+	}
+	targetUrl = nil;
 }
 
 @end

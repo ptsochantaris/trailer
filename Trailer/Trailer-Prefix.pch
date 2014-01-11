@@ -1,43 +1,40 @@
-//
-//  Prefix header
-//
-//  The contents of this file are implicitly included at the beginning of every source file.
-//
 
 #import <Availability.h>
 
 #ifdef __OBJC__
 
-	#define MENU_WIDTH 500.0
+#define MENU_WIDTH 500.0
 
-	#define DLog(fmt, ...) NSLog(fmt, ##__VA_ARGS__)
-	//#define DLog(...)
+#define DLog(fmt, ...) NSLog(fmt, ##__VA_ARGS__)
+//#define DLog(...)
 
-	#import <Cocoa/Cocoa.h>
-    #import <CommonCrypto/CommonCrypto.h>
-	#import <Foundation/Foundation.h>
-	#import <CoreData/CoreData.h>
-	#import "NSDictionary+NSDictionary_OFK.h"
-    #import "NSString+Extensions.h"
-    #import "NSImage+Scale.h"
-	#import "Reachability.h"
-	#import "API.h"
-	#import "DataItem.h"
-	#import "PRComment.h"
-	#import "Org.h"
-	#import "Repo.h"
-	#import "PullRequest.h"
-	#import "RemoteImageView.h"
-	#import "CenteredTextFieldCell.h"
-	#import "CenteredTextField.h"
-	#import "CommentCounts.h"
-	#import "PRItemView.h"
-	#import "SectionHeader.h"
-	#import <Sparkle/Sparkle.h>
-	#import "StatusItemView.h"
-	#import "MenuScrollView.h"
-	#import "MenuWindow.h"
-	#import "HTPopTimer.h"
-	#import "DataManager.h"
-	#import "AppDelegate.h"
+#import <Cocoa/Cocoa.h>
+#import <CommonCrypto/CommonCrypto.h>
+#import <Foundation/Foundation.h>
+#import <CoreData/CoreData.h>
+#import "NSDictionary+NSDictionary_OFK.h"
+#import "NSString+Extensions.h"
+#import "NSImage+Scale.h"
+#import "Reachability.h"
+#import "Settings.h"
+#import "API.h"
+#import "DataItem.h"
+#import "PRComment.h"
+#import "Org.h"
+#import "Repo.h"
+#import "PullRequest.h"
+#import "RemoteImageView.h"
+#import "CenteredTextFieldCell.h"
+#import "CenteredTextField.h"
+#import "CommentCounts.h"
+#import "PRItemView.h"
+#import "SectionHeader.h"
+#import <Sparkle/Sparkle.h>
+#import "StatusItemView.h"
+#import "MenuScrollView.h"
+#import "MenuWindow.h"
+#import "HTPopTimer.h"
+#import "DataManager.h"
+#import "AppDelegate.h"
+
 #endif

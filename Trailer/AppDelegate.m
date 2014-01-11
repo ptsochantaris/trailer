@@ -54,9 +54,9 @@ static AppDelegate *_static_shared_ref;
 	[self.versionNumber setStringValue:currentAppVersion];
 	[self.aboutVersion setStringValue:currentAppVersion];
 
-	if(self.api.authToken.length)
+	if([Settings shared].authToken.length)
 	{
-		[self.githubTokenHolder setStringValue:self.api.authToken];
+		[self.githubTokenHolder setStringValue:[Settings shared].authToken];
 		[self startRefresh];
 	}
 	else
@@ -73,7 +73,7 @@ static AppDelegate *_static_shared_ref;
 - (void)setupSortMethodMenu
 {
 	NSMenu *m = [[NSMenu alloc] initWithTitle:@"Sorting"];
-	if(self.api.sortDescending)
+	if([Settings shared].sortDescending)
 	{
 		[m addItemWithTitle:@"Newest First" action:@selector(sortMethodChanged:) keyEquivalent:@""];
 		[m addItemWithTitle:@"Most Recently Active" action:@selector(sortMethodChanged:) keyEquivalent:@""];
@@ -86,54 +86,54 @@ static AppDelegate *_static_shared_ref;
 		[m addItemWithTitle:@"Alphabetically" action:@selector(sortMethodChanged:) keyEquivalent:@""];
 	}
 	self.sortModeSelect.menu = m;
-	[self.sortModeSelect selectItemAtIndex:self.api.sortMethod];
+	[self.sortModeSelect selectItemAtIndex:[Settings shared].sortMethod];
 }
 
 - (IBAction)dontKeepMyPrsSelected:(NSButton *)sender
 {
 	BOOL dontKeep = (sender.integerValue==1);
-	self.api.dontKeepMyPrs = dontKeep;
+	[Settings shared].dontKeepMyPrs = dontKeep;
 }
 
 - (IBAction)hideAvatarsSelected:(NSButton *)sender
 {
 	BOOL hide = (sender.integerValue==1);
-	self.api.hideAvatars = hide;
+	[Settings shared].hideAvatars = hide;
 	[self updateMenu];
 }
 
 - (IBAction)hidePrsSelected:(NSButton *)sender
 {
 	BOOL show = (sender.integerValue==1);
-	self.api.shouldHideUncommentedRequests = show;
+	[Settings shared].shouldHideUncommentedRequests = show;
 	[self updateMenu];
 }
 
 - (IBAction)showAllCommentsSelected:(NSButton *)sender
 {
 	BOOL show = (sender.integerValue==1);
-	self.api.showCommentsEverywhere = show;
+	[Settings shared].showCommentsEverywhere = show;
 	[self updateMenu];
 }
 
 - (IBAction)sortOrderSelected:(NSButton *)sender
 {
 	BOOL descending = (sender.integerValue==1);
-	self.api.sortDescending = descending;
+	[Settings shared].sortDescending = descending;
 	[self setupSortMethodMenu];
 	[self updateMenu];
 }
 
 - (IBAction)sortMethodChanged:(id)sender
 {
-	self.api.sortMethod = self.sortModeSelect.indexOfSelectedItem;
+	[Settings shared].sortMethod = self.sortModeSelect.indexOfSelectedItem;
 	[self updateMenu];
 }
 
 - (IBAction)showCreationSelected:(NSButton *)sender
 {
 	BOOL show = (sender.integerValue==1);
-	self.api.showCreatedInsteadOfUpdated = show;
+	[Settings shared].showCreatedInsteadOfUpdated = show;
 	[self updateMenu];
 }
 
@@ -263,9 +263,9 @@ static AppDelegate *_static_shared_ref;
 		if(!self.isRefreshing)
 		{
 			NSString *prefix;
-			if(self.api.localUser)
+			if([Settings shared].localUser)
 			{
-				prefix = [NSString stringWithFormat:@" Refresh %@",self.api.localUser];
+				prefix = [NSString stringWithFormat:@" Refresh %@",[Settings shared].localUser];
 			}
 			else
 			{
@@ -391,7 +391,7 @@ static AppDelegate *_static_shared_ref;
 
 	for(PullRequest *r in pullRequests)
 	{
-		if(self.api.shouldHideUncommentedRequests)
+		if([Settings shared].shouldHideUncommentedRequests)
 			if(r.unreadCommentCount==0)
 				continue;
 
@@ -420,7 +420,7 @@ static AppDelegate *_static_shared_ref;
 		{
 			allCount++;
 			[menuItems insertObject:item atIndex:allIndex];
-			if([AppDelegate shared].api.showCommentsEverywhere)
+			if([Settings shared].showCommentsEverywhere)
 				unreadCommentCount += [r unreadCommentCount];
 		}
 		allIndex++;
@@ -451,8 +451,8 @@ static AppDelegate *_static_shared_ref;
 
 - (void)defaultsUpdated
 {
-	if(self.api.localUser)
-		self.githubDetailsBox.title = [NSString stringWithFormat:@"Repositories for %@",self.api.localUser];
+	if([Settings shared].localUser)
+		self.githubDetailsBox.title = [NSString stringWithFormat:@"Repositories for %@",[Settings shared].localUser];
 	else
 		self.githubDetailsBox.title = @"Your Repositories";
 }
@@ -462,7 +462,7 @@ static AppDelegate *_static_shared_ref;
 	[self.apiLoad setIndeterminate:YES];
 	[self.apiLoad stopAnimation:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(apiUsageUpdate:) name:RATE_UPDATE_NOTIFICATION object:nil];
-	if(self.api.authToken.length)
+	if([Settings shared].authToken.length)
 	{
 		[self.api updateLimitFromServer];
 	}
@@ -491,16 +491,16 @@ static AppDelegate *_static_shared_ref;
 	if(obj.object==self.githubTokenHolder)
 	{
 		NSString *newToken = [self.githubTokenHolder.stringValue stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-		NSString *oldToken = self.api.authToken;
+		NSString *oldToken = [Settings shared].authToken;
 		if(newToken.length>0)
 		{
 			self.refreshButton.enabled = YES;
-			self.api.authToken = newToken;
+			[Settings shared].authToken = newToken;
 		}
 		else
 		{
 			self.refreshButton.enabled = NO;
-			self.api.authToken = nil;
+			[Settings shared].authToken = nil;
 		}
 		if(newToken && oldToken && ![newToken isEqualToString:oldToken])
 		{
@@ -547,44 +547,44 @@ static AppDelegate *_static_shared_ref;
 
 	[self.api updateLimitFromServer];
 
-	[self.sortModeSelect selectItemAtIndex:self.api.sortMethod];
+	[self.sortModeSelect selectItemAtIndex:[Settings shared].sortMethod];
 
 	if([self isAppLoginItem])
 		[self.launchAtStartup setIntegerValue:1];
 	else
 		[self.launchAtStartup setIntegerValue:0];
 
-	if(self.api.shouldHideUncommentedRequests)
+	if([Settings shared].shouldHideUncommentedRequests)
 		[self.hideUncommentedPrs setIntegerValue:1];
 	else
 		[self.hideUncommentedPrs setIntegerValue:0];
 
-	if(self.api.hideAvatars)
+	if([Settings shared].hideAvatars)
 		[self.hideAvatars setIntegerValue:1];
 	else
 		[self.hideAvatars setIntegerValue:0];
 
-	if(self.api.dontKeepMyPrs)
+	if([Settings shared].dontKeepMyPrs)
 		[self.dontKeepMyPrs setIntegerValue:1];
 	else
 		[self.dontKeepMyPrs setIntegerValue:0];
 
-	if(self.api.showCommentsEverywhere)
+	if([Settings shared].showCommentsEverywhere)
 		[self.showAllComments setIntegerValue:1];
 	else
 		[self.showAllComments setIntegerValue:0];
 
-	if(self.api.sortDescending)
+	if([Settings shared].sortDescending)
 		[self.sortingOrder setIntegerValue:1];
 	else
 		[self.sortingOrder setIntegerValue:0];
 
-	if(self.api.showCreatedInsteadOfUpdated)
+	if([Settings shared].showCreatedInsteadOfUpdated)
 		[self.showCreationDates setIntegerValue:1];
 	else
 		[self.showCreationDates setIntegerValue:0];
 
-	[self.refreshDurationStepper setFloatValue:self.api.refreshPeriod];
+	[self.refreshDurationStepper setFloatValue:[Settings shared].refreshPeriod];
 	[self refreshDurationChanged:nil];
 
 	[self.preferencesWindow setLevel:NSFloatingWindowLevel];
@@ -680,13 +680,13 @@ static AppDelegate *_static_shared_ref;
 	if([notification object]==self.preferencesWindow)
 	{
 		[self controlTextDidChange:nil];
-		if(self.api.authToken.length && self.preferencesDirty)
+		if([Settings shared].authToken.length && self.preferencesDirty)
 		{
 			[self startRefresh];
 		}
 		else
 		{
-			if(!self.refreshTimer && self.api.refreshPeriod>0.0)
+			if(!self.refreshTimer && [Settings shared].refreshPeriod>0.0)
 			{
 				[self startRefreshIfItIsDue];
 			}
@@ -708,13 +708,13 @@ static AppDelegate *_static_shared_ref;
 	if(self.lastSuccessfulRefresh)
 	{
 		NSTimeInterval howLongAgo = [[NSDate date] timeIntervalSinceDate:self.lastSuccessfulRefresh];
-		if(howLongAgo>self.api.refreshPeriod)
+		if(howLongAgo>[Settings shared].refreshPeriod)
 		{
 			[self startRefresh];
 		}
 		else
 		{
-			NSTimeInterval howLongUntilNextSync = self.api.refreshPeriod-howLongAgo;
+			NSTimeInterval howLongUntilNextSync = [Settings shared].refreshPeriod-howLongAgo;
 			DLog(@"No need to refresh yet, will refresh in %f",howLongUntilNextSync);
 			self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:howLongUntilNextSync
 																 target:self
@@ -813,8 +813,8 @@ static AppDelegate *_static_shared_ref;
 
     [self.api expireOldEntries];
 
-	if(self.api.localUser)
-		self.refreshNow.title = [NSString stringWithFormat:@" Refreshing %@...",self.api.localUser];
+	if([Settings shared].localUser)
+		self.refreshNow.title = [NSString stringWithFormat:@" Refreshing %@...",[Settings shared].localUser];
 	else
 		self.refreshNow.title = @" Refreshing...";
 
@@ -831,7 +831,7 @@ static AppDelegate *_static_shared_ref;
 			self.lastSuccessfulRefresh = [NSDate date];
 			self.preferencesDirty = NO;
 		}
-		self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:self.api.refreshPeriod
+		self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:[Settings shared].refreshPeriod
 															 target:self
 														   selector:@selector(refreshTimerDone)
 														   userInfo:nil
@@ -843,13 +843,13 @@ static AppDelegate *_static_shared_ref;
 
 - (IBAction)refreshDurationChanged:(NSStepper *)sender
 {
-	self.api.refreshPeriod = self.refreshDurationStepper.floatValue;
+	[Settings shared].refreshPeriod = self.refreshDurationStepper.floatValue;
 	[self.refreshDurationLabel setStringValue:[NSString stringWithFormat:@"Automatically refresh every %ld seconds",(long)self.refreshDurationStepper.integerValue]];
 }
 
 -(void)refreshTimerDone
 {
-	if(self.api.localUserId && self.api.authToken.length)
+	if([Settings shared].localUserId && [Settings shared].authToken.length)
 	{
 		[self startRefresh];
 	}
@@ -857,17 +857,8 @@ static AppDelegate *_static_shared_ref;
 
 - (NSArray *)pullRequestList
 {
-	NSString *sortCriterion;
-	switch (self.api.sortMethod) {
-		case kCreationDate: sortCriterion = @"createdAt"; break;
-		case kRecentActivity: sortCriterion = @"updatedAt"; break;
-		case kTitle: sortCriterion = @"title"; break;
-	}
-	NSArray *pullRequests = [PullRequest pullRequestsSortedByField:sortCriterion
-															filter:self.mainMenuFilter.stringValue
-														 ascending:!self.api.sortDescending
-															 inMoc:self.dataManager.managedObjectContext];
-	return pullRequests;
+	NSFetchRequest *f = [PullRequest requestForPullRequestsSortedByField:[Settings shared].sortField filter:self.mainMenuFilter.stringValue ascending:![Settings shared].sortDescending];
+	return [self.dataManager.managedObjectContext executeFetchRequest:f error:nil];
 }
 
 - (void)updateMenu

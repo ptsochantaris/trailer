@@ -53,13 +53,13 @@ static CGColorRef _highlightColor;
 
 		NSInteger _commentsNew=0;
 		NSInteger _commentsTotal = [PRComment countCommentsForPullRequestUrl:pullRequest.url inMoc:[AppDelegate shared].dataManager.managedObjectContext];
-		if([AppDelegate shared].api.showCommentsEverywhere || pullRequest.isMine || pullRequest.commentedByMe)
+		if([Settings shared].showCommentsEverywhere || pullRequest.isMine || pullRequest.commentedByMe)
 		{
 			_commentsNew = [pullRequest unreadCommentCount];
 		}
 
 		NSString *_dates, *_title;
-		if([AppDelegate shared].api.showCreatedInsteadOfUpdated)
+		if([Settings shared].showCreatedInsteadOfUpdated)
 		{
 			_dates = [dateFormatter stringFromDate:pullRequest.createdAt];
 		}
@@ -79,7 +79,7 @@ static CGColorRef _highlightColor;
 		BOOL showUnpin = pullRequest.merged.boolValue;
 		if(showUnpin) W -= REMOVE_BUTTON_WIDTH;
 
-		BOOL showAvatar = pullRequest.userAvatarUrl.length && ![AppDelegate shared].api.hideAvatars;
+		BOOL showAvatar = pullRequest.userAvatarUrl.length && ![Settings shared].hideAvatars;
 		if(showAvatar) W -= (AVATAR_SIZE+AVATAR_PADDING);
 		else W += 4.0;
 

@@ -1,4 +1,4 @@
 
-@interface AdvancedSettingsViewController : UIViewController
+@interface AdvancedSettingsViewController : UITableViewController
 
 @end

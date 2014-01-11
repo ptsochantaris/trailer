@@ -89,11 +89,15 @@
 		16B9553117EC89520005118F /* Org.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B9553017EC89520005118F /* Org.m */; };
 		16B9553617EC89B50005118F /* DataItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B9553517EC89B50005118F /* DataItem.m */; };
 		16B9553A17EC93DE0005118F /* Repo.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B9553917EC93DE0005118F /* Repo.m */; };
+		16C54F941881639B00849B76 /* GithubViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 16C54F931881639B00849B76 /* GithubViewController.m */; };
+		16C54F981881721400849B76 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 16C54F971881721400849B76 /* Settings.m */; };
+		16C54F991881721400849B76 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 16C54F971881721400849B76 /* Settings.m */; };
 		16EAA972182D897E0018018B /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16B94066182D051700F32061 /* Sparkle.framework */; };
 		16EC79E617ECA18000F7EB44 /* HTTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 16EC79E517ECA18000F7EB44 /* HTTextField.m */; };
 		16EC79E717ECA18000F7EB44 /* HTTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 16EC79E517ECA18000F7EB44 /* HTTextField.m */; };
 		16FA683B1823CF4600401E9B /* PRItemView.m in Sources */ = {isa = PBXBuildFile; fileRef = 16FA683A1823CF4600401E9B /* PRItemView.m */; };
 		16FA683C1823CF4600401E9B /* PRItemView.m in Sources */ = {isa = PBXBuildFile; fileRef = 16FA683A1823CF4600401E9B /* PRItemView.m */; };
+		16FD14D71881CBC400FDC960 /* PickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 16FD14D61881CBC400FDC960 /* PickerViewController.m */; };
 		16FDD6DD18804470008D2223 /* PRCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 16FDD6DC18804470008D2223 /* PRCell.m */; };
 /* End PBXBuildFile section */
 
@@ -224,10 +228,16 @@
 		16B9553517EC89B50005118F /* DataItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataItem.m; sourceTree = "<group>"; };
 		16B9553817EC93DE0005118F /* Repo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Repo.h; sourceTree = "<group>"; };
 		16B9553917EC93DE0005118F /* Repo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Repo.m; sourceTree = "<group>"; };
+		16C54F921881639B00849B76 /* GithubViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GithubViewController.h; sourceTree = "<group>"; };
+		16C54F931881639B00849B76 /* GithubViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GithubViewController.m; sourceTree = "<group>"; };
+		16C54F961881721400849B76 /* Settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Settings.h; sourceTree = "<group>"; };
+		16C54F971881721400849B76 /* Settings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Settings.m; sourceTree = "<group>"; };
 		16EC79E417ECA18000F7EB44 /* HTTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HTTextField.h; sourceTree = "<group>"; };
 		16EC79E517ECA18000F7EB44 /* HTTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HTTextField.m; sourceTree = "<group>"; };
 		16FA68391823CF4600401E9B /* PRItemView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PRItemView.h; sourceTree = "<group>"; };
 		16FA683A1823CF4600401E9B /* PRItemView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = PRItemView.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		16FD14D51881CBC400FDC960 /* PickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PickerViewController.h; sourceTree = "<group>"; };
+		16FD14D61881CBC400FDC960 /* PickerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PickerViewController.m; sourceTree = "<group>"; };
 		16FDD6DB18804470008D2223 /* PRCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PRCell.h; sourceTree = "<group>"; };
 		16FDD6DC18804470008D2223 /* PRCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PRCell.m; sourceTree = "<group>"; };
 		20041A0D334347FC907AC67E /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = "<group>"; };
@@ -294,21 +304,18 @@
 		1628A6BA18789E73005EDA69 /* MobileTrailer */ = {
 			isa = PBXGroup;
 			children = (
+				16FD14D11881C82400FDC960 /* Settings */,
 				1628A6C318789E73005EDA69 /* AppDelegate.h */,
 				1628A6C418789E73005EDA69 /* AppDelegate.m */,
-				1628A6C618789E73005EDA69 /* Main_iPhone.storyboard */,
-				1628A6C918789E73005EDA69 /* Main_iPad.storyboard */,
-				1628A6CF18789E73005EDA69 /* MasterViewController.h */,
-				1628A6D018789E73005EDA69 /* MasterViewController.m */,
 				1628A6D218789E73005EDA69 /* DetailViewController.h */,
 				1628A6D318789E73005EDA69 /* DetailViewController.m */,
-				169CEB9A1879D5BB0083A068 /* AdvancedSettingsViewController.h */,
-				169CEB9B1879D5BB0083A068 /* AdvancedSettingsViewController.m */,
-				1628A6FA1878B64E005EDA69 /* PreferencesViewController.h */,
-				1628A6FB1878B64E005EDA69 /* PreferencesViewController.m */,
+				1628A6D518789E73005EDA69 /* Images.xcassets */,
+				1628A6C918789E73005EDA69 /* Main_iPad.storyboard */,
+				1628A6C618789E73005EDA69 /* Main_iPhone.storyboard */,
+				1628A6CF18789E73005EDA69 /* MasterViewController.h */,
+				1628A6D018789E73005EDA69 /* MasterViewController.m */,
 				16FDD6DB18804470008D2223 /* PRCell.h */,
 				16FDD6DC18804470008D2223 /* PRCell.m */,
-				1628A6D518789E73005EDA69 /* Images.xcassets */,
 				1628A6BB18789E73005EDA69 /* Supporting Files */,
 			);
 			path = MobileTrailer;
@@ -364,6 +371,7 @@
 		1628A6F218789EA3005EDA69 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				16C54F951881720400849B76 /* Settings */,
 				1628A6F518789F85005EDA69 /* Utilities */,
 				1628A6F418789F78005EDA69 /* API */,
 				1628A6F318789F6D005EDA69 /* Extensions */,
@@ -558,6 +566,30 @@
 			path = Trailer;
 			sourceTree = "<group>";
 		};
+		16C54F951881720400849B76 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				16C54F961881721400849B76 /* Settings.h */,
+				16C54F971881721400849B76 /* Settings.m */,
+			);
+			name = Settings;
+			sourceTree = "<group>";
+		};
+		16FD14D11881C82400FDC960 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				169CEB9A1879D5BB0083A068 /* AdvancedSettingsViewController.h */,
+				169CEB9B1879D5BB0083A068 /* AdvancedSettingsViewController.m */,
+				1628A6FA1878B64E005EDA69 /* PreferencesViewController.h */,
+				1628A6FB1878B64E005EDA69 /* PreferencesViewController.m */,
+				16C54F921881639B00849B76 /* GithubViewController.h */,
+				16C54F931881639B00849B76 /* GithubViewController.m */,
+				16FD14D51881CBC400FDC960 /* PickerViewController.h */,
+				16FD14D61881CBC400FDC960 /* PickerViewController.m */,
+			);
+			name = Settings;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -738,6 +770,7 @@
 				1628A6C518789E73005EDA69 /* AppDelegate.m in Sources */,
 				1628A7061878BC18005EDA69 /* DataItem.m in Sources */,
 				1628A6FC1878B64E005EDA69 /* PreferencesViewController.m in Sources */,
+				16C54F941881639B00849B76 /* GithubViewController.m in Sources */,
 				1628A6F91878A171005EDA69 /* DataManager.m in Sources */,
 				1628A7111878ED0E005EDA69 /* ImageFunctions.m in Sources */,
 				1628A7071878BC23005EDA69 /* Trailer.xcdatamodeld in Sources */,
@@ -746,7 +779,9 @@
 				16302084187DC8790091FD6C /* NSString+Extensions.m in Sources */,
 				1628A6C118789E73005EDA69 /* main.m in Sources */,
 				1628A7031878BC18005EDA69 /* PullRequest.m in Sources */,
+				16C54F991881721400849B76 /* Settings.m in Sources */,
 				1628A6FD1878B804005EDA69 /* HTPopTimer.m in Sources */,
+				16FD14D71881CBC400FDC960 /* PickerViewController.m in Sources */,
 				1628A70E1878EC57005EDA69 /* UIImage+Scale.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -767,6 +802,7 @@
 			files = (
 				160C5ACF18675E9300142482 /* CenteredTextField.m in Sources */,
 				1617BEEA183F538100E89BB2 /* Reachability.m in Sources */,
+				16C54F981881721400849B76 /* Settings.m in Sources */,
 				16B9553A17EC93DE0005118F /* Repo.m in Sources */,
 				16302083187DC8790091FD6C /* NSString+Extensions.m in Sources */,
 				161CA3CE17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m in Sources */,

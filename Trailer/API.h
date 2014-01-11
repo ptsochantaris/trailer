@@ -25,12 +25,9 @@ typedef enum {
 
 @interface API : NSObject
 
-@property (nonatomic) NSString *authToken, *localUser, *localUserId, *resetDate;
-@property (nonatomic) NSInteger sortMethod;
-@property (nonatomic) float refreshPeriod, requestsLimit, requestsRemaining;
+@property (nonatomic) NSString *resetDate;
+@property (nonatomic) float requestsLimit, requestsRemaining;
 @property (nonatomic) Reachability *reachability;
-@property (nonatomic) BOOL shouldHideUncommentedRequests, showCommentsEverywhere,
-sortDescending, showCreatedInsteadOfUpdated, dontKeepMyPrs, hideAvatars;
 
 - (void)updateLimitFromServer;
 

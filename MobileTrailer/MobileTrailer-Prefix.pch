@@ -1,8 +1,3 @@
-//
-//  Prefix header
-//
-//  The contents of this file are implicitly included at the beginning of every source file.
-//
 
 #import <Availability.h>
 
@@ -19,6 +14,7 @@
 #import "NSDictionary+NSDictionary_OFK.h"
 #import "NSString+Extensions.h"
 #import "Reachability.h"
+#import "Settings.h"
 #import "API.h"
 #import "DataItem.h"
 #import "PRComment.h"
@@ -30,8 +26,10 @@
 #import "DataManager.h"
 #import "ImageFunctions.h"
 #import "UIImage+Scale.h"
+#import "PickerViewController.h"
 #import "MasterViewController.h"
 #import "DetailViewController.h"
+#import "GithubViewController.h"
 #import "PreferencesViewController.h"
 #import "AdvancedSettingsViewController.h"
 #import "AppDelegate.h"

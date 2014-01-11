@@ -18,15 +18,13 @@ static NSNumberFormatter *itemCountFormatter;
 	self.detailTextLabel.textColor = [UIColor grayColor];
 
 	unreadCount = [[UILabel alloc] initWithFrame:CGRectZero];
-	unreadCount.backgroundColor = [UIColor redColor];
 	unreadCount.textColor = [UIColor whiteColor];
 	unreadCount.textAlignment = NSTextAlignmentCenter;
 	unreadCount.layer.cornerRadius = 9.0;
-	unreadCount.font = [UIFont systemFontOfSize:12.0];
+	unreadCount.font = [UIFont boldSystemFontOfSize:12.0];
 	[self.contentView addSubview:unreadCount];
 
 	readCount = [[UILabel alloc] initWithFrame:CGRectZero];
-	readCount.backgroundColor = [UIColor colorWithWhite:0.9 alpha:1.0];
 	readCount.textColor = [UIColor darkGrayColor];
 	readCount.textAlignment = NSTextAlignmentCenter;
 	readCount.layer.cornerRadius = 9.0;
@@ -65,21 +63,35 @@ static NSNumberFormatter *itemCountFormatter;
 
 - (void)setPullRequest:(PullRequest *)pullRequest
 {
+	NSInteger _commentsNew=0;
 	NSInteger _commentsTotal = [PRComment countCommentsForPullRequestUrl:pullRequest.url inMoc:[AppDelegate shared].dataManager.managedObjectContext];
-	NSInteger _commentsNew = pullRequest.unreadCommentCount;
+	if([Settings shared].showCommentsEverywhere || pullRequest.isMine || pullRequest.commentedByMe)
+	{
+		_commentsNew = [pullRequest unreadCommentCount];
+	}
+
+	NSString *_dates;
+	if([Settings shared].showCreatedInsteadOfUpdated)
+		_dates = [itemDateFormatter stringFromDate:pullRequest.createdAt];
+	else
+		_dates = [itemDateFormatter stringFromDate:pullRequest.updatedAt];
+
+	if(pullRequest.userLogin.length)
+		_dates = [NSString stringWithFormat:@"%@ - %@",pullRequest.userLogin,_dates];
 
 	readCount.text = [itemCountFormatter stringFromNumber:@(_commentsTotal)];
 	CGSize size = [readCount sizeThatFits:CGSizeMake(200, 14.0)];
 	readCount.frame = CGRectMake(0, 0, size.width+10.0, 17.0);
 	readCount.hidden = (_commentsTotal==0);
 
+	unreadCount.hidden = _commentsNew==0;
 	unreadCount.text = [itemCountFormatter stringFromNumber:@(_commentsNew)];
 	size = [unreadCount sizeThatFits:CGSizeMake(200, 18.0)];
 	unreadCount.frame = CGRectMake(0, 0, size.width+10.0, 17.0);
-	unreadCount.hidden = (_commentsNew==0);
 
 	self.textLabel.text = pullRequest.title;
-	self.detailTextLabel.text = [NSString stringWithFormat:@"%@ - %@",pullRequest.userLogin,[itemDateFormatter stringFromDate:pullRequest.updatedAt]];
+	self.detailTextLabel.text = _dates;
+
 	NSString *imagePath = pullRequest.userAvatarUrl;
 	if(imagePath)
         [self loadImageAtPath:imagePath];
@@ -121,10 +133,12 @@ static NSNumberFormatter *itemCountFormatter;
 	[self.contentView bringSubviewToFront:readCount];
 }
 
-- (void)setSelected:(BOOL)selected
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated
 {
-	[self.contentView bringSubviewToFront:unreadCount];
-	[self.contentView bringSubviewToFront:readCount];
+	[super setSelected:selected animated:animated];
+
+	unreadCount.backgroundColor = [UIColor redColor];
+	readCount.backgroundColor = [UIColor colorWithWhite:0.9 alpha:1.0];
 }
 
 @end

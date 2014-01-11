@@ -34,7 +34,7 @@
 
 -(BOOL)isMine
 {
-	return [self.userId.stringValue isEqualToString:[AppDelegate shared].api.localUserId];
+	return [self.userId.stringValue isEqualToString:[Settings shared].localUserId];
 }
 
 +(void)removeCommentsWithPullRequestURL:(NSString *)url inMoc:(NSManagedObjectContext *)moc

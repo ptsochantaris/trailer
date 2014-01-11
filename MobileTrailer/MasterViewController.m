@@ -76,7 +76,7 @@
 {
     [super viewDidLoad];
 
-    searchTimer = [[HTPopTimer alloc] initWithTimeInterval:0.5 target:self selector:@selector(searchTimerPopped)];
+    searchTimer = [[HTPopTimer alloc] initWithTimeInterval:0.5 target:self selector:@selector(reloadData)];
 
     searchField = [[UITextField alloc] initWithFrame:CGRectMake(10, 10, 300, 31)];
 	searchField.placeholder = @"Filter...";
@@ -111,6 +111,17 @@
 											 selector:@selector(localNotification:)
 												 name:RECEIVED_NOTIFICATION_KEY
 											   object:nil];
+
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(reloadData)
+												 name:DISPLAY_OPTIONS_UPDATED_KEY
+											   object:nil];
+}
+
+- (void)reloadData
+{
+	_fetchedResultsController = nil;
+	[self.tableView reloadData];
 }
 
 - (void)localNotification:(NSNotification *)notification
@@ -144,8 +155,7 @@
 		});
 
         searchField.text = nil;
-        _fetchedResultsController = nil;
-        [self.tableView reloadData];
+        [self reloadData];
 		NSIndexPath *ip = [_fetchedResultsController indexPathForObject:pullRequest];
 		if(ip)
 		{
@@ -263,39 +273,25 @@
     if (_fetchedResultsController != nil) {
         return _fetchedResultsController;
     }
-    
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-    // Edit the entity name as appropriate.
-    NSEntityDescription *entity = [NSEntityDescription entityForName:@"PullRequest" inManagedObjectContext:self.managedObjectContext];
-    [fetchRequest setEntity:entity];
 
-    if(searchField.text.length)
-        [fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"title CONTAINS [cd] %@ OR userLogin CONTAINS [cd] %@",searchField.text,searchField.text]];
-    
-    // Set the batch size to a suitable number.
+    NSFetchRequest *fetchRequest = [PullRequest requestForPullRequestsSortedByField:[Settings shared].sortField
+																			 filter:searchField.text
+																		  ascending:![Settings shared].sortDescending];
     [fetchRequest setFetchBatchSize:20];
-    
-    // Edit the sort key as appropriate.
-    [fetchRequest setSortDescriptors:@[ [[NSSortDescriptor alloc] initWithKey:@"sectionIndex" ascending:YES],
-									    [[NSSortDescriptor alloc] initWithKey:@"createdAt" ascending:NO] ]];
-    
-    // Edit the section name key path and cache name if appropriate.
-    // nil for section name key path means "no sections".
+
     NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
 																								managedObjectContext:self.managedObjectContext
 																								  sectionNameKeyPath:@"sectionName"
 																										   cacheName:nil];
     aFetchedResultsController.delegate = self;
     self.fetchedResultsController = aFetchedResultsController;
-    
+
 	NSError *error = nil;
 	if (![self.fetchedResultsController performFetch:&error]) {
-	     // Replace this implementation with code to handle the error appropriately.
-	     // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. 
 	    NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
 	    abort();
 	}
-    
+
     return _fetchedResultsController;
 }    
 
@@ -368,8 +364,7 @@
 - (BOOL)textFieldShouldClear:(UITextField *)textField
 {
     textField.text = nil;
-    _fetchedResultsController = nil;
-    [self.tableView reloadData];
+    [self reloadData];
     return NO;
 }
 
@@ -384,12 +379,6 @@
         [searchTimer push];
 	}
 	return YES;
-}
-
-- (void)searchTimerPopped
-{
-    _fetchedResultsController = nil;
-    [self.tableView reloadData];
 }
 
 @end

@@ -18,9 +18,9 @@
 	for(PRComment *c in latestComments)
 	{
 		PullRequest *r = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:self.managedObjectContext];
-		if([AppDelegate shared].api.showCommentsEverywhere || r.isMine || r.commentedByMe)
+		if([Settings shared].showCommentsEverywhere || r.isMine || r.commentedByMe)
 		{
-			if(![c.userId.stringValue isEqualToString:[AppDelegate shared].api.localUserId])
+			if(![c.userId.stringValue isEqualToString:[Settings shared].localUserId])
 			{
 				[[AppDelegate shared] postNotificationOfType:kNewComment forItem:c];
 			}

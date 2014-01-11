@@ -27,7 +27,7 @@ CGFloat GLOBAL_SCREEN_SCALE;
 	self.dataManager = [[DataManager alloc] init];
 	self.api = [[API alloc] init];
 
-	if(self.api.authToken.length) [self.api updateLimitFromServer];
+	if([Settings shared].authToken.length) [self.api updateLimitFromServer];
 
 	[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(defaultsUpdated)
@@ -36,7 +36,7 @@ CGFloat GLOBAL_SCREEN_SCALE;
 
 	[self setupUI];
 
-	if(self.api.authToken.length)
+	if([Settings shared].authToken.length)
 	{
 		NSArray *activeRepos = [Repo activeReposInMoc:self.dataManager.managedObjectContext];
 		if(activeRepos.count==0)
@@ -58,7 +58,7 @@ CGFloat GLOBAL_SCREEN_SCALE;
 												 name:kReachabilityChangedNotification
 											   object:nil];
 
-	[[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:600.0];
+	[[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:[Settings shared].backgroundRefreshPeriod];
 
 // ONLY FOR DEBUG!
 /*
@@ -132,13 +132,13 @@ CGFloat GLOBAL_SCREEN_SCALE;
 	if(self.lastSuccessfulRefresh)
 	{
 		NSTimeInterval howLongAgo = [[NSDate date] timeIntervalSinceDate:self.lastSuccessfulRefresh];
-		if(howLongAgo>self.api.refreshPeriod)
+		if(howLongAgo>[Settings shared].refreshPeriod)
 		{
 			[self startRefresh];
 		}
 		else
 		{
-			NSTimeInterval howLongUntilNextSync = self.api.refreshPeriod-howLongAgo;
+			NSTimeInterval howLongUntilNextSync = [Settings shared].refreshPeriod-howLongAgo;
 			DLog(@"No need to refresh yet, will refresh in %f",howLongUntilNextSync);
 			self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:howLongUntilNextSync
 																 target:self
@@ -161,10 +161,8 @@ CGFloat GLOBAL_SCREEN_SCALE;
 
 - (void)updateBadge
 {
-	NSArray *allPRs = [PullRequest pullRequestsSortedByField:nil
-													  filter:nil
-												   ascending:NO
-													   inMoc:self.dataManager.managedObjectContext];
+	NSFetchRequest *f = [PullRequest requestForPullRequestsSortedByField:nil filter:nil ascending:YES];
+	NSArray *allPRs = [self.dataManager.managedObjectContext executeFetchRequest:f error:nil];
 	NSInteger count = 0;
 	for(PullRequest *r in allPRs)
 		if(!r.merged.boolValue)
@@ -175,7 +173,7 @@ CGFloat GLOBAL_SCREEN_SCALE;
 
 - (void)checkApiUsage
 {
-	if(self.api.authToken.length==0) return;
+	if([Settings shared].authToken.length==0) return;
 	if(self.api.requestsRemaining==0)
 	{
 		[[[UIAlertView alloc] initWithTitle:@"Your API request usage is over the limit!"
@@ -231,7 +229,7 @@ CGFloat GLOBAL_SCREEN_SCALE;
 
 	if([[AppDelegate shared].api.reachability currentReachabilityStatus]==NotReachable) return;
 
-	if(self.api.authToken.length==0) return;
+	if([Settings shared].authToken.length==0) return;
 
 	[self prepareForRefresh];
 
@@ -273,7 +271,7 @@ CGFloat GLOBAL_SCREEN_SCALE;
 							  otherButtonTitles:nil] show];
 		}
 
-		self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:self.api.refreshPeriod
+		self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:[Settings shared].refreshPeriod
 															 target:self
 														   selector:@selector(refreshTimerDone)
 														   userInfo:nil
@@ -284,7 +282,7 @@ CGFloat GLOBAL_SCREEN_SCALE;
 
 -(void)refreshTimerDone
 {
-	if(self.api.localUserId && self.api.authToken.length)
+	if([Settings shared].localUserId && [Settings shared].authToken.length)
 	{
 		[self startRefresh];
 	}
