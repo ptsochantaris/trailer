@@ -124,14 +124,15 @@
 		NSDictionary *m = [NSPersistentStoreCoordinator metadataForPersistentStoreOfType:NSSQLiteStoreType URL:sqlStore error:&error];
 		self.justMigrated = ![mom isConfiguration:nil compatibleWithStoreMetadata:m];
 
-		if (![coordinator addPersistentStoreWithType:NSSQLiteStoreType
-									   configuration:nil
-												 URL:sqlStore
-											 options:@{ NSMigratePersistentStoresAutomaticallyOption: @YES,
-														NSInferMappingModelAutomaticallyOption: @YES }
-											   error:&error]) {
-			DLog(@"%@",error);
-			return nil;
+		if(![self addStorePath:sqlStore toCoordinator:coordinator])
+		{
+			DLog(@"Failed to migrate/load DB store - will nuke it and retry");
+			[[NSFileManager defaultManager] removeItemAtURL:sqlStore error:nil];
+			if(![self addStorePath:sqlStore toCoordinator:coordinator])
+			{
+				DLog(@"Catastrophic failure, app is probably corrupted and needs reinstall");
+				abort();
+			}
 		}
 #ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
 	}
@@ -139,6 +140,19 @@
     _persistentStoreCoordinator = coordinator;
 
     return _persistentStoreCoordinator;
+}
+
+- (BOOL)addStorePath:(NSURL *)sqlStore toCoordinator:(NSPersistentStoreCoordinator *)coordinator
+{
+	NSError *error = nil;
+	NSPersistentStore *store = [coordinator addPersistentStoreWithType:NSSQLiteStoreType
+														 configuration:nil
+																   URL:sqlStore
+															   options:@{ NSMigratePersistentStoresAutomaticallyOption: @YES,
+																		  NSInferMappingModelAutomaticallyOption: @YES }
+																 error:&error];
+	if(error) DLog(@"%@",error);
+	return store!=nil;
 }
 
 - (void)removeDatabaseFiles

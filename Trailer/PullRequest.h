@@ -26,6 +26,9 @@
 @property (nonatomic, retain) NSNumber *repoId;
 @property (nonatomic, retain) NSNumber *merged;
 
+@property (nonatomic, retain) NSNumber *totalComments;
+@property (nonatomic, retain) NSNumber *unreadComments;
+
 @property (nonatomic, retain) NSNumber *sectionIndex;
 @property (nonatomic, readonly) NSString *sectionName;
 
@@ -33,15 +36,11 @@
 
 + (PullRequest *)pullRequestWithUrl:(NSString *)url moc:(NSManagedObjectContext *)moc;
 
-+ (NSFetchRequest *)requestForPullRequestsSortedByField:(NSString *)fieldName
-												 filter:(NSString *)filter
-											  ascending:(BOOL)ascending;
++ (NSFetchRequest *)requestForPullRequestsWithFilter:(NSString *)filter;
 
 + (NSArray *)allMergedRequestsInMoc:(NSManagedObjectContext *)moc;
 
 + (NSUInteger)countUnmergedRequestsInMoc:(NSManagedObjectContext *)moc;
-
-- (NSInteger)unreadCommentCount;
 
 - (void)catchUpWithComments;
 
@@ -49,6 +48,6 @@
 
 - (BOOL)commentedByMe;
 
-- (void)updateSectionIndex;
+- (void)postProcess;
 
 @end

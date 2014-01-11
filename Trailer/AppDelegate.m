@@ -391,10 +391,6 @@ static AppDelegate *_static_shared_ref;
 
 	for(PullRequest *r in pullRequests)
 	{
-		if([Settings shared].shouldHideUncommentedRequests)
-			if(r.unreadCommentCount==0)
-				continue;
-
 		PRItemView *item = [[PRItemView alloc] initWithPullRequest:r userInfo:r.serverId delegate:self];
 		if(r.merged.boolValue)
 		{
@@ -405,7 +401,7 @@ static AppDelegate *_static_shared_ref;
 		{
 			myCount++;
 			[menuItems insertObject:item atIndex:myIndex++];
-			unreadCommentCount += [r unreadCommentCount];
+			unreadCommentCount += r.unreadComments.integerValue;
 			participatedIndex++;
 			mergedIndex++;
 		}
@@ -413,7 +409,7 @@ static AppDelegate *_static_shared_ref;
 		{
 			participatedCount++;
 			[menuItems insertObject:item atIndex:participatedIndex++];
-			unreadCommentCount += [r unreadCommentCount];
+			unreadCommentCount += r.unreadComments.integerValue;
 			mergedIndex++;
 		}
 		else // all other pull requests
@@ -421,7 +417,7 @@ static AppDelegate *_static_shared_ref;
 			allCount++;
 			[menuItems insertObject:item atIndex:allIndex];
 			if([Settings shared].showCommentsEverywhere)
-				unreadCommentCount += [r unreadCommentCount];
+				unreadCommentCount += r.unreadComments.integerValue;
 		}
 		allIndex++;
 	}
@@ -857,7 +853,7 @@ static AppDelegate *_static_shared_ref;
 
 - (NSArray *)pullRequestList
 {
-	NSFetchRequest *f = [PullRequest requestForPullRequestsSortedByField:[Settings shared].sortField filter:self.mainMenuFilter.stringValue ascending:![Settings shared].sortDescending];
+	NSFetchRequest *f = [PullRequest requestForPullRequestsWithFilter:self.mainMenuFilter.stringValue];
 	return [self.dataManager.managedObjectContext executeFetchRequest:f error:nil];
 }
 

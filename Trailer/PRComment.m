@@ -48,13 +48,6 @@
 	}
 }
 
-+(NSInteger)countCommentsForPullRequestUrl:(NSString *)url inMoc:(NSManagedObjectContext *)moc
-{
-	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
-	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestUrl = %@",url];
-	return [moc countForFetchRequest:f error:nil];
-}
-
 +(NSArray *)commentsForPullRequestUrl:(NSString *)url inMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];

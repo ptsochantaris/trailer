@@ -52,10 +52,10 @@ static CGColorRef _highlightColor;
 		_userInfo = userInfo;
 
 		NSInteger _commentsNew=0;
-		NSInteger _commentsTotal = [PRComment countCommentsForPullRequestUrl:pullRequest.url inMoc:[AppDelegate shared].dataManager.managedObjectContext];
+		NSInteger _commentsTotal = pullRequest.totalComments.integerValue;
 		if([Settings shared].showCommentsEverywhere || pullRequest.isMine || pullRequest.commentedByMe)
 		{
-			_commentsNew = [pullRequest unreadCommentCount];
+			_commentsNew = pullRequest.unreadComments.integerValue;
 		}
 
 		NSString *_dates, *_title;

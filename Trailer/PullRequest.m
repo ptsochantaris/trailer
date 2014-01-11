@@ -19,6 +19,8 @@
 @dynamic userAvatarUrl;
 @dynamic userLogin;
 @dynamic sectionIndex;
+@dynamic totalComments;
+@dynamic unreadComments;
 
 +(PullRequest *)pullRequestWithInfo:(NSDictionary *)info moc:(NSManagedObjectContext *)moc
 {
@@ -41,12 +43,28 @@
 	return p;
 }
 
-- (void)updateSectionIndex
+- (void)postProcess
 {
 	if(self.isMine) self.sectionIndex = @kPullRequestSectionMine;
 	else if(self.merged.boolValue) self.sectionIndex = @kPullRequestSectionMerged;
 	else if(self.commentedByMe) self.sectionIndex = @kPullRequestSectionParticipated;
 	else self.sectionIndex = @kPullRequestSectionAll;
+
+	if(!self.latestReadCommentDate) self.latestReadCommentDate = [NSDate distantPast];
+
+	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
+	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestUrl == %@ and updatedAt > %@", self.url, self.latestReadCommentDate];
+	NSArray *res = [self.managedObjectContext executeFetchRequest:f error:nil];
+
+	NSInteger unreadCount = 0;
+	for(PRComment *c in res)
+		if(!c.isMine) // don't count my comments
+			unreadCount++;
+
+	self.unreadComments = @(unreadCount);
+
+	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestUrl = %@",self.url];
+	self.totalComments = @([self.managedObjectContext countForFetchRequest:f error:nil]);
 }
 
 - (NSString *)sectionName
@@ -54,17 +72,27 @@
 	return [kPullRequestSectionNames objectAtIndex:self.sectionIndex.integerValue];
 }
 
-+ (NSFetchRequest *)requestForPullRequestsSortedByField:(NSString *)fieldName
-												 filter:(NSString *)filter
-											  ascending:(BOOL)ascending
++ (NSFetchRequest *)requestForPullRequestsWithFilter:(NSString *)filter
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PullRequest"];
+
+	NSMutableArray *predicateSegments = [NSMutableArray array];
+
 	if(filter.length)
 	{
-		f.predicate = [NSPredicate predicateWithFormat:@"title contains[cd] %@ or userLogin contains[cd] %@",filter,filter];
+		[predicateSegments addObject:[NSString stringWithFormat:@"(title contains[cd] %@ or userLogin contains[cd] %@)",filter,filter]];
 	}
 
+	if([Settings shared].shouldHideUncommentedRequests)
+	{
+		[predicateSegments addObject:@"(unreadComments > 0)"];
+	}
+
+	if(predicateSegments.count) f.predicate = [NSPredicate predicateWithFormat:[predicateSegments componentsJoinedByString:@" and "]];
+
 	NSMutableArray *sortDescriptors = [NSMutableArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"sectionIndex" ascending:YES]];
+	NSString *fieldName = [Settings shared].sortField;
+	BOOL ascending = ![Settings shared].sortDescending;
 	if([fieldName isEqualToString:@"title"])
 	{
 		[sortDescriptors addObject:[NSSortDescriptor sortDescriptorWithKey:fieldName ascending:ascending selector:@selector(caseInsensitiveCompare:)]];
@@ -97,22 +125,6 @@
 	[PRComment removeCommentsWithPullRequestURL:self.url inMoc:self.managedObjectContext];
 }
 
--(NSInteger)unreadCommentCount
-{
-	if(!self.latestReadCommentDate) self.latestReadCommentDate = [NSDate distantPast];
-	
-	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
-	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestUrl == %@ and updatedAt > %@",self.url,self.latestReadCommentDate];
-	NSArray *res = [self.managedObjectContext executeFetchRequest:f error:nil];
-
-	NSInteger unreadCount = 0;
-	for(PRComment *c in res)
-		if(!c.isMine) // don't count my comments
-			unreadCount++;
-
-	return unreadCount;
-}
-
 +(PullRequest *)pullRequestWithUrl:(NSString *)url moc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PullRequest"];
@@ -133,6 +145,7 @@
 			self.latestReadCommentDate = c.updatedAt;
 		}
 	}
+	[self postProcess];
 }
 
 -(BOOL)isMine

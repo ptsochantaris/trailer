@@ -22,17 +22,10 @@ CGFloat GLOBAL_SCREEN_SCALE;
 
 	GLOBAL_SCREEN_SCALE = [UIScreen mainScreen].scale;
 
-	self.filterTimer = [[HTPopTimer alloc] initWithTimeInterval:0.4 target:self selector:@selector(filterTimerPopped)];
-
 	self.dataManager = [[DataManager alloc] init];
 	self.api = [[API alloc] init];
 
 	if([Settings shared].authToken.length) [self.api updateLimitFromServer];
-
-	[[NSNotificationCenter defaultCenter] addObserver:self
-											 selector:@selector(defaultsUpdated)
-												 name:NSUserDefaultsDidChangeNotification
-											   object:nil];
 
 	[self setupUI];
 
@@ -103,16 +96,6 @@ CGFloat GLOBAL_SCREEN_SCALE;
 	}
 }
 
-- (void)filterTimerPopped
-{
-	// TODO
-}
-
-- (void)defaultsUpdated
-{
-	// TODO
-}
-
 - (void)forcePreferences
 {
 	// TODO
@@ -161,12 +144,12 @@ CGFloat GLOBAL_SCREEN_SCALE;
 
 - (void)updateBadge
 {
-	NSFetchRequest *f = [PullRequest requestForPullRequestsSortedByField:nil filter:nil ascending:YES];
+	NSFetchRequest *f = [PullRequest requestForPullRequestsWithFilter:nil];
 	NSArray *allPRs = [self.dataManager.managedObjectContext executeFetchRequest:f error:nil];
 	NSInteger count = 0;
 	for(PullRequest *r in allPRs)
 		if(!r.merged.boolValue)
-			count += [r unreadCommentCount];
+			count += r.unreadComments.integerValue;
 	
 	[UIApplication sharedApplication].applicationIconBadgeNumber = count;
 }

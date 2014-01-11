@@ -35,13 +35,20 @@
 		switch (indexPath.row) {
 			case 0:
 			{
-				cell.textLabel.text = [NSString stringWithFormat:@"Foreground refresh interval"];
+				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+					cell.textLabel.text = [NSString stringWithFormat:@"Foreground refresh interval"];
+				else
+					cell.textLabel.text = [NSString stringWithFormat:@"Foreground refresh\ninterval"];
+
 				cell.detailTextLabel.text = [NSString stringWithFormat:@"%.0f seconds",[Settings shared].refreshPeriod];
 				break;
 			}
 			case 1:
 			{
-				cell.textLabel.text = [NSString stringWithFormat:@"Background refresh interval (minimum)"];
+				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+					cell.textLabel.text = [NSString stringWithFormat:@"Background refresh interval (minimum)"];
+				else
+					cell.textLabel.text = [NSString stringWithFormat:@"Background refresh\ninterval (minimum)"];
 				cell.detailTextLabel.text = [NSString stringWithFormat:@"%.0f minutes",[Settings shared].backgroundRefreshPeriod/60.0];
 				break;
 			}
@@ -52,25 +59,37 @@
 		switch (indexPath.row) {
 			case 0:
 			{
-				cell.textLabel.text = [NSString stringWithFormat:@"Display creation instead of activity times"];
+				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+					cell.textLabel.text = [NSString stringWithFormat:@"Display creation instead of activity times"];
+				else
+					cell.textLabel.text = [NSString stringWithFormat:@"Display creation instead\nof activity times"];
 				cell.detailTextLabel.text = [self yesNo:[Settings shared].showCreatedInsteadOfUpdated];
 				break;
 			}
 			case 1:
 			{
-				cell.textLabel.text = [NSString stringWithFormat:@"Display new badges and alerts for all PRs"];
+				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+					cell.textLabel.text = [NSString stringWithFormat:@"Display new badges and alerts for all PRs"];
+				else
+					cell.textLabel.text = [NSString stringWithFormat:@"Display new badges\nand alerts for all PRs"];
 				cell.detailTextLabel.text = [self yesNo:[Settings shared].showCommentsEverywhere];
 				break;
 			}
 			case 2:
 			{
-				cell.textLabel.text = [NSString stringWithFormat:@"Only display PRs with unread comments"];
+				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+					cell.textLabel.text = [NSString stringWithFormat:@"Only display PRs with unread comments"];
+				else
+					cell.textLabel.text = [NSString stringWithFormat:@"Only display PRs\nwith unread comments"];
 				cell.detailTextLabel.text = [self yesNo:[Settings shared].shouldHideUncommentedRequests];
 				break;
 			}
 			case 3:
 			{
-				cell.textLabel.text = [NSString stringWithFormat:@"Don't keep PRs merged by me"];
+				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+					cell.textLabel.text = [NSString stringWithFormat:@"Don't keep PRs merged by me"];
+				else
+					cell.textLabel.text = [NSString stringWithFormat:@"Don't keep PRs\nmerged by me"];
 				cell.detailTextLabel.text = [self yesNo:[Settings shared].dontKeepMyPrs];
 				break;
 			}
@@ -123,7 +142,7 @@
 				for(NSInteger f=30;f<3600;f+=10)
 				{
 					if(f==[Settings shared].refreshPeriod) previousValue = count;
-					[values addObject:[NSString stringWithFormat:@"%d seconds",f]];
+					[values addObject:[NSString stringWithFormat:@"%ld seconds",(long)f]];
 					count++;
 				}
 				break;
@@ -135,7 +154,7 @@
 				for(NSInteger f=10;f<10000;f+=10)
 				{
 					if(f==[Settings shared].backgroundRefreshPeriod/60) previousValue = count;
-					[values addObject:[NSString stringWithFormat:@"%d minutes",f]];
+					[values addObject:[NSString stringWithFormat:@"%ld minutes",(long)f]];
 					count++;
 				}
 				break;

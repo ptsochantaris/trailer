@@ -17,7 +17,7 @@
 	#define CACHE_DISK 1024*1024*128
 #else
 	#define CACHE_MEMORY 1024*1024*2
-	#define CACHE_DISK 0
+	#define CACHE_DISK 1024*1024*8
 #endif
 
 - (id)init
@@ -303,7 +303,8 @@
 									[DataItem nukeDeletedItemsOfType:@"Repo" inMoc:syncContext];
 									[DataItem nukeDeletedItemsOfType:@"PullRequest" inMoc:syncContext];
 
-									[self updateSectionIndexesInMoc:syncContext];
+									NSArray *surviving = [PullRequest itemsOfType:@"PullRequest" surviving:YES inMoc:syncContext];
+									for(PullRequest *r in surviving) [r postProcess];
 
 									if(success && syncContext.hasChanges)
 									{
@@ -320,12 +321,6 @@
 		}
 		else if(callback) callback(NO);
 	}];
-}
-
-- (void)updateSectionIndexesInMoc:(NSManagedObjectContext *)moc
-{
-	NSArray *prs = [PullRequest itemsOfType:@"PullRequest" surviving:YES inMoc:moc];
-	for(PullRequest *r in prs) [r updateSectionIndex];
 }
 
 -(void)_fetchPullRequestsForRepos:(NSMutableArray *)repos toMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback

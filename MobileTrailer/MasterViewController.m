@@ -229,9 +229,10 @@
 	CGFloat w = 208;
 	if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) w = 227;
 
-	return [pr.title sizeWithFont:[UIFont systemFontOfSize:[UIFont labelFontSize]]
-				constrainedToSize:CGSizeMake(w, 5000)
-					lineBreakMode:NSLineBreakByWordWrapping].height+40;
+	return [pr.title boundingRectWithSize:CGSizeMake(w, CGFLOAT_MAX)
+								  options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
+							   attributes:@{ NSFontAttributeName:[UIFont systemFontOfSize:[UIFont labelFontSize]] }
+								  context:nil].size.height+40;
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
@@ -274,9 +275,7 @@
         return _fetchedResultsController;
     }
 
-    NSFetchRequest *fetchRequest = [PullRequest requestForPullRequestsSortedByField:[Settings shared].sortField
-																			 filter:searchField.text
-																		  ascending:![Settings shared].sortDescending];
+    NSFetchRequest *fetchRequest = [PullRequest requestForPullRequestsWithFilter:searchField.text];
     [fetchRequest setFetchBatchSize:20];
 
     NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
