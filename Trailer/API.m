@@ -670,7 +670,7 @@
     }
 }
 
-- (void)expireOldEntries
+- (void)expireOldImageCacheEntries
 {
     NSFileManager *fileManager = [NSFileManager defaultManager];
     NSArray *files = [fileManager contentsOfDirectoryAtPath:cacheDirectory error:nil];

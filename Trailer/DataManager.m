@@ -214,4 +214,15 @@
 	}
 }
 
+- (void)postMigrationTasks
+{
+	if(self.justMigrated)
+	{
+		DLog(@"FORCING ALL PRS TO BE REFETCHED");
+		NSArray *prs = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.managedObjectContext];
+		for(PullRequest *r in prs) r.updatedAt = [NSDate distantPast];
+		self.justMigrated = NO;
+	}
+}
+
 @end

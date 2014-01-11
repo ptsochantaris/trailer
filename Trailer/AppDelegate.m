@@ -772,13 +772,9 @@ static AppDelegate *_static_shared_ref;
 	[self.githubTokenHolder setEnabled:NO];
 	[self.activityDisplay startAnimation:nil];
 	self.statusItemView.grayOut = YES;
-	if(self.dataManager.justMigrated)
-	{
-		DLog(@"FORCING ALL PRS TO BE REFETCHED");
-		NSArray *prs = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.dataManager.managedObjectContext];
-		for(PullRequest *r in prs) r.updatedAt = [NSDate distantPast];
-		self.dataManager.justMigrated = NO;
-	}
+
+	[self.api expireOldImageCacheEntries];
+	[self.dataManager postMigrationTasks];
 }
 
 -(void)completeRefresh
@@ -809,8 +805,6 @@ static AppDelegate *_static_shared_ref;
 	[self prepareForRefresh];
 	id oldTarget = self.refreshNow.target;
 	SEL oldAction = self.refreshNow.action;
-
-    [self.api expireOldEntries];
 
 	if([Settings shared].localUser)
 		self.refreshNow.title = [NSString stringWithFormat:@" Refreshing %@...",[Settings shared].localUser];

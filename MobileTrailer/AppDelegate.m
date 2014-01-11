@@ -188,15 +188,8 @@ CGFloat GLOBAL_SCREEN_SCALE;
 	[[NSNotificationCenter defaultCenter] postNotificationName:REFRESH_STARTED_NOTIFICATION object:nil];
 	DLog(@"Starting refresh");
 
-    [self.api expireOldEntries];
-
-	if(self.dataManager.justMigrated)
-	{
-		DLog(@"FORCING ALL PRS TO BE REFETCHED");
-		NSArray *prs = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.dataManager.managedObjectContext];
-		for(PullRequest *r in prs) r.updatedAt = [NSDate distantPast];
-		self.dataManager.justMigrated = NO;
-	}
+    [self.api expireOldImageCacheEntries];
+	[self.dataManager postMigrationTasks];
 }
 
 -(void)completeRefresh
