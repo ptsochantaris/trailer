@@ -738,22 +738,25 @@ static AppDelegate *_static_shared_ref;
 
 - (void)checkApiUsage
 {
-	if(self.api.requestsRemaining==0)
+	if(self.api.requestsLimit>0)
 	{
-        NSAlert *alert = [[NSAlert alloc] init];
-        [alert setMessageText:@"Your API request usage is over the limit!"];
-        [alert setInformativeText:[NSString stringWithFormat:@"Your request cannot be completed until GitHub resets your hourly API allowance at %@.\n\nIf you get this error often, try to make fewer manual refreshes or reducing the number of repos you are monitoring.\n\nYou can check your API usage at any time from the bottom of the preferences pane at any time.",self.api.resetDate]];
-        [alert addButtonWithTitle:@"OK"];
-		[alert runModal];
-		return;
-	}
-	else if((self.api.requestsRemaining/self.api.requestsLimit)<LOW_API_WARNING)
-	{
-        NSAlert *alert = [[NSAlert alloc] init];
-        [alert setMessageText:@"Your API request usage is close to full"];
-        [alert setInformativeText:[NSString stringWithFormat:@"Try to make fewer manual refreshes, increasing the automatic refresh time, or reducing the number of repos you are monitoring.\n\nYour allowance will be reset by Github on %@.\n\nYou can check your API usage from the bottom of the preferences pane.",self.api.resetDate]];
-        [alert addButtonWithTitle:@"OK"];
-		[alert runModal];
+		if(self.api.requestsRemaining==0)
+		{
+			NSAlert *alert = [[NSAlert alloc] init];
+			[alert setMessageText:@"Your API request usage is over the limit!"];
+			[alert setInformativeText:[NSString stringWithFormat:@"Your request cannot be completed until GitHub resets your hourly API allowance at %@.\n\nIf you get this error often, try to make fewer manual refreshes or reducing the number of repos you are monitoring.\n\nYou can check your API usage at any time from the bottom of the preferences pane at any time.",self.api.resetDate]];
+			[alert addButtonWithTitle:@"OK"];
+			[alert runModal];
+			return;
+		}
+		else if((self.api.requestsRemaining/self.api.requestsLimit)<LOW_API_WARNING)
+		{
+			NSAlert *alert = [[NSAlert alloc] init];
+			[alert setMessageText:@"Your API request usage is close to full"];
+			[alert setInformativeText:[NSString stringWithFormat:@"Try to make fewer manual refreshes, increasing the automatic refresh time, or reducing the number of repos you are monitoring.\n\nYour allowance will be reset by Github on %@.\n\nYou can check your API usage from the bottom of the preferences pane.",self.api.resetDate]];
+			[alert addButtonWithTitle:@"OK"];
+			[alert runModal];
+		}
 	}
 }
 
