@@ -8,6 +8,29 @@
 
 
 		<item>
+	            <title>Version 1.0.2</title>
+				<description><![CDATA[<font face="sans-serif" size="3"><ul>
+<li>Corrected a non-critical issue with the “refreshing” menu item label</li>
+<li>Significant UI smoothness and performance gains, specifically relating to image handling, caching, and comment counting logic</li>
+<li>Large under-the-hood changes to improve the codebase</li>
+<li>Improvements to API load warning logic</li>
+<li>Repository refresh bug corrected</li>
+<li>Prioritised API calls over image calls in the network queue</li>
+<li>When removing merged PRs the menu re-opens after the confirmation box has been responded to</li>
+<li>Failed database upgrades would cause the app to lock up, fixed</li>
+<li>Corrected rare corner case where the first API load would fail and the app would give an API limit warning</li>				
+</ul></font>]]></description>
+	            <pubDate>Sun, 12 Jan 2014 00:00:00 +0000</pubDate>
+	            <enclosure 
+url="http://dev.housetrip.com/trailer/trailer102.zip"
+sparkle:version="1020"
+sparkle:shortVersionString="1.0.2"
+sparkle:dsaSignature="MC4CFQCwtiHMpMQZcOVMaqJTKYscYHLedAIVAKtWcXeg1EymvGJi3BE0cY+lMLXM"
+type="application/octet-stream"/>
+		</item>
+					
+
+		<item>
 	            <title>Version 1.0.1</title>
 				<description><![CDATA[<font face="sans-serif" size="3"><ul>
 <li>Added new 'About' box</li>
