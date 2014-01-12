@@ -12,6 +12,7 @@
 #import <CommonCrypto/CommonCrypto.h>
 
 #import "NSDictionary+NSDictionary_OFK.h"
+#import "UINavigationController+DismissKeyboard.h"
 #import "NSString+Extensions.h"
 #import "Reachability.h"
 #import "Settings.h"
@@ -32,6 +33,7 @@
 #import "GithubViewController.h"
 #import "PreferencesViewController.h"
 #import "AdvancedSettingsViewController.h"
+#import "AboutTrailerViewController.h"
 #import "AppDelegate.h"
 
 #endif

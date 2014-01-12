@@ -29,23 +29,6 @@ CGFloat GLOBAL_SCREEN_SCALE;
 
 	[self setupUI];
 
-	if([Settings shared].authToken.length)
-	{
-		NSArray *activeRepos = [Repo activeReposInMoc:self.dataManager.managedObjectContext];
-		if(activeRepos.count==0)
-		{
-			[self forcePreferences];
-		}
-		else
-		{
-			[self startRefresh];
-		}
-	}
-	else
-	{
-		[self forcePreferences];
-	}
-
 	[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(networkStateChanged)
 												 name:kReachabilityChangedNotification
@@ -61,6 +44,20 @@ CGFloat GLOBAL_SCREEN_SCALE;
 													   inMoc:self.dataManager.managedObjectContext];
 	if(allPRs.count) [allPRs[0] setMerged:@YES];
 */
+
+	double delayInSeconds = 0.1;
+	dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+	dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+		NSArray *activeRepos = [Repo activeReposInMoc:self.dataManager.managedObjectContext];
+		if(activeRepos.count==0 || [Settings shared].authToken.length==0)
+		{
+			[self forcePreferences];
+		}
+		else
+		{
+			[self startRefresh];
+		}
+	});
 
     return YES;
 }
@@ -81,7 +78,8 @@ CGFloat GLOBAL_SCREEN_SCALE;
 
 - (void)setupUI
 {
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+	{
 	    UISplitViewController *splitViewController = (UISplitViewController *)self.window.rootViewController;
 	    UINavigationController *navigationController = [splitViewController.viewControllers lastObject];
 	    splitViewController.delegate = (id)navigationController.topViewController;
@@ -89,7 +87,9 @@ CGFloat GLOBAL_SCREEN_SCALE;
 	    UINavigationController *masterNavigationController = splitViewController.viewControllers[0];
 	    MasterViewController *controller = (MasterViewController *)masterNavigationController.topViewController;
 	    controller.managedObjectContext = self.dataManager.managedObjectContext;
-	} else {
+	}
+	else
+	{
 	    UINavigationController *navigationController = (UINavigationController *)self.window.rootViewController;
 	    MasterViewController *controller = (MasterViewController *)navigationController.topViewController;
 	    controller.managedObjectContext = self.dataManager.managedObjectContext;
@@ -98,7 +98,21 @@ CGFloat GLOBAL_SCREEN_SCALE;
 
 - (void)forcePreferences
 {
-	// TODO
+	MasterViewController *controller = nil;
+
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+	{
+		UISplitViewController *splitViewController = (UISplitViewController *)self.window.rootViewController;
+		UINavigationController *masterNavigationController = splitViewController.viewControllers[0];
+		controller = (MasterViewController *)masterNavigationController.topViewController;
+	}
+	else
+	{
+		UINavigationController *navigationController = (UINavigationController *)self.window.rootViewController;
+		controller = (MasterViewController *)navigationController.topViewController;
+	}
+	
+	[controller performSegueWithIdentifier:@"showPreferences" sender:self];
 }
 
 - (void)networkStateChanged
