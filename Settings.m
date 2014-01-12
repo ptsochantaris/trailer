@@ -1,10 +1,3 @@
-//
-//  Settings.m
-//  Trailer
-//
-//  Created by Paul Tsochantaris on 11/1/14.
-//  Copyright (c) 2014 HouseTrip. All rights reserved.
-//
 
 @implementation Settings
 

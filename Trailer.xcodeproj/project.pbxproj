@@ -945,6 +945,8 @@
 				);
 				INFOPLIST_FILE = "MobileTrailer/MobileTrailer-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				LLVM_LTO = YES;
+				LLVM_VECTORIZE_LOOPS = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -965,10 +967,13 @@
 					"$(inherited)",
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 				);
+				GCC_OPTIMIZATION_LEVEL = fast;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MobileTrailer/MobileTrailer-Prefix.pch";
 				INFOPLIST_FILE = "MobileTrailer/MobileTrailer-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				LLVM_LTO = YES;
+				LLVM_VECTORIZE_LOOPS = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1106,6 +1111,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Trailer/Trailer-Prefix.pch";
 				INFOPLIST_FILE = "Trailer/Trailer-Info.plist";
+				LLVM_VECTORIZE_LOOPS = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1120,9 +1126,12 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
+				GCC_OPTIMIZATION_LEVEL = fast;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Trailer/Trailer-Prefix.pch";
 				INFOPLIST_FILE = "Trailer/Trailer-Info.plist";
+				LLVM_LTO = YES;
+				LLVM_VECTORIZE_LOOPS = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1136,7 +1145,6 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 					"$(inherited)",
-					/Users/ptsochantaris/Desktop/Trailer,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Trailer/Trailer-Prefix.pch";
@@ -1159,7 +1167,6 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 					"$(inherited)",
-					/Users/ptsochantaris/Desktop/Trailer,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Trailer/Trailer-Prefix.pch";

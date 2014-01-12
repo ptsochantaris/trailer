@@ -5,8 +5,8 @@
 
 #define MENU_WIDTH 500.0
 
-#define DLog(fmt, ...) NSLog(fmt, ##__VA_ARGS__)
-//#define DLog(...)
+//#define DLog(fmt, ...) NSLog(fmt, ##__VA_ARGS__)
+#define DLog(...)
 
 #import <Cocoa/Cocoa.h>
 #import <CommonCrypto/CommonCrypto.h>

@@ -191,10 +191,9 @@
 										}
 										else
 										{
-											NSError *error = [NSError errorWithDomain:@"YOUR_ERROR_DOMAIN"
-																				 code:101
-																			 userInfo:@{NSLocalizedDescriptionKey:@"Error while fetching data from GitHub, please check that the token you have provided is correct and that you have a working network connection"}];
-											DLog(@"%@",error);
+											DLog(@"%@",[NSError errorWithDomain:@"YOUR_ERROR_DOMAIN"
+																		   code:101
+																	   userInfo:@{NSLocalizedDescriptionKey:@"Error while fetching data from GitHub"}]);
 										}
 										if(ok && syncContext.hasChanges) [syncContext save:nil];
 										callback(ok);
