@@ -1,10 +1,6 @@
 
 @implementation AppDelegate
 
-@synthesize persistentStoreCoordinator = _persistentStoreCoordinator;
-@synthesize managedObjectModel = _managedObjectModel;
-@synthesize managedObjectContext = _managedObjectContext;
-
 static AppDelegate *_static_shared_ref;
 +(AppDelegate *)shared { return _static_shared_ref; }
 
@@ -30,9 +26,17 @@ static AppDelegate *_static_shared_ref;
 
 	_static_shared_ref = self;
 
+	self.dataManager = [[DataManager alloc] init];
 	self.api = [[API alloc] init];
 
 	[self setupSortMethodMenu];
+
+    /* DEBUG
+    NSArray *allPRs = [PullRequest pullRequestsSortedByField:nil
+                                                      filter:nil
+                                                   ascending:NO
+                                                       inMoc:self.dataManager.managedObjectContext];
+    if(allPRs.count) [allPRs[0] setMerged:@YES];*/
 
 	[self updateMenu];
 
@@ -50,9 +54,9 @@ static AppDelegate *_static_shared_ref;
 	[self.versionNumber setStringValue:currentAppVersion];
 	[self.aboutVersion setStringValue:currentAppVersion];
 
-	if(self.api.authToken.length)
+	if([Settings shared].authToken.length)
 	{
-		[self.githubTokenHolder setStringValue:self.api.authToken];
+		[self.githubTokenHolder setStringValue:[Settings shared].authToken];
 		[self startRefresh];
 	}
 	else
@@ -69,7 +73,7 @@ static AppDelegate *_static_shared_ref;
 - (void)setupSortMethodMenu
 {
 	NSMenu *m = [[NSMenu alloc] initWithTitle:@"Sorting"];
-	if(self.api.sortDescending)
+	if([Settings shared].sortDescending)
 	{
 		[m addItemWithTitle:@"Newest First" action:@selector(sortMethodChanged:) keyEquivalent:@""];
 		[m addItemWithTitle:@"Most Recently Active" action:@selector(sortMethodChanged:) keyEquivalent:@""];
@@ -82,54 +86,54 @@ static AppDelegate *_static_shared_ref;
 		[m addItemWithTitle:@"Alphabetically" action:@selector(sortMethodChanged:) keyEquivalent:@""];
 	}
 	self.sortModeSelect.menu = m;
-	[self.sortModeSelect selectItemAtIndex:self.api.sortMethod];
+	[self.sortModeSelect selectItemAtIndex:[Settings shared].sortMethod];
 }
 
 - (IBAction)dontKeepMyPrsSelected:(NSButton *)sender
 {
 	BOOL dontKeep = (sender.integerValue==1);
-	self.api.dontKeepMyPrs = dontKeep;
+	[Settings shared].dontKeepMyPrs = dontKeep;
 }
 
 - (IBAction)hideAvatarsSelected:(NSButton *)sender
 {
 	BOOL hide = (sender.integerValue==1);
-	self.api.hideAvatars = hide;
+	[Settings shared].hideAvatars = hide;
 	[self updateMenu];
 }
 
 - (IBAction)hidePrsSelected:(NSButton *)sender
 {
 	BOOL show = (sender.integerValue==1);
-	self.api.shouldHideUncommentedRequests = show;
+	[Settings shared].shouldHideUncommentedRequests = show;
 	[self updateMenu];
 }
 
 - (IBAction)showAllCommentsSelected:(NSButton *)sender
 {
 	BOOL show = (sender.integerValue==1);
-	self.api.showCommentsEverywhere = show;
+	[Settings shared].showCommentsEverywhere = show;
 	[self updateMenu];
 }
 
 - (IBAction)sortOrderSelected:(NSButton *)sender
 {
 	BOOL descending = (sender.integerValue==1);
-	self.api.sortDescending = descending;
+	[Settings shared].sortDescending = descending;
 	[self setupSortMethodMenu];
 	[self updateMenu];
 }
 
 - (IBAction)sortMethodChanged:(id)sender
 {
-	self.api.sortMethod = self.sortModeSelect.indexOfSelectedItem;
+	[Settings shared].sortMethod = self.sortModeSelect.indexOfSelectedItem;
 	[self updateMenu];
 }
 
 - (IBAction)showCreationSelected:(NSButton *)sender
 {
 	BOOL show = (sender.integerValue==1);
-	self.api.showCreatedInsteadOfUpdated = show;
+	[Settings shared].showCreatedInsteadOfUpdated = show;
 	[self updateMenu];
 }
 
@@ -158,10 +162,6 @@ static AppDelegate *_static_shared_ref;
 	return YES;
 }
 
-#define PULL_REQUEST_ID_KEY @"pullRequestIdKey"
-#define COMMENT_ID_KEY @"commentIdKey"
-#define NOTIFICATION_URL_KEY @"urlKey"
-
 -(void)userNotificationCenter:(NSUserNotificationCenter *)center didActivateNotification:(NSUserNotification *)notification
 {
 	switch (notification.activationType)
@@ -178,15 +178,15 @@ static AppDelegate *_static_shared_ref;
 				PullRequest *pullRequest = nil;
 				if(itemId) // it's a pull request
 				{
-					pullRequest = [PullRequest itemOfType:@"PullRequest" serverId:itemId moc:self.managedObjectContext];
+					pullRequest = [PullRequest itemOfType:@"PullRequest" serverId:itemId moc:self.dataManager.managedObjectContext];
 					urlToOpen = pullRequest.webUrl;
 				}
 				else // it's a comment
 				{
 					itemId = notification.userInfo[COMMENT_ID_KEY];
-					PRComment *c = [PRComment itemOfType:@"PRComment" serverId:itemId moc:self.managedObjectContext];
+					PRComment *c = [PRComment itemOfType:@"PRComment" serverId:itemId moc:self.dataManager.managedObjectContext];
 					urlToOpen = c.webUrl;
-					pullRequest = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:self.managedObjectContext];
+					pullRequest = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:self.dataManager.managedObjectContext];
 				}
 				[pullRequest catchUpWithComments];
 			}
@@ -206,6 +206,7 @@ static AppDelegate *_static_shared_ref;
 	if(self.preferencesDirty) return;
 
 	NSUserNotification *notification = [[NSUserNotification alloc] init];
+	notification.userInfo = [self.dataManager infoForType:type item:item];
 
 	switch (type)
 	{
@@ -213,22 +214,19 @@ static AppDelegate *_static_shared_ref;
 		{
 			notification.title = @"New PR Comment";
 			notification.informativeText = [item body];
-			PullRequest *associatedRequest = [PullRequest pullRequestWithUrl:[item pullRequestUrl] moc:self.managedObjectContext];
-			notification.userInfo = @{COMMENT_ID_KEY:[item serverId]};
+			PullRequest *associatedRequest = [PullRequest pullRequestWithUrl:[item pullRequestUrl] moc:self.dataManager.managedObjectContext];
 			notification.subtitle = associatedRequest.title;
 			break;
 		}
 		case kNewPr:
 		{
 			notification.title = @"New PR";
-			notification.userInfo = @{PULL_REQUEST_ID_KEY:[item serverId]};
 			notification.subtitle = [item title];
 			break;
 		}
 		case kPrMerged:
 		{
 			notification.title = @"PR Merged!";
-			notification.userInfo = @{NOTIFICATION_URL_KEY:[item webUrl]};
 			notification.subtitle = [item title];
 			break;
 		}
@@ -239,7 +237,7 @@ static AppDelegate *_static_shared_ref;
 
 - (void)prItemSelected:(PRItemView *)item
 {
-	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:item.userInfo moc:self.managedObjectContext];
+	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:item.userInfo moc:self.dataManager.managedObjectContext];
 	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:r.webUrl]];
 	[r catchUpWithComments];
 	[self updateMenu];
@@ -250,39 +248,47 @@ static AppDelegate *_static_shared_ref;
 	if(self.statusItemView.highlighted)
 	{
 		[self closeMenu];
-		return;
 	}
-	self.statusItemView.highlighted = YES;
-	if(!self.isRefreshing)
+	else
 	{
-		NSString *prefix;
-		if(self.api.localUser)
+		self.statusItemView.highlighted = YES;
+		[self sizeMenuAndShow:YES];
+	}
+}
+
+-(void)menuWillOpen:(NSMenu *)menu
+{
+    if([[menu title] isEqualToString:@"Options"])
+	{
+		if(!self.isRefreshing)
 		{
-			prefix = [NSString stringWithFormat:@" Refresh %@",self.api.localUser];
-		}
-		else
-		{
-			prefix = @" Refresh";
-		}
-		if(self.lastUpdateFailed)
-		{
-			self.refreshNow.title = [prefix stringByAppendingString:@" (last update failed!)"];
-		}
-		else
-		{
-			long ago = (long)[[NSDate date] timeIntervalSinceDate:self.lastSuccessfulRefresh];
-			if(ago<10)
+			NSString *prefix;
+			if([Settings shared].localUser)
 			{
-				self.refreshNow.title = [prefix stringByAppendingString:@" (just updated)"];
+				prefix = [NSString stringWithFormat:@" Refresh %@",[Settings shared].localUser];
 			}
 			else
 			{
-				self.refreshNow.title = [NSString stringWithFormat:@"%@ (updated %ld seconds ago)",prefix,(long)ago];
+				prefix = @" Refresh";
+			}
+			if(self.lastUpdateFailed)
+			{
+				self.refreshNow.title = [prefix stringByAppendingString:@" (last update failed!)"];
+			}
+			else
+			{
+				long ago = (long)[[NSDate date] timeIntervalSinceDate:self.lastSuccessfulRefresh];
+				if(ago<10)
+				{
+					self.refreshNow.title = [prefix stringByAppendingString:@" (just updated)"];
+				}
+				else
+				{
+					self.refreshNow.title = [NSString stringWithFormat:@"%@ (updated %ld seconds ago)",prefix,(long)ago];
+				}
 			}
 		}
-	}
-
-	[self sizeMenuAndShow:YES];
+    }
 }
 
 - (void)sizeMenuAndShow:(BOOL)show
@@ -327,7 +333,7 @@ static AppDelegate *_static_shared_ref;
 
 - (void)sectionHeaderRemoveSelectedFrom:(SectionHeader *)header
 {
-	NSArray *mergedRequests = [PullRequest allMergedRequestsInMoc:self.managedObjectContext];
+	NSArray *mergedRequests = [PullRequest allMergedRequestsInMoc:self.dataManager.managedObjectContext];
 
 	NSAlert *alert = [[NSAlert alloc] init];
 	[alert setMessageText:[NSString stringWithFormat:@"Clear %ld merged PRs?",mergedRequests.count]];
@@ -339,22 +345,25 @@ static AppDelegate *_static_shared_ref;
 	{
 		[self removeAllMergedRequests];
 	}
+    [self sizeMenuAndShow:YES];
 }
 
 - (void)removeAllMergedRequests
 {
-	NSArray *mergedRequests = [PullRequest allMergedRequestsInMoc:self.managedObjectContext];
+	DataManager *dataManager = self.dataManager;
+	NSArray *mergedRequests = [PullRequest allMergedRequestsInMoc:dataManager.managedObjectContext];
 	for(PullRequest *r in mergedRequests)
-		[self.managedObjectContext deleteObject:r];
-	[self saveDB];
+		[dataManager.managedObjectContext deleteObject:r];
+	[dataManager saveDB];
 	[self updateMenu];
 }
 
 - (void)unPinSelectedFrom:(PRItemView *)item
 {
-	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:item.userInfo moc:self.managedObjectContext];
-	[self.managedObjectContext deleteObject:r];
-	[self saveDB];
+	DataManager *dataManager = self.dataManager;
+	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:item.userInfo moc:dataManager.managedObjectContext];
+	[dataManager.managedObjectContext deleteObject:r];
+	[dataManager saveDB];
 	[self updateMenu];
 }
 
@@ -382,10 +391,6 @@ static AppDelegate *_static_shared_ref;
 
 	for(PullRequest *r in pullRequests)
 	{
-		if(self.api.shouldHideUncommentedRequests)
-			if(r.unreadCommentCount==0)
-				continue;
-
 		PRItemView *item = [[PRItemView alloc] initWithPullRequest:r userInfo:r.serverId delegate:self];
 		if(r.merged.boolValue)
 		{
@@ -396,7 +401,7 @@ static AppDelegate *_static_shared_ref;
 		{
 			myCount++;
 			[menuItems insertObject:item atIndex:myIndex++];
-			unreadCommentCount += [r unreadCommentCount];
+			unreadCommentCount += r.unreadComments.integerValue;
 			participatedIndex++;
 			mergedIndex++;
 		}
@@ -404,15 +409,15 @@ static AppDelegate *_static_shared_ref;
 		{
 			participatedCount++;
 			[menuItems insertObject:item atIndex:participatedIndex++];
-			unreadCommentCount += [r unreadCommentCount];
+			unreadCommentCount += r.unreadComments.integerValue;
 			mergedIndex++;
 		}
 		else // all other pull requests
 		{
 			allCount++;
 			[menuItems insertObject:item atIndex:allIndex];
-			if([AppDelegate shared].api.showCommentsEverywhere)
-				unreadCommentCount += [r unreadCommentCount];
+			if([Settings shared].showCommentsEverywhere)
+				unreadCommentCount += r.unreadComments.integerValue;
 		}
 		allIndex++;
 	}
@@ -442,8 +447,8 @@ static AppDelegate *_static_shared_ref;
 
 - (void)defaultsUpdated
 {
-	if(self.api.localUser)
-		self.githubDetailsBox.title = [NSString stringWithFormat:@"Repositories for %@",self.api.localUser];
+	if([Settings shared].localUser)
+		self.githubDetailsBox.title = [NSString stringWithFormat:@"Repositories for %@",[Settings shared].localUser];
 	else
 		self.githubDetailsBox.title = @"Your Repositories";
 }
@@ -453,34 +458,17 @@ static AppDelegate *_static_shared_ref;
 	[self.apiLoad setIndeterminate:YES];
 	[self.apiLoad stopAnimation:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(apiUsageUpdate:) name:RATE_UPDATE_NOTIFICATION object:nil];
-	if(self.api.authToken.length)
+	if([Settings shared].authToken.length)
 	{
-		[self updateLimitFromServer];
+		[self.api updateLimitFromServer];
 	}
-}
-
-- (void)updateLimitFromServer
-{
-	[self.api getRateLimitAndCallback:^(long long remaining, long long limit, long long reset) {
-		if(reset>=0)
-		{
-			[[NSNotificationCenter defaultCenter] postNotificationName:RATE_UPDATE_NOTIFICATION
-																object:nil
-															  userInfo:@{
-																		 RATE_UPDATE_NOTIFICATION_LIMIT_KEY:@(limit),
-																		 RATE_UPDATE_NOTIFICATION_REMAINING_KEY:@(remaining)
-																		 }];
-		}
-	}];
 }
 
 - (void)apiUsageUpdate:(NSNotification *)n
 {
 	[self.apiLoad setIndeterminate:NO];
-	long long remaining = [n.userInfo[RATE_UPDATE_NOTIFICATION_REMAINING_KEY] longLongValue];
-	long long limit = [n.userInfo[RATE_UPDATE_NOTIFICATION_LIMIT_KEY] longLongValue];
-	self.apiLoad.maxValue = limit;
-	self.apiLoad.doubleValue = limit-remaining;
+	self.apiLoad.maxValue = self.api.requestsLimit;
+	self.apiLoad.doubleValue = self.api.requestsLimit-self.api.requestsRemaining;
 }
 
 
@@ -489,26 +477,7 @@ static AppDelegate *_static_shared_ref;
 	[self prepareForRefresh];
 	[self controlTextDidChange:nil];
 
-	NSArray *items = [PullRequest itemsOfType:@"Repo" surviving:YES inMoc:self.managedObjectContext];
-	for(DataItem *i in items) i.postSyncAction = @(kPostSyncDelete);
-
-	items = [PullRequest itemsOfType:@"Org" surviving:YES inMoc:self.managedObjectContext];
-	for(DataItem *i in items) i.postSyncAction = @(kPostSyncDelete);
-
 	[self.api fetchRepositoriesAndCallback:^(BOOL success) {
-
-		if(!success)
-		{
-            NSError *error = [NSError errorWithDomain:@"YOUR_ERROR_DOMAIN"
-												 code:101
-											 userInfo:@{NSLocalizedDescriptionKey:@"Error while fetching data from GitHub, please check that the token you have provided is correct and that you have a working network connection"}];
-            [[NSApplication sharedApplication] presentError:error];
-		}
-		else
-		{
-			[DataItem nukeDeletedItemsOfType:@"Repo" inMoc:self.managedObjectContext];
-			[DataItem nukeDeletedItemsOfType:@"Org" inMoc:self.managedObjectContext];
-		}
 		[self completeRefresh];
 	}];
 }
@@ -518,16 +487,16 @@ static AppDelegate *_static_shared_ref;
 	if(obj.object==self.githubTokenHolder)
 	{
 		NSString *newToken = [self.githubTokenHolder.stringValue stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-		NSString *oldToken = self.api.authToken;
+		NSString *oldToken = [Settings shared].authToken;
 		if(newToken.length>0)
 		{
 			self.refreshButton.enabled = YES;
-			self.api.authToken = newToken;
+			[Settings shared].authToken = newToken;
 		}
 		else
 		{
 			self.refreshButton.enabled = NO;
-			self.api.authToken = nil;
+			[Settings shared].authToken = nil;
 		}
 		if(newToken && oldToken && ![newToken isEqualToString:oldToken])
 		{
@@ -554,13 +523,11 @@ static AppDelegate *_static_shared_ref;
 {
 	self.preferencesDirty = YES;
 	self.lastSuccessfulRefresh = nil;
-	[DataItem deleteAllObjectsInContext:self.managedObjectContext
-							 usingModel:self.managedObjectModel];
+	[DataItem deleteAllObjectsInContext:self.dataManager.managedObjectContext
+							 usingModel:self.dataManager.managedObjectModel];
 	[self.projectsTable reloadData];
 	[self updateMenu];
 }
-
-
 
 - (IBAction)markAllReadSelected:(NSMenuItem *)sender
 {
@@ -574,46 +541,46 @@ static AppDelegate *_static_shared_ref;
 	[self.refreshTimer invalidate];
 	self.refreshTimer = nil;
 
-	[self updateLimitFromServer];
+	[self.api updateLimitFromServer];
 
-	[self.sortModeSelect selectItemAtIndex:self.api.sortMethod];
+	[self.sortModeSelect selectItemAtIndex:[Settings shared].sortMethod];
 
 	if([self isAppLoginItem])
 		[self.launchAtStartup setIntegerValue:1];
 	else
 		[self.launchAtStartup setIntegerValue:0];
 
-	if(self.api.shouldHideUncommentedRequests)
+	if([Settings shared].shouldHideUncommentedRequests)
 		[self.hideUncommentedPrs setIntegerValue:1];
 	else
 		[self.hideUncommentedPrs setIntegerValue:0];
 
-	if(self.api.hideAvatars)
+	if([Settings shared].hideAvatars)
 		[self.hideAvatars setIntegerValue:1];
 	else
 		[self.hideAvatars setIntegerValue:0];
 
-	if(self.api.dontKeepMyPrs)
+	if([Settings shared].dontKeepMyPrs)
 		[self.dontKeepMyPrs setIntegerValue:1];
 	else
 		[self.dontKeepMyPrs setIntegerValue:0];
 
-	if(self.api.showCommentsEverywhere)
+	if([Settings shared].showCommentsEverywhere)
 		[self.showAllComments setIntegerValue:1];
 	else
 		[self.showAllComments setIntegerValue:0];
 
-	if(self.api.sortDescending)
+	if([Settings shared].sortDescending)
 		[self.sortingOrder setIntegerValue:1];
 	else
 		[self.sortingOrder setIntegerValue:0];
 
-	if(self.api.showCreatedInsteadOfUpdated)
+	if([Settings shared].showCreatedInsteadOfUpdated)
 		[self.showCreationDates setIntegerValue:1];
 	else
 		[self.showCreationDates setIntegerValue:0];
 
-	[self.refreshDurationStepper setFloatValue:self.api.refreshPeriod];
+	[self.refreshDurationStepper setFloatValue:[Settings shared].refreshPeriod];
 	[self refreshDurationChanged:nil];
 
 	[self.preferencesWindow setLevel:NSFloatingWindowLevel];
@@ -636,7 +603,7 @@ static AppDelegate *_static_shared_ref;
 {
 	NSArray *allRepos = [Repo allReposSortedByField:@"fullName"
 									withTitleFilter:self.repoFilter.stringValue
-											  inMoc:self.managedObjectContext];
+											  inMoc:self.dataManager.managedObjectContext];
 	return allRepos;
 }
 
@@ -668,182 +635,14 @@ static AppDelegate *_static_shared_ref;
 	NSArray *allRepos = [self getFileterdRepos];
 	Repo *r = allRepos[row];
 	r.active = @([object boolValue]);
-	[self saveDB];
+	[self.dataManager saveDB];
 	self.preferencesDirty = YES;
-}
-
-/////////////////////////////////// Core Data
-
-// Returns the directory the application uses to store the Core Data store file. This code uses a directory named "com.housetrip.Trailer" in the user's Application Support directory.
-- (NSURL *)applicationFilesDirectory
-{
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSURL *appSupportURL = [[fileManager URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask] lastObject];
-    appSupportURL = [appSupportURL URLByAppendingPathComponent:@"com.housetrip.Trailer"];
-	DLog(@"Files in %@",appSupportURL);
-	return appSupportURL;
-}
-
-// Creates if necessary and returns the managed object model for the application.
-- (NSManagedObjectModel *)managedObjectModel
-{
-    if (_managedObjectModel) {
-        return _managedObjectModel;
-    }
-	
-    NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"Trailer" withExtension:@"momd"];
-    _managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
-    return _managedObjectModel;
-}
-
-// Returns the persistent store coordinator for the application. This implementation creates and return a coordinator, having added the store for the application to it. (The directory for the store is created, if necessary.)
-- (NSPersistentStoreCoordinator *)persistentStoreCoordinator
-{
-    if (_persistentStoreCoordinator) {
-        return _persistentStoreCoordinator;
-    }
-    
-    NSManagedObjectModel *mom = [self managedObjectModel];
-	NSPersistentStoreCoordinator *coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:mom];
-
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSURL *applicationFilesDirectory = [self applicationFilesDirectory];
-    NSError *error = nil;
-    
-    NSDictionary *properties = [applicationFilesDirectory resourceValuesForKeys:@[NSURLIsDirectoryKey] error:&error];
-    
-    if (!properties) {
-        BOOL ok = NO;
-        if ([error code] == NSFileReadNoSuchFileError) {
-            ok = [fileManager createDirectoryAtPath:[applicationFilesDirectory path] withIntermediateDirectories:YES attributes:nil error:&error];
-        }
-        if (!ok) {
-            [[NSApplication sharedApplication] presentError:error];
-            return nil;
-        }
-    } else {
-        if (![properties[NSURLIsDirectoryKey] boolValue]) {
-            // Customize and localize this error.
-            NSString *failureDescription = [NSString stringWithFormat:@"Expected a folder to store application data, found a file (%@).", [applicationFilesDirectory path]];
-            
-            NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-            [dict setValue:failureDescription forKey:NSLocalizedDescriptionKey];
-            error = [NSError errorWithDomain:@"YOUR_ERROR_DOMAIN" code:101 userInfo:dict];
-            
-            [[NSApplication sharedApplication] presentError:error];
-            return nil;
-        }
-    }
-
-	NSURL *sqlStore = [applicationFilesDirectory URLByAppendingPathComponent:@"Trailer.sqlite"];
-
-	// migrate to SQLite if needed
-    NSURL *xmlStore = [applicationFilesDirectory URLByAppendingPathComponent:@"Trailer.storedata"];
-	if([fileManager fileExistsAtPath:xmlStore.path])
-	{
-		DLog(@"MIGRATING TO SQLITE");
-		[self removeDatabaseFiles];
-
-		NSPersistentStore *xml = [coordinator addPersistentStoreWithType:NSXMLStoreType
-														   configuration:nil
-																	 URL:xmlStore
-																 options:@{ NSMigratePersistentStoresAutomaticallyOption: @YES,
-																			NSInferMappingModelAutomaticallyOption: @YES }
-																   error:nil];
-
-		if([coordinator migratePersistentStore:xml
-										 toURL:sqlStore
-									   options:nil
-									  withType:NSSQLiteStoreType
-										 error:nil])
-		{
-			[fileManager removeItemAtURL:xmlStore error:nil];
-			DLog(@"Deleted old XML store");
-		}
-		self.justMigrated = YES;
-	}
-	else
-	{
-		NSDictionary *m = [NSPersistentStoreCoordinator metadataForPersistentStoreOfType:NSSQLiteStoreType URL:sqlStore error:&error];
-		self.justMigrated = ![mom isConfiguration:nil compatibleWithStoreMetadata:m];
-
-		if (![coordinator addPersistentStoreWithType:NSSQLiteStoreType
-									   configuration:nil
-												 URL:sqlStore
-											 options:@{ NSMigratePersistentStoresAutomaticallyOption: @YES,
-														NSInferMappingModelAutomaticallyOption: @YES }
-											   error:&error]) {
-			[[NSApplication sharedApplication] presentError:error];
-			return nil;
-		}
-	}
-    _persistentStoreCoordinator = coordinator;
-    
-    return _persistentStoreCoordinator;
-}
-
-- (void)removeDatabaseFiles
-{
-    NSFileManager *fm = [NSFileManager defaultManager];
-    NSString *documentsDirectory = [self applicationFilesDirectory].path;
-    NSArray *files = [fm contentsOfDirectoryAtPath:documentsDirectory error:nil];
-    for(NSString *file in files)
-    {
-        if([file rangeOfString:@"Trailer.sqlite"].location!=NSNotFound)
-        {
-            DLog(@"Removing old database file: %@",file);
-            [fm removeItemAtPath:[documentsDirectory stringByAppendingPathComponent:file] error:nil];
-        }
-    }
-}
-
-// Returns the managed object context for the application (which is already bound to the persistent store coordinator for the application.) 
-- (NSManagedObjectContext *)managedObjectContext
-{
-    if (_managedObjectContext) {
-        return _managedObjectContext;
-    }
-    
-    NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
-    if (!coordinator) {
-		NSFileManager *fm = [NSFileManager defaultManager];
-		NSURL *applicationFilesDirectory = [self applicationFilesDirectory];
-		NSURL *url = [applicationFilesDirectory URLByAppendingPathComponent:@"Trailer.storedata"];
-		[fm removeItemAtURL:url error:nil];
-        return self.managedObjectContext;
-    }
-    _managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
-	_managedObjectContext.undoManager = nil;
-    [_managedObjectContext setPersistentStoreCoordinator:coordinator];
-
-    return _managedObjectContext;
 }
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
 {
-    // Save changes in the application's managed object context before the application terminates.
-    
-    if (!_managedObjectContext) {
-        return NSTerminateNow;
-    }
-    
-    if (![[self managedObjectContext] commitEditing]) {
-        DLog(@"%@:%@ unable to commit editing to terminate", [self class], NSStringFromSelector(_cmd));
-        return NSTerminateCancel;
-    }
-    
-    if (![[self managedObjectContext] hasChanges]) {
-        return NSTerminateNow;
-    }
-
-	[self saveDB];
+	[self.dataManager saveDB];
     return NSTerminateNow;
-}
-
-- (void)saveDB
-{
-	if(self.managedObjectContext.hasChanges)
-		[self.managedObjectContext save:nil];
 }
 
 - (void)scrollToTop
@@ -877,13 +676,13 @@ static AppDelegate *_static_shared_ref;
 	if([notification object]==self.preferencesWindow)
 	{
 		[self controlTextDidChange:nil];
-		if(self.api.authToken.length && self.preferencesDirty)
+		if([Settings shared].authToken.length && self.preferencesDirty)
 		{
 			[self startRefresh];
 		}
 		else
 		{
-			if(!self.refreshTimer && self.api.refreshPeriod>0.0)
+			if(!self.refreshTimer && [Settings shared].refreshPeriod>0.0)
 			{
 				[self startRefreshIfItIsDue];
 			}
@@ -905,13 +704,13 @@ static AppDelegate *_static_shared_ref;
 	if(self.lastSuccessfulRefresh)
 	{
 		NSTimeInterval howLongAgo = [[NSDate date] timeIntervalSinceDate:self.lastSuccessfulRefresh];
-		if(howLongAgo>self.api.refreshPeriod)
+		if(howLongAgo>[Settings shared].refreshPeriod)
 		{
 			[self startRefresh];
 		}
 		else
 		{
-			NSTimeInterval howLongUntilNextSync = self.api.refreshPeriod-howLongAgo;
+			NSTimeInterval howLongUntilNextSync = [Settings shared].refreshPeriod-howLongAgo;
 			DLog(@"No need to refresh yet, will refresh in %f",howLongUntilNextSync);
 			self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:howLongUntilNextSync
 																 target:self
@@ -928,7 +727,7 @@ static AppDelegate *_static_shared_ref;
 
 - (IBAction)refreshNowSelected:(NSMenuItem *)sender
 {
-	NSArray *activeRepos = [Repo activeReposInMoc:self.managedObjectContext];
+	NSArray *activeRepos = [Repo activeReposInMoc:self.dataManager.managedObjectContext];
 	if(activeRepos.count==0)
 	{
 		[self preferencesSelected:nil];
@@ -939,22 +738,25 @@ static AppDelegate *_static_shared_ref;
 
 - (void)checkApiUsage
 {
-	if(self.apiLoad.maxValue-self.apiLoad.doubleValue==0)
+	if(self.api.requestsLimit>0)
 	{
-        NSAlert *alert = [[NSAlert alloc] init];
-        [alert setMessageText:@"Your API request usage is over the limit!"];
-        [alert setInformativeText:[NSString stringWithFormat:@"Your request cannot be completed until GitHub resets your hourly API allowance at %@.\n\nIf you get this error often, try to make fewer manual refreshes or reducing the number of repos you are monitoring.\n\nYou can check your API usage at any time from the bottom of the preferences pane at any time.",self.api.resetDate]];
-        [alert addButtonWithTitle:@"OK"];
-		[alert runModal];
-		return;
-	}
-	else if((self.apiLoad.doubleValue/self.apiLoad.maxValue)>LOW_API_WARNING)
-	{
-        NSAlert *alert = [[NSAlert alloc] init];
-        [alert setMessageText:@"Your API request usage is close to full"];
-        [alert setInformativeText:[NSString stringWithFormat:@"Try to make fewer manual refreshes, increasing the automatic refresh time, or reducing the number of repos you are monitoring.\n\nYour allowance will be reset by Github on %@.\n\nYou can check your API usage from the bottom of the preferences pane.",self.api.resetDate]];
-        [alert addButtonWithTitle:@"OK"];
-		[alert runModal];
+		if(self.api.requestsRemaining==0)
+		{
+			NSAlert *alert = [[NSAlert alloc] init];
+			[alert setMessageText:@"Your API request usage is over the limit!"];
+			[alert setInformativeText:[NSString stringWithFormat:@"Your request cannot be completed until GitHub resets your hourly API allowance at %@.\n\nIf you get this error often, try to make fewer manual refreshes or reducing the number of repos you are monitoring.\n\nYou can check your API usage at any time from the bottom of the preferences pane at any time.",self.api.resetDate]];
+			[alert addButtonWithTitle:@"OK"];
+			[alert runModal];
+			return;
+		}
+		else if((self.api.requestsRemaining/self.api.requestsLimit)<LOW_API_WARNING)
+		{
+			NSAlert *alert = [[NSAlert alloc] init];
+			[alert setMessageText:@"Your API request usage is close to full"];
+			[alert setInformativeText:[NSString stringWithFormat:@"Try to make fewer manual refreshes, increasing the automatic refresh time, or reducing the number of repos you are monitoring.\n\nYour allowance will be reset by Github on %@.\n\nYou can check your API usage from the bottom of the preferences pane.",self.api.resetDate]];
+			[alert addButtonWithTitle:@"OK"];
+			[alert runModal];
+		}
 	}
 }
 
@@ -970,13 +772,9 @@ static AppDelegate *_static_shared_ref;
 	[self.githubTokenHolder setEnabled:NO];
 	[self.activityDisplay startAnimation:nil];
 	self.statusItemView.grayOut = YES;
-	if(self.justMigrated)
-	{
-		DLog(@"FORCING ALL PRS TO BE REFETCHED");
-		NSArray *prs = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.managedObjectContext];
-		for(PullRequest *r in prs) r.updatedAt = [NSDate distantPast];
-		self.justMigrated = NO;
-	}
+
+	[self.api expireOldImageCacheEntries];
+	[self.dataManager postMigrationTasks];
 }
 
 -(void)completeRefresh
@@ -987,11 +785,12 @@ static AppDelegate *_static_shared_ref;
 	[self.githubTokenHolder setEnabled:YES];
 	[self.clearAll setEnabled:YES];
 	[self.activityDisplay stopAnimation:nil];
-	[self saveDB];
+	[self.dataManager saveDB];
 	[self.projectsTable reloadData];
 	[self updateMenu];
 	[self checkApiUsage];
-	[self sendNotifications];
+	[self.dataManager sendNotifications];
+	[self.dataManager saveDB];
 }
 
 -(BOOL)isRefreshing
@@ -1007,8 +806,8 @@ static AppDelegate *_static_shared_ref;
 	id oldTarget = self.refreshNow.target;
 	SEL oldAction = self.refreshNow.action;
 
-	if(self.api.localUser)
-		self.refreshNow.title = [NSString stringWithFormat:@" Refreshing %@...",self.api.localUser];
+	if([Settings shared].localUser)
+		self.refreshNow.title = [NSString stringWithFormat:@" Refreshing %@...",[Settings shared].localUser];
 	else
 		self.refreshNow.title = @" Refreshing...";
 
@@ -1025,7 +824,7 @@ static AppDelegate *_static_shared_ref;
 			self.lastSuccessfulRefresh = [NSDate date];
 			self.preferencesDirty = NO;
 		}
-		self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:self.api.refreshPeriod
+		self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:[Settings shared].refreshPeriod
 															 target:self
 														   selector:@selector(refreshTimerDone)
 														   userInfo:nil
@@ -1037,62 +836,28 @@ static AppDelegate *_static_shared_ref;
 
 - (IBAction)refreshDurationChanged:(NSStepper *)sender
 {
-	self.api.refreshPeriod = self.refreshDurationStepper.floatValue;
+	[Settings shared].refreshPeriod = self.refreshDurationStepper.floatValue;
 	[self.refreshDurationLabel setStringValue:[NSString stringWithFormat:@"Automatically refresh every %ld seconds",(long)self.refreshDurationStepper.integerValue]];
 }
 
 -(void)refreshTimerDone
 {
-	if(self.api.localUserId && self.api.authToken.length)
+	if([Settings shared].localUserId && [Settings shared].authToken.length)
 	{
 		[self startRefresh];
 	}
 }
 
--(void)sendNotifications
-{
-	NSArray *latestPrs = [PullRequest newItemsOfType:@"PullRequest" inMoc:self.managedObjectContext];
-	for(PullRequest *r in latestPrs)
-	{
-		[self postNotificationOfType:kNewPr forItem:r];
-		r.postSyncAction = @(kPostSyncDoNothing);
-	}
-
-	NSArray *latestComments = [PRComment newItemsOfType:@"PRComment" inMoc:self.managedObjectContext];
-	for(PRComment *c in latestComments)
-	{
-		PullRequest *r = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:self.managedObjectContext];
-		if(self.api.showCommentsEverywhere || r.isMine || r.commentedByMe)
-		{
-			if(![c.userId.stringValue isEqualToString:self.api.localUserId])
-			{
-				[self postNotificationOfType:kNewComment forItem:c];
-			}
-		}
-		c.postSyncAction = @(kPostSyncDoNothing);
-	}
-	[self saveDB];
-}
-
 - (NSArray *)pullRequestList
 {
-	NSString *sortCriterion;
-	switch (self.api.sortMethod) {
-		case kCreationDate: sortCriterion = @"createdAt"; break;
-		case kRecentActivity: sortCriterion = @"updatedAt"; break;
-		case kTitle: sortCriterion = @"title"; break;
-	}
-	NSArray *pullRequests = [PullRequest pullRequestsSortedByField:sortCriterion
-															filter:self.mainMenuFilter.stringValue
-														 ascending:!self.api.sortDescending
-															 inMoc:self.managedObjectContext];
-	return pullRequests;
+	NSFetchRequest *f = [PullRequest requestForPullRequestsWithFilter:self.mainMenuFilter.stringValue];
+	return [self.dataManager.managedObjectContext executeFetchRequest:f error:nil];
 }
 
 - (void)updateMenu
 {
 	NSArray *pullRequests = [self pullRequestList];
-	NSString *countString = [NSString stringWithFormat:@"%ld",[PullRequest countUnmergedRequestsInMoc:self.managedObjectContext]];
+	NSString *countString = [NSString stringWithFormat:@"%ld",[PullRequest countUnmergedRequestsInMoc:self.dataManager.managedObjectContext]];
 	NSInteger newCommentCount = [self buildPrMenuItemsFromList:pullRequests];
 
 	DLog(@"Updating menu, %@ total PRs",countString);
@@ -1146,7 +911,7 @@ static AppDelegate *_static_shared_ref;
 	{
 		r.active = @YES;
 	}
-	[self saveDB];
+	[self.dataManager saveDB];
 	[self.projectsTable reloadData];
 	self.preferencesDirty = YES;
 }
@@ -1158,7 +923,7 @@ static AppDelegate *_static_shared_ref;
 	{
 		r.active = @NO;
 	}
-	[self saveDB];
+	[self.dataManager saveDB];
 	[self.projectsTable reloadData];
 	self.preferencesDirty = YES;
 }

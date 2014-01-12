@@ -34,7 +34,7 @@
 
 -(BOOL)isMine
 {
-	return [self.userId.stringValue isEqualToString:[AppDelegate shared].api.localUserId];
+	return [self.userId.stringValue isEqualToString:[Settings shared].localUserId];
 }
 
 +(void)removeCommentsWithPullRequestURL:(NSString *)url inMoc:(NSManagedObjectContext *)moc
@@ -46,13 +46,6 @@
 		DLog(@"  Deleting comment ID %@",c.serverId);
 		[moc deleteObject:c];
 	}
-}
-
-+(NSInteger)countCommentsForPullRequestUrl:(NSString *)url inMoc:(NSManagedObjectContext *)moc
-{
-	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
-	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestUrl = %@",url];
-	return [moc countForFetchRequest:f error:nil];
 }
 
 +(NSArray *)commentsForPullRequestUrl:(NSString *)url inMoc:(NSManagedObjectContext *)moc

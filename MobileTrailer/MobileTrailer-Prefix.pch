@@ -1,0 +1,37 @@
+
+#import <Availability.h>
+
+#ifdef __OBJC__
+
+//#define DLog(fmt, ...) NSLog(fmt, ##__VA_ARGS__)
+#define DLog(...)
+
+#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
+#import <CoreData/CoreData.h>
+#import <CommonCrypto/CommonCrypto.h>
+
+#import "NSDictionary+NSDictionary_OFK.h"
+#import "NSString+Extensions.h"
+#import "Reachability.h"
+#import "Settings.h"
+#import "API.h"
+#import "DataItem.h"
+#import "PRComment.h"
+#import "Org.h"
+#import "Repo.h"
+#import "PullRequest.h"
+#import "PRCell.h"
+#import "HTPopTimer.h"
+#import "DataManager.h"
+#import "ImageFunctions.h"
+#import "UIImage+Scale.h"
+#import "PickerViewController.h"
+#import "MasterViewController.h"
+#import "DetailViewController.h"
+#import "GithubViewController.h"
+#import "PreferencesViewController.h"
+#import "AdvancedSettingsViewController.h"
+#import "AppDelegate.h"
+
+#endif

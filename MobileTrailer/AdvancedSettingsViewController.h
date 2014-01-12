@@ -1,0 +1,4 @@
+
+@interface AdvancedSettingsViewController : UITableViewController
+
+@end

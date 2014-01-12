@@ -1,19 +1,4 @@
 
-#define TRAILER_GITHUB_REPO @"http://dev.housetrip.com/trailer/"
-#define LOW_API_WARNING 0.90
-
-typedef enum {
-	kNewComment = 0,
-	kNewPr = 1,
-	kPrMerged = 2
-} PRNotificationType;
-
-typedef enum {
-	kCreationDate = 0,
-	kRecentActivity = 1,
-	kTitle= 2
-} PRSortingMethod;
-
 @interface AppDelegate : NSObject <
 	NSApplicationDelegate,
 	NSTableViewDelegate,
@@ -24,11 +9,6 @@ typedef enum {
 	SectionHeaderDelegate,
 	StatusItemDelegate
 >
-
-// Core Data
-@property (readonly, strong, nonatomic) NSPersistentStoreCoordinator *persistentStoreCoordinator;
-@property (readonly, strong, nonatomic) NSManagedObjectModel *managedObjectModel;
-@property (readonly, strong, nonatomic) NSManagedObjectContext *managedObjectContext;
 
 // Preferences window
 @property (unsafe_unretained) IBOutlet NSWindow *preferencesWindow;
@@ -59,7 +39,7 @@ typedef enum {
 
 
 // Used to track action state
-@property (nonatomic) BOOL opening, justMigrated;
+@property (nonatomic) BOOL opening;
 
 // Menu
 @property (nonatomic) NSStatusItem *statusItem;
@@ -70,6 +50,7 @@ typedef enum {
 
 // Globals
 @property (nonatomic) API *api;
+@property (nonatomic) DataManager *dataManager;
 @property (weak) NSTimer *refreshTimer;
 @property (strong) NSDate *lastSuccessfulRefresh;
 @property (nonatomic) BOOL lastUpdateFailed, preferencesDirty;

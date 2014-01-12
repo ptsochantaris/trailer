@@ -1,4 +1,11 @@
 
+#define kPullRequestSectionMine 0
+#define kPullRequestSectionMerged 1
+#define kPullRequestSectionParticipated 2
+#define kPullRequestSectionAll 3
+
+#define kPullRequestSectionNames @[@"Mine", @"Recently Merged", @"Participated", @"All Pull Requests"]
+
 @interface PullRequest : DataItem
 
 @property (nonatomic, retain) NSString * url;
@@ -19,25 +26,28 @@
 @property (nonatomic, retain) NSNumber *repoId;
 @property (nonatomic, retain) NSNumber *merged;
 
+@property (nonatomic, retain) NSNumber *totalComments;
+@property (nonatomic, retain) NSNumber *unreadComments;
+
+@property (nonatomic, retain) NSNumber *sectionIndex;
+@property (nonatomic, readonly) NSString *sectionName;
+
 + (PullRequest *)pullRequestWithInfo:(NSDictionary*)info moc:(NSManagedObjectContext *)moc;
 
 + (PullRequest *)pullRequestWithUrl:(NSString *)url moc:(NSManagedObjectContext *)moc;
 
-+ (NSArray *)pullRequestsSortedByField:(NSString *)fieldName
-								filter:(NSString *)filter
-							 ascending:(BOOL)ascending
-								 inMoc:(NSManagedObjectContext *)moc;
++ (NSFetchRequest *)requestForPullRequestsWithFilter:(NSString *)filter;
 
 + (NSArray *)allMergedRequestsInMoc:(NSManagedObjectContext *)moc;
 
 + (NSUInteger)countUnmergedRequestsInMoc:(NSManagedObjectContext *)moc;
-
-- (NSInteger)unreadCommentCount;
 
 - (void)catchUpWithComments;
 
 - (BOOL)isMine;
 
 - (BOOL)commentedByMe;
+
+- (void)postProcess;
 
 @end

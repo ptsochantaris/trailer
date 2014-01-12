@@ -4,6 +4,11 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
+		<key>MobileTrailer.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
 		<key>Trailer.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
@@ -12,6 +17,16 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>1628A6B018789E73005EDA69</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>1628A6DA18789E73005EDA69</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>168BC6A917EC2DF000BC4584</key>
 		<dict>
 			<key>primary</key>

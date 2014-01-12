@@ -3,100 +3,72 @@
 {
 	NSOperationQueue *requestQueue;
 	NSDateFormatter *dateFormatter;
+    NSString *cacheDirectory;
+#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
+	NSInteger networkIndicationCount;
+#endif
 }
 @end
 
 @implementation API
+
+#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
+	#define CACHE_MEMORY 1024*1024*4
+	#define CACHE_DISK 1024*1024*128
+#else
+	#define CACHE_MEMORY 1024*1024*2
+	#define CACHE_DISK 1024*1024*8
+#endif
 
 - (id)init
 {
     self = [super init];
     if (self) {
 
-		NSURLCache *cache = [[NSURLCache alloc] initWithMemoryCapacity:1024*1024*4
-														  diskCapacity:1024*1024*128
+		NSURLCache *cache = [[NSURLCache alloc] initWithMemoryCapacity:CACHE_MEMORY
+														  diskCapacity:CACHE_DISK
 															  diskPath:nil];
 		[NSURLCache setSharedURLCache:cache];
 
-		dateFormatter = [[NSDateFormatter alloc] initWithDateFormat:@"YYYY-MM-DDTHH:MM:SSZ" allowNaturalLanguage:NO];
+		dateFormatter = [[NSDateFormatter alloc] init];
+		dateFormatter.dateFormat = @"YYYY-MM-DDTHH:MM:SSZ";
+
 		requestQueue = [[NSOperationQueue alloc] init];
 		requestQueue.maxConcurrentOperationCount = 8;
 
 		self.reachability = [Reachability reachabilityWithHostName:API_SERVER];
 		[self.reachability startNotifier];
+
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        NSURL *appSupportURL = [[fileManager URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] lastObject];
+        appSupportURL = [appSupportURL URLByAppendingPathComponent:@"com.housetrip.Trailer"];
+        cacheDirectory = appSupportURL.path;
+
+        if([fileManager fileExistsAtPath:cacheDirectory])
+            [self clearImageCache];
+        else
+            [fileManager createDirectoryAtPath:cacheDirectory withIntermediateDirectories:YES attributes:nil error:nil];
 	}
     return self;
 }
 
--(void)storeDefaultValue:(id)value forKey:(NSString *)key
-{
-	NSUserDefaults *d = [NSUserDefaults standardUserDefaults];
-	if(value)
-		[d setObject:value forKey:key];
-	else
-		[d removeObjectForKey:key];
-	[d synchronize];
-}
-
-#define REFRESH_PERIOD_KEY @"REFRESH_PERIOD_KEY"
--(float)refreshPeriod
-{
-	float period = [[NSUserDefaults standardUserDefaults] floatForKey:REFRESH_PERIOD_KEY];
-	if(period==0)
-	{
-		period = 60.0;
-		self.refreshPeriod = period;
-	}
-	return period;
-}
--(void)setRefreshPeriod:(float)refreshPeriod { [[NSUserDefaults standardUserDefaults] setFloat:refreshPeriod forKey:REFRESH_PERIOD_KEY]; }
-
-#define GITHUB_TOKEN_KEY @"GITHUB_AUTH_TOKEN"
--(NSString*)authToken { return [[NSUserDefaults standardUserDefaults] stringForKey:GITHUB_TOKEN_KEY]; }
--(void)setAuthToken:(NSString *)authToken
-{
-	[self storeDefaultValue:authToken forKey:GITHUB_TOKEN_KEY];
-}
-
-#define USER_NAME_KEY @"USER_NAME_KEY"
--(NSString *)localUser { return [[NSUserDefaults standardUserDefaults] stringForKey:USER_NAME_KEY]; }
--(void)setLocalUser:(NSString *)localUser { [self storeDefaultValue:localUser forKey:USER_NAME_KEY]; }
-
-#define USER_ID_KEY @"USER_ID_KEY"
--(NSString *)localUserId { return [[NSUserDefaults standardUserDefaults] stringForKey:USER_ID_KEY]; }
--(void)setLocalUserId:(NSString *)localUserId { [self storeDefaultValue:localUserId forKey:USER_ID_KEY]; }
-
-#define HIDE_PRS_KEY @"HIDE_UNCOMMENTED_PRS_KEY"
--(void)setShouldHideUncommentedRequests:(BOOL)shouldHideUncommentedRequests { [self storeDefaultValue:@(shouldHideUncommentedRequests) forKey:HIDE_PRS_KEY]; }
--(BOOL)shouldHideUncommentedRequests { return [[[NSUserDefaults standardUserDefaults] stringForKey:HIDE_PRS_KEY] boolValue]; }
-
-#define SHOW_COMMENTS_EVERYWHERE_KEY @"SHOW_COMMENTS_EVERYWHERE_KEY"
--(BOOL)showCommentsEverywhere { return [[[NSUserDefaults standardUserDefaults] stringForKey:SHOW_COMMENTS_EVERYWHERE_KEY] boolValue]; }
--(void)setShowCommentsEverywhere:(BOOL)showCommentsEverywhere { [self storeDefaultValue:@(showCommentsEverywhere) forKey:SHOW_COMMENTS_EVERYWHERE_KEY]; }
-
-#define SORT_ORDER_KEY @"SORT_ORDER_KEY"
--(BOOL)sortDescending { return [[[NSUserDefaults standardUserDefaults] stringForKey:SORT_ORDER_KEY] boolValue]; }
--(void)setSortDescending:(BOOL)sortDescending { [self storeDefaultValue:@(sortDescending) forKey:SORT_ORDER_KEY]; }
-
-#define SHOW_UPDATED_KEY @"SHOW_UPDATED_KEY"
--(BOOL)showCreatedInsteadOfUpdated { return [[[NSUserDefaults standardUserDefaults] stringForKey:SHOW_UPDATED_KEY] boolValue]; }
--(void)setShowCreatedInsteadOfUpdated:(BOOL)showCreatedInsteadOfUpdated { [self storeDefaultValue:@(showCreatedInsteadOfUpdated) forKey:SHOW_UPDATED_KEY]; }
-
-#define SORT_METHOD_KEY @"SORT_METHOD_KEY"
--(NSInteger)sortMethod { return [[[NSUserDefaults standardUserDefaults] objectForKey:SORT_METHOD_KEY] integerValue]; }
--(void)setSortMethod:(NSInteger)sortMethod { [self storeDefaultValue:@(sortMethod) forKey:SORT_METHOD_KEY]; }
-
-#define DONT_KEEP_MY_PRS_KEY @"DONT_KEEP_MY_PRS_KEY"
--(void)setDontKeepMyPrs:(BOOL)dontKeepMyPrs { [self storeDefaultValue:@(dontKeepMyPrs) forKey:DONT_KEEP_MY_PRS_KEY]; }
--(BOOL)dontKeepMyPrs { return [[[NSUserDefaults standardUserDefaults] stringForKey:DONT_KEEP_MY_PRS_KEY] boolValue]; }
-
-#define HIDE_AVATARS_KEY @"HIDE_AVATARS_KEY"
--(void)setHideAvatars:(BOOL)hideAvatars { [self storeDefaultValue:@(hideAvatars) forKey:HIDE_AVATARS_KEY]; }
--(BOOL)hideAvatars { return [[[NSUserDefaults standardUserDefaults] stringForKey:HIDE_AVATARS_KEY] boolValue]; }
-
 -(void)error:(NSString*)errorString
 {
 	DLog(@"Failed to fetch %@",errorString);
+}
+
+- (void)updateLimitFromServer
+{
+	[self getRateLimitAndCallback:^(long long remaining, long long limit, long long reset) {
+		self.requestsRemaining = remaining;
+		self.requestsLimit = limit;
+		if(reset>=0)
+		{
+			[[NSNotificationCenter defaultCenter] postNotificationName:RATE_UPDATE_NOTIFICATION
+																object:nil
+															  userInfo:nil];
+		}
+	}];
 }
 
 -(void)fetchCommentsForCurrentPullRequestsToMoc:(NSManagedObjectContext *)moc andCallback:(void (^)(BOOL))callback
@@ -181,8 +153,14 @@
 		if(success)
 		{
 			NSManagedObjectContext *syncContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
-			syncContext.parentContext = [AppDelegate shared].managedObjectContext;
+			syncContext.parentContext = [AppDelegate shared].dataManager.managedObjectContext;
 			syncContext.undoManager = nil;
+
+			NSArray *items = [PullRequest itemsOfType:@"Repo" surviving:YES inMoc:syncContext];
+			for(DataItem *i in items) i.postSyncAction = @(kPostSyncDelete);
+
+			items = [PullRequest itemsOfType:@"Org" surviving:YES inMoc:syncContext];
+			for(DataItem *i in items) i.postSyncAction = @(kPostSyncDelete);
 
 			[self syncOrgsToMoc:syncContext andCallback:^(BOOL success) {
 				if(!success)
@@ -206,6 +184,17 @@
 									if(ok) ok = success;
 									if(callback)
 									{
+										if(ok)
+										{
+											[DataItem nukeDeletedItemsOfType:@"Repo" inMoc:syncContext];
+											[DataItem nukeDeletedItemsOfType:@"Org" inMoc:syncContext];
+										}
+										else
+										{
+											DLog(@"%@",[NSError errorWithDomain:@"YOUR_ERROR_DOMAIN"
+																		   code:101
+																	   userInfo:@{NSLocalizedDescriptionKey:@"Error while fetching data from GitHub"}]);
+										}
 										if(ok && syncContext.hasChanges) [syncContext save:nil];
 										callback(ok);
 									}
@@ -229,7 +218,7 @@
 		Repo *parent = [Repo itemOfType:@"Repo" serverId:r.repoId moc:moc];
 		if(r.postSyncAction.integerValue==kPostSyncDelete &&
 		   parent.active.boolValue && (parent.postSyncAction.integerValue!=kPostSyncDelete) &&
-		   ([AppDelegate shared].api.showCommentsEverywhere || r.isMine || r.commentedByMe) &&
+		   ([Settings shared].showCommentsEverywhere || r.isMine || r.commentedByMe) &&
 		   (!r.merged.boolValue))
 		{
 			[prsToCheck addObject:r]; // possibly merged
@@ -260,11 +249,10 @@
 		  if(mergeInfo)
 		  {
 			  DLog(@"detected merged PR: %@",r.title);
-			  API *api = [AppDelegate shared].api;
 			  NSString *mergeUserId = [[mergeInfo  ofk:@"id"] stringValue];
-			  DLog(@"merged by user id: %@, our id is: %@",mergeUserId,api.localUserId);
-			  BOOL mergedByMyself = [mergeUserId isEqualToString:api.localUserId];
-			  if(!(api.dontKeepMyPrs && mergedByMyself)) // someone else merged
+			  DLog(@"merged by user id: %@, our id is: %@",mergeUserId,[Settings shared].localUserId);
+			  BOOL mergedByMyself = [mergeUserId isEqualToString:[Settings shared].localUserId];
+			  if(!([Settings shared].dontKeepMyPrs && mergedByMyself)) // someone else merged
 			  {
 				  DLog(@"announcing merged PR: %@",r.title);
 				  r.postSyncAction = @(kPostSyncDoNothing); // don't delete this
@@ -294,7 +282,7 @@
 		if(success)
 		{
 			NSManagedObjectContext *syncContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSConfinementConcurrencyType];
-			syncContext.parentContext = [AppDelegate shared].managedObjectContext;
+			syncContext.parentContext = [AppDelegate shared].dataManager.managedObjectContext;
 			syncContext.undoManager = nil;
 
 			NSArray *prs = [PullRequest itemsOfType:@"PullRequest" surviving:YES inMoc:syncContext];
@@ -313,7 +301,14 @@
 								{
 									[DataItem nukeDeletedItemsOfType:@"Repo" inMoc:syncContext];
 									[DataItem nukeDeletedItemsOfType:@"PullRequest" inMoc:syncContext];
-									if(success && syncContext.hasChanges) [syncContext save:nil];
+
+									NSArray *surviving = [PullRequest itemsOfType:@"PullRequest" surviving:YES inMoc:syncContext];
+									for(PullRequest *r in surviving) [r postProcess];
+
+									if(success && syncContext.hasChanges)
+									{
+										[syncContext save:nil];
+									}
 									if(callback) callback(success);
 								}
 							}];
@@ -421,8 +416,8 @@
 			andCallback:^(id data, BOOL lastPage, NSInteger resultCode) {
 				if(data)
 				{
-					[[NSUserDefaults standardUserDefaults] setObject:[data ofk:@"login"] forKey:USER_NAME_KEY];
-					[[NSUserDefaults standardUserDefaults] setObject:[data ofk:@"id"] forKey:USER_ID_KEY];
+					[Settings shared].localUser = [data ofk:@"login"];
+					[Settings shared].localUserId = [data ofk:@"id"];
 					[[NSUserDefaults standardUserDefaults] synchronize];
 					if(callback) callback(YES);
 				}
@@ -476,9 +471,9 @@
 	[self get:path
    parameters:params
 	  success:^(NSHTTPURLResponse *response, id data) {
-		  long long requestsRemaining = [[response allHeaderFields][@"X-RateLimit-Remaining"] longLongValue];
-		  long long requestLimit = [[response allHeaderFields][@"X-RateLimit-Limit"] longLongValue];
-		  long long epochSeconds = [[response allHeaderFields][@"X-RateLimit-Reset"] longLongValue];
+		  self.requestsRemaining = [[response allHeaderFields][@"X-RateLimit-Remaining"] floatValue];
+		  self.requestsLimit = [[response allHeaderFields][@"X-RateLimit-Limit"] floatValue];
+		  float epochSeconds = [[response allHeaderFields][@"X-RateLimit-Reset"] floatValue];
 		  NSDate *date = [NSDate dateWithTimeIntervalSince1970:epochSeconds];
 		  NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
 		  formatter.dateStyle = NSDateFormatterMediumStyle;
@@ -486,8 +481,7 @@
 		  self.resetDate = [formatter stringFromDate:date];
 		  [[NSNotificationCenter defaultCenter] postNotificationName:RATE_UPDATE_NOTIFICATION
 															  object:nil
-															userInfo:@{ RATE_UPDATE_NOTIFICATION_LIMIT_KEY: @(requestLimit),
-																		RATE_UPDATE_NOTIFICATION_REMAINING_KEY: @(requestsRemaining) }];
+															userInfo:nil];
 		  if(callback) callback(data, [API lastPage:response], response.statusCode);
 	  } failure:^(NSHTTPURLResponse *response, NSError *error) {
 		  DLog(@"Failure: %@",error);
@@ -521,7 +515,9 @@
 			success:(void(^)(NSHTTPURLResponse *response, id data))successCallback
 			failure:(void(^)(NSHTTPURLResponse *response, NSError *error))failureCallback
 {
-	NSString *authToken = self.authToken;
+	[self networkIndicationStart];
+
+	NSString *authToken = [Settings shared].authToken;
 	NSBlockOperation *o = [NSBlockOperation blockOperationWithBlock:^{
 
 		NSString *expandedPath;
@@ -575,16 +571,25 @@
 				});
 			}
 		}
+
+		[self networkIndicationEnd];
 	}];
-	o.threadPriority = 0.1;
+	o.queuePriority = NSOperationQueuePriorityVeryHigh;
 	[requestQueue addOperation:o];
 	return o;
 }
 
+// warning: now calls back on thread!!
 - (NSOperation *)getImage:(NSString *)path
-				  success:(void(^)(NSHTTPURLResponse *response, NSImage *image))successCallback
+				  success:(void(^)(NSHTTPURLResponse *response, NSData *imageData))successCallback
 				  failure:(void(^)(NSHTTPURLResponse *response, NSError *error))failureCallback
 {
+	double delayInSeconds = 0.5;
+	dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+	dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+		[self networkIndicationStart];
+	});
+
 	NSBlockOperation *o = [NSBlockOperation blockOperationWithBlock:^{
 
 		NSMutableURLRequest *r = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:path]
@@ -604,9 +609,7 @@
 			DLog(@"GET IMAGE %@ - FAILED: %@",path,error);
 			if(failureCallback)
 			{
-				dispatch_async(dispatch_get_main_queue(), ^{
-					failureCallback(response, error);
-				});
+                failureCallback(response, error);
 			}
 		}
 		else
@@ -614,26 +617,136 @@
 			DLog(@"GET IMAGE %@ - RESULT: %ld",path,(long)response.statusCode);
 			if(successCallback)
 			{
-				NSImage *returnedImage = nil;
 				if(data.length)
 				{
-					returnedImage = [[NSImage alloc] initWithData:data];
-					dispatch_async(dispatch_get_main_queue(), ^{
-						successCallback(response,returnedImage);
-					});
+                    successCallback(response, data);
 				}
 				else
 				{
-					dispatch_async(dispatch_get_main_queue(), ^{
-						failureCallback(response, error);
-					});
+                    failureCallback(response, error);
 				}
 			}
 		}
+
+		[self networkIndicationEnd];
 	}];
-	o.threadPriority = 0.0;
+	o.queuePriority = NSOperationQueuePriorityVeryLow;
 	[requestQueue addOperation:o];
 	return o;
+}
+
+- (void)networkIndicationStart
+{
+#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
+	dispatch_async(dispatch_get_main_queue(), ^{
+		if(++networkIndicationCount==1)
+			[UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+	});
+#endif
+}
+
+- (void)networkIndicationEnd
+{
+#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
+	dispatch_async(dispatch_get_main_queue(), ^{
+		if(--networkIndicationCount==0)
+			[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+	});
+#endif
+}
+
+- (void)clearImageCache
+{
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSArray *files = [fileManager contentsOfDirectoryAtPath:cacheDirectory error:nil];
+    for(NSString *f in files)
+    {
+        if([f rangeOfString:@"imgcache-"].location==0)
+        {
+            NSString *path = [cacheDirectory stringByAppendingPathComponent:f];
+            [fileManager removeItemAtPath:path error:nil];
+        }
+    }
+}
+
+- (void)expireOldImageCacheEntries
+{
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSArray *files = [fileManager contentsOfDirectoryAtPath:cacheDirectory error:nil];
+    for(NSString *f in files)
+    {
+        NSDate *now = [NSDate date];
+        if([f rangeOfString:@"imgcache-"].location==0)
+        {
+            NSString *path = [cacheDirectory stringByAppendingPathComponent:f];
+            NSError *error;
+            NSDictionary *attributes = [fileManager attributesOfItemAtPath:path error:&error];
+            NSDate *date = attributes[NSFileCreationDate];
+            if([now timeIntervalSinceDate:date]>(3600.0*24))
+                [fileManager removeItemAtPath:path error:nil];
+        }
+    }
+}
+
+- (BOOL)haveCachedImage:(NSString *)path
+                forSize:(CGSize)imageSize
+     tryLoadAndCallback:(void (^)(id image))callbackOrNil
+{
+    // mix image path, size, and app version into one md5
+	NSString *currentAppVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+    NSString *imageKey = [[NSString stringWithFormat:@"%@ %f %f %@",
+                           path,
+                           imageSize.width,
+                           imageSize.height,
+                           currentAppVersion] md5hash];
+    NSString *imagePath = [cacheDirectory stringByAppendingPathComponent:[@"imgcache-" stringByAppendingString:imageKey]];
+
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    if([fileManager fileExistsAtPath:imagePath])
+    {
+        id ret;
+#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
+        ret = [UIImage imageWithContentsOfFile:imagePath];
+#else
+        ret = [[NSImage alloc] initWithContentsOfFile:imagePath];
+#endif
+        if(ret)
+        {
+            if(callbackOrNil) callbackOrNil(ret);
+            return YES;
+        }
+        else
+        {
+            [fileManager removeItemAtPath:imagePath error:nil];
+        }
+    }
+
+    if(callbackOrNil)
+    {
+        [self getImage:path
+               success:^(NSHTTPURLResponse *response, NSData *imageData) {
+                   id image = nil;
+                   if(imageData)
+                   {
+#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
+                       image = [[UIImage imageWithData:imageData] scaleToFillPixelSize:imageSize];
+                       [UIImagePNGRepresentation(image) writeToFile:imagePath atomically:YES];
+#else
+                       image = [[[NSImage alloc] initWithData:imageData] scaleToFillSize:imageSize];
+                       [[image TIFFRepresentation] writeToFile:imagePath atomically:YES];
+#endif
+                   }
+                   dispatch_async(dispatch_get_main_queue(), ^{
+                       callbackOrNil(image);
+                   });
+               } failure:^(NSHTTPURLResponse *response, NSError *error) {
+                   dispatch_async(dispatch_get_main_queue(), ^{
+                       callbackOrNil(nil);
+                   });
+               }];
+    }
+
+    return NO;
 }
 
 @end

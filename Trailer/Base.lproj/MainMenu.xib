@@ -477,6 +477,9 @@
                                         </connections>
                                     </menuItem>
                                 </items>
+                                <connections>
+                                    <outlet property="delegate" destination="494" id="qR8-W0-W14"/>
+                                </connections>
                             </menu>
                         </popUpButtonCell>
                     </popUpButton>
@@ -531,7 +534,7 @@
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" id="QyU-WN-WeW">
                                         <font key="font" size="9" name="LucidaGrande"/>
-                                        <mutableString key="title">Copyright (c) 2013-2014 HouseTrip Ltd.
+                                        <string key="title">Copyright (c) 2013-2014 HouseTrip Ltd.
 
 Released under the terms of the MIT licence:
 
@@ -551,7 +554,7 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.</mutableString>
+THE SOFTWARE.</string>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
