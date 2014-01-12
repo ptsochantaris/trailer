@@ -288,21 +288,20 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 		cell.accessoryType = UITableViewCellAccessoryNone;
 }
 
-- (IBAction)iphoneSelection:(UIBarButtonItem *)sender
-{
-	[[self selectionSheet] showInView:self.view];
+- (IBAction)iphoneSelection:(UIBarButtonItem *)sender {
+	[self showSelectionOptions:sender];
 }
-- (IBAction)ipadSelection:(UIBarButtonItem *)sender
-{
-	[[self selectionSheet] showFromBarButtonItem:sender animated:YES];
+- (IBAction)ipadSelection:(UIBarButtonItem *)sender {
+	[self showSelectionOptions:sender];
 }
-- (UIActionSheet *)selectionSheet
+- (void)showSelectionOptions:(UIBarButtonItem *)sender
 {
-	return [[UIActionSheet alloc] initWithTitle:self.title
-									   delegate:self
-							  cancelButtonTitle:@"Cancel"
-						 destructiveButtonTitle:nil
-							  otherButtonTitles:@"Select All", @"Unselect All", nil];
+	UIActionSheet *selectionSheet = [[UIActionSheet alloc] initWithTitle:self.title
+																delegate:self
+													   cancelButtonTitle:@"Cancel"
+												  destructiveButtonTitle:nil
+													   otherButtonTitles:@"Select All", @"Unselect All", nil];
+	[selectionSheet showFromBarButtonItem:sender animated:YES];
 }
 
 - (void)actionSheet:(UIActionSheet *)actionSheet willDismissWithButtonIndex:(NSInteger)buttonIndex
