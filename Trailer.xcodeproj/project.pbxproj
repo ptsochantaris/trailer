@@ -154,7 +154,7 @@
 		161CA3C917F5B1F300F4AF6C /* PRComment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PRComment.m; sourceTree = "<group>"; };
 		161CA3CC17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSDictionary+NSDictionary_OFK.m"; path = "Trailer/NSDictionary+NSDictionary_OFK.m"; sourceTree = "<group>"; };
 		161CA3CD17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSDictionary+NSDictionary_OFK.h"; path = "Trailer/NSDictionary+NSDictionary_OFK.h"; sourceTree = "<group>"; };
-		1628A6B118789E73005EDA69 /* MobileTrailer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MobileTrailer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1628A6B118789E73005EDA69 /* iTrailer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iTrailer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1628A6B218789E73005EDA69 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1628A6B418789E73005EDA69 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		1628A6BC18789E73005EDA69 /* MobileTrailer-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "MobileTrailer-Info.plist"; sourceTree = "<group>"; };
@@ -460,7 +460,7 @@
 			children = (
 				168BC6AA17EC2DF000BC4584 /* Trailer.app */,
 				168BC6CE17EC2DF000BC4584 /* TrailerTests.xctest */,
-				1628A6B118789E73005EDA69 /* MobileTrailer.app */,
+				1628A6B118789E73005EDA69 /* iTrailer.app */,
 				1628A6DB18789E73005EDA69 /* MobileTrailerTests.xctest */,
 			);
 			name = Products;
@@ -615,9 +615,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		1628A6B018789E73005EDA69 /* MobileTrailer */ = {
+		1628A6B018789E73005EDA69 /* iTrailer */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 1628A6EE18789E74005EDA69 /* Build configuration list for PBXNativeTarget "MobileTrailer" */;
+			buildConfigurationList = 1628A6EE18789E74005EDA69 /* Build configuration list for PBXNativeTarget "iTrailer" */;
 			buildPhases = (
 				1628A6AD18789E73005EDA69 /* Sources */,
 				1628A6AE18789E73005EDA69 /* Frameworks */,
@@ -627,9 +627,9 @@
 			);
 			dependencies = (
 			);
-			name = MobileTrailer;
+			name = iTrailer;
 			productName = MobileTrailer;
-			productReference = 1628A6B118789E73005EDA69 /* MobileTrailer.app */;
+			productReference = 1628A6B118789E73005EDA69 /* iTrailer.app */;
 			productType = "com.apple.product-type.application";
 		};
 		1628A6DA18789E73005EDA69 /* MobileTrailerTests */ = {
@@ -729,7 +729,7 @@
 			targets = (
 				168BC6A917EC2DF000BC4584 /* Trailer */,
 				168BC6CD17EC2DF000BC4584 /* TrailerTests */,
-				1628A6B018789E73005EDA69 /* MobileTrailer */,
+				1628A6B018789E73005EDA69 /* iTrailer */,
 				1628A6DA18789E73005EDA69 /* MobileTrailerTests */,
 			);
 		};
@@ -878,7 +878,7 @@
 /* Begin PBXTargetDependency section */
 		1628A6E118789E73005EDA69 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 1628A6B018789E73005EDA69 /* MobileTrailer */;
+			target = 1628A6B018789E73005EDA69 /* iTrailer */;
 			targetProxy = 1628A6E018789E73005EDA69 /* PBXContainerItemProxy */;
 		};
 		168BC6D317EC2DF000BC4584 /* PBXTargetDependency */ = {
@@ -955,8 +955,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
@@ -972,6 +971,7 @@
 				LLVM_LTO = YES;
 				LLVM_VECTORIZE_LOOPS = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "A8C7A547-175A-444B-998A-CD48105D63A0";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
@@ -985,8 +985,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
@@ -999,6 +998,7 @@
 				LLVM_LTO = YES;
 				LLVM_VECTORIZE_LOOPS = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "B2E058DF-08FF-41ED-A673-BBB088E942CE";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -1204,7 +1204,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		1628A6EE18789E74005EDA69 /* Build configuration list for PBXNativeTarget "MobileTrailer" */ = {
+		1628A6EE18789E74005EDA69 /* Build configuration list for PBXNativeTarget "iTrailer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1628A6EA18789E74005EDA69 /* Debug */,
