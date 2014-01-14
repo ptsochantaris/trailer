@@ -71,6 +71,7 @@ CGFloat GLOBAL_SCREEN_SCALE;
 {
 	if(notification)
 	{
+        DLog(@"Received local notification: %@",notification.userInfo);
 		[[NSNotificationCenter defaultCenter] postNotificationName:RECEIVED_NOTIFICATION_KEY object:nil userInfo:notification.userInfo];
 		[[UIApplication sharedApplication] cancelLocalNotification:notification];
 	}

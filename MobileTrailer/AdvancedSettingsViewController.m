@@ -123,7 +123,7 @@
 
 - (NSString *)yesNo:(BOOL)option
 {
-	if(option) return @"YES"; else return @"NO";
+	if(option) return @"Yes"; else return @"No";
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath

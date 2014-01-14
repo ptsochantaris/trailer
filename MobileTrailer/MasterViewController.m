@@ -33,18 +33,22 @@
 	UIActionSheet *a = [[UIActionSheet alloc] initWithTitle:@"Action"
 												   delegate:self
 										  cancelButtonTitle:@"Cancel"
-									 destructiveButtonTitle:@"Mark all as read"
-										  otherButtonTitles:@"Refresh Now", nil];
+									 destructiveButtonTitle:@"Remove all merged"
+										  otherButtonTitles:@"Mark all as read", @"Refresh Now", nil];
 	[a showFromBarButtonItem:self.navigationItem.rightBarButtonItem animated:YES];
 }
 
 - (void)actionSheet:(UIActionSheet *)actionSheet willDismissWithButtonIndex:(NSInteger)buttonIndex
 {
-	if(buttonIndex==0)
+    if(buttonIndex==0)
+    {
+        [self removeAllMerged];
+    }
+	if(buttonIndex==1)
 	{
 		[self markAllAsRead];
 	}
-	else if(buttonIndex==1)
+	else if(buttonIndex==2)
 	{
 		[self tryRefresh];
 	}
@@ -64,6 +68,15 @@
 	{
 		[[AppDelegate shared] startRefresh];
 	}
+}
+
+- (void)removeAllMerged
+{
+	for(PullRequest *p in self.fetchedResultsController.fetchedObjects)
+        if(p.merged.boolValue)
+            [self.managedObjectContext deleteObject:p];
+    [[AppDelegate shared] updateBadge];
+    [[AppDelegate shared].dataManager saveDB];
 }
 
 - (void)markAllAsRead
@@ -160,10 +173,24 @@
 		if(ip)
 		{
 			[self.tableView selectRowAtIndexPath:ip animated:YES scrollPosition:UITableViewScrollPositionMiddle];
+            [self tableView:self.tableView didSelectRowAtIndexPath:ip];
 		}
+        else
+        {
+            if(pullRequest)
+            {
+                [[[UIAlertView alloc] initWithTitle:@"PR not found"
+                                            message:@"Could not locale the relevant PR, perhaps it was merged or closed"
+                                           delegate:nil
+                                  cancelButtonTitle:@"OK"
+                                  otherButtonTitles:nil] show];
+            }
+        }
 	}
-
-	if(urlToOpen) self.detailViewController.detailItem = [NSURL URLWithString:urlToOpen];
+    else
+    {
+        self.detailViewController.detailItem = [NSURL URLWithString:urlToOpen];
+    }
 }
 
 - (void)dealloc
@@ -173,13 +200,11 @@
 
 - (void)refreshStarted
 {
-	self.refreshButton.enabled = NO;
 	self.title = @"Refreshing...";
 }
 
 - (void)refreshEnded
 {
-	self.refreshButton.enabled = YES;
 	self.title = @"Pull Requests";
 }
 
