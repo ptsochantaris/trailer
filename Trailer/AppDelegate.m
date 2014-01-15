@@ -345,7 +345,7 @@ static AppDelegate *_static_shared_ref;
 	{
 		[self removeAllMergedRequests];
 	}
-    [self sizeMenuAndShow:YES];
+    [self statusItemTapped:nil];
 }
 
 - (void)removeAllMergedRequests

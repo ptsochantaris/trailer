@@ -45,6 +45,8 @@ CGFloat GLOBAL_SCREEN_SCALE;
 	if(allPRs.count) [allPRs[0] setMerged:@YES];
 */
 
+	UILocalNotification *localNotification = [launchOptions objectForKey:UIApplicationLaunchOptionsLocalNotificationKey];
+
 	double delayInSeconds = 0.1;
 	dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
 	dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
@@ -56,6 +58,7 @@ CGFloat GLOBAL_SCREEN_SCALE;
 		else
 		{
 			[self startRefresh];
+			if(localNotification) [self handleLocalNotification:localNotification];
 		}
 	});
 
@@ -71,10 +74,15 @@ CGFloat GLOBAL_SCREEN_SCALE;
 {
 	if(notification)
 	{
-        DLog(@"Received local notification: %@",notification.userInfo);
-		[[NSNotificationCenter defaultCenter] postNotificationName:RECEIVED_NOTIFICATION_KEY object:nil userInfo:notification.userInfo];
-		[[UIApplication sharedApplication] cancelLocalNotification:notification];
+		[self handleLocalNotification:notification];
 	}
+}
+
+- (void)handleLocalNotification:(UILocalNotification *)notification
+{
+	DLog(@"Received local notification: %@",notification.userInfo);
+	[[NSNotificationCenter defaultCenter] postNotificationName:RECEIVED_NOTIFICATION_KEY object:nil userInfo:notification.userInfo];
+	[[UIApplication sharedApplication] cancelLocalNotification:notification];
 }
 
 - (void)setupUI
