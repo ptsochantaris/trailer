@@ -317,7 +317,7 @@ CGFloat GLOBAL_SCREEN_SCALE;
 		}
 		case kPrMerged:
 		{
-			notification.alertBody = [NSString stringWithFormat:@"PR Merged: %@",[item title]];
+			notification.alertBody = [NSString stringWithFormat:@"PR Merged! %@",[item title]];
 			break;
 		}
 	}

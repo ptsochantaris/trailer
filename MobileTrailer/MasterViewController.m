@@ -1,6 +1,9 @@
 
-@interface MasterViewController () <UITextFieldDelegate, UIActionSheetDelegate>
+@interface MasterViewController () <UITextFieldDelegate, UIActionSheetDelegate, UIAlertViewDelegate>
 {
+    // Opening PRs
+    NSString *urlToOpen;
+
     // Filtering
     UITextField *searchField;
     HTPopTimer *searchTimer;
@@ -33,8 +36,8 @@
 	UIActionSheet *a = [[UIActionSheet alloc] initWithTitle:@"Action"
 												   delegate:self
 										  cancelButtonTitle:@"Cancel"
-									 destructiveButtonTitle:@"Remove all merged"
-										  otherButtonTitles:@"Mark all as read", @"Refresh Now", nil];
+									 destructiveButtonTitle:@"Mark all as read"
+										  otherButtonTitles:@"Remove all merged", @"Refresh Now", nil];
 	[a showFromBarButtonItem:self.navigationItem.rightBarButtonItem animated:YES];
 }
 
@@ -42,11 +45,11 @@
 {
     if(buttonIndex==0)
     {
-        [self removeAllMerged];
-    }
-	if(buttonIndex==1)
-	{
 		[self markAllAsRead];
+    }
+	else if(buttonIndex==1)
+	{
+        [self removeAllMerged];
 	}
 	else if(buttonIndex==2)
 	{
@@ -71,6 +74,23 @@
 }
 
 - (void)removeAllMerged
+{
+    [[[UIAlertView alloc] initWithTitle:@"Sure?"
+                                message:@"Remove all PRs in the Merged section?"
+                               delegate:self
+                      cancelButtonTitle:@"No"
+                      otherButtonTitles:@"Yes", nil] show];
+}
+
+- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+    if(buttonIndex==1)
+    {
+        [self removeAllMergedConfirmed];
+    }
+}
+
+- (void)removeAllMergedConfirmed
 {
 	for(PullRequest *p in self.fetchedResultsController.fetchedObjects)
         if(p.merged.boolValue)
@@ -143,54 +163,71 @@
 
 	NSManagedObjectContext *mainMoc = [AppDelegate shared].dataManager.managedObjectContext;
 
-	NSString *urlToOpen = notification.userInfo[NOTIFICATION_URL_KEY];
-	if(!urlToOpen)
-	{
-		NSNumber *itemId = notification.userInfo[PULL_REQUEST_ID_KEY];
-		PullRequest *pullRequest = nil;
-		if(itemId) // it's a pull request
-		{
-			pullRequest = [PullRequest itemOfType:@"PullRequest" serverId:itemId moc:mainMoc];
-			urlToOpen = pullRequest.webUrl;
-		}
-		else // it's a comment
-		{
-			itemId = notification.userInfo[COMMENT_ID_KEY];
-			PRComment *c = [PRComment itemOfType:@"PRComment" serverId:itemId moc:mainMoc];
-			urlToOpen = c.webUrl;
-			pullRequest = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:mainMoc];
-		}
-		double delayInSeconds = 0.1;
-		dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
-		dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-			[pullRequest catchUpWithComments];
-			[[AppDelegate shared] updateBadge];
-		});
+	urlToOpen = notification.userInfo[NOTIFICATION_URL_KEY];
 
+    NSNumber *pullRequestId = notification.userInfo[PULL_REQUEST_ID_KEY];
+
+    NSNumber *commentId = notification.userInfo[COMMENT_ID_KEY];
+
+    PullRequest *pullRequest = nil;
+
+    if(commentId)
+    {
+        PRComment *c = [PRComment itemOfType:@"PRComment" serverId:commentId moc:mainMoc];
+        if(!urlToOpen) urlToOpen = c.webUrl;
+        pullRequest = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:mainMoc];
+    }
+    else if(pullRequestId)
+    {
+        pullRequest = [PullRequest itemOfType:@"PullRequest" serverId:pullRequestId moc:mainMoc];
+        if(!urlToOpen) urlToOpen = pullRequest.webUrl;
+
+        if(!pullRequest)
+        {
+            [[[UIAlertView alloc] initWithTitle:@"PR not found"
+                                        message:@"Could not locale the PR related to this notification"
+                                       delegate:nil
+                              cancelButtonTitle:@"OK"
+                              otherButtonTitles:nil] show];
+        }
+    }
+
+    if(urlToOpen)
+    {
         searchField.text = nil;
+        _fetchedResultsController = nil;
         [self reloadData];
-		NSIndexPath *ip = [_fetchedResultsController indexPathForObject:pullRequest];
+    }
+
+    if(pullRequest)
+    {
+        NSIndexPath *ip = [self.fetchedResultsController indexPathForObject:pullRequest];
 		if(ip)
 		{
-			[self.tableView selectRowAtIndexPath:ip animated:YES scrollPosition:UITableViewScrollPositionMiddle];
-            [self tableView:self.tableView didSelectRowAtIndexPath:ip];
+			[self.tableView selectRowAtIndexPath:ip animated:NO scrollPosition:UITableViewScrollPositionMiddle];
 		}
-        else
-        {
-            if(pullRequest)
-            {
-                [[[UIAlertView alloc] initWithTitle:@"PR not found"
-                                            message:@"Could not locale the relevant PR, perhaps it was merged or closed"
-                                           delegate:nil
-                                  cancelButtonTitle:@"OK"
-                                  otherButtonTitles:nil] show];
-            }
-        }
-	}
-    else
-    {
-        self.detailViewController.detailItem = [NSURL URLWithString:urlToOpen];
+
+        [self catchUp:pullRequest];
     }
+
+    if(urlToOpen)
+    {
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+            self.detailViewController.detailItem = [NSURL URLWithString:urlToOpen];
+        else
+            [self performSegueWithIdentifier:@"showDetail" sender:self];
+    }
+}
+
+- (void)catchUp:(PullRequest *)pullRequest
+{
+    double delayInSeconds = 0.1;
+    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+    dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+        [pullRequest catchUpWithComments];
+        [[AppDelegate shared] updateBadge];
+        [[AppDelegate shared].dataManager saveDB];
+    });
 }
 
 - (void)dealloc
@@ -230,16 +267,17 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-        PullRequest *object = [[self fetchedResultsController] objectAtIndexPath:indexPath];
-        self.detailViewController.detailItem = [NSURL URLWithString:object.webUrl];
-		double delayInSeconds = 0.1;
-		dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
-		dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-			[object catchUpWithComments];
-			[[AppDelegate shared] updateBadge];
-		});
+    PullRequest *pullRequest = [[self fetchedResultsController] objectAtIndexPath:indexPath];
+    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+    {
+        self.detailViewController.detailItem = [NSURL URLWithString:pullRequest.webUrl];
     }
+    else
+    {
+        urlToOpen = pullRequest.webUrl;
+        [self performSegueWithIdentifier:@"showDetail" sender:self];
+    }
+    [self catchUp:pullRequest];
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
@@ -285,10 +323,9 @@
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
-    if ([[segue identifier] isEqualToString:@"showDetail"]) {
-        NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
-        PullRequest *object = [[self fetchedResultsController] objectAtIndexPath:indexPath];
-        [[segue destinationViewController] setDetailItem:[NSURL URLWithString:object.webUrl]];
+    if ([[segue identifier] isEqualToString:@"showDetail"])
+    {
+        [[segue destinationViewController] setDetailItem:[NSURL URLWithString:urlToOpen]];
     }
 }
 

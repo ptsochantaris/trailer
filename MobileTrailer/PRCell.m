@@ -22,6 +22,7 @@ static NSNumberFormatter *itemCountFormatter;
 	unreadCount.textAlignment = NSTextAlignmentCenter;
 	unreadCount.layer.cornerRadius = 9.0;
 	unreadCount.font = [UIFont boldSystemFontOfSize:12.0];
+    unreadCount.hidden = YES;
 	[self.contentView addSubview:unreadCount];
 
 	readCount = [[UILabel alloc] initWithFrame:CGRectZero];
@@ -29,6 +30,7 @@ static NSNumberFormatter *itemCountFormatter;
 	readCount.textAlignment = NSTextAlignmentCenter;
 	readCount.layer.cornerRadius = 9.0;
 	readCount.font = [UIFont systemFontOfSize:12.0];
+    readCount.hidden = YES;
 	[self.contentView addSubview:readCount];
 
 	static dispatch_once_t onceToken;
@@ -124,6 +126,7 @@ static NSNumberFormatter *itemCountFormatter;
 - (void)layoutSubviews
 {
 	[super layoutSubviews];
+
 	CGPoint topLeft = CGPointMake(self.imageView.frame.origin.x, self.imageView.frame.origin.y);
 	unreadCount.center = topLeft;
 	[self.contentView bringSubviewToFront:unreadCount];
@@ -136,6 +139,14 @@ static NSNumberFormatter *itemCountFormatter;
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated
 {
 	[super setSelected:selected animated:animated];
+
+	unreadCount.backgroundColor = [UIColor redColor];
+	readCount.backgroundColor = [UIColor colorWithWhite:0.9 alpha:1.0];
+}
+
+- (void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated
+{
+    [super setHighlighted:highlighted animated:animated];
 
 	unreadCount.backgroundColor = [UIColor redColor];
 	readCount.backgroundColor = [UIColor colorWithWhite:0.9 alpha:1.0];
