@@ -164,7 +164,7 @@ CGFloat GLOBAL_SCREEN_SCALE;
 	}
 }
 
--(void)application:(UIApplication *)application performFetchWithCompletionHandler:(backgroundFetchCompletionCallback)completionHandler
+- (void)application:(UIApplication *)application performFetchWithCompletionHandler:(backgroundFetchCompletionCallback)completionHandler
 {
 	self.backgroundCallback = completionHandler;
 	[self startRefresh];
