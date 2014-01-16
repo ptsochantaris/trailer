@@ -242,7 +242,8 @@
 
 - (void)refreshEnded
 {
-	self.title = @"Pull Requests";
+	NSInteger count = [PullRequest countUnmergedRequestsInMoc:self.managedObjectContext];
+	self.title = [NSString stringWithFormat:@"%ld Active PRs",(long)count];
 }
 
 #pragma mark - Table View

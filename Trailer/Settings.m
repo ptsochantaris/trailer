@@ -40,7 +40,7 @@
 	float period = [[NSUserDefaults standardUserDefaults] floatForKey:IOS_BACKGROUND_REFRESH_PERIOD_KEY];
 	if(period==0)
 	{
-		period = 600.0;
+		period = 1800.0;
 		self.backgroundRefreshPeriod = period;
 	}
 	return period;

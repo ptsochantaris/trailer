@@ -70,9 +70,14 @@ CGFloat GLOBAL_SCREEN_SCALE;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
+- (void)applicationWillEnterForeground:(UIApplication *)application
+{
+	self.enteringForeground = YES;
+}
+
 - (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification
 {
-	if(notification)
+	if(notification && (self.enteringForeground || [UIApplication sharedApplication].applicationState==UIApplicationStateInactive))
 	{
 		[self handleLocalNotification:notification];
 	}
@@ -292,6 +297,7 @@ CGFloat GLOBAL_SCREEN_SCALE;
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
+	self.enteringForeground = NO;
 	[self startRefreshIfItIsDue];
 }
 
