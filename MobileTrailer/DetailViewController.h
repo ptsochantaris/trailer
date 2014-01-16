@@ -9,7 +9,7 @@
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *spinner;
 @property (weak, nonatomic) IBOutlet UILabel *statusLabel;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *shareButton;
-// copy link, open in safari
+@property (weak, nonatomic) IBOutlet UIButton *tryAgainButton;
 
 + (DetailViewController *)shared;
 

@@ -46,6 +46,16 @@
                                 <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="Le9-pP-LXq">
+                                <rect key="frame" x="285" y="697" width="132" height="52"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <state key="normal" title="Try again">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="iPadTryAgain:" destination="JEX-9P-axG" eventType="touchUpInside" id="dfM-ih-dNt"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
@@ -62,6 +72,7 @@
                         <outlet property="shareButton" destination="49c-8N-huw" id="RU2-Fh-IgY"/>
                         <outlet property="spinner" destination="iCz-7v-EPc" id="mqi-Fb-lib"/>
                         <outlet property="statusLabel" destination="JEI-RV-Ntc" id="FXH-WF-SUZ"/>
+                        <outlet property="tryAgainButton" destination="Le9-pP-LXq" id="piA-8Y-9Kc"/>
                         <outlet property="web" destination="5u8-Lo-ZoT" id="VrS-Xw-ody"/>
                     </connections>
                 </viewController>
@@ -386,7 +397,7 @@ Select one of these options if you need to create one first:</string>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Version" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="XBv-UE-utz">
-                                <rect key="frame" x="270.99999866227893" y="85" width="242" height="21"/>
+                                <rect key="frame" x="271" y="85" width="242" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
                                 <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
