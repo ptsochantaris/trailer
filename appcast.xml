@@ -6,84 +6,101 @@
 		<description>Most recent changes with links to updates.</description>
 		<language>en</language>
 
-				<item>
-			            <title>Version 1.0.3</title>
-						<description><![CDATA[<font face="sans-serif" size="3"><ul>
-		<li>Corrected a filtering issue in 1.0.2, plus the changes from 1.0.2:</li>							
-		<li>Corrected a non-critical issue with the “refreshing” menu item label</li>
-		<li>Significant UI smoothness and performance gains, specifically relating to image handling, caching, and comment counting logic</li>
-		<li>Large under-the-hood changes to improve the codebase</li>
-		<li>Improvements to API load warning logic</li>
-		<li>Repository refresh bug corrected</li>
-		<li>Prioritised API calls over image calls in the network queue</li>
-		<li>When removing merged PRs the menu re-opens after the confirmation box has been responded to</li>
-		<li>Failed database upgrades would cause the app to lock up, fixed</li>
-		<li>Corrected rare corner case where the first API load would fail and the app would give an API limit warning</li>				
-		</ul></font>]]></description>
-			            <pubDate>Mon, 13 Jan 2014 13:00:00 +0000</pubDate>
-			            <enclosure 
-		url="http://dev.housetrip.com/trailer/trailer103.zip"
-		sparkle:version="1030"
-		sparkle:shortVersionString="1.0.3"
-		sparkle:dsaSignature="MC4CFQDNSbEA66O26kvq1yhZ68dfjEAwLAIVAIpRgVmUE27rBVmXEd2qvtopehKW"
-		type="application/octet-stream"/>
-				</item>
-
 		<item>
-	            <title>Version 1.0.2</title>
-				<description><![CDATA[<font face="sans-serif" size="3"><ul>
-<li>Corrected a non-critical issue with the “refreshing” menu item label</li>
-<li>Significant UI smoothness and performance gains, specifically relating to image handling, caching, and comment counting logic</li>
-<li>Large under-the-hood changes to improve the codebase</li>
-<li>Improvements to API load warning logic</li>
-<li>Repository refresh bug corrected</li>
-<li>Prioritised API calls over image calls in the network queue</li>
-<li>When removing merged PRs the menu re-opens after the confirmation box has been responded to</li>
-<li>Failed database upgrades would cause the app to lock up, fixed</li>
-<li>Corrected rare corner case where the first API load would fail and the app would give an API limit warning</li>				
-</ul></font>]]></description>
-	            <pubDate>Sun, 12 Jan 2014 00:00:00 +0000</pubDate>
-	            <enclosure 
-url="http://dev.housetrip.com/trailer/trailer102.zip"
-sparkle:version="1020"
-sparkle:shortVersionString="1.0.2"
-sparkle:dsaSignature="MC4CFQCwtiHMpMQZcOVMaqJTKYscYHLedAIVAKtWcXeg1EymvGJi3BE0cY+lMLXM"
-type="application/octet-stream"/>
+			<title>Version 1.0.4</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+<li>Added notification support for being mentioned in a Github comment</li>
+<li>Added ability to move PRs in which you are mentioned to the "Participated" group</li>
+<li>Added support to keeping closed (i.e. not merged) PRs much like the merged PRs are kept</li>
+<li>Further code cleanup, hopefully even faster menu drawing and display issue corrections</li>
+				</ul></font>]]></description>
+			<pubDate>Fri, 17 Jan 2014 15:00:00 +0000</pubDate>
+			<enclosure
+			url="http://dev.housetrip.com/trailer/trailer104.zip"
+			sparkle:version="1040"
+			sparkle:shortVersionString="1.0.4"
+			sparkle:dsaSignature="MCwCFFStmaZO7I6e2Aw+7WCu7GcpAYwVAhQprm2Ai89kCLK6G3Df4ZiFMgss3Q=="
+			type="application/octet-stream"/>
 		</item>
-					
 
 		<item>
-	            <title>Version 1.0.1</title>
-				<description><![CDATA[<font face="sans-serif" size="3"><ul>
-<li>Added new 'About' box</li>
-<li>Changed updater URLs for hosting on Github pages</li>
-<li>Updated copyright and licensing for release</li>
-</ul></font>]]></description>
-	            <pubDate>Fri, 3 Jan 2014 12:00:00 +0000</pubDate>
-	            <enclosure 
-	url="http://dev.housetrip.com/trailer/trailer101.zip"
-	sparkle:version="1010"
-	sparkle:shortVersionString="1.0.1"
-	sparkle:dsaSignature="MCwCFEWpHV5IDHdj6AD5h66qh8dpG8PTAhRd4XH2gvsUnFIUODoUkqOV74mfwg=="
-	type="application/octet-stream"/>
-			</item>
+			<title>Version 1.0.3</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Corrected a filtering issue in 1.0.2, plus the changes from 1.0.2:</li>
+				<li>Corrected a non-critical issue with the “refreshing” menu item label</li>
+				<li>Significant UI smoothness and performance gains, specifically relating to image handling, caching, and comment counting logic</li>
+				<li>Large under-the-hood changes to improve the codebase</li>
+				<li>Improvements to API load warning logic</li>
+				<li>Repository refresh bug corrected</li>
+				<li>Prioritised API calls over image calls in the network queue</li>
+				<li>When removing merged PRs the menu re-opens after the confirmation box has been responded to</li>
+				<li>Failed database upgrades would cause the app to lock up, fixed</li>
+				<li>Corrected rare corner case where the first API load would fail and the app would give an API limit warning</li>
+				</ul></font>]]></description>
+			<pubDate>Mon, 13 Jan 2014 13:00:00 +0000</pubDate>
+			<enclosure
+			url="http://dev.housetrip.com/trailer/trailer103.zip"
+			sparkle:version="1030"
+			sparkle:shortVersionString="1.0.3"
+			sparkle:dsaSignature="MC4CFQDNSbEA66O26kvq1yhZ68dfjEAwLAIVAIpRgVmUE27rBVmXEd2qvtopehKW"
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
+			<title>Version 1.0.2</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Corrected a non-critical issue with the “refreshing” menu item label</li>
+				<li>Significant UI smoothness and performance gains, specifically relating to image handling, caching, and comment counting logic</li>
+				<li>Large under-the-hood changes to improve the codebase</li>
+				<li>Improvements to API load warning logic</li>
+				<li>Repository refresh bug corrected</li>
+				<li>Prioritised API calls over image calls in the network queue</li>
+				<li>When removing merged PRs the menu re-opens after the confirmation box has been responded to</li>
+				<li>Failed database upgrades would cause the app to lock up, fixed</li>
+				<li>Corrected rare corner case where the first API load would fail and the app would give an API limit warning</li>
+				</ul></font>]]></description>
+			<pubDate>Sun, 12 Jan 2014 00:00:00 +0000</pubDate>
+			<enclosure
+			url="http://dev.housetrip.com/trailer/trailer102.zip"
+			sparkle:version="1020"
+			sparkle:shortVersionString="1.0.2"
+			sparkle:dsaSignature="MC4CFQCwtiHMpMQZcOVMaqJTKYscYHLedAIVAKtWcXeg1EymvGJi3BE0cY+lMLXM"
+			type="application/octet-stream"/>
+		</item>
 
 
 		<item>
-	            <title>Version 1.0.0</title>
-				<description><![CDATA[<font face="sans-serif" size="3"><ul>
-<li>Version 1.0!</li>
-<li>Please report issues so we can move onto 1.0.1 as soon as possible :)</li>
-</ul></font>]]></description>
-	            <pubDate>Wed, 1 Jan 2014 19:00:00 +0000</pubDate>
-	            <enclosure 
-	url="http://dev.housetrip.com/trailer/trailer100.zip"
-	sparkle:version="1000"
-	sparkle:shortVersionString="1.0.0"
-	sparkle:dsaSignature="MC0CFQCblFitqFh2DyStsGAydchcY1e+FwIUcQa53y3jwUuu/D3cBm2pU0Hujdg="
-	type="application/octet-stream"/>
-			</item>
-			
-			
+			<title>Version 1.0.1</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Added new 'About' box</li>
+				<li>Changed updater URLs for hosting on Github pages</li>
+				<li>Updated copyright and licensing for release</li>
+				</ul></font>]]></description>
+			<pubDate>Fri, 3 Jan 2014 12:00:00 +0000</pubDate>
+			<enclosure
+			url="http://dev.housetrip.com/trailer/trailer101.zip"
+			sparkle:version="1010"
+			sparkle:shortVersionString="1.0.1"
+			sparkle:dsaSignature="MCwCFEWpHV5IDHdj6AD5h66qh8dpG8PTAhRd4XH2gvsUnFIUODoUkqOV74mfwg=="
+			type="application/octet-stream"/>
+		</item>
+
+
+		<item>
+			<title>Version 1.0.0</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Version 1.0!</li>
+				<li>Please report issues so we can move onto 1.0.1 as soon as possible :)</li>
+				</ul></font>]]></description>
+			<pubDate>Wed, 1 Jan 2014 19:00:00 +0000</pubDate>
+			<enclosure
+			url="http://dev.housetrip.com/trailer/trailer100.zip"
+			sparkle:version="1000"
+			sparkle:shortVersionString="1.0.0"
+			sparkle:dsaSignature="MC0CFQCblFitqFh2DyStsGAydchcY1e+FwIUcQa53y3jwUuu/D3cBm2pU0Hujdg="
+			type="application/octet-stream"/>
+		</item>
+		
+		
 	</channel>
 </rss>
