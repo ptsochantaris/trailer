@@ -46,6 +46,16 @@
                                 <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="Le9-pP-LXq">
+                                <rect key="frame" x="285" y="697" width="132" height="52"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <state key="normal" title="Try again">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="iPadTryAgain:" destination="JEX-9P-axG" eventType="touchUpInside" id="dfM-ih-dNt"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
@@ -62,6 +72,7 @@
                         <outlet property="shareButton" destination="49c-8N-huw" id="RU2-Fh-IgY"/>
                         <outlet property="spinner" destination="iCz-7v-EPc" id="mqi-Fb-lib"/>
                         <outlet property="statusLabel" destination="JEI-RV-Ntc" id="FXH-WF-SUZ"/>
+                        <outlet property="tryAgainButton" destination="Le9-pP-LXq" id="piA-8Y-9Kc"/>
                         <outlet property="web" destination="5u8-Lo-ZoT" id="VrS-Xw-ody"/>
                     </connections>
                 </viewController>
@@ -130,9 +141,7 @@
                     <navigationItem key="navigationItem" title="Pull Requests" id="Zdf-7t-Un8">
                         <barButtonItem key="leftBarButtonItem" title="Settings" id="uCG-Gj-QGq">
                             <connections>
-                                <segue destination="zPa-1n-gqo" kind="popover" popoverAnchorBarButtonItem="uCG-Gj-QGq" id="9Mj-hJ-deg">
-                                    <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
-                                </segue>
+                                <segue destination="zPa-1n-gqo" kind="modal" identifier="showPreferences" modalPresentationStyle="formSheet" id="9Mj-hJ-deg"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="action" id="vlQ-6x-FuM">
@@ -152,7 +161,7 @@
         <!--Navigation Controller-->
         <scene sceneID="r7l-gg-dq7">
             <objects>
-                <navigationController id="vC3-pB-5Vb" sceneMemberID="viewController">
+                <navigationController modalPresentationStyle="pageSheet" id="vC3-pB-5Vb" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="DjV-YW-jjY">
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
@@ -167,24 +176,17 @@
         <!--Preferences View Controller - Settings-->
         <scene sceneID="8yv-cf-BQa">
             <objects>
-                <viewController id="qtb-G3-HJM" customClass="PreferencesViewController" sceneMemberID="viewController">
+                <viewController modalPresentationStyle="currentContext" id="qtb-G3-HJM" customClass="PreferencesViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="uff-X7-RRX">
-                        <rect key="frame" x="0.0" y="64" width="540" height="556"/>
+                        <rect key="frame" x="0.0" y="44" width="540" height="532"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progress="0.5" id="StE-Tp-YNR">
-                                <rect key="frame" x="312" y="535" width="208" height="2"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                            <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" id="StE-Tp-YNR">
+                                <rect key="frame" x="140" y="513" width="380" height="2"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                             </progressView>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="8QF-eU-pd6">
-                                <rect key="frame" x="20" y="525" width="403" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="13"/>
-                                <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="GitHub personal access token" textAlignment="center" minimumFontSize="17" id="gm0-vf-klI">
-                                <rect key="frame" x="20" y="14" width="500" height="30"/>
+                                <rect key="frame" x="20" y="10" width="500" height="30"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" returnKeyType="done"/>
@@ -192,25 +194,15 @@
                                     <outlet property="delegate" destination="qtb-G3-HJM" id="g0H-hI-7Ji"/>
                                 </connections>
                             </textField>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="GitHub API usage:" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="pcd-uY-flT">
-                                <rect key="frame" x="87" y="525" width="217" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="GitHub API usage:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="pcd-uY-flT">
+                                <rect key="frame" x="20" y="503" width="117" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="13"/>
                                 <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="VJR-YC-WkL">
-                                <rect key="frame" x="266" y="472" width="274" height="45"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMinY="YES"/>
-                                <state key="normal" title="Load Repository List">
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <action selector="ipadLoadRepositories:" destination="qtb-G3-HJM" eventType="touchUpInside" id="8D7-EJ-kMp"/>
-                                </connections>
-                            </button>
                             <tableView opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" id="2NG-2o-yHF">
-                                <rect key="frame" x="0.0" y="58" width="540" height="406"/>
+                                <rect key="frame" x="0.0" y="47" width="540" height="448"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                                 <prototypes>
@@ -237,27 +229,17 @@
                                     <outlet property="delegate" destination="qtb-G3-HJM" id="piT-8d-9Dg"/>
                                 </connections>
                             </tableView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="GM9-Ft-PUf">
-                                <rect key="frame" x="0.0" y="472" width="262" height="45"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <state key="normal" title="Advanced">
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <segue destination="ls6-NX-hye" kind="push" id="AdA-Cp-Ym8"/>
-                                </connections>
-                            </button>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="svI-g4-EPO">
-                                <rect key="frame" x="20" y="52" width="500" height="101"/>
+                                <rect key="frame" x="20" y="47" width="500" height="101"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
-                                <string key="text">To access your repositories, enter your personal sccess token in the field above and select 'Load Repository List' from below.
+                                <string key="text">To access your repositories, enter your personal sccess token in the field above and select 'Load repository list' from below.
 
 Select one of these options if you need to create one first:</string>
                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="nYr-zF-36S">
-                                <rect key="frame" x="0.0" y="149" width="262" height="44"/>
+                                <rect key="frame" x="0.0" y="144" width="262" height="44"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Create a token">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
@@ -267,7 +249,7 @@ Select one of these options if you need to create one first:</string>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="xRS-LU-s5f">
-                                <rect key="frame" x="266" y="149" width="274" height="44"/>
+                                <rect key="frame" x="266" y="144" width="274" height="44"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="View existing tokens">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
@@ -280,30 +262,41 @@ Select one of these options if you need to create one first:</string>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     </view>
+                    <toolbarItems>
+                        <barButtonItem title="Select/Clear" id="97J-Hs-P99">
+                            <connections>
+                                <action selector="ipadSelection:" destination="qtb-G3-HJM" id="4O2-mz-XZN"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem style="plain" systemItem="flexibleSpace" id="CKC-cd-s6h"/>
+                        <barButtonItem title="Load repository list" id="pdh-Ia-tmJ">
+                            <connections>
+                                <action selector="ipadLoadRepos:" destination="qtb-G3-HJM" id="VQ0-N5-Flo"/>
+                            </connections>
+                        </barButtonItem>
+                    </toolbarItems>
                     <navigationItem key="navigationItem" title="Settings" id="XM6-pw-CgJ">
                         <barButtonItem key="leftBarButtonItem" style="done" systemItem="done" id="mYI-Lo-soT">
                             <connections>
                                 <action selector="ipadDone:" destination="qtb-G3-HJM" id="9jG-ZJ-lnI"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" title="Select/Clear" id="97J-Hs-P99">
+                        <barButtonItem key="rightBarButtonItem" title="Advanced" id="kqQ-Ne-NTr">
                             <connections>
-                                <action selector="ipadSelection:" destination="qtb-G3-HJM" id="4O2-mz-XZN"/>
+                                <segue destination="ls6-NX-hye" kind="push" id="xwZ-va-sPr"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
-                    <value key="contentSizeForViewInPopover" type="size" width="480" height="768"/>
                     <connections>
                         <outlet property="apiLoad" destination="StE-Tp-YNR" id="03f-ZZ-jJq"/>
                         <outlet property="createTokenButton" destination="nYr-zF-36S" id="sGF-TC-glt"/>
                         <outlet property="githubApiToken" destination="gm0-vf-klI" id="kzE-I3-6Ap"/>
                         <outlet property="instructionLabel" destination="svI-g4-EPO" id="tGQ-re-tvi"/>
-                        <outlet property="refreshRepoList" destination="VJR-YC-WkL" id="9aB-N7-KdY"/>
+                        <outlet property="refreshRepoList" destination="pdh-Ia-tmJ" id="C2z-8M-9YN"/>
                         <outlet property="repositories" destination="2NG-2o-yHF" id="dWS-92-Q17"/>
                         <outlet property="selectionButton" destination="97J-Hs-P99" id="FJ0-yy-q4P"/>
-                        <outlet property="versionNumber" destination="8QF-eU-pd6" id="Uim-oP-pR5"/>
                         <outlet property="viewTokensButton" destination="xRS-LU-s5f" id="nzq-ue-Thb"/>
-                        <segue destination="kWj-6b-yq2" kind="push" identifier="openGithub" id="imS-nC-Wda"/>
+                        <segue destination="bYl-MI-Ah5" kind="modal" identifier="openGithub" id="imS-nC-Wda"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="2dF-YS-pAX" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -313,14 +306,14 @@ Select one of these options if you need to create one first:</string>
         <!--Advanced Settings View Controller - Advanced-->
         <scene sceneID="13M-SK-H8U">
             <objects>
-                <tableViewController modalPresentationStyle="currentContext" id="ls6-NX-hye" customClass="AdvancedSettingsViewController" sceneMemberID="viewController">
+                <tableViewController modalPresentationStyle="currentContext" hidesBottomBarWhenPushed="YES" id="ls6-NX-hye" customClass="AdvancedSettingsViewController" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" id="Q1r-gB-XEK">
-                        <rect key="frame" x="0.0" y="64" width="540" height="556"/>
+                        <rect key="frame" x="0.0" y="44" width="540" height="532"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" textLabel="rea-wC-dmF" detailTextLabel="8Zd-fd-kIl" style="IBUITableViewCellStyleValue1" id="0IG-O1-8fc">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" textLabel="rea-wC-dmF" detailTextLabel="iht-nD-wTn" style="IBUITableViewCellStyleValue1" id="0IG-O1-8fc">
                                 <rect key="frame" x="0.0" y="55" width="540" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="0IG-O1-8fc" id="Cde-Zq-FvG">
@@ -334,7 +327,7 @@ Select one of these options if you need to create one first:</string>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
-                                        <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Detail" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="8Zd-fd-kIl">
+                                        <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Detail" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="iht-nD-wTn">
                                             <rect key="frame" x="481" y="11" width="44" height="21"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
@@ -350,8 +343,13 @@ Select one of these options if you need to create one first:</string>
                             <outlet property="delegate" destination="ls6-NX-hye" id="UeF-vQ-tyy"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Advanced" id="0ij-Vd-OcD"/>
-                    <value key="contentSizeForViewInPopover" type="size" width="480" height="768"/>
+                    <navigationItem key="navigationItem" title="Advanced" id="0ij-Vd-OcD">
+                        <barButtonItem key="rightBarButtonItem" title="About" id="mWC-vq-1Vd">
+                            <connections>
+                                <segue destination="yvK-be-nK4" kind="push" id="0Qg-mw-SFp"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <segue destination="UM1-Tl-R50" kind="push" identifier="showPicker" id="hKI-wI-J3q"/>
                     </connections>
@@ -363,9 +361,9 @@ Select one of these options if you need to create one first:</string>
         <!--Picker View Controller-->
         <scene sceneID="5Tx-Cn-3zg">
             <objects>
-                <tableViewController modalPresentationStyle="currentContext" id="UM1-Tl-R50" customClass="PickerViewController" sceneMemberID="viewController">
+                <tableViewController modalPresentationStyle="currentContext" hidesBottomBarWhenPushed="YES" id="UM1-Tl-R50" customClass="PickerViewController" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" id="JIf-tM-OPO">
-                        <rect key="frame" x="0.0" y="64" width="540" height="556"/>
+                        <rect key="frame" x="0.0" y="44" width="540" height="532"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
@@ -385,22 +383,90 @@ Select one of these options if you need to create one first:</string>
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" id="3eE-6I-NaF"/>
-                    <value key="contentSizeForViewInPopover" type="size" width="480" height="768"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="qm4-CU-PPj" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3530" y="-780"/>
+            <point key="canvasLocation" x="3568" y="-780"/>
+        </scene>
+        <!--About Trailer View Controller - About-->
+        <scene sceneID="gk8-1F-TsH">
+            <objects>
+                <viewController modalPresentationStyle="currentContext" id="yvK-be-nK4" customClass="AboutTrailerViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="8zL-cy-7x3">
+                        <rect key="frame" x="0.0" y="44" width="540" height="532"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Version" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="XBv-UE-utz">
+                                <rect key="frame" x="271" y="85" width="242" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
+                                <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Trailer" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="ZLN-iY-Lrv">
+                                <rect key="frame" x="276" y="20" width="242" height="70"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="64"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" editable="NO" textAlignment="center" selectable="NO" id="cun-Cw-EIG">
+                                <rect key="frame" x="21" y="144" width="500" height="388"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <string key="text">Copyright (c) 2013-2014 HouseTrip Ltd.
+
+Released under the terms of the MIT licence:
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</string>
+                                <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Team Octopus" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="9eQ-Jm-HX5">
+                                <rect key="frame" x="13" y="92" width="96" height="14"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                                <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="htLogo" id="mkI-ej-j3O">
+                                <rect key="frame" x="13" y="24" width="130" height="70"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
+                    </view>
+                    <toolbarItems/>
+                    <navigationItem key="navigationItem" title="About" id="0uQ-oM-T56">
+                        <barButtonItem key="rightBarButtonItem" title="View on GitHub" id="DsZ-7N-eAb">
+                            <connections>
+                                <action selector="ipadLink:" destination="yvK-be-nK4" id="Uvr-sW-ypB"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="versionNumber" destination="XBv-UE-utz" id="zGM-ej-vCe"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="R6w-yG-GO1" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3568" y="-1531"/>
         </scene>
         <!--Github View Controller - GitHub-->
         <scene sceneID="ocq-RM-6Ci">
             <objects>
-                <viewController modalPresentationStyle="currentContext" id="kWj-6b-yq2" customClass="GithubViewController" sceneMemberID="viewController">
+                <viewController modalPresentationStyle="currentContext" hidesBottomBarWhenPushed="YES" id="kWj-6b-yq2" customClass="GithubViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="KZ8-wc-h6g">
-                        <rect key="frame" x="0.0" y="64" width="540" height="556"/>
+                        <rect key="frame" x="0.0" y="0.0" width="1024" height="768"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <webView contentMode="scaleToFill" id="nWB-a1-bTA">
-                                <rect key="frame" x="0.0" y="0.0" width="540" height="556"/>
+                                <rect key="frame" x="0.0" y="0.0" width="1024" height="768"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <connections>
@@ -408,15 +474,20 @@ Select one of these options if you need to create one first:</string>
                                 </connections>
                             </webView>
                             <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="gray" id="00q-SG-a6I">
-                                <rect key="frame" x="260" y="268" width="20" height="20"/>
+                                <rect key="frame" x="502" y="374" width="20" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                             </activityIndicatorView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     </view>
-                    <navigationItem key="navigationItem" title="GitHub" id="uon-TC-PDK"/>
-                    <value key="contentSizeForViewInPopover" type="size" width="1024" height="768"/>
+                    <navigationItem key="navigationItem" title="GitHub" id="uon-TC-PDK">
+                        <barButtonItem key="leftBarButtonItem" systemItem="done" id="mNO-8A-axj">
+                            <connections>
+                                <action selector="ipadDone:" destination="kWj-6b-yq2" id="JBA-Bs-pE6"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="spinner" destination="00q-SG-a6I" id="fN9-ae-kq1"/>
                         <outlet property="webView" destination="nWB-a1-bTA" id="4Te-hb-TDh"/>
@@ -424,20 +495,25 @@ Select one of these options if you need to create one first:</string>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="BoF-TD-ccs" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2819" y="-39"/>
+            <point key="canvasLocation" x="4049" y="-11"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="iMa-Ee-G8n">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="zPa-1n-gqo" sceneMemberID="viewController">
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" toolbarHidden="NO" id="zPa-1n-gqo" sceneMemberID="viewController">
                     <toolbarItems/>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics" translucent="NO"/>
                     <modalFormSheetSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" translucent="NO" id="iUE-EM-vVl">
                         <rect key="frame" x="0.0" y="0.0" width="768" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
+                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translucent="NO" id="eXk-a0-dgg">
+                        <rect key="frame" x="0.0" y="576" width="540" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </toolbar>
                     <connections>
                         <segue destination="qtb-G3-HJM" kind="relationship" relationship="rootViewController" id="bAO-8M-XTw"/>
                     </connections>
@@ -446,7 +522,29 @@ Select one of these options if you need to create one first:</string>
             </objects>
             <point key="canvasLocation" x="1345" y="-557"/>
         </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="jAX-VB-lnl">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="bYl-MI-Ah5" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <value key="contentSizeForViewInPopover" type="size" width="1024" height="768"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="DIu-0j-rGO">
+                        <rect key="frame" x="0.0" y="0.0" width="768" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="kWj-6b-yq2" kind="relationship" relationship="rootViewController" id="QGT-0w-YvN"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="H6b-De-qc9" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2819" y="-11"/>
+        </scene>
     </scenes>
+    <resources>
+        <image name="htLogo" width="200" height="108"/>
+    </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar" statusBarStyle="blackOpaque"/>
         <simulatedOrientationMetrics key="orientation"/>

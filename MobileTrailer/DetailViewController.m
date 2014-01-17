@@ -76,6 +76,7 @@ static DetailViewController *_detail_shared_ref;
 	[self.spinner startAnimating];
 	self.statusLabel.hidden = YES;
 	self.web.hidden = YES;
+    self.tryAgainButton.hidden = YES;
 	self.title = @"Loading...";
 }
 
@@ -84,6 +85,7 @@ static DetailViewController *_detail_shared_ref;
 	[self.spinner stopAnimating];
 	self.statusLabel.hidden = YES;
 	self.web.hidden = NO;
+    self.tryAgainButton.hidden = YES;
 	self.title = [self.web stringByEvaluatingJavaScriptFromString:@"document.title"];
 }
 
@@ -91,9 +93,10 @@ static DetailViewController *_detail_shared_ref;
 {
 	[self.spinner stopAnimating];
 	self.statusLabel.textColor = [UIColor redColor];
-	self.statusLabel.text = [NSString stringWithFormat:@"There was an error loading this pull request page: %@",error];
+	self.statusLabel.text = [NSString stringWithFormat:@"There was an error loading this pull request page: %@",error.localizedDescription];
 	self.statusLabel.hidden = NO;
 	self.web.hidden = YES;
+    self.tryAgainButton.hidden = NO;
 	self.title = @"Error";
 }
 
@@ -112,6 +115,13 @@ static DetailViewController *_detail_shared_ref;
 							  cancelButtonTitle:@"Cancel"
 						 destructiveButtonTitle:nil
 							  otherButtonTitles:@"Copy Link", @"Open in Safari", nil];
+}
+
+- (IBAction)iPhoneTryAgain:(UIButton *)sender {
+    [_web reload];
+}
+- (IBAction)iPadTryAgain:(UIButton *)sender {
+    [_web reload];
 }
 
 - (void)actionSheet:(UIActionSheet *)actionSheet willDismissWithButtonIndex:(NSInteger)buttonIndex

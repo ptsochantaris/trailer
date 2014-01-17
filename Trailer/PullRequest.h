@@ -1,10 +1,10 @@
 
 #define kPullRequestSectionMine 0
-#define kPullRequestSectionMerged 1
-#define kPullRequestSectionParticipated 2
+#define kPullRequestSectionParticipated 1
+#define kPullRequestSectionMerged 2
 #define kPullRequestSectionAll 3
 
-#define kPullRequestSectionNames @[@"Mine", @"Recently Merged", @"Participated", @"All Pull Requests"]
+#define kPullRequestSectionNames @[@"Mine", @"Participated", @"Recently Merged", @"All Pull Requests"]
 
 @interface PullRequest : DataItem
 

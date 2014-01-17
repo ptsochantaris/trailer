@@ -123,7 +123,7 @@
 
 - (NSString *)yesNo:(BOOL)option
 {
-	if(option) return @"YES"; else return @"NO";
+	if(option) return @"Yes"; else return @"No";
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
@@ -245,13 +245,16 @@
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
-	PickerViewController *p = (PickerViewController *)segue.destinationViewController;
-	p.delegate = self;
-	p.title = pickerName;
-	p.values = valuesToPush;
-	p.previousValue = previousValue;
-	pickerName = nil;
-	valuesToPush = nil;
+	if([segue.destinationViewController isKindOfClass:[PickerViewController class]])
+	{
+		PickerViewController *p = (PickerViewController *)segue.destinationViewController;
+		p.delegate = self;
+		p.title = pickerName;
+		p.values = valuesToPush;
+		p.previousValue = previousValue;
+		pickerName = nil;
+		valuesToPush = nil;
+	}
 }
 
 - (void)pickerViewController:(PickerViewController *)picker selectedIndexPath:(NSIndexPath *)indexPath

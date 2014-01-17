@@ -45,8 +45,8 @@
 
 - (void)postProcess
 {
-	if(self.isMine) self.sectionIndex = @kPullRequestSectionMine;
-	else if(self.merged.boolValue) self.sectionIndex = @kPullRequestSectionMerged;
+	if(self.merged.boolValue) self.sectionIndex = @kPullRequestSectionMerged;
+	else if(self.isMine) self.sectionIndex = @kPullRequestSectionMine;
 	else if(self.commentedByMe) self.sectionIndex = @kPullRequestSectionParticipated;
 	else self.sectionIndex = @kPullRequestSectionAll;
 
@@ -80,7 +80,7 @@
 
 	if(filter.length)
 	{
-		[predicateSegments addObject:[NSString stringWithFormat:@"(title contains[cd] %@ or userLogin contains[cd] %@)",filter,filter]];
+		[predicateSegments addObject:[NSString stringWithFormat:@"(title contains[cd] '%@' or userLogin contains[cd] '%@')",filter,filter]];
 	}
 
 	if([Settings shared].shouldHideUncommentedRequests)

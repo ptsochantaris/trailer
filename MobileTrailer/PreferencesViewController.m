@@ -1,7 +1,6 @@
 
 @interface PreferencesViewController () <UITextFieldDelegate,
-NSFetchedResultsControllerDelegate, UINavigationControllerDelegate,
-UIActionSheetDelegate>
+NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 {
 	NSString *targetUrl;
 	BOOL refreshStartedWithEmpty;
@@ -11,36 +10,28 @@ UIActionSheetDelegate>
 @implementation PreferencesViewController
 
 - (IBAction)ipadDone:(UIBarButtonItem *)sender {
-	[[self valueForKey:@"popoverController"] dismissPopoverAnimated:YES];
+	[self done];
 }
-
-- (void)viewWillDisappear:(BOOL)animated
+- (IBAction)iphoneDone:(UIBarButtonItem *)sender {
+	[self done];
+}
+- (void)done
 {
-	[super viewWillDisappear:animated];
-	if([AppDelegate shared].preferencesDirty)
-	{
-		[[AppDelegate shared] startRefresh];
-	}
+	if([AppDelegate shared].preferencesDirty) [[AppDelegate shared] startRefresh];
+	[self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 
-	self.apiLoad.progress = 0.0;
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(apiUsageUpdate) name:RATE_UPDATE_NOTIFICATION object:nil];
-
-	NSString *currentAppVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
-	currentAppVersion = [@"Version " stringByAppendingString:currentAppVersion];
-	self.versionNumber.text = currentAppVersion;
 
 	self.githubApiToken.text = [Settings shared].authToken;
 	self.refreshRepoList.enabled = ([Settings shared].authToken.length>0);
 	self.repositories.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
 
 	[self.repositories reloadData];
-
-	self.navigationController.delegate = self;
 
 	[self apiUsageUpdate];
 
@@ -64,7 +55,7 @@ UIActionSheetDelegate>
 - (void)apiUsageUpdate
 {
 	API *api = [AppDelegate shared].api;
-	[self.apiLoad setProgress:(api.requestsLimit-api.requestsRemaining)/api.requestsRemaining];
+	[self.apiLoad setProgress:(api.requestsLimit-api.requestsRemaining)/api.requestsLimit];
 }
 
 - (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
@@ -110,10 +101,12 @@ UIActionSheetDelegate>
 	[[AppDelegate shared].dataManager saveDB];
 }
 
-- (IBAction)ipadLoadRepositories:(UIButton *)sender {
+- (IBAction)ipadLoadRepos:(UIBarButtonItem *)sender
+{
 	[self updateRepositories];
 }
-- (IBAction)iphoneLoadRepositories:(UIButton *)sender {
+- (IBAction)iphoneLoadRepos:(UIBarButtonItem *)sender
+{
 	[self updateRepositories];
 }
 - (void)updateRepositories
@@ -125,8 +118,8 @@ UIActionSheetDelegate>
 
 	refreshStartedWithEmpty = (self.fetchedResultsController.fetchedObjects.count==0);
 
-	NSString *originalName = [self.refreshRepoList titleForState:UIControlStateNormal];
-	[self.refreshRepoList setTitle:@"Loading..." forState:UIControlStateNormal];
+	NSString *originalName = self.refreshRepoList.title;
+	self.refreshRepoList.title = @"Loading...";
 	[self instructionMode:NO];
 	self.refreshRepoList.enabled = NO;
 	self.repositories.hidden = YES;
@@ -139,7 +132,7 @@ UIActionSheetDelegate>
 				r.active = @YES;
 
 		[self.repositories reloadData];
-		[self.refreshRepoList setTitle:originalName forState:UIControlStateNormal];
+		self.refreshRepoList.title = originalName;
 		self.refreshRepoList.enabled = YES;
 		self.repositories.hidden = NO;
 		self.githubApiToken.hidden = NO;
@@ -270,7 +263,10 @@ UIActionSheetDelegate>
             break;
 
         case NSFetchedResultsChangeUpdate:
-            [self configureCell:[tableView cellForRowAtIndexPath:indexPath] atIndexPath:indexPath];
+			if(newIndexPath)
+				[self configureCell:[tableView cellForRowAtIndexPath:indexPath] atIndexPath:newIndexPath];
+			else
+				[self configureCell:[tableView cellForRowAtIndexPath:indexPath] atIndexPath:indexPath];
             break;
 
         case NSFetchedResultsChangeMove:
@@ -295,21 +291,20 @@ UIActionSheetDelegate>
 		cell.accessoryType = UITableViewCellAccessoryNone;
 }
 
-- (IBAction)iphoneSelection:(UIBarButtonItem *)sender
-{
-	[[self selectionSheet] showInView:self.view];
+- (IBAction)iphoneSelection:(UIBarButtonItem *)sender {
+	[self showSelectionOptions:sender];
 }
-- (IBAction)ipadSelection:(UIBarButtonItem *)sender
-{
-	[[self selectionSheet] showFromBarButtonItem:sender animated:YES];
+- (IBAction)ipadSelection:(UIBarButtonItem *)sender {
+	[self showSelectionOptions:sender];
 }
-- (UIActionSheet *)selectionSheet
+- (void)showSelectionOptions:(UIBarButtonItem *)sender
 {
-	return [[UIActionSheet alloc] initWithTitle:self.title
-									   delegate:self
-							  cancelButtonTitle:@"Cancel"
-						 destructiveButtonTitle:nil
-							  otherButtonTitles:@"Select All", @"Unselect All", nil];
+	UIActionSheet *selectionSheet = [[UIActionSheet alloc] initWithTitle:self.title
+																delegate:self
+													   cancelButtonTitle:@"Cancel"
+												  destructiveButtonTitle:nil
+													   otherButtonTitles:@"Select All", @"Unselect All", nil];
+	[selectionSheet showFromBarButtonItem:sender animated:YES];
 }
 
 - (void)actionSheet:(UIActionSheet *)actionSheet willDismissWithButtonIndex:(NSInteger)buttonIndex
@@ -351,6 +346,10 @@ UIActionSheetDelegate>
 	if([segue.destinationViewController isKindOfClass:[GithubViewController class]])
 	{
 		((GithubViewController *)segue.destinationViewController).pathToLoad = targetUrl;
+	}
+	else if([segue.destinationViewController isKindOfClass:[UINavigationController class]])
+	{
+		((GithubViewController *)[segue.destinationViewController topViewController]).pathToLoad = targetUrl;
 	}
 	targetUrl = nil;
 }

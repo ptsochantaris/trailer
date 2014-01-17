@@ -29,23 +29,6 @@ CGFloat GLOBAL_SCREEN_SCALE;
 
 	[self setupUI];
 
-	if([Settings shared].authToken.length)
-	{
-		NSArray *activeRepos = [Repo activeReposInMoc:self.dataManager.managedObjectContext];
-		if(activeRepos.count==0)
-		{
-			[self forcePreferences];
-		}
-		else
-		{
-			[self startRefresh];
-		}
-	}
-	else
-	{
-		[self forcePreferences];
-	}
-
 	[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(networkStateChanged)
 												 name:kReachabilityChangedNotification
@@ -62,6 +45,23 @@ CGFloat GLOBAL_SCREEN_SCALE;
 	if(allPRs.count) [allPRs[0] setMerged:@YES];
 */
 
+	UILocalNotification *localNotification = [launchOptions objectForKey:UIApplicationLaunchOptionsLocalNotificationKey];
+
+	double delayInSeconds = 0.1;
+	dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+	dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+		NSArray *activeRepos = [Repo activeReposInMoc:self.dataManager.managedObjectContext];
+		if(activeRepos.count==0 || [Settings shared].authToken.length==0)
+		{
+			[self forcePreferences];
+		}
+		else
+		{
+			[self startRefresh];
+			if(localNotification) [self handleLocalNotification:localNotification];
+		}
+	});
+
     return YES;
 }
 
@@ -70,18 +70,30 @@ CGFloat GLOBAL_SCREEN_SCALE;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
+- (void)applicationWillEnterForeground:(UIApplication *)application
+{
+	self.enteringForeground = YES;
+}
+
 - (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification
 {
-	if(notification)
+	if(notification && (self.enteringForeground || [UIApplication sharedApplication].applicationState==UIApplicationStateInactive))
 	{
-		[[NSNotificationCenter defaultCenter] postNotificationName:RECEIVED_NOTIFICATION_KEY object:nil userInfo:notification.userInfo];
-		[[UIApplication sharedApplication] cancelLocalNotification:notification];
+		[self handleLocalNotification:notification];
 	}
+}
+
+- (void)handleLocalNotification:(UILocalNotification *)notification
+{
+	DLog(@"Received local notification: %@",notification.userInfo);
+	[[NSNotificationCenter defaultCenter] postNotificationName:RECEIVED_NOTIFICATION_KEY object:nil userInfo:notification.userInfo];
+	[[UIApplication sharedApplication] cancelLocalNotification:notification];
 }
 
 - (void)setupUI
 {
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+	{
 	    UISplitViewController *splitViewController = (UISplitViewController *)self.window.rootViewController;
 	    UINavigationController *navigationController = [splitViewController.viewControllers lastObject];
 	    splitViewController.delegate = (id)navigationController.topViewController;
@@ -89,7 +101,9 @@ CGFloat GLOBAL_SCREEN_SCALE;
 	    UINavigationController *masterNavigationController = splitViewController.viewControllers[0];
 	    MasterViewController *controller = (MasterViewController *)masterNavigationController.topViewController;
 	    controller.managedObjectContext = self.dataManager.managedObjectContext;
-	} else {
+	}
+	else
+	{
 	    UINavigationController *navigationController = (UINavigationController *)self.window.rootViewController;
 	    MasterViewController *controller = (MasterViewController *)navigationController.topViewController;
 	    controller.managedObjectContext = self.dataManager.managedObjectContext;
@@ -98,7 +112,21 @@ CGFloat GLOBAL_SCREEN_SCALE;
 
 - (void)forcePreferences
 {
-	// TODO
+	MasterViewController *controller = nil;
+
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+	{
+		UISplitViewController *splitViewController = (UISplitViewController *)self.window.rootViewController;
+		UINavigationController *masterNavigationController = splitViewController.viewControllers[0];
+		controller = (MasterViewController *)masterNavigationController.topViewController;
+	}
+	else
+	{
+		UINavigationController *navigationController = (UINavigationController *)self.window.rootViewController;
+		controller = (MasterViewController *)navigationController.topViewController;
+	}
+	
+	[controller performSegueWithIdentifier:@"showPreferences" sender:self];
 }
 
 - (void)networkStateChanged
@@ -136,7 +164,7 @@ CGFloat GLOBAL_SCREEN_SCALE;
 	}
 }
 
--(void)application:(UIApplication *)application performFetchWithCompletionHandler:(backgroundFetchCompletionCallback)completionHandler
+- (void)application:(UIApplication *)application performFetchWithCompletionHandler:(backgroundFetchCompletionCallback)completionHandler
 {
 	self.backgroundCallback = completionHandler;
 	[self startRefresh];
@@ -269,6 +297,7 @@ CGFloat GLOBAL_SCREEN_SCALE;
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
+	self.enteringForeground = NO;
 	[self startRefreshIfItIsDue];
 }
 
@@ -294,7 +323,7 @@ CGFloat GLOBAL_SCREEN_SCALE;
 		}
 		case kPrMerged:
 		{
-			notification.alertBody = [NSString stringWithFormat:@"PR Merged: %@",[item title]];
+			notification.alertBody = [NSString stringWithFormat:@"PR Merged! %@",[item title]];
 			break;
 		}
 	}

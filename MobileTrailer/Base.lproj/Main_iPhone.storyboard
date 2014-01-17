@@ -11,6 +11,10 @@
                     <navigationBar key="navigationBar" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="yXu-0R-QUA">
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
+                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="hoL-DO-zNK">
+                        <rect key="frame" x="0.0" y="436" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </toolbar>
                     <connections>
                         <segue destination="pGg-6v-bdr" kind="relationship" relationship="rootViewController" id="RxB-wf-QIq"/>
                     </connections>
@@ -52,9 +56,6 @@
                                     </subviews>
                                 </tableViewCellContentView>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <connections>
-                                    <segue destination="Ah7-4n-0Wa" kind="push" identifier="showDetail" id="jUr-3t-vfg"/>
-                                </connections>
                             </tableViewCell>
                         </prototypes>
                         <sections/>
@@ -66,7 +67,7 @@
                     <navigationItem key="navigationItem" title="Pull Requests" id="tQt-TN-PWz">
                         <barButtonItem key="leftBarButtonItem" title="Settings" id="5xA-gC-rhd">
                             <connections>
-                                <segue destination="Bxt-3e-UBi" kind="push" id="PHN-4t-rCA"/>
+                                <segue destination="Qce-wy-QT3" kind="modal" identifier="showPreferences" id="PHN-4t-rCA"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="action" id="fce-Re-WeY">
@@ -77,6 +78,7 @@
                     </navigationItem>
                     <connections>
                         <outlet property="refreshButton" destination="fce-Re-WeY" id="Rtm-IP-iAu"/>
+                        <segue destination="Ah7-4n-0Wa" kind="push" identifier="showDetail" id="o1z-sR-CpQ"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="6Cn-md-YlS" sceneMemberID="firstResponder"/>
@@ -88,15 +90,15 @@
             <objects>
                 <viewController id="Bxt-3e-UBi" customClass="PreferencesViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="6tf-80-liN">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="436"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progress="0.5" id="oci-na-Ebb">
-                                <rect key="frame" x="20" y="434" width="280" height="2"/>
+                            <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" id="oci-na-Ebb">
+                                <rect key="frame" x="117" y="420" width="197" height="2"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                             </progressView>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="GitHub personal access token" textAlignment="center" minimumFontSize="17" id="7cz-hD-3Vj">
-                                <rect key="frame" x="6" y="75" width="308" height="30"/>
+                                <rect key="frame" x="6" y="74" width="308" height="30"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" returnKeyType="done"/>
@@ -104,44 +106,27 @@
                                     <outlet property="delegate" destination="Bxt-3e-UBi" id="xCk-Lc-nUC"/>
                                 </connections>
                             </textField>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="0pe-ax-dhU">
-                                <rect key="frame" x="168" y="444" width="132" height="21"/>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="GitHub API usage:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="ZbX-vD-h6i">
+                                <rect key="frame" x="6" y="410" width="108" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                 <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="GitHub API usage" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="ZbX-vD-h6i">
-                                <rect key="frame" x="20" y="444" width="134" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="13"/>
-                                <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="enZ-M6-lcx">
-                                <rect key="frame" x="143" y="391" width="157" height="35"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
-                                <state key="normal" title="Load repository list">
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <action selector="iphoneLoadRepositories:" destination="Bxt-3e-UBi" eventType="touchUpInside" id="Z8z-SW-ArG"/>
-                                </connections>
-                            </button>
-                            <tableView opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="32" sectionHeaderHeight="10" sectionFooterHeight="10" id="HZb-VF-reB">
-                                <rect key="frame" x="0.0" y="113" width="320" height="270"/>
+                            <tableView opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="36" sectionHeaderHeight="10" sectionFooterHeight="10" id="HZb-VF-reB">
+                                <rect key="frame" x="0.0" y="111" width="320" height="296"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="Cell" textLabel="SC3-Mt-RhP" style="IBUITableViewCellStyleDefault" id="oGz-eN-yL4">
-                                        <rect key="frame" x="0.0" y="55" width="320" height="32"/>
+                                        <rect key="frame" x="0.0" y="55" width="320" height="36"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="oGz-eN-yL4" id="ZCb-fv-pdL">
-                                            <rect key="frame" x="0.0" y="0.0" width="320" height="31"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="35"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="SC3-Mt-RhP">
-                                                    <rect key="frame" x="15" y="0.0" width="290" height="31"/>
+                                                    <rect key="frame" x="15" y="0.0" width="290" height="35"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
@@ -156,16 +141,6 @@
                                     <outlet property="delegate" destination="Bxt-3e-UBi" id="qD9-xZ-y5H"/>
                                 </connections>
                             </tableView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="KEB-UN-7ir">
-                                <rect key="frame" x="20" y="391" width="115" height="35"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <state key="normal" title="Advanced">
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <segue destination="nmi-8t-acM" kind="push" id="byQ-n3-7Zc"/>
-                                </connections>
-                            </button>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="QNw-cJ-Ujs">
                                 <rect key="frame" x="20" y="117" width="280" height="134"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -198,42 +173,58 @@ Select one of these options if you need to create one first:</string>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
-                    <navigationItem key="navigationItem" title="Settings" id="KE8-kL-te2">
-                        <barButtonItem key="rightBarButtonItem" title="Select/Clear" id="HSG-NR-1y5">
+                    <toolbarItems>
+                        <barButtonItem title="Select/Clear" id="HSG-NR-1y5">
                             <connections>
                                 <action selector="iphoneSelection:" destination="Bxt-3e-UBi" id="2MA-RE-CtL"/>
                             </connections>
                         </barButtonItem>
+                        <barButtonItem style="plain" systemItem="flexibleSpace" id="VlR-Gq-zFD"/>
+                        <barButtonItem title="Load repository list" id="1d6-JI-qNG">
+                            <connections>
+                                <action selector="iphoneLoadRepos:" destination="Bxt-3e-UBi" id="dKn-gH-czu"/>
+                            </connections>
+                        </barButtonItem>
+                    </toolbarItems>
+                    <navigationItem key="navigationItem" title="Settings" id="KE8-kL-te2">
+                        <barButtonItem key="leftBarButtonItem" systemItem="done" id="rhn-c0-bPe">
+                            <connections>
+                                <action selector="iphoneDone:" destination="Bxt-3e-UBi" id="cQJ-dS-aQQ"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" title="Advanced" id="ato-WW-Rc3">
+                            <connections>
+                                <segue destination="nmi-8t-acM" kind="push" id="X8o-KP-0HC"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
-                        <outlet property="advancedButton" destination="KEB-UN-7ir" id="T9f-6R-dFr"/>
                         <outlet property="apiLoad" destination="oci-na-Ebb" id="43L-2w-JSY"/>
                         <outlet property="apiUsageLabel" destination="ZbX-vD-h6i" id="Nm5-Mb-0OI"/>
                         <outlet property="createTokenButton" destination="2E6-BT-FDF" id="8El-r3-aqp"/>
                         <outlet property="githubApiToken" destination="7cz-hD-3Vj" id="kX3-xC-c74"/>
                         <outlet property="instructionLabel" destination="QNw-cJ-Ujs" id="DSO-59-7S8"/>
-                        <outlet property="refreshRepoList" destination="enZ-M6-lcx" id="GWF-NE-pw3"/>
+                        <outlet property="refreshRepoList" destination="1d6-JI-qNG" id="ggi-hU-OuM"/>
                         <outlet property="repositories" destination="HZb-VF-reB" id="fpa-3E-Mds"/>
                         <outlet property="selectionButton" destination="HSG-NR-1y5" id="lKO-VB-Xrm"/>
-                        <outlet property="versionNumber" destination="0pe-ax-dhU" id="hUj-9u-Zpd"/>
                         <outlet property="viewTokensButton" destination="V8g-lc-mi3" id="jDV-2h-tIc"/>
                         <segue destination="SiV-zQ-DDX" kind="push" identifier="openGithub" id="hHw-VU-VoJ"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="zIj-mX-hrN" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="459" y="747"/>
+            <point key="canvasLocation" x="1441" y="690"/>
         </scene>
         <!--Advanced Settings View Controller - Advanced-->
         <scene sceneID="2Kb-J4-7YD">
             <objects>
-                <tableViewController id="nmi-8t-acM" customClass="AdvancedSettingsViewController" sceneMemberID="viewController">
+                <tableViewController hidesBottomBarWhenPushed="YES" id="nmi-8t-acM" customClass="AdvancedSettingsViewController" sceneMemberID="viewController">
                     <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="60" sectionHeaderHeight="10" sectionFooterHeight="10" id="uof-9F-9Pr">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="436"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" textLabel="Kpo-Yu-ipZ" detailTextLabel="L12-qP-CpB" style="IBUITableViewCellStyleValue1" id="u1d-Ia-WQn">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" textLabel="Kpo-Yu-ipZ" detailTextLabel="L1G-N3-aNj" style="IBUITableViewCellStyleValue1" id="u1d-Ia-WQn">
                                 <rect key="frame" x="0.0" y="119" width="320" height="60"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="u1d-Ia-WQn" id="7QB-sU-GZw">
@@ -247,7 +238,7 @@ Select one of these options if you need to create one first:</string>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
-                                        <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Detail" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="L12-qP-CpB">
+                                        <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Detail" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="L1G-N3-aNj">
                                             <rect key="frame" x="261" y="19" width="44" height="21"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
@@ -263,21 +254,27 @@ Select one of these options if you need to create one first:</string>
                             <outlet property="delegate" destination="nmi-8t-acM" id="L0a-ek-msn"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Advanced" id="u3E-1D-Y7o"/>
+                    <navigationItem key="navigationItem" title="Advanced" id="u3E-1D-Y7o">
+                        <barButtonItem key="rightBarButtonItem" title="About" id="W8w-32-QdW">
+                            <connections>
+                                <segue destination="sWz-r5-uZE" kind="push" id="WTK-Em-pmo"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <segue destination="CmG-f8-s0D" kind="push" identifier="showPicker" id="AaS-fb-omv"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="IUv-Go-xD0" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="915" y="747"/>
+            <point key="canvasLocation" x="1897" y="690"/>
         </scene>
         <!--Picker View Controller-->
         <scene sceneID="ybf-tF-HW9">
             <objects>
-                <tableViewController id="CmG-f8-s0D" customClass="PickerViewController" sceneMemberID="viewController">
+                <tableViewController hidesBottomBarWhenPushed="YES" id="CmG-f8-s0D" customClass="PickerViewController" sceneMemberID="viewController">
                     <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" id="gfR-Ie-pfb">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="436"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                         <prototypes>
@@ -299,18 +296,18 @@ Select one of these options if you need to create one first:</string>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="3kQ-qC-d2v" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1355" y="747"/>
+            <point key="canvasLocation" x="2337" y="690"/>
         </scene>
         <!--Github View Controller - GitHub-->
         <scene sceneID="xmy-sK-CrB">
             <objects>
-                <viewController id="SiV-zQ-DDX" customClass="GithubViewController" sceneMemberID="viewController">
+                <viewController hidesBottomBarWhenPushed="YES" id="SiV-zQ-DDX" customClass="GithubViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="uxN-00-8h6">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="436"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <webView contentMode="scaleToFill" id="xzE-Ne-cvf">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="436"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                             </webView>
@@ -329,7 +326,75 @@ Select one of these options if you need to create one first:</string>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="uTB-MN-lEr" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="459" y="1391"/>
+            <point key="canvasLocation" x="1897" y="64"/>
+        </scene>
+        <!--About Trailer View Controller - About-->
+        <scene sceneID="eku-XE-fbz">
+            <objects>
+                <viewController hidesBottomBarWhenPushed="YES" id="sWz-r5-uZE" customClass="AboutTrailerViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="efp-7G-qLe">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="436"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Version" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="pRN-hL-pPG">
+                                <rect key="frame" x="6.000000188225215" y="138" width="304" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
+                                <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Trailer" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="83g-gE-zyn">
+                                <rect key="frame" x="95.000000188225215" y="67" width="215" height="63"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="64"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" editable="NO" selectable="NO" id="2x1-FS-EQb">
+                                <rect key="frame" x="0.0" y="167" width="320" height="269"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <string key="text">Copyright (c) 2013-2014 HouseTrip Ltd.
+
+Released under the terms of the MIT licence:
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</string>
+                                <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Team Octopus" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="WZE-FP-nFa">
+                                <rect key="frame" x="7" y="109" width="75" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                                <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="htLogo" id="vhY-sJ-Y1J">
+                                <rect key="frame" x="1" y="67" width="87" height="47"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <toolbarItems/>
+                    <navigationItem key="navigationItem" title="About" id="ahx-nD-zWh">
+                        <barButtonItem key="rightBarButtonItem" title="View on Github" id="x38-Cb-dTP">
+                            <connections>
+                                <action selector="iphoneLink:" destination="sWz-r5-uZE" id="36v-bO-VEy"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="versionNumber" destination="pRN-hL-pPG" id="UF9-0S-X8v"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="oNT-qh-aL9" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2337" y="64"/>
         </scene>
         <!--Detail View Controller - Detail-->
         <scene sceneID="Cn3-H9-jdl">
@@ -358,6 +423,16 @@ Select one of these options if you need to create one first:</string>
                                 <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="sJk-Pt-dWb">
+                                <rect key="frame" x="95" y="407" width="130" height="53"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <state key="normal" title="Try Again">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="iPhoneTryAgain:" destination="Ah7-4n-0Wa" eventType="touchUpInside" id="csv-Ap-ygL"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
@@ -372,14 +447,42 @@ Select one of these options if you need to create one first:</string>
                         <outlet property="shareButton" destination="95G-PH-vyC" id="jtz-UP-8vK"/>
                         <outlet property="spinner" destination="gdY-Aq-EIj" id="XbL-WL-zH8"/>
                         <outlet property="statusLabel" destination="cns-eJ-KZ9" id="w9J-8o-LDP"/>
+                        <outlet property="tryAgainButton" destination="sJk-Pt-dWb" id="3a2-9r-AtN"/>
                         <outlet property="web" destination="B99-yS-DsE" id="IXP-2F-cxP"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="lrm-kH-fPn" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="902" y="64"/>
+            <point key="canvasLocation" x="915" y="64"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="fqD-vm-lIR">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" toolbarHidden="NO" id="Qce-wy-QT3" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationItem key="navigationItem" id="J81-1I-5nw"/>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics" translucent="NO"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="Mex-IZ-F4u">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translucent="NO" id="58k-pg-PIY">
+                        <rect key="frame" x="0.0" y="436" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </toolbar>
+                    <connections>
+                        <segue destination="Bxt-3e-UBi" kind="relationship" relationship="rootViewController" id="5V9-3E-9Cp"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="jcR-6h-3UB" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="915" y="690"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="htLogo" width="200" height="108"/>
+    </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>

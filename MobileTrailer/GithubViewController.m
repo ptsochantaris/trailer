@@ -23,4 +23,8 @@
 	[self.spinner stopAnimating];
 }
 
+- (IBAction)ipadDone:(UIBarButtonItem *)sender {
+	[self dismissViewControllerAnimated:YES completion:nil];
+}
+
 @end

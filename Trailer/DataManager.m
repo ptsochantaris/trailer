@@ -208,7 +208,7 @@
 		case kNewPr:
 			return @{PULL_REQUEST_ID_KEY:[item serverId]};
 		case kPrMerged:
-			return @{NOTIFICATION_URL_KEY:[item webUrl]};
+			return @{NOTIFICATION_URL_KEY:[item webUrl], PULL_REQUEST_ID_KEY:[item serverId]};
 		default:
 			return nil;
 	}
