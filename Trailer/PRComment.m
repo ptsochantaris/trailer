@@ -13,7 +13,7 @@
 @dynamic userId;
 @dynamic webUrl;
 
-+(PRComment *)commentWithInfo:(NSDictionary *)info moc:(NSManagedObjectContext *)moc
++ (PRComment *)commentWithInfo:(NSDictionary *)info moc:(NSManagedObjectContext *)moc
 {
 	PRComment *c = [DataItem itemWithInfo:info type:@"PRComment" moc:moc];
 
@@ -32,9 +32,16 @@
 	return c;
 }
 
--(BOOL)isMine
+- (BOOL)isMine
 {
 	return [self.userId.stringValue isEqualToString:[Settings shared].localUserId];
+}
+
+- (BOOL)refersToMe
+{
+	NSString *myHandle = [NSString stringWithFormat:@"@%@",[Settings shared].localUser];
+	NSRange rangeOfHandle = [self.body rangeOfString:myHandle options:NSCaseInsensitiveSearch|NSDiacriticInsensitiveSearch];
+	return rangeOfHandle.location != NSNotFound;
 }
 
 +(void)removeCommentsWithPullRequestURL:(NSString *)url inMoc:(NSManagedObjectContext *)moc

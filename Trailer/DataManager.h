@@ -15,4 +15,6 @@
 
 - (void)postMigrationTasks;
 
+- (void)postProcessAllPrs;
+
 @end

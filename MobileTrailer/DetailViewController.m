@@ -12,15 +12,13 @@ static DetailViewController *_detail_shared_ref;
 
 - (void)setDetailItem:(id)newDetailItem
 {
-    if (_detailItem != newDetailItem) {
+    if (_detailItem != newDetailItem || self.web.hidden)
+	{
         _detailItem = newDetailItem;
-        
         [self configureView];
     }
 
-    if (self.masterPopoverController != nil) {
-        [self.masterPopoverController dismissPopoverAnimated:YES];
-    }        
+	[self.masterPopoverController dismissPopoverAnimated:YES];
 }
 
 - (void)configureView
@@ -118,10 +116,10 @@ static DetailViewController *_detail_shared_ref;
 }
 
 - (IBAction)iPhoneTryAgain:(UIButton *)sender {
-    [_web reload];
+    self.detailItem = self.detailItem;
 }
 - (IBAction)iPadTryAgain:(UIButton *)sender {
-    [_web reload];
+    self.detailItem = self.detailItem;
 }
 
 - (void)actionSheet:(UIActionSheet *)actionSheet willDismissWithButtonIndex:(NSInteger)buttonIndex

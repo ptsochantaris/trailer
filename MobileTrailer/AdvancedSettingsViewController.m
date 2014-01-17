@@ -30,6 +30,7 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell"];
+	cell.accessoryType = UITableViewCellAccessoryNone;
 	if(indexPath.section==0)
 	{
 		switch (indexPath.row) {
@@ -56,6 +57,7 @@
 	}
 	else if(indexPath.section==1)
 	{
+		cell.detailTextLabel.text = nil;
 		switch (indexPath.row) {
 			case 0:
 			{
@@ -63,34 +65,43 @@
 					cell.textLabel.text = [NSString stringWithFormat:@"Display creation instead of activity times"];
 				else
 					cell.textLabel.text = [NSString stringWithFormat:@"Display creation instead\nof activity times"];
-				cell.detailTextLabel.text = [self yesNo:[Settings shared].showCreatedInsteadOfUpdated];
+				if([Settings shared].showCreatedInsteadOfUpdated) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
 			case 1:
 			{
 				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-					cell.textLabel.text = [NSString stringWithFormat:@"Display new badges and alerts for all PRs"];
+					cell.textLabel.text = [NSString stringWithFormat:@"Move PRs that mention me to 'Participated'"];
 				else
-					cell.textLabel.text = [NSString stringWithFormat:@"Display new badges\nand alerts for all PRs"];
-				cell.detailTextLabel.text = [self yesNo:[Settings shared].showCommentsEverywhere];
+					cell.textLabel.text = [NSString stringWithFormat:@"Move PRs that mention me\nto 'Participated'"];
+				if([Settings shared].autoParticipateInMentions) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
 			case 2:
 			{
 				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-					cell.textLabel.text = [NSString stringWithFormat:@"Only display PRs with unread comments"];
+					cell.textLabel.text = [NSString stringWithFormat:@"Display new badges and alerts for all PRs"];
 				else
-					cell.textLabel.text = [NSString stringWithFormat:@"Only display PRs\nwith unread comments"];
-				cell.detailTextLabel.text = [self yesNo:[Settings shared].shouldHideUncommentedRequests];
+					cell.textLabel.text = [NSString stringWithFormat:@"Display new badges\nand alerts for all PRs"];
+				if([Settings shared].showCommentsEverywhere) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
 			case 3:
 			{
 				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+					cell.textLabel.text = [NSString stringWithFormat:@"Only display PRs with unread comments"];
+				else
+					cell.textLabel.text = [NSString stringWithFormat:@"Only display PRs\nwith unread comments"];
+				if([Settings shared].shouldHideUncommentedRequests) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				break;
+			}
+			case 4:
+			{
+				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
 					cell.textLabel.text = [NSString stringWithFormat:@"Don't keep PRs merged by me"];
 				else
 					cell.textLabel.text = [NSString stringWithFormat:@"Don't keep PRs\nmerged by me"];
-				cell.detailTextLabel.text = [self yesNo:[Settings shared].dontKeepMyPrs];
+				if([Settings shared].dontKeepMyPrs) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
 		}
@@ -119,11 +130,6 @@
 		}
 	}
 	return cell;
-}
-
-- (NSString *)yesNo:(BOOL)option
-{
-	if(option) return @"Yes"; else return @"No";
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
@@ -174,15 +180,20 @@
 			}
 			case 1:
 			{
-				[Settings shared].showCommentsEverywhere = ![Settings shared].showCommentsEverywhere;
+				[Settings shared].autoParticipateInMentions = ![Settings shared].autoParticipateInMentions;
 				break;
 			}
 			case 2:
 			{
-				[Settings shared].shouldHideUncommentedRequests = ![Settings shared].shouldHideUncommentedRequests;
+				[Settings shared].showCommentsEverywhere = ![Settings shared].showCommentsEverywhere;
 				break;
 			}
 			case 3:
+			{
+				[Settings shared].shouldHideUncommentedRequests = ![Settings shared].shouldHideUncommentedRequests;
+				break;
+			}
+			case 4:
 			{
 				[Settings shared].dontKeepMyPrs = ![Settings shared].dontKeepMyPrs;
 				break;
@@ -222,7 +233,7 @@
 {
     switch (section) {
 		case 0: return 2; // refresh period, background refresh
-		case 1: return 4; // toggled options (4)
+		case 1: return 5; // toggled options (5)
 		case 2: return 2; // sorting category, sorting direction
 	}
 	return 0;
@@ -232,7 +243,7 @@
 {
     switch (section) {
 		case 0: return @"Auto Refresh"; // refresh period, background refresh
-		case 1: return @"Options"; // toggled options (4)
+		case 1: return @"Options"; // toggled options (5)
 		case 2: return @"Sorting"; // sorting category, sorting direction
 	}
 	return nil;

@@ -6,7 +6,8 @@
 typedef enum {
 	kNewComment = 0,
 	kNewPr = 1,
-	kPrMerged = 2
+	kPrMerged = 2,
+	kNewMention = 4
 } PRNotificationType;
 
 typedef enum {

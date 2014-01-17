@@ -7,8 +7,8 @@ static AppDelegate *_static_shared_ref;
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
 	// Useful snippet for resetting prefs when testing
-	//NSString *appDomain = [[NSBundle mainBundle] bundleIdentifier];
-	//[[NSUserDefaults standardUserDefaults] removePersistentDomainForName:appDomain];
+	// NSString *appDomain = [[NSBundle mainBundle] bundleIdentifier];
+	// [[NSUserDefaults standardUserDefaults] removePersistentDomainForName:appDomain];
 
 	self.mainMenu.backgroundColor = [NSColor whiteColor];
 
@@ -89,6 +89,15 @@ static AppDelegate *_static_shared_ref;
 	[self.sortModeSelect selectItemAtIndex:[Settings shared].sortMethod];
 }
 
+
+- (IBAction)autoParticipateOnMentionSelected:(NSButton *)sender
+{
+	BOOL autoParticipate = (sender.integerValue==1);
+	[Settings shared].autoParticipateInMentions = autoParticipate;
+	[self.dataManager postProcessAllPrs]; // apply any view option changes
+	[self updateMenu];
+}
+
 - (IBAction)dontKeepMyPrsSelected:(NSButton *)sender
 {
 	BOOL dontKeep = (sender.integerValue==1);
@@ -99,6 +108,7 @@ static AppDelegate *_static_shared_ref;
 {
 	BOOL hide = (sender.integerValue==1);
 	[Settings shared].hideAvatars = hide;
+	[self.dataManager postProcessAllPrs]; // apply any view option changes
 	[self updateMenu];
 }
 
@@ -106,6 +116,7 @@ static AppDelegate *_static_shared_ref;
 {
 	BOOL show = (sender.integerValue==1);
 	[Settings shared].shouldHideUncommentedRequests = show;
+	[self.dataManager postProcessAllPrs]; // apply any view option changes
 	[self updateMenu];
 }
 
@@ -113,6 +124,7 @@ static AppDelegate *_static_shared_ref;
 {
 	BOOL show = (sender.integerValue==1);
 	[Settings shared].showCommentsEverywhere = show;
+	[self.dataManager postProcessAllPrs]; // apply any view option changes
 	[self updateMenu];
 }
 
@@ -121,12 +133,14 @@ static AppDelegate *_static_shared_ref;
 	BOOL descending = (sender.integerValue==1);
 	[Settings shared].sortDescending = descending;
 	[self setupSortMethodMenu];
+	[self.dataManager postProcessAllPrs]; // apply any view option changes
 	[self updateMenu];
 }
 
 - (IBAction)sortMethodChanged:(id)sender
 {
 	[Settings shared].sortMethod = self.sortModeSelect.indexOfSelectedItem;
+	[self.dataManager postProcessAllPrs]; // apply any view option changes
 	[self updateMenu];
 }
 
@@ -134,6 +148,7 @@ static AppDelegate *_static_shared_ref;
 {
 	BOOL show = (sender.integerValue==1);
 	[Settings shared].showCreatedInsteadOfUpdated = show;
+	[self.dataManager postProcessAllPrs]; // apply any view option changes
 	[self updateMenu];
 }
 
@@ -210,6 +225,14 @@ static AppDelegate *_static_shared_ref;
 
 	switch (type)
 	{
+		case kNewMention:
+		{
+			notification.title = @"Mentioned in Comment";
+			notification.informativeText = [item body];
+			PullRequest *associatedRequest = [PullRequest pullRequestWithUrl:[item pullRequestUrl] moc:self.dataManager.managedObjectContext];
+			notification.subtitle = associatedRequest.title;
+			break;
+		}
 		case kNewComment:
 		{
 			notification.title = @"New PR Comment";
@@ -369,73 +392,43 @@ static AppDelegate *_static_shared_ref;
 
 - (NSInteger)buildPrMenuItemsFromList:(NSArray *)pullRequests
 {
-	NSMutableArray *menuItems = [NSMutableArray array];
-
-	// above it have a single view with search and options
-
 	SectionHeader *myHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:nil title:@"Mine"];
 	SectionHeader *participatedHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:nil title:@"Participated"];
 	SectionHeader *mergedHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:self title:@"Recently Merged"];
 	SectionHeader *allHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:nil title:@"All Pull Requests"];
 
-	[menuItems addObject:myHeader];
-	[menuItems addObject:participatedHeader];
-	[menuItems addObject:mergedHeader];
-	[menuItems addObject:allHeader];
+	NSDictionary *sections = @{
+							   @kPullRequestSectionMine: [NSMutableArray arrayWithObject:myHeader],
+								@kPullRequestSectionParticipated: [NSMutableArray arrayWithObject:participatedHeader],
+								@kPullRequestSectionMerged: [NSMutableArray arrayWithObject:mergedHeader],
+								@kPullRequestSectionAll: [NSMutableArray arrayWithObject:allHeader],
+							   };
 
-	NSInteger unreadCommentCount = 0;
-	NSInteger myIndex = 1, myCount = 0;
-	NSInteger participatedIndex = myIndex+1, participatedCount = 0;
-	NSInteger mergedIndex = participatedIndex+1, mergedCount = 0;
-	NSInteger allIndex = mergedIndex+1, allCount = 0;
-
+	NSInteger unreadCommentCount=0;
 	for(PullRequest *r in pullRequests)
 	{
-		PRItemView *item = [[PRItemView alloc] initWithPullRequest:r userInfo:r.serverId delegate:self];
-		if(r.merged.boolValue)
-		{
-			mergedCount++;
-			[menuItems insertObject:item atIndex:mergedIndex++];
-		}
-		else if(r.isMine)
-		{
-			myCount++;
-			[menuItems insertObject:item atIndex:myIndex++];
-			unreadCommentCount += r.unreadComments.integerValue;
-			participatedIndex++;
-			mergedIndex++;
-		}
-		else if(r.commentedByMe)
-		{
-			participatedCount++;
-			[menuItems insertObject:item atIndex:participatedIndex++];
-			unreadCommentCount += r.unreadComments.integerValue;
-			mergedIndex++;
-		}
-		else // all other pull requests
-		{
-			allCount++;
-			[menuItems insertObject:item atIndex:allIndex];
-			if([Settings shared].showCommentsEverywhere)
-				unreadCommentCount += r.unreadComments.integerValue;
-		}
-		allIndex++;
+		unreadCommentCount += r.unreadComments.integerValue;
+		PRItemView *view = [[PRItemView alloc] initWithPullRequest:r userInfo:r.serverId delegate:self];
+		[sections[r.sectionIndex] addObject:view];
 	}
-
-	if(!myCount) [menuItems removeObject:myHeader];
-	if(!participatedCount) [menuItems removeObject:participatedHeader];
-	if(!mergedCount) [menuItems removeObject:mergedHeader];
-	if(!allCount) [menuItems removeObject:allHeader];
 
 	CGFloat top = 10.0;
 	NSView *menuContents = [[NSView alloc] initWithFrame:CGRectZero];
-	for(NSView *v in [menuItems reverseObjectEnumerator])
+	for(NSInteger section=kPullRequestSectionAll; section>=kPullRequestSectionMine; section--)
 	{
-		CGFloat H = v.frame.size.height;
-		v.frame = CGRectMake(0, top, MENU_WIDTH, H);
-		top += H;
-		[menuContents addSubview:v];
+		NSArray *itemsInSection = sections[@(section)];
+		if(itemsInSection.count>1)
+		{
+			for(NSView *v in [itemsInSection reverseObjectEnumerator])
+			{
+				CGFloat H = v.frame.size.height;
+				v.frame = CGRectMake(0, top, MENU_WIDTH, H);
+				top += H;
+				[menuContents addSubview:v];
+			}
+		}
 	}
+
 	menuContents.frame = CGRectMake(0, 0, MENU_WIDTH, top);
 
 	CGPoint lastPos = self.mainMenu.scrollView.contentView.documentVisibleRect.origin;
@@ -554,6 +547,11 @@ static AppDelegate *_static_shared_ref;
 		[self.hideUncommentedPrs setIntegerValue:1];
 	else
 		[self.hideUncommentedPrs setIntegerValue:0];
+
+	if([Settings shared].autoParticipateInMentions)
+		[self.autoParticipateWhenMentioned setIntegerValue:1];
+	else
+		[self.autoParticipateWhenMentioned setIntegerValue:0];
 
 	if([Settings shared].hideAvatars)
 		[self.hideAvatars setIntegerValue:1];

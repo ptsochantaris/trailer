@@ -5,24 +5,33 @@
 @synthesize managedObjectModel = _managedObjectModel;
 @synthesize managedObjectContext = _managedObjectContext;
 
--(void)sendNotifications
+- (void)sendNotifications
 {
-	NSArray *latestPrs = [PullRequest newItemsOfType:@"PullRequest" inMoc:self.managedObjectContext];
+	NSManagedObjectContext *mainContext = self.managedObjectContext;
+
+	NSArray *latestPrs = [PullRequest newItemsOfType:@"PullRequest" inMoc:mainContext];
 	for(PullRequest *r in latestPrs)
 	{
 		[[AppDelegate shared] postNotificationOfType:kNewPr forItem:r];
 		r.postSyncAction = @(kPostSyncDoNothing);
 	}
 
-	NSArray *latestComments = [PRComment newItemsOfType:@"PRComment" inMoc:self.managedObjectContext];
+	NSArray *latestComments = [PRComment newItemsOfType:@"PRComment" inMoc:mainContext];
 	for(PRComment *c in latestComments)
 	{
-		PullRequest *r = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:self.managedObjectContext];
-		if([Settings shared].showCommentsEverywhere || r.isMine || r.commentedByMe)
+		if(c.refersToMe)
 		{
-			if(![c.userId.stringValue isEqualToString:[Settings shared].localUserId])
+			[[AppDelegate shared] postNotificationOfType:kNewMention forItem:c];
+		}
+		else
+		{
+			PullRequest *r = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:mainContext];
+			if([Settings shared].showCommentsEverywhere || r.isMine || r.commentedByMe)
 			{
-				[[AppDelegate shared] postNotificationOfType:kNewComment forItem:c];
+				if(![c.userId.stringValue isEqualToString:[Settings shared].localUserId])
+				{
+					[[AppDelegate shared] postNotificationOfType:kNewComment forItem:c];
+				}
 			}
 		}
 		c.postSyncAction = @(kPostSyncDoNothing);
@@ -203,6 +212,7 @@
 {
 	switch (type)
 	{
+		case kNewMention:
 		case kNewComment:
 			return @{COMMENT_ID_KEY:[item serverId]};
 		case kNewPr:
@@ -223,6 +233,12 @@
 		for(PullRequest *r in prs) r.updatedAt = [NSDate distantPast];
 		self.justMigrated = NO;
 	}
+}
+
+- (void)postProcessAllPrs
+{
+	NSArray *prs = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.managedObjectContext];
+	for(PullRequest *r in prs) [r postProcess];
 }
 
 @end

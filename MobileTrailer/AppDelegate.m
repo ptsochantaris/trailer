@@ -287,7 +287,7 @@ CGFloat GLOBAL_SCREEN_SCALE;
 	}];
 }
 
--(void)refreshTimerDone
+- (void)refreshTimerDone
 {
 	if([Settings shared].localUserId && [Settings shared].authToken.length)
 	{
@@ -301,7 +301,7 @@ CGFloat GLOBAL_SCREEN_SCALE;
 	[self startRefreshIfItIsDue];
 }
 
--(void)postNotificationOfType:(PRNotificationType)type forItem:(id)item
+- (void)postNotificationOfType:(PRNotificationType)type forItem:(id)item
 {
 	if(self.preferencesDirty) return;
 
@@ -310,6 +310,12 @@ CGFloat GLOBAL_SCREEN_SCALE;
 
 	switch (type)
 	{
+		case kNewMention:
+		{
+			PullRequest *associatedRequest = [PullRequest pullRequestWithUrl:[item pullRequestUrl] moc:self.dataManager.managedObjectContext];
+			notification.alertBody = [NSString stringWithFormat:@"Mentioned in Comment for '%@': %@",associatedRequest.title,[item body]];
+			break;
+		}
 		case kNewComment:
 		{
 			PullRequest *associatedRequest = [PullRequest pullRequestWithUrl:[item pullRequestUrl] moc:self.dataManager.managedObjectContext];
