@@ -53,19 +53,16 @@
 	if(!self.latestReadCommentDate) self.latestReadCommentDate = [NSDate distantPast];
 
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
-	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestUrl == %@ and updatedAt > %@", self.url, self.latestReadCommentDate];
+	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestUrl == %@ and updatedAt > %@ and userId != %@", self.url, self.latestReadCommentDate, [Settings shared].localUserId];
 	NSArray *unreadComments = [self.managedObjectContext executeFetchRequest:f error:nil];
 
 	NSInteger unreadCount = 0;
 	BOOL autoParticipateInMentions = [Settings shared].autoParticipateInMentions && (!self.merged.boolValue);
 	for(PRComment *c in unreadComments)
 	{
-		if(!c.isMine) // don't count my comments
-		{
-			unreadCount++;
-			if(autoParticipateInMentions && c.refersToMe)
-				self.sectionIndex = @kPullRequestSectionParticipated;
-		}
+		unreadCount++;
+		if(autoParticipateInMentions && c.refersToMe)
+			self.sectionIndex = @kPullRequestSectionParticipated;
 	}
 
 	self.unreadComments = @(unreadCount);
