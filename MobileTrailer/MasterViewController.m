@@ -51,11 +51,11 @@
 	{
         [self removeAllMerged];
 	}
-	else if(buttonIndex==1)
+	else if(buttonIndex==2)
 	{
         [self removeAllClosed];
 	}
-	else if(buttonIndex==2)
+	else if(buttonIndex==3)
 	{
 		[self tryRefresh];
 	}

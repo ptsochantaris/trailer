@@ -25,6 +25,10 @@ CGFloat GLOBAL_SCREEN_SCALE;
 	self.dataManager = [[DataManager alloc] init];
 	self.api = [[API alloc] init];
 
+	// ONLY FOR DEBUG!
+	// NSArray *allPRs = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.dataManager.managedObjectContext];
+	// if(allPRs.count) [allPRs[0] setCondition:@kPullRequestConditionClosed];
+
 	[self.dataManager postProcessAllPrs];
 
 	if([Settings shared].authToken.length) [self.api updateLimitFromServer];
@@ -37,15 +41,6 @@ CGFloat GLOBAL_SCREEN_SCALE;
 											   object:nil];
 
 	[[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:[Settings shared].backgroundRefreshPeriod];
-
-// ONLY FOR DEBUG!
-/*
-	NSArray *allPRs = [PullRequest pullRequestsSortedByField:nil
-													  filter:nil
-												   ascending:NO
-													   inMoc:self.dataManager.managedObjectContext];
-	if(allPRs.count) [allPRs[0] setMerged:@YES];
-*/
 
 	UILocalNotification *localNotification = [launchOptions objectForKey:UIApplicationLaunchOptionsLocalNotificationKey];
 
