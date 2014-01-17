@@ -39,6 +39,7 @@
 
 	p.issueCommentLink = info[@"_links"][@"comments"][@"href"];
 	p.reviewCommentLink = info[@"_links"][@"review_comments"][@"href"];
+	p.condition = @kPullRequestConditionOpen;
 
 	return p;
 }
