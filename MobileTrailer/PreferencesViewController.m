@@ -17,6 +17,7 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 }
 - (void)done
 {
+	[[AppDelegate shared].dataManager postProcessAllPrs]; // apply any view option changes
 	if([AppDelegate shared].preferencesDirty) [[AppDelegate shared] startRefresh];
 	[self dismissViewControllerAnimated:YES completion:nil];
 }

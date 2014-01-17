@@ -33,6 +33,7 @@
 @property (weak) IBOutlet NSButton *showCreationDates;
 @property (weak) IBOutlet NSButton *dontKeepMyPrs;
 @property (weak) IBOutlet NSButton *hideAvatars;
+@property (weak) IBOutlet NSButton *autoParticipateWhenMentioned;
 
 // About window
 @property (weak) IBOutlet NSTextField *aboutVersion;

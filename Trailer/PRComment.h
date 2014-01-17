@@ -13,12 +13,14 @@
 @property (nonatomic, retain) NSString * webUrl;
 @property (nonatomic, retain) NSNumber * userId;
 
-+(PRComment *)commentWithInfo:(NSDictionary *)info moc:(NSManagedObjectContext *)moc;
++ (PRComment *)commentWithInfo:(NSDictionary *)info moc:(NSManagedObjectContext *)moc;
 
-+(void)removeCommentsWithPullRequestURL:(NSString *)url inMoc:(NSManagedObjectContext *)moc;
++ (void)removeCommentsWithPullRequestURL:(NSString *)url inMoc:(NSManagedObjectContext *)moc;
 
-+(NSArray *)commentsForPullRequestUrl:(NSString *)url inMoc:(NSManagedObjectContext *)moc;
++ (NSArray *)commentsForPullRequestUrl:(NSString *)url inMoc:(NSManagedObjectContext *)moc;
 
--(BOOL)isMine;
+- (BOOL)isMine;
+
+- (BOOL)refersToMe;
 
 @end

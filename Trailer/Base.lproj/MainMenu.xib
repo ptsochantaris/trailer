@@ -14,11 +14,11 @@
         <customObject id="-3" userLabel="Application"/>
         <window title="Trailer Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="371">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" resizable="YES"/>
-            <rect key="contentRect" x="335" y="390" width="620" height="545"/>
+            <rect key="contentRect" x="335" y="390" width="620" height="565"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1058"/>
             <value key="minSize" type="size" width="620" height="500"/>
             <view key="contentView" id="372">
-                <rect key="frame" x="0.0" y="0.0" width="620" height="545"/>
+                <rect key="frame" x="0.0" y="0.0" width="620" height="565"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <progressIndicator maxValue="100" style="bar" id="U6L-MC-3fm">
@@ -44,7 +44,7 @@
                         </textFieldCell>
                     </textField>
                     <button id="qqE-Ib-sQ9">
-                        <rect key="frame" x="10" y="45" width="299" height="18"/>
+                        <rect key="frame" x="10" y="44" width="299" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <buttonCell key="cell" type="check" title="Start Trailer Automatically at Login" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="yY0-OR-yEh">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -55,7 +55,7 @@
                         </connections>
                     </button>
                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="Tbh-2L-zvn">
-                        <rect key="frame" x="593" y="40" width="19" height="27"/>
+                        <rect key="frame" x="593" y="39" width="19" height="27"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                         <stepperCell key="cell" continuous="YES" alignment="left" increment="10" minValue="30" maxValue="99999" doubleValue="60" id="ti4-RJ-FVo"/>
                         <connections>
@@ -63,7 +63,7 @@
                         </connections>
                     </stepper>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="wFz-AT-nev">
-                        <rect key="frame" x="311" y="46" width="282" height="17"/>
+                        <rect key="frame" x="311" y="45" width="282" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Automatically refresh every 3600 seconds" id="jIv-Hj-CCr">
                             <font key="font" metaFont="system"/>
@@ -72,7 +72,7 @@
                         </textFieldCell>
                     </textField>
                     <box autoresizesSubviews="NO" title="Your Repositories" borderType="line" id="dxR-Lv-bJK">
-                        <rect key="frame" x="9" y="226" width="603" height="225"/>
+                        <rect key="frame" x="9" y="246" width="603" height="225"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <view key="contentView">
                             <rect key="frame" x="1" y="1" width="601" height="209"/>
@@ -177,7 +177,7 @@
                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     </box>
                     <box autoresizesSubviews="NO" title="GitHub Personal Access Token" borderType="line" id="DHO-Rh-euf">
-                        <rect key="frame" x="9" y="455" width="603" height="80"/>
+                        <rect key="frame" x="9" y="475" width="603" height="80"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <view key="contentView">
                             <rect key="frame" x="1" y="1" width="601" height="64"/>
@@ -224,14 +224,14 @@
                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     </box>
                     <box autoresizesSubviews="NO" title="Sorting" borderType="line" id="bjG-QS-kmb">
-                        <rect key="frame" x="9" y="70" width="238" height="152"/>
+                        <rect key="frame" x="9" y="68" width="238" height="174"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <view key="contentView">
-                            <rect key="frame" x="1" y="1" width="236" height="136"/>
+                            <rect key="frame" x="1" y="1" width="236" height="158"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <button id="B8S-t3-bHc">
-                                    <rect key="frame" x="24" y="74" width="187" height="25"/>
+                                    <rect key="frame" x="24" y="96" width="187" height="25"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="check" title="Reverse direction" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="J6P-LD-eW2">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -242,7 +242,7 @@
                                     </connections>
                                 </button>
                                 <popUpButton verticalHuggingPriority="750" id="geS-Jc-8P2">
-                                    <rect key="frame" x="16" y="101" width="205" height="26"/>
+                                    <rect key="frame" x="16" y="123" width="205" height="26"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <popUpButtonCell key="cell" type="push" title="Sorting" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="Y3K-gh-R4x" id="2pu-mn-goa">
                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -265,14 +265,14 @@
                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     </box>
                     <box autoresizesSubviews="NO" title="Behaviour" borderType="line" id="a8k-Aa-Uyn">
-                        <rect key="frame" x="249" y="70" width="363" height="152"/>
+                        <rect key="frame" x="249" y="68" width="363" height="174"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                         <view key="contentView">
-                            <rect key="frame" x="1" y="1" width="361" height="136"/>
+                            <rect key="frame" x="1" y="1" width="361" height="158"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <button id="c6m-8a-CRl">
-                                    <rect key="frame" x="16" y="61" width="329" height="18"/>
+                                    <rect key="frame" x="16" y="60" width="329" height="18"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                     <buttonCell key="cell" type="check" title="Only display PRs with unread comments" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="djW-U3-Ae9">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -283,7 +283,7 @@
                                     </connections>
                                 </button>
                                 <button id="CPe-TS-qPS">
-                                    <rect key="frame" x="16" y="85" width="329" height="18"/>
+                                    <rect key="frame" x="16" y="84" width="329" height="18"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                     <buttonCell key="cell" type="check" title="Display new badges and alerts for all PRs" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="EcZ-Ov-Dct">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -294,7 +294,7 @@
                                     </connections>
                                 </button>
                                 <button id="AEB-MY-2H6">
-                                    <rect key="frame" x="16" y="109" width="329" height="18"/>
+                                    <rect key="frame" x="16" y="131" width="329" height="18"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                     <buttonCell key="cell" type="check" title="Display creation instead of activity times" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="FUA-CI-tqc">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -305,7 +305,7 @@
                                     </connections>
                                 </button>
                                 <button id="sNq-fA-PLU">
-                                    <rect key="frame" x="16" y="37" width="329" height="18"/>
+                                    <rect key="frame" x="16" y="36" width="329" height="18"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                     <buttonCell key="cell" type="check" title="Don't keep PRs merged by me" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="ZvA-e4-rHz">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -316,7 +316,7 @@
                                     </connections>
                                 </button>
                                 <button id="KdG-4v-vf7">
-                                    <rect key="frame" x="16" y="13" width="329" height="18"/>
+                                    <rect key="frame" x="16" y="12" width="329" height="18"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                     <buttonCell key="cell" type="check" title="Hide user avatars" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="eW5-mR-deV">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -324,6 +324,17 @@
                                     </buttonCell>
                                     <connections>
                                         <action selector="hideAvatarsSelected:" target="494" id="z40-g9-EI6"/>
+                                    </connections>
+                                </button>
+                                <button id="lTI-8Y-voD">
+                                    <rect key="frame" x="16" y="108" width="329" height="18"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                    <buttonCell key="cell" type="check" title="Move PRs that mention me to 'Participated'" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="dIf-8Y-axW">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="autoParticipateOnMentionSelected:" target="494" id="phv-oT-lnX"/>
                                     </connections>
                                 </button>
                             </subviews>
@@ -343,6 +354,7 @@
                 <outlet property="aboutVersion" destination="S57-NF-ZQw" id="Rsc-c3-NPJ"/>
                 <outlet property="activityDisplay" destination="Lax-cU-vqe" id="jxh-1P-ph0"/>
                 <outlet property="apiLoad" destination="U6L-MC-3fm" id="oYJ-81-Ywn"/>
+                <outlet property="autoParticipateWhenMentioned" destination="lTI-8Y-voD" id="i9M-pb-2Ig"/>
                 <outlet property="clearAll" destination="5Sj-ma-EM3" id="4Lh-JS-ceA"/>
                 <outlet property="dontKeepMyPrs" destination="sNq-fA-PLU" id="CaO-g8-RqK"/>
                 <outlet property="githubDetailsBox" destination="dxR-Lv-bJK" id="UKN-au-hBa"/>

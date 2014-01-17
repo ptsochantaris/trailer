@@ -22,7 +22,7 @@
 @dynamic totalComments;
 @dynamic unreadComments;
 
-+(PullRequest *)pullRequestWithInfo:(NSDictionary *)info moc:(NSManagedObjectContext *)moc
++ (PullRequest *)pullRequestWithInfo:(NSDictionary *)info moc:(NSManagedObjectContext *)moc
 {
 	PullRequest *p = [DataItem itemWithInfo:info type:@"PullRequest" moc:moc];
 
@@ -54,12 +54,19 @@
 
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
 	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestUrl == %@ and updatedAt > %@", self.url, self.latestReadCommentDate];
-	NSArray *res = [self.managedObjectContext executeFetchRequest:f error:nil];
+	NSArray *unreadComments = [self.managedObjectContext executeFetchRequest:f error:nil];
 
 	NSInteger unreadCount = 0;
-	for(PRComment *c in res)
+	BOOL autoParticipateInMentions = [Settings shared].autoParticipateInMentions && (!self.merged.boolValue);
+	for(PRComment *c in unreadComments)
+	{
 		if(!c.isMine) // don't count my comments
+		{
 			unreadCount++;
+			if(autoParticipateInMentions && c.refersToMe)
+				self.sectionIndex = @kPullRequestSectionParticipated;
+		}
+	}
 
 	self.unreadComments = @(unreadCount);
 
