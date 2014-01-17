@@ -57,7 +57,7 @@
 
 - (void)layout
 {
-	//DLog(@"layout");
+	DLog(@"layout");
 
 	[topArrow removeFromSuperview];
 	[bottomArrow removeFromSuperview];

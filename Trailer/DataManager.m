@@ -217,6 +217,7 @@
 			return @{COMMENT_ID_KEY:[item serverId]};
 		case kNewPr:
 			return @{PULL_REQUEST_ID_KEY:[item serverId]};
+		case kPrClosed:
 		case kPrMerged:
 			return @{NOTIFICATION_URL_KEY:[item webUrl], PULL_REQUEST_ID_KEY:[item serverId]};
 		default:
