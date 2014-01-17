@@ -15,4 +15,6 @@
 
 - (id)initWithRemoveAllDelegate:(id<SectionHeaderDelegate>)delegate title:(NSString *)title;
 
+- (NSString *)title;
+
 @end

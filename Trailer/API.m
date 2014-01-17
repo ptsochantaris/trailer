@@ -219,9 +219,9 @@
 		if(r.postSyncAction.integerValue==kPostSyncDelete &&
 		   parent.active.boolValue && (parent.postSyncAction.integerValue!=kPostSyncDelete) &&
 		   ([Settings shared].showCommentsEverywhere || r.isMine || r.commentedByMe) &&
-		   (!r.merged.boolValue))
+		   (r.condition.integerValue == kPullRequestConditionOpen))
 		{
-			[prsToCheck addObject:r]; // possibly merged
+			[prsToCheck addObject:r]; // check closed status
 		}
 	}
 	[self _detectMergedPullRequests:prsToCheck andCallback:callback];
@@ -256,7 +256,7 @@
 			  {
 				  DLog(@"announcing merged PR: %@",r.title);
 				  r.postSyncAction = @(kPostSyncDoNothing); // don't delete this
-				  r.merged = @(YES); // pin it so it sticks around
+				  r.condition = @kPullRequestConditionMerged;
 				  [[AppDelegate shared] postNotificationOfType:kPrMerged forItem:r];
 			  }
 			  else
@@ -267,6 +267,12 @@
 		  else
 		  {
 			  DLog(@"detected closed PR: %@",r.title);
+			  if([Settings shared].alsoKeepClosedPrs)
+			  {
+				  r.postSyncAction = @(kPostSyncDoNothing); // don't delete this
+				  r.condition = @kPullRequestConditionClosed;
+				  [[AppDelegate shared] postNotificationOfType:kPrClosed forItem:r];
+			  }
 		  }
 		  [self _detectMergedPullRequests:prsToCheck andCallback:callback];
 
@@ -287,7 +293,7 @@
 
 			NSArray *prs = [PullRequest itemsOfType:@"PullRequest" surviving:YES inMoc:syncContext];
 			for(PullRequest *r in prs)
-				if(!r.merged.boolValue)
+				if(r.condition.integerValue == kPullRequestConditionOpen)
 					r.postSyncAction = @(kPostSyncDelete);
 			NSMutableArray *activeRepos = [[Repo activeReposInMoc:syncContext] mutableCopy];
 			[self _fetchPullRequestsForRepos:activeRepos toMoc:syncContext andCallback:^(BOOL success) {

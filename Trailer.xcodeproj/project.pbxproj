@@ -228,6 +228,7 @@
 		169CEB99187988D00083A068 /* Trailer 4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 4.xcdatamodel"; sourceTree = "<group>"; };
 		169CEB9A1879D5BB0083A068 /* AdvancedSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdvancedSettingsViewController.h; sourceTree = "<group>"; };
 		169CEB9B1879D5BB0083A068 /* AdvancedSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdvancedSettingsViewController.m; sourceTree = "<group>"; };
+		16AD4E6D18896770001C17B7 /* Trailer 5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Trailer 5.xcdatamodel"; sourceTree = "<group>"; };
 		16B94066182D051700F32061 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		16B94070182D136700F32061 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
 		16B9552F17EC89520005118F /* Org.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Org.h; sourceTree = "<group>"; };
@@ -971,7 +972,7 @@
 				LLVM_LTO = YES;
 				LLVM_VECTORIZE_LOOPS = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "A8C7A547-175A-444B-998A-CD48105D63A0";
+				PROVISIONING_PROFILE = "FD03AFF8-2AD6-44C7-8FFA-04F283E628DB";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
@@ -998,7 +999,7 @@
 				LLVM_LTO = YES;
 				LLVM_VECTORIZE_LOOPS = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "B2E058DF-08FF-41ED-A673-BBB088E942CE";
+				PROVISIONING_PROFILE = "A28489B9-08F6-478E-9E82-4886625DF917";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -1257,10 +1258,11 @@
 			children = (
 				164976221864935200C13A6B /* Trailer 3.xcdatamodel */,
 				169CEB99187988D00083A068 /* Trailer 4.xcdatamodel */,
+				16AD4E6D18896770001C17B7 /* Trailer 5.xcdatamodel */,
 				1617BEEE183F9C4F00E89BB2 /* Trailer 2.xcdatamodel */,
 				168BC6C617EC2DF000BC4584 /* Trailer.xcdatamodel */,
 			);
-			currentVersion = 169CEB99187988D00083A068 /* Trailer 4.xcdatamodel */;
+			currentVersion = 16AD4E6D18896770001C17B7 /* Trailer 5.xcdatamodel */;
 			path = Trailer.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

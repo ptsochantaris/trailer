@@ -15,7 +15,7 @@
 @dynamic userId;
 @dynamic latestReadCommentDate;
 @dynamic repoId;
-@dynamic merged;
+@dynamic condition;
 @dynamic userAvatarUrl;
 @dynamic userLogin;
 @dynamic sectionIndex;
@@ -45,7 +45,8 @@
 
 - (void)postProcess
 {
-	if(self.merged.boolValue) self.sectionIndex = @kPullRequestSectionMerged;
+	if(self.condition.integerValue==kPullRequestConditionMerged) self.sectionIndex = @kPullRequestSectionMerged;
+	else if(self.condition.integerValue==kPullRequestConditionClosed) self.sectionIndex = @kPullRequestSectionClosed;
 	else if(self.isMine) self.sectionIndex = @kPullRequestSectionMine;
 	else if(self.commentedByMe) self.sectionIndex = @kPullRequestSectionParticipated;
 	else self.sectionIndex = @kPullRequestSectionAll;
@@ -53,7 +54,7 @@
 	if(!self.latestReadCommentDate) self.latestReadCommentDate = [NSDate distantPast];
 
 	NSInteger unreadCount = 0;
-	BOOL autoParticipateInMentions = [Settings shared].autoParticipateInMentions && (!self.merged.boolValue);
+	BOOL autoParticipateInMentions = [Settings shared].autoParticipateInMentions && (self.condition.integerValue==kPullRequestConditionOpen);
 
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
 	NSNumber *localUserId = @([Settings shared].localUserId.longLongValue);
@@ -118,14 +119,21 @@
 + (NSArray *)allMergedRequestsInMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PullRequest"];
-	f.predicate = [NSPredicate predicateWithFormat:@"merged == YES"];
+	f.predicate = [NSPredicate predicateWithFormat:@"condition == %@",@kPullRequestConditionMerged];
 	return [moc executeFetchRequest:f error:nil];
 }
 
-+ (NSUInteger)countUnmergedRequestsInMoc:(NSManagedObjectContext *)moc
++ (NSArray *)allClosedRequestsInMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PullRequest"];
-	f.predicate = [NSPredicate predicateWithFormat:@"merged == NO or merged == nil"];
+	f.predicate = [NSPredicate predicateWithFormat:@"condition == %@",@kPullRequestConditionClosed];
+	return [moc executeFetchRequest:f error:nil];
+}
+
++ (NSUInteger)countOpenRequestsInMoc:(NSManagedObjectContext *)moc
+{
+	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PullRequest"];
+	f.predicate = [NSPredicate predicateWithFormat:@"condition == %@ or condition == nil",@kPullRequestConditionOpen];
 	return [moc countForFetchRequest:f error:nil];
 }
 

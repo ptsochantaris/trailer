@@ -37,7 +37,7 @@
 												   delegate:self
 										  cancelButtonTitle:@"Cancel"
 									 destructiveButtonTitle:@"Mark all as read"
-										  otherButtonTitles:@"Remove all merged", @"Refresh Now", nil];
+										  otherButtonTitles:@"Remove all merged", @"Remove all closed", @"Refresh Now", nil];
 	[a showFromBarButtonItem:self.navigationItem.rightBarButtonItem animated:YES];
 }
 
@@ -50,6 +50,10 @@
 	else if(buttonIndex==1)
 	{
         [self removeAllMerged];
+	}
+	else if(buttonIndex==1)
+	{
+        [self removeAllClosed];
 	}
 	else if(buttonIndex==2)
 	{
@@ -82,19 +86,42 @@
                       otherButtonTitles:@"Yes", nil] show];
 }
 
+- (void)removeAllClosed
+{
+    [[[UIAlertView alloc] initWithTitle:@"Sure?"
+                                message:@"Remove all PRs in the Closed section?"
+                               delegate:self
+                      cancelButtonTitle:@"No"
+                      otherButtonTitles:@"Yes", nil] show];
+}
+
 - (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
     if(buttonIndex==1)
     {
-        [self removeAllMergedConfirmed];
+		if([alertView.message rangeOfString:@"Merged"].location!=NSNotFound)
+		{
+			[self removeAllMergedConfirmed];
+		}
+		else
+		{
+			[self removeAllClosedConfirmed];
+		}
     }
+}
+
+- (void)removeAllClosedConfirmed
+{
+	for(PullRequest *p in [PullRequest allClosedRequestsInMoc:self.managedObjectContext])
+		[self.managedObjectContext deleteObject:p];
+    [[AppDelegate shared] updateBadge];
+    [[AppDelegate shared].dataManager saveDB];
 }
 
 - (void)removeAllMergedConfirmed
 {
-	for(PullRequest *p in self.fetchedResultsController.fetchedObjects)
-        if(p.merged.boolValue)
-            [self.managedObjectContext deleteObject:p];
+	for(PullRequest *p in [PullRequest allMergedRequestsInMoc:self.managedObjectContext])
+		[self.managedObjectContext deleteObject:p];
     [[AppDelegate shared] updateBadge];
     [[AppDelegate shared].dataManager saveDB];
 }
@@ -242,8 +269,8 @@
 
 - (void)refreshEnded
 {
-	NSInteger count = [PullRequest countUnmergedRequestsInMoc:self.managedObjectContext];
-	self.title = [NSString stringWithFormat:@"%ld Active PRs",(long)count];
+	NSInteger count = [PullRequest countOpenRequestsInMoc:self.managedObjectContext];
+	self.title = [NSString stringWithFormat:@"%ld Open PRs",(long)count];
 }
 
 #pragma mark - Table View
@@ -302,9 +329,12 @@
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	id <NSFetchedResultsSectionInfo> sectionInfo = [self.fetchedResultsController sections][indexPath.section];
+
 	NSString *sectionName = [sectionInfo name];
 	NSString *mergedName = kPullRequestSectionNames[kPullRequestSectionMerged];
-	return [sectionName isEqualToString:mergedName];
+	NSString *closedName = kPullRequestSectionNames[kPullRequestSectionClosed];
+
+	return [sectionName isEqualToString:mergedName]||[sectionName isEqualToString:closedName];
 }
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath

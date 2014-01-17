@@ -38,6 +38,7 @@ static AppDelegate *_static_shared_ref;
                                                        inMoc:self.dataManager.managedObjectContext];
     if(allPRs.count) [allPRs[0] setMerged:@YES];*/
 
+	[self.dataManager postProcessAllPrs];
 	[self updateMenu];
 
 	[self startRateLimitHandling];
@@ -102,6 +103,12 @@ static AppDelegate *_static_shared_ref;
 {
 	BOOL dontKeep = (sender.integerValue==1);
 	[Settings shared].dontKeepMyPrs = dontKeep;
+}
+
+- (IBAction)keepClosedPrsSelected:(NSButton *)sender
+{
+	BOOL keep = (sender.integerValue==1);
+	[Settings shared].alsoKeepClosedPrs = keep;
 }
 
 - (IBAction)hideAvatarsSelected:(NSButton *)sender
@@ -253,6 +260,12 @@ static AppDelegate *_static_shared_ref;
 			notification.subtitle = [item title];
 			break;
 		}
+		case kPrClosed:
+		{
+			notification.title = @"PR Closed";
+			notification.subtitle = [item title];
+			break;
+		}
 	}
 
     [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
@@ -356,17 +369,35 @@ static AppDelegate *_static_shared_ref;
 
 - (void)sectionHeaderRemoveSelectedFrom:(SectionHeader *)header
 {
-	NSArray *mergedRequests = [PullRequest allMergedRequestsInMoc:self.dataManager.managedObjectContext];
-
-	NSAlert *alert = [[NSAlert alloc] init];
-	[alert setMessageText:[NSString stringWithFormat:@"Clear %ld merged PRs?",mergedRequests.count]];
-	[alert setInformativeText:[NSString stringWithFormat:@"This will clear %ld merged PRs from your list.  This action cannot be undone, are you sure?",mergedRequests.count]];
-	[alert addButtonWithTitle:@"No"];
-	[alert addButtonWithTitle:@"Yes"];
-	NSInteger selected = [alert runModal];
-	if(selected==NSAlertSecondButtonReturn)
+	if([header.title isEqualToString:kPullRequestSectionNames[kPullRequestSectionMerged]])
 	{
-		[self removeAllMergedRequests];
+		NSArray *mergedRequests = [PullRequest allMergedRequestsInMoc:self.dataManager.managedObjectContext];
+
+		NSAlert *alert = [[NSAlert alloc] init];
+		[alert setMessageText:[NSString stringWithFormat:@"Clear %ld merged PRs?",mergedRequests.count]];
+		[alert setInformativeText:[NSString stringWithFormat:@"This will clear %ld merged PRs from your list.  This action cannot be undone, are you sure?",mergedRequests.count]];
+		[alert addButtonWithTitle:@"No"];
+		[alert addButtonWithTitle:@"Yes"];
+		NSInteger selected = [alert runModal];
+		if(selected==NSAlertSecondButtonReturn)
+		{
+			[self removeAllMergedRequests];
+		}
+	}
+	else if([header.title isEqualToString:kPullRequestSectionNames[kPullRequestSectionClosed]])
+	{
+		NSArray *closedRequests = [PullRequest allClosedRequestsInMoc:self.dataManager.managedObjectContext];
+
+		NSAlert *alert = [[NSAlert alloc] init];
+		[alert setMessageText:[NSString stringWithFormat:@"Clear %ld closed PRs?",closedRequests.count]];
+		[alert setInformativeText:[NSString stringWithFormat:@"This will clear %ld closed PRs from your list.  This action cannot be undone, are you sure?",closedRequests.count]];
+		[alert addButtonWithTitle:@"No"];
+		[alert addButtonWithTitle:@"Yes"];
+		NSInteger selected = [alert runModal];
+		if(selected==NSAlertSecondButtonReturn)
+		{
+			[self removeAllClosedRequests];
+		}
 	}
     [self statusItemTapped:nil];
 }
@@ -376,6 +407,16 @@ static AppDelegate *_static_shared_ref;
 	DataManager *dataManager = self.dataManager;
 	NSArray *mergedRequests = [PullRequest allMergedRequestsInMoc:dataManager.managedObjectContext];
 	for(PullRequest *r in mergedRequests)
+		[dataManager.managedObjectContext deleteObject:r];
+	[dataManager saveDB];
+	[self updateMenu];
+}
+
+- (void)removeAllClosedRequests
+{
+	DataManager *dataManager = self.dataManager;
+	NSArray *closedRequests = [PullRequest allClosedRequestsInMoc:dataManager.managedObjectContext];
+	for(PullRequest *r in closedRequests)
 		[dataManager.managedObjectContext deleteObject:r];
 	[dataManager saveDB];
 	[self updateMenu];
@@ -392,15 +433,17 @@ static AppDelegate *_static_shared_ref;
 
 - (NSInteger)buildPrMenuItemsFromList:(NSArray *)pullRequests
 {
-	SectionHeader *myHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:nil title:@"Mine"];
-	SectionHeader *participatedHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:nil title:@"Participated"];
-	SectionHeader *mergedHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:self title:@"Recently Merged"];
-	SectionHeader *allHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:nil title:@"All Pull Requests"];
+	SectionHeader *myHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:nil title:kPullRequestSectionNames[kPullRequestSectionMine]];
+	SectionHeader *participatedHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:nil title:kPullRequestSectionNames[kPullRequestSectionParticipated]];
+	SectionHeader *mergedHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:self title:kPullRequestSectionNames[kPullRequestSectionMerged]];
+	SectionHeader *closedHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:self title:kPullRequestSectionNames[kPullRequestSectionClosed]];
+	SectionHeader *allHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:nil title:kPullRequestSectionNames[kPullRequestSectionAll]];
 
 	NSDictionary *sections = @{
 							   @kPullRequestSectionMine: [NSMutableArray arrayWithObject:myHeader],
 								@kPullRequestSectionParticipated: [NSMutableArray arrayWithObject:participatedHeader],
 								@kPullRequestSectionMerged: [NSMutableArray arrayWithObject:mergedHeader],
+								@kPullRequestSectionClosed: [NSMutableArray arrayWithObject:closedHeader],
 								@kPullRequestSectionAll: [NSMutableArray arrayWithObject:allHeader],
 							   };
 
@@ -558,6 +601,11 @@ static AppDelegate *_static_shared_ref;
 	else
 		[self.hideAvatars setIntegerValue:0];
 
+	if([Settings shared].alsoKeepClosedPrs)
+		[self.keepClosedPrs setIntegerValue:1];
+	else
+		[self.keepClosedPrs setIntegerValue:0];
+
 	if([Settings shared].dontKeepMyPrs)
 		[self.dontKeepMyPrs setIntegerValue:1];
 	else
@@ -647,6 +695,7 @@ static AppDelegate *_static_shared_ref;
 {
 	NSScrollView *scrollView = self.mainMenu.scrollView;
 	[scrollView.documentView scrollPoint:CGPointMake(0, [scrollView.documentView frame].size.height-scrollView.contentView.bounds.size.height)];
+	[self.mainMenu layout];
 }
 
 - (void)windowDidBecomeKey:(NSNotification *)notification
@@ -855,7 +904,7 @@ static AppDelegate *_static_shared_ref;
 - (void)updateMenu
 {
 	NSArray *pullRequests = [self pullRequestList];
-	NSString *countString = [NSString stringWithFormat:@"%ld",[PullRequest countUnmergedRequestsInMoc:self.dataManager.managedObjectContext]];
+	NSString *countString = [NSString stringWithFormat:@"%ld",[PullRequest countOpenRequestsInMoc:self.dataManager.managedObjectContext]];
 	NSInteger newCommentCount = [self buildPrMenuItemsFromList:pullRequests];
 
 	DLog(@"Updating menu, %@ total PRs",countString);

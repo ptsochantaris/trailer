@@ -1,4 +1,10 @@
 
+@interface SectionHeader ()
+{
+	CenteredTextField *titleView;
+}
+@end
+
 @implementation SectionHeader
 
 static NSDictionary *_titleAttributes;
@@ -42,11 +48,16 @@ static CGColorRef _lightGray;
 		}
 
 		CGRect titleRect = CGRectMake(12, 0, MENU_WIDTH-120-AVATAR_SIZE-LEFTPADDING, TITLE_HEIGHT-8.0);
-		CenteredTextField *titleView = [[CenteredTextField alloc] initWithFrame:titleRect];
+		titleView = [[CenteredTextField alloc] initWithFrame:titleRect];
 		titleView.attributedStringValue = [[NSAttributedString alloc] initWithString:title attributes:_titleAttributes];
 		[self addSubview:titleView];
     }
     return self;
+}
+
+- (NSString *)title
+{
+	return titleView.attributedStringValue.string;
 }
 
 -(void)drawRect:(NSRect)dirtyRect

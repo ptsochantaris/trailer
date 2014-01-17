@@ -25,6 +25,8 @@ CGFloat GLOBAL_SCREEN_SCALE;
 	self.dataManager = [[DataManager alloc] init];
 	self.api = [[API alloc] init];
 
+	[self.dataManager postProcessAllPrs];
+
 	if([Settings shared].authToken.length) [self.api updateLimitFromServer];
 
 	[self setupUI];
@@ -176,7 +178,7 @@ CGFloat GLOBAL_SCREEN_SCALE;
 	NSArray *allPRs = [self.dataManager.managedObjectContext executeFetchRequest:f error:nil];
 	NSInteger count = 0;
 	for(PullRequest *r in allPRs)
-		if(!r.merged.boolValue)
+		if(r.condition.integerValue==kPullRequestConditionOpen)
 			count += r.unreadComments.integerValue;
 	
 	[UIApplication sharedApplication].applicationIconBadgeNumber = count;
@@ -330,6 +332,11 @@ CGFloat GLOBAL_SCREEN_SCALE;
 		case kPrMerged:
 		{
 			notification.alertBody = [NSString stringWithFormat:@"PR Merged! %@",[item title]];
+			break;
+		}
+		case kPrClosed:
+		{
+			notification.alertBody = [NSString stringWithFormat:@"PR Closed: %@",[item title]];
 			break;
 		}
 	}

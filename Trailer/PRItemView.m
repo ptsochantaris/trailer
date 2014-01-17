@@ -76,7 +76,7 @@ static CGColorRef _highlightColor;
 		_title = pullRequest.title;
 
 		CGFloat W = MENU_WIDTH-LEFTPADDING;
-		BOOL showUnpin = pullRequest.merged.boolValue;
+		BOOL showUnpin = pullRequest.condition.integerValue!=kPullRequestConditionOpen;
 		if(showUnpin) W -= REMOVE_BUTTON_WIDTH;
 
 		BOOL showAvatar = pullRequest.userAvatarUrl.length && ![Settings shared].hideAvatars;

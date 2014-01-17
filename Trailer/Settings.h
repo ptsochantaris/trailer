@@ -13,6 +13,7 @@
 
 @property (nonatomic) BOOL shouldHideUncommentedRequests, showCommentsEverywhere,
 							sortDescending, showCreatedInsteadOfUpdated,
-							dontKeepMyPrs, hideAvatars, autoParticipateInMentions;
+							dontKeepMyPrs, hideAvatars, autoParticipateInMentions,
+							alsoKeepClosedPrs;
 
 @end

@@ -104,6 +104,12 @@
 				if([Settings shared].dontKeepMyPrs) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
+			case 5:
+			{
+				cell.textLabel.text = [NSString stringWithFormat:@"Keep closed PRs"];
+				if([Settings shared].alsoKeepClosedPrs) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				break;
+			}
 		}
 	}
 	else if(indexPath.section==2)
@@ -198,6 +204,11 @@
 				[Settings shared].dontKeepMyPrs = ![Settings shared].dontKeepMyPrs;
 				break;
 			}
+			case 5:
+			{
+				[Settings shared].alsoKeepClosedPrs = ![Settings shared].alsoKeepClosedPrs;
+				break;
+			}
 		}
 		[settingsChangedAnnounceTimer push];
 	}
@@ -233,7 +244,7 @@
 {
     switch (section) {
 		case 0: return 2; // refresh period, background refresh
-		case 1: return 5; // toggled options (5)
+		case 1: return 6; // toggled options
 		case 2: return 2; // sorting category, sorting direction
 	}
 	return 0;
@@ -243,7 +254,7 @@
 {
     switch (section) {
 		case 0: return @"Auto Refresh"; // refresh period, background refresh
-		case 1: return @"Options"; // toggled options (5)
+		case 1: return @"Options"; // toggled options
 		case 2: return @"Sorting"; // sorting category, sorting direction
 	}
 	return nil;
