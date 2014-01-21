@@ -59,7 +59,7 @@
 
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
 	NSNumber *localUserId = @([Settings shared].localUserId.longLongValue);
-	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestUrl == %@ and updatedAt > %@ and userId != %@",
+	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestUrl == %@ and createdAt > %@ and userId != %@",
 				   self.url,
 				   self.latestReadCommentDate,
 				   localUserId];
@@ -157,10 +157,10 @@
 	NSArray *res = [self.managedObjectContext executeFetchRequest:f error:nil];
 	for(PRComment *c in res)
 	{
-		if(!self.latestReadCommentDate) self.latestReadCommentDate = c.updatedAt;
-		else if([self.latestReadCommentDate compare:c.updatedAt]==NSOrderedAscending)
+		NSDate *commentCreation = c.createdAt;
+		if(!self.latestReadCommentDate || [self.latestReadCommentDate compare:commentCreation]==NSOrderedAscending)
 		{
-			self.latestReadCommentDate = c.updatedAt;
+			self.latestReadCommentDate = commentCreation;
 		}
 	}
 	[self postProcess];

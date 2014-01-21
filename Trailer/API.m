@@ -133,8 +133,9 @@
 						 // check if we're assigned to a just created pull request, in which case we want to "fast forward" its latest comment dates to our own if we're newer
 						 if(p.postSyncAction.integerValue == kPostSyncNoteNew)
 						 {
-							 if(!p.latestReadCommentDate || [p.latestReadCommentDate compare:c.updatedAt]==NSOrderedAscending)
-								 p.latestReadCommentDate = c.updatedAt;
+							 NSDate *commentCreation = c.createdAt;
+							 if(!p.latestReadCommentDate || [p.latestReadCommentDate compare:commentCreation]==NSOrderedAscending)
+								 p.latestReadCommentDate = commentCreation;
 						 }
 					 }
 				 } finalCallback:^(BOOL success, NSInteger resultCode) {
