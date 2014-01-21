@@ -7,12 +7,26 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.0.5</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Important fix for unread comment counts on items</li>
+				</ul></font>]]></description>
+			<pubDate>Fri, 21 Jan 2014 09:00:00 +0000</pubDate>
+			<enclosure
+			url="http://dev.housetrip.com/trailer/trailer105.zip"
+			sparkle:version="1050"
+			sparkle:shortVersionString="1.0.5"
+			sparkle:dsaSignature="MC0CFQCZg+qRB4pEYBcT8X7x8wHGkkccXgIUS6iRvQpAa1zeuXAtN1XaXVfCAR8="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.0.4</title>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
-<li>Added notification support for being mentioned in a Github comment</li>
-<li>Added ability to move PRs in which you are mentioned to the "Participated" group</li>
-<li>Added support to keeping closed (i.e. not merged) PRs much like the merged PRs are kept</li>
-<li>Further code cleanup, hopefully even faster menu drawing and display issue corrections</li>
+				<li>Added notification support for being mentioned in a Github comment</li>
+				<li>Added ability to move PRs in which you are mentioned to the "Participated" group</li>
+				<li>Added support to keeping closed (i.e. not merged) PRs much like the merged PRs are kept</li>
+				<li>Further code cleanup, hopefully even faster menu drawing and display issue corrections</li>
 				</ul></font>]]></description>
 			<pubDate>Fri, 17 Jan 2014 15:00:00 +0000</pubDate>
 			<enclosure
