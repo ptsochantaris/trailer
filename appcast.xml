@@ -7,6 +7,20 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.0.6</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Corrected an issue that would show a red menubar count when no PRs are showing any unread comments</li>
+				</ul></font>]]></description>
+			<pubDate>Fri, 22 Jan 2014 9:00:00 +0000</pubDate>
+			<enclosure
+			url="http://dev.housetrip.com/trailer/trailer106.zip"
+			sparkle:version="1060"
+			sparkle:shortVersionString="1.0.6"
+			sparkle:dsaSignature="MC4CFQC5Qfyn8R9r0d5aRsrz2F7E1H3oxQIVAMT9gzIQkHACT+I2mGjNlwIeqIcA"
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.0.5</title>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
 				<li>Important fix for unread comment counts on items</li>
