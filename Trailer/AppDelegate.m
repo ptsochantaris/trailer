@@ -371,32 +371,46 @@ static AppDelegate *_static_shared_ref;
 {
 	if([header.title isEqualToString:kPullRequestSectionNames[kPullRequestSectionMerged]])
 	{
-		NSArray *mergedRequests = [PullRequest allMergedRequestsInMoc:self.dataManager.managedObjectContext];
-
-		NSAlert *alert = [[NSAlert alloc] init];
-		[alert setMessageText:[NSString stringWithFormat:@"Clear %ld merged PRs?",mergedRequests.count]];
-		[alert setInformativeText:[NSString stringWithFormat:@"This will clear %ld merged PRs from your list.  This action cannot be undone, are you sure?",mergedRequests.count]];
-		[alert addButtonWithTitle:@"No"];
-		[alert addButtonWithTitle:@"Yes"];
-		NSInteger selected = [alert runModal];
-		if(selected==NSAlertSecondButtonReturn)
+		if([Settings shared].dontAskBeforeWipingMerged)
 		{
 			[self removeAllMergedRequests];
+		}
+		else
+		{
+			NSArray *mergedRequests = [PullRequest allMergedRequestsInMoc:self.dataManager.managedObjectContext];
+
+			NSAlert *alert = [[NSAlert alloc] init];
+			[alert setMessageText:[NSString stringWithFormat:@"Clear %ld merged PRs?",mergedRequests.count]];
+			[alert setInformativeText:[NSString stringWithFormat:@"This will clear %ld merged PRs from your list.  This action cannot be undone, are you sure?",mergedRequests.count]];
+			[alert addButtonWithTitle:@"No"];
+			[alert addButtonWithTitle:@"Yes"];
+			[alert setShowsSuppressionButton:YES];
+
+			if([alert runModal]==NSAlertSecondButtonReturn) [self removeAllMergedRequests];
+
+			if([[alert suppressionButton] state] == NSOnState) [Settings shared].dontAskBeforeWipingMerged = YES;
 		}
 	}
 	else if([header.title isEqualToString:kPullRequestSectionNames[kPullRequestSectionClosed]])
 	{
-		NSArray *closedRequests = [PullRequest allClosedRequestsInMoc:self.dataManager.managedObjectContext];
-
-		NSAlert *alert = [[NSAlert alloc] init];
-		[alert setMessageText:[NSString stringWithFormat:@"Clear %ld closed PRs?",closedRequests.count]];
-		[alert setInformativeText:[NSString stringWithFormat:@"This will clear %ld closed PRs from your list.  This action cannot be undone, are you sure?",closedRequests.count]];
-		[alert addButtonWithTitle:@"No"];
-		[alert addButtonWithTitle:@"Yes"];
-		NSInteger selected = [alert runModal];
-		if(selected==NSAlertSecondButtonReturn)
+		if([Settings shared].dontAskBeforeWipingClosed)
 		{
 			[self removeAllClosedRequests];
+		}
+		else
+		{
+			NSArray *closedRequests = [PullRequest allClosedRequestsInMoc:self.dataManager.managedObjectContext];
+
+			NSAlert *alert = [[NSAlert alloc] init];
+			[alert setMessageText:[NSString stringWithFormat:@"Clear %ld closed PRs?",closedRequests.count]];
+			[alert setInformativeText:[NSString stringWithFormat:@"This will clear %ld closed PRs from your list.  This action cannot be undone, are you sure?",closedRequests.count]];
+			[alert addButtonWithTitle:@"No"];
+			[alert addButtonWithTitle:@"Yes"];
+			[alert setShowsSuppressionButton:YES];
+
+			if([alert runModal]==NSAlertSecondButtonReturn) [self removeAllClosedRequests];
+
+			if([[alert suppressionButton] state] == NSOnState) [Settings shared].dontAskBeforeWipingClosed = YES;
 		}
 	}
     [self statusItemTapped:nil];

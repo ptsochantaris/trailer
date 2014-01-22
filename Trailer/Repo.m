@@ -9,7 +9,7 @@
 +(Repo*)repoWithInfo:(NSDictionary*)info moc:(NSManagedObjectContext*)moc
 {
 	Repo *r = [DataItem itemWithInfo:info type:@"Repo" moc:moc];
-	r.fullName = info[@"full_name"];
+	r.fullName = [info ofk:@"full_name"];
 	return r;
 }
 

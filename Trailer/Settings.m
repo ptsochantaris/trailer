@@ -143,4 +143,16 @@
 -(void)setAlsoKeepClosedPrs:(BOOL)alsoKeepClosedPrs { [self storeDefaultValue:@(alsoKeepClosedPrs) forKey:ALSO_KEEP_CLOSED_PRS_KEY]; }
 -(BOOL)alsoKeepClosedPrs { return [[[NSUserDefaults standardUserDefaults] stringForKey:ALSO_KEEP_CLOSED_PRS_KEY] boolValue]; }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define DONT_ASK_BEFORE_WIPING_MERGED @"DONT_ASK_BEFORE_WIPING_MERGED"
+-(void)setDontAskBeforeWipingMerged:(BOOL)dontAskBeforeWipingMerged { [self storeDefaultValue:@(dontAskBeforeWipingMerged) forKey:DONT_ASK_BEFORE_WIPING_MERGED]; }
+-(BOOL)dontAskBeforeWipingMerged { return [[[NSUserDefaults standardUserDefaults] stringForKey:DONT_ASK_BEFORE_WIPING_MERGED] boolValue]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define DONT_ASK_BEFORE_WIPING_CLOSED @"DONT_ASK_BEFORE_WIPING_CLOSED"
+-(void)setDontAskBeforeWipingClosed:(BOOL)dontAskBeforeWipingClosed { [self storeDefaultValue:@(dontAskBeforeWipingClosed) forKey:DONT_ASK_BEFORE_WIPING_CLOSED]; }
+-(BOOL)dontAskBeforeWipingClosed { return [[[NSUserDefaults standardUserDefaults] stringForKey:DONT_ASK_BEFORE_WIPING_CLOSED] boolValue]; }
+
 @end
