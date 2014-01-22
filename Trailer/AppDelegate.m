@@ -450,9 +450,14 @@ static AppDelegate *_static_shared_ref;
 	NSInteger unreadCommentCount=0;
 	for(PullRequest *r in pullRequests)
 	{
-		unreadCommentCount += r.unreadComments.integerValue;
+		NSNumber *sectionIndex = r.sectionIndex;
+		if([Settings shared].showCommentsEverywhere ||
+		   sectionIndex.integerValue==kPullRequestSectionMine ||
+		   sectionIndex.integerValue==kPullRequestSectionParticipated)
+			unreadCommentCount += r.unreadComments.integerValue;
+
 		PRItemView *view = [[PRItemView alloc] initWithPullRequest:r userInfo:r.serverId delegate:self];
-		[sections[r.sectionIndex] addObject:view];
+		[sections[sectionIndex] addObject:view];
 	}
 
 	CGFloat top = 10.0;
