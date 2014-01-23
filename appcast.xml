@@ -7,11 +7,27 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.0.7</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Important fix for null fields sent by Github API which could result in app crashing</li>
+				<li>Added options to skip confirming removing all merged/closed PRs</li>
+				<li>Preferences slightly cleaned up (though this needs more work)</li>
+				</ul></font>]]></description>
+			<pubDate>Thu, 23 Jan 2014 9:00:00 +0000</pubDate>
+			<enclosure
+			url="http://dev.housetrip.com/trailer/trailer107.zip"
+			sparkle:version="1070"
+			sparkle:shortVersionString="1.0.7"
+			sparkle:dsaSignature="MC4CFQCPwr4NdueSJfu6RXhx2gT0x6E7egIVAMmKzagF9KFVt9mCtaNrvSoBOqKL"
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.0.6</title>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
 				<li>Corrected an issue that would show a red menubar count when no PRs are showing any unread comments</li>
 				</ul></font>]]></description>
-			<pubDate>Fri, 22 Jan 2014 9:00:00 +0000</pubDate>
+			<pubDate>Wed, 22 Jan 2014 9:00:00 +0000</pubDate>
 			<enclosure
 			url="http://dev.housetrip.com/trailer/trailer106.zip"
 			sparkle:version="1060"
@@ -128,7 +144,7 @@
 			sparkle:dsaSignature="MC0CFQCblFitqFh2DyStsGAydchcY1e+FwIUcQa53y3jwUuu/D3cBm2pU0Hujdg="
 			type="application/octet-stream"/>
 		</item>
-		
+
 		
 	</channel>
 </rss>
