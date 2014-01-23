@@ -90,6 +90,17 @@ static AppDelegate *_static_shared_ref;
 	[self.sortModeSelect selectItemAtIndex:[Settings shared].sortMethod];
 }
 
+- (IBAction)dontConfirmRemoveAllMergedSelected:(NSButton *)sender
+{
+	BOOL dontConfirm = (sender.integerValue==1);
+    [Settings shared].dontAskBeforeWipingMerged = dontConfirm;
+}
+
+- (IBAction)dontConfirmRemoveAllClosedSelected:(NSButton *)sender
+{
+	BOOL dontConfirm = (sender.integerValue==1);
+    [Settings shared].dontAskBeforeWipingClosed = dontConfirm;
+}
 
 - (IBAction)autoParticipateOnMentionSelected:(NSButton *)sender
 {
@@ -386,9 +397,14 @@ static AppDelegate *_static_shared_ref;
 			[alert addButtonWithTitle:@"Yes"];
 			[alert setShowsSuppressionButton:YES];
 
-			if([alert runModal]==NSAlertSecondButtonReturn) [self removeAllMergedRequests];
-
-			if([[alert suppressionButton] state] == NSOnState) [Settings shared].dontAskBeforeWipingMerged = YES;
+			if([alert runModal]==NSAlertSecondButtonReturn)
+            {
+                [self removeAllMergedRequests];
+                if([[alert suppressionButton] state] == NSOnState)
+                {
+                    [Settings shared].dontAskBeforeWipingMerged = YES;
+                }
+            }
 		}
 	}
 	else if([header.title isEqualToString:kPullRequestSectionNames[kPullRequestSectionClosed]])
@@ -408,9 +424,14 @@ static AppDelegate *_static_shared_ref;
 			[alert addButtonWithTitle:@"Yes"];
 			[alert setShowsSuppressionButton:YES];
 
-			if([alert runModal]==NSAlertSecondButtonReturn) [self removeAllClosedRequests];
-
-			if([[alert suppressionButton] state] == NSOnState) [Settings shared].dontAskBeforeWipingClosed = YES;
+			if([alert runModal]==NSAlertSecondButtonReturn)
+            {
+                [self removeAllClosedRequests];
+                if([[alert suppressionButton] state] == NSOnState)
+                {
+                    [Settings shared].dontAskBeforeWipingClosed = YES;
+                }
+            }
 		}
 	}
     [self statusItemTapped:nil];
@@ -604,6 +625,16 @@ static AppDelegate *_static_shared_ref;
 		[self.launchAtStartup setIntegerValue:1];
 	else
 		[self.launchAtStartup setIntegerValue:0];
+
+    if([Settings shared].dontAskBeforeWipingClosed)
+        [self.dontConfirmRemoveAllClosed setIntegerValue:1];
+    else
+        [self.dontConfirmRemoveAllClosed setIntegerValue:0];
+
+    if([Settings shared].dontAskBeforeWipingMerged)
+        [self.dontConfirmRemoveAllMerged setIntegerValue:1];
+    else
+        [self.dontConfirmRemoveAllMerged setIntegerValue:0];
 
 	if([Settings shared].shouldHideUncommentedRequests)
 		[self.hideUncommentedPrs setIntegerValue:1];

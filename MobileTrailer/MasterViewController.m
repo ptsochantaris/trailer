@@ -79,20 +79,34 @@
 
 - (void)removeAllMerged
 {
-    [[[UIAlertView alloc] initWithTitle:@"Sure?"
-                                message:@"Remove all PRs in the Merged section?"
-                               delegate:self
-                      cancelButtonTitle:@"No"
-                      otherButtonTitles:@"Yes", nil] show];
+    if([Settings shared].dontAskBeforeWipingMerged)
+    {
+        [self removeAllMergedConfirmed];
+    }
+    else
+    {
+        [[[UIAlertView alloc] initWithTitle:@"Sure?"
+                                    message:@"Remove all PRs in the Merged section?"
+                                   delegate:self
+                          cancelButtonTitle:@"No"
+                          otherButtonTitles:@"Yes", nil] show];
+    }
 }
 
 - (void)removeAllClosed
 {
-    [[[UIAlertView alloc] initWithTitle:@"Sure?"
-                                message:@"Remove all PRs in the Closed section?"
-                               delegate:self
-                      cancelButtonTitle:@"No"
-                      otherButtonTitles:@"Yes", nil] show];
+    if([Settings shared].dontAskBeforeWipingClosed)
+    {
+        [self removeAllClosedConfirmed];
+    }
+    else
+    {
+        [[[UIAlertView alloc] initWithTitle:@"Sure?"
+                                    message:@"Remove all PRs in the Closed section?"
+                                   delegate:self
+                          cancelButtonTitle:@"No"
+                          otherButtonTitles:@"Yes", nil] show];
+    }
 }
 
 - (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
