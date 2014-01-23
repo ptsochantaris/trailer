@@ -334,10 +334,11 @@
 	CGFloat w = 208;
 	if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) w = 227;
 
-	return [pr.title boundingRectWithSize:CGSizeMake(w, CGFLOAT_MAX)
-								  options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
-							   attributes:@{ NSFontAttributeName:[UIFont systemFontOfSize:[UIFont labelFontSize]] }
-								  context:nil].size.height+40;
+	CGFloat H = [pr.title boundingRectWithSize:CGSizeMake(w, CGFLOAT_MAX)
+									   options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
+									attributes:@{ NSFontAttributeName:[UIFont systemFontOfSize:[UIFont labelFontSize]] }
+									   context:nil].size.height+40;
+	return MAX(65,H);
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath

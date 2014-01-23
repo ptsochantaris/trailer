@@ -74,6 +74,7 @@ static CGColorRef _highlightColor;
 		}
 
 		_title = pullRequest.title;
+		if(!_title) _title = @"(No title)";
 
 		CGFloat W = MENU_WIDTH-LEFTPADDING;
 		BOOL showUnpin = pullRequest.condition.integerValue!=kPullRequestConditionOpen;

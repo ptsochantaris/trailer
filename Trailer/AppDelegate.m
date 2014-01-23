@@ -31,12 +31,9 @@ static AppDelegate *_static_shared_ref;
 
 	[self setupSortMethodMenu];
 
-    /* DEBUG
-    NSArray *allPRs = [PullRequest pullRequestsSortedByField:nil
-                                                      filter:nil
-                                                   ascending:NO
-                                                       inMoc:self.dataManager.managedObjectContext];
-    if(allPRs.count) [allPRs[0] setMerged:@YES];*/
+    // DEBUG
+    //NSArray *allPRs = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.dataManager.managedObjectContext];
+    //if(allPRs.count) [allPRs[0] setTitle:nil];
 
 	[self.dataManager postProcessAllPrs];
 	[self updateMenu];
