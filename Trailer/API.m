@@ -36,8 +36,7 @@
 		requestQueue = [[NSOperationQueue alloc] init];
 		requestQueue.maxConcurrentOperationCount = 8;
 
-		self.reachability = [Reachability reachabilityWithHostName:API_SERVER];
-		[self.reachability startNotifier];
+		[self restartNotifier];
 
         NSFileManager *fileManager = [NSFileManager defaultManager];
         NSURL *appSupportURL = [[fileManager URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] lastObject];
@@ -50,6 +49,13 @@
             [fileManager createDirectoryAtPath:cacheDirectory withIntermediateDirectories:YES attributes:nil error:nil];
 	}
     return self;
+}
+
+- (void)restartNotifier
+{
+	[self.reachability stopNotifier];
+	self.reachability = [Reachability reachabilityWithHostName:[Settings shared].apiBackEnd];
+	[self.reachability startNotifier];
 }
 
 -(void)error:(NSString*)errorString
@@ -528,7 +534,7 @@
 	NSBlockOperation *o = [NSBlockOperation blockOperationWithBlock:^{
 
 		NSString *expandedPath;
-		if([path rangeOfString:@"/"].location==0) expandedPath = [[@"https://" stringByAppendingString:API_SERVER] stringByAppendingString:path];
+		if([path rangeOfString:@"/"].location==0) expandedPath = [[@"https://" stringByAppendingString:[Settings shared].apiBackEnd] stringByAppendingString:path];
 		else expandedPath = path;
 
 		if(params.count)

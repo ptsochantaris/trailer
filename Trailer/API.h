@@ -1,5 +1,4 @@
 
-#define API_SERVER @"api.github.com"
 #define TRAILER_GITHUB_REPO @"http://dev.housetrip.com/trailer/"
 #define LOW_API_WARNING 0.10
 
@@ -14,7 +13,8 @@ typedef enum {
 typedef enum {
 	kCreationDate = 0,
 	kRecentActivity = 1,
-	kTitle= 2
+	kTitle = 2,
+	kRepository = 3
 } PRSortingMethod;
 
 #define PULL_REQUEST_ID_KEY @"pullRequestIdKey"
@@ -42,6 +42,8 @@ typedef enum {
 - (void)expireOldImageCacheEntries;
 
 - (void)clearImageCache;
+
+- (void)restartNotifier;
 
 - (BOOL)haveCachedImage:(NSString *)path
                 forSize:(CGSize)imageSize

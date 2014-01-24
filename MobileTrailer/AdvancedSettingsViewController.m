@@ -33,7 +33,8 @@
 	cell.accessoryType = UITableViewCellAccessoryNone;
 	if(indexPath.section==0)
 	{
-		switch (indexPath.row) {
+		switch (indexPath.row)
+		{
 			case 0:
 			{
 				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
@@ -58,7 +59,8 @@
 	else if(indexPath.section==1)
 	{
 		cell.detailTextLabel.text = nil;
-		switch (indexPath.row) {
+		switch (indexPath.row)
+		{
 			case 0:
 			{
 				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
@@ -69,6 +71,19 @@
 				break;
 			}
 			case 1:
+            {
+				cell.textLabel.text = [NSString stringWithFormat:@"Don't report refresh failures"];
+				if([Settings shared].dontReportRefreshFailures) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				break;
+            }
+		}
+	}
+	else if(indexPath.section==2)
+	{
+		cell.detailTextLabel.text = nil;
+		switch (indexPath.row)
+		{
+			case 2:
 			{
 				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
 					cell.textLabel.text = [NSString stringWithFormat:@"Move PRs that mention me to 'Participated'"];
@@ -77,7 +92,7 @@
 				if([Settings shared].autoParticipateInMentions) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
-			case 2:
+			case 0:
 			{
 				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
 					cell.textLabel.text = [NSString stringWithFormat:@"Display comment badges and alerts for all PRs"];
@@ -86,7 +101,7 @@
 				if([Settings shared].showCommentsEverywhere) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
-			case 3:
+			case 1:
 			{
 				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
 					cell.textLabel.text = [NSString stringWithFormat:@"Only display PRs with unread comments"];
@@ -95,44 +110,76 @@
 				if([Settings shared].shouldHideUncommentedRequests) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
-			case 4:
+		}
+	}
+	else if(indexPath.section==3)
+	{
+		cell.detailTextLabel.text = nil;
+		switch (indexPath.row)
+		{
+			case 0:
+            {
+				cell.textLabel.text = [NSString stringWithFormat:@"Display repository names"];
+				if([Settings shared].showReposInName) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				break;
+            }
+			case 1:
+            {
+				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+					cell.textLabel.text = [NSString stringWithFormat:@"Include repositories in filtering"];
+				else
+					cell.textLabel.text = [NSString stringWithFormat:@"Include repositories in\nfiltering"];
+				if([Settings shared].includeReposInFilter) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				break;
+            }
+		}
+	}
+	else if(indexPath.section==4)
+	{
+		cell.detailTextLabel.text = nil;
+		switch (indexPath.row)
+		{
+			case 1:
 			{
 				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
 					cell.textLabel.text = [NSString stringWithFormat:@"Don't keep PRs merged by me"];
 				else
-					cell.textLabel.text = [NSString stringWithFormat:@"Don't keep PRs\nmerged by me"];
+					cell.textLabel.text = [NSString stringWithFormat:@"Don't keep PRs merged\nby me"];
 				if([Settings shared].dontKeepMyPrs) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
-			case 5:
+			case 0:
 			{
 				cell.textLabel.text = [NSString stringWithFormat:@"Keep closed PRs"];
 				if([Settings shared].alsoKeepClosedPrs) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
-            case 6:
+		}
+	}
+	else if(indexPath.section==5)
+	{
+		cell.detailTextLabel.text = nil;
+		switch (indexPath.row)
+		{
+			case 0:
             {
-				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-					cell.textLabel.text = [NSString stringWithFormat:@"Don't confirm removing all merged PRs"];
-				else
-					cell.textLabel.text = [NSString stringWithFormat:@"Don't confirm removing\nall merged PRs"];
+				cell.textLabel.text = [NSString stringWithFormat:@"Removing all merged PRs"];
 				if([Settings shared].dontAskBeforeWipingMerged) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
             }
-            case 7:
+            case 1:
             {
-				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-					cell.textLabel.text = [NSString stringWithFormat:@"Don't confirm removing all closed PRs"];
-				else
-					cell.textLabel.text = [NSString stringWithFormat:@"Don't confirm removing\nall closed PRs"];
+				cell.textLabel.text = [NSString stringWithFormat:@"Removing all closed PRs"];
 				if([Settings shared].dontAskBeforeWipingClosed) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
             }
 		}
 	}
-	else if(indexPath.section==2)
+	else if(indexPath.section==6)
 	{
-		switch (indexPath.row) {
+		cell.detailTextLabel.text = nil;
+		switch (indexPath.row)
+		{
 			case 0:
 			{
 				cell.textLabel.text = [NSString stringWithFormat:@"Sort by"];
@@ -149,6 +196,12 @@
 					cell.detailTextLabel.text = @"Reverse";
 				else
 					cell.detailTextLabel.text = @"Normal";
+				break;
+			}
+			case 2:
+			{
+				cell.textLabel.text = [NSString stringWithFormat:@"Group by repository"];
+				if([Settings shared].groupByRepo) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
 		}
@@ -204,35 +257,78 @@
 			}
 			case 1:
 			{
+				[Settings shared].dontReportRefreshFailures = ![Settings shared].dontReportRefreshFailures;
+				break;
+			}
+		}
+		[settingsChangedAnnounceTimer push];
+	}
+	else if(indexPath.section==2)
+	{
+		switch (indexPath.row)
+		{
+			case 2:
+			{
 				[Settings shared].autoParticipateInMentions = ![Settings shared].autoParticipateInMentions;
 				break;
 			}
-			case 2:
+			case 0:
 			{
 				[Settings shared].showCommentsEverywhere = ![Settings shared].showCommentsEverywhere;
 				break;
 			}
-			case 3:
+			case 1:
 			{
 				[Settings shared].shouldHideUncommentedRequests = ![Settings shared].shouldHideUncommentedRequests;
 				break;
 			}
-			case 4:
+		}
+		[settingsChangedAnnounceTimer push];
+	}
+	else if(indexPath.section==3)
+	{
+		switch (indexPath.row)
+		{
+			case 0:
+			{
+				[Settings shared].showReposInName = ![Settings shared].showReposInName;
+				break;
+			}
+			case 1:
+			{
+				[Settings shared].includeReposInFilter = ![Settings shared].includeReposInFilter;
+				break;
+			}
+		}
+		[settingsChangedAnnounceTimer push];
+	}
+	else if(indexPath.section==4)
+	{
+		switch (indexPath.row)
+		{
+			case 1:
 			{
 				[Settings shared].dontKeepMyPrs = ![Settings shared].dontKeepMyPrs;
 				break;
 			}
-			case 5:
+			case 0:
 			{
 				[Settings shared].alsoKeepClosedPrs = ![Settings shared].alsoKeepClosedPrs;
 				break;
 			}
-			case 6:
+		}
+		[settingsChangedAnnounceTimer push];
+	}
+	else if(indexPath.section==5)
+	{
+		switch (indexPath.row)
+		{
+			case 0:
 			{
 				[Settings shared].dontAskBeforeWipingMerged = ![Settings shared].dontAskBeforeWipingMerged;
 				break;
 			}
-			case 7:
+			case 1:
 			{
 				[Settings shared].dontAskBeforeWipingClosed = ![Settings shared].dontAskBeforeWipingClosed;
 				break;
@@ -240,7 +336,7 @@
 		}
 		[settingsChangedAnnounceTimer push];
 	}
-	else if(indexPath.section==2)
+	else if(indexPath.section==6)
 	{
 		switch (indexPath.row)
 		{
@@ -263,6 +359,12 @@
 				[self performSegueWithIdentifier:@"showPicker" sender:self];
 				break;
 			}
+			case 2:
+			{
+				[Settings shared].groupByRepo = ![Settings shared].groupByRepo;
+				[settingsChangedAnnounceTimer push];
+				break;
+			}
 		}
 	}
 	[tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
@@ -272,8 +374,12 @@
 {
     switch (section) {
 		case 0: return 2; // refresh period, background refresh
-		case 1: return 8; // toggled options
-		case 2: return 2; // sorting category, sorting direction
+		case 1: return 2; // toggled options
+		case 2: return 3; // toggled options
+		case 3: return 2; // toggled options
+		case 4: return 2; // toggled options
+		case 5: return 2; // toggled options
+		case 6: return 3; // sorting category, sorting direction
 	}
 	return 0;
 }
@@ -282,15 +388,19 @@
 {
     switch (section) {
 		case 0: return @"Auto Refresh"; // refresh period, background refresh
-		case 1: return @"Options"; // toggled options
-		case 2: return @"Sorting"; // sorting category, sorting direction
+		case 1: return @"Display"; // toggled options
+		case 2: return @"Comments"; // toggled options
+		case 3: return @"Repositories"; // toggled options
+		case 4: return @"Merging"; // toggled options
+		case 5: return @"Don't confirm when"; // toggled options
+		case 6: return @"Sorting"; // sorting category, sorting direction
 	}
 	return nil;
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return 3;
+    return 7;
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender

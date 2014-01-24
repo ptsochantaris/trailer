@@ -7,13 +7,16 @@
 
 @property (nonatomic) NSInteger sortMethod;
 
-@property (nonatomic) NSString *authToken, *localUser, *localUserId;
+@property (nonatomic) NSString *authToken, *localUser, *localUserId,
+							*apiFrontEnd, *apiBackEnd;
 
 @property (nonatomic) float refreshPeriod, backgroundRefreshPeriod;
 
 @property (nonatomic) BOOL shouldHideUncommentedRequests, showCommentsEverywhere,
 							sortDescending, showCreatedInsteadOfUpdated,
 							dontKeepMyPrs, hideAvatars, autoParticipateInMentions,
-							alsoKeepClosedPrs, dontAskBeforeWipingMerged, dontAskBeforeWipingClosed;
+							alsoKeepClosedPrs, dontAskBeforeWipingMerged,
+							dontAskBeforeWipingClosed, includeReposInFilter, showReposInName,
+							dontReportRefreshFailures, groupByRepo;
 
 @end

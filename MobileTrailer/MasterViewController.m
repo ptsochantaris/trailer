@@ -334,10 +334,18 @@
 	CGFloat w = 208;
 	if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) w = 227;
 
-	CGFloat H = [pr.title boundingRectWithSize:CGSizeMake(w, CGFLOAT_MAX)
-									   options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
-									attributes:@{ NSFontAttributeName:[UIFont systemFontOfSize:[UIFont labelFontSize]] }
-									   context:nil].size.height+40;
+	CGFloat H = 30;
+
+	H += [pr.title boundingRectWithSize:CGSizeMake(w, CGFLOAT_MAX)
+								options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
+							 attributes:@{ NSFontAttributeName:[UIFont systemFontOfSize:[UIFont labelFontSize]] }
+								context:nil].size.height;
+
+	H += [pr.subtitle boundingRectWithSize:CGSizeMake(w, CGFLOAT_MAX)
+								   options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
+								attributes:@{ NSFontAttributeName:[UIFont systemFontOfSize:[UIFont smallSystemFontSize]] }
+								   context:nil].size.height;
+
 	return MAX(65,H);
 }
 

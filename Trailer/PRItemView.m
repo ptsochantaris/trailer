@@ -13,7 +13,6 @@ static CGColorRef _highlightColor;
 @implementation PRItemView
 
 #define REMOVE_BUTTON_WIDTH 80.0
-#define DATE_PADDING 16.0
 #define CELL_PADDING 4.0
 
 + (void)initialize
@@ -58,23 +57,8 @@ static CGColorRef _highlightColor;
 			_commentsNew = pullRequest.unreadComments.integerValue;
 		}
 
-		NSString *_dates, *_title;
-		if([Settings shared].showCreatedInsteadOfUpdated)
-		{
-			_dates = [dateFormatter stringFromDate:pullRequest.createdAt];
-		}
-		else
-		{
-			_dates = [dateFormatter stringFromDate:pullRequest.updatedAt];
-		}
-
-		if(pullRequest.userLogin.length)
-		{
-			_dates = [NSString stringWithFormat:@"%@ - %@",pullRequest.userLogin,_dates];
-		}
-
-		_title = pullRequest.title;
-		if(!_title) _title = @"(No title)";
+		NSString *_title = pullRequest.title;
+		NSString *_subtitle = pullRequest.subtitle;
 
 		CGFloat W = MENU_WIDTH-LEFTPADDING;
 		BOOL showUnpin = pullRequest.condition.integerValue!=kPullRequestConditionOpen;
@@ -84,13 +68,17 @@ static CGColorRef _highlightColor;
 		if(showAvatar) W -= (AVATAR_SIZE+AVATAR_PADDING);
 		else W += 4.0;
 
-		CGRect titleSize = [_title boundingRectWithSize:CGSizeMake(W, FLT_MAX)
-												options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
-											 attributes:_titleAttributes];
-		CGFloat H = titleSize.size.height;
-		self.frame = CGRectMake(0, 0, MENU_WIDTH, H+DATE_PADDING+CELL_PADDING);
-		CGRect titleRect = CGRectMake(LEFTPADDING, DATE_PADDING+CELL_PADDING*0.5, W, H);
-		CGRect dateRect = CGRectMake(LEFTPADDING, CELL_PADDING*0.5, W, DATE_PADDING);
+		CGFloat titleHeight = [_title boundingRectWithSize:CGSizeMake(W, FLT_MAX)
+												   options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
+												attributes:_titleAttributes].size.height;
+
+		CGFloat subtitleHeight = [_subtitle boundingRectWithSize:CGSizeMake(W, FLT_MAX)
+														 options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
+													  attributes:_createdAttributes].size.height;
+
+		self.frame = CGRectMake(0, 0, MENU_WIDTH, titleHeight+subtitleHeight+CELL_PADDING);
+		CGRect titleRect = CGRectMake(LEFTPADDING, subtitleHeight+CELL_PADDING*0.5, W, titleHeight);
+		CGRect dateRect = CGRectMake(LEFTPADDING, CELL_PADDING*0.5, W, subtitleHeight);
 		CGRect pinRect = CGRectMake(LEFTPADDING+W, floorf((self.bounds.size.height-24.0)*0.5), REMOVE_BUTTON_WIDTH-10.0, 24.0);
 
 		if(showAvatar)
@@ -128,7 +116,7 @@ static CGColorRef _highlightColor;
 		[self addSubview:title];
 
 		CenteredTextField *subtitle = [[CenteredTextField alloc] initWithFrame:dateRect];
-		subtitle.attributedStringValue = [[NSAttributedString alloc] initWithString:_dates attributes:_createdAttributes];
+		subtitle.attributedStringValue = [[NSAttributedString alloc] initWithString:_subtitle attributes:_createdAttributes];
 		[self addSubview:subtitle];
 
 		CommentCounts *commentCounts = [[CommentCounts alloc] initWithFrame:CGRectMake(0, 0, LEFTPADDING, self.bounds.size.height)

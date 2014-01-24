@@ -27,7 +27,7 @@ CGFloat GLOBAL_SCREEN_SCALE;
 
 	// ONLY FOR DEBUG!
 	//NSArray *allPRs = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.dataManager.managedObjectContext];
-    //for(PullRequest *r in allPRs) [r setTitle:nil];
+    //for(PullRequest *r in allPRs) r.condition = @kPullRequestConditionMerged;
 
 	[self.dataManager postProcessAllPrs];
 
@@ -268,11 +268,14 @@ CGFloat GLOBAL_SCREEN_SCALE;
 
 		if(!success && [UIApplication sharedApplication].applicationState==UIApplicationStateActive)
 		{
-			[[[UIAlertView alloc] initWithTitle:@"Refresh failed"
-										message:@"Loading the latest data from Github failed"
-									   delegate:nil
-							  cancelButtonTitle:@"OK"
-							  otherButtonTitles:nil] show];
+			if(![Settings shared].dontReportRefreshFailures)
+			{
+				[[[UIAlertView alloc] initWithTitle:@"Refresh failed"
+											message:@"Loading the latest data from Github failed"
+										   delegate:nil
+								  cancelButtonTitle:@"OK"
+								  otherButtonTitles:nil] show];
+			}
 		}
 
 		self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:[Settings shared].refreshPeriod

@@ -37,10 +37,18 @@
 @property (weak) IBOutlet NSButton *keepClosedPrs;
 @property (weak) IBOutlet NSButton *dontConfirmRemoveAllMerged;
 @property (weak) IBOutlet NSButton *dontConfirmRemoveAllClosed;
+@property (weak) IBOutlet NSButton *displayRepositoryNames;
+@property (weak) IBOutlet NSButton *includeRepositoriesInFiltering;
+@property (weak) IBOutlet NSButton *dontReportRefreshFailures;
+@property (weak) IBOutlet NSButton *groupByRepo;
 
 // About window
 @property (weak) IBOutlet NSTextField *aboutVersion;
 
+// API widow
+@property (unsafe_unretained) IBOutlet NSWindow *apiSettings;
+@property (weak) IBOutlet NSTextField *apiFrontEnd;
+@property (weak) IBOutlet NSTextField *apiBackEnd;
 
 // Used to track action state
 @property (nonatomic) BOOL opening;

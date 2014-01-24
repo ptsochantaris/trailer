@@ -27,6 +27,7 @@
 @property (nonatomic, retain) NSNumber * userId;
 @property (nonatomic, retain) NSString * userAvatarUrl;
 @property (nonatomic, retain) NSString * userLogin;
+@property (nonatomic, retain) NSString * repoName;
 @property (nonatomic, retain) NSDate * latestReadCommentDate;
 @property (nonatomic, retain) NSNumber *repoId;
 @property (nonatomic, retain) NSNumber *condition;
@@ -53,8 +54,12 @@
 
 - (BOOL)isMine;
 
+- (BOOL)refersToMe;
+
 - (BOOL)commentedByMe;
 
 - (void)postProcess;
+
+- (NSString *)subtitle;
 
 @end

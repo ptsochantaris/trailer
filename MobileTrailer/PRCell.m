@@ -6,7 +6,6 @@
 }
 @end
 
-static NSDateFormatter *itemDateFormatter;
 static NSNumberFormatter *itemCountFormatter;
 
 @implementation PRCell
@@ -35,10 +34,6 @@ static NSNumberFormatter *itemCountFormatter;
 
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
-		itemDateFormatter = [[NSDateFormatter alloc] init];
-		itemDateFormatter.dateStyle = NSDateFormatterShortStyle;
-		itemDateFormatter.timeStyle = NSDateFormatterShortStyle;
-
 		itemCountFormatter = [[NSNumberFormatter alloc] init];
 		itemCountFormatter.numberStyle = NSNumberFormatterDecimalStyle;
 	});
@@ -65,21 +60,15 @@ static NSNumberFormatter *itemCountFormatter;
 
 - (void)setPullRequest:(PullRequest *)pullRequest
 {
+	self.textLabel.text = pullRequest.title;
+	self.detailTextLabel.text = pullRequest.subtitle;
+
 	NSInteger _commentsNew=0;
 	NSInteger _commentsTotal = pullRequest.totalComments.integerValue;
 	if([Settings shared].showCommentsEverywhere || pullRequest.isMine || pullRequest.commentedByMe)
 	{
 		_commentsNew = pullRequest.unreadComments.integerValue;
 	}
-
-	NSString *_dates;
-	if([Settings shared].showCreatedInsteadOfUpdated)
-		_dates = [itemDateFormatter stringFromDate:pullRequest.createdAt];
-	else
-		_dates = [itemDateFormatter stringFromDate:pullRequest.updatedAt];
-
-	if(pullRequest.userLogin.length)
-		_dates = [NSString stringWithFormat:@"%@ - %@",pullRequest.userLogin,_dates];
 
 	readCount.text = [itemCountFormatter stringFromNumber:@(_commentsTotal)];
 	CGSize size = [readCount sizeThatFits:CGSizeMake(200, 14.0)];
@@ -90,12 +79,6 @@ static NSNumberFormatter *itemCountFormatter;
 	unreadCount.text = [itemCountFormatter stringFromNumber:@(_commentsNew)];
 	size = [unreadCount sizeThatFits:CGSizeMake(200, 18.0)];
 	unreadCount.frame = CGRectMake(0, 0, size.width+10.0, 17.0);
-
-	NSString *_title = pullRequest.title;
-	if(!_title) _title = @"(No title)";
-
-	self.textLabel.text = _title;
-	self.detailTextLabel.text = _dates;
 
 	NSString *imagePath = pullRequest.userAvatarUrl;
 	if(imagePath)

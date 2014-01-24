@@ -30,7 +30,6 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 
 	self.githubApiToken.text = [Settings shared].authToken;
 	self.refreshRepoList.enabled = ([Settings shared].authToken.length>0);
-	self.repositories.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
 
 	[self.repositories reloadData];
 
@@ -185,8 +184,22 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-	if([Settings shared].localUser) return [Settings shared].localUser;
-	return nil;
+	NSString *title;
+	if([Settings shared].localUser)
+		title = [Settings shared].localUser;
+	else
+		title = @"";
+
+	switch (section) {
+		case 0:
+			title = [title stringByAppendingString:@" - Parent Repos"];
+			break;
+		default:
+			title = [title stringByAppendingString:@" - Forked Repos"];
+			break;
+	}
+
+	return title;
 }
 
 #pragma mark - Fetched results controller
@@ -206,14 +219,14 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
     [fetchRequest setFetchBatchSize:20];
 
     // Edit the sort key as appropriate.
-    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"fullName" ascending:YES];
-    [fetchRequest setSortDescriptors:@[sortDescriptor]];
+    [fetchRequest setSortDescriptors:@[[[NSSortDescriptor alloc] initWithKey:@"fork" ascending:YES],
+									   [[NSSortDescriptor alloc] initWithKey:@"fullName" ascending:YES]]];
 
     // Edit the section name key path and cache name if appropriate.
     // nil for section name key path means "no sections".
     NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
 																								managedObjectContext:[AppDelegate shared].dataManager.managedObjectContext
-																								  sectionNameKeyPath:nil
+																								  sectionNameKeyPath:@"fork"
 																										   cacheName:nil];
     aFetchedResultsController.delegate = self;
     self.fetchedResultsController = aFetchedResultsController;
@@ -304,16 +317,31 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 																delegate:self
 													   cancelButtonTitle:@"Cancel"
 												  destructiveButtonTitle:nil
-													   otherButtonTitles:@"Select All", @"Unselect All", nil];
+													   otherButtonTitles:@"Select All", @"Select All Parents", @"Unselect All", nil];
 	[selectionSheet showFromBarButtonItem:sender animated:YES];
 }
 
 - (void)actionSheet:(UIActionSheet *)actionSheet willDismissWithButtonIndex:(NSInteger)buttonIndex
 {
-	if(buttonIndex==2) return;
-	NSNumber *selection = @(buttonIndex==0);
-	NSArray *allRepos = [Repo allReposSortedByField:nil withTitleFilter:nil inMoc:[AppDelegate shared].dataManager.managedObjectContext];
-	for(Repo *r in allRepos) r.active = selection;
+	if(buttonIndex==3) return;
+	NSArray *allRepos = [Repo allItemsOfType:@"Repo" inMoc:[AppDelegate shared].dataManager.managedObjectContext];
+	switch (buttonIndex) {
+		case 0:
+		{
+			for(Repo *r in allRepos) r.active = @YES;
+			break;
+		}
+		case 1:
+		{
+			for(Repo *r in allRepos) if(!r.fork.boolValue) r.active = @YES;
+			break;
+		}
+		case 2:
+		{
+			for(Repo *r in allRepos) r.active = @NO;
+			break;
+		}
+	}
 	[AppDelegate shared].preferencesDirty = YES;
 }
 
@@ -332,13 +360,13 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 
 - (void)viewTokens
 {
-	targetUrl = @"https://github.com/settings/applications";
+	targetUrl = [NSString stringWithFormat:@"https://%@/settings/applications",[Settings shared].apiFrontEnd];
 	[self performSegueWithIdentifier:@"openGithub" sender:self];
 }
 
 - (void)createToken
 {
-	targetUrl = @"https://github.com/settings/tokens/new";
+	targetUrl = [NSString stringWithFormat:@"https://%@/settings/tokens/new",[Settings shared].apiFrontEnd];
 	[self performSegueWithIdentifier:@"openGithub" sender:self];
 }
 

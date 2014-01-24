@@ -31,9 +31,10 @@ static AppDelegate *_static_shared_ref;
 
 	[self setupSortMethodMenu];
 
-    // DEBUG
-    //NSArray *allPRs = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.dataManager.managedObjectContext];
-    //if(allPRs.count) [allPRs[0] setTitle:nil];
+	// ONLY FOR DEBUG!
+	//NSArray *allPRs = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.dataManager.managedObjectContext];
+    //[[allPRs objectAtIndex:0] setCondition:@kPullRequestConditionMerged];
+    //[[allPRs objectAtIndex:1] setCondition:@kPullRequestConditionClosed];
 
 	[self.dataManager postProcessAllPrs];
 	[self updateMenu];
@@ -91,6 +92,25 @@ static AppDelegate *_static_shared_ref;
 {
 	BOOL dontConfirm = (sender.integerValue==1);
     [Settings shared].dontAskBeforeWipingMerged = dontConfirm;
+}
+
+- (IBAction)displayRepositoryNameSelected:(NSButton *)sender
+{
+	BOOL setting = (sender.integerValue==1);
+	[Settings shared].showReposInName = setting;
+	[self updateMenu];
+}
+
+- (IBAction)includeRepositoriesInfilterSelected:(NSButton *)sender
+{
+	BOOL setting = (sender.integerValue==1);
+	[Settings shared].includeReposInFilter = setting;
+}
+
+- (IBAction)dontReportRefreshFailuresSelected:(NSButton *)sender
+{
+	BOOL setting = (sender.integerValue==1);
+	[Settings shared].dontReportRefreshFailures = setting;
 }
 
 - (IBAction)dontConfirmRemoveAllClosedSelected:(NSButton *)sender
@@ -167,6 +187,12 @@ static AppDelegate *_static_shared_ref;
 	[self updateMenu];
 }
 
+- (IBAction)groupbyRepoSelected:(NSButton *)sender
+{
+	BOOL setting = (sender.integerValue==1);
+	[Settings shared].groupByRepo = setting;
+	[self updateMenu];
+}
 
 - (IBAction)launchAtStartSelected:(NSButton *)sender
 {
@@ -431,7 +457,7 @@ static AppDelegate *_static_shared_ref;
             }
 		}
 	}
-    [self statusItemTapped:nil];
+    if(!self.mainMenu.isVisible) [self statusItemTapped:nil];
 }
 
 - (void)removeAllMergedRequests
@@ -552,6 +578,14 @@ static AppDelegate *_static_shared_ref;
 
 	[self.api fetchRepositoriesAndCallback:^(BOOL success) {
 		[self completeRefresh];
+		if(!success)
+		{
+			NSAlert *alert = [[NSAlert alloc] init];
+			[alert setMessageText:@"Error"];
+			[alert setInformativeText:@"Could not refresh repository list, please ensure that the token you are using is valid"];
+			[alert addButtonWithTitle:@"OK"];
+			[alert runModal];
+		}
 	}];
 }
 
@@ -628,6 +662,21 @@ static AppDelegate *_static_shared_ref;
     else
         [self.dontConfirmRemoveAllClosed setIntegerValue:0];
 
+	if([Settings shared].dontReportRefreshFailures)
+		[self.dontReportRefreshFailures setIntegerValue:1];
+	else
+		[self.dontReportRefreshFailures setIntegerValue:0];
+
+	if([Settings shared].showReposInName)
+		[self.displayRepositoryNames setIntegerValue:1];
+	else
+		[self.displayRepositoryNames setIntegerValue:0];
+
+	if([Settings shared].includeReposInFilter)
+		[self.includeRepositoriesInFiltering setIntegerValue:1];
+	else
+		[self.includeRepositoriesInFiltering setIntegerValue:0];
+
     if([Settings shared].dontAskBeforeWipingMerged)
         [self.dontConfirmRemoveAllMerged setIntegerValue:1];
     else
@@ -673,6 +722,11 @@ static AppDelegate *_static_shared_ref;
 	else
 		[self.showCreationDates setIntegerValue:0];
 
+	if([Settings shared].groupByRepo)
+		[self.groupByRepo setIntegerValue:1];
+	else
+		[self.groupByRepo setIntegerValue:0];
+
 	[self.refreshDurationStepper setFloatValue:[Settings shared].refreshPeriod];
 	[self refreshDurationChanged:nil];
 
@@ -682,52 +736,109 @@ static AppDelegate *_static_shared_ref;
 
 - (IBAction)createTokenSelected:(NSButton *)sender
 {
-	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://github.com/settings/tokens/new"]];
+	NSString *address = [NSString stringWithFormat:@"https://%@/settings/tokens/new",[Settings shared].apiFrontEnd];
+	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:address]];
 }
 
 - (IBAction)viewExistingTokensSelected:(NSButton *)sender
 {
-	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://github.com/settings/applications"]];
+	NSString *address = [NSString stringWithFormat:@"https://%@/settings/applications",[Settings shared].apiFrontEnd];
+	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:address]];
 }
 
 /////////////////////////////////// Repo table
 
 - (NSArray *)getFileterdRepos
 {
-	NSArray *allRepos = [Repo allReposSortedByField:@"fullName"
-									withTitleFilter:self.repoFilter.stringValue
-											  inMoc:self.dataManager.managedObjectContext];
-	return allRepos;
+	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"Repo"];
+
+	NSString *filter = self.repoFilter.stringValue;
+	if(filter.length)
+		f.predicate = [NSPredicate predicateWithFormat:@"fullName contains [cd] %@",filter];
+
+	f.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"fork" ascending:YES],
+						  [NSSortDescriptor sortDescriptorWithKey:@"fullName" ascending:YES]];
+
+	return [self.dataManager.managedObjectContext executeFetchRequest:f error:nil];
+}
+
+- (NSUInteger)countParentRepos
+{
+	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"Repo"];
+
+	NSString *filter = self.repoFilter.stringValue;
+	if(filter.length)
+		f.predicate = [NSPredicate predicateWithFormat:@"fork == NO and fullName contains [cd] %@",filter];
+	else
+		f.predicate = [NSPredicate predicateWithFormat:@"fork == NO"];
+
+	return [self.dataManager.managedObjectContext countForFetchRequest:f error:nil];
+}
+
+- (Repo *)repoForRow:(NSUInteger)row
+{
+	if(row>[self countParentRepos]) row--;
+	return [self getFileterdRepos][row-1];
 }
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-	NSArray *allRepos = [self getFileterdRepos];
-	Repo *r = allRepos[row];
-
 	NSButtonCell *cell = [tableColumn dataCellForRow:row];
-	cell.title = r.fullName;
-	if(r.active.boolValue)
+	if([self tableView:tableView isGroupRow:row])
 	{
-		cell.state = NSOnState;
+		[cell setAlignment:NSCenterTextAlignment];
+		[cell setImagePosition:NSNoImage];
+
+		if(row==0)
+		{
+			cell.title = @"Parent Repositories";
+		}
+		else
+		{
+			cell.title = @"Forked Repositories";
+		}
+
+		cell.state = NSMixedState;
+		[cell setEnabled:NO];
 	}
 	else
 	{
-		cell.state = NSOffState;
+		[cell setAlignment:NSLeftTextAlignment];
+		[cell setImagePosition:NSImageLeft];
+
+		Repo *r = [self repoForRow:row];
+
+		cell.title = r.fullName;
+		if(r.active.boolValue)
+		{
+			cell.state = NSOnState;
+		}
+		else
+		{
+			cell.state = NSOffState;
+		}
+		[cell setEnabled:YES];
 	}
 	return cell;
 }
 
+- (BOOL)tableView:(NSTableView *)tableView isGroupRow:(NSInteger)row
+{
+	return (row == 0 || row == [self countParentRepos]+1);
+}
+
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-	return [self getFileterdRepos].count;
+	return [self getFileterdRepos].count+2;
 }
 
 - (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-	NSArray *allRepos = [self getFileterdRepos];
-	Repo *r = allRepos[row];
-	r.active = @([object boolValue]);
+	if(![self tableView:tableView isGroupRow:row])
+	{
+		Repo *r = [self repoForRow:row];
+		r.active = @([object boolValue]);
+	}
 	[self.dataManager saveDB];
 	self.preferencesDirty = YES;
 }
@@ -781,6 +892,17 @@ static AppDelegate *_static_shared_ref;
 				[self startRefreshIfItIsDue];
 			}
 		}
+	}
+	else if([notification object]==self.apiSettings)
+	{
+		NSString *frontEnd = [self.apiFrontEnd stringValue];
+		NSString *backEnd = [self.apiBackEnd stringValue];
+		frontEnd = [frontEnd stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+		backEnd = [backEnd stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+		if(frontEnd.length==0) frontEnd = nil;
+		if(backEnd.length==0) backEnd = nil;
+		[Settings shared].apiFrontEnd = frontEnd;
+		[Settings shared].apiBackEnd = backEnd;
 	}
 }
 
@@ -957,7 +1079,7 @@ static AppDelegate *_static_shared_ref;
 	DLog(@"Updating menu, %@ total PRs",countString);
 
 	NSDictionary *attributes;
-	if(self.lastUpdateFailed)
+	if(self.lastUpdateFailed && (![Settings shared].dontReportRefreshFailures))
 	{
 		countString = @"X";
 		attributes = @{
@@ -998,13 +1120,27 @@ static AppDelegate *_static_shared_ref;
 	[self sizeMenuAndShow:NO];
 }
 
+
+- (IBAction)selectParentsSelected:(NSButton *)sender
+{
+	NSArray *allRepos = [self getFileterdRepos];
+
+	for(Repo *r in allRepos)
+		if(!r.fork.boolValue)
+			r.active = @YES;
+
+	[self.dataManager saveDB];
+	[self.projectsTable reloadData];
+	self.preferencesDirty = YES;
+}
+
 - (IBAction)selectAllSelected:(NSButton *)sender
 {
 	NSArray *allRepos = [self getFileterdRepos];
+
 	for(Repo *r in allRepos)
-	{
 		r.active = @YES;
-	}
+
 	[self.dataManager saveDB];
 	[self.projectsTable reloadData];
 	self.preferencesDirty = YES;
@@ -1013,10 +1149,10 @@ static AppDelegate *_static_shared_ref;
 - (IBAction)clearallSelected:(NSButton *)sender
 {
 	NSArray *allRepos = [self getFileterdRepos];
+
 	for(Repo *r in allRepos)
-	{
 		r.active = @NO;
-	}
+
 	[self.dataManager saveDB];
 	[self.projectsTable reloadData];
 	self.preferencesDirty = YES;
@@ -1107,6 +1243,23 @@ static AppDelegate *_static_shared_ref;
 			}
 		}
 	}
+}
+
+- (IBAction)apiServerSelected:(NSButton *)sender
+{
+	[self.apiFrontEnd setStringValue:[Settings shared].apiFrontEnd];
+	[self.apiBackEnd setStringValue:[Settings shared].apiBackEnd];
+
+	[self.apiSettings setLevel:NSFloatingWindowLevel];
+	[self.apiSettings makeKeyAndOrderFront:self];
+}
+
+- (IBAction)apiRestoreDefaultsSelected:(NSButton *)sender
+{
+	[Settings shared].apiFrontEnd = nil;
+	[Settings shared].apiBackEnd = nil;
+	[self.apiFrontEnd setStringValue:[Settings shared].apiFrontEnd];
+	[self.apiBackEnd setStringValue:[Settings shared].apiBackEnd];
 }
 
 @end

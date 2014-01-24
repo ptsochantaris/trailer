@@ -136,6 +136,7 @@
 /* Begin PBXFileReference section */
 		16075A9517EC7492000D86FD /* API.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = API.h; path = Trailer/API.h; sourceTree = "<group>"; };
 		16075A9617EC7492000D86FD /* API.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = API.m; path = Trailer/API.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		16096DC518927C4C0016357A /* Trailer 6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Trailer 6.xcdatamodel"; sourceTree = "<group>"; };
 		160C5AC41867551500142482 /* CenteredTextFieldCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CenteredTextFieldCell.h; sourceTree = "<group>"; };
 		160C5AC51867551500142482 /* CenteredTextFieldCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CenteredTextFieldCell.m; sourceTree = "<group>"; };
 		160C5ACD18675E9300142482 /* CenteredTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CenteredTextField.h; sourceTree = "<group>"; };
@@ -306,7 +307,7 @@
 			path = Trailer;
 			sourceTree = "<group>";
 		};
-		1628A6BA18789E73005EDA69 /* MobileTrailer */ = {
+		1628A6BA18789E73005EDA69 /* PocketTrailer */ = {
 			isa = PBXGroup;
 			children = (
 				16B069721882EA530053620E /* Extensions */,
@@ -319,6 +320,7 @@
 				1628A6D518789E73005EDA69 /* Images.xcassets */,
 				1628A6BB18789E73005EDA69 /* Supporting Files */,
 			);
+			name = PocketTrailer;
 			path = MobileTrailer;
 			sourceTree = "<group>";
 		};
@@ -333,12 +335,13 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		1628A6E218789E73005EDA69 /* MobileTrailerTests */ = {
+		1628A6E218789E73005EDA69 /* PocketTrailerTests */ = {
 			isa = PBXGroup;
 			children = (
 				1628A6E818789E73005EDA69 /* MobileTrailerTests.m */,
 				1628A6E318789E73005EDA69 /* Supporting Files */,
 			);
+			name = PocketTrailerTests;
 			path = MobileTrailerTests;
 			sourceTree = "<group>";
 		};
@@ -363,8 +366,8 @@
 		1628A6F118789E9D005EDA69 /* iOS */ = {
 			isa = PBXGroup;
 			children = (
-				1628A6BA18789E73005EDA69 /* MobileTrailer */,
-				1628A6E218789E73005EDA69 /* MobileTrailerTests */,
+				1628A6BA18789E73005EDA69 /* PocketTrailer */,
+				1628A6E218789E73005EDA69 /* PocketTrailerTests */,
 			);
 			name = iOS;
 			sourceTree = "<group>";
@@ -616,9 +619,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		1628A6B018789E73005EDA69 /* iTrailer */ = {
+		1628A6B018789E73005EDA69 /* PocketTrailer */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 1628A6EE18789E74005EDA69 /* Build configuration list for PBXNativeTarget "iTrailer" */;
+			buildConfigurationList = 1628A6EE18789E74005EDA69 /* Build configuration list for PBXNativeTarget "PocketTrailer" */;
 			buildPhases = (
 				1628A6AD18789E73005EDA69 /* Sources */,
 				1628A6AE18789E73005EDA69 /* Frameworks */,
@@ -628,7 +631,7 @@
 			);
 			dependencies = (
 			);
-			name = iTrailer;
+			name = PocketTrailer;
 			productName = MobileTrailer;
 			productReference = 1628A6B118789E73005EDA69 /* iTrailer.app */;
 			productType = "com.apple.product-type.application";
@@ -697,7 +700,7 @@
 				ORGANIZATIONNAME = HouseTrip;
 				TargetAttributes = {
 					1628A6B018789E73005EDA69 = {
-						DevelopmentTeam = 47UMK8NJEK;
+						DevelopmentTeam = X727JSJUGJ;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
 								enabled = 1;
@@ -730,7 +733,7 @@
 			targets = (
 				168BC6A917EC2DF000BC4584 /* Trailer */,
 				168BC6CD17EC2DF000BC4584 /* TrailerTests */,
-				1628A6B018789E73005EDA69 /* iTrailer */,
+				1628A6B018789E73005EDA69 /* PocketTrailer */,
 				1628A6DA18789E73005EDA69 /* MobileTrailerTests */,
 			);
 		};
@@ -879,7 +882,7 @@
 /* Begin PBXTargetDependency section */
 		1628A6E118789E73005EDA69 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 1628A6B018789E73005EDA69 /* iTrailer */;
+			target = 1628A6B018789E73005EDA69 /* PocketTrailer */;
 			targetProxy = 1628A6E018789E73005EDA69 /* PBXContainerItemProxy */;
 		};
 		168BC6D317EC2DF000BC4584 /* PBXTargetDependency */ = {
@@ -956,7 +959,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
@@ -986,7 +989,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
@@ -1205,7 +1208,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		1628A6EE18789E74005EDA69 /* Build configuration list for PBXNativeTarget "iTrailer" */ = {
+		1628A6EE18789E74005EDA69 /* Build configuration list for PBXNativeTarget "PocketTrailer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1628A6EA18789E74005EDA69 /* Debug */,
@@ -1256,13 +1259,14 @@
 		168BC6C517EC2DF000BC4584 /* Trailer.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				16096DC518927C4C0016357A /* Trailer 6.xcdatamodel */,
 				164976221864935200C13A6B /* Trailer 3.xcdatamodel */,
 				169CEB99187988D00083A068 /* Trailer 4.xcdatamodel */,
 				16AD4E6D18896770001C17B7 /* Trailer 5.xcdatamodel */,
 				1617BEEE183F9C4F00E89BB2 /* Trailer 2.xcdatamodel */,
 				168BC6C617EC2DF000BC4584 /* Trailer.xcdatamodel */,
 			);
-			currentVersion = 16AD4E6D18896770001C17B7 /* Trailer 5.xcdatamodel */;
+			currentVersion = 16096DC518927C4C0016357A /* Trailer 6.xcdatamodel */;
 			path = Trailer.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

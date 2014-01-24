@@ -26,11 +26,14 @@
 		else
 		{
 			PullRequest *r = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:mainContext];
-			if([Settings shared].showCommentsEverywhere || r.isMine || r.commentedByMe)
+			if(r.postSyncAction.integerValue == kPostSyncNoteUpdated)
 			{
-				if(![c.userId.stringValue isEqualToString:[Settings shared].localUserId])
+				if([Settings shared].showCommentsEverywhere || r.isMine || r.commentedByMe)
 				{
-					[[AppDelegate shared] postNotificationOfType:kNewComment forItem:c];
+					if(![c.userId.stringValue isEqualToString:[Settings shared].localUserId])
+					{
+						[[AppDelegate shared] postNotificationOfType:kNewComment forItem:c];
+					}
 				}
 			}
 		}
@@ -136,7 +139,7 @@
 		if(![self addStorePath:sqlStore toCoordinator:coordinator])
 		{
 			DLog(@"Failed to migrate/load DB store - will nuke it and retry");
-			[[NSFileManager defaultManager] removeItemAtURL:sqlStore error:nil];
+			[self removeDatabaseFiles];
 			if(![self addStorePath:sqlStore toCoordinator:coordinator])
 			{
 				DLog(@"Catastrophic failure, app is probably corrupted and needs reinstall");
