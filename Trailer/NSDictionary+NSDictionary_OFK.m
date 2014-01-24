@@ -1,6 +1,3 @@
-//
-//  NSDictionary+NSDictionary_OFK.m
-//
 
 @implementation NSDictionary (NSDictionary_OFK)
 

@@ -26,19 +26,24 @@
 {
 	PullRequest *p = [DataItem itemWithInfo:info type:@"PullRequest" moc:moc];
 
-	p.url = info[@"url"];
-	p.webUrl = info[@"html_url"];
-	p.number = info[@"number"];
-	p.state = info[@"state"];
-	p.title = info[@"title"];
-	p.body = info[@"body"];
-	p.userId = info[@"user"][@"id"];
-	p.userLogin = info[@"user"][@"login"];
-	p.userAvatarUrl = info[@"user"][@"avatar_url"];
-	p.repoId = info[@"base"][@"repo"][@"id"];
+	p.url = [info ofk:@"url"];
+	p.webUrl = [info ofk:@"html_url"];
+	p.number = [info ofk:@"number"];
+	p.state = [info ofk:@"state"];
+	p.title = [info ofk:@"title"];
+	p.body = [info ofk:@"body"];
 
-	p.issueCommentLink = info[@"_links"][@"comments"][@"href"];
-	p.reviewCommentLink = info[@"_links"][@"review_comments"][@"href"];
+	NSDictionary *userInfo = [info ofk:@"user"];
+	p.userId = [userInfo ofk:@"id"];
+	p.userLogin = [userInfo ofk:@"login"];
+	p.userAvatarUrl = [userInfo ofk:@"avatar_url"];
+
+	p.repoId = [[[info ofk:@"base"] ofk:@"repo"] ofk:@"id"];
+
+	NSDictionary *linkInfo = [info ofk:@"_links"];
+	p.issueCommentLink = [[linkInfo ofk:@"comments"] ofk:@"href"];
+	p.reviewCommentLink = [[linkInfo ofk:@"review_comments"] ofk:@"href"];
+	
 	p.condition = @kPullRequestConditionOpen;
 
 	return p;

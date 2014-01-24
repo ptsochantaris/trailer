@@ -35,8 +35,8 @@ static NSDateFormatter *_syncDateFormatter;
 
 +(id)itemWithInfo:(NSDictionary*)info type:(NSString*)type moc:(NSManagedObjectContext*)moc
 {
-	NSNumber *serverId = info[@"id"];
-	NSDate *updatedDate = [_syncDateFormatter dateFromString:info[@"updated_at"]];
+	NSNumber *serverId = [info ofk:@"id"];
+	NSDate *updatedDate = [_syncDateFormatter dateFromString:[info ofk:@"updated_at"]];
 
 	DataItem *existingItem = [DataItem itemOfType:type serverId:serverId moc:moc];
 	if(!existingItem)
@@ -44,7 +44,7 @@ static NSDateFormatter *_syncDateFormatter;
 		DLog(@"Creating new %@: %@",type,serverId);
 		existingItem = [NSEntityDescription insertNewObjectForEntityForName:type inManagedObjectContext:moc];
 		existingItem.serverId = serverId;
-		existingItem.createdAt = [_syncDateFormatter dateFromString:info[@"created_at"]];
+		existingItem.createdAt = [_syncDateFormatter dateFromString:[info ofk:@"created_at"]];
 		existingItem.postSyncAction = @(kPostSyncNoteNew);
 	}
 	else if([updatedDate compare:existingItem.updatedAt]==NSOrderedDescending)

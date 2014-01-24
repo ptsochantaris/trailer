@@ -80,9 +80,9 @@
 			case 2:
 			{
 				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-					cell.textLabel.text = [NSString stringWithFormat:@"Display new badges and alerts for all PRs"];
+					cell.textLabel.text = [NSString stringWithFormat:@"Display comment badges and alerts for all PRs"];
 				else
-					cell.textLabel.text = [NSString stringWithFormat:@"Display new badges\nand alerts for all PRs"];
+					cell.textLabel.text = [NSString stringWithFormat:@"Display comment badges\nand alerts for all PRs"];
 				if([Settings shared].showCommentsEverywhere) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
@@ -110,6 +110,24 @@
 				if([Settings shared].alsoKeepClosedPrs) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
+            case 6:
+            {
+				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+					cell.textLabel.text = [NSString stringWithFormat:@"Don't confirm removing all merged PRs"];
+				else
+					cell.textLabel.text = [NSString stringWithFormat:@"Don't confirm removing\nall merged PRs"];
+				if([Settings shared].dontAskBeforeWipingMerged) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				break;
+            }
+            case 7:
+            {
+				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+					cell.textLabel.text = [NSString stringWithFormat:@"Don't confirm removing all closed PRs"];
+				else
+					cell.textLabel.text = [NSString stringWithFormat:@"Don't confirm removing\nall closed PRs"];
+				if([Settings shared].dontAskBeforeWipingClosed) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				break;
+            }
 		}
 	}
 	else if(indexPath.section==2)
@@ -209,6 +227,16 @@
 				[Settings shared].alsoKeepClosedPrs = ![Settings shared].alsoKeepClosedPrs;
 				break;
 			}
+			case 6:
+			{
+				[Settings shared].dontAskBeforeWipingMerged = ![Settings shared].dontAskBeforeWipingMerged;
+				break;
+			}
+			case 7:
+			{
+				[Settings shared].dontAskBeforeWipingClosed = ![Settings shared].dontAskBeforeWipingClosed;
+				break;
+			}
 		}
 		[settingsChangedAnnounceTimer push];
 	}
@@ -244,7 +272,7 @@
 {
     switch (section) {
 		case 0: return 2; // refresh period, background refresh
-		case 1: return 6; // toggled options
+		case 1: return 8; // toggled options
 		case 2: return 2; // sorting category, sorting direction
 	}
 	return 0;

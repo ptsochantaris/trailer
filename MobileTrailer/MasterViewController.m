@@ -79,20 +79,34 @@
 
 - (void)removeAllMerged
 {
-    [[[UIAlertView alloc] initWithTitle:@"Sure?"
-                                message:@"Remove all PRs in the Merged section?"
-                               delegate:self
-                      cancelButtonTitle:@"No"
-                      otherButtonTitles:@"Yes", nil] show];
+    if([Settings shared].dontAskBeforeWipingMerged)
+    {
+        [self removeAllMergedConfirmed];
+    }
+    else
+    {
+        [[[UIAlertView alloc] initWithTitle:@"Sure?"
+                                    message:@"Remove all PRs in the Merged section?"
+                                   delegate:self
+                          cancelButtonTitle:@"No"
+                          otherButtonTitles:@"Yes", nil] show];
+    }
 }
 
 - (void)removeAllClosed
 {
-    [[[UIAlertView alloc] initWithTitle:@"Sure?"
-                                message:@"Remove all PRs in the Closed section?"
-                               delegate:self
-                      cancelButtonTitle:@"No"
-                      otherButtonTitles:@"Yes", nil] show];
+    if([Settings shared].dontAskBeforeWipingClosed)
+    {
+        [self removeAllClosedConfirmed];
+    }
+    else
+    {
+        [[[UIAlertView alloc] initWithTitle:@"Sure?"
+                                    message:@"Remove all PRs in the Closed section?"
+                                   delegate:self
+                          cancelButtonTitle:@"No"
+                          otherButtonTitles:@"Yes", nil] show];
+    }
 }
 
 - (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
@@ -320,10 +334,11 @@
 	CGFloat w = 208;
 	if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) w = 227;
 
-	return [pr.title boundingRectWithSize:CGSizeMake(w, CGFLOAT_MAX)
-								  options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
-							   attributes:@{ NSFontAttributeName:[UIFont systemFontOfSize:[UIFont labelFontSize]] }
-								  context:nil].size.height+40;
+	CGFloat H = [pr.title boundingRectWithSize:CGSizeMake(w, CGFLOAT_MAX)
+									   options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
+									attributes:@{ NSFontAttributeName:[UIFont systemFontOfSize:[UIFont labelFontSize]] }
+									   context:nil].size.height+40;
+	return MAX(65,H);
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath

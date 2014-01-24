@@ -35,6 +35,8 @@
 @property (weak) IBOutlet NSButton *hideAvatars;
 @property (weak) IBOutlet NSButton *autoParticipateWhenMentioned;
 @property (weak) IBOutlet NSButton *keepClosedPrs;
+@property (weak) IBOutlet NSButton *dontConfirmRemoveAllMerged;
+@property (weak) IBOutlet NSButton *dontConfirmRemoveAllClosed;
 
 // About window
 @property (weak) IBOutlet NSTextField *aboutVersion;

@@ -17,17 +17,20 @@
 {
 	PRComment *c = [DataItem itemWithInfo:info type:@"PRComment" moc:moc];
 
-	c.body = info[@"body"];
+	c.body = [info ofk:@"body"];
 	c.position = [info ofk:@"position"];
-	c.body = info[@"body"];
-	c.path = info[@"path"];
-	c.url = info[@"url"];
-	c.userName = info[@"user"][@"userName"];
-	c.userId = info[@"user"][@"id"];
-	c.url = info[@"_links"][@"self"][@"href"];
-	c.pullRequestUrl = info[@"_links"][@"pull_request"][@"href"];
-	c.webUrl = info[@"html_url"];
-	if(!c.webUrl) c.webUrl = info[@"_links"][@"html"][@"href"];
+	c.path = [info ofk:@"path"];
+	c.url = [info ofk:@"url"];
+	c.webUrl = [info ofk:@"html_url"];
+
+	NSDictionary *userInfo = [info ofk:@"user"];
+	c.userName = [userInfo ofk:@"userName"];
+	c.userId = [userInfo ofk:@"id"];
+
+	NSDictionary *links = [info ofk:@"links"];
+	c.url = [[links ofk:@"self"] ofk:@"href"];
+	c.pullRequestUrl = [[links ofk:@"pull_request"] ofk:@"href"];
+	if(!c.webUrl) c.webUrl = [[links ofk:@"html"] ofk:@"href"];
 
 	return c;
 }

@@ -26,8 +26,8 @@ CGFloat GLOBAL_SCREEN_SCALE;
 	self.api = [[API alloc] init];
 
 	// ONLY FOR DEBUG!
-	// NSArray *allPRs = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.dataManager.managedObjectContext];
-	// if(allPRs.count) [allPRs[0] setCondition:@kPullRequestConditionClosed];
+	//NSArray *allPRs = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.dataManager.managedObjectContext];
+    //for(PullRequest *r in allPRs) [r setTitle:nil];
 
 	[self.dataManager postProcessAllPrs];
 

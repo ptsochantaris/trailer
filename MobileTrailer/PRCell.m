@@ -91,7 +91,10 @@ static NSNumberFormatter *itemCountFormatter;
 	size = [unreadCount sizeThatFits:CGSizeMake(200, 18.0)];
 	unreadCount.frame = CGRectMake(0, 0, size.width+10.0, 17.0);
 
-	self.textLabel.text = pullRequest.title;
+	NSString *_title = pullRequest.title;
+	if(!_title) _title = @"(No title)";
+
+	self.textLabel.text = _title;
 	self.detailTextLabel.text = _dates;
 
 	NSString *imagePath = pullRequest.userAvatarUrl;
