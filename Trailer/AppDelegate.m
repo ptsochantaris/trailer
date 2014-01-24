@@ -1220,12 +1220,10 @@ static AppDelegate *_static_shared_ref;
 - (IBAction)testApiServerSelected:(NSButton *)sender
 {
 	[self copyApiInfo];
-	[self.githubTokenHolder setStringValue:@""];
-	[self tokenChanged];
 	[sender setEnabled:NO];
 
 	[self.api getRateLimitAndCallback:^(long long remaining, long long limit, long long reset) {
-		if(remaining<0)
+		if(reset<0)
 		{
 			NSAlert *alert = [[NSAlert alloc] init];
 			[alert setMessageText:[NSString stringWithFormat:@"The test request failed to https://%@/%@",[Settings shared].apiBackEnd,[Settings shared].apiPath]];

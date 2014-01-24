@@ -512,7 +512,13 @@
 			 long long epochSeconds = [[response allHeaderFields][@"X-RateLimit-Reset"] longLongValue];
 			 if(callback) callback(requestsRemaining,requestLimit,epochSeconds);
 		 } failure:^(NSHTTPURLResponse *response, NSError *error) {
-			 if(callback) callback(-1, -1, -1);
+			 if(callback)
+			 {
+				 if(response.statusCode==404)
+					 callback(10000,10000,0);
+				 else
+					 callback(-1, -1, -1);
+			 }
 		 }];
 }
 
@@ -575,6 +581,7 @@
 		NSError *error;
 		NSHTTPURLResponse *response;
 		NSData *data = [NSURLConnection sendSynchronousRequest:r returningResponse:&response error:&error];
+
 		if(!error && response.statusCode>299)
 		{
 			error = [NSError errorWithDomain:@"Error response received" code:response.statusCode userInfo:nil];
@@ -596,8 +603,9 @@
 			{
 				id parsedData = nil;
 				if(data.length) parsedData = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+
 				dispatch_async(dispatch_get_main_queue(), ^{
-					successCallback(response,parsedData);
+					successCallback(response, parsedData);
 				});
 			}
 		}
