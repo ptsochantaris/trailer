@@ -76,6 +76,12 @@
 				if([Settings shared].dontReportRefreshFailures) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
             }
+			case 2:
+            {
+				cell.textLabel.text = [NSString stringWithFormat:@"Hide 'All PRs' section"];
+				if([Settings shared].hideAllPrsSection) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				break;
+            }
 		}
 	}
 	else if(indexPath.section==2)
@@ -260,6 +266,11 @@
 				[Settings shared].dontReportRefreshFailures = ![Settings shared].dontReportRefreshFailures;
 				break;
 			}
+			case 2:
+			{
+				[Settings shared].hideAllPrsSection = ![Settings shared].hideAllPrsSection;
+				break;
+			}
 		}
 		[settingsChangedAnnounceTimer push];
 	}
@@ -374,7 +385,7 @@
 {
     switch (section) {
 		case 0: return 2; // refresh period, background refresh
-		case 1: return 2; // toggled options
+		case 1: return 3; // toggled options
 		case 2: return 3; // toggled options
 		case 3: return 2; // toggled options
 		case 4: return 2; // toggled options

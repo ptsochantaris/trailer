@@ -136,7 +136,7 @@
 /* Begin PBXFileReference section */
 		16075A9517EC7492000D86FD /* API.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = API.h; path = Trailer/API.h; sourceTree = "<group>"; };
 		16075A9617EC7492000D86FD /* API.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = API.m; path = Trailer/API.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
-		16096DC518927C4C0016357A /* Trailer 6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Trailer 6.xcdatamodel"; sourceTree = "<group>"; };
+		16096DC518927C4C0016357A /* Trailer 6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 6.xcdatamodel"; sourceTree = "<group>"; };
 		160C5AC41867551500142482 /* CenteredTextFieldCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CenteredTextFieldCell.h; sourceTree = "<group>"; };
 		160C5AC51867551500142482 /* CenteredTextFieldCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CenteredTextFieldCell.m; sourceTree = "<group>"; };
 		160C5ACD18675E9300142482 /* CenteredTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CenteredTextField.h; sourceTree = "<group>"; };
@@ -155,7 +155,7 @@
 		161CA3C917F5B1F300F4AF6C /* PRComment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PRComment.m; sourceTree = "<group>"; };
 		161CA3CC17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSDictionary+NSDictionary_OFK.m"; path = "Trailer/NSDictionary+NSDictionary_OFK.m"; sourceTree = "<group>"; };
 		161CA3CD17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSDictionary+NSDictionary_OFK.h"; path = "Trailer/NSDictionary+NSDictionary_OFK.h"; sourceTree = "<group>"; };
-		1628A6B118789E73005EDA69 /* iTrailer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iTrailer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1628A6B118789E73005EDA69 /* PocketTrailer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PocketTrailer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1628A6B218789E73005EDA69 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1628A6B418789E73005EDA69 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		1628A6BC18789E73005EDA69 /* MobileTrailer-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "MobileTrailer-Info.plist"; sourceTree = "<group>"; };
@@ -464,7 +464,7 @@
 			children = (
 				168BC6AA17EC2DF000BC4584 /* Trailer.app */,
 				168BC6CE17EC2DF000BC4584 /* TrailerTests.xctest */,
-				1628A6B118789E73005EDA69 /* iTrailer.app */,
+				1628A6B118789E73005EDA69 /* PocketTrailer.app */,
 				1628A6DB18789E73005EDA69 /* MobileTrailerTests.xctest */,
 			);
 			name = Products;
@@ -633,7 +633,7 @@
 			);
 			name = PocketTrailer;
 			productName = MobileTrailer;
-			productReference = 1628A6B118789E73005EDA69 /* iTrailer.app */;
+			productReference = 1628A6B118789E73005EDA69 /* PocketTrailer.app */;
 			productType = "com.apple.product-type.application";
 		};
 		1628A6DA18789E73005EDA69 /* MobileTrailerTests */ = {

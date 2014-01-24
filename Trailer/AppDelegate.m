@@ -94,6 +94,13 @@ static AppDelegate *_static_shared_ref;
     [Settings shared].dontAskBeforeWipingMerged = dontConfirm;
 }
 
+- (IBAction)hideAllPrsSection:(NSButton *)sender
+{
+	BOOL setting = (sender.integerValue==1);
+	[Settings shared].hideAllPrsSection = setting;
+	[self updateMenu];
+}
+
 - (IBAction)displayRepositoryNameSelected:(NSButton *)sender
 {
 	BOOL setting = (sender.integerValue==1);
@@ -589,26 +596,31 @@ static AppDelegate *_static_shared_ref;
 	}];
 }
 
--(void)controlTextDidChange:(NSNotification *)obj
+- (void)tokenChanged
+{
+	NSString *newToken = [self.githubTokenHolder.stringValue stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	NSString *oldToken = [Settings shared].authToken;
+	if(newToken.length>0)
+	{
+		self.refreshButton.enabled = YES;
+		[Settings shared].authToken = newToken;
+	}
+	else
+	{
+		self.refreshButton.enabled = NO;
+		[Settings shared].authToken = nil;
+	}
+	if(newToken && oldToken && ![newToken isEqualToString:oldToken])
+	{
+		[self reset];
+	}
+}
+
+- (void)controlTextDidChange:(NSNotification *)obj
 {
 	if(obj.object==self.githubTokenHolder)
 	{
-		NSString *newToken = [self.githubTokenHolder.stringValue stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-		NSString *oldToken = [Settings shared].authToken;
-		if(newToken.length>0)
-		{
-			self.refreshButton.enabled = YES;
-			[Settings shared].authToken = newToken;
-		}
-		else
-		{
-			self.refreshButton.enabled = NO;
-			[Settings shared].authToken = nil;
-		}
-		if(newToken && oldToken && ![newToken isEqualToString:oldToken])
-		{
-			[self reset];
-		}
+		[self tokenChanged];
 	}
 	else if(obj.object==self.repoFilter)
 	{
@@ -651,85 +663,26 @@ static AppDelegate *_static_shared_ref;
 	[self.api updateLimitFromServer];
 
 	[self.sortModeSelect selectItemAtIndex:[Settings shared].sortMethod];
-
-	if([self isAppLoginItem])
-		[self.launchAtStartup setIntegerValue:1];
-	else
-		[self.launchAtStartup setIntegerValue:0];
-
-    if([Settings shared].dontAskBeforeWipingClosed)
-        [self.dontConfirmRemoveAllClosed setIntegerValue:1];
-    else
-        [self.dontConfirmRemoveAllClosed setIntegerValue:0];
-
-	if([Settings shared].dontReportRefreshFailures)
-		[self.dontReportRefreshFailures setIntegerValue:1];
-	else
-		[self.dontReportRefreshFailures setIntegerValue:0];
-
-	if([Settings shared].showReposInName)
-		[self.displayRepositoryNames setIntegerValue:1];
-	else
-		[self.displayRepositoryNames setIntegerValue:0];
-
-	if([Settings shared].includeReposInFilter)
-		[self.includeRepositoriesInFiltering setIntegerValue:1];
-	else
-		[self.includeRepositoriesInFiltering setIntegerValue:0];
-
-    if([Settings shared].dontAskBeforeWipingMerged)
-        [self.dontConfirmRemoveAllMerged setIntegerValue:1];
-    else
-        [self.dontConfirmRemoveAllMerged setIntegerValue:0];
-
-	if([Settings shared].shouldHideUncommentedRequests)
-		[self.hideUncommentedPrs setIntegerValue:1];
-	else
-		[self.hideUncommentedPrs setIntegerValue:0];
-
-	if([Settings shared].autoParticipateInMentions)
-		[self.autoParticipateWhenMentioned setIntegerValue:1];
-	else
-		[self.autoParticipateWhenMentioned setIntegerValue:0];
-
-	if([Settings shared].hideAvatars)
-		[self.hideAvatars setIntegerValue:1];
-	else
-		[self.hideAvatars setIntegerValue:0];
-
-	if([Settings shared].alsoKeepClosedPrs)
-		[self.keepClosedPrs setIntegerValue:1];
-	else
-		[self.keepClosedPrs setIntegerValue:0];
-
-	if([Settings shared].dontKeepMyPrs)
-		[self.dontKeepMyPrs setIntegerValue:1];
-	else
-		[self.dontKeepMyPrs setIntegerValue:0];
-
-	if([Settings shared].showCommentsEverywhere)
-		[self.showAllComments setIntegerValue:1];
-	else
-		[self.showAllComments setIntegerValue:0];
-
-	if([Settings shared].sortDescending)
-		[self.sortingOrder setIntegerValue:1];
-	else
-		[self.sortingOrder setIntegerValue:0];
-
-	if([Settings shared].showCreatedInsteadOfUpdated)
-		[self.showCreationDates setIntegerValue:1];
-	else
-		[self.showCreationDates setIntegerValue:0];
-
-	if([Settings shared].groupByRepo)
-		[self.groupByRepo setIntegerValue:1];
-	else
-		[self.groupByRepo setIntegerValue:0];
+	[self.launchAtStartup setIntegerValue:[self isAppLoginItem]];
+	[self.hideAllPrsSection setIntegerValue:[Settings shared].hideAllPrsSection];
+	[self.dontConfirmRemoveAllClosed setIntegerValue:[Settings shared].dontAskBeforeWipingClosed];
+	[self.dontReportRefreshFailures setIntegerValue:[Settings shared].dontReportRefreshFailures];
+	[self.displayRepositoryNames setIntegerValue:[Settings shared].showReposInName];
+	[self.includeRepositoriesInFiltering setIntegerValue:[Settings shared].includeReposInFilter];
+	[self.dontConfirmRemoveAllMerged setIntegerValue:[Settings shared].dontAskBeforeWipingMerged];
+	[self.hideUncommentedPrs setIntegerValue:[Settings shared].shouldHideUncommentedRequests];
+	[self.autoParticipateWhenMentioned setIntegerValue:[Settings shared].autoParticipateInMentions];
+	[self.hideAvatars setIntegerValue:[Settings shared].hideAvatars];
+	[self.keepClosedPrs setIntegerValue:[Settings shared].alsoKeepClosedPrs];
+	[self.dontKeepMyPrs setIntegerValue:[Settings shared].dontKeepMyPrs];
+	[self.showAllComments setIntegerValue:[Settings shared].showCommentsEverywhere];
+	[self.sortingOrder setIntegerValue:[Settings shared].sortDescending];
+	[self.showCreationDates setIntegerValue:[Settings shared].showCreatedInsteadOfUpdated];
+	[self.groupByRepo setIntegerValue:[Settings shared].groupByRepo];
 
 	[self.refreshDurationStepper setFloatValue:[Settings shared].refreshPeriod];
 	[self refreshDurationChanged:nil];
-
+	
 	[self.preferencesWindow setLevel:NSFloatingWindowLevel];
 	[self.preferencesWindow makeKeyAndOrderFront:self];
 }
@@ -895,15 +848,24 @@ static AppDelegate *_static_shared_ref;
 	}
 	else if([notification object]==self.apiSettings)
 	{
-		NSString *frontEnd = [self.apiFrontEnd stringValue];
-		NSString *backEnd = [self.apiBackEnd stringValue];
-		frontEnd = [frontEnd stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-		backEnd = [backEnd stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-		if(frontEnd.length==0) frontEnd = nil;
-		if(backEnd.length==0) backEnd = nil;
-		[Settings shared].apiFrontEnd = frontEnd;
-		[Settings shared].apiBackEnd = backEnd;
+		[self copyApiInfo];
 	}
+}
+
+- (void)copyApiInfo
+{
+	NSString *frontEnd = [self.apiFrontEnd stringValue];
+	NSString *backEnd = [self.apiBackEnd stringValue];
+	NSString *path = [self.apiPath stringValue];
+	frontEnd = [frontEnd stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	backEnd = [backEnd stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	path = [path stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	if(frontEnd.length==0) frontEnd = nil;
+	if(backEnd.length==0) backEnd = nil;
+	if(path.length==0) path = nil;
+	[Settings shared].apiFrontEnd = frontEnd;
+	[Settings shared].apiBackEnd = backEnd;
+	[Settings shared].apiPath = path;
 }
 
 - (void)networkStateChanged
@@ -1249,17 +1211,49 @@ static AppDelegate *_static_shared_ref;
 {
 	[self.apiFrontEnd setStringValue:[Settings shared].apiFrontEnd];
 	[self.apiBackEnd setStringValue:[Settings shared].apiBackEnd];
+	[self.apiPath setStringValue:[Settings shared].apiPath];
 
 	[self.apiSettings setLevel:NSFloatingWindowLevel];
 	[self.apiSettings makeKeyAndOrderFront:self];
+}
+
+- (IBAction)testApiServerSelected:(NSButton *)sender
+{
+	[self copyApiInfo];
+	[self.githubTokenHolder setStringValue:@""];
+	[self tokenChanged];
+	[sender setEnabled:NO];
+
+	[self.api getRateLimitAndCallback:^(long long remaining, long long limit, long long reset) {
+		if(remaining<0)
+		{
+			NSAlert *alert = [[NSAlert alloc] init];
+			[alert setMessageText:[NSString stringWithFormat:@"The test request failed to https://%@/%@",[Settings shared].apiBackEnd,[Settings shared].apiPath]];
+			[alert addButtonWithTitle:@"OK"];
+			[alert runModal];
+		}
+		else
+		{
+			NSAlert *alert = [[NSAlert alloc] init];
+			[alert setMessageText:@"The API server seems to be OK!"];
+			[alert addButtonWithTitle:@"OK"];
+			[alert runModal];
+		}
+		[sender setEnabled:YES];
+	}];
 }
 
 - (IBAction)apiRestoreDefaultsSelected:(NSButton *)sender
 {
 	[Settings shared].apiFrontEnd = nil;
 	[Settings shared].apiBackEnd = nil;
+	[Settings shared].apiPath = nil;
+
 	[self.apiFrontEnd setStringValue:[Settings shared].apiFrontEnd];
 	[self.apiBackEnd setStringValue:[Settings shared].apiBackEnd];
+	[self.apiPath setStringValue:[Settings shared].apiPath];
 }
+
+
 
 @end

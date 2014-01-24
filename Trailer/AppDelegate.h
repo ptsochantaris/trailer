@@ -41,6 +41,7 @@
 @property (weak) IBOutlet NSButton *includeRepositoriesInFiltering;
 @property (weak) IBOutlet NSButton *dontReportRefreshFailures;
 @property (weak) IBOutlet NSButton *groupByRepo;
+@property (weak) IBOutlet NSButton *hideAllPrsSection;
 
 // About window
 @property (weak) IBOutlet NSTextField *aboutVersion;
@@ -49,6 +50,7 @@
 @property (unsafe_unretained) IBOutlet NSWindow *apiSettings;
 @property (weak) IBOutlet NSTextField *apiFrontEnd;
 @property (weak) IBOutlet NSTextField *apiBackEnd;
+@property (weak) IBOutlet NSTextField *apiPath;
 
 // Used to track action state
 @property (nonatomic) BOOL opening;

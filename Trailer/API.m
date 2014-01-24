@@ -534,8 +534,25 @@
 	NSBlockOperation *o = [NSBlockOperation blockOperationWithBlock:^{
 
 		NSString *expandedPath;
-		if([path rangeOfString:@"/"].location==0) expandedPath = [[@"https://" stringByAppendingString:[Settings shared].apiBackEnd] stringByAppendingString:path];
-		else expandedPath = path;
+		if([path rangeOfString:@"/"].location==0)
+		{
+			NSString *apiPath = [Settings shared].apiPath;
+
+			if([apiPath rangeOfString:@"/"].location==0)
+				apiPath = [apiPath substringFromIndex:1];
+
+			if(apiPath.length>1)
+				if([[apiPath substringFromIndex:apiPath.length-2] isEqualToString:@"/"])
+					apiPath = [apiPath substringToIndex:apiPath.length-2];
+
+			expandedPath = [[[@"https://" stringByAppendingString:[Settings shared].apiBackEnd]
+							 stringByAppendingPathComponent:apiPath]
+							stringByAppendingString:path];
+		}
+		else
+		{
+			expandedPath = path;
+		}
 
 		if(params.count)
 		{

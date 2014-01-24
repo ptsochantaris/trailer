@@ -184,6 +184,12 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#define HIDE_ALL_SECTION @"HIDE_ALL_SECTION"
+-(void)setHideAllPrsSection:(BOOL)hideAllPrsSection { [self storeDefaultValue:@(hideAllPrsSection) forKey:HIDE_ALL_SECTION]; }
+-(BOOL)hideAllPrsSection { return [[[NSUserDefaults standardUserDefaults] stringForKey:HIDE_ALL_SECTION] boolValue]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #define API_FRONTEND_SERVER @"API_FRONTEND_SERVER"
 -(NSString *)apiFrontEnd
 {
@@ -206,6 +212,20 @@
 {
 	[self storeDefaultValue:apiBackEnd forKey:API_BACKEND_SERVER];
 	[[AppDelegate shared].api restartNotifier];
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define API_SERVER_PATH @"API_SERVER_PATH"
+-(NSString *)apiPath
+{
+	NSString *value = [[NSUserDefaults standardUserDefaults] stringForKey:API_SERVER_PATH];
+	if(!value) value = @"";
+	return value;
+}
+-(void)setApiPath:(NSString *)apiPath
+{
+	[self storeDefaultValue:apiPath forKey:API_SERVER_PATH];
 }
 
 @end

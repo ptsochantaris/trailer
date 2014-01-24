@@ -153,6 +153,11 @@
 		[predicateSegments addObject:@"(unreadComments > 0)"];
 	}
 
+	if([Settings shared].hideAllPrsSection)
+	{
+		[predicateSegments addObject:[NSString stringWithFormat:@"(sectionIndex != %d)",kPullRequestSectionAll]];
+	}
+
 	if(predicateSegments.count) f.predicate = [NSPredicate predicateWithFormat:[predicateSegments componentsJoinedByString:@" and "]];
 
 	NSMutableArray *sortDescriptors = [NSMutableArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"sectionIndex" ascending:YES]];

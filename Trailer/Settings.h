@@ -8,7 +8,7 @@
 @property (nonatomic) NSInteger sortMethod;
 
 @property (nonatomic) NSString *authToken, *localUser, *localUserId,
-							*apiFrontEnd, *apiBackEnd;
+							*apiFrontEnd, *apiBackEnd, *apiPath;
 
 @property (nonatomic) float refreshPeriod, backgroundRefreshPeriod;
 
@@ -17,6 +17,6 @@
 							dontKeepMyPrs, hideAvatars, autoParticipateInMentions,
 							alsoKeepClosedPrs, dontAskBeforeWipingMerged,
 							dontAskBeforeWipingClosed, includeReposInFilter, showReposInName,
-							dontReportRefreshFailures, groupByRepo;
+							dontReportRefreshFailures, groupByRepo, hideAllPrsSection;
 
 @end
