@@ -231,7 +231,7 @@
                                 </button>
                                 <button verticalHuggingPriority="750" id="GgR-n1-ENy">
                                     <rect key="frame" x="800" y="13" width="56" height="45"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                     <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" imagePosition="overlaps" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="YtC-bZ-TQn">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <string key="title">API
@@ -335,7 +335,7 @@ Server</string>
                     </box>
                     <box autoresizesSubviews="NO" title="Display" borderType="line" id="GlN-4l-tL7">
                         <rect key="frame" x="614" y="152" width="269" height="94"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                         <view key="contentView">
                             <rect key="frame" x="1" y="1" width="267" height="78"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -459,7 +459,7 @@ Server</string>
                     </box>
                     <box autoresizesSubviews="NO" title="Repositories" borderType="line" id="HFE-bj-1gc">
                         <rect key="frame" x="9" y="74" width="267" height="74"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <view key="contentView">
                             <rect key="frame" x="1" y="1" width="265" height="58"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -777,10 +777,10 @@ THE SOFTWARE.</string>
         <window title="API Server" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="IgO-qu-f69">
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
             <windowCollectionBehavior key="collectionBehavior" transient="YES" ignoresCycle="YES"/>
-            <rect key="contentRect" x="196" y="207" width="434" height="173"/>
+            <rect key="contentRect" x="196" y="207" width="434" height="203"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1058"/>
             <view key="contentView" id="gML-ul-Ax6">
-                <rect key="frame" x="0.0" y="0.0" width="434" height="173"/>
+                <rect key="frame" x="0.0" y="0.0" width="434" height="203"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <button verticalHuggingPriority="750" id="xjW-u8-SwA">
@@ -831,9 +831,9 @@ THE SOFTWARE.</string>
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="A6u-ae-He5">
-                        <rect key="frame" x="18" y="17" width="250" height="27"/>
+                        <rect key="frame" x="18" y="171" width="398" height="13"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="This feature is experimental, please do not modify unless you know what you are doing" id="ZJX-qd-OCH">
+                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="This is an expert feature, don't modify unless you know what you are doing" id="ZJX-qd-OCH">
                             <font key="font" size="10" name="LucidaGrande"/>
                             <color key="textColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
