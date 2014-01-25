@@ -7,6 +7,28 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.0.8</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Menu closing behaviour corrected when removing items</li>
+				<li>New PRs won’t generate lists of comment notifications (regression)</li>
+				<li>Repo list now splits Repos into parent and forked repos</li>
+				<li>Mention auto-participation now also takes PR body text into account</li>
+				<li>Ability to display repositories and optionally include them when filtering</li>
+				<li>Option for simple grouping by repository</li>
+				<li>Ability to specify custom API server for the GitHub API (experimental)</li>
+				<li>Added more descriptive messaging for empty PR lists</li>
+				<li>Ability to hide “all PRs” section</li>
+				</ul></font>]]></description>
+			<pubDate>Sat, 25 Jan 2014 11:00:00 +0000</pubDate>
+			<enclosure
+			url="http://dev.housetrip.com/trailer/trailer108.zip"
+			sparkle:version="1080"
+			sparkle:shortVersionString="1.0.8"
+			sparkle:dsaSignature="MC0CFBf4iy1772FSwj+H+aERbl3ejOgNAhUAkLoRl8oDYj9e2hqtCh29bb+61Rs="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.0.7</title>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
 				<li>Important fix for null fields sent by Github API which could result in app crashing</li>
