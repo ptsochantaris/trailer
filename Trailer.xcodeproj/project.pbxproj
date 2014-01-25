@@ -55,6 +55,7 @@
 		1640470A1882ED0000A4AC9C /* AboutTrailerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 164047091882ED0000A4AC9C /* AboutTrailerViewController.m */; };
 		164976251864985500C13A6B /* RemoteImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 164976241864985500C13A6B /* RemoteImageView.m */; };
 		164976261864985500C13A6B /* RemoteImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 164976241864985500C13A6B /* RemoteImageView.m */; };
+		16517CE11893BDE800B3D384 /* EmptyView.m in Sources */ = {isa = PBXBuildFile; fileRef = 16517CE01893BDE800B3D384 /* EmptyView.m */; };
 		16583E481851F082003A7A55 /* SectionHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 16583E471851F082003A7A55 /* SectionHeader.m */; };
 		16583E491851F082003A7A55 /* SectionHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 16583E471851F082003A7A55 /* SectionHeader.m */; };
 		1665B65D1882F1C600972111 /* UIImage+Scale.m in Sources */ = {isa = PBXBuildFile; fileRef = 1665B65C1882F1C600972111 /* UIImage+Scale.m */; };
@@ -185,6 +186,8 @@
 		164976221864935200C13A6B /* Trailer 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 3.xcdatamodel"; sourceTree = "<group>"; };
 		164976231864985500C13A6B /* RemoteImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RemoteImageView.h; sourceTree = "<group>"; };
 		164976241864985500C13A6B /* RemoteImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RemoteImageView.m; sourceTree = "<group>"; };
+		16517CDF1893BDE800B3D384 /* EmptyView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmptyView.h; sourceTree = "<group>"; };
+		16517CE01893BDE800B3D384 /* EmptyView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EmptyView.m; sourceTree = "<group>"; };
 		16583E461851F082003A7A55 /* SectionHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SectionHeader.h; sourceTree = "<group>"; };
 		16583E471851F082003A7A55 /* SectionHeader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SectionHeader.m; sourceTree = "<group>"; };
 		1665B65B1882F1C600972111 /* UIImage+Scale.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Scale.h"; sourceTree = "<group>"; };
@@ -423,6 +426,8 @@
 				16FA683A1823CF4600401E9B /* PRItemView.m */,
 				16583E461851F082003A7A55 /* SectionHeader.h */,
 				16583E471851F082003A7A55 /* SectionHeader.m */,
+				16517CDF1893BDE800B3D384 /* EmptyView.h */,
+				16517CE01893BDE800B3D384 /* EmptyView.m */,
 			);
 			name = MenuItems;
 			sourceTree = "<group>";
@@ -848,6 +853,7 @@
 				168BC6BA17EC2DF000BC4584 /* main.m in Sources */,
 				1628A6F81878A171005EDA69 /* DataManager.m in Sources */,
 				16075A9717EC7492000D86FD /* API.m in Sources */,
+				16517CE11893BDE800B3D384 /* EmptyView.m in Sources */,
 				164976251864985500C13A6B /* RemoteImageView.m in Sources */,
 				16EC79E617ECA18000F7EB44 /* HTTextField.m in Sources */,
 				161BED25185B5368005C00F7 /* StatusItemView.m in Sources */,

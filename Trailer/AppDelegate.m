@@ -496,8 +496,10 @@ static AppDelegate *_static_shared_ref;
 	[self updateMenu];
 }
 
-- (NSInteger)buildPrMenuItemsFromList:(NSArray *)pullRequests
+- (NSInteger)buildPrMenuItemsFromList
 {
+	NSArray *pullRequests = [self pullRequestList];
+
 	SectionHeader *myHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:nil title:kPullRequestSectionNames[kPullRequestSectionMine]];
 	SectionHeader *participatedHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:nil title:kPullRequestSectionNames[kPullRequestSectionParticipated]];
 	SectionHeader *mergedHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:self title:kPullRequestSectionNames[kPullRequestSectionMerged]];
@@ -527,19 +529,53 @@ static AppDelegate *_static_shared_ref;
 
 	CGFloat top = 10.0;
 	NSView *menuContents = [[NSView alloc] initWithFrame:CGRectZero];
-	for(NSInteger section=kPullRequestSectionAll; section>=kPullRequestSectionMine; section--)
+
+	if(pullRequests.count)
 	{
-		NSArray *itemsInSection = sections[@(section)];
-		if(itemsInSection.count>1)
+		for(NSInteger section=kPullRequestSectionAll; section>=kPullRequestSectionMine; section--)
 		{
-			for(NSView *v in [itemsInSection reverseObjectEnumerator])
+			NSArray *itemsInSection = sections[@(section)];
+			if(itemsInSection.count>1)
 			{
-				CGFloat H = v.frame.size.height;
-				v.frame = CGRectMake(0, top, MENU_WIDTH, H);
-				top += H;
-				[menuContents addSubview:v];
+				for(NSView *v in [itemsInSection reverseObjectEnumerator])
+				{
+					CGFloat H = v.frame.size.height;
+					v.frame = CGRectMake(0, top, MENU_WIDTH, H);
+					top += H;
+					[menuContents addSubview:v];
+				}
 			}
 		}
+	}
+	else
+	{
+		top = 100;
+		NSString *message;
+		NSColor *messageColor = [NSColor darkGrayColor];
+		NSUInteger openRequests = [PullRequest countOpenRequestsInMoc:self.dataManager.managedObjectContext];
+		if(self.isRefreshing)
+		{
+			message = @"Refreshing PR information, please wait a moment...";
+		}
+		else if(self.mainMenuFilter.stringValue.length)
+		{
+			message = @"There are no PRs matching this filter.";
+		}
+		else if(openRequests>0)
+		{
+			message = [NSString stringWithFormat:@"%ld PRs are hidden by your settings.",openRequests];
+		}
+		else if([Repo activeReposInMoc:self.dataManager.managedObjectContext].count==0)
+		{
+			messageColor = [NSColor colorWithRed:0.8 green:0.0 blue:0.0 alpha:1.0];
+			message = @"There are no active repositories, please visit preferences to add or activate some.";
+		}
+		else if(openRequests==0)
+		{
+			message = @"There are no open PRs for your selected repositories.";
+		}
+		EmptyView *empty = [[EmptyView alloc] initWithFrame:CGRectMake(0, 0, MENU_WIDTH, top) message:message color:messageColor];
+		[menuContents addSubview:empty];
 	}
 
 	menuContents.frame = CGRectMake(0, 0, MENU_WIDTH, top);
@@ -953,10 +989,24 @@ static AppDelegate *_static_shared_ref;
 
 	[self.api expireOldImageCacheEntries];
 	[self.dataManager postMigrationTasks];
+
+	self.isRefreshing = YES;
+
+	for(NSView *v in [self.mainMenu.scrollView.documentView subviews])
+		if([v isKindOfClass:[EmptyView class]])
+			[self updateMenu];
+
+	if([Settings shared].localUser)
+		self.refreshNow.title = [NSString stringWithFormat:@" Refreshing %@...",[Settings shared].localUser];
+	else
+		self.refreshNow.title = @" Refreshing...";
+
+	DLog(@"Starting refresh");
 }
 
 -(void)completeRefresh
 {
+	self.isRefreshing = NO;
 	[self.refreshButton setEnabled:YES];
 	[self.projectsTable setEnabled:YES];
 	[self.selectAll setEnabled:YES];
@@ -969,26 +1019,18 @@ static AppDelegate *_static_shared_ref;
 	[self checkApiUsage];
 	[self.dataManager sendNotifications];
 	[self.dataManager saveDB];
-}
 
--(BOOL)isRefreshing
-{
-	return self.refreshNow.target==nil;
+	DLog(@"Refresh done");
 }
 
 -(void)startRefresh
 {
 	if(self.isRefreshing) return;
-	DLog(@"Starting refresh");
+
 	[self prepareForRefresh];
+
 	id oldTarget = self.refreshNow.target;
 	SEL oldAction = self.refreshNow.action;
-
-	if([Settings shared].localUser)
-		self.refreshNow.title = [NSString stringWithFormat:@" Refreshing %@...",[Settings shared].localUser];
-	else
-		self.refreshNow.title = @" Refreshing...";
-
 	[self.refreshNow setAction:nil];
 	[self.refreshNow setTarget:nil];
 
@@ -1007,7 +1049,6 @@ static AppDelegate *_static_shared_ref;
 														   selector:@selector(refreshTimerDone)
 														   userInfo:nil
 															repeats:NO];
-		DLog(@"Refresh done");
 	}];
 }
 
@@ -1034,11 +1075,8 @@ static AppDelegate *_static_shared_ref;
 
 - (void)updateMenu
 {
-	NSArray *pullRequests = [self pullRequestList];
-	NSString *countString = [NSString stringWithFormat:@"%ld",[PullRequest countOpenRequestsInMoc:self.dataManager.managedObjectContext]];
-	NSInteger newCommentCount = [self buildPrMenuItemsFromList:pullRequests];
-
-	DLog(@"Updating menu, %@ total PRs",countString);
+	NSString *countString;
+	NSInteger newCommentCount = [self buildPrMenuItemsFromList];
 
 	NSDictionary *attributes;
 	if(self.lastUpdateFailed && (![Settings shared].dontReportRefreshFailures))
@@ -1049,20 +1087,26 @@ static AppDelegate *_static_shared_ref;
 					   NSForegroundColorAttributeName: [NSColor colorWithRed:0.8 green:0.0 blue:0.0 alpha:1.0],
 					   };
 	}
-	else if(newCommentCount)
-	{
-		attributes = @{
-					   NSFontAttributeName: [NSFont systemFontOfSize:11.0],
-					   NSForegroundColorAttributeName: [NSColor colorWithRed:0.8 green:0.0 blue:0.0 alpha:1.0],
-					   };
-	}
 	else
 	{
-		attributes = @{
-					   NSFontAttributeName: [NSFont systemFontOfSize:11.0],
-					   NSForegroundColorAttributeName: [NSColor blackColor],
-					   };
+		countString = [NSString stringWithFormat:@"%ld",[PullRequest countOpenRequestsInMoc:self.dataManager.managedObjectContext]];
+		if(newCommentCount)
+		{
+			attributes = @{
+						   NSFontAttributeName: [NSFont systemFontOfSize:11.0],
+						   NSForegroundColorAttributeName: [NSColor colorWithRed:0.8 green:0.0 blue:0.0 alpha:1.0],
+						   };
+		}
+		else
+		{
+			attributes = @{
+						   NSFontAttributeName: [NSFont systemFontOfSize:11.0],
+						   NSForegroundColorAttributeName: [NSColor blackColor],
+						   };
+		}
 	}
+
+	DLog(@"Updating menu, %@ total PRs",countString);
 
 	CGFloat width = [countString sizeWithAttributes:attributes].width;
 
@@ -1222,21 +1266,19 @@ static AppDelegate *_static_shared_ref;
 	[self copyApiInfo];
 	[sender setEnabled:NO];
 
-	[self.api getRateLimitAndCallback:^(long long remaining, long long limit, long long reset) {
-		if(reset<0)
+	[self.api testApiAndCallback:^(NSError *error) {
+		NSAlert *alert = [[NSAlert alloc] init];
+		if(error)
 		{
-			NSAlert *alert = [[NSAlert alloc] init];
-			[alert setMessageText:[NSString stringWithFormat:@"The test request failed to https://%@/%@",[Settings shared].apiBackEnd,[Settings shared].apiPath]];
-			[alert addButtonWithTitle:@"OK"];
-			[alert runModal];
+			[alert setMessageText:[NSString stringWithFormat:@"The test failed for https://%@/%@",[Settings shared].apiBackEnd,[Settings shared].apiPath]];
+			[alert setInformativeText:error.localizedDescription];
 		}
 		else
 		{
-			NSAlert *alert = [[NSAlert alloc] init];
-			[alert setMessageText:@"The API server seems to be OK!"];
-			[alert addButtonWithTitle:@"OK"];
-			[alert runModal];
+			[alert setMessageText:@"The API server is OK!"];
 		}
+		[alert addButtonWithTitle:@"OK"];
+		[alert runModal];
 		[sender setEnabled:YES];
 	}];
 }

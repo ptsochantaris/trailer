@@ -39,6 +39,8 @@ typedef enum {
 
 - (void) getRateLimitAndCallback:(void(^)(long long remaining, long long limit, long long reset))callback;
 
+- (void)testApiAndCallback:(void(^)(NSError *error))callback;
+
 - (void)expireOldImageCacheEntries;
 
 - (void)clearImageCache;

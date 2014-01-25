@@ -67,8 +67,8 @@
 @property (nonatomic) DataManager *dataManager;
 @property (weak) NSTimer *refreshTimer;
 @property (strong) NSDate *lastSuccessfulRefresh;
-@property (nonatomic) BOOL lastUpdateFailed, preferencesDirty;
-@property (nonatomic, readonly) BOOL isRefreshing, menuIsOpen;
+@property (nonatomic) BOOL lastUpdateFailed, preferencesDirty, isRefreshing;
+@property (nonatomic, readonly) BOOL menuIsOpen;
 
 +(AppDelegate*)shared;
 
