@@ -4,6 +4,10 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 {
 	NSString *targetUrl;
 	BOOL refreshStartedWithEmpty;
+
+	// Filtering
+    UITextField *searchField;
+    HTPopTimer *searchTimer;
 }
 @end
 
@@ -26,11 +30,29 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 {
     [super viewDidLoad];
 
+    searchTimer = [[HTPopTimer alloc] initWithTimeInterval:0.5 target:self selector:@selector(reloadData)];
+
+    searchField = [[UITextField alloc] initWithFrame:CGRectMake(10, 10, 300, 31)];
+	searchField.placeholder = @"Filter...";
+	searchField.returnKeyType = UIReturnKeySearch;
+	searchField.font = [UIFont systemFontOfSize:18.0];
+	searchField.borderStyle = UITextBorderStyleRoundedRect;
+	searchField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
+	searchField.clearButtonMode = UITextFieldViewModeAlways;
+	searchField.autocapitalizationType = UITextAutocapitalizationTypeNone;
+	searchField.autocorrectionType = UITextAutocorrectionTypeNo;
+    searchField.delegate = self;
+
+    UIView *searchHolder = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 50)];
+	[searchHolder addSubview:searchField];
+	self.repositories.tableHeaderView = searchHolder;
+
+    self.repositories.contentOffset = CGPointMake(0, 50);
+
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(apiUsageUpdate) name:RATE_UPDATE_NOTIFICATION object:nil];
 
 	self.githubApiToken.text = [Settings shared].authToken;
 	self.refreshRepoList.enabled = ([Settings shared].authToken.length>0);
-	self.repositories.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
 
 	[self.repositories reloadData];
 
@@ -57,33 +79,6 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 {
 	API *api = [AppDelegate shared].api;
 	[self.apiLoad setProgress:(api.requestsLimit-api.requestsRemaining)/api.requestsLimit];
-}
-
-- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
-{
-	self.repositories.hidden = YES;
-	return YES;
-}
-
--(void)textFieldDidEndEditing:(UITextField *)textField
-{
-	[self instructionMode:(self.fetchedResultsController.fetchedObjects.count==0
-						   || self.githubApiToken.text.length==0)];
-}
-
-- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
-{
-	if([string isEqualToString:@"\n"])
-	{
-		[self commitToken];
-		return NO;
-	}
-	else
-	{
-		[AppDelegate shared].preferencesDirty = YES;
-		[self resetData];
-		return YES;
-	}
 }
 
 - (void)commitToken
@@ -185,8 +180,22 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-	if([Settings shared].localUser) return [Settings shared].localUser;
-	return nil;
+	NSString *title;
+	if([Settings shared].localUser)
+		title = [Settings shared].localUser;
+	else
+		title = @"";
+
+	switch (section) {
+		case 0:
+			title = [title stringByAppendingString:@" - Parent Repos"];
+			break;
+		default:
+			title = [title stringByAppendingString:@" - Forked Repos"];
+			break;
+	}
+
+	return title;
 }
 
 #pragma mark - Fetched results controller
@@ -202,18 +211,21 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Repo" inManagedObjectContext:[AppDelegate shared].dataManager.managedObjectContext];
     [fetchRequest setEntity:entity];
 
+	if(searchField.text.length)
+		fetchRequest.predicate = [NSPredicate predicateWithFormat:@"fullName contains [cd] %@",searchField.text];
+
     // Set the batch size to a suitable number.
     [fetchRequest setFetchBatchSize:20];
 
     // Edit the sort key as appropriate.
-    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"fullName" ascending:YES];
-    [fetchRequest setSortDescriptors:@[sortDescriptor]];
+    [fetchRequest setSortDescriptors:@[[[NSSortDescriptor alloc] initWithKey:@"fork" ascending:YES],
+									   [[NSSortDescriptor alloc] initWithKey:@"fullName" ascending:YES]]];
 
     // Edit the section name key path and cache name if appropriate.
     // nil for section name key path means "no sections".
     NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
 																								managedObjectContext:[AppDelegate shared].dataManager.managedObjectContext
-																								  sectionNameKeyPath:nil
+																								  sectionNameKeyPath:@"fork"
 																										   cacheName:nil];
     aFetchedResultsController.delegate = self;
     self.fetchedResultsController = aFetchedResultsController;
@@ -304,16 +316,31 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 																delegate:self
 													   cancelButtonTitle:@"Cancel"
 												  destructiveButtonTitle:nil
-													   otherButtonTitles:@"Select All", @"Unselect All", nil];
+													   otherButtonTitles:@"Select All", @"Select All Parents", @"Unselect All", nil];
 	[selectionSheet showFromBarButtonItem:sender animated:YES];
 }
 
 - (void)actionSheet:(UIActionSheet *)actionSheet willDismissWithButtonIndex:(NSInteger)buttonIndex
 {
-	if(buttonIndex==2) return;
-	NSNumber *selection = @(buttonIndex==0);
-	NSArray *allRepos = [Repo allReposSortedByField:nil withTitleFilter:nil inMoc:[AppDelegate shared].dataManager.managedObjectContext];
-	for(Repo *r in allRepos) r.active = selection;
+	if(buttonIndex==3) return;
+	NSArray *allRepos = self.fetchedResultsController.fetchedObjects;
+	switch (buttonIndex) {
+		case 0:
+		{
+			for(Repo *r in allRepos) r.active = @YES;
+			break;
+		}
+		case 1:
+		{
+			for(Repo *r in allRepos) if(!r.fork.boolValue) r.active = @YES;
+			break;
+		}
+		case 2:
+		{
+			for(Repo *r in allRepos) r.active = @NO;
+			break;
+		}
+	}
 	[AppDelegate shared].preferencesDirty = YES;
 }
 
@@ -332,13 +359,13 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 
 - (void)viewTokens
 {
-	targetUrl = @"https://github.com/settings/applications";
+	targetUrl = [NSString stringWithFormat:@"https://%@/settings/applications",[Settings shared].apiFrontEnd];
 	[self performSegueWithIdentifier:@"openGithub" sender:self];
 }
 
 - (void)createToken
 {
-	targetUrl = @"https://github.com/settings/tokens/new";
+	targetUrl = [NSString stringWithFormat:@"https://%@/settings/tokens/new",[Settings shared].apiFrontEnd];
 	[self performSegueWithIdentifier:@"openGithub" sender:self];
 }
 
@@ -353,6 +380,77 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 		((GithubViewController *)[segue.destinationViewController topViewController]).pathToLoad = targetUrl;
 	}
 	targetUrl = nil;
+}
+
+///////////////////////////// filtering
+
+- (void)reloadData
+{
+	self.fetchedResultsController = nil;
+	[self.repositories reloadData];
+}
+
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
+{
+    if(searchField.isFirstResponder)
+    {
+        [searchField resignFirstResponder];
+    }
+}
+
+- (BOOL)textFieldShouldClear:(UITextField *)textField
+{
+	textField.text = nil;
+	[self reloadData];
+	return NO;
+}
+
+- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
+{
+	if(textField==self.githubApiToken)
+	{
+		self.repositories.hidden = YES;
+	}
+	return YES;
+}
+
+-(void)textFieldDidEndEditing:(UITextField *)textField
+{
+	if(textField==self.githubApiToken)
+	{
+		[self instructionMode:(self.fetchedResultsController.fetchedObjects.count==0
+							   || self.githubApiToken.text.length==0)];
+	}
+}
+
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
+{
+	if(textField==self.githubApiToken)
+	{
+		if([string isEqualToString:@"\n"])
+		{
+			[self commitToken];
+			return NO;
+		}
+		else
+		{
+			[AppDelegate shared].preferencesDirty = YES;
+			[self resetData];
+			return YES;
+		}
+	}
+	else
+	{
+		if([string isEqualToString:@"\n"])
+		{
+			[textField resignFirstResponder];
+		}
+		else
+		{
+			[searchTimer push];
+		}
+		return YES;
+	}
 }
 
 @end

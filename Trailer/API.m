@@ -36,8 +36,7 @@
 		requestQueue = [[NSOperationQueue alloc] init];
 		requestQueue.maxConcurrentOperationCount = 8;
 
-		self.reachability = [Reachability reachabilityWithHostName:API_SERVER];
-		[self.reachability startNotifier];
+		[self restartNotifier];
 
         NSFileManager *fileManager = [NSFileManager defaultManager];
         NSURL *appSupportURL = [[fileManager URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] lastObject];
@@ -50,6 +49,13 @@
             [fileManager createDirectoryAtPath:cacheDirectory withIntermediateDirectories:YES attributes:nil error:nil];
 	}
     return self;
+}
+
+- (void)restartNotifier
+{
+	[self.reachability stopNotifier];
+	self.reachability = [Reachability reachabilityWithHostName:[Settings shared].apiBackEnd];
+	[self.reachability startNotifier];
 }
 
 -(void)error:(NSString*)errorString
@@ -277,7 +283,7 @@
 		  }
 		  [self _detectMergedPullRequests:prsToCheck andCallback:callback];
 
-	  } failure:^(NSHTTPURLResponse *response, NSError *error) {
+	  } failure:^(NSHTTPURLResponse *response, id data, NSError *error) {
 		  r.postSyncAction = @(kPostSyncDoNothing); // don't delete this, we couldn't check, play it safe
 		  [self _detectMergedPullRequests:prsToCheck andCallback:callback];
 	  }];
@@ -473,7 +479,7 @@
 			}];
 }
 
--(void)getDataInPath:(NSString*)path params:(NSDictionary*)params andCallback:(void(^)(id data, BOOL lastPage, NSInteger resultCode))callback
+- (void)getDataInPath:(NSString*)path params:(NSDictionary*)params andCallback:(void(^)(id data, BOOL lastPage, NSInteger resultCode))callback
 {
 	[self get:path
    parameters:params
@@ -490,13 +496,13 @@
 															  object:nil
 															userInfo:nil];
 		  if(callback) callback(data, [API lastPage:response], response.statusCode);
-	  } failure:^(NSHTTPURLResponse *response, NSError *error) {
+	  } failure:^(NSHTTPURLResponse *response, id data, NSError *error) {
 		  DLog(@"Failure: %@",error);
 		  if(callback) callback(nil, NO, response.statusCode);
 	  }];
 }
 
--(void)getRateLimitAndCallback:(void (^)(long long, long long, long long))callback
+- (void)getRateLimitAndCallback:(void (^)(long long, long long, long long))callback
 {
 	[self get:@"/rate_limit"
 	  parameters:nil
@@ -505,22 +511,45 @@
 			 long long requestLimit = [[response allHeaderFields][@"X-RateLimit-Limit"] longLongValue];
 			 long long epochSeconds = [[response allHeaderFields][@"X-RateLimit-Reset"] longLongValue];
 			 if(callback) callback(requestsRemaining,requestLimit,epochSeconds);
-		 } failure:^(NSHTTPURLResponse *response, NSError *error) {
-			 if(callback) callback(-1, -1, -1);
+		 } failure:^(NSHTTPURLResponse *response, id data, NSError *error) {
+			 if(callback)
+			 {
+				 if(response.statusCode==404 && data && ![[data ofk:@"message"] isEqualToString:@"Not Found"])
+					 callback(10000,10000,0);
+				 else
+					 callback(-1, -1, -1);
+			 }
 		 }];
 }
 
-+(BOOL)lastPage:(NSHTTPURLResponse*)response
+- (void)testApiAndCallback:(void (^)(NSError *))callback
+{
+	[self get:@"/rate_limit"
+   parameters:nil
+	  success:^(NSHTTPURLResponse *response, id data) {
+		  if(callback) callback(nil);
+	  } failure:^(NSHTTPURLResponse *response, id data, NSError *error) {
+		  if(callback)
+		  {
+			  if(response.statusCode==404 && data && ![[data ofk:@"message"] isEqualToString:@"Not Found"])
+				  callback(nil);
+			  else
+				  callback(error);
+		  }
+	  }];
+}
+
++ (BOOL)lastPage:(NSHTTPURLResponse*)response
 {
 	NSString *linkHeader = [[response allHeaderFields] ofk:@"Link"];
 	if(!linkHeader) return YES;
 	return ([linkHeader rangeOfString:@"rel=\"next\""].location==NSNotFound);
 }
 
--(NSOperation *)get:(NSString *)path
+- (NSOperation *)get:(NSString *)path
 		 parameters:(NSDictionary *)params
 			success:(void(^)(NSHTTPURLResponse *response, id data))successCallback
-			failure:(void(^)(NSHTTPURLResponse *response, NSError *error))failureCallback
+			failure:(void(^)(NSHTTPURLResponse *response, id data, NSError *error))failureCallback
 {
 	[self networkIndicationStart];
 
@@ -528,8 +557,25 @@
 	NSBlockOperation *o = [NSBlockOperation blockOperationWithBlock:^{
 
 		NSString *expandedPath;
-		if([path rangeOfString:@"/"].location==0) expandedPath = [[@"https://" stringByAppendingString:API_SERVER] stringByAppendingString:path];
-		else expandedPath = path;
+		if([path rangeOfString:@"/"].location==0)
+		{
+			NSString *apiPath = [Settings shared].apiPath;
+
+			if([apiPath rangeOfString:@"/"].location==0)
+				apiPath = [apiPath substringFromIndex:1];
+
+			if(apiPath.length>1)
+				if([[apiPath substringFromIndex:apiPath.length-2] isEqualToString:@"/"])
+					apiPath = [apiPath substringToIndex:apiPath.length-2];
+
+			expandedPath = [[[@"https://" stringByAppendingString:[Settings shared].apiBackEnd]
+							 stringByAppendingPathComponent:apiPath]
+							stringByAppendingString:path];
+		}
+		else
+		{
+			expandedPath = path;
+		}
 
 		if(params.count)
 		{
@@ -552,6 +598,9 @@
 		NSError *error;
 		NSHTTPURLResponse *response;
 		NSData *data = [NSURLConnection sendSynchronousRequest:r returningResponse:&response error:&error];
+		id parsedData = nil;
+		if(data.length) parsedData = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+
 		if(!error && response.statusCode>299)
 		{
 			error = [NSError errorWithDomain:@"Error response received" code:response.statusCode userInfo:nil];
@@ -562,7 +611,7 @@
 			if(failureCallback)
 			{
 				dispatch_async(dispatch_get_main_queue(), ^{
-					failureCallback(response, error);
+					failureCallback(response, parsedData, error);
 				});
 			}
 		}
@@ -571,10 +620,8 @@
 			DLog(@"GET %@ - RESULT: %ld",expandedPath,(long)response.statusCode);
 			if(successCallback)
 			{
-				id parsedData = nil;
-				if(data.length) parsedData = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
 				dispatch_async(dispatch_get_main_queue(), ^{
-					successCallback(response,parsedData);
+					successCallback(response, parsedData);
 				});
 			}
 		}

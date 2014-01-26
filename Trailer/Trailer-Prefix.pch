@@ -23,6 +23,7 @@
 #import "Org.h"
 #import "Repo.h"
 #import "PullRequest.h"
+#import "HTTextField.h"
 #import "RemoteImageView.h"
 #import "CenteredTextFieldCell.h"
 #import "CenteredTextField.h"
@@ -35,6 +36,7 @@
 #import "MenuWindow.h"
 #import "HTPopTimer.h"
 #import "DataManager.h"
+#import "EmptyView.h"
 #import "AppDelegate.h"
 
 #endif

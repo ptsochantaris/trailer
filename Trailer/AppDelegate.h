@@ -37,10 +37,20 @@
 @property (weak) IBOutlet NSButton *keepClosedPrs;
 @property (weak) IBOutlet NSButton *dontConfirmRemoveAllMerged;
 @property (weak) IBOutlet NSButton *dontConfirmRemoveAllClosed;
+@property (weak) IBOutlet NSButton *displayRepositoryNames;
+@property (weak) IBOutlet NSButton *includeRepositoriesInFiltering;
+@property (weak) IBOutlet NSButton *dontReportRefreshFailures;
+@property (weak) IBOutlet NSButton *groupByRepo;
+@property (weak) IBOutlet NSButton *hideAllPrsSection;
 
 // About window
 @property (weak) IBOutlet NSTextField *aboutVersion;
 
+// API widow
+@property (unsafe_unretained) IBOutlet NSWindow *apiSettings;
+@property (weak) IBOutlet NSTextField *apiFrontEnd;
+@property (weak) IBOutlet NSTextField *apiBackEnd;
+@property (weak) IBOutlet NSTextField *apiPath;
 
 // Used to track action state
 @property (nonatomic) BOOL opening;
@@ -57,8 +67,8 @@
 @property (nonatomic) DataManager *dataManager;
 @property (weak) NSTimer *refreshTimer;
 @property (strong) NSDate *lastSuccessfulRefresh;
-@property (nonatomic) BOOL lastUpdateFailed, preferencesDirty;
-@property (nonatomic, readonly) BOOL isRefreshing, menuIsOpen;
+@property (nonatomic) BOOL lastUpdateFailed, preferencesDirty, isRefreshing;
+@property (nonatomic, readonly) BOOL menuIsOpen;
 
 +(AppDelegate*)shared;
 

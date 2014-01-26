@@ -21,6 +21,7 @@
 @dynamic sectionIndex;
 @dynamic totalComments;
 @dynamic unreadComments;
+@dynamic repoName;
 
 + (PullRequest *)pullRequestWithInfo:(NSDictionary *)info moc:(NSManagedObjectContext *)moc
 {
@@ -69,6 +70,9 @@
 				   self.latestReadCommentDate,
 				   localUserId];
 
+	if(autoParticipateInMentions && self.refersToMe)
+		self.sectionIndex = @kPullRequestSectionParticipated;
+
 	NSArray *unreadComments = [self.managedObjectContext executeFetchRequest:f error:nil];
 	for(PRComment *c in unreadComments)
 	{
@@ -81,11 +85,53 @@
 
 	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestUrl = %@",self.url];
 	self.totalComments = @([self.managedObjectContext countForFetchRequest:f error:nil]);
+
+	if(self.repoId)
+		self.repoName = ((Repo*)[Repo itemOfType:@"Repo" serverId:self.repoId moc:self.managedObjectContext]).fullName;
+	else
+		self.repoName = @"Unknown repository";
+
+	if(!self.title) self.title = @"(No title)";
+}
+
+- (BOOL)refersToMe
+{
+	NSString *myHandle = [NSString stringWithFormat:@"@%@",[Settings shared].localUser];
+	NSRange rangeOfHandle = [self.body rangeOfString:myHandle options:NSCaseInsensitiveSearch|NSDiacriticInsensitiveSearch];
+	return rangeOfHandle.location != NSNotFound;
 }
 
 - (NSString *)sectionName
 {
 	return [kPullRequestSectionNames objectAtIndex:self.sectionIndex.integerValue];
+}
+
+- (NSString *)subtitle
+{
+	static NSDateFormatter *itemDateFormatter;
+
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		itemDateFormatter = [[NSDateFormatter alloc] init];
+		itemDateFormatter.dateStyle = NSDateFormatterShortStyle;
+		itemDateFormatter.timeStyle = NSDateFormatterShortStyle;
+	});
+
+	NSString *_subtitle;
+	if([Settings shared].showCreatedInsteadOfUpdated)
+		_subtitle = [itemDateFormatter stringFromDate:self.createdAt];
+	else
+		_subtitle = [itemDateFormatter stringFromDate:self.updatedAt];
+
+	if(self.userLogin.length)
+		_subtitle = [NSString stringWithFormat:@"%@ - %@",self.userLogin,_subtitle];
+
+	if([Settings shared].showReposInName)
+	{
+		_subtitle = [_subtitle stringByAppendingFormat:@" - %@",self.repoName];
+	}
+
+	return _subtitle;
 }
 
 + (NSFetchRequest *)requestForPullRequestsWithFilter:(NSString *)filter
@@ -96,7 +142,10 @@
 
 	if(filter.length)
 	{
-		[predicateSegments addObject:[NSString stringWithFormat:@"(title contains[cd] '%@' or userLogin contains[cd] '%@')",filter,filter]];
+		if([Settings shared].includeReposInFilter)
+			[predicateSegments addObject:[NSString stringWithFormat:@"(title contains[cd] '%@' or userLogin contains[cd] '%@' or repoName contains[cd] '%@')",filter,filter,filter]];
+		else
+			[predicateSegments addObject:[NSString stringWithFormat:@"(title contains[cd] '%@' or userLogin contains[cd] '%@')",filter,filter]];
 	}
 
 	if([Settings shared].shouldHideUncommentedRequests)
@@ -104,11 +153,22 @@
 		[predicateSegments addObject:@"(unreadComments > 0)"];
 	}
 
+	if([Settings shared].hideAllPrsSection)
+	{
+		[predicateSegments addObject:[NSString stringWithFormat:@"(sectionIndex != %d)",kPullRequestSectionAll]];
+	}
+
 	if(predicateSegments.count) f.predicate = [NSPredicate predicateWithFormat:[predicateSegments componentsJoinedByString:@" and "]];
 
 	NSMutableArray *sortDescriptors = [NSMutableArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"sectionIndex" ascending:YES]];
-	NSString *fieldName = [Settings shared].sortField;
+
+	if([Settings shared].groupByRepo)
+	{
+		[sortDescriptors addObject:[NSSortDescriptor sortDescriptorWithKey:@"repoName" ascending:YES selector:@selector(caseInsensitiveCompare:)]];
+	}
+
 	BOOL ascending = ![Settings shared].sortDescending;
+	NSString *fieldName = [Settings shared].sortField;
 	if([fieldName isEqualToString:@"title"])
 	{
 		[sortDescriptors addObject:[NSSortDescriptor sortDescriptorWithKey:fieldName ascending:ascending selector:@selector(caseInsensitiveCompare:)]];

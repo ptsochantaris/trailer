@@ -26,9 +26,15 @@
 {
 	NSUserDefaults *d = [NSUserDefaults standardUserDefaults];
 	if(value)
+	{
 		[d setObject:value forKey:key];
+		DLog(@"Setting %@: %@",key,value);
+	}
 	else
+	{
 		[d removeObjectForKey:key];
+		DLog(@"Clearing %@",key);
+	}
 	[d synchronize];
 }
 
@@ -72,10 +78,7 @@
 
 #define GITHUB_TOKEN_KEY @"GITHUB_AUTH_TOKEN"
 -(NSString*)authToken { return [[NSUserDefaults standardUserDefaults] stringForKey:GITHUB_TOKEN_KEY]; }
--(void)setAuthToken:(NSString *)authToken
-{
-	[self storeDefaultValue:authToken forKey:GITHUB_TOKEN_KEY];
-}
+-(void)setAuthToken:(NSString *)authToken { [self storeDefaultValue:authToken forKey:GITHUB_TOKEN_KEY]; }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -154,5 +157,79 @@
 #define DONT_ASK_BEFORE_WIPING_CLOSED @"DONT_ASK_BEFORE_WIPING_CLOSED"
 -(void)setDontAskBeforeWipingClosed:(BOOL)dontAskBeforeWipingClosed { [self storeDefaultValue:@(dontAskBeforeWipingClosed) forKey:DONT_ASK_BEFORE_WIPING_CLOSED]; }
 -(BOOL)dontAskBeforeWipingClosed { return [[[NSUserDefaults standardUserDefaults] stringForKey:DONT_ASK_BEFORE_WIPING_CLOSED] boolValue]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define INCLUDE_REPOS_IN_FILTER @"INCLUDE_REPOS_IN_FILTER"
+-(void)setIncludeReposInFilter:(BOOL)includeReposInFilter { [self storeDefaultValue:@(includeReposInFilter) forKey:INCLUDE_REPOS_IN_FILTER]; }
+-(BOOL)includeReposInFilter { return [[[NSUserDefaults standardUserDefaults] stringForKey:INCLUDE_REPOS_IN_FILTER] boolValue]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define SHOW_REPOS_IN_NAME @"SHOW_REPOS_IN_NAME"
+-(void)setShowReposInName:(BOOL)showReposInName { [self storeDefaultValue:@(showReposInName) forKey:SHOW_REPOS_IN_NAME]; }
+-(BOOL)showReposInName { return [[[NSUserDefaults standardUserDefaults] stringForKey:SHOW_REPOS_IN_NAME] boolValue]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define DONT_REPORT_REFRESH_FAILURES @"DONT_REPORT_REFRESH_FAILURES"
+-(void)setDontReportRefreshFailures:(BOOL)dontReportRefreshFailures { [self storeDefaultValue:@(dontReportRefreshFailures) forKey:DONT_REPORT_REFRESH_FAILURES]; }
+-(BOOL)dontReportRefreshFailures { return [[[NSUserDefaults standardUserDefaults] stringForKey:DONT_REPORT_REFRESH_FAILURES] boolValue]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define GROUP_BY_REPO @"GROUP_BY_REPO"
+-(void)setGroupByRepo:(BOOL)groupByRepo { [self storeDefaultValue:@(groupByRepo) forKey:GROUP_BY_REPO]; }
+-(BOOL)groupByRepo { return [[[NSUserDefaults standardUserDefaults] stringForKey:GROUP_BY_REPO] boolValue]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define HIDE_ALL_SECTION @"HIDE_ALL_SECTION"
+-(void)setHideAllPrsSection:(BOOL)hideAllPrsSection { [self storeDefaultValue:@(hideAllPrsSection) forKey:HIDE_ALL_SECTION]; }
+-(BOOL)hideAllPrsSection { return [[[NSUserDefaults standardUserDefaults] stringForKey:HIDE_ALL_SECTION] boolValue]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define API_FRONTEND_SERVER @"API_FRONTEND_SERVER"
+-(NSString *)apiFrontEnd
+{
+	NSString *value = [[NSUserDefaults standardUserDefaults] stringForKey:API_FRONTEND_SERVER];
+	if(!value) value = @"github.com";
+	return value;
+}
+-(void)setApiFrontEnd:(NSString *)apiFrontEnd { [self storeDefaultValue:apiFrontEnd forKey:API_FRONTEND_SERVER]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define API_BACKEND_SERVER @"API_BACKEND_SERVER"
+-(NSString *)apiBackEnd
+{
+	NSString *value = [[NSUserDefaults standardUserDefaults] stringForKey:API_BACKEND_SERVER];
+	if(!value) value = @"api.github.com";
+	return value;
+}
+-(void)setApiBackEnd:(NSString *)apiBackEnd
+{
+	NSString *oldValue = self.apiBackEnd;
+	[self storeDefaultValue:apiBackEnd forKey:API_BACKEND_SERVER];
+	if(![oldValue isEqualToString:apiBackEnd])
+	{
+		[[AppDelegate shared].api restartNotifier];
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define API_SERVER_PATH @"API_SERVER_PATH"
+-(NSString *)apiPath
+{
+	NSString *value = [[NSUserDefaults standardUserDefaults] stringForKey:API_SERVER_PATH];
+	if(!value) value = @"";
+	return value;
+}
+-(void)setApiPath:(NSString *)apiPath
+{
+	[self storeDefaultValue:apiPath forKey:API_SERVER_PATH];
+}
 
 @end

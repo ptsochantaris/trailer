@@ -26,11 +26,14 @@
 		else
 		{
 			PullRequest *r = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:mainContext];
-			if([Settings shared].showCommentsEverywhere || r.isMine || r.commentedByMe)
+			if(r.postSyncAction.integerValue == kPostSyncNoteUpdated)
 			{
-				if(![c.userId.stringValue isEqualToString:[Settings shared].localUserId])
+				if([Settings shared].showCommentsEverywhere || r.isMine || r.commentedByMe)
 				{
-					[[AppDelegate shared] postNotificationOfType:kNewComment forItem:c];
+					if(![c.userId.stringValue isEqualToString:[Settings shared].localUserId])
+					{
+						[[AppDelegate shared] postNotificationOfType:kNewComment forItem:c];
+					}
 				}
 			}
 		}
@@ -136,7 +139,7 @@
 		if(![self addStorePath:sqlStore toCoordinator:coordinator])
 		{
 			DLog(@"Failed to migrate/load DB store - will nuke it and retry");
-			[[NSFileManager defaultManager] removeItemAtURL:sqlStore error:nil];
+			[self removeDatabaseFiles];
 			if(![self addStorePath:sqlStore toCoordinator:coordinator])
 			{
 				DLog(@"Catastrophic failure, app is probably corrupted and needs reinstall");
@@ -240,6 +243,57 @@
 {
 	NSArray *prs = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.managedObjectContext];
 	for(PullRequest *r in prs) [r postProcess];
+}
+
+- (NSAttributedString *)reasonForEmptyWithFilter:(NSString *)filterValueOrNil
+{
+
+#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
+	#define COLOR_CLASS NSColor
+#else
+	#define COLOR_CLASS UIColor
+#endif
+
+	COLOR_CLASS *messageColor = [COLOR_CLASS lightGrayColor];
+	NSUInteger openRequests = [PullRequest countOpenRequestsInMoc:self.managedObjectContext];
+	NSString *message;
+
+	if([AppDelegate shared].isRefreshing)
+	{
+		message = @"Refreshing PR information, please wait a moment...";
+	}
+	else if(filterValueOrNil.length)
+	{
+		message = @"There are no PRs matching this filter.";
+	}
+	else if(openRequests>0)
+	{
+		message = [NSString stringWithFormat:@"%ld PRs are hidden by your settings.",(unsigned long)openRequests];
+	}
+	else if([Repo countActiveReposInMoc:self.managedObjectContext]==0)
+	{
+		messageColor = [COLOR_CLASS colorWithRed:0.8 green:0.0 blue:0.0 alpha:1.0];
+		message = @"There are no active repositories, please add or activate some.";
+	}
+	else if(openRequests==0)
+	{
+		message = @"There are no open PRs for your selected repositories.";
+	}
+
+	NSMutableParagraphStyle *paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+	paragraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
+#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
+	paragraphStyle.alignment = NSCenterTextAlignment;
+	return [[NSAttributedString alloc] initWithString:message
+										   attributes:@{ NSForegroundColorAttributeName: messageColor,
+														 NSParagraphStyleAttributeName: paragraphStyle }];
+#else
+	paragraphStyle.alignment = NSTextAlignmentCenter;
+	return [[NSAttributedString alloc] initWithString:message
+										   attributes:@{ NSForegroundColorAttributeName: messageColor,
+														 NSParagraphStyleAttributeName: paragraphStyle,
+														 NSFontAttributeName: [UIFont systemFontOfSize:[UIFont smallSystemFontSize]] }];
+#endif
 }
 
 @end

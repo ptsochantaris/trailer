@@ -27,7 +27,7 @@ CGFloat GLOBAL_SCREEN_SCALE;
 
 	// ONLY FOR DEBUG!
 	//NSArray *allPRs = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.dataManager.managedObjectContext];
-    //for(PullRequest *r in allPRs) [r setTitle:nil];
+    //for(PullRequest *r in allPRs) r.condition = @kPullRequestConditionMerged;
 
 	[self.dataManager postProcessAllPrs];
 
@@ -47,8 +47,7 @@ CGFloat GLOBAL_SCREEN_SCALE;
 	double delayInSeconds = 0.1;
 	dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
 	dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-		NSArray *activeRepos = [Repo activeReposInMoc:self.dataManager.managedObjectContext];
-		if(activeRepos.count==0 || [Settings shared].authToken.length==0)
+		if([Repo countActiveReposInMoc:self.dataManager.managedObjectContext]==0 || [Settings shared].authToken.length==0)
 		{
 			[self forcePreferences];
 		}
@@ -268,11 +267,14 @@ CGFloat GLOBAL_SCREEN_SCALE;
 
 		if(!success && [UIApplication sharedApplication].applicationState==UIApplicationStateActive)
 		{
-			[[[UIAlertView alloc] initWithTitle:@"Refresh failed"
-										message:@"Loading the latest data from Github failed"
-									   delegate:nil
-							  cancelButtonTitle:@"OK"
-							  otherButtonTitles:nil] show];
+			if(![Settings shared].dontReportRefreshFailures)
+			{
+				[[[UIAlertView alloc] initWithTitle:@"Refresh failed"
+											message:@"Loading the latest data from Github failed"
+										   delegate:nil
+								  cancelButtonTitle:@"OK"
+								  otherButtonTitles:nil] show];
+			}
 		}
 
 		self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:[Settings shared].refreshPeriod
