@@ -550,31 +550,8 @@ static AppDelegate *_static_shared_ref;
 	else
 	{
 		top = 100;
-		NSString *message;
-		NSColor *messageColor = [NSColor darkGrayColor];
-		NSUInteger openRequests = [PullRequest countOpenRequestsInMoc:self.dataManager.managedObjectContext];
-		if(self.isRefreshing)
-		{
-			message = @"Refreshing PR information, please wait a moment...";
-		}
-		else if(self.mainMenuFilter.stringValue.length)
-		{
-			message = @"There are no PRs matching this filter.";
-		}
-		else if(openRequests>0)
-		{
-			message = [NSString stringWithFormat:@"%ld PRs are hidden by your settings.",openRequests];
-		}
-		else if([Repo activeReposInMoc:self.dataManager.managedObjectContext].count==0)
-		{
-			messageColor = [NSColor colorWithRed:0.8 green:0.0 blue:0.0 alpha:1.0];
-			message = @"There are no active repositories, please visit preferences to add or activate some.";
-		}
-		else if(openRequests==0)
-		{
-			message = @"There are no open PRs for your selected repositories.";
-		}
-		EmptyView *empty = [[EmptyView alloc] initWithFrame:CGRectMake(0, 0, MENU_WIDTH, top) message:message color:messageColor];
+		EmptyView *empty = [[EmptyView alloc] initWithFrame:CGRectMake(0, 0, MENU_WIDTH, top)
+													message:[self.dataManager reasonForEmptyWithFilter:self.mainMenuFilter.stringValue]];
 		[menuContents addSubview:empty];
 	}
 
@@ -941,8 +918,7 @@ static AppDelegate *_static_shared_ref;
 
 - (IBAction)refreshNowSelected:(NSMenuItem *)sender
 {
-	NSArray *activeRepos = [Repo activeReposInMoc:self.dataManager.managedObjectContext];
-	if(activeRepos.count==0)
+	if([Repo countActiveReposInMoc:self.dataManager.managedObjectContext]==0)
 	{
 		[self preferencesSelected:nil];
 		return;

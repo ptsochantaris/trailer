@@ -1,6 +1,4 @@
 
-#import "HTTextField.h"
-
 @implementation HTTextField
 
 - (BOOL)performKeyEquivalent:(NSEvent *)event {

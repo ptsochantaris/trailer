@@ -1,6 +1,6 @@
 
 @interface EmptyView : NSView
 
-- (id)initWithFrame:(NSRect)frameRect message:(NSString *)message color:(NSColor *)messageColor;
+- (id)initWithFrame:(NSRect)frameRect message:(NSAttributedString *)message;
 
 @end

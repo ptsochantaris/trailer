@@ -210,8 +210,12 @@
 }
 -(void)setApiBackEnd:(NSString *)apiBackEnd
 {
+	NSString *oldValue = self.apiBackEnd;
 	[self storeDefaultValue:apiBackEnd forKey:API_BACKEND_SERVER];
-	[[AppDelegate shared].api restartNotifier];
+	if(![oldValue isEqualToString:apiBackEnd])
+	{
+		[[AppDelegate shared].api restartNotifier];
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

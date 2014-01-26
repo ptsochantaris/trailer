@@ -190,12 +190,15 @@
 											 selector:@selector(reloadData)
 												 name:DISPLAY_OPTIONS_UPDATED_KEY
 											   object:nil];
+
+	[self updateStatus];
 }
 
 - (void)reloadData
 {
 	_fetchedResultsController = nil;
 	[self.tableView reloadData];
+	[self updateStatus];
 }
 
 - (void)localNotification:(NSNotification *)notification
@@ -279,12 +282,17 @@
 - (void)refreshStarted
 {
 	self.title = @"Refreshing...";
+	[self updateStatus];
 }
 
 - (void)refreshEnded
 {
 	NSInteger count = [PullRequest countOpenRequestsInMoc:self.managedObjectContext];
-	self.title = [NSString stringWithFormat:@"%ld Open PRs",(long)count];
+	if(count>0)
+		self.title = [NSString stringWithFormat:@"%ld Open PRs",(long)count];
+	else
+		self.title = @"No open PRs";
+	[self updateStatus];
 }
 
 #pragma mark - Table View
@@ -467,6 +475,19 @@
 {
     PullRequest *pr = [self.fetchedResultsController objectAtIndexPath:indexPath];
 	[((PRCell *)cell) setPullRequest:pr];
+}
+
+- (void)updateStatus
+{
+	if(self.fetchedResultsController.fetchedObjects.count)
+	{
+		self.tableView.tableFooterView = nil;
+	}
+	else
+	{
+		EmptyView *label = [[EmptyView alloc] initWithMessage:[[AppDelegate shared].dataManager reasonForEmptyWithFilter:searchField.text]];
+		self.tableView.tableFooterView = label;
+	}
 }
 
 ///////////////////////////// filtering

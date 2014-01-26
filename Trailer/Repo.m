@@ -1,6 +1,4 @@
 
-#import "Repo.h"
-
 @implementation Repo
 
 @dynamic fullName;
@@ -20,6 +18,13 @@
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"Repo"];
 	f.predicate = [NSPredicate predicateWithFormat:@"active = YES"];
 	return [moc executeFetchRequest:f error:nil];
+}
+
++(NSUInteger)countActiveReposInMoc:(NSManagedObjectContext *)moc
+{
+	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"Repo"];
+	f.predicate = [NSPredicate predicateWithFormat:@"active = YES"];
+	return [moc countForFetchRequest:f error:nil];
 }
 
 -(void)prepareForDeletion

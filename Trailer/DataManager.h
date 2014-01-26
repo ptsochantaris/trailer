@@ -17,4 +17,6 @@
 
 - (void)postProcessAllPrs;
 
+- (NSAttributedString *)reasonForEmptyWithFilter:(NSString *)filterValueOrNil;
+
 @end

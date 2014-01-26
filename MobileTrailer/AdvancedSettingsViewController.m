@@ -24,6 +24,17 @@
 	[[NSNotificationCenter defaultCenter] postNotificationName:DISPLAY_OPTIONS_UPDATED_KEY object:nil];
 }
 
+#define REFRESH_SECTION_INDEX 0
+#define DISPLAY_SECTION_INDEX 1
+#define COMMENTS_SECTION_INDEX 2
+#define REPOS_SECTION_INDEX 3
+#define MERGING_SECTION_INDEX 4
+#define CONFIRM_SECTION_INDEX 5
+#define SORT_SECTION_INDEX 6
+#define API_SECTION_INDEX 7
+
+#define TOTAL_SECTIONS 8
+
 #define SORT_REVERSE @[@"Newest first",@"Most recently active",@"Reverse alphabetically"]
 #define SORT_NORMAL @[@"Oldest first",@"Inactive for longest",@"Alphabetically"]
 
@@ -31,7 +42,7 @@
 {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell"];
 	cell.accessoryType = UITableViewCellAccessoryNone;
-	if(indexPath.section==0)
+	if(indexPath.section==REFRESH_SECTION_INDEX)
 	{
 		switch (indexPath.row)
 		{
@@ -56,7 +67,7 @@
 			}
 		}
 	}
-	else if(indexPath.section==1)
+	else if(indexPath.section==DISPLAY_SECTION_INDEX)
 	{
 		cell.detailTextLabel.text = nil;
 		switch (indexPath.row)
@@ -84,20 +95,11 @@
             }
 		}
 	}
-	else if(indexPath.section==2)
+	else if(indexPath.section==COMMENTS_SECTION_INDEX)
 	{
 		cell.detailTextLabel.text = nil;
 		switch (indexPath.row)
 		{
-			case 2:
-			{
-				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-					cell.textLabel.text = [NSString stringWithFormat:@"Move PRs that mention me to 'Participated'"];
-				else
-					cell.textLabel.text = [NSString stringWithFormat:@"Move PRs that mention me\nto 'Participated'"];
-				if([Settings shared].autoParticipateInMentions) cell.accessoryType = UITableViewCellAccessoryCheckmark;
-				break;
-			}
 			case 0:
 			{
 				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
@@ -116,9 +118,18 @@
 				if([Settings shared].shouldHideUncommentedRequests) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
+			case 2:
+			{
+				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+					cell.textLabel.text = [NSString stringWithFormat:@"Move PRs that mention me to 'Participated'"];
+				else
+					cell.textLabel.text = [NSString stringWithFormat:@"Move PRs that mention me\nto 'Participated'"];
+				if([Settings shared].autoParticipateInMentions) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				break;
+			}
 		}
 	}
-	else if(indexPath.section==3)
+	else if(indexPath.section==REPOS_SECTION_INDEX)
 	{
 		cell.detailTextLabel.text = nil;
 		switch (indexPath.row)
@@ -140,11 +151,17 @@
             }
 		}
 	}
-	else if(indexPath.section==4)
+	else if(indexPath.section==MERGING_SECTION_INDEX)
 	{
 		cell.detailTextLabel.text = nil;
 		switch (indexPath.row)
 		{
+			case 0:
+			{
+				cell.textLabel.text = [NSString stringWithFormat:@"Keep closed PRs"];
+				if([Settings shared].alsoKeepClosedPrs) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				break;
+			}
 			case 1:
 			{
 				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
@@ -154,15 +171,9 @@
 				if([Settings shared].dontKeepMyPrs) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
-			case 0:
-			{
-				cell.textLabel.text = [NSString stringWithFormat:@"Keep closed PRs"];
-				if([Settings shared].alsoKeepClosedPrs) cell.accessoryType = UITableViewCellAccessoryCheckmark;
-				break;
-			}
 		}
 	}
-	else if(indexPath.section==5)
+	else if(indexPath.section==CONFIRM_SECTION_INDEX)
 	{
 		cell.detailTextLabel.text = nil;
 		switch (indexPath.row)
@@ -181,27 +192,27 @@
             }
 		}
 	}
-	else if(indexPath.section==6)
+	else if(indexPath.section==SORT_SECTION_INDEX)
 	{
 		cell.detailTextLabel.text = nil;
 		switch (indexPath.row)
 		{
 			case 0:
 			{
-				cell.textLabel.text = [NSString stringWithFormat:@"Sort by"];
-				if([Settings shared].sortDescending)
-					cell.detailTextLabel.text = SORT_REVERSE[[Settings shared].sortMethod];
-				else
-					cell.detailTextLabel.text = SORT_NORMAL[[Settings shared].sortMethod];
-				break;
-			}
-			case 1:
-			{
-				cell.textLabel.text = [NSString stringWithFormat:@"Sort direction"];
+				cell.textLabel.text = [NSString stringWithFormat:@"Direction"];
 				if([Settings shared].sortDescending)
 					cell.detailTextLabel.text = @"Reverse";
 				else
 					cell.detailTextLabel.text = @"Normal";
+				break;
+			}
+			case 1:
+			{
+				cell.textLabel.text = [NSString stringWithFormat:@"Criterion"];
+				if([Settings shared].sortDescending)
+					cell.detailTextLabel.text = SORT_REVERSE[[Settings shared].sortMethod];
+				else
+					cell.detailTextLabel.text = SORT_NORMAL[[Settings shared].sortMethod];
 				break;
 			}
 			case 2:
@@ -212,12 +223,18 @@
 			}
 		}
 	}
+	else if(indexPath.section==API_SECTION_INDEX)
+	{
+		cell.textLabel.text = @"API Server";
+		cell.detailTextLabel.text = nil;
+		cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+	}
 	return cell;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-	if(indexPath.section==0)
+	if(indexPath.section==REFRESH_SECTION_INDEX)
 	{
 		pickerName = [self.tableView cellForRowAtIndexPath:indexPath].textLabel.text;
 		selectedIndexPath = indexPath;
@@ -252,7 +269,7 @@
 		valuesToPush = values;
 		[self performSegueWithIdentifier:@"showPicker" sender:self];
 	}
-	else if(indexPath.section==1)
+	else if(indexPath.section==DISPLAY_SECTION_INDEX)
 	{
 		switch (indexPath.row)
 		{
@@ -274,15 +291,10 @@
 		}
 		[settingsChangedAnnounceTimer push];
 	}
-	else if(indexPath.section==2)
+	else if(indexPath.section==COMMENTS_SECTION_INDEX)
 	{
 		switch (indexPath.row)
 		{
-			case 2:
-			{
-				[Settings shared].autoParticipateInMentions = ![Settings shared].autoParticipateInMentions;
-				break;
-			}
 			case 0:
 			{
 				[Settings shared].showCommentsEverywhere = ![Settings shared].showCommentsEverywhere;
@@ -293,10 +305,15 @@
 				[Settings shared].shouldHideUncommentedRequests = ![Settings shared].shouldHideUncommentedRequests;
 				break;
 			}
+			case 2:
+			{
+				[Settings shared].autoParticipateInMentions = ![Settings shared].autoParticipateInMentions;
+				break;
+			}
 		}
 		[settingsChangedAnnounceTimer push];
 	}
-	else if(indexPath.section==3)
+	else if(indexPath.section==REPOS_SECTION_INDEX)
 	{
 		switch (indexPath.row)
 		{
@@ -313,24 +330,24 @@
 		}
 		[settingsChangedAnnounceTimer push];
 	}
-	else if(indexPath.section==4)
+	else if(indexPath.section==MERGING_SECTION_INDEX)
 	{
 		switch (indexPath.row)
 		{
-			case 1:
-			{
-				[Settings shared].dontKeepMyPrs = ![Settings shared].dontKeepMyPrs;
-				break;
-			}
 			case 0:
 			{
 				[Settings shared].alsoKeepClosedPrs = ![Settings shared].alsoKeepClosedPrs;
 				break;
 			}
+			case 1:
+			{
+				[Settings shared].dontKeepMyPrs = ![Settings shared].dontKeepMyPrs;
+				break;
+			}
 		}
 		[settingsChangedAnnounceTimer push];
 	}
-	else if(indexPath.section==5)
+	else if(indexPath.section==CONFIRM_SECTION_INDEX)
 	{
 		switch (indexPath.row)
 		{
@@ -347,18 +364,18 @@
 		}
 		[settingsChangedAnnounceTimer push];
 	}
-	else if(indexPath.section==6)
+	else if(indexPath.section==SORT_SECTION_INDEX)
 	{
 		switch (indexPath.row)
 		{
-			case 1:
+			case 0:
 			{
 				[Settings shared].sortDescending = ![Settings shared].sortDescending;
 				[settingsChangedAnnounceTimer push];
 				[self.tableView reloadData];
 				break;
 			}
-			case 0:
+			case 1:
 			{
 				selectedIndexPath = indexPath;
 				previousValue = [Settings shared].sortMethod;
@@ -378,19 +395,24 @@
 			}
 		}
 	}
+	else if(indexPath.section==API_SECTION_INDEX)
+	{
+		[self performSegueWithIdentifier:@"apiServer" sender:self];
+	}
 	[tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     switch (section) {
-		case 0: return 2; // refresh period, background refresh
-		case 1: return 3; // toggled options
-		case 2: return 3; // toggled options
-		case 3: return 2; // toggled options
-		case 4: return 2; // toggled options
-		case 5: return 2; // toggled options
-		case 6: return 3; // sorting category, sorting direction
+		case REFRESH_SECTION_INDEX: return 2;
+		case DISPLAY_SECTION_INDEX: return 3;
+		case COMMENTS_SECTION_INDEX: return 3;
+		case REPOS_SECTION_INDEX: return 2;
+		case MERGING_SECTION_INDEX: return 2;
+		case CONFIRM_SECTION_INDEX: return 2;
+		case SORT_SECTION_INDEX: return 3;
+		case API_SECTION_INDEX: return 1;
 	}
 	return 0;
 }
@@ -398,20 +420,21 @@
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
     switch (section) {
-		case 0: return @"Auto Refresh"; // refresh period, background refresh
-		case 1: return @"Display"; // toggled options
-		case 2: return @"Comments"; // toggled options
-		case 3: return @"Repositories"; // toggled options
-		case 4: return @"Merging"; // toggled options
-		case 5: return @"Don't confirm when"; // toggled options
-		case 6: return @"Sorting"; // sorting category, sorting direction
+		case REFRESH_SECTION_INDEX: return @"Auto Refresh";
+		case DISPLAY_SECTION_INDEX: return @"Display";
+		case COMMENTS_SECTION_INDEX: return @"Comments";
+		case REPOS_SECTION_INDEX: return @"Repositories";
+		case MERGING_SECTION_INDEX: return @"Merging";
+		case CONFIRM_SECTION_INDEX: return @"Don't confirm when";
+		case SORT_SECTION_INDEX: return @"Sorting";
+		case API_SECTION_INDEX: return @"API";
 	}
 	return nil;
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return 7;
+    return TOTAL_SECTIONS;
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
@@ -430,7 +453,7 @@
 
 - (void)pickerViewController:(PickerViewController *)picker selectedIndexPath:(NSIndexPath *)indexPath
 {
-	if(selectedIndexPath.section==0)
+	if(selectedIndexPath.section==REFRESH_SECTION_INDEX)
 	{
 		if(selectedIndexPath.row==0)
 		{
@@ -441,7 +464,7 @@
 			[Settings shared].backgroundRefreshPeriod = (indexPath.row*10+10)*60.0;
 		}
 	}
-	else if(selectedIndexPath.section==2)
+	else if(selectedIndexPath.section==SORT_SECTION_INDEX)
 	{
 		[Settings shared].sortMethod = indexPath.row;
 		[settingsChangedAnnounceTimer push];

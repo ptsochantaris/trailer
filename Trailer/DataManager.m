@@ -245,4 +245,55 @@
 	for(PullRequest *r in prs) [r postProcess];
 }
 
+- (NSAttributedString *)reasonForEmptyWithFilter:(NSString *)filterValueOrNil
+{
+
+#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
+	#define COLOR_CLASS NSColor
+#else
+	#define COLOR_CLASS UIColor
+#endif
+
+	COLOR_CLASS *messageColor = [COLOR_CLASS lightGrayColor];
+	NSUInteger openRequests = [PullRequest countOpenRequestsInMoc:self.managedObjectContext];
+	NSString *message;
+
+	if([AppDelegate shared].isRefreshing)
+	{
+		message = @"Refreshing PR information, please wait a moment...";
+	}
+	else if(filterValueOrNil.length)
+	{
+		message = @"There are no PRs matching this filter.";
+	}
+	else if(openRequests>0)
+	{
+		message = [NSString stringWithFormat:@"%ld PRs are hidden by your settings.",(unsigned long)openRequests];
+	}
+	else if([Repo countActiveReposInMoc:self.managedObjectContext]==0)
+	{
+		messageColor = [COLOR_CLASS colorWithRed:0.8 green:0.0 blue:0.0 alpha:1.0];
+		message = @"There are no active repositories, please add or activate some.";
+	}
+	else if(openRequests==0)
+	{
+		message = @"There are no open PRs for your selected repositories.";
+	}
+
+	NSMutableParagraphStyle *paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+	paragraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
+#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
+	paragraphStyle.alignment = NSCenterTextAlignment;
+	return [[NSAttributedString alloc] initWithString:message
+										   attributes:@{ NSForegroundColorAttributeName: messageColor,
+														 NSParagraphStyleAttributeName: paragraphStyle }];
+#else
+	paragraphStyle.alignment = NSTextAlignmentCenter;
+	return [[NSAttributedString alloc] initWithString:message
+										   attributes:@{ NSForegroundColorAttributeName: messageColor,
+														 NSParagraphStyleAttributeName: paragraphStyle,
+														 NSFontAttributeName: [UIFont systemFontOfSize:[UIFont smallSystemFontSize]] }];
+#endif
+}
+
 @end
