@@ -32,7 +32,7 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 
     searchTimer = [[HTPopTimer alloc] initWithTimeInterval:0.5 target:self selector:@selector(reloadData)];
 
-    searchField = [[UITextField alloc] initWithFrame:CGRectMake(10, 10, 300, 31)];
+    searchField = [[UITextField alloc] initWithFrame:CGRectMake(10, 10, self.view.bounds.size.width-20, 31)];
 	searchField.placeholder = @"Filter...";
 	searchField.returnKeyType = UIReturnKeySearch;
 	searchField.font = [UIFont systemFontOfSize:18.0];
@@ -42,9 +42,12 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 	searchField.autocapitalizationType = UITextAutocapitalizationTypeNone;
 	searchField.autocorrectionType = UITextAutocorrectionTypeNo;
     searchField.delegate = self;
+	searchField.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 
-    UIView *searchHolder = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 50)];
+    UIView *searchHolder = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 50)];
 	[searchHolder addSubview:searchField];
+	searchHolder.autoresizesSubviews = YES;
+	searchHolder.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	self.repositories.tableHeaderView = searchHolder;
 
     self.repositories.contentOffset = CGPointMake(0, 50);
