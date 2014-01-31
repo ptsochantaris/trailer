@@ -12,7 +12,8 @@
 	NSArray *latestPrs = [PullRequest newItemsOfType:@"PullRequest" inMoc:mainContext];
 	for(PullRequest *r in latestPrs)
 	{
-		[[AppDelegate shared] postNotificationOfType:kNewPr forItem:r];
+		if(!r.isMine)
+			[[AppDelegate shared] postNotificationOfType:kNewPr forItem:r];
 		r.postSyncAction = @(kPostSyncDoNothing);
 	}
 
@@ -247,13 +248,6 @@
 
 - (NSAttributedString *)reasonForEmptyWithFilter:(NSString *)filterValueOrNil
 {
-
-#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
-	#define COLOR_CLASS NSColor
-#else
-	#define COLOR_CLASS UIColor
-#endif
-
 	COLOR_CLASS *messageColor = [COLOR_CLASS lightGrayColor];
 	NSUInteger openRequests = [PullRequest countOpenRequestsInMoc:self.managedObjectContext];
 	NSString *message;

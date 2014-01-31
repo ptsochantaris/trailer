@@ -190,6 +190,23 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#define SHOW_STATUS_ITEMS @"SHOW_STATUS_ITEMS"
+-(void)setShowStatusItems:(BOOL)showStatusItems { [self storeDefaultValue:@(showStatusItems) forKey:SHOW_STATUS_ITEMS]; }
+-(BOOL)showStatusItems
+{
+	NSString *v = [[NSUserDefaults standardUserDefaults] stringForKey:SHOW_STATUS_ITEMS];
+	if(!v) v = @"true";
+	return [v boolValue];
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define MAKE_STATUS_ITEMS_SELECTABLE @"MAKE_STATUS_ITEMS_SELECTABLE"
+-(void)setMakeStatusItemsSelectable:(BOOL)makeStatusItemsSelectable { [self storeDefaultValue:@(makeStatusItemsSelectable) forKey:MAKE_STATUS_ITEMS_SELECTABLE]; }
+-(BOOL)makeStatusItemsSelectable { return [[[NSUserDefaults standardUserDefaults] stringForKey:MAKE_STATUS_ITEMS_SELECTABLE] boolValue]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #define API_FRONTEND_SERVER @"API_FRONTEND_SERVER"
 -(NSString *)apiFrontEnd
 {

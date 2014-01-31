@@ -68,7 +68,7 @@ CGFloat GLOBAL_SCREEN_SCALE;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (void)applicationWillEnterForeground:(UIApplication *)application
+- (void)applicationWillResignActive:(UIApplication *)application
 {
 	self.enteringForeground = YES;
 }

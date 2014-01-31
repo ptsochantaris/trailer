@@ -17,6 +17,7 @@
 							dontKeepMyPrs, hideAvatars, autoParticipateInMentions,
 							alsoKeepClosedPrs, dontAskBeforeWipingMerged,
 							dontAskBeforeWipingClosed, includeReposInFilter, showReposInName,
-							dontReportRefreshFailures, groupByRepo, hideAllPrsSection;
+							dontReportRefreshFailures, groupByRepo, hideAllPrsSection,
+							showStatusItems, makeStatusItemsSelectable;
 
 @end

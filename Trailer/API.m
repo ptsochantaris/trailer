@@ -77,10 +77,59 @@
 	}];
 }
 
+- (void)fetchStatusesForCurrentPullRequestsToMoc:(NSManagedObjectContext *)moc andCallback:(void (^)(BOOL))callback
+{
+	NSArray *prs = [DataItem newOrUpdatedItemsOfType:@"PullRequest" inMoc:moc];
+
+	if(!prs.count)
+	{
+		if(callback) callback(YES);
+		return;
+	}
+
+	for(PullRequest *r in prs)
+	{
+		NSArray *statuses = [PRStatus statusesForPullRequestId:r.serverId inMoc:moc];
+		for(PRStatus *s in statuses) s.postSyncAction = @(kPostSyncDelete);
+	}
+
+	NSInteger total = prs.count;
+	__block NSInteger succeeded = 0;
+	__block NSInteger failed = 0;
+
+	for(PullRequest *p in prs)
+	{
+		[self getPagedDataInPath:p.statusesLink
+				startingFromPage:1
+						  params:nil
+				 perPageCallback:^(id data, BOOL lastPage) {
+					 for(NSDictionary *info in data)
+					 {
+						 PRStatus *s = [PRStatus statusWithInfo:info moc:moc];
+						 if(!s.pullRequestId) s.pullRequestId = p.serverId;
+					 }
+				 } finalCallback:^(BOOL success, NSInteger resultCode) {
+					 if(success) succeeded++; else failed++;
+					 if(succeeded+failed==total)
+					 {
+						 if(failed==0)
+						 {
+							 [DataItem nukeDeletedItemsOfType:@"PRStatus" inMoc:moc];
+							 if(callback) callback(YES);
+						 }
+						 else
+						 {
+							 if(callback) callback(NO);
+						 }
+					 }
+				 }];
+	}
+}
+
 -(void)fetchCommentsForCurrentPullRequestsToMoc:(NSManagedObjectContext *)moc andCallback:(void (^)(BOOL))callback
 {
-	NSMutableArray *prs1 = [[DataItem newOrUpdatedItemsOfType:@"PullRequest" inMoc:moc] mutableCopy];
-	for(PullRequest *r in prs1)
+	NSArray *prs = [DataItem newOrUpdatedItemsOfType:@"PullRequest" inMoc:moc];
+	for(PullRequest *r in prs)
 	{
 		NSArray *comments = [PRComment commentsForPullRequestUrl:r.url inMoc:moc];
 		for(PRComment *c in comments) c.postSyncAction = @(kPostSyncDelete);
@@ -101,21 +150,23 @@
 		}
 	};
 
-	[self _fetchCommentsForPullRequestIssues:YES toMoc:moc andCallback:completionCallback];
+	[self _fetchCommentsForPullRequests:prs issues:YES toMoc:moc andCallback:completionCallback];
 
-	[self _fetchCommentsForPullRequestIssues:NO toMoc:moc andCallback:completionCallback];
+	[self _fetchCommentsForPullRequests:prs issues:NO toMoc:moc andCallback:completionCallback];
 }
 
--(void)_fetchCommentsForPullRequestIssues:(BOOL)issues toMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
+-(void)_fetchCommentsForPullRequests:(NSArray*)prs
+							  issues:(BOOL)issues
+							   toMoc:(NSManagedObjectContext *)moc
+						 andCallback:(void(^)(BOOL success))callback
 {
-	NSArray *prs = [DataItem newOrUpdatedItemsOfType:@"PullRequest" inMoc:moc];
-	if(!prs.count)
+	NSInteger total = prs.count;
+	if(!total)
 	{
 		if(callback) callback(YES);
 		return;
 	}
 
-	NSInteger total = prs.count;
 	__block NSInteger succeeded = 0;
 	__block NSInteger failed = 0;
 
@@ -298,44 +349,68 @@
 			syncContext.parentContext = [AppDelegate shared].dataManager.managedObjectContext;
 			syncContext.undoManager = nil;
 
-			NSArray *prs = [PullRequest itemsOfType:@"PullRequest" surviving:YES inMoc:syncContext];
-			for(PullRequest *r in prs)
-				if(r.condition.integerValue == kPullRequestConditionOpen)
-					r.postSyncAction = @(kPostSyncDelete);
-			NSMutableArray *activeRepos = [[Repo activeReposInMoc:syncContext] mutableCopy];
-			[self _fetchPullRequestsForRepos:activeRepos toMoc:syncContext andCallback:^(BOOL success) {
+			[self syncToMoc:syncContext andCallback:callback];
+		}
+		else if(callback) callback(NO);
+	}];
+}
+
+- (void)syncToMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
+{
+	NSArray *prs = [PullRequest itemsOfType:@"PullRequest" surviving:YES inMoc:moc];
+	for(PullRequest *r in prs)
+		if(r.condition.integerValue == kPullRequestConditionOpen)
+			r.postSyncAction = @(kPostSyncDelete);
+
+	NSArray *activeRepos = [Repo activeReposInMoc:moc];
+	[self fetchPullRequestsForRepos:activeRepos toMoc:moc andCallback:^(BOOL success) {
+		if(success)
+		{
+			[self updatePullRequestsInMoc:moc andCallback:^(BOOL success) {
 				if(success)
 				{
-					[self fetchCommentsForCurrentPullRequestsToMoc:syncContext andCallback:^(BOOL success) {
-						if(success)
-						{
-							[self detectMergedPullRequestsInMoc:syncContext andCallback:^(BOOL success) {
-								if(success)
-								{
-									[DataItem nukeDeletedItemsOfType:@"Repo" inMoc:syncContext];
-									[DataItem nukeDeletedItemsOfType:@"PullRequest" inMoc:syncContext];
+					// do not cleanup PRs before because some "deleted" ones will turn to merged or closed ones
+					[DataItem nukeDeletedItemsOfType:@"Repo" inMoc:moc];
+					[DataItem nukeDeletedItemsOfType:@"PullRequest" inMoc:moc];
 
-									NSArray *surviving = [PullRequest itemsOfType:@"PullRequest" surviving:YES inMoc:syncContext];
-									for(PullRequest *r in surviving) [r postProcess];
+					NSArray *surviving = [PullRequest itemsOfType:@"PullRequest" surviving:YES inMoc:moc];
+					for(PullRequest *r in surviving) [r postProcess];
 
-									if(success && syncContext.hasChanges)
-									{
-										[syncContext save:nil];
-									}
-									if(callback) callback(success);
-								}
-							}];
-						}
-					}];
+					if(moc.hasChanges)
+					{
+						DLog(@"Database dirty after sync, saving");
+						[moc save:nil];
+					}
 				}
-				else if(callback) callback(NO);
+				if(callback) callback(success);
 			}];
 		}
 		else if(callback) callback(NO);
 	}];
 }
 
--(void)_fetchPullRequestsForRepos:(NSMutableArray *)repos toMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
+- (void)updatePullRequestsInMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
+{
+	NSInteger totalOperations = 3;
+	__block NSInteger succeded = 0;
+	__block NSInteger failed = 0;
+
+	typedef void (^completionBlockType)(BOOL);
+
+	completionBlockType completionCallback = ^(BOOL success) {
+		if(success) succeded++; else failed++;
+		if(succeded+failed==totalOperations)
+		{
+			if(callback) callback(failed==0);
+		}
+	};
+	
+	[self fetchCommentsForCurrentPullRequestsToMoc:moc andCallback:completionCallback];
+	[self fetchStatusesForCurrentPullRequestsToMoc:moc andCallback:completionCallback];
+	[self detectMergedPullRequestsInMoc:moc andCallback:completionCallback];
+}
+
+-(void)fetchPullRequestsForRepos:(NSArray *)repos toMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
 {
 	if(!repos.count)
 	{
