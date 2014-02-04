@@ -259,7 +259,7 @@
 				NSInteger count=0;
 				for(NSInteger f=10;f<10000;f+=10)
 				{
-					if(f==[Settings shared].backgroundRefreshPeriod/60) previousValue = count;
+					if(f==[Settings shared].backgroundRefreshPeriod/60.0) previousValue = count;
 					[values addObject:[NSString stringWithFormat:@"%ld minutes",(long)f]];
 					count++;
 				}

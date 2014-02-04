@@ -7,8 +7,8 @@ static AppDelegate *_static_shared_ref;
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
 	// Useful snippet for resetting prefs when testing
-	// NSString *appDomain = [[NSBundle mainBundle] bundleIdentifier];
-	// [[NSUserDefaults standardUserDefaults] removePersistentDomainForName:appDomain];
+	//NSString *appDomain = [[NSBundle mainBundle] bundleIdentifier];
+	//[[NSUserDefaults standardUserDefaults] removePersistentDomainForName:appDomain];
 
 	self.mainMenu.backgroundColor = [NSColor whiteColor];
 
@@ -33,8 +33,7 @@ static AppDelegate *_static_shared_ref;
 
 	// ONLY FOR DEBUG!
 	//NSArray *allPRs = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.dataManager.managedObjectContext];
-    //[[allPRs objectAtIndex:0] setCondition:@kPullRequestConditionMerged];
-    //[[allPRs objectAtIndex:1] setCondition:@kPullRequestConditionClosed];
+    //[[allPRs objectAtIndex:0] setMergeable:@NO];
 
 	[self.dataManager postProcessAllPrs];
 	[self updateMenu];
@@ -183,6 +182,20 @@ static AppDelegate *_static_shared_ref;
 {
 	[Settings shared].sortMethod = self.sortModeSelect.indexOfSelectedItem;
 	[self.dataManager postProcessAllPrs]; // apply any view option changes
+	[self updateMenu];
+}
+
+- (IBAction)showStatusItemsSelected:(NSButton *)sender
+{
+	BOOL show = (sender.integerValue==1);
+	[Settings shared].showStatusItems = show;
+	[self updateMenu];
+}
+
+- (IBAction)makeStatusItemsSelectableSelected:(NSButton *)sender
+{
+	BOOL yes = (sender.integerValue==1);
+	[Settings shared].makeStatusItemsSelectable = yes;
 	[self updateMenu];
 }
 
@@ -692,6 +705,8 @@ static AppDelegate *_static_shared_ref;
 	[self.sortingOrder setIntegerValue:[Settings shared].sortDescending];
 	[self.showCreationDates setIntegerValue:[Settings shared].showCreatedInsteadOfUpdated];
 	[self.groupByRepo setIntegerValue:[Settings shared].groupByRepo];
+	[self.showStatusItems setIntegerValue:[Settings shared].showStatusItems];
+	[self.makeStatusItemsSelectable setIntegerValue:[Settings shared].makeStatusItemsSelectable];
 
 	[self.refreshDurationStepper setFloatValue:[Settings shared].refreshPeriod];
 	[self refreshDurationChanged:nil];

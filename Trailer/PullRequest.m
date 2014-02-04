@@ -22,6 +22,8 @@
 @dynamic totalComments;
 @dynamic unreadComments;
 @dynamic repoName;
+@dynamic mergeable;
+@dynamic statusesLink;
 
 + (PullRequest *)pullRequestWithInfo:(NSDictionary *)info moc:(NSManagedObjectContext *)moc
 {
@@ -34,6 +36,10 @@
 	p.title = [info ofk:@"title"];
 	p.body = [info ofk:@"body"];
 
+	NSNumber *m = [info ofk:@"mergeable"];
+	if(!m) m = @YES;
+	p.mergeable = m;
+
 	NSDictionary *userInfo = [info ofk:@"user"];
 	p.userId = [userInfo ofk:@"id"];
 	p.userLogin = [userInfo ofk:@"login"];
@@ -44,7 +50,8 @@
 	NSDictionary *linkInfo = [info ofk:@"_links"];
 	p.issueCommentLink = [[linkInfo ofk:@"comments"] ofk:@"href"];
 	p.reviewCommentLink = [[linkInfo ofk:@"review_comments"] ofk:@"href"];
-	
+	p.statusesLink = [[linkInfo ofk:@"statuses"] ofk:@"href"];
+
 	p.condition = @kPullRequestConditionOpen;
 
 	return p;
@@ -243,6 +250,32 @@
 			return YES;
 	return NO;
 
+}
+
+- (NSArray *)displayedStatuses
+{
+	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRStatus"];
+	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestId = %@",self.serverId];
+	f.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"createdAt" ascending:NO]];
+	NSArray *ret = [self.managedObjectContext executeFetchRequest:f error:nil];
+	NSMutableArray *result = [NSMutableArray array];
+	NSMutableSet *targetUrls = [NSMutableSet set];
+	NSMutableSet *descriptions = [NSMutableSet set];
+	for(PRStatus *s in ret)
+	{
+		NSString *targetUrl = s.targetUrl;
+		NSString *desc = s.descriptionText;
+		if(![descriptions containsObject:desc])
+		{
+			[descriptions addObject:desc];
+			if(![targetUrls containsObject:targetUrl])
+			{
+				[targetUrls addObject:targetUrl];
+				[result addObject:s];
+			}
+		}
+	}
+	return result;
 }
 
 @end

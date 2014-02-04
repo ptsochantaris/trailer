@@ -20,6 +20,7 @@
 @property (nonatomic, retain) NSString * body;
 @property (nonatomic, retain) NSString * issueCommentLink;
 @property (nonatomic, retain) NSString * reviewCommentLink;
+@property (nonatomic, retain) NSString * statusesLink;
 @property (nonatomic, retain) NSDate * updatedAt;
 @property (nonatomic, retain) NSNumber * serverId;
 @property (nonatomic, retain) NSNumber * postSyncAction;
@@ -31,6 +32,7 @@
 @property (nonatomic, retain) NSDate * latestReadCommentDate;
 @property (nonatomic, retain) NSNumber *repoId;
 @property (nonatomic, retain) NSNumber *condition;
+@property (nonatomic, retain) NSNumber *mergeable;
 
 @property (nonatomic, retain) NSNumber *totalComments;
 @property (nonatomic, retain) NSNumber *unreadComments;
@@ -61,5 +63,7 @@
 - (void)postProcess;
 
 - (NSString *)subtitle;
+
+- (NSArray *)displayedStatuses;
 
 @end

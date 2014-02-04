@@ -69,6 +69,25 @@ static DetailViewController *_detail_shared_ref;
     self.masterPopoverController = nil;
 }
 
+- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
+{
+	[NSURLConnection connectionWithRequest:request delegate:self];
+	return YES;
+}
+
+- (void) connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
+{
+	NSInteger code = ((NSHTTPURLResponse*)response).statusCode;
+	if(code==404)
+	{
+		[[[UIAlertView alloc] initWithTitle:@"Not Found"
+									message:[NSString stringWithFormat:@"Please ensure you are logged in with the '%@' account on GitHub",[Settings shared].localUser]
+								   delegate:nil
+						  cancelButtonTitle:@"OK"
+						  otherButtonTitles:nil] show];
+	}
+}
+
 - (void)webViewDidStartLoad:(UIWebView *)webView
 {
 	[self.spinner startAnimating];

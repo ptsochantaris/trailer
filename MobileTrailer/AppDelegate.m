@@ -16,6 +16,8 @@ CGFloat GLOBAL_SCREEN_SCALE;
 {
 	_static_shared_ref = self;
 
+	self.enteringForeground = YES;
+
 	// Useful snippet for resetting prefs when testing
 	//NSString *appDomain = [[NSBundle mainBundle] bundleIdentifier];
 	//[[NSUserDefaults standardUserDefaults] removePersistentDomainForName:appDomain];
@@ -66,14 +68,14 @@ CGFloat GLOBAL_SCREEN_SCALE;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (void)applicationWillEnterForeground:(UIApplication *)application
+- (void)applicationWillResignActive:(UIApplication *)application
 {
 	self.enteringForeground = YES;
 }
 
 - (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification
 {
-	if(notification && (self.enteringForeground || [UIApplication sharedApplication].applicationState==UIApplicationStateInactive))
+	if(notification && self.enteringForeground)
 	{
 		[self handleLocalNotification:notification];
 	}

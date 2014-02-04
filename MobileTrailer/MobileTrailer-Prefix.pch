@@ -3,6 +3,7 @@
 
 #ifdef __OBJC__
 
+#define COLOR_CLASS UIColor
 //#define DLog(fmt, ...) NSLog(fmt, ##__VA_ARGS__)
 #define DLog(...)
 
@@ -18,6 +19,7 @@
 #import "Settings.h"
 #import "API.h"
 #import "DataItem.h"
+#import "PRStatus.h"
 #import "PRComment.h"
 #import "Org.h"
 #import "Repo.h"

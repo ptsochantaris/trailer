@@ -12,28 +12,26 @@
 	NSArray *latestPrs = [PullRequest newItemsOfType:@"PullRequest" inMoc:mainContext];
 	for(PullRequest *r in latestPrs)
 	{
-		[[AppDelegate shared] postNotificationOfType:kNewPr forItem:r];
+		if(!r.isMine)
+			[[AppDelegate shared] postNotificationOfType:kNewPr forItem:r];
 		r.postSyncAction = @(kPostSyncDoNothing);
 	}
 
 	NSArray *latestComments = [PRComment newItemsOfType:@"PRComment" inMoc:mainContext];
 	for(PRComment *c in latestComments)
 	{
-		if(c.refersToMe)
+		PullRequest *r = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:mainContext];
+		if(r.postSyncAction.integerValue == kPostSyncNoteUpdated)
 		{
-			[[AppDelegate shared] postNotificationOfType:kNewMention forItem:c];
-		}
-		else
-		{
-			PullRequest *r = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:mainContext];
-			if(r.postSyncAction.integerValue == kPostSyncNoteUpdated)
+			if(c.refersToMe)
 			{
-				if([Settings shared].showCommentsEverywhere || r.isMine || r.commentedByMe)
+				[[AppDelegate shared] postNotificationOfType:kNewMention forItem:c];
+			}
+			else if([Settings shared].showCommentsEverywhere || r.isMine || r.commentedByMe)
+			{
+				if(![c.userId.stringValue isEqualToString:[Settings shared].localUserId])
 				{
-					if(![c.userId.stringValue isEqualToString:[Settings shared].localUserId])
-					{
-						[[AppDelegate shared] postNotificationOfType:kNewComment forItem:c];
-					}
+					[[AppDelegate shared] postNotificationOfType:kNewComment forItem:c];
 				}
 			}
 		}
@@ -247,13 +245,6 @@
 
 - (NSAttributedString *)reasonForEmptyWithFilter:(NSString *)filterValueOrNil
 {
-
-#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
-	#define COLOR_CLASS NSColor
-#else
-	#define COLOR_CLASS UIColor
-#endif
-
 	COLOR_CLASS *messageColor = [COLOR_CLASS lightGrayColor];
 	NSUInteger openRequests = [PullRequest countOpenRequestsInMoc:self.managedObjectContext];
 	NSString *message;

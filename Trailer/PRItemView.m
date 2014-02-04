@@ -6,14 +6,13 @@
 }
 @end
 
-static NSDictionary *_titleAttributes, *_createdAttributes;
+static NSDictionary *_titleAttributes, *_createdAttributes, *_statusAttributes;
 static NSDateFormatter *dateFormatter;
 static CGColorRef _highlightColor;
 
 @implementation PRItemView
 
 #define REMOVE_BUTTON_WIDTH 80.0
-#define CELL_PADDING 4.0
 
 + (void)initialize
 {
@@ -36,6 +35,13 @@ static CGColorRef _highlightColor;
 							   NSFontAttributeName:[NSFont menuFontOfSize:10.0],
 							   NSForegroundColorAttributeName:[NSColor grayColor],
 							   NSBackgroundColorAttributeName:[NSColor clearColor],
+							   };
+		NSMutableParagraphStyle *paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+		paragraphStyle.headIndent = 92.0;
+		_statusAttributes = @{
+							   NSFontAttributeName:[NSFont fontWithName:@"Monaco" size:9.0],
+							   NSBackgroundColorAttributeName:[NSColor clearColor],
+							   NSParagraphStyleAttributeName: paragraphStyle
 							   };
 	});
 }
@@ -61,7 +67,7 @@ static CGColorRef _highlightColor;
 		NSString *_subtitle = pullRequest.subtitle;
 
 		CGFloat W = MENU_WIDTH-LEFTPADDING;
-		BOOL showUnpin = pullRequest.condition.integerValue!=kPullRequestConditionOpen;
+		BOOL showUnpin = pullRequest.condition.integerValue!=kPullRequestConditionOpen || !pullRequest.mergeable.boolValue;
 		if(showUnpin) W -= REMOVE_BUTTON_WIDTH;
 
 		BOOL showAvatar = pullRequest.userAvatarUrl.length && ![Settings shared].hideAvatars;
@@ -74,41 +80,82 @@ static CGColorRef _highlightColor;
 
 		CGFloat subtitleHeight = [_subtitle boundingRectWithSize:CGSizeMake(W, FLT_MAX)
 														 options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
-													  attributes:_createdAttributes].size.height;
+													  attributes:_createdAttributes].size.height+2.0;
 
-		self.frame = CGRectMake(0, 0, MENU_WIDTH, titleHeight+subtitleHeight+CELL_PADDING);
-		CGRect titleRect = CGRectMake(LEFTPADDING, subtitleHeight+CELL_PADDING*0.5, W, titleHeight);
-		CGRect dateRect = CGRectMake(LEFTPADDING, CELL_PADDING*0.5, W, subtitleHeight);
+		NSMutableArray *statusRects = nil;
+		NSArray *statuses = nil;
+		CGFloat bottom, CELL_PADDING;
+		CGFloat statusBottom = 0;
+
+		if([Settings shared].showStatusItems)
+		{
+			CELL_PADDING = 10;
+			bottom = CELL_PADDING * 0.5;
+			statuses = pullRequest.displayedStatuses;
+			statusRects = [NSMutableArray arrayWithCapacity:statuses.count];
+			for(PRStatus *s in statuses)
+			{
+				CGFloat H = [s.displayText boundingRectWithSize:CGSizeMake(W, FLT_MAX)
+														options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
+													 attributes:_statusAttributes].size.height;
+				CGRect statusRect = CGRectMake(LEFTPADDING, bottom+statusBottom, W, H);
+				statusBottom += H;
+				[statusRects addObject:[NSValue valueWithRect:statusRect]];
+			}
+		}
+		else
+		{
+			CELL_PADDING = 6.0;
+			bottom = CELL_PADDING * 0.5;
+		}
+
+		self.frame = CGRectMake(0, 0, MENU_WIDTH, titleHeight+subtitleHeight+statusBottom+CELL_PADDING);
+		CGRect titleRect = CGRectMake(LEFTPADDING, subtitleHeight+bottom+statusBottom, W, titleHeight);
+		CGRect dateRect = CGRectMake(LEFTPADDING, statusBottom+bottom, W, subtitleHeight);
 		CGRect pinRect = CGRectMake(LEFTPADDING+W, floorf((self.bounds.size.height-24.0)*0.5), REMOVE_BUTTON_WIDTH-10.0, 24.0);
 
+		CGFloat shift = -4.0;
 		if(showAvatar)
 		{
 			RemoteImageView *userImage = [[RemoteImageView alloc] initWithFrame:CGRectMake(LEFTPADDING, (self.bounds.size.height-AVATAR_SIZE)*0.5, AVATAR_SIZE, AVATAR_SIZE) url:pullRequest.userAvatarUrl];
 			[self addSubview:userImage];
-
-			CGFloat shift = AVATAR_PADDING+AVATAR_SIZE;
-			pinRect = CGRectOffset(pinRect, shift, 0);
-			dateRect = CGRectOffset(dateRect, shift, 0);
-			titleRect = CGRectOffset(titleRect, shift, 0);
+			shift = AVATAR_PADDING+AVATAR_SIZE;
 		}
-		else
+		pinRect = CGRectOffset(pinRect, shift, 0);
+		dateRect = CGRectOffset(dateRect, shift, 0);
+		titleRect = CGRectOffset(titleRect, shift, 0);
+		NSMutableArray *replacementRects = [NSMutableArray arrayWithCapacity:statusRects.count];
+		for(NSValue *rv in statusRects)
 		{
-			CGFloat shift = -4.0;
-			pinRect = CGRectOffset(pinRect, shift, 0);
-			dateRect = CGRectOffset(dateRect, shift, 0);
-			titleRect = CGRectOffset(titleRect, shift, 0);
+			CGRect r = rv.rectValue;
+			r = CGRectOffset(r, shift, 0);
+			[replacementRects addObject:[NSValue valueWithRect:r]];
 		}
+		statusRects = replacementRects;
+		replacementRects = nil;
 
 		if(showUnpin)
 		{
-			NSButton *unpin = [[NSButton alloc] initWithFrame:pinRect];
-			[unpin setTitle:@"Remove"];
-			[unpin setTarget:self];
-			[unpin setAction:@selector(unPinSelected:)];
-			[unpin setButtonType:NSMomentaryLightButton];
-			[unpin setBezelStyle:NSRoundRectBezelStyle];
-			[unpin setFont:[NSFont systemFontOfSize:10.0]];
-			[self addSubview:unpin];
+			if(pullRequest.condition.integerValue==kPullRequestConditionOpen)
+			{
+				CenteredTextField *unmergeableLabel = [[CenteredTextField alloc] initWithFrame:pinRect];
+				unmergeableLabel.textColor = [NSColor redColor];
+				unmergeableLabel.font = [NSFont fontWithName:@"Monaco" size:8.0];
+				unmergeableLabel.alignment = NSCenterTextAlignment;
+				[unmergeableLabel setStringValue:@"Cannot be merged"];
+				[self addSubview:unmergeableLabel];
+			}
+			else
+			{
+				NSButton *unpin = [[NSButton alloc] initWithFrame:pinRect];
+				[unpin setTitle:@"Remove"];
+				[unpin setTarget:self];
+				[unpin setAction:@selector(unPinSelected:)];
+				[unpin setButtonType:NSMomentaryLightButton];
+				[unpin setBezelStyle:NSRoundRectBezelStyle];
+				[unpin setFont:[NSFont systemFontOfSize:10.0]];
+				[self addSubview:unpin];
+			}
 		}
 
 		CenteredTextField *title = [[CenteredTextField alloc] initWithFrame:titleRect];
@@ -118,6 +165,20 @@ static CGColorRef _highlightColor;
 		CenteredTextField *subtitle = [[CenteredTextField alloc] initWithFrame:dateRect];
 		subtitle.attributedStringValue = [[NSAttributedString alloc] initWithString:_subtitle attributes:_createdAttributes];
 		[self addSubview:subtitle];
+
+		for(NSInteger count=0;count<statusRects.count;count++)
+		{
+			CGRect frame = [statusRects[statusRects.count-count-1] rectValue];
+			LinkTextField *statusLabel = [[LinkTextField alloc] initWithFrame:frame];
+
+			PRStatus *status = statuses[count];
+			statusLabel.targetUrl = status.targetUrl;
+			statusLabel.needsAlt = ![Settings shared].makeStatusItemsSelectable;
+			statusLabel.attributedStringValue = [[NSAttributedString alloc] initWithString:status.displayText
+																				attributes:_statusAttributes];
+			statusLabel.textColor = status.colorForDisplay;
+			[self addSubview:statusLabel];
+		}
 
 		CommentCounts *commentCounts = [[CommentCounts alloc] initWithFrame:CGRectMake(0, 0, LEFTPADDING, self.bounds.size.height)
 																unreadCount:_commentsNew

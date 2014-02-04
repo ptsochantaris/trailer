@@ -42,6 +42,8 @@
 @property (weak) IBOutlet NSButton *dontReportRefreshFailures;
 @property (weak) IBOutlet NSButton *groupByRepo;
 @property (weak) IBOutlet NSButton *hideAllPrsSection;
+@property (weak) IBOutlet NSButton *showStatusItems;
+@property (weak) IBOutlet NSButton *makeStatusItemsSelectable;
 
 // About window
 @property (weak) IBOutlet NSTextField *aboutVersion;

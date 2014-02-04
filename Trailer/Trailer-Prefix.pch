@@ -5,6 +5,8 @@
 
 #define MENU_WIDTH 500.0
 
+#define COLOR_CLASS NSColor
+
 //#define DLog(fmt, ...) NSLog(fmt, ##__VA_ARGS__)
 #define DLog(...)
 
@@ -19,6 +21,7 @@
 #import "Settings.h"
 #import "API.h"
 #import "DataItem.h"
+#import "PRStatus.h"
 #import "PRComment.h"
 #import "Org.h"
 #import "Repo.h"
@@ -27,6 +30,7 @@
 #import "RemoteImageView.h"
 #import "CenteredTextFieldCell.h"
 #import "CenteredTextField.h"
+#import "LinkTextField.h"
 #import "CommentCounts.h"
 #import "PRItemView.h"
 #import "SectionHeader.h"
