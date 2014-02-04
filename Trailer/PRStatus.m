@@ -62,6 +62,8 @@
 		dateFormatter.dateStyle = NSDateFormatterShortStyle;
 		dateFormatter.timeStyle = NSDateFormatterShortStyle;
 	});
+	NSString *desc = self.descriptionText;
+	if(!desc) desc = @"(No description)";
 	return [NSString stringWithFormat:@"%@ %@",[dateFormatter stringFromDate:self.createdAt],self.descriptionText];
 }
 

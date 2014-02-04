@@ -264,7 +264,11 @@
 	for(PRStatus *s in ret)
 	{
 		NSString *targetUrl = s.targetUrl;
+		if(!targetUrl) targetUrl = @"";
+
 		NSString *desc = s.descriptionText;
+		if(!desc) desc = @"(No status description)";
+
 		if(![descriptions containsObject:desc])
 		{
 			[descriptions addObject:desc];
