@@ -7,6 +7,20 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.0.10</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Stability corrections for handling empty status item fields</li>
+				</ul></font>]]></description>
+			<pubDate>Tue, 4 Feb 2014 17:00:00 +0000</pubDate>
+			<enclosure
+			url="http://dev.housetrip.com/trailer/trailer1010.zip"
+			sparkle:version="1010"
+			sparkle:shortVersionString="1.0.10"
+			sparkle:dsaSignature="MC0CFHbV4IOeYPk/lmXi4qbiioqhaVRiAhUA2bg4vvyPIz3eEhe0xSAaQ88i9B8="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.0.9</title>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
 				<li>Support for GitHub statuses (alt-click to open them, and they can be disabled in preferences)</li>
@@ -14,7 +28,7 @@
 				<li>App will not announce user's own PRs</li>
 				<li>Faster refreshing, and stability corrections</li>
 				</ul></font>]]></description>
-			<pubDate>Fri, 31 Jan 2014 05:00:00 +0000</pubDate>
+			<pubDate>Fri, 31 Jan 2014 17:00:00 +0000</pubDate>
 			<enclosure
 			url="http://dev.housetrip.com/trailer/trailer109.zip"
 			sparkle:version="1090"
