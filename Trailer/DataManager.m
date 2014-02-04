@@ -20,21 +20,18 @@
 	NSArray *latestComments = [PRComment newItemsOfType:@"PRComment" inMoc:mainContext];
 	for(PRComment *c in latestComments)
 	{
-		if(c.refersToMe)
+		PullRequest *r = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:mainContext];
+		if(r.postSyncAction.integerValue == kPostSyncNoteUpdated)
 		{
-			[[AppDelegate shared] postNotificationOfType:kNewMention forItem:c];
-		}
-		else
-		{
-			PullRequest *r = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:mainContext];
-			if(r.postSyncAction.integerValue == kPostSyncNoteUpdated)
+			if(c.refersToMe)
 			{
-				if([Settings shared].showCommentsEverywhere || r.isMine || r.commentedByMe)
+				[[AppDelegate shared] postNotificationOfType:kNewMention forItem:c];
+			}
+			else if([Settings shared].showCommentsEverywhere || r.isMine || r.commentedByMe)
+			{
+				if(![c.userId.stringValue isEqualToString:[Settings shared].localUserId])
 				{
-					if(![c.userId.stringValue isEqualToString:[Settings shared].localUserId])
-					{
-						[[AppDelegate shared] postNotificationOfType:kNewComment forItem:c];
-					}
+					[[AppDelegate shared] postNotificationOfType:kNewComment forItem:c];
 				}
 			}
 		}

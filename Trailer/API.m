@@ -519,6 +519,15 @@
 		  perPageCallback:(void(^)(id data, BOOL lastPage))pageCallback
 			finalCallback:(void(^)(BOOL success, NSInteger resultCode))finalCallback
 {
+	if(!path.length)
+	{
+		// handling empty or null fields as success, since we don't want syncs to fail, we simply have nothing to process
+		dispatch_async(dispatch_get_main_queue(), ^{
+			finalCallback(YES, -1);
+		});
+		return;
+	}
+
 	NSMutableDictionary *mparams;
 	if(params) mparams = [params mutableCopy];
 	else mparams = [NSMutableDictionary dictionaryWithCapacity:2];

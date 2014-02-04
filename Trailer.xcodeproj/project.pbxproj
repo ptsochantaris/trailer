@@ -199,7 +199,7 @@
 		16517CE01893BDE800B3D384 /* EmptyView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EmptyView.m; sourceTree = "<group>"; };
 		16583E461851F082003A7A55 /* SectionHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SectionHeader.h; sourceTree = "<group>"; };
 		16583E471851F082003A7A55 /* SectionHeader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SectionHeader.m; sourceTree = "<group>"; };
-		1661667C189BBDAB00FBF4E0 /* Trailer 7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Trailer 7.xcdatamodel"; sourceTree = "<group>"; };
+		1661667C189BBDAB00FBF4E0 /* Trailer 7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 7.xcdatamodel"; sourceTree = "<group>"; };
 		1661667D189BC47F00FBF4E0 /* PRStatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PRStatus.h; sourceTree = "<group>"; };
 		1661667E189BC47F00FBF4E0 /* PRStatus.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PRStatus.m; sourceTree = "<group>"; };
 		16616681189BFC6400FBF4E0 /* LinkTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LinkTextField.h; sourceTree = "<group>"; };
