@@ -45,6 +45,9 @@
 @property (weak) IBOutlet NSButton *hideAllPrsSection;
 @property (weak) IBOutlet NSButton *showStatusItems;
 @property (weak) IBOutlet NSButton *makeStatusItemsSelectable;
+@property (weak) IBOutlet NSBox *statusTermsHolder;
+@property (weak) IBOutlet NSTextField *statusTerms;
+@property (weak) IBOutlet NSPopUpButton *statusTermMenu;
 
 // About window
 @property (weak) IBOutlet NSTextField *aboutVersion;

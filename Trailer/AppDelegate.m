@@ -656,6 +656,10 @@ static AppDelegate *_static_shared_ref;
 	{
 		[self.filterTimer push];
 	}
+	else if(obj.object==self.statusTerms)
+	{
+
+	}
 }
 
 - (void)filterTimerPopped
@@ -687,6 +691,7 @@ static AppDelegate *_static_shared_ref;
 	self.refreshTimer = nil;
 
 	[self.api updateLimitFromServer];
+	[self updateStatusTermPreferences];
 
 	[self.sortModeSelect selectItemAtIndex:[Settings shared].sortMethod];
 	[self.launchAtStartup setIntegerValue:[self isAppLoginItem]];
@@ -1242,6 +1247,24 @@ static AppDelegate *_static_shared_ref;
 			}
 		}
 	}
+}
+
+- (void)updateStatusTermPreferences
+{
+	if(self.statusTermMenu.indexOfSelectedItem==0)
+	{
+		[self.statusTermsHolder setHidden:YES];
+		self.statusTerms.stringValue = @"";
+	}
+	else
+	{
+		[self.statusTermsHolder setHidden:NO];
+	}
+}
+
+- (IBAction)statusFilterMenuChanged:(NSPopUpButton *)sender
+{
+	[self updateStatusTermPreferences];
 }
 
 - (IBAction)apiServerSelected:(NSButton *)sender

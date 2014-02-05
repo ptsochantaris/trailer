@@ -26,7 +26,7 @@
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                     </progressIndicator>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="zJk-LE-3Vm">
-                        <rect key="frame" x="389" y="3" width="204" height="20"/>
+                        <rect key="frame" x="397" y="3" width="196" height="20"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Used API allowance for this hour:" id="W7K-PJ-GMI">
                             <font key="font" metaFont="smallSystem"/>
@@ -35,7 +35,7 @@
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="SrS-Tc-X7C">
-                        <rect key="frame" x="8" y="3" width="195" height="20"/>
+                        <rect key="frame" x="8" y="3" width="158" height="20"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Version" id="hkc-v6-9Jd">
                             <font key="font" metaFont="smallSystem"/>
@@ -225,7 +225,7 @@ Server</string>
                                                         </connections>
                                                     </searchField>
                                                     <button id="eoe-1H-ixD">
-                                                        <rect key="frame" x="16" y="12" width="304" height="18"/>
+                                                        <rect key="frame" x="16" y="12" width="199" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Display repository names" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="6nK-Gh-kAV">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -236,7 +236,7 @@ Server</string>
                                                         </connections>
                                                     </button>
                                                     <button id="GOC-8L-GHy">
-                                                        <rect key="frame" x="367" y="12" width="339" height="18"/>
+                                                        <rect key="frame" x="472" y="12" width="234" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Include repositories in filtering" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="77a-Wc-eM3">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -260,7 +260,7 @@ Server</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <button id="W7L-ge-mHy">
-                                            <rect key="frame" x="489" y="50" width="232" height="18"/>
+                                            <rect key="frame" x="510" y="50" width="211" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                             <buttonCell key="cell" type="check" title="Don't report failed refreshes" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="G9X-c5-EXE">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -279,7 +279,7 @@ Server</string>
                                             </connections>
                                         </stepper>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="wFz-AT-nev">
-                                            <rect key="frame" x="445" y="20" width="258" height="17"/>
+                                            <rect key="frame" x="475" y="20" width="228" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Auto-refresh every 3600 seconds" id="jIv-Hj-CCr">
                                                 <font key="font" metaFont="system"/>
@@ -299,7 +299,7 @@ Server</string>
                                             </connections>
                                         </button>
                                         <button id="KdG-4v-vf7">
-                                            <rect key="frame" x="168" y="202" width="304" height="18"/>
+                                            <rect key="frame" x="168" y="202" width="140" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Hide user avatars" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="eW5-mR-deV">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -310,7 +310,7 @@ Server</string>
                                             </connections>
                                         </button>
                                         <button id="4E0-iw-eoN">
-                                            <rect key="frame" x="168" y="167" width="304" height="18"/>
+                                            <rect key="frame" x="168" y="167" width="193" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Hide the &quot;All PRs&quot; section" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="JA8-t0-2Rt">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -329,7 +329,7 @@ Server</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <button id="B8S-t3-bHc">
-                                            <rect key="frame" x="259" y="160" width="226" height="25"/>
+                                            <rect key="frame" x="259" y="160" width="149" height="25"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Reverse direction" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="J6P-LD-eW2">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -340,7 +340,7 @@ Server</string>
                                             </connections>
                                         </button>
                                         <button id="gkF-k1-8Ig">
-                                            <rect key="frame" x="259" y="126" width="226" height="25"/>
+                                            <rect key="frame" x="259" y="126" width="164" height="25"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Group by repository" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="i1y-rp-0xU">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -435,43 +435,13 @@ Server</string>
                                     </subviews>
                                 </view>
                             </tabViewItem>
-                            <tabViewItem label="Statuses" identifier="" id="n3G-rT-Ltp">
-                                <view key="view" id="LNK-r1-5Wx">
-                                    <rect key="frame" x="10" y="33" width="736" height="339"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <subviews>
-                                        <button id="217-Vi-ReC">
-                                            <rect key="frame" x="216" y="185" width="304" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Show status items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="u1v-21-7Q5">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="showStatusItemsSelected:" target="494" id="gMB-pI-n7e"/>
-                                            </connections>
-                                        </button>
-                                        <button id="yD7-Y4-ZaZ">
-                                            <rect key="frame" x="216" y="150" width="304" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Status items don't need alt-click" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Nwp-dZ-JYi">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="makeStatusItemsSelectableSelected:" target="494" id="THf-eS-kW2"/>
-                                            </connections>
-                                        </button>
-                                    </subviews>
-                                </view>
-                            </tabViewItem>
                             <tabViewItem label="Comments" identifier="" id="GQp-vc-2bC">
                                 <view key="view" id="0Vn-bJ-fJl">
                                     <rect key="frame" x="10" y="33" width="736" height="339"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <button id="c6m-8a-CRl">
-                                            <rect key="frame" x="218" y="167" width="300" height="18"/>
+                                            <rect key="frame" x="218" y="167" width="279" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Only display PRs with unread comments" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="djW-U3-Ae9">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -506,10 +476,82 @@ Server</string>
                                     </subviews>
                                 </view>
                             </tabViewItem>
+                            <tabViewItem label="Statuses" identifier="" id="n3G-rT-Ltp">
+                                <view key="view" id="LNK-r1-5Wx">
+                                    <rect key="frame" x="10" y="33" width="736" height="339"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <button id="217-Vi-ReC">
+                                            <rect key="frame" x="185" y="247" width="148" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Show status items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="u1v-21-7Q5">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="showStatusItemsSelected:" target="494" id="gMB-pI-n7e"/>
+                                            </connections>
+                                        </button>
+                                        <button id="yD7-Y4-ZaZ">
+                                            <rect key="frame" x="185" y="212" width="240" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Status items don't need alt-click" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Nwp-dZ-JYi">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="makeStatusItemsSelectableSelected:" target="494" id="THf-eS-kW2"/>
+                                            </connections>
+                                        </button>
+                                        <popUpButton verticalHuggingPriority="750" id="Bx7-99-sDc">
+                                            <rect key="frame" x="185" y="165" width="368" height="26"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <popUpButtonCell key="cell" type="push" title="Show all status items" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="za3-yE-QZS" id="mON-Mm-XBq">
+                                                <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="menu"/>
+                                                <menu key="menu" title="StatusFiltering" showsStateColumn="NO" id="JtD-r9-DMp">
+                                                    <items>
+                                                        <menuItem title="Show all status items" state="on" id="za3-yE-QZS"/>
+                                                        <menuItem title="Only show status items that include the following" id="33V-fT-6mG"/>
+                                                        <menuItem title="Filter out status items that include the following" id="ZDP-RF-KcJ"/>
+                                                    </items>
+                                                </menu>
+                                            </popUpButtonCell>
+                                            <connections>
+                                                <action selector="statusFilterMenuChanged:" target="494" id="Jet-uD-wzs"/>
+                                            </connections>
+                                        </popUpButton>
+                                        <box autoresizesSubviews="NO" title="Comma-separated list" borderType="line" id="hIJ-6b-DM1">
+                                            <rect key="frame" x="184" y="86" width="369" height="62"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <view key="contentView">
+                                                <rect key="frame" x="1" y="1" width="367" height="46"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <textField verticalHuggingPriority="750" id="iFU-mQ-fgc" customClass="HTTextField">
+                                                        <rect key="frame" x="18" y="14" width="331" height="22"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="BTz-kR-8DR">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <outlet property="delegate" destination="494" id="Ns0-Pm-K6q"/>
+                                                        </connections>
+                                                    </textField>
+                                                </subviews>
+                                            </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </box>
+                                    </subviews>
+                                </view>
+                            </tabViewItem>
                         </tabViewItems>
                     </tabView>
                     <button id="qqE-Ib-sQ9">
-                        <rect key="frame" x="207" y="3" width="180" height="26"/>
+                        <rect key="frame" x="182" y="3" width="141" height="26"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <buttonCell key="cell" type="check" title="Start Trailer at Login" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" scrollable="YES" lineBreakMode="clipping" state="on" inset="2" id="yY0-OR-yEh">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -569,6 +611,9 @@ Server</string>
                 <outlet property="showStatusItems" destination="217-Vi-ReC" id="Gu1-wa-hE2"/>
                 <outlet property="sortModeSelect" destination="geS-Jc-8P2" id="L5a-K5-3PH"/>
                 <outlet property="sortingOrder" destination="B8S-t3-bHc" id="K24-7i-FqU"/>
+                <outlet property="statusTermMenu" destination="Bx7-99-sDc" id="pBm-jb-bo6"/>
+                <outlet property="statusTerms" destination="iFU-mQ-fgc" id="aL3-pk-cYc"/>
+                <outlet property="statusTermsHolder" destination="hIJ-6b-DM1" id="eXm-kx-STB"/>
                 <outlet property="tokenHolder" destination="89t-uF-tda" id="FrU-nv-0AM"/>
                 <outlet property="versionNumber" destination="SrS-Tc-X7C" id="RSu-YF-jmY"/>
             </connections>
