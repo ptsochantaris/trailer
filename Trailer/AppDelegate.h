@@ -18,6 +18,7 @@
 @property (weak) IBOutlet NSTableView *projectsTable;
 @property (weak) IBOutlet NSMenuItem *refreshNow;
 @property (weak) IBOutlet NSButton *clearAll;
+@property (weak) IBOutlet NSButton *selectParents;
 @property (weak) IBOutlet NSButton *selectAll;
 @property (weak) IBOutlet NSProgressIndicator *apiLoad;
 @property (weak) IBOutlet NSTextField *versionNumber;

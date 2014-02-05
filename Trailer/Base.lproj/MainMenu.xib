@@ -568,6 +568,7 @@ Server</string>
                 <outlet property="refreshNow" destination="asb-Mc-b5c" id="aSx-vn-F0X"/>
                 <outlet property="repoFilter" destination="pEa-FD-K1R" id="bxl-Ii-j5p"/>
                 <outlet property="selectAll" destination="2jy-CL-3Vb" id="2lW-dU-CAb"/>
+                <outlet property="selectParents" destination="hyy-ox-ZhU" id="nct-Rp-kly"/>
                 <outlet property="showAllComments" destination="CPe-TS-qPS" id="gmg-D0-MUO"/>
                 <outlet property="showCreationDates" destination="AEB-MY-2H6" id="i7b-Cv-Tgf"/>
                 <outlet property="showStatusItems" destination="217-Vi-ReC" id="Gu1-wa-hE2"/>
