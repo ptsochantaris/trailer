@@ -229,37 +229,34 @@
 				else
 				{
 					NSArray *orgs = [Org allItemsOfType:@"Org" inMoc:syncContext];
-					__block NSInteger count=orgs.count;
+					__block NSInteger count=orgs.count+1;
 					__block BOOL ok = YES;
-					for(Org *r in orgs)
-					{
-						[self syncReposForOrg:r.login toMoc:syncContext andCallback:^(BOOL success) {
-							count--;
-							if(ok) ok = success;
-							if(count==0)
+
+					typedef void (^completionBlockType)(BOOL);
+
+					completionBlockType completionCallback = ^(BOOL success) {
+						count--;
+						if(ok) ok = success;
+						if(count==0 && callback)
+						{
+							if(ok)
 							{
-								[self syncReposForUserToMoc:syncContext andCallback:^(BOOL success) {
-									if(ok) ok = success;
-									if(callback)
-									{
-										if(ok)
-										{
-											[DataItem nukeDeletedItemsOfType:@"Repo" inMoc:syncContext];
-											[DataItem nukeDeletedItemsOfType:@"Org" inMoc:syncContext];
-										}
-										else
-										{
-											DLog(@"%@",[NSError errorWithDomain:@"YOUR_ERROR_DOMAIN"
-																		   code:101
-																	   userInfo:@{NSLocalizedDescriptionKey:@"Error while fetching data from GitHub"}]);
-										}
-										if(ok && syncContext.hasChanges) [syncContext save:nil];
-										callback(ok);
-									}
-								}];
+								[DataItem nukeDeletedItemsOfType:@"Repo" inMoc:syncContext];
+								[DataItem nukeDeletedItemsOfType:@"Org" inMoc:syncContext];
 							}
-						}];
-					}
+							else
+							{
+								DLog(@"%@",[NSError errorWithDomain:@"YOUR_ERROR_DOMAIN"
+															   code:101
+														   userInfo:@{NSLocalizedDescriptionKey:@"Error while fetching data from GitHub"}]);
+							}
+							if(ok && syncContext.hasChanges) [syncContext save:nil];
+							callback(ok);
+						}
+					};
+
+					for(Org *r in orgs) [self syncReposForOrg:r.login toMoc:syncContext andCallback:completionCallback];
+					[self syncReposForUserToMoc:syncContext andCallback:completionCallback];
 				}
 			}];
 		}
