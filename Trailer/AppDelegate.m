@@ -1259,7 +1259,16 @@ static AppDelegate *_static_shared_ref;
 {
 	NSInteger mode = [Settings shared].statusFilteringMode;
 	[self.statusTermMenu selectItemAtIndex:mode];
-	[self.statusTermsField setHidden:(mode==0)];
+	if(mode!=0)
+	{
+		[self.statusTermsField setEnabled:YES];
+		self.statusTermsField.alphaValue = 1.0;
+	}
+	else
+	{
+		[self.statusTermsField setEnabled:NO];
+		self.statusTermsField.alphaValue = 0.8;
+	}
 	self.statusTermsField.objectValue = [Settings shared].statusFilteringTerms;
 }
 
