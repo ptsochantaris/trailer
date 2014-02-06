@@ -10,21 +10,28 @@
     self = [super init];
     if (self)
 	{
-		//
-		// will leave this in for a while to clear databases from orphaned PRStatus objects
-		//
-		NSArray *statuses = [DataItem allItemsOfType:@"PRStatus" inMoc:self.managedObjectContext];
-		for(PRStatus *s in statuses)
+		if([self versionBumpOccured])
 		{
-			PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:s.pullRequestId moc:self.managedObjectContext];
-			if(!r)
-			{
-				DLog(@"Deleting orphaned PRStatus item %@",s.serverId);
-				[self.managedObjectContext deleteObject:s];
-			}
+			DLog(@"VERSION UPDATE MAINTENANCE NEEDED");
+			[self performVersionChangedTasks];
+			[self versionBumpComplete];
 		}
     }
     return self;
+}
+
+- (void)performVersionChangedTasks
+{
+	NSArray *statuses = [DataItem allItemsOfType:@"PRStatus" inMoc:self.managedObjectContext];
+	for(PRStatus *s in statuses)
+	{
+		PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:s.pullRequestId moc:self.managedObjectContext];
+		if(!r)
+		{
+			DLog(@"Deleting orphaned PRStatus item %@",s.serverId);
+			[self.managedObjectContext deleteObject:s];
+		}
+	}
 }
 
 - (void)sendNotifications
@@ -307,6 +314,20 @@
 														 NSParagraphStyleAttributeName: paragraphStyle,
 														 NSFontAttributeName: [UIFont systemFontOfSize:[UIFont smallSystemFontSize]] }];
 #endif
+}
+
+/////////////////////////////////////////////////////////////////////
+
+#define LAST_RUN_VERSION_KEY @"LAST_RUN_VERSION"
+- (void)versionBumpComplete
+{
+	NSString *currentAppVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+	[[NSUserDefaults standardUserDefaults] setObject:currentAppVersion forKey:LAST_RUN_VERSION_KEY];
+}
+- (BOOL)versionBumpOccured
+{
+	NSString *currentAppVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+	return !([[[NSUserDefaults standardUserDefaults] objectForKey:LAST_RUN_VERSION_KEY] isEqualToString:currentAppVersion]);
 }
 
 @end

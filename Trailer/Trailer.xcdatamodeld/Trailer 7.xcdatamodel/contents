@@ -74,8 +74,8 @@
     <elements>
         <element name="Org" positionX="0" positionY="0" width="0" height="0"/>
         <element name="PRComment" positionX="0" positionY="0" width="0" height="0"/>
+        <element name="PRStatus" positionX="0" positionY="0" width="0" height="0"/>
         <element name="PullRequest" positionX="0" positionY="0" width="0" height="0"/>
         <element name="Repo" positionX="0" positionY="0" width="0" height="0"/>
-        <element name="PRStatus" positionX="0" positionY="0" width="0" height="0"/>
     </elements>
 </model>
