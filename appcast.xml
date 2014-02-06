@@ -7,6 +7,22 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.0.11</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>New filtering options for status items</li>
+				<li>Status item display disabled by default on new installs</li>
+				<li>First attempt at a preferences cleanup, more to come</li>
+				</ul></font>]]></description>
+			<pubDate>Thu, 6 Feb 2014 20:00:00 +0000</pubDate>
+			<enclosure
+			url="http://dev.housetrip.com/trailer/trailer1011.zip"
+			sparkle:version="1101"
+			sparkle:shortVersionString="1.0.11"
+			sparkle:dsaSignature="MC0CFE+CXe4ILdrTFE9NLSIfemW+IkBsAhUAsOacAfLneWN/Horfk3zJJW7upZ0="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.0.10</title>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
 				<li>Stability corrections for handling empty status item fields</li>
