@@ -482,7 +482,7 @@ Server</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <button id="217-Vi-ReC">
-                                            <rect key="frame" x="185" y="247" width="148" height="18"/>
+                                            <rect key="frame" x="149" y="266" width="148" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Show status items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="u1v-21-7Q5">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -493,9 +493,9 @@ Server</string>
                                             </connections>
                                         </button>
                                         <button id="yD7-Y4-ZaZ">
-                                            <rect key="frame" x="185" y="212" width="240" height="18"/>
+                                            <rect key="frame" x="149" y="231" width="396" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Status items don't need alt-click" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Nwp-dZ-JYi">
+                                            <buttonCell key="cell" type="check" title="Make status items always selectable (don't require alt-click)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Nwp-dZ-JYi">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -504,7 +504,7 @@ Server</string>
                                             </connections>
                                         </button>
                                         <popUpButton verticalHuggingPriority="750" id="Bx7-99-sDc">
-                                            <rect key="frame" x="185" y="165" width="368" height="26"/>
+                                            <rect key="frame" x="149" y="184" width="439" height="26"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <popUpButtonCell key="cell" type="push" title="Show all status items" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="za3-yE-QZS" id="mON-Mm-XBq">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -512,8 +512,8 @@ Server</string>
                                                 <menu key="menu" title="StatusFiltering" showsStateColumn="NO" id="JtD-r9-DMp">
                                                     <items>
                                                         <menuItem title="Show all status items" state="on" id="za3-yE-QZS"/>
-                                                        <menuItem title="Only show status items that include the following" id="33V-fT-6mG"/>
-                                                        <menuItem title="Filter out status items that include the following" id="ZDP-RF-KcJ"/>
+                                                        <menuItem title="Only show status items that include any of the following terms" id="33V-fT-6mG"/>
+                                                        <menuItem title="Exclude status items that include any of the following terms" id="ZDP-RF-KcJ"/>
                                                     </items>
                                                 </menu>
                                             </popUpButtonCell>
@@ -521,30 +521,18 @@ Server</string>
                                                 <action selector="statusFilterMenuChanged:" target="494" id="Jet-uD-wzs"/>
                                             </connections>
                                         </popUpButton>
-                                        <box autoresizesSubviews="NO" title="Comma-separated list" borderType="line" id="hIJ-6b-DM1">
-                                            <rect key="frame" x="184" y="86" width="369" height="62"/>
+                                        <tokenField verticalHuggingPriority="750" id="JNC-T1-vCD">
+                                            <rect key="frame" x="151" y="70" width="434" height="104"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView">
-                                                <rect key="frame" x="1" y="1" width="367" height="46"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                <subviews>
-                                                    <textField verticalHuggingPriority="750" id="iFU-mQ-fgc" customClass="HTTextField">
-                                                        <rect key="frame" x="18" y="14" width="331" height="22"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="BTz-kR-8DR">
-                                                            <font key="font" metaFont="system"/>
-                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                        <connections>
-                                                            <outlet property="delegate" destination="494" id="Ns0-Pm-K6q"/>
-                                                        </connections>
-                                                    </textField>
-                                                </subviews>
-                                            </view>
-                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                        </box>
+                                            <tokenFieldCell key="cell" selectable="YES" editable="YES" borderStyle="bezel" alignment="left" placeholderString="Comma separated list of terms" drawsBackground="YES" allowsEditingTextAttributes="YES" id="EaR-SJ-Mk1">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </tokenFieldCell>
+                                            <connections>
+                                                <outlet property="delegate" destination="494" id="AIG-1f-yL5"/>
+                                            </connections>
+                                        </tokenField>
                                     </subviews>
                                 </view>
                             </tabViewItem>
@@ -612,8 +600,7 @@ Server</string>
                 <outlet property="sortModeSelect" destination="geS-Jc-8P2" id="L5a-K5-3PH"/>
                 <outlet property="sortingOrder" destination="B8S-t3-bHc" id="K24-7i-FqU"/>
                 <outlet property="statusTermMenu" destination="Bx7-99-sDc" id="pBm-jb-bo6"/>
-                <outlet property="statusTerms" destination="iFU-mQ-fgc" id="aL3-pk-cYc"/>
-                <outlet property="statusTermsHolder" destination="hIJ-6b-DM1" id="eXm-kx-STB"/>
+                <outlet property="statusTermsField" destination="JNC-T1-vCD" id="Gab-bS-wOF"/>
                 <outlet property="tokenHolder" destination="89t-uF-tda" id="FrU-nv-0AM"/>
                 <outlet property="versionNumber" destination="SrS-Tc-X7C" id="RSu-YF-jmY"/>
             </connections>

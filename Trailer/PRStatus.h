@@ -16,6 +16,8 @@
 
 + (NSArray *)statusesForPullRequestId:(NSNumber *)pullRequestId inMoc:(NSManagedObjectContext *)moc;
 
++ (void)removeStatusesWithPullRequestId:(NSNumber *)pullRequestId inMoc:(NSManagedObjectContext *)moc;
+
 - (COLOR_CLASS *)colorForDisplay;
 
 - (NSString *)displayText;

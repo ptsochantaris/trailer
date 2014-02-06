@@ -9,6 +9,10 @@
 #define kPullRequestSectionClosed 3
 #define kPullRequestSectionAll 4
 
+#define kStatusFilterAll 0
+#define kStatusFilterInclude 1
+#define kStatusFilterExclude 2
+
 #define kPullRequestSectionNames @[@"Mine", @"Participated", @"Recently Merged", @"Recently Closed", @"All Pull Requests"]
 
 @interface PullRequest : DataItem

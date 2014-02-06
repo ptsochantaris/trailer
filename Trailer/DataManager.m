@@ -5,6 +5,28 @@
 @synthesize managedObjectModel = _managedObjectModel;
 @synthesize managedObjectContext = _managedObjectContext;
 
+- (id)init
+{
+    self = [super init];
+    if (self)
+	{
+		//
+		// will leave this in for a while to clear databases from orphaned PRStatus objects
+		//
+		NSArray *statuses = [DataItem allItemsOfType:@"PRStatus" inMoc:self.managedObjectContext];
+		for(PRStatus *s in statuses)
+		{
+			PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:s.pullRequestId moc:self.managedObjectContext];
+			if(!r)
+			{
+				DLog(@"Deleting orphaned PRStatus item %@",s.serverId);
+				[self.managedObjectContext deleteObject:s];
+			}
+		}
+    }
+    return self;
+}
+
 - (void)sendNotifications
 {
 	NSManagedObjectContext *mainContext = self.managedObjectContext;

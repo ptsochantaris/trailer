@@ -67,4 +67,15 @@
 	return [NSString stringWithFormat:@"%@ %@",[dateFormatter stringFromDate:self.createdAt],self.descriptionText];
 }
 
++ (void)removeStatusesWithPullRequestId:(NSNumber *)pullRequestId inMoc:(NSManagedObjectContext *)moc
+{
+	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRStatus"];
+	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestId = %@",pullRequestId];
+	for(PRStatus *s in [moc executeFetchRequest:f error:nil])
+	{
+		DLog(@"  Deleting status ID %@",s.serverId);
+		[moc deleteObject:s];
+	}
+}
+
 @end

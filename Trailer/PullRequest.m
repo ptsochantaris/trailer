@@ -210,19 +210,20 @@
 	return [moc countForFetchRequest:f error:nil];
 }
 
--(void)prepareForDeletion
+- (void)prepareForDeletion
 {
 	[PRComment removeCommentsWithPullRequestURL:self.url inMoc:self.managedObjectContext];
+	[PRStatus removeStatusesWithPullRequestId:self.serverId inMoc:self.managedObjectContext];
 }
 
-+(PullRequest *)pullRequestWithUrl:(NSString *)url moc:(NSManagedObjectContext *)moc
++ (PullRequest *)pullRequestWithUrl:(NSString *)url moc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PullRequest"];
 	f.predicate = [NSPredicate predicateWithFormat:@"url == %@",url];
 	return [[moc executeFetchRequest:f error:nil] lastObject];
 }
 
--(void)catchUpWithComments
+- (void)catchUpWithComments
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
 	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestUrl == %@",self.url];
@@ -238,12 +239,12 @@
 	[self postProcess];
 }
 
--(BOOL)isMine
+- (BOOL)isMine
 {
 	return [self.userId.stringValue isEqualToString:[Settings shared].localUserId];
 }
 
--(BOOL)commentedByMe
+- (BOOL)commentedByMe
 {
 	for(PRComment *c in [PRComment commentsForPullRequestUrl:self.url inMoc:self.managedObjectContext])
 		if(c.isMine)
@@ -255,7 +256,28 @@
 - (NSArray *)displayedStatuses
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRStatus"];
-	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestId = %@",self.serverId];
+
+	NSString *predicate = [NSString stringWithFormat:@"pullRequestId = %@",self.serverId];
+
+	NSInteger mode = [Settings shared].statusFilteringMode;
+	if(mode!=kStatusFilterAll)
+	{
+		NSArray *terms = [Settings shared].statusFilteringTerms;
+		if(terms.count)
+		{
+			NSMutableArray *ors = [NSMutableArray arrayWithCapacity:terms.count];
+			for(NSString *term in terms)
+			{
+				[ors addObject:[NSString stringWithFormat:@"descriptionText contains[cd] '%@'",term]];
+			}
+			if(mode==kStatusFilterInclude)
+				predicate = [predicate stringByAppendingFormat:@" and (%@)",[ors componentsJoinedByString:@" or "]];
+			else
+				predicate = [predicate stringByAppendingFormat:@" and (not (%@))",[ors componentsJoinedByString:@" or "]];
+		}
+	}
+
+	f.predicate = [NSPredicate predicateWithFormat:predicate];
 	f.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"createdAt" ascending:NO]];
 	NSArray *ret = [self.managedObjectContext executeFetchRequest:f error:nil];
 	NSMutableArray *result = [NSMutableArray array];

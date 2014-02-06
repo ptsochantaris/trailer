@@ -656,9 +656,15 @@ static AppDelegate *_static_shared_ref;
 	{
 		[self.filterTimer push];
 	}
-	else if(obj.object==self.statusTerms)
+	else if(obj.object==self.statusTermsField)
 	{
-
+		NSArray *existingTerms = [Settings shared].statusFilteringTerms;
+		NSArray *newTerms = self.statusTermsField.objectValue;
+		if(![existingTerms isEqualToArray:newTerms])
+		{
+			[Settings shared].statusFilteringTerms = newTerms;
+			[self updateMenu];
+		}
 	}
 }
 
@@ -691,7 +697,7 @@ static AppDelegate *_static_shared_ref;
 	self.refreshTimer = nil;
 
 	[self.api updateLimitFromServer];
-	[self updateStatusTermPreferences];
+	[self updateStatusTermPreferenceControls];
 
 	[self.sortModeSelect selectItemAtIndex:[Settings shared].sortMethod];
 	[self.launchAtStartup setIntegerValue:[self isAppLoginItem]];
@@ -1249,22 +1255,19 @@ static AppDelegate *_static_shared_ref;
 	}
 }
 
-- (void)updateStatusTermPreferences
+- (void)updateStatusTermPreferenceControls
 {
-	if(self.statusTermMenu.indexOfSelectedItem==0)
-	{
-		[self.statusTermsHolder setHidden:YES];
-		self.statusTerms.stringValue = @"";
-	}
-	else
-	{
-		[self.statusTermsHolder setHidden:NO];
-	}
+	NSInteger mode = [Settings shared].statusFilteringMode;
+	[self.statusTermMenu selectItemAtIndex:mode];
+	[self.statusTermsField setHidden:(mode==0)];
+	self.statusTermsField.objectValue = [Settings shared].statusFilteringTerms;
 }
 
 - (IBAction)statusFilterMenuChanged:(NSPopUpButton *)sender
 {
-	[self updateStatusTermPreferences];
+	[Settings shared].statusFilteringMode = sender.indexOfSelectedItem;
+	[Settings shared].statusFilteringTerms = self.statusTermsField.objectValue;
+	[self updateStatusTermPreferenceControls];
 }
 
 - (IBAction)apiServerSelected:(NSButton *)sender

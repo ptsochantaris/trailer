@@ -124,6 +124,18 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#define STATUS_FILTERING_METHOD_KEY @"STATUS_FILTERING_METHOD_KEY"
+-(NSInteger)statusFilteringMode { return [[[NSUserDefaults standardUserDefaults] objectForKey:STATUS_FILTERING_METHOD_KEY] integerValue]; }
+-(void)setStatusFilteringMode:(NSInteger)statusFilteringMode { [self storeDefaultValue:@(statusFilteringMode) forKey:STATUS_FILTERING_METHOD_KEY]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define STATUS_FILTERING_TERMS_KEY @"STATUS_FILTERING_TERMS_KEY"
+-(NSArray *)statusFilteringTerms { return [[NSUserDefaults standardUserDefaults] objectForKey:STATUS_FILTERING_TERMS_KEY]; }
+-(void)setStatusFilteringTerms:(NSArray *)statusFilteringTerms { [self storeDefaultValue:statusFilteringTerms forKey:STATUS_FILTERING_TERMS_KEY]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #define DONT_KEEP_MY_PRS_KEY @"DONT_KEEP_MY_PRS_KEY"
 -(void)setDontKeepMyPrs:(BOOL)dontKeepMyPrs { [self storeDefaultValue:@(dontKeepMyPrs) forKey:DONT_KEEP_MY_PRS_KEY]; }
 -(BOOL)dontKeepMyPrs { return [[[NSUserDefaults standardUserDefaults] stringForKey:DONT_KEEP_MY_PRS_KEY] boolValue]; }
@@ -192,12 +204,7 @@
 
 #define SHOW_STATUS_ITEMS @"SHOW_STATUS_ITEMS"
 -(void)setShowStatusItems:(BOOL)showStatusItems { [self storeDefaultValue:@(showStatusItems) forKey:SHOW_STATUS_ITEMS]; }
--(BOOL)showStatusItems
-{
-	NSString *v = [[NSUserDefaults standardUserDefaults] stringForKey:SHOW_STATUS_ITEMS];
-	if(!v) v = @"true";
-	return [v boolValue];
-}
+-(BOOL)showStatusItems { return [[[NSUserDefaults standardUserDefaults] stringForKey:SHOW_STATUS_ITEMS] boolValue]; }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

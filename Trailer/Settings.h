@@ -5,7 +5,9 @@
 
 - (NSString *)sortField;
 
-@property (nonatomic) NSInteger sortMethod;
+@property (nonatomic) NSInteger sortMethod, statusFilteringMode;
+
+@property (nonatomic) NSArray *statusFilteringTerms;
 
 @property (nonatomic) NSString *authToken, *localUser, *localUserId,
 							*apiFrontEnd, *apiBackEnd, *apiPath;
