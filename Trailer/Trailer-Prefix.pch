@@ -7,8 +7,8 @@
 
 #define COLOR_CLASS NSColor
 
-//#define DLog(fmt, ...) NSLog(fmt, ##__VA_ARGS__)
-#define DLog(...)
+#define DLog(fmt, ...) NSLog(fmt, ##__VA_ARGS__)
+//#define DLog(...)
 
 #import <Cocoa/Cocoa.h>
 #import <CommonCrypto/CommonCrypto.h>

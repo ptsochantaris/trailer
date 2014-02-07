@@ -74,6 +74,7 @@
 @property (strong) NSDate *lastSuccessfulRefresh;
 @property (nonatomic) BOOL lastUpdateFailed, preferencesDirty, isRefreshing;
 @property (nonatomic, readonly) BOOL menuIsOpen;
+@property (nonatomic) long highlightedPrIndex;
 
 +(AppDelegate*)shared;
 

@@ -1,4 +1,10 @@
 
+@interface AppDelegate ()
+{
+	NSMutableArray *currentPRItems;
+}
+@end
+
 @implementation AppDelegate
 
 static AppDelegate *_static_shared_ref;
@@ -66,6 +72,8 @@ static AppDelegate *_static_shared_ref;
 											 selector:@selector(networkStateChanged)
 												 name:kReachabilityChangedNotification
 											   object:nil];
+
+	[self addHotKeySupport];
 }
 
 - (void)setupSortMethodMenu
@@ -346,7 +354,7 @@ static AppDelegate *_static_shared_ref;
 	}
 }
 
--(void)menuWillOpen:(NSMenu *)menu
+- (void)menuWillOpen:(NSMenu *)menu
 {
     if([[menu title] isEqualToString:@"Options"])
 	{
@@ -419,6 +427,7 @@ static AppDelegate *_static_shared_ref;
 {
 	self.statusItemView.highlighted = NO;
 	[self.mainMenu orderOut:nil];
+	for(PRItemView *v in currentPRItems) v.focused = NO;
 }
 
 - (void)sectionHeaderRemoveSelectedFrom:(SectionHeader *)header
@@ -512,6 +521,7 @@ static AppDelegate *_static_shared_ref;
 - (NSInteger)buildPrMenuItemsFromList
 {
 	NSArray *pullRequests = [self pullRequestList];
+	currentPRItems = [NSMutableArray array];
 
 	SectionHeader *myHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:nil title:kPullRequestSectionNames[kPullRequestSectionMine]];
 	SectionHeader *participatedHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:nil title:kPullRequestSectionNames[kPullRequestSectionParticipated]];
@@ -538,6 +548,13 @@ static AppDelegate *_static_shared_ref;
 
 		PRItemView *view = [[PRItemView alloc] initWithPullRequest:r userInfo:r.serverId delegate:self];
 		[sections[sectionIndex] addObject:view];
+	}
+
+	for(NSInteger section=kPullRequestSectionMine;section<=kPullRequestSectionAll;section++)
+	{
+		NSArray *itemsInSection = sections[@(section)];
+		for(NSInteger p=1;p<itemsInSection.count;p++) // first item is the header
+			[currentPRItems addObject:itemsInSection[p]];
 	}
 
 	CGFloat top = 10.0;
@@ -1313,6 +1330,90 @@ static AppDelegate *_static_shared_ref;
 	[self.apiPath setStringValue:[Settings shared].apiPath];
 }
 
+/////////////////////// keyboard shortcuts
 
+- (void)addHotKeySupport
+{
+	NSDictionary *options = @{ (__bridge id)kAXTrustedCheckOptionPrompt: @YES};
+	if(AXIsProcessTrustedWithOptions((__bridge CFDictionaryRef)options))
+	{
+		[NSEvent addGlobalMonitorForEventsMatchingMask:NSKeyDownMask handler:^void(NSEvent* incomingEvent) {
+			[self checkForHotkey:incomingEvent];
+		}];
+	}
+
+	[NSEvent addLocalMonitorForEventsMatchingMask:NSKeyDownMask handler:^NSEvent *(NSEvent *incomingEvent) {
+		if([self checkForHotkey:incomingEvent]) return nil;
+
+		// down 125 // up 126 // 36 enter
+		switch(incomingEvent.keyCode)
+		{
+			case 125: // down
+			{
+				PRItemView *v = [self focusedItemView];
+				NSInteger i = -1;
+				if(v) i = [currentPRItems indexOfObject:v];
+				if(i<(NSInteger)currentPRItems.count-1)
+				{
+					i++;
+					v.focused = NO;
+					v = currentPRItems[i];
+					v.focused = YES;
+					[self.mainMenu scrollToView:v];
+				}
+				return nil;
+			}
+			case 126: // up
+			{
+				PRItemView *v = [self focusedItemView];
+				NSInteger i = currentPRItems.count;
+				if(v) i = [currentPRItems indexOfObject:v];
+				if(i>0)
+				{
+					i--;
+					v.focused = NO;
+					v = currentPRItems[i];
+					v.focused = YES;
+					[self.mainMenu scrollToView:v];
+				}
+				return nil;
+			}
+			case 36: // enter
+			{
+				PRItemView *v = [self focusedItemView];
+				if(v) [self prItemSelected:v];
+				return nil;
+			}
+		}
+
+		return incomingEvent;
+	}];
+}
+
+- (PRItemView *)focusedItemView
+{
+	for(PRItemView *v in currentPRItems)
+	{
+		if(v.focused)
+		{
+			return v;
+		}
+	}
+	return nil;
+}
+
+- (BOOL)checkForHotkey:(NSEvent *)incomingEvent
+{
+	NSInteger masks = NSCommandKeyMask|NSShiftKeyMask|NSAlternateKeyMask;
+	if((incomingEvent.modifierFlags & masks) == masks)
+	{
+		if(incomingEvent.keyCode==17)
+		{
+			[self statusItemTapped:self.statusItemView];
+			return YES;
+		}
+	}
+	return NO;
+}
 
 @end

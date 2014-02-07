@@ -2,6 +2,7 @@
 #define AVATAR_SIZE 26.0
 #define LEFTPADDING 44.0
 
+
 @class PRItemView;
 
 
@@ -17,6 +18,7 @@
 
 @property (nonatomic,weak) id<PRItemViewDelegate> delegate;
 @property (nonatomic) id userInfo;
+@property (nonatomic) BOOL highlighted, focused;
 
 - (instancetype)initWithPullRequest:(PullRequest *)pullRequest userInfo:(id)userInfo delegate:(id<PRItemViewDelegate>)delegate;
 

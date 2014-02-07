@@ -96,6 +96,26 @@
 	}
 }
 
+- (void)scrollToView:(NSView *)view
+{
+	CGFloat itemBottom = view.frame.origin.y-50;
+	CGFloat itemHeight = view.frame.size.height;
+	CGFloat itemTop = view.frame.origin.y+itemHeight+20;
+
+	CGFloat containerBottom = self.scrollView.contentView.documentVisibleRect.origin.y;
+	CGFloat containerHeight = self.scrollView.contentView.documentVisibleRect.size.height;
+	CGFloat containerTop = containerBottom + containerHeight;
+
+	if(itemTop>containerTop)
+	{
+		[self.scrollView.contentView.documentView scrollPoint:CGPointMake(0, itemTop+itemHeight-containerHeight)];
+	}
+	else if(itemBottom<containerBottom)
+	{
+		[self.scrollView.contentView.documentView scrollPoint:CGPointMake(0, itemBottom)];
+	}
+}
+
 - (NSTrackingArea *)addTrackingAreaInRect:(CGRect)trackingRect
 {
 	NSTrackingArea *newArea = [[NSTrackingArea alloc] initWithRect:trackingRect

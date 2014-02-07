@@ -1,7 +1,6 @@
 
 @interface PRItemView ()
 {
-	BOOL _highlighted;
 	NSTrackingArea *trackingArea;
 }
 @end
@@ -206,14 +205,30 @@ static CGColorRef _highlightColor;
 
 - (void)mouseEntered:(NSEvent *)theEvent
 {
-	_highlighted = YES;
-	[self setNeedsDisplay:YES];
+	self.highlighted = YES;
 }
 
 - (void)mouseExited:(NSEvent *)theEvent
 {
-	_highlighted = NO;
-	[self setNeedsDisplay:YES];
+	self.highlighted = NO;
+}
+
+- (void)setHighlighted:(BOOL)highlighted
+{
+	if(_highlighted!=highlighted)
+	{
+		_highlighted = highlighted;
+		[self setNeedsDisplay:YES];
+	}
+}
+
+- (void)setFocused:(BOOL)focused
+{
+	if(_focused!=focused)
+	{
+		_focused = focused;
+		self.highlighted = _focused;
+	}
 }
 
 - (void)mouseDown:(NSEvent*) event
@@ -236,7 +251,7 @@ static CGColorRef _highlightColor;
     if (NSPointInRect(mouseLocation, [self bounds]))
 		[self mouseEntered: nil];
 	else
-		[self mouseExited: nil];
+		if(!_focused) [self mouseExited: nil];
 }
 
 @end
