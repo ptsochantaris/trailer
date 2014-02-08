@@ -553,20 +553,20 @@ Server</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="B02-2m-mrP">
-                                            <rect key="frame" x="107" y="233" width="522" height="68"/>
+                                            <rect key="frame" x="94" y="229" width="548" height="68"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" id="nPj-Jx-Vfo">
                                                 <font key="font" metaFont="system"/>
-                                                <string key="title">When enabling this for the first time you will be asked to
-confirm if Trailer can use the keyboard, and then you must restart Trailer.
+                                                <string key="title">Note: When enabling this for the first time you will be asked to
+provide permission for Trailer to use the keyboard, and then you MUST restart Trailer.
 
-You can change this setting later from: System Preferences -&gt; Security -&gt; Privacy</string>
+You can change this permission later from: System Preferences -&gt; Security -&gt; Privacy</string>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="gcI-fu-NzS">
-                                            <rect key="frame" x="33" y="44" width="671" height="17"/>
+                                            <rect key="frame" x="33" y="39" width="671" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Tip: When Trailer is open, you can navigate the menu with the arrow keys and select a PR entry with enter" id="cu3-pU-hKR">
                                                 <font key="font" metaFont="system"/>
@@ -575,7 +575,7 @@ You can change this setting later from: System Preferences -&gt; Security -&gt; 
                                             </textFieldCell>
                                         </textField>
                                         <box autoresizesSubviews="NO" title="Hotkey" borderType="line" titlePosition="noTitle" id="uty-zk-pnf">
-                                            <rect key="frame" x="192" y="101" width="353" height="70"/>
+                                            <rect key="frame" x="192" y="96" width="353" height="70"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="351" height="68"/>
@@ -632,9 +632,9 @@ You can change this setting later from: System Preferences -&gt; Security -&gt; 
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <button id="IIa-Oc-a7l">
-                                            <rect key="frame" x="245" y="175" width="247" height="18"/>
+                                            <rect key="frame" x="192" y="170" width="353" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Enable hotkey to open Trailer menu" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="ptW-de-jCU">
+                                            <buttonCell key="cell" type="check" title="Enable global hotkey to open/close the Trailer menu" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="ptW-de-jCU">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
