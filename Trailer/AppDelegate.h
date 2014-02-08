@@ -47,6 +47,14 @@
 @property (weak) IBOutlet NSButton *makeStatusItemsSelectable;
 @property (weak) IBOutlet NSPopUpButton *statusTermMenu;
 @property (weak) IBOutlet NSTokenField *statusTermsField;
+@property (weak) IBOutlet NSButton *moveAssignedPrsToMySection;
+
+// Keyboard
+@property (weak) IBOutlet NSButton *hotkeyEnable;
+@property (weak) IBOutlet NSButton *hotkeyCommandModifier;
+@property (weak) IBOutlet NSButton *hotkeyOptionModifier;
+@property (weak) IBOutlet NSButton *hotkeyShiftModifier;
+@property (weak) IBOutlet NSPopUpButton *hotkeyLetter;
 
 // About window
 @property (weak) IBOutlet NSTextField *aboutVersion;

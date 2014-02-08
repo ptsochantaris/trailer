@@ -34,15 +34,17 @@
 @property (nonatomic, retain) NSString * userLogin;
 @property (nonatomic, retain) NSString * repoName;
 @property (nonatomic, retain) NSDate * latestReadCommentDate;
-@property (nonatomic, retain) NSNumber *repoId;
-@property (nonatomic, retain) NSNumber *condition;
-@property (nonatomic, retain) NSNumber *mergeable;
+@property (nonatomic, retain) NSNumber * repoId;
+@property (nonatomic, retain) NSNumber * condition;
+@property (nonatomic, retain) NSNumber * mergeable;
+@property (nonatomic, retain) NSNumber * assignedToMe;
+@property (nonatomic, retain) NSString * issueUrl;
 
-@property (nonatomic, retain) NSNumber *totalComments;
-@property (nonatomic, retain) NSNumber *unreadComments;
+@property (nonatomic, retain) NSNumber * totalComments;
+@property (nonatomic, retain) NSNumber * unreadComments;
 
-@property (nonatomic, retain) NSNumber *sectionIndex;
-@property (nonatomic, readonly) NSString *sectionName;
+@property (nonatomic, retain) NSNumber * sectionIndex;
+@property (nonatomic, readonly) NSString * sectionName;
 
 + (PullRequest *)pullRequestWithInfo:(NSDictionary*)info moc:(NSManagedObjectContext *)moc;
 

@@ -20,6 +20,8 @@
 	#define CACHE_DISK 1024*1024*8
 #endif
 
+typedef void (^completionBlockType)(BOOL);
+
 - (id)init
 {
     self = [super init];
@@ -139,8 +141,6 @@
 	__block NSInteger succeded = 0;
 	__block NSInteger failed = 0;
 
-	typedef void (^completionBlockType)(BOOL);
-
 	completionBlockType completionCallback = ^(BOOL success){
 		if(success) succeded++; else failed++;
 		if(succeded+failed==totalOperations)
@@ -232,8 +232,6 @@
 					__block NSInteger count=orgs.count+1;
 					__block BOOL ok = YES;
 
-					typedef void (^completionBlockType)(BOOL);
-
 					completionBlockType completionCallback = ^(BOOL success) {
 						count--;
 						if(ok) ok = success;
@@ -264,10 +262,59 @@
 	}];
 }
 
--(void)detectMergedPullRequestsInMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
+- (void)detectAssignedPullRequestsInMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
+{
+	NSArray *prs = [DataItem newOrUpdatedItemsOfType:@"PullRequest" inMoc:moc];
+
+	if(!prs.count)
+	{
+		if(callback) callback(YES);
+		return;
+	}
+
+	for(PullRequest *r in prs)
+	{
+		NSArray *statuses = [PRStatus statusesForPullRequestId:r.serverId inMoc:moc];
+		for(PRStatus *s in statuses) s.postSyncAction = @(kPostSyncDelete);
+	}
+
+	NSInteger totalOperations = prs.count;
+	__block NSInteger succeeded = 0;
+	__block NSInteger failed = 0;
+
+	completionBlockType completionCallback = ^(BOOL success) {
+		if(success) succeeded++; else failed++;
+		if(succeeded+failed==totalOperations)
+		{
+			if(callback) callback(failed==0);
+		}
+	};
+
+	for(PullRequest *p in prs)
+	{
+		if(p.issueUrl)
+		{
+			[self getDataInPath:p.issueUrl
+						 params:nil
+					andCallback:^(id data, BOOL lastPage, NSInteger resultCode) {
+						if(data)
+						{
+							NSString *assignee = [data ofk:@"assignee"];
+							BOOL assigned = [assignee isEqualToString:[Settings shared].localUser];
+							p.assignedToMe = @(assigned);
+							completionCallback(YES);
+						}
+						else completionCallback(NO);
+					}];
+		}
+	}
+}
+
+- (void)detectMergedPullRequestsInMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
 {
 	NSArray *pullRequests = [PullRequest allItemsOfType:@"PullRequest" inMoc:moc];
 	NSMutableArray *prsToCheck = [NSMutableArray array];
+
 	for(PullRequest *r in pullRequests)
 	{
 		Repo *parent = [Repo itemOfType:@"Repo" serverId:r.repoId moc:moc];
@@ -279,19 +326,31 @@
 			[prsToCheck addObject:r]; // check closed status
 		}
 	}
-	[self _detectMergedPullRequests:prsToCheck andCallback:callback];
-}
 
--(void)_detectMergedPullRequests:(NSMutableArray *)prsToCheck andCallback:(void(^)(BOOL success))callback
-{
 	if(prsToCheck.count==0)
 	{
 		callback(YES);
 		return;
 	}
-	PullRequest *r = [prsToCheck objectAtIndex:0];
-	[prsToCheck removeObjectAtIndex:0];
 
+	NSInteger totalOperations = prsToCheck.count;
+	__block NSInteger succeded = 0;
+	__block NSInteger failed = 0;
+
+	completionBlockType completionCallback = ^(BOOL success) {
+		if(success) succeded++; else failed++;
+		if(succeded+failed==totalOperations)
+		{
+			if(callback) callback(failed==0);
+		}
+	};
+
+	for(PullRequest *r in prsToCheck)
+		[self _detectMergedPullRequest:r andCallback:completionCallback];
+}
+
+- (void)_detectMergedPullRequest:(PullRequest *)r andCallback:(void(^)(BOOL success))callback
+{
 	DLog(@"Checking closed PR to see if it was merged: %@",r.title);
 
 	Repo *parent = [Repo itemOfType:@"Repo" serverId:r.repoId moc:r.managedObjectContext];
@@ -329,11 +388,11 @@
 				  [[AppDelegate shared] postNotificationOfType:kPrClosed forItem:r];
 			  }
 		  }
-		  [self _detectMergedPullRequests:prsToCheck andCallback:callback];
+		  if(callback) callback(YES);
 
 	  } failure:^(NSHTTPURLResponse *response, id data, NSError *error) {
 		  r.postSyncAction = @(kPostSyncDoNothing); // don't delete this, we couldn't check, play it safe
-		  [self _detectMergedPullRequests:prsToCheck andCallback:callback];
+		  if(callback) callback(NO);
 	  }];
 }
 
@@ -388,11 +447,9 @@
 
 - (void)updatePullRequestsInMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
 {
-	NSInteger totalOperations = 3;
+	NSInteger totalOperations = 4;
 	__block NSInteger succeded = 0;
 	__block NSInteger failed = 0;
-
-	typedef void (^completionBlockType)(BOOL);
 
 	completionBlockType completionCallback = ^(BOOL success) {
 		if(success) succeded++; else failed++;
@@ -405,6 +462,7 @@
 	[self fetchCommentsForCurrentPullRequestsToMoc:moc andCallback:completionCallback];
 	[self fetchStatusesForCurrentPullRequestsToMoc:moc andCallback:completionCallback];
 	[self detectMergedPullRequestsInMoc:moc andCallback:completionCallback];
+	[self detectAssignedPullRequestsInMoc:moc andCallback:completionCallback];
 }
 
 -(void)fetchPullRequestsForRepos:(NSArray *)repos toMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback

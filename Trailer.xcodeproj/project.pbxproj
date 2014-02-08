@@ -199,6 +199,7 @@
 		16517CE01893BDE800B3D384 /* EmptyView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EmptyView.m; sourceTree = "<group>"; };
 		16583E461851F082003A7A55 /* SectionHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SectionHeader.h; sourceTree = "<group>"; };
 		16583E471851F082003A7A55 /* SectionHeader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SectionHeader.m; sourceTree = "<group>"; };
+		165B5D2318A62FBE0085FCB3 /* Trailer 8.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Trailer 8.xcdatamodel"; sourceTree = "<group>"; };
 		1661667C189BBDAB00FBF4E0 /* Trailer 7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 7.xcdatamodel"; sourceTree = "<group>"; };
 		1661667D189BC47F00FBF4E0 /* PRStatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PRStatus.h; sourceTree = "<group>"; };
 		1661667E189BC47F00FBF4E0 /* PRStatus.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PRStatus.m; sourceTree = "<group>"; };
@@ -1291,6 +1292,7 @@
 			isa = XCVersionGroup;
 			children = (
 				1661667C189BBDAB00FBF4E0 /* Trailer 7.xcdatamodel */,
+				165B5D2318A62FBE0085FCB3 /* Trailer 8.xcdatamodel */,
 				16096DC518927C4C0016357A /* Trailer 6.xcdatamodel */,
 				164976221864935200C13A6B /* Trailer 3.xcdatamodel */,
 				169CEB99187988D00083A068 /* Trailer 4.xcdatamodel */,
@@ -1298,7 +1300,7 @@
 				1617BEEE183F9C4F00E89BB2 /* Trailer 2.xcdatamodel */,
 				168BC6C617EC2DF000BC4584 /* Trailer.xcdatamodel */,
 			);
-			currentVersion = 1661667C189BBDAB00FBF4E0 /* Trailer 7.xcdatamodel */;
+			currentVersion = 165B5D2318A62FBE0085FCB3 /* Trailer 8.xcdatamodel */;
 			path = Trailer.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

@@ -1,6 +1,8 @@
 
 @interface AppDelegate ()
 {
+	// Keyboard support
+	id globalKeyMonitor, localKeyMonitor;
 	NSMutableArray *currentPRItems;
 }
 @end
@@ -219,6 +221,14 @@ static AppDelegate *_static_shared_ref;
 {
 	BOOL setting = (sender.integerValue==1);
 	[Settings shared].groupByRepo = setting;
+	[self updateMenu];
+}
+
+- (IBAction)moveAssignedPrsToMySectionSelected:(NSButton *)sender
+{
+	BOOL setting = (sender.integerValue==1);
+	[Settings shared].moveAssignedPrsToMySection = setting;
+	[self.dataManager postProcessAllPrs]; // apply any view option changes
 	[self updateMenu];
 }
 
@@ -717,30 +727,57 @@ static AppDelegate *_static_shared_ref;
 	[self updateStatusTermPreferenceControls];
 
 	[self.sortModeSelect selectItemAtIndex:[Settings shared].sortMethod];
-	[self.launchAtStartup setIntegerValue:[self isAppLoginItem]];
-	[self.hideAllPrsSection setIntegerValue:[Settings shared].hideAllPrsSection];
-	[self.dontConfirmRemoveAllClosed setIntegerValue:[Settings shared].dontAskBeforeWipingClosed];
-	[self.dontReportRefreshFailures setIntegerValue:[Settings shared].dontReportRefreshFailures];
-	[self.displayRepositoryNames setIntegerValue:[Settings shared].showReposInName];
-	[self.includeRepositoriesInFiltering setIntegerValue:[Settings shared].includeReposInFilter];
-	[self.dontConfirmRemoveAllMerged setIntegerValue:[Settings shared].dontAskBeforeWipingMerged];
-	[self.hideUncommentedPrs setIntegerValue:[Settings shared].shouldHideUncommentedRequests];
-	[self.autoParticipateWhenMentioned setIntegerValue:[Settings shared].autoParticipateInMentions];
-	[self.hideAvatars setIntegerValue:[Settings shared].hideAvatars];
-	[self.keepClosedPrs setIntegerValue:[Settings shared].alsoKeepClosedPrs];
-	[self.dontKeepMyPrs setIntegerValue:[Settings shared].dontKeepMyPrs];
-	[self.showAllComments setIntegerValue:[Settings shared].showCommentsEverywhere];
-	[self.sortingOrder setIntegerValue:[Settings shared].sortDescending];
-	[self.showCreationDates setIntegerValue:[Settings shared].showCreatedInsteadOfUpdated];
-	[self.groupByRepo setIntegerValue:[Settings shared].groupByRepo];
-	[self.showStatusItems setIntegerValue:[Settings shared].showStatusItems];
-	[self.makeStatusItemsSelectable setIntegerValue:[Settings shared].makeStatusItemsSelectable];
+
+	self.launchAtStartup.integerValue = [self isAppLoginItem];
+	self.hideAllPrsSection.integerValue = [Settings shared].hideAllPrsSection;
+	self.dontConfirmRemoveAllClosed.integerValue = [Settings shared].dontAskBeforeWipingClosed;
+	self.dontReportRefreshFailures.integerValue = [Settings shared].dontReportRefreshFailures;
+	self.displayRepositoryNames.integerValue = [Settings shared].showReposInName;
+	self.includeRepositoriesInFiltering.integerValue = [Settings shared].includeReposInFilter;
+	self.dontConfirmRemoveAllMerged.integerValue = [Settings shared].dontAskBeforeWipingMerged;
+	self.hideUncommentedPrs.integerValue = [Settings shared].shouldHideUncommentedRequests;
+	self.autoParticipateWhenMentioned.integerValue = [Settings shared].autoParticipateInMentions;
+	self.hideAvatars.integerValue = [Settings shared].hideAvatars;
+	self.keepClosedPrs.integerValue = [Settings shared].alsoKeepClosedPrs;
+	self.dontKeepMyPrs.integerValue = [Settings shared].dontKeepMyPrs;
+	self.showAllComments.integerValue = [Settings shared].showCommentsEverywhere;
+	self.sortingOrder.integerValue = [Settings shared].sortDescending;
+	self.showCreationDates.integerValue = [Settings shared].showCreatedInsteadOfUpdated;
+	self.groupByRepo.integerValue = [Settings shared].groupByRepo;
+	self.moveAssignedPrsToMySection.integerValue = [Settings shared].moveAssignedPrsToMySection;
+	self.showStatusItems.integerValue = [Settings shared].showStatusItems;
+	self.makeStatusItemsSelectable.integerValue = [Settings shared].makeStatusItemsSelectable;
+
+	self.hotkeyEnable.integerValue = [Settings shared].hotkeyEnable;
+	self.hotkeyCommandModifier.integerValue = [Settings shared].hotkeyCommandModifier;
+	self.hotkeyOptionModifier.integerValue = [Settings shared].hotkeyOptionModifier;
+	self.hotkeyShiftModifier.integerValue = [Settings shared].hotkeyShiftModifier;
+	[self populateHotkeyLetterMenu];
 
 	[self.refreshDurationStepper setFloatValue:[Settings shared].refreshPeriod];
 	[self refreshDurationChanged:nil];
 	
 	[self.preferencesWindow setLevel:NSFloatingWindowLevel];
 	[self.preferencesWindow makeKeyAndOrderFront:self];
+}
+
+- (void)populateHotkeyLetterMenu
+{
+	NSMutableArray *titles = [NSMutableArray array];
+	for(char l='A';l<='Z';l++)
+		[titles addObject:[NSString stringWithFormat:@"%c",l]];
+	[self.hotkeyLetter addItemsWithTitles:titles];
+	[self.hotkeyLetter selectItemWithTitle:[Settings shared].hotkeyLetter];
+}
+
+- (IBAction)enableHotkeySelected:(NSButton *)sender
+{
+	[Settings shared].hotkeyEnable = self.hotkeyEnable.integerValue;
+	[Settings shared].hotkeyLetter = self.hotkeyLetter.titleOfSelectedItem;
+	[Settings shared].hotkeyCommandModifier = self.hotkeyCommandModifier.integerValue;
+	[Settings shared].hotkeyOptionModifier = self.hotkeyOptionModifier.integerValue;
+	[Settings shared].hotkeyShiftModifier = self.hotkeyShiftModifier.integerValue;
+	[self addHotKeySupport];
 }
 
 - (IBAction)createTokenSelected:(NSButton *)sender
@@ -1343,20 +1380,45 @@ static AppDelegate *_static_shared_ref;
 
 - (void)addHotKeySupport
 {
-	NSDictionary *options = @{ (__bridge id)kAXTrustedCheckOptionPrompt: @YES};
-	if(AXIsProcessTrustedWithOptions((__bridge CFDictionaryRef)options))
+	if([Settings shared].hotkeyEnable)
 	{
-		[NSEvent addGlobalMonitorForEventsMatchingMask:NSKeyDownMask handler:^void(NSEvent* incomingEvent) {
-			[self checkForHotkey:incomingEvent];
-		}];
+		if(!globalKeyMonitor)
+		{
+			NSDictionary *options = @{ (__bridge id)kAXTrustedCheckOptionPrompt: @YES};
+			if(AXIsProcessTrustedWithOptions((__bridge CFDictionaryRef)options))
+			{
+				globalKeyMonitor = [NSEvent addGlobalMonitorForEventsMatchingMask:NSKeyDownMask handler:^void(NSEvent* incomingEvent) {
+					[self checkForHotkey:incomingEvent];
+				}];
+			}
+		}
+	}
+	else
+	{
+		if(globalKeyMonitor)
+		{
+			[NSEvent removeMonitor:globalKeyMonitor];
+			globalKeyMonitor = nil;
+		}
 	}
 
-	[NSEvent addLocalMonitorForEventsMatchingMask:NSKeyDownMask handler:^NSEvent *(NSEvent *incomingEvent) {
+	if(localKeyMonitor) return;
+
+	localKeyMonitor = [NSEvent addLocalMonitorForEventsMatchingMask:NSKeyDownMask handler:^NSEvent *(NSEvent *incomingEvent) {
+
 		if([self checkForHotkey:incomingEvent]) return nil;
 
-		// down 125 // up 126 // 36 enter
 		switch(incomingEvent.keyCode)
 		{
+			case 43: // prefs
+			{
+				if(incomingEvent.modifierFlags & NSCommandKeyMask)
+				{
+					[self preferencesSelected:nil];
+					return nil;
+				}
+				break;
+			}
 			case 125: // down
 			{
 				PRItemView *v = [self focusedItemView];
@@ -1413,10 +1475,66 @@ static AppDelegate *_static_shared_ref;
 
 - (BOOL)checkForHotkey:(NSEvent *)incomingEvent
 {
-	NSInteger masks = NSCommandKeyMask|NSShiftKeyMask|NSAlternateKeyMask;
-	if((incomingEvent.modifierFlags & masks) == masks)
+	NSInteger check = 0;
+
+	if([Settings shared].hotkeyCommandModifier)
 	{
-		if(incomingEvent.keyCode==17)
+		if(incomingEvent.modifierFlags & NSCommandKeyMask) check++; else check--;
+	}
+	else
+	{
+		if(incomingEvent.modifierFlags & NSCommandKeyMask) check--; else check++;
+	}
+
+	if([Settings shared].hotkeyOptionModifier)
+	{
+		if(incomingEvent.modifierFlags & NSAlternateKeyMask) check++; else check--;
+	}
+	else
+	{
+		if(incomingEvent.modifierFlags & NSAlternateKeyMask) check--; else check++;
+	}
+
+	if([Settings shared].hotkeyShiftModifier)
+	{
+		if(incomingEvent.modifierFlags & NSShiftKeyMask) check++; else check--;
+	}
+	else
+	{
+		if(incomingEvent.modifierFlags & NSShiftKeyMask) check--; else check++;
+	}
+
+	if(check==3)
+	{
+		NSDictionary *codeLookup = @{@"A": @(0),
+									 @"B": @(11),
+									 @"C": @(8),
+									 @"D": @(2),
+									 @"E": @(14),
+									 @"F": @(3),
+									 @"G": @(5),
+									 @"H": @(4),
+									 @"I": @(34),
+									 @"J": @(38),
+									 @"K": @(40),
+									 @"L": @(37),
+									 @"M": @(46),
+									 @"N": @(45),
+									 @"O": @(31),
+									 @"P": @(35),
+									 @"Q": @(12),
+									 @"R": @(15),
+									 @"S": @(1),
+									 @"T": @(17),
+									 @"U": @(32),
+									 @"V": @(9),
+									 @"W": @(13),
+									 @"X": @(7),
+									 @"Y": @(16),
+									 @"Z": @(6) };
+
+		NSNumber *n = codeLookup[[Settings shared].hotkeyLetter];
+		if(incomingEvent.keyCode==n.integerValue)
 		{
 			[self statusItemTapped:self.statusItemView];
 			return YES;

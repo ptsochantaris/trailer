@@ -24,6 +24,8 @@
 @dynamic repoName;
 @dynamic mergeable;
 @dynamic statusesLink;
+@dynamic assignedToMe;
+@dynamic issueUrl;
 
 + (PullRequest *)pullRequestWithInfo:(NSDictionary *)info moc:(NSManagedObjectContext *)moc
 {
@@ -51,6 +53,7 @@
 	p.issueCommentLink = [[linkInfo ofk:@"comments"] ofk:@"href"];
 	p.reviewCommentLink = [[linkInfo ofk:@"review_comments"] ofk:@"href"];
 	p.statusesLink = [[linkInfo ofk:@"statuses"] ofk:@"href"];
+	p.issueUrl = [[linkInfo ofk:@"issue"] ofk:@"href"];
 
 	p.condition = @kPullRequestConditionOpen;
 
@@ -241,6 +244,7 @@
 
 - (BOOL)isMine
 {
+	if(self.assignedToMe.boolValue && [Settings shared].moveAssignedPrsToMySection) return YES;
 	return [self.userId.stringValue isEqualToString:[Settings shared].localUserId];
 }
 
