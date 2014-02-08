@@ -299,7 +299,7 @@ typedef void (^completionBlockType)(BOOL);
 					andCallback:^(id data, BOOL lastPage, NSInteger resultCode) {
 						if(data)
 						{
-							NSString *assignee = [data ofk:@"assignee"];
+							NSString *assignee = [[data ofk:@"assignee"] ofk:@"login"];
 							BOOL assigned = [assignee isEqualToString:[Settings shared].localUser];
 							p.assignedToMe = @(assigned);
 							completionCallback(YES);

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="4514" systemVersion="13B42" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
-        <deployment defaultVersion="1090" identifier="macosx"/>
+        <deployment defaultVersion="1080" identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="4514"/>
     </dependencies>
     <objects>
@@ -230,7 +230,7 @@ Server</string>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <button id="eoe-1H-ixD">
-                                            <rect key="frame" x="15" y="7" width="238" height="18"/>
+                                            <rect key="frame" x="15" y="7" width="257" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <buttonCell key="cell" type="check" title="Display repository names in PR list" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="6nK-Gh-kAV">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -241,7 +241,7 @@ Server</string>
                                             </connections>
                                         </button>
                                         <button id="GOC-8L-GHy">
-                                            <rect key="frame" x="266" y="7" width="272" height="18"/>
+                                            <rect key="frame" x="276" y="7" width="287" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                             <buttonCell key="cell" type="check" title="Include repository names when filtering" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="77a-Wc-eM3">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -260,7 +260,7 @@ Server</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <button id="W7L-ge-mHy">
-                                            <rect key="frame" x="510" y="50" width="211" height="18"/>
+                                            <rect key="frame" x="486" y="50" width="235" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                             <buttonCell key="cell" type="check" title="Don't report failed refreshes" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="G9X-c5-EXE">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -279,7 +279,7 @@ Server</string>
                                             </connections>
                                         </stepper>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="wFz-AT-nev">
-                                            <rect key="frame" x="475" y="20" width="228" height="17"/>
+                                            <rect key="frame" x="407" y="20" width="296" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Auto-refresh every 3600 seconds" id="jIv-Hj-CCr">
                                                 <font key="font" metaFont="system"/>
@@ -288,7 +288,7 @@ Server</string>
                                             </textFieldCell>
                                         </textField>
                                         <button id="AEB-MY-2H6">
-                                            <rect key="frame" x="168" y="153" width="400" height="18"/>
+                                            <rect key="frame" x="168" y="153" width="419" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Display PR creation time instead of most recent activity time" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="FUA-CI-tqc">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -299,7 +299,7 @@ Server</string>
                                             </connections>
                                         </button>
                                         <button id="ZD1-Lw-zpW">
-                                            <rect key="frame" x="168" y="118" width="389" height="18"/>
+                                            <rect key="frame" x="168" y="118" width="405" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Move PRs assigned to me to the &quot;My Pull Requests&quot; section" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="4g6-XV-fVn">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -388,7 +388,7 @@ Server</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <button id="6Hg-wy-xhx">
-                                            <rect key="frame" x="183" y="225" width="370" height="18"/>
+                                            <rect key="frame" x="183" y="225" width="385" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Hold onto PRs which have been closed, but not merged" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="zfA-K2-57J">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -399,7 +399,7 @@ Server</string>
                                             </connections>
                                         </button>
                                         <button id="sNq-fA-PLU">
-                                            <rect key="frame" x="183" y="186" width="352" height="18"/>
+                                            <rect key="frame" x="183" y="186" width="373" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="When one of my PRs is merged, don't keep it around" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="ZvA-e4-rHz">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -452,7 +452,7 @@ Server</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <button id="c6m-8a-CRl">
-                                            <rect key="frame" x="218" y="167" width="279" height="18"/>
+                                            <rect key="frame" x="218" y="167" width="288" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Only display PRs with unread comments" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="djW-U3-Ae9">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -463,7 +463,7 @@ Server</string>
                                             </connections>
                                         </button>
                                         <button id="CPe-TS-qPS">
-                                            <rect key="frame" x="218" y="202" width="300" height="18"/>
+                                            <rect key="frame" x="218" y="202" width="325" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Display comment badges &amp; alerts for all PRs" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="EcZ-Ov-Dct">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -504,7 +504,7 @@ Server</string>
                                             </connections>
                                         </button>
                                         <button id="yD7-Y4-ZaZ">
-                                            <rect key="frame" x="149" y="231" width="396" height="18"/>
+                                            <rect key="frame" x="149" y="231" width="418" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Make status items always selectable (don't require alt-click)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Nwp-dZ-JYi">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -553,14 +553,16 @@ Server</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="B02-2m-mrP">
-                                            <rect key="frame" x="94" y="229" width="548" height="68"/>
+                                            <rect key="frame" x="94" y="205" width="548" height="102"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" id="nPj-Jx-Vfo">
                                                 <font key="font" metaFont="system"/>
                                                 <string key="title">Note: When enabling this for the first time you will be asked to
 provide permission for Trailer to use the keyboard, and then you MUST restart Trailer.
 
-You can change this permission later from: System Preferences -&gt; Security -&gt; Privacy</string>
+You can change this permission later from: System Preferences -&gt; Security -&gt; Privacy
+
+This feature is available on OS X Mavericks onwards</string>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
@@ -575,7 +577,7 @@ You can change this permission later from: System Preferences -&gt; Security -&g
                                             </textFieldCell>
                                         </textField>
                                         <box autoresizesSubviews="NO" title="Hotkey" borderType="line" titlePosition="noTitle" id="uty-zk-pnf">
-                                            <rect key="frame" x="192" y="96" width="353" height="70"/>
+                                            <rect key="frame" x="192" y="86" width="353" height="70"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="351" height="68"/>
@@ -619,7 +621,7 @@ You can change this permission later from: System Preferences -&gt; Security -&g
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="gFU-aR-877">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="system"/>
+                                                            <font key="font" metaFont="menu"/>
                                                             <menu key="menu" title="Keys" id="v4c-JW-qPh"/>
                                                         </popUpButtonCell>
                                                         <connections>
@@ -632,7 +634,7 @@ You can change this permission later from: System Preferences -&gt; Security -&g
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <button id="IIa-Oc-a7l">
-                                            <rect key="frame" x="192" y="170" width="353" height="18"/>
+                                            <rect key="frame" x="192" y="160" width="353" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Enable global hotkey to open/close the Trailer menu" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="ptW-de-jCU">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>

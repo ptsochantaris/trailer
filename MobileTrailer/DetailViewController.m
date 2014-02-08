@@ -39,7 +39,7 @@ static DetailViewController *_detail_shared_ref;
 
 - (void)setEmpty
 {
-	self.statusLabel.textColor = [UIColor lightGrayColor];
+	self.statusLabel.textColor = [COLOR_CLASS lightGrayColor];
 	self.statusLabel.text = @"Please select a Pull Request from the list on the left, or select 'Settings' to change your repository selection.\n\n(You may have to login to GitHub the first time you visit a page)";
 	self.statusLabel.hidden = NO;
 	self.navigationItem.rightBarButtonItem.enabled = NO;
@@ -109,7 +109,7 @@ static DetailViewController *_detail_shared_ref;
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error
 {
 	[self.spinner stopAnimating];
-	self.statusLabel.textColor = [UIColor redColor];
+	self.statusLabel.textColor = [COLOR_CLASS redColor];
 	self.statusLabel.text = [NSString stringWithFormat:@"There was an error loading this pull request page: %@",error.localizedDescription];
 	self.statusLabel.hidden = NO;
 	self.web.hidden = YES;

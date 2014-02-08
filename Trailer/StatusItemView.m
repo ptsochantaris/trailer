@@ -18,9 +18,9 @@
 		_delegate = delegate;
 		_attributes = attributes;
 		_templateAttributes = [attributes mutableCopy];
-		_templateAttributes[NSForegroundColorAttributeName] = [NSColor whiteColor];
+		_templateAttributes[NSForegroundColorAttributeName] = [COLOR_CLASS whiteColor];
 		_grayAttributes = [attributes mutableCopy];
-		_grayAttributes[NSForegroundColorAttributeName] = [NSColor lightGrayColor];
+		_grayAttributes[NSForegroundColorAttributeName] = [COLOR_CLASS lightGrayColor];
     }
     return self;
 }

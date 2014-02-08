@@ -50,14 +50,14 @@
 		{
 			if([theEvent modifierFlags] & NSAlternateKeyMask)
 			{
-				self.textColor = [NSColor blueColor];
+				self.textColor = [COLOR_CLASS blueColor];
 				highlighted = YES;
 				[self.window invalidateCursorRectsForView:self];
 			}
 		}
 		else
 		{
-			self.textColor = [NSColor blueColor];
+			self.textColor = [COLOR_CLASS blueColor];
 			highlighted = YES;
 			[self.window invalidateCursorRectsForView:self];
 		}
@@ -80,7 +80,7 @@
 	{
 		if([theEvent modifierFlags] & NSAlternateKeyMask)
 		{
-			self.textColor = [NSColor blueColor];
+			self.textColor = [COLOR_CLASS blueColor];
 			highlighted = YES;
 			[self.window invalidateCursorRectsForView:self];
 		}

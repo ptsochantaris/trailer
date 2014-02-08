@@ -23,7 +23,7 @@ static CGColorRef _highlightColor;
 		dateFormatter.timeStyle = NSDateFormatterMediumStyle;
 		dateFormatter.doesRelativeDateFormatting = YES;
 
-		_highlightColor = CGColorCreateCopy([NSColor colorWithWhite:0.95 alpha:1.0].CGColor);
+		_highlightColor = CGColorCreateCopy(MAKECOLOR(0.95, 0.95, 0.95, 1.0).CGColor);
 
 		_titleAttributes = @{
 							 NSFontAttributeName:[NSFont menuFontOfSize:13.0],
@@ -138,7 +138,7 @@ static CGColorRef _highlightColor;
 			if(pullRequest.condition.integerValue==kPullRequestConditionOpen)
 			{
 				CenteredTextField *unmergeableLabel = [[CenteredTextField alloc] initWithFrame:pinRect];
-				unmergeableLabel.textColor = [NSColor redColor];
+				unmergeableLabel.textColor = [COLOR_CLASS redColor];
 				unmergeableLabel.font = [NSFont fontWithName:@"Monaco" size:8.0];
 				unmergeableLabel.alignment = NSCenterTextAlignment;
 				[unmergeableLabel setStringValue:@"Cannot be merged"];

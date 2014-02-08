@@ -18,7 +18,7 @@ static AppDelegate *_static_shared_ref;
 	//NSString *appDomain = [[NSBundle mainBundle] bundleIdentifier];
 	//[[NSUserDefaults standardUserDefaults] removePersistentDomainForName:appDomain];
 
-	self.mainMenu.backgroundColor = [NSColor whiteColor];
+	self.mainMenu.backgroundColor = [COLOR_CLASS whiteColor];
 
 	self.filterTimer = [[HTPopTimer alloc] initWithTimeInterval:0.2 target:self selector:@selector(filterTimerPopped)];
 
@@ -754,6 +754,15 @@ static AppDelegate *_static_shared_ref;
 	self.hotkeyShiftModifier.integerValue = [Settings shared].hotkeyShiftModifier;
 	[self populateHotkeyLetterMenu];
 
+	if(AXIsProcessTrustedWithOptions == NULL)
+	{
+		[self.hotkeyEnable setEnabled:NO];
+		[self.hotkeyLetter setEnabled:NO];
+		[self.hotkeyOptionModifier setEnabled:NO];
+		[self.hotkeyShiftModifier setEnabled:NO];
+		[self.hotkeyCommandModifier setEnabled:NO];
+	}
+
 	[self.refreshDurationStepper setFloatValue:[Settings shared].refreshPeriod];
 	[self refreshDurationChanged:nil];
 	
@@ -1142,7 +1151,7 @@ static AppDelegate *_static_shared_ref;
 		countString = @"X";
 		attributes = @{
 					   NSFontAttributeName: [NSFont boldSystemFontOfSize:11.0],
-					   NSForegroundColorAttributeName: [NSColor colorWithRed:0.8 green:0.0 blue:0.0 alpha:1.0],
+					   NSForegroundColorAttributeName: MAKECOLOR(0.8, 0.0, 0.0, 1.0),
 					   };
 	}
 	else
@@ -1152,14 +1161,14 @@ static AppDelegate *_static_shared_ref;
 		{
 			attributes = @{
 						   NSFontAttributeName: [NSFont systemFontOfSize:11.0],
-						   NSForegroundColorAttributeName: [NSColor colorWithRed:0.8 green:0.0 blue:0.0 alpha:1.0],
+						   NSForegroundColorAttributeName: MAKECOLOR(0.8, 0.0, 0.0, 1.0),
 						   };
 		}
 		else
 		{
 			attributes = @{
 						   NSFontAttributeName: [NSFont systemFontOfSize:11.0],
-						   NSForegroundColorAttributeName: [NSColor blackColor],
+						   NSForegroundColorAttributeName: [COLOR_CLASS blackColor],
 						   };
 		}
 	}
@@ -1380,6 +1389,7 @@ static AppDelegate *_static_shared_ref;
 
 - (void)addHotKeySupport
 {
+	if(AXIsProcessTrustedWithOptions == NULL) return;
 	if([Settings shared].hotkeyEnable)
 	{
 		if(!globalKeyMonitor)

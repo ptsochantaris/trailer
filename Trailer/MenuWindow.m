@@ -23,7 +23,7 @@
 	topBox = [[NSBox alloc] initWithFrame:CGRectZero];
 	topBox.boxType = NSBoxCustom;
 	topBox.borderType = NSNoBorder;
-	topBox.fillColor = [NSColor whiteColor];
+	topBox.fillColor = [COLOR_CLASS whiteColor];
 
 	bottomArrow = [[NSImageView alloc] initWithFrame:CGRectZero];
 	bottomArrow.image = [NSImage imageNamed:@"downArrow"];
@@ -32,7 +32,7 @@
 	bottomBox = [[NSBox alloc] initWithFrame:CGRectZero];
 	bottomBox.boxType = NSBoxCustom;
 	bottomBox.borderType = NSNoBorder;
-	bottomBox.fillColor = [NSColor whiteColor];
+	bottomBox.fillColor = [COLOR_CLASS whiteColor];
 
 	[self.scrollView.contentView setPostsBoundsChangedNotifications:YES];
 	[[NSNotificationCenter defaultCenter] addObserver:self
@@ -51,9 +51,8 @@
     return YES;
 }
 
-#define TOP_SCROLL_ZONE_HEIGHT 22.0
-#define BOTTOM_SCROLL_ZONE_HEIGHT 22.0
-#define TOP_CONTROLS_HEIGHT 27.0
+#define SCROLL_ZONE_HEIGHT 22.0
+#define TOP_CONTROLS_HEIGHT 28.0
 
 - (void)layout
 {
@@ -75,9 +74,10 @@
 	CGSize size = [self.contentView bounds].size;
 	self.scrollView.frame = CGRectMake(0, 0, size.width, size.height-TOP_CONTROLS_HEIGHT);
 
+	CGFloat scrollbarWidth = self.scrollView.verticalScroller.frame.size.width;
 	if([self shouldShowTop])
 	{
-		CGRect rect = CGRectMake(0, size.height-TOP_SCROLL_ZONE_HEIGHT-TOP_CONTROLS_HEIGHT-5.0, size.width, TOP_SCROLL_ZONE_HEIGHT);
+		CGRect rect = CGRectMake(0, size.height-SCROLL_ZONE_HEIGHT-TOP_CONTROLS_HEIGHT, size.width-scrollbarWidth, SCROLL_ZONE_HEIGHT);
 		topBox.frame = rect;
 		topArrow.frame = rect;
 		[self.contentView addSubview:topBox];
@@ -87,7 +87,7 @@
 
 	if([self shouldShowBottom])
 	{
-		CGRect rect = CGRectMake(0, 0, size.width, BOTTOM_SCROLL_ZONE_HEIGHT);
+		CGRect rect = CGRectMake(0, 0, size.width-scrollbarWidth, SCROLL_ZONE_HEIGHT);
 		bottomBox.frame = rect;
 		bottomArrow.frame = rect;
 		[self.contentView addSubview:bottomBox];
@@ -100,7 +100,7 @@
 {
 	CGFloat itemBottom = view.frame.origin.y-50;
 	CGFloat itemHeight = view.frame.size.height;
-	CGFloat itemTop = view.frame.origin.y+itemHeight+20;
+	CGFloat itemTop = view.frame.origin.y+itemHeight+30;
 
 	CGFloat containerBottom = self.scrollView.contentView.documentVisibleRect.origin.y;
 	CGFloat containerHeight = self.scrollView.contentView.documentVisibleRect.size.height;

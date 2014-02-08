@@ -292,7 +292,7 @@
 	}
 	else if([Repo countActiveReposInMoc:self.managedObjectContext]==0)
 	{
-		messageColor = [COLOR_CLASS colorWithRed:0.8 green:0.0 blue:0.0 alpha:1.0];
+		messageColor = MAKECOLOR(0.8, 0.0, 0.0, 1.0);
 		message = @"There are no active repositories, please add or activate some.";
 	}
 	else if(openRequests==0)

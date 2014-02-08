@@ -18,12 +18,12 @@ static CGColorRef _lightGray;
 		NSMutableParagraphStyle *pCenter = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
 		pCenter.alignment = NSCenterTextAlignment;
 
-		_lightGray = CGColorCreateCopy([NSColor colorWithWhite:0.92 alpha:1.0].CGColor);
+		_lightGray = CGColorCreateCopy(MAKECOLOR(0.92, 0.92, 0.92, 1.0).CGColor);
 
 		_titleAttributes = @{
 							 NSFontAttributeName:[NSFont boldSystemFontOfSize:14.0],
-							 NSForegroundColorAttributeName:[NSColor lightGrayColor],
-							 NSBackgroundColorAttributeName:[NSColor clearColor],
+							 NSForegroundColorAttributeName:[COLOR_CLASS lightGrayColor],
+							 NSBackgroundColorAttributeName:[COLOR_CLASS clearColor],
 							 };
 	});
 }
