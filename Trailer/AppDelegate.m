@@ -1168,7 +1168,7 @@ static AppDelegate *_static_shared_ref;
 	{
 		countString = @"X";
 		attributes = @{
-					   NSFontAttributeName: [NSFont boldSystemFontOfSize:11.0],
+					   NSFontAttributeName: [NSFont boldSystemFontOfSize:10.0],
 					   NSForegroundColorAttributeName: MAKECOLOR(0.8, 0.0, 0.0, 1.0),
 					   };
 	}
@@ -1178,14 +1178,14 @@ static AppDelegate *_static_shared_ref;
 		if(newCommentCount)
 		{
 			attributes = @{
-						   NSFontAttributeName: [NSFont systemFontOfSize:11.0],
+						   NSFontAttributeName: [NSFont menuFontOfSize:10.0],
 						   NSForegroundColorAttributeName: MAKECOLOR(0.8, 0.0, 0.0, 1.0),
 						   };
 		}
 		else
 		{
 			attributes = @{
-						   NSFontAttributeName: [NSFont systemFontOfSize:11.0],
+						   NSFontAttributeName: [NSFont menuFontOfSize:10.0],
 						   NSForegroundColorAttributeName: [COLOR_CLASS blackColor],
 						   };
 		}
@@ -1210,7 +1210,6 @@ static AppDelegate *_static_shared_ref;
 
 	[self sizeMenuAndShow:NO];
 }
-
 
 - (IBAction)selectParentsSelected:(NSButton *)sender
 {

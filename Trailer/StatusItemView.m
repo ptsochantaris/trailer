@@ -40,29 +40,29 @@
 		[[NSColor blueColor] setFill];
 		CGContextFillRect(context, dirtyRect);
 
-		[oldImage drawInRect:CGRectMake(STATUSITEM_PADDING, 0, self.bounds.size.height, self.bounds.size.height)
+		[oldImage drawInRect:CGRectMake(STATUSITEM_PADDING, 1.0, self.bounds.size.height, self.bounds.size.height)
 					fromRect:NSZeroRect
 				   operation:NSCompositeXOR
 					fraction:1.0];
 
-		[_label drawInRect:CGRectMake(self.bounds.size.height+STATUSITEM_PADDING, -5, self.bounds.size.width, self.bounds.size.height)
+		[_label drawInRect:CGRectMake(self.bounds.size.height, -5, self.bounds.size.width, self.bounds.size.height)
 			withAttributes:_templateAttributes];
 	}
 	else
 	{
-		[oldImage drawInRect:CGRectMake(STATUSITEM_PADDING, 0, self.bounds.size.height, self.bounds.size.height)
+		[oldImage drawInRect:CGRectMake(STATUSITEM_PADDING, 1.0, self.bounds.size.height, self.bounds.size.height)
 					fromRect:NSZeroRect
 				   operation:NSCompositeSourceOver
 					fraction:1.0];
 
 		if(_grayOut)
 		{
-			[_label drawInRect:CGRectMake(self.bounds.size.height+STATUSITEM_PADDING, -5, self.bounds.size.width, self.bounds.size.height)
+			[_label drawInRect:CGRectMake(self.bounds.size.height, -5, self.bounds.size.width, self.bounds.size.height)
 				withAttributes:_grayAttributes];
 		}
 		else
 		{
-			[_label drawInRect:CGRectMake(self.bounds.size.height+STATUSITEM_PADDING, -5, self.bounds.size.width, self.bounds.size.height)
+			[_label drawInRect:CGRectMake(self.bounds.size.height, -5, self.bounds.size.width, self.bounds.size.height)
 				withAttributes:_attributes];
 		}
 	}
