@@ -6,7 +6,7 @@
 //#define DLog(fmt, ...) NSLog(fmt, ##__VA_ARGS__)
 #define DLog(...)
 #define COLOR_CLASS UIColor
-#define MAKECOLOR(R,G,B,A) [NSColor colorWithRed:R green:G blue:B alpha:A]
+#define MAKECOLOR(R,G,B,A) [COLOR_CLASS colorWithRed:R green:G blue:B alpha:A]
 
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>

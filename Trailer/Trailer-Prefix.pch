@@ -8,7 +8,7 @@
 //#define DLog(fmt, ...) NSLog(fmt, ##__VA_ARGS__)
 #define DLog(...)
 #define COLOR_CLASS NSColor
-#define MAKECOLOR(R,G,B,A) [NSColor colorWithSRGBRed:R green:G blue:B alpha:A]
+#define MAKECOLOR(R,G,B,A) [COLOR_CLASS colorWithSRGBRed:R green:G blue:B alpha:A]
 
 #import <Cocoa/Cocoa.h>
 #import <CommonCrypto/CommonCrypto.h>

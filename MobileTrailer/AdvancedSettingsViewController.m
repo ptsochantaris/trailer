@@ -93,6 +93,12 @@
 				if([Settings shared].hideAllPrsSection) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
             }
+			case 3:
+            {
+				cell.textLabel.text = [NSString stringWithFormat:@"Move assigned PRs to 'Mine'"];
+				if([Settings shared].moveAssignedPrsToMySection) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				break;
+            }
 		}
 	}
 	else if(indexPath.section==COMMENTS_SECTION_INDEX)
@@ -288,6 +294,11 @@
 				[Settings shared].hideAllPrsSection = ![Settings shared].hideAllPrsSection;
 				break;
 			}
+			case 3:
+			{
+				[Settings shared].moveAssignedPrsToMySection = ![Settings shared].moveAssignedPrsToMySection;
+				break;
+			}
 		}
 		[settingsChangedAnnounceTimer push];
 	}
@@ -406,7 +417,7 @@
 {
     switch (section) {
 		case REFRESH_SECTION_INDEX: return 2;
-		case DISPLAY_SECTION_INDEX: return 3;
+		case DISPLAY_SECTION_INDEX: return 4;
 		case COMMENTS_SECTION_INDEX: return 3;
 		case REPOS_SECTION_INDEX: return 2;
 		case MERGING_SECTION_INDEX: return 2;

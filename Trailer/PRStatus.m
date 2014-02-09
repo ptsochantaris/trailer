@@ -64,7 +64,7 @@
 	});
 	NSString *desc = self.descriptionText;
 	if(!desc) desc = @"(No description)";
-	return [NSString stringWithFormat:@"%@ %@",[dateFormatter stringFromDate:self.createdAt],self.descriptionText];
+	return [NSString stringWithFormat:@"%@ %@",[dateFormatter stringFromDate:self.createdAt],desc];
 }
 
 + (void)removeStatusesWithPullRequestId:(NSNumber *)pullRequestId inMoc:(NSManagedObjectContext *)moc

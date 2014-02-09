@@ -892,16 +892,23 @@ typedef void (^completionBlockType)(BOOL);
                            imageSize.width,
                            imageSize.height,
                            currentAppVersion] md5hash];
-    NSString *imagePath = [cacheDirectory stringByAppendingPathComponent:[@"imgcache-" stringByAppendingString:imageKey]];
+    NSString *imagePath = [cacheDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"imgcache-%@-%d", imageKey, (NSInteger)GLOBAL_SCREEN_SCALE]];
 
     NSFileManager *fileManager = [NSFileManager defaultManager];
     if([fileManager fileExistsAtPath:imagePath])
     {
-        id ret;
 #ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
-        ret = [UIImage imageWithContentsOfFile:imagePath];
+		CFDataRef imgData = (__bridge CFDataRef)[NSData dataWithContentsOfFile:imagePath];
+		CGDataProviderRef imgDataProvider = CGDataProviderCreateWithCFData (imgData);
+		CGImageRef cfImage = CGImageCreateWithPNGDataProvider(imgDataProvider, NULL, false, kCGRenderingIntentDefault);
+		CGDataProviderRelease(imgDataProvider);
+
+		id ret = [[UIImage alloc] initWithCGImage:cfImage
+											scale:GLOBAL_SCREEN_SCALE
+									  orientation:UIImageOrientationUp];
+		CGImageRelease(cfImage);
 #else
-        ret = [[NSImage alloc] initWithContentsOfFile:imagePath];
+        id ret = [[NSImage alloc] initWithContentsOfFile:imagePath];
 #endif
         if(ret)
         {
@@ -922,7 +929,7 @@ typedef void (^completionBlockType)(BOOL);
                    if(imageData)
                    {
 #ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
-                       image = [[UIImage imageWithData:imageData] scaleToFillPixelSize:imageSize];
+                       image = [[UIImage imageWithData:imageData] scaleToFillSize:imageSize];
                        [UIImagePNGRepresentation(image) writeToFile:imagePath atomically:YES];
 #else
                        image = [[[NSImage alloc] initWithData:imageData] scaleToFillSize:imageSize];
