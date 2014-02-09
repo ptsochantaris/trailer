@@ -1178,14 +1178,14 @@ static AppDelegate *_static_shared_ref;
 		if(newCommentCount)
 		{
 			attributes = @{
-						   NSFontAttributeName: [NSFont menuFontOfSize:10.0],
+						   NSFontAttributeName: [NSFont menuBarFontOfSize:10.0],
 						   NSForegroundColorAttributeName: MAKECOLOR(0.8, 0.0, 0.0, 1.0),
 						   };
 		}
 		else
 		{
 			attributes = @{
-						   NSFontAttributeName: [NSFont menuFontOfSize:10.0],
+						   NSFontAttributeName: [NSFont menuBarFontOfSize:10.0],
 						   NSForegroundColorAttributeName: [COLOR_CLASS blackColor],
 						   };
 		}
