@@ -220,6 +220,12 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#define MARK_UNMERGEABLE_ON_USER_SECTIONS_ONLY @"MARK_UNMERGEABLE_ON_USER_SECTIONS_ONLY"
+-(void)setMarkUnmergeableOnUserSectionsOnly:(BOOL)markUnmergeableOnUserSectionsOnly { [self storeDefaultValue:@(markUnmergeableOnUserSectionsOnly) forKey:MARK_UNMERGEABLE_ON_USER_SECTIONS_ONLY]; }
+-(BOOL)markUnmergeableOnUserSectionsOnly { return [[[NSUserDefaults standardUserDefaults] stringForKey:MARK_UNMERGEABLE_ON_USER_SECTIONS_ONLY] boolValue]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #define HOTKEY_ENABLE @"HOTKEY_ENABLE"
 -(void)setHotkeyEnable:(BOOL)hotkeyEnable { [self storeDefaultValue:@(hotkeyEnable) forKey:HOTKEY_ENABLE]; }
 -(BOOL)hotkeyEnable { return [[[NSUserDefaults standardUserDefaults] stringForKey:HOTKEY_ENABLE] boolValue]; }

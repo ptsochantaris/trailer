@@ -104,6 +104,18 @@
 	if(!self.title) self.title = @"(No title)";
 }
 
+- (BOOL)markUnmergeable
+{
+	if(!self.mergeable.boolValue)
+	{
+		if(self.sectionIndex.integerValue == kPullRequestSectionAll &&
+		   [Settings shared].markUnmergeableOnUserSectionsOnly)
+			return NO;
+		return YES;
+	}
+	return NO;
+}
+
 - (BOOL)refersToMe
 {
 	NSString *myHandle = [NSString stringWithFormat:@"@%@",[Settings shared].localUser];

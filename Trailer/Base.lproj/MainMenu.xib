@@ -288,7 +288,7 @@ Server</string>
                                             </textFieldCell>
                                         </textField>
                                         <button id="AEB-MY-2H6">
-                                            <rect key="frame" x="168" y="153" width="419" height="18"/>
+                                            <rect key="frame" x="65" y="186" width="419" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Display PR creation time instead of most recent activity time" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="FUA-CI-tqc">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -299,7 +299,7 @@ Server</string>
                                             </connections>
                                         </button>
                                         <button id="ZD1-Lw-zpW">
-                                            <rect key="frame" x="168" y="118" width="405" height="18"/>
+                                            <rect key="frame" x="65" y="151" width="405" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Move PRs assigned to me to the &quot;My Pull Requests&quot; section" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="4g6-XV-fVn">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -309,8 +309,19 @@ Server</string>
                                                 <action selector="moveAssignedPrsToMySectionSelected:" target="494" id="Z83-j9-pmS"/>
                                             </connections>
                                         </button>
+                                        <button id="SoW-AJ-5kD">
+                                            <rect key="frame" x="65" y="116" width="442" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Mark PRs as un-mergeable only in my own or participated sections" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="yfb-m7-og2">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="markUnmergeableOnUserSectionsOnlySelected:" target="494" id="1u3-wH-cGa"/>
+                                            </connections>
+                                        </button>
                                         <button id="KdG-4v-vf7">
-                                            <rect key="frame" x="168" y="222" width="140" height="18"/>
+                                            <rect key="frame" x="65" y="255" width="140" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Hide user avatars" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="eW5-mR-deV">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -321,7 +332,7 @@ Server</string>
                                             </connections>
                                         </button>
                                         <button id="4E0-iw-eoN">
-                                            <rect key="frame" x="168" y="187" width="193" height="18"/>
+                                            <rect key="frame" x="65" y="220" width="193" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Hide the &quot;All PRs&quot; section" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="JA8-t0-2Rt">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -701,6 +712,7 @@ This feature is available on OS X Mavericks onwards</string>
                 <outlet property="mainMenuFilter" destination="gaD-Aj-14T" id="1vn-8Q-OCo"/>
                 <outlet property="mainMenuHeader" destination="uIa-cA-gk9" id="JDR-T5-fDT"/>
                 <outlet property="makeStatusItemsSelectable" destination="yD7-Y4-ZaZ" id="rgg-se-o4u"/>
+                <outlet property="markUnmergeableOnUserSectionsOnly" destination="SoW-AJ-5kD" id="UTu-Bf-nOY"/>
                 <outlet property="moveAssignedPrsToMySection" destination="ZD1-Lw-zpW" id="btl-cm-k5r"/>
                 <outlet property="preferencesWindow" destination="371" id="uYB-yu-610"/>
                 <outlet property="projectsTable" destination="eB0-Bq-YR9" id="kuh-DJ-Kls"/>
@@ -780,7 +792,7 @@ This feature is available on OS X Mavericks onwards</string>
                         <color key="fillColor" name="controlLightHighlightColor" catalog="System" colorSpace="catalog"/>
                     </box>
                     <searchField focusRingType="none" verticalHuggingPriority="750" id="gaD-Aj-14T">
-                        <rect key="frame" x="42" y="683" width="324" height="22"/>
+                        <rect key="frame" x="41" y="683" width="327" height="22"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" focusRingType="none" placeholderString="Filter..." usesSingleLineMode="YES" bezelStyle="round" id="vvd-HC-Usx">
                             <font key="font" metaFont="cellTitle"/>

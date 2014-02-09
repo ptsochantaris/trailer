@@ -48,6 +48,7 @@
 @property (weak) IBOutlet NSPopUpButton *statusTermMenu;
 @property (weak) IBOutlet NSTokenField *statusTermsField;
 @property (weak) IBOutlet NSButton *moveAssignedPrsToMySection;
+@property (weak) IBOutlet NSButton *markUnmergeableOnUserSectionsOnly;
 
 // Keyboard
 @property (weak) IBOutlet NSButton *hotkeyEnable;
@@ -80,9 +81,10 @@
 @property (nonatomic) DataManager *dataManager;
 @property (weak) NSTimer *refreshTimer;
 @property (strong) NSDate *lastSuccessfulRefresh;
-@property (nonatomic) BOOL lastUpdateFailed, preferencesDirty, isRefreshing;
+@property (nonatomic) BOOL lastUpdateFailed, preferencesDirty, isRefreshing, isManuallyScrolling;
 @property (nonatomic, readonly) BOOL menuIsOpen;
 @property (nonatomic) long highlightedPrIndex;
+@property (nonatomic) float scrollBarWidth;
 
 +(AppDelegate*)shared;
 

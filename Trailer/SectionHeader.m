@@ -35,9 +35,10 @@ static CGColorRef _lightGray;
     self = [super initWithFrame:CGRectMake(0, 0, MENU_WIDTH, TITLE_HEIGHT)];
     if (self) {
 		self.delegate = delegate;
+		CGFloat W = MENU_WIDTH-[AppDelegate shared].scrollBarWidth;
 		if(delegate)
 		{
-			NSButton *_unpin = [[NSButton alloc] initWithFrame:CGRectMake(MENU_WIDTH-100, -4.0, 90, TITLE_HEIGHT)];
+			NSButton *_unpin = [[NSButton alloc] initWithFrame:CGRectMake(W-100, -4.0, 90, TITLE_HEIGHT)];
 			[_unpin setTitle:@"Remove All"];
 			[_unpin setTarget:self];
 			[_unpin setAction:@selector(unPinSelected:)];
@@ -47,7 +48,7 @@ static CGColorRef _lightGray;
 			[self addSubview:_unpin];
 		}
 
-		CGRect titleRect = CGRectMake(12, 0, MENU_WIDTH-120-AVATAR_SIZE-LEFTPADDING, TITLE_HEIGHT-8.0);
+		CGRect titleRect = CGRectMake(12, 0, W-120-AVATAR_SIZE-LEFTPADDING, TITLE_HEIGHT-8.0);
 		titleView = [[CenteredTextField alloc] initWithFrame:titleRect];
 		titleView.attributedStringValue = [[NSAttributedString alloc] initWithString:title attributes:_titleAttributes];
 		[self addSubview:titleView];

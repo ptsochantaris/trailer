@@ -21,7 +21,8 @@
 							alsoKeepClosedPrs, dontAskBeforeWipingMerged,
 							dontAskBeforeWipingClosed, includeReposInFilter, showReposInName,
 							dontReportRefreshFailures, groupByRepo, hideAllPrsSection,
-							showStatusItems, makeStatusItemsSelectable, moveAssignedPrsToMySection;
+							showStatusItems, makeStatusItemsSelectable, moveAssignedPrsToMySection,
+							markUnmergeableOnUserSectionsOnly;
 
 @property (nonatomic) BOOL hotkeyEnable, hotkeyCommandModifier, hotkeyOptionModifier, hotkeyShiftModifier;
 

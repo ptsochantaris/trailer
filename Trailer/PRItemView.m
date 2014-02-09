@@ -65,8 +65,9 @@ static CGColorRef _highlightColor;
 		NSString *_title = pullRequest.title;
 		NSString *_subtitle = pullRequest.subtitle;
 
-		CGFloat W = MENU_WIDTH-LEFTPADDING;
-		BOOL showUnpin = pullRequest.condition.integerValue!=kPullRequestConditionOpen || !pullRequest.mergeable.boolValue;
+		CGFloat W = MENU_WIDTH-LEFTPADDING-[AppDelegate shared].scrollBarWidth;
+		BOOL showUnpin = pullRequest.condition.integerValue!=kPullRequestConditionOpen || pullRequest.markUnmergeable;
+
 		if(showUnpin) W -= REMOVE_BUTTON_WIDTH;
 
 		BOOL showAvatar = pullRequest.userAvatarUrl.length && ![Settings shared].hideAvatars;
@@ -195,7 +196,7 @@ static CGColorRef _highlightColor;
 - (void)drawRect:(NSRect)dirtyRect
 {
 	[super drawRect:dirtyRect];
-	if(_highlighted)
+	if(_focused)
 	{
 		CGContextRef context = (CGContextRef) [[NSGraphicsContext currentContext] graphicsPort];
 		CGContextSetFillColorWithColor(context, _highlightColor);
@@ -205,21 +206,12 @@ static CGColorRef _highlightColor;
 
 - (void)mouseEntered:(NSEvent *)theEvent
 {
-	self.highlighted = YES;
+	if(![AppDelegate shared].isManuallyScrolling) self.focused = YES;
 }
 
 - (void)mouseExited:(NSEvent *)theEvent
 {
-	self.highlighted = NO;
-}
-
-- (void)setHighlighted:(BOOL)highlighted
-{
-	if(_highlighted!=highlighted)
-	{
-		_highlighted = highlighted;
-		[self setNeedsDisplay:YES];
-	}
+	self.focused = NO;
 }
 
 - (void)setFocused:(BOOL)focused
@@ -227,7 +219,10 @@ static CGColorRef _highlightColor;
 	if(_focused!=focused)
 	{
 		_focused = focused;
-		self.highlighted = _focused;
+		[self setNeedsDisplay:YES];
+		[[NSNotificationCenter defaultCenter] postNotificationName:PR_ITEM_FOCUSED_NOTIFICATION_KEY
+															object:self
+														  userInfo:@{ PR_ITEM_FOCUSED_STATE_KEY: @(focused) }];
 	}
 }
 

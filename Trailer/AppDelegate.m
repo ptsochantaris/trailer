@@ -44,7 +44,7 @@ static AppDelegate *_static_shared_ref;
     //[[allPRs objectAtIndex:0] setMergeable:@NO];
 
 	[self.dataManager postProcessAllPrs];
-	[self updateMenu];
+	[self updateScrollBarWidth]; // also updates menu
 
 	[self startRateLimitHandling];
 
@@ -73,6 +73,16 @@ static AppDelegate *_static_shared_ref;
 	[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(networkStateChanged)
 												 name:kReachabilityChangedNotification
+											   object:nil];
+
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(prItemFocused:)
+												 name:PR_ITEM_FOCUSED_NOTIFICATION_KEY
+											   object:nil];
+
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(updateScrollBarWidth)
+												 name:NSPreferredScrollerStyleDidChangeNotification
 											   object:nil];
 
 	[self addHotKeySupport];
@@ -107,6 +117,13 @@ static AppDelegate *_static_shared_ref;
 {
 	BOOL setting = (sender.integerValue==1);
 	[Settings shared].hideAllPrsSection = setting;
+	[self updateMenu];
+}
+
+- (IBAction)markUnmergeableOnUserSectionsOnlySelected:(NSButton *)sender
+{
+	BOOL setting = (sender.integerValue==1);
+	[Settings shared].markUnmergeableOnUserSectionsOnly = setting;
 	[self updateMenu];
 }
 
@@ -747,6 +764,7 @@ static AppDelegate *_static_shared_ref;
 	self.moveAssignedPrsToMySection.integerValue = [Settings shared].moveAssignedPrsToMySection;
 	self.showStatusItems.integerValue = [Settings shared].showStatusItems;
 	self.makeStatusItemsSelectable.integerValue = [Settings shared].makeStatusItemsSelectable;
+	self.markUnmergeableOnUserSectionsOnly.integerValue = [Settings shared].markUnmergeableOnUserSectionsOnly;
 
 	self.hotkeyEnable.integerValue = [Settings shared].hotkeyEnable;
 	self.hotkeyCommandModifier.integerValue = [Settings shared].hotkeyCommandModifier;
@@ -1389,26 +1407,28 @@ static AppDelegate *_static_shared_ref;
 
 - (void)addHotKeySupport
 {
-	if(AXIsProcessTrustedWithOptions == NULL) return;
-	if([Settings shared].hotkeyEnable)
+	if(AXIsProcessTrustedWithOptions != NULL)
 	{
-		if(!globalKeyMonitor)
+		if([Settings shared].hotkeyEnable)
 		{
-			NSDictionary *options = @{ (__bridge id)kAXTrustedCheckOptionPrompt: @YES};
-			if(AXIsProcessTrustedWithOptions((__bridge CFDictionaryRef)options))
+			if(!globalKeyMonitor)
 			{
-				globalKeyMonitor = [NSEvent addGlobalMonitorForEventsMatchingMask:NSKeyDownMask handler:^void(NSEvent* incomingEvent) {
-					[self checkForHotkey:incomingEvent];
-				}];
+				NSDictionary *options = @{ (__bridge id)kAXTrustedCheckOptionPrompt: @YES};
+				if(AXIsProcessTrustedWithOptions((__bridge CFDictionaryRef)options))
+				{
+					globalKeyMonitor = [NSEvent addGlobalMonitorForEventsMatchingMask:NSKeyDownMask handler:^void(NSEvent* incomingEvent) {
+						[self checkForHotkey:incomingEvent];
+					}];
+				}
 			}
 		}
-	}
-	else
-	{
-		if(globalKeyMonitor)
+		else
 		{
-			[NSEvent removeMonitor:globalKeyMonitor];
-			globalKeyMonitor = nil;
+			if(globalKeyMonitor)
+			{
+				[NSEvent removeMonitor:globalKeyMonitor];
+				globalKeyMonitor = nil;
+			}
 		}
 	}
 
@@ -1471,20 +1491,31 @@ static AppDelegate *_static_shared_ref;
 	}];
 }
 
+- (void)prItemFocused:(NSNotification *)focusedNotification
+{
+	BOOL state = [focusedNotification.userInfo[PR_ITEM_FOCUSED_STATE_KEY] boolValue];
+	if(state)
+	{
+		PRItemView *itemView = focusedNotification.object;
+		for(PRItemView *v in currentPRItems)
+			if(itemView!=v)
+				v.focused = NO;
+	}
+}
+
 - (PRItemView *)focusedItemView
 {
 	for(PRItemView *v in currentPRItems)
-	{
 		if(v.focused)
-		{
 			return v;
-		}
-	}
+
 	return nil;
 }
 
 - (BOOL)checkForHotkey:(NSEvent *)incomingEvent
 {
+	if(AXIsProcessTrustedWithOptions == NULL) return NO;
+
 	NSInteger check = 0;
 
 	if([Settings shared].hotkeyCommandModifier)
@@ -1551,6 +1582,17 @@ static AppDelegate *_static_shared_ref;
 		}
 	}
 	return NO;
+}
+
+////////////// scrollbars
+
+- (void)updateScrollBarWidth
+{
+	if(self.mainMenu.scrollView.verticalScroller.scrollerStyle==NSScrollerStyleLegacy)
+		self.scrollBarWidth = self.mainMenu.scrollView.verticalScroller.frame.size.width;
+	else
+		self.scrollBarWidth = 0;
+	[self updateMenu];
 }
 
 @end

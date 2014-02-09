@@ -66,6 +66,8 @@
 
 - (BOOL)commentedByMe;
 
+- (BOOL)markUnmergeable;
+
 - (void)postProcess;
 
 - (NSString *)subtitle;

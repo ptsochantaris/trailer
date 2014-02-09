@@ -7,6 +7,7 @@
 	BOOL scrollUp;
 	CGFloat scrollDistance;
 	NSTimer *scrollTimer;
+	HTPopTimer *mouseIgnoreTimer;
 }
 @end
 
@@ -33,6 +34,8 @@
 	bottomBox.boxType = NSBoxCustom;
 	bottomBox.borderType = NSNoBorder;
 	bottomBox.fillColor = [COLOR_CLASS whiteColor];
+
+	mouseIgnoreTimer = [[HTPopTimer alloc] initWithTimeInterval:0.4 target:self selector:@selector(mouseIngoreItemPopped:)];
 
 	[self.scrollView.contentView setPostsBoundsChangedNotifications:YES];
 	[[NSNotificationCenter defaultCenter] addObserver:self
@@ -74,10 +77,9 @@
 	CGSize size = [self.contentView bounds].size;
 	self.scrollView.frame = CGRectMake(0, 0, size.width, size.height-TOP_CONTROLS_HEIGHT);
 
-	CGFloat scrollbarWidth = self.scrollView.verticalScroller.frame.size.width;
 	if([self shouldShowTop])
 	{
-		CGRect rect = CGRectMake(0, size.height-SCROLL_ZONE_HEIGHT-TOP_CONTROLS_HEIGHT, size.width-scrollbarWidth, SCROLL_ZONE_HEIGHT);
+		CGRect rect = CGRectMake(0, size.height-SCROLL_ZONE_HEIGHT-TOP_CONTROLS_HEIGHT, size.width-[AppDelegate shared].scrollBarWidth, SCROLL_ZONE_HEIGHT);
 		topBox.frame = rect;
 		topArrow.frame = rect;
 		[self.contentView addSubview:topBox];
@@ -87,7 +89,7 @@
 
 	if([self shouldShowBottom])
 	{
-		CGRect rect = CGRectMake(0, 0, size.width-scrollbarWidth, SCROLL_ZONE_HEIGHT);
+		CGRect rect = CGRectMake(0, 0, size.width-[AppDelegate shared].scrollBarWidth, SCROLL_ZONE_HEIGHT);
 		bottomBox.frame = rect;
 		bottomArrow.frame = rect;
 		[self.contentView addSubview:bottomBox];
@@ -106,6 +108,9 @@
 	CGFloat containerHeight = self.scrollView.contentView.documentVisibleRect.size.height;
 	CGFloat containerTop = containerBottom + containerHeight;
 
+	[AppDelegate shared].isManuallyScrolling = YES;
+	[mouseIgnoreTimer push];
+
 	if(itemTop>containerTop)
 	{
 		[self.scrollView.contentView.documentView scrollPoint:CGPointMake(0, itemTop+itemHeight-containerHeight)];
@@ -114,6 +119,11 @@
 	{
 		[self.scrollView.contentView.documentView scrollPoint:CGPointMake(0, itemBottom)];
 	}
+}
+
+- (void)mouseIngoreItemPopped:(HTPopTimer *)popTimer
+{
+	[AppDelegate shared].isManuallyScrolling = NO;
 }
 
 - (NSTrackingArea *)addTrackingAreaInRect:(CGRect)trackingRect
