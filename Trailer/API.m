@@ -892,7 +892,12 @@ typedef void (^completionBlockType)(BOOL);
                            imageSize.width,
                            imageSize.height,
                            currentAppVersion] md5hash];
+
+#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
     NSString *imagePath = [cacheDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"imgcache-%@-%d", imageKey, (NSInteger)GLOBAL_SCREEN_SCALE]];
+#else
+    NSString *imagePath = [cacheDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"imgcache-%@", imageKey]];
+#endif
 
     NSFileManager *fileManager = [NSFileManager defaultManager];
     if([fileManager fileExistsAtPath:imagePath])
