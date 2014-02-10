@@ -9,7 +9,7 @@
 		<item>
 			<title>Version 1.0.13</title>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
-				<li><b>Important fix for PR refreshing, as well as the changes from 2.0.12:</b></li>
+				<li><b>Important fix for PR refreshing, as well as the changes from 1.0.12:</b></li>
 				<li>Mac OS X 10.8 support</li>
 				<li>Assigned PRs support</li>
 				<li>Option to limit un-mergeable warnings to own/participated PRs</li>
