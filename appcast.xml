@@ -7,6 +7,27 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.0.13</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li><b>Important fix for PR refreshing, as well as the changes from 2.0.12:</b></li>
+				<li>Mac OS X 10.8 support</li>
+				<li>Assigned PRs support</li>
+				<li>Option to limit un-mergeable warnings to own/participated PRs</li>
+				<li>Appearance and layout corrections in the menu</li>
+				<li>Status item appearance and cursor improvements</li>
+				<li>Keyboard shortcut and navigation</li>
+				<li>Bugfixes and sync speedups</li>
+				</ul></font>]]></description>
+			<pubDate>Mon, 10 Feb 2014 16:00:00 +0000</pubDate>
+			<enclosure
+			url="http://dev.housetrip.com/trailer/trailer1013.zip"
+			sparkle:version="1105"
+			sparkle:shortVersionString="1.0.13"
+			sparkle:dsaSignature="MC4CFQCLf1MmMuVAbZNITsTrSpsOc9B+GgIVANkXl4FibzGhxvhCqjOVj4ZusUKa"
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.0.12</title>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
 				<li>Mac OS X 10.8 support</li>
