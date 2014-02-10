@@ -1,4 +1,12 @@
 
+@interface AppDelegate ()
+{
+	// Keyboard support
+	id globalKeyMonitor, localKeyMonitor;
+	NSMutableArray *currentPRItems;
+}
+@end
+
 @implementation AppDelegate
 
 static AppDelegate *_static_shared_ref;
@@ -10,7 +18,7 @@ static AppDelegate *_static_shared_ref;
 	//NSString *appDomain = [[NSBundle mainBundle] bundleIdentifier];
 	//[[NSUserDefaults standardUserDefaults] removePersistentDomainForName:appDomain];
 
-	self.mainMenu.backgroundColor = [NSColor whiteColor];
+	self.mainMenu.backgroundColor = [COLOR_CLASS whiteColor];
 
 	self.filterTimer = [[HTPopTimer alloc] initWithTimeInterval:0.2 target:self selector:@selector(filterTimerPopped)];
 
@@ -36,7 +44,7 @@ static AppDelegate *_static_shared_ref;
     //[[allPRs objectAtIndex:0] setMergeable:@NO];
 
 	[self.dataManager postProcessAllPrs];
-	[self updateMenu];
+	[self updateScrollBarWidth]; // also updates menu
 
 	[self startRateLimitHandling];
 
@@ -66,6 +74,18 @@ static AppDelegate *_static_shared_ref;
 											 selector:@selector(networkStateChanged)
 												 name:kReachabilityChangedNotification
 											   object:nil];
+
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(prItemFocused:)
+												 name:PR_ITEM_FOCUSED_NOTIFICATION_KEY
+											   object:nil];
+
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(updateScrollBarWidth)
+												 name:NSPreferredScrollerStyleDidChangeNotification
+											   object:nil];
+
+	[self addHotKeySupport];
 }
 
 - (void)setupSortMethodMenu
@@ -97,6 +117,13 @@ static AppDelegate *_static_shared_ref;
 {
 	BOOL setting = (sender.integerValue==1);
 	[Settings shared].hideAllPrsSection = setting;
+	[self updateMenu];
+}
+
+- (IBAction)markUnmergeableOnUserSectionsOnlySelected:(NSButton *)sender
+{
+	BOOL setting = (sender.integerValue==1);
+	[Settings shared].markUnmergeableOnUserSectionsOnly = setting;
 	[self updateMenu];
 }
 
@@ -211,6 +238,14 @@ static AppDelegate *_static_shared_ref;
 {
 	BOOL setting = (sender.integerValue==1);
 	[Settings shared].groupByRepo = setting;
+	[self updateMenu];
+}
+
+- (IBAction)moveAssignedPrsToMySectionSelected:(NSButton *)sender
+{
+	BOOL setting = (sender.integerValue==1);
+	[Settings shared].moveAssignedPrsToMySection = setting;
+	[self.dataManager postProcessAllPrs]; // apply any view option changes
 	[self updateMenu];
 }
 
@@ -346,7 +381,7 @@ static AppDelegate *_static_shared_ref;
 	}
 }
 
--(void)menuWillOpen:(NSMenu *)menu
+- (void)menuWillOpen:(NSMenu *)menu
 {
     if([[menu title] isEqualToString:@"Options"])
 	{
@@ -419,6 +454,7 @@ static AppDelegate *_static_shared_ref;
 {
 	self.statusItemView.highlighted = NO;
 	[self.mainMenu orderOut:nil];
+	for(PRItemView *v in currentPRItems) v.focused = NO;
 }
 
 - (void)sectionHeaderRemoveSelectedFrom:(SectionHeader *)header
@@ -512,6 +548,7 @@ static AppDelegate *_static_shared_ref;
 - (NSInteger)buildPrMenuItemsFromList
 {
 	NSArray *pullRequests = [self pullRequestList];
+	currentPRItems = [NSMutableArray array];
 
 	SectionHeader *myHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:nil title:kPullRequestSectionNames[kPullRequestSectionMine]];
 	SectionHeader *participatedHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:nil title:kPullRequestSectionNames[kPullRequestSectionParticipated]];
@@ -538,6 +575,13 @@ static AppDelegate *_static_shared_ref;
 
 		PRItemView *view = [[PRItemView alloc] initWithPullRequest:r userInfo:r.serverId delegate:self];
 		[sections[sectionIndex] addObject:view];
+	}
+
+	for(NSInteger section=kPullRequestSectionMine;section<=kPullRequestSectionAll;section++)
+	{
+		NSArray *itemsInSection = sections[@(section)];
+		for(NSInteger p=1;p<itemsInSection.count;p++) // first item is the header
+			[currentPRItems addObject:itemsInSection[p]];
 	}
 
 	CGFloat top = 10.0;
@@ -656,6 +700,16 @@ static AppDelegate *_static_shared_ref;
 	{
 		[self.filterTimer push];
 	}
+	else if(obj.object==self.statusTermsField)
+	{
+		NSArray *existingTerms = [Settings shared].statusFilteringTerms;
+		NSArray *newTerms = self.statusTermsField.objectValue;
+		if(![existingTerms isEqualToArray:newTerms])
+		{
+			[Settings shared].statusFilteringTerms = newTerms;
+			[self updateMenu];
+		}
+	}
 }
 
 - (void)filterTimerPopped
@@ -687,32 +741,70 @@ static AppDelegate *_static_shared_ref;
 	self.refreshTimer = nil;
 
 	[self.api updateLimitFromServer];
+	[self updateStatusTermPreferenceControls];
 
 	[self.sortModeSelect selectItemAtIndex:[Settings shared].sortMethod];
-	[self.launchAtStartup setIntegerValue:[self isAppLoginItem]];
-	[self.hideAllPrsSection setIntegerValue:[Settings shared].hideAllPrsSection];
-	[self.dontConfirmRemoveAllClosed setIntegerValue:[Settings shared].dontAskBeforeWipingClosed];
-	[self.dontReportRefreshFailures setIntegerValue:[Settings shared].dontReportRefreshFailures];
-	[self.displayRepositoryNames setIntegerValue:[Settings shared].showReposInName];
-	[self.includeRepositoriesInFiltering setIntegerValue:[Settings shared].includeReposInFilter];
-	[self.dontConfirmRemoveAllMerged setIntegerValue:[Settings shared].dontAskBeforeWipingMerged];
-	[self.hideUncommentedPrs setIntegerValue:[Settings shared].shouldHideUncommentedRequests];
-	[self.autoParticipateWhenMentioned setIntegerValue:[Settings shared].autoParticipateInMentions];
-	[self.hideAvatars setIntegerValue:[Settings shared].hideAvatars];
-	[self.keepClosedPrs setIntegerValue:[Settings shared].alsoKeepClosedPrs];
-	[self.dontKeepMyPrs setIntegerValue:[Settings shared].dontKeepMyPrs];
-	[self.showAllComments setIntegerValue:[Settings shared].showCommentsEverywhere];
-	[self.sortingOrder setIntegerValue:[Settings shared].sortDescending];
-	[self.showCreationDates setIntegerValue:[Settings shared].showCreatedInsteadOfUpdated];
-	[self.groupByRepo setIntegerValue:[Settings shared].groupByRepo];
-	[self.showStatusItems setIntegerValue:[Settings shared].showStatusItems];
-	[self.makeStatusItemsSelectable setIntegerValue:[Settings shared].makeStatusItemsSelectable];
+
+	self.launchAtStartup.integerValue = [self isAppLoginItem];
+	self.hideAllPrsSection.integerValue = [Settings shared].hideAllPrsSection;
+	self.dontConfirmRemoveAllClosed.integerValue = [Settings shared].dontAskBeforeWipingClosed;
+	self.dontReportRefreshFailures.integerValue = [Settings shared].dontReportRefreshFailures;
+	self.displayRepositoryNames.integerValue = [Settings shared].showReposInName;
+	self.includeRepositoriesInFiltering.integerValue = [Settings shared].includeReposInFilter;
+	self.dontConfirmRemoveAllMerged.integerValue = [Settings shared].dontAskBeforeWipingMerged;
+	self.hideUncommentedPrs.integerValue = [Settings shared].shouldHideUncommentedRequests;
+	self.autoParticipateWhenMentioned.integerValue = [Settings shared].autoParticipateInMentions;
+	self.hideAvatars.integerValue = [Settings shared].hideAvatars;
+	self.keepClosedPrs.integerValue = [Settings shared].alsoKeepClosedPrs;
+	self.dontKeepMyPrs.integerValue = [Settings shared].dontKeepMyPrs;
+	self.showAllComments.integerValue = [Settings shared].showCommentsEverywhere;
+	self.sortingOrder.integerValue = [Settings shared].sortDescending;
+	self.showCreationDates.integerValue = [Settings shared].showCreatedInsteadOfUpdated;
+	self.groupByRepo.integerValue = [Settings shared].groupByRepo;
+	self.moveAssignedPrsToMySection.integerValue = [Settings shared].moveAssignedPrsToMySection;
+	self.showStatusItems.integerValue = [Settings shared].showStatusItems;
+	self.makeStatusItemsSelectable.integerValue = [Settings shared].makeStatusItemsSelectable;
+	self.markUnmergeableOnUserSectionsOnly.integerValue = [Settings shared].markUnmergeableOnUserSectionsOnly;
+
+	self.hotkeyEnable.integerValue = [Settings shared].hotkeyEnable;
+	self.hotkeyCommandModifier.integerValue = [Settings shared].hotkeyCommandModifier;
+	self.hotkeyOptionModifier.integerValue = [Settings shared].hotkeyOptionModifier;
+	self.hotkeyShiftModifier.integerValue = [Settings shared].hotkeyShiftModifier;
+	[self populateHotkeyLetterMenu];
+
+	if(AXIsProcessTrustedWithOptions == NULL)
+	{
+		[self.hotkeyEnable setEnabled:NO];
+		[self.hotkeyLetter setEnabled:NO];
+		[self.hotkeyOptionModifier setEnabled:NO];
+		[self.hotkeyShiftModifier setEnabled:NO];
+		[self.hotkeyCommandModifier setEnabled:NO];
+	}
 
 	[self.refreshDurationStepper setFloatValue:[Settings shared].refreshPeriod];
 	[self refreshDurationChanged:nil];
 	
 	[self.preferencesWindow setLevel:NSFloatingWindowLevel];
 	[self.preferencesWindow makeKeyAndOrderFront:self];
+}
+
+- (void)populateHotkeyLetterMenu
+{
+	NSMutableArray *titles = [NSMutableArray array];
+	for(char l='A';l<='Z';l++)
+		[titles addObject:[NSString stringWithFormat:@"%c",l]];
+	[self.hotkeyLetter addItemsWithTitles:titles];
+	[self.hotkeyLetter selectItemWithTitle:[Settings shared].hotkeyLetter];
+}
+
+- (IBAction)enableHotkeySelected:(NSButton *)sender
+{
+	[Settings shared].hotkeyEnable = self.hotkeyEnable.integerValue;
+	[Settings shared].hotkeyLetter = self.hotkeyLetter.titleOfSelectedItem;
+	[Settings shared].hotkeyCommandModifier = self.hotkeyCommandModifier.integerValue;
+	[Settings shared].hotkeyOptionModifier = self.hotkeyOptionModifier.integerValue;
+	[Settings shared].hotkeyShiftModifier = self.hotkeyShiftModifier.integerValue;
+	[self addHotKeySupport];
 }
 
 - (IBAction)createTokenSelected:(NSButton *)sender
@@ -973,6 +1065,7 @@ static AppDelegate *_static_shared_ref;
 	[self.refreshButton setEnabled:NO];
 	[self.projectsTable setEnabled:NO];
 	[self.selectAll setEnabled:NO];
+	[self.selectParents setEnabled:NO];
 	[self.clearAll setEnabled:NO];
 	[self.githubTokenHolder setEnabled:NO];
 	[self.activityDisplay startAnimation:nil];
@@ -1001,6 +1094,7 @@ static AppDelegate *_static_shared_ref;
 	[self.refreshButton setEnabled:YES];
 	[self.projectsTable setEnabled:YES];
 	[self.selectAll setEnabled:YES];
+	[self.selectParents setEnabled:YES];
 	[self.githubTokenHolder setEnabled:YES];
 	[self.clearAll setEnabled:YES];
 	[self.activityDisplay stopAnimation:nil];
@@ -1074,8 +1168,8 @@ static AppDelegate *_static_shared_ref;
 	{
 		countString = @"X";
 		attributes = @{
-					   NSFontAttributeName: [NSFont boldSystemFontOfSize:11.0],
-					   NSForegroundColorAttributeName: [NSColor colorWithRed:0.8 green:0.0 blue:0.0 alpha:1.0],
+					   NSFontAttributeName: [NSFont boldSystemFontOfSize:10.0],
+					   NSForegroundColorAttributeName: MAKECOLOR(0.8, 0.0, 0.0, 1.0),
 					   };
 	}
 	else
@@ -1084,15 +1178,15 @@ static AppDelegate *_static_shared_ref;
 		if(newCommentCount)
 		{
 			attributes = @{
-						   NSFontAttributeName: [NSFont systemFontOfSize:11.0],
-						   NSForegroundColorAttributeName: [NSColor colorWithRed:0.8 green:0.0 blue:0.0 alpha:1.0],
+						   NSFontAttributeName: [NSFont menuBarFontOfSize:10.0],
+						   NSForegroundColorAttributeName: MAKECOLOR(0.8, 0.0, 0.0, 1.0),
 						   };
 		}
 		else
 		{
 			attributes = @{
-						   NSFontAttributeName: [NSFont systemFontOfSize:11.0],
-						   NSForegroundColorAttributeName: [NSColor blackColor],
+						   NSFontAttributeName: [NSFont menuBarFontOfSize:10.0],
+						   NSForegroundColorAttributeName: [COLOR_CLASS blackColor],
 						   };
 		}
 	}
@@ -1116,7 +1210,6 @@ static AppDelegate *_static_shared_ref;
 
 	[self sizeMenuAndShow:NO];
 }
-
 
 - (IBAction)selectParentsSelected:(NSButton *)sender
 {
@@ -1242,6 +1335,30 @@ static AppDelegate *_static_shared_ref;
 	}
 }
 
+- (void)updateStatusTermPreferenceControls
+{
+	NSInteger mode = [Settings shared].statusFilteringMode;
+	[self.statusTermMenu selectItemAtIndex:mode];
+	if(mode!=0)
+	{
+		[self.statusTermsField setEnabled:YES];
+		self.statusTermsField.alphaValue = 1.0;
+	}
+	else
+	{
+		[self.statusTermsField setEnabled:NO];
+		self.statusTermsField.alphaValue = 0.8;
+	}
+	self.statusTermsField.objectValue = [Settings shared].statusFilteringTerms;
+}
+
+- (IBAction)statusFilterMenuChanged:(NSPopUpButton *)sender
+{
+	[Settings shared].statusFilteringMode = sender.indexOfSelectedItem;
+	[Settings shared].statusFilteringTerms = self.statusTermsField.objectValue;
+	[self updateStatusTermPreferenceControls];
+}
+
 - (IBAction)apiServerSelected:(NSButton *)sender
 {
 	[self.apiFrontEnd setStringValue:[Settings shared].apiFrontEnd];
@@ -1285,6 +1402,196 @@ static AppDelegate *_static_shared_ref;
 	[self.apiPath setStringValue:[Settings shared].apiPath];
 }
 
+/////////////////////// keyboard shortcuts
 
+- (void)addHotKeySupport
+{
+	if(AXIsProcessTrustedWithOptions != NULL)
+	{
+		if([Settings shared].hotkeyEnable)
+		{
+			if(!globalKeyMonitor)
+			{
+				NSDictionary *options = @{ (__bridge id)kAXTrustedCheckOptionPrompt: @YES};
+				if(AXIsProcessTrustedWithOptions((__bridge CFDictionaryRef)options))
+				{
+					globalKeyMonitor = [NSEvent addGlobalMonitorForEventsMatchingMask:NSKeyDownMask handler:^void(NSEvent* incomingEvent) {
+						[self checkForHotkey:incomingEvent];
+					}];
+				}
+			}
+		}
+		else
+		{
+			if(globalKeyMonitor)
+			{
+				[NSEvent removeMonitor:globalKeyMonitor];
+				globalKeyMonitor = nil;
+			}
+		}
+	}
+
+	if(localKeyMonitor) return;
+
+	localKeyMonitor = [NSEvent addLocalMonitorForEventsMatchingMask:NSKeyDownMask handler:^NSEvent *(NSEvent *incomingEvent) {
+
+		if([self checkForHotkey:incomingEvent]) return nil;
+
+		switch(incomingEvent.keyCode)
+		{
+			case 43: // prefs
+			{
+				if(incomingEvent.modifierFlags & NSCommandKeyMask)
+				{
+					[self preferencesSelected:nil];
+					return nil;
+				}
+				break;
+			}
+			case 125: // down
+			{
+				PRItemView *v = [self focusedItemView];
+				NSInteger i = -1;
+				if(v) i = [currentPRItems indexOfObject:v];
+				if(i<(NSInteger)currentPRItems.count-1)
+				{
+					i++;
+					v.focused = NO;
+					v = currentPRItems[i];
+					v.focused = YES;
+					[self.mainMenu scrollToView:v];
+				}
+				return nil;
+			}
+			case 126: // up
+			{
+				PRItemView *v = [self focusedItemView];
+				NSInteger i = currentPRItems.count;
+				if(v) i = [currentPRItems indexOfObject:v];
+				if(i>0)
+				{
+					i--;
+					v.focused = NO;
+					v = currentPRItems[i];
+					v.focused = YES;
+					[self.mainMenu scrollToView:v];
+				}
+				return nil;
+			}
+			case 36: // enter
+			{
+				PRItemView *v = [self focusedItemView];
+				if(v) [self prItemSelected:v];
+				return nil;
+			}
+		}
+
+		return incomingEvent;
+	}];
+}
+
+- (void)prItemFocused:(NSNotification *)focusedNotification
+{
+	BOOL state = [focusedNotification.userInfo[PR_ITEM_FOCUSED_STATE_KEY] boolValue];
+	if(state)
+	{
+		PRItemView *itemView = focusedNotification.object;
+		for(PRItemView *v in currentPRItems)
+			if(itemView!=v)
+				v.focused = NO;
+	}
+}
+
+- (PRItemView *)focusedItemView
+{
+	for(PRItemView *v in currentPRItems)
+		if(v.focused)
+			return v;
+
+	return nil;
+}
+
+- (BOOL)checkForHotkey:(NSEvent *)incomingEvent
+{
+	if(AXIsProcessTrustedWithOptions == NULL) return NO;
+
+	NSInteger check = 0;
+
+	if([Settings shared].hotkeyCommandModifier)
+	{
+		if(incomingEvent.modifierFlags & NSCommandKeyMask) check++; else check--;
+	}
+	else
+	{
+		if(incomingEvent.modifierFlags & NSCommandKeyMask) check--; else check++;
+	}
+
+	if([Settings shared].hotkeyOptionModifier)
+	{
+		if(incomingEvent.modifierFlags & NSAlternateKeyMask) check++; else check--;
+	}
+	else
+	{
+		if(incomingEvent.modifierFlags & NSAlternateKeyMask) check--; else check++;
+	}
+
+	if([Settings shared].hotkeyShiftModifier)
+	{
+		if(incomingEvent.modifierFlags & NSShiftKeyMask) check++; else check--;
+	}
+	else
+	{
+		if(incomingEvent.modifierFlags & NSShiftKeyMask) check--; else check++;
+	}
+
+	if(check==3)
+	{
+		NSDictionary *codeLookup = @{@"A": @(0),
+									 @"B": @(11),
+									 @"C": @(8),
+									 @"D": @(2),
+									 @"E": @(14),
+									 @"F": @(3),
+									 @"G": @(5),
+									 @"H": @(4),
+									 @"I": @(34),
+									 @"J": @(38),
+									 @"K": @(40),
+									 @"L": @(37),
+									 @"M": @(46),
+									 @"N": @(45),
+									 @"O": @(31),
+									 @"P": @(35),
+									 @"Q": @(12),
+									 @"R": @(15),
+									 @"S": @(1),
+									 @"T": @(17),
+									 @"U": @(32),
+									 @"V": @(9),
+									 @"W": @(13),
+									 @"X": @(7),
+									 @"Y": @(16),
+									 @"Z": @(6) };
+
+		NSNumber *n = codeLookup[[Settings shared].hotkeyLetter];
+		if(incomingEvent.keyCode==n.integerValue)
+		{
+			[self statusItemTapped:self.statusItemView];
+			return YES;
+		}
+	}
+	return NO;
+}
+
+////////////// scrollbars
+
+- (void)updateScrollBarWidth
+{
+	if(self.mainMenu.scrollView.verticalScroller.scrollerStyle==NSScrollerStyleLegacy)
+		self.scrollBarWidth = self.mainMenu.scrollView.verticalScroller.frame.size.width;
+	else
+		self.scrollBarWidth = 0;
+	[self updateMenu];
+}
 
 @end

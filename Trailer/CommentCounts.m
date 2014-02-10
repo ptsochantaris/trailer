@@ -23,7 +23,7 @@ static CGColorRef _redFill, _grayFill;
 
 		_commentCountAttributes = @{
 									NSFontAttributeName:[NSFont fontWithName:@"Helvetica Neue" size:11.0],
-									NSForegroundColorAttributeName:[NSColor colorWithWhite:0.4 alpha:1.0],
+									NSForegroundColorAttributeName:MAKECOLOR(0.4, 0.4, 0.4, 1.0),
 									NSParagraphStyleAttributeName:pCenter,
 									};
 		_commentAlertAttributes = @{
@@ -31,8 +31,8 @@ static CGColorRef _redFill, _grayFill;
 									NSForegroundColorAttributeName:[NSColor whiteColor],
 									NSParagraphStyleAttributeName:pCenter,
 									};
-		_redFill = CGColorCreateCopy([NSColor colorWithRed:1.0 green:0.4 blue:0.4 alpha:1.0].CGColor);
-		_grayFill = CGColorCreateCopy([NSColor colorWithRed:0.92 green:0.92 blue:0.92 alpha:1.0].CGColor);
+		_redFill = CGColorCreateCopy(MAKECOLOR(1.0, 0.4, 0.4, 1.0).CGColor);
+		_grayFill = CGColorCreateCopy(MAKECOLOR(0.92, 0.92, 0.92, 1.0).CGColor);
 	});
 }
 

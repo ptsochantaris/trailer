@@ -36,10 +36,12 @@
         <attribute name="userName" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <entity name="PullRequest" representedClassName="PullRequest" syncable="YES">
+        <attribute name="assignedToMe" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="body" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="condition" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
         <attribute name="createdAt" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="issueCommentLink" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="issueUrl" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="latestReadCommentDate" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="mergeable" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="number" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>

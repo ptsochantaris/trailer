@@ -2,7 +2,7 @@
 @class StatusItemView;
 
 
-#define STATUSITEM_PADDING 3.0
+#define STATUSITEM_PADDING 1.0
 
 
 @protocol StatusItemDelegate <NSObject>

@@ -5,4 +5,6 @@
 
 - (void)layout;
 
+- (void)scrollToView:(NSView *)view;
+
 @end

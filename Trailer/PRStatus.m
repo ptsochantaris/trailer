@@ -40,9 +40,9 @@
 	static COLOR_CLASS *STATUS_RED, *STATUS_YELLOW, *STATUS_GREEN;
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
-		STATUS_RED = [COLOR_CLASS colorWithRed:0.5 green:0.2 blue:0.2 alpha:1.0];
-		STATUS_YELLOW = [COLOR_CLASS colorWithRed:0.6 green:0.5 blue:0.0 alpha:1.0];
-		STATUS_GREEN = [COLOR_CLASS colorWithRed:0.3 green:0.5 blue:0.3 alpha:1.0];
+		STATUS_RED = MAKECOLOR(0.5, 0.2, 0.2, 1.0);
+		STATUS_YELLOW = MAKECOLOR(0.6, 0.5, 0.0, 1.0);
+		STATUS_GREEN = MAKECOLOR(0.3, 0.5, 0.3, 1.0);
 	});
 
 	if([self.state isEqualToString:@"pending"])
@@ -64,7 +64,18 @@
 	});
 	NSString *desc = self.descriptionText;
 	if(!desc) desc = @"(No description)";
-	return [NSString stringWithFormat:@"%@ %@",[dateFormatter stringFromDate:self.createdAt],self.descriptionText];
+	return [NSString stringWithFormat:@"%@ %@",[dateFormatter stringFromDate:self.createdAt],desc];
+}
+
++ (void)removeStatusesWithPullRequestId:(NSNumber *)pullRequestId inMoc:(NSManagedObjectContext *)moc
+{
+	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRStatus"];
+	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestId = %@",pullRequestId];
+	for(PRStatus *s in [moc executeFetchRequest:f error:nil])
+	{
+		DLog(@"  Deleting status ID %@",s.serverId);
+		[moc deleteObject:s];
+	}
 }
 
 @end

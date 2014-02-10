@@ -2,6 +2,10 @@
 #define AVATAR_SIZE 26.0
 #define LEFTPADDING 44.0
 
+#define PR_ITEM_FOCUSED_NOTIFICATION_KEY @"PrItemFocusedNotificationKey"
+#define PR_ITEM_FOCUSED_STATE_KEY @"PrItemFocusedStateKey"
+
+
 @class PRItemView;
 
 
@@ -17,6 +21,7 @@
 
 @property (nonatomic,weak) id<PRItemViewDelegate> delegate;
 @property (nonatomic) id userInfo;
+@property (nonatomic) BOOL focused;
 
 - (instancetype)initWithPullRequest:(PullRequest *)pullRequest userInfo:(id)userInfo delegate:(id<PRItemViewDelegate>)delegate;
 

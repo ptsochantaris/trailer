@@ -5,6 +5,35 @@
 @synthesize managedObjectModel = _managedObjectModel;
 @synthesize managedObjectContext = _managedObjectContext;
 
+- (id)init
+{
+    self = [super init];
+    if (self)
+	{
+		if([self versionBumpOccured])
+		{
+			DLog(@"VERSION UPDATE MAINTENANCE NEEDED");
+			[self performVersionChangedTasks];
+			[self versionBumpComplete];
+		}
+    }
+    return self;
+}
+
+- (void)performVersionChangedTasks
+{
+	NSArray *statuses = [DataItem allItemsOfType:@"PRStatus" inMoc:self.managedObjectContext];
+	for(PRStatus *s in statuses)
+	{
+		PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:s.pullRequestId moc:self.managedObjectContext];
+		if(!r)
+		{
+			DLog(@"Deleting orphaned PRStatus item %@",s.serverId);
+			[self.managedObjectContext deleteObject:s];
+		}
+	}
+}
+
 - (void)sendNotifications
 {
 	NSManagedObjectContext *mainContext = self.managedObjectContext;
@@ -263,7 +292,7 @@
 	}
 	else if([Repo countActiveReposInMoc:self.managedObjectContext]==0)
 	{
-		messageColor = [COLOR_CLASS colorWithRed:0.8 green:0.0 blue:0.0 alpha:1.0];
+		messageColor = MAKECOLOR(0.8, 0.0, 0.0, 1.0);
 		message = @"There are no active repositories, please add or activate some.";
 	}
 	else if(openRequests==0)
@@ -285,6 +314,20 @@
 														 NSParagraphStyleAttributeName: paragraphStyle,
 														 NSFontAttributeName: [UIFont systemFontOfSize:[UIFont smallSystemFontSize]] }];
 #endif
+}
+
+/////////////////////////////////////////////////////////////////////
+
+#define LAST_RUN_VERSION_KEY @"LAST_RUN_VERSION"
+- (void)versionBumpComplete
+{
+	NSString *currentAppVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+	[[NSUserDefaults standardUserDefaults] setObject:currentAppVersion forKey:LAST_RUN_VERSION_KEY];
+}
+- (BOOL)versionBumpOccured
+{
+	NSString *currentAppVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+	return !([[[NSUserDefaults standardUserDefaults] objectForKey:LAST_RUN_VERSION_KEY] isEqualToString:currentAppVersion]);
 }
 
 @end

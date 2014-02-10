@@ -5,10 +5,13 @@
 
 - (NSString *)sortField;
 
-@property (nonatomic) NSInteger sortMethod;
+@property (nonatomic) NSInteger sortMethod, statusFilteringMode;
+
+@property (nonatomic) NSArray *statusFilteringTerms;
 
 @property (nonatomic) NSString *authToken, *localUser, *localUserId,
-							*apiFrontEnd, *apiBackEnd, *apiPath;
+							*apiFrontEnd, *apiBackEnd, *apiPath,
+							*hotkeyLetter;
 
 @property (nonatomic) float refreshPeriod, backgroundRefreshPeriod;
 
@@ -18,6 +21,9 @@
 							alsoKeepClosedPrs, dontAskBeforeWipingMerged,
 							dontAskBeforeWipingClosed, includeReposInFilter, showReposInName,
 							dontReportRefreshFailures, groupByRepo, hideAllPrsSection,
-							showStatusItems, makeStatusItemsSelectable;
+							showStatusItems, makeStatusItemsSelectable, moveAssignedPrsToMySection,
+							markUnmergeableOnUserSectionsOnly;
+
+@property (nonatomic) BOOL hotkeyEnable, hotkeyCommandModifier, hotkeyOptionModifier, hotkeyShiftModifier;
 
 @end

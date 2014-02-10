@@ -14,10 +14,10 @@ static NSNumberFormatter *itemCountFormatter;
 {
 	[super awakeFromNib];
 	self.textLabel.numberOfLines = 0;
-	self.detailTextLabel.textColor = [UIColor grayColor];
+	self.detailTextLabel.textColor = [COLOR_CLASS grayColor];
 
 	unreadCount = [[UILabel alloc] initWithFrame:CGRectZero];
-	unreadCount.textColor = [UIColor whiteColor];
+	unreadCount.textColor = [COLOR_CLASS whiteColor];
 	unreadCount.textAlignment = NSTextAlignmentCenter;
 	unreadCount.layer.cornerRadius = 9.0;
 	unreadCount.font = [UIFont boldSystemFontOfSize:12.0];
@@ -25,7 +25,7 @@ static NSNumberFormatter *itemCountFormatter;
 	[self.contentView addSubview:unreadCount];
 
 	readCount = [[UILabel alloc] initWithFrame:CGRectZero];
-	readCount.textColor = [UIColor darkGrayColor];
+	readCount.textColor = [COLOR_CLASS darkGrayColor];
 	readCount.textAlignment = NSTextAlignmentCenter;
 	readCount.layer.cornerRadius = 9.0;
 	readCount.font = [UIFont systemFontOfSize:12.0];
@@ -126,16 +126,16 @@ static NSNumberFormatter *itemCountFormatter;
 {
 	[super setSelected:selected animated:animated];
 
-	unreadCount.backgroundColor = [UIColor redColor];
-	readCount.backgroundColor = [UIColor colorWithWhite:0.9 alpha:1.0];
+	unreadCount.backgroundColor = [COLOR_CLASS redColor];
+	readCount.backgroundColor = [COLOR_CLASS colorWithWhite:0.9 alpha:1.0];
 }
 
 - (void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated
 {
     [super setHighlighted:highlighted animated:animated];
 
-	unreadCount.backgroundColor = [UIColor redColor];
-	readCount.backgroundColor = [UIColor colorWithWhite:0.9 alpha:1.0];
+	unreadCount.backgroundColor = [COLOR_CLASS redColor];
+	readCount.backgroundColor = [COLOR_CLASS colorWithWhite:0.9 alpha:1.0];
 }
 
 @end

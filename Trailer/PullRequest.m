@@ -24,6 +24,8 @@
 @dynamic repoName;
 @dynamic mergeable;
 @dynamic statusesLink;
+@dynamic assignedToMe;
+@dynamic issueUrl;
 
 + (PullRequest *)pullRequestWithInfo:(NSDictionary *)info moc:(NSManagedObjectContext *)moc
 {
@@ -51,6 +53,7 @@
 	p.issueCommentLink = [[linkInfo ofk:@"comments"] ofk:@"href"];
 	p.reviewCommentLink = [[linkInfo ofk:@"review_comments"] ofk:@"href"];
 	p.statusesLink = [[linkInfo ofk:@"statuses"] ofk:@"href"];
+	p.issueUrl = [[linkInfo ofk:@"issue"] ofk:@"href"];
 
 	p.condition = @kPullRequestConditionOpen;
 
@@ -99,6 +102,18 @@
 		self.repoName = @"Unknown repository";
 
 	if(!self.title) self.title = @"(No title)";
+}
+
+- (BOOL)markUnmergeable
+{
+	if(!self.mergeable.boolValue)
+	{
+		if(self.sectionIndex.integerValue == kPullRequestSectionAll &&
+		   [Settings shared].markUnmergeableOnUserSectionsOnly)
+			return NO;
+		return YES;
+	}
+	return NO;
 }
 
 - (BOOL)refersToMe
@@ -210,19 +225,20 @@
 	return [moc countForFetchRequest:f error:nil];
 }
 
--(void)prepareForDeletion
+- (void)prepareForDeletion
 {
 	[PRComment removeCommentsWithPullRequestURL:self.url inMoc:self.managedObjectContext];
+	[PRStatus removeStatusesWithPullRequestId:self.serverId inMoc:self.managedObjectContext];
 }
 
-+(PullRequest *)pullRequestWithUrl:(NSString *)url moc:(NSManagedObjectContext *)moc
++ (PullRequest *)pullRequestWithUrl:(NSString *)url moc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PullRequest"];
 	f.predicate = [NSPredicate predicateWithFormat:@"url == %@",url];
 	return [[moc executeFetchRequest:f error:nil] lastObject];
 }
 
--(void)catchUpWithComments
+- (void)catchUpWithComments
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
 	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestUrl == %@",self.url];
@@ -238,12 +254,13 @@
 	[self postProcess];
 }
 
--(BOOL)isMine
+- (BOOL)isMine
 {
+	if(self.assignedToMe.boolValue && [Settings shared].moveAssignedPrsToMySection) return YES;
 	return [self.userId.stringValue isEqualToString:[Settings shared].localUserId];
 }
 
--(BOOL)commentedByMe
+- (BOOL)commentedByMe
 {
 	for(PRComment *c in [PRComment commentsForPullRequestUrl:self.url inMoc:self.managedObjectContext])
 		if(c.isMine)
@@ -255,7 +272,28 @@
 - (NSArray *)displayedStatuses
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRStatus"];
-	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestId = %@",self.serverId];
+
+	NSString *predicate = [NSString stringWithFormat:@"pullRequestId = %@",self.serverId];
+
+	NSInteger mode = [Settings shared].statusFilteringMode;
+	if(mode!=kStatusFilterAll)
+	{
+		NSArray *terms = [Settings shared].statusFilteringTerms;
+		if(terms.count)
+		{
+			NSMutableArray *ors = [NSMutableArray arrayWithCapacity:terms.count];
+			for(NSString *term in terms)
+			{
+				[ors addObject:[NSString stringWithFormat:@"descriptionText contains[cd] '%@'",term]];
+			}
+			if(mode==kStatusFilterInclude)
+				predicate = [predicate stringByAppendingFormat:@" and (%@)",[ors componentsJoinedByString:@" or "]];
+			else
+				predicate = [predicate stringByAppendingFormat:@" and (not (%@))",[ors componentsJoinedByString:@" or "]];
+		}
+	}
+
+	f.predicate = [NSPredicate predicateWithFormat:predicate];
 	f.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"createdAt" ascending:NO]];
 	NSArray *ret = [self.managedObjectContext executeFetchRequest:f error:nil];
 	NSMutableArray *result = [NSMutableArray array];

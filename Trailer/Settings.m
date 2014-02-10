@@ -124,6 +124,18 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#define STATUS_FILTERING_METHOD_KEY @"STATUS_FILTERING_METHOD_KEY"
+-(NSInteger)statusFilteringMode { return [[[NSUserDefaults standardUserDefaults] objectForKey:STATUS_FILTERING_METHOD_KEY] integerValue]; }
+-(void)setStatusFilteringMode:(NSInteger)statusFilteringMode { [self storeDefaultValue:@(statusFilteringMode) forKey:STATUS_FILTERING_METHOD_KEY]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define STATUS_FILTERING_TERMS_KEY @"STATUS_FILTERING_TERMS_KEY"
+-(NSArray *)statusFilteringTerms { return [[NSUserDefaults standardUserDefaults] objectForKey:STATUS_FILTERING_TERMS_KEY]; }
+-(void)setStatusFilteringTerms:(NSArray *)statusFilteringTerms { [self storeDefaultValue:statusFilteringTerms forKey:STATUS_FILTERING_TERMS_KEY]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #define DONT_KEEP_MY_PRS_KEY @"DONT_KEEP_MY_PRS_KEY"
 -(void)setDontKeepMyPrs:(BOOL)dontKeepMyPrs { [self storeDefaultValue:@(dontKeepMyPrs) forKey:DONT_KEEP_MY_PRS_KEY]; }
 -(BOOL)dontKeepMyPrs { return [[[NSUserDefaults standardUserDefaults] stringForKey:DONT_KEEP_MY_PRS_KEY] boolValue]; }
@@ -192,18 +204,75 @@
 
 #define SHOW_STATUS_ITEMS @"SHOW_STATUS_ITEMS"
 -(void)setShowStatusItems:(BOOL)showStatusItems { [self storeDefaultValue:@(showStatusItems) forKey:SHOW_STATUS_ITEMS]; }
--(BOOL)showStatusItems
-{
-	NSString *v = [[NSUserDefaults standardUserDefaults] stringForKey:SHOW_STATUS_ITEMS];
-	if(!v) v = @"true";
-	return [v boolValue];
-}
+-(BOOL)showStatusItems { return [[[NSUserDefaults standardUserDefaults] stringForKey:SHOW_STATUS_ITEMS] boolValue]; }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #define MAKE_STATUS_ITEMS_SELECTABLE @"MAKE_STATUS_ITEMS_SELECTABLE"
 -(void)setMakeStatusItemsSelectable:(BOOL)makeStatusItemsSelectable { [self storeDefaultValue:@(makeStatusItemsSelectable) forKey:MAKE_STATUS_ITEMS_SELECTABLE]; }
 -(BOOL)makeStatusItemsSelectable { return [[[NSUserDefaults standardUserDefaults] stringForKey:MAKE_STATUS_ITEMS_SELECTABLE] boolValue]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define MOVE_ASSIGNED_PRS_TO_MY_SECTION @"MOVE_ASSIGNED_PRS_TO_MY_SECTION"
+-(void)setMoveAssignedPrsToMySection:(BOOL)moveAssignedPrsToMySection { [self storeDefaultValue:@(moveAssignedPrsToMySection) forKey:MOVE_ASSIGNED_PRS_TO_MY_SECTION]; }
+-(BOOL)moveAssignedPrsToMySection { return [[[NSUserDefaults standardUserDefaults] stringForKey:MOVE_ASSIGNED_PRS_TO_MY_SECTION] boolValue]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define MARK_UNMERGEABLE_ON_USER_SECTIONS_ONLY @"MARK_UNMERGEABLE_ON_USER_SECTIONS_ONLY"
+-(void)setMarkUnmergeableOnUserSectionsOnly:(BOOL)markUnmergeableOnUserSectionsOnly { [self storeDefaultValue:@(markUnmergeableOnUserSectionsOnly) forKey:MARK_UNMERGEABLE_ON_USER_SECTIONS_ONLY]; }
+-(BOOL)markUnmergeableOnUserSectionsOnly { return [[[NSUserDefaults standardUserDefaults] stringForKey:MARK_UNMERGEABLE_ON_USER_SECTIONS_ONLY] boolValue]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define HOTKEY_ENABLE @"HOTKEY_ENABLE"
+-(void)setHotkeyEnable:(BOOL)hotkeyEnable { [self storeDefaultValue:@(hotkeyEnable) forKey:HOTKEY_ENABLE]; }
+-(BOOL)hotkeyEnable { return [[[NSUserDefaults standardUserDefaults] stringForKey:HOTKEY_ENABLE] boolValue]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define HOTKEY_COMMAND_MODIFIER @"HOTKEY_COMMAND_MODIFIER"
+-(void)setHotkeyCommandModifier:(BOOL)hotkeyCommandModifier { [self storeDefaultValue:@(hotkeyCommandModifier) forKey:HOTKEY_COMMAND_MODIFIER]; }
+-(BOOL)hotkeyCommandModifier
+{
+	NSString *v = [[NSUserDefaults standardUserDefaults] stringForKey:HOTKEY_COMMAND_MODIFIER];
+	if(!v) return YES;
+	return v.boolValue;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define HOTKEY_SHIFT_MODIFIER @"HOTKEY_SHIFT_MODIFIER"
+-(void)setHotkeyShiftModifier:(BOOL)hotkeyShiftModifier { [self storeDefaultValue:@(hotkeyShiftModifier) forKey:HOTKEY_SHIFT_MODIFIER]; }
+-(BOOL)hotkeyShiftModifier
+{
+	NSString *v = [[NSUserDefaults standardUserDefaults] stringForKey:HOTKEY_SHIFT_MODIFIER];
+	if(!v) return YES;
+	return v.boolValue;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define HOTKEY_OPTION_MODIFIER @"HOTKEY_OPTION_MODIFIER"
+-(void)setHotkeyOptionModifier:(BOOL)hotkeyOptionModifier { [self storeDefaultValue:@(hotkeyOptionModifier) forKey:HOTKEY_OPTION_MODIFIER]; }
+-(BOOL)hotkeyOptionModifier
+{
+	NSString *v = [[NSUserDefaults standardUserDefaults] stringForKey:HOTKEY_OPTION_MODIFIER];
+	if(!v) return YES;
+	return v.boolValue;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define HOTKEY_LETTER @"HOTKEY_LETTER"
+-(NSString *)hotkeyLetter
+{
+	NSString *value = [[NSUserDefaults standardUserDefaults] stringForKey:HOTKEY_LETTER];
+	if(!value) value = @"T";
+	return value;
+}
+-(void)setHotkeyLetter:(NSString *)hotkeyLetter { [self storeDefaultValue:hotkeyLetter forKey:HOTKEY_LETTER]; }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

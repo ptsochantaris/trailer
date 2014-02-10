@@ -1,7 +1,6 @@
 
 @interface PRItemView ()
 {
-	BOOL _highlighted;
 	NSTrackingArea *trackingArea;
 }
 @end
@@ -24,7 +23,7 @@ static CGColorRef _highlightColor;
 		dateFormatter.timeStyle = NSDateFormatterMediumStyle;
 		dateFormatter.doesRelativeDateFormatting = YES;
 
-		_highlightColor = CGColorCreateCopy([NSColor colorWithWhite:0.95 alpha:1.0].CGColor);
+		_highlightColor = CGColorCreateCopy(MAKECOLOR(0.95, 0.95, 0.95, 1.0).CGColor);
 
 		_titleAttributes = @{
 							 NSFontAttributeName:[NSFont menuFontOfSize:13.0],
@@ -66,8 +65,9 @@ static CGColorRef _highlightColor;
 		NSString *_title = pullRequest.title;
 		NSString *_subtitle = pullRequest.subtitle;
 
-		CGFloat W = MENU_WIDTH-LEFTPADDING;
-		BOOL showUnpin = pullRequest.condition.integerValue!=kPullRequestConditionOpen || !pullRequest.mergeable.boolValue;
+		CGFloat W = MENU_WIDTH-LEFTPADDING-[AppDelegate shared].scrollBarWidth;
+		BOOL showUnpin = pullRequest.condition.integerValue!=kPullRequestConditionOpen || pullRequest.markUnmergeable;
+
 		if(showUnpin) W -= REMOVE_BUTTON_WIDTH;
 
 		BOOL showAvatar = pullRequest.userAvatarUrl.length && ![Settings shared].hideAvatars;
@@ -139,7 +139,7 @@ static CGColorRef _highlightColor;
 			if(pullRequest.condition.integerValue==kPullRequestConditionOpen)
 			{
 				CenteredTextField *unmergeableLabel = [[CenteredTextField alloc] initWithFrame:pinRect];
-				unmergeableLabel.textColor = [NSColor redColor];
+				unmergeableLabel.textColor = [COLOR_CLASS redColor];
 				unmergeableLabel.font = [NSFont fontWithName:@"Monaco" size:8.0];
 				unmergeableLabel.alignment = NSCenterTextAlignment;
 				[unmergeableLabel setStringValue:@"Cannot be merged"];
@@ -196,7 +196,7 @@ static CGColorRef _highlightColor;
 - (void)drawRect:(NSRect)dirtyRect
 {
 	[super drawRect:dirtyRect];
-	if(_highlighted)
+	if(_focused)
 	{
 		CGContextRef context = (CGContextRef) [[NSGraphicsContext currentContext] graphicsPort];
 		CGContextSetFillColorWithColor(context, _highlightColor);
@@ -206,14 +206,24 @@ static CGColorRef _highlightColor;
 
 - (void)mouseEntered:(NSEvent *)theEvent
 {
-	_highlighted = YES;
-	[self setNeedsDisplay:YES];
+	if(![AppDelegate shared].isManuallyScrolling) self.focused = YES;
 }
 
 - (void)mouseExited:(NSEvent *)theEvent
 {
-	_highlighted = NO;
-	[self setNeedsDisplay:YES];
+	self.focused = NO;
+}
+
+- (void)setFocused:(BOOL)focused
+{
+	if(_focused!=focused)
+	{
+		_focused = focused;
+		[self setNeedsDisplay:YES];
+		[[NSNotificationCenter defaultCenter] postNotificationName:PR_ITEM_FOCUSED_NOTIFICATION_KEY
+															object:self
+														  userInfo:@{ PR_ITEM_FOCUSED_STATE_KEY: @(focused) }];
+	}
 }
 
 - (void)mouseDown:(NSEvent*) event
@@ -236,7 +246,7 @@ static CGColorRef _highlightColor;
     if (NSPointInRect(mouseLocation, [self bounds]))
 		[self mouseEntered: nil];
 	else
-		[self mouseExited: nil];
+		if(!_focused) [self mouseExited: nil];
 }
 
 @end

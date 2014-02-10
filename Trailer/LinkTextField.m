@@ -13,7 +13,8 @@
 	[super viewDidMoveToWindow];
 
 	CGRect check = [self.attributedStringValue boundingRectWithSize:self.bounds.size
-															options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading];
+															options:NSStringDrawingUsesLineFragmentOrigin |
+																	NSStringDrawingUsesFontLeading];
 
 	NSTrackingArea *newArea = [[NSTrackingArea alloc] initWithRect:check
 														   options:NSTrackingMouseEnteredAndExited | NSTrackingMouseMoved | NSTrackingActiveInKeyWindow
@@ -27,6 +28,20 @@
 	normalColor = self.textColor;
 }
 
+- (void)resetCursorRects
+{
+	[super resetCursorRects];
+
+	if(highlighted)
+	{
+		CGRect check = [self.attributedStringValue boundingRectWithSize:self.bounds.size
+																options:NSStringDrawingUsesLineFragmentOrigin |
+																		NSStringDrawingUsesFontLeading];
+
+		[self addCursorRect:check cursor:[NSCursor pointingHandCursor]];
+	}
+}
+
 - (void)mouseEntered:(NSEvent *)theEvent
 {
 	if(self.targetUrl)
@@ -35,23 +50,28 @@
 		{
 			if([theEvent modifierFlags] & NSAlternateKeyMask)
 			{
-				self.textColor = [NSColor blueColor];
+				self.textColor = [COLOR_CLASS blueColor];
 				highlighted = YES;
+				[self.window invalidateCursorRectsForView:self];
 			}
 		}
 		else
 		{
-			self.textColor = [NSColor blueColor];
+			self.textColor = [COLOR_CLASS blueColor];
 			highlighted = YES;
+			[self.window invalidateCursorRectsForView:self];
 		}
 	}
 }
 
 - (void)mouseExited:(NSEvent *)theEvent
 {
-	if(self.targetUrl)
-		self.textColor = normalColor;
 	highlighted = NO;
+	if(self.targetUrl)
+	{
+		self.textColor = normalColor;
+		[self.window invalidateCursorRectsForView:self];
+	}
 }
 
 - (void)mouseMoved:(NSEvent *)theEvent
@@ -60,8 +80,9 @@
 	{
 		if([theEvent modifierFlags] & NSAlternateKeyMask)
 		{
-			self.textColor = [NSColor blueColor];
+			self.textColor = [COLOR_CLASS blueColor];
 			highlighted = YES;
+			[self.window invalidateCursorRectsForView:self];
 		}
 	}
 	else if(highlighted)
@@ -69,7 +90,10 @@
 		if(!([theEvent modifierFlags] & NSAlternateKeyMask))
 		{
 			if(self.targetUrl)
+			{
+				[self.window invalidateCursorRectsForView:self];
 				self.textColor = normalColor;
+			}
 			highlighted = NO;
 		}
 	}

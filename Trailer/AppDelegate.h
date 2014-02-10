@@ -18,6 +18,7 @@
 @property (weak) IBOutlet NSTableView *projectsTable;
 @property (weak) IBOutlet NSMenuItem *refreshNow;
 @property (weak) IBOutlet NSButton *clearAll;
+@property (weak) IBOutlet NSButton *selectParents;
 @property (weak) IBOutlet NSButton *selectAll;
 @property (weak) IBOutlet NSProgressIndicator *apiLoad;
 @property (weak) IBOutlet NSTextField *versionNumber;
@@ -44,6 +45,17 @@
 @property (weak) IBOutlet NSButton *hideAllPrsSection;
 @property (weak) IBOutlet NSButton *showStatusItems;
 @property (weak) IBOutlet NSButton *makeStatusItemsSelectable;
+@property (weak) IBOutlet NSPopUpButton *statusTermMenu;
+@property (weak) IBOutlet NSTokenField *statusTermsField;
+@property (weak) IBOutlet NSButton *moveAssignedPrsToMySection;
+@property (weak) IBOutlet NSButton *markUnmergeableOnUserSectionsOnly;
+
+// Keyboard
+@property (weak) IBOutlet NSButton *hotkeyEnable;
+@property (weak) IBOutlet NSButton *hotkeyCommandModifier;
+@property (weak) IBOutlet NSButton *hotkeyOptionModifier;
+@property (weak) IBOutlet NSButton *hotkeyShiftModifier;
+@property (weak) IBOutlet NSPopUpButton *hotkeyLetter;
 
 // About window
 @property (weak) IBOutlet NSTextField *aboutVersion;
@@ -69,8 +81,10 @@
 @property (nonatomic) DataManager *dataManager;
 @property (weak) NSTimer *refreshTimer;
 @property (strong) NSDate *lastSuccessfulRefresh;
-@property (nonatomic) BOOL lastUpdateFailed, preferencesDirty, isRefreshing;
+@property (nonatomic) BOOL lastUpdateFailed, preferencesDirty, isRefreshing, isManuallyScrolling;
 @property (nonatomic, readonly) BOOL menuIsOpen;
+@property (nonatomic) long highlightedPrIndex;
+@property (nonatomic) float scrollBarWidth;
 
 +(AppDelegate*)shared;
 
