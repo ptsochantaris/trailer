@@ -304,8 +304,24 @@ typedef void (^completionBlockType)(BOOL);
 							p.assignedToMe = @(assigned);
 							completionCallback(YES);
 						}
-						else completionCallback(NO);
+						else
+						{
+							if(resultCode == 404 || resultCode == 410)
+							{
+								// 404/410 is fine, it means issue entry doesn't exist
+								p.assignedToMe = @NO;
+								completionCallback(YES);
+							}
+							else
+							{
+								completionCallback(NO);
+							}
+						}
 					}];
+		}
+		else
+		{
+			completionCallback(YES);
 		}
 	}
 }
@@ -492,7 +508,7 @@ typedef void (^completionBlockType)(BOOL);
 					 }
 					 else
 					 {
-						 if(resultCode==404) // 404 is an acceptable answer, it means the repo is gone
+						 if(resultCode == 404 || resultCode == 410) // 404/410 is an acceptable answer, it means the repo is gone
 						 {
 							 succeeded++;
 							 r.postSyncAction = @(kPostSyncDelete);
@@ -636,7 +652,7 @@ typedef void (^completionBlockType)(BOOL);
 															userInfo:nil];
 		  if(callback) callback(data, [API lastPage:response], response.statusCode);
 	  } failure:^(NSHTTPURLResponse *response, id data, NSError *error) {
-		  DLog(@"Failure: %@",error);
+		  DLog(@"Failure for %@: %@",path,error);
 		  if(callback) callback(nil, NO, response.statusCode);
 	  }];
 }
