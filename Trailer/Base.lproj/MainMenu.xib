@@ -515,9 +515,9 @@ Server</string>
                                             </connections>
                                         </button>
                                         <button id="yD7-Y4-ZaZ">
-                                            <rect key="frame" x="149" y="231" width="418" height="18"/>
+                                            <rect key="frame" x="149" y="231" width="442" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Make status items always selectable (don't require alt-click)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Nwp-dZ-JYi">
+                                            <buttonCell key="cell" type="check" title="Make status items always selectable (don't require command-click)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Nwp-dZ-JYi">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>

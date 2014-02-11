@@ -228,7 +228,7 @@ static CGColorRef _highlightColor;
 
 - (void)mouseDown:(NSEvent*) event
 {
-	[self.delegate prItemSelected:self];
+	[self.delegate prItemSelected:self alternativeSelect:(event.modifierFlags & NSAlternateKeyMask)];
 }
 
 - (void)updateTrackingAreas

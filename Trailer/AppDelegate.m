@@ -360,12 +360,13 @@ static AppDelegate *_static_shared_ref;
     [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
 }
 
-- (void)prItemSelected:(PRItemView *)item
+- (void)prItemSelected:(PRItemView *)item alternativeSelect:(BOOL)isAlternative
 {
 	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:item.userInfo moc:self.dataManager.managedObjectContext];
 	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:r.webUrl]];
 	[r catchUpWithComments];
 	[self updateMenu];
+	self.ignoreNextFocusLoss = YES;
 }
 
 - (void)statusItemTapped:(StatusItemView *)statusItem
@@ -442,12 +443,17 @@ static AppDelegate *_static_shared_ref;
 
 	if(show)
 	{
-		self.opening = YES;
-		[self.mainMenu setLevel:NSFloatingWindowLevel];
-		[self.mainMenu makeKeyAndOrderFront:self];
-		[NSApp activateIgnoringOtherApps:YES];
-		self.opening = NO;
+		[self displayMenu];
 	}
+}
+
+- (void)displayMenu
+{
+	self.opening = YES;
+	[self.mainMenu setLevel:NSFloatingWindowLevel];
+	[self.mainMenu makeKeyAndOrderFront:self];
+	[NSApp activateIgnoringOtherApps:YES];
+	self.opening = NO;
 }
 
 - (void)closeMenu
@@ -933,13 +939,27 @@ static AppDelegate *_static_shared_ref;
 {
 	if([notification object]==self.mainMenu)
 	{
-		[self scrollToTop];
+		if(self.ignoreNextFocusLoss)
+		{
+			self.ignoreNextFocusLoss = NO;
+		}
+		else
+		{
+			[self scrollToTop];
+			for(PRItemView *v in currentPRItems)
+				v.focused = NO;
+		}
 		[self.mainMenuFilter becomeFirstResponder];
 	}
 }
 
 - (void)windowDidResignKey:(NSNotification *)notification
 {
+	if(self.ignoreNextFocusLoss)
+	{
+		[self displayMenu];
+		return;
+	}
 	if(!self.opening)
 	{
 		if([notification object]==self.mainMenu)
@@ -1481,7 +1501,7 @@ static AppDelegate *_static_shared_ref;
 			case 36: // enter
 			{
 				PRItemView *v = [self focusedItemView];
-				if(v) [self prItemSelected:v];
+				if(v) [self prItemSelected:v alternativeSelect:(incomingEvent.modifierFlags & NSAlternateKeyMask)];
 				return nil;
 			}
 		}

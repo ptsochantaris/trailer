@@ -48,7 +48,7 @@
 	{
 		if(self.needsAlt)
 		{
-			if([theEvent modifierFlags] & NSAlternateKeyMask)
+			if([theEvent modifierFlags] & NSCommandKeyMask)
 			{
 				self.textColor = [COLOR_CLASS blueColor];
 				highlighted = YES;
@@ -78,7 +78,7 @@
 {
 	if(!highlighted && self.needsAlt)
 	{
-		if([theEvent modifierFlags] & NSAlternateKeyMask)
+		if([theEvent modifierFlags] & NSCommandKeyMask)
 		{
 			self.textColor = [COLOR_CLASS blueColor];
 			highlighted = YES;
@@ -87,7 +87,7 @@
 	}
 	else if(highlighted)
 	{
-		if(!([theEvent modifierFlags] & NSAlternateKeyMask))
+		if(!([theEvent modifierFlags] & NSCommandKeyMask))
 		{
 			if(self.targetUrl)
 			{
@@ -105,8 +105,9 @@
 	{
 		if(self.needsAlt)
 		{
-			if([theEvent modifierFlags] & NSAlternateKeyMask)
+			if([theEvent modifierFlags] & NSCommandKeyMask)
 			{
+				if(theEvent.modifierFlags & NSAlternateKeyMask) [AppDelegate shared].ignoreNextFocusLoss = YES;
 				[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:self.targetUrl]];
 				[self mouseExited:nil];
 			}

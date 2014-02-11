@@ -12,7 +12,7 @@
 @protocol PRItemViewDelegate <NSObject>
 
 - (void)unPinSelectedFrom:(PRItemView *)item;
-- (void)prItemSelected:(PRItemView *)item;
+- (void)prItemSelected:(PRItemView *)item alternativeSelect:(BOOL)isAlternative;
 
 @end
 

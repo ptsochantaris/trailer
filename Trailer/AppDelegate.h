@@ -81,7 +81,7 @@
 @property (nonatomic) DataManager *dataManager;
 @property (weak) NSTimer *refreshTimer;
 @property (strong) NSDate *lastSuccessfulRefresh;
-@property (nonatomic) BOOL lastUpdateFailed, preferencesDirty, isRefreshing, isManuallyScrolling;
+@property (nonatomic) BOOL lastUpdateFailed, preferencesDirty, isRefreshing, isManuallyScrolling, ignoreNextFocusLoss;
 @property (nonatomic, readonly) BOOL menuIsOpen;
 @property (nonatomic) long highlightedPrIndex;
 @property (nonatomic) float scrollBarWidth;
