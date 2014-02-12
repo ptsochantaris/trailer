@@ -2,7 +2,7 @@
 @interface API ()
 {
 	NSOperationQueue *requestQueue;
-	NSDateFormatter *dateFormatter;
+	NSDateFormatter *dateFormatter, *mediumFormatter;
     NSString *cacheDirectory;
 #ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
 	NSInteger networkIndicationCount;
@@ -34,6 +34,10 @@ typedef void (^completionBlockType)(BOOL);
 
 		dateFormatter = [[NSDateFormatter alloc] init];
 		dateFormatter.dateFormat = @"YYYY-MM-DDTHH:MM:SSZ";
+
+		mediumFormatter = [[NSDateFormatter alloc] init];
+		mediumFormatter.dateStyle = NSDateFormatterMediumStyle;
+		mediumFormatter.timeStyle = NSDateFormatterMediumStyle;
 
 		requestQueue = [[NSOperationQueue alloc] init];
 		requestQueue.maxConcurrentOperationCount = 8;
@@ -643,10 +647,7 @@ typedef void (^completionBlockType)(BOOL);
 		  self.requestsLimit = [[response allHeaderFields][@"X-RateLimit-Limit"] floatValue];
 		  float epochSeconds = [[response allHeaderFields][@"X-RateLimit-Reset"] floatValue];
 		  NSDate *date = [NSDate dateWithTimeIntervalSince1970:epochSeconds];
-		  NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-		  formatter.dateStyle = NSDateFormatterMediumStyle;
-		  formatter.timeStyle = NSDateFormatterMediumStyle;
-		  self.resetDate = [formatter stringFromDate:date];
+		  self.resetDate = [mediumFormatter stringFromDate:date];
 		  [[NSNotificationCenter defaultCenter] postNotificationName:RATE_UPDATE_NOTIFICATION
 															  object:nil
 															userInfo:nil];
