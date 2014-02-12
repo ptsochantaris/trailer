@@ -363,10 +363,26 @@ static AppDelegate *_static_shared_ref;
 - (void)prItemSelected:(PRItemView *)item alternativeSelect:(BOOL)isAlternative
 {
 	self.ignoreNextFocusLoss = isAlternative;
+
 	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:item.userInfo moc:self.dataManager.managedObjectContext];
-	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:r.webUrl]];
 	[r catchUpWithComments];
+
+	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:r.webUrl]];
+
+	NSInteger reSelectIndex = -1;
+	if(isAlternative)
+	{
+		PRItemView *v = [self focusedItemView];
+		if(v) reSelectIndex = [currentPRItems indexOfObject:v];
+	}
+
 	[self updateMenu];
+
+	if(reSelectIndex>-1 && reSelectIndex<currentPRItems.count)
+	{
+		PRItemView *v = currentPRItems[reSelectIndex];
+		v.focused = YES;
+	}
 }
 
 - (void)statusItemTapped:(StatusItemView *)statusItem
