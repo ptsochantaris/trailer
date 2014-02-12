@@ -362,11 +362,11 @@ static AppDelegate *_static_shared_ref;
 
 - (void)prItemSelected:(PRItemView *)item alternativeSelect:(BOOL)isAlternative
 {
+	self.ignoreNextFocusLoss = isAlternative;
 	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:item.userInfo moc:self.dataManager.managedObjectContext];
 	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:r.webUrl]];
 	[r catchUpWithComments];
 	[self updateMenu];
-	self.ignoreNextFocusLoss = YES;
 }
 
 - (void)statusItemTapped:(StatusItemView *)statusItem
@@ -1461,7 +1461,7 @@ static AppDelegate *_static_shared_ref;
 		{
 			case 43: // prefs
 			{
-				if(incomingEvent.modifierFlags & NSCommandKeyMask)
+				if((incomingEvent.modifierFlags & NSCommandKeyMask) == NSCommandKeyMask)
 				{
 					[self preferencesSelected:nil];
 					return nil;
@@ -1501,7 +1501,8 @@ static AppDelegate *_static_shared_ref;
 			case 36: // enter
 			{
 				PRItemView *v = [self focusedItemView];
-				if(v) [self prItemSelected:v alternativeSelect:(incomingEvent.modifierFlags & NSAlternateKeyMask)];
+				BOOL isAlternative = ((incomingEvent.modifierFlags & NSAlternateKeyMask) == NSAlternateKeyMask);
+				if(v) [self prItemSelected:v alternativeSelect:isAlternative];
 				return nil;
 			}
 		}
@@ -1539,29 +1540,29 @@ static AppDelegate *_static_shared_ref;
 
 	if([Settings shared].hotkeyCommandModifier)
 	{
-		if(incomingEvent.modifierFlags & NSCommandKeyMask) check++; else check--;
+		if((incomingEvent.modifierFlags & NSCommandKeyMask) == NSCommandKeyMask) check++; else check--;
 	}
 	else
 	{
-		if(incomingEvent.modifierFlags & NSCommandKeyMask) check--; else check++;
+		if((incomingEvent.modifierFlags & NSCommandKeyMask) == NSCommandKeyMask) check--; else check++;
 	}
 
 	if([Settings shared].hotkeyOptionModifier)
 	{
-		if(incomingEvent.modifierFlags & NSAlternateKeyMask) check++; else check--;
+		if((incomingEvent.modifierFlags & NSAlternateKeyMask) == NSAlternateKeyMask) check++; else check--;
 	}
 	else
 	{
-		if(incomingEvent.modifierFlags & NSAlternateKeyMask) check--; else check++;
+		if((incomingEvent.modifierFlags & NSAlternateKeyMask) == NSAlternateKeyMask) check--; else check++;
 	}
 
 	if([Settings shared].hotkeyShiftModifier)
 	{
-		if(incomingEvent.modifierFlags & NSShiftKeyMask) check++; else check--;
+		if((incomingEvent.modifierFlags & NSShiftKeyMask) == NSShiftKeyMask) check++; else check--;
 	}
 	else
 	{
-		if(incomingEvent.modifierFlags & NSShiftKeyMask) check--; else check++;
+		if((incomingEvent.modifierFlags & NSShiftKeyMask) == NSShiftKeyMask) check--; else check++;
 	}
 
 	if(check==3)
