@@ -37,6 +37,7 @@
 
 #define SORT_REVERSE @[@"Newest first",@"Most recently active",@"Reverse alphabetically"]
 #define SORT_NORMAL @[@"Oldest first",@"Inactive for longest",@"Alphabetically"]
+#define AUTO_SUBSCRIPTION @[@"None",@"Parents",@"All"]
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -154,6 +155,15 @@
 					cell.textLabel.text = [NSString stringWithFormat:@"Include repositories in\nfiltering"];
 				if([Settings shared].includeReposInFilter) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
+            }
+            case 2:
+            {
+				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+					cell.textLabel.text = [NSString stringWithFormat:@"Auto subscribe to new repositories"];
+				else
+					cell.textLabel.text = [NSString stringWithFormat:@"Auto subscribe to new\nrepositories"];
+                cell.detailTextLabel.text = AUTO_SUBSCRIPTION[[Settings shared].repoSubscriptionPolicy];
+                break;
             }
 		}
 	}
@@ -338,6 +348,15 @@
 				[Settings shared].includeReposInFilter = ![Settings shared].includeReposInFilter;
 				break;
 			}
+            case 2:
+            {
+                selectedIndexPath = indexPath;
+				previousValue = [Settings shared].sortMethod;
+				pickerName = [self.tableView cellForRowAtIndexPath:indexPath].textLabel.text;
+                valuesToPush = AUTO_SUBSCRIPTION;
+				[self performSegueWithIdentifier:@"showPicker" sender:self];
+				break;
+            }
 		}
 		[settingsChangedAnnounceTimer push];
 	}
@@ -419,7 +438,7 @@
 		case REFRESH_SECTION_INDEX: return 2;
 		case DISPLAY_SECTION_INDEX: return 4;
 		case COMMENTS_SECTION_INDEX: return 3;
-		case REPOS_SECTION_INDEX: return 2;
+		case REPOS_SECTION_INDEX: return 3;
 		case MERGING_SECTION_INDEX: return 2;
 		case CONFIRM_SECTION_INDEX: return 2;
 		case SORT_SECTION_INDEX: return 3;
@@ -480,6 +499,10 @@
 		[Settings shared].sortMethod = indexPath.row;
 		[settingsChangedAnnounceTimer push];
 	}
+    else if(selectedIndexPath.section==REPOS_SECTION_INDEX)
+    {
+        [Settings shared].repoSubscriptionPolicy = indexPath.row;
+    }
 	[self.tableView reloadData];
 	selectedIndexPath = nil;
 }
