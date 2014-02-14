@@ -418,7 +418,6 @@ typedef void (^completionBlockType)(BOOL);
 
 - (void)fetchPullRequestsForActiveReposAndCallback:(void(^)(BOOL success))callback
 {
-	[Settings shared].numberOfRefreshesSinceLastRepoCheck ++;
 	[self syncUserDetailsAndCallback:^(BOOL success) {
 		if(success)
 		{
@@ -435,20 +434,33 @@ typedef void (^completionBlockType)(BOOL);
 
 - (void)autoSubscribeToReposAndCallback:(void(^)())callback
 {
-	if([Settings shared].repoSubscriptionPolicy == kRepoAutoSubscribeNone) if(callback) callback();
-
-	if([Settings shared].numberOfRefreshesSinceLastRepoCheck < 100) if(callback) callback();
+	if([AppDelegate shared].lastRepoCheck &&
+	   ([[NSDate date] timeIntervalSinceDate:[AppDelegate shared].lastRepoCheck] < [Settings shared].newRepoCheckPeriod*3600.0))
+	{
+		if(callback) callback();
+		return;
+	}
 
 	[self fetchRepositoriesAndCallback:^(BOOL success) {
 		if(success)
 		{
-			BOOL parentsOnly = ([Settings shared].repoSubscriptionPolicy == kRepoAutoSubscribeParentsOnly);
 			NSManagedObjectContext *moc = [AppDelegate shared].dataManager.managedObjectContext;
 			for(Repo *r in [Repo newItemsOfType:@"Repo" inMoc:moc])
 			{
-				if(parentsOnly && r.fork.boolValue) continue;
-				r.active = @YES;
-				[[AppDelegate shared] postNotificationOfType:kNewRepoSubscribed forItem:r];
+				if([Settings shared].repoSubscriptionPolicy == kRepoAutoSubscribeNone)
+				{
+					[[AppDelegate shared] postNotificationOfType:kNewRepoAnnouncement forItem:r];
+				}
+				else if([Settings shared].repoSubscriptionPolicy == kRepoAutoSubscribeParentsOnly)
+				{
+					if(!r.fork.boolValue) r.active = @YES;
+					[[AppDelegate shared] postNotificationOfType:kNewRepoSubscribed forItem:r];
+				}
+				else
+				{
+					r.active = @YES;
+					[[AppDelegate shared] postNotificationOfType:kNewRepoSubscribed forItem:r];
+				}
 			}
 		}
 		if(callback) callback();
@@ -565,7 +577,6 @@ typedef void (^completionBlockType)(BOOL);
 					 [Repo repoWithInfo:info moc:moc];
 				 }
 			 } finalCallback:^(BOOL success, NSInteger resultCode) {
-				 if(success) [Settings shared].numberOfRefreshesSinceLastRepoCheck = 0;
 				 if(callback) callback(success);
 			 }];
 }

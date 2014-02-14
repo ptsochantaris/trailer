@@ -340,7 +340,12 @@ CGFloat GLOBAL_SCREEN_SCALE;
 		}
 		case kNewRepoSubscribed:
 		{
-			notification.alertBody = [NSString stringWithFormat:@"New Repo Subscribed: %@",[item fullName]];
+			notification.alertBody = [NSString stringWithFormat:@"New Repository Subscribed: %@",[item fullName]];
+			break;
+		}
+		case kNewRepoAnnouncement:
+		{
+			notification.alertBody = [NSString stringWithFormat:@"New Repository: %@",[item fullName]];
 			break;
 		}
 	}

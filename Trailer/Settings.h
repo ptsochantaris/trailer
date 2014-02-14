@@ -6,7 +6,6 @@
 - (NSString *)sortField;
 
 @property (nonatomic) NSInteger sortMethod, statusFilteringMode,
-								numberOfRefreshesSinceLastRepoCheck,
 								repoSubscriptionPolicy;
 
 @property (nonatomic) NSArray *statusFilteringTerms;
@@ -15,7 +14,7 @@
 							*apiFrontEnd, *apiBackEnd, *apiPath,
 							*hotkeyLetter;
 
-@property (nonatomic) float refreshPeriod, backgroundRefreshPeriod;
+@property (nonatomic) float refreshPeriod, backgroundRefreshPeriod, newRepoCheckPeriod;
 
 @property (nonatomic) BOOL shouldHideUncommentedRequests, showCommentsEverywhere,
 							sortDescending, showCreatedInsteadOfUpdated,

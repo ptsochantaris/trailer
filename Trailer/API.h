@@ -8,7 +8,8 @@ typedef enum {
 	kPrMerged = 2,
 	kNewMention = 4,
 	kPrClosed = 5,
-	kNewRepoSubscribed = 6
+	kNewRepoSubscribed = 6,
+	kNewRepoAnnouncement = 7
 } PRNotificationType;
 
 typedef enum {

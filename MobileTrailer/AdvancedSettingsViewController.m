@@ -66,6 +66,15 @@
 				cell.detailTextLabel.text = [NSString stringWithFormat:@"%.0f minutes",[Settings shared].backgroundRefreshPeriod/60.0];
 				break;
 			}
+			case 2:
+			{
+				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+					cell.textLabel.text = [NSString stringWithFormat:@"Refresh repositories interval"];
+				else
+					cell.textLabel.text = [NSString stringWithFormat:@"Refresh repositories\ninterval"];
+				cell.detailTextLabel.text = [NSString stringWithFormat:@"%.0f hours",[Settings shared].newRepoCheckPeriod];
+				break;
+			}
 		}
 	}
 	else if(indexPath.section==DISPLAY_SECTION_INDEX)
@@ -281,6 +290,18 @@
 				}
 				break;
 			}
+			case 2:
+			{
+				// hours
+				NSInteger count=0;
+				for(NSInteger f=1;f<100;f+=1)
+				{
+					if(f==[Settings shared].newRepoCheckPeriod) previousValue = count;
+					[values addObject:[NSString stringWithFormat:@"%ld hours",(long)f]];
+					count++;
+				}
+				break;
+			}
 		}
 		valuesToPush = values;
 		[self performSegueWithIdentifier:@"showPicker" sender:self];
@@ -351,7 +372,7 @@
             case 2:
             {
                 selectedIndexPath = indexPath;
-				previousValue = [Settings shared].sortMethod;
+				previousValue = [Settings shared].repoSubscriptionPolicy;
 				pickerName = [self.tableView cellForRowAtIndexPath:indexPath].textLabel.text;
                 valuesToPush = AUTO_SUBSCRIPTION;
 				[self performSegueWithIdentifier:@"showPicker" sender:self];
@@ -435,7 +456,7 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     switch (section) {
-		case REFRESH_SECTION_INDEX: return 2;
+		case REFRESH_SECTION_INDEX: return 3;
 		case DISPLAY_SECTION_INDEX: return 4;
 		case COMMENTS_SECTION_INDEX: return 3;
 		case REPOS_SECTION_INDEX: return 3;
@@ -492,6 +513,10 @@
 		else if(selectedIndexPath.row==1)
 		{
 			[Settings shared].backgroundRefreshPeriod = (indexPath.row*10+10)*60.0;
+		}
+		else if(selectedIndexPath.row==2)
+		{
+			[Settings shared].newRepoCheckPeriod = indexPath.row+1;
 		}
 	}
 	else if(selectedIndexPath.section==SORT_SECTION_INDEX)

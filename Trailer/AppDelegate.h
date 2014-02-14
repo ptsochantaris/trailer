@@ -50,6 +50,8 @@
 @property (weak) IBOutlet NSButton *moveAssignedPrsToMySection;
 @property (weak) IBOutlet NSButton *markUnmergeableOnUserSectionsOnly;
 @property (weak) IBOutlet NSPopUpButton *repoSubscriptionPolicy;
+@property (weak) IBOutlet NSTextField *repoCheckLabel;
+@property (weak) IBOutlet NSStepper *repoCheckStepper;
 
 // Keyboard
 @property (weak) IBOutlet NSButton *hotkeyEnable;
@@ -81,7 +83,7 @@
 @property (nonatomic) API *api;
 @property (nonatomic) DataManager *dataManager;
 @property (weak) NSTimer *refreshTimer;
-@property (strong) NSDate *lastSuccessfulRefresh;
+@property (strong) NSDate *lastSuccessfulRefresh, *lastRepoCheck;
 @property (nonatomic) BOOL lastUpdateFailed, preferencesDirty, isRefreshing, isManuallyScrolling, ignoreNextFocusLoss;
 @property (nonatomic, readonly) BOOL menuIsOpen;
 @property (nonatomic) long highlightedPrIndex;

@@ -76,6 +76,21 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#define NEW_REPO_CHECK_PERIOD @"NEW_REPO_CHECK_PERIOD"
+-(float)newRepoCheckPeriod
+{
+	float period = [[NSUserDefaults standardUserDefaults] floatForKey:NEW_REPO_CHECK_PERIOD];
+	if(period==0)
+	{
+		period = 2;
+		self.newRepoCheckPeriod = period;
+	}
+	return period;
+}
+-(void)setNewRepoCheckPeriod:(float)newRepoCheckPeriod { [[NSUserDefaults standardUserDefaults] setFloat:newRepoCheckPeriod forKey:NEW_REPO_CHECK_PERIOD]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #define GITHUB_TOKEN_KEY @"GITHUB_AUTH_TOKEN"
 -(NSString*)authToken { return [[NSUserDefaults standardUserDefaults] stringForKey:GITHUB_TOKEN_KEY]; }
 -(void)setAuthToken:(NSString *)authToken { [self storeDefaultValue:authToken forKey:GITHUB_TOKEN_KEY]; }
@@ -115,12 +130,6 @@
 #define SHOW_UPDATED_KEY @"SHOW_UPDATED_KEY"
 -(BOOL)showCreatedInsteadOfUpdated { return [[[NSUserDefaults standardUserDefaults] stringForKey:SHOW_UPDATED_KEY] boolValue]; }
 -(void)setShowCreatedInsteadOfUpdated:(BOOL)showCreatedInsteadOfUpdated { [self storeDefaultValue:@(showCreatedInsteadOfUpdated) forKey:SHOW_UPDATED_KEY]; }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#define NUMBER_REFRESHES_SINCE_REPO_CHECK @"NUMBER_REFRESHES_SINCE_REPO_CHECK"
--(NSInteger)numberOfRefreshesSinceLastRepoCheck { return [[[NSUserDefaults standardUserDefaults] objectForKey:NUMBER_REFRESHES_SINCE_REPO_CHECK] integerValue]; }
--(void)setNumberOfRefreshesSinceLastRepoCheck:(NSInteger)numberOfRefreshesSinceLastRepoCheck { [self storeDefaultValue:@(numberOfRefreshesSinceLastRepoCheck) forKey:NUMBER_REFRESHES_SINCE_REPO_CHECK]; }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #define SORT_METHOD_KEY @"SORT_METHOD_KEY"

@@ -362,7 +362,13 @@ static AppDelegate *_static_shared_ref;
 		}
 		case kNewRepoSubscribed:
 		{
-			notification.title = @"New Repo Subscribed";
+			notification.title = @"New Repository Subscribed";
+			notification.subtitle = [item fullName];
+			break;
+		}
+		case kNewRepoAnnouncement:
+		{
+			notification.title = @"New Repository";
 			notification.subtitle = [item fullName];
 			break;
 		}
@@ -815,6 +821,9 @@ static AppDelegate *_static_shared_ref;
 		[self.hotkeyCommandModifier setEnabled:NO];
 	}
 
+	[self.repoCheckStepper setFloatValue:[Settings shared].newRepoCheckPeriod];
+	[self newRepoCheckChanged:nil];
+
 	[self.refreshDurationStepper setFloatValue:[Settings shared].refreshPeriod];
 	[self refreshDurationChanged:nil];
 	
@@ -1189,7 +1198,13 @@ static AppDelegate *_static_shared_ref;
 - (IBAction)refreshDurationChanged:(NSStepper *)sender
 {
 	[Settings shared].refreshPeriod = self.refreshDurationStepper.floatValue;
-	[self.refreshDurationLabel setStringValue:[NSString stringWithFormat:@"Automatically refresh every %ld seconds",(long)self.refreshDurationStepper.integerValue]];
+	[self.refreshDurationLabel setStringValue:[NSString stringWithFormat:@"Refresh PRs every %ld seconds",(long)self.refreshDurationStepper.integerValue]];
+}
+
+- (IBAction)newRepoCheckChanged:(NSStepper *)sender
+{
+	[Settings shared].newRepoCheckPeriod = self.repoCheckStepper.floatValue;
+	[self.repoCheckLabel setStringValue:[NSString stringWithFormat:@"Refresh repositories every %ld hours",(long)self.repoCheckStepper.integerValue]];
 }
 
 -(void)refreshTimerDone
