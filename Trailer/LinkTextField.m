@@ -42,28 +42,6 @@
 	}
 }
 
-- (void)mouseEntered:(NSEvent *)theEvent
-{
-	if(self.targetUrl)
-	{
-		if(self.needsAlt)
-		{
-			if([theEvent modifierFlags] & NSCommandKeyMask)
-			{
-				self.textColor = [COLOR_CLASS blueColor];
-				highlighted = YES;
-				[self.window invalidateCursorRectsForView:self];
-			}
-		}
-		else
-		{
-			self.textColor = [COLOR_CLASS blueColor];
-			highlighted = YES;
-			[self.window invalidateCursorRectsForView:self];
-		}
-	}
-}
-
 - (void)mouseExited:(NSEvent *)theEvent
 {
 	highlighted = NO;
@@ -76,25 +54,25 @@
 
 - (void)mouseMoved:(NSEvent *)theEvent
 {
-	if(!highlighted && self.needsAlt)
+	if(self.targetUrl)
 	{
-		if([theEvent modifierFlags] & NSCommandKeyMask)
+		if(highlighted)
 		{
-			self.textColor = [COLOR_CLASS blueColor];
-			highlighted = YES;
-			[self.window invalidateCursorRectsForView:self];
-		}
-	}
-	else if(highlighted)
-	{
-		if(!([theEvent modifierFlags] & NSCommandKeyMask))
-		{
-			if(self.targetUrl)
+			if(self.needsCommand && (!([theEvent modifierFlags] & NSCommandKeyMask)))
 			{
-				[self.window invalidateCursorRectsForView:self];
+				highlighted = NO;
 				self.textColor = normalColor;
+				[self.window invalidateCursorRectsForView:self];
 			}
-			highlighted = NO;
+		}
+		else
+		{
+			if((!self.needsCommand) || ([theEvent modifierFlags] & NSCommandKeyMask))
+			{
+				highlighted = YES;
+				self.textColor = [COLOR_CLASS blueColor];
+				[self.window invalidateCursorRectsForView:self];
+			}
 		}
 	}
 }
@@ -103,7 +81,7 @@
 {
 	if(self.targetUrl)
 	{
-		if(self.needsAlt)
+		if(self.needsCommand)
 		{
 			if([theEvent modifierFlags] & NSCommandKeyMask)
 			{
