@@ -140,17 +140,23 @@
 	});
 
 	NSString *_subtitle;
-	if([Settings shared].showCreatedInsteadOfUpdated)
-		_subtitle = [itemDateFormatter stringFromDate:self.createdAt];
-	else
-		_subtitle = [itemDateFormatter stringFromDate:self.updatedAt];
 
 	if(self.userLogin.length)
-		_subtitle = [NSString stringWithFormat:@"%@ - %@",self.userLogin,_subtitle];
+		_subtitle = [NSString stringWithFormat:@"%@\n",self.userLogin];
+	else
+		_subtitle = @"";
+
+	if([Settings shared].showCreatedInsteadOfUpdated)
+		_subtitle = [_subtitle stringByAppendingString:[ itemDateFormatter stringFromDate:self.createdAt]];
+	else
+		_subtitle = [_subtitle stringByAppendingString:[ itemDateFormatter stringFromDate:self.updatedAt]];
 
 	if([Settings shared].showReposInName)
+		_subtitle = [_subtitle stringByAppendingFormat:@"\n%@",self.repoName];
+
+	if(!self.mergeable.boolValue)
 	{
-		_subtitle = [_subtitle stringByAppendingFormat:@" - %@",self.repoName];
+		_subtitle = [_subtitle stringByAppendingString:@"\nCannot be merged!"];
 	}
 
 	return _subtitle;
