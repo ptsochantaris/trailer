@@ -27,6 +27,18 @@
 @dynamic assignedToMe;
 @dynamic issueUrl;
 
+static NSDateFormatter *itemDateFormatter;
+
++ (void)initialize
+{
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		itemDateFormatter = [[NSDateFormatter alloc] init];
+		itemDateFormatter.dateStyle = NSDateFormatterShortStyle;
+		itemDateFormatter.timeStyle = NSDateFormatterShortStyle;
+	});
+}
+
 + (PullRequest *)pullRequestWithInfo:(NSDictionary *)info moc:(NSManagedObjectContext *)moc
 {
 	PullRequest *p = [DataItem itemWithInfo:info type:@"PullRequest" moc:moc];
@@ -130,15 +142,6 @@
 
 - (NSString *)subtitle
 {
-	static NSDateFormatter *itemDateFormatter;
-
-	static dispatch_once_t onceToken;
-	dispatch_once(&onceToken, ^{
-		itemDateFormatter = [[NSDateFormatter alloc] init];
-		itemDateFormatter.dateStyle = NSDateFormatterShortStyle;
-		itemDateFormatter.timeStyle = NSDateFormatterShortStyle;
-	});
-
 	NSString *_subtitle;
 
 	if(self.userLogin.length)
@@ -147,17 +150,15 @@
 		_subtitle = @"";
 
 	if([Settings shared].showCreatedInsteadOfUpdated)
-		_subtitle = [_subtitle stringByAppendingString:[ itemDateFormatter stringFromDate:self.createdAt]];
+		_subtitle = [_subtitle stringByAppendingString:[itemDateFormatter stringFromDate:self.createdAt]];
 	else
-		_subtitle = [_subtitle stringByAppendingString:[ itemDateFormatter stringFromDate:self.updatedAt]];
+		_subtitle = [_subtitle stringByAppendingString:[itemDateFormatter stringFromDate:self.updatedAt]];
 
 	if([Settings shared].showReposInName)
 		_subtitle = [_subtitle stringByAppendingFormat:@"\n%@",self.repoName];
 
 	if(!self.mergeable.boolValue)
-	{
 		_subtitle = [_subtitle stringByAppendingString:@"\nCannot be merged!"];
-	}
 
 	return _subtitle;
 }
