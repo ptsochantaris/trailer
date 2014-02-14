@@ -5,7 +5,9 @@
 
 - (NSString *)sortField;
 
-@property (nonatomic) NSInteger sortMethod, statusFilteringMode;
+@property (nonatomic) NSInteger sortMethod, statusFilteringMode,
+								numberOfRefreshesSinceLastRepoCheck,
+								repoSubscriptionPolicy;
 
 @property (nonatomic) NSArray *statusFilteringTerms;
 

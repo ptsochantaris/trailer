@@ -49,6 +49,7 @@
 @property (weak) IBOutlet NSTokenField *statusTermsField;
 @property (weak) IBOutlet NSButton *moveAssignedPrsToMySection;
 @property (weak) IBOutlet NSButton *markUnmergeableOnUserSectionsOnly;
+@property (weak) IBOutlet NSPopUpButton *repoSubscriptionPolicy;
 
 // Keyboard
 @property (weak) IBOutlet NSButton *hotkeyEnable;

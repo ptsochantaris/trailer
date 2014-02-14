@@ -230,9 +230,9 @@ Server</string>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <button id="eoe-1H-ixD">
-                                            <rect key="frame" x="15" y="7" width="257" height="18"/>
+                                            <rect key="frame" x="15" y="7" width="185" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Display repository names in PR list" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="6nK-Gh-kAV">
+                                            <buttonCell key="cell" type="check" title="Display repos in PR list" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="6nK-Gh-kAV">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -241,9 +241,9 @@ Server</string>
                                             </connections>
                                         </button>
                                         <button id="GOC-8L-GHy">
-                                            <rect key="frame" x="276" y="7" width="287" height="18"/>
+                                            <rect key="frame" x="202" y="7" width="184" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Include repository names when filtering" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="77a-Wc-eM3">
+                                            <buttonCell key="cell" type="check" title="Filtering includes repos" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="77a-Wc-eM3">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -251,6 +251,24 @@ Server</string>
                                                 <action selector="includeRepositoriesInfilterSelected:" target="494" id="Tkz-zX-f6p"/>
                                             </connections>
                                         </button>
+                                        <popUpButton verticalHuggingPriority="750" id="4dF-UG-TAj">
+                                            <rect key="frame" x="454" y="2" width="276" height="26"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="Dfl-to-v8n">
+                                                <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                                <menu key="menu" title="OtherViews" id="M1z-nd-dWe">
+                                                    <items>
+                                                        <menuItem title="Do not auto-subscribe to new repos" id="Vd8-vn-Osu"/>
+                                                        <menuItem title="Auto-subscribe to new parent repos" id="idH-2B-ttG"/>
+                                                        <menuItem title="Auto-subscribe to all new repos" id="KTi-Xw-N0H"/>
+                                                    </items>
+                                                </menu>
+                                            </popUpButtonCell>
+                                            <connections>
+                                                <action selector="repoSubscriptionPolicySelected:" target="494" id="SUN-Fp-bv8"/>
+                                            </connections>
+                                        </popUpButton>
                                     </subviews>
                                 </view>
                             </tabViewItem>
@@ -721,6 +739,7 @@ This feature is available on OS X Mavericks onwards</string>
                 <outlet property="refreshDurationStepper" destination="Tbh-2L-zvn" id="Sq1-ai-4BZ"/>
                 <outlet property="refreshNow" destination="asb-Mc-b5c" id="aSx-vn-F0X"/>
                 <outlet property="repoFilter" destination="pEa-FD-K1R" id="bxl-Ii-j5p"/>
+                <outlet property="repoSubscriptionPolicy" destination="4dF-UG-TAj" id="3jQ-45-VZd"/>
                 <outlet property="selectAll" destination="2jy-CL-3Vb" id="2lW-dU-CAb"/>
                 <outlet property="selectParents" destination="hyy-ox-ZhU" id="nct-Rp-kly"/>
                 <outlet property="showAllComments" destination="CPe-TS-qPS" id="gmg-D0-MUO"/>

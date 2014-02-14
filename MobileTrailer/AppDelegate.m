@@ -338,6 +338,11 @@ CGFloat GLOBAL_SCREEN_SCALE;
 			notification.alertBody = [NSString stringWithFormat:@"PR Closed: %@",[item title]];
 			break;
 		}
+		case kNewRepoSubscribed:
+		{
+			notification.alertBody = [NSString stringWithFormat:@"New Repo Subscribed: %@",[item fullName]];
+			break;
+		}
 	}
 
     [[UIApplication sharedApplication] presentLocalNotificationNow:notification];

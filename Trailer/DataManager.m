@@ -278,6 +278,8 @@
 		case kPrClosed:
 		case kPrMerged:
 			return @{NOTIFICATION_URL_KEY:[item webUrl], PULL_REQUEST_ID_KEY:[item serverId]};
+		case kNewRepoSubscribed:
+			return @{NOTIFICATION_URL_KEY:[item webUrl] };
 		default:
 			return nil;
 	}

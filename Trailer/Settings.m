@@ -118,6 +118,11 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#define NUMBER_REFRESHES_SINCE_REPO_CHECK @"NUMBER_REFRESHES_SINCE_REPO_CHECK"
+-(NSInteger)numberOfRefreshesSinceLastRepoCheck { return [[[NSUserDefaults standardUserDefaults] objectForKey:NUMBER_REFRESHES_SINCE_REPO_CHECK] integerValue]; }
+-(void)setNumberOfRefreshesSinceLastRepoCheck:(NSInteger)numberOfRefreshesSinceLastRepoCheck { [self storeDefaultValue:@(numberOfRefreshesSinceLastRepoCheck) forKey:NUMBER_REFRESHES_SINCE_REPO_CHECK]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #define SORT_METHOD_KEY @"SORT_METHOD_KEY"
 -(NSInteger)sortMethod { return [[[NSUserDefaults standardUserDefaults] objectForKey:SORT_METHOD_KEY] integerValue]; }
 -(void)setSortMethod:(NSInteger)sortMethod { [self storeDefaultValue:@(sortMethod) forKey:SORT_METHOD_KEY]; }
@@ -229,6 +234,12 @@
 #define HOTKEY_ENABLE @"HOTKEY_ENABLE"
 -(void)setHotkeyEnable:(BOOL)hotkeyEnable { [self storeDefaultValue:@(hotkeyEnable) forKey:HOTKEY_ENABLE]; }
 -(BOOL)hotkeyEnable { return [[[NSUserDefaults standardUserDefaults] stringForKey:HOTKEY_ENABLE] boolValue]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define REPO_SUBSCRIPTION_POLICY @"REPO_SUBSCRIPTION_POLICY"
+-(NSInteger)repoSubscriptionPolicy { return [[[NSUserDefaults standardUserDefaults] stringForKey:REPO_SUBSCRIPTION_POLICY] integerValue]; }
+-(void)setRepoSubscriptionPolicy:(NSInteger)repoSubscriptionPolicy { [self storeDefaultValue:@(repoSubscriptionPolicy) forKey:REPO_SUBSCRIPTION_POLICY]; }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

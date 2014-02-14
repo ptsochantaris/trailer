@@ -144,8 +144,14 @@ static NSDateFormatter *itemDateFormatter;
 {
 	NSString *_subtitle;
 
+#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
+	#define SEPARATOR @"\n"
+#else
+	#define SEPARATOR @" - "
+#endif
+
 	if(self.userLogin.length)
-		_subtitle = [NSString stringWithFormat:@"%@\n",self.userLogin];
+		_subtitle = [NSString stringWithFormat:@"%@%@",self.userLogin,SEPARATOR];
 	else
 		_subtitle = @"";
 
@@ -155,10 +161,12 @@ static NSDateFormatter *itemDateFormatter;
 		_subtitle = [_subtitle stringByAppendingString:[itemDateFormatter stringFromDate:self.updatedAt]];
 
 	if([Settings shared].showReposInName)
-		_subtitle = [_subtitle stringByAppendingFormat:@"\n%@",self.repoName];
+		_subtitle = [_subtitle stringByAppendingFormat:@"%@%@",SEPARATOR,self.repoName];
 
+#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
 	if(!self.mergeable.boolValue)
 		_subtitle = [_subtitle stringByAppendingString:@"\nCannot be merged!"];
+#endif
 
 	return _subtitle;
 }

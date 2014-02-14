@@ -416,18 +416,42 @@ typedef void (^completionBlockType)(BOOL);
 	  }];
 }
 
--(void)fetchPullRequestsForActiveReposAndCallback:(void(^)(BOOL success))callback
+- (void)fetchPullRequestsForActiveReposAndCallback:(void(^)(BOOL success))callback
 {
+	[Settings shared].numberOfRefreshesSinceLastRepoCheck ++;
 	[self syncUserDetailsAndCallback:^(BOOL success) {
 		if(success)
 		{
-			NSManagedObjectContext *syncContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSConfinementConcurrencyType];
-			syncContext.parentContext = [AppDelegate shared].dataManager.managedObjectContext;
-			syncContext.undoManager = nil;
-
-			[self syncToMoc:syncContext andCallback:callback];
+			[self autoSubscribeToReposAndCallback:^{
+				NSManagedObjectContext *syncContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSConfinementConcurrencyType];
+				syncContext.parentContext = [AppDelegate shared].dataManager.managedObjectContext;
+				syncContext.undoManager = nil;
+				[self syncToMoc:syncContext andCallback:callback];
+			}];
 		}
 		else if(callback) callback(NO);
+	}];
+}
+
+- (void)autoSubscribeToReposAndCallback:(void(^)())callback
+{
+	if([Settings shared].repoSubscriptionPolicy == kRepoAutoSubscribeNone) if(callback) callback();
+
+	if([Settings shared].numberOfRefreshesSinceLastRepoCheck < 100) if(callback) callback();
+
+	[self fetchRepositoriesAndCallback:^(BOOL success) {
+		if(success)
+		{
+			BOOL parentsOnly = ([Settings shared].repoSubscriptionPolicy == kRepoAutoSubscribeParentsOnly);
+			NSManagedObjectContext *moc = [AppDelegate shared].dataManager.managedObjectContext;
+			for(Repo *r in [Repo newItemsOfType:@"Repo" inMoc:moc])
+			{
+				if(parentsOnly && r.fork.boolValue) continue;
+				r.active = @YES;
+				[[AppDelegate shared] postNotificationOfType:kNewRepoSubscribed forItem:r];
+			}
+		}
+		if(callback) callback();
 	}];
 }
 
@@ -541,6 +565,7 @@ typedef void (^completionBlockType)(BOOL);
 					 [Repo repoWithInfo:info moc:moc];
 				 }
 			 } finalCallback:^(BOOL success, NSInteger resultCode) {
+				 if(success) [Settings shared].numberOfRefreshesSinceLastRepoCheck = 0;
 				 if(callback) callback(success);
 			 }];
 }

@@ -40,8 +40,8 @@ static AppDelegate *_static_shared_ref;
 	[self setupSortMethodMenu];
 
 	// ONLY FOR DEBUG!
-	//NSArray *allPRs = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.dataManager.managedObjectContext];
-    //[[allPRs objectAtIndex:0] setMergeable:@NO];
+	//NSArray *allRepos = [PullRequest allItemsOfType:@"Repo" inMoc:self.dataManager.managedObjectContext];
+    //[self.dataManager.managedObjectContext deleteObject:[allRepos objectAtIndex:0]];
 
 	[self.dataManager postProcessAllPrs];
 	[self updateScrollBarWidth]; // also updates menu
@@ -105,6 +105,11 @@ static AppDelegate *_static_shared_ref;
 	}
 	self.sortModeSelect.menu = m;
 	[self.sortModeSelect selectItemAtIndex:[Settings shared].sortMethod];
+}
+
+- (IBAction)repoSubscriptionPolicySelected:(NSPopUpButton *)sender
+{
+	[Settings shared].repoSubscriptionPolicy = sender.indexOfSelectedItem;
 }
 
 - (IBAction)dontConfirmRemoveAllMergedSelected:(NSButton *)sender
@@ -353,6 +358,12 @@ static AppDelegate *_static_shared_ref;
 		{
 			notification.title = @"PR Closed";
 			notification.subtitle = [item title];
+			break;
+		}
+		case kNewRepoSubscribed:
+		{
+			notification.title = @"New Repo Subscribed";
+			notification.subtitle = [item fullName];
 			break;
 		}
 	}
@@ -765,6 +776,8 @@ static AppDelegate *_static_shared_ref;
 	[self updateStatusTermPreferenceControls];
 
 	[self.sortModeSelect selectItemAtIndex:[Settings shared].sortMethod];
+
+	[self.repoSubscriptionPolicy selectItemAtIndex:[Settings shared].repoSubscriptionPolicy];
 
 	self.launchAtStartup.integerValue = [self isAppLoginItem];
 	self.hideAllPrsSection.integerValue = [Settings shared].hideAllPrsSection;
