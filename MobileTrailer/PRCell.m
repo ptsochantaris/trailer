@@ -2,7 +2,7 @@
 @interface PRCell ()
 {
 	UILabel *unreadCount, *readCount;
-    NSString *failedToLoadImage;
+    NSString *failedToLoadImage, *waitingForImageInPath;
 }
 @end
 
@@ -89,21 +89,29 @@ static NSNumberFormatter *itemCountFormatter;
 
 - (void)loadImageAtPath:(NSString *)imagePath
 {
+	waitingForImageInPath = imagePath;
     if(![[AppDelegate shared].api haveCachedImage:imagePath
                                           forSize:CGSizeMake(40, 40)
                                tryLoadAndCallback:^(id image) {
-                                   if(image)
-                                   {
-                                       self.imageView.image = image;
-                                       failedToLoadImage = nil;
-                                   }
-                                   else
-                                   {
-                                       self.imageView.image = [UIImage imageNamed:@"avatarPlaceHolder"];
-                                       failedToLoadImage = imagePath;
-                                   }
+								   if([waitingForImageInPath isEqualToString:imagePath])
+								   {
+									   if(image)
+									   {
+										   // image loaded
+										   self.imageView.image = image;
+										   failedToLoadImage = nil;
+									   }
+									   else
+									   {
+										   // load failed / no image
+										   self.imageView.image = [UIImage imageNamed:@"avatarPlaceHolder"];
+										   failedToLoadImage = imagePath;
+									   }
+									   waitingForImageInPath = nil;
+								   }
                                }])
     {
+		// prepare UI for over-the-network load
         self.imageView.image = [UIImage imageNamed:@"avatarPlaceHolder"];
         failedToLoadImage = nil;
     }
@@ -112,6 +120,9 @@ static NSNumberFormatter *itemCountFormatter;
 - (void)layoutSubviews
 {
 	[super layoutSubviews];
+
+	self.imageView.contentMode = UIViewContentModeCenter;
+	self.imageView.clipsToBounds = YES;
 
 	CGPoint topLeft = CGPointMake(self.imageView.frame.origin.x, self.imageView.frame.origin.y);
 	unreadCount.center = topLeft;
