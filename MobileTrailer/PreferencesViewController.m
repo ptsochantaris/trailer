@@ -95,9 +95,7 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 {
 	[AppDelegate shared].preferencesDirty = YES;
 	[AppDelegate shared].lastSuccessfulRefresh = nil;
-	[DataItem deleteAllObjectsInContext:[AppDelegate shared].dataManager.managedObjectContext
-							 usingModel:[AppDelegate shared].dataManager.managedObjectModel];
-	[[AppDelegate shared].dataManager saveDB];
+	[[AppDelegate shared].dataManager deleteEverything];
 }
 
 - (IBAction)ipadLoadRepos:(UIBarButtonItem *)sender

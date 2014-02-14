@@ -744,8 +744,7 @@ static AppDelegate *_static_shared_ref;
 {
 	self.preferencesDirty = YES;
 	self.lastSuccessfulRefresh = nil;
-	[DataItem deleteAllObjectsInContext:self.dataManager.managedObjectContext
-							 usingModel:self.dataManager.managedObjectModel];
+	[self.dataManager deleteEverything];
 	[self.projectsTable reloadData];
 	[self updateMenu];
 }

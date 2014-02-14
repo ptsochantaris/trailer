@@ -911,7 +911,7 @@ typedef void (^completionBlockType)(BOOL);
                            currentAppVersion] md5hash];
 
 #ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
-    NSString *imagePath = [cacheDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"imgcache-%@-%d", imageKey, (NSInteger)GLOBAL_SCREEN_SCALE]];
+    NSString *imagePath = [cacheDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"imgcache-%@-%ld", imageKey, (long)GLOBAL_SCREEN_SCALE]];
 #else
     NSString *imagePath = [cacheDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"imgcache-%@", imageKey]];
 #endif

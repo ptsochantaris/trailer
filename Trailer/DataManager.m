@@ -187,8 +187,10 @@
 	NSPersistentStore *store = [coordinator addPersistentStoreWithType:NSSQLiteStoreType
 														 configuration:nil
 																   URL:sqlStore
-															   options:@{ NSMigratePersistentStoresAutomaticallyOption: @YES,
-																		  NSInferMappingModelAutomaticallyOption: @YES }
+															   options:@{ NSMigratePersistentStoresAutomaticallyOption:@YES,
+																		  NSInferMappingModelAutomaticallyOption:@YES,
+																		  NSSQLitePragmasOption:@{ @"synchronous":@"OFF",
+																								   @"fullfsync":@"0" } }
 																 error:&error];
 	if(error) DLog(@"%@",error);
 	return store!=nil;
@@ -233,9 +235,35 @@
 
 - (BOOL)saveDB
 {
-	if(self.managedObjectContext.hasChanges)
-		return [self.managedObjectContext save:nil];
+	if(_managedObjectContext.hasChanges)
+		return [_managedObjectContext save:nil];
 	return YES;
+}
+
+- (void)deleteEverything
+{
+	@autoreleasepool
+	{
+		NSManagedObjectContext *tempMoc = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
+		tempMoc.parentContext = self.managedObjectContext;
+		tempMoc.undoManager = nil;
+
+		for (NSString *entityName in self.managedObjectModel.entitiesByName)
+		{
+			@autoreleasepool
+			{
+				NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:entityName];
+				fetchRequest.includesPropertyValues = NO;
+				fetchRequest.includesSubentities = NO;
+
+				for (NSManagedObject *managedObject in [tempMoc executeFetchRequest:fetchRequest error:nil])
+					[tempMoc deleteObject:managedObject];
+			}
+		}
+
+		[tempMoc save:nil];
+	}
+	[self saveDB];
 }
 
 - (NSDictionary *)infoForType:(PRNotificationType)type item:(id)item
