@@ -15,12 +15,12 @@
 				<li>More preferences tidying</li>
 				<li>Various fixes and optimizations</li>
 				</ul></font>]]></description>
-			<pubDate>Sat, 15 Feb 2014 09:00:00 +0000</pubDate>
+			<pubDate>Sat, 15 Feb 2014 09:20:00 +0000</pubDate>
 			<enclosure
 			url="http://dev.housetrip.com/trailer/trailer1014.zip"
-			sparkle:version="1107"
+			sparkle:version="1109"
 			sparkle:shortVersionString="1.0.14"
-			sparkle:dsaSignature="MCwCFECC02evQzOd89SQqygZ1nmc/My/AhQxFBkOJWb+puTFSiS4CjdaBxuwNw=="
+			sparkle:dsaSignature="MCwCFHhrUCSqou+tMgKqhpBJLSdbSjMUAhRD6AUvkE5jrnV5qUngHuGZFDCRnw=="
 			type="application/octet-stream"/>
 		</item>
 
