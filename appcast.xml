@@ -7,6 +7,24 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.0.14</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Option to auto-subscribe to new repositories</li>
+				<li>Option-click opens items in background without closing the menu</li>
+				<li>Improvements and cleanups to keyboard navigation</li>
+				<li>More preferences tidying</li>
+				<li>Various fixes and optimizations</li>
+				</ul></font>]]></description>
+			<pubDate>Sat, 15 Feb 2014 09:00:00 +0000</pubDate>
+			<enclosure
+			url="http://dev.housetrip.com/trailer/trailer1014.zip"
+			sparkle:version="1107"
+			sparkle:shortVersionString="1.0.14"
+			sparkle:dsaSignature="MCwCFECC02evQzOd89SQqygZ1nmc/My/AhQxFBkOJWb+puTFSiS4CjdaBxuwNw=="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.0.13</title>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
 				<li><b>Important fix for PR refreshing, as well as the changes from 1.0.12:</b></li>
@@ -30,6 +48,7 @@
 		<item>
 			<title>Version 1.0.12</title>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li><b>Please note this build is broken, use 1.0.13 instead</b></li>
 				<li>Mac OS X 10.8 support</li>
 				<li>Assigned PRs support</li>
 				<li>Option to limit un-mergeable warnings to own/participated PRs</li>
