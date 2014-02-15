@@ -245,6 +245,7 @@ typedef void (^completionBlockType)(BOOL);
 							{
 								[DataItem nukeDeletedItemsOfType:@"Repo" inMoc:syncContext];
 								[DataItem nukeDeletedItemsOfType:@"Org" inMoc:syncContext];
+								[AppDelegate shared].lastRepoCheck = [NSDate date];
 							}
 							else
 							{
