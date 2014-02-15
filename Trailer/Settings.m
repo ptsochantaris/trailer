@@ -300,7 +300,8 @@
 -(NSString *)apiFrontEnd
 {
 	NSString *value = [[NSUserDefaults standardUserDefaults] stringForKey:API_FRONTEND_SERVER];
-	if(!value) value = @"github.com";
+	value = [value stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	if(value.length==0) value = @"github.com";
 	return value;
 }
 -(void)setApiFrontEnd:(NSString *)apiFrontEnd { [self storeDefaultValue:apiFrontEnd forKey:API_FRONTEND_SERVER]; }
@@ -311,7 +312,8 @@
 -(NSString *)apiBackEnd
 {
 	NSString *value = [[NSUserDefaults standardUserDefaults] stringForKey:API_BACKEND_SERVER];
-	if(!value) value = @"api.github.com";
+	value = [value stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	if(value.length==0) value = @"api.github.com";
 	return value;
 }
 -(void)setApiBackEnd:(NSString *)apiBackEnd
@@ -330,7 +332,8 @@
 -(NSString *)apiPath
 {
 	NSString *value = [[NSUserDefaults standardUserDefaults] stringForKey:API_SERVER_PATH];
-	if(!value) value = @"";
+	value = [value stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	if(value.length==0) value = @"";
 	return value;
 }
 -(void)setApiPath:(NSString *)apiPath

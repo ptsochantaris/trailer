@@ -39,6 +39,13 @@
 #define SORT_NORMAL @[@"Oldest first",@"Inactive for longest",@"Alphabetically"]
 #define AUTO_SUBSCRIPTION @[@"None",@"Parents",@"All"]
 
+NSString *B(NSString *input)
+{
+	if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+		input = [input stringByReplacingOccurrencesOfString:@"\n" withString:@" "];
+	return input;
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell"];
@@ -49,29 +56,19 @@
 		{
 			case 0:
 			{
-				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-					cell.textLabel.text = [NSString stringWithFormat:@"Foreground refresh interval"];
-				else
-					cell.textLabel.text = [NSString stringWithFormat:@"Foreground refresh\ninterval"];
-
+				cell.textLabel.text = B(@"Foreground refresh\ninterval");
 				cell.detailTextLabel.text = [NSString stringWithFormat:@"%.0f seconds",[Settings shared].refreshPeriod];
 				break;
 			}
 			case 1:
 			{
-				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-					cell.textLabel.text = [NSString stringWithFormat:@"Background refresh interval (minimum)"];
-				else
-					cell.textLabel.text = [NSString stringWithFormat:@"Background refresh\ninterval (minimum)"];
+				cell.textLabel.text = B(@"Background refresh\ninterval (minimum)");
 				cell.detailTextLabel.text = [NSString stringWithFormat:@"%.0f minutes",[Settings shared].backgroundRefreshPeriod/60.0];
 				break;
 			}
 			case 2:
 			{
-				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-					cell.textLabel.text = [NSString stringWithFormat:@"Refresh repositories interval"];
-				else
-					cell.textLabel.text = [NSString stringWithFormat:@"Refresh repositories\ninterval"];
+				cell.textLabel.text = B(@"Repository refresh\ninterval");
 				cell.detailTextLabel.text = [NSString stringWithFormat:@"%.0f hours",[Settings shared].newRepoCheckPeriod];
 				break;
 			}
@@ -84,31 +81,34 @@
 		{
 			case 0:
 			{
-				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-					cell.textLabel.text = [NSString stringWithFormat:@"Display creation instead of activity times"];
-				else
-					cell.textLabel.text = [NSString stringWithFormat:@"Display creation instead\nof activity times"];
+				cell.textLabel.text = B(@"Display creation instead\nof activity times");
 				if([Settings shared].showCreatedInsteadOfUpdated) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
 			case 1:
             {
-				cell.textLabel.text = [NSString stringWithFormat:@"Don't report refresh failures"];
+				cell.textLabel.text = @"Don't report refresh failures";
 				if([Settings shared].dontReportRefreshFailures) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
             }
 			case 2:
             {
-				cell.textLabel.text = [NSString stringWithFormat:@"Hide 'All PRs' section"];
+				cell.textLabel.text = @"Hide 'All PRs' section";
 				if([Settings shared].hideAllPrsSection) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
             }
 			case 3:
             {
-				cell.textLabel.text = [NSString stringWithFormat:@"Move assigned PRs to 'Mine'"];
+				cell.textLabel.text = @"Move assigned PRs to 'Mine'";
 				if([Settings shared].moveAssignedPrsToMySection) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
             }
+			case 4:
+			{
+				cell.textLabel.text = B(@"Announce unmergeable PRs only\nin 'Mine'/'Participated'");
+				if([Settings shared].markUnmergeableOnUserSectionsOnly) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				break;
+			}
 		}
 	}
 	else if(indexPath.section==COMMENTS_SECTION_INDEX)
@@ -118,28 +118,19 @@
 		{
 			case 0:
 			{
-				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-					cell.textLabel.text = [NSString stringWithFormat:@"Display comment badges and alerts for all PRs"];
-				else
-					cell.textLabel.text = [NSString stringWithFormat:@"Display comment badges\nand alerts for all PRs"];
+				cell.textLabel.text = B(@"Display comment badges\nand alerts for all PRs");
 				if([Settings shared].showCommentsEverywhere) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
 			case 1:
 			{
-				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-					cell.textLabel.text = [NSString stringWithFormat:@"Only display PRs with unread comments"];
-				else
-					cell.textLabel.text = [NSString stringWithFormat:@"Only display PRs\nwith unread comments"];
+				cell.textLabel.text = B(@"Only display PRs\nwith unread comments");
 				if([Settings shared].shouldHideUncommentedRequests) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
 			case 2:
 			{
-				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-					cell.textLabel.text = [NSString stringWithFormat:@"Move PRs that mention me to 'Participated'"];
-				else
-					cell.textLabel.text = [NSString stringWithFormat:@"Move PRs that mention me\nto 'Participated'"];
+				cell.textLabel.text = B(@"Move PRs that mention me\nto 'Participated'");
 				if([Settings shared].autoParticipateInMentions) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
@@ -152,25 +143,19 @@
 		{
 			case 0:
             {
-				cell.textLabel.text = [NSString stringWithFormat:@"Display repository names"];
+				cell.textLabel.text = @"Display repository names";
 				if([Settings shared].showReposInName) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
             }
 			case 1:
             {
-				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-					cell.textLabel.text = [NSString stringWithFormat:@"Include repositories in filtering"];
-				else
-					cell.textLabel.text = [NSString stringWithFormat:@"Include repositories in\nfiltering"];
+				cell.textLabel.text = B(@"Include repositories in\nfiltering");
 				if([Settings shared].includeReposInFilter) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
             }
             case 2:
             {
-				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-					cell.textLabel.text = [NSString stringWithFormat:@"Auto subscribe to new repositories"];
-				else
-					cell.textLabel.text = [NSString stringWithFormat:@"Auto subscribe to new\nrepositories"];
+				cell.textLabel.text = B(@"Auto subscribe to new\nrepositories");
                 cell.detailTextLabel.text = AUTO_SUBSCRIPTION[[Settings shared].repoSubscriptionPolicy];
                 break;
             }
@@ -183,16 +168,13 @@
 		{
 			case 0:
 			{
-				cell.textLabel.text = [NSString stringWithFormat:@"Keep closed PRs"];
+				cell.textLabel.text = @"Keep closed PRs";
 				if([Settings shared].alsoKeepClosedPrs) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
 			case 1:
 			{
-				if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-					cell.textLabel.text = [NSString stringWithFormat:@"Don't keep PRs merged by me"];
-				else
-					cell.textLabel.text = [NSString stringWithFormat:@"Don't keep PRs merged\nby me"];
+				cell.textLabel.text = B(@"Don't keep PRs merged\nby me");
 				if([Settings shared].dontKeepMyPrs) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
@@ -205,13 +187,13 @@
 		{
 			case 0:
             {
-				cell.textLabel.text = [NSString stringWithFormat:@"Removing all merged PRs"];
+				cell.textLabel.text = @"Removing all merged PRs";
 				if([Settings shared].dontAskBeforeWipingMerged) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
             }
             case 1:
             {
-				cell.textLabel.text = [NSString stringWithFormat:@"Removing all closed PRs"];
+				cell.textLabel.text = @"Removing all closed PRs";
 				if([Settings shared].dontAskBeforeWipingClosed) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
             }
@@ -224,7 +206,7 @@
 		{
 			case 0:
 			{
-				cell.textLabel.text = [NSString stringWithFormat:@"Direction"];
+				cell.textLabel.text = @"Direction";
 				if([Settings shared].sortDescending)
 					cell.detailTextLabel.text = @"Reverse";
 				else
@@ -233,7 +215,7 @@
 			}
 			case 1:
 			{
-				cell.textLabel.text = [NSString stringWithFormat:@"Criterion"];
+				cell.textLabel.text = @"Criterion";
 				if([Settings shared].sortDescending)
 					cell.detailTextLabel.text = SORT_REVERSE[[Settings shared].sortMethod];
 				else
@@ -242,7 +224,7 @@
 			}
 			case 2:
 			{
-				cell.textLabel.text = [NSString stringWithFormat:@"Group by repository"];
+				cell.textLabel.text = @"Group by repository";
 				if([Settings shared].groupByRepo) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
@@ -328,6 +310,11 @@
 			case 3:
 			{
 				[Settings shared].moveAssignedPrsToMySection = ![Settings shared].moveAssignedPrsToMySection;
+				break;
+			}
+			case 4:
+			{
+				[Settings shared].markUnmergeableOnUserSectionsOnly = ![Settings shared].markUnmergeableOnUserSectionsOnly;
 				break;
 			}
 		}
@@ -457,7 +444,7 @@
 {
     switch (section) {
 		case REFRESH_SECTION_INDEX: return 3;
-		case DISPLAY_SECTION_INDEX: return 4;
+		case DISPLAY_SECTION_INDEX: return 5;
 		case COMMENTS_SECTION_INDEX: return 3;
 		case REPOS_SECTION_INDEX: return 3;
 		case MERGING_SECTION_INDEX: return 2;

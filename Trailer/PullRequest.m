@@ -120,9 +120,15 @@ static NSDateFormatter *itemDateFormatter;
 {
 	if(!self.mergeable.boolValue)
 	{
-		if(self.sectionIndex.integerValue == kPullRequestSectionAll &&
+		NSInteger section = self.sectionIndex.integerValue;
+
+		if(section == kPullRequestConditionClosed || section == kPullRequestConditionMerged)
+			return NO;
+
+		if(section == kPullRequestSectionAll &&
 		   [Settings shared].markUnmergeableOnUserSectionsOnly)
 			return NO;
+
 		return YES;
 	}
 	return NO;
