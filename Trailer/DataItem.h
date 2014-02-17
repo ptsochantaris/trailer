@@ -28,9 +28,4 @@ enum PostSyncAction {
 
 +(NSArray*)itemsOfType:(NSString *)type surviving:(BOOL)survivingItems inMoc:(NSManagedObjectContext *)moc;
 
-+ (void)deleteAllObjectsInContext:(NSManagedObjectContext *)context
-                       usingModel:(NSManagedObjectModel *)model;
-
-+ (void)deleteAllObjectsWithEntityName:(NSString *)entityName
-                             inContext:(NSManagedObjectContext *)context;
 @end

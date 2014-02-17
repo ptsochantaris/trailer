@@ -2,7 +2,7 @@
 @interface API ()
 {
 	NSOperationQueue *requestQueue;
-	NSDateFormatter *dateFormatter;
+	NSDateFormatter *dateFormatter, *mediumFormatter;
     NSString *cacheDirectory;
 #ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
 	NSInteger networkIndicationCount;
@@ -34,6 +34,10 @@ typedef void (^completionBlockType)(BOOL);
 
 		dateFormatter = [[NSDateFormatter alloc] init];
 		dateFormatter.dateFormat = @"YYYY-MM-DDTHH:MM:SSZ";
+
+		mediumFormatter = [[NSDateFormatter alloc] init];
+		mediumFormatter.dateStyle = NSDateFormatterMediumStyle;
+		mediumFormatter.timeStyle = NSDateFormatterMediumStyle;
 
 		requestQueue = [[NSOperationQueue alloc] init];
 		requestQueue.maxConcurrentOperationCount = 8;
@@ -241,6 +245,7 @@ typedef void (^completionBlockType)(BOOL);
 							{
 								[DataItem nukeDeletedItemsOfType:@"Repo" inMoc:syncContext];
 								[DataItem nukeDeletedItemsOfType:@"Org" inMoc:syncContext];
+								[AppDelegate shared].lastRepoCheck = [NSDate date];
 							}
 							else
 							{
@@ -412,18 +417,54 @@ typedef void (^completionBlockType)(BOOL);
 	  }];
 }
 
--(void)fetchPullRequestsForActiveReposAndCallback:(void(^)(BOOL success))callback
+- (void)fetchPullRequestsForActiveReposAndCallback:(void(^)(BOOL success))callback
 {
 	[self syncUserDetailsAndCallback:^(BOOL success) {
 		if(success)
 		{
-			NSManagedObjectContext *syncContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSConfinementConcurrencyType];
-			syncContext.parentContext = [AppDelegate shared].dataManager.managedObjectContext;
-			syncContext.undoManager = nil;
-
-			[self syncToMoc:syncContext andCallback:callback];
+			[self autoSubscribeToReposAndCallback:^{
+				NSManagedObjectContext *syncContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSConfinementConcurrencyType];
+				syncContext.parentContext = [AppDelegate shared].dataManager.managedObjectContext;
+				syncContext.undoManager = nil;
+				[self syncToMoc:syncContext andCallback:callback];
+			}];
 		}
 		else if(callback) callback(NO);
+	}];
+}
+
+- (void)autoSubscribeToReposAndCallback:(void(^)())callback
+{
+	if([AppDelegate shared].lastRepoCheck &&
+	   ([[NSDate date] timeIntervalSinceDate:[AppDelegate shared].lastRepoCheck] < [Settings shared].newRepoCheckPeriod*3600.0))
+	{
+		if(callback) callback();
+		return;
+	}
+
+	[self fetchRepositoriesAndCallback:^(BOOL success) {
+		if(success)
+		{
+			NSManagedObjectContext *moc = [AppDelegate shared].dataManager.managedObjectContext;
+			for(Repo *r in [Repo newItemsOfType:@"Repo" inMoc:moc])
+			{
+				if([Settings shared].repoSubscriptionPolicy == kRepoAutoSubscribeNone)
+				{
+					[[AppDelegate shared] postNotificationOfType:kNewRepoAnnouncement forItem:r];
+				}
+				else if([Settings shared].repoSubscriptionPolicy == kRepoAutoSubscribeParentsOnly)
+				{
+					if(!r.fork.boolValue) r.active = @YES;
+					[[AppDelegate shared] postNotificationOfType:kNewRepoSubscribed forItem:r];
+				}
+				else
+				{
+					r.active = @YES;
+					[[AppDelegate shared] postNotificationOfType:kNewRepoSubscribed forItem:r];
+				}
+			}
+		}
+		if(callback) callback();
 	}];
 }
 
@@ -643,10 +684,7 @@ typedef void (^completionBlockType)(BOOL);
 		  self.requestsLimit = [[response allHeaderFields][@"X-RateLimit-Limit"] floatValue];
 		  float epochSeconds = [[response allHeaderFields][@"X-RateLimit-Reset"] floatValue];
 		  NSDate *date = [NSDate dateWithTimeIntervalSince1970:epochSeconds];
-		  NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-		  formatter.dateStyle = NSDateFormatterMediumStyle;
-		  formatter.timeStyle = NSDateFormatterMediumStyle;
-		  self.resetDate = [formatter stringFromDate:date];
+		  self.resetDate = [mediumFormatter stringFromDate:date];
 		  [[NSNotificationCenter defaultCenter] postNotificationName:RATE_UPDATE_NOTIFICATION
 															  object:nil
 															userInfo:nil];
@@ -910,7 +948,7 @@ typedef void (^completionBlockType)(BOOL);
                            currentAppVersion] md5hash];
 
 #ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
-    NSString *imagePath = [cacheDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"imgcache-%@-%d", imageKey, (NSInteger)GLOBAL_SCREEN_SCALE]];
+    NSString *imagePath = [cacheDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"imgcache-%@-%ld", imageKey, (long)GLOBAL_SCREEN_SCALE]];
 #else
     NSString *imagePath = [cacheDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"imgcache-%@", imageKey]];
 #endif

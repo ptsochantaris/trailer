@@ -106,31 +106,4 @@ static NSDateFormatter *_syncDateFormatter;
 	return [moc countForFetchRequest:f error:nil];
 }
 
-+ (void)deleteAllObjectsInContext:(NSManagedObjectContext *)context
-                       usingModel:(NSManagedObjectModel *)model
-{
-    NSArray *entities = model.entities;
-    for (NSEntityDescription *entityDescription in entities) {
-        [self deleteAllObjectsWithEntityName:entityDescription.name
-                                   inContext:context];
-    }
-}
-
-+ (void)deleteAllObjectsWithEntityName:(NSString *)entityName
-                             inContext:(NSManagedObjectContext *)context
-{
-    NSFetchRequest *fetchRequest =
-	[NSFetchRequest fetchRequestWithEntityName:entityName];
-    fetchRequest.includesPropertyValues = NO;
-    fetchRequest.includesSubentities = NO;
-
-    NSError *error;
-    NSArray *items = [context executeFetchRequest:fetchRequest error:&error];
-
-    for (NSManagedObject *managedObject in items) {
-        [context deleteObject:managedObject];
-        DLog(@"Deleted %@", entityName);
-    }
-}
-
 @end

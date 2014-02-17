@@ -7,7 +7,9 @@ typedef enum {
 	kNewPr = 1,
 	kPrMerged = 2,
 	kNewMention = 4,
-	kPrClosed = 5
+	kPrClosed = 5,
+	kNewRepoSubscribed = 6,
+	kNewRepoAnnouncement = 7
 } PRNotificationType;
 
 typedef enum {
@@ -16,6 +18,12 @@ typedef enum {
 	kTitle = 2,
 	kRepository = 3
 } PRSortingMethod;
+
+typedef enum {
+	kRepoAutoSubscribeNone = 0,
+	kRepoAutoSubscribeParentsOnly = 1,
+	kRepoDontAutoSubscribeAll = 2,
+} PRSubscriptionPolicy;
 
 #define PULL_REQUEST_ID_KEY @"pullRequestIdKey"
 #define COMMENT_ID_KEY @"commentIdKey"

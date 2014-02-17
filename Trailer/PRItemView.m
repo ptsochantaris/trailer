@@ -173,7 +173,7 @@ static CGColorRef _highlightColor;
 
 			PRStatus *status = statuses[count];
 			statusLabel.targetUrl = status.targetUrl;
-			statusLabel.needsAlt = ![Settings shared].makeStatusItemsSelectable;
+			statusLabel.needsCommand = ![Settings shared].makeStatusItemsSelectable;
 			statusLabel.attributedStringValue = [[NSAttributedString alloc] initWithString:status.displayText
 																				attributes:_statusAttributes];
 			statusLabel.textColor = status.colorForDisplay;
@@ -228,7 +228,8 @@ static CGColorRef _highlightColor;
 
 - (void)mouseDown:(NSEvent*) event
 {
-	[self.delegate prItemSelected:self];
+	BOOL isAlternative = ((event.modifierFlags & NSAlternateKeyMask) == NSAlternateKeyMask);
+	[self.delegate prItemSelected:self alternativeSelect:isAlternative];
 }
 
 - (void)updateTrackingAreas

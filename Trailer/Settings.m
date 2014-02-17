@@ -76,6 +76,21 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#define NEW_REPO_CHECK_PERIOD @"NEW_REPO_CHECK_PERIOD"
+-(float)newRepoCheckPeriod
+{
+	float period = [[NSUserDefaults standardUserDefaults] floatForKey:NEW_REPO_CHECK_PERIOD];
+	if(period==0)
+	{
+		period = 2;
+		self.newRepoCheckPeriod = period;
+	}
+	return period;
+}
+-(void)setNewRepoCheckPeriod:(float)newRepoCheckPeriod { [[NSUserDefaults standardUserDefaults] setFloat:newRepoCheckPeriod forKey:NEW_REPO_CHECK_PERIOD]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #define GITHUB_TOKEN_KEY @"GITHUB_AUTH_TOKEN"
 -(NSString*)authToken { return [[NSUserDefaults standardUserDefaults] stringForKey:GITHUB_TOKEN_KEY]; }
 -(void)setAuthToken:(NSString *)authToken { [self storeDefaultValue:authToken forKey:GITHUB_TOKEN_KEY]; }
@@ -117,7 +132,6 @@
 -(void)setShowCreatedInsteadOfUpdated:(BOOL)showCreatedInsteadOfUpdated { [self storeDefaultValue:@(showCreatedInsteadOfUpdated) forKey:SHOW_UPDATED_KEY]; }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 #define SORT_METHOD_KEY @"SORT_METHOD_KEY"
 -(NSInteger)sortMethod { return [[[NSUserDefaults standardUserDefaults] objectForKey:SORT_METHOD_KEY] integerValue]; }
 -(void)setSortMethod:(NSInteger)sortMethod { [self storeDefaultValue:@(sortMethod) forKey:SORT_METHOD_KEY]; }
@@ -232,6 +246,12 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#define REPO_SUBSCRIPTION_POLICY @"REPO_SUBSCRIPTION_POLICY"
+-(NSInteger)repoSubscriptionPolicy { return [[[NSUserDefaults standardUserDefaults] stringForKey:REPO_SUBSCRIPTION_POLICY] integerValue]; }
+-(void)setRepoSubscriptionPolicy:(NSInteger)repoSubscriptionPolicy { [self storeDefaultValue:@(repoSubscriptionPolicy) forKey:REPO_SUBSCRIPTION_POLICY]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #define HOTKEY_COMMAND_MODIFIER @"HOTKEY_COMMAND_MODIFIER"
 -(void)setHotkeyCommandModifier:(BOOL)hotkeyCommandModifier { [self storeDefaultValue:@(hotkeyCommandModifier) forKey:HOTKEY_COMMAND_MODIFIER]; }
 -(BOOL)hotkeyCommandModifier
@@ -280,7 +300,8 @@
 -(NSString *)apiFrontEnd
 {
 	NSString *value = [[NSUserDefaults standardUserDefaults] stringForKey:API_FRONTEND_SERVER];
-	if(!value) value = @"github.com";
+	value = [value stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	if(value.length==0) value = @"github.com";
 	return value;
 }
 -(void)setApiFrontEnd:(NSString *)apiFrontEnd { [self storeDefaultValue:apiFrontEnd forKey:API_FRONTEND_SERVER]; }
@@ -291,7 +312,8 @@
 -(NSString *)apiBackEnd
 {
 	NSString *value = [[NSUserDefaults standardUserDefaults] stringForKey:API_BACKEND_SERVER];
-	if(!value) value = @"api.github.com";
+	value = [value stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	if(value.length==0) value = @"api.github.com";
 	return value;
 }
 -(void)setApiBackEnd:(NSString *)apiBackEnd
@@ -310,7 +332,8 @@
 -(NSString *)apiPath
 {
 	NSString *value = [[NSUserDefaults standardUserDefaults] stringForKey:API_SERVER_PATH];
-	if(!value) value = @"";
+	value = [value stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	if(value.length==0) value = @"";
 	return value;
 }
 -(void)setApiPath:(NSString *)apiPath

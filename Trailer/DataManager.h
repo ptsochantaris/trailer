@@ -11,6 +11,8 @@
 
 - (void)sendNotifications;
 
+- (void)deleteEverything;
+
 - (NSDictionary *)infoForType:(PRNotificationType)type item:(id)item;
 
 - (void)postMigrationTasks;

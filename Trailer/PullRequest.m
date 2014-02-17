@@ -27,6 +27,18 @@
 @dynamic assignedToMe;
 @dynamic issueUrl;
 
+static NSDateFormatter *itemDateFormatter;
+
++ (void)initialize
+{
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		itemDateFormatter = [[NSDateFormatter alloc] init];
+		itemDateFormatter.dateStyle = NSDateFormatterShortStyle;
+		itemDateFormatter.timeStyle = NSDateFormatterShortStyle;
+	});
+}
+
 + (PullRequest *)pullRequestWithInfo:(NSDictionary *)info moc:(NSManagedObjectContext *)moc
 {
 	PullRequest *p = [DataItem itemWithInfo:info type:@"PullRequest" moc:moc];
@@ -108,9 +120,15 @@
 {
 	if(!self.mergeable.boolValue)
 	{
-		if(self.sectionIndex.integerValue == kPullRequestSectionAll &&
+		NSInteger section = self.sectionIndex.integerValue;
+
+		if(section == kPullRequestConditionClosed || section == kPullRequestConditionMerged)
+			return NO;
+
+		if(section == kPullRequestSectionAll &&
 		   [Settings shared].markUnmergeableOnUserSectionsOnly)
 			return NO;
+
 		return YES;
 	}
 	return NO;
@@ -130,28 +148,31 @@
 
 - (NSString *)subtitle
 {
-	static NSDateFormatter *itemDateFormatter;
-
-	static dispatch_once_t onceToken;
-	dispatch_once(&onceToken, ^{
-		itemDateFormatter = [[NSDateFormatter alloc] init];
-		itemDateFormatter.dateStyle = NSDateFormatterShortStyle;
-		itemDateFormatter.timeStyle = NSDateFormatterShortStyle;
-	});
-
 	NSString *_subtitle;
-	if([Settings shared].showCreatedInsteadOfUpdated)
-		_subtitle = [itemDateFormatter stringFromDate:self.createdAt];
-	else
-		_subtitle = [itemDateFormatter stringFromDate:self.updatedAt];
+
+#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
+	#define SEPARATOR @"\n"
+#else
+	#define SEPARATOR @" - "
+#endif
 
 	if(self.userLogin.length)
-		_subtitle = [NSString stringWithFormat:@"%@ - %@",self.userLogin,_subtitle];
+		_subtitle = [NSString stringWithFormat:@"%@%@",self.userLogin,SEPARATOR];
+	else
+		_subtitle = @"";
+
+	if([Settings shared].showCreatedInsteadOfUpdated)
+		_subtitle = [_subtitle stringByAppendingString:[itemDateFormatter stringFromDate:self.createdAt]];
+	else
+		_subtitle = [_subtitle stringByAppendingString:[itemDateFormatter stringFromDate:self.updatedAt]];
 
 	if([Settings shared].showReposInName)
-	{
-		_subtitle = [_subtitle stringByAppendingFormat:@" - %@",self.repoName];
-	}
+		_subtitle = [_subtitle stringByAppendingFormat:@"%@%@",SEPARATOR,self.repoName];
+
+#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
+	if(!self.mergeable.boolValue)
+		_subtitle = [_subtitle stringByAppendingString:@"\nCannot be merged!"];
+#endif
 
 	return _subtitle;
 }

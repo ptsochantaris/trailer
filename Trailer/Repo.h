@@ -2,6 +2,7 @@
 @interface Repo : DataItem
 
 @property (nonatomic, retain) NSString * fullName;
+@property (nonatomic, retain) NSString * webUrl;
 @property (nonatomic, retain) NSNumber * active;
 @property (nonatomic, retain) NSNumber * fork;
 

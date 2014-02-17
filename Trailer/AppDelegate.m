@@ -40,8 +40,8 @@ static AppDelegate *_static_shared_ref;
 	[self setupSortMethodMenu];
 
 	// ONLY FOR DEBUG!
-	//NSArray *allPRs = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.dataManager.managedObjectContext];
-    //[[allPRs objectAtIndex:0] setMergeable:@NO];
+	//NSArray *allRepos = [PullRequest allItemsOfType:@"Repo" inMoc:self.dataManager.managedObjectContext];
+    //[self.dataManager.managedObjectContext deleteObject:[allRepos objectAtIndex:0]];
 
 	[self.dataManager postProcessAllPrs];
 	[self updateScrollBarWidth]; // also updates menu
@@ -105,6 +105,11 @@ static AppDelegate *_static_shared_ref;
 	}
 	self.sortModeSelect.menu = m;
 	[self.sortModeSelect selectItemAtIndex:[Settings shared].sortMethod];
+}
+
+- (IBAction)repoSubscriptionPolicySelected:(NSPopUpButton *)sender
+{
+	[Settings shared].repoSubscriptionPolicy = sender.indexOfSelectedItem;
 }
 
 - (IBAction)dontConfirmRemoveAllMergedSelected:(NSButton *)sender
@@ -355,17 +360,46 @@ static AppDelegate *_static_shared_ref;
 			notification.subtitle = [item title];
 			break;
 		}
+		case kNewRepoSubscribed:
+		{
+			notification.title = @"New Repository Subscribed";
+			notification.subtitle = [item fullName];
+			break;
+		}
+		case kNewRepoAnnouncement:
+		{
+			notification.title = @"New Repository";
+			notification.subtitle = [item fullName];
+			break;
+		}
 	}
 
     [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
 }
 
-- (void)prItemSelected:(PRItemView *)item
+- (void)prItemSelected:(PRItemView *)item alternativeSelect:(BOOL)isAlternative
 {
+	self.ignoreNextFocusLoss = isAlternative;
+
 	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:item.userInfo moc:self.dataManager.managedObjectContext];
-	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:r.webUrl]];
 	[r catchUpWithComments];
+
+	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:r.webUrl]];
+
+	NSInteger reSelectIndex = -1;
+	if(isAlternative)
+	{
+		PRItemView *v = [self focusedItemView];
+		if(v) reSelectIndex = [currentPRItems indexOfObject:v];
+	}
+
 	[self updateMenu];
+
+	if(reSelectIndex>-1 && reSelectIndex<currentPRItems.count)
+	{
+		PRItemView *v = currentPRItems[reSelectIndex];
+		v.focused = YES;
+	}
 }
 
 - (void)statusItemTapped:(StatusItemView *)statusItem
@@ -442,12 +476,17 @@ static AppDelegate *_static_shared_ref;
 
 	if(show)
 	{
-		self.opening = YES;
-		[self.mainMenu setLevel:NSFloatingWindowLevel];
-		[self.mainMenu makeKeyAndOrderFront:self];
-		[NSApp activateIgnoringOtherApps:YES];
-		self.opening = NO;
+		[self displayMenu];
 	}
+}
+
+- (void)displayMenu
+{
+	self.opening = YES;
+	[self.mainMenu setLevel:NSFloatingWindowLevel];
+	[self.mainMenu makeKeyAndOrderFront:self];
+	[NSApp activateIgnoringOtherApps:YES];
+	self.opening = NO;
 }
 
 - (void)closeMenu
@@ -722,8 +761,7 @@ static AppDelegate *_static_shared_ref;
 {
 	self.preferencesDirty = YES;
 	self.lastSuccessfulRefresh = nil;
-	[DataItem deleteAllObjectsInContext:self.dataManager.managedObjectContext
-							 usingModel:self.dataManager.managedObjectModel];
+	[self.dataManager deleteEverything];
 	[self.projectsTable reloadData];
 	[self updateMenu];
 }
@@ -744,6 +782,8 @@ static AppDelegate *_static_shared_ref;
 	[self updateStatusTermPreferenceControls];
 
 	[self.sortModeSelect selectItemAtIndex:[Settings shared].sortMethod];
+
+	[self.repoSubscriptionPolicy selectItemAtIndex:[Settings shared].repoSubscriptionPolicy];
 
 	self.launchAtStartup.integerValue = [self isAppLoginItem];
 	self.hideAllPrsSection.integerValue = [Settings shared].hideAllPrsSection;
@@ -780,6 +820,9 @@ static AppDelegate *_static_shared_ref;
 		[self.hotkeyShiftModifier setEnabled:NO];
 		[self.hotkeyCommandModifier setEnabled:NO];
 	}
+
+	[self.repoCheckStepper setFloatValue:[Settings shared].newRepoCheckPeriod];
+	[self newRepoCheckChanged:nil];
 
 	[self.refreshDurationStepper setFloatValue:[Settings shared].refreshPeriod];
 	[self refreshDurationChanged:nil];
@@ -933,13 +976,27 @@ static AppDelegate *_static_shared_ref;
 {
 	if([notification object]==self.mainMenu)
 	{
-		[self scrollToTop];
+		if(self.ignoreNextFocusLoss)
+		{
+			self.ignoreNextFocusLoss = NO;
+		}
+		else
+		{
+			[self scrollToTop];
+			for(PRItemView *v in currentPRItems)
+				v.focused = NO;
+		}
 		[self.mainMenuFilter becomeFirstResponder];
 	}
 }
 
 - (void)windowDidResignKey:(NSNotification *)notification
 {
+	if(self.ignoreNextFocusLoss)
+	{
+		[self displayMenu];
+		return;
+	}
 	if(!self.opening)
 	{
 		if([notification object]==self.mainMenu)
@@ -1141,7 +1198,13 @@ static AppDelegate *_static_shared_ref;
 - (IBAction)refreshDurationChanged:(NSStepper *)sender
 {
 	[Settings shared].refreshPeriod = self.refreshDurationStepper.floatValue;
-	[self.refreshDurationLabel setStringValue:[NSString stringWithFormat:@"Automatically refresh every %ld seconds",(long)self.refreshDurationStepper.integerValue]];
+	[self.refreshDurationLabel setStringValue:[NSString stringWithFormat:@"Refresh PRs every %ld seconds",(long)self.refreshDurationStepper.integerValue]];
+}
+
+- (IBAction)newRepoCheckChanged:(NSStepper *)sender
+{
+	[Settings shared].newRepoCheckPeriod = self.repoCheckStepper.floatValue;
+	[self.repoCheckLabel setStringValue:[NSString stringWithFormat:@"Refresh repositories every %ld hours",(long)self.repoCheckStepper.integerValue]];
 }
 
 -(void)refreshTimerDone
@@ -1441,7 +1504,7 @@ static AppDelegate *_static_shared_ref;
 		{
 			case 43: // prefs
 			{
-				if(incomingEvent.modifierFlags & NSCommandKeyMask)
+				if((incomingEvent.modifierFlags & NSCommandKeyMask) == NSCommandKeyMask)
 				{
 					[self preferencesSelected:nil];
 					return nil;
@@ -1481,7 +1544,8 @@ static AppDelegate *_static_shared_ref;
 			case 36: // enter
 			{
 				PRItemView *v = [self focusedItemView];
-				if(v) [self prItemSelected:v];
+				BOOL isAlternative = ((incomingEvent.modifierFlags & NSAlternateKeyMask) == NSAlternateKeyMask);
+				if(v) [self prItemSelected:v alternativeSelect:isAlternative];
 				return nil;
 			}
 		}
@@ -1519,29 +1583,29 @@ static AppDelegate *_static_shared_ref;
 
 	if([Settings shared].hotkeyCommandModifier)
 	{
-		if(incomingEvent.modifierFlags & NSCommandKeyMask) check++; else check--;
+		if((incomingEvent.modifierFlags & NSCommandKeyMask) == NSCommandKeyMask) check++; else check--;
 	}
 	else
 	{
-		if(incomingEvent.modifierFlags & NSCommandKeyMask) check--; else check++;
+		if((incomingEvent.modifierFlags & NSCommandKeyMask) == NSCommandKeyMask) check--; else check++;
 	}
 
 	if([Settings shared].hotkeyOptionModifier)
 	{
-		if(incomingEvent.modifierFlags & NSAlternateKeyMask) check++; else check--;
+		if((incomingEvent.modifierFlags & NSAlternateKeyMask) == NSAlternateKeyMask) check++; else check--;
 	}
 	else
 	{
-		if(incomingEvent.modifierFlags & NSAlternateKeyMask) check--; else check++;
+		if((incomingEvent.modifierFlags & NSAlternateKeyMask) == NSAlternateKeyMask) check--; else check++;
 	}
 
 	if([Settings shared].hotkeyShiftModifier)
 	{
-		if(incomingEvent.modifierFlags & NSShiftKeyMask) check++; else check--;
+		if((incomingEvent.modifierFlags & NSShiftKeyMask) == NSShiftKeyMask) check++; else check--;
 	}
 	else
 	{
-		if(incomingEvent.modifierFlags & NSShiftKeyMask) check--; else check++;
+		if((incomingEvent.modifierFlags & NSShiftKeyMask) == NSShiftKeyMask) check--; else check++;
 	}
 
 	if(check==3)

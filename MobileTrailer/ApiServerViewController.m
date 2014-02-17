@@ -30,7 +30,7 @@
 	self.apiPath.text = [Settings shared].apiPath;
 }
 
--(BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
 {
 	if([string isEqualToString:@"\n"])
 	{
