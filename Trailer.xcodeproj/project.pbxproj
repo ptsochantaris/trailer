@@ -92,6 +92,8 @@
 		168BC6D117EC2DF000BC4584 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 168BC6AD17EC2DF000BC4584 /* Cocoa.framework */; };
 		168BC6D917EC2DF000BC4584 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 168BC6D717EC2DF000BC4584 /* InfoPlist.strings */; };
 		168BC6DB17EC2DF000BC4584 /* TrailerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 168BC6DA17EC2DF000BC4584 /* TrailerTests.m */; };
+		168C6ECE18B2104100E41D85 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 168C6ECC18B2104100E41D85 /* LICENSE */; };
+		168C6ECF18B2104100E41D85 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 168C6ECD18B2104100E41D85 /* README.md */; };
 		169CEB9C1879D5BB0083A068 /* AdvancedSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 169CEB9B1879D5BB0083A068 /* AdvancedSettingsViewController.m */; };
 		16B94068182D051F00F32061 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16B94066182D051700F32061 /* Sparkle.framework */; };
 		16B9406B182D078C00F32061 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 16B94066182D051700F32061 /* Sparkle.framework */; };
@@ -244,6 +246,8 @@
 		168BC6D617EC2DF000BC4584 /* TrailerTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TrailerTests-Info.plist"; sourceTree = "<group>"; };
 		168BC6D817EC2DF000BC4584 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		168BC6DA17EC2DF000BC4584 /* TrailerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TrailerTests.m; sourceTree = "<group>"; };
+		168C6ECC18B2104100E41D85 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		168C6ECD18B2104100E41D85 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
 		169CEB99187988D00083A068 /* Trailer 4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 4.xcdatamodel"; sourceTree = "<group>"; };
 		169CEB9A1879D5BB0083A068 /* AdvancedSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdvancedSettingsViewController.h; sourceTree = "<group>"; };
 		169CEB9B1879D5BB0083A068 /* AdvancedSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdvancedSettingsViewController.m; sourceTree = "<group>"; };
@@ -394,6 +398,8 @@
 		1628A6F218789EA3005EDA69 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				168C6ECC18B2104100E41D85 /* LICENSE */,
+				168C6ECD18B2104100E41D85 /* README.md */,
 				16C54F951881720400849B76 /* Settings */,
 				1628A6F518789F85005EDA69 /* Utilities */,
 				1628A6F418789F78005EDA69 /* API */,
@@ -792,10 +798,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				168C6ECF18B2104100E41D85 /* README.md in Resources */,
 				168BC6B817EC2DF000BC4584 /* InfoPlist.strings in Resources */,
 				16B94072182D136700F32061 /* dsa_pub.pem in Resources */,
 				168BC6C917EC2DF000BC4584 /* Images.xcassets in Resources */,
 				168BC6C417EC2DF000BC4584 /* MainMenu.xib in Resources */,
+				168C6ECE18B2104100E41D85 /* LICENSE in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
