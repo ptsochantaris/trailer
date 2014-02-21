@@ -42,8 +42,23 @@
 	for(PullRequest *r in latestPrs)
 	{
 		if(!r.isMine)
+		{
 			[[AppDelegate shared] postNotificationOfType:kNewPr forItem:r];
+		}
 		r.postSyncAction = @(kPostSyncDoNothing);
+	}
+
+	latestPrs = [PullRequest updatedItemsOfType:@"PullRequest" inMoc:mainContext];
+	for(PullRequest *r in latestPrs)
+	{
+		if(r.reopened.boolValue)
+		{
+			if(!r.isMine)
+			{
+				[[AppDelegate shared] postNotificationOfType:kPrReopened forItem:r];
+			}
+			r.reopened = @NO;
+		}
 	}
 
 	NSArray *latestComments = [PRComment newItemsOfType:@"PRComment" inMoc:mainContext];
@@ -274,6 +289,7 @@
 		case kNewComment:
 			return @{COMMENT_ID_KEY:[item serverId]};
 		case kNewPr:
+		case kPrReopened:
 			return @{PULL_REQUEST_ID_KEY:[item serverId]};
 		case kPrClosed:
 		case kPrMerged:

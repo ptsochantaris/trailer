@@ -3,17 +3,18 @@
 #define kPullRequestConditionClosed 1
 #define kPullRequestConditionMerged 2
 
-#define kPullRequestSectionMine 0
-#define kPullRequestSectionParticipated 1
-#define kPullRequestSectionMerged 2
-#define kPullRequestSectionClosed 3
-#define kPullRequestSectionAll 4
+#define kPullRequestSectionNone 0
+#define kPullRequestSectionMine 1
+#define kPullRequestSectionParticipated 2
+#define kPullRequestSectionMerged 3
+#define kPullRequestSectionClosed 4
+#define kPullRequestSectionAll 5
 
 #define kStatusFilterAll 0
 #define kStatusFilterInclude 1
 #define kStatusFilterExclude 2
 
-#define kPullRequestSectionNames @[@"Mine", @"Participated", @"Recently Merged", @"Recently Closed", @"All Pull Requests"]
+#define kPullRequestSectionNames @[@"", @"Mine", @"Participated", @"Recently Merged", @"Recently Closed", @"All Pull Requests"]
 
 @interface PullRequest : DataItem
 
@@ -37,6 +38,7 @@
 @property (nonatomic, retain) NSNumber * repoId;
 @property (nonatomic, retain) NSNumber * condition;
 @property (nonatomic, retain) NSNumber * mergeable;
+@property (nonatomic, retain) NSNumber * reopened;
 @property (nonatomic, retain) NSNumber * assignedToMe;
 @property (nonatomic, retain) NSString * issueUrl;
 
@@ -57,6 +59,8 @@
 + (NSArray *)allClosedRequestsInMoc:(NSManagedObjectContext *)moc;
 
 + (NSUInteger)countOpenRequestsInMoc:(NSManagedObjectContext *)moc;
+
++ (NSUInteger)countListedOpenRequestsInMoc:(NSManagedObjectContext *)moc;
 
 - (void)catchUpWithComments;
 

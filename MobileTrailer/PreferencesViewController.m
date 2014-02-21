@@ -21,7 +21,7 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 }
 - (void)done
 {
-	[[AppDelegate shared].dataManager postProcessAllPrs]; // apply any view option changes
+	[[NSNotificationCenter defaultCenter] postNotificationName:DISPLAY_OPTIONS_UPDATED_KEY object:nil];
 	if([AppDelegate shared].preferencesDirty) [[AppDelegate shared] startRefresh];
 	[self dismissViewControllerAnimated:YES completion:nil];
 }
@@ -44,13 +44,13 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
     searchField.delegate = self;
 	searchField.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 
-    UIView *searchHolder = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 50)];
+    UIView *searchHolder = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 41)];
 	[searchHolder addSubview:searchField];
 	searchHolder.autoresizesSubviews = YES;
 	searchHolder.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	self.repositories.tableHeaderView = searchHolder;
 
-    self.repositories.contentOffset = CGPointMake(0, 50);
+    self.repositories.contentOffset = CGPointMake(0, searchHolder.frame.size.height);
 
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(apiUsageUpdate) name:RATE_UPDATE_NOTIFICATION object:nil];
 

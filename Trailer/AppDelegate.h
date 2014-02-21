@@ -32,7 +32,7 @@
 @property (weak) IBOutlet NSButton *sortingOrder;
 @property (weak) IBOutlet NSPopUpButton *sortModeSelect;
 @property (weak) IBOutlet NSButton *showCreationDates;
-@property (weak) IBOutlet NSButton *dontKeepMyPrs;
+@property (weak) IBOutlet NSButton *dontKeepPrsMergedByMe;
 @property (weak) IBOutlet NSButton *hideAvatars;
 @property (weak) IBOutlet NSButton *autoParticipateWhenMentioned;
 @property (weak) IBOutlet NSButton *keepClosedPrs;
@@ -52,6 +52,9 @@
 @property (weak) IBOutlet NSPopUpButton *repoSubscriptionPolicy;
 @property (weak) IBOutlet NSTextField *repoCheckLabel;
 @property (weak) IBOutlet NSStepper *repoCheckStepper;
+@property (weak) IBOutlet NSButton *countOnlyListedPrs;
+@property (weak) IBOutlet NSPopUpButton *prMergedPolicy;
+@property (weak) IBOutlet NSPopUpButton *prClosedPolicy;
 
 // Keyboard
 @property (weak) IBOutlet NSButton *hotkeyEnable;
@@ -59,6 +62,9 @@
 @property (weak) IBOutlet NSButton *hotkeyOptionModifier;
 @property (weak) IBOutlet NSButton *hotkeyShiftModifier;
 @property (weak) IBOutlet NSPopUpButton *hotkeyLetter;
+@property (weak) IBOutlet NSTextField *hotKeyHelp;
+@property (weak) IBOutlet NSBox *hotKeyContainer;
+@property (weak) IBOutlet NSButton *hotkeyControlModifier;
 
 // About window
 @property (weak) IBOutlet NSTextField *aboutVersion;

@@ -241,12 +241,12 @@ CGFloat GLOBAL_SCREEN_SCALE;
 	[self.api fetchPullRequestsForActiveReposAndCallback:^(BOOL success) {
 		self.lastUpdateFailed = !success;
 		BOOL hasNewData = (success && self.dataManager.managedObjectContext.hasChanges);
-		[self completeRefresh];
 		if(success)
 		{
 			self.lastSuccessfulRefresh = [NSDate date];
 			self.preferencesDirty = NO;
 		}
+		[self completeRefresh];
 		if(self.backgroundCallback)
 		{
 			if(hasNewData)
@@ -326,6 +326,11 @@ CGFloat GLOBAL_SCREEN_SCALE;
 		case kNewPr:
 		{
 			notification.alertBody = [NSString stringWithFormat:@"New PR: %@",[item title]];
+			break;
+		}
+		case kPrReopened:
+		{
+			notification.alertBody = [NSString stringWithFormat:@"Re-Opened PR: %@",[item title]];
 			break;
 		}
 		case kPrMerged:

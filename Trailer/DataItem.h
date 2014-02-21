@@ -24,6 +24,8 @@ enum PostSyncAction {
 
 +(NSArray*)newOrUpdatedItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc;
 
++(NSArray*)updatedItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc;
+
 +(NSArray*)newItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc;
 
 +(NSArray*)itemsOfType:(NSString *)type surviving:(BOOL)survivingItems inMoc:(NSManagedObjectContext *)moc;

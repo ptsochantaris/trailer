@@ -82,6 +82,13 @@ static NSDateFormatter *_syncDateFormatter;
 	return [moc executeFetchRequest:f error:nil];
 }
 
++(NSArray*)updatedItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
+{
+	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:type];
+	f.predicate = [NSPredicate predicateWithFormat:@"postSyncAction = %d",kPostSyncNoteUpdated];
+	return [moc executeFetchRequest:f error:nil];
+}
+
 +(NSArray *)newItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:type];
