@@ -7,6 +7,25 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.0.15</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Preferences improvements in History section for handling merged and/or closed PRs</li>
+				<li>Trailer will now report any PRs in the “closed” section that get re-opened</li>
+				<li>New option to display number of listed PRs instead of all open PRs</li>
+				<li>Fix for un-mergeable PR status handling</li>
+				<li>Added Ctrl key support to keyboard shortcut and improved Keyboard section appearance</li>
+				<li>Small performance improvements</li>
+				</ul></font>]]></description>
+			<pubDate>Fri, 21 Feb 2014 17:00:00 +0000</pubDate>
+			<enclosure
+			url="http://dev.housetrip.com/trailer/trailer1015.zip"
+			sparkle:version="1110"
+			sparkle:shortVersionString="1.0.15"
+			sparkle:dsaSignature="MCwCFENu6B0XCEgWtJlFmtjkO72sen4WAhQsEX1CQd90ldBsJWXaCM1BIAU0PQ=="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.0.14</title>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
 				<li>Option to auto-subscribe to new repositories</li>
