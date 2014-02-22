@@ -575,9 +575,8 @@ static AppDelegate *_static_shared_ref;
 	[self updateMenu];
 }
 
-- (NSInteger)buildPrMenuItemsFromList
+- (void)buildPrMenuItemsFromList:(NSArray *)pullRequests
 {
-	NSArray *pullRequests = [self pullRequestList];
 	currentPRItems = [NSMutableArray array];
 
 	SectionHeader *myHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:nil title:kPullRequestSectionNames[kPullRequestSectionMine]];
@@ -594,17 +593,10 @@ static AppDelegate *_static_shared_ref;
 								@kPullRequestSectionAll: [NSMutableArray arrayWithObject:allHeader],
 							   };
 
-	NSInteger unreadCommentCount=0;
 	for(PullRequest *r in pullRequests)
 	{
-		NSNumber *sectionIndex = r.sectionIndex;
-		if([Settings shared].showCommentsEverywhere ||
-		   sectionIndex.integerValue==kPullRequestSectionMine ||
-		   sectionIndex.integerValue==kPullRequestSectionParticipated)
-			unreadCommentCount += r.unreadComments.integerValue;
-
 		PRItemView *view = [[PRItemView alloc] initWithPullRequest:r userInfo:r.serverId delegate:self];
-		[sections[sectionIndex] addObject:view];
+		[sections[r.sectionIndex] addObject:view];
 	}
 
 	for(NSInteger section=kPullRequestSectionMine;section<=kPullRequestSectionAll;section++)
@@ -647,8 +639,6 @@ static AppDelegate *_static_shared_ref;
 	CGPoint lastPos = self.mainMenu.scrollView.contentView.documentVisibleRect.origin;
 	self.mainMenu.scrollView.documentView = menuContents;
 	[self.mainMenu.scrollView.documentView scrollPoint:lastPos];
-
-	return unreadCommentCount;
 }
 
 - (void)defaultsUpdated
@@ -759,7 +749,10 @@ static AppDelegate *_static_shared_ref;
 
 - (IBAction)markAllReadSelected:(NSMenuItem *)sender
 {
-	for(PullRequest *r in [self pullRequestList])
+	NSManagedObjectContext *moc = self.dataManager.managedObjectContext;
+	NSFetchRequest *f = [PullRequest requestForPullRequestsWithFilter:self.mainMenuFilter.stringValue];
+
+	for(PullRequest *r in [moc executeFetchRequest:f error:nil])
 		[r catchUpWithComments];
 	[self updateMenu];
 }
@@ -1252,17 +1245,15 @@ static AppDelegate *_static_shared_ref;
 	}
 }
 
-- (NSArray *)pullRequestList
-{
-	NSFetchRequest *f = [PullRequest requestForPullRequestsWithFilter:self.mainMenuFilter.stringValue];
-	return [self.dataManager.managedObjectContext executeFetchRequest:f error:nil];
-}
-
 - (void)updateMenu
 {
-	NSString *countString;
-	NSInteger newCommentCount = [self buildPrMenuItemsFromList];
+	NSManagedObjectContext *moc = self.dataManager.managedObjectContext;
+	NSFetchRequest *f = [PullRequest requestForPullRequestsWithFilter:self.mainMenuFilter.stringValue];
+	NSArray *pullRequests = [moc executeFetchRequest:f error:nil];
 
+	[self buildPrMenuItemsFromList:pullRequests];
+
+	NSString *countString;
 	NSDictionary *attributes;
 	if(self.lastUpdateFailed && (![Settings shared].dontReportRefreshFailures))
 	{
@@ -1275,16 +1266,15 @@ static AppDelegate *_static_shared_ref;
 	else
 	{
 		NSUInteger count;
+
 		if([Settings shared].countOnlyListedPrs)
-		{
-			count = [PullRequest countListedOpenRequestsInMoc:self.dataManager.managedObjectContext];
-		}
+			count = pullRequests.count;
 		else
-		{
-			count = [PullRequest countOpenRequestsInMoc:self.dataManager.managedObjectContext];
-		}
+			count = [PullRequest countOpenRequestsInMoc:moc];
+
 		countString = [NSString stringWithFormat:@"%ld",count];
-		if(newCommentCount)
+
+		if([PullRequest badgeCountInMoc:moc]>0)
 		{
 			attributes = @{ NSFontAttributeName: [NSFont menuBarFontOfSize:10.0],
 							NSForegroundColorAttributeName: MAKECOLOR(0.8, 0.0, 0.0, 1.0) };

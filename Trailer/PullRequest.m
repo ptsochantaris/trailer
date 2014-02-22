@@ -91,7 +91,6 @@ static NSDateFormatter *itemDateFormatter;
 
 	if(!self.latestReadCommentDate) self.latestReadCommentDate = [NSDate distantPast];
 
-	NSInteger unreadCount = 0;
 	BOOL autoParticipateInMentions = [Settings shared].autoParticipateInMentions && (self.condition.integerValue==kPullRequestConditionOpen);
 
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
@@ -107,12 +106,11 @@ static NSDateFormatter *itemDateFormatter;
 	NSArray *unreadComments = [self.managedObjectContext executeFetchRequest:f error:nil];
 	for(PRComment *c in unreadComments)
 	{
-		unreadCount++;
 		if(autoParticipateInMentions && c.refersToMe)
 			self.sectionIndex = @kPullRequestSectionParticipated;
 	}
 
-	self.unreadComments = @(unreadCount);
+	self.unreadComments = @(unreadComments.count);
 
 	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestUrl = %@",self.url];
 	self.totalComments = @([self.managedObjectContext countForFetchRequest:f error:nil]);
@@ -250,11 +248,23 @@ static NSDateFormatter *itemDateFormatter;
 	return [moc countForFetchRequest:f error:nil];
 }
 
-+ (NSUInteger)countListedOpenRequestsInMoc:(NSManagedObjectContext *)moc
++ (NSInteger)badgeCountInMoc:(NSManagedObjectContext *)moc
 {
-	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PullRequest"];
-	f.predicate = [NSPredicate predicateWithFormat:@"sectionIndex == %d or sectionIndex == %d or sectionIndex == %d",kPullRequestSectionMine,kPullRequestSectionParticipated,kPullRequestSectionAll];
-	return [moc countForFetchRequest:f error:nil];
+	NSFetchRequest *f = [PullRequest requestForPullRequestsWithFilter:nil];
+	NSArray *allPRs = [moc executeFetchRequest:f error:nil];
+	NSInteger count = 0;
+	BOOL showCommentsEverywhere = [Settings shared].showCommentsEverywhere;
+	for(PullRequest *r in allPRs)
+	{
+		NSInteger sectionIndex = r.sectionIndex.integerValue;
+		if(showCommentsEverywhere ||
+		   sectionIndex==kPullRequestSectionMine ||
+		   sectionIndex==kPullRequestSectionParticipated)
+		{
+			count += r.unreadComments.integerValue;
+		}
+	}
+	return count;
 }
 
 - (void)prepareForDeletion

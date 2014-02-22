@@ -130,7 +130,7 @@
 {
 	for(PullRequest *p in [PullRequest allClosedRequestsInMoc:self.managedObjectContext])
 		[self.managedObjectContext deleteObject:p];
-    [[AppDelegate shared] updateBadge];
+    [self updateBadge];
     [[AppDelegate shared].dataManager saveDB];
 }
 
@@ -138,14 +138,14 @@
 {
 	for(PullRequest *p in [PullRequest allMergedRequestsInMoc:self.managedObjectContext])
 		[self.managedObjectContext deleteObject:p];
-    [[AppDelegate shared] updateBadge];
+    [self updateBadge];
     [[AppDelegate shared].dataManager saveDB];
 }
 
 - (void)markAllAsRead
 {
 	for(PullRequest *p in self.fetchedResultsController.fetchedObjects) [p catchUpWithComments];
-	[[AppDelegate shared] updateBadge];
+	[self updateBadge];
 }
 
 - (void)refreshControlChanged
@@ -248,8 +248,6 @@
 {
 	//DLog(@"local notification: %@",notification.userInfo);
 
-	NSManagedObjectContext *mainMoc = [AppDelegate shared].dataManager.managedObjectContext;
-
 	urlToOpen = notification.userInfo[NOTIFICATION_URL_KEY];
 
     NSNumber *pullRequestId = notification.userInfo[PULL_REQUEST_ID_KEY];
@@ -260,13 +258,13 @@
 
     if(commentId)
     {
-        PRComment *c = [PRComment itemOfType:@"PRComment" serverId:commentId moc:mainMoc];
+        PRComment *c = [PRComment itemOfType:@"PRComment" serverId:commentId moc:self.managedObjectContext];
         if(!urlToOpen) urlToOpen = c.webUrl;
-        pullRequest = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:mainMoc];
+        pullRequest = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:self.managedObjectContext];
     }
     else if(pullRequestId)
     {
-        pullRequest = [PullRequest itemOfType:@"PullRequest" serverId:pullRequestId moc:mainMoc];
+        pullRequest = [PullRequest itemOfType:@"PullRequest" serverId:pullRequestId moc:self.managedObjectContext];
         if(!urlToOpen) urlToOpen = pullRequest.webUrl;
 
         if(!pullRequest)
@@ -311,7 +309,7 @@
     dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
     dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
         [pullRequest catchUpWithComments];
-        [[AppDelegate shared] updateBadge];
+        [self updateBadge];
         [[AppDelegate shared].dataManager saveDB];
     });
 }
@@ -404,7 +402,7 @@
 	if(editingStyle==UITableViewCellEditingStyleDelete)
 	{
 		PullRequest *pr = [self.fetchedResultsController objectAtIndexPath:indexPath];
-		[[AppDelegate shared].dataManager.managedObjectContext deleteObject:pr];
+		[self.managedObjectContext deleteObject:pr];
 		[[AppDelegate shared].dataManager saveDB];
 	}
 }
@@ -531,9 +529,9 @@
 		if(count>0)
 		{
 			if(count==1)
-				self.title = @"1 PR";
+				self.title = @"1 Pull Request";
 			else
-				self.title = [NSString stringWithFormat:@"%ld PRs",(long)count];
+				self.title = [NSString stringWithFormat:@"%ld Pull Requests",(long)count];
 			self.tableView.tableFooterView = nil;
 		}
 		else
@@ -545,6 +543,13 @@
 	}
 	self.refreshControl.attributedTitle = [[NSAttributedString alloc] initWithString:[[AppDelegate shared].api lastUpdateDescription]
 																		  attributes:@{ }];
+
+	[self updateBadge];
+}
+
+- (void)updateBadge
+{
+	[UIApplication sharedApplication].applicationIconBadgeNumber = [PullRequest badgeCountInMoc:self.managedObjectContext];
 }
 
 ///////////////////////////// filtering

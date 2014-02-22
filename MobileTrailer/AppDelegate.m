@@ -168,18 +168,6 @@ CGFloat GLOBAL_SCREEN_SCALE;
 	[self startRefresh];
 }
 
-- (void)updateBadge
-{
-	NSFetchRequest *f = [PullRequest requestForPullRequestsWithFilter:nil];
-	NSArray *allPRs = [self.dataManager.managedObjectContext executeFetchRequest:f error:nil];
-	NSInteger count = 0;
-	for(PullRequest *r in allPRs)
-		if(r.condition.integerValue==kPullRequestConditionOpen)
-			count += r.unreadComments.integerValue;
-	
-	[UIApplication sharedApplication].applicationIconBadgeNumber = count;
-}
-
 - (void)checkApiUsage
 {
 	if([Settings shared].authToken.length==0) return;
@@ -221,7 +209,6 @@ CGFloat GLOBAL_SCREEN_SCALE;
 -(void)completeRefresh
 {
 	[self checkApiUsage];
-	[self updateBadge];
 	self.isRefreshing = NO;
 	[[NSNotificationCenter defaultCenter] postNotificationName:REFRESH_ENDED_NOTIFICATION object:nil];
 	[self.dataManager sendNotifications];

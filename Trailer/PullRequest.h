@@ -60,7 +60,7 @@
 
 + (NSUInteger)countOpenRequestsInMoc:(NSManagedObjectContext *)moc;
 
-+ (NSUInteger)countListedOpenRequestsInMoc:(NSManagedObjectContext *)moc;
++ (NSInteger)badgeCountInMoc:(NSManagedObjectContext *)moc;
 
 - (void)catchUpWithComments;
 
