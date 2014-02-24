@@ -122,6 +122,7 @@ static AppDelegate *_static_shared_ref;
 {
 	BOOL setting = (sender.integerValue==1);
 	[Settings shared].hideAllPrsSection = setting;
+	[self.dataManager postProcessAllPrs]; // apply any view option changes
 	[self updateMenu];
 }
 
@@ -168,13 +169,7 @@ static AppDelegate *_static_shared_ref;
 - (IBAction)dontKeepMyPrsSelected:(NSButton *)sender
 {
 	BOOL dontKeep = (sender.integerValue==1);
-	[Settings shared].dontKeepMyPrs = dontKeep;
-}
-
-- (IBAction)keepClosedPrsSelected:(NSButton *)sender
-{
-	BOOL keep = (sender.integerValue==1);
-	[Settings shared].alsoKeepClosedPrs = keep;
+	[Settings shared].dontKeepPrsMergedByMe = dontKeep;
 }
 
 - (IBAction)hideAvatarsSelected:(NSButton *)sender
@@ -206,6 +201,13 @@ static AppDelegate *_static_shared_ref;
 	BOOL descending = (sender.integerValue==1);
 	[Settings shared].sortDescending = descending;
 	[self setupSortMethodMenu];
+	[self.dataManager postProcessAllPrs]; // apply any view option changes
+	[self updateMenu];
+}
+
+- (IBAction)countOnlyListedPrsSelected:(NSButton *)sender
+{
+	[Settings shared].countOnlyListedPrs = (sender.integerValue==1);
 	[self.dataManager postProcessAllPrs]; // apply any view option changes
 	[self updateMenu];
 }
@@ -348,6 +350,12 @@ static AppDelegate *_static_shared_ref;
 			notification.subtitle = [item title];
 			break;
 		}
+		case kPrReopened:
+		{
+			notification.title = @"Re-Opened PR";
+			notification.subtitle = [item title];
+			break;
+		}
 		case kPrMerged:
 		{
 			notification.title = @"PR Merged!";
@@ -422,30 +430,13 @@ static AppDelegate *_static_shared_ref;
 		if(!self.isRefreshing)
 		{
 			NSString *prefix;
+
 			if([Settings shared].localUser)
-			{
 				prefix = [NSString stringWithFormat:@" Refresh %@",[Settings shared].localUser];
-			}
 			else
-			{
 				prefix = @" Refresh";
-			}
-			if(self.lastUpdateFailed)
-			{
-				self.refreshNow.title = [prefix stringByAppendingString:@" (last update failed!)"];
-			}
-			else
-			{
-				long ago = (long)[[NSDate date] timeIntervalSinceDate:self.lastSuccessfulRefresh];
-				if(ago<10)
-				{
-					self.refreshNow.title = [prefix stringByAppendingString:@" (just updated)"];
-				}
-				else
-				{
-					self.refreshNow.title = [NSString stringWithFormat:@"%@ (updated %ld seconds ago)",prefix,(long)ago];
-				}
-			}
+
+			self.refreshNow.title = [prefix stringByAppendingFormat:@" - %@",[self.api lastUpdateDescription]];
 		}
     }
 }
@@ -584,9 +575,8 @@ static AppDelegate *_static_shared_ref;
 	[self updateMenu];
 }
 
-- (NSInteger)buildPrMenuItemsFromList
+- (void)buildPrMenuItemsFromList:(NSArray *)pullRequests
 {
-	NSArray *pullRequests = [self pullRequestList];
 	currentPRItems = [NSMutableArray array];
 
 	SectionHeader *myHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:nil title:kPullRequestSectionNames[kPullRequestSectionMine]];
@@ -603,17 +593,10 @@ static AppDelegate *_static_shared_ref;
 								@kPullRequestSectionAll: [NSMutableArray arrayWithObject:allHeader],
 							   };
 
-	NSInteger unreadCommentCount=0;
 	for(PullRequest *r in pullRequests)
 	{
-		NSNumber *sectionIndex = r.sectionIndex;
-		if([Settings shared].showCommentsEverywhere ||
-		   sectionIndex.integerValue==kPullRequestSectionMine ||
-		   sectionIndex.integerValue==kPullRequestSectionParticipated)
-			unreadCommentCount += r.unreadComments.integerValue;
-
 		PRItemView *view = [[PRItemView alloc] initWithPullRequest:r userInfo:r.serverId delegate:self];
-		[sections[sectionIndex] addObject:view];
+		[sections[r.sectionIndex] addObject:view];
 	}
 
 	for(NSInteger section=kPullRequestSectionMine;section<=kPullRequestSectionAll;section++)
@@ -656,8 +639,6 @@ static AppDelegate *_static_shared_ref;
 	CGPoint lastPos = self.mainMenu.scrollView.contentView.documentVisibleRect.origin;
 	self.mainMenu.scrollView.documentView = menuContents;
 	[self.mainMenu.scrollView.documentView scrollPoint:lastPos];
-
-	return unreadCommentCount;
 }
 
 - (void)defaultsUpdated
@@ -768,7 +749,10 @@ static AppDelegate *_static_shared_ref;
 
 - (IBAction)markAllReadSelected:(NSMenuItem *)sender
 {
-	for(PullRequest *r in [self pullRequestList])
+	NSManagedObjectContext *moc = self.dataManager.managedObjectContext;
+	NSFetchRequest *f = [PullRequest requestForPullRequestsWithFilter:self.mainMenuFilter.stringValue];
+
+	for(PullRequest *r in [moc executeFetchRequest:f error:nil])
 		[r catchUpWithComments];
 	[self updateMenu];
 }
@@ -782,7 +766,8 @@ static AppDelegate *_static_shared_ref;
 	[self updateStatusTermPreferenceControls];
 
 	[self.sortModeSelect selectItemAtIndex:[Settings shared].sortMethod];
-
+	[self.prMergedPolicy selectItemAtIndex:[Settings shared].mergeHandlingPolicy];
+	[self.prClosedPolicy selectItemAtIndex:[Settings shared].closeHandlingPolicy];
 	[self.repoSubscriptionPolicy selectItemAtIndex:[Settings shared].repoSubscriptionPolicy];
 
 	self.launchAtStartup.integerValue = [self isAppLoginItem];
@@ -795,8 +780,7 @@ static AppDelegate *_static_shared_ref;
 	self.hideUncommentedPrs.integerValue = [Settings shared].shouldHideUncommentedRequests;
 	self.autoParticipateWhenMentioned.integerValue = [Settings shared].autoParticipateInMentions;
 	self.hideAvatars.integerValue = [Settings shared].hideAvatars;
-	self.keepClosedPrs.integerValue = [Settings shared].alsoKeepClosedPrs;
-	self.dontKeepMyPrs.integerValue = [Settings shared].dontKeepMyPrs;
+	self.dontKeepPrsMergedByMe.integerValue = [Settings shared].dontKeepPrsMergedByMe;
 	self.showAllComments.integerValue = [Settings shared].showCommentsEverywhere;
 	self.sortingOrder.integerValue = [Settings shared].sortDescending;
 	self.showCreationDates.integerValue = [Settings shared].showCreatedInsteadOfUpdated;
@@ -805,21 +789,17 @@ static AppDelegate *_static_shared_ref;
 	self.showStatusItems.integerValue = [Settings shared].showStatusItems;
 	self.makeStatusItemsSelectable.integerValue = [Settings shared].makeStatusItemsSelectable;
 	self.markUnmergeableOnUserSectionsOnly.integerValue = [Settings shared].markUnmergeableOnUserSectionsOnly;
+	self.countOnlyListedPrs.integerValue = [Settings shared].countOnlyListedPrs;
 
 	self.hotkeyEnable.integerValue = [Settings shared].hotkeyEnable;
+	self.hotkeyControlModifier.integerValue = [Settings shared].hotkeyControlModifier;
 	self.hotkeyCommandModifier.integerValue = [Settings shared].hotkeyCommandModifier;
 	self.hotkeyOptionModifier.integerValue = [Settings shared].hotkeyOptionModifier;
 	self.hotkeyShiftModifier.integerValue = [Settings shared].hotkeyShiftModifier;
+	[self enableHotkeySegments];
 	[self populateHotkeyLetterMenu];
 
-	if(AXIsProcessTrustedWithOptions == NULL)
-	{
-		[self.hotkeyEnable setEnabled:NO];
-		[self.hotkeyLetter setEnabled:NO];
-		[self.hotkeyOptionModifier setEnabled:NO];
-		[self.hotkeyShiftModifier setEnabled:NO];
-		[self.hotkeyCommandModifier setEnabled:NO];
-	}
+	[self.hotkeyEnable setEnabled:(AXIsProcessTrustedWithOptions != NULL)];
 
 	[self.repoCheckStepper setFloatValue:[Settings shared].newRepoCheckPeriod];
 	[self newRepoCheckChanged:nil];
@@ -829,6 +809,44 @@ static AppDelegate *_static_shared_ref;
 	
 	[self.preferencesWindow setLevel:NSFloatingWindowLevel];
 	[self.preferencesWindow makeKeyAndOrderFront:self];
+}
+
+- (void)colorButton:(NSButton *)button withColor:(NSColor *)color
+{
+	NSMutableAttributedString *title = [button.attributedTitle mutableCopy];
+	[title addAttribute:NSForegroundColorAttributeName
+				  value:color
+				  range:NSMakeRange(0, title.length)];
+	button.attributedTitle = title;
+}
+
+- (void)enableHotkeySegments
+{
+	Settings *s = [Settings shared];
+	if(s.hotkeyEnable)
+	{
+		if(s.hotkeyCommandModifier)
+			[self colorButton:self.hotkeyCommandModifier withColor:[NSColor controlTextColor]];
+		else
+			[self colorButton:self.hotkeyCommandModifier withColor:[NSColor disabledControlTextColor]];
+
+		if(s.hotkeyControlModifier)
+			[self colorButton:self.hotkeyControlModifier withColor:[NSColor controlTextColor]];
+		else
+			[self colorButton:self.hotkeyControlModifier withColor:[NSColor disabledControlTextColor]];
+
+		if(s.hotkeyOptionModifier)
+			[self colorButton:self.hotkeyOptionModifier withColor:[NSColor controlTextColor]];
+		else
+			[self colorButton:self.hotkeyOptionModifier withColor:[NSColor disabledControlTextColor]];
+
+		if(s.hotkeyShiftModifier)
+			[self colorButton:self.hotkeyShiftModifier withColor:[NSColor controlTextColor]];
+		else
+			[self colorButton:self.hotkeyShiftModifier withColor:[NSColor disabledControlTextColor]];
+	}
+	[self.hotKeyContainer setHidden:!s.hotkeyEnable];
+	[self.hotKeyHelp setHidden:s.hotkeyEnable];
 }
 
 - (void)populateHotkeyLetterMenu
@@ -844,9 +862,11 @@ static AppDelegate *_static_shared_ref;
 {
 	[Settings shared].hotkeyEnable = self.hotkeyEnable.integerValue;
 	[Settings shared].hotkeyLetter = self.hotkeyLetter.titleOfSelectedItem;
+	[Settings shared].hotkeyControlModifier = self.hotkeyControlModifier.integerValue;
 	[Settings shared].hotkeyCommandModifier = self.hotkeyCommandModifier.integerValue;
 	[Settings shared].hotkeyOptionModifier = self.hotkeyOptionModifier.integerValue;
 	[Settings shared].hotkeyShiftModifier = self.hotkeyShiftModifier.integerValue;
+	[self enableHotkeySegments];
 	[self addHotKeySupport];
 }
 
@@ -860,6 +880,16 @@ static AppDelegate *_static_shared_ref;
 {
 	NSString *address = [NSString stringWithFormat:@"https://%@/settings/applications",[Settings shared].apiFrontEnd];
 	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:address]];
+}
+
+- (IBAction)prMergePolicySelected:(NSPopUpButton *)sender
+{
+	[Settings shared].mergeHandlingPolicy = sender.indexOfSelectedItem;
+}
+
+- (IBAction)prClosePolicySelected:(NSPopUpButton *)sender
+{
+	[Settings shared].closeHandlingPolicy = sender.indexOfSelectedItem;
 }
 
 /////////////////////////////////// Repo table
@@ -1180,12 +1210,12 @@ static AppDelegate *_static_shared_ref;
 		self.refreshNow.target = oldTarget;
 		self.refreshNow.action = oldAction;
 		self.lastUpdateFailed = !success;
-		[self completeRefresh];
 		if(success)
 		{
 			self.lastSuccessfulRefresh = [NSDate date];
 			self.preferencesDirty = NO;
 		}
+		[self completeRefresh];
 		self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:[Settings shared].refreshPeriod
 															 target:self
 														   selector:@selector(refreshTimerDone)
@@ -1215,17 +1245,15 @@ static AppDelegate *_static_shared_ref;
 	}
 }
 
-- (NSArray *)pullRequestList
-{
-	NSFetchRequest *f = [PullRequest requestForPullRequestsWithFilter:self.mainMenuFilter.stringValue];
-	return [self.dataManager.managedObjectContext executeFetchRequest:f error:nil];
-}
-
 - (void)updateMenu
 {
-	NSString *countString;
-	NSInteger newCommentCount = [self buildPrMenuItemsFromList];
+	NSManagedObjectContext *moc = self.dataManager.managedObjectContext;
+	NSFetchRequest *f = [PullRequest requestForPullRequestsWithFilter:self.mainMenuFilter.stringValue];
+	NSArray *pullRequests = [moc executeFetchRequest:f error:nil];
 
+	[self buildPrMenuItemsFromList:pullRequests];
+
+	NSString *countString;
 	NSDictionary *attributes;
 	if(self.lastUpdateFailed && (![Settings shared].dontReportRefreshFailures))
 	{
@@ -1237,20 +1265,24 @@ static AppDelegate *_static_shared_ref;
 	}
 	else
 	{
-		countString = [NSString stringWithFormat:@"%ld",[PullRequest countOpenRequestsInMoc:self.dataManager.managedObjectContext]];
-		if(newCommentCount)
+		NSUInteger count;
+
+		if([Settings shared].countOnlyListedPrs)
+			count = pullRequests.count;
+		else
+			count = [PullRequest countOpenRequestsInMoc:moc];
+
+		countString = [NSString stringWithFormat:@"%ld",count];
+
+		if([PullRequest badgeCountInMoc:moc]>0)
 		{
-			attributes = @{
-						   NSFontAttributeName: [NSFont menuBarFontOfSize:10.0],
-						   NSForegroundColorAttributeName: MAKECOLOR(0.8, 0.0, 0.0, 1.0),
-						   };
+			attributes = @{ NSFontAttributeName: [NSFont menuBarFontOfSize:10.0],
+							NSForegroundColorAttributeName: MAKECOLOR(0.8, 0.0, 0.0, 1.0) };
 		}
 		else
 		{
-			attributes = @{
-						   NSFontAttributeName: [NSFont menuBarFontOfSize:10.0],
-						   NSForegroundColorAttributeName: [COLOR_CLASS blackColor],
-						   };
+			attributes = @{ NSFontAttributeName: [NSFont menuBarFontOfSize:10.0],
+							NSForegroundColorAttributeName: [COLOR_CLASS blackColor] };
 		}
 	}
 
@@ -1590,6 +1622,15 @@ static AppDelegate *_static_shared_ref;
 		if((incomingEvent.modifierFlags & NSCommandKeyMask) == NSCommandKeyMask) check--; else check++;
 	}
 
+	if([Settings shared].hotkeyControlModifier)
+	{
+		if((incomingEvent.modifierFlags & NSControlKeyMask) == NSControlKeyMask) check++; else check--;
+	}
+	else
+	{
+		if((incomingEvent.modifierFlags & NSControlKeyMask) == NSControlKeyMask) check--; else check++;
+	}
+
 	if([Settings shared].hotkeyOptionModifier)
 	{
 		if((incomingEvent.modifierFlags & NSAlternateKeyMask) == NSAlternateKeyMask) check++; else check--;
@@ -1608,7 +1649,7 @@ static AppDelegate *_static_shared_ref;
 		if((incomingEvent.modifierFlags & NSShiftKeyMask) == NSShiftKeyMask) check--; else check++;
 	}
 
-	if(check==3)
+	if(check==4)
 	{
 		NSDictionary *codeLookup = @{@"A": @(0),
 									 @"B": @(11),

@@ -8,6 +8,7 @@
 //#define DLog(fmt, ...) NSLog(fmt, ##__VA_ARGS__)
 #define DLog(...)
 #define COLOR_CLASS NSColor
+#define IMAGE_CLASS NSImage
 #define MAKECOLOR(R,G,B,A) [COLOR_CLASS colorWithSRGBRed:R green:G blue:B alpha:A]
 
 #import <Cocoa/Cocoa.h>

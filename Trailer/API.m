@@ -2,7 +2,7 @@
 @interface API ()
 {
 	NSOperationQueue *requestQueue;
-	NSDateFormatter *dateFormatter, *mediumFormatter;
+	NSDateFormatter *mediumFormatter;
     NSString *cacheDirectory;
 #ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
 	NSInteger networkIndicationCount;
@@ -31,9 +31,6 @@ typedef void (^completionBlockType)(BOOL);
 														  diskCapacity:CACHE_DISK
 															  diskPath:nil];
 		[NSURLCache setSharedURLCache:cache];
-
-		dateFormatter = [[NSDateFormatter alloc] init];
-		dateFormatter.dateFormat = @"YYYY-MM-DDTHH:MM:SSZ";
 
 		mediumFormatter = [[NSDateFormatter alloc] init];
 		mediumFormatter.dateStyle = NSDateFormatterMediumStyle;
@@ -387,12 +384,23 @@ typedef void (^completionBlockType)(BOOL);
 			  NSString *mergeUserId = [[mergeInfo  ofk:@"id"] stringValue];
 			  DLog(@"merged by user id: %@, our id is: %@",mergeUserId,[Settings shared].localUserId);
 			  BOOL mergedByMyself = [mergeUserId isEqualToString:[Settings shared].localUserId];
-			  if(!([Settings shared].dontKeepMyPrs && mergedByMyself)) // someone else merged
+			  if(!([Settings shared].dontKeepPrsMergedByMe && mergedByMyself))
 			  {
-				  DLog(@"announcing merged PR: %@",r.title);
-				  r.postSyncAction = @(kPostSyncDoNothing); // don't delete this
-				  r.condition = @kPullRequestConditionMerged;
-				  [[AppDelegate shared] postNotificationOfType:kPrMerged forItem:r];
+				  DLog(@"detected merged PR: %@",r.title);
+				  switch ([Settings shared].mergeHandlingPolicy)
+				  {
+					  case kPullRequestHandlingKeepMine:
+					  {
+						  if(r.sectionIndex.integerValue==kPullRequestSectionAll) break;
+					  }
+					  case kPullRequestHandlingKeepAll:
+					  {
+						  r.postSyncAction = @(kPostSyncDoNothing); // don't delete this
+						  r.condition = @kPullRequestConditionMerged;
+						  [[AppDelegate shared] postNotificationOfType:kPrMerged forItem:r];
+					  }
+					  case kPullRequestHandlingKeepNone: {}
+				  }
 			  }
 			  else
 			  {
@@ -402,11 +410,19 @@ typedef void (^completionBlockType)(BOOL);
 		  else
 		  {
 			  DLog(@"detected closed PR: %@",r.title);
-			  if([Settings shared].alsoKeepClosedPrs)
+			  switch([Settings shared].closeHandlingPolicy)
 			  {
-				  r.postSyncAction = @(kPostSyncDoNothing); // don't delete this
-				  r.condition = @kPullRequestConditionClosed;
-				  [[AppDelegate shared] postNotificationOfType:kPrClosed forItem:r];
+				  case kPullRequestHandlingKeepMine:
+				  {
+					  if(r.sectionIndex.integerValue==kPullRequestSectionAll) break;
+				  }
+				  case kPullRequestHandlingKeepAll:
+				  {
+					  r.postSyncAction = @(kPostSyncDoNothing); // don't delete this
+					  r.condition = @kPullRequestConditionClosed;
+					  [[AppDelegate shared] postNotificationOfType:kPrClosed forItem:r];
+				  }
+				  case kPullRequestHandlingKeepNone: {}
 			  }
 		  }
 		  if(callback) callback(YES);
@@ -937,7 +953,7 @@ typedef void (^completionBlockType)(BOOL);
 
 - (BOOL)haveCachedImage:(NSString *)path
                 forSize:(CGSize)imageSize
-     tryLoadAndCallback:(void (^)(id image))callbackOrNil
+     tryLoadAndCallback:(void (^)(IMAGE_CLASS *image))callbackOrNil
 {
     // mix image path, size, and app version into one md5
 	NSString *currentAppVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
@@ -956,18 +972,19 @@ typedef void (^completionBlockType)(BOOL);
     NSFileManager *fileManager = [NSFileManager defaultManager];
     if([fileManager fileExistsAtPath:imagePath])
     {
+		IMAGE_CLASS *ret;
 #ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
 		CFDataRef imgData = (__bridge CFDataRef)[NSData dataWithContentsOfFile:imagePath];
 		CGDataProviderRef imgDataProvider = CGDataProviderCreateWithCFData (imgData);
 		CGImageRef cfImage = CGImageCreateWithPNGDataProvider(imgDataProvider, NULL, false, kCGRenderingIntentDefault);
 		CGDataProviderRelease(imgDataProvider);
 
-		id ret = [[UIImage alloc] initWithCGImage:cfImage
-											scale:GLOBAL_SCREEN_SCALE
-									  orientation:UIImageOrientationUp];
+		ret = [[UIImage alloc] initWithCGImage:cfImage
+										 scale:GLOBAL_SCREEN_SCALE
+								   orientation:UIImageOrientationUp];
 		CGImageRelease(cfImage);
 #else
-        id ret = [[NSImage alloc] initWithContentsOfFile:imagePath];
+        ret = [[NSImage alloc] initWithContentsOfFile:imagePath];
 #endif
         if(ret)
         {
@@ -1006,6 +1023,29 @@ typedef void (^completionBlockType)(BOOL);
     }
 
     return NO;
+}
+
+- (NSString *)lastUpdateDescription
+{
+	if([AppDelegate shared].isRefreshing)
+	{
+		return @"Refreshing...";
+	}
+	else if([AppDelegate shared].lastUpdateFailed)
+	{
+		return @"Last update failed";
+	}
+	else
+	{
+		NSDate *lastSuccess = [AppDelegate shared].lastSuccessfulRefresh;
+		if(!lastSuccess) lastSuccess = [NSDate date];
+		long ago = (long)[[NSDate date] timeIntervalSinceDate:lastSuccess];
+		if(ago<10)
+			return @"Just updated";
+		else
+			return [NSString stringWithFormat:@"Updated %ld seconds ago",(long)ago];
+	}
+
 }
 
 @end

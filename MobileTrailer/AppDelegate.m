@@ -168,18 +168,6 @@ CGFloat GLOBAL_SCREEN_SCALE;
 	[self startRefresh];
 }
 
-- (void)updateBadge
-{
-	NSFetchRequest *f = [PullRequest requestForPullRequestsWithFilter:nil];
-	NSArray *allPRs = [self.dataManager.managedObjectContext executeFetchRequest:f error:nil];
-	NSInteger count = 0;
-	for(PullRequest *r in allPRs)
-		if(r.condition.integerValue==kPullRequestConditionOpen)
-			count += r.unreadComments.integerValue;
-	
-	[UIApplication sharedApplication].applicationIconBadgeNumber = count;
-}
-
 - (void)checkApiUsage
 {
 	if([Settings shared].authToken.length==0) return;
@@ -221,7 +209,6 @@ CGFloat GLOBAL_SCREEN_SCALE;
 -(void)completeRefresh
 {
 	[self checkApiUsage];
-	[self updateBadge];
 	self.isRefreshing = NO;
 	[[NSNotificationCenter defaultCenter] postNotificationName:REFRESH_ENDED_NOTIFICATION object:nil];
 	[self.dataManager sendNotifications];
@@ -241,12 +228,12 @@ CGFloat GLOBAL_SCREEN_SCALE;
 	[self.api fetchPullRequestsForActiveReposAndCallback:^(BOOL success) {
 		self.lastUpdateFailed = !success;
 		BOOL hasNewData = (success && self.dataManager.managedObjectContext.hasChanges);
-		[self completeRefresh];
 		if(success)
 		{
 			self.lastSuccessfulRefresh = [NSDate date];
 			self.preferencesDirty = NO;
 		}
+		[self completeRefresh];
 		if(self.backgroundCallback)
 		{
 			if(hasNewData)
@@ -326,6 +313,11 @@ CGFloat GLOBAL_SCREEN_SCALE;
 		case kNewPr:
 		{
 			notification.alertBody = [NSString stringWithFormat:@"New PR: %@",[item title]];
+			break;
+		}
+		case kPrReopened:
+		{
+			notification.alertBody = [NSString stringWithFormat:@"Re-Opened PR: %@",[item title]];
 			break;
 		}
 		case kPrMerged:

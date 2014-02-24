@@ -6,17 +6,18 @@ typedef enum {
 	kNewComment = 0,
 	kNewPr = 1,
 	kPrMerged = 2,
+	kPrReopened = 3,
 	kNewMention = 4,
 	kPrClosed = 5,
 	kNewRepoSubscribed = 6,
-	kNewRepoAnnouncement = 7
+	kNewRepoAnnouncement = 7,
 } PRNotificationType;
 
 typedef enum {
 	kCreationDate = 0,
 	kRecentActivity = 1,
 	kTitle = 2,
-	kRepository = 3
+	kRepository = 3,
 } PRSortingMethod;
 
 typedef enum {
@@ -24,6 +25,12 @@ typedef enum {
 	kRepoAutoSubscribeParentsOnly = 1,
 	kRepoDontAutoSubscribeAll = 2,
 } PRSubscriptionPolicy;
+
+typedef enum {
+	kPullRequestHandlingKeepMine = 0,
+	kPullRequestHandlingKeepAll = 1,
+	kPullRequestHandlingKeepNone = 2,
+} PRHandlingPolicy;
 
 #define PULL_REQUEST_ID_KEY @"pullRequestIdKey"
 #define COMMENT_ID_KEY @"commentIdKey"
@@ -55,8 +62,10 @@ typedef enum {
 
 - (void)restartNotifier;
 
+- (NSString *)lastUpdateDescription;
+
 - (BOOL)haveCachedImage:(NSString *)path
                 forSize:(CGSize)imageSize
-     tryLoadAndCallback:(void(^)(id image))callbackOrNil;
+     tryLoadAndCallback:(void(^)(IMAGE_CLASS *image))callbackOrNil;
 
 @end

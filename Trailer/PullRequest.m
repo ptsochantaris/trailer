@@ -26,6 +26,7 @@
 @dynamic statusesLink;
 @dynamic assignedToMe;
 @dynamic issueUrl;
+@dynamic reopened;
 
 static NSDateFormatter *itemDateFormatter;
 
@@ -67,6 +68,7 @@ static NSDateFormatter *itemDateFormatter;
 	p.statusesLink = [[linkInfo ofk:@"statuses"] ofk:@"href"];
 	p.issueUrl = [[linkInfo ofk:@"issue"] ofk:@"href"];
 
+	p.reopened = @(p.condition.integerValue == kPullRequestConditionClosed);
 	p.condition = @kPullRequestConditionOpen;
 
 	return p;
@@ -74,15 +76,21 @@ static NSDateFormatter *itemDateFormatter;
 
 - (void)postProcess
 {
-	if(self.condition.integerValue==kPullRequestConditionMerged) self.sectionIndex = @kPullRequestSectionMerged;
-	else if(self.condition.integerValue==kPullRequestConditionClosed) self.sectionIndex = @kPullRequestSectionClosed;
-	else if(self.isMine) self.sectionIndex = @kPullRequestSectionMine;
-	else if(self.commentedByMe) self.sectionIndex = @kPullRequestSectionParticipated;
-	else self.sectionIndex = @kPullRequestSectionAll;
+	if(self.condition.integerValue==kPullRequestConditionMerged)
+		self.sectionIndex = @kPullRequestSectionMerged;
+	else if(self.condition.integerValue==kPullRequestConditionClosed)
+		self.sectionIndex = @kPullRequestSectionClosed;
+	else if(self.isMine)
+		self.sectionIndex = @kPullRequestSectionMine;
+	else if(self.commentedByMe)
+		self.sectionIndex = @kPullRequestSectionParticipated;
+	else if([Settings shared].hideAllPrsSection)
+		self.sectionIndex = @kPullRequestSectionNone;
+	else
+		self.sectionIndex = @kPullRequestSectionAll;
 
 	if(!self.latestReadCommentDate) self.latestReadCommentDate = [NSDate distantPast];
 
-	NSInteger unreadCount = 0;
 	BOOL autoParticipateInMentions = [Settings shared].autoParticipateInMentions && (self.condition.integerValue==kPullRequestConditionOpen);
 
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
@@ -98,12 +106,11 @@ static NSDateFormatter *itemDateFormatter;
 	NSArray *unreadComments = [self.managedObjectContext executeFetchRequest:f error:nil];
 	for(PRComment *c in unreadComments)
 	{
-		unreadCount++;
 		if(autoParticipateInMentions && c.refersToMe)
 			self.sectionIndex = @kPullRequestSectionParticipated;
 	}
 
-	self.unreadComments = @(unreadCount);
+	self.unreadComments = @(unreadComments.count);
 
 	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestUrl = %@",self.url];
 	self.totalComments = @([self.managedObjectContext countForFetchRequest:f error:nil]);
@@ -122,7 +129,7 @@ static NSDateFormatter *itemDateFormatter;
 	{
 		NSInteger section = self.sectionIndex.integerValue;
 
-		if(section == kPullRequestConditionClosed || section == kPullRequestConditionMerged)
+		if(section == kPullRequestSectionClosed || section == kPullRequestSectionMerged)
 			return NO;
 
 		if(section == kPullRequestSectionAll &&
@@ -181,7 +188,7 @@ static NSDateFormatter *itemDateFormatter;
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PullRequest"];
 
-	NSMutableArray *predicateSegments = [NSMutableArray array];
+	NSMutableArray *predicateSegments = [NSMutableArray arrayWithObject:@"(sectionIndex > 0)"];
 
 	if(filter.length)
 	{
@@ -194,11 +201,6 @@ static NSDateFormatter *itemDateFormatter;
 	if([Settings shared].shouldHideUncommentedRequests)
 	{
 		[predicateSegments addObject:@"(unreadComments > 0)"];
-	}
-
-	if([Settings shared].hideAllPrsSection)
-	{
-		[predicateSegments addObject:[NSString stringWithFormat:@"(sectionIndex != %d)",kPullRequestSectionAll]];
 	}
 
 	if(predicateSegments.count) f.predicate = [NSPredicate predicateWithFormat:[predicateSegments componentsJoinedByString:@" and "]];
@@ -228,22 +230,41 @@ static NSDateFormatter *itemDateFormatter;
 + (NSArray *)allMergedRequestsInMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PullRequest"];
-	f.predicate = [NSPredicate predicateWithFormat:@"condition == %@",@kPullRequestConditionMerged];
+	f.predicate = [NSPredicate predicateWithFormat:@"condition == %d",kPullRequestConditionMerged];
 	return [moc executeFetchRequest:f error:nil];
 }
 
 + (NSArray *)allClosedRequestsInMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PullRequest"];
-	f.predicate = [NSPredicate predicateWithFormat:@"condition == %@",@kPullRequestConditionClosed];
+	f.predicate = [NSPredicate predicateWithFormat:@"condition == %d",kPullRequestConditionClosed];
 	return [moc executeFetchRequest:f error:nil];
 }
 
 + (NSUInteger)countOpenRequestsInMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PullRequest"];
-	f.predicate = [NSPredicate predicateWithFormat:@"condition == %@ or condition == nil",@kPullRequestConditionOpen];
+	f.predicate = [NSPredicate predicateWithFormat:@"condition == %d or condition == nil",kPullRequestConditionOpen];
 	return [moc countForFetchRequest:f error:nil];
+}
+
++ (NSInteger)badgeCountInMoc:(NSManagedObjectContext *)moc
+{
+	NSFetchRequest *f = [PullRequest requestForPullRequestsWithFilter:nil];
+	NSArray *allPRs = [moc executeFetchRequest:f error:nil];
+	NSInteger count = 0;
+	BOOL showCommentsEverywhere = [Settings shared].showCommentsEverywhere;
+	for(PullRequest *r in allPRs)
+	{
+		NSInteger sectionIndex = r.sectionIndex.integerValue;
+		if(showCommentsEverywhere ||
+		   sectionIndex==kPullRequestSectionMine ||
+		   sectionIndex==kPullRequestSectionParticipated)
+		{
+			count += r.unreadComments.integerValue;
+		}
+	}
+	return count;
 }
 
 - (void)prepareForDeletion

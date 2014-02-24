@@ -7,6 +7,9 @@
     // Filtering
     UITextField *searchField;
     HTPopTimer *searchTimer;
+
+	// Refreshing
+	BOOL refreshOnRelease;
 }
 
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
@@ -37,7 +40,7 @@
 												   delegate:self
 										  cancelButtonTitle:@"Cancel"
 									 destructiveButtonTitle:@"Mark all as read"
-										  otherButtonTitles:@"Remove all merged", @"Remove all closed", @"Refresh Now", nil];
+										  otherButtonTitles:@"Remove all merged", @"Remove all closed", nil];
 	[a showFromBarButtonItem:self.navigationItem.rightBarButtonItem animated:YES];
 }
 
@@ -55,14 +58,13 @@
 	{
         [self removeAllClosed];
 	}
-	else if(buttonIndex==3)
-	{
-		[self tryRefresh];
-	}
 }
 
 - (void)tryRefresh
 {
+	refreshOnRelease = NO;
+	self.tableView.userInteractionEnabled = YES;
+
 	if([[AppDelegate shared].api.reachability currentReachabilityStatus]==NotReachable)
 	{
 		[[[UIAlertView alloc] initWithTitle:@"No Network"
@@ -128,7 +130,7 @@
 {
 	for(PullRequest *p in [PullRequest allClosedRequestsInMoc:self.managedObjectContext])
 		[self.managedObjectContext deleteObject:p];
-    [[AppDelegate shared] updateBadge];
+    [self updateBadge];
     [[AppDelegate shared].dataManager saveDB];
 }
 
@@ -136,19 +138,49 @@
 {
 	for(PullRequest *p in [PullRequest allMergedRequestsInMoc:self.managedObjectContext])
 		[self.managedObjectContext deleteObject:p];
-    [[AppDelegate shared] updateBadge];
+    [self updateBadge];
     [[AppDelegate shared].dataManager saveDB];
 }
 
 - (void)markAllAsRead
 {
 	for(PullRequest *p in self.fetchedResultsController.fetchedObjects) [p catchUpWithComments];
-	[[AppDelegate shared] updateBadge];
+	[self updateBadge];
+}
+
+- (void)refreshControlChanged
+{
+	if(![AppDelegate shared].isRefreshing) refreshOnRelease = YES;
+}
+
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
+{
+	if(refreshOnRelease)
+	{
+		if(decelerate)
+		{
+			self.tableView.userInteractionEnabled = NO;
+		}
+		else
+		{
+			[self tryRefresh];
+		}
+	}
+}
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+{
+	if(refreshOnRelease)
+	{
+		[self tryRefresh];
+	}
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
+	[self.refreshControl addTarget:self action:@selector(refreshControlChanged) forControlEvents:UIControlEventValueChanged];
 
     searchTimer = [[HTPopTimer alloc] initWithTimeInterval:0.5 target:self selector:@selector(reloadData)];
 
@@ -163,21 +195,21 @@
 	searchField.autocorrectionType = UITextAutocorrectionTypeNo;
     searchField.delegate = self;
 
-    UIView *searchHolder = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 50)];
+    UIView *searchHolder = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 41)];
 	[searchHolder addSubview:searchField];
 	self.tableView.tableHeaderView = searchHolder;
 
-    self.tableView.contentOffset = CGPointMake(0, 50);
+    self.tableView.contentOffset = CGPointMake(0, searchHolder.frame.size.height);
 
 	self.detailViewController = (DetailViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
 
 	[[NSNotificationCenter defaultCenter] addObserver:self
-											 selector:@selector(refreshStarted)
+											 selector:@selector(updateStatus)
 												 name:REFRESH_STARTED_NOTIFICATION
 											   object:nil];
 
 	[[NSNotificationCenter defaultCenter] addObserver:self
-											 selector:@selector(refreshEnded)
+											 selector:@selector(updateStatus)
 												 name:REFRESH_ENDED_NOTIFICATION
 											   object:nil];
 
@@ -187,11 +219,22 @@
 											   object:nil];
 
 	[[NSNotificationCenter defaultCenter] addObserver:self
-											 selector:@selector(reloadData)
+											 selector:@selector(displayOptionsUpdated)
 												 name:DISPLAY_OPTIONS_UPDATED_KEY
 											   object:nil];
+}
 
+- (void)viewDidAppear:(BOOL)animated
+{
+	[super viewDidAppear:animated];
 	[self updateStatus];
+}
+
+- (void)displayOptionsUpdated
+{
+	_fetchedResultsController = nil;
+	[[AppDelegate shared].dataManager postProcessAllPrs];
+	[self reloadData];
 }
 
 - (void)reloadData
@@ -205,8 +248,6 @@
 {
 	//DLog(@"local notification: %@",notification.userInfo);
 
-	NSManagedObjectContext *mainMoc = [AppDelegate shared].dataManager.managedObjectContext;
-
 	urlToOpen = notification.userInfo[NOTIFICATION_URL_KEY];
 
     NSNumber *pullRequestId = notification.userInfo[PULL_REQUEST_ID_KEY];
@@ -217,13 +258,13 @@
 
     if(commentId)
     {
-        PRComment *c = [PRComment itemOfType:@"PRComment" serverId:commentId moc:mainMoc];
+        PRComment *c = [PRComment itemOfType:@"PRComment" serverId:commentId moc:self.managedObjectContext];
         if(!urlToOpen) urlToOpen = c.webUrl;
-        pullRequest = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:mainMoc];
+        pullRequest = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:self.managedObjectContext];
     }
     else if(pullRequestId)
     {
-        pullRequest = [PullRequest itemOfType:@"PullRequest" serverId:pullRequestId moc:mainMoc];
+        pullRequest = [PullRequest itemOfType:@"PullRequest" serverId:pullRequestId moc:self.managedObjectContext];
         if(!urlToOpen) urlToOpen = pullRequest.webUrl;
 
         if(!pullRequest)
@@ -239,7 +280,6 @@
     if(urlToOpen)
     {
         searchField.text = nil;
-        _fetchedResultsController = nil;
         [self reloadData];
     }
 
@@ -269,7 +309,7 @@
     dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
     dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
         [pullRequest catchUpWithComments];
-        [[AppDelegate shared] updateBadge];
+        [self updateBadge];
         [[AppDelegate shared].dataManager saveDB];
     });
 }
@@ -277,22 +317,6 @@
 - (void)dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-}
-
-- (void)refreshStarted
-{
-	self.title = @"Refreshing...";
-	[self updateStatus];
-}
-
-- (void)refreshEnded
-{
-	NSInteger count = [PullRequest countOpenRequestsInMoc:self.managedObjectContext];
-	if(count>0)
-		self.title = [NSString stringWithFormat:@"%ld Open PRs",(long)count];
-	else
-		self.title = @"No open PRs";
-	[self updateStatus];
 }
 
 #pragma mark - Table View
@@ -378,7 +402,7 @@
 	if(editingStyle==UITableViewCellEditingStyleDelete)
 	{
 		PullRequest *pr = [self.fetchedResultsController objectAtIndexPath:indexPath];
-		[[AppDelegate shared].dataManager.managedObjectContext deleteObject:pr];
+		[self.managedObjectContext deleteObject:pr];
 		[[AppDelegate shared].dataManager saveDB];
 	}
 }
@@ -479,15 +503,53 @@
 
 - (void)updateStatus
 {
-	if(self.fetchedResultsController.fetchedObjects.count)
+	if([AppDelegate shared].isRefreshing)
 	{
-		self.tableView.tableFooterView = nil;
+		self.title = @"Refreshing...";
+		EmptyView *label = [[EmptyView alloc] initWithMessage:[[AppDelegate shared].dataManager reasonForEmptyWithFilter:searchField.text]];
+		self.tableView.tableFooterView = label;
+
+		if(!self.refreshControl.isRefreshing)
+		{
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[self.refreshControl beginRefreshing];
+			});
+		}
 	}
 	else
 	{
-		EmptyView *label = [[EmptyView alloc] initWithMessage:[[AppDelegate shared].dataManager reasonForEmptyWithFilter:searchField.text]];
-		self.tableView.tableFooterView = label;
+		if(self.refreshControl.isRefreshing)
+		{
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[self.refreshControl endRefreshing];
+			});
+		}
+
+		NSInteger count = self.fetchedResultsController.fetchedObjects.count;
+		if(count>0)
+		{
+			if(count==1)
+				self.title = @"1 Pull Request";
+			else
+				self.title = [NSString stringWithFormat:@"%ld Pull Requests",(long)count];
+			self.tableView.tableFooterView = nil;
+		}
+		else
+		{
+			self.title = @"No PRs";
+			EmptyView *label = [[EmptyView alloc] initWithMessage:[[AppDelegate shared].dataManager reasonForEmptyWithFilter:searchField.text]];
+			self.tableView.tableFooterView = label;
+		}
 	}
+	self.refreshControl.attributedTitle = [[NSAttributedString alloc] initWithString:[[AppDelegate shared].api lastUpdateDescription]
+																		  attributes:@{ }];
+
+	[self updateBadge];
+}
+
+- (void)updateBadge
+{
+	[UIApplication sharedApplication].applicationIconBadgeNumber = [PullRequest badgeCountInMoc:self.managedObjectContext];
 }
 
 ///////////////////////////// filtering

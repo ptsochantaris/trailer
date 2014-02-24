@@ -16,7 +16,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	settingsChangedAnnounceTimer = [[HTPopTimer alloc] initWithTimeInterval:1.0 target:self selector:@selector(postChangeNotification)];
+	if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+		settingsChangedAnnounceTimer = [[HTPopTimer alloc] initWithTimeInterval:1.0 target:self selector:@selector(postChangeNotification)];
 }
 
 - (void)postChangeNotification
@@ -28,7 +29,7 @@
 #define DISPLAY_SECTION_INDEX 1
 #define COMMENTS_SECTION_INDEX 2
 #define REPOS_SECTION_INDEX 3
-#define MERGING_SECTION_INDEX 4
+#define HISTORY_SECTION_INDEX 4
 #define CONFIRM_SECTION_INDEX 5
 #define SORT_SECTION_INDEX 6
 #define API_SECTION_INDEX 7
@@ -38,6 +39,7 @@
 #define SORT_REVERSE @[@"Newest first",@"Most recently active",@"Reverse alphabetically"]
 #define SORT_NORMAL @[@"Oldest first",@"Inactive for longest",@"Alphabetically"]
 #define AUTO_SUBSCRIPTION @[@"None",@"Parents",@"All"]
+#define PR_HANDLING_POLICY @[@"Keep My Own",@"Keep All",@"Don't Keep"]
 
 NSString *B(NSString *input)
 {
@@ -161,21 +163,27 @@ NSString *B(NSString *input)
             }
 		}
 	}
-	else if(indexPath.section==MERGING_SECTION_INDEX)
+	else if(indexPath.section==HISTORY_SECTION_INDEX)
 	{
 		cell.detailTextLabel.text = nil;
 		switch (indexPath.row)
 		{
 			case 0:
 			{
-				cell.textLabel.text = @"Keep closed PRs";
-				if([Settings shared].alsoKeepClosedPrs) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				cell.textLabel.text = B(@"When a PR is merged");
+				cell.detailTextLabel.text = PR_HANDLING_POLICY[[Settings shared].mergeHandlingPolicy];
 				break;
 			}
 			case 1:
 			{
+				cell.textLabel.text = B(@"When a PR is closed");
+				cell.detailTextLabel.text = PR_HANDLING_POLICY[[Settings shared].closeHandlingPolicy];
+				break;
+			}
+			case 2:
+			{
 				cell.textLabel.text = B(@"Don't keep PRs merged\nby me");
-				if([Settings shared].dontKeepMyPrs) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if([Settings shared].dontKeepPrsMergedByMe) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
 		}
@@ -368,22 +376,35 @@ NSString *B(NSString *input)
 		}
 		[settingsChangedAnnounceTimer push];
 	}
-	else if(indexPath.section==MERGING_SECTION_INDEX)
+	else if(indexPath.section==HISTORY_SECTION_INDEX)
 	{
 		switch (indexPath.row)
 		{
 			case 0:
 			{
-				[Settings shared].alsoKeepClosedPrs = ![Settings shared].alsoKeepClosedPrs;
+                selectedIndexPath = indexPath;
+				previousValue = [Settings shared].mergeHandlingPolicy;
+				pickerName = [self.tableView cellForRowAtIndexPath:indexPath].textLabel.text;
+                valuesToPush = PR_HANDLING_POLICY;
+				[self performSegueWithIdentifier:@"showPicker" sender:self];
 				break;
 			}
 			case 1:
 			{
-				[Settings shared].dontKeepMyPrs = ![Settings shared].dontKeepMyPrs;
+                selectedIndexPath = indexPath;
+				previousValue = [Settings shared].closeHandlingPolicy;
+				pickerName = [self.tableView cellForRowAtIndexPath:indexPath].textLabel.text;
+                valuesToPush = PR_HANDLING_POLICY;
+				[self performSegueWithIdentifier:@"showPicker" sender:self];
+				break;
+			}
+			case 2:
+			{
+				[Settings shared].dontKeepPrsMergedByMe = ![Settings shared].dontKeepPrsMergedByMe;
+				[settingsChangedAnnounceTimer push];
 				break;
 			}
 		}
-		[settingsChangedAnnounceTimer push];
 	}
 	else if(indexPath.section==CONFIRM_SECTION_INDEX)
 	{
@@ -447,7 +468,7 @@ NSString *B(NSString *input)
 		case DISPLAY_SECTION_INDEX: return 5;
 		case COMMENTS_SECTION_INDEX: return 3;
 		case REPOS_SECTION_INDEX: return 3;
-		case MERGING_SECTION_INDEX: return 2;
+		case HISTORY_SECTION_INDEX: return 3;
 		case CONFIRM_SECTION_INDEX: return 2;
 		case SORT_SECTION_INDEX: return 3;
 		case API_SECTION_INDEX: return 1;
@@ -462,7 +483,7 @@ NSString *B(NSString *input)
 		case DISPLAY_SECTION_INDEX: return @"Display";
 		case COMMENTS_SECTION_INDEX: return @"Comments";
 		case REPOS_SECTION_INDEX: return @"Repositories";
-		case MERGING_SECTION_INDEX: return @"Merging";
+		case HISTORY_SECTION_INDEX: return @"History";
 		case CONFIRM_SECTION_INDEX: return @"Don't confirm when";
 		case SORT_SECTION_INDEX: return @"Sorting";
 		case API_SECTION_INDEX: return @"API";
@@ -515,6 +536,17 @@ NSString *B(NSString *input)
     {
         [Settings shared].repoSubscriptionPolicy = indexPath.row;
     }
+	else if(selectedIndexPath.section==HISTORY_SECTION_INDEX)
+	{
+		if(selectedIndexPath.row==0)
+		{
+			[Settings shared].mergeHandlingPolicy = indexPath.row;
+		}
+		else if(selectedIndexPath.row==1)
+		{
+			[Settings shared].closeHandlingPolicy = indexPath.row;
+		}
+	}
 	[self.tableView reloadData];
 	selectedIndexPath = nil;
 }

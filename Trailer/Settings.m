@@ -151,8 +151,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #define DONT_KEEP_MY_PRS_KEY @"DONT_KEEP_MY_PRS_KEY"
--(void)setDontKeepMyPrs:(BOOL)dontKeepMyPrs { [self storeDefaultValue:@(dontKeepMyPrs) forKey:DONT_KEEP_MY_PRS_KEY]; }
--(BOOL)dontKeepMyPrs { return [[[NSUserDefaults standardUserDefaults] stringForKey:DONT_KEEP_MY_PRS_KEY] boolValue]; }
+-(void)setDontKeepPrsMergedByMe:(BOOL)dontKeepPrsMergedByMe { [self storeDefaultValue:@(dontKeepPrsMergedByMe) forKey:DONT_KEEP_MY_PRS_KEY]; }
+-(BOOL)dontKeepPrsMergedByMe { return [[[NSUserDefaults standardUserDefaults] stringForKey:DONT_KEEP_MY_PRS_KEY] boolValue]; }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -165,12 +165,6 @@
 #define AUTO_PARTICIPATE_IN_MENTIONS_KEY @"AUTO_PARTICIPATE_IN_MENTIONS_KEY"
 -(void)setAutoParticipateInMentions:(BOOL)autoParticipateInMentions { [self storeDefaultValue:@(autoParticipateInMentions) forKey:AUTO_PARTICIPATE_IN_MENTIONS_KEY]; }
 -(BOOL)autoParticipateInMentions { return [[[NSUserDefaults standardUserDefaults] stringForKey:AUTO_PARTICIPATE_IN_MENTIONS_KEY] boolValue]; }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#define ALSO_KEEP_CLOSED_PRS_KEY @"ALSO_KEEP_CLOSED_PRS_KEY"
--(void)setAlsoKeepClosedPrs:(BOOL)alsoKeepClosedPrs { [self storeDefaultValue:@(alsoKeepClosedPrs) forKey:ALSO_KEEP_CLOSED_PRS_KEY]; }
--(BOOL)alsoKeepClosedPrs { return [[[NSUserDefaults standardUserDefaults] stringForKey:ALSO_KEEP_CLOSED_PRS_KEY] boolValue]; }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -249,6 +243,29 @@
 #define REPO_SUBSCRIPTION_POLICY @"REPO_SUBSCRIPTION_POLICY"
 -(NSInteger)repoSubscriptionPolicy { return [[[NSUserDefaults standardUserDefaults] stringForKey:REPO_SUBSCRIPTION_POLICY] integerValue]; }
 -(void)setRepoSubscriptionPolicy:(NSInteger)repoSubscriptionPolicy { [self storeDefaultValue:@(repoSubscriptionPolicy) forKey:REPO_SUBSCRIPTION_POLICY]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define MERGE_HANDLING_POLICY @"MERGE_HANDLING_POLICY"
+-(NSInteger)mergeHandlingPolicy { return [[[NSUserDefaults standardUserDefaults] stringForKey:MERGE_HANDLING_POLICY] integerValue]; }
+-(void)setMergeHandlingPolicy:(NSInteger)mergeHandlingPolicy { [self storeDefaultValue:@(mergeHandlingPolicy) forKey:MERGE_HANDLING_POLICY]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#define CLOSE_HANDLING_POLICY @"CLOSE_HANDLING_POLICY"
+-(NSInteger)closeHandlingPolicy { return [[[NSUserDefaults standardUserDefaults] stringForKey:CLOSE_HANDLING_POLICY] integerValue]; }
+-(void)setCloseHandlingPolicy:(NSInteger)closeHandlingPolicy { [self storeDefaultValue:@(closeHandlingPolicy) forKey:CLOSE_HANDLING_POLICY]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define COUNT_ONLY_LISTED_PRS @"COUNT_ONLY_LISTED_PRS"
+-(void)setCountOnlyListedPrs:(BOOL)countOnlyListedPrs { [self storeDefaultValue:@(countOnlyListedPrs) forKey:COUNT_ONLY_LISTED_PRS]; }
+-(BOOL)countOnlyListedPrs { return [[[NSUserDefaults standardUserDefaults] stringForKey:COUNT_ONLY_LISTED_PRS] boolValue]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define HOTKEY_CONTROL_MODIFIER @"HOTKEY_CONTROL_MODIFIER"
+-(void)setHotkeyControlModifier:(BOOL)hotkeyControlModifier { [self storeDefaultValue:@(hotkeyControlModifier) forKey:HOTKEY_CONTROL_MODIFIER]; }
+-(BOOL)hotkeyControlModifier { return [[[NSUserDefaults standardUserDefaults] stringForKey:HOTKEY_CONTROL_MODIFIER] boolValue]; }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

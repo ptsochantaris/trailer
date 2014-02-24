@@ -323,7 +323,7 @@ Server</string>
                                             </textFieldCell>
                                         </textField>
                                         <button id="AEB-MY-2H6">
-                                            <rect key="frame" x="51" y="211" width="419" height="18"/>
+                                            <rect key="frame" x="51" y="221" width="419" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Display PR creation time instead of most recent activity time" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="FUA-CI-tqc">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -334,7 +334,7 @@ Server</string>
                                             </connections>
                                         </button>
                                         <button id="ZD1-Lw-zpW">
-                                            <rect key="frame" x="51" y="176" width="405" height="18"/>
+                                            <rect key="frame" x="51" y="191" width="405" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Move PRs assigned to me to the &quot;My Pull Requests&quot; section" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="4g6-XV-fVn">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -345,7 +345,7 @@ Server</string>
                                             </connections>
                                         </button>
                                         <button id="SoW-AJ-5kD">
-                                            <rect key="frame" x="51" y="141" width="442" height="18"/>
+                                            <rect key="frame" x="51" y="161" width="442" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Mark PRs as un-mergeable only in my own or participated sections" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="yfb-m7-og2">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -355,8 +355,19 @@ Server</string>
                                                 <action selector="markUnmergeableOnUserSectionsOnlySelected:" target="494" id="1u3-wH-cGa"/>
                                             </connections>
                                         </button>
+                                        <button id="y7T-zw-tAa">
+                                            <rect key="frame" x="51" y="130" width="255" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Count only listed PRs in the menubar" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="pnZ-CL-lVd">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="countOnlyListedPrsSelected:" target="494" id="u7Q-BE-fyk"/>
+                                            </connections>
+                                        </button>
                                         <button id="KdG-4v-vf7">
-                                            <rect key="frame" x="51" y="280" width="140" height="18"/>
+                                            <rect key="frame" x="51" y="281" width="140" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Hide user avatars" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="eW5-mR-deV">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -367,7 +378,7 @@ Server</string>
                                             </connections>
                                         </button>
                                         <button id="4E0-iw-eoN">
-                                            <rect key="frame" x="51" y="245" width="193" height="18"/>
+                                            <rect key="frame" x="51" y="251" width="193" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Hide the &quot;All PRs&quot; section" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="JA8-t0-2Rt">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -446,27 +457,16 @@ Server</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" borderType="none" titlePosition="noTitle" id="2tW-Hw-fFy">
-                                            <rect key="frame" x="156" y="96" width="424" height="158"/>
+                                            <rect key="frame" x="156" y="69" width="427" height="212"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <view key="contentView">
-                                                <rect key="frame" x="0.0" y="0.0" width="424" height="158"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="427" height="212"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <button id="6Hg-wy-xhx">
-                                                        <rect key="frame" x="17" y="129" width="395" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Hold onto PRs which have been closed, but not merged" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="zfA-K2-57J">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="keepClosedPrsSelected:" target="494" id="KCu-1B-5yF"/>
-                                                        </connections>
-                                                    </button>
                                                     <button id="sNq-fA-PLU">
-                                                        <rect key="frame" x="17" y="91" width="395" height="18"/>
+                                                        <rect key="frame" x="107" y="95" width="211" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="When one of my PRs is merged, don't keep it around" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="ZvA-e4-rHz">
+                                                        <buttonCell key="cell" type="check" title="Don't keep PRs merged by me" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="ZvA-e4-rHz">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
@@ -475,14 +475,14 @@ Server</string>
                                                         </connections>
                                                     </button>
                                                     <box autoresizesSubviews="NO" title="Don't confirm when selecting to remove..." borderType="line" id="vlI-Pt-9wc">
-                                                        <rect key="frame" x="16" y="12" width="397" height="54"/>
+                                                        <rect key="frame" x="14" y="11" width="397" height="54"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView">
                                                             <rect key="frame" x="1" y="1" width="395" height="38"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <button id="fU7-ye-zZ9">
-                                                                    <rect key="frame" x="51" y="12" width="127" height="18"/>
+                                                                    <rect key="frame" x="53" y="12" width="127" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="...all merged PRs" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="8Z6-fm-ybL">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -493,7 +493,7 @@ Server</string>
                                                                     </connections>
                                                                 </button>
                                                                 <button id="a8N-EM-mQf">
-                                                                    <rect key="frame" x="221" y="12" width="119" height="18"/>
+                                                                    <rect key="frame" x="223" y="12" width="119" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="...all closed PRs" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="9sy-6j-7e4">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -508,6 +508,60 @@ Server</string>
                                                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                     </box>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="ODT-YL-v99">
+                                                        <rect key="frame" x="74" y="181" width="140" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="When a PR is merged:" id="U2n-6O-f3k">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <popUpButton verticalHuggingPriority="750" id="p7f-Hm-I81">
+                                                        <rect key="frame" x="218" y="175" width="134" height="26"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="D9G-Pg-ZMT">
+                                                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="menu"/>
+                                                            <menu key="menu" title="OtherViews" id="AEE-SH-fUc">
+                                                                <items>
+                                                                    <menuItem title="Keep My Own" id="uWR-Hq-DiF"/>
+                                                                    <menuItem title="Keep All" id="iFq-k5-bdi"/>
+                                                                    <menuItem title="Don't Keep" id="5pB-y1-gaO"/>
+                                                                </items>
+                                                            </menu>
+                                                        </popUpButtonCell>
+                                                        <connections>
+                                                            <action selector="prMergePolicySelected:" target="494" id="cis-Wb-Xz0"/>
+                                                        </connections>
+                                                    </popUpButton>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="hkc-4G-U7B">
+                                                        <rect key="frame" x="82" y="145" width="132" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="When a PR is closed:" id="Dsn-Zh-a0O">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <popUpButton verticalHuggingPriority="750" id="8Ju-qc-WBt">
+                                                        <rect key="frame" x="218" y="139" width="134" height="26"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="NnB-1k-Kfv">
+                                                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="menu"/>
+                                                            <menu key="menu" title="OtherViews" id="dGQ-7d-Hxr">
+                                                                <items>
+                                                                    <menuItem title="Keep My Own" id="dRH-zW-PxY"/>
+                                                                    <menuItem title="Keep All" id="0jW-iY-SLy"/>
+                                                                    <menuItem title="Don't Keep" id="9pQ-Ap-fmU"/>
+                                                                </items>
+                                                            </menu>
+                                                        </popUpButtonCell>
+                                                        <connections>
+                                                            <action selector="prClosePolicySelected:" target="494" id="tcy-UF-AQn"/>
+                                                        </connections>
+                                                    </popUpButton>
                                                 </subviews>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
@@ -653,8 +707,85 @@ Server</string>
                                                 <rect key="frame" x="0.0" y="0.0" width="705" height="300"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
+                                                    <box autoresizesSubviews="NO" title="Hotkey" borderType="line" titlePosition="noTitle" id="uty-zk-pnf">
+                                                        <rect key="frame" x="197" y="64" width="311" height="72"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <view key="contentView">
+                                                            <rect key="frame" x="1" y="1" width="309" height="70"/>
+                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                            <subviews>
+                                                                <button id="sLc-s4-xlc">
+                                                                    <rect key="frame" x="65" y="12" width="40" height="48"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <buttonCell key="cell" type="check" title="⌘" bezelStyle="regularSquare" imagePosition="below" alignment="center" state="on" inset="2" id="6xE-g6-buW">
+                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                        <font key="font" metaFont="system" size="24"/>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="enableHotkeySelected:" target="494" id="yXl-wb-BKM"/>
+                                                                    </connections>
+                                                                </button>
+                                                                <button id="Dja-8A-nEx">
+                                                                    <rect key="frame" x="16" y="12" width="47" height="49"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <buttonCell key="cell" type="check" title="Ctrl" bezelStyle="regularSquare" imagePosition="below" alignment="center" state="on" inset="2" id="uc0-NJ-QAI">
+                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                        <font key="font" metaFont="system" size="16"/>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="enableHotkeySelected:" target="494" id="jp0-j6-67Y"/>
+                                                                    </connections>
+                                                                </button>
+                                                                <button id="AEc-A8-j0N">
+                                                                    <rect key="frame" x="107" y="12" width="40" height="48"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <buttonCell key="cell" type="check" title="⌥" bezelStyle="regularSquare" imagePosition="below" alignment="center" state="on" inset="2" id="zqa-nT-kEg">
+                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                        <font key="font" metaFont="system" size="24"/>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="enableHotkeySelected:" target="494" id="0gV-oz-VTU"/>
+                                                                    </connections>
+                                                                </button>
+                                                                <button id="ha7-N5-qJl">
+                                                                    <rect key="frame" x="149" y="12" width="40" height="48"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <buttonCell key="cell" type="check" title="⇧" bezelStyle="regularSquare" imagePosition="below" alignment="center" state="on" inset="2" id="B8v-bY-mJG">
+                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                        <font key="font" metaFont="system" size="24"/>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="enableHotkeySelected:" target="494" id="bQ0-DM-jUr"/>
+                                                                    </connections>
+                                                                </button>
+                                                                <popUpButton verticalHuggingPriority="750" id="pbg-9Q-ZfJ">
+                                                                    <rect key="frame" x="219" y="34" width="75" height="26"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="gFU-aR-877">
+                                                                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                                        <font key="font" size="13" name="LucidaGrande"/>
+                                                                        <menu key="menu" title="Keys" id="v4c-JW-qPh"/>
+                                                                    </popUpButtonCell>
+                                                                    <connections>
+                                                                        <action selector="enableHotkeySelected:" target="494" id="AJp-q2-BcN"/>
+                                                                    </connections>
+                                                                </popUpButton>
+                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="kMV-77-kPR">
+                                                                    <rect key="frame" x="191" y="33" width="24" height="29"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="+" id="xxn-ZB-ah1">
+                                                                        <font key="font" metaFont="system" size="24"/>
+                                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                    </textFieldCell>
+                                                                </textField>
+                                                            </subviews>
+                                                        </view>
+                                                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                    </box>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="B02-2m-mrP">
-                                                        <rect key="frame" x="36" y="71" width="632" height="42"/>
+                                                        <rect key="frame" x="36" y="80" width="632" height="42"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" id="nPj-Jx-Vfo">
                                                             <font key="font" metaFont="toolTip"/>
@@ -665,67 +796,10 @@ Available on OS X Mavericks onwards</string>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <box autoresizesSubviews="NO" title="Hotkey" borderType="line" titlePosition="noTitle" id="uty-zk-pnf">
-                                                        <rect key="frame" x="176" y="122" width="353" height="70"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <view key="contentView">
-                                                            <rect key="frame" x="1" y="1" width="351" height="68"/>
-                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                            <subviews>
-                                                                <button id="sLc-s4-xlc">
-                                                                    <rect key="frame" x="16" y="26" width="87" height="18"/>
-                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                    <buttonCell key="cell" type="check" title="Command" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="6xE-g6-buW">
-                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                        <font key="font" metaFont="system"/>
-                                                                    </buttonCell>
-                                                                    <connections>
-                                                                        <action selector="enableHotkeySelected:" target="494" id="yXl-wb-BKM"/>
-                                                                    </connections>
-                                                                </button>
-                                                                <button id="AEc-A8-j0N">
-                                                                    <rect key="frame" x="117" y="26" width="65" height="18"/>
-                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                    <buttonCell key="cell" type="check" title="Option" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="zqa-nT-kEg">
-                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                        <font key="font" metaFont="system"/>
-                                                                    </buttonCell>
-                                                                    <connections>
-                                                                        <action selector="enableHotkeySelected:" target="494" id="0gV-oz-VTU"/>
-                                                                    </connections>
-                                                                </button>
-                                                                <button id="ha7-N5-qJl">
-                                                                    <rect key="frame" x="196" y="26" width="51" height="18"/>
-                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                    <buttonCell key="cell" type="check" title="Shift" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="B8v-bY-mJG">
-                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                        <font key="font" metaFont="system"/>
-                                                                    </buttonCell>
-                                                                    <connections>
-                                                                        <action selector="enableHotkeySelected:" target="494" id="bQ0-DM-jUr"/>
-                                                                    </connections>
-                                                                </button>
-                                                                <popUpButton verticalHuggingPriority="750" id="pbg-9Q-ZfJ">
-                                                                    <rect key="frame" x="261" y="22" width="75" height="26"/>
-                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                    <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="gFU-aR-877">
-                                                                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                                        <font key="font" metaFont="menu"/>
-                                                                        <menu key="menu" title="Keys" id="v4c-JW-qPh"/>
-                                                                    </popUpButtonCell>
-                                                                    <connections>
-                                                                        <action selector="enableHotkeySelected:" target="494" id="AJp-q2-BcN"/>
-                                                                    </connections>
-                                                                </popUpButton>
-                                                            </subviews>
-                                                        </view>
-                                                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                                                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                                    </box>
                                                     <button id="IIa-Oc-a7l">
-                                                        <rect key="frame" x="176" y="196" width="353" height="18"/>
+                                                        <rect key="frame" x="191" y="140" width="323" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Enable global hotkey to open/close the Trailer menu" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="ptW-de-jCU">
+                                                        <buttonCell key="cell" type="check" title="Enable global hotkey to toggle the Trailer menu" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="ptW-de-jCU">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
@@ -733,6 +807,17 @@ Available on OS X Mavericks onwards</string>
                                                             <action selector="enableHotkeySelected:" target="494" id="Am7-0T-Lpp"/>
                                                         </connections>
                                                     </button>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="ZRZ-7P-3RV">
+                                                        <rect key="frame" x="80" y="201" width="544" height="34"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" id="Rul-sI-lqQ">
+                                                            <font key="font" metaFont="system"/>
+                                                            <string key="title">When Trailer's menu is open you can use the arrow keys to navigate,
+Enter to select, and Cmd-, for preferences.</string>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
                                                 </subviews>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
@@ -772,10 +857,11 @@ Available on OS X Mavericks onwards</string>
                 <outlet property="apiSettings" destination="IgO-qu-f69" id="tfZ-lA-xfw"/>
                 <outlet property="autoParticipateWhenMentioned" destination="lTI-8Y-voD" id="i9M-pb-2Ig"/>
                 <outlet property="clearAll" destination="5Sj-ma-EM3" id="4Lh-JS-ceA"/>
+                <outlet property="countOnlyListedPrs" destination="y7T-zw-tAa" id="NtB-ef-IsY"/>
                 <outlet property="displayRepositoryNames" destination="eoe-1H-ixD" id="0s6-Ac-0bI"/>
                 <outlet property="dontConfirmRemoveAllClosed" destination="a8N-EM-mQf" id="coj-EZ-aEM"/>
                 <outlet property="dontConfirmRemoveAllMerged" destination="fU7-ye-zZ9" id="bYB-om-tew"/>
-                <outlet property="dontKeepMyPrs" destination="sNq-fA-PLU" id="CaO-g8-RqK"/>
+                <outlet property="dontKeepPrsMergedByMe" destination="sNq-fA-PLU" id="Si3-5T-6vs"/>
                 <outlet property="dontReportRefreshFailures" destination="W7L-ge-mHy" id="x06-i4-De6"/>
                 <outlet property="githubDetailsBox" destination="dxR-Lv-bJK" id="UKN-au-hBa"/>
                 <outlet property="githubTokenHolder" destination="89t-uF-tda" id="XIm-D3-9YE"/>
@@ -783,13 +869,15 @@ Available on OS X Mavericks onwards</string>
                 <outlet property="hideAllPrsSection" destination="4E0-iw-eoN" id="d3m-yT-lxi"/>
                 <outlet property="hideAvatars" destination="KdG-4v-vf7" id="Ncu-kQ-2Gi"/>
                 <outlet property="hideUncommentedPrs" destination="c6m-8a-CRl" id="N1u-BD-gDF"/>
+                <outlet property="hotKeyContainer" destination="uty-zk-pnf" id="vfd-vy-rwB"/>
+                <outlet property="hotKeyHelp" destination="B02-2m-mrP" id="M6W-y6-lqT"/>
                 <outlet property="hotkeyCommandModifier" destination="sLc-s4-xlc" id="wou-ds-faC"/>
+                <outlet property="hotkeyControlModifier" destination="Dja-8A-nEx" id="EPl-Ca-Unj"/>
                 <outlet property="hotkeyEnable" destination="IIa-Oc-a7l" id="jK5-5m-GKw"/>
                 <outlet property="hotkeyLetter" destination="pbg-9Q-ZfJ" id="Ged-cj-g77"/>
                 <outlet property="hotkeyOptionModifier" destination="AEc-A8-j0N" id="x87-Qj-1cP"/>
                 <outlet property="hotkeyShiftModifier" destination="ha7-N5-qJl" id="OLt-Ca-P0D"/>
                 <outlet property="includeRepositoriesInFiltering" destination="GOC-8L-GHy" id="zF4-Zo-CGn"/>
-                <outlet property="keepClosedPrs" destination="6Hg-wy-xhx" id="JZr-lO-gXv"/>
                 <outlet property="launchAtStartup" destination="qqE-Ib-sQ9" id="brX-S8-Ge0"/>
                 <outlet property="mainMenu" destination="b2W-dJ-ldg" id="8t8-8X-oYH"/>
                 <outlet property="mainMenuFilter" destination="gaD-Aj-14T" id="1vn-8Q-OCo"/>
@@ -797,6 +885,8 @@ Available on OS X Mavericks onwards</string>
                 <outlet property="makeStatusItemsSelectable" destination="yD7-Y4-ZaZ" id="rgg-se-o4u"/>
                 <outlet property="markUnmergeableOnUserSectionsOnly" destination="SoW-AJ-5kD" id="UTu-Bf-nOY"/>
                 <outlet property="moveAssignedPrsToMySection" destination="ZD1-Lw-zpW" id="btl-cm-k5r"/>
+                <outlet property="prClosedPolicy" destination="8Ju-qc-WBt" id="XMn-0e-GqW"/>
+                <outlet property="prMergedPolicy" destination="p7f-Hm-I81" id="6mg-Ts-qyi"/>
                 <outlet property="preferencesWindow" destination="371" id="uYB-yu-610"/>
                 <outlet property="projectsTable" destination="eB0-Bq-YR9" id="kuh-DJ-Kls"/>
                 <outlet property="refreshButton" destination="yOJ-6Q-uTn" id="TDk-eM-0Yi"/>
