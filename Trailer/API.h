@@ -48,11 +48,11 @@ typedef enum {
 
 - (void)updateLimitFromServer;
 
-- (void) fetchRepositoriesAndCallback:(void(^)(BOOL success))callback;
+- (void)fetchRepositoriesAndCallback:(void(^)(BOOL success))callback;
 
-- (void) fetchPullRequestsForActiveReposAndCallback:(void(^)(BOOL success))callback;
+- (void)fetchPullRequestsForActiveReposAndCallback:(void(^)(BOOL success))callback;
 
-- (void) getRateLimitAndCallback:(void(^)(long long remaining, long long limit, long long reset))callback;
+- (void)getRateLimitAndCallback:(void(^)(long long remaining, long long limit, long long reset))callback;
 
 - (void)testApiAndCallback:(void(^)(NSError *error))callback;
 

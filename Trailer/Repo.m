@@ -18,6 +18,7 @@
 +(NSArray *)activeReposInMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"Repo"];
+	f.returnsObjectsAsFaults = NO;
 	f.predicate = [NSPredicate predicateWithFormat:@"active = YES"];
 	return [moc executeFetchRequest:f error:nil];
 }

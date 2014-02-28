@@ -31,6 +31,7 @@
 + (NSArray *)statusesForPullRequestId:(NSNumber *)pullRequestId inMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRStatus"];
+	f.returnsObjectsAsFaults = NO;
 	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestId = %@",pullRequestId];
 	return [moc executeFetchRequest:f error:nil];
 }
@@ -70,6 +71,8 @@
 + (void)removeStatusesWithPullRequestId:(NSNumber *)pullRequestId inMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRStatus"];
+	f.includesPropertyValues = NO;
+	f.includesSubentities = NO;
 	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestId = %@",pullRequestId];
 	for(PRStatus *s in [moc executeFetchRequest:f error:nil])
 	{

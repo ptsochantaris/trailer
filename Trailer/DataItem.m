@@ -23,6 +23,7 @@ static NSDateFormatter *_syncDateFormatter;
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:type];
 	f.fetchLimit = 1;
+	f.returnsObjectsAsFaults = NO;
 	f.predicate = [NSPredicate predicateWithFormat:@"serverId = %@",serverId];
 	return [[moc executeFetchRequest:f error:nil] lastObject];
 }
@@ -30,6 +31,7 @@ static NSDateFormatter *_syncDateFormatter;
 +(NSArray *)allItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:type];
+	f.returnsObjectsAsFaults = NO;
 	return [moc executeFetchRequest:f error:nil];
 }
 
@@ -64,6 +66,7 @@ static NSDateFormatter *_syncDateFormatter;
 +(NSArray*)itemsOfType:(NSString *)type surviving:(BOOL)survivingItems inMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:type];
+	f.returnsObjectsAsFaults = NO;
 	if(survivingItems)
 	{
 		f.predicate = [NSPredicate predicateWithFormat:@"postSyncAction != %d",kPostSyncDelete];
@@ -78,6 +81,7 @@ static NSDateFormatter *_syncDateFormatter;
 +(NSArray*)newOrUpdatedItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:type];
+	f.returnsObjectsAsFaults = NO;
 	f.predicate = [NSPredicate predicateWithFormat:@"postSyncAction = %d or postSyncAction = %d",kPostSyncNoteNew,kPostSyncNoteUpdated];
 	return [moc executeFetchRequest:f error:nil];
 }
@@ -85,6 +89,7 @@ static NSDateFormatter *_syncDateFormatter;
 +(NSArray*)updatedItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:type];
+	f.returnsObjectsAsFaults = NO;
 	f.predicate = [NSPredicate predicateWithFormat:@"postSyncAction = %d",kPostSyncNoteUpdated];
 	return [moc executeFetchRequest:f error:nil];
 }
@@ -92,6 +97,7 @@ static NSDateFormatter *_syncDateFormatter;
 +(NSArray *)newItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:type];
+	f.returnsObjectsAsFaults = NO;
 	f.predicate = [NSPredicate predicateWithFormat:@"postSyncAction = %d",kPostSyncNoteNew];
 	return [moc executeFetchRequest:f error:nil];
 }
