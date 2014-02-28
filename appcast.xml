@@ -7,6 +7,22 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.0.17</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Corrected an issue which would prefer “participated” over “mine” sections for references made on own PRs</li>
+				<li>Button in repository list preferences renamed to “load repositories” instead of “projects” to be clearer</li>
+				<li>Further database and sync performance improvements</li>
+				</ul></font>]]></description>
+			<pubDate>Fri, 28 Feb 2014 20:00:00 +0000</pubDate>
+			<enclosure
+			url="http://dev.housetrip.com/trailer/trailer1017.zip"
+			sparkle:version="1112"
+			sparkle:shortVersionString="1.0.17"
+			sparkle:dsaSignature="MCwCFCeVlvtSEGy/lgR8qRTVcjBLbrkKAhR4mR6vZtTR1Wwmm1CjDaEMCfxWhQ=="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.0.16</title>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
 				<li>Improved counts on the menubar depending on the user's preferences</li>
