@@ -894,9 +894,10 @@ static AppDelegate *_static_shared_ref;
 
 /////////////////////////////////// Repo table
 
-- (NSArray *)getFileterdRepos
+- (NSArray *)getFilteredRepos
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"Repo"];
+	f.returnsObjectsAsFaults = NO;
 
 	NSString *filter = self.repoFilter.stringValue;
 	if(filter.length)
@@ -924,7 +925,7 @@ static AppDelegate *_static_shared_ref;
 - (Repo *)repoForRow:(NSUInteger)row
 {
 	if(row>[self countParentRepos]) row--;
-	return [self getFileterdRepos][row-1];
+	return [self getFilteredRepos][row-1];
 }
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
@@ -975,7 +976,7 @@ static AppDelegate *_static_shared_ref;
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-	return [self getFileterdRepos].count+2;
+	return [self getFilteredRepos].count+2;
 }
 
 - (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
@@ -1308,7 +1309,7 @@ static AppDelegate *_static_shared_ref;
 
 - (IBAction)selectParentsSelected:(NSButton *)sender
 {
-	NSArray *allRepos = [self getFileterdRepos];
+	NSArray *allRepos = [self getFilteredRepos];
 
 	for(Repo *r in allRepos)
 		if(!r.fork.boolValue)
@@ -1321,7 +1322,7 @@ static AppDelegate *_static_shared_ref;
 
 - (IBAction)selectAllSelected:(NSButton *)sender
 {
-	NSArray *allRepos = [self getFileterdRepos];
+	NSArray *allRepos = [self getFilteredRepos];
 
 	for(Repo *r in allRepos)
 		r.active = @YES;
@@ -1333,7 +1334,7 @@ static AppDelegate *_static_shared_ref;
 
 - (IBAction)clearallSelected:(NSButton *)sender
 {
-	NSArray *allRepos = [self getFileterdRepos];
+	NSArray *allRepos = [self getFilteredRepos];
 
 	for(Repo *r in allRepos)
 		r.active = @NO;

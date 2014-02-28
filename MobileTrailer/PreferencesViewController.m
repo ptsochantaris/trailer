@@ -71,6 +71,7 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 	self.instructionLabel.hidden = !instructionMode;
 	self.createTokenButton.hidden = !instructionMode;
 	self.viewTokensButton.hidden = !instructionMode;
+	self.selectionButton.enabled = (self.fetchedResultsController.fetchedObjects.count>0);
 }
 
 - (void)dealloc
@@ -81,7 +82,10 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 - (void)apiUsageUpdate
 {
 	API *api = [AppDelegate shared].api;
-	[self.apiLoad setProgress:(api.requestsLimit-api.requestsRemaining)/api.requestsLimit];
+	if(api.requestsLimit==0 && api.requestsRemaining==0)
+		[self.apiLoad setProgress:0.0];
+	else
+		[self.apiLoad setProgress:(api.requestsLimit-api.requestsRemaining)/api.requestsLimit];
 }
 
 - (void)commitToken
@@ -93,9 +97,30 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 
 - (void)resetData
 {
-	[AppDelegate shared].preferencesDirty = YES;
-	[AppDelegate shared].lastSuccessfulRefresh = nil;
-	[[AppDelegate shared].dataManager deleteEverything];
+	if([Repo countItemsOfType:@"Repo" inMoc:[AppDelegate shared].dataManager.managedObjectContext])
+	{
+		CGRect frame = self.githubApiToken.frame;
+		frame = CGRectOffset(frame, 0, frame.size.height);
+		UILabel *pleaseWaitLabel = [[UILabel alloc] initWithFrame:frame];
+		pleaseWaitLabel.text = @"Clearing database - Just a moment...";
+		pleaseWaitLabel.backgroundColor = [UIColor whiteColor];
+		pleaseWaitLabel.font = [UIFont systemFontOfSize:16.0];
+		pleaseWaitLabel.textAlignment = NSTextAlignmentCenter;
+		pleaseWaitLabel.textColor = [UIColor redColor];
+		[self.view addSubview:pleaseWaitLabel];
+
+		double delayInSeconds = 0.01;
+		dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+		dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+			[AppDelegate shared].preferencesDirty = YES;
+			[AppDelegate shared].lastSuccessfulRefresh = nil;
+			[[AppDelegate shared].dataManager deleteEverything];
+			[AppDelegate shared].api.requestsLimit = 0;
+			[AppDelegate shared].api.requestsRemaining = 0;
+			[self apiUsageUpdate];
+			[pleaseWaitLabel removeFromSuperview];
+		});
+	}
 }
 
 - (IBAction)ipadLoadRepos:(UIBarButtonItem *)sender
@@ -389,6 +414,7 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 {
 	self.fetchedResultsController = nil;
 	[self.repositories reloadData];
+	self.selectionButton.enabled = (self.fetchedResultsController.fetchedObjects.count>0);
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
@@ -401,9 +427,8 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 
 - (BOOL)textFieldShouldClear:(UITextField *)textField
 {
-	textField.text = nil;
-	[self reloadData];
-	return NO;
+	[searchTimer push];
+	return YES;
 }
 
 - (BOOL)textFieldShouldBeginEditing:(UITextField *)textField

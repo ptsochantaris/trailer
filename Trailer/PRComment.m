@@ -51,6 +51,8 @@
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
 	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestUrl = %@",url];
+	f.includesPropertyValues = NO;
+	f.includesSubentities = NO;
 	for(PRComment *c in [moc executeFetchRequest:f error:nil])
 	{
 		DLog(@"  Deleting comment ID %@",c.serverId);
@@ -61,6 +63,7 @@
 +(NSArray *)commentsForPullRequestUrl:(NSString *)url inMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
+	f.returnsObjectsAsFaults = NO;
 	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestUrl = %@",url];
 	return [moc executeFetchRequest:f error:nil];
 }

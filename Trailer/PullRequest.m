@@ -76,47 +76,59 @@ static NSDateFormatter *itemDateFormatter;
 
 - (void)postProcess
 {
-	if(self.condition.integerValue==kPullRequestConditionMerged)
-		self.sectionIndex = @kPullRequestSectionMerged;
-	else if(self.condition.integerValue==kPullRequestConditionClosed)
-		self.sectionIndex = @kPullRequestSectionClosed;
-	else if(self.isMine)
-		self.sectionIndex = @kPullRequestSectionMine;
-	else if(self.commentedByMe)
-		self.sectionIndex = @kPullRequestSectionParticipated;
-	else if([Settings shared].hideAllPrsSection)
-		self.sectionIndex = @kPullRequestSectionNone;
-	else
-		self.sectionIndex = @kPullRequestSectionAll;
+	NSInteger section;
+	NSInteger condition = self.condition.integerValue;
+
+	if(condition==kPullRequestConditionMerged)		section = kPullRequestSectionMerged;
+	else if(condition==kPullRequestConditionClosed) section = kPullRequestSectionClosed;
+	else if(self.isMine)							section = kPullRequestSectionMine;
+	else if(self.commentedByMe)						section = kPullRequestSectionParticipated;
+	else if([Settings shared].hideAllPrsSection)	section = kPullRequestSectionNone;
+	else											section = kPullRequestSectionAll;
 
 	if(!self.latestReadCommentDate) self.latestReadCommentDate = [NSDate distantPast];
 
-	BOOL autoParticipateInMentions = [Settings shared].autoParticipateInMentions && (self.condition.integerValue==kPullRequestConditionOpen);
-
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
-	NSNumber *localUserId = @([Settings shared].localUserId.longLongValue);
-	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestUrl == %@ and createdAt > %@ and userId != %@",
+	f.returnsObjectsAsFaults = NO;
+	f.predicate = [NSPredicate predicateWithFormat:@"userId != %lld and pullRequestUrl == %@ and createdAt > %@",
+				   [Settings shared].localUserId.longLongValue,
 				   self.url,
-				   self.latestReadCommentDate,
-				   localUserId];
+				   self.latestReadCommentDate];
 
-	if(autoParticipateInMentions && self.refersToMe)
-		self.sectionIndex = @kPullRequestSectionParticipated;
-
-	NSArray *unreadComments = [self.managedObjectContext executeFetchRequest:f error:nil];
-	for(PRComment *c in unreadComments)
+	if(((section == kPullRequestSectionAll) || (section == kPullRequestSectionNone))
+	   && [Settings shared].autoParticipateInMentions)
 	{
-		if(autoParticipateInMentions && c.refersToMe)
-			self.sectionIndex = @kPullRequestSectionParticipated;
+		if(self.refersToMe)
+		{
+			section = kPullRequestSectionParticipated;
+			self.unreadComments = @([self.managedObjectContext countForFetchRequest:f error:nil]);
+		}
+		else
+		{
+			NSArray *unreadComments = [self.managedObjectContext executeFetchRequest:f error:nil];
+			self.unreadComments = @(unreadComments.count);
+			for(PRComment *c in unreadComments)
+			{
+				if(c.refersToMe)
+				{
+					section = kPullRequestSectionParticipated;
+					break;
+				}
+			}
+		}
+	}
+	else
+	{
+		self.unreadComments = @([self.managedObjectContext countForFetchRequest:f error:nil]);
 	}
 
-	self.unreadComments = @(unreadComments.count);
+	self.sectionIndex = @(section);
 
 	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestUrl = %@",self.url];
 	self.totalComments = @([self.managedObjectContext countForFetchRequest:f error:nil]);
 
 	if(self.repoId)
-		self.repoName = ((Repo*)[Repo itemOfType:@"Repo" serverId:self.repoId moc:self.managedObjectContext]).fullName;
+		self.repoName = [[Repo itemOfType:@"Repo" serverId:self.repoId moc:self.managedObjectContext] fullName];
 	else
 		self.repoName = @"Unknown repository";
 
@@ -187,6 +199,7 @@ static NSDateFormatter *itemDateFormatter;
 + (NSFetchRequest *)requestForPullRequestsWithFilter:(NSString *)filter
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PullRequest"];
+	f.returnsObjectsAsFaults = NO;
 
 	NSMutableArray *predicateSegments = [NSMutableArray arrayWithObject:@"(sectionIndex > 0)"];
 
@@ -230,6 +243,7 @@ static NSDateFormatter *itemDateFormatter;
 + (NSArray *)allMergedRequestsInMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PullRequest"];
+	f.returnsObjectsAsFaults = NO;
 	f.predicate = [NSPredicate predicateWithFormat:@"condition == %d",kPullRequestConditionMerged];
 	return [moc executeFetchRequest:f error:nil];
 }
@@ -237,6 +251,7 @@ static NSDateFormatter *itemDateFormatter;
 + (NSArray *)allClosedRequestsInMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PullRequest"];
+	f.returnsObjectsAsFaults = NO;
 	f.predicate = [NSPredicate predicateWithFormat:@"condition == %d",kPullRequestConditionClosed];
 	return [moc executeFetchRequest:f error:nil];
 }
@@ -276,6 +291,8 @@ static NSDateFormatter *itemDateFormatter;
 + (PullRequest *)pullRequestWithUrl:(NSString *)url moc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PullRequest"];
+	f.returnsObjectsAsFaults = NO;
+	f.fetchLimit = 1;
 	f.predicate = [NSPredicate predicateWithFormat:@"url == %@",url];
 	return [[moc executeFetchRequest:f error:nil] lastObject];
 }
@@ -283,6 +300,7 @@ static NSDateFormatter *itemDateFormatter;
 - (void)catchUpWithComments
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
+	f.returnsObjectsAsFaults = NO;
 	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestUrl == %@",self.url];
 	NSArray *res = [self.managedObjectContext executeFetchRequest:f error:nil];
 	for(PRComment *c in res)
@@ -314,6 +332,7 @@ static NSDateFormatter *itemDateFormatter;
 - (NSArray *)displayedStatuses
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRStatus"];
+	f.returnsObjectsAsFaults = NO;
 
 	NSString *predicate = [NSString stringWithFormat:@"pullRequestId = %@",self.serverId];
 
