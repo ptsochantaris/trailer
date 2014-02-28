@@ -427,9 +427,8 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 
 - (BOOL)textFieldShouldClear:(UITextField *)textField
 {
-	textField.text = nil;
 	[searchTimer push];
-	return NO;
+	return YES;
 }
 
 - (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
