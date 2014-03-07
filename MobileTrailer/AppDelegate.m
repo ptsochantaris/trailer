@@ -29,7 +29,8 @@ CGFloat GLOBAL_SCREEN_SCALE;
 
 	// ONLY FOR DEBUG!
 	//NSArray *allPRs = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.dataManager.managedObjectContext];
-    //for(PullRequest *r in allPRs) r.condition = @kPullRequestConditionMerged;
+	//[self.dataManager.managedObjectContext deleteObject:[allPRs firstObject]];
+    //[allPRs.firstObject setCondition:@kPullRequestConditionMerged];
 
 	[self.dataManager postProcessAllPrs];
 

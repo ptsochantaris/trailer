@@ -21,7 +21,7 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 }
 - (void)done
 {
-	[[NSNotificationCenter defaultCenter] postNotificationName:DISPLAY_OPTIONS_UPDATED_KEY object:nil];
+	[[AppDelegate shared].dataManager postProcessAllPrs];
 	if([AppDelegate shared].preferencesDirty) [[AppDelegate shared] startRefresh];
 	[self dismissViewControllerAnimated:YES completion:nil];
 }
