@@ -56,7 +56,6 @@ CGFloat GLOBAL_SCREEN_SCALE;
 		}
 		else
 		{
-			[self startRefresh];
 			if(localNotification) [self handleLocalNotification:localNotification];
 		}
 	});
@@ -343,7 +342,24 @@ CGFloat GLOBAL_SCREEN_SCALE;
 		}
 	}
 
-    [[UIApplication sharedApplication] presentLocalNotificationNow:notification];
+	// Present notifications only if the user isn't currenty reading notifications in the notification center, over the open app, a corner case
+	// Otherwise the app will end up consuming them
+	if(self.enteringForeground)
+	{
+		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
+
+			while([UIApplication sharedApplication].applicationState==UIApplicationStateInactive)
+				[NSThread sleepForTimeInterval:1.0];
+
+			dispatch_sync(dispatch_get_main_queue(), ^{
+				[[UIApplication sharedApplication] presentLocalNotificationNow:notification];
+			});
+		});
+	}
+	else
+	{
+		[[UIApplication sharedApplication] presentLocalNotificationNow:notification];
+	}
 }
 
 @end
