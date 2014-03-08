@@ -216,20 +216,36 @@
 
 - (void)reloadData
 {
+	NSIndexSet *currentIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, _fetchedResultsController.sections.count)];
+
 	_fetchedResultsController = nil;
 	[self updateStatus];
-	if(self.fetchedResultsController.fetchedObjects.count>0)
-	{
-		if(self.tableView.numberOfSections>0)
-			[self.tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
-		else
-			[self.tableView insertSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
-	}
-	else
-	{
-		if(self.tableView.numberOfSections>0)
-			[self.tableView deleteSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
-	}
+
+	NSIndexSet *dataIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, _fetchedResultsController.sections.count)];
+
+	NSIndexSet *removedIndexes = [currentIndexes indexesPassingTest:^BOOL(NSUInteger idx, BOOL *stop) {
+		return ![dataIndexes containsIndex:idx];
+	}];
+	NSIndexSet *addedIndexes = [dataIndexes indexesPassingTest:^BOOL(NSUInteger idx, BOOL *stop) {
+		return ![currentIndexes containsIndex:idx];
+	}];
+
+	NSIndexSet *untouchedIndexes = [dataIndexes indexesPassingTest:^BOOL(NSUInteger idx, BOOL *stop) {
+		return !([removedIndexes containsIndex:idx] || [addedIndexes containsIndex:idx]);
+	}];
+
+	[self.tableView beginUpdates];
+
+	if(removedIndexes.count)
+		[self.tableView deleteSections:removedIndexes withRowAnimation:UITableViewRowAnimationAutomatic];
+
+	if(untouchedIndexes.count)
+		[self.tableView reloadSections:untouchedIndexes withRowAnimation:UITableViewRowAnimationAutomatic];
+
+	if(addedIndexes.count)
+		[self.tableView insertSections:addedIndexes withRowAnimation:UITableViewRowAnimationAutomatic];
+	
+	[self.tableView endUpdates];
 }
 
 - (void)localNotification:(NSNotification *)notification
@@ -548,9 +564,8 @@
 
 - (BOOL)textFieldShouldClear:(UITextField *)textField
 {
-    textField.text = nil;
-    [self reloadData];
-    return NO;
+    [searchTimer push];
+    return YES;
 }
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string

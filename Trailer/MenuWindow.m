@@ -179,11 +179,11 @@
 	NSRect bottomRectangle = [self convertRectToScreen:bottomArea.rect];
 	if(CGRectContainsPoint(topRectangle, mouseLocation))
 	{
-		scrollDistance = -(topRectangle.origin.y-mouseLocation.y);
+		scrollDistance = - (topRectangle.origin.y-mouseLocation.y);
 	}
 	else
 	{
-		scrollDistance = (bottomRectangle.size.height-(mouseLocation.y-bottomRectangle.origin.y));
+		scrollDistance = (bottomRectangle.size.height- (mouseLocation.y-bottomRectangle.origin.y));
 	}
 	scrollDistance *= 0.33;
 	scrollDistance = MAX(1.0,scrollDistance*scrollDistance);
@@ -201,7 +201,7 @@
 	[self.scrollView.documentView scrollPoint:pos];
 }
 
--(BOOL)shouldShowTop
+- (BOOL)shouldShowTop
 {
 	CGFloat base = self.scrollView.documentVisibleRect.origin.y;
 	CGFloat line = self.scrollView.frame.size.height-[self.scrollView.documentView frame].size.height;

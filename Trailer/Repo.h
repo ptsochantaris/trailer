@@ -10,6 +10,6 @@
 
 + (NSArray *)activeReposInMoc:(NSManagedObjectContext *)moc;
 
-+(NSUInteger)countActiveReposInMoc:(NSManagedObjectContext *)moc;
++ (NSUInteger)countActiveReposInMoc:(NSManagedObjectContext *)moc;
 
 @end

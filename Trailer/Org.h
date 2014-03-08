@@ -4,6 +4,6 @@
 @property (nonatomic, retain) NSString * avatarUrl;
 @property (nonatomic, retain) NSString * login;
 
-+(Org*)orgWithInfo:(NSDictionary*)info moc:(NSManagedObjectContext*)moc;
++ (Org*)orgWithInfo:(NSDictionary*)info moc:(NSManagedObjectContext*)moc;
 
 @end

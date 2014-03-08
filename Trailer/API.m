@@ -61,7 +61,7 @@ typedef void (^completionBlockType)(BOOL);
 	[self.reachability startNotifier];
 }
 
--(void)error:(NSString*)errorString
+- (void)error:(NSString*)errorString
 {
 	DLog(@"Failed to fetch %@",errorString);
 }
@@ -129,7 +129,7 @@ typedef void (^completionBlockType)(BOOL);
 	}
 }
 
--(void)fetchCommentsForCurrentPullRequestsToMoc:(NSManagedObjectContext *)moc andCallback:(void (^)(BOOL))callback
+- (void)fetchCommentsForCurrentPullRequestsToMoc:(NSManagedObjectContext *)moc andCallback:(void (^)(BOOL))callback
 {
 	NSArray *prs = [DataItem newOrUpdatedItemsOfType:@"PullRequest" inMoc:moc];
 	for(PullRequest *r in prs)
@@ -156,7 +156,7 @@ typedef void (^completionBlockType)(BOOL);
 	[self _fetchCommentsForPullRequests:prs issues:NO toMoc:moc andCallback:completionCallback];
 }
 
--(void)_fetchCommentsForPullRequests:(NSArray*)prs
+- (void)_fetchCommentsForPullRequests:(NSArray*)prs
 							  issues:(BOOL)issues
 							   toMoc:(NSManagedObjectContext *)moc
 						 andCallback:(void(^)(BOOL success))callback
@@ -206,7 +206,7 @@ typedef void (^completionBlockType)(BOOL);
 	}
 }
 
--(void)fetchRepositoriesAndCallback:(void(^)(BOOL success))callback
+- (void)fetchRepositoriesAndCallback:(void(^)(BOOL success))callback
 {
 	[self syncUserDetailsAndCallback:^(BOOL success) {
 		if(success)
@@ -538,7 +538,7 @@ typedef void (^completionBlockType)(BOOL);
 	[self detectAssignedPullRequestsInMoc:moc andCallback:completionCallback];
 }
 
--(void)fetchPullRequestsForRepos:(NSArray *)repos toMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
+- (void)fetchPullRequestsForRepos:(NSArray *)repos toMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
 {
 	if(!repos.count)
 	{
@@ -583,7 +583,7 @@ typedef void (^completionBlockType)(BOOL);
 	}
 }
 
--(void)syncReposForUserToMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
+- (void)syncReposForUserToMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
 {
 	[self getPagedDataInPath:@"/user/repos"
 			startingFromPage:1
@@ -598,7 +598,7 @@ typedef void (^completionBlockType)(BOOL);
 			 }];
 }
 
--(void)syncReposForOrg:(NSString*)orgLogin toMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
+- (void)syncReposForOrg:(NSString*)orgLogin toMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
 {
 	[self getPagedDataInPath:[NSString stringWithFormat:@"/orgs/%@/repos",orgLogin]
 			startingFromPage:1
@@ -613,7 +613,7 @@ typedef void (^completionBlockType)(BOOL);
 			 }];
 }
 
--(void)syncOrgsToMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
+- (void)syncOrgsToMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
 {
 	[self getPagedDataInPath:@"/user/orgs"
 			startingFromPage:1
@@ -625,7 +625,7 @@ typedef void (^completionBlockType)(BOOL);
 			 }];
 }
 
--(void)syncUserDetailsAndCallback:(void (^)(BOOL))callback
+- (void)syncUserDetailsAndCallback:(void (^)(BOOL))callback
 {
 	[self getDataInPath:@"/user"
 				 params:nil
@@ -641,7 +641,7 @@ typedef void (^completionBlockType)(BOOL);
 			}];
 }
 
--(void)getPagedDataInPath:(NSString*)path
+- (void)getPagedDataInPath:(NSString*)path
 		 startingFromPage:(NSInteger)page
 				   params:(NSDictionary*)params
 		  perPageCallback:(void(^)(id data, BOOL lastPage))pageCallback

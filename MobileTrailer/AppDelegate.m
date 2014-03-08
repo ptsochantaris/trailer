@@ -2,7 +2,7 @@
 @implementation AppDelegate
 
 static AppDelegate *_static_shared_ref;
-+(AppDelegate *)shared { return _static_shared_ref; }
++ (AppDelegate *)shared { return _static_shared_ref; }
 
 CGFloat GLOBAL_SCREEN_SCALE;
 
@@ -193,7 +193,7 @@ CGFloat GLOBAL_SCREEN_SCALE;
 	}
 }
 
--(void)prepareForRefresh
+- (void)prepareForRefresh
 {
 	[self.refreshTimer invalidate];
 	self.refreshTimer = nil;
@@ -206,7 +206,7 @@ CGFloat GLOBAL_SCREEN_SCALE;
 	[self.dataManager postMigrationTasks];
 }
 
--(void)completeRefresh
+- (void)completeRefresh
 {
 	[self checkApiUsage];
 	self.isRefreshing = NO;
@@ -215,7 +215,7 @@ CGFloat GLOBAL_SCREEN_SCALE;
 	[self.dataManager saveDB];
 }
 
--(void)startRefresh
+- (void)startRefresh
 {
 	if(self.isRefreshing) return;
 
