@@ -85,6 +85,8 @@ static NSNumberFormatter *itemCountFormatter;
         [self loadImageAtPath:imagePath];
     else
         failedToLoadImage = nil;
+
+	[self setNeedsLayout];
 }
 
 - (void)loadImageAtPath:(NSString *)imagePath
