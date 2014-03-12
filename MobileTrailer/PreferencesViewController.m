@@ -3,7 +3,6 @@
 NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 {
 	NSString *targetUrl;
-	BOOL refreshStartedWithEmpty;
 
 	// Filtering
     UITextField *searchField;
@@ -21,7 +20,7 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 }
 - (void)done
 {
-	[[NSNotificationCenter defaultCenter] postNotificationName:DISPLAY_OPTIONS_UPDATED_KEY object:nil];
+	[[AppDelegate shared].dataManager postProcessAllPrs];
 	if([AppDelegate shared].preferencesDirty) [[AppDelegate shared] startRefresh];
 	[self dismissViewControllerAnimated:YES completion:nil];
 }
@@ -61,8 +60,7 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 
 	[self apiUsageUpdate];
 
-	[self instructionMode:(self.fetchedResultsController.fetchedObjects.count==0
-						   || self.githubApiToken.text.length==0)];
+	[self updateInstructionMode];
 }
 
 - (void)instructionMode:(BOOL)instructionMode
@@ -138,7 +136,7 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 		[self commitToken];
 	}
 
-	refreshStartedWithEmpty = (self.fetchedResultsController.fetchedObjects.count==0);
+	BOOL refreshStartedWithEmpty = ([Repo countItemsOfType:@"Repo" inMoc:[AppDelegate shared].dataManager.managedObjectContext]==0);
 
 	NSString *originalName = self.refreshRepoList.title;
 	self.refreshRepoList.title = @"Loading...";
@@ -153,7 +151,6 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 			for(Repo *r in self.fetchedResultsController.fetchedObjects)
 				r.active = @YES;
 
-		[self.repositories reloadData];
 		self.refreshRepoList.title = originalName;
 		self.refreshRepoList.enabled = YES;
 		self.repositories.hidden = NO;
@@ -161,8 +158,7 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 
 		[AppDelegate shared].preferencesDirty = YES;
 
-		[self instructionMode:(self.fetchedResultsController.fetchedObjects.count==0
-							   || self.githubApiToken.text.length==0)];
+		[self updateInstructionMode];
 
 		if(!success)
 		{
@@ -212,13 +208,21 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 	else
 		title = @"";
 
-	switch (section) {
-		case 0:
-			title = [title stringByAppendingString:@" - Parent Repos"];
-			break;
-		default:
+	if(section==1)
+	{
+		title = [title stringByAppendingString:@" - Forked Repos"];
+	}
+	else
+	{
+		Repo *repo = [self.fetchedResultsController objectAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:section]];
+		if(repo.fork.boolValue)
+		{
 			title = [title stringByAppendingString:@" - Forked Repos"];
-			break;
+		}
+		else
+		{
+			title = [title stringByAppendingString:@" - Parent Repos"];
+		}
 	}
 
 	return title;
@@ -412,9 +416,36 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 
 - (void)reloadData
 {
-	self.fetchedResultsController = nil;
-	[self.repositories reloadData];
+	NSIndexSet *currentIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, _fetchedResultsController.sections.count)];
+
+	_fetchedResultsController = nil;
 	self.selectionButton.enabled = (self.fetchedResultsController.fetchedObjects.count>0);
+
+	NSIndexSet *dataIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, _fetchedResultsController.sections.count)];
+
+	NSIndexSet *removedIndexes = [currentIndexes indexesPassingTest:^BOOL(NSUInteger idx, BOOL *stop) {
+		return ![dataIndexes containsIndex:idx];
+	}];
+	NSIndexSet *addedIndexes = [dataIndexes indexesPassingTest:^BOOL(NSUInteger idx, BOOL *stop) {
+		return ![currentIndexes containsIndex:idx];
+	}];
+
+	NSIndexSet *untouchedIndexes = [dataIndexes indexesPassingTest:^BOOL(NSUInteger idx, BOOL *stop) {
+		return !([removedIndexes containsIndex:idx] || [addedIndexes containsIndex:idx]);
+	}];
+
+	[self.repositories beginUpdates];
+
+	if(removedIndexes.count)
+		[self.repositories deleteSections:removedIndexes withRowAnimation:UITableViewRowAnimationAutomatic];
+
+	if(untouchedIndexes.count)
+		[self.repositories reloadSections:untouchedIndexes withRowAnimation:UITableViewRowAnimationAutomatic];
+
+	if(addedIndexes.count)
+		[self.repositories insertSections:addedIndexes withRowAnimation:UITableViewRowAnimationAutomatic];
+
+	[self.repositories endUpdates];
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
@@ -440,13 +471,17 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 	return YES;
 }
 
--(void)textFieldDidEndEditing:(UITextField *)textField
+- (void)textFieldDidEndEditing:(UITextField *)textField
 {
 	if(textField==self.githubApiToken)
 	{
-		[self instructionMode:(self.fetchedResultsController.fetchedObjects.count==0
-							   || self.githubApiToken.text.length==0)];
+		[self updateInstructionMode];
 	}
+}
+
+- (void)updateInstructionMode
+{
+	[self instructionMode:([Repo countItemsOfType:@"Repo" inMoc:[AppDelegate shared].dataManager.managedObjectContext]==0 || self.githubApiToken.text.length==0)];
 }
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string

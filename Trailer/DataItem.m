@@ -8,7 +8,7 @@
 
 static NSDateFormatter *_syncDateFormatter;
 
-+(void)initialize
++ (void)initialize
 {
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
@@ -19,7 +19,7 @@ static NSDateFormatter *_syncDateFormatter;
 	});
 }
 
-+(id)itemOfType:(NSString*)type serverId:(NSNumber*)serverId moc:(NSManagedObjectContext*)moc
++ (id)itemOfType:(NSString*)type serverId:(NSNumber*)serverId moc:(NSManagedObjectContext*)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:type];
 	f.fetchLimit = 1;
@@ -28,14 +28,14 @@ static NSDateFormatter *_syncDateFormatter;
 	return [[moc executeFetchRequest:f error:nil] lastObject];
 }
 
-+(NSArray *)allItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
++ (NSArray *)allItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:type];
 	f.returnsObjectsAsFaults = NO;
 	return [moc executeFetchRequest:f error:nil];
 }
 
-+(id)itemWithInfo:(NSDictionary*)info type:(NSString*)type moc:(NSManagedObjectContext*)moc
++ (id)itemWithInfo:(NSDictionary*)info type:(NSString*)type moc:(NSManagedObjectContext*)moc
 {
 	NSNumber *serverId = [info ofk:@"id"];
 	NSDate *updatedDate = [_syncDateFormatter dateFromString:[info ofk:@"updated_at"]];
@@ -63,7 +63,7 @@ static NSDateFormatter *_syncDateFormatter;
 	return existingItem;
 }
 
-+(NSArray*)itemsOfType:(NSString *)type surviving:(BOOL)survivingItems inMoc:(NSManagedObjectContext *)moc
++ (NSArray*)itemsOfType:(NSString *)type surviving:(BOOL)survivingItems inMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:type];
 	f.returnsObjectsAsFaults = NO;
@@ -78,7 +78,7 @@ static NSDateFormatter *_syncDateFormatter;
 	return [moc executeFetchRequest:f error:nil];
 }
 
-+(NSArray*)newOrUpdatedItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
++ (NSArray*)newOrUpdatedItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:type];
 	f.returnsObjectsAsFaults = NO;
@@ -86,7 +86,7 @@ static NSDateFormatter *_syncDateFormatter;
 	return [moc executeFetchRequest:f error:nil];
 }
 
-+(NSArray*)updatedItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
++ (NSArray*)updatedItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:type];
 	f.returnsObjectsAsFaults = NO;
@@ -94,7 +94,7 @@ static NSDateFormatter *_syncDateFormatter;
 	return [moc executeFetchRequest:f error:nil];
 }
 
-+(NSArray *)newItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
++ (NSArray *)newItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:type];
 	f.returnsObjectsAsFaults = NO;
@@ -102,7 +102,7 @@ static NSDateFormatter *_syncDateFormatter;
 	return [moc executeFetchRequest:f error:nil];
 }
 
-+(void)nukeDeletedItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
++ (void)nukeDeletedItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
 {
 	NSArray *untouchedItems = [self itemsOfType:type surviving:NO inMoc:moc];
 	for(DataItem *i in untouchedItems)
@@ -113,7 +113,7 @@ static NSDateFormatter *_syncDateFormatter;
 	DLog(@"Nuked %lu %@ items",(unsigned long)untouchedItems.count,type);
 }
 
-+(NSUInteger)countItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
++ (NSUInteger)countItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:type];
 	return [moc countForFetchRequest:f error:nil];

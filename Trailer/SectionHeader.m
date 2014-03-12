@@ -61,7 +61,7 @@ static CGColorRef _lightGray;
 	return titleView.attributedStringValue.string;
 }
 
--(void)drawRect:(NSRect)dirtyRect
+- (void)drawRect:(NSRect)dirtyRect
 {
 	[super drawRect:dirtyRect];
 	CGContextRef context = (CGContextRef) [[NSGraphicsContext currentContext] graphicsPort];

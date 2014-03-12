@@ -6,7 +6,7 @@
 @dynamic fork;
 @dynamic webUrl;
 
-+(Repo*)repoWithInfo:(NSDictionary*)info moc:(NSManagedObjectContext*)moc
++ (Repo*)repoWithInfo:(NSDictionary*)info moc:(NSManagedObjectContext*)moc
 {
 	Repo *r = [DataItem itemWithInfo:info type:@"Repo" moc:moc];
 	r.fullName = [info ofk:@"full_name"];
@@ -15,7 +15,7 @@
 	return r;
 }
 
-+(NSArray *)activeReposInMoc:(NSManagedObjectContext *)moc
++ (NSArray *)activeReposInMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"Repo"];
 	f.returnsObjectsAsFaults = NO;
@@ -23,14 +23,14 @@
 	return [moc executeFetchRequest:f error:nil];
 }
 
-+(NSUInteger)countActiveReposInMoc:(NSManagedObjectContext *)moc
++ (NSUInteger)countActiveReposInMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"Repo"];
 	f.predicate = [NSPredicate predicateWithFormat:@"active = YES"];
 	return [moc countForFetchRequest:f error:nil];
 }
 
--(void)prepareForDeletion
+- (void)prepareForDeletion
 {
 	for(PullRequest *r in [PullRequest allItemsOfType:@"PullRequest" inMoc:self.managedObjectContext])
 	{

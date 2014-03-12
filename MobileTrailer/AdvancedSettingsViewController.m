@@ -1,7 +1,7 @@
 
 @interface AdvancedSettingsViewController () <PickerViewControllerDelegate>
 {
-	HTPopTimer *settingsChangedAnnounceTimer;
+	HTPopTimer *settingsChangedTimer;
 
 	// showing the picker
 	NSArray *valuesToPush;
@@ -16,13 +16,12 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-		settingsChangedAnnounceTimer = [[HTPopTimer alloc] initWithTimeInterval:1.0 target:self selector:@selector(postChangeNotification)];
-}
-
-- (void)postChangeNotification
-{
-	[[NSNotificationCenter defaultCenter] postNotificationName:DISPLAY_OPTIONS_UPDATED_KEY object:nil];
+	if(UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad)
+	{
+		settingsChangedTimer = [[HTPopTimer alloc] initWithTimeInterval:1.0
+																 target:[AppDelegate shared].dataManager
+															   selector:@selector(postProcessAllPrs)];
+	}
 }
 
 #define REFRESH_SECTION_INDEX 0
@@ -326,7 +325,7 @@ NSString *B(NSString *input)
 				break;
 			}
 		}
-		[settingsChangedAnnounceTimer push];
+		[settingsChangedTimer push];
 	}
 	else if(indexPath.section==COMMENTS_SECTION_INDEX)
 	{
@@ -348,7 +347,7 @@ NSString *B(NSString *input)
 				break;
 			}
 		}
-		[settingsChangedAnnounceTimer push];
+		[settingsChangedTimer push];
 	}
 	else if(indexPath.section==REPOS_SECTION_INDEX)
 	{
@@ -374,7 +373,7 @@ NSString *B(NSString *input)
 				break;
             }
 		}
-		[settingsChangedAnnounceTimer push];
+		[settingsChangedTimer push];
 	}
 	else if(indexPath.section==HISTORY_SECTION_INDEX)
 	{
@@ -401,7 +400,7 @@ NSString *B(NSString *input)
 			case 2:
 			{
 				[Settings shared].dontKeepPrsMergedByMe = ![Settings shared].dontKeepPrsMergedByMe;
-				[settingsChangedAnnounceTimer push];
+				[settingsChangedTimer push];
 				break;
 			}
 		}
@@ -421,7 +420,7 @@ NSString *B(NSString *input)
 				break;
 			}
 		}
-		[settingsChangedAnnounceTimer push];
+		[settingsChangedTimer push];
 	}
 	else if(indexPath.section==SORT_SECTION_INDEX)
 	{
@@ -430,7 +429,7 @@ NSString *B(NSString *input)
 			case 0:
 			{
 				[Settings shared].sortDescending = ![Settings shared].sortDescending;
-				[settingsChangedAnnounceTimer push];
+				[settingsChangedTimer push];
 				[self.tableView reloadData];
 				break;
 			}
@@ -449,7 +448,7 @@ NSString *B(NSString *input)
 			case 2:
 			{
 				[Settings shared].groupByRepo = ![Settings shared].groupByRepo;
-				[settingsChangedAnnounceTimer push];
+				[settingsChangedTimer push];
 				break;
 			}
 		}
@@ -530,7 +529,7 @@ NSString *B(NSString *input)
 	else if(selectedIndexPath.section==SORT_SECTION_INDEX)
 	{
 		[Settings shared].sortMethod = indexPath.row;
-		[settingsChangedAnnounceTimer push];
+		[settingsChangedTimer push];
 	}
     else if(selectedIndexPath.section==REPOS_SECTION_INDEX)
     {

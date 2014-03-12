@@ -130,7 +130,6 @@
 {
 	for(PullRequest *p in [PullRequest allClosedRequestsInMoc:self.managedObjectContext])
 		[self.managedObjectContext deleteObject:p];
-    [self updateBadge];
     [[AppDelegate shared].dataManager saveDB];
 }
 
@@ -138,14 +137,13 @@
 {
 	for(PullRequest *p in [PullRequest allMergedRequestsInMoc:self.managedObjectContext])
 		[self.managedObjectContext deleteObject:p];
-    [self updateBadge];
     [[AppDelegate shared].dataManager saveDB];
 }
 
 - (void)markAllAsRead
 {
 	for(PullRequest *p in self.fetchedResultsController.fetchedObjects) [p catchUpWithComments];
-	[self updateBadge];
+    [[AppDelegate shared].dataManager saveDB];
 }
 
 - (void)refreshControlChanged
@@ -170,10 +168,7 @@
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
-	if(refreshOnRelease)
-	{
-		[self tryRefresh];
-	}
+	if(refreshOnRelease) [self tryRefresh];
 }
 
 - (void)viewDidLoad
@@ -217,31 +212,40 @@
 											 selector:@selector(localNotification:)
 												 name:RECEIVED_NOTIFICATION_KEY
 											   object:nil];
-
-	[[NSNotificationCenter defaultCenter] addObserver:self
-											 selector:@selector(displayOptionsUpdated)
-												 name:DISPLAY_OPTIONS_UPDATED_KEY
-											   object:nil];
-}
-
-- (void)viewDidAppear:(BOOL)animated
-{
-	[super viewDidAppear:animated];
-	[self updateStatus];
-}
-
-- (void)displayOptionsUpdated
-{
-	_fetchedResultsController = nil;
-	[[AppDelegate shared].dataManager postProcessAllPrs];
-	[self reloadData];
 }
 
 - (void)reloadData
 {
+	NSIndexSet *currentIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, _fetchedResultsController.sections.count)];
+
 	_fetchedResultsController = nil;
-	[self.tableView reloadData];
 	[self updateStatus];
+
+	NSIndexSet *dataIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, _fetchedResultsController.sections.count)];
+
+	NSIndexSet *removedIndexes = [currentIndexes indexesPassingTest:^BOOL(NSUInteger idx, BOOL *stop) {
+		return ![dataIndexes containsIndex:idx];
+	}];
+	NSIndexSet *addedIndexes = [dataIndexes indexesPassingTest:^BOOL(NSUInteger idx, BOOL *stop) {
+		return ![currentIndexes containsIndex:idx];
+	}];
+
+	NSIndexSet *untouchedIndexes = [dataIndexes indexesPassingTest:^BOOL(NSUInteger idx, BOOL *stop) {
+		return !([removedIndexes containsIndex:idx] || [addedIndexes containsIndex:idx]);
+	}];
+
+	[self.tableView beginUpdates];
+
+	if(removedIndexes.count)
+		[self.tableView deleteSections:removedIndexes withRowAnimation:UITableViewRowAnimationAutomatic];
+
+	if(untouchedIndexes.count)
+		[self.tableView reloadSections:untouchedIndexes withRowAnimation:UITableViewRowAnimationAutomatic];
+
+	if(addedIndexes.count)
+		[self.tableView insertSections:addedIndexes withRowAnimation:UITableViewRowAnimationAutomatic];
+	
+	[self.tableView endUpdates];
 }
 
 - (void)localNotification:(NSNotification *)notification
@@ -280,6 +284,7 @@
     if(urlToOpen)
     {
         searchField.text = nil;
+		[searchField resignFirstResponder];
         [self reloadData];
     }
 
@@ -309,7 +314,6 @@
     dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
     dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
         [pullRequest catchUpWithComments];
-        [self updateBadge];
         [[AppDelegate shared].dataManager saveDB];
     });
 }
@@ -493,6 +497,7 @@
 - (void)controllerDidChangeContent:(NSFetchedResultsController *)controller
 {
     [self.tableView endUpdates];
+	[self updateStatus];
 }
 
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath
@@ -544,11 +549,6 @@
 	self.refreshControl.attributedTitle = [[NSAttributedString alloc] initWithString:[[AppDelegate shared].api lastUpdateDescription]
 																		  attributes:@{ }];
 
-	[self updateBadge];
-}
-
-- (void)updateBadge
-{
 	[UIApplication sharedApplication].applicationIconBadgeNumber = [PullRequest badgeCountInMoc:self.managedObjectContext];
 }
 
@@ -564,9 +564,8 @@
 
 - (BOOL)textFieldShouldClear:(UITextField *)textField
 {
-    textField.text = nil;
-    [self reloadData];
-    return NO;
+    [searchTimer push];
+    return YES;
 }
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string

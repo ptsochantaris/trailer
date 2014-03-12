@@ -2,7 +2,7 @@
 @implementation AppDelegate
 
 static AppDelegate *_static_shared_ref;
-+(AppDelegate *)shared { return _static_shared_ref; }
++ (AppDelegate *)shared { return _static_shared_ref; }
 
 CGFloat GLOBAL_SCREEN_SCALE;
 
@@ -29,7 +29,8 @@ CGFloat GLOBAL_SCREEN_SCALE;
 
 	// ONLY FOR DEBUG!
 	//NSArray *allPRs = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.dataManager.managedObjectContext];
-    //for(PullRequest *r in allPRs) r.condition = @kPullRequestConditionMerged;
+	//[self.dataManager.managedObjectContext deleteObject:[allPRs firstObject]];
+    //[allPRs.firstObject setCondition:@kPullRequestConditionMerged];
 
 	[self.dataManager postProcessAllPrs];
 
@@ -55,7 +56,6 @@ CGFloat GLOBAL_SCREEN_SCALE;
 		}
 		else
 		{
-			[self startRefresh];
 			if(localNotification) [self handleLocalNotification:localNotification];
 		}
 	});
@@ -193,7 +193,7 @@ CGFloat GLOBAL_SCREEN_SCALE;
 	}
 }
 
--(void)prepareForRefresh
+- (void)prepareForRefresh
 {
 	[self.refreshTimer invalidate];
 	self.refreshTimer = nil;
@@ -206,7 +206,7 @@ CGFloat GLOBAL_SCREEN_SCALE;
 	[self.dataManager postMigrationTasks];
 }
 
--(void)completeRefresh
+- (void)completeRefresh
 {
 	[self checkApiUsage];
 	self.isRefreshing = NO;
@@ -215,7 +215,7 @@ CGFloat GLOBAL_SCREEN_SCALE;
 	[self.dataManager saveDB];
 }
 
--(void)startRefresh
+- (void)startRefresh
 {
 	if(self.isRefreshing) return;
 
@@ -342,7 +342,24 @@ CGFloat GLOBAL_SCREEN_SCALE;
 		}
 	}
 
-    [[UIApplication sharedApplication] presentLocalNotificationNow:notification];
+	// Present notifications only if the user isn't currenty reading notifications in the notification center, over the open app, a corner case
+	// Otherwise the app will end up consuming them
+	if(self.enteringForeground)
+	{
+		dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
+
+			while([UIApplication sharedApplication].applicationState==UIApplicationStateInactive)
+				[NSThread sleepForTimeInterval:1.0];
+
+			dispatch_sync(dispatch_get_main_queue(), ^{
+				[[UIApplication sharedApplication] presentLocalNotificationNow:notification];
+			});
+		});
+	}
+	else
+	{
+		[[UIApplication sharedApplication] presentLocalNotificationNow:notification];
+	}
 }
 
 @end

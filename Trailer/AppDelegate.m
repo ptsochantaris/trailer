@@ -10,7 +10,7 @@
 @implementation AppDelegate
 
 static AppDelegate *_static_shared_ref;
-+(AppDelegate *)shared { return _static_shared_ref; }
++ (AppDelegate *)shared { return _static_shared_ref; }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
@@ -275,12 +275,12 @@ static AppDelegate *_static_shared_ref;
 }
 
 
--(BOOL)userNotificationCenter:(NSUserNotificationCenter *)center shouldPresentNotification:(NSUserNotification *)notification
+- (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center shouldPresentNotification:(NSUserNotification *)notification
 {
 	return YES;
 }
 
--(void)userNotificationCenter:(NSUserNotificationCenter *)center didActivateNotification:(NSUserNotification *)notification
+- (void)userNotificationCenter:(NSUserNotificationCenter *)center didActivateNotification:(NSUserNotification *)notification
 {
 	switch (notification.activationType)
 	{
@@ -319,7 +319,7 @@ static AppDelegate *_static_shared_ref;
 	}
 }
 
--(void)postNotificationOfType:(PRNotificationType)type forItem:(id)item
+- (void)postNotificationOfType:(PRNotificationType)type forItem:(id)item
 {
 	if(self.preferencesDirty) return;
 
@@ -1037,7 +1037,7 @@ static AppDelegate *_static_shared_ref;
 	}
 }
 
--(void)windowWillClose:(NSNotification *)notification
+- (void)windowWillClose:(NSNotification *)notification
 {
 	if([notification object]==self.preferencesWindow)
 	{
@@ -1145,7 +1145,7 @@ static AppDelegate *_static_shared_ref;
 	}
 }
 
--(void)prepareForRefresh
+- (void)prepareForRefresh
 {
 	[self.refreshTimer invalidate];
 	self.refreshTimer = nil;
@@ -1176,7 +1176,7 @@ static AppDelegate *_static_shared_ref;
 	DLog(@"Starting refresh");
 }
 
--(void)completeRefresh
+- (void)completeRefresh
 {
 	self.isRefreshing = NO;
 	[self.refreshButton setEnabled:YES];
@@ -1196,7 +1196,7 @@ static AppDelegate *_static_shared_ref;
 	DLog(@"Refresh done");
 }
 
--(void)startRefresh
+- (void)startRefresh
 {
 	if(self.isRefreshing) return;
 
@@ -1238,7 +1238,7 @@ static AppDelegate *_static_shared_ref;
 	[self.repoCheckLabel setStringValue:[NSString stringWithFormat:@"Refresh repositories every %ld hours",(long)self.repoCheckStepper.integerValue]];
 }
 
--(void)refreshTimerDone
+- (void)refreshTimerDone
 {
 	if([Settings shared].localUserId && [Settings shared].authToken.length)
 	{
@@ -1346,7 +1346,7 @@ static AppDelegate *_static_shared_ref;
 
 //////////////// launch at startup from: http://cocoatutorial.grapewave.com/tag/lssharedfilelistitemresolve/
 
--(void) addAppAsLoginItem
+- (void) addAppAsLoginItem
 {
 	NSString * appPath = [[NSBundle mainBundle] bundlePath];
 
@@ -1372,7 +1372,7 @@ static AppDelegate *_static_shared_ref;
 	}
 }
 
--(BOOL)isAppLoginItem
+- (BOOL)isAppLoginItem
 {
 	NSString * appPath = [[NSBundle mainBundle] bundlePath];
 
@@ -1402,7 +1402,7 @@ static AppDelegate *_static_shared_ref;
 	return NO;
 }
 
--(void) deleteAppFromLoginItem
+- (void) deleteAppFromLoginItem
 {
 	NSString * appPath = [[NSBundle mainBundle] bundlePath];
 

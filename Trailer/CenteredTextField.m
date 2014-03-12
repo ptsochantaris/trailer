@@ -1,7 +1,7 @@
 
 @implementation CenteredTextField
 
-+(void)initialize
++ (void)initialize
 {
 	[self setCellClass:[CenteredTextFieldCell class]];
 }

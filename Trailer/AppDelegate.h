@@ -95,8 +95,8 @@
 @property (nonatomic) long highlightedPrIndex;
 @property (nonatomic) float scrollBarWidth;
 
-+(AppDelegate*)shared;
++ (AppDelegate*)shared;
 
--(void)postNotificationOfType:(PRNotificationType)type forItem:(id)item;
+- (void)postNotificationOfType:(PRNotificationType)type forItem:(id)item;
 
 @end
