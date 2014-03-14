@@ -328,30 +328,25 @@ typedef void (^completionBlockType)(BOOL);
 	}
 }
 
-- (void)detectMergedPullRequestsInMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
+- (void)checkPrClosuresInMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
 {
-	NSArray *pullRequests = [PullRequest allItemsOfType:@"PullRequest" inMoc:moc];
-	NSMutableArray *prsToCheck = [NSMutableArray array];
+	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PullRequest"];
+	f.predicate = [NSPredicate predicateWithFormat:@"postSyncAction == %d and condition == %d",kPostSyncDelete, kPullRequestConditionOpen];
+	f.returnsObjectsAsFaults = NO;
+	NSArray *pullRequests = [moc executeFetchRequest:f error:nil];
 
-	for(PullRequest *r in pullRequests)
-	{
+	NSArray *prsToCheck = [pullRequests filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(PullRequest *r, NSDictionary *bindings) {
 		Repo *parent = [Repo itemOfType:@"Repo" serverId:r.repoId moc:moc];
-		if(r.postSyncAction.integerValue==kPostSyncDelete &&
-		   parent.active.boolValue && (parent.postSyncAction.integerValue!=kPostSyncDelete) &&
-		   ([Settings shared].showCommentsEverywhere || r.isMine || r.commentedByMe) &&
-		   (r.condition.integerValue == kPullRequestConditionOpen))
-		{
-			[prsToCheck addObject:r]; // check closed status
-		}
-	}
+		return parent.active.boolValue && (parent.postSyncAction.integerValue!=kPostSyncDelete);
+	}]];
 
-	if(prsToCheck.count==0)
+	NSInteger totalOperations = prsToCheck.count;
+	if(totalOperations==0)
 	{
 		callback(YES);
 		return;
 	}
 
-	NSInteger totalOperations = prsToCheck.count;
 	__block NSInteger succeded = 0;
 	__block NSInteger failed = 0;
 
@@ -364,10 +359,10 @@ typedef void (^completionBlockType)(BOOL);
 	};
 
 	for(PullRequest *r in prsToCheck)
-		[self _detectMergedPullRequest:r andCallback:completionCallback];
+		[self investigatePrClosureInMoc:r andCallback:completionCallback];
 }
 
-- (void)_detectMergedPullRequest:(PullRequest *)r andCallback:(void(^)(BOOL success))callback
+- (void)investigatePrClosureInMoc:(PullRequest *)r andCallback:(void(^)(BOOL success))callback
 {
 	DLog(@"Checking closed PR to see if it was merged: %@",r.title);
 
@@ -534,7 +529,7 @@ typedef void (^completionBlockType)(BOOL);
 	
 	[self fetchCommentsForCurrentPullRequestsToMoc:moc andCallback:completionCallback];
 	[self fetchStatusesForCurrentPullRequestsToMoc:moc andCallback:completionCallback];
-	[self detectMergedPullRequestsInMoc:moc andCallback:completionCallback];
+	[self checkPrClosuresInMoc:moc andCallback:completionCallback];
 	[self detectAssignedPullRequestsInMoc:moc andCallback:completionCallback];
 }
 

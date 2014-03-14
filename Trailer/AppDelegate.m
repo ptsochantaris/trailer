@@ -44,6 +44,7 @@ static AppDelegate *_static_shared_ref;
     //[self.dataManager.managedObjectContext deleteObject:[allRepos objectAtIndex:0]];
 
 	[self.dataManager postProcessAllPrs];
+
 	[self updateScrollBarWidth]; // also updates menu
 
 	[self startRateLimitHandling];
