@@ -7,6 +7,21 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.0.19</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Corrected an issue where the PR merging / closing logic would not follow the settings in preferences</li>
+				<li>Corrected an issue where unread badge counts did not appear on some PR items</li>
+				</ul></font>]]></description>
+			<pubDate>Fri, 14 Mar 2014 10:00:00 +0000</pubDate>
+			<enclosure
+			url="http://dev.housetrip.com/trailer/trailer1019.zip"
+			sparkle:version="1115"
+			sparkle:shortVersionString="1.0.19"
+			sparkle:dsaSignature="MC0CFCRudLkzJNF+hTxWR0/9AEWQKuHxAhUAkcveeHDkXqKnMZxezn6PhvVYfyQ="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.0.17</title>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
 				<li>Corrected an issue which would prefer “participated” over “mine” sections for references made on own PRs</li>
