@@ -55,9 +55,12 @@ static CGColorRef _highlightColor;
 		_delegate = delegate;
 		_userInfo = userInfo;
 
-		NSInteger _commentsNew=0;
+		NSInteger _commentsNew = 0;
 		NSInteger _commentsTotal = pullRequest.totalComments.integerValue;
-		if([Settings shared].showCommentsEverywhere || pullRequest.isMine || pullRequest.commentedByMe)
+		NSInteger sectionIndex = pullRequest.sectionIndex.integerValue;
+		if(sectionIndex==kPullRequestSectionMine ||
+		   sectionIndex==kPullRequestSectionParticipated ||
+		   [Settings shared].showCommentsEverywhere)
 		{
 			_commentsNew = pullRequest.unreadComments.integerValue;
 		}
