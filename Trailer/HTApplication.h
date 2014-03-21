@@ -1,0 +1,4 @@
+
+@interface HTApplication : NSApplication
+
+@end

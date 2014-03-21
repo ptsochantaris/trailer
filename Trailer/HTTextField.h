@@ -1,4 +1,0 @@
-
-@interface HTTextField : NSTextField { }
-
-@end

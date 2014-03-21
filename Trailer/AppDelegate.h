@@ -99,4 +99,6 @@
 
 - (void)postNotificationOfType:(PRNotificationType)type forItem:(id)item;
 
+- (NSString *)focusedItemUrl;
+
 @end

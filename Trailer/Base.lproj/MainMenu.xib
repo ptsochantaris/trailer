@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="4514" systemVersion="13C64" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5053" systemVersion="13C64" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment defaultVersion="1080" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="4514"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="5053"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -60,7 +60,7 @@
                                                 <rect key="frame" x="1" y="1" width="722" height="64"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" id="89t-uF-tda" customClass="HTTextField">
+                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" id="89t-uF-tda">
                                                         <rect key="frame" x="19" y="14" width="457" height="40"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="ZEE-fM-gtZ">
@@ -707,8 +707,20 @@ Server</string>
                                                 <rect key="frame" x="0.0" y="0.0" width="705" height="300"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="B02-2m-mrP">
+                                                        <rect key="frame" x="36" y="65" width="632" height="42"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" id="nPj-Jx-Vfo">
+                                                            <font key="font" metaFont="toolTip"/>
+                                                            <string key="title">Important: When enabling this for the first time you will be asked to provide permission for Trailer to use the
+keyboard in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the permission to take effect.
+Available on OS X Mavericks onwards</string>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
                                                     <box autoresizesSubviews="NO" title="Hotkey" borderType="line" titlePosition="noTitle" id="uty-zk-pnf">
-                                                        <rect key="frame" x="197" y="64" width="311" height="72"/>
+                                                        <rect key="frame" x="197" y="49" width="311" height="72"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView">
                                                             <rect key="frame" x="1" y="1" width="309" height="70"/>
@@ -784,20 +796,8 @@ Server</string>
                                                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                     </box>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="B02-2m-mrP">
-                                                        <rect key="frame" x="36" y="80" width="632" height="42"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" id="nPj-Jx-Vfo">
-                                                            <font key="font" metaFont="toolTip"/>
-                                                            <string key="title">Important: When enabling this for the first time you will be asked to provide permission for Trailer to use the
-keyboard in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the permission to take effect.
-Available on OS X Mavericks onwards</string>
-                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
                                                     <button id="IIa-Oc-a7l">
-                                                        <rect key="frame" x="191" y="140" width="323" height="18"/>
+                                                        <rect key="frame" x="191" y="125" width="323" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Enable global hotkey to toggle the Trailer menu" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="ptW-de-jCU">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -808,12 +808,14 @@ Available on OS X Mavericks onwards</string>
                                                         </connections>
                                                     </button>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="ZRZ-7P-3RV">
-                                                        <rect key="frame" x="80" y="201" width="544" height="34"/>
+                                                        <rect key="frame" x="80" y="177" width="544" height="79"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" id="Rul-sI-lqQ">
                                                             <font key="font" metaFont="system"/>
                                                             <string key="title">When Trailer's menu is open you can use the arrow keys to navigate,
-Enter to select, and Cmd-, for preferences.</string>
+Enter to select and ⌘, for preferences.
+
+⌘C over a highlighted PR will copy its web URL to the clipboard.</string>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
@@ -1164,7 +1166,7 @@ THE SOFTWARE.</string>
                             <action selector="apiRestoreDefaultsSelected:" target="494" id="UX5-12-fi2"/>
                         </connections>
                     </button>
-                    <textField verticalHuggingPriority="750" id="9Wj-P9-y7J" customClass="HTTextField">
+                    <textField verticalHuggingPriority="750" id="9Wj-P9-y7J">
                         <rect key="frame" x="90" y="112" width="214" height="22"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="github.com" drawsBackground="YES" id="2OC-Aw-RTI">
@@ -1173,7 +1175,7 @@ THE SOFTWARE.</string>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" id="407-KF-a6G" customClass="HTTextField">
+                    <textField verticalHuggingPriority="750" id="407-KF-a6G">
                         <rect key="frame" x="90" y="57" width="214" height="22"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="api.github.com" drawsBackground="YES" id="vDc-En-Svg">
@@ -1182,7 +1184,7 @@ THE SOFTWARE.</string>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" id="Z4R-x6-Tuv" customClass="HTTextField">
+                    <textField verticalHuggingPriority="750" id="Z4R-x6-Tuv">
                         <rect key="frame" x="322" y="57" width="129" height="22"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="..." drawsBackground="YES" id="aUU-TQ-W4I">

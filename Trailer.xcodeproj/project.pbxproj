@@ -54,6 +54,7 @@
 		1628A7081878BC32005EDA69 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 1617BEE9183F538100E89BB2 /* Reachability.m */; };
 		1628A70A1878BC53005EDA69 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1628A7091878BC53005EDA69 /* SystemConfiguration.framework */; };
 		1628A70B1878D2B2005EDA69 /* NSDictionary+NSDictionary_OFK.m in Sources */ = {isa = PBXBuildFile; fileRef = 161CA3CC17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m */; };
+		163D880E18DC750C0075F77E /* HTApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = 163D880D18DC750C0075F77E /* HTApplication.m */; };
 		1640470A1882ED0000A4AC9C /* AboutTrailerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 164047091882ED0000A4AC9C /* AboutTrailerViewController.m */; };
 		164976251864985500C13A6B /* RemoteImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 164976241864985500C13A6B /* RemoteImageView.m */; };
 		164976261864985500C13A6B /* RemoteImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 164976241864985500C13A6B /* RemoteImageView.m */; };
@@ -103,8 +104,6 @@
 		16B9553A17EC93DE0005118F /* Repo.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B9553917EC93DE0005118F /* Repo.m */; };
 		16C54F941881639B00849B76 /* GithubViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 16C54F931881639B00849B76 /* GithubViewController.m */; };
 		16EAA972182D897E0018018B /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16B94066182D051700F32061 /* Sparkle.framework */; };
-		16EC79E617ECA18000F7EB44 /* HTTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 16EC79E517ECA18000F7EB44 /* HTTextField.m */; };
-		16EC79E717ECA18000F7EB44 /* HTTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 16EC79E517ECA18000F7EB44 /* HTTextField.m */; };
 		16FA683B1823CF4600401E9B /* PRItemView.m in Sources */ = {isa = PBXBuildFile; fileRef = 16FA683A1823CF4600401E9B /* PRItemView.m */; };
 		16FA683C1823CF4600401E9B /* PRItemView.m in Sources */ = {isa = PBXBuildFile; fileRef = 16FA683A1823CF4600401E9B /* PRItemView.m */; };
 		16FD14D71881CBC400FDC960 /* PickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 16FD14D61881CBC400FDC960 /* PickerViewController.m */; };
@@ -192,6 +191,8 @@
 		1628A6FA1878B64E005EDA69 /* PreferencesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreferencesViewController.h; sourceTree = "<group>"; };
 		1628A6FB1878B64E005EDA69 /* PreferencesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreferencesViewController.m; sourceTree = "<group>"; };
 		1628A7091878BC53005EDA69 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/System/Library/Frameworks/SystemConfiguration.framework; sourceTree = DEVELOPER_DIR; };
+		163D880C18DC750B0075F77E /* HTApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HTApplication.h; sourceTree = "<group>"; };
+		163D880D18DC750C0075F77E /* HTApplication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HTApplication.m; sourceTree = "<group>"; };
 		164047081882ED0000A4AC9C /* AboutTrailerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AboutTrailerViewController.h; sourceTree = "<group>"; };
 		164047091882ED0000A4AC9C /* AboutTrailerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AboutTrailerViewController.m; sourceTree = "<group>"; };
 		164976221864935200C13A6B /* Trailer 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 3.xcdatamodel"; sourceTree = "<group>"; };
@@ -263,8 +264,6 @@
 		16B9553917EC93DE0005118F /* Repo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Repo.m; sourceTree = "<group>"; };
 		16C54F921881639B00849B76 /* GithubViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GithubViewController.h; sourceTree = "<group>"; };
 		16C54F931881639B00849B76 /* GithubViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GithubViewController.m; sourceTree = "<group>"; };
-		16EC79E417ECA18000F7EB44 /* HTTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HTTextField.h; sourceTree = "<group>"; };
-		16EC79E517ECA18000F7EB44 /* HTTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HTTextField.m; sourceTree = "<group>"; };
 		16ECCFAF18B7AC5E000B012F /* Trailer 10.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 10.xcdatamodel"; sourceTree = "<group>"; };
 		16FA68391823CF4600401E9B /* PRItemView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PRItemView.h; sourceTree = "<group>"; };
 		16FA683A1823CF4600401E9B /* PRItemView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = PRItemView.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
@@ -470,10 +469,10 @@
 				160C5ACE18675E9300142482 /* CenteredTextField.m */,
 				160C5AC41867551500142482 /* CenteredTextFieldCell.h */,
 				160C5AC51867551500142482 /* CenteredTextFieldCell.m */,
-				16EC79E417ECA18000F7EB44 /* HTTextField.h */,
-				16EC79E517ECA18000F7EB44 /* HTTextField.m */,
 				16616681189BFC6400FBF4E0 /* LinkTextField.h */,
 				16616682189BFC6400FBF4E0 /* LinkTextField.m */,
+				163D880C18DC750B0075F77E /* HTApplication.h */,
+				163D880D18DC750C0075F77E /* HTApplication.m */,
 			);
 			name = Display;
 			sourceTree = "<group>";
@@ -884,6 +883,7 @@
 				168A5C77185BBA2F00CB6B02 /* MenuWindow.m in Sources */,
 				168A5C7B185C922300CB6B02 /* HTPopTimer.m in Sources */,
 				161CA3CA17F5B1F300F4AF6C /* PRComment.m in Sources */,
+				163D880E18DC750C0075F77E /* HTApplication.m in Sources */,
 				168BC6C117EC2DF000BC4584 /* AppDelegate.m in Sources */,
 				1665B6691882F29300972111 /* NSString+Extensions.m in Sources */,
 				16583E481851F082003A7A55 /* SectionHeader.m in Sources */,
@@ -893,7 +893,6 @@
 				16075A9717EC7492000D86FD /* API.m in Sources */,
 				16517CE11893BDE800B3D384 /* EmptyView.m in Sources */,
 				164976251864985500C13A6B /* RemoteImageView.m in Sources */,
-				16EC79E617ECA18000F7EB44 /* HTTextField.m in Sources */,
 				161BED25185B5368005C00F7 /* StatusItemView.m in Sources */,
 				160C5AC61867551500142482 /* CenteredTextFieldCell.m in Sources */,
 				16B9553617EC89B50005118F /* DataItem.m in Sources */,
@@ -906,7 +905,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				164976261864985500C13A6B /* RemoteImageView.m in Sources */,
-				16EC79E717ECA18000F7EB44 /* HTTextField.m in Sources */,
 				16583E491851F082003A7A55 /* SectionHeader.m in Sources */,
 				1675AC1E185CF80C00ADD213 /* MenuScrollView.m in Sources */,
 				168A5C7C185C922300CB6B02 /* HTPopTimer.m in Sources */,
