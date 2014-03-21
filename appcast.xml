@@ -6,6 +6,22 @@
 		<description>Most recent changes with links to updates.</description>
 		<language>en</language>
 
+<item>
+	<title>Version 1.0.20</title>
+	<description><![CDATA[<font face="sans-serif" size="3"><ul>
+		<li>Pressing Cmd-C over a highlighted item will copy its URL to the clipboard</li>
+		<li>You can drag a PR off the Trailer menu to paste its URL into another app</li>
+		<li>Keyboard shortcuts for Copy, Paste, Select-All, and Undo/Redo should now work on all text and search fields</li>
+		</ul></font>]]></description>
+	<pubDate>Fri, 21 Mar 2014 15:00:00 +0000</pubDate>
+	<enclosure
+	url="http://dev.housetrip.com/trailer/trailer1020.zip"
+	sparkle:version="1116"
+	sparkle:shortVersionString="1.0.20"
+	sparkle:dsaSignature="MC0CFQClcafAlJ9nULjMb/4pGN36m2OL3QIUXzCSYQrxixjdCKX853g9Pvo2Ilo="
+	type="application/octet-stream"/>
+</item>
+
 		<item>
 			<title>Version 1.0.19</title>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
