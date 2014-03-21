@@ -1588,6 +1588,17 @@ static AppDelegate *_static_shared_ref;
 	}];
 }
 
+- (NSString *)focusedItemUrl
+{
+	PRItemView *v = [self focusedItemView];
+	v.focused = NO;
+	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+		v.focused = YES;
+	});
+	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:v.userInfo moc:self.dataManager.managedObjectContext];
+	return r.webUrl;
+}
+
 - (void)prItemFocused:(NSNotification *)focusedNotification
 {
 	BOOL state = [focusedNotification.userInfo[PR_ITEM_FOCUSED_STATE_KEY] boolValue];

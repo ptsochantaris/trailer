@@ -2,6 +2,7 @@
 @interface PRItemView ()
 {
 	NSTrackingArea *trackingArea;
+	BOOL dragging;
 }
 @end
 
@@ -229,10 +230,17 @@ static CGColorRef _highlightColor;
 	}
 }
 
-- (void)mouseDown:(NSEvent*) event
+- (void)mouseUp:(NSEvent *)theEvent
 {
-	BOOL isAlternative = ((event.modifierFlags & NSAlternateKeyMask) == NSAlternateKeyMask);
-	[self.delegate prItemSelected:self alternativeSelect:isAlternative];
+	if(dragging)
+	{
+		dragging = NO;
+	}
+	else
+	{
+		BOOL isAlternative = ((theEvent.modifierFlags & NSAlternateKeyMask) == NSAlternateKeyMask);
+		[self.delegate prItemSelected:self alternativeSelect:isAlternative];
+	}
 }
 
 - (void)updateTrackingAreas
@@ -251,6 +259,39 @@ static CGColorRef _highlightColor;
 		[self mouseEntered: nil];
 	else
 		if(!_focused) [self mouseExited: nil];
+}
+
+/////////////// dragging url off this item
+
+- (NSDragOperation)draggingSourceOperationMaskForLocal:(BOOL)flag
+{
+	return NSDragOperationCopy;
+}
+
+- (BOOL)ignoreModifierKeysWhileDragging { return YES; }
+
+- (void)mouseDragged:(NSEvent *)theEvent
+{
+	dragging = YES;
+
+    NSPasteboard *pboard = [NSPasteboard pasteboardWithName:NSDragPboard];
+    [pboard declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:self];
+
+	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:self.userInfo moc:[AppDelegate shared].dataManager.managedObjectContext];
+    [pboard setString:r.webUrl forType:NSStringPboardType];
+
+	NSPoint globalLocation = [ NSEvent mouseLocation ];
+	NSPoint windowLocation = [ [ self window ] convertScreenToBase: globalLocation ];
+	NSPoint viewLocation = [ self convertPoint: windowLocation fromView: nil ];
+	viewLocation = NSMakePoint(viewLocation.x-28, viewLocation.y-4);
+
+    [self dragImage:[[NSApp applicationIconImage] scaleToFillSize:CGSizeMake(32, 32)]
+				 at:viewLocation
+			 offset:CGSizeZero
+			  event:theEvent
+		 pasteboard:pboard
+			 source:self
+		  slideBack:YES];
 }
 
 @end
