@@ -216,36 +216,48 @@
 
 - (void)reloadData
 {
-	NSIndexSet *currentIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, _fetchedResultsController.sections.count)];
+	[self reloadDataWithAnimation:YES];
+}
 
-	_fetchedResultsController = nil;
-	[self updateStatus];
+- (void)reloadDataWithAnimation:(BOOL)animated
+{
+	if(animated)
+	{
+		NSIndexSet *currentIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, _fetchedResultsController.sections.count)];
 
-	NSIndexSet *dataIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, _fetchedResultsController.sections.count)];
+		_fetchedResultsController = nil;
+		[self updateStatus];
 
-	NSIndexSet *removedIndexes = [currentIndexes indexesPassingTest:^BOOL(NSUInteger idx, BOOL *stop) {
-		return ![dataIndexes containsIndex:idx];
-	}];
-	NSIndexSet *addedIndexes = [dataIndexes indexesPassingTest:^BOOL(NSUInteger idx, BOOL *stop) {
-		return ![currentIndexes containsIndex:idx];
-	}];
+		NSIndexSet *dataIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, _fetchedResultsController.sections.count)];
 
-	NSIndexSet *untouchedIndexes = [dataIndexes indexesPassingTest:^BOOL(NSUInteger idx, BOOL *stop) {
-		return !([removedIndexes containsIndex:idx] || [addedIndexes containsIndex:idx]);
-	}];
+		NSIndexSet *removedIndexes = [currentIndexes indexesPassingTest:^BOOL(NSUInteger idx, BOOL *stop) {
+			return ![dataIndexes containsIndex:idx];
+		}];
+		NSIndexSet *addedIndexes = [dataIndexes indexesPassingTest:^BOOL(NSUInteger idx, BOOL *stop) {
+			return ![currentIndexes containsIndex:idx];
+		}];
 
-	[self.tableView beginUpdates];
+		NSIndexSet *untouchedIndexes = [dataIndexes indexesPassingTest:^BOOL(NSUInteger idx, BOOL *stop) {
+			return !([removedIndexes containsIndex:idx] || [addedIndexes containsIndex:idx]);
+		}];
 
-	if(removedIndexes.count)
-		[self.tableView deleteSections:removedIndexes withRowAnimation:UITableViewRowAnimationAutomatic];
+		[self.tableView beginUpdates];
 
-	if(untouchedIndexes.count)
-		[self.tableView reloadSections:untouchedIndexes withRowAnimation:UITableViewRowAnimationAutomatic];
+		if(removedIndexes.count)
+			[self.tableView deleteSections:removedIndexes withRowAnimation:UITableViewRowAnimationAutomatic];
 
-	if(addedIndexes.count)
-		[self.tableView insertSections:addedIndexes withRowAnimation:UITableViewRowAnimationAutomatic];
-	
-	[self.tableView endUpdates];
+		if(untouchedIndexes.count)
+			[self.tableView reloadSections:untouchedIndexes withRowAnimation:UITableViewRowAnimationAutomatic];
+
+		if(addedIndexes.count)
+			[self.tableView insertSections:addedIndexes withRowAnimation:UITableViewRowAnimationAutomatic];
+		
+		[self.tableView endUpdates];
+	}
+	else
+	{
+		[self.tableView reloadData];
+	}
 }
 
 - (void)localNotification:(NSNotification *)notification
@@ -281,11 +293,11 @@
         }
     }
 
-    if(urlToOpen)
+    if(urlToOpen && searchField.text.length)
     {
         searchField.text = nil;
 		[searchField resignFirstResponder];
-        [self reloadData];
+        [self reloadDataWithAnimation:NO];
     }
 
     if(pullRequest)

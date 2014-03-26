@@ -88,6 +88,15 @@ static DetailViewController *_detail_shared_ref;
 	}
 }
 
+- (void)viewWillAppear:(BOOL)animated
+{
+	[super viewWillAppear:animated];
+	if(self.web.isLoading)
+		[self.spinner startAnimating];
+	else
+		[self.spinner stopAnimating];
+}
+
 - (void)webViewDidStartLoad:(UIWebView *)webView
 {
 	[self.spinner startAnimating];
