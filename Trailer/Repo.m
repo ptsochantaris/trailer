@@ -32,13 +32,18 @@
 
 - (void)prepareForDeletion
 {
-	for(PullRequest *r in [PullRequest allItemsOfType:@"PullRequest" inMoc:self.managedObjectContext])
-	{
-		if([r.repoId isEqualToNumber:self.serverId])
-		{
-			[self.managedObjectContext deleteObject:r];
-		}
-	}
+    NSNumber *sid = self.serverId;
+    if(sid)
+    {
+        NSManagedObjectContext *moc = self.managedObjectContext;
+        for(PullRequest *r in [PullRequest allItemsOfType:@"PullRequest" inMoc:moc])
+        {
+            if([r.repoId isEqualToNumber:sid])
+            {
+                [moc deleteObject:r];
+            }
+        }
+    }
 }
 
 @end
