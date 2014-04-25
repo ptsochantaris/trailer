@@ -23,12 +23,11 @@ static AppDelegate *_static_shared_ref;
 	self.filterTimer = [[HTPopTimer alloc] initWithTimeInterval:0.2 target:self selector:@selector(filterTimerPopped)];
 
 	SUUpdater *s = [SUUpdater sharedUpdater];
+    [self setUpdateCheckParameters];
 	if(!s.updateInProgress)
 	{
 		[s checkForUpdatesInBackground];
 	}
-	[s setUpdateCheckInterval:28800.0]; // 8 hours
-	s.automaticallyChecksForUpdates = YES;
 
 	[NSThread setThreadPriority:0.0];
 
@@ -255,6 +254,39 @@ static AppDelegate *_static_shared_ref;
 	[Settings shared].moveAssignedPrsToMySection = setting;
 	[self.dataManager postProcessAllPrs]; // apply any view option changes
 	[self updateMenu];
+}
+
+- (IBAction)checkForUpdatesAutomaticallySelected:(NSButton *)sender
+{
+	BOOL setting = (sender.integerValue==1);
+    [Settings shared].checkForUpdatesAutomatically = setting;
+    [self refreshUpdatePreferences];
+}
+
+- (void)refreshUpdatePreferences
+{
+    BOOL setting = [Settings shared].checkForUpdatesAutomatically;
+    NSInteger interval = [Settings shared].checkForUpdatesInterval;
+
+    [self.checkForUpdatesLabel setHidden:!setting];
+    [self.checkForUpdatesSelector setHidden:!setting];
+
+    [self.checkForUpdatesSelector setIntegerValue:interval];
+    [self.checkForUpdatesAutomatically setIntegerValue:setting];
+    if(interval<2)
+    {
+        self.checkForUpdatesLabel.stringValue = [NSString stringWithFormat:@"Check every hour"];
+    }
+    else
+    {
+        self.checkForUpdatesLabel.stringValue = [NSString stringWithFormat:@"Check every %ld hours",(long)interval];
+    }
+}
+
+- (IBAction)checkForUpdatesIntervalChanged:(NSStepper *)sender
+{
+    [Settings shared].checkForUpdatesInterval = sender.integerValue;
+    [self refreshUpdatePreferences];
 }
 
 - (IBAction)launchAtStartSelected:(NSButton *)sender
@@ -800,6 +832,8 @@ static AppDelegate *_static_shared_ref;
 	[self enableHotkeySegments];
 	[self populateHotkeyLetterMenu];
 
+    [self refreshUpdatePreferences];
+
 	[self.hotkeyEnable setEnabled:(AXIsProcessTrustedWithOptions != NULL)];
 
 	[self.repoCheckStepper setFloatValue:[Settings shared].newRepoCheckPeriod];
@@ -1054,11 +1088,24 @@ static AppDelegate *_static_shared_ref;
 				[self startRefreshIfItIsDue];
 			}
 		}
+        [self setUpdateCheckParameters];
 	}
 	else if([notification object]==self.apiSettings)
 	{
 		[self copyApiInfo];
 	}
+}
+
+- (void)setUpdateCheckParameters
+{
+    SUUpdater *s = [SUUpdater sharedUpdater];
+    BOOL autoCheck = [Settings shared].checkForUpdatesAutomatically;
+	s.automaticallyChecksForUpdates = autoCheck;
+    if(autoCheck)
+    {
+        [s setUpdateCheckInterval:3600.0*[Settings shared].checkForUpdatesInterval];
+    }
+    DLog(@"Check for updates set to %d every %f seconds",s.automaticallyChecksForUpdates,s.updateCheckInterval);
 }
 
 - (void)copyApiInfo

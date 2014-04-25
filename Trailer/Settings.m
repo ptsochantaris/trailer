@@ -144,6 +144,40 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#define UPDATE_CHECK_INTERVAL_KEY @"UPDATE_CHECK_INTERVAL_KEY"
+- (NSInteger)checkForUpdatesInterval
+{
+    id item = [[NSUserDefaults standardUserDefaults] objectForKey:UPDATE_CHECK_INTERVAL_KEY];
+    if(item)
+    {
+        return [item integerValue];
+    }
+    else
+    {
+        return 8;
+    }
+}
+- (void)setCheckForUpdatesInterval:(NSInteger)checkForUpdatesInterval { [self storeDefaultValue:@(checkForUpdatesInterval) forKey:UPDATE_CHECK_INTERVAL_KEY]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define UPDATE_CHECK_AUTO_KEY @"UPDATE_CHECK_AUTO_KEY"
+- (void)setCheckForUpdatesAutomatically:(BOOL)checkForUpdatesAutomatically { [self storeDefaultValue:@(checkForUpdatesAutomatically) forKey:UPDATE_CHECK_AUTO_KEY]; }
+- (BOOL)checkForUpdatesAutomatically
+{
+    id item = [[NSUserDefaults standardUserDefaults] stringForKey:UPDATE_CHECK_AUTO_KEY];
+    if(item)
+    {
+        return [item boolValue];
+    }
+    else
+    {
+        return YES;
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #define STATUS_FILTERING_TERMS_KEY @"STATUS_FILTERING_TERMS_KEY"
 - (NSArray *)statusFilteringTerms { return [[NSUserDefaults standardUserDefaults] objectForKey:STATUS_FILTERING_TERMS_KEY]; }
 - (void)setStatusFilteringTerms:(NSArray *)statusFilteringTerms { [self storeDefaultValue:statusFilteringTerms forKey:STATUS_FILTERING_TERMS_KEY]; }
