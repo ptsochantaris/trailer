@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5053" systemVersion="13C64" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5056" systemVersion="13C1021" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment defaultVersion="1080" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="5053"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="5056"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -828,6 +828,54 @@ Enter to select and ⌘, for preferences.
                                     </subviews>
                                 </view>
                             </tabViewItem>
+                            <tabViewItem label="Updates" identifier="" id="xKy-ON-K2f">
+                                <view key="view" id="LRp-Re-sQj">
+                                    <rect key="frame" x="10" y="33" width="736" height="339"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <box autoresizesSubviews="NO" borderType="none" titlePosition="noTitle" id="pyS-ma-X4O">
+                                            <rect key="frame" x="130" y="55" width="476" height="240"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                            <view key="contentView">
+                                                <rect key="frame" x="0.0" y="0.0" width="476" height="240"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <button id="884-i6-3Qz">
+                                                        <rect key="frame" x="89" y="132" width="299" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Check for new Trailer releases automatically" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Bty-E4-KMD">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="checkForUpdatesAutomaticallySelected:" target="494" id="JIX-Fq-JbQ"/>
+                                                        </connections>
+                                                    </button>
+                                                    <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="VSJ-4k-oD4">
+                                                        <rect key="frame" x="295" y="91" width="19" height="27"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                                        <stepperCell key="cell" continuous="YES" alignment="left" minValue="1" maxValue="1024" doubleValue="1" id="7GS-Kl-F8N"/>
+                                                        <connections>
+                                                            <action selector="checkForUpdatesIntervalChanged:" target="494" id="BQq-gL-w3Y"/>
+                                                        </connections>
+                                                    </stepper>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="bIt-Bu-LYU">
+                                                        <rect key="frame" x="30" y="97" width="265" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Check every X hours" id="Ygh-by-o2s">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                </subviews>
+                                            </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </box>
+                                    </subviews>
+                                </view>
+                            </tabViewItem>
                         </tabViewItems>
                     </tabView>
                     <button id="qqE-Ib-sQ9">
@@ -858,6 +906,9 @@ Enter to select and ⌘, for preferences.
                 <outlet property="apiPath" destination="Z4R-x6-Tuv" id="mby-M5-JDx"/>
                 <outlet property="apiSettings" destination="IgO-qu-f69" id="tfZ-lA-xfw"/>
                 <outlet property="autoParticipateWhenMentioned" destination="lTI-8Y-voD" id="i9M-pb-2Ig"/>
+                <outlet property="checkForUpdatesAutomatically" destination="884-i6-3Qz" id="1eW-Ky-Ll9"/>
+                <outlet property="checkForUpdatesLabel" destination="bIt-Bu-LYU" id="phD-Ph-UPE"/>
+                <outlet property="checkForUpdatesSelector" destination="VSJ-4k-oD4" id="Upd-8P-Dkw"/>
                 <outlet property="clearAll" destination="5Sj-ma-EM3" id="4Lh-JS-ceA"/>
                 <outlet property="countOnlyListedPrs" destination="y7T-zw-tAa" id="NtB-ef-IsY"/>
                 <outlet property="displayRepositoryNames" destination="eoe-1H-ixD" id="0s6-Ac-0bI"/>

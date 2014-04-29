@@ -230,7 +230,7 @@ typedef void (^completionBlockType)(BOOL);
 				else
 				{
 					NSArray *orgs = [Org allItemsOfType:@"Org" inMoc:syncContext];
-					__block NSInteger count=orgs.count+1;
+					__block NSInteger count=orgs.count+2;
 					__block BOOL ok = YES;
 
 					completionBlockType completionCallback = ^(BOOL success) {
@@ -257,6 +257,7 @@ typedef void (^completionBlockType)(BOOL);
 
 					for(Org *r in orgs) [self syncReposForOrg:r.login toMoc:syncContext andCallback:completionCallback];
 					[self syncReposForUserToMoc:syncContext andCallback:completionCallback];
+					[self syncWatchedReposForUserToMoc:syncContext andCallback:completionCallback];
 				}
 			}];
 		}
@@ -587,6 +588,39 @@ typedef void (^completionBlockType)(BOOL);
 				 for(NSDictionary *info in data)
 				 {
 					 [Repo repoWithInfo:info moc:moc];
+				 }
+			 } finalCallback:^(BOOL success, NSInteger resultCode) {
+				 if(callback) callback(success);
+			 }];
+}
+
+- (void)syncWatchedReposForUserToMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
+{
+	[self getPagedDataInPath:@"/user/subscriptions"
+			startingFromPage:1
+					  params:nil
+			 perPageCallback:^(id data, BOOL lastPage) {
+				 for(NSDictionary *info in data)
+				 {
+                     if([[info ofk:@"private"] boolValue])
+                     {
+                         NSDictionary *permissions = [info ofk:@"permissions"];
+                         if([[permissions ofk:@"pull"] boolValue] ||
+                            [[permissions ofk:@"push"] boolValue] ||
+                            [[permissions ofk:@"admin"] boolValue])
+                         {
+                             [Repo repoWithInfo:info moc:moc];
+                         }
+                         else
+                         {
+                             DLog(@"Watched private repository '%@' seems to be inaccessible, skipping",[info ofk:@"full_name"]);
+                             continue;
+                         }
+                     }
+                     else
+                     {
+                         [Repo repoWithInfo:info moc:moc];
+                     }
 				 }
 			 } finalCallback:^(BOOL success, NSInteger resultCode) {
 				 if(callback) callback(success);

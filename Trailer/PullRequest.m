@@ -284,8 +284,13 @@ static NSDateFormatter *itemDateFormatter;
 
 - (void)prepareForDeletion
 {
-	[PRComment removeCommentsWithPullRequestURL:self.url inMoc:self.managedObjectContext];
-	[PRStatus removeStatusesWithPullRequestId:self.serverId inMoc:self.managedObjectContext];
+    NSNumber *sid = self.serverId;
+    if(sid)
+    {
+        NSManagedObjectContext *moc = self.managedObjectContext;
+        [PRComment removeCommentsWithPullRequestURL:self.url inMoc:moc];
+        [PRStatus removeStatusesWithPullRequestId:sid inMoc:moc];
+    }
 }
 
 + (PullRequest *)pullRequestWithUrl:(NSString *)url moc:(NSManagedObjectContext *)moc

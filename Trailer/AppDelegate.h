@@ -55,6 +55,9 @@
 @property (weak) IBOutlet NSButton *countOnlyListedPrs;
 @property (weak) IBOutlet NSPopUpButton *prMergedPolicy;
 @property (weak) IBOutlet NSPopUpButton *prClosedPolicy;
+@property (weak) IBOutlet NSButton *checkForUpdatesAutomatically;
+@property (weak) IBOutlet NSTextField *checkForUpdatesLabel;
+@property (weak) IBOutlet NSStepper *checkForUpdatesSelector;
 
 // Keyboard
 @property (weak) IBOutlet NSButton *hotkeyEnable;
