@@ -24,7 +24,7 @@ static AppDelegate *_static_shared_ref;
 
 	SUUpdater *s = [SUUpdater sharedUpdater];
     [self setUpdateCheckParameters];
-	if(!s.updateInProgress)
+	if(!s.updateInProgress && [Settings shared].checkForUpdatesAutomatically)
 	{
 		[s checkForUpdatesInBackground];
 	}
