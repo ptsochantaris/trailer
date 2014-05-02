@@ -7,6 +7,24 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.0.22</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Fetching statuses is now done for all, not just updated PRs.  This means that status items will not be updated property but each refresh may eat up a lot of API allowance, so it now happens once every 10 refreshes by default (configurable via preferences)</li>
+				<li>Trailer will no longer fetch orgs or list the user's repos, but will base all processed repos on the user's watch list, which allows far greater flexibility on what they can select in the Repos list.</li>
+				<li>Postprocessing PRs after a sync happens only to new or updated PRs for improved performance.</li>
+				<li>Added indexes to speed up various DB lookup operations.</li>
+				<li>Menu icon should be stronger and less fuzzy in the menubar, especially on non-retina displays.</li>
+				</ul></font>]]></description>
+			<pubDate>Fri, 2 May 2014 17:00:00 +0000</pubDate>
+			<enclosure
+			url="http://dev.housetrip.com/trailer/trailer1022.zip"
+			sparkle:version="1118"
+			sparkle:shortVersionString="1.0.22"
+			sparkle:dsaSignature="MC4CFQDY+QutpdR5Cwhc2rWjI5kfu3lWYAIVALLQHrxrCSgpedL0+wMZiah5nr9O"
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.0.21</title>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
 				<li>Will additionally retrieve/auto-subscribe/etc the repositories that a user watches (but will skip repositories that are watched but the user has no permissions for - GitHub doesn’t clean those up)</li>
