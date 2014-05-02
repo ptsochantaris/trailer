@@ -7,19 +7,22 @@
 		<language>en</language>
 
 		<item>
-			<title>Version 1.0.23</title>
+			<title>Version 1.0.24</title>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Auto-subscription will also apply when reloading the repository list</li>
+				<li>Keyboard accessibility nag will not happen on every launch if keyboard shortcut is enabled</li>
+				<li>From the recent 1.0.23 update:</li>
 				<li>Fetching statuses is now done for all, not just updated PRs.  This means that status items will not be updated property but each refresh may eat up a lot of API allowance, so it now happens once every 10 refreshes by default (configurable via preferences)</li>
 				<li>Trailer will no longer fetch orgs or list the user's repos, but will base all processed repos on the user's watch list, which allows far greater flexibility on what they can select in the Repos list.</li>
 				<li>Added indexes to speed up various DB lookup operations.</li>
 				<li>Menu icon should be stronger and less fuzzy in the menubar, especially on non-retina displays.</li>
 				</ul></font>]]></description>
-			<pubDate>Fri, 2 May 2014 18:00:00 +0000</pubDate>
+			<pubDate>Fri, 2 May 2014 21:00:00 +0000</pubDate>
 			<enclosure
-			url="http://dev.housetrip.com/trailer/trailer1023.zip"
-			sparkle:version="1119"
-			sparkle:shortVersionString="1.0.23"
-			sparkle:dsaSignature="MCwCFGKFuDW8ZsW9uvIap33EukNDve3vAhQD29eb/fBCe/62O5gcJ3xkoz0Nqg=="
+			url="http://dev.housetrip.com/trailer/trailer1024.zip"
+			sparkle:version="1120"
+			sparkle:shortVersionString="1.0.24"
+			sparkle:dsaSignature="MC0CFQCyPP/FPFV281U7cfDU0JEF408FZQIUIIJxQtdIQKrZqe6HDFRlyQYuIXk="
 			type="application/octet-stream"/>
 		</item>
 
