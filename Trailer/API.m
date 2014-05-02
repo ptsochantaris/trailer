@@ -471,8 +471,8 @@ typedef void (^completionBlockType)(BOOL);
 					[DataItem nukeDeletedItemsOfType:@"Repo" inMoc:moc];
 					[DataItem nukeDeletedItemsOfType:@"PullRequest" inMoc:moc];
 
-					NSArray *newOrUpdatedPrs = [PullRequest newOrUpdatedItemsOfType:@"PullRequest" inMoc:moc];
-					for(PullRequest *r in newOrUpdatedPrs) [r postProcess];
+					NSArray *surviving = [PullRequest itemsOfType:@"PullRequest" surviving:YES inMoc:moc];
+					for(PullRequest *r in surviving) [r postProcess];
 
 					if(moc.hasChanges)
 					{
