@@ -5,8 +5,12 @@
 
 #define MENU_WIDTH 500.0
 
-#define DLog(fmt, ...) NSLog(fmt, ##__VA_ARGS__)
-//#define DLog(...)
+#ifdef DEBUG
+	#define DLog(fmt, ...) NSLog(fmt, ##__VA_ARGS__)
+#else
+	#define DLog(...)
+#endif
+
 #define COLOR_CLASS NSColor
 #define IMAGE_CLASS NSImage
 #define MAKECOLOR(R,G,B,A) [COLOR_CLASS colorWithSRGBRed:R green:G blue:B alpha:A]
