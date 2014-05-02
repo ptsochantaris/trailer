@@ -1597,7 +1597,8 @@ static AppDelegate *_static_shared_ref;
 		{
 			if(!globalKeyMonitor)
 			{
-				NSDictionary *options = @{ (__bridge id)kAXTrustedCheckOptionPrompt: @YES};
+				BOOL alreadyTrusted = AXIsProcessTrusted();
+				NSDictionary *options = @{ (__bridge id)kAXTrustedCheckOptionPrompt: @(!alreadyTrusted)};
 				if(AXIsProcessTrustedWithOptions((__bridge CFDictionaryRef)options))
 				{
 					globalKeyMonitor = [NSEvent addGlobalMonitorForEventsMatchingMask:NSKeyDownMask handler:^void(NSEvent* incomingEvent) {

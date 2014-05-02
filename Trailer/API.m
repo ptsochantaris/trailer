@@ -25,8 +25,8 @@ typedef void (^completionBlockType)(BOOL);
 - (id)init
 {
     self = [super init];
-    if (self) {
-
+    if (self)
+	{
 		NSURLCache *cache = [[NSURLCache alloc] initWithMemoryCapacity:CACHE_MEMORY
 														  diskCapacity:CACHE_DISK
 															  diskPath:nil];
@@ -222,6 +222,9 @@ typedef void (^completionBlockType)(BOOL);
 				if(success)
 				{
 					[DataItem nukeDeletedItemsOfType:@"Repo" inMoc:syncContext];
+
+					[self processAutoSubscriptionPolicyInMoc:syncContext];
+
 					[AppDelegate shared].lastRepoCheck = [NSDate date];
 					if(syncContext.hasChanges) [syncContext save:nil];
 				}
@@ -236,6 +239,27 @@ typedef void (^completionBlockType)(BOOL);
 		}
 		else if(callback) callback(NO);
 	}];
+}
+
+- (void)processAutoSubscriptionPolicyInMoc:(NSManagedObjectContext *)moc
+{
+	for(Repo *r in [Repo newItemsOfType:@"Repo" inMoc:moc])
+	{
+		if([Settings shared].repoSubscriptionPolicy == kRepoAutoSubscribeNone)
+		{
+			[[AppDelegate shared] postNotificationOfType:kNewRepoAnnouncement forItem:r];
+		}
+		else if([Settings shared].repoSubscriptionPolicy == kRepoAutoSubscribeParentsOnly)
+		{
+			if(!r.fork.boolValue) r.active = @YES;
+			[[AppDelegate shared] postNotificationOfType:kNewRepoSubscribed forItem:r];
+		}
+		else
+		{
+			r.active = @YES;
+			[[AppDelegate shared] postNotificationOfType:kNewRepoSubscribed forItem:r];
+		}
+	}
 }
 
 - (void)detectAssignedPullRequestsInMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
@@ -428,27 +452,6 @@ typedef void (^completionBlockType)(BOOL);
 	}
 
 	[self fetchRepositoriesAndCallback:^(BOOL success) {
-		if(success)
-		{
-			NSManagedObjectContext *moc = [AppDelegate shared].dataManager.managedObjectContext;
-			for(Repo *r in [Repo newItemsOfType:@"Repo" inMoc:moc])
-			{
-				if([Settings shared].repoSubscriptionPolicy == kRepoAutoSubscribeNone)
-				{
-					[[AppDelegate shared] postNotificationOfType:kNewRepoAnnouncement forItem:r];
-				}
-				else if([Settings shared].repoSubscriptionPolicy == kRepoAutoSubscribeParentsOnly)
-				{
-					if(!r.fork.boolValue) r.active = @YES;
-					[[AppDelegate shared] postNotificationOfType:kNewRepoSubscribed forItem:r];
-				}
-				else
-				{
-					r.active = @YES;
-					[[AppDelegate shared] postNotificationOfType:kNewRepoSubscribed forItem:r];
-				}
-			}
-		}
 		if(callback) callback();
 	}];
 }
