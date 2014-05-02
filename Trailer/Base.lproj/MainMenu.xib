@@ -629,14 +629,23 @@ Server</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" borderType="none" titlePosition="noTitle" id="bza-5m-qaP">
-                                            <rect key="frame" x="130" y="55" width="476" height="240"/>
+                                            <rect key="frame" x="107" y="23" width="522" height="284"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <view key="contentView">
-                                                <rect key="frame" x="0.0" y="0.0" width="476" height="240"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="522" height="284"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="XBq-82-2L8">
+                                                        <rect key="frame" x="87" y="256" width="397" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="...re-scan all statuses every X refreshes" id="8ZQ-Ty-R6z">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
                                                     <button id="217-Vi-ReC">
-                                                        <rect key="frame" x="17" y="211" width="148" height="18"/>
+                                                        <rect key="frame" x="17" y="255" width="148" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Show status items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="u1v-21-7Q5">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -647,7 +656,7 @@ Server</string>
                                                         </connections>
                                                     </button>
                                                     <button id="yD7-Y4-ZaZ">
-                                                        <rect key="frame" x="17" y="177" width="442" height="18"/>
+                                                        <rect key="frame" x="17" y="184" width="442" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Make status items always selectable (don't require command-click)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Nwp-dZ-JYi">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -658,7 +667,7 @@ Server</string>
                                                         </connections>
                                                     </button>
                                                     <popUpButton verticalHuggingPriority="750" id="Bx7-99-sDc">
-                                                        <rect key="frame" x="17" y="130" width="443" height="26"/>
+                                                        <rect key="frame" x="17" y="136" width="489" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" title="Show all status items" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="za3-yE-QZS" id="mON-Mm-XBq">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -676,7 +685,7 @@ Server</string>
                                                         </connections>
                                                     </popUpButton>
                                                     <tokenField verticalHuggingPriority="750" id="JNC-T1-vCD">
-                                                        <rect key="frame" x="19" y="15" width="438" height="104"/>
+                                                        <rect key="frame" x="19" y="15" width="484" height="104"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <tokenFieldCell key="cell" selectable="YES" editable="YES" borderStyle="bezel" alignment="left" placeholderString="Comma separated list of terms" drawsBackground="YES" allowsEditingTextAttributes="YES" id="EaR-SJ-Mk1">
                                                             <font key="font" metaFont="system"/>
@@ -687,6 +696,26 @@ Server</string>
                                                             <outlet property="delegate" destination="494" id="AIG-1f-yL5"/>
                                                         </connections>
                                                     </tokenField>
+                                                    <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="O6x-Fv-9vm">
+                                                        <rect key="frame" x="487" y="249" width="19" height="27"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <stepperCell key="cell" continuous="YES" alignment="left" minValue="1" maxValue="1000" doubleValue="1" id="I2X-9y-EAQ"/>
+                                                        <connections>
+                                                            <action selector="statusItemRefreshCountChanged:" target="494" id="BE2-tg-Hbb"/>
+                                                        </connections>
+                                                    </stepper>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Ud3-8I-IKZ">
+                                                        <rect key="frame" x="103" y="208" width="381" height="44"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" id="q1K-0J-arN">
+                                                            <font key="font" metaFont="miniSystem"/>
+                                                            <string key="title">Status items need to be rescanned fully in order be updated.  If you
+usually manage alot of PRs, then you may want to set this value
+to a higher number in order to keep your API usage reasonable</string>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
                                                 </subviews>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
@@ -957,6 +986,9 @@ Enter to select and ⌘, for preferences.
                 <outlet property="showStatusItems" destination="217-Vi-ReC" id="Gu1-wa-hE2"/>
                 <outlet property="sortModeSelect" destination="geS-Jc-8P2" id="L5a-K5-3PH"/>
                 <outlet property="sortingOrder" destination="B8S-t3-bHc" id="K24-7i-FqU"/>
+                <outlet property="statusItemRefreshCounter" destination="O6x-Fv-9vm" id="Wcv-lG-Xlm"/>
+                <outlet property="statusItemRescanLabel" destination="XBq-82-2L8" id="B84-w5-Stj"/>
+                <outlet property="statusItemsRefreshNote" destination="Ud3-8I-IKZ" id="7qy-EF-8Cd"/>
                 <outlet property="statusTermMenu" destination="Bx7-99-sDc" id="pBm-jb-bo6"/>
                 <outlet property="statusTermsField" destination="JNC-T1-vCD" id="Gab-bS-wOF"/>
                 <outlet property="tokenHolder" destination="89t-uF-tda" id="FrU-nv-0AM"/>

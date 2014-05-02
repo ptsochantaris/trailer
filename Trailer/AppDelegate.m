@@ -224,6 +224,44 @@ static AppDelegate *_static_shared_ref;
 	BOOL show = (sender.integerValue==1);
 	[Settings shared].showStatusItems = show;
 	[self updateMenu];
+
+	[self updateStatusItemsOptions];
+
+	self.api.successfulRefreshesSinceLastStatusCheck = 0;
+	self.preferencesDirty = YES;
+}
+
+- (void)updateStatusItemsOptions
+{
+	BOOL enable = [Settings shared].showStatusItems;
+	[self.makeStatusItemsSelectable setEnabled:enable];
+	[self.statusTermMenu setEnabled:enable];
+	[self.statusTermsField setEnabled:enable];
+	[self.statusItemRefreshCounter setEnabled:enable];
+
+	if(enable)
+	{
+		[self.statusItemRescanLabel setAlphaValue:1.0];
+		[self.statusItemsRefreshNote setAlphaValue:1.0];
+	}
+	else
+	{
+		[self.statusItemRescanLabel setAlphaValue:0.5];
+		[self.statusItemsRefreshNote setAlphaValue:0.5];
+	}
+
+	self.statusItemRefreshCounter.integerValue = [Settings shared].statusItemRefreshInterval;
+	NSInteger count = [Settings shared].statusItemRefreshInterval;
+	if(count>1)
+		self.statusItemRescanLabel.stringValue = [NSString stringWithFormat:@"...and re-scan once every %ld refreshes",(long)count];
+	else
+		self.statusItemRescanLabel.stringValue = [NSString stringWithFormat:@"...and re-scan on every refresh"];
+}
+
+- (IBAction)statusItemRefreshCountChanged:(NSStepper *)sender
+{
+	[Settings shared].statusItemRefreshInterval = self.statusItemRefreshCounter.integerValue;
+	[self updateStatusItemsOptions];
 }
 
 - (IBAction)makeStatusItemsSelectableSelected:(NSButton *)sender
@@ -774,6 +812,7 @@ static AppDelegate *_static_shared_ref;
 - (void)reset
 {
 	self.preferencesDirty = YES;
+	self.api.successfulRefreshesSinceLastStatusCheck = 0;
 	self.lastSuccessfulRefresh = nil;
 	[self.dataManager deleteEverything];
 	[self.projectsTable reloadData];
@@ -833,6 +872,8 @@ static AppDelegate *_static_shared_ref;
 	[self populateHotkeyLetterMenu];
 
     [self refreshUpdatePreferences];
+
+	[self updateStatusItemsOptions];
 
 	[self.hotkeyEnable setEnabled:(AXIsProcessTrustedWithOptions != NULL)];
 

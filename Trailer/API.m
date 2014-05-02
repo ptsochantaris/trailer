@@ -82,7 +82,7 @@ typedef void (^completionBlockType)(BOOL);
 
 - (void)fetchStatusesForCurrentPullRequestsToMoc:(NSManagedObjectContext *)moc andCallback:(void (^)(BOOL))callback
 {
-	NSArray *prs = [DataItem newOrUpdatedItemsOfType:@"PullRequest" inMoc:moc];
+	NSArray *prs = [DataItem allItemsOfType:@"PullRequest" inMoc:moc];
 
 	if(!prs.count)
 	{
@@ -218,47 +218,20 @@ typedef void (^completionBlockType)(BOOL);
 			NSArray *items = [PullRequest itemsOfType:@"Repo" surviving:YES inMoc:syncContext];
 			for(DataItem *i in items) i.postSyncAction = @(kPostSyncDelete);
 
-			items = [PullRequest itemsOfType:@"Org" surviving:YES inMoc:syncContext];
-			for(DataItem *i in items) i.postSyncAction = @(kPostSyncDelete);
-
-			[self syncOrgsToMoc:syncContext andCallback:^(BOOL success) {
-				if(!success)
+			[self syncWatchedReposForUserToMoc:syncContext andCallback:^(BOOL success) {
+				if(success)
 				{
-					[self error:@"orgs"];
-					callback(NO);
+					[DataItem nukeDeletedItemsOfType:@"Repo" inMoc:syncContext];
+					[AppDelegate shared].lastRepoCheck = [NSDate date];
+					if(syncContext.hasChanges) [syncContext save:nil];
 				}
 				else
 				{
-					NSArray *orgs = [Org allItemsOfType:@"Org" inMoc:syncContext];
-					__block NSInteger count=orgs.count+2;
-					__block BOOL ok = YES;
-
-					completionBlockType completionCallback = ^(BOOL success) {
-						count--;
-						if(ok) ok = success;
-						if(count==0 && callback)
-						{
-							if(ok)
-							{
-								[DataItem nukeDeletedItemsOfType:@"Repo" inMoc:syncContext];
-								[DataItem nukeDeletedItemsOfType:@"Org" inMoc:syncContext];
-								[AppDelegate shared].lastRepoCheck = [NSDate date];
-							}
-							else
-							{
-								DLog(@"%@",[NSError errorWithDomain:@"YOUR_ERROR_DOMAIN"
-															   code:101
-														   userInfo:@{NSLocalizedDescriptionKey:@"Error while fetching data from GitHub"}]);
-							}
-							if(ok && syncContext.hasChanges) [syncContext save:nil];
-							callback(ok);
-						}
-					};
-
-					for(Org *r in orgs) [self syncReposForOrg:r.login toMoc:syncContext andCallback:completionCallback];
-					[self syncReposForUserToMoc:syncContext andCallback:completionCallback];
-					[self syncWatchedReposForUserToMoc:syncContext andCallback:completionCallback];
+					DLog(@"%@",[NSError errorWithDomain:@"YOUR_ERROR_DOMAIN"
+												   code:101
+											   userInfo:@{NSLocalizedDescriptionKey:@"Error while fetching data from GitHub"}]);
 				}
+				callback(success);
 			}];
 		}
 		else if(callback) callback(NO);
@@ -498,13 +471,18 @@ typedef void (^completionBlockType)(BOOL);
 					[DataItem nukeDeletedItemsOfType:@"Repo" inMoc:moc];
 					[DataItem nukeDeletedItemsOfType:@"PullRequest" inMoc:moc];
 
-					NSArray *surviving = [PullRequest itemsOfType:@"PullRequest" surviving:YES inMoc:moc];
-					for(PullRequest *r in surviving) [r postProcess];
+					NSArray *newOrUpdatedPrs = [PullRequest newOrUpdatedItemsOfType:@"PullRequest" inMoc:moc];
+					for(PullRequest *r in newOrUpdatedPrs) [r postProcess];
 
 					if(moc.hasChanges)
 					{
 						DLog(@"Database dirty after sync, saving");
 						[moc save:nil];
+					}
+
+					if([Settings shared].showStatusItems)
+					{
+						self.successfulRefreshesSinceLastStatusCheck++;
 					}
 				}
 				if(callback) callback(success);
@@ -516,9 +494,12 @@ typedef void (^completionBlockType)(BOOL);
 
 - (void)updatePullRequestsInMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
 {
-	NSInteger totalOperations = 4;
-	__block NSInteger succeded = 0;
-	__block NSInteger failed = 0;
+	BOOL willScanForStatuses = [self shouldScanForStatusesInMoc:moc];
+
+	NSInteger totalOperations = 3;
+	if(willScanForStatuses) totalOperations++;
+
+	__block NSInteger succeded = 0, failed = 0;
 
 	completionBlockType completionCallback = ^(BOOL success) {
 		if(success) succeded++; else failed++;
@@ -527,11 +508,35 @@ typedef void (^completionBlockType)(BOOL);
 			if(callback) callback(failed==0);
 		}
 	};
-	
+
+	if(willScanForStatuses)
+		[self fetchStatusesForCurrentPullRequestsToMoc:moc andCallback:completionCallback];
+
 	[self fetchCommentsForCurrentPullRequestsToMoc:moc andCallback:completionCallback];
-	[self fetchStatusesForCurrentPullRequestsToMoc:moc andCallback:completionCallback];
 	[self checkPrClosuresInMoc:moc andCallback:completionCallback];
 	[self detectAssignedPullRequestsInMoc:moc andCallback:completionCallback];
+}
+
+- (BOOL)shouldScanForStatusesInMoc:(NSManagedObjectContext *)moc
+{
+	if(self.successfulRefreshesSinceLastStatusCheck % [Settings shared].statusItemRefreshInterval == 0)
+	{
+		if([Settings shared].showStatusItems)
+		{
+			self.successfulRefreshesSinceLastStatusCheck = 0;
+			return YES;
+		}
+		[self clearAllStatusObjectsInMoc:moc];
+	}
+	return NO;
+}
+
+- (void)clearAllStatusObjectsInMoc:(NSManagedObjectContext *)moc
+{
+	for(PRStatus *s in [DataItem allItemsOfType:@"PRStatus" inMoc:moc])
+	{
+		[moc deleteObject:s];
+	}
 }
 
 - (void)fetchPullRequestsForRepos:(NSArray *)repos toMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
@@ -579,21 +584,6 @@ typedef void (^completionBlockType)(BOOL);
 	}
 }
 
-- (void)syncReposForUserToMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
-{
-	[self getPagedDataInPath:@"/user/repos"
-			startingFromPage:1
-					  params:nil
-			 perPageCallback:^(id data, BOOL lastPage) {
-				 for(NSDictionary *info in data)
-				 {
-					 [Repo repoWithInfo:info moc:moc];
-				 }
-			 } finalCallback:^(BOOL success, NSInteger resultCode) {
-				 if(callback) callback(success);
-			 }];
-}
-
 - (void)syncWatchedReposForUserToMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
 {
 	[self getPagedDataInPath:@"/user/subscriptions"
@@ -622,33 +612,6 @@ typedef void (^completionBlockType)(BOOL);
                          [Repo repoWithInfo:info moc:moc];
                      }
 				 }
-			 } finalCallback:^(BOOL success, NSInteger resultCode) {
-				 if(callback) callback(success);
-			 }];
-}
-
-- (void)syncReposForOrg:(NSString*)orgLogin toMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
-{
-	[self getPagedDataInPath:[NSString stringWithFormat:@"/orgs/%@/repos",orgLogin]
-			startingFromPage:1
-					  params:nil
-			 perPageCallback:^(id data, BOOL lastPage) {
-				 for(NSDictionary *info in data)
-				 {
-					 [Repo repoWithInfo:info moc:moc];
-				 }
-			 } finalCallback:^(BOOL success, NSInteger resultCode) {
-				 if(callback) callback(success);
-			 }];
-}
-
-- (void)syncOrgsToMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
-{
-	[self getPagedDataInPath:@"/user/orgs"
-			startingFromPage:1
-					  params:nil
-			 perPageCallback:^(id data, BOOL lastPage) {
-				 for(NSDictionary *info in data) [Org orgWithInfo:info moc:moc];
 			 } finalCallback:^(BOOL success, NSInteger resultCode) {
 				 if(callback) callback(success);
 			 }];

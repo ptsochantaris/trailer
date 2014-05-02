@@ -45,6 +45,7 @@ typedef enum {
 @property (nonatomic) NSString *resetDate;
 @property (nonatomic) float requestsLimit, requestsRemaining;
 @property (nonatomic) Reachability *reachability;
+@property (nonatomic) long successfulRefreshesSinceLastStatusCheck;
 
 - (void)updateLimitFromServer;
 
