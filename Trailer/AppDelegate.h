@@ -35,7 +35,6 @@
 @property (weak) IBOutlet NSButton *dontKeepPrsMergedByMe;
 @property (weak) IBOutlet NSButton *hideAvatars;
 @property (weak) IBOutlet NSButton *autoParticipateWhenMentioned;
-@property (weak) IBOutlet NSButton *keepClosedPrs;
 @property (weak) IBOutlet NSButton *dontConfirmRemoveAllMerged;
 @property (weak) IBOutlet NSButton *dontConfirmRemoveAllClosed;
 @property (weak) IBOutlet NSButton *displayRepositoryNames;
@@ -58,6 +57,10 @@
 @property (weak) IBOutlet NSButton *checkForUpdatesAutomatically;
 @property (weak) IBOutlet NSTextField *checkForUpdatesLabel;
 @property (weak) IBOutlet NSStepper *checkForUpdatesSelector;
+@property (weak) IBOutlet NSTextField *statusItemRescanLabel;
+@property (weak) IBOutlet NSStepper *statusItemRefreshCounter;
+@property (weak) IBOutlet NSTextField *statusItemsRefreshNote;
+
 
 // Keyboard
 @property (weak) IBOutlet NSButton *hotkeyEnable;

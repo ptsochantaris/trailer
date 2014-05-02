@@ -290,6 +290,16 @@
 - (void)setCloseHandlingPolicy:(NSInteger)closeHandlingPolicy { [self storeDefaultValue:@(closeHandlingPolicy) forKey:CLOSE_HANDLING_POLICY]; }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#define STATUS_ITEM_REFRESH_COUNT @"STATUS_ITEM_REFRESH_COUNT"
+- (NSInteger)statusItemRefreshInterval
+{
+	NSInteger i = [[[NSUserDefaults standardUserDefaults] stringForKey:STATUS_ITEM_REFRESH_COUNT] integerValue];
+	if(i==0) i = 10;
+	return i;
+}
+- (void)setStatusItemRefreshInterval:(NSInteger)statusItemRefreshInterval { [self storeDefaultValue:@(statusItemRefreshInterval) forKey:STATUS_ITEM_REFRESH_COUNT]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #define COUNT_ONLY_LISTED_PRS @"COUNT_ONLY_LISTED_PRS"
 - (void)setCountOnlyListedPrs:(BOOL)countOnlyListedPrs { [self storeDefaultValue:@(countOnlyListedPrs) forKey:COUNT_ONLY_LISTED_PRS]; }

@@ -5,8 +5,8 @@
 
 #define MENU_WIDTH 500.0
 
-//#define DLog(fmt, ...) NSLog(fmt, ##__VA_ARGS__)
-#define DLog(...)
+#define DLog(fmt, ...) NSLog(fmt, ##__VA_ARGS__)
+//#define DLog(...)
 #define COLOR_CLASS NSColor
 #define IMAGE_CLASS NSImage
 #define MAKECOLOR(R,G,B,A) [COLOR_CLASS colorWithSRGBRed:R green:G blue:B alpha:A]
@@ -24,7 +24,6 @@
 #import "DataItem.h"
 #import "PRStatus.h"
 #import "PRComment.h"
-#import "Org.h"
 #import "Repo.h"
 #import "PullRequest.h"
 #import "RemoteImageView.h"

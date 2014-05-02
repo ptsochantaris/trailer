@@ -33,37 +33,32 @@
 
 - (void)drawRect:(NSRect)dirtyRect
 {
-	NSImage *oldImage = [NSImage imageNamed:NSImageNameApplicationIcon];
+	NSImage *oldImage = [NSImage imageNamed:@"menuIcon"];
+
+	NSPoint imagePoint = NSMakePoint(STATUSITEM_PADDING, 1.0);
+	NSRect labelRect = CGRectMake(self.bounds.size.height, -5, self.bounds.size.width, self.bounds.size.height);
+
 	if(_highlighted)
 	{
 		CGContextRef context = (CGContextRef) [[NSGraphicsContext currentContext] graphicsPort];
 		[[NSColor blueColor] setFill];
 		CGContextFillRect(context, dirtyRect);
 
-		[oldImage drawInRect:CGRectMake(STATUSITEM_PADDING, 1.0, self.bounds.size.height, self.bounds.size.height)
-					fromRect:NSZeroRect
-				   operation:NSCompositeXOR
-					fraction:1.0];
+		[oldImage drawAtPoint:imagePoint fromRect:NSZeroRect operation:NSCompositeXOR fraction:1.0];
 
-		[_label drawInRect:CGRectMake(self.bounds.size.height, -5, self.bounds.size.width, self.bounds.size.height)
-			withAttributes:_templateAttributes];
+		[_label drawInRect:labelRect withAttributes:_templateAttributes];
 	}
 	else
 	{
-		[oldImage drawInRect:CGRectMake(STATUSITEM_PADDING, 1.0, self.bounds.size.height, self.bounds.size.height)
-					fromRect:NSZeroRect
-				   operation:NSCompositeSourceOver
-					fraction:1.0];
+		[oldImage drawAtPoint:imagePoint fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
 
 		if(_grayOut)
 		{
-			[_label drawInRect:CGRectMake(self.bounds.size.height, -5, self.bounds.size.width, self.bounds.size.height)
-				withAttributes:_grayAttributes];
+			[_label drawInRect:labelRect withAttributes:_grayAttributes];
 		}
 		else
 		{
-			[_label drawInRect:CGRectMake(self.bounds.size.height, -5, self.bounds.size.width, self.bounds.size.height)
-				withAttributes:_attributes];
+			[_label drawInRect:labelRect withAttributes:_attributes];
 		}
 	}
 }
