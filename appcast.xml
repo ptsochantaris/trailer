@@ -9,6 +9,20 @@
 		<item>
 			<title>Version 1.0.24</title>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Preferences interface simplified to reflect the new watch-based repository subscription scheme, as well as providing a link to view and edit the watchlist</li>
+				</ul></font>]]></description>
+			<pubDate>Tue, 6 May 2014 20:00:00 +0000</pubDate>
+			<enclosure
+			url="http://dev.housetrip.com/trailer/trailer1025.zip"
+			sparkle:version="1121"
+			sparkle:shortVersionString="1.0.25"
+			sparkle:dsaSignature="MC0CFFKUDd5q4ndl/W7H7Txzo0H/ZAN3AhUA0O+OT0YFHrLkGbAwBKDYFu3Fx/U="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
+			<title>Version 1.0.24</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
 				<li>Auto-subscription will also apply when reloading the repository list</li>
 				<li>Keyboard accessibility nag will not happen on every launch if keyboard shortcut is enabled</li>
 				<li>From the recent 1.0.23 update:</li>
