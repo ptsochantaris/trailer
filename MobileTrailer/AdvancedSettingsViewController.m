@@ -37,7 +37,6 @@
 
 #define SORT_REVERSE @[@"Newest first",@"Most recently active",@"Reverse alphabetically"]
 #define SORT_NORMAL @[@"Oldest first",@"Inactive for longest",@"Alphabetically"]
-#define AUTO_SUBSCRIPTION @[@"None",@"Parents",@"All"]
 #define PR_HANDLING_POLICY @[@"Keep My Own",@"Keep All",@"Don't Keep"]
 
 NSString *B(NSString *input)
@@ -153,12 +152,6 @@ NSString *B(NSString *input)
 				cell.textLabel.text = B(@"Include repositories in\nfiltering");
 				if([Settings shared].includeReposInFilter) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
-            }
-            case 2:
-            {
-				cell.textLabel.text = B(@"Auto subscribe to new\nrepositories");
-                cell.detailTextLabel.text = AUTO_SUBSCRIPTION[[Settings shared].repoSubscriptionPolicy];
-                break;
             }
 		}
 	}
@@ -363,15 +356,6 @@ NSString *B(NSString *input)
 				[Settings shared].includeReposInFilter = ![Settings shared].includeReposInFilter;
 				break;
 			}
-            case 2:
-            {
-                selectedIndexPath = indexPath;
-				previousValue = [Settings shared].repoSubscriptionPolicy;
-				pickerName = [self.tableView cellForRowAtIndexPath:indexPath].textLabel.text;
-                valuesToPush = AUTO_SUBSCRIPTION;
-				[self performSegueWithIdentifier:@"showPicker" sender:self];
-				break;
-            }
 		}
 		[settingsChangedTimer push];
 	}
@@ -466,7 +450,7 @@ NSString *B(NSString *input)
 		case REFRESH_SECTION_INDEX: return 3;
 		case DISPLAY_SECTION_INDEX: return 5;
 		case COMMENTS_SECTION_INDEX: return 3;
-		case REPOS_SECTION_INDEX: return 3;
+		case REPOS_SECTION_INDEX: return 2;
 		case HISTORY_SECTION_INDEX: return 3;
 		case CONFIRM_SECTION_INDEX: return 2;
 		case SORT_SECTION_INDEX: return 3;
@@ -531,10 +515,6 @@ NSString *B(NSString *input)
 		[Settings shared].sortMethod = indexPath.row;
 		[settingsChangedTimer push];
 	}
-    else if(selectedIndexPath.section==REPOS_SECTION_INDEX)
-    {
-        [Settings shared].repoSubscriptionPolicy = indexPath.row;
-    }
 	else if(selectedIndexPath.section==HISTORY_SECTION_INDEX)
 	{
 		if(selectedIndexPath.row==0)

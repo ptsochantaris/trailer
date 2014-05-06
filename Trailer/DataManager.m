@@ -337,10 +337,10 @@
 	{
 		message = [NSString stringWithFormat:@"%ld PRs are hidden by your settings.",(unsigned long)openRequests];
 	}
-	else if([Repo countActiveReposInMoc:self.managedObjectContext]==0)
+	else if([DataItem countItemsOfType:@"Repo" inMoc:self.managedObjectContext]==0)
 	{
 		messageColor = MAKECOLOR(0.8, 0.0, 0.0, 1.0);
-		message = @"There are no active repositories, please add or activate some.";
+		message = @"There are no watched repositories, please add or activate some.";
 	}
 	else if(openRequests==0)
 	{

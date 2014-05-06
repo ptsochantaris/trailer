@@ -58,7 +58,6 @@
         <attribute name="webUrl" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <entity name="Repo" representedClassName="Repo" syncable="YES">
-        <attribute name="active" optional="YES" attributeType="Boolean" indexed="YES" syncable="YES"/>
         <attribute name="createdAt" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="fork" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="fullName" optional="YES" attributeType="String" syncable="YES"/>
@@ -71,6 +70,6 @@
         <element name="PRComment" positionX="0" positionY="0" width="128" height="225"/>
         <element name="PRStatus" positionX="0" positionY="0" width="128" height="208"/>
         <element name="PullRequest" positionX="0" positionY="0" width="128" height="463"/>
-        <element name="Repo" positionX="0" positionY="0" width="128" height="163"/>
+        <element name="Repo" positionX="0" positionY="0" width="128" height="150"/>
     </elements>
 </model>

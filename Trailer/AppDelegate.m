@@ -107,11 +107,6 @@ static AppDelegate *_static_shared_ref;
 	[self.sortModeSelect selectItemAtIndex:[Settings shared].sortMethod];
 }
 
-- (IBAction)repoSubscriptionPolicySelected:(NSPopUpButton *)sender
-{
-	[Settings shared].repoSubscriptionPolicy = sender.indexOfSelectedItem;
-}
-
 - (IBAction)dontConfirmRemoveAllMergedSelected:(NSButton *)sender
 {
 	BOOL dontConfirm = (sender.integerValue==1);
@@ -715,9 +710,9 @@ static AppDelegate *_static_shared_ref;
 - (void)defaultsUpdated
 {
 	if([Settings shared].localUser)
-		self.githubDetailsBox.title = [NSString stringWithFormat:@"Repositories for %@",[Settings shared].localUser];
+		self.githubDetailsBox.title = [NSString stringWithFormat:@"Watched repositories for %@",[Settings shared].localUser];
 	else
-		self.githubDetailsBox.title = @"Your Repositories";
+		self.githubDetailsBox.title = @"Your watched repositories";
 }
 
 - (void)startRateLimitHandling
@@ -840,7 +835,6 @@ static AppDelegate *_static_shared_ref;
 	[self.sortModeSelect selectItemAtIndex:[Settings shared].sortMethod];
 	[self.prMergedPolicy selectItemAtIndex:[Settings shared].mergeHandlingPolicy];
 	[self.prClosedPolicy selectItemAtIndex:[Settings shared].closeHandlingPolicy];
-	[self.repoSubscriptionPolicy selectItemAtIndex:[Settings shared].repoSubscriptionPolicy];
 
 	self.launchAtStartup.integerValue = [self isAppLoginItem];
 	self.hideAllPrsSection.integerValue = [Settings shared].hideAllPrsSection;
@@ -958,6 +952,12 @@ static AppDelegate *_static_shared_ref;
 	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:address]];
 }
 
+- (IBAction)viewWatchlistSelected:(NSButton *)sender
+{
+	NSString *address = [NSString stringWithFormat:@"https://%@/watching",[Settings shared].apiFrontEnd];
+	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:address]];
+}
+
 - (IBAction)prMergePolicySelected:(NSPopUpButton *)sender
 {
 	[Settings shared].mergeHandlingPolicy = sender.indexOfSelectedItem;
@@ -1004,13 +1004,17 @@ static AppDelegate *_static_shared_ref;
 	return [self getFilteredRepos][row-1];
 }
 
+- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)row
+{
+	return NO;
+}
+
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
 	NSButtonCell *cell = [tableColumn dataCellForRow:row];
 	if([self tableView:tableView isGroupRow:row])
 	{
 		[cell setAlignment:NSCenterTextAlignment];
-		[cell setImagePosition:NSNoImage];
 
 		if(row==0)
 		{
@@ -1021,25 +1025,15 @@ static AppDelegate *_static_shared_ref;
 			cell.title = @"Forked Repositories";
 		}
 
-		cell.state = NSMixedState;
 		[cell setEnabled:NO];
 	}
 	else
 	{
 		[cell setAlignment:NSLeftTextAlignment];
-		[cell setImagePosition:NSImageLeft];
 
 		Repo *r = [self repoForRow:row];
 
 		cell.title = r.fullName;
-		if(r.active.boolValue)
-		{
-			cell.state = NSOnState;
-		}
-		else
-		{
-			cell.state = NSOffState;
-		}
 		[cell setEnabled:YES];
 	}
 	return cell;
@@ -1053,17 +1047,6 @@ static AppDelegate *_static_shared_ref;
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
 	return [self getFilteredRepos].count+2;
-}
-
-- (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
-{
-	if(![self tableView:tableView isGroupRow:row])
-	{
-		Repo *r = [self repoForRow:row];
-		r.active = @([object boolValue]);
-	}
-	[self.dataManager saveDB];
-	self.preferencesDirty = YES;
 }
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
@@ -1202,7 +1185,7 @@ static AppDelegate *_static_shared_ref;
 
 - (IBAction)refreshNowSelected:(NSMenuItem *)sender
 {
-	if([Repo countActiveReposInMoc:self.dataManager.managedObjectContext]==0)
+	if([DataItem countItemsOfType:@"Repo" inMoc:self.dataManager.managedObjectContext]==0)
 	{
 		[self preferencesSelected:nil];
 		return;
@@ -1241,9 +1224,6 @@ static AppDelegate *_static_shared_ref;
 
 	[self.refreshButton setEnabled:NO];
 	[self.projectsTable setEnabled:NO];
-	[self.selectAll setEnabled:NO];
-	[self.selectParents setEnabled:NO];
-	[self.clearAll setEnabled:NO];
 	[self.githubTokenHolder setEnabled:NO];
 	[self.activityDisplay startAnimation:nil];
 	self.statusItemView.grayOut = YES;
@@ -1270,10 +1250,7 @@ static AppDelegate *_static_shared_ref;
 	self.isRefreshing = NO;
 	[self.refreshButton setEnabled:YES];
 	[self.projectsTable setEnabled:YES];
-	[self.selectAll setEnabled:YES];
-	[self.selectParents setEnabled:YES];
 	[self.githubTokenHolder setEnabled:YES];
-	[self.clearAll setEnabled:YES];
 	[self.activityDisplay stopAnimation:nil];
 	[self.dataManager saveDB];
 	[self.projectsTable reloadData];
@@ -1394,43 +1371,6 @@ static AppDelegate *_static_shared_ref;
 	self.statusItem.view = self.statusItemView;
 
 	[self sizeMenuAndShow:NO];
-}
-
-- (IBAction)selectParentsSelected:(NSButton *)sender
-{
-	NSArray *allRepos = [self getFilteredRepos];
-
-	for(Repo *r in allRepos)
-		if(!r.fork.boolValue)
-			r.active = @YES;
-
-	[self.dataManager saveDB];
-	[self.projectsTable reloadData];
-	self.preferencesDirty = YES;
-}
-
-- (IBAction)selectAllSelected:(NSButton *)sender
-{
-	NSArray *allRepos = [self getFilteredRepos];
-
-	for(Repo *r in allRepos)
-		r.active = @YES;
-
-	[self.dataManager saveDB];
-	[self.projectsTable reloadData];
-	self.preferencesDirty = YES;
-}
-
-- (IBAction)clearallSelected:(NSButton *)sender
-{
-	NSArray *allRepos = [self getFilteredRepos];
-
-	for(Repo *r in allRepos)
-		r.active = @NO;
-
-	[self.dataManager saveDB];
-	[self.projectsTable reloadData];
-	self.preferencesDirty = YES;
 }
 
 //////////////// launch at startup from: http://cocoatutorial.grapewave.com/tag/lssharedfilelistitemresolve/
