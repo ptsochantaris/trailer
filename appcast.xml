@@ -7,7 +7,21 @@
 		<language>en</language>
 
 		<item>
-			<title>Version 1.0.24</title>
+			<title>Version 1.0.26</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Added ability to hide watched repositories in preferences</li>
+				</ul></font>]]></description>
+			<pubDate>Tue, 7 May 2014 22:00:00 +0000</pubDate>
+			<enclosure
+			url="http://dev.housetrip.com/trailer/trailer1026.zip"
+			sparkle:version="1122"
+			sparkle:shortVersionString="1.0.26"
+			sparkle:dsaSignature="MC0CFBXyKNd5bql0r+exAkbb9tKkd7HWAhUAw0DoSDzBa60LnpKGEjhEdc1/VWI="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
+			<title>Version 1.0.25</title>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
 				<li>Preferences interface simplified to reflect the new watch-based repository subscription scheme, as well as providing a link to view and edit the watchlist</li>
 				</ul></font>]]></description>
