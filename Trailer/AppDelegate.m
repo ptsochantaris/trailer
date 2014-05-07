@@ -207,6 +207,11 @@ static AppDelegate *_static_shared_ref;
 	[self updateMenu];
 }
 
+- (IBAction)hideNewRespositoriesSelected:(NSButton *)sender
+{
+	[Settings shared].hideNewRepositories = (sender.integerValue==1);
+}
+
 - (IBAction)sortMethodChanged:(id)sender
 {
 	[Settings shared].sortMethod = self.sortModeSelect.indexOfSelectedItem;
@@ -709,10 +714,12 @@ static AppDelegate *_static_shared_ref;
 
 - (void)defaultsUpdated
 {
+	NSTableColumn *repositoryColumn = [self.projectsTable tableColumns][1];
+
 	if([Settings shared].localUser)
-		self.githubDetailsBox.title = [NSString stringWithFormat:@"Watched repositories for %@",[Settings shared].localUser];
+		[[repositoryColumn headerCell] setStringValue:[NSString stringWithFormat:@" Watched repositories for %@",[Settings shared].localUser]];
 	else
-		self.githubDetailsBox.title = @"Your watched repositories";
+		[[repositoryColumn headerCell] setStringValue:@" Your watched repositories"];
 }
 
 - (void)startRateLimitHandling
@@ -856,6 +863,7 @@ static AppDelegate *_static_shared_ref;
 	self.makeStatusItemsSelectable.integerValue = [Settings shared].makeStatusItemsSelectable;
 	self.markUnmergeableOnUserSectionsOnly.integerValue = [Settings shared].markUnmergeableOnUserSectionsOnly;
 	self.countOnlyListedPrs.integerValue = [Settings shared].countOnlyListedPrs;
+	self.hideNewRepositories.integerValue = [Settings shared].hideNewRepositories;
 
 	self.hotkeyEnable.integerValue = [Settings shared].hotkeyEnable;
 	self.hotkeyControlModifier.integerValue = [Settings shared].hotkeyControlModifier;
@@ -926,6 +934,20 @@ static AppDelegate *_static_shared_ref;
 		[titles addObject:[NSString stringWithFormat:@"%c",l]];
 	[self.hotkeyLetter addItemsWithTitles:titles];
 	[self.hotkeyLetter selectItemWithTitle:[Settings shared].hotkeyLetter];
+}
+
+- (IBAction)showAllRepositoriesSelected:(NSButton *)sender
+{
+	for(Repo *r in [self getFilteredRepos]) r.hidden = @NO;
+	self.preferencesDirty = YES;
+	[self.projectsTable reloadData];
+}
+
+- (IBAction)hideAllRepositoriesSelected:(NSButton *)sender
+{
+	for(Repo *r in [self getFilteredRepos]) r.hidden = @YES;
+	self.preferencesDirty = YES;
+	[self.projectsTable reloadData];
 }
 
 - (IBAction)enableHotkeySelected:(NSButton *)sender
@@ -1004,37 +1026,47 @@ static AppDelegate *_static_shared_ref;
 	return [self getFilteredRepos][row-1];
 }
 
-- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)row
-{
-	return NO;
-}
-
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
 	NSButtonCell *cell = [tableColumn dataCellForRow:row];
-	if([self tableView:tableView isGroupRow:row])
+	if([tableColumn.identifier isEqualToString:@"hide"])
 	{
-		[cell setAlignment:NSCenterTextAlignment];
-
-		if(row==0)
+		if([self tableView:tableView isGroupRow:row])
 		{
-			cell.title = @"Parent Repositories";
+			[cell setImagePosition:NSNoImage];
+			cell.state = NSMixedState;
+			[cell setEnabled:NO];
 		}
 		else
 		{
-			cell.title = @"Forked Repositories";
-		}
+			[cell setImagePosition:NSImageOnly];
 
-		[cell setEnabled:NO];
+			Repo *r = [self repoForRow:row];
+			if(r.hidden.boolValue)
+				cell.state = NSOnState;
+			else
+				cell.state = NSOffState;
+			[cell setEnabled:YES];
+		}
 	}
 	else
 	{
-		[cell setAlignment:NSLeftTextAlignment];
+		if([self tableView:tableView isGroupRow:row])
+		{
+			if(row==0)
+				cell.title = @"Parent Repositories";
+			else
+				cell.title = @"Forked Repositories";
 
-		Repo *r = [self repoForRow:row];
-
-		cell.title = r.fullName;
-		[cell setEnabled:YES];
+			cell.state = NSMixedState;
+			[cell setEnabled:NO];
+		}
+		else
+		{
+			Repo *r = [self repoForRow:row];
+			cell.title = r.fullName;
+			[cell setEnabled:YES];
+		}
 	}
 	return cell;
 }
@@ -1047,6 +1079,17 @@ static AppDelegate *_static_shared_ref;
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
 	return [self getFilteredRepos].count+2;
+}
+
+- (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+{
+	if(![self tableView:tableView isGroupRow:row])
+	{
+		Repo *r = [self repoForRow:row];
+		r.hidden = @([object boolValue]);
+	}
+	[self.dataManager saveDB];
+	self.preferencesDirty = YES;
 }
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
@@ -1185,7 +1228,7 @@ static AppDelegate *_static_shared_ref;
 
 - (IBAction)refreshNowSelected:(NSMenuItem *)sender
 {
-	if([DataItem countItemsOfType:@"Repo" inMoc:self.dataManager.managedObjectContext]==0)
+	if([Repo countVisibleReposInMoc:self.dataManager.managedObjectContext]==0)
 	{
 		[self preferencesSelected:nil];
 		return;

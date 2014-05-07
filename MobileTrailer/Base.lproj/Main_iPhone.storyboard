@@ -178,7 +178,7 @@ Select one of these options if you need to create one first:</string>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
                     <toolbarItems>
-                        <barButtonItem title="GitHub Watchlist" id="GpT-RA-Eel">
+                        <barButtonItem title="Visit Watchlist" id="GpT-RA-Eel">
                             <connections>
                                 <action selector="iphoneWatchlistSelected:" destination="Bxt-3e-UBi" id="v7E-UZ-9Ku"/>
                             </connections>

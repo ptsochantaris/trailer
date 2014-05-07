@@ -56,7 +56,7 @@
 @property (weak) IBOutlet NSTextField *statusItemRescanLabel;
 @property (weak) IBOutlet NSStepper *statusItemRefreshCounter;
 @property (weak) IBOutlet NSTextField *statusItemsRefreshNote;
-
+@property (weak) IBOutlet NSButton *hideNewRepositories;
 
 // Keyboard
 @property (weak) IBOutlet NSButton *hotkeyEnable;

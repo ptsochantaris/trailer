@@ -4,6 +4,7 @@
 @dynamic fullName;
 @dynamic fork;
 @dynamic webUrl;
+@dynamic hidden;
 
 + (Repo*)repoWithInfo:(NSDictionary*)info moc:(NSManagedObjectContext*)moc
 {
@@ -28,6 +29,21 @@
             }
         }
     }
+}
+
++ (NSArray *)visibleReposInMoc:(NSManagedObjectContext *)moc
+{
+	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"Repo"];
+	f.returnsObjectsAsFaults = NO;
+	f.predicate = [NSPredicate predicateWithFormat:@"hidden = NO"];
+	return [moc executeFetchRequest:f error:nil];
+}
+
++ (NSUInteger)countVisibleReposInMoc:(NSManagedObjectContext *)moc
+{
+	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"Repo"];
+	f.predicate = [NSPredicate predicateWithFormat:@"hidden = NO"];
+	return [moc countForFetchRequest:f error:nil];
 }
 
 @end

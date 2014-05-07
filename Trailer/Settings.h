@@ -20,7 +20,7 @@
 							sortDescending, showCreatedInsteadOfUpdated,
 							dontKeepPrsMergedByMe, hideAvatars, autoParticipateInMentions,
 							dontAskBeforeWipingMerged, dontAskBeforeWipingClosed,
-							includeReposInFilter, showReposInName,
+							includeReposInFilter, showReposInName, hideNewRepositories,
 							dontReportRefreshFailures, groupByRepo, hideAllPrsSection,
 							showStatusItems, makeStatusItemsSelectable, moveAssignedPrsToMySection,
 							markUnmergeableOnUserSectionsOnly, countOnlyListedPrs;

@@ -223,8 +223,15 @@ typedef void (^completionBlockType)(BOOL);
 				{
 					[DataItem nukeDeletedItemsOfType:@"Repo" inMoc:syncContext];
 
+					BOOL shouldHideByDefault = [Settings shared].hideNewRepositories;
 					for(Repo *r in [DataItem newItemsOfType:@"Repo" inMoc:syncContext])
-						[[AppDelegate shared] postNotificationOfType:kNewRepoAnnouncement forItem:r];
+					{
+						r.hidden = @(shouldHideByDefault);
+						if(!shouldHideByDefault)
+						{
+							[[AppDelegate shared] postNotificationOfType:kNewRepoAnnouncement forItem:r];
+						}
+					}
 
 					[AppDelegate shared].lastRepoCheck = [NSDate date];
 					if(syncContext.hasChanges) [syncContext save:nil];
@@ -315,7 +322,7 @@ typedef void (^completionBlockType)(BOOL);
 
 	NSArray *prsToCheck = [pullRequests filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(PullRequest *r, NSDictionary *bindings) {
 		Repo *parent = [Repo itemOfType:@"Repo" serverId:r.repoId moc:moc];
-		return parent.postSyncAction.integerValue!=kPostSyncDelete;
+		return (!parent.hidden.boolValue) && (parent.postSyncAction.integerValue!=kPostSyncDelete);
 	}]];
 
 	NSInteger totalOperations = prsToCheck.count;
@@ -443,8 +450,8 @@ typedef void (^completionBlockType)(BOOL);
 		if(r.condition.integerValue == kPullRequestConditionOpen)
 			r.postSyncAction = @(kPostSyncDelete);
 
-	NSArray *watchedRepos = [DataItem allItemsOfType:@"Repo" inMoc:moc];
-	[self fetchPullRequestsForRepos:watchedRepos toMoc:moc andCallback:^(BOOL success) {
+	NSArray *visibleRepos = [Repo visibleReposInMoc:moc];
+	[self fetchPullRequestsForRepos:visibleRepos toMoc:moc andCallback:^(BOOL success) {
 		if(success)
 		{
 			[self updatePullRequestsInMoc:moc andCallback:^(BOOL success) {
