@@ -1,5 +1,6 @@
 
-@interface PreferencesViewController () <UITextFieldDelegate, NSFetchedResultsControllerDelegate>
+@interface PreferencesViewController () <UITextFieldDelegate,
+NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 {
 	NSString *targetUrl;
 
@@ -68,7 +69,7 @@
 	self.instructionLabel.hidden = !instructionMode;
 	self.createTokenButton.hidden = !instructionMode;
 	self.viewTokensButton.hidden = !instructionMode;
-	self.selectionButton.enabled = (self.fetchedResultsController.fetchedObjects.count>0);
+	self.watchListButton.enabled = (self.fetchedResultsController.fetchedObjects.count>0);
 }
 
 - (void)dealloc
@@ -182,6 +183,15 @@
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
 	[self configureCell:cell atIndexPath:indexPath];
     return cell;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+	Repo *repo = [self.fetchedResultsController objectAtIndexPath:indexPath];
+	repo.hidden = @(!repo.hidden.boolValue);
+	[[AppDelegate shared].dataManager saveDB];
+	[tableView deselectRowAtIndexPath:indexPath animated:NO];
+	[AppDelegate shared].preferencesDirty = YES;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
@@ -312,6 +322,25 @@
 {
     Repo *repo = [self.fetchedResultsController objectAtIndexPath:indexPath];
     cell.textLabel.text = repo.fullName;
+	if(repo.hidden.boolValue)
+	{
+		cell.accessoryView = [self makeX];
+		cell.textLabel.textColor = [UIColor lightGrayColor];
+	}
+	else
+	{
+		cell.accessoryView = nil;
+		cell.textLabel.textColor = [UIColor darkTextColor];
+	}
+}
+
+- (UIView *)makeX
+{
+	UILabel *x = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 16, 16)];
+	x.textColor = [UIColor redColor];
+	x.font = [UIFont systemFontOfSize:14.0];
+	x.text = @"X";
+	return x;
 }
 
 - (IBAction)iphoneCreateToken:(UIButton *)sender {
@@ -327,16 +356,48 @@
 	[self viewTokens];
 }
 - (IBAction)ipadWatchlistSelected:(UIBarButtonItem *)sender {
-	[self viewWatchlist];
+	[self watchListSelected];
 }
 - (IBAction)iphoneWatchlistSelected:(id)sender {
-	[self viewWatchlist];
+	[self watchListSelected];
 }
 
-- (void)viewWatchlist
+- (void)watchListSelected
 {
-	targetUrl = [NSString stringWithFormat:@"https://%@/watching",[Settings shared].apiFrontEnd];
-	[self performSegueWithIdentifier:@"openGithub" sender:self];
+	UIActionSheet *a = [[UIActionSheet alloc] initWithTitle:@"Watchlist"
+												   delegate:self
+										  cancelButtonTitle:@"Cancel"
+									 destructiveButtonTitle:@"Visit Watchlist"
+										  otherButtonTitles:@"Hide All",@"Show All",nil];
+	[a showInView:self.navigationController.view];
+}
+
+- (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+	if(buttonIndex==3) return;
+
+	switch (buttonIndex) {
+		case 0:
+		{
+			targetUrl = [NSString stringWithFormat:@"https://%@/watching",[Settings shared].apiFrontEnd];
+			[self performSegueWithIdentifier:@"openGithub" sender:self];
+			break;
+		}
+		case 1:
+		{
+			NSArray *allRepos = self.fetchedResultsController.fetchedObjects;
+			for(Repo *r in allRepos) r.hidden = @YES;
+			break;
+		}
+		case 2:
+		{
+			NSArray *allRepos = self.fetchedResultsController.fetchedObjects;
+			for(Repo *r in allRepos) r.hidden = @NO;
+			break;
+		}
+	}
+
+	[AppDelegate shared].preferencesDirty = YES;
 }
 
 - (void)viewTokens
@@ -371,7 +432,7 @@
 	NSIndexSet *currentIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, _fetchedResultsController.sections.count)];
 
 	_fetchedResultsController = nil;
-	self.selectionButton.enabled = (self.fetchedResultsController.fetchedObjects.count>0);
+	self.watchListButton.enabled = (self.fetchedResultsController.fetchedObjects.count>0);
 
 	NSIndexSet *dataIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, _fetchedResultsController.sections.count)];
 

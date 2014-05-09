@@ -205,7 +205,7 @@
                                 <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <tableView opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" allowsSelection="NO" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" id="2NG-2o-yHF">
+                            <tableView opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" id="2NG-2o-yHF">
                                 <rect key="frame" x="0.0" y="47" width="540" height="448"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
@@ -267,7 +267,7 @@ Select one of these options if you need to create one first:</string>
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     </view>
                     <toolbarItems>
-                        <barButtonItem title="Visit Watchlist" id="Trq-cH-N0N">
+                        <barButtonItem title="Watchlist" id="Trq-cH-N0N">
                             <connections>
                                 <action selector="ipadWatchlistSelected:" destination="qtb-G3-HJM" id="gJS-74-sh5"/>
                             </connections>
@@ -299,6 +299,7 @@ Select one of these options if you need to create one first:</string>
                         <outlet property="refreshRepoList" destination="pdh-Ia-tmJ" id="C2z-8M-9YN"/>
                         <outlet property="repositories" destination="2NG-2o-yHF" id="dWS-92-Q17"/>
                         <outlet property="viewTokensButton" destination="xRS-LU-s5f" id="nzq-ue-Thb"/>
+                        <outlet property="watchListButton" destination="Trq-cH-N0N" id="2Ny-xs-G9c"/>
                         <segue destination="bYl-MI-Ah5" kind="modal" identifier="openGithub" id="imS-nC-Wda"/>
                     </connections>
                 </viewController>
@@ -509,7 +510,7 @@ Select one of these options if you need to create one first:</string>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Version" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="XBv-UE-utz">
-                                <rect key="frame" x="271" y="85" width="242" height="21"/>
+                                <rect key="frame" x="270.99999934828975" y="85" width="242" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
                                 <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
