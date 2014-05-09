@@ -115,6 +115,12 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#define HIDE_NEW_REPOS_KEY @"HIDE_NEW_REPOS_KEY"
+- (void)setHideNewRepositories:(BOOL)hideNewRepositories { [self storeDefaultValue:@(hideNewRepositories) forKey:HIDE_NEW_REPOS_KEY]; }
+- (BOOL)hideNewRepositories { return [[[NSUserDefaults standardUserDefaults] stringForKey:HIDE_NEW_REPOS_KEY] boolValue]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #define SHOW_COMMENTS_EVERYWHERE_KEY @"SHOW_COMMENTS_EVERYWHERE_KEY"
 - (BOOL)showCommentsEverywhere { return [[[NSUserDefaults standardUserDefaults] stringForKey:SHOW_COMMENTS_EVERYWHERE_KEY] boolValue]; }
 - (void)setShowCommentsEverywhere:(BOOL)showCommentsEverywhere { [self storeDefaultValue:@(showCommentsEverywhere) forKey:SHOW_COMMENTS_EVERYWHERE_KEY]; }

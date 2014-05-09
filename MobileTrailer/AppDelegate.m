@@ -50,7 +50,7 @@ CGFloat GLOBAL_SCREEN_SCALE;
 	double delayInSeconds = 0.1;
 	dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
 	dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-		if([Repo countActiveReposInMoc:self.dataManager.managedObjectContext]==0 || [Settings shared].authToken.length==0)
+		if([Repo visibleReposInMoc:self.dataManager.managedObjectContext]==0 || [Settings shared].authToken.length==0)
 		{
 			[self forcePreferences];
 		}

@@ -2,9 +2,9 @@
 @implementation Repo
 
 @dynamic fullName;
-@dynamic active;
 @dynamic fork;
 @dynamic webUrl;
+@dynamic hidden;
 
 + (Repo*)repoWithInfo:(NSDictionary*)info moc:(NSManagedObjectContext*)moc
 {
@@ -13,21 +13,6 @@
 	r.fork = @([[info ofk:@"fork"] boolValue]);
 	r.webUrl = [info ofk:@"html_url"];
 	return r;
-}
-
-+ (NSArray *)activeReposInMoc:(NSManagedObjectContext *)moc
-{
-	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"Repo"];
-	f.returnsObjectsAsFaults = NO;
-	f.predicate = [NSPredicate predicateWithFormat:@"active = YES"];
-	return [moc executeFetchRequest:f error:nil];
-}
-
-+ (NSUInteger)countActiveReposInMoc:(NSManagedObjectContext *)moc
-{
-	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"Repo"];
-	f.predicate = [NSPredicate predicateWithFormat:@"active = YES"];
-	return [moc countForFetchRequest:f error:nil];
 }
 
 - (void)prepareForDeletion
@@ -44,6 +29,21 @@
             }
         }
     }
+}
+
++ (NSArray *)visibleReposInMoc:(NSManagedObjectContext *)moc
+{
+	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"Repo"];
+	f.returnsObjectsAsFaults = NO;
+	f.predicate = [NSPredicate predicateWithFormat:@"hidden = NO"];
+	return [moc executeFetchRequest:f error:nil];
+}
+
++ (NSUInteger)countVisibleReposInMoc:(NSManagedObjectContext *)moc
+{
+	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"Repo"];
+	f.predicate = [NSPredicate predicateWithFormat:@"hidden = NO"];
+	return [moc countForFetchRequest:f error:nil];
 }
 
 @end

@@ -1,6 +1,5 @@
 
-@interface PreferencesViewController () <UITextFieldDelegate,
-NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
+@interface PreferencesViewController () <UITextFieldDelegate, NSFetchedResultsControllerDelegate>
 {
 	NSString *targetUrl;
 
@@ -136,8 +135,6 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 		[self commitToken];
 	}
 
-	BOOL refreshStartedWithEmpty = ([Repo countItemsOfType:@"Repo" inMoc:[AppDelegate shared].dataManager.managedObjectContext]==0);
-
 	NSString *originalName = self.refreshRepoList.title;
 	self.refreshRepoList.title = @"Loading...";
 	[self instructionMode:NO];
@@ -146,10 +143,6 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 	self.githubApiToken.hidden = YES;
 
 	[[AppDelegate shared].api fetchRepositoriesAndCallback:^(BOOL success) {
-
-		if(refreshStartedWithEmpty)
-			for(Repo *r in self.fetchedResultsController.fetchedObjects)
-				r.active = @YES;
 
 		self.refreshRepoList.title = originalName;
 		self.refreshRepoList.enabled = YES;
@@ -189,15 +182,6 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
 	[self configureCell:cell atIndexPath:indexPath];
     return cell;
-}
-
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
-	Repo *repo = [self.fetchedResultsController objectAtIndexPath:indexPath];
-	repo.active = @(!repo.active.boolValue);
-	[[AppDelegate shared].dataManager saveDB];
-	[tableView deselectRowAtIndexPath:indexPath animated:NO];
-	[AppDelegate shared].preferencesDirty = YES;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
@@ -328,50 +312,6 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 {
     Repo *repo = [self.fetchedResultsController objectAtIndexPath:indexPath];
     cell.textLabel.text = repo.fullName;
-	if(repo.active.boolValue)
-		cell.accessoryType = UITableViewCellAccessoryCheckmark;
-	else
-		cell.accessoryType = UITableViewCellAccessoryNone;
-}
-
-- (IBAction)iphoneSelection:(UIBarButtonItem *)sender {
-	[self showSelectionOptions:sender];
-}
-- (IBAction)ipadSelection:(UIBarButtonItem *)sender {
-	[self showSelectionOptions:sender];
-}
-- (void)showSelectionOptions:(UIBarButtonItem *)sender
-{
-	UIActionSheet *selectionSheet = [[UIActionSheet alloc] initWithTitle:self.title
-																delegate:self
-													   cancelButtonTitle:@"Cancel"
-												  destructiveButtonTitle:nil
-													   otherButtonTitles:@"Select All", @"Select All Parents", @"Unselect All", nil];
-	[selectionSheet showFromBarButtonItem:sender animated:YES];
-}
-
-- (void)actionSheet:(UIActionSheet *)actionSheet willDismissWithButtonIndex:(NSInteger)buttonIndex
-{
-	if(buttonIndex==3) return;
-	NSArray *allRepos = self.fetchedResultsController.fetchedObjects;
-	switch (buttonIndex) {
-		case 0:
-		{
-			for(Repo *r in allRepos) r.active = @YES;
-			break;
-		}
-		case 1:
-		{
-			for(Repo *r in allRepos) if(!r.fork.boolValue) r.active = @YES;
-			break;
-		}
-		case 2:
-		{
-			for(Repo *r in allRepos) r.active = @NO;
-			break;
-		}
-	}
-	[AppDelegate shared].preferencesDirty = YES;
 }
 
 - (IBAction)iphoneCreateToken:(UIButton *)sender {
@@ -385,6 +325,18 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 }
 - (IBAction)ipadViewTokens:(UIButton *)sender {
 	[self viewTokens];
+}
+- (IBAction)ipadWatchlistSelected:(UIBarButtonItem *)sender {
+	[self viewWatchlist];
+}
+- (IBAction)iphoneWatchlistSelected:(id)sender {
+	[self viewWatchlist];
+}
+
+- (void)viewWatchlist
+{
+	targetUrl = [NSString stringWithFormat:@"https://%@/watching",[Settings shared].apiFrontEnd];
+	[self performSegueWithIdentifier:@"openGithub" sender:self];
 }
 
 - (void)viewTokens

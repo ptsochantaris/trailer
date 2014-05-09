@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5053" systemVersion="13C64" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" initialViewController="H1p-Uh-vWS">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5056" systemVersion="13C1021" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" initialViewController="H1p-Uh-vWS">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
     </dependencies>
@@ -205,7 +205,7 @@
                                 <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <tableView opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" id="2NG-2o-yHF">
+                            <tableView opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" allowsSelection="NO" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" id="2NG-2o-yHF">
                                 <rect key="frame" x="0.0" y="47" width="540" height="448"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
@@ -236,7 +236,7 @@
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="svI-g4-EPO">
                                 <rect key="frame" x="20" y="47" width="500" height="101"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
-                                <string key="text">To access your repositories, enter your personal sccess token in the field above and select 'Load repository list' from below.
+                                <string key="text">To access your repositories, enter your personal sccess token in the field above and select 'Load Watchlist' from below.
 
 Select one of these options if you need to create one first:</string>
                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
@@ -267,13 +267,13 @@ Select one of these options if you need to create one first:</string>
                         <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     </view>
                     <toolbarItems>
-                        <barButtonItem title="Select/Clear" id="97J-Hs-P99">
+                        <barButtonItem title="Visit Watchlist" id="Trq-cH-N0N">
                             <connections>
-                                <action selector="ipadSelection:" destination="qtb-G3-HJM" id="4O2-mz-XZN"/>
+                                <action selector="ipadWatchlistSelected:" destination="qtb-G3-HJM" id="gJS-74-sh5"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem style="plain" systemItem="flexibleSpace" id="CKC-cd-s6h"/>
-                        <barButtonItem title="Load repository list" id="pdh-Ia-tmJ">
+                        <barButtonItem title="Load Watchlist" id="pdh-Ia-tmJ">
                             <connections>
                                 <action selector="ipadLoadRepos:" destination="qtb-G3-HJM" id="VQ0-N5-Flo"/>
                             </connections>
@@ -298,7 +298,6 @@ Select one of these options if you need to create one first:</string>
                         <outlet property="instructionLabel" destination="svI-g4-EPO" id="tGQ-re-tvi"/>
                         <outlet property="refreshRepoList" destination="pdh-Ia-tmJ" id="C2z-8M-9YN"/>
                         <outlet property="repositories" destination="2NG-2o-yHF" id="dWS-92-Q17"/>
-                        <outlet property="selectionButton" destination="97J-Hs-P99" id="FJ0-yy-q4P"/>
                         <outlet property="viewTokensButton" destination="xRS-LU-s5f" id="nzq-ue-Thb"/>
                         <segue destination="bYl-MI-Ah5" kind="modal" identifier="openGithub" id="imS-nC-Wda"/>
                     </connections>
@@ -510,7 +509,7 @@ Select one of these options if you need to create one first:</string>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Version" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="XBv-UE-utz">
-                                <rect key="frame" x="271" y="85" width="241.99999934828975" height="21"/>
+                                <rect key="frame" x="271" y="85" width="242" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
                                 <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>

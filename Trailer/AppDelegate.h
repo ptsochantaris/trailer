@@ -17,9 +17,6 @@
 @property (weak) IBOutlet NSProgressIndicator *activityDisplay;
 @property (weak) IBOutlet NSTableView *projectsTable;
 @property (weak) IBOutlet NSMenuItem *refreshNow;
-@property (weak) IBOutlet NSButton *clearAll;
-@property (weak) IBOutlet NSButton *selectParents;
-@property (weak) IBOutlet NSButton *selectAll;
 @property (weak) IBOutlet NSProgressIndicator *apiLoad;
 @property (weak) IBOutlet NSTextField *versionNumber;
 @property (weak) IBOutlet NSButton *launchAtStartup;
@@ -48,7 +45,6 @@
 @property (weak) IBOutlet NSTokenField *statusTermsField;
 @property (weak) IBOutlet NSButton *moveAssignedPrsToMySection;
 @property (weak) IBOutlet NSButton *markUnmergeableOnUserSectionsOnly;
-@property (weak) IBOutlet NSPopUpButton *repoSubscriptionPolicy;
 @property (weak) IBOutlet NSTextField *repoCheckLabel;
 @property (weak) IBOutlet NSStepper *repoCheckStepper;
 @property (weak) IBOutlet NSButton *countOnlyListedPrs;
@@ -60,7 +56,7 @@
 @property (weak) IBOutlet NSTextField *statusItemRescanLabel;
 @property (weak) IBOutlet NSStepper *statusItemRefreshCounter;
 @property (weak) IBOutlet NSTextField *statusItemsRefreshNote;
-
+@property (weak) IBOutlet NSButton *hideNewRepositories;
 
 // Keyboard
 @property (weak) IBOutlet NSButton *hotkeyEnable;

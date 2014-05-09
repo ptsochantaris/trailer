@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5053" systemVersion="13C64" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="rS3-R9-Ivy">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5056" systemVersion="13C1021" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="rS3-R9-Ivy">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
     </dependencies>
@@ -117,7 +117,7 @@
                                 <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <tableView opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="36" sectionHeaderHeight="10" sectionFooterHeight="10" id="HZb-VF-reB">
+                            <tableView opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" allowsSelection="NO" rowHeight="36" sectionHeaderHeight="10" sectionFooterHeight="10" id="HZb-VF-reB">
                                 <rect key="frame" x="0.0" y="111" width="320" height="296"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
@@ -148,7 +148,7 @@
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="QNw-cJ-Ujs">
                                 <rect key="frame" x="20" y="117" width="280" height="134"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <string key="text">To access your repositories, enter your personal sccess token in the field above and select 'Load repository list' from below.
+                                <string key="text">To access your repositories, enter your personal sccess token in the field above and select 'Load Watchlist' from below.
 
 Select one of these options if you need to create one first:</string>
                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
@@ -178,13 +178,13 @@ Select one of these options if you need to create one first:</string>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
                     <toolbarItems>
-                        <barButtonItem title="Select/Clear" id="HSG-NR-1y5">
+                        <barButtonItem title="Visit Watchlist" id="GpT-RA-Eel">
                             <connections>
-                                <action selector="iphoneSelection:" destination="Bxt-3e-UBi" id="2MA-RE-CtL"/>
+                                <action selector="iphoneWatchlistSelected:" destination="Bxt-3e-UBi" id="v7E-UZ-9Ku"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem style="plain" systemItem="flexibleSpace" id="VlR-Gq-zFD"/>
-                        <barButtonItem title="Load repository list" id="1d6-JI-qNG">
+                        <barButtonItem title="Load Watchlist" id="1d6-JI-qNG">
                             <connections>
                                 <action selector="iphoneLoadRepos:" destination="Bxt-3e-UBi" id="dKn-gH-czu"/>
                             </connections>
@@ -210,7 +210,6 @@ Select one of these options if you need to create one first:</string>
                         <outlet property="instructionLabel" destination="QNw-cJ-Ujs" id="DSO-59-7S8"/>
                         <outlet property="refreshRepoList" destination="1d6-JI-qNG" id="ggi-hU-OuM"/>
                         <outlet property="repositories" destination="HZb-VF-reB" id="fpa-3E-Mds"/>
-                        <outlet property="selectionButton" destination="HSG-NR-1y5" id="lKO-VB-Xrm"/>
                         <outlet property="viewTokensButton" destination="V8g-lc-mi3" id="jDV-2h-tIc"/>
                         <segue destination="SiV-zQ-DDX" kind="push" identifier="openGithub" id="hHw-VU-VoJ"/>
                     </connections>
@@ -450,14 +449,14 @@ Select one of these options if you need to create one first:</string>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Version" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="pRN-hL-pPG">
-                                <rect key="frame" x="6.0000007901211756" y="138" width="304" height="21"/>
+                                <rect key="frame" x="6" y="138" width="304" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
                                 <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Trailer" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="83g-gE-zyn">
-                                <rect key="frame" x="95.000000790121177" y="67" width="215" height="63"/>
+                                <rect key="frame" x="95" y="67" width="215" height="63"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="64"/>
                                 <nil key="highlightedColor"/>

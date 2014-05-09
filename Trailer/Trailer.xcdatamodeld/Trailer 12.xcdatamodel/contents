@@ -61,6 +61,7 @@
         <attribute name="createdAt" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="fork" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="fullName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="hidden" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
         <attribute name="postSyncAction" optional="YES" attributeType="Integer 16" indexed="YES" syncable="YES"/>
         <attribute name="serverId" optional="YES" attributeType="Integer 64" defaultValueString="0" indexed="YES" syncable="YES"/>
         <attribute name="updatedAt" optional="YES" attributeType="Date" syncable="YES"/>
@@ -70,6 +71,6 @@
         <element name="PRComment" positionX="0" positionY="0" width="128" height="225"/>
         <element name="PRStatus" positionX="0" positionY="0" width="128" height="208"/>
         <element name="PullRequest" positionX="0" positionY="0" width="128" height="463"/>
-        <element name="Repo" positionX="0" positionY="0" width="128" height="148"/>
+        <element name="Repo" positionX="0" positionY="0" width="128" height="165"/>
     </elements>
 </model>

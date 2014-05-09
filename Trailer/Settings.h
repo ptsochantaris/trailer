@@ -5,7 +5,7 @@
 
 - (NSString *)sortField;
 
-@property (nonatomic) NSInteger sortMethod, statusFilteringMode, repoSubscriptionPolicy,
+@property (nonatomic) NSInteger sortMethod, statusFilteringMode,
 								closeHandlingPolicy, mergeHandlingPolicy, statusItemRefreshInterval;
 
 @property (nonatomic) NSArray *statusFilteringTerms;
@@ -20,7 +20,7 @@
 							sortDescending, showCreatedInsteadOfUpdated,
 							dontKeepPrsMergedByMe, hideAvatars, autoParticipateInMentions,
 							dontAskBeforeWipingMerged, dontAskBeforeWipingClosed,
-							includeReposInFilter, showReposInName,
+							includeReposInFilter, showReposInName, hideNewRepositories,
 							dontReportRefreshFailures, groupByRepo, hideAllPrsSection,
 							showStatusItems, makeStatusItemsSelectable, moveAssignedPrsToMySection,
 							markUnmergeableOnUserSectionsOnly, countOnlyListedPrs;
