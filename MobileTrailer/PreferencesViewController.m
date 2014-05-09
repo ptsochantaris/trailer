@@ -369,7 +369,7 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 										  cancelButtonTitle:@"Cancel"
 									 destructiveButtonTitle:@"Visit Watchlist"
 										  otherButtonTitles:@"Hide All",@"Show All",nil];
-	[a showInView:self.navigationController.view];
+	[a showFromBarButtonItem:self.watchListButton animated:YES];
 }
 
 - (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
