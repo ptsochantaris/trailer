@@ -153,6 +153,12 @@ NSString *B(NSString *input)
 				if([Settings shared].includeReposInFilter) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
             }
+			case 2:
+			{
+				cell.textLabel.text = B(@"Hide new repositories\nby default");
+				if([Settings shared].hideNewRepositories) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				break;
+			}
 		}
 	}
 	else if(indexPath.section==HISTORY_SECTION_INDEX)
@@ -356,6 +362,11 @@ NSString *B(NSString *input)
 				[Settings shared].includeReposInFilter = ![Settings shared].includeReposInFilter;
 				break;
 			}
+			case 2:
+			{
+				[Settings shared].hideNewRepositories = ![Settings shared].hideNewRepositories;
+				break;
+			}
 		}
 		[settingsChangedTimer push];
 	}
@@ -450,7 +461,7 @@ NSString *B(NSString *input)
 		case REFRESH_SECTION_INDEX: return 3;
 		case DISPLAY_SECTION_INDEX: return 5;
 		case COMMENTS_SECTION_INDEX: return 3;
-		case REPOS_SECTION_INDEX: return 2;
+		case REPOS_SECTION_INDEX: return 3;
 		case HISTORY_SECTION_INDEX: return 3;
 		case CONFIRM_SECTION_INDEX: return 2;
 		case SORT_SECTION_INDEX: return 3;

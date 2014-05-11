@@ -117,7 +117,7 @@
                                 <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <tableView opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" allowsSelection="NO" rowHeight="36" sectionHeaderHeight="10" sectionFooterHeight="10" id="HZb-VF-reB">
+                            <tableView opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="36" sectionHeaderHeight="10" sectionFooterHeight="10" id="HZb-VF-reB">
                                 <rect key="frame" x="0.0" y="111" width="320" height="296"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
@@ -178,7 +178,7 @@ Select one of these options if you need to create one first:</string>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
                     <toolbarItems>
-                        <barButtonItem title="Visit Watchlist" id="GpT-RA-Eel">
+                        <barButtonItem title="Watchlist" id="GpT-RA-Eel">
                             <connections>
                                 <action selector="iphoneWatchlistSelected:" destination="Bxt-3e-UBi" id="v7E-UZ-9Ku"/>
                             </connections>
@@ -211,6 +211,7 @@ Select one of these options if you need to create one first:</string>
                         <outlet property="refreshRepoList" destination="1d6-JI-qNG" id="ggi-hU-OuM"/>
                         <outlet property="repositories" destination="HZb-VF-reB" id="fpa-3E-Mds"/>
                         <outlet property="viewTokensButton" destination="V8g-lc-mi3" id="jDV-2h-tIc"/>
+                        <outlet property="watchListButton" destination="GpT-RA-Eel" id="ytm-XV-rnN"/>
                         <segue destination="SiV-zQ-DDX" kind="push" identifier="openGithub" id="hHw-VU-VoJ"/>
                     </connections>
                 </viewController>
@@ -449,14 +450,14 @@ Select one of these options if you need to create one first:</string>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Version" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="pRN-hL-pPG">
-                                <rect key="frame" x="6" y="138" width="304" height="21"/>
+                                <rect key="frame" x="6.000000188225215" y="138" width="304" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
                                 <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Trailer" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="83g-gE-zyn">
-                                <rect key="frame" x="95" y="67" width="215" height="63"/>
+                                <rect key="frame" x="95.000000188225215" y="67" width="215" height="63"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="64"/>
                                 <nil key="highlightedColor"/>
