@@ -386,4 +386,23 @@ static NSDateFormatter *itemDateFormatter;
 	return result;
 }
 
+- (NSString *)mostRelevantUrl {
+	if (self.unreadComments.integerValue != 0)
+	{
+		NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
+		f.returnsObjectsAsFaults = NO;
+		f.predicate = [NSPredicate predicateWithFormat:@"userId != %lld and pullRequestUrl == %@ and createdAt > %@",
+													   [Settings shared].localUserId.longLongValue,
+													   self.url,
+													   self.latestReadCommentDate];
+		f.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"createdAt" ascending:YES]];
+		NSArray *ret = [self.managedObjectContext executeFetchRequest:f error:nil];
+		if (ret.count > 0)
+		{
+			PRComment *comment = (PRComment *)ret[0];
+			return comment.webUrl;
+		}
+	}
+	return self.webUrl;
+}
 @end

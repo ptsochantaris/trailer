@@ -463,7 +463,7 @@ static AppDelegate *_static_shared_ref;
 	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:item.userInfo moc:self.dataManager.managedObjectContext];
 	[r catchUpWithComments];
 
-	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:r.webUrl]];
+	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[r mostRelevantUrl]]];
 
 	NSInteger reSelectIndex = -1;
 	if(isAlternative)
