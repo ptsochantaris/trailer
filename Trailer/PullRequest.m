@@ -391,6 +391,7 @@ static NSDateFormatter *itemDateFormatter;
 	{
 		NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
 		f.returnsObjectsAsFaults = NO;
+		f.fetchLimit = 1;
 		f.predicate = [NSPredicate predicateWithFormat:@"userId != %lld and pullRequestUrl == %@ and createdAt > %@",
 													   [Settings shared].localUserId.longLongValue,
 													   self.url,
