@@ -384,7 +384,7 @@ static NSDateFormatter *itemDateFormatter;
 }
 
 - (NSString *)urlForOpening {
-	if (self.unreadComments.integerValue != 0)
+	if (self.unreadComments.integerValue != 0 && [Settings shared].openPrAtFirstUnreadComment)
 	{
 		NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
 		f.returnsObjectsAsFaults = NO;
