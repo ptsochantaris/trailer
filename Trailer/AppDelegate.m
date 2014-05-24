@@ -461,7 +461,7 @@ static AppDelegate *_static_shared_ref;
 	self.ignoreNextFocusLoss = isAlternative;
 
 	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:item.userInfo moc:self.dataManager.managedObjectContext];
-	NSString *mostRelevantUrl = [r mostRelevantUrl];
+	NSString *mostRelevantUrl = [r urlForOpening];
 	[r catchUpWithComments];
 
 	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:mostRelevantUrl]];

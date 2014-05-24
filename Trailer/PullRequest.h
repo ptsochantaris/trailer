@@ -78,5 +78,5 @@
 
 - (NSArray *)displayedStatuses;
 
-- (NSString *)mostRelevantUrl;
+- (NSString *)urlForOpening;
 @end
