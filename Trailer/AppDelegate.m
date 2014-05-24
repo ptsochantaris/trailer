@@ -212,6 +212,11 @@ static AppDelegate *_static_shared_ref;
 	[Settings shared].hideNewRepositories = (sender.integerValue==1);
 }
 
+- (IBAction)openPrAtFirstUnreadCommentSelected:(NSButton *)sender
+{
+	[Settings shared].openPrAtFirstUnreadComment = (sender.integerValue==1);
+}
+
 - (IBAction)sortMethodChanged:(id)sender
 {
 	[Settings shared].sortMethod = self.sortModeSelect.indexOfSelectedItem;
@@ -865,6 +870,7 @@ static AppDelegate *_static_shared_ref;
 	self.markUnmergeableOnUserSectionsOnly.integerValue = [Settings shared].markUnmergeableOnUserSectionsOnly;
 	self.countOnlyListedPrs.integerValue = [Settings shared].countOnlyListedPrs;
 	self.hideNewRepositories.integerValue = [Settings shared].hideNewRepositories;
+	self.openPrAtFirstUnreadComment.integerValue = [Settings shared].openPrAtFirstUnreadComment;
 
 	self.hotkeyEnable.integerValue = [Settings shared].hotkeyEnable;
 	self.hotkeyControlModifier.integerValue = [Settings shared].hotkeyControlModifier;

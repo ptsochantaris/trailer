@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5056" systemVersion="13C1021" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5056" systemVersion="13D65" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment defaultVersion="1080" identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="5056"/>
@@ -143,7 +143,7 @@ Server</string>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" typeSelect="NO" headerView="rNo-pA-RK9" id="eB0-Bq-YR9">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="685" height="152"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="684" height="152"/>
                                                                     <autoresizingMask key="autoresizingMask"/>
                                                                     <size key="intercellSpacing" width="3" height="2"/>
                                                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -160,7 +160,7 @@ Server</string>
                                                                                 <font key="font" metaFont="system"/>
                                                                             </buttonCell>
                                                                         </tableColumn>
-                                                                        <tableColumn identifier="repos" editable="NO" width="642" minWidth="40" maxWidth="1000" id="BfG-Q4-Cru">
+                                                                        <tableColumn identifier="repos" editable="NO" width="641" minWidth="40" maxWidth="1000" id="BfG-Q4-Cru">
                                                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Watched Repository">
                                                                                 <font key="font" metaFont="smallSystem"/>
                                                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -182,7 +182,7 @@ Server</string>
                                                             </subviews>
                                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </clipView>
-                                                        <scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="7GP-vt-nA3">
+                                                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="7GP-vt-nA3">
                                                             <rect key="frame" x="1" y="153" width="684" height="16"/>
                                                             <autoresizingMask key="autoresizingMask"/>
                                                         </scroller>
@@ -191,7 +191,7 @@ Server</string>
                                                             <autoresizingMask key="autoresizingMask"/>
                                                         </scroller>
                                                         <tableHeaderView key="headerView" id="rNo-pA-RK9">
-                                                            <rect key="frame" x="0.0" y="0.0" width="685" height="17"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="684" height="17"/>
                                                             <autoresizingMask key="autoresizingMask"/>
                                                         </tableHeaderView>
                                                     </scrollView>
@@ -585,14 +585,14 @@ Server</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" borderType="none" titlePosition="noTitle" id="TPK-e4-WCR">
-                                            <rect key="frame" x="201" y="119" width="334" height="112"/>
+                                            <rect key="frame" x="201" y="100" width="334" height="150"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <view key="contentView">
-                                                <rect key="frame" x="0.0" y="0.0" width="334" height="112"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="334" height="150"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button id="c6m-8a-CRl">
-                                                        <rect key="frame" x="17" y="48" width="288" height="18"/>
+                                                        <rect key="frame" x="17" y="86" width="288" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Only display PRs with unread comments" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="djW-U3-Ae9">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -603,7 +603,7 @@ Server</string>
                                                         </connections>
                                                     </button>
                                                     <button id="CPe-TS-qPS">
-                                                        <rect key="frame" x="17" y="83" width="325" height="18"/>
+                                                        <rect key="frame" x="17" y="121" width="325" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Display comment badges &amp; alerts for all PRs" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="EcZ-Ov-Dct">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -614,7 +614,7 @@ Server</string>
                                                         </connections>
                                                     </button>
                                                     <button id="lTI-8Y-voD">
-                                                        <rect key="frame" x="17" y="13" width="300" height="18"/>
+                                                        <rect key="frame" x="17" y="51" width="300" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Move PRs that mention me to 'Participated'" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="dIf-8Y-axW">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -622,6 +622,17 @@ Server</string>
                                                         </buttonCell>
                                                         <connections>
                                                             <action selector="autoParticipateOnMentionSelected:" target="494" id="phv-oT-lnX"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button id="UE2-cu-KR1">
+                                                        <rect key="frame" x="17" y="16" width="246" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Open PR at first unread comment" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="OvZ-nc-wRD">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="openPrAtFirstUnreadCommentSelected:" target="494" id="UP2-m4-UvH"/>
                                                         </connections>
                                                     </button>
                                                 </subviews>
@@ -976,6 +987,7 @@ Enter to select and ⌘, for preferences.
                 <outlet property="makeStatusItemsSelectable" destination="yD7-Y4-ZaZ" id="rgg-se-o4u"/>
                 <outlet property="markUnmergeableOnUserSectionsOnly" destination="SoW-AJ-5kD" id="UTu-Bf-nOY"/>
                 <outlet property="moveAssignedPrsToMySection" destination="ZD1-Lw-zpW" id="btl-cm-k5r"/>
+                <outlet property="openPrAtFirstUnreadComment" destination="UE2-cu-KR1" id="e3R-dS-z4M"/>
                 <outlet property="prClosedPolicy" destination="8Ju-qc-WBt" id="XMn-0e-GqW"/>
                 <outlet property="prMergedPolicy" destination="p7f-Hm-I81" id="6mg-Ts-qyi"/>
                 <outlet property="preferencesWindow" destination="371" id="uYB-yu-610"/>
