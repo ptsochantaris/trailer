@@ -23,7 +23,7 @@
 							includeReposInFilter, showReposInName, hideNewRepositories,
 							dontReportRefreshFailures, groupByRepo, hideAllPrsSection,
 							showStatusItems, makeStatusItemsSelectable, moveAssignedPrsToMySection,
-							markUnmergeableOnUserSectionsOnly, countOnlyListedPrs;
+							markUnmergeableOnUserSectionsOnly, countOnlyListedPrs, openPrAtFirstUnreadComment;
 
 @property (nonatomic) BOOL hotkeyEnable, hotkeyCommandModifier, hotkeyOptionModifier, hotkeyShiftModifier, hotkeyControlModifier;
 

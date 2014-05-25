@@ -115,6 +115,12 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#define OPEN_PR_AT_FIRST_UNREAD_COMMENT_KEY @"OPEN_PR_AT_FIRST_UNREAD_COMMENT_KEY"
+- (void)setOpenPrAtFirstUnreadComment:(BOOL)openPrAtFirstUnreadComment { [self storeDefaultValue:@(openPrAtFirstUnreadComment) forKey:OPEN_PR_AT_FIRST_UNREAD_COMMENT_KEY]; }
+- (BOOL)openPrAtFirstUnreadComment { return [[[NSUserDefaults standardUserDefaults] stringForKey:OPEN_PR_AT_FIRST_UNREAD_COMMENT_KEY] boolValue]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #define HIDE_NEW_REPOS_KEY @"HIDE_NEW_REPOS_KEY"
 - (void)setHideNewRepositories:(BOOL)hideNewRepositories { [self storeDefaultValue:@(hideNewRepositories) forKey:HIDE_NEW_REPOS_KEY]; }
 - (BOOL)hideNewRepositories { return [[[NSUserDefaults standardUserDefaults] stringForKey:HIDE_NEW_REPOS_KEY] boolValue]; }
