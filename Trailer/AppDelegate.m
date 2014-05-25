@@ -1613,15 +1613,6 @@ static AppDelegate *_static_shared_ref;
 
 		switch(incomingEvent.keyCode)
 		{
-			case 43: // prefs
-			{
-				if((incomingEvent.modifierFlags & NSCommandKeyMask) == NSCommandKeyMask)
-				{
-					[self preferencesSelected:nil];
-					return nil;
-				}
-				break;
-			}
 			case 125: // down
 			{
 				PRItemView *v = [self focusedItemView];
