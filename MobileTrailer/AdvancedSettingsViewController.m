@@ -134,6 +134,11 @@ NSString *B(NSString *input)
 				if([Settings shared].autoParticipateInMentions) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
+			case 3:
+			{
+				cell.textLabel.text = B(@"Open PR at first unread\ncomment");
+				if([Settings shared].openPrAtFirstUnreadComment) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+			}
 		}
 	}
 	else if(indexPath.section==REPOS_SECTION_INDEX)
@@ -345,6 +350,10 @@ NSString *B(NSString *input)
 				[Settings shared].autoParticipateInMentions = ![Settings shared].autoParticipateInMentions;
 				break;
 			}
+			case 3:
+			{
+				[Settings shared].openPrAtFirstUnreadComment = ![Settings shared].openPrAtFirstUnreadComment;
+			}
 		}
 		[settingsChangedTimer push];
 	}
@@ -460,7 +469,7 @@ NSString *B(NSString *input)
     switch (section) {
 		case REFRESH_SECTION_INDEX: return 3;
 		case DISPLAY_SECTION_INDEX: return 5;
-		case COMMENTS_SECTION_INDEX: return 3;
+		case COMMENTS_SECTION_INDEX: return 4;
 		case REPOS_SECTION_INDEX: return 3;
 		case HISTORY_SECTION_INDEX: return 3;
 		case CONFIRM_SECTION_INDEX: return 2;
