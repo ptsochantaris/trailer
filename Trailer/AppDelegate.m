@@ -1164,7 +1164,7 @@ static AppDelegate *_static_shared_ref;
 	}
 	else if([notification object]==self.apiSettings)
 	{
-		[self copyApiInfo];
+		[self commitApiInfo];
 	}
 }
 
@@ -1180,20 +1180,26 @@ static AppDelegate *_static_shared_ref;
     DLog(@"Check for updates set to %d every %f seconds",s.automaticallyChecksForUpdates,s.updateCheckInterval);
 }
 
-- (void)copyApiInfo
+- (void)commitApiInfo
 {
 	NSString *frontEnd = [self.apiFrontEnd stringValue];
 	NSString *backEnd = [self.apiBackEnd stringValue];
 	NSString *path = [self.apiPath stringValue];
-	frontEnd = [frontEnd stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-	backEnd = [backEnd stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-	path = [path stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+
+	NSCharacterSet *cs = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+	frontEnd = [frontEnd stringByTrimmingCharactersInSet:cs];
+	backEnd = [backEnd stringByTrimmingCharactersInSet:cs];
+	path = [path stringByTrimmingCharactersInSet:cs];
+	
 	if(frontEnd.length==0) frontEnd = nil;
 	if(backEnd.length==0) backEnd = nil;
 	if(path.length==0) path = nil;
+
 	[Settings shared].apiFrontEnd = frontEnd;
 	[Settings shared].apiBackEnd = backEnd;
 	[Settings shared].apiPath = path;
+
+	[AppDelegate shared].preferencesDirty = YES;
 }
 
 - (void)networkStateChanged
@@ -1544,7 +1550,7 @@ static AppDelegate *_static_shared_ref;
 
 - (IBAction)testApiServerSelected:(NSButton *)sender
 {
-	[self copyApiInfo];
+	[self commitApiInfo];
 	[sender setEnabled:NO];
 
 	[self.api testApiAndCallback:^(NSError *error) {

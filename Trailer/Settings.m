@@ -56,7 +56,9 @@
 #ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
 	[[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:backgroundRefreshPeriod];
 #endif
-	[[NSUserDefaults standardUserDefaults] setFloat:backgroundRefreshPeriod forKey:IOS_BACKGROUND_REFRESH_PERIOD_KEY];
+	NSUserDefaults *d = [NSUserDefaults standardUserDefaults];
+	[d setFloat:backgroundRefreshPeriod forKey:IOS_BACKGROUND_REFRESH_PERIOD_KEY];
+	[d synchronize];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -72,7 +74,12 @@
 	}
 	return period;
 }
-- (void)setRefreshPeriod:(float)refreshPeriod { [[NSUserDefaults standardUserDefaults] setFloat:refreshPeriod forKey:REFRESH_PERIOD_KEY]; }
+- (void)setRefreshPeriod:(float)refreshPeriod
+{
+	NSUserDefaults *d = [NSUserDefaults standardUserDefaults];
+	[d setFloat:refreshPeriod forKey:REFRESH_PERIOD_KEY];
+	[d synchronize];
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -87,7 +94,12 @@
 	}
 	return period;
 }
-- (void)setNewRepoCheckPeriod:(float)newRepoCheckPeriod { [[NSUserDefaults standardUserDefaults] setFloat:newRepoCheckPeriod forKey:NEW_REPO_CHECK_PERIOD]; }
+- (void)setNewRepoCheckPeriod:(float)newRepoCheckPeriod
+{
+	NSUserDefaults *d = [NSUserDefaults standardUserDefaults];
+	[d setFloat:newRepoCheckPeriod forKey:NEW_REPO_CHECK_PERIOD];
+	[d synchronize];
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -297,11 +309,13 @@
 - (void)setMergeHandlingPolicy:(NSInteger)mergeHandlingPolicy { [self storeDefaultValue:@(mergeHandlingPolicy) forKey:MERGE_HANDLING_POLICY]; }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #define CLOSE_HANDLING_POLICY @"CLOSE_HANDLING_POLICY"
 - (NSInteger)closeHandlingPolicy { return [[[NSUserDefaults standardUserDefaults] stringForKey:CLOSE_HANDLING_POLICY] integerValue]; }
 - (void)setCloseHandlingPolicy:(NSInteger)closeHandlingPolicy { [self storeDefaultValue:@(closeHandlingPolicy) forKey:CLOSE_HANDLING_POLICY]; }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #define STATUS_ITEM_REFRESH_COUNT @"STATUS_ITEM_REFRESH_COUNT"
 - (NSInteger)statusItemRefreshInterval
 {
@@ -373,7 +387,6 @@
 - (NSString *)apiFrontEnd
 {
 	NSString *value = [[NSUserDefaults standardUserDefaults] stringForKey:API_FRONTEND_SERVER];
-	value = [value stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 	if(value.length==0) value = @"github.com";
 	return value;
 }
@@ -385,7 +398,6 @@
 - (NSString *)apiBackEnd
 {
 	NSString *value = [[NSUserDefaults standardUserDefaults] stringForKey:API_BACKEND_SERVER];
-	value = [value stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 	if(value.length==0) value = @"api.github.com";
 	return value;
 }
@@ -393,7 +405,7 @@
 {
 	NSString *oldValue = self.apiBackEnd;
 	[self storeDefaultValue:apiBackEnd forKey:API_BACKEND_SERVER];
-	if(![oldValue isEqualToString:apiBackEnd])
+	if(!apiBackEnd || ![oldValue isEqualToString:apiBackEnd])
 	{
 		[[AppDelegate shared].api restartNotifier];
 	}
@@ -405,13 +417,9 @@
 - (NSString *)apiPath
 {
 	NSString *value = [[NSUserDefaults standardUserDefaults] stringForKey:API_SERVER_PATH];
-	value = [value stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-	if(value.length==0) value = @"";
+	if(value==nil) value = @"";
 	return value;
 }
-- (void)setApiPath:(NSString *)apiPath
-{
-	[self storeDefaultValue:apiPath forKey:API_SERVER_PATH];
-}
+- (void)setApiPath:(NSString *)apiPath { [self storeDefaultValue:apiPath forKey:API_SERVER_PATH]; }
 
 @end
