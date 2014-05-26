@@ -68,7 +68,7 @@ NSString *B(NSString *input)
 			}
 			case 2:
 			{
-				cell.textLabel.text = B(@"Repository refresh\ninterval");
+				cell.textLabel.text = B(@"Watchlist refresh\ninterval");
 				cell.detailTextLabel.text = [NSString stringWithFormat:@"%.0f hours",[Settings shared].newRepoCheckPeriod];
 				break;
 			}

@@ -1090,8 +1090,7 @@ Enter to select and ⌘, for preferences.
                             <font key="font" metaFont="menu"/>
                             <menu key="menu" title="Options" showsStateColumn="NO" id="TJQ-rB-fHm">
                                 <items>
-                                    <menuItem title=" Refresh" id="asb-Mc-b5c">
-                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                    <menuItem title=" Refresh" keyEquivalent="r" id="asb-Mc-b5c">
                                         <connections>
                                             <action selector="refreshNowSelected:" target="494" id="AiB-dg-t4e"/>
                                         </connections>
@@ -1102,20 +1101,18 @@ Enter to select and ⌘, for preferences.
                                             <action selector="markAllReadSelected:" target="494" id="vWk-YR-lXO"/>
                                         </connections>
                                     </menuItem>
-                                    <menuItem title=" Preferences..." id="IyB-CB-sO1">
-                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                    <menuItem title=" Preferences..." keyEquivalent="," id="IyB-CB-sO1">
                                         <connections>
                                             <action selector="preferencesSelected:" target="494" id="APu-P9-9A4"/>
                                         </connections>
                                     </menuItem>
-                                    <menuItem title=" About..." id="gYG-gS-tKD">
+                                    <menuItem title=" About Trailer" id="gYG-gS-tKD">
                                         <modifierMask key="keyEquivalentModifierMask"/>
                                         <connections>
                                             <action selector="makeKeyAndOrderFront:" target="jQi-BK-oDc" id="ryq-zX-bJb"/>
                                         </connections>
                                     </menuItem>
-                                    <menuItem title=" Quit" id="eNw-Iw-Fkg">
-                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                    <menuItem title=" Quit" keyEquivalent="q" id="eNw-Iw-Fkg">
                                         <connections>
                                             <action selector="terminate:" target="-3" id="VcX-PJ-RoB"/>
                                         </connections>

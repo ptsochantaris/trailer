@@ -383,7 +383,8 @@ static NSDateFormatter *itemDateFormatter;
 	return result;
 }
 
-- (NSString *)urlForOpening {
+- (NSString *)urlForOpening
+{
 	if (self.unreadComments.integerValue != 0 && [Settings shared].openPrAtFirstUnreadComment)
 	{
 		NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
@@ -401,7 +402,8 @@ static NSDateFormatter *itemDateFormatter;
 	return self.webUrl;
 }
 
-- (NSPredicate *)predicateForCommentsSinceDate:(NSDate *)date {
+- (NSPredicate *)predicateForCommentsSinceDate:(NSDate *)date
+{
 	return [NSPredicate predicateWithFormat:@"userId != %@ and pullRequestUrl == %@ and createdAt > %@",
 											[Settings shared].localUserId,
 											self.url,

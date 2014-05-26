@@ -54,10 +54,25 @@
 
 - (BOOL)textFieldShouldEndEditing:(UITextField *)textField
 {
-	[Settings shared].apiFrontEnd = [self.apiFrontEnd.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-	[Settings shared].apiBackEnd = [self.apiBackEnd.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-	[Settings shared].apiPath = [self.apiPath.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	NSString *frontEnd = self.apiFrontEnd.text;
+	NSString *backEnd = self.apiBackEnd.text;
+	NSString *path = self.apiPath.text;
+
+	NSCharacterSet *cs = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+	frontEnd = [frontEnd stringByTrimmingCharactersInSet:cs];
+	backEnd = [backEnd stringByTrimmingCharactersInSet:cs];
+	path = [path stringByTrimmingCharactersInSet:cs];
+
+	if(frontEnd.length==0) frontEnd = nil;
+	if(backEnd.length==0) backEnd = nil;
+	if(path.length==0) path = nil;
+
+	[Settings shared].apiFrontEnd = frontEnd;
+	[Settings shared].apiBackEnd = backEnd;
+	[Settings shared].apiPath = path;
+
 	[AppDelegate shared].preferencesDirty = YES;
+
 	return YES;
 }
 

@@ -79,4 +79,5 @@
 - (NSArray *)displayedStatuses;
 
 - (NSString *)urlForOpening;
+
 @end

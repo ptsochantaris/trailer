@@ -358,14 +358,13 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     PullRequest *pullRequest = [[self fetchedResultsController] objectAtIndexPath:indexPath];
-	NSString *urlForOpening = [pullRequest urlForOpening];
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
     {
-        self.detailViewController.detailItem = [NSURL URLWithString:urlForOpening];
+        self.detailViewController.detailItem = [NSURL URLWithString:pullRequest.urlForOpening];
     }
     else
     {
-        urlToOpen = urlForOpening;
+        urlToOpen = pullRequest.urlForOpening;
         [self performSegueWithIdentifier:@"showDetail" sender:self];
     }
     [self catchUp:pullRequest];
