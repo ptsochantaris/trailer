@@ -136,7 +136,7 @@ NSString *B(NSString *input)
 			}
 			case 3:
 			{
-				cell.textLabel.text = B(@"Open PR at first unread\ncomment");
+				cell.textLabel.text = B(@"Open PRs at first unread\ncomment");
 				if([Settings shared].openPrAtFirstUnreadComment) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 			}
 		}
