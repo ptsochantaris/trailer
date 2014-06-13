@@ -40,6 +40,13 @@
 	return [self.userId.stringValue isEqualToString:[Settings shared].localUserId];
 }
 
+- (BOOL)hasThumb
+{
+	NSString *thumb = @":+1:";
+	NSRange rangeOfHandle = [self.body rangeOfString:thumb options:NSCaseInsensitiveSearch|NSDiacriticInsensitiveSearch];
+	return rangeOfHandle.location != NSNotFound;
+}
+
 - (BOOL)refersToMe
 {
 	NSString *myHandle = [NSString stringWithFormat:@"@%@",[Settings shared].localUser];

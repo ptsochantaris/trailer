@@ -21,6 +21,8 @@
 
 - (BOOL)isMine;
 
+- (BOOL)hasThumb;
+
 - (BOOL)refersToMe;
 
 @end
