@@ -82,9 +82,9 @@ static NSDateFormatter *itemDateFormatter;
 	if(condition==kPullRequestConditionMerged)		section = kPullRequestSectionMerged;
 	else if(condition==kPullRequestConditionClosed) section = kPullRequestSectionClosed;
 	else if(self.isMine)							section = kPullRequestSectionMine;
-    else if(self.thumbedByMe)						section = kPullRequestSectionThumbed;
-    else if(self.commentedByMe)						section = kPullRequestSectionParticipated;
-	else if([Settings shared].hideAllPrsSection)    section = kPullRequestSectionNone;
+	else if(self.thumbedByMe)						section = kPullRequestSectionThumbed;
+	else if(self.commentedByMe)						section = kPullRequestSectionParticipated;
+	else if([Settings shared].hideAllPrsSection)		section = kPullRequestSectionNone;
 	else											section = kPullRequestSectionAll;
     
     
