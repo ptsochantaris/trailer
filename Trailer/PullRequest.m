@@ -82,10 +82,12 @@ static NSDateFormatter *itemDateFormatter;
 	if(condition==kPullRequestConditionMerged)		section = kPullRequestSectionMerged;
 	else if(condition==kPullRequestConditionClosed) section = kPullRequestSectionClosed;
 	else if(self.isMine)							section = kPullRequestSectionMine;
-	else if(self.commentedByMe)						section = kPullRequestSectionParticipated;
-	else if([Settings shared].hideAllPrsSection)	section = kPullRequestSectionNone;
+    else if(self.thumbedByMe)						section = kPullRequestSectionThumbed;
+    else if(self.commentedByMe)						section = kPullRequestSectionParticipated;
+	else if([Settings shared].hideAllPrsSection)    section = kPullRequestSectionNone;
 	else											section = kPullRequestSectionAll;
-
+    
+    
 	if(!self.latestReadCommentDate) self.latestReadCommentDate = [NSDate distantPast];
 
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
@@ -329,6 +331,16 @@ static NSDateFormatter *itemDateFormatter;
 			return YES;
 	return NO;
 
+}
+
+- (BOOL)thumbedByMe
+{
+	for(PRComment *c in [PRComment commentsForPullRequestUrl:self.url inMoc:self.managedObjectContext])
+		if(c.isMine && c.hasThumb)
+            return YES;
+			
+	return NO;
+    
 }
 
 - (NSArray *)displayedStatuses

@@ -9,12 +9,13 @@
 #define kPullRequestSectionMerged 3
 #define kPullRequestSectionClosed 4
 #define kPullRequestSectionAll 5
+#define kPullRequestSectionThumbed 6
 
 #define kStatusFilterAll 0
 #define kStatusFilterInclude 1
 #define kStatusFilterExclude 2
 
-#define kPullRequestSectionNames @[@"", @"Mine", @"Participated", @"Recently Merged", @"Recently Closed", @"All Pull Requests"]
+#define kPullRequestSectionNames @[@"", @"Mine", @"Participated", @"Recently Merged", @"Recently Closed", @"All Pull Requests", @"You have Thumbed Up: 👍"]
 
 @interface PullRequest : DataItem
 
@@ -69,6 +70,8 @@
 - (BOOL)refersToMe;
 
 - (BOOL)commentedByMe;
+
+- (BOOL)thumbedByMe;
 
 - (BOOL)markUnmergeable;
 

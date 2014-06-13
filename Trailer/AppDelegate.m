@@ -655,6 +655,7 @@ static AppDelegate *_static_shared_ref;
 	currentPRItems = [NSMutableArray array];
 
 	SectionHeader *myHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:nil title:kPullRequestSectionNames[kPullRequestSectionMine]];
+	SectionHeader *thumbedHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:nil title:kPullRequestSectionNames[kPullRequestSectionThumbed]];
 	SectionHeader *participatedHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:nil title:kPullRequestSectionNames[kPullRequestSectionParticipated]];
 	SectionHeader *mergedHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:self title:kPullRequestSectionNames[kPullRequestSectionMerged]];
 	SectionHeader *closedHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:self title:kPullRequestSectionNames[kPullRequestSectionClosed]];
@@ -662,6 +663,7 @@ static AppDelegate *_static_shared_ref;
 
 	NSDictionary *sections = @{
 							   @kPullRequestSectionMine: [NSMutableArray arrayWithObject:myHeader],
+                                @kPullRequestSectionThumbed: [NSMutableArray arrayWithObject:thumbedHeader],
 								@kPullRequestSectionParticipated: [NSMutableArray arrayWithObject:participatedHeader],
 								@kPullRequestSectionMerged: [NSMutableArray arrayWithObject:mergedHeader],
 								@kPullRequestSectionClosed: [NSMutableArray arrayWithObject:closedHeader],
@@ -674,7 +676,7 @@ static AppDelegate *_static_shared_ref;
 		[sections[r.sectionIndex] addObject:view];
 	}
 
-	for(NSInteger section=kPullRequestSectionMine;section<=kPullRequestSectionAll;section++)
+	for(NSInteger section=kPullRequestSectionMine;section<=kPullRequestSectionThumbed;section++)
 	{
 		NSArray *itemsInSection = sections[@(section)];
 		for(NSInteger p=1;p<itemsInSection.count;p++) // first item is the header
@@ -686,7 +688,7 @@ static AppDelegate *_static_shared_ref;
 
 	if(pullRequests.count)
 	{
-		for(NSInteger section=kPullRequestSectionAll; section>=kPullRequestSectionMine; section--)
+		for(NSInteger section=kPullRequestSectionThumbed; section>=kPullRequestSectionMine; section--)
 		{
 			NSArray *itemsInSection = sections[@(section)];
 			if(itemsInSection.count>1)
