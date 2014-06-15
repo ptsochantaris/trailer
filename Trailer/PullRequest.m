@@ -90,7 +90,7 @@ static NSDateFormatter *itemDateFormatter;
 
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
 	f.returnsObjectsAsFaults = NO;
-	f.predicate = [self predicateForCommentsSinceDate:self.latestReadCommentDate];
+	f.predicate = [self predicateForUnreadComments];
 
 	if(((section == kPullRequestSectionAll) || (section == kPullRequestSectionNone))
 	   && [Settings shared].autoParticipateInMentions)
@@ -390,7 +390,7 @@ static NSDateFormatter *itemDateFormatter;
 		NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
 		f.returnsObjectsAsFaults = NO;
 		f.fetchLimit = 1;
-		f.predicate = [self predicateForCommentsSinceDate:self.latestReadCommentDate];
+		f.predicate = [self predicateForUnreadComments];
 		f.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"createdAt" ascending:YES]];
 		NSArray *ret = [self.managedObjectContext executeFetchRequest:f error:nil];
 		if (ret.count > 0)
@@ -402,12 +402,12 @@ static NSDateFormatter *itemDateFormatter;
 	return self.webUrl;
 }
 
-- (NSPredicate *)predicateForCommentsSinceDate:(NSDate *)date
+- (NSPredicate *)predicateForUnreadComments
 {
 	return [NSPredicate predicateWithFormat:@"userId != %@ and pullRequestUrl == %@ and createdAt > %@",
 											[Settings shared].localUserId,
 											self.url,
-											date];
+											self.latestReadCommentDate];
 }
 
 @end
