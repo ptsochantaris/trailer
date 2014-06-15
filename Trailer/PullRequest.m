@@ -90,7 +90,8 @@ static NSDateFormatter *itemDateFormatter;
 
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
 	f.returnsObjectsAsFaults = NO;
-	f.predicate = [self predicateForUnreadComments];
+
+	NSDate *latestDate = self.latestReadCommentDate;
 
 	if(((section == kPullRequestSectionAll) || (section == kPullRequestSectionNone))
 	   && [Settings shared].autoParticipateInMentions)
@@ -98,24 +99,31 @@ static NSDateFormatter *itemDateFormatter;
 		if(self.refersToMe)
 		{
 			section = kPullRequestSectionParticipated;
+			f.predicate = [self predicateForOthersCommentsSinceDate:latestDate];
 			self.unreadComments = @([self.managedObjectContext countForFetchRequest:f error:nil]);
 		}
 		else
 		{
-			NSArray *unreadComments = [self.managedObjectContext executeFetchRequest:f error:nil];
-			self.unreadComments = @(unreadComments.count);
-			for(PRComment *c in unreadComments)
+			f.predicate = [self predicateForOthersCommentsSinceDate:nil];
+			NSUInteger unreadCommentCount = 0;
+			NSArray *allOthersComments = [self.managedObjectContext executeFetchRequest:f error:nil];
+			for(PRComment *c in allOthersComments)
 			{
 				if(c.refersToMe)
 				{
 					section = kPullRequestSectionParticipated;
-					break;
+				}
+				if([c.createdAt compare:latestDate]==NSOrderedDescending)
+				{
+					unreadCommentCount++;
 				}
 			}
+			self.unreadComments = @(unreadCommentCount);
 		}
 	}
 	else
 	{
+		f.predicate = [self predicateForOthersCommentsSinceDate:latestDate];
 		self.unreadComments = @([self.managedObjectContext countForFetchRequest:f error:nil]);
 	}
 
@@ -390,7 +398,7 @@ static NSDateFormatter *itemDateFormatter;
 		NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
 		f.returnsObjectsAsFaults = NO;
 		f.fetchLimit = 1;
-		f.predicate = [self predicateForUnreadComments];
+		f.predicate = [self predicateForOthersCommentsSinceDate:self.latestReadCommentDate];
 		f.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"createdAt" ascending:YES]];
 		NSArray *ret = [self.managedObjectContext executeFetchRequest:f error:nil];
 		if (ret.count > 0)
@@ -402,12 +410,21 @@ static NSDateFormatter *itemDateFormatter;
 	return self.webUrl;
 }
 
-- (NSPredicate *)predicateForUnreadComments
+- (NSPredicate *)predicateForOthersCommentsSinceDate:(NSDate *)date
 {
-	return [NSPredicate predicateWithFormat:@"userId != %@ and pullRequestUrl == %@ and createdAt > %@",
-											[Settings shared].localUserId,
-											self.url,
-											self.latestReadCommentDate];
+	if(date)
+	{
+		return [NSPredicate predicateWithFormat:@"userId != %@ and pullRequestUrl == %@ and createdAt > %@",
+				[Settings shared].localUserId,
+				self.url,
+				date];
+	}
+	else
+	{
+		return [NSPredicate predicateWithFormat:@"userId != %@ and pullRequestUrl == %@",
+				[Settings shared].localUserId,
+				self.url];
+	}
 }
 
 @end
