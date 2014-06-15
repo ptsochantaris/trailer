@@ -7,6 +7,21 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.0.28</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Added "mark all as read" keyboard shortcut</li>
+				<li>Corrected an issue with unread comment counts on PRs</li>
+				</ul></font>]]></description>
+			<pubDate>Sun, 15 Jun 2014 17:00:00 +0000</pubDate>
+			<enclosure
+			url="http://dev.housetrip.com/trailer/trailer1028.zip"
+			sparkle:version="1124"
+			sparkle:shortVersionString="1.0.28"
+			sparkle:dsaSignature="MC0CFQCOKJNJwesPETnkEVZ9WlrPXi/mLwIUbbQ222/WCmu8xvJUGLh/75WDR8o="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.0.27</title>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
 				<li>Added option to open PRs after the most recently read comment (thanks @mauricerkelly for the feature!)</li>
