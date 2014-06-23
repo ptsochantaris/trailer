@@ -986,13 +986,16 @@ typedef void (^completionBlockType)(BOOL);
                    id image = nil;
                    if(imageData)
                    {
+					   @autoreleasepool
+					   {
 #ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
-                       image = [[UIImage imageWithData:imageData] scaleToFillSize:imageSize];
-                       [UIImagePNGRepresentation(image) writeToFile:imagePath atomically:YES];
+						   image = [[UIImage imageWithData:imageData] scaleToFillSize:imageSize];
+						   [UIImagePNGRepresentation(image) writeToFile:imagePath atomically:YES];
 #else
-                       image = [[[NSImage alloc] initWithData:imageData] scaleToFillSize:imageSize];
-                       [[image TIFFRepresentation] writeToFile:imagePath atomically:YES];
+						   image = [[[NSImage alloc] initWithData:imageData] scaleToFillSize:imageSize];
+						   [[image TIFFRepresentation] writeToFile:imagePath atomically:YES];
 #endif
+					   }
                    }
                    dispatch_async(dispatch_get_main_queue(), ^{
                        callbackOrNil(image);

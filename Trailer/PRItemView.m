@@ -53,7 +53,7 @@ static CGColorRef _highlightColor;
     self = [super init];
     if (self)
 	{
-		_delegate = delegate;
+		self.delegate = delegate;
 		_userInfo = userInfo;
 
 		NSInteger _commentsNew = 0;
@@ -246,10 +246,10 @@ static CGColorRef _highlightColor;
 - (void)updateTrackingAreas
 {
 	if(trackingArea) [self removeTrackingArea:trackingArea];
-	trackingArea = [ [NSTrackingArea alloc] initWithRect:[self bounds]
-												 options:NSTrackingMouseEnteredAndExited | NSTrackingActiveInKeyWindow
-												   owner:self
-												userInfo:nil];
+	trackingArea = [[NSTrackingArea alloc] initWithRect:self.bounds
+												options:NSTrackingMouseEnteredAndExited | NSTrackingActiveInKeyWindow
+												  owner:self
+											   userInfo:nil];
 	[self addTrackingArea:trackingArea];
 
 	NSPoint mouseLocation = [[self window] mouseLocationOutsideOfEventStream];

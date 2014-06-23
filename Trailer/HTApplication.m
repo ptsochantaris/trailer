@@ -4,17 +4,17 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wundeclared-selector"
 
-- (void) sendEvent:(NSEvent *)event
+- (void)sendEvent:(NSEvent *)event
 {
-    if([event type] == NSKeyDown)
+    if(event.type == NSKeyDown)
 	{
         if(([event modifierFlags] & NSDeviceIndependentModifierFlagsMask) == NSCommandKeyMask)
 		{
-            if([[event charactersIgnoringModifiers] isEqualToString:@"x"])
+            if([event.charactersIgnoringModifiers isEqualToString:@"x"])
 			{
                 if([self sendAction:@selector(cut:) to:nil from:self]) return;
             }
-            else if([[event charactersIgnoringModifiers] isEqualToString:@"c"])
+            else if([event.charactersIgnoringModifiers isEqualToString:@"c"])
 			{
 				NSString *url = [AppDelegate shared].focusedItemUrl;
 				if(url)
@@ -28,22 +28,22 @@
 					if([self sendAction:@selector(copy:) to:nil from:self]) return;
 				}
             }
-            else if([[event charactersIgnoringModifiers] isEqualToString:@"v"])
+            else if([event.charactersIgnoringModifiers isEqualToString:@"v"])
 			{
                 if([self sendAction:@selector(paste:) to:nil from:self]) return;
             }
-            else if([[event charactersIgnoringModifiers] isEqualToString:@"z"])
+            else if([event.charactersIgnoringModifiers isEqualToString:@"z"])
 			{
                 if([self sendAction:@selector(undo:) to:nil from:self]) return;
             }
-            else if([[event charactersIgnoringModifiers] isEqualToString:@"a"])
+            else if([event.charactersIgnoringModifiers isEqualToString:@"a"])
 			{
                 if([self sendAction:@selector(selectAll:) to:nil from:self]) return;
             }
         }
         else if(([event modifierFlags] & NSDeviceIndependentModifierFlagsMask) == (NSCommandKeyMask | NSShiftKeyMask))
 		{
-            if ([[event charactersIgnoringModifiers] isEqualToString:@"Z"])
+            if ([event.charactersIgnoringModifiers isEqualToString:@"Z"])
 			{
                 if ([self sendAction:@selector(redo:) to:nil from:self]) return;
             }

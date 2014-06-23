@@ -1095,8 +1095,8 @@ Enter to select and ⌘, for preferences.
                                             <action selector="refreshNowSelected:" target="494" id="AiB-dg-t4e"/>
                                         </connections>
                                     </menuItem>
-                                    <menuItem title=" Mark All As Read" id="HVf-zs-7iK">
-                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                    <menuItem title=" Mark All As Read" keyEquivalent="a" id="HVf-zs-7iK">
+                                        <modifierMask key="keyEquivalentModifierMask" control="YES" option="YES" command="YES"/>
                                         <connections>
                                             <action selector="markAllReadSelected:" target="494" id="vWk-YR-lXO"/>
                                         </connections>
