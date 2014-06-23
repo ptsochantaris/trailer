@@ -22,13 +22,6 @@ static AppDelegate *_static_shared_ref;
 
 	self.filterTimer = [[HTPopTimer alloc] initWithTimeInterval:0.2 target:self selector:@selector(filterTimerPopped)];
 
-	SUUpdater *s = [SUUpdater sharedUpdater];
-    [self setUpdateCheckParameters];
-	if(!s.updateInProgress && [Settings shared].checkForUpdatesAutomatically)
-	{
-		[s checkForUpdatesInBackground];
-	}
-
 	[NSThread setThreadPriority:0.0];
 
 	_static_shared_ref = self;
@@ -86,6 +79,13 @@ static AppDelegate *_static_shared_ref;
 											   object:nil];
 
 	[self addHotKeySupport];
+
+	SUUpdater *s = [SUUpdater sharedUpdater];
+    [self setUpdateCheckParameters];
+	if(!s.updateInProgress && [Settings shared].checkForUpdatesAutomatically)
+	{
+		[s checkForUpdatesInBackground];
+	}
 }
 
 - (void)setupSortMethodMenu
@@ -1431,52 +1431,43 @@ static AppDelegate *_static_shared_ref;
 
 - (void) addAppAsLoginItem
 {
-	NSString * appPath = [[NSBundle mainBundle] bundlePath];
-
-	// This will retrieve the path for the application
-	// For example, /Applications/test.app
-	CFURLRef url = (__bridge CFURLRef)[NSURL fileURLWithPath:appPath];
-
 	// Create a reference to the shared file list.
 	// We are adding it to the current user only.
 	// If we want to add it all users, use
-	// kLSSharedFileListGlobalLoginItems instead of
-	//kLSSharedFileListSessionLoginItems
+	// kLSSharedFileListGlobalLoginItems instead of kLSSharedFileListSessionLoginItems
 	LSSharedFileListRef loginItems = LSSharedFileListCreate(NULL, kLSSharedFileListSessionLoginItems, NULL);
-	if (loginItems) {
-		//Insert an item to the list.
+	if(loginItems)
+	{
+		NSString * appPath = [[NSBundle mainBundle] bundlePath];
+		CFURLRef url = (__bridge CFURLRef)[NSURL fileURLWithPath:appPath];
 		LSSharedFileListItemRef item = LSSharedFileListInsertItemURL(loginItems,
 																	 kLSSharedFileListItemLast, NULL, NULL,
 																	 url, NULL, NULL);
-		if (item){
-			CFRelease(item);
-		}
+		if (item) CFRelease(item);
 		CFRelease(loginItems);
 	}
 }
 
 - (BOOL)isAppLoginItem
 {
-	NSString * appPath = [[NSBundle mainBundle] bundlePath];
-
-	// This will retrieve the path for the application
-	// For example, /Applications/test.app
-	CFURLRef url = (__bridge CFURLRef)[NSURL fileURLWithPath:appPath];
-
-	// Create a reference to the shared file list.
 	LSSharedFileListRef loginItems = LSSharedFileListCreate(NULL, kLSSharedFileListSessionLoginItems, NULL);
-
-	if (loginItems) {
+	if(loginItems)
+	{
 		UInt32 seedValue;
-		//Retrieve the list of Login Items and cast them to
-		// a NSArray so that it will be easier to iterate.
 		NSArray  *loginItemsArray = (__bridge_transfer NSArray *)LSSharedFileListCopySnapshot(loginItems, &seedValue);
-		for(int i = 0 ; i< [loginItemsArray count]; i++){
-			LSSharedFileListItemRef itemRef = (__bridge LSSharedFileListItemRef)[loginItemsArray objectAtIndex:i];
-			//Resolve the item with URL
-			if (LSSharedFileListItemResolve(itemRef, 0, (CFURLRef*) &url, NULL) == noErr) {
-				NSURL *uu = (__bridge NSURL*)url;
-				if ([[uu path] compare:appPath] == NSOrderedSame){
+		CFRelease(loginItems);
+
+		for(int i = 0 ; i< loginItemsArray.count; i++)
+		{
+			LSSharedFileListItemRef itemRef = (__bridge LSSharedFileListItemRef)loginItemsArray[i];
+
+			NSString * appPath = [[NSBundle mainBundle] bundlePath];
+			CFURLRef url = (__bridge CFURLRef)[NSURL fileURLWithPath:appPath];
+			if(LSSharedFileListItemResolve(itemRef, 0, &url, NULL) == noErr)
+			{
+				NSURL *uu = (__bridge_transfer NSURL*)url;
+				if ([[uu path] compare:appPath] == NSOrderedSame)
+				{
 					return YES;
 				}
 			}
@@ -1487,26 +1478,25 @@ static AppDelegate *_static_shared_ref;
 
 - (void) deleteAppFromLoginItem
 {
-	NSString * appPath = [[NSBundle mainBundle] bundlePath];
-
-	// This will retrieve the path for the application
-	// For example, /Applications/test.app
-	CFURLRef url = (__bridge CFURLRef)[NSURL fileURLWithPath:appPath];
-
-	// Create a reference to the shared file list.
 	LSSharedFileListRef loginItems = LSSharedFileListCreate(NULL, kLSSharedFileListSessionLoginItems, NULL);
-
-	if (loginItems) {
+	if(loginItems)
+	{
 		UInt32 seedValue;
-		//Retrieve the list of Login Items and cast them to
-		// a NSArray so that it will be easier to iterate.
 		NSArray  *loginItemsArray = (__bridge_transfer NSArray *)LSSharedFileListCopySnapshot(loginItems, &seedValue);
-		for(int i = 0 ; i< [loginItemsArray count]; i++){
+		CFRelease(loginItems);
+
+		for(int i = 0 ; i< [loginItemsArray count]; i++)
+		{
 			LSSharedFileListItemRef itemRef = (__bridge LSSharedFileListItemRef)[loginItemsArray objectAtIndex:i];
-			//Resolve the item with URL
-			if (LSSharedFileListItemResolve(itemRef, 0, (CFURLRef*) &url, NULL) == noErr) {
-				NSURL *uu = (__bridge NSURL*)url;
-				if ([[uu path] compare:appPath] == NSOrderedSame){
+
+			NSString * appPath = [[NSBundle mainBundle] bundlePath];
+			CFURLRef url = (__bridge CFURLRef)[NSURL fileURLWithPath:appPath];
+
+			if (LSSharedFileListItemResolve(itemRef, 0, (CFURLRef*) &url, NULL) == noErr)
+			{
+				NSURL *uu = (__bridge_transfer NSURL*)url;
+				if ([[uu path] compare:appPath] == NSOrderedSame)
+				{
 					LSSharedFileListItemRemove(loginItems,itemRef);
 				}
 			}
