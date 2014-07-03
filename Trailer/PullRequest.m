@@ -86,9 +86,6 @@ static NSDateFormatter *itemDateFormatter;
 	else if([Settings shared].hideAllPrsSection)	section = kPullRequestSectionNone;
 	else											section = kPullRequestSectionAll;
 
-	if(!self.latestReadCommentDate) self.latestReadCommentDate = [NSDate distantPast];
-
-	
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
 	f.returnsObjectsAsFaults = NO;
 
@@ -415,15 +412,15 @@ static NSDateFormatter *itemDateFormatter;
 {
 	if(date)
 	{
-		return [NSPredicate predicateWithFormat:@"userId != %@ and pullRequestUrl == %@ and createdAt > %@",
-				[Settings shared].localUserId,
+		return [NSPredicate predicateWithFormat:@"userId != %lld and pullRequestUrl == %@ and createdAt > %@",
+				[Settings shared].localUserId.longLongValue,
 				self.url,
 				date];
 	}
 	else
 	{
-		return [NSPredicate predicateWithFormat:@"userId != %@ and pullRequestUrl == %@",
-				[Settings shared].localUserId,
+		return [NSPredicate predicateWithFormat:@"userId != %lld and pullRequestUrl == %@",
+				[Settings shared].localUserId.longLongValue,
 				self.url];
 	}
 }
