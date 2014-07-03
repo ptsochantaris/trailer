@@ -416,10 +416,11 @@ static AppDelegate *_static_shared_ref;
 		{
 			notification.title = @"New PR Comment";
 			notification.informativeText = [item body];
-            if (![Settings shared].hideAvatars) {
+			if(![Settings shared].hideAvatars)
+			{
 				notification.contentImage = [[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:[item avatarUrl]]];
-            }
-            
+			}
+
 			PullRequest *associatedRequest = [PullRequest pullRequestWithUrl:[item pullRequestUrl] moc:self.dataManager.managedObjectContext];
 			notification.subtitle = associatedRequest.title;
 			break;
@@ -462,7 +463,7 @@ static AppDelegate *_static_shared_ref;
 		}
 	}
 
-    [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
+	[[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
 }
 
 - (void)prItemSelected:(PRItemView *)item alternativeSelect:(BOOL)isAlternative
@@ -504,7 +505,7 @@ static AppDelegate *_static_shared_ref;
 
 - (void)menuWillOpen:(NSMenu *)menu
 {
-    if([[menu title] isEqualToString:@"Options"])
+	if([[menu title] isEqualToString:@"Options"])
 	{
 		if(!self.isRefreshing)
 		{
@@ -517,7 +518,7 @@ static AppDelegate *_static_shared_ref;
 
 			self.refreshNow.title = [prefix stringByAppendingFormat:@" - %@",[self.api lastUpdateDescription]];
 		}
-    }
+	}
 }
 
 - (void)sizeMenuAndShow:(BOOL)show
