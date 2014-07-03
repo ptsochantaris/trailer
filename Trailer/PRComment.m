@@ -7,6 +7,7 @@
 @dynamic position;
 @dynamic body;
 @dynamic userName;
+@dynamic avatarUrl;
 @dynamic path;
 @dynamic pullRequestUrl;
 @dynamic url;
@@ -26,6 +27,7 @@
 	NSDictionary *userInfo = [info ofk:@"user"];
 	c.userName = [userInfo ofk:@"userName"];
 	c.userId = [userInfo ofk:@"id"];
+	c.avatarUrl = [userInfo ofk:@"avatar_url"];
 
 	NSDictionary *links = [info ofk:@"links"];
 	c.url = [[links ofk:@"self"] ofk:@"href"];

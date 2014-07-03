@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="3401" systemVersion="13A603" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="5064" systemVersion="13D65" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="Org" representedClassName="Org" syncable="YES">
         <attribute name="avatarUrl" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="createdAt" optional="YES" attributeType="Date" syncable="YES"/>
@@ -48,9 +48,9 @@
         <attribute name="updatedAt" optional="YES" attributeType="Date" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Org" positionX="0" positionY="0" width="0" height="0"/>
-        <element name="PRComment" positionX="0" positionY="0" width="0" height="0"/>
-        <element name="PullRequest" positionX="0" positionY="0" width="0" height="0"/>
-        <element name="Repo" positionX="0" positionY="0" width="0" height="0"/>
+        <element name="Org" positionX="0" positionY="0" width="128" height="135"/>
+        <element name="PRComment" positionX="0" positionY="0" width="128" height="225"/>
+        <element name="PullRequest" positionX="0" positionY="0" width="128" height="270"/>
+        <element name="Repo" positionX="0" positionY="0" width="128" height="135"/>
     </elements>
 </model>

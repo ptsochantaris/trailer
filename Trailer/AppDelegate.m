@@ -416,6 +416,10 @@ static AppDelegate *_static_shared_ref;
 		{
 			notification.title = @"New PR Comment";
 			notification.informativeText = [item body];
+            if (![Settings shared].hideAvatars) {
+				notification.contentImage = [[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:[item avatarUrl]]];
+            }
+            
 			PullRequest *associatedRequest = [PullRequest pullRequestWithUrl:[item pullRequestUrl] moc:self.dataManager.managedObjectContext];
 			notification.subtitle = associatedRequest.title;
 			break;
