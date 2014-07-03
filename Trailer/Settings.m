@@ -67,9 +67,9 @@
 - (float)refreshPeriod
 {
 	float period = [[NSUserDefaults standardUserDefaults] floatForKey:REFRESH_PERIOD_KEY];
-	if(period==0)
+	if(period<60.0)
 	{
-		period = 60.0;
+		period = 120.0;
 		self.refreshPeriod = period;
 	}
 	return period;

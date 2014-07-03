@@ -37,7 +37,7 @@ typedef void (^completionBlockType)(BOOL);
 		mediumFormatter.timeStyle = NSDateFormatterMediumStyle;
 
 		requestQueue = [[NSOperationQueue alloc] init];
-		requestQueue.maxConcurrentOperationCount = 8;
+		requestQueue.maxConcurrentOperationCount = 4;
 
 		[self restartNotifier];
 
@@ -782,7 +782,7 @@ typedef void (^completionBlockType)(BOOL);
 		NSMutableURLRequest *r = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:expandedPath]
 															  cachePolicy:NSURLRequestUseProtocolCachePolicy
 														  timeoutInterval:NETWORK_TIMEOUT];
-		[r setValue:@"Trailer" forHTTPHeaderField:@"User-Agent"];
+		[r setValue:[self userAgent] forHTTPHeaderField:@"User-Agent"];
 		[r setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
 		if(authToken) [r setValue:[@"token " stringByAppendingString:authToken] forHTTPHeaderField:@"Authorization"];
 
@@ -840,7 +840,7 @@ typedef void (^completionBlockType)(BOOL);
 		NSMutableURLRequest *r = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:path]
 															  cachePolicy:NSURLRequestReturnCacheDataElseLoad
 														  timeoutInterval:NETWORK_TIMEOUT];
-		[r setValue:@"Trailer" forHTTPHeaderField:@"User-Agent"];
+		[r setValue:[self userAgent] forHTTPHeaderField:@"User-Agent"];
 
 		NSError *error;
 		NSHTTPURLResponse *response;
@@ -878,6 +878,16 @@ typedef void (^completionBlockType)(BOOL);
 	o.queuePriority = NSOperationQueuePriorityVeryLow;
 	[requestQueue addOperation:o];
 	return o;
+}
+
+- (NSString *)userAgent
+{
+	NSString *currentAppVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
+	return [NSString stringWithFormat:@"HouseTrip-Trailer-v%@-iOS",currentAppVersion];
+#else
+	return [NSString stringWithFormat:@"HouseTrip-Trailer-v%@-OSX",currentAppVersion];
+#endif
 }
 
 - (void)networkIndicationStart

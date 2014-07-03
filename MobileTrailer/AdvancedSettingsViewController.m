@@ -263,7 +263,7 @@ NSString *B(NSString *input)
 			{
 				// seconds
 				NSInteger count=0;
-				for(NSInteger f=30;f<3600;f+=10)
+				for(NSInteger f=60;f<3600;f+=10)
 				{
 					if(f==[Settings shared].refreshPeriod) previousValue = count;
 					[values addObject:[NSString stringWithFormat:@"%ld seconds",(long)f]];
@@ -519,7 +519,7 @@ NSString *B(NSString *input)
 	{
 		if(selectedIndexPath.row==0)
 		{
-			[Settings shared].refreshPeriod = indexPath.row*10+30;
+			[Settings shared].refreshPeriod = indexPath.row*10+60;
 		}
 		else if(selectedIndexPath.row==1)
 		{
