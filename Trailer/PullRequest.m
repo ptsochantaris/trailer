@@ -88,6 +88,7 @@ static NSDateFormatter *itemDateFormatter;
 
 	if(!self.latestReadCommentDate) self.latestReadCommentDate = [NSDate distantPast];
 
+	
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
 	f.returnsObjectsAsFaults = NO;
 
