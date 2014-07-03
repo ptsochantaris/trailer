@@ -7,6 +7,21 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.0.30</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Tweaks to API access defaults and minimums to place less stress on the Github API, please use Trailer responsibly!</li>
+				<li>Corrected an issue that would mark the current user's comments as part of the unread comments in a PR</li>
+				</ul></font>]]></description>
+			<pubDate>Thu, 3 Jul 2014 20:00:00 +0000</pubDate>
+			<enclosure
+			url="http://dev.housetrip.com/trailer/trailer1028.zip"
+			sparkle:version="1126"
+			sparkle:shortVersionString="1.0.30"
+			sparkle:dsaSignature="MC4CFQC22t370QiuTjoQFVw1Zg3nz+c3+QIVAMDPic95itoVCNY+DW1z0AbNRNdV"
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.0.28</title>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
 				<li>Added "mark all as read" keyboard shortcut</li>
