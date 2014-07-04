@@ -416,9 +416,9 @@ static AppDelegate *_static_shared_ref;
 		{
 			notification.title = @"New PR Comment";
 			notification.informativeText = [item body];
-			if(![Settings shared].hideAvatars)
+			if(![Settings shared].hideAvatars && [notification respondsToSelector:@selector(setContentImage:)])
 			{
-				notification.contentImage = [[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:[item avatarUrl]]];
+				[notification setContentImage:[[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:[item avatarUrl]]]];
 			}
 
 			PullRequest *associatedRequest = [PullRequest pullRequestWithUrl:[item pullRequestUrl] moc:self.dataManager.managedObjectContext];
@@ -671,7 +671,7 @@ static AppDelegate *_static_shared_ref;
 								@kPullRequestSectionMerged: [NSMutableArray arrayWithObject:mergedHeader],
 								@kPullRequestSectionClosed: [NSMutableArray arrayWithObject:closedHeader],
 								@kPullRequestSectionAll: [NSMutableArray arrayWithObject:allHeader],
-							   };
+								};
 
 	for(PullRequest *r in pullRequests)
 	{
@@ -894,7 +894,7 @@ static AppDelegate *_static_shared_ref;
 
 	[self.refreshDurationStepper setFloatValue:[Settings shared].refreshPeriod];
 	[self refreshDurationChanged:nil];
-	
+
 	[self.preferencesWindow setLevel:NSFloatingWindowLevel];
 	[self.preferencesWindow makeKeyAndOrderFront:self];
 }
@@ -1195,7 +1195,7 @@ static AppDelegate *_static_shared_ref;
 	frontEnd = [frontEnd stringByTrimmingCharactersInSet:cs];
 	backEnd = [backEnd stringByTrimmingCharactersInSet:cs];
 	path = [path stringByTrimmingCharactersInSet:cs];
-	
+
 	if(frontEnd.length==0) frontEnd = nil;
 	if(backEnd.length==0) backEnd = nil;
 	if(path.length==0) path = nil;
@@ -1422,9 +1422,9 @@ static AppDelegate *_static_shared_ref;
 	if(!self.statusItem) self.statusItem = [statusBar statusItemWithLength:NSVariableStatusItemLength];
 
 	self.statusItemView = [[StatusItemView alloc] initWithFrame:CGRectMake(0, 0, length, H)
-													  label:countString
-												 attributes:attributes
-												   delegate:self];
+														  label:countString
+													 attributes:attributes
+													   delegate:self];
 	self.statusItemView.highlighted = [self.mainMenu isVisible];
 	self.statusItemView.grayOut = self.isRefreshing;
 	self.statusItem.view = self.statusItemView;
