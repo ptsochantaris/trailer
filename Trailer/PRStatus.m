@@ -15,16 +15,17 @@
 + (PRStatus *)statusWithInfo:(NSDictionary *)info moc:(NSManagedObjectContext *)moc
 {
 	PRStatus *s = [DataItem itemWithInfo:info type:@"PRStatus" moc:moc];
+	if(s.postSyncAction.integerValue != kPostSyncDoNothing)
+	{
+		s.url = [info ofk:@"url"];
+		s.state = [info ofk:@"state"];
+		s.targetUrl = [info ofk:@"target_url"];
+		s.descriptionText = [info ofk:@"description"];
 
-	s.url = [info ofk:@"url"];
-	s.state = [info ofk:@"state"];
-	s.targetUrl = [info ofk:@"target_url"];
-	s.descriptionText = [info ofk:@"description"];
-
-	NSDictionary *userInfo = [info ofk:@"creator"];
-	s.userName = [userInfo ofk:@"login"];
-	s.userId = [userInfo ofk:@"id"];
-
+		NSDictionary *userInfo = [info ofk:@"creator"];
+		s.userName = [userInfo ofk:@"login"];
+		s.userId = [userInfo ofk:@"id"];
+	}
 	return s;
 }
 

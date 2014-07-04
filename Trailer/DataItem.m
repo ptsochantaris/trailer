@@ -6,9 +6,9 @@
 @dynamic createdAt;
 @dynamic updatedAt;
 
-static NSDateFormatter *_syncDateFormatter;
+NSDateFormatter *_syncDateFormatter;
 
-+ (void)initialize
++ (void)load
 {
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
@@ -48,18 +48,19 @@ static NSDateFormatter *_syncDateFormatter;
 		existingItem.serverId = serverId;
 		existingItem.createdAt = [_syncDateFormatter dateFromString:[info ofk:@"created_at"]];
 		existingItem.postSyncAction = @(kPostSyncNoteNew);
+		existingItem.updatedAt = updatedDate;
 	}
-	else if([updatedDate compare:existingItem.updatedAt]==NSOrderedDescending)
+	else if(![updatedDate isEqual:existingItem.updatedAt])
 	{
 		DLog(@"Updating existing %@: %@",type,serverId);
 		existingItem.postSyncAction = @(kPostSyncNoteUpdated);
+		existingItem.updatedAt = updatedDate;
 	}
 	else
 	{
 		DLog(@"Skipping %@: %@",type,serverId);
 		existingItem.postSyncAction = @(kPostSyncDoNothing);
 	}
-	existingItem.updatedAt = updatedDate;
 	return existingItem;
 }
 

@@ -383,6 +383,42 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#define RECEIVED_EVENT_ETAG @"RECEIVED_EVENT_ETAG"
+- (NSString *)latestReceivedEventEtag { return [[NSUserDefaults standardUserDefaults] stringForKey:RECEIVED_EVENT_ETAG]; }
+- (void)setLatestReceivedEventEtag:(NSString *)latestReceivedEventEtag { [self storeDefaultValue:latestReceivedEventEtag forKey:RECEIVED_EVENT_ETAG]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define RECEIVED_LATEST_EVENT_DATE @"RECEIVED_LATEST_EVENT_DATE"
+- (NSDate *)latestReceivedEventDateProcessed
+{
+	NSDate *d = [[NSUserDefaults standardUserDefaults] objectForKey:RECEIVED_LATEST_EVENT_DATE];
+	if(!d) d = [NSDate distantPast];
+	return d;
+}
+- (void)setLatestReceivedEventDateProcessed:(NSString *)latestReceivedEventDateProcessed
+{ [self storeDefaultValue:latestReceivedEventDateProcessed forKey:RECEIVED_LATEST_EVENT_DATE]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define LATEST_USER_EVENT_ETAG @"LATEST_USER_EVENT_ETAG"
+- (NSString *)latestUserEventEtag { return [[NSUserDefaults standardUserDefaults] stringForKey:LATEST_USER_EVENT_ETAG]; }
+- (void)setLatestUserEventEtag:(NSString *)latestUserEventEtag { [self storeDefaultValue:latestUserEventEtag forKey:LATEST_USER_EVENT_ETAG]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define LATEST_USER_EVENT_DATE @"LATEST_USER_EVENT_DATE"
+- (NSDate *)latestUserEventDateProcessed
+{
+	NSDate *d = [[NSUserDefaults standardUserDefaults] objectForKey:LATEST_USER_EVENT_DATE];
+	if(!d) d = [NSDate distantPast];
+	return d;
+}
+- (void)setLatestUserEventDateProcessed:(NSString *)setLatestUserEventDateProcessed
+{ [self storeDefaultValue:setLatestUserEventDateProcessed forKey:LATEST_USER_EVENT_DATE]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #define API_FRONTEND_SERVER @"API_FRONTEND_SERVER"
 - (NSString *)apiFrontEnd
 {

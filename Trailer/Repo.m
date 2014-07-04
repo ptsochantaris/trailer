@@ -5,13 +5,18 @@
 @dynamic fork;
 @dynamic webUrl;
 @dynamic hidden;
+@dynamic dirty;
 
 + (Repo*)repoWithInfo:(NSDictionary*)info moc:(NSManagedObjectContext*)moc
 {
 	Repo *r = [DataItem itemWithInfo:info type:@"Repo" moc:moc];
-	r.fullName = [info ofk:@"full_name"];
-	r.fork = @([[info ofk:@"fork"] boolValue]);
-	r.webUrl = [info ofk:@"html_url"];
+	if(r.postSyncAction.integerValue != kPostSyncDoNothing)
+	{
+		r.fullName = [info ofk:@"full_name"];
+		r.fork = @([[info ofk:@"fork"] boolValue]);
+		r.webUrl = [info ofk:@"html_url"];
+		r.dirty = @(YES);
+	}
 	return r;
 }
 
@@ -39,11 +44,28 @@
 	return [moc executeFetchRequest:f error:nil];
 }
 
++ (NSArray *)dirtyReposInMoc:(NSManagedObjectContext *)moc
+{
+	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"Repo"];
+	f.returnsObjectsAsFaults = NO;
+	f.predicate = [NSPredicate predicateWithFormat:@"dirty = YES"];
+	return [moc executeFetchRequest:f error:nil];
+}
+
 + (NSUInteger)countVisibleReposInMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"Repo"];
 	f.predicate = [NSPredicate predicateWithFormat:@"hidden = NO"];
 	return [moc countForFetchRequest:f error:nil];
+}
+
++ (void)markDirtyReposWithIds:(NSSet *)ids inMoc:(NSManagedObjectContext *)moc
+{
+	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"Repo"];
+	f.returnsObjectsAsFaults = NO;
+	f.predicate = [NSPredicate predicateWithFormat:@"serverId IN %@",ids];
+	NSArray *repos = [moc executeFetchRequest:f error:nil];
+	for(Repo *r in repos) r.dirty = @(YES);
 }
 
 @end
