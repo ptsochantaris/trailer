@@ -32,8 +32,19 @@ static AppDelegate *_static_shared_ref;
 	[self setupSortMethodMenu];
 
 	// ONLY FOR DEBUG!
-	//NSArray *allRepos = [PullRequest allItemsOfType:@"Repo" inMoc:self.dataManager.managedObjectContext];
-    //[self.dataManager.managedObjectContext deleteObject:[allRepos objectAtIndex:0]];
+	/*
+	NSArray *allPRs = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.dataManager.managedObjectContext];
+	PullRequest *firstPr = allPRs[2];
+	firstPr.updatedAt = [NSDate distantPast];
+
+	Repo *r = [Repo itemOfType:@"Repo" serverId:firstPr.repoId moc:self.dataManager.managedObjectContext];
+	r.updatedAt = [NSDate distantPast];
+
+	NSString *prUrl = firstPr.url;
+	NSArray *allCommentsForFirstPr = [PRComment commentsForPullRequestUrl:prUrl inMoc:self.dataManager.managedObjectContext];
+    [self.dataManager.managedObjectContext deleteObject:[allCommentsForFirstPr objectAtIndex:0]];
+	 */
+	// ONLY FOR DEBUG!
 
 	[self.dataManager postProcessAllPrs];
 
@@ -464,7 +475,7 @@ static AppDelegate *_static_shared_ref;
 	{
 		PRComment *c = (PRComment *)item;
 		[self.api haveCachedImage:c.avatarUrl
-						  forSize:CGSizeMake(AVATAR_SIZE,AVATAR_SIZE)
+						  forSize:CGSizeMake(AVATAR_SIZE, AVATAR_SIZE)
 			   tryLoadAndCallback:^(NSImage *image) {
 				   notification.contentImage = image;
 				   [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];

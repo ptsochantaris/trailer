@@ -14,9 +14,8 @@
 	{
 		self.imageAlignment = NSImageAlignCenter;
 		self.imageScaling = NSImageScaleNone;
-
         if(![[AppDelegate shared].api haveCachedImage:urlPath
-                                              forSize:CGSizeMake(frameRect.size.width, frameRect.size.height)
+                                              forSize:frameRect.size
                                    tryLoadAndCallback:^(id image) {
                                        self.image = image;
                                        [self done];
