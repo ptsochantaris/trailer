@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="5064" systemVersion="13C1021" minimumToolsVersion="Xcode 4.5" macOSVersion="Automatic" iOSVersion="Automatic">
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="5064" systemVersion="13D65" minimumToolsVersion="Xcode 4.5" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="PRComment" representedClassName="PRComment" syncable="YES">
+        <attribute name="avatarUrl" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="body" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="createdAt" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="path" optional="YES" attributeType="String" syncable="YES"/>
@@ -68,7 +69,7 @@
         <attribute name="webUrl" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <elements>
-        <element name="PRComment" positionX="0" positionY="0" width="128" height="225"/>
+        <element name="PRComment" positionX="0" positionY="0" width="128" height="240"/>
         <element name="PRStatus" positionX="0" positionY="0" width="128" height="208"/>
         <element name="PullRequest" positionX="0" positionY="0" width="128" height="463"/>
         <element name="Repo" positionX="0" positionY="0" width="128" height="165"/>
