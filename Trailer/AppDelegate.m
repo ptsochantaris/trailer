@@ -416,11 +416,6 @@ static AppDelegate *_static_shared_ref;
 		{
 			notification.title = @"New PR Comment";
 			notification.informativeText = [item body];
-			if(![Settings shared].hideAvatars && [notification respondsToSelector:@selector(setContentImage:)])
-			{
-				[notification setContentImage:[[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:[item avatarUrl]]]];
-			}
-
 			PullRequest *associatedRequest = [PullRequest pullRequestWithUrl:[item pullRequestUrl] moc:self.dataManager.managedObjectContext];
 			notification.subtitle = associatedRequest.title;
 			break;
@@ -463,7 +458,22 @@ static AppDelegate *_static_shared_ref;
 		}
 	}
 
-	[[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
+	if((type==kNewComment || type==kNewMention) &&
+	   ![Settings shared].hideAvatars &&
+	   [notification respondsToSelector:@selector(setContentImage:)]) // let's add an avatar on this!
+	{
+		PRComment *c = (PRComment *)item;
+		[self.api haveCachedImage:c.avatarUrl
+						  forSize:CGSizeMake(AVATAR_SIZE,AVATAR_SIZE)
+			   tryLoadAndCallback:^(NSImage *image) {
+				   notification.contentImage = image;
+				   [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
+			   }];
+	}
+	else // proceed as normal
+	{
+		[[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
+	}
 }
 
 - (void)prItemSelected:(PRItemView *)item alternativeSelect:(BOOL)isAlternative
