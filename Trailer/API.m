@@ -1072,10 +1072,18 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 - (NSString *)userAgent
 {
 	NSString *currentAppVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
-#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
-	return [NSString stringWithFormat:@"HouseTrip-Trailer-v%@-iOS",currentAppVersion];
+#ifdef DEBUG
+	#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
+		return [NSString stringWithFormat:@"HouseTrip-Trailer-v%@-iOS-Development",currentAppVersion];
+	#else
+		return [NSString stringWithFormat:@"HouseTrip-Trailer-v%@-OSX-Development",currentAppVersion];
+	#endif
 #else
-	return [NSString stringWithFormat:@"HouseTrip-Trailer-v%@-OSX",currentAppVersion];
+	#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
+		return [NSString stringWithFormat:@"HouseTrip-Trailer-v%@-iOS-Release",currentAppVersion];
+	#else
+		return [NSString stringWithFormat:@"HouseTrip-Trailer-v%@-OSX-Release",currentAppVersion];
+	#endif
 #endif
 }
 

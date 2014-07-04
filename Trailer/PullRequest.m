@@ -68,10 +68,11 @@ static NSDateFormatter *itemDateFormatter;
 		p.reviewCommentLink = [[linkInfo ofk:@"review_comments"] ofk:@"href"];
 		p.statusesLink = [[linkInfo ofk:@"statuses"] ofk:@"href"];
 		p.issueUrl = [[linkInfo ofk:@"issue"] ofk:@"href"];
-
-		p.reopened = @(p.condition.integerValue == kPullRequestConditionClosed);
-		p.condition = @kPullRequestConditionOpen;
 	}
+
+	p.reopened = @(p.condition.integerValue == kPullRequestConditionClosed);
+	p.condition = @kPullRequestConditionOpen;
+
 	return p;
 }
 
