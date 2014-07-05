@@ -384,12 +384,12 @@
 #define LAST_RUN_VERSION_KEY @"LAST_RUN_VERSION"
 - (void)versionBumpComplete
 {
-	NSString *currentAppVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+	NSString *currentAppVersion = [AppDelegate shared].currentAppVersion;
 	[[NSUserDefaults standardUserDefaults] setObject:currentAppVersion forKey:LAST_RUN_VERSION_KEY];
 }
 - (BOOL)versionBumpOccured
 {
-	NSString *currentAppVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+	NSString *currentAppVersion = [AppDelegate shared].currentAppVersion;
 	return !([[[NSUserDefaults standardUserDefaults] objectForKey:LAST_RUN_VERSION_KEY] isEqualToString:currentAppVersion]);
 }
 

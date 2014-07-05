@@ -1085,7 +1085,7 @@ Enter to select and ⌘, for preferences.
                     <popUpButton appearanceType="lightContent" horizontalHuggingPriority="750" verticalHuggingPriority="750" id="pTb-UR-Euf">
                         <rect key="frame" x="11" y="681" width="22" height="26"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <popUpButtonCell key="cell" type="disclosure" bezelStyle="roundedDisclosure" imagePosition="only" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" id="j86-0c-T7i">
+                        <popUpButtonCell key="cell" type="disclosure" title=" Mark All As Read" bezelStyle="roundedDisclosure" imagePosition="only" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="HVf-zs-7iK" id="j86-0c-T7i">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="menu"/>
                             <menu key="menu" title="Options" showsStateColumn="NO" id="TJQ-rB-fHm">
@@ -1095,7 +1095,7 @@ Enter to select and ⌘, for preferences.
                                             <action selector="refreshNowSelected:" target="494" id="AiB-dg-t4e"/>
                                         </connections>
                                     </menuItem>
-                                    <menuItem title=" Mark All As Read" keyEquivalent="a" id="HVf-zs-7iK">
+                                    <menuItem title=" Mark All As Read" state="on" keyEquivalent="a" id="HVf-zs-7iK">
                                         <modifierMask key="keyEquivalentModifierMask" control="YES" option="YES" command="YES"/>
                                         <connections>
                                             <action selector="markAllReadSelected:" target="494" id="vWk-YR-lXO"/>

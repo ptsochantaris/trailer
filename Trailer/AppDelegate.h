@@ -97,6 +97,8 @@
 @property (nonatomic, readonly) BOOL menuIsOpen;
 @property (nonatomic) long highlightedPrIndex;
 @property (nonatomic) float scrollBarWidth;
+@property (nonatomic) NSString *currentAppVersion;
+
 
 + (AppDelegate*)shared;
 

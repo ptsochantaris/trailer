@@ -977,7 +977,15 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 
 		NSError *error;
 		NSHTTPURLResponse *response;
+
+#ifdef DEBUG
+		NSDate *startTime = [NSDate date];
+#endif
 		NSData *data = [NSURLConnection sendSynchronousRequest:r returningResponse:&response error:&error];
+#ifdef DEBUG
+		NSTimeInterval networkTime = [[NSDate date] timeIntervalSinceDate:startTime];
+#endif
+
 		id parsedData = nil;
 		if(data.length) parsedData = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
 
@@ -997,7 +1005,7 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 		}
 		else
 		{
-			DLog(@"GET %@ - RESULT: %ld",expandedPath,(long)response.statusCode);
+			DLog(@"GET %@ - RESULT: %ld, %f sec.",expandedPath,(long)response.statusCode,networkTime);
 			if(successCallback)
 			{
 				dispatch_async(dispatch_get_main_queue(), ^{
@@ -1040,7 +1048,7 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 		}
 		if(error)
 		{
-			DLog(@"GET IMAGE %@ - FAILED: %@",path,error);
+			//DLog(@"IMAGE %@ - FAILED: %@",path,error);
 			if(failureCallback)
 			{
                 failureCallback(response, error);
@@ -1048,7 +1056,7 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 		}
 		else
 		{
-			DLog(@"GET IMAGE %@ - RESULT: %ld",path,(long)response.statusCode);
+			//DLog(@"IMAGE %@ - RESULT: %ld",path,(long)response.statusCode);
 			if(successCallback)
 			{
 				if(data.length)
@@ -1071,18 +1079,17 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 
 - (NSString *)userAgent
 {
-	NSString *currentAppVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
 #ifdef DEBUG
 	#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
-		return [NSString stringWithFormat:@"HouseTrip-Trailer-v%@-iOS-Development",currentAppVersion];
+		return [NSString stringWithFormat:@"HouseTrip-Trailer-v%@-iOS-Development",[AppDelegate shared].currentAppVersion];
 	#else
-		return [NSString stringWithFormat:@"HouseTrip-Trailer-v%@-OSX-Development",currentAppVersion];
+		return [NSString stringWithFormat:@"HouseTrip-Trailer-v%@-OSX-Development",[AppDelegate shared].currentAppVersion];
 	#endif
 #else
 	#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
-		return [NSString stringWithFormat:@"HouseTrip-Trailer-v%@-iOS-Release",currentAppVersion];
+		return [NSString stringWithFormat:@"HouseTrip-Trailer-v%@-iOS-Release",[AppDelegate shared].currentAppVersion];
 	#else
-		return [NSString stringWithFormat:@"HouseTrip-Trailer-v%@-OSX-Release",currentAppVersion];
+		return [NSString stringWithFormat:@"HouseTrip-Trailer-v%@-OSX-Release",[AppDelegate shared].currentAppVersion];
 	#endif
 #endif
 }
@@ -1145,12 +1152,11 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
      tryLoadAndCallback:(void (^)(IMAGE_CLASS *image))callbackOrNil
 {
     // mix image path, size, and app version into one md5
-	NSString *currentAppVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
     NSString *imageKey = [[NSString stringWithFormat:@"%@ %f %f %@",
                            path,
                            imageSize.width,
                            imageSize.height,
-                           currentAppVersion] md5hash];
+                           [AppDelegate shared].currentAppVersion] md5hash];
 
 #ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
     NSString *imagePath = [cacheDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"imgcache-%@-%ld", imageKey, (long)GLOBAL_SCREEN_SCALE]];
