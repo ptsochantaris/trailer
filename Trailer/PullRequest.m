@@ -311,7 +311,7 @@ static NSDateFormatter *itemDateFormatter;
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PullRequest"];
 	f.returnsObjectsAsFaults = NO;
-	f.predicate = [NSPredicate predicateWithFormat:@"serverId == %@",repoId];
+	f.predicate = [NSPredicate predicateWithFormat:@"repoId == %@",repoId];
 	return [moc executeFetchRequest:f error:nil];
 }
 
