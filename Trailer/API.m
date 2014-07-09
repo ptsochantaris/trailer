@@ -996,7 +996,7 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 		}
 		if(error)
 		{
-			DLog(@"GET %@ - FAILED: %@",expandedPath,error);
+			DLog(@"GET %@ - FAILED: %@",expandedPath,error.localizedDescription);
 			if(failureCallback)
 			{
 				dispatch_async(dispatch_get_main_queue(), ^{
