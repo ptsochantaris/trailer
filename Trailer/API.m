@@ -494,7 +494,7 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 				 }
 				 return NO;
 			 } finalCallback:^(BOOL success, NSInteger resultCode, NSString *etag) {
-				 if(success) successfulSync_latestReceivedEventEtag = etag;
+				 successfulSync_latestReceivedEventEtag = etag;
 				 CALLBACK(success);
 			 }];
 }
@@ -534,7 +534,7 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 				 }
 				 return NO;
 			 } finalCallback:^(BOOL success, NSInteger resultCode, NSString *etag) {
-				 if(success) successfulSync_latestUserEventEtag = etag;
+				 successfulSync_latestUserEventEtag = etag;
 				 CALLBACK(success);
 			 }];
 }
@@ -838,7 +838,7 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 				}
 				else
 				{
-					finalCallback(NO, resultCode, nil);
+					finalCallback((resultCode==304), resultCode, etag);
 				}
 			}];
 }
@@ -865,8 +865,9 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 															userInfo:nil];
 		  CALLBACK(data, [API lastPage:response], response.statusCode, allHeaders[@"Etag"]);
 	  } failure:^(NSHTTPURLResponse *response, id data, NSError *error) {
-		  DLog(@"Failure for %@: %@",path,error);
-		  CALLBACK(nil, NO, response.statusCode, nil);
+		  NSInteger code = response.statusCode;
+		  if(code==304) DLog(@"No change reported (304)"); else DLog(@"Failure for %@: %@",path,error);
+		  CALLBACK(nil, NO, code, nil);
 	  }];
 }
 
