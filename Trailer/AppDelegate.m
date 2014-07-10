@@ -105,7 +105,7 @@ static AppDelegate *_static_shared_ref;
 	NSMenu *m = [[NSMenu alloc] initWithTitle:@"Sorting"];
 	if([Settings shared].sortDescending)
 	{
-		[m addItemWithTitle:@"Newest First" action:@selector(sortMethodChanged:) keyEquivalent:@""];
+		[m addItemWithTitle:@"Youngest First" action:@selector(sortMethodChanged:) keyEquivalent:@""];
 		[m addItemWithTitle:@"Most Recently Active" action:@selector(sortMethodChanged:) keyEquivalent:@""];
 		[m addItemWithTitle:@"Reverse Alphabetically" action:@selector(sortMethodChanged:) keyEquivalent:@""];
 	}
