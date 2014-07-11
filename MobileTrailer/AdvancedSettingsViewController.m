@@ -35,7 +35,7 @@
 
 #define TOTAL_SECTIONS 8
 
-#define SORT_REVERSE @[@"Newest first",@"Most recently active",@"Reverse alphabetically"]
+#define SORT_REVERSE @[@"Youngest first",@"Most recently active",@"Reverse alphabetically"]
 #define SORT_NORMAL @[@"Oldest first",@"Inactive for longest",@"Alphabetically"]
 #define PR_HANDLING_POLICY @[@"Keep My Own",@"Keep All",@"Don't Keep"]
 

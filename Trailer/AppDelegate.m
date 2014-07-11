@@ -18,6 +18,8 @@ static AppDelegate *_static_shared_ref;
 	//NSString *appDomain = [[NSBundle mainBundle] bundleIdentifier];
 	//[[NSUserDefaults standardUserDefaults] removePersistentDomainForName:appDomain];
 
+	self.currentAppVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+
 	self.mainMenu.backgroundColor = [COLOR_CLASS whiteColor];
 
 	self.filterTimer = [[HTPopTimer alloc] initWithTimeInterval:0.2 target:self selector:@selector(filterTimerPopped)];
@@ -59,8 +61,7 @@ static AppDelegate *_static_shared_ref;
 
 	[[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate:self];
 
-	NSString *currentAppVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
-	currentAppVersion = [@"Version " stringByAppendingString:currentAppVersion];
+	NSString *currentAppVersion = [@"Version " stringByAppendingString:self.currentAppVersion];
 	[self.versionNumber setStringValue:currentAppVersion];
 	[self.aboutVersion setStringValue:currentAppVersion];
 
@@ -104,7 +105,7 @@ static AppDelegate *_static_shared_ref;
 	NSMenu *m = [[NSMenu alloc] initWithTitle:@"Sorting"];
 	if([Settings shared].sortDescending)
 	{
-		[m addItemWithTitle:@"Newest First" action:@selector(sortMethodChanged:) keyEquivalent:@""];
+		[m addItemWithTitle:@"Youngest First" action:@selector(sortMethodChanged:) keyEquivalent:@""];
 		[m addItemWithTitle:@"Most Recently Active" action:@selector(sortMethodChanged:) keyEquivalent:@""];
 		[m addItemWithTitle:@"Reverse Alphabetically" action:@selector(sortMethodChanged:) keyEquivalent:@""];
 	}

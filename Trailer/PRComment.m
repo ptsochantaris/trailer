@@ -17,23 +17,24 @@
 + (PRComment *)commentWithInfo:(NSDictionary *)info moc:(NSManagedObjectContext *)moc
 {
 	PRComment *c = [DataItem itemWithInfo:info type:@"PRComment" moc:moc];
+	if(c.postSyncAction.integerValue != kPostSyncDoNothing)
+	{
+		c.body = [info ofk:@"body"];
+		c.position = [info ofk:@"position"];
+		c.path = [info ofk:@"path"];
+		c.url = [info ofk:@"url"];
+		c.webUrl = [info ofk:@"html_url"];
 
-	c.body = [info ofk:@"body"];
-	c.position = [info ofk:@"position"];
-	c.path = [info ofk:@"path"];
-	c.url = [info ofk:@"url"];
-	c.webUrl = [info ofk:@"html_url"];
+		NSDictionary *userInfo = [info ofk:@"user"];
+		c.userName = [userInfo ofk:@"userName"];
+		c.userId = [userInfo ofk:@"id"];
+		c.avatarUrl = [userInfo ofk:@"avatar_url"];
 
-	NSDictionary *userInfo = [info ofk:@"user"];
-	c.userName = [userInfo ofk:@"userName"];
-	c.userId = [userInfo ofk:@"id"];
-	c.avatarUrl = [userInfo ofk:@"avatar_url"];
-
-	NSDictionary *links = [info ofk:@"links"];
-	c.url = [[links ofk:@"self"] ofk:@"href"];
-	c.pullRequestUrl = [[links ofk:@"pull_request"] ofk:@"href"];
-	if(!c.webUrl) c.webUrl = [[links ofk:@"html"] ofk:@"href"];
-
+		NSDictionary *links = [info ofk:@"links"];
+		c.url = [[links ofk:@"self"] ofk:@"href"];
+		c.pullRequestUrl = [[links ofk:@"pull_request"] ofk:@"href"];
+		if(!c.webUrl) c.webUrl = [[links ofk:@"html"] ofk:@"href"];
+	}
 	return c;
 }
 

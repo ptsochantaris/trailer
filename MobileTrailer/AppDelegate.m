@@ -16,6 +16,8 @@ CGFloat GLOBAL_SCREEN_SCALE;
 {
 	_static_shared_ref = self;
 
+	self.currentAppVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+
 	self.enteringForeground = YES;
 
 	// Useful snippet for resetting prefs when testing

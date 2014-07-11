@@ -43,30 +43,32 @@ static NSDateFormatter *itemDateFormatter;
 + (PullRequest *)pullRequestWithInfo:(NSDictionary *)info moc:(NSManagedObjectContext *)moc
 {
 	PullRequest *p = [DataItem itemWithInfo:info type:@"PullRequest" moc:moc];
+	if(p.postSyncAction.integerValue != kPostSyncDoNothing)
+	{
+		p.url = [info ofk:@"url"];
+		p.webUrl = [info ofk:@"html_url"];
+		p.number = [info ofk:@"number"];
+		p.state = [info ofk:@"state"];
+		p.title = [info ofk:@"title"];
+		p.body = [info ofk:@"body"];
 
-	p.url = [info ofk:@"url"];
-	p.webUrl = [info ofk:@"html_url"];
-	p.number = [info ofk:@"number"];
-	p.state = [info ofk:@"state"];
-	p.title = [info ofk:@"title"];
-	p.body = [info ofk:@"body"];
+		NSNumber *m = [info ofk:@"mergeable"];
+		if(!m) m = @YES;
+		p.mergeable = m;
 
-	NSNumber *m = [info ofk:@"mergeable"];
-	if(!m) m = @YES;
-	p.mergeable = m;
+		NSDictionary *userInfo = [info ofk:@"user"];
+		p.userId = [userInfo ofk:@"id"];
+		p.userLogin = [userInfo ofk:@"login"];
+		p.userAvatarUrl = [userInfo ofk:@"avatar_url"];
 
-	NSDictionary *userInfo = [info ofk:@"user"];
-	p.userId = [userInfo ofk:@"id"];
-	p.userLogin = [userInfo ofk:@"login"];
-	p.userAvatarUrl = [userInfo ofk:@"avatar_url"];
+		p.repoId = [[[info ofk:@"base"] ofk:@"repo"] ofk:@"id"];
 
-	p.repoId = [[[info ofk:@"base"] ofk:@"repo"] ofk:@"id"];
-
-	NSDictionary *linkInfo = [info ofk:@"_links"];
-	p.issueCommentLink = [[linkInfo ofk:@"comments"] ofk:@"href"];
-	p.reviewCommentLink = [[linkInfo ofk:@"review_comments"] ofk:@"href"];
-	p.statusesLink = [[linkInfo ofk:@"statuses"] ofk:@"href"];
-	p.issueUrl = [[linkInfo ofk:@"issue"] ofk:@"href"];
+		NSDictionary *linkInfo = [info ofk:@"_links"];
+		p.issueCommentLink = [[linkInfo ofk:@"comments"] ofk:@"href"];
+		p.reviewCommentLink = [[linkInfo ofk:@"review_comments"] ofk:@"href"];
+		p.statusesLink = [[linkInfo ofk:@"statuses"] ofk:@"href"];
+		p.issueUrl = [[linkInfo ofk:@"issue"] ofk:@"href"];
+	}
 
 	p.reopened = @(p.condition.integerValue == kPullRequestConditionClosed);
 	p.condition = @kPullRequestConditionOpen;
@@ -303,6 +305,14 @@ static NSDateFormatter *itemDateFormatter;
 	f.fetchLimit = 1;
 	f.predicate = [NSPredicate predicateWithFormat:@"url == %@",url];
 	return [[moc executeFetchRequest:f error:nil] lastObject];
+}
+
++ (NSArray *)pullRequestsForRepoId:(NSNumber *)repoId inMoc:(NSManagedObjectContext *)moc
+{
+	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PullRequest"];
+	f.returnsObjectsAsFaults = NO;
+	f.predicate = [NSPredicate predicateWithFormat:@"repoId == %@",repoId];
+	return [moc executeFetchRequest:f error:nil];
 }
 
 - (void)catchUpWithComments

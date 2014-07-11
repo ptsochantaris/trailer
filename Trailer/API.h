@@ -1,6 +1,6 @@
 
 #define TRAILER_GITHUB_REPO @"http://dev.housetrip.com/trailer/"
-#define LOW_API_WARNING 0.10
+#define LOW_API_WARNING 0.20
 
 typedef enum {
 	kNewComment = 0,

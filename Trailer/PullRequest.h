@@ -54,6 +54,8 @@
 
 + (NSFetchRequest *)requestForPullRequestsWithFilter:(NSString *)filter;
 
++ (NSArray *)pullRequestsForRepoId:(NSNumber *)repoId inMoc:(NSManagedObjectContext *)moc;
+
 + (NSArray *)allMergedRequestsInMoc:(NSManagedObjectContext *)moc;
 
 + (NSArray *)allClosedRequestsInMoc:(NSManagedObjectContext *)moc;

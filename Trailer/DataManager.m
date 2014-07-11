@@ -16,6 +16,11 @@
 			[self performVersionChangedTasks];
 			[self versionBumpComplete];
 		}
+
+		for(Repo *r in [Repo allItemsOfType:@"Repo" inMoc:self.managedObjectContext])
+		{
+			r.dirty = @(YES);
+		}
     }
     return self;
 }
@@ -224,6 +229,7 @@
             [fm removeItemAtPath:[documentsDirectory stringByAppendingPathComponent:file] error:nil];
         }
     }
+	[self wipeApiMarkers];
 }
 
 // Returns the managed object context for the application (which is already bound to the persistent store coordinator for the application.)
@@ -278,7 +284,17 @@
 
 		[tempMoc save:nil];
 	}
+	[self wipeApiMarkers];
 	[self saveDB];
+}
+
+- (void)wipeApiMarkers
+{
+	// because these control the DB state with the event feed, needs to be reset
+	[Settings shared].latestReceivedEventEtag = nil;
+	[Settings shared].latestReceivedEventDateProcessed = nil;
+	[Settings shared].latestUserEventEtag = nil;
+	[Settings shared].latestUserEventDateProcessed = nil;
 }
 
 - (NSDictionary *)infoForType:(PRNotificationType)type item:(id)item
@@ -368,12 +384,12 @@
 #define LAST_RUN_VERSION_KEY @"LAST_RUN_VERSION"
 - (void)versionBumpComplete
 {
-	NSString *currentAppVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+	NSString *currentAppVersion = [AppDelegate shared].currentAppVersion;
 	[[NSUserDefaults standardUserDefaults] setObject:currentAppVersion forKey:LAST_RUN_VERSION_KEY];
 }
 - (BOOL)versionBumpOccured
 {
-	NSString *currentAppVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+	NSString *currentAppVersion = [AppDelegate shared].currentAppVersion;
 	return !([[[NSUserDefaults standardUserDefaults] objectForKey:LAST_RUN_VERSION_KEY] isEqualToString:currentAppVersion]);
 }
 
