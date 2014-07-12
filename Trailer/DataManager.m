@@ -284,8 +284,9 @@
 
 		[tempMoc save:nil];
 	}
-	[self wipeApiMarkers];
 	[self saveDB];
+
+	[self wipeApiMarkers];
 }
 
 - (void)wipeApiMarkers

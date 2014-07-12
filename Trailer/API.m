@@ -1,4 +1,11 @@
 
+@interface SuccessfulSyncCommitData : NSObject
+@property (nonatomic) NSDate *latestReceivedEventDate, *latestUserEventDate;
+@property (nonatomic) NSString *latestReceivedEventEtag, *latestUserEventEtag;
+@end
+@implementation SuccessfulSyncCommitData
+@end
+
 @interface API ()
 {
 	NSOperationQueue *requestQueue;
@@ -9,9 +16,7 @@
 	NSInteger networkIndicationCount;
 #endif
 
-	// holders to commit on successful sync
-	NSDate *successfulSync_latestReceivedEventDate, *successfulSync_latestUserEventDate;
-	NSString *successfulSync_latestReceivedEventEtag, *successfulSync_latestUserEventEtag;
+	SuccessfulSyncCommitData *syncDataToCommit;
 }
 @end
 
@@ -38,6 +43,8 @@ typedef void (^completionBlockType)(BOOL);
 														  diskCapacity:CACHE_DISK
 															  diskPath:nil];
 		[NSURLCache setSharedURLCache:cache];
+
+		syncDataToCommit = [[SuccessfulSyncCommitData alloc] init];
 
 		mediumFormatter = [[NSDateFormatter alloc] init];
 		mediumFormatter.dateStyle = NSDateFormatterMediumStyle;
@@ -466,7 +473,8 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 	NSString *latestEtag = [Settings shared].latestReceivedEventEtag;
 	NSDate *latestDate = [Settings shared].latestReceivedEventDateProcessed;
 
-	successfulSync_latestReceivedEventDate = latestDate;
+	syncDataToCommit.latestReceivedEventDate = latestDate;
+	BOOL needFirstDateOnly = ([latestDate isEqualToDate:[NSDate distantPast]]);
 
 	[self getPagedDataInPath:[NSString stringWithFormat:@"/users/%@/received_events",[Settings shared].localUser]
 			startingFromPage:1
@@ -481,9 +489,14 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 						 DLog(@"New event at %@",eventDate);
 						 NSNumber *repoId = d[@"repo"][@"id"];
 						 if(repoId) [repoIdsToMarkDirty addObject:repoId];
-						 if([successfulSync_latestReceivedEventDate compare:eventDate]==NSOrderedAscending)
+						 if([syncDataToCommit.latestReceivedEventDate compare:eventDate]==NSOrderedAscending)
 						 {
-							 successfulSync_latestReceivedEventDate = eventDate;
+							 syncDataToCommit.latestReceivedEventDate = eventDate;
+							 if(needFirstDateOnly)
+							 {
+								 DLog(@"First sync, all repos are dirty so we don't need to read further, we have the latest received event date: %@",syncDataToCommit.latestReceivedEventDate);
+								 return YES;
+							 }
 						 }
 					 }
 					 else
@@ -494,7 +507,7 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 				 }
 				 return NO;
 			 } finalCallback:^(BOOL success, NSInteger resultCode, NSString *etag) {
-				 successfulSync_latestReceivedEventEtag = etag;
+				 syncDataToCommit.latestReceivedEventEtag = etag;
 				 CALLBACK(success);
 			 }];
 }
@@ -506,7 +519,8 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 	NSString *latestEtag = [Settings shared].latestUserEventEtag;
 	NSDate *latestDate = [Settings shared].latestUserEventDateProcessed;
 
-	successfulSync_latestUserEventDate = latestDate;
+	syncDataToCommit.latestUserEventDate = latestDate;
+	BOOL needFirstDateOnly = ([latestDate isEqualToDate:[NSDate distantPast]]);
 
 	[self getPagedDataInPath:[NSString stringWithFormat:@"/users/%@/events",[Settings shared].localUser]
 			startingFromPage:1
@@ -521,9 +535,14 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 						 DLog(@"New event at %@",eventDate);
 						 NSNumber *repoId = d[@"repo"][@"id"];
 						 if(repoId) [repoIdsToMarkDirty addObject:repoId];
-						 if([successfulSync_latestUserEventDate compare:eventDate]==NSOrderedAscending)
+						 if([syncDataToCommit.latestUserEventDate compare:eventDate]==NSOrderedAscending)
 						 {
-							 successfulSync_latestUserEventDate = eventDate;
+							 syncDataToCommit.latestUserEventDate = eventDate;
+							 if(needFirstDateOnly)
+							 {
+								 DLog(@"First sync, all repos are dirty so we don't need to read further, we have the latest user event date: %@",syncDataToCommit.latestUserEventDate);
+								 return YES;
+							 }
 						 }
 					 }
 					 else
@@ -534,7 +553,7 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 				 }
 				 return NO;
 			 } finalCallback:^(BOOL success, NSInteger resultCode, NSString *etag) {
-				 successfulSync_latestUserEventEtag = etag;
+				 syncDataToCommit.latestUserEventEtag = etag;
 				 CALLBACK(success);
 			 }];
 }
@@ -587,27 +606,27 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 				  }];
 }
 
-- (void)storeEventTags
+- (void)syncTransactionSucceeded
 {
-	if(successfulSync_latestReceivedEventDate)
+	if(syncDataToCommit.latestReceivedEventDate)
 	{
-		[Settings shared].latestReceivedEventDateProcessed = successfulSync_latestReceivedEventDate;
-		successfulSync_latestReceivedEventDate = nil;
+		[Settings shared].latestReceivedEventDateProcessed = syncDataToCommit.latestReceivedEventDate;
+		syncDataToCommit.latestReceivedEventDate = nil;
 	}
-	if(successfulSync_latestReceivedEventEtag)
+	if(syncDataToCommit.latestReceivedEventEtag)
 	{
-		[Settings shared].latestReceivedEventEtag = successfulSync_latestReceivedEventEtag;
-		successfulSync_latestReceivedEventEtag = nil;
+		[Settings shared].latestReceivedEventEtag = syncDataToCommit.latestReceivedEventEtag;
+		syncDataToCommit.latestReceivedEventEtag = nil;
 	}
-	if(successfulSync_latestUserEventDate)
+	if(syncDataToCommit.latestUserEventDate)
 	{
-		[Settings shared].latestUserEventDateProcessed = successfulSync_latestUserEventDate;
-		successfulSync_latestUserEventDate = nil;
+		[Settings shared].latestUserEventDateProcessed = syncDataToCommit.latestUserEventDate;
+		syncDataToCommit.latestUserEventDate = nil;
 	}
-	if(successfulSync_latestUserEventEtag)
+	if(syncDataToCommit.latestUserEventEtag)
 	{
-		[Settings shared].latestUserEventEtag = successfulSync_latestUserEventEtag;
-		successfulSync_latestUserEventEtag = nil;
+		[Settings shared].latestUserEventEtag = syncDataToCommit.latestUserEventEtag;
+		syncDataToCommit.latestUserEventEtag = nil;
 	}
 }
 
@@ -625,12 +644,12 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 		DLog(@"Database dirty after sync, saving");
 		NSError *error = nil;
 		[moc save:&error];
-		if(!error) [self storeEventTags];
+		if(!error) [self syncTransactionSucceeded];
 	}
 	else
 	{
 		DLog(@"No database changes after sync");
-		[self storeEventTags];
+		[self syncTransactionSucceeded];
 	}
 
 	if([Settings shared].showStatusItems)
