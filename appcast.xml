@@ -7,6 +7,24 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.0.32</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>User avatars in comment notifications (thanks @Timothee for the feature!)</li>
+				<li>Event-based API polling of repos, far reduced Github API queries, CPU use, and sync duration</li>
+				<li>Slightly reduced level at which user is warned of high API usage</li>
+				<li>Improved user agent reporting on API</li>
+				<li>Tweaked "youngest/oldest" sorting option names to hopefully make their purpose clearer</li>
+				</ul></font>]]></description>
+			<pubDate>Sat, 12 Jul 2014 10:00:00 +0000</pubDate>
+			<enclosure
+			url="http://dev.housetrip.com/trailer/trailer1032.zip"
+			sparkle:version="1130"
+			sparkle:shortVersionString="1.0.32"
+			sparkle:dsaSignature="MCwCFCtRSefYjoYgMk/raKLx8ywjgVOAAhR7ZWzszB1uEbE784mjCov70SNxZw=="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.0.30</title>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
 				<li>Tweaks to API access defaults and minimums to place less stress on the Github API, please use Trailer responsibly!</li>
