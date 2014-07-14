@@ -476,7 +476,7 @@ static AppDelegate *_static_shared_ref;
 	{
 		PRComment *c = (PRComment *)item;
 		[self.api haveCachedImage:c.avatarUrl
-						  forSize:CGSizeMake(AVATAR_SIZE, AVATAR_SIZE)
+						  forSize:CGSizeMake(NOTIFICATION_AVATAR_SIZE, NOTIFICATION_AVATAR_SIZE)
 			   tryLoadAndCallback:^(NSImage *image) {
 				   notification.contentImage = image;
 				   [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
