@@ -28,7 +28,7 @@
 		NSDictionary *userInfo = [info ofk:@"user"];
 		c.userName = [userInfo ofk:@"userName"];
 		c.userId = [userInfo ofk:@"id"];
-		c.avatarUrl = [userInfo ofk:@"avatar_url"];
+		c.avatarUrl = [(NSString *)[userInfo ofk:@"avatar_url"] stringByAppendingFormat:@"s=%.f", NOTIFICATION_AVATAR_SIZE];
 
 		NSDictionary *links = [info ofk:@"links"];
 		c.url = [[links ofk:@"self"] ofk:@"href"];

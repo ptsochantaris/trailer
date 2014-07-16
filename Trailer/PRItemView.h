@@ -1,5 +1,6 @@
 
 #define AVATAR_SIZE 26.0
+#define NOTIFICATION_AVATAR_SIZE 88.0
 #define LEFTPADDING 44.0
 
 #define PR_ITEM_FOCUSED_NOTIFICATION_KEY @"PrItemFocusedNotificationKey"

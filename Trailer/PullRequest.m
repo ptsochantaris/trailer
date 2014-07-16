@@ -59,7 +59,7 @@ static NSDateFormatter *itemDateFormatter;
 		NSDictionary *userInfo = [info ofk:@"user"];
 		p.userId = [userInfo ofk:@"id"];
 		p.userLogin = [userInfo ofk:@"login"];
-		p.userAvatarUrl = [userInfo ofk:@"avatar_url"];
+		p.userAvatarUrl = [(NSString *)[userInfo ofk:@"avatar_url"] stringByAppendingFormat:@"s=%.f", NOTIFICATION_AVATAR_SIZE];
 
 		p.repoId = [[[info ofk:@"base"] ofk:@"repo"] ofk:@"id"];
 
