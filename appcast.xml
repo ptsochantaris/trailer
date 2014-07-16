@@ -7,6 +7,21 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.0.33</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Updated app icon</li>
+				<li>Fix for observing the watchlist using the new sync mechanism</li>
+				</ul></font>]]></description>
+			<pubDate>Wed, 16 Jul 2014 15:00:00 +0000</pubDate>
+			<enclosure
+			url="http://dev.housetrip.com/trailer/trailer1033.zip"
+			sparkle:version="1131"
+			sparkle:shortVersionString="1.0.33"
+			sparkle:dsaSignature="MC0CFF2WIzWQGuSqExSCjWGQyXIrRXrMAhUAmpWnfaOqhNLtwN/B+HXpF+yKJ2s="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.0.32</title>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
 				<li>User avatars in comment notifications (thanks @Timothee for the feature!)</li>
