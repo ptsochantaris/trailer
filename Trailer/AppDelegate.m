@@ -970,7 +970,7 @@ static AppDelegate *_static_shared_ref;
 
 - (IBAction)showAllRepositoriesSelected:(NSButton *)sender
 {
-	for(Repo *r in [self getFilteredRepos]) r.hidden = @NO;
+	for(Repo *r in [self getFilteredRepos]) { r.hidden = @NO; r.dirty = @YES; }
 	self.preferencesDirty = YES;
 	[self.projectsTable reloadData];
 }
@@ -1118,7 +1118,9 @@ static AppDelegate *_static_shared_ref;
 	if(![self tableView:tableView isGroupRow:row])
 	{
 		Repo *r = [self repoForRow:row];
-		r.hidden = @([object boolValue]);
+		BOOL hide = [object boolValue];
+		r.hidden = @(hide);
+		r.dirty = @(!hide);
 	}
 	[self.dataManager saveDB];
 	self.preferencesDirty = YES;

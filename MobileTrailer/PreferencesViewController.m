@@ -188,7 +188,9 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	Repo *repo = [self.fetchedResultsController objectAtIndexPath:indexPath];
-	repo.hidden = @(!repo.hidden.boolValue);
+	BOOL hide = !repo.hidden.boolValue;
+	repo.hidden = @(hide);
+	repo.dirty = @(!hide);
 	[[AppDelegate shared].dataManager saveDB];
 	[tableView deselectRowAtIndexPath:indexPath animated:NO];
 	[AppDelegate shared].preferencesDirty = YES;
@@ -392,7 +394,7 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 		case 2:
 		{
 			NSArray *allRepos = self.fetchedResultsController.fetchedObjects;
-			for(Repo *r in allRepos) r.hidden = @NO;
+			for(Repo *r in allRepos) { r.hidden = @NO; r.dirty = @YES; }
 			break;
 		}
 	}

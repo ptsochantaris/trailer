@@ -22,7 +22,12 @@
 
 - (void)prepareForDeletion
 {
-    NSNumber *sid = self.serverId;
+    [self nukeChildren];
+}
+
+- (void)nukeChildren
+{
+	NSNumber *sid = self.serverId;
     if(sid)
     {
         NSManagedObjectContext *moc = self.managedObjectContext;
@@ -44,11 +49,19 @@
 	return [moc executeFetchRequest:f error:nil];
 }
 
++ (NSArray *)hiddenReposInMoc:(NSManagedObjectContext *)moc
+{
+	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"Repo"];
+	f.returnsObjectsAsFaults = NO;
+	f.predicate = [NSPredicate predicateWithFormat:@"hidden = YES"];
+	return [moc executeFetchRequest:f error:nil];
+}
+
 + (NSArray *)dirtyReposInMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"Repo"];
 	f.returnsObjectsAsFaults = NO;
-	f.predicate = [NSPredicate predicateWithFormat:@"dirty = YES"];
+	f.predicate = [NSPredicate predicateWithFormat:@"dirty = YES and hidden = NO"];
 	return [moc executeFetchRequest:f error:nil];
 }
 
@@ -65,7 +78,7 @@
 	f.returnsObjectsAsFaults = NO;
 	f.predicate = [NSPredicate predicateWithFormat:@"serverId IN %@",ids];
 	NSArray *repos = [moc executeFetchRequest:f error:nil];
-	for(Repo *r in repos) r.dirty = @(YES);
+	for(Repo *r in repos) r.dirty = @(!r.hidden.boolValue);
 }
 
 @end

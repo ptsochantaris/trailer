@@ -15,6 +15,10 @@
 
 + (NSArray *)dirtyReposInMoc:(NSManagedObjectContext *)moc;
 
++ (NSArray *)hiddenReposInMoc:(NSManagedObjectContext *)moc;
+
 + (void)markDirtyReposWithIds:(NSSet *)ids inMoc:(NSManagedObjectContext *)moc;
+
+- (void)nukeChildren;
 
 @end

@@ -589,6 +589,8 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 				  andCallback:^(BOOL success) {
 					  if(success)
 					  {
+						  NSArray *hiddenRepos = [Repo hiddenReposInMoc:moc];
+						  for(Repo *r in hiddenRepos) [r nukeChildren];
 						  [self fetchPullRequestsForRepos:[Repo dirtyReposInMoc:moc]
 													toMoc:moc
 											  andCallback:^(BOOL success) {
