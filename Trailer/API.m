@@ -590,7 +590,7 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 					  if(success)
 					  {
 						  NSArray *hiddenRepos = [Repo hiddenReposInMoc:moc];
-						  for(Repo *r in hiddenRepos) [r nukeChildren];
+						  for(Repo *r in hiddenRepos) [r removeAllRelatedPullRequests];
 						  [self fetchPullRequestsForRepos:[Repo dirtyReposInMoc:moc]
 													toMoc:moc
 											  andCallback:^(BOOL success) {

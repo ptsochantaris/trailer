@@ -296,6 +296,7 @@ static NSDateFormatter *itemDateFormatter;
         [PRComment removeCommentsWithPullRequestURL:self.url inMoc:moc];
         [PRStatus removeStatusesWithPullRequestId:sid inMoc:moc];
     }
+	[super prepareForDeletion];
 }
 
 + (PullRequest *)pullRequestWithUrl:(NSString *)url moc:(NSManagedObjectContext *)moc

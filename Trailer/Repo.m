@@ -22,10 +22,11 @@
 
 - (void)prepareForDeletion
 {
-    [self nukeChildren];
+    [self removeAllRelatedPullRequests];
+	[super prepareForDeletion];
 }
 
-- (void)nukeChildren
+- (void)removeAllRelatedPullRequests
 {
 	NSNumber *sid = self.serverId;
     if(sid)

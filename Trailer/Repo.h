@@ -19,6 +19,6 @@
 
 + (void)markDirtyReposWithIds:(NSSet *)ids inMoc:(NSManagedObjectContext *)moc;
 
-- (void)nukeChildren;
+- (void)removeAllRelatedPullRequests;
 
 @end
