@@ -9,6 +9,22 @@
 		<item>
 			<title>Version 1.0.33</title>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Improved avatar loading and appearance, especially in comment notifications</li>
+				<li>Database performance improvements</li>
+				<li>Small size reduction using optimised image assets</li>
+				</ul></font>]]></description>
+			<pubDate>Sat, 19 Jul 2014 10:00:00 +0000</pubDate>
+			<enclosure
+			url="http://dev.housetrip.com/trailer/trailer1034.zip"
+			sparkle:version="1132"
+			sparkle:shortVersionString="1.0.34"
+			sparkle:dsaSignature="MC0CFQCR+D7y4oA29EFgO8ZTLrc4NyOU1gIUZM4h7ZWCPhS7NvEe551BAfNDYoE="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
+			<title>Version 1.0.33</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
 				<li>Updated app icon</li>
 				<li>Fix for observing the watchlist using the new sync mechanism</li>
 				</ul></font>]]></description>
