@@ -32,8 +32,6 @@
 #import "PRCell.h"
 #import "HTPopTimer.h"
 #import "DataManager.h"
-#import "ImageFunctions.h"
-#import "UIImage+Scale.h"
 #import "EmptyView.h"
 #import "PickerViewController.h"
 #import "MasterViewController.h"

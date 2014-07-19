@@ -4,8 +4,6 @@
 static AppDelegate *_static_shared_ref;
 + (AppDelegate *)shared { return _static_shared_ref; }
 
-CGFloat GLOBAL_SCREEN_SCALE;
-
 - (void)applicationDidReceiveMemoryWarning:(UIApplication *)application
 {
 	DLog(@"Memory warning");
@@ -23,8 +21,6 @@ CGFloat GLOBAL_SCREEN_SCALE;
 	// Useful snippet for resetting prefs when testing
 	//NSString *appDomain = [[NSBundle mainBundle] bundleIdentifier];
 	//[[NSUserDefaults standardUserDefaults] removePersistentDomainForName:appDomain];
-
-	GLOBAL_SCREEN_SCALE = [UIScreen mainScreen].scale;
 
 	self.dataManager = [[DataManager alloc] init];
 	self.api = [[API alloc] init];

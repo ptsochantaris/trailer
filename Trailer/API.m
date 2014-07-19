@@ -14,6 +14,7 @@
 
 #ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
 	NSInteger networkIndicationCount;
+	CGFloat GLOBAL_SCREEN_SCALE;
 #endif
 
 	SuccessfulSyncCommitData *syncDataToCommit;
@@ -39,6 +40,9 @@ typedef void (^completionBlockType)(BOOL);
     self = [super init];
     if (self)
 	{
+#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
+		GLOBAL_SCREEN_SCALE = [UIScreen mainScreen].scale;
+#endif
 		NSURLCache *cache = [[NSURLCache alloc] initWithMemoryCapacity:CACHE_MEMORY
 														  diskCapacity:CACHE_DISK
 															  diskPath:nil];
@@ -1044,7 +1048,7 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 }
 
 // warning: now calls back on thread!!
-- (NSOperation *)getImage:(NSString *)path
+- (NSOperation *)getImage:(NSURL *)url
 				  success:(void(^)(NSHTTPURLResponse *response, NSData *imageData))successCallback
 				  failure:(void(^)(NSHTTPURLResponse *response, NSError *error))failureCallback
 {
@@ -1056,8 +1060,8 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 
 	NSBlockOperation *o = [NSBlockOperation blockOperationWithBlock:^{
 
-		NSMutableURLRequest *r = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:path]
-															  cachePolicy:NSURLRequestReturnCacheDataElseLoad
+		NSMutableURLRequest *r = [[NSMutableURLRequest alloc] initWithURL:url
+															  cachePolicy:NSURLRequestUseProtocolCachePolicy
 														  timeoutInterval:NETWORK_TIMEOUT];
 		[r setValue:[self userAgent] forHTTPHeaderField:@"User-Agent"];
 
@@ -1169,39 +1173,37 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
     }
 }
 
-- (BOOL)haveCachedImage:(NSString *)path
-                forSize:(CGSize)imageSize
-     tryLoadAndCallback:(void (^)(IMAGE_CLASS *image))callbackOrNil
+- (BOOL)haveCachedAvatar:(NSString *)path
+	  tryLoadAndCallback:(void (^)(IMAGE_CLASS *image))callbackOrNil
 {
-    // mix image path, size, and app version into one md5
-    NSString *imageKey = [[NSString stringWithFormat:@"%@ %f %f %@",
-                           path,
-                           imageSize.width,
-                           imageSize.height,
-                           [AppDelegate shared].currentAppVersion] md5hash];
-
+	NSURLComponents *c = [NSURLComponents componentsWithString:path];
 #ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
-    NSString *imagePath = [cacheDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"imgcache-%@-%ld", imageKey, (long)GLOBAL_SCREEN_SCALE]];
+	c.query = [NSString stringWithFormat:@"s=%.0f",40.0*GLOBAL_SCREEN_SCALE];
 #else
-    NSString *imagePath = [cacheDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"imgcache-%@", imageKey]];
+	c.query = [NSString stringWithFormat:@"s=%.0f",88.0];
 #endif
+	NSURL *imageURL = c.URL;
+    NSString *imageKey = [NSString stringWithFormat:@"%@ %@",
+						  imageURL.absoluteString,
+						  [AppDelegate shared].currentAppVersion];
+
+    NSString *cachePath = [cacheDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"imgcache-%@", [imageKey md5hash]]];
 
     NSFileManager *fileManager = [NSFileManager defaultManager];
-    if([fileManager fileExistsAtPath:imagePath])
+    if([fileManager fileExistsAtPath:cachePath])
     {
-		IMAGE_CLASS *ret;
 #ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
-		CFDataRef imgData = (__bridge CFDataRef)[NSData dataWithContentsOfFile:imagePath];
+		CFDataRef imgData = (__bridge CFDataRef)[NSData dataWithContentsOfFile:cachePath];
 		CGDataProviderRef imgDataProvider = CGDataProviderCreateWithCFData (imgData);
-		CGImageRef cfImage = CGImageCreateWithPNGDataProvider(imgDataProvider, NULL, false, kCGRenderingIntentDefault);
+		CGImageRef cfImage = CGImageCreateWithJPEGDataProvider(imgDataProvider, NULL, false, kCGRenderingIntentDefault);
 		CGDataProviderRelease(imgDataProvider);
 
-		ret = [[UIImage alloc] initWithCGImage:cfImage
-										 scale:GLOBAL_SCREEN_SCALE
-								   orientation:UIImageOrientationUp];
+		UIImage *ret = [[UIImage alloc] initWithCGImage:cfImage
+												  scale:GLOBAL_SCREEN_SCALE
+											orientation:UIImageOrientationUp];
 		CGImageRelease(cfImage);
 #else
-        ret = [[NSImage alloc] initWithContentsOfFile:imagePath];
+        NSImage *ret = [[NSImage alloc] initWithContentsOfFile:cachePath];
 #endif
         if(ret)
         {
@@ -1210,13 +1212,13 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
         }
         else
         {
-            [fileManager removeItemAtPath:imagePath error:nil];
+            [fileManager removeItemAtPath:cachePath error:nil];
         }
     }
 
     if(callbackOrNil)
     {
-        [self getImage:path
+        [self getImage:imageURL
                success:^(NSHTTPURLResponse *response, NSData *imageData) {
                    id image = nil;
                    if(imageData)
@@ -1224,11 +1226,11 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 					   @autoreleasepool
 					   {
 #ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
-						   image = [[UIImage imageWithData:imageData] scaleToFillSize:imageSize];
-						   [UIImagePNGRepresentation(image) writeToFile:imagePath atomically:YES];
+						   image = [UIImage imageWithData:imageData scale:GLOBAL_SCREEN_SCALE];
+						   [UIImageJPEGRepresentation(image, 1.0) writeToFile:cachePath atomically:YES];
 #else
-						   image = [[[NSImage alloc] initWithData:imageData] scaleToFillSize:imageSize];
-						   [[image TIFFRepresentation] writeToFile:imagePath atomically:YES];
+						   image = [[NSImage alloc] initWithData:imageData];
+						   [[image TIFFRepresentation] writeToFile:cachePath atomically:YES];
 #endif
 					   }
                    }

@@ -475,12 +475,11 @@ static AppDelegate *_static_shared_ref;
 	   [notification respondsToSelector:@selector(setContentImage:)]) // let's add an avatar on this!
 	{
 		PRComment *c = (PRComment *)item;
-		[self.api haveCachedImage:c.avatarUrl
-						  forSize:CGSizeMake(AVATAR_SIZE, AVATAR_SIZE)
-			   tryLoadAndCallback:^(NSImage *image) {
-				   notification.contentImage = image;
-				   [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
-			   }];
+		[self.api haveCachedAvatar:c.avatarUrl
+				tryLoadAndCallback:^(NSImage *image) {
+					notification.contentImage = image;
+					[[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
+				}];
 	}
 	else // proceed as normal
 	{

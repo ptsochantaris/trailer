@@ -94,26 +94,25 @@ static NSNumberFormatter *itemCountFormatter;
 - (void)loadImageAtPath:(NSString *)imagePath
 {
 	waitingForImageInPath = imagePath;
-    if(![[AppDelegate shared].api haveCachedImage:imagePath
-                                          forSize:CGSizeMake(40, 40)
-                               tryLoadAndCallback:^(id image) {
-								   if([waitingForImageInPath isEqualToString:imagePath])
-								   {
-									   if(image)
-									   {
-										   // image loaded
-										   self.imageView.image = image;
-										   failedToLoadImage = nil;
-									   }
-									   else
-									   {
-										   // load failed / no image
-										   self.imageView.image = [UIImage imageNamed:@"avatarPlaceHolder"];
-										   failedToLoadImage = imagePath;
-									   }
-									   waitingForImageInPath = nil;
-								   }
-                               }])
+    if(![[AppDelegate shared].api haveCachedAvatar:imagePath
+								tryLoadAndCallback:^(id image) {
+									if([waitingForImageInPath isEqualToString:imagePath])
+									{
+										if(image)
+										{
+											// image loaded
+											self.imageView.image = image;
+											failedToLoadImage = nil;
+										}
+										else
+										{
+											// load failed / no image
+											self.imageView.image = [UIImage imageNamed:@"avatarPlaceHolder"];
+											failedToLoadImage = imagePath;
+										}
+										waitingForImageInPath = nil;
+									}
+								}])
     {
 		// prepare UI for over-the-network load
         self.imageView.image = [UIImage imageNamed:@"avatarPlaceHolder"];

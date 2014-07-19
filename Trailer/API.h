@@ -65,8 +65,7 @@ typedef enum {
 
 - (NSString *)lastUpdateDescription;
 
-- (BOOL)haveCachedImage:(NSString *)path
-                forSize:(CGSize)imageSize
-     tryLoadAndCallback:(void(^)(IMAGE_CLASS *image))callbackOrNil;
+- (BOOL)haveCachedAvatar:(NSString *)path
+	  tryLoadAndCallback:(void(^)(IMAGE_CLASS *image))callbackOrNil;
 
 @end

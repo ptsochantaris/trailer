@@ -286,13 +286,31 @@ static CGColorRef _highlightColor;
 	NSPoint viewLocation = [ self convertPoint: windowLocation fromView: nil ];
 	viewLocation = NSMakePoint(viewLocation.x-28, viewLocation.y-4);
 
-    [self dragImage:[[NSApp applicationIconImage] scaleToFillSize:CGSizeMake(32, 32)]
+	NSImage *dragIcon = [self scaleImage:[NSApp applicationIconImage]
+							  toFillSize:CGSizeMake(32, 32)];
+
+    [self dragImage:dragIcon
 				 at:viewLocation
 			 offset:CGSizeZero
 			  event:theEvent
 		 pasteboard:pboard
 			 source:self
 		  slideBack:YES];
+}
+
+- (NSImage *)scaleImage:(NSImage *)image toFillSize:(CGSize)toSize
+{
+    NSRect targetFrame = NSMakeRect(0, 0, toSize.width, toSize.height);
+    NSImageRep *sourceImageRep = [image bestRepresentationForRect:targetFrame
+														  context:nil
+															hints:nil];
+
+    NSImage *targetImage = [[NSImage alloc] initWithSize:toSize];
+    [targetImage lockFocus];
+    [sourceImageRep drawInRect: targetFrame];
+    [targetImage unlockFocus];
+
+	return targetImage;
 }
 
 @end

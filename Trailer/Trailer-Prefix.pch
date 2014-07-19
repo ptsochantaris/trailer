@@ -21,7 +21,6 @@
 #import <CoreData/CoreData.h>
 #import "NSDictionary+NSDictionary_OFK.h"
 #import "NSString+Extensions.h"
-#import "NSImage+Scale.h"
 #import "Reachability.h"
 #import "Settings.h"
 #import "API.h"

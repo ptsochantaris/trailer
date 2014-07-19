@@ -63,9 +63,6 @@
 		1661667F189BC47F00FBF4E0 /* PRStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = 1661667E189BC47F00FBF4E0 /* PRStatus.m */; };
 		16616680189BC47F00FBF4E0 /* PRStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = 1661667E189BC47F00FBF4E0 /* PRStatus.m */; };
 		16616683189BFC6400FBF4E0 /* LinkTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 16616682189BFC6400FBF4E0 /* LinkTextField.m */; };
-		1665B65D1882F1C600972111 /* UIImage+Scale.m in Sources */ = {isa = PBXBuildFile; fileRef = 1665B65C1882F1C600972111 /* UIImage+Scale.m */; };
-		1665B6601882F1EA00972111 /* NSImage+Scale.m in Sources */ = {isa = PBXBuildFile; fileRef = 1665B65F1882F1EA00972111 /* NSImage+Scale.m */; };
-		1665B6631882F22500972111 /* ImageFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 1665B6621882F22500972111 /* ImageFunctions.m */; };
 		1665B6661882F24400972111 /* UINavigationController+DismissKeyboard.m in Sources */ = {isa = PBXBuildFile; fileRef = 1665B6651882F24400972111 /* UINavigationController+DismissKeyboard.m */; };
 		1665B6691882F29300972111 /* NSString+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 1665B6681882F29300972111 /* NSString+Extensions.m */; };
 		1665B66A1882F29300972111 /* NSString+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 1665B6681882F29300972111 /* NSString+Extensions.m */; };
@@ -209,12 +206,6 @@
 		1661667E189BC47F00FBF4E0 /* PRStatus.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PRStatus.m; sourceTree = "<group>"; };
 		16616681189BFC6400FBF4E0 /* LinkTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LinkTextField.h; sourceTree = "<group>"; };
 		16616682189BFC6400FBF4E0 /* LinkTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LinkTextField.m; sourceTree = "<group>"; };
-		1665B65B1882F1C600972111 /* UIImage+Scale.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Scale.h"; sourceTree = "<group>"; };
-		1665B65C1882F1C600972111 /* UIImage+Scale.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Scale.m"; sourceTree = "<group>"; };
-		1665B65E1882F1EA00972111 /* NSImage+Scale.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSImage+Scale.h"; sourceTree = "<group>"; };
-		1665B65F1882F1EA00972111 /* NSImage+Scale.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSImage+Scale.m"; sourceTree = "<group>"; };
-		1665B6611882F22500972111 /* ImageFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageFunctions.h; sourceTree = "<group>"; };
-		1665B6621882F22500972111 /* ImageFunctions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageFunctions.m; sourceTree = "<group>"; };
 		1665B6641882F24400972111 /* UINavigationController+DismissKeyboard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UINavigationController+DismissKeyboard.h"; sourceTree = "<group>"; };
 		1665B6651882F24400972111 /* UINavigationController+DismissKeyboard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UINavigationController+DismissKeyboard.m"; sourceTree = "<group>"; };
 		1665B6671882F29300972111 /* NSString+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSString+Extensions.h"; path = "Trailer/NSString+Extensions.h"; sourceTree = "<group>"; };
@@ -520,7 +511,6 @@
 		168BC6B317EC2DF000BC4584 /* Trailer */ = {
 			isa = PBXGroup;
 			children = (
-				16B069731882EA5A0053620E /* Extensions */,
 				168A5C74185BB9D900CB6B02 /* Display */,
 				16583E411851E5C6003A7A55 /* MenuItems */,
 				168BC6BF17EC2DF000BC4584 /* AppDelegate.h */,
@@ -580,21 +570,8 @@
 		16B069721882EA530053620E /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				1665B6611882F22500972111 /* ImageFunctions.h */,
-				1665B6621882F22500972111 /* ImageFunctions.m */,
 				1665B6641882F24400972111 /* UINavigationController+DismissKeyboard.h */,
 				1665B6651882F24400972111 /* UINavigationController+DismissKeyboard.m */,
-				1665B65B1882F1C600972111 /* UIImage+Scale.h */,
-				1665B65C1882F1C600972111 /* UIImage+Scale.m */,
-			);
-			name = Extensions;
-			sourceTree = "<group>";
-		};
-		16B069731882EA5A0053620E /* Extensions */ = {
-			isa = PBXGroup;
-			children = (
-				1665B65E1882F1EA00972111 /* NSImage+Scale.h */,
-				1665B65F1882F1EA00972111 /* NSImage+Scale.m */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
@@ -821,7 +798,6 @@
 			files = (
 				1665B6661882F24400972111 /* UINavigationController+DismissKeyboard.m in Sources */,
 				1665B66E1882F29E00972111 /* Settings.m in Sources */,
-				1665B65D1882F1C600972111 /* UIImage+Scale.m in Sources */,
 				1604D4D2189548350064A385 /* ApiServerViewController.m in Sources */,
 				1628A7041878BC18005EDA69 /* Repo.m in Sources */,
 				1628A70B1878D2B2005EDA69 /* NSDictionary+NSDictionary_OFK.m in Sources */,
@@ -834,7 +810,6 @@
 				1628A6C518789E73005EDA69 /* AppDelegate.m in Sources */,
 				1628A7061878BC18005EDA69 /* DataItem.m in Sources */,
 				1640470A1882ED0000A4AC9C /* AboutTrailerViewController.m in Sources */,
-				1665B6631882F22500972111 /* ImageFunctions.m in Sources */,
 				1628A6FC1878B64E005EDA69 /* PreferencesViewController.m in Sources */,
 				1665B66A1882F29300972111 /* NSString+Extensions.m in Sources */,
 				16C54F941881639B00849B76 /* GithubViewController.m in Sources */,
@@ -870,7 +845,6 @@
 				16B9553A17EC93DE0005118F /* Repo.m in Sources */,
 				161CA3CE17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m in Sources */,
 				1675AC1D185CF80C00ADD213 /* MenuScrollView.m in Sources */,
-				1665B6601882F1EA00972111 /* NSImage+Scale.m in Sources */,
 				160C5AD318682CD800142482 /* CommentCounts.m in Sources */,
 				161CA3C617F5A55300F4AF6C /* PullRequest.m in Sources */,
 				16FA683B1823CF4600401E9B /* PRItemView.m in Sources */,
