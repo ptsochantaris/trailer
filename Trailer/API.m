@@ -456,7 +456,7 @@ typedef void (^completionBlockType)(BOOL);
 - (void)autoSubscribeToReposAndCallback:(void(^)())callback
 {
 	if([AppDelegate shared].lastRepoCheck &&
-	   ([[NSDate date] timeIntervalSinceDate:[AppDelegate shared].lastRepoCheck] < [Settings shared].newRepoCheckPeriod*15.0))
+	   ([[NSDate date] timeIntervalSinceDate:[AppDelegate shared].lastRepoCheck] < [Settings shared].newRepoCheckPeriod*3600.0))
 	{
 		CALLBACK();
 	}
