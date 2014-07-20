@@ -6,6 +6,7 @@
 @property (nonatomic, retain) NSNumber * fork;
 @property (nonatomic, retain) NSNumber * hidden;
 @property (nonatomic, retain) NSNumber * dirty;
+@property (nonatomic, retain) NSNumber * private;
 
 + (Repo*)repoWithInfo:(NSDictionary*)info moc:(NSManagedObjectContext *)moc;
 

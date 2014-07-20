@@ -456,7 +456,7 @@ typedef void (^completionBlockType)(BOOL);
 - (void)autoSubscribeToReposAndCallback:(void(^)())callback
 {
 	if([AppDelegate shared].lastRepoCheck &&
-	   ([[NSDate date] timeIntervalSinceDate:[AppDelegate shared].lastRepoCheck] < [Settings shared].newRepoCheckPeriod*3600.0))
+	   ([[NSDate date] timeIntervalSinceDate:[AppDelegate shared].lastRepoCheck] < [Settings shared].newRepoCheckPeriod*15.0))
 	{
 		CALLBACK();
 	}
@@ -745,11 +745,16 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 					 }
 					 else
 					 {
-						 if(resultCode == 404 || resultCode == 410) // 404/410 is an acceptable answer, it means the repo is gone
-						 {
-							 succeeded++;
-							 r.postSyncAction = @(kPostSyncDelete);
-						 }
+                         if (r.private && resultCode == 404)  // 404 could mean that a private repo is currently disabled
+                         {
+                             succeeded++;
+                             r.postSyncAction = @(kPostSyncDoNothing);
+                         }
+                         else if (resultCode == 410) // 404/410 is an acceptable answer, it means the repo is gone
+                         {
+                             succeeded++;
+                             r.postSyncAction = @(kPostSyncDelete);
+                         }
 						 else
 						 {
 							 failed++;
@@ -1267,7 +1272,7 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 		else
 			return [NSString stringWithFormat:@"Updated %ld seconds ago",(long)ago];
 	}
-	
+
 }
 
 @end

@@ -6,6 +6,7 @@
 @dynamic webUrl;
 @dynamic hidden;
 @dynamic dirty;
+@dynamic private;
 
 + (Repo*)repoWithInfo:(NSDictionary*)info moc:(NSManagedObjectContext*)moc
 {
@@ -16,6 +17,7 @@
 		r.fork = @([[info ofk:@"fork"] boolValue]);
 		r.webUrl = [info ofk:@"html_url"];
 		r.dirty = @(YES);
+        r.private = @([[info ofk:@"private"] boolValue]);
 	}
 	return r;
 }
