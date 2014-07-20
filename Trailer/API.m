@@ -745,16 +745,16 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 					 }
 					 else
 					 {
-                         if (r.private && resultCode == 404)  // 404 could mean that a private repo is currently disabled
-                         {
-                             succeeded++;
-                             r.postSyncAction = @(kPostSyncDoNothing);
-                         }
-                         else if (resultCode == 410) // 404/410 is an acceptable answer, it means the repo is gone
-                         {
-                             succeeded++;
-                             r.postSyncAction = @(kPostSyncDelete);
-                         }
+						 if (r.private && resultCode == 404)  // 404 could mean that a private repo is currently disabled
+						 {
+							 succeeded++;
+							 r.postSyncAction = @(kPostSyncDoNothing);
+						 }
+						 else if (resultCode == 410) // 404/410 is an acceptable answer, it means the repo is gone
+						 {
+							 succeeded++;
+							 r.postSyncAction = @(kPostSyncDelete);
+						 }
 						 else
 						 {
 							 failed++;

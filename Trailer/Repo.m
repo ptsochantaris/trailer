@@ -17,7 +17,7 @@
 		r.fork = @([[info ofk:@"fork"] boolValue]);
 		r.webUrl = [info ofk:@"html_url"];
 		r.dirty = @(YES);
-        r.private = @([[info ofk:@"private"] boolValue]);
+		r.private = @([[info ofk:@"private"] boolValue]);
 	}
 	return r;
 }
