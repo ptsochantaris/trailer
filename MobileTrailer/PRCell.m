@@ -14,6 +14,7 @@ static NSNumberFormatter *itemCountFormatter;
 {
 	[super awakeFromNib];
 	self.textLabel.numberOfLines = 0;
+	self.textLabel.font = [UIFont systemFontOfSize:[UIFont labelFontSize]];
 	self.detailTextLabel.textColor = [COLOR_CLASS grayColor];
 
 	unreadCount = [[UILabel alloc] initWithFrame:CGRectZero];
@@ -63,7 +64,7 @@ static NSNumberFormatter *itemCountFormatter;
 - (void)setPullRequest:(PullRequest *)pullRequest
 {
 	self.textLabel.text = pullRequest.title;
-	self.detailTextLabel.text = pullRequest.subtitle;
+	self.detailTextLabel.attributedText = [pullRequest subtitleWithFont:self.detailTextLabel.font];
 
 	NSInteger _commentsNew=0;
 	NSInteger _commentsTotal = pullRequest.totalComments.integerValue;

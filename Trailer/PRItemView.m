@@ -6,7 +6,7 @@
 }
 @end
 
-static NSDictionary *_titleAttributes, *_createdAttributes, *_statusAttributes;
+static NSDictionary *_titleAttributes, *_statusAttributes;
 static NSDateFormatter *dateFormatter;
 static CGColorRef _highlightColor;
 
@@ -31,11 +31,6 @@ static CGColorRef _highlightColor;
 							 NSForegroundColorAttributeName:[NSColor blackColor],
 							 NSBackgroundColorAttributeName:[NSColor clearColor],
 							 };
-		_createdAttributes = @{
-							   NSFontAttributeName:[NSFont menuFontOfSize:10.0],
-							   NSForegroundColorAttributeName:[NSColor grayColor],
-							   NSBackgroundColorAttributeName:[NSColor clearColor],
-							   };
 		NSMutableParagraphStyle *paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
 		paragraphStyle.headIndent = 92.0;
 		_statusAttributes = @{
@@ -67,7 +62,7 @@ static CGColorRef _highlightColor;
 		}
 
 		NSString *_title = pullRequest.title;
-		NSString *_subtitle = pullRequest.subtitle;
+		NSAttributedString *_subtitle = [pullRequest subtitleWithFont:[NSFont menuFontOfSize:10.0]];
 
 		CGFloat W = MENU_WIDTH-LEFTPADDING-app.scrollBarWidth;
 		BOOL showUnpin = pullRequest.condition.integerValue!=kPullRequestConditionOpen || pullRequest.markUnmergeable;
@@ -83,8 +78,7 @@ static CGColorRef _highlightColor;
 												attributes:_titleAttributes].size.height;
 
 		CGFloat subtitleHeight = [_subtitle boundingRectWithSize:CGSizeMake(W, FLT_MAX)
-														 options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
-													  attributes:_createdAttributes].size.height+2.0;
+														 options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading].size.height+4.0;
 
 		NSMutableArray *statusRects = nil;
 		NSArray *statuses = nil;
@@ -168,7 +162,7 @@ static CGColorRef _highlightColor;
 		[self addSubview:title];
 
 		CenteredTextField *subtitle = [[CenteredTextField alloc] initWithFrame:dateRect];
-		subtitle.attributedStringValue = [[NSAttributedString alloc] initWithString:_subtitle attributes:_createdAttributes];
+		subtitle.attributedStringValue = _subtitle;
 		[self addSubview:subtitle];
 
 		for(NSInteger count=0;count<statusRects.count;count++)

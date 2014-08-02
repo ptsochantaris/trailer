@@ -109,6 +109,19 @@ NSString *B(NSString *input)
 				if(settings.markUnmergeableOnUserSectionsOnly) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
+			case 5:
+            {
+				cell.textLabel.text = @"Display repository names";
+				if(settings.showReposInName) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				break;
+            }
+			case 6:
+            {
+				cell.textLabel.text = B(@"Include repository names\nin filtering");
+				if(settings.includeReposInFilter) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				break;
+            }
+
 		}
 	}
 	else if(indexPath.section==COMMENTS_SECTION_INDEX)
@@ -147,20 +160,8 @@ NSString *B(NSString *input)
 		switch (indexPath.row)
 		{
 			case 0:
-            {
-				cell.textLabel.text = @"Display repository names";
-				if(settings.showReposInName) cell.accessoryType = UITableViewCellAccessoryCheckmark;
-				break;
-            }
-			case 1:
-            {
-				cell.textLabel.text = B(@"Include repositories in\nfiltering");
-				if(settings.includeReposInFilter) cell.accessoryType = UITableViewCellAccessoryCheckmark;
-				break;
-            }
-			case 2:
 			{
-				cell.textLabel.text = B(@"Hide new repositories\nby default");
+				cell.textLabel.text = B(@"Auto-hide new repositories\nin your watchlist");
 				if(settings.hideNewRepositories) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
@@ -328,6 +329,16 @@ NSString *B(NSString *input)
 				settings.markUnmergeableOnUserSectionsOnly = !settings.markUnmergeableOnUserSectionsOnly;
 				break;
 			}
+			case 5:
+			{
+				settings.showReposInName = !settings.showReposInName;
+				break;
+			}
+			case 6:
+			{
+				settings.includeReposInFilter = !settings.includeReposInFilter;
+				break;
+			}
 		}
 		[settingsChangedTimer push];
 	}
@@ -362,16 +373,6 @@ NSString *B(NSString *input)
 		switch (indexPath.row)
 		{
 			case 0:
-			{
-				settings.showReposInName = !settings.showReposInName;
-				break;
-			}
-			case 1:
-			{
-				settings.includeReposInFilter = !settings.includeReposInFilter;
-				break;
-			}
-			case 2:
 			{
 				settings.hideNewRepositories = !settings.hideNewRepositories;
 				break;
@@ -468,9 +469,9 @@ NSString *B(NSString *input)
 {
     switch (section) {
 		case REFRESH_SECTION_INDEX: return 3;
-		case DISPLAY_SECTION_INDEX: return 5;
+		case DISPLAY_SECTION_INDEX: return 7;
 		case COMMENTS_SECTION_INDEX: return 4;
-		case REPOS_SECTION_INDEX: return 3;
+		case REPOS_SECTION_INDEX: return 1;
 		case HISTORY_SECTION_INDEX: return 3;
 		case CONFIRM_SECTION_INDEX: return 2;
 		case SORT_SECTION_INDEX: return 3;

@@ -35,7 +35,7 @@ static NSDateFormatter *itemDateFormatter;
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
 		itemDateFormatter = [[NSDateFormatter alloc] init];
-		itemDateFormatter.dateStyle = NSDateFormatterShortStyle;
+		itemDateFormatter.dateStyle = NSDateFormatterMediumStyle;
 		itemDateFormatter.timeStyle = NSDateFormatterShortStyle;
 	});
 }
@@ -170,32 +170,60 @@ static NSDateFormatter *itemDateFormatter;
 	return [kPullRequestSectionNames objectAtIndex:self.sectionIndex.integerValue];
 }
 
-- (NSString *)subtitle
+- (NSAttributedString *)subtitleWithFont:(FONT_CLASS *)font
 {
-	NSString *_subtitle;
+	NSMutableAttributedString *_subtitle = [[NSMutableAttributedString alloc] init];
 
+	NSMutableParagraphStyle *p = [[NSMutableParagraphStyle alloc] init];
 #ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
-	#define SEPARATOR @"\n"
-#else
-	#define SEPARATOR @" - "
+	p.lineHeightMultiple = 1.3;
 #endif
 
-	if(self.userLogin.length)
-		_subtitle = [NSString stringWithFormat:@"%@%@",self.userLogin,SEPARATOR];
-	else
-		_subtitle = @"";
+	NSDictionary *lightSubtitle = @{ NSForegroundColorAttributeName: [COLOR_CLASS grayColor],
+									 NSFontAttributeName:font,
+									 NSParagraphStyleAttributeName: p};
 
-	if(settings.showCreatedInsteadOfUpdated)
-		_subtitle = [_subtitle stringByAppendingString:[itemDateFormatter stringFromDate:self.createdAt]];
-	else
-		_subtitle = [_subtitle stringByAppendingString:[itemDateFormatter stringFromDate:self.updatedAt]];
+	NSAttributedString *separator;
+#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
+	separator = [[NSAttributedString alloc] initWithString:@"\n"
+												attributes:lightSubtitle];
+#else
+	separator = [[NSAttributedString alloc] initWithString:@"   "
+												attributes:lightSubtitle];
+#endif
 
 	if(settings.showReposInName)
-		_subtitle = [_subtitle stringByAppendingFormat:@"%@%@",SEPARATOR,self.repoName];
+	{
+		NSMutableDictionary *darkSubtitle = [lightSubtitle mutableCopy];
+		darkSubtitle[NSForegroundColorAttributeName] = [COLOR_CLASS darkGrayColor];
+		[_subtitle appendAttributedString:[[NSAttributedString alloc] initWithString:self.repoName
+																		  attributes:darkSubtitle]];
+		[_subtitle appendAttributedString:separator];
+	}
+
+	if(self.userLogin.length)
+	{
+		[_subtitle appendAttributedString:[[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"@%@", self.userLogin]
+																		  attributes:lightSubtitle]];
+		[_subtitle appendAttributedString:separator];
+	}
+
+	if(settings.showCreatedInsteadOfUpdated)
+		[_subtitle appendAttributedString:[[NSAttributedString alloc] initWithString:[itemDateFormatter stringFromDate:self.createdAt]
+																		  attributes:lightSubtitle]];
+	else
+		[_subtitle appendAttributedString:[[NSAttributedString alloc] initWithString:[itemDateFormatter stringFromDate:self.updatedAt]
+																		  attributes:lightSubtitle]];
 
 #ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
 	if(!self.mergeable.boolValue)
-		_subtitle = [_subtitle stringByAppendingString:@"\nCannot be merged!"];
+	{
+		[_subtitle appendAttributedString:separator];
+		NSMutableDictionary *redSubtitle = [lightSubtitle mutableCopy];
+		redSubtitle[NSForegroundColorAttributeName] = [COLOR_CLASS redColor];
+		[_subtitle appendAttributedString:[[NSAttributedString alloc] initWithString:@"Cannot be merged!"
+																		  attributes:redSubtitle]];
+	}
 #endif
 
 	return _subtitle;

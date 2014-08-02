@@ -7,6 +7,7 @@
 
 #define COLOR_CLASS NSColor
 #define IMAGE_CLASS NSImage
+#define FONT_CLASS NSFont
 #define MAKECOLOR(R,G,B,A) [COLOR_CLASS colorWithSRGBRed:R green:G blue:B alpha:A]
 
 #import <Cocoa/Cocoa.h>

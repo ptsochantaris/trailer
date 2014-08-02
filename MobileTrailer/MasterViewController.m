@@ -1,5 +1,5 @@
 
-@interface MasterViewController () <UITextFieldDelegate, UIActionSheetDelegate, UIAlertViewDelegate>
+@implementation MasterViewController
 {
     // Opening PRs
     NSString *urlToOpen;
@@ -11,12 +11,6 @@
 	// Refreshing
 	BOOL refreshOnRelease;
 }
-
-- (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
-
-@end
-
-@implementation MasterViewController
 
 - (void)awakeFromNib
 {
@@ -251,7 +245,7 @@
 
 		if(addedIndexes.count)
 			[self.tableView insertSections:addedIndexes withRowAnimation:UITableViewRowAnimationAutomatic];
-		
+
 		[self.tableView endUpdates];
 	}
 	else
@@ -379,21 +373,18 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     PullRequest *pr = [self.fetchedResultsController objectAtIndexPath:indexPath];
-	CGFloat w = 208;
-	if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) w = 227;
-
 	CGFloat H = 30;
+	CGFloat w = UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad ? 230 : 214;
 
-	H += [pr.title boundingRectWithSize:CGSizeMake(w, CGFLOAT_MAX)
+	H += CGRectIntegral([pr.title boundingRectWithSize:CGSizeMake(w, CGFLOAT_MAX)
 								options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
 							 attributes:@{ NSFontAttributeName:[UIFont systemFontOfSize:[UIFont labelFontSize]] }
-								context:nil].size.height;
+								context:nil]).size.height;
 
-	H += [pr.subtitle boundingRectWithSize:CGSizeMake(w, CGFLOAT_MAX)
-								   options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
-								attributes:@{ NSFontAttributeName:[UIFont systemFontOfSize:[UIFont smallSystemFontSize]] }
-								   context:nil].size.height;
-
+	NSAttributedString *subtitle = [pr subtitleWithFont:[UIFont systemFontOfSize:[UIFont smallSystemFontSize]]];
+	H += CGRectIntegral([subtitle boundingRectWithSize:CGSizeMake(w, CGFLOAT_MAX)
+								options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
+								context:nil]).size.height;
 	return MAX(65,H);
 }
 
@@ -456,15 +447,17 @@
 	}
 
     return _fetchedResultsController;
-}    
+}
 
 - (void)controllerWillChangeContent:(NSFetchedResultsController *)controller
 {
     [self.tableView beginUpdates];
 }
 
-- (void)controller:(NSFetchedResultsController *)controller didChangeSection:(id <NSFetchedResultsSectionInfo>)sectionInfo
-           atIndex:(NSUInteger)sectionIndex forChangeType:(NSFetchedResultsChangeType)type
+- (void)controller:(NSFetchedResultsController *)controller
+  didChangeSection:(id <NSFetchedResultsSectionInfo>)sectionInfo
+           atIndex:(NSUInteger)sectionIndex
+	 forChangeType:(NSFetchedResultsChangeType)type
 {
     switch(type) {
         case NSFetchedResultsChangeInsert:
