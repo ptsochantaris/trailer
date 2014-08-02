@@ -48,7 +48,7 @@
 	{
 		if(!r.isMine)
 		{
-			[[AppDelegate shared] postNotificationOfType:kNewPr forItem:r];
+			[app postNotificationOfType:kNewPr forItem:r];
 		}
 		r.postSyncAction = @(kPostSyncDoNothing);
 	}
@@ -60,7 +60,7 @@
 		{
 			if(!r.isMine)
 			{
-				[[AppDelegate shared] postNotificationOfType:kPrReopened forItem:r];
+				[app postNotificationOfType:kPrReopened forItem:r];
 			}
 			r.reopened = @NO;
 		}
@@ -74,13 +74,13 @@
 		{
 			if(c.refersToMe)
 			{
-				[[AppDelegate shared] postNotificationOfType:kNewMention forItem:c];
+				[app postNotificationOfType:kNewMention forItem:c];
 			}
-			else if([Settings shared].showCommentsEverywhere || r.isMine || r.commentedByMe)
+			else if(settings.showCommentsEverywhere || r.isMine || r.commentedByMe)
 			{
-				if(![c.userId.stringValue isEqualToString:[Settings shared].localUserId])
+				if(![c.userId.stringValue isEqualToString:settings.localUserId])
 				{
-					[[AppDelegate shared] postNotificationOfType:kNewComment forItem:c];
+					[app postNotificationOfType:kNewComment forItem:c];
 				}
 			}
 		}
@@ -292,10 +292,10 @@
 - (void)wipeApiMarkers
 {
 	// because these control the DB state with the event feed, needs to be reset
-	[Settings shared].latestReceivedEventEtag = nil;
-	[Settings shared].latestReceivedEventDateProcessed = nil;
-	[Settings shared].latestUserEventEtag = nil;
-	[Settings shared].latestUserEventDateProcessed = nil;
+	settings.latestReceivedEventEtag = nil;
+	settings.latestReceivedEventDateProcessed = nil;
+	settings.latestUserEventEtag = nil;
+	settings.latestUserEventDateProcessed = nil;
 }
 
 - (NSDictionary *)infoForType:(PRNotificationType)type item:(id)item
@@ -342,7 +342,7 @@
 	NSUInteger openRequests = [PullRequest countOpenRequestsInMoc:self.managedObjectContext];
 	NSString *message;
 
-	if([AppDelegate shared].isRefreshing)
+	if(app.isRefreshing)
 	{
 		message = @"Refreshing PR information, please wait a moment...";
 	}
@@ -385,12 +385,14 @@
 #define LAST_RUN_VERSION_KEY @"LAST_RUN_VERSION"
 - (void)versionBumpComplete
 {
-	NSString *currentAppVersion = [AppDelegate shared].currentAppVersion;
-	[[NSUserDefaults standardUserDefaults] setObject:currentAppVersion forKey:LAST_RUN_VERSION_KEY];
+	NSString *currentAppVersion = app.currentAppVersion;
+	NSUserDefaults *d = [NSUserDefaults standardUserDefaults];
+	[d setObject:currentAppVersion forKey:LAST_RUN_VERSION_KEY];
+	[d synchronize];
 }
 - (BOOL)versionBumpOccured
 {
-	NSString *currentAppVersion = [AppDelegate shared].currentAppVersion;
+	NSString *currentAppVersion = app.currentAppVersion;
 	return !([[[NSUserDefaults standardUserDefaults] objectForKey:LAST_RUN_VERSION_KEY] isEqualToString:currentAppVersion]);
 }
 

@@ -8,7 +8,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	self.versionNumber.text = [@"Version " stringByAppendingString:[AppDelegate shared].currentAppVersion];
+	self.versionNumber.text = [@"Version " stringByAppendingString:app.currentAppVersion];
 }
 
 - (IBAction)iphoneLink:(UIBarButtonItem *)sender

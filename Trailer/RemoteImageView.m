@@ -13,7 +13,7 @@
 	if(self)
 	{
 		self.imageAlignment = NSImageAlignCenter;
-        if(![[AppDelegate shared].api haveCachedAvatar:urlPath
+        if(![app.api haveCachedAvatar:urlPath
 									tryLoadAndCallback:^(id image) {
 										self.image = image;
 										[self done];

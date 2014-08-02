@@ -81,7 +81,7 @@ static DetailViewController *_detail_shared_ref;
 	if(code==404)
 	{
 		[[[UIAlertView alloc] initWithTitle:@"Not Found"
-									message:[NSString stringWithFormat:@"Please ensure you are logged in with the '%@' account on GitHub",[Settings shared].localUser]
+									message:[NSString stringWithFormat:@"Please ensure you are logged in with the '%@' account on GitHub",settings.localUser]
 								   delegate:nil
 						  cancelButtonTitle:@"OK"
 						  otherButtonTitles:nil] show];

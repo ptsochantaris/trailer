@@ -85,7 +85,7 @@ static NSDateFormatter *itemDateFormatter;
 	else if(condition==kPullRequestConditionClosed) section = kPullRequestSectionClosed;
 	else if(self.isMine)							section = kPullRequestSectionMine;
 	else if(self.commentedByMe)						section = kPullRequestSectionParticipated;
-	else if([Settings shared].hideAllPrsSection)	section = kPullRequestSectionNone;
+	else if(settings.hideAllPrsSection)	section = kPullRequestSectionNone;
 	else											section = kPullRequestSectionAll;
 
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
@@ -94,7 +94,7 @@ static NSDateFormatter *itemDateFormatter;
 	NSDate *latestDate = self.latestReadCommentDate;
 
 	if(((section == kPullRequestSectionAll) || (section == kPullRequestSectionNone))
-	   && [Settings shared].autoParticipateInMentions)
+	   && settings.autoParticipateInMentions)
 	{
 		if(self.refersToMe)
 		{
@@ -150,7 +150,7 @@ static NSDateFormatter *itemDateFormatter;
 			return NO;
 
 		if(section == kPullRequestSectionAll &&
-		   [Settings shared].markUnmergeableOnUserSectionsOnly)
+		   settings.markUnmergeableOnUserSectionsOnly)
 			return NO;
 
 		return YES;
@@ -160,7 +160,7 @@ static NSDateFormatter *itemDateFormatter;
 
 - (BOOL)refersToMe
 {
-	NSString *myHandle = [NSString stringWithFormat:@"@%@",[Settings shared].localUser];
+	NSString *myHandle = [NSString stringWithFormat:@"@%@",settings.localUser];
 	NSRange rangeOfHandle = [self.body rangeOfString:myHandle options:NSCaseInsensitiveSearch|NSDiacriticInsensitiveSearch];
 	return rangeOfHandle.location != NSNotFound;
 }
@@ -185,12 +185,12 @@ static NSDateFormatter *itemDateFormatter;
 	else
 		_subtitle = @"";
 
-	if([Settings shared].showCreatedInsteadOfUpdated)
+	if(settings.showCreatedInsteadOfUpdated)
 		_subtitle = [_subtitle stringByAppendingString:[itemDateFormatter stringFromDate:self.createdAt]];
 	else
 		_subtitle = [_subtitle stringByAppendingString:[itemDateFormatter stringFromDate:self.updatedAt]];
 
-	if([Settings shared].showReposInName)
+	if(settings.showReposInName)
 		_subtitle = [_subtitle stringByAppendingFormat:@"%@%@",SEPARATOR,self.repoName];
 
 #ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
@@ -210,13 +210,13 @@ static NSDateFormatter *itemDateFormatter;
 
 	if(filter.length)
 	{
-		if([Settings shared].includeReposInFilter)
+		if(settings.includeReposInFilter)
 			[predicateSegments addObject:[NSString stringWithFormat:@"(title contains[cd] '%@' or userLogin contains[cd] '%@' or repoName contains[cd] '%@')",filter,filter,filter]];
 		else
 			[predicateSegments addObject:[NSString stringWithFormat:@"(title contains[cd] '%@' or userLogin contains[cd] '%@')",filter,filter]];
 	}
 
-	if([Settings shared].shouldHideUncommentedRequests)
+	if(settings.shouldHideUncommentedRequests)
 	{
 		[predicateSegments addObject:@"(unreadComments > 0)"];
 	}
@@ -225,13 +225,13 @@ static NSDateFormatter *itemDateFormatter;
 
 	NSMutableArray *sortDescriptors = [NSMutableArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"sectionIndex" ascending:YES]];
 
-	if([Settings shared].groupByRepo)
+	if(settings.groupByRepo)
 	{
 		[sortDescriptors addObject:[NSSortDescriptor sortDescriptorWithKey:@"repoName" ascending:YES selector:@selector(caseInsensitiveCompare:)]];
 	}
 
-	BOOL ascending = ![Settings shared].sortDescending;
-	NSString *fieldName = [Settings shared].sortField;
+	BOOL ascending = !settings.sortDescending;
+	NSString *fieldName = settings.sortField;
 	if([fieldName isEqualToString:@"title"])
 	{
 		[sortDescriptors addObject:[NSSortDescriptor sortDescriptorWithKey:fieldName ascending:ascending selector:@selector(caseInsensitiveCompare:)]];
@@ -273,7 +273,7 @@ static NSDateFormatter *itemDateFormatter;
 	NSFetchRequest *f = [PullRequest requestForPullRequestsWithFilter:nil];
 	NSArray *allPRs = [moc executeFetchRequest:f error:nil];
 	NSInteger count = 0;
-	BOOL showCommentsEverywhere = [Settings shared].showCommentsEverywhere;
+	BOOL showCommentsEverywhere = settings.showCommentsEverywhere;
 	for(PullRequest *r in allPRs)
 	{
 		NSInteger sectionIndex = r.sectionIndex.integerValue;
@@ -335,8 +335,8 @@ static NSDateFormatter *itemDateFormatter;
 
 - (BOOL)isMine
 {
-	if(self.assignedToMe.boolValue && [Settings shared].moveAssignedPrsToMySection) return YES;
-	return [self.userId.stringValue isEqualToString:[Settings shared].localUserId];
+	if(self.assignedToMe.boolValue && settings.moveAssignedPrsToMySection) return YES;
+	return [self.userId.stringValue isEqualToString:settings.localUserId];
 }
 
 - (BOOL)commentedByMe
@@ -355,10 +355,10 @@ static NSDateFormatter *itemDateFormatter;
 
 	NSString *predicate = [NSString stringWithFormat:@"pullRequestId = %@",self.serverId];
 
-	NSInteger mode = [Settings shared].statusFilteringMode;
+	NSInteger mode = settings.statusFilteringMode;
 	if(mode!=kStatusFilterAll)
 	{
-		NSArray *terms = [Settings shared].statusFilteringTerms;
+		NSArray *terms = settings.statusFilteringTerms;
 		if(terms.count)
 		{
 			NSMutableArray *ors = [NSMutableArray arrayWithCapacity:terms.count];
@@ -402,7 +402,7 @@ static NSDateFormatter *itemDateFormatter;
 
 - (NSString *)urlForOpening
 {
-	if (self.unreadComments.integerValue != 0 && [Settings shared].openPrAtFirstUnreadComment)
+	if (self.unreadComments.integerValue != 0 && settings.openPrAtFirstUnreadComment)
 	{
 		NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
 		f.returnsObjectsAsFaults = NO;
@@ -424,14 +424,14 @@ static NSDateFormatter *itemDateFormatter;
 	if(date)
 	{
 		return [NSPredicate predicateWithFormat:@"userId != %lld and pullRequestUrl == %@ and createdAt > %@",
-				[Settings shared].localUserId.longLongValue,
+				settings.localUserId.longLongValue,
 				self.url,
 				date];
 	}
 	else
 	{
 		return [NSPredicate predicateWithFormat:@"userId != %lld and pullRequestUrl == %@",
-				[Settings shared].localUserId.longLongValue,
+				settings.localUserId.longLongValue,
 				self.url];
 	}
 }

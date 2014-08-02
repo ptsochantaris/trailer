@@ -86,7 +86,7 @@
 			if([theEvent modifierFlags] & NSCommandKeyMask)
 			{
 				if((theEvent.modifierFlags & NSAlternateKeyMask) == NSAlternateKeyMask)
-					[AppDelegate shared].ignoreNextFocusLoss = YES;
+					app.ignoreNextFocusLoss = YES;
 				[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:self.targetUrl]];
 				[self mouseExited:nil];
 			}

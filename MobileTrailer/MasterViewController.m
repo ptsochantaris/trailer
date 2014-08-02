@@ -65,7 +65,7 @@
 	refreshOnRelease = NO;
 	self.tableView.userInteractionEnabled = YES;
 
-	if([[AppDelegate shared].api.reachability currentReachabilityStatus]==NotReachable)
+	if([app.api.reachability currentReachabilityStatus]==NotReachable)
 	{
 		[[[UIAlertView alloc] initWithTitle:@"No Network"
 									message:@"There is no network connectivity, please try again later"
@@ -75,13 +75,13 @@
 	}
 	else
 	{
-		[[AppDelegate shared] startRefresh];
+		[app startRefresh];
 	}
 }
 
 - (void)removeAllMerged
 {
-    if([Settings shared].dontAskBeforeWipingMerged)
+    if(settings.dontAskBeforeWipingMerged)
     {
         [self removeAllMergedConfirmed];
     }
@@ -97,7 +97,7 @@
 
 - (void)removeAllClosed
 {
-    if([Settings shared].dontAskBeforeWipingClosed)
+    if(settings.dontAskBeforeWipingClosed)
     {
         [self removeAllClosedConfirmed];
     }
@@ -130,25 +130,25 @@
 {
 	for(PullRequest *p in [PullRequest allClosedRequestsInMoc:self.managedObjectContext])
 		[self.managedObjectContext deleteObject:p];
-    [[AppDelegate shared].dataManager saveDB];
+    [app.dataManager saveDB];
 }
 
 - (void)removeAllMergedConfirmed
 {
 	for(PullRequest *p in [PullRequest allMergedRequestsInMoc:self.managedObjectContext])
 		[self.managedObjectContext deleteObject:p];
-    [[AppDelegate shared].dataManager saveDB];
+    [app.dataManager saveDB];
 }
 
 - (void)markAllAsRead
 {
 	for(PullRequest *p in self.fetchedResultsController.fetchedObjects) [p catchUpWithComments];
-    [[AppDelegate shared].dataManager saveDB];
+    [app.dataManager saveDB];
 }
 
 - (void)refreshControlChanged
 {
-	if(![AppDelegate shared].isRefreshing) refreshOnRelease = YES;
+	if(!app.isRefreshing) refreshOnRelease = YES;
 }
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
@@ -326,7 +326,7 @@
     dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
     dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
         [pullRequest catchUpWithComments];
-        [[AppDelegate shared].dataManager saveDB];
+        [app.dataManager saveDB];
     });
 }
 
@@ -419,7 +419,7 @@
 	{
 		PullRequest *pr = [self.fetchedResultsController objectAtIndexPath:indexPath];
 		[self.managedObjectContext deleteObject:pr];
-		[[AppDelegate shared].dataManager saveDB];
+		[app.dataManager saveDB];
 	}
 }
 
@@ -520,10 +520,10 @@
 
 - (void)updateStatus
 {
-	if([AppDelegate shared].isRefreshing)
+	if(app.isRefreshing)
 	{
 		self.title = @"Refreshing...";
-		EmptyView *label = [[EmptyView alloc] initWithMessage:[[AppDelegate shared].dataManager reasonForEmptyWithFilter:searchField.text]];
+		EmptyView *label = [[EmptyView alloc] initWithMessage:[app.dataManager reasonForEmptyWithFilter:searchField.text]];
 		self.tableView.tableFooterView = label;
 
 		if(!self.refreshControl.isRefreshing)
@@ -554,11 +554,11 @@
 		else
 		{
 			self.title = @"No PRs";
-			EmptyView *label = [[EmptyView alloc] initWithMessage:[[AppDelegate shared].dataManager reasonForEmptyWithFilter:searchField.text]];
+			EmptyView *label = [[EmptyView alloc] initWithMessage:[app.dataManager reasonForEmptyWithFilter:searchField.text]];
 			self.tableView.tableFooterView = label;
 		}
 	}
-	self.refreshControl.attributedTitle = [[NSAttributedString alloc] initWithString:[[AppDelegate shared].api lastUpdateDescription]
+	self.refreshControl.attributedTitle = [[NSAttributedString alloc] initWithString:[app.api lastUpdateDescription]
 																		  attributes:@{ }];
 
 	[UIApplication sharedApplication].applicationIconBadgeNumber = [PullRequest badgeCountInMoc:self.managedObjectContext];

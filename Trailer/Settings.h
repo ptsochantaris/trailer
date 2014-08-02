@@ -1,8 +1,6 @@
 
 @interface Settings : NSObject
 
-+ (Settings *)shared;
-
 - (NSString *)sortField;
 
 @property (nonatomic) NSInteger sortMethod, statusFilteringMode,
@@ -34,3 +32,5 @@
 @property (nonatomic) NSInteger checkForUpdatesInterval;
 
 @end
+
+extern Settings *settings;

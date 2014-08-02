@@ -79,7 +79,7 @@
 
 	if([self shouldShowTop])
 	{
-		CGRect rect = CGRectMake(0, size.height-SCROLL_ZONE_HEIGHT-TOP_CONTROLS_HEIGHT, size.width-[AppDelegate shared].scrollBarWidth, SCROLL_ZONE_HEIGHT);
+		CGRect rect = CGRectMake(0, size.height-SCROLL_ZONE_HEIGHT-TOP_CONTROLS_HEIGHT, size.width-app.scrollBarWidth, SCROLL_ZONE_HEIGHT);
 		topBox.frame = rect;
 		topArrow.frame = rect;
 		[self.contentView addSubview:topBox];
@@ -89,7 +89,7 @@
 
 	if([self shouldShowBottom])
 	{
-		CGRect rect = CGRectMake(0, 0, size.width-[AppDelegate shared].scrollBarWidth, SCROLL_ZONE_HEIGHT);
+		CGRect rect = CGRectMake(0, 0, size.width-app.scrollBarWidth, SCROLL_ZONE_HEIGHT);
 		bottomBox.frame = rect;
 		bottomArrow.frame = rect;
 		[self.contentView addSubview:bottomBox];
@@ -108,7 +108,7 @@
 	CGFloat containerHeight = self.scrollView.contentView.documentVisibleRect.size.height;
 	CGFloat containerTop = containerBottom + containerHeight;
 
-	[AppDelegate shared].isManuallyScrolling = YES;
+	app.isManuallyScrolling = YES;
 	[mouseIgnoreTimer push];
 
 	if(itemTop>containerTop)
@@ -123,7 +123,7 @@
 
 - (void)mouseIngoreItemPopped:(HTPopTimer *)popTimer
 {
-	[AppDelegate shared].isManuallyScrolling = NO;
+	app.isManuallyScrolling = NO;
 }
 
 - (NSTrackingArea *)addTrackingAreaInRect:(CGRect)trackingRect

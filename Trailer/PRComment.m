@@ -40,12 +40,12 @@
 
 - (BOOL)isMine
 {
-	return [self.userId.stringValue isEqualToString:[Settings shared].localUserId];
+	return [self.userId.stringValue isEqualToString:settings.localUserId];
 }
 
 - (BOOL)refersToMe
 {
-	NSString *myHandle = [NSString stringWithFormat:@"@%@",[Settings shared].localUser];
+	NSString *myHandle = [NSString stringWithFormat:@"@%@",settings.localUser];
 	NSRange rangeOfHandle = [self.body rangeOfString:myHandle options:NSCaseInsensitiveSearch|NSDiacriticInsensitiveSearch];
 	return rangeOfHandle.location != NSNotFound;
 }

@@ -19,7 +19,7 @@
 	if(UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad)
 	{
 		settingsChangedTimer = [[HTPopTimer alloc] initWithTimeInterval:1.0
-																 target:[AppDelegate shared].dataManager
+																 target:app.dataManager
 															   selector:@selector(postProcessAllPrs)];
 	}
 }
@@ -57,19 +57,19 @@ NSString *B(NSString *input)
 			case 0:
 			{
 				cell.textLabel.text = B(@"Foreground refresh\ninterval");
-				cell.detailTextLabel.text = [NSString stringWithFormat:@"%.0f seconds",[Settings shared].refreshPeriod];
+				cell.detailTextLabel.text = [NSString stringWithFormat:@"%.0f seconds",settings.refreshPeriod];
 				break;
 			}
 			case 1:
 			{
 				cell.textLabel.text = B(@"Background refresh\ninterval (minimum)");
-				cell.detailTextLabel.text = [NSString stringWithFormat:@"%.0f minutes",[Settings shared].backgroundRefreshPeriod/60.0];
+				cell.detailTextLabel.text = [NSString stringWithFormat:@"%.0f minutes",settings.backgroundRefreshPeriod/60.0];
 				break;
 			}
 			case 2:
 			{
 				cell.textLabel.text = B(@"Watchlist refresh\ninterval");
-				cell.detailTextLabel.text = [NSString stringWithFormat:@"%.0f hours",[Settings shared].newRepoCheckPeriod];
+				cell.detailTextLabel.text = [NSString stringWithFormat:@"%.0f hours",settings.newRepoCheckPeriod];
 				break;
 			}
 		}
@@ -82,31 +82,31 @@ NSString *B(NSString *input)
 			case 0:
 			{
 				cell.textLabel.text = B(@"Display creation instead\nof activity times");
-				if([Settings shared].showCreatedInsteadOfUpdated) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if(settings.showCreatedInsteadOfUpdated) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
 			case 1:
             {
 				cell.textLabel.text = @"Don't report refresh failures";
-				if([Settings shared].dontReportRefreshFailures) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if(settings.dontReportRefreshFailures) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
             }
 			case 2:
             {
 				cell.textLabel.text = @"Hide 'All PRs' section";
-				if([Settings shared].hideAllPrsSection) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if(settings.hideAllPrsSection) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
             }
 			case 3:
             {
 				cell.textLabel.text = @"Move assigned PRs to 'Mine'";
-				if([Settings shared].moveAssignedPrsToMySection) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if(settings.moveAssignedPrsToMySection) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
             }
 			case 4:
 			{
 				cell.textLabel.text = B(@"Announce unmergeable PRs only\nin 'Mine'/'Participated'");
-				if([Settings shared].markUnmergeableOnUserSectionsOnly) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if(settings.markUnmergeableOnUserSectionsOnly) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
 		}
@@ -119,25 +119,25 @@ NSString *B(NSString *input)
 			case 0:
 			{
 				cell.textLabel.text = B(@"Display comment badges\nand alerts for all PRs");
-				if([Settings shared].showCommentsEverywhere) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if(settings.showCommentsEverywhere) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
 			case 1:
 			{
 				cell.textLabel.text = B(@"Only display PRs\nwith unread comments");
-				if([Settings shared].shouldHideUncommentedRequests) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if(settings.shouldHideUncommentedRequests) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
 			case 2:
 			{
 				cell.textLabel.text = B(@"Move PRs that mention me\nto 'Participated'");
-				if([Settings shared].autoParticipateInMentions) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if(settings.autoParticipateInMentions) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
 			case 3:
 			{
 				cell.textLabel.text = B(@"Open PRs at first unread\ncomment");
-				if([Settings shared].openPrAtFirstUnreadComment) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if(settings.openPrAtFirstUnreadComment) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 			}
 		}
 	}
@@ -149,19 +149,19 @@ NSString *B(NSString *input)
 			case 0:
             {
 				cell.textLabel.text = @"Display repository names";
-				if([Settings shared].showReposInName) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if(settings.showReposInName) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
             }
 			case 1:
             {
 				cell.textLabel.text = B(@"Include repositories in\nfiltering");
-				if([Settings shared].includeReposInFilter) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if(settings.includeReposInFilter) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
             }
 			case 2:
 			{
 				cell.textLabel.text = B(@"Hide new repositories\nby default");
-				if([Settings shared].hideNewRepositories) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if(settings.hideNewRepositories) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
 		}
@@ -174,19 +174,19 @@ NSString *B(NSString *input)
 			case 0:
 			{
 				cell.textLabel.text = B(@"When a PR is merged");
-				cell.detailTextLabel.text = PR_HANDLING_POLICY[[Settings shared].mergeHandlingPolicy];
+				cell.detailTextLabel.text = PR_HANDLING_POLICY[settings.mergeHandlingPolicy];
 				break;
 			}
 			case 1:
 			{
 				cell.textLabel.text = B(@"When a PR is closed");
-				cell.detailTextLabel.text = PR_HANDLING_POLICY[[Settings shared].closeHandlingPolicy];
+				cell.detailTextLabel.text = PR_HANDLING_POLICY[settings.closeHandlingPolicy];
 				break;
 			}
 			case 2:
 			{
 				cell.textLabel.text = B(@"Don't keep PRs merged\nby me");
-				if([Settings shared].dontKeepPrsMergedByMe) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if(settings.dontKeepPrsMergedByMe) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
 		}
@@ -199,13 +199,13 @@ NSString *B(NSString *input)
 			case 0:
             {
 				cell.textLabel.text = @"Removing all merged PRs";
-				if([Settings shared].dontAskBeforeWipingMerged) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if(settings.dontAskBeforeWipingMerged) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
             }
             case 1:
             {
 				cell.textLabel.text = @"Removing all closed PRs";
-				if([Settings shared].dontAskBeforeWipingClosed) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if(settings.dontAskBeforeWipingClosed) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
             }
 		}
@@ -218,7 +218,7 @@ NSString *B(NSString *input)
 			case 0:
 			{
 				cell.textLabel.text = @"Direction";
-				if([Settings shared].sortDescending)
+				if(settings.sortDescending)
 					cell.detailTextLabel.text = @"Reverse";
 				else
 					cell.detailTextLabel.text = @"Normal";
@@ -227,16 +227,16 @@ NSString *B(NSString *input)
 			case 1:
 			{
 				cell.textLabel.text = @"Criterion";
-				if([Settings shared].sortDescending)
-					cell.detailTextLabel.text = SORT_REVERSE[[Settings shared].sortMethod];
+				if(settings.sortDescending)
+					cell.detailTextLabel.text = SORT_REVERSE[settings.sortMethod];
 				else
-					cell.detailTextLabel.text = SORT_NORMAL[[Settings shared].sortMethod];
+					cell.detailTextLabel.text = SORT_NORMAL[settings.sortMethod];
 				break;
 			}
 			case 2:
 			{
 				cell.textLabel.text = @"Group by repository";
-				if([Settings shared].groupByRepo) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if(settings.groupByRepo) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
 		}
@@ -265,7 +265,7 @@ NSString *B(NSString *input)
 				NSInteger count=0;
 				for(NSInteger f=60;f<3600;f+=10)
 				{
-					if(f==[Settings shared].refreshPeriod) previousValue = count;
+					if(f==settings.refreshPeriod) previousValue = count;
 					[values addObject:[NSString stringWithFormat:@"%ld seconds",(long)f]];
 					count++;
 				}
@@ -277,7 +277,7 @@ NSString *B(NSString *input)
 				NSInteger count=0;
 				for(NSInteger f=10;f<10000;f+=10)
 				{
-					if(f==[Settings shared].backgroundRefreshPeriod/60.0) previousValue = count;
+					if(f==settings.backgroundRefreshPeriod/60.0) previousValue = count;
 					[values addObject:[NSString stringWithFormat:@"%ld minutes",(long)f]];
 					count++;
 				}
@@ -289,7 +289,7 @@ NSString *B(NSString *input)
 				NSInteger count=0;
 				for(NSInteger f=1;f<100;f+=1)
 				{
-					if(f==[Settings shared].newRepoCheckPeriod) previousValue = count;
+					if(f==settings.newRepoCheckPeriod) previousValue = count;
 					[values addObject:[NSString stringWithFormat:@"%ld hours",(long)f]];
 					count++;
 				}
@@ -305,27 +305,27 @@ NSString *B(NSString *input)
 		{
 			case 0:
 			{
-				[Settings shared].showCreatedInsteadOfUpdated = ![Settings shared].showCreatedInsteadOfUpdated;
+				settings.showCreatedInsteadOfUpdated = !settings.showCreatedInsteadOfUpdated;
 				break;
 			}
 			case 1:
 			{
-				[Settings shared].dontReportRefreshFailures = ![Settings shared].dontReportRefreshFailures;
+				settings.dontReportRefreshFailures = !settings.dontReportRefreshFailures;
 				break;
 			}
 			case 2:
 			{
-				[Settings shared].hideAllPrsSection = ![Settings shared].hideAllPrsSection;
+				settings.hideAllPrsSection = !settings.hideAllPrsSection;
 				break;
 			}
 			case 3:
 			{
-				[Settings shared].moveAssignedPrsToMySection = ![Settings shared].moveAssignedPrsToMySection;
+				settings.moveAssignedPrsToMySection = !settings.moveAssignedPrsToMySection;
 				break;
 			}
 			case 4:
 			{
-				[Settings shared].markUnmergeableOnUserSectionsOnly = ![Settings shared].markUnmergeableOnUserSectionsOnly;
+				settings.markUnmergeableOnUserSectionsOnly = !settings.markUnmergeableOnUserSectionsOnly;
 				break;
 			}
 		}
@@ -337,22 +337,22 @@ NSString *B(NSString *input)
 		{
 			case 0:
 			{
-				[Settings shared].showCommentsEverywhere = ![Settings shared].showCommentsEverywhere;
+				settings.showCommentsEverywhere = !settings.showCommentsEverywhere;
 				break;
 			}
 			case 1:
 			{
-				[Settings shared].shouldHideUncommentedRequests = ![Settings shared].shouldHideUncommentedRequests;
+				settings.shouldHideUncommentedRequests = !settings.shouldHideUncommentedRequests;
 				break;
 			}
 			case 2:
 			{
-				[Settings shared].autoParticipateInMentions = ![Settings shared].autoParticipateInMentions;
+				settings.autoParticipateInMentions = !settings.autoParticipateInMentions;
 				break;
 			}
 			case 3:
 			{
-				[Settings shared].openPrAtFirstUnreadComment = ![Settings shared].openPrAtFirstUnreadComment;
+				settings.openPrAtFirstUnreadComment = !settings.openPrAtFirstUnreadComment;
 			}
 		}
 		[settingsChangedTimer push];
@@ -363,17 +363,17 @@ NSString *B(NSString *input)
 		{
 			case 0:
 			{
-				[Settings shared].showReposInName = ![Settings shared].showReposInName;
+				settings.showReposInName = !settings.showReposInName;
 				break;
 			}
 			case 1:
 			{
-				[Settings shared].includeReposInFilter = ![Settings shared].includeReposInFilter;
+				settings.includeReposInFilter = !settings.includeReposInFilter;
 				break;
 			}
 			case 2:
 			{
-				[Settings shared].hideNewRepositories = ![Settings shared].hideNewRepositories;
+				settings.hideNewRepositories = !settings.hideNewRepositories;
 				break;
 			}
 		}
@@ -386,7 +386,7 @@ NSString *B(NSString *input)
 			case 0:
 			{
                 selectedIndexPath = indexPath;
-				previousValue = [Settings shared].mergeHandlingPolicy;
+				previousValue = settings.mergeHandlingPolicy;
 				pickerName = [self.tableView cellForRowAtIndexPath:indexPath].textLabel.text;
                 valuesToPush = PR_HANDLING_POLICY;
 				[self performSegueWithIdentifier:@"showPicker" sender:self];
@@ -395,7 +395,7 @@ NSString *B(NSString *input)
 			case 1:
 			{
                 selectedIndexPath = indexPath;
-				previousValue = [Settings shared].closeHandlingPolicy;
+				previousValue = settings.closeHandlingPolicy;
 				pickerName = [self.tableView cellForRowAtIndexPath:indexPath].textLabel.text;
                 valuesToPush = PR_HANDLING_POLICY;
 				[self performSegueWithIdentifier:@"showPicker" sender:self];
@@ -403,7 +403,7 @@ NSString *B(NSString *input)
 			}
 			case 2:
 			{
-				[Settings shared].dontKeepPrsMergedByMe = ![Settings shared].dontKeepPrsMergedByMe;
+				settings.dontKeepPrsMergedByMe = !settings.dontKeepPrsMergedByMe;
 				[settingsChangedTimer push];
 				break;
 			}
@@ -415,12 +415,12 @@ NSString *B(NSString *input)
 		{
 			case 0:
 			{
-				[Settings shared].dontAskBeforeWipingMerged = ![Settings shared].dontAskBeforeWipingMerged;
+				settings.dontAskBeforeWipingMerged = !settings.dontAskBeforeWipingMerged;
 				break;
 			}
 			case 1:
 			{
-				[Settings shared].dontAskBeforeWipingClosed = ![Settings shared].dontAskBeforeWipingClosed;
+				settings.dontAskBeforeWipingClosed = !settings.dontAskBeforeWipingClosed;
 				break;
 			}
 		}
@@ -432,7 +432,7 @@ NSString *B(NSString *input)
 		{
 			case 0:
 			{
-				[Settings shared].sortDescending = ![Settings shared].sortDescending;
+				settings.sortDescending = !settings.sortDescending;
 				[settingsChangedTimer push];
 				[self.tableView reloadData];
 				break;
@@ -440,9 +440,9 @@ NSString *B(NSString *input)
 			case 1:
 			{
 				selectedIndexPath = indexPath;
-				previousValue = [Settings shared].sortMethod;
+				previousValue = settings.sortMethod;
 				pickerName = [self.tableView cellForRowAtIndexPath:indexPath].textLabel.text;
-				if([Settings shared].sortDescending)
+				if(settings.sortDescending)
 					valuesToPush = SORT_REVERSE;
 				else
 					valuesToPush = SORT_NORMAL;
@@ -451,7 +451,7 @@ NSString *B(NSString *input)
 			}
 			case 2:
 			{
-				[Settings shared].groupByRepo = ![Settings shared].groupByRepo;
+				settings.groupByRepo = !settings.groupByRepo;
 				[settingsChangedTimer push];
 				break;
 			}
@@ -519,31 +519,31 @@ NSString *B(NSString *input)
 	{
 		if(selectedIndexPath.row==0)
 		{
-			[Settings shared].refreshPeriod = indexPath.row*10+60;
+			settings.refreshPeriod = indexPath.row*10+60;
 		}
 		else if(selectedIndexPath.row==1)
 		{
-			[Settings shared].backgroundRefreshPeriod = (indexPath.row*10+10)*60.0;
+			settings.backgroundRefreshPeriod = (indexPath.row*10+10)*60.0;
 		}
 		else if(selectedIndexPath.row==2)
 		{
-			[Settings shared].newRepoCheckPeriod = indexPath.row+1;
+			settings.newRepoCheckPeriod = indexPath.row+1;
 		}
 	}
 	else if(selectedIndexPath.section==SORT_SECTION_INDEX)
 	{
-		[Settings shared].sortMethod = indexPath.row;
+		settings.sortMethod = indexPath.row;
 		[settingsChangedTimer push];
 	}
 	else if(selectedIndexPath.section==HISTORY_SECTION_INDEX)
 	{
 		if(selectedIndexPath.row==0)
 		{
-			[Settings shared].mergeHandlingPolicy = indexPath.row;
+			settings.mergeHandlingPolicy = indexPath.row;
 		}
 		else if(selectedIndexPath.row==1)
 		{
-			[Settings shared].closeHandlingPolicy = indexPath.row;
+			settings.closeHandlingPolicy = indexPath.row;
 		}
 	}
 	[self.tableView reloadData];

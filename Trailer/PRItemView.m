@@ -61,7 +61,7 @@ static CGColorRef _highlightColor;
 		NSInteger sectionIndex = pullRequest.sectionIndex.integerValue;
 		if(sectionIndex==kPullRequestSectionMine ||
 		   sectionIndex==kPullRequestSectionParticipated ||
-		   [Settings shared].showCommentsEverywhere)
+		   settings.showCommentsEverywhere)
 		{
 			_commentsNew = pullRequest.unreadComments.integerValue;
 		}
@@ -69,12 +69,12 @@ static CGColorRef _highlightColor;
 		NSString *_title = pullRequest.title;
 		NSString *_subtitle = pullRequest.subtitle;
 
-		CGFloat W = MENU_WIDTH-LEFTPADDING-[AppDelegate shared].scrollBarWidth;
+		CGFloat W = MENU_WIDTH-LEFTPADDING-app.scrollBarWidth;
 		BOOL showUnpin = pullRequest.condition.integerValue!=kPullRequestConditionOpen || pullRequest.markUnmergeable;
 
 		if(showUnpin) W -= REMOVE_BUTTON_WIDTH;
 
-		BOOL showAvatar = pullRequest.userAvatarUrl.length && ![Settings shared].hideAvatars;
+		BOOL showAvatar = pullRequest.userAvatarUrl.length && !settings.hideAvatars;
 		if(showAvatar) W -= (AVATAR_SIZE+AVATAR_PADDING);
 		else W += 4.0;
 
@@ -91,7 +91,7 @@ static CGColorRef _highlightColor;
 		CGFloat bottom, CELL_PADDING;
 		CGFloat statusBottom = 0;
 
-		if([Settings shared].showStatusItems)
+		if(settings.showStatusItems)
 		{
 			CELL_PADDING = 10;
 			bottom = CELL_PADDING * 0.5;
@@ -178,7 +178,7 @@ static CGColorRef _highlightColor;
 
 			PRStatus *status = statuses[count];
 			statusLabel.targetUrl = status.targetUrl;
-			statusLabel.needsCommand = ![Settings shared].makeStatusItemsSelectable;
+			statusLabel.needsCommand = !settings.makeStatusItemsSelectable;
 			statusLabel.attributedStringValue = [[NSAttributedString alloc] initWithString:status.displayText
 																				attributes:_statusAttributes];
 			statusLabel.textColor = status.colorForDisplay;
@@ -211,7 +211,7 @@ static CGColorRef _highlightColor;
 
 - (void)mouseEntered:(NSEvent *)theEvent
 {
-	if(![AppDelegate shared].isManuallyScrolling) self.focused = YES;
+	if(!app.isManuallyScrolling) self.focused = YES;
 }
 
 - (void)mouseExited:(NSEvent *)theEvent
@@ -278,7 +278,7 @@ static CGColorRef _highlightColor;
     NSPasteboard *pboard = [NSPasteboard pasteboardWithName:NSDragPboard];
     [pboard declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:self];
 
-	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:self.userInfo moc:[AppDelegate shared].dataManager.managedObjectContext];
+	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:self.userInfo moc:app.dataManager.managedObjectContext];
     [pboard setString:r.webUrl forType:NSStringPboardType];
 
 	NSPoint globalLocation = [ NSEvent mouseLocation ];

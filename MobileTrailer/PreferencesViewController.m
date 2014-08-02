@@ -20,8 +20,8 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 }
 - (void)done
 {
-	[[AppDelegate shared].dataManager postProcessAllPrs];
-	if([AppDelegate shared].preferencesDirty) [[AppDelegate shared] startRefresh];
+	[app.dataManager postProcessAllPrs];
+	if(app.preferencesDirty) [app startRefresh];
 	[self dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -53,8 +53,8 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(apiUsageUpdate) name:RATE_UPDATE_NOTIFICATION object:nil];
 
-	self.githubApiToken.text = [Settings shared].authToken;
-	self.refreshRepoList.enabled = ([Settings shared].authToken.length>0);
+	self.githubApiToken.text = settings.authToken;
+	self.refreshRepoList.enabled = (settings.authToken.length>0);
 
 	[self.repositories reloadData];
 
@@ -79,7 +79,7 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 
 - (void)apiUsageUpdate
 {
-	API *api = [AppDelegate shared].api;
+	API *api = app.api;
 	if(api.requestsLimit==0 && api.requestsRemaining==0)
 		[self.apiLoad setProgress:0.0];
 	else
@@ -88,14 +88,14 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 
 - (void)commitToken
 {
-	[Settings shared].authToken = [self.githubApiToken.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-	self.refreshRepoList.enabled = ([Settings shared].authToken.length>0);
+	settings.authToken = [self.githubApiToken.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	self.refreshRepoList.enabled = (settings.authToken.length>0);
 	[self.githubApiToken resignFirstResponder];
 }
 
 - (void)resetData
 {
-	if([Repo countItemsOfType:@"Repo" inMoc:[AppDelegate shared].dataManager.managedObjectContext])
+	if([Repo countItemsOfType:@"Repo" inMoc:app.dataManager.managedObjectContext])
 	{
 		CGRect frame = self.githubApiToken.frame;
 		frame = CGRectOffset(frame, 0, frame.size.height);
@@ -110,11 +110,11 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 		double delayInSeconds = 0.01;
 		dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
 		dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-			[AppDelegate shared].preferencesDirty = YES;
-			[AppDelegate shared].lastSuccessfulRefresh = nil;
-			[[AppDelegate shared].dataManager deleteEverything];
-			[AppDelegate shared].api.requestsLimit = 0;
-			[AppDelegate shared].api.requestsRemaining = 0;
+			app.preferencesDirty = YES;
+			app.lastSuccessfulRefresh = nil;
+			[app.dataManager deleteEverything];
+			app.api.requestsLimit = 0;
+			app.api.requestsRemaining = 0;
 			[self apiUsageUpdate];
 			[pleaseWaitLabel removeFromSuperview];
 		});
@@ -143,14 +143,14 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 	self.repositories.hidden = YES;
 	self.githubApiToken.hidden = YES;
 
-	[[AppDelegate shared].api fetchRepositoriesAndCallback:^(BOOL success) {
+	[app.api fetchRepositoriesAndCallback:^(BOOL success) {
 
 		self.refreshRepoList.title = originalName;
 		self.refreshRepoList.enabled = YES;
 		self.repositories.hidden = NO;
 		self.githubApiToken.hidden = NO;
 
-		[AppDelegate shared].preferencesDirty = YES;
+		app.preferencesDirty = YES;
 
 		[self updateInstructionMode];
 
@@ -191,16 +191,16 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 	BOOL hideNow = !repo.hidden.boolValue;
 	repo.hidden = @(hideNow);
 	repo.dirty = @(!hideNow);
-	[[AppDelegate shared].dataManager saveDB];
+	[app.dataManager saveDB];
 	[tableView deselectRowAtIndexPath:indexPath animated:NO];
-	[AppDelegate shared].preferencesDirty = YES;
+	app.preferencesDirty = YES;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
 	NSString *title;
-	if([Settings shared].localUser)
-		title = [Settings shared].localUser;
+	if(settings.localUser)
+		title = settings.localUser;
 	else
 		title = @"";
 
@@ -234,7 +234,7 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     // Edit the entity name as appropriate.
-    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Repo" inManagedObjectContext:[AppDelegate shared].dataManager.managedObjectContext];
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Repo" inManagedObjectContext:app.dataManager.managedObjectContext];
     [fetchRequest setEntity:entity];
 
 	if(searchField.text.length)
@@ -250,7 +250,7 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
     // Edit the section name key path and cache name if appropriate.
     // nil for section name key path means "no sections".
     NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
-																								managedObjectContext:[AppDelegate shared].dataManager.managedObjectContext
+																								managedObjectContext:app.dataManager.managedObjectContext
 																								  sectionNameKeyPath:@"fork"
 																										   cacheName:nil];
     aFetchedResultsController.delegate = self;
@@ -381,7 +381,7 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 	switch (buttonIndex) {
 		case 0:
 		{
-			targetUrl = [NSString stringWithFormat:@"https://%@/watching",[Settings shared].apiFrontEnd];
+			targetUrl = [NSString stringWithFormat:@"https://%@/watching",settings.apiFrontEnd];
 			[self performSegueWithIdentifier:@"openGithub" sender:self];
 			break;
 		}
@@ -399,18 +399,18 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 		}
 	}
 
-	[AppDelegate shared].preferencesDirty = YES;
+	app.preferencesDirty = YES;
 }
 
 - (void)viewTokens
 {
-	targetUrl = [NSString stringWithFormat:@"https://%@/settings/applications",[Settings shared].apiFrontEnd];
+	targetUrl = [NSString stringWithFormat:@"https://%@/settings/applications",settings.apiFrontEnd];
 	[self performSegueWithIdentifier:@"openGithub" sender:self];
 }
 
 - (void)createToken
 {
-	targetUrl = [NSString stringWithFormat:@"https://%@/settings/tokens/new",[Settings shared].apiFrontEnd];
+	targetUrl = [NSString stringWithFormat:@"https://%@/settings/tokens/new",settings.apiFrontEnd];
 	[self performSegueWithIdentifier:@"openGithub" sender:self];
 }
 
@@ -496,7 +496,7 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 
 - (void)updateInstructionMode
 {
-	[self instructionMode:([Repo countItemsOfType:@"Repo" inMoc:[AppDelegate shared].dataManager.managedObjectContext]==0 || self.githubApiToken.text.length==0)];
+	[self instructionMode:([Repo countItemsOfType:@"Repo" inMoc:app.dataManager.managedObjectContext]==0 || self.githubApiToken.text.length==0)];
 }
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
@@ -510,7 +510,7 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 		}
 		else
 		{
-			[AppDelegate shared].preferencesDirty = YES;
+			app.preferencesDirty = YES;
 			[self resetData];
 			return YES;
 		}

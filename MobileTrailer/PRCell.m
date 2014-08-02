@@ -49,7 +49,7 @@ static NSNumberFormatter *itemCountFormatter;
 - (void)networkStateChanged
 {
     if(!failedToLoadImage) return;
-    if([[AppDelegate shared].api.reachability currentReachabilityStatus]!=NotReachable)
+    if([app.api.reachability currentReachabilityStatus]!=NotReachable)
 	{
         [self loadImageAtPath:failedToLoadImage];
 	}
@@ -67,7 +67,7 @@ static NSNumberFormatter *itemCountFormatter;
 
 	NSInteger _commentsNew=0;
 	NSInteger _commentsTotal = pullRequest.totalComments.integerValue;
-	if([Settings shared].showCommentsEverywhere || pullRequest.isMine || pullRequest.commentedByMe)
+	if(settings.showCommentsEverywhere || pullRequest.isMine || pullRequest.commentedByMe)
 	{
 		_commentsNew = pullRequest.unreadComments.integerValue;
 	}
@@ -94,7 +94,7 @@ static NSNumberFormatter *itemCountFormatter;
 - (void)loadImageAtPath:(NSString *)imagePath
 {
 	waitingForImageInPath = imagePath;
-    if(![[AppDelegate shared].api haveCachedAvatar:imagePath
+    if(![app.api haveCachedAvatar:imagePath
 								tryLoadAndCallback:^(id image) {
 									if([waitingForImageInPath isEqualToString:imagePath])
 									{

@@ -35,7 +35,7 @@ static CGColorRef _lightGray;
     self = [super initWithFrame:CGRectMake(0, 0, MENU_WIDTH, TITLE_HEIGHT)];
     if (self) {
 		self.delegate = delegate;
-		CGFloat W = MENU_WIDTH-[AppDelegate shared].scrollBarWidth;
+		CGFloat W = MENU_WIDTH-app.scrollBarWidth;
 		if(delegate)
 		{
 			NSButton *_unpin = [[NSButton alloc] initWithFrame:CGRectMake(W-100, -4.0, 90, TITLE_HEIGHT)];

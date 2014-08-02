@@ -25,9 +25,9 @@
 
 - (void)loadSettings
 {
-	self.apiFrontEnd.text = [Settings shared].apiFrontEnd;
-	self.apiBackEnd.text = [Settings shared].apiBackEnd;
-	self.apiPath.text = [Settings shared].apiPath;
+	self.apiFrontEnd.text = settings.apiFrontEnd;
+	self.apiBackEnd.text = settings.apiBackEnd;
+	self.apiPath.text = settings.apiPath;
 }
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
@@ -67,11 +67,11 @@
 	if(backEnd.length==0) backEnd = nil;
 	if(path.length==0) path = nil;
 
-	[Settings shared].apiFrontEnd = frontEnd;
-	[Settings shared].apiBackEnd = backEnd;
-	[Settings shared].apiPath = path;
+	settings.apiFrontEnd = frontEnd;
+	settings.apiBackEnd = backEnd;
+	settings.apiPath = path;
 
-	[AppDelegate shared].preferencesDirty = YES;
+	app.preferencesDirty = YES;
 
 	return YES;
 }
@@ -100,9 +100,9 @@
 
 - (void)restoreDefaults
 {
-	[Settings shared].apiBackEnd = nil;
-	[Settings shared].apiFrontEnd = nil;
-	[Settings shared].apiPath = nil;
+	settings.apiBackEnd = nil;
+	settings.apiFrontEnd = nil;
+	settings.apiPath = nil;
 	[self loadSettings];
 }
 
@@ -110,7 +110,7 @@
 {
 	self.testApiButton.enabled = NO;
 	self.restoreDefaultsButton.enabled = NO;
-	[[AppDelegate shared].api testApiAndCallback:^(NSError *error) {
+	[app.api testApiAndCallback:^(NSError *error) {
 
 		self.testApiButton.enabled = YES;
 		self.restoreDefaultsButton.enabled = YES;
@@ -118,7 +118,7 @@
 		if(error)
 		{
 			[[[UIAlertView alloc] initWithTitle:@"Failed"
-										message:[NSString stringWithFormat:@"The test failed for https://%@/%@",[Settings shared].apiBackEnd,[Settings shared].apiPath]
+										message:[NSString stringWithFormat:@"The test failed for https://%@/%@",settings.apiBackEnd,settings.apiPath]
 									   delegate:nil
 							  cancelButtonTitle:@"OK"
 							  otherButtonTitles:nil] show];

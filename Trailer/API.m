@@ -75,7 +75,7 @@ typedef void (^completionBlockType)(BOOL);
 - (void)restartNotifier
 {
 	[self.reachability stopNotifier];
-	self.reachability = [Reachability reachabilityWithHostName:[Settings shared].apiBackEnd];
+	self.reachability = [Reachability reachabilityWithHostName:settings.apiBackEnd];
 	[self.reachability startNotifier];
 }
 
@@ -234,7 +234,7 @@ typedef void (^completionBlockType)(BOOL);
 		if(success)
 		{
 			NSManagedObjectContext *syncContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
-			syncContext.parentContext = [AppDelegate shared].dataManager.managedObjectContext;
+			syncContext.parentContext = app.dataManager.managedObjectContext;
 			syncContext.undoManager = nil;
 
 			NSArray *allRepos = [PullRequest itemsOfType:@"Repo" surviving:YES inMoc:syncContext];
@@ -245,17 +245,17 @@ typedef void (^completionBlockType)(BOOL);
 				{
 					[DataItem nukeDeletedItemsOfType:@"Repo" inMoc:syncContext];
 
-					BOOL shouldHideByDefault = [Settings shared].hideNewRepositories;
+					BOOL shouldHideByDefault = settings.hideNewRepositories;
 					for(Repo *r in [DataItem newItemsOfType:@"Repo" inMoc:syncContext])
 					{
 						r.hidden = @(shouldHideByDefault);
 						if(!shouldHideByDefault)
 						{
-							[[AppDelegate shared] postNotificationOfType:kNewRepoAnnouncement forItem:r];
+							[app postNotificationOfType:kNewRepoAnnouncement forItem:r];
 						}
 					}
 
-					[AppDelegate shared].lastRepoCheck = [NSDate date];
+					app.lastRepoCheck = [NSDate date];
 					if(syncContext.hasChanges) [syncContext save:nil];
 				}
 				else
@@ -310,7 +310,7 @@ typedef void (^completionBlockType)(BOOL);
 						if(data)
 						{
 							NSString *assignee = [[data ofk:@"assignee"] ofk:@"login"];
-							BOOL assigned = [assignee isEqualToString:[Settings shared].localUser];
+							BOOL assigned = [assignee isEqualToString:settings.localUser];
 							p.assignedToMe = @(assigned);
 							completionCallback(YES);
 						}
@@ -386,12 +386,12 @@ typedef void (^completionBlockType)(BOOL);
 		  {
 			  DLog(@"detected merged PR: %@",r.title);
 			  NSString *mergeUserId = [[mergeInfo  ofk:@"id"] stringValue];
-			  DLog(@"merged by user id: %@, our id is: %@",mergeUserId,[Settings shared].localUserId);
-			  BOOL mergedByMyself = [mergeUserId isEqualToString:[Settings shared].localUserId];
-			  if(!([Settings shared].dontKeepPrsMergedByMe && mergedByMyself))
+			  DLog(@"merged by user id: %@, our id is: %@",mergeUserId,settings.localUserId);
+			  BOOL mergedByMyself = [mergeUserId isEqualToString:settings.localUserId];
+			  if(!(settings.dontKeepPrsMergedByMe && mergedByMyself))
 			  {
 				  DLog(@"detected merged PR: %@",r.title);
-				  switch ([Settings shared].mergeHandlingPolicy)
+				  switch (settings.mergeHandlingPolicy)
 				  {
 					  case kPullRequestHandlingKeepMine:
 					  {
@@ -401,7 +401,7 @@ typedef void (^completionBlockType)(BOOL);
 					  {
 						  r.postSyncAction = @(kPostSyncDoNothing); // don't delete this
 						  r.condition = @kPullRequestConditionMerged;
-						  [[AppDelegate shared] postNotificationOfType:kPrMerged forItem:r];
+						  [app postNotificationOfType:kPrMerged forItem:r];
 					  }
 					  case kPullRequestHandlingKeepNone: {}
 				  }
@@ -414,7 +414,7 @@ typedef void (^completionBlockType)(BOOL);
 		  else
 		  {
 			  DLog(@"detected closed PR: %@",r.title);
-			  switch([Settings shared].closeHandlingPolicy)
+			  switch(settings.closeHandlingPolicy)
 			  {
 				  case kPullRequestHandlingKeepMine:
 				  {
@@ -424,7 +424,7 @@ typedef void (^completionBlockType)(BOOL);
 				  {
 					  r.postSyncAction = @(kPostSyncDoNothing); // don't delete this
 					  r.condition = @kPullRequestConditionClosed;
-					  [[AppDelegate shared] postNotificationOfType:kPrClosed forItem:r];
+					  [app postNotificationOfType:kPrClosed forItem:r];
 				  }
 				  case kPullRequestHandlingKeepNone: {}
 			  }
@@ -444,7 +444,7 @@ typedef void (^completionBlockType)(BOOL);
 		{
 			[self autoSubscribeToReposAndCallback:^{
 				NSManagedObjectContext *syncContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSConfinementConcurrencyType];
-				syncContext.parentContext = [AppDelegate shared].dataManager.managedObjectContext;
+				syncContext.parentContext = app.dataManager.managedObjectContext;
 				syncContext.undoManager = nil;
 				[self syncToMoc:syncContext andCallback:callback];
 			}];
@@ -455,8 +455,8 @@ typedef void (^completionBlockType)(BOOL);
 
 - (void)autoSubscribeToReposAndCallback:(void(^)())callback
 {
-	if([AppDelegate shared].lastRepoCheck &&
-	   ([[NSDate date] timeIntervalSinceDate:[AppDelegate shared].lastRepoCheck] < [Settings shared].newRepoCheckPeriod*3600.0))
+	if(app.lastRepoCheck &&
+	   ([[NSDate date] timeIntervalSinceDate:app.lastRepoCheck] < settings.newRepoCheckPeriod*3600.0))
 	{
 		CALLBACK();
 	}
@@ -474,13 +474,13 @@ extern NSDateFormatter *_syncDateFormatter;
 usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 			 andCallback:(void(^)(BOOL success))callback
 {
-	NSString *latestEtag = [Settings shared].latestReceivedEventEtag;
-	NSDate *latestDate = [Settings shared].latestReceivedEventDateProcessed;
+	NSString *latestEtag = settings.latestReceivedEventEtag;
+	NSDate *latestDate = settings.latestReceivedEventDateProcessed;
 
 	syncDataToCommit.latestReceivedEventDate = latestDate;
 	BOOL needFirstDateOnly = ([latestDate isEqualToDate:[NSDate distantPast]]);
 
-	[self getPagedDataInPath:[NSString stringWithFormat:@"/users/%@/received_events",[Settings shared].localUser]
+	[self getPagedDataInPath:[NSString stringWithFormat:@"/users/%@/received_events",settings.localUser]
 			startingFromPage:1
 					  params:nil
 				extraHeaders:latestEtag ? @{ @"If-None-Match": latestEtag } : nil
@@ -520,13 +520,13 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 	usingUserEventsInMoc:(NSManagedObjectContext *)moc
 			 andCallback:(void(^)(BOOL success))callback
 {
-	NSString *latestEtag = [Settings shared].latestUserEventEtag;
-	NSDate *latestDate = [Settings shared].latestUserEventDateProcessed;
+	NSString *latestEtag = settings.latestUserEventEtag;
+	NSDate *latestDate = settings.latestUserEventDateProcessed;
 
 	syncDataToCommit.latestUserEventDate = latestDate;
 	BOOL needFirstDateOnly = ([latestDate isEqualToDate:[NSDate distantPast]]);
 
-	[self getPagedDataInPath:[NSString stringWithFormat:@"/users/%@/events",[Settings shared].localUser]
+	[self getPagedDataInPath:[NSString stringWithFormat:@"/users/%@/events",settings.localUser]
 			startingFromPage:1
 					  params:nil
 				extraHeaders:latestEtag ? @{ @"If-None-Match": latestEtag } : nil
@@ -616,22 +616,22 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 {
 	if(syncDataToCommit.latestReceivedEventDate)
 	{
-		[Settings shared].latestReceivedEventDateProcessed = syncDataToCommit.latestReceivedEventDate;
+		settings.latestReceivedEventDateProcessed = syncDataToCommit.latestReceivedEventDate;
 		syncDataToCommit.latestReceivedEventDate = nil;
 	}
 	if(syncDataToCommit.latestReceivedEventEtag)
 	{
-		[Settings shared].latestReceivedEventEtag = syncDataToCommit.latestReceivedEventEtag;
+		settings.latestReceivedEventEtag = syncDataToCommit.latestReceivedEventEtag;
 		syncDataToCommit.latestReceivedEventEtag = nil;
 	}
 	if(syncDataToCommit.latestUserEventDate)
 	{
-		[Settings shared].latestUserEventDateProcessed = syncDataToCommit.latestUserEventDate;
+		settings.latestUserEventDateProcessed = syncDataToCommit.latestUserEventDate;
 		syncDataToCommit.latestUserEventDate = nil;
 	}
 	if(syncDataToCommit.latestUserEventEtag)
 	{
-		[Settings shared].latestUserEventEtag = syncDataToCommit.latestUserEventEtag;
+		settings.latestUserEventEtag = syncDataToCommit.latestUserEventEtag;
 		syncDataToCommit.latestUserEventEtag = nil;
 	}
 }
@@ -658,7 +658,7 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 		[self syncTransactionSucceeded];
 	}
 
-	if([Settings shared].showStatusItems)
+	if(settings.showStatusItems)
 	{
 		self.successfulRefreshesSinceLastStatusCheck++;
 	}
@@ -691,9 +691,9 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 
 - (BOOL)shouldScanForStatusesInMoc:(NSManagedObjectContext *)moc
 {
-	if(self.successfulRefreshesSinceLastStatusCheck % [Settings shared].statusItemRefreshInterval == 0)
+	if(self.successfulRefreshesSinceLastStatusCheck % settings.statusItemRefreshInterval == 0)
 	{
-		if([Settings shared].showStatusItems)
+		if(settings.showStatusItems)
 		{
 			self.successfulRefreshesSinceLastStatusCheck = 0;
 			return YES;
@@ -806,9 +806,8 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 			andCallback:^(id data, BOOL lastPage, NSInteger resultCode, NSString *etag) {
 				if(data)
 				{
-					[Settings shared].localUser = [data ofk:@"login"];
-					[Settings shared].localUserId = [data ofk:@"id"];
-					[[NSUserDefaults standardUserDefaults] synchronize];
+					settings.localUser = [data ofk:@"login"];
+					settings.localUserId = [data ofk:@"id"];
 					CALLBACK(YES);
 				}
 				else CALLBACK(NO);
@@ -950,13 +949,17 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 {
 	[self networkIndicationStart];
 
-	NSString *authToken = [Settings shared].authToken;
+	NSString *authToken = settings.authToken;
 	NSBlockOperation *o = [NSBlockOperation blockOperationWithBlock:^{
 
 		NSString *expandedPath;
 		if([path rangeOfString:@"/"].location==0)
 		{
-			NSString *apiPath = [Settings shared].apiPath;
+			NSString *apiPath = settings.apiPath;
+			if(!apiPath && settings.apiPath)
+			{
+				DLog(@"weirdness");
+			}
 
 			if([apiPath rangeOfString:@"/"].location==0)
 				apiPath = [apiPath substringFromIndex:1];
@@ -965,7 +968,7 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 				if([[apiPath substringFromIndex:apiPath.length-2] isEqualToString:@"/"])
 					apiPath = [apiPath substringToIndex:apiPath.length-2];
 
-			expandedPath = [[[@"https://" stringByAppendingString:[Settings shared].apiBackEnd]
+			expandedPath = [[[@"https://" stringByAppendingString:settings.apiBackEnd]
 							 stringByAppendingPathComponent:apiPath]
 							stringByAppendingString:path];
 		}
@@ -1107,15 +1110,15 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 {
 #ifdef DEBUG
 	#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
-		return [NSString stringWithFormat:@"HouseTrip-Trailer-v%@-iOS-Development",[AppDelegate shared].currentAppVersion];
+		return [NSString stringWithFormat:@"HouseTrip-Trailer-v%@-iOS-Development",app.currentAppVersion];
 	#else
-		return [NSString stringWithFormat:@"HouseTrip-Trailer-v%@-OSX-Development",[AppDelegate shared].currentAppVersion];
+		return [NSString stringWithFormat:@"HouseTrip-Trailer-v%@-OSX-Development",app.currentAppVersion];
 	#endif
 #else
 	#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
-		return [NSString stringWithFormat:@"HouseTrip-Trailer-v%@-iOS-Release",[AppDelegate shared].currentAppVersion];
+		return [NSString stringWithFormat:@"HouseTrip-Trailer-v%@-iOS-Release",app.currentAppVersion];
 	#else
-		return [NSString stringWithFormat:@"HouseTrip-Trailer-v%@-OSX-Release",[AppDelegate shared].currentAppVersion];
+		return [NSString stringWithFormat:@"HouseTrip-Trailer-v%@-OSX-Release",app.currentAppVersion];
 	#endif
 #endif
 }
@@ -1185,7 +1188,7 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 	NSURL *imageURL = c.URL;
     NSString *imageKey = [NSString stringWithFormat:@"%@ %@",
 						  imageURL.absoluteString,
-						  [AppDelegate shared].currentAppVersion];
+						  app.currentAppVersion];
 
     NSString *cachePath = [cacheDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"imgcache-%@", [imageKey md5hash]]];
 
@@ -1249,17 +1252,17 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 
 - (NSString *)lastUpdateDescription
 {
-	if([AppDelegate shared].isRefreshing)
+	if(app.isRefreshing)
 	{
 		return @"Refreshing...";
 	}
-	else if([AppDelegate shared].lastUpdateFailed)
+	else if(app.lastUpdateFailed)
 	{
 		return @"Last update failed";
 	}
 	else
 	{
-		NSDate *lastSuccess = [AppDelegate shared].lastSuccessfulRefresh;
+		NSDate *lastSuccess = app.lastSuccessfulRefresh;
 		if(!lastSuccess) lastSuccess = [NSDate date];
 		long ago = (long)[[NSDate date] timeIntervalSinceDate:lastSuccess];
 		if(ago<10)

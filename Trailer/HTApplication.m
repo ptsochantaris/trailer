@@ -16,7 +16,7 @@
             }
             else if([event.charactersIgnoringModifiers isEqualToString:@"c"])
 			{
-				NSString *url = [AppDelegate shared].focusedItemUrl;
+				NSString *url = app.focusedItemUrl;
 				if(url)
 				{
 					NSPasteboard *p = [NSPasteboard generalPasteboard];

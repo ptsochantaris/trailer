@@ -100,10 +100,10 @@
 @property (nonatomic) NSString *currentAppVersion;
 
 
-+ (AppDelegate*)shared;
-
 - (void)postNotificationOfType:(PRNotificationType)type forItem:(id)item;
 
 - (NSString *)focusedItemUrl;
 
 @end
+
+extern AppDelegate *app;

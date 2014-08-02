@@ -1,8 +1,7 @@
 
-@implementation AppDelegate
+AppDelegate *app;
 
-static AppDelegate *_static_shared_ref;
-+ (AppDelegate *)shared { return _static_shared_ref; }
+@implementation AppDelegate
 
 - (void)applicationDidReceiveMemoryWarning:(UIApplication *)application
 {
@@ -12,7 +11,7 @@ static AppDelegate *_static_shared_ref;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-	_static_shared_ref = self;
+	app = self;
 
 	self.currentAppVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
 
@@ -22,6 +21,7 @@ static AppDelegate *_static_shared_ref;
 	//NSString *appDomain = [[NSBundle mainBundle] bundleIdentifier];
 	//[[NSUserDefaults standardUserDefaults] removePersistentDomainForName:appDomain];
 
+	settings = [[Settings alloc] init];
 	self.dataManager = [[DataManager alloc] init];
 	self.api = [[API alloc] init];
 
@@ -32,7 +32,16 @@ static AppDelegate *_static_shared_ref;
 
 	[self.dataManager postProcessAllPrs];
 
-	if([Settings shared].authToken.length) [self.api updateLimitFromServer];
+	if(settings.authToken.length) [self.api updateLimitFromServer];
+
+	/*
+	NSDate *start = [NSDate date];
+	for(NSInteger f=0;f<100000;f++)
+	{
+		NSDate *d = settings.latestReceivedEventDateProcessed;
+	}
+	DLog(@"%f sec",[[NSDate date] timeIntervalSinceDate:start]);
+	*/
 
 	[self setupUI];
 
@@ -41,14 +50,14 @@ static AppDelegate *_static_shared_ref;
 												 name:kReachabilityChangedNotification
 											   object:nil];
 
-	[[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:[Settings shared].backgroundRefreshPeriod];
+	[[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:settings.backgroundRefreshPeriod];
 
 	UILocalNotification *localNotification = [launchOptions objectForKey:UIApplicationLaunchOptionsLocalNotificationKey];
 
 	double delayInSeconds = 0.1;
 	dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
 	dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-		if([Repo visibleReposInMoc:self.dataManager.managedObjectContext]==0 || [Settings shared].authToken.length==0)
+		if([Repo visibleReposInMoc:self.dataManager.managedObjectContext]==0 || settings.authToken.length==0)
 		{
 			[self forcePreferences];
 		}
@@ -139,13 +148,13 @@ static AppDelegate *_static_shared_ref;
 	if(self.lastSuccessfulRefresh)
 	{
 		NSTimeInterval howLongAgo = [[NSDate date] timeIntervalSinceDate:self.lastSuccessfulRefresh];
-		if(howLongAgo>[Settings shared].refreshPeriod)
+		if(howLongAgo>settings.refreshPeriod)
 		{
 			[self startRefresh];
 		}
 		else
 		{
-			NSTimeInterval howLongUntilNextSync = [Settings shared].refreshPeriod-howLongAgo;
+			NSTimeInterval howLongUntilNextSync = settings.refreshPeriod-howLongAgo;
 			DLog(@"No need to refresh yet, will refresh in %f",howLongUntilNextSync);
 			self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:howLongUntilNextSync
 																 target:self
@@ -168,7 +177,7 @@ static AppDelegate *_static_shared_ref;
 
 - (void)checkApiUsage
 {
-	if([Settings shared].authToken.length==0) return;
+	if(settings.authToken.length==0) return;
 	if(self.api.requestsLimit>0)
 	{
 		if(self.api.requestsRemaining==0)
@@ -217,9 +226,9 @@ static AppDelegate *_static_shared_ref;
 {
 	if(self.isRefreshing) return;
 
-	if([[AppDelegate shared].api.reachability currentReachabilityStatus]==NotReachable) return;
+	if([app.api.reachability currentReachabilityStatus]==NotReachable) return;
 
-	if([Settings shared].authToken.length==0) return;
+	if(settings.authToken.length==0) return;
 
 	[self prepareForRefresh];
 
@@ -254,7 +263,7 @@ static AppDelegate *_static_shared_ref;
 
 		if(!success && [UIApplication sharedApplication].applicationState==UIApplicationStateActive)
 		{
-			if(![Settings shared].dontReportRefreshFailures)
+			if(!settings.dontReportRefreshFailures)
 			{
 				[[[UIAlertView alloc] initWithTitle:@"Refresh failed"
 											message:@"Loading the latest data from Github failed"
@@ -264,7 +273,7 @@ static AppDelegate *_static_shared_ref;
 			}
 		}
 
-		self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:[Settings shared].refreshPeriod
+		self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:settings.refreshPeriod
 															 target:self
 														   selector:@selector(refreshTimerDone)
 														   userInfo:nil
@@ -275,7 +284,7 @@ static AppDelegate *_static_shared_ref;
 
 - (void)refreshTimerDone
 {
-	if([Settings shared].localUserId && [Settings shared].authToken.length)
+	if(settings.localUserId && settings.authToken.length)
 	{
 		[self startRefresh];
 	}

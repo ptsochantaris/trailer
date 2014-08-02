@@ -13,10 +13,10 @@ typedef void (^backgroundFetchCompletionCallback)(UIBackgroundFetchResult result
 @property (nonatomic,copy) backgroundFetchCompletionCallback backgroundCallback;
 @property (nonatomic) NSString *currentAppVersion;
 
-+ (AppDelegate *)shared;
-
 - (void)postNotificationOfType:(PRNotificationType)type forItem:(id)item;
 
 - (void)startRefresh;
 
 @end
+
+extern AppDelegate *app;
