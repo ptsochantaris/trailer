@@ -7,7 +7,25 @@
 		<language>en</language>
 
 		<item>
-			<title>Version 1.0.33</title>
+			<title>Version 1.0.35</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Comments or mentions will now display the name of the author too</li>
+				<li>Repository name will now be a slightly more promiment on the list</li>
+				<li>New option to enable logging to console, in the 'Misc' preferences section</li>
+				<li>Moved repo name display and filtering options to the display section</li>
+				<li>Performance improvements</li>
+				</ul></font>]]></description>
+			<pubDate>Sat, 2 Aug 2014 18:00:00 +0000</pubDate>
+			<enclosure
+			url="http://dev.housetrip.com/trailer/trailer1035.zip"
+			sparkle:version="1133"
+			sparkle:shortVersionString="1.0.35"
+			sparkle:dsaSignature="MC0CFAws/sUctSFUahgttrte4crLsQXDAhUAiLjKKIdEpsZh4CUZ0W0nunjjUHU="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
+			<title>Version 1.0.34</title>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
 				<li>Improved avatar loading and appearance, especially in comment notifications</li>
 				<li>Database performance improvements</li>
