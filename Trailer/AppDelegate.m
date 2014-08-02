@@ -424,17 +424,19 @@ AppDelegate *app;
 	{
 		case kNewMention:
 		{
-			notification.title = @"Mentioned in Comment";
-			notification.informativeText = [item body];
-			PullRequest *associatedRequest = [PullRequest pullRequestWithUrl:[item pullRequestUrl] moc:self.dataManager.managedObjectContext];
+			PRComment *c = item;
+			notification.title = [NSString stringWithFormat:@"@%@ mentioned you:",c.userName];
+			notification.informativeText = c.body;
+			PullRequest *associatedRequest = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:c.managedObjectContext];
 			notification.subtitle = associatedRequest.title;
 			break;
 		}
 		case kNewComment:
 		{
-			notification.title = @"New PR Comment";
-			notification.informativeText = [item body];
-			PullRequest *associatedRequest = [PullRequest pullRequestWithUrl:[item pullRequestUrl] moc:self.dataManager.managedObjectContext];
+			PRComment *c = item;
+			notification.title = [NSString stringWithFormat:@"@%@ commented:", c.userName];
+			notification.informativeText = c.body;
+			PullRequest *associatedRequest = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:c.managedObjectContext];
 			notification.subtitle = associatedRequest.title;
 			break;
 		}

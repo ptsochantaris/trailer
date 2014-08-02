@@ -26,7 +26,7 @@
 		c.webUrl = [info ofk:@"html_url"];
 
 		NSDictionary *userInfo = [info ofk:@"user"];
-		c.userName = [userInfo ofk:@"userName"];
+		c.userName = [userInfo ofk:@"login"];
 		c.userId = [userInfo ofk:@"id"];
 		c.avatarUrl = [userInfo ofk:@"avatar_url"];
 

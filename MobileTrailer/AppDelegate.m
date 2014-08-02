@@ -307,14 +307,16 @@ AppDelegate *app;
 	{
 		case kNewMention:
 		{
-			PullRequest *associatedRequest = [PullRequest pullRequestWithUrl:[item pullRequestUrl] moc:self.dataManager.managedObjectContext];
-			notification.alertBody = [NSString stringWithFormat:@"Mentioned in Comment for '%@': %@",associatedRequest.title,[item body]];
+			PRComment *c = item;
+			PullRequest *associatedRequest = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:c.managedObjectContext];
+			notification.alertBody = [NSString stringWithFormat:@"@%@ mentioned you in '%@': %@", c.userName, associatedRequest.title, c.body];
 			break;
 		}
 		case kNewComment:
 		{
-			PullRequest *associatedRequest = [PullRequest pullRequestWithUrl:[item pullRequestUrl] moc:self.dataManager.managedObjectContext];
-			notification.alertBody = [NSString stringWithFormat:@"Comment for '%@': %@",associatedRequest.title,[item body]];
+			PRComment *c = item;
+			PullRequest *associatedRequest = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:c.managedObjectContext];
+			notification.alertBody = [NSString stringWithFormat:@"@%@ commented on '%@': %@", c.userName, associatedRequest.title, c.body];
 			break;
 		}
 		case kNewPr:
