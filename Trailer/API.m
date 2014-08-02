@@ -1034,7 +1034,11 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 		}
 		else
 		{
+#ifdef DEBUG
 			DLog(@"GET %@ - RESULT: %ld, %f sec.",expandedPath,(long)response.statusCode,networkTime);
+#else
+			DLog(@"GET %@ - RESULT: %ld",expandedPath,(long)response.statusCode);
+#endif
 			if(successCallback)
 			{
 				dispatch_async(dispatch_get_main_queue(), ^{

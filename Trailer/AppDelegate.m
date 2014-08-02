@@ -147,6 +147,12 @@ AppDelegate *app;
 	[self updateMenu];
 }
 
+- (IBAction)logActivityToConsoleSelected:(NSButton *)sender
+{
+	BOOL setting = (sender.integerValue==1);
+	settings.logActivityToConsole = setting;
+}
+
 - (IBAction)includeRepositoriesInfilterSelected:(NSButton *)sender
 {
 	BOOL setting = (sender.integerValue==1);
@@ -895,6 +901,7 @@ AppDelegate *app;
 	self.countOnlyListedPrs.integerValue = settings.countOnlyListedPrs;
 	self.hideNewRepositories.integerValue = settings.hideNewRepositories;
 	self.openPrAtFirstUnreadComment.integerValue = settings.openPrAtFirstUnreadComment;
+	self.logActivityToConsole.integerValue = settings.logActivityToConsole;
 
 	self.hotkeyEnable.integerValue = settings.hotkeyEnable;
 	self.hotkeyControlModifier.integerValue = settings.hotkeyControlModifier;

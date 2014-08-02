@@ -17,6 +17,11 @@ Settings *settings;
     return self;
 }
 
+- (void)log:(NSString *)logMessage
+{
+	if(settings.logActivityToConsole) NSLog(@"%@",logMessage);
+}
+
 - (NSString *)sortField
 {
 	switch (self.sortMethod)
@@ -154,6 +159,12 @@ Settings *settings;
 #define SHOW_COMMENTS_EVERYWHERE_KEY @"SHOW_COMMENTS_EVERYWHERE_KEY"
 - (BOOL)showCommentsEverywhere { return [[self defaultValueForKey:SHOW_COMMENTS_EVERYWHERE_KEY] boolValue]; }
 - (void)setShowCommentsEverywhere:(BOOL)showCommentsEverywhere { [self storeDefaultValue:@(showCommentsEverywhere) forKey:SHOW_COMMENTS_EVERYWHERE_KEY]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define LOG_ACTIVITY_TO_CONSOLE_KEY @"LOG_ACTIVITY_TO_CONSOLE_KEY"
+- (BOOL)logActivityToConsole { return [[self defaultValueForKey:LOG_ACTIVITY_TO_CONSOLE_KEY] boolValue]; }
+- (void)setLogActivityToConsole:(BOOL)logActivityToConsole { [self storeDefaultValue:@(logActivityToConsole) forKey:LOG_ACTIVITY_TO_CONSOLE_KEY]; }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

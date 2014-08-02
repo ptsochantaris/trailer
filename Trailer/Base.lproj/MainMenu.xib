@@ -877,7 +877,7 @@ Enter to select and ⌘, for preferences.
                                     </subviews>
                                 </view>
                             </tabViewItem>
-                            <tabViewItem label="Updates" identifier="" id="xKy-ON-K2f">
+                            <tabViewItem label="Misc" identifier="" id="xKy-ON-K2f">
                                 <view key="view" id="LRp-Re-sQj">
                                     <rect key="frame" x="10" y="33" width="736" height="339"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -890,7 +890,7 @@ Enter to select and ⌘, for preferences.
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button id="884-i6-3Qz">
-                                                        <rect key="frame" x="89" y="132" width="299" height="18"/>
+                                                        <rect key="frame" x="89" y="101" width="299" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Check for new Trailer releases automatically" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Bty-E4-KMD">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -901,7 +901,7 @@ Enter to select and ⌘, for preferences.
                                                         </connections>
                                                     </button>
                                                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="VSJ-4k-oD4">
-                                                        <rect key="frame" x="295" y="91" width="19" height="27"/>
+                                                        <rect key="frame" x="370" y="70" width="19" height="27"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                                         <stepperCell key="cell" continuous="YES" alignment="left" minValue="1" maxValue="1024" doubleValue="1" id="7GS-Kl-F8N"/>
                                                         <connections>
@@ -909,7 +909,7 @@ Enter to select and ⌘, for preferences.
                                                         </connections>
                                                     </stepper>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="bIt-Bu-LYU">
-                                                        <rect key="frame" x="30" y="97" width="265" height="17"/>
+                                                        <rect key="frame" x="102" y="76" width="265" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Check every X hours" id="Ygh-by-o2s">
                                                             <font key="font" metaFont="system"/>
@@ -917,6 +917,17 @@ Enter to select and ⌘, for preferences.
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
+                                                    <button id="bpi-er-6rE">
+                                                        <rect key="frame" x="89" y="151" width="187" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Log activity to the console" bezelStyle="regularSquare" imagePosition="left" inset="2" id="fuS-vj-d1E">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="logActivityToConsoleSelected:" target="494" id="7oH-Nw-4ze"/>
+                                                        </connections>
+                                                    </button>
                                                 </subviews>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
@@ -981,6 +992,7 @@ Enter to select and ⌘, for preferences.
                 <outlet property="hotkeyShiftModifier" destination="ha7-N5-qJl" id="OLt-Ca-P0D"/>
                 <outlet property="includeRepositoriesInFiltering" destination="GOC-8L-GHy" id="zF4-Zo-CGn"/>
                 <outlet property="launchAtStartup" destination="qqE-Ib-sQ9" id="brX-S8-Ge0"/>
+                <outlet property="logActivityToConsole" destination="bpi-er-6rE" id="akm-SR-jfL"/>
                 <outlet property="mainMenu" destination="b2W-dJ-ldg" id="8t8-8X-oYH"/>
                 <outlet property="mainMenuFilter" destination="gaD-Aj-14T" id="1vn-8Q-OCo"/>
                 <outlet property="mainMenuHeader" destination="uIa-cA-gk9" id="JDR-T5-fDT"/>

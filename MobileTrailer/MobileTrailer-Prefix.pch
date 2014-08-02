@@ -3,12 +3,6 @@
 
 #ifdef __OBJC__
 
-#ifdef DEBUG
-	#define DLog(fmt, ...) NSLog(fmt, ##__VA_ARGS__)
-#else
-	#define DLog(...)
-#endif
-
 #define COLOR_CLASS UIColor
 #define IMAGE_CLASS UIImage
 #define MAKECOLOR(R,G,B,A) [COLOR_CLASS colorWithRed:R green:G blue:B alpha:A]

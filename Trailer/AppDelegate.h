@@ -58,6 +58,7 @@
 @property (weak) IBOutlet NSTextField *statusItemsRefreshNote;
 @property (weak) IBOutlet NSButton *hideNewRepositories;
 @property (weak) IBOutlet NSButton *openPrAtFirstUnreadComment;
+@property (weak) IBOutlet NSButton *logActivityToConsole;
 
 // Keyboard
 @property (weak) IBOutlet NSButton *hotkeyEnable;
