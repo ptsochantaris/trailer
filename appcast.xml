@@ -7,20 +7,21 @@
 		<language>en</language>
 
 		<item>
-			<title>Version 1.0.35</title>
+			<title>Version 1.0.36</title>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>(Important correction for comment and PR ownership issue from 1.0.35)</li>
 				<li>Comments or mentions will now display the name of the author too</li>
 				<li>Repository name will now be a slightly more promiment on the list</li>
 				<li>New option to enable logging to console, in the 'Misc' preferences section</li>
 				<li>Moved repo name display and filtering options to the display section</li>
 				<li>Performance improvements</li>
 				</ul></font>]]></description>
-			<pubDate>Sat, 2 Aug 2014 18:00:00 +0000</pubDate>
+			<pubDate>Sun, 3 Aug 2014 10:00:00 +0000</pubDate>
 			<enclosure
-			url="http://dev.housetrip.com/trailer/trailer1035.zip"
-			sparkle:version="1133"
-			sparkle:shortVersionString="1.0.35"
-			sparkle:dsaSignature="MC0CFAws/sUctSFUahgttrte4crLsQXDAhUAiLjKKIdEpsZh4CUZ0W0nunjjUHU="
+			url="http://dev.housetrip.com/trailer/trailer1036.zip"
+			sparkle:version="1134"
+			sparkle:shortVersionString="1.0.36"
+			sparkle:dsaSignature="MCwCFER7s6LCAZeF3mKJK5jKnahvK+SaAhR9Z6keNhjOxSH8LmGSpQj6Fw26eg=="
 			type="application/octet-stream"/>
 		</item>
 
