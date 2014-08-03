@@ -27,6 +27,7 @@
 
 - (void)performVersionChangedTasks
 {
+	settings.localUserId = @(settings.localUserId.longLongValue);
 	NSArray *statuses = [DataItem allItemsOfType:@"PRStatus" inMoc:self.managedObjectContext];
 	for(PRStatus *s in statuses)
 	{
@@ -78,7 +79,7 @@
 			}
 			else if(settings.showCommentsEverywhere || r.isMine || r.commentedByMe)
 			{
-				if(![c.userId.stringValue isEqualToString:settings.localUserId])
+				if(![c.userId isEqualToNumber:settings.localUserId])
 				{
 					[app postNotificationOfType:kNewComment forItem:c];
 				}

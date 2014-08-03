@@ -40,7 +40,7 @@
 
 - (BOOL)isMine
 {
-	return [self.userId.stringValue isEqualToString:settings.localUserId];
+	return [self.userId isEqualToNumber:settings.localUserId];
 }
 
 - (BOOL)refersToMe
