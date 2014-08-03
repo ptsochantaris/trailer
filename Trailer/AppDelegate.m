@@ -15,6 +15,8 @@ AppDelegate *app;
 {
 	app = self;
 
+	/* throw this away */
+
 	// Useful snippet for resetting prefs when testing
 	//NSString *appDomain = [[NSBundle mainBundle] bundleIdentifier];
 	//[[NSUserDefaults standardUserDefaults] removePersistentDomainForName:appDomain];
