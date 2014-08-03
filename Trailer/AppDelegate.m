@@ -45,7 +45,7 @@ AppDelegate *app;
 	NSString *prUrl = firstPr.url;
 	NSArray *allCommentsForFirstPr = [PRComment commentsForPullRequestUrl:prUrl inMoc:self.dataManager.managedObjectContext];
     [self.dataManager.managedObjectContext deleteObject:[allCommentsForFirstPr objectAtIndex:0]];
-	 */
+	*/
 	// ONLY FOR DEBUG!
 
 	[self.dataManager postProcessAllPrs];

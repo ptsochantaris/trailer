@@ -12,7 +12,9 @@
 
 @property (nonatomic) NSDate *latestReceivedEventDateProcessed, *latestUserEventDateProcessed;
 
-@property (nonatomic) NSString *authToken, *localUser, *localUserId,
+@property (nonatomic) NSNumber *localUserId;
+
+@property (nonatomic) NSString *authToken, *localUser,
 							*apiFrontEnd, *apiBackEnd, *apiPath,
 							*hotkeyLetter, *latestReceivedEventEtag, *latestUserEventEtag;
 

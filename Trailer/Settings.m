@@ -133,8 +133,8 @@ Settings *settings;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #define USER_ID_KEY @"USER_ID_KEY"
-- (NSString *)localUserId { return [self defaultValueForKey:USER_ID_KEY]; }
-- (void)setLocalUserId:(NSString *)localUserId { [self storeDefaultValue:localUserId forKey:USER_ID_KEY]; }
+- (NSNumber *)localUserId { return [self defaultValueForKey:USER_ID_KEY]; }
+- (void)setLocalUserId:(NSNumber *)localUserId { [self storeDefaultValue:localUserId forKey:USER_ID_KEY]; }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

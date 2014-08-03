@@ -385,9 +385,9 @@ typedef void (^completionBlockType)(BOOL);
 		  if(mergeInfo)
 		  {
 			  DLog(@"detected merged PR: %@",r.title);
-			  NSString *mergeUserId = [[mergeInfo  ofk:@"id"] stringValue];
+			  NSNumber *mergeUserId = [mergeInfo  ofk:@"id"];
 			  DLog(@"merged by user id: %@, our id is: %@",mergeUserId,settings.localUserId);
-			  BOOL mergedByMyself = [mergeUserId isEqualToString:settings.localUserId];
+			  BOOL mergedByMyself = [mergeUserId isEqualToNumber:settings.localUserId];
 			  if(!(settings.dontKeepPrsMergedByMe && mergedByMyself))
 			  {
 				  DLog(@"detected merged PR: %@",r.title);

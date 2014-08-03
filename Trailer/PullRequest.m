@@ -364,7 +364,7 @@ static NSDateFormatter *itemDateFormatter;
 - (BOOL)isMine
 {
 	if(self.assignedToMe.boolValue && settings.moveAssignedPrsToMySection) return YES;
-	return [self.userId.stringValue isEqualToString:settings.localUserId];
+	return [self.userId isEqualToNumber:settings.localUserId];
 }
 
 - (BOOL)commentedByMe
