@@ -745,7 +745,12 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 					 }
 					 else
 					 {
-						 if(resultCode == 404 || resultCode == 410) // 404/410 is an acceptable answer, it means the repo is gone
+						 if (r.private && resultCode == 404)  // 404 could mean that a private repo is currently disabled
+						 {
+							 succeeded++;
+							 r.postSyncAction = @(kPostSyncDoNothing);
+						 }
+						 else if (resultCode == 410) // 404/410 is an acceptable answer, it means the repo is gone
 						 {
 							 succeeded++;
 							 r.postSyncAction = @(kPostSyncDelete);
@@ -1274,7 +1279,7 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 		else
 			return [NSString stringWithFormat:@"Updated %ld seconds ago",(long)ago];
 	}
-	
+
 }
 
 @end

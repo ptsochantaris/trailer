@@ -261,6 +261,7 @@
 		16FD14D61881CBC400FDC960 /* PickerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PickerViewController.m; sourceTree = "<group>"; };
 		16FDD6DB18804470008D2223 /* PRCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PRCell.h; sourceTree = "<group>"; };
 		16FDD6DC18804470008D2223 /* PRCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PRCell.m; sourceTree = "<group>"; };
+		583A5DEB197BDCDD00BCA21A /* Trailer 14.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 14.xcdatamodel"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1268,6 +1269,7 @@
 		168BC6C517EC2DF000BC4584 /* Trailer.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				583A5DEB197BDCDD00BCA21A /* Trailer 14.xcdatamodel */,
 				1653FD6F1966B2900080D972 /* Trailer 13.xcdatamodel */,
 				16458E37191AC2D200FB13EC /* Trailer 12.xcdatamodel */,
 				162D96F91913F0E7000A54EA /* Trailer 11.xcdatamodel */,
@@ -1282,7 +1284,7 @@
 				1617BEEE183F9C4F00E89BB2 /* Trailer 2.xcdatamodel */,
 				168BC6C617EC2DF000BC4584 /* Trailer.xcdatamodel */,
 			);
-			currentVersion = 1653FD6F1966B2900080D972 /* Trailer 13.xcdatamodel */;
+			currentVersion = 583A5DEB197BDCDD00BCA21A /* Trailer 14.xcdatamodel */;
 			path = Trailer.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
