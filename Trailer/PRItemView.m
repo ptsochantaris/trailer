@@ -2,7 +2,6 @@
 @interface PRItemView ()
 {
 	NSTrackingArea *trackingArea;
-	BOOL dragging;
 }
 @end
 
@@ -227,15 +226,8 @@ static CGColorRef _highlightColor;
 
 - (void)mouseUp:(NSEvent *)theEvent
 {
-	if(dragging)
-	{
-		dragging = NO;
-	}
-	else
-	{
-		BOOL isAlternative = ((theEvent.modifierFlags & NSAlternateKeyMask) == NSAlternateKeyMask);
-		[self.delegate prItemSelected:self alternativeSelect:isAlternative];
-	}
+	BOOL isAlternative = ((theEvent.modifierFlags & NSAlternateKeyMask) == NSAlternateKeyMask);
+	[self.delegate prItemSelected:self alternativeSelect:isAlternative];
 }
 
 - (void)updateTrackingAreas
@@ -267,8 +259,6 @@ static CGColorRef _highlightColor;
 
 - (void)mouseDragged:(NSEvent *)theEvent
 {
-	dragging = YES;
-
     NSPasteboard *pboard = [NSPasteboard pasteboardWithName:NSDragPboard];
     [pboard declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:self];
 
