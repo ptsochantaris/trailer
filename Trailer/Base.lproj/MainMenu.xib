@@ -585,14 +585,14 @@ Server</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" borderType="none" titlePosition="noTitle" id="TPK-e4-WCR">
-                                            <rect key="frame" x="201" y="100" width="334" height="150"/>
+                                            <rect key="frame" x="32" y="47" width="673" height="237"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <view key="contentView">
-                                                <rect key="frame" x="0.0" y="0.0" width="334" height="150"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="673" height="237"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button id="c6m-8a-CRl">
-                                                        <rect key="frame" x="17" y="86" width="288" height="18"/>
+                                                        <rect key="frame" x="10" y="173" width="288" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Only display PRs with unread comments" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="djW-U3-Ae9">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -603,7 +603,7 @@ Server</string>
                                                         </connections>
                                                     </button>
                                                     <button id="CPe-TS-qPS">
-                                                        <rect key="frame" x="17" y="121" width="325" height="18"/>
+                                                        <rect key="frame" x="10" y="208" width="325" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Display comment badges &amp; alerts for all PRs" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="EcZ-Ov-Dct">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -614,7 +614,7 @@ Server</string>
                                                         </connections>
                                                     </button>
                                                     <button id="lTI-8Y-voD">
-                                                        <rect key="frame" x="17" y="51" width="300" height="18"/>
+                                                        <rect key="frame" x="339" y="208" width="300" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Move PRs that mention me to 'Participated'" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="dIf-8Y-axW">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -625,7 +625,7 @@ Server</string>
                                                         </connections>
                                                     </button>
                                                     <button id="UE2-cu-KR1">
-                                                        <rect key="frame" x="17" y="16" width="246" height="18"/>
+                                                        <rect key="frame" x="339" y="173" width="246" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Open PRs at first unread comment" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="OvZ-nc-wRD">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -635,6 +635,27 @@ Server</string>
                                                             <action selector="openPrAtFirstUnreadCommentSelected:" target="494" id="UP2-m4-UvH"/>
                                                         </connections>
                                                     </button>
+                                                    <tokenField verticalHuggingPriority="750" id="sXw-Dp-4Fc">
+                                                        <rect key="frame" x="19" y="15" width="635" height="96"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                        <tokenFieldCell key="cell" selectable="YES" editable="YES" borderStyle="bezel" alignment="left" placeholderString="Comma separated list of usernames (case/accent insensitive, without the '@' prefix)" drawsBackground="YES" allowsEditingTextAttributes="YES" id="G8I-x9-GhN">
+                                                            <font key="font" metaFont="cellTitle"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </tokenFieldCell>
+                                                        <connections>
+                                                            <outlet property="delegate" destination="494" id="NwA-nf-cvJ"/>
+                                                        </connections>
+                                                    </tokenField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="oQy-Dc-Qvp">
+                                                        <rect key="frame" x="17" y="124" width="468" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Do not present notifications for comments from the following usernames:" id="xyy-eR-l2v">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
                                                 </subviews>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
@@ -969,6 +990,7 @@ Enter to select and ⌘, for preferences.
                 <outlet property="checkForUpdatesAutomatically" destination="884-i6-3Qz" id="1eW-Ky-Ll9"/>
                 <outlet property="checkForUpdatesLabel" destination="bIt-Bu-LYU" id="phD-Ph-UPE"/>
                 <outlet property="checkForUpdatesSelector" destination="VSJ-4k-oD4" id="Upd-8P-Dkw"/>
+                <outlet property="commentAuthorBlacklist" destination="sXw-Dp-4Fc" id="kRg-1n-FyC"/>
                 <outlet property="countOnlyListedPrs" destination="y7T-zw-tAa" id="NtB-ef-IsY"/>
                 <outlet property="dontConfirmRemoveAllClosed" destination="a8N-EM-mQf" id="coj-EZ-aEM"/>
                 <outlet property="dontConfirmRemoveAllMerged" destination="fU7-ye-zZ9" id="bYB-om-tew"/>

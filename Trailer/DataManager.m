@@ -81,7 +81,19 @@
 			{
 				if(![c.userId isEqualToNumber:settings.localUserId])
 				{
-					[app postNotificationOfType:kNewComment forItem:c];
+					NSString *commenterAuthorName = c.userName;
+					NSArray *blacklistMatches = [settings.commentAuthorBlacklist filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(NSString *name, NSDictionary *bindings) {
+						return [name compare:commenterAuthorName options:NSCaseInsensitiveSearch|NSDiacriticInsensitiveSearch]==NSOrderedSame;
+					}]];
+					if(blacklistMatches.count==0)
+					{
+						DLog(@"user '%@' not on blacklist, can post notification",commenterAuthorName);
+						[app postNotificationOfType:kNewComment forItem:c];
+					}
+					else
+					{
+						DLog(@"Blocked notification for user '%@' as their name is on the blacklist",commenterAuthorName);
+					}
 				}
 			}
 		}

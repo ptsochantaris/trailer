@@ -151,6 +151,13 @@ NSString *B(NSString *input)
 			{
 				cell.textLabel.text = B(@"Open PRs at first unread\ncomment");
 				if(settings.openPrAtFirstUnreadComment) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				break;
+			}
+			case 4:
+			{
+				cell.textLabel.text = B(@"Block comment notifications\nfrom usernames...");
+				cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+				break;
 			}
 		}
 	}
@@ -365,6 +372,11 @@ NSString *B(NSString *input)
 			{
 				settings.openPrAtFirstUnreadComment = !settings.openPrAtFirstUnreadComment;
 			}
+			case 4:
+			{
+				[self performSegueWithIdentifier:@"showBlacklist" sender:self];
+				return;
+			}
 		}
 		[settingsChangedTimer push];
 	}
@@ -470,7 +482,7 @@ NSString *B(NSString *input)
     switch (section) {
 		case REFRESH_SECTION_INDEX: return 3;
 		case DISPLAY_SECTION_INDEX: return 7;
-		case COMMENTS_SECTION_INDEX: return 4;
+		case COMMENTS_SECTION_INDEX: return 5;
 		case REPOS_SECTION_INDEX: return 1;
 		case HISTORY_SECTION_INDEX: return 3;
 		case CONFIRM_SECTION_INDEX: return 2;

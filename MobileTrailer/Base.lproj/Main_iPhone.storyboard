@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5056" systemVersion="13C1021" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="rS3-R9-Ivy">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5056" systemVersion="13E28" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="rS3-R9-Ivy">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
     </dependencies>
@@ -269,11 +269,12 @@ Select one of these options if you need to create one first:</string>
                     <connections>
                         <segue destination="CmG-f8-s0D" kind="push" identifier="showPicker" id="AaS-fb-omv"/>
                         <segue destination="38y-eH-fII" kind="push" identifier="apiServer" id="42e-0b-Vnf"/>
+                        <segue destination="aPC-CX-P5J" kind="push" identifier="showBlacklist" id="3HD-dB-5ai"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="IUv-Go-xD0" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1897" y="690"/>
+            <point key="canvasLocation" x="1981" y="690"/>
         </scene>
         <!--Picker View Controller-->
         <scene sceneID="ybf-tF-HW9">
@@ -302,7 +303,56 @@ Select one of these options if you need to create one first:</string>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="3kQ-qC-d2v" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2337" y="690"/>
+            <point key="canvasLocation" x="2557" y="966"/>
+        </scene>
+        <!--Comment Blacklist View Controller - Block Comment Notifications-->
+        <scene sceneID="iAu-Vg-gm6">
+            <objects>
+                <viewController id="aPC-CX-P5J" customClass="CommentBlacklistViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="KiC-3c-Q94">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="436"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Add a username; case insensitive, wihout @" minimumFontSize="17" id="GMA-jZ-9IX">
+                                <rect key="frame" x="5" y="73" width="311" height="30"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocorrectionType="no" returnKeyType="done"/>
+                                <connections>
+                                    <outlet property="delegate" destination="aPC-CX-P5J" id="cEc-MK-aev"/>
+                                </connections>
+                            </textField>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" keyboardDismissMode="onDrag" dataMode="prototypes" style="plain" separatorStyle="default" allowsSelection="NO" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="46a-Cb-8BO">
+                                <rect key="frame" x="-2" y="111" width="322" height="325"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <prototypes>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="UsernameCell" id="kno-aH-nR7">
+                                        <rect key="frame" x="0.0" y="22" width="322" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="kno-aH-nR7" id="jeY-nM-uqf">
+                                            <rect key="frame" x="0.0" y="0.0" width="322" height="43"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </prototypes>
+                                <connections>
+                                    <outlet property="dataSource" destination="aPC-CX-P5J" id="VrM-xv-rQy"/>
+                                    <outlet property="delegate" destination="aPC-CX-P5J" id="rmE-cV-lNo"/>
+                                </connections>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="Block Comment Notifications" id="zDa-wl-7kq"/>
+                    <connections>
+                        <outlet property="usernameField" destination="GMA-jZ-9IX" id="R44-xa-75t"/>
+                        <outlet property="usernameTable" destination="46a-Cb-8BO" id="nyp-W8-7z8"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="PcL-ld-iTN" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2552" y="1603"/>
         </scene>
         <!--Api Server View Controller - API Server-->
         <scene sceneID="m1D-Wb-eT6">
@@ -409,7 +459,7 @@ Select one of these options if you need to create one first:</string>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ePr-Wb-6QU" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2337" y="1288"/>
+            <point key="canvasLocation" x="2557" y="-284"/>
         </scene>
         <!--Github View Controller - GitHub-->
         <scene sceneID="xmy-sK-CrB">
@@ -439,7 +489,7 @@ Select one of these options if you need to create one first:</string>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="uTB-MN-lEr" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1897" y="64"/>
+            <point key="canvasLocation" x="1981" y="64"/>
         </scene>
         <!--About Trailer View Controller - About-->
         <scene sceneID="eku-XE-fbz">
@@ -450,14 +500,14 @@ Select one of these options if you need to create one first:</string>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Version" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="pRN-hL-pPG">
-                                <rect key="frame" x="6.000000188225215" y="138" width="304" height="21"/>
+                                <rect key="frame" x="6.0000003825221517" y="138" width="304" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
                                 <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Trailer" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="83g-gE-zyn">
-                                <rect key="frame" x="95.000000188225215" y="67" width="215" height="63"/>
+                                <rect key="frame" x="95.000000382522131" y="67" width="215" height="63"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="64"/>
                                 <nil key="highlightedColor"/>
@@ -507,7 +557,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="oNT-qh-aL9" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2337" y="64"/>
+            <point key="canvasLocation" x="2557" y="340"/>
         </scene>
         <!--Detail View Controller - Detail-->
         <scene sceneID="Cn3-H9-jdl">

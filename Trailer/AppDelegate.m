@@ -35,6 +35,7 @@ AppDelegate *app;
 
 	// ONLY FOR DEBUG!
 	/*
+	#warning COMMENT THIS
 	NSArray *allPRs = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.dataManager.managedObjectContext];
 	PullRequest *firstPr = allPRs[2];
 	firstPr.updatedAt = [NSDate distantPast];
@@ -45,7 +46,7 @@ AppDelegate *app;
 	NSString *prUrl = firstPr.url;
 	NSArray *allCommentsForFirstPr = [PRComment commentsForPullRequestUrl:prUrl inMoc:self.dataManager.managedObjectContext];
     [self.dataManager.managedObjectContext deleteObject:[allCommentsForFirstPr objectAtIndex:0]];
-	*/
+	 */
 	// ONLY FOR DEBUG!
 
 	[self.dataManager postProcessAllPrs];
@@ -833,12 +834,21 @@ AppDelegate *app;
 	}
 	else if(obj.object==self.statusTermsField)
 	{
-		NSArray *existingTerms = settings.statusFilteringTerms;
-		NSArray *newTerms = self.statusTermsField.objectValue;
-		if(![existingTerms isEqualToArray:newTerms])
+		NSArray *existingTokens = settings.statusFilteringTerms;
+		NSArray *newTokens = self.statusTermsField.objectValue;
+		if(![existingTokens isEqualToArray:newTokens])
 		{
-			settings.statusFilteringTerms = newTerms;
+			settings.statusFilteringTerms = newTokens;
 			[self updateMenu];
+		}
+	}
+	else if(obj.object==self.commentAuthorBlacklist)
+	{
+		NSArray *existingTokens = settings.commentAuthorBlacklist;
+		NSArray *newTokens = self.commentAuthorBlacklist.objectValue;
+		if(![existingTokens isEqualToArray:newTokens])
+		{
+			settings.commentAuthorBlacklist = newTokens;
 		}
 	}
 }
@@ -876,6 +886,7 @@ AppDelegate *app;
 
 	[self.api updateLimitFromServer];
 	[self updateStatusTermPreferenceControls];
+	self.commentAuthorBlacklist.objectValue = settings.commentAuthorBlacklist;
 
 	[self.sortModeSelect selectItemAtIndex:settings.sortMethod];
 	[self.prMergedPolicy selectItemAtIndex:settings.mergeHandlingPolicy];

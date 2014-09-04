@@ -99,6 +99,7 @@
 		16B9553A17EC93DE0005118F /* Repo.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B9553917EC93DE0005118F /* Repo.m */; };
 		16C54F941881639B00849B76 /* GithubViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 16C54F931881639B00849B76 /* GithubViewController.m */; };
 		16EAA972182D897E0018018B /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16B94066182D051700F32061 /* Sparkle.framework */; };
+		16EE562019B78DBA0031DF6D /* CommentBlacklistViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 16EE561F19B78DBA0031DF6D /* CommentBlacklistViewController.m */; };
 		16FA683B1823CF4600401E9B /* PRItemView.m in Sources */ = {isa = PBXBuildFile; fileRef = 16FA683A1823CF4600401E9B /* PRItemView.m */; };
 		16FA683C1823CF4600401E9B /* PRItemView.m in Sources */ = {isa = PBXBuildFile; fileRef = 16FA683A1823CF4600401E9B /* PRItemView.m */; };
 		16FD14D71881CBC400FDC960 /* PickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 16FD14D61881CBC400FDC960 /* PickerViewController.m */; };
@@ -255,6 +256,8 @@
 		16C54F921881639B00849B76 /* GithubViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GithubViewController.h; sourceTree = "<group>"; };
 		16C54F931881639B00849B76 /* GithubViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GithubViewController.m; sourceTree = "<group>"; };
 		16ECCFAF18B7AC5E000B012F /* Trailer 10.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 10.xcdatamodel"; sourceTree = "<group>"; };
+		16EE561E19B78DBA0031DF6D /* CommentBlacklistViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommentBlacklistViewController.h; sourceTree = "<group>"; };
+		16EE561F19B78DBA0031DF6D /* CommentBlacklistViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommentBlacklistViewController.m; sourceTree = "<group>"; };
 		16FA68391823CF4600401E9B /* PRItemView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PRItemView.h; sourceTree = "<group>"; };
 		16FA683A1823CF4600401E9B /* PRItemView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = PRItemView.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		16FD14D51881CBC400FDC960 /* PickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PickerViewController.h; sourceTree = "<group>"; };
@@ -621,6 +624,8 @@
 				164047091882ED0000A4AC9C /* AboutTrailerViewController.m */,
 				1604D4D0189548350064A385 /* ApiServerViewController.h */,
 				1604D4D1189548350064A385 /* ApiServerViewController.m */,
+				16EE561E19B78DBA0031DF6D /* CommentBlacklistViewController.h */,
+				16EE561F19B78DBA0031DF6D /* CommentBlacklistViewController.m */,
 			);
 			name = Settings;
 			sourceTree = "<group>";
@@ -809,6 +814,7 @@
 				1628A7001878B810005EDA69 /* API.m in Sources */,
 				1628A6C518789E73005EDA69 /* AppDelegate.m in Sources */,
 				1628A7061878BC18005EDA69 /* DataItem.m in Sources */,
+				16EE562019B78DBA0031DF6D /* CommentBlacklistViewController.m in Sources */,
 				1640470A1882ED0000A4AC9C /* AboutTrailerViewController.m in Sources */,
 				1628A6FC1878B64E005EDA69 /* PreferencesViewController.m in Sources */,
 				1665B66A1882F29300972111 /* NSString+Extensions.m in Sources */,

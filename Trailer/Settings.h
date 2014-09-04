@@ -8,7 +8,7 @@
 @property (nonatomic) NSInteger sortMethod, statusFilteringMode,
 								closeHandlingPolicy, mergeHandlingPolicy, statusItemRefreshInterval;
 
-@property (nonatomic) NSArray *statusFilteringTerms;
+@property (nonatomic) NSArray *statusFilteringTerms, *commentAuthorBlacklist;
 
 @property (nonatomic) NSDate *latestReceivedEventDateProcessed, *latestUserEventDateProcessed;
 
