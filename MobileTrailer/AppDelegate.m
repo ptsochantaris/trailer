@@ -351,6 +351,11 @@ AppDelegate *app;
 			notification.alertBody = [NSString stringWithFormat:@"New Repository: %@",[item fullName]];
 			break;
 		}
+		case kNewPrAssigned:
+		{
+			notification.alertBody = [NSString stringWithFormat:@"PR Assigned: %@",[item title]];
+			break;
+		}
 	}
 
 	// Present notifications only if the user isn't currenty reading notifications in the notification center, over the open app, a corner case

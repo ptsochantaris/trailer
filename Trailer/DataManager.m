@@ -44,18 +44,17 @@
 {
 	NSManagedObjectContext *mainContext = self.managedObjectContext;
 
-	NSArray *latestPrs = [PullRequest newItemsOfType:@"PullRequest" inMoc:mainContext];
-	for(PullRequest *r in latestPrs)
+	NSArray *newPrs = [PullRequest newItemsOfType:@"PullRequest" inMoc:mainContext];
+	for(PullRequest *r in newPrs)
 	{
 		if(!r.isMine)
 		{
 			[app postNotificationOfType:kNewPr forItem:r];
 		}
-		r.postSyncAction = @(kPostSyncDoNothing);
 	}
 
-	latestPrs = [PullRequest updatedItemsOfType:@"PullRequest" inMoc:mainContext];
-	for(PullRequest *r in latestPrs)
+	NSArray *updatedPrs = [PullRequest updatedItemsOfType:@"PullRequest" inMoc:mainContext];
+	for(PullRequest *r in updatedPrs)
 	{
 		if(r.reopened.boolValue)
 		{
@@ -65,6 +64,18 @@
 			}
 			r.reopened = @NO;
 		}
+	}
+
+	NSMutableArray *allTouchedPrs = [NSMutableArray arrayWithArray:newPrs];
+	[allTouchedPrs addObjectsFromArray:updatedPrs];
+	for(PullRequest *r in allTouchedPrs)
+	{
+		if(r.newAssignment.boolValue)
+		{
+			[app postNotificationOfType:kNewPrAssigned forItem:r];
+			r.newAssignment = @NO;
+		}
+		r.postSyncAction = @(kPostSyncDoNothing);
 	}
 
 	NSArray *latestComments = [PRComment newItemsOfType:@"PRComment" inMoc:mainContext];
@@ -320,6 +331,7 @@
 			return @{COMMENT_ID_KEY:[item serverId]};
 		case kNewPr:
 		case kPrReopened:
+		case kNewPrAssigned:
 			return @{PULL_REQUEST_ID_KEY:[item serverId]};
 		case kPrClosed:
 		case kPrMerged:
@@ -327,8 +339,6 @@
 		case kNewRepoSubscribed:
 		case kNewRepoAnnouncement:
 			return @{NOTIFICATION_URL_KEY:[item webUrl] };
-		default:
-			return nil;
 	}
 }
 

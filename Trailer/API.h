@@ -4,32 +4,33 @@
 
 typedef enum {
 	kNewComment = 0,
-	kNewPr = 1,
-	kPrMerged = 2,
-	kPrReopened = 3,
-	kNewMention = 4,
-	kPrClosed = 5,
-	kNewRepoSubscribed = 6,
-	kNewRepoAnnouncement = 7,
+	kNewPr,
+	kPrMerged,
+	kPrReopened,
+	kNewMention,
+	kPrClosed,
+	kNewRepoSubscribed,
+	kNewRepoAnnouncement,
+	kNewPrAssigned
 } PRNotificationType;
 
 typedef enum {
 	kCreationDate = 0,
-	kRecentActivity = 1,
-	kTitle = 2,
-	kRepository = 3,
+	kRecentActivity,
+	kTitle,
+	kRepository,
 } PRSortingMethod;
 
 typedef enum {
 	kRepoAutoSubscribeNone = 0,
-	kRepoAutoSubscribeParentsOnly = 1,
-	kRepoDontAutoSubscribeAll = 2,
+	kRepoAutoSubscribeParentsOnly,
+	kRepoDontAutoSubscribeAll,
 } PRSubscriptionPolicy;
 
 typedef enum {
 	kPullRequestHandlingKeepMine = 0,
-	kPullRequestHandlingKeepAll = 1,
-	kPullRequestHandlingKeepNone = 2,
+	kPullRequestHandlingKeepAll,
+	kPullRequestHandlingKeepNone,
 } PRHandlingPolicy;
 
 #define PULL_REQUEST_ID_KEY @"pullRequestIdKey"

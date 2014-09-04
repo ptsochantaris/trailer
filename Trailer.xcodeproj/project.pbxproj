@@ -258,6 +258,7 @@
 		16ECCFAF18B7AC5E000B012F /* Trailer 10.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 10.xcdatamodel"; sourceTree = "<group>"; };
 		16EE561E19B78DBA0031DF6D /* CommentBlacklistViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommentBlacklistViewController.h; sourceTree = "<group>"; };
 		16EE561F19B78DBA0031DF6D /* CommentBlacklistViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommentBlacklistViewController.m; sourceTree = "<group>"; };
+		16EE562119B857930031DF6D /* Trailer 14.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 14.xcdatamodel"; sourceTree = "<group>"; };
 		16FA68391823CF4600401E9B /* PRItemView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PRItemView.h; sourceTree = "<group>"; };
 		16FA683A1823CF4600401E9B /* PRItemView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = PRItemView.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		16FD14D51881CBC400FDC960 /* PickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PickerViewController.h; sourceTree = "<group>"; };
@@ -582,17 +583,8 @@
 		16B9552E17EC86D10005118F /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				16EE562219B857C90031DF6D /* Models */,
 				168BC6C517EC2DF000BC4584 /* Trailer.xcdatamodeld */,
-				1661667D189BC47F00FBF4E0 /* PRStatus.h */,
-				1661667E189BC47F00FBF4E0 /* PRStatus.m */,
-				161CA3C817F5B1F300F4AF6C /* PRComment.h */,
-				161CA3C917F5B1F300F4AF6C /* PRComment.m */,
-				161CA3C417F5A55300F4AF6C /* PullRequest.h */,
-				161CA3C517F5A55300F4AF6C /* PullRequest.m */,
-				16B9553817EC93DE0005118F /* Repo.h */,
-				16B9553917EC93DE0005118F /* Repo.m */,
-				16B9553417EC89B50005118F /* DataItem.h */,
-				16B9553517EC89B50005118F /* DataItem.m */,
 				1628A6F61878A171005EDA69 /* DataManager.h */,
 				1628A6F71878A171005EDA69 /* DataManager.m */,
 			);
@@ -607,6 +599,23 @@
 				1665B66C1882F29E00972111 /* Settings.m */,
 			);
 			name = Settings;
+			sourceTree = "<group>";
+		};
+		16EE562219B857C90031DF6D /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				1661667D189BC47F00FBF4E0 /* PRStatus.h */,
+				1661667E189BC47F00FBF4E0 /* PRStatus.m */,
+				161CA3C817F5B1F300F4AF6C /* PRComment.h */,
+				161CA3C917F5B1F300F4AF6C /* PRComment.m */,
+				161CA3C417F5A55300F4AF6C /* PullRequest.h */,
+				161CA3C517F5A55300F4AF6C /* PullRequest.m */,
+				16B9553817EC93DE0005118F /* Repo.h */,
+				16B9553917EC93DE0005118F /* Repo.m */,
+				16B9553417EC89B50005118F /* DataItem.h */,
+				16B9553517EC89B50005118F /* DataItem.m */,
+			);
+			name = Models;
 			sourceTree = "<group>";
 		};
 		16FD14D11881C82400FDC960 /* Settings */ = {
@@ -1274,6 +1283,7 @@
 		168BC6C517EC2DF000BC4584 /* Trailer.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				16EE562119B857930031DF6D /* Trailer 14.xcdatamodel */,
 				1653FD6F1966B2900080D972 /* Trailer 13.xcdatamodel */,
 				16458E37191AC2D200FB13EC /* Trailer 12.xcdatamodel */,
 				162D96F91913F0E7000A54EA /* Trailer 11.xcdatamodel */,
@@ -1288,7 +1298,7 @@
 				1617BEEE183F9C4F00E89BB2 /* Trailer 2.xcdatamodel */,
 				168BC6C617EC2DF000BC4584 /* Trailer.xcdatamodel */,
 			);
-			currentVersion = 1653FD6F1966B2900080D972 /* Trailer 13.xcdatamodel */;
+			currentVersion = 16EE562119B857930031DF6D /* Trailer 14.xcdatamodel */;
 			path = Trailer.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

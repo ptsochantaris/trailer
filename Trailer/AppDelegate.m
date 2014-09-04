@@ -477,6 +477,12 @@ AppDelegate *app;
 			notification.subtitle = [item fullName];
 			break;
 		}
+		case kNewPrAssigned:
+		{
+			notification.title = @"PR Assigned";
+			notification.subtitle = [item title];
+			break;
+		}
 	}
 
 	if((type==kNewComment || type==kNewMention) &&
