@@ -958,10 +958,6 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 		if([path rangeOfString:@"/"].location==0)
 		{
 			NSString *apiPath = settings.apiPath;
-			if(!apiPath && settings.apiPath)
-			{
-				DLog(@"weirdness");
-			}
 
 			if([apiPath rangeOfString:@"/"].location==0)
 				apiPath = [apiPath substringFromIndex:1];
