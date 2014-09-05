@@ -1,0 +1,3 @@
+@interface OpenInSafariActivity : UIActivity
+
+@end

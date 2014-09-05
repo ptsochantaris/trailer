@@ -72,6 +72,7 @@
 		1665B6721882F3B600972111 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1665B6711882F3B600972111 /* UIKit.framework */; };
 		1665B6751882F42500972111 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 168BC6B117EC2DF000BC4584 /* CoreData.framework */; };
 		1665B6761882F43800972111 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1628A6B218789E73005EDA69 /* Foundation.framework */; };
+		166A19AA19B99C4C004D9057 /* OpenInSafariActivity.m in Sources */ = {isa = PBXBuildFile; fileRef = 166A19A819B99C48004D9057 /* OpenInSafariActivity.m */; };
 		1675AC1D185CF80C00ADD213 /* MenuScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1675AC1C185CF80C00ADD213 /* MenuScrollView.m */; };
 		1675AC1E185CF80C00ADD213 /* MenuScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1675AC1C185CF80C00ADD213 /* MenuScrollView.m */; };
 		168A5C77185BBA2F00CB6B02 /* MenuWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 168A5C76185BBA2F00CB6B02 /* MenuWindow.m */; };
@@ -215,6 +216,8 @@
 		1665B66C1882F29E00972111 /* Settings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Settings.m; path = Trailer/Settings.m; sourceTree = "<group>"; };
 		1665B66F1882F3AC00972111 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/System/Library/Frameworks/CoreData.framework; sourceTree = DEVELOPER_DIR; };
 		1665B6711882F3B600972111 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
+		166A19A719B99C48004D9057 /* OpenInSafariActivity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenInSafariActivity.h; sourceTree = "<group>"; };
+		166A19A819B99C48004D9057 /* OpenInSafariActivity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OpenInSafariActivity.m; sourceTree = "<group>"; };
 		1675AC1B185CF80C00ADD213 /* MenuScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MenuScrollView.h; sourceTree = "<group>"; };
 		1675AC1C185CF80C00ADD213 /* MenuScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MenuScrollView.m; sourceTree = "<group>"; };
 		168A5C75185BBA2F00CB6B02 /* MenuWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MenuWindow.h; sourceTree = "<group>"; };
@@ -576,6 +579,8 @@
 			children = (
 				1665B6641882F24400972111 /* UINavigationController+DismissKeyboard.h */,
 				1665B6651882F24400972111 /* UINavigationController+DismissKeyboard.m */,
+				166A19A719B99C48004D9057 /* OpenInSafariActivity.h */,
+				166A19A819B99C48004D9057 /* OpenInSafariActivity.m */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
@@ -831,6 +836,7 @@
 				1628A6F91878A171005EDA69 /* DataManager.m in Sources */,
 				1628A7071878BC23005EDA69 /* Trailer.xcdatamodeld in Sources */,
 				1604D4CF189541D70064A385 /* EmptyView.m in Sources */,
+				166A19AA19B99C4C004D9057 /* OpenInSafariActivity.m in Sources */,
 				16FDD6DD18804470008D2223 /* PRCell.m in Sources */,
 				1628A7021878BC18005EDA69 /* PRComment.m in Sources */,
 				1628A6C118789E73005EDA69 /* main.m in Sources */,

@@ -2,6 +2,9 @@
 AppDelegate *app;
 
 @implementation AppDelegate
+{
+	UIPopoverController *sharePopover;
+}
 
 - (void)applicationDidReceiveMemoryWarning:(UIApplication *)application
 {
@@ -376,6 +379,30 @@ AppDelegate *app;
 	{
 		[[UIApplication sharedApplication] presentLocalNotificationNow:notification];
 	}
+}
+
+/////////////// sharing
+
+- (void)shareFromView:(UIViewController *)view buttonItem:(UIBarButtonItem *)button url:(NSURL *)url
+{
+	OpenInSafariActivity *a = [[OpenInSafariActivity alloc] init];
+	UIActivityViewController * v = [[UIActivityViewController alloc] initWithActivityItems:@[url]
+																	 applicationActivities:@[a]];
+	if(UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad)
+	{
+		sharePopover = [[UIPopoverController alloc] initWithContentViewController:v];
+		sharePopover.delegate = self;
+		[sharePopover presentPopoverFromBarButtonItem:button permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+	}
+	else
+	{
+		[view presentViewController:v animated:YES completion:nil];
+	}
+}
+
+- (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController
+{
+	sharePopover = nil;
 }
 
 @end
