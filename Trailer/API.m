@@ -1103,7 +1103,7 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 #ifdef DEBUG
 			DLog(@"GET %@ - RESULT: %ld, %f sec.", fullUrlPath, (long)response.statusCode, networkTime);
 #else
-			DLog(@"GET %@ - RESULT: %ld", badLinkKey, (long)response.statusCode);
+			DLog(@"GET %@ - RESULT: %ld", fullUrlPath, (long)response.statusCode);
 #endif
 			[badLinks removeObjectForKey:fullUrlPath];
 			if(successCallback)
