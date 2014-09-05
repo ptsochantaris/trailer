@@ -378,7 +378,8 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 {
 	if(buttonIndex==3) return;
 
-	switch (buttonIndex) {
+	switch (buttonIndex)
+	{
 		case 0:
 		{
 			targetUrl = [NSString stringWithFormat:@"https://%@/watching",settings.apiFrontEnd];
@@ -394,7 +395,7 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 		case 2:
 		{
 			NSArray *allRepos = self.fetchedResultsController.fetchedObjects;
-			for(Repo *r in allRepos) { r.hidden = @NO; r.dirty = @YES; }
+			for(Repo *r in allRepos) { r.hidden = @NO; r.dirty = @YES; r.lastDirtied = [NSDate date]; }
 			break;
 		}
 	}

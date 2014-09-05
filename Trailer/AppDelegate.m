@@ -948,7 +948,7 @@ AppDelegate *app;
 	[self.repoCheckStepper setFloatValue:settings.newRepoCheckPeriod];
 	[self newRepoCheckChanged:nil];
 
-	[self.refreshDurationStepper setFloatValue:settings.refreshPeriod];
+	[self.refreshDurationStepper setFloatValue:MIN(settings.refreshPeriod,3600)];
 	[self refreshDurationChanged:nil];
 
 	[self.preferencesWindow setLevel:NSFloatingWindowLevel];
@@ -1004,7 +1004,7 @@ AppDelegate *app;
 
 - (IBAction)showAllRepositoriesSelected:(NSButton *)sender
 {
-	for(Repo *r in [self getFilteredRepos]) { r.hidden = @NO; r.dirty = @YES; }
+	for(Repo *r in [self getFilteredRepos]) { r.hidden = @NO; r.dirty = @YES; r.lastDirtied = [NSDate date]; }
 	self.preferencesDirty = YES;
 	[self.projectsTable reloadData];
 }

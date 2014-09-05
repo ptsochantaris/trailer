@@ -111,7 +111,7 @@ NSDateFormatter *_syncDateFormatter;
 		DLog(@"Nuking %@: %@",type,i.serverId);
 		[moc deleteObject:i];
 	}
-	DLog(@"Nuked %lu %@ items",(unsigned long)untouchedItems.count,type);
+	if(untouchedItems.count>0) DLog(@"Nuked %lu %@ items",(unsigned long)untouchedItems.count,type);
 }
 
 + (NSUInteger)countItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc

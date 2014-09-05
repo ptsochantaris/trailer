@@ -16,11 +16,6 @@
 			[self performVersionChangedTasks];
 			[self versionBumpComplete];
 		}
-
-		for(Repo *r in [Repo allItemsOfType:@"Repo" inMoc:self.managedObjectContext])
-		{
-			r.dirty = @(YES);
-		}
     }
     return self;
 }
@@ -37,6 +32,13 @@
 			DLog(@"Deleting orphaned PRStatus item %@",s.serverId);
 			[self.managedObjectContext deleteObject:s];
 		}
+	}
+
+	DLog(@"Marking all repos as dirty");
+	for(Repo *r in [Repo allItemsOfType:@"Repo" inMoc:self.managedObjectContext])
+	{
+		r.dirty = @YES;
+		r.lastDirtied = [NSDate date];
 	}
 }
 

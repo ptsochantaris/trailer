@@ -82,6 +82,7 @@
         <attribute name="fork" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="fullName" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="hidden" attributeType="Boolean" defaultValueString="NO" indexed="YES" syncable="YES"/>
+        <attribute name="lastDirtied" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="postSyncAction" optional="YES" attributeType="Integer 16" indexed="YES" syncable="YES"/>
         <attribute name="serverId" optional="YES" attributeType="Integer 64" defaultValueString="0" indexed="YES" syncable="YES"/>
         <attribute name="updatedAt" optional="YES" attributeType="Date" syncable="YES"/>
@@ -91,12 +92,16 @@
                 <index value="dirty"/>
                 <index value="hidden"/>
             </compoundIndex>
+            <compoundIndex>
+                <index value="dirty"/>
+                <index value="lastDirtied"/>
+            </compoundIndex>
         </compoundIndexes>
     </entity>
     <elements>
-        <element name="PRComment" positionX="0" positionY="0" width="128" height="238"/>
+        <element name="PRComment" positionX="0" positionY="0" width="128" height="240"/>
         <element name="PRStatus" positionX="0" positionY="0" width="128" height="208"/>
-        <element name="PullRequest" positionX="0" positionY="0" width="128" height="480"/>
-        <element name="Repo" positionX="0" positionY="0" width="128" height="180"/>
+        <element name="PullRequest" positionX="0" positionY="0" width="128" height="478"/>
+        <element name="Repo" positionX="0" positionY="0" width="128" height="195"/>
     </elements>
 </model>

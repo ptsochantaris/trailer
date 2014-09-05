@@ -597,6 +597,24 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 
 	[self markDirtyRepoIds:repoIdsToMarkDirty usingUserEventsInMoc:moc andCallback:completionCallback];
 	[self markDirtyRepoIds:repoIdsToMarkDirty usingReceivedEventsInMoc:moc andCallback:completionCallback];
+
+	if(repoIdsToMarkDirty.count>0) DLog(@"Marked dirty %ld repos which have events in their Github event stream", (long)repoIdsToMarkDirty.count);
+
+	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"Repo"];
+	f.predicate = [NSPredicate predicateWithFormat:@"dirty != YES and lastDirtied < %@", [NSDate dateWithTimeInterval:-3600 sinceDate:[NSDate date]]];
+	f.includesPropertyValues = NO;
+	f.returnsObjectsAsFaults = NO;
+	NSArray *reposNotFetchedRecently = [moc executeFetchRequest:f error:nil];
+	for(Repo *r in reposNotFetchedRecently)
+	{
+		r.dirty = @YES;
+		r.lastDirtied = [NSDate date];
+	}
+
+	if(reposNotFetchedRecently.count>0)
+	{
+		DLog(@"Marked dirty %ld repos which haven't been refreshed in over an hour", (long)reposNotFetchedRecently.count);
+	}
 }
 
 - (void)syncToMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
@@ -750,7 +768,7 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 					 }
 					 return NO;
 				 } finalCallback:^(BOOL success, NSInteger resultCode, NSString *etag) {
-					 r.dirty = @(NO);
+					 r.dirty = @NO;
 					 if(success)
 					 {
 						 succeeded++;
