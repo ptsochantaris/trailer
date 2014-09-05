@@ -7,6 +7,25 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.0.37</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Corrected drag & drop bug issue</li>
+				<li>Added Cmd-C and copy-URL context menu for PR entries</li>
+				<li>Added blacklist to optionally block comments from certain users (or, more importantly bots)</li>
+				<li>Added notifications when assigned a PR</li>
+				<li>Added incremental back-off for requests which return a 400+ code</li>
+				<li>Better management of repo queries, less queries needed on startup, but also ensuring that repos with no events are checked at least once an hour</li>
+				</ul></font>]]></description>
+			<pubDate>Fri, 5 Sep 2014 09:00:00 +0000</pubDate>
+			<enclosure
+			url="http://dev.housetrip.com/trailer/trailer1037.zip"
+			sparkle:version="1135"
+			sparkle:shortVersionString="1.0.37"
+			sparkle:dsaSignature="MC0CFHl7V38X8cLSaclSO77KV14usFy5AhUAoaPDO8wl02Ke1Sc30fD3wmX7TV4="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.0.36</title>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
 				<li>(Important correction for comment and PR ownership issue from 1.0.35)</li>
