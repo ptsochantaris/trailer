@@ -39,7 +39,8 @@ typedef enum {
 
 #define RATE_UPDATE_NOTIFICATION @"RateUpdateNotification"
 
-#define NETWORK_TIMEOUT 60.0
+#define NETWORK_TIMEOUT 120.0
+#define BACKOFF_STEP 120.0
 
 @interface API : NSObject
 
