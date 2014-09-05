@@ -152,6 +152,15 @@ AppDelegate *app;
 {
 	BOOL setting = (sender.integerValue==1);
 	settings.logActivityToConsole = setting;
+
+	if(settings.logActivityToConsole)
+	{
+		NSAlert *alert = [[NSAlert alloc] init];
+		[alert setMessageText:@"Warning"];
+		[alert setInformativeText:@"Logging is a feature meant for error reporting, having it constantly enabled will cause this app to be less responsive and use more power"];
+		[alert addButtonWithTitle:@"OK"];
+		[alert runModal];
+	}
 }
 
 - (IBAction)includeRepositoriesInfilterSelected:(NSButton *)sender
