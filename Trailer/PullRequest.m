@@ -25,6 +25,7 @@
 @dynamic mergeable;
 @dynamic statusesLink;
 @dynamic assignedToMe;
+@dynamic newAssignment;
 @dynamic issueUrl;
 @dynamic reopened;
 

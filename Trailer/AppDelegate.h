@@ -59,6 +59,7 @@
 @property (weak) IBOutlet NSButton *hideNewRepositories;
 @property (weak) IBOutlet NSButton *openPrAtFirstUnreadComment;
 @property (weak) IBOutlet NSButton *logActivityToConsole;
+@property (weak) IBOutlet NSTokenField *commentAuthorBlacklist;
 
 // Keyboard
 @property (weak) IBOutlet NSButton *hotkeyEnable;

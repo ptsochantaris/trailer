@@ -6,6 +6,7 @@
 @dynamic webUrl;
 @dynamic hidden;
 @dynamic dirty;
+@dynamic lastDirtied;
 
 + (Repo*)repoWithInfo:(NSDictionary*)info moc:(NSManagedObjectContext*)moc
 {
@@ -15,7 +16,8 @@
 		r.fullName = [info ofk:@"full_name"];
 		r.fork = @([[info ofk:@"fork"] boolValue]);
 		r.webUrl = [info ofk:@"html_url"];
-		r.dirty = @(YES);
+		r.dirty = @YES;
+		r.lastDirtied = [NSDate date];
 	}
 	return r;
 }

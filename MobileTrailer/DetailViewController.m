@@ -128,38 +128,20 @@ static DetailViewController *_detail_shared_ref;
 
 - (IBAction)iphoneShareButtonSelected:(UIBarButtonItem *)sender
 {
-	[[self shareSheet] showInView:self.view];
+	[app shareFromView:self buttonItem:sender url:self.web.request.URL];
 }
 - (IBAction)ipadShareButtonSelected:(UIBarButtonItem *)sender
 {
-	[[self shareSheet] showFromBarButtonItem:sender animated:NO];
-}
-- (UIActionSheet *)shareSheet
-{
-	return [[UIActionSheet alloc] initWithTitle:self.title
-									   delegate:self
-							  cancelButtonTitle:@"Cancel"
-						 destructiveButtonTitle:nil
-							  otherButtonTitles:@"Copy Link", @"Open in Safari", nil];
+	[app shareFromView:self buttonItem:sender url:self.web.request.URL];
 }
 
-- (IBAction)iPhoneTryAgain:(UIButton *)sender {
-    self.detailItem = self.detailItem;
-}
-- (IBAction)iPadTryAgain:(UIButton *)sender {
-    self.detailItem = self.detailItem;
-}
-
-- (void)actionSheet:(UIActionSheet *)actionSheet willDismissWithButtonIndex:(NSInteger)buttonIndex
+- (IBAction)iPhoneTryAgain:(UIButton *)sender
 {
-	switch (buttonIndex) {
-		case 0:
-			[UIPasteboard generalPasteboard].string = self.web.request.URL.absoluteString;
-			break;
-		case 1:
-			[[UIApplication sharedApplication] openURL:self.web.request.URL];
-			break;
-	}
+    self.detailItem = self.detailItem;
+}
+- (IBAction)iPadTryAgain:(UIButton *)sender
+{
+    self.detailItem = self.detailItem;
 }
 
 @end

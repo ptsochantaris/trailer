@@ -1,9 +1,9 @@
 
 enum PostSyncAction {
 	kPostSyncDoNothing = 0,
-	kPostSyncDelete = 1,
-	kPostSyncNoteNew = 2,
-	kPostSyncNoteUpdated = 3
+	kPostSyncDelete,
+	kPostSyncNoteNew,
+	kPostSyncNoteUpdated
 	};
 
 @interface DataItem : NSManagedObject

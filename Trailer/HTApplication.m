@@ -22,6 +22,7 @@
 					NSPasteboard *p = [NSPasteboard generalPasteboard];
 					[p clearContents];
 					[p setString:url forType:NSStringPboardType];
+					return;
 				}
 				else
 				{

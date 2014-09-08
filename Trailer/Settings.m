@@ -231,6 +231,17 @@ Settings *settings;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#define COMMENT_AUTHOR_BLACKLIST @"COMMENT_AUTHOR_BLACKLIST"
+- (NSArray *)commentAuthorBlacklist
+{
+	NSArray *r = [self defaultValueForKey:COMMENT_AUTHOR_BLACKLIST];
+	if(!r) r = @[];
+	return r;
+}
+- (void)setCommentAuthorBlacklist:(NSArray *)commentAuthorBlacklist { [self storeDefaultValue:commentAuthorBlacklist forKey:COMMENT_AUTHOR_BLACKLIST]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #define DONT_KEEP_MY_PRS_KEY @"DONT_KEEP_MY_PRS_KEY"
 - (void)setDontKeepPrsMergedByMe:(BOOL)dontKeepPrsMergedByMe { [self storeDefaultValue:@(dontKeepPrsMergedByMe) forKey:DONT_KEEP_MY_PRS_KEY]; }
 - (BOOL)dontKeepPrsMergedByMe { return [[self defaultValueForKey:DONT_KEEP_MY_PRS_KEY] boolValue]; }

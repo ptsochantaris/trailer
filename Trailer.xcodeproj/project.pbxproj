@@ -72,6 +72,7 @@
 		1665B6721882F3B600972111 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1665B6711882F3B600972111 /* UIKit.framework */; };
 		1665B6751882F42500972111 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 168BC6B117EC2DF000BC4584 /* CoreData.framework */; };
 		1665B6761882F43800972111 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1628A6B218789E73005EDA69 /* Foundation.framework */; };
+		166A19AA19B99C4C004D9057 /* OpenInSafariActivity.m in Sources */ = {isa = PBXBuildFile; fileRef = 166A19A819B99C48004D9057 /* OpenInSafariActivity.m */; };
 		1675AC1D185CF80C00ADD213 /* MenuScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1675AC1C185CF80C00ADD213 /* MenuScrollView.m */; };
 		1675AC1E185CF80C00ADD213 /* MenuScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1675AC1C185CF80C00ADD213 /* MenuScrollView.m */; };
 		168A5C77185BBA2F00CB6B02 /* MenuWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 168A5C76185BBA2F00CB6B02 /* MenuWindow.m */; };
@@ -99,6 +100,7 @@
 		16B9553A17EC93DE0005118F /* Repo.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B9553917EC93DE0005118F /* Repo.m */; };
 		16C54F941881639B00849B76 /* GithubViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 16C54F931881639B00849B76 /* GithubViewController.m */; };
 		16EAA972182D897E0018018B /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16B94066182D051700F32061 /* Sparkle.framework */; };
+		16EE562019B78DBA0031DF6D /* CommentBlacklistViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 16EE561F19B78DBA0031DF6D /* CommentBlacklistViewController.m */; };
 		16FA683B1823CF4600401E9B /* PRItemView.m in Sources */ = {isa = PBXBuildFile; fileRef = 16FA683A1823CF4600401E9B /* PRItemView.m */; };
 		16FA683C1823CF4600401E9B /* PRItemView.m in Sources */ = {isa = PBXBuildFile; fileRef = 16FA683A1823CF4600401E9B /* PRItemView.m */; };
 		16FD14D71881CBC400FDC960 /* PickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 16FD14D61881CBC400FDC960 /* PickerViewController.m */; };
@@ -214,6 +216,8 @@
 		1665B66C1882F29E00972111 /* Settings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Settings.m; path = Trailer/Settings.m; sourceTree = "<group>"; };
 		1665B66F1882F3AC00972111 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/System/Library/Frameworks/CoreData.framework; sourceTree = DEVELOPER_DIR; };
 		1665B6711882F3B600972111 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
+		166A19A719B99C48004D9057 /* OpenInSafariActivity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenInSafariActivity.h; sourceTree = "<group>"; };
+		166A19A819B99C48004D9057 /* OpenInSafariActivity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OpenInSafariActivity.m; sourceTree = "<group>"; };
 		1675AC1B185CF80C00ADD213 /* MenuScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MenuScrollView.h; sourceTree = "<group>"; };
 		1675AC1C185CF80C00ADD213 /* MenuScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MenuScrollView.m; sourceTree = "<group>"; };
 		168A5C75185BBA2F00CB6B02 /* MenuWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MenuWindow.h; sourceTree = "<group>"; };
@@ -255,6 +259,9 @@
 		16C54F921881639B00849B76 /* GithubViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GithubViewController.h; sourceTree = "<group>"; };
 		16C54F931881639B00849B76 /* GithubViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GithubViewController.m; sourceTree = "<group>"; };
 		16ECCFAF18B7AC5E000B012F /* Trailer 10.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 10.xcdatamodel"; sourceTree = "<group>"; };
+		16EE561E19B78DBA0031DF6D /* CommentBlacklistViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommentBlacklistViewController.h; sourceTree = "<group>"; };
+		16EE561F19B78DBA0031DF6D /* CommentBlacklistViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommentBlacklistViewController.m; sourceTree = "<group>"; };
+		16EE562119B857930031DF6D /* Trailer 14.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 14.xcdatamodel"; sourceTree = "<group>"; };
 		16FA68391823CF4600401E9B /* PRItemView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PRItemView.h; sourceTree = "<group>"; };
 		16FA683A1823CF4600401E9B /* PRItemView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = PRItemView.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		16FD14D51881CBC400FDC960 /* PickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PickerViewController.h; sourceTree = "<group>"; };
@@ -572,6 +579,8 @@
 			children = (
 				1665B6641882F24400972111 /* UINavigationController+DismissKeyboard.h */,
 				1665B6651882F24400972111 /* UINavigationController+DismissKeyboard.m */,
+				166A19A719B99C48004D9057 /* OpenInSafariActivity.h */,
+				166A19A819B99C48004D9057 /* OpenInSafariActivity.m */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
@@ -579,17 +588,8 @@
 		16B9552E17EC86D10005118F /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				16EE562219B857C90031DF6D /* Models */,
 				168BC6C517EC2DF000BC4584 /* Trailer.xcdatamodeld */,
-				1661667D189BC47F00FBF4E0 /* PRStatus.h */,
-				1661667E189BC47F00FBF4E0 /* PRStatus.m */,
-				161CA3C817F5B1F300F4AF6C /* PRComment.h */,
-				161CA3C917F5B1F300F4AF6C /* PRComment.m */,
-				161CA3C417F5A55300F4AF6C /* PullRequest.h */,
-				161CA3C517F5A55300F4AF6C /* PullRequest.m */,
-				16B9553817EC93DE0005118F /* Repo.h */,
-				16B9553917EC93DE0005118F /* Repo.m */,
-				16B9553417EC89B50005118F /* DataItem.h */,
-				16B9553517EC89B50005118F /* DataItem.m */,
 				1628A6F61878A171005EDA69 /* DataManager.h */,
 				1628A6F71878A171005EDA69 /* DataManager.m */,
 			);
@@ -604,6 +604,23 @@
 				1665B66C1882F29E00972111 /* Settings.m */,
 			);
 			name = Settings;
+			sourceTree = "<group>";
+		};
+		16EE562219B857C90031DF6D /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				1661667D189BC47F00FBF4E0 /* PRStatus.h */,
+				1661667E189BC47F00FBF4E0 /* PRStatus.m */,
+				161CA3C817F5B1F300F4AF6C /* PRComment.h */,
+				161CA3C917F5B1F300F4AF6C /* PRComment.m */,
+				161CA3C417F5A55300F4AF6C /* PullRequest.h */,
+				161CA3C517F5A55300F4AF6C /* PullRequest.m */,
+				16B9553817EC93DE0005118F /* Repo.h */,
+				16B9553917EC93DE0005118F /* Repo.m */,
+				16B9553417EC89B50005118F /* DataItem.h */,
+				16B9553517EC89B50005118F /* DataItem.m */,
+			);
+			name = Models;
 			sourceTree = "<group>";
 		};
 		16FD14D11881C82400FDC960 /* Settings */ = {
@@ -621,6 +638,8 @@
 				164047091882ED0000A4AC9C /* AboutTrailerViewController.m */,
 				1604D4D0189548350064A385 /* ApiServerViewController.h */,
 				1604D4D1189548350064A385 /* ApiServerViewController.m */,
+				16EE561E19B78DBA0031DF6D /* CommentBlacklistViewController.h */,
+				16EE561F19B78DBA0031DF6D /* CommentBlacklistViewController.m */,
 			);
 			name = Settings;
 			sourceTree = "<group>";
@@ -809,6 +828,7 @@
 				1628A7001878B810005EDA69 /* API.m in Sources */,
 				1628A6C518789E73005EDA69 /* AppDelegate.m in Sources */,
 				1628A7061878BC18005EDA69 /* DataItem.m in Sources */,
+				16EE562019B78DBA0031DF6D /* CommentBlacklistViewController.m in Sources */,
 				1640470A1882ED0000A4AC9C /* AboutTrailerViewController.m in Sources */,
 				1628A6FC1878B64E005EDA69 /* PreferencesViewController.m in Sources */,
 				1665B66A1882F29300972111 /* NSString+Extensions.m in Sources */,
@@ -816,6 +836,7 @@
 				1628A6F91878A171005EDA69 /* DataManager.m in Sources */,
 				1628A7071878BC23005EDA69 /* Trailer.xcdatamodeld in Sources */,
 				1604D4CF189541D70064A385 /* EmptyView.m in Sources */,
+				166A19AA19B99C4C004D9057 /* OpenInSafariActivity.m in Sources */,
 				16FDD6DD18804470008D2223 /* PRCell.m in Sources */,
 				1628A7021878BC18005EDA69 /* PRComment.m in Sources */,
 				1628A6C118789E73005EDA69 /* main.m in Sources */,
@@ -1268,6 +1289,7 @@
 		168BC6C517EC2DF000BC4584 /* Trailer.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				16EE562119B857930031DF6D /* Trailer 14.xcdatamodel */,
 				1653FD6F1966B2900080D972 /* Trailer 13.xcdatamodel */,
 				16458E37191AC2D200FB13EC /* Trailer 12.xcdatamodel */,
 				162D96F91913F0E7000A54EA /* Trailer 11.xcdatamodel */,
@@ -1282,7 +1304,7 @@
 				1617BEEE183F9C4F00E89BB2 /* Trailer 2.xcdatamodel */,
 				168BC6C617EC2DF000BC4584 /* Trailer.xcdatamodel */,
 			);
-			currentVersion = 1653FD6F1966B2900080D972 /* Trailer 13.xcdatamodel */;
+			currentVersion = 16EE562119B857930031DF6D /* Trailer 14.xcdatamodel */;
 			path = Trailer.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

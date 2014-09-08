@@ -2,7 +2,6 @@
 @interface PRItemView ()
 {
 	NSTrackingArea *trackingArea;
-	BOOL dragging;
 }
 @end
 
@@ -183,6 +182,11 @@ static CGColorRef _highlightColor;
 																unreadCount:_commentsNew
 																 totalCount:_commentsTotal];
 		[self addSubview:commentCounts];
+
+		NSMenu *theMenu = [[NSMenu alloc] initWithTitle:@"PR Options"];
+		NSMenuItem *i = [theMenu insertItemWithTitle:@"Copy URL" action:@selector(copyThisPr) keyEquivalent:@"c" atIndex:0];
+		i.keyEquivalentModifierMask = NSCommandKeyMask;
+		[self setMenu:theMenu];
     }
     return self;
 }
@@ -227,15 +231,13 @@ static CGColorRef _highlightColor;
 
 - (void)mouseUp:(NSEvent *)theEvent
 {
-	if(dragging)
-	{
-		dragging = NO;
-	}
-	else
-	{
-		BOOL isAlternative = ((theEvent.modifierFlags & NSAlternateKeyMask) == NSAlternateKeyMask);
-		[self.delegate prItemSelected:self alternativeSelect:isAlternative];
-	}
+	BOOL isAlternative = ((theEvent.modifierFlags & NSAlternateKeyMask) == NSAlternateKeyMask);
+	[self.delegate prItemSelected:self alternativeSelect:isAlternative];
+}
+
+- (void)copyThisPr
+{
+	[self copyPrToClipboard:[NSPasteboard generalPasteboard]];
 }
 
 - (void)updateTrackingAreas
@@ -267,13 +269,8 @@ static CGColorRef _highlightColor;
 
 - (void)mouseDragged:(NSEvent *)theEvent
 {
-	dragging = YES;
-
-    NSPasteboard *pboard = [NSPasteboard pasteboardWithName:NSDragPboard];
-    [pboard declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:self];
-
-	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:self.userInfo moc:app.dataManager.managedObjectContext];
-    [pboard setString:r.webUrl forType:NSStringPboardType];
+	NSPasteboard *pboard = [NSPasteboard pasteboardWithName:NSDragPboard];
+	[self copyPrToClipboard:pboard];
 
 	NSPoint globalLocation = [ NSEvent mouseLocation ];
 	NSPoint windowLocation = [ [ self window ] convertScreenToBase: globalLocation ];
@@ -290,6 +287,14 @@ static CGColorRef _highlightColor;
 		 pasteboard:pboard
 			 source:self
 		  slideBack:YES];
+}
+
+- (void)copyPrToClipboard:(NSPasteboard *)pboard
+{
+	[pboard clearContents];
+    [pboard declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:self];
+	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:self.userInfo moc:app.dataManager.managedObjectContext];
+    [pboard setString:r.webUrl forType:NSStringPboardType];
 }
 
 - (NSImage *)scaleImage:(NSImage *)image toFillSize:(CGSize)toSize

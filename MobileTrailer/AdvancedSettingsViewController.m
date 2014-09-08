@@ -31,7 +31,7 @@
 #define HISTORY_SECTION_INDEX 4
 #define CONFIRM_SECTION_INDEX 5
 #define SORT_SECTION_INDEX 6
-#define API_SECTION_INDEX 7
+#define MISC_SECTION_INDEX 7
 
 #define TOTAL_SECTIONS 8
 
@@ -151,6 +151,13 @@ NSString *B(NSString *input)
 			{
 				cell.textLabel.text = B(@"Open PRs at first unread\ncomment");
 				if(settings.openPrAtFirstUnreadComment) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				break;
+			}
+			case 4:
+			{
+				cell.textLabel.text = B(@"Block comment notifications\nfrom usernames...");
+				cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+				break;
 			}
 		}
 	}
@@ -242,11 +249,24 @@ NSString *B(NSString *input)
 			}
 		}
 	}
-	else if(indexPath.section==API_SECTION_INDEX)
+	else if(indexPath.section==MISC_SECTION_INDEX)
 	{
-		cell.textLabel.text = @"API Server";
 		cell.detailTextLabel.text = nil;
-		cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+		switch (indexPath.row)
+		{
+			case 0:
+			{
+				cell.textLabel.text = @"API Server";
+				cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+				break;
+			}
+			case 1:
+			{
+				cell.textLabel.text = @"Log activity to console";
+				if(settings.logActivityToConsole) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				break;
+			}
+		}
 	}
 	return cell;
 }
@@ -365,6 +385,11 @@ NSString *B(NSString *input)
 			{
 				settings.openPrAtFirstUnreadComment = !settings.openPrAtFirstUnreadComment;
 			}
+			case 4:
+			{
+				[self performSegueWithIdentifier:@"showBlacklist" sender:self];
+				return;
+			}
 		}
 		[settingsChangedTimer push];
 	}
@@ -458,9 +483,29 @@ NSString *B(NSString *input)
 			}
 		}
 	}
-	else if(indexPath.section==API_SECTION_INDEX)
+	else if(indexPath.section==MISC_SECTION_INDEX)
 	{
-		[self performSegueWithIdentifier:@"apiServer" sender:self];
+		switch (indexPath.row) {
+			case 0:
+			{
+				[self performSegueWithIdentifier:@"apiServer" sender:self];
+				break;
+			}
+			case 1:
+			{
+				settings.logActivityToConsole = !settings.logActivityToConsole;
+				[self.tableView reloadData];
+				if(settings.logActivityToConsole)
+				{
+					[[[UIAlertView alloc] initWithTitle:@"Warning"
+												message:@"Logging is a feature meant for error reporting, having it constantly enabled will cause this app to be less responsive and use more battery"
+											   delegate:nil
+									  cancelButtonTitle:@"OK"
+									  otherButtonTitles:nil] show];
+				}
+				break;
+			}
+		}
 	}
 	[tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
 }
@@ -470,12 +515,12 @@ NSString *B(NSString *input)
     switch (section) {
 		case REFRESH_SECTION_INDEX: return 3;
 		case DISPLAY_SECTION_INDEX: return 7;
-		case COMMENTS_SECTION_INDEX: return 4;
+		case COMMENTS_SECTION_INDEX: return 5;
 		case REPOS_SECTION_INDEX: return 1;
 		case HISTORY_SECTION_INDEX: return 3;
 		case CONFIRM_SECTION_INDEX: return 2;
 		case SORT_SECTION_INDEX: return 3;
-		case API_SECTION_INDEX: return 1;
+		case MISC_SECTION_INDEX: return 2;
 	}
 	return 0;
 }
@@ -490,7 +535,7 @@ NSString *B(NSString *input)
 		case HISTORY_SECTION_INDEX: return @"History";
 		case CONFIRM_SECTION_INDEX: return @"Don't confirm when";
 		case SORT_SECTION_INDEX: return @"Sorting";
-		case API_SECTION_INDEX: return @"API";
+		case MISC_SECTION_INDEX: return @"Misc";
 	}
 	return nil;
 }

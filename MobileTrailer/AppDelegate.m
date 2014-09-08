@@ -2,6 +2,9 @@
 AppDelegate *app;
 
 @implementation AppDelegate
+{
+	UIPopoverController *sharePopover;
+}
 
 - (void)applicationDidReceiveMemoryWarning:(UIApplication *)application
 {
@@ -26,22 +29,24 @@ AppDelegate *app;
 	self.api = [[API alloc] init];
 
 	// ONLY FOR DEBUG!
-	//NSArray *allPRs = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.dataManager.managedObjectContext];
-	//[self.dataManager.managedObjectContext deleteObject:[allPRs firstObject]];
-    //[allPRs.firstObject setCondition:@kPullRequestConditionMerged];
+	/*
+	 #warning COMMENT THIS
+	 NSArray *allPRs = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.dataManager.managedObjectContext];
+	 PullRequest *firstPr = allPRs[2];
+	 firstPr.updatedAt = [NSDate distantPast];
+
+	 Repo *r = [Repo itemOfType:@"Repo" serverId:firstPr.repoId moc:self.dataManager.managedObjectContext];
+	 r.updatedAt = [NSDate distantPast];
+
+	 NSString *prUrl = firstPr.url;
+	 NSArray *allCommentsForFirstPr = [PRComment commentsForPullRequestUrl:prUrl inMoc:self.dataManager.managedObjectContext];
+	 [self.dataManager.managedObjectContext deleteObject:[allCommentsForFirstPr objectAtIndex:0]];
+	 */
+	// ONLY FOR DEBUG!
 
 	[self.dataManager postProcessAllPrs];
 
 	if(settings.authToken.length) [self.api updateLimitFromServer];
-
-	/*
-	NSDate *start = [NSDate date];
-	for(NSInteger f=0;f<100000;f++)
-	{
-		NSDate *d = settings.latestReceivedEventDateProcessed;
-	}
-	DLog(@"%f sec",[[NSDate date] timeIntervalSinceDate:start]);
-	*/
 
 	[self setupUI];
 
@@ -349,6 +354,11 @@ AppDelegate *app;
 			notification.alertBody = [NSString stringWithFormat:@"New Repository: %@",[item fullName]];
 			break;
 		}
+		case kNewPrAssigned:
+		{
+			notification.alertBody = [NSString stringWithFormat:@"PR Assigned: %@",[item title]];
+			break;
+		}
 	}
 
 	// Present notifications only if the user isn't currenty reading notifications in the notification center, over the open app, a corner case
@@ -369,6 +379,30 @@ AppDelegate *app;
 	{
 		[[UIApplication sharedApplication] presentLocalNotificationNow:notification];
 	}
+}
+
+/////////////// sharing
+
+- (void)shareFromView:(UIViewController *)view buttonItem:(UIBarButtonItem *)button url:(NSURL *)url
+{
+	OpenInSafariActivity *a = [[OpenInSafariActivity alloc] init];
+	UIActivityViewController * v = [[UIActivityViewController alloc] initWithActivityItems:@[url]
+																	 applicationActivities:@[a]];
+	if(UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad)
+	{
+		sharePopover = [[UIPopoverController alloc] initWithContentViewController:v];
+		sharePopover.delegate = self;
+		[sharePopover presentPopoverFromBarButtonItem:button permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+	}
+	else
+	{
+		[view presentViewController:v animated:YES completion:nil];
+	}
+}
+
+- (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController
+{
+	sharePopover = nil;
 }
 
 @end

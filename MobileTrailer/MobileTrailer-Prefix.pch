@@ -36,6 +36,7 @@
 #import "ApiServerViewController.h"
 #import "AdvancedSettingsViewController.h"
 #import "AboutTrailerViewController.h"
+#import "OpenInSafariActivity.h"
 #import "AppDelegate.h"
 
 #endif

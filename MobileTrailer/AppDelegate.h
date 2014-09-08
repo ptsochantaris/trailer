@@ -1,5 +1,5 @@
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
+@interface AppDelegate : UIResponder <UIApplicationDelegate, UIPopoverControllerDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
 
@@ -16,6 +16,8 @@ typedef void (^backgroundFetchCompletionCallback)(UIBackgroundFetchResult result
 - (void)postNotificationOfType:(PRNotificationType)type forItem:(id)item;
 
 - (void)startRefresh;
+
+- (void)shareFromView:(UIViewController *)view buttonItem:(UIBarButtonItem *)button url:(NSURL *)url;
 
 @end
 

@@ -6,6 +6,13 @@
 @implementation SuccessfulSyncCommitData
 @end
 
+@interface UrlBackOffEntry : NSObject
+@property (nonatomic) NSDate *nextAttemptAt;
+@property (nonatomic) NSTimeInterval duration;
+@end
+@implementation UrlBackOffEntry
+@end
+
 @interface API ()
 {
 	NSOperationQueue *requestQueue;
@@ -18,6 +25,7 @@
 #endif
 
 	SuccessfulSyncCommitData *syncDataToCommit;
+	NSMutableDictionary *badLinks;
 }
 @end
 
@@ -56,6 +64,8 @@ typedef void (^completionBlockType)(BOOL);
 
 		requestQueue = [[NSOperationQueue alloc] init];
 		requestQueue.maxConcurrentOperationCount = 4;
+
+		badLinks = [NSMutableDictionary new];
 
 		[self restartNotifier];
 
@@ -311,6 +321,7 @@ typedef void (^completionBlockType)(BOOL);
 						{
 							NSString *assignee = [[data ofk:@"assignee"] ofk:@"login"];
 							BOOL assigned = [assignee isEqualToString:settings.localUser];
+							p.newAssignment = @(assigned && !p.assignedToMe.boolValue);
 							p.assignedToMe = @(assigned);
 							completionCallback(YES);
 						}
@@ -320,6 +331,7 @@ typedef void (^completionBlockType)(BOOL);
 							{
 								// 404/410 is fine, it means issue entry doesn't exist
 								p.assignedToMe = @NO;
+								p.newAssignment = @NO;
 								completionCallback(YES);
 							}
 							else
@@ -585,6 +597,24 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 
 	[self markDirtyRepoIds:repoIdsToMarkDirty usingUserEventsInMoc:moc andCallback:completionCallback];
 	[self markDirtyRepoIds:repoIdsToMarkDirty usingReceivedEventsInMoc:moc andCallback:completionCallback];
+
+	if(repoIdsToMarkDirty.count>0) DLog(@"Marked dirty %ld repos which have events in their Github event stream", (long)repoIdsToMarkDirty.count);
+
+	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"Repo"];
+	f.predicate = [NSPredicate predicateWithFormat:@"dirty != YES and lastDirtied < %@", [NSDate dateWithTimeInterval:-3600 sinceDate:[NSDate date]]];
+	f.includesPropertyValues = NO;
+	f.returnsObjectsAsFaults = NO;
+	NSArray *reposNotFetchedRecently = [moc executeFetchRequest:f error:nil];
+	for(Repo *r in reposNotFetchedRecently)
+	{
+		r.dirty = @YES;
+		r.lastDirtied = [NSDate date];
+	}
+
+	if(reposNotFetchedRecently.count>0)
+	{
+		DLog(@"Marked dirty %ld repos which haven't been refreshed in over an hour", (long)reposNotFetchedRecently.count);
+	}
 }
 
 - (void)syncToMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
@@ -738,7 +768,7 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 					 }
 					 return NO;
 				 } finalCallback:^(BOOL success, NSInteger resultCode, NSString *etag) {
-					 r.dirty = @(NO);
+					 r.dirty = @NO;
 					 if(success)
 					 {
 						 succeeded++;
@@ -956,10 +986,6 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 		if([path rangeOfString:@"/"].location==0)
 		{
 			NSString *apiPath = settings.apiPath;
-			if(!apiPath && settings.apiPath)
-			{
-				DLog(@"weirdness");
-			}
 
 			if([apiPath rangeOfString:@"/"].location==0)
 				apiPath = [apiPath substringFromIndex:1];
@@ -1004,13 +1030,35 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 			[r setValue:extraHeaders[extraHeaderKey] forHTTPHeaderField:extraHeaderKey];
 		}
 
-		NSError *error;
-		NSHTTPURLResponse *response;
+		////////////////////////// preempt with error backoff algorithm
+		NSString *fullUrlPath = r.URL.absoluteString;
+		UrlBackOffEntry *existingBackOff = badLinks[fullUrlPath];
+		if(existingBackOff)
+		{
+			if([[NSDate date] compare:existingBackOff.nextAttemptAt]==NSOrderedAscending)
+			{
+				// report failure and return
+				DLog(@"Preempted fetch to previously broken link %@, won't actually access this URL until %@", fullUrlPath, existingBackOff.nextAttemptAt);
+				if(failureCallback)
+				{
+					NSError *error = [NSError errorWithDomain:@"Preempted fetch because of throttling" code:400 userInfo:nil];
+					dispatch_async(dispatch_get_main_queue(), ^{
+						failureCallback(nil, nil, error);
+					});
+				}
+				[self networkIndicationEnd];
+				return;
+			}
+		}
 
 #ifdef DEBUG
 		NSDate *startTime = [NSDate date];
 #endif
+
+		NSError *error;
+		NSHTTPURLResponse *response;
 		NSData *data = [NSURLConnection sendSynchronousRequest:r returningResponse:&response error:&error];
+
 #ifdef DEBUG
 		NSTimeInterval networkTime = [[NSDate date] timeIntervalSinceDate:startTime];
 #endif
@@ -1021,10 +1069,28 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 		if(!error && response.statusCode>299)
 		{
 			error = [NSError errorWithDomain:@"Error response received" code:response.statusCode userInfo:nil];
+			if(response.statusCode>=400)
+			{
+				if(existingBackOff)
+				{
+					DLog(@"Extending backoff for already throttled URL %@ by %f seconds", fullUrlPath, BACKOFF_STEP);
+					if(existingBackOff.duration<3600.0) existingBackOff.duration += BACKOFF_STEP;
+					existingBackOff.nextAttemptAt = [NSDate dateWithTimeInterval:existingBackOff.duration sinceDate:[NSDate date]];
+				}
+				else
+				{
+					DLog(@"Placing URL %@ on the throttled list", fullUrlPath);
+					UrlBackOffEntry *newBackOff = [[UrlBackOffEntry alloc] init];
+					newBackOff.duration = existingBackOff.duration+BACKOFF_STEP;
+					newBackOff.nextAttemptAt = [NSDate dateWithTimeInterval:newBackOff.duration sinceDate:[NSDate date]];
+					badLinks[fullUrlPath] = newBackOff;
+				}
+			}
 		}
+
 		if(error)
 		{
-			DLog(@"GET %@ - FAILED: %@",expandedPath,error.localizedDescription);
+			DLog(@"GET %@ - FAILED: %@", fullUrlPath, error.localizedDescription);
 			if(failureCallback)
 			{
 				dispatch_async(dispatch_get_main_queue(), ^{
@@ -1035,10 +1101,11 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 		else
 		{
 #ifdef DEBUG
-			DLog(@"GET %@ - RESULT: %ld, %f sec.",expandedPath,(long)response.statusCode,networkTime);
+			DLog(@"GET %@ - RESULT: %ld, %f sec.", fullUrlPath, (long)response.statusCode, networkTime);
 #else
-			DLog(@"GET %@ - RESULT: %ld",expandedPath,(long)response.statusCode);
+			DLog(@"GET %@ - RESULT: %ld", fullUrlPath, (long)response.statusCode);
 #endif
+			[badLinks removeObjectForKey:fullUrlPath];
 			if(successCallback)
 			{
 				dispatch_async(dispatch_get_main_queue(), ^{
@@ -1106,6 +1173,7 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 		[self networkIndicationEnd];
 	}];
 	o.queuePriority = NSOperationQueuePriorityVeryLow;
+	o.threadPriority = 0.0;
 	[requestQueue addOperation:o];
 	return o;
 }

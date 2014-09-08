@@ -35,6 +35,7 @@ AppDelegate *app;
 
 	// ONLY FOR DEBUG!
 	/*
+	#warning COMMENT THIS
 	NSArray *allPRs = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.dataManager.managedObjectContext];
 	PullRequest *firstPr = allPRs[2];
 	firstPr.updatedAt = [NSDate distantPast];
@@ -45,7 +46,7 @@ AppDelegate *app;
 	NSString *prUrl = firstPr.url;
 	NSArray *allCommentsForFirstPr = [PRComment commentsForPullRequestUrl:prUrl inMoc:self.dataManager.managedObjectContext];
     [self.dataManager.managedObjectContext deleteObject:[allCommentsForFirstPr objectAtIndex:0]];
-	*/
+	 */
 	// ONLY FOR DEBUG!
 
 	[self.dataManager postProcessAllPrs];
@@ -151,6 +152,15 @@ AppDelegate *app;
 {
 	BOOL setting = (sender.integerValue==1);
 	settings.logActivityToConsole = setting;
+
+	if(settings.logActivityToConsole)
+	{
+		NSAlert *alert = [[NSAlert alloc] init];
+		[alert setMessageText:@"Warning"];
+		[alert setInformativeText:@"Logging is a feature meant for error reporting, having it constantly enabled will cause this app to be less responsive and use more power"];
+		[alert addButtonWithTitle:@"OK"];
+		[alert runModal];
+	}
 }
 
 - (IBAction)includeRepositoriesInfilterSelected:(NSButton *)sender
@@ -474,6 +484,12 @@ AppDelegate *app;
 		{
 			notification.title = @"New Repository";
 			notification.subtitle = [item fullName];
+			break;
+		}
+		case kNewPrAssigned:
+		{
+			notification.title = @"PR Assigned";
+			notification.subtitle = [item title];
 			break;
 		}
 	}
@@ -833,12 +849,21 @@ AppDelegate *app;
 	}
 	else if(obj.object==self.statusTermsField)
 	{
-		NSArray *existingTerms = settings.statusFilteringTerms;
-		NSArray *newTerms = self.statusTermsField.objectValue;
-		if(![existingTerms isEqualToArray:newTerms])
+		NSArray *existingTokens = settings.statusFilteringTerms;
+		NSArray *newTokens = self.statusTermsField.objectValue;
+		if(![existingTokens isEqualToArray:newTokens])
 		{
-			settings.statusFilteringTerms = newTerms;
+			settings.statusFilteringTerms = newTokens;
 			[self updateMenu];
+		}
+	}
+	else if(obj.object==self.commentAuthorBlacklist)
+	{
+		NSArray *existingTokens = settings.commentAuthorBlacklist;
+		NSArray *newTokens = self.commentAuthorBlacklist.objectValue;
+		if(![existingTokens isEqualToArray:newTokens])
+		{
+			settings.commentAuthorBlacklist = newTokens;
 		}
 	}
 }
@@ -876,6 +901,7 @@ AppDelegate *app;
 
 	[self.api updateLimitFromServer];
 	[self updateStatusTermPreferenceControls];
+	self.commentAuthorBlacklist.objectValue = settings.commentAuthorBlacklist;
 
 	[self.sortModeSelect selectItemAtIndex:settings.sortMethod];
 	[self.prMergedPolicy selectItemAtIndex:settings.mergeHandlingPolicy];
@@ -922,7 +948,7 @@ AppDelegate *app;
 	[self.repoCheckStepper setFloatValue:settings.newRepoCheckPeriod];
 	[self newRepoCheckChanged:nil];
 
-	[self.refreshDurationStepper setFloatValue:settings.refreshPeriod];
+	[self.refreshDurationStepper setFloatValue:MIN(settings.refreshPeriod,3600)];
 	[self refreshDurationChanged:nil];
 
 	[self.preferencesWindow setLevel:NSFloatingWindowLevel];
@@ -978,7 +1004,7 @@ AppDelegate *app;
 
 - (IBAction)showAllRepositoriesSelected:(NSButton *)sender
 {
-	for(Repo *r in [self getFilteredRepos]) { r.hidden = @NO; r.dirty = @YES; }
+	for(Repo *r in [self getFilteredRepos]) { r.hidden = @NO; r.dirty = @YES; r.lastDirtied = [NSDate date]; }
 	self.preferencesDirty = YES;
 	[self.projectsTable reloadData];
 }

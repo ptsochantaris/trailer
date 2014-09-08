@@ -16,11 +16,6 @@
 			[self performVersionChangedTasks];
 			[self versionBumpComplete];
 		}
-
-		for(Repo *r in [Repo allItemsOfType:@"Repo" inMoc:self.managedObjectContext])
-		{
-			r.dirty = @(YES);
-		}
     }
     return self;
 }
@@ -38,24 +33,30 @@
 			[self.managedObjectContext deleteObject:s];
 		}
 	}
+
+	DLog(@"Marking all repos as dirty");
+	for(Repo *r in [Repo allItemsOfType:@"Repo" inMoc:self.managedObjectContext])
+	{
+		r.dirty = @YES;
+		r.lastDirtied = [NSDate date];
+	}
 }
 
 - (void)sendNotifications
 {
 	NSManagedObjectContext *mainContext = self.managedObjectContext;
 
-	NSArray *latestPrs = [PullRequest newItemsOfType:@"PullRequest" inMoc:mainContext];
-	for(PullRequest *r in latestPrs)
+	NSArray *newPrs = [PullRequest newItemsOfType:@"PullRequest" inMoc:mainContext];
+	for(PullRequest *r in newPrs)
 	{
 		if(!r.isMine)
 		{
 			[app postNotificationOfType:kNewPr forItem:r];
 		}
-		r.postSyncAction = @(kPostSyncDoNothing);
 	}
 
-	latestPrs = [PullRequest updatedItemsOfType:@"PullRequest" inMoc:mainContext];
-	for(PullRequest *r in latestPrs)
+	NSArray *updatedPrs = [PullRequest updatedItemsOfType:@"PullRequest" inMoc:mainContext];
+	for(PullRequest *r in updatedPrs)
 	{
 		if(r.reopened.boolValue)
 		{
@@ -65,6 +66,18 @@
 			}
 			r.reopened = @NO;
 		}
+	}
+
+	NSMutableArray *allTouchedPrs = [NSMutableArray arrayWithArray:newPrs];
+	[allTouchedPrs addObjectsFromArray:updatedPrs];
+	for(PullRequest *r in allTouchedPrs)
+	{
+		if(r.newAssignment.boolValue)
+		{
+			[app postNotificationOfType:kNewPrAssigned forItem:r];
+			r.newAssignment = @NO;
+		}
+		r.postSyncAction = @(kPostSyncDoNothing);
 	}
 
 	NSArray *latestComments = [PRComment newItemsOfType:@"PRComment" inMoc:mainContext];
@@ -81,7 +94,19 @@
 			{
 				if(![c.userId isEqualToNumber:settings.localUserId])
 				{
-					[app postNotificationOfType:kNewComment forItem:c];
+					NSString *commenterAuthorName = c.userName;
+					NSArray *blacklistMatches = [settings.commentAuthorBlacklist filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(NSString *name, NSDictionary *bindings) {
+						return [name compare:commenterAuthorName options:NSCaseInsensitiveSearch|NSDiacriticInsensitiveSearch]==NSOrderedSame;
+					}]];
+					if(blacklistMatches.count==0)
+					{
+						DLog(@"user '%@' not on blacklist, can post notification",commenterAuthorName);
+						[app postNotificationOfType:kNewComment forItem:c];
+					}
+					else
+					{
+						DLog(@"Blocked notification for user '%@' as their name is on the blacklist",commenterAuthorName);
+					}
 				}
 			}
 		}
@@ -308,6 +333,7 @@
 			return @{COMMENT_ID_KEY:[item serverId]};
 		case kNewPr:
 		case kPrReopened:
+		case kNewPrAssigned:
 			return @{PULL_REQUEST_ID_KEY:[item serverId]};
 		case kPrClosed:
 		case kPrMerged:
@@ -315,8 +341,6 @@
 		case kNewRepoSubscribed:
 		case kNewRepoAnnouncement:
 			return @{NOTIFICATION_URL_KEY:[item webUrl] };
-		default:
-			return nil;
 	}
 }
 
