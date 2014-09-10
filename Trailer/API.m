@@ -321,7 +321,7 @@ typedef void (^completionBlockType)(BOOL);
 						{
 							NSString *assignee = [[data ofk:@"assignee"] ofk:@"login"];
 							BOOL assigned = [assignee isEqualToString:settings.localUser];
-							p.newAssignment = @(assigned && !p.assignedToMe.boolValue);
+							p.isNewAssignment = @(assigned && !p.assignedToMe.boolValue);
 							p.assignedToMe = @(assigned);
 							completionCallback(YES);
 						}
@@ -331,7 +331,7 @@ typedef void (^completionBlockType)(BOOL);
 							{
 								// 404/410 is fine, it means issue entry doesn't exist
 								p.assignedToMe = @NO;
-								p.newAssignment = @NO;
+								p.isNewAssignment = @NO;
 								completionCallback(YES);
 							}
 							else

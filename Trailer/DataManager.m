@@ -72,10 +72,10 @@
 	[allTouchedPrs addObjectsFromArray:updatedPrs];
 	for(PullRequest *r in allTouchedPrs)
 	{
-		if(r.newAssignment.boolValue)
+		if(r.isNewAssignment.boolValue)
 		{
 			[app postNotificationOfType:kNewPrAssigned forItem:r];
-			r.newAssignment = @NO;
+			r.isNewAssignment = @NO;
 		}
 		r.postSyncAction = @(kPostSyncDoNothing);
 	}

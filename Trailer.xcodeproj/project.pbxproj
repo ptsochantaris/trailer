@@ -94,7 +94,7 @@
 		168C6ECF18B2104100E41D85 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 168C6ECD18B2104100E41D85 /* README.md */; };
 		169CEB9C1879D5BB0083A068 /* AdvancedSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 169CEB9B1879D5BB0083A068 /* AdvancedSettingsViewController.m */; };
 		16B94068182D051F00F32061 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16B94066182D051700F32061 /* Sparkle.framework */; };
-		16B9406B182D078C00F32061 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 16B94066182D051700F32061 /* Sparkle.framework */; };
+		16B9406B182D078C00F32061 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 16B94066182D051700F32061 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		16B94072182D136700F32061 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 16B94070182D136700F32061 /* dsa_pub.pem */; };
 		16B9553617EC89B50005118F /* DataItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B9553517EC89B50005118F /* DataItem.m */; };
 		16B9553A17EC93DE0005118F /* Repo.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B9553917EC93DE0005118F /* Repo.m */; };
@@ -262,6 +262,7 @@
 		16EE561E19B78DBA0031DF6D /* CommentBlacklistViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommentBlacklistViewController.h; sourceTree = "<group>"; };
 		16EE561F19B78DBA0031DF6D /* CommentBlacklistViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommentBlacklistViewController.m; sourceTree = "<group>"; };
 		16EE562119B857930031DF6D /* Trailer 14.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 14.xcdatamodel"; sourceTree = "<group>"; };
+		16F2B33E19C070F2005CB433 /* Trailer 15.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 15.xcdatamodel"; sourceTree = "<group>"; };
 		16FA68391823CF4600401E9B /* PRItemView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PRItemView.h; sourceTree = "<group>"; };
 		16FA683A1823CF4600401E9B /* PRItemView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = PRItemView.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		16FD14D51881CBC400FDC960 /* PickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PickerViewController.h; sourceTree = "<group>"; };
@@ -724,7 +725,7 @@
 		168BC6A217EC2DF000BC4584 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0510;
+				LastUpgradeCheck = 0600;
 				ORGANIZATIONNAME = HouseTrip;
 				TargetAttributes = {
 					1628A6B018789E73005EDA69 = {
@@ -1289,6 +1290,7 @@
 		168BC6C517EC2DF000BC4584 /* Trailer.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				16F2B33E19C070F2005CB433 /* Trailer 15.xcdatamodel */,
 				16EE562119B857930031DF6D /* Trailer 14.xcdatamodel */,
 				1653FD6F1966B2900080D972 /* Trailer 13.xcdatamodel */,
 				16458E37191AC2D200FB13EC /* Trailer 12.xcdatamodel */,
@@ -1304,7 +1306,7 @@
 				1617BEEE183F9C4F00E89BB2 /* Trailer 2.xcdatamodel */,
 				168BC6C617EC2DF000BC4584 /* Trailer.xcdatamodel */,
 			);
-			currentVersion = 16EE562119B857930031DF6D /* Trailer 14.xcdatamodel */;
+			currentVersion = 16F2B33E19C070F2005CB433 /* Trailer 15.xcdatamodel */;
 			path = Trailer.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

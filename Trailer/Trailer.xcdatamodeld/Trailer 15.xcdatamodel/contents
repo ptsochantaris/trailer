@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="6244" systemVersion="13E28" minimumToolsVersion="Xcode 4.5" macOSVersion="Automatic" iOSVersion="Automatic">
+    <entity name="PRComment" representedClassName="PRComment" syncable="YES">
+        <attribute name="avatarUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="body" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="path" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="position" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="postSyncAction" optional="YES" attributeType="Integer 16" indexed="YES" syncable="YES"/>
+        <attribute name="pullRequestUrl" optional="YES" attributeType="String" indexed="YES" syncable="YES"/>
+        <attribute name="serverId" optional="YES" attributeType="Integer 64" defaultValueString="0" indexed="YES" syncable="YES"/>
+        <attribute name="updatedAt" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userId" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="userName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="webUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <compoundIndexes>
+            <compoundIndex>
+                <index value="userId"/>
+                <index value="pullRequestUrl"/>
+            </compoundIndex>
+            <compoundIndex>
+                <index value="userId"/>
+                <index value="pullRequestUrl"/>
+                <index value="createdAt"/>
+            </compoundIndex>
+        </compoundIndexes>
+    </entity>
+    <entity name="PRStatus" representedClassName="PRStatus" syncable="YES">
+        <attribute name="createdAt" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="descriptionText" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="postSyncAction" optional="YES" attributeType="Integer 16" indexed="YES" syncable="YES"/>
+        <attribute name="pullRequestId" optional="YES" attributeType="Integer 64" indexed="YES" syncable="YES"/>
+        <attribute name="serverId" optional="YES" attributeType="Integer 64" defaultValueString="0" indexed="YES" syncable="YES"/>
+        <attribute name="state" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="targetUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="updatedAt" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userId" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="userName" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="PullRequest" representedClassName="PullRequest" syncable="YES">
+        <attribute name="assignedToMe" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="body" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="condition" optional="YES" attributeType="Integer 16" defaultValueString="0" indexed="YES" syncable="YES"/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="isNewAssignment" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="issueCommentLink" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="issueUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="latestReadCommentDate" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="mergeable" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="number" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="pinned" optional="YES" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
+        <attribute name="postSyncAction" optional="YES" attributeType="Integer 16" indexed="YES" syncable="YES"/>
+        <attribute name="reopened" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="repoId" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="repoName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="reviewCommentLink" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="sectionIndex" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="serverId" optional="YES" attributeType="Integer 64" defaultValueString="0" indexed="YES" syncable="YES"/>
+        <attribute name="state" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="statusesLink" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="totalComments" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="unreadComments" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="updatedAt" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userAvatarUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userId" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="userLogin" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="webUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <compoundIndexes>
+            <compoundIndex>
+                <index value="postSyncAction"/>
+                <index value="condition"/>
+            </compoundIndex>
+        </compoundIndexes>
+    </entity>
+    <entity name="Repo" representedClassName="Repo" syncable="YES">
+        <attribute name="createdAt" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="dirty" optional="YES" attributeType="Boolean" indexed="YES" syncable="YES"/>
+        <attribute name="fork" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="fullName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="hidden" attributeType="Boolean" defaultValueString="NO" indexed="YES" syncable="YES"/>
+        <attribute name="lastDirtied" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="postSyncAction" optional="YES" attributeType="Integer 16" indexed="YES" syncable="YES"/>
+        <attribute name="serverId" optional="YES" attributeType="Integer 64" defaultValueString="0" indexed="YES" syncable="YES"/>
+        <attribute name="updatedAt" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="webUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <compoundIndexes>
+            <compoundIndex>
+                <index value="dirty"/>
+                <index value="hidden"/>
+            </compoundIndex>
+            <compoundIndex>
+                <index value="dirty"/>
+                <index value="lastDirtied"/>
+            </compoundIndex>
+        </compoundIndexes>
+    </entity>
+    <elements>
+        <element name="PRComment" positionX="0" positionY="0" width="128" height="240"/>
+        <element name="PRStatus" positionX="0" positionY="0" width="128" height="208"/>
+        <element name="PullRequest" positionX="0" positionY="0" width="128" height="480"/>
+        <element name="Repo" positionX="0" positionY="0" width="128" height="195"/>
+    </elements>
+</model>

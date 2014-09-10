@@ -40,7 +40,7 @@
 @property (nonatomic, retain) NSNumber * mergeable;
 @property (nonatomic, retain) NSNumber * reopened;
 @property (nonatomic, retain) NSNumber * assignedToMe;
-@property (nonatomic, retain) NSNumber * newAssignment;
+@property (nonatomic, retain) NSNumber * isNewAssignment;
 
 @property (nonatomic, retain) NSString * issueUrl;
 

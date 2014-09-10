@@ -283,6 +283,9 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
         case NSFetchedResultsChangeDelete:
             [self.repositories deleteSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:UITableViewRowAnimationFade];
             break;
+
+		default:
+			break;
     }
 }
 
