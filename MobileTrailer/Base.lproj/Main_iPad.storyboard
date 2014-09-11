@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5056" systemVersion="13E28" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" initialViewController="H1p-Uh-vWS">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6245" systemVersion="13E28" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" initialViewController="H1p-Uh-vWS">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
     </dependencies>
     <scenes>
         <!--Navigation Controller-->
@@ -19,7 +19,7 @@
             </objects>
             <point key="canvasLocation" x="448" y="-630"/>
         </scene>
-        <!--Detail View Controller - Detail-->
+        <!--Detail-->
         <scene sceneID="yUG-lL-AsK">
             <objects>
                 <viewController title="Detail" id="JEX-9P-axG" customClass="DetailViewController" sceneMemberID="viewController">
@@ -58,7 +58,6 @@
                             </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                        <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     </view>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" id="mOI-FS-AaM">
@@ -96,7 +95,7 @@
             </objects>
             <point key="canvasLocation" x="-687" y="-630"/>
         </scene>
-        <!--Master View Controller - Master-->
+        <!--Master-->
         <scene sceneID="smW-Zh-WAh">
             <objects>
                 <tableViewController title="Master" clearsSelectionOnViewWillAppear="NO" id="7bK-jq-Zjz" customClass="MasterViewController" sceneMemberID="viewController">
@@ -104,7 +103,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="768"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
-                        <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                         <prototypes>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="default" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" textLabel="Arm-wq-HPj" detailTextLabel="6y5-LT-oPj" style="IBUITableViewCellStyleSubtitle" id="WCw-Qf-5nD" customClass="PRCell">
                                 <rect key="frame" x="0.0" y="119" width="320" height="44"/>
@@ -177,7 +175,7 @@
             </objects>
             <point key="canvasLocation" x="-366" y="248"/>
         </scene>
-        <!--Preferences View Controller - Settings-->
+        <!--Settings-->
         <scene sceneID="8yv-cf-BQa">
             <objects>
                 <viewController modalPresentationStyle="currentContext" id="qtb-G3-HJM" customClass="PreferencesViewController" sceneMemberID="viewController">
@@ -264,7 +262,6 @@ Select one of these options if you need to create one first:</string>
                             </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                        <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     </view>
                     <toolbarItems>
                         <barButtonItem title="Watchlist" id="Trq-cH-N0N">
@@ -307,7 +304,7 @@ Select one of these options if you need to create one first:</string>
             </objects>
             <point key="canvasLocation" x="2051" y="-557"/>
         </scene>
-        <!--Advanced Settings View Controller - Advanced-->
+        <!--Advanced-->
         <scene sceneID="13M-SK-H8U">
             <objects>
                 <tableViewController modalPresentationStyle="currentContext" hidesBottomBarWhenPushed="YES" id="ls6-NX-hye" customClass="AdvancedSettingsViewController" sceneMemberID="viewController">
@@ -315,7 +312,6 @@ Select one of these options if you need to create one first:</string>
                         <rect key="frame" x="0.0" y="44" width="540" height="532"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
-                        <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                         <prototypes>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="default" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" textLabel="rea-wC-dmF" detailTextLabel="iht-nD-wTn" style="IBUITableViewCellStyleValue1" id="0IG-O1-8fc">
                                 <rect key="frame" x="0.0" y="55" width="540" height="44"/>
@@ -372,7 +368,6 @@ Select one of these options if you need to create one first:</string>
                         <rect key="frame" x="0.0" y="44" width="540" height="532"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
-                        <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                         <prototypes>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" id="RgZ-W8-AF8">
                                 <rect key="frame" x="0.0" y="55" width="540" height="44"/>
@@ -394,7 +389,7 @@ Select one of these options if you need to create one first:</string>
             </objects>
             <point key="canvasLocation" x="3568" y="-780"/>
         </scene>
-        <!--Api Server View Controller - API Server-->
+        <!--API Server-->
         <scene sceneID="Y2c-tD-1CL">
             <objects>
                 <viewController id="gDP-Z2-fSb" customClass="ApiServerViewController" sceneMemberID="viewController">
@@ -474,7 +469,6 @@ Select one of these options if you need to create one first:</string>
                             </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                        <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     </view>
                     <toolbarItems>
                         <barButtonItem title="Test API Server" id="0Ad-33-TUn">
@@ -502,7 +496,7 @@ Select one of these options if you need to create one first:</string>
             </objects>
             <point key="canvasLocation" x="3568" y="713"/>
         </scene>
-        <!--About Trailer View Controller - About-->
+        <!--About-->
         <scene sceneID="gk8-1F-TsH">
             <objects>
                 <viewController modalPresentationStyle="currentContext" id="yvK-be-nK4" customClass="AboutTrailerViewController" sceneMemberID="viewController">
@@ -511,7 +505,7 @@ Select one of these options if you need to create one first:</string>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Version" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="XBv-UE-utz">
-                                <rect key="frame" x="271" y="85" width="242" height="21"/>
+                                <rect key="frame" x="270.99999934828975" y="85" width="242" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
                                 <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
@@ -553,7 +547,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
                             </imageView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                        <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     </view>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" title="About" id="0uQ-oM-T56">
@@ -571,16 +564,16 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
             </objects>
             <point key="canvasLocation" x="3568" y="-1531"/>
         </scene>
-        <!--Github View Controller - GitHub-->
+        <!--GitHub-->
         <scene sceneID="ocq-RM-6Ci">
             <objects>
                 <viewController modalPresentationStyle="currentContext" hidesBottomBarWhenPushed="YES" id="kWj-6b-yq2" customClass="GithubViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="KZ8-wc-h6g">
-                        <rect key="frame" x="0.0" y="0.0" width="540" height="620"/>
+                        <rect key="frame" x="0.0" y="0.0" width="1024" height="768"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <webView contentMode="scaleToFill" id="nWB-a1-bTA">
-                                <rect key="frame" x="0.0" y="0.0" width="540" height="620"/>
+                                <rect key="frame" x="0.0" y="0.0" width="1024" height="768"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <connections>
@@ -588,12 +581,11 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
                                 </connections>
                             </webView>
                             <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="gray" id="00q-SG-a6I">
-                                <rect key="frame" x="260" y="300" width="20" height="20"/>
+                                <rect key="frame" x="502" y="374" width="20" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                             </activityIndicatorView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                        <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     </view>
                     <navigationItem key="navigationItem" title="GitHub" id="uon-TC-PDK">
                         <barButtonItem key="leftBarButtonItem" systemItem="done" id="mNO-8A-axj">
@@ -611,7 +603,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
             </objects>
             <point key="canvasLocation" x="2799" y="-1427"/>
         </scene>
-        <!--Comment Blacklist View Controller - Block Comment Notifications-->
+        <!--Block Comment Notifications-->
         <scene sceneID="40O-VZ-iDA">
             <objects>
                 <viewController id="KMw-nr-hgG" customClass="CommentBlacklistViewController" sceneMemberID="viewController">
@@ -649,7 +641,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
                             </tableView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                        <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
                     </view>
                     <navigationItem key="navigationItem" title="Block Comment Notifications" id="WZS-LQ-xlC"/>
                     <connections>

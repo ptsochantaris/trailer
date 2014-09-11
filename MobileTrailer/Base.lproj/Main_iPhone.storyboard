@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5056" systemVersion="13E28" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="rS3-R9-Ivy">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6245" systemVersion="13E28" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="rS3-R9-Ivy">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
     </dependencies>
     <scenes>
         <!--Navigation Controller-->
@@ -23,7 +23,7 @@
             </objects>
             <point key="canvasLocation" x="-1" y="64"/>
         </scene>
-        <!--Master View Controller - Master-->
+        <!--Master-->
         <scene sceneID="VgW-fR-Quf">
             <objects>
                 <tableViewController title="Master" id="pGg-6v-bdr" customClass="MasterViewController" sceneMemberID="viewController">
@@ -89,7 +89,7 @@
             </objects>
             <point key="canvasLocation" x="459" y="64"/>
         </scene>
-        <!--Preferences View Controller - Settings-->
+        <!--Settings-->
         <scene sceneID="YkD-BV-5QN">
             <objects>
                 <viewController id="Bxt-3e-UBi" customClass="PreferencesViewController" sceneMemberID="viewController">
@@ -219,7 +219,7 @@ Select one of these options if you need to create one first:</string>
             </objects>
             <point key="canvasLocation" x="1441" y="690"/>
         </scene>
-        <!--Advanced Settings View Controller - Advanced-->
+        <!--Advanced-->
         <scene sceneID="2Kb-J4-7YD">
             <objects>
                 <tableViewController hidesBottomBarWhenPushed="YES" id="nmi-8t-acM" customClass="AdvancedSettingsViewController" sceneMemberID="viewController">
@@ -305,7 +305,7 @@ Select one of these options if you need to create one first:</string>
             </objects>
             <point key="canvasLocation" x="2557" y="966"/>
         </scene>
-        <!--Comment Blacklist View Controller - Block Comment Notifications-->
+        <!--Block Comment Notifications-->
         <scene sceneID="iAu-Vg-gm6">
             <objects>
                 <viewController id="aPC-CX-P5J" customClass="CommentBlacklistViewController" sceneMemberID="viewController">
@@ -354,7 +354,7 @@ Select one of these options if you need to create one first:</string>
             </objects>
             <point key="canvasLocation" x="2552" y="1603"/>
         </scene>
-        <!--Api Server View Controller - API Server-->
+        <!--API Server-->
         <scene sceneID="m1D-Wb-eT6">
             <objects>
                 <viewController id="38y-eH-fII" customClass="ApiServerViewController" sceneMemberID="viewController">
@@ -461,7 +461,7 @@ Select one of these options if you need to create one first:</string>
             </objects>
             <point key="canvasLocation" x="2557" y="-284"/>
         </scene>
-        <!--Github View Controller - GitHub-->
+        <!--GitHub-->
         <scene sceneID="xmy-sK-CrB">
             <objects>
                 <viewController hidesBottomBarWhenPushed="YES" id="SiV-zQ-DDX" customClass="GithubViewController" sceneMemberID="viewController">
@@ -491,7 +491,7 @@ Select one of these options if you need to create one first:</string>
             </objects>
             <point key="canvasLocation" x="1981" y="64"/>
         </scene>
-        <!--About Trailer View Controller - About-->
+        <!--About-->
         <scene sceneID="eku-XE-fbz">
             <objects>
                 <viewController hidesBottomBarWhenPushed="YES" id="sWz-r5-uZE" customClass="AboutTrailerViewController" sceneMemberID="viewController">
@@ -500,14 +500,14 @@ Select one of these options if you need to create one first:</string>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Version" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="pRN-hL-pPG">
-                                <rect key="frame" x="6.0000005830867638" y="138" width="304" height="21"/>
+                                <rect key="frame" x="6.0000007901211756" y="138" width="304" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
                                 <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Trailer" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="83g-gE-zyn">
-                                <rect key="frame" x="95.000000583086788" y="67" width="215" height="63"/>
+                                <rect key="frame" x="95.000000790121177" y="67" width="215" height="63"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="64"/>
                                 <nil key="highlightedColor"/>
@@ -559,7 +559,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
             </objects>
             <point key="canvasLocation" x="2557" y="340"/>
         </scene>
-        <!--Detail View Controller - Detail-->
+        <!--Detail-->
         <scene sceneID="Cn3-H9-jdl">
             <objects>
                 <viewController title="Detail" id="Ah7-4n-0Wa" customClass="DetailViewController" sceneMemberID="viewController">
