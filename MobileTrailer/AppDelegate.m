@@ -48,7 +48,12 @@ AppDelegate *app;
 
 	if(settings.authToken.length) [self.api updateLimitFromServer];
 
-	[self setupUI];
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+	{
+		UISplitViewController *splitViewController = (UISplitViewController *)self.window.rootViewController;
+		UINavigationController *navigationController = [splitViewController.viewControllers lastObject];
+		splitViewController.delegate = (id)navigationController.topViewController;
+	}
 
 	[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(networkStateChanged)
@@ -98,26 +103,6 @@ AppDelegate *app;
 	DLog(@"Received local notification: %@",notification.userInfo);
 	[[NSNotificationCenter defaultCenter] postNotificationName:RECEIVED_NOTIFICATION_KEY object:nil userInfo:notification.userInfo];
 	[[UIApplication sharedApplication] cancelLocalNotification:notification];
-}
-
-- (void)setupUI
-{
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
-	{
-	    UISplitViewController *splitViewController = (UISplitViewController *)self.window.rootViewController;
-	    UINavigationController *navigationController = [splitViewController.viewControllers lastObject];
-	    splitViewController.delegate = (id)navigationController.topViewController;
-
-	    UINavigationController *masterNavigationController = splitViewController.viewControllers[0];
-	    MasterViewController *controller = (MasterViewController *)masterNavigationController.topViewController;
-	    controller.managedObjectContext = self.dataManager.managedObjectContext;
-	}
-	else
-	{
-	    UINavigationController *navigationController = (UINavigationController *)self.window.rootViewController;
-	    MasterViewController *controller = (MasterViewController *)navigationController.topViewController;
-	    controller.managedObjectContext = self.dataManager.managedObjectContext;
-	}
 }
 
 - (void)forcePreferences

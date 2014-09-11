@@ -122,15 +122,21 @@
 
 - (void)removeAllClosedConfirmed
 {
-	for(PullRequest *p in [PullRequest allClosedRequestsInMoc:self.managedObjectContext])
-		[self.managedObjectContext deleteObject:p];
+	NSManagedObjectContext *moc = app.dataManager.managedObjectContext;
+
+	for(PullRequest *p in [PullRequest allClosedRequestsInMoc:moc])
+		[moc deleteObject:p];
+	
     [app.dataManager saveDB];
 }
 
 - (void)removeAllMergedConfirmed
 {
-	for(PullRequest *p in [PullRequest allMergedRequestsInMoc:self.managedObjectContext])
-		[self.managedObjectContext deleteObject:p];
+	NSManagedObjectContext *moc = app.dataManager.managedObjectContext;
+
+	for(PullRequest *p in [PullRequest allMergedRequestsInMoc:moc])
+		[moc deleteObject:p];
+
     [app.dataManager saveDB];
 }
 
@@ -266,15 +272,17 @@
 
     PullRequest *pullRequest = nil;
 
+	NSManagedObjectContext *moc = app.dataManager.managedObjectContext;
+
     if(commentId)
     {
-        PRComment *c = [PRComment itemOfType:@"PRComment" serverId:commentId moc:self.managedObjectContext];
+        PRComment *c = [PRComment itemOfType:@"PRComment" serverId:commentId moc:moc];
         if(!urlToOpen) urlToOpen = c.webUrl;
-        pullRequest = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:self.managedObjectContext];
+        pullRequest = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:moc];
     }
     else if(pullRequestId)
     {
-        pullRequest = [PullRequest itemOfType:@"PullRequest" serverId:pullRequestId moc:self.managedObjectContext];
+        pullRequest = [PullRequest itemOfType:@"PullRequest" serverId:pullRequestId moc:moc];
         if(!urlToOpen) urlToOpen = pullRequest.webUrl;
 
         if(!pullRequest)
@@ -409,7 +417,7 @@
 	if(editingStyle==UITableViewCellEditingStyleDelete)
 	{
 		PullRequest *pr = [self.fetchedResultsController objectAtIndexPath:indexPath];
-		[self.managedObjectContext deleteObject:pr];
+		[app.dataManager.managedObjectContext deleteObject:pr];
 		[app.dataManager saveDB];
 	}
 }
@@ -434,7 +442,7 @@
     [fetchRequest setFetchBatchSize:20];
 
     NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
-																								managedObjectContext:self.managedObjectContext
+																								managedObjectContext:app.dataManager.managedObjectContext
 																								  sectionNameKeyPath:@"sectionName"
 																										   cacheName:nil];
     aFetchedResultsController.delegate = self;
@@ -557,7 +565,7 @@
 	self.refreshControl.attributedTitle = [[NSAttributedString alloc] initWithString:[app.api lastUpdateDescription]
 																		  attributes:@{ }];
 
-	[UIApplication sharedApplication].applicationIconBadgeNumber = [PullRequest badgeCountInMoc:self.managedObjectContext];
+	[UIApplication sharedApplication].applicationIconBadgeNumber = [PullRequest badgeCountInMoc:app.dataManager.managedObjectContext];
 }
 
 ///////////////////////////// filtering
