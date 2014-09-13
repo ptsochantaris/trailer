@@ -126,19 +126,11 @@ static DetailViewController *_detail_shared_ref;
 	self.title = @"Error";
 }
 
-- (IBAction)iphoneShareButtonSelected:(UIBarButtonItem *)sender
-{
-	[app shareFromView:self buttonItem:sender url:self.web.request.URL];
-}
 - (IBAction)ipadShareButtonSelected:(UIBarButtonItem *)sender
 {
 	[app shareFromView:self buttonItem:sender url:self.web.request.URL];
 }
 
-- (IBAction)iPhoneTryAgain:(UIButton *)sender
-{
-    self.detailItem = self.detailItem;
-}
 - (IBAction)iPadTryAgain:(UIButton *)sender
 {
     self.detailItem = self.detailItem;

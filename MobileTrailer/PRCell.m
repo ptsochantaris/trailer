@@ -7,15 +7,13 @@
 @end
 
 static NSNumberFormatter *itemCountFormatter;
+static NSDictionary *titleAttributes, *descriptionAttributes;
 
 @implementation PRCell
 
 - (void)awakeFromNib
 {
 	[super awakeFromNib];
-	self.textLabel.numberOfLines = 0;
-	self.textLabel.font = [UIFont systemFontOfSize:[UIFont labelFontSize]];
-	self.detailTextLabel.textColor = [COLOR_CLASS grayColor];
 
 	unreadCount = [[UILabel alloc] initWithFrame:CGRectZero];
 	unreadCount.textColor = [COLOR_CLASS whiteColor];
@@ -39,6 +37,11 @@ static NSNumberFormatter *itemCountFormatter;
 	dispatch_once(&onceToken, ^{
 		itemCountFormatter = [[NSNumberFormatter alloc] init];
 		itemCountFormatter.numberStyle = NSNumberFormatterDecimalStyle;
+
+		titleAttributes = @{ NSFontAttributeName: [UIFont systemFontOfSize:[UIFont labelFontSize]],
+							 };
+		descriptionAttributes = @{ NSForegroundColorAttributeName: [UIColor grayColor],
+								  };
 	});
 
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -63,8 +66,15 @@ static NSNumberFormatter *itemCountFormatter;
 
 - (void)setPullRequest:(PullRequest *)pullRequest
 {
-	self.textLabel.text = pullRequest.title;
-	self.detailTextLabel.attributedText = [pullRequest subtitleWithFont:self.detailTextLabel.font];
+	NSMutableAttributedString *a = [[NSMutableAttributedString alloc] initWithString:pullRequest.title
+																		  attributes:titleAttributes];
+	[a appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n" attributes:titleAttributes]];
+	NSMutableAttributedString *d = [pullRequest subtitleWithFont:[UIFont systemFontOfSize:[UIFont smallSystemFontSize]]];
+	[d addAttributes:descriptionAttributes range:NSMakeRange(0, d.length)];
+	[a appendAttributedString:d];
+
+	_label.attributedText = a;
+	[_label sizeToFit];
 
 	NSInteger _commentsNew=0;
 	NSInteger _commentsTotal = pullRequest.totalComments.integerValue;

@@ -13,13 +13,6 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 @implementation PreferencesViewController
 
 - (IBAction)ipadDone:(UIBarButtonItem *)sender {
-	[self done];
-}
-- (IBAction)iphoneDone:(UIBarButtonItem *)sender {
-	[self done];
-}
-- (void)done
-{
 	[app.dataManager postProcessAllPrs];
 	if(app.preferencesDirty) [app startRefresh];
 	[self dismissViewControllerAnimated:YES completion:nil];
@@ -122,14 +115,6 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 }
 
 - (IBAction)ipadLoadRepos:(UIBarButtonItem *)sender
-{
-	[self updateRepositories];
-}
-- (IBAction)iphoneLoadRepos:(UIBarButtonItem *)sender
-{
-	[self updateRepositories];
-}
-- (void)updateRepositories
 {
 	if(self.githubApiToken.isFirstResponder)
 	{
@@ -348,27 +333,19 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 	return x;
 }
 
-- (IBAction)iphoneCreateToken:(UIButton *)sender {
-	[self createToken];
-}
-- (IBAction)iphoneVieTokens:(UIButton *)sender {
-	[self viewTokens];
-}
-- (IBAction)ipadCreateToken:(UIButton *)sender {
-	[self createToken];
-}
-- (IBAction)ipadViewTokens:(UIButton *)sender {
-	[self viewTokens];
-}
-- (IBAction)ipadWatchlistSelected:(UIBarButtonItem *)sender {
-	[self watchListSelected];
-}
-- (IBAction)iphoneWatchlistSelected:(id)sender {
-	[self watchListSelected];
+- (IBAction)ipadCreateToken:(UIButton *)sender
+{
+	targetUrl = [NSString stringWithFormat:@"https://%@/settings/tokens/new",settings.apiFrontEnd];
+	[self performSegueWithIdentifier:@"openGithub" sender:self];
 }
 
-- (void)watchListSelected
+- (IBAction)ipadViewTokens:(UIButton *)sender
 {
+	targetUrl = [NSString stringWithFormat:@"https://%@/settings/applications",settings.apiFrontEnd];
+	[self performSegueWithIdentifier:@"openGithub" sender:self];
+}
+
+- (IBAction)ipadWatchlistSelected:(UIBarButtonItem *)sender {
 	UIActionSheet *a = [[UIActionSheet alloc] initWithTitle:@"Watchlist"
 												   delegate:self
 										  cancelButtonTitle:@"Cancel"
@@ -404,18 +381,6 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 	}
 
 	app.preferencesDirty = YES;
-}
-
-- (void)viewTokens
-{
-	targetUrl = [NSString stringWithFormat:@"https://%@/settings/applications",settings.apiFrontEnd];
-	[self performSegueWithIdentifier:@"openGithub" sender:self];
-}
-
-- (void)createToken
-{
-	targetUrl = [NSString stringWithFormat:@"https://%@/settings/tokens/new",settings.apiFrontEnd];
-	[self performSegueWithIdentifier:@"openGithub" sender:self];
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender

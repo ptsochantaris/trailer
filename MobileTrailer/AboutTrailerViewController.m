@@ -11,17 +11,7 @@
 	self.versionNumber.text = [@"Version " stringByAppendingString:app.currentAppVersion];
 }
 
-- (IBAction)iphoneLink:(UIBarButtonItem *)sender
-{
-	[self link];
-}
-
 - (IBAction)ipadLink:(UIBarButtonItem *)sender
-{
-	[self link];
-}
-
-- (void)link
 {
 	NSString *url = @"http://dev.housetrip.com/trailer";
 	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:url]];

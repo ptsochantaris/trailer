@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6245" systemVersion="13E28" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="ADQ-hp-Ney">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="oHK-do-Uq7">
+            <objects>
+                <viewController id="ADQ-hp-Ney" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="WPt-9O-JwY"/>
+                        <viewControllerLayoutGuide type="bottom" id="iR2-yw-aZ8"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="kML-Pl-O2X">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="launchIcon" translatesAutoresizingMaskIntoConstraints="NO" id="IQd-6w-ukx">
+                                <rect key="frame" x="225" y="225" width="150" height="150"/>
+                            </imageView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="centerY" secondItem="IQd-6w-ukx" secondAttribute="centerY" id="8MM-xj-aZx"/>
+                            <constraint firstAttribute="centerX" secondItem="IQd-6w-ukx" secondAttribute="centerX" id="xbv-Dp-uEr"/>
+                        </constraints>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="nzD-pE-7jP" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="393" y="485"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="launchIcon" width="150" height="150"/>
+    </resources>
+</document>

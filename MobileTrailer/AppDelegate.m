@@ -48,12 +48,10 @@ AppDelegate *app;
 
 	if(settings.authToken.length) [self.api updateLimitFromServer];
 
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
-	{
-		UISplitViewController *splitViewController = (UISplitViewController *)self.window.rootViewController;
-		UINavigationController *navigationController = [splitViewController.viewControllers lastObject];
-		splitViewController.delegate = (id)navigationController.topViewController;
-	}
+	UISplitViewController *splitViewController = (UISplitViewController *)self.window.rootViewController;
+	splitViewController.minimumPrimaryColumnWidth = 240;
+	splitViewController.preferredPrimaryColumnWidthFraction = 0.3;
+	splitViewController.delegate = self;
 
 	[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(networkStateChanged)
@@ -78,6 +76,23 @@ AppDelegate *app;
 	});
 
     return YES;
+}
+
+	- (BOOL)splitViewController:(UISplitViewController *)splitViewController
+collapseSecondaryViewController:(UIViewController *)secondaryViewController
+	  ontoPrimaryViewController:(UIViewController *)primaryViewController
+{
+	MasterViewController *m = (MasterViewController *)[(UINavigationController *)primaryViewController viewControllers][0];
+	m.clearsSelectionOnViewWillAppear = YES;
+	DetailViewController *d = (DetailViewController *)[(UINavigationController *)secondaryViewController viewControllers][0];
+	return (d.detailItem==nil);
+}
+
+- (UIViewController *)splitViewController:(UISplitViewController *)splitViewController separateSecondaryViewControllerFromPrimaryViewController:(UIViewController *)primaryViewController
+{
+	MasterViewController *m = (MasterViewController *)[(UINavigationController *)primaryViewController viewControllers][0];
+	m.clearsSelectionOnViewWillAppear = NO;
+	return nil;
 }
 
 - (void)dealloc
@@ -107,20 +122,10 @@ AppDelegate *app;
 
 - (void)forcePreferences
 {
-	MasterViewController *controller = nil;
+	UISplitViewController *splitViewController = (UISplitViewController *)self.window.rootViewController;
+	UINavigationController *masterNavigationController = splitViewController.viewControllers[0];
+	MasterViewController *controller = (MasterViewController *)masterNavigationController.viewControllers[0];
 
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
-	{
-		UISplitViewController *splitViewController = (UISplitViewController *)self.window.rootViewController;
-		UINavigationController *masterNavigationController = splitViewController.viewControllers[0];
-		controller = (MasterViewController *)masterNavigationController.topViewController;
-	}
-	else
-	{
-		UINavigationController *navigationController = (UINavigationController *)self.window.rootViewController;
-		controller = (MasterViewController *)navigationController.topViewController;
-	}
-	
 	[controller performSegueWithIdentifier:@"showPreferences" sender:self];
 }
 

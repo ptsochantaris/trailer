@@ -17,6 +17,7 @@
 		160C5AD018675E9300142482 /* CenteredTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 160C5ACE18675E9300142482 /* CenteredTextField.m */; };
 		160C5AD318682CD800142482 /* CommentCounts.m in Sources */ = {isa = PBXBuildFile; fileRef = 160C5AD218682CD800142482 /* CommentCounts.m */; };
 		160C5AD418682CD800142482 /* CommentCounts.m in Sources */ = {isa = PBXBuildFile; fileRef = 160C5AD218682CD800142482 /* CommentCounts.m */; };
+		16154E2F19C43E8E00E49139 /* Launch.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 16154E2E19C43E8E00E49139 /* Launch.storyboard */; };
 		1617BEEA183F538100E89BB2 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 1617BEE9183F538100E89BB2 /* Reachability.m */; };
 		1617BEED183F543600E89BB2 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1617BEEC183F543600E89BB2 /* SystemConfiguration.framework */; };
 		161BED25185B5368005C00F7 /* StatusItemView.m in Sources */ = {isa = PBXBuildFile; fileRef = 161BED24185B5368005C00F7 /* StatusItemView.m */; };
@@ -29,8 +30,7 @@
 		1628A6BF18789E73005EDA69 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1628A6BD18789E73005EDA69 /* InfoPlist.strings */; };
 		1628A6C118789E73005EDA69 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 1628A6C018789E73005EDA69 /* main.m */; };
 		1628A6C518789E73005EDA69 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1628A6C418789E73005EDA69 /* AppDelegate.m */; };
-		1628A6C818789E73005EDA69 /* Main_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1628A6C618789E73005EDA69 /* Main_iPhone.storyboard */; };
-		1628A6CB18789E73005EDA69 /* Main_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1628A6C918789E73005EDA69 /* Main_iPad.storyboard */; };
+		1628A6CB18789E73005EDA69 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1628A6C918789E73005EDA69 /* Main.storyboard */; };
 		1628A6D118789E73005EDA69 /* MasterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1628A6D018789E73005EDA69 /* MasterViewController.m */; };
 		1628A6D418789E73005EDA69 /* DetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1628A6D318789E73005EDA69 /* DetailViewController.m */; };
 		1628A6D618789E73005EDA69 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1628A6D518789E73005EDA69 /* Images.xcassets */; };
@@ -151,6 +151,7 @@
 		160C5ACE18675E9300142482 /* CenteredTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CenteredTextField.m; sourceTree = "<group>"; };
 		160C5AD118682CD800142482 /* CommentCounts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommentCounts.h; sourceTree = "<group>"; };
 		160C5AD218682CD800142482 /* CommentCounts.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommentCounts.m; sourceTree = "<group>"; };
+		16154E2E19C43E8E00E49139 /* Launch.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Launch.storyboard; sourceTree = "<group>"; };
 		1617BEE8183F538100E89BB2 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		1617BEE9183F538100E89BB2 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		1617BEEC183F543600E89BB2 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
@@ -172,8 +173,7 @@
 		1628A6C218789E73005EDA69 /* MobileTrailer-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MobileTrailer-Prefix.pch"; sourceTree = "<group>"; };
 		1628A6C318789E73005EDA69 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		1628A6C418789E73005EDA69 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		1628A6C718789E73005EDA69 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPhone.storyboard; sourceTree = "<group>"; };
-		1628A6CA18789E73005EDA69 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPad.storyboard; sourceTree = "<group>"; };
+		1628A6CA18789E73005EDA69 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		1628A6CF18789E73005EDA69 /* MasterViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MasterViewController.h; sourceTree = "<group>"; };
 		1628A6D018789E73005EDA69 /* MasterViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MasterViewController.m; sourceTree = "<group>"; };
 		1628A6D218789E73005EDA69 /* DetailViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DetailViewController.h; sourceTree = "<group>"; };
@@ -336,8 +336,8 @@
 				16FD14D11881C82400FDC960 /* Settings */,
 				1628A6C318789E73005EDA69 /* AppDelegate.h */,
 				1628A6C418789E73005EDA69 /* AppDelegate.m */,
-				1628A6C918789E73005EDA69 /* Main_iPad.storyboard */,
-				1628A6C618789E73005EDA69 /* Main_iPhone.storyboard */,
+				1628A6C918789E73005EDA69 /* Main.storyboard */,
+				16154E2E19C43E8E00E49139 /* Launch.storyboard */,
 				1628A6D518789E73005EDA69 /* Images.xcassets */,
 				1628A6BB18789E73005EDA69 /* Supporting Files */,
 			);
@@ -773,10 +773,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1628A6CB18789E73005EDA69 /* Main_iPad.storyboard in Resources */,
+				1628A6CB18789E73005EDA69 /* Main.storyboard in Resources */,
 				1628A6D618789E73005EDA69 /* Images.xcassets in Resources */,
-				1628A6C818789E73005EDA69 /* Main_iPhone.storyboard in Resources */,
 				1628A6BF18789E73005EDA69 /* InfoPlist.strings in Resources */,
+				16154E2F19C43E8E00E49139 /* Launch.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -934,20 +934,12 @@
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
-		1628A6C618789E73005EDA69 /* Main_iPhone.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				1628A6C718789E73005EDA69 /* Base */,
-			);
-			name = Main_iPhone.storyboard;
-			sourceTree = "<group>";
-		};
-		1628A6C918789E73005EDA69 /* Main_iPad.storyboard */ = {
+		1628A6C918789E73005EDA69 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
 				1628A6CA18789E73005EDA69 /* Base */,
 			);
-			name = Main_iPad.storyboard;
+			name = Main.storyboard;
 			sourceTree = "<group>";
 		};
 		1628A6E518789E73005EDA69 /* InfoPlist.strings */ = {
@@ -989,7 +981,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COMPRESS_PNG_FILES = NO;
@@ -1000,7 +991,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MobileTrailer/MobileTrailer-Prefix.pch";
 				INFOPLIST_FILE = "MobileTrailer/MobileTrailer-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LLVM_LTO = YES;
 				LLVM_VECTORIZE_LOOPS = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1015,7 +1006,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				COMPRESS_PNG_FILES = NO;
@@ -1027,7 +1017,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MobileTrailer/MobileTrailer-Prefix.pch";
 				INFOPLIST_FILE = "MobileTrailer/MobileTrailer-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LLVM_LTO = YES;
 				LLVM_VECTORIZE_LOOPS = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";

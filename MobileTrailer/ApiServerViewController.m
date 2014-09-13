@@ -93,20 +93,7 @@
 	return YES;
 }
 
-- (IBAction)iPadTestSelected:(UIBarButtonItem *)sender { [self testApi]; }
-- (IBAction)iPadDefaultsSelected:(UIBarButtonItem *)sender { [self restoreDefaults]; }
-- (IBAction)iPhoneTestSelected:(UIBarButtonItem *)sender { [self testApi]; }
-- (IBAction)iPhoneDefaultsSelected:(UIBarButtonItem *)sender { [self restoreDefaults]; }
-
-- (void)restoreDefaults
-{
-	settings.apiBackEnd = nil;
-	settings.apiFrontEnd = nil;
-	settings.apiPath = nil;
-	[self loadSettings];
-}
-
-- (void)testApi
+- (IBAction)iPadTestSelected:(UIBarButtonItem *)sender
 {
 	self.testApiButton.enabled = NO;
 	self.restoreDefaultsButton.enabled = NO;
@@ -132,6 +119,13 @@
 							  otherButtonTitles:nil] show];
 		}
 	}];
+}
+- (IBAction)iPadDefaultsSelected:(UIBarButtonItem *)sender
+{
+	settings.apiBackEnd = nil;
+	settings.apiFrontEnd = nil;
+	settings.apiPath = nil;
+	[self loadSettings];
 }
 
 @end
