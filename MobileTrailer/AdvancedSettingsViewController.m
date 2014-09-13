@@ -16,12 +16,9 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	if(UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad)
-	{
-		settingsChangedTimer = [[HTPopTimer alloc] initWithTimeInterval:1.0
-																 target:app.dataManager
-															   selector:@selector(postProcessAllPrs)];
-	}
+	settingsChangedTimer = [[HTPopTimer alloc] initWithTimeInterval:1.0
+															 target:app.dataManager
+														   selector:@selector(postProcessAllPrs)];
 }
 
 #define REFRESH_SECTION_INDEX 0

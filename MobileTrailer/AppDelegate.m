@@ -49,9 +49,13 @@ AppDelegate *app;
 	if(settings.authToken.length) [self.api updateLimitFromServer];
 
 	UISplitViewController *splitViewController = (UISplitViewController *)self.window.rootViewController;
-	splitViewController.minimumPrimaryColumnWidth = 240;
-	splitViewController.preferredPrimaryColumnWidthFraction = 0.3;
+	CGFloat W = UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad ? 320 : 240;
+	splitViewController.minimumPrimaryColumnWidth = W;
+	splitViewController.maximumPrimaryColumnWidth = W;
 	splitViewController.delegate = self;
+
+	MasterViewController *m = (MasterViewController *)[(UINavigationController *)splitViewController.viewControllers[0] topViewController];
+	m.clearsSelectionOnViewWillAppear = (UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPhone && splitViewController.viewControllers.count>1);
 
 	[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(networkStateChanged)
@@ -75,6 +79,10 @@ AppDelegate *app;
 		}
 	});
 
+	UIUserNotificationSettings *notificationSettings = [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeAlert | UIUserNotificationTypeBadge | UIUserNotificationTypeSound
+																						 categories:nil];
+	[[UIApplication sharedApplication] registerUserNotificationSettings:notificationSettings];
+
     return YES;
 }
 
@@ -83,7 +91,7 @@ collapseSecondaryViewController:(UIViewController *)secondaryViewController
 	  ontoPrimaryViewController:(UIViewController *)primaryViewController
 {
 	MasterViewController *m = (MasterViewController *)[(UINavigationController *)primaryViewController viewControllers][0];
-	m.clearsSelectionOnViewWillAppear = YES;
+	m.clearsSelectionOnViewWillAppear = (UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPhone);
 	DetailViewController *d = (DetailViewController *)[(UINavigationController *)secondaryViewController viewControllers][0];
 	return (d.detailItem==nil);
 }

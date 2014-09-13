@@ -3,11 +3,13 @@
 {
 	UILabel *unreadCount, *readCount;
     NSString *failedToLoadImage, *waitingForImageInPath;
+	__weak IBOutlet UIImageView *_image;
+	__weak IBOutlet UILabel *_title;
+	__weak IBOutlet UILabel *_description;
 }
 @end
 
 static NSNumberFormatter *itemCountFormatter;
-static NSDictionary *titleAttributes, *descriptionAttributes;
 
 @implementation PRCell
 
@@ -37,11 +39,6 @@ static NSDictionary *titleAttributes, *descriptionAttributes;
 	dispatch_once(&onceToken, ^{
 		itemCountFormatter = [[NSNumberFormatter alloc] init];
 		itemCountFormatter.numberStyle = NSNumberFormatterDecimalStyle;
-
-		titleAttributes = @{ NSFontAttributeName: [UIFont systemFontOfSize:[UIFont labelFontSize]],
-							 };
-		descriptionAttributes = @{ NSForegroundColorAttributeName: [UIColor grayColor],
-								  };
 	});
 
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -66,15 +63,8 @@ static NSDictionary *titleAttributes, *descriptionAttributes;
 
 - (void)setPullRequest:(PullRequest *)pullRequest
 {
-	NSMutableAttributedString *a = [[NSMutableAttributedString alloc] initWithString:pullRequest.title
-																		  attributes:titleAttributes];
-	[a appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n" attributes:titleAttributes]];
-	NSMutableAttributedString *d = [pullRequest subtitleWithFont:[UIFont systemFontOfSize:[UIFont smallSystemFontSize]]];
-	[d addAttributes:descriptionAttributes range:NSMakeRange(0, d.length)];
-	[a appendAttributedString:d];
-
-	_label.attributedText = a;
-	[_label sizeToFit];
+	_title.text = pullRequest.title;
+	_description.attributedText = [pullRequest subtitleWithFont:[UIFont systemFontOfSize:[UIFont smallSystemFontSize]]];
 
 	NSInteger _commentsNew=0;
 	NSInteger _commentsTotal = pullRequest.totalComments.integerValue;
@@ -112,13 +102,13 @@ static NSDictionary *titleAttributes, *descriptionAttributes;
 										if(image)
 										{
 											// image loaded
-											self.imageView.image = image;
+											_image.image = image;
 											failedToLoadImage = nil;
 										}
 										else
 										{
 											// load failed / no image
-											self.imageView.image = [UIImage imageNamed:@"avatarPlaceHolder"];
+											_image.image = [UIImage imageNamed:@"avatarPlaceHolder"];
 											failedToLoadImage = imagePath;
 										}
 										waitingForImageInPath = nil;
@@ -126,7 +116,7 @@ static NSDictionary *titleAttributes, *descriptionAttributes;
 								}])
     {
 		// prepare UI for over-the-network load
-        self.imageView.image = [UIImage imageNamed:@"avatarPlaceHolder"];
+        _image.image = [UIImage imageNamed:@"avatarPlaceHolder"];
         failedToLoadImage = nil;
     }
 }
@@ -135,14 +125,14 @@ static NSDictionary *titleAttributes, *descriptionAttributes;
 {
 	[super layoutSubviews];
 
-	self.imageView.contentMode = UIViewContentModeCenter;
-	self.imageView.clipsToBounds = YES;
+	[_title sizeToFit];
+	[_description sizeToFit];
 
-	CGPoint topLeft = CGPointMake(self.imageView.frame.origin.x, self.imageView.frame.origin.y);
+	CGPoint topLeft = CGPointMake(_image.frame.origin.x, _image.frame.origin.y);
 	unreadCount.center = topLeft;
 	[self.contentView bringSubviewToFront:unreadCount];
 
-	CGPoint bottomRight = CGPointMake(topLeft.x+self.imageView.frame.size.width, topLeft.y+self.imageView.frame.size.height);
+	CGPoint bottomRight = CGPointMake(topLeft.x+_image.frame.size.width, topLeft.y+_image.frame.size.height);
 	readCount.center = bottomRight;
 	[self.contentView bringSubviewToFront:readCount];
 }
@@ -150,15 +140,17 @@ static NSDictionary *titleAttributes, *descriptionAttributes;
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated
 {
 	[super setSelected:selected animated:animated];
-
-	unreadCount.backgroundColor = [COLOR_CLASS redColor];
-	readCount.backgroundColor = [COLOR_CLASS colorWithWhite:0.9 alpha:1.0];
+	[self tone:selected];
 }
 
 - (void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated
 {
     [super setHighlighted:highlighted animated:animated];
+	[self tone:highlighted];
+}
 
+- (void)tone:(BOOL)tone
+{
 	unreadCount.backgroundColor = [COLOR_CLASS redColor];
 	readCount.backgroundColor = [COLOR_CLASS colorWithWhite:0.9 alpha:1.0];
 }
