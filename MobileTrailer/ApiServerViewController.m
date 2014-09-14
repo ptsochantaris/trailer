@@ -1,6 +1,8 @@
 
 @interface ApiServerViewController () <UITextFieldDelegate>
-
+{
+	__weak UITextField *focusedField;
+}
 @end
 
 @implementation ApiServerViewController
@@ -9,6 +11,35 @@
 {
     [super viewDidLoad];
 	[self loadSettings];
+
+	//NSNotificationCenter *n = [NSNotificationCenter defaultCenter];
+	//[n addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+	//[n addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
+}
+
+/*- (void)keyboardWillShow:(NSNotification *)n
+{
+	if(!focusedField) return;
+
+	CGRect keyboardFrame = [n.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
+	keyboardFrame = [self.view convertRect:keyboardFrame fromView:app.window];
+
+	CGRect firstResponderFrame = CGRectInset(focusedField.frame, -44, -44);
+	if(CGRectIntersectsRect(keyboardFrame, firstResponderFrame))
+	{
+		CGFloat neededDistance = (firstResponderFrame.origin.y+firstResponderFrame.size.height) - keyboardFrame.origin.y;
+		self.view.transform = CGAffineTransformMakeTranslation(0, -neededDistance);
+	}
+}*/
+
+- (void)keyboardWillHide:(NSNotification *)n
+{
+	self.view.transform = CGAffineTransformIdentity;
+}
+
+- (void)dealloc
+{
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -34,26 +65,22 @@
 {
 	if([string isEqualToString:@"\n"])
 	{
-		if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
-		{
-			[UIView animateWithDuration:0.3
-								  delay:0.0
-								options:UIViewAnimationOptionCurveEaseInOut|UIViewAnimationOptionBeginFromCurrentState
-							 animations:^{
-								 for(UIView *v in self.view.subviews)
-									 v.transform = CGAffineTransformIdentity;
-							 } completion:^(BOOL finished) {
-
-							 }];
-		}
 		[textField resignFirstResponder];
 		return NO;
 	}
 	return YES;
 }
 
+- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
+{
+	focusedField = textField;
+	return YES;
+}
+
 - (BOOL)textFieldShouldEndEditing:(UITextField *)textField
 {
+	focusedField = nil;
+
 	NSString *frontEnd = self.apiFrontEnd.text;
 	NSString *backEnd = self.apiBackEnd.text;
 	NSString *path = self.apiPath.text;
@@ -73,23 +100,6 @@
 
 	app.preferencesDirty = YES;
 
-	return YES;
-}
-
-- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
-{
-	if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
-	{
-		[UIView animateWithDuration:0.3
-							  delay:0.0
-							options:UIViewAnimationOptionCurveEaseInOut|UIViewAnimationOptionBeginFromCurrentState
-						 animations:^{
-							 for(UIView *v in self.view.subviews)
-								 v.transform = CGAffineTransformMakeTranslation(0, -100);
-						 } completion:^(BOOL finished) {
-
-						 }];
-	}
 	return YES;
 }
 
