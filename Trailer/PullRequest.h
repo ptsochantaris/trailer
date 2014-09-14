@@ -78,7 +78,7 @@
 
 - (void)postProcess;
 
-- (NSAttributedString *)subtitleWithFont:(FONT_CLASS *)font;
+- (NSMutableAttributedString *)subtitleWithFont:(FONT_CLASS *)font;
 
 - (NSArray *)displayedStatuses;
 

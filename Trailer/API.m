@@ -1173,7 +1173,6 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 		[self networkIndicationEnd];
 	}];
 	o.queuePriority = NSOperationQueuePriorityVeryLow;
-	o.threadPriority = 0.0;
 	[requestQueue addOperation:o];
 	return o;
 }

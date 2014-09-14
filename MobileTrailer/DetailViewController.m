@@ -17,8 +17,6 @@ static DetailViewController *_detail_shared_ref;
         _detailItem = newDetailItem;
         [self configureView];
     }
-
-	[self.masterPopoverController dismissPopoverAnimated:YES];
 }
 
 - (void)configureView
@@ -26,7 +24,6 @@ static DetailViewController *_detail_shared_ref;
 	if (self.detailItem)
 	{
 		DLog(@"will load: %@",self.detailItem.absoluteString);
-		self.navigationItem.rightBarButtonItem.enabled = YES;
 		[self.web loadRequest:[NSURLRequest requestWithURL:self.detailItem]];
 		self.statusLabel.text = @"";
 		self.statusLabel.hidden = YES;
@@ -54,19 +51,11 @@ static DetailViewController *_detail_shared_ref;
 	[self configureView];
 }
 
-#pragma mark - Split view
-
-- (void)splitViewController:(UISplitViewController *)splitController willHideViewController:(UIViewController *)viewController withBarButtonItem:(UIBarButtonItem *)barButtonItem forPopoverController:(UIPopoverController *)popoverController
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection
 {
-    barButtonItem.title = @"Pull Requests";
-    [self.navigationItem setLeftBarButtonItem:barButtonItem animated:YES];
-    self.masterPopoverController = popoverController;
-}
+	[super traitCollectionDidChange:previousTraitCollection];
 
-- (void)splitViewController:(UISplitViewController *)splitController willShowViewController:(UIViewController *)viewController invalidatingBarButtonItem:(UIBarButtonItem *)barButtonItem
-{
-    [self.navigationItem setLeftBarButtonItem:nil animated:YES];
-    self.masterPopoverController = nil;
+	self.navigationItem.leftBarButtonItem = (self.traitCollection.horizontalSizeClass==UIUserInterfaceSizeClassCompact) ? nil : self.splitViewController.displayModeButtonItem;
 }
 
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
@@ -81,7 +70,7 @@ static DetailViewController *_detail_shared_ref;
 	if(code==404)
 	{
 		[[[UIAlertView alloc] initWithTitle:@"Not Found"
-									message:[NSString stringWithFormat:@"Please ensure you are logged in with the '%@' account on GitHub",settings.localUser]
+									message:[NSString stringWithFormat:@"\nPlease ensure you are logged in with the '%@' account on GitHub\n\nIf you are using two-factor auth: There is a bug between Github and iOS which may cause your login to fail.  If it happens, temporarily disable two-factor auth and log in from here, then re-enable it afterwards.  You will only need to do this once.",settings.localUser]
 								   delegate:nil
 						  cancelButtonTitle:@"OK"
 						  otherButtonTitles:nil] show];
@@ -112,6 +101,7 @@ static DetailViewController *_detail_shared_ref;
 	self.statusLabel.hidden = YES;
 	self.web.hidden = NO;
     self.tryAgainButton.hidden = YES;
+	self.navigationItem.rightBarButtonItem.enabled = YES;
 	self.title = [self.web stringByEvaluatingJavaScriptFromString:@"document.title"];
 }
 
@@ -126,19 +116,11 @@ static DetailViewController *_detail_shared_ref;
 	self.title = @"Error";
 }
 
-- (IBAction)iphoneShareButtonSelected:(UIBarButtonItem *)sender
-{
-	[app shareFromView:self buttonItem:sender url:self.web.request.URL];
-}
 - (IBAction)ipadShareButtonSelected:(UIBarButtonItem *)sender
 {
 	[app shareFromView:self buttonItem:sender url:self.web.request.URL];
 }
 
-- (IBAction)iPhoneTryAgain:(UIButton *)sender
-{
-    self.detailItem = self.detailItem;
-}
 - (IBAction)iPadTryAgain:(UIButton *)sender
 {
     self.detailItem = self.detailItem;

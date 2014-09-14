@@ -1,6 +1,9 @@
 
 @interface ApiServerViewController () <UITextFieldDelegate>
-
+{
+	__weak UITextField *focusedField;
+	__weak IBOutlet UIScrollView *_scrollView;
+}
 @end
 
 @implementation ApiServerViewController
@@ -9,6 +12,44 @@
 {
     [super viewDidLoad];
 	[self loadSettings];
+
+	NSNotificationCenter *n = [NSNotificationCenter defaultCenter];
+	[n addObserver:self selector:@selector(keyboardWasShown:) name:UIKeyboardWillShowNotification object:nil];
+	[n addObserver:self selector:@selector(keyboardWillBeHidden:) name:UIKeyboardWillHideNotification object:nil];
+}
+
+- (void)keyboardWasShown:(NSNotification*)aNotification
+{
+	NSDictionary* info = [aNotification userInfo];
+	CGSize kbSize = [[info objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
+	UIEdgeInsets contentInsets = UIEdgeInsetsMake(0.0, 0.0, kbSize.height, 0.0);
+	_scrollView.contentInset = contentInsets;
+	_scrollView.scrollIndicatorInsets = contentInsets;
+
+	CGRect aRect = self.view.frame;
+	aRect.size.height -= kbSize.height;
+	if(!CGRectContainsPoint(aRect, focusedField.frame.origin))
+	{
+		CGPoint scrollPoint = CGPointMake(0.0, focusedField.frame.origin.y-kbSize.height);
+		[_scrollView setContentOffset:scrollPoint animated:YES];
+	}
+}
+
+- (void)keyboardWillBeHidden:(NSNotification*)aNotification
+{
+	UIEdgeInsets contentInsets = UIEdgeInsetsZero;
+	_scrollView.contentInset = contentInsets;
+	_scrollView.scrollIndicatorInsets = contentInsets;
+}
+
+- (void)keyboardWillHide:(NSNotification *)n
+{
+	self.view.transform = CGAffineTransformIdentity;
+}
+
+- (void)dealloc
+{
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -34,26 +75,22 @@
 {
 	if([string isEqualToString:@"\n"])
 	{
-		if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
-		{
-			[UIView animateWithDuration:0.3
-								  delay:0.0
-								options:UIViewAnimationOptionCurveEaseInOut|UIViewAnimationOptionBeginFromCurrentState
-							 animations:^{
-								 for(UIView *v in self.view.subviews)
-									 v.transform = CGAffineTransformIdentity;
-							 } completion:^(BOOL finished) {
-
-							 }];
-		}
 		[textField resignFirstResponder];
 		return NO;
 	}
 	return YES;
 }
 
+- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
+{
+	focusedField = textField;
+	return YES;
+}
+
 - (BOOL)textFieldShouldEndEditing:(UITextField *)textField
 {
+	focusedField = nil;
+
 	NSString *frontEnd = self.apiFrontEnd.text;
 	NSString *backEnd = self.apiBackEnd.text;
 	NSString *path = self.apiPath.text;
@@ -76,37 +113,7 @@
 	return YES;
 }
 
-- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
-{
-	if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
-	{
-		[UIView animateWithDuration:0.3
-							  delay:0.0
-							options:UIViewAnimationOptionCurveEaseInOut|UIViewAnimationOptionBeginFromCurrentState
-						 animations:^{
-							 for(UIView *v in self.view.subviews)
-								 v.transform = CGAffineTransformMakeTranslation(0, -100);
-						 } completion:^(BOOL finished) {
-
-						 }];
-	}
-	return YES;
-}
-
-- (IBAction)iPadTestSelected:(UIBarButtonItem *)sender { [self testApi]; }
-- (IBAction)iPadDefaultsSelected:(UIBarButtonItem *)sender { [self restoreDefaults]; }
-- (IBAction)iPhoneTestSelected:(UIBarButtonItem *)sender { [self testApi]; }
-- (IBAction)iPhoneDefaultsSelected:(UIBarButtonItem *)sender { [self restoreDefaults]; }
-
-- (void)restoreDefaults
-{
-	settings.apiBackEnd = nil;
-	settings.apiFrontEnd = nil;
-	settings.apiPath = nil;
-	[self loadSettings];
-}
-
-- (void)testApi
+- (IBAction)iPadTestSelected:(UIBarButtonItem *)sender
 {
 	self.testApiButton.enabled = NO;
 	self.restoreDefaultsButton.enabled = NO;
@@ -132,6 +139,13 @@
 							  otherButtonTitles:nil] show];
 		}
 	}];
+}
+- (IBAction)iPadDefaultsSelected:(UIBarButtonItem *)sender
+{
+	settings.apiBackEnd = nil;
+	settings.apiFrontEnd = nil;
+	settings.apiPath = nil;
+	[self loadSettings];
 }
 
 @end

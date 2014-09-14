@@ -171,7 +171,7 @@ static NSDateFormatter *itemDateFormatter;
 	return [kPullRequestSectionNames objectAtIndex:self.sectionIndex.integerValue];
 }
 
-- (NSAttributedString *)subtitleWithFont:(FONT_CLASS *)font
+- (NSMutableAttributedString *)subtitleWithFont:(FONT_CLASS *)font
 {
 	NSMutableAttributedString *_subtitle = [[NSMutableAttributedString alloc] init];
 

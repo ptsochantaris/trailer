@@ -3,6 +3,9 @@
 {
 	UILabel *unreadCount, *readCount;
     NSString *failedToLoadImage, *waitingForImageInPath;
+	__weak IBOutlet UIImageView *_image;
+	__weak IBOutlet UILabel *_title;
+	__weak IBOutlet UILabel *_description;
 }
 @end
 
@@ -13,9 +16,6 @@ static NSNumberFormatter *itemCountFormatter;
 - (void)awakeFromNib
 {
 	[super awakeFromNib];
-	self.textLabel.numberOfLines = 0;
-	self.textLabel.font = [UIFont systemFontOfSize:[UIFont labelFontSize]];
-	self.detailTextLabel.textColor = [COLOR_CLASS grayColor];
 
 	unreadCount = [[UILabel alloc] initWithFrame:CGRectZero];
 	unreadCount.textColor = [COLOR_CLASS whiteColor];
@@ -63,8 +63,8 @@ static NSNumberFormatter *itemCountFormatter;
 
 - (void)setPullRequest:(PullRequest *)pullRequest
 {
-	self.textLabel.text = pullRequest.title;
-	self.detailTextLabel.attributedText = [pullRequest subtitleWithFont:self.detailTextLabel.font];
+	_title.text = pullRequest.title;
+	_description.attributedText = [pullRequest subtitleWithFont:[UIFont systemFontOfSize:[UIFont smallSystemFontSize]]];
 
 	NSInteger _commentsNew=0;
 	NSInteger _commentsTotal = pullRequest.totalComments.integerValue;
@@ -102,13 +102,13 @@ static NSNumberFormatter *itemCountFormatter;
 										if(image)
 										{
 											// image loaded
-											self.imageView.image = image;
+											_image.image = image;
 											failedToLoadImage = nil;
 										}
 										else
 										{
 											// load failed / no image
-											self.imageView.image = [UIImage imageNamed:@"avatarPlaceHolder"];
+											_image.image = [UIImage imageNamed:@"avatarPlaceHolder"];
 											failedToLoadImage = imagePath;
 										}
 										waitingForImageInPath = nil;
@@ -116,7 +116,7 @@ static NSNumberFormatter *itemCountFormatter;
 								}])
     {
 		// prepare UI for over-the-network load
-        self.imageView.image = [UIImage imageNamed:@"avatarPlaceHolder"];
+        _image.image = [UIImage imageNamed:@"avatarPlaceHolder"];
         failedToLoadImage = nil;
     }
 }
@@ -125,14 +125,14 @@ static NSNumberFormatter *itemCountFormatter;
 {
 	[super layoutSubviews];
 
-	self.imageView.contentMode = UIViewContentModeCenter;
-	self.imageView.clipsToBounds = YES;
+	[_title sizeToFit];
+	[_description sizeToFit];
 
-	CGPoint topLeft = CGPointMake(self.imageView.frame.origin.x, self.imageView.frame.origin.y);
+	CGPoint topLeft = CGPointMake(_image.frame.origin.x, _image.frame.origin.y);
 	unreadCount.center = topLeft;
 	[self.contentView bringSubviewToFront:unreadCount];
 
-	CGPoint bottomRight = CGPointMake(topLeft.x+self.imageView.frame.size.width, topLeft.y+self.imageView.frame.size.height);
+	CGPoint bottomRight = CGPointMake(topLeft.x+_image.frame.size.width, topLeft.y+_image.frame.size.height);
 	readCount.center = bottomRight;
 	[self.contentView bringSubviewToFront:readCount];
 }
@@ -140,15 +140,17 @@ static NSNumberFormatter *itemCountFormatter;
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated
 {
 	[super setSelected:selected animated:animated];
-
-	unreadCount.backgroundColor = [COLOR_CLASS redColor];
-	readCount.backgroundColor = [COLOR_CLASS colorWithWhite:0.9 alpha:1.0];
+	[self tone:selected];
 }
 
 - (void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated
 {
     [super setHighlighted:highlighted animated:animated];
+	[self tone:highlighted];
+}
 
+- (void)tone:(BOOL)tone
+{
 	unreadCount.backgroundColor = [COLOR_CLASS redColor];
 	readCount.backgroundColor = [COLOR_CLASS colorWithWhite:0.9 alpha:1.0];
 }

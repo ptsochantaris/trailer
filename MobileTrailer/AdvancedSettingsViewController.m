@@ -16,12 +16,9 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	if(UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad)
-	{
-		settingsChangedTimer = [[HTPopTimer alloc] initWithTimeInterval:1.0
-																 target:app.dataManager
-															   selector:@selector(postProcessAllPrs)];
-	}
+	settingsChangedTimer = [[HTPopTimer alloc] initWithTimeInterval:1.0
+															 target:app.dataManager
+														   selector:@selector(postProcessAllPrs)];
 }
 
 #define REFRESH_SECTION_INDEX 0
@@ -39,13 +36,6 @@
 #define SORT_NORMAL @[@"Oldest first",@"Inactive for longest",@"Alphabetically"]
 #define PR_HANDLING_POLICY @[@"Keep My Own",@"Keep All",@"Don't Keep"]
 
-NSString *B(NSString *input)
-{
-	if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
-		input = [input stringByReplacingOccurrencesOfString:@"\n" withString:@" "];
-	return input;
-}
-
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell"];
@@ -56,19 +46,19 @@ NSString *B(NSString *input)
 		{
 			case 0:
 			{
-				cell.textLabel.text = B(@"Foreground refresh\ninterval");
+				cell.textLabel.text = @"Foreground refresh interval";
 				cell.detailTextLabel.text = [NSString stringWithFormat:@"%.0f seconds",settings.refreshPeriod];
 				break;
 			}
 			case 1:
 			{
-				cell.textLabel.text = B(@"Background refresh\ninterval (minimum)");
+				cell.textLabel.text = @"Background refresh interval (minimum)";
 				cell.detailTextLabel.text = [NSString stringWithFormat:@"%.0f minutes",settings.backgroundRefreshPeriod/60.0];
 				break;
 			}
 			case 2:
 			{
-				cell.textLabel.text = B(@"Watchlist refresh\ninterval");
+				cell.textLabel.text = @"Watchlist refresh interval";
 				cell.detailTextLabel.text = [NSString stringWithFormat:@"%.0f hours",settings.newRepoCheckPeriod];
 				break;
 			}
@@ -81,7 +71,7 @@ NSString *B(NSString *input)
 		{
 			case 0:
 			{
-				cell.textLabel.text = B(@"Display creation instead\nof activity times");
+				cell.textLabel.text = @"Display creation instead of activity times";
 				if(settings.showCreatedInsteadOfUpdated) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
@@ -105,7 +95,7 @@ NSString *B(NSString *input)
             }
 			case 4:
 			{
-				cell.textLabel.text = B(@"Announce unmergeable PRs only\nin 'Mine'/'Participated'");
+				cell.textLabel.text = @"Announce unmergeable PRs only in 'Mine'/'Participated'";
 				if(settings.markUnmergeableOnUserSectionsOnly) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
@@ -117,7 +107,7 @@ NSString *B(NSString *input)
             }
 			case 6:
             {
-				cell.textLabel.text = B(@"Include repository names\nin filtering");
+				cell.textLabel.text = @"Include repository names in filtering";
 				if(settings.includeReposInFilter) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
             }
@@ -131,31 +121,31 @@ NSString *B(NSString *input)
 		{
 			case 0:
 			{
-				cell.textLabel.text = B(@"Display comment badges\nand alerts for all PRs");
+				cell.textLabel.text = @"Display comment badges and alerts for all PRs";
 				if(settings.showCommentsEverywhere) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
 			case 1:
 			{
-				cell.textLabel.text = B(@"Only display PRs\nwith unread comments");
+				cell.textLabel.text = @"Only display PRs with unread comments";
 				if(settings.shouldHideUncommentedRequests) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
 			case 2:
 			{
-				cell.textLabel.text = B(@"Move PRs that mention me\nto 'Participated'");
+				cell.textLabel.text = @"Move PRs that mention me to 'Participated'";
 				if(settings.autoParticipateInMentions) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
 			case 3:
 			{
-				cell.textLabel.text = B(@"Open PRs at first unread\ncomment");
+				cell.textLabel.text = @"Open PRs at first unread comment";
 				if(settings.openPrAtFirstUnreadComment) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
 			case 4:
 			{
-				cell.textLabel.text = B(@"Block comment notifications\nfrom usernames...");
+				cell.textLabel.text = @"Block comment notifications from usernames...";
 				cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 				break;
 			}
@@ -168,7 +158,7 @@ NSString *B(NSString *input)
 		{
 			case 0:
 			{
-				cell.textLabel.text = B(@"Auto-hide new repositories\nin your watchlist");
+				cell.textLabel.text = @"Auto-hide new repositories in your watchlist";
 				if(settings.hideNewRepositories) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
@@ -181,19 +171,19 @@ NSString *B(NSString *input)
 		{
 			case 0:
 			{
-				cell.textLabel.text = B(@"When a PR is merged");
+				cell.textLabel.text = @"When a PR is merged";
 				cell.detailTextLabel.text = PR_HANDLING_POLICY[settings.mergeHandlingPolicy];
 				break;
 			}
 			case 1:
 			{
-				cell.textLabel.text = B(@"When a PR is closed");
+				cell.textLabel.text = @"When a PR is closed";
 				cell.detailTextLabel.text = PR_HANDLING_POLICY[settings.closeHandlingPolicy];
 				break;
 			}
 			case 2:
 			{
-				cell.textLabel.text = B(@"Don't keep PRs merged\nby me");
+				cell.textLabel.text = @"Don't keep PRs merged by me";
 				if(settings.dontKeepPrsMergedByMe) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}

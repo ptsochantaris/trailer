@@ -1,9 +1,6 @@
 
 @implementation MasterViewController
 {
-    // Opening PRs
-    NSString *urlToOpen;
-
     // Filtering
     UITextField *searchField;
     HTPopTimer *searchTimer;
@@ -12,30 +9,45 @@
 	BOOL refreshOnRelease;
 }
 
-- (void)awakeFromNib
+- (IBAction)phoneRefreshSelected:(UIBarButtonItem *)sender
 {
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-	    self.clearsSelectionOnViewWillAppear = NO;
-	    self.preferredContentSize = CGSizeMake(320.0, 600.0);
+	if (UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad && UIInterfaceOrientationIsPortrait([[UIApplication sharedApplication] statusBarOrientation]))
+	{
+		UIAlertController *a = [UIAlertController alertControllerWithTitle:@"Action"
+																	message:nil
+															 preferredStyle:UIAlertControllerStyleAlert];
+		[a addAction:[UIAlertAction actionWithTitle:@"Cancel"
+											  style:UIAlertActionStyleCancel
+											handler:^(UIAlertAction *action) {
+												[a dismissViewControllerAnimated:YES completion:nil];
+											}]];
+		[a addAction:[UIAlertAction actionWithTitle:@"Mark all as read"
+											  style:UIAlertActionStyleDestructive
+											handler:^(UIAlertAction *action) {
+												[self markAllAsRead];
+											}]];
+		[a addAction:[UIAlertAction actionWithTitle:@"Remove all merged"
+											  style:UIAlertActionStyleDefault
+											handler:^(UIAlertAction *action) {
+												[self removeAllMerged];
+											}]];
+		[a addAction:[UIAlertAction actionWithTitle:@"Remove all closed"
+											  style:UIAlertActionStyleDefault
+											handler:^(UIAlertAction *action) {
+												[self removeAllClosed];
+											}]];
+		[self presentViewController:a animated:YES completion:nil];
 	}
-    [super awakeFromNib];
-}
-
-- (IBAction)phoneRefreshSelected:(UIBarButtonItem *)sender {
-	[self showAction];
-}
-- (IBAction)ipadRefreshSelected:(id)sender {
-	[self showAction];
-}
-
-- (void)showAction
-{
-	UIActionSheet *a = [[UIActionSheet alloc] initWithTitle:@"Action"
-												   delegate:self
-										  cancelButtonTitle:@"Cancel"
-									 destructiveButtonTitle:@"Mark all as read"
-										  otherButtonTitles:@"Remove all merged", @"Remove all closed", nil];
-	[a showFromBarButtonItem:self.navigationItem.rightBarButtonItem animated:YES];
+	else
+	{
+		UIActionSheet *a = [[UIActionSheet alloc] initWithTitle:@"Action"
+													   delegate:self
+											  cancelButtonTitle:@"Cancel"
+										 destructiveButtonTitle:@"Mark all as read"
+											  otherButtonTitles:@"Remove all merged", @"Remove all closed", nil];
+		
+		[a showFromBarButtonItem:sender animated:YES];
+	}
 }
 
 - (void)actionSheet:(UIActionSheet *)actionSheet willDismissWithButtonIndex:(NSInteger)buttonIndex
@@ -180,6 +192,8 @@
     searchTimer = [[HTPopTimer alloc] initWithTimeInterval:0.5 target:self selector:@selector(reloadData)];
 
     searchField = [[UITextField alloc] initWithFrame:CGRectMake(10, 10, 300, 31)];
+	searchField.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+	searchField.translatesAutoresizingMaskIntoConstraints = YES;
 	searchField.placeholder = @"Filter...";
 	searchField.returnKeyType = UIReturnKeySearch;
 	searchField.font = [UIFont systemFontOfSize:18.0];
@@ -193,8 +207,9 @@
     UIView *searchHolder = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 41)];
 	[searchHolder addSubview:searchField];
 	self.tableView.tableHeaderView = searchHolder;
-
     self.tableView.contentOffset = CGPointMake(0, searchHolder.frame.size.height);
+	self.tableView.estimatedRowHeight = 160;
+	self.tableView.rowHeight = UITableViewAutomaticDimension;
 
 	self.detailViewController = (DetailViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
 
@@ -264,7 +279,7 @@
 {
 	//DLog(@"local notification: %@",notification.userInfo);
 
-	urlToOpen = notification.userInfo[NOTIFICATION_URL_KEY];
+	NSString *urlToOpen = notification.userInfo[NOTIFICATION_URL_KEY];
 
     NSNumber *pullRequestId = notification.userInfo[PULL_REQUEST_ID_KEY];
 
@@ -315,10 +330,8 @@
 
     if(urlToOpen)
     {
-        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
-            self.detailViewController.detailItem = [NSURL URLWithString:urlToOpen];
-        else
-            [self performSegueWithIdentifier:@"showDetail" sender:self];
+		self.detailViewController.detailItem = [NSURL URLWithString:urlToOpen];
+		[self showDetailViewController:self.detailViewController.navigationController sender:self];
     }
 }
 
@@ -360,15 +373,8 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     PullRequest *pullRequest = [[self fetchedResultsController] objectAtIndexPath:indexPath];
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
-    {
-        self.detailViewController.detailItem = [NSURL URLWithString:pullRequest.urlForOpening];
-    }
-    else
-    {
-        urlToOpen = pullRequest.urlForOpening;
-        [self performSegueWithIdentifier:@"showDetail" sender:self];
-    }
+	self.detailViewController.detailItem = [NSURL URLWithString:pullRequest.urlForOpening];
+	[self showDetailViewController:self.detailViewController.navigationController sender:self];
     [self catchUp:pullRequest];
 }
 
@@ -376,24 +382,6 @@
 {
 	id <NSFetchedResultsSectionInfo> sectionInfo = [self.fetchedResultsController sections][section];
 	return sectionInfo.name;
-}
-
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    PullRequest *pr = [self.fetchedResultsController objectAtIndexPath:indexPath];
-	CGFloat H = 30;
-	CGFloat w = UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad ? 230 : 214;
-
-	H += CGRectIntegral([pr.title boundingRectWithSize:CGSizeMake(w, CGFLOAT_MAX)
-								options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
-							 attributes:@{ NSFontAttributeName:[UIFont systemFontOfSize:[UIFont labelFontSize]] }
-								context:nil]).size.height;
-
-	NSAttributedString *subtitle = [pr subtitleWithFont:[UIFont systemFontOfSize:[UIFont smallSystemFontSize]]];
-	H += CGRectIntegral([subtitle boundingRectWithSize:CGSizeMake(w, CGFLOAT_MAX)
-								options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
-								context:nil]).size.height;
-	return MAX(65,H);
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
@@ -420,14 +408,6 @@
 		[app.dataManager.managedObjectContext deleteObject:pr];
 		[app.dataManager saveDB];
 	}
-}
-
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
-{
-    if ([[segue identifier] isEqualToString:@"showDetail"])
-    {
-        [[segue destinationViewController] setDetailItem:[NSURL URLWithString:urlToOpen]];
-    }
 }
 
 #pragma mark - Fetched results controller
@@ -566,6 +546,9 @@
 																		  attributes:@{ }];
 
 	[UIApplication sharedApplication].applicationIconBadgeNumber = [PullRequest badgeCountInMoc:app.dataManager.managedObjectContext];
+
+	if(self.splitViewController.isCollapsed && self.traitCollection.horizontalSizeClass==UIUserInterfaceSizeClassRegular)
+		self.detailViewController.navigationItem.leftBarButtonItem.title = self.title;
 }
 
 ///////////////////////////// filtering

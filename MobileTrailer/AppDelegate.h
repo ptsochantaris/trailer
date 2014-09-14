@@ -1,5 +1,5 @@
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate, UIPopoverControllerDelegate>
+@interface AppDelegate : UIResponder <UIApplicationDelegate, UIPopoverControllerDelegate, UISplitViewControllerDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
 
