@@ -17,8 +17,6 @@ static DetailViewController *_detail_shared_ref;
         _detailItem = newDetailItem;
         [self configureView];
     }
-
-	[self.masterPopoverController dismissPopoverAnimated:YES];
 }
 
 - (void)configureView
@@ -52,21 +50,8 @@ static DetailViewController *_detail_shared_ref;
     [super viewDidLoad];
 	_detail_shared_ref = self;
 	[self configureView];
-}
 
-#pragma mark - Split view
-
-- (void)splitViewController:(UISplitViewController *)splitController willHideViewController:(UIViewController *)viewController withBarButtonItem:(UIBarButtonItem *)barButtonItem forPopoverController:(UIPopoverController *)popoverController
-{
-    barButtonItem.title = @"Pull Requests";
-    [self.navigationItem setLeftBarButtonItem:barButtonItem animated:YES];
-    self.masterPopoverController = popoverController;
-}
-
-- (void)splitViewController:(UISplitViewController *)splitController willShowViewController:(UIViewController *)viewController invalidatingBarButtonItem:(UIBarButtonItem *)barButtonItem
-{
-    [self.navigationItem setLeftBarButtonItem:nil animated:YES];
-    self.masterPopoverController = nil;
+	self.navigationItem.leftBarButtonItem = self.splitViewController.displayModeButtonItem;
 }
 
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
