@@ -546,6 +546,8 @@
 																		  attributes:@{ }];
 
 	[UIApplication sharedApplication].applicationIconBadgeNumber = [PullRequest badgeCountInMoc:app.dataManager.managedObjectContext];
+
+	self.detailViewController.navigationItem.leftBarButtonItem.title = self.title;
 }
 
 ///////////////////////////// filtering
