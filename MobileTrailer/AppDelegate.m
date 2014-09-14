@@ -49,9 +49,8 @@ AppDelegate *app;
 	if(settings.authToken.length) [self.api updateLimitFromServer];
 
 	UISplitViewController *splitViewController = (UISplitViewController *)self.window.rootViewController;
-	CGFloat W = UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad ? 320 : 240;
-	splitViewController.minimumPrimaryColumnWidth = W;
-	splitViewController.maximumPrimaryColumnWidth = W;
+	splitViewController.minimumPrimaryColumnWidth = 320;
+	splitViewController.maximumPrimaryColumnWidth = 320;
 	splitViewController.delegate = self;
 
 	MasterViewController *m = (MasterViewController *)[(UINavigationController *)splitViewController.viewControllers[0] topViewController];
