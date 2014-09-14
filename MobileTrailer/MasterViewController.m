@@ -547,7 +547,7 @@
 
 	[UIApplication sharedApplication].applicationIconBadgeNumber = [PullRequest badgeCountInMoc:app.dataManager.managedObjectContext];
 
-	if(UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad || self.splitViewController.isCollapsed)
+	if(self.splitViewController.isCollapsed && self.traitCollection.horizontalSizeClass==UIUserInterfaceSizeClassRegular)
 		self.detailViewController.navigationItem.leftBarButtonItem.title = self.title;
 }
 
