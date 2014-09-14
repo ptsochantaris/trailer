@@ -11,12 +11,43 @@
 
 - (IBAction)phoneRefreshSelected:(UIBarButtonItem *)sender
 {
-	UIActionSheet *a = [[UIActionSheet alloc] initWithTitle:@"Action"
-												   delegate:self
-										  cancelButtonTitle:@"Cancel"
-									 destructiveButtonTitle:@"Mark all as read"
-										  otherButtonTitles:@"Remove all merged", @"Remove all closed", nil];
-	[a showFromBarButtonItem:self.navigationItem.rightBarButtonItem animated:YES];
+	if (UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad && UIInterfaceOrientationIsPortrait([[UIApplication sharedApplication] statusBarOrientation]))
+	{
+		UIAlertController *a = [UIAlertController alertControllerWithTitle:@"Action"
+																	message:nil
+															 preferredStyle:UIAlertControllerStyleAlert];
+		[a addAction:[UIAlertAction actionWithTitle:@"Cancel"
+											  style:UIAlertActionStyleCancel
+											handler:^(UIAlertAction *action) {
+												[a dismissViewControllerAnimated:YES completion:nil];
+											}]];
+		[a addAction:[UIAlertAction actionWithTitle:@"Mark all as read"
+											  style:UIAlertActionStyleDestructive
+											handler:^(UIAlertAction *action) {
+												[self markAllAsRead];
+											}]];
+		[a addAction:[UIAlertAction actionWithTitle:@"Remove all merged"
+											  style:UIAlertActionStyleDefault
+											handler:^(UIAlertAction *action) {
+												[self removeAllMerged];
+											}]];
+		[a addAction:[UIAlertAction actionWithTitle:@"Remove all closed"
+											  style:UIAlertActionStyleDefault
+											handler:^(UIAlertAction *action) {
+												[self removeAllClosed];
+											}]];
+		[self presentViewController:a animated:YES completion:nil];
+	}
+	else
+	{
+		UIActionSheet *a = [[UIActionSheet alloc] initWithTitle:@"Action"
+													   delegate:self
+											  cancelButtonTitle:@"Cancel"
+										 destructiveButtonTitle:@"Mark all as read"
+											  otherButtonTitles:@"Remove all merged", @"Remove all closed", nil];
+		
+		[a showFromBarButtonItem:sender animated:YES];
+	}
 }
 
 - (void)actionSheet:(UIActionSheet *)actionSheet willDismissWithButtonIndex:(NSInteger)buttonIndex
