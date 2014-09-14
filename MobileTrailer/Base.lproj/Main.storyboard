@@ -192,7 +192,7 @@
                                 <segue destination="zPa-1n-gqo" kind="presentation" identifier="showPreferences" modalPresentationStyle="formSheet" id="9Mj-hJ-deg"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" systemItem="action" id="vlQ-6x-FuM">
+                        <barButtonItem key="rightBarButtonItem" systemItem="edit" id="vlQ-6x-FuM">
                             <connections>
                                 <action selector="phoneRefreshSelected:" destination="7bK-jq-Zjz" id="Vwd-s6-rP9"/>
                             </connections>

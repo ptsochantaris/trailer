@@ -1,7 +1,6 @@
 
 @interface DetailViewController : UIViewController
-<UISplitViewControllerDelegate, UIWebViewDelegate,
-UIActionSheetDelegate, NSURLConnectionDataDelegate>
+<UISplitViewControllerDelegate, UIWebViewDelegate, NSURLConnectionDataDelegate>
 
 @property (strong, nonatomic) NSURL *detailItem;
 

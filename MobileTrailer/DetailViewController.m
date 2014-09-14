@@ -24,7 +24,6 @@ static DetailViewController *_detail_shared_ref;
 	if (self.detailItem)
 	{
 		DLog(@"will load: %@",self.detailItem.absoluteString);
-		self.navigationItem.rightBarButtonItem.enabled = YES;
 		[self.web loadRequest:[NSURLRequest requestWithURL:self.detailItem]];
 		self.statusLabel.text = @"";
 		self.statusLabel.hidden = YES;
@@ -50,8 +49,13 @@ static DetailViewController *_detail_shared_ref;
     [super viewDidLoad];
 	_detail_shared_ref = self;
 	[self configureView];
+}
 
-	self.navigationItem.leftBarButtonItem = self.splitViewController.displayModeButtonItem;
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection
+{
+	[super traitCollectionDidChange:previousTraitCollection];
+
+	self.navigationItem.leftBarButtonItem = (self.traitCollection.horizontalSizeClass==UIUserInterfaceSizeClassCompact) ? nil : self.splitViewController.displayModeButtonItem;
 }
 
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
@@ -97,6 +101,7 @@ static DetailViewController *_detail_shared_ref;
 	self.statusLabel.hidden = YES;
 	self.web.hidden = NO;
     self.tryAgainButton.hidden = YES;
+	self.navigationItem.rightBarButtonItem.enabled = YES;
 	self.title = [self.web stringByEvaluatingJavaScriptFromString:@"document.title"];
 }
 
