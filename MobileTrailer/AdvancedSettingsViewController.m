@@ -368,6 +368,7 @@
 			case 3:
 			{
 				settings.openPrAtFirstUnreadComment = !settings.openPrAtFirstUnreadComment;
+				break;
 			}
 			case 4:
 			{
