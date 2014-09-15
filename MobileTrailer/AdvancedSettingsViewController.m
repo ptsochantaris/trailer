@@ -40,6 +40,7 @@
 {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell"];
 	cell.accessoryType = UITableViewCellAccessoryNone;
+	cell.detailTextLabel.text = @" ";
 	if(indexPath.section==REFRESH_SECTION_INDEX)
 	{
 		switch (indexPath.row)
@@ -66,7 +67,6 @@
 	}
 	else if(indexPath.section==DISPLAY_SECTION_INDEX)
 	{
-		cell.detailTextLabel.text = nil;
 		switch (indexPath.row)
 		{
 			case 0:
@@ -116,7 +116,6 @@
 	}
 	else if(indexPath.section==COMMENTS_SECTION_INDEX)
 	{
-		cell.detailTextLabel.text = nil;
 		switch (indexPath.row)
 		{
 			case 0:
@@ -153,7 +152,6 @@
 	}
 	else if(indexPath.section==REPOS_SECTION_INDEX)
 	{
-		cell.detailTextLabel.text = nil;
 		switch (indexPath.row)
 		{
 			case 0:
@@ -166,7 +164,6 @@
 	}
 	else if(indexPath.section==HISTORY_SECTION_INDEX)
 	{
-		cell.detailTextLabel.text = nil;
 		switch (indexPath.row)
 		{
 			case 0:
@@ -191,7 +188,6 @@
 	}
 	else if(indexPath.section==CONFIRM_SECTION_INDEX)
 	{
-		cell.detailTextLabel.text = nil;
 		switch (indexPath.row)
 		{
 			case 0:
@@ -210,7 +206,6 @@
 	}
 	else if(indexPath.section==SORT_SECTION_INDEX)
 	{
-		cell.detailTextLabel.text = nil;
 		switch (indexPath.row)
 		{
 			case 0:
@@ -241,7 +236,6 @@
 	}
 	else if(indexPath.section==MISC_SECTION_INDEX)
 	{
-		cell.detailTextLabel.text = nil;
 		switch (indexPath.row)
 		{
 			case 0:
