@@ -887,13 +887,13 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="uMX-0p-t9W" firstAttribute="leading" secondItem="mZY-0X-VxY" secondAttribute="leadingMargin" constant="-16" id="5pA-eF-AgU"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="O4p-eK-azP" secondAttribute="trailing" id="Ccg-qD-o3v"/>
+                            <constraint firstItem="O4p-eK-azP" firstAttribute="leading" secondItem="mZY-0X-VxY" secondAttribute="leadingMargin" id="EUN-pm-cVY"/>
                             <constraint firstItem="O4p-eK-azP" firstAttribute="top" secondItem="hIS-W7-IeL" secondAttribute="bottom" constant="13" id="GYj-p3-2El"/>
                             <constraint firstItem="uMX-0p-t9W" firstAttribute="top" secondItem="O4p-eK-azP" secondAttribute="bottom" constant="8" symbolic="YES" id="LyC-eu-PQm"/>
-                            <constraint firstItem="uMX-0p-t9W" firstAttribute="leading" secondItem="93O-i9-JXP" secondAttribute="leading" id="Ndz-4b-WgR"/>
-                            <constraint firstItem="uMX-0p-t9W" firstAttribute="trailing" secondItem="93O-i9-JXP" secondAttribute="trailing" id="PiX-WS-2D0"/>
                             <constraint firstItem="uMX-0p-t9W" firstAttribute="bottom" secondItem="93O-i9-JXP" secondAttribute="top" id="TNi-ec-XcQ"/>
-                            <constraint firstItem="O4p-eK-azP" firstAttribute="leading" secondItem="mZY-0X-VxY" secondAttribute="leadingMargin" id="bU1-LN-KFr"/>
-                            <constraint firstItem="uMX-0p-t9W" firstAttribute="centerX" secondItem="O4p-eK-azP" secondAttribute="centerX" id="gxd-it-zRi"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="uMX-0p-t9W" secondAttribute="trailing" constant="-16" id="bHG-fP-jwd"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Block Comment Notifications" id="WZS-LQ-xlC"/>

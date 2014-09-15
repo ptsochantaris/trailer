@@ -77,7 +77,6 @@
 			[app postNotificationOfType:kNewPrAssigned forItem:r];
 			r.isNewAssignment = @NO;
 		}
-		r.postSyncAction = @(kPostSyncDoNothing);
 	}
 
 	NSArray *latestComments = [PRComment newItemsOfType:@"PRComment" inMoc:mainContext];
@@ -111,6 +110,11 @@
 			}
 		}
 		c.postSyncAction = @(kPostSyncDoNothing);
+	}
+
+	for(PullRequest *r in allTouchedPrs)
+	{
+		r.postSyncAction = @(kPostSyncDoNothing);
 	}
 }
 
