@@ -171,6 +171,16 @@ collapseSecondaryViewController:(UIViewController *)secondaryViewController
 	}
 }
 
+- (void)refreshMainList
+{
+	[app.dataManager postProcessAllPrs];
+	
+	UISplitViewController *splitViewController = (UISplitViewController *)self.window.rootViewController;
+	UINavigationController *masterNavigationController = splitViewController.viewControllers[0];
+	MasterViewController *controller = (MasterViewController *)masterNavigationController.viewControllers[0];
+	[controller reloadData];
+}
+
 - (void)application:(UIApplication *)application performFetchWithCompletionHandler:(backgroundFetchCompletionCallback)completionHandler
 {
 	self.backgroundCallback = completionHandler;

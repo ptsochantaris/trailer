@@ -17,8 +17,8 @@
 {
     [super viewDidLoad];
 	settingsChangedTimer = [[HTPopTimer alloc] initWithTimeInterval:1.0
-															 target:app.dataManager
-														   selector:@selector(postProcessAllPrs)];
+															 target:app
+														   selector:@selector(refreshMainList)];
 }
 
 #define REFRESH_SECTION_INDEX 0
@@ -311,31 +311,37 @@
 			case 0:
 			{
 				settings.showCreatedInsteadOfUpdated = !settings.showCreatedInsteadOfUpdated;
+				[settingsChangedTimer push];
 				break;
 			}
 			case 1:
 			{
 				settings.dontReportRefreshFailures = !settings.dontReportRefreshFailures;
+				[settingsChangedTimer push];
 				break;
 			}
 			case 2:
 			{
 				settings.hideAllPrsSection = !settings.hideAllPrsSection;
+				[settingsChangedTimer push];
 				break;
 			}
 			case 3:
 			{
 				settings.moveAssignedPrsToMySection = !settings.moveAssignedPrsToMySection;
+				[settingsChangedTimer push];
 				break;
 			}
 			case 4:
 			{
 				settings.markUnmergeableOnUserSectionsOnly = !settings.markUnmergeableOnUserSectionsOnly;
+				[settingsChangedTimer push];
 				break;
 			}
 			case 5:
 			{
 				settings.showReposInName = !settings.showReposInName;
+				[settingsChangedTimer push];
 				break;
 			}
 			case 6:
@@ -344,7 +350,6 @@
 				break;
 			}
 		}
-		[settingsChangedTimer push];
 	}
 	else if(indexPath.section==COMMENTS_SECTION_INDEX)
 	{
@@ -353,16 +358,19 @@
 			case 0:
 			{
 				settings.showCommentsEverywhere = !settings.showCommentsEverywhere;
+				[settingsChangedTimer push];
 				break;
 			}
 			case 1:
 			{
 				settings.shouldHideUncommentedRequests = !settings.shouldHideUncommentedRequests;
+				[settingsChangedTimer push];
 				break;
 			}
 			case 2:
 			{
 				settings.autoParticipateInMentions = !settings.autoParticipateInMentions;
+				[settingsChangedTimer push];
 				break;
 			}
 			case 3:
@@ -376,7 +384,6 @@
 				return;
 			}
 		}
-		[settingsChangedTimer push];
 	}
 	else if(indexPath.section==REPOS_SECTION_INDEX)
 	{
@@ -388,7 +395,6 @@
 				break;
 			}
 		}
-		[settingsChangedTimer push];
 	}
 	else if(indexPath.section==HISTORY_SECTION_INDEX)
 	{
@@ -415,7 +421,6 @@
 			case 2:
 			{
 				settings.dontKeepPrsMergedByMe = !settings.dontKeepPrsMergedByMe;
-				[settingsChangedTimer push];
 				break;
 			}
 		}
@@ -435,7 +440,6 @@
 				break;
 			}
 		}
-		[settingsChangedTimer push];
 	}
 	else if(indexPath.section==SORT_SECTION_INDEX)
 	{

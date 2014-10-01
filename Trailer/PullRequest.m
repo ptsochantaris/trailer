@@ -36,6 +36,7 @@ static NSDateFormatter *itemDateFormatter;
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
 		itemDateFormatter = [[NSDateFormatter alloc] init];
+		itemDateFormatter.doesRelativeDateFormatting = YES;
 		itemDateFormatter.dateStyle = NSDateFormatterMediumStyle;
 		itemDateFormatter.timeStyle = NSDateFormatterShortStyle;
 	});
@@ -169,6 +170,37 @@ static NSDateFormatter *itemDateFormatter;
 - (NSString *)sectionName
 {
 	return [kPullRequestSectionNames objectAtIndex:self.sectionIndex.integerValue];
+}
+
+- (NSString *)accessibleSubtitle
+{
+	NSMutableArray *components = [NSMutableArray new];
+	
+	if(settings.showReposInName)
+	{
+		[components addObject:[NSString stringWithFormat:@"Repository: %@", self.repoName]];
+	}
+
+	if(self.userLogin.length)
+	{
+		[components addObject:[NSString stringWithFormat:@"Author: %@", self.userLogin]];
+	}
+
+	if(settings.showCreatedInsteadOfUpdated)
+	{
+		[components addObject:[NSString stringWithFormat:@"Created %@",[itemDateFormatter stringFromDate:self.createdAt]]];
+	}
+	else
+	{
+		[components addObject:[NSString stringWithFormat:@"Updated %@",[itemDateFormatter stringFromDate:self.updatedAt]]];
+	}
+
+	if(!self.mergeable.boolValue)
+	{
+		[components addObject:@"Cannot be merged!"];
+	}
+
+	return [components componentsJoinedByString:@","];
 }
 
 - (NSMutableAttributedString *)subtitleWithFont:(FONT_CLASS *)font

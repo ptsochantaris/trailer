@@ -17,6 +17,8 @@ typedef void (^backgroundFetchCompletionCallback)(UIBackgroundFetchResult result
 
 - (void)startRefresh;
 
+- (void)refreshMainList;
+
 - (void)shareFromView:(UIViewController *)view buttonItem:(UIBarButtonItem *)button url:(NSURL *)url;
 
 @end

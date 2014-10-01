@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6245" systemVersion="13E28" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="H1p-Uh-vWS">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6245" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="H1p-Uh-vWS">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
@@ -32,13 +32,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <webView contentMode="scaleToFill" scalesPageToFit="YES" suppressesIncrementalRendering="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5u8-Lo-ZoT">
-                                <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <connections>
-                                    <outlet property="delegate" destination="JEX-9P-axG" id="l2G-VH-hFF"/>
-                                </connections>
-                            </webView>
                             <activityIndicatorView opaque="NO" contentMode="center" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" animating="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="iCz-7v-EPc">
                                 <rect key="frame" x="290" y="290" width="20" height="20"/>
                             </activityIndicatorView>
@@ -68,16 +61,12 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstAttribute="centerX" secondItem="iCz-7v-EPc" secondAttribute="centerX" id="074-iX-yJ0"/>
-                            <constraint firstItem="UUU-nP-EaO" firstAttribute="top" secondItem="5u8-Lo-ZoT" secondAttribute="bottom" id="2pL-uZ-Irz"/>
                             <constraint firstItem="JEI-RV-Ntc" firstAttribute="top" secondItem="4Ib-n3-jTB" secondAttribute="bottom" id="LkT-Hd-pXt"/>
                             <constraint firstAttribute="centerX" secondItem="JEI-RV-Ntc" secondAttribute="centerX" id="UpG-sI-EcZ"/>
                             <constraint firstItem="UUU-nP-EaO" firstAttribute="top" secondItem="Le9-pP-LXq" secondAttribute="bottom" constant="8" symbolic="YES" id="VBq-a9-uSy"/>
                             <constraint firstItem="JEI-RV-Ntc" firstAttribute="bottom" secondItem="UUU-nP-EaO" secondAttribute="top" id="Wh0-Vk-2jy"/>
                             <constraint firstItem="Le9-pP-LXq" firstAttribute="centerX" secondItem="iCz-7v-EPc" secondAttribute="centerX" id="biP-LG-oBo"/>
-                            <constraint firstItem="5u8-Lo-ZoT" firstAttribute="top" secondItem="svH-Pt-448" secondAttribute="topMargin" id="fzS-HA-4of"/>
-                            <constraint firstAttribute="centerX" secondItem="5u8-Lo-ZoT" secondAttribute="centerX" id="nGe-DR-hEN"/>
                             <constraint firstAttribute="centerY" secondItem="iCz-7v-EPc" secondAttribute="centerY" id="oBI-er-j2z"/>
-                            <constraint firstItem="5u8-Lo-ZoT" firstAttribute="width" secondItem="svH-Pt-448" secondAttribute="width" id="zxk-e6-oaS"/>
                         </constraints>
                     </view>
                     <toolbarItems/>
@@ -93,7 +82,6 @@
                         <outlet property="spinner" destination="iCz-7v-EPc" id="mqi-Fb-lib"/>
                         <outlet property="statusLabel" destination="JEI-RV-Ntc" id="FXH-WF-SUZ"/>
                         <outlet property="tryAgainButton" destination="Le9-pP-LXq" id="piA-8Y-9Kc"/>
-                        <outlet property="web" destination="5u8-Lo-ZoT" id="VrS-Xw-ody"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="FJe-Yq-33r" sceneMemberID="firstResponder"/>
@@ -809,25 +797,14 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <webView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nWB-a1-bTA">
-                                <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
-                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                <connections>
-                                    <outlet property="delegate" destination="kWj-6b-yq2" id="rza-tb-NS2"/>
-                                </connections>
-                            </webView>
                             <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="00q-SG-a6I">
                                 <rect key="frame" x="290" y="290" width="20" height="20"/>
                             </activityIndicatorView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="nWB-a1-bTA" firstAttribute="leading" secondItem="UhO-5W-ZzH" secondAttribute="leading" id="16U-Xa-piG"/>
-                            <constraint firstItem="00q-SG-a6I" firstAttribute="centerY" secondItem="nWB-a1-bTA" secondAttribute="centerY" id="Nao-3b-z7I"/>
-                            <constraint firstItem="nWB-a1-bTA" firstAttribute="trailing" secondItem="zic-tr-u8O" secondAttribute="trailing" id="Okq-gy-wdG"/>
-                            <constraint firstItem="nWB-a1-bTA" firstAttribute="top" secondItem="KZ8-wc-h6g" secondAttribute="top" id="XHD-fX-3al"/>
-                            <constraint firstItem="00q-SG-a6I" firstAttribute="centerX" secondItem="nWB-a1-bTA" secondAttribute="centerX" id="hja-oD-APP"/>
-                            <constraint firstItem="nWB-a1-bTA" firstAttribute="bottom" secondItem="UhO-5W-ZzH" secondAttribute="top" id="mcB-Id-pKk"/>
+                            <constraint firstAttribute="centerX" secondItem="00q-SG-a6I" secondAttribute="centerX" id="lB0-If-Mfm"/>
+                            <constraint firstAttribute="centerY" secondItem="00q-SG-a6I" secondAttribute="centerY" id="ncU-h5-TJb"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="GitHub" id="uon-TC-PDK">
@@ -839,7 +816,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
                     </navigationItem>
                     <connections>
                         <outlet property="spinner" destination="00q-SG-a6I" id="fN9-ae-kq1"/>
-                        <outlet property="webView" destination="nWB-a1-bTA" id="4Te-hb-TDh"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="BoF-TD-ccs" userLabel="First Responder" sceneMemberID="firstResponder"/>

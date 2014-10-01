@@ -14,4 +14,6 @@
 
 @property (strong, nonatomic) NSFetchedResultsController *fetchedResultsController;
 
+- (void)reloadData;
+
 @end

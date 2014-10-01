@@ -208,7 +208,7 @@
 	[searchHolder addSubview:searchField];
 	self.tableView.tableHeaderView = searchHolder;
     self.tableView.contentOffset = CGPointMake(0, searchHolder.frame.size.height);
-	self.tableView.estimatedRowHeight = 160;
+	self.tableView.estimatedRowHeight = 125;
 	self.tableView.rowHeight = UITableViewAutomaticDimension;
 
 	self.detailViewController = (DetailViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];

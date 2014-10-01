@@ -80,6 +80,8 @@
 
 - (NSMutableAttributedString *)subtitleWithFont:(FONT_CLASS *)font;
 
+- (NSString *)accessibleSubtitle;
+
 - (NSArray *)displayedStatuses;
 
 - (NSString *)urlForOpening;

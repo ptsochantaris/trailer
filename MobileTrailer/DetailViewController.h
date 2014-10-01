@@ -1,10 +1,9 @@
 
-@interface DetailViewController : UIViewController
-<UISplitViewControllerDelegate, UIWebViewDelegate, NSURLConnectionDataDelegate>
+@interface DetailViewController : UIViewController <WKNavigationDelegate>
 
 @property (strong, nonatomic) NSURL *detailItem;
 
-@property (weak, nonatomic) IBOutlet UIWebView *web;
+@property (nonatomic) WKWebView *webView;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *spinner;
 @property (weak, nonatomic) IBOutlet UILabel *statusLabel;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *shareButton;

@@ -13,7 +13,6 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 @implementation PreferencesViewController
 
 - (IBAction)ipadDone:(UIBarButtonItem *)sender {
-	[app.dataManager postProcessAllPrs];
 	if(app.preferencesDirty) [app startRefresh];
 	[self dismissViewControllerAnimated:YES completion:nil];
 }
@@ -316,11 +315,13 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 	{
 		cell.accessoryView = [self makeX];
 		cell.textLabel.textColor = [UIColor lightGrayColor];
+		cell.accessibilityLabel = [NSString stringWithFormat:@"Hidden: %@", cell.textLabel.text];
 	}
 	else
 	{
 		cell.accessoryView = nil;
 		cell.textLabel.textColor = [UIColor darkTextColor];
+		cell.accessibilityLabel = cell.textLabel.text;
 	}
 }
 

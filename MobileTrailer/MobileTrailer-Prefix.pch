@@ -12,6 +12,7 @@
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
 #import <CommonCrypto/CommonCrypto.h>
+#import <WebKit/WebKit.h>
 
 #import "NSDictionary+NSDictionary_OFK.h"
 #import "UINavigationController+DismissKeyboard.h"

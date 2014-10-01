@@ -89,6 +89,12 @@ static NSNumberFormatter *itemCountFormatter;
     else
         failedToLoadImage = nil;
 
+	self.accessibilityLabel = [NSString stringWithFormat:@"%@, %@ unread comments, %@ total comments, %@",
+							   _title.text,
+							   unreadCount.text,
+							   readCount.text,
+							   [pullRequest accessibleSubtitle]];
+
 	[self setNeedsLayout];
 }
 
