@@ -6,7 +6,6 @@
 @end
 
 static NSDictionary *_titleAttributes, *_statusAttributes;
-static NSDateFormatter *dateFormatter;
 static CGColorRef _highlightColor;
 
 @implementation PRItemView
@@ -17,11 +16,6 @@ static CGColorRef _highlightColor;
 {
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
-
-		dateFormatter = [[NSDateFormatter alloc] init];
-		dateFormatter.dateStyle = NSDateFormatterLongStyle;
-		dateFormatter.timeStyle = NSDateFormatterMediumStyle;
-		dateFormatter.doesRelativeDateFormatting = YES;
 
 		_highlightColor = CGColorCreateCopy(MAKECOLOR(0.95, 0.95, 0.95, 1.0).CGColor);
 
