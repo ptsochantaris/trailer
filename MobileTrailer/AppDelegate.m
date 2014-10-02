@@ -54,7 +54,7 @@ AppDelegate *app;
 	splitViewController.delegate = self;
 
 	MasterViewController *m = (MasterViewController *)[(UINavigationController *)splitViewController.viewControllers[0] topViewController];
-	m.clearsSelectionOnViewWillAppear = (UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPhone && splitViewController.viewControllers.count>1);
+	m.clearsSelectionOnViewWillAppear = NO; // for iPad
 
 	[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(networkStateChanged)
@@ -90,7 +90,7 @@ collapseSecondaryViewController:(UIViewController *)secondaryViewController
 	  ontoPrimaryViewController:(UIViewController *)primaryViewController
 {
 	MasterViewController *m = (MasterViewController *)[(UINavigationController *)primaryViewController viewControllers][0];
-	m.clearsSelectionOnViewWillAppear = (UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPhone);
+	m.clearsSelectionOnViewWillAppear = YES;
 	DetailViewController *d = (DetailViewController *)[(UINavigationController *)secondaryViewController viewControllers][0];
 	return (d.detailItem==nil);
 }

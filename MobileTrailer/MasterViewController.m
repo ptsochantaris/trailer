@@ -11,7 +11,7 @@
 
 - (IBAction)phoneRefreshSelected:(UIBarButtonItem *)sender
 {
-	if (UI_USER_INTERFACE_IDIOM()==UIUserInterfaceIdiomPad && UIInterfaceOrientationIsPortrait([[UIApplication sharedApplication] statusBarOrientation]))
+	if (self.traitCollection.userInterfaceIdiom==UIUserInterfaceIdiomPad && UIInterfaceOrientationIsPortrait([[UIApplication sharedApplication] statusBarOrientation]))
 	{
 		UIAlertController *a = [UIAlertController alertControllerWithTitle:@"Action"
 																	message:nil
@@ -547,8 +547,10 @@
 
 	[UIApplication sharedApplication].applicationIconBadgeNumber = [PullRequest badgeCountInMoc:app.dataManager.managedObjectContext];
 
-	if(self.splitViewController.isCollapsed && self.traitCollection.horizontalSizeClass==UIUserInterfaceSizeClassRegular)
+	if(self.splitViewController.displayMode != UISplitViewControllerDisplayModeAllVisible)
+	{
 		self.detailViewController.navigationItem.leftBarButtonItem.title = self.title;
+	}
 }
 
 ///////////////////////////// filtering
