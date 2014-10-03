@@ -1,0 +1,25 @@
+Privacy Policy
+
+TL;DR All information is kept locally inside your installation
+of Trailer and PocketTrailer, nothing is ever sent or processed
+beyond that.
+
+API Key
+
+Trailer and PocketTrailer need your generated API key in order
+to create API calls to Github and fetch your data, as well as
+optional URLs for using Enterprise Github API servers.  This
+info is stored locally on your device and never sent or
+otherwise processed in any way, beyond being used inside the
+local app to construct the required API calls to Github.
+
+Github Login
+
+PocketTrailer, specifically, displays an inline web-view
+where you can directly browse your PRs inside the app.  In
+order to view your PRs you may need to provide login
+information got Github.  This is done directly inside the
+web-view and PocketTrailer never reads, intercepts, or
+stores any of that information, beyond what may be done at a
+lower level by the system web view control, to which
+PocketTrailer has no access to.
