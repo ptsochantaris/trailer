@@ -1466,7 +1466,7 @@ AppDelegate *app;
 		else
 		{
 			attributes = @{ NSFontAttributeName: [NSFont menuBarFontOfSize:10.0],
-							NSForegroundColorAttributeName: [COLOR_CLASS blackColor] };
+							NSForegroundColorAttributeName: [COLOR_CLASS controlTextColor] };
 		}
 	}
 

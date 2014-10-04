@@ -2,7 +2,6 @@
 @interface StatusItemView ()
 {
 	NSDictionary *_attributes;
-	NSMutableDictionary *_templateAttributes, *_grayAttributes;
 	NSString *_label;
 	__weak id<StatusItemDelegate> _delegate;
 }
@@ -12,17 +11,13 @@
 
 - (id)initWithFrame:(NSRect)frame label:(NSString *)label attributes:(NSDictionary *)attributes delegate:(id<StatusItemDelegate>)delegate
 {
-    self = [super initWithFrame:frame];
-    if (self) {
+	self = [super initWithFrame:frame];
+	if (self) {
 		_label = label;
 		_delegate = delegate;
 		_attributes = attributes;
-		_templateAttributes = [attributes mutableCopy];
-		_templateAttributes[NSForegroundColorAttributeName] = [COLOR_CLASS whiteColor];
-		_grayAttributes = [attributes mutableCopy];
-		_grayAttributes[NSForegroundColorAttributeName] = [COLOR_CLASS lightGrayColor];
-    }
-    return self;
+	}
+	return self;
 }
 
 - (void)setGrayOut:(BOOL)grayOut
@@ -33,34 +28,44 @@
 
 - (void)drawRect:(NSRect)dirtyRect
 {
-	NSImage *oldImage = [NSImage imageNamed:@"menuIcon"];
-
 	NSPoint imagePoint = NSMakePoint(STATUSITEM_PADDING, 1.0);
 	NSRect labelRect = CGRectMake(self.bounds.size.height, -5, self.bounds.size.width, self.bounds.size.height);
+
+	NSMutableDictionary *textAttributes = [_attributes mutableCopy];
+	NSImage *icon;
 
 	if(_highlighted)
 	{
 		CGContextRef context = (CGContextRef) [[NSGraphicsContext currentContext] graphicsPort];
-		[[NSColor blueColor] setFill];
+		[[NSColor selectedMenuItemColor] setFill];
 		CGContextFillRect(context, dirtyRect);
 
-		[oldImage drawAtPoint:imagePoint fromRect:NSZeroRect operation:NSCompositeXOR fraction:1.0];
-
-		[_label drawInRect:labelRect withAttributes:_templateAttributes];
+		icon = [NSImage imageNamed:@"menuIconBright"];
+		textAttributes[NSForegroundColorAttributeName] = [COLOR_CLASS selectedMenuItemTextColor];
 	}
 	else
 	{
-		[oldImage drawAtPoint:imagePoint fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
-
-		if(_grayOut)
+		if(NSAppKitVersionNumber>NSAppKitVersionNumber10_9 && [[NSAppearance currentAppearance].name containsString:NSAppearanceNameVibrantDark])
 		{
-			[_label drawInRect:labelRect withAttributes:_grayAttributes];
+			icon = [NSImage imageNamed:@"menuIconBright"];
+			if([textAttributes[NSForegroundColorAttributeName] isEqual:[COLOR_CLASS controlTextColor]])
+			{
+				textAttributes[NSForegroundColorAttributeName] = [COLOR_CLASS selectedMenuItemTextColor];
+			}
 		}
 		else
 		{
-			[_label drawInRect:labelRect withAttributes:_attributes];
+			icon = [NSImage imageNamed:@"menuIcon"];
 		}
 	}
+
+	if(_grayOut)
+	{
+		textAttributes[NSForegroundColorAttributeName] = [COLOR_CLASS disabledControlTextColor];
+	}
+
+	[icon drawAtPoint:imagePoint fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
+	[_label drawInRect:labelRect withAttributes:textAttributes];
 }
 
 - (void)mouseDown:(NSEvent *)theEvent
