@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5056" systemVersion="13E28" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6249" systemVersion="14A379a" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
-        <deployment defaultVersion="1080" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="5056"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6249"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -11,7 +11,7 @@
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
-        <customObject id="-3" userLabel="Application"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <window title="Trailer Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="371">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" resizable="YES"/>
             <rect key="contentRect" x="335" y="390" width="782" height="433"/>
@@ -64,7 +64,7 @@
                                                         <rect key="frame" x="19" y="14" width="457" height="40"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="ZEE-fM-gtZ">
-                                                            <font key="font" size="12" name="LucidaGrande"/>
+                                                            <font key="font" metaFont="cellTitle"/>
                                                             <string key="placeholderString">Paste your GitHub personal access token in here.  Use the links on the right to view or create one.  Then select "Load Watchlist" from below.</string>
                                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -102,7 +102,7 @@
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <string key="title">API
 Server</string>
-                                                            <font key="font" size="11" name="LucidaGrande"/>
+                                                            <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
                                                         <connections>
                                                             <action selector="apiServerSelected:" target="494" id="e2g-fg-IE4"/>
@@ -143,7 +143,7 @@ Server</string>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" typeSelect="NO" headerView="rNo-pA-RK9" id="eB0-Bq-YR9">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="684" height="152"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="684" height="19"/>
                                                                     <autoresizingMask key="autoresizingMask"/>
                                                                     <size key="intercellSpacing" width="3" height="2"/>
                                                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -186,7 +186,7 @@ Server</string>
                                                             <rect key="frame" x="1" y="153" width="684" height="16"/>
                                                             <autoresizingMask key="autoresizingMask"/>
                                                         </scroller>
-                                                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="ykC-8P-IkG">
+                                                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="ykC-8P-IkG">
                                                             <rect key="frame" x="224" y="17" width="15" height="102"/>
                                                             <autoresizingMask key="autoresizingMask"/>
                                                         </scroller>
@@ -195,11 +195,11 @@ Server</string>
                                                             <autoresizingMask key="autoresizingMask"/>
                                                         </tableHeaderView>
                                                     </scrollView>
-                                                    <searchField verticalHuggingPriority="750" id="pEa-FD-K1R">
+                                                    <searchField wantsLayer="YES" verticalHuggingPriority="750" id="pEa-FD-K1R">
                                                         <rect key="frame" x="196" y="14" width="171" height="22"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                         <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" placeholderString="Filter..." usesSingleLineMode="YES" bezelStyle="round" id="641-Kc-XV1">
-                                                            <font key="font" size="12" name="LucidaGrande"/>
+                                                            <font key="font" metaFont="cellTitle"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </searchFieldCell>
@@ -845,7 +845,7 @@ Available on OS X Mavericks onwards</string>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="gFU-aR-877">
                                                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                                        <font key="font" size="13" name="LucidaGrande"/>
+                                                                        <font key="font" metaFont="system"/>
                                                                         <menu key="menu" title="Keys" id="v4c-JW-qPh"/>
                                                                     </popUpButtonCell>
                                                                     <connections>
@@ -1063,9 +1063,9 @@ Enter to select and ⌘, for preferences.
         <window title="Trailer Menu" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="none" id="b2W-dJ-ldg" customClass="MenuWindow">
             <windowCollectionBehavior key="collectionBehavior" transient="YES" ignoresCycle="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="196" y="213" width="376" height="710"/>
+            <rect key="contentRect" x="0.0" y="0.0" width="376" height="710"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1080"/>
-            <view key="contentView" appearanceType="lightContent" id="pz7-Cu-3Sm">
+            <view key="contentView" appearanceType="aqua" id="pz7-Cu-3Sm">
                 <rect key="frame" x="0.0" y="0.0" width="376" height="710"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
@@ -1092,7 +1092,7 @@ Enter to select and ⌘, for preferences.
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
-                    <box autoresizesSubviews="NO" appearanceType="lightContent" title="Header" boxType="custom" borderType="none" titlePosition="noTitle" id="uIa-cA-gk9">
+                    <box autoresizesSubviews="NO" appearanceType="aqua" title="Header" boxType="custom" borderType="none" titlePosition="noTitle" id="uIa-cA-gk9">
                         <rect key="frame" x="0.0" y="678" width="376" height="32"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <view key="contentView">
@@ -1102,7 +1102,7 @@ Enter to select and ⌘, for preferences.
                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                         <color key="fillColor" name="controlLightHighlightColor" catalog="System" colorSpace="catalog"/>
                     </box>
-                    <searchField focusRingType="none" verticalHuggingPriority="750" id="gaD-Aj-14T">
+                    <searchField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" id="gaD-Aj-14T">
                         <rect key="frame" x="41" y="683" width="327" height="22"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" focusRingType="none" placeholderString="Filter..." usesSingleLineMode="YES" bezelStyle="round" id="vvd-HC-Usx">
@@ -1114,7 +1114,7 @@ Enter to select and ⌘, for preferences.
                             <outlet property="delegate" destination="494" id="KUX-SR-9nr"/>
                         </connections>
                     </searchField>
-                    <popUpButton appearanceType="lightContent" horizontalHuggingPriority="750" verticalHuggingPriority="750" id="pTb-UR-Euf">
+                    <popUpButton horizontalHuggingPriority="750" verticalHuggingPriority="750" id="pTb-UR-Euf">
                         <rect key="frame" x="11" y="681" width="22" height="26"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <popUpButtonCell key="cell" type="disclosure" title=" Mark All As Read" bezelStyle="roundedDisclosure" imagePosition="only" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="HVf-zs-7iK" id="j86-0c-T7i">
@@ -1188,7 +1188,7 @@ Enter to select and ⌘, for preferences.
                                     <rect key="frame" x="208" y="279" width="394" height="31"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="Trailer" id="eX7-r0-5Jg">
-                                        <font key="font" size="26" name="LucidaGrande-Bold"/>
+                                        <font key="font" metaFont="systemBold" size="26"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
@@ -1206,7 +1206,7 @@ Enter to select and ⌘, for preferences.
                                     <rect key="frame" x="208" y="15" width="394" height="231"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" id="QyU-WN-WeW">
-                                        <font key="font" size="9" name="LucidaGrande"/>
+                                        <font key="font" metaFont="miniSystem"/>
                                         <string key="title">Copyright (c) 2013-2014 HouseTrip Ltd.
 
 Released under the terms of the MIT licence:
@@ -1241,7 +1241,7 @@ THE SOFTWARE.</string>
                                     <rect key="frame" x="14" y="255" width="86" height="17"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Team Octopus" id="7Mc-yk-hkr">
-                                        <font key="font" size="9" name="LucidaGrande-Bold"/>
+                                        <font key="font" metaFont="miniSystemBold"/>
                                         <color key="textColor" name="controlShadowColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
@@ -1345,7 +1345,7 @@ THE SOFTWARE.</string>
                         <rect key="frame" x="18" y="171" width="435" height="13"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="This is an expert feature, don't modify unless you know what you are doing" id="ZJX-qd-OCH">
-                            <font key="font" size="10" name="LucidaGrande"/>
+                            <font key="font" metaFont="system" size="10"/>
                             <color key="textColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>

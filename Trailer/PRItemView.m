@@ -1,5 +1,5 @@
 
-@interface PRItemView ()
+@interface PRItemView () <NSPasteboardItemDataProvider, NSDraggingSource>
 {
 	NSTrackingArea *trackingArea;
 }
@@ -231,7 +231,18 @@ static CGColorRef _highlightColor;
 
 - (void)copyThisPr
 {
-	[self copyPrToClipboard:[NSPasteboard generalPasteboard]];
+	NSPasteboard *p = [NSPasteboard generalPasteboard];
+	[p clearContents];
+	[p declareTypes:@[NSStringPboardType] owner:self];
+	[p setString:[self stringForCopy] forType:NSStringPboardType];
+}
+
+- (NSString *)stringForCopy
+{
+	PullRequest *r = [PullRequest itemOfType:@"PullRequest"
+									serverId:self.userInfo
+										 moc:app.dataManager.managedObjectContext];
+	return r.webUrl;
 }
 
 - (void)updateTrackingAreas
@@ -254,41 +265,39 @@ static CGColorRef _highlightColor;
 
 /////////////// dragging url off this item
 
-- (NSDragOperation)draggingSourceOperationMaskForLocal:(BOOL)flag
-{
-	return NSDragOperationCopy;
-}
-
 - (BOOL)ignoreModifierKeysWhileDragging { return YES; }
 
 - (void)mouseDragged:(NSEvent *)theEvent
 {
-	NSPasteboard *pboard = [NSPasteboard pasteboardWithName:NSDragPboard];
-	[self copyPrToClipboard:pboard];
-
-	NSPoint globalLocation = [ NSEvent mouseLocation ];
-	NSPoint windowLocation = [ [ self window ] convertScreenToBase: globalLocation ];
-	NSPoint viewLocation = [ self convertPoint: windowLocation fromView: nil ];
-	viewLocation = NSMakePoint(viewLocation.x-28, viewLocation.y-4);
-
 	NSImage *dragIcon = [self scaleImage:[NSApp applicationIconImage]
 							  toFillSize:CGSizeMake(32, 32)];
 
-    [self dragImage:dragIcon
-				 at:viewLocation
-			 offset:CGSizeZero
-			  event:theEvent
-		 pasteboard:pboard
-			 source:self
-		  slideBack:YES];
+	NSPasteboardItem *pbItem = [NSPasteboardItem new];
+	[pbItem setDataProvider:self forTypes:@[NSPasteboardTypeString]];
+
+	NSDraggingItem *dragItem = [[NSDraggingItem alloc] initWithPasteboardWriter:pbItem];
+	NSPoint dragPosition = [self convertPoint:[theEvent locationInWindow] fromView:nil];
+	dragPosition.x -= 24;
+	[dragItem setDraggingFrame:NSMakeRect(dragPosition.x, dragPosition.y, dragIcon.size.width, dragIcon.size.height)
+					  contents:dragIcon];
+
+	NSDraggingSession *draggingSession = [self beginDraggingSessionWithItems:@[dragItem]
+																	   event:theEvent
+																	  source:self];
+	draggingSession.animatesToStartingPositionsOnCancelOrFail = YES;
 }
 
-- (void)copyPrToClipboard:(NSPasteboard *)pboard
+- (NSDragOperation)draggingSession:(NSDraggingSession *)session sourceOperationMaskForDraggingContext:(NSDraggingContext)context
 {
-	[pboard clearContents];
-    [pboard declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:self];
-	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:self.userInfo moc:app.dataManager.managedObjectContext];
-    [pboard setString:r.webUrl forType:NSStringPboardType];
+	return (context == NSDraggingContextOutsideApplication) ?  NSDragOperationCopy : NSDragOperationNone;
+}
+
+- (void)pasteboard:(NSPasteboard *)sender item:(NSPasteboardItem *)item provideDataForType:(NSString *)type
+{
+	if([type compare: NSPasteboardTypeString]==NSOrderedSame)
+	{
+		[sender setData:[[self stringForCopy] dataUsingEncoding:NSUTF8StringEncoding] forType:NSPasteboardTypeString];
+	}
 }
 
 - (NSImage *)scaleImage:(NSImage *)image toFillSize:(CGSize)toSize
