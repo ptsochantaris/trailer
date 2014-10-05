@@ -7,6 +7,7 @@
 @dynamic hidden;
 @dynamic dirty;
 @dynamic lastDirtied;
+@dynamic inaccessible;
 
 + (Repo*)repoWithInfo:(NSDictionary*)info moc:(NSManagedObjectContext*)moc
 {
@@ -44,6 +45,14 @@
     }
 }
 
++ (NSArray *)inaccessibleReposInMoc:(NSManagedObjectContext *)moc
+{
+	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"Repo"];
+	f.returnsObjectsAsFaults = NO;
+	f.predicate = [NSPredicate predicateWithFormat:@"inaccessible = YES"];
+	return [moc executeFetchRequest:f error:nil];
+}
+
 + (NSArray *)visibleReposInMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"Repo"];
@@ -52,19 +61,19 @@
 	return [moc executeFetchRequest:f error:nil];
 }
 
-+ (NSArray *)hiddenReposInMoc:(NSManagedObjectContext *)moc
++ (NSArray *)unsyncableReposInMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"Repo"];
 	f.returnsObjectsAsFaults = NO;
-	f.predicate = [NSPredicate predicateWithFormat:@"hidden = YES"];
+	f.predicate = [NSPredicate predicateWithFormat:@"hidden = YES or inaccessible = YES"];
 	return [moc executeFetchRequest:f error:nil];
 }
 
-+ (NSArray *)dirtyReposInMoc:(NSManagedObjectContext *)moc
++ (NSArray *)syncableReposInMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"Repo"];
 	f.returnsObjectsAsFaults = NO;
-	f.predicate = [NSPredicate predicateWithFormat:@"dirty = YES and hidden = NO"];
+	f.predicate = [NSPredicate predicateWithFormat:@"dirty = YES and hidden = NO and inaccessible != YES"];
 	return [moc executeFetchRequest:f error:nil];
 }
 

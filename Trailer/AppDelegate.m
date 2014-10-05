@@ -1130,7 +1130,7 @@ AppDelegate *app;
 		else
 		{
 			Repo *r = [self repoForRow:row];
-			cell.title = r.fullName;
+			cell.title = r.inaccessible.boolValue ? [r.fullName stringByAppendingString:@" (inaccessible)"] : r.fullName;
 			[cell setEnabled:YES];
 		}
 	}

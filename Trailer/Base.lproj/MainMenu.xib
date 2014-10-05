@@ -845,7 +845,7 @@ Available on OS X Mavericks onwards</string>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="gFU-aR-877">
                                                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                                        <font key="font" metaFont="system"/>
+                                                                        <font key="font" metaFont="menu"/>
                                                                         <menu key="menu" title="Keys" id="v4c-JW-qPh"/>
                                                                     </popUpButtonCell>
                                                                     <connections>
@@ -1015,7 +1015,6 @@ Enter to select and ⌘, for preferences.
                 <outlet property="logActivityToConsole" destination="bpi-er-6rE" id="akm-SR-jfL"/>
                 <outlet property="mainMenu" destination="b2W-dJ-ldg" id="8t8-8X-oYH"/>
                 <outlet property="mainMenuFilter" destination="gaD-Aj-14T" id="1vn-8Q-OCo"/>
-                <outlet property="mainMenuHeader" destination="uIa-cA-gk9" id="JDR-T5-fDT"/>
                 <outlet property="makeStatusItemsSelectable" destination="yD7-Y4-ZaZ" id="rgg-se-o4u"/>
                 <outlet property="markUnmergeableOnUserSectionsOnly" destination="SoW-AJ-5kD" id="UTu-Bf-nOY"/>
                 <outlet property="moveAssignedPrsToMySection" destination="ZD1-Lw-zpW" id="btl-cm-k5r"/>
@@ -1041,7 +1040,6 @@ Enter to select and ⌘, for preferences.
                 <outlet property="statusItemsRefreshNote" destination="Ud3-8I-IKZ" id="7qy-EF-8Cd"/>
                 <outlet property="statusTermMenu" destination="Bx7-99-sDc" id="pBm-jb-bo6"/>
                 <outlet property="statusTermsField" destination="JNC-T1-vCD" id="Gab-bS-wOF"/>
-                <outlet property="tokenHolder" destination="89t-uF-tda" id="FrU-nv-0AM"/>
                 <outlet property="versionNumber" destination="SrS-Tc-X7C" id="RSu-YF-jmY"/>
             </connections>
         </customObject>

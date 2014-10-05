@@ -310,7 +310,7 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath
 {
     Repo *repo = [self.fetchedResultsController objectAtIndexPath:indexPath];
-    cell.textLabel.text = repo.fullName;
+	cell.textLabel.text = repo.inaccessible.boolValue ? [repo.fullName stringByAppendingString:@" (inaccessible)"] : repo.fullName;
 	if(repo.hidden.boolValue)
 	{
 		cell.accessoryView = [self makeX];

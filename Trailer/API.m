@@ -623,9 +623,9 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 				  andCallback:^(BOOL success) {
 					  if(success)
 					  {
-						  NSArray *hiddenRepos = [Repo hiddenReposInMoc:moc];
+						  NSArray *hiddenRepos = [Repo unsyncableReposInMoc:moc];
 						  for(Repo *r in hiddenRepos) [r removeAllRelatedPullRequests];
-						  [self fetchPullRequestsForRepos:[Repo dirtyReposInMoc:moc]
+						  [self fetchPullRequestsForRepos:[Repo syncableReposInMoc:moc]
 													toMoc:moc
 											  andCallback:^(BOOL success) {
 												  if(success)
@@ -775,7 +775,14 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 					 }
 					 else
 					 {
-						 if(resultCode == 404 || resultCode == 410) // 404/410 is an acceptable answer, it means the repo is gone
+						 if(resultCode == 404) // repo disabled
+						 {
+							 succeeded++;
+							 r.inaccessible = @YES;
+							 r.postSyncAction = @(kPostSyncDoNothing);
+							 [r removeAllRelatedPullRequests];
+						 }
+						 else if(resultCode==410) // repo gone for good
 						 {
 							 succeeded++;
 							 r.postSyncAction = @(kPostSyncDelete);
@@ -795,6 +802,9 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 
 - (void)syncWatchedReposForUserToMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
 {
+	NSArray *inaccessibleRepos = [Repo inaccessibleReposInMoc:moc];
+	for(Repo *r in inaccessibleRepos) r.inaccessible = @NO;
+
 	[self getPagedDataInPath:@"/user/subscriptions"
 			startingFromPage:1
 					  params:nil

@@ -7,6 +7,7 @@
 @property (nonatomic, retain) NSNumber * hidden;
 @property (nonatomic, retain) NSNumber * dirty;
 @property (nonatomic, retain) NSDate * lastDirtied;
+@property (nonatomic, retain) NSNumber * inaccessible;
 
 + (Repo*)repoWithInfo:(NSDictionary*)info moc:(NSManagedObjectContext *)moc;
 
@@ -14,9 +15,11 @@
 
 + (NSUInteger)countVisibleReposInMoc:(NSManagedObjectContext *)moc;
 
-+ (NSArray *)dirtyReposInMoc:(NSManagedObjectContext *)moc;
++ (NSArray *)syncableReposInMoc:(NSManagedObjectContext *)moc;
 
-+ (NSArray *)hiddenReposInMoc:(NSManagedObjectContext *)moc;
++ (NSArray *)unsyncableReposInMoc:(NSManagedObjectContext *)moc;
+
++ (NSArray *)inaccessibleReposInMoc:(NSManagedObjectContext *)moc;
 
 + (void)markDirtyReposWithIds:(NSSet *)ids inMoc:(NSManagedObjectContext *)moc;
 
