@@ -1485,6 +1485,7 @@ AppDelegate *app;
 													   delegate:self];
 	self.statusItemView.highlighted = [self.mainMenu isVisible];
 	self.statusItemView.grayOut = self.isRefreshing;
+	self.statusItemView.hostItem = self.statusItem;
 	self.statusItem.view = self.statusItemView;
 
 	[self sizeMenuAndShow:NO];

@@ -14,8 +14,12 @@
 
 @interface StatusItemView : NSView
 
-- (id)initWithFrame:(NSRect)frame label:(NSString *)label attributes:(NSDictionary *)attributes delegate:(id<StatusItemDelegate>)delegate;
+- (id)initWithFrame:(NSRect)frame
+			  label:(NSString *)label
+		 attributes:(NSDictionary *)attributes
+		   delegate:(id<StatusItemDelegate>)delegate;
 
 @property (nonatomic) BOOL highlighted, grayOut;
+@property (nonatomic,weak) NSStatusItem *hostItem;
 
 @end

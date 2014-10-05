@@ -26,8 +26,17 @@
 	[self setNeedsDisplay:YES];
 }
 
+- (BOOL)darkMode
+{
+	return (NSAppKitVersionNumber>NSAppKitVersionNumber10_9 &&
+			[[NSAppearance currentAppearance].name containsString:NSAppearanceNameVibrantDark]);
+}
+
 - (void)drawRect:(NSRect)dirtyRect
 {
+	[_hostItem drawStatusBarBackgroundInRect:dirtyRect
+							   withHighlight:_highlighted];
+
 	NSPoint imagePoint = NSMakePoint(STATUSITEM_PADDING, 1.0);
 	NSRect labelRect = CGRectMake(self.bounds.size.height, -5, self.bounds.size.width, self.bounds.size.height);
 
@@ -36,16 +45,12 @@
 
 	if(_highlighted)
 	{
-		CGContextRef context = (CGContextRef) [[NSGraphicsContext currentContext] graphicsPort];
-		[[NSColor selectedMenuItemColor] setFill];
-		CGContextFillRect(context, dirtyRect);
-
 		icon = [NSImage imageNamed:@"menuIconBright"];
 		textAttributes[NSForegroundColorAttributeName] = [COLOR_CLASS selectedMenuItemTextColor];
 	}
 	else
 	{
-		if(NSAppKitVersionNumber>NSAppKitVersionNumber10_9 && [[NSAppearance currentAppearance].name containsString:NSAppearanceNameVibrantDark])
+		if([self darkMode])
 		{
 			icon = [NSImage imageNamed:@"menuIconBright"];
 			if([textAttributes[NSForegroundColorAttributeName] isEqual:[COLOR_CLASS controlTextColor]])
