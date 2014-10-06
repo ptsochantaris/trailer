@@ -6,7 +6,23 @@
 		<description>Most recent changes with links to updates.</description>
 		<language>en</language>
 
-		
+		<item>
+			<title>Version 1.0.40</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Correct status item appearance in all themes & display modes (including dark mode in Yosemite)</li>
+				<li>Inaccessible repositories will no longer be repeatedly reported every time watchlists are refreshed</li>
+				<li>PR dragging improvements</li>
+				<li>Sparkle auto-updater bumped up to v1.8</li>
+				</ul></font>]]></description>
+			<pubDate>Mon, 06 Oct 2014 09:00:00 +0000</pubDate>
+			<enclosure
+			url="http://dev.housetrip.com/trailer/trailer1040.zip"
+			sparkle:version="1147"
+			sparkle:shortVersionString="1.0.40"
+			sparkle:dsaSignature="MC4CFQCOX4/NAUMp+1HUQHkV5n2Fpyl/GQIVAMK/ZtSApXj+r/oxw6qWlX50FIp2"
+			type="application/octet-stream"/>
+		</item>
+
 		<item>
 			<title>Version 1.0.38</title>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
