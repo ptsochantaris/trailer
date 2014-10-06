@@ -28,8 +28,15 @@
 
 - (BOOL)darkMode
 {
-	return (NSAppKitVersionNumber>NSAppKitVersionNumber10_9 &&
-			[[NSAppearance currentAppearance].name containsString:NSAppearanceNameVibrantDark]);
+	if(NSAppKitVersionNumber>NSAppKitVersionNumber10_9)
+	{
+		NSAppearance *c = [NSAppearance currentAppearance];
+		if([c respondsToSelector:@selector(allowsVibrancy)])
+		{
+			return ([c.name containsString:NSAppearanceNameVibrantDark]);
+		}
+	}
+	return NO;
 }
 
 - (void)drawRect:(NSRect)dirtyRect
