@@ -119,10 +119,8 @@ typedef void (^completionBlockType)(BOOL);
 	}
 
 	for(PullRequest *r in prs)
-	{
-		NSArray *statuses = [PRStatus statusesForPullRequestId:r.serverId inMoc:moc];
-		for(PRStatus *s in statuses) s.postSyncAction = @(kPostSyncDelete);
-	}
+		for(PRStatus *s in r.statuses)
+			s.postSyncAction = @(kPostSyncDelete);
 
 	NSInteger total = prs.count;
 	__block NSInteger succeeded = 0;
@@ -138,7 +136,7 @@ typedef void (^completionBlockType)(BOOL);
 					 for(NSDictionary *info in data)
 					 {
 						 PRStatus *s = [PRStatus statusWithInfo:info moc:moc];
-						 if(!s.pullRequestId) s.pullRequestId = p.serverId;
+						 s.pullRequest = p;
 					 }
 					 return NO;
 				 } finalCallback:^(BOOL success, NSInteger resultCode, NSString *etag) {
@@ -163,10 +161,8 @@ typedef void (^completionBlockType)(BOOL);
 {
 	NSArray *prs = [DataItem newOrUpdatedItemsOfType:@"PullRequest" inMoc:moc];
 	for(PullRequest *r in prs)
-	{
-		NSArray *comments = [PRComment commentsForPullRequestUrl:r.url inMoc:moc];
-		for(PRComment *c in comments) c.postSyncAction = @(kPostSyncDelete);
-	}
+		for(PRComment *c in r.comments)
+			c.postSyncAction = @(kPostSyncDelete);
 
 	NSInteger totalOperations = 2;
 	__block NSInteger succeded = 0;
@@ -217,7 +213,7 @@ typedef void (^completionBlockType)(BOOL);
 					 for(NSDictionary *info in data)
 					 {
 						 PRComment *c = [PRComment commentWithInfo:info moc:moc];
-						 if(!c.pullRequestUrl) c.pullRequestUrl = p.url;
+						 c.pullRequest = p;
 
 						 // check if we're assigned to a just created pull request, in which case we want to "fast forward" its latest comment dates to our own if we're newer
 						 if(p.postSyncAction.integerValue == kPostSyncNoteNew)
@@ -292,10 +288,8 @@ typedef void (^completionBlockType)(BOOL);
 	}
 
 	for(PullRequest *r in prs)
-	{
-		NSArray *statuses = [PRStatus statusesForPullRequestId:r.serverId inMoc:moc];
-		for(PRStatus *s in statuses) s.postSyncAction = @(kPostSyncDelete);
-	}
+		for(PRStatus *s in r.statuses)
+			s.postSyncAction = @(kPostSyncDelete);
 
 	NSInteger totalOperations = prs.count;
 	__block NSInteger succeeded = 0;
@@ -356,7 +350,7 @@ typedef void (^completionBlockType)(BOOL);
 	NSArray *pullRequests = [moc executeFetchRequest:f error:nil];
 
 	NSArray *prsToCheck = [pullRequests filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(PullRequest *r, NSDictionary *bindings) {
-		Repo *parent = [Repo itemOfType:@"Repo" serverId:r.repoId moc:moc];
+		Repo *parent = r.repo;
 		return (!parent.hidden.boolValue) && (parent.postSyncAction.integerValue!=kPostSyncDelete);
 	}]];
 
@@ -386,9 +380,7 @@ typedef void (^completionBlockType)(BOOL);
 {
 	DLog(@"Checking closed PR to see if it was merged: %@",r.title);
 
-	Repo *parent = [Repo itemOfType:@"Repo" serverId:r.repoId moc:r.managedObjectContext];
-
-	[self get:[NSString stringWithFormat:@"/repos/%@/pulls/%@",parent.fullName,r.number]
+	[self get:[NSString stringWithFormat:@"/repos/%@/pulls/%@", r.repo.fullName, r.number]
    parameters:nil
  extraHeaders:nil
 	  success:^(NSHTTPURLResponse *response, id data) {
@@ -623,8 +615,10 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 				  andCallback:^(BOOL success) {
 					  if(success)
 					  {
-						  NSArray *hiddenRepos = [Repo unsyncableReposInMoc:moc];
-						  for(Repo *r in hiddenRepos) [r removeAllRelatedPullRequests];
+						  for(Repo *r in [Repo unsyncableReposInMoc:moc])
+							  for(PullRequest *p in r.pullRequests)
+								  [moc deleteObject:p];
+
 						  [self fetchPullRequestsForRepos:[Repo syncableReposInMoc:moc]
 													toMoc:moc
 											  andCallback:^(BOOL success) {
@@ -728,17 +722,11 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 			self.successfulRefreshesSinceLastStatusCheck = 0;
 			return YES;
 		}
-		[self clearAllStatusObjectsInMoc:moc];
+
+		for(PRStatus *s in [DataItem allItemsOfType:@"PRStatus" inMoc:moc])
+			[moc deleteObject:s];
 	}
 	return NO;
-}
-
-- (void)clearAllStatusObjectsInMoc:(NSManagedObjectContext *)moc
-{
-	for(PRStatus *s in [DataItem allItemsOfType:@"PRStatus" inMoc:moc])
-	{
-		[moc deleteObject:s];
-	}
 }
 
 - (void)fetchPullRequestsForRepos:(NSArray *)repos toMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
@@ -753,7 +741,7 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 	__block NSInteger failed = 0;
 	for(Repo *r in repos)
 	{
-		for(PullRequest *pr in [PullRequest pullRequestsForRepoId:r.serverId inMoc:moc])
+		for(PullRequest *pr in r.pullRequests)
 			if(pr.condition.integerValue == kPullRequestConditionOpen)
 				pr.postSyncAction = @(kPostSyncDelete);
 
@@ -764,7 +752,8 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 				 perPageCallback:^BOOL(id data, BOOL lastPage) {
 					 for(NSDictionary *info in data)
 					 {
-						 [PullRequest pullRequestWithInfo:info moc:moc];
+						 PullRequest *p = [PullRequest pullRequestWithInfo:info moc:moc];
+						 p.repo = r;
 					 }
 					 return NO;
 				 } finalCallback:^(BOOL success, NSInteger resultCode, NSString *etag) {
@@ -780,7 +769,8 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 							 succeeded++;
 							 r.inaccessible = @YES;
 							 r.postSyncAction = @(kPostSyncDoNothing);
-							 [r removeAllRelatedPullRequests];
+							 for(PullRequest *p in r.pullRequests)
+								 [moc deleteObject:p];
 						 }
 						 else if(resultCode==410) // repo gone for good
 						 {

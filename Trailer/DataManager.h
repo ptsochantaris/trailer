@@ -21,4 +21,6 @@
 
 - (NSAttributedString *)reasonForEmptyWithFilter:(NSString *)filterValueOrNil;
 
+- (NSManagedObjectID *)idForUriPath:(NSString *)uriPath;
+
 @end

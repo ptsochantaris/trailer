@@ -12,8 +12,6 @@ enum PostSyncAction {
 @property (nonatomic, retain) NSNumber * postSyncAction;
 @property (nonatomic, retain) NSDate * updatedAt, * createdAt;
 
-+ (id)itemOfType:(NSString*)type serverId:(NSNumber*)serverId moc:(NSManagedObjectContext*)moc;
-
 + (NSArray *)allItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc;
 
 + (id)itemWithInfo:(NSDictionary*)info type:(NSString*)type moc:(NSManagedObjectContext*)moc;

@@ -396,19 +396,22 @@ AppDelegate *app;
 			NSString *urlToOpen = notification.userInfo[NOTIFICATION_URL_KEY];
 			if(!urlToOpen)
 			{
-				NSNumber *itemId = notification.userInfo[PULL_REQUEST_ID_KEY];
+				NSManagedObjectContext *moc = app.dataManager.managedObjectContext;
+
+				NSManagedObjectID *itemId = [app.dataManager idForUriPath:notification.userInfo[PULL_REQUEST_ID_KEY]];
+
 				PullRequest *pullRequest = nil;
 				if(itemId) // it's a pull request
 				{
-					pullRequest = [PullRequest itemOfType:@"PullRequest" serverId:itemId moc:self.dataManager.managedObjectContext];
+					pullRequest = (PullRequest *)[moc existingObjectWithID:itemId error:nil];
 					urlToOpen = pullRequest.webUrl;
 				}
 				else // it's a comment
 				{
-					itemId = notification.userInfo[COMMENT_ID_KEY];
-					PRComment *c = [PRComment itemOfType:@"PRComment" serverId:itemId moc:self.dataManager.managedObjectContext];
+					itemId = [app.dataManager idForUriPath:notification.userInfo[COMMENT_ID_KEY]];
+					PRComment *c = (PRComment *)[moc existingObjectWithID:itemId error:nil];
 					urlToOpen = c.webUrl;
-					pullRequest = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:self.dataManager.managedObjectContext];
+					pullRequest = c.pullRequest;
 				}
 				[pullRequest catchUpWithComments];
 			}
@@ -437,8 +440,7 @@ AppDelegate *app;
 			PRComment *c = item;
 			notification.title = [NSString stringWithFormat:@"@%@ mentioned you:",c.userName];
 			notification.informativeText = c.body;
-			PullRequest *associatedRequest = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:c.managedObjectContext];
-			notification.subtitle = associatedRequest.title;
+			notification.subtitle = c.pullRequest.title;
 			break;
 		}
 		case kNewComment:
@@ -446,8 +448,7 @@ AppDelegate *app;
 			PRComment *c = item;
 			notification.title = [NSString stringWithFormat:@"@%@ commented:", c.userName];
 			notification.informativeText = c.body;
-			PullRequest *associatedRequest = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:c.managedObjectContext];
-			notification.subtitle = associatedRequest.title;
+			notification.subtitle = c.pullRequest.title;
 			break;
 		}
 		case kNewPr:
@@ -515,7 +516,7 @@ AppDelegate *app;
 {
 	self.ignoreNextFocusLoss = isAlternative;
 
-	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:item.userInfo moc:self.dataManager.managedObjectContext];
+	PullRequest *r = item.associatedPullRequest;
 	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:r.urlForOpening]];
 	[r catchUpWithComments];
 
@@ -694,7 +695,7 @@ AppDelegate *app;
 - (void)unPinSelectedFrom:(PRItemView *)item
 {
 	DataManager *dataManager = self.dataManager;
-	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:item.userInfo moc:dataManager.managedObjectContext];
+	PullRequest *r = item.associatedPullRequest;
 	[dataManager.managedObjectContext deleteObject:r];
 	[dataManager saveDB];
 	[self updateMenu];
@@ -720,7 +721,7 @@ AppDelegate *app;
 
 	for(PullRequest *r in pullRequests)
 	{
-		PRItemView *view = [[PRItemView alloc] initWithPullRequest:r userInfo:r.serverId delegate:self];
+		PRItemView *view = [[PRItemView alloc] initWithPullRequest:r delegate:self];
 		[sections[r.sectionIndex] addObject:view];
 	}
 
@@ -1373,8 +1374,8 @@ AppDelegate *app;
 	[self.projectsTable reloadData];
 	[self updateMenu];
 	[self checkApiUsage];
-	[self.dataManager sendNotifications];
 	[self.dataManager saveDB];
+	[self.dataManager sendNotifications];
 
 	DLog(@"Refresh done");
 }
@@ -1723,8 +1724,7 @@ AppDelegate *app;
 	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
 		v.focused = YES;
 	});
-	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:v.userInfo moc:self.dataManager.managedObjectContext];
-	return r.webUrl;
+	return v.associatedPullRequest.webUrl;
 }
 
 - (void)prItemFocused:(NSNotification *)focusedNotification

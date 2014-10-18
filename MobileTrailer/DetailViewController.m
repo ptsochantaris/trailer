@@ -84,6 +84,7 @@ static DetailViewController *_detail_shared_ref;
 	self.webView.hidden = YES;
 	self.tryAgainButton.hidden = YES;
 	self.title = @"Loading...";
+	self.navigationItem.rightBarButtonItem = nil;
 }
 
 - (void)webView:(WKWebView *)webView decidePolicyForNavigationResponse:(WKNavigationResponse *)navigationResponse decisionHandler:(void (^)(WKNavigationResponsePolicy))decisionHandler
@@ -108,6 +109,9 @@ static DetailViewController *_detail_shared_ref;
 	self.tryAgainButton.hidden = YES;
 	self.navigationItem.rightBarButtonItem.enabled = YES;
 	self.title = self.webView.title;
+	self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction
+																						   target:self
+																						   action:@selector(shareSelected:)];
 }
 
 - (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error
@@ -129,14 +133,17 @@ static DetailViewController *_detail_shared_ref;
 	self.webView.hidden = YES;
 	self.tryAgainButton.hidden = NO;
 	self.title = @"Error";
+	self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
+																						   target:self
+																						   action:@selector(tryAgainSelected:)];
 }
 
-- (IBAction)ipadShareButtonSelected:(UIBarButtonItem *)sender
+- (void)shareSelected:(UIBarButtonItem *)sender
 {
 	[app shareFromView:self buttonItem:sender url:self.webView.URL];
 }
 
-- (IBAction)iPadTryAgain:(UIButton *)sender
+- (void)tryAgainSelected:(UIBarButtonItem *)sender
 {
     self.detailItem = self.detailItem;
 }

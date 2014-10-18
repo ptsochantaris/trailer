@@ -196,7 +196,7 @@
 	searchField.translatesAutoresizingMaskIntoConstraints = YES;
 	searchField.placeholder = @"Filter...";
 	searchField.returnKeyType = UIReturnKeySearch;
-	searchField.font = [UIFont systemFontOfSize:18.0];
+	searchField.font = [UIFont systemFontOfSize:17.0];
 	searchField.borderStyle = UITextBorderStyleRoundedRect;
 	searchField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
 	searchField.clearButtonMode = UITextFieldViewModeAlways;
@@ -278,26 +278,23 @@
 - (void)localNotification:(NSNotification *)notification
 {
 	//DLog(@"local notification: %@",notification.userInfo);
-
 	NSString *urlToOpen = notification.userInfo[NOTIFICATION_URL_KEY];
+    NSManagedObjectID *pullRequestId = [app.dataManager idForUriPath:notification.userInfo[PULL_REQUEST_ID_KEY]];
+    NSManagedObjectID *commentId = [app.dataManager idForUriPath:notification.userInfo[COMMENT_ID_KEY]];
 
-    NSNumber *pullRequestId = notification.userInfo[PULL_REQUEST_ID_KEY];
-
-    NSNumber *commentId = notification.userInfo[COMMENT_ID_KEY];
-
-    PullRequest *pullRequest = nil;
+	PullRequest *pullRequest = nil;
 
 	NSManagedObjectContext *moc = app.dataManager.managedObjectContext;
 
     if(commentId)
     {
-        PRComment *c = [PRComment itemOfType:@"PRComment" serverId:commentId moc:moc];
+        PRComment *c = (PRComment *)[moc existingObjectWithID:commentId error:nil];
         if(!urlToOpen) urlToOpen = c.webUrl;
-        pullRequest = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:moc];
+        pullRequest = c.pullRequest;
     }
     else if(pullRequestId)
     {
-        pullRequest = [PullRequest itemOfType:@"PullRequest" serverId:pullRequestId moc:moc];
+        pullRequest = (PullRequest *)[moc existingObjectWithID:pullRequestId error:nil];
         if(!urlToOpen) urlToOpen = pullRequest.webUrl;
 
         if(!pullRequest)

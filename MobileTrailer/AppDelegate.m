@@ -230,8 +230,8 @@ collapseSecondaryViewController:(UIViewController *)secondaryViewController
 	[self checkApiUsage];
 	self.isRefreshing = NO;
 	[[NSNotificationCenter defaultCenter] postNotificationName:REFRESH_ENDED_NOTIFICATION object:nil];
-	[self.dataManager sendNotifications];
 	[self.dataManager saveDB];
+	[self.dataManager sendNotifications];
 }
 
 - (void)startRefresh
@@ -320,15 +320,13 @@ collapseSecondaryViewController:(UIViewController *)secondaryViewController
 		case kNewMention:
 		{
 			PRComment *c = item;
-			PullRequest *associatedRequest = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:c.managedObjectContext];
-			notification.alertBody = [NSString stringWithFormat:@"@%@ mentioned you in '%@': %@", c.userName, associatedRequest.title, c.body];
+			notification.alertBody = [NSString stringWithFormat:@"@%@ mentioned you in '%@': %@", c.userName, c.pullRequest.title, c.body];
 			break;
 		}
 		case kNewComment:
 		{
 			PRComment *c = item;
-			PullRequest *associatedRequest = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:c.managedObjectContext];
-			notification.alertBody = [NSString stringWithFormat:@"@%@ commented on '%@': %@", c.userName, associatedRequest.title, c.body];
+			notification.alertBody = [NSString stringWithFormat:@"@%@ commented on '%@': %@", c.userName, c.pullRequest.title, c.body];
 			break;
 		}
 		case kNewPr:

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6245" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="H1p-Uh-vWS">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6250" systemVersion="14A389" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="H1p-Uh-vWS">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6244"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
@@ -35,19 +35,6 @@
                             <activityIndicatorView opaque="NO" contentMode="center" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" animating="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="iCz-7v-EPc">
                                 <rect key="frame" x="290" y="290" width="20" height="20"/>
                             </activityIndicatorView>
-                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Le9-pP-LXq">
-                                <rect key="frame" x="234" y="540" width="132" height="52"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="132" id="dGM-q4-po1"/>
-                                    <constraint firstAttribute="height" constant="52" id="omv-NH-TeE"/>
-                                </constraints>
-                                <state key="normal" title="Try again">
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <action selector="iPadTryAgain:" destination="JEX-9P-axG" eventType="touchUpInside" id="dfM-ih-dNt"/>
-                                </connections>
-                            </button>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Status" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JEI-RV-Ntc">
                                 <rect key="frame" x="150" y="64" width="300" height="536"/>
                                 <constraints>
@@ -63,25 +50,15 @@
                             <constraint firstAttribute="centerX" secondItem="iCz-7v-EPc" secondAttribute="centerX" id="074-iX-yJ0"/>
                             <constraint firstItem="JEI-RV-Ntc" firstAttribute="top" secondItem="4Ib-n3-jTB" secondAttribute="bottom" id="LkT-Hd-pXt"/>
                             <constraint firstAttribute="centerX" secondItem="JEI-RV-Ntc" secondAttribute="centerX" id="UpG-sI-EcZ"/>
-                            <constraint firstItem="UUU-nP-EaO" firstAttribute="top" secondItem="Le9-pP-LXq" secondAttribute="bottom" constant="8" symbolic="YES" id="VBq-a9-uSy"/>
                             <constraint firstItem="JEI-RV-Ntc" firstAttribute="bottom" secondItem="UUU-nP-EaO" secondAttribute="top" id="Wh0-Vk-2jy"/>
-                            <constraint firstItem="Le9-pP-LXq" firstAttribute="centerX" secondItem="iCz-7v-EPc" secondAttribute="centerX" id="biP-LG-oBo"/>
                             <constraint firstAttribute="centerY" secondItem="iCz-7v-EPc" secondAttribute="centerY" id="oBI-er-j2z"/>
                         </constraints>
                     </view>
                     <toolbarItems/>
-                    <navigationItem key="navigationItem" id="mOI-FS-AaM">
-                        <barButtonItem key="rightBarButtonItem" systemItem="action" id="49c-8N-huw">
-                            <connections>
-                                <action selector="ipadShareButtonSelected:" destination="JEX-9P-axG" id="hxq-ys-upI"/>
-                            </connections>
-                        </barButtonItem>
-                    </navigationItem>
+                    <navigationItem key="navigationItem" id="mOI-FS-AaM"/>
                     <connections>
-                        <outlet property="shareButton" destination="49c-8N-huw" id="RU2-Fh-IgY"/>
                         <outlet property="spinner" destination="iCz-7v-EPc" id="mqi-Fb-lib"/>
                         <outlet property="statusLabel" destination="JEI-RV-Ntc" id="FXH-WF-SUZ"/>
-                        <outlet property="tryAgainButton" destination="Le9-pP-LXq" id="piA-8Y-9Kc"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="FJe-Yq-33r" sceneMemberID="firstResponder"/>

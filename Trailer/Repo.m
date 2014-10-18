@@ -8,6 +8,7 @@
 @dynamic dirty;
 @dynamic lastDirtied;
 @dynamic inaccessible;
+@dynamic pullRequests;
 
 + (Repo*)repoWithInfo:(NSDictionary*)info moc:(NSManagedObjectContext*)moc
 {
@@ -25,24 +26,8 @@
 
 - (void)prepareForDeletion
 {
-    [self removeAllRelatedPullRequests];
 	[super prepareForDeletion];
-}
-
-- (void)removeAllRelatedPullRequests
-{
-	NSNumber *sid = self.serverId;
-    if(sid)
-    {
-        NSManagedObjectContext *moc = self.managedObjectContext;
-        for(PullRequest *r in [PullRequest allItemsOfType:@"PullRequest" inMoc:moc])
-        {
-            if([r.repoId isEqualToNumber:sid])
-            {
-                [moc deleteObject:r];
-            }
-        }
-    }
+	DLog(@"Deleting repo ID %@",self.serverId);
 }
 
 + (NSArray *)inaccessibleReposInMoc:(NSManagedObjectContext *)moc

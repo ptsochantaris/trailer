@@ -9,10 +9,10 @@
 @dynamic userName;
 @dynamic avatarUrl;
 @dynamic path;
-@dynamic pullRequestUrl;
 @dynamic url;
 @dynamic userId;
 @dynamic webUrl;
+@dynamic pullRequest;
 
 + (PRComment *)commentWithInfo:(NSDictionary *)info moc:(NSManagedObjectContext *)moc
 {
@@ -32,7 +32,6 @@
 
 		NSDictionary *links = [info ofk:@"links"];
 		c.url = [[links ofk:@"self"] ofk:@"href"];
-		c.pullRequestUrl = [[links ofk:@"pull_request"] ofk:@"href"];
 		if(!c.webUrl) c.webUrl = [[links ofk:@"html"] ofk:@"href"];
 	}
 	return c;
@@ -50,25 +49,10 @@
 	return rangeOfHandle.location != NSNotFound;
 }
 
-+ (void)removeCommentsWithPullRequestURL:(NSString *)url inMoc:(NSManagedObjectContext *)moc
+- (void)prepareForDeletion
 {
-	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
-	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestUrl = %@",url];
-	f.includesPropertyValues = NO;
-	f.includesSubentities = NO;
-	for(PRComment *c in [moc executeFetchRequest:f error:nil])
-	{
-		DLog(@"  Deleting comment ID %@",c.serverId);
-		[moc deleteObject:c];
-	}
-}
-
-+ (NSArray *)commentsForPullRequestUrl:(NSString *)url inMoc:(NSManagedObjectContext *)moc
-{
-	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
-	f.returnsObjectsAsFaults = NO;
-	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestUrl = %@",url];
-	return [moc executeFetchRequest:f error:nil];
+	DLog(@"  Deleting comment ID %@",self.serverId);
+	[super prepareForDeletion];
 }
 
 @end

@@ -1,4 +1,6 @@
 
+@class PullRequest;
+
 @interface Repo : DataItem
 
 @property (nonatomic, retain) NSString * fullName;
@@ -8,6 +10,7 @@
 @property (nonatomic, retain) NSNumber * dirty;
 @property (nonatomic, retain) NSDate * lastDirtied;
 @property (nonatomic, retain) NSNumber * inaccessible;
+@property (nonatomic, retain) NSSet *pullRequests;
 
 + (Repo*)repoWithInfo:(NSDictionary*)info moc:(NSManagedObjectContext *)moc;
 
@@ -23,6 +26,13 @@
 
 + (void)markDirtyReposWithIds:(NSSet *)ids inMoc:(NSManagedObjectContext *)moc;
 
-- (void)removeAllRelatedPullRequests;
+@end
+
+@interface Repo (CoreDataGeneratedAccessors)
+
+- (void)addPullRequestsObject:(PullRequest *)value;
+- (void)removePullRequestsObject:(PullRequest *)value;
+- (void)addPullRequests:(NSSet *)values;
+- (void)removePullRequests:(NSSet *)values;
 
 @end

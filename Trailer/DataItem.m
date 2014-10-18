@@ -19,6 +19,13 @@ NSDateFormatter *_syncDateFormatter;
 	});
 }
 
++ (NSArray *)allItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
+{
+	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:type];
+	f.returnsObjectsAsFaults = NO;
+	return [moc executeFetchRequest:f error:nil];
+}
+
 + (id)itemOfType:(NSString*)type serverId:(NSNumber*)serverId moc:(NSManagedObjectContext*)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:type];
@@ -28,19 +35,12 @@ NSDateFormatter *_syncDateFormatter;
 	return [[moc executeFetchRequest:f error:nil] lastObject];
 }
 
-+ (NSArray *)allItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
-{
-	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:type];
-	f.returnsObjectsAsFaults = NO;
-	return [moc executeFetchRequest:f error:nil];
-}
-
 + (id)itemWithInfo:(NSDictionary*)info type:(NSString*)type moc:(NSManagedObjectContext*)moc
 {
 	NSNumber *serverId = [info ofk:@"id"];
 	NSDate *updatedDate = [_syncDateFormatter dateFromString:[info ofk:@"updated_at"]];
 
-	DataItem *existingItem = [DataItem itemOfType:type serverId:serverId moc:moc];
+	DataItem *existingItem = [self itemOfType:type serverId:serverId moc:moc];
 	if(!existingItem)
 	{
 		DLog(@"Creating new %@: %@",type,serverId);

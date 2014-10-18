@@ -23,16 +23,6 @@
 - (void)performVersionChangedTasks
 {
 	settings.localUserId = @(settings.localUserId.longLongValue);
-	NSArray *statuses = [DataItem allItemsOfType:@"PRStatus" inMoc:self.managedObjectContext];
-	for(PRStatus *s in statuses)
-	{
-		PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:s.pullRequestId moc:self.managedObjectContext];
-		if(!r)
-		{
-			DLog(@"Deleting orphaned PRStatus item %@",s.serverId);
-			[self.managedObjectContext deleteObject:s];
-		}
-	}
 
 	DLog(@"Marking all repos as dirty");
 	for(Repo *r in [Repo allItemsOfType:@"Repo" inMoc:self.managedObjectContext])
@@ -82,7 +72,7 @@
 	NSArray *latestComments = [PRComment newItemsOfType:@"PRComment" inMoc:mainContext];
 	for(PRComment *c in latestComments)
 	{
-		PullRequest *r = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:mainContext];
+		PullRequest *r = c.pullRequest;
 		if(r.postSyncAction.integerValue == kPostSyncNoteUpdated)
 		{
 			if(c.refersToMe)
@@ -334,14 +324,14 @@
 	{
 		case kNewMention:
 		case kNewComment:
-			return @{COMMENT_ID_KEY:[item serverId]};
+			return @{COMMENT_ID_KEY:[[[item objectID] URIRepresentation] absoluteString]};
 		case kNewPr:
 		case kPrReopened:
 		case kNewPrAssigned:
-			return @{PULL_REQUEST_ID_KEY:[item serverId]};
+			return @{PULL_REQUEST_ID_KEY:[[[item objectID] URIRepresentation] absoluteString]};
 		case kPrClosed:
 		case kPrMerged:
-			return @{NOTIFICATION_URL_KEY:[item webUrl], PULL_REQUEST_ID_KEY:[item serverId]};
+			return @{NOTIFICATION_URL_KEY:[item webUrl], PULL_REQUEST_ID_KEY:[item objectID]};
 		case kNewRepoSubscribed:
 		case kNewRepoAnnouncement:
 			return @{NOTIFICATION_URL_KEY:[item webUrl] };
@@ -407,6 +397,13 @@
 														 NSParagraphStyleAttributeName: paragraphStyle,
 														 NSFontAttributeName: [UIFont systemFontOfSize:[UIFont smallSystemFontSize]] }];
 #endif
+}
+
+- (NSManagedObjectID *)idForUriPath:(NSString *)uriPath
+{
+	if(!uriPath) return nil;
+	NSURL *u = [NSURL URLWithString:uriPath];
+	return [self.persistentStoreCoordinator managedObjectIDForURIRepresentation:u];
 }
 
 /////////////////////////////////////////////////////////////////////
