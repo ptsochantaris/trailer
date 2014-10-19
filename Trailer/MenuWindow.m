@@ -17,6 +17,16 @@
 {
 	[super awakeFromNib];
 
+	// Disabled because it causes serious readability issues for now
+	/*Class vibrantClass=NSClassFromString(@"NSVisualEffectView");
+	if (vibrantClass)
+	{
+		NSVisualEffectView *vibrant=[[vibrantClass alloc] initWithFrame:[self.contentView bounds]];
+		vibrant.autoresizingMask = NSViewWidthSizable|NSViewHeightSizable;
+		[vibrant setBlendingMode:NSVisualEffectBlendingModeBehindWindow];
+		[self.contentView addSubview:vibrant positioned:NSWindowBelow relativeTo:nil];
+	}*/
+
 	topArrow = [[NSImageView alloc] initWithFrame:CGRectZero];
 	topArrow.image = [NSImage imageNamed:@"upArrow"];
 	[topArrow setImageAlignment:NSImageAlignTop];

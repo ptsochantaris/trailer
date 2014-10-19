@@ -18,7 +18,7 @@ static CGColorRef _highlightColor;
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
 
-		_highlightColor = CGColorCreateCopy(MAKECOLOR(0.95, 0.95, 0.95, 1.0).CGColor);
+		_highlightColor = CGColorCreateCopy(MAKECOLOR(0.92, 0.92, 0.92, 1.0).CGColor);
 
 		_titleAttributes = @{
 							 NSFontAttributeName:[NSFont menuFontOfSize:13.0],
@@ -30,7 +30,7 @@ static CGColorRef _highlightColor;
 		_statusAttributes = @{
 							   NSFontAttributeName:[NSFont fontWithName:@"Monaco" size:9.0],
 							   NSBackgroundColorAttributeName:[NSColor clearColor],
-							   NSParagraphStyleAttributeName: paragraphStyle
+							   NSParagraphStyleAttributeName: paragraphStyle,
 							   };
 	});
 }
@@ -57,7 +57,7 @@ static CGColorRef _highlightColor;
 		}
 
 		NSString *_title = pullRequest.title;
-		NSAttributedString *_subtitle = [pullRequest subtitleWithFont:[NSFont menuFontOfSize:10.0]];
+		NSMutableAttributedString *_subtitle = [pullRequest subtitleWithFont:[NSFont menuFontOfSize:10.0]];
 
 		CGFloat W = MENU_WIDTH-LEFTPADDING-app.scrollBarWidth;
 		BOOL showUnpin = pullRequest.condition.integerValue!=kPullRequestConditionOpen || pullRequest.markUnmergeable;

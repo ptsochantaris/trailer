@@ -20,6 +20,5 @@
 		   delegate:(id<StatusItemDelegate>)delegate;
 
 @property (nonatomic) BOOL highlighted, grayOut;
-@property (nonatomic,weak) NSStatusItem *hostItem;
 
 @end
