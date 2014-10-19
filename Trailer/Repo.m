@@ -10,9 +10,9 @@
 @dynamic inaccessible;
 @dynamic pullRequests;
 
-+ (Repo*)repoWithInfo:(NSDictionary*)info moc:(NSManagedObjectContext*)moc
++ (Repo*)repoWithInfo:(NSDictionary*)info fromServer:(ApiServer *)apiServer
 {
-	Repo *r = [DataItem itemWithInfo:info type:@"Repo" moc:moc];
+	Repo *r = [DataItem itemWithInfo:info type:@"Repo" fromServer:apiServer];
 	if(r.postSyncAction.integerValue != kPostSyncDoNothing)
 	{
 		r.fullName = [info ofk:@"full_name"];

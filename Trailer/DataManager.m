@@ -10,6 +10,7 @@
     self = [super init];
     if (self)
 	{
+		[ApiServer ensureAtLeastGithubInMoc:self.managedObjectContext];
 		if([self versionBumpOccured])
 		{
 			DLog(@"VERSION UPDATE MAINTENANCE NEEDED");
@@ -22,8 +23,6 @@
 
 - (void)performVersionChangedTasks
 {
-	settings.localUserId = @(settings.localUserId.longLongValue);
-
 	DLog(@"Marking all repos as dirty");
 	for(Repo *r in [Repo allItemsOfType:@"Repo" inMoc:self.managedObjectContext])
 	{
@@ -81,7 +80,7 @@
 			}
 			else if(settings.showCommentsEverywhere || r.isMine || r.commentedByMe)
 			{
-				if(![c.userId isEqualToNumber:settings.localUserId])
+				if(![c.userId isEqualToNumber:c.apiServer.userId])
 				{
 					NSString *commenterAuthorName = c.userName;
 					NSArray *blacklistMatches = [settings.commentAuthorBlacklist filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(NSString *name, NSDictionary *bindings) {
@@ -249,7 +248,6 @@
             [fm removeItemAtPath:[documentsDirectory stringByAppendingPathComponent:file] error:nil];
         }
     }
-	[self wipeApiMarkers];
 }
 
 // Returns the managed object context for the application (which is already bound to the persistent store coordinator for the application.)
@@ -281,6 +279,14 @@
 	return YES;
 }
 
+- (NSManagedObjectContext *)tempContext
+{
+	NSManagedObjectContext *syncContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSConfinementConcurrencyType];
+	syncContext.parentContext = self.managedObjectContext;
+	syncContext.undoManager = nil;
+	return syncContext;
+}
+
 - (void)deleteEverything
 {
 	@autoreleasepool
@@ -291,31 +297,23 @@
 
 		for (NSString *entityName in self.managedObjectModel.entitiesByName)
 		{
-			@autoreleasepool
+			if(![entityName isEqualToString:@"ApiServer"])
 			{
-				NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:entityName];
-				fetchRequest.includesPropertyValues = NO;
-				fetchRequest.includesSubentities = NO;
+				@autoreleasepool
+				{
+					NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:entityName];
+					fetchRequest.includesPropertyValues = NO;
+					fetchRequest.includesSubentities = NO;
 
-				for (NSManagedObject *managedObject in [tempMoc executeFetchRequest:fetchRequest error:nil])
-					[tempMoc deleteObject:managedObject];
+					for (NSManagedObject *managedObject in [tempMoc executeFetchRequest:fetchRequest error:nil])
+						[tempMoc deleteObject:managedObject];
+				}
 			}
 		}
 
 		[tempMoc save:nil];
 	}
 	[self saveDB];
-
-	[self wipeApiMarkers];
-}
-
-- (void)wipeApiMarkers
-{
-	// because these control the DB state with the event feed, needs to be reset
-	settings.latestReceivedEventEtag = nil;
-	settings.latestReceivedEventDateProcessed = nil;
-	settings.latestUserEventEtag = nil;
-	settings.latestUserEventDateProcessed = nil;
 }
 
 - (NSDictionary *)infoForType:(PRNotificationType)type item:(id)item

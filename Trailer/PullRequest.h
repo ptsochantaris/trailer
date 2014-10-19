@@ -55,9 +55,7 @@
 @property (nonatomic, retain) Repo *repo;
 @property (nonatomic, retain) NSSet *statuses;
 
-+ (PullRequest *)pullRequestWithInfo:(NSDictionary*)info moc:(NSManagedObjectContext *)moc;
-
-+ (PullRequest *)pullRequestWithUrl:(NSString *)url moc:(NSManagedObjectContext *)moc;
++ (PullRequest *)pullRequestWithInfo:(NSDictionary*)info fromServer:(ApiServer *)apiServer;
 
 + (NSFetchRequest *)requestForPullRequestsWithFilter:(NSString *)filter;
 

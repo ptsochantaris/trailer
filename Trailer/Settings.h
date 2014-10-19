@@ -10,13 +10,7 @@
 
 @property (nonatomic) NSArray *statusFilteringTerms, *commentAuthorBlacklist;
 
-@property (nonatomic) NSDate *latestReceivedEventDateProcessed, *latestUserEventDateProcessed;
-
-@property (nonatomic) NSNumber *localUserId;
-
-@property (nonatomic) NSString *authToken, *localUser,
-							*apiFrontEnd, *apiBackEnd, *apiPath,
-							*hotkeyLetter, *latestReceivedEventEtag, *latestUserEventEtag;
+@property (nonatomic) NSString *hotkeyLetter;
 
 @property (nonatomic) float refreshPeriod, backgroundRefreshPeriod, newRepoCheckPeriod;
 

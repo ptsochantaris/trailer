@@ -14,7 +14,7 @@
 @property (nonatomic, retain) NSNumber * userId;
 @property (nonatomic, retain) PullRequest *pullRequest;
 
-+ (PRComment *)commentWithInfo:(NSDictionary *)info moc:(NSManagedObjectContext *)moc;
++ (PRComment *)commentWithInfo:(NSDictionary *)info fromServer:(ApiServer *)apiServer;
 
 - (BOOL)isMine;
 

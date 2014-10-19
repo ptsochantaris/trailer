@@ -5,6 +5,7 @@
 @dynamic postSyncAction;
 @dynamic createdAt;
 @dynamic updatedAt;
+@dynamic apiServer;
 
 NSDateFormatter *_syncDateFormatter;
 
@@ -26,29 +27,38 @@ NSDateFormatter *_syncDateFormatter;
 	return [moc executeFetchRequest:f error:nil];
 }
 
-+ (id)itemOfType:(NSString*)type serverId:(NSNumber*)serverId moc:(NSManagedObjectContext*)moc
++ (NSArray *)allItemsOfType:(NSString *)type fromServer:(ApiServer *)apiServer
+{
+	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:type];
+	f.returnsObjectsAsFaults = NO;
+	f.predicate = [NSPredicate predicateWithFormat:@"apiServer == %@", apiServer];
+	return [apiServer.managedObjectContext executeFetchRequest:f error:nil];
+}
+
++ (id)itemOfType:(NSString*)type serverId:(NSNumber*)serverId fromServer:(ApiServer *)apiServer
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:type];
 	f.fetchLimit = 1;
 	f.returnsObjectsAsFaults = NO;
-	f.predicate = [NSPredicate predicateWithFormat:@"serverId = %@",serverId];
-	return [[moc executeFetchRequest:f error:nil] lastObject];
+	f.predicate = [NSPredicate predicateWithFormat:@"serverId = %@ and apiServer == %@", serverId, apiServer];
+	return [[apiServer.managedObjectContext executeFetchRequest:f error:nil] lastObject];
 }
 
-+ (id)itemWithInfo:(NSDictionary*)info type:(NSString*)type moc:(NSManagedObjectContext*)moc
++ (id)itemWithInfo:(NSDictionary*)info type:(NSString*)type fromServer:(ApiServer *)apiServer
 {
 	NSNumber *serverId = [info ofk:@"id"];
 	NSDate *updatedDate = [_syncDateFormatter dateFromString:[info ofk:@"updated_at"]];
 
-	DataItem *existingItem = [self itemOfType:type serverId:serverId moc:moc];
+	DataItem *existingItem = [self itemOfType:type serverId:serverId fromServer:apiServer];
 	if(!existingItem)
 	{
 		DLog(@"Creating new %@: %@",type,serverId);
-		existingItem = [NSEntityDescription insertNewObjectForEntityForName:type inManagedObjectContext:moc];
+		existingItem = [NSEntityDescription insertNewObjectForEntityForName:type inManagedObjectContext:apiServer.managedObjectContext];
 		existingItem.serverId = serverId;
 		existingItem.createdAt = [_syncDateFormatter dateFromString:[info ofk:@"created_at"]];
 		existingItem.postSyncAction = @(kPostSyncNoteNew);
 		existingItem.updatedAt = updatedDate;
+		existingItem.apiServer = apiServer;
 	}
 	else if(![updatedDate isEqual:existingItem.updatedAt])
 	{
@@ -83,7 +93,7 @@ NSDateFormatter *_syncDateFormatter;
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:type];
 	f.returnsObjectsAsFaults = NO;
-	f.predicate = [NSPredicate predicateWithFormat:@"postSyncAction = %d or postSyncAction = %d",kPostSyncNoteNew,kPostSyncNoteUpdated];
+	f.predicate = [NSPredicate predicateWithFormat:@"postSyncAction = %d or postSyncAction = %d", kPostSyncNoteNew, kPostSyncNoteUpdated];
 	return [moc executeFetchRequest:f error:nil];
 }
 

@@ -59,6 +59,8 @@
 		1665B6751882F42500972111 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 168BC6B117EC2DF000BC4584 /* CoreData.framework */; };
 		1665B6761882F43800972111 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1628A6B218789E73005EDA69 /* Foundation.framework */; };
 		166A19AA19B99C4C004D9057 /* OpenInSafariActivity.m in Sources */ = {isa = PBXBuildFile; fileRef = 166A19A819B99C48004D9057 /* OpenInSafariActivity.m */; };
+		166F29E119F2B1F300A083E3 /* ApiServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 166F29E019F2B1F300A083E3 /* ApiServer.m */; };
+		166F29E219F2B1F300A083E3 /* ApiServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 166F29E019F2B1F300A083E3 /* ApiServer.m */; };
 		1675AC1D185CF80C00ADD213 /* MenuScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1675AC1C185CF80C00ADD213 /* MenuScrollView.m */; };
 		168A5C77185BBA2F00CB6B02 /* MenuWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 168A5C76185BBA2F00CB6B02 /* MenuWindow.m */; };
 		168A5C7B185C922300CB6B02 /* HTPopTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = 168A5C7A185C922300CB6B02 /* HTPopTimer.m */; };
@@ -171,6 +173,8 @@
 		1665B66C1882F29E00972111 /* Settings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Settings.m; path = Trailer/Settings.m; sourceTree = "<group>"; };
 		166A19A719B99C48004D9057 /* OpenInSafariActivity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenInSafariActivity.h; sourceTree = "<group>"; };
 		166A19A819B99C48004D9057 /* OpenInSafariActivity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OpenInSafariActivity.m; sourceTree = "<group>"; };
+		166F29DF19F2B1F300A083E3 /* ApiServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ApiServer.h; sourceTree = "<group>"; };
+		166F29E019F2B1F300A083E3 /* ApiServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ApiServer.m; sourceTree = "<group>"; };
 		1675AC1B185CF80C00ADD213 /* MenuScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MenuScrollView.h; sourceTree = "<group>"; };
 		1675AC1C185CF80C00ADD213 /* MenuScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MenuScrollView.m; sourceTree = "<group>"; };
 		168A5C75185BBA2F00CB6B02 /* MenuWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MenuWindow.h; sourceTree = "<group>"; };
@@ -478,6 +482,8 @@
 		16EE562219B857C90031DF6D /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				166F29DF19F2B1F300A083E3 /* ApiServer.h */,
+				166F29E019F2B1F300A083E3 /* ApiServer.m */,
 				1661667D189BC47F00FBF4E0 /* PRStatus.h */,
 				1661667E189BC47F00FBF4E0 /* PRStatus.m */,
 				161CA3C817F5B1F300F4AF6C /* PRComment.h */,
@@ -629,6 +635,7 @@
 				1604D4D2189548350064A385 /* ApiServerViewController.m in Sources */,
 				1628A7041878BC18005EDA69 /* Repo.m in Sources */,
 				1628A70B1878D2B2005EDA69 /* NSDictionary+NSDictionary_OFK.m in Sources */,
+				166F29E219F2B1F300A083E3 /* ApiServer.m in Sources */,
 				169CEB9C1879D5BB0083A068 /* AdvancedSettingsViewController.m in Sources */,
 				1628A6D418789E73005EDA69 /* DetailViewController.m in Sources */,
 				16616680189BC47F00FBF4E0 /* PRStatus.m in Sources */,
@@ -662,6 +669,7 @@
 				160C5ACF18675E9300142482 /* CenteredTextField.m in Sources */,
 				1617BEEA183F538100E89BB2 /* Reachability.m in Sources */,
 				1665B66D1882F29E00972111 /* Settings.m in Sources */,
+				166F29E119F2B1F300A083E3 /* ApiServer.m in Sources */,
 				16B9553A17EC93DE0005118F /* Repo.m in Sources */,
 				161CA3CE17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m in Sources */,
 				1675AC1D185CF80C00ADD213 /* MenuScrollView.m in Sources */,

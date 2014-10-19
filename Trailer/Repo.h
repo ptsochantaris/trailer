@@ -12,7 +12,7 @@
 @property (nonatomic, retain) NSNumber * inaccessible;
 @property (nonatomic, retain) NSSet *pullRequests;
 
-+ (Repo*)repoWithInfo:(NSDictionary*)info moc:(NSManagedObjectContext *)moc;
++ (Repo*)repoWithInfo:(NSDictionary*)info fromServer:(ApiServer *)apiServer;
 
 + (NSArray *)visibleReposInMoc:(NSManagedObjectContext *)moc;
 

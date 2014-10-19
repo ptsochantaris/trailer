@@ -14,7 +14,7 @@
 @property (nonatomic, retain) NSString * userName;
 @property (nonatomic, retain) PullRequest *pullRequest;
 
-+ (PRStatus *)statusWithInfo:(NSDictionary *)info moc:(NSManagedObjectContext *)moc;
++ (PRStatus *)statusWithInfo:(NSDictionary *)info fromServer:(ApiServer *)apiServer;
 
 - (COLOR_CLASS *)colorForDisplay;
 

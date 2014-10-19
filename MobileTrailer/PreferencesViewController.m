@@ -43,7 +43,7 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 
     self.repositories.contentOffset = CGPointMake(0, searchHolder.frame.size.height);
 
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(apiUsageUpdate) name:RATE_UPDATE_NOTIFICATION object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(apiUsageUpdate) name:API_USAGE_UPDATE object:nil];
 
 	self.githubApiToken.text = settings.authToken;
 	self.refreshRepoList.enabled = (settings.authToken.length>0);

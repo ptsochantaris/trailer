@@ -12,9 +12,9 @@
 @dynamic userName;
 @dynamic pullRequest;
 
-+ (PRStatus *)statusWithInfo:(NSDictionary *)info moc:(NSManagedObjectContext *)moc
++ (PRStatus *)statusWithInfo:(NSDictionary *)info fromServer:(ApiServer *)apiServer
 {
-	PRStatus *s = [DataItem itemWithInfo:info type:@"PRStatus" moc:moc];
+	PRStatus *s = [DataItem itemWithInfo:info type:@"PRStatus" fromServer:apiServer];
 	if(s.postSyncAction.integerValue != kPostSyncDoNothing)
 	{
 		s.url = [info ofk:@"url"];

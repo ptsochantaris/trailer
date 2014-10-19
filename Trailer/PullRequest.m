@@ -44,9 +44,9 @@ static NSDateFormatter *itemDateFormatter;
 	});
 }
 
-+ (PullRequest *)pullRequestWithInfo:(NSDictionary *)info moc:(NSManagedObjectContext *)moc
++ (PullRequest *)pullRequestWithInfo:(NSDictionary *)info fromServer:(ApiServer *)apiServer
 {
-	PullRequest *p = [DataItem itemWithInfo:info type:@"PullRequest" moc:moc];
+	PullRequest *p = [DataItem itemWithInfo:info type:@"PullRequest" fromServer:apiServer];
 	if(p.postSyncAction.integerValue != kPostSyncDoNothing)
 	{
 		p.url = [info ofk:@"url"];
@@ -157,7 +157,7 @@ static NSDateFormatter *itemDateFormatter;
 
 - (BOOL)refersToMe
 {
-	NSString *myHandle = [NSString stringWithFormat:@"@%@",settings.localUser];
+	NSString *myHandle = [NSString stringWithFormat:@"@%@", self.apiServer.userName];
 	NSRange rangeOfHandle = [self.body rangeOfString:myHandle options:NSCaseInsensitiveSearch|NSDiacriticInsensitiveSearch];
 	return rangeOfHandle.location != NSNotFound;
 }
@@ -349,15 +349,6 @@ static NSDateFormatter *itemDateFormatter;
 	[super prepareForDeletion];
 }
 
-+ (PullRequest *)pullRequestWithUrl:(NSString *)url moc:(NSManagedObjectContext *)moc
-{
-	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PullRequest"];
-	f.returnsObjectsAsFaults = NO;
-	f.fetchLimit = 1;
-	f.predicate = [NSPredicate predicateWithFormat:@"url == %@",url];
-	return [[moc executeFetchRequest:f error:nil] lastObject];
-}
-
 - (void)catchUpWithComments
 {
 	for(PRComment *c in self.comments)
@@ -374,7 +365,7 @@ static NSDateFormatter *itemDateFormatter;
 - (BOOL)isMine
 {
 	if(self.assignedToMe.boolValue && settings.moveAssignedPrsToMySection) return YES;
-	return [self.userId isEqualToNumber:settings.localUserId];
+	return [self.userId isEqualToNumber:self.apiServer.userId];
 }
 
 - (BOOL)commentedByMe
@@ -472,14 +463,14 @@ static NSDateFormatter *itemDateFormatter;
 	if(date)
 	{
 		return [NSPredicate predicateWithFormat:@"userId != %lld and pullRequest == %@ and createdAt > %@",
-				settings.localUserId.longLongValue,
+				self.apiServer.userId.longLongValue,
 				self,
 				date];
 	}
 	else
 	{
 		return [NSPredicate predicateWithFormat:@"userId != %lld and pullRequest == %@",
-				settings.localUserId.longLongValue,
+				self.apiServer.userId.longLongValue,
 				self];
 	}
 }

@@ -19,6 +19,7 @@
 #import "Reachability.h"
 #import "Settings.h"
 #import "API.h"
+#import "ApiServer.h"
 #import "DataItem.h"
 #import "Repo.h"
 #import "PullRequest.h"

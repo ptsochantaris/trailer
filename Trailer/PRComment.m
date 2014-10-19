@@ -14,9 +14,9 @@
 @dynamic webUrl;
 @dynamic pullRequest;
 
-+ (PRComment *)commentWithInfo:(NSDictionary *)info moc:(NSManagedObjectContext *)moc
++ (PRComment *)commentWithInfo:(NSDictionary *)info fromServer:(ApiServer *)apiServer
 {
-	PRComment *c = [DataItem itemWithInfo:info type:@"PRComment" moc:moc];
+	PRComment *c = [DataItem itemWithInfo:info type:@"PRComment" fromServer:apiServer];
 	if(c.postSyncAction.integerValue != kPostSyncDoNothing)
 	{
 		c.body = [info ofk:@"body"];
@@ -39,12 +39,12 @@
 
 - (BOOL)isMine
 {
-	return [self.userId isEqualToNumber:settings.localUserId];
+	return [self.userId isEqualToNumber:self.apiServer.userId];
 }
 
 - (BOOL)refersToMe
 {
-	NSString *myHandle = [NSString stringWithFormat:@"@%@",settings.localUser];
+	NSString *myHandle = [NSString stringWithFormat:@"@%@", self.apiServer.userName];
 	NSRange rangeOfHandle = [self.body rangeOfString:myHandle options:NSCaseInsensitiveSearch|NSDiacriticInsensitiveSearch];
 	return rangeOfHandle.location != NSNotFound;
 }

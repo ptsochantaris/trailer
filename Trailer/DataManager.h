@@ -23,4 +23,6 @@
 
 - (NSManagedObjectID *)idForUriPath:(NSString *)uriPath;
 
+- (NSManagedObjectContext *)tempContext;
+
 @end
