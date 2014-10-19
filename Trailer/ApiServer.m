@@ -45,6 +45,12 @@
 	return githubServer;
 }
 
+- (void)clearAllRelatedInfo
+{
+	for(NSManagedObject *o in self.repos)
+		[self.managedObjectContext deleteObject:o];
+}
+
 - (void)resetToGithub
 {
 	self.webPath = @"https://github.com";
@@ -52,6 +58,11 @@
 	self.label = @"GitHub";
 	self.latestReceivedEventDateProcessed = [NSDate distantPast];
 	self.latestUserEventDateProcessed = [NSDate distantPast];
+}
+
+- (BOOL)goodToGo
+{
+	return (self.authToken.length>0);
 }
 
 + (void)ensureAtLeastGithubInMoc:(NSManagedObjectContext *)moc
@@ -70,14 +81,13 @@
 	return [moc executeFetchRequest:f error:nil];
 }
 
-+ (BOOL)allServersHaveAuthTokensInMoc:(NSManagedObjectContext *)moc
++ (BOOL)someServersHaveAuthTokensInMoc:(NSManagedObjectContext *)moc
 {
 	NSArray *allServers = [self allApiServersInMoc:moc];
-	BOOL ok = (allServers>0);
 	for(ApiServer *apiServer in allServers)
-		if(ok)
-			ok = (apiServer.authToken.length>0);
-	return ok;
+		if(apiServer.authToken.length>0)
+			return YES;
+	return NO;
 }
 
 + (NSUInteger)countApiServersInMoc:(NSManagedObjectContext *)moc

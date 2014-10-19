@@ -588,8 +588,11 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 
 	for(ApiServer *apiServer in allApiServers)
 	{
-		[self markDirtyRepoIds:repoIdsToMarkDirty usingUserEventsFromServer:apiServer andCallback:completionCallback];
-		[self markDirtyRepoIds:repoIdsToMarkDirty usingReceivedEventsFromServer:apiServer andCallback:completionCallback];
+		if(apiServer.goodToGo)
+		{
+			[self markDirtyRepoIds:repoIdsToMarkDirty usingUserEventsFromServer:apiServer andCallback:completionCallback];
+			[self markDirtyRepoIds:repoIdsToMarkDirty usingReceivedEventsFromServer:apiServer andCallback:completionCallback];
+		}
 	}
 }
 
@@ -770,6 +773,12 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 
 - (void)syncWatchedReposFromServer:(ApiServer *)apiServer andCallback:(void(^)(BOOL success))callback
 {
+	if(!apiServer.goodToGo)
+	{
+		CALLBACK(YES); // yes, because there was no fetching failure, we're just ignoring this for now
+		return;
+	}
+
 	[self getPagedDataInPath:@"/user/subscriptions"
 				  fromServer:apiServer
 			startingFromPage:1
@@ -816,27 +825,38 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 	__block NSInteger fail = 0;
 	for(ApiServer *apiServer in allApiServers)
 	{
-		[self getDataInPath:@"/user"
-				 fromServer:apiServer
-					 params:nil
-			   extraHeaders:nil
-				andCallback:^(id data, BOOL lastPage, NSInteger resultCode, NSString *etag) {
-					if(data)
-					{
-						apiServer.userName = [data ofk:@"login"];
-						apiServer.userId = [data ofk:@"id"];
-						success++;
-					}
-					else
-					{
-						DLog(@"Could not read user credentials from %@", apiServer.label);
-						fail++;
-					}
-					if(success+fail==allApiServers.count)
-					{
-						CALLBACK(fail==0);
-					}
-				}];
+		if(apiServer.goodToGo)
+		{
+			[self getDataInPath:@"/user"
+					 fromServer:apiServer
+						 params:nil
+				   extraHeaders:nil
+					andCallback:^(id data, BOOL lastPage, NSInteger resultCode, NSString *etag) {
+						if(data)
+						{
+							apiServer.userName = [data ofk:@"login"];
+							apiServer.userId = [data ofk:@"id"];
+							success++;
+						}
+						else
+						{
+							DLog(@"Could not read user credentials from %@", apiServer.label);
+							fail++;
+						}
+						if(success+fail==allApiServers.count)
+						{
+							CALLBACK(fail==0);
+						}
+					}];
+		}
+		else
+		{
+			success++; // yes because there was no fetch failure, we just ignore this
+			if(success+fail==allApiServers.count)
+			{
+				CALLBACK(fail==0);
+			}
+		}
 	}
 }
 

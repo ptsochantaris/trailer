@@ -61,7 +61,7 @@ AppDelegate *app;
 	[self.versionNumber setStringValue:currentAppVersion];
 	[self.aboutVersion setStringValue:currentAppVersion];
 
-	if([ApiServer allServersHaveAuthTokensInMoc:self.dataManager.managedObjectContext])
+	if([ApiServer someServersHaveAuthTokensInMoc:self.dataManager.managedObjectContext])
 	{
 		[self startRefresh];
 	}
@@ -820,6 +820,7 @@ AppDelegate *app;
 		ApiServer *apiServer = [self selectedServer];
 		apiServer.apiPath = self.apiServerApiPath.stringValue;
 		[self storeApiFormToSelectedServer];
+		[apiServer clearAllRelatedInfo];
 		[self reset];
 	}
 	else if(obj.object==self.apiServerWebPath)
@@ -833,6 +834,7 @@ AppDelegate *app;
 		ApiServer *apiServer = [self selectedServer];
 		apiServer.authToken = self.apiServerAuthToken.stringValue;
 		[self storeApiFormToSelectedServer];
+		[apiServer clearAllRelatedInfo];
 		[self reset];
 	}
 	else if(obj.object==self.repoFilter)
@@ -875,9 +877,8 @@ AppDelegate *app;
 	self.preferencesDirty = YES;
 	self.api.successfulRefreshesSinceLastStatusCheck = 0;
 	self.lastSuccessfulRefresh = nil;
-	[self.dataManager deleteEverything];
 	[self.projectsTable reloadData];
-	self.refreshButton.enabled = [ApiServer allServersHaveAuthTokensInMoc:self.dataManager.managedObjectContext];
+	self.refreshButton.enabled = [ApiServer someServersHaveAuthTokensInMoc:self.dataManager.managedObjectContext];
 	[self updateMenu];
 }
 
@@ -1288,7 +1289,7 @@ AppDelegate *app;
 	if([notification object]==self.preferencesWindow)
 	{
 		[self controlTextDidChange:nil];
-		if([ApiServer allServersHaveAuthTokensInMoc:self.dataManager.managedObjectContext] && self.preferencesDirty)
+		if([ApiServer someServersHaveAuthTokensInMoc:self.dataManager.managedObjectContext] && self.preferencesDirty)
 		{
 			[self startRefresh];
 		}
@@ -1390,7 +1391,7 @@ AppDelegate *app;
 - (void)tabView:(NSTabView *)tabView willSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
 	if([Repo countVisibleReposInMoc:self.dataManager.managedObjectContext]==0 &&
-	   [ApiServer allServersHaveAuthTokensInMoc:self.dataManager.managedObjectContext])
+	   [ApiServer someServersHaveAuthTokensInMoc:self.dataManager.managedObjectContext])
 	{
 		[self refreshReposSelected:nil];
 	}
@@ -1488,7 +1489,7 @@ AppDelegate *app;
 
 - (void)refreshTimerDone
 {
-	if([ApiServer allServersHaveAuthTokensInMoc:self.dataManager.managedObjectContext])
+	if([ApiServer someServersHaveAuthTokensInMoc:self.dataManager.managedObjectContext])
 	{
 		[self startRefresh];
 	}

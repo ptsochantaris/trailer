@@ -41,11 +41,15 @@
 
 + (NSArray *)allApiServersInMoc:(NSManagedObjectContext *)moc;
 
-+ (BOOL)allServersHaveAuthTokensInMoc:(NSManagedObjectContext *)moc;
++ (BOOL)someServersHaveAuthTokensInMoc:(NSManagedObjectContext *)moc;
 
 + (NSUInteger)countApiServersInMoc:(NSManagedObjectContext *)moc;
 
+- (void)clearAllRelatedInfo;
+
 - (void)resetToGithub;
+
+- (BOOL)goodToGo;
 
 @end
 

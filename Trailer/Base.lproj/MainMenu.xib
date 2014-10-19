@@ -105,7 +105,7 @@
                                         <button verticalHuggingPriority="750" id="Sqx-CP-s40">
                                             <rect key="frame" x="17" y="16" width="240" height="32"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                            <buttonCell key="cell" type="smallSquare" title="Add a new server" bezelStyle="smallSquare" imagePosition="overlaps" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="MPU-qY-9hn">
+                                            <buttonCell key="cell" type="smallSquare" title="Add API Server" bezelStyle="smallSquare" imagePosition="overlaps" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="MPU-qY-9hn">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="label"/>
                                             </buttonCell>
@@ -952,7 +952,7 @@ Available on OS X Mavericks onwards</string>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <button id="sLc-s4-xlc">
-                                                                    <rect key="frame" x="65" y="12" width="40" height="48"/>
+                                                                    <rect key="frame" x="65" y="12" width="32" height="48"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="⌘" bezelStyle="regularSquare" imagePosition="below" alignment="center" state="on" inset="2" id="6xE-g6-buW">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -974,18 +974,18 @@ Available on OS X Mavericks onwards</string>
                                                                     </connections>
                                                                 </button>
                                                                 <button id="AEc-A8-j0N">
-                                                                    <rect key="frame" x="107" y="12" width="40" height="48"/>
+                                                                    <rect key="frame" x="107" y="12" width="32" height="48"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="⌥" bezelStyle="regularSquare" imagePosition="below" alignment="center" state="on" inset="2" id="zqa-nT-kEg">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                        <font key="font" metaFont="system" size="24"/>
+                                                                        <font key="font" metaFont="system" size="23"/>
                                                                     </buttonCell>
                                                                     <connections>
                                                                         <action selector="enableHotkeySelected:" target="494" id="0gV-oz-VTU"/>
                                                                     </connections>
                                                                 </button>
                                                                 <button id="ha7-N5-qJl">
-                                                                    <rect key="frame" x="149" y="12" width="40" height="48"/>
+                                                                    <rect key="frame" x="149" y="12" width="32" height="48"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <buttonCell key="cell" type="check" title="⇧" bezelStyle="regularSquare" imagePosition="below" alignment="center" state="on" inset="2" id="B8v-bY-mJG">
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
