@@ -329,7 +329,7 @@
 			return @{PULL_REQUEST_ID_KEY:[[[item objectID] URIRepresentation] absoluteString]};
 		case kPrClosed:
 		case kPrMerged:
-			return @{NOTIFICATION_URL_KEY:[item webUrl], PULL_REQUEST_ID_KEY:[item objectID]};
+			return @{NOTIFICATION_URL_KEY:[item webUrl], PULL_REQUEST_ID_KEY:[[[item objectID] URIRepresentation] absoluteString] };
 		case kNewRepoSubscribed:
 		case kNewRepoAnnouncement:
 			return @{NOTIFICATION_URL_KEY:[item webUrl] };
