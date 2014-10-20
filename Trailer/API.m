@@ -291,10 +291,6 @@ typedef void (^completionBlockType)(BOOL);
 		return;
 	}
 
-	for(PullRequest *r in prs)
-		for(PRStatus *s in r.statuses)
-			s.postSyncAction = @(kPostSyncDelete);
-
 	NSInteger totalOperations = prs.count;
 	__block NSInteger succeeded = 0;
 	__block NSInteger failed = 0;
