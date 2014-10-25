@@ -24,12 +24,6 @@
 	return r;
 }
 
-- (void)prepareForDeletion
-{
-	[super prepareForDeletion];
-	DLog(@"Deleting repo ID %@",self.serverId);
-}
-
 + (NSArray *)inaccessibleReposInMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"Repo"];

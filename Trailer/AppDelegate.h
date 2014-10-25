@@ -68,6 +68,7 @@
 @property (weak) IBOutlet NSBox *apiServerSelectedBox;
 @property (weak) IBOutlet NSButton *apiServerTestButton;
 @property (weak) IBOutlet NSButton *apiServerDeleteButton;
+@property (weak) IBOutlet NSButton *apiServerReportError;
 
 // Keyboard
 @property (weak) IBOutlet NSButton *hotkeyEnable;
@@ -97,7 +98,7 @@
 @property (nonatomic) DataManager *dataManager;
 @property (weak) NSTimer *refreshTimer;
 @property (strong) NSDate *lastSuccessfulRefresh, *lastRepoCheck;
-@property (nonatomic) BOOL lastUpdateFailed, preferencesDirty, isRefreshing, isManuallyScrolling, ignoreNextFocusLoss;
+@property (nonatomic) BOOL preferencesDirty, isRefreshing, isManuallyScrolling, ignoreNextFocusLoss;
 @property (nonatomic, readonly) BOOL menuIsOpen;
 @property (nonatomic) long highlightedPrIndex;
 @property (nonatomic) float scrollBarWidth;

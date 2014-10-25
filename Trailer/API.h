@@ -33,6 +33,8 @@ typedef enum {
 	kPullRequestHandlingKeepNone,
 } PRHandlingPolicy;
 
+typedef void (^completionBlockType)();
+
 #define PULL_REQUEST_ID_KEY @"pullRequestIdKey"
 #define COMMENT_ID_KEY @"commentIdKey"
 #define NOTIFICATION_URL_KEY @"urlKey"
@@ -52,10 +54,10 @@ typedef enum {
 - (void)updateLimitsFromServer;
 
 - (void)fetchRepositoriesToMoc:(NSManagedObjectContext *)moc
-				   andCallback:(void(^)(BOOL success))callback;
+				   andCallback:(completionBlockType)callback;
 
 - (void)fetchPullRequestsForActiveReposWithRepoRefresh:(BOOL)forceRepoRefresh
-										   andCallback:(void(^)(BOOL success))callback;
+										   andCallback:(completionBlockType)callback;
 
 - (void)getRateLimitFromServer:(ApiServer *)apiServer
 				   andCallback:(void(^)(long long remaining, long long limit, long long reset))callback;

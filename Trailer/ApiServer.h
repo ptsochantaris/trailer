@@ -27,6 +27,8 @@
 @property (nonatomic, retain) NSString * userName;
 @property (nonatomic, retain) NSString * webPath;
 @property (nonatomic, retain) NSDate * createdAt;
+@property (nonatomic, retain) NSNumber * lastSyncSucceeded;
+@property (nonatomic, retain) NSNumber * reportRefreshFailures;
 
 @property (nonatomic, retain) NSSet *repos;
 @property (nonatomic, retain) NSSet *comments;
@@ -34,6 +36,10 @@
 @property (nonatomic, retain) NSSet *statuses;
 
 + (ApiServer *)insertNewServerInMoc:(NSManagedObjectContext *)moc;
+
++ (void)resetSyncSuccessInMoc:(NSManagedObjectContext *)moc;
+
++ (BOOL)shouldReportRefreshFailureInMoc:(NSManagedObjectContext *)moc;
 
 + (void)ensureAtLeastGithubInMoc:(NSManagedObjectContext *)moc;
 
@@ -44,6 +50,8 @@
 + (BOOL)someServersHaveAuthTokensInMoc:(NSManagedObjectContext *)moc;
 
 + (NSUInteger)countApiServersInMoc:(NSManagedObjectContext *)moc;
+
+- (void)rollBackAllUpdatesInMoc:(NSManagedObjectContext *)moc;
 
 - (void)clearAllRelatedInfo;
 

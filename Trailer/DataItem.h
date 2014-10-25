@@ -27,7 +27,7 @@ enum PostSyncAction {
 
 + (NSArray*)newItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc;
 
-+ (void)nukeDeletedItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc;
++ (void)nukeDeletedItemsInMoc:(NSManagedObjectContext *)moc;
 
 + (NSUInteger)countItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc;
 

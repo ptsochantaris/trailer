@@ -19,7 +19,7 @@
 							dontKeepPrsMergedByMe, hideAvatars, autoParticipateInMentions,
 							dontAskBeforeWipingMerged, dontAskBeforeWipingClosed,
 							includeReposInFilter, showReposInName, hideNewRepositories,
-							dontReportRefreshFailures, groupByRepo, hideAllPrsSection,
+							groupByRepo, hideAllPrsSection,
 							showStatusItems, makeStatusItemsSelectable, moveAssignedPrsToMySection,
 							markUnmergeableOnUserSectionsOnly, countOnlyListedPrs,
 							openPrAtFirstUnreadComment, logActivityToConsole;

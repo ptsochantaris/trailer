@@ -10,12 +10,15 @@
     self = [super init];
     if (self)
 	{
-		[ApiServer ensureAtLeastGithubInMoc:self.managedObjectContext];
 		if([self versionBumpOccured])
 		{
 			DLog(@"VERSION UPDATE MAINTENANCE NEEDED");
 			[self performVersionChangedTasks];
 			[self versionBumpComplete];
+		}
+		else
+		{
+			[ApiServer ensureAtLeastGithubInMoc:self.managedObjectContext];
 		}
     }
     return self;
@@ -23,6 +26,37 @@
 
 - (void)performVersionChangedTasks
 {
+	NSUserDefaults *d = [NSUserDefaults standardUserDefaults];
+	NSString *legacyAuthToken = [d objectForKey:@"GITHUB_AUTH_TOKEN"];
+	if(legacyAuthToken)
+	{
+		NSString *legacyApiHost = [d objectForKey:@"API_BACKEND_SERVER"];
+		if(!legacyApiHost.length) legacyApiHost = @"api.github.com";
+
+		NSString *legacyApiPath = [d objectForKey:@"API_SERVER_PATH"];
+		if(!legacyApiPath) legacyApiPath = @"";
+
+		NSString *legacyWebHost = [d objectForKey:@"API_FRONTEND_SERVER"];
+		if(!legacyWebHost.length) legacyWebHost = @"github.com";
+
+		NSString *actualApiPath = [NSString stringWithFormat:@"%@/%@",legacyApiHost,legacyApiPath];
+		actualApiPath = [actualApiPath stringByReplacingOccurrencesOfString:@"//" withString:@"/"];
+
+		ApiServer *newApiServer = [ApiServer addDefaultGithubInMoc:self.managedObjectContext];
+		newApiServer.apiPath = [@"https://" stringByAppendingString:actualApiPath];
+		newApiServer.webPath = [@"https://" stringByAppendingString:legacyWebHost];
+		newApiServer.authToken = legacyAuthToken;
+
+		[d removeObjectForKey:@"API_BACKEND_SERVER"];
+		[d removeObjectForKey:@"API_SERVER_PATH"];
+		[d removeObjectForKey:@"API_FRONTEND_SERVER"];
+		[d removeObjectForKey:@"GITHUB_AUTH_TOKEN"];
+	}
+	else
+	{
+		[ApiServer ensureAtLeastGithubInMoc:self.managedObjectContext];
+	}
+
 	DLog(@"Marking all repos as dirty");
 	for(Repo *r in [Repo allItemsOfType:@"Repo" inMoc:self.managedObjectContext])
 	{
@@ -275,7 +309,10 @@
 - (BOOL)saveDB
 {
 	if(_managedObjectContext.hasChanges)
+	{
+		DLog(@"Saving DB");
 		return [_managedObjectContext save:nil];
+	}
 	return YES;
 }
 

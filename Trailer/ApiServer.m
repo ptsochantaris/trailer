@@ -29,6 +29,52 @@
 @dynamic userName;
 @dynamic webPath;
 @dynamic createdAt;
+@dynamic lastSyncSucceeded;
+@dynamic reportRefreshFailures;
+
++ (BOOL)shouldReportRefreshFailureInMoc:(NSManagedObjectContext *)moc
+{
+	for(ApiServer *apiServer in [ApiServer allApiServersInMoc:moc])
+	{
+		if(apiServer.goodToGo && !apiServer.lastSyncSucceeded.boolValue && apiServer.reportRefreshFailures.boolValue)
+		{
+			return YES;
+		}
+	}
+
+	return NO;
+}
+
+- (void)rollBackAllUpdatesInMoc:(NSManagedObjectContext *)moc
+{
+	DLog(@"Rolling back changes for failed sync on API server %@",self.label);
+	for(NSArray *items in @[self.repos, self.pullRequests, self.comments, self.statuses])
+	{
+		for(DataItem *i in items)
+		{
+			switch (i.postSyncAction.integerValue)
+			{
+				case kPostSyncDelete:
+					i.postSyncAction = @(kPostSyncDoNothing);
+					break;
+				case kPostSyncNoteNew:
+					[moc deleteObject:i];
+					break;
+				case kPostSyncNoteUpdated:
+					[moc refreshObject:i mergeChanges:NO];
+					break;
+			}
+		}
+	}
+	[moc refreshObject:self mergeChanges:NO];
+}
+
++ (void)resetSyncSuccessInMoc:(NSManagedObjectContext *)moc
+{
+	for(ApiServer *apiServer in [ApiServer allApiServersInMoc:moc])
+		if(apiServer.goodToGo)
+			apiServer.lastSyncSucceeded = @YES;
+}
 
 + (ApiServer *)insertNewServerInMoc:(NSManagedObjectContext *)moc
 {

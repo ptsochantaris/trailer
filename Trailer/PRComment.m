@@ -49,10 +49,4 @@
 	return rangeOfHandle.location != NSNotFound;
 }
 
-- (void)prepareForDeletion
-{
-	DLog(@"  Deleting comment ID %@",self.serverId);
-	[super prepareForDeletion];
-}
-
 @end

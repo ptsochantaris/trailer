@@ -29,12 +29,6 @@
 	return s;
 }
 
-- (void)prepareForDeletion
-{
-	DLog(@"  Deleting status ID %@",self.serverId);
-	[super prepareForDeletion];
-}
-
 - (COLOR_CLASS *)colorForDisplay
 {
 	static COLOR_CLASS *STATUS_RED, *STATUS_YELLOW, *STATUS_GREEN;

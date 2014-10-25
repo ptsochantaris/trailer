@@ -14,11 +14,11 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <window title="Trailer Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="371">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" resizable="YES"/>
-            <rect key="contentRect" x="335" y="390" width="782" height="433"/>
+            <rect key="contentRect" x="335" y="390" width="782" height="460"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1058"/>
-            <value key="minSize" type="size" width="782" height="433"/>
+            <value key="minSize" type="size" width="782" height="460"/>
             <view key="contentView" id="372">
-                <rect key="frame" x="0.0" y="0.0" width="782" height="433"/>
+                <rect key="frame" x="0.0" y="0.0" width="782" height="460"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <button id="qqE-Ib-sQ9">
@@ -33,24 +33,24 @@
                         </connections>
                     </button>
                     <tabView id="BIa-CQ-JTw">
-                        <rect key="frame" x="13" y="42" width="756" height="385"/>
+                        <rect key="frame" x="13" y="42" width="756" height="412"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
                             <tabViewItem label="Servers" identifier="" id="5wy-Bp-LCg">
                                 <view key="view" id="DvA-2N-fWE">
-                                    <rect key="frame" x="10" y="33" width="736" height="339"/>
+                                    <rect key="frame" x="10" y="33" width="736" height="366"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <scrollView autohidesScrollers="YES" horizontalLineScroll="26" horizontalPageScroll="10" verticalLineScroll="26" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="FYc-bT-aWh">
-                                            <rect key="frame" x="17" y="46" width="240" height="290"/>
+                                            <rect key="frame" x="17" y="46" width="240" height="317"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" heightSizable="YES"/>
                                             <clipView key="contentView" id="pwm-Da-nkm">
                                                 <rect key="frame" x="1" y="0.0" width="238" height="134"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" headerView="5D4-lm-M9R" id="hUY-Ur-mK8">
-                                                        <rect key="frame" x="0.0" y="0.0" width="238" height="19"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="238" height="26"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <size key="intercellSpacing" width="3" height="9"/>
                                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -114,10 +114,10 @@
                                             </connections>
                                         </button>
                                         <box autoresizesSubviews="NO" title="Selected Server" borderType="line" id="gYU-e1-1bO">
-                                            <rect key="frame" x="263" y="13" width="468" height="323"/>
+                                            <rect key="frame" x="263" y="13" width="468" height="350"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <view key="contentView">
-                                                <rect key="frame" x="1" y="1" width="466" height="307"/>
+                                                <rect key="frame" x="1" y="1" width="466" height="334"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button verticalHuggingPriority="750" id="AI6-bG-6Qi">
@@ -154,7 +154,7 @@
                                                         </connections>
                                                     </button>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="d1b-ec-AFd">
-                                                        <rect key="frame" x="6" y="238" width="90" height="20"/>
+                                                        <rect key="frame" x="6" y="265" width="90" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="API Path" id="NWe-cP-IBe">
                                                             <font key="font" metaFont="label"/>
@@ -163,7 +163,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="aoa-sk-XNp">
-                                                        <rect key="frame" x="6" y="206" width="90" height="20"/>
+                                                        <rect key="frame" x="6" y="233" width="90" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Web Front End" id="iPH-Rt-TPV">
                                                             <font key="font" metaFont="label"/>
@@ -172,7 +172,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="4O2-Pl-jfy">
-                                                        <rect key="frame" x="6" y="169" width="90" height="28"/>
+                                                        <rect key="frame" x="6" y="163" width="90" height="28"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" id="GAZ-fd-zs2">
                                                             <font key="font" metaFont="smallSystemBold"/>
@@ -183,7 +183,7 @@ Token</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="3oh-fk-kue">
-                                                        <rect key="frame" x="6" y="270" width="90" height="20"/>
+                                                        <rect key="frame" x="6" y="297" width="90" height="20"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Name" id="g5a-dA-Ioh">
                                                             <font key="font" metaFont="label"/>
@@ -192,7 +192,7 @@ Token</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" id="J7Y-Tt-5df">
-                                                        <rect key="frame" x="102" y="90" width="346" height="111"/>
+                                                        <rect key="frame" x="102" y="89" width="346" height="106"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="border" drawsBackground="YES" id="uXn-MX-kT2">
                                                             <font key="font" metaFont="system"/>
@@ -210,7 +210,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" id="X5B-lQ-rue">
-                                                        <rect key="frame" x="102" y="241" width="346" height="24"/>
+                                                        <rect key="frame" x="102" y="268" width="346" height="24"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="https://api.github.com" drawsBackground="YES" usesSingleLineMode="YES" id="Ziu-VQ-AnW">
                                                             <font key="font" metaFont="system"/>
@@ -222,7 +222,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" id="tHE-jI-Ndq">
-                                                        <rect key="frame" x="102" y="273" width="346" height="24"/>
+                                                        <rect key="frame" x="102" y="300" width="346" height="24"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Github" drawsBackground="YES" usesSingleLineMode="YES" id="0qH-Sb-Rfg">
                                                             <font key="font" metaFont="system"/>
@@ -234,7 +234,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </textField>
                                                     <button verticalHuggingPriority="750" id="u2V-6t-5fv">
-                                                        <rect key="frame" x="167" y="62" width="130" height="17"/>
+                                                        <rect key="frame" x="167" y="57" width="130" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                                         <buttonCell key="cell" type="inline" title="Existing Tokens" bezelStyle="inline" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Aab-ZD-hcU">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -245,7 +245,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" id="ZQ2-cS-fsn">
-                                                        <rect key="frame" x="318" y="62" width="130" height="17"/>
+                                                        <rect key="frame" x="318" y="57" width="130" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                                         <buttonCell key="cell" type="inline" title="Watchlist" bezelStyle="inline" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="X7R-e3-6dM">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -256,7 +256,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" id="s07-DL-ERX">
-                                                        <rect key="frame" x="18" y="62" width="130" height="17"/>
+                                                        <rect key="frame" x="18" y="57" width="130" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                                         <buttonCell key="cell" type="inline" title="Create Token" bezelStyle="inline" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="zqN-r3-vxd">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -267,7 +267,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </button>
                                                     <textField verticalHuggingPriority="750" id="JaO-RD-p1k">
-                                                        <rect key="frame" x="102" y="209" width="346" height="24"/>
+                                                        <rect key="frame" x="102" y="236" width="346" height="24"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="https://github.com" drawsBackground="YES" usesSingleLineMode="YES" id="nhs-BL-5Lh">
                                                             <font key="font" metaFont="system"/>
@@ -278,6 +278,17 @@ user you can add more servers from the left.</string>
                                                             <outlet property="delegate" destination="494" id="nh7-MJ-Wrk"/>
                                                         </connections>
                                                     </textField>
+                                                    <button id="dWD-uY-VLR">
+                                                        <rect key="frame" x="110" y="207" width="340" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Report problems when syncing to this server" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="Mb1-50-oB7">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="label"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="apiServerReportErrorSelected:" target="494" id="jTg-HR-KGX"/>
+                                                        </connections>
+                                                    </button>
                                                 </subviews>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
@@ -416,20 +427,9 @@ user you can add more servers from the left.</string>
                             </tabViewItem>
                             <tabViewItem label="Display" identifier="" id="ou1-pg-nes">
                                 <view key="view" id="F8e-Op-5Fv">
-                                    <rect key="frame" x="10" y="33" width="736" height="339"/>
+                                    <rect key="frame" x="10" y="33" width="736" height="366"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <button id="W7L-ge-mHy">
-                                            <rect key="frame" x="486" y="83" width="235" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Don't report failed refreshes" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="G9X-c5-EXE">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="dontReportRefreshFailuresSelected:" target="494" id="OBS-b2-HDt"/>
-                                            </connections>
-                                        </button>
                                         <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="Tbh-2L-zvn">
                                             <rect key="frame" x="703" y="14" width="19" height="27"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
@@ -465,7 +465,7 @@ user you can add more servers from the left.</string>
                                             </textFieldCell>
                                         </textField>
                                         <button id="AEB-MY-2H6">
-                                            <rect key="frame" x="51" y="210" width="419" height="18"/>
+                                            <rect key="frame" x="51" y="237" width="419" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Display PR creation time instead of most recent activity time" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="FUA-CI-tqc">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -476,7 +476,7 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="ZD1-Lw-zpW">
-                                            <rect key="frame" x="51" y="185" width="405" height="18"/>
+                                            <rect key="frame" x="51" y="212" width="405" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Move PRs assigned to me to the &quot;My Pull Requests&quot; section" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="4g6-XV-fVn">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -487,7 +487,7 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="SoW-AJ-5kD">
-                                            <rect key="frame" x="51" y="160" width="442" height="18"/>
+                                            <rect key="frame" x="51" y="187" width="442" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Mark PRs as un-mergeable only in my own or participated sections" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="yfb-m7-og2">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -498,7 +498,7 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="y7T-zw-tAa">
-                                            <rect key="frame" x="51" y="114" width="339" height="18"/>
+                                            <rect key="frame" x="51" y="141" width="339" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Count only the currently listed PRs in the menubar" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="pnZ-CL-lVd">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -509,7 +509,7 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="KdG-4v-vf7">
-                                            <rect key="frame" x="51" y="280" width="140" height="18"/>
+                                            <rect key="frame" x="51" y="307" width="140" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Hide user avatars" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="eW5-mR-deV">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -520,7 +520,7 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="4E0-iw-eoN">
-                                            <rect key="frame" x="51" y="255" width="193" height="18"/>
+                                            <rect key="frame" x="51" y="282" width="193" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Hide the &quot;All PRs&quot; section" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="JA8-t0-2Rt">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -531,7 +531,7 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="cyW-kN-E51">
-                                            <rect key="frame" x="51" y="42" width="272" height="18"/>
+                                            <rect key="frame" x="51" y="69" width="272" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Include repository names when filtering" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="iJ5-8d-ZYv">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -542,7 +542,7 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="NO0-4G-QWM">
-                                            <rect key="frame" x="51" y="68" width="238" height="18"/>
+                                            <rect key="frame" x="51" y="95" width="238" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Display repository names in PR list" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Xz9-oA-gKh">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1132,6 +1132,7 @@ Enter to select and ⌘, for preferences.
             <connections>
                 <outlet property="delegate" destination="494" id="wwK-Xp-Xzn"/>
             </connections>
+            <point key="canvasLocation" x="446" y="483"/>
         </window>
         <customObject id="494" customClass="AppDelegate">
             <connections>
@@ -1141,6 +1142,7 @@ Enter to select and ⌘, for preferences.
                 <outlet property="apiServerAuthToken" destination="J7Y-Tt-5df" id="FZ8-IW-4o5"/>
                 <outlet property="apiServerDeleteButton" destination="AI6-bG-6Qi" id="VWZ-3e-DDB"/>
                 <outlet property="apiServerName" destination="tHE-jI-Ndq" id="Ft7-jx-RoT"/>
+                <outlet property="apiServerReportError" destination="dWD-uY-VLR" id="NVd-xC-829"/>
                 <outlet property="apiServerSelectedBox" destination="gYU-e1-1bO" id="21W-Fd-qVe"/>
                 <outlet property="apiServerTestButton" destination="fYm-9p-IS1" id="qOa-iY-UqH"/>
                 <outlet property="apiServerWebPath" destination="JaO-RD-p1k" id="q30-v5-kVA"/>
@@ -1154,7 +1156,6 @@ Enter to select and ⌘, for preferences.
                 <outlet property="dontConfirmRemoveAllClosed" destination="a8N-EM-mQf" id="coj-EZ-aEM"/>
                 <outlet property="dontConfirmRemoveAllMerged" destination="fU7-ye-zZ9" id="bYB-om-tew"/>
                 <outlet property="dontKeepPrsMergedByMe" destination="sNq-fA-PLU" id="Si3-5T-6vs"/>
-                <outlet property="dontReportRefreshFailures" destination="W7L-ge-mHy" id="x06-i4-De6"/>
                 <outlet property="groupByRepo" destination="gkF-k1-8Ig" id="zua-wi-PGi"/>
                 <outlet property="hideAllPrsSection" destination="4E0-iw-eoN" id="d3m-yT-lxi"/>
                 <outlet property="hideAvatars" destination="KdG-4v-vf7" id="Ncu-kQ-2Gi"/>

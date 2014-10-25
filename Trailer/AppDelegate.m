@@ -163,12 +163,6 @@ AppDelegate *app;
 	settings.includeReposInFilter = setting;
 }
 
-- (IBAction)dontReportRefreshFailuresSelected:(NSButton *)sender
-{
-	BOOL setting = (sender.integerValue==1);
-	settings.dontReportRefreshFailures = setting;
-}
-
 - (IBAction)dontConfirmRemoveAllClosedSelected:(NSButton *)sender
 {
 	BOOL dontConfirm = (sender.integerValue==1);
@@ -766,18 +760,30 @@ AppDelegate *app;
 	[self controlTextDidChange:nil];
 
 	NSManagedObjectContext *tempContext = [self.dataManager tempContext];
-	[self.api fetchRepositoriesToMoc:tempContext andCallback:^(BOOL success) {
-		if(success)
+	[self.api fetchRepositoriesToMoc:tempContext andCallback:^{
+		if([ApiServer shouldReportRefreshFailureInMoc:tempContext])
 		{
-			[tempContext save:nil];
+			NSMutableArray *errorServers = [NSMutableArray new];
+			for(ApiServer *apiServer in [ApiServer allApiServersInMoc:tempContext])
+			{
+				if(apiServer.goodToGo && !apiServer.lastSyncSucceeded.boolValue)
+				{
+					[errorServers addObject:apiServer.label];
+				}
+			}
+
+			NSString *serverNames = [errorServers componentsJoinedByString:@", "];
+			NSString *message = [NSString stringWithFormat:@"Could not refresh repository list from %@, please ensure that the tokens you are using are valid",serverNames];
+
+			NSAlert *alert = [[NSAlert alloc] init];
+			[alert setMessageText:@"Error"];
+			[alert setInformativeText:message];
+			[alert addButtonWithTitle:@"OK"];
+			[alert runModal];
 		}
 		else
 		{
-			NSAlert *alert = [[NSAlert alloc] init];
-			[alert setMessageText:@"Error"];
-			[alert setInformativeText:@"Could not refresh repository list, please ensure that the tokens you are using are valid"];
-			[alert addButtonWithTitle:@"OK"];
-			[alert runModal];
+			[tempContext save:nil];
 		}
 		[self completeRefresh];
 	}];
@@ -805,6 +811,14 @@ AppDelegate *app;
 	[self fillServerApiFormFromSelectedServer];
 	[self updateMenu];
 	[self.dataManager saveDB];
+}
+
+
+- (IBAction)apiServerReportErrorSelected:(NSButton *)sender
+{
+	ApiServer *apiServer = [self selectedServer];
+	apiServer.reportRefreshFailures = @(sender.integerValue!=0);
+	[self storeApiFormToSelectedServer];
 }
 
 - (void)controlTextDidChange:(NSNotification *)obj
@@ -877,6 +891,7 @@ AppDelegate *app;
 	self.preferencesDirty = YES;
 	self.api.successfulRefreshesSinceLastStatusCheck = 0;
 	self.lastSuccessfulRefresh = nil;
+	self.lastRepoCheck = nil;
 	[self.projectsTable reloadData];
 	self.refreshButton.enabled = [ApiServer someServersHaveAuthTokensInMoc:self.dataManager.managedObjectContext];
 	[self updateMenu];
@@ -910,7 +925,6 @@ AppDelegate *app;
 	self.launchAtStartup.integerValue = [self isAppLoginItem];
 	self.hideAllPrsSection.integerValue = settings.hideAllPrsSection;
 	self.dontConfirmRemoveAllClosed.integerValue = settings.dontAskBeforeWipingClosed;
-	self.dontReportRefreshFailures.integerValue = settings.dontReportRefreshFailures;
 	self.displayRepositoryNames.integerValue = settings.showReposInName;
 	self.includeRepositoriesInFiltering.integerValue = settings.includeReposInFilter;
 	self.dontConfirmRemoveAllMerged.integerValue = settings.dontAskBeforeWipingMerged;
@@ -1390,10 +1404,13 @@ AppDelegate *app;
 
 - (void)tabView:(NSTabView *)tabView willSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
-	if([Repo countVisibleReposInMoc:self.dataManager.managedObjectContext]==0 &&
-	   [ApiServer someServersHaveAuthTokensInMoc:self.dataManager.managedObjectContext])
+	if([tabView indexOfTabViewItem:tabViewItem]==1)
 	{
-		[self refreshReposSelected:nil];
+		if((!self.lastRepoCheck || [Repo countVisibleReposInMoc:self.dataManager.managedObjectContext]==0) &&
+		   [ApiServer someServersHaveAuthTokensInMoc:self.dataManager.managedObjectContext])
+		{
+			[self refreshReposSelected:nil];
+		}
 	}
 }
 
@@ -1448,15 +1465,15 @@ AppDelegate *app;
 	[self.refreshNow setAction:nil];
 	[self.refreshNow setTarget:nil];
 
-	BOOL shouldRefreshReposToo = (app.lastRepoCheck && ([[NSDate date] timeIntervalSinceDate:app.lastRepoCheck] < settings.newRepoCheckPeriod*3600.0))
+	BOOL shouldRefreshReposToo = !app.lastRepoCheck
+		|| ([[NSDate date] timeIntervalSinceDate:app.lastRepoCheck] < settings.newRepoCheckPeriod*3600.0)
 		|| [Repo countVisibleReposInMoc:self.dataManager.managedObjectContext]==0;
 
 	[self.api fetchPullRequestsForActiveReposWithRepoRefresh:shouldRefreshReposToo
-												 andCallback:^(BOOL success) {
+												 andCallback:^{
 													 self.refreshNow.target = oldTarget;
 													 self.refreshNow.action = oldAction;
-													 self.lastUpdateFailed = !success;
-													 if(success)
+													 if(![ApiServer shouldReportRefreshFailureInMoc:self.dataManager.managedObjectContext])
 													 {
 														 self.lastSuccessfulRefresh = [NSDate date];
 														 self.preferencesDirty = NO;
@@ -1505,7 +1522,7 @@ AppDelegate *app;
 
 	NSString *countString;
 	NSDictionary *attributes;
-	if(self.lastUpdateFailed && (!settings.dontReportRefreshFailures))
+	if([ApiServer shouldReportRefreshFailureInMoc:moc])
 	{
 		countString = @"X";
 		attributes = @{
@@ -1697,6 +1714,7 @@ AppDelegate *app;
 	self.apiServerSelectedBox.title = apiServer.label ? apiServer.label : @"New Server";
 	self.apiServerTestButton.enabled = (apiServer.authToken.length>0);
 	self.apiServerDeleteButton.enabled = ([ApiServer countApiServersInMoc:self.dataManager.managedObjectContext]>1);
+	self.apiServerReportError.integerValue = apiServer.reportRefreshFailures.boolValue;
 }
 
 - (void)storeApiFormToSelectedServer

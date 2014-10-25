@@ -343,12 +343,6 @@ static NSDateFormatter *itemDateFormatter;
 	return count;
 }
 
-- (void)prepareForDeletion
-{
-	DLog(@"  Deleting PR ID %@",self.serverId);
-	[super prepareForDeletion];
-}
-
 - (void)catchUpWithComments
 {
 	for(PRComment *c in self.comments)

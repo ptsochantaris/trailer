@@ -266,12 +266,6 @@ Settings *settings;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define DONT_REPORT_REFRESH_FAILURES @"DONT_REPORT_REFRESH_FAILURES"
-- (void)setDontReportRefreshFailures:(BOOL)dontReportRefreshFailures { [self storeDefaultValue:@(dontReportRefreshFailures) forKey:DONT_REPORT_REFRESH_FAILURES]; }
-- (BOOL)dontReportRefreshFailures { return [[self defaultValueForKey:DONT_REPORT_REFRESH_FAILURES] boolValue]; }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 #define GROUP_BY_REPO @"GROUP_BY_REPO"
 - (void)setGroupByRepo:(BOOL)groupByRepo { [self storeDefaultValue:@(groupByRepo) forKey:GROUP_BY_REPO]; }
 - (BOOL)groupByRepo { return [[self defaultValueForKey:GROUP_BY_REPO] boolValue]; }

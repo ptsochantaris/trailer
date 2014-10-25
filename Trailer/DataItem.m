@@ -20,6 +20,12 @@ NSDateFormatter *_syncDateFormatter;
 	});
 }
 
+- (void)prepareForDeletion
+{
+	if(self.postSyncAction.integerValue==kPostSyncDelete) DLog(@"Deleting %@ ID: %@",self.entity.name,self.serverId);
+	[super prepareForDeletion];
+}
+
 + (NSArray *)allItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:type];
@@ -77,13 +83,14 @@ NSDateFormatter *_syncDateFormatter;
 + (NSArray*)itemsOfType:(NSString *)type surviving:(BOOL)survivingItems inMoc:(NSManagedObjectContext *)moc
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:type];
-	f.returnsObjectsAsFaults = NO;
 	if(survivingItems)
 	{
+		f.returnsObjectsAsFaults = NO;
 		f.predicate = [NSPredicate predicateWithFormat:@"postSyncAction != %d",kPostSyncDelete];
 	}
 	else
 	{
+		f.returnsObjectsAsFaults = YES;
 		f.predicate = [NSPredicate predicateWithFormat:@"postSyncAction = %d",kPostSyncDelete];
 	}
 	return [moc executeFetchRequest:f error:nil];
@@ -113,15 +120,21 @@ NSDateFormatter *_syncDateFormatter;
 	return [moc executeFetchRequest:f error:nil];
 }
 
-+ (void)nukeDeletedItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
++ (void)nukeDeletedItemsInMoc:(NSManagedObjectContext *)moc
 {
-	NSArray *untouchedItems = [self itemsOfType:type surviving:NO inMoc:moc];
-	for(DataItem *i in untouchedItems)
+	NSArray *types = @[@"Repo", @"PullRequest", @"PRStatus", @"PRComment"];
+	unsigned long count=0;
+	for(NSString *type in types)
 	{
-		DLog(@"Nuking %@: %@",type,i.serverId);
-		[moc deleteObject:i];
+		NSArray *discarded = [self itemsOfType:type surviving:NO inMoc:moc];
+		count += discarded.count;
+		for(DataItem *i in discarded)
+		{
+			DLog(@"Nuking unused %@: %@",type,i.serverId);
+			[moc deleteObject:i];
+		}
 	}
-	if(untouchedItems.count>0) DLog(@"Nuked %lu %@ items",(unsigned long)untouchedItems.count,type);
+	DLog(@"Nuked %lu deleted items in total",count);
 }
 
 + (NSUInteger)countItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc

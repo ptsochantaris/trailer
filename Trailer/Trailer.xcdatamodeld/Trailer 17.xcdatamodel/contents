@@ -5,10 +5,12 @@
         <attribute name="authToken" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="createdAt" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="label" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="lastSyncSucceeded" optional="YES" attributeType="Boolean" defaultValueString="YES" syncable="YES"/>
         <attribute name="latestReceivedEventDateProcessed" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="latestReceivedEventEtag" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="latestUserEventDateProcessed" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="latestUserEventEtag" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="reportRefreshFailures" attributeType="Boolean" defaultValueString="YES" syncable="YES"/>
         <attribute name="requestsLimit" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
         <attribute name="requestsRemaining" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
         <attribute name="resetDate" optional="YES" attributeType="Date" syncable="YES"/>
@@ -116,10 +118,10 @@
         </compoundIndexes>
     </entity>
     <elements>
-        <element name="ApiServer" positionX="9" positionY="153" width="128" height="315"/>
+        <element name="ApiServer" positionX="9" positionY="153" width="128" height="345"/>
         <element name="PRComment" positionX="0" positionY="0" width="128" height="253"/>
-        <element name="PRStatus" positionX="0" positionY="0" width="128" height="223"/>
-        <element name="PullRequest" positionX="0" positionY="0" width="128" height="523"/>
+        <element name="PRStatus" positionX="0" positionY="0" width="128" height="225"/>
+        <element name="PullRequest" positionX="0" positionY="0" width="128" height="525"/>
         <element name="Repo" positionX="0" positionY="0" width="128" height="240"/>
     </elements>
 </model>
