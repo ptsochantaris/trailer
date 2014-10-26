@@ -44,8 +44,6 @@ typedef void (^completionBlockType)();
 #define NETWORK_TIMEOUT 120.0
 #define BACKOFF_STEP 120.0
 
-@class ApiServer;
-
 @interface API : NSObject
 
 @property (nonatomic) Reachability *reachability;
@@ -56,8 +54,7 @@ typedef void (^completionBlockType)();
 - (void)fetchRepositoriesToMoc:(NSManagedObjectContext *)moc
 				   andCallback:(completionBlockType)callback;
 
-- (void)fetchPullRequestsForActiveReposWithRepoRefresh:(BOOL)forceRepoRefresh
-										   andCallback:(completionBlockType)callback;
+- (void)fetchPullRequestsForActiveReposAndCallback:(completionBlockType)callback;
 
 - (void)getRateLimitFromServer:(ApiServer *)apiServer
 				   andCallback:(void(^)(long long remaining, long long limit, long long reset))callback;

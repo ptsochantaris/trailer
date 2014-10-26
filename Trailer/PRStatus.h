@@ -1,6 +1,4 @@
 
-@class PullRequest;
-
 @interface PRStatus : DataItem
 
 @property (nonatomic, retain) NSString * state;

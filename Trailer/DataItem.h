@@ -1,4 +1,6 @@
 
+@class ApiServer;
+
 enum PostSyncAction {
 	kPostSyncDoNothing = 0,
 	kPostSyncDelete,

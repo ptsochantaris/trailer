@@ -1,6 +1,4 @@
 
-@class PullRequest;
-
 @interface Repo : DataItem
 
 @property (nonatomic, retain) NSString * fullName;

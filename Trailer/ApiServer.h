@@ -1,15 +1,3 @@
-//
-//  ApiServer.h
-//  Trailer
-//
-//  Created by Paul Tsochantaris on 18/10/14.
-//  Copyright (c) 2014 HouseTrip. All rights reserved.
-//
-
-#import <Foundation/Foundation.h>
-#import <CoreData/CoreData.h>
-
-@class Repo, PRComment, PullRequest, PRStatus;
 
 @interface ApiServer : NSManagedObject
 

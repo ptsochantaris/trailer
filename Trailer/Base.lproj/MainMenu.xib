@@ -192,7 +192,7 @@ Token</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" id="J7Y-Tt-5df">
-                                                        <rect key="frame" x="102" y="89" width="346" height="106"/>
+                                                        <rect key="frame" x="102" y="77" width="346" height="118"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="border" drawsBackground="YES" id="uXn-MX-kT2">
                                                             <font key="font" metaFont="system"/>
@@ -234,7 +234,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </textField>
                                                     <button verticalHuggingPriority="750" id="u2V-6t-5fv">
-                                                        <rect key="frame" x="167" y="57" width="130" height="17"/>
+                                                        <rect key="frame" x="167" y="52" width="130" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                                         <buttonCell key="cell" type="inline" title="Existing Tokens" bezelStyle="inline" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Aab-ZD-hcU">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -245,7 +245,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" id="ZQ2-cS-fsn">
-                                                        <rect key="frame" x="318" y="57" width="130" height="17"/>
+                                                        <rect key="frame" x="318" y="52" width="130" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                                         <buttonCell key="cell" type="inline" title="Watchlist" bezelStyle="inline" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="X7R-e3-6dM">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -256,7 +256,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" id="s07-DL-ERX">
-                                                        <rect key="frame" x="18" y="57" width="130" height="17"/>
+                                                        <rect key="frame" x="18" y="52" width="130" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                                         <buttonCell key="cell" type="inline" title="Create Token" bezelStyle="inline" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="zqN-r3-vxd">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -299,7 +299,7 @@ user you can add more servers from the left.</string>
                             </tabViewItem>
                             <tabViewItem label="Repositories" identifier="1" id="Eyw-jb-YPT">
                                 <view key="view" id="FS2-21-75e">
-                                    <rect key="frame" x="10" y="33" width="736" height="339"/>
+                                    <rect key="frame" x="10" y="33" width="736" height="366"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <button id="7nq-Rp-N5H">
@@ -314,7 +314,7 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="yLA-OX-5oO">
-                                            <rect key="frame" x="17" y="67" width="709" height="269"/>
+                                            <rect key="frame" x="17" y="67" width="709" height="296"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <clipView key="contentView" id="xVQ-Jm-WCh">
                                                 <rect key="frame" x="1" y="17" width="684" height="152"/>

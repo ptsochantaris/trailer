@@ -17,4 +17,10 @@
 	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:url]];
 }
 
+- (IBAction)done:(UIBarButtonItem *)sender
+{
+	if(app.preferencesDirty) [app startRefresh];
+	[self dismissViewControllerAnimated:YES completion:nil];
+}
+
 @end

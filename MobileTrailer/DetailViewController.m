@@ -93,7 +93,7 @@ static DetailViewController *_detail_shared_ref;
 	if(res.statusCode==404)
 	{
 		[[[UIAlertView alloc] initWithTitle:@"Not Found"
-									message:[NSString stringWithFormat:@"\nPlease ensure you are logged in with the '%@' account on GitHub\n\nIf you are using two-factor auth: There is a bug between Github and iOS which may cause your login to fail.  If it happens, temporarily disable two-factor auth and log in from here, then re-enable it afterwards.  You will only need to do this once.",settings.localUser]
+									message:@"\nPlease ensure you are logged in with the correct account on GitHub\n\nIf you are using two-factor auth: There is a bug between Github and iOS which may cause your login to fail.  If it happens, temporarily disable two-factor auth and log in from here, then re-enable it afterwards.  You will only need to do this once."
 								   delegate:nil
 						  cancelButtonTitle:@"OK"
 						  otherButtonTitles:nil] show];

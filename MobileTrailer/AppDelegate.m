@@ -46,7 +46,8 @@ AppDelegate *app;
 
 	[self.dataManager postProcessAllPrs];
 
-	if(settings.authToken.length) [self.api updateLimitFromServer];
+	if([ApiServer someServersHaveAuthTokensInMoc:self.dataManager.managedObjectContext])
+		[self.api updateLimitsFromServer];
 
 	UISplitViewController *splitViewController = (UISplitViewController *)self.window.rootViewController;
 	splitViewController.minimumPrimaryColumnWidth = 320;
@@ -68,7 +69,7 @@ AppDelegate *app;
 	double delayInSeconds = 0.1;
 	dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
 	dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-		if([Repo visibleReposInMoc:self.dataManager.managedObjectContext]>0 && [ApiServer allServersHaveAuthTokensInMoc:self.dataManager.managedObjectContext])
+		if([Repo visibleReposInMoc:self.dataManager.managedObjectContext]>0 && [ApiServer someServersHaveAuthTokensInMoc:self.dataManager.managedObjectContext])
 		{
 			if(localNotification) [self handleLocalNotification:localNotification];
 		}
@@ -189,25 +190,27 @@ collapseSecondaryViewController:(UIViewController *)secondaryViewController
 
 - (void)checkApiUsage
 {
-	if(settings.authToken.length==0) return;
-	if(self.api.requestsLimit>0)
+	for(ApiServer *apiServer in [ApiServer allApiServersInMoc:self.dataManager.managedObjectContext])
 	{
-		if(self.api.requestsRemaining==0)
+		if(apiServer.goodToGo && apiServer.requestsLimit.doubleValue>0)
 		{
-			[[[UIAlertView alloc] initWithTitle:@"Your API request usage is over the limit!"
-										message:[NSString stringWithFormat:@"Your request cannot be completed until GitHub resets your hourly API allowance at %@.\n\nIf you get this error often, try to make fewer manual refreshes or reducing the number of repos you are monitoring.\n\nYou can check your API usage at any time from the bottom of the preferences pane at any time.",self.api.resetDate]
-									   delegate:nil
-							  cancelButtonTitle:@"OK"
-							  otherButtonTitles:nil] show];
-			return;
-		}
-		else if((self.api.requestsRemaining/self.api.requestsLimit)<LOW_API_WARNING)
-		{
-			[[[UIAlertView alloc] initWithTitle:@"Your API request usage is close to full"
-										message:[NSString stringWithFormat:@"Try to make fewer manual refreshes, increasing the automatic refresh time, or reducing the number of repos you are monitoring.\n\nYour allowance will be reset by Github on %@.\n\nYou can check your API usage from the bottom of the preferences pane.",self.api.resetDate]
-									   delegate:nil
-							  cancelButtonTitle:@"OK"
-							  otherButtonTitles:nil] show];
+			if(apiServer.requestsRemaining.doubleValue==0)
+			{
+				[[[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ API request usage is over the limit!",apiServer.label]
+											message:[NSString stringWithFormat:@"Your request cannot be completed until GitHub resets your hourly API allowance at %@.\n\nIf you get this error often, try to make fewer manual refreshes or reducing the number of repos you are monitoring.\n\nYou can check your API usage at any time from the bottom of the preferences pane at any time.",apiServer.resetDate]
+										   delegate:nil
+								  cancelButtonTitle:@"OK"
+								  otherButtonTitles:nil] show];
+				return;
+			}
+			else if((apiServer.requestsRemaining.doubleValue/apiServer.requestsLimit.doubleValue)<LOW_API_WARNING)
+			{
+				[[[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ API request usage is close to full",apiServer.label]
+											message:[NSString stringWithFormat:@"Try to make fewer manual refreshes, increasing the automatic refresh time, or reducing the number of repos you are monitoring.\n\nYour allowance will be reset by Github on %@.\n\nYou can check your API usage from the bottom of the preferences pane.",apiServer.resetDate]
+										   delegate:nil
+								  cancelButtonTitle:@"OK"
+								  otherButtonTitles:nil] show];
+			}
 		}
 	}
 }
@@ -240,11 +243,12 @@ collapseSecondaryViewController:(UIViewController *)secondaryViewController
 
 	if([app.api.reachability currentReachabilityStatus]==NotReachable) return;
 
-	if(settings.authToken.length==0) return;
+	if(![ApiServer someServersHaveAuthTokensInMoc:self.dataManager.managedObjectContext]) return;
 
 	[self prepareForRefresh];
 
-	[self.api fetchPullRequestsForActiveReposAndCallback:^(BOOL success) {
+	[self.api fetchPullRequestsForActiveReposAndCallback:^{
+		BOOL success = ![ApiServer shouldReportRefreshFailureInMoc:self.dataManager.managedObjectContext];
 		self.lastUpdateFailed = !success;
 		BOOL hasNewData = (success && self.dataManager.managedObjectContext.hasChanges);
 		if(success)
@@ -275,14 +279,11 @@ collapseSecondaryViewController:(UIViewController *)secondaryViewController
 
 		if(!success && [UIApplication sharedApplication].applicationState==UIApplicationStateActive)
 		{
-			if(!settings.dontReportRefreshFailures)
-			{
-				[[[UIAlertView alloc] initWithTitle:@"Refresh failed"
-											message:@"Loading the latest data from Github failed"
-										   delegate:nil
-								  cancelButtonTitle:@"OK"
-								  otherButtonTitles:nil] show];
-			}
+			[[[UIAlertView alloc] initWithTitle:@"Refresh failed"
+										message:@"Loading the latest data from Github failed"
+									   delegate:nil
+							  cancelButtonTitle:@"OK"
+							  otherButtonTitles:nil] show];
 		}
 
 		self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:settings.refreshPeriod
@@ -296,7 +297,8 @@ collapseSecondaryViewController:(UIViewController *)secondaryViewController
 
 - (void)refreshTimerDone
 {
-	if(settings.localUserId && settings.authToken.length)
+	NSManagedObjectContext *moc = self.dataManager.managedObjectContext;
+	if([ApiServer someServersHaveAuthTokensInMoc:moc] && ([Repo countVisibleReposInMoc:moc]>0))
 	{
 		[self startRefresh];
 	}

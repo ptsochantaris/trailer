@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		1604D4CF189541D70064A385 /* EmptyView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1604D4CE189541D70064A385 /* EmptyView.m */; };
-		1604D4D2189548350064A385 /* ApiServerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1604D4D1189548350064A385 /* ApiServerViewController.m */; };
 		16075A9717EC7492000D86FD /* API.m in Sources */ = {isa = PBXBuildFile; fileRef = 16075A9617EC7492000D86FD /* API.m */; };
 		160C5AC61867551500142482 /* CenteredTextFieldCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 160C5AC51867551500142482 /* CenteredTextFieldCell.m */; };
 		160C5ACF18675E9300142482 /* CenteredTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 160C5ACE18675E9300142482 /* CenteredTextField.m */; };
@@ -31,7 +30,7 @@
 		1628A6D618789E73005EDA69 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1628A6D518789E73005EDA69 /* Images.xcassets */; };
 		1628A6F81878A171005EDA69 /* DataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1628A6F71878A171005EDA69 /* DataManager.m */; };
 		1628A6F91878A171005EDA69 /* DataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1628A6F71878A171005EDA69 /* DataManager.m */; };
-		1628A6FC1878B64E005EDA69 /* PreferencesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1628A6FB1878B64E005EDA69 /* PreferencesViewController.m */; };
+		1628A6FC1878B64E005EDA69 /* RespositoriesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1628A6FB1878B64E005EDA69 /* RespositoriesViewController.m */; };
 		1628A6FD1878B804005EDA69 /* HTPopTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = 168A5C7A185C922300CB6B02 /* HTPopTimer.m */; };
 		1628A7001878B810005EDA69 /* API.m in Sources */ = {isa = PBXBuildFile; fileRef = 16075A9617EC7492000D86FD /* API.m */; };
 		1628A7021878BC18005EDA69 /* PRComment.m in Sources */ = {isa = PBXBuildFile; fileRef = 161CA3C917F5B1F300F4AF6C /* PRComment.m */; };
@@ -73,6 +72,8 @@
 		168BC6C917EC2DF000BC4584 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 168BC6C817EC2DF000BC4584 /* Images.xcassets */; };
 		168C6ECE18B2104100E41D85 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 168C6ECC18B2104100E41D85 /* LICENSE */; };
 		168C6ECF18B2104100E41D85 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 168C6ECD18B2104100E41D85 /* README.md */; };
+		1694372619FD3F4D005079F6 /* ServersViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1694372519FD3F4D005079F6 /* ServersViewController.m */; };
+		1694372919FD4056005079F6 /* ServerDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1694372819FD4056005079F6 /* ServerDetailViewController.m */; };
 		169CEB9C1879D5BB0083A068 /* AdvancedSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 169CEB9B1879D5BB0083A068 /* AdvancedSettingsViewController.m */; };
 		16B94072182D136700F32061 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 16B94070182D136700F32061 /* dsa_pub.pem */; };
 		16B9553617EC89B50005118F /* DataItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B9553517EC89B50005118F /* DataItem.m */; };
@@ -100,8 +101,6 @@
 /* Begin PBXFileReference section */
 		1604D4CD189541D70064A385 /* EmptyView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmptyView.h; sourceTree = "<group>"; };
 		1604D4CE189541D70064A385 /* EmptyView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EmptyView.m; sourceTree = "<group>"; };
-		1604D4D0189548350064A385 /* ApiServerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ApiServerViewController.h; sourceTree = "<group>"; };
-		1604D4D1189548350064A385 /* ApiServerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ApiServerViewController.m; sourceTree = "<group>"; };
 		16075A9517EC7492000D86FD /* API.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = API.h; path = Trailer/API.h; sourceTree = "<group>"; };
 		16075A9617EC7492000D86FD /* API.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = API.m; path = Trailer/API.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		16096DC518927C4C0016357A /* Trailer 6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 6.xcdatamodel"; sourceTree = "<group>"; };
@@ -141,8 +140,8 @@
 		1628A6D518789E73005EDA69 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		1628A6F61878A171005EDA69 /* DataManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataManager.h; sourceTree = "<group>"; };
 		1628A6F71878A171005EDA69 /* DataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataManager.m; sourceTree = "<group>"; };
-		1628A6FA1878B64E005EDA69 /* PreferencesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreferencesViewController.h; sourceTree = "<group>"; };
-		1628A6FB1878B64E005EDA69 /* PreferencesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreferencesViewController.m; sourceTree = "<group>"; };
+		1628A6FA1878B64E005EDA69 /* RespositoriesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RespositoriesViewController.h; sourceTree = "<group>"; };
+		1628A6FB1878B64E005EDA69 /* RespositoriesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RespositoriesViewController.m; sourceTree = "<group>"; };
 		162D96F91913F0E7000A54EA /* Trailer 11.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 11.xcdatamodel"; sourceTree = "<group>"; };
 		163D880C18DC750B0075F77E /* HTApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HTApplication.h; sourceTree = "<group>"; };
 		163D880D18DC750C0075F77E /* HTApplication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HTApplication.m; sourceTree = "<group>"; };
@@ -197,6 +196,10 @@
 		168BC6C817EC2DF000BC4584 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		168C6ECC18B2104100E41D85 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		168C6ECD18B2104100E41D85 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
+		1694372419FD3F4D005079F6 /* ServersViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServersViewController.h; sourceTree = "<group>"; };
+		1694372519FD3F4D005079F6 /* ServersViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServersViewController.m; sourceTree = "<group>"; };
+		1694372719FD4056005079F6 /* ServerDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerDetailViewController.h; sourceTree = "<group>"; };
+		1694372819FD4056005079F6 /* ServerDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServerDetailViewController.m; sourceTree = "<group>"; };
 		169CEB99187988D00083A068 /* Trailer 4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 4.xcdatamodel"; sourceTree = "<group>"; };
 		169CEB9A1879D5BB0083A068 /* AdvancedSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdvancedSettingsViewController.h; sourceTree = "<group>"; };
 		169CEB9B1879D5BB0083A068 /* AdvancedSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdvancedSettingsViewController.m; sourceTree = "<group>"; };
@@ -503,18 +506,20 @@
 			children = (
 				169CEB9A1879D5BB0083A068 /* AdvancedSettingsViewController.h */,
 				169CEB9B1879D5BB0083A068 /* AdvancedSettingsViewController.m */,
-				1628A6FA1878B64E005EDA69 /* PreferencesViewController.h */,
-				1628A6FB1878B64E005EDA69 /* PreferencesViewController.m */,
+				1628A6FA1878B64E005EDA69 /* RespositoriesViewController.h */,
+				1628A6FB1878B64E005EDA69 /* RespositoriesViewController.m */,
 				16C54F921881639B00849B76 /* GithubViewController.h */,
 				16C54F931881639B00849B76 /* GithubViewController.m */,
 				16FD14D51881CBC400FDC960 /* PickerViewController.h */,
 				16FD14D61881CBC400FDC960 /* PickerViewController.m */,
 				164047081882ED0000A4AC9C /* AboutTrailerViewController.h */,
 				164047091882ED0000A4AC9C /* AboutTrailerViewController.m */,
-				1604D4D0189548350064A385 /* ApiServerViewController.h */,
-				1604D4D1189548350064A385 /* ApiServerViewController.m */,
 				16EE561E19B78DBA0031DF6D /* CommentBlacklistViewController.h */,
 				16EE561F19B78DBA0031DF6D /* CommentBlacklistViewController.m */,
+				1694372419FD3F4D005079F6 /* ServersViewController.h */,
+				1694372519FD3F4D005079F6 /* ServersViewController.m */,
+				1694372719FD4056005079F6 /* ServerDetailViewController.h */,
+				1694372819FD4056005079F6 /* ServerDetailViewController.m */,
 			);
 			name = Settings;
 			sourceTree = "<group>";
@@ -632,7 +637,6 @@
 			files = (
 				1665B6661882F24400972111 /* UINavigationController+DismissKeyboard.m in Sources */,
 				1665B66E1882F29E00972111 /* Settings.m in Sources */,
-				1604D4D2189548350064A385 /* ApiServerViewController.m in Sources */,
 				1628A7041878BC18005EDA69 /* Repo.m in Sources */,
 				1628A70B1878D2B2005EDA69 /* NSDictionary+NSDictionary_OFK.m in Sources */,
 				166F29E219F2B1F300A083E3 /* ApiServer.m in Sources */,
@@ -640,14 +644,16 @@
 				1628A6D418789E73005EDA69 /* DetailViewController.m in Sources */,
 				16616680189BC47F00FBF4E0 /* PRStatus.m in Sources */,
 				1628A6D118789E73005EDA69 /* MasterViewController.m in Sources */,
+				1694372619FD3F4D005079F6 /* ServersViewController.m in Sources */,
 				1628A7081878BC32005EDA69 /* Reachability.m in Sources */,
 				1628A7001878B810005EDA69 /* API.m in Sources */,
 				1628A6C518789E73005EDA69 /* AppDelegate.m in Sources */,
 				1628A7061878BC18005EDA69 /* DataItem.m in Sources */,
 				16EE562019B78DBA0031DF6D /* CommentBlacklistViewController.m in Sources */,
 				1640470A1882ED0000A4AC9C /* AboutTrailerViewController.m in Sources */,
-				1628A6FC1878B64E005EDA69 /* PreferencesViewController.m in Sources */,
+				1628A6FC1878B64E005EDA69 /* RespositoriesViewController.m in Sources */,
 				1665B66A1882F29300972111 /* NSString+Extensions.m in Sources */,
+				1694372919FD4056005079F6 /* ServerDetailViewController.m in Sources */,
 				16C54F941881639B00849B76 /* GithubViewController.m in Sources */,
 				1628A6F91878A171005EDA69 /* DataManager.m in Sources */,
 				1628A7071878BC23005EDA69 /* Trailer.xcdatamodeld in Sources */,
@@ -786,6 +792,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
@@ -820,6 +827,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;

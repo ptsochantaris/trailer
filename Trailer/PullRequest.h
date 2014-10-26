@@ -16,7 +16,7 @@
 
 #define kPullRequestSectionNames @[@"", @"Mine", @"Participated", @"Recently Merged", @"Recently Closed", @"All Pull Requests"]
 
-@class PRComment, PRStatus;
+@class Repo, PRComment, PRStatus;
 
 @interface PullRequest : DataItem
 

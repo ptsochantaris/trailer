@@ -1379,9 +1379,9 @@ AppDelegate *app;
 {
 	for(ApiServer *apiServer in [ApiServer allApiServersInMoc:self.dataManager.managedObjectContext])
 	{
-		if(apiServer.requestsLimit.integerValue>0)
+		if(apiServer.requestsLimit.doubleValue>0)
 		{
-			if(apiServer.requestsRemaining.integerValue==0)
+			if(apiServer.requestsRemaining.doubleValue==0)
 			{
 				NSAlert *alert = [[NSAlert alloc] init];
 				[alert setMessageText:[NSString stringWithFormat:@"Your API request usage for '%@' is over the limit!",apiServer.label]];
@@ -1390,7 +1390,7 @@ AppDelegate *app;
 				[alert runModal];
 				return;
 			}
-			else if((apiServer.requestsRemaining.floatValue/apiServer.requestsLimit.floatValue)<LOW_API_WARNING)
+			else if((apiServer.requestsRemaining.doubleValue/apiServer.requestsLimit.doubleValue)<LOW_API_WARNING)
 			{
 				NSAlert *alert = [[NSAlert alloc] init];
 				[alert setMessageText:[NSString stringWithFormat:@"Your API request usage for '%@' is close to full",apiServer.label]];
@@ -1465,26 +1465,21 @@ AppDelegate *app;
 	[self.refreshNow setAction:nil];
 	[self.refreshNow setTarget:nil];
 
-	BOOL shouldRefreshReposToo = !app.lastRepoCheck
-		|| ([[NSDate date] timeIntervalSinceDate:app.lastRepoCheck] < settings.newRepoCheckPeriod*3600.0)
-		|| [Repo countVisibleReposInMoc:self.dataManager.managedObjectContext]==0;
-
-	[self.api fetchPullRequestsForActiveReposWithRepoRefresh:shouldRefreshReposToo
-												 andCallback:^{
-													 self.refreshNow.target = oldTarget;
-													 self.refreshNow.action = oldAction;
-													 if(![ApiServer shouldReportRefreshFailureInMoc:self.dataManager.managedObjectContext])
-													 {
-														 self.lastSuccessfulRefresh = [NSDate date];
-														 self.preferencesDirty = NO;
-													 }
-													 [self completeRefresh];
-													 self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:settings.refreshPeriod
-																										  target:self
-																										selector:@selector(refreshTimerDone)
-																										userInfo:nil
-																										 repeats:NO];
-												 }];
+	[self.api fetchPullRequestsForActiveReposAndCallback:^{
+		self.refreshNow.target = oldTarget;
+		self.refreshNow.action = oldAction;
+		if(![ApiServer shouldReportRefreshFailureInMoc:self.dataManager.managedObjectContext])
+		{
+			self.lastSuccessfulRefresh = [NSDate date];
+			self.preferencesDirty = NO;
+		}
+		[self completeRefresh];
+		self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:settings.refreshPeriod
+															 target:self
+														   selector:@selector(refreshTimerDone)
+														   userInfo:nil
+															repeats:NO];
+	}];
 }
 
 - (void)refreshMainWithTarget:(id)oldTarget action:(SEL)oldaction
@@ -1506,7 +1501,8 @@ AppDelegate *app;
 
 - (void)refreshTimerDone
 {
-	if([ApiServer someServersHaveAuthTokensInMoc:self.dataManager.managedObjectContext])
+	NSManagedObjectContext *moc = self.dataManager.managedObjectContext;
+	if([ApiServer someServersHaveAuthTokensInMoc:moc] && ([Repo countVisibleReposInMoc:moc]>0))
 	{
 		[self startRefresh];
 	}
@@ -1702,6 +1698,7 @@ AppDelegate *app;
 	ApiServer *apiServer = [self selectedServer];
 	[apiServer resetToGithub];
 	[self fillServerApiFormFromSelectedServer];
+	[self storeApiFormToSelectedServer];
 }
 
 - (void)fillServerApiFormFromSelectedServer

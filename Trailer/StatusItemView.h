@@ -4,11 +4,8 @@
 
 #define STATUSITEM_PADDING 1.0
 
-
 @protocol StatusItemDelegate <NSObject>
-
 - (void)statusItemTapped:(StatusItemView *)statusItem;
-
 @end
 
 

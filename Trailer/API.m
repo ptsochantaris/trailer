@@ -405,11 +405,15 @@
 	  }];
 }
 
-- (void)fetchPullRequestsForActiveReposWithRepoRefresh:(BOOL)doRepoRefresh
-										   andCallback:(completionBlockType)callback
+- (void)fetchPullRequestsForActiveReposAndCallback:(completionBlockType)callback
 {
 	NSManagedObjectContext *syncContext = [app.dataManager tempContext];
-	if(doRepoRefresh)
+
+	BOOL shouldRefreshReposToo = !app.lastRepoCheck
+	|| ([[NSDate date] timeIntervalSinceDate:app.lastRepoCheck] < settings.newRepoCheckPeriod*3600.0)
+	|| [Repo countVisibleReposInMoc:syncContext]==0;
+
+	if(shouldRefreshReposToo)
 	{
 		[self fetchRepositoriesToMoc:syncContext andCallback:^{
 			[self syncToMoc:syncContext andCallback:callback];

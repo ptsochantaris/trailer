@@ -47,9 +47,4 @@
 	[self.spinner startAnimating];
 }
 
-- (IBAction)ipadDone:(UIBarButtonItem *)sender
-{
-	[self dismissViewControllerAnimated:YES completion:nil];
-}
-
 @end

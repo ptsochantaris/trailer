@@ -1,12 +1,3 @@
-//
-//  ApiServer.m
-//  Trailer
-//
-//  Created by Paul Tsochantaris on 18/10/14.
-//  Copyright (c) 2014 HouseTrip. All rights reserved.
-//
-
-#import "ApiServer.h"
 
 @implementation ApiServer
 
