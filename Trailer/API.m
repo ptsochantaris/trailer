@@ -924,6 +924,7 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 
 - (void)testApiToServer:(ApiServer *)apiServer andCallback:(void (^)(NSError *))callback
 {
+	apiServer.lastSyncSucceeded = @YES;
 	[self get:@"/rate_limit"
    fromServer:apiServer
    parameters:nil
