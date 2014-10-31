@@ -15,9 +15,9 @@
 			<pubDate>Fri, 31 Oct 2014 09:00:00 +0000</pubDate>
 			<enclosure
 			url="http://dev.housetrip.com/trailer/trailer110.zip"
-			sparkle:version="1149"
+			sparkle:version="1150"
 			sparkle:shortVersionString="1.1.0"
-			sparkle:dsaSignature="MCwCFCDB06zQBf+DnXqwwc0yYUjJxlM4AhQHwfA4v9wKIgE5wBssszSSAXzMuQ=="
+			sparkle:dsaSignature="MC0CFFlsUvZEU73/NPVDIGzj3DZJA9JLAhUA2fGb2u8bARriCkqcPqv4MCQA9oo="
 			type="application/octet-stream"/>
 		</item>
 
