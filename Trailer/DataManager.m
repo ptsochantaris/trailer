@@ -46,6 +46,7 @@
 		newApiServer.apiPath = [@"https://" stringByAppendingString:actualApiPath];
 		newApiServer.webPath = [@"https://" stringByAppendingString:legacyWebHost];
 		newApiServer.authToken = legacyAuthToken;
+		newApiServer.lastSyncSucceeded = @YES;
 
 		[d removeObjectForKey:@"API_BACKEND_SERVER"];
 		[d removeObjectForKey:@"API_SERVER_PATH"];
