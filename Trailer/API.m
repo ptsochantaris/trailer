@@ -344,6 +344,7 @@
 
 	[self get:[NSString stringWithFormat:@"/repos/%@/pulls/%@", r.repo.fullName, r.number]
    fromServer:r.apiServer
+ignoreLastSync:NO
    parameters:nil
  extraHeaders:nil
 	  success:^(NSHTTPURLResponse *response, id data) {
@@ -879,6 +880,7 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 {
 	[self get:path
    fromServer:apiServer
+ignoreLastSync:NO
    parameters:params
  extraHeaders:extraHeaders
 	  success:^(NSHTTPURLResponse *response, id data) {
@@ -904,6 +906,7 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 {
 	[self get:@"/rate_limit"
    fromServer:apiServer
+ignoreLastSync:YES
    parameters:nil
  extraHeaders:nil
 	  success:^(NSHTTPURLResponse *response, id data) {
@@ -924,9 +927,9 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 
 - (void)testApiToServer:(ApiServer *)apiServer andCallback:(void (^)(NSError *))callback
 {
-	apiServer.lastSyncSucceeded = @YES;
 	[self get:@"/rate_limit"
    fromServer:apiServer
+ignoreLastSync:YES
    parameters:nil
  extraHeaders:nil
 	  success:^(NSHTTPURLResponse *response, id data) {
@@ -951,13 +954,14 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 
 - (void)get:(NSString *)path
  fromServer:(ApiServer *)apiServer
+ignoreLastSync:(BOOL)ignoreLastSync
  parameters:(NSDictionary *)params
 extraHeaders:(NSDictionary *)extraHeaders
 	success:(void(^)(NSHTTPURLResponse *response, id data))successCallback
 	failure:(void(^)(NSHTTPURLResponse *response, id data, NSError *error))failureCallback
 {
 	NSString *apiServerLabel;
-	if(apiServer.lastSyncSucceeded.boolValue)
+	if(apiServer.lastSyncSucceeded.boolValue || ignoreLastSync)
 	{
 		apiServerLabel = apiServer.label;
 	}
