@@ -1,12 +1,6 @@
 
 @implementation CommentBlacklistViewController
 
-- (void)viewDidLoad
-{
-	[super viewDidLoad];
-	self.tableView.tableFooterView = [UIView new];
-}
-
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView { return settings.commentAuthorBlacklist.count == 0 ? 0 : 1; }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath { return YES; }
@@ -34,18 +28,18 @@
 	}
 }
 
-///////////////////////////// adding
-
-- (void)textFieldDidEndEditing:(UITextField *)textField
+- (IBAction)addSelected:(UIBarButtonItem *)sender
 {
-	textField.text = nil;
-}
-
-- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
-{
-	if([string isEqualToString:@"\n"])
-	{
-		NSString *name = [textField.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	UIAlertController *a = [UIAlertController alertControllerWithTitle:@"Block commenter"
+															   message:@"Enter the username of the poster whose comments you don't want to be notified about"
+														preferredStyle:UIAlertControllerStyleAlert];
+	[a addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+		textField.placeholder = @"Username";
+	}];
+	[a addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+	[a addAction:[UIAlertAction actionWithTitle:@"Block" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+		NSString *name = [[a.textFields[0] text] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+		if([name rangeOfString:@"@"].location==0) name = [name substringFromIndex:1];
 		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
 			if(name.length>0 && ![settings.commentAuthorBlacklist containsObject:name])
 			{
@@ -59,10 +53,8 @@
 					[self.tableView insertRowsAtIndexPaths:@[ip] withRowAnimation:UITableViewRowAnimationAutomatic];
 			}
 		});
-		[textField resignFirstResponder];
-		return NO;
-	}
-	return YES;
+	}]];
+	[self presentViewController:a animated:YES completion:nil];
 }
 
 @end
