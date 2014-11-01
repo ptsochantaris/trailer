@@ -237,13 +237,13 @@ collapseSecondaryViewController:(UIViewController *)secondaryViewController
 	[self.dataManager sendNotifications];
 }
 
-- (void)startRefresh
+- (BOOL)startRefresh
 {
-	if(self.isRefreshing) return;
+	if(self.isRefreshing) return NO;
 
-	if([app.api.reachability currentReachabilityStatus]==NotReachable) return;
+	if([app.api.reachability currentReachabilityStatus]==NotReachable) return NO;
 
-	if(![ApiServer someServersHaveAuthTokensInMoc:self.dataManager.managedObjectContext]) return;
+	if(![ApiServer someServersHaveAuthTokensInMoc:self.dataManager.managedObjectContext]) return NO;
 
 	[self prepareForRefresh];
 
@@ -293,6 +293,8 @@ collapseSecondaryViewController:(UIViewController *)secondaryViewController
 															repeats:NO];
 		DLog(@"Refresh done");
 	}];
+
+	return YES;
 }
 
 - (void)refreshTimerDone

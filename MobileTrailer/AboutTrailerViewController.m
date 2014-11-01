@@ -1,14 +1,17 @@
 
-@interface AboutTrailerViewController ()
-
-@end
-
 @implementation AboutTrailerViewController
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 	self.versionNumber.text = [@"Version " stringByAppendingString:app.currentAppVersion];
+	self.licenseText.textContainerInset = UIEdgeInsetsMake(0, 10, 10, 10);
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+	[super viewDidAppear:animated];
+	self.licenseText.contentOffset = CGPointZero;
 }
 
 - (IBAction)ipadLink:(UIBarButtonItem *)sender

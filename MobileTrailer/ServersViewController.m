@@ -17,9 +17,14 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	allServers = [[ApiServer allApiServersInMoc:app.dataManager.managedObjectContext] mutableCopy];
     self.clearsSelectionOnViewWillAppear = YES;
-	self.tableView.tableFooterView = [UIView new];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+	[super viewWillAppear:animated];
+	allServers = [[ApiServer allApiServersInMoc:app.dataManager.managedObjectContext] mutableCopy];
+	[self.tableView reloadData];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView { return 1; }
@@ -32,9 +37,22 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"ServerCell" forIndexPath:indexPath];
-
-	cell.textLabel.text = [allServers[indexPath.row] label];
-
+	ApiServer *a = allServers[indexPath.row];
+	if(a.authToken.length==0)
+	{
+		cell.textLabel.textColor = [UIColor redColor];
+		cell.textLabel.text = [a.label stringByAppendingString:@" (needs token!)"];
+	}
+	else if(!a.lastSyncSucceeded.boolValue)
+	{
+		cell.textLabel.textColor = [UIColor redColor];
+		cell.textLabel.text = [a.label stringByAppendingString:@" (last sync failed)"];
+	}
+	else
+	{
+		cell.textLabel.textColor = [UIColor darkTextColor];
+		cell.textLabel.text = a.label;
+	}
     return cell;
 }
 
@@ -44,15 +62,31 @@
 {
     if (editingStyle == UITableViewCellEditingStyleDelete)
 	{
+		ApiServer *a = allServers[indexPath.row];
 		[allServers removeObjectAtIndex:indexPath.row];
+		[app.dataManager.managedObjectContext deleteObject:a];
+		[app.dataManager saveDB];
         [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
     }
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+	ApiServer *a = allServers[indexPath.row];
+	selectedServerId = a.objectID;
+	[self performSegueWithIdentifier:@"editServer" sender:self];
+}
+
+- (IBAction)newServer:(UIBarButtonItem *)sender
+{
+	[self performSegueWithIdentifier:@"editServer" sender:self];
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
 	ServerDetailViewController *sd = [segue destinationViewController];
 	sd.serverId = selectedServerId;
+	selectedServerId = nil;
 }
 
 @end

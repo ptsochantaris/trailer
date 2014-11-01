@@ -5,7 +5,7 @@
 
 - (void)log:(NSString *)logMessage;
 
-@property (nonatomic) NSInteger sortMethod, statusFilteringMode,
+@property (nonatomic) NSInteger sortMethod, statusFilteringMode, lastPreferencesTabSelected,
 								closeHandlingPolicy, mergeHandlingPolicy, statusItemRefreshInterval;
 
 @property (nonatomic) NSArray *statusFilteringTerms, *commentAuthorBlacklist;

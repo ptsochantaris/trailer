@@ -15,7 +15,7 @@
         <window title="Trailer Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="371">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" resizable="YES"/>
             <rect key="contentRect" x="335" y="390" width="782" height="460"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1058"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="782" height="460"/>
             <view key="contentView" id="372">
                 <rect key="frame" x="0.0" y="0.0" width="782" height="460"/>
@@ -224,7 +224,7 @@ user you can add more servers from the left.</string>
                                                     <textField verticalHuggingPriority="750" id="tHE-jI-Ndq">
                                                         <rect key="frame" x="102" y="300" width="346" height="24"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Github" drawsBackground="YES" usesSingleLineMode="YES" id="0qH-Sb-Rfg">
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="GitHub" drawsBackground="YES" usesSingleLineMode="YES" id="0qH-Sb-Rfg">
                                                             <font key="font" metaFont="system"/>
                                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -281,7 +281,7 @@ user you can add more servers from the left.</string>
                                                     <button id="dWD-uY-VLR">
                                                         <rect key="frame" x="110" y="207" width="340" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Report problems when syncing to this server" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="Mb1-50-oB7">
+                                                        <buttonCell key="cell" type="check" title="Report syncing problems with this server" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="Mb1-50-oB7">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="label"/>
                                                         </buttonCell>

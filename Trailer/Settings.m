@@ -326,6 +326,12 @@ Settings *settings;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#define LAST_PREFS_TAB_SELECTED @"LAST_PREFS_TAB_SELECTED"
+- (NSInteger)lastPreferencesTabSelected { return [[self defaultValueForKey:LAST_PREFS_TAB_SELECTED] integerValue]; }
+- (void)setLastPreferencesTabSelected:(NSInteger)lastPreferencesTabSelected { [self storeDefaultValue:@(lastPreferencesTabSelected) forKey:LAST_PREFS_TAB_SELECTED]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #define STATUS_ITEM_REFRESH_COUNT @"STATUS_ITEM_REFRESH_COUNT"
 - (NSInteger)statusItemRefreshInterval
 {

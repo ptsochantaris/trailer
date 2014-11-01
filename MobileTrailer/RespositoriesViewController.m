@@ -47,6 +47,11 @@
 	UIAlertController *a = [UIAlertController alertControllerWithTitle:nil
 															   message:nil
 														preferredStyle:UIAlertControllerStyleActionSheet];
+	[a addAction:[UIAlertAction actionWithTitle:@"Refresh List"
+										  style:UIAlertActionStyleDestructive
+										handler:^(UIAlertAction *action) {
+											[self refreshList];
+										}]];
 	[a addAction:[UIAlertAction actionWithTitle:@"Hide All"
 										  style:UIAlertActionStyleDefault
 										handler:^(UIAlertAction *action) {
@@ -61,11 +66,7 @@
 											for(Repo *r in allRepos) { r.hidden = @NO; r.dirty = @YES; r.lastDirtied = [NSDate date]; }
 											app.preferencesDirty = YES;
 										}]];
-	[a addAction:[UIAlertAction actionWithTitle:@"Refresh List"
-										  style:UIAlertActionStyleDefault
-										handler:^(UIAlertAction *action) {
-											[self refreshList];
-										}]];
+	[a addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
 	a.popoverPresentationController.barButtonItem = sender;
 	[self presentViewController:a animated:YES completion:nil];
 }
@@ -73,9 +74,10 @@
 - (void)refreshList
 {
 	NSString *originalName = self.navigationItem.title;
-	self.title = @"Loading...";
+	self.navigationItem.title = @"Loading...";
 	self.actionsButton.enabled = NO;
-	self.tableView.hidden = YES;
+	self.tableView.userInteractionEnabled = NO;
+	self.tableView.alpha = 0.5;
 
 	NSManagedObjectContext *tempContext = [app.dataManager tempContext];
 	[app.api fetchRepositoriesToMoc:tempContext andCallback:^{
@@ -103,11 +105,12 @@
 		else
 		{
 			[tempContext save:nil];
-			self.navigationItem.title = originalName;
-			self.actionsButton.enabled = YES;
-			self.tableView.hidden = NO;
-			app.preferencesDirty = YES;
 		}
+		self.navigationItem.title = originalName;
+		self.actionsButton.enabled = YES;
+		self.tableView.alpha = 1.0;
+		self.tableView.userInteractionEnabled = YES;
+		app.preferencesDirty = YES;
 	}];
 }
 

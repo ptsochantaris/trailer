@@ -13,18 +13,18 @@
 
 @implementation AdvancedSettingsViewController
 
+- (IBAction)done:(UIBarButtonItem *)sender
+{
+	if(app.preferencesDirty) [app startRefresh];
+	[self dismissViewControllerAnimated:YES completion:nil];
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 	settingsChangedTimer = [[HTPopTimer alloc] initWithTimeInterval:1.0
 															 target:app
 														   selector:@selector(refreshMainList)];
-}
-
-- (IBAction)done:(UIBarButtonItem *)sender
-{
-	if(app.preferencesDirty) [app startRefresh];
-	[self dismissViewControllerAnimated:YES completion:nil];
 }
 
 #define REFRESH_SECTION_INDEX 0

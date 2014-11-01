@@ -213,7 +213,11 @@
                     </tableView>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" title="Repositories" id="QfX-C1-a3i">
-                        <barButtonItem key="leftBarButtonItem" style="done" systemItem="done" id="mYI-Lo-soT"/>
+                        <barButtonItem key="leftBarButtonItem" style="done" systemItem="done" id="mYI-Lo-soT">
+                            <connections>
+                                <action selector="done:" destination="qen-v7-82i" id="W4S-ba-b5i"/>
+                            </connections>
+                        </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" title="Actions" id="kBh-JC-HZv">
                             <connections>
                                 <action selector="actionSelected:" destination="qen-v7-82i" id="LdD-A8-dPl"/>
@@ -299,7 +303,7 @@
                     <navigationItem key="navigationItem" title="Advanced" id="0ij-Vd-OcD">
                         <barButtonItem key="leftBarButtonItem" style="done" systemItem="done" id="cbh-rc-sSM">
                             <connections>
-                                <action selector="done:" destination="ls6-NX-hye" id="WxW-hj-N2t"/>
+                                <action selector="done:" destination="ls6-NX-hye" id="WNJ-zz-WqT"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -321,7 +325,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="ServerCell" id="TLs-yk-Rpp">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" accessoryType="detailDisclosureButton" indentationWidth="10" reuseIdentifier="ServerCell" id="TLs-yk-Rpp">
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="TLs-yk-Rpp" id="T3l-gc-8wR">
                                     <autoresizingMask key="autoresizingMask"/>
@@ -340,7 +344,11 @@
                                 <action selector="done:" destination="Ny5-Q9-wJN" id="apW-GM-iMg"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="w7v-i7-rs4"/>
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="w7v-i7-rs4">
+                            <connections>
+                                <action selector="newServer:" destination="Ny5-Q9-wJN" id="LV7-JY-XMa"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
@@ -351,10 +359,10 @@
             </objects>
             <point key="canvasLocation" x="2746" y="1553"/>
         </scene>
-        <!--Server Details-->
+        <!--API Server Details-->
         <scene sceneID="Mrr-Mu-sAc">
             <objects>
-                <viewController id="iSf-H9-TPW" customClass="ServerDetailViewController" sceneMemberID="viewController">
+                <viewController automaticallyAdjustsScrollViewInsets="NO" id="iSf-H9-TPW" customClass="ServerDetailViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="6JD-Od-MMA"/>
                         <viewControllerLayoutGuide type="bottom" id="YAK-Zg-OTM"/>
@@ -362,18 +370,176 @@
                     <view key="view" contentMode="scaleToFill" id="Hjh-Cm-SFi">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" keyboardDismissMode="onDrag" translatesAutoresizingMaskIntoConstraints="NO" id="bZU-nh-qhg">
+                                <rect key="frame" x="0.0" y="44" width="600" height="512"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cvy-3g-Cpb">
+                                        <rect key="frame" x="11" y="20" width="46" height="21"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="API Path" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Bve-oc-5Y7">
+                                        <rect key="frame" x="11" y="99" width="67" height="21"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Web Front End" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iWB-GC-rdV">
+                                        <rect key="frame" x="11" y="178" width="114" height="21"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Authorization Token" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yVf-Xw-8iy">
+                                        <rect key="frame" x="11" y="257" width="152" height="21"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="GitHub" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="bME-ye-aAN">
+                                        <rect key="frame" x="11" y="49" width="578" height="30"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <textInputTraits key="textInputTraits" returnKeyType="done"/>
+                                        <connections>
+                                            <outlet property="delegate" destination="iSf-H9-TPW" id="hPl-zn-3qw"/>
+                                        </connections>
+                                    </textField>
+                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="https://api.github.com" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="MTl-S3-U8P">
+                                        <rect key="frame" x="11" y="128" width="578" height="30"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <textInputTraits key="textInputTraits" returnKeyType="done"/>
+                                        <connections>
+                                            <outlet property="delegate" destination="iSf-H9-TPW" id="pfr-iG-w6W"/>
+                                        </connections>
+                                    </textField>
+                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="GitHub personal access token" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="lDU-gx-tBY">
+                                        <rect key="frame" x="11" y="286" width="578" height="30"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <textInputTraits key="textInputTraits" returnKeyType="done"/>
+                                        <connections>
+                                            <outlet property="delegate" destination="iSf-H9-TPW" id="9ye-lG-6hR"/>
+                                        </connections>
+                                    </textField>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Report syncing problems with this server" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rgY-HF-p2c">
+                                        <rect key="frame" x="11" y="373" width="521" height="21"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="P3I-BS-Gwz">
+                                        <rect key="frame" x="540" y="368" width="51" height="31"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="49" id="Afs-i7-6GS"/>
+                                        </constraints>
+                                        <connections>
+                                            <action selector="reportChanged:" destination="iSf-H9-TPW" eventType="valueChanged" id="Ytn-P5-yeZ"/>
+                                        </connections>
+                                    </switch>
+                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="https://github.com" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="jgQ-9E-dxw">
+                                        <rect key="frame" x="11" y="207" width="578" height="30"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <textInputTraits key="textInputTraits" returnKeyType="done"/>
+                                        <connections>
+                                            <outlet property="delegate" destination="iSf-H9-TPW" id="Vc9-Gt-vkA"/>
+                                        </connections>
+                                    </textField>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="btD-7d-z1H">
+                                        <rect key="frame" x="11" y="326" width="578" height="27"/>
+                                        <string key="text">Paste your GitHub personal access token above; use the links below to view or create one.  You can use 'Test' to verify your settings.</string>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
+                                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FSU-dH-Zb1">
+                                        <rect key="frame" x="559" y="253" width="30" height="30"/>
+                                        <state key="normal" title="Test">
+                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="testConnectionSelected:" destination="iSf-H9-TPW" eventType="touchUpInside" id="9UE-dw-jSv"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="bME-ye-aAN" firstAttribute="leading" secondItem="cvy-3g-Cpb" secondAttribute="leading" id="0Vu-lq-9rV"/>
+                                    <constraint firstItem="lDU-gx-tBY" firstAttribute="top" secondItem="yVf-Xw-8iy" secondAttribute="bottom" constant="8" id="1Up-ua-KYR"/>
+                                    <constraint firstItem="btD-7d-z1H" firstAttribute="top" secondItem="lDU-gx-tBY" secondAttribute="bottom" constant="10" id="22m-Jp-J9P"/>
+                                    <constraint firstItem="cvy-3g-Cpb" firstAttribute="top" secondItem="bZU-nh-qhg" secondAttribute="top" constant="20" id="2JH-Ru-Vyf"/>
+                                    <constraint firstItem="jgQ-9E-dxw" firstAttribute="top" secondItem="iWB-GC-rdV" secondAttribute="bottom" constant="8" id="4Dv-83-0Sy"/>
+                                    <constraint firstItem="rgY-HF-p2c" firstAttribute="leading" secondItem="bZU-nh-qhg" secondAttribute="leading" constant="11" id="8jk-nD-077"/>
+                                    <constraint firstItem="rgY-HF-p2c" firstAttribute="leading" secondItem="lDU-gx-tBY" secondAttribute="leading" id="CYW-EB-Fgk"/>
+                                    <constraint firstItem="lDU-gx-tBY" firstAttribute="top" secondItem="FSU-dH-Zb1" secondAttribute="bottom" constant="3" id="JIX-ov-u1b"/>
+                                    <constraint firstItem="jgQ-9E-dxw" firstAttribute="width" secondItem="lDU-gx-tBY" secondAttribute="width" id="JuA-DE-h0N"/>
+                                    <constraint firstItem="yVf-Xw-8iy" firstAttribute="leading" secondItem="lDU-gx-tBY" secondAttribute="leading" id="KAp-Cf-0tG"/>
+                                    <constraint firstItem="btD-7d-z1H" firstAttribute="width" secondItem="lDU-gx-tBY" secondAttribute="width" id="Ko4-BD-niK"/>
+                                    <constraint firstItem="P3I-BS-Gwz" firstAttribute="leading" secondItem="rgY-HF-p2c" secondAttribute="trailing" constant="8" id="Opl-Wu-Jx4"/>
+                                    <constraint firstItem="jgQ-9E-dxw" firstAttribute="leading" secondItem="iWB-GC-rdV" secondAttribute="leading" id="YU7-Ab-qFh"/>
+                                    <constraint firstItem="bME-ye-aAN" firstAttribute="width" secondItem="MTl-S3-U8P" secondAttribute="width" id="YV3-e3-R6X"/>
+                                    <constraint firstItem="Bve-oc-5Y7" firstAttribute="leading" secondItem="MTl-S3-U8P" secondAttribute="leading" id="ZFb-3s-EEK"/>
+                                    <constraint firstItem="lDU-gx-tBY" firstAttribute="trailing" secondItem="P3I-BS-Gwz" secondAttribute="trailing" id="bY7-ij-FMZ"/>
+                                    <constraint firstItem="yVf-Xw-8iy" firstAttribute="top" secondItem="jgQ-9E-dxw" secondAttribute="bottom" constant="20" id="bl6-mq-FX4"/>
+                                    <constraint firstItem="lDU-gx-tBY" firstAttribute="trailing" secondItem="FSU-dH-Zb1" secondAttribute="trailing" id="d0o-f4-0eM"/>
+                                    <constraint firstItem="bME-ye-aAN" firstAttribute="top" secondItem="cvy-3g-Cpb" secondAttribute="bottom" constant="8" id="dDN-74-Qjj"/>
+                                    <constraint firstItem="rgY-HF-p2c" firstAttribute="top" secondItem="btD-7d-z1H" secondAttribute="bottom" constant="20" id="dt1-Ck-iqx"/>
+                                    <constraint firstAttribute="trailing" secondItem="bME-ye-aAN" secondAttribute="trailing" constant="11" id="fRI-ng-rIc"/>
+                                    <constraint firstItem="jgQ-9E-dxw" firstAttribute="leading" secondItem="yVf-Xw-8iy" secondAttribute="leading" id="hSx-hY-eqT"/>
+                                    <constraint firstItem="rgY-HF-p2c" firstAttribute="centerY" secondItem="P3I-BS-Gwz" secondAttribute="centerY" id="iFK-ab-Hg3"/>
+                                    <constraint firstItem="iWB-GC-rdV" firstAttribute="top" secondItem="MTl-S3-U8P" secondAttribute="bottom" constant="20" id="jcd-S5-lqv"/>
+                                    <constraint firstItem="Bve-oc-5Y7" firstAttribute="leading" secondItem="bME-ye-aAN" secondAttribute="leading" id="lcv-4C-xSZ"/>
+                                    <constraint firstItem="bME-ye-aAN" firstAttribute="width" secondItem="bZU-nh-qhg" secondAttribute="width" constant="-22" id="lgS-e1-2xs"/>
+                                    <constraint firstItem="MTl-S3-U8P" firstAttribute="leading" secondItem="iWB-GC-rdV" secondAttribute="leading" id="mdK-D6-pJ9"/>
+                                    <constraint firstItem="btD-7d-z1H" firstAttribute="leading" secondItem="lDU-gx-tBY" secondAttribute="leading" id="mgx-1G-DWY"/>
+                                    <constraint firstItem="jgQ-9E-dxw" firstAttribute="width" secondItem="MTl-S3-U8P" secondAttribute="width" id="nLo-KA-Hsv"/>
+                                    <constraint firstItem="MTl-S3-U8P" firstAttribute="top" secondItem="Bve-oc-5Y7" secondAttribute="bottom" constant="8" id="syz-pH-B1B"/>
+                                    <constraint firstAttribute="bottom" secondItem="rgY-HF-p2c" secondAttribute="bottom" constant="30" id="v89-Tw-gVu"/>
+                                    <constraint firstItem="Bve-oc-5Y7" firstAttribute="top" secondItem="bME-ye-aAN" secondAttribute="bottom" constant="20" id="vJB-0j-M1g"/>
+                                </constraints>
+                            </scrollView>
+                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="YAK-Zg-OTM" firstAttribute="top" secondItem="bZU-nh-qhg" secondAttribute="bottom" id="HXu-26-eOA"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="bZU-nh-qhg" secondAttribute="trailing" constant="-16" id="TpJ-Aq-SXP"/>
+                            <constraint firstItem="bZU-nh-qhg" firstAttribute="leading" secondItem="Hjh-Cm-SFi" secondAttribute="leadingMargin" constant="-16" id="ceo-q8-6S3"/>
+                            <constraint firstItem="bZU-nh-qhg" firstAttribute="top" secondItem="6JD-Od-MMA" secondAttribute="bottom" id="eZU-oo-GR6"/>
+                        </constraints>
                     </view>
                     <toolbarItems>
-                        <barButtonItem title="Create Token" id="2AG-OX-1ye"/>
+                        <barButtonItem title="New Token" id="2AG-OX-1ye">
+                            <connections>
+                                <action selector="createTokenSelected:" destination="iSf-H9-TPW" id="Acr-t2-L7Z"/>
+                            </connections>
+                        </barButtonItem>
                         <barButtonItem style="plain" systemItem="flexibleSpace" id="bKv-Ij-yMl"/>
-                        <barButtonItem title="Existing Tokens" id="6NO-IC-LtP"/>
+                        <barButtonItem title="My Tokens" id="6NO-IC-LtP">
+                            <connections>
+                                <action selector="existingTokensSelected:" destination="iSf-H9-TPW" id="3JP-08-G5e"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem style="plain" systemItem="flexibleSpace" id="vSt-Ph-ZPH"/>
+                        <barButtonItem title="Watchlist" id="QXW-n6-Yfh">
+                            <connections>
+                                <action selector="watchListSelected:" destination="iSf-H9-TPW" id="mMg-UC-awA"/>
+                            </connections>
+                        </barButtonItem>
                     </toolbarItems>
-                    <navigationItem key="navigationItem" title="Server Details" id="WuN-oo-IBq">
-                        <barButtonItem key="rightBarButtonItem" title="Watchlist" id="QXW-n6-Yfh"/>
+                    <navigationItem key="navigationItem" title="API Server Details" id="WuN-oo-IBq">
+                        <barButtonItem key="rightBarButtonItem" title="Delete" id="uhq-Gt-M9L">
+                            <connections>
+                                <action selector="deleteSelected:" destination="iSf-H9-TPW" id="yQC-jA-dGI"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
+                        <outlet property="apiPath" destination="MTl-S3-U8P" id="DFf-0S-ibw"/>
+                        <outlet property="authToken" destination="lDU-gx-tBY" id="vjX-7U-vqD"/>
+                        <outlet property="name" destination="bME-ye-aAN" id="LkL-7d-dVU"/>
+                        <outlet property="reportErrors" destination="P3I-BS-Gwz" id="06j-Hm-CQJ"/>
+                        <outlet property="scrollView" destination="bZU-nh-qhg" id="CHr-1c-Bhf"/>
+                        <outlet property="webFrontEnd" destination="jgQ-9E-dxw" id="7Sp-Ty-RY9"/>
                         <segue destination="kWj-6b-yq2" kind="show" identifier="openGithub" id="OaO-SO-2eE"/>
                     </connections>
                 </viewController>
@@ -413,7 +579,7 @@
         <!--About-->
         <scene sceneID="gk8-1F-TsH">
             <objects>
-                <viewController modalPresentationStyle="currentContext" id="yvK-be-nK4" customClass="AboutTrailerViewController" sceneMemberID="viewController">
+                <viewController automaticallyAdjustsScrollViewInsets="NO" modalPresentationStyle="currentContext" id="yvK-be-nK4" customClass="AboutTrailerViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="sc4-NU-7KZ"/>
                         <viewControllerLayoutGuide type="bottom" id="rvX-Ad-77Q"/>
@@ -439,8 +605,8 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="48"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" editable="NO" textAlignment="center" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cun-Cw-EIG">
-                                <rect key="frame" x="16" y="171" width="568" height="380"/>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="top" showsHorizontalScrollIndicator="NO" editable="NO" textAlignment="center" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cun-Cw-EIG">
+                                <rect key="frame" x="0.0" y="171" width="600" height="380"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <string key="text">Copyright (c) 2013-2014 HouseTrip Ltd.
 
@@ -452,7 +618,8 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</string>
-                                <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                                <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="13"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Team Octopus" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9eQ-Jm-HX5">
@@ -475,8 +642,9 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="cun-Cw-EIG" firstAttribute="bottom" secondItem="rvX-Ad-77Q" secondAttribute="top" id="35u-qX-XCG"/>
-                            <constraint firstItem="cun-Cw-EIG" firstAttribute="leading" secondItem="8zL-cy-7x3" secondAttribute="leadingMargin" id="3ct-dO-ReR"/>
-                            <constraint firstItem="cun-Cw-EIG" firstAttribute="trailing" secondItem="8zL-cy-7x3" secondAttribute="trailingMargin" id="7Hi-MU-Amj"/>
+                            <constraint firstItem="cun-Cw-EIG" firstAttribute="leading" secondItem="8zL-cy-7x3" secondAttribute="leading" id="3ct-dO-ReR"/>
+                            <constraint firstItem="cun-Cw-EIG" firstAttribute="trailing" secondItem="8zL-cy-7x3" secondAttribute="trailing" id="7Hi-MU-Amj"/>
+                            <constraint firstItem="ZLN-iY-Lrv" firstAttribute="top" secondItem="sc4-NU-7KZ" secondAttribute="bottom" constant="20" id="84m-CB-86h"/>
                             <constraint firstItem="mkI-ej-j3O" firstAttribute="leading" secondItem="8zL-cy-7x3" secondAttribute="leadingMargin" constant="-3" id="AFc-AW-uuD"/>
                             <constraint firstItem="cun-Cw-EIG" firstAttribute="top" secondItem="XBv-UE-utz" secondAttribute="bottom" constant="35" id="AqZ-dH-f0q"/>
                             <constraint firstItem="9eQ-Jm-HX5" firstAttribute="leading" secondItem="mkI-ej-j3O" secondAttribute="leading" id="CRw-z3-fUc"/>
@@ -485,7 +653,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
                             <constraint firstAttribute="trailingMargin" secondItem="ZLN-iY-Lrv" secondAttribute="trailing" constant="6" id="Hs5-Y5-9vs"/>
                             <constraint firstItem="cun-Cw-EIG" firstAttribute="top" secondItem="mkI-ej-j3O" secondAttribute="bottom" constant="33" id="Jn4-er-iHk"/>
                             <constraint firstItem="mkI-ej-j3O" firstAttribute="top" secondItem="sc4-NU-7KZ" secondAttribute="bottom" constant="24" id="bj6-Nk-inp"/>
-                            <constraint firstItem="ZLN-iY-Lrv" firstAttribute="top" secondItem="8zL-cy-7x3" secondAttribute="top" constant="64" id="xVi-sC-yI7"/>
                             <constraint firstItem="9eQ-Jm-HX5" firstAttribute="top" secondItem="sc4-NU-7KZ" secondAttribute="bottom" constant="92" id="yI0-uW-YaU"/>
                         </constraints>
                     </view>
@@ -503,6 +670,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
                         </barButtonItem>
                     </navigationItem>
                     <connections>
+                        <outlet property="licenseText" destination="cun-Cw-EIG" id="4JL-tF-p7Z"/>
                         <outlet property="versionNumber" destination="XBv-UE-utz" id="zGM-ej-vCe"/>
                     </connections>
                 </viewController>
@@ -567,7 +735,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
         <scene sceneID="4VK-bY-2jl">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="hV5-hQ-Klx" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Repositories" id="GbY-BF-5eA"/>
+                    <tabBarItem key="tabBarItem" title="Repositories" image="repos" id="GbY-BF-5eA"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="zTJ-3E-UPj">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
@@ -590,7 +758,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
         <scene sceneID="ZNa-ko-Uvz">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="4lU-fx-xrq" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="About" id="21w-d1-k6l"/>
+                    <tabBarItem key="tabBarItem" title="About" image="about" id="21w-d1-k6l"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="TL4-K7-73x">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
@@ -609,7 +777,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
         <scene sceneID="AE2-3Q-laH">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="S0n-Er-w3n" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Advanced" id="byu-eU-4PM"/>
+                    <tabBarItem key="tabBarItem" title="Advanced" image="advanced" id="byu-eU-4PM"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="DjA-kY-8aC">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
@@ -628,7 +796,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
         <scene sceneID="O8y-pt-1Ow">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="uY2-9H-xYT" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Servers" id="4P2-5Y-Yda"/>
+                    <tabBarItem key="tabBarItem" title="Servers" image="servers" id="4P2-5Y-Yda"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="uZE-n9-f8D">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
@@ -645,7 +813,11 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
         </scene>
     </scenes>
     <resources>
+        <image name="about" width="30" height="28"/>
+        <image name="advanced" width="32" height="32"/>
         <image name="htLogo" width="200" height="108"/>
+        <image name="repos" width="32" height="32"/>
+        <image name="servers" width="32" height="32"/>
     </resources>
     <color key="tintColor" red="0.25490197539329529" green="0.51372551918029785" blue="0.76862752437591553" alpha="1" colorSpace="deviceRGB"/>
 </document>

@@ -104,7 +104,7 @@
 {
 	NSArray *prs = [DataItem allItemsOfType:@"PullRequest" inMoc:moc];
 
-	if(!prs.count)
+	if(prs.count==0)
 	{
 		CALLBACK();
 		return;
@@ -141,6 +141,13 @@
 - (void)fetchCommentsForCurrentPullRequestsToMoc:(NSManagedObjectContext *)moc andCallback:(completionBlockType)callback
 {
 	NSArray *prs = [DataItem newOrUpdatedItemsOfType:@"PullRequest" inMoc:moc];
+
+	if(prs.count==0)
+	{
+		CALLBACK();
+		return;
+	}
+
 	for(PullRequest *r in prs)
 		for(PRComment *c in r.comments)
 			c.postSyncAction = @(kPostSyncDelete);
@@ -256,7 +263,7 @@
 {
 	NSArray *prs = [DataItem newOrUpdatedItemsOfType:@"PullRequest" inMoc:moc];
 
-	if(!prs.count)
+	if(prs.count==0)
 	{
 		CALLBACK();
 		return;
@@ -553,10 +560,16 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 - (void)markDirtyReposInMoc:(NSManagedObjectContext *)moc andCallback:(completionBlockType)callback
 {
 	NSArray *allApiServers = [ApiServer allApiServersInMoc:moc];
-	NSMutableSet *repoIdsToMarkDirty = [NSMutableSet set];
 
 	NSInteger totalOperations = 2*allApiServers.count;
+	if(totalOperations==0)
+	{
+		CALLBACK();
+		return;
+	}
+
 	__block NSInteger operationCount = 0;
+	NSMutableSet *repoIdsToMarkDirty = [NSMutableSet set];
 
 	completionBlockType completionCallback = ^{
 		operationCount++;
@@ -688,7 +701,7 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 
 - (void)fetchPullRequestsForRepos:(NSArray *)repos toMoc:(NSManagedObjectContext *)moc andCallback:(completionBlockType)callback
 {
-	if(!repos.count)
+	if(repos.count==0)
 	{
 		CALLBACK();
 		return;

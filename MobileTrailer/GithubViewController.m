@@ -32,6 +32,11 @@
 	self.webView.hidden = NO;
 	[self.spinner stopAnimating];
 	self.title = @"Loading Failed";
+	[[[UIAlertView alloc] initWithTitle:@"Loading Failed"
+								message:[NSString stringWithFormat:@"URL: '%@'",self.pathToLoad]
+							   delegate:nil
+					  cancelButtonTitle:@"OK"
+					  otherButtonTitles:nil] show];
 }
 
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation

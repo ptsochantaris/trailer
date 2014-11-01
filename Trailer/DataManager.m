@@ -397,7 +397,12 @@
 	NSUInteger openRequests = [PullRequest countOpenRequestsInMoc:self.managedObjectContext];
 	NSString *message;
 
-	if(app.isRefreshing)
+	if(![ApiServer someServersHaveAuthTokensInMoc:self.managedObjectContext])
+	{
+		messageColor = MAKECOLOR(0.8, 0.0, 0.0, 1.0);
+		message = @"There are no configured API servers in your settings, please ensure you have added at least one server with a valid API token.";
+	}
+	else if(app.isRefreshing)
 	{
 		message = @"Refreshing PR information, please wait a moment...";
 	}

@@ -4,7 +4,8 @@
 #define RECEIVED_NOTIFICATION_KEY @"ReceivedNotificationKey"
 
 @interface MasterViewController : UITableViewController
-<NSFetchedResultsControllerDelegate, UITextFieldDelegate, UIActionSheetDelegate, UIAlertViewDelegate>
+<NSFetchedResultsControllerDelegate, UITextFieldDelegate,
+UIActionSheetDelegate, UITabBarControllerDelegate>
 
 @property (strong, nonatomic) DetailViewController *detailViewController;
 

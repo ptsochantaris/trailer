@@ -69,7 +69,6 @@
 - (void)tryRefresh
 {
 	refreshOnRelease = NO;
-	self.tableView.userInteractionEnabled = YES;
 
 	if([app.api.reachability currentReachabilityStatus]==NotReachable)
 	{
@@ -81,55 +80,57 @@
 	}
 	else
 	{
-		[app startRefresh];
+		if(![app startRefresh])
+		{
+			[self updateStatus];
+		}
 	}
 }
 
 - (void)removeAllMerged
 {
-    if(settings.dontAskBeforeWipingMerged)
-    {
-        [self removeAllMergedConfirmed];
-    }
-    else
-    {
-        [[[UIAlertView alloc] initWithTitle:@"Sure?"
-                                    message:@"Remove all PRs in the Merged section?"
-                                   delegate:self
-                          cancelButtonTitle:@"No"
-                          otherButtonTitles:@"Yes", nil] show];
-    }
-}
-
-- (void)removeAllClosed
-{
-    if(settings.dontAskBeforeWipingClosed)
-    {
-        [self removeAllClosedConfirmed];
-    }
-    else
-    {
-        [[[UIAlertView alloc] initWithTitle:@"Sure?"
-                                    message:@"Remove all PRs in the Closed section?"
-                                   delegate:self
-                          cancelButtonTitle:@"No"
-                          otherButtonTitles:@"Yes", nil] show];
-    }
-}
-
-- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
-{
-    if(buttonIndex==1)
-    {
-		if([alertView.message rangeOfString:@"Merged"].location!=NSNotFound)
+	dispatch_async(dispatch_get_main_queue(), ^{
+		if(settings.dontAskBeforeWipingMerged)
 		{
 			[self removeAllMergedConfirmed];
 		}
 		else
 		{
+			UIAlertController *a = [UIAlertController alertControllerWithTitle:@"Sure?"
+																	   message:@"Remove all PRs in the Merged section?"
+																preferredStyle:UIAlertControllerStyleAlert];
+			[a addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+			[a addAction:[UIAlertAction actionWithTitle:@"Remove"
+												  style:UIAlertActionStyleDestructive
+												handler:^(UIAlertAction *action) {
+													[self removeAllMergedConfirmed];
+												}]];
+			[self presentViewController:a animated:YES completion:nil];
+		}
+	});
+}
+
+- (void)removeAllClosed
+{
+	dispatch_async(dispatch_get_main_queue(), ^{
+		if(settings.dontAskBeforeWipingClosed)
+		{
 			[self removeAllClosedConfirmed];
 		}
-    }
+		else
+		{
+			UIAlertController *a = [UIAlertController alertControllerWithTitle:@"Sure?"
+																	   message:@"Remove all PRs in the Closed section?"
+																preferredStyle:UIAlertControllerStyleAlert];
+			[a addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+			[a addAction:[UIAlertAction actionWithTitle:@"Remove"
+												  style:UIAlertActionStyleDestructive
+												handler:^(UIAlertAction *action) {
+													[self removeAllClosedConfirmed];
+												}]];
+			[self presentViewController:a animated:YES completion:nil];
+		}
+	});
 }
 
 - (void)removeAllClosedConfirmed
@@ -176,11 +177,30 @@
 			[self tryRefresh];
 		}
 	}
+	else
+	{
+		if(decelerate)
+		{
+			self.tableView.userInteractionEnabled = NO;
+		}
+		else
+		{
+			[self.refreshControl endRefreshing];
+		}
+	}
 }
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
-	if(refreshOnRelease) [self tryRefresh];
+	self.tableView.userInteractionEnabled = YES;
+	if(refreshOnRelease)
+	{
+		[self tryRefresh];
+	}
+	else
+	{
+		[self.refreshControl endRefreshing];
+	}
 }
 
 - (void)viewDidLoad
@@ -227,6 +247,12 @@
 											 selector:@selector(localNotification:)
 												 name:RECEIVED_NOTIFICATION_KEY
 											   object:nil];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+	[super viewWillAppear:animated];
+	[self updateStatus];
 }
 
 - (void)reloadData
@@ -516,13 +542,6 @@
 	}
 	else
 	{
-		if(self.refreshControl.isRefreshing)
-		{
-			dispatch_async(dispatch_get_main_queue(), ^{
-				[self.refreshControl endRefreshing];
-			});
-		}
-
 		NSInteger count = self.fetchedResultsController.fetchedObjects.count;
 		if(count>0)
 		{
@@ -538,6 +557,10 @@
 			EmptyView *label = [[EmptyView alloc] initWithMessage:[app.dataManager reasonForEmptyWithFilter:searchField.text]];
 			self.tableView.tableFooterView = label;
 		}
+
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[self.refreshControl endRefreshing];
+		});
 	}
 	self.refreshControl.attributedTitle = [[NSAttributedString alloc] initWithString:[app.api lastUpdateDescription]
 																		  attributes:@{ }];
@@ -577,6 +600,23 @@
         [searchTimer push];
 	}
 	return YES;
+}
+
+////////////////// opening prefs
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+	if([segue.destinationViewController isKindOfClass:[UITabBarController class]])
+	{
+		UITabBarController *t = segue.destinationViewController;
+		t.selectedIndex = MIN(settings.lastPreferencesTabSelected, t.viewControllers.count-1);
+		t.delegate = self;
+	}
+}
+
+- (void)tabBarController:(UITabBarController *)tabBarController didSelectViewController:(UIViewController *)viewController
+{
+	settings.lastPreferencesTabSelected = [tabBarController.viewControllers indexOfObject:viewController];
 }
 
 @end
