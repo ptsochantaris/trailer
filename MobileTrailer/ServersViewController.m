@@ -3,6 +3,7 @@
 {
 	NSManagedObjectID *selectedServerId;
 	NSMutableArray *allServers;
+	NSDateFormatter *resetFormatter;
 }
 @end
 
@@ -18,6 +19,20 @@
 {
     [super viewDidLoad];
     self.clearsSelectionOnViewWillAppear = YES;
+	resetFormatter = [[NSDateFormatter alloc] init];
+	resetFormatter.doesRelativeDateFormatting = YES;
+	resetFormatter.timeStyle = NSDateFormatterShortStyle;
+	resetFormatter.dateStyle = NSDateFormatterShortStyle;
+
+	[[NSNotificationCenter defaultCenter] addObserver:self.tableView
+											 selector:@selector(reloadData)
+												 name:REFRESH_ENDED_NOTIFICATION
+											   object:nil];
+}
+
+- (void)dealloc
+{
+	[[NSNotificationCenter defaultCenter] removeObserver:self.tableView];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -52,6 +67,25 @@
 	{
 		cell.textLabel.textColor = [UIColor darkTextColor];
 		cell.textLabel.text = a.label;
+	}
+	if(a.requestsLimit.doubleValue==0.0)
+	{
+		cell.detailTextLabel.text = nil;
+	}
+	else
+	{
+		double total = a.requestsLimit.doubleValue;
+		double used = total-a.requestsRemaining.doubleValue;
+		if(a.resetDate)
+		{
+			cell.detailTextLabel.text = [NSString stringWithFormat:@"%.01f%% API used (%.0f / %.0f requests)\nNext reset: %@",
+										 100*used/total, used, total, [resetFormatter stringFromDate:a.resetDate]];
+		}
+		else
+		{
+			cell.detailTextLabel.text = [NSString stringWithFormat:@"%.01f%% API used (%.0f / %.0f requests)",
+										 100*used/total, used, total];
+		}
 	}
     return cell;
 }

@@ -592,6 +592,11 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 			[self markDirtyRepoIds:repoIdsToMarkDirty usingUserEventsFromServer:apiServer andCallback:completionCallback];
 			[self markDirtyRepoIds:repoIdsToMarkDirty usingReceivedEventsFromServer:apiServer andCallback:completionCallback];
 		}
+		else
+		{
+			completionCallback();
+			completionCallback();
+		}
 	}
 }
 
@@ -797,6 +802,11 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 - (void)syncUserDetailsInMoc:(NSManagedObjectContext *)moc andCallback:(completionBlockType)callback
 {
 	NSArray *allApiServers = [ApiServer allApiServersInMoc:moc];
+	if(allApiServers.count==0)
+	{
+		CALLBACK();
+		return;
+	}
 	__block NSInteger operationCount = 0;
 	for(ApiServer *apiServer in allApiServers)
 	{
