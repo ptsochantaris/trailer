@@ -821,11 +821,11 @@ user you can add more servers from the left.</string>
                             </tabViewItem>
                             <tabViewItem label="Statuses" identifier="" id="n3G-rT-Ltp">
                                 <view key="view" id="LNK-r1-5Wx">
-                                    <rect key="frame" x="10" y="33" width="736" height="339"/>
+                                    <rect key="frame" x="10" y="33" width="736" height="366"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" borderType="none" titlePosition="noTitle" id="bza-5m-qaP">
-                                            <rect key="frame" x="107" y="23" width="522" height="284"/>
+                                            <rect key="frame" x="107" y="34" width="522" height="284"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="0.0" y="0.0" width="522" height="284"/>

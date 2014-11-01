@@ -25,33 +25,12 @@
 	self.authToken.text = a.authToken;
 	self.reportErrors.on = a.reportRefreshFailures.boolValue;
 
-	NSNotificationCenter *n = [NSNotificationCenter defaultCenter];
-	[n addObserver:self selector:@selector(keyboardWasShown:) name:UIKeyboardWillShowNotification object:nil];
-	[n addObserver:self selector:@selector(keyboardWillBeHidden:) name:UIKeyboardWillHideNotification object:nil];
-}
-
-- (void)keyboardWasShown:(NSNotification*)aNotification
-{
-	NSDictionary* info = [aNotification userInfo];
-	CGSize kbSize = [[info objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
-	UIEdgeInsets contentInsets = UIEdgeInsetsMake(0.0, 0.0, kbSize.height, 0.0);
-	_scrollView.contentInset = contentInsets;
-	_scrollView.scrollIndicatorInsets = contentInsets;
-
-	CGRect aRect = self.view.frame;
-	aRect.size.height -= kbSize.height;
-	if(!CGRectContainsPoint(aRect, focusedField.frame.origin))
+	if(UI_USER_INTERFACE_IDIOM()!=UIUserInterfaceIdiomPad)
 	{
-		CGPoint scrollPoint = CGPointMake(0.0, focusedField.frame.origin.y-kbSize.height);
-		[_scrollView setContentOffset:scrollPoint animated:YES];
+		NSNotificationCenter *n = [NSNotificationCenter defaultCenter];
+		[n addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+		[n addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
 	}
-}
-
-- (void)keyboardWillBeHidden:(NSNotification*)aNotification
-{
-	UIEdgeInsets contentInsets = UIEdgeInsetsZero;
-	_scrollView.contentInset = contentInsets;
-	_scrollView.scrollIndicatorInsets = contentInsets;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -204,6 +183,36 @@
 	if(a) [app.dataManager.managedObjectContext deleteObject:a];
 	[app.dataManager saveDB];
 	[self.navigationController popViewControllerAnimated:YES];
+}
+
+///////////////////////// keyboard
+
+- (void)keyboardWillShow:(NSNotification *)notification
+{
+	CGRect keyboardFrame = [[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
+	CGFloat keyboardHeight = MAX(0, self.view.bounds.size.height-keyboardFrame.origin.y);
+	CGRect firstResponderFrame = [self.view convertRect:focusedField.frame fromView:focusedField.superview];
+	CGFloat bottomOfFirstResponder = firstResponderFrame.origin.y+firstResponderFrame.size.height;
+	bottomOfFirstResponder += 36.0;
+
+	CGFloat topOfKeyboard = self.view.bounds.size.height-keyboardHeight;
+	if(bottomOfFirstResponder>topOfKeyboard)
+	{
+		CGFloat distance = (bottomOfFirstResponder-topOfKeyboard);
+		_scrollView.contentOffset = CGPointMake(0, _scrollView.contentOffset.y+distance);
+	}
+}
+
+- (void)keyboardWillHide:(NSNotification *)notification
+{
+	if(!_scrollView.isDragging)
+	{
+		[_scrollView scrollRectToVisible:CGRectMake(0,
+													MIN(_scrollView.contentOffset.y, _scrollView.contentSize.height-_scrollView.bounds.size.height),
+													_scrollView.bounds.size.width,
+													_scrollView.bounds.size.height)
+								animated:NO];
+	}
 }
 
 @end
