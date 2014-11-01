@@ -3,6 +3,7 @@
 	NSApplicationDelegate,
 	NSTableViewDelegate,
 	NSTableViewDataSource,
+	NSTabViewDelegate,
 	NSWindowDelegate,
 	NSUserNotificationCenterDelegate,
 	PRItemViewDelegate,
@@ -13,11 +14,9 @@
 // Preferences window
 @property (unsafe_unretained) IBOutlet NSWindow *preferencesWindow;
 @property (weak) IBOutlet NSButton *refreshButton;
-@property (weak) IBOutlet NSTextField *githubTokenHolder;
 @property (weak) IBOutlet NSProgressIndicator *activityDisplay;
 @property (weak) IBOutlet NSTableView *projectsTable;
 @property (weak) IBOutlet NSMenuItem *refreshNow;
-@property (weak) IBOutlet NSProgressIndicator *apiLoad;
 @property (weak) IBOutlet NSTextField *versionNumber;
 @property (weak) IBOutlet NSButton *launchAtStartup;
 @property (weak) IBOutlet NSTextField *refreshDurationLabel;
@@ -25,7 +24,6 @@
 @property (weak) IBOutlet NSButton *hideUncommentedPrs;
 @property (weak) IBOutlet NSTextField *repoFilter;
 @property (weak) IBOutlet NSButton *showAllComments;
-@property (weak) IBOutlet NSBox *githubDetailsBox;
 @property (weak) IBOutlet NSButton *sortingOrder;
 @property (weak) IBOutlet NSPopUpButton *sortModeSelect;
 @property (weak) IBOutlet NSButton *showCreationDates;
@@ -61,6 +59,17 @@
 @property (weak) IBOutlet NSButton *logActivityToConsole;
 @property (weak) IBOutlet NSTokenField *commentAuthorBlacklist;
 
+// Preferences - Servers
+@property (weak) IBOutlet NSTableView *serverList;
+@property (weak) IBOutlet NSTextField *apiServerName;
+@property (weak) IBOutlet NSTextField *apiServerApiPath;
+@property (weak) IBOutlet NSTextField *apiServerWebPath;
+@property (weak) IBOutlet NSTextField *apiServerAuthToken;
+@property (weak) IBOutlet NSBox *apiServerSelectedBox;
+@property (weak) IBOutlet NSButton *apiServerTestButton;
+@property (weak) IBOutlet NSButton *apiServerDeleteButton;
+@property (weak) IBOutlet NSButton *apiServerReportError;
+
 // Keyboard
 @property (weak) IBOutlet NSButton *hotkeyEnable;
 @property (weak) IBOutlet NSButton *hotkeyCommandModifier;
@@ -73,12 +82,6 @@
 
 // About window
 @property (weak) IBOutlet NSTextField *aboutVersion;
-
-// API widow
-@property (unsafe_unretained) IBOutlet NSWindow *apiSettings;
-@property (weak) IBOutlet NSTextField *apiFrontEnd;
-@property (weak) IBOutlet NSTextField *apiBackEnd;
-@property (weak) IBOutlet NSTextField *apiPath;
 
 // Used to track action state
 @property (nonatomic) BOOL opening;
@@ -95,7 +98,7 @@
 @property (nonatomic) DataManager *dataManager;
 @property (weak) NSTimer *refreshTimer;
 @property (strong) NSDate *lastSuccessfulRefresh, *lastRepoCheck;
-@property (nonatomic) BOOL lastUpdateFailed, preferencesDirty, isRefreshing, isManuallyScrolling, ignoreNextFocusLoss;
+@property (nonatomic) BOOL preferencesDirty, isRefreshing, isManuallyScrolling, ignoreNextFocusLoss;
 @property (nonatomic, readonly) BOOL menuIsOpen;
 @property (nonatomic) long highlightedPrIndex;
 @property (nonatomic) float scrollBarWidth;

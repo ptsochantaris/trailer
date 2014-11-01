@@ -41,8 +41,8 @@
 
 - (void)drawRect:(NSRect)dirtyRect
 {
-	[_hostItem drawStatusBarBackgroundInRect:dirtyRect
-							   withHighlight:_highlighted];
+	[app.statusItem drawStatusBarBackgroundInRect:dirtyRect
+									withHighlight:_highlighted];
 
 	NSPoint imagePoint = NSMakePoint(STATUSITEM_PADDING, 1.0);
 	NSRect labelRect = CGRectMake(self.bounds.size.height, -5, self.bounds.size.width, self.bounds.size.height);

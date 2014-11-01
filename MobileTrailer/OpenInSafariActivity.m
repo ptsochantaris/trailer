@@ -1,3 +1,4 @@
+
 // with many thanks to https://github.com/davbeck/TUSafariActivity for the example and the icon
 
 @implementation OpenInSafariActivity

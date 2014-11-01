@@ -16,6 +16,8 @@
 
 #define kPullRequestSectionNames @[@"", @"Mine", @"Participated", @"Recently Merged", @"Recently Closed", @"All Pull Requests"]
 
+@class Repo, PRComment, PRStatus;
+
 @interface PullRequest : DataItem
 
 @property (nonatomic, retain) NSString * url;
@@ -35,7 +37,6 @@
 @property (nonatomic, retain) NSString * userLogin;
 @property (nonatomic, retain) NSString * repoName;
 @property (nonatomic, retain) NSDate * latestReadCommentDate;
-@property (nonatomic, retain) NSNumber * repoId;
 @property (nonatomic, retain) NSNumber * condition;
 @property (nonatomic, retain) NSNumber * mergeable;
 @property (nonatomic, retain) NSNumber * reopened;
@@ -50,13 +51,13 @@
 @property (nonatomic, retain) NSNumber * sectionIndex;
 @property (nonatomic, readonly) NSString * sectionName;
 
-+ (PullRequest *)pullRequestWithInfo:(NSDictionary*)info moc:(NSManagedObjectContext *)moc;
+@property (nonatomic, retain) NSSet *comments;
+@property (nonatomic, retain) Repo *repo;
+@property (nonatomic, retain) NSSet *statuses;
 
-+ (PullRequest *)pullRequestWithUrl:(NSString *)url moc:(NSManagedObjectContext *)moc;
++ (PullRequest *)pullRequestWithInfo:(NSDictionary*)info fromServer:(ApiServer *)apiServer;
 
 + (NSFetchRequest *)requestForPullRequestsWithFilter:(NSString *)filter;
-
-+ (NSArray *)pullRequestsForRepoId:(NSNumber *)repoId inMoc:(NSManagedObjectContext *)moc;
 
 + (NSArray *)allMergedRequestsInMoc:(NSManagedObjectContext *)moc;
 
@@ -85,5 +86,19 @@
 - (NSArray *)displayedStatuses;
 
 - (NSString *)urlForOpening;
+
+@end
+
+@interface PullRequest (CoreDataGeneratedAccessors)
+
+- (void)addCommentsObject:(PRComment *)value;
+- (void)removeCommentsObject:(PRComment *)value;
+- (void)addComments:(NSSet *)values;
+- (void)removeComments:(NSSet *)values;
+
+- (void)addStatusesObject:(PRStatus *)value;
+- (void)removeStatusesObject:(PRStatus *)value;
+- (void)addStatuses:(NSSet *)values;
+- (void)removeStatuses:(NSSet *)values;
 
 @end

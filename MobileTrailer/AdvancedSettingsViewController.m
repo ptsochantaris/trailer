@@ -13,6 +13,12 @@
 
 @implementation AdvancedSettingsViewController
 
+- (IBAction)done:(UIBarButtonItem *)sender
+{
+	if(app.preferencesDirty) [app startRefresh];
+	[self dismissViewControllerAnimated:YES completion:nil];
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -77,35 +83,29 @@
 			}
 			case 1:
             {
-				cell.textLabel.text = @"Don't report refresh failures";
-				if(settings.dontReportRefreshFailures) cell.accessoryType = UITableViewCellAccessoryCheckmark;
-				break;
-            }
-			case 2:
-            {
 				cell.textLabel.text = @"Hide 'All PRs' section";
 				if(settings.hideAllPrsSection) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
             }
-			case 3:
+			case 2:
             {
 				cell.textLabel.text = @"Move assigned PRs to 'Mine'";
 				if(settings.moveAssignedPrsToMySection) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
             }
-			case 4:
+			case 3:
 			{
 				cell.textLabel.text = @"Announce unmergeable PRs only in 'Mine'/'Participated'";
 				if(settings.markUnmergeableOnUserSectionsOnly) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
-			case 5:
+			case 4:
             {
 				cell.textLabel.text = @"Display repository names";
 				if(settings.showReposInName) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
             }
-			case 6:
+			case 5:
             {
 				cell.textLabel.text = @"Include repository names in filtering";
 				if(settings.includeReposInFilter) cell.accessoryType = UITableViewCellAccessoryCheckmark;
@@ -240,12 +240,6 @@
 		{
 			case 0:
 			{
-				cell.textLabel.text = @"API Server";
-				cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-				break;
-			}
-			case 1:
-			{
 				cell.textLabel.text = @"Log activity to console";
 				if(settings.logActivityToConsole) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
@@ -316,35 +310,29 @@
 			}
 			case 1:
 			{
-				settings.dontReportRefreshFailures = !settings.dontReportRefreshFailures;
+				settings.hideAllPrsSection = !settings.hideAllPrsSection;
 				[settingsChangedTimer push];
 				break;
 			}
 			case 2:
 			{
-				settings.hideAllPrsSection = !settings.hideAllPrsSection;
+				settings.moveAssignedPrsToMySection = !settings.moveAssignedPrsToMySection;
 				[settingsChangedTimer push];
 				break;
 			}
 			case 3:
 			{
-				settings.moveAssignedPrsToMySection = !settings.moveAssignedPrsToMySection;
+				settings.markUnmergeableOnUserSectionsOnly = !settings.markUnmergeableOnUserSectionsOnly;
 				[settingsChangedTimer push];
 				break;
 			}
 			case 4:
 			{
-				settings.markUnmergeableOnUserSectionsOnly = !settings.markUnmergeableOnUserSectionsOnly;
-				[settingsChangedTimer push];
-				break;
-			}
-			case 5:
-			{
 				settings.showReposInName = !settings.showReposInName;
 				[settingsChangedTimer push];
 				break;
 			}
-			case 6:
+			case 5:
 			{
 				settings.includeReposInFilter = !settings.includeReposInFilter;
 				break;
@@ -477,11 +465,6 @@
 		switch (indexPath.row) {
 			case 0:
 			{
-				[self performSegueWithIdentifier:@"apiServer" sender:self];
-				break;
-			}
-			case 1:
-			{
 				settings.logActivityToConsole = !settings.logActivityToConsole;
 				[self.tableView reloadData];
 				if(settings.logActivityToConsole)
@@ -503,13 +486,13 @@
 {
     switch (section) {
 		case REFRESH_SECTION_INDEX: return 3;
-		case DISPLAY_SECTION_INDEX: return 7;
+		case DISPLAY_SECTION_INDEX: return 6;
 		case COMMENTS_SECTION_INDEX: return 5;
 		case REPOS_SECTION_INDEX: return 1;
 		case HISTORY_SECTION_INDEX: return 3;
 		case CONFIRM_SECTION_INDEX: return 2;
 		case SORT_SECTION_INDEX: return 3;
-		case MISC_SECTION_INDEX: return 2;
+		case MISC_SECTION_INDEX: return 1;
 	}
 	return 0;
 }

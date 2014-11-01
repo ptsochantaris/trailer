@@ -8,10 +8,11 @@
 @dynamic dirty;
 @dynamic lastDirtied;
 @dynamic inaccessible;
+@dynamic pullRequests;
 
-+ (Repo*)repoWithInfo:(NSDictionary*)info moc:(NSManagedObjectContext*)moc
++ (Repo*)repoWithInfo:(NSDictionary*)info fromServer:(ApiServer *)apiServer
 {
-	Repo *r = [DataItem itemWithInfo:info type:@"Repo" moc:moc];
+	Repo *r = [DataItem itemWithInfo:info type:@"Repo" fromServer:apiServer];
 	if(r.postSyncAction.integerValue != kPostSyncDoNothing)
 	{
 		r.fullName = [info ofk:@"full_name"];
@@ -21,28 +22,6 @@
 		r.lastDirtied = [NSDate date];
 	}
 	return r;
-}
-
-- (void)prepareForDeletion
-{
-    [self removeAllRelatedPullRequests];
-	[super prepareForDeletion];
-}
-
-- (void)removeAllRelatedPullRequests
-{
-	NSNumber *sid = self.serverId;
-    if(sid)
-    {
-        NSManagedObjectContext *moc = self.managedObjectContext;
-        for(PullRequest *r in [PullRequest allItemsOfType:@"PullRequest" inMoc:moc])
-        {
-            if([r.repoId isEqualToNumber:sid])
-            {
-                [moc deleteObject:r];
-            }
-        }
-    }
 }
 
 + (NSArray *)inaccessibleReposInMoc:(NSManagedObjectContext *)moc

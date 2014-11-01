@@ -84,6 +84,7 @@ static DetailViewController *_detail_shared_ref;
 	self.webView.hidden = YES;
 	self.tryAgainButton.hidden = YES;
 	self.title = @"Loading...";
+	self.navigationItem.rightBarButtonItem = nil;
 }
 
 - (void)webView:(WKWebView *)webView decidePolicyForNavigationResponse:(WKNavigationResponse *)navigationResponse decisionHandler:(void (^)(WKNavigationResponsePolicy))decisionHandler
@@ -92,7 +93,7 @@ static DetailViewController *_detail_shared_ref;
 	if(res.statusCode==404)
 	{
 		[[[UIAlertView alloc] initWithTitle:@"Not Found"
-									message:[NSString stringWithFormat:@"\nPlease ensure you are logged in with the '%@' account on GitHub\n\nIf you are using two-factor auth: There is a bug between Github and iOS which may cause your login to fail.  If it happens, temporarily disable two-factor auth and log in from here, then re-enable it afterwards.  You will only need to do this once.",settings.localUser]
+									message:@"\nPlease ensure you are logged in with the correct account on GitHub\n\nIf you are using two-factor auth: There is a bug between Github and iOS which may cause your login to fail.  If it happens, temporarily disable two-factor auth and log in from here, then re-enable it afterwards.  You will only need to do this once."
 								   delegate:nil
 						  cancelButtonTitle:@"OK"
 						  otherButtonTitles:nil] show];
@@ -108,6 +109,9 @@ static DetailViewController *_detail_shared_ref;
 	self.tryAgainButton.hidden = YES;
 	self.navigationItem.rightBarButtonItem.enabled = YES;
 	self.title = self.webView.title;
+	self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction
+																						   target:self
+																						   action:@selector(shareSelected:)];
 }
 
 - (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error
@@ -129,14 +133,17 @@ static DetailViewController *_detail_shared_ref;
 	self.webView.hidden = YES;
 	self.tryAgainButton.hidden = NO;
 	self.title = @"Error";
+	self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
+																						   target:self
+																						   action:@selector(tryAgainSelected:)];
 }
 
-- (IBAction)ipadShareButtonSelected:(UIBarButtonItem *)sender
+- (void)shareSelected:(UIBarButtonItem *)sender
 {
 	[app shareFromView:self buttonItem:sender url:self.webView.URL];
 }
 
-- (IBAction)iPadTryAgain:(UIButton *)sender
+- (void)tryAgainSelected:(UIBarButtonItem *)sender
 {
     self.detailItem = self.detailItem;
 }

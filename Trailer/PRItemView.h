@@ -20,9 +20,11 @@
 @interface PRItemView : NSView
 
 @property (nonatomic,weak) id<PRItemViewDelegate> delegate;
-@property (nonatomic) id userInfo;
 @property (nonatomic) BOOL focused;
 
-- (instancetype)initWithPullRequest:(PullRequest *)pullRequest userInfo:(id)userInfo delegate:(id<PRItemViewDelegate>)delegate;
+- (instancetype)initWithPullRequest:(PullRequest *)pullRequest
+						   delegate:(id<PRItemViewDelegate>)delegate;
+
+- (PullRequest *)associatedPullRequest;
 
 @end

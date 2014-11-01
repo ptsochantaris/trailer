@@ -14,7 +14,6 @@
 @dynamic webUrl;
 @dynamic userId;
 @dynamic latestReadCommentDate;
-@dynamic repoId;
 @dynamic condition;
 @dynamic userAvatarUrl;
 @dynamic userLogin;
@@ -28,6 +27,9 @@
 @dynamic isNewAssignment;
 @dynamic issueUrl;
 @dynamic reopened;
+@dynamic statuses;
+@dynamic repo;
+@dynamic comments;
 
 static NSDateFormatter *itemDateFormatter;
 
@@ -42,9 +44,9 @@ static NSDateFormatter *itemDateFormatter;
 	});
 }
 
-+ (PullRequest *)pullRequestWithInfo:(NSDictionary *)info moc:(NSManagedObjectContext *)moc
++ (PullRequest *)pullRequestWithInfo:(NSDictionary *)info fromServer:(ApiServer *)apiServer
 {
-	PullRequest *p = [DataItem itemWithInfo:info type:@"PullRequest" moc:moc];
+	PullRequest *p = [DataItem itemWithInfo:info type:@"PullRequest" fromServer:apiServer];
 	if(p.postSyncAction.integerValue != kPostSyncDoNothing)
 	{
 		p.url = [info ofk:@"url"];
@@ -62,8 +64,6 @@ static NSDateFormatter *itemDateFormatter;
 		p.userId = [userInfo ofk:@"id"];
 		p.userLogin = [userInfo ofk:@"login"];
 		p.userAvatarUrl = [userInfo ofk:@"avatar_url"];
-
-		p.repoId = [[[info ofk:@"base"] ofk:@"repo"] ofk:@"id"];
 
 		NSDictionary *linkInfo = [info ofk:@"_links"];
 		p.issueCommentLink = [[linkInfo ofk:@"comments"] ofk:@"href"];
@@ -131,13 +131,8 @@ static NSDateFormatter *itemDateFormatter;
 
 	self.sectionIndex = @(section);
 
-	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestUrl = %@",self.url];
-	self.totalComments = @([self.managedObjectContext countForFetchRequest:f error:nil]);
-
-	if(self.repoId)
-		self.repoName = [[Repo itemOfType:@"Repo" serverId:self.repoId moc:self.managedObjectContext] fullName];
-	else
-		self.repoName = @"Unknown repository";
+	self.totalComments = @(self.comments.count);
+	self.repoName = self.repo.fullName;
 
 	if(!self.title) self.title = @"(No title)";
 }
@@ -162,7 +157,7 @@ static NSDateFormatter *itemDateFormatter;
 
 - (BOOL)refersToMe
 {
-	NSString *myHandle = [NSString stringWithFormat:@"@%@",settings.localUser];
+	NSString *myHandle = [NSString stringWithFormat:@"@%@", self.apiServer.userName];
 	NSRange rangeOfHandle = [self.body rangeOfString:myHandle options:NSCaseInsensitiveSearch|NSDiacriticInsensitiveSearch];
 	return rangeOfHandle.location != NSNotFound;
 }
@@ -348,42 +343,9 @@ static NSDateFormatter *itemDateFormatter;
 	return count;
 }
 
-- (void)prepareForDeletion
-{
-    NSNumber *sid = self.serverId;
-    if(sid)
-    {
-        NSManagedObjectContext *moc = self.managedObjectContext;
-        [PRComment removeCommentsWithPullRequestURL:self.url inMoc:moc];
-        [PRStatus removeStatusesWithPullRequestId:sid inMoc:moc];
-    }
-	[super prepareForDeletion];
-}
-
-+ (PullRequest *)pullRequestWithUrl:(NSString *)url moc:(NSManagedObjectContext *)moc
-{
-	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PullRequest"];
-	f.returnsObjectsAsFaults = NO;
-	f.fetchLimit = 1;
-	f.predicate = [NSPredicate predicateWithFormat:@"url == %@",url];
-	return [[moc executeFetchRequest:f error:nil] lastObject];
-}
-
-+ (NSArray *)pullRequestsForRepoId:(NSNumber *)repoId inMoc:(NSManagedObjectContext *)moc
-{
-	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PullRequest"];
-	f.returnsObjectsAsFaults = NO;
-	f.predicate = [NSPredicate predicateWithFormat:@"repoId == %@",repoId];
-	return [moc executeFetchRequest:f error:nil];
-}
-
 - (void)catchUpWithComments
 {
-	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
-	f.returnsObjectsAsFaults = NO;
-	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestUrl == %@",self.url];
-	NSArray *res = [self.managedObjectContext executeFetchRequest:f error:nil];
-	for(PRComment *c in res)
+	for(PRComment *c in self.comments)
 	{
 		NSDate *commentCreation = c.createdAt;
 		if(!self.latestReadCommentDate || [self.latestReadCommentDate compare:commentCreation]==NSOrderedAscending)
@@ -397,12 +359,12 @@ static NSDateFormatter *itemDateFormatter;
 - (BOOL)isMine
 {
 	if(self.assignedToMe.boolValue && settings.moveAssignedPrsToMySection) return YES;
-	return [self.userId isEqualToNumber:settings.localUserId];
+	return [self.userId isEqualToNumber:self.apiServer.userId];
 }
 
 - (BOOL)commentedByMe
 {
-	for(PRComment *c in [PRComment commentsForPullRequestUrl:self.url inMoc:self.managedObjectContext])
+	for(PRComment *c in self.comments)
 		if(c.isMine)
 			return YES;
 	return NO;
@@ -414,10 +376,12 @@ static NSDateFormatter *itemDateFormatter;
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRStatus"];
 	f.returnsObjectsAsFaults = NO;
 
-	NSString *predicate = [NSString stringWithFormat:@"pullRequestId = %@",self.serverId];
-
 	NSInteger mode = settings.statusFilteringMode;
-	if(mode!=kStatusFilterAll)
+	if(mode==kStatusFilterAll)
+	{
+		f.predicate = [NSPredicate predicateWithFormat:@"pullRequest == %@", self];
+	}
+	else
 	{
 		NSArray *terms = settings.statusFilteringTerms;
 		if(terms.count)
@@ -425,16 +389,24 @@ static NSDateFormatter *itemDateFormatter;
 			NSMutableArray *ors = [NSMutableArray arrayWithCapacity:terms.count];
 			for(NSString *term in terms)
 			{
-				[ors addObject:[NSString stringWithFormat:@"descriptionText contains[cd] '%@'",term]];
+				[ors addObject:[NSString stringWithFormat:@"descriptionText contains[cd] '%@'", term]];
 			}
+
 			if(mode==kStatusFilterInclude)
-				predicate = [predicate stringByAppendingFormat:@" and (%@)",[ors componentsJoinedByString:@" or "]];
+			{
+				f.predicate = [NSPredicate predicateWithFormat:@"pullRequest == %@ and (%@)", self, [ors componentsJoinedByString:@" or "]];
+			}
 			else
-				predicate = [predicate stringByAppendingFormat:@" and (not (%@))",[ors componentsJoinedByString:@" or "]];
+			{
+				f.predicate = [NSPredicate predicateWithFormat:@"pullRequest == %@ and (not (%@))", self, [ors componentsJoinedByString:@" or "]];
+			}
+		}
+		else
+		{
+			f.predicate = [NSPredicate predicateWithFormat:@"pullRequest == %@", self];
 		}
 	}
 
-	f.predicate = [NSPredicate predicateWithFormat:predicate];
 	f.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"createdAt" ascending:NO]];
 	NSArray *ret = [self.managedObjectContext executeFetchRequest:f error:nil];
 	NSMutableArray *result = [NSMutableArray array];
@@ -484,16 +456,16 @@ static NSDateFormatter *itemDateFormatter;
 {
 	if(date)
 	{
-		return [NSPredicate predicateWithFormat:@"userId != %lld and pullRequestUrl == %@ and createdAt > %@",
-				settings.localUserId.longLongValue,
-				self.url,
+		return [NSPredicate predicateWithFormat:@"userId != %lld and pullRequest == %@ and createdAt > %@",
+				self.apiServer.userId.longLongValue,
+				self,
 				date];
 	}
 	else
 	{
-		return [NSPredicate predicateWithFormat:@"userId != %lld and pullRequestUrl == %@",
-				settings.localUserId.longLongValue,
-				self.url];
+		return [NSPredicate predicateWithFormat:@"userId != %lld and pullRequest == %@",
+				self.apiServer.userId.longLongValue,
+				self];
 	}
 }
 

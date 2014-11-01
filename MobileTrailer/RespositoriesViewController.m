@@ -1,18 +1,16 @@
 
-@interface PreferencesViewController () <UITextFieldDelegate,
-NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
+@interface RespositoriesViewController () <UITextFieldDelegate, NSFetchedResultsControllerDelegate>
 {
-	NSString *targetUrl;
-
 	// Filtering
     UITextField *searchField;
     HTPopTimer *searchTimer;
 }
 @end
 
-@implementation PreferencesViewController
+@implementation RespositoriesViewController
 
-- (IBAction)ipadDone:(UIBarButtonItem *)sender {
+- (IBAction)done:(UIBarButtonItem *)sender
+{
 	if(app.preferencesDirty) [app startRefresh];
 	[self dismissViewControllerAnimated:YES completion:nil];
 }
@@ -35,117 +33,84 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
     searchField.delegate = self;
 	searchField.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 
-    UIView *searchHolder = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 41)];
+    UIView *searchHolder = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 51)];
 	[searchHolder addSubview:searchField];
 	searchHolder.autoresizesSubviews = YES;
 	searchHolder.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-	self.repositories.tableHeaderView = searchHolder;
+	self.tableView.tableHeaderView = searchHolder;
 
-    self.repositories.contentOffset = CGPointMake(0, searchHolder.frame.size.height);
-
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(apiUsageUpdate) name:RATE_UPDATE_NOTIFICATION object:nil];
-
-	self.githubApiToken.text = settings.authToken;
-	self.refreshRepoList.enabled = (settings.authToken.length>0);
-
-	[self.repositories reloadData];
-
-	[self apiUsageUpdate];
-
-	[self updateInstructionMode];
+	self.actionsButton.enabled = [ApiServer someServersHaveAuthTokensInMoc:app.dataManager.managedObjectContext];
 }
 
-- (void)instructionMode:(BOOL)instructionMode
+- (IBAction)actionSelected:(UIBarButtonItem *)sender
 {
-	self.repositories.hidden = instructionMode;
-	self.instructionLabel.hidden = !instructionMode;
-	self.createTokenButton.hidden = !instructionMode;
-	self.viewTokensButton.hidden = !instructionMode;
-	self.watchListButton.enabled = (self.fetchedResultsController.fetchedObjects.count>0);
+	UIAlertController *a = [UIAlertController alertControllerWithTitle:nil
+															   message:nil
+														preferredStyle:UIAlertControllerStyleActionSheet];
+	[a addAction:[UIAlertAction actionWithTitle:@"Refresh List"
+										  style:UIAlertActionStyleDestructive
+										handler:^(UIAlertAction *action) {
+											[self refreshList];
+										}]];
+	[a addAction:[UIAlertAction actionWithTitle:@"Hide All"
+										  style:UIAlertActionStyleDefault
+										handler:^(UIAlertAction *action) {
+											NSArray *allRepos = self.fetchedResultsController.fetchedObjects;
+											for(Repo *r in allRepos) { r.hidden = @YES; r.dirty = @NO; }
+											app.preferencesDirty = YES;
+										}]];
+	[a addAction:[UIAlertAction actionWithTitle:@"Show All"
+										  style:UIAlertActionStyleDefault
+										handler:^(UIAlertAction *action) {
+											NSArray *allRepos = self.fetchedResultsController.fetchedObjects;
+											for(Repo *r in allRepos) { r.hidden = @NO; r.dirty = @YES; r.lastDirtied = [NSDate date]; }
+											app.preferencesDirty = YES;
+										}]];
+	[a addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+	a.popoverPresentationController.barButtonItem = sender;
+	[self presentViewController:a animated:YES completion:nil];
 }
 
-- (void)dealloc
+- (void)refreshList
 {
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
-}
+	NSString *originalName = self.navigationItem.title;
+	self.navigationItem.title = @"Loading...";
+	self.actionsButton.enabled = NO;
+	self.tableView.userInteractionEnabled = NO;
+	self.tableView.alpha = 0.5;
 
-- (void)apiUsageUpdate
-{
-	API *api = app.api;
-	if(api.requestsLimit==0 && api.requestsRemaining==0)
-		[self.apiLoad setProgress:0.0];
-	else
-		[self.apiLoad setProgress:(api.requestsLimit-api.requestsRemaining)/api.requestsLimit];
-}
-
-- (void)commitToken
-{
-	settings.authToken = [self.githubApiToken.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-	self.refreshRepoList.enabled = (settings.authToken.length>0);
-	[self.githubApiToken resignFirstResponder];
-}
-
-- (void)resetData
-{
-	if([Repo countItemsOfType:@"Repo" inMoc:app.dataManager.managedObjectContext])
-	{
-		CGRect frame = self.githubApiToken.frame;
-		frame = CGRectOffset(frame, 0, frame.size.height);
-		UILabel *pleaseWaitLabel = [[UILabel alloc] initWithFrame:frame];
-		pleaseWaitLabel.text = @"Clearing database - Just a moment...";
-		pleaseWaitLabel.backgroundColor = [UIColor whiteColor];
-		pleaseWaitLabel.font = [UIFont systemFontOfSize:16.0];
-		pleaseWaitLabel.textAlignment = NSTextAlignmentCenter;
-		pleaseWaitLabel.textColor = [UIColor redColor];
-		[self.view addSubview:pleaseWaitLabel];
-
-		double delayInSeconds = 0.01;
-		dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
-		dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-			app.preferencesDirty = YES;
-			app.lastSuccessfulRefresh = nil;
-			[app.dataManager deleteEverything];
-			app.api.requestsLimit = 0;
-			app.api.requestsRemaining = 0;
-			[self apiUsageUpdate];
-			[pleaseWaitLabel removeFromSuperview];
-		});
-	}
-}
-
-- (IBAction)ipadLoadRepos:(UIBarButtonItem *)sender
-{
-	if(self.githubApiToken.isFirstResponder)
-	{
-		[self commitToken];
-	}
-
-	NSString *originalName = self.refreshRepoList.title;
-	self.refreshRepoList.title = @"Loading...";
-	[self instructionMode:NO];
-	self.refreshRepoList.enabled = NO;
-	self.repositories.hidden = YES;
-	self.githubApiToken.hidden = YES;
-
-	[app.api fetchRepositoriesAndCallback:^(BOOL success) {
-
-		self.refreshRepoList.title = originalName;
-		self.refreshRepoList.enabled = YES;
-		self.repositories.hidden = NO;
-		self.githubApiToken.hidden = NO;
-
-		app.preferencesDirty = YES;
-
-		[self updateInstructionMode];
-
-		if(!success)
+	NSManagedObjectContext *tempContext = [app.dataManager tempContext];
+	[app.api fetchRepositoriesToMoc:tempContext andCallback:^{
+		if([ApiServer shouldReportRefreshFailureInMoc:tempContext])
 		{
+			NSMutableArray *errorServers = [NSMutableArray new];
+			for(ApiServer *apiServer in [ApiServer allApiServersInMoc:tempContext])
+			{
+				if(apiServer.goodToGo && !apiServer.lastSyncSucceeded.boolValue)
+				{
+					[errorServers addObject:apiServer.label];
+				}
+			}
+
+			NSString *serverNames = [errorServers componentsJoinedByString:@", "];
+			NSString *message = [NSString stringWithFormat:@"Could not refresh repository list from %@, please ensure that the tokens you are using are valid",serverNames];
+
 			[[[UIAlertView alloc] initWithTitle:@"Error"
-										message:@"Could not refresh repository list, please ensure that the token you are using is valid"
+										message:message
 									   delegate:nil
 							  cancelButtonTitle:@"OK"
 							  otherButtonTitles:nil] show];
+
 		}
+		else
+		{
+			[tempContext save:nil];
+		}
+		self.navigationItem.title = originalName;
+		self.actionsButton.enabled = YES;
+		self.tableView.alpha = 1.0;
+		self.tableView.userInteractionEnabled = YES;
+		app.preferencesDirty = YES;
 	}];
 }
 
@@ -182,30 +147,22 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-	NSString *title;
-	if(settings.localUser)
-		title = settings.localUser;
-	else
-		title = @"";
-
 	if(section==1)
 	{
-		title = [title stringByAppendingString:@" - Forked Repos"];
+		return @"Forked Repos";
 	}
 	else
 	{
 		Repo *repo = [self.fetchedResultsController objectAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:section]];
 		if(repo.fork.boolValue)
 		{
-			title = [title stringByAppendingString:@" - Forked Repos"];
+			return @"Forked Repos";
 		}
 		else
 		{
-			title = [title stringByAppendingString:@" - Parent Repos"];
+			return @"Parent Repos";
 		}
 	}
-
-	return title;
 }
 
 #pragma mark - Fetched results controller
@@ -253,7 +210,7 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 
 - (void)controllerWillChangeContent:(NSFetchedResultsController *)controller
 {
-    [self.repositories beginUpdates];
+    [self.tableView beginUpdates];
 }
 
 - (void)controller:(NSFetchedResultsController *)controller didChangeSection:(id <NSFetchedResultsSectionInfo>)sectionInfo
@@ -261,11 +218,11 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 {
     switch(type) {
         case NSFetchedResultsChangeInsert:
-            [self.repositories insertSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:UITableViewRowAnimationFade];
+            [self.tableView insertSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:UITableViewRowAnimationFade];
             break;
 
         case NSFetchedResultsChangeDelete:
-            [self.repositories deleteSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:UITableViewRowAnimationFade];
+            [self.tableView deleteSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:UITableViewRowAnimationFade];
             break;
 
 		default:
@@ -277,7 +234,7 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
        atIndexPath:(NSIndexPath *)indexPath forChangeType:(NSFetchedResultsChangeType)type
       newIndexPath:(NSIndexPath *)newIndexPath
 {
-    UITableView *tableView = self.repositories;
+    UITableView *tableView = self.tableView;
 
     switch(type) {
         case NSFetchedResultsChangeInsert:
@@ -304,7 +261,7 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 
 - (void)controllerDidChangeContent:(NSFetchedResultsController *)controller
 {
-    [self.repositories endUpdates];
+    [self.tableView endUpdates];
 }
 
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath
@@ -334,69 +291,6 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 	return x;
 }
 
-- (IBAction)ipadCreateToken:(UIButton *)sender
-{
-	targetUrl = [NSString stringWithFormat:@"https://%@/settings/tokens/new",settings.apiFrontEnd];
-	[self performSegueWithIdentifier:@"openGithub" sender:self];
-}
-
-- (IBAction)ipadViewTokens:(UIButton *)sender
-{
-	targetUrl = [NSString stringWithFormat:@"https://%@/settings/applications",settings.apiFrontEnd];
-	[self performSegueWithIdentifier:@"openGithub" sender:self];
-}
-
-- (IBAction)ipadWatchlistSelected:(UIBarButtonItem *)sender {
-	UIActionSheet *a = [[UIActionSheet alloc] initWithTitle:@"Watchlist"
-												   delegate:self
-										  cancelButtonTitle:@"Cancel"
-									 destructiveButtonTitle:@"Visit Watchlist"
-										  otherButtonTitles:@"Hide All",@"Show All",nil];
-	[a showFromBarButtonItem:self.watchListButton animated:YES];
-}
-
-- (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
-{
-	if(buttonIndex==3) return;
-
-	switch (buttonIndex)
-	{
-		case 0:
-		{
-			targetUrl = [NSString stringWithFormat:@"https://%@/watching",settings.apiFrontEnd];
-			[self performSegueWithIdentifier:@"openGithub" sender:self];
-			break;
-		}
-		case 1:
-		{
-			NSArray *allRepos = self.fetchedResultsController.fetchedObjects;
-			for(Repo *r in allRepos) { r.hidden = @YES; r.dirty = @NO; }
-			break;
-		}
-		case 2:
-		{
-			NSArray *allRepos = self.fetchedResultsController.fetchedObjects;
-			for(Repo *r in allRepos) { r.hidden = @NO; r.dirty = @YES; r.lastDirtied = [NSDate date]; }
-			break;
-		}
-	}
-
-	app.preferencesDirty = YES;
-}
-
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
-{
-	if([segue.destinationViewController isKindOfClass:[GithubViewController class]])
-	{
-		((GithubViewController *)segue.destinationViewController).pathToLoad = targetUrl;
-	}
-	else if([segue.destinationViewController isKindOfClass:[UINavigationController class]])
-	{
-		((GithubViewController *)[segue.destinationViewController topViewController]).pathToLoad = targetUrl;
-	}
-	targetUrl = nil;
-}
-
 ///////////////////////////// filtering
 
 - (void)reloadData
@@ -404,7 +298,6 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 	NSIndexSet *currentIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, _fetchedResultsController.sections.count)];
 
 	_fetchedResultsController = nil;
-	self.watchListButton.enabled = (self.fetchedResultsController.fetchedObjects.count>0);
 
 	NSIndexSet *dataIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, _fetchedResultsController.sections.count)];
 
@@ -419,18 +312,18 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 		return !([removedIndexes containsIndex:idx] || [addedIndexes containsIndex:idx]);
 	}];
 
-	[self.repositories beginUpdates];
+	[self.tableView beginUpdates];
 
 	if(removedIndexes.count)
-		[self.repositories deleteSections:removedIndexes withRowAnimation:UITableViewRowAnimationAutomatic];
+		[self.tableView deleteSections:removedIndexes withRowAnimation:UITableViewRowAnimationAutomatic];
 
 	if(untouchedIndexes.count)
-		[self.repositories reloadSections:untouchedIndexes withRowAnimation:UITableViewRowAnimationAutomatic];
+		[self.tableView reloadSections:untouchedIndexes withRowAnimation:UITableViewRowAnimationAutomatic];
 
 	if(addedIndexes.count)
-		[self.repositories insertSections:addedIndexes withRowAnimation:UITableViewRowAnimationAutomatic];
+		[self.tableView insertSections:addedIndexes withRowAnimation:UITableViewRowAnimationAutomatic];
 
-	[self.repositories endUpdates];
+	[self.tableView endUpdates];
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
@@ -447,56 +340,17 @@ NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 	return YES;
 }
 
-- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
-{
-	if(textField==self.githubApiToken)
-	{
-		self.repositories.hidden = YES;
-	}
-	return YES;
-}
-
-- (void)textFieldDidEndEditing:(UITextField *)textField
-{
-	if(textField==self.githubApiToken)
-	{
-		[self updateInstructionMode];
-	}
-}
-
-- (void)updateInstructionMode
-{
-	[self instructionMode:([Repo countItemsOfType:@"Repo" inMoc:app.dataManager.managedObjectContext]==0 || self.githubApiToken.text.length==0)];
-}
-
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
 {
-	if(textField==self.githubApiToken)
+	if([string isEqualToString:@"\n"])
 	{
-		if([string isEqualToString:@"\n"])
-		{
-			[self commitToken];
-			return NO;
-		}
-		else
-		{
-			app.preferencesDirty = YES;
-			[self resetData];
-			return YES;
-		}
+		[textField resignFirstResponder];
 	}
 	else
 	{
-		if([string isEqualToString:@"\n"])
-		{
-			[textField resignFirstResponder];
-		}
-		else
-		{
-			[searchTimer push];
-		}
-		return YES;
+		[searchTimer push];
 	}
+	return YES;
 }
 
 @end

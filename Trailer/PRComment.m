@@ -9,14 +9,14 @@
 @dynamic userName;
 @dynamic avatarUrl;
 @dynamic path;
-@dynamic pullRequestUrl;
 @dynamic url;
 @dynamic userId;
 @dynamic webUrl;
+@dynamic pullRequest;
 
-+ (PRComment *)commentWithInfo:(NSDictionary *)info moc:(NSManagedObjectContext *)moc
++ (PRComment *)commentWithInfo:(NSDictionary *)info fromServer:(ApiServer *)apiServer
 {
-	PRComment *c = [DataItem itemWithInfo:info type:@"PRComment" moc:moc];
+	PRComment *c = [DataItem itemWithInfo:info type:@"PRComment" fromServer:apiServer];
 	if(c.postSyncAction.integerValue != kPostSyncDoNothing)
 	{
 		c.body = [info ofk:@"body"];
@@ -32,7 +32,6 @@
 
 		NSDictionary *links = [info ofk:@"links"];
 		c.url = [[links ofk:@"self"] ofk:@"href"];
-		c.pullRequestUrl = [[links ofk:@"pull_request"] ofk:@"href"];
 		if(!c.webUrl) c.webUrl = [[links ofk:@"html"] ofk:@"href"];
 	}
 	return c;
@@ -40,35 +39,14 @@
 
 - (BOOL)isMine
 {
-	return [self.userId isEqualToNumber:settings.localUserId];
+	return [self.userId isEqualToNumber:self.apiServer.userId];
 }
 
 - (BOOL)refersToMe
 {
-	NSString *myHandle = [NSString stringWithFormat:@"@%@",settings.localUser];
+	NSString *myHandle = [NSString stringWithFormat:@"@%@", self.apiServer.userName];
 	NSRange rangeOfHandle = [self.body rangeOfString:myHandle options:NSCaseInsensitiveSearch|NSDiacriticInsensitiveSearch];
 	return rangeOfHandle.location != NSNotFound;
-}
-
-+ (void)removeCommentsWithPullRequestURL:(NSString *)url inMoc:(NSManagedObjectContext *)moc
-{
-	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
-	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestUrl = %@",url];
-	f.includesPropertyValues = NO;
-	f.includesSubentities = NO;
-	for(PRComment *c in [moc executeFetchRequest:f error:nil])
-	{
-		DLog(@"  Deleting comment ID %@",c.serverId);
-		[moc deleteObject:c];
-	}
-}
-
-+ (NSArray *)commentsForPullRequestUrl:(NSString *)url inMoc:(NSManagedObjectContext *)moc
-{
-	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRComment"];
-	f.returnsObjectsAsFaults = NO;
-	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestUrl = %@",url];
-	return [moc executeFetchRequest:f error:nil];
 }
 
 @end

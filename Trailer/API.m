@@ -1,11 +1,4 @@
 
-@interface SuccessfulSyncCommitData : NSObject
-@property (nonatomic) NSDate *latestReceivedEventDate, *latestUserEventDate;
-@property (nonatomic) NSString *latestReceivedEventEtag, *latestUserEventEtag;
-@end
-@implementation SuccessfulSyncCommitData
-@end
-
 @interface UrlBackOffEntry : NSObject
 @property (nonatomic) NSDate *nextAttemptAt;
 @property (nonatomic) NSTimeInterval duration;
@@ -24,7 +17,6 @@
 	CGFloat GLOBAL_SCREEN_SCALE;
 #endif
 
-	SuccessfulSyncCommitData *syncDataToCommit;
 	NSMutableDictionary *badLinks;
 }
 @end
@@ -41,8 +33,6 @@
 
 #define CALLBACK if(callback) callback
 
-typedef void (^completionBlockType)(BOOL);
-
 - (id)init
 {
     self = [super init];
@@ -56,8 +46,6 @@ typedef void (^completionBlockType)(BOOL);
 															  diskPath:nil];
 		[NSURLCache setSharedURLCache:cache];
 
-		syncDataToCommit = [[SuccessfulSyncCommitData alloc] init];
-
 		mediumFormatter = [[NSDateFormatter alloc] init];
 		mediumFormatter.dateStyle = NSDateFormatterMediumStyle;
 		mediumFormatter.timeStyle = NSDateFormatterMediumStyle;
@@ -67,7 +55,8 @@ typedef void (^completionBlockType)(BOOL);
 
 		badLinks = [NSMutableDictionary new];
 
-		[self restartNotifier];
+		self.reachability = [Reachability reachabilityForInternetConnection];
+		[self.reachability startNotifier];
 
         NSFileManager *fileManager = [NSFileManager defaultManager];
         NSURL *appSupportURL = [[fileManager URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] lastObject];
@@ -82,124 +71,112 @@ typedef void (^completionBlockType)(BOOL);
     return self;
 }
 
-- (void)restartNotifier
-{
-	[self.reachability stopNotifier];
-	self.reachability = [Reachability reachabilityWithHostName:settings.apiBackEnd];
-	[self.reachability startNotifier];
-}
-
 - (void)error:(NSString*)errorString
 {
 	DLog(@"Failed to fetch %@",errorString);
 }
 
-- (void)updateLimitFromServer
+- (void)updateLimitsFromServer
 {
-	[self getRateLimitAndCallback:^(long long remaining, long long limit, long long reset) {
-		self.requestsRemaining = remaining;
-		self.requestsLimit = limit;
-		if(reset>=0)
+	NSArray *allApiServers = [ApiServer allApiServersInMoc:app.dataManager.managedObjectContext];
+	NSInteger total = allApiServers.count;
+	__block NSInteger count = 0;
+	for(ApiServer *apiServer in allApiServers)
+	{
+		if(apiServer.goodToGo)
 		{
-			[[NSNotificationCenter defaultCenter] postNotificationName:RATE_UPDATE_NOTIFICATION
-																object:nil
-															  userInfo:nil];
+			[self getRateLimitFromServer:(ApiServer *)apiServer andCallback:^(long long remaining, long long limit, long long reset) {
+				apiServer.requestsRemaining = @(remaining);
+				apiServer.requestsLimit = @(limit);
+				count++;
+				if(count==total)
+				{
+					[[NSNotificationCenter defaultCenter] postNotificationName:API_USAGE_UPDATE
+																		object:apiServer
+																	  userInfo:nil];
+				}
+			}];
 		}
-	}];
+	}
 }
 
-- (void)fetchStatusesForCurrentPullRequestsToMoc:(NSManagedObjectContext *)moc andCallback:(void (^)(BOOL))callback
+- (void)fetchStatusesForCurrentPullRequestsToMoc:(NSManagedObjectContext *)moc andCallback:(completionBlockType)callback
 {
 	NSArray *prs = [DataItem allItemsOfType:@"PullRequest" inMoc:moc];
 
-	if(!prs.count)
+	if(prs.count==0)
 	{
-		CALLBACK(YES);
+		CALLBACK();
 		return;
 	}
 
-	for(PullRequest *r in prs)
-	{
-		NSArray *statuses = [PRStatus statusesForPullRequestId:r.serverId inMoc:moc];
-		for(PRStatus *s in statuses) s.postSyncAction = @(kPostSyncDelete);
-	}
-
 	NSInteger total = prs.count;
-	__block NSInteger succeeded = 0;
-	__block NSInteger failed = 0;
+	__block NSInteger operationCount = 0;
 
 	for(PullRequest *p in prs)
 	{
+		for(PRStatus *s in p.statuses)
+			s.postSyncAction = @(kPostSyncDelete);
+
 		[self getPagedDataInPath:p.statusesLink
+					  fromServer:p.apiServer
 				startingFromPage:1
 						  params:nil
 					extraHeaders:nil
 				 perPageCallback:^BOOL(id data, BOOL lastPage) {
 					 for(NSDictionary *info in data)
 					 {
-						 PRStatus *s = [PRStatus statusWithInfo:info moc:moc];
-						 if(!s.pullRequestId) s.pullRequestId = p.serverId;
+						 PRStatus *s = [PRStatus statusWithInfo:info fromServer:p.apiServer];
+						 s.pullRequest = p;
 					 }
 					 return NO;
 				 } finalCallback:^(BOOL success, NSInteger resultCode, NSString *etag) {
-					 if(success) succeeded++; else failed++;
-					 if(succeeded+failed==total)
-					 {
-						 if(failed==0)
-						 {
-							 [DataItem nukeDeletedItemsOfType:@"PRStatus" inMoc:moc];
-							 CALLBACK(YES);
-						 }
-						 else
-						 {
-							 CALLBACK(NO);
-						 }
-					 }
+					 operationCount++;
+					 if(!success) p.apiServer.lastSyncSucceeded = @NO;
+					 if(operationCount==total) CALLBACK();
 				 }];
 	}
 }
 
-- (void)fetchCommentsForCurrentPullRequestsToMoc:(NSManagedObjectContext *)moc andCallback:(void (^)(BOOL))callback
+- (void)fetchCommentsForCurrentPullRequestsToMoc:(NSManagedObjectContext *)moc andCallback:(completionBlockType)callback
 {
 	NSArray *prs = [DataItem newOrUpdatedItemsOfType:@"PullRequest" inMoc:moc];
-	for(PullRequest *r in prs)
+
+	if(prs.count==0)
 	{
-		NSArray *comments = [PRComment commentsForPullRequestUrl:r.url inMoc:moc];
-		for(PRComment *c in comments) c.postSyncAction = @(kPostSyncDelete);
+		CALLBACK();
+		return;
 	}
 
-	NSInteger totalOperations = 2;
-	__block NSInteger succeded = 0;
-	__block NSInteger failed = 0;
+	for(PullRequest *r in prs)
+		for(PRComment *c in r.comments)
+			c.postSyncAction = @(kPostSyncDelete);
 
-	completionBlockType completionCallback = ^(BOOL success){
-		if(success) succeded++; else failed++;
-		if(succeded+failed==totalOperations)
-		{
-			[DataItem nukeDeletedItemsOfType:@"PRComment" inMoc:moc];
-			CALLBACK(failed==0);
-		}
+	NSInteger totalOperations = 2;
+	__block NSInteger operationCount = 0;
+
+	completionBlockType completionCallback = ^{
+		operationCount++;
+		if(operationCount==totalOperations) CALLBACK();
 	};
 
-	[self _fetchCommentsForPullRequests:prs issues:YES toMoc:moc andCallback:completionCallback];
-
-	[self _fetchCommentsForPullRequests:prs issues:NO toMoc:moc andCallback:completionCallback];
+	[self _fetchCommentsForPullRequests:prs issues:YES inMoc:moc andCallback:completionCallback];
+	[self _fetchCommentsForPullRequests:prs issues:NO inMoc:moc andCallback:completionCallback];
 }
 
 - (void)_fetchCommentsForPullRequests:(NSArray*)prs
 							   issues:(BOOL)issues
-								toMoc:(NSManagedObjectContext *)moc
-						  andCallback:(void(^)(BOOL success))callback
+								inMoc:(NSManagedObjectContext *)moc
+						  andCallback:(completionBlockType)callback
 {
 	NSInteger total = prs.count;
-	if(!total)
+	if(total==0)
 	{
-		CALLBACK(YES);
+		CALLBACK();
 		return;
 	}
 
-	__block NSInteger succeeded = 0;
-	__block NSInteger failed = 0;
+	__block NSInteger operationCount = 0;
 
 	for(PullRequest *p in prs)
 	{
@@ -210,14 +187,15 @@ typedef void (^completionBlockType)(BOOL);
 			link = p.reviewCommentLink;
 
 		[self getPagedDataInPath:link
+					  fromServer:p.apiServer
 				startingFromPage:1
 						  params:nil
 					extraHeaders:nil
 				 perPageCallback:^BOOL(id data, BOOL lastPage) {
 					 for(NSDictionary *info in data)
 					 {
-						 PRComment *c = [PRComment commentWithInfo:info moc:moc];
-						 if(!c.pullRequestUrl) c.pullRequestUrl = p.url;
+						 PRComment *c = [PRComment commentWithInfo:info fromServer:p.apiServer];
+						 c.pullRequest = p;
 
 						 // check if we're assigned to a just created pull request, in which case we want to "fast forward" its latest comment dates to our own if we're newer
 						 if(p.postSyncAction.integerValue == kPostSyncNoteNew)
@@ -229,84 +207,74 @@ typedef void (^completionBlockType)(BOOL);
 					 }
 					 return NO;
 				 } finalCallback:^(BOOL success, NSInteger resultCode, NSString *etag) {
-					 if(success) succeeded++; else failed++;
-					 if(succeeded+failed==total)
-					 {
-						 callback(failed==0);
-					 }
+					 operationCount++;
+					 if(!success) p.apiServer.lastSyncSucceeded = @NO;
+					 if(operationCount==total) CALLBACK();
 				 }];
 	}
 }
 
-- (void)fetchRepositoriesAndCallback:(void(^)(BOOL success))callback
+- (void)fetchRepositoriesToMoc:(NSManagedObjectContext *)moc andCallback:(completionBlockType)callback
 {
-	[self syncUserDetailsAndCallback:^(BOOL success) {
-		if(success)
+	[ApiServer resetSyncSuccessInMoc:moc];
+
+	[self syncUserDetailsInMoc:moc andCallback:^{
+		NSArray *allRepos = [PullRequest itemsOfType:@"Repo" surviving:YES inMoc:moc];
+		for(Repo *r in allRepos)
 		{
-			NSManagedObjectContext *syncContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
-			syncContext.parentContext = app.dataManager.managedObjectContext;
-			syncContext.undoManager = nil;
-
-			NSArray *allRepos = [PullRequest itemsOfType:@"Repo" surviving:YES inMoc:syncContext];
-			for(Repo *r in allRepos) r.postSyncAction = @(kPostSyncDelete);
-
-			[self syncWatchedReposForUserToMoc:syncContext andCallback:^(BOOL success) {
-				if(success)
-				{
-					[DataItem nukeDeletedItemsOfType:@"Repo" inMoc:syncContext];
-
-					BOOL shouldHideByDefault = settings.hideNewRepositories;
-					for(Repo *r in [DataItem newItemsOfType:@"Repo" inMoc:syncContext])
-					{
-						r.hidden = @(shouldHideByDefault);
-						if(!shouldHideByDefault)
-						{
-							[app postNotificationOfType:kNewRepoAnnouncement forItem:r];
-						}
-					}
-
-					app.lastRepoCheck = [NSDate date];
-					if(syncContext.hasChanges) [syncContext save:nil];
-				}
-				else
-				{
-					DLog(@"%@",[NSError errorWithDomain:@"YOUR_ERROR_DOMAIN"
-												   code:101
-											   userInfo:@{NSLocalizedDescriptionKey:@"Error while fetching data from GitHub"}]);
-				}
-				callback(success);
-			}];
+			r.postSyncAction = @(kPostSyncDelete);
+			r.inaccessible = @NO;
 		}
-		else CALLBACK(NO);
+
+		NSArray *allApiServers = [ApiServer allApiServersInMoc:moc];
+		NSInteger totalOperations = allApiServers.count;
+		__block NSInteger operationCount = 0;
+
+		completionBlockType completionCallback = ^{
+			operationCount++;
+			if(operationCount==totalOperations)
+			{
+				BOOL shouldHideByDefault = settings.hideNewRepositories;
+				for(Repo *r in [DataItem newItemsOfType:@"Repo" inMoc:moc])
+				{
+					r.hidden = @(shouldHideByDefault);
+					if(!shouldHideByDefault)
+					{
+						[app postNotificationOfType:kNewRepoAnnouncement forItem:r];
+					}
+				}
+
+				app.lastRepoCheck = [NSDate date];
+				CALLBACK();
+			}
+		};
+
+		for(ApiServer *apiServer in allApiServers)
+		{
+			if(apiServer.goodToGo)
+				[self syncWatchedReposFromServer:apiServer andCallback:completionCallback];
+			else
+				completionCallback();
+		}
 	}];
 }
 
-- (void)detectAssignedPullRequestsInMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
+- (void)detectAssignedPullRequestsInMoc:(NSManagedObjectContext *)moc andCallback:(completionBlockType)callback
 {
 	NSArray *prs = [DataItem newOrUpdatedItemsOfType:@"PullRequest" inMoc:moc];
 
-	if(!prs.count)
+	if(prs.count==0)
 	{
-		CALLBACK(YES);
+		CALLBACK();
 		return;
 	}
 
-	for(PullRequest *r in prs)
-	{
-		NSArray *statuses = [PRStatus statusesForPullRequestId:r.serverId inMoc:moc];
-		for(PRStatus *s in statuses) s.postSyncAction = @(kPostSyncDelete);
-	}
-
 	NSInteger totalOperations = prs.count;
-	__block NSInteger succeeded = 0;
-	__block NSInteger failed = 0;
+	__block NSInteger operationCount = 0;
 
-	completionBlockType completionCallback = ^(BOOL success) {
-		if(success) succeeded++; else failed++;
-		if(succeeded+failed==totalOperations)
-		{
-			CALLBACK(failed==0);
-		}
+	completionBlockType completionCallback = ^{
+		operationCount++;
+		if(operationCount==totalOperations) CALLBACK();
 	};
 
 	for(PullRequest *p in prs)
@@ -314,16 +282,16 @@ typedef void (^completionBlockType)(BOOL);
 		if(p.issueUrl)
 		{
 			[self getDataInPath:p.issueUrl
+					 fromServer:p.apiServer
 						 params:nil
 				   extraHeaders:nil
 					andCallback:^(id data, BOOL lastPage, NSInteger resultCode, NSString *etag) {
 						if(data)
 						{
 							NSString *assignee = [[data ofk:@"assignee"] ofk:@"login"];
-							BOOL assigned = [assignee isEqualToString:settings.localUser];
+							BOOL assigned = [assignee isEqualToString:p.apiServer.userName];
 							p.isNewAssignment = @(assigned && !p.assignedToMe.boolValue);
 							p.assignedToMe = @(assigned);
-							completionCallback(YES);
 						}
 						else
 						{
@@ -332,23 +300,23 @@ typedef void (^completionBlockType)(BOOL);
 								// 404/410 is fine, it means issue entry doesn't exist
 								p.assignedToMe = @NO;
 								p.isNewAssignment = @NO;
-								completionCallback(YES);
 							}
 							else
 							{
-								completionCallback(NO);
+								p.apiServer.lastSyncSucceeded = @NO;
 							}
 						}
+						completionCallback();
 					}];
 		}
 		else
 		{
-			completionCallback(YES);
+			completionCallback();
 		}
 	}
 }
 
-- (void)checkPrClosuresInMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
+- (void)checkPrClosuresInMoc:(NSManagedObjectContext *)moc andCallback:(completionBlockType)callback
 {
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PullRequest"];
 	f.predicate = [NSPredicate predicateWithFormat:@"postSyncAction == %d and condition == %d",kPostSyncDelete, kPullRequestConditionOpen];
@@ -356,39 +324,34 @@ typedef void (^completionBlockType)(BOOL);
 	NSArray *pullRequests = [moc executeFetchRequest:f error:nil];
 
 	NSArray *prsToCheck = [pullRequests filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(PullRequest *r, NSDictionary *bindings) {
-		Repo *parent = [Repo itemOfType:@"Repo" serverId:r.repoId moc:moc];
+		Repo *parent = r.repo;
 		return (!parent.hidden.boolValue) && (parent.postSyncAction.integerValue!=kPostSyncDelete);
 	}]];
 
 	NSInteger totalOperations = prsToCheck.count;
 	if(totalOperations==0)
 	{
-		callback(YES);
+		CALLBACK();
 		return;
 	}
 
-	__block NSInteger succeded = 0;
-	__block NSInteger failed = 0;
-
-	completionBlockType completionCallback = ^(BOOL success) {
-		if(success) succeded++; else failed++;
-		if(succeded+failed==totalOperations)
-		{
-			CALLBACK(failed==0);
-		}
+	__block NSInteger operationCount = 0;
+	completionBlockType completionCallback = ^{
+		operationCount++;
+		if(operationCount==totalOperations) CALLBACK();
 	};
 
 	for(PullRequest *r in prsToCheck)
-		[self investigatePrClosureInMoc:r andCallback:completionCallback];
+		[self investigatePrClosureForPr:r andCallback:completionCallback];
 }
 
-- (void)investigatePrClosureInMoc:(PullRequest *)r andCallback:(void(^)(BOOL success))callback
+- (void)investigatePrClosureForPr:(PullRequest *)r andCallback:(completionBlockType)callback
 {
 	DLog(@"Checking closed PR to see if it was merged: %@",r.title);
 
-	Repo *parent = [Repo itemOfType:@"Repo" serverId:r.repoId moc:r.managedObjectContext];
-
-	[self get:[NSString stringWithFormat:@"/repos/%@/pulls/%@",parent.fullName,r.number]
+	[self get:[NSString stringWithFormat:@"/repos/%@/pulls/%@", r.repo.fullName, r.number]
+   fromServer:r.apiServer
+ignoreLastSync:NO
    parameters:nil
  extraHeaders:nil
 	  success:^(NSHTTPURLResponse *response, id data) {
@@ -398,8 +361,8 @@ typedef void (^completionBlockType)(BOOL);
 		  {
 			  DLog(@"detected merged PR: %@",r.title);
 			  NSNumber *mergeUserId = [mergeInfo  ofk:@"id"];
-			  DLog(@"merged by user id: %@, our id is: %@",mergeUserId,settings.localUserId);
-			  BOOL mergedByMyself = [mergeUserId isEqualToNumber:settings.localUserId];
+			  DLog(@"merged by user id: %@, our id is: %@", mergeUserId, r.apiServer.userId);
+			  BOOL mergedByMyself = [mergeUserId isEqualToNumber:r.apiServer.userId];
 			  if(!(settings.dontKeepPrsMergedByMe && mergedByMyself))
 			  {
 				  DLog(@"detected merged PR: %@",r.title);
@@ -441,58 +404,75 @@ typedef void (^completionBlockType)(BOOL);
 				  case kPullRequestHandlingKeepNone: {}
 			  }
 		  }
-		  CALLBACK(YES);
+		  CALLBACK();
 
 	  } failure:^(NSHTTPURLResponse *response, id data, NSError *error) {
 		  r.postSyncAction = @(kPostSyncDoNothing); // don't delete this, we couldn't check, play it safe
-		  CALLBACK(NO);
+		  r.apiServer.lastSyncSucceeded = @NO;
+		  CALLBACK();
 	  }];
 }
 
-- (void)fetchPullRequestsForActiveReposAndCallback:(void(^)(BOOL success))callback
+- (void)fetchPullRequestsForActiveReposAndCallback:(completionBlockType)callback
 {
-	[self syncUserDetailsAndCallback:^(BOOL success) {
-		if(success)
-		{
-			[self autoSubscribeToReposAndCallback:^{
-				NSManagedObjectContext *syncContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSConfinementConcurrencyType];
-				syncContext.parentContext = app.dataManager.managedObjectContext;
-				syncContext.undoManager = nil;
-				[self syncToMoc:syncContext andCallback:callback];
-			}];
-		}
-		else CALLBACK(NO);
-	}];
-}
+	NSManagedObjectContext *syncContext = [app.dataManager tempContext];
 
-- (void)autoSubscribeToReposAndCallback:(void(^)())callback
-{
-	if(app.lastRepoCheck &&
-	   ([[NSDate date] timeIntervalSinceDate:app.lastRepoCheck] < settings.newRepoCheckPeriod*3600.0))
+	BOOL shouldRefreshReposToo = !app.lastRepoCheck
+	|| ([[NSDate date] timeIntervalSinceDate:app.lastRepoCheck] < settings.newRepoCheckPeriod*3600.0)
+	|| [Repo countVisibleReposInMoc:syncContext]==0;
+
+	if(shouldRefreshReposToo)
 	{
-		CALLBACK();
+		[self fetchRepositoriesToMoc:syncContext andCallback:^{
+			[self syncToMoc:syncContext andCallback:callback];
+		}];
 	}
 	else
 	{
-		[self fetchRepositoriesAndCallback:^(BOOL success) {
-			CALLBACK();
+		[ApiServer resetSyncSuccessInMoc:syncContext];
+		[self ensureApiServersHaveUserIdsInMoc:syncContext andCallback:^{
+			[self syncToMoc:syncContext andCallback:callback];
 		}];
+	}
+}
+
+- (void)ensureApiServersHaveUserIdsInMoc:(NSManagedObjectContext *)moc andCallback:(completionBlockType)callback
+{
+	BOOL needToCheck = NO;
+	for(ApiServer *apiServer in [ApiServer allApiServersInMoc:moc])
+	{
+		if(apiServer.userId.integerValue==0)
+		{
+			needToCheck = YES;
+			break;
+		}
+	}
+
+	if(needToCheck)
+	{
+		DLog(@"Some API servers don't have user details yet, will bring user credentials down for them");
+		[self syncUserDetailsInMoc:moc andCallback:callback];
+	}
+	else
+	{
+		CALLBACK();
 	}
 }
 
 extern NSDateFormatter *_syncDateFormatter;
 
 - (void)markDirtyRepoIds:(NSMutableSet *)repoIdsToMarkDirty
-usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
-			 andCallback:(void(^)(BOOL success))callback
+usingReceivedEventsFromServer:(ApiServer *)apiServer
+			 andCallback:(completionBlockType)callback
 {
-	NSString *latestEtag = settings.latestReceivedEventEtag;
-	NSDate *latestDate = settings.latestReceivedEventDateProcessed;
+	NSString *latestEtag = apiServer.latestReceivedEventEtag;
+	NSDate *latestDate = apiServer.latestReceivedEventDateProcessed;
 
-	syncDataToCommit.latestReceivedEventDate = latestDate;
+	apiServer.latestReceivedEventDateProcessed = latestDate;
 	BOOL needFirstDateOnly = ([latestDate isEqualToDate:[NSDate distantPast]]);
 
-	[self getPagedDataInPath:[NSString stringWithFormat:@"/users/%@/received_events",settings.localUser]
+	[self getPagedDataInPath:[NSString stringWithFormat:@"/users/%@/received_events",apiServer.userName]
+				  fromServer:apiServer
 			startingFromPage:1
 					  params:nil
 				extraHeaders:latestEtag ? @{ @"If-None-Match": latestEtag } : nil
@@ -505,12 +485,12 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 						 DLog(@"New event at %@",eventDate);
 						 NSNumber *repoId = d[@"repo"][@"id"];
 						 if(repoId) [repoIdsToMarkDirty addObject:repoId];
-						 if([syncDataToCommit.latestReceivedEventDate compare:eventDate]==NSOrderedAscending)
+						 if([apiServer.latestReceivedEventDateProcessed compare:eventDate]==NSOrderedAscending)
 						 {
-							 syncDataToCommit.latestReceivedEventDate = eventDate;
+							 apiServer.latestReceivedEventDateProcessed = eventDate;
 							 if(needFirstDateOnly)
 							 {
-								 DLog(@"First sync, all repos are dirty so we don't need to read further, we have the latest received event date: %@",syncDataToCommit.latestReceivedEventDate);
+								 DLog(@"First sync, all repos are dirty so we don't need to read further, we have the latest received event date: %@",apiServer.latestReceivedEventDateProcessed);
 								 return YES;
 							 }
 						 }
@@ -523,22 +503,24 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 				 }
 				 return NO;
 			 } finalCallback:^(BOOL success, NSInteger resultCode, NSString *etag) {
-				 syncDataToCommit.latestReceivedEventEtag = etag;
-				 CALLBACK(success);
+				 apiServer.latestReceivedEventEtag = etag;
+				 if(!success) apiServer.lastSyncSucceeded = @NO;
+				 CALLBACK();
 			 }];
 }
 
 - (void)markDirtyRepoIds:(NSMutableSet *)repoIdsToMarkDirty
-	usingUserEventsInMoc:(NSManagedObjectContext *)moc
-			 andCallback:(void(^)(BOOL success))callback
+	usingUserEventsFromServer:(ApiServer *)apiServer
+			 andCallback:(completionBlockType)callback
 {
-	NSString *latestEtag = settings.latestUserEventEtag;
-	NSDate *latestDate = settings.latestUserEventDateProcessed;
+	NSString *latestEtag = apiServer.latestUserEventEtag;
+	NSDate *latestDate = apiServer.latestUserEventDateProcessed;
 
-	syncDataToCommit.latestUserEventDate = latestDate;
+	apiServer.latestUserEventDateProcessed = latestDate;
 	BOOL needFirstDateOnly = ([latestDate isEqualToDate:[NSDate distantPast]]);
 
-	[self getPagedDataInPath:[NSString stringWithFormat:@"/users/%@/events",settings.localUser]
+	[self getPagedDataInPath:[NSString stringWithFormat:@"/users/%@/events",apiServer.userName]
+				  fromServer:apiServer
 			startingFromPage:1
 					  params:nil
 				extraHeaders:latestEtag ? @{ @"If-None-Match": latestEtag } : nil
@@ -551,12 +533,12 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 						 DLog(@"New event at %@",eventDate);
 						 NSNumber *repoId = d[@"repo"][@"id"];
 						 if(repoId) [repoIdsToMarkDirty addObject:repoId];
-						 if([syncDataToCommit.latestUserEventDate compare:eventDate]==NSOrderedAscending)
+						 if([apiServer.latestUserEventDateProcessed compare:eventDate]==NSOrderedAscending)
 						 {
-							 syncDataToCommit.latestUserEventDate = eventDate;
+							 apiServer.latestUserEventDateProcessed = eventDate;
 							 if(needFirstDateOnly)
 							 {
-								 DLog(@"First sync, all repos are dirty so we don't need to read further, we have the latest user event date: %@",syncDataToCommit.latestUserEventDate);
+								 DLog(@"First sync, all repos are dirty so we don't need to read further, we have the latest user event date: %@",apiServer.latestUserEventDateProcessed);
 								 return YES;
 							 }
 						 }
@@ -569,37 +551,57 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 				 }
 				 return NO;
 			 } finalCallback:^(BOOL success, NSInteger resultCode, NSString *etag) {
-				 syncDataToCommit.latestUserEventEtag = etag;
-				 CALLBACK(success);
+				 apiServer.latestUserEventEtag = etag;
+				 if(!success) apiServer.lastSyncSucceeded = @NO;
+				 CALLBACK();
 			 }];
 }
 
-- (void)markDirtyReposInMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
+- (void)markDirtyReposInMoc:(NSManagedObjectContext *)moc andCallback:(completionBlockType)callback
 {
-	NSInteger totalOperations = 2;
+	NSArray *allApiServers = [ApiServer allApiServersInMoc:moc];
 
-	__block NSInteger succeded = 0, failed = 0;
+	NSInteger totalOperations = 2*allApiServers.count;
+	if(totalOperations==0)
+	{
+		CALLBACK();
+		return;
+	}
 
+	__block NSInteger operationCount = 0;
 	NSMutableSet *repoIdsToMarkDirty = [NSMutableSet set];
 
-	completionBlockType completionCallback = ^(BOOL success) {
-		if(success) succeded++; else failed++;
-		if(succeded+failed==totalOperations)
+	completionBlockType completionCallback = ^{
+		operationCount++;
+		if(operationCount==totalOperations)
 		{
-			BOOL ok = (failed==0);
-			if(ok)
-			{
-				[Repo markDirtyReposWithIds:repoIdsToMarkDirty inMoc:moc];
-			}
-			CALLBACK(ok);
+			[Repo markDirtyReposWithIds:repoIdsToMarkDirty inMoc:moc];
+
+			if(repoIdsToMarkDirty.count>0) DLog(@"Marked dirty %ld repos which have events in their event stream", (long)repoIdsToMarkDirty.count);
+
+			[self markLongCleanReposAsDirtyInMoc:moc];
+
+			CALLBACK();
 		}
 	};
 
-	[self markDirtyRepoIds:repoIdsToMarkDirty usingUserEventsInMoc:moc andCallback:completionCallback];
-	[self markDirtyRepoIds:repoIdsToMarkDirty usingReceivedEventsInMoc:moc andCallback:completionCallback];
+	for(ApiServer *apiServer in allApiServers)
+	{
+		if(apiServer.goodToGo)
+		{
+			[self markDirtyRepoIds:repoIdsToMarkDirty usingUserEventsFromServer:apiServer andCallback:completionCallback];
+			[self markDirtyRepoIds:repoIdsToMarkDirty usingReceivedEventsFromServer:apiServer andCallback:completionCallback];
+		}
+		else
+		{
+			completionCallback();
+			completionCallback();
+		}
+	}
+}
 
-	if(repoIdsToMarkDirty.count>0) DLog(@"Marked dirty %ld repos which have events in their Github event stream", (long)repoIdsToMarkDirty.count);
-
+- (void)markLongCleanReposAsDirtyInMoc:(NSManagedObjectContext *)moc
+{
 	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"Repo"];
 	f.predicate = [NSPredicate predicateWithFormat:@"dirty != YES and lastDirtied < %@", [NSDate dateWithTimeInterval:-3600 sinceDate:[NSDate date]]];
 	f.includesPropertyValues = NO;
@@ -617,76 +619,46 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 	}
 }
 
-- (void)syncToMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
+- (void)syncToMoc:(NSManagedObjectContext *)moc andCallback:(completionBlockType)callback
 {
 	[self markDirtyReposInMoc:moc
-				  andCallback:^(BOOL success) {
-					  if(success)
-					  {
-						  NSArray *hiddenRepos = [Repo unsyncableReposInMoc:moc];
-						  for(Repo *r in hiddenRepos) [r removeAllRelatedPullRequests];
-						  [self fetchPullRequestsForRepos:[Repo syncableReposInMoc:moc]
-													toMoc:moc
-											  andCallback:^(BOOL success) {
-												  if(success)
-												  {
-													  [self updatePullRequestsInMoc:moc andCallback:^(BOOL success) {
-														  if(success) [self syncSucceededInMoc:moc];
-														  CALLBACK(success);
-													  }];
-												  }
-												  else CALLBACK(NO);
+				  andCallback:^{
+
+					  for(Repo *r in [Repo unsyncableReposInMoc:moc])
+						  for(PullRequest *p in r.pullRequests)
+							  [moc deleteObject:p];
+
+					  [self fetchPullRequestsForRepos:[Repo syncableReposInMoc:moc]
+												toMoc:moc
+										  andCallback:^{
+
+											  [self updatePullRequestsInMoc:moc andCallback:^{
+												  [self completeSyncInMoc:moc];
+												  CALLBACK();
 											  }];
-					  }
-					  else CALLBACK(NO);
+
+										  }];
 				  }];
 }
 
-- (void)syncTransactionSucceeded
+- (void)completeSyncInMoc:(NSManagedObjectContext *)moc
 {
-	if(syncDataToCommit.latestReceivedEventDate)
+	// discard any changes related to any failed API server
+	for(ApiServer *apiServer in [ApiServer allApiServersInMoc:moc])
 	{
-		settings.latestReceivedEventDateProcessed = syncDataToCommit.latestReceivedEventDate;
-		syncDataToCommit.latestReceivedEventDate = nil;
+		if(!apiServer.lastSyncSucceeded.boolValue)
+		{
+			[apiServer rollBackAllUpdatesInMoc:moc];
+			apiServer.lastSyncSucceeded = @NO; // we just wiped all changes, but want to keep this
+		}
 	}
-	if(syncDataToCommit.latestReceivedEventEtag)
-	{
-		settings.latestReceivedEventEtag = syncDataToCommit.latestReceivedEventEtag;
-		syncDataToCommit.latestReceivedEventEtag = nil;
-	}
-	if(syncDataToCommit.latestUserEventDate)
-	{
-		settings.latestUserEventDateProcessed = syncDataToCommit.latestUserEventDate;
-		syncDataToCommit.latestUserEventDate = nil;
-	}
-	if(syncDataToCommit.latestUserEventEtag)
-	{
-		settings.latestUserEventEtag = syncDataToCommit.latestUserEventEtag;
-		syncDataToCommit.latestUserEventEtag = nil;
-	}
-}
 
-- (void)syncSucceededInMoc:(NSManagedObjectContext *)moc
-{
-	// do not cleanup PRs before because some "deleted" ones will turn to merged or closed ones
-	[DataItem nukeDeletedItemsOfType:@"Repo" inMoc:moc];
-	[DataItem nukeDeletedItemsOfType:@"PullRequest" inMoc:moc];
+	[DataItem nukeDeletedItemsInMoc:moc];
 
 	NSArray *surviving = [PullRequest itemsOfType:@"PullRequest" surviving:YES inMoc:moc];
 	for(PullRequest *r in surviving) [r postProcess];
 
-	if(moc.hasChanges)
-	{
-		DLog(@"Database dirty after sync, saving");
-		NSError *error = nil;
-		[moc save:&error];
-		if(!error) [self syncTransactionSucceeded];
-	}
-	else
-	{
-		DLog(@"No database changes after sync");
-		[self syncTransactionSucceeded];
-	}
+	[moc save:nil];
 
 	if(settings.showStatusItems)
 	{
@@ -694,21 +666,18 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 	}
 }
 
-- (void)updatePullRequestsInMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
+- (void)updatePullRequestsInMoc:(NSManagedObjectContext *)moc andCallback:(completionBlockType)callback
 {
 	BOOL willScanForStatuses = [self shouldScanForStatusesInMoc:moc];
 
 	NSInteger totalOperations = 3;
 	if(willScanForStatuses) totalOperations++;
 
-	__block NSInteger succeded = 0, failed = 0;
+	__block NSInteger operationCount = 0;
 
-	completionBlockType completionCallback = ^(BOOL success) {
-		if(success) succeded++; else failed++;
-		if(succeded+failed==totalOperations)
-		{
-			CALLBACK(failed==0);
-		}
+	completionBlockType completionCallback = ^{
+		operationCount++;
+		if(operationCount==totalOperations) CALLBACK();
 	};
 
 	if(willScanForStatuses)
@@ -728,84 +697,70 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 			self.successfulRefreshesSinceLastStatusCheck = 0;
 			return YES;
 		}
-		[self clearAllStatusObjectsInMoc:moc];
+
+		for(PRStatus *s in [DataItem allItemsOfType:@"PRStatus" inMoc:moc])
+			[moc deleteObject:s];
 	}
 	return NO;
 }
 
-- (void)clearAllStatusObjectsInMoc:(NSManagedObjectContext *)moc
+- (void)fetchPullRequestsForRepos:(NSArray *)repos toMoc:(NSManagedObjectContext *)moc andCallback:(completionBlockType)callback
 {
-	for(PRStatus *s in [DataItem allItemsOfType:@"PRStatus" inMoc:moc])
+	if(repos.count==0)
 	{
-		[moc deleteObject:s];
-	}
-}
-
-- (void)fetchPullRequestsForRepos:(NSArray *)repos toMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
-{
-	if(!repos.count)
-	{
-		CALLBACK(YES);
+		CALLBACK();
 		return;
 	}
 	NSInteger total = repos.count;
-	__block NSInteger succeeded = 0;
-	__block NSInteger failed = 0;
+	__block NSInteger operationCount = 0;
 	for(Repo *r in repos)
 	{
-		for(PullRequest *pr in [PullRequest pullRequestsForRepoId:r.serverId inMoc:moc])
+		for(PullRequest *pr in r.pullRequests)
 			if(pr.condition.integerValue == kPullRequestConditionOpen)
 				pr.postSyncAction = @(kPostSyncDelete);
 
 		[self getPagedDataInPath:[NSString stringWithFormat:@"/repos/%@/pulls",r.fullName]
+					  fromServer:r.apiServer
 				startingFromPage:1
 						  params:nil
 					extraHeaders:nil
 				 perPageCallback:^BOOL(id data, BOOL lastPage) {
 					 for(NSDictionary *info in data)
 					 {
-						 [PullRequest pullRequestWithInfo:info moc:moc];
+						 PullRequest *p = [PullRequest pullRequestWithInfo:info fromServer:r.apiServer];
+						 p.repo = r;
 					 }
 					 return NO;
 				 } finalCallback:^(BOOL success, NSInteger resultCode, NSString *etag) {
+					 operationCount++;
 					 r.dirty = @NO;
-					 if(success)
-					 {
-						 succeeded++;
-					 }
-					 else
+					 if(!success)
 					 {
 						 if(resultCode == 404) // repo disabled
 						 {
-							 succeeded++;
 							 r.inaccessible = @YES;
 							 r.postSyncAction = @(kPostSyncDoNothing);
-							 [r removeAllRelatedPullRequests];
+							 for(PullRequest *p in r.pullRequests)
+								 [moc deleteObject:p];
 						 }
 						 else if(resultCode==410) // repo gone for good
 						 {
-							 succeeded++;
 							 r.postSyncAction = @(kPostSyncDelete);
 						 }
-						 else
+						 else // fetch problem
 						 {
-							 failed++;
+							 r.apiServer.lastSyncSucceeded = @NO;
 						 }
 					 }
-					 if(succeeded+failed==total)
-					 {
-						 callback(failed==0);
-					 }
+					 if(operationCount==total) CALLBACK();
 				 }];
 	}
 }
 
-- (void)syncWatchedReposForUserToMoc:(NSManagedObjectContext *)moc andCallback:(void(^)(BOOL success))callback
+- (void)syncWatchedReposFromServer:(ApiServer *)apiServer andCallback:(completionBlockType)callback
 {
-	NSArray *inaccessibleRepos = [Repo inaccessibleReposInMoc:moc];
-	for(Repo *r in inaccessibleRepos) r.inaccessible = @NO;
-
 	[self getPagedDataInPath:@"/user/subscriptions"
+				  fromServer:apiServer
 			startingFromPage:1
 					  params:nil
 				extraHeaders:nil
@@ -819,7 +774,7 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
                             [[permissions ofk:@"push"] boolValue] ||
                             [[permissions ofk:@"admin"] boolValue])
                          {
-                             [Repo repoWithInfo:info moc:moc];
+                             [Repo repoWithInfo:info fromServer:apiServer];
                          }
                          else
                          {
@@ -829,32 +784,63 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
                      }
                      else
                      {
-                         [Repo repoWithInfo:info moc:moc];
+                         Repo *r = [Repo repoWithInfo:info fromServer:apiServer];
+						 r.apiServer = apiServer;
                      }
 				 }
 				 return NO;
 			 } finalCallback:^(BOOL success, NSInteger resultCode, NSString *etag) {
-				 CALLBACK(success);
+				 if(!success)
+				 {
+					 DLog(@"Error while fetching data from %@", apiServer.label);
+					 apiServer.lastSyncSucceeded = @NO;
+				 }
+				 CALLBACK();
 			 }];
 }
 
-- (void)syncUserDetailsAndCallback:(void (^)(BOOL))callback
+- (void)syncUserDetailsInMoc:(NSManagedObjectContext *)moc andCallback:(completionBlockType)callback
 {
-	[self getDataInPath:@"/user"
-				 params:nil
-		   extraHeaders:nil
-			andCallback:^(id data, BOOL lastPage, NSInteger resultCode, NSString *etag) {
-				if(data)
-				{
-					settings.localUser = [data ofk:@"login"];
-					settings.localUserId = [data ofk:@"id"];
-					CALLBACK(YES);
-				}
-				else CALLBACK(NO);
-			}];
+	NSArray *allApiServers = [ApiServer allApiServersInMoc:moc];
+	if(allApiServers.count==0)
+	{
+		CALLBACK();
+		return;
+	}
+	__block NSInteger operationCount = 0;
+	for(ApiServer *apiServer in allApiServers)
+	{
+		if(apiServer.goodToGo)
+		{
+			[self getDataInPath:@"/user"
+					 fromServer:apiServer
+						 params:nil
+				   extraHeaders:nil
+					andCallback:^(id data, BOOL lastPage, NSInteger resultCode, NSString *etag) {
+						if(data)
+						{
+							apiServer.userName = [data ofk:@"login"];
+							apiServer.userId = [data ofk:@"id"];
+						}
+						else
+						{
+							DLog(@"Could not read user credentials from %@", apiServer.label);
+							apiServer.lastSyncSucceeded = @NO;
+						}
+						operationCount++;
+						if(operationCount==allApiServers.count) CALLBACK();
+					}];
+		}
+		else
+		{
+			operationCount++;
+			if(operationCount==allApiServers.count) CALLBACK();
+		}
+	}
 }
 
 - (void)getPagedDataInPath:(NSString*)path
+				fromServer:(ApiServer *)apiServer
 		  startingFromPage:(NSInteger)page
 					params:(NSDictionary*)params
 			  extraHeaders:(NSDictionary *)extraHeaders
@@ -876,6 +862,7 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 	mparams[@"page"] = @(page);
 	mparams[@"per_page"] = @100;
 	[self getDataInPath:path
+			 fromServer:apiServer
 				 params:mparams
 		   extraHeaders:extraHeaders
 			andCallback:^(id data, BOOL lastPage, NSInteger resultCode, NSString *etag) {
@@ -893,6 +880,7 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 					else
 					{
 						[self getPagedDataInPath:path
+									  fromServer:apiServer
 								startingFromPage:page+1
 										  params:params
 									extraHeaders:extraHeaders
@@ -908,36 +896,40 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 }
 
 - (void)getDataInPath:(NSString*)path
+		   fromServer:(ApiServer *)apiServer
 			   params:(NSDictionary *)params
 		 extraHeaders:(NSDictionary *)extraHeaders
 		  andCallback:(void(^)(id data, BOOL lastPage, NSInteger resultCode, NSString *etag))callback
 {
 	[self get:path
+   fromServer:apiServer
+ignoreLastSync:NO
    parameters:params
  extraHeaders:extraHeaders
 	  success:^(NSHTTPURLResponse *response, id data) {
 
 		  NSDictionary *allHeaders = response.allHeaderFields;
 
-		  self.requestsRemaining = [allHeaders[@"X-RateLimit-Remaining"] floatValue];
-		  self.requestsLimit = [allHeaders[@"X-RateLimit-Limit"] floatValue];
+		  apiServer.requestsRemaining = @([allHeaders[@"X-RateLimit-Remaining"] floatValue]);
+		  apiServer.requestsLimit = @([allHeaders[@"X-RateLimit-Limit"] floatValue]);
 		  float epochSeconds = [allHeaders[@"X-RateLimit-Reset"] floatValue];
-		  NSDate *date = [NSDate dateWithTimeIntervalSince1970:epochSeconds];
-		  self.resetDate = [mediumFormatter stringFromDate:date];
-		  [[NSNotificationCenter defaultCenter] postNotificationName:RATE_UPDATE_NOTIFICATION
-															  object:nil
+		  apiServer.resetDate = [NSDate dateWithTimeIntervalSince1970:epochSeconds];
+		  [[NSNotificationCenter defaultCenter] postNotificationName:API_USAGE_UPDATE
+															  object:apiServer
 															userInfo:nil];
 		  CALLBACK(data, [API lastPage:response], response.statusCode, allHeaders[@"Etag"]);
 	  } failure:^(NSHTTPURLResponse *response, id data, NSError *error) {
 		  NSInteger code = response.statusCode;
-		  if(code==304) DLog(@"No change reported (304)"); else DLog(@"Failure for %@: %@",path,error);
+		  if(code==304) DLog(@"(%@) no change reported (304)",apiServer.label); else DLog(@"(%@) failure for %@: %@",apiServer.label, path,error);
 		  CALLBACK(nil, NO, code, nil);
 	  }];
 }
 
-- (void)getRateLimitAndCallback:(void (^)(long long, long long, long long))callback
+- (void)getRateLimitFromServer:(ApiServer *)apiServer andCallback:(void (^)(long long, long long, long long))callback
 {
 	[self get:@"/rate_limit"
+   fromServer:apiServer
+ignoreLastSync:YES
    parameters:nil
  extraHeaders:nil
 	  success:^(NSHTTPURLResponse *response, id data) {
@@ -956,9 +948,11 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 	  }];
 }
 
-- (void)testApiAndCallback:(void (^)(NSError *))callback
+- (void)testApiToServer:(ApiServer *)apiServer andCallback:(void (^)(NSError *))callback
 {
 	[self get:@"/rate_limit"
+   fromServer:apiServer
+ignoreLastSync:YES
    parameters:nil
  extraHeaders:nil
 	  success:^(NSHTTPURLResponse *response, id data) {
@@ -981,37 +975,37 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 	return ([linkHeader rangeOfString:@"rel=\"next\""].location==NSNotFound);
 }
 
-- (NSOperation *)get:(NSString *)path
-		  parameters:(NSDictionary *)params
-		extraHeaders:(NSDictionary *)extraHeaders
-			 success:(void(^)(NSHTTPURLResponse *response, id data))successCallback
-			 failure:(void(^)(NSHTTPURLResponse *response, id data, NSError *error))failureCallback
+- (void)get:(NSString *)path
+ fromServer:(ApiServer *)apiServer
+ignoreLastSync:(BOOL)ignoreLastSync
+ parameters:(NSDictionary *)params
+extraHeaders:(NSDictionary *)extraHeaders
+	success:(void(^)(NSHTTPURLResponse *response, id data))successCallback
+	failure:(void(^)(NSHTTPURLResponse *response, id data, NSError *error))failureCallback
 {
+	NSString *apiServerLabel;
+	if(apiServer.lastSyncSucceeded.boolValue || ignoreLastSync)
+	{
+		apiServerLabel = apiServer.label;
+	}
+	else
+	{
+		if(failureCallback)
+		{
+			NSError *error = [NSError errorWithDomain:@"Server already inaccessible, saving the network call" code:-1 userInfo:nil];
+			failureCallback(nil, nil, error);
+		}
+		return;
+	}
+
 	[self networkIndicationStart];
 
-	NSString *authToken = settings.authToken;
+	NSString *authToken = apiServer.authToken;
+	NSString *apiPath = apiServer.apiPath;
+
 	NSBlockOperation *o = [NSBlockOperation blockOperationWithBlock:^{
 
-		NSString *expandedPath;
-		if([path rangeOfString:@"/"].location==0)
-		{
-			NSString *apiPath = settings.apiPath;
-
-			if([apiPath rangeOfString:@"/"].location==0)
-				apiPath = [apiPath substringFromIndex:1];
-
-			if(apiPath.length>1)
-				if([[apiPath substringFromIndex:apiPath.length-2] isEqualToString:@"/"])
-					apiPath = [apiPath substringToIndex:apiPath.length-2];
-
-			expandedPath = [[[@"https://" stringByAppendingString:settings.apiBackEnd]
-							 stringByAppendingPathComponent:apiPath]
-							stringByAppendingString:path];
-		}
-		else
-		{
-			expandedPath = path;
-		}
+		NSString *expandedPath = ([path rangeOfString:@"/"].location==0) ? [apiPath stringByAppendingPathComponent:path] : path;
 
 		if(params.count)
 		{
@@ -1036,7 +1030,7 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 
 		for(NSString *extraHeaderKey in extraHeaders)
 		{
-			DLog(@"Custom header: %@=%@",extraHeaderKey,extraHeaders[extraHeaderKey]);
+			DLog(@"(%@) custom header: %@=%@",apiServerLabel, extraHeaderKey,extraHeaders[extraHeaderKey]);
 			[r setValue:extraHeaders[extraHeaderKey] forHTTPHeaderField:extraHeaderKey];
 		}
 
@@ -1048,7 +1042,7 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 			if([[NSDate date] compare:existingBackOff.nextAttemptAt]==NSOrderedAscending)
 			{
 				// report failure and return
-				DLog(@"Preempted fetch to previously broken link %@, won't actually access this URL until %@", fullUrlPath, existingBackOff.nextAttemptAt);
+				DLog(@"(%@) preempted fetch to previously broken link %@, won't actually access this URL until %@", apiServerLabel, fullUrlPath, existingBackOff.nextAttemptAt);
 				if(failureCallback)
 				{
 					NSError *error = [NSError errorWithDomain:@"Preempted fetch because of throttling" code:400 userInfo:nil];
@@ -1083,13 +1077,13 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 			{
 				if(existingBackOff)
 				{
-					DLog(@"Extending backoff for already throttled URL %@ by %f seconds", fullUrlPath, BACKOFF_STEP);
+					DLog(@"(%@) extending backoff for already throttled URL %@ by %f seconds", apiServerLabel, fullUrlPath, BACKOFF_STEP);
 					if(existingBackOff.duration<3600.0) existingBackOff.duration += BACKOFF_STEP;
 					existingBackOff.nextAttemptAt = [NSDate dateWithTimeInterval:existingBackOff.duration sinceDate:[NSDate date]];
 				}
 				else
 				{
-					DLog(@"Placing URL %@ on the throttled list", fullUrlPath);
+					DLog(@"(%@) placing URL %@ on the throttled list", apiServerLabel, fullUrlPath);
 					UrlBackOffEntry *newBackOff = [[UrlBackOffEntry alloc] init];
 					newBackOff.duration = existingBackOff.duration+BACKOFF_STEP;
 					newBackOff.nextAttemptAt = [NSDate dateWithTimeInterval:newBackOff.duration sinceDate:[NSDate date]];
@@ -1100,7 +1094,7 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 
 		if(error)
 		{
-			DLog(@"GET %@ - FAILED: %@", fullUrlPath, error.localizedDescription);
+			DLog(@"(%@) GET %@ - FAILED: %@", apiServerLabel, fullUrlPath, error.localizedDescription);
 			if(failureCallback)
 			{
 				dispatch_async(dispatch_get_main_queue(), ^{
@@ -1111,9 +1105,9 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 		else
 		{
 #ifdef DEBUG
-			DLog(@"GET %@ - RESULT: %ld, %f sec.", fullUrlPath, (long)response.statusCode, networkTime);
+			DLog(@"(%@) GET %@ - RESULT: %ld, %f sec.", apiServerLabel, fullUrlPath, (long)response.statusCode, networkTime);
 #else
-			DLog(@"GET %@ - RESULT: %ld", fullUrlPath, (long)response.statusCode);
+			DLog(@"(%@) GET %@ - RESULT: %ld", apiServerLabel, fullUrlPath, (long)response.statusCode);
 #endif
 			[badLinks removeObjectForKey:fullUrlPath];
 			if(successCallback)
@@ -1128,7 +1122,6 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 	}];
 	o.queuePriority = NSOperationQueuePriorityVeryHigh;
 	[requestQueue addOperation:o];
-	return o;
 }
 
 // warning: now calls back on thread!!
@@ -1337,7 +1330,7 @@ usingReceivedEventsInMoc:(NSManagedObjectContext *)moc
 	{
 		return @"Refreshing...";
 	}
-	else if(app.lastUpdateFailed)
+	else if([ApiServer shouldReportRefreshFailureInMoc:app.dataManager.managedObjectContext])
 	{
 		return @"Last update failed";
 	}

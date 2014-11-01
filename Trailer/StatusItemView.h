@@ -4,11 +4,8 @@
 
 #define STATUSITEM_PADDING 1.0
 
-
 @protocol StatusItemDelegate <NSObject>
-
 - (void)statusItemTapped:(StatusItemView *)statusItem;
-
 @end
 
 
@@ -20,6 +17,5 @@
 		   delegate:(id<StatusItemDelegate>)delegate;
 
 @property (nonatomic) BOOL highlighted, grayOut;
-@property (nonatomic,weak) NSStatusItem *hostItem;
 
 @end

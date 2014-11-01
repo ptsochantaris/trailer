@@ -1,24 +1,10 @@
-//
-//  CommentBlacklistViewController.m
-//  Trailer
-//
-//  Created by Paul Tsochantaris on 3/9/14.
-//  Copyright (c) 2014 HouseTrip. All rights reserved.
-//
-
-#import "CommentBlacklistViewController.h"
-
-@interface CommentBlacklistViewController () <UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate>
-@property (weak, nonatomic) IBOutlet UITextField *usernameField;
-@property (weak, nonatomic) IBOutlet UITableView *usernameTable;
-@end
 
 @implementation CommentBlacklistViewController
 
 - (void)viewDidLoad
 {
-    [super viewDidLoad];
-	self.usernameTable.tableFooterView = [UIView new];
+	[super viewDidLoad];
+	self.tableView.tableFooterView = [UIView new];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView { return settings.commentAuthorBlacklist.count == 0 ? 0 : 1; }
@@ -68,9 +54,9 @@
 				settings.commentAuthorBlacklist = blackList;
 				NSIndexPath *ip = [NSIndexPath indexPathForRow:blackList.count-1 inSection:0];
 				if(blackList.count==1) // first insert
-					[self.usernameTable insertSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
+					[self.tableView insertSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
 				else
-					[self.usernameTable insertRowsAtIndexPaths:@[ip] withRowAnimation:UITableViewRowAnimationAutomatic];
+					[self.tableView insertRowsAtIndexPaths:@[ip] withRowAnimation:UITableViewRowAnimationAutomatic];
 			}
 		});
 		[textField resignFirstResponder];

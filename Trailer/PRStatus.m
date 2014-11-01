@@ -10,11 +10,11 @@
 @dynamic url;
 @dynamic userId;
 @dynamic userName;
-@dynamic pullRequestId;
+@dynamic pullRequest;
 
-+ (PRStatus *)statusWithInfo:(NSDictionary *)info moc:(NSManagedObjectContext *)moc
++ (PRStatus *)statusWithInfo:(NSDictionary *)info fromServer:(ApiServer *)apiServer
 {
-	PRStatus *s = [DataItem itemWithInfo:info type:@"PRStatus" moc:moc];
+	PRStatus *s = [DataItem itemWithInfo:info type:@"PRStatus" fromServer:apiServer];
 	if(s.postSyncAction.integerValue != kPostSyncDoNothing)
 	{
 		s.url = [info ofk:@"url"];
@@ -27,14 +27,6 @@
 		s.userId = [userInfo ofk:@"id"];
 	}
 	return s;
-}
-
-+ (NSArray *)statusesForPullRequestId:(NSNumber *)pullRequestId inMoc:(NSManagedObjectContext *)moc
-{
-	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRStatus"];
-	f.returnsObjectsAsFaults = NO;
-	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestId = %@",pullRequestId];
-	return [moc executeFetchRequest:f error:nil];
 }
 
 - (COLOR_CLASS *)colorForDisplay
@@ -67,19 +59,6 @@
 	NSString *desc = self.descriptionText;
 	if(!desc) desc = @"(No description)";
 	return [NSString stringWithFormat:@"%@ %@",[dateFormatter stringFromDate:self.createdAt],desc];
-}
-
-+ (void)removeStatusesWithPullRequestId:(NSNumber *)pullRequestId inMoc:(NSManagedObjectContext *)moc
-{
-	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRStatus"];
-	f.includesPropertyValues = NO;
-	f.includesSubentities = NO;
-	f.predicate = [NSPredicate predicateWithFormat:@"pullRequestId = %@",pullRequestId];
-	for(PRStatus *s in [moc executeFetchRequest:f error:nil])
-	{
-		DLog(@"  Deleting status ID %@",s.serverId);
-		[moc deleteObject:s];
-	}
 }
 
 @end

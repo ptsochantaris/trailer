@@ -55,20 +55,14 @@ AppDelegate *app;
 
 	[self startRateLimitHandling];
 
-	[[NSNotificationCenter defaultCenter] addObserver:self
-											 selector:@selector(defaultsUpdated)
-												 name:NSUserDefaultsDidChangeNotification
-											   object:nil];
-
 	[[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate:self];
 
 	NSString *currentAppVersion = [@"Version " stringByAppendingString:self.currentAppVersion];
 	[self.versionNumber setStringValue:currentAppVersion];
 	[self.aboutVersion setStringValue:currentAppVersion];
 
-	if(settings.authToken.length)
+	if([ApiServer someServersHaveAuthTokensInMoc:self.dataManager.managedObjectContext])
 	{
-		[self.githubTokenHolder setStringValue:settings.authToken];
 		[self startRefresh];
 	}
 	else
@@ -167,12 +161,6 @@ AppDelegate *app;
 {
 	BOOL setting = (sender.integerValue==1);
 	settings.includeReposInFilter = setting;
-}
-
-- (IBAction)dontReportRefreshFailuresSelected:(NSButton *)sender
-{
-	BOOL setting = (sender.integerValue==1);
-	settings.dontReportRefreshFailures = setting;
 }
 
 - (IBAction)dontConfirmRemoveAllClosedSelected:(NSButton *)sender
@@ -396,19 +384,22 @@ AppDelegate *app;
 			NSString *urlToOpen = notification.userInfo[NOTIFICATION_URL_KEY];
 			if(!urlToOpen)
 			{
-				NSNumber *itemId = notification.userInfo[PULL_REQUEST_ID_KEY];
+				NSManagedObjectContext *moc = app.dataManager.managedObjectContext;
+
+				NSManagedObjectID *itemId = [app.dataManager idForUriPath:notification.userInfo[PULL_REQUEST_ID_KEY]];
+
 				PullRequest *pullRequest = nil;
 				if(itemId) // it's a pull request
 				{
-					pullRequest = [PullRequest itemOfType:@"PullRequest" serverId:itemId moc:self.dataManager.managedObjectContext];
+					pullRequest = (PullRequest *)[moc existingObjectWithID:itemId error:nil];
 					urlToOpen = pullRequest.webUrl;
 				}
 				else // it's a comment
 				{
-					itemId = notification.userInfo[COMMENT_ID_KEY];
-					PRComment *c = [PRComment itemOfType:@"PRComment" serverId:itemId moc:self.dataManager.managedObjectContext];
+					itemId = [app.dataManager idForUriPath:notification.userInfo[COMMENT_ID_KEY]];
+					PRComment *c = (PRComment *)[moc existingObjectWithID:itemId error:nil];
 					urlToOpen = c.webUrl;
-					pullRequest = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:self.dataManager.managedObjectContext];
+					pullRequest = c.pullRequest;
 				}
 				[pullRequest catchUpWithComments];
 			}
@@ -437,8 +428,7 @@ AppDelegate *app;
 			PRComment *c = item;
 			notification.title = [NSString stringWithFormat:@"@%@ mentioned you:",c.userName];
 			notification.informativeText = c.body;
-			PullRequest *associatedRequest = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:c.managedObjectContext];
-			notification.subtitle = associatedRequest.title;
+			notification.subtitle = c.pullRequest.title;
 			break;
 		}
 		case kNewComment:
@@ -446,8 +436,7 @@ AppDelegate *app;
 			PRComment *c = item;
 			notification.title = [NSString stringWithFormat:@"@%@ commented:", c.userName];
 			notification.informativeText = c.body;
-			PullRequest *associatedRequest = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:c.managedObjectContext];
-			notification.subtitle = associatedRequest.title;
+			notification.subtitle = c.pullRequest.title;
 			break;
 		}
 		case kNewPr:
@@ -515,7 +504,7 @@ AppDelegate *app;
 {
 	self.ignoreNextFocusLoss = isAlternative;
 
-	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:item.userInfo moc:self.dataManager.managedObjectContext];
+	PullRequest *r = item.associatedPullRequest;
 	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:r.urlForOpening]];
 	[r catchUpWithComments];
 
@@ -554,14 +543,7 @@ AppDelegate *app;
 	{
 		if(!self.isRefreshing)
 		{
-			NSString *prefix;
-
-			if(settings.localUser)
-				prefix = [NSString stringWithFormat:@" Refresh %@",settings.localUser];
-			else
-				prefix = @" Refresh";
-
-			self.refreshNow.title = [prefix stringByAppendingFormat:@" - %@",[self.api lastUpdateDescription]];
+			self.refreshNow.title = [@" Refresh" stringByAppendingFormat:@" - %@",[self.api lastUpdateDescription]];
 		}
 	}
 }
@@ -694,7 +676,7 @@ AppDelegate *app;
 - (void)unPinSelectedFrom:(PRItemView *)item
 {
 	DataManager *dataManager = self.dataManager;
-	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:item.userInfo moc:dataManager.managedObjectContext];
+	PullRequest *r = item.associatedPullRequest;
 	[dataManager.managedObjectContext deleteObject:r];
 	[dataManager saveDB];
 	[self updateMenu];
@@ -720,7 +702,7 @@ AppDelegate *app;
 
 	for(PullRequest *r in pullRequests)
 	{
-		PRItemView *view = [[PRItemView alloc] initWithPullRequest:r userInfo:r.serverId delegate:self];
+		PRItemView *view = [[PRItemView alloc] initWithPullRequest:r delegate:self];
 		[sections[r.sectionIndex] addObject:view];
 	}
 
@@ -766,78 +748,108 @@ AppDelegate *app;
 	[self.mainMenu.scrollView.documentView scrollPoint:lastPos];
 }
 
-- (void)defaultsUpdated
-{
-	NSTableColumn *repositoryColumn = [self.projectsTable tableColumns][1];
-
-	if(settings.localUser)
-		[[repositoryColumn headerCell] setStringValue:[NSString stringWithFormat:@" Watched repositories for %@",settings.localUser]];
-	else
-		[[repositoryColumn headerCell] setStringValue:@" Your watched repositories"];
-}
-
 - (void)startRateLimitHandling
 {
-	[self.apiLoad setIndeterminate:YES];
-	[self.apiLoad stopAnimation:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(apiUsageUpdate:) name:RATE_UPDATE_NOTIFICATION object:nil];
-	if(settings.authToken.length)
-	{
-		[self.api updateLimitFromServer];
-	}
+	[[NSNotificationCenter defaultCenter] addObserver:self.serverList selector:@selector(reloadData) name:API_USAGE_UPDATE object:nil];
+	[self.api updateLimitsFromServer];
 }
-
-- (void)apiUsageUpdate:(NSNotification *)n
-{
-	[self.apiLoad setIndeterminate:NO];
-	self.apiLoad.maxValue = self.api.requestsLimit;
-	self.apiLoad.doubleValue = self.api.requestsLimit-self.api.requestsRemaining;
-}
-
 
 - (IBAction)refreshReposSelected:(NSButton *)sender
 {
 	[self prepareForRefresh];
 	[self controlTextDidChange:nil];
 
-	[self.api fetchRepositoriesAndCallback:^(BOOL success) {
-		[self completeRefresh];
-		if(!success)
+	NSManagedObjectContext *tempContext = [self.dataManager tempContext];
+	[self.api fetchRepositoriesToMoc:tempContext andCallback:^{
+		if([ApiServer shouldReportRefreshFailureInMoc:tempContext])
 		{
+			NSMutableArray *errorServers = [NSMutableArray new];
+			for(ApiServer *apiServer in [ApiServer allApiServersInMoc:tempContext])
+			{
+				if(apiServer.goodToGo && !apiServer.lastSyncSucceeded.boolValue)
+				{
+					[errorServers addObject:apiServer.label];
+				}
+			}
+
+			NSString *serverNames = [errorServers componentsJoinedByString:@", "];
+			NSString *message = [NSString stringWithFormat:@"Could not refresh repository list from %@, please ensure that the tokens you are using are valid",serverNames];
+
 			NSAlert *alert = [[NSAlert alloc] init];
 			[alert setMessageText:@"Error"];
-			[alert setInformativeText:@"Could not refresh repository list, please ensure that the token you are using is valid"];
+			[alert setInformativeText:message];
 			[alert addButtonWithTitle:@"OK"];
 			[alert runModal];
 		}
+		else
+		{
+			[tempContext save:nil];
+		}
+		[self completeRefresh];
 	}];
 }
 
-- (void)tokenChanged
+- (ApiServer *)selectedServer
 {
-	NSString *newToken = [self.githubTokenHolder.stringValue stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-	NSString *oldToken = settings.authToken;
-	if(newToken.length>0)
+	NSInteger selected = self.serverList.selectedRow;
+	if(selected>=0)
 	{
-		self.refreshButton.enabled = YES;
-		settings.authToken = newToken;
+		NSArray *allApiServers = [ApiServer allApiServersInMoc:self.dataManager.managedObjectContext];
+		return allApiServers[selected];
 	}
-	else
-	{
-		self.refreshButton.enabled = NO;
-		settings.authToken = nil;
-	}
-	if(newToken && oldToken && ![newToken isEqualToString:oldToken])
-	{
-		[self reset];
-	}
+	return nil;
+}
+
+- (IBAction)deleteSelectedServerSelected:(NSButton *)sender
+{
+	ApiServer *selectedServer = [self selectedServer];
+	NSInteger index = [[ApiServer allApiServersInMoc:self.dataManager.managedObjectContext] indexOfObject:selectedServer];
+	[self.dataManager.managedObjectContext deleteObject:selectedServer];
+	[self.serverList reloadData];
+	[self.serverList selectRowIndexes:[NSIndexSet indexSetWithIndex:MIN(index,self.serverList.numberOfRows-1)]
+				 byExtendingSelection:NO];
+	[self fillServerApiFormFromSelectedServer];
+	[self updateMenu];
+	[self.dataManager saveDB];
+}
+
+
+- (IBAction)apiServerReportErrorSelected:(NSButton *)sender
+{
+	ApiServer *apiServer = [self selectedServer];
+	apiServer.reportRefreshFailures = @(sender.integerValue!=0);
+	[self storeApiFormToSelectedServer];
 }
 
 - (void)controlTextDidChange:(NSNotification *)obj
 {
-	if(obj.object==self.githubTokenHolder)
+	if(obj.object==self.apiServerName)
 	{
-		[self tokenChanged];
+		ApiServer *apiServer = [self selectedServer];
+		apiServer.label = self.apiServerName.stringValue;
+		[self storeApiFormToSelectedServer];
+	}
+	else if(obj.object==self.apiServerApiPath)
+	{
+		ApiServer *apiServer = [self selectedServer];
+		apiServer.apiPath = self.apiServerApiPath.stringValue;
+		[self storeApiFormToSelectedServer];
+		[apiServer clearAllRelatedInfo];
+		[self reset];
+	}
+	else if(obj.object==self.apiServerWebPath)
+	{
+		ApiServer *apiServer = [self selectedServer];
+		apiServer.webPath = self.apiServerWebPath.stringValue;
+		[self storeApiFormToSelectedServer];
+	}
+	else if(obj.object==self.apiServerAuthToken)
+	{
+		ApiServer *apiServer = [self selectedServer];
+		apiServer.authToken = self.apiServerAuthToken.stringValue;
+		[self storeApiFormToSelectedServer];
+		[apiServer clearAllRelatedInfo];
+		[self reset];
 	}
 	else if(obj.object==self.repoFilter)
 	{
@@ -879,8 +891,9 @@ AppDelegate *app;
 	self.preferencesDirty = YES;
 	self.api.successfulRefreshesSinceLastStatusCheck = 0;
 	self.lastSuccessfulRefresh = nil;
-	[self.dataManager deleteEverything];
+	self.lastRepoCheck = nil;
 	[self.projectsTable reloadData];
+	self.refreshButton.enabled = [ApiServer someServersHaveAuthTokensInMoc:self.dataManager.managedObjectContext];
 	[self updateMenu];
 }
 
@@ -899,7 +912,9 @@ AppDelegate *app;
 	[self.refreshTimer invalidate];
 	self.refreshTimer = nil;
 
-	[self.api updateLimitFromServer];
+	[self.serverList selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
+
+	[self.api updateLimitsFromServer];
 	[self updateStatusTermPreferenceControls];
 	self.commentAuthorBlacklist.objectValue = settings.commentAuthorBlacklist;
 
@@ -910,7 +925,6 @@ AppDelegate *app;
 	self.launchAtStartup.integerValue = [self isAppLoginItem];
 	self.hideAllPrsSection.integerValue = settings.hideAllPrsSection;
 	self.dontConfirmRemoveAllClosed.integerValue = settings.dontAskBeforeWipingClosed;
-	self.dontReportRefreshFailures.integerValue = settings.dontReportRefreshFailures;
 	self.displayRepositoryNames.integerValue = settings.showReposInName;
 	self.includeRepositoriesInFiltering.integerValue = settings.includeReposInFilter;
 	self.dontConfirmRemoveAllMerged.integerValue = settings.dontAskBeforeWipingMerged;
@@ -1028,22 +1042,51 @@ AppDelegate *app;
 	[self addHotKeySupport];
 }
 
+- (void)reportNeedFrontEnd
+{
+	NSAlert *alert = [[NSAlert alloc] init];
+	[alert setMessageText:[NSString stringWithFormat:@"Please provide a full URL for the web front end of this server first"]];
+	[alert addButtonWithTitle:@"OK"];
+	[alert runModal];
+}
+
 - (IBAction)createTokenSelected:(NSButton *)sender
 {
-	NSString *address = [NSString stringWithFormat:@"https://%@/settings/tokens/new",settings.apiFrontEnd];
-	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:address]];
+	if([self.apiServerWebPath.stringValue length]==0)
+	{
+		[self reportNeedFrontEnd];
+	}
+	else
+	{
+		NSString *address = [NSString stringWithFormat:@"%@/settings/tokens/new",self.apiServerWebPath.stringValue];
+		[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:address]];
+	}
 }
 
 - (IBAction)viewExistingTokensSelected:(NSButton *)sender
 {
-	NSString *address = [NSString stringWithFormat:@"https://%@/settings/applications",settings.apiFrontEnd];
-	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:address]];
+	if([self.apiServerWebPath.stringValue length]==0)
+	{
+		[self reportNeedFrontEnd];
+	}
+	else
+	{
+		NSString *address = [NSString stringWithFormat:@"%@/settings/applications",self.apiServerWebPath.stringValue];
+		[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:address]];
+	}
 }
 
 - (IBAction)viewWatchlistSelected:(NSButton *)sender
 {
-	NSString *address = [NSString stringWithFormat:@"https://%@/watching",settings.apiFrontEnd];
-	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:address]];
+	if([self.apiServerWebPath.stringValue length]==0)
+	{
+		[self reportNeedFrontEnd];
+	}
+	else
+	{
+		NSString *address = [NSString stringWithFormat:@"%@/watching",self.apiServerWebPath.stringValue];
+		[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:address]];
+	}
 }
 
 - (IBAction)prMergePolicySelected:(NSPopUpButton *)sender
@@ -1092,46 +1135,73 @@ AppDelegate *app;
 	return [self getFilteredRepos][row-1];
 }
 
+- (void)tableViewSelectionDidChange:(NSNotification *)notification
+{
+	[self fillServerApiFormFromSelectedServer];
+}
+
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
 	NSButtonCell *cell = [tableColumn dataCellForRow:row];
-	if([tableColumn.identifier isEqualToString:@"hide"])
+
+	if(tableView==self.projectsTable)
 	{
-		if([self tableView:tableView isGroupRow:row])
+		if([tableColumn.identifier isEqualToString:@"hide"])
 		{
-			[cell setImagePosition:NSNoImage];
-			cell.state = NSMixedState;
-			[cell setEnabled:NO];
+			if([self tableView:tableView isGroupRow:row])
+			{
+				[cell setImagePosition:NSNoImage];
+				cell.state = NSMixedState;
+				[cell setEnabled:NO];
+			}
+			else
+			{
+				[cell setImagePosition:NSImageOnly];
+
+				Repo *r = [self repoForRow:row];
+				if(r.hidden.boolValue)
+					cell.state = NSOnState;
+				else
+					cell.state = NSOffState;
+				[cell setEnabled:YES];
+			}
 		}
 		else
 		{
-			[cell setImagePosition:NSImageOnly];
+			if([self tableView:tableView isGroupRow:row])
+			{
+				if(row==0)
+					cell.title = @"Parent Repositories";
+				else
+					cell.title = @"Forked Repositories";
 
-			Repo *r = [self repoForRow:row];
-			if(r.hidden.boolValue)
-				cell.state = NSOnState;
+				cell.state = NSMixedState;
+				[cell setEnabled:NO];
+			}
 			else
-				cell.state = NSOffState;
-			[cell setEnabled:YES];
+			{
+				Repo *r = [self repoForRow:row];
+				cell.title = r.inaccessible.boolValue ? [r.fullName stringByAppendingString:@" (inaccessible)"] : r.fullName;
+				[cell setEnabled:YES];
+			}
 		}
 	}
 	else
 	{
-		if([self tableView:tableView isGroupRow:row])
+		NSArray *allServers = [ApiServer allApiServersInMoc:self.dataManager.managedObjectContext];
+		ApiServer *apiServer = allServers[row];
+		if([tableColumn.identifier isEqualToString:@"server"])
 		{
-			if(row==0)
-				cell.title = @"Parent Repositories";
-			else
-				cell.title = @"Forked Repositories";
-
-			cell.state = NSMixedState;
-			[cell setEnabled:NO];
+			cell.title = apiServer.label;
 		}
-		else
+		else // api usage
 		{
-			Repo *r = [self repoForRow:row];
-			cell.title = r.inaccessible.boolValue ? [r.fullName stringByAppendingString:@" (inaccessible)"] : r.fullName;
-			[cell setEnabled:YES];
+			NSLevelIndicatorCell *c = (NSLevelIndicatorCell*)cell;
+			[c setMinValue:0.0];
+			[c setMaxValue:apiServer.requestsLimit.doubleValue];
+			[c setWarningValue:apiServer.requestsLimit.doubleValue*0.5];
+			[c setCriticalValue:apiServer.requestsLimit.doubleValue*0.8];
+			[c setDoubleValue:apiServer.requestsLimit.doubleValue-apiServer.requestsRemaining.doubleValue];
 		}
 	}
 	return cell;
@@ -1139,25 +1209,46 @@ AppDelegate *app;
 
 - (BOOL)tableView:(NSTableView *)tableView isGroupRow:(NSInteger)row
 {
-	return (row == 0 || row == [self countParentRepos]+1);
+	if(tableView==self.projectsTable)
+	{
+		return (row == 0 || row == [self countParentRepos]+1);
+	}
+	else
+	{
+		return NO;
+	}
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-	return [self getFilteredRepos].count+2;
+	if(tableView==self.projectsTable)
+	{
+		return [self getFilteredRepos].count+2;
+	}
+	else
+	{
+		return [ApiServer countApiServersInMoc:self.dataManager.managedObjectContext];
+	}
 }
 
 - (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-	if(![self tableView:tableView isGroupRow:row])
+	if(tableView==self.projectsTable)
 	{
-		Repo *r = [self repoForRow:row];
-		BOOL hideNow = [object boolValue];
-		r.hidden = @(hideNow);
-		r.dirty = @(!hideNow);
+		if(![self tableView:tableView isGroupRow:row])
+		{
+			Repo *r = [self repoForRow:row];
+			BOOL hideNow = [object boolValue];
+			r.hidden = @(hideNow);
+			r.dirty = @(!hideNow);
+		}
+		[self.dataManager saveDB];
+		self.preferencesDirty = YES;
 	}
-	[self.dataManager saveDB];
-	self.preferencesDirty = YES;
+	else
+	{
+		// TODO serverList
+	}
 }
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
@@ -1212,7 +1303,7 @@ AppDelegate *app;
 	if([notification object]==self.preferencesWindow)
 	{
 		[self controlTextDidChange:nil];
-		if(settings.authToken.length && self.preferencesDirty)
+		if([ApiServer someServersHaveAuthTokensInMoc:self.dataManager.managedObjectContext] && self.preferencesDirty)
 		{
 			[self startRefresh];
 		}
@@ -1224,10 +1315,6 @@ AppDelegate *app;
 			}
 		}
         [self setUpdateCheckParameters];
-	}
-	else if([notification object]==self.apiSettings)
-	{
-		[self commitApiInfo];
 	}
 }
 
@@ -1241,28 +1328,6 @@ AppDelegate *app;
         [s setUpdateCheckInterval:3600.0*settings.checkForUpdatesInterval];
     }
     DLog(@"Check for updates set to %d every %f seconds",s.automaticallyChecksForUpdates,s.updateCheckInterval);
-}
-
-- (void)commitApiInfo
-{
-	NSString *frontEnd = [self.apiFrontEnd stringValue];
-	NSString *backEnd = [self.apiBackEnd stringValue];
-	NSString *path = [self.apiPath stringValue];
-
-	NSCharacterSet *cs = [NSCharacterSet whitespaceAndNewlineCharacterSet];
-	frontEnd = [frontEnd stringByTrimmingCharactersInSet:cs];
-	backEnd = [backEnd stringByTrimmingCharactersInSet:cs];
-	path = [path stringByTrimmingCharactersInSet:cs];
-
-	if(frontEnd.length==0) frontEnd = nil;
-	if(backEnd.length==0) backEnd = nil;
-	if(path.length==0) path = nil;
-
-	settings.apiFrontEnd = frontEnd;
-	settings.apiBackEnd = backEnd;
-	settings.apiPath = path;
-
-	app.preferencesDirty = YES;
 }
 
 - (void)networkStateChanged
@@ -1312,24 +1377,39 @@ AppDelegate *app;
 
 - (void)checkApiUsage
 {
-	if(self.api.requestsLimit>0)
+	for(ApiServer *apiServer in [ApiServer allApiServersInMoc:self.dataManager.managedObjectContext])
 	{
-		if(self.api.requestsRemaining==0)
+		if(apiServer.requestsLimit.doubleValue>0)
 		{
-			NSAlert *alert = [[NSAlert alloc] init];
-			[alert setMessageText:@"Your API request usage is over the limit!"];
-			[alert setInformativeText:[NSString stringWithFormat:@"Your request cannot be completed until GitHub resets your hourly API allowance at %@.\n\nIf you get this error often, try to make fewer manual refreshes or reducing the number of repos you are monitoring.\n\nYou can check your API usage at any time from the bottom of the preferences pane at any time.",self.api.resetDate]];
-			[alert addButtonWithTitle:@"OK"];
-			[alert runModal];
-			return;
+			if(apiServer.requestsRemaining.doubleValue==0)
+			{
+				NSAlert *alert = [[NSAlert alloc] init];
+				[alert setMessageText:[NSString stringWithFormat:@"Your API request usage for '%@' is over the limit!",apiServer.label]];
+				[alert setInformativeText:[NSString stringWithFormat:@"Your request cannot be completed until your hourly API allowance is reset at %@.\n\nIf you get this error often, try to make fewer manual refreshes or reducing the number of repos you are monitoring.\n\nYou can check your API usage at any time from 'Servers' preferences pane at any time.",apiServer.resetDate]];
+				[alert addButtonWithTitle:@"OK"];
+				[alert runModal];
+				return;
+			}
+			else if((apiServer.requestsRemaining.doubleValue/apiServer.requestsLimit.doubleValue)<LOW_API_WARNING)
+			{
+				NSAlert *alert = [[NSAlert alloc] init];
+				[alert setMessageText:[NSString stringWithFormat:@"Your API request usage for '%@' is close to full",apiServer.label]];
+				[alert setInformativeText:[NSString stringWithFormat:@"Try to make fewer manual refreshes, increasing the automatic refresh time, or reducing the number of repos you are monitoring.\n\nYour allowance will be reset by Github on %@.\n\nYou can check your API usage from the 'Servers' preferences pane at any time.",apiServer.resetDate]];
+				[alert addButtonWithTitle:@"OK"];
+				[alert runModal];
+			}
 		}
-		else if((self.api.requestsRemaining/self.api.requestsLimit)<LOW_API_WARNING)
+	}
+}
+
+- (void)tabView:(NSTabView *)tabView willSelectTabViewItem:(NSTabViewItem *)tabViewItem
+{
+	if([tabView indexOfTabViewItem:tabViewItem]==1)
+	{
+		if((!self.lastRepoCheck || [Repo countVisibleReposInMoc:self.dataManager.managedObjectContext]==0) &&
+		   [ApiServer someServersHaveAuthTokensInMoc:self.dataManager.managedObjectContext])
 		{
-			NSAlert *alert = [[NSAlert alloc] init];
-			[alert setMessageText:@"Your API request usage is close to full"];
-			[alert setInformativeText:[NSString stringWithFormat:@"Try to make fewer manual refreshes, increasing the automatic refresh time, or reducing the number of repos you are monitoring.\n\nYour allowance will be reset by Github on %@.\n\nYou can check your API usage from the bottom of the preferences pane.",self.api.resetDate]];
-			[alert addButtonWithTitle:@"OK"];
-			[alert runModal];
+			[self refreshReposSelected:nil];
 		}
 	}
 }
@@ -1341,7 +1421,6 @@ AppDelegate *app;
 
 	[self.refreshButton setEnabled:NO];
 	[self.projectsTable setEnabled:NO];
-	[self.githubTokenHolder setEnabled:NO];
 	[self.activityDisplay startAnimation:nil];
 	self.statusItemView.grayOut = YES;
 
@@ -1354,10 +1433,7 @@ AppDelegate *app;
 		if([v isKindOfClass:[EmptyView class]])
 			[self updateMenu];
 
-	if(settings.localUser)
-		self.refreshNow.title = [NSString stringWithFormat:@" Refreshing %@...",settings.localUser];
-	else
-		self.refreshNow.title = @" Refreshing...";
+	self.refreshNow.title = @" Refreshing...";
 
 	DLog(@"Starting refresh");
 }
@@ -1367,14 +1443,13 @@ AppDelegate *app;
 	self.isRefreshing = NO;
 	[self.refreshButton setEnabled:YES];
 	[self.projectsTable setEnabled:YES];
-	[self.githubTokenHolder setEnabled:YES];
 	[self.activityDisplay stopAnimation:nil];
 	[self.dataManager saveDB];
 	[self.projectsTable reloadData];
 	[self updateMenu];
 	[self checkApiUsage];
-	[self.dataManager sendNotifications];
 	[self.dataManager saveDB];
+	[self.dataManager sendNotifications];
 
 	DLog(@"Refresh done");
 }
@@ -1390,11 +1465,10 @@ AppDelegate *app;
 	[self.refreshNow setAction:nil];
 	[self.refreshNow setTarget:nil];
 
-	[self.api fetchPullRequestsForActiveReposAndCallback:^(BOOL success) {
+	[self.api fetchPullRequestsForActiveReposAndCallback:^{
 		self.refreshNow.target = oldTarget;
 		self.refreshNow.action = oldAction;
-		self.lastUpdateFailed = !success;
-		if(success)
+		if(![ApiServer shouldReportRefreshFailureInMoc:self.dataManager.managedObjectContext])
 		{
 			self.lastSuccessfulRefresh = [NSDate date];
 			self.preferencesDirty = NO;
@@ -1408,6 +1482,10 @@ AppDelegate *app;
 	}];
 }
 
+- (void)refreshMainWithTarget:(id)oldTarget action:(SEL)oldaction
+{
+
+}
 
 - (IBAction)refreshDurationChanged:(NSStepper *)sender
 {
@@ -1423,7 +1501,8 @@ AppDelegate *app;
 
 - (void)refreshTimerDone
 {
-	if(settings.localUserId && settings.authToken.length)
+	NSManagedObjectContext *moc = self.dataManager.managedObjectContext;
+	if([ApiServer someServersHaveAuthTokensInMoc:moc] && ([Repo countVisibleReposInMoc:moc]>0))
 	{
 		[self startRefresh];
 	}
@@ -1439,7 +1518,7 @@ AppDelegate *app;
 
 	NSString *countString;
 	NSDictionary *attributes;
-	if(self.lastUpdateFailed && (!settings.dontReportRefreshFailures))
+	if([ApiServer shouldReportRefreshFailureInMoc:moc])
 	{
 		countString = @"X";
 		attributes = @{
@@ -1485,7 +1564,6 @@ AppDelegate *app;
 													   delegate:self];
 	self.statusItemView.highlighted = [self.mainMenu isVisible];
 	self.statusItemView.grayOut = self.isRefreshing;
-	self.statusItemView.hostItem = self.statusItem;
 	self.statusItem.view = self.statusItemView;
 
 	[self sizeMenuAndShow:NO];
@@ -1592,47 +1670,74 @@ AppDelegate *app;
 	[self updateStatusTermPreferenceControls];
 }
 
-- (IBAction)apiServerSelected:(NSButton *)sender
-{
-	[self.apiFrontEnd setStringValue:settings.apiFrontEnd];
-	[self.apiBackEnd setStringValue:settings.apiBackEnd];
-	[self.apiPath setStringValue:settings.apiPath];
-
-	[self.apiSettings setLevel:NSFloatingWindowLevel];
-	[self.apiSettings makeKeyAndOrderFront:self];
-}
-
 - (IBAction)testApiServerSelected:(NSButton *)sender
 {
-	[self commitApiInfo];
 	[sender setEnabled:NO];
+	ApiServer *apiServer = [self selectedServer];
 
-	[self.api testApiAndCallback:^(NSError *error) {
-		NSAlert *alert = [[NSAlert alloc] init];
-		if(error)
-		{
-			[alert setMessageText:[NSString stringWithFormat:@"The test failed for https://%@/%@",settings.apiBackEnd,settings.apiPath]];
-			[alert setInformativeText:error.localizedDescription];
-		}
-		else
-		{
-			[alert setMessageText:@"The API server is OK!"];
-		}
-		[alert addButtonWithTitle:@"OK"];
-		[alert runModal];
-		[sender setEnabled:YES];
-	}];
+	[self.api testApiToServer:apiServer
+				  andCallback:^(NSError *error) {
+					  NSAlert *alert = [[NSAlert alloc] init];
+					  if(error)
+					  {
+						  [alert setMessageText:[NSString stringWithFormat:@"The test failed for %@", apiServer.apiPath]];
+						  [alert setInformativeText:error.localizedDescription];
+					  }
+					  else
+					  {
+						  [alert setMessageText:@"This API server seems OK!"];
+					  }
+					  [alert addButtonWithTitle:@"OK"];
+					  [alert runModal];
+					  [sender setEnabled:YES];
+				  }];
 }
 
 - (IBAction)apiRestoreDefaultsSelected:(NSButton *)sender
 {
-	settings.apiFrontEnd = nil;
-	settings.apiBackEnd = nil;
-	settings.apiPath = nil;
+	ApiServer *apiServer = [self selectedServer];
+	[apiServer resetToGithub];
+	[self fillServerApiFormFromSelectedServer];
+	[self storeApiFormToSelectedServer];
+}
 
-	[self.apiFrontEnd setStringValue:settings.apiFrontEnd];
-	[self.apiBackEnd setStringValue:settings.apiBackEnd];
-	[self.apiPath setStringValue:settings.apiPath];
+- (void)fillServerApiFormFromSelectedServer
+{
+	ApiServer *apiServer = [self selectedServer];
+	self.apiServerName.stringValue = [self emptyStringIfNil:apiServer.label];
+	self.apiServerWebPath.stringValue = [self emptyStringIfNil:apiServer.webPath];
+	self.apiServerApiPath.stringValue = [self emptyStringIfNil:apiServer.apiPath];
+	self.apiServerAuthToken.stringValue = [self emptyStringIfNil:apiServer.authToken];
+	self.apiServerSelectedBox.title = apiServer.label ? apiServer.label : @"New Server";
+	self.apiServerTestButton.enabled = (apiServer.authToken.length>0);
+	self.apiServerDeleteButton.enabled = ([ApiServer countApiServersInMoc:self.dataManager.managedObjectContext]>1);
+	self.apiServerReportError.integerValue = apiServer.reportRefreshFailures.boolValue;
+}
+
+- (void)storeApiFormToSelectedServer
+{
+	ApiServer *apiServer = [self selectedServer];
+	apiServer.label = self.apiServerName.stringValue;
+	apiServer.apiPath = self.apiServerApiPath.stringValue;
+	apiServer.webPath = self.apiServerWebPath.stringValue;
+	apiServer.authToken = self.apiServerAuthToken.stringValue;
+	self.apiServerTestButton.enabled = (apiServer.authToken.length>0);
+	[self.serverList reloadData];
+}
+
+- (NSString *)emptyStringIfNil:(NSString *)string
+{
+	return string ? string : @"";
+}
+
+- (IBAction)addNewApiServerSelected:(NSButton *)sender
+{
+	ApiServer *a = [ApiServer insertNewServerInMoc:self.dataManager.managedObjectContext];
+	a.label = @"New API Server";
+	NSUInteger index = [[ApiServer allApiServersInMoc:self.dataManager.managedObjectContext] indexOfObject:a];
+	[self.serverList reloadData];
+	[self.serverList selectRowIndexes:[NSIndexSet indexSetWithIndex:index] byExtendingSelection:NO];
+	[self fillServerApiFormFromSelectedServer];
 }
 
 /////////////////////// keyboard shortcuts
@@ -1723,8 +1828,7 @@ AppDelegate *app;
 	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
 		v.focused = YES;
 	});
-	PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:v.userInfo moc:self.dataManager.managedObjectContext];
-	return r.webUrl;
+	return v.associatedPullRequest.webUrl;
 }
 
 - (void)prItemFocused:(NSNotification *)focusedNotification

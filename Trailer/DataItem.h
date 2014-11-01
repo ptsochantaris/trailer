@@ -1,4 +1,6 @@
 
+@class ApiServer;
+
 enum PostSyncAction {
 	kPostSyncDoNothing = 0,
 	kPostSyncDelete,
@@ -11,16 +13,15 @@ enum PostSyncAction {
 @property (nonatomic, retain) NSNumber * serverId;
 @property (nonatomic, retain) NSNumber * postSyncAction;
 @property (nonatomic, retain) NSDate * updatedAt, * createdAt;
-
-+ (id)itemOfType:(NSString*)type serverId:(NSNumber*)serverId moc:(NSManagedObjectContext*)moc;
+@property (nonatomic, retain) ApiServer *apiServer;
 
 + (NSArray *)allItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc;
 
-+ (id)itemWithInfo:(NSDictionary*)info type:(NSString*)type moc:(NSManagedObjectContext*)moc;
++ (NSArray *)allItemsOfType:(NSString *)type fromServer:(ApiServer *)apiServer;
 
-+ (void)nukeDeletedItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc;
++ (id)itemWithInfo:(NSDictionary*)info type:(NSString*)type fromServer:(ApiServer *)apiServer;
 
-+ (NSUInteger)countItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc;
++ (NSArray*)itemsOfType:(NSString *)type surviving:(BOOL)survivingItems inMoc:(NSManagedObjectContext *)moc;
 
 + (NSArray*)newOrUpdatedItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc;
 
@@ -28,6 +29,8 @@ enum PostSyncAction {
 
 + (NSArray*)newItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc;
 
-+ (NSArray*)itemsOfType:(NSString *)type surviving:(BOOL)survivingItems inMoc:(NSManagedObjectContext *)moc;
++ (void)nukeDeletedItemsInMoc:(NSManagedObjectContext *)moc;
+
++ (NSUInteger)countItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc;
 
 @end

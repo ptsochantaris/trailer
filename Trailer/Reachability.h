@@ -45,11 +45,6 @@
 
  */
 
-#import <Foundation/Foundation.h>
-#import <SystemConfiguration/SystemConfiguration.h>
-#import <netinet/in.h>
-
-
 typedef enum : NSInteger {
     NotReachable = 0,
     ReachableViaWiFi,

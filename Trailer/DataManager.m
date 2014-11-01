@@ -16,22 +16,46 @@
 			[self performVersionChangedTasks];
 			[self versionBumpComplete];
 		}
+		else
+		{
+			[ApiServer ensureAtLeastGithubInMoc:self.managedObjectContext];
+		}
     }
     return self;
 }
 
 - (void)performVersionChangedTasks
 {
-	settings.localUserId = @(settings.localUserId.longLongValue);
-	NSArray *statuses = [DataItem allItemsOfType:@"PRStatus" inMoc:self.managedObjectContext];
-	for(PRStatus *s in statuses)
+	NSUserDefaults *d = [NSUserDefaults standardUserDefaults];
+	NSString *legacyAuthToken = [d objectForKey:@"GITHUB_AUTH_TOKEN"];
+	if(legacyAuthToken)
 	{
-		PullRequest *r = [PullRequest itemOfType:@"PullRequest" serverId:s.pullRequestId moc:self.managedObjectContext];
-		if(!r)
-		{
-			DLog(@"Deleting orphaned PRStatus item %@",s.serverId);
-			[self.managedObjectContext deleteObject:s];
-		}
+		NSString *legacyApiHost = [d objectForKey:@"API_BACKEND_SERVER"];
+		if(!legacyApiHost.length) legacyApiHost = @"api.github.com";
+
+		NSString *legacyApiPath = [d objectForKey:@"API_SERVER_PATH"];
+		if(!legacyApiPath) legacyApiPath = @"";
+
+		NSString *legacyWebHost = [d objectForKey:@"API_FRONTEND_SERVER"];
+		if(!legacyWebHost.length) legacyWebHost = @"github.com";
+
+		NSString *actualApiPath = [NSString stringWithFormat:@"%@/%@",legacyApiHost,legacyApiPath];
+		actualApiPath = [actualApiPath stringByReplacingOccurrencesOfString:@"//" withString:@"/"];
+
+		ApiServer *newApiServer = [ApiServer addDefaultGithubInMoc:self.managedObjectContext];
+		newApiServer.apiPath = [@"https://" stringByAppendingString:actualApiPath];
+		newApiServer.webPath = [@"https://" stringByAppendingString:legacyWebHost];
+		newApiServer.authToken = legacyAuthToken;
+		newApiServer.lastSyncSucceeded = @YES;
+
+		[d removeObjectForKey:@"API_BACKEND_SERVER"];
+		[d removeObjectForKey:@"API_SERVER_PATH"];
+		[d removeObjectForKey:@"API_FRONTEND_SERVER"];
+		[d removeObjectForKey:@"GITHUB_AUTH_TOKEN"];
+	}
+	else
+	{
+		[ApiServer ensureAtLeastGithubInMoc:self.managedObjectContext];
 	}
 
 	DLog(@"Marking all repos as dirty");
@@ -82,7 +106,7 @@
 	NSArray *latestComments = [PRComment newItemsOfType:@"PRComment" inMoc:mainContext];
 	for(PRComment *c in latestComments)
 	{
-		PullRequest *r = [PullRequest pullRequestWithUrl:c.pullRequestUrl moc:mainContext];
+		PullRequest *r = c.pullRequest;
 		if(r.postSyncAction.integerValue == kPostSyncNoteUpdated)
 		{
 			if(c.refersToMe)
@@ -91,7 +115,7 @@
 			}
 			else if(settings.showCommentsEverywhere || r.isMine || r.commentedByMe)
 			{
-				if(![c.userId isEqualToNumber:settings.localUserId])
+				if(![c.userId isEqualToNumber:c.apiServer.userId])
 				{
 					NSString *commenterAuthorName = c.userName;
 					NSArray *blacklistMatches = [settings.commentAuthorBlacklist filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(NSString *name, NSDictionary *bindings) {
@@ -259,7 +283,6 @@
             [fm removeItemAtPath:[documentsDirectory stringByAppendingPathComponent:file] error:nil];
         }
     }
-	[self wipeApiMarkers];
 }
 
 // Returns the managed object context for the application (which is already bound to the persistent store coordinator for the application.)
@@ -287,8 +310,19 @@
 - (BOOL)saveDB
 {
 	if(_managedObjectContext.hasChanges)
+	{
+		DLog(@"Saving DB");
 		return [_managedObjectContext save:nil];
+	}
 	return YES;
+}
+
+- (NSManagedObjectContext *)tempContext
+{
+	NSManagedObjectContext *syncContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSConfinementConcurrencyType];
+	syncContext.parentContext = self.managedObjectContext;
+	syncContext.undoManager = nil;
+	return syncContext;
 }
 
 - (void)deleteEverything
@@ -301,31 +335,23 @@
 
 		for (NSString *entityName in self.managedObjectModel.entitiesByName)
 		{
-			@autoreleasepool
+			if(![entityName isEqualToString:@"ApiServer"])
 			{
-				NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:entityName];
-				fetchRequest.includesPropertyValues = NO;
-				fetchRequest.includesSubentities = NO;
+				@autoreleasepool
+				{
+					NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:entityName];
+					fetchRequest.includesPropertyValues = NO;
+					fetchRequest.includesSubentities = NO;
 
-				for (NSManagedObject *managedObject in [tempMoc executeFetchRequest:fetchRequest error:nil])
-					[tempMoc deleteObject:managedObject];
+					for (NSManagedObject *managedObject in [tempMoc executeFetchRequest:fetchRequest error:nil])
+						[tempMoc deleteObject:managedObject];
+				}
 			}
 		}
 
 		[tempMoc save:nil];
 	}
 	[self saveDB];
-
-	[self wipeApiMarkers];
-}
-
-- (void)wipeApiMarkers
-{
-	// because these control the DB state with the event feed, needs to be reset
-	settings.latestReceivedEventEtag = nil;
-	settings.latestReceivedEventDateProcessed = nil;
-	settings.latestUserEventEtag = nil;
-	settings.latestUserEventDateProcessed = nil;
 }
 
 - (NSDictionary *)infoForType:(PRNotificationType)type item:(id)item
@@ -334,14 +360,14 @@
 	{
 		case kNewMention:
 		case kNewComment:
-			return @{COMMENT_ID_KEY:[item serverId]};
+			return @{COMMENT_ID_KEY:[[[item objectID] URIRepresentation] absoluteString]};
 		case kNewPr:
 		case kPrReopened:
 		case kNewPrAssigned:
-			return @{PULL_REQUEST_ID_KEY:[item serverId]};
+			return @{PULL_REQUEST_ID_KEY:[[[item objectID] URIRepresentation] absoluteString]};
 		case kPrClosed:
 		case kPrMerged:
-			return @{NOTIFICATION_URL_KEY:[item webUrl], PULL_REQUEST_ID_KEY:[item serverId]};
+			return @{NOTIFICATION_URL_KEY:[item webUrl], PULL_REQUEST_ID_KEY:[[[item objectID] URIRepresentation] absoluteString] };
 		case kNewRepoSubscribed:
 		case kNewRepoAnnouncement:
 			return @{NOTIFICATION_URL_KEY:[item webUrl] };
@@ -371,7 +397,12 @@
 	NSUInteger openRequests = [PullRequest countOpenRequestsInMoc:self.managedObjectContext];
 	NSString *message;
 
-	if(app.isRefreshing)
+	if(![ApiServer someServersHaveAuthTokensInMoc:self.managedObjectContext])
+	{
+		messageColor = MAKECOLOR(0.8, 0.0, 0.0, 1.0);
+		message = @"There are no configured API servers in your settings, please ensure you have added at least one server with a valid API token.";
+	}
+	else if(app.isRefreshing)
 	{
 		message = @"Refreshing PR information, please wait a moment...";
 	}
@@ -407,6 +438,13 @@
 														 NSParagraphStyleAttributeName: paragraphStyle,
 														 NSFontAttributeName: [UIFont systemFontOfSize:[UIFont smallSystemFontSize]] }];
 #endif
+}
+
+- (NSManagedObjectID *)idForUriPath:(NSString *)uriPath
+{
+	if(!uriPath) return nil;
+	NSURL *u = [NSURL URLWithString:uriPath];
+	return [self.persistentStoreCoordinator managedObjectIDForURIRepresentation:u];
 }
 
 /////////////////////////////////////////////////////////////////////

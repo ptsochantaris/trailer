@@ -33,37 +33,37 @@ typedef enum {
 	kPullRequestHandlingKeepNone,
 } PRHandlingPolicy;
 
+typedef void (^completionBlockType)();
+
 #define PULL_REQUEST_ID_KEY @"pullRequestIdKey"
 #define COMMENT_ID_KEY @"commentIdKey"
 #define NOTIFICATION_URL_KEY @"urlKey"
 
-#define RATE_UPDATE_NOTIFICATION @"RateUpdateNotification"
+#define API_USAGE_UPDATE @"RateUpdateNotification"
 
 #define NETWORK_TIMEOUT 120.0
 #define BACKOFF_STEP 120.0
 
 @interface API : NSObject
 
-@property (nonatomic) NSString *resetDate;
-@property (nonatomic) float requestsLimit, requestsRemaining;
 @property (nonatomic) Reachability *reachability;
 @property (nonatomic) long successfulRefreshesSinceLastStatusCheck;
 
-- (void)updateLimitFromServer;
+- (void)updateLimitsFromServer;
 
-- (void)fetchRepositoriesAndCallback:(void(^)(BOOL success))callback;
+- (void)fetchRepositoriesToMoc:(NSManagedObjectContext *)moc
+				   andCallback:(completionBlockType)callback;
 
-- (void)fetchPullRequestsForActiveReposAndCallback:(void(^)(BOOL success))callback;
+- (void)fetchPullRequestsForActiveReposAndCallback:(completionBlockType)callback;
 
-- (void)getRateLimitAndCallback:(void(^)(long long remaining, long long limit, long long reset))callback;
+- (void)getRateLimitFromServer:(ApiServer *)apiServer
+				   andCallback:(void(^)(long long remaining, long long limit, long long reset))callback;
 
-- (void)testApiAndCallback:(void(^)(NSError *error))callback;
+- (void)testApiToServer:(ApiServer *)apiServer andCallback:(void (^)(NSError *))callback;
 
 - (void)expireOldImageCacheEntries;
 
 - (void)clearImageCache;
-
-- (void)restartNotifier;
 
 - (NSString *)lastUpdateDescription;
 

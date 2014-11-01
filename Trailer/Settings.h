@@ -5,18 +5,12 @@
 
 - (void)log:(NSString *)logMessage;
 
-@property (nonatomic) NSInteger sortMethod, statusFilteringMode,
+@property (nonatomic) NSInteger sortMethod, statusFilteringMode, lastPreferencesTabSelected,
 								closeHandlingPolicy, mergeHandlingPolicy, statusItemRefreshInterval;
 
 @property (nonatomic) NSArray *statusFilteringTerms, *commentAuthorBlacklist;
 
-@property (nonatomic) NSDate *latestReceivedEventDateProcessed, *latestUserEventDateProcessed;
-
-@property (nonatomic) NSNumber *localUserId;
-
-@property (nonatomic) NSString *authToken, *localUser,
-							*apiFrontEnd, *apiBackEnd, *apiPath,
-							*hotkeyLetter, *latestReceivedEventEtag, *latestUserEventEtag;
+@property (nonatomic) NSString *hotkeyLetter;
 
 @property (nonatomic) float refreshPeriod, backgroundRefreshPeriod, newRepoCheckPeriod;
 
@@ -25,7 +19,7 @@
 							dontKeepPrsMergedByMe, hideAvatars, autoParticipateInMentions,
 							dontAskBeforeWipingMerged, dontAskBeforeWipingClosed,
 							includeReposInFilter, showReposInName, hideNewRepositories,
-							dontReportRefreshFailures, groupByRepo, hideAllPrsSection,
+							groupByRepo, hideAllPrsSection,
 							showStatusItems, makeStatusItemsSelectable, moveAssignedPrsToMySection,
 							markUnmergeableOnUserSectionsOnly, countOnlyListedPrs,
 							openPrAtFirstUnreadComment, logActivityToConsole;

@@ -2,6 +2,7 @@
 @interface PRItemView () <NSPasteboardItemDataProvider, NSDraggingSource>
 {
 	NSTrackingArea *trackingArea;
+	NSManagedObjectID *pullRequestId;
 }
 @end
 
@@ -17,7 +18,7 @@ static CGColorRef _highlightColor;
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
 
-		_highlightColor = CGColorCreateCopy(MAKECOLOR(0.95, 0.95, 0.95, 1.0).CGColor);
+		_highlightColor = CGColorCreateCopy(MAKECOLOR(0.92, 0.92, 0.92, 1.0).CGColor);
 
 		_titleAttributes = @{
 							 NSFontAttributeName:[NSFont menuFontOfSize:13.0],
@@ -29,20 +30,21 @@ static CGColorRef _highlightColor;
 		_statusAttributes = @{
 							   NSFontAttributeName:[NSFont fontWithName:@"Monaco" size:9.0],
 							   NSBackgroundColorAttributeName:[NSColor clearColor],
-							   NSParagraphStyleAttributeName: paragraphStyle
+							   NSParagraphStyleAttributeName: paragraphStyle,
 							   };
 	});
 }
 
 #define AVATAR_PADDING 8.0
 
-- (instancetype)initWithPullRequest:(PullRequest *)pullRequest userInfo:(id)userInfo delegate:(id<PRItemViewDelegate>)delegate
+- (instancetype)initWithPullRequest:(PullRequest *)pullRequest
+						   delegate:(id<PRItemViewDelegate>)delegate
 {
     self = [super init];
     if (self)
 	{
 		self.delegate = delegate;
-		_userInfo = userInfo;
+		pullRequestId = pullRequest.objectID;
 
 		NSInteger _commentsNew = 0;
 		NSInteger _commentsTotal = pullRequest.totalComments.integerValue;
@@ -55,7 +57,7 @@ static CGColorRef _highlightColor;
 		}
 
 		NSString *_title = pullRequest.title;
-		NSAttributedString *_subtitle = [pullRequest subtitleWithFont:[NSFont menuFontOfSize:10.0]];
+		NSMutableAttributedString *_subtitle = [pullRequest subtitleWithFont:[NSFont menuFontOfSize:10.0]];
 
 		CGFloat W = MENU_WIDTH-LEFTPADDING-app.scrollBarWidth;
 		BOOL showUnpin = pullRequest.condition.integerValue!=kPullRequestConditionOpen || pullRequest.markUnmergeable;
@@ -237,12 +239,14 @@ static CGColorRef _highlightColor;
 	[p setString:[self stringForCopy] forType:NSStringPboardType];
 }
 
+- (PullRequest *)associatedPullRequest
+{
+	return (PullRequest*)[app.dataManager.managedObjectContext existingObjectWithID:pullRequestId error:nil];
+}
+
 - (NSString *)stringForCopy
 {
-	PullRequest *r = [PullRequest itemOfType:@"PullRequest"
-									serverId:self.userInfo
-										 moc:app.dataManager.managedObjectContext];
-	return r.webUrl;
+	return [self associatedPullRequest].webUrl;
 }
 
 - (void)updateTrackingAreas

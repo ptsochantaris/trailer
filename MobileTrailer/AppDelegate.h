@@ -15,7 +15,7 @@ typedef void (^backgroundFetchCompletionCallback)(UIBackgroundFetchResult result
 
 - (void)postNotificationOfType:(PRNotificationType)type forItem:(id)item;
 
-- (void)startRefresh;
+- (BOOL)startRefresh;
 
 - (void)refreshMainList;
 
