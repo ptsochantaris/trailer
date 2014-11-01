@@ -7,6 +7,22 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.1.1</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Additional updates and cleanups from v1.1.0:</li>
+				<li>New support for multiple API servers, with optional error reporting per-server</li>
+				<li>API server settings should no longer reset after updates</li>
+				</ul></font>]]></description>
+			<pubDate>Sat, 1 Nov 2014 19:00:00 +0000</pubDate>
+			<enclosure
+			url="http://dev.housetrip.com/trailer/trailer111.zip"
+			sparkle:version="1155"
+			sparkle:shortVersionString="1.1.1"
+			sparkle:dsaSignature="MC0CFAfQR6X2eJOKAysPDSXpd/VMDuGLAhUAjTPf+tff4AHv2eU6dmGW3qxAJOg="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.1.0</title>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
 				<li>New support for multiple API servers, with optional error reporting per-server</li>
@@ -37,6 +53,6 @@
 			sparkle:dsaSignature="MC4CFQCOX4/NAUMp+1HUQHkV5n2Fpyl/GQIVAMK/ZtSApXj+r/oxw6qWlX50FIp2"
 			type="application/octet-stream"/>
 		</item>
-
+		
 	</channel>
 </rss>
