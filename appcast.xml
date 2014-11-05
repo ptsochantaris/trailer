@@ -7,6 +7,20 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.1.2</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Added option for displaying PR labels in preferences</li>
+				</ul></font>]]></description>
+			<pubDate>Wed, 5 Nov 2014 19:00:00 +0000</pubDate>
+			<enclosure
+			url="http://dev.housetrip.com/trailer/trailer112.zip"
+			sparkle:version="1157"
+			sparkle:shortVersionString="1.1.2"
+			sparkle:dsaSignature="MC0CFQDYMax97OKHkwt6MA0FJ16ef5wl2AIUea3Jms8AzvxQuUKDcKJdRo8Yak4="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.1.1</title>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
 				<li>Additional updates and cleanups from v1.1.0:</li>
