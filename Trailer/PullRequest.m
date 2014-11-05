@@ -234,7 +234,7 @@ static NSDateFormatter *itemDateFormatter;
 			[_title appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n" attributes:titleAttributes]];
 			NSMutableParagraphStyle *lp = [[NSMutableParagraphStyle alloc] init];
 #ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
-			lp.lineHeightMultiple = 1.1;
+			lp.lineHeightMultiple = 1.15;
 			NSDictionary *labelAttributes = [NSMutableDictionary dictionaryWithDictionary:
 											 @{ NSFontAttributeName: labelFont,
 												NSBackgroundColorAttributeName: [COLOR_CLASS clearColor],
@@ -250,7 +250,6 @@ static NSDateFormatter *itemDateFormatter;
 												NSParagraphStyleAttributeName: lp,
 												}];
 #endif
-
 			NSInteger count=0;
 			for(PRLabel *l in sortedLabels)
 			{
