@@ -20,7 +20,7 @@ static NSNumberFormatter *itemCountFormatter;
 	unreadCount = [[UILabel alloc] initWithFrame:CGRectZero];
 	unreadCount.textColor = [COLOR_CLASS whiteColor];
 	unreadCount.textAlignment = NSTextAlignmentCenter;
-	unreadCount.layer.cornerRadius = 9.0;
+	unreadCount.layer.cornerRadius = 8.5;
 	unreadCount.clipsToBounds = YES;
 	unreadCount.font = [UIFont boldSystemFontOfSize:12.0];
     unreadCount.hidden = YES;
@@ -64,7 +64,7 @@ static NSNumberFormatter *itemCountFormatter;
 - (void)setPullRequest:(PullRequest *)pullRequest
 {
 	UIFont *detailFont = [UIFont systemFontOfSize:[UIFont smallSystemFontSize]];
-	_title.attributedText = [pullRequest titleWithFont:_title.font labelFont:detailFont];
+	_title.attributedText = [pullRequest titleWithFont:_title.font labelFont:[detailFont fontWithSize:detailFont.pointSize-2.0]];
 	_description.attributedText = [pullRequest subtitleWithFont:detailFont];
 
 	NSInteger _commentsNew=0;

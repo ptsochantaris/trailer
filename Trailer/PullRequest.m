@@ -238,7 +238,7 @@ static NSDateFormatter *itemDateFormatter;
 			NSDictionary *labelAttributes = [NSMutableDictionary dictionaryWithDictionary:
 											 @{ NSFontAttributeName: labelFont,
 												NSBackgroundColorAttributeName: [COLOR_CLASS clearColor],
-												NSBaselineOffsetAttributeName: @3.0,
+												NSBaselineOffsetAttributeName: @2.0,
 												NSParagraphStyleAttributeName: lp,
 												}];
 #else
@@ -264,8 +264,7 @@ static NSDateFormatter *itemDateFormatter;
 				[_title appendAttributedString:[[NSAttributedString alloc] initWithString:@"\u00a0" attributes:a]];
 				[_title appendAttributedString:[[NSAttributedString alloc] initWithString:name attributes:a]];
 				[_title appendAttributedString:[[NSAttributedString alloc] initWithString:@"\u00a0" attributes:a]];
-				[_title appendAttributedString:[[NSAttributedString alloc] initWithString:(count<sortedLabels.count-1) ? @" " : @"\n"
-																			   attributes:labelAttributes]];
+				if(count<sortedLabels.count-1) [_title appendAttributedString:[[NSAttributedString alloc] initWithString:@" " attributes:labelAttributes]];
 			}
 		}
 	}
