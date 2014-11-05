@@ -1159,7 +1159,7 @@ Enter to select and ⌘, for preferences.
                     </tabView>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="SrS-Tc-X7C">
                         <rect key="frame" x="615" y="3" width="158" height="20"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Version" id="hkc-v6-9Jd">
                             <font key="font" metaFont="smallSystem"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
