@@ -142,7 +142,7 @@
 		}
 		else
 		{
-			// no issues link, so no labels
+			// no issues link, so presumably no labels
 			operationCount++;
 			if(operationCount==total) CALLBACK();
 		}
@@ -712,25 +712,33 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 	NSArray *surviving = [PullRequest itemsOfType:@"PullRequest" surviving:YES inMoc:moc];
 	for(PullRequest *r in surviving) [r postProcess];
 
-	[moc save:nil];
+	NSError *error;
+	[moc save:&error];
+	if(error)
+	{
+		DLog(@"Comitting sync failed: %@",error);
+	}
 
 	if(settings.showStatusItems)
 	{
 		self.successfulRefreshesSinceLastStatusCheck++;
+	}
+	if(settings.showLabels)
+	{
+		self.successfulRefreshesSinceLastLabelCheck++;
 	}
 }
 
 - (void)updatePullRequestsInMoc:(NSManagedObjectContext *)moc andCallback:(completionBlockType)callback
 {
 	BOOL willScanForStatuses = [self shouldScanForStatusesInMoc:moc];
-	BOOL wantLabelsForPrs = settings.showLabels;
+	BOOL willScanForLabels = [self shouldScanForLabelsInMoc:moc];
 
 	NSInteger totalOperations = 3;
 	if(willScanForStatuses) totalOperations++;
-	if(wantLabelsForPrs) totalOperations++;
+	if(willScanForLabels) totalOperations++;
 
 	__block NSInteger operationCount = 0;
-
 	completionBlockType completionCallback = ^{
 		operationCount++;
 		if(operationCount==totalOperations) CALLBACK();
@@ -739,7 +747,7 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 	if(willScanForStatuses)
 		[self fetchStatusesForCurrentPullRequestsToMoc:moc andCallback:completionCallback];
 
-	if(wantLabelsForPrs)
+	if([self shouldScanForLabelsInMoc:moc])
 		[self fetchLabelsForUpdatedPullRequestsToMoc:moc andCallback:completionCallback];
 
 	[self fetchCommentsForCurrentPullRequestsToMoc:moc andCallback:completionCallback];
@@ -759,6 +767,22 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 
 		for(PRStatus *s in [DataItem allItemsOfType:@"PRStatus" inMoc:moc])
 			[moc deleteObject:s];
+	}
+	return NO;
+}
+
+- (BOOL)shouldScanForLabelsInMoc:(NSManagedObjectContext *)moc
+{
+	if(self.successfulRefreshesSinceLastLabelCheck % settings.labelRefreshInterval == 0)
+	{
+		if(settings.showLabels)
+		{
+			self.successfulRefreshesSinceLastLabelCheck = 0;
+			return YES;
+		}
+
+		for(PRLabel *l in [DataItem allItemsOfType:@"PRLabel" inMoc:moc])
+			[moc deleteObject:l];
 	}
 	return NO;
 }

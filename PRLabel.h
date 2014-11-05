@@ -1,7 +1,7 @@
 
 @class ApiServer, PullRequest;
 
-@interface PRLabel : NSManagedObject
+@interface PRLabel : DataItem
 
 @property (nonatomic, retain) NSString * url;
 @property (nonatomic, retain) NSString * name;

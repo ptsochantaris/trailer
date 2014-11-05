@@ -60,6 +60,11 @@
 @property (weak) IBOutlet NSTokenField *commentAuthorBlacklist;
 @property (weak) IBOutlet NSButton *showLabels;
 
+// Preferences - Labels
+@property (weak) IBOutlet NSTextField *labelRescanLabel;
+@property (weak) IBOutlet NSTextField *labelRefreshNote;
+@property (weak) IBOutlet NSStepper *labelRefreshCounter;
+
 // Preferences - Servers
 @property (weak) IBOutlet NSTableView *serverList;
 @property (weak) IBOutlet NSTextField *apiServerName;

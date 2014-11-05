@@ -47,7 +47,7 @@ typedef void (^completionBlockType)();
 @interface API : NSObject
 
 @property (nonatomic) Reachability *reachability;
-@property (nonatomic) long successfulRefreshesSinceLastStatusCheck;
+@property (nonatomic) long successfulRefreshesSinceLastStatusCheck, successfulRefreshesSinceLastLabelCheck;
 
 - (void)updateLimitsFromServer;
 

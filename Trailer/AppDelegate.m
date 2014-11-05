@@ -117,14 +117,20 @@ AppDelegate *app;
 - (IBAction)showLabelsSelected:(NSButton *)sender
 {
 	settings.showLabels = (sender.integerValue==1);
-	for(Repo *r in [Repo allItemsOfType:@"Repo" inMoc:self.dataManager.managedObjectContext])
+	[self updateMenu];
+
+	[self updateLabelOptions];
+
+	self.api.successfulRefreshesSinceLastLabelCheck = 0;
+	if(settings.showLabels)
 	{
-		r.dirty = @YES;
-		r.lastDirtied = [NSDate date];
-		for(PullRequest *p in r.pullRequests)
-			p.updatedAt = [NSDate distantPast];
+		for(Repo *r in [Repo allItemsOfType:@"Repo" inMoc:self.dataManager.managedObjectContext])
+		{
+			r.dirty = @YES;
+			r.lastDirtied = [NSDate distantPast];
+		}
+		self.preferencesDirty = YES;
 	}
-	self.preferencesDirty = YES;
 }
 
 - (IBAction)dontConfirmRemoveAllMergedSelected:(NSButton *)sender
@@ -254,14 +260,21 @@ AppDelegate *app;
 
 - (IBAction)showStatusItemsSelected:(NSButton *)sender
 {
-	BOOL show = (sender.integerValue==1);
-	settings.showStatusItems = show;
+	settings.showStatusItems = (sender.integerValue==1);
 	[self updateMenu];
 
 	[self updateStatusItemsOptions];
 
 	self.api.successfulRefreshesSinceLastStatusCheck = 0;
-	self.preferencesDirty = YES;
+	if(settings.showStatusItems)
+	{
+		for(Repo *r in [Repo allItemsOfType:@"Repo" inMoc:self.dataManager.managedObjectContext])
+		{
+			r.dirty = @YES;
+			r.lastDirtied = [NSDate distantPast];
+		}
+		self.preferencesDirty = YES;
+	}
 }
 
 - (void)updateStatusItemsOptions
@@ -283,12 +296,42 @@ AppDelegate *app;
 		[self.statusItemsRefreshNote setAlphaValue:0.5];
 	}
 
-	self.statusItemRefreshCounter.integerValue = settings.statusItemRefreshInterval;
 	NSInteger count = settings.statusItemRefreshInterval;
+	self.statusItemRefreshCounter.integerValue = count;
 	if(count>1)
 		self.statusItemRescanLabel.stringValue = [NSString stringWithFormat:@"...and re-scan once every %ld refreshes",(long)count];
 	else
 		self.statusItemRescanLabel.stringValue = [NSString stringWithFormat:@"...and re-scan on every refresh"];
+}
+
+- (void)updateLabelOptions
+{
+	BOOL enable = settings.showLabels;
+	[self.labelRefreshCounter setEnabled:enable];
+
+	if(enable)
+	{
+		[self.labelRescanLabel setAlphaValue:1.0];
+		[self.labelRefreshNote setAlphaValue:1.0];
+	}
+	else
+	{
+		[self.labelRescanLabel setAlphaValue:0.5];
+		[self.labelRefreshNote setAlphaValue:0.5];
+	}
+
+	NSInteger count = settings.labelRefreshInterval;
+	self.labelRefreshCounter.integerValue = count;
+	if(count>1)
+		self.labelRescanLabel.stringValue = [NSString stringWithFormat:@"...and re-scan once every %ld refreshes",(long)count];
+	else
+		self.labelRescanLabel.stringValue = [NSString stringWithFormat:@"...and re-scan on every refresh"];
+}
+
+- (IBAction)labelRefreshCounterChanged:(NSStepper *)sender
+{
+	settings.labelRefreshInterval = self.labelRefreshCounter.integerValue;
+	[self updateLabelOptions];
 }
 
 - (IBAction)statusItemRefreshCountChanged:(NSStepper *)sender
@@ -902,6 +945,7 @@ AppDelegate *app;
 {
 	self.preferencesDirty = YES;
 	self.api.successfulRefreshesSinceLastStatusCheck = 0;
+	self.api.successfulRefreshesSinceLastLabelCheck = 0;
 	self.lastSuccessfulRefresh = nil;
 	self.lastRepoCheck = nil;
 	[self.projectsTable reloadData];
@@ -969,6 +1013,7 @@ AppDelegate *app;
     [self refreshUpdatePreferences];
 
 	[self updateStatusItemsOptions];
+	[self updateLabelOptions];
 
 	[self.hotkeyEnable setEnabled:(AXIsProcessTrustedWithOptions != NULL)];
 

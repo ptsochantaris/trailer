@@ -199,6 +199,53 @@ static NSDateFormatter *itemDateFormatter;
 	return [components componentsJoinedByString:@","];
 }
 
+- (NSMutableAttributedString *)titleWithFont:(FONT_CLASS *)font
+{
+	NSDictionary *titleAttributes = @{ NSFontAttributeName: font,
+									   NSForegroundColorAttributeName: [COLOR_CLASS blackColor],
+									   NSBackgroundColorAttributeName: [COLOR_CLASS clearColor],
+									   };
+
+	NSMutableAttributedString *_title = [[NSMutableAttributedString alloc] initWithString:self.title
+																			   attributes:titleAttributes];
+
+	if(settings.showLabels)
+	{
+		NSArray *sortedLabels = [self.labels sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES]]];
+		if(sortedLabels.count>0)
+		{
+			NSDictionary *labelAttributes = [NSMutableDictionary dictionaryWithDictionary:
+											 @{ NSFontAttributeName: [FONT_CLASS fontWithName:font.fontName size:font.pointSize-2.0],
+												NSBackgroundColorAttributeName: [COLOR_CLASS clearColor],
+												}];
+			[_title appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n" attributes:labelAttributes]];
+			NSInteger count=0;
+			for(PRLabel *l in sortedLabels)
+			{
+				NSMutableDictionary *a = [labelAttributes mutableCopy];
+				COLOR_CLASS *color = l.colorForDisplay;
+				a[NSBackgroundColorAttributeName] = color;
+				a[NSForegroundColorAttributeName] = [self isDarkColor:color] ? [COLOR_CLASS whiteColor] : [COLOR_CLASS blackColor];
+				[_title appendAttributedString:[[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@" %@ ",l.name]
+																			   attributes:a]];
+				if(count<sortedLabels.count-1) [_title appendAttributedString:[[NSAttributedString alloc] initWithString:@" "
+																											  attributes:labelAttributes]];
+			}
+		}
+	}
+
+	return _title;
+}
+
+// Much gratitude to the Samback/ColorArt project for the constants used below: https://github.com/Samback/ColorArt
+- (BOOL)isDarkColor:(COLOR_CLASS *)color
+{
+	CGFloat r, g, b, a;
+	[color getRed:&r green:&g blue:&b alpha:&a];
+	CGFloat lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+	return (lum < 0.5);
+}
+
 - (NSMutableAttributedString *)subtitleWithFont:(FONT_CLASS *)font
 {
 	NSMutableAttributedString *_subtitle = [[NSMutableAttributedString alloc] init];
@@ -409,11 +456,10 @@ static NSDateFormatter *itemDateFormatter;
 	}
 
 	f.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"createdAt" ascending:NO]];
-	NSArray *ret = [self.managedObjectContext executeFetchRequest:f error:nil];
 	NSMutableArray *result = [NSMutableArray array];
 	NSMutableSet *targetUrls = [NSMutableSet set];
 	NSMutableSet *descriptions = [NSMutableSet set];
-	for(PRStatus *s in ret)
+	for(PRStatus *s in [self.managedObjectContext executeFetchRequest:f error:nil])
 	{
 		NSString *targetUrl = s.targetUrl;
 		if(!targetUrl) targetUrl = @"";

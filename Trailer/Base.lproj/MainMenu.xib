@@ -841,7 +841,7 @@ user you can add more servers from the left.</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <button id="217-Vi-ReC">
-                                                        <rect key="frame" x="17" y="255" width="148" height="18"/>
+                                                        <rect key="frame" x="17" y="254" width="148" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Show status items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="u1v-21-7Q5">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -901,7 +901,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </stepper>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Ud3-8I-IKZ">
-                                                        <rect key="frame" x="103" y="208" width="381" height="44"/>
+                                                        <rect key="frame" x="103" y="210" width="381" height="44"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" id="q1K-0J-arN">
                                                             <font key="font" metaFont="miniSystem"/>
@@ -912,10 +912,39 @@ to a higher number in order to keep your API usage reasonable</string>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <button id="Mi5-4X-8AB">
-                                                        <rect key="frame" x="17" y="311" width="199" height="18"/>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="PFs-0N-Roc">
+                                                        <rect key="frame" x="87" y="327" width="397" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Show labels on pull requests" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="OKX-ar-Kq6">
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="...re-scan PR labels every X refreshes" id="xJk-dB-bsa">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="d21-jw-T4f">
+                                                        <rect key="frame" x="487" y="320" width="19" height="27"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <stepperCell key="cell" continuous="YES" alignment="left" minValue="1" maxValue="1000" doubleValue="1" id="FOQ-qK-u1r"/>
+                                                        <connections>
+                                                            <action selector="labelRefreshCounterChanged:" target="494" id="foR-Za-RXJ"/>
+                                                        </connections>
+                                                    </stepper>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="D5z-BQ-8db">
+                                                        <rect key="frame" x="103" y="281" width="381" height="44"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" id="Ktv-MA-uYT">
+                                                            <font key="font" metaFont="miniSystem"/>
+                                                            <string key="title">Labels need to be rescanned fully in order be updated.  If you
+usually manage alot of PRs, then you may want to set this value
+to a higher number in order to keep your API usage reasonable</string>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <button id="Mi5-4X-8AB">
+                                                        <rect key="frame" x="17" y="325" width="97" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Show labels" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="OKX-ar-Kq6">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
@@ -1181,6 +1210,9 @@ Enter to select and ⌘, for preferences.
                 <outlet property="hotkeyOptionModifier" destination="AEc-A8-j0N" id="x87-Qj-1cP"/>
                 <outlet property="hotkeyShiftModifier" destination="ha7-N5-qJl" id="OLt-Ca-P0D"/>
                 <outlet property="includeRepositoriesInFiltering" destination="cyW-kN-E51" id="aSH-jQ-z0u"/>
+                <outlet property="labelRefreshCounter" destination="d21-jw-T4f" id="kdK-DV-zuS"/>
+                <outlet property="labelRefreshNote" destination="D5z-BQ-8db" id="Ui3-KC-zhW"/>
+                <outlet property="labelRescanLabel" destination="PFs-0N-Roc" id="qu3-V4-Jge"/>
                 <outlet property="launchAtStartup" destination="qqE-Ib-sQ9" id="brX-S8-Ge0"/>
                 <outlet property="logActivityToConsole" destination="bpi-er-6rE" id="akm-SR-jfL"/>
                 <outlet property="mainMenu" destination="b2W-dJ-ldg" id="8t8-8X-oYH"/>

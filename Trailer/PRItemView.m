@@ -6,7 +6,7 @@
 }
 @end
 
-static NSDictionary *_titleAttributes, *_statusAttributes;
+static NSDictionary *_statusAttributes;
 static CGColorRef _highlightColor;
 
 @implementation PRItemView
@@ -20,11 +20,6 @@ static CGColorRef _highlightColor;
 
 		_highlightColor = CGColorCreateCopy(MAKECOLOR(0.92, 0.92, 0.92, 1.0).CGColor);
 
-		_titleAttributes = @{
-							 NSFontAttributeName:[NSFont menuFontOfSize:13.0],
-							 NSForegroundColorAttributeName:[NSColor blackColor],
-							 NSBackgroundColorAttributeName:[NSColor clearColor],
-							 };
 		NSMutableParagraphStyle *paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
 		paragraphStyle.headIndent = 92.0;
 		_statusAttributes = @{
@@ -56,7 +51,7 @@ static CGColorRef _highlightColor;
 			_commentsNew = pullRequest.unreadComments.integerValue;
 		}
 
-		NSString *_title = pullRequest.title;
+		NSMutableAttributedString *_title = [pullRequest titleWithFont:[NSFont menuFontOfSize:13.0]];
 		NSMutableAttributedString *_subtitle = [pullRequest subtitleWithFont:[NSFont menuFontOfSize:10.0]];
 
 		CGFloat W = MENU_WIDTH-LEFTPADDING-app.scrollBarWidth;
@@ -69,8 +64,7 @@ static CGColorRef _highlightColor;
 		else W += 4.0;
 
 		CGFloat titleHeight = [_title boundingRectWithSize:CGSizeMake(W, FLT_MAX)
-												   options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
-												attributes:_titleAttributes].size.height;
+												   options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading].size.height;
 
 		CGFloat subtitleHeight = [_subtitle boundingRectWithSize:CGSizeMake(W, FLT_MAX)
 														 options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading].size.height+4.0;
@@ -153,7 +147,7 @@ static CGColorRef _highlightColor;
 		}
 
 		CenteredTextField *title = [[CenteredTextField alloc] initWithFrame:titleRect];
-		title.attributedStringValue = [[NSAttributedString alloc] initWithString:_title attributes:_titleAttributes];
+		title.attributedStringValue = _title;
 		[self addSubview:title];
 
 		CenteredTextField *subtitle = [[CenteredTextField alloc] initWithFrame:dateRect];

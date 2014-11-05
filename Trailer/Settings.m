@@ -342,10 +342,19 @@ Settings *settings;
 - (NSInteger)statusItemRefreshInterval
 {
 	NSInteger i = [[self defaultValueForKey:STATUS_ITEM_REFRESH_COUNT] integerValue];
-	if(i==0) i = 10;
-	return i;
+	return (i>0) ? i :  10;
 }
 - (void)setStatusItemRefreshInterval:(NSInteger)statusItemRefreshInterval { [self storeDefaultValue:@(statusItemRefreshInterval) forKey:STATUS_ITEM_REFRESH_COUNT]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define LABEL_REFRESH_COUNT @"LABEL_REFRESH_COUNT"
+- (NSInteger)labelRefreshInterval
+{
+	NSInteger i = [[self defaultValueForKey:LABEL_REFRESH_COUNT] integerValue];
+	return (i>0) ? i :  10;
+}
+- (void)setLabelRefreshInterval:(NSInteger)labelRefreshInterval { [self storeDefaultValue:@(labelRefreshInterval) forKey:LABEL_REFRESH_COUNT]; }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

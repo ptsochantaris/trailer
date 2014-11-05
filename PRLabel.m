@@ -13,14 +13,30 @@
 
 + (PRLabel *)labelWithInfo:(NSDictionary *)info fromServer:(ApiServer *)apiServer
 {
-	PRLabel *l = [DataItem itemWithInfo:info type:@"PRLabel" fromServer:apiServer];
-	if(l.postSyncAction.integerValue != kPostSyncDoNothing)
+	NSString *name = [info ofk:@"name"];
+	PRLabel *l = [PRLabel labelWithName:name fromServer:apiServer];
+	if(!l)
 	{
-		l.url = [info ofk:@"url"];
-		l.name = [info ofk:@"name"];
-		l.color = @([[info ofk:@"color"] parseFromHex]);
+		l = [NSEntityDescription insertNewObjectForEntityForName:@"PRLabel" inManagedObjectContext:apiServer.managedObjectContext];
+		l.name = name;
+		l.serverId = @0;
+		l.updatedAt = [NSDate distantPast];
+		l.createdAt = [NSDate distantPast];
+		l.apiServer = apiServer;
 	}
+	l.url = [info ofk:@"url"];
+	l.color = @([[info ofk:@"color"] parseFromHex]);
+	l.postSyncAction = @(kPostSyncDoNothing);
 	return l;
+}
+
++ (PRLabel *)labelWithName:(NSString *)name fromServer:(ApiServer *)apiServer
+{
+	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"PRLabel"];
+	f.fetchLimit = 1;
+	f.returnsObjectsAsFaults = NO;
+	f.predicate = [NSPredicate predicateWithFormat:@"name == %@ and apiServer == %@", name, apiServer];
+	return [[apiServer.managedObjectContext executeFetchRequest:f error:nil] lastObject];
 }
 
 - (COLOR_CLASS *)colorForDisplay
