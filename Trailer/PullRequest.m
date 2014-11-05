@@ -231,11 +231,26 @@ static NSDateFormatter *itemDateFormatter;
 		NSArray *sortedLabels = [self.labels sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES]]];
 		if(sortedLabels.count>0)
 		{
+			[_title appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n" attributes:titleAttributes]];
+			NSMutableParagraphStyle *lp = [[NSMutableParagraphStyle alloc] init];
+#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
+			lp.lineHeightMultiple = 1.1;
 			NSDictionary *labelAttributes = [NSMutableDictionary dictionaryWithDictionary:
 											 @{ NSFontAttributeName: labelFont,
 												NSBackgroundColorAttributeName: [COLOR_CLASS clearColor],
+												NSBaselineOffsetAttributeName: @3.0,
+												NSParagraphStyleAttributeName: lp,
 												}];
-			[_title appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n" attributes:labelAttributes]];
+#else
+			lp.minimumLineHeight = labelFont.pointSize+6.0;
+			NSDictionary *labelAttributes = [NSMutableDictionary dictionaryWithDictionary:
+											 @{ NSFontAttributeName: labelFont,
+												NSBackgroundColorAttributeName: [COLOR_CLASS clearColor],
+												NSBaselineOffsetAttributeName: @1.0,
+												NSParagraphStyleAttributeName: lp,
+												}];
+#endif
+
 			NSInteger count=0;
 			for(PRLabel *l in sortedLabels)
 			{
