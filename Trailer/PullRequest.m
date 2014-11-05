@@ -199,7 +199,20 @@ static NSDateFormatter *itemDateFormatter;
 	return [components componentsJoinedByString:@","];
 }
 
-- (NSMutableAttributedString *)titleWithFont:(FONT_CLASS *)font
+- (NSString *)accessibleTitle
+{
+	NSMutableArray *components = [NSMutableArray new];
+	[components addObject:self.title];
+	if(settings.showLabels)
+	{
+		NSArray *sortedLabels = [self.labels sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES]]];
+		[components addObject:[NSString stringWithFormat:@"%ld labels:",(long)sortedLabels.count]];
+		for(PRLabel *l in sortedLabels) [components addObject:l.name];
+	}
+	return [components componentsJoinedByString:@","];
+}
+
+- (NSMutableAttributedString *)titleWithFont:(FONT_CLASS *)font labelFont:(FONT_CLASS *)labelFont
 {
 	NSMutableParagraphStyle *p = [[NSMutableParagraphStyle alloc] init];
 	p.paragraphSpacing = 1.0;
@@ -219,7 +232,7 @@ static NSDateFormatter *itemDateFormatter;
 		if(sortedLabels.count>0)
 		{
 			NSDictionary *labelAttributes = [NSMutableDictionary dictionaryWithDictionary:
-											 @{ NSFontAttributeName: [FONT_CLASS fontWithName:font.fontName size:font.pointSize-2.0],
+											 @{ NSFontAttributeName: labelFont,
 												NSBackgroundColorAttributeName: [COLOR_CLASS clearColor],
 												}];
 			[_title appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n" attributes:labelAttributes]];

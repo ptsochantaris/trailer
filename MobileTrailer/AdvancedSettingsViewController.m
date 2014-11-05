@@ -31,12 +31,13 @@
 #define DISPLAY_SECTION_INDEX 1
 #define COMMENTS_SECTION_INDEX 2
 #define REPOS_SECTION_INDEX 3
-#define HISTORY_SECTION_INDEX 4
-#define CONFIRM_SECTION_INDEX 5
-#define SORT_SECTION_INDEX 6
-#define MISC_SECTION_INDEX 7
+#define LABEL_SECTION_INDEX 4
+#define HISTORY_SECTION_INDEX 5
+#define CONFIRM_SECTION_INDEX 6
+#define SORT_SECTION_INDEX 7
+#define MISC_SECTION_INDEX 8
 
-#define TOTAL_SECTIONS 8
+#define TOTAL_SECTIONS 9
 
 #define SORT_REVERSE @[@"Youngest first",@"Most recently active",@"Reverse alphabetically"]
 #define SORT_NORMAL @[@"Oldest first",@"Inactive for longest",@"Alphabetically"]
@@ -159,6 +160,26 @@
 				cell.textLabel.text = @"Auto-hide new repositories in your watchlist";
 				if(settings.hideNewRepositories) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
+			}
+		}
+	}
+	else if(indexPath.section==LABEL_SECTION_INDEX)
+	{
+		switch (indexPath.row)
+		{
+			case 0:
+			{
+				cell.textLabel.text = @"Show labels";
+				if(settings.showLabels) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				break;
+			}
+			case 1:
+			{
+				cell.textLabel.text = @"Re-query labels";
+				if(settings.labelRefreshInterval==1)
+					cell.detailTextLabel.text = @"Every refresh";
+				else
+					cell.detailTextLabel.text = [NSString stringWithFormat:@"Every %ld refreshes",(long)settings.labelRefreshInterval];
 			}
 		}
 	}
@@ -384,6 +405,46 @@
 			}
 		}
 	}
+	else if(indexPath.section==LABEL_SECTION_INDEX)
+	{
+		switch (indexPath.row)
+		{
+			case 0:
+			{
+				settings.showLabels = !settings.showLabels;
+				app.api.successfulRefreshesSinceLastLabelCheck = 0;
+				if(settings.showLabels)
+				{
+					for(Repo *r in [Repo allItemsOfType:@"Repo" inMoc:app.dataManager.managedObjectContext])
+					{
+						r.dirty = @YES;
+						r.lastDirtied = [NSDate distantPast];
+					}
+					app.preferencesDirty = YES;
+					[settingsChangedTimer push];
+				}
+				break;
+			}
+			case 1:
+			{
+				selectedIndexPath = indexPath;
+				pickerName = [self.tableView cellForRowAtIndexPath:indexPath].textLabel.text;
+
+				NSMutableArray *values = [[NSMutableArray alloc] init];
+				NSInteger count=1;
+				[values addObject:@"Every refresh"];
+				previousValue = 0;
+				for(NSInteger f=2;f<100;f++)
+				{
+					if(f==settings.labelRefreshInterval) previousValue = count;
+					[values addObject:[NSString stringWithFormat:@"Every %ld refreshes",(long)f]];
+					count++;
+				}
+				valuesToPush = values;
+				[self performSegueWithIdentifier:@"showPicker" sender:self];
+			}
+		}
+	}
 	else if(indexPath.section==HISTORY_SECTION_INDEX)
 	{
 		switch (indexPath.row)
@@ -489,6 +550,7 @@
 		case DISPLAY_SECTION_INDEX: return 6;
 		case COMMENTS_SECTION_INDEX: return 5;
 		case REPOS_SECTION_INDEX: return 1;
+		case LABEL_SECTION_INDEX: return 2;
 		case HISTORY_SECTION_INDEX: return 3;
 		case CONFIRM_SECTION_INDEX: return 2;
 		case SORT_SECTION_INDEX: return 3;
@@ -504,6 +566,7 @@
 		case DISPLAY_SECTION_INDEX: return @"Display";
 		case COMMENTS_SECTION_INDEX: return @"Comments";
 		case REPOS_SECTION_INDEX: return @"Repositories";
+		case LABEL_SECTION_INDEX: return @"PR Labels";
 		case HISTORY_SECTION_INDEX: return @"History";
 		case CONFIRM_SECTION_INDEX: return @"Don't confirm when";
 		case SORT_SECTION_INDEX: return @"Sorting";
@@ -563,6 +626,10 @@
 		{
 			settings.closeHandlingPolicy = indexPath.row;
 		}
+	}
+	else if(selectedIndexPath.section==LABEL_SECTION_INDEX)
+	{
+		settings.labelRefreshInterval = indexPath.row+1;
 	}
 	[self.tableView reloadData];
 	selectedIndexPath = nil;

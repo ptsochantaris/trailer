@@ -51,8 +51,9 @@ static CGColorRef _highlightColor;
 			_commentsNew = pullRequest.unreadComments.integerValue;
 		}
 
-		NSMutableAttributedString *_title = [pullRequest titleWithFont:[NSFont menuFontOfSize:13.0]];
-		NSMutableAttributedString *_subtitle = [pullRequest subtitleWithFont:[NSFont menuFontOfSize:10.0]];
+		NSFont *detailFont = [NSFont menuFontOfSize:10.0];
+		NSMutableAttributedString *_title = [pullRequest titleWithFont:[NSFont menuFontOfSize:13.0] labelFont:detailFont];
+		NSMutableAttributedString *_subtitle = [pullRequest subtitleWithFont:detailFont];
 
 		CGFloat W = MENU_WIDTH-LEFTPADDING-app.scrollBarWidth;
 		BOOL showUnpin = pullRequest.condition.integerValue!=kPullRequestConditionOpen || pullRequest.markUnmergeable;
