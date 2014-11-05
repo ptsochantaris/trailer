@@ -201,9 +201,13 @@ static NSDateFormatter *itemDateFormatter;
 
 - (NSMutableAttributedString *)titleWithFont:(FONT_CLASS *)font
 {
+	NSMutableParagraphStyle *p = [[NSMutableParagraphStyle alloc] init];
+	p.paragraphSpacing = 1.0;
+
 	NSDictionary *titleAttributes = @{ NSFontAttributeName: font,
 									   NSForegroundColorAttributeName: [COLOR_CLASS blackColor],
 									   NSBackgroundColorAttributeName: [COLOR_CLASS clearColor],
+									   NSParagraphStyleAttributeName: p,
 									   };
 
 	NSMutableAttributedString *_title = [[NSMutableAttributedString alloc] initWithString:self.title
@@ -226,10 +230,14 @@ static NSDateFormatter *itemDateFormatter;
 				COLOR_CLASS *color = l.colorForDisplay;
 				a[NSBackgroundColorAttributeName] = color;
 				a[NSForegroundColorAttributeName] = [self isDarkColor:color] ? [COLOR_CLASS whiteColor] : [COLOR_CLASS blackColor];
-				[_title appendAttributedString:[[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@" %@ ",l.name]
-																			   attributes:a]];
-				if(count<sortedLabels.count-1) [_title appendAttributedString:[[NSAttributedString alloc] initWithString:@" "
-																											  attributes:labelAttributes]];
+
+				NSString *name = [l.name stringByReplacingOccurrencesOfString:@" " withString:@"\u00a0"];
+
+				[_title appendAttributedString:[[NSAttributedString alloc] initWithString:@"\u00a0" attributes:a]];
+				[_title appendAttributedString:[[NSAttributedString alloc] initWithString:name attributes:a]];
+				[_title appendAttributedString:[[NSAttributedString alloc] initWithString:@"\u00a0" attributes:a]];
+				[_title appendAttributedString:[[NSAttributedString alloc] initWithString:(count<sortedLabels.count-1) ? @" " : @"\n"
+																			   attributes:labelAttributes]];
 			}
 		}
 	}
