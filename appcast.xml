@@ -11,12 +11,12 @@
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
 				<li>Added option for displaying PR labels in preferences</li>
 				</ul></font>]]></description>
-			<pubDate>Wed, 5 Nov 2014 19:00:00 +0000</pubDate>
+			<pubDate>Wed, 5 Nov 2014 19:30:00 +0000</pubDate>
 			<enclosure
 			url="http://dev.housetrip.com/trailer/trailer112.zip"
-			sparkle:version="1157"
+			sparkle:version="1158"
 			sparkle:shortVersionString="1.1.2"
-			sparkle:dsaSignature="MC0CFQDYMax97OKHkwt6MA0FJ16ef5wl2AIUea3Jms8AzvxQuUKDcKJdRo8Yak4="
+			sparkle:dsaSignature="MC0CFBYNfLOg8/N5HbbVAdTVUTRxKEW4AhUAmgDlYC0P7sONKSFB2xRYPt7h+ME="
 			type="application/octet-stream"/>
 		</item>
 
