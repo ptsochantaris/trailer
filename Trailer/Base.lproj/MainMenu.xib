@@ -736,11 +736,11 @@ user you can add more servers from the left.</string>
                             </tabViewItem>
                             <tabViewItem label="Comments" identifier="" id="GQp-vc-2bC">
                                 <view key="view" id="0Vn-bJ-fJl">
-                                    <rect key="frame" x="10" y="33" width="736" height="339"/>
+                                    <rect key="frame" x="10" y="33" width="736" height="366"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" borderType="none" titlePosition="noTitle" id="TPK-e4-WCR">
-                                            <rect key="frame" x="32" y="47" width="673" height="237"/>
+                                            <rect key="frame" x="32" y="59" width="673" height="237"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="0.0" y="0.0" width="673" height="237"/>
@@ -825,14 +825,14 @@ user you can add more servers from the left.</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" borderType="none" titlePosition="noTitle" id="bza-5m-qaP">
-                                            <rect key="frame" x="107" y="5" width="522" height="363"/>
+                                            <rect key="frame" x="107" y="19" width="522" height="325"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <view key="contentView">
-                                                <rect key="frame" x="0.0" y="0.0" width="522" height="363"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="522" height="325"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="XBq-82-2L8">
-                                                        <rect key="frame" x="87" y="256" width="397" height="17"/>
+                                                        <rect key="frame" x="87" y="227" width="397" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="...re-scan all statuses every X refreshes" id="8ZQ-Ty-R6z">
                                                             <font key="font" metaFont="system"/>
@@ -841,7 +841,7 @@ user you can add more servers from the left.</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <button id="217-Vi-ReC">
-                                                        <rect key="frame" x="17" y="254" width="148" height="18"/>
+                                                        <rect key="frame" x="17" y="225" width="148" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Show status items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="u1v-21-7Q5">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -852,7 +852,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </button>
                                                     <button id="yD7-Y4-ZaZ">
-                                                        <rect key="frame" x="17" y="184" width="442" height="18"/>
+                                                        <rect key="frame" x="17" y="155" width="442" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Make status items always selectable (don't require command-click)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Nwp-dZ-JYi">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -863,7 +863,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </button>
                                                     <popUpButton verticalHuggingPriority="750" id="Bx7-99-sDc">
-                                                        <rect key="frame" x="17" y="136" width="489" height="26"/>
+                                                        <rect key="frame" x="17" y="117" width="489" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" title="Show all status items" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="za3-yE-QZS" id="mON-Mm-XBq">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -881,7 +881,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </popUpButton>
                                                     <tokenField verticalHuggingPriority="750" id="JNC-T1-vCD">
-                                                        <rect key="frame" x="19" y="15" width="484" height="104"/>
+                                                        <rect key="frame" x="19" y="15" width="484" height="90"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <tokenFieldCell key="cell" selectable="YES" editable="YES" borderStyle="bezel" alignment="left" placeholderString="Comma separated list of terms" drawsBackground="YES" allowsEditingTextAttributes="YES" id="EaR-SJ-Mk1">
                                                             <font key="font" metaFont="system"/>
@@ -893,7 +893,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </tokenField>
                                                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="O6x-Fv-9vm">
-                                                        <rect key="frame" x="487" y="249" width="19" height="27"/>
+                                                        <rect key="frame" x="487" y="220" width="19" height="27"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <stepperCell key="cell" continuous="YES" alignment="left" minValue="1" maxValue="1000" doubleValue="1" id="I2X-9y-EAQ"/>
                                                         <connections>
@@ -901,7 +901,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </stepper>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Ud3-8I-IKZ">
-                                                        <rect key="frame" x="103" y="210" width="381" height="44"/>
+                                                        <rect key="frame" x="103" y="181" width="381" height="44"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" id="q1K-0J-arN">
                                                             <font key="font" metaFont="miniSystem"/>
@@ -913,7 +913,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="PFs-0N-Roc">
-                                                        <rect key="frame" x="87" y="327" width="397" height="17"/>
+                                                        <rect key="frame" x="87" y="298" width="397" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="...re-scan PR labels every X refreshes" id="xJk-dB-bsa">
                                                             <font key="font" metaFont="system"/>
@@ -922,7 +922,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="d21-jw-T4f">
-                                                        <rect key="frame" x="487" y="320" width="19" height="27"/>
+                                                        <rect key="frame" x="487" y="291" width="19" height="27"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <stepperCell key="cell" continuous="YES" alignment="left" minValue="1" maxValue="1000" doubleValue="1" id="FOQ-qK-u1r"/>
                                                         <connections>
@@ -930,7 +930,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </connections>
                                                     </stepper>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="D5z-BQ-8db">
-                                                        <rect key="frame" x="103" y="281" width="381" height="44"/>
+                                                        <rect key="frame" x="103" y="252" width="381" height="44"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" id="Ktv-MA-uYT">
                                                             <font key="font" metaFont="miniSystem"/>
@@ -942,7 +942,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <button id="Mi5-4X-8AB">
-                                                        <rect key="frame" x="17" y="325" width="97" height="18"/>
+                                                        <rect key="frame" x="17" y="296" width="97" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Show labels" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="OKX-ar-Kq6">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
