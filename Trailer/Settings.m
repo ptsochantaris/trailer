@@ -302,6 +302,12 @@ Settings *settings;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#define SHOW_LABELS @"SHOW_LABELS"
+- (void)setShowLabels:(BOOL)showLabels { [self storeDefaultValue:@(showLabels) forKey:SHOW_LABELS]; }
+- (BOOL)showLabels { return [[self defaultValueForKey:SHOW_LABELS] boolValue]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #define HOTKEY_ENABLE @"HOTKEY_ENABLE"
 - (void)setHotkeyEnable:(BOOL)hotkeyEnable { [self storeDefaultValue:@(hotkeyEnable) forKey:HOTKEY_ENABLE]; }
 - (BOOL)hotkeyEnable { return [[self defaultValueForKey:HOTKEY_ENABLE] boolValue]; }

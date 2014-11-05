@@ -58,6 +58,7 @@
 @property (weak) IBOutlet NSButton *openPrAtFirstUnreadComment;
 @property (weak) IBOutlet NSButton *logActivityToConsole;
 @property (weak) IBOutlet NSTokenField *commentAuthorBlacklist;
+@property (weak) IBOutlet NSButton *showLabels;
 
 // Preferences - Servers
 @property (weak) IBOutlet NSTableView *serverList;

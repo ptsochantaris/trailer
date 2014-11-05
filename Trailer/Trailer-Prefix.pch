@@ -26,6 +26,7 @@
 #import "Settings.h"
 #import "DataItem.h"
 #import "PullRequest.h"
+#import "PRLabel.h"
 #import "Repo.h"
 #import "PRStatus.h"
 #import "PRComment.h"

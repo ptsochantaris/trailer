@@ -114,10 +114,22 @@ AppDelegate *app;
 	[self.sortModeSelect selectItemAtIndex:settings.sortMethod];
 }
 
+- (IBAction)showLabelsSelected:(NSButton *)sender
+{
+	settings.showLabels = (sender.integerValue==1);
+	for(Repo *r in [Repo allItemsOfType:@"Repo" inMoc:self.dataManager.managedObjectContext])
+	{
+		r.dirty = @YES;
+		r.lastDirtied = [NSDate date];
+		for(PullRequest *p in r.pullRequests)
+			p.updatedAt = [NSDate distantPast];
+	}
+	self.preferencesDirty = YES;
+}
+
 - (IBAction)dontConfirmRemoveAllMergedSelected:(NSButton *)sender
 {
-	BOOL dontConfirm = (sender.integerValue==1);
-    settings.dontAskBeforeWipingMerged = dontConfirm;
+	settings.dontAskBeforeWipingMerged = (sender.integerValue==1);
 }
 
 - (IBAction)hideAllPrsSection:(NSButton *)sender
@@ -944,6 +956,7 @@ AppDelegate *app;
 	self.hideNewRepositories.integerValue = settings.hideNewRepositories;
 	self.openPrAtFirstUnreadComment.integerValue = settings.openPrAtFirstUnreadComment;
 	self.logActivityToConsole.integerValue = settings.logActivityToConsole;
+	self.showLabels.integerValue = settings.showLabels;
 
 	self.hotkeyEnable.integerValue = settings.hotkeyEnable;
 	self.hotkeyControlModifier.integerValue = settings.hotkeyControlModifier;

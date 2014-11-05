@@ -134,7 +134,7 @@ NSDateFormatter *_syncDateFormatter;
 			[moc deleteObject:i];
 		}
 	}
-	DLog(@"Nuked %lu deleted items in total",count);
+	DLog(@"Nuked %lu deleted items",count);
 }
 
 + (NSUInteger)countItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc

@@ -30,6 +30,7 @@
 @dynamic statuses;
 @dynamic repo;
 @dynamic comments;
+@dynamic labels;
 
 static NSDateFormatter *itemDateFormatter;
 
@@ -431,6 +432,11 @@ static NSDateFormatter *itemDateFormatter;
 		}
 	}
 	return result;
+}
+
+- (NSString *)labelsLink
+{
+	return [self.issueUrl stringByAppendingPathComponent:@"labels"];
 }
 
 - (NSString *)urlForOpening
