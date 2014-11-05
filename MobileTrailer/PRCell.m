@@ -20,7 +20,7 @@ static NSNumberFormatter *itemCountFormatter;
 	unreadCount = [[UILabel alloc] initWithFrame:CGRectZero];
 	unreadCount.textColor = [COLOR_CLASS whiteColor];
 	unreadCount.textAlignment = NSTextAlignmentCenter;
-	unreadCount.layer.cornerRadius = 9.0;
+	unreadCount.layer.cornerRadius = 8.5;
 	unreadCount.clipsToBounds = YES;
 	unreadCount.font = [UIFont boldSystemFontOfSize:12.0];
     unreadCount.hidden = YES;
@@ -63,8 +63,9 @@ static NSNumberFormatter *itemCountFormatter;
 
 - (void)setPullRequest:(PullRequest *)pullRequest
 {
-	_title.text = pullRequest.title;
-	_description.attributedText = [pullRequest subtitleWithFont:[UIFont systemFontOfSize:[UIFont smallSystemFontSize]]];
+	UIFont *detailFont = [UIFont systemFontOfSize:[UIFont smallSystemFontSize]];
+	_title.attributedText = [pullRequest titleWithFont:_title.font labelFont:[detailFont fontWithSize:detailFont.pointSize-2.0]];
+	_description.attributedText = [pullRequest subtitleWithFont:detailFont];
 
 	NSInteger _commentsNew=0;
 	NSInteger _commentsTotal = pullRequest.totalComments.integerValue;
@@ -90,7 +91,7 @@ static NSNumberFormatter *itemCountFormatter;
         failedToLoadImage = nil;
 
 	self.accessibilityLabel = [NSString stringWithFormat:@"%@, %@ unread comments, %@ total comments, %@",
-							   _title.text,
+							   [pullRequest accessibleTitle],
 							   unreadCount.text,
 							   readCount.text,
 							   [pullRequest accessibleSubtitle]];
@@ -130,9 +131,6 @@ static NSNumberFormatter *itemCountFormatter;
 - (void)layoutSubviews
 {
 	[super layoutSubviews];
-
-	[_title sizeToFit];
-	[_description sizeToFit];
 
 	CGPoint topLeft = CGPointMake(_image.frame.origin.x, _image.frame.origin.y);
 	unreadCount.center = topLeft;

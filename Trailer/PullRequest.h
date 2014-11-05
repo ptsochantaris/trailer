@@ -16,7 +16,7 @@
 
 #define kPullRequestSectionNames @[@"", @"Mine", @"Participated", @"Recently Merged", @"Recently Closed", @"All Pull Requests"]
 
-@class Repo, PRComment, PRStatus;
+@class Repo, PRComment, PRStatus, PRLabel;
 
 @interface PullRequest : DataItem
 
@@ -54,6 +54,7 @@
 @property (nonatomic, retain) NSSet *comments;
 @property (nonatomic, retain) Repo *repo;
 @property (nonatomic, retain) NSSet *statuses;
+@property (nonatomic, retain) NSSet *labels;
 
 + (PullRequest *)pullRequestWithInfo:(NSDictionary*)info fromServer:(ApiServer *)apiServer;
 
@@ -79,13 +80,19 @@
 
 - (void)postProcess;
 
+- (NSMutableAttributedString *)titleWithFont:(FONT_CLASS *)font labelFont:(FONT_CLASS *)labelFont;
+
 - (NSMutableAttributedString *)subtitleWithFont:(FONT_CLASS *)font;
+
+- (NSString *)accessibleTitle;
 
 - (NSString *)accessibleSubtitle;
 
 - (NSArray *)displayedStatuses;
 
 - (NSString *)urlForOpening;
+
+- (NSString *)labelsLink;
 
 @end
 
@@ -100,5 +107,10 @@
 - (void)removeStatusesObject:(PRStatus *)value;
 - (void)addStatuses:(NSSet *)values;
 - (void)removeStatuses:(NSSet *)values;
+
+- (void)addLabelsObject:(PRLabel *)value;
+- (void)removeLabelsObject:(PRLabel *)value;
+- (void)addLabels:(NSSet *)values;
+- (void)removeLabels:(NSSet *)values;
 
 @end

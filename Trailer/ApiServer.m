@@ -5,6 +5,7 @@
 @dynamic comments;
 @dynamic pullRequests;
 @dynamic statuses;
+@dynamic labels;
 
 @dynamic apiPath;
 @dynamic authToken;
@@ -39,7 +40,7 @@
 - (void)rollBackAllUpdatesInMoc:(NSManagedObjectContext *)moc
 {
 	DLog(@"Rolling back changes for failed sync on API server %@",self.label);
-	for(NSArray *items in @[self.repos, self.pullRequests, self.comments, self.statuses])
+	for(NSArray *items in @[self.repos, self.pullRequests, self.comments, self.statuses, self.labels])
 	{
 		for(DataItem *i in items)
 		{

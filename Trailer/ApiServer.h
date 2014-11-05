@@ -22,6 +22,7 @@
 @property (nonatomic, retain) NSSet *comments;
 @property (nonatomic, retain) NSSet *pullRequests;
 @property (nonatomic, retain) NSSet *statuses;
+@property (nonatomic, retain) NSSet *labels;
 
 + (ApiServer *)insertNewServerInMoc:(NSManagedObjectContext *)moc;
 
@@ -70,5 +71,10 @@
 - (void)removeReposObject:(Repo *)value;
 - (void)addRepos:(NSSet *)values;
 - (void)removeRepos:(NSSet *)values;
+
+- (void)addLabelsObject:(PRLabel *)value;
+- (void)removeLabelsObject:(PRLabel *)value;
+- (void)addLabels:(NSSet *)values;
+- (void)removeLabels:(NSSet *)values;
 
 @end

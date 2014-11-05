@@ -100,17 +100,73 @@
 	}
 }
 
-- (void)fetchStatusesForCurrentPullRequestsToMoc:(NSManagedObjectContext *)moc andCallback:(completionBlockType)callback
+- (void)fetchLabelsForForCurrentPullRequestsToMoc:(NSManagedObjectContext *)moc andCallback:(completionBlockType)callback
 {
 	NSArray *prs = [DataItem allItemsOfType:@"PullRequest" inMoc:moc];
 
-	if(prs.count==0)
+	NSInteger total = prs.count;
+	if(total==0)
 	{
 		CALLBACK();
 		return;
 	}
 
+	__block NSInteger operationCount = 0;
+
+	for(PullRequest *p in prs)
+	{
+		for(PRLabel *l in p.labels)
+			l.postSyncAction = @(kPostSyncDelete);
+
+		NSString *labelsLink = p.labelsLink;
+		if(labelsLink)
+		{
+			ApiServer *apiServer = p.apiServer;
+			[self getPagedDataInPath:labelsLink
+						  fromServer:apiServer
+					startingFromPage:1
+							  params:nil
+						extraHeaders:nil
+					 perPageCallback:^BOOL(id data, BOOL lastPage) {
+						 for(NSDictionary *info in data)
+						 {
+							 PRLabel *l = [PRLabel labelWithInfo:info fromServer:apiServer];
+							 l.pullRequest = p;
+						 }
+						 return NO;
+					 } finalCallback:^(BOOL success, NSInteger resultCode, NSString *etag) {
+						 operationCount++;
+						 if(success)
+						 {
+							 self.successfulRefreshesSinceLastLabelCheck = 0;
+						 }
+						 else
+						 {
+							 apiServer.lastSyncSucceeded = @NO;
+						 }
+						 if(operationCount==total) CALLBACK();
+					 }];
+		}
+		else
+		{
+			// no issues link, so presumably no labels
+			operationCount++;
+			if(operationCount==total) CALLBACK();
+		}
+	}
+}
+
+- (void)fetchStatusesForCurrentPullRequestsToMoc:(NSManagedObjectContext *)moc andCallback:(completionBlockType)callback
+{
+	NSArray *prs = [DataItem allItemsOfType:@"PullRequest" inMoc:moc];
+
 	NSInteger total = prs.count;
+	if(total==0)
+	{
+		CALLBACK();
+		return;
+	}
+
 	__block NSInteger operationCount = 0;
 
 	for(PullRequest *p in prs)
@@ -118,21 +174,30 @@
 		for(PRStatus *s in p.statuses)
 			s.postSyncAction = @(kPostSyncDelete);
 
+		ApiServer *apiServer = p.apiServer;
+
 		[self getPagedDataInPath:p.statusesLink
-					  fromServer:p.apiServer
+					  fromServer:apiServer
 				startingFromPage:1
 						  params:nil
 					extraHeaders:nil
 				 perPageCallback:^BOOL(id data, BOOL lastPage) {
 					 for(NSDictionary *info in data)
 					 {
-						 PRStatus *s = [PRStatus statusWithInfo:info fromServer:p.apiServer];
+						 PRStatus *s = [PRStatus statusWithInfo:info fromServer:apiServer];
 						 s.pullRequest = p;
 					 }
 					 return NO;
 				 } finalCallback:^(BOOL success, NSInteger resultCode, NSString *etag) {
 					 operationCount++;
-					 if(!success) p.apiServer.lastSyncSucceeded = @NO;
+					 if(success)
+					 {
+						 self.successfulRefreshesSinceLastStatusCheck = 0;
+					 }
+					 else
+					 {
+						 apiServer.lastSyncSucceeded = @NO;
+					 }
 					 if(operationCount==total) CALLBACK();
 				 }];
 	}
@@ -186,15 +251,17 @@
 		else
 			link = p.reviewCommentLink;
 
+		ApiServer *apiServer = p.apiServer;
+
 		[self getPagedDataInPath:link
-					  fromServer:p.apiServer
+					  fromServer:apiServer
 				startingFromPage:1
 						  params:nil
 					extraHeaders:nil
 				 perPageCallback:^BOOL(id data, BOOL lastPage) {
 					 for(NSDictionary *info in data)
 					 {
-						 PRComment *c = [PRComment commentWithInfo:info fromServer:p.apiServer];
+						 PRComment *c = [PRComment commentWithInfo:info fromServer:apiServer];
 						 c.pullRequest = p;
 
 						 // check if we're assigned to a just created pull request, in which case we want to "fast forward" its latest comment dates to our own if we're newer
@@ -208,7 +275,7 @@
 					 return NO;
 				 } finalCallback:^(BOOL success, NSInteger resultCode, NSString *etag) {
 					 operationCount++;
-					 if(!success) p.apiServer.lastSyncSucceeded = @NO;
+					 if(!success) apiServer.lastSyncSucceeded = @NO;
 					 if(operationCount==total) CALLBACK();
 				 }];
 	}
@@ -279,17 +346,18 @@
 
 	for(PullRequest *p in prs)
 	{
+		ApiServer *apiServer = p.apiServer;
 		if(p.issueUrl)
 		{
 			[self getDataInPath:p.issueUrl
-					 fromServer:p.apiServer
+					 fromServer:apiServer
 						 params:nil
 				   extraHeaders:nil
 					andCallback:^(id data, BOOL lastPage, NSInteger resultCode, NSString *etag) {
 						if(data)
 						{
 							NSString *assignee = [[data ofk:@"assignee"] ofk:@"login"];
-							BOOL assigned = [assignee isEqualToString:p.apiServer.userName];
+							BOOL assigned = [assignee isEqualToString:apiServer.userName];
 							p.isNewAssignment = @(assigned && !p.assignedToMe.boolValue);
 							p.assignedToMe = @(assigned);
 						}
@@ -303,7 +371,7 @@
 							}
 							else
 							{
-								p.apiServer.lastSyncSucceeded = @NO;
+								apiServer.lastSyncSucceeded = @NO;
 							}
 						}
 						completionCallback();
@@ -649,7 +717,7 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 		if(!apiServer.lastSyncSucceeded.boolValue)
 		{
 			[apiServer rollBackAllUpdatesInMoc:moc];
-			apiServer.lastSyncSucceeded = @NO; // we just wiped all changes, but want to keep this
+			apiServer.lastSyncSucceeded = @NO; // we just wiped all changes, but want to keep this one
 		}
 	}
 
@@ -658,23 +726,27 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 	NSArray *surviving = [PullRequest itemsOfType:@"PullRequest" surviving:YES inMoc:moc];
 	for(PullRequest *r in surviving) [r postProcess];
 
-	[moc save:nil];
-
-	if(settings.showStatusItems)
+	NSError *error;
+	[moc save:&error];
+	if(error)
 	{
-		self.successfulRefreshesSinceLastStatusCheck++;
+		DLog(@"Comitting sync failed: %@",error);
 	}
+
+	if(settings.showStatusItems) self.successfulRefreshesSinceLastStatusCheck++;
+	if(settings.showLabels) self.successfulRefreshesSinceLastLabelCheck++;
 }
 
 - (void)updatePullRequestsInMoc:(NSManagedObjectContext *)moc andCallback:(completionBlockType)callback
 {
 	BOOL willScanForStatuses = [self shouldScanForStatusesInMoc:moc];
+	BOOL willScanForLabels = [self shouldScanForLabelsInMoc:moc];
 
 	NSInteger totalOperations = 3;
 	if(willScanForStatuses) totalOperations++;
+	if(willScanForLabels) totalOperations++;
 
 	__block NSInteger operationCount = 0;
-
 	completionBlockType completionCallback = ^{
 		operationCount++;
 		if(operationCount==totalOperations) CALLBACK();
@@ -682,6 +754,9 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 
 	if(willScanForStatuses)
 		[self fetchStatusesForCurrentPullRequestsToMoc:moc andCallback:completionCallback];
+
+	if([self shouldScanForLabelsInMoc:moc])
+		[self fetchLabelsForForCurrentPullRequestsToMoc:moc andCallback:completionCallback];
 
 	[self fetchCommentsForCurrentPullRequestsToMoc:moc andCallback:completionCallback];
 	[self checkPrClosuresInMoc:moc andCallback:completionCallback];
@@ -692,14 +767,22 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 {
 	if(self.successfulRefreshesSinceLastStatusCheck % settings.statusItemRefreshInterval == 0)
 	{
-		if(settings.showStatusItems)
-		{
-			self.successfulRefreshesSinceLastStatusCheck = 0;
-			return YES;
-		}
+		if(settings.showStatusItems) return YES;
 
 		for(PRStatus *s in [DataItem allItemsOfType:@"PRStatus" inMoc:moc])
 			[moc deleteObject:s];
+	}
+	return NO;
+}
+
+- (BOOL)shouldScanForLabelsInMoc:(NSManagedObjectContext *)moc
+{
+	if(self.successfulRefreshesSinceLastLabelCheck % settings.labelRefreshInterval == 0)
+	{
+		if(settings.showLabels) return YES;
+
+		for(PRLabel *l in [DataItem allItemsOfType:@"PRLabel" inMoc:moc])
+			[moc deleteObject:l];
 	}
 	return NO;
 }
@@ -719,15 +802,17 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 			if(pr.condition.integerValue == kPullRequestConditionOpen)
 				pr.postSyncAction = @(kPostSyncDelete);
 
+		ApiServer *apiServer = r.apiServer;
+
 		[self getPagedDataInPath:[NSString stringWithFormat:@"/repos/%@/pulls",r.fullName]
-					  fromServer:r.apiServer
+					  fromServer:apiServer
 				startingFromPage:1
 						  params:nil
 					extraHeaders:nil
 				 perPageCallback:^BOOL(id data, BOOL lastPage) {
 					 for(NSDictionary *info in data)
 					 {
-						 PullRequest *p = [PullRequest pullRequestWithInfo:info fromServer:r.apiServer];
+						 PullRequest *p = [PullRequest pullRequestWithInfo:info fromServer:apiServer];
 						 p.repo = r;
 					 }
 					 return NO;
@@ -749,7 +834,7 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 						 }
 						 else // fetch problem
 						 {
-							 r.apiServer.lastSyncSucceeded = @NO;
+							 apiServer.lastSyncSucceeded = @NO;
 						 }
 					 }
 					 if(operationCount==total) CALLBACK();

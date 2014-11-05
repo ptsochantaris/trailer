@@ -6,7 +6,8 @@
 - (void)log:(NSString *)logMessage;
 
 @property (nonatomic) NSInteger sortMethod, statusFilteringMode, lastPreferencesTabSelected,
-								closeHandlingPolicy, mergeHandlingPolicy, statusItemRefreshInterval;
+								closeHandlingPolicy, mergeHandlingPolicy, statusItemRefreshInterval,
+								labelRefreshInterval;
 
 @property (nonatomic) NSArray *statusFilteringTerms, *commentAuthorBlacklist;
 
@@ -19,7 +20,7 @@
 							dontKeepPrsMergedByMe, hideAvatars, autoParticipateInMentions,
 							dontAskBeforeWipingMerged, dontAskBeforeWipingClosed,
 							includeReposInFilter, showReposInName, hideNewRepositories,
-							groupByRepo, hideAllPrsSection,
+							groupByRepo, hideAllPrsSection, showLabels,
 							showStatusItems, makeStatusItemsSelectable, moveAssignedPrsToMySection,
 							markUnmergeableOnUserSectionsOnly, countOnlyListedPrs,
 							openPrAtFirstUnreadComment, logActivityToConsole;

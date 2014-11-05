@@ -10,6 +10,7 @@
 @property (nonatomic, retain) NSString * url;
 @property (nonatomic, retain) NSNumber * userId;
 @property (nonatomic, retain) NSString * userName;
+
 @property (nonatomic, retain) PullRequest *pullRequest;
 
 + (PRStatus *)statusWithInfo:(NSDictionary *)info fromServer:(ApiServer *)apiServer;

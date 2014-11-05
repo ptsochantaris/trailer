@@ -30,6 +30,7 @@
 @dynamic statuses;
 @dynamic repo;
 @dynamic comments;
+@dynamic labels;
 
 static NSDateFormatter *itemDateFormatter;
 
@@ -196,6 +197,87 @@ static NSDateFormatter *itemDateFormatter;
 	}
 
 	return [components componentsJoinedByString:@","];
+}
+
+- (NSString *)accessibleTitle
+{
+	NSMutableArray *components = [NSMutableArray new];
+	[components addObject:self.title];
+	if(settings.showLabels)
+	{
+		NSArray *sortedLabels = [self.labels sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES]]];
+		[components addObject:[NSString stringWithFormat:@"%ld labels:",(long)sortedLabels.count]];
+		for(PRLabel *l in sortedLabels) [components addObject:l.name];
+	}
+	return [components componentsJoinedByString:@","];
+}
+
+- (NSMutableAttributedString *)titleWithFont:(FONT_CLASS *)font labelFont:(FONT_CLASS *)labelFont
+{
+	NSMutableParagraphStyle *p = [[NSMutableParagraphStyle alloc] init];
+	p.paragraphSpacing = 1.0;
+
+	NSDictionary *titleAttributes = @{ NSFontAttributeName: font,
+									   NSForegroundColorAttributeName: [COLOR_CLASS blackColor],
+									   NSBackgroundColorAttributeName: [COLOR_CLASS clearColor],
+									   NSParagraphStyleAttributeName: p,
+									   };
+
+	NSMutableAttributedString *_title = [[NSMutableAttributedString alloc] initWithString:self.title
+																			   attributes:titleAttributes];
+
+	if(settings.showLabels)
+	{
+		NSArray *sortedLabels = [self.labels sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES]]];
+		if(sortedLabels.count>0)
+		{
+			[_title appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n" attributes:titleAttributes]];
+			NSMutableParagraphStyle *lp = [[NSMutableParagraphStyle alloc] init];
+#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
+			lp.lineHeightMultiple = 1.15;
+			NSDictionary *labelAttributes = [NSMutableDictionary dictionaryWithDictionary:
+											 @{ NSFontAttributeName: labelFont,
+												NSBackgroundColorAttributeName: [COLOR_CLASS clearColor],
+												NSBaselineOffsetAttributeName: @2.0,
+												NSParagraphStyleAttributeName: lp,
+												}];
+#else
+			lp.minimumLineHeight = labelFont.pointSize+6.0;
+			NSDictionary *labelAttributes = [NSMutableDictionary dictionaryWithDictionary:
+											 @{ NSFontAttributeName: labelFont,
+												NSBackgroundColorAttributeName: [COLOR_CLASS clearColor],
+												NSBaselineOffsetAttributeName: @1.0,
+												NSParagraphStyleAttributeName: lp,
+												}];
+#endif
+			NSInteger count=0;
+			for(PRLabel *l in sortedLabels)
+			{
+				NSMutableDictionary *a = [labelAttributes mutableCopy];
+				COLOR_CLASS *color = l.colorForDisplay;
+				a[NSBackgroundColorAttributeName] = color;
+				a[NSForegroundColorAttributeName] = [self isDarkColor:color] ? [COLOR_CLASS whiteColor] : [COLOR_CLASS blackColor];
+
+				NSString *name = [l.name stringByReplacingOccurrencesOfString:@" " withString:@"\u00a0"];
+
+				[_title appendAttributedString:[[NSAttributedString alloc] initWithString:@"\u00a0" attributes:a]];
+				[_title appendAttributedString:[[NSAttributedString alloc] initWithString:name attributes:a]];
+				[_title appendAttributedString:[[NSAttributedString alloc] initWithString:@"\u00a0" attributes:a]];
+				if(count<sortedLabels.count-1) [_title appendAttributedString:[[NSAttributedString alloc] initWithString:@" " attributes:labelAttributes]];
+			}
+		}
+	}
+
+	return _title;
+}
+
+// Much gratitude to the Samback/ColorArt project for the constants used below: https://github.com/Samback/ColorArt
+- (BOOL)isDarkColor:(COLOR_CLASS *)color
+{
+	CGFloat r, g, b, a;
+	[color getRed:&r green:&g blue:&b alpha:&a];
+	CGFloat lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+	return (lum < 0.5);
 }
 
 - (NSMutableAttributedString *)subtitleWithFont:(FONT_CLASS *)font
@@ -408,11 +490,10 @@ static NSDateFormatter *itemDateFormatter;
 	}
 
 	f.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"createdAt" ascending:NO]];
-	NSArray *ret = [self.managedObjectContext executeFetchRequest:f error:nil];
 	NSMutableArray *result = [NSMutableArray array];
 	NSMutableSet *targetUrls = [NSMutableSet set];
 	NSMutableSet *descriptions = [NSMutableSet set];
-	for(PRStatus *s in ret)
+	for(PRStatus *s in [self.managedObjectContext executeFetchRequest:f error:nil])
 	{
 		NSString *targetUrl = s.targetUrl;
 		if(!targetUrl) targetUrl = @"";
@@ -431,6 +512,11 @@ static NSDateFormatter *itemDateFormatter;
 		}
 	}
 	return result;
+}
+
+- (NSString *)labelsLink
+{
+	return [self.issueUrl stringByAppendingPathComponent:@"labels"];
 }
 
 - (NSString *)urlForOpening

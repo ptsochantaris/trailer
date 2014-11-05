@@ -12,6 +12,8 @@
 		160C5AC61867551500142482 /* CenteredTextFieldCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 160C5AC51867551500142482 /* CenteredTextFieldCell.m */; };
 		160C5ACF18675E9300142482 /* CenteredTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 160C5ACE18675E9300142482 /* CenteredTextField.m */; };
 		160C5AD318682CD800142482 /* CommentCounts.m in Sources */ = {isa = PBXBuildFile; fileRef = 160C5AD218682CD800142482 /* CommentCounts.m */; };
+		160E60351A0A29D800742BA9 /* PRLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 160E60341A0A29D800742BA9 /* PRLabel.m */; };
+		160E60361A0A29D800742BA9 /* PRLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 160E60341A0A29D800742BA9 /* PRLabel.m */; };
 		16154E2F19C43E8E00E49139 /* Launch.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 16154E2E19C43E8E00E49139 /* Launch.storyboard */; };
 		1617BEEA183F538100E89BB2 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 1617BEE9183F538100E89BB2 /* Reachability.m */; };
 		1617BEED183F543600E89BB2 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1617BEEC183F543600E89BB2 /* SystemConfiguration.framework */; };
@@ -110,6 +112,9 @@
 		160C5ACE18675E9300142482 /* CenteredTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CenteredTextField.m; sourceTree = "<group>"; };
 		160C5AD118682CD800142482 /* CommentCounts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommentCounts.h; sourceTree = "<group>"; };
 		160C5AD218682CD800142482 /* CommentCounts.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommentCounts.m; sourceTree = "<group>"; };
+		160E60321A0A28DF00742BA9 /* Trailer 18.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 18.xcdatamodel"; sourceTree = "<group>"; };
+		160E60331A0A29D700742BA9 /* PRLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PRLabel.h; path = ../PRLabel.h; sourceTree = "<group>"; };
+		160E60341A0A29D800742BA9 /* PRLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PRLabel.m; path = ../PRLabel.m; sourceTree = "<group>"; };
 		16154E2E19C43E8E00E49139 /* Launch.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Launch.storyboard; sourceTree = "<group>"; };
 		1617BEE8183F538100E89BB2 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		1617BEE9183F538100E89BB2 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
@@ -487,16 +492,18 @@
 			children = (
 				166F29DF19F2B1F300A083E3 /* ApiServer.h */,
 				166F29E019F2B1F300A083E3 /* ApiServer.m */,
-				1661667D189BC47F00FBF4E0 /* PRStatus.h */,
-				1661667E189BC47F00FBF4E0 /* PRStatus.m */,
+				16B9553417EC89B50005118F /* DataItem.h */,
+				16B9553517EC89B50005118F /* DataItem.m */,
 				161CA3C817F5B1F300F4AF6C /* PRComment.h */,
 				161CA3C917F5B1F300F4AF6C /* PRComment.m */,
+				160E60331A0A29D700742BA9 /* PRLabel.h */,
+				160E60341A0A29D800742BA9 /* PRLabel.m */,
+				1661667D189BC47F00FBF4E0 /* PRStatus.h */,
+				1661667E189BC47F00FBF4E0 /* PRStatus.m */,
 				161CA3C417F5A55300F4AF6C /* PullRequest.h */,
 				161CA3C517F5A55300F4AF6C /* PullRequest.m */,
 				16B9553817EC93DE0005118F /* Repo.h */,
 				16B9553917EC93DE0005118F /* Repo.m */,
-				16B9553417EC89B50005118F /* DataItem.h */,
-				16B9553517EC89B50005118F /* DataItem.m */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -648,6 +655,7 @@
 				1628A7081878BC32005EDA69 /* Reachability.m in Sources */,
 				1628A7001878B810005EDA69 /* API.m in Sources */,
 				1628A6C518789E73005EDA69 /* AppDelegate.m in Sources */,
+				160E60361A0A29D800742BA9 /* PRLabel.m in Sources */,
 				1628A7061878BC18005EDA69 /* DataItem.m in Sources */,
 				16EE562019B78DBA0031DF6D /* CommentBlacklistViewController.m in Sources */,
 				1640470A1882ED0000A4AC9C /* AboutTrailerViewController.m in Sources */,
@@ -697,6 +705,7 @@
 				16517CE11893BDE800B3D384 /* EmptyView.m in Sources */,
 				164976251864985500C13A6B /* RemoteImageView.m in Sources */,
 				161BED25185B5368005C00F7 /* StatusItemView.m in Sources */,
+				160E60351A0A29D800742BA9 /* PRLabel.m in Sources */,
 				160C5AC61867551500142482 /* CenteredTextFieldCell.m in Sources */,
 				16B9553617EC89B50005118F /* DataItem.m in Sources */,
 				168BC6C717EC2DF000BC4584 /* Trailer.xcdatamodeld in Sources */,
@@ -747,6 +756,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COMPRESS_PNG_FILES = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -757,7 +767,7 @@
 				INFOPLIST_FILE = "MobileTrailer/MobileTrailer-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "2B043F43-7C6D-488B-9E60-111C8921407C";
+				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
@@ -769,7 +779,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COMPRESS_PNG_FILES = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -780,7 +791,7 @@
 				INFOPLIST_FILE = "MobileTrailer/MobileTrailer-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "ec205024-54be-4c77-b372-0f766baeca7a";
+				PROVISIONING_PROFILE = "8f4c3fa9-1a0d-4555-8a8a-c027cec25618";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -928,6 +939,7 @@
 			children = (
 				16508CD819E1B53E0029ADFE /* Trailer 16.xcdatamodel */,
 				16D223EA19F2811F00B48E88 /* Trailer 17.xcdatamodel */,
+				160E60321A0A28DF00742BA9 /* Trailer 18.xcdatamodel */,
 				16F2B33E19C070F2005CB433 /* Trailer 15.xcdatamodel */,
 				16EE562119B857930031DF6D /* Trailer 14.xcdatamodel */,
 				1653FD6F1966B2900080D972 /* Trailer 13.xcdatamodel */,
@@ -944,7 +956,7 @@
 				1617BEEE183F9C4F00E89BB2 /* Trailer 2.xcdatamodel */,
 				168BC6C617EC2DF000BC4584 /* Trailer.xcdatamodel */,
 			);
-			currentVersion = 16D223EA19F2811F00B48E88 /* Trailer 17.xcdatamodel */;
+			currentVersion = 160E60321A0A28DF00742BA9 /* Trailer 18.xcdatamodel */;
 			path = Trailer.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

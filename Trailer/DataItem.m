@@ -122,7 +122,7 @@ NSDateFormatter *_syncDateFormatter;
 
 + (void)nukeDeletedItemsInMoc:(NSManagedObjectContext *)moc
 {
-	NSArray *types = @[@"Repo", @"PullRequest", @"PRStatus", @"PRComment"];
+	NSArray *types = @[@"Repo", @"PullRequest", @"PRStatus", @"PRComment", @"PRLabel"];
 	unsigned long count=0;
 	for(NSString *type in types)
 	{
@@ -134,7 +134,7 @@ NSDateFormatter *_syncDateFormatter;
 			[moc deleteObject:i];
 		}
 	}
-	DLog(@"Nuked %lu deleted items in total",count);
+	DLog(@"Nuked %lu deleted items",count);
 }
 
 + (NSUInteger)countItemsOfType:(NSString *)type inMoc:(NSManagedObjectContext *)moc
