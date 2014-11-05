@@ -122,7 +122,7 @@ NSDateFormatter *_syncDateFormatter;
 
 + (void)nukeDeletedItemsInMoc:(NSManagedObjectContext *)moc
 {
-	NSArray *types = @[@"Repo", @"PullRequest", @"PRStatus", @"PRComment"];
+	NSArray *types = @[@"Repo", @"PullRequest", @"PRStatus", @"PRComment", @"PRLabel"];
 	unsigned long count=0;
 	for(NSString *type in types)
 	{

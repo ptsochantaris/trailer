@@ -47,12 +47,6 @@
 		return STATUS_RED;
 }
 
-- (void)prepareForDeletion
-{
-	[super prepareForDeletion];
-	DLog(@"deleting status");
-}
-
 - (NSString *)displayText
 {
 	static NSDateFormatter *dateFormatter;

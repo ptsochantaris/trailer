@@ -100,9 +100,9 @@
 	}
 }
 
-- (void)fetchLabelsForUpdatedPullRequestsToMoc:(NSManagedObjectContext *)moc andCallback:(completionBlockType)callback
+- (void)fetchLabelsForForCurrentPullRequestsToMoc:(NSManagedObjectContext *)moc andCallback:(completionBlockType)callback
 {
-	NSArray *prs = [DataItem newOrUpdatedItemsOfType:@"PullRequest" inMoc:moc];
+	NSArray *prs = [DataItem allItemsOfType:@"PullRequest" inMoc:moc];
 
 	NSInteger total = prs.count;
 	if(total==0)
@@ -136,7 +136,14 @@
 						 return NO;
 					 } finalCallback:^(BOOL success, NSInteger resultCode, NSString *etag) {
 						 operationCount++;
-						 if(!success) apiServer.lastSyncSucceeded = @NO;
+						 if(success)
+						 {
+							 self.successfulRefreshesSinceLastLabelCheck = 0;
+						 }
+						 else
+						 {
+							 apiServer.lastSyncSucceeded = @NO;
+						 }
 						 if(operationCount==total) CALLBACK();
 					 }];
 		}
@@ -183,7 +190,14 @@
 					 return NO;
 				 } finalCallback:^(BOOL success, NSInteger resultCode, NSString *etag) {
 					 operationCount++;
-					 if(!success) apiServer.lastSyncSucceeded = @NO;
+					 if(success)
+					 {
+						 self.successfulRefreshesSinceLastStatusCheck = 0;
+					 }
+					 else
+					 {
+						 apiServer.lastSyncSucceeded = @NO;
+					 }
 					 if(operationCount==total) CALLBACK();
 				 }];
 	}
@@ -719,14 +733,8 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 		DLog(@"Comitting sync failed: %@",error);
 	}
 
-	if(settings.showStatusItems)
-	{
-		self.successfulRefreshesSinceLastStatusCheck++;
-	}
-	if(settings.showLabels)
-	{
-		self.successfulRefreshesSinceLastLabelCheck++;
-	}
+	if(settings.showStatusItems) self.successfulRefreshesSinceLastStatusCheck++;
+	if(settings.showLabels) self.successfulRefreshesSinceLastLabelCheck++;
 }
 
 - (void)updatePullRequestsInMoc:(NSManagedObjectContext *)moc andCallback:(completionBlockType)callback
@@ -748,7 +756,7 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 		[self fetchStatusesForCurrentPullRequestsToMoc:moc andCallback:completionCallback];
 
 	if([self shouldScanForLabelsInMoc:moc])
-		[self fetchLabelsForUpdatedPullRequestsToMoc:moc andCallback:completionCallback];
+		[self fetchLabelsForForCurrentPullRequestsToMoc:moc andCallback:completionCallback];
 
 	[self fetchCommentsForCurrentPullRequestsToMoc:moc andCallback:completionCallback];
 	[self checkPrClosuresInMoc:moc andCallback:completionCallback];
@@ -759,11 +767,7 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 {
 	if(self.successfulRefreshesSinceLastStatusCheck % settings.statusItemRefreshInterval == 0)
 	{
-		if(settings.showStatusItems)
-		{
-			self.successfulRefreshesSinceLastStatusCheck = 0;
-			return YES;
-		}
+		if(settings.showStatusItems) return YES;
 
 		for(PRStatus *s in [DataItem allItemsOfType:@"PRStatus" inMoc:moc])
 			[moc deleteObject:s];
@@ -775,11 +779,7 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 {
 	if(self.successfulRefreshesSinceLastLabelCheck % settings.labelRefreshInterval == 0)
 	{
-		if(settings.showLabels)
-		{
-			self.successfulRefreshesSinceLastLabelCheck = 0;
-			return YES;
-		}
+		if(settings.showLabels) return YES;
 
 		for(PRLabel *l in [DataItem allItemsOfType:@"PRLabel" inMoc:moc])
 			[moc deleteObject:l];

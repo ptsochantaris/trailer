@@ -352,7 +352,7 @@ Settings *settings;
 - (NSInteger)labelRefreshInterval
 {
 	NSInteger i = [[self defaultValueForKey:LABEL_REFRESH_COUNT] integerValue];
-	return (i>0) ? i :  10;
+	return (i>0) ? i :  4;
 }
 - (void)setLabelRefreshInterval:(NSInteger)labelRefreshInterval { [self storeDefaultValue:@(labelRefreshInterval) forKey:LABEL_REFRESH_COUNT]; }
 
