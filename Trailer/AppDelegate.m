@@ -417,7 +417,7 @@ AppDelegate *app;
 
 - (IBAction)aboutLinkSelected:(NSButton *)sender
 {
-	NSString *urlToOpen = TRAILER_GITHUB_REPO;
+	NSString *urlToOpen = @"https://github.com/ptsochantaris/trailer";
 	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlToOpen]];
 }
 

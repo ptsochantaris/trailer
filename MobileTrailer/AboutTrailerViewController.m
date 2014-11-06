@@ -16,7 +16,7 @@
 
 - (IBAction)ipadLink:(UIBarButtonItem *)sender
 {
-	NSString *url = @"http://dev.housetrip.com/trailer";
+	NSString *url = @"https://github.com/ptsochantaris/trailer";
 	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:url]];
 }
 
