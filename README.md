@@ -2,6 +2,7 @@ Trailer
 =======
 
 Copyright (c) 2014 Paul Tsochantaris
+
 Parts copyright (c) 2012-2014 HouseTrip Ltd.
 
 Released under the terms of the MIT licence, see the file LICENCE for details.
