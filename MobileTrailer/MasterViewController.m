@@ -177,30 +177,12 @@
 			[self tryRefresh];
 		}
 	}
-	else
-	{
-		if(decelerate)
-		{
-			self.tableView.userInteractionEnabled = NO;
-		}
-		else
-		{
-			[self.refreshControl endRefreshing];
-		}
-	}
 }
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
 	self.tableView.userInteractionEnabled = YES;
-	if(refreshOnRelease)
-	{
-		[self tryRefresh];
-	}
-	else
-	{
-		[self.refreshControl endRefreshing];
-	}
+	if(refreshOnRelease) [self tryRefresh];
 }
 
 - (void)viewDidLoad
