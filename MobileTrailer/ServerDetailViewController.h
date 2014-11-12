@@ -9,5 +9,7 @@
 @property (weak, nonatomic) IBOutlet UITextField *authToken;
 @property (weak, nonatomic) IBOutlet UISwitch *reportErrors;
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
+@property (weak, nonatomic) IBOutlet UILabel *authTokenLabel;
+@property (weak, nonatomic) IBOutlet UIButton *testButton;
 
 @end

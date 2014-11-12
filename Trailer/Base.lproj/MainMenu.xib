@@ -212,7 +212,7 @@ user you can add more servers from the left.</string>
                                                     <textField verticalHuggingPriority="750" id="X5B-lQ-rue">
                                                         <rect key="frame" x="102" y="268" width="346" height="24"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="https://api.github.com" drawsBackground="YES" usesSingleLineMode="YES" id="Ziu-VQ-AnW">
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="https://api.github.com (for GE: https://server/api/v3)" drawsBackground="YES" usesSingleLineMode="YES" id="Ziu-VQ-AnW">
                                                             <font key="font" metaFont="system"/>
                                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1172,7 +1172,7 @@ Enter to select and ⌘, for preferences.
             <connections>
                 <outlet property="delegate" destination="494" id="wwK-Xp-Xzn"/>
             </connections>
-            <point key="canvasLocation" x="446" y="483"/>
+            <point key="canvasLocation" x="626" y="488"/>
         </window>
         <customObject id="494" customClass="AppDelegate">
             <connections>
@@ -1423,7 +1423,7 @@ Enter to select and ⌘, for preferences.
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="justified" id="QyU-WN-WeW">
                                         <font key="font" metaFont="system" size="8"/>
-                                        <mutableString key="title">Copyright (c) 2014 Paul Tsochantaris
+                                        <string key="title">Copyright (c) 2014 Paul Tsochantaris
 Parts copyright (c) 2012-2014 HouseTrip Ltd.
 
 Released under the terms of the MIT licence:
@@ -1432,7 +1432,7 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</mutableString>
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</string>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>

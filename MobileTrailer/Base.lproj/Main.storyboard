@@ -440,7 +440,7 @@
                                             <outlet property="delegate" destination="iSf-H9-TPW" id="hPl-zn-3qw"/>
                                         </connections>
                                     </textField>
-                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="https://api.github.com" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="MTl-S3-U8P">
+                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="https://api.github.com (for GE: https://server/api/v3)" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="MTl-S3-U8P">
                                         <rect key="frame" x="11" y="127" width="578" height="30"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                         <textInputTraits key="textInputTraits" returnKeyType="done"/>
@@ -570,9 +570,11 @@
                     <connections>
                         <outlet property="apiPath" destination="MTl-S3-U8P" id="DFf-0S-ibw"/>
                         <outlet property="authToken" destination="lDU-gx-tBY" id="vjX-7U-vqD"/>
+                        <outlet property="authTokenLabel" destination="yVf-Xw-8iy" id="ohD-Ha-9GT"/>
                         <outlet property="name" destination="bME-ye-aAN" id="LkL-7d-dVU"/>
                         <outlet property="reportErrors" destination="P3I-BS-Gwz" id="06j-Hm-CQJ"/>
                         <outlet property="scrollView" destination="bZU-nh-qhg" id="CHr-1c-Bhf"/>
+                        <outlet property="testButton" destination="FSU-dH-Zb1" id="FQx-x9-gB9"/>
                         <outlet property="webFrontEnd" destination="jgQ-9E-dxw" id="7Sp-Ty-RY9"/>
                         <segue destination="kWj-6b-yq2" kind="show" identifier="openGithub" id="OaO-SO-2eE"/>
                     </connections>
@@ -642,7 +644,7 @@
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="top" showsHorizontalScrollIndicator="NO" editable="NO" textAlignment="center" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cun-Cw-EIG">
                                 <rect key="frame" x="0.0" y="171" width="600" height="380"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                <mutableString key="text">Copyright (c) 2014 Paul Tsochantaris
+                                <string key="text">Copyright (c) 2014 Paul Tsochantaris
 Parts copyright (c) 2012-2014 HouseTrip Ltd.
 
 Released under the terms of the MIT licence:
@@ -652,7 +654,7 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</mutableString>
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</string>
                                 <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="13"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>

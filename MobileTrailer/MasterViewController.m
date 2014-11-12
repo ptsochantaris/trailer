@@ -606,7 +606,17 @@
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
-	if([segue.destinationViewController isKindOfClass:[UITabBarController class]])
+	BOOL allServersHaveTokens = YES;
+	NSArray *apiServers = [ApiServer allApiServersInMoc:app.dataManager.managedObjectContext];
+	for(ApiServer *a in apiServers)
+	{
+		if(!a.goodToGo)
+		{
+			allServersHaveTokens = NO;
+			break;
+		}
+	}
+	if(allServersHaveTokens && [segue.destinationViewController isKindOfClass:[UITabBarController class]])
 	{
 		UITabBarController *t = segue.destinationViewController;
 		t.selectedIndex = MIN(settings.lastPreferencesTabSelected, t.viewControllers.count-1);

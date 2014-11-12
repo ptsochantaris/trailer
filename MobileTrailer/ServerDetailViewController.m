@@ -37,6 +37,7 @@
 {
 	[super viewWillAppear:animated];
 	[self.navigationController setToolbarHidden:NO animated:YES];
+	[self processTokenStateFrom:self.authToken.text];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -69,7 +70,25 @@
 	a.reportRefreshFailures = @(self.reportErrors.on);
 	a.lastSyncSucceeded = @YES;
 	app.preferencesDirty = YES;
+
+	[self processTokenStateFrom:a.authToken];
 	return a;
+}
+
+- (void)processTokenStateFrom:(NSString *)tokenText
+{
+	if(tokenText.length==0)
+	{
+		self.authTokenLabel.textColor =  [UIColor redColor];
+		self.testButton.enabled = NO;
+		self.testButton.alpha = 0.6;
+	}
+	else
+	{
+		self.authTokenLabel.textColor =  [UIColor blackColor];
+		self.testButton.enabled = YES;
+		self.testButton.alpha = 1.0;
+	}
 }
 
 - (IBAction)reportChanged:(UISwitch *)sender
@@ -95,6 +114,11 @@
 	{
 		[textField resignFirstResponder];
 		return NO;
+	}
+	if(textField==self.authToken)
+	{
+		NSString *newToken = [textField.text stringByReplacingCharactersInRange:range withString:string];
+		[self processTokenStateFrom:newToken];
 	}
 	return YES;
 }
