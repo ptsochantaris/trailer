@@ -166,7 +166,7 @@
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {
-	if(refreshOnRelease)
+	if(refreshOnRelease && !app.isRefreshing)
 	{
 		if(decelerate)
 		{
@@ -182,7 +182,8 @@
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
 	self.tableView.userInteractionEnabled = YES;
-	if(refreshOnRelease) [self tryRefresh];
+	refreshOnRelease = NO;
+	if(refreshOnRelease && !app.isRefreshing) [self tryRefresh];
 }
 
 - (void)viewDidLoad
