@@ -9,6 +9,8 @@ Released under the terms of the MIT licence, see the file LICENCE for details.
 
 For maintained binaries and/or more info:
 
-- [Official OSX build](http://ptsochantaris.github.io/trailer/)
+- [Latest OSX version](http://ptsochantaris.github.io/trailer/)
 
-- [Official iOS build](https://itunes.apple.com/US/app/id806104975?mt=8)
+- [Latest iOS version](https://itunes.apple.com/US/app/id806104975?mt=8)
+
+- [Trailer for Android](https://github.com/amencarini/droidtrailer)
