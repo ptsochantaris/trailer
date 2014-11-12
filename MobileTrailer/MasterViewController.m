@@ -161,29 +161,17 @@
 
 - (void)refreshControlChanged
 {
-	if(!app.isRefreshing) refreshOnRelease = YES;
+	refreshOnRelease = !app.isRefreshing;
 }
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {
-	if(refreshOnRelease && !app.isRefreshing)
-	{
-		if(decelerate)
-		{
-			self.tableView.userInteractionEnabled = NO;
-		}
-		else
-		{
-			[self tryRefresh];
-		}
-	}
+	if(refreshOnRelease && !decelerate) [self tryRefresh];
 }
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
-	self.tableView.userInteractionEnabled = YES;
-	refreshOnRelease = NO;
-	if(refreshOnRelease && !app.isRefreshing) [self tryRefresh];
+	if(refreshOnRelease) [self tryRefresh];
 }
 
 - (void)viewDidLoad
