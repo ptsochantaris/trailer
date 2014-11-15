@@ -364,6 +364,12 @@ Settings *settings;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#define USE_VIBRANCY_UI @"USE_VIBRANCY_UI"
+- (void)setUseVibrancy:(BOOL)useVibrancy { [self storeDefaultValue:@(useVibrancy) forKey:USE_VIBRANCY_UI]; }
+- (BOOL)useVibrancy { return [[self defaultValueForKey:USE_VIBRANCY_UI] boolValue]; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #define HOTKEY_CONTROL_MODIFIER @"HOTKEY_CONTROL_MODIFIER"
 - (void)setHotkeyControlModifier:(BOOL)hotkeyControlModifier { [self storeDefaultValue:@(hotkeyControlModifier) forKey:HOTKEY_CONTROL_MODIFIER]; }
 - (BOOL)hotkeyControlModifier { return [[self defaultValueForKey:HOTKEY_CONTROL_MODIFIER] boolValue]; }

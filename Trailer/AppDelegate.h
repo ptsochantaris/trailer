@@ -60,6 +60,9 @@
 @property (weak) IBOutlet NSTokenField *commentAuthorBlacklist;
 @property (weak) IBOutlet NSButton *showLabels;
 
+// Preferences - Display
+@property (weak) IBOutlet NSButton *useVibrancy;
+
 // Preferences - Labels
 @property (weak) IBOutlet NSTextField *labelRescanLabel;
 @property (weak) IBOutlet NSTextField *labelRefreshNote;

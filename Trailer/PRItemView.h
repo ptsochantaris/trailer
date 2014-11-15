@@ -4,7 +4,7 @@
 
 #define PR_ITEM_FOCUSED_NOTIFICATION_KEY @"PrItemFocusedNotificationKey"
 #define PR_ITEM_FOCUSED_STATE_KEY @"PrItemFocusedStateKey"
-
+#define UPDATE_VIBRANCY_NOTIFICATION @"UpdateVibrancyNotfication"
 
 @class PRItemView;
 

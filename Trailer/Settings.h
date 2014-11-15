@@ -27,8 +27,8 @@
 
 @property (nonatomic) BOOL hotkeyEnable, hotkeyCommandModifier, hotkeyOptionModifier, hotkeyShiftModifier, hotkeyControlModifier;
 
-// auto updates in OSX
-@property (nonatomic) BOOL checkForUpdatesAutomatically;
+// OSX only
+@property (nonatomic) BOOL checkForUpdatesAutomatically, useVibrancy;
 @property (nonatomic) NSInteger checkForUpdatesInterval;
 
 @end

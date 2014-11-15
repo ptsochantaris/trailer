@@ -465,7 +465,7 @@ user you can add more servers from the left.</string>
                                             </textFieldCell>
                                         </textField>
                                         <button id="AEB-MY-2H6">
-                                            <rect key="frame" x="51" y="237" width="419" height="18"/>
+                                            <rect key="frame" x="51" y="243" width="419" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Display PR creation time instead of most recent activity time" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="FUA-CI-tqc">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -476,7 +476,7 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="ZD1-Lw-zpW">
-                                            <rect key="frame" x="51" y="212" width="405" height="18"/>
+                                            <rect key="frame" x="51" y="218" width="405" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Move PRs assigned to me to the &quot;My Pull Requests&quot; section" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="4g6-XV-fVn">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -487,7 +487,7 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="SoW-AJ-5kD">
-                                            <rect key="frame" x="51" y="187" width="442" height="18"/>
+                                            <rect key="frame" x="51" y="193" width="442" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Mark PRs as un-mergeable only in my own or participated sections" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="yfb-m7-og2">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -498,9 +498,9 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="y7T-zw-tAa">
-                                            <rect key="frame" x="51" y="141" width="339" height="18"/>
+                                            <rect key="frame" x="51" y="149" width="335" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Count only the currently listed PRs in the menubar" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="pnZ-CL-lVd">
+                                            <buttonCell key="cell" type="check" title="Count only currently displayed PRs in the menubar" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="pnZ-CL-lVd">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -509,7 +509,7 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="KdG-4v-vf7">
-                                            <rect key="frame" x="51" y="307" width="140" height="18"/>
+                                            <rect key="frame" x="51" y="310" width="140" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Hide user avatars" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="eW5-mR-deV">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -520,7 +520,7 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="4E0-iw-eoN">
-                                            <rect key="frame" x="51" y="282" width="193" height="18"/>
+                                            <rect key="frame" x="51" y="285" width="193" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Hide the &quot;All PRs&quot; section" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="JA8-t0-2Rt">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -531,7 +531,7 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="cyW-kN-E51">
-                                            <rect key="frame" x="51" y="69" width="272" height="18"/>
+                                            <rect key="frame" x="51" y="80" width="272" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Include repository names when filtering" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="iJ5-8d-ZYv">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -542,7 +542,7 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="NO0-4G-QWM">
-                                            <rect key="frame" x="51" y="95" width="238" height="18"/>
+                                            <rect key="frame" x="51" y="106" width="238" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Display repository names in PR list" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Xz9-oA-gKh">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -550,6 +550,17 @@ user you can add more servers from the left.</string>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="displayRepositoryNameSelected:" target="494" id="ErF-Pi-Ruo"/>
+                                            </connections>
+                                        </button>
+                                        <button id="oFz-4f-O57">
+                                            <rect key="frame" x="51" y="37" width="346" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Use vibrancy (recommended only on Retina screens)" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="O1m-Zd-WBS">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="useVibrancySelected:" target="494" id="vR2-zz-CdH"/>
                                             </connections>
                                         </button>
                                     </subviews>
@@ -1244,6 +1255,7 @@ Enter to select and ⌘, for preferences.
                 <outlet property="statusItemsRefreshNote" destination="Ud3-8I-IKZ" id="7qy-EF-8Cd"/>
                 <outlet property="statusTermMenu" destination="Bx7-99-sDc" id="pBm-jb-bo6"/>
                 <outlet property="statusTermsField" destination="JNC-T1-vCD" id="Gab-bS-wOF"/>
+                <outlet property="useVibrancy" destination="oFz-4f-O57" id="Ltc-WO-JS5"/>
                 <outlet property="versionNumber" destination="SrS-Tc-X7C" id="RSu-YF-jmY"/>
             </connections>
         </customObject>
@@ -1272,14 +1284,14 @@ Enter to select and ⌘, for preferences.
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <scrollView focusRingType="none" borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="1jc-DF-1GW" customClass="MenuScrollView">
-                        <rect key="frame" x="0.0" y="0.0" width="376" height="682"/>
+                        <rect key="frame" x="0.0" y="0.0" width="376" height="710"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="e4g-XR-7jB">
                             <rect key="frame" x="0.0" y="0.0" width="376" height="682"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <view id="lMY-YH-Amm">
-                                    <rect key="frame" x="0.0" y="0.0" width="376" height="682"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="376" height="710"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 </view>
                             </subviews>
@@ -1294,76 +1306,74 @@ Enter to select and ⌘, for preferences.
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
-                    <box autoresizesSubviews="NO" appearanceType="aqua" title="Header" boxType="custom" borderType="none" titlePosition="noTitle" id="uIa-cA-gk9">
+                    <customView id="8KA-D9-rJV" customClass="NSViewAllowsVibrancy">
                         <rect key="frame" x="0.0" y="678" width="376" height="32"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                        <view key="contentView">
-                            <rect key="frame" x="0.0" y="0.0" width="376" height="32"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        </view>
-                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                        <color key="fillColor" name="controlLightHighlightColor" catalog="System" colorSpace="catalog"/>
-                    </box>
-                    <searchField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" id="gaD-Aj-14T">
-                        <rect key="frame" x="41" y="683" width="327" height="22"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                        <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" focusRingType="none" placeholderString="Filter..." usesSingleLineMode="YES" bezelStyle="round" id="vvd-HC-Usx">
-                            <font key="font" metaFont="cellTitle"/>
-                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                        </searchFieldCell>
-                        <connections>
-                            <outlet property="delegate" destination="494" id="KUX-SR-9nr"/>
-                        </connections>
-                    </searchField>
-                    <popUpButton horizontalHuggingPriority="750" verticalHuggingPriority="750" id="pTb-UR-Euf">
-                        <rect key="frame" x="11" y="681" width="22" height="26"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <popUpButtonCell key="cell" type="disclosure" title=" Mark All As Read" bezelStyle="roundedDisclosure" imagePosition="only" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="HVf-zs-7iK" id="j86-0c-T7i">
-                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="menu"/>
-                            <menu key="menu" title="Options" showsStateColumn="NO" id="TJQ-rB-fHm">
-                                <items>
-                                    <menuItem title=" Refresh" keyEquivalent="r" id="asb-Mc-b5c">
-                                        <connections>
-                                            <action selector="refreshNowSelected:" target="494" id="AiB-dg-t4e"/>
-                                        </connections>
-                                    </menuItem>
-                                    <menuItem title=" Mark All As Read" state="on" keyEquivalent="a" id="HVf-zs-7iK">
-                                        <modifierMask key="keyEquivalentModifierMask" control="YES" option="YES" command="YES"/>
-                                        <connections>
-                                            <action selector="markAllReadSelected:" target="494" id="vWk-YR-lXO"/>
-                                        </connections>
-                                    </menuItem>
-                                    <menuItem title=" Preferences..." keyEquivalent="," id="IyB-CB-sO1">
-                                        <connections>
-                                            <action selector="preferencesSelected:" target="494" id="APu-P9-9A4"/>
-                                        </connections>
-                                    </menuItem>
-                                    <menuItem title=" About Trailer" id="gYG-gS-tKD">
-                                        <modifierMask key="keyEquivalentModifierMask"/>
-                                        <connections>
-                                            <action selector="makeKeyAndOrderFront:" target="jQi-BK-oDc" id="ryq-zX-bJb"/>
-                                        </connections>
-                                    </menuItem>
-                                    <menuItem title=" Quit" keyEquivalent="q" id="eNw-Iw-Fkg">
-                                        <connections>
-                                            <action selector="terminate:" target="-3" id="VcX-PJ-RoB"/>
-                                        </connections>
-                                    </menuItem>
-                                </items>
+                        <subviews>
+                            <searchField wantsLayer="YES" focusRingType="none" verticalHuggingPriority="750" id="gaD-Aj-14T">
+                                <rect key="frame" x="33" y="5" width="338" height="22"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" focusRingType="none" placeholderString="Filter..." usesSingleLineMode="YES" bezelStyle="round" id="vvd-HC-Usx">
+                                    <font key="font" metaFont="cellTitle"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </searchFieldCell>
                                 <connections>
-                                    <outlet property="delegate" destination="494" id="qR8-W0-W14"/>
+                                    <outlet property="delegate" destination="494" id="KUX-SR-9nr"/>
                                 </connections>
-                            </menu>
-                        </popUpButtonCell>
-                    </popUpButton>
+                            </searchField>
+                            <popUpButton horizontalHuggingPriority="750" verticalHuggingPriority="750" id="pTb-UR-Euf">
+                                <rect key="frame" x="7" y="3" width="22" height="26"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <popUpButtonCell key="cell" type="disclosure" bezelStyle="roundedDisclosure" imagePosition="only" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" id="j86-0c-T7i">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="menu"/>
+                                    <menu key="menu" title="Options" showsStateColumn="NO" id="TJQ-rB-fHm">
+                                        <items>
+                                            <menuItem title=" Refresh" keyEquivalent="r" id="asb-Mc-b5c">
+                                                <connections>
+                                                    <action selector="refreshNowSelected:" target="494" id="AiB-dg-t4e"/>
+                                                </connections>
+                                            </menuItem>
+                                            <menuItem title=" Mark All As Read" keyEquivalent="a" id="HVf-zs-7iK">
+                                                <modifierMask key="keyEquivalentModifierMask" control="YES" option="YES" command="YES"/>
+                                                <connections>
+                                                    <action selector="markAllReadSelected:" target="494" id="vWk-YR-lXO"/>
+                                                </connections>
+                                            </menuItem>
+                                            <menuItem title=" Preferences..." keyEquivalent="," id="IyB-CB-sO1">
+                                                <connections>
+                                                    <action selector="preferencesSelected:" target="494" id="APu-P9-9A4"/>
+                                                </connections>
+                                            </menuItem>
+                                            <menuItem title=" About Trailer" id="gYG-gS-tKD">
+                                                <modifierMask key="keyEquivalentModifierMask"/>
+                                                <connections>
+                                                    <action selector="makeKeyAndOrderFront:" target="jQi-BK-oDc" id="ryq-zX-bJb"/>
+                                                </connections>
+                                            </menuItem>
+                                            <menuItem title=" Quit" keyEquivalent="q" id="eNw-Iw-Fkg">
+                                                <connections>
+                                                    <action selector="terminate:" target="-3" id="VcX-PJ-RoB"/>
+                                                </connections>
+                                            </menuItem>
+                                        </items>
+                                        <connections>
+                                            <outlet property="delegate" destination="494" id="qR8-W0-W14"/>
+                                        </connections>
+                                    </menu>
+                                </popUpButtonCell>
+                            </popUpButton>
+                        </subviews>
+                    </customView>
                 </subviews>
             </view>
             <connections>
                 <outlet property="delegate" destination="494" id="jEY-vW-iEx"/>
+                <outlet property="header" destination="8KA-D9-rJV" id="Xeo-0o-2k5"/>
                 <outlet property="scrollView" destination="1jc-DF-1GW" id="3OM-0g-ri5"/>
             </connections>
+            <point key="canvasLocation" x="589" y="103"/>
         </window>
         <window allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="jQi-BK-oDc" userLabel="About">
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>

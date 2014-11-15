@@ -2,61 +2,159 @@
 @interface MenuWindow ()
 {
 	NSTrackingArea *topArea, *bottomArea;
-	NSImageView *topArrow, *bottomArrow;
-	NSBox *topBox, *bottomBox;
+	NSImageView *topBox, *bottomBox;
 	BOOL scrollUp;
 	CGFloat scrollDistance;
 	NSTimer *scrollTimer;
 	HTPopTimer *mouseIgnoreTimer;
+
+	NSArray *vibrancyLayers;
 }
 @end
 
 @implementation MenuWindow
 
+#define ARROW_BAND_HEIGHT 22.0
+
 - (void)awakeFromNib
 {
 	[super awakeFromNib];
 
-	// Disabled because it causes serious readability issues for now
-	/*Class vibrantClass=NSClassFromString(@"NSVisualEffectView");
-	if (vibrantClass)
-	{
-		NSVisualEffectView *vibrant=[[vibrantClass alloc] initWithFrame:[self.contentView bounds]];
-		vibrant.autoresizingMask = NSViewWidthSizable|NSViewHeightSizable;
-		[vibrant setBlendingMode:NSVisualEffectBlendingModeBehindWindow];
-		[self.contentView addSubview:vibrant positioned:NSWindowBelow relativeTo:nil];
-	}*/
+	topBox = [[NSImageView alloc] initWithFrame:CGRectZero];
+	topBox.wantsLayer = YES;
+	topBox.image = [NSImage imageNamed:@"upArrow"];
+	[topBox.image setTemplate:YES];
+	[topBox setImageAlignment:NSImageAlignCenter];
 
-	topArrow = [[NSImageView alloc] initWithFrame:CGRectZero];
-	topArrow.image = [NSImage imageNamed:@"upArrow"];
-	[topArrow setImageAlignment:NSImageAlignTop];
-
-	topBox = [[NSBox alloc] initWithFrame:CGRectZero];
-	topBox.boxType = NSBoxCustom;
-	topBox.borderType = NSNoBorder;
-	topBox.fillColor = [COLOR_CLASS whiteColor];
-
-	bottomArrow = [[NSImageView alloc] initWithFrame:CGRectZero];
-	bottomArrow.image = [NSImage imageNamed:@"downArrow"];
-	[bottomArrow setImageAlignment:NSImageAlignBottom];
-
-	bottomBox = [[NSBox alloc] initWithFrame:CGRectZero];
-	bottomBox.boxType = NSBoxCustom;
-	bottomBox.borderType = NSNoBorder;
-	bottomBox.fillColor = [COLOR_CLASS whiteColor];
+	bottomBox = [[NSImageView alloc] initWithFrame:CGRectZero];
+	bottomBox.wantsLayer = YES;
+	bottomBox.image = [NSImage imageNamed:@"downArrow"];
+	[bottomBox.image setTemplate:YES];
+	[bottomBox setImageAlignment:NSImageAlignCenter];
 
 	mouseIgnoreTimer = [[HTPopTimer alloc] initWithTimeInterval:0.4 target:self selector:@selector(mouseIngoreItemPopped:)];
 
+	if([self.scrollView respondsToSelector:@selector(setAutomaticallyAdjustsContentInsets:)])
+	{
+		[self.scrollView setAutomaticallyAdjustsContentInsets:NO];
+	}
+
 	[self.scrollView.contentView setPostsBoundsChangedNotifications:YES];
+
 	[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(boundsDidChange:)
 												 name:NSViewBoundsDidChangeNotification
 											   object:self.scrollView.contentView];
+
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(updateVibrancy)
+												 name:UPDATE_VIBRANCY_NOTIFICATION
+											   object:nil];
+}
+
++ (BOOL)isVibrancySupported
+{
+	Class vibrantClass=NSClassFromString(@"NSVisualEffectView");
+	return (vibrantClass!=nil);
+}
+
+- (void)updateVibrancy
+{
+	BOOL useVibrancy = settings.useVibrancy;
+	[self.contentView setWantsLayer:useVibrancy];
+
+	if(!useVibrancy)
+	{
+		for(NSView *v in vibrancyLayers) [v removeFromSuperview];
+		vibrancyLayers = nil;
+
+		topBox.layer.backgroundColor = [COLOR_CLASS controlBackgroundColor].CGColor;
+		bottomBox.layer.backgroundColor = [COLOR_CLASS controlBackgroundColor].CGColor;
+		self.header.layer.backgroundColor = [COLOR_CLASS controlBackgroundColor].CGColor;
+
+		CGSize windowSize = [self.contentView bounds].size;
+		self.scrollView.frame = CGRectMake(0, 0, windowSize.width, windowSize.height-TOP_HEADER_HEIGHT);
+		if([self.scrollView respondsToSelector:@selector(setContentInsets:)])
+		{
+			self.scrollView.contentInsets = NSEdgeInsetsMake(0, 0, 0, 0);
+		}
+	}
+	else if(useVibrancy && !vibrancyLayers && [MenuWindow isVibrancySupported])
+	{
+		// we're on 10.10+ here
+		self.scrollView.frame = [self.contentView bounds];
+		self.scrollView.contentInsets = NSEdgeInsetsMake(TOP_HEADER_HEIGHT, 0, 0, 0);
+
+		topBox.layer.backgroundColor = [COLOR_CLASS clearColor].CGColor;
+		bottomBox.layer.backgroundColor = [COLOR_CLASS clearColor].CGColor;
+		self.header.layer.backgroundColor = [COLOR_CLASS clearColor].CGColor;
+
+		NSVisualEffectView *headerVibrant=[[NSVisualEffectView alloc] initWithFrame:self.header.bounds];
+		headerVibrant.material = NSVisualEffectMaterialTitlebar;
+		headerVibrant.autoresizingMask = NSViewWidthSizable|NSViewHeightSizable;
+		[headerVibrant setBlendingMode:NSVisualEffectBlendingModeWithinWindow];
+		[self.header addSubview:headerVibrant positioned:NSWindowBelow relativeTo:nil];
+
+		NSVisualEffectView *topBoxVibrant=[[NSVisualEffectView alloc] initWithFrame:topBox.bounds];
+		topBoxVibrant.material = NSVisualEffectMaterialLight;
+		topBoxVibrant.autoresizingMask = NSViewWidthSizable|NSViewHeightSizable;
+		[topBoxVibrant setBlendingMode:NSVisualEffectBlendingModeWithinWindow];
+		[topBox addSubview:topBoxVibrant positioned:NSWindowBelow relativeTo:nil];
+
+		NSVisualEffectView *bottomBoxVibrant=[[NSVisualEffectView alloc] initWithFrame:bottomBox.bounds];
+		bottomBoxVibrant.material = NSVisualEffectMaterialLight;
+		bottomBoxVibrant.autoresizingMask = NSViewWidthSizable|NSViewHeightSizable;
+		[bottomBoxVibrant setBlendingMode:NSVisualEffectBlendingModeWithinWindow];
+		[bottomBox addSubview:bottomBoxVibrant positioned:NSWindowBelow relativeTo:nil];
+
+		NSVisualEffectView *windowVibrant=[[NSVisualEffectView alloc] initWithFrame:[self.contentView bounds]];
+		windowVibrant.autoresizingMask = NSViewWidthSizable|NSViewHeightSizable;
+		[windowVibrant setBlendingMode:NSVisualEffectBlendingModeBehindWindow];
+		[self.contentView addSubview:windowVibrant positioned:NSWindowBelow relativeTo:nil];
+
+		vibrancyLayers = @[windowVibrant,topBoxVibrant,bottomBoxVibrant,headerVibrant];
+	}
+
+	if([self.scrollView respondsToSelector:@selector(setScrollerInsets:)])
+	{
+		self.scrollView.scrollerInsets = NSEdgeInsetsMake(4.0, 0, 0.0, 0);
+	}
 }
 
 - (void)boundsDidChange:(NSNotification *)notification
 {
-	[self testLayout];
+	BOOL needLayout = NO;
+
+	if([self shouldShowTop])
+	{
+		if(!topArea) needLayout = YES;
+	}
+	else
+	{
+		if(topArea)
+		{
+			needLayout = YES;
+			[self disableScrollTimer];
+		}
+	}
+
+	if([self shouldShowBottom])
+	{
+		if(!bottomArea) needLayout = YES;
+	}
+	else
+	{
+		if(bottomArea)
+		{
+			needLayout = YES;
+			[self disableScrollTimer];
+		}
+	}
+
+	if(needLayout)
+	{
+		[self layout];
+	}
 }
 
 - (BOOL)canBecomeKeyWindow
@@ -64,13 +162,8 @@
     return YES;
 }
 
-#define SCROLL_ZONE_HEIGHT 22.0
-#define TOP_CONTROLS_HEIGHT 28.0
-
 - (void)layout
 {
-	[topArrow removeFromSuperview];
-	[bottomArrow removeFromSuperview];
 	[topBox removeFromSuperview];
 	[bottomBox removeFromSuperview];
 	if(topArea)
@@ -85,27 +178,30 @@
 	}
 
 	CGSize size = [self.contentView bounds].size;
-	self.scrollView.frame = CGRectMake(0, 0, size.width, size.height-TOP_CONTROLS_HEIGHT);
-
 	if([self shouldShowTop])
 	{
-		CGRect rect = CGRectMake(0, size.height-SCROLL_ZONE_HEIGHT-TOP_CONTROLS_HEIGHT, size.width-app.scrollBarWidth, SCROLL_ZONE_HEIGHT);
+		CGFloat offset = TOP_HEADER_HEIGHT;
+		if([MenuWindow isVibrancySupported] && settings.useVibrancy) offset += 4.0;
+		CGRect rect = CGRectMake(0, size.height-ARROW_BAND_HEIGHT-offset, size.width-app.scrollBarWidth, ARROW_BAND_HEIGHT);
 		topBox.frame = rect;
-		topArrow.frame = rect;
 		[self.contentView addSubview:topBox];
-		[self.contentView addSubview:topArrow];
 		topArea = [self addTrackingAreaInRect:rect];
 	}
 
 	if([self shouldShowBottom])
 	{
-		CGRect rect = CGRectMake(0, 0, size.width-app.scrollBarWidth, SCROLL_ZONE_HEIGHT);
+		CGRect rect = CGRectMake(0, 0, size.width-app.scrollBarWidth, ARROW_BAND_HEIGHT);
 		bottomBox.frame = rect;
-		bottomArrow.frame = rect;
 		[self.contentView addSubview:bottomBox];
-		[self.contentView addSubview:bottomArrow];
 		bottomArea = [self addTrackingAreaInRect:rect];
 	}
+
+	[self updateVibrancy];
+}
+
+- (void)dealloc
+{
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)scrollToView:(NSView *)view
@@ -215,48 +311,14 @@
 {
 	CGFloat base = self.scrollView.documentVisibleRect.origin.y;
 	CGFloat line = self.scrollView.frame.size.height-[self.scrollView.documentView frame].size.height;
+	if([self.scrollView respondsToSelector:@selector(contentInsets)])
+		line -= self.scrollView.contentInsets.top;
 	return (base+line<0);
 }
 
 - (BOOL)shouldShowBottom
 {
 	return (self.scrollView.contentView.documentVisibleRect.origin.y>0);
-}
-
-- (void)testLayout
-{
-	BOOL needLayout = NO;
-
-	if([self shouldShowTop])
-	{
-		if(!topArea) needLayout = YES;
-	}
-	else
-	{
-		if(topArea)
-		{
-			needLayout = YES;
-			[self disableScrollTimer];
-		}
-	}
-
-	if([self shouldShowBottom])
-	{
-		if(!bottomArea) needLayout = YES;
-	}
-	else
-	{
-		if(bottomArea)
-		{
-			needLayout = YES;
-			[self disableScrollTimer];
-		}
-	}
-
-	if(needLayout)
-	{
-		[self layout];
-	}
 }
 
 @end

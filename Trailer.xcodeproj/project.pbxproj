@@ -14,6 +14,7 @@
 		160C5AD318682CD800142482 /* CommentCounts.m in Sources */ = {isa = PBXBuildFile; fileRef = 160C5AD218682CD800142482 /* CommentCounts.m */; };
 		160E60351A0A29D800742BA9 /* PRLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 160E60341A0A29D800742BA9 /* PRLabel.m */; };
 		160E60361A0A29D800742BA9 /* PRLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 160E60341A0A29D800742BA9 /* PRLabel.m */; };
+		161506E61A1788A800B3E40C /* NSViewAllowsVibrancy.m in Sources */ = {isa = PBXBuildFile; fileRef = 161506E51A1788A800B3E40C /* NSViewAllowsVibrancy.m */; };
 		16154E2F19C43E8E00E49139 /* Launch.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 16154E2E19C43E8E00E49139 /* Launch.storyboard */; };
 		1617BEEA183F538100E89BB2 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 1617BEE9183F538100E89BB2 /* Reachability.m */; };
 		1617BEED183F543600E89BB2 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1617BEEC183F543600E89BB2 /* SystemConfiguration.framework */; };
@@ -115,6 +116,8 @@
 		160E60321A0A28DF00742BA9 /* Trailer 18.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 18.xcdatamodel"; sourceTree = "<group>"; };
 		160E60331A0A29D700742BA9 /* PRLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PRLabel.h; path = ../PRLabel.h; sourceTree = "<group>"; };
 		160E60341A0A29D800742BA9 /* PRLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PRLabel.m; path = ../PRLabel.m; sourceTree = "<group>"; };
+		161506E41A1788A800B3E40C /* NSViewAllowsVibrancy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSViewAllowsVibrancy.h; sourceTree = "<group>"; };
+		161506E51A1788A800B3E40C /* NSViewAllowsVibrancy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSViewAllowsVibrancy.m; sourceTree = "<group>"; };
 		16154E2E19C43E8E00E49139 /* Launch.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Launch.storyboard; sourceTree = "<group>"; };
 		1617BEE8183F538100E89BB2 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		1617BEE9183F538100E89BB2 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
@@ -372,6 +375,8 @@
 				160C5AC51867551500142482 /* CenteredTextFieldCell.m */,
 				16616681189BFC6400FBF4E0 /* LinkTextField.h */,
 				16616682189BFC6400FBF4E0 /* LinkTextField.m */,
+				161506E41A1788A800B3E40C /* NSViewAllowsVibrancy.h */,
+				161506E51A1788A800B3E40C /* NSViewAllowsVibrancy.m */,
 				163D880C18DC750B0075F77E /* HTApplication.h */,
 				163D880D18DC750C0075F77E /* HTApplication.m */,
 			);
@@ -707,6 +712,7 @@
 				161BED25185B5368005C00F7 /* StatusItemView.m in Sources */,
 				160E60351A0A29D800742BA9 /* PRLabel.m in Sources */,
 				160C5AC61867551500142482 /* CenteredTextFieldCell.m in Sources */,
+				161506E61A1788A800B3E40C /* NSViewAllowsVibrancy.m in Sources */,
 				16B9553617EC89B50005118F /* DataItem.m in Sources */,
 				168BC6C717EC2DF000BC4584 /* Trailer.xcdatamodeld in Sources */,
 			);

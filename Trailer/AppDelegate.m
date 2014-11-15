@@ -53,6 +53,8 @@ AppDelegate *app;
 
 	[self updateScrollBarWidth]; // also updates menu
 
+	[self scrollToTop];
+
 	[self startRateLimitHandling];
 
 	[[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate:self];
@@ -148,16 +150,20 @@ AppDelegate *app;
 
 - (IBAction)markUnmergeableOnUserSectionsOnlySelected:(NSButton *)sender
 {
-	BOOL setting = (sender.integerValue==1);
-	settings.markUnmergeableOnUserSectionsOnly = setting;
+	settings.markUnmergeableOnUserSectionsOnly = (sender.integerValue==1);
 	[self updateMenu];
 }
 
 - (IBAction)displayRepositoryNameSelected:(NSButton *)sender
 {
-	BOOL setting = (sender.integerValue==1);
-	settings.showReposInName = setting;
+	settings.showReposInName = (sender.integerValue==1);
 	[self updateMenu];
+}
+
+- (IBAction)useVibrancySelected:(NSButton *)sender
+{
+	settings.useVibrancy = (sender.integerValue==1);
+	[[NSNotificationCenter defaultCenter] postNotificationName:UPDATE_VIBRANCY_NOTIFICATION object:nil];
 }
 
 - (IBAction)logActivityToConsoleSelected:(NSButton *)sender
@@ -612,7 +618,8 @@ AppDelegate *app;
 	if(overflow>0) menuLeft -= overflow;
 
 	CGFloat screenHeight = screen.visibleFrame.size.height;
-	CGFloat menuHeight = 28.0+[self.mainMenu.scrollView.documentView frame].size.height;
+	CGFloat offset = TOP_HEADER_HEIGHT;
+	CGFloat menuHeight = offset+[self.mainMenu.scrollView.documentView frame].size.height;
 	CGFloat bottom = screen.visibleFrame.origin.y;
 	if(menuHeight<screenHeight)
 	{
@@ -1001,6 +1008,7 @@ AppDelegate *app;
 	self.openPrAtFirstUnreadComment.integerValue = settings.openPrAtFirstUnreadComment;
 	self.logActivityToConsole.integerValue = settings.logActivityToConsole;
 	self.showLabels.integerValue = settings.showLabels;
+	self.useVibrancy.integerValue = settings.useVibrancy;
 
 	self.hotkeyEnable.integerValue = settings.hotkeyEnable;
 	self.hotkeyControlModifier.integerValue = settings.hotkeyControlModifier;
@@ -1317,9 +1325,9 @@ AppDelegate *app;
 
 - (void)scrollToTop
 {
-	NSScrollView *scrollView = self.mainMenu.scrollView;
-	[scrollView.documentView scrollPoint:CGPointMake(0, [scrollView.documentView frame].size.height-scrollView.contentView.bounds.size.height)];
-	[self.mainMenu layout];
+	id documentView = self.mainMenu.scrollView.documentView;
+	CGFloat y = [documentView frame].size.height;
+	[documentView scrollPoint:CGPointMake(0, y)];
 }
 
 - (void)windowDidBecomeKey:(NSNotification *)notification
@@ -1995,10 +2003,7 @@ AppDelegate *app;
 
 - (void)updateScrollBarWidth
 {
-	if(self.mainMenu.scrollView.verticalScroller.scrollerStyle==NSScrollerStyleLegacy)
-		self.scrollBarWidth = self.mainMenu.scrollView.verticalScroller.frame.size.width;
-	else
-		self.scrollBarWidth = 0;
+	self.scrollBarWidth = self.mainMenu.scrollView.verticalScroller.frame.size.width;
 	[self updateMenu];
 }
 

@@ -42,6 +42,7 @@
 #import <Sparkle/Sparkle.h>
 #import "StatusItemView.h"
 #import "MenuScrollView.h"
+#import "NSViewAllowsVibrancy.h"
 #import "MenuWindow.h"
 #import "HTPopTimer.h"
 #import "DataManager.h"
