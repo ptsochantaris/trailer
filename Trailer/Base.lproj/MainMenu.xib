@@ -553,9 +553,9 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="oFz-4f-O57">
-                                            <rect key="frame" x="51" y="37" width="346" height="18"/>
+                                            <rect key="frame" x="51" y="37" width="347" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Use vibrancy (recommended only on Retina screens)" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="O1m-Zd-WBS">
+                                            <buttonCell key="cell" type="check" title="Use vibrancy (recommended only for Retina screens)" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="O1m-Zd-WBS">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>

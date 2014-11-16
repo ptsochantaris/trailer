@@ -1585,8 +1585,6 @@ AppDelegate *app;
 	NSFetchRequest *f = [PullRequest requestForPullRequestsWithFilter:self.mainMenuFilter.stringValue];
 	NSArray *pullRequests = [moc executeFetchRequest:f error:nil];
 
-	[self buildPrMenuItemsFromList:pullRequests];
-
 	NSString *countString;
 	NSDictionary *attributes;
 	if([ApiServer shouldReportRefreshFailureInMoc:moc])
@@ -1636,6 +1634,8 @@ AppDelegate *app;
 	self.statusItemView.highlighted = [self.mainMenu isVisible];
 	self.statusItemView.grayOut = self.isRefreshing;
 	self.statusItem.view = self.statusItemView;
+
+	[self buildPrMenuItemsFromList:pullRequests];
 
 	[self sizeMenuAndShow:NO];
 }

@@ -51,8 +51,16 @@ static CGColorRef _highlightColor;
 		}
 
 		NSFont *detailFont = [NSFont menuFontOfSize:10.0];
-		NSMutableAttributedString *_title = [pullRequest titleWithFont:[NSFont menuFontOfSize:13.0] labelFont:detailFont titleColor:[COLOR_CLASS controlTextColor]];
-		NSMutableAttributedString *_subtitle = [pullRequest subtitleWithFont:detailFont];
+
+		BOOL goneDark = [MenuWindow usingVibrancy] && app.statusItemView.darkMode;
+
+		NSMutableAttributedString *_title = [pullRequest titleWithFont:[NSFont menuFontOfSize:13.0]
+															 labelFont:detailFont
+															titleColor:goneDark ? [COLOR_CLASS controlHighlightColor] : [COLOR_CLASS controlTextColor]];
+
+		NSMutableAttributedString *_subtitle = [pullRequest subtitleWithFont:detailFont
+																  lightColor:goneDark ? [COLOR_CLASS lightGrayColor] : [COLOR_CLASS grayColor]
+																   darkColor:goneDark ? [COLOR_CLASS grayColor] : [COLOR_CLASS darkGrayColor]];
 
 		CGFloat W = MENU_WIDTH-LEFTPADDING-app.scrollBarWidth;
 		BOOL showUnpin = pullRequest.condition.integerValue!=kPullRequestConditionOpen || pullRequest.markUnmergeable;
@@ -203,9 +211,14 @@ static CGColorRef _highlightColor;
 		_focused = focused;
 		[self setWantsLayer:_focused];
 		self.layer.backgroundColor = _focused ? [COLOR_CLASS selectedMenuItemColor].CGColor : [COLOR_CLASS clearColor].CGColor;
+
 		NSMutableAttributedString *m = [title.attributedStringValue mutableCopy];
-		[m setAttributes:@{ NSForegroundColorAttributeName: _focused ? [NSColor selectedMenuItemTextColor] : [NSColor controlTextColor] }
-							range:NSMakeRange(0, m.length)];
+		NSColor *titleColor;
+		if(_focused) titleColor = [NSColor selectedControlColor];
+		else if([MenuWindow usingVibrancy] && app.statusItemView.darkMode) titleColor = [NSColor controlHighlightColor];
+		else titleColor = [NSColor controlTextColor];
+		[m setAttributes:@{ NSForegroundColorAttributeName:titleColor } range:NSMakeRange(0, m.length)];
+
 		title.attributedStringValue = m;
 		[[NSNotificationCenter defaultCenter] postNotificationName:PR_ITEM_FOCUSED_NOTIFICATION_KEY
 															object:self

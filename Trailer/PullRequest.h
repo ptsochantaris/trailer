@@ -82,7 +82,7 @@
 
 - (NSMutableAttributedString *)titleWithFont:(FONT_CLASS *)font labelFont:(FONT_CLASS *)labelFont titleColor:(COLOR_CLASS *)titleColor;
 
-- (NSMutableAttributedString *)subtitleWithFont:(FONT_CLASS *)font;
+- (NSMutableAttributedString *)subtitleWithFont:(FONT_CLASS *)font lightColor:(COLOR_CLASS *)lightColor darkColor:(COLOR_CLASS *)darkColor;
 
 - (NSString *)accessibleTitle;
 

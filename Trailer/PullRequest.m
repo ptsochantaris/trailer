@@ -279,7 +279,7 @@ static NSDateFormatter *itemDateFormatter;
 	return (lum < 0.5);
 }
 
-- (NSMutableAttributedString *)subtitleWithFont:(FONT_CLASS *)font
+- (NSMutableAttributedString *)subtitleWithFont:(FONT_CLASS *)font lightColor:(COLOR_CLASS *)lightColor darkColor:(COLOR_CLASS *)darkColor
 {
 	NSMutableAttributedString *_subtitle = [[NSMutableAttributedString alloc] init];
 
@@ -288,7 +288,7 @@ static NSDateFormatter *itemDateFormatter;
 	p.lineHeightMultiple = 1.3;
 #endif
 
-	NSDictionary *lightSubtitle = @{ NSForegroundColorAttributeName: [COLOR_CLASS grayColor],
+	NSDictionary *lightSubtitle = @{ NSForegroundColorAttributeName: lightColor,
 									 NSFontAttributeName:font,
 									 NSParagraphStyleAttributeName: p};
 
@@ -304,7 +304,7 @@ static NSDateFormatter *itemDateFormatter;
 	if(settings.showReposInName)
 	{
 		NSMutableDictionary *darkSubtitle = [lightSubtitle mutableCopy];
-		darkSubtitle[NSForegroundColorAttributeName] = [COLOR_CLASS darkGrayColor];
+		darkSubtitle[NSForegroundColorAttributeName] = darkColor;
 		[_subtitle appendAttributedString:[[NSAttributedString alloc] initWithString:self.repoName
 																		  attributes:darkSubtitle]];
 		[_subtitle appendAttributedString:separator];

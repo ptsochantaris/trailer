@@ -64,10 +64,14 @@ static NSNumberFormatter *itemCountFormatter;
 - (void)setPullRequest:(PullRequest *)pullRequest
 {
 	UIFont *detailFont = [UIFont systemFontOfSize:[UIFont smallSystemFontSize]];
+
 	_title.attributedText = [pullRequest titleWithFont:_title.font
 											 labelFont:[detailFont fontWithSize:detailFont.pointSize-2.0]
 											titleColor:[COLOR_CLASS darkTextColor]];
-	_description.attributedText = [pullRequest subtitleWithFont:detailFont];
+
+	_description.attributedText = [pullRequest subtitleWithFont:detailFont
+													 lightColor:[COLOR_CLASS lightGrayColor]
+													  darkColor:[COLOR_CLASS darkGrayColor]];
 
 	NSInteger _commentsNew=0;
 	NSInteger _commentsTotal = pullRequest.totalComments.integerValue;
