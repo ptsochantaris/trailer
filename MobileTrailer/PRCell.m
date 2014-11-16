@@ -2,7 +2,7 @@
 @interface PRCell ()
 {
 	UILabel *unreadCount, *readCount;
-    NSString *failedToLoadImage, *waitingForImageInPath;
+	NSString *failedToLoadImage, *waitingForImageInPath;
 	__weak IBOutlet UIImageView *_image;
 	__weak IBOutlet UILabel *_title;
 	__weak IBOutlet UILabel *_description;
@@ -23,7 +23,7 @@ static NSNumberFormatter *itemCountFormatter;
 	unreadCount.layer.cornerRadius = 8.5;
 	unreadCount.clipsToBounds = YES;
 	unreadCount.font = [UIFont boldSystemFontOfSize:12.0];
-    unreadCount.hidden = YES;
+	unreadCount.hidden = YES;
 	[self.contentView addSubview:unreadCount];
 
 	readCount = [[UILabel alloc] initWithFrame:CGRectZero];
@@ -32,7 +32,7 @@ static NSNumberFormatter *itemCountFormatter;
 	readCount.layer.cornerRadius = 9.0;
 	readCount.clipsToBounds = YES;
 	readCount.font = [UIFont systemFontOfSize:12.0];
-    readCount.hidden = YES;
+	readCount.hidden = YES;
 	[self.contentView addSubview:readCount];
 
 	static dispatch_once_t onceToken;
@@ -41,7 +41,7 @@ static NSNumberFormatter *itemCountFormatter;
 		itemCountFormatter.numberStyle = NSNumberFormatterDecimalStyle;
 	});
 
-    [[NSNotificationCenter defaultCenter] addObserver:self
+	[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(networkStateChanged)
 												 name:kReachabilityChangedNotification
 											   object:nil];
@@ -49,22 +49,24 @@ static NSNumberFormatter *itemCountFormatter;
 
 - (void)networkStateChanged
 {
-    if(!failedToLoadImage) return;
-    if([app.api.reachability currentReachabilityStatus]!=NotReachable)
+	if(!failedToLoadImage) return;
+	if([app.api.reachability currentReachabilityStatus]!=NotReachable)
 	{
-        [self loadImageAtPath:failedToLoadImage];
+		[self loadImageAtPath:failedToLoadImage];
 	}
 }
 
 - (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)setPullRequest:(PullRequest *)pullRequest
 {
 	UIFont *detailFont = [UIFont systemFontOfSize:[UIFont smallSystemFontSize]];
-	_title.attributedText = [pullRequest titleWithFont:_title.font labelFont:[detailFont fontWithSize:detailFont.pointSize-2.0]];
+	_title.attributedText = [pullRequest titleWithFont:_title.font
+											 labelFont:[detailFont fontWithSize:detailFont.pointSize-2.0]
+											titleColor:[COLOR_CLASS darkTextColor]];
 	_description.attributedText = [pullRequest subtitleWithFont:detailFont];
 
 	NSInteger _commentsNew=0;
@@ -86,9 +88,9 @@ static NSNumberFormatter *itemCountFormatter;
 
 	NSString *imagePath = pullRequest.userAvatarUrl;
 	if(imagePath)
-        [self loadImageAtPath:imagePath];
-    else
-        failedToLoadImage = nil;
+		[self loadImageAtPath:imagePath];
+	else
+		failedToLoadImage = nil;
 
 	self.accessibilityLabel = [NSString stringWithFormat:@"%@, %@ unread comments, %@ total comments, %@",
 							   [pullRequest accessibleTitle],
@@ -102,30 +104,30 @@ static NSNumberFormatter *itemCountFormatter;
 - (void)loadImageAtPath:(NSString *)imagePath
 {
 	waitingForImageInPath = imagePath;
-    if(![app.api haveCachedAvatar:imagePath
-								tryLoadAndCallback:^(id image) {
-									if([waitingForImageInPath isEqualToString:imagePath])
-									{
-										if(image)
-										{
-											// image loaded
-											_image.image = image;
-											failedToLoadImage = nil;
-										}
-										else
-										{
-											// load failed / no image
-											_image.image = [UIImage imageNamed:@"avatarPlaceHolder"];
-											failedToLoadImage = imagePath;
-										}
-										waitingForImageInPath = nil;
-									}
-								}])
-    {
+	if(![app.api haveCachedAvatar:imagePath
+			   tryLoadAndCallback:^(id image) {
+				   if([waitingForImageInPath isEqualToString:imagePath])
+				   {
+					   if(image)
+					   {
+						   // image loaded
+						   _image.image = image;
+						   failedToLoadImage = nil;
+					   }
+					   else
+					   {
+						   // load failed / no image
+						   _image.image = [UIImage imageNamed:@"avatarPlaceHolder"];
+						   failedToLoadImage = imagePath;
+					   }
+					   waitingForImageInPath = nil;
+				   }
+			   }])
+	{
 		// prepare UI for over-the-network load
-        _image.image = [UIImage imageNamed:@"avatarPlaceHolder"];
-        failedToLoadImage = nil;
-    }
+		_image.image = [UIImage imageNamed:@"avatarPlaceHolder"];
+		failedToLoadImage = nil;
+	}
 }
 
 - (void)layoutSubviews
@@ -149,7 +151,7 @@ static NSNumberFormatter *itemCountFormatter;
 
 - (void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated
 {
-    [super setHighlighted:highlighted animated:animated];
+	[super setHighlighted:highlighted animated:animated];
 	[self tone:highlighted];
 }
 

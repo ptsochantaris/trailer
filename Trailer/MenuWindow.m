@@ -23,13 +23,11 @@
 	topBox = [[NSImageView alloc] initWithFrame:CGRectZero];
 	topBox.wantsLayer = YES;
 	topBox.image = [NSImage imageNamed:@"upArrow"];
-	[topBox.image setTemplate:YES];
 	[topBox setImageAlignment:NSImageAlignCenter];
 
 	bottomBox = [[NSImageView alloc] initWithFrame:CGRectZero];
 	bottomBox.wantsLayer = YES;
 	bottomBox.image = [NSImage imageNamed:@"downArrow"];
-	[bottomBox.image setTemplate:YES];
 	[bottomBox setImageAlignment:NSImageAlignCenter];
 
 	mouseIgnoreTimer = [[HTPopTimer alloc] initWithTimeInterval:0.4 target:self selector:@selector(mouseIngoreItemPopped:)];
@@ -50,44 +48,42 @@
 											 selector:@selector(updateVibrancy)
 												 name:UPDATE_VIBRANCY_NOTIFICATION
 											   object:nil];
+
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(updateVibrancy)
+												 name:DARK_MODE_CHANGED
+											   object:nil];
 }
 
-+ (BOOL)isVibrancySupported
++ (BOOL)usingVibrancy
 {
-	Class vibrantClass=NSClassFromString(@"NSVisualEffectView");
-	return (vibrantClass!=nil);
+	return settings.useVibrancy && (NSClassFromString(@"NSVisualEffectView")!=nil);
 }
 
 - (void)updateVibrancy
 {
-	BOOL useVibrancy = settings.useVibrancy;
-	[self.contentView setWantsLayer:useVibrancy];
+	BOOL usingVibrancy = [MenuWindow usingVibrancy];
 
-	if(!useVibrancy)
-	{
-		for(NSView *v in vibrancyLayers) [v removeFromSuperview];
-		vibrancyLayers = nil;
+	[self.header setWantsLayer:usingVibrancy];
+	[self.contentView setWantsLayer:usingVibrancy];
+	for(NSView *v in vibrancyLayers) [v removeFromSuperview];
+	vibrancyLayers = nil;
 
-		topBox.layer.backgroundColor = [COLOR_CLASS controlBackgroundColor].CGColor;
-		bottomBox.layer.backgroundColor = [COLOR_CLASS controlBackgroundColor].CGColor;
-		self.header.layer.backgroundColor = [COLOR_CLASS controlBackgroundColor].CGColor;
+	// ensure temp[lates are updated
+	[topBox.image setTemplate:YES];
+	[bottomBox.image setTemplate:YES];
 
-		CGSize windowSize = [self.contentView bounds].size;
-		self.scrollView.frame = CGRectMake(0, 0, windowSize.width, windowSize.height-TOP_HEADER_HEIGHT);
-		if([self.scrollView respondsToSelector:@selector(setContentInsets:)])
-		{
-			self.scrollView.contentInsets = NSEdgeInsetsMake(0, 0, 0, 0);
-		}
-	}
-	else if(useVibrancy && !vibrancyLayers && [MenuWindow isVibrancySupported])
+	CGColorRef bgColor;
+
+	if(usingVibrancy)
 	{
 		// we're on 10.10+ here
 		self.scrollView.frame = [self.contentView bounds];
 		self.scrollView.contentInsets = NSEdgeInsetsMake(TOP_HEADER_HEIGHT, 0, 0, 0);
 
-		topBox.layer.backgroundColor = [COLOR_CLASS clearColor].CGColor;
-		bottomBox.layer.backgroundColor = [COLOR_CLASS clearColor].CGColor;
-		self.header.layer.backgroundColor = [COLOR_CLASS clearColor].CGColor;
+		bgColor = [COLOR_CLASS clearColor].CGColor;
+
+		self.appearance = [NSAppearance appearanceNamed:app.statusItemView.darkMode ? NSAppearanceNameVibrantDark : NSAppearanceNameVibrantLight];
 
 		NSVisualEffectView *headerVibrant=[[NSVisualEffectView alloc] initWithFrame:self.header.bounds];
 		headerVibrant.material = NSVisualEffectMaterialTitlebar;
@@ -96,13 +92,11 @@
 		[self.header addSubview:headerVibrant positioned:NSWindowBelow relativeTo:nil];
 
 		NSVisualEffectView *topBoxVibrant=[[NSVisualEffectView alloc] initWithFrame:topBox.bounds];
-		topBoxVibrant.material = NSVisualEffectMaterialLight;
 		topBoxVibrant.autoresizingMask = NSViewWidthSizable|NSViewHeightSizable;
 		[topBoxVibrant setBlendingMode:NSVisualEffectBlendingModeWithinWindow];
 		[topBox addSubview:topBoxVibrant positioned:NSWindowBelow relativeTo:nil];
 
 		NSVisualEffectView *bottomBoxVibrant=[[NSVisualEffectView alloc] initWithFrame:bottomBox.bounds];
-		bottomBoxVibrant.material = NSVisualEffectMaterialLight;
 		bottomBoxVibrant.autoresizingMask = NSViewWidthSizable|NSViewHeightSizable;
 		[bottomBoxVibrant setBlendingMode:NSVisualEffectBlendingModeWithinWindow];
 		[bottomBox addSubview:bottomBoxVibrant positioned:NSWindowBelow relativeTo:nil];
@@ -114,11 +108,26 @@
 
 		vibrancyLayers = @[windowVibrant,topBoxVibrant,bottomBoxVibrant,headerVibrant];
 	}
+	else
+	{
+		if([self respondsToSelector:@selector(setAppearance:)])
+			[self setAppearance:[NSAppearance appearanceNamed:NSAppearanceNameAqua]];
+
+		bgColor = [COLOR_CLASS controlBackgroundColor].CGColor;
+
+		CGSize windowSize = [self.contentView bounds].size;
+		self.scrollView.frame = CGRectMake(0, 0, windowSize.width, windowSize.height-TOP_HEADER_HEIGHT);
+
+		if([self.scrollView respondsToSelector:@selector(setContentInsets:)])
+			self.scrollView.contentInsets = NSEdgeInsetsMake(0, 0, 0, 0);
+	}
+
+	topBox.layer.backgroundColor = bgColor;
+	bottomBox.layer.backgroundColor = bgColor;
+	self.header.layer.backgroundColor = bgColor;
 
 	if([self.scrollView respondsToSelector:@selector(setScrollerInsets:)])
-	{
 		self.scrollView.scrollerInsets = NSEdgeInsetsMake(4.0, 0, 0.0, 0);
-	}
 }
 
 - (void)boundsDidChange:(NSNotification *)notification
@@ -164,15 +173,21 @@
 
 - (void)layout
 {
+	BOOL needVibrancyUpdate = NO;
+	BOOL startedWithTopArea = NO;
+	BOOL startedWithBottomArea = NO;
+
 	[topBox removeFromSuperview];
 	[bottomBox removeFromSuperview];
 	if(topArea)
 	{
+		startedWithTopArea = YES;
 		[self.contentView removeTrackingArea:topArea];
 		topArea = nil;
 	}
 	if(bottomArea)
 	{
+		startedWithBottomArea = YES;
 		[self.contentView removeTrackingArea:bottomArea];
 		bottomArea = nil;
 	}
@@ -181,11 +196,16 @@
 	if([self shouldShowTop])
 	{
 		CGFloat offset = TOP_HEADER_HEIGHT;
-		if([MenuWindow isVibrancySupported] && settings.useVibrancy) offset += 4.0;
+		if([MenuWindow usingVibrancy]) offset += 4.0;
 		CGRect rect = CGRectMake(0, size.height-ARROW_BAND_HEIGHT-offset, size.width-app.scrollBarWidth, ARROW_BAND_HEIGHT);
 		topBox.frame = rect;
 		[self.contentView addSubview:topBox];
 		topArea = [self addTrackingAreaInRect:rect];
+		needVibrancyUpdate = !startedWithTopArea;
+	}
+	else
+	{
+		needVibrancyUpdate = startedWithTopArea;
 	}
 
 	if([self shouldShowBottom])
@@ -194,9 +214,14 @@
 		bottomBox.frame = rect;
 		[self.contentView addSubview:bottomBox];
 		bottomArea = [self addTrackingAreaInRect:rect];
+		needVibrancyUpdate = needVibrancyUpdate || !startedWithBottomArea;
+	}
+	else
+	{
+		needVibrancyUpdate = needVibrancyUpdate || startedWithBottomArea;
 	}
 
-	[self updateVibrancy];
+	if(needVibrancyUpdate) [self updateVibrancy];
 }
 
 - (void)dealloc

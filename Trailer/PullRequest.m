@@ -212,14 +212,13 @@ static NSDateFormatter *itemDateFormatter;
 	return [components componentsJoinedByString:@","];
 }
 
-- (NSMutableAttributedString *)titleWithFont:(FONT_CLASS *)font labelFont:(FONT_CLASS *)labelFont
+- (NSMutableAttributedString *)titleWithFont:(FONT_CLASS *)font labelFont:(FONT_CLASS *)labelFont titleColor:(COLOR_CLASS *)titleColor
 {
 	NSMutableParagraphStyle *p = [[NSMutableParagraphStyle alloc] init];
 	p.paragraphSpacing = 1.0;
 
 	NSDictionary *titleAttributes = @{ NSFontAttributeName: font,
-									   NSForegroundColorAttributeName: [COLOR_CLASS blackColor],
-									   NSBackgroundColorAttributeName: [COLOR_CLASS clearColor],
+									   NSForegroundColorAttributeName: titleColor,
 									   NSParagraphStyleAttributeName: p,
 									   };
 

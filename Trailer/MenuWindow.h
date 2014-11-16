@@ -10,6 +10,6 @@
 
 - (void)scrollToView:(NSView *)view;
 
-+ (BOOL)isVibrancySupported;
++ (BOOL)usingVibrancy;
 
 @end

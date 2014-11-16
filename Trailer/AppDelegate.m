@@ -87,6 +87,11 @@ AppDelegate *app;
 												 name:NSPreferredScrollerStyleDidChangeNotification
 											   object:nil];
 
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(updateMenu)
+												 name:DARK_MODE_CHANGED
+											   object:nil];
+
 	[self addHotKeySupport];
 
 	SUUpdater *s = [SUUpdater sharedUpdater];
@@ -2003,7 +2008,10 @@ AppDelegate *app;
 
 - (void)updateScrollBarWidth
 {
-	self.scrollBarWidth = self.mainMenu.scrollView.verticalScroller.frame.size.width;
+	if(self.mainMenu.scrollView.verticalScroller.scrollerStyle==NSScrollerStyleLegacy)
+		self.scrollBarWidth = self.mainMenu.scrollView.verticalScroller.frame.size.width;
+	else
+		self.scrollBarWidth = 0;
 	[self updateMenu];
 }
 

@@ -1279,7 +1279,7 @@ Enter to select and ⌘, for preferences.
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="0.0" y="0.0" width="376" height="710"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1080"/>
-            <view key="contentView" appearanceType="aqua" id="pz7-Cu-3Sm">
+            <view key="contentView" id="pz7-Cu-3Sm">
                 <rect key="frame" x="0.0" y="0.0" width="376" height="710"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
@@ -1291,7 +1291,7 @@ Enter to select and ⌘, for preferences.
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <view id="lMY-YH-Amm">
-                                    <rect key="frame" x="0.0" y="0.0" width="376" height="710"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="376" height="738"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 </view>
                             </subviews>
@@ -1301,7 +1301,7 @@ Enter to select and ⌘, for preferences.
                             <rect key="frame" x="-100" y="-100" width="376" height="16"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
-                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="vQq-6N-Tac">
+                        <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="vQq-6N-Tac">
                             <rect key="frame" x="361" y="0.0" width="15" height="682"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>

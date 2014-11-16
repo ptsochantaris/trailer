@@ -3,6 +3,7 @@
 {
 	NSTrackingArea *trackingArea;
 	NSManagedObjectID *pullRequestId;
+	CenteredTextField *title;
 }
 @end
 
@@ -18,13 +19,9 @@ static CGColorRef _highlightColor;
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
 
-		_highlightColor = CGColorCreateCopy(MAKECOLOR(0.92, 0.92, 0.92, 1.0).CGColor);
-
 		NSMutableParagraphStyle *paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
 		paragraphStyle.headIndent = 92.0;
-		_statusAttributes = @{
-							   NSFontAttributeName:[NSFont fontWithName:@"Monaco" size:9.0],
-							   NSBackgroundColorAttributeName:[NSColor clearColor],
+		_statusAttributes = @{ NSFontAttributeName:[NSFont fontWithName:@"Monaco" size:9.0],
 							   NSParagraphStyleAttributeName: paragraphStyle,
 							   };
 	});
@@ -41,6 +38,8 @@ static CGColorRef _highlightColor;
 		self.delegate = delegate;
 		pullRequestId = pullRequest.objectID;
 
+		_highlightColor = [COLOR_CLASS selectedMenuItemColor].CGColor;
+
 		NSInteger _commentsNew = 0;
 		NSInteger _commentsTotal = pullRequest.totalComments.integerValue;
 		NSInteger sectionIndex = pullRequest.sectionIndex.integerValue;
@@ -52,7 +51,7 @@ static CGColorRef _highlightColor;
 		}
 
 		NSFont *detailFont = [NSFont menuFontOfSize:10.0];
-		NSMutableAttributedString *_title = [pullRequest titleWithFont:[NSFont menuFontOfSize:13.0] labelFont:detailFont];
+		NSMutableAttributedString *_title = [pullRequest titleWithFont:[NSFont menuFontOfSize:13.0] labelFont:detailFont titleColor:[COLOR_CLASS controlTextColor]];
 		NSMutableAttributedString *_subtitle = [pullRequest subtitleWithFont:detailFont];
 
 		CGFloat W = MENU_WIDTH-LEFTPADDING-app.scrollBarWidth;
@@ -147,7 +146,7 @@ static CGColorRef _highlightColor;
 			}
 		}
 
-		CenteredTextField *title = [[CenteredTextField alloc] initWithFrame:titleRect];
+		title = [[CenteredTextField alloc] initWithFrame:titleRect];
 		title.attributedStringValue = _title;
 		[self addSubview:title];
 
@@ -187,17 +186,6 @@ static CGColorRef _highlightColor;
 	[self.delegate unPinSelectedFrom:self];
 }
 
-- (void)drawRect:(NSRect)dirtyRect
-{
-	[super drawRect:dirtyRect];
-	if(_focused)
-	{
-		CGContextRef context = (CGContextRef) [[NSGraphicsContext currentContext] graphicsPort];
-		CGContextSetFillColorWithColor(context, _highlightColor);
-		CGContextFillRect(context, CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height));
-	}
-}
-
 - (void)mouseEntered:(NSEvent *)theEvent
 {
 	if(!app.isManuallyScrolling) self.focused = YES;
@@ -213,7 +201,12 @@ static CGColorRef _highlightColor;
 	if(_focused!=focused)
 	{
 		_focused = focused;
-		[self setNeedsDisplay:YES];
+		[self setWantsLayer:_focused];
+		self.layer.backgroundColor = _focused ? [COLOR_CLASS selectedMenuItemColor].CGColor : [COLOR_CLASS clearColor].CGColor;
+		NSMutableAttributedString *m = [title.attributedStringValue mutableCopy];
+		[m setAttributes:@{ NSForegroundColorAttributeName: _focused ? [NSColor selectedMenuItemTextColor] : [NSColor controlTextColor] }
+							range:NSMakeRange(0, m.length)];
+		title.attributedStringValue = m;
 		[[NSNotificationCenter defaultCenter] postNotificationName:PR_ITEM_FOCUSED_NOTIFICATION_KEY
 															object:self
 														  userInfo:@{ PR_ITEM_FOCUSED_STATE_KEY: @(focused) }];

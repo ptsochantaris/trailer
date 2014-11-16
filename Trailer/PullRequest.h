@@ -80,7 +80,7 @@
 
 - (void)postProcess;
 
-- (NSMutableAttributedString *)titleWithFont:(FONT_CLASS *)font labelFont:(FONT_CLASS *)labelFont;
+- (NSMutableAttributedString *)titleWithFont:(FONT_CLASS *)font labelFont:(FONT_CLASS *)labelFont titleColor:(COLOR_CLASS *)titleColor;
 
 - (NSMutableAttributedString *)subtitleWithFont:(FONT_CLASS *)font;
 

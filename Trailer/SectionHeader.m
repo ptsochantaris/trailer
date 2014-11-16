@@ -7,27 +7,6 @@
 
 @implementation SectionHeader
 
-static NSDictionary *_titleAttributes;
-static CGColorRef _lightGray;
-
-+ (void)initialize
-{
-	static dispatch_once_t onceToken;
-	dispatch_once(&onceToken, ^{
-
-		NSMutableParagraphStyle *pCenter = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-		pCenter.alignment = NSCenterTextAlignment;
-
-		_lightGray = CGColorCreateCopy(MAKECOLOR(0.92, 0.92, 0.92, 1.0).CGColor);
-
-		_titleAttributes = @{
-							 NSFontAttributeName:[NSFont boldSystemFontOfSize:14.0],
-							 NSForegroundColorAttributeName:[COLOR_CLASS lightGrayColor],
-							 NSBackgroundColorAttributeName:[COLOR_CLASS clearColor],
-							 };
-	});
-}
-
 #define TITLE_HEIGHT 42
 
 - (id)initWithRemoveAllDelegate:(id<SectionHeaderDelegate>)delegate title:(NSString *)title
@@ -48,9 +27,17 @@ static CGColorRef _lightGray;
 			[self addSubview:_unpin];
 		}
 
+		NSMutableParagraphStyle *pCenter = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+		pCenter.alignment = NSCenterTextAlignment;
+
+		NSDictionary *titleAttributes = @{ NSFontAttributeName:[NSFont boldSystemFontOfSize:14.0],
+										   NSForegroundColorAttributeName:[COLOR_CLASS controlShadowColor],
+										   };
+		
 		CGRect titleRect = CGRectMake(12, 0, W-120-AVATAR_SIZE-LEFTPADDING, TITLE_HEIGHT-8.0);
 		titleView = [[CenteredTextField alloc] initWithFrame:titleRect];
-		titleView.attributedStringValue = [[NSAttributedString alloc] initWithString:title attributes:_titleAttributes];
+		titleView.attributedStringValue = [[NSAttributedString alloc] initWithString:title
+																		  attributes:titleAttributes];
 		[self addSubview:titleView];
     }
     return self;
@@ -65,7 +52,7 @@ static CGColorRef _lightGray;
 {
 	[super drawRect:dirtyRect];
 	CGContextRef context = (CGContextRef) [[NSGraphicsContext currentContext] graphicsPort];
-	CGContextSetFillColorWithColor(context, _lightGray);
+	CGContextSetFillColorWithColor(context, [COLOR_CLASS controlShadowColor].CGColor);
 	CGContextFillRect(context, CGRectMake(1.0, self.bounds.size.height-5.0, MENU_WIDTH-2.0, 1.0));
 }
 

@@ -142,7 +142,11 @@
 						 }
 						 else
 						 {
-							 apiServer.lastSyncSucceeded = @NO;
+							 // 404/410 means the PR has been deleted
+							 if(!(resultCode==404 || resultCode==410))
+							 {
+								 apiServer.lastSyncSucceeded = @NO;
+							 }
 						 }
 						 if(operationCount==total) CALLBACK();
 					 }];
@@ -275,7 +279,10 @@
 					 return NO;
 				 } finalCallback:^(BOOL success, NSInteger resultCode, NSString *etag) {
 					 operationCount++;
-					 if(!success) apiServer.lastSyncSucceeded = @NO;
+					 if(!success)
+					 {
+						 apiServer.lastSyncSucceeded = @NO;
+					 }
 					 if(operationCount==total) CALLBACK();
 				 }];
 	}
@@ -572,7 +579,10 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 				 return NO;
 			 } finalCallback:^(BOOL success, NSInteger resultCode, NSString *etag) {
 				 apiServer.latestReceivedEventEtag = etag;
-				 if(!success) apiServer.lastSyncSucceeded = @NO;
+				 if(!success)
+				 {
+					 apiServer.lastSyncSucceeded = @NO;
+				 }
 				 CALLBACK();
 			 }];
 }
@@ -620,7 +630,10 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 				 return NO;
 			 } finalCallback:^(BOOL success, NSInteger resultCode, NSString *etag) {
 				 apiServer.latestUserEventEtag = etag;
-				 if(!success) apiServer.lastSyncSucceeded = @NO;
+				 if(!success)
+				 {
+					 apiServer.lastSyncSucceeded = @NO;
+				 }
 				 CALLBACK();
 			 }];
 }

@@ -16,6 +16,7 @@
 		_label = label;
 		_delegate = delegate;
 		_attributes = attributes;
+		_darkMode = [StatusItemView checkDarkMode];
 	}
 	return self;
 }
@@ -26,7 +27,7 @@
 	[self setNeedsDisplay:YES];
 }
 
-- (BOOL)darkMode
++ (BOOL)checkDarkMode
 {
 	if(NSAppKitVersionNumber>NSAppKitVersionNumber10_9)
 	{
@@ -37,6 +38,17 @@
 		}
 	}
 	return NO;
+}
+
+- (void)setDarkMode:(BOOL)darkMode
+{
+	if(_darkMode!=darkMode)
+	{
+		_darkMode = darkMode;
+		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+			[[NSNotificationCenter defaultCenter] postNotificationName:DARK_MODE_CHANGED object:nil];
+		});
+	}
 }
 
 - (void)drawRect:(NSRect)dirtyRect
@@ -50,6 +62,8 @@
 	NSMutableDictionary *textAttributes = [_attributes mutableCopy];
 	NSImage *icon;
 
+	self.darkMode = [StatusItemView checkDarkMode];
+
 	if(_highlighted)
 	{
 		icon = [NSImage imageNamed:@"menuIconBright"];
@@ -57,7 +71,7 @@
 	}
 	else
 	{
-		if([self darkMode])
+		if(self.darkMode)
 		{
 			icon = [NSImage imageNamed:@"menuIconBright"];
 			if([textAttributes[NSForegroundColorAttributeName] isEqual:[COLOR_CLASS controlTextColor]])
