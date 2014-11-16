@@ -53,7 +53,8 @@
 	[super drawRect:dirtyRect];
 	CGContextRef context = (CGContextRef) [[NSGraphicsContext currentContext] graphicsPort];
 	CGContextSetFillColorWithColor(context, [COLOR_CLASS controlShadowColor].CGColor);
-	CGContextFillRect(context, CGRectMake(1.0, self.bounds.size.height-5.0, MENU_WIDTH-2.0, 1.0));
+	CGFloat offset = [MenuWindow usingVibrancy] ? -4.0 : -4.5;
+	CGContextFillRect(context, CGRectMake(1.0, self.bounds.size.height+offset, MENU_WIDTH-2.0, 0.5));
 }
 
 - (void)unPinSelected:(NSButton *)button
