@@ -467,19 +467,22 @@ static NSDateFormatter *itemDateFormatter;
 		NSArray *terms = settings.statusFilteringTerms;
 		if(terms.count)
 		{
-			NSMutableArray *ors = [NSMutableArray arrayWithCapacity:terms.count];
+			NSMutableArray *subpredicates = [NSMutableArray arrayWithCapacity:terms.count];
 			for(NSString *term in terms)
 			{
-				[ors addObject:[NSString stringWithFormat:@"descriptionText contains[cd] '%@'", term]];
+				[subpredicates addObject:[NSPredicate predicateWithFormat:@"descriptionText contains[cd] %@", term]];
 			}
+			NSPredicate *orPredicate = [NSCompoundPredicate orPredicateWithSubpredicates:subpredicates];
+			NSPredicate *selfPredicate = [NSPredicate predicateWithFormat:@"pullRequest == %@", self];
 
 			if(mode==kStatusFilterInclude)
 			{
-				f.predicate = [NSPredicate predicateWithFormat:@"pullRequest == %@ and (%@)", self, [ors componentsJoinedByString:@" or "]];
+				f.predicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[selfPredicate, orPredicate]];
 			}
 			else
 			{
-				f.predicate = [NSPredicate predicateWithFormat:@"pullRequest == %@ and (not (%@))", self, [ors componentsJoinedByString:@" or "]];
+				NSPredicate *notOrPredicate = [NSCompoundPredicate notPredicateWithSubpredicate:orPredicate];
+				f.predicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[selfPredicate, notOrPredicate]];
 			}
 		}
 		else
