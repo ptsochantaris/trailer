@@ -465,7 +465,7 @@ user you can add more servers from the left.</string>
                                             </textFieldCell>
                                         </textField>
                                         <button id="AEB-MY-2H6">
-                                            <rect key="frame" x="51" y="243" width="419" height="18"/>
+                                            <rect key="frame" x="51" y="239" width="419" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Display PR creation time instead of most recent activity time" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="FUA-CI-tqc">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -476,7 +476,7 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="ZD1-Lw-zpW">
-                                            <rect key="frame" x="51" y="218" width="405" height="18"/>
+                                            <rect key="frame" x="51" y="214" width="405" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Move PRs assigned to me to the &quot;My Pull Requests&quot; section" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="4g6-XV-fVn">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -487,7 +487,7 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="SoW-AJ-5kD">
-                                            <rect key="frame" x="51" y="193" width="442" height="18"/>
+                                            <rect key="frame" x="51" y="189" width="442" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Mark PRs as un-mergeable only in my own or participated sections" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="yfb-m7-og2">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -498,7 +498,7 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="y7T-zw-tAa">
-                                            <rect key="frame" x="51" y="149" width="335" height="18"/>
+                                            <rect key="frame" x="51" y="148" width="335" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Count only currently displayed PRs in the menubar" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="pnZ-CL-lVd">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -509,7 +509,7 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="KdG-4v-vf7">
-                                            <rect key="frame" x="51" y="310" width="140" height="18"/>
+                                            <rect key="frame" x="51" y="307" width="140" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Hide user avatars" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="eW5-mR-deV">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -520,7 +520,7 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="4E0-iw-eoN">
-                                            <rect key="frame" x="51" y="285" width="193" height="18"/>
+                                            <rect key="frame" x="51" y="282" width="193" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Hide the &quot;All PRs&quot; section" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="JA8-t0-2Rt">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -531,7 +531,7 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="cyW-kN-E51">
-                                            <rect key="frame" x="51" y="80" width="272" height="18"/>
+                                            <rect key="frame" x="51" y="81" width="272" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Include repository names when filtering" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="iJ5-8d-ZYv">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -542,7 +542,7 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="NO0-4G-QWM">
-                                            <rect key="frame" x="51" y="106" width="238" height="18"/>
+                                            <rect key="frame" x="51" y="107" width="238" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Display repository names in PR list" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Xz9-oA-gKh">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -553,7 +553,7 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="oFz-4f-O57">
-                                            <rect key="frame" x="51" y="37" width="347" height="18"/>
+                                            <rect key="frame" x="51" y="38" width="347" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Use vibrancy (recommended only for Retina screens)" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="O1m-Zd-WBS">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>

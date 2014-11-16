@@ -209,17 +209,31 @@ static CGColorRef _highlightColor;
 	if(_focused!=focused)
 	{
 		_focused = focused;
-		[self setWantsLayer:_focused];
-		self.layer.backgroundColor = _focused ? [COLOR_CLASS selectedMenuItemColor].CGColor : [COLOR_CLASS clearColor].CGColor;
+		if(_focused)
+		{
+			[self setWantsLayer:YES];
+			if([MenuWindow usingVibrancy])
+			{
+				if(app.statusItemView.darkMode)
+				{
+					self.layer.backgroundColor = [COLOR_CLASS colorWithWhite:0.0 alpha:0.4].CGColor;
+				}
+				else
+				{
+					self.layer.backgroundColor = [COLOR_CLASS whiteColor].CGColor;
+				}
+			}
+			else
+			{
+				self.layer.backgroundColor = MAKECOLOR(0.94, 0.94, 0.94, 1.0).CGColor;
+			}
+		}
+		else
+		{
+			self.layer.backgroundColor = [COLOR_CLASS clearColor].CGColor;
+			[self setWantsLayer:NO];
+		}
 
-		NSMutableAttributedString *m = [title.attributedStringValue mutableCopy];
-		NSColor *titleColor;
-		if(_focused) titleColor = [NSColor selectedControlColor];
-		else if([MenuWindow usingVibrancy] && app.statusItemView.darkMode) titleColor = [NSColor controlHighlightColor];
-		else titleColor = [NSColor controlTextColor];
-		[m setAttributes:@{ NSForegroundColorAttributeName:titleColor } range:NSMakeRange(0, m.length)];
-
-		title.attributedStringValue = m;
 		[[NSNotificationCenter defaultCenter] postNotificationName:PR_ITEM_FOCUSED_NOTIFICATION_KEY
 															object:self
 														  userInfo:@{ PR_ITEM_FOCUSED_STATE_KEY: @(focused) }];
