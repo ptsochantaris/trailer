@@ -29,6 +29,24 @@
 	return s;
 }
 
+- (COLOR_CLASS *)colorForDarkDisplay
+{
+	static COLOR_CLASS *STATUS_RED, *STATUS_YELLOW, *STATUS_GREEN;
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		STATUS_RED = MAKECOLOR(0.8, 0.5, 0.5, 1.0);
+		STATUS_YELLOW = MAKECOLOR(0.9, 0.8, 0.3, 1.0);
+		STATUS_GREEN = MAKECOLOR(0.6, 0.8, 0.6, 1.0);
+	});
+
+	if([self.state isEqualToString:@"pending"])
+		return STATUS_YELLOW;
+	else if([self.state isEqualToString:@"success"])
+		return STATUS_GREEN;
+	else
+		return STATUS_RED;
+}
+
 - (COLOR_CLASS *)colorForDisplay
 {
 	static COLOR_CLASS *STATUS_RED, *STATUS_YELLOW, *STATUS_GREEN;

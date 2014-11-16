@@ -17,6 +17,8 @@
 
 - (COLOR_CLASS *)colorForDisplay;
 
+- (COLOR_CLASS *)colorForDarkDisplay;
+
 - (NSString *)displayText;
 
 @end

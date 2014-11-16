@@ -12,4 +12,6 @@
 
 + (BOOL)usingVibrancy;
 
+- (void)updateVibrancy;
+
 @end

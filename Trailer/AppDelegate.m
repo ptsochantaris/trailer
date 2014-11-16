@@ -1333,6 +1333,7 @@ AppDelegate *app;
 	id documentView = self.mainMenu.scrollView.documentView;
 	CGFloat y = [documentView frame].size.height;
 	[documentView scrollPoint:CGPointMake(0, y)];
+	[self.mainMenu updateVibrancy];
 }
 
 - (void)windowDidBecomeKey:(NSNotification *)notification

@@ -172,7 +172,7 @@ static CGColorRef _highlightColor;
 			statusLabel.needsCommand = !settings.makeStatusItemsSelectable;
 			statusLabel.attributedStringValue = [[NSAttributedString alloc] initWithString:status.displayText
 																				attributes:_statusAttributes];
-			statusLabel.textColor = status.colorForDisplay;
+			statusLabel.textColor = goneDark ? status.colorForDarkDisplay : status.colorForDisplay;
 			[self addSubview:statusLabel];
 		}
 
