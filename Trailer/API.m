@@ -200,7 +200,11 @@
 					 }
 					 else
 					 {
-						 apiServer.lastSyncSucceeded = @NO;
+						 // 404/410 means the PR has been deleted
+						 if(!(resultCode==404 || resultCode==410))
+						 {
+							 apiServer.lastSyncSucceeded = @NO;
+						 }
 					 }
 					 if(operationCount==total) CALLBACK();
 				 }];
