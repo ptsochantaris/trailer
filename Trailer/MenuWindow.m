@@ -110,8 +110,10 @@
 	}
 	else
 	{
-		if([self respondsToSelector:@selector(setAppearance:)])
+		if(NSAppKitVersionNumber>NSAppKitVersionNumber10_9)
+		{
 			[self setAppearance:[NSAppearance appearanceNamed:NSAppearanceNameAqua]];
+		}
 
 		bgColor = [COLOR_CLASS controlBackgroundColor].CGColor;
 

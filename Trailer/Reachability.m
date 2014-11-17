@@ -50,17 +50,16 @@ NSString *kReachabilityChangedNotification = @"kNetworkReachabilityChangedNotifi
 
 #pragma mark - Supporting functions
 
-#define kShouldPrintReachabilityFlags 1
+//#define kShouldPrintReachabilityFlags 1
 
 static void PrintReachabilityFlags(SCNetworkReachabilityFlags flags, const char* comment)
 {
 #if kShouldPrintReachabilityFlags
-
-    NSLog(@"Reachability Flag Status: %c%c %c%c%c%c%c%c%c %s\n",
+    DLog(@"Reachability Flag Status: %c%c %c%c%c%c%c%c%c %s\n",
 #ifdef _IPHONE_OS_VERSION_MIN_REQUIRED
           (flags & kSCNetworkReachabilityFlagsIsWWAN)               ? 'W' : '-',
 #else
-          '-',
+																			'-',
 #endif
           (flags & kSCNetworkReachabilityFlagsReachable)            ? 'R' : '-',
 
