@@ -7,6 +7,25 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.1.4</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Added optional support for vibrancy in Yosemite, which also allows extended dark mode support</li>
+				<li>Status filtering crash corrected (thank you @ypresto!)</li>
+				<li>Status and label fetching-related bugs corrected</li>
+				<li>Readability colour tweaks and small Retina-related improvements</li>
+				<li>Image display corrections under OS X 10.8</li>
+				<li>Preference layout improvements for OS X < 10.10</li>
+				</ul></font>]]></description>
+			<pubDate>Mon, 17 Nov 2014 11:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer114.zip"
+			sparkle:version="1163"
+			sparkle:shortVersionString="1.1.4"
+			sparkle:dsaSignature="MC0CFDH9QKYL2TpC9BzzujWdIs0wrRHrAhUAgSi855l6LMxjaVuZs3suOLEKuac="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.1.3</title>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
 				<li>Auto-updater now pointing for new trailer repository</li>
