@@ -13,15 +13,15 @@
 	if(self)
 	{
 		self.imageAlignment = NSImageAlignCenter;
-        if(![app.api haveCachedAvatar:urlPath
-									tryLoadAndCallback:^(id image) {
-										self.image = image;
-										[self done];
-									}])
-        {
-            [self startSpinner];
-        }
-    }
+		if(![app.api haveCachedAvatar:urlPath
+				   tryLoadAndCallback:^(id image) {
+					   self.image = image;
+					   [self done];
+				   }])
+		{
+			[self startSpinner];
+		}
+	}
 	return self;
 }
 

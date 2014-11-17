@@ -1253,7 +1253,7 @@ extraHeaders:(NSDictionary *)extraHeaders
 		}
 		if(error)
 		{
-			//DLog(@"IMAGE %@ - FAILED: %@",path,error);
+			//DLog(@"IMAGE %@ - FAILED: %@",url.absoluteString,error);
 			if(failureCallback)
 			{
                 failureCallback(response, error);
@@ -1261,7 +1261,7 @@ extraHeaders:(NSDictionary *)extraHeaders
 		}
 		else
 		{
-			//DLog(@"IMAGE %@ - RESULT: %ld",path,(long)response.statusCode);
+			//DLog(@"IMAGE %@ - RESULT: %ld",url.absoluteString,(long)response.statusCode);
 			if(successCallback)
 			{
 				if(data.length)
@@ -1355,16 +1355,19 @@ extraHeaders:(NSDictionary *)extraHeaders
 - (BOOL)haveCachedAvatar:(NSString *)path
 	  tryLoadAndCallback:(void (^)(IMAGE_CLASS *image))callbackOrNil
 {
-	NSURLComponents *c = [NSURLComponents componentsWithString:path];
+	NSString *sizeParameter;
 #ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
-	c.query = [NSString stringWithFormat:@"s=%.0f",40.0*GLOBAL_SCREEN_SCALE];
+	sizeParameter = [NSString stringWithFormat:@"s=%.0f",40.0*GLOBAL_SCREEN_SCALE];
 #else
-	c.query = [NSString stringWithFormat:@"s=%.0f",88.0];
+	sizeParameter = [NSString stringWithFormat:@"s=%.0f",88.0];
 #endif
-	NSURL *imageURL = c.URL;
-    NSString *imageKey = [NSString stringWithFormat:@"%@ %@",
-						  imageURL.absoluteString,
-						  app.currentAppVersion];
+	if([path rangeOfString:@"?"].location==NSNotFound)
+		sizeParameter = [@"?" stringByAppendingString:sizeParameter];
+	else
+		sizeParameter = [@"&" stringByAppendingString:sizeParameter];
+
+	NSString *absolutePath = [path stringByAppendingString:sizeParameter];
+    NSString *imageKey = [NSString stringWithFormat:@"%@ %@", absolutePath, app.currentAppVersion];
 
     NSString *cachePath = [cacheDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"imgcache-%@", [imageKey md5hash]]];
 
@@ -1397,7 +1400,7 @@ extraHeaders:(NSDictionary *)extraHeaders
 
     if(callbackOrNil)
     {
-        [self getImage:imageURL
+        [self getImage:[NSURL URLWithString:absolutePath]
                success:^(NSHTTPURLResponse *response, NSData *imageData) {
                    id image = nil;
                    if(imageData)
