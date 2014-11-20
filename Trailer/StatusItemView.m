@@ -56,7 +56,7 @@
 	[app.statusItem drawStatusBarBackgroundInRect:dirtyRect
 									withHighlight:_highlighted];
 
-	NSPoint imagePoint = NSMakePoint(STATUSITEM_PADDING, 1.0);
+	NSPoint imagePoint = NSMakePoint(STATUSITEM_PADDING, 0.0);
 	NSRect labelRect = CGRectMake(self.bounds.size.height, -5, self.bounds.size.width, self.bounds.size.height);
 
 	NSMutableDictionary *textAttributes = [_attributes mutableCopy];
