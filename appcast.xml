@@ -6,21 +6,21 @@
 		<description>Most recent changes with links to updates.</description>
 		<language>en</language>
 
-<item>
-	<title>Version 1.1.5</title>
-	<description><![CDATA[<font face="sans-serif" size="3"><ul>
-		<li>Performance improvements for vibrancy mode, and some appearance simplifications</li>
-		<li>Readability improvements for non-retina screens using vibrancy</li>
-		<li>Possible corrections to some OS X 10.9 rendering issues</li>
-		</ul></font>]]></description>
-	<pubDate>Thu, 20 Nov 2014 17:00:00 +0000</pubDate>
-	<enclosure
-	url="http://ptsochantaris.github.io/trailer/trailer114.zip"
-	sparkle:version="1164"
-	sparkle:shortVersionString="1.1.5"
-	sparkle:dsaSignature="MCwCFGiDSYnm9i2zArJaiIpmWAad2DecAhRpT/NKQ1B5JUO6dJoB7eZxe+Hq3Q=="
-	type="application/octet-stream"/>
-</item>
+		<item>
+			<title>Version 1.1.5</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Performance improvements for vibrancy mode, and some appearance simplifications</li>
+				<li>Readability improvements for non-retina screens using vibrancy</li>
+				<li>Possible corrections to some OS X 10.9 rendering issues</li>
+				</ul></font>]]></description>
+			<pubDate>Thu, 20 Nov 2014 17:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer114.zip"
+			sparkle:version="1164"
+			sparkle:shortVersionString="1.1.5"
+			sparkle:dsaSignature="MC0CFQCaVuXtScGC4MwBlJejZqY5YlSgZAIUbsSJEzzmn6iaoC98Ni0tKr4iN/4="
+			type="application/octet-stream"/>
+		</item>
 
 		<item>
 			<title>Version 1.1.4</title>
