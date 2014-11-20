@@ -9,7 +9,7 @@
 	if (heightDelta > 0)
 	{
 		newRect.size.height -= heightDelta;
-		newRect.origin.y += (heightDelta * 0.5);
+		newRect.origin.y += floorf(heightDelta * 0.5);
 	}
     return newRect;
 }

@@ -14,6 +14,7 @@
 		[self setEditable:NO];
 		[self setSelectable:NO];
 		[self setDrawsBackground:NO];
+		[self.cell setScrollable:NO];
     }
     return self;
 }

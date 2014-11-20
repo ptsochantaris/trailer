@@ -1316,10 +1316,6 @@ AppDelegate *app;
 		[self.dataManager saveDB];
 		self.preferencesDirty = YES;
 	}
-	else
-	{
-		// TODO serverList
-	}
 }
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender

@@ -73,9 +73,11 @@ static CGColorRef _highlightColor;
 
 		CGFloat titleHeight = [_title boundingRectWithSize:CGSizeMake(W, FLT_MAX)
 												   options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading].size.height;
+		titleHeight = ceilf(titleHeight);
 
 		CGFloat subtitleHeight = [_subtitle boundingRectWithSize:CGSizeMake(W, FLT_MAX)
 														 options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading].size.height+4.0;
+		subtitleHeight = ceilf(subtitleHeight);
 
 		NSMutableArray *statusRects = nil;
 		NSArray *statuses = nil;
@@ -85,7 +87,7 @@ static CGColorRef _highlightColor;
 		if(settings.showStatusItems)
 		{
 			CELL_PADDING = 10;
-			bottom = CELL_PADDING * 0.5;
+			bottom = ceilf(CELL_PADDING * 0.5);
 			statuses = pullRequest.displayedStatuses;
 			statusRects = [NSMutableArray arrayWithCapacity:statuses.count];
 			for(PRStatus *s in statuses)
@@ -93,6 +95,7 @@ static CGColorRef _highlightColor;
 				CGFloat H = [s.displayText boundingRectWithSize:CGSizeMake(W, FLT_MAX)
 														options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
 													 attributes:_statusAttributes].size.height;
+				H = ceilf(H);
 				CGRect statusRect = CGRectMake(LEFTPADDING, bottom+statusBottom, W, H);
 				statusBottom += H;
 				[statusRects addObject:[NSValue valueWithRect:statusRect]];
@@ -101,7 +104,7 @@ static CGColorRef _highlightColor;
 		else
 		{
 			CELL_PADDING = 6.0;
-			bottom = CELL_PADDING * 0.5;
+			bottom = ceilf(CELL_PADDING * 0.5);
 		}
 
 		self.frame = CGRectMake(0, 0, MENU_WIDTH, titleHeight+subtitleHeight+statusBottom+CELL_PADDING);
