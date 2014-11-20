@@ -214,7 +214,6 @@ static CGColorRef _highlightColor;
 		_focused = focused;
 		if(_focused)
 		{
-			[self setWantsLayer:YES];
 			if([MenuWindow usingVibrancy])
 			{
 				if(app.statusItemView.darkMode)
@@ -234,7 +233,6 @@ static CGColorRef _highlightColor;
 		else
 		{
 			self.layer.backgroundColor = [COLOR_CLASS clearColor].CGColor;
-			[self setWantsLayer:NO];
 		}
 
 		[[NSNotificationCenter defaultCenter] postNotificationName:PR_ITEM_FOCUSED_NOTIFICATION_KEY

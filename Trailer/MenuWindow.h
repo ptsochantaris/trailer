@@ -6,8 +6,6 @@
 @property (weak) IBOutlet MenuScrollView *scrollView;
 @property (weak) IBOutlet NSViewAllowsVibrancy *header;
 
-- (void)layout;
-
 - (void)scrollToView:(NSView *)view;
 
 + (BOOL)usingVibrancy;
