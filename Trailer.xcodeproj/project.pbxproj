@@ -34,7 +34,6 @@
 		1628A6F81878A171005EDA69 /* DataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1628A6F71878A171005EDA69 /* DataManager.m */; };
 		1628A6F91878A171005EDA69 /* DataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1628A6F71878A171005EDA69 /* DataManager.m */; };
 		1628A6FC1878B64E005EDA69 /* RespositoriesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1628A6FB1878B64E005EDA69 /* RespositoriesViewController.m */; };
-		1628A6FD1878B804005EDA69 /* HTPopTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = 168A5C7A185C922300CB6B02 /* HTPopTimer.m */; };
 		1628A7001878B810005EDA69 /* API.m in Sources */ = {isa = PBXBuildFile; fileRef = 16075A9617EC7492000D86FD /* API.m */; };
 		1628A7021878BC18005EDA69 /* PRComment.m in Sources */ = {isa = PBXBuildFile; fileRef = 161CA3C917F5B1F300F4AF6C /* PRComment.m */; };
 		1628A7031878BC18005EDA69 /* PullRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 161CA3C517F5A55300F4AF6C /* PullRequest.m */; };
@@ -65,7 +64,6 @@
 		166F29E219F2B1F300A083E3 /* ApiServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 166F29E019F2B1F300A083E3 /* ApiServer.m */; };
 		1675AC1D185CF80C00ADD213 /* MenuScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1675AC1C185CF80C00ADD213 /* MenuScrollView.m */; };
 		168A5C77185BBA2F00CB6B02 /* MenuWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 168A5C76185BBA2F00CB6B02 /* MenuWindow.m */; };
-		168A5C7B185C922300CB6B02 /* HTPopTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = 168A5C7A185C922300CB6B02 /* HTPopTimer.m */; };
 		168BC6AE17EC2DF000BC4584 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 168BC6AD17EC2DF000BC4584 /* Cocoa.framework */; };
 		168BC6B817EC2DF000BC4584 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 168BC6B617EC2DF000BC4584 /* InfoPlist.strings */; };
 		168BC6BA17EC2DF000BC4584 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 168BC6B917EC2DF000BC4584 /* main.m */; };
@@ -78,6 +76,8 @@
 		1694372619FD3F4D005079F6 /* ServersViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1694372519FD3F4D005079F6 /* ServersViewController.m */; };
 		1694372919FD4056005079F6 /* ServerDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1694372819FD4056005079F6 /* ServerDetailViewController.m */; };
 		169CEB9C1879D5BB0083A068 /* AdvancedSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 169CEB9B1879D5BB0083A068 /* AdvancedSettingsViewController.m */; };
+		16A794F41A252BFA00A76553 /* PopTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A794F31A252BFA00A76553 /* PopTimer.swift */; };
+		16A794F51A252BFA00A76553 /* PopTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A794F31A252BFA00A76553 /* PopTimer.swift */; };
 		16B94072182D136700F32061 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 16B94070182D136700F32061 /* dsa_pub.pem */; };
 		16B9553617EC89B50005118F /* DataItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B9553517EC89B50005118F /* DataItem.m */; };
 		16B9553A17EC93DE0005118F /* Repo.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B9553917EC93DE0005118F /* Repo.m */; };
@@ -186,8 +186,6 @@
 		1675AC1C185CF80C00ADD213 /* MenuScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MenuScrollView.m; sourceTree = "<group>"; };
 		168A5C75185BBA2F00CB6B02 /* MenuWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MenuWindow.h; sourceTree = "<group>"; };
 		168A5C76185BBA2F00CB6B02 /* MenuWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MenuWindow.m; sourceTree = "<group>"; };
-		168A5C79185C922300CB6B02 /* HTPopTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HTPopTimer.h; path = Trailer/HTPopTimer.h; sourceTree = "<group>"; };
-		168A5C7A185C922300CB6B02 /* HTPopTimer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HTPopTimer.m; path = Trailer/HTPopTimer.m; sourceTree = "<group>"; };
 		168BC6AA17EC2DF000BC4584 /* Trailer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Trailer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		168BC6AD17EC2DF000BC4584 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		168BC6B017EC2DF000BC4584 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -211,6 +209,9 @@
 		169CEB99187988D00083A068 /* Trailer 4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 4.xcdatamodel"; sourceTree = "<group>"; };
 		169CEB9A1879D5BB0083A068 /* AdvancedSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdvancedSettingsViewController.h; sourceTree = "<group>"; };
 		169CEB9B1879D5BB0083A068 /* AdvancedSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdvancedSettingsViewController.m; sourceTree = "<group>"; };
+		16A794F11A252BF900A76553 /* Trailer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Trailer-Bridging-Header.h"; sourceTree = "<group>"; };
+		16A794F21A252BF900A76553 /* PocketTrailer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PocketTrailer-Bridging-Header.h"; sourceTree = "<group>"; };
+		16A794F31A252BFA00A76553 /* PopTimer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PopTimer.swift; path = Shared/PopTimer.swift; sourceTree = "<group>"; };
 		16AD4E6D18896770001C17B7 /* Trailer 5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 5.xcdatamodel"; sourceTree = "<group>"; };
 		16B8A10218AE5E5300C6ECB4 /* Trailer 9.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 9.xcdatamodel"; sourceTree = "<group>"; };
 		16B94070182D136700F32061 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
@@ -304,6 +305,8 @@
 				168C6ECC18B2104100E41D85 /* LICENSE */,
 				16F51FA019DE8C78007B0BB1 /* PRIVACY */,
 				168C6ECD18B2104100E41D85 /* README.md */,
+				16A794F11A252BF900A76553 /* Trailer-Bridging-Header.h */,
+				16A794F21A252BF900A76553 /* PocketTrailer-Bridging-Header.h */,
 				16C54F951881720400849B76 /* Settings */,
 				1628A6F518789F85005EDA69 /* Utilities */,
 				1628A6F418789F78005EDA69 /* API */,
@@ -337,8 +340,7 @@
 		1628A6F518789F85005EDA69 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
-				168A5C79185C922300CB6B02 /* HTPopTimer.h */,
-				168A5C7A185C922300CB6B02 /* HTPopTimer.m */,
+				16A794F31A252BFA00A76553 /* PopTimer.swift */,
 			);
 			name = Utilities;
 			sourceTree = "<group>";
@@ -672,11 +674,11 @@
 				1628A7071878BC23005EDA69 /* Trailer.xcdatamodeld in Sources */,
 				1604D4CF189541D70064A385 /* EmptyView.m in Sources */,
 				166A19AA19B99C4C004D9057 /* OpenInSafariActivity.m in Sources */,
+				16A794F51A252BFA00A76553 /* PopTimer.swift in Sources */,
 				16FDD6DD18804470008D2223 /* PRCell.m in Sources */,
 				1628A7021878BC18005EDA69 /* PRComment.m in Sources */,
 				1628A6C118789E73005EDA69 /* main.m in Sources */,
 				1628A7031878BC18005EDA69 /* PullRequest.m in Sources */,
-				1628A6FD1878B804005EDA69 /* HTPopTimer.m in Sources */,
 				16FD14D71881CBC400FDC960 /* PickerViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -697,7 +699,6 @@
 				16FA683B1823CF4600401E9B /* PRItemView.m in Sources */,
 				16616683189BFC6400FBF4E0 /* LinkTextField.m in Sources */,
 				168A5C77185BBA2F00CB6B02 /* MenuWindow.m in Sources */,
-				168A5C7B185C922300CB6B02 /* HTPopTimer.m in Sources */,
 				161CA3CA17F5B1F300F4AF6C /* PRComment.m in Sources */,
 				163D880E18DC750C0075F77E /* HTApplication.m in Sources */,
 				168BC6C117EC2DF000BC4584 /* AppDelegate.m in Sources */,
@@ -712,6 +713,7 @@
 				161BED25185B5368005C00F7 /* StatusItemView.m in Sources */,
 				160E60351A0A29D800742BA9 /* PRLabel.m in Sources */,
 				160C5AC61867551500142482 /* CenteredTextFieldCell.m in Sources */,
+				16A794F41A252BFA00A76553 /* PopTimer.swift in Sources */,
 				161506E61A1788A800B3E40C /* NSViewAllowsVibrancy.m in Sources */,
 				16B9553617EC89B50005118F /* DataItem.m in Sources */,
 				168BC6C717EC2DF000BC4584 /* Trailer.xcdatamodeld in Sources */,
@@ -771,9 +773,12 @@
 				GCC_PREFIX_HEADER = "MobileTrailer/MobileTrailer-Prefix.pch";
 				INFOPLIST_FILE = "MobileTrailer/MobileTrailer-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "PocketTrailer-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
@@ -794,9 +799,11 @@
 				GCC_PREFIX_HEADER = "MobileTrailer/MobileTrailer-Prefix.pch";
 				INFOPLIST_FILE = "MobileTrailer/MobileTrailer-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "8f4c3fa9-1a0d-4555-8a8a-c027cec25618";
 				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "PocketTrailer-Bridging-Header.h";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
@@ -873,6 +880,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -881,8 +889,11 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Trailer/Trailer-Prefix.pch";
 				INFOPLIST_FILE = "Trailer/Trailer-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Trailer-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -891,6 +902,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -899,8 +911,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Trailer/Trailer-Prefix.pch";
 				INFOPLIST_FILE = "Trailer/Trailer-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Trailer-Bridging-Header.h";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

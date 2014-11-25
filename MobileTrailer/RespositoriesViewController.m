@@ -3,7 +3,7 @@
 {
 	// Filtering
     UITextField *searchField;
-    HTPopTimer *searchTimer;
+    PopTimer *searchTimer;
 }
 @end
 
@@ -19,7 +19,10 @@
 {
     [super viewDidLoad];
 
-    searchTimer = [[HTPopTimer alloc] initWithTimeInterval:0.5 target:self selector:@selector(reloadData)];
+	searchTimer = [[PopTimer alloc] initWithTimeInterval:0.5
+												callback:^{
+													[self reloadData];
+												}];
 
     searchField = [[UITextField alloc] initWithFrame:CGRectMake(10, 10, self.view.bounds.size.width-20, 31)];
 	searchField.placeholder = @"Filter...";

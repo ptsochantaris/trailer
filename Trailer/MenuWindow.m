@@ -1,7 +1,7 @@
 
 @interface MenuWindow ()
 {
-	HTPopTimer *mouseIgnoreTimer;
+	PopTimer *mouseIgnoreTimer;
 	NSArray *vibrancyLayers;
 }
 @end
@@ -16,7 +16,10 @@
 
 	[self.contentView setWantsLayer:YES];
 
-	mouseIgnoreTimer = [[HTPopTimer alloc] initWithTimeInterval:0.4 target:self selector:@selector(mouseIngoreItemPopped:)];
+	mouseIgnoreTimer = [[PopTimer alloc] initWithTimeInterval:0.4
+													 callback:^{
+														 [self mouseIngoreItemPopped];
+													 }];
 
 	if([self.scrollView respondsToSelector:@selector(setAutomaticallyAdjustsContentInsets:)])
 	{
@@ -125,7 +128,7 @@
 	}
 }
 
-- (void)mouseIngoreItemPopped:(HTPopTimer *)popTimer
+- (void)mouseIngoreItemPopped
 {
 	app.isManuallyScrolling = NO;
 }

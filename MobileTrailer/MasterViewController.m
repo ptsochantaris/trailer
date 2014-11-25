@@ -3,7 +3,7 @@
 {
     // Filtering
     UITextField *searchField;
-    HTPopTimer *searchTimer;
+    PopTimer *searchTimer;
 
 	// Refreshing
 	BOOL refreshOnRelease;
@@ -180,7 +180,10 @@
 
 	[self.refreshControl addTarget:self action:@selector(refreshControlChanged) forControlEvents:UIControlEventValueChanged];
 
-    searchTimer = [[HTPopTimer alloc] initWithTimeInterval:0.5 target:self selector:@selector(reloadData)];
+	searchTimer = [[PopTimer alloc] initWithTimeInterval:0.5
+												callback:^{
+													[self reloadData];
+												}];
 
     searchField = [[UITextField alloc] initWithFrame:CGRectMake(10, 10, 300, 31)];
 	searchField.autoresizingMask = UIViewAutoresizingFlexibleWidth;

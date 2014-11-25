@@ -14,6 +14,7 @@
 #import <SystemConfiguration/SystemConfiguration.h>
 #import <CommonCrypto/CommonCrypto.h>
 #import <WebKit/WebKit.h>
+#import "PocketTrailer-Swift.h"
 #import <netinet/in.h>
 #import <arpa/inet.h>
 #import <ifaddrs.h>
@@ -34,7 +35,6 @@
 #import "ApiServer.h"
 #import "API.h"
 #import "PRCell.h"
-#import "HTPopTimer.h"
 #import "DataManager.h"
 #import "EmptyView.h"
 #import "PickerViewController.h"

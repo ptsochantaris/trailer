@@ -100,7 +100,7 @@
 @property (nonatomic) StatusItemView *statusItemView;
 @property (unsafe_unretained) IBOutlet MenuWindow *mainMenu;
 @property (weak) IBOutlet NSSearchField *mainMenuFilter;
-@property (nonatomic) HTPopTimer *filterTimer;
+@property (nonatomic) PopTimer *filterTimer;
 
 // Globals
 @property (nonatomic) API *api;

@@ -23,7 +23,10 @@ AppDelegate *app;
 
 	self.mainMenu.backgroundColor = [COLOR_CLASS whiteColor];
 
-	self.filterTimer = [[HTPopTimer alloc] initWithTimeInterval:0.2 target:self selector:@selector(filterTimerPopped)];
+	self.filterTimer = [[PopTimer alloc] initWithTimeInterval:0.2
+													 callback:^{
+														 [self filterTimerPopped];
+													 }];
 
 	[NSThread setThreadPriority:0.0];
 

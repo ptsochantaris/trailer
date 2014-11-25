@@ -15,6 +15,7 @@
 #import <SystemConfiguration/SystemConfiguration.h>
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
+#import "Trailer-Swift.h"
 #import <netinet/in.h>
 #import <arpa/inet.h>
 #import <ifaddrs.h>
@@ -44,7 +45,6 @@
 #import "MenuScrollView.h"
 #import "NSViewAllowsVibrancy.h"
 #import "MenuWindow.h"
-#import "HTPopTimer.h"
 #import "DataManager.h"
 #import "EmptyView.h"
 #import "AppDelegate.h"

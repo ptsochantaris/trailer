@@ -1,7 +1,7 @@
 
 @interface AdvancedSettingsViewController () <PickerViewControllerDelegate>
 {
-	HTPopTimer *settingsChangedTimer;
+	PopTimer *settingsChangedTimer;
 
 	// showing the picker
 	NSArray *valuesToPush;
@@ -22,9 +22,10 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	settingsChangedTimer = [[HTPopTimer alloc] initWithTimeInterval:1.0
-															 target:app
-														   selector:@selector(refreshMainList)];
+	settingsChangedTimer = [[PopTimer alloc] initWithTimeInterval:1.0
+														 callback:^{
+															 [app refreshMainList];
+														 }];
 }
 
 #define REFRESH_SECTION_INDEX 0
