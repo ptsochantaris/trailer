@@ -1,5 +1,4 @@
 #import "PRComment.h"
-#import "NSDictionary+NSDictionary_OFK.h"
 
 @implementation PRComment
 

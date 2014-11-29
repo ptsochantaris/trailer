@@ -18,12 +18,15 @@
 		161BED25185B5368005C00F7 /* StatusItemView.m in Sources */ = {isa = PBXBuildFile; fileRef = 161BED24185B5368005C00F7 /* StatusItemView.m */; };
 		161CA3C617F5A55300F4AF6C /* PullRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 161CA3C517F5A55300F4AF6C /* PullRequest.m */; };
 		161CA3CA17F5B1F300F4AF6C /* PRComment.m in Sources */ = {isa = PBXBuildFile; fileRef = 161CA3C917F5B1F300F4AF6C /* PRComment.m */; };
-		161CA3CE17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m in Sources */ = {isa = PBXBuildFile; fileRef = 161CA3CC17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m */; };
 		162002D01A2A3E2100FF95F3 /* Application.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002CF1A2A3E2100FF95F3 /* Application.swift */; };
 		162002D61A2A49A300FF95F3 /* ViewAllowsVibrancy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002D51A2A49A300FF95F3 /* ViewAllowsVibrancy.swift */; };
 		162002DB1A2A545C00FF95F3 /* CenterTextFieldCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002DA1A2A545C00FF95F3 /* CenterTextFieldCell.swift */; };
 		162002DD1A2A58B900FF95F3 /* CenterTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002DC1A2A58B900FF95F3 /* CenterTextField.swift */; };
 		162002DF1A2A5C9200FF95F3 /* LinkField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002DE1A2A5C9200FF95F3 /* LinkField.swift */; };
+		162002E11A2A6B2700FF95F3 /* NSDictionaryExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002E01A2A6B2700FF95F3 /* NSDictionaryExtensions.swift */; };
+		162002E21A2A6B2700FF95F3 /* NSDictionaryExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002E01A2A6B2700FF95F3 /* NSDictionaryExtensions.swift */; };
+		162002E41A2A6D5C00FF95F3 /* NSStringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002E31A2A6D5C00FF95F3 /* NSStringExtensions.swift */; };
+		162002E51A2A6D5C00FF95F3 /* NSStringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002E31A2A6D5C00FF95F3 /* NSStringExtensions.swift */; };
 		1628A6B318789E73005EDA69 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1628A6B218789E73005EDA69 /* Foundation.framework */; };
 		1628A6B518789E73005EDA69 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1628A6B418789E73005EDA69 /* CoreGraphics.framework */; };
 		1628A6BF18789E73005EDA69 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1628A6BD18789E73005EDA69 /* InfoPlist.strings */; };
@@ -43,7 +46,6 @@
 		1628A7061878BC18005EDA69 /* DataItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B9553517EC89B50005118F /* DataItem.m */; };
 		1628A7071878BC23005EDA69 /* Trailer.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 168BC6C517EC2DF000BC4584 /* Trailer.xcdatamodeld */; };
 		1628A7081878BC32005EDA69 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 1617BEE9183F538100E89BB2 /* Reachability.m */; };
-		1628A70B1878D2B2005EDA69 /* NSDictionary+NSDictionary_OFK.m in Sources */ = {isa = PBXBuildFile; fileRef = 161CA3CC17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m */; };
 		1640470A1882ED0000A4AC9C /* AboutTrailerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 164047091882ED0000A4AC9C /* AboutTrailerViewController.m */; };
 		164976251864985500C13A6B /* RemoteImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 164976241864985500C13A6B /* RemoteImageView.m */; };
 		16517CE11893BDE800B3D384 /* EmptyView.m in Sources */ = {isa = PBXBuildFile; fileRef = 16517CE01893BDE800B3D384 /* EmptyView.m */; };
@@ -53,8 +55,6 @@
 		1661667F189BC47F00FBF4E0 /* PRStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = 1661667E189BC47F00FBF4E0 /* PRStatus.m */; };
 		16616680189BC47F00FBF4E0 /* PRStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = 1661667E189BC47F00FBF4E0 /* PRStatus.m */; };
 		1665B6661882F24400972111 /* UINavigationController+DismissKeyboard.m in Sources */ = {isa = PBXBuildFile; fileRef = 1665B6651882F24400972111 /* UINavigationController+DismissKeyboard.m */; };
-		1665B6691882F29300972111 /* NSString+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 1665B6681882F29300972111 /* NSString+Extensions.m */; };
-		1665B66A1882F29300972111 /* NSString+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 1665B6681882F29300972111 /* NSString+Extensions.m */; };
 		1665B66D1882F29E00972111 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 1665B66C1882F29E00972111 /* Settings.m */; };
 		1665B66E1882F29E00972111 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 1665B66C1882F29E00972111 /* Settings.m */; };
 		1665B6751882F42500972111 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 168BC6B117EC2DF000BC4584 /* CoreData.framework */; };
@@ -122,8 +122,6 @@
 		161CA3C517F5A55300F4AF6C /* PullRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PullRequest.m; sourceTree = "<group>"; };
 		161CA3C817F5B1F300F4AF6C /* PRComment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PRComment.h; sourceTree = "<group>"; };
 		161CA3C917F5B1F300F4AF6C /* PRComment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PRComment.m; sourceTree = "<group>"; };
-		161CA3CC17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSDictionary+NSDictionary_OFK.m"; path = "Trailer/NSDictionary+NSDictionary_OFK.m"; sourceTree = "<group>"; };
-		161CA3CD17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSDictionary+NSDictionary_OFK.h"; path = "Trailer/NSDictionary+NSDictionary_OFK.h"; sourceTree = "<group>"; };
 		162002CF1A2A3E2100FF95F3 /* Application.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Application.swift; sourceTree = "<group>"; };
 		162002D21A2A40B800FF95F3 /* OSX_Globals.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OSX_Globals.h; sourceTree = "<group>"; };
 		162002D51A2A49A300FF95F3 /* ViewAllowsVibrancy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewAllowsVibrancy.swift; sourceTree = "<group>"; };
@@ -131,6 +129,8 @@
 		162002DA1A2A545C00FF95F3 /* CenterTextFieldCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CenterTextFieldCell.swift; sourceTree = "<group>"; };
 		162002DC1A2A58B900FF95F3 /* CenterTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CenterTextField.swift; sourceTree = "<group>"; };
 		162002DE1A2A5C9200FF95F3 /* LinkField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinkField.swift; sourceTree = "<group>"; };
+		162002E01A2A6B2700FF95F3 /* NSDictionaryExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSDictionaryExtensions.swift; sourceTree = "<group>"; };
+		162002E31A2A6D5C00FF95F3 /* NSStringExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSStringExtensions.swift; sourceTree = "<group>"; };
 		1628A6B118789E73005EDA69 /* PocketTrailer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PocketTrailer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1628A6B218789E73005EDA69 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1628A6B418789E73005EDA69 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -170,8 +170,6 @@
 		1661667E189BC47F00FBF4E0 /* PRStatus.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PRStatus.m; sourceTree = "<group>"; };
 		1665B6641882F24400972111 /* UINavigationController+DismissKeyboard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UINavigationController+DismissKeyboard.h"; sourceTree = "<group>"; };
 		1665B6651882F24400972111 /* UINavigationController+DismissKeyboard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UINavigationController+DismissKeyboard.m"; sourceTree = "<group>"; };
-		1665B6671882F29300972111 /* NSString+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSString+Extensions.h"; path = "Trailer/NSString+Extensions.h"; sourceTree = "<group>"; };
-		1665B6681882F29300972111 /* NSString+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSString+Extensions.m"; path = "Trailer/NSString+Extensions.m"; sourceTree = "<group>"; };
 		1665B66B1882F29E00972111 /* Settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Settings.h; path = Trailer/Settings.h; sourceTree = "<group>"; };
 		1665B66C1882F29E00972111 /* Settings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Settings.m; path = Trailer/Settings.m; sourceTree = "<group>"; };
 		166A19A719B99C48004D9057 /* OpenInSafariActivity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenInSafariActivity.h; sourceTree = "<group>"; };
@@ -335,10 +333,8 @@
 		1628A6F318789F6D005EDA69 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				1665B6671882F29300972111 /* NSString+Extensions.h */,
-				1665B6681882F29300972111 /* NSString+Extensions.m */,
-				161CA3CC17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m */,
-				161CA3CD17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.h */,
+				162002E01A2A6B2700FF95F3 /* NSDictionaryExtensions.swift */,
+				162002E31A2A6D5C00FF95F3 /* NSStringExtensions.swift */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
@@ -657,10 +653,10 @@
 				1665B6661882F24400972111 /* UINavigationController+DismissKeyboard.m in Sources */,
 				1665B66E1882F29E00972111 /* Settings.m in Sources */,
 				1628A7041878BC18005EDA69 /* Repo.m in Sources */,
-				1628A70B1878D2B2005EDA69 /* NSDictionary+NSDictionary_OFK.m in Sources */,
 				166F29E219F2B1F300A083E3 /* ApiServer.m in Sources */,
 				169CEB9C1879D5BB0083A068 /* AdvancedSettingsViewController.m in Sources */,
 				1628A6D418789E73005EDA69 /* DetailViewController.m in Sources */,
+				162002E21A2A6B2700FF95F3 /* NSDictionaryExtensions.swift in Sources */,
 				16616680189BC47F00FBF4E0 /* PRStatus.m in Sources */,
 				1628A6D118789E73005EDA69 /* MasterViewController.m in Sources */,
 				1694372619FD3F4D005079F6 /* ServersViewController.m in Sources */,
@@ -672,7 +668,6 @@
 				16EE562019B78DBA0031DF6D /* CommentBlacklistViewController.m in Sources */,
 				1640470A1882ED0000A4AC9C /* AboutTrailerViewController.m in Sources */,
 				1628A6FC1878B64E005EDA69 /* RespositoriesViewController.m in Sources */,
-				1665B66A1882F29300972111 /* NSString+Extensions.m in Sources */,
 				1694372919FD4056005079F6 /* ServerDetailViewController.m in Sources */,
 				16C54F941881639B00849B76 /* GithubViewController.m in Sources */,
 				1628A6F91878A171005EDA69 /* DataManager.m in Sources */,
@@ -681,6 +676,7 @@
 				166A19AA19B99C4C004D9057 /* OpenInSafariActivity.m in Sources */,
 				16A794F51A252BFA00A76553 /* PopTimer.swift in Sources */,
 				16FDD6DD18804470008D2223 /* PRCell.m in Sources */,
+				162002E51A2A6D5C00FF95F3 /* NSStringExtensions.swift in Sources */,
 				1628A7021878BC18005EDA69 /* PRComment.m in Sources */,
 				1628A6C118789E73005EDA69 /* main.m in Sources */,
 				1628A7031878BC18005EDA69 /* PullRequest.m in Sources */,
@@ -696,7 +692,6 @@
 				1665B66D1882F29E00972111 /* Settings.m in Sources */,
 				166F29E119F2B1F300A083E3 /* ApiServer.m in Sources */,
 				16B9553A17EC93DE0005118F /* Repo.m in Sources */,
-				161CA3CE17F5CFAF00F4AF6C /* NSDictionary+NSDictionary_OFK.m in Sources */,
 				160C5AD318682CD800142482 /* CommentCounts.m in Sources */,
 				161CA3C617F5A55300F4AF6C /* PullRequest.m in Sources */,
 				16FA683B1823CF4600401E9B /* PRItemView.m in Sources */,
@@ -707,7 +702,6 @@
 				168BC6C117EC2DF000BC4584 /* OSX_AppDelegate.m in Sources */,
 				162002DD1A2A58B900FF95F3 /* CenterTextField.swift in Sources */,
 				162002DB1A2A545C00FF95F3 /* CenterTextFieldCell.swift in Sources */,
-				1665B6691882F29300972111 /* NSString+Extensions.m in Sources */,
 				16583E481851F082003A7A55 /* SectionHeader.m in Sources */,
 				162002D01A2A3E2100FF95F3 /* Application.swift in Sources */,
 				168BC6BA17EC2DF000BC4584 /* main.m in Sources */,
@@ -720,7 +714,9 @@
 				160E60351A0A29D800742BA9 /* PRLabel.m in Sources */,
 				16A794F41A252BFA00A76553 /* PopTimer.swift in Sources */,
 				16B9553617EC89B50005118F /* DataItem.m in Sources */,
+				162002E41A2A6D5C00FF95F3 /* NSStringExtensions.swift in Sources */,
 				168BC6C717EC2DF000BC4584 /* Trailer.xcdatamodeld in Sources */,
+				162002E11A2A6B2700FF95F3 /* NSDictionaryExtensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

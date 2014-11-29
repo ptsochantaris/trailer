@@ -5,6 +5,7 @@
 @import Cocoa;
 @import CoreData;
 
+#import <CommonCrypto/CommonCrypto.h>
 #import "OSX_Globals.h"
 #import "OSX_AppDelegate.h"
 

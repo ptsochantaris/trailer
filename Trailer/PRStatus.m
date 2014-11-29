@@ -1,5 +1,4 @@
 #import "PRStatus.h"
-#import "NSDictionary+NSDictionary_OFK.h"
 
 @implementation PRStatus
 
