@@ -4,7 +4,6 @@
 #import "Repo.h"
 #import "PullRequest.h"
 #import "PRComment.h"
-#import "EmptyView.h"
 #import <Sparkle/Sparkle.h>
 
 OSX_AppDelegate *app;
@@ -813,8 +812,8 @@ OSX_AppDelegate *app;
 	else
 	{
 		top = 100;
-		EmptyView *empty = [[EmptyView alloc] initWithFrame:CGRectMake(0, 0, MENU_WIDTH, top)
-													message:[self.dataManager reasonForEmptyWithFilter:self.mainMenuFilter.stringValue]];
+		MessageView *empty = [[MessageView alloc] initWithFrame:CGRectMake(0, 0, MENU_WIDTH, top)
+														message:[self.dataManager reasonForEmptyWithFilter:self.mainMenuFilter.stringValue]];
 		[menuContents addSubview:empty];
 	}
 
@@ -1507,7 +1506,7 @@ OSX_AppDelegate *app;
 	self.isRefreshing = YES;
 
 	for(NSView *v in [self.mainMenu.scrollView.documentView subviews])
-		if([v isKindOfClass:[EmptyView class]])
+		if([v isKindOfClass:[MessageView class]])
 			[self updateMenu];
 
 	self.refreshNow.title = @" Refreshing...";

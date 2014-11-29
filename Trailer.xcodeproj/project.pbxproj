@@ -48,7 +48,6 @@
 		1628A7071878BC23005EDA69 /* Trailer.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 168BC6C517EC2DF000BC4584 /* Trailer.xcdatamodeld */; };
 		1628A7081878BC32005EDA69 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 1617BEE9183F538100E89BB2 /* Reachability.m */; };
 		1640470A1882ED0000A4AC9C /* AboutTrailerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 164047091882ED0000A4AC9C /* AboutTrailerViewController.m */; };
-		16517CE11893BDE800B3D384 /* EmptyView.m in Sources */ = {isa = PBXBuildFile; fileRef = 16517CE01893BDE800B3D384 /* EmptyView.m */; };
 		16583E481851F082003A7A55 /* SectionHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 16583E471851F082003A7A55 /* SectionHeader.m */; };
 		165F1FC519E1D01E000690E6 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 165F1FC419E1D01E000690E6 /* Sparkle.framework */; };
 		165F1FC619E1D04D000690E6 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 165F1FC419E1D01E000690E6 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -72,6 +71,7 @@
 		168BC6C917EC2DF000BC4584 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 168BC6C817EC2DF000BC4584 /* Images.xcassets */; };
 		168C6ECE18B2104100E41D85 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 168C6ECC18B2104100E41D85 /* LICENSE */; };
 		168C6ECF18B2104100E41D85 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 168C6ECD18B2104100E41D85 /* README.md */; };
+		168FD00E1A2A7AD1005929CB /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 168FD00D1A2A7AD1005929CB /* MessageView.swift */; };
 		1694372619FD3F4D005079F6 /* ServersViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1694372519FD3F4D005079F6 /* ServersViewController.m */; };
 		1694372919FD4056005079F6 /* ServerDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1694372819FD4056005079F6 /* ServerDetailViewController.m */; };
 		169CEB9C1879D5BB0083A068 /* AdvancedSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 169CEB9B1879D5BB0083A068 /* AdvancedSettingsViewController.m */; };
@@ -157,8 +157,6 @@
 		16458E37191AC2D200FB13EC /* Trailer 12.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 12.xcdatamodel"; sourceTree = "<group>"; };
 		164976221864935200C13A6B /* Trailer 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 3.xcdatamodel"; sourceTree = "<group>"; };
 		16508CD819E1B53E0029ADFE /* Trailer 16.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 16.xcdatamodel"; sourceTree = "<group>"; };
-		16517CDF1893BDE800B3D384 /* EmptyView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmptyView.h; sourceTree = "<group>"; };
-		16517CE01893BDE800B3D384 /* EmptyView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EmptyView.m; sourceTree = "<group>"; };
 		1653FD6F1966B2900080D972 /* Trailer 13.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 13.xcdatamodel"; sourceTree = "<group>"; };
 		16583E461851F082003A7A55 /* SectionHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SectionHeader.h; sourceTree = "<group>"; };
 		16583E471851F082003A7A55 /* SectionHeader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SectionHeader.m; sourceTree = "<group>"; };
@@ -193,6 +191,7 @@
 		168BC6C817EC2DF000BC4584 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		168C6ECC18B2104100E41D85 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		168C6ECD18B2104100E41D85 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
+		168FD00D1A2A7AD1005929CB /* MessageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageView.swift; sourceTree = "<group>"; };
 		1694372419FD3F4D005079F6 /* ServersViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServersViewController.h; sourceTree = "<group>"; };
 		1694372519FD3F4D005079F6 /* ServersViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServersViewController.m; sourceTree = "<group>"; };
 		1694372719FD4056005079F6 /* ServerDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerDetailViewController.h; sourceTree = "<group>"; };
@@ -364,8 +363,7 @@
 				16FA683A1823CF4600401E9B /* PRItemView.m */,
 				16583E461851F082003A7A55 /* SectionHeader.h */,
 				16583E471851F082003A7A55 /* SectionHeader.m */,
-				16517CDF1893BDE800B3D384 /* EmptyView.h */,
-				16517CE01893BDE800B3D384 /* EmptyView.m */,
+				168FD00D1A2A7AD1005929CB /* MessageView.swift */,
 			);
 			name = MenuItems;
 			sourceTree = "<group>";
@@ -707,9 +705,9 @@
 				1628A6F81878A171005EDA69 /* DataManager.m in Sources */,
 				1661667F189BC47F00FBF4E0 /* PRStatus.m in Sources */,
 				16075A9717EC7492000D86FD /* API.m in Sources */,
-				16517CE11893BDE800B3D384 /* EmptyView.m in Sources */,
 				161BED25185B5368005C00F7 /* StatusItemView.m in Sources */,
 				160E60351A0A29D800742BA9 /* PRLabel.m in Sources */,
+				168FD00E1A2A7AD1005929CB /* MessageView.swift in Sources */,
 				16A794F41A252BFA00A76553 /* PopTimer.swift in Sources */,
 				16B9553617EC89B50005118F /* DataItem.m in Sources */,
 				162002E41A2A6D5C00FF95F3 /* NSStringExtensions.swift in Sources */,
