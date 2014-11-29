@@ -1,15 +1,20 @@
+#import "OSX_AppDelegate.h"
+#import "Settings.h"
+#import "ApiServer.h"
+#import "Repo.h"
+#import "PullRequest.h"
+#import "PRComment.h"
+#import "EmptyView.h"
+#import <Sparkle/Sparkle.h>
 
-AppDelegate *app;
+OSX_AppDelegate *app;
 
-@interface AppDelegate ()
+@implementation OSX_AppDelegate
 {
 	// Keyboard support
 	id globalKeyMonitor, localKeyMonitor;
 	NSMutableArray *currentPRItems;
 }
-@end
-
-@implementation AppDelegate
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {

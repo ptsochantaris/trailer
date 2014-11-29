@@ -1,4 +1,0 @@
-
-@interface NSViewAllowsVibrancy : NSView
-
-@end

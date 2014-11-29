@@ -1,3 +1,4 @@
+@import WebKit;
 
 @interface DetailViewController : UIViewController <WKNavigationDelegate>
 

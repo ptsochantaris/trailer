@@ -1,3 +1,5 @@
+#import "Settings.h"
+#import "API.h"
 
 Settings *settings;
 

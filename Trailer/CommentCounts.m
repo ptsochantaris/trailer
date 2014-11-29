@@ -1,3 +1,5 @@
+#import "CommentCounts.h"
+#import "MenuWindow.h"
 
 static NSDictionary *_commentAlertAttributes;
 static NSNumberFormatter *formatter;

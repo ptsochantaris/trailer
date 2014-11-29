@@ -1,11 +1,9 @@
-
-@interface SectionHeader ()
-{
-	CenteredTextField *titleView;
-}
-@end
+#import "SectionHeader.h"
 
 @implementation SectionHeader
+{
+	CenterTextField *titleView;
+}
 
 #define TITLE_HEIGHT 42
 
@@ -35,7 +33,7 @@
 										   };
 		
 		CGRect titleRect = CGRectMake(12, 0, W-120-AVATAR_SIZE-LEFTPADDING, TITLE_HEIGHT-8.0);
-		titleView = [[CenteredTextField alloc] initWithFrame:titleRect];
+		titleView = [[CenterTextField alloc] initWithFrame:titleRect];
 		titleView.attributedStringValue = [[NSAttributedString alloc] initWithString:title
 																		  attributes:titleAttributes];
 		[self addSubview:titleView];

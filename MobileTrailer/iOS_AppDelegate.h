@@ -1,5 +1,7 @@
+#import "API.h"
+#import "DataManager.h"
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate, UIPopoverControllerDelegate, UISplitViewControllerDelegate>
+@interface iOS_AppDelegate : UIResponder <UIApplicationDelegate, UIPopoverControllerDelegate, UISplitViewControllerDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
 
@@ -23,4 +25,4 @@ typedef void (^backgroundFetchCompletionCallback)(UIBackgroundFetchResult result
 
 @end
 
-extern AppDelegate *app;
+extern iOS_AppDelegate *app;

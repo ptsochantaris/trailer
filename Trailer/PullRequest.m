@@ -1,3 +1,10 @@
+#import "PullRequest.h"
+#import "NSDictionary+NSDictionary_OFK.h"
+#import "Settings.h"
+#import "PRComment.h"
+#import "Repo.h"
+#import "PRLabel.h"
+#import "PRStatus.h"
 
 @implementation PullRequest
 

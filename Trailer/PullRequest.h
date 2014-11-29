@@ -1,3 +1,5 @@
+#import "DataItem.h"
+#import "ApiServer.h"
 
 #define kPullRequestConditionOpen 0
 #define kPullRequestConditionClosed 1

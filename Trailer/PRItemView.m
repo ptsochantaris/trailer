@@ -1,9 +1,13 @@
+#import "Settings.h"
+#import "PRStatus.h"
+#import "RemoteImageView.h"
+#import "CommentCounts.h"
 
 @interface PRItemView () <NSPasteboardItemDataProvider, NSDraggingSource>
 {
 	NSTrackingArea *trackingArea;
 	NSManagedObjectID *pullRequestId;
-	CenteredTextField *title;
+	CenterTextField *title;
 }
 @end
 
@@ -137,7 +141,7 @@ static CGColorRef _highlightColor;
 		{
 			if(pullRequest.condition.integerValue==kPullRequestConditionOpen)
 			{
-				CenteredTextField *unmergeableLabel = [[CenteredTextField alloc] initWithFrame:pinRect];
+				CenterTextField *unmergeableLabel = [[CenterTextField alloc] initWithFrame:pinRect];
 				unmergeableLabel.textColor = [COLOR_CLASS redColor];
 				unmergeableLabel.font = [NSFont fontWithName:@"Monaco" size:8.0];
 				unmergeableLabel.alignment = NSCenterTextAlignment;
@@ -157,18 +161,18 @@ static CGColorRef _highlightColor;
 			}
 		}
 
-		title = [[CenteredTextField alloc] initWithFrame:titleRect];
+		title = [[CenterTextField alloc] initWithFrame:titleRect];
 		title.attributedStringValue = _title;
 		[self addSubview:title];
 
-		CenteredTextField *subtitle = [[CenteredTextField alloc] initWithFrame:dateRect];
+		CenterTextField *subtitle = [[CenterTextField alloc] initWithFrame:dateRect];
 		subtitle.attributedStringValue = _subtitle;
 		[self addSubview:subtitle];
 
 		for(NSInteger count=0;count<statusRects.count;count++)
 		{
 			CGRect frame = [statusRects[statusRects.count-count-1] rectValue];
-			LinkTextField *statusLabel = [[LinkTextField alloc] initWithFrame:frame];
+			LinkField *statusLabel = [[LinkField alloc] initWithFrame:frame];
 
 			PRStatus *status = statuses[count];
 			statusLabel.targetUrl = status.targetUrl;

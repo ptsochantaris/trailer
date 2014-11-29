@@ -1,3 +1,8 @@
+#import "ApiServer.h"
+#import "PRComment.h"
+#import "PullRequest.h"
+#import "Repo.h"
+#import "PRLabel.h"
 
 @implementation ApiServer
 

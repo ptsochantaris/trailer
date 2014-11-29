@@ -1,3 +1,5 @@
+#import "ServerDetailViewController.h"
+#import "GithubViewController.h"
 
 @implementation ServerDetailViewController
 {

@@ -1,3 +1,6 @@
+#import "PRLabel.h"
+#import "NSDictionary+NSDictionary_OFK.h"
+#import "NSString+Extensions.h"
 
 @implementation PRLabel
 

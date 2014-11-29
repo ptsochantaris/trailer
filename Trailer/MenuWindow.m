@@ -1,3 +1,5 @@
+#import "MenuWindow.h"
+#import "Settings.h"
 
 @interface MenuWindow ()
 {

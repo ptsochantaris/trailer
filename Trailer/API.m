@@ -1,3 +1,10 @@
+#import "PRLabel.h"
+#import "PRComment.h"
+#import "Repo.h"
+#import "PRStatus.h"
+#import "Settings.h"
+#import "NSDictionary+NSDictionary_OFK.h"
+#import "NSString+Extensions.h"
 
 @interface UrlBackOffEntry : NSObject
 @property (nonatomic) NSDate *nextAttemptAt;

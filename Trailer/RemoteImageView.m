@@ -1,11 +1,9 @@
+#import "RemoteImageView.h"
 
-@interface RemoteImageView ()
+@implementation RemoteImageView
 {
 	NSProgressIndicator *spinner;
 }
-@end
-
-@implementation RemoteImageView
 
 - (id)initWithFrame:(NSRect)frameRect url:(NSString *)urlPath
 {

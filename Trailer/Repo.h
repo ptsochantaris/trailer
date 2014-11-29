@@ -1,3 +1,5 @@
+#import "DataItem.h"
+#import "PullRequest.h"
 
 @interface Repo : DataItem
 

@@ -1,3 +1,4 @@
+#import "PullRequest.h"
 
 #define AVATAR_SIZE 26.0
 #define LEFTPADDING 44.0

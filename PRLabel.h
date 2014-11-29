@@ -1,3 +1,4 @@
+#import "DataItem.h"
 
 @class ApiServer, PullRequest;
 

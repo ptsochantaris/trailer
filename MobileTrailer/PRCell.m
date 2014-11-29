@@ -1,5 +1,10 @@
+#import "PRCell.h"
+#import "PullRequest.h"
+#import "Settings.h"
 
-@interface PRCell ()
+static NSNumberFormatter *itemCountFormatter;
+
+@implementation PRCell
 {
 	UILabel *unreadCount, *readCount;
 	NSString *failedToLoadImage, *waitingForImageInPath;
@@ -7,11 +12,6 @@
 	__weak IBOutlet UILabel *_title;
 	__weak IBOutlet UILabel *_description;
 }
-@end
-
-static NSNumberFormatter *itemCountFormatter;
-
-@implementation PRCell
 
 - (void)awakeFromNib
 {

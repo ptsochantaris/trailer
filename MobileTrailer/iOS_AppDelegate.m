@@ -1,7 +1,13 @@
+#import "Settings.h"
+#import "MasterViewController.h"
+#import "Repo.h"
+#import "PullRequest.h"
+#import "PRComment.h"
+#import "OpenInSafariActivity.h"
 
-AppDelegate *app;
+iOS_AppDelegate *app;
 
-@implementation AppDelegate
+@implementation iOS_AppDelegate
 {
 	UIPopoverController *sharePopover;
 }

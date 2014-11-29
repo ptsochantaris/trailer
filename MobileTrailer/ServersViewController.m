@@ -1,3 +1,6 @@
+#import "ServersViewController.h"
+#import "MasterViewController.h"
+#import "ServerDetailViewController.h"
 
 @interface ServersViewController ()
 {

@@ -1,3 +1,5 @@
+#import "NSString+Extensions.h"
+#import <CommonCrypto/CommonCrypto.h>
 
 @implementation NSString (Extensions)
 

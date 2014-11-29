@@ -45,6 +45,13 @@
 
  */
 
+#import <SystemConfiguration/SystemConfiguration.h>
+#import <netinet/in.h>
+#import <arpa/inet.h>
+#import <ifaddrs.h>
+#import <netdb.h>
+#import <sys/socket.h>
+
 NSString *kReachabilityChangedNotification = @"kNetworkReachabilityChangedNotification";
 
 

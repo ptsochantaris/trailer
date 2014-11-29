@@ -1,3 +1,5 @@
+#import "CommentBlacklistViewController.h"
+#import "Settings.h"
 
 @implementation CommentBlacklistViewController
 

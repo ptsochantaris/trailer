@@ -1,3 +1,4 @@
+#import "DetailViewController.h"
 
 @implementation DetailViewController
 

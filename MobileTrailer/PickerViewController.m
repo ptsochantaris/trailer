@@ -1,11 +1,9 @@
+#import "PickerViewController.h"
 
-@interface PickerViewController ()
+@implementation PickerViewController
 {
 	BOOL layoutDone;
 }
-@end
-
-@implementation PickerViewController
 
 #pragma mark - Table view data source
 

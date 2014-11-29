@@ -1,5 +1,14 @@
 
-@interface AppDelegate : NSObject <
+#import "PRItemView.h"
+#import "SectionHeader.h"
+#import "StatusItemView.h"
+#import "DataManager.h"
+#import "MenuWindow.h"
+#import "API.h"
+
+@class PopTimer;
+
+@interface OSX_AppDelegate : NSObject <
 	NSApplicationDelegate,
 	NSTableViewDelegate,
 	NSTableViewDataSource,
@@ -120,4 +129,4 @@
 
 @end
 
-extern AppDelegate *app;
+extern OSX_AppDelegate *app;

@@ -1,3 +1,9 @@
+#import "MasterViewController.h"
+#import "Settings.h"
+#import "PullRequest.h"
+#import "PRComment.h"
+#import "PRCell.h"
+#import "EmptyView.h"
 
 @implementation MasterViewController
 {

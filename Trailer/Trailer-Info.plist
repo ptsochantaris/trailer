@@ -33,7 +33,7 @@
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
-	<string>HTApplication</string>
+	<string>Trailer.Application</string>
 	<key>NSUserNotificationAlertStyle</key>
 	<string>alert</string>
 	<key>SUFeedURL</key>

@@ -35,10 +35,3 @@
 
 extern Settings *settings;
 
-#ifdef DEBUG
-	#define DLog(fmt, ...) NSLog(fmt, ##__VA_ARGS__)
-#elif __MAC_OS_X_VERSION_MIN_REQUIRED
-	#define DLog(s, ...) [settings log:[NSString stringWithFormat:s, ##__VA_ARGS__]]
-#else
-	#define DLog(...)
-#endif

@@ -1,3 +1,4 @@
+#import "AboutTrailerViewController.h"
 
 @implementation AboutTrailerViewController
 

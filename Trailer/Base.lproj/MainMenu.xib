@@ -1194,7 +1194,7 @@ Enter to select and ⌘, for preferences.
             </connections>
             <point key="canvasLocation" x="626" y="488"/>
         </window>
-        <customObject id="494" customClass="AppDelegate">
+        <customObject id="494" customClass="OSX_AppDelegate">
             <connections>
                 <outlet property="aboutVersion" destination="S57-NF-ZQw" id="Rsc-c3-NPJ"/>
                 <outlet property="activityDisplay" destination="Lax-cU-vqe" id="jxh-1P-ph0"/>
@@ -1292,7 +1292,7 @@ Enter to select and ⌘, for preferences.
                 <rect key="frame" x="0.0" y="0.0" width="376" height="710"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <scrollView focusRingType="none" borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="1jc-DF-1GW" customClass="MenuScrollView">
+                    <scrollView focusRingType="none" borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="1jc-DF-1GW">
                         <rect key="frame" x="0.0" y="0.0" width="376" height="710"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="e4g-XR-7jB">
@@ -1300,7 +1300,7 @@ Enter to select and ⌘, for preferences.
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <view id="lMY-YH-Amm">
-                                    <rect key="frame" x="0.0" y="0.0" width="376" height="794"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="376" height="822"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 </view>
                             </subviews>
@@ -1315,7 +1315,7 @@ Enter to select and ⌘, for preferences.
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
-                    <customView id="8KA-D9-rJV" customClass="NSViewAllowsVibrancy">
+                    <customView id="8KA-D9-rJV" customClass="ViewAllowsVibrancy" customModule="Trailer" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="678" width="376" height="32"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <subviews>

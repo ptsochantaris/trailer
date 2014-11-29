@@ -1,3 +1,4 @@
+@class PRComment, PullRequest, Repo, PRStatus, PRLabel;
 
 @interface ApiServer : NSManagedObject
 
