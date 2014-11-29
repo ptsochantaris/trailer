@@ -27,6 +27,7 @@
 		162002E21A2A6B2700FF95F3 /* NSDictionaryExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002E01A2A6B2700FF95F3 /* NSDictionaryExtensions.swift */; };
 		162002E41A2A6D5C00FF95F3 /* NSStringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002E31A2A6D5C00FF95F3 /* NSStringExtensions.swift */; };
 		162002E51A2A6D5C00FF95F3 /* NSStringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002E31A2A6D5C00FF95F3 /* NSStringExtensions.swift */; };
+		162002E71A2A75BD00FF95F3 /* AvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002E61A2A75BD00FF95F3 /* AvatarView.swift */; };
 		1628A6B318789E73005EDA69 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1628A6B218789E73005EDA69 /* Foundation.framework */; };
 		1628A6B518789E73005EDA69 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1628A6B418789E73005EDA69 /* CoreGraphics.framework */; };
 		1628A6BF18789E73005EDA69 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1628A6BD18789E73005EDA69 /* InfoPlist.strings */; };
@@ -47,7 +48,6 @@
 		1628A7071878BC23005EDA69 /* Trailer.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 168BC6C517EC2DF000BC4584 /* Trailer.xcdatamodeld */; };
 		1628A7081878BC32005EDA69 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 1617BEE9183F538100E89BB2 /* Reachability.m */; };
 		1640470A1882ED0000A4AC9C /* AboutTrailerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 164047091882ED0000A4AC9C /* AboutTrailerViewController.m */; };
-		164976251864985500C13A6B /* RemoteImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 164976241864985500C13A6B /* RemoteImageView.m */; };
 		16517CE11893BDE800B3D384 /* EmptyView.m in Sources */ = {isa = PBXBuildFile; fileRef = 16517CE01893BDE800B3D384 /* EmptyView.m */; };
 		16583E481851F082003A7A55 /* SectionHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 16583E471851F082003A7A55 /* SectionHeader.m */; };
 		165F1FC519E1D01E000690E6 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 165F1FC419E1D01E000690E6 /* Sparkle.framework */; };
@@ -131,6 +131,7 @@
 		162002DE1A2A5C9200FF95F3 /* LinkField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinkField.swift; sourceTree = "<group>"; };
 		162002E01A2A6B2700FF95F3 /* NSDictionaryExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSDictionaryExtensions.swift; sourceTree = "<group>"; };
 		162002E31A2A6D5C00FF95F3 /* NSStringExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSStringExtensions.swift; sourceTree = "<group>"; };
+		162002E61A2A75BD00FF95F3 /* AvatarView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AvatarView.swift; sourceTree = "<group>"; };
 		1628A6B118789E73005EDA69 /* PocketTrailer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PocketTrailer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1628A6B218789E73005EDA69 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1628A6B418789E73005EDA69 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -155,8 +156,6 @@
 		164047091882ED0000A4AC9C /* AboutTrailerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AboutTrailerViewController.m; sourceTree = "<group>"; };
 		16458E37191AC2D200FB13EC /* Trailer 12.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 12.xcdatamodel"; sourceTree = "<group>"; };
 		164976221864935200C13A6B /* Trailer 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 3.xcdatamodel"; sourceTree = "<group>"; };
-		164976231864985500C13A6B /* RemoteImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RemoteImageView.h; sourceTree = "<group>"; };
-		164976241864985500C13A6B /* RemoteImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RemoteImageView.m; sourceTree = "<group>"; };
 		16508CD819E1B53E0029ADFE /* Trailer 16.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 16.xcdatamodel"; sourceTree = "<group>"; };
 		16517CDF1893BDE800B3D384 /* EmptyView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmptyView.h; sourceTree = "<group>"; };
 		16517CE01893BDE800B3D384 /* EmptyView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EmptyView.m; sourceTree = "<group>"; };
@@ -378,12 +377,11 @@
 				168A5C76185BBA2F00CB6B02 /* MenuWindow.m */,
 				161BED23185B5368005C00F7 /* StatusItemView.h */,
 				161BED24185B5368005C00F7 /* StatusItemView.m */,
-				164976231864985500C13A6B /* RemoteImageView.h */,
-				164976241864985500C13A6B /* RemoteImageView.m */,
 				162002D51A2A49A300FF95F3 /* ViewAllowsVibrancy.swift */,
 				162002DA1A2A545C00FF95F3 /* CenterTextFieldCell.swift */,
 				162002DC1A2A58B900FF95F3 /* CenterTextField.swift */,
 				162002DE1A2A5C9200FF95F3 /* LinkField.swift */,
+				162002E61A2A75BD00FF95F3 /* AvatarView.swift */,
 			);
 			name = Display;
 			sourceTree = "<group>";
@@ -701,6 +699,7 @@
 				162002DF1A2A5C9200FF95F3 /* LinkField.swift in Sources */,
 				168BC6C117EC2DF000BC4584 /* OSX_AppDelegate.m in Sources */,
 				162002DD1A2A58B900FF95F3 /* CenterTextField.swift in Sources */,
+				162002E71A2A75BD00FF95F3 /* AvatarView.swift in Sources */,
 				162002DB1A2A545C00FF95F3 /* CenterTextFieldCell.swift in Sources */,
 				16583E481851F082003A7A55 /* SectionHeader.m in Sources */,
 				162002D01A2A3E2100FF95F3 /* Application.swift in Sources */,
@@ -709,7 +708,6 @@
 				1661667F189BC47F00FBF4E0 /* PRStatus.m in Sources */,
 				16075A9717EC7492000D86FD /* API.m in Sources */,
 				16517CE11893BDE800B3D384 /* EmptyView.m in Sources */,
-				164976251864985500C13A6B /* RemoteImageView.m in Sources */,
 				161BED25185B5368005C00F7 /* StatusItemView.m in Sources */,
 				160E60351A0A29D800742BA9 /* PRLabel.m in Sources */,
 				16A794F41A252BFA00A76553 /* PopTimer.swift in Sources */,

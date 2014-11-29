@@ -1,6 +1,5 @@
 #import "Settings.h"
 #import "PRStatus.h"
-#import "RemoteImageView.h"
 #import "CommentCounts.h"
 
 @interface PRItemView () <NSPasteboardItemDataProvider, NSDraggingSource>
@@ -119,8 +118,8 @@ static CGColorRef _highlightColor;
 		CGFloat shift = -4.0;
 		if(showAvatar)
 		{
-			RemoteImageView *userImage = [[RemoteImageView alloc] initWithFrame:CGRectMake(LEFTPADDING, (self.bounds.size.height-AVATAR_SIZE)*0.5, AVATAR_SIZE, AVATAR_SIZE)
-																			url:pullRequest.userAvatarUrl];
+			AvatarView *userImage = [[AvatarView alloc] initWithFrame:CGRectMake(LEFTPADDING, (self.bounds.size.height-AVATAR_SIZE)*0.5, AVATAR_SIZE, AVATAR_SIZE)
+																  url:pullRequest.userAvatarUrl];
 			[self addSubview:userImage];
 			shift = AVATAR_PADDING+AVATAR_SIZE;
 		}
