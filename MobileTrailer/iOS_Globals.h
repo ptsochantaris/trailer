@@ -6,10 +6,4 @@
 #define FONT_CLASS UIFont
 #define MAKECOLOR(R,G,B,A) [COLOR_CLASS colorWithRed:R green:G blue:B alpha:A]
 
-#ifdef DEBUG
-#define DLog(fmt, ...) NSLog(fmt, ##__VA_ARGS__)
-#else
-#define DLog(...)
-#endif
-
 #endif

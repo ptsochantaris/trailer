@@ -3,6 +3,7 @@
 #import "PullRequest.h"
 #import "Repo.h"
 #import "PRLabel.h"
+#import "Settings.h"
 
 @implementation ApiServer
 

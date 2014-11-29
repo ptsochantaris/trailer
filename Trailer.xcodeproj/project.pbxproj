@@ -278,10 +278,10 @@
 			isa = PBXGroup;
 			children = (
 				1628A6C218789E73005EDA69 /* MobileTrailer-Prefix.pch */,
+				162002D91A2A4D9E00FF95F3 /* iOS_Globals.h */,
 				16A794F21A252BF900A76553 /* PocketTrailer-Bridging-Header.h */,
 				1628A6C318789E73005EDA69 /* iOS_AppDelegate.h */,
 				1628A6C418789E73005EDA69 /* iOS_AppDelegate.m */,
-				162002D91A2A4D9E00FF95F3 /* iOS_Globals.h */,
 			);
 			name = Core;
 			sourceTree = "<group>";

@@ -3,8 +3,6 @@
 
 - (NSString *)sortField;
 
-- (void)log:(NSString *)logMessage;
-
 @property (nonatomic) NSInteger sortMethod, statusFilteringMode, lastPreferencesTabSelected,
 								closeHandlingPolicy, mergeHandlingPolicy, statusItemRefreshInterval,
 								labelRefreshInterval;
@@ -35,3 +33,4 @@
 
 extern Settings *settings;
 
+void DLog(NSString *format, ...);

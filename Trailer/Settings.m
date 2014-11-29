@@ -3,6 +3,17 @@
 
 Settings *settings;
 
+void DLog(NSString *format, ...)
+{
+	if(settings.logActivityToConsole)
+	{
+		va_list args;
+		va_start(args, format);
+		NSLogv(format, args);
+		va_end(args);
+	}
+}
+
 @implementation Settings
 {
 	NSUserDefaults *defaults;
@@ -17,11 +28,6 @@ Settings *settings;
 		valuesCache = [NSMutableDictionary new];
     }
     return self;
-}
-
-- (void)log:(NSString *)logMessage
-{
-	if(settings.logActivityToConsole) NSLog(@"%@",logMessage);
 }
 
 - (NSString *)sortField
