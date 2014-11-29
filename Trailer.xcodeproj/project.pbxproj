@@ -72,11 +72,11 @@
 		168C6ECE18B2104100E41D85 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 168C6ECC18B2104100E41D85 /* LICENSE */; };
 		168C6ECF18B2104100E41D85 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 168C6ECD18B2104100E41D85 /* README.md */; };
 		168FD00E1A2A7AD1005929CB /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 168FD00D1A2A7AD1005929CB /* MessageView.swift */; };
+		168FD0121A2A8C28005929CB /* PopTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A794F31A252BFA00A76553 /* PopTimer.swift */; };
 		1694372619FD3F4D005079F6 /* ServersViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1694372519FD3F4D005079F6 /* ServersViewController.m */; };
 		1694372919FD4056005079F6 /* ServerDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1694372819FD4056005079F6 /* ServerDetailViewController.m */; };
 		169CEB9C1879D5BB0083A068 /* AdvancedSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 169CEB9B1879D5BB0083A068 /* AdvancedSettingsViewController.m */; };
 		16A794F41A252BFA00A76553 /* PopTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A794F31A252BFA00A76553 /* PopTimer.swift */; };
-		16A794F51A252BFA00A76553 /* PopTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A794F31A252BFA00A76553 /* PopTimer.swift */; };
 		16B94072182D136700F32061 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 16B94070182D136700F32061 /* dsa_pub.pem */; };
 		16B9553617EC89B50005118F /* DataItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B9553517EC89B50005118F /* DataItem.m */; };
 		16B9553A17EC93DE0005118F /* Repo.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B9553917EC93DE0005118F /* Repo.m */; };
@@ -670,10 +670,10 @@
 				1628A7071878BC23005EDA69 /* Trailer.xcdatamodeld in Sources */,
 				1604D4CF189541D70064A385 /* EmptyView.m in Sources */,
 				166A19AA19B99C4C004D9057 /* OpenInSafariActivity.m in Sources */,
-				16A794F51A252BFA00A76553 /* PopTimer.swift in Sources */,
 				16FDD6DD18804470008D2223 /* PRCell.m in Sources */,
 				162002E51A2A6D5C00FF95F3 /* NSStringExtensions.swift in Sources */,
 				1628A7021878BC18005EDA69 /* PRComment.m in Sources */,
+				168FD0121A2A8C28005929CB /* PopTimer.swift in Sources */,
 				1628A6C118789E73005EDA69 /* main.m in Sources */,
 				1628A7031878BC18005EDA69 /* PullRequest.m in Sources */,
 				16FD14D71881CBC400FDC960 /* PickerViewController.m in Sources */,
