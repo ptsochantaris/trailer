@@ -5,13 +5,17 @@ Settings *settings;
 
 void DLog(NSString *format, ...)
 {
+#ifndef DEBUG
 	if(settings.logActivityToConsole)
 	{
+#endif
 		va_list args;
 		va_start(args, format);
 		NSLogv(format, args);
 		va_end(args);
+#ifndef DEBUG
 	}
+#endif
 }
 
 @implementation Settings

@@ -4,7 +4,13 @@
 typealias LazyVarArgClosure = @autoclosure () -> CVarArgType?
 
 func DLog(messageFormat:@autoclosure () -> String, args:LazyVarArgClosure...) {
-	if settings.logActivityToConsole {
+	var shouldLog: Bool
+	#if DEBUG
+		shouldLog = true
+	#else
+		shouldLog = settings.logActivityToConsole
+	#endif
+	if shouldLog {
 		let realArgs:[CVarArgType] = args.map { (lazyArg:LazyVarArgClosure) in
 			if let l = lazyArg() { return l } else { return "(nil)" }
 		}
