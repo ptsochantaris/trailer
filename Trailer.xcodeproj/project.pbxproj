@@ -19,10 +19,6 @@
 		162002DB1A2A545C00FF95F3 /* CenterTextFieldCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002DA1A2A545C00FF95F3 /* CenterTextFieldCell.swift */; };
 		162002DD1A2A58B900FF95F3 /* CenterTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002DC1A2A58B900FF95F3 /* CenterTextField.swift */; };
 		162002DF1A2A5C9200FF95F3 /* LinkField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002DE1A2A5C9200FF95F3 /* LinkField.swift */; };
-		162002E11A2A6B2700FF95F3 /* NSDictionaryExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002E01A2A6B2700FF95F3 /* NSDictionaryExtensions.swift */; };
-		162002E21A2A6B2700FF95F3 /* NSDictionaryExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002E01A2A6B2700FF95F3 /* NSDictionaryExtensions.swift */; };
-		162002E41A2A6D5C00FF95F3 /* NSStringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002E31A2A6D5C00FF95F3 /* NSStringExtensions.swift */; };
-		162002E51A2A6D5C00FF95F3 /* NSStringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002E31A2A6D5C00FF95F3 /* NSStringExtensions.swift */; };
 		162002E71A2A75BD00FF95F3 /* AvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002E61A2A75BD00FF95F3 /* AvatarView.swift */; };
 		1628A6B318789E73005EDA69 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1628A6B218789E73005EDA69 /* Foundation.framework */; };
 		1628A6B518789E73005EDA69 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1628A6B418789E73005EDA69 /* CoreGraphics.framework */; };
@@ -54,8 +50,6 @@
 		1665B6751882F42500972111 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 168BC6B117EC2DF000BC4584 /* CoreData.framework */; };
 		1665B6761882F43800972111 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1628A6B218789E73005EDA69 /* Foundation.framework */; };
 		166A19AA19B99C4C004D9057 /* OpenInSafariActivity.m in Sources */ = {isa = PBXBuildFile; fileRef = 166A19A819B99C48004D9057 /* OpenInSafariActivity.m */; };
-		168253EF1A2BC06100240C7B /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 168253EE1A2BC06100240C7B /* Globals.swift */; };
-		168253F01A2BC06100240C7B /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 168253EE1A2BC06100240C7B /* Globals.swift */; };
 		168A5C77185BBA2F00CB6B02 /* MenuWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 168A5C76185BBA2F00CB6B02 /* MenuWindow.m */; };
 		168BC6AE17EC2DF000BC4584 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 168BC6AD17EC2DF000BC4584 /* Cocoa.framework */; };
 		168BC6B817EC2DF000BC4584 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 168BC6B617EC2DF000BC4584 /* InfoPlist.strings */; };
@@ -651,9 +645,7 @@
 				1665B66E1882F29E00972111 /* Settings.m in Sources */,
 				169CEB9C1879D5BB0083A068 /* AdvancedSettingsViewController.m in Sources */,
 				1628A6D418789E73005EDA69 /* DetailViewController.m in Sources */,
-				162002E21A2A6B2700FF95F3 /* NSDictionaryExtensions.swift in Sources */,
 				164785AB1A2CE7BD00297764 /* Globals.swift in Sources */,
-				168253F01A2BC06100240C7B /* Globals.swift in Sources */,
 				164785B11A2CE7CD00297764 /* NSStringExtensions.swift in Sources */,
 				16928CB91A2B3AED0030AE23 /* Repo.swift in Sources */,
 				1628A6D118789E73005EDA69 /* MasterViewController.m in Sources */,
@@ -676,7 +668,6 @@
 				1604D4CF189541D70064A385 /* EmptyView.m in Sources */,
 				166A19AA19B99C4C004D9057 /* OpenInSafariActivity.m in Sources */,
 				16FDD6DD18804470008D2223 /* PRCell.m in Sources */,
-				162002E51A2A6D5C00FF95F3 /* NSStringExtensions.swift in Sources */,
 				168FD0121A2A8C28005929CB /* PopTimer.swift in Sources */,
 				1628A6C118789E73005EDA69 /* main.m in Sources */,
 				16FD14D71881CBC400FDC960 /* PickerViewController.m in Sources */,
@@ -714,14 +705,11 @@
 				16928CBB1A2B3AED0030AE23 /* ApiServer.swift in Sources */,
 				161BED25185B5368005C00F7 /* StatusItemView.m in Sources */,
 				168FD00E1A2A7AD1005929CB /* MessageView.swift in Sources */,
-				168253EF1A2BC06100240C7B /* Globals.swift in Sources */,
 				164785AA1A2CE7BD00297764 /* Globals.swift in Sources */,
 				16A794F41A252BFA00A76553 /* PopTimer.swift in Sources */,
-				162002E41A2A6D5C00FF95F3 /* NSStringExtensions.swift in Sources */,
 				168BC6C717EC2DF000BC4584 /* Trailer.xcdatamodeld in Sources */,
 				16928CB21A2B3AED0030AE23 /* PRLabel.swift in Sources */,
 				164785AE1A2CE7CD00297764 /* NSDictionaryExtensions.swift in Sources */,
-				162002E11A2A6B2700FF95F3 /* NSDictionaryExtensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -782,7 +770,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
-				SWIFT_OBJC_BRIDGING_HEADER = "PocketTrailer-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "MobileTrailer/PocketTrailer-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
@@ -808,7 +796,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "8f4c3fa9-1a0d-4555-8a8a-c027cec25618";
 				SDKROOT = iphoneos;
-				SWIFT_OBJC_BRIDGING_HEADER = "PocketTrailer-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "MobileTrailer/PocketTrailer-Bridging-Header.h";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
@@ -898,7 +886,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "Trailer-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "Trailer/Trailer-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				WRAPPER_EXTENSION = app;
 			};
@@ -921,7 +909,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "Trailer-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "Trailer/Trailer-Bridging-Header.h";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
