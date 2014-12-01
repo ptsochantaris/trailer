@@ -24,8 +24,8 @@ class PRLabel: DataItem {
 			l = NSEntityDescription.insertNewObjectForEntityForName("PRLabel", inManagedObjectContext: fromServer.managedObjectContext!) as? PRLabel
 			l!.name = name
 			l!.serverId = NSNumber(int: 0)
-			l!.updatedAt! = NSDate.distantPast() as NSDate
-			l!.createdAt! = NSDate.distantPast() as NSDate
+			l!.updatedAt = NSDate.distantPast() as? NSDate
+			l!.createdAt = NSDate.distantPast() as? NSDate
 			l!.apiServer = fromServer
 		}
 		l!.url = info.ofk("url") as String?

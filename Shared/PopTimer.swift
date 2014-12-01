@@ -1,7 +1,5 @@
 
-import Foundation
-
-internal class PopTimer : NSObject {
+class PopTimer : NSObject {
 
 	var popTimer: NSTimer?
 	let timeInterval: NSTimeInterval

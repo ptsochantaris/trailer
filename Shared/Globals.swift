@@ -14,7 +14,7 @@ func DLog(messageFormat:@autoclosure () -> String, args:LazyVarArgClosure...) {
 		}
 
 		var s = withVaList(realArgs, curriedStringWithFormat)
-		println(s)
+		NSLog("%@", s)
 	}
 }
 
