@@ -1,5 +1,4 @@
 #import "PRCell.h"
-#import "PullRequest.h"
 #import "Settings.h"
 
 static NSNumberFormatter *itemCountFormatter;

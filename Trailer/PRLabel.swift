@@ -21,7 +21,7 @@ class PRLabel: DataItem {
 		let name = info.ofk("name") as String?
 		var l = PRLabel.labelWithName(name!, fromServer: fromServer)
 		if(l==nil) {
-			l! = NSEntityDescription.insertNewObjectForEntityForName("PRLabel", inManagedObjectContext: fromServer.managedObjectContext!) as PRLabel
+			l = NSEntityDescription.insertNewObjectForEntityForName("PRLabel", inManagedObjectContext: fromServer.managedObjectContext!) as? PRLabel
 			l!.name = name
 			l!.serverId = NSNumber(int: 0)
 			l!.updatedAt! = NSDate.distantPast() as NSDate

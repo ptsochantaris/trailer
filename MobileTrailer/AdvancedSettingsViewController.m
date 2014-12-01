@@ -1,7 +1,6 @@
 #import "PickerViewController.h"
 #import "AdvancedSettingsViewController.h"
 #import "Settings.h"
-#import "Repo.h"
 
 @interface AdvancedSettingsViewController () <PickerViewControllerDelegate>
 {

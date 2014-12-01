@@ -1,8 +1,5 @@
 #import "Settings.h"
 #import "MasterViewController.h"
-#import "Repo.h"
-#import "PullRequest.h"
-#import "PRComment.h"
 #import "OpenInSafariActivity.h"
 
 iOS_AppDelegate *app;

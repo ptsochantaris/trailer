@@ -46,7 +46,7 @@ class DataItem: NSManagedObject {
 		var existingItem = itemOfType(type, serverId: serverId, fromServer: fromServer)
 		if existingItem == nil {
 			DLog("Creating new %@: %@",type,serverId);
-			existingItem! = NSEntityDescription.insertNewObjectForEntityForName(type, inManagedObjectContext: fromServer.managedObjectContext!)as DataItem
+			existingItem = NSEntityDescription.insertNewObjectForEntityForName(type, inManagedObjectContext: fromServer.managedObjectContext!) as? DataItem
 			existingItem!.serverId = serverId
 			existingItem!.createdAt = syncDateFormatter.dateFromString(info.ofk("created_at") as String)
 			existingItem!.postSyncAction = NSNumber(long: PostSyncAction.NoteNew.rawValue)
