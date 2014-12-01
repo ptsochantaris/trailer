@@ -1,6 +1,6 @@
 
 @objc(ApiServer)
-class ApiServer: DataItem {
+class ApiServer: NSManagedObject {
 
     @NSManaged var apiPath: String?
     @NSManaged var authToken: String?
@@ -17,6 +17,7 @@ class ApiServer: DataItem {
     @NSManaged var userId: NSNumber?
     @NSManaged var userName: String?
     @NSManaged var webPath: String?
+	@NSManaged var createdAt: NSDate?
 
     @NSManaged var comments: NSSet
     @NSManaged var labels: NSSet
