@@ -1,5 +1,4 @@
 #import "Settings.h"
-#import "PRStatus.h"
 #import "CommentCounts.h"
 
 @interface PRItemView () <NSPasteboardItemDataProvider, NSDraggingSource>

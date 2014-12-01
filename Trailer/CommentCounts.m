@@ -42,13 +42,13 @@ static NSMutableParagraphStyle *pCenter;
 	return self;
 }
 
-typedef enum {
+typedef NS_ENUM(NSInteger, RoundedCorners) {
 	kRoundedCornerNone = 0,
 	kRoundedCornerTopLeft = 1,
 	kRoundedCornerTopRight = 2,
 	kRoundedCornerBottomLeft = 4,
 	kRoundedCornerBottomRight = 8
-} RoundedCorners;
+};
 
 #define BASE_BADGE_SIZE 21.0
 #define SMALL_BADGE_SIZE 14.0

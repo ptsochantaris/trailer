@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="6252" systemVersion="14A389" minimumToolsVersion="Xcode 4.5" macOSVersion="Automatic" iOSVersion="Automatic">
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="6252" systemVersion="14B25" minimumToolsVersion="Xcode 4.5" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="ApiServer" representedClassName="ApiServer" syncable="YES">
         <attribute name="apiPath" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="authToken" optional="YES" attributeType="String" syncable="YES"/>
@@ -133,9 +133,9 @@
     <elements>
         <element name="ApiServer" positionX="9" positionY="153" width="128" height="360"/>
         <element name="PRComment" positionX="0" positionY="0" width="128" height="253"/>
+        <element name="PRLabel" positionX="9" positionY="153" width="128" height="178"/>
         <element name="PRStatus" positionX="0" positionY="0" width="128" height="225"/>
         <element name="PullRequest" positionX="0" positionY="0" width="128" height="540"/>
         <element name="Repo" positionX="0" positionY="0" width="128" height="240"/>
-        <element name="PRLabel" positionX="9" positionY="153" width="128" height="178"/>
     </elements>
 </model>

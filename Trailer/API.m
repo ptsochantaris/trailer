@@ -1,7 +1,3 @@
-#import "PRLabel.h"
-#import "PRComment.h"
-#import "Repo.h"
-#import "PRStatus.h"
 #import "Settings.h"
 
 @interface UrlBackOffEntry : NSObject
@@ -11,11 +7,21 @@
 @implementation UrlBackOffEntry
 @end
 
-@interface API ()
+#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
+#define CACHE_MEMORY 1024*1024*4
+#define CACHE_DISK 1024*1024*128
+#else
+#define CACHE_MEMORY 1024*1024*2
+#define CACHE_DISK 1024*1024*8
+#endif
+
+#define CALLBACK if(callback) callback
+
+@implementation API
 {
 	NSOperationQueue *requestQueue;
 	NSDateFormatter *mediumFormatter;
-    NSString *cacheDirectory;
+	NSString *cacheDirectory;
 
 #ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
 	NSInteger networkIndicationCount;
@@ -23,20 +29,8 @@
 #endif
 
 	NSMutableDictionary *badLinks;
+	NSDateFormatter *syncDateFormatter;
 }
-@end
-
-@implementation API
-
-#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
-	#define CACHE_MEMORY 1024*1024*4
-	#define CACHE_DISK 1024*1024*128
-#else
-	#define CACHE_MEMORY 1024*1024*2
-	#define CACHE_DISK 1024*1024*8
-#endif
-
-#define CALLBACK if(callback) callback
 
 - (id)init
 {
@@ -54,6 +48,11 @@
 		mediumFormatter = [[NSDateFormatter alloc] init];
 		mediumFormatter.dateStyle = NSDateFormatterMediumStyle;
 		mediumFormatter.timeStyle = NSDateFormatterMediumStyle;
+
+		syncDateFormatter = [[NSDateFormatter alloc] init];
+		syncDateFormatter.dateFormat = @"yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'";
+		syncDateFormatter.timeZone = [NSTimeZone timeZoneWithAbbreviation:@"UTC"];
+		syncDateFormatter.locale = [NSLocale localeWithLocaleIdentifier:@"en_US"];
 
 		requestQueue = [[NSOperationQueue alloc] init];
 		requestQueue.maxConcurrentOperationCount = 4;
@@ -543,8 +542,6 @@ ignoreLastSync:NO
 	}
 }
 
-extern NSDateFormatter *_syncDateFormatter;
-
 - (void)markDirtyRepoIds:(NSMutableSet *)repoIdsToMarkDirty
 usingReceivedEventsFromServer:(ApiServer *)apiServer
 			 andCallback:(completionBlockType)callback
@@ -563,7 +560,7 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 			 perPageCallback:^BOOL(id data, BOOL lastPage) {
 				 for(NSDictionary *d in data)
 				 {
-					 NSDate *eventDate = [_syncDateFormatter dateFromString:d[@"created_at"]];
+					 NSDate *eventDate = [syncDateFormatter dateFromString:d[@"created_at"]];
 					 if([latestDate compare:eventDate]==NSOrderedAscending) // this is where we came in
 					 {
 						 DLog(@"New event at %@",eventDate);
@@ -614,7 +611,7 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 			 perPageCallback:^BOOL(id data, BOOL lastPage) {
 				 for(NSDictionary *d in data)
 				 {
-					 NSDate *eventDate = [_syncDateFormatter dateFromString:d[@"created_at"]];
+					 NSDate *eventDate = [syncDateFormatter dateFromString:d[@"created_at"]];
 					 if([latestDate compare:eventDate]==NSOrderedAscending) // this is where we came in
 					 {
 						 DLog(@"New event at %@",eventDate);

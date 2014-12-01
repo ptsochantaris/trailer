@@ -1,9 +1,32 @@
 #import "Reachability.h"
-#import "ApiServer.h"
 
 #define LOW_API_WARNING 0.20
 
-typedef enum {
+#define kPullRequestConditionOpen 0
+#define kPullRequestConditionClosed 1
+#define kPullRequestConditionMerged 2
+
+#define kPullRequestSectionNone 0
+#define kPullRequestSectionMine 1
+#define kPullRequestSectionParticipated 2
+#define kPullRequestSectionMerged 3
+#define kPullRequestSectionClosed 4
+#define kPullRequestSectionAll 5
+
+#define kStatusFilterAll 0
+#define kStatusFilterInclude 1
+#define kStatusFilterExclude 2
+
+#define kPullRequestSectionNames @[@"", @"Mine", @"Participated", @"Recently Merged", @"Recently Closed", @"All Pull Requests"]
+
+typedef NS_ENUM(NSInteger, PostSyncAction) {
+	kPostSyncDoNothing = 0,
+	kPostSyncDelete,
+	kPostSyncNoteNew,
+	kPostSyncNoteUpdated
+};
+
+typedef NS_ENUM(NSInteger, PRNotificationType) {
 	kNewComment = 0,
 	kNewPr,
 	kPrMerged,
@@ -13,26 +36,26 @@ typedef enum {
 	kNewRepoSubscribed,
 	kNewRepoAnnouncement,
 	kNewPrAssigned
-} PRNotificationType;
+};
 
-typedef enum {
+typedef NS_ENUM(NSInteger, PRSortingMethod) {
 	kCreationDate = 0,
 	kRecentActivity,
 	kTitle,
 	kRepository,
-} PRSortingMethod;
+};
 
-typedef enum {
+typedef NS_ENUM(NSInteger, PRSubscriptionPolicy) {
 	kRepoAutoSubscribeNone = 0,
 	kRepoAutoSubscribeParentsOnly,
 	kRepoDontAutoSubscribeAll,
-} PRSubscriptionPolicy;
+};
 
-typedef enum {
+typedef NS_ENUM(NSInteger, PRHandlingPolicy) {
 	kPullRequestHandlingKeepMine = 0,
 	kPullRequestHandlingKeepAll,
 	kPullRequestHandlingKeepNone,
-} PRHandlingPolicy;
+};
 
 typedef void (^completionBlockType)();
 
@@ -44,6 +67,8 @@ typedef void (^completionBlockType)();
 
 #define NETWORK_TIMEOUT 120.0
 #define BACKOFF_STEP 120.0
+
+@class ApiServer;
 
 @interface API : NSObject
 

@@ -1,9 +1,5 @@
 #import "OSX_AppDelegate.h"
 #import "Settings.h"
-#import "ApiServer.h"
-#import "Repo.h"
-#import "PullRequest.h"
-#import "PRComment.h"
 #import <Sparkle/Sparkle.h>
 
 OSX_AppDelegate *app;

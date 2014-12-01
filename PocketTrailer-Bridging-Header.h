@@ -8,5 +8,6 @@
 #import <CommonCrypto/CommonCrypto.h>
 #import "iOS_Globals.h"
 #import "iOS_AppDelegate.h"
+#import "Settings.h"
 
 extern iOS_AppDelegate *app;

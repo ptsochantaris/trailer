@@ -1,6 +1,4 @@
 #import "DataManager.h"
-#import "Repo.h"
-#import "PRComment.h"
 #import "Settings.h"
 
 @implementation DataManager

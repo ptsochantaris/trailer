@@ -20,12 +20,12 @@ extension NSString {
 		return String(hash)
 	}
 
-	func parseFromHex() -> UInt64 {
+	func parseFromHex() -> UInt32 {
 		var safe = self.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
 		safe = safe.stringByTrimmingCharactersInSet(NSCharacterSet.symbolCharacterSet())
 		let s = NSScanner(string: safe)
-		var result:UInt64 = 0
-		s.scanHexLongLong(&result)
+		var result:UInt32 = 0
+		s.scanHexInt(&result)
 		return result
 	}
 }
