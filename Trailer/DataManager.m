@@ -2,10 +2,9 @@
 #import "Settings.h"
 
 @implementation DataManager
-
-@synthesize persistentStoreCoordinator = _persistentStoreCoordinator;
-@synthesize managedObjectModel = _managedObjectModel;
-@synthesize managedObjectContext = _managedObjectContext;
+{
+	BOOL justMigrated;
+}
 
 - (id)init
 {
@@ -157,22 +156,13 @@
 // Creates if necessary and returns the managed object model for the application.
 - (NSManagedObjectModel *)managedObjectModel
 {
-    if (_managedObjectModel) {
-        return _managedObjectModel;
-    }
-
     NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"Trailer" withExtension:@"momd"];
-    _managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
-    return _managedObjectModel;
+    return [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
 }
 
 // Returns the persistent store coordinator for the application. This implementation creates and return a coordinator, having added the store for the application to it. (The directory for the store is created, if necessary.)
 - (NSPersistentStoreCoordinator *)persistentStoreCoordinator
 {
-    if (_persistentStoreCoordinator) {
-        return _persistentStoreCoordinator;
-    }
-
     NSManagedObjectModel *mom = [self managedObjectModel];
 	NSPersistentStoreCoordinator *coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:mom];
 
@@ -208,7 +198,7 @@
 	NSURL *sqlStore = [applicationFilesDirectory URLByAppendingPathComponent:@"Trailer.sqlite"];
 
 	NSDictionary *m = [NSPersistentStoreCoordinator metadataForPersistentStoreOfType:NSSQLiteStoreType URL:sqlStore error:&error];
-	self.justMigrated = ![mom isConfiguration:nil compatibleWithStoreMetadata:m];
+	justMigrated = ![mom isConfiguration:nil compatibleWithStoreMetadata:m];
 
 	if(![self addStorePath:sqlStore toCoordinator:coordinator])
 	{
@@ -220,8 +210,7 @@
 			abort();
 		}
 	}
-    _persistentStoreCoordinator = coordinator;
-    return _persistentStoreCoordinator;
+    return coordinator;
 }
 
 - (BOOL)addStorePath:(NSURL *)sqlStore toCoordinator:(NSPersistentStoreCoordinator *)coordinator
@@ -288,10 +277,10 @@
 
 - (NSManagedObjectContext *)tempContext
 {
-	NSManagedObjectContext *syncContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSConfinementConcurrencyType];
-	syncContext.parentContext = self.managedObjectContext;
-	syncContext.undoManager = nil;
-	return syncContext;
+	NSManagedObjectContext *c = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSConfinementConcurrencyType];
+	c.parentContext = self.managedObjectContext;
+	c.undoManager = nil;
+	return c;
 }
 
 - (void)deleteEverything
@@ -345,12 +334,12 @@
 
 - (void)postMigrationTasks
 {
-	if(self.justMigrated)
+	if(justMigrated)
 	{
 		DLog(@"FORCING ALL PRS TO BE REFETCHED");
 		NSArray *prs = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.managedObjectContext];
 		for(PullRequest *r in prs) r.updatedAt = [NSDate distantPast];
-		self.justMigrated = NO;
+		justMigrated = NO;
 	}
 }
 
