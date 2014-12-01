@@ -10,8 +10,9 @@ class PRComment: DataItem {
     @NSManaged var userId: NSNumber?
     @NSManaged var userName: String?
     @NSManaged var webUrl: String?
-    @NSManaged var pullRequest: PullRequest
 
+    @NSManaged var pullRequest: PullRequest
+	
 	class func commentWithInfo(info:NSDictionary, fromServer:ApiServer) -> PRComment {
 		let c = DataItem.itemWithInfo(info, type: "PRComment", fromServer: fromServer) as PRComment
 		if(c.postSyncAction?.integerValue != PostSyncAction.DoNothing.rawValue) {

@@ -10,7 +10,7 @@ class ApiServer: DataItem {
     @NSManaged var latestReceivedEventEtag: String?
     @NSManaged var latestUserEventDateProcessed: NSDate?
     @NSManaged var latestUserEventEtag: String?
-    @NSManaged var reportRefreshFailures: NSNumber?
+    @NSManaged var reportRefreshFailures: NSNumber
     @NSManaged var requestsLimit: NSNumber?
     @NSManaged var requestsRemaining: NSNumber?
     @NSManaged var resetDate: NSDate?
@@ -42,12 +42,9 @@ class ApiServer: DataItem {
 		for apiServer in allApiServersInMoc(moc) {
 
 			var lastSyncSucceeded = apiServer.lastSyncSucceeded?.boolValue
-			var reportRefreshFailures = apiServer.reportRefreshFailures?.boolValue
-
 			if(lastSyncSucceeded==nil) { lastSyncSucceeded!=false }
-			if(reportRefreshFailures==nil) { reportRefreshFailures!=false }
 
-			if apiServer.goodToGo() && !(lastSyncSucceeded!) && (reportRefreshFailures!) {
+			if apiServer.goodToGo() && !(lastSyncSucceeded!) && (apiServer.reportRefreshFailures.boolValue) {
 				return true
 			}
 		}

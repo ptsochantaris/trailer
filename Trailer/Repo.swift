@@ -1,13 +1,16 @@
+
+@objc (Repo)
 class Repo: DataItem {
 
     @NSManaged var dirty: NSNumber?
     @NSManaged var fork: NSNumber?
     @NSManaged var fullName: String?
-    @NSManaged var hidden: NSNumber?
+    @NSManaged var hidden: NSNumber
     @NSManaged var inaccessible: NSNumber?
     @NSManaged var lastDirtied: NSDate?
     @NSManaged var webUrl: String?
-    @NSManaged var pullRequests: NSSet
+
+	@NSManaged var pullRequests: NSSet
 
 	class func repoWithInfo(info: NSDictionary, fromServer: ApiServer) -> Repo {
 		let r = DataItem.itemWithInfo(info, type: "Repo", fromServer: fromServer) as Repo
@@ -60,9 +63,7 @@ class Repo: DataItem {
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "serverId IN %@", ids)
 		for repo in inMoc.executeFetchRequest(f, error: nil) as [Repo] {
-			var hidden: Bool
-			if let h = repo.hidden { hidden = h.boolValue } else { hidden = false }
-			repo.dirty = NSNumber(bool: !hidden)
+			repo.dirty = NSNumber(bool: !repo.hidden.boolValue)
 		}
 	}
 }

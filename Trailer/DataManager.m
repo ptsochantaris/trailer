@@ -207,53 +207,20 @@
 
 	NSURL *sqlStore = [applicationFilesDirectory URLByAppendingPathComponent:@"Trailer.sqlite"];
 
-#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
-	// migrate to SQLite if needed
-    NSURL *xmlStore = [applicationFilesDirectory URLByAppendingPathComponent:@"Trailer.storedata"];
-	if([fileManager fileExistsAtPath:xmlStore.path])
+	NSDictionary *m = [NSPersistentStoreCoordinator metadataForPersistentStoreOfType:NSSQLiteStoreType URL:sqlStore error:&error];
+	self.justMigrated = ![mom isConfiguration:nil compatibleWithStoreMetadata:m];
+
+	if(![self addStorePath:sqlStore toCoordinator:coordinator])
 	{
-		DLog(@"MIGRATING TO SQLITE");
+		DLog(@"Failed to migrate/load DB store - will nuke it and retry");
 		[self removeDatabaseFiles];
-
-		NSPersistentStore *xml = [coordinator addPersistentStoreWithType:NSXMLStoreType
-														   configuration:nil
-																	 URL:xmlStore
-																 options:@{ NSMigratePersistentStoresAutomaticallyOption: @YES,
-																			NSInferMappingModelAutomaticallyOption: @YES }
-																   error:nil];
-
-		if([coordinator migratePersistentStore:xml
-										 toURL:sqlStore
-									   options:nil
-									  withType:NSSQLiteStoreType
-										 error:nil])
-		{
-			[fileManager removeItemAtURL:xmlStore error:nil];
-			DLog(@"Deleted old XML store");
-		}
-		self.justMigrated = YES;
-	}
-	else
-	{
-#endif
-		NSDictionary *m = [NSPersistentStoreCoordinator metadataForPersistentStoreOfType:NSSQLiteStoreType URL:sqlStore error:&error];
-		self.justMigrated = ![mom isConfiguration:nil compatibleWithStoreMetadata:m];
-
 		if(![self addStorePath:sqlStore toCoordinator:coordinator])
 		{
-			DLog(@"Failed to migrate/load DB store - will nuke it and retry");
-			[self removeDatabaseFiles];
-			if(![self addStorePath:sqlStore toCoordinator:coordinator])
-			{
-				DLog(@"Catastrophic failure, app is probably corrupted and needs reinstall");
-				abort();
-			}
+			DLog(@"Catastrophic failure, app is probably corrupted and needs reinstall");
+			abort();
 		}
-#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
 	}
-#endif
     _persistentStoreCoordinator = coordinator;
-
     return _persistentStoreCoordinator;
 }
 

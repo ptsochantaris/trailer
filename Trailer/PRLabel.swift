@@ -1,8 +1,11 @@
+
+@objc (PRLabel)
 class PRLabel: DataItem {
 
     @NSManaged var color: NSNumber?
     @NSManaged var name: String?
     @NSManaged var url: String?
+
     @NSManaged var pullRequest: PullRequest
 
 	class func labelWithName(name: String, fromServer: ApiServer) -> PRLabel? {

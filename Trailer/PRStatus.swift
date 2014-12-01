@@ -14,6 +14,7 @@ func createDateFormatter() -> NSDateFormatter {
 	return dateFormatter
 }
 
+@objc(PRStatus)
 class PRStatus: DataItem {
 
     @NSManaged var descriptionText: String?
@@ -22,7 +23,8 @@ class PRStatus: DataItem {
     @NSManaged var url: String?
     @NSManaged var userId: NSNumber?
     @NSManaged var userName: String?
-    @NSManaged var pullRequest: PullRequest
+
+	@NSManaged var pullRequest: PullRequest
 
 	class func statusWithInfo(info: NSDictionary, fromServer: ApiServer) -> PRStatus {
 		let s = DataItem.itemWithInfo(info, type: "PRStatus", fromServer: fromServer) as PRStatus
