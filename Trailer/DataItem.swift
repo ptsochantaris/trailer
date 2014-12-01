@@ -107,7 +107,7 @@ class DataItem: NSManagedObject {
 				moc.deleteObject(i)
 			}
 		}
-		DLog("Nuked %@ deleted items",count);
+		DLog("Nuked %d deleted items",count);
 	}
 
 	class func countItemsOfType(type: String, moc: NSManagedObjectContext) -> Int {
