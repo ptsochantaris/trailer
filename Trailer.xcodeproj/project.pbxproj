@@ -40,6 +40,13 @@
 		1628A7071878BC23005EDA69 /* Trailer.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 168BC6C517EC2DF000BC4584 /* Trailer.xcdatamodeld */; };
 		1628A7081878BC32005EDA69 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 1617BEE9183F538100E89BB2 /* Reachability.m */; };
 		1640470A1882ED0000A4AC9C /* AboutTrailerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 164047091882ED0000A4AC9C /* AboutTrailerViewController.m */; };
+		164785AA1A2CE7BD00297764 /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785A91A2CE7BD00297764 /* Globals.swift */; };
+		164785AB1A2CE7BD00297764 /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785A91A2CE7BD00297764 /* Globals.swift */; };
+		164785AE1A2CE7CD00297764 /* NSDictionaryExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785AC1A2CE7CD00297764 /* NSDictionaryExtensions.swift */; };
+		164785AF1A2CE7CD00297764 /* NSDictionaryExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785AC1A2CE7CD00297764 /* NSDictionaryExtensions.swift */; };
+		164785B01A2CE7CD00297764 /* NSStringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785AD1A2CE7CD00297764 /* NSStringExtensions.swift */; };
+		164785B11A2CE7CD00297764 /* NSStringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785AD1A2CE7CD00297764 /* NSStringExtensions.swift */; };
+		164785B51A2CE82D00297764 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 164785B41A2CE82D00297764 /* Sparkle.framework */; };
 		16583E481851F082003A7A55 /* SectionHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 16583E471851F082003A7A55 /* SectionHeader.m */; };
 		165F1FC519E1D01E000690E6 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 165F1FC419E1D01E000690E6 /* Sparkle.framework */; };
 		165F1FC619E1D04D000690E6 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 165F1FC419E1D01E000690E6 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -151,6 +158,12 @@
 		164047081882ED0000A4AC9C /* AboutTrailerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AboutTrailerViewController.h; sourceTree = "<group>"; };
 		164047091882ED0000A4AC9C /* AboutTrailerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AboutTrailerViewController.m; sourceTree = "<group>"; };
 		16458E37191AC2D200FB13EC /* Trailer 12.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 12.xcdatamodel"; sourceTree = "<group>"; };
+		164785A91A2CE7BD00297764 /* Globals.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Globals.swift; path = Shared/Globals.swift; sourceTree = "<group>"; };
+		164785AC1A2CE7CD00297764 /* NSDictionaryExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NSDictionaryExtensions.swift; path = Shared/NSDictionaryExtensions.swift; sourceTree = "<group>"; };
+		164785AD1A2CE7CD00297764 /* NSStringExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NSStringExtensions.swift; path = Shared/NSStringExtensions.swift; sourceTree = "<group>"; };
+		164785B21A2CE7FB00297764 /* PocketTrailer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PocketTrailer-Bridging-Header.h"; sourceTree = "<group>"; };
+		164785B31A2CE80800297764 /* Trailer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Trailer-Bridging-Header.h"; sourceTree = "<group>"; };
+		164785B41A2CE82D00297764 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = Trailer/Sparkle.framework; sourceTree = "<group>"; };
 		164976221864935200C13A6B /* Trailer 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 3.xcdatamodel"; sourceTree = "<group>"; };
 		16508CD819E1B53E0029ADFE /* Trailer 16.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 16.xcdatamodel"; sourceTree = "<group>"; };
 		1653FD6F1966B2900080D972 /* Trailer 13.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 13.xcdatamodel"; sourceTree = "<group>"; };
@@ -238,6 +251,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1665B6761882F43800972111 /* Foundation.framework in Frameworks */,
+				164785B51A2CE82D00297764 /* Sparkle.framework in Frameworks */,
 				1665B6751882F42500972111 /* CoreData.framework in Frameworks */,
 				165F1FC519E1D01E000690E6 /* Sparkle.framework in Frameworks */,
 				1617BEED183F543600E89BB2 /* SystemConfiguration.framework in Frameworks */,
@@ -264,6 +278,7 @@
 				168BC6BB17EC2DF000BC4584 /* Trailer-Prefix.pch */,
 				162002D21A2A40B800FF95F3 /* OSX_Globals.h */,
 				16A794F11A252BF900A76553 /* Trailer-Bridging-Header.h */,
+				164785B31A2CE80800297764 /* Trailer-Bridging-Header.h */,
 				168BC6BF17EC2DF000BC4584 /* OSX_AppDelegate.h */,
 				168BC6C017EC2DF000BC4584 /* OSX_AppDelegate.m */,
 				162002CF1A2A3E2100FF95F3 /* Application.swift */,
@@ -277,6 +292,7 @@
 				1628A6C218789E73005EDA69 /* MobileTrailer-Prefix.pch */,
 				162002D91A2A4D9E00FF95F3 /* iOS_Globals.h */,
 				16A794F21A252BF900A76553 /* PocketTrailer-Bridging-Header.h */,
+				164785B21A2CE7FB00297764 /* PocketTrailer-Bridging-Header.h */,
 				1628A6C318789E73005EDA69 /* iOS_AppDelegate.h */,
 				1628A6C418789E73005EDA69 /* iOS_AppDelegate.m */,
 			);
@@ -330,6 +346,8 @@
 			children = (
 				162002E01A2A6B2700FF95F3 /* NSDictionaryExtensions.swift */,
 				162002E31A2A6D5C00FF95F3 /* NSStringExtensions.swift */,
+				164785AC1A2CE7CD00297764 /* NSDictionaryExtensions.swift */,
+				164785AD1A2CE7CD00297764 /* NSStringExtensions.swift */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
@@ -347,6 +365,7 @@
 			isa = PBXGroup;
 			children = (
 				16A794F31A252BFA00A76553 /* PopTimer.swift */,
+				164785A91A2CE7BD00297764 /* Globals.swift */,
 				168253EE1A2BC06100240C7B /* Globals.swift */,
 			);
 			name = Utilities;
@@ -406,6 +425,7 @@
 			isa = PBXGroup;
 			children = (
 				165F1FC419E1D01E000690E6 /* Sparkle.framework */,
+				164785B41A2CE82D00297764 /* Sparkle.framework */,
 				1628A6B218789E73005EDA69 /* Foundation.framework */,
 				1617BEEC183F543600E89BB2 /* SystemConfiguration.framework */,
 				168BC6B017EC2DF000BC4584 /* AppKit.framework */,
@@ -642,10 +662,13 @@
 				169CEB9C1879D5BB0083A068 /* AdvancedSettingsViewController.m in Sources */,
 				1628A6D418789E73005EDA69 /* DetailViewController.m in Sources */,
 				162002E21A2A6B2700FF95F3 /* NSDictionaryExtensions.swift in Sources */,
+				164785AB1A2CE7BD00297764 /* Globals.swift in Sources */,
 				168253F01A2BC06100240C7B /* Globals.swift in Sources */,
+				164785B11A2CE7CD00297764 /* NSStringExtensions.swift in Sources */,
 				16928CB91A2B3AED0030AE23 /* Repo.swift in Sources */,
 				1628A6D118789E73005EDA69 /* MasterViewController.m in Sources */,
 				1694372619FD3F4D005079F6 /* ServersViewController.m in Sources */,
+				164785AF1A2CE7CD00297764 /* NSDictionaryExtensions.swift in Sources */,
 				1628A7081878BC32005EDA69 /* Reachability.m in Sources */,
 				1628A7001878B810005EDA69 /* API.m in Sources */,
 				1628A6C518789E73005EDA69 /* iOS_AppDelegate.m in Sources */,
@@ -688,6 +711,7 @@
 				16928CA91A2A8E060030AE23 /* PRComment.swift in Sources */,
 				168BC6C117EC2DF000BC4584 /* OSX_AppDelegate.m in Sources */,
 				162002DD1A2A58B900FF95F3 /* CenterTextField.swift in Sources */,
+				164785B01A2CE7CD00297764 /* NSStringExtensions.swift in Sources */,
 				162002E71A2A75BD00FF95F3 /* AvatarView.swift in Sources */,
 				16928CB51A2B3AED0030AE23 /* PRStatus.swift in Sources */,
 				162002DB1A2A545C00FF95F3 /* CenterTextFieldCell.swift in Sources */,
@@ -701,10 +725,12 @@
 				161BED25185B5368005C00F7 /* StatusItemView.m in Sources */,
 				168FD00E1A2A7AD1005929CB /* MessageView.swift in Sources */,
 				168253EF1A2BC06100240C7B /* Globals.swift in Sources */,
+				164785AA1A2CE7BD00297764 /* Globals.swift in Sources */,
 				16A794F41A252BFA00A76553 /* PopTimer.swift in Sources */,
 				162002E41A2A6D5C00FF95F3 /* NSStringExtensions.swift in Sources */,
 				168BC6C717EC2DF000BC4584 /* Trailer.xcdatamodeld in Sources */,
 				16928CB21A2B3AED0030AE23 /* PRLabel.swift in Sources */,
+				164785AE1A2CE7CD00297764 /* NSDictionaryExtensions.swift in Sources */,
 				162002E11A2A6B2700FF95F3 /* NSDictionaryExtensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -874,6 +900,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Trailer",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Trailer/Trailer-Prefix.pch";
@@ -896,6 +923,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Trailer",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Trailer/Trailer-Prefix.pch";
