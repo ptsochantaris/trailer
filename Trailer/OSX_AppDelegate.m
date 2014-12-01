@@ -28,8 +28,6 @@ OSX_AppDelegate *app;
 														 [self filterTimerPopped];
 													 }];
 
-	[NSThread setThreadPriority:0.0];
-
 	settings = [[Settings alloc] init];
 	self.dataManager = [[DataManager alloc] init];
 	self.api = [[API alloc] init];

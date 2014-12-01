@@ -129,10 +129,10 @@
 		1628A6B118789E73005EDA69 /* PocketTrailer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PocketTrailer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1628A6B218789E73005EDA69 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1628A6B418789E73005EDA69 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		1628A6BC18789E73005EDA69 /* MobileTrailer-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "MobileTrailer-Info.plist"; sourceTree = "<group>"; };
+		1628A6BC18789E73005EDA69 /* PocketTrailer-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "PocketTrailer-Info.plist"; sourceTree = "<group>"; };
 		1628A6BE18789E73005EDA69 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1628A6C018789E73005EDA69 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		1628A6C218789E73005EDA69 /* MobileTrailer-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MobileTrailer-Prefix.pch"; sourceTree = "<group>"; };
+		1628A6C218789E73005EDA69 /* PocketTrailer-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PocketTrailer-Prefix.pch"; sourceTree = "<group>"; };
 		1628A6C318789E73005EDA69 /* iOS_AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = iOS_AppDelegate.h; sourceTree = "<group>"; };
 		1628A6C418789E73005EDA69 /* iOS_AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = iOS_AppDelegate.m; sourceTree = "<group>"; };
 		1628A6CA18789E73005EDA69 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -274,7 +274,7 @@
 		162002D11A2A409900FF95F3 /* Core */ = {
 			isa = PBXGroup;
 			children = (
-				1628A6C218789E73005EDA69 /* MobileTrailer-Prefix.pch */,
+				1628A6C218789E73005EDA69 /* PocketTrailer-Prefix.pch */,
 				162002D91A2A4D9E00FF95F3 /* iOS_Globals.h */,
 				164785B21A2CE7FB00297764 /* PocketTrailer-Bridging-Header.h */,
 				1628A6C318789E73005EDA69 /* iOS_AppDelegate.h */,
@@ -302,7 +302,7 @@
 		1628A6BB18789E73005EDA69 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				1628A6BC18789E73005EDA69 /* MobileTrailer-Info.plist */,
+				1628A6BC18789E73005EDA69 /* PocketTrailer-Info.plist */,
 				1628A6BD18789E73005EDA69 /* InfoPlist.strings */,
 				1628A6C018789E73005EDA69 /* main.m */,
 			);
@@ -759,8 +759,8 @@
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "MobileTrailer/MobileTrailer-Prefix.pch";
-				INFOPLIST_FILE = "MobileTrailer/MobileTrailer-Info.plist";
+				GCC_PREFIX_HEADER = "MobileTrailer/PocketTrailer-Prefix.pch";
+				INFOPLIST_FILE = "MobileTrailer/PocketTrailer-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -785,8 +785,8 @@
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "MobileTrailer/MobileTrailer-Prefix.pch";
-				INFOPLIST_FILE = "MobileTrailer/MobileTrailer-Info.plist";
+				GCC_PREFIX_HEADER = "MobileTrailer/PocketTrailer-Prefix.pch";
+				INFOPLIST_FILE = "MobileTrailer/PocketTrailer-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
