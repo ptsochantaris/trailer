@@ -65,8 +65,10 @@ typedef void (^completionBlockType)();
 #define NOTIFICATION_URL_KEY @"urlKey"
 
 #define API_USAGE_UPDATE @"RateUpdateNotification"
+#define DARK_MODE_CHANGED @"DarkModeChangedNotificationKey"
 
 #define NETWORK_TIMEOUT 120.0
 #define BACKOFF_STEP 120.0
+#define STATUSITEM_PADDING 1.0
 
 void DLog(NSString *format, ...);
