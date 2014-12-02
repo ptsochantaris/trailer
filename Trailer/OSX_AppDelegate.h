@@ -2,11 +2,10 @@
 #import "PRItemView.h"
 #import "SectionHeader.h"
 #import "StatusItemView.h"
-#import "DataManager.h"
 #import "MenuWindow.h"
 #import "API.h"
 
-@class PopTimer;
+@class PopTimer, DataManager;
 
 @interface OSX_AppDelegate : NSObject <
 	NSApplicationDelegate,

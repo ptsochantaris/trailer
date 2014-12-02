@@ -29,8 +29,6 @@
 		1628A6D118789E73005EDA69 /* MasterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1628A6D018789E73005EDA69 /* MasterViewController.m */; };
 		1628A6D418789E73005EDA69 /* DetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1628A6D318789E73005EDA69 /* DetailViewController.m */; };
 		1628A6D618789E73005EDA69 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1628A6D518789E73005EDA69 /* Images.xcassets */; };
-		1628A6F81878A171005EDA69 /* DataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1628A6F71878A171005EDA69 /* DataManager.m */; };
-		1628A6F91878A171005EDA69 /* DataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1628A6F71878A171005EDA69 /* DataManager.m */; };
 		1628A6FC1878B64E005EDA69 /* RespositoriesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1628A6FB1878B64E005EDA69 /* RespositoriesViewController.m */; };
 		1628A7001878B810005EDA69 /* API.m in Sources */ = {isa = PBXBuildFile; fileRef = 16075A9617EC7492000D86FD /* API.m */; };
 		1628A7071878BC23005EDA69 /* Trailer.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 168BC6C517EC2DF000BC4584 /* Trailer.xcdatamodeld */; };
@@ -83,6 +81,8 @@
 		16A794F41A252BFA00A76553 /* PopTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A794F31A252BFA00A76553 /* PopTimer.swift */; };
 		16B94072182D136700F32061 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 16B94070182D136700F32061 /* dsa_pub.pem */; };
 		16C54F941881639B00849B76 /* GithubViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 16C54F931881639B00849B76 /* GithubViewController.m */; };
+		16CBE1C11A2DBB2700485053 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C01A2DBB2700485053 /* DataManager.swift */; };
+		16CBE1C21A2DBB2700485053 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C01A2DBB2700485053 /* DataManager.swift */; };
 		16EE562019B78DBA0031DF6D /* CommentBlacklistViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 16EE561F19B78DBA0031DF6D /* CommentBlacklistViewController.m */; };
 		16FA683B1823CF4600401E9B /* PRItemView.m in Sources */ = {isa = PBXBuildFile; fileRef = 16FA683A1823CF4600401E9B /* PRItemView.m */; };
 		16FD14D71881CBC400FDC960 /* PickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 16FD14D61881CBC400FDC960 /* PickerViewController.m */; };
@@ -141,8 +141,6 @@
 		1628A6D218789E73005EDA69 /* DetailViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DetailViewController.h; sourceTree = "<group>"; };
 		1628A6D318789E73005EDA69 /* DetailViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DetailViewController.m; sourceTree = "<group>"; };
 		1628A6D518789E73005EDA69 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		1628A6F61878A171005EDA69 /* DataManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataManager.h; sourceTree = "<group>"; };
-		1628A6F71878A171005EDA69 /* DataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataManager.m; sourceTree = "<group>"; };
 		1628A6FA1878B64E005EDA69 /* RespositoriesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RespositoriesViewController.h; sourceTree = "<group>"; };
 		1628A6FB1878B64E005EDA69 /* RespositoriesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RespositoriesViewController.m; sourceTree = "<group>"; };
 		162D96F91913F0E7000A54EA /* Trailer 11.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 11.xcdatamodel"; sourceTree = "<group>"; };
@@ -208,6 +206,7 @@
 		16B94070182D136700F32061 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
 		16C54F921881639B00849B76 /* GithubViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GithubViewController.h; sourceTree = "<group>"; };
 		16C54F931881639B00849B76 /* GithubViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GithubViewController.m; sourceTree = "<group>"; };
+		16CBE1C01A2DBB2700485053 /* DataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DataManager.swift; path = Shared/DataManager.swift; sourceTree = SOURCE_ROOT; };
 		16D223EA19F2811F00B48E88 /* Trailer 17.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 17.xcdatamodel"; sourceTree = "<group>"; };
 		16ECCFAF18B7AC5E000B012F /* Trailer 10.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 10.xcdatamodel"; sourceTree = "<group>"; };
 		16EE561E19B78DBA0031DF6D /* CommentBlacklistViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommentBlacklistViewController.h; sourceTree = "<group>"; };
@@ -473,8 +472,7 @@
 			children = (
 				16EE562219B857C90031DF6D /* Models */,
 				168BC6C517EC2DF000BC4584 /* Trailer.xcdatamodeld */,
-				1628A6F61878A171005EDA69 /* DataManager.h */,
-				1628A6F71878A171005EDA69 /* DataManager.m */,
+				16CBE1C01A2DBB2700485053 /* DataManager.swift */,
 			);
 			name = Data;
 			path = Trailer;
@@ -656,10 +654,10 @@
 				1640470A1882ED0000A4AC9C /* AboutTrailerViewController.m in Sources */,
 				1628A6FC1878B64E005EDA69 /* RespositoriesViewController.m in Sources */,
 				16928CAD1A2B2DED0030AE23 /* DataItem.swift in Sources */,
+				16CBE1C21A2DBB2700485053 /* DataManager.swift in Sources */,
 				16928CB01A2B3AED0030AE23 /* PullRequest.swift in Sources */,
 				1694372919FD4056005079F6 /* ServerDetailViewController.m in Sources */,
 				16C54F941881639B00849B76 /* GithubViewController.m in Sources */,
-				1628A6F91878A171005EDA69 /* DataManager.m in Sources */,
 				1628A7071878BC23005EDA69 /* Trailer.xcdatamodeld in Sources */,
 				1604D4CF189541D70064A385 /* EmptyView.m in Sources */,
 				166A19AA19B99C4C004D9057 /* OpenInSafariActivity.m in Sources */,
@@ -693,10 +691,10 @@
 				16928CB51A2B3AED0030AE23 /* PRStatus.swift in Sources */,
 				162002DB1A2A545C00FF95F3 /* CenterTextFieldCell.swift in Sources */,
 				16583E481851F082003A7A55 /* SectionHeader.m in Sources */,
+				16CBE1C11A2DBB2700485053 /* DataManager.swift in Sources */,
 				162002D01A2A3E2100FF95F3 /* Application.swift in Sources */,
 				16928CAF1A2B3AED0030AE23 /* PullRequest.swift in Sources */,
 				168BC6BA17EC2DF000BC4584 /* main.m in Sources */,
-				1628A6F81878A171005EDA69 /* DataManager.m in Sources */,
 				16075A9717EC7492000D86FD /* API.m in Sources */,
 				16928CBB1A2B3AED0030AE23 /* ApiServer.swift in Sources */,
 				161BED25185B5368005C00F7 /* StatusItemView.m in Sources */,

@@ -55,7 +55,7 @@ class PullRequest: DataItem {
 			if let m = info.ofk("mergeable") as NSNumber? {
 				p.mergeable = m
 			} else {
-				p.mergeable = NSNumber(bool: true)
+				p.mergeable = true
 			}
 
 			if let userInfo = info.ofk("user") as NSDictionary? {
@@ -73,11 +73,11 @@ class PullRequest: DataItem {
 		}
 
 		if let c = p.condition {
-			p.reopened = NSNumber(bool: (c.intValue == kPullRequestConditionClosed))
+			p.reopened = (c.intValue == kPullRequestConditionClosed)
 		} else {
-			p.reopened = NSNumber(bool: false)
+			p.reopened = false
 		}
-		p.condition = NSNumber(int: kPullRequestConditionOpen)
+		p.condition = Int(kPullRequestConditionOpen)
 
 		return p;
 	}
@@ -479,7 +479,7 @@ class PullRequest: DataItem {
 				section = kPullRequestSectionParticipated;
 				f.predicate = predicateForOthersCommentsSinceDate(latestDate)
 				let count = self.managedObjectContext?.countForFetchRequest(f, error: nil)
-				self.unreadComments = NSNumber(integer: count!)
+				self.unreadComments = count!
 			} else {
 				f.predicate = predicateForOthersCommentsSinceDate(nil)
 				var unreadCommentCount: Int = 0
@@ -493,16 +493,16 @@ class PullRequest: DataItem {
 						}
 					}
 				}
-				self.unreadComments = NSNumber(integer: unreadCommentCount)
+				self.unreadComments = unreadCommentCount
 			}
 		} else {
 			f.predicate = predicateForOthersCommentsSinceDate(latestDate)
 			let count = self.managedObjectContext?.countForFetchRequest(f, error: nil)
-			self.unreadComments = NSNumber(integer: count!)
+			self.unreadComments = count!
 		}
 
-		self.sectionIndex = NSNumber(int: section)
-		self.totalComments = NSNumber(integer: self.comments.count)
+		self.sectionIndex = Int(section)
+		self.totalComments = self.comments.count
 		self.repoName = self.repo.fullName
 
 		if self.title==nil { self.title = "(No title)" }

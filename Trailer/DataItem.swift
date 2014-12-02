@@ -49,16 +49,16 @@ class DataItem: NSManagedObject {
 			existingItem = NSEntityDescription.insertNewObjectForEntityForName(type, inManagedObjectContext: fromServer.managedObjectContext!) as? DataItem
 			existingItem!.serverId = serverId
 			existingItem!.createdAt = syncDateFormatter.dateFromString(info.ofk("created_at") as String)
-			existingItem!.postSyncAction = NSNumber(long: PostSyncAction.NoteNew.rawValue)
+			existingItem!.postSyncAction = PostSyncAction.NoteNew.rawValue
 			existingItem!.updatedAt = updatedDate
 			existingItem!.apiServer = fromServer
 		} else if updatedDate != existingItem!.updatedAt {
-			DLog("Updating existing %@: %@",type,serverId);
-			existingItem!.postSyncAction = NSNumber(long: PostSyncAction.NoteUpdated.rawValue);
-			existingItem!.updatedAt = updatedDate;
+			DLog("Updating existing %@: %@",type,serverId)
+			existingItem!.postSyncAction = PostSyncAction.NoteUpdated.rawValue
+			existingItem!.updatedAt = updatedDate
 		} else {
-			DLog("Skipping %@: %@",type,serverId);
-			existingItem!.postSyncAction = NSNumber(long: PostSyncAction.DoNothing.rawValue);
+			DLog("Skipping %@: %@",type,serverId)
+			existingItem!.postSyncAction = PostSyncAction.DoNothing.rawValue
 		}
 		return existingItem!
 	}

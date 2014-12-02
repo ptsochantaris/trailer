@@ -23,7 +23,7 @@ class PRLabel: DataItem {
 		if(l==nil) {
 			l = NSEntityDescription.insertNewObjectForEntityForName("PRLabel", inManagedObjectContext: fromServer.managedObjectContext!) as? PRLabel
 			l!.name = name
-			l!.serverId = NSNumber(int: 0)
+			l!.serverId = 0
 			l!.updatedAt = NSDate.distantPast() as? NSDate
 			l!.createdAt = NSDate.distantPast() as? NSDate
 			l!.apiServer = fromServer
@@ -32,9 +32,9 @@ class PRLabel: DataItem {
 		if let c = info.ofk("color") as String? {
 			l!.color = NSNumber(unsignedInt: c.parseFromHex())
 		} else {
-			l!.color = NSNumber(integer: 0)
+			l!.color = 0
 		}
-		l!.postSyncAction = NSNumber(integer: PostSyncAction.DoNothing.rawValue)
+		l!.postSyncAction = PostSyncAction.DoNothing.rawValue
 		return l!
 	}
 

@@ -18,7 +18,7 @@ class Repo: DataItem {
 			r.fullName = info.ofk("full_name") as String?
 			r.fork = (info.ofk("fork") as NSNumber?)?.boolValue
 			r.webUrl = info.ofk("html_url") as String?
-			r.dirty = NSNumber(bool: true)
+			r.dirty = true
 			r.lastDirtied = NSDate()
 		}
 		return r
@@ -63,7 +63,7 @@ class Repo: DataItem {
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "serverId IN %@", ids)
 		for repo in inMoc.executeFetchRequest(f, error: nil) as [Repo] {
-			repo.dirty = NSNumber(bool: !repo.hidden.boolValue)
+			repo.dirty = !repo.hidden.boolValue
 		}
 	}
 }

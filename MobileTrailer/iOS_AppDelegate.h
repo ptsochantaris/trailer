@@ -1,5 +1,6 @@
 #import "API.h"
-#import "DataManager.h"
+
+@class DataManager;
 
 @interface iOS_AppDelegate : UIResponder <UIApplicationDelegate, UIPopoverControllerDelegate, UISplitViewControllerDelegate>
 
