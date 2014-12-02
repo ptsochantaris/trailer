@@ -241,6 +241,11 @@ class Settings: NSObject {
 		set { set("HOTKEY_CONTROL_MODIFIER", newValue) }
 	}
 
+	class var useVibrancy: Bool {
+		get { if let b = get("USE_VIBRANCY_UI") as Bool? { return b } else { return false } }
+		set { set("USE_VIBRANCY_UI", newValue) }
+	}
+
 	class var hotkeyCommandModifier: Bool {
 		get { if let b = get("HOTKEY_COMMAND_MODIFIER") as Bool? { return b } else { return true } }
 		set { set("HOTKEY_COMMAND_MODIFIER", newValue) }

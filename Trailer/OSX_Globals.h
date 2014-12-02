@@ -11,6 +11,3 @@
 
 #import "OSX_AppDelegate.h"
 extern OSX_AppDelegate *app;
-
-@class Settings;
-extern Settings *settings;

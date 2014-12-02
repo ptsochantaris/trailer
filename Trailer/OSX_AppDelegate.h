@@ -1,11 +1,10 @@
 
 #import "PRItemView.h"
 #import "SectionHeader.h"
-#import "StatusItemView.h"
 #import "MenuWindow.h"
 #import "API.h"
 
-@class PopTimer, DataManager;
+@class PopTimer, DataManager, StatusItemView;
 
 @interface OSX_AppDelegate : NSObject <
 	NSApplicationDelegate,
@@ -15,8 +14,7 @@
 	NSWindowDelegate,
 	NSUserNotificationCenterDelegate,
 	PRItemViewDelegate,
-	SectionHeaderDelegate,
-	StatusItemDelegate
+	SectionHeaderDelegate
 >
 
 // Preferences window

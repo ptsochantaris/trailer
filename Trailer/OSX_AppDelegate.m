@@ -1052,31 +1052,30 @@ OSX_AppDelegate *app;
 
 - (void)enableHotkeySegments
 {
-	Settings *s = settings;
-	if(s.hotkeyEnable)
+	if(Settings.hotkeyEnable)
 	{
-		if(s.hotkeyCommandModifier)
+		if(Settings.hotkeyCommandModifier)
 			[self colorButton:self.hotkeyCommandModifier withColor:[NSColor controlTextColor]];
 		else
 			[self colorButton:self.hotkeyCommandModifier withColor:[NSColor disabledControlTextColor]];
 
-		if(s.hotkeyControlModifier)
+		if(Settings.hotkeyControlModifier)
 			[self colorButton:self.hotkeyControlModifier withColor:[NSColor controlTextColor]];
 		else
 			[self colorButton:self.hotkeyControlModifier withColor:[NSColor disabledControlTextColor]];
 
-		if(s.hotkeyOptionModifier)
+		if(Settings.hotkeyOptionModifier)
 			[self colorButton:self.hotkeyOptionModifier withColor:[NSColor controlTextColor]];
 		else
 			[self colorButton:self.hotkeyOptionModifier withColor:[NSColor disabledControlTextColor]];
 
-		if(s.hotkeyShiftModifier)
+		if(Settings.hotkeyShiftModifier)
 			[self colorButton:self.hotkeyShiftModifier withColor:[NSColor controlTextColor]];
 		else
 			[self colorButton:self.hotkeyShiftModifier withColor:[NSColor disabledControlTextColor]];
 	}
-	[self.hotKeyContainer setHidden:!s.hotkeyEnable];
-	[self.hotKeyHelp setHidden:s.hotkeyEnable];
+	[self.hotKeyContainer setHidden:!Settings.hotkeyEnable];
+	[self.hotKeyHelp setHidden:Settings.hotkeyEnable];
 }
 
 - (void)populateHotkeyLetterMenu
@@ -1626,10 +1625,15 @@ OSX_AppDelegate *app;
 
 	self.statusItemView = [[StatusItemView alloc] initWithFrame:CGRectMake(0, 0, length, H)
 														  label:countString
-													 attributes:attributes
-													   delegate:self];
+													 attributes:attributes];
 	self.statusItemView.highlighted = [self.mainMenu isVisible];
 	self.statusItemView.grayOut = self.isRefreshing;
+
+	__weak OSX_AppDelegate *weakSelf = self;
+	self.statusItemView.tappedCallback = ^{
+		[weakSelf statusItemTapped:weakSelf.statusItemView];
+	};
+
 	self.statusItem.view = self.statusItemView;
 
 	[self buildPrMenuItemsFromList:pullRequests];

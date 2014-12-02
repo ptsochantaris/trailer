@@ -13,7 +13,6 @@
 		16154E2F19C43E8E00E49139 /* Launch.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 16154E2E19C43E8E00E49139 /* Launch.storyboard */; };
 		1617BEEA183F538100E89BB2 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 1617BEE9183F538100E89BB2 /* Reachability.m */; };
 		1617BEED183F543600E89BB2 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1617BEEC183F543600E89BB2 /* SystemConfiguration.framework */; };
-		161BED25185B5368005C00F7 /* StatusItemView.m in Sources */ = {isa = PBXBuildFile; fileRef = 161BED24185B5368005C00F7 /* StatusItemView.m */; };
 		162002D01A2A3E2100FF95F3 /* Application.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002CF1A2A3E2100FF95F3 /* Application.swift */; };
 		162002D61A2A49A300FF95F3 /* ViewAllowsVibrancy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002D51A2A49A300FF95F3 /* ViewAllowsVibrancy.swift */; };
 		162002DB1A2A545C00FF95F3 /* CenterTextFieldCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002DA1A2A545C00FF95F3 /* CenterTextFieldCell.swift */; };
@@ -83,6 +82,7 @@
 		16CBE1C21A2DBB2700485053 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C01A2DBB2700485053 /* DataManager.swift */; };
 		16CBE1C51A2DFBA500485053 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C41A2DFBA500485053 /* Settings.swift */; };
 		16CBE1C61A2DFBA500485053 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C41A2DFBA500485053 /* Settings.swift */; };
+		16CBE1CA1A2E13A400485053 /* StatusItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C91A2E13A400485053 /* StatusItemView.swift */; };
 		16EE562019B78DBA0031DF6D /* CommentBlacklistViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 16EE561F19B78DBA0031DF6D /* CommentBlacklistViewController.m */; };
 		16FA683B1823CF4600401E9B /* PRItemView.m in Sources */ = {isa = PBXBuildFile; fileRef = 16FA683A1823CF4600401E9B /* PRItemView.m */; };
 		16FD14D71881CBC400FDC960 /* PickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 16FD14D61881CBC400FDC960 /* PickerViewController.m */; };
@@ -116,8 +116,6 @@
 		1617BEE9183F538100E89BB2 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Reachability.m; path = Trailer/Reachability.m; sourceTree = "<group>"; };
 		1617BEEC183F543600E89BB2 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		1617BEEE183F9C4F00E89BB2 /* Trailer 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 2.xcdatamodel"; sourceTree = "<group>"; };
-		161BED23185B5368005C00F7 /* StatusItemView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StatusItemView.h; sourceTree = "<group>"; };
-		161BED24185B5368005C00F7 /* StatusItemView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StatusItemView.m; sourceTree = "<group>"; };
 		162002CF1A2A3E2100FF95F3 /* Application.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Application.swift; sourceTree = "<group>"; };
 		162002D21A2A40B800FF95F3 /* OSX_Globals.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OSX_Globals.h; sourceTree = "<group>"; };
 		162002D51A2A49A300FF95F3 /* ViewAllowsVibrancy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewAllowsVibrancy.swift; sourceTree = "<group>"; };
@@ -207,6 +205,7 @@
 		16CBE1C01A2DBB2700485053 /* DataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = DataManager.swift; path = Shared/DataManager.swift; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16CBE1C31A2DF61C00485053 /* GlobalsObjC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GlobalsObjC.h; path = Shared/GlobalsObjC.h; sourceTree = "<group>"; };
 		16CBE1C41A2DFBA500485053 /* Settings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Settings.swift; path = Shared/Settings.swift; sourceTree = "<group>"; };
+		16CBE1C91A2E13A400485053 /* StatusItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatusItemView.swift; sourceTree = "<group>"; };
 		16D223EA19F2811F00B48E88 /* Trailer 17.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 17.xcdatamodel"; sourceTree = "<group>"; };
 		16ECCFAF18B7AC5E000B012F /* Trailer 10.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 10.xcdatamodel"; sourceTree = "<group>"; };
 		16EE561E19B78DBA0031DF6D /* CommentBlacklistViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommentBlacklistViewController.h; sourceTree = "<group>"; };
@@ -346,13 +345,12 @@
 			children = (
 				168A5C75185BBA2F00CB6B02 /* MenuWindow.h */,
 				168A5C76185BBA2F00CB6B02 /* MenuWindow.m */,
-				161BED23185B5368005C00F7 /* StatusItemView.h */,
-				161BED24185B5368005C00F7 /* StatusItemView.m */,
 				162002D51A2A49A300FF95F3 /* ViewAllowsVibrancy.swift */,
 				162002DA1A2A545C00FF95F3 /* CenterTextFieldCell.swift */,
 				162002DC1A2A58B900FF95F3 /* CenterTextField.swift */,
 				162002DE1A2A5C9200FF95F3 /* LinkField.swift */,
 				162002E61A2A75BD00FF95F3 /* AvatarView.swift */,
+				16CBE1C91A2E13A400485053 /* StatusItemView.swift */,
 			);
 			name = Display;
 			sourceTree = "<group>";
@@ -649,6 +647,7 @@
 				162002D61A2A49A300FF95F3 /* ViewAllowsVibrancy.swift in Sources */,
 				162002DF1A2A5C9200FF95F3 /* LinkField.swift in Sources */,
 				16928CAC1A2B2DED0030AE23 /* DataItem.swift in Sources */,
+				16CBE1CA1A2E13A400485053 /* StatusItemView.swift in Sources */,
 				16928CA91A2A8E060030AE23 /* PRComment.swift in Sources */,
 				168BC6C117EC2DF000BC4584 /* OSX_AppDelegate.m in Sources */,
 				162002DD1A2A58B900FF95F3 /* CenterTextField.swift in Sources */,
@@ -664,7 +663,6 @@
 				16CBE1C51A2DFBA500485053 /* Settings.swift in Sources */,
 				16075A9717EC7492000D86FD /* API.m in Sources */,
 				16928CBB1A2B3AED0030AE23 /* ApiServer.swift in Sources */,
-				161BED25185B5368005C00F7 /* StatusItemView.m in Sources */,
 				168FD00E1A2A7AD1005929CB /* MessageView.swift in Sources */,
 				164785AA1A2CE7BD00297764 /* Globals.swift in Sources */,
 				16A794F41A252BFA00A76553 /* PopTimer.swift in Sources */,
