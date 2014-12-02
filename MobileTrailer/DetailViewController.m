@@ -1,5 +1,4 @@
 #import "DetailViewController.h"
-#import "Settings.h"
 
 @implementation DetailViewController
 

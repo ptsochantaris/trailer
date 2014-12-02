@@ -1,5 +1,4 @@
 #import "MasterViewController.h"
-#import "Settings.h"
 #import "PRCell.h"
 #import "EmptyView.h"
 
@@ -94,7 +93,7 @@
 - (void)removeAllMerged
 {
 	dispatch_async(dispatch_get_main_queue(), ^{
-		if(settings.dontAskBeforeWipingMerged)
+		if(Settings.dontAskBeforeWipingMerged)
 		{
 			[self removeAllMergedConfirmed];
 		}
@@ -117,7 +116,7 @@
 - (void)removeAllClosed
 {
 	dispatch_async(dispatch_get_main_queue(), ^{
-		if(settings.dontAskBeforeWipingClosed)
+		if(Settings.dontAskBeforeWipingClosed)
 		{
 			[self removeAllClosedConfirmed];
 		}
@@ -597,14 +596,14 @@
 	if(allServersHaveTokens && [segue.destinationViewController isKindOfClass:[UITabBarController class]])
 	{
 		UITabBarController *t = segue.destinationViewController;
-		t.selectedIndex = MIN(settings.lastPreferencesTabSelected, t.viewControllers.count-1);
+		t.selectedIndex = MIN(Settings.lastPreferencesTabSelected, t.viewControllers.count-1);
 		t.delegate = self;
 	}
 }
 
 - (void)tabBarController:(UITabBarController *)tabBarController didSelectViewController:(UIViewController *)viewController
 {
-	settings.lastPreferencesTabSelected = [tabBarController.viewControllers indexOfObject:viewController];
+	Settings.lastPreferencesTabSelected = [tabBarController.viewControllers indexOfObject:viewController];
 }
 
 @end

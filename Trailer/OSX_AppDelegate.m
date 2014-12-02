@@ -1,5 +1,4 @@
 #import "OSX_AppDelegate.h"
-#import "Settings.h"
 #import <Sparkle/Sparkle.h>
 
 OSX_AppDelegate *app;
@@ -28,7 +27,6 @@ OSX_AppDelegate *app;
 														 [self filterTimerPopped];
 													 }];
 
-	settings = [[Settings alloc] init];
 	self.dataManager = [[DataManager alloc] init];
 	self.api = [[API alloc] init];
 
@@ -99,7 +97,7 @@ OSX_AppDelegate *app;
 
 	SUUpdater *s = [SUUpdater sharedUpdater];
     [self setUpdateCheckParameters];
-	if(!s.updateInProgress && settings.checkForUpdatesAutomatically)
+	if(!s.updateInProgress && Settings.checkForUpdatesAutomatically)
 	{
 		[s checkForUpdatesInBackground];
 	}
@@ -108,7 +106,7 @@ OSX_AppDelegate *app;
 - (void)setupSortMethodMenu
 {
 	NSMenu *m = [[NSMenu alloc] initWithTitle:@"Sorting"];
-	if(settings.sortDescending)
+	if(Settings.sortDescending)
 	{
 		[m addItemWithTitle:@"Youngest First" action:@selector(sortMethodChanged:) keyEquivalent:@""];
 		[m addItemWithTitle:@"Most Recently Active" action:@selector(sortMethodChanged:) keyEquivalent:@""];
@@ -121,18 +119,18 @@ OSX_AppDelegate *app;
 		[m addItemWithTitle:@"Alphabetically" action:@selector(sortMethodChanged:) keyEquivalent:@""];
 	}
 	self.sortModeSelect.menu = m;
-	[self.sortModeSelect selectItemAtIndex:settings.sortMethod];
+	[self.sortModeSelect selectItemAtIndex:Settings.sortMethod];
 }
 
 - (IBAction)showLabelsSelected:(NSButton *)sender
 {
-	settings.showLabels = (sender.integerValue==1);
+	Settings.showLabels = (sender.integerValue==1);
 	[self updateMenu];
 
 	[self updateLabelOptions];
 
 	self.api.successfulRefreshesSinceLastLabelCheck = 0;
-	if(settings.showLabels)
+	if(Settings.showLabels)
 	{
 		for(Repo *r in [Repo allItemsOfType:@"Repo" inMoc:self.dataManager.managedObjectContext])
 		{
@@ -145,41 +143,41 @@ OSX_AppDelegate *app;
 
 - (IBAction)dontConfirmRemoveAllMergedSelected:(NSButton *)sender
 {
-	settings.dontAskBeforeWipingMerged = (sender.integerValue==1);
+	Settings.dontAskBeforeWipingMerged = (sender.integerValue==1);
 }
 
 - (IBAction)hideAllPrsSection:(NSButton *)sender
 {
 	BOOL setting = (sender.integerValue==1);
-	settings.hideAllPrsSection = setting;
+	Settings.hideAllPrsSection = setting;
 	[self.dataManager postProcessAllPrs]; // apply any view option changes
 	[self updateMenu];
 }
 
 - (IBAction)markUnmergeableOnUserSectionsOnlySelected:(NSButton *)sender
 {
-	settings.markUnmergeableOnUserSectionsOnly = (sender.integerValue==1);
+	Settings.markUnmergeableOnUserSectionsOnly = (sender.integerValue==1);
 	[self updateMenu];
 }
 
 - (IBAction)displayRepositoryNameSelected:(NSButton *)sender
 {
-	settings.showReposInName = (sender.integerValue==1);
+	Settings.showReposInName = (sender.integerValue==1);
 	[self updateMenu];
 }
 
 - (IBAction)useVibrancySelected:(NSButton *)sender
 {
-	settings.useVibrancy = (sender.integerValue==1);
+	Settings.useVibrancy = (sender.integerValue==1);
 	[[NSNotificationCenter defaultCenter] postNotificationName:UPDATE_VIBRANCY_NOTIFICATION object:nil];
 }
 
 - (IBAction)logActivityToConsoleSelected:(NSButton *)sender
 {
 	BOOL setting = (sender.integerValue==1);
-	settings.logActivityToConsole = setting;
+	Settings.logActivityToConsole = setting;
 
-	if(settings.logActivityToConsole)
+	if(Settings.logActivityToConsole)
 	{
 		NSAlert *alert = [[NSAlert alloc] init];
 		[alert setMessageText:@"Warning"];
@@ -192,19 +190,19 @@ OSX_AppDelegate *app;
 - (IBAction)includeRepositoriesInfilterSelected:(NSButton *)sender
 {
 	BOOL setting = (sender.integerValue==1);
-	settings.includeReposInFilter = setting;
+	Settings.includeReposInFilter = setting;
 }
 
 - (IBAction)dontConfirmRemoveAllClosedSelected:(NSButton *)sender
 {
 	BOOL dontConfirm = (sender.integerValue==1);
-    settings.dontAskBeforeWipingClosed = dontConfirm;
+    Settings.dontAskBeforeWipingClosed = dontConfirm;
 }
 
 - (IBAction)autoParticipateOnMentionSelected:(NSButton *)sender
 {
 	BOOL autoParticipate = (sender.integerValue==1);
-	settings.autoParticipateInMentions = autoParticipate;
+	Settings.autoParticipateInMentions = autoParticipate;
 	[self.dataManager postProcessAllPrs]; // apply any view option changes
 	[self updateMenu];
 }
@@ -212,13 +210,13 @@ OSX_AppDelegate *app;
 - (IBAction)dontKeepMyPrsSelected:(NSButton *)sender
 {
 	BOOL dontKeep = (sender.integerValue==1);
-	settings.dontKeepPrsMergedByMe = dontKeep;
+	Settings.dontKeepPrsMergedByMe = dontKeep;
 }
 
 - (IBAction)hideAvatarsSelected:(NSButton *)sender
 {
 	BOOL hide = (sender.integerValue==1);
-	settings.hideAvatars = hide;
+	Settings.hideAvatars = hide;
 	[self.dataManager postProcessAllPrs]; // apply any view option changes
 	[self updateMenu];
 }
@@ -226,7 +224,7 @@ OSX_AppDelegate *app;
 - (IBAction)hidePrsSelected:(NSButton *)sender
 {
 	BOOL show = (sender.integerValue==1);
-	settings.shouldHideUncommentedRequests = show;
+	Settings.shouldHideUncommentedRequests = show;
 	[self.dataManager postProcessAllPrs]; // apply any view option changes
 	[self updateMenu];
 }
@@ -234,7 +232,7 @@ OSX_AppDelegate *app;
 - (IBAction)showAllCommentsSelected:(NSButton *)sender
 {
 	BOOL show = (sender.integerValue==1);
-	settings.showCommentsEverywhere = show;
+	Settings.showCommentsEverywhere = show;
 	[self.dataManager postProcessAllPrs]; // apply any view option changes
 	[self updateMenu];
 }
@@ -242,7 +240,7 @@ OSX_AppDelegate *app;
 - (IBAction)sortOrderSelected:(NSButton *)sender
 {
 	BOOL descending = (sender.integerValue==1);
-	settings.sortDescending = descending;
+	Settings.sortDescending = descending;
 	[self setupSortMethodMenu];
 	[self.dataManager postProcessAllPrs]; // apply any view option changes
 	[self updateMenu];
@@ -250,37 +248,37 @@ OSX_AppDelegate *app;
 
 - (IBAction)countOnlyListedPrsSelected:(NSButton *)sender
 {
-	settings.countOnlyListedPrs = (sender.integerValue==1);
+	Settings.countOnlyListedPrs = (sender.integerValue==1);
 	[self.dataManager postProcessAllPrs]; // apply any view option changes
 	[self updateMenu];
 }
 
 - (IBAction)hideNewRespositoriesSelected:(NSButton *)sender
 {
-	settings.hideNewRepositories = (sender.integerValue==1);
+	Settings.hideNewRepositories = (sender.integerValue==1);
 }
 
 - (IBAction)openPrAtFirstUnreadCommentSelected:(NSButton *)sender
 {
-	settings.openPrAtFirstUnreadComment = (sender.integerValue==1);
+	Settings.openPrAtFirstUnreadComment = (sender.integerValue==1);
 }
 
 - (IBAction)sortMethodChanged:(id)sender
 {
-	settings.sortMethod = self.sortModeSelect.indexOfSelectedItem;
+	Settings.sortMethod = self.sortModeSelect.indexOfSelectedItem;
 	[self.dataManager postProcessAllPrs]; // apply any view option changes
 	[self updateMenu];
 }
 
 - (IBAction)showStatusItemsSelected:(NSButton *)sender
 {
-	settings.showStatusItems = (sender.integerValue==1);
+	Settings.showStatusItems = (sender.integerValue==1);
 	[self updateMenu];
 
 	[self updateStatusItemsOptions];
 
 	self.api.successfulRefreshesSinceLastStatusCheck = 0;
-	if(settings.showStatusItems)
+	if(Settings.showStatusItems)
 	{
 		for(Repo *r in [Repo allItemsOfType:@"Repo" inMoc:self.dataManager.managedObjectContext])
 		{
@@ -293,7 +291,7 @@ OSX_AppDelegate *app;
 
 - (void)updateStatusItemsOptions
 {
-	BOOL enable = settings.showStatusItems;
+	BOOL enable = Settings.showStatusItems;
 	[self.makeStatusItemsSelectable setEnabled:enable];
 	[self.statusTermMenu setEnabled:enable];
 	[self.statusTermsField setEnabled:enable];
@@ -310,7 +308,7 @@ OSX_AppDelegate *app;
 		[self.statusItemsRefreshNote setAlphaValue:0.5];
 	}
 
-	NSInteger count = settings.statusItemRefreshInterval;
+	NSInteger count = Settings.statusItemRefreshInterval;
 	self.statusItemRefreshCounter.integerValue = count;
 	if(count>1)
 		self.statusItemRescanLabel.stringValue = [NSString stringWithFormat:@"...and re-scan once every %ld refreshes",(long)count];
@@ -320,7 +318,7 @@ OSX_AppDelegate *app;
 
 - (void)updateLabelOptions
 {
-	BOOL enable = settings.showLabels;
+	BOOL enable = Settings.showLabels;
 	[self.labelRefreshCounter setEnabled:enable];
 
 	if(enable)
@@ -334,7 +332,7 @@ OSX_AppDelegate *app;
 		[self.labelRefreshNote setAlphaValue:0.5];
 	}
 
-	NSInteger count = settings.labelRefreshInterval;
+	NSInteger count = Settings.labelRefreshInterval;
 	self.labelRefreshCounter.integerValue = count;
 	if(count>1)
 		self.labelRescanLabel.stringValue = [NSString stringWithFormat:@"...and re-scan once every %ld refreshes",(long)count];
@@ -344,27 +342,27 @@ OSX_AppDelegate *app;
 
 - (IBAction)labelRefreshCounterChanged:(NSStepper *)sender
 {
-	settings.labelRefreshInterval = self.labelRefreshCounter.integerValue;
+	Settings.labelRefreshInterval = self.labelRefreshCounter.integerValue;
 	[self updateLabelOptions];
 }
 
 - (IBAction)statusItemRefreshCountChanged:(NSStepper *)sender
 {
-	settings.statusItemRefreshInterval = self.statusItemRefreshCounter.integerValue;
+	Settings.statusItemRefreshInterval = self.statusItemRefreshCounter.integerValue;
 	[self updateStatusItemsOptions];
 }
 
 - (IBAction)makeStatusItemsSelectableSelected:(NSButton *)sender
 {
 	BOOL yes = (sender.integerValue==1);
-	settings.makeStatusItemsSelectable = yes;
+	Settings.makeStatusItemsSelectable = yes;
 	[self updateMenu];
 }
 
 - (IBAction)showCreationSelected:(NSButton *)sender
 {
 	BOOL show = (sender.integerValue==1);
-	settings.showCreatedInsteadOfUpdated = show;
+	Settings.showCreatedInsteadOfUpdated = show;
 	[self.dataManager postProcessAllPrs]; // apply any view option changes
 	[self updateMenu];
 }
@@ -372,14 +370,14 @@ OSX_AppDelegate *app;
 - (IBAction)groupbyRepoSelected:(NSButton *)sender
 {
 	BOOL setting = (sender.integerValue==1);
-	settings.groupByRepo = setting;
+	Settings.groupByRepo = setting;
 	[self updateMenu];
 }
 
 - (IBAction)moveAssignedPrsToMySectionSelected:(NSButton *)sender
 {
 	BOOL setting = (sender.integerValue==1);
-	settings.moveAssignedPrsToMySection = setting;
+	Settings.moveAssignedPrsToMySection = setting;
 	[self.dataManager postProcessAllPrs]; // apply any view option changes
 	[self updateMenu];
 }
@@ -387,14 +385,14 @@ OSX_AppDelegate *app;
 - (IBAction)checkForUpdatesAutomaticallySelected:(NSButton *)sender
 {
 	BOOL setting = (sender.integerValue==1);
-    settings.checkForUpdatesAutomatically = setting;
+    Settings.checkForUpdatesAutomatically = setting;
     [self refreshUpdatePreferences];
 }
 
 - (void)refreshUpdatePreferences
 {
-    BOOL setting = settings.checkForUpdatesAutomatically;
-    NSInteger interval = settings.checkForUpdatesInterval;
+    BOOL setting = Settings.checkForUpdatesAutomatically;
+    NSInteger interval = Settings.checkForUpdatesInterval;
 
     [self.checkForUpdatesLabel setHidden:!setting];
     [self.checkForUpdatesSelector setHidden:!setting];
@@ -413,7 +411,7 @@ OSX_AppDelegate *app;
 
 - (IBAction)checkForUpdatesIntervalChanged:(NSStepper *)sender
 {
-    settings.checkForUpdatesInterval = sender.integerValue;
+    Settings.checkForUpdatesInterval = sender.integerValue;
     [self refreshUpdatePreferences];
 }
 
@@ -553,7 +551,7 @@ OSX_AppDelegate *app;
 	}
 
 	if((type==kNewComment || type==kNewMention) &&
-	   !settings.hideAvatars &&
+	   !Settings.hideAvatars &&
 	   [notification respondsToSelector:@selector(setContentImage:)]) // let's add an avatar on this!
 	{
 		PRComment *c = (PRComment *)item;
@@ -668,7 +666,7 @@ OSX_AppDelegate *app;
 {
 	if([header.title isEqualToString:kPullRequestSectionNames[kPullRequestSectionMerged]])
 	{
-		if(settings.dontAskBeforeWipingMerged)
+		if(Settings.dontAskBeforeWipingMerged)
 		{
 			[self removeAllMergedRequests];
 		}
@@ -688,14 +686,14 @@ OSX_AppDelegate *app;
                 [self removeAllMergedRequests];
                 if([[alert suppressionButton] state] == NSOnState)
                 {
-                    settings.dontAskBeforeWipingMerged = YES;
+                    Settings.dontAskBeforeWipingMerged = YES;
                 }
             }
 		}
 	}
 	else if([header.title isEqualToString:kPullRequestSectionNames[kPullRequestSectionClosed]])
 	{
-		if(settings.dontAskBeforeWipingClosed)
+		if(Settings.dontAskBeforeWipingClosed)
 		{
 			[self removeAllClosedRequests];
 		}
@@ -715,7 +713,7 @@ OSX_AppDelegate *app;
                 [self removeAllClosedRequests];
                 if([[alert suppressionButton] state] == NSOnState)
                 {
-                    settings.dontAskBeforeWipingClosed = YES;
+                    Settings.dontAskBeforeWipingClosed = YES;
                 }
             }
 		}
@@ -931,21 +929,21 @@ OSX_AppDelegate *app;
 	}
 	else if(obj.object==self.statusTermsField)
 	{
-		NSArray *existingTokens = settings.statusFilteringTerms;
+		NSArray *existingTokens = Settings.statusFilteringTerms;
 		NSArray *newTokens = self.statusTermsField.objectValue;
 		if(![existingTokens isEqualToArray:newTokens])
 		{
-			settings.statusFilteringTerms = newTokens;
+			Settings.statusFilteringTerms = newTokens;
 			[self updateMenu];
 		}
 	}
 	else if(obj.object==self.commentAuthorBlacklist)
 	{
-		NSArray *existingTokens = settings.commentAuthorBlacklist;
+		NSArray *existingTokens = Settings.commentAuthorBlacklist;
 		NSArray *newTokens = self.commentAuthorBlacklist.objectValue;
 		if(![existingTokens isEqualToArray:newTokens])
 		{
-			settings.commentAuthorBlacklist = newTokens;
+			Settings.commentAuthorBlacklist = newTokens;
 		}
 	}
 }
@@ -987,42 +985,42 @@ OSX_AppDelegate *app;
 
 	[self.api updateLimitsFromServer];
 	[self updateStatusTermPreferenceControls];
-	self.commentAuthorBlacklist.objectValue = settings.commentAuthorBlacklist;
+	self.commentAuthorBlacklist.objectValue = Settings.commentAuthorBlacklist;
 
-	[self.sortModeSelect selectItemAtIndex:settings.sortMethod];
-	[self.prMergedPolicy selectItemAtIndex:settings.mergeHandlingPolicy];
-	[self.prClosedPolicy selectItemAtIndex:settings.closeHandlingPolicy];
+	[self.sortModeSelect selectItemAtIndex:Settings.sortMethod];
+	[self.prMergedPolicy selectItemAtIndex:Settings.mergeHandlingPolicy];
+	[self.prClosedPolicy selectItemAtIndex:Settings.closeHandlingPolicy];
 
 	self.launchAtStartup.integerValue = [self isAppLoginItem];
-	self.hideAllPrsSection.integerValue = settings.hideAllPrsSection;
-	self.dontConfirmRemoveAllClosed.integerValue = settings.dontAskBeforeWipingClosed;
-	self.displayRepositoryNames.integerValue = settings.showReposInName;
-	self.includeRepositoriesInFiltering.integerValue = settings.includeReposInFilter;
-	self.dontConfirmRemoveAllMerged.integerValue = settings.dontAskBeforeWipingMerged;
-	self.hideUncommentedPrs.integerValue = settings.shouldHideUncommentedRequests;
-	self.autoParticipateWhenMentioned.integerValue = settings.autoParticipateInMentions;
-	self.hideAvatars.integerValue = settings.hideAvatars;
-	self.dontKeepPrsMergedByMe.integerValue = settings.dontKeepPrsMergedByMe;
-	self.showAllComments.integerValue = settings.showCommentsEverywhere;
-	self.sortingOrder.integerValue = settings.sortDescending;
-	self.showCreationDates.integerValue = settings.showCreatedInsteadOfUpdated;
-	self.groupByRepo.integerValue = settings.groupByRepo;
-	self.moveAssignedPrsToMySection.integerValue = settings.moveAssignedPrsToMySection;
-	self.showStatusItems.integerValue = settings.showStatusItems;
-	self.makeStatusItemsSelectable.integerValue = settings.makeStatusItemsSelectable;
-	self.markUnmergeableOnUserSectionsOnly.integerValue = settings.markUnmergeableOnUserSectionsOnly;
-	self.countOnlyListedPrs.integerValue = settings.countOnlyListedPrs;
-	self.hideNewRepositories.integerValue = settings.hideNewRepositories;
-	self.openPrAtFirstUnreadComment.integerValue = settings.openPrAtFirstUnreadComment;
-	self.logActivityToConsole.integerValue = settings.logActivityToConsole;
-	self.showLabels.integerValue = settings.showLabels;
-	self.useVibrancy.integerValue = settings.useVibrancy;
+	self.hideAllPrsSection.integerValue = Settings.hideAllPrsSection;
+	self.dontConfirmRemoveAllClosed.integerValue = Settings.dontAskBeforeWipingClosed;
+	self.displayRepositoryNames.integerValue = Settings.showReposInName;
+	self.includeRepositoriesInFiltering.integerValue = Settings.includeReposInFilter;
+	self.dontConfirmRemoveAllMerged.integerValue = Settings.dontAskBeforeWipingMerged;
+	self.hideUncommentedPrs.integerValue = Settings.shouldHideUncommentedRequests;
+	self.autoParticipateWhenMentioned.integerValue = Settings.autoParticipateInMentions;
+	self.hideAvatars.integerValue = Settings.hideAvatars;
+	self.dontKeepPrsMergedByMe.integerValue = Settings.dontKeepPrsMergedByMe;
+	self.showAllComments.integerValue = Settings.showCommentsEverywhere;
+	self.sortingOrder.integerValue = Settings.sortDescending;
+	self.showCreationDates.integerValue = Settings.showCreatedInsteadOfUpdated;
+	self.groupByRepo.integerValue = Settings.groupByRepo;
+	self.moveAssignedPrsToMySection.integerValue = Settings.moveAssignedPrsToMySection;
+	self.showStatusItems.integerValue = Settings.showStatusItems;
+	self.makeStatusItemsSelectable.integerValue = Settings.makeStatusItemsSelectable;
+	self.markUnmergeableOnUserSectionsOnly.integerValue = Settings.markUnmergeableOnUserSectionsOnly;
+	self.countOnlyListedPrs.integerValue = Settings.countOnlyListedPrs;
+	self.hideNewRepositories.integerValue = Settings.hideNewRepositories;
+	self.openPrAtFirstUnreadComment.integerValue = Settings.openPrAtFirstUnreadComment;
+	self.logActivityToConsole.integerValue = Settings.logActivityToConsole;
+	self.showLabels.integerValue = Settings.showLabels;
+	self.useVibrancy.integerValue = Settings.useVibrancy;
 
-	self.hotkeyEnable.integerValue = settings.hotkeyEnable;
-	self.hotkeyControlModifier.integerValue = settings.hotkeyControlModifier;
-	self.hotkeyCommandModifier.integerValue = settings.hotkeyCommandModifier;
-	self.hotkeyOptionModifier.integerValue = settings.hotkeyOptionModifier;
-	self.hotkeyShiftModifier.integerValue = settings.hotkeyShiftModifier;
+	self.hotkeyEnable.integerValue = Settings.hotkeyEnable;
+	self.hotkeyControlModifier.integerValue = Settings.hotkeyControlModifier;
+	self.hotkeyCommandModifier.integerValue = Settings.hotkeyCommandModifier;
+	self.hotkeyOptionModifier.integerValue = Settings.hotkeyOptionModifier;
+	self.hotkeyShiftModifier.integerValue = Settings.hotkeyShiftModifier;
 	[self enableHotkeySegments];
 	[self populateHotkeyLetterMenu];
 
@@ -1033,10 +1031,10 @@ OSX_AppDelegate *app;
 
 	[self.hotkeyEnable setEnabled:(AXIsProcessTrustedWithOptions != NULL)];
 
-	[self.repoCheckStepper setFloatValue:settings.newRepoCheckPeriod];
+	[self.repoCheckStepper setFloatValue:Settings.newRepoCheckPeriod];
 	[self newRepoCheckChanged:nil];
 
-	[self.refreshDurationStepper setFloatValue:MIN(settings.refreshPeriod,3600)];
+	[self.refreshDurationStepper setFloatValue:MIN(Settings.refreshPeriod,3600)];
 	[self refreshDurationChanged:nil];
 
 	[self.preferencesWindow setLevel:NSFloatingWindowLevel];
@@ -1087,7 +1085,7 @@ OSX_AppDelegate *app;
 	for(char l='A';l<='Z';l++)
 		[titles addObject:[NSString stringWithFormat:@"%c",l]];
 	[self.hotkeyLetter addItemsWithTitles:titles];
-	[self.hotkeyLetter selectItemWithTitle:settings.hotkeyLetter];
+	[self.hotkeyLetter selectItemWithTitle:Settings.hotkeyLetter];
 }
 
 - (IBAction)showAllRepositoriesSelected:(NSButton *)sender
@@ -1106,12 +1104,12 @@ OSX_AppDelegate *app;
 
 - (IBAction)enableHotkeySelected:(NSButton *)sender
 {
-	settings.hotkeyEnable = self.hotkeyEnable.integerValue;
-	settings.hotkeyLetter = self.hotkeyLetter.titleOfSelectedItem;
-	settings.hotkeyControlModifier = self.hotkeyControlModifier.integerValue;
-	settings.hotkeyCommandModifier = self.hotkeyCommandModifier.integerValue;
-	settings.hotkeyOptionModifier = self.hotkeyOptionModifier.integerValue;
-	settings.hotkeyShiftModifier = self.hotkeyShiftModifier.integerValue;
+	Settings.hotkeyEnable = self.hotkeyEnable.integerValue;
+	Settings.hotkeyLetter = self.hotkeyLetter.titleOfSelectedItem;
+	Settings.hotkeyControlModifier = self.hotkeyControlModifier.integerValue;
+	Settings.hotkeyCommandModifier = self.hotkeyCommandModifier.integerValue;
+	Settings.hotkeyOptionModifier = self.hotkeyOptionModifier.integerValue;
+	Settings.hotkeyShiftModifier = self.hotkeyShiftModifier.integerValue;
 	[self enableHotkeySegments];
 	[self addHotKeySupport];
 }
@@ -1165,12 +1163,12 @@ OSX_AppDelegate *app;
 
 - (IBAction)prMergePolicySelected:(NSPopUpButton *)sender
 {
-	settings.mergeHandlingPolicy = sender.indexOfSelectedItem;
+	Settings.mergeHandlingPolicy = sender.indexOfSelectedItem;
 }
 
 - (IBAction)prClosePolicySelected:(NSPopUpButton *)sender
 {
-	settings.closeHandlingPolicy = sender.indexOfSelectedItem;
+	Settings.closeHandlingPolicy = sender.indexOfSelectedItem;
 }
 
 /////////////////////////////////// Repo table
@@ -1379,7 +1377,7 @@ OSX_AppDelegate *app;
 		}
 		else
 		{
-			if(!self.refreshTimer && settings.refreshPeriod>0.0)
+			if(!self.refreshTimer && Settings.refreshPeriod>0.0)
 			{
 				[self startRefreshIfItIsDue];
 			}
@@ -1391,11 +1389,11 @@ OSX_AppDelegate *app;
 - (void)setUpdateCheckParameters
 {
     SUUpdater *s = [SUUpdater sharedUpdater];
-    BOOL autoCheck = settings.checkForUpdatesAutomatically;
+    BOOL autoCheck = Settings.checkForUpdatesAutomatically;
 	s.automaticallyChecksForUpdates = autoCheck;
     if(autoCheck)
     {
-        [s setUpdateCheckInterval:3600.0*settings.checkForUpdatesInterval];
+        [s setUpdateCheckInterval:3600.0*Settings.checkForUpdatesInterval];
     }
     DLog(@"Check for updates set to %d every %f seconds",s.automaticallyChecksForUpdates,s.updateCheckInterval);
 }
@@ -1414,13 +1412,13 @@ OSX_AppDelegate *app;
 	if(self.lastSuccessfulRefresh)
 	{
 		NSTimeInterval howLongAgo = [[NSDate date] timeIntervalSinceDate:self.lastSuccessfulRefresh];
-		if(howLongAgo>settings.refreshPeriod)
+		if(howLongAgo>Settings.refreshPeriod)
 		{
 			[self startRefresh];
 		}
 		else
 		{
-			NSTimeInterval howLongUntilNextSync = settings.refreshPeriod-howLongAgo;
+			NSTimeInterval howLongUntilNextSync = Settings.refreshPeriod-howLongAgo;
 			DLog(@"No need to refresh yet, will refresh in %f",howLongUntilNextSync);
 			self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:howLongUntilNextSync
 																 target:self
@@ -1544,7 +1542,7 @@ OSX_AppDelegate *app;
 			self.preferencesDirty = NO;
 		}
 		[self completeRefresh];
-		self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:settings.refreshPeriod
+		self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:Settings.refreshPeriod
 															 target:self
 														   selector:@selector(refreshTimerDone)
 														   userInfo:nil
@@ -1559,13 +1557,13 @@ OSX_AppDelegate *app;
 
 - (IBAction)refreshDurationChanged:(NSStepper *)sender
 {
-	settings.refreshPeriod = self.refreshDurationStepper.floatValue;
+	Settings.refreshPeriod = self.refreshDurationStepper.floatValue;
 	[self.refreshDurationLabel setStringValue:[NSString stringWithFormat:@"Refresh PRs every %ld seconds",(long)self.refreshDurationStepper.integerValue]];
 }
 
 - (IBAction)newRepoCheckChanged:(NSStepper *)sender
 {
-	settings.newRepoCheckPeriod = self.repoCheckStepper.floatValue;
+	Settings.newRepoCheckPeriod = self.repoCheckStepper.floatValue;
 	[self.repoCheckLabel setStringValue:[NSString stringWithFormat:@"Refresh repositories every %ld hours",(long)self.repoCheckStepper.integerValue]];
 }
 
@@ -1598,7 +1596,7 @@ OSX_AppDelegate *app;
 	{
 		NSUInteger count;
 
-		if(settings.countOnlyListedPrs)
+		if(Settings.countOnlyListedPrs)
 			count = pullRequests.count;
 		else
 			count = [PullRequest countOpenRequestsInMoc:moc];
@@ -1718,7 +1716,7 @@ OSX_AppDelegate *app;
 
 - (void)updateStatusTermPreferenceControls
 {
-	NSInteger mode = settings.statusFilteringMode;
+	NSInteger mode = Settings.statusFilteringMode;
 	[self.statusTermMenu selectItemAtIndex:mode];
 	if(mode!=0)
 	{
@@ -1730,13 +1728,13 @@ OSX_AppDelegate *app;
 		[self.statusTermsField setEnabled:NO];
 		self.statusTermsField.alphaValue = 0.8;
 	}
-	self.statusTermsField.objectValue = settings.statusFilteringTerms;
+	self.statusTermsField.objectValue = Settings.statusFilteringTerms;
 }
 
 - (IBAction)statusFilterMenuChanged:(NSPopUpButton *)sender
 {
-	settings.statusFilteringMode = sender.indexOfSelectedItem;
-	settings.statusFilteringTerms = self.statusTermsField.objectValue;
+	Settings.statusFilteringMode = sender.indexOfSelectedItem;
+	Settings.statusFilteringTerms = self.statusTermsField.objectValue;
 	[self updateStatusTermPreferenceControls];
 }
 
@@ -1816,7 +1814,7 @@ OSX_AppDelegate *app;
 {
 	if(AXIsProcessTrustedWithOptions != NULL)
 	{
-		if(settings.hotkeyEnable)
+		if(Settings.hotkeyEnable)
 		{
 			if(!globalKeyMonitor)
 			{
@@ -1928,7 +1926,7 @@ OSX_AppDelegate *app;
 
 	NSInteger check = 0;
 
-	if(settings.hotkeyCommandModifier)
+	if(Settings.hotkeyCommandModifier)
 	{
 		if((incomingEvent.modifierFlags & NSCommandKeyMask) == NSCommandKeyMask) check++; else check--;
 	}
@@ -1937,7 +1935,7 @@ OSX_AppDelegate *app;
 		if((incomingEvent.modifierFlags & NSCommandKeyMask) == NSCommandKeyMask) check--; else check++;
 	}
 
-	if(settings.hotkeyControlModifier)
+	if(Settings.hotkeyControlModifier)
 	{
 		if((incomingEvent.modifierFlags & NSControlKeyMask) == NSControlKeyMask) check++; else check--;
 	}
@@ -1946,7 +1944,7 @@ OSX_AppDelegate *app;
 		if((incomingEvent.modifierFlags & NSControlKeyMask) == NSControlKeyMask) check--; else check++;
 	}
 
-	if(settings.hotkeyOptionModifier)
+	if(Settings.hotkeyOptionModifier)
 	{
 		if((incomingEvent.modifierFlags & NSAlternateKeyMask) == NSAlternateKeyMask) check++; else check--;
 	}
@@ -1955,7 +1953,7 @@ OSX_AppDelegate *app;
 		if((incomingEvent.modifierFlags & NSAlternateKeyMask) == NSAlternateKeyMask) check--; else check++;
 	}
 
-	if(settings.hotkeyShiftModifier)
+	if(Settings.hotkeyShiftModifier)
 	{
 		if((incomingEvent.modifierFlags & NSShiftKeyMask) == NSShiftKeyMask) check++; else check--;
 	}
@@ -1993,7 +1991,7 @@ OSX_AppDelegate *app;
 									 @"Y": @(16),
 									 @"Z": @(6) };
 
-		NSNumber *n = codeLookup[settings.hotkeyLetter];
+		NSNumber *n = codeLookup[Settings.hotkeyLetter];
 		if(incomingEvent.keyCode==n.integerValue)
 		{
 			[self statusItemTapped:self.statusItemView];

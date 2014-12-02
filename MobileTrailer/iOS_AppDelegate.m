@@ -1,4 +1,3 @@
-#import "Settings.h"
 #import "MasterViewController.h"
 #import "OpenInSafariActivity.h"
 
@@ -27,7 +26,6 @@ iOS_AppDelegate *app;
 	//NSString *appDomain = [[NSBundle mainBundle] bundleIdentifier];
 	//[[NSUserDefaults standardUserDefaults] removePersistentDomainForName:appDomain];
 
-	settings = [[Settings alloc] init];
 	self.dataManager = [[DataManager alloc] init];
 	self.api = [[API alloc] init];
 
@@ -65,7 +63,7 @@ iOS_AppDelegate *app;
 												 name:kReachabilityChangedNotification
 											   object:nil];
 
-	[[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:settings.backgroundRefreshPeriod];
+	[[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:Settings.backgroundRefreshPeriod];
 
 	UILocalNotification *localNotification = [launchOptions objectForKey:UIApplicationLaunchOptionsLocalNotificationKey];
 
@@ -154,13 +152,13 @@ collapseSecondaryViewController:(UIViewController *)secondaryViewController
 	if(self.lastSuccessfulRefresh)
 	{
 		NSTimeInterval howLongAgo = [[NSDate date] timeIntervalSinceDate:self.lastSuccessfulRefresh];
-		if(howLongAgo>settings.refreshPeriod)
+		if(howLongAgo>Settings.refreshPeriod)
 		{
 			[self startRefresh];
 		}
 		else
 		{
-			NSTimeInterval howLongUntilNextSync = settings.refreshPeriod-howLongAgo;
+			NSTimeInterval howLongUntilNextSync = Settings.refreshPeriod-howLongAgo;
 			DLog(@"No need to refresh yet, will refresh in %f",howLongUntilNextSync);
 			self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:howLongUntilNextSync
 																 target:self
@@ -289,7 +287,7 @@ collapseSecondaryViewController:(UIViewController *)secondaryViewController
 							  otherButtonTitles:nil] show];
 		}
 
-		self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:settings.refreshPeriod
+		self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:Settings.refreshPeriod
 															 target:self
 														   selector:@selector(refreshTimerDone)
 														   userInfo:nil

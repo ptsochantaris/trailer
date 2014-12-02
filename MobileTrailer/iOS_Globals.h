@@ -10,6 +10,3 @@
 
 #import "iOS_AppDelegate.h"
 extern iOS_AppDelegate *app;
-
-#import "Settings.h"
-extern Settings *settings;

@@ -8,7 +8,7 @@ func DLog(messageFormat:@autoclosure () -> String, args:LazyVarArgClosure...) {
 	#if DEBUG
 		shouldLog = true
 	#else
-		shouldLog = settings.logActivityToConsole
+		shouldLog = Settings.logActivityToConsole
 	#endif
 	if shouldLog {
 		let realArgs:[CVarArgType] = args.map { (lazyArg:LazyVarArgClosure) in

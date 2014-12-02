@@ -83,7 +83,7 @@ class PullRequest: DataItem {
 	}
 
 	class func sortField() -> String? {
-		switch (settings.sortMethod) {
+		switch (Settings.sortMethod) {
 		case PRSortingMethod.CreationDate.rawValue: return "createdAt"
 		case PRSortingMethod.RecentActivity.rawValue: return "updatedAt"
 		case PRSortingMethod.Title.rawValue: return "title"
@@ -98,7 +98,7 @@ class PullRequest: DataItem {
 
 		if let f = filter {
 			if f.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 0 {
-				if settings.includeReposInFilter {
+				if Settings.includeReposInFilter {
 					predicateSegments.append("(title contains[cd] '\(f)' or userLogin contains[cd] '\(f)' or repoName contains[cd] '\(f)')")
 				} else {
 					predicateSegments.append("(title contains[cd] '\(f)' or userLogin contains[cd] '\(f)'")
@@ -106,22 +106,22 @@ class PullRequest: DataItem {
 			}
 		}
 
-		if settings.shouldHideUncommentedRequests {
+		if Settings.shouldHideUncommentedRequests {
 			predicateSegments.append("(unreadComments > 0)")
 		}
 
 		var sortDescriptiors = [NSSortDescriptor]()
 		sortDescriptiors.append(NSSortDescriptor(key: "sectionIndex", ascending: true))
 
-		if settings.groupByRepo {
+		if Settings.groupByRepo {
 			sortDescriptiors.append(NSSortDescriptor(key: "repoName", ascending: true, selector: Selector("caseInsensitiveCompare:")))
 		}
 
 		if let fieldName = sortField() {
 			if fieldName == "title" {
-				sortDescriptiors.append(NSSortDescriptor(key: fieldName, ascending: !settings.sortDescending, selector: Selector("caseInsensitiveCompare:")))
+				sortDescriptiors.append(NSSortDescriptor(key: fieldName, ascending: !Settings.sortDescending, selector: Selector("caseInsensitiveCompare:")))
 			} else if fieldName.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 0 {
-				sortDescriptiors.append(NSSortDescriptor(key: fieldName, ascending: !settings.sortDescending))
+				sortDescriptiors.append(NSSortDescriptor(key: fieldName, ascending: !Settings.sortDescending))
 			}
 		}
 
@@ -155,7 +155,7 @@ class PullRequest: DataItem {
 	class func badgeCountInMoc(moc: NSManagedObjectContext) -> Int {
 		let f = requestForPullRequestsWithFilter(nil)
 		var badgeCount:Int = 0
-		let showCommentsEverywhere = settings.showCommentsEverywhere
+		let showCommentsEverywhere = Settings.showCommentsEverywhere
 		for p in moc.executeFetchRequest(f, error: nil) as [PullRequest] {
 			if let sectionIndex = p.sectionIndex?.intValue {
 				if showCommentsEverywhere || sectionIndex==kPullRequestSectionMine || sectionIndex==kPullRequestSectionParticipated {
@@ -185,7 +185,7 @@ class PullRequest: DataItem {
 
 	func isMine() -> Bool {
 		if let assigned = assignedToMe?.boolValue {
-			if assigned && settings.moveAssignedPrsToMySection {
+			if assigned && Settings.moveAssignedPrsToMySection {
 				return true
 			}
 		}
@@ -224,7 +224,7 @@ class PullRequest: DataItem {
 					if s == kPullRequestConditionMerged || s == kPullRequestConditionClosed {
 						return false
 					}
-					if s == kPullRequestSectionAll && settings.markUnmergeableOnUserSectionsOnly {
+					if s == kPullRequestSectionAll && Settings.markUnmergeableOnUserSectionsOnly {
 						return false
 					}
 					return true
@@ -242,7 +242,7 @@ class PullRequest: DataItem {
 		let _title = NSMutableAttributedString()
 		if let t = title {
 			_title.appendAttributedString(NSAttributedString(string: t, attributes: titleAttributes))
-			if settings.showLabels {
+			if Settings.showLabels {
 				var allLabels = labels.allObjects as [PRLabel]
 				if allLabels.count > 0 {
 
@@ -309,7 +309,7 @@ class PullRequest: DataItem {
 			let separator = NSAttributedString(string:"   ", attributes:lightSubtitle)
 		#endif
 
-		if settings.showReposInName {
+		if Settings.showReposInName {
 			if let n = repoName {
 				var darkSubtitle = lightSubtitle;
 				darkSubtitle[NSForegroundColorAttributeName] = darkColor
@@ -323,7 +323,7 @@ class PullRequest: DataItem {
 			_subtitle.appendAttributedString(separator)
 		}
 
-		if settings.showCreatedInsteadOfUpdated {
+		if Settings.showCreatedInsteadOfUpdated {
 			_subtitle.appendAttributedString(NSAttributedString(string: itemDateFormatter.stringFromDate(createdAt!), attributes: lightSubtitle))
 		} else {
 			_subtitle.appendAttributedString(NSAttributedString(string: itemDateFormatter.stringFromDate(updatedAt!), attributes: lightSubtitle))
@@ -346,7 +346,7 @@ class PullRequest: DataItem {
 	func accessibleTitle() -> String {
 		var components = [String]()
 		if let t = title { components.append(t) }
-		if settings.showLabels {
+		if Settings.showLabels {
 			var allLabels = labels.allObjects as [PRLabel]
 			allLabels.sort({ (l1: PRLabel, l2: PRLabel) -> Bool in
 				return l1.name<l2.name
@@ -360,11 +360,11 @@ class PullRequest: DataItem {
 	func accessibleSubtitle() -> String {
 		var components = [String]()
 
-		if(settings.showReposInName) { components.append("Repository: \(self.repoName)") }
+		if(Settings.showReposInName) { components.append("Repository: \(self.repoName)") }
 
 		if let l = userLogin { components.append("Author: \(l)") }
 
-		if(settings.showCreatedInsteadOfUpdated) {
+		if(Settings.showCreatedInsteadOfUpdated) {
 			components.append("Created \(itemDateFormatter.stringFromDate(createdAt!))")
 		} else {
 			components.append("Updated \(itemDateFormatter.stringFromDate(updatedAt!))")
@@ -382,11 +382,11 @@ class PullRequest: DataItem {
 	func displayedStatuses() -> [PRStatus] {
 		let f = NSFetchRequest(entityName: "PRStatus")
 		f.returnsObjectsAsFaults = false
-		let mode = Int32(settings.statusFilteringMode)
+		let mode = Int32(Settings.statusFilteringMode)
 		if mode==kStatusFilterAll {
 			f.predicate = NSPredicate(format: "pullRequest == %@", self)
 		} else {
-			let terms = settings.statusFilteringTerms as [String]?;
+			let terms = Settings.statusFilteringTerms as [String]?;
 			if(terms != nil && terms!.count > 0)
 			{
 				var subPredicates = [NSPredicate]()
@@ -439,7 +439,7 @@ class PullRequest: DataItem {
 			unreadCount = c
 		}
 
-		if(unreadCount > 0 && settings.openPrAtFirstUnreadComment) {
+		if(unreadCount > 0 && Settings.openPrAtFirstUnreadComment) {
 			let f = NSFetchRequest(entityName: "PRComment")
 			f.returnsObjectsAsFaults = false
 			f.fetchLimit = 1
@@ -476,14 +476,14 @@ class PullRequest: DataItem {
 		else if condition == kPullRequestConditionClosed	{ section = kPullRequestConditionClosed }
 		else if isMine()									{ section = kPullRequestSectionMine }
 		else if commentedByMe()								{ section = kPullRequestSectionParticipated }
-		else if settings.hideAllPrsSection					{ section = kPullRequestSectionNone }
+		else if Settings.hideAllPrsSection					{ section = kPullRequestSectionNone }
 		else												{ section = kPullRequestSectionAll }
 
 		let f = NSFetchRequest(entityName: "PRComment")
 		f.returnsObjectsAsFaults = false
 
 		let latestDate = self.latestReadCommentDate;
-		if (section == kPullRequestSectionAll || section == kPullRequestSectionNone) && settings.autoParticipateInMentions {
+		if (section == kPullRequestSectionAll || section == kPullRequestSectionNone) && Settings.autoParticipateInMentions {
 			if refersToMe() {
 				section = kPullRequestSectionParticipated;
 				f.predicate = predicateForOthersCommentsSinceDate(latestDate)

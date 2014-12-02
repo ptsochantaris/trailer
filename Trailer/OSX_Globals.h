@@ -12,5 +12,5 @@
 #import "OSX_AppDelegate.h"
 extern OSX_AppDelegate *app;
 
-#import "Settings.h"
+@class Settings;
 extern Settings *settings;

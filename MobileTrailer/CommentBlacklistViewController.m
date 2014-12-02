@@ -1,18 +1,17 @@
 #import "CommentBlacklistViewController.h"
-#import "Settings.h"
 
 @implementation CommentBlacklistViewController
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView { return settings.commentAuthorBlacklist.count == 0 ? 0 : 1; }
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView { return Settings.commentAuthorBlacklist.count == 0 ? 0 : 1; }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath { return YES; }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section { return settings.commentAuthorBlacklist.count; }
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section { return Settings.commentAuthorBlacklist.count; }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"UsernameCell" forIndexPath:indexPath];
-	cell.textLabel.text = settings.commentAuthorBlacklist[indexPath.row];
+	cell.textLabel.text = Settings.commentAuthorBlacklist[indexPath.row];
 	return cell;
 }
 
@@ -20,9 +19,9 @@
 {
 	if(editingStyle==UITableViewCellEditingStyleDelete)
 	{
-		NSMutableArray *blackList = [settings.commentAuthorBlacklist mutableCopy];
+		NSMutableArray *blackList = [Settings.commentAuthorBlacklist mutableCopy];
 		[blackList removeObjectAtIndex:indexPath.row];
-		settings.commentAuthorBlacklist = blackList;
+		Settings.commentAuthorBlacklist = blackList;
 		if(blackList.count==0) // last delete
 			[tableView deleteSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
 		else
@@ -43,11 +42,11 @@
 		NSString *name = [[a.textFields[0] text] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 		if([name rangeOfString:@"@"].location==0) name = [name substringFromIndex:1];
 		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-			if(name.length>0 && ![settings.commentAuthorBlacklist containsObject:name])
+			if(name.length>0 && ![Settings.commentAuthorBlacklist containsObject:name])
 			{
-				NSMutableArray *blackList = [settings.commentAuthorBlacklist mutableCopy];
+				NSMutableArray *blackList = [Settings.commentAuthorBlacklist mutableCopy];
 				[blackList addObject:name];
-				settings.commentAuthorBlacklist = blackList;
+				Settings.commentAuthorBlacklist = blackList;
 				NSIndexPath *ip = [NSIndexPath indexPathForRow:blackList.count-1 inSection:0];
 				if(blackList.count==1) // first insert
 					[self.tableView insertSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];

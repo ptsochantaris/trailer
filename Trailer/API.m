@@ -1,9 +1,8 @@
-#import "Settings.h"
 
 void DLog(NSString *format, ...)
 {
 #ifndef DEBUG
-	if(settings.logActivityToConsole)
+	if(Settings.logActivityToConsole)
 	{
 #endif
 		va_list args;
@@ -331,7 +330,7 @@ void DLog(NSString *format, ...)
 			operationCount++;
 			if(operationCount==totalOperations)
 			{
-				BOOL shouldHideByDefault = settings.hideNewRepositories;
+				BOOL shouldHideByDefault = Settings.hideNewRepositories;
 				for(Repo *r in [DataItem newItemsOfType:@"Repo" inMoc:moc])
 				{
 					r.hidden = @(shouldHideByDefault);
@@ -461,10 +460,10 @@ ignoreLastSync:NO
 			  NSNumber *mergeUserId = [mergeInfo  ofk:@"id"];
 			  DLog(@"merged by user id: %@, our id is: %@", mergeUserId, r.apiServer.userId);
 			  BOOL mergedByMyself = [mergeUserId isEqualToNumber:r.apiServer.userId];
-			  if(!(settings.dontKeepPrsMergedByMe && mergedByMyself))
+			  if(!(Settings.dontKeepPrsMergedByMe && mergedByMyself))
 			  {
 				  DLog(@"detected merged PR: %@",r.title);
-				  switch (settings.mergeHandlingPolicy)
+				  switch (Settings.mergeHandlingPolicy)
 				  {
 					  case kPullRequestHandlingKeepMine:
 					  {
@@ -487,7 +486,7 @@ ignoreLastSync:NO
 		  else
 		  {
 			  DLog(@"detected closed PR: %@",r.title);
-			  switch(settings.closeHandlingPolicy)
+			  switch(Settings.closeHandlingPolicy)
 			  {
 				  case kPullRequestHandlingKeepMine:
 				  {
@@ -516,7 +515,7 @@ ignoreLastSync:NO
 	NSManagedObjectContext *syncContext = [app.dataManager tempContext];
 
 	BOOL shouldRefreshReposToo = !app.lastRepoCheck
-	|| ([[NSDate date] timeIntervalSinceDate:app.lastRepoCheck] < settings.newRepoCheckPeriod*3600.0)
+	|| ([[NSDate date] timeIntervalSinceDate:app.lastRepoCheck] < Settings.newRepoCheckPeriod*3600.0)
 	|| [Repo countVisibleReposInMoc:syncContext]==0;
 
 	if(shouldRefreshReposToo)
@@ -767,8 +766,8 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 		DLog(@"Comitting sync failed: %@",error);
 	}
 
-	if(settings.showStatusItems) self.successfulRefreshesSinceLastStatusCheck++;
-	if(settings.showLabels) self.successfulRefreshesSinceLastLabelCheck++;
+	if(Settings.showStatusItems) self.successfulRefreshesSinceLastStatusCheck++;
+	if(Settings.showLabels) self.successfulRefreshesSinceLastLabelCheck++;
 }
 
 - (void)updatePullRequestsInMoc:(NSManagedObjectContext *)moc andCallback:(completionBlockType)callback
@@ -799,9 +798,9 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 
 - (BOOL)shouldScanForStatusesInMoc:(NSManagedObjectContext *)moc
 {
-	if(self.successfulRefreshesSinceLastStatusCheck % settings.statusItemRefreshInterval == 0)
+	if(self.successfulRefreshesSinceLastStatusCheck % Settings.statusItemRefreshInterval == 0)
 	{
-		if(settings.showStatusItems) return YES;
+		if(Settings.showStatusItems) return YES;
 
 		for(PRStatus *s in [DataItem allItemsOfType:@"PRStatus" inMoc:moc])
 			[moc deleteObject:s];
@@ -811,9 +810,9 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 
 - (BOOL)shouldScanForLabelsInMoc:(NSManagedObjectContext *)moc
 {
-	if(self.successfulRefreshesSinceLastLabelCheck % settings.labelRefreshInterval == 0)
+	if(self.successfulRefreshesSinceLastLabelCheck % Settings.labelRefreshInterval == 0)
 	{
-		if(settings.showLabels) return YES;
+		if(Settings.showLabels) return YES;
 
 		for(PRLabel *l in [DataItem allItemsOfType:@"PRLabel" inMoc:moc])
 			[moc deleteObject:l];

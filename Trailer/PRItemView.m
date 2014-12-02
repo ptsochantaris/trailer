@@ -1,4 +1,3 @@
-#import "Settings.h"
 #import "CommentCounts.h"
 
 @interface PRItemView () <NSPasteboardItemDataProvider, NSDraggingSource>
@@ -47,7 +46,7 @@ static CGColorRef _highlightColor;
 		NSInteger sectionIndex = pullRequest.sectionIndex.integerValue;
 		if(sectionIndex==kPullRequestSectionMine ||
 		   sectionIndex==kPullRequestSectionParticipated ||
-		   settings.showCommentsEverywhere)
+		   Settings.showCommentsEverywhere)
 		{
 			_commentsNew = pullRequest.unreadComments.integerValue;
 		}
@@ -69,7 +68,7 @@ static CGColorRef _highlightColor;
 
 		if(showUnpin) W -= REMOVE_BUTTON_WIDTH;
 
-		BOOL showAvatar = pullRequest.userAvatarUrl.length && !settings.hideAvatars;
+		BOOL showAvatar = pullRequest.userAvatarUrl.length && !Settings.hideAvatars;
 		if(showAvatar) W -= (AVATAR_SIZE+AVATAR_PADDING);
 		else W += 4.0;
 
@@ -86,7 +85,7 @@ static CGColorRef _highlightColor;
 		CGFloat bottom, CELL_PADDING;
 		CGFloat statusBottom = 0;
 
-		if(settings.showStatusItems)
+		if(Settings.showStatusItems)
 		{
 			CELL_PADDING = 10;
 			bottom = ceilf(CELL_PADDING * 0.5);
@@ -174,7 +173,7 @@ static CGColorRef _highlightColor;
 
 			PRStatus *status = statuses[count];
 			statusLabel.targetUrl = status.targetUrl;
-			statusLabel.needsCommand = !settings.makeStatusItemsSelectable;
+			statusLabel.needsCommand = !Settings.makeStatusItemsSelectable;
 			statusLabel.attributedStringValue = [[NSAttributedString alloc] initWithString:status.displayText
 																				attributes:_statusAttributes];
 			statusLabel.textColor = goneDark ? status.colorForDarkDisplay : status.colorForDisplay;

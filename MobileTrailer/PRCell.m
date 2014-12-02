@@ -1,5 +1,4 @@
 #import "PRCell.h"
-#import "Settings.h"
 
 static NSNumberFormatter *itemCountFormatter;
 
@@ -74,7 +73,7 @@ static NSNumberFormatter *itemCountFormatter;
 
 	NSInteger _commentsNew=0;
 	NSInteger _commentsTotal = pullRequest.totalComments.integerValue;
-	if(settings.showCommentsEverywhere || pullRequest.isMine || pullRequest.commentedByMe)
+	if(Settings.showCommentsEverywhere || pullRequest.isMine || pullRequest.commentedByMe)
 	{
 		_commentsNew = pullRequest.unreadComments.integerValue;
 	}

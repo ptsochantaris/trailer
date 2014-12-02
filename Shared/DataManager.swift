@@ -92,10 +92,10 @@ class DataManager : NSObject {
 			if p.postSyncAction?.integerValue == PostSyncAction.NoteUpdated.rawValue {
 				if c.refersToMe() {
 					app.postNotificationOfType(PRNotificationType.NewMention, forItem: c)
-				} else if (settings.showCommentsEverywhere || p.isMine() || p.commentedByMe()) && !c.isMine() {
+				} else if (Settings.showCommentsEverywhere || p.isMine() || p.commentedByMe()) && !c.isMine() {
 					if let authorName = c.userName {
 						var blocked = false
-						for blockedAuthor in settings.commentAuthorBlacklist as [String] {
+						for blockedAuthor in Settings.commentAuthorBlacklist as [String] {
 							if authorName.compare(blockedAuthor, options: NSStringCompareOptions.CaseInsensitiveSearch|NSStringCompareOptions.DiacriticInsensitiveSearch)==NSComparisonResult.OrderedSame {
 								blocked = true
 								break;
@@ -205,7 +205,7 @@ class DataManager : NSObject {
 		} else if filterValue != nil && filterValue?.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 0 {
 			message = "There are no PRs matching this filter."
 		} else if openRequests > 0 {
-			message = "\(openRequests) PRs are hidden by your settings."
+			message = "\(openRequests) PRs are hidden by your Settings."
 		} else if Repo.countVisibleReposInMoc(managedObjectContext)==0 {
 			messageColor = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
 			message = "There are no watched repositories, please watch or unhide some."

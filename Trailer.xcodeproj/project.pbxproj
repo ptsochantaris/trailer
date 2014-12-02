@@ -44,8 +44,6 @@
 		164CCC3B1A2CEA19007E4C01 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 164785B41A2CE82D00297764 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		16583E481851F082003A7A55 /* SectionHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 16583E471851F082003A7A55 /* SectionHeader.m */; };
 		1665B6661882F24400972111 /* UINavigationController+DismissKeyboard.m in Sources */ = {isa = PBXBuildFile; fileRef = 1665B6651882F24400972111 /* UINavigationController+DismissKeyboard.m */; };
-		1665B66D1882F29E00972111 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 1665B66C1882F29E00972111 /* Settings.m */; };
-		1665B66E1882F29E00972111 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 1665B66C1882F29E00972111 /* Settings.m */; };
 		1665B6751882F42500972111 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 168BC6B117EC2DF000BC4584 /* CoreData.framework */; };
 		1665B6761882F43800972111 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1628A6B218789E73005EDA69 /* Foundation.framework */; };
 		166A19AA19B99C4C004D9057 /* OpenInSafariActivity.m in Sources */ = {isa = PBXBuildFile; fileRef = 166A19A819B99C48004D9057 /* OpenInSafariActivity.m */; };
@@ -83,6 +81,8 @@
 		16C54F941881639B00849B76 /* GithubViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 16C54F931881639B00849B76 /* GithubViewController.m */; };
 		16CBE1C11A2DBB2700485053 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C01A2DBB2700485053 /* DataManager.swift */; };
 		16CBE1C21A2DBB2700485053 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C01A2DBB2700485053 /* DataManager.swift */; };
+		16CBE1C51A2DFBA500485053 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C41A2DFBA500485053 /* Settings.swift */; };
+		16CBE1C61A2DFBA500485053 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C41A2DFBA500485053 /* Settings.swift */; };
 		16EE562019B78DBA0031DF6D /* CommentBlacklistViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 16EE561F19B78DBA0031DF6D /* CommentBlacklistViewController.m */; };
 		16FA683B1823CF4600401E9B /* PRItemView.m in Sources */ = {isa = PBXBuildFile; fileRef = 16FA683A1823CF4600401E9B /* PRItemView.m */; };
 		16FD14D71881CBC400FDC960 /* PickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 16FD14D61881CBC400FDC960 /* PickerViewController.m */; };
@@ -134,10 +134,10 @@
 		1628A6C018789E73005EDA69 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		1628A6C218789E73005EDA69 /* PocketTrailer-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PocketTrailer-Prefix.pch"; sourceTree = "<group>"; };
 		1628A6C318789E73005EDA69 /* iOS_AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = iOS_AppDelegate.h; sourceTree = "<group>"; };
-		1628A6C418789E73005EDA69 /* iOS_AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = iOS_AppDelegate.m; sourceTree = "<group>"; };
+		1628A6C418789E73005EDA69 /* iOS_AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = iOS_AppDelegate.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		1628A6CA18789E73005EDA69 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		1628A6CF18789E73005EDA69 /* MasterViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MasterViewController.h; sourceTree = "<group>"; };
-		1628A6D018789E73005EDA69 /* MasterViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MasterViewController.m; sourceTree = "<group>"; };
+		1628A6D018789E73005EDA69 /* MasterViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = MasterViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		1628A6D218789E73005EDA69 /* DetailViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DetailViewController.h; sourceTree = "<group>"; };
 		1628A6D318789E73005EDA69 /* DetailViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DetailViewController.m; sourceTree = "<group>"; };
 		1628A6D518789E73005EDA69 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -147,7 +147,7 @@
 		164047081882ED0000A4AC9C /* AboutTrailerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AboutTrailerViewController.h; sourceTree = "<group>"; };
 		164047091882ED0000A4AC9C /* AboutTrailerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AboutTrailerViewController.m; sourceTree = "<group>"; };
 		16458E37191AC2D200FB13EC /* Trailer 12.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 12.xcdatamodel"; sourceTree = "<group>"; };
-		164785A91A2CE7BD00297764 /* Globals.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Globals.swift; path = Shared/Globals.swift; sourceTree = "<group>"; };
+		164785A91A2CE7BD00297764 /* Globals.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = Globals.swift; path = Shared/Globals.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		164785AC1A2CE7CD00297764 /* NSDictionaryExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NSDictionaryExtensions.swift; path = Shared/NSDictionaryExtensions.swift; sourceTree = "<group>"; };
 		164785AD1A2CE7CD00297764 /* NSStringExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NSStringExtensions.swift; path = Shared/NSStringExtensions.swift; sourceTree = "<group>"; };
 		164785B21A2CE7FB00297764 /* PocketTrailer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PocketTrailer-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -162,12 +162,10 @@
 		1661667C189BBDAB00FBF4E0 /* Trailer 7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 7.xcdatamodel"; sourceTree = "<group>"; };
 		1665B6641882F24400972111 /* UINavigationController+DismissKeyboard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UINavigationController+DismissKeyboard.h"; sourceTree = "<group>"; };
 		1665B6651882F24400972111 /* UINavigationController+DismissKeyboard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UINavigationController+DismissKeyboard.m"; sourceTree = "<group>"; };
-		1665B66B1882F29E00972111 /* Settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Settings.h; path = Trailer/Settings.h; sourceTree = "<group>"; };
-		1665B66C1882F29E00972111 /* Settings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Settings.m; path = Trailer/Settings.m; sourceTree = "<group>"; };
 		166A19A719B99C48004D9057 /* OpenInSafariActivity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenInSafariActivity.h; sourceTree = "<group>"; };
 		166A19A819B99C48004D9057 /* OpenInSafariActivity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OpenInSafariActivity.m; sourceTree = "<group>"; };
 		168A5C75185BBA2F00CB6B02 /* MenuWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MenuWindow.h; sourceTree = "<group>"; };
-		168A5C76185BBA2F00CB6B02 /* MenuWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MenuWindow.m; sourceTree = "<group>"; };
+		168A5C76185BBA2F00CB6B02 /* MenuWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = MenuWindow.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		168BC6AA17EC2DF000BC4584 /* Trailer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Trailer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		168BC6AD17EC2DF000BC4584 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		168BC6B017EC2DF000BC4584 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -188,7 +186,7 @@
 		168FD00D1A2A7AD1005929CB /* MessageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageView.swift; sourceTree = "<group>"; };
 		16928CA81A2A8E060030AE23 /* PRComment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PRComment.swift; sourceTree = "<group>"; };
 		16928CAB1A2B2DED0030AE23 /* DataItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataItem.swift; sourceTree = "<group>"; };
-		16928CAE1A2B3AED0030AE23 /* PullRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PullRequest.swift; sourceTree = "<group>"; };
+		16928CAE1A2B3AED0030AE23 /* PullRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PullRequest.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16928CB11A2B3AED0030AE23 /* PRLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PRLabel.swift; sourceTree = "<group>"; };
 		16928CB41A2B3AED0030AE23 /* PRStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PRStatus.swift; sourceTree = "<group>"; };
 		16928CB71A2B3AED0030AE23 /* Repo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Repo.swift; sourceTree = "<group>"; };
@@ -199,19 +197,20 @@
 		1694372819FD4056005079F6 /* ServerDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServerDetailViewController.m; sourceTree = "<group>"; };
 		169CEB99187988D00083A068 /* Trailer 4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 4.xcdatamodel"; sourceTree = "<group>"; };
 		169CEB9A1879D5BB0083A068 /* AdvancedSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdvancedSettingsViewController.h; sourceTree = "<group>"; };
-		169CEB9B1879D5BB0083A068 /* AdvancedSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdvancedSettingsViewController.m; sourceTree = "<group>"; };
+		169CEB9B1879D5BB0083A068 /* AdvancedSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = AdvancedSettingsViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		16A794F31A252BFA00A76553 /* PopTimer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PopTimer.swift; path = Shared/PopTimer.swift; sourceTree = "<group>"; };
 		16AD4E6D18896770001C17B7 /* Trailer 5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 5.xcdatamodel"; sourceTree = "<group>"; };
 		16B8A10218AE5E5300C6ECB4 /* Trailer 9.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 9.xcdatamodel"; sourceTree = "<group>"; };
 		16B94070182D136700F32061 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
 		16C54F921881639B00849B76 /* GithubViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GithubViewController.h; sourceTree = "<group>"; };
 		16C54F931881639B00849B76 /* GithubViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GithubViewController.m; sourceTree = "<group>"; };
-		16CBE1C01A2DBB2700485053 /* DataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DataManager.swift; path = Shared/DataManager.swift; sourceTree = SOURCE_ROOT; };
+		16CBE1C01A2DBB2700485053 /* DataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = DataManager.swift; path = Shared/DataManager.swift; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16CBE1C31A2DF61C00485053 /* GlobalsObjC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GlobalsObjC.h; path = Shared/GlobalsObjC.h; sourceTree = "<group>"; };
+		16CBE1C41A2DFBA500485053 /* Settings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Settings.swift; path = Shared/Settings.swift; sourceTree = "<group>"; };
 		16D223EA19F2811F00B48E88 /* Trailer 17.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 17.xcdatamodel"; sourceTree = "<group>"; };
 		16ECCFAF18B7AC5E000B012F /* Trailer 10.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 10.xcdatamodel"; sourceTree = "<group>"; };
 		16EE561E19B78DBA0031DF6D /* CommentBlacklistViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommentBlacklistViewController.h; sourceTree = "<group>"; };
-		16EE561F19B78DBA0031DF6D /* CommentBlacklistViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommentBlacklistViewController.m; sourceTree = "<group>"; };
+		16EE561F19B78DBA0031DF6D /* CommentBlacklistViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = CommentBlacklistViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		16EE562119B857930031DF6D /* Trailer 14.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 14.xcdatamodel"; sourceTree = "<group>"; };
 		16F2B33E19C070F2005CB433 /* Trailer 15.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 15.xcdatamodel"; sourceTree = "<group>"; };
 		16F51FA019DE8C78007B0BB1 /* PRIVACY */ = {isa = PBXFileReference; lastKnownFileType = text; path = PRIVACY; sourceTree = "<group>"; };
@@ -220,7 +219,7 @@
 		16FD14D51881CBC400FDC960 /* PickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PickerViewController.h; sourceTree = "<group>"; };
 		16FD14D61881CBC400FDC960 /* PickerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PickerViewController.m; sourceTree = "<group>"; };
 		16FDD6DB18804470008D2223 /* PRCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PRCell.h; sourceTree = "<group>"; };
-		16FDD6DC18804470008D2223 /* PRCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PRCell.m; sourceTree = "<group>"; };
+		16FDD6DC18804470008D2223 /* PRCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = PRCell.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -319,12 +318,11 @@
 				16A794F31A252BFA00A76553 /* PopTimer.swift */,
 				164785AC1A2CE7CD00297764 /* NSDictionaryExtensions.swift */,
 				164785AD1A2CE7CD00297764 /* NSStringExtensions.swift */,
+				16CBE1C41A2DFBA500485053 /* Settings.swift */,
 				16075A9517EC7492000D86FD /* API.h */,
 				16075A9617EC7492000D86FD /* API.m */,
 				1617BEE8183F538100E89BB2 /* Reachability.h */,
 				1617BEE9183F538100E89BB2 /* Reachability.m */,
-				1665B66B1882F29E00972111 /* Settings.h */,
-				1665B66C1882F29E00972111 /* Settings.m */,
 			);
 			name = Logic;
 			sourceTree = "<group>";
@@ -605,7 +603,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				1665B6661882F24400972111 /* UINavigationController+DismissKeyboard.m in Sources */,
-				1665B66E1882F29E00972111 /* Settings.m in Sources */,
 				169CEB9C1879D5BB0083A068 /* AdvancedSettingsViewController.m in Sources */,
 				1628A6D418789E73005EDA69 /* DetailViewController.m in Sources */,
 				164785AB1A2CE7BD00297764 /* Globals.swift in Sources */,
@@ -613,6 +610,7 @@
 				16928CB91A2B3AED0030AE23 /* Repo.swift in Sources */,
 				1628A6D118789E73005EDA69 /* MasterViewController.m in Sources */,
 				1694372619FD3F4D005079F6 /* ServersViewController.m in Sources */,
+				16CBE1C61A2DFBA500485053 /* Settings.swift in Sources */,
 				164785AF1A2CE7CD00297764 /* NSDictionaryExtensions.swift in Sources */,
 				1628A7081878BC32005EDA69 /* Reachability.m in Sources */,
 				1628A7001878B810005EDA69 /* API.m in Sources */,
@@ -645,7 +643,6 @@
 			files = (
 				16928CB81A2B3AED0030AE23 /* Repo.swift in Sources */,
 				1617BEEA183F538100E89BB2 /* Reachability.m in Sources */,
-				1665B66D1882F29E00972111 /* Settings.m in Sources */,
 				160C5AD318682CD800142482 /* CommentCounts.m in Sources */,
 				16FA683B1823CF4600401E9B /* PRItemView.m in Sources */,
 				168A5C77185BBA2F00CB6B02 /* MenuWindow.m in Sources */,
@@ -664,6 +661,7 @@
 				162002D01A2A3E2100FF95F3 /* Application.swift in Sources */,
 				16928CAF1A2B3AED0030AE23 /* PullRequest.swift in Sources */,
 				168BC6BA17EC2DF000BC4584 /* main.m in Sources */,
+				16CBE1C51A2DFBA500485053 /* Settings.swift in Sources */,
 				16075A9717EC7492000D86FD /* API.m in Sources */,
 				16928CBB1A2B3AED0030AE23 /* ApiServer.swift in Sources */,
 				161BED25185B5368005C00F7 /* StatusItemView.m in Sources */,

@@ -1,5 +1,4 @@
 #import "MenuWindow.h"
-#import "Settings.h"
 
 @interface MenuWindow ()
 {
@@ -41,7 +40,7 @@
 
 + (BOOL)usingVibrancy
 {
-	return NSAppKitVersionNumber>NSAppKitVersionNumber10_9 && settings.useVibrancy && (NSClassFromString(@"NSVisualEffectView")!=nil);
+	return NSAppKitVersionNumber>NSAppKitVersionNumber10_9 && Settings.useVibrancy && (NSClassFromString(@"NSVisualEffectView")!=nil);
 }
 
 - (void)updateVibrancy

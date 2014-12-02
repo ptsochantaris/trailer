@@ -1,5 +1,4 @@
 #import "RespositoriesViewController.h"
-#import "Settings.h"
 
 @interface RespositoriesViewController () <UITextFieldDelegate, NSFetchedResultsControllerDelegate>
 {

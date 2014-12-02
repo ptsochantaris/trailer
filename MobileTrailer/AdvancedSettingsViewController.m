@@ -1,6 +1,5 @@
 #import "PickerViewController.h"
 #import "AdvancedSettingsViewController.h"
-#import "Settings.h"
 
 @interface AdvancedSettingsViewController () <PickerViewControllerDelegate>
 {
@@ -59,19 +58,19 @@
 			case 0:
 			{
 				cell.textLabel.text = @"Foreground refresh interval";
-				cell.detailTextLabel.text = [NSString stringWithFormat:@"%.0f seconds",settings.refreshPeriod];
+				cell.detailTextLabel.text = [NSString stringWithFormat:@"%.0f seconds",Settings.refreshPeriod];
 				break;
 			}
 			case 1:
 			{
 				cell.textLabel.text = @"Background refresh interval (minimum)";
-				cell.detailTextLabel.text = [NSString stringWithFormat:@"%.0f minutes",settings.backgroundRefreshPeriod/60.0];
+				cell.detailTextLabel.text = [NSString stringWithFormat:@"%.0f minutes",Settings.backgroundRefreshPeriod/60.0];
 				break;
 			}
 			case 2:
 			{
 				cell.textLabel.text = @"Watchlist refresh interval";
-				cell.detailTextLabel.text = [NSString stringWithFormat:@"%.0f hours",settings.newRepoCheckPeriod];
+				cell.detailTextLabel.text = [NSString stringWithFormat:@"%.0f hours",Settings.newRepoCheckPeriod];
 				break;
 			}
 		}
@@ -83,37 +82,37 @@
 			case 0:
 			{
 				cell.textLabel.text = @"Display creation instead of activity times";
-				if(settings.showCreatedInsteadOfUpdated) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if(Settings.showCreatedInsteadOfUpdated) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
 			case 1:
             {
 				cell.textLabel.text = @"Hide 'All PRs' section";
-				if(settings.hideAllPrsSection) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if(Settings.hideAllPrsSection) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
             }
 			case 2:
             {
 				cell.textLabel.text = @"Move assigned PRs to 'Mine'";
-				if(settings.moveAssignedPrsToMySection) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if(Settings.moveAssignedPrsToMySection) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
             }
 			case 3:
 			{
 				cell.textLabel.text = @"Announce unmergeable PRs only in 'Mine'/'Participated'";
-				if(settings.markUnmergeableOnUserSectionsOnly) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if(Settings.markUnmergeableOnUserSectionsOnly) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
 			case 4:
             {
 				cell.textLabel.text = @"Display repository names";
-				if(settings.showReposInName) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if(Settings.showReposInName) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
             }
 			case 5:
             {
 				cell.textLabel.text = @"Include repository names in filtering";
-				if(settings.includeReposInFilter) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if(Settings.includeReposInFilter) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
             }
 
@@ -126,25 +125,25 @@
 			case 0:
 			{
 				cell.textLabel.text = @"Display comment badges and alerts for all PRs";
-				if(settings.showCommentsEverywhere) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if(Settings.showCommentsEverywhere) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
 			case 1:
 			{
 				cell.textLabel.text = @"Only display PRs with unread comments";
-				if(settings.shouldHideUncommentedRequests) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if(Settings.shouldHideUncommentedRequests) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
 			case 2:
 			{
 				cell.textLabel.text = @"Move PRs that mention me to 'Participated'";
-				if(settings.autoParticipateInMentions) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if(Settings.autoParticipateInMentions) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
 			case 3:
 			{
 				cell.textLabel.text = @"Open PRs at first unread comment";
-				if(settings.openPrAtFirstUnreadComment) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if(Settings.openPrAtFirstUnreadComment) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
 			case 4:
@@ -162,7 +161,7 @@
 			case 0:
 			{
 				cell.textLabel.text = @"Auto-hide new repositories in your watchlist";
-				if(settings.hideNewRepositories) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if(Settings.hideNewRepositories) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
 		}
@@ -174,16 +173,16 @@
 			case 0:
 			{
 				cell.textLabel.text = @"Show labels";
-				if(settings.showLabels) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if(Settings.showLabels) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
 			case 1:
 			{
 				cell.textLabel.text = @"Re-query labels";
-				if(settings.labelRefreshInterval==1)
+				if(Settings.labelRefreshInterval==1)
 					cell.detailTextLabel.text = @"Every refresh";
 				else
-					cell.detailTextLabel.text = [NSString stringWithFormat:@"Every %ld refreshes",(long)settings.labelRefreshInterval];
+					cell.detailTextLabel.text = [NSString stringWithFormat:@"Every %ld refreshes",(long)Settings.labelRefreshInterval];
 			}
 		}
 	}
@@ -194,19 +193,19 @@
 			case 0:
 			{
 				cell.textLabel.text = @"When a PR is merged";
-				cell.detailTextLabel.text = PR_HANDLING_POLICY[settings.mergeHandlingPolicy];
+				cell.detailTextLabel.text = PR_HANDLING_POLICY[Settings.mergeHandlingPolicy];
 				break;
 			}
 			case 1:
 			{
 				cell.textLabel.text = @"When a PR is closed";
-				cell.detailTextLabel.text = PR_HANDLING_POLICY[settings.closeHandlingPolicy];
+				cell.detailTextLabel.text = PR_HANDLING_POLICY[Settings.closeHandlingPolicy];
 				break;
 			}
 			case 2:
 			{
 				cell.textLabel.text = @"Don't keep PRs merged by me";
-				if(settings.dontKeepPrsMergedByMe) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if(Settings.dontKeepPrsMergedByMe) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
 		}
@@ -218,13 +217,13 @@
 			case 0:
             {
 				cell.textLabel.text = @"Removing all merged PRs";
-				if(settings.dontAskBeforeWipingMerged) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if(Settings.dontAskBeforeWipingMerged) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
             }
             case 1:
             {
 				cell.textLabel.text = @"Removing all closed PRs";
-				if(settings.dontAskBeforeWipingClosed) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if(Settings.dontAskBeforeWipingClosed) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
             }
 		}
@@ -236,7 +235,7 @@
 			case 0:
 			{
 				cell.textLabel.text = @"Direction";
-				if(settings.sortDescending)
+				if(Settings.sortDescending)
 					cell.detailTextLabel.text = @"Reverse";
 				else
 					cell.detailTextLabel.text = @"Normal";
@@ -245,16 +244,16 @@
 			case 1:
 			{
 				cell.textLabel.text = @"Criterion";
-				if(settings.sortDescending)
-					cell.detailTextLabel.text = SORT_REVERSE[settings.sortMethod];
+				if(Settings.sortDescending)
+					cell.detailTextLabel.text = SORT_REVERSE[Settings.sortMethod];
 				else
-					cell.detailTextLabel.text = SORT_NORMAL[settings.sortMethod];
+					cell.detailTextLabel.text = SORT_NORMAL[Settings.sortMethod];
 				break;
 			}
 			case 2:
 			{
 				cell.textLabel.text = @"Group by repository";
-				if(settings.groupByRepo) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if(Settings.groupByRepo) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
 		}
@@ -266,7 +265,7 @@
 			case 0:
 			{
 				cell.textLabel.text = @"Log activity to console";
-				if(settings.logActivityToConsole) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				if(Settings.logActivityToConsole) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
 			}
 		}
@@ -289,7 +288,7 @@
 				NSInteger count=0;
 				for(NSInteger f=60;f<3600;f+=10)
 				{
-					if(f==settings.refreshPeriod) previousValue = count;
+					if(f==Settings.refreshPeriod) previousValue = count;
 					[values addObject:[NSString stringWithFormat:@"%ld seconds",(long)f]];
 					count++;
 				}
@@ -301,7 +300,7 @@
 				NSInteger count=0;
 				for(NSInteger f=10;f<10000;f+=10)
 				{
-					if(f==settings.backgroundRefreshPeriod/60.0) previousValue = count;
+					if(f==Settings.backgroundRefreshPeriod/60.0) previousValue = count;
 					[values addObject:[NSString stringWithFormat:@"%ld minutes",(long)f]];
 					count++;
 				}
@@ -313,7 +312,7 @@
 				NSInteger count=0;
 				for(NSInteger f=1;f<100;f+=1)
 				{
-					if(f==settings.newRepoCheckPeriod) previousValue = count;
+					if(f==Settings.newRepoCheckPeriod) previousValue = count;
 					[values addObject:[NSString stringWithFormat:@"%ld hours",(long)f]];
 					count++;
 				}
@@ -329,37 +328,37 @@
 		{
 			case 0:
 			{
-				settings.showCreatedInsteadOfUpdated = !settings.showCreatedInsteadOfUpdated;
+				Settings.showCreatedInsteadOfUpdated = !Settings.showCreatedInsteadOfUpdated;
 				[settingsChangedTimer push];
 				break;
 			}
 			case 1:
 			{
-				settings.hideAllPrsSection = !settings.hideAllPrsSection;
+				Settings.hideAllPrsSection = !Settings.hideAllPrsSection;
 				[settingsChangedTimer push];
 				break;
 			}
 			case 2:
 			{
-				settings.moveAssignedPrsToMySection = !settings.moveAssignedPrsToMySection;
+				Settings.moveAssignedPrsToMySection = !Settings.moveAssignedPrsToMySection;
 				[settingsChangedTimer push];
 				break;
 			}
 			case 3:
 			{
-				settings.markUnmergeableOnUserSectionsOnly = !settings.markUnmergeableOnUserSectionsOnly;
+				Settings.markUnmergeableOnUserSectionsOnly = !Settings.markUnmergeableOnUserSectionsOnly;
 				[settingsChangedTimer push];
 				break;
 			}
 			case 4:
 			{
-				settings.showReposInName = !settings.showReposInName;
+				Settings.showReposInName = !Settings.showReposInName;
 				[settingsChangedTimer push];
 				break;
 			}
 			case 5:
 			{
-				settings.includeReposInFilter = !settings.includeReposInFilter;
+				Settings.includeReposInFilter = !Settings.includeReposInFilter;
 				break;
 			}
 		}
@@ -370,25 +369,25 @@
 		{
 			case 0:
 			{
-				settings.showCommentsEverywhere = !settings.showCommentsEverywhere;
+				Settings.showCommentsEverywhere = !Settings.showCommentsEverywhere;
 				[settingsChangedTimer push];
 				break;
 			}
 			case 1:
 			{
-				settings.shouldHideUncommentedRequests = !settings.shouldHideUncommentedRequests;
+				Settings.shouldHideUncommentedRequests = !Settings.shouldHideUncommentedRequests;
 				[settingsChangedTimer push];
 				break;
 			}
 			case 2:
 			{
-				settings.autoParticipateInMentions = !settings.autoParticipateInMentions;
+				Settings.autoParticipateInMentions = !Settings.autoParticipateInMentions;
 				[settingsChangedTimer push];
 				break;
 			}
 			case 3:
 			{
-				settings.openPrAtFirstUnreadComment = !settings.openPrAtFirstUnreadComment;
+				Settings.openPrAtFirstUnreadComment = !Settings.openPrAtFirstUnreadComment;
 				break;
 			}
 			case 4:
@@ -404,7 +403,7 @@
 		{
 			case 0:
 			{
-				settings.hideNewRepositories = !settings.hideNewRepositories;
+				Settings.hideNewRepositories = !Settings.hideNewRepositories;
 				break;
 			}
 		}
@@ -415,9 +414,9 @@
 		{
 			case 0:
 			{
-				settings.showLabels = !settings.showLabels;
+				Settings.showLabels = !Settings.showLabels;
 				app.api.successfulRefreshesSinceLastLabelCheck = 0;
-				if(settings.showLabels)
+				if(Settings.showLabels)
 				{
 					for(Repo *r in [Repo allItemsOfType:@"Repo" inMoc:app.dataManager.managedObjectContext])
 					{
@@ -440,7 +439,7 @@
 				previousValue = 0;
 				for(NSInteger f=2;f<100;f++)
 				{
-					if(f==settings.labelRefreshInterval) previousValue = count;
+					if(f==Settings.labelRefreshInterval) previousValue = count;
 					[values addObject:[NSString stringWithFormat:@"Every %ld refreshes",(long)f]];
 					count++;
 				}
@@ -456,7 +455,7 @@
 			case 0:
 			{
                 selectedIndexPath = indexPath;
-				previousValue = settings.mergeHandlingPolicy;
+				previousValue = Settings.mergeHandlingPolicy;
 				pickerName = [self.tableView cellForRowAtIndexPath:indexPath].textLabel.text;
                 valuesToPush = PR_HANDLING_POLICY;
 				[self performSegueWithIdentifier:@"showPicker" sender:self];
@@ -465,7 +464,7 @@
 			case 1:
 			{
                 selectedIndexPath = indexPath;
-				previousValue = settings.closeHandlingPolicy;
+				previousValue = Settings.closeHandlingPolicy;
 				pickerName = [self.tableView cellForRowAtIndexPath:indexPath].textLabel.text;
                 valuesToPush = PR_HANDLING_POLICY;
 				[self performSegueWithIdentifier:@"showPicker" sender:self];
@@ -473,7 +472,7 @@
 			}
 			case 2:
 			{
-				settings.dontKeepPrsMergedByMe = !settings.dontKeepPrsMergedByMe;
+				Settings.dontKeepPrsMergedByMe = !Settings.dontKeepPrsMergedByMe;
 				break;
 			}
 		}
@@ -484,12 +483,12 @@
 		{
 			case 0:
 			{
-				settings.dontAskBeforeWipingMerged = !settings.dontAskBeforeWipingMerged;
+				Settings.dontAskBeforeWipingMerged = !Settings.dontAskBeforeWipingMerged;
 				break;
 			}
 			case 1:
 			{
-				settings.dontAskBeforeWipingClosed = !settings.dontAskBeforeWipingClosed;
+				Settings.dontAskBeforeWipingClosed = !Settings.dontAskBeforeWipingClosed;
 				break;
 			}
 		}
@@ -500,7 +499,7 @@
 		{
 			case 0:
 			{
-				settings.sortDescending = !settings.sortDescending;
+				Settings.sortDescending = !Settings.sortDescending;
 				[settingsChangedTimer push];
 				[self.tableView reloadData];
 				break;
@@ -508,9 +507,9 @@
 			case 1:
 			{
 				selectedIndexPath = indexPath;
-				previousValue = settings.sortMethod;
+				previousValue = Settings.sortMethod;
 				pickerName = [self.tableView cellForRowAtIndexPath:indexPath].textLabel.text;
-				if(settings.sortDescending)
+				if(Settings.sortDescending)
 					valuesToPush = SORT_REVERSE;
 				else
 					valuesToPush = SORT_NORMAL;
@@ -519,7 +518,7 @@
 			}
 			case 2:
 			{
-				settings.groupByRepo = !settings.groupByRepo;
+				Settings.groupByRepo = !Settings.groupByRepo;
 				[settingsChangedTimer push];
 				break;
 			}
@@ -530,9 +529,9 @@
 		switch (indexPath.row) {
 			case 0:
 			{
-				settings.logActivityToConsole = !settings.logActivityToConsole;
+				Settings.logActivityToConsole = !Settings.logActivityToConsole;
 				[self.tableView reloadData];
-				if(settings.logActivityToConsole)
+				if(Settings.logActivityToConsole)
 				{
 					[[[UIAlertView alloc] initWithTitle:@"Warning"
 												message:@"Logging is a feature meant for error reporting, having it constantly enabled will cause this app to be less responsive and use more battery"
@@ -604,36 +603,36 @@
 	{
 		if(selectedIndexPath.row==0)
 		{
-			settings.refreshPeriod = indexPath.row*10+60;
+			Settings.refreshPeriod = indexPath.row*10+60;
 		}
 		else if(selectedIndexPath.row==1)
 		{
-			settings.backgroundRefreshPeriod = (indexPath.row*10+10)*60.0;
+			Settings.backgroundRefreshPeriod = (indexPath.row*10+10)*60.0;
 		}
 		else if(selectedIndexPath.row==2)
 		{
-			settings.newRepoCheckPeriod = indexPath.row+1;
+			Settings.newRepoCheckPeriod = indexPath.row+1;
 		}
 	}
 	else if(selectedIndexPath.section==SORT_SECTION_INDEX)
 	{
-		settings.sortMethod = indexPath.row;
+		Settings.sortMethod = indexPath.row;
 		[settingsChangedTimer push];
 	}
 	else if(selectedIndexPath.section==HISTORY_SECTION_INDEX)
 	{
 		if(selectedIndexPath.row==0)
 		{
-			settings.mergeHandlingPolicy = indexPath.row;
+			Settings.mergeHandlingPolicy = indexPath.row;
 		}
 		else if(selectedIndexPath.row==1)
 		{
-			settings.closeHandlingPolicy = indexPath.row;
+			Settings.closeHandlingPolicy = indexPath.row;
 		}
 	}
 	else if(selectedIndexPath.section==LABEL_SECTION_INDEX)
 	{
-		settings.labelRefreshInterval = indexPath.row+1;
+		Settings.labelRefreshInterval = indexPath.row+1;
 	}
 	[self.tableView reloadData];
 	selectedIndexPath = nil;
