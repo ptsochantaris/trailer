@@ -101,7 +101,7 @@ class PullRequest: DataItem {
 				if Settings.includeReposInFilter {
 					predicateSegments.append("(title contains[cd] '\(f)' or userLogin contains[cd] '\(f)' or repoName contains[cd] '\(f)')")
 				} else {
-					predicateSegments.append("(title contains[cd] '\(f)' or userLogin contains[cd] '\(f)'")
+					predicateSegments.append("(title contains[cd] '\(f)' or userLogin contains[cd] '\(f)')")
 				}
 			}
 		}
