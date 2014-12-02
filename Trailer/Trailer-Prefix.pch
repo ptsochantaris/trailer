@@ -3,11 +3,7 @@
 
 #ifdef __OBJC__
 
-@import Cocoa;
-@import CoreData;
-
 #import "OSX_Globals.h"
 #import "Trailer-Swift.h"
-#import "OSX_AppDelegate.h"
 
 #endif

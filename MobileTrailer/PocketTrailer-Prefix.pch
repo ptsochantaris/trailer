@@ -3,12 +3,8 @@
 
 #ifdef __OBJC__
 
-@import UIKit;
-@import CoreData;
-
 #import "iOS_Globals.h"
 #import "PocketTrailer-Swift.h"
 #import "UINavigationController+DismissKeyboard.h"
-#import "iOS_AppDelegate.h"
 
 #endif

@@ -1,8 +1,6 @@
 
 @interface Settings : NSObject
 
-- (NSString *)sortField;
-
 @property (nonatomic) NSInteger sortMethod, statusFilteringMode, lastPreferencesTabSelected,
 								closeHandlingPolicy, mergeHandlingPolicy, statusItemRefreshInterval,
 								labelRefreshInterval;
@@ -30,7 +28,3 @@
 @property (nonatomic) NSInteger checkForUpdatesInterval;
 
 @end
-
-extern Settings *settings;
-
-void DLog(NSString *format, ...);

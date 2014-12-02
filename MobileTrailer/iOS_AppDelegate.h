@@ -25,5 +25,3 @@ typedef void (^backgroundFetchCompletionCallback)(UIBackgroundFetchResult result
 - (void)shareFromView:(UIViewController *)view buttonItem:(UIBarButtonItem *)button url:(NSURL *)url;
 
 @end
-
-extern iOS_AppDelegate *app;

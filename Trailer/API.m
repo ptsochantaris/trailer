@@ -1,5 +1,20 @@
 #import "Settings.h"
 
+void DLog(NSString *format, ...)
+{
+#ifndef DEBUG
+	if(settings.logActivityToConsole)
+	{
+#endif
+		va_list args;
+		va_start(args, format);
+		NSLogv(format, args);
+		va_end(args);
+#ifndef DEBUG
+	}
+#endif
+}
+
 @interface UrlBackOffEntry : NSObject
 @property (nonatomic) NSDate *nextAttemptAt;
 @property (nonatomic) NSTimeInterval duration;

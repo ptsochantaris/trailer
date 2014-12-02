@@ -32,7 +32,7 @@ func DLog(messageFormat:@autoclosure () -> String, args:LazyVarArgClosure...) {
 	typealias FONT_CLASS = NSFont
 #endif
 
-func MAKECOLOR(red: CGFloat, _ green: CGFloat, _ blue: CGFloat,  _ alpha: CGFloat) -> COLOR_CLASS {
+func MAKECOLOR(red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat) -> COLOR_CLASS {
 	return COLOR_CLASS(red: red, green: green, blue: blue, alpha: alpha)
 }
 

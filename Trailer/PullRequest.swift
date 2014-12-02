@@ -82,6 +82,15 @@ class PullRequest: DataItem {
 		return p;
 	}
 
+	class func sortField() -> String? {
+		switch (settings.sortMethod) {
+		case PRSortingMethod.CreationDate.rawValue: return "createdAt"
+		case PRSortingMethod.RecentActivity.rawValue: return "updatedAt"
+		case PRSortingMethod.Title.rawValue: return "title"
+		default: return nil
+		}
+	}
+
 	class func requestForPullRequestsWithFilter(filter: String?) -> NSFetchRequest {
 
 		var predicateSegments = [String]()
@@ -108,7 +117,7 @@ class PullRequest: DataItem {
 			sortDescriptiors.append(NSSortDescriptor(key: "repoName", ascending: true, selector: Selector("caseInsensitiveCompare:")))
 		}
 
-		if let fieldName = settings.sortField() {
+		if let fieldName = sortField() {
 			if fieldName == "title" {
 				sortDescriptiors.append(NSSortDescriptor(key: fieldName, ascending: !settings.sortDescending, selector: Selector("caseInsensitiveCompare:")))
 			} else if fieldName.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 0 {

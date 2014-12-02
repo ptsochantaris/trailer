@@ -112,8 +112,8 @@
 		160C5AD218682CD800142482 /* CommentCounts.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommentCounts.m; sourceTree = "<group>"; };
 		160E60321A0A28DF00742BA9 /* Trailer 18.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 18.xcdatamodel"; sourceTree = "<group>"; };
 		16154E2E19C43E8E00E49139 /* Launch.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Launch.storyboard; sourceTree = "<group>"; };
-		1617BEE8183F538100E89BB2 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
-		1617BEE9183F538100E89BB2 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
+		1617BEE8183F538100E89BB2 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reachability.h; path = Trailer/Reachability.h; sourceTree = "<group>"; };
+		1617BEE9183F538100E89BB2 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Reachability.m; path = Trailer/Reachability.m; sourceTree = "<group>"; };
 		1617BEEC183F543600E89BB2 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		1617BEEE183F9C4F00E89BB2 /* Trailer 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 2.xcdatamodel"; sourceTree = "<group>"; };
 		161BED23185B5368005C00F7 /* StatusItemView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StatusItemView.h; sourceTree = "<group>"; };
@@ -207,6 +207,7 @@
 		16C54F921881639B00849B76 /* GithubViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GithubViewController.h; sourceTree = "<group>"; };
 		16C54F931881639B00849B76 /* GithubViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GithubViewController.m; sourceTree = "<group>"; };
 		16CBE1C01A2DBB2700485053 /* DataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DataManager.swift; path = Shared/DataManager.swift; sourceTree = SOURCE_ROOT; };
+		16CBE1C31A2DF61C00485053 /* GlobalsObjC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GlobalsObjC.h; path = Shared/GlobalsObjC.h; sourceTree = "<group>"; };
 		16D223EA19F2811F00B48E88 /* Trailer 17.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 17.xcdatamodel"; sourceTree = "<group>"; };
 		16ECCFAF18B7AC5E000B012F /* Trailer 10.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 10.xcdatamodel"; sourceTree = "<group>"; };
 		16EE561E19B78DBA0031DF6D /* CommentBlacklistViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommentBlacklistViewController.h; sourceTree = "<group>"; };
@@ -247,21 +248,11 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		1617BEE7183F537500E89BB2 /* Reachability */ = {
-			isa = PBXGroup;
-			children = (
-				1617BEE8183F538100E89BB2 /* Reachability.h */,
-				1617BEE9183F538100E89BB2 /* Reachability.m */,
-			);
-			name = Reachability;
-			path = Trailer;
-			sourceTree = "<group>";
-		};
 		162002CE1A2A3E0100FF95F3 /* Core */ = {
 			isa = PBXGroup;
 			children = (
-				168BC6BB17EC2DF000BC4584 /* Trailer-Prefix.pch */,
 				162002D21A2A40B800FF95F3 /* OSX_Globals.h */,
+				168BC6BB17EC2DF000BC4584 /* Trailer-Prefix.pch */,
 				164785B31A2CE80800297764 /* Trailer-Bridging-Header.h */,
 				168BC6BF17EC2DF000BC4584 /* OSX_AppDelegate.h */,
 				168BC6C017EC2DF000BC4584 /* OSX_AppDelegate.m */,
@@ -273,8 +264,8 @@
 		162002D11A2A409900FF95F3 /* Core */ = {
 			isa = PBXGroup;
 			children = (
-				1628A6C218789E73005EDA69 /* PocketTrailer-Prefix.pch */,
 				162002D91A2A4D9E00FF95F3 /* iOS_Globals.h */,
+				1628A6C218789E73005EDA69 /* PocketTrailer-Prefix.pch */,
 				164785B21A2CE7FB00297764 /* PocketTrailer-Bridging-Header.h */,
 				1628A6C318789E73005EDA69 /* iOS_AppDelegate.h */,
 				1628A6C418789E73005EDA69 /* iOS_AppDelegate.m */,
@@ -314,41 +305,28 @@
 				168C6ECC18B2104100E41D85 /* LICENSE */,
 				16F51FA019DE8C78007B0BB1 /* PRIVACY */,
 				168C6ECD18B2104100E41D85 /* README.md */,
-				16C54F951881720400849B76 /* Settings */,
-				1628A6F518789F85005EDA69 /* Utilities */,
-				1628A6F418789F78005EDA69 /* API */,
-				1628A6F318789F6D005EDA69 /* Extensions */,
-				1617BEE7183F537500E89BB2 /* Reachability */,
+				1628A6F518789F85005EDA69 /* Logic */,
 				16B9552E17EC86D10005118F /* Data */,
 			);
 			name = Shared;
 			sourceTree = "<group>";
 		};
-		1628A6F318789F6D005EDA69 /* Extensions */ = {
+		1628A6F518789F85005EDA69 /* Logic */ = {
 			isa = PBXGroup;
 			children = (
+				16CBE1C31A2DF61C00485053 /* GlobalsObjC.h */,
+				164785A91A2CE7BD00297764 /* Globals.swift */,
+				16A794F31A252BFA00A76553 /* PopTimer.swift */,
 				164785AC1A2CE7CD00297764 /* NSDictionaryExtensions.swift */,
 				164785AD1A2CE7CD00297764 /* NSStringExtensions.swift */,
-			);
-			name = Extensions;
-			sourceTree = "<group>";
-		};
-		1628A6F418789F78005EDA69 /* API */ = {
-			isa = PBXGroup;
-			children = (
 				16075A9517EC7492000D86FD /* API.h */,
 				16075A9617EC7492000D86FD /* API.m */,
+				1617BEE8183F538100E89BB2 /* Reachability.h */,
+				1617BEE9183F538100E89BB2 /* Reachability.m */,
+				1665B66B1882F29E00972111 /* Settings.h */,
+				1665B66C1882F29E00972111 /* Settings.m */,
 			);
-			name = API;
-			sourceTree = "<group>";
-		};
-		1628A6F518789F85005EDA69 /* Utilities */ = {
-			isa = PBXGroup;
-			children = (
-				16A794F31A252BFA00A76553 /* PopTimer.swift */,
-				164785A91A2CE7BD00297764 /* Globals.swift */,
-			);
-			name = Utilities;
+			name = Logic;
 			sourceTree = "<group>";
 		};
 		16583E411851E5C6003A7A55 /* MenuItems */ = {
@@ -470,21 +448,12 @@
 		16B9552E17EC86D10005118F /* Data */ = {
 			isa = PBXGroup;
 			children = (
-				16EE562219B857C90031DF6D /* Models */,
 				168BC6C517EC2DF000BC4584 /* Trailer.xcdatamodeld */,
 				16CBE1C01A2DBB2700485053 /* DataManager.swift */,
+				16EE562219B857C90031DF6D /* Models */,
 			);
 			name = Data;
 			path = Trailer;
-			sourceTree = "<group>";
-		};
-		16C54F951881720400849B76 /* Settings */ = {
-			isa = PBXGroup;
-			children = (
-				1665B66B1882F29E00972111 /* Settings.h */,
-				1665B66C1882F29E00972111 /* Settings.m */,
-			);
-			name = Settings;
 			sourceTree = "<group>";
 		};
 		16EE562219B857C90031DF6D /* Models */ = {

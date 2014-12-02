@@ -127,5 +127,3 @@
 - (NSString *)focusedItemUrl;
 
 @end
-
-extern OSX_AppDelegate *app;

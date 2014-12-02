@@ -3,21 +3,6 @@
 
 Settings *settings;
 
-void DLog(NSString *format, ...)
-{
-#ifndef DEBUG
-	if(settings.logActivityToConsole)
-	{
-#endif
-		va_list args;
-		va_start(args, format);
-		NSLogv(format, args);
-		va_end(args);
-#ifndef DEBUG
-	}
-#endif
-}
-
 @implementation Settings
 {
 	NSUserDefaults *defaults;
@@ -32,17 +17,6 @@ void DLog(NSString *format, ...)
 		valuesCache = [NSMutableDictionary new];
     }
     return self;
-}
-
-- (NSString *)sortField
-{
-	switch (self.sortMethod)
-	{
-		case kCreationDate: return @"createdAt";
-		case kRecentActivity: return @"updatedAt";
-		case kTitle: return @"title";
-	}
-	return nil;
 }
 
 - (void)storeDefaultValue:(id)value forKey:(NSString *)key
