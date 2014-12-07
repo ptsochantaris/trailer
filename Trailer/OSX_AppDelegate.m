@@ -2,6 +2,7 @@
 #import <Sparkle/Sparkle.h>
 
 OSX_AppDelegate *app;
+NSString *currentAppVersion;
 
 @implementation OSX_AppDelegate
 {
@@ -13,8 +14,6 @@ OSX_AppDelegate *app;
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
 	app = self;
-
-	self.currentAppVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
 
 	self.mainMenu.backgroundColor = [COLOR_CLASS whiteColor];
 
@@ -39,9 +38,9 @@ OSX_AppDelegate *app;
 
 	[[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate:self];
 
-	NSString *currentAppVersion = [@"Version " stringByAppendingString:self.currentAppVersion];
-	[self.versionNumber setStringValue:currentAppVersion];
-	[self.aboutVersion setStringValue:currentAppVersion];
+	NSString *cav = [@"Version " stringByAppendingString:currentAppVersion];
+	[self.versionNumber setStringValue:cav];
+	[self.aboutVersion setStringValue:cav];
 
 	if([ApiServer someServersHaveAuthTokensInMoc:DataManager.managedObjectContext])
 	{

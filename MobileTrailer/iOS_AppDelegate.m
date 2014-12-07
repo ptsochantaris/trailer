@@ -2,6 +2,7 @@
 #import "OpenInSafariActivity.h"
 
 iOS_AppDelegate *app;
+NSString *currentAppVersion;
 
 @implementation iOS_AppDelegate
 {
@@ -17,8 +18,6 @@ iOS_AppDelegate *app;
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
 	app = self;
-
-	self.currentAppVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
 
 	self.enteringForeground = YES;
 

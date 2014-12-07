@@ -5,7 +5,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	self.versionNumber.text = [@"Version " stringByAppendingString:app.currentAppVersion];
+	self.versionNumber.text = [@"Version " stringByAppendingString:currentAppVersion];
 	self.licenseText.textContainerInset = UIEdgeInsetsMake(0, 10, 10, 10);
 }
 

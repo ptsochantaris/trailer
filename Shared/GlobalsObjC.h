@@ -72,3 +72,4 @@ typedef void (^completionBlockType)();
 #define STATUSITEM_PADDING 1.0
 
 void DLog(NSString *format, ...);
+extern NSString *currentAppVersion;

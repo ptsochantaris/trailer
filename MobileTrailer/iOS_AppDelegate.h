@@ -11,7 +11,6 @@ typedef void (^backgroundFetchCompletionCallback)(UIBackgroundFetchResult result
 @property (nonatomic) NSDate *lastSuccessfulRefresh, *lastRepoCheck;
 @property (nonatomic) NSTimer *refreshTimer;
 @property (nonatomic,copy) backgroundFetchCompletionCallback backgroundCallback;
-@property (nonatomic) NSString *currentAppVersion;
 
 - (void)postNotificationOfType:(PRNotificationType)type forItem:(id)item;
 

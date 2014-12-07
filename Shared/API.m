@@ -1302,15 +1302,15 @@ extraHeaders:(NSDictionary *)extraHeaders
 {
 #ifdef DEBUG
 	#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
-		return [NSString stringWithFormat:@"HouseTrip-Trailer-v%@-iOS-Development",app.currentAppVersion];
+		return [NSString stringWithFormat:@"HouseTrip-Trailer-v%@-iOS-Development", currentAppVersion];
 	#else
-		return [NSString stringWithFormat:@"HouseTrip-Trailer-v%@-OSX-Development",app.currentAppVersion];
+		return [NSString stringWithFormat:@"HouseTrip-Trailer-v%@-OSX-Development", currentAppVersion];
 	#endif
 #else
 	#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
-		return [NSString stringWithFormat:@"HouseTrip-Trailer-v%@-iOS-Release",app.currentAppVersion];
+		return [NSString stringWithFormat:@"HouseTrip-Trailer-v%@-iOS-Release", currentAppVersion];
 	#else
-		return [NSString stringWithFormat:@"HouseTrip-Trailer-v%@-OSX-Release",app.currentAppVersion];
+		return [NSString stringWithFormat:@"HouseTrip-Trailer-v%@-OSX-Release", currentAppVersion];
 	#endif
 #endif
 }
@@ -1383,7 +1383,7 @@ extraHeaders:(NSDictionary *)extraHeaders
 		sizeParameter = [@"&" stringByAppendingString:sizeParameter];
 
 	NSString *absolutePath = [path stringByAppendingString:sizeParameter];
-    NSString *imageKey = [NSString stringWithFormat:@"%@ %@", absolutePath, app.currentAppVersion];
+    NSString *imageKey = [NSString stringWithFormat:@"%@ %@", absolutePath, currentAppVersion];
 
     NSString *cachePath = [cacheDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"imgcache-%@", [imageKey md5hash]]];
 

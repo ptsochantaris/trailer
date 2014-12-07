@@ -238,14 +238,14 @@ class DataManager : NSObject {
 
 	class func versionBumpComplete() {
 		let d = NSUserDefaults.standardUserDefaults()
-		d.setObject(app.currentAppVersion, forKey: "LAST_RUN_VERSION_KEY")
+		d.setObject(currentAppVersion, forKey: "LAST_RUN_VERSION_KEY")
 		d.synchronize()
 	}
 
 	class func versionBumpOccured() -> Bool {
 		let d = NSUserDefaults.standardUserDefaults()
 		if let thisVersion = d.objectForKey("LAST_RUN_VERSION_KEY") as? String {
-			return !(thisVersion == app.currentAppVersion)
+			return !(thisVersion == currentAppVersion)
 		} else {
 			return true
 		}
