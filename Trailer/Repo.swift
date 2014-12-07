@@ -66,4 +66,17 @@ class Repo: DataItem {
 			repo.dirty = !repo.hidden.boolValue
 		}
 	}
+
+	class func reposForFilter(filter: String?) -> [Repo] {
+		let f = NSFetchRequest(entityName: "Repo")
+		f.returnsObjectsAsFaults = false
+		if let filterText = filter {
+			f.predicate = NSPredicate(format: "fullName contains [cd] %@", filterText)
+		}
+		f.sortDescriptors = [
+			NSSortDescriptor(key: "fork", ascending: true),
+			NSSortDescriptor(key: "fullName", ascending: true)
+		]
+		return mainObjectContext.executeFetchRequest(f, error: nil) as [Repo]
+	}
 }

@@ -1148,35 +1148,12 @@ OSX_AppDelegate *app;
 
 - (NSArray *)getFilteredRepos
 {
-	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"Repo"];
-	f.returnsObjectsAsFaults = NO;
-
-	NSString *filter = self.repoFilter.stringValue;
-	if(filter.length)
-		f.predicate = [NSPredicate predicateWithFormat:@"fullName contains [cd] %@",filter];
-
-	f.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"fork" ascending:YES],
-						  [NSSortDescriptor sortDescriptorWithKey:@"fullName" ascending:YES]];
-
-	return [DataManager.managedObjectContext executeFetchRequest:f error:nil];
-}
-
-- (NSUInteger)countParentRepos
-{
-	NSFetchRequest *f = [NSFetchRequest fetchRequestWithEntityName:@"Repo"];
-
-	NSString *filter = self.repoFilter.stringValue;
-	if(filter.length)
-		f.predicate = [NSPredicate predicateWithFormat:@"fork == NO and fullName contains [cd] %@",filter];
-	else
-		f.predicate = [NSPredicate predicateWithFormat:@"fork == NO"];
-
-	return [DataManager.managedObjectContext countForFetchRequest:f error:nil];
+	return [Repo reposForFilter:self.repoFilter.stringValue];
 }
 
 - (Repo *)repoForRow:(NSUInteger)row
 {
-	if(row>[self countParentRepos]) row--;
+	if(row>[DataManager countParentRepos:self.repoFilter.stringValue]) row--;
 	return [self getFilteredRepos][row-1];
 }
 
@@ -1256,7 +1233,7 @@ OSX_AppDelegate *app;
 {
 	if(tableView==self.projectsTable)
 	{
-		return (row == 0 || row == [self countParentRepos]+1);
+		return (row == 0 || row == [DataManager countParentRepos:self.repoFilter.stringValue]+1);
 	}
 	else
 	{
