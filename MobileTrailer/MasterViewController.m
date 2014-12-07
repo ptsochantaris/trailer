@@ -73,7 +73,7 @@
 {
 	refreshOnRelease = NO;
 
-	if([app.api.reachability currentReachabilityStatus]==NotReachable)
+	if([api.reachability currentReachabilityStatus]==NotReachable)
 	{
 		[[[UIAlertView alloc] initWithTitle:@"No Network"
 									message:@"There is no network connectivity, please try again later"
@@ -533,7 +533,7 @@
 			[self.refreshControl endRefreshing];
 		});
 	}
-	self.refreshControl.attributedTitle = [[NSAttributedString alloc] initWithString:[app.api lastUpdateDescription]
+	self.refreshControl.attributedTitle = [[NSAttributedString alloc] initWithString:[api lastUpdateDescription]
 																		  attributes:@{ }];
 
 	[UIApplication sharedApplication].applicationIconBadgeNumber = [PullRequest badgeCountInMoc:DataManager.managedObjectContext];

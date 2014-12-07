@@ -6,7 +6,7 @@ class AvatarView: NSImageView {
 	init(frame frameRect:NSRect, url:NSString) {
 		super.init(frame: frameRect)
 		imageAlignment = NSImageAlignment.AlignCenter
-		if !app.api.haveCachedAvatar(url, tryLoadAndCallback: { img in
+		if !api.haveCachedAvatar(url, tryLoadAndCallback: { img in
 			self.image = img
 			self.done()
 		}) {

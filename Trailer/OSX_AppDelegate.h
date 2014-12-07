@@ -109,7 +109,6 @@
 @property (nonatomic) PopTimer *filterTimer;
 
 // Globals
-@property (nonatomic) API *api;
 @property (weak) NSTimer *refreshTimer;
 @property (strong) NSDate *lastSuccessfulRefresh, *lastRepoCheck;
 @property (nonatomic) BOOL preferencesDirty, isRefreshing, isManuallyScrolling, ignoreNextFocusLoss;

@@ -415,7 +415,7 @@
 			case 0:
 			{
 				Settings.showLabels = !Settings.showLabels;
-				app.api.successfulRefreshesSinceLastLabelCheck = 0;
+				api.successfulRefreshesSinceLastLabelCheck = 0;
 				if(Settings.showLabels)
 				{
 					for(Repo *r in [Repo allItemsOfType:@"Repo" inMoc:DataManager.managedObjectContext])

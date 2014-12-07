@@ -6,7 +6,6 @@
 
 typedef void (^backgroundFetchCompletionCallback)(UIBackgroundFetchResult result);
 
-@property (nonatomic) API *api;
 @property (nonatomic) BOOL preferencesDirty, isRefreshing, lastUpdateFailed, enteringForeground;
 @property (nonatomic) NSDate *lastSuccessfulRefresh, *lastRepoCheck;
 @property (nonatomic) NSTimer *refreshTimer;

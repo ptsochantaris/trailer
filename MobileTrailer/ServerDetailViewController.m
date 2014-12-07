@@ -51,15 +51,15 @@
 - (IBAction)testConnectionSelected:(UIButton *)sender
 {
 	sender.enabled = NO;
-	[app.api testApiToServer:[self updateServerFromForm]
-				 andCallback:^(NSError *error) {
-					 sender.enabled = YES;
-					 [[[UIAlertView alloc] initWithTitle:error ? @"Failed" : @"Success"
-												 message:error ? error.localizedDescription : nil
-												delegate:nil
-									   cancelButtonTitle:@"OK"
-									   otherButtonTitles:nil] show];
-				 }];
+	[api testApiToServer:[self updateServerFromForm]
+			 andCallback:^(NSError *error) {
+				 sender.enabled = YES;
+				 [[[UIAlertView alloc] initWithTitle:error ? @"Failed" : @"Success"
+											 message:error ? error.localizedDescription : nil
+											delegate:nil
+								   cancelButtonTitle:@"OK"
+								   otherButtonTitles:nil] show];
+			 }];
 }
 
 - (ApiServer *)updateServerFromForm

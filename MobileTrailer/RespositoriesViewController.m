@@ -84,7 +84,7 @@
 	self.tableView.alpha = 0.5;
 
 	NSManagedObjectContext *tempContext = [DataManager tempContext];
-	[app.api fetchRepositoriesToMoc:tempContext andCallback:^{
+	[api fetchRepositoriesToMoc:tempContext andCallback:^{
 		if([ApiServer shouldReportRefreshFailureInMoc:tempContext])
 		{
 			NSMutableArray *errorServers = [NSMutableArray new];

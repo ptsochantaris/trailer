@@ -31,6 +31,8 @@ void DLog(NSString *format, ...)
 
 #define CALLBACK if(callback) callback
 
+API *api;
+
 @implementation API
 {
 	NSOperationQueue *requestQueue;
@@ -51,6 +53,7 @@ void DLog(NSString *format, ...)
     self = [super init];
     if (self)
 	{
+		api = self;
 #ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
 		GLOBAL_SCREEN_SCALE = [UIScreen mainScreen].scale;
 #endif
@@ -85,6 +88,8 @@ void DLog(NSString *format, ...)
             [self clearImageCache];
         else
             [fileManager createDirectoryAtPath:cacheDirectory withIntermediateDirectories:YES attributes:nil error:nil];
+
+		DLog(@"API setup complete");
 	}
     return self;
 }

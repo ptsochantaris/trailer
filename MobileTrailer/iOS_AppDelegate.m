@@ -21,12 +21,10 @@ NSString *currentAppVersion;
 
 	self.enteringForeground = YES;
 
-	self.api = [[API alloc] init];
-
 	[DataManager postProcessAllPrs];
 
 	if([ApiServer someServersHaveAuthTokensInMoc:DataManager.managedObjectContext])
-		[self.api updateLimitsFromServer];
+		[api updateLimitsFromServer];
 
 	UISplitViewController *splitViewController = (UISplitViewController *)self.window.rootViewController;
 	splitViewController.minimumPrimaryColumnWidth = 320;
@@ -63,12 +61,12 @@ NSString *currentAppVersion;
 																						 categories:nil];
 	[[UIApplication sharedApplication] registerUserNotificationSettings:notificationSettings];
 
-    return YES;
+	return YES;
 }
 
-	- (BOOL)splitViewController:(UISplitViewController *)splitViewController
+- (BOOL)splitViewController:(UISplitViewController *)splitViewController
 collapseSecondaryViewController:(UIViewController *)secondaryViewController
-	  ontoPrimaryViewController:(UIViewController *)primaryViewController
+  ontoPrimaryViewController:(UIViewController *)primaryViewController
 {
 	MasterViewController *m = (MasterViewController *)[(UINavigationController *)primaryViewController viewControllers][0];
 	m.clearsSelectionOnViewWillAppear = YES;
@@ -85,7 +83,7 @@ collapseSecondaryViewController:(UIViewController *)secondaryViewController
 
 - (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application
@@ -119,7 +117,7 @@ collapseSecondaryViewController:(UIViewController *)secondaryViewController
 
 - (void)networkStateChanged
 {
-	if([self.api.reachability currentReachabilityStatus]!=NotReachable)
+	if([api.reachability currentReachabilityStatus]!=NotReachable)
 	{
 		DLog(@"Network is back");
 		[self startRefreshIfItIsDue];
@@ -155,7 +153,7 @@ collapseSecondaryViewController:(UIViewController *)secondaryViewController
 - (void)refreshMainList
 {
 	[DataManager postProcessAllPrs];
-	
+
 	UISplitViewController *splitViewController = (UISplitViewController *)self.window.rootViewController;
 	UINavigationController *masterNavigationController = splitViewController.viewControllers[0];
 	MasterViewController *controller = (MasterViewController *)masterNavigationController.viewControllers[0];
@@ -200,11 +198,11 @@ collapseSecondaryViewController:(UIViewController *)secondaryViewController
 	[self.refreshTimer invalidate];
 	self.refreshTimer = nil;
 
-    self.isRefreshing = YES;
+	self.isRefreshing = YES;
 	[[NSNotificationCenter defaultCenter] postNotificationName:REFRESH_STARTED_NOTIFICATION object:nil];
 	DLog(@"Starting refresh");
 
-    [self.api expireOldImageCacheEntries];
+	[api expireOldImageCacheEntries];
 	[DataManager postMigrationTasks];
 }
 
@@ -221,13 +219,13 @@ collapseSecondaryViewController:(UIViewController *)secondaryViewController
 {
 	if(self.isRefreshing) return NO;
 
-	if([app.api.reachability currentReachabilityStatus]==NotReachable) return NO;
+	if([api.reachability currentReachabilityStatus]==NotReachable) return NO;
 
 	if(![ApiServer someServersHaveAuthTokensInMoc:DataManager.managedObjectContext]) return NO;
 
 	[self prepareForRefresh];
 
-	[self.api fetchPullRequestsForActiveReposAndCallback:^{
+	[api fetchPullRequestsForActiveReposAndCallback:^{
 		BOOL success = ![ApiServer shouldReportRefreshFailureInMoc:DataManager.managedObjectContext];
 		self.lastUpdateFailed = !success;
 		BOOL hasNewData = (success && DataManager.managedObjectContext.hasChanges);

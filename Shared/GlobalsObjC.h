@@ -73,3 +73,6 @@ typedef void (^completionBlockType)();
 
 void DLog(NSString *format, ...);
 extern NSString *currentAppVersion;
+
+#import "API.h"
+extern API *api;

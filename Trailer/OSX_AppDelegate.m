@@ -22,8 +22,6 @@ NSString *currentAppVersion;
 														 [self filterTimerPopped];
 													 }];
 
-	self.api = [[API alloc] init];
-
 	[self setupSortMethodMenu];
 
 	[DataManager postProcessAllPrs];
@@ -74,7 +72,7 @@ NSString *currentAppVersion;
 	[self addHotKeySupport];
 
 	SUUpdater *s = [SUUpdater sharedUpdater];
-    [self setUpdateCheckParameters];
+	[self setUpdateCheckParameters];
 	if(!s.updateInProgress && Settings.checkForUpdatesAutomatically)
 	{
 		[s checkForUpdatesInBackground];
@@ -107,7 +105,7 @@ NSString *currentAppVersion;
 
 	[self updateLabelOptions];
 
-	self.api.successfulRefreshesSinceLastLabelCheck = 0;
+	api.successfulRefreshesSinceLastLabelCheck = 0;
 	if(Settings.showLabels)
 	{
 		for(Repo *r in [Repo allItemsOfType:@"Repo" inMoc:DataManager.managedObjectContext])
@@ -174,7 +172,7 @@ NSString *currentAppVersion;
 - (IBAction)dontConfirmRemoveAllClosedSelected:(NSButton *)sender
 {
 	BOOL dontConfirm = (sender.integerValue==1);
-    Settings.dontAskBeforeWipingClosed = dontConfirm;
+	Settings.dontAskBeforeWipingClosed = dontConfirm;
 }
 
 - (IBAction)autoParticipateOnMentionSelected:(NSButton *)sender
@@ -255,7 +253,7 @@ NSString *currentAppVersion;
 
 	[self updateStatusItemsOptions];
 
-	self.api.successfulRefreshesSinceLastStatusCheck = 0;
+	api.successfulRefreshesSinceLastStatusCheck = 0;
 	if(Settings.showStatusItems)
 	{
 		for(Repo *r in [Repo allItemsOfType:@"Repo" inMoc:DataManager.managedObjectContext])
@@ -363,34 +361,34 @@ NSString *currentAppVersion;
 - (IBAction)checkForUpdatesAutomaticallySelected:(NSButton *)sender
 {
 	BOOL setting = (sender.integerValue==1);
-    Settings.checkForUpdatesAutomatically = setting;
-    [self refreshUpdatePreferences];
+	Settings.checkForUpdatesAutomatically = setting;
+	[self refreshUpdatePreferences];
 }
 
 - (void)refreshUpdatePreferences
 {
-    BOOL setting = Settings.checkForUpdatesAutomatically;
-    NSInteger interval = Settings.checkForUpdatesInterval;
+	BOOL setting = Settings.checkForUpdatesAutomatically;
+	NSInteger interval = Settings.checkForUpdatesInterval;
 
-    [self.checkForUpdatesLabel setHidden:!setting];
-    [self.checkForUpdatesSelector setHidden:!setting];
+	[self.checkForUpdatesLabel setHidden:!setting];
+	[self.checkForUpdatesSelector setHidden:!setting];
 
-    [self.checkForUpdatesSelector setIntegerValue:interval];
-    [self.checkForUpdatesAutomatically setIntegerValue:setting];
-    if(interval<2)
-    {
-        self.checkForUpdatesLabel.stringValue = [NSString stringWithFormat:@"Check every hour"];
-    }
-    else
-    {
-        self.checkForUpdatesLabel.stringValue = [NSString stringWithFormat:@"Check every %ld hours",(long)interval];
-    }
+	[self.checkForUpdatesSelector setIntegerValue:interval];
+	[self.checkForUpdatesAutomatically setIntegerValue:setting];
+	if(interval<2)
+	{
+		self.checkForUpdatesLabel.stringValue = [NSString stringWithFormat:@"Check every hour"];
+	}
+	else
+	{
+		self.checkForUpdatesLabel.stringValue = [NSString stringWithFormat:@"Check every %ld hours",(long)interval];
+	}
 }
 
 - (IBAction)checkForUpdatesIntervalChanged:(NSStepper *)sender
 {
-    Settings.checkForUpdatesInterval = sender.integerValue;
-    [self refreshUpdatePreferences];
+	Settings.checkForUpdatesInterval = sender.integerValue;
+	[self refreshUpdatePreferences];
 }
 
 - (IBAction)launchAtStartSelected:(NSButton *)sender
@@ -531,11 +529,11 @@ NSString *currentAppVersion;
 	   [notification respondsToSelector:@selector(setContentImage:)]) // let's add an avatar on this!
 	{
 		PRComment *c = (PRComment *)item;
-		[self.api haveCachedAvatar:c.avatarUrl
-				tryLoadAndCallback:^(NSImage *image) {
-					notification.contentImage = image;
-					[[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
-				}];
+		[api haveCachedAvatar:c.avatarUrl
+		   tryLoadAndCallback:^(NSImage *image) {
+			   notification.contentImage = image;
+			   [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
+		   }];
 	}
 	else // proceed as normal
 	{
@@ -586,7 +584,7 @@ NSString *currentAppVersion;
 	{
 		if(!self.isRefreshing)
 		{
-			self.refreshNow.title = [@" Refresh" stringByAppendingFormat:@" - %@",[self.api lastUpdateDescription]];
+			self.refreshNow.title = [@" Refresh" stringByAppendingFormat:@" - %@",[api lastUpdateDescription]];
 		}
 	}
 }
@@ -658,13 +656,13 @@ NSString *currentAppVersion;
 			[alert setShowsSuppressionButton:YES];
 
 			if([alert runModal]==NSAlertSecondButtonReturn)
-            {
-                [self removeAllMergedRequests];
-                if([[alert suppressionButton] state] == NSOnState)
-                {
-                    Settings.dontAskBeforeWipingMerged = YES;
-                }
-            }
+			{
+				[self removeAllMergedRequests];
+				if([[alert suppressionButton] state] == NSOnState)
+				{
+					Settings.dontAskBeforeWipingMerged = YES;
+				}
+			}
 		}
 	}
 	else if([header.title isEqualToString:kPullRequestSectionNames[kPullRequestSectionClosed]])
@@ -685,16 +683,16 @@ NSString *currentAppVersion;
 			[alert setShowsSuppressionButton:YES];
 
 			if([alert runModal]==NSAlertSecondButtonReturn)
-            {
-                [self removeAllClosedRequests];
-                if([[alert suppressionButton] state] == NSOnState)
-                {
-                    Settings.dontAskBeforeWipingClosed = YES;
-                }
-            }
+			{
+				[self removeAllClosedRequests];
+				if([[alert suppressionButton] state] == NSOnState)
+				{
+					Settings.dontAskBeforeWipingClosed = YES;
+				}
+			}
 		}
 	}
-    if(!self.mainMenu.isVisible) [self statusItemTapped:nil];
+	if(!self.mainMenu.isVisible) [self statusItemTapped:nil];
 }
 
 - (void)removeAllMergedRequests
@@ -792,7 +790,7 @@ NSString *currentAppVersion;
 - (void)startRateLimitHandling
 {
 	[[NSNotificationCenter defaultCenter] addObserver:self.serverList selector:@selector(reloadData) name:API_USAGE_UPDATE object:nil];
-	[self.api updateLimitsFromServer];
+	[api updateLimitsFromServer];
 }
 
 - (IBAction)refreshReposSelected:(NSButton *)sender
@@ -801,7 +799,7 @@ NSString *currentAppVersion;
 	[self controlTextDidChange:nil];
 
 	NSManagedObjectContext *tempContext = [DataManager tempContext];
-	[self.api fetchRepositoriesToMoc:tempContext andCallback:^{
+	[api fetchRepositoriesToMoc:tempContext andCallback:^{
 		if([ApiServer shouldReportRefreshFailureInMoc:tempContext])
 		{
 			NSMutableArray *errorServers = [NSMutableArray new];
@@ -930,8 +928,8 @@ NSString *currentAppVersion;
 - (void)reset
 {
 	self.preferencesDirty = YES;
-	self.api.successfulRefreshesSinceLastStatusCheck = 0;
-	self.api.successfulRefreshesSinceLastLabelCheck = 0;
+	api.successfulRefreshesSinceLastStatusCheck = 0;
+	api.successfulRefreshesSinceLastLabelCheck = 0;
 	self.lastSuccessfulRefresh = nil;
 	self.lastRepoCheck = nil;
 	[self.projectsTable reloadData];
@@ -955,7 +953,7 @@ NSString *currentAppVersion;
 
 	[self.serverList selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
 
-	[self.api updateLimitsFromServer];
+	[api updateLimitsFromServer];
 	[self updateStatusTermPreferenceControls];
 	self.commentAuthorBlacklist.objectValue = Settings.commentAuthorBlacklist;
 
@@ -996,7 +994,7 @@ NSString *currentAppVersion;
 	[self enableHotkeySegments];
 	[self populateHotkeyLetterMenu];
 
-    [self refreshUpdatePreferences];
+	[self refreshUpdatePreferences];
 
 	[self updateStatusItemsOptions];
 	[self updateLabelOptions];
@@ -1270,7 +1268,7 @@ NSString *currentAppVersion;
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
 {
 	[DataManager saveDB];
-    return NSTerminateNow;
+	return NSTerminateNow;
 }
 
 - (void)scrollToTop
@@ -1330,25 +1328,25 @@ NSString *currentAppVersion;
 				[self startRefreshIfItIsDue];
 			}
 		}
-        [self setUpdateCheckParameters];
+		[self setUpdateCheckParameters];
 	}
 }
 
 - (void)setUpdateCheckParameters
 {
-    SUUpdater *s = [SUUpdater sharedUpdater];
-    BOOL autoCheck = Settings.checkForUpdatesAutomatically;
+	SUUpdater *s = [SUUpdater sharedUpdater];
+	BOOL autoCheck = Settings.checkForUpdatesAutomatically;
 	s.automaticallyChecksForUpdates = autoCheck;
-    if(autoCheck)
-    {
-        [s setUpdateCheckInterval:3600.0*Settings.checkForUpdatesInterval];
-    }
-    DLog(@"Check for updates set to %d every %f seconds",s.automaticallyChecksForUpdates,s.updateCheckInterval);
+	if(autoCheck)
+	{
+		[s setUpdateCheckInterval:3600.0*Settings.checkForUpdatesInterval];
+	}
+	DLog(@"Check for updates set to %d every %f seconds",s.automaticallyChecksForUpdates,s.updateCheckInterval);
 }
 
 - (void)networkStateChanged
 {
-	if([self.api.reachability currentReachabilityStatus]!=NotReachable)
+	if([api.reachability currentReachabilityStatus]!=NotReachable)
 	{
 		DLog(@"Network is back");
 		[self startRefreshIfItIsDue];
@@ -1440,7 +1438,7 @@ NSString *currentAppVersion;
 	[self.activityDisplay startAnimation:nil];
 	self.statusItemView.grayOut = YES;
 
-	[self.api expireOldImageCacheEntries];
+	[api expireOldImageCacheEntries];
 	[DataManager postMigrationTasks];
 
 	self.isRefreshing = YES;
@@ -1481,7 +1479,7 @@ NSString *currentAppVersion;
 	[self.refreshNow setAction:nil];
 	[self.refreshNow setTarget:nil];
 
-	[self.api fetchPullRequestsForActiveReposAndCallback:^{
+	[api fetchPullRequestsForActiveReposAndCallback:^{
 		self.refreshNow.target = oldTarget;
 		self.refreshNow.action = oldAction;
 		if(![ApiServer shouldReportRefreshFailureInMoc:DataManager.managedObjectContext])
@@ -1696,22 +1694,22 @@ NSString *currentAppVersion;
 	[sender setEnabled:NO];
 	ApiServer *apiServer = [self selectedServer];
 
-	[self.api testApiToServer:apiServer
-				  andCallback:^(NSError *error) {
-					  NSAlert *alert = [[NSAlert alloc] init];
-					  if(error)
-					  {
-						  [alert setMessageText:[NSString stringWithFormat:@"The test failed for %@", apiServer.apiPath]];
-						  [alert setInformativeText:error.localizedDescription];
-					  }
-					  else
-					  {
-						  [alert setMessageText:@"This API server seems OK!"];
-					  }
-					  [alert addButtonWithTitle:@"OK"];
-					  [alert runModal];
-					  [sender setEnabled:YES];
-				  }];
+	[api testApiToServer:apiServer
+			 andCallback:^(NSError *error) {
+				 NSAlert *alert = [[NSAlert alloc] init];
+				 if(error)
+				 {
+					 [alert setMessageText:[NSString stringWithFormat:@"The test failed for %@", apiServer.apiPath]];
+					 [alert setInformativeText:error.localizedDescription];
+				 }
+				 else
+				 {
+					 [alert setMessageText:@"This API server seems OK!"];
+				 }
+				 [alert addButtonWithTitle:@"OK"];
+				 [alert runModal];
+				 [sender setEnabled:YES];
+			 }];
 }
 
 - (IBAction)apiRestoreDefaultsSelected:(NSButton *)sender

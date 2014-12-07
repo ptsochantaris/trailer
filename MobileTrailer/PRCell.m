@@ -48,7 +48,7 @@ static NSNumberFormatter *itemCountFormatter;
 - (void)networkStateChanged
 {
 	if(!failedToLoadImage) return;
-	if([app.api.reachability currentReachabilityStatus]!=NotReachable)
+	if([api.reachability currentReachabilityStatus]!=NotReachable)
 	{
 		[self loadImageAtPath:failedToLoadImage];
 	}
@@ -106,25 +106,25 @@ static NSNumberFormatter *itemCountFormatter;
 - (void)loadImageAtPath:(NSString *)imagePath
 {
 	waitingForImageInPath = imagePath;
-	if(![app.api haveCachedAvatar:imagePath
-			   tryLoadAndCallback:^(id image) {
-				   if([waitingForImageInPath isEqualToString:imagePath])
+	if(![api haveCachedAvatar:imagePath
+		   tryLoadAndCallback:^(id image) {
+			   if([waitingForImageInPath isEqualToString:imagePath])
+			   {
+				   if(image)
 				   {
-					   if(image)
-					   {
-						   // image loaded
-						   _image.image = image;
-						   failedToLoadImage = nil;
-					   }
-					   else
-					   {
-						   // load failed / no image
-						   _image.image = [UIImage imageNamed:@"avatarPlaceHolder"];
-						   failedToLoadImage = imagePath;
-					   }
-					   waitingForImageInPath = nil;
+					   // image loaded
+					   _image.image = image;
+					   failedToLoadImage = nil;
 				   }
-			   }])
+				   else
+				   {
+					   // load failed / no image
+					   _image.image = [UIImage imageNamed:@"avatarPlaceHolder"];
+					   failedToLoadImage = imagePath;
+				   }
+				   waitingForImageInPath = nil;
+			   }
+		   }])
 	{
 		// prepare UI for over-the-network load
 		_image.image = [UIImage imageNamed:@"avatarPlaceHolder"];
