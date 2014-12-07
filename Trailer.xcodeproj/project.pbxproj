@@ -48,8 +48,6 @@
 		168BC6C417EC2DF000BC4584 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 168BC6C217EC2DF000BC4584 /* MainMenu.xib */; };
 		168BC6C717EC2DF000BC4584 /* Trailer.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 168BC6C517EC2DF000BC4584 /* Trailer.xcdatamodeld */; };
 		168BC6C917EC2DF000BC4584 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 168BC6C817EC2DF000BC4584 /* Images.xcassets */; };
-		168C6ECE18B2104100E41D85 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 168C6ECC18B2104100E41D85 /* LICENSE */; };
-		168C6ECF18B2104100E41D85 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 168C6ECD18B2104100E41D85 /* README.md */; };
 		168FD00E1A2A7AD1005929CB /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 168FD00D1A2A7AD1005929CB /* MessageView.swift */; };
 		168FD0121A2A8C28005929CB /* PopTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A794F31A252BFA00A76553 /* PopTimer.swift */; };
 		16928CA91A2A8E060030AE23 /* PRComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16928CA81A2A8E060030AE23 /* PRComment.swift */; };
@@ -558,12 +556,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				168C6ECF18B2104100E41D85 /* README.md in Resources */,
 				168BC6B817EC2DF000BC4584 /* InfoPlist.strings in Resources */,
 				16B94072182D136700F32061 /* dsa_pub.pem in Resources */,
 				168BC6C917EC2DF000BC4584 /* Images.xcassets in Resources */,
 				168BC6C417EC2DF000BC4584 /* MainMenu.xib in Resources */,
-				168C6ECE18B2104100E41D85 /* LICENSE in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
