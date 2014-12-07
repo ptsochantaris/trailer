@@ -22,30 +22,10 @@ iOS_AppDelegate *app;
 
 	self.enteringForeground = YES;
 
-	// Useful snippet for resetting prefs when testing
-	//NSString *appDomain = [[NSBundle mainBundle] bundleIdentifier];
-	//[[NSUserDefaults standardUserDefaults] removePersistentDomainForName:appDomain];
-
-	self.dataManager = [[DataManager alloc] init];
+	[DataManager checkMigration];
 	self.api = [[API alloc] init];
 
-	// ONLY FOR DEBUG!
-	/*
-	 #warning COMMENT THIS
-	 NSArray *allPRs = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.dataManager.managedObjectContext];
-	 PullRequest *firstPr = allPRs[2];
-	 firstPr.updatedAt = [NSDate distantPast];
-
-	 Repo *r = [Repo itemOfType:@"Repo" serverId:firstPr.repoId moc:self.dataManager.managedObjectContext];
-	 r.updatedAt = [NSDate distantPast];
-
-	 NSString *prUrl = firstPr.url;
-	 NSArray *allCommentsForFirstPr = [PRComment commentsForPullRequestUrl:prUrl inMoc:self.dataManager.managedObjectContext];
-	 [self.dataManager.managedObjectContext deleteObject:[allCommentsForFirstPr objectAtIndex:0]];
-	 */
-	// ONLY FOR DEBUG!
-
-	[self.dataManager postProcessAllPrs];
+	[DataManager postProcessAllPrs];
 
 	if([ApiServer someServersHaveAuthTokensInMoc:DataManager.managedObjectContext])
 		[self.api updateLimitsFromServer];
@@ -176,7 +156,7 @@ collapseSecondaryViewController:(UIViewController *)secondaryViewController
 
 - (void)refreshMainList
 {
-	[app.dataManager postProcessAllPrs];
+	[DataManager postProcessAllPrs];
 	
 	UISplitViewController *splitViewController = (UISplitViewController *)self.window.rootViewController;
 	UINavigationController *masterNavigationController = splitViewController.viewControllers[0];
@@ -227,7 +207,7 @@ collapseSecondaryViewController:(UIViewController *)secondaryViewController
 	DLog(@"Starting refresh");
 
     [self.api expireOldImageCacheEntries];
-	[self.dataManager postMigrationTasks];
+	[DataManager postMigrationTasks];
 }
 
 - (void)completeRefresh
@@ -236,7 +216,7 @@ collapseSecondaryViewController:(UIViewController *)secondaryViewController
 	self.isRefreshing = NO;
 	[[NSNotificationCenter defaultCenter] postNotificationName:REFRESH_ENDED_NOTIFICATION object:nil];
 	[DataManager saveDB];
-	[self.dataManager sendNotifications];
+	[DataManager sendNotifications];
 }
 
 - (BOOL)startRefresh
@@ -319,7 +299,7 @@ collapseSecondaryViewController:(UIViewController *)secondaryViewController
 	if(self.preferencesDirty) return;
 
 	UILocalNotification *notification = [[UILocalNotification alloc] init];
-	notification.userInfo = [self.dataManager infoForType:type item:item];
+	notification.userInfo = [DataManager infoForType:type item:item];
 
 	switch (type)
 	{

@@ -1,19 +1,16 @@
 
-let mainObjectContext = buildMainContext()
-
 class DataManager : NSObject {
 
-	override init() {
-		super.init()
-		if versionBumpOccured() {
+	class func checkMigration() {
+		if DataManager.versionBumpOccured() {
 			DLog("VERSION UPDATE MAINTENANCE NEEDED")
-			performVersionChangedTasks()
-			versionBumpComplete()
+			DataManager.performVersionChangedTasks()
+			DataManager.versionBumpComplete()
 		}
 		ApiServer.ensureAtLeastGithubInMoc(mainObjectContext)
 	}
 
-	func performVersionChangedTasks() {
+	class func performVersionChangedTasks() {
 		let d = NSUserDefaults.standardUserDefaults()
 		if let legacyAuthToken = d.objectForKey("GITHUB_AUTH_TOKEN") as String? {
 			var legacyApiHost = d.objectForKey("API_BACKEND_SERVER") as String?
@@ -57,7 +54,7 @@ class DataManager : NSObject {
 
 	class func managedObjectContext() -> NSManagedObjectContext { return mainObjectContext }
 
-	func sendNotifications() {
+	class func sendNotifications() {
 
 		let newPrs = PullRequest.newItemsOfType("PullRequest", inMoc: mainObjectContext) as [PullRequest]
 		for p in newPrs {
@@ -130,16 +127,16 @@ class DataManager : NSObject {
 		return true
 	}
 
-	func tempContext() -> NSManagedObjectContext {
+	class func tempContext() -> NSManagedObjectContext {
 		let c = NSManagedObjectContext(concurrencyType: NSManagedObjectContextConcurrencyType.ConfinementConcurrencyType)
 		c.parentContext = mainObjectContext
 		c.undoManager = nil
 		return c
 	}
 
-	func deleteEverything() {
+	class func deleteEverything() {
 		autoreleasepool {
-			let tempMoc = self.tempContext()
+			let tempMoc = DataManager.tempContext()
 			for entity in managedObjectModel().entities {
 				if let name = entity.name {
 					if name != "ApiServer" {
@@ -159,7 +156,7 @@ class DataManager : NSObject {
 		DataManager.saveDB()
 	}
 
-	func infoForType(type: PRNotificationType, item: NSManagedObject) -> Dictionary<String, AnyObject> {
+	class func infoForType(type: PRNotificationType, item: NSManagedObject) -> Dictionary<String, AnyObject> {
 		switch type {
 		case .NewMention: fallthrough
 		case .NewComment:
@@ -179,7 +176,7 @@ class DataManager : NSObject {
 		}
 	}
 
-	func postMigrationTasks() {
+	class func postMigrationTasks() {
 		if _justMigrated {
 			DLog("FORCING ALL PRS TO BE REFETCHED")
 			for p in PullRequest.allItemsOfType("PullRequest", inMoc:mainObjectContext) as [PullRequest] {
@@ -189,13 +186,13 @@ class DataManager : NSObject {
 		}
 	}
 
-	func postProcessAllPrs() {
+	class func postProcessAllPrs() {
 		for p in PullRequest.allItemsOfType("PullRequest", inMoc:mainObjectContext) as [PullRequest] {
 			p.postProcess()
 		}
 	}
 
-	func reasonForEmptyWithFilter(filterValue: String?) -> NSAttributedString {
+	class func reasonForEmptyWithFilter(filterValue: String?) -> NSAttributedString {
 		let openRequests = PullRequest.countOpenRequestsInMoc(mainObjectContext)
 
 		var messageColor = COLOR_CLASS.lightGrayColor()
@@ -233,19 +230,19 @@ class DataManager : NSObject {
 
 	}
 
-	func idForUriPath(uriPath: String?) -> NSManagedObjectID? {
+	class func idForUriPath(uriPath: String?) -> NSManagedObjectID? {
 		if uriPath == nil { return nil }
 		let u = NSURL(string: uriPath!)
 		return persistentStoreCoordinator()!.managedObjectIDForURIRepresentation(u!)
 	}
 
-	func versionBumpComplete() {
+	class func versionBumpComplete() {
 		let d = NSUserDefaults.standardUserDefaults()
 		d.setObject(app.currentAppVersion, forKey: "LAST_RUN_VERSION_KEY")
 		d.synchronize()
 	}
 
-	func versionBumpOccured() -> Bool {
+	class func versionBumpOccured() -> Bool {
 		let d = NSUserDefaults.standardUserDefaults()
 		if let thisVersion = d.objectForKey("LAST_RUN_VERSION_KEY") as? String {
 			return !(thisVersion == app.currentAppVersion)
@@ -257,6 +254,7 @@ class DataManager : NSObject {
 
 ///////////////////////////////////////
 
+let mainObjectContext = buildMainContext()
 var _managedObjectModel: NSManagedObjectModel?
 var _persistentStoreCoordinator: NSPersistentStoreCoordinator?
 var _justMigrated: Bool = false

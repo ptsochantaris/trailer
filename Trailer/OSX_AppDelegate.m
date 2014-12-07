@@ -14,10 +14,6 @@ OSX_AppDelegate *app;
 {
 	app = self;
 
-	// Useful snippet for resetting prefs when testing
-	//NSString *appDomain = [[NSBundle mainBundle] bundleIdentifier];
-	//[[NSUserDefaults standardUserDefaults] removePersistentDomainForName:appDomain];
-
 	self.currentAppVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
 
 	self.mainMenu.backgroundColor = [COLOR_CLASS whiteColor];
@@ -27,28 +23,12 @@ OSX_AppDelegate *app;
 														 [self filterTimerPopped];
 													 }];
 
-	self.dataManager = [[DataManager alloc] init];
+	[DataManager checkMigration];
 	self.api = [[API alloc] init];
 
 	[self setupSortMethodMenu];
 
-	// ONLY FOR DEBUG!
-	/*
-	#warning COMMENT THIS
-	NSArray *allPRs = [PullRequest allItemsOfType:@"PullRequest" inMoc:self.dataManager.managedObjectContext];
-	PullRequest *firstPr = allPRs[2];
-	firstPr.updatedAt = [NSDate distantPast];
-
-	Repo *r = [Repo itemOfType:@"Repo" serverId:firstPr.repoId moc:self.dataManager.managedObjectContext];
-	r.updatedAt = [NSDate distantPast];
-
-	NSString *prUrl = firstPr.url;
-	NSArray *allCommentsForFirstPr = [PRComment commentsForPullRequestUrl:prUrl inMoc:self.dataManager.managedObjectContext];
-    [self.dataManager.managedObjectContext deleteObject:[allCommentsForFirstPr objectAtIndex:0]];
-	 */
-	// ONLY FOR DEBUG!
-
-	[self.dataManager postProcessAllPrs];
+	[DataManager postProcessAllPrs];
 
 	[self updateScrollBarWidth]; // also updates menu
 
@@ -150,7 +130,7 @@ OSX_AppDelegate *app;
 {
 	BOOL setting = (sender.integerValue==1);
 	Settings.hideAllPrsSection = setting;
-	[self.dataManager postProcessAllPrs]; // apply any view option changes
+	[DataManager postProcessAllPrs]; // apply any view option changes
 	[self updateMenu];
 }
 
@@ -203,7 +183,7 @@ OSX_AppDelegate *app;
 {
 	BOOL autoParticipate = (sender.integerValue==1);
 	Settings.autoParticipateInMentions = autoParticipate;
-	[self.dataManager postProcessAllPrs]; // apply any view option changes
+	[DataManager postProcessAllPrs]; // apply any view option changes
 	[self updateMenu];
 }
 
@@ -217,7 +197,7 @@ OSX_AppDelegate *app;
 {
 	BOOL hide = (sender.integerValue==1);
 	Settings.hideAvatars = hide;
-	[self.dataManager postProcessAllPrs]; // apply any view option changes
+	[DataManager postProcessAllPrs]; // apply any view option changes
 	[self updateMenu];
 }
 
@@ -225,7 +205,7 @@ OSX_AppDelegate *app;
 {
 	BOOL show = (sender.integerValue==1);
 	Settings.shouldHideUncommentedRequests = show;
-	[self.dataManager postProcessAllPrs]; // apply any view option changes
+	[DataManager postProcessAllPrs]; // apply any view option changes
 	[self updateMenu];
 }
 
@@ -233,7 +213,7 @@ OSX_AppDelegate *app;
 {
 	BOOL show = (sender.integerValue==1);
 	Settings.showCommentsEverywhere = show;
-	[self.dataManager postProcessAllPrs]; // apply any view option changes
+	[DataManager postProcessAllPrs]; // apply any view option changes
 	[self updateMenu];
 }
 
@@ -242,14 +222,14 @@ OSX_AppDelegate *app;
 	BOOL descending = (sender.integerValue==1);
 	Settings.sortDescending = descending;
 	[self setupSortMethodMenu];
-	[self.dataManager postProcessAllPrs]; // apply any view option changes
+	[DataManager postProcessAllPrs]; // apply any view option changes
 	[self updateMenu];
 }
 
 - (IBAction)countOnlyListedPrsSelected:(NSButton *)sender
 {
 	Settings.countOnlyListedPrs = (sender.integerValue==1);
-	[self.dataManager postProcessAllPrs]; // apply any view option changes
+	[DataManager postProcessAllPrs]; // apply any view option changes
 	[self updateMenu];
 }
 
@@ -266,7 +246,7 @@ OSX_AppDelegate *app;
 - (IBAction)sortMethodChanged:(id)sender
 {
 	Settings.sortMethod = self.sortModeSelect.indexOfSelectedItem;
-	[self.dataManager postProcessAllPrs]; // apply any view option changes
+	[DataManager postProcessAllPrs]; // apply any view option changes
 	[self updateMenu];
 }
 
@@ -363,7 +343,7 @@ OSX_AppDelegate *app;
 {
 	BOOL show = (sender.integerValue==1);
 	Settings.showCreatedInsteadOfUpdated = show;
-	[self.dataManager postProcessAllPrs]; // apply any view option changes
+	[DataManager postProcessAllPrs]; // apply any view option changes
 	[self updateMenu];
 }
 
@@ -378,7 +358,7 @@ OSX_AppDelegate *app;
 {
 	BOOL setting = (sender.integerValue==1);
 	Settings.moveAssignedPrsToMySection = setting;
-	[self.dataManager postProcessAllPrs]; // apply any view option changes
+	[DataManager postProcessAllPrs]; // apply any view option changes
 	[self updateMenu];
 }
 
@@ -451,7 +431,7 @@ OSX_AppDelegate *app;
 			NSString *urlToOpen = notification.userInfo[NOTIFICATION_URL_KEY];
 			if(!urlToOpen)
 			{
-				NSManagedObjectID *itemId = [app.dataManager idForUriPath:notification.userInfo[PULL_REQUEST_ID_KEY]];
+				NSManagedObjectID *itemId = [DataManager idForUriPath:notification.userInfo[PULL_REQUEST_ID_KEY]];
 
 				PullRequest *pullRequest = nil;
 				if(itemId) // it's a pull request
@@ -461,7 +441,7 @@ OSX_AppDelegate *app;
 				}
 				else // it's a comment
 				{
-					itemId = [app.dataManager idForUriPath:notification.userInfo[COMMENT_ID_KEY]];
+					itemId = [DataManager idForUriPath:notification.userInfo[COMMENT_ID_KEY]];
 					PRComment *c = (PRComment *)[DataManager.managedObjectContext existingObjectWithID:itemId error:nil];
 					urlToOpen = c.webUrl;
 					pullRequest = c.pullRequest;
@@ -484,7 +464,7 @@ OSX_AppDelegate *app;
 	if(self.preferencesDirty) return;
 
 	NSUserNotification *notification = [[NSUserNotification alloc] init];
-	notification.userInfo = [self.dataManager infoForType:type item:item];
+	notification.userInfo = [DataManager infoForType:type item:item];
 
 	switch (type)
 	{
@@ -800,7 +780,7 @@ OSX_AppDelegate *app;
 	{
 		top = 100;
 		MessageView *empty = [[MessageView alloc] initWithFrame:CGRectMake(0, 0, MENU_WIDTH, top)
-														message:[self.dataManager reasonForEmptyWithFilter:self.mainMenuFilter.stringValue]];
+														message:[DataManager reasonForEmptyWithFilter:self.mainMenuFilter.stringValue]];
 		[menuContents addSubview:empty];
 	}
 
@@ -822,7 +802,7 @@ OSX_AppDelegate *app;
 	[self prepareForRefresh];
 	[self controlTextDidChange:nil];
 
-	NSManagedObjectContext *tempContext = [self.dataManager tempContext];
+	NSManagedObjectContext *tempContext = [DataManager tempContext];
 	[self.api fetchRepositoriesToMoc:tempContext andCallback:^{
 		if([ApiServer shouldReportRefreshFailureInMoc:tempContext])
 		{
@@ -1486,7 +1466,7 @@ OSX_AppDelegate *app;
 	self.statusItemView.grayOut = YES;
 
 	[self.api expireOldImageCacheEntries];
-	[self.dataManager postMigrationTasks];
+	[DataManager postMigrationTasks];
 
 	self.isRefreshing = YES;
 
@@ -1510,7 +1490,7 @@ OSX_AppDelegate *app;
 	[self updateMenu];
 	[self checkApiUsage];
 	[DataManager saveDB];
-	[self.dataManager sendNotifications];
+	[DataManager sendNotifications];
 
 	DLog(@"Refresh done");
 }

@@ -4,7 +4,7 @@
 #import "MenuWindow.h"
 #import "API.h"
 
-@class PopTimer, DataManager, StatusItemView;
+@class PopTimer, StatusItemView;
 
 @interface OSX_AppDelegate : NSObject <
 	NSApplicationDelegate,
@@ -110,7 +110,6 @@
 
 // Globals
 @property (nonatomic) API *api;
-@property (nonatomic) DataManager *dataManager;
 @property (weak) NSTimer *refreshTimer;
 @property (strong) NSDate *lastSuccessfulRefresh, *lastRepoCheck;
 @property (nonatomic) BOOL preferencesDirty, isRefreshing, isManuallyScrolling, ignoreNextFocusLoss;

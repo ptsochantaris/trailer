@@ -512,7 +512,7 @@ ignoreLastSync:NO
 
 - (void)fetchPullRequestsForActiveReposAndCallback:(completionBlockType)callback
 {
-	NSManagedObjectContext *syncContext = [app.dataManager tempContext];
+	NSManagedObjectContext *syncContext = [DataManager tempContext];
 
 	BOOL shouldRefreshReposToo = !app.lastRepoCheck
 	|| ([[NSDate date] timeIntervalSinceDate:app.lastRepoCheck] < Settings.newRepoCheckPeriod*3600.0)

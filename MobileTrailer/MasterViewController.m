@@ -278,8 +278,8 @@
 {
 	//DLog(@"local notification: %@",notification.userInfo);
 	NSString *urlToOpen = notification.userInfo[NOTIFICATION_URL_KEY];
-    NSManagedObjectID *pullRequestId = [app.dataManager idForUriPath:notification.userInfo[PULL_REQUEST_ID_KEY]];
-    NSManagedObjectID *commentId = [app.dataManager idForUriPath:notification.userInfo[COMMENT_ID_KEY]];
+    NSManagedObjectID *pullRequestId = [DataManager idForUriPath:notification.userInfo[PULL_REQUEST_ID_KEY]];
+    NSManagedObjectID *commentId = [DataManager idForUriPath:notification.userInfo[COMMENT_ID_KEY]];
 
 	PullRequest *pullRequest = nil;
 
@@ -501,7 +501,7 @@
 	if(app.isRefreshing)
 	{
 		self.title = @"Refreshing...";
-		EmptyView *label = [[EmptyView alloc] initWithMessage:[app.dataManager reasonForEmptyWithFilter:searchField.text]];
+		EmptyView *label = [[EmptyView alloc] initWithMessage:[DataManager reasonForEmptyWithFilter:searchField.text]];
 		self.tableView.tableFooterView = label;
 
 		if(!self.refreshControl.isRefreshing)
@@ -525,7 +525,7 @@
 		else
 		{
 			self.title = @"No PRs";
-			EmptyView *label = [[EmptyView alloc] initWithMessage:[app.dataManager reasonForEmptyWithFilter:searchField.text]];
+			EmptyView *label = [[EmptyView alloc] initWithMessage:[DataManager reasonForEmptyWithFilter:searchField.text]];
 			self.tableView.tableFooterView = label;
 		}
 
