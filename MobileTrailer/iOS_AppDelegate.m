@@ -22,7 +22,6 @@ iOS_AppDelegate *app;
 
 	self.enteringForeground = YES;
 
-	[DataManager checkMigration];
 	self.api = [[API alloc] init];
 
 	[DataManager postProcessAllPrs];

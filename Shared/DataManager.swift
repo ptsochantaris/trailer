@@ -275,6 +275,7 @@ func buildMainContext() -> NSManagedObjectContext {
 		let m = NSManagedObjectContext(concurrencyType:NSManagedObjectContextConcurrencyType.MainQueueConcurrencyType)
 		m.undoManager = nil;
 		m.persistentStoreCoordinator = coordinator
+		DLog("Database setup complete")
 		return m
 	} else {
 		let fm = NSFileManager.defaultManager()

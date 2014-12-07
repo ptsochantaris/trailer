@@ -23,7 +23,6 @@ OSX_AppDelegate *app;
 														 [self filterTimerPopped];
 													 }];
 
-	[DataManager checkMigration];
 	self.api = [[API alloc] init];
 
 	[self setupSortMethodMenu];
