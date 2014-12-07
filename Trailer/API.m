@@ -96,7 +96,7 @@ void DLog(NSString *format, ...)
 
 - (void)updateLimitsFromServer
 {
-	NSArray *allApiServers = [ApiServer allApiServersInMoc:app.dataManager.managedObjectContext];
+	NSArray *allApiServers = [ApiServer allApiServersInMoc:DataManager.managedObjectContext];
 	NSInteger total = allApiServers.count;
 	__block NSInteger count = 0;
 	for(ApiServer *apiServer in allApiServers)
@@ -1451,7 +1451,7 @@ extraHeaders:(NSDictionary *)extraHeaders
 	{
 		return @"Refreshing...";
 	}
-	else if([ApiServer shouldReportRefreshFailureInMoc:app.dataManager.managedObjectContext])
+	else if([ApiServer shouldReportRefreshFailureInMoc:DataManager.managedObjectContext])
 	{
 		return @"Last update failed";
 	}

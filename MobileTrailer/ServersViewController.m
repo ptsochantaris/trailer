@@ -41,7 +41,7 @@
 - (void)viewWillAppear:(BOOL)animated
 {
 	[super viewWillAppear:animated];
-	allServers = [[ApiServer allApiServersInMoc:app.dataManager.managedObjectContext] mutableCopy];
+	allServers = [[ApiServer allApiServersInMoc:DataManager.managedObjectContext] mutableCopy];
 	[self.tableView reloadData];
 }
 
@@ -101,8 +101,8 @@
 	{
 		ApiServer *a = allServers[indexPath.row];
 		[allServers removeObjectAtIndex:indexPath.row];
-		[app.dataManager.managedObjectContext deleteObject:a];
-		[app.dataManager saveDB];
+		[DataManager.managedObjectContext deleteObject:a];
+		[DataManager saveDB];
         [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
     }
 }

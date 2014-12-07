@@ -47,7 +47,7 @@ iOS_AppDelegate *app;
 
 	[self.dataManager postProcessAllPrs];
 
-	if([ApiServer someServersHaveAuthTokensInMoc:self.dataManager.managedObjectContext])
+	if([ApiServer someServersHaveAuthTokensInMoc:DataManager.managedObjectContext])
 		[self.api updateLimitsFromServer];
 
 	UISplitViewController *splitViewController = (UISplitViewController *)self.window.rootViewController;
@@ -70,7 +70,8 @@ iOS_AppDelegate *app;
 	double delayInSeconds = 0.1;
 	dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
 	dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-		if([Repo visibleReposInMoc:self.dataManager.managedObjectContext]>0 && [ApiServer someServersHaveAuthTokensInMoc:self.dataManager.managedObjectContext])
+		NSManagedObjectContext *moc = DataManager.managedObjectContext;
+		if([Repo visibleReposInMoc:moc]>0 && [ApiServer someServersHaveAuthTokensInMoc:moc])
 		{
 			if(localNotification) [self handleLocalNotification:localNotification];
 		}
@@ -191,7 +192,7 @@ collapseSecondaryViewController:(UIViewController *)secondaryViewController
 
 - (void)checkApiUsage
 {
-	for(ApiServer *apiServer in [ApiServer allApiServersInMoc:self.dataManager.managedObjectContext])
+	for(ApiServer *apiServer in [ApiServer allApiServersInMoc:DataManager.managedObjectContext])
 	{
 		if(apiServer.goodToGo && apiServer.requestsLimit.doubleValue>0)
 		{
@@ -234,7 +235,7 @@ collapseSecondaryViewController:(UIViewController *)secondaryViewController
 	[self checkApiUsage];
 	self.isRefreshing = NO;
 	[[NSNotificationCenter defaultCenter] postNotificationName:REFRESH_ENDED_NOTIFICATION object:nil];
-	[self.dataManager saveDB];
+	[DataManager saveDB];
 	[self.dataManager sendNotifications];
 }
 
@@ -244,14 +245,14 @@ collapseSecondaryViewController:(UIViewController *)secondaryViewController
 
 	if([app.api.reachability currentReachabilityStatus]==NotReachable) return NO;
 
-	if(![ApiServer someServersHaveAuthTokensInMoc:self.dataManager.managedObjectContext]) return NO;
+	if(![ApiServer someServersHaveAuthTokensInMoc:DataManager.managedObjectContext]) return NO;
 
 	[self prepareForRefresh];
 
 	[self.api fetchPullRequestsForActiveReposAndCallback:^{
-		BOOL success = ![ApiServer shouldReportRefreshFailureInMoc:self.dataManager.managedObjectContext];
+		BOOL success = ![ApiServer shouldReportRefreshFailureInMoc:DataManager.managedObjectContext];
 		self.lastUpdateFailed = !success;
-		BOOL hasNewData = (success && self.dataManager.managedObjectContext.hasChanges);
+		BOOL hasNewData = (success && DataManager.managedObjectContext.hasChanges);
 		if(success)
 		{
 			self.lastSuccessfulRefresh = [NSDate date];
@@ -300,7 +301,7 @@ collapseSecondaryViewController:(UIViewController *)secondaryViewController
 
 - (void)refreshTimerDone
 {
-	NSManagedObjectContext *moc = self.dataManager.managedObjectContext;
+	NSManagedObjectContext *moc = DataManager.managedObjectContext;
 	if([ApiServer someServersHaveAuthTokensInMoc:moc] && ([Repo countVisibleReposInMoc:moc]>0))
 	{
 		[self startRefresh];

@@ -138,28 +138,24 @@
 
 - (void)removeAllClosedConfirmed
 {
-	NSManagedObjectContext *moc = app.dataManager.managedObjectContext;
-
-	for(PullRequest *p in [PullRequest allClosedRequestsInMoc:moc])
-		[moc deleteObject:p];
+	for(PullRequest *p in [PullRequest allClosedRequestsInMoc:DataManager.managedObjectContext])
+		[DataManager.managedObjectContext deleteObject:p];
 	
-    [app.dataManager saveDB];
+    [DataManager saveDB];
 }
 
 - (void)removeAllMergedConfirmed
 {
-	NSManagedObjectContext *moc = app.dataManager.managedObjectContext;
+	for(PullRequest *p in [PullRequest allMergedRequestsInMoc:DataManager.managedObjectContext])
+		[DataManager.managedObjectContext deleteObject:p];
 
-	for(PullRequest *p in [PullRequest allMergedRequestsInMoc:moc])
-		[moc deleteObject:p];
-
-    [app.dataManager saveDB];
+    [DataManager saveDB];
 }
 
 - (void)markAllAsRead
 {
 	for(PullRequest *p in self.fetchedResultsController.fetchedObjects) [p catchUpWithComments];
-    [app.dataManager saveDB];
+    [DataManager saveDB];
 }
 
 - (void)refreshControlChanged
@@ -287,17 +283,15 @@
 
 	PullRequest *pullRequest = nil;
 
-	NSManagedObjectContext *moc = app.dataManager.managedObjectContext;
-
     if(commentId)
     {
-        PRComment *c = (PRComment *)[moc existingObjectWithID:commentId error:nil];
+        PRComment *c = (PRComment *)[DataManager.managedObjectContext existingObjectWithID:commentId error:nil];
         if(!urlToOpen) urlToOpen = c.webUrl;
         pullRequest = c.pullRequest;
     }
     else if(pullRequestId)
     {
-        pullRequest = (PullRequest *)[moc existingObjectWithID:pullRequestId error:nil];
+        pullRequest = (PullRequest *)[DataManager.managedObjectContext existingObjectWithID:pullRequestId error:nil];
         if(!urlToOpen) urlToOpen = pullRequest.webUrl;
 
         if(!pullRequest)
@@ -341,7 +335,7 @@
     dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
     dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
         [pullRequest catchUpWithComments];
-        [app.dataManager saveDB];
+        [DataManager saveDB];
     });
 }
 
@@ -405,8 +399,8 @@
 	if(editingStyle==UITableViewCellEditingStyleDelete)
 	{
 		PullRequest *pr = [self.fetchedResultsController objectAtIndexPath:indexPath];
-		[app.dataManager.managedObjectContext deleteObject:pr];
-		[app.dataManager saveDB];
+		[DataManager.managedObjectContext deleteObject:pr];
+		[DataManager saveDB];
 	}
 }
 
@@ -422,7 +416,7 @@
     [fetchRequest setFetchBatchSize:20];
 
     NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
-																								managedObjectContext:app.dataManager.managedObjectContext
+																								managedObjectContext:DataManager.managedObjectContext
 																								  sectionNameKeyPath:@"sectionName"
 																										   cacheName:nil];
     aFetchedResultsController.delegate = self;
@@ -542,7 +536,7 @@
 	self.refreshControl.attributedTitle = [[NSAttributedString alloc] initWithString:[app.api lastUpdateDescription]
 																		  attributes:@{ }];
 
-	[UIApplication sharedApplication].applicationIconBadgeNumber = [PullRequest badgeCountInMoc:app.dataManager.managedObjectContext];
+	[UIApplication sharedApplication].applicationIconBadgeNumber = [PullRequest badgeCountInMoc:DataManager.managedObjectContext];
 
 	if(self.splitViewController.displayMode != UISplitViewControllerDisplayModeAllVisible)
 	{
@@ -584,7 +578,7 @@
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
 	BOOL allServersHaveTokens = YES;
-	NSArray *apiServers = [ApiServer allApiServersInMoc:app.dataManager.managedObjectContext];
+	NSArray *apiServers = [ApiServer allApiServersInMoc:DataManager.managedObjectContext];
 	for(ApiServer *a in apiServers)
 	{
 		if(!a.goodToGo)

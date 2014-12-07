@@ -1,4 +1,3 @@
-import Cocoa
 
 class Application: NSApplication {
 	override func sendEvent(theEvent: NSEvent) {

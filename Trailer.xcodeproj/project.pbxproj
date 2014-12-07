@@ -140,7 +140,7 @@
 		1628A6D318789E73005EDA69 /* DetailViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DetailViewController.m; sourceTree = "<group>"; };
 		1628A6D518789E73005EDA69 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		1628A6FA1878B64E005EDA69 /* RespositoriesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RespositoriesViewController.h; sourceTree = "<group>"; };
-		1628A6FB1878B64E005EDA69 /* RespositoriesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RespositoriesViewController.m; sourceTree = "<group>"; };
+		1628A6FB1878B64E005EDA69 /* RespositoriesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = RespositoriesViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		162D96F91913F0E7000A54EA /* Trailer 11.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 11.xcdatamodel"; sourceTree = "<group>"; };
 		164047081882ED0000A4AC9C /* AboutTrailerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AboutTrailerViewController.h; sourceTree = "<group>"; };
 		164047091882ED0000A4AC9C /* AboutTrailerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AboutTrailerViewController.m; sourceTree = "<group>"; };
@@ -190,9 +190,9 @@
 		16928CB71A2B3AED0030AE23 /* Repo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Repo.swift; sourceTree = "<group>"; };
 		16928CBA1A2B3AED0030AE23 /* ApiServer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApiServer.swift; sourceTree = "<group>"; };
 		1694372419FD3F4D005079F6 /* ServersViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServersViewController.h; sourceTree = "<group>"; };
-		1694372519FD3F4D005079F6 /* ServersViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServersViewController.m; sourceTree = "<group>"; };
+		1694372519FD3F4D005079F6 /* ServersViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = ServersViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		1694372719FD4056005079F6 /* ServerDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerDetailViewController.h; sourceTree = "<group>"; };
-		1694372819FD4056005079F6 /* ServerDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServerDetailViewController.m; sourceTree = "<group>"; };
+		1694372819FD4056005079F6 /* ServerDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = ServerDetailViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		169CEB99187988D00083A068 /* Trailer 4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 4.xcdatamodel"; sourceTree = "<group>"; };
 		169CEB9A1879D5BB0083A068 /* AdvancedSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdvancedSettingsViewController.h; sourceTree = "<group>"; };
 		169CEB9B1879D5BB0083A068 /* AdvancedSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = AdvancedSettingsViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
@@ -534,7 +534,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0600;
-				ORGANIZATIONNAME = HouseTrip;
+				ORGANIZATIONNAME = "";
 				TargetAttributes = {
 					1628A6B018789E73005EDA69 = {
 						DevelopmentTeam = X727JSJUGJ;

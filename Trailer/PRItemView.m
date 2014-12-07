@@ -258,7 +258,7 @@ static CGColorRef _highlightColor;
 
 - (PullRequest *)associatedPullRequest
 {
-	return (PullRequest*)[app.dataManager.managedObjectContext existingObjectWithID:pullRequestId error:nil];
+	return (PullRequest*)[DataManager.managedObjectContext existingObjectWithID:pullRequestId error:nil];
 }
 
 - (NSString *)stringForCopy

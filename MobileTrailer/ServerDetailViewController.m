@@ -13,12 +13,12 @@
 	ApiServer *a;
 	if(self.serverId)
 	{
-		a = (ApiServer *)[app.dataManager.managedObjectContext existingObjectWithID:self.serverId error:nil];
+		a = (ApiServer *)[DataManager.managedObjectContext existingObjectWithID:self.serverId error:nil];
 	}
 	else
 	{
-		a = [ApiServer addDefaultGithubInMoc:app.dataManager.managedObjectContext];
-		[app.dataManager.managedObjectContext save:nil];
+		a = [ApiServer addDefaultGithubInMoc:DataManager.managedObjectContext];
+		[DataManager.managedObjectContext save:nil];
 		self.serverId = a.objectID;
 	}
 	self.name.text = a.label;
@@ -64,7 +64,7 @@
 
 - (ApiServer *)updateServerFromForm
 {
-	ApiServer *a = (ApiServer *)[app.dataManager.managedObjectContext existingObjectWithID:self.serverId error:nil];
+	ApiServer *a = (ApiServer *)[DataManager.managedObjectContext existingObjectWithID:self.serverId error:nil];
 	a.label = [self.name.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 	a.apiPath = [self.apiPath.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 	a.webPath = [self.webFrontEnd.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
@@ -205,9 +205,9 @@
 
 - (void)deleteServer
 {
-	ApiServer *a = (ApiServer *)[app.dataManager.managedObjectContext existingObjectWithID:self.serverId error:nil];
-	if(a) [app.dataManager.managedObjectContext deleteObject:a];
-	[app.dataManager saveDB];
+	ApiServer *a = (ApiServer *)[DataManager.managedObjectContext existingObjectWithID:self.serverId error:nil];
+	if(a) [DataManager.managedObjectContext deleteObject:a];
+	[DataManager saveDB];
 	[self.navigationController popViewControllerAnimated:YES];
 }
 

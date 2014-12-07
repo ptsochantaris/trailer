@@ -64,7 +64,7 @@ OSX_AppDelegate *app;
 	[self.versionNumber setStringValue:currentAppVersion];
 	[self.aboutVersion setStringValue:currentAppVersion];
 
-	if([ApiServer someServersHaveAuthTokensInMoc:self.dataManager.managedObjectContext])
+	if([ApiServer someServersHaveAuthTokensInMoc:DataManager.managedObjectContext])
 	{
 		[self startRefresh];
 	}
@@ -132,7 +132,7 @@ OSX_AppDelegate *app;
 	self.api.successfulRefreshesSinceLastLabelCheck = 0;
 	if(Settings.showLabels)
 	{
-		for(Repo *r in [Repo allItemsOfType:@"Repo" inMoc:self.dataManager.managedObjectContext])
+		for(Repo *r in [Repo allItemsOfType:@"Repo" inMoc:DataManager.managedObjectContext])
 		{
 			r.dirty = @YES;
 			r.lastDirtied = [NSDate distantPast];
@@ -280,7 +280,7 @@ OSX_AppDelegate *app;
 	self.api.successfulRefreshesSinceLastStatusCheck = 0;
 	if(Settings.showStatusItems)
 	{
-		for(Repo *r in [Repo allItemsOfType:@"Repo" inMoc:self.dataManager.managedObjectContext])
+		for(Repo *r in [Repo allItemsOfType:@"Repo" inMoc:DataManager.managedObjectContext])
 		{
 			r.dirty = @YES;
 			r.lastDirtied = [NSDate distantPast];
@@ -451,20 +451,18 @@ OSX_AppDelegate *app;
 			NSString *urlToOpen = notification.userInfo[NOTIFICATION_URL_KEY];
 			if(!urlToOpen)
 			{
-				NSManagedObjectContext *moc = app.dataManager.managedObjectContext;
-
 				NSManagedObjectID *itemId = [app.dataManager idForUriPath:notification.userInfo[PULL_REQUEST_ID_KEY]];
 
 				PullRequest *pullRequest = nil;
 				if(itemId) // it's a pull request
 				{
-					pullRequest = (PullRequest *)[moc existingObjectWithID:itemId error:nil];
+					pullRequest = (PullRequest *)[DataManager.managedObjectContext existingObjectWithID:itemId error:nil];
 					urlToOpen = pullRequest.webUrl;
 				}
 				else // it's a comment
 				{
 					itemId = [app.dataManager idForUriPath:notification.userInfo[COMMENT_ID_KEY]];
-					PRComment *c = (PRComment *)[moc existingObjectWithID:itemId error:nil];
+					PRComment *c = (PRComment *)[DataManager.managedObjectContext existingObjectWithID:itemId error:nil];
 					urlToOpen = c.webUrl;
 					pullRequest = c.pullRequest;
 				}
@@ -672,7 +670,7 @@ OSX_AppDelegate *app;
 		}
 		else
 		{
-			NSArray *mergedRequests = [PullRequest allMergedRequestsInMoc:self.dataManager.managedObjectContext];
+			NSArray *mergedRequests = [PullRequest allMergedRequestsInMoc:DataManager.managedObjectContext];
 
 			NSAlert *alert = [[NSAlert alloc] init];
 			[alert setMessageText:[NSString stringWithFormat:@"Clear %ld merged PRs?",mergedRequests.count]];
@@ -699,7 +697,7 @@ OSX_AppDelegate *app;
 		}
 		else
 		{
-			NSArray *closedRequests = [PullRequest allClosedRequestsInMoc:self.dataManager.managedObjectContext];
+			NSArray *closedRequests = [PullRequest allClosedRequestsInMoc:DataManager.managedObjectContext];
 
 			NSAlert *alert = [[NSAlert alloc] init];
 			[alert setMessageText:[NSString stringWithFormat:@"Clear %ld closed PRs?",closedRequests.count]];
@@ -723,30 +721,27 @@ OSX_AppDelegate *app;
 
 - (void)removeAllMergedRequests
 {
-	DataManager *dataManager = self.dataManager;
-	NSArray *mergedRequests = [PullRequest allMergedRequestsInMoc:dataManager.managedObjectContext];
+	NSArray *mergedRequests = [PullRequest allMergedRequestsInMoc:DataManager.managedObjectContext];
 	for(PullRequest *r in mergedRequests)
-		[dataManager.managedObjectContext deleteObject:r];
-	[dataManager saveDB];
+		[DataManager.managedObjectContext deleteObject:r];
+	[DataManager saveDB];
 	[self updateMenu];
 }
 
 - (void)removeAllClosedRequests
 {
-	DataManager *dataManager = self.dataManager;
-	NSArray *closedRequests = [PullRequest allClosedRequestsInMoc:dataManager.managedObjectContext];
+	NSArray *closedRequests = [PullRequest allClosedRequestsInMoc:DataManager.managedObjectContext];
 	for(PullRequest *r in closedRequests)
-		[dataManager.managedObjectContext deleteObject:r];
-	[dataManager saveDB];
+		[DataManager.managedObjectContext deleteObject:r];
+	[DataManager saveDB];
 	[self updateMenu];
 }
 
 - (void)unPinSelectedFrom:(PRItemView *)item
 {
-	DataManager *dataManager = self.dataManager;
 	PullRequest *r = item.associatedPullRequest;
-	[dataManager.managedObjectContext deleteObject:r];
-	[dataManager saveDB];
+	[DataManager.managedObjectContext deleteObject:r];
+	[DataManager saveDB];
 	[self updateMenu];
 }
 
@@ -862,7 +857,7 @@ OSX_AppDelegate *app;
 	NSInteger selected = self.serverList.selectedRow;
 	if(selected>=0)
 	{
-		NSArray *allApiServers = [ApiServer allApiServersInMoc:self.dataManager.managedObjectContext];
+		NSArray *allApiServers = [ApiServer allApiServersInMoc:DataManager.managedObjectContext];
 		return allApiServers[selected];
 	}
 	return nil;
@@ -871,14 +866,14 @@ OSX_AppDelegate *app;
 - (IBAction)deleteSelectedServerSelected:(NSButton *)sender
 {
 	ApiServer *selectedServer = [self selectedServer];
-	NSInteger index = [[ApiServer allApiServersInMoc:self.dataManager.managedObjectContext] indexOfObject:selectedServer];
-	[self.dataManager.managedObjectContext deleteObject:selectedServer];
+	NSInteger index = [[ApiServer allApiServersInMoc:DataManager.managedObjectContext] indexOfObject:selectedServer];
+	[DataManager.managedObjectContext deleteObject:selectedServer];
 	[self.serverList reloadData];
 	[self.serverList selectRowIndexes:[NSIndexSet indexSetWithIndex:MIN(index,self.serverList.numberOfRows-1)]
 				 byExtendingSelection:NO];
 	[self fillServerApiFormFromSelectedServer];
 	[self updateMenu];
-	[self.dataManager saveDB];
+	[DataManager saveDB];
 }
 
 
@@ -962,16 +957,15 @@ OSX_AppDelegate *app;
 	self.lastSuccessfulRefresh = nil;
 	self.lastRepoCheck = nil;
 	[self.projectsTable reloadData];
-	self.refreshButton.enabled = [ApiServer someServersHaveAuthTokensInMoc:self.dataManager.managedObjectContext];
+	self.refreshButton.enabled = [ApiServer someServersHaveAuthTokensInMoc:DataManager.managedObjectContext];
 	[self updateMenu];
 }
 
 - (IBAction)markAllReadSelected:(NSMenuItem *)sender
 {
-	NSManagedObjectContext *moc = self.dataManager.managedObjectContext;
 	NSFetchRequest *f = [PullRequest requestForPullRequestsWithFilter:self.mainMenuFilter.stringValue];
 
-	for(PullRequest *r in [moc executeFetchRequest:f error:nil])
+	for(PullRequest *r in [DataManager.managedObjectContext executeFetchRequest:f error:nil])
 		[r catchUpWithComments];
 	[self updateMenu];
 }
@@ -1184,7 +1178,7 @@ OSX_AppDelegate *app;
 	f.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"fork" ascending:YES],
 						  [NSSortDescriptor sortDescriptorWithKey:@"fullName" ascending:YES]];
 
-	return [self.dataManager.managedObjectContext executeFetchRequest:f error:nil];
+	return [DataManager.managedObjectContext executeFetchRequest:f error:nil];
 }
 
 - (NSUInteger)countParentRepos
@@ -1197,7 +1191,7 @@ OSX_AppDelegate *app;
 	else
 		f.predicate = [NSPredicate predicateWithFormat:@"fork == NO"];
 
-	return [self.dataManager.managedObjectContext countForFetchRequest:f error:nil];
+	return [DataManager.managedObjectContext countForFetchRequest:f error:nil];
 }
 
 - (Repo *)repoForRow:(NSUInteger)row
@@ -1259,7 +1253,7 @@ OSX_AppDelegate *app;
 	}
 	else
 	{
-		NSArray *allServers = [ApiServer allApiServersInMoc:self.dataManager.managedObjectContext];
+		NSArray *allServers = [ApiServer allApiServersInMoc:DataManager.managedObjectContext];
 		ApiServer *apiServer = allServers[row];
 		if([tableColumn.identifier isEqualToString:@"server"])
 		{
@@ -1298,7 +1292,7 @@ OSX_AppDelegate *app;
 	}
 	else
 	{
-		return [ApiServer countApiServersInMoc:self.dataManager.managedObjectContext];
+		return [ApiServer countApiServersInMoc:DataManager.managedObjectContext];
 	}
 }
 
@@ -1313,14 +1307,14 @@ OSX_AppDelegate *app;
 			r.hidden = @(hideNow);
 			r.dirty = @(!hideNow);
 		}
-		[self.dataManager saveDB];
+		[DataManager saveDB];
 		self.preferencesDirty = YES;
 	}
 }
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
 {
-	[self.dataManager saveDB];
+	[DataManager saveDB];
     return NSTerminateNow;
 }
 
@@ -1370,7 +1364,7 @@ OSX_AppDelegate *app;
 	if([notification object]==self.preferencesWindow)
 	{
 		[self controlTextDidChange:nil];
-		if([ApiServer someServersHaveAuthTokensInMoc:self.dataManager.managedObjectContext] && self.preferencesDirty)
+		if([ApiServer someServersHaveAuthTokensInMoc:DataManager.managedObjectContext] && self.preferencesDirty)
 		{
 			[self startRefresh];
 		}
@@ -1434,7 +1428,7 @@ OSX_AppDelegate *app;
 
 - (IBAction)refreshNowSelected:(NSMenuItem *)sender
 {
-	if([Repo countVisibleReposInMoc:self.dataManager.managedObjectContext]==0)
+	if([Repo countVisibleReposInMoc:DataManager.managedObjectContext]==0)
 	{
 		[self preferencesSelected:nil];
 		return;
@@ -1444,7 +1438,7 @@ OSX_AppDelegate *app;
 
 - (void)checkApiUsage
 {
-	for(ApiServer *apiServer in [ApiServer allApiServersInMoc:self.dataManager.managedObjectContext])
+	for(ApiServer *apiServer in [ApiServer allApiServersInMoc:DataManager.managedObjectContext])
 	{
 		if(apiServer.requestsLimit.doubleValue>0)
 		{
@@ -1473,8 +1467,8 @@ OSX_AppDelegate *app;
 {
 	if([tabView indexOfTabViewItem:tabViewItem]==1)
 	{
-		if((!self.lastRepoCheck || [Repo countVisibleReposInMoc:self.dataManager.managedObjectContext]==0) &&
-		   [ApiServer someServersHaveAuthTokensInMoc:self.dataManager.managedObjectContext])
+		if((!self.lastRepoCheck || [Repo countVisibleReposInMoc:DataManager.managedObjectContext]==0) &&
+		   [ApiServer someServersHaveAuthTokensInMoc:DataManager.managedObjectContext])
 		{
 			[self refreshReposSelected:nil];
 		}
@@ -1511,11 +1505,11 @@ OSX_AppDelegate *app;
 	[self.refreshButton setEnabled:YES];
 	[self.projectsTable setEnabled:YES];
 	[self.activityDisplay stopAnimation:nil];
-	[self.dataManager saveDB];
+	[DataManager saveDB];
 	[self.projectsTable reloadData];
 	[self updateMenu];
 	[self checkApiUsage];
-	[self.dataManager saveDB];
+	[DataManager saveDB];
 	[self.dataManager sendNotifications];
 
 	DLog(@"Refresh done");
@@ -1535,7 +1529,7 @@ OSX_AppDelegate *app;
 	[self.api fetchPullRequestsForActiveReposAndCallback:^{
 		self.refreshNow.target = oldTarget;
 		self.refreshNow.action = oldAction;
-		if(![ApiServer shouldReportRefreshFailureInMoc:self.dataManager.managedObjectContext])
+		if(![ApiServer shouldReportRefreshFailureInMoc:DataManager.managedObjectContext])
 		{
 			self.lastSuccessfulRefresh = [NSDate date];
 			self.preferencesDirty = NO;
@@ -1568,7 +1562,7 @@ OSX_AppDelegate *app;
 
 - (void)refreshTimerDone
 {
-	NSManagedObjectContext *moc = self.dataManager.managedObjectContext;
+	NSManagedObjectContext *moc = DataManager.managedObjectContext;
 	if([ApiServer someServersHaveAuthTokensInMoc:moc] && ([Repo countVisibleReposInMoc:moc]>0))
 	{
 		[self startRefresh];
@@ -1577,7 +1571,7 @@ OSX_AppDelegate *app;
 
 - (void)updateMenu
 {
-	NSManagedObjectContext *moc = self.dataManager.managedObjectContext;
+	NSManagedObjectContext *moc = DataManager.managedObjectContext;
 	NSFetchRequest *f = [PullRequest requestForPullRequestsWithFilter:self.mainMenuFilter.stringValue];
 	NSArray *pullRequests = [moc executeFetchRequest:f error:nil];
 
@@ -1782,7 +1776,7 @@ OSX_AppDelegate *app;
 	self.apiServerAuthToken.stringValue = [self emptyStringIfNil:apiServer.authToken];
 	self.apiServerSelectedBox.title = apiServer.label ? apiServer.label : @"New Server";
 	self.apiServerTestButton.enabled = (apiServer.authToken.length>0);
-	self.apiServerDeleteButton.enabled = ([ApiServer countApiServersInMoc:self.dataManager.managedObjectContext]>1);
+	self.apiServerDeleteButton.enabled = ([ApiServer countApiServersInMoc:DataManager.managedObjectContext]>1);
 	self.apiServerReportError.integerValue = apiServer.reportRefreshFailures.boolValue;
 }
 
@@ -1804,9 +1798,9 @@ OSX_AppDelegate *app;
 
 - (IBAction)addNewApiServerSelected:(NSButton *)sender
 {
-	ApiServer *a = [ApiServer insertNewServerInMoc:self.dataManager.managedObjectContext];
+	ApiServer *a = [ApiServer insertNewServerInMoc:DataManager.managedObjectContext];
 	a.label = @"New API Server";
-	NSUInteger index = [[ApiServer allApiServersInMoc:self.dataManager.managedObjectContext] indexOfObject:a];
+	NSUInteger index = [[ApiServer allApiServersInMoc:DataManager.managedObjectContext] indexOfObject:a];
 	[self.serverList reloadData];
 	[self.serverList selectRowIndexes:[NSIndexSet indexSetWithIndex:index] byExtendingSelection:NO];
 	[self fillServerApiFormFromSelectedServer];

@@ -43,7 +43,7 @@
 	searchHolder.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	self.tableView.tableHeaderView = searchHolder;
 
-	self.actionsButton.enabled = [ApiServer someServersHaveAuthTokensInMoc:app.dataManager.managedObjectContext];
+	self.actionsButton.enabled = [ApiServer someServersHaveAuthTokensInMoc:DataManager.managedObjectContext];
 }
 
 - (IBAction)actionSelected:(UIBarButtonItem *)sender
@@ -144,7 +144,7 @@
 	BOOL hideNow = !repo.hidden.boolValue;
 	repo.hidden = @(hideNow);
 	repo.dirty = @(!hideNow);
-	[app.dataManager saveDB];
+	[DataManager saveDB];
 	[tableView deselectRowAtIndexPath:indexPath animated:NO];
 	app.preferencesDirty = YES;
 }
@@ -179,7 +179,7 @@
 
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     // Edit the entity name as appropriate.
-    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Repo" inManagedObjectContext:app.dataManager.managedObjectContext];
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Repo" inManagedObjectContext:DataManager.managedObjectContext];
     [fetchRequest setEntity:entity];
 
 	if(searchField.text.length)
@@ -195,7 +195,7 @@
     // Edit the section name key path and cache name if appropriate.
     // nil for section name key path means "no sections".
     NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
-																								managedObjectContext:app.dataManager.managedObjectContext
+																								managedObjectContext:DataManager.managedObjectContext
 																								  sectionNameKeyPath:@"fork"
 																										   cacheName:nil];
     aFetchedResultsController.delegate = self;

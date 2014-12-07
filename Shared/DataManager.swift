@@ -1,6 +1,7 @@
 
+let mainObjectContext = buildMainContext()
+
 class DataManager : NSObject {
-	let managedObjectContext = buildMainContext()
 
 	override init() {
 		super.init()
@@ -8,9 +9,8 @@ class DataManager : NSObject {
 			DLog("VERSION UPDATE MAINTENANCE NEEDED")
 			performVersionChangedTasks()
 			versionBumpComplete()
-		} else {
-			ApiServer.ensureAtLeastGithubInMoc(managedObjectContext)
 		}
+		ApiServer.ensureAtLeastGithubInMoc(mainObjectContext)
 	}
 
 	func performVersionChangedTasks() {
@@ -34,7 +34,7 @@ class DataManager : NSObject {
 			var actualApiPath = legacyApiHost! + "/" + legacyApiPath!
 			actualApiPath = actualApiPath.stringByReplacingOccurrencesOfString("//", withString:"/")
 
-			let newApiServer = ApiServer.addDefaultGithubInMoc(managedObjectContext)
+			let newApiServer = ApiServer.addDefaultGithubInMoc(mainObjectContext)
 			newApiServer.apiPath = "https://".stringByAppendingString(actualApiPath)
 			newApiServer.webPath = "https://".stringByAppendingString(legacyWebHost!)
 			newApiServer.authToken = legacyAuthToken
@@ -45,26 +45,28 @@ class DataManager : NSObject {
 			d.removeObjectForKey("API_FRONTEND_SERVER")
 			d.removeObjectForKey("GITHUB_AUTH_TOKEN")
 		} else {
-			ApiServer.ensureAtLeastGithubInMoc(managedObjectContext)
+			ApiServer.ensureAtLeastGithubInMoc(mainObjectContext)
 		}
 
 		DLog("Marking all repos as dirty")
-		for r in Repo.allItemsOfType("Repo", inMoc:managedObjectContext) as [Repo] {
+		for r in Repo.allItemsOfType("Repo", inMoc:mainObjectContext) as [Repo] {
 			r.dirty = true
 			r.lastDirtied = NSDate()
 		}
 	}
 
+	class func managedObjectContext() -> NSManagedObjectContext { return mainObjectContext }
+
 	func sendNotifications() {
 
-		let newPrs = PullRequest.newItemsOfType("PullRequest", inMoc: managedObjectContext) as [PullRequest]
+		let newPrs = PullRequest.newItemsOfType("PullRequest", inMoc: mainObjectContext) as [PullRequest]
 		for p in newPrs {
 			if !p.isMine() {
 				app.postNotificationOfType(PRNotificationType.NewPr, forItem: p)
 			}
 		}
 
-		let updatedPrs = PullRequest.updatedItemsOfType("PullRequest", inMoc: managedObjectContext) as [PullRequest]
+		let updatedPrs = PullRequest.updatedItemsOfType("PullRequest", inMoc: mainObjectContext) as [PullRequest]
 		for p in updatedPrs {
 			if let reopened = p.reopened?.boolValue {
 				if reopened {
@@ -86,7 +88,7 @@ class DataManager : NSObject {
 			}
 		}
 
-		var latestComments = PRComment.newItemsOfType("PRComment", inMoc: managedObjectContext) as [PRComment]
+		var latestComments = PRComment.newItemsOfType("PRComment", inMoc: mainObjectContext) as [PRComment]
 		for c in latestComments {
 			let p = c.pullRequest
 			if p.postSyncAction?.integerValue == PostSyncAction.NoteUpdated.rawValue {
@@ -118,17 +120,19 @@ class DataManager : NSObject {
 		}
 	}
 
-	func saveDB() -> Bool {
-		if managedObjectContext.hasChanges {
+	class func saveDB() -> Bool {
+		if mainObjectContext.hasChanges {
 			DLog("Saving DB")
-			return managedObjectContext.save(nil)
+			var error: NSError?
+			var ok = mainObjectContext.save(&error)
+			if !ok { DLog("Error while saving DB: %@", error) }
 		}
 		return true
 	}
 
 	func tempContext() -> NSManagedObjectContext {
 		let c = NSManagedObjectContext(concurrencyType: NSManagedObjectContextConcurrencyType.ConfinementConcurrencyType)
-		c.parentContext = managedObjectContext
+		c.parentContext = mainObjectContext
 		c.undoManager = nil
 		return c
 	}
@@ -152,7 +156,7 @@ class DataManager : NSObject {
 			}
 			tempMoc.save(nil)
 		}
-		saveDB()
+		DataManager.saveDB()
 	}
 
 	func infoForType(type: PRNotificationType, item: NSManagedObject) -> Dictionary<String, AnyObject> {
@@ -178,7 +182,7 @@ class DataManager : NSObject {
 	func postMigrationTasks() {
 		if _justMigrated {
 			DLog("FORCING ALL PRS TO BE REFETCHED")
-			for p in PullRequest.allItemsOfType("PullRequest", inMoc:managedObjectContext) as [PullRequest] {
+			for p in PullRequest.allItemsOfType("PullRequest", inMoc:mainObjectContext) as [PullRequest] {
 				p.updatedAt = NSDate.distantPast() as? NSDate
 			}
 			_justMigrated = false
@@ -186,18 +190,18 @@ class DataManager : NSObject {
 	}
 
 	func postProcessAllPrs() {
-		for p in PullRequest.allItemsOfType("PullRequest", inMoc:managedObjectContext) as [PullRequest] {
+		for p in PullRequest.allItemsOfType("PullRequest", inMoc:mainObjectContext) as [PullRequest] {
 			p.postProcess()
 		}
 	}
 
 	func reasonForEmptyWithFilter(filterValue: String?) -> NSAttributedString {
-		let openRequests = PullRequest.countOpenRequestsInMoc(managedObjectContext)
+		let openRequests = PullRequest.countOpenRequestsInMoc(mainObjectContext)
 
 		var messageColor = COLOR_CLASS.lightGrayColor()
 		var message: String = ""
 
-		if !ApiServer.someServersHaveAuthTokensInMoc(managedObjectContext) {
+		if !ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
 			messageColor = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
 			message = "There are no configured API servers in your settings, please ensure you have added at least one server with a valid API token."
 		} else if app.isRefreshing {
@@ -206,7 +210,7 @@ class DataManager : NSObject {
 			message = "There are no PRs matching this filter."
 		} else if openRequests > 0 {
 			message = "\(openRequests) PRs are hidden by your Settings."
-		} else if Repo.countVisibleReposInMoc(managedObjectContext)==0 {
+		} else if Repo.countVisibleReposInMoc(mainObjectContext)==0 {
 			messageColor = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
 			message = "There are no watched repositories, please watch or unhide some."
 		} else if openRequests==0 {
