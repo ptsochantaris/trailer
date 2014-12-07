@@ -8,10 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		1604D4CF189541D70064A385 /* EmptyView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1604D4CE189541D70064A385 /* EmptyView.m */; };
-		16075A9717EC7492000D86FD /* API.m in Sources */ = {isa = PBXBuildFile; fileRef = 16075A9617EC7492000D86FD /* API.m */; };
 		160C5AD318682CD800142482 /* CommentCounts.m in Sources */ = {isa = PBXBuildFile; fileRef = 160C5AD218682CD800142482 /* CommentCounts.m */; };
 		16154E2F19C43E8E00E49139 /* Launch.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 16154E2E19C43E8E00E49139 /* Launch.storyboard */; };
-		1617BEEA183F538100E89BB2 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 1617BEE9183F538100E89BB2 /* Reachability.m */; };
 		162002D01A2A3E2100FF95F3 /* Application.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002CF1A2A3E2100FF95F3 /* Application.swift */; };
 		162002D61A2A49A300FF95F3 /* ViewAllowsVibrancy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002D51A2A49A300FF95F3 /* ViewAllowsVibrancy.swift */; };
 		162002DB1A2A545C00FF95F3 /* CenterTextFieldCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002DA1A2A545C00FF95F3 /* CenterTextFieldCell.swift */; };
@@ -25,9 +23,6 @@
 		1628A6D418789E73005EDA69 /* DetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1628A6D318789E73005EDA69 /* DetailViewController.m */; };
 		1628A6D618789E73005EDA69 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1628A6D518789E73005EDA69 /* Images.xcassets */; };
 		1628A6FC1878B64E005EDA69 /* RespositoriesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1628A6FB1878B64E005EDA69 /* RespositoriesViewController.m */; };
-		1628A7001878B810005EDA69 /* API.m in Sources */ = {isa = PBXBuildFile; fileRef = 16075A9617EC7492000D86FD /* API.m */; };
-		1628A7071878BC23005EDA69 /* Trailer.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 168BC6C517EC2DF000BC4584 /* Trailer.xcdatamodeld */; };
-		1628A7081878BC32005EDA69 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 1617BEE9183F538100E89BB2 /* Reachability.m */; };
 		1640470A1882ED0000A4AC9C /* AboutTrailerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 164047091882ED0000A4AC9C /* AboutTrailerViewController.m */; };
 		164785AA1A2CE7BD00297764 /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785A91A2CE7BD00297764 /* Globals.swift */; };
 		164785AB1A2CE7BD00297764 /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785A91A2CE7BD00297764 /* Globals.swift */; };
@@ -46,28 +41,33 @@
 		168BC6B817EC2DF000BC4584 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 168BC6B617EC2DF000BC4584 /* InfoPlist.strings */; };
 		168BC6C117EC2DF000BC4584 /* OSX_AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 168BC6C017EC2DF000BC4584 /* OSX_AppDelegate.m */; };
 		168BC6C417EC2DF000BC4584 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 168BC6C217EC2DF000BC4584 /* MainMenu.xib */; };
-		168BC6C717EC2DF000BC4584 /* Trailer.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 168BC6C517EC2DF000BC4584 /* Trailer.xcdatamodeld */; };
 		168BC6C917EC2DF000BC4584 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 168BC6C817EC2DF000BC4584 /* Images.xcassets */; };
 		168FD00E1A2A7AD1005929CB /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 168FD00D1A2A7AD1005929CB /* MessageView.swift */; };
 		168FD0121A2A8C28005929CB /* PopTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A794F31A252BFA00A76553 /* PopTimer.swift */; };
-		16928CA91A2A8E060030AE23 /* PRComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16928CA81A2A8E060030AE23 /* PRComment.swift */; };
-		16928CAA1A2A8E060030AE23 /* PRComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16928CA81A2A8E060030AE23 /* PRComment.swift */; };
-		16928CAC1A2B2DED0030AE23 /* DataItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16928CAB1A2B2DED0030AE23 /* DataItem.swift */; };
-		16928CAD1A2B2DED0030AE23 /* DataItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16928CAB1A2B2DED0030AE23 /* DataItem.swift */; };
-		16928CAF1A2B3AED0030AE23 /* PullRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16928CAE1A2B3AED0030AE23 /* PullRequest.swift */; };
-		16928CB01A2B3AED0030AE23 /* PullRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16928CAE1A2B3AED0030AE23 /* PullRequest.swift */; };
-		16928CB21A2B3AED0030AE23 /* PRLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16928CB11A2B3AED0030AE23 /* PRLabel.swift */; };
-		16928CB31A2B3AED0030AE23 /* PRLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16928CB11A2B3AED0030AE23 /* PRLabel.swift */; };
-		16928CB51A2B3AED0030AE23 /* PRStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16928CB41A2B3AED0030AE23 /* PRStatus.swift */; };
-		16928CB61A2B3AED0030AE23 /* PRStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16928CB41A2B3AED0030AE23 /* PRStatus.swift */; };
-		16928CB81A2B3AED0030AE23 /* Repo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16928CB71A2B3AED0030AE23 /* Repo.swift */; };
-		16928CB91A2B3AED0030AE23 /* Repo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16928CB71A2B3AED0030AE23 /* Repo.swift */; };
-		16928CBB1A2B3AED0030AE23 /* ApiServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16928CBA1A2B3AED0030AE23 /* ApiServer.swift */; };
-		16928CBC1A2B3AED0030AE23 /* ApiServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16928CBA1A2B3AED0030AE23 /* ApiServer.swift */; };
 		1694372619FD3F4D005079F6 /* ServersViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1694372519FD3F4D005079F6 /* ServersViewController.m */; };
 		1694372919FD4056005079F6 /* ServerDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1694372819FD4056005079F6 /* ServerDetailViewController.m */; };
 		169CEB9C1879D5BB0083A068 /* AdvancedSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 169CEB9B1879D5BB0083A068 /* AdvancedSettingsViewController.m */; };
 		16A794F41A252BFA00A76553 /* PopTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A794F31A252BFA00A76553 /* PopTimer.swift */; };
+		16B3B3171A34E8E2000BE6CC /* ApiServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3101A34E8E2000BE6CC /* ApiServer.swift */; };
+		16B3B3181A34E8E2000BE6CC /* ApiServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3101A34E8E2000BE6CC /* ApiServer.swift */; };
+		16B3B3191A34E8E2000BE6CC /* DataItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3111A34E8E2000BE6CC /* DataItem.swift */; };
+		16B3B31A1A34E8E2000BE6CC /* DataItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3111A34E8E2000BE6CC /* DataItem.swift */; };
+		16B3B31B1A34E8E2000BE6CC /* PRComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3121A34E8E2000BE6CC /* PRComment.swift */; };
+		16B3B31C1A34E8E2000BE6CC /* PRComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3121A34E8E2000BE6CC /* PRComment.swift */; };
+		16B3B31D1A34E8E2000BE6CC /* PRLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3131A34E8E2000BE6CC /* PRLabel.swift */; };
+		16B3B31E1A34E8E2000BE6CC /* PRLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3131A34E8E2000BE6CC /* PRLabel.swift */; };
+		16B3B31F1A34E8E2000BE6CC /* PRStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3141A34E8E2000BE6CC /* PRStatus.swift */; };
+		16B3B3201A34E8E2000BE6CC /* PRStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3141A34E8E2000BE6CC /* PRStatus.swift */; };
+		16B3B3211A34E8E2000BE6CC /* PullRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3151A34E8E2000BE6CC /* PullRequest.swift */; };
+		16B3B3221A34E8E2000BE6CC /* PullRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3151A34E8E2000BE6CC /* PullRequest.swift */; };
+		16B3B3231A34E8E2000BE6CC /* Repo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3161A34E8E2000BE6CC /* Repo.swift */; };
+		16B3B3241A34E8E2000BE6CC /* Repo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3161A34E8E2000BE6CC /* Repo.swift */; };
+		16B3B34F1A34E990000BE6CC /* Trailer.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B33B1A34E990000BE6CC /* Trailer.xcdatamodeld */; };
+		16B3B3501A34E990000BE6CC /* Trailer.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B33B1A34E990000BE6CC /* Trailer.xcdatamodeld */; };
+		16B3B3551A34E9F7000BE6CC /* API.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3521A34E9F7000BE6CC /* API.m */; };
+		16B3B3561A34E9F7000BE6CC /* API.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3521A34E9F7000BE6CC /* API.m */; };
+		16B3B3571A34E9F7000BE6CC /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3541A34E9F7000BE6CC /* Reachability.m */; };
+		16B3B3581A34E9F7000BE6CC /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3541A34E9F7000BE6CC /* Reachability.m */; };
 		16B94072182D136700F32061 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 16B94070182D136700F32061 /* dsa_pub.pem */; };
 		16C54F941881639B00849B76 /* GithubViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 16C54F931881639B00849B76 /* GithubViewController.m */; };
 		16CBE1C11A2DBB2700485053 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C01A2DBB2700485053 /* DataManager.swift */; };
@@ -97,16 +97,9 @@
 /* Begin PBXFileReference section */
 		1604D4CD189541D70064A385 /* EmptyView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmptyView.h; sourceTree = "<group>"; };
 		1604D4CE189541D70064A385 /* EmptyView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EmptyView.m; sourceTree = "<group>"; };
-		16075A9517EC7492000D86FD /* API.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = API.h; path = Trailer/API.h; sourceTree = "<group>"; };
-		16075A9617EC7492000D86FD /* API.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = API.m; path = Trailer/API.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
-		16096DC518927C4C0016357A /* Trailer 6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 6.xcdatamodel"; sourceTree = "<group>"; };
 		160C5AD118682CD800142482 /* CommentCounts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommentCounts.h; sourceTree = "<group>"; };
 		160C5AD218682CD800142482 /* CommentCounts.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommentCounts.m; sourceTree = "<group>"; };
-		160E60321A0A28DF00742BA9 /* Trailer 18.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 18.xcdatamodel"; sourceTree = "<group>"; };
 		16154E2E19C43E8E00E49139 /* Launch.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Launch.storyboard; sourceTree = "<group>"; };
-		1617BEE8183F538100E89BB2 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reachability.h; path = Trailer/Reachability.h; sourceTree = "<group>"; };
-		1617BEE9183F538100E89BB2 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Reachability.m; path = Trailer/Reachability.m; sourceTree = "<group>"; };
-		1617BEEE183F9C4F00E89BB2 /* Trailer 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 2.xcdatamodel"; sourceTree = "<group>"; };
 		162002CF1A2A3E2100FF95F3 /* Application.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Application.swift; sourceTree = "<group>"; };
 		162002D21A2A40B800FF95F3 /* OSX_Globals.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OSX_Globals.h; sourceTree = "<group>"; };
 		162002D51A2A49A300FF95F3 /* ViewAllowsVibrancy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewAllowsVibrancy.swift; sourceTree = "<group>"; };
@@ -129,23 +122,16 @@
 		1628A6D518789E73005EDA69 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		1628A6FA1878B64E005EDA69 /* RespositoriesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RespositoriesViewController.h; sourceTree = "<group>"; };
 		1628A6FB1878B64E005EDA69 /* RespositoriesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = RespositoriesViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
-		162D96F91913F0E7000A54EA /* Trailer 11.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 11.xcdatamodel"; sourceTree = "<group>"; };
 		164047081882ED0000A4AC9C /* AboutTrailerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AboutTrailerViewController.h; sourceTree = "<group>"; };
 		164047091882ED0000A4AC9C /* AboutTrailerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AboutTrailerViewController.m; sourceTree = "<group>"; };
-		16458E37191AC2D200FB13EC /* Trailer 12.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 12.xcdatamodel"; sourceTree = "<group>"; };
 		164785A91A2CE7BD00297764 /* Globals.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = Globals.swift; path = Shared/Globals.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		164785AC1A2CE7CD00297764 /* NSDictionaryExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NSDictionaryExtensions.swift; path = Shared/NSDictionaryExtensions.swift; sourceTree = "<group>"; };
 		164785AD1A2CE7CD00297764 /* NSStringExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NSStringExtensions.swift; path = Shared/NSStringExtensions.swift; sourceTree = "<group>"; };
 		164785B21A2CE7FB00297764 /* PocketTrailer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PocketTrailer-Bridging-Header.h"; sourceTree = "<group>"; };
 		164785B31A2CE80800297764 /* Trailer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Trailer-Bridging-Header.h"; sourceTree = "<group>"; };
 		164785B41A2CE82D00297764 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = Trailer/Sparkle.framework; sourceTree = "<group>"; };
-		164976221864935200C13A6B /* Trailer 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 3.xcdatamodel"; sourceTree = "<group>"; };
-		16508CD819E1B53E0029ADFE /* Trailer 16.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 16.xcdatamodel"; sourceTree = "<group>"; };
-		1653FD6F1966B2900080D972 /* Trailer 13.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 13.xcdatamodel"; sourceTree = "<group>"; };
 		16583E461851F082003A7A55 /* SectionHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SectionHeader.h; sourceTree = "<group>"; };
 		16583E471851F082003A7A55 /* SectionHeader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SectionHeader.m; sourceTree = "<group>"; };
-		165B5D2318A62FBE0085FCB3 /* Trailer 8.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 8.xcdatamodel"; sourceTree = "<group>"; };
-		1661667C189BBDAB00FBF4E0 /* Trailer 7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 7.xcdatamodel"; sourceTree = "<group>"; };
 		1665B6641882F24400972111 /* UINavigationController+DismissKeyboard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UINavigationController+DismissKeyboard.h"; sourceTree = "<group>"; };
 		1665B6651882F24400972111 /* UINavigationController+DismissKeyboard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UINavigationController+DismissKeyboard.m"; sourceTree = "<group>"; };
 		166A19A719B99C48004D9057 /* OpenInSafariActivity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenInSafariActivity.h; sourceTree = "<group>"; };
@@ -161,29 +147,47 @@
 		168BC6BF17EC2DF000BC4584 /* OSX_AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OSX_AppDelegate.h; sourceTree = "<group>"; };
 		168BC6C017EC2DF000BC4584 /* OSX_AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = OSX_AppDelegate.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		168BC6C317EC2DF000BC4584 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
-		168BC6C617EC2DF000BC4584 /* Trailer.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Trailer.xcdatamodel; sourceTree = "<group>"; };
 		168BC6C817EC2DF000BC4584 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		168C6ECC18B2104100E41D85 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		168C6ECD18B2104100E41D85 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
-		168DC6311A2CDB6C007D418F /* Trailer 19.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 19.xcdatamodel"; sourceTree = "<group>"; };
 		168FD00D1A2A7AD1005929CB /* MessageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageView.swift; sourceTree = "<group>"; };
-		16928CA81A2A8E060030AE23 /* PRComment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PRComment.swift; sourceTree = "<group>"; };
-		16928CAB1A2B2DED0030AE23 /* DataItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataItem.swift; sourceTree = "<group>"; };
-		16928CAE1A2B3AED0030AE23 /* PullRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PullRequest.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		16928CB11A2B3AED0030AE23 /* PRLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PRLabel.swift; sourceTree = "<group>"; };
-		16928CB41A2B3AED0030AE23 /* PRStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PRStatus.swift; sourceTree = "<group>"; };
-		16928CB71A2B3AED0030AE23 /* Repo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Repo.swift; sourceTree = "<group>"; };
-		16928CBA1A2B3AED0030AE23 /* ApiServer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApiServer.swift; sourceTree = "<group>"; };
 		1694372419FD3F4D005079F6 /* ServersViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServersViewController.h; sourceTree = "<group>"; };
 		1694372519FD3F4D005079F6 /* ServersViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = ServersViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		1694372719FD4056005079F6 /* ServerDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerDetailViewController.h; sourceTree = "<group>"; };
 		1694372819FD4056005079F6 /* ServerDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = ServerDetailViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
-		169CEB99187988D00083A068 /* Trailer 4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 4.xcdatamodel"; sourceTree = "<group>"; };
 		169CEB9A1879D5BB0083A068 /* AdvancedSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdvancedSettingsViewController.h; sourceTree = "<group>"; };
 		169CEB9B1879D5BB0083A068 /* AdvancedSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = AdvancedSettingsViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		16A794F31A252BFA00A76553 /* PopTimer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PopTimer.swift; path = Shared/PopTimer.swift; sourceTree = "<group>"; };
-		16AD4E6D18896770001C17B7 /* Trailer 5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 5.xcdatamodel"; sourceTree = "<group>"; };
-		16B8A10218AE5E5300C6ECB4 /* Trailer 9.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 9.xcdatamodel"; sourceTree = "<group>"; };
+		16B3B3101A34E8E2000BE6CC /* ApiServer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ApiServer.swift; path = Shared/ApiServer.swift; sourceTree = SOURCE_ROOT; };
+		16B3B3111A34E8E2000BE6CC /* DataItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DataItem.swift; path = Shared/DataItem.swift; sourceTree = SOURCE_ROOT; };
+		16B3B3121A34E8E2000BE6CC /* PRComment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PRComment.swift; path = Shared/PRComment.swift; sourceTree = SOURCE_ROOT; };
+		16B3B3131A34E8E2000BE6CC /* PRLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PRLabel.swift; path = Shared/PRLabel.swift; sourceTree = SOURCE_ROOT; };
+		16B3B3141A34E8E2000BE6CC /* PRStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PRStatus.swift; path = Shared/PRStatus.swift; sourceTree = SOURCE_ROOT; };
+		16B3B3151A34E8E2000BE6CC /* PullRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PullRequest.swift; path = Shared/PullRequest.swift; sourceTree = SOURCE_ROOT; };
+		16B3B3161A34E8E2000BE6CC /* Repo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Repo.swift; path = Shared/Repo.swift; sourceTree = SOURCE_ROOT; };
+		16B3B33C1A34E990000BE6CC /* Trailer 10.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 10.xcdatamodel"; sourceTree = "<group>"; };
+		16B3B33D1A34E990000BE6CC /* Trailer 11.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 11.xcdatamodel"; sourceTree = "<group>"; };
+		16B3B33E1A34E990000BE6CC /* Trailer 12.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 12.xcdatamodel"; sourceTree = "<group>"; };
+		16B3B33F1A34E990000BE6CC /* Trailer 13.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 13.xcdatamodel"; sourceTree = "<group>"; };
+		16B3B3401A34E990000BE6CC /* Trailer 14.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 14.xcdatamodel"; sourceTree = "<group>"; };
+		16B3B3411A34E990000BE6CC /* Trailer 15.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 15.xcdatamodel"; sourceTree = "<group>"; };
+		16B3B3421A34E990000BE6CC /* Trailer 16.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 16.xcdatamodel"; sourceTree = "<group>"; };
+		16B3B3431A34E990000BE6CC /* Trailer 17.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 17.xcdatamodel"; sourceTree = "<group>"; };
+		16B3B3441A34E990000BE6CC /* Trailer 18.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 18.xcdatamodel"; sourceTree = "<group>"; };
+		16B3B3451A34E990000BE6CC /* Trailer 19.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 19.xcdatamodel"; sourceTree = "<group>"; };
+		16B3B3461A34E990000BE6CC /* Trailer 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 2.xcdatamodel"; sourceTree = "<group>"; };
+		16B3B3471A34E990000BE6CC /* Trailer 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 3.xcdatamodel"; sourceTree = "<group>"; };
+		16B3B3481A34E990000BE6CC /* Trailer 4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 4.xcdatamodel"; sourceTree = "<group>"; };
+		16B3B3491A34E990000BE6CC /* Trailer 5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 5.xcdatamodel"; sourceTree = "<group>"; };
+		16B3B34A1A34E990000BE6CC /* Trailer 6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 6.xcdatamodel"; sourceTree = "<group>"; };
+		16B3B34B1A34E990000BE6CC /* Trailer 7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 7.xcdatamodel"; sourceTree = "<group>"; };
+		16B3B34C1A34E990000BE6CC /* Trailer 8.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 8.xcdatamodel"; sourceTree = "<group>"; };
+		16B3B34D1A34E990000BE6CC /* Trailer 9.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 9.xcdatamodel"; sourceTree = "<group>"; };
+		16B3B34E1A34E990000BE6CC /* Trailer.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Trailer.xcdatamodel; sourceTree = "<group>"; };
+		16B3B3511A34E9F7000BE6CC /* API.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = API.h; path = Shared/API.h; sourceTree = "<group>"; };
+		16B3B3521A34E9F7000BE6CC /* API.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = API.m; path = Shared/API.m; sourceTree = "<group>"; };
+		16B3B3531A34E9F7000BE6CC /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reachability.h; path = Shared/Reachability.h; sourceTree = "<group>"; };
+		16B3B3541A34E9F7000BE6CC /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Reachability.m; path = Shared/Reachability.m; sourceTree = "<group>"; };
 		16B94070182D136700F32061 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
 		16C54F921881639B00849B76 /* GithubViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GithubViewController.h; sourceTree = "<group>"; };
 		16C54F931881639B00849B76 /* GithubViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GithubViewController.m; sourceTree = "<group>"; };
@@ -191,12 +195,8 @@
 		16CBE1C31A2DF61C00485053 /* GlobalsObjC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GlobalsObjC.h; path = Shared/GlobalsObjC.h; sourceTree = "<group>"; };
 		16CBE1C41A2DFBA500485053 /* Settings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Settings.swift; path = Shared/Settings.swift; sourceTree = "<group>"; };
 		16CBE1C91A2E13A400485053 /* StatusItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatusItemView.swift; sourceTree = "<group>"; };
-		16D223EA19F2811F00B48E88 /* Trailer 17.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 17.xcdatamodel"; sourceTree = "<group>"; };
-		16ECCFAF18B7AC5E000B012F /* Trailer 10.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 10.xcdatamodel"; sourceTree = "<group>"; };
 		16EE561E19B78DBA0031DF6D /* CommentBlacklistViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommentBlacklistViewController.h; sourceTree = "<group>"; };
 		16EE561F19B78DBA0031DF6D /* CommentBlacklistViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = CommentBlacklistViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
-		16EE562119B857930031DF6D /* Trailer 14.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 14.xcdatamodel"; sourceTree = "<group>"; };
-		16F2B33E19C070F2005CB433 /* Trailer 15.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 15.xcdatamodel"; sourceTree = "<group>"; };
 		16F51FA019DE8C78007B0BB1 /* PRIVACY */ = {isa = PBXFileReference; lastKnownFileType = text; path = PRIVACY; sourceTree = "<group>"; };
 		16FA68391823CF4600401E9B /* PRItemView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PRItemView.h; sourceTree = "<group>"; };
 		16FA683A1823CF4600401E9B /* PRItemView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = PRItemView.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
@@ -298,10 +298,10 @@
 				164785AC1A2CE7CD00297764 /* NSDictionaryExtensions.swift */,
 				164785AD1A2CE7CD00297764 /* NSStringExtensions.swift */,
 				16CBE1C41A2DFBA500485053 /* Settings.swift */,
-				16075A9517EC7492000D86FD /* API.h */,
-				16075A9617EC7492000D86FD /* API.m */,
-				1617BEE8183F538100E89BB2 /* Reachability.h */,
-				1617BEE9183F538100E89BB2 /* Reachability.m */,
+				16B3B3511A34E9F7000BE6CC /* API.h */,
+				16B3B3521A34E9F7000BE6CC /* API.m */,
+				16B3B3531A34E9F7000BE6CC /* Reachability.h */,
+				16B3B3541A34E9F7000BE6CC /* Reachability.m */,
 			);
 			name = Logic;
 			sourceTree = "<group>";
@@ -416,7 +416,7 @@
 		16B9552E17EC86D10005118F /* Data */ = {
 			isa = PBXGroup;
 			children = (
-				168BC6C517EC2DF000BC4584 /* Trailer.xcdatamodeld */,
+				16B3B33B1A34E990000BE6CC /* Trailer.xcdatamodeld */,
 				16CBE1C01A2DBB2700485053 /* DataManager.swift */,
 				16EE562219B857C90031DF6D /* Models */,
 			);
@@ -427,13 +427,13 @@
 		16EE562219B857C90031DF6D /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				16928CAB1A2B2DED0030AE23 /* DataItem.swift */,
-				16928CA81A2A8E060030AE23 /* PRComment.swift */,
-				16928CBA1A2B3AED0030AE23 /* ApiServer.swift */,
-				16928CB71A2B3AED0030AE23 /* Repo.swift */,
-				16928CB41A2B3AED0030AE23 /* PRStatus.swift */,
-				16928CB11A2B3AED0030AE23 /* PRLabel.swift */,
-				16928CAE1A2B3AED0030AE23 /* PullRequest.swift */,
+				16B3B3101A34E8E2000BE6CC /* ApiServer.swift */,
+				16B3B3111A34E8E2000BE6CC /* DataItem.swift */,
+				16B3B3121A34E8E2000BE6CC /* PRComment.swift */,
+				16B3B3131A34E8E2000BE6CC /* PRLabel.swift */,
+				16B3B3141A34E8E2000BE6CC /* PRStatus.swift */,
+				16B3B3151A34E8E2000BE6CC /* PullRequest.swift */,
+				16B3B3161A34E8E2000BE6CC /* Repo.swift */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -571,37 +571,37 @@
 			buildActionMask = 2147483647;
 			files = (
 				1665B6661882F24400972111 /* UINavigationController+DismissKeyboard.m in Sources */,
+				16B3B31C1A34E8E2000BE6CC /* PRComment.swift in Sources */,
 				169CEB9C1879D5BB0083A068 /* AdvancedSettingsViewController.m in Sources */,
 				1628A6D418789E73005EDA69 /* DetailViewController.m in Sources */,
+				16B3B3561A34E9F7000BE6CC /* API.m in Sources */,
+				16B3B3201A34E8E2000BE6CC /* PRStatus.swift in Sources */,
 				164785AB1A2CE7BD00297764 /* Globals.swift in Sources */,
 				164785B11A2CE7CD00297764 /* NSStringExtensions.swift in Sources */,
-				16928CB91A2B3AED0030AE23 /* Repo.swift in Sources */,
 				1628A6D118789E73005EDA69 /* MasterViewController.m in Sources */,
 				1694372619FD3F4D005079F6 /* ServersViewController.m in Sources */,
 				16CBE1C61A2DFBA500485053 /* Settings.swift in Sources */,
 				164785AF1A2CE7CD00297764 /* NSDictionaryExtensions.swift in Sources */,
-				1628A7081878BC32005EDA69 /* Reachability.m in Sources */,
-				1628A7001878B810005EDA69 /* API.m in Sources */,
 				1628A6C518789E73005EDA69 /* iOS_AppDelegate.m in Sources */,
-				16928CB61A2B3AED0030AE23 /* PRStatus.swift in Sources */,
-				16928CB31A2B3AED0030AE23 /* PRLabel.swift in Sources */,
+				16B3B3181A34E8E2000BE6CC /* ApiServer.swift in Sources */,
 				16EE562019B78DBA0031DF6D /* CommentBlacklistViewController.m in Sources */,
 				1640470A1882ED0000A4AC9C /* AboutTrailerViewController.m in Sources */,
 				1628A6FC1878B64E005EDA69 /* RespositoriesViewController.m in Sources */,
-				16928CAD1A2B2DED0030AE23 /* DataItem.swift in Sources */,
 				16CBE1C21A2DBB2700485053 /* DataManager.swift in Sources */,
-				16928CB01A2B3AED0030AE23 /* PullRequest.swift in Sources */,
 				1694372919FD4056005079F6 /* ServerDetailViewController.m in Sources */,
 				16C54F941881639B00849B76 /* GithubViewController.m in Sources */,
-				1628A7071878BC23005EDA69 /* Trailer.xcdatamodeld in Sources */,
+				16B3B3221A34E8E2000BE6CC /* PullRequest.swift in Sources */,
+				16B3B3241A34E8E2000BE6CC /* Repo.swift in Sources */,
+				16B3B31E1A34E8E2000BE6CC /* PRLabel.swift in Sources */,
 				1604D4CF189541D70064A385 /* EmptyView.m in Sources */,
 				166A19AA19B99C4C004D9057 /* OpenInSafariActivity.m in Sources */,
 				16FDD6DD18804470008D2223 /* PRCell.m in Sources */,
+				16B3B3581A34E9F7000BE6CC /* Reachability.m in Sources */,
 				168FD0121A2A8C28005929CB /* PopTimer.swift in Sources */,
 				1677BB9B1A34CB34008F01B8 /* main.swift in Sources */,
 				16FD14D71881CBC400FDC960 /* PickerViewController.m in Sources */,
-				16928CAA1A2A8E060030AE23 /* PRComment.swift in Sources */,
-				16928CBC1A2B3AED0030AE23 /* ApiServer.swift in Sources */,
+				16B3B31A1A34E8E2000BE6CC /* DataItem.swift in Sources */,
+				16B3B3501A34E990000BE6CC /* Trailer.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -609,35 +609,35 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				16928CB81A2B3AED0030AE23 /* Repo.swift in Sources */,
-				1617BEEA183F538100E89BB2 /* Reachability.m in Sources */,
 				160C5AD318682CD800142482 /* CommentCounts.m in Sources */,
 				16FA683B1823CF4600401E9B /* PRItemView.m in Sources */,
+				16B3B31F1A34E8E2000BE6CC /* PRStatus.swift in Sources */,
 				168A5C77185BBA2F00CB6B02 /* MenuWindow.m in Sources */,
+				16B3B3571A34E9F7000BE6CC /* Reachability.m in Sources */,
+				16B3B34F1A34E990000BE6CC /* Trailer.xcdatamodeld in Sources */,
+				16B3B3211A34E8E2000BE6CC /* PullRequest.swift in Sources */,
 				162002D61A2A49A300FF95F3 /* ViewAllowsVibrancy.swift in Sources */,
 				162002DF1A2A5C9200FF95F3 /* LinkField.swift in Sources */,
-				16928CAC1A2B2DED0030AE23 /* DataItem.swift in Sources */,
+				16B3B31D1A34E8E2000BE6CC /* PRLabel.swift in Sources */,
+				16B3B3231A34E8E2000BE6CC /* Repo.swift in Sources */,
 				16CBE1CA1A2E13A400485053 /* StatusItemView.swift in Sources */,
-				16928CA91A2A8E060030AE23 /* PRComment.swift in Sources */,
 				168BC6C117EC2DF000BC4584 /* OSX_AppDelegate.m in Sources */,
 				162002DD1A2A58B900FF95F3 /* CenterTextField.swift in Sources */,
 				1677BB991A34C9C6008F01B8 /* main.swift in Sources */,
 				164785B01A2CE7CD00297764 /* NSStringExtensions.swift in Sources */,
 				162002E71A2A75BD00FF95F3 /* AvatarView.swift in Sources */,
-				16928CB51A2B3AED0030AE23 /* PRStatus.swift in Sources */,
 				162002DB1A2A545C00FF95F3 /* CenterTextFieldCell.swift in Sources */,
 				16583E481851F082003A7A55 /* SectionHeader.m in Sources */,
+				16B3B3191A34E8E2000BE6CC /* DataItem.swift in Sources */,
+				16B3B3551A34E9F7000BE6CC /* API.m in Sources */,
 				16CBE1C11A2DBB2700485053 /* DataManager.swift in Sources */,
 				162002D01A2A3E2100FF95F3 /* Application.swift in Sources */,
-				16928CAF1A2B3AED0030AE23 /* PullRequest.swift in Sources */,
+				16B3B3171A34E8E2000BE6CC /* ApiServer.swift in Sources */,
 				16CBE1C51A2DFBA500485053 /* Settings.swift in Sources */,
-				16075A9717EC7492000D86FD /* API.m in Sources */,
-				16928CBB1A2B3AED0030AE23 /* ApiServer.swift in Sources */,
 				168FD00E1A2A7AD1005929CB /* MessageView.swift in Sources */,
 				164785AA1A2CE7BD00297764 /* Globals.swift in Sources */,
 				16A794F41A252BFA00A76553 /* PopTimer.swift in Sources */,
-				168BC6C717EC2DF000BC4584 /* Trailer.xcdatamodeld in Sources */,
-				16928CB21A2B3AED0030AE23 /* PRLabel.swift in Sources */,
+				16B3B31B1A34E8E2000BE6CC /* PRComment.swift in Sources */,
 				164785AE1A2CE7CD00297764 /* NSDictionaryExtensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -873,31 +873,32 @@
 /* End XCConfigurationList section */
 
 /* Begin XCVersionGroup section */
-		168BC6C517EC2DF000BC4584 /* Trailer.xcdatamodeld */ = {
+		16B3B33B1A34E990000BE6CC /* Trailer.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
-				16508CD819E1B53E0029ADFE /* Trailer 16.xcdatamodel */,
-				16D223EA19F2811F00B48E88 /* Trailer 17.xcdatamodel */,
-				160E60321A0A28DF00742BA9 /* Trailer 18.xcdatamodel */,
-				168DC6311A2CDB6C007D418F /* Trailer 19.xcdatamodel */,
-				16F2B33E19C070F2005CB433 /* Trailer 15.xcdatamodel */,
-				16EE562119B857930031DF6D /* Trailer 14.xcdatamodel */,
-				1653FD6F1966B2900080D972 /* Trailer 13.xcdatamodel */,
-				16458E37191AC2D200FB13EC /* Trailer 12.xcdatamodel */,
-				162D96F91913F0E7000A54EA /* Trailer 11.xcdatamodel */,
-				16ECCFAF18B7AC5E000B012F /* Trailer 10.xcdatamodel */,
-				16B8A10218AE5E5300C6ECB4 /* Trailer 9.xcdatamodel */,
-				1661667C189BBDAB00FBF4E0 /* Trailer 7.xcdatamodel */,
-				165B5D2318A62FBE0085FCB3 /* Trailer 8.xcdatamodel */,
-				16096DC518927C4C0016357A /* Trailer 6.xcdatamodel */,
-				164976221864935200C13A6B /* Trailer 3.xcdatamodel */,
-				169CEB99187988D00083A068 /* Trailer 4.xcdatamodel */,
-				16AD4E6D18896770001C17B7 /* Trailer 5.xcdatamodel */,
-				1617BEEE183F9C4F00E89BB2 /* Trailer 2.xcdatamodel */,
-				168BC6C617EC2DF000BC4584 /* Trailer.xcdatamodel */,
+				16B3B33C1A34E990000BE6CC /* Trailer 10.xcdatamodel */,
+				16B3B33D1A34E990000BE6CC /* Trailer 11.xcdatamodel */,
+				16B3B33E1A34E990000BE6CC /* Trailer 12.xcdatamodel */,
+				16B3B33F1A34E990000BE6CC /* Trailer 13.xcdatamodel */,
+				16B3B3401A34E990000BE6CC /* Trailer 14.xcdatamodel */,
+				16B3B3411A34E990000BE6CC /* Trailer 15.xcdatamodel */,
+				16B3B3421A34E990000BE6CC /* Trailer 16.xcdatamodel */,
+				16B3B3431A34E990000BE6CC /* Trailer 17.xcdatamodel */,
+				16B3B3441A34E990000BE6CC /* Trailer 18.xcdatamodel */,
+				16B3B3451A34E990000BE6CC /* Trailer 19.xcdatamodel */,
+				16B3B3461A34E990000BE6CC /* Trailer 2.xcdatamodel */,
+				16B3B3471A34E990000BE6CC /* Trailer 3.xcdatamodel */,
+				16B3B3481A34E990000BE6CC /* Trailer 4.xcdatamodel */,
+				16B3B3491A34E990000BE6CC /* Trailer 5.xcdatamodel */,
+				16B3B34A1A34E990000BE6CC /* Trailer 6.xcdatamodel */,
+				16B3B34B1A34E990000BE6CC /* Trailer 7.xcdatamodel */,
+				16B3B34C1A34E990000BE6CC /* Trailer 8.xcdatamodel */,
+				16B3B34D1A34E990000BE6CC /* Trailer 9.xcdatamodel */,
+				16B3B34E1A34E990000BE6CC /* Trailer.xcdatamodel */,
 			);
-			currentVersion = 168DC6311A2CDB6C007D418F /* Trailer 19.xcdatamodel */;
-			path = Trailer.xcdatamodeld;
+			currentVersion = 16B3B3451A34E990000BE6CC /* Trailer 19.xcdatamodel */;
+			name = Trailer.xcdatamodeld;
+			path = ../Shared/Trailer.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
 		};
