@@ -280,7 +280,7 @@
 				168C6ECC18B2104100E41D85 /* LICENSE */,
 				16F51FA019DE8C78007B0BB1 /* PRIVACY */,
 				168C6ECD18B2104100E41D85 /* README.md */,
-				16B3B3591A34EAEE000BE6CC /* main.swift */,
+				16B3B35C1A34F859000BE6CC /* Globals */,
 				1628A6F518789F85005EDA69 /* Logic */,
 				16B9552E17EC86D10005118F /* Data */,
 			);
@@ -290,8 +290,6 @@
 		1628A6F518789F85005EDA69 /* Logic */ = {
 			isa = PBXGroup;
 			children = (
-				16CBE1C31A2DF61C00485053 /* GlobalsObjC.h */,
-				164785A91A2CE7BD00297764 /* Globals.swift */,
 				16A794F31A252BFA00A76553 /* PopTimer.swift */,
 				164785AC1A2CE7CD00297764 /* NSDictionaryExtensions.swift */,
 				164785AD1A2CE7CD00297764 /* NSStringExtensions.swift */,
@@ -409,6 +407,16 @@
 				166A19A819B99C48004D9057 /* OpenInSafariActivity.m */,
 			);
 			name = Extensions;
+			sourceTree = "<group>";
+		};
+		16B3B35C1A34F859000BE6CC /* Globals */ = {
+			isa = PBXGroup;
+			children = (
+				16B3B3591A34EAEE000BE6CC /* main.swift */,
+				16CBE1C31A2DF61C00485053 /* GlobalsObjC.h */,
+				164785A91A2CE7BD00297764 /* Globals.swift */,
+			);
+			name = Globals;
 			sourceTree = "<group>";
 		};
 		16B9552E17EC86D10005118F /* Data */ = {
