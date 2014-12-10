@@ -11,7 +11,7 @@
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
-        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customObject id="-3" userLabel="Application" customClass="Application" customModule="Trailer" customModuleProvider="target"/>
         <window title="Trailer Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="371">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" resizable="YES"/>
             <rect key="contentRect" x="335" y="390" width="782" height="460"/>
@@ -1192,7 +1192,7 @@ Enter to select and ⌘, for preferences.
             <connections>
                 <outlet property="delegate" destination="494" id="wwK-Xp-Xzn"/>
             </connections>
-            <point key="canvasLocation" x="626" y="488"/>
+            <point key="canvasLocation" x="209" y="309"/>
         </window>
         <customObject id="494" customClass="OSX_AppDelegate">
             <connections>
@@ -1485,6 +1485,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                     </button>
                 </subviews>
             </view>
+            <point key="canvasLocation" x="114" y="479.5"/>
         </window>
     </objects>
     <resources>

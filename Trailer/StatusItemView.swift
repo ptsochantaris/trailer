@@ -8,6 +8,9 @@ class StatusItemView: NSView {
 	init(frame: NSRect, label: String, attributes: Dictionary<String, AnyObject>) {
 		self.label = label
 		self.textAttributes = attributes
+		highlighted = false
+		grayOut = false
+		darkMode = false
 		super.init(frame: frame)
 		darkMode = StatusItemView.checkDarkMode()
 	}
@@ -27,24 +30,16 @@ class StatusItemView: NSView {
 	}
 
 	var grayOut: Bool {
-		get {
-			return self.grayOut
-		}
-		set {
-			if grayOut != newValue {
-				self.grayOut = newValue
+		didSet {
+			if grayOut != oldValue {
 				needsDisplay = true
 			}
 		}
 	}
 
 	var darkMode: Bool {
-		get {
-			return self.grayOut
-		}
-		set {
-			if(darkMode != newValue) {
-				self.darkMode = newValue;
+		didSet {
+			if(darkMode != oldValue) {
 				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
 					NSNotificationCenter.defaultCenter().postNotificationName(DARK_MODE_CHANGED, object:nil)
 				}
@@ -53,12 +48,8 @@ class StatusItemView: NSView {
 	}
 
 	var highlighted: Bool {
-		get {
-			return self.highlighted
-		}
-		set {
-			if highlighted != newValue {
-				self.highlighted = newValue
+		didSet {
+			if highlighted != oldValue {
 				needsDisplay = true
 			}
 		}

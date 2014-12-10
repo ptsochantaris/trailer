@@ -1149,8 +1149,10 @@ NSString *currentAppVersion;
 
 - (Repo *)repoForRow:(NSUInteger)row
 {
-	if(row>[DataManager countParentRepos:self.repoFilter.stringValue]) row--;
-	return [self getFilteredRepos][row-1];
+	NSInteger parentCount = [DataManager countParentRepos:self.repoFilter.stringValue];
+	if(row>parentCount) row--;
+	NSArray *filteredRepos = [self getFilteredRepos];
+	return filteredRepos[row-1];
 }
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification

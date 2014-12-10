@@ -71,7 +71,9 @@ class Repo: DataItem {
 		let f = NSFetchRequest(entityName: "Repo")
 		f.returnsObjectsAsFaults = false
 		if let filterText = filter {
-			f.predicate = NSPredicate(format: "fullName contains [cd] %@", filterText)
+			if filterText.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 0 {
+				f.predicate = NSPredicate(format: "fullName contains [cd] %@", filterText)
+			}
 		}
 		f.sortDescriptors = [
 			NSSortDescriptor(key: "fork", ascending: true),

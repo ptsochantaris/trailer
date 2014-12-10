@@ -30,11 +30,9 @@
 		164785AF1A2CE7CD00297764 /* NSDictionaryExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785AC1A2CE7CD00297764 /* NSDictionaryExtensions.swift */; };
 		164785B01A2CE7CD00297764 /* NSStringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785AD1A2CE7CD00297764 /* NSStringExtensions.swift */; };
 		164785B11A2CE7CD00297764 /* NSStringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785AD1A2CE7CD00297764 /* NSStringExtensions.swift */; };
-		164CCC3B1A2CEA19007E4C01 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 164785B41A2CE82D00297764 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		16583E481851F082003A7A55 /* SectionHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 16583E471851F082003A7A55 /* SectionHeader.m */; };
 		1665B6661882F24400972111 /* UINavigationController+DismissKeyboard.m in Sources */ = {isa = PBXBuildFile; fileRef = 1665B6651882F24400972111 /* UINavigationController+DismissKeyboard.m */; };
 		166A19AA19B99C4C004D9057 /* OpenInSafariActivity.m in Sources */ = {isa = PBXBuildFile; fileRef = 166A19A819B99C48004D9057 /* OpenInSafariActivity.m */; };
-		1677BB971A34C147008F01B8 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 164785B41A2CE82D00297764 /* Sparkle.framework */; };
 		168A5C77185BBA2F00CB6B02 /* MenuWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 168A5C76185BBA2F00CB6B02 /* MenuWindow.m */; };
 		168BC6B817EC2DF000BC4584 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 168BC6B617EC2DF000BC4584 /* InfoPlist.strings */; };
 		168BC6C117EC2DF000BC4584 /* OSX_AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 168BC6C017EC2DF000BC4584 /* OSX_AppDelegate.m */; };
@@ -45,6 +43,8 @@
 		1694372619FD3F4D005079F6 /* ServersViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1694372519FD3F4D005079F6 /* ServersViewController.m */; };
 		1694372919FD4056005079F6 /* ServerDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1694372819FD4056005079F6 /* ServerDetailViewController.m */; };
 		169CEB9C1879D5BB0083A068 /* AdvancedSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 169CEB9B1879D5BB0083A068 /* AdvancedSettingsViewController.m */; };
+		16A505E01A3888D6005DD3B7 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16A505DF1A3888D6005DD3B7 /* Sparkle.framework */; };
+		16A505E21A3889B9005DD3B7 /* Sparkle.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 16A505DF1A3888D6005DD3B7 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		16A794F41A252BFA00A76553 /* PopTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A794F31A252BFA00A76553 /* PopTimer.swift */; };
 		16B3B3171A34E8E2000BE6CC /* ApiServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3101A34E8E2000BE6CC /* ApiServer.swift */; };
 		16B3B3181A34E8E2000BE6CC /* ApiServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3101A34E8E2000BE6CC /* ApiServer.swift */; };
@@ -82,14 +82,15 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		16B9406A182D076E00F32061 /* CopyFiles */ = {
+		16A505D71A387C99005DD3B7 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				164CCC3B1A2CEA19007E4C01 /* Sparkle.framework in CopyFiles */,
+				16A505E21A3889B9005DD3B7 /* Sparkle.framework in Embed Frameworks */,
 			);
+			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -129,7 +130,6 @@
 		164785AD1A2CE7CD00297764 /* NSStringExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NSStringExtensions.swift; path = Shared/NSStringExtensions.swift; sourceTree = "<group>"; };
 		164785B21A2CE7FB00297764 /* PocketTrailer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PocketTrailer-Bridging-Header.h"; sourceTree = "<group>"; };
 		164785B31A2CE80800297764 /* Trailer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Trailer-Bridging-Header.h"; sourceTree = "<group>"; };
-		164785B41A2CE82D00297764 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = Trailer/Sparkle.framework; sourceTree = "<group>"; };
 		16583E461851F082003A7A55 /* SectionHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SectionHeader.h; sourceTree = "<group>"; };
 		16583E471851F082003A7A55 /* SectionHeader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SectionHeader.m; sourceTree = "<group>"; };
 		1665B6641882F24400972111 /* UINavigationController+DismissKeyboard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UINavigationController+DismissKeyboard.h"; sourceTree = "<group>"; };
@@ -155,6 +155,7 @@
 		1694372819FD4056005079F6 /* ServerDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = ServerDetailViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		169CEB9A1879D5BB0083A068 /* AdvancedSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdvancedSettingsViewController.h; sourceTree = "<group>"; };
 		169CEB9B1879D5BB0083A068 /* AdvancedSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = AdvancedSettingsViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		16A505DF1A3888D6005DD3B7 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = Trailer/Sparkle.framework; sourceTree = "<group>"; };
 		16A794F31A252BFA00A76553 /* PopTimer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PopTimer.swift; path = Shared/PopTimer.swift; sourceTree = "<group>"; };
 		16B3B3101A34E8E2000BE6CC /* ApiServer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ApiServer.swift; path = Shared/ApiServer.swift; sourceTree = SOURCE_ROOT; };
 		16B3B3111A34E8E2000BE6CC /* DataItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DataItem.swift; path = Shared/DataItem.swift; sourceTree = SOURCE_ROOT; };
@@ -217,7 +218,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1677BB971A34C147008F01B8 /* Sparkle.framework in Frameworks */,
+				16A505E01A3888D6005DD3B7 /* Sparkle.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -354,7 +355,7 @@
 		168BC6AC17EC2DF000BC4584 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				164785B41A2CE82D00297764 /* Sparkle.framework */,
+				16A505DF1A3888D6005DD3B7 /* Sparkle.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -494,7 +495,7 @@
 				168BC6A617EC2DF000BC4584 /* Sources */,
 				168BC6A717EC2DF000BC4584 /* Frameworks */,
 				168BC6A817EC2DF000BC4584 /* Resources */,
-				16B9406A182D076E00F32061 /* CopyFiles */,
+				16A505D71A387C99005DD3B7 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -802,6 +803,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -822,6 +824,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
