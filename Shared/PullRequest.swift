@@ -252,13 +252,11 @@ class PullRequest: DataItem {
 					#if os(iOS)
 						lp.lineHeightMultiple = 1.15;
 						let labelAttributes = [NSFontAttributeName: labelFont,
-						NSBackgroundColorAttributeName: COLOR_CLASS.clearColor(),
 						NSBaselineOffsetAttributeName: 2.0,
 						NSParagraphStyleAttributeName: lp]
 						#elseif os(OSX)
 						lp.minimumLineHeight = labelFont.pointSize+6.0;
 						let labelAttributes = [NSFontAttributeName: labelFont,
-							NSBackgroundColorAttributeName: COLOR_CLASS.clearColor(),
 							NSBaselineOffsetAttributeName: 1.0,
 							NSParagraphStyleAttributeName: lp]
 					#endif

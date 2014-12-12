@@ -6,9 +6,9 @@ NSString *currentAppVersion;
 
 @implementation OSX_AppDelegate
 {
-	// Keyboard support
 	id globalKeyMonitor, localKeyMonitor;
-	NSMutableArray *currentPRItems;
+	PopTimer *mouseIgnoreTimer, *filterTimer;
+	NSView *messageView;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
@@ -17,14 +17,26 @@ NSString *currentAppVersion;
 
 	self.mainMenu.backgroundColor = [COLOR_CLASS whiteColor];
 
-	self.filterTimer = [[PopTimer alloc] initWithTimeInterval:0.2
+	filterTimer = [[PopTimer alloc] initWithTimeInterval:0.2
+												callback:^{
+													[app updateMenu];
+													[app scrollToTop];
+												}];
+
+	mouseIgnoreTimer = [[PopTimer alloc] initWithTimeInterval:0.4
 													 callback:^{
-														 [self filterTimerPopped];
+														 app.isManuallyScrolling = NO;
 													 }];
 
 	[self setupSortMethodMenu];
 
 	[DataManager postProcessAllPrs];
+
+	self.pullRequestDelegate = [[PullRequestDelegate alloc] initWithSectionDelegate:self];
+	NSTableColumn *prColumn = self.mainMenu.prTable.tableColumns[0];
+	prColumn.width = MENU_WIDTH;
+	self.mainMenu.prTable.dataSource = self.pullRequestDelegate;
+	self.mainMenu.prTable.delegate = self.pullRequestDelegate;
 
 	[self updateScrollBarWidth]; // also updates menu
 
@@ -52,11 +64,6 @@ NSString *currentAppVersion;
 	[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(networkStateChanged)
 												 name:kReachabilityChangedNotification
-											   object:nil];
-
-	[[NSNotificationCenter defaultCenter] addObserver:self
-											 selector:@selector(prItemFocused:)
-												 name:PR_ITEM_FOCUSED_NOTIFICATION_KEY
 											   object:nil];
 
 	[[NSNotificationCenter defaultCenter] addObserver:self
@@ -541,39 +548,35 @@ NSString *currentAppVersion;
 	}
 }
 
-- (void)prItemSelected:(PRItemView *)item alternativeSelect:(BOOL)isAlternative
+- (void)prItemSelected:(PullRequest *)pullRequest alternativeSelect:(BOOL)isAlternative
 {
+	[self.mainMenu.filter becomeFirstResponder];
+
 	self.ignoreNextFocusLoss = isAlternative;
 
-	PullRequest *r = item.associatedPullRequest;
-	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:r.urlForOpening]];
-	[r catchUpWithComments];
+	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:pullRequest.urlForOpening]];
+	[pullRequest catchUpWithComments];
 
-	NSInteger reSelectIndex = -1;
-	if(isAlternative)
-	{
-		PRItemView *v = [self focusedItemView];
-		if(v) reSelectIndex = [currentPRItems indexOfObject:v];
-	}
+	NSInteger reSelectIndex = isAlternative ? self.mainMenu.prTable.selectedRow : -1;
 
 	[self updateMenu];
 
-	if(reSelectIndex>-1 && reSelectIndex<currentPRItems.count)
+	if(reSelectIndex>-1 && reSelectIndex<self.mainMenu.prTable.numberOfRows)
 	{
-		PRItemView *v = currentPRItems[reSelectIndex];
-		v.focused = YES;
+		[self.mainMenu.prTable selectRowIndexes:[NSIndexSet indexSetWithIndex:reSelectIndex] byExtendingSelection:NO];
 	}
 }
 
-- (void)statusItemTapped:(StatusItemView *)statusItem
+- (void)statusItemTapped
 {
-	if(self.statusItemView.highlighted)
+	StatusItemView *v = (StatusItemView*)self.statusItem.view;
+	if(v.highlighted)
 	{
 		[self closeMenu];
 	}
 	else
 	{
-		self.statusItemView.highlighted = YES;
+		v.highlighted = YES;
 		[self sizeMenuAndShow:YES];
 	}
 }
@@ -592,14 +595,30 @@ NSString *currentAppVersion;
 - (void)sizeMenuAndShow:(BOOL)show
 {
 	NSScreen *screen = [NSScreen mainScreen];
-	CGFloat menuLeft = self.statusItemView.window.frame.origin.x;
 	CGFloat rightSide = screen.visibleFrame.origin.x+screen.visibleFrame.size.width;
+	StatusItemView *siv = (StatusItemView*)self.statusItem.view;
+	CGFloat menuLeft = siv.window.frame.origin.x;
 	CGFloat overflow = (menuLeft+MENU_WIDTH)-rightSide;
 	if(overflow>0) menuLeft -= overflow;
 
+	CGFloat menuHeight = TOP_HEADER_HEIGHT;
+	NSInteger rowCount = self.mainMenu.prTable.numberOfRows;
 	CGFloat screenHeight = screen.visibleFrame.size.height;
-	CGFloat offset = TOP_HEADER_HEIGHT;
-	CGFloat menuHeight = offset+[self.mainMenu.scrollView.documentView frame].size.height;
+	if(rowCount==0)
+	{
+		menuHeight += 95;
+	}
+	else
+	{
+		menuHeight += 30;
+		for(NSInteger f=0;f<rowCount;f++)
+		{
+			NSView *rowView = [self.mainMenu.prTable viewAtColumn:0 row:f makeIfNecessary:YES];
+			menuHeight += rowView.frame.size.height;
+			if(menuHeight>=screenHeight) break;
+		}
+	}
+
 	CGFloat bottom = screen.visibleFrame.origin.y;
 	if(menuHeight<screenHeight)
 	{
@@ -610,14 +629,11 @@ NSString *currentAppVersion;
 		menuHeight = screenHeight;
 	}
 
-	CGRect frame = CGRectMake(menuLeft, bottom, MENU_WIDTH, menuHeight);
-	//DLog(@"Will show menu at %f, %f - %f x %f",frame.origin.x,frame.origin.y,frame.size.width,frame.size.height);
-	[self.mainMenu setFrame:frame display:NO animate:NO];
+	[self.mainMenu setFrame:CGRectMake(menuLeft, bottom, MENU_WIDTH, menuHeight)
+					display:NO
+					animate:NO];
 
-	if(show)
-	{
-		[self displayMenu];
-	}
+	if(show) [self displayMenu];
 }
 
 - (void)displayMenu
@@ -631,9 +647,10 @@ NSString *currentAppVersion;
 
 - (void)closeMenu
 {
-	self.statusItemView.highlighted = NO;
+	StatusItemView *siv = (StatusItemView*)self.statusItem.view;
+	siv.highlighted = NO;
 	[self.mainMenu orderOut:nil];
-	for(PRItemView *v in currentPRItems) v.focused = NO;
+	[self.mainMenu.prTable deselectAll:nil];
 }
 
 - (void)sectionHeaderRemoveSelectedFrom:(SectionHeader *)header
@@ -692,7 +709,7 @@ NSString *currentAppVersion;
 			}
 		}
 	}
-	if(!self.mainMenu.isVisible) [self statusItemTapped:nil];
+	if(!self.mainMenu.isVisible) [self statusItemTapped];
 }
 
 - (void)removeAllMergedRequests
@@ -713,15 +730,14 @@ NSString *currentAppVersion;
 	[self updateMenu];
 }
 
-- (void)unPinSelectedFrom:(PRItemView *)item
+- (void)unPinSelectedFor:(PullRequest *)pullRequest
 {
-	PullRequest *r = item.associatedPullRequest;
-	[DataManager.managedObjectContext deleteObject:r];
+	[DataManager.managedObjectContext deleteObject:pullRequest];
 	[DataManager saveDB];
 	[self updateMenu];
 }
 
-- (void)buildPrMenuItemsFromList:(NSArray *)pullRequests
+/*- (void)buildPrMenuItemsFromList:(NSArray *)pullRequests
 {
 	currentPRItems = [NSMutableArray array];
 
@@ -785,7 +801,7 @@ NSString *currentAppVersion;
 	CGPoint lastPos = self.mainMenu.scrollView.contentView.documentVisibleRect.origin;
 	self.mainMenu.scrollView.documentView = menuContents;
 	[self.mainMenu.scrollView.documentView scrollPoint:lastPos];
-}
+}*/
 
 - (void)startRateLimitHandling
 {
@@ -852,7 +868,6 @@ NSString *currentAppVersion;
 	[DataManager saveDB];
 }
 
-
 - (IBAction)apiServerReportErrorSelected:(NSButton *)sender
 {
 	ApiServer *apiServer = [self selectedServer];
@@ -894,9 +909,9 @@ NSString *currentAppVersion;
 	{
 		[self.projectsTable reloadData];
 	}
-	else if(obj.object==self.mainMenuFilter)
+	else if(obj.object==self.mainMenu.filter)
 	{
-		[self.filterTimer push];
+		[filterTimer push];
 	}
 	else if(obj.object==self.statusTermsField)
 	{
@@ -919,12 +934,6 @@ NSString *currentAppVersion;
 	}
 }
 
-- (void)filterTimerPopped
-{
-	[self updateMenu];
-	[self scrollToTop];
-}
-
 - (void)reset
 {
 	self.preferencesDirty = YES;
@@ -939,7 +948,7 @@ NSString *currentAppVersion;
 
 - (IBAction)markAllReadSelected:(NSMenuItem *)sender
 {
-	NSFetchRequest *f = [PullRequest requestForPullRequestsWithFilter:self.mainMenuFilter.stringValue];
+	NSFetchRequest *f = [PullRequest requestForPullRequestsWithFilter:self.mainMenu.filter.stringValue];
 
 	for(PullRequest *r in [DataManager.managedObjectContext executeFetchRequest:f error:nil])
 		[r catchUpWithComments];
@@ -1245,6 +1254,11 @@ NSString *currentAppVersion;
 	{
 		return [self getFilteredRepos].count+2;
 	}
+	else if(tableView==self.mainMenu.prTable)
+	{
+		NSFetchRequest *f = [PullRequest requestForPullRequestsWithFilter:self.mainMenu.filter.stringValue];
+		return [DataManager.managedObjectContext countForFetchRequest:f error:nil];
+	}
 	else
 	{
 		return [ApiServer countApiServersInMoc:DataManager.managedObjectContext];
@@ -1275,9 +1289,7 @@ NSString *currentAppVersion;
 
 - (void)scrollToTop
 {
-	id documentView = self.mainMenu.scrollView.documentView;
-	CGFloat y = [documentView frame].size.height;
-	[documentView scrollPoint:CGPointMake(0, y)];
+	[self.mainMenu.prTable scrollToBeginningOfDocument:nil];
 }
 
 - (void)windowDidBecomeKey:(NSNotification *)notification
@@ -1291,10 +1303,9 @@ NSString *currentAppVersion;
 		else
 		{
 			[self scrollToTop];
-			for(PRItemView *v in currentPRItems)
-				v.focused = NO;
+			[self.mainMenu.prTable deselectAll:nil];
 		}
-		[self.mainMenuFilter becomeFirstResponder];
+		[self.mainMenu.filter becomeFirstResponder];
 	}
 }
 
@@ -1438,16 +1449,18 @@ NSString *currentAppVersion;
 	[self.refreshButton setEnabled:NO];
 	[self.projectsTable setEnabled:NO];
 	[self.activityDisplay startAnimation:nil];
-	self.statusItemView.grayOut = YES;
+	StatusItemView *siv = (StatusItemView *)self.statusItem.view;
+	siv.grayOut = YES;
 
 	[api expireOldImageCacheEntries];
 	[DataManager postMigrationTasks];
 
 	self.isRefreshing = YES;
 
-	for(NSView *v in [self.mainMenu.scrollView.documentView subviews])
-		if([v isKindOfClass:[MessageView class]])
-			[self updateMenu];
+	if(messageView)
+	{
+		[self updateMenu];
+	}
 
 	self.refreshNow.title = @" Refreshing...";
 
@@ -1498,11 +1511,6 @@ NSString *currentAppVersion;
 	}];
 }
 
-- (void)refreshMainWithTarget:(id)oldTarget action:(SEL)oldaction
-{
-
-}
-
 - (IBAction)refreshDurationChanged:(NSStepper *)sender
 {
 	Settings.refreshPeriod = self.refreshDurationStepper.floatValue;
@@ -1526,30 +1534,29 @@ NSString *currentAppVersion;
 
 - (void)updateMenu
 {
-	NSManagedObjectContext *moc = DataManager.managedObjectContext;
-	NSFetchRequest *f = [PullRequest requestForPullRequestsWithFilter:self.mainMenuFilter.stringValue];
-	NSArray *pullRequests = [moc executeFetchRequest:f error:nil];
-
 	NSString *countString;
 	NSDictionary *attributes;
+	NSManagedObjectContext *moc = DataManager.managedObjectContext;
 	if([ApiServer shouldReportRefreshFailureInMoc:moc])
 	{
 		countString = @"X";
-		attributes = @{
-					   NSFontAttributeName: [NSFont boldSystemFontOfSize:10.0],
-					   NSForegroundColorAttributeName: MAKECOLOR(0.8, 0.0, 0.0, 1.0),
-					   };
+		attributes = @{ NSFontAttributeName: [NSFont boldSystemFontOfSize:10.0],
+					    NSForegroundColorAttributeName: MAKECOLOR(0.8, 0.0, 0.0, 1.0) };
 	}
 	else
 	{
 		NSUInteger count;
-
 		if(Settings.countOnlyListedPrs)
-			count = pullRequests.count;
+		{
+			NSFetchRequest *f = [PullRequest requestForPullRequestsWithFilter:self.mainMenu.filter.stringValue];
+			count = [moc countForFetchRequest:f error:nil];
+		}
 		else
+		{
 			count = [PullRequest countOpenRequestsInMoc:moc];
+		}
 
-		countString = [NSString stringWithFormat:@"%ld",count];
+		countString = [NSString stringWithFormat:@"%ld", count];
 
 		if([PullRequest badgeCountInMoc:moc]>0)
 		{
@@ -1572,20 +1579,30 @@ NSString *currentAppVersion;
 	CGFloat length = H+width+STATUSITEM_PADDING*3;
 	if(!self.statusItem) self.statusItem = [statusBar statusItemWithLength:NSVariableStatusItemLength];
 
-	self.statusItemView = [[StatusItemView alloc] initWithFrame:CGRectMake(0, 0, length, H)
+	StatusItemView *siv = [[StatusItemView alloc] initWithFrame:CGRectMake(0, 0, length, H)
 														  label:countString
 													 attributes:attributes];
-	self.statusItemView.highlighted = [self.mainMenu isVisible];
-	self.statusItemView.grayOut = self.isRefreshing;
+	siv.highlighted = [self.mainMenu isVisible];
+	siv.grayOut = self.isRefreshing;
 
 	__weak OSX_AppDelegate *weakSelf = self;
-	self.statusItemView.tappedCallback = ^{
-		[weakSelf statusItemTapped:weakSelf.statusItemView];
+	siv.tappedCallback = ^{
+		[weakSelf statusItemTapped];
 	};
 
-	self.statusItem.view = self.statusItemView;
+	self.statusItem.view = siv;
 
-	[self buildPrMenuItemsFromList:pullRequests];
+	[self.pullRequestDelegate reloadData:self.mainMenu.filter.stringValue];
+	[self.mainMenu.prTable reloadData];
+
+	[messageView removeFromSuperview];
+
+	if(self.mainMenu.prTable.numberOfRows == 0)
+	{
+		messageView = [[MessageView alloc] initWithFrame:CGRectMake(0, 0, MENU_WIDTH, 100)
+												 message:[DataManager reasonForEmptyWithFilter:self.mainMenu.filter.stringValue]];
+		[self.mainMenu.contentView addSubview:messageView];
+	}
 
 	[self sizeMenuAndShow:NO];
 }
@@ -1801,39 +1818,22 @@ NSString *currentAppVersion;
 		{
 			case 125: // down
 			{
-				PRItemView *v = [self focusedItemView];
-				NSInteger i = -1;
-				if(v) i = [currentPRItems indexOfObject:v];
-				if(i<(NSInteger)currentPRItems.count-1)
-				{
-					i++;
-					v.focused = NO;
-					v = currentPRItems[i];
-					v.focused = YES;
-					[self.mainMenu scrollToView:v];
-				}
+				NSInteger i = self.mainMenu.prTable.selectedRow+1;
+				if(i<self.mainMenu.prTable.numberOfRows) [self scrollToIndex:i];
 				return nil;
 			}
 			case 126: // up
 			{
-				PRItemView *v = [self focusedItemView];
-				NSInteger i = currentPRItems.count;
-				if(v) i = [currentPRItems indexOfObject:v];
-				if(i>0)
-				{
-					i--;
-					v.focused = NO;
-					v = currentPRItems[i];
-					v.focused = YES;
-					[self.mainMenu scrollToView:v];
-				}
+				NSInteger i = self.mainMenu.prTable.selectedRow-1;
+				if(i>=0) [self scrollToIndex:i];
 				return nil;
 			}
 			case 36: // enter
 			{
-				PRItemView *v = [self focusedItemView];
+				NSInteger i = self.mainMenu.prTable.selectedRow;
+				PRItemView *v = [self.mainMenu.prTable rowViewAtRow:i makeIfNecessary:NO];
 				BOOL isAlternative = ((incomingEvent.modifierFlags & NSAlternateKeyMask) == NSAlternateKeyMask);
-				if(v) [self prItemSelected:v alternativeSelect:isAlternative];
+				if(v) [self prItemSelected:[v associatedPullRequest] alternativeSelect:isAlternative];
 				return nil;
 			}
 		}
@@ -1842,35 +1842,27 @@ NSString *currentAppVersion;
 	}];
 }
 
+- (void)scrollToIndex:(NSInteger)i
+{
+	[self.mainMenu.prTable selectRowIndexes:[NSIndexSet indexSetWithIndex:i] byExtendingSelection:NO];
+	[self.mainMenu.prTable scrollRowToVisible:i];
+	app.isManuallyScrolling = YES;
+	[mouseIgnoreTimer push];
+}
+
 - (NSString *)focusedItemUrl
 {
-	PRItemView *v = [self focusedItemView];
-	v.focused = NO;
-	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-		v.focused = YES;
-	});
-	return v.associatedPullRequest.webUrl;
-}
-
-- (void)prItemFocused:(NSNotification *)focusedNotification
-{
-	BOOL state = [focusedNotification.userInfo[PR_ITEM_FOCUSED_STATE_KEY] boolValue];
-	if(state)
+	NSInteger row = self.mainMenu.prTable.selectedRow;
+	PullRequest *pr = nil;
+	if(row>=0)
 	{
-		PRItemView *itemView = focusedNotification.object;
-		for(PRItemView *v in currentPRItems)
-			if(itemView!=v)
-				v.focused = NO;
+		[self.mainMenu.prTable deselectAll:nil];
+		pr = [self.pullRequestDelegate pullRequestAtRow:row];
 	}
-}
-
-- (PRItemView *)focusedItemView
-{
-	for(PRItemView *v in currentPRItems)
-		if(v.focused)
-			return v;
-
-	return nil;
+	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+		[self.mainMenu.prTable selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+	});
+	return pr.webUrl;
 }
 
 - (BOOL)checkForHotkey:(NSEvent *)incomingEvent
@@ -1947,7 +1939,7 @@ NSString *currentAppVersion;
 		NSNumber *n = codeLookup[Settings.hotkeyLetter];
 		if(incomingEvent.keyCode==n.integerValue)
 		{
-			[self statusItemTapped:self.statusItemView];
+			[self statusItemTapped];
 			return YES;
 		}
 	}

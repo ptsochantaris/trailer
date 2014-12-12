@@ -1,5 +1,4 @@
 #import "CommentCounts.h"
-#import "MenuWindow.h"
 
 static NSDictionary *_commentAlertAttributes;
 static NSNumberFormatter *formatter;
@@ -74,11 +73,12 @@ typedef NS_ENUM(NSInteger, RoundedCorners) {
 		CGFloat left = (self.bounds.size.width-width)*0.5;
 
 		CGRect countRect = CGRectMake(left, bottom, width, height);
+		StatusItemView *v = (StatusItemView*)app.statusItem.view;
 		[self drawRoundRect:countRect
 				  withColor:[MenuWindow usingVibrancy] ? [COLOR_CLASS controlLightHighlightColor].CGColor : MAKECOLOR(0.94, 0.94, 0.94, 1.0).CGColor
 					corners:kRoundedCornerTopLeft|kRoundedCornerBottomLeft|kRoundedCornerBottomRight|kRoundedCornerTopRight
 					 radius:4.0
-					   fill:!([MenuWindow usingVibrancy] && app.statusItemView.darkMode)
+					   fill:!([MenuWindow usingVibrancy] && v.darkMode)
 				  inContext:context];
 
 		countRect = CGRectOffset(countRect, 0, -3.0);

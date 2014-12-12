@@ -66,10 +66,15 @@ typedef void (^completionBlockType)();
 
 #define API_USAGE_UPDATE @"RateUpdateNotification"
 #define DARK_MODE_CHANGED @"DarkModeChangedNotificationKey"
+#define PR_ITEM_FOCUSED_STATE_KEY @"PrItemFocusedStateKey"
+#define UPDATE_VIBRANCY_NOTIFICATION @"UpdateVibrancyNotfication"
 
 #define NETWORK_TIMEOUT 120.0
 #define BACKOFF_STEP 120.0
 #define STATUSITEM_PADDING 1.0
+#define TOP_HEADER_HEIGHT 28.0
+#define AVATAR_SIZE 26.0
+#define LEFTPADDING 44.0
 
 void DLog(NSString *format, ...);
 extern NSString *currentAppVersion;

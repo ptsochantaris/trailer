@@ -1,31 +1,14 @@
 
-#define AVATAR_SIZE 26.0
-#define LEFTPADDING 44.0
-
-#define PR_ITEM_FOCUSED_NOTIFICATION_KEY @"PrItemFocusedNotificationKey"
-#define PR_ITEM_FOCUSED_STATE_KEY @"PrItemFocusedStateKey"
-#define UPDATE_VIBRANCY_NOTIFICATION @"UpdateVibrancyNotfication"
-
-@class PRItemView;
-
-
-@protocol PRItemViewDelegate <NSObject>
-
-- (void)unPinSelectedFrom:(PRItemView *)item;
-- (void)prItemSelected:(PRItemView *)item alternativeSelect:(BOOL)isAlternative;
-
-@end
-
 @class PullRequest;
 
-@interface PRItemView : NSView
+@interface PRItemView : NSTableCellView
 
-@property (nonatomic,weak) id<PRItemViewDelegate> delegate;
-@property (nonatomic) BOOL focused;
+@property (nonatomic) BOOL selected;
 
-- (instancetype)initWithPullRequest:(PullRequest *)pullRequest
-						   delegate:(id<PRItemViewDelegate>)delegate;
+- (instancetype)initWithPullRequest:(PullRequest *)pullRequest;
 
 - (PullRequest *)associatedPullRequest;
+
+- (NSString *)stringForCopy;
 
 @end

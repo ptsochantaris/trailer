@@ -170,7 +170,7 @@ class DataManager : NSObject {
 			return [NOTIFICATION_URL_KEY : (item as PullRequest).webUrl!, PULL_REQUEST_ID_KEY: item.objectID.URIRepresentation().absoluteString!]
 		case .NewRepoSubscribed: fallthrough
 		case .NewRepoAnnouncement:
-			return [NOTIFICATION_URL_KEY : (item as PullRequest).webUrl!]
+			return [NOTIFICATION_URL_KEY : (item as Repo).webUrl!]
 		default:
 			break
 		}

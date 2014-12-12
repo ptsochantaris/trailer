@@ -597,7 +597,7 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 					 }
 					 else
 					 {
-						 DLog(@"The rest of these received events we've processed, stopping event parsing");
+						 DLog(@"The rest of these received events are processed, stopping event parsing");
 						 return YES;
 					 }
 				 }
@@ -648,7 +648,7 @@ usingReceivedEventsFromServer:(ApiServer *)apiServer
 					 }
 					 else
 					 {
-						 DLog(@"The rest of these user events we've processed, stopping event parsing");
+						 DLog(@"The rest of these user events are processed, stopping event parsing");
 						 return YES;
 					 }
 				 }

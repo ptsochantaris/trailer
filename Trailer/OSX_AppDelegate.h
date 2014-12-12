@@ -1,10 +1,9 @@
 
 #import "PRItemView.h"
 #import "SectionHeader.h"
-#import "MenuWindow.h"
 #import "API.h"
 
-@class PopTimer, StatusItemView;
+@class PopTimer, StatusItemView, PullRequestDelegate, MenuWindow;
 
 @interface OSX_AppDelegate : NSObject <
 	NSApplicationDelegate,
@@ -13,7 +12,6 @@
 	NSTabViewDelegate,
 	NSWindowDelegate,
 	NSUserNotificationCenterDelegate,
-	PRItemViewDelegate,
 	SectionHeaderDelegate
 >
 
@@ -40,7 +38,6 @@
 @property (weak) IBOutlet NSButton *dontConfirmRemoveAllClosed;
 @property (weak) IBOutlet NSButton *displayRepositoryNames;
 @property (weak) IBOutlet NSButton *includeRepositoriesInFiltering;
-@property (weak) IBOutlet NSButton *dontReportRefreshFailures;
 @property (weak) IBOutlet NSButton *groupByRepo;
 @property (weak) IBOutlet NSButton *hideAllPrsSection;
 @property (weak) IBOutlet NSButton *showStatusItems;
@@ -103,10 +100,7 @@
 
 // Menu
 @property (nonatomic) NSStatusItem *statusItem;
-@property (nonatomic) StatusItemView *statusItemView;
 @property (unsafe_unretained) IBOutlet MenuWindow *mainMenu;
-@property (weak) IBOutlet NSSearchField *mainMenuFilter;
-@property (nonatomic) PopTimer *filterTimer;
 
 // Globals
 @property (weak) NSTimer *refreshTimer;
@@ -115,10 +109,13 @@
 @property (nonatomic, readonly) BOOL menuIsOpen;
 @property (nonatomic) long highlightedPrIndex;
 @property (nonatomic) float scrollBarWidth;
-
+@property (nonatomic) PullRequestDelegate *pullRequestDelegate;
 
 - (void)postNotificationOfType:(PRNotificationType)type forItem:(id)item;
 
 - (NSString *)focusedItemUrl;
+
+- (void)unPinSelectedFor:(PullRequest *)pullRequest;
+- (void)prItemSelected:(PullRequest *)pullRequest alternativeSelect:(BOOL)isAlternative;
 
 @end

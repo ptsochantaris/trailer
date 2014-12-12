@@ -7,7 +7,7 @@
 
 #define TITLE_HEIGHT 42
 
-- (id)initWithRemoveAllDelegate:(id<SectionHeaderDelegate>)delegate title:(NSString *)title
+- (id)initWithDelegate:(id<SectionHeaderDelegate>)delegate title:(NSString *)title
 {
     self = [super initWithFrame:CGRectMake(0, 0, MENU_WIDTH, TITLE_HEIGHT)];
     if (self) {

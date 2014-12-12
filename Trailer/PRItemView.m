@@ -1,6 +1,6 @@
 #import "CommentCounts.h"
 
-@interface PRItemView () <NSPasteboardItemDataProvider, NSDraggingSource>
+@interface PRItemView ()
 {
 	NSTrackingArea *trackingArea;
 	NSManagedObjectID *pullRequestId;
@@ -9,7 +9,6 @@
 @end
 
 static NSDictionary *_statusAttributes;
-static CGColorRef _highlightColor;
 
 @implementation PRItemView
 
@@ -31,15 +30,11 @@ static CGColorRef _highlightColor;
 #define AVATAR_PADDING 8.0
 
 - (instancetype)initWithPullRequest:(PullRequest *)pullRequest
-						   delegate:(id<PRItemViewDelegate>)delegate
 {
-    self = [super init];
-    if (self)
+	self = [super init];
+	if (self)
 	{
-		self.delegate = delegate;
 		pullRequestId = pullRequest.objectID;
-
-		_highlightColor = [COLOR_CLASS selectedMenuItemColor].CGColor;
 
 		NSInteger _commentsNew = 0;
 		NSInteger _commentsTotal = pullRequest.totalComments.integerValue;
@@ -53,7 +48,8 @@ static CGColorRef _highlightColor;
 
 		NSFont *detailFont = [NSFont menuFontOfSize:10.0];
 
-		BOOL goneDark = [MenuWindow usingVibrancy] && app.statusItemView.darkMode;
+		StatusItemView *v = (StatusItemView*)app.statusItem.view;
+		BOOL goneDark = [MenuWindow usingVibrancy] && v.darkMode;
 
 		NSMutableAttributedString *_title = [pullRequest titleWithFont:[NSFont menuFontOfSize:13.0]
 															 labelFont:detailFont
@@ -189,63 +185,49 @@ static CGColorRef _highlightColor;
 		NSMenuItem *i = [theMenu insertItemWithTitle:@"Copy URL" action:@selector(copyThisPr) keyEquivalent:@"c" atIndex:0];
 		i.keyEquivalentModifierMask = NSCommandKeyMask;
 		[self setMenu:theMenu];
-    }
-    return self;
+	}
+	return self;
 }
 
 - (void)unPinSelected:(NSButton *)button
 {
-	[self.delegate unPinSelectedFrom:self];
+	[app unPinSelectedFor:[self associatedPullRequest]];
 }
 
 - (void)mouseEntered:(NSEvent *)theEvent
 {
-	if(!app.isManuallyScrolling) self.focused = YES;
+	if(!app.isManuallyScrolling) { self.selected = YES; }
 }
 
 - (void)mouseExited:(NSEvent *)theEvent
 {
-	self.focused = NO;
+	self.selected = NO;
 }
 
-- (void)setFocused:(BOOL)focused
+// TODO: update table when selection changes
+- (void)setSelected:(BOOL)selected
 {
-	if(_focused!=focused)
+	_selected = selected;
+	if(_selected)
 	{
-		_focused = focused;
-		if(_focused)
+		[app.mainMenu.prTable selectRowIndexes:[NSIndexSet indexSetWithIndex:[app.mainMenu.prTable rowForView:self]] byExtendingSelection:NO];
+	}
+
+	/*if(selected)
+	{
+		if([MenuWindow usingVibrancy])
 		{
-			if([MenuWindow usingVibrancy])
-			{
-				if(app.statusItemView.darkMode)
-				{
-					self.layer.backgroundColor = [COLOR_CLASS colorWithWhite:0.0 alpha:0.4].CGColor;
-				}
-				else
-				{
-					self.layer.backgroundColor = [COLOR_CLASS whiteColor].CGColor;
-				}
-			}
-			else
-			{
-				self.layer.backgroundColor = MAKECOLOR(0.94, 0.94, 0.94, 1.0).CGColor;
-			}
+			self.backgroundColor = app.statusItemView.darkMode ? [COLOR_CLASS colorWithWhite:0.0 alpha:0.4] : [COLOR_CLASS whiteColor];
 		}
 		else
 		{
-			self.layer.backgroundColor = [COLOR_CLASS clearColor].CGColor;
+			self.backgroundColor = MAKECOLOR(0.94, 0.94, 0.94, 1.0);
 		}
-
-		[[NSNotificationCenter defaultCenter] postNotificationName:PR_ITEM_FOCUSED_NOTIFICATION_KEY
-															object:self
-														  userInfo:@{ PR_ITEM_FOCUSED_STATE_KEY: @(focused) }];
 	}
-}
-
-- (void)mouseUp:(NSEvent *)theEvent
-{
-	BOOL isAlternative = ((theEvent.modifierFlags & NSAlternateKeyMask) == NSAlternateKeyMask);
-	[self.delegate prItemSelected:self alternativeSelect:isAlternative];
+	else
+	{
+		self.backgroundColor = [COLOR_CLASS clearColor];
+	}*/
 }
 
 - (void)copyThisPr
@@ -276,64 +258,12 @@ static CGColorRef _highlightColor;
 	[self addTrackingArea:trackingArea];
 
 	NSPoint mouseLocation = [[self window] mouseLocationOutsideOfEventStream];
-    mouseLocation = [self convertPoint: mouseLocation fromView: nil];
+	mouseLocation = [self convertPoint:mouseLocation fromView:nil];
 
-    if (NSPointInRect(mouseLocation, [self bounds]))
+	if (NSPointInRect(mouseLocation, [self bounds]))
 		[self mouseEntered: nil];
 	else
-		if(!_focused) [self mouseExited: nil];
-}
-
-/////////////// dragging url off this item
-
-- (BOOL)ignoreModifierKeysWhileDragging { return YES; }
-
-- (void)mouseDragged:(NSEvent *)theEvent
-{
-	NSImage *dragIcon = [self scaleImage:[NSApp applicationIconImage]
-							  toFillSize:CGSizeMake(32, 32)];
-
-	NSPasteboardItem *pbItem = [NSPasteboardItem new];
-	[pbItem setDataProvider:self forTypes:@[NSPasteboardTypeString]];
-
-	NSDraggingItem *dragItem = [[NSDraggingItem alloc] initWithPasteboardWriter:pbItem];
-	NSPoint dragPosition = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-	dragPosition.x -= 24;
-	[dragItem setDraggingFrame:NSMakeRect(dragPosition.x, dragPosition.y, dragIcon.size.width, dragIcon.size.height)
-					  contents:dragIcon];
-
-	NSDraggingSession *draggingSession = [self beginDraggingSessionWithItems:@[dragItem]
-																	   event:theEvent
-																	  source:self];
-	draggingSession.animatesToStartingPositionsOnCancelOrFail = YES;
-}
-
-- (NSDragOperation)draggingSession:(NSDraggingSession *)session sourceOperationMaskForDraggingContext:(NSDraggingContext)context
-{
-	return (context == NSDraggingContextOutsideApplication) ?  NSDragOperationCopy : NSDragOperationNone;
-}
-
-- (void)pasteboard:(NSPasteboard *)sender item:(NSPasteboardItem *)item provideDataForType:(NSString *)type
-{
-	if([type compare: NSPasteboardTypeString]==NSOrderedSame)
-	{
-		[sender setData:[[self stringForCopy] dataUsingEncoding:NSUTF8StringEncoding] forType:NSPasteboardTypeString];
-	}
-}
-
-- (NSImage *)scaleImage:(NSImage *)image toFillSize:(CGSize)toSize
-{
-    NSRect targetFrame = NSMakeRect(0, 0, toSize.width, toSize.height);
-    NSImageRep *sourceImageRep = [image bestRepresentationForRect:targetFrame
-														  context:nil
-															hints:nil];
-
-    NSImage *targetImage = [[NSImage alloc] initWithSize:toSize];
-    [targetImage lockFocus];
-    [sourceImageRep drawInRect: targetFrame];
-    [targetImage unlockFocus];
-
-	return targetImage;
+		if(!self.selected) [self mouseExited: nil];
 }
 
 @end

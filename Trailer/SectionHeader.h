@@ -9,11 +9,11 @@
 @end
 
 
-@interface SectionHeader : NSView
+@interface SectionHeader : NSTableRowView
 
 @property (nonatomic,weak) id<SectionHeaderDelegate> delegate;
 
-- (id)initWithRemoveAllDelegate:(id<SectionHeaderDelegate>)delegate title:(NSString *)title;
+- (id)initWithDelegate:(id<SectionHeaderDelegate>)delegate title:(NSString *)title;
 
 - (NSString *)title;
 
