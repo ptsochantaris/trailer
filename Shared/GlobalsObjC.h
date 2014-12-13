@@ -1,8 +1,6 @@
 
 @import CoreData;
 
-#define LOW_API_WARNING 0.20
-
 typedef NS_ENUM(NSInteger, PullRequestCondition) {
 	kPullRequestConditionOpen = 0,
 	kPullRequestConditionClosed,
@@ -67,12 +65,12 @@ typedef void (^completionBlockType)();
 #define PULL_REQUEST_ID_KEY @"pullRequestIdKey"
 #define COMMENT_ID_KEY @"commentIdKey"
 #define NOTIFICATION_URL_KEY @"urlKey"
-
 #define API_USAGE_UPDATE @"RateUpdateNotification"
 #define DARK_MODE_CHANGED @"DarkModeChangedNotificationKey"
 #define PR_ITEM_FOCUSED_STATE_KEY @"PrItemFocusedStateKey"
 #define UPDATE_VIBRANCY_NOTIFICATION @"UpdateVibrancyNotfication"
 
+#define LOW_API_WARNING 0.20
 #define NETWORK_TIMEOUT 120.0
 #define BACKOFF_STEP 120.0
 #define STATUSITEM_PADDING 1.0

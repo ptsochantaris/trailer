@@ -18,7 +18,7 @@ class PRLabel: DataItem {
 	}
 
 	class func labelWithInfo(info: NSDictionary, forPullRequest: PullRequest) -> PRLabel {
-		let name = info.ofk("name") as String?
+		let name = info.ofk("name") as? String
 		var l = PRLabel.labelWithName(name!, forPullRequest: forPullRequest)
 		if(l==nil) {
 			l = NSEntityDescription.insertNewObjectForEntityForName("PRLabel", inManagedObjectContext: forPullRequest.managedObjectContext!) as? PRLabel
@@ -29,8 +29,8 @@ class PRLabel: DataItem {
 			l!.pullRequest = forPullRequest
 			l!.apiServer = forPullRequest.apiServer
 		}
-		l!.url = info.ofk("url") as String?
-		if let c = info.ofk("color") as String? {
+		l!.url = info.ofk("url") as? String
+		if let c = info.ofk("color") as? String {
 			l!.color = NSNumber(unsignedInt: c.parseFromHex())
 		} else {
 			l!.color = 0

@@ -15,9 +15,9 @@ class Repo: DataItem {
 	class func repoWithInfo(info: NSDictionary, fromServer: ApiServer) -> Repo {
 		let r = DataItem.itemWithInfo(info, type: "Repo", fromServer: fromServer) as Repo
 		if r.postSyncAction?.integerValue != PostSyncAction.DoNothing.rawValue {
-			r.fullName = info.ofk("full_name") as String?
-			r.fork = (info.ofk("fork") as NSNumber?)?.boolValue
-			r.webUrl = info.ofk("html_url") as String?
+			r.fullName = info.ofk("full_name") as? String
+			r.fork = (info.ofk("fork") as? NSNumber)?.boolValue
+			r.webUrl = info.ofk("html_url") as? String
 			r.dirty = true
 			r.lastDirtied = NSDate()
 		}

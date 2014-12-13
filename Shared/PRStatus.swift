@@ -30,14 +30,14 @@ class PRStatus: DataItem {
 	class func statusWithInfo(info: NSDictionary, fromServer: ApiServer) -> PRStatus {
 		let s = DataItem.itemWithInfo(info, type: "PRStatus", fromServer: fromServer) as PRStatus
 		if s.postSyncAction?.integerValue != PostSyncAction.DoNothing.rawValue {
-			s.url = info.ofk("url") as String?
-			s.state = info.ofk("state") as String?
-			s.targetUrl = info.ofk("target_url") as String?
-			s.descriptionText = info.ofk("description") as String?
+			s.url = info.ofk("url") as? String
+			s.state = info.ofk("state") as? String
+			s.targetUrl = info.ofk("target_url") as? String
+			s.descriptionText = info.ofk("description") as? String
 
-			if let userInfo = info.ofk("creator") as NSDictionary? {
-				s.userName = userInfo.ofk("login") as String?
-				s.userId = userInfo.ofk("id") as NSNumber?
+			if let userInfo = info.ofk("creator") as? NSDictionary {
+				s.userName = userInfo.ofk("login") as? String
+				s.userId = userInfo.ofk("id") as? NSNumber
 			}
 		}
 		return s

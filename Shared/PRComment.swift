@@ -16,21 +16,21 @@ class PRComment: DataItem {
 	class func commentWithInfo(info:NSDictionary, fromServer:ApiServer) -> PRComment {
 		let c = DataItem.itemWithInfo(info, type: "PRComment", fromServer: fromServer) as PRComment
 		if(c.postSyncAction?.integerValue != PostSyncAction.DoNothing.rawValue) {
-			c.body = info.ofk("body")as String?
-			c.position = info.ofk("position") as NSNumber?
-			c.path = info.ofk("path") as String?
-			c.url = info.ofk("url") as String?
-			c.webUrl = info.ofk("html_url") as String?
+			c.body = info.ofk("body") as? String
+			c.position = info.ofk("position") as? NSNumber
+			c.path = info.ofk("path") as? String
+			c.url = info.ofk("url") as? String
+			c.webUrl = info.ofk("html_url") as? String
 
-			if let userInfo = info.ofk("user") as NSDictionary? {
-				c.userName = userInfo.ofk("login") as String?
-				c.userId = userInfo.ofk("id") as NSNumber?
-				c.avatarUrl = userInfo.ofk("avatar_url") as String?
+			if let userInfo = info.ofk("user") as? NSDictionary {
+				c.userName = userInfo.ofk("login") as? String
+				c.userId = userInfo.ofk("id") as? NSNumber
+				c.avatarUrl = userInfo.ofk("avatar_url") as? String
 			}
 
-			if let links = info.ofk("links") as NSDictionary? {
-				c.url = links.ofk("self")?.ofk("href") as String?
-				if(c.webUrl==nil) { c.webUrl = links.ofk("html")?.ofk("href") as String? }
+			if let links = info.ofk("links") as? NSDictionary {
+				c.url = links.ofk("self")?.ofk("href") as? String
+				if(c.webUrl==nil) { c.webUrl = links.ofk("html")?.ofk("href") as? String }
 			}
 		}
 		return c

@@ -34,7 +34,7 @@ class PullRequestDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource 
 	func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
 		let object = pullRequestIds[row]
 		if object.isKindOfClass(NSManagedObjectID) {
-			let pr = mainObjectContext.existingObjectWithID(object as NSManagedObjectID, error: nil) as PullRequest?
+			let pr = mainObjectContext.existingObjectWithID(object as NSManagedObjectID, error: nil) as? PullRequest
 			return PRItemView(pullRequest: pr!)
 		} else {
 			let title = object as String
@@ -56,7 +56,7 @@ class PullRequestDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource 
 	func pullRequestAtRow(row: Int) -> PullRequest? {
 		let object = pullRequestIds[row]
 		if object.isKindOfClass(NSManagedObjectID) {
-			return mainObjectContext.existingObjectWithID(object as NSManagedObjectID, error: nil) as PullRequest?
+			return mainObjectContext.existingObjectWithID(object as NSManagedObjectID, error: nil) as? PullRequest
 		} else {
 			return nil;
 		}

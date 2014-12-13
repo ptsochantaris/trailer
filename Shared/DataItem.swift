@@ -37,7 +37,7 @@ class DataItem: NSManagedObject {
 		f.fetchLimit = 1
 		f.predicate = NSPredicate(format:"serverId = %@ and apiServer == %@", serverId, fromServer)
 		let items = fromServer.managedObjectContext?.executeFetchRequest(f, error: nil)
-		return items?.first as DataItem?
+		return items?.first as? DataItem
 	}
 
 	class func itemWithInfo(info: NSDictionary, type: String, fromServer: ApiServer) -> DataItem {
@@ -79,14 +79,14 @@ class DataItem: NSManagedObject {
 		let f = NSFetchRequest(entityName: type)
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "postSyncAction = %d or postSyncAction = %d", PostSyncAction.NoteNew.rawValue, PostSyncAction.NoteUpdated.rawValue)
-		return inMoc.executeFetchRequest(f, error: nil) as [DataItem];
+		return inMoc.executeFetchRequest(f, error: nil) as [DataItem]
 	}
 
 	class func updatedItemsOfType(type: String, inMoc: NSManagedObjectContext) -> [DataItem] {
 		let f = NSFetchRequest(entityName: type)
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "postSyncAction = %d", PostSyncAction.NoteUpdated.rawValue)
-		return inMoc.executeFetchRequest(f, error: nil) as [DataItem];
+		return inMoc.executeFetchRequest(f, error: nil) as [DataItem]
 	}
 
 	class func newItemsOfType(type: String, inMoc: NSManagedObjectContext) -> [DataItem] {

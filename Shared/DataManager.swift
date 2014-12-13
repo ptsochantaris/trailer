@@ -12,18 +12,18 @@ class DataManager : NSObject {
 
 	class func performVersionChangedTasks() {
 		let d = NSUserDefaults.standardUserDefaults()
-		if let legacyAuthToken = d.objectForKey("GITHUB_AUTH_TOKEN") as String? {
-			var legacyApiHost = d.objectForKey("API_BACKEND_SERVER") as String?
+		if let legacyAuthToken = d.objectForKey("GITHUB_AUTH_TOKEN") as? String {
+			var legacyApiHost = d.objectForKey("API_BACKEND_SERVER") as? String
 			if(legacyApiHost == nil || legacyApiHost?.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) == 0) {
 				legacyApiHost = "api.github.com"
 			}
 
-			var legacyApiPath = d.objectForKey("API_SERVER_PATH") as String?
+			var legacyApiPath = d.objectForKey("API_SERVER_PATH") as? String
 			if(legacyApiPath == nil || legacyApiPath?.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) == 0) {
 				legacyApiPath = ""
 			}
 
-			var legacyWebHost = d.objectForKey("API_FRONTEND_SERVER") as String?
+			var legacyWebHost = d.objectForKey("API_FRONTEND_SERVER") as? String
 			if(legacyWebHost == nil || legacyWebHost?.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) == 0) {
 				legacyWebHost = "github.com"
 			}

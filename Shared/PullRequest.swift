@@ -45,30 +45,30 @@ class PullRequest: DataItem {
 	class func pullRequestWithInfo(info: NSDictionary, fromServer: ApiServer) -> PullRequest {
 		let p = DataItem.itemWithInfo(info, type: "PullRequest", fromServer: fromServer) as PullRequest
 		if p.postSyncAction?.integerValue != PostSyncAction.DoNothing.rawValue {
-			p.url = info.ofk("url") as String?
-			p.webUrl = info.ofk("html_url") as String?
-			p.number = info.ofk("number") as NSNumber?
-			p.state = info.ofk("state") as String?
-			p.title = info.ofk("title") as String?
-			p.body = info.ofk("body") as String?
+			p.url = info.ofk("url") as? String
+			p.webUrl = info.ofk("html_url") as? String
+			p.number = info.ofk("number") as? NSNumber
+			p.state = info.ofk("state") as? String
+			p.title = info.ofk("title") as? String
+			p.body = info.ofk("body") as? String
 
-			if let m = info.ofk("mergeable") as NSNumber? {
+			if let m = info.ofk("mergeable") as? NSNumber {
 				p.mergeable = m
 			} else {
 				p.mergeable = true
 			}
 
-			if let userInfo = info.ofk("user") as NSDictionary? {
-				p.userId = userInfo.ofk("id") as NSNumber?
-				p.userLogin = userInfo.ofk("login") as String?
-				p.userAvatarUrl = userInfo.ofk("avatar_url") as String?
+			if let userInfo = info.ofk("user") as? NSDictionary {
+				p.userId = userInfo.ofk("id") as? NSNumber
+				p.userLogin = userInfo.ofk("login") as? String
+				p.userAvatarUrl = userInfo.ofk("avatar_url") as? String
 			}
 
-			if let linkInfo = info.ofk("_links") as NSDictionary? {
-				p.issueCommentLink = (linkInfo.ofk("comments") as NSDictionary?)?.ofk("href") as String?
-				p.reviewCommentLink = (linkInfo.ofk("review_comments") as NSDictionary?)?.ofk("href") as String?
-				p.statusesLink = (linkInfo.ofk("statuses") as NSDictionary?)?.ofk("href") as String?
-				p.issueUrl = (linkInfo.ofk("issue") as NSDictionary?)?.ofk("href") as String?
+			if let linkInfo = info.ofk("_links") as? NSDictionary {
+				p.issueCommentLink = (linkInfo.ofk("comments") as? NSDictionary)?.ofk("href") as? String
+				p.reviewCommentLink = (linkInfo.ofk("review_comments") as? NSDictionary)?.ofk("href") as? String
+				p.statusesLink = (linkInfo.ofk("statuses") as? NSDictionary)?.ofk("href") as? String
+				p.issueUrl = (linkInfo.ofk("issue") as? NSDictionary)?.ofk("href") as? String
 			}
 		}
 
@@ -384,10 +384,10 @@ class PullRequest: DataItem {
 		if mode==StatusFilter.All.rawValue {
 			f.predicate = NSPredicate(format: "pullRequest == %@", self)
 		} else {
-			let terms = Settings.statusFilteringTerms as [String]?;
-			if terms != nil && terms!.count > 0 {
+			let terms = Settings.statusFilteringTerms
+			if terms.count > 0 {
 				var subPredicates = [NSPredicate]()
-				for t in terms! {
+				for t in terms {
 					subPredicates.append(NSPredicate(format: "descriptionText contains[cd] %@", t)!)
 				}
 				let orPredicate = NSCompoundPredicate.orPredicateWithSubpredicates(subPredicates);
