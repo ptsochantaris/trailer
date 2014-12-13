@@ -70,6 +70,7 @@
 		16B3B35A1A34EAEE000BE6CC /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3591A34EAEE000BE6CC /* main.swift */; };
 		16B3B35B1A34EAEE000BE6CC /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3591A34EAEE000BE6CC /* main.swift */; };
 		16B74E481A3B4AC800410EF6 /* PrTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B74E471A3B4AC800410EF6 /* PrTable.swift */; };
+		16B74E4E1A3C78FB00410EF6 /* GlobalsObjC.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B74E4D1A3C78FB00410EF6 /* GlobalsObjC.m */; };
 		16B94072182D136700F32061 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 16B94070182D136700F32061 /* dsa_pub.pem */; };
 		16C54F941881639B00849B76 /* GithubViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 16C54F931881639B00849B76 /* GithubViewController.m */; };
 		16CBE1C11A2DBB2700485053 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C01A2DBB2700485053 /* DataManager.swift */; };
@@ -191,6 +192,7 @@
 		16B3B3541A34E9F7000BE6CC /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Reachability.m; path = Shared/Reachability.m; sourceTree = "<group>"; };
 		16B3B3591A34EAEE000BE6CC /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = main.swift; path = Shared/main.swift; sourceTree = "<group>"; };
 		16B74E471A3B4AC800410EF6 /* PrTable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrTable.swift; sourceTree = "<group>"; };
+		16B74E4D1A3C78FB00410EF6 /* GlobalsObjC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GlobalsObjC.m; path = Shared/GlobalsObjC.m; sourceTree = "<group>"; };
 		16B94070182D136700F32061 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
 		16C54F921881639B00849B76 /* GithubViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GithubViewController.h; sourceTree = "<group>"; };
 		16C54F931881639B00849B76 /* GithubViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GithubViewController.m; sourceTree = "<group>"; };
@@ -419,6 +421,7 @@
 			children = (
 				16B3B3591A34EAEE000BE6CC /* main.swift */,
 				16CBE1C31A2DF61C00485053 /* GlobalsObjC.h */,
+				16B74E4D1A3C78FB00410EF6 /* GlobalsObjC.m */,
 				164785A91A2CE7BD00297764 /* Globals.swift */,
 			);
 			name = Globals;
@@ -646,6 +649,7 @@
 				16B3B3171A34E8E2000BE6CC /* ApiServer.swift in Sources */,
 				161C959E1A3A36020019A577 /* MenuWindow.swift in Sources */,
 				16CBE1C51A2DFBA500485053 /* Settings.swift in Sources */,
+				16B74E4E1A3C78FB00410EF6 /* GlobalsObjC.m in Sources */,
 				168FD00E1A2A7AD1005929CB /* MessageView.swift in Sources */,
 				164785AA1A2CE7BD00297764 /* Globals.swift in Sources */,
 				16A794F41A252BFA00A76553 /* PopTimer.swift in Sources */,

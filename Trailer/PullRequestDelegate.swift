@@ -38,8 +38,8 @@ class PullRequestDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource 
 			return PRItemView(pullRequest: pr!)
 		} else {
 			let title = object as String
-			let showButton = (title == kPullRequestSectionNames[Int(kPullRequestSectionMerged)] as String)
-				|| (title == kPullRequestSectionNames[Int(kPullRequestSectionClosed)] as String)
+			let showButton = (title == kPullRequestSectionNames[PullRequestSection.Merged.rawValue] as String)
+				|| (title == kPullRequestSectionNames[PullRequestSection.Closed.rawValue] as String)
 			return SectionHeader(title: title, showRemoveAllButton: showButton)
 		}
 	}

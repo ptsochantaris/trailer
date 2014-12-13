@@ -4,11 +4,7 @@ var _settings_valuesCache = Dictionary<String, NSObject>()
 
 class Settings: NSObject {
 
-	override init() {
-		super.init()
-	}
-
-	class func set(key: String, _ value: NSObject?) {
+	private class func set(key: String, _ value: NSObject?) {
 		if let v = value {
 			_settings_defaults.setObject(v, forKey: key)
 			DLog("Set %@: %@", key, v)
@@ -20,7 +16,7 @@ class Settings: NSObject {
 		_settings_defaults.synchronize()
 	}
 
-	class func get(key: String) -> NSObject? {
+	private class func get(key: String) -> NSObject? {
 		if let v = _settings_valuesCache[key] {
 			return v
 		} else {

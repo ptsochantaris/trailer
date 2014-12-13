@@ -1,37 +1,10 @@
 
-void DLog(NSString *format, ...)
-{
-#ifndef DEBUG
-	if(Settings.logActivityToConsole)
-	{
-#endif
-		va_list args;
-		va_start(args, format);
-		NSLogv(format, args);
-		va_end(args);
-#ifndef DEBUG
-	}
-#endif
-}
-
 @interface UrlBackOffEntry : NSObject
 @property (nonatomic) NSDate *nextAttemptAt;
 @property (nonatomic) NSTimeInterval duration;
 @end
 @implementation UrlBackOffEntry
 @end
-
-#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
-#define CACHE_MEMORY 1024*1024*4
-#define CACHE_DISK 1024*1024*128
-#else
-#define CACHE_MEMORY 1024*1024*2
-#define CACHE_DISK 1024*1024*8
-#endif
-
-#define CALLBACK if(callback) callback
-
-API *api;
 
 @implementation API
 {
@@ -476,7 +449,7 @@ ignoreLastSync:NO
 					  case kPullRequestHandlingKeepAll:
 					  {
 						  r.postSyncAction = @(kPostSyncDoNothing); // don't delete this
-						  r.condition = @kPullRequestConditionMerged;
+						  r.condition = @(kPullRequestConditionMerged);
 						  [app postNotificationOfType:kPrMerged forItem:r];
 					  }
 					  case kPullRequestHandlingKeepNone: {}
@@ -499,7 +472,7 @@ ignoreLastSync:NO
 				  case kPullRequestHandlingKeepAll:
 				  {
 					  r.postSyncAction = @(kPostSyncDoNothing); // don't delete this
-					  r.condition = @kPullRequestConditionClosed;
+					  r.condition = @(kPullRequestConditionClosed);
 					  [app postNotificationOfType:kPrClosed forItem:r];
 				  }
 				  case kPullRequestHandlingKeepNone: {}

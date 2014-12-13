@@ -73,11 +73,11 @@ class PullRequest: DataItem {
 		}
 
 		if let c = p.condition {
-			p.reopened = (c.intValue == kPullRequestConditionClosed)
+			p.reopened = (c.integerValue == PullRequestCondition.Closed.rawValue)
 		} else {
 			p.reopened = false
 		}
-		p.condition = Int(kPullRequestConditionOpen)
+		p.condition = PullRequestCondition.Open.rawValue
 
 		return p;
 	}
@@ -135,20 +135,20 @@ class PullRequest: DataItem {
 	class func allMergedRequestsInMoc(moc: NSManagedObjectContext) -> [PullRequest] {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
-		f.predicate = NSPredicate(format: "condition == %d", kPullRequestConditionMerged)
+		f.predicate = NSPredicate(format: "condition == %d", PullRequestCondition.Merged.rawValue)
 		return moc.executeFetchRequest(f, error: nil) as [PullRequest]
 	}
 
 	class func allClosedRequestsInMoc(moc: NSManagedObjectContext) -> [PullRequest] {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
-		f.predicate = NSPredicate(format: "condition == %d", kPullRequestConditionClosed)
+		f.predicate = NSPredicate(format: "condition == %d", PullRequestCondition.Closed.rawValue)
 		return moc.executeFetchRequest(f, error: nil) as [PullRequest]
 	}
 
 	class func countOpenRequestsInMoc(moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest(entityName: "PullRequest")
-		f.predicate = NSPredicate(format: "condition == %d or condition == nil", kPullRequestConditionOpen)
+		f.predicate = NSPredicate(format: "condition == %d or condition == nil", PullRequestCondition.Open.rawValue)
 		return moc.countForFetchRequest(f, error: nil)
 	}
 
@@ -157,8 +157,8 @@ class PullRequest: DataItem {
 		var badgeCount:Int = 0
 		let showCommentsEverywhere = Settings.showCommentsEverywhere
 		for p in moc.executeFetchRequest(f, error: nil) as [PullRequest] {
-			if let sectionIndex = p.sectionIndex?.intValue {
-				if showCommentsEverywhere || sectionIndex==kPullRequestSectionMine || sectionIndex==kPullRequestSectionParticipated {
+			if let sectionIndex = p.sectionIndex?.integerValue {
+				if showCommentsEverywhere || sectionIndex==PullRequestSection.Mine.rawValue || sectionIndex==PullRequestSection.Participated.rawValue {
 					if let c = p.unreadComments?.integerValue {
 						badgeCount += c
 					}
@@ -220,11 +220,11 @@ class PullRequest: DataItem {
 	func markUnmergeable() -> Bool {
 		if let m = mergeable?.boolValue {
 			if !m {
-				if let s = sectionIndex?.intValue {
-					if s == kPullRequestConditionMerged || s == kPullRequestConditionClosed {
+				if let s = sectionIndex?.integerValue {
+					if s == PullRequestCondition.Merged.rawValue || s == PullRequestCondition.Closed.rawValue {
 						return false
 					}
-					if s == kPullRequestSectionAll && Settings.markUnmergeableOnUserSectionsOnly {
+					if s == PullRequestSection.All.rawValue && Settings.markUnmergeableOnUserSectionsOnly {
 						return false
 					}
 					return true
@@ -380,13 +380,12 @@ class PullRequest: DataItem {
 	func displayedStatuses() -> [PRStatus] {
 		let f = NSFetchRequest(entityName: "PRStatus")
 		f.returnsObjectsAsFaults = false
-		let mode = Int32(Settings.statusFilteringMode)
-		if mode==kStatusFilterAll {
+		let mode = Settings.statusFilteringMode
+		if mode==StatusFilter.All.rawValue {
 			f.predicate = NSPredicate(format: "pullRequest == %@", self)
 		} else {
 			let terms = Settings.statusFilteringTerms as [String]?;
-			if(terms != nil && terms!.count > 0)
-			{
+			if terms != nil && terms!.count > 0 {
 				var subPredicates = [NSPredicate]()
 				for t in terms! {
 					subPredicates.append(NSPredicate(format: "descriptionText contains[cd] %@", t)!)
@@ -394,18 +393,13 @@ class PullRequest: DataItem {
 				let orPredicate = NSCompoundPredicate.orPredicateWithSubpredicates(subPredicates);
 				let selfPredicate = NSPredicate(format: "pullRequest == %@", self)!
 
-				if(mode==kStatusFilterInclude)
-				{
+				if mode==StatusFilter.Include.rawValue {
 					f.predicate = NSCompoundPredicate.andPredicateWithSubpredicates([selfPredicate, orPredicate])
-				}
-				else
-				{
+				} else {
 					let notOrPredicate = NSCompoundPredicate.notPredicateWithSubpredicate(orPredicate)
 					f.predicate = NSCompoundPredicate.andPredicateWithSubpredicates([selfPredicate, notOrPredicate])
 				}
-			}
-			else
-			{
+			} else {
 				f.predicate = NSPredicate(format: "pullRequest == %@", self)
 			}
 		}
@@ -463,23 +457,23 @@ class PullRequest: DataItem {
 	}
 
 	func postProcess() {
-		var section: Int32
-		var condition = self.condition?.intValue ?? kPullRequestConditionOpen
+		var section: Int
+		var condition = self.condition?.integerValue ?? PullRequestCondition.Open.rawValue
 
-		if condition == kPullRequestConditionMerged			{ section = kPullRequestSectionMerged }
-		else if condition == kPullRequestConditionClosed	{ section = kPullRequestSectionClosed }
-		else if isMine()									{ section = kPullRequestSectionMine }
-		else if commentedByMe()								{ section = kPullRequestSectionParticipated }
-		else if Settings.hideAllPrsSection					{ section = kPullRequestSectionNone }
-		else												{ section = kPullRequestSectionAll }
+		if condition == PullRequestCondition.Merged.rawValue		{ section = PullRequestSection.Merged.rawValue }
+		else if condition == PullRequestCondition.Closed.rawValue	{ section = PullRequestSection.Closed.rawValue }
+		else if isMine()											{ section = PullRequestSection.Mine.rawValue }
+		else if commentedByMe()										{ section = PullRequestSection.Participated.rawValue }
+		else if Settings.hideAllPrsSection							{ section = PullRequestSection.None.rawValue }
+		else														{ section = PullRequestSection.All.rawValue }
 
 		let f = NSFetchRequest(entityName: "PRComment")
 		f.returnsObjectsAsFaults = false
 
 		let latestDate = self.latestReadCommentDate;
-		if (section == kPullRequestSectionAll || section == kPullRequestSectionNone) && Settings.autoParticipateInMentions {
+		if (section == PullRequestSection.All.rawValue || section == PullRequestSection.None.rawValue) && Settings.autoParticipateInMentions {
 			if refersToMe() {
-				section = kPullRequestSectionParticipated;
+				section = PullRequestSection.Participated.rawValue;
 				f.predicate = predicateForOthersCommentsSinceDate(latestDate)
 				let count = self.managedObjectContext?.countForFetchRequest(f, error: nil)
 				self.unreadComments = count!
@@ -488,7 +482,7 @@ class PullRequest: DataItem {
 				var unreadCommentCount: Int = 0
 				for c in self.managedObjectContext?.executeFetchRequest(f, error: nil) as [PRComment] {
 					if c.refersToMe() {
-						section = kPullRequestSectionParticipated
+						section = PullRequestSection.Participated.rawValue
 					}
 					if let l = latestDate {
 						if c.createdAt?.compare(l)==NSComparisonResult.OrderedDescending {

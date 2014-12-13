@@ -1,10 +1,6 @@
 #import "OSX_AppDelegate.h"
 #import <Sparkle/Sparkle.h>
 
-OSX_AppDelegate *app;
-NSString *currentAppVersion;
-NSArray *kPullRequestSectionNames;
-
 @implementation OSX_AppDelegate
 {
 	id globalKeyMonitor, localKeyMonitor;

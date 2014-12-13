@@ -3,20 +3,26 @@
 
 #define LOW_API_WARNING 0.20
 
-#define kPullRequestConditionOpen 0
-#define kPullRequestConditionClosed 1
-#define kPullRequestConditionMerged 2
+typedef NS_ENUM(NSInteger, PullRequestCondition) {
+	kPullRequestConditionOpen = 0,
+	kPullRequestConditionClosed,
+	kPullRequestConditionMerged
+};
 
-#define kPullRequestSectionNone 0
-#define kPullRequestSectionMine 1
-#define kPullRequestSectionParticipated 2
-#define kPullRequestSectionMerged 3
-#define kPullRequestSectionClosed 4
-#define kPullRequestSectionAll 5
+typedef NS_ENUM(NSInteger, PullRequestSection) {
+	kPullRequestSectionNone = 0,
+	kPullRequestSectionMine,
+	kPullRequestSectionParticipated,
+	kPullRequestSectionMerged,
+	kPullRequestSectionClosed,
+	kPullRequestSectionAll
+};
 
-#define kStatusFilterAll 0
-#define kStatusFilterInclude 1
-#define kStatusFilterExclude 2
+typedef NS_ENUM(NSInteger, StatusFilter) {
+	kStatusFilterAll = 0,
+	kStatusFilterInclude,
+	kStatusFilterExclude
+};
 
 typedef NS_ENUM(NSInteger, PostSyncAction) {
 	kPostSyncDoNothing = 0,
@@ -73,6 +79,17 @@ typedef void (^completionBlockType)();
 #define TOP_HEADER_HEIGHT 28.0
 #define AVATAR_SIZE 26.0
 #define LEFTPADDING 44.0
+#define TITLE_HEIGHT 42
+
+#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
+	#define CACHE_MEMORY 1024*1024*4
+	#define CACHE_DISK 1024*1024*128
+#else
+	#define CACHE_MEMORY 1024*1024*2
+	#define CACHE_DISK 1024*1024*8
+#endif
+
+#define CALLBACK if(callback) callback
 
 void DLog(NSString *format, ...);
 extern NSString *currentAppVersion;

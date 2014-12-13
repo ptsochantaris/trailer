@@ -5,8 +5,6 @@
 	CenterTextField *titleView;
 }
 
-#define TITLE_HEIGHT 42
-
 - (id)initWithTitle:(NSString *)title showRemoveAllButton:(BOOL)show
 {
     self = [super initWithFrame:CGRectMake(0, 0, MENU_WIDTH, TITLE_HEIGHT)];

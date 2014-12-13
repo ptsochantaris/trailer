@@ -63,7 +63,7 @@ static NSDictionary *_statusAttributes;
 																   darkColor:goneDark ? [COLOR_CLASS grayColor] : [COLOR_CLASS darkGrayColor]];
 
 		CGFloat W = MENU_WIDTH-LEFTPADDING-app.scrollBarWidth;
-		BOOL showUnpin = pullRequest.condition.integerValue!=kPullRequestConditionOpen || pullRequest.markUnmergeable;
+		BOOL showUnpin = (pullRequest.condition.integerValue != kPullRequestConditionOpen) || pullRequest.markUnmergeable;
 
 		if(showUnpin) W -= REMOVE_BUTTON_WIDTH;
 
