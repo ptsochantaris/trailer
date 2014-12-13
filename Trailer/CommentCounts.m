@@ -62,8 +62,9 @@ typedef NS_ENUM(NSInteger, RoundedCorners) {
 
 		NSString *countString = [formatter stringFromNumber:@(_totalCount)];
 
+		BOOL darkMode = ((StatusItemView *)app.statusItem.view).darkMode;
 		NSDictionary *_commentCountAttributes = @{ NSFontAttributeName:[NSFont menuFontOfSize:11.0],
-												   NSForegroundColorAttributeName:[NSColor controlTextColor],
+												   NSForegroundColorAttributeName:darkMode ? [COLOR_CLASS controlLightHighlightColor] : [COLOR_CLASS controlTextColor],
 												   NSParagraphStyleAttributeName:pCenter,
 												   };
 

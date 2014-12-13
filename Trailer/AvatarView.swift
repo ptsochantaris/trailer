@@ -31,5 +31,4 @@ class AvatarView: NSImageView {
 		spinner?.removeFromSuperview()
 		spinner = nil
 	}
-    
 }

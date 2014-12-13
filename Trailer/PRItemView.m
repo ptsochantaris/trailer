@@ -5,6 +5,7 @@
 	NSTrackingArea *trackingArea;
 	NSManagedObjectID *pullRequestId;
 	CenterTextField *title;
+	COLOR_CLASS *unselectedTitleColor;
 }
 @end
 
@@ -65,8 +66,7 @@ static NSDictionary *_statusAttributes;
 		if(showUnpin) W -= REMOVE_BUTTON_WIDTH;
 
 		BOOL showAvatar = pullRequest.userAvatarUrl.length && !Settings.hideAvatars;
-		if(showAvatar) W -= (AVATAR_SIZE+AVATAR_PADDING);
-		else W += 4.0;
+		if(showAvatar) W -= (AVATAR_SIZE+AVATAR_PADDING); else W += 4.0;
 
 		CGFloat titleHeight = [_title boundingRectWithSize:CGSizeMake(W, FLT_MAX)
 												   options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading].size.height;
@@ -181,6 +181,8 @@ static NSDictionary *_statusAttributes;
 																 totalCount:_commentsTotal];
 		[self addSubview:commentCounts];
 
+		unselectedTitleColor = [title.attributedStringValue attribute:NSForegroundColorAttributeName atIndex:0 effectiveRange:nil];
+
 		NSMenu *theMenu = [[NSMenu alloc] initWithTitle:@"PR Options"];
 		NSMenuItem *i = [theMenu insertItemWithTitle:@"Copy URL" action:@selector(copyThisPr) keyEquivalent:@"c" atIndex:0];
 		i.keyEquivalentModifierMask = NSCommandKeyMask;
@@ -204,34 +206,34 @@ static NSDictionary *_statusAttributes;
 	self.selected = NO;
 }
 
-// TODO: update table when selection changes
 - (void)setSelected:(BOOL)selected
 {
 	_selected = selected;
+	NSMutableAttributedString *previousTitle = [title.attributedStringValue mutableCopy];
+	COLOR_CLASS *finalColor = unselectedTitleColor;
 	if(_selected)
 	{
 		[app.mainMenu.prTable selectRowIndexes:[NSIndexSet indexSetWithIndex:[app.mainMenu.prTable rowForView:self]] byExtendingSelection:NO];
+		BOOL darkMode = ((StatusItemView *)app.statusItem.view).darkMode;
+		if(darkMode) finalColor = [COLOR_CLASS darkGrayColor];
 	}
 	else
 	{
 		[app.mainMenu.prTable deselectRow:[app.mainMenu.prTable rowForView:self]];
 	}
+	[previousTitle setAttributes:@{ NSForegroundColorAttributeName: finalColor } range:NSMakeRange(0, previousTitle.length)];
+	title.attributedStringValue = previousTitle;
 
-	/*if(selected)
-	{
-		if([MenuWindow usingVibrancy])
-		{
+	/*
+	if(selected) {
+		if([MenuWindow usingVibrancy]) {
 			self.backgroundColor = app.statusItemView.darkMode ? [COLOR_CLASS colorWithWhite:0.0 alpha:0.4] : [COLOR_CLASS whiteColor];
-		}
-		else
-		{
+		} else {
 			self.backgroundColor = MAKECOLOR(0.94, 0.94, 0.94, 1.0);
 		}
 	}
-	else
-	{
-		self.backgroundColor = [COLOR_CLASS clearColor];
-	}*/
+	else { self.backgroundColor = [COLOR_CLASS clearColor]; }
+	*/
 }
 
 - (void)copyThisPr

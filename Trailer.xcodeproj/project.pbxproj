@@ -237,6 +237,7 @@
 				168BC6BF17EC2DF000BC4584 /* OSX_AppDelegate.h */,
 				168BC6C017EC2DF000BC4584 /* OSX_AppDelegate.m */,
 				162002CF1A2A3E2100FF95F3 /* Application.swift */,
+				16A505E31A39B2DD005DD3B7 /* PullRequestDelegate.swift */,
 			);
 			name = Core;
 			sourceTree = "<group>";
@@ -306,7 +307,7 @@
 			name = Logic;
 			sourceTree = "<group>";
 		};
-		16583E411851E5C6003A7A55 /* MenuItems */ = {
+		16583E411851E5C6003A7A55 /* Menu Items */ = {
 			isa = PBXGroup;
 			children = (
 				160C5AD118682CD800142482 /* CommentCounts.h */,
@@ -317,10 +318,10 @@
 				16583E471851F082003A7A55 /* SectionHeader.m */,
 				168FD00D1A2A7AD1005929CB /* MessageView.swift */,
 			);
-			name = MenuItems;
+			name = "Menu Items";
 			sourceTree = "<group>";
 		};
-		168A5C74185BB9D900CB6B02 /* Display */ = {
+		168A5C74185BB9D900CB6B02 /* UI Components */ = {
 			isa = PBXGroup;
 			children = (
 				162002D51A2A49A300FF95F3 /* ViewAllowsVibrancy.swift */,
@@ -329,11 +330,10 @@
 				162002DE1A2A5C9200FF95F3 /* LinkField.swift */,
 				162002E61A2A75BD00FF95F3 /* AvatarView.swift */,
 				16CBE1C91A2E13A400485053 /* StatusItemView.swift */,
-				16A505E31A39B2DD005DD3B7 /* PullRequestDelegate.swift */,
 				161C959D1A3A36020019A577 /* MenuWindow.swift */,
 				16B74E471A3B4AC800410EF6 /* PrTable.swift */,
 			);
-			name = Display;
+			name = "UI Components";
 			sourceTree = "<group>";
 		};
 		168BC6A117EC2DF000BC4584 = {
@@ -368,8 +368,8 @@
 			isa = PBXGroup;
 			children = (
 				162002CE1A2A3E0100FF95F3 /* Core */,
-				168A5C74185BB9D900CB6B02 /* Display */,
-				16583E411851E5C6003A7A55 /* MenuItems */,
+				168A5C74185BB9D900CB6B02 /* UI Components */,
+				16583E411851E5C6003A7A55 /* Menu Items */,
 				168BC6C217EC2DF000BC4584 /* MainMenu.xib */,
 				168BC6C817EC2DF000BC4584 /* Images.xcassets */,
 				168BC6B417EC2DF000BC4584 /* Supporting Files */,
