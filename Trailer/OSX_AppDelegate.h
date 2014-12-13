@@ -11,8 +11,7 @@
 	NSTableViewDataSource,
 	NSTabViewDelegate,
 	NSWindowDelegate,
-	NSUserNotificationCenterDelegate,
-	SectionHeaderDelegate
+	NSUserNotificationCenterDelegate
 >
 
 // Preferences window
@@ -117,5 +116,6 @@
 
 - (void)unPinSelectedFor:(PullRequest *)pullRequest;
 - (void)prItemSelected:(PullRequest *)pullRequest alternativeSelect:(BOOL)isAlternative;
+- (void)sectionHeaderRemoveSelected:(NSString *)headerTitle;
 
 @end

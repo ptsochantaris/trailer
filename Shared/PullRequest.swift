@@ -126,7 +126,7 @@ class PullRequest: DataItem {
 		}
 
 		let f = NSFetchRequest(entityName: "PullRequest")
-		f.returnsObjectsAsFaults = false
+		f.fetchBatchSize = 100
 		f.predicate = NSPredicate(format: " and ".join(predicateSegments))
 		f.sortDescriptors = sortDescriptiors
 		return f
@@ -459,19 +459,21 @@ class PullRequest: DataItem {
 	}
 
 	func sectionName() -> String {
-		return kPullRequestSectionNames[self.sectionIndex!.integerValue]
+		return kPullRequestSectionNames[self.sectionIndex!.integerValue] as String
 	}
 
 	func postProcess() {
 		var section: Int32
-		var condition = kPullRequestConditionOpen
+		var condition = self.condition?.intValue ?? kPullRequestConditionOpen
 
-		if let c = self.condition?.intValue {
-			condition = c
+		if let c = self.condition {
+			if c.integerValue == Int(kPullRequestConditionClosed) {
+				DLog("Aha!")
+			}
 		}
 
 		if condition == kPullRequestConditionMerged			{ section = kPullRequestSectionMerged }
-		else if condition == kPullRequestConditionClosed	{ section = kPullRequestConditionClosed }
+		else if condition == kPullRequestConditionClosed	{ section = kPullRequestSectionClosed }
 		else if isMine()									{ section = kPullRequestSectionMine }
 		else if commentedByMe()								{ section = kPullRequestSectionParticipated }
 		else if Settings.hideAllPrsSection					{ section = kPullRequestSectionNone }

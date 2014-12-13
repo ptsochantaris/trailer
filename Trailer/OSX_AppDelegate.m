@@ -3,6 +3,7 @@
 
 OSX_AppDelegate *app;
 NSString *currentAppVersion;
+NSArray *kPullRequestSectionNames;
 
 @implementation OSX_AppDelegate
 {
@@ -32,7 +33,7 @@ NSString *currentAppVersion;
 
 	[DataManager postProcessAllPrs];
 
-	self.pullRequestDelegate = [[PullRequestDelegate alloc] initWithSectionDelegate:self];
+	self.pullRequestDelegate = [[PullRequestDelegate alloc] init];
 	NSTableColumn *prColumn = self.mainMenu.prTable.tableColumns[0];
 	prColumn.width = MENU_WIDTH;
 	self.mainMenu.prTable.dataSource = self.pullRequestDelegate;
@@ -633,7 +634,11 @@ NSString *currentAppVersion;
 					display:NO
 					animate:NO];
 
-	if(show) [self displayMenu];
+	if(show)
+	{
+		[self.mainMenu.prTable deselectAll:nil];
+		[self displayMenu];
+	}
 }
 
 - (void)displayMenu
@@ -653,9 +658,9 @@ NSString *currentAppVersion;
 	[self.mainMenu.prTable deselectAll:nil];
 }
 
-- (void)sectionHeaderRemoveSelectedFrom:(SectionHeader *)header
+- (void)sectionHeaderRemoveSelected:(NSString *)headerTitle
 {
-	if([header.title isEqualToString:kPullRequestSectionNames[kPullRequestSectionMerged]])
+	if([headerTitle isEqualToString:kPullRequestSectionNames[kPullRequestSectionMerged]])
 	{
 		if(Settings.dontAskBeforeWipingMerged)
 		{
@@ -682,7 +687,7 @@ NSString *currentAppVersion;
 			}
 		}
 	}
-	else if([header.title isEqualToString:kPullRequestSectionNames[kPullRequestSectionClosed]])
+	else if([headerTitle isEqualToString:kPullRequestSectionNames[kPullRequestSectionClosed]])
 	{
 		if(Settings.dontAskBeforeWipingClosed)
 		{
@@ -1819,13 +1824,21 @@ NSString *currentAppVersion;
 			case 125: // down
 			{
 				NSInteger i = self.mainMenu.prTable.selectedRow+1;
-				if(i<self.mainMenu.prTable.numberOfRows) [self scrollToIndex:i];
+				if(i<self.mainMenu.prTable.numberOfRows)
+				{
+					while(![self.pullRequestDelegate pullRequestAtRow:i]) i++;
+					[self scrollToIndex:i];
+				}
 				return nil;
 			}
 			case 126: // up
 			{
 				NSInteger i = self.mainMenu.prTable.selectedRow-1;
-				if(i>=0) [self scrollToIndex:i];
+				if(i>=0)
+				{
+					while(![self.pullRequestDelegate pullRequestAtRow:i]) i--;
+					[self scrollToIndex:i];
+				}
 				return nil;
 			}
 			case 36: // enter

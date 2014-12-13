@@ -35,5 +35,3 @@ func DLog(messageFormat:@autoclosure () -> String, args:LazyVarArgClosure...) {
 func MAKECOLOR(red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat) -> COLOR_CLASS {
 	return COLOR_CLASS(red: red, green: green, blue: blue, alpha: alpha)
 }
-
-let kPullRequestSectionNames = ["", "Mine", "Participated", "Recently Merged", "Recently Closed", "All Pull Requests"]

@@ -212,6 +212,10 @@ static NSDictionary *_statusAttributes;
 	{
 		[app.mainMenu.prTable selectRowIndexes:[NSIndexSet indexSetWithIndex:[app.mainMenu.prTable rowForView:self]] byExtendingSelection:NO];
 	}
+	else
+	{
+		[app.mainMenu.prTable deselectRow:[app.mainMenu.prTable rowForView:self]];
+	}
 
 	/*if(selected)
 	{

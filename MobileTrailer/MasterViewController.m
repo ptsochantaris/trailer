@@ -413,7 +413,6 @@
     }
 
     NSFetchRequest *fetchRequest = [PullRequest requestForPullRequestsWithFilter:searchField.text];
-    [fetchRequest setFetchBatchSize:20];
 
     NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
 																								managedObjectContext:DataManager.managedObjectContext

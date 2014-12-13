@@ -2,19 +2,33 @@
 class PullRequestDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 
 	private var pullRequestIds: [NSObject]
-	private let sectionDelegate: SectionHeaderDelegate
 
-	init(sectionDelegate: SectionHeaderDelegate) {
-		self.sectionDelegate = sectionDelegate
-		self.pullRequestIds = [NSObject]()
+	override init() {
+		pullRequestIds = [NSObject]()
 		super.init()
 		reloadData(nil)
 	}
 
 	func reloadData(filter: String?) {
+
+		pullRequestIds = [NSObject]()
+
 		let f = PullRequest.requestForPullRequestsWithFilter(filter)
-		f.resultType = NSFetchRequestResultType.ManagedObjectIDResultType
-		pullRequestIds = mainObjectContext.executeFetchRequest(f, error: nil) as [NSManagedObjectID]
+		let allPrs = mainObjectContext.executeFetchRequest(f, error: nil) as [PullRequest]
+
+		if let firstPr = allPrs.first {
+			var lastSection = firstPr.sectionIndex!.integerValue
+			pullRequestIds.append(kPullRequestSectionNames[lastSection] as String)
+
+			for pr in allPrs {
+				let i = pr.sectionIndex!.integerValue
+				if lastSection < i {
+					pullRequestIds.append(kPullRequestSectionNames[i] as String)
+					lastSection = i
+				}
+				pullRequestIds.append(pr.objectID)
+			}
+		}
 	}
 
 	func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
@@ -23,7 +37,10 @@ class PullRequestDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource 
 			let pr = mainObjectContext.existingObjectWithID(object as NSManagedObjectID, error: nil) as PullRequest?
 			return PRItemView(pullRequest: pr!)
 		} else {
-			return SectionHeader(delegate: sectionDelegate, title: object as String)
+			let title = object as String
+			let showButton = (title == kPullRequestSectionNames[Int(kPullRequestSectionMerged)] as String)
+				|| (title == kPullRequestSectionNames[Int(kPullRequestSectionClosed)] as String)
+			return SectionHeader(title: title, showRemoveAllButton: showButton)
 		}
 	}
 

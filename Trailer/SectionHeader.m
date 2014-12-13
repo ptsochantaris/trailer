@@ -7,15 +7,14 @@
 
 #define TITLE_HEIGHT 42
 
-- (id)initWithDelegate:(id<SectionHeaderDelegate>)delegate title:(NSString *)title
+- (id)initWithTitle:(NSString *)title showRemoveAllButton:(BOOL)show
 {
     self = [super initWithFrame:CGRectMake(0, 0, MENU_WIDTH, TITLE_HEIGHT)];
     if (self) {
-		self.delegate = delegate;
 		CGFloat W = MENU_WIDTH-app.scrollBarWidth;
-		if(delegate)
+		if(show)
 		{
-			NSButton *_unpin = [[NSButton alloc] initWithFrame:CGRectMake(W-100, -4.0, 90, TITLE_HEIGHT)];
+			NSButton *_unpin = [[NSButton alloc] initWithFrame:CGRectMake(W-100, 5.0, 90, TITLE_HEIGHT)];
 			[_unpin setTitle:@"Remove All"];
 			[_unpin setTarget:self];
 			[_unpin setAction:@selector(unPinSelected:)];
@@ -32,7 +31,7 @@
 										   NSForegroundColorAttributeName:[COLOR_CLASS controlShadowColor],
 										   };
 		
-		CGRect titleRect = CGRectMake(12, 0, W-120-AVATAR_SIZE-LEFTPADDING, TITLE_HEIGHT-8.0);
+		CGRect titleRect = CGRectMake(12, 4.0, W-120-AVATAR_SIZE-LEFTPADDING, TITLE_HEIGHT);
 		titleView = [[CenterTextField alloc] initWithFrame:titleRect];
 		titleView.attributedStringValue = [[NSAttributedString alloc] initWithString:title
 																		  attributes:titleAttributes];
@@ -41,23 +40,18 @@
     return self;
 }
 
-- (NSString *)title
-{
-	return titleView.attributedStringValue.string;
-}
-
 - (void)drawRect:(NSRect)dirtyRect
 {
 	[super drawRect:dirtyRect];
 	CGContextRef context = (CGContextRef) [[NSGraphicsContext currentContext] graphicsPort];
 	CGContextSetFillColorWithColor(context, [COLOR_CLASS controlShadowColor].CGColor);
-	CGFloat offset = [MenuWindow usingVibrancy] ? -4.0 : -4.5;
-	CGContextFillRect(context, CGRectMake(1.0, self.bounds.size.height+offset, MENU_WIDTH-2.0, 0.5));
+	CGFloat offset = [MenuWindow usingVibrancy] ? 2.0 : 2.5;
+	CGContextFillRect(context, CGRectMake(1.0, offset, MENU_WIDTH-2.0, 0.5));
 }
 
 - (void)unPinSelected:(NSButton *)button
 {
-	[self.delegate sectionHeaderRemoveSelectedFrom:self];
+	[app sectionHeaderRemoveSelected:titleView.attributedStringValue.string];
 }
 
 @end
