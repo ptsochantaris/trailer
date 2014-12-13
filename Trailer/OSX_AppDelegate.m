@@ -1815,6 +1815,8 @@
 
 		if([self checkForHotkey:incomingEvent]) return nil;
 
+		if([incomingEvent window]!=self.mainMenu) return incomingEvent;
+
 		switch(incomingEvent.keyCode)
 		{
 			case 125: // down
@@ -1840,9 +1842,12 @@
 			case 36: // enter
 			{
 				NSInteger i = self.mainMenu.prTable.selectedRow;
-				PRItemView *v = [self.mainMenu.prTable rowViewAtRow:i makeIfNecessary:NO];
-				BOOL isAlternative = ((incomingEvent.modifierFlags & NSAlternateKeyMask) == NSAlternateKeyMask);
-				if(v) [self prItemSelected:[v associatedPullRequest] alternativeSelect:isAlternative];
+				if(i>=0)
+				{
+					PRItemView *v = [self.mainMenu.prTable rowViewAtRow:i makeIfNecessary:NO];
+					BOOL isAlternative = ((incomingEvent.modifierFlags & NSAlternateKeyMask) == NSAlternateKeyMask);
+					if(v) [self prItemSelected:[v associatedPullRequest] alternativeSelect:isAlternative];
+				}
 				return nil;
 			}
 		}
