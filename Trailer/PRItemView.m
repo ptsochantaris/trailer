@@ -6,6 +6,7 @@
 	NSManagedObjectID *pullRequestId;
 	CenterTextField *title;
 	COLOR_CLASS *unselectedTitleColor;
+	FONT_CLASS *detailFont, *titleFont;
 }
 @end
 
@@ -47,12 +48,13 @@ static NSDictionary *_statusAttributes;
 			_commentsNew = pullRequest.unreadComments.integerValue;
 		}
 
-		NSFont *detailFont = [NSFont menuFontOfSize:10.0];
+		detailFont = [NSFont menuFontOfSize:10.0];
+		titleFont = [NSFont menuFontOfSize:13.0];
 
 		StatusItemView *v = (StatusItemView*)app.statusItem.view;
 		BOOL goneDark = [MenuWindow usingVibrancy] && v.darkMode;
 
-		NSMutableAttributedString *_title = [pullRequest titleWithFont:[NSFont menuFontOfSize:13.0]
+		NSMutableAttributedString *_title = [pullRequest titleWithFont:titleFont
 															 labelFont:detailFont
 															titleColor:goneDark ? [COLOR_CLASS controlHighlightColor] : [COLOR_CLASS controlTextColor]];
 
@@ -209,7 +211,6 @@ static NSDictionary *_statusAttributes;
 - (void)setSelected:(BOOL)selected
 {
 	_selected = selected;
-	NSMutableAttributedString *previousTitle = [title.attributedStringValue mutableCopy];
 	COLOR_CLASS *finalColor = unselectedTitleColor;
 	if(_selected)
 	{
@@ -221,19 +222,10 @@ static NSDictionary *_statusAttributes;
 	{
 		[app.mainMenu.prTable deselectRow:[app.mainMenu.prTable rowForView:self]];
 	}
-	[previousTitle setAttributes:@{ NSForegroundColorAttributeName: finalColor } range:NSMakeRange(0, previousTitle.length)];
-	title.attributedStringValue = previousTitle;
 
-	/*
-	if(selected) {
-		if([MenuWindow usingVibrancy]) {
-			self.backgroundColor = app.statusItemView.darkMode ? [COLOR_CLASS colorWithWhite:0.0 alpha:0.4] : [COLOR_CLASS whiteColor];
-		} else {
-			self.backgroundColor = MAKECOLOR(0.94, 0.94, 0.94, 1.0);
-		}
-	}
-	else { self.backgroundColor = [COLOR_CLASS clearColor]; }
-	*/
+	title.attributedStringValue = [[self associatedPullRequest] titleWithFont:titleFont
+																	labelFont:detailFont
+																   titleColor:finalColor];
 }
 
 - (void)copyThisPr

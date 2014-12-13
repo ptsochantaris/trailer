@@ -466,12 +466,6 @@ class PullRequest: DataItem {
 		var section: Int32
 		var condition = self.condition?.intValue ?? kPullRequestConditionOpen
 
-		if let c = self.condition {
-			if c.integerValue == Int(kPullRequestConditionClosed) {
-				DLog("Aha!")
-			}
-		}
-
 		if condition == kPullRequestConditionMerged			{ section = kPullRequestSectionMerged }
 		else if condition == kPullRequestConditionClosed	{ section = kPullRequestSectionClosed }
 		else if isMine()									{ section = kPullRequestSectionMine }

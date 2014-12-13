@@ -153,8 +153,7 @@ API *api;
 					 perPageCallback:^BOOL(id data, BOOL lastPage) {
 						 for(NSDictionary *info in data)
 						 {
-							 PRLabel *l = [PRLabel labelWithInfo:info fromServer:apiServer];
-							 l.pullRequest = p;
+							 [PRLabel labelWithInfo:info forPullRequest:p];
 						 }
 						 return NO;
 					 } finalCallback:^(BOOL success, NSInteger resultCode, NSString *etag) {
