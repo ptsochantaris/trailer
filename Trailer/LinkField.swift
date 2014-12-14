@@ -9,7 +9,7 @@ class LinkField: CenterTextField {
 
 	override func viewDidMoveToWindow() {
 		super.viewDidMoveToWindow()
-		let check = self.attributedStringValue .boundingRectWithSize(self.bounds.size,
+		let check = attributedStringValue .boundingRectWithSize(bounds.size,
 			options: NSStringDrawingOptions.UsesLineFragmentOrigin | NSStringDrawingOptions.UsesFontLeading)
 
 		let newArea = NSTrackingArea(rect: check,
@@ -17,11 +17,11 @@ class LinkField: CenterTextField {
 			owner: self,
 			userInfo: nil)
 
-		self.addTrackingArea(newArea)
+		addTrackingArea(newArea)
 
-		if let point = self.window?.mouseLocationOutsideOfEventStream {
+		if let point = window?.mouseLocationOutsideOfEventStream {
 			if NSPointInRect(point, check) {
-				self.mouseEntered(NSEvent())
+				mouseEntered(NSEvent())
 			}
 		}
 	}
@@ -30,56 +30,56 @@ class LinkField: CenterTextField {
 		super.resetCursorRects()
 		if highlight {
 
-			let check = self.attributedStringValue .boundingRectWithSize(self.bounds.size,
+			let check = attributedStringValue .boundingRectWithSize(bounds.size,
 				options: NSStringDrawingOptions.UsesLineFragmentOrigin | NSStringDrawingOptions.UsesFontLeading)
-			self.addCursorRect(check, cursor: NSCursor.pointingHandCursor())
+			addCursorRect(check, cursor: NSCursor.pointingHandCursor())
 		}
 	}
 
 	override func mouseExited(theEvent: NSEvent) {
 		highlight = false
-		if self.targetUrl != nil {
-			self.textColor = normalColor
-			self.window?.invalidateCursorRectsForView(self)
+		if targetUrl != nil {
+			textColor = normalColor
+			window?.invalidateCursorRectsForView(self)
 		}
 	}
 
 	override func mouseMoved(theEvent: NSEvent) {
-		if self.targetUrl != nil {
+		if targetUrl != nil {
 			if(highlight) {
-				if self.needsCommand && (theEvent.modifierFlags & NSEventModifierFlags.CommandKeyMask != NSEventModifierFlags.CommandKeyMask) {
+				if needsCommand && (theEvent.modifierFlags & NSEventModifierFlags.CommandKeyMask != NSEventModifierFlags.CommandKeyMask) {
 					highlight = false
-					self.textColor = normalColor
-					self.window?.invalidateCursorRectsForView(self)
+					textColor = normalColor
+					window?.invalidateCursorRectsForView(self)
 				}
 			} else {
-				if !self.needsCommand || (theEvent.modifierFlags & NSEventModifierFlags.CommandKeyMask == NSEventModifierFlags.CommandKeyMask) {
+				if !needsCommand || (theEvent.modifierFlags & NSEventModifierFlags.CommandKeyMask == NSEventModifierFlags.CommandKeyMask) {
 					highlight = true
-					normalColor = self.textColor
-					self.textColor = NSColor.blueColor()
-					self.window?.invalidateCursorRectsForView(self)
+					normalColor = textColor
+					textColor = NSColor.blueColor()
+					window?.invalidateCursorRectsForView(self)
 				}
 			}
 		}
 	}
 
 	override func mouseDown(theEvent: NSEvent) {
-		if self.targetUrl == nil {
-			self.nextResponder?.mouseDown(theEvent)
+		if targetUrl == nil {
+			nextResponder?.mouseDown(theEvent)
 		} else {
-			if self.needsCommand {
+			if needsCommand {
 				if theEvent.modifierFlags & NSEventModifierFlags.CommandKeyMask == NSEventModifierFlags.CommandKeyMask {
 					if theEvent.modifierFlags & NSEventModifierFlags.AlternateKeyMask == NSEventModifierFlags.AlternateKeyMask {
 						app.ignoreNextFocusLoss = true
 					}
-					NSWorkspace.sharedWorkspace().openURL(NSURL(string:self.targetUrl!)!)
-					self.mouseExited(theEvent)
+					NSWorkspace.sharedWorkspace().openURL(NSURL(string:targetUrl!)!)
+					mouseExited(theEvent)
 				} else {
-					self.nextResponder?.mouseDown(theEvent)
+					nextResponder?.mouseDown(theEvent)
 				}
 			} else {
-				NSWorkspace.sharedWorkspace().openURL(NSURL(string:self.targetUrl!)!)
-				self.mouseExited(theEvent)
+				NSWorkspace.sharedWorkspace().openURL(NSURL(string:targetUrl!)!)
+				mouseExited(theEvent)
 			}
 		}
 	}

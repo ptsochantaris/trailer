@@ -12,10 +12,10 @@ class MenuWindow: NSWindow {
 
 		super.awakeFromNib()
 
-		(self.contentView as NSView).wantsLayer = true
+		(contentView as NSView).wantsLayer = true
 
-		if self.scrollView.respondsToSelector(Selector("setAutomaticallyAdjustsContentInsets:")) {
-			self.scrollView.automaticallyAdjustsContentInsets = false
+		if scrollView.respondsToSelector(Selector("setAutomaticallyAdjustsContentInsets:")) {
+			scrollView.automaticallyAdjustsContentInsets = false
 		}
 
 		let n = NSNotificationCenter.defaultCenter()
@@ -37,38 +37,38 @@ class MenuWindow: NSWindow {
 		var bgColor: CGColorRef
 
 		if MenuWindow.usingVibrancy() { // we're on 10.10+ here
-			self.scrollView.frame = self.contentView.bounds
-			self.scrollView.contentInsets = NSEdgeInsetsMake(CGFloat(TOP_HEADER_HEIGHT), 0, 0, 0)
+			scrollView.frame = contentView.bounds
+			scrollView.contentInsets = NSEdgeInsetsMake(CGFloat(TOP_HEADER_HEIGHT), 0, 0, 0)
 
 			bgColor = COLOR_CLASS.clearColor().CGColor
 
-			self.appearance = NSAppearance(named: (app.statusItem.view as StatusItemView).darkMode ? NSAppearanceNameVibrantDark : NSAppearanceNameVibrantLight)
-			self.prTable.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.SourceList
+			appearance = NSAppearance(named: (app.statusItem.view as StatusItemView).darkMode ? NSAppearanceNameVibrantDark : NSAppearanceNameVibrantLight)
+			prTable.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.SourceList
 
-			headerVibrant = NSVisualEffectView(frame: self.header.bounds)
+			headerVibrant = NSVisualEffectView(frame: header.bounds)
 			headerVibrant!.autoresizingMask = NSAutoresizingMaskOptions.ViewHeightSizable | NSAutoresizingMaskOptions.ViewWidthSizable
 			headerVibrant!.blendingMode = NSVisualEffectBlendingMode.WithinWindow
-			self.header.addSubview(headerVibrant!, positioned:NSWindowOrderingMode.Below, relativeTo:nil)
+			header.addSubview(headerVibrant!, positioned:NSWindowOrderingMode.Below, relativeTo:nil)
 		} else {
-			let windowSize = self.contentView.bounds.size
-			self.scrollView.frame = CGRectMake(0, 0, windowSize.width, windowSize.height-CGFloat(TOP_HEADER_HEIGHT))
+			let windowSize = contentView.bounds.size
+			scrollView.frame = CGRectMake(0, 0, windowSize.width, windowSize.height-CGFloat(TOP_HEADER_HEIGHT))
 
 			bgColor = COLOR_CLASS.controlBackgroundColor().CGColor
 
 			if(NSAppKitVersionNumber>Double(NSAppKitVersionNumber10_9)) {
-				self.appearance = NSAppearance(named: NSAppearanceNameAqua)
+				appearance = NSAppearance(named: NSAppearanceNameAqua)
 			}
-			self.prTable.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.Regular
+			prTable.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.Regular
 
-			if self.scrollView.respondsToSelector(Selector("setContentInsets:")) {
-				self.scrollView.contentInsets = NSEdgeInsetsMake(0, 0, 0, 0)
+			if scrollView.respondsToSelector(Selector("setContentInsets:")) {
+				scrollView.contentInsets = NSEdgeInsetsMake(0, 0, 0, 0)
 			}
 		}
 
-		self.header.layer!.backgroundColor = bgColor;
+		header.layer!.backgroundColor = bgColor;
 
-		if self.scrollView.respondsToSelector(Selector("setScrollerInsets:")) {
-			self.scrollView.scrollerInsets = NSEdgeInsetsMake(4.0, 0, 0.0, 0)
+		if scrollView.respondsToSelector(Selector("setScrollerInsets:")) {
+			scrollView.scrollerInsets = NSEdgeInsetsMake(4.0, 0, 0.0, 0)
 		}
 	}
 

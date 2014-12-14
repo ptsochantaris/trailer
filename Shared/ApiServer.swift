@@ -75,7 +75,7 @@ class ApiServer: NSManagedObject {
 	}
 
 	class func someServersHaveAuthTokensInMoc(moc: NSManagedObjectContext) -> Bool {
-		for apiServer in self.allApiServersInMoc(moc) {
+		for apiServer in allApiServersInMoc(moc) {
 			if apiServer.authToken?.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 0 {
 				return true
 			}
@@ -90,7 +90,7 @@ class ApiServer: NSManagedObject {
 
 	func rollBackAllUpdatesInMoc(moc: NSManagedObjectContext) {
 		DLog("Rolling back changes for failed sync on API server %@",label);
-		for set in [self.repos, self.pullRequests, self.comments, self.statuses, self.labels] {
+		for set in [repos, pullRequests, comments, statuses, labels] {
 			for dataItem: DataItem in set.allObjects as [DataItem] {
 				if let action = dataItem.postSyncAction?.integerValue {
 					switch action {
@@ -109,7 +109,7 @@ class ApiServer: NSManagedObject {
 	}
 
 	func clearAllRelatedInfo() {
-		if let moc = self.managedObjectContext {
+		if let moc = managedObjectContext {
 			for repo in repos.allObjects as [Repo] {
 				moc.deleteObject(repo)
 			}
@@ -125,6 +125,6 @@ class ApiServer: NSManagedObject {
 	}
 
 	func goodToGo() -> Bool {
-		return self.authToken?.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 0
+		return authToken?.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 0
 	}
 }

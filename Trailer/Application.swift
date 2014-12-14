@@ -6,10 +6,10 @@ class Application: NSApplication {
 			if modifiers == NSEventModifierFlags.CommandKeyMask {
 				if let char = theEvent.charactersIgnoringModifiers {
 					switch char {
-					case "x": if self.sendAction(Selector("cut:"), to:nil, from:self) { return }
-					case "v": if self.sendAction(Selector("paste:"), to:nil, from:self) { return }
-					case "z": if self.sendAction(Selector("undo:"), to:nil, from:self) { return }
-					case "a": if self.sendAction(Selector("selectAll:"), to:nil, from:self) { return }
+					case "x": if sendAction(Selector("cut:"), to:nil, from:self) { return }
+					case "v": if sendAction(Selector("paste:"), to:nil, from:self) { return }
+					case "z": if sendAction(Selector("undo:"), to:nil, from:self) { return }
+					case "a": if sendAction(Selector("selectAll:"), to:nil, from:self) { return }
 					case "c":
 						if let url = app.focusedItemUrl() {
 							let p = NSPasteboard.generalPasteboard()
@@ -17,14 +17,14 @@ class Application: NSApplication {
 							p.setString(url, forType:NSStringPboardType)
 							return
 						} else {
-							if self.sendAction(Selector("copy:"), to:nil, from:self) { return }
+							if sendAction(Selector("copy:"), to:nil, from:self) { return }
 						}
 					default: break
 					}
 				}
 			} else if modifiers == NSEventModifierFlags.CommandKeyMask | NSEventModifierFlags.ShiftKeyMask {
 				if let char = theEvent.charactersIgnoringModifiers {
-					if char == "Z" && self.sendAction(Selector("redo:"), to:nil, from:self) { return }
+					if char == "Z" && sendAction(Selector("redo:"), to:nil, from:self) { return }
 				}
 			}
 		}

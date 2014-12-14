@@ -116,8 +116,8 @@ class DataItem: NSManagedObject {
 	}
 
 	override func prepareForDeletion() {
-		if self.postSyncAction?.integerValue==PostSyncAction.Delete.rawValue {
-			DLog("Deleting %@ ID: %@", self.entity.name, self.serverId)
+		if postSyncAction?.integerValue==PostSyncAction.Delete.rawValue {
+			DLog("Deleting %@ ID: %@", entity.name, serverId)
 		}
 		super.prepareForDeletion()
 	}

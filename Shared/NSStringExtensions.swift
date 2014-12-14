@@ -6,8 +6,8 @@ extension NSString {
 		let result = UnsafeMutablePointer<CUnsignedChar>.alloc(digestLen)
 
 		CC_MD5(
-			self.cStringUsingEncoding(NSUTF8StringEncoding),
-			CC_LONG(self.lengthOfBytesUsingEncoding(NSUTF8StringEncoding)),
+			cStringUsingEncoding(NSUTF8StringEncoding),
+			CC_LONG(lengthOfBytesUsingEncoding(NSUTF8StringEncoding)),
 			result)
 
 		var hash = NSMutableString()
@@ -21,7 +21,7 @@ extension NSString {
 	}
 
 	func parseFromHex() -> UInt32 {
-		var safe = self.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+		var safe = stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
 		safe = safe.stringByTrimmingCharactersInSet(NSCharacterSet.symbolCharacterSet())
 		let s = NSScanner(string: safe)
 		var result:UInt32 = 0

@@ -37,12 +37,12 @@ class PRComment: DataItem {
 	}
 
 	func isMine() -> Bool {
-		return self.userId == self.apiServer.userId
+		return userId == apiServer.userId
 	}
 
 	func refersToMe() -> Bool {
-		if let userForServer = self.apiServer.userName {
-			let rangeOfHandle = self.body?.rangeOfString("@"+userForServer,
+		if let userForServer = apiServer.userName {
+			let rangeOfHandle = body?.rangeOfString("@"+userForServer,
 				options: NSStringCompareOptions.CaseInsensitiveSearch|NSStringCompareOptions.DiacriticInsensitiveSearch)
 			return rangeOfHandle != nil
 		} else {

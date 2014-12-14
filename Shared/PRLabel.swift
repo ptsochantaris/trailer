@@ -40,7 +40,7 @@ class PRLabel: DataItem {
 	}
 
 	func colorForDisplay() -> COLOR_CLASS {
-		if let c = self.color?.unsignedLongLongValue {
+		if let c = color?.unsignedLongLongValue {
 			let red: UInt64 = (c & 0xFF0000)>>16
 			let green: UInt64 = (c & 0x00FF00)>>8
 			let blue: UInt64 = c & 0x0000FF

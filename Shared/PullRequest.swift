@@ -194,8 +194,8 @@ class PullRequest: DataItem {
 				return true
 			}
 		}
-		if let userId = self.userId {
-			if let apiId = self.apiServer.userId {
+		if let userId = userId {
+			if let apiId = apiServer.userId {
 				return userId == apiId
 			}
 		}
@@ -203,7 +203,7 @@ class PullRequest: DataItem {
 	}
 
 	func refersToMe() -> Bool {
-		if let apiName = self.apiServer.userName {
+		if let apiName = apiServer.userName {
 			if let b = body {
 				let range = b.rangeOfString("@"+apiName,
 					options: NSStringCompareOptions.CaseInsensitiveSearch | NSStringCompareOptions.DiacriticInsensitiveSearch)
@@ -413,7 +413,7 @@ class PullRequest: DataItem {
 		var result = [PRStatus]()
 		let targetUrls = NSMutableSet()
 		let descriptions = NSMutableSet()
-		for s in self.managedObjectContext?.executeFetchRequest(f, error: nil) as [PRStatus] {
+		for s in managedObjectContext?.executeFetchRequest(f, error: nil) as [PRStatus] {
 			var targetUrl: String
 			if let t = s.targetUrl { targetUrl = t } else { targetUrl = "" }
 			var desc: String
@@ -431,10 +431,7 @@ class PullRequest: DataItem {
 	}
 
 	func urlForOpening() -> String? {
-		var unreadCount = 0
-		if let c = self.unreadComments?.integerValue {
-			unreadCount = c
-		}
+		var unreadCount = unreadComments?.integerValue ?? 0
 
 		if(unreadCount > 0 && Settings.openPrAtFirstUnreadComment) {
 			let f = NSFetchRequest(entityName: "PRComment")
@@ -454,23 +451,23 @@ class PullRequest: DataItem {
 	}
 
 	func labelsLink() -> String {
-		return self.issueUrl!.stringByAppendingPathComponent("labels");
+		return issueUrl!.stringByAppendingPathComponent("labels");
 	}
 
 	func sectionName() -> String {
-		return kPullRequestSectionNames[self.sectionIndex!.integerValue] as String
+		return kPullRequestSectionNames[sectionIndex!.integerValue] as String
 	}
 
 	func postProcess() {
 		var section: Int
-		var condition = self.condition?.integerValue ?? PullRequestCondition.Open.rawValue
+		var currentCondition = condition?.integerValue ?? PullRequestCondition.Open.rawValue
 
-		if condition == PullRequestCondition.Merged.rawValue		{ section = PullRequestSection.Merged.rawValue }
-		else if condition == PullRequestCondition.Closed.rawValue	{ section = PullRequestSection.Closed.rawValue }
-		else if isMine()											{ section = PullRequestSection.Mine.rawValue }
-		else if commentedByMe()										{ section = PullRequestSection.Participated.rawValue }
-		else if Settings.hideAllPrsSection							{ section = PullRequestSection.None.rawValue }
-		else														{ section = PullRequestSection.All.rawValue }
+		if currentCondition == PullRequestCondition.Merged.rawValue			{ section = PullRequestSection.Merged.rawValue }
+		else if currentCondition == PullRequestCondition.Closed.rawValue	{ section = PullRequestSection.Closed.rawValue }
+		else if isMine()													{ section = PullRequestSection.Mine.rawValue }
+		else if commentedByMe()												{ section = PullRequestSection.Participated.rawValue }
+		else if Settings.hideAllPrsSection									{ section = PullRequestSection.None.rawValue }
+		else																{ section = PullRequestSection.All.rawValue }
 
 		let f = NSFetchRequest(entityName: "PRComment")
 		f.returnsObjectsAsFaults = false
@@ -480,12 +477,12 @@ class PullRequest: DataItem {
 			if refersToMe() {
 				section = PullRequestSection.Participated.rawValue;
 				f.predicate = predicateForOthersCommentsSinceDate(latestDate)
-				let count = self.managedObjectContext?.countForFetchRequest(f, error: nil)
+				let count = managedObjectContext?.countForFetchRequest(f, error: nil)
 				unreadComments = count!
 			} else {
 				f.predicate = predicateForOthersCommentsSinceDate(nil)
 				var unreadCommentCount: Int = 0
-				for c in self.managedObjectContext?.executeFetchRequest(f, error: nil) as [PRComment] {
+				for c in managedObjectContext?.executeFetchRequest(f, error: nil) as [PRComment] {
 					if c.refersToMe() {
 						section = PullRequestSection.Participated.rawValue
 					}
@@ -495,11 +492,11 @@ class PullRequest: DataItem {
 						}
 					}
 				}
-				self.unreadComments = unreadCommentCount
+				unreadComments = unreadCommentCount
 			}
 		} else {
 			f.predicate = predicateForOthersCommentsSinceDate(latestDate)
-			let count = self.managedObjectContext?.countForFetchRequest(f, error: nil)
+			let count = managedObjectContext?.countForFetchRequest(f, error: nil)
 			unreadComments = count!
 		}
 

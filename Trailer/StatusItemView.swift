@@ -1,13 +1,13 @@
 
 class StatusItemView: NSView {
 
-	let label: String
+	let statusLabel: String
 	let textAttributes: Dictionary<String, AnyObject>
 	var tappedCallback: (() -> Void)?
 
 	init(frame: NSRect, label: String, attributes: Dictionary<String, AnyObject>) {
-		self.label = label
-		self.textAttributes = attributes
+		statusLabel = label
+		textAttributes = attributes
 		highlighted = false
 		grayOut = false
 		darkMode = false
@@ -66,7 +66,7 @@ class StatusItemView: NSView {
 		darkMode = StatusItemView.checkDarkMode()
 
 		let imagePoint = NSMakePoint(CGFloat(STATUSITEM_PADDING), CGFloat(0))
-		let labelRect = CGRectMake(self.bounds.size.height, -5, self.bounds.size.width, self.bounds.size.height)
+		let labelRect = CGRectMake(bounds.size.height, -5, bounds.size.width, bounds.size.height)
 		var displayAttributes = textAttributes
 		var icon: NSImage
 
@@ -89,6 +89,6 @@ class StatusItemView: NSView {
 		}
 
 		icon.drawAtPoint(imagePoint, fromRect: NSZeroRect, operation: NSCompositingOperation.CompositeSourceOver, fraction: 1.0)
-		label.drawInRect(labelRect, withAttributes: displayAttributes)
+		statusLabel.drawInRect(labelRect, withAttributes: displayAttributes)
 	}
 }

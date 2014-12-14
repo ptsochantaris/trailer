@@ -3,11 +3,11 @@ class CenterTextField: NSTextField {
 
 	override init(frame frameRect: NSRect) {
 		super.init(frame: frameRect)
-		self.bezeled = false
-		self.editable = false
-		self.selectable = false
-		self.drawsBackground = false
-		if let myCell = self.cell() as? CenterTextFieldCell {
+		bezeled = false
+		editable = false
+		selectable = false
+		drawsBackground = false
+		if let myCell = cell() as? CenterTextFieldCell {
 			myCell.scrollable = false
 		}
 	}
@@ -17,7 +17,7 @@ class CenterTextField: NSTextField {
 	}
 
 	override class func initialize() {
-		self.setCellClass(CenterTextFieldCell)
+		setCellClass(CenterTextFieldCell)
 	}
 
 }

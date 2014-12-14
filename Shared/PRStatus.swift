@@ -44,7 +44,7 @@ class PRStatus: DataItem {
 	}
 
 	func colorForDarkDisplay() -> COLOR_CLASS {
-		switch self.state! {
+		switch state! {
 		case "pending":
 			return darkStatusYellow
 		case "success":
@@ -55,7 +55,7 @@ class PRStatus: DataItem {
 	}
 
 	func colorForDisplay() -> COLOR_CLASS {
-		switch self.state! {
+		switch state! {
 		case "pending":
 			return lightStatusYellow
 		case "success":
@@ -66,8 +66,8 @@ class PRStatus: DataItem {
 	}
 
 	func displayText() -> String {
-		if let desc = self.descriptionText {
-			return NSString(format: "%@ %@", dateFormatter.stringFromDate(self.createdAt!), desc)
+		if let desc = descriptionText {
+			return NSString(format: "%@ %@", dateFormatter.stringFromDate(createdAt!), desc)
 		} else {
 			return "(No description)"
 		}
