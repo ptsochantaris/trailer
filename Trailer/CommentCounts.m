@@ -49,9 +49,6 @@ typedef NS_ENUM(NSInteger, RoundedCorners) {
 	kRoundedCornerBottomRight = 8
 };
 
-#define BASE_BADGE_SIZE 21.0
-#define SMALL_BADGE_SIZE 14.0
-
 - (void)drawRect:(NSRect)dirtyRect
 {
 	[super drawRect:dirtyRect];

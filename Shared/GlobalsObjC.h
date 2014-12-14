@@ -73,19 +73,6 @@ typedef void (^completionBlockType)();
 #define LOW_API_WARNING 0.20
 #define NETWORK_TIMEOUT 120.0
 #define BACKOFF_STEP 120.0
-#define STATUSITEM_PADDING 1.0
-#define TOP_HEADER_HEIGHT 28.0
-#define AVATAR_SIZE 26.0
-#define LEFTPADDING 44.0
-#define TITLE_HEIGHT 42
-
-#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
-	#define CACHE_MEMORY 1024*1024*4
-	#define CACHE_DISK 1024*1024*128
-#else
-	#define CACHE_MEMORY 1024*1024*2
-	#define CACHE_DISK 1024*1024*8
-#endif
 
 #define CALLBACK if(callback) callback
 

@@ -1,6 +1,9 @@
 
 @import UIKit;
 
+#define CACHE_MEMORY 1024*1024*2
+#define CACHE_DISK 1024*1024*32
+
 #define COLOR_CLASS UIColor
 #define IMAGE_CLASS UIImage
 #define FONT_CLASS UIFont
