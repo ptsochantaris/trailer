@@ -9,6 +9,9 @@
 {
     self = [super initWithFrame:CGRectMake(0, 0, MENU_WIDTH, TITLE_HEIGHT)];
     if (self) {
+
+		self.canDrawSubviewsIntoLayer = YES;
+
 		CGFloat W = MENU_WIDTH-app.scrollBarWidth;
 		if(show)
 		{

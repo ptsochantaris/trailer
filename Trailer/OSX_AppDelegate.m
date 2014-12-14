@@ -30,8 +30,6 @@
 	[DataManager postProcessAllPrs];
 
 	self.pullRequestDelegate = [[PullRequestDelegate alloc] init];
-	NSTableColumn *prColumn = self.mainMenu.prTable.tableColumns[0];
-	prColumn.width = MENU_WIDTH;
 	self.mainMenu.prTable.dataSource = self.pullRequestDelegate;
 	self.mainMenu.prTable.delegate = self.pullRequestDelegate;
 
@@ -862,8 +860,7 @@
 	NSInteger index = [[ApiServer allApiServersInMoc:DataManager.managedObjectContext] indexOfObject:selectedServer];
 	[DataManager.managedObjectContext deleteObject:selectedServer];
 	[self.serverList reloadData];
-	[self.serverList selectRowIndexes:[NSIndexSet indexSetWithIndex:MIN(index,self.serverList.numberOfRows-1)]
-				 byExtendingSelection:NO];
+	[self.serverList selectRowIndexes:[NSIndexSet indexSetWithIndex:MIN(index,self.serverList.numberOfRows-1)] byExtendingSelection:NO];
 	[self fillServerApiFormFromSelectedServer];
 	[self updateMenu];
 	[DataManager saveDB];
@@ -1832,7 +1829,7 @@
 			case 126: // up
 			{
 				NSInteger i = self.mainMenu.prTable.selectedRow-1;
-				if(i>=0)
+				if(i>0)
 				{
 					while(![self.pullRequestDelegate pullRequestAtRow:i]) i--;
 					[self scrollToIndex:i];
@@ -1858,10 +1855,12 @@
 
 - (void)scrollToIndex:(NSInteger)i
 {
-	[self.mainMenu.prTable selectRowIndexes:[NSIndexSet indexSetWithIndex:i] byExtendingSelection:NO];
-	[self.mainMenu.prTable scrollRowToVisible:i];
 	app.isManuallyScrolling = YES;
 	[mouseIgnoreTimer push];
+	[self.mainMenu.prTable scrollRowToVisible:i];
+	dispatch_async(dispatch_get_main_queue(), ^{
+		[self.mainMenu.prTable selectRowIndexes:[NSIndexSet indexSetWithIndex:i] byExtendingSelection:NO];
+	});
 }
 
 - (NSString *)focusedItemUrl

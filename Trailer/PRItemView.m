@@ -38,6 +38,8 @@ static NSDictionary *_statusAttributes;
 	{
 		pullRequestId = pullRequest.objectID;
 
+		self.canDrawSubviewsIntoLayer = YES;
+
 		NSInteger _commentsNew = 0;
 		NSInteger _commentsTotal = pullRequest.totalComments.integerValue;
 		NSInteger sectionIndex = pullRequest.sectionIndex.integerValue;
