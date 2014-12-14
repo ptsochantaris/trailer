@@ -53,6 +53,11 @@ class PullRequestDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource 
 		return pullRequestIds.count
 	}
 
+	func tableView(tableView: NSTableView, isGroupRow row: Int) -> Bool {
+		let object = pullRequestIds[row]
+		return !object.isKindOfClass(NSManagedObjectID)
+	}
+
 	func pullRequestAtRow(row: Int) -> PullRequest? {
 		let object = pullRequestIds[row]
 		if object.isKindOfClass(NSManagedObjectID) {

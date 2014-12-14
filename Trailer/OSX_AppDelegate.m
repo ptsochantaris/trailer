@@ -1825,6 +1825,7 @@ OSX_AppDelegate *app;
 		{
 			case 125: // down
 			{
+				if(app.isManuallyScrolling && self.mainMenu.prTable.selectedRow==-1) return nil;
 				NSInteger i = self.mainMenu.prTable.selectedRow+1;
 				if(i<self.mainMenu.prTable.numberOfRows)
 				{
@@ -1835,6 +1836,7 @@ OSX_AppDelegate *app;
 			}
 			case 126: // up
 			{
+				if(app.isManuallyScrolling && self.mainMenu.prTable.selectedRow==-1) return nil;
 				NSInteger i = self.mainMenu.prTable.selectedRow-1;
 				if(i>0)
 				{
