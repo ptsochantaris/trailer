@@ -95,8 +95,7 @@ class PullRequest: DataItem {
 		var andPredicates = [NSPredicate]()
 		andPredicates.append(NSPredicate(format: "sectionIndex > 0")!)
 
-		if let fs = filter {
-			let fi = fs.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+		if let fi = filter {
 			if fi.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 0 {
 
 				var orPredicates = [NSPredicate]()
@@ -106,7 +105,7 @@ class PullRequest: DataItem {
 					orPredicates.append(NSPredicate(format: "repo.fullName contains[cd] %@", fi)!)
 				}
 				if Settings.includeLabelsInFilter {
-					orPredicates.append(NSPredicate(format: "labels.name contains[cd] %@", fi)!)
+					orPredicates.append(NSPredicate(format: "any labels.name contains[cd] %@", fi)!)
 				}
 				andPredicates.append(NSCompoundPredicate.orPredicateWithSubpredicates(orPredicates))
 			}

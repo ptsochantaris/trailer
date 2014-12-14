@@ -1856,6 +1856,11 @@ OSX_AppDelegate *app;
 				}
 				return nil;
 			}
+			case 53: // escape
+			{
+				[self closeMenu];
+				return nil;
+			}
 		}
 
 		return incomingEvent;
