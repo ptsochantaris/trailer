@@ -1,6 +1,5 @@
 
 #import "PRItemView.h"
-#import "SectionHeader.h"
 #import "API.h"
 
 @class PopTimer, StatusItemView, PullRequestDelegate, MenuWindow;

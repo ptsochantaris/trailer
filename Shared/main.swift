@@ -4,12 +4,12 @@ currentAppVersion = NSBundle.mainBundle().infoDictionary!["CFBundleShortVersionS
 DataManager.checkMigration()
 api = API()
 
-//debugging layout
+//debugging sections
 //let prs = PullRequest.allItemsOfType("PullRequest", inMoc: mainObjectContext) as [PullRequest]
-//prs[0].condition = NSNumber(int: kPullRequestConditionMerged)
-//prs[1].condition = NSNumber(int: kPullRequestConditionClosed)
-//prs[2].condition = NSNumber(int: kPullRequestConditionMerged)
-//prs[3].condition = NSNumber(int: kPullRequestConditionClosed)
+//prs[0].condition = NSNumber(integer: PullRequestCondition.Merged.rawValue)
+//prs[1].condition = NSNumber(integer: PullRequestCondition.Closed.rawValue)
+//prs[2].condition = NSNumber(integer: PullRequestCondition.Merged.rawValue)
+//prs[3].condition = NSNumber(integer: PullRequestCondition.Closed.rawValue)
 
 #if os(iOS)
 	UIApplicationMain(C_ARGC, C_ARGV, nil, NSStringFromClass(iOS_AppDelegate));
