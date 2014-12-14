@@ -1,6 +1,8 @@
 #import "OSX_AppDelegate.h"
 #import <Sparkle/Sparkle.h>
 
+OSX_AppDelegate *app;
+
 @implementation OSX_AppDelegate
 {
 	id globalKeyMonitor, localKeyMonitor;
@@ -165,10 +167,14 @@
 	}
 }
 
+- (IBAction)includeLabelsInFilteringSelected:(NSButton *)sender
+{
+	Settings.includeLabelsInFilter = (sender.integerValue==1);
+}
+
 - (IBAction)includeRepositoriesInfilterSelected:(NSButton *)sender
 {
-	BOOL setting = (sender.integerValue==1);
-	Settings.includeReposInFilter = setting;
+	Settings.includeReposInFilter = (sender.integerValue==1);
 }
 
 - (IBAction)dontConfirmRemoveAllClosedSelected:(NSButton *)sender
@@ -973,6 +979,7 @@
 	self.dontConfirmRemoveAllClosed.integerValue = Settings.dontAskBeforeWipingClosed;
 	self.displayRepositoryNames.integerValue = Settings.showReposInName;
 	self.includeRepositoriesInFiltering.integerValue = Settings.includeReposInFilter;
+	self.includeLabelsInFiltering.integerValue = Settings.includeLabelsInFilter;
 	self.dontConfirmRemoveAllMerged.integerValue = Settings.dontAskBeforeWipingMerged;
 	self.hideUncommentedPrs.integerValue = Settings.shouldHideUncommentedRequests;
 	self.autoParticipateWhenMentioned.integerValue = Settings.autoParticipateInMentions;

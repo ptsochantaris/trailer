@@ -64,6 +64,7 @@
 
 // Preferences - Display
 @property (weak) IBOutlet NSButton *useVibrancy;
+@property (weak) IBOutlet NSButton *includeLabelsInFiltering;
 
 // Preferences - Labels
 @property (weak) IBOutlet NSTextField *labelRescanLabel;

@@ -160,16 +160,6 @@ class Settings: NSObject {
 		set { set("DONT_ASK_BEFORE_WIPING_CLOSED", newValue) }
 	}
 
-	class var includeReposInFilter: Bool {
-		get { return get("INCLUDE_REPOS_IN_FILTER") as? Bool ?? false }
-		set { set("INCLUDE_REPOS_IN_FILTER", newValue) }
-	}
-
-	class var showReposInName: Bool {
-		get { return get("SHOW_REPOS_IN_NAME") as? Bool ?? false }
-		set { set("SHOW_REPOS_IN_NAME", newValue) }
-	}
-
 	class var hideNewRepositories: Bool {
 		get { return get("HIDE_NEW_REPOS_KEY") as? Bool ?? false }
 		set { set("HIDE_NEW_REPOS_KEY", newValue) }
@@ -238,6 +228,23 @@ class Settings: NSObject {
 	class var useVibrancy: Bool {
 		get { return get("USE_VIBRANCY_UI") as? Bool ?? false }
 		set { set("USE_VIBRANCY_UI", newValue) }
+	}
+
+	//////////////////////////////
+
+	class var showReposInName: Bool {
+		get { return get("SHOW_REPOS_IN_NAME") as? Bool ?? true }
+		set { set("SHOW_REPOS_IN_NAME", newValue) }
+	}
+
+	class var includeReposInFilter: Bool {
+		get { return get("INCLUDE_REPOS_IN_FILTER") as? Bool ?? true }
+		set { set("INCLUDE_REPOS_IN_FILTER", newValue) }
+	}
+
+	class var includeLabelsInFilter: Bool {
+		get { return get("INCLUDE_LABELS_IN_FILTER") as? Bool ?? true }
+		set { set("INCLUDE_LABELS_IN_FILTER", newValue) }
 	}
 
 	class var hotkeyCommandModifier: Bool {

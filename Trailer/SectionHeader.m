@@ -46,7 +46,7 @@
 	[super drawRect:dirtyRect];
 	CGContextRef context = (CGContextRef) [[NSGraphicsContext currentContext] graphicsPort];
 	CGContextSetFillColorWithColor(context, [COLOR_CLASS controlShadowColor].CGColor);
-	CGFloat offset = [MenuWindow usingVibrancy] ? 2.0 : 2.5;
+	CGFloat offset = [MenuWindow usingVibrancy] ? 2.5 : 3.5;
 	CGContextFillRect(context, CGRectMake(1.0, offset, MENU_WIDTH-2.0, 0.5));
 }
 

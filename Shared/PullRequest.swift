@@ -23,7 +23,6 @@ class PullRequest: DataItem {
     @NSManaged var number: NSNumber?
     @NSManaged var pinned: NSNumber?
     @NSManaged var reopened: NSNumber?
-    @NSManaged var repoName: String?
     @NSManaged var reviewCommentLink: String?
     @NSManaged var sectionIndex: NSNumber?
     @NSManaged var state: String?
@@ -93,28 +92,34 @@ class PullRequest: DataItem {
 
 	class func requestForPullRequestsWithFilter(filter: String?) -> NSFetchRequest {
 
-		var predicateSegments = [String]()
-		predicateSegments.append("(sectionIndex > 0)")
+		var andPredicates = [NSPredicate]()
+		andPredicates.append(NSPredicate(format: "sectionIndex > 0")!)
 
-		if let f = filter {
-			if f.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 0 {
+		if let fs = filter {
+			let fi = fs.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+			if fi.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 0 {
+
+				var orPredicates = [NSPredicate]()
+				orPredicates.append(NSPredicate(format: "title contains[cd] %@", fi)!)
+				orPredicates.append(NSPredicate(format: "userLogin contains[cd] %@", fi)!)
 				if Settings.includeReposInFilter {
-					predicateSegments.append("(title contains[cd] '\(f)' or userLogin contains[cd] '\(f)' or repoName contains[cd] '\(f)')")
-				} else {
-					predicateSegments.append("(title contains[cd] '\(f)' or userLogin contains[cd] '\(f)')")
+					orPredicates.append(NSPredicate(format: "repo.fullName contains[cd] %@", fi)!)
 				}
+				if Settings.includeLabelsInFilter {
+					orPredicates.append(NSPredicate(format: "labels.name contains[cd] %@", fi)!)
+				}
+				andPredicates.append(NSCompoundPredicate.orPredicateWithSubpredicates(orPredicates))
 			}
 		}
 
 		if Settings.shouldHideUncommentedRequests {
-			predicateSegments.append("(unreadComments > 0)")
+			andPredicates.append(NSPredicate(format: "unreadComments > 0")!)
 		}
 
 		var sortDescriptiors = [NSSortDescriptor]()
 		sortDescriptiors.append(NSSortDescriptor(key: "sectionIndex", ascending: true))
-
 		if Settings.groupByRepo {
-			sortDescriptiors.append(NSSortDescriptor(key: "repoName", ascending: true, selector: Selector("caseInsensitiveCompare:")))
+			sortDescriptiors.append(NSSortDescriptor(key: "repo.fullName", ascending: true, selector: Selector("caseInsensitiveCompare:")))
 		}
 
 		if let fieldName = sortField() {
@@ -127,7 +132,7 @@ class PullRequest: DataItem {
 
 		let f = NSFetchRequest(entityName: "PullRequest")
 		f.fetchBatchSize = 100
-		f.predicate = NSPredicate(format: " and ".join(predicateSegments))
+		f.predicate = NSCompoundPredicate.andPredicateWithSubpredicates(andPredicates)
 		f.sortDescriptors = sortDescriptiors
 		return f
 	}
@@ -308,7 +313,7 @@ class PullRequest: DataItem {
 		#endif
 
 		if Settings.showReposInName {
-			if let n = repoName {
+			if let n = repo.fullName {
 				var darkSubtitle = lightSubtitle;
 				darkSubtitle[NSForegroundColorAttributeName] = darkColor
 				_subtitle.appendAttributedString(NSAttributedString(string:n, attributes:darkSubtitle));
@@ -358,7 +363,7 @@ class PullRequest: DataItem {
 	func accessibleSubtitle() -> String {
 		var components = [String]()
 
-		if(Settings.showReposInName) { components.append("Repository: \(self.repoName)") }
+		if(Settings.showReposInName) { components.append("Repository: \(repo.fullName)") }
 
 		if let l = userLogin { components.append("Author: \(l)") }
 
@@ -470,13 +475,13 @@ class PullRequest: DataItem {
 		let f = NSFetchRequest(entityName: "PRComment")
 		f.returnsObjectsAsFaults = false
 
-		let latestDate = self.latestReadCommentDate;
+		let latestDate = latestReadCommentDate;
 		if (section == PullRequestSection.All.rawValue || section == PullRequestSection.None.rawValue) && Settings.autoParticipateInMentions {
 			if refersToMe() {
 				section = PullRequestSection.Participated.rawValue;
 				f.predicate = predicateForOthersCommentsSinceDate(latestDate)
 				let count = self.managedObjectContext?.countForFetchRequest(f, error: nil)
-				self.unreadComments = count!
+				unreadComments = count!
 			} else {
 				f.predicate = predicateForOthersCommentsSinceDate(nil)
 				var unreadCommentCount: Int = 0
@@ -495,14 +500,13 @@ class PullRequest: DataItem {
 		} else {
 			f.predicate = predicateForOthersCommentsSinceDate(latestDate)
 			let count = self.managedObjectContext?.countForFetchRequest(f, error: nil)
-			self.unreadComments = count!
+			unreadComments = count!
 		}
 
-		self.sectionIndex = Int(section)
-		self.totalComments = self.comments.count
-		self.repoName = self.repo.fullName
+		sectionIndex = Int(section)
+		totalComments = comments.count
 
-		if self.title==nil { self.title = "(No title)" }
+		if title==nil { title = "(No title)" }
 	}
 
 	func predicateForOthersCommentsSinceDate(optionalDate: NSDate?) -> NSPredicate {

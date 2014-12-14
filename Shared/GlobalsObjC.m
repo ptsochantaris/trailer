@@ -15,6 +15,5 @@ void DLog(NSString *format, ...)
 }
 
 API *api;
-OSX_AppDelegate *app;
 NSString *currentAppVersion;
 NSArray *kPullRequestSectionNames;

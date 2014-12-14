@@ -1,7 +1,7 @@
 
 class AvatarView: NSImageView {
 
-	var spinner:NSProgressIndicator?
+	var spinner: NSProgressIndicator?
 
 	init(frame frameRect:NSRect, url:NSString) {
 		super.init(frame: frameRect)

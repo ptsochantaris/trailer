@@ -115,7 +115,12 @@
 				if(Settings.includeReposInFilter) cell.accessoryType = UITableViewCellAccessoryCheckmark;
 				break;
             }
-
+			case 6:
+			{
+				cell.textLabel.text = @"Include labels in filtering";
+				if(Settings.includeLabelsInFilter) cell.accessoryType = UITableViewCellAccessoryCheckmark;
+				break;
+			}
 		}
 	}
 	else if(indexPath.section==COMMENTS_SECTION_INDEX)
@@ -361,6 +366,11 @@
 				Settings.includeReposInFilter = !Settings.includeReposInFilter;
 				break;
 			}
+			case 6:
+			{
+				Settings.includeLabelsInFilter = !Settings.includeLabelsInFilter;
+				break;
+			}
 		}
 	}
 	else if(indexPath.section==COMMENTS_SECTION_INDEX)
@@ -550,7 +560,7 @@
 {
     switch (section) {
 		case REFRESH_SECTION_INDEX: return 3;
-		case DISPLAY_SECTION_INDEX: return 6;
+		case DISPLAY_SECTION_INDEX: return 7;
 		case COMMENTS_SECTION_INDEX: return 5;
 		case REPOS_SECTION_INDEX: return 1;
 		case LABEL_SECTION_INDEX: return 2;
