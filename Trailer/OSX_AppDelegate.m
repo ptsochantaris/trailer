@@ -611,11 +611,10 @@ OSX_AppDelegate *app;
 	}
 	else
 	{
-		menuHeight += 30;
 		for(NSInteger f=0;f<rowCount;f++)
 		{
 			NSView *rowView = [self.mainMenu.prTable viewAtColumn:0 row:f makeIfNecessary:YES];
-			menuHeight += rowView.frame.size.height;
+			menuHeight += rowView.frame.size.height + 2;
 			if(menuHeight>=screenHeight) break;
 		}
 	}

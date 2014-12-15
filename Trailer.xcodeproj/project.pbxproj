@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		1604D4CF189541D70064A385 /* EmptyView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1604D4CE189541D70064A385 /* EmptyView.m */; };
-		160C5AD318682CD800142482 /* CommentCounts.m in Sources */ = {isa = PBXBuildFile; fileRef = 160C5AD218682CD800142482 /* CommentCounts.m */; };
 		16154E2F19C43E8E00E49139 /* Launch.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 16154E2E19C43E8E00E49139 /* Launch.storyboard */; };
 		161C959E1A3A36020019A577 /* MenuWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 161C959D1A3A36020019A577 /* MenuWindow.swift */; };
 		162002D01A2A3E2100FF95F3 /* Application.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002CF1A2A3E2100FF95F3 /* Application.swift */; };
@@ -44,6 +43,7 @@
 		169CEB9C1879D5BB0083A068 /* AdvancedSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 169CEB9B1879D5BB0083A068 /* AdvancedSettingsViewController.m */; };
 		169FB2341A3DAFED00E00771 /* GlobalsObjC.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B74E4D1A3C78FB00410EF6 /* GlobalsObjC.m */; };
 		169FB2361A3DBD7D00E00771 /* SectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169FB2351A3DBD7D00E00771 /* SectionHeader.swift */; };
+		169FB2381A3DF13800E00771 /* CommentCounts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169FB2371A3DF13800E00771 /* CommentCounts.swift */; };
 		16A505E01A3888D6005DD3B7 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16A505DF1A3888D6005DD3B7 /* Sparkle.framework */; };
 		16A505E21A3889B9005DD3B7 /* Sparkle.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 16A505DF1A3888D6005DD3B7 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		16A505E41A39B2DD005DD3B7 /* PullRequestDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A505E31A39B2DD005DD3B7 /* PullRequestDelegate.swift */; };
@@ -102,8 +102,6 @@
 /* Begin PBXFileReference section */
 		1604D4CD189541D70064A385 /* EmptyView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmptyView.h; sourceTree = "<group>"; };
 		1604D4CE189541D70064A385 /* EmptyView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EmptyView.m; sourceTree = "<group>"; };
-		160C5AD118682CD800142482 /* CommentCounts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommentCounts.h; sourceTree = "<group>"; };
-		160C5AD218682CD800142482 /* CommentCounts.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommentCounts.m; sourceTree = "<group>"; };
 		16154E2E19C43E8E00E49139 /* Launch.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Launch.storyboard; sourceTree = "<group>"; };
 		161C959D1A3A36020019A577 /* MenuWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuWindow.swift; sourceTree = "<group>"; };
 		162002CF1A2A3E2100FF95F3 /* Application.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Application.swift; sourceTree = "<group>"; };
@@ -157,6 +155,7 @@
 		169CEB9A1879D5BB0083A068 /* AdvancedSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdvancedSettingsViewController.h; sourceTree = "<group>"; };
 		169CEB9B1879D5BB0083A068 /* AdvancedSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = AdvancedSettingsViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		169FB2351A3DBD7D00E00771 /* SectionHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SectionHeader.swift; sourceTree = "<group>"; };
+		169FB2371A3DF13800E00771 /* CommentCounts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentCounts.swift; sourceTree = "<group>"; };
 		16A505DF1A3888D6005DD3B7 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = Trailer/Sparkle.framework; sourceTree = "<group>"; };
 		16A505E31A39B2DD005DD3B7 /* PullRequestDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PullRequestDelegate.swift; sourceTree = "<group>"; };
 		16A794F31A252BFA00A76553 /* PopTimer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PopTimer.swift; path = Shared/PopTimer.swift; sourceTree = "<group>"; };
@@ -312,12 +311,11 @@
 		16583E411851E5C6003A7A55 /* Menu Items */ = {
 			isa = PBXGroup;
 			children = (
-				160C5AD118682CD800142482 /* CommentCounts.h */,
-				160C5AD218682CD800142482 /* CommentCounts.m */,
 				16FA68391823CF4600401E9B /* PRItemView.h */,
 				16FA683A1823CF4600401E9B /* PRItemView.m */,
 				168FD00D1A2A7AD1005929CB /* MessageView.swift */,
 				169FB2351A3DBD7D00E00771 /* SectionHeader.swift */,
+				169FB2371A3DF13800E00771 /* CommentCounts.swift */,
 			);
 			name = "Menu Items";
 			sourceTree = "<group>";
@@ -623,9 +621,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				160C5AD318682CD800142482 /* CommentCounts.m in Sources */,
 				16FA683B1823CF4600401E9B /* PRItemView.m in Sources */,
 				16B3B31F1A34E8E2000BE6CC /* PRStatus.swift in Sources */,
+				169FB2381A3DF13800E00771 /* CommentCounts.swift in Sources */,
 				16B3B3571A34E9F7000BE6CC /* Reachability.m in Sources */,
 				16A505E41A39B2DD005DD3B7 /* PullRequestDelegate.swift in Sources */,
 				16B3B3211A34E8E2000BE6CC /* PullRequest.swift in Sources */,
