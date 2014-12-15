@@ -79,8 +79,8 @@
 		16CBE1C51A2DFBA500485053 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C41A2DFBA500485053 /* Settings.swift */; };
 		16CBE1C61A2DFBA500485053 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C41A2DFBA500485053 /* Settings.swift */; };
 		16CBE1CA1A2E13A400485053 /* StatusItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C91A2E13A400485053 /* StatusItemView.swift */; };
+		16DC40FC1A3F591200BB361A /* PrItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16DC40FB1A3F591200BB361A /* PrItemView.swift */; };
 		16EE562019B78DBA0031DF6D /* CommentBlacklistViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 16EE561F19B78DBA0031DF6D /* CommentBlacklistViewController.m */; };
-		16FA683B1823CF4600401E9B /* PRItemView.m in Sources */ = {isa = PBXBuildFile; fileRef = 16FA683A1823CF4600401E9B /* PRItemView.m */; };
 		16FD14D71881CBC400FDC960 /* PickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 16FD14D61881CBC400FDC960 /* PickerViewController.m */; };
 		16FDD6DD18804470008D2223 /* PRCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 16FDD6DC18804470008D2223 /* PRCell.m */; };
 /* End PBXBuildFile section */
@@ -199,11 +199,10 @@
 		16CBE1C31A2DF61C00485053 /* GlobalsObjC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GlobalsObjC.h; path = Shared/GlobalsObjC.h; sourceTree = "<group>"; };
 		16CBE1C41A2DFBA500485053 /* Settings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Settings.swift; path = Shared/Settings.swift; sourceTree = "<group>"; };
 		16CBE1C91A2E13A400485053 /* StatusItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatusItemView.swift; sourceTree = "<group>"; };
+		16DC40FB1A3F591200BB361A /* PrItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrItemView.swift; sourceTree = "<group>"; };
 		16EE561E19B78DBA0031DF6D /* CommentBlacklistViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommentBlacklistViewController.h; sourceTree = "<group>"; };
 		16EE561F19B78DBA0031DF6D /* CommentBlacklistViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = CommentBlacklistViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		16F51FA019DE8C78007B0BB1 /* PRIVACY */ = {isa = PBXFileReference; lastKnownFileType = text; path = PRIVACY; sourceTree = "<group>"; };
-		16FA68391823CF4600401E9B /* PRItemView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PRItemView.h; sourceTree = "<group>"; };
-		16FA683A1823CF4600401E9B /* PRItemView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = PRItemView.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		16FD14D51881CBC400FDC960 /* PickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PickerViewController.h; sourceTree = "<group>"; };
 		16FD14D61881CBC400FDC960 /* PickerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PickerViewController.m; sourceTree = "<group>"; };
 		16FDD6DB18804470008D2223 /* PRCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PRCell.h; sourceTree = "<group>"; };
@@ -311,11 +310,10 @@
 		16583E411851E5C6003A7A55 /* Menu Items */ = {
 			isa = PBXGroup;
 			children = (
-				16FA68391823CF4600401E9B /* PRItemView.h */,
-				16FA683A1823CF4600401E9B /* PRItemView.m */,
 				168FD00D1A2A7AD1005929CB /* MessageView.swift */,
 				169FB2351A3DBD7D00E00771 /* SectionHeader.swift */,
 				169FB2371A3DF13800E00771 /* CommentCounts.swift */,
+				16DC40FB1A3F591200BB361A /* PrItemView.swift */,
 			);
 			name = "Menu Items";
 			sourceTree = "<group>";
@@ -621,7 +619,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				16FA683B1823CF4600401E9B /* PRItemView.m in Sources */,
 				16B3B31F1A34E8E2000BE6CC /* PRStatus.swift in Sources */,
 				169FB2381A3DF13800E00771 /* CommentCounts.swift in Sources */,
 				16B3B3571A34E9F7000BE6CC /* Reachability.m in Sources */,
@@ -648,6 +645,7 @@
 				161C959E1A3A36020019A577 /* MenuWindow.swift in Sources */,
 				16CBE1C51A2DFBA500485053 /* Settings.swift in Sources */,
 				16B74E4E1A3C78FB00410EF6 /* GlobalsObjC.m in Sources */,
+				16DC40FC1A3F591200BB361A /* PrItemView.swift in Sources */,
 				168FD00E1A2A7AD1005929CB /* MessageView.swift in Sources */,
 				164785AA1A2CE7BD00297764 /* Globals.swift in Sources */,
 				16A794F41A252BFA00A76553 /* PopTimer.swift in Sources */,

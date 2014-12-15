@@ -35,7 +35,7 @@ class PullRequestDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource 
 		let object = pullRequestIds[row]
 		if object.isKindOfClass(NSManagedObjectID) {
 			let pr = mainObjectContext.existingObjectWithID(object as NSManagedObjectID, error: nil) as? PullRequest
-			return PRItemView(pullRequest: pr!)
+			return PrItemView(pullRequest: pr!)
 		} else {
 			let title = object as String
 			let showButton = (title == kPullRequestSectionNames[PullRequestSection.Merged.rawValue] as String)

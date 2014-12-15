@@ -611,6 +611,7 @@ OSX_AppDelegate *app;
 	}
 	else
 	{
+		menuHeight += 10;
 		for(NSInteger f=0;f<rowCount;f++)
 		{
 			NSView *rowView = [self.mainMenu.prTable viewAtColumn:0 row:f makeIfNecessary:YES];
@@ -740,72 +741,6 @@ OSX_AppDelegate *app;
 	[DataManager saveDB];
 	[self updateMenu];
 }
-
-/*- (void)buildPrMenuItemsFromList:(NSArray *)pullRequests
-{
-	currentPRItems = [NSMutableArray array];
-
-	SectionHeader *myHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:nil title:kPullRequestSectionNames[kPullRequestSectionMine]];
-	SectionHeader *participatedHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:nil title:kPullRequestSectionNames[kPullRequestSectionParticipated]];
-	SectionHeader *mergedHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:self title:kPullRequestSectionNames[kPullRequestSectionMerged]];
-	SectionHeader *closedHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:self title:kPullRequestSectionNames[kPullRequestSectionClosed]];
-	SectionHeader *allHeader = [[SectionHeader alloc] initWithRemoveAllDelegate:nil title:kPullRequestSectionNames[kPullRequestSectionAll]];
-
-	NSDictionary *sections = @{
-							   @kPullRequestSectionMine: [NSMutableArray arrayWithObject:myHeader],
-								@kPullRequestSectionParticipated: [NSMutableArray arrayWithObject:participatedHeader],
-								@kPullRequestSectionMerged: [NSMutableArray arrayWithObject:mergedHeader],
-								@kPullRequestSectionClosed: [NSMutableArray arrayWithObject:closedHeader],
-								@kPullRequestSectionAll: [NSMutableArray arrayWithObject:allHeader],
-								};
-
-	for(PullRequest *r in pullRequests)
-	{
-		PRItemView *view = [[PRItemView alloc] initWithPullRequest:r delegate:self];
-		[sections[r.sectionIndex] addObject:view];
-	}
-
-	for(NSInteger section=kPullRequestSectionMine;section<=kPullRequestSectionAll;section++)
-	{
-		NSArray *itemsInSection = sections[@(section)];
-		for(NSInteger p=1;p<itemsInSection.count;p++) // first item is the header
-			[currentPRItems addObject:itemsInSection[p]];
-	}
-
-	CGFloat top = 10.0;
-	NSView *menuContents = [[NSView alloc] initWithFrame:CGRectZero];
-
-	if(pullRequests.count)
-	{
-		for(NSInteger section=kPullRequestSectionAll; section>=kPullRequestSectionMine; section--)
-		{
-			NSArray *itemsInSection = sections[@(section)];
-			if(itemsInSection.count>1)
-			{
-				for(NSView *v in [itemsInSection reverseObjectEnumerator])
-				{
-					CGFloat H = v.frame.size.height;
-					v.frame = CGRectMake(0, top, MENU_WIDTH, H);
-					top += H;
-					[menuContents addSubview:v];
-				}
-			}
-		}
-	}
-	else
-	{
-		top = 100;
-		MessageView *empty = [[MessageView alloc] initWithFrame:CGRectMake(0, 0, MENU_WIDTH, top)
-														message:[DataManager reasonForEmptyWithFilter:self.mainMenuFilter.stringValue]];
-		[menuContents addSubview:empty];
-	}
-
-	menuContents.frame = CGRectMake(0, 0, MENU_WIDTH, top);
-
-	CGPoint lastPos = self.mainMenu.scrollView.contentView.documentVisibleRect.origin;
-	self.mainMenu.scrollView.documentView = menuContents;
-	[self.mainMenu.scrollView.documentView scrollPoint:lastPos];
-}*/
 
 - (void)startRateLimitHandling
 {
@@ -1849,7 +1784,7 @@ OSX_AppDelegate *app;
 				NSInteger i = self.mainMenu.prTable.selectedRow;
 				if(i>=0)
 				{
-					PRItemView *v = [self.mainMenu.prTable rowViewAtRow:i makeIfNecessary:NO];
+					PrItemView *v = [self.mainMenu.prTable rowViewAtRow:i makeIfNecessary:NO];
 					BOOL isAlternative = ((incomingEvent.modifierFlags & NSAlternateKeyMask) == NSAlternateKeyMask);
 					if(v) [self prItemSelected:[v associatedPullRequest] alternativeSelect:isAlternative];
 				}

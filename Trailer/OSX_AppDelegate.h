@@ -1,8 +1,6 @@
-
-#import "PRItemView.h"
 #import "API.h"
 
-@class PopTimer, StatusItemView, PullRequestDelegate, MenuWindow;
+@class PopTimer, StatusItemView, PullRequestDelegate, MenuWindow, PullRequest;
 
 @interface OSX_AppDelegate : NSObject <
 	NSApplicationDelegate,
