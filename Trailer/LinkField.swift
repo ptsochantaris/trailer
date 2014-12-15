@@ -44,7 +44,16 @@ class LinkField: CenterTextField {
 		}
 	}
 
+	override func mouseEntered(theEvent: NSEvent) {
+		normalColor = textColor
+		checkMove(theEvent)
+	}
+
 	override func mouseMoved(theEvent: NSEvent) {
+		checkMove(theEvent)
+	}
+
+	private func checkMove(theEvent: NSEvent) {
 		if targetUrl != nil {
 			if(highlight) {
 				if needsCommand && (theEvent.modifierFlags & NSEventModifierFlags.CommandKeyMask != NSEventModifierFlags.CommandKeyMask) {
@@ -55,7 +64,6 @@ class LinkField: CenterTextField {
 			} else {
 				if !needsCommand || (theEvent.modifierFlags & NSEventModifierFlags.CommandKeyMask == NSEventModifierFlags.CommandKeyMask) {
 					highlight = true
-					normalColor = textColor
 					textColor = NSColor.blueColor()
 					window?.invalidateCursorRectsForView(self)
 				}
