@@ -29,10 +29,14 @@
 		api = self;
 #ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
 		GLOBAL_SCREEN_SCALE = [UIScreen mainScreen].scale;
-#endif
-		NSURLCache *cache = [[NSURLCache alloc] initWithMemoryCapacity:CACHE_MEMORY
-														  diskCapacity:CACHE_DISK
+		NSURLCache *cache = [[NSURLCache alloc] initWithMemoryCapacity:1024*1024*2
+														  diskCapacity:1024*1024*32
 															  diskPath:nil];
+#else
+		NSURLCache *cache = [[NSURLCache alloc] initWithMemoryCapacity:1024*1024*4
+														  diskCapacity:1024*1024*128
+															  diskPath:nil];
+#endif
 		[NSURLCache setSharedURLCache:cache];
 
 		mediumFormatter = [[NSDateFormatter alloc] init];

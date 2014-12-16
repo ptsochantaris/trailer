@@ -28,6 +28,17 @@ func DLog(messageFormat:@autoclosure () -> String, args:LazyVarArgClosure...) {
 	typealias COLOR_CLASS = UIColor
 	typealias FONT_CLASS = UIFont
 #elseif os(OSX)
+	let STATUSITEM_PADDING: CGFloat = 1.0
+	let TOP_HEADER_HEIGHT: CGFloat =  28.0
+	let AVATAR_SIZE: CGFloat =  26.0
+	let LEFTPADDING: CGFloat =  44.0
+	let TITLE_HEIGHT: CGFloat =  42.0
+	let BASE_BADGE_SIZE: CGFloat =  21.0
+	let SMALL_BADGE_SIZE: CGFloat =  14.0
+	let MENU_WIDTH: CGFloat =  500.0
+	let AVATAR_PADDING: CGFloat =  8.0
+	let REMOVE_BUTTON_WIDTH: CGFloat =  80.0
+
 	typealias COLOR_CLASS = NSColor
 	typealias FONT_CLASS = NSFont
 #endif
