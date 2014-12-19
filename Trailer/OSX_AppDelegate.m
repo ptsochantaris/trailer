@@ -15,6 +15,7 @@ OSX_AppDelegate *app;
 	app = self;
 
 	self.mainMenu.backgroundColor = [COLOR_CLASS whiteColor];
+	self.lastRepoCheck = [NSDate distantPast];
 
 	filterTimer = [[PopTimer alloc] initWithTimeInterval:0.2
 												callback:^{
@@ -878,7 +879,7 @@ OSX_AppDelegate *app;
 	api.successfulRefreshesSinceLastStatusCheck = 0;
 	api.successfulRefreshesSinceLastLabelCheck = 0;
 	self.lastSuccessfulRefresh = nil;
-	self.lastRepoCheck = nil;
+	self.lastRepoCheck = [NSDate distantPast];
 	[self.projectsTable reloadData];
 	self.refreshButton.enabled = [ApiServer someServersHaveAuthTokensInMoc:DataManager.managedObjectContext];
 	[self updateMenu];
@@ -1372,7 +1373,7 @@ OSX_AppDelegate *app;
 {
 	if([tabView indexOfTabViewItem:tabViewItem]==1)
 	{
-		if((!self.lastRepoCheck || [Repo countVisibleReposInMoc:DataManager.managedObjectContext]==0) &&
+		if(([self.lastRepoCheck isEqualToDate:[NSDate distantPast]] || [Repo countVisibleReposInMoc:DataManager.managedObjectContext]==0) &&
 		   [ApiServer someServersHaveAuthTokensInMoc:DataManager.managedObjectContext])
 		{
 			[self refreshReposSelected:nil];

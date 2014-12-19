@@ -19,6 +19,7 @@ NSString *currentAppVersion;
 {
 	app = self;
 
+	self.lastRepoCheck = [NSDate distantPast];
 	self.enteringForeground = YES;
 
 	[DataManager postProcessAllPrs];

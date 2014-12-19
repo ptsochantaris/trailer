@@ -32,8 +32,8 @@ class DataManager : NSObject {
 			actualApiPath = actualApiPath.stringByReplacingOccurrencesOfString("//", withString:"/")
 
 			let newApiServer = ApiServer.addDefaultGithubInMoc(mainObjectContext)
-			newApiServer.apiPath = "https://".stringByAppendingString(actualApiPath)
-			newApiServer.webPath = "https://".stringByAppendingString(legacyWebHost!)
+			newApiServer.apiPath = "https://" + actualApiPath
+			newApiServer.webPath = "https://" + legacyWebHost!
 			newApiServer.authToken = legacyAuthToken
 			newApiServer.lastSyncSucceeded = true
 

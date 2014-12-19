@@ -1,4 +1,3 @@
-#import "API.h"
 
 @class PopTimer, StatusItemView, PullRequestDelegate, MenuWindow, PullRequest;
 

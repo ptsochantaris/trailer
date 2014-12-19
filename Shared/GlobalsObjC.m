@@ -17,3 +17,7 @@ void DLog(NSString *format, ...)
 API *api;
 NSString *currentAppVersion;
 NSArray *kPullRequestSectionNames;
+
+CGFloat LOW_API_WARNING = 0.20;
+NSTimeInterval NETWORK_TIMEOUT = 120.0;
+NSTimeInterval BACKOFF_STEP = 120.0;

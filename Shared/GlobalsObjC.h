@@ -60,8 +60,6 @@ typedef NS_ENUM(NSInteger, PRHandlingPolicy) {
 	kPullRequestHandlingKeepNone,
 };
 
-typedef void (^completionBlockType)();
-
 #define PULL_REQUEST_ID_KEY @"pullRequestIdKey"
 #define COMMENT_ID_KEY @"commentIdKey"
 #define NOTIFICATION_URL_KEY @"urlKey"
@@ -70,9 +68,9 @@ typedef void (^completionBlockType)();
 #define PR_ITEM_FOCUSED_STATE_KEY @"PrItemFocusedStateKey"
 #define UPDATE_VIBRANCY_NOTIFICATION @"UpdateVibrancyNotfication"
 
-#define LOW_API_WARNING 0.20
-#define NETWORK_TIMEOUT 120.0
-#define BACKOFF_STEP 120.0
+extern CGFloat LOW_API_WARNING;
+extern NSTimeInterval NETWORK_TIMEOUT;
+extern NSTimeInterval BACKOFF_STEP;
 
 #define CALLBACK if(callback) callback
 
@@ -80,5 +78,7 @@ void DLog(NSString *format, ...);
 extern NSString *currentAppVersion;
 extern NSArray *kPullRequestSectionNames;
 
-#import "API.h"
+#import "Reachability.h"
+
+@class API;
 extern API *api;

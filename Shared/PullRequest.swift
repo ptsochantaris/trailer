@@ -362,7 +362,10 @@ class PullRequest: DataItem {
 	func accessibleSubtitle() -> String {
 		var components = [String]()
 
-		if(Settings.showReposInName) { components.append("Repository: \(repo.fullName)") }
+		if(Settings.showReposInName) {
+			let repoFullName = repo.fullName ?? "NoRepoFullName"
+			components.append("Repository: \(repoFullName)")
+		}
 
 		if let l = userLogin { components.append("Author: \(l)") }
 
@@ -449,8 +452,8 @@ class PullRequest: DataItem {
 		return webUrl
 	}
 
-	func labelsLink() -> String {
-		return issueUrl!.stringByAppendingPathComponent("labels");
+	func labelsLink() -> String? {
+		return issueUrl?.stringByAppendingPathComponent("labels");
 	}
 
 	func sectionName() -> String {

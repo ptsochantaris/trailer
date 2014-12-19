@@ -27,6 +27,8 @@ func DLog(messageFormat:@autoclosure () -> String, args:LazyVarArgClosure...) {
 #if os(iOS)
 	typealias COLOR_CLASS = UIColor
 	typealias FONT_CLASS = UIFont
+	typealias IMAGE_CLASS = UIImage
+
 #elseif os(OSX)
 	let STATUSITEM_PADDING: CGFloat = 1.0
 	let TOP_HEADER_HEIGHT: CGFloat =  28.0
@@ -41,6 +43,7 @@ func DLog(messageFormat:@autoclosure () -> String, args:LazyVarArgClosure...) {
 
 	typealias COLOR_CLASS = NSColor
 	typealias FONT_CLASS = NSFont
+	typealias IMAGE_CLASS = NSImage
 #endif
 
 func MAKECOLOR(red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat) -> COLOR_CLASS {
