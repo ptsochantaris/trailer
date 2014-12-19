@@ -71,8 +71,8 @@
 		16B74E481A3B4AC800410EF6 /* PrTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B74E471A3B4AC800410EF6 /* PrTable.swift */; };
 		16B74E4E1A3C78FB00410EF6 /* GlobalsObjC.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B74E4D1A3C78FB00410EF6 /* GlobalsObjC.m */; };
 		16B94072182D136700F32061 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 16B94070182D136700F32061 /* dsa_pub.pem */; };
-		16C54F941881639B00849B76 /* GithubViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 16C54F931881639B00849B76 /* GithubViewController.m */; };
 		16C9A2761A44D12600EE54EC /* AboutTrailerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C9A2751A44D12600EE54EC /* AboutTrailerViewController.swift */; };
+		16C9A2781A44D86B00EE54EC /* GithubViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C9A2771A44D86B00EE54EC /* GithubViewController.swift */; };
 		16CBE1C11A2DBB2700485053 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C01A2DBB2700485053 /* DataManager.swift */; };
 		16CBE1C21A2DBB2700485053 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C01A2DBB2700485053 /* DataManager.swift */; };
 		16CBE1C51A2DFBA500485053 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C41A2DFBA500485053 /* Settings.swift */; };
@@ -186,9 +186,8 @@
 		16B74E471A3B4AC800410EF6 /* PrTable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrTable.swift; sourceTree = "<group>"; };
 		16B74E4D1A3C78FB00410EF6 /* GlobalsObjC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GlobalsObjC.m; path = Shared/GlobalsObjC.m; sourceTree = "<group>"; };
 		16B94070182D136700F32061 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
-		16C54F921881639B00849B76 /* GithubViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GithubViewController.h; sourceTree = "<group>"; };
-		16C54F931881639B00849B76 /* GithubViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GithubViewController.m; sourceTree = "<group>"; };
 		16C9A2751A44D12600EE54EC /* AboutTrailerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutTrailerViewController.swift; sourceTree = "<group>"; };
+		16C9A2771A44D86B00EE54EC /* GithubViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GithubViewController.swift; sourceTree = "<group>"; };
 		16CBE1C01A2DBB2700485053 /* DataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = DataManager.swift; path = Shared/DataManager.swift; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16CBE1C31A2DF61C00485053 /* GlobalsObjC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GlobalsObjC.h; path = Shared/GlobalsObjC.h; sourceTree = "<group>"; };
 		16CBE1C41A2DFBA500485053 /* Settings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Settings.swift; path = Shared/Settings.swift; sourceTree = "<group>"; };
@@ -445,8 +444,6 @@
 				169CEB9B1879D5BB0083A068 /* AdvancedSettingsViewController.m */,
 				1628A6FA1878B64E005EDA69 /* RespositoriesViewController.h */,
 				1628A6FB1878B64E005EDA69 /* RespositoriesViewController.m */,
-				16C54F921881639B00849B76 /* GithubViewController.h */,
-				16C54F931881639B00849B76 /* GithubViewController.m */,
 				16FD14D51881CBC400FDC960 /* PickerViewController.h */,
 				16FD14D61881CBC400FDC960 /* PickerViewController.m */,
 				16EE561E19B78DBA0031DF6D /* CommentBlacklistViewController.h */,
@@ -456,6 +453,7 @@
 				1694372719FD4056005079F6 /* ServerDetailViewController.h */,
 				1694372819FD4056005079F6 /* ServerDetailViewController.m */,
 				16C9A2751A44D12600EE54EC /* AboutTrailerViewController.swift */,
+				16C9A2771A44D86B00EE54EC /* GithubViewController.swift */,
 			);
 			name = Settings;
 			sourceTree = "<group>";
@@ -584,11 +582,11 @@
 				16B3B3181A34E8E2000BE6CC /* ApiServer.swift in Sources */,
 				16259BCE1A449400009C5745 /* OpenInSafariActivity.swift in Sources */,
 				16EE562019B78DBA0031DF6D /* CommentBlacklistViewController.m in Sources */,
+				16C9A2781A44D86B00EE54EC /* GithubViewController.swift in Sources */,
 				1628A6FC1878B64E005EDA69 /* RespositoriesViewController.m in Sources */,
 				169FB2341A3DAFED00E00771 /* GlobalsObjC.m in Sources */,
 				16CBE1C21A2DBB2700485053 /* DataManager.swift in Sources */,
 				1694372919FD4056005079F6 /* ServerDetailViewController.m in Sources */,
-				16C54F941881639B00849B76 /* GithubViewController.m in Sources */,
 				16B3B3221A34E8E2000BE6CC /* PullRequest.swift in Sources */,
 				16B3B3241A34E8E2000BE6CC /* Repo.swift in Sources */,
 				16B3B31E1A34E8E2000BE6CC /* PRLabel.swift in Sources */,

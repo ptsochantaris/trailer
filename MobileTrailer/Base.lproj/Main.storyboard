@@ -240,7 +240,7 @@
                     </navigationItem>
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
-                        <outlet property="actionsButton" destination="kBh-JC-HZv" id="ymr-Xd-DMK"/>
+                        <outlet property="actionsButton" destination="kBh-JC-HZv" id="Niq-mx-ZmL"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="6O3-4c-cEn" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -718,7 +718,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
         <!--GitHub-->
         <scene sceneID="ocq-RM-6Ci">
             <objects>
-                <viewController modalPresentationStyle="currentContext" hidesBottomBarWhenPushed="YES" id="kWj-6b-yq2" customClass="GithubViewController" sceneMemberID="viewController">
+                <viewController modalPresentationStyle="currentContext" hidesBottomBarWhenPushed="YES" id="kWj-6b-yq2" customClass="GithubViewController" customModule="PocketTrailer" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="zic-tr-u8O"/>
                         <viewControllerLayoutGuide type="bottom" id="UhO-5W-ZzH"/>

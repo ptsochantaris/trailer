@@ -6,6 +6,8 @@
     UITextField *searchField;
     PopTimer *searchTimer;
 }
+@property (nonatomic) NSFetchedResultsController *fetchedResultsController;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *actionsButton;
 @end
 
 @implementation RespositoriesViewController
