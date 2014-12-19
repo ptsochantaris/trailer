@@ -615,7 +615,7 @@
         <!--About-->
         <scene sceneID="gk8-1F-TsH">
             <objects>
-                <viewController automaticallyAdjustsScrollViewInsets="NO" modalPresentationStyle="currentContext" id="yvK-be-nK4" customClass="AboutTrailerViewController" sceneMemberID="viewController">
+                <viewController automaticallyAdjustsScrollViewInsets="NO" modalPresentationStyle="currentContext" id="yvK-be-nK4" customClass="AboutTrailerViewController" customModule="PocketTrailer" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="sc4-NU-7KZ"/>
                         <viewControllerLayoutGuide type="bottom" id="rvX-Ad-77Q"/>
@@ -697,12 +697,12 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
                     <navigationItem key="navigationItem" title="About" id="0uQ-oM-T56">
                         <barButtonItem key="leftBarButtonItem" style="done" systemItem="done" id="ZkS-hs-qdL">
                             <connections>
-                                <action selector="done:" destination="yvK-be-nK4" id="VKV-NS-dY0"/>
+                                <action selector="doneSelected" destination="yvK-be-nK4" id="eke-6y-5OQ"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" title="Web Site" id="DsZ-7N-eAb">
                             <connections>
-                                <action selector="ipadLink:" destination="yvK-be-nK4" id="Uvr-sW-ypB"/>
+                                <action selector="linkSelected" destination="yvK-be-nK4" id="IO2-cZ-Stq"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>

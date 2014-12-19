@@ -499,7 +499,8 @@
 	if(app.isRefreshing)
 	{
 		self.title = @"Refreshing...";
-		EmptyView *label = [[EmptyView alloc] initWithMessage:[DataManager reasonForEmptyWithFilter:searchField.text]];
+		EmptyView *label = [[EmptyView alloc] initWithMessage:[DataManager reasonForEmptyWithFilter:searchField.text]
+												  parentWidth:self.view.bounds.size.width];
 		self.tableView.tableFooterView = label;
 
 		if(!self.refreshControl.isRefreshing)
@@ -523,7 +524,8 @@
 		else
 		{
 			self.title = @"No PRs";
-			EmptyView *label = [[EmptyView alloc] initWithMessage:[DataManager reasonForEmptyWithFilter:searchField.text]];
+			EmptyView *label = [[EmptyView alloc] initWithMessage:[DataManager reasonForEmptyWithFilter:searchField.text]
+													  parentWidth:self.view.bounds.size.width];
 			self.tableView.tableFooterView = label;
 		}
 
