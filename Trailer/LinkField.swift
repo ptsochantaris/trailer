@@ -10,7 +10,7 @@ class LinkField: CenterTextField {
 	override func viewDidMoveToWindow() {
 		super.viewDidMoveToWindow()
 		let check = attributedStringValue .boundingRectWithSize(bounds.size,
-			options: NSStringDrawingOptions.UsesLineFragmentOrigin | NSStringDrawingOptions.UsesFontLeading)
+			options: stringDrawingOptions)
 
 		let newArea = NSTrackingArea(rect: check,
 			options: NSTrackingAreaOptions.MouseEnteredAndExited | NSTrackingAreaOptions.MouseMoved | NSTrackingAreaOptions.ActiveInKeyWindow,
@@ -30,8 +30,8 @@ class LinkField: CenterTextField {
 		super.resetCursorRects()
 		if highlight {
 
-			let check = attributedStringValue .boundingRectWithSize(bounds.size,
-				options: NSStringDrawingOptions.UsesLineFragmentOrigin | NSStringDrawingOptions.UsesFontLeading)
+			let check = attributedStringValue.boundingRectWithSize(bounds.size,
+				options: stringDrawingOptions)
 			addCursorRect(check, cursor: NSCursor.pointingHandCursor())
 		}
 	}

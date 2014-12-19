@@ -77,6 +77,7 @@ extern NSTimeInterval BACKOFF_STEP;
 void DLog(NSString *format, ...);
 extern NSString *currentAppVersion;
 extern NSArray *kPullRequestSectionNames;
+extern NSStringDrawingOptions stringDrawingOptions;
 
 #import "Reachability.h"
 

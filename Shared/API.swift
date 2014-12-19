@@ -15,7 +15,7 @@ class API: NSOperationQueue {
 	private let cacheDirectory: String
 	private var badLinks = [String:UrlBackOffEntry]()
 	#if os(iOS)
-	private var networkIndicationCount: Int
+	private var networkIndicationCount: Int = 0
 	private let GLOBAL_SCREEN_SCALE = UIScreen.mainScreen().scale
 	#endif
 
@@ -161,7 +161,7 @@ class API: NSOperationQueue {
 	func haveCachedAvatar(path: String, tryLoadAndCallback: ((IMAGE_CLASS?)->Void)?) -> Bool
 	{
 		#if os(iOS)
-			let absolutePath = path + (contains(path, "?") ? "&" : "?") + "s=" + (40.0*GLOBAL_SCREEN_SCALE)
+			let absolutePath = path + (contains(path, "?") ? "&" : "?") + "s=\(40.0*GLOBAL_SCREEN_SCALE)"
 			#else
 			let absolutePath = path + (contains(path, "?") ? "&" : "?") + "s=88"
 		#endif
@@ -173,13 +173,10 @@ class API: NSOperationQueue {
 		let fileManager = NSFileManager.defaultManager()
 		if fileManager.fileExistsAtPath(cachePath) {
 			#if os(iOS)
-				let imgData = NSData(contentsOfFile: cachePath) as CFDataRef
+				let imgData = NSData(contentsOfFile: cachePath)
 				let imgDataProvider = CGDataProviderCreateWithCFData(imgData)
-				let cfImage = CGImageCreateWithJPEGDataProvider(imgDataProvider, NULL, false, kCGRenderingIntentDefault)
-				CGDataProviderRelease(imgDataProvider);
-
-				let ret = UIImage(CGImage: cfImage, scale: GLOBAL_SCREEN_SCALE, orientation:UIImageOrientationUp)
-				CGImageRelease(cfImage)
+				let cfImage = CGImageCreateWithJPEGDataProvider(imgDataProvider, nil, false, kCGRenderingIntentDefault)
+				let ret = UIImage(CGImage: cfImage, scale: GLOBAL_SCREEN_SCALE, orientation:UIImageOrientation.Up)
 				#else
 				let ret = NSImage(contentsOfFile: cachePath)
 			#endif
@@ -197,7 +194,7 @@ class API: NSOperationQueue {
 					var image: IMAGE_CLASS?
 					if data != nil {
 						#if os(iOS)
-							image = IMAGE_CLASS(data: data!, scale: GLOBAL_SCREEN_SCALE)
+							image = IMAGE_CLASS(data: data!, scale: self.GLOBAL_SCREEN_SCALE)
 							UIImageJPEGRepresentation(image!, 1.0).writeToFile(cachePath, atomically: true)
 							#else
 							image = IMAGE_CLASS(data: data!)
@@ -1231,7 +1228,7 @@ class API: NSOperationQueue {
 	private func networkIndicationStart() {
 		#if os(iOS)
 			dispatch_async(dispatch_get_main_queue(), {
-			if ++networkIndicationCount==1 {
+			if ++self.networkIndicationCount==1 {
 			UIApplication.sharedApplication().networkActivityIndicatorVisible = true
 			}
 			})
@@ -1241,7 +1238,7 @@ class API: NSOperationQueue {
 	private func networkIndicationEnd() {
 		#if os(iOS)
 			dispatch_async(dispatch_get_main_queue(), {
-			if --networkIndicationCount==0 {
+			if --self.networkIndicationCount==0 {
 			UIApplication.sharedApplication().networkActivityIndicatorVisible = false
 			}
 			})

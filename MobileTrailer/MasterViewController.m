@@ -1,6 +1,5 @@
 #import "MasterViewController.h"
 #import "PRCell.h"
-#import "EmptyView.h"
 
 @implementation MasterViewController
 {

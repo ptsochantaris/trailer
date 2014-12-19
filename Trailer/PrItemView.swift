@@ -38,7 +38,7 @@ class PrItemView: NSTableCellView {
 		let showAvatar = (pullRequest.userAvatarUrl?.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) ?? 0) > 0 && !Settings.hideAvatars
 		if(showAvatar) { W -= CGFloat(AVATAR_SIZE+AVATAR_PADDING) } else { W += 4.0 }
 
-		let drawingOptions = NSStringDrawingOptions.UsesLineFragmentOrigin | NSStringDrawingOptions.UsesFontLeading
+		let drawingOptions = stringDrawingOptions
 		let titleHeight = ceil(_title.boundingRectWithSize(CGSizeMake(W, CGFloat(FLT_MAX)), options: drawingOptions).size.height)
 		let subtitleHeight = ceil(_subtitle.boundingRectWithSize(CGSizeMake(W, CGFloat(FLT_MAX)), options: drawingOptions).size.height+4.0)
 
@@ -60,7 +60,7 @@ class PrItemView: NSTableCellView {
 			statuses = pullRequest.displayedStatuses()
 			for s in statuses! {
 				let H = ceil(s.displayText().boundingRectWithSize(CGSizeMake(W, CGFloat(FLT_MAX)),
-					options: NSStringDrawingOptions.UsesLineFragmentOrigin|NSStringDrawingOptions.UsesFontLeading,
+					options: stringDrawingOptions,
 					attributes: statusAttributes).size.height)
 				statusRects.append(NSValue(rect: NSMakeRect(CGFloat(LEFTPADDING), bottom+statusBottom, W, H)))
 				statusBottom += H
