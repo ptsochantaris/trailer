@@ -250,7 +250,7 @@
         <!--Comment Blocking-->
         <scene sceneID="L4e-B0-eWh">
             <objects>
-                <tableViewController id="QXf-Ap-v0o" customClass="CommentBlacklistViewController" sceneMemberID="viewController">
+                <tableViewController id="QXf-Ap-v0o" customClass="CommentBlacklistViewController" customModule="PocketTrailer" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="60" sectionHeaderHeight="22" sectionFooterHeight="22" id="OK3-GS-b9l">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -272,7 +272,7 @@
                     <navigationItem key="navigationItem" title="Comment Blocking" id="Juw-ZJ-mYS">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="lmw-zy-yiu">
                             <connections>
-                                <action selector="addSelected:" destination="QXf-Ap-v0o" id="SZi-P3-L2c"/>
+                                <action selector="addSelected" destination="QXf-Ap-v0o" id="P67-d6-O7I"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>

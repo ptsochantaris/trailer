@@ -1,4 +1,0 @@
-
-@interface CommentBlacklistViewController : UITableViewController
-
-@end

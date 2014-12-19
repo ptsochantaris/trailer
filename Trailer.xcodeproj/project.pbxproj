@@ -73,13 +73,13 @@
 		16B94072182D136700F32061 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 16B94070182D136700F32061 /* dsa_pub.pem */; };
 		16C9A2761A44D12600EE54EC /* AboutTrailerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C9A2751A44D12600EE54EC /* AboutTrailerViewController.swift */; };
 		16C9A2781A44D86B00EE54EC /* GithubViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C9A2771A44D86B00EE54EC /* GithubViewController.swift */; };
+		16C9A27A1A44DD0200EE54EC /* CommentBlacklistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C9A2791A44DD0200EE54EC /* CommentBlacklistViewController.swift */; };
 		16CBE1C11A2DBB2700485053 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C01A2DBB2700485053 /* DataManager.swift */; };
 		16CBE1C21A2DBB2700485053 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C01A2DBB2700485053 /* DataManager.swift */; };
 		16CBE1C51A2DFBA500485053 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C41A2DFBA500485053 /* Settings.swift */; };
 		16CBE1C61A2DFBA500485053 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C41A2DFBA500485053 /* Settings.swift */; };
 		16CBE1CA1A2E13A400485053 /* StatusItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C91A2E13A400485053 /* StatusItemView.swift */; };
 		16DC40FC1A3F591200BB361A /* PrItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16DC40FB1A3F591200BB361A /* PrItemView.swift */; };
-		16EE562019B78DBA0031DF6D /* CommentBlacklistViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 16EE561F19B78DBA0031DF6D /* CommentBlacklistViewController.m */; };
 		16EE871B1A446BFE00A1D16F /* EmptyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16EE871A1A446BFE00A1D16F /* EmptyView.swift */; };
 		16FD14D71881CBC400FDC960 /* PickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 16FD14D61881CBC400FDC960 /* PickerViewController.m */; };
 		16FDD6DD18804470008D2223 /* PRCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 16FDD6DC18804470008D2223 /* PRCell.m */; };
@@ -188,13 +188,12 @@
 		16B94070182D136700F32061 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
 		16C9A2751A44D12600EE54EC /* AboutTrailerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutTrailerViewController.swift; sourceTree = "<group>"; };
 		16C9A2771A44D86B00EE54EC /* GithubViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GithubViewController.swift; sourceTree = "<group>"; };
+		16C9A2791A44DD0200EE54EC /* CommentBlacklistViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentBlacklistViewController.swift; sourceTree = "<group>"; };
 		16CBE1C01A2DBB2700485053 /* DataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = DataManager.swift; path = Shared/DataManager.swift; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16CBE1C31A2DF61C00485053 /* GlobalsObjC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GlobalsObjC.h; path = Shared/GlobalsObjC.h; sourceTree = "<group>"; };
 		16CBE1C41A2DFBA500485053 /* Settings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Settings.swift; path = Shared/Settings.swift; sourceTree = "<group>"; };
 		16CBE1C91A2E13A400485053 /* StatusItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatusItemView.swift; sourceTree = "<group>"; };
 		16DC40FB1A3F591200BB361A /* PrItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrItemView.swift; sourceTree = "<group>"; };
-		16EE561E19B78DBA0031DF6D /* CommentBlacklistViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommentBlacklistViewController.h; sourceTree = "<group>"; };
-		16EE561F19B78DBA0031DF6D /* CommentBlacklistViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = CommentBlacklistViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		16EE871A1A446BFE00A1D16F /* EmptyView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmptyView.swift; sourceTree = "<group>"; };
 		16F51FA019DE8C78007B0BB1 /* PRIVACY */ = {isa = PBXFileReference; lastKnownFileType = text; path = PRIVACY; sourceTree = "<group>"; };
 		16FD14D51881CBC400FDC960 /* PickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PickerViewController.h; sourceTree = "<group>"; };
@@ -446,14 +445,13 @@
 				1628A6FB1878B64E005EDA69 /* RespositoriesViewController.m */,
 				16FD14D51881CBC400FDC960 /* PickerViewController.h */,
 				16FD14D61881CBC400FDC960 /* PickerViewController.m */,
-				16EE561E19B78DBA0031DF6D /* CommentBlacklistViewController.h */,
-				16EE561F19B78DBA0031DF6D /* CommentBlacklistViewController.m */,
 				1694372419FD3F4D005079F6 /* ServersViewController.h */,
 				1694372519FD3F4D005079F6 /* ServersViewController.m */,
 				1694372719FD4056005079F6 /* ServerDetailViewController.h */,
 				1694372819FD4056005079F6 /* ServerDetailViewController.m */,
 				16C9A2751A44D12600EE54EC /* AboutTrailerViewController.swift */,
 				16C9A2771A44D86B00EE54EC /* GithubViewController.swift */,
+				16C9A2791A44DD0200EE54EC /* CommentBlacklistViewController.swift */,
 			);
 			name = Settings;
 			sourceTree = "<group>";
@@ -581,7 +579,7 @@
 				1628A6C518789E73005EDA69 /* iOS_AppDelegate.m in Sources */,
 				16B3B3181A34E8E2000BE6CC /* ApiServer.swift in Sources */,
 				16259BCE1A449400009C5745 /* OpenInSafariActivity.swift in Sources */,
-				16EE562019B78DBA0031DF6D /* CommentBlacklistViewController.m in Sources */,
+				16C9A27A1A44DD0200EE54EC /* CommentBlacklistViewController.swift in Sources */,
 				16C9A2781A44D86B00EE54EC /* GithubViewController.swift in Sources */,
 				1628A6FC1878B64E005EDA69 /* RespositoriesViewController.m in Sources */,
 				169FB2341A3DAFED00E00771 /* GlobalsObjC.m in Sources */,
