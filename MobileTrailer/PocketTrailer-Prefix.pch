@@ -5,6 +5,5 @@
 
 #import "iOS_Globals.h"
 #import "PocketTrailer-Swift.h"
-#import "UINavigationController+DismissKeyboard.h"
 
 #endif

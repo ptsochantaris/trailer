@@ -1,5 +1,4 @@
 #import "MasterViewController.h"
-#import "OpenInSafariActivity.h"
 
 iOS_AppDelegate *app;
 NSString *currentAppVersion;

@@ -1,4 +1,0 @@
-
-@interface UINavigationController (DismissKeyboard)
-
-@end

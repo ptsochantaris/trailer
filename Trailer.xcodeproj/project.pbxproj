@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		160823F51A44997F006F91AD /* UINavigationControllerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160823F31A44982F006F91AD /* UINavigationControllerExtensions.swift */; };
 		16154E2F19C43E8E00E49139 /* Launch.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 16154E2E19C43E8E00E49139 /* Launch.storyboard */; };
 		161C959E1A3A36020019A577 /* MenuWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 161C959D1A3A36020019A577 /* MenuWindow.swift */; };
 		162002D01A2A3E2100FF95F3 /* Application.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002CF1A2A3E2100FF95F3 /* Application.swift */; };
@@ -15,6 +16,7 @@
 		162002DD1A2A58B900FF95F3 /* CenterTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002DC1A2A58B900FF95F3 /* CenterTextField.swift */; };
 		162002DF1A2A5C9200FF95F3 /* LinkField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002DE1A2A5C9200FF95F3 /* LinkField.swift */; };
 		162002E71A2A75BD00FF95F3 /* AvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002E61A2A75BD00FF95F3 /* AvatarView.swift */; };
+		16259BCE1A449400009C5745 /* OpenInSafariActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16259BCD1A449400009C5745 /* OpenInSafariActivity.swift */; };
 		1628A6BF18789E73005EDA69 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1628A6BD18789E73005EDA69 /* InfoPlist.strings */; };
 		1628A6C518789E73005EDA69 /* iOS_AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1628A6C418789E73005EDA69 /* iOS_AppDelegate.m */; };
 		1628A6CB18789E73005EDA69 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1628A6C918789E73005EDA69 /* Main.storyboard */; };
@@ -31,8 +33,6 @@
 		164785AF1A2CE7CD00297764 /* NSDictionaryExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785AC1A2CE7CD00297764 /* NSDictionaryExtensions.swift */; };
 		164785B01A2CE7CD00297764 /* NSStringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785AD1A2CE7CD00297764 /* NSStringExtensions.swift */; };
 		164785B11A2CE7CD00297764 /* NSStringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785AD1A2CE7CD00297764 /* NSStringExtensions.swift */; };
-		1665B6661882F24400972111 /* UINavigationController+DismissKeyboard.m in Sources */ = {isa = PBXBuildFile; fileRef = 1665B6651882F24400972111 /* UINavigationController+DismissKeyboard.m */; };
-		166A19AA19B99C4C004D9057 /* OpenInSafariActivity.m in Sources */ = {isa = PBXBuildFile; fileRef = 166A19A819B99C48004D9057 /* OpenInSafariActivity.m */; };
 		168BC6B817EC2DF000BC4584 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 168BC6B617EC2DF000BC4584 /* InfoPlist.strings */; };
 		168BC6C117EC2DF000BC4584 /* OSX_AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 168BC6C017EC2DF000BC4584 /* OSX_AppDelegate.m */; };
 		168BC6C417EC2DF000BC4584 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 168BC6C217EC2DF000BC4584 /* MainMenu.xib */; };
@@ -100,6 +100,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		160823F31A44982F006F91AD /* UINavigationControllerExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UINavigationControllerExtensions.swift; sourceTree = "<group>"; };
 		16154E2E19C43E8E00E49139 /* Launch.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Launch.storyboard; sourceTree = "<group>"; };
 		161C959D1A3A36020019A577 /* MenuWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuWindow.swift; sourceTree = "<group>"; };
 		162002CF1A2A3E2100FF95F3 /* Application.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Application.swift; sourceTree = "<group>"; };
@@ -110,6 +111,7 @@
 		162002DC1A2A58B900FF95F3 /* CenterTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CenterTextField.swift; sourceTree = "<group>"; };
 		162002DE1A2A5C9200FF95F3 /* LinkField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinkField.swift; sourceTree = "<group>"; };
 		162002E61A2A75BD00FF95F3 /* AvatarView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AvatarView.swift; sourceTree = "<group>"; };
+		16259BCD1A449400009C5745 /* OpenInSafariActivity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenInSafariActivity.swift; sourceTree = "<group>"; };
 		1628A6B118789E73005EDA69 /* PocketTrailer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PocketTrailer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1628A6BC18789E73005EDA69 /* PocketTrailer-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "PocketTrailer-Info.plist"; sourceTree = "<group>"; };
 		1628A6BE18789E73005EDA69 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -132,10 +134,6 @@
 		164785AD1A2CE7CD00297764 /* NSStringExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NSStringExtensions.swift; path = Shared/NSStringExtensions.swift; sourceTree = "<group>"; };
 		164785B21A2CE7FB00297764 /* PocketTrailer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PocketTrailer-Bridging-Header.h"; sourceTree = "<group>"; };
 		164785B31A2CE80800297764 /* Trailer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Trailer-Bridging-Header.h"; sourceTree = "<group>"; };
-		1665B6641882F24400972111 /* UINavigationController+DismissKeyboard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UINavigationController+DismissKeyboard.h"; sourceTree = "<group>"; };
-		1665B6651882F24400972111 /* UINavigationController+DismissKeyboard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UINavigationController+DismissKeyboard.m"; sourceTree = "<group>"; };
-		166A19A719B99C48004D9057 /* OpenInSafariActivity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenInSafariActivity.h; sourceTree = "<group>"; };
-		166A19A819B99C48004D9057 /* OpenInSafariActivity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OpenInSafariActivity.m; sourceTree = "<group>"; };
 		168BC6AA17EC2DF000BC4584 /* Trailer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Trailer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		168BC6B517EC2DF000BC4584 /* Trailer-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Trailer-Info.plist"; sourceTree = "<group>"; };
 		168BC6B717EC2DF000BC4584 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -399,10 +397,8 @@
 		16B069721882EA530053620E /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				1665B6641882F24400972111 /* UINavigationController+DismissKeyboard.h */,
-				1665B6651882F24400972111 /* UINavigationController+DismissKeyboard.m */,
-				166A19A719B99C48004D9057 /* OpenInSafariActivity.h */,
-				166A19A819B99C48004D9057 /* OpenInSafariActivity.m */,
+				16259BCD1A449400009C5745 /* OpenInSafariActivity.swift */,
+				160823F31A44982F006F91AD /* UINavigationControllerExtensions.swift */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
@@ -575,7 +571,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1665B6661882F24400972111 /* UINavigationController+DismissKeyboard.m in Sources */,
 				16B3B31C1A34E8E2000BE6CC /* PRComment.swift in Sources */,
 				169CEB9C1879D5BB0083A068 /* AdvancedSettingsViewController.m in Sources */,
 				1628A6D418789E73005EDA69 /* DetailViewController.m in Sources */,
@@ -588,6 +583,7 @@
 				164785AF1A2CE7CD00297764 /* NSDictionaryExtensions.swift in Sources */,
 				1628A6C518789E73005EDA69 /* iOS_AppDelegate.m in Sources */,
 				16B3B3181A34E8E2000BE6CC /* ApiServer.swift in Sources */,
+				16259BCE1A449400009C5745 /* OpenInSafariActivity.swift in Sources */,
 				16EE562019B78DBA0031DF6D /* CommentBlacklistViewController.m in Sources */,
 				1640470A1882ED0000A4AC9C /* AboutTrailerViewController.m in Sources */,
 				1628A6FC1878B64E005EDA69 /* RespositoriesViewController.m in Sources */,
@@ -599,7 +595,6 @@
 				16B3B3241A34E8E2000BE6CC /* Repo.swift in Sources */,
 				16B3B31E1A34E8E2000BE6CC /* PRLabel.swift in Sources */,
 				16EE871B1A446BFE00A1D16F /* EmptyView.swift in Sources */,
-				166A19AA19B99C4C004D9057 /* OpenInSafariActivity.m in Sources */,
 				16FDD6DD18804470008D2223 /* PRCell.m in Sources */,
 				16B3B3581A34E9F7000BE6CC /* Reachability.m in Sources */,
 				168FD0121A2A8C28005929CB /* PopTimer.swift in Sources */,
@@ -607,6 +602,7 @@
 				16FD14D71881CBC400FDC960 /* PickerViewController.m in Sources */,
 				16B3B31A1A34E8E2000BE6CC /* DataItem.swift in Sources */,
 				162A29DA1A4085FD008F41A9 /* API.swift in Sources */,
+				160823F51A44997F006F91AD /* UINavigationControllerExtensions.swift in Sources */,
 				16B3B3501A34E990000BE6CC /* Trailer.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -299,11 +299,9 @@ class API: NSOperationQueue {
 		if willScanForStatuses {
 			fetchStatusesForCurrentPullRequestsToMoc(moc, andCallback: completionCallback)
 		}
-
 		if willScanForLabels {
 			fetchLabelsForForCurrentPullRequestsToMoc(moc, andCallback: completionCallback)
 		}
-
 		fetchCommentsForCurrentPullRequestsToMoc(moc, andCallback: completionCallback)
 		checkPrClosuresInMoc(moc, andCallback: completionCallback)
 		detectAssignedPullRequestsInMoc(moc, andCallback: completionCallback)
@@ -357,7 +355,7 @@ class API: NSOperationQueue {
 		getPagedDataInPath("/users/\(userName)/events",
 			fromServer: usingUserEventsFromServer,
 			startingFromPage: 1,
-			parameters:nil,
+			parameters: nil,
 			extraHeaders: extraHeaders,
 			perPageCallback: { (data, lastPage) in
 				for d in data as [NSDictionary] {
@@ -790,7 +788,7 @@ class API: NSOperationQueue {
 
 		let repoFullName = r.repo.fullName ?? "NoRepoFullName"
 		let repoNumber = r.number ?? "NoRepoNumber"
-		get("/repos/\(repoFullName)/pulls/\(repoNumber)", fromServer: r.apiServer, ignoreLastSync: false, parameters:nil, extraHeaders: nil,
+		get("/repos/\(repoFullName)/pulls/\(repoNumber)", fromServer: r.apiServer, ignoreLastSync: false, parameters: nil, extraHeaders: nil,
 			success: { (response, data) in
 
 				if let mergeInfo = (data as? NSDictionary)?.ofk("merged_by") as NSDictionary? {
@@ -954,7 +952,7 @@ class API: NSOperationQueue {
 		var completionCount = 0
 		for apiServer in allApiServers {
 			if apiServer.goodToGo() {
-				getDataInPath("/user", fromServer:apiServer, parameters:nil, extraHeaders:nil, andCallback: {
+				getDataInPath("/user", fromServer:apiServer, parameters: nil, extraHeaders:nil, andCallback: {
 					(data, lastPage, resultCode, etag) in
 
 					if let d = data as NSDictionary? {
@@ -1002,7 +1000,7 @@ class API: NSOperationQueue {
 		path: String,
 		fromServer: ApiServer,
 		startingFromPage: Int,
-		parameters: Dictionary<String,AnyObject>?,
+		parameters: Dictionary<String, String>?,
 		extraHeaders: Dictionary<String, String>?,
 		perPageCallback: ((data: AnyObject?, lastPage: Bool)->Bool)?,
 		finalCallback: ((success: Bool, resultCode: Int, etag: String?)->Void)?) {
@@ -1017,12 +1015,18 @@ class API: NSOperationQueue {
 				return
 			}
 
-			var mutableParams = parameters ?? [String:AnyObject]()
-			mutableParams["page"] = startingFromPage
-			mutableParams["per_page"] = 100
+			var mutableParams: [String:String]
+			if let p = parameters {
+				mutableParams = p
+			} else {
+				mutableParams = [String:String]()
+			}
+			mutableParams["page"] = String(startingFromPage)
+			mutableParams["per_page"] = "100"
 
 			getDataInPath(path, fromServer: fromServer, parameters: mutableParams, extraHeaders: extraHeaders) {
 				(data, lastPage, resultCode, etag) in
+
 				if let d: AnyObject = data {
 					var isLastPage = lastPage
 					if let p = perPageCallback {
@@ -1047,7 +1051,7 @@ class API: NSOperationQueue {
 	private func getDataInPath(
 		path: String,
 		fromServer: ApiServer,
-		parameters: Dictionary<String,AnyObject>?,
+		parameters: Dictionary<String, String>?,
 		extraHeaders: Dictionary<String, String>?,
 		andCallback:((data: AnyObject?, lastPage: Bool, resultCode: Int, etag: String?)->Void)?) {
 
@@ -1083,7 +1087,7 @@ class API: NSOperationQueue {
 		path:String,
 		fromServer: ApiServer,
 		ignoreLastSync: Bool,
-		parameters: Dictionary<String,AnyObject>?,
+		parameters: Dictionary<String, String>?,
 		extraHeaders: Dictionary<String, String>?,
 		success: ((response: NSHTTPURLResponse?, data: AnyObject?)->Void)?,
 		failure: ((response: NSHTTPURLResponse?, data: AnyObject?, error: NSError?)->Void)?) {
@@ -1109,8 +1113,8 @@ class API: NSOperationQueue {
 
 				if let params = parameters {
 					var pairs = [String]()
-					for (key,value) in params {
-						pairs.append("\(key)=\(value)")
+					for (key, value) in params {
+						pairs.append(key + "=" + value)
 					}
 					expandedPath = expandedPath + "?" + "&".join(pairs)
 				}
