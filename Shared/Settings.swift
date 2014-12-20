@@ -94,9 +94,9 @@ class Settings: NSObject {
 	}
 
 	class var backgroundRefreshPeriod: Float {
-		get { if let n = get("REFRESH_PERIOD_KEY") as? Float { return n > 0 ? n : 1800 } else { return 1800 } }
+		get { if let n = get("IOS_BACKGROUND_REFRESH_PERIOD_KEY") as? Float { return n > 0 ? n : 1800 } else { return 1800 } }
 		set {
-			set("REFRESH_PERIOD_KEY", newValue)
+			set("IOS_BACKGROUND_REFRESH_PERIOD_KEY", newValue)
 			#if os(iOS)
 			UIApplication.sharedApplication().setMinimumBackgroundFetchInterval(NSTimeInterval(newValue))
 			#endif

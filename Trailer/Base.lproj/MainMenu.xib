@@ -450,7 +450,7 @@ user you can add more servers from the left.</string>
                                         <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="cA3-l8-9ga">
                                             <rect key="frame" x="703" y="51" width="19" height="27"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                                            <stepperCell key="cell" continuous="YES" alignment="left" minValue="1" maxValue="99999" doubleValue="2" id="cqd-bh-Lwg"/>
+                                            <stepperCell key="cell" continuous="YES" alignment="left" minValue="2" maxValue="99999" doubleValue="2" id="cqd-bh-Lwg"/>
                                             <connections>
                                                 <action selector="newRepoCheckChanged:" target="494" id="kF0-jm-0IT"/>
                                             </connections>

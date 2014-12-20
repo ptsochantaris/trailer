@@ -284,7 +284,7 @@
         <!--Advanced-->
         <scene sceneID="13M-SK-H8U">
             <objects>
-                <tableViewController modalPresentationStyle="currentContext" id="ls6-NX-hye" customClass="AdvancedSettingsViewController" sceneMemberID="viewController">
+                <tableViewController modalPresentationStyle="currentContext" id="ls6-NX-hye" customClass="AdvancedSettingsViewController" customModule="PocketTrailer" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="54" sectionHeaderHeight="10" sectionFooterHeight="10" id="Q1r-gB-XEK">
                         <rect key="frame" x="0.0" y="64" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -586,7 +586,7 @@
         <!--Picker View Controller-->
         <scene sceneID="5Tx-Cn-3zg">
             <objects>
-                <tableViewController modalPresentationStyle="currentContext" id="UM1-Tl-R50" customClass="PickerViewController" sceneMemberID="viewController">
+                <tableViewController modalPresentationStyle="currentContext" id="UM1-Tl-R50" customClass="PickerViewController" customModule="PocketTrailer" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" id="JIf-tM-OPO">
                         <rect key="frame" x="0.0" y="64" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

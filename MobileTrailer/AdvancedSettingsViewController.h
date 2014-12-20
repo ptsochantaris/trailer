@@ -1,5 +1,0 @@
-
-@interface AdvancedSettingsViewController : UITableViewController
-
-@end
-

@@ -33,13 +33,14 @@
 		164785B11A2CE7CD00297764 /* NSStringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785AD1A2CE7CD00297764 /* NSStringExtensions.swift */; };
 		166A84BE1A457CA700A3B292 /* ServersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166A84BD1A457CA700A3B292 /* ServersViewController.swift */; };
 		166A84C01A4582C100A3B292 /* ServerDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166A84BF1A4582C100A3B292 /* ServerDetailViewController.swift */; };
+		166A84C21A45A37700A3B292 /* AdvancedSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166A84C11A45A37700A3B292 /* AdvancedSettingsViewController.swift */; };
+		166A84C41A45CEE000A3B292 /* PickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166A84C31A45CEE000A3B292 /* PickerViewController.swift */; };
 		168BC6B817EC2DF000BC4584 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 168BC6B617EC2DF000BC4584 /* InfoPlist.strings */; };
 		168BC6C117EC2DF000BC4584 /* OSX_AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 168BC6C017EC2DF000BC4584 /* OSX_AppDelegate.m */; };
 		168BC6C417EC2DF000BC4584 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 168BC6C217EC2DF000BC4584 /* MainMenu.xib */; };
 		168BC6C917EC2DF000BC4584 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 168BC6C817EC2DF000BC4584 /* Images.xcassets */; };
 		168FD00E1A2A7AD1005929CB /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 168FD00D1A2A7AD1005929CB /* MessageView.swift */; };
 		168FD0121A2A8C28005929CB /* PopTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A794F31A252BFA00A76553 /* PopTimer.swift */; };
-		169CEB9C1879D5BB0083A068 /* AdvancedSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 169CEB9B1879D5BB0083A068 /* AdvancedSettingsViewController.m */; };
 		169FB2341A3DAFED00E00771 /* GlobalsObjC.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B74E4D1A3C78FB00410EF6 /* GlobalsObjC.m */; };
 		169FB2361A3DBD7D00E00771 /* SectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169FB2351A3DBD7D00E00771 /* SectionHeader.swift */; };
 		169FB2381A3DF13800E00771 /* CommentCounts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169FB2371A3DF13800E00771 /* CommentCounts.swift */; };
@@ -81,7 +82,6 @@
 		16CBE1CA1A2E13A400485053 /* StatusItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C91A2E13A400485053 /* StatusItemView.swift */; };
 		16DC40FC1A3F591200BB361A /* PrItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16DC40FB1A3F591200BB361A /* PrItemView.swift */; };
 		16EE871B1A446BFE00A1D16F /* EmptyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16EE871A1A446BFE00A1D16F /* EmptyView.swift */; };
-		16FD14D71881CBC400FDC960 /* PickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 16FD14D61881CBC400FDC960 /* PickerViewController.m */; };
 		16FDD6DD18804470008D2223 /* PRCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 16FDD6DC18804470008D2223 /* PRCell.m */; };
 /* End PBXBuildFile section */
 
@@ -132,6 +132,8 @@
 		164785B31A2CE80800297764 /* Trailer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Trailer-Bridging-Header.h"; sourceTree = "<group>"; };
 		166A84BD1A457CA700A3B292 /* ServersViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServersViewController.swift; sourceTree = "<group>"; };
 		166A84BF1A4582C100A3B292 /* ServerDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServerDetailViewController.swift; sourceTree = "<group>"; };
+		166A84C11A45A37700A3B292 /* AdvancedSettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdvancedSettingsViewController.swift; sourceTree = "<group>"; };
+		166A84C31A45CEE000A3B292 /* PickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerViewController.swift; sourceTree = "<group>"; };
 		168BC6AA17EC2DF000BC4584 /* Trailer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Trailer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		168BC6B517EC2DF000BC4584 /* Trailer-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Trailer-Info.plist"; sourceTree = "<group>"; };
 		168BC6B717EC2DF000BC4584 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -143,8 +145,6 @@
 		168C6ECC18B2104100E41D85 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		168C6ECD18B2104100E41D85 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
 		168FD00D1A2A7AD1005929CB /* MessageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageView.swift; sourceTree = "<group>"; };
-		169CEB9A1879D5BB0083A068 /* AdvancedSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdvancedSettingsViewController.h; sourceTree = "<group>"; };
-		169CEB9B1879D5BB0083A068 /* AdvancedSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = AdvancedSettingsViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		169FB2351A3DBD7D00E00771 /* SectionHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SectionHeader.swift; sourceTree = "<group>"; };
 		169FB2371A3DF13800E00771 /* CommentCounts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentCounts.swift; sourceTree = "<group>"; };
 		16A505DF1A3888D6005DD3B7 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = Trailer/Sparkle.framework; sourceTree = "<group>"; };
@@ -193,8 +193,6 @@
 		16DC40FB1A3F591200BB361A /* PrItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrItemView.swift; sourceTree = "<group>"; };
 		16EE871A1A446BFE00A1D16F /* EmptyView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmptyView.swift; sourceTree = "<group>"; };
 		16F51FA019DE8C78007B0BB1 /* PRIVACY */ = {isa = PBXFileReference; lastKnownFileType = text; path = PRIVACY; sourceTree = "<group>"; };
-		16FD14D51881CBC400FDC960 /* PickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PickerViewController.h; sourceTree = "<group>"; };
-		16FD14D61881CBC400FDC960 /* PickerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PickerViewController.m; sourceTree = "<group>"; };
 		16FDD6DB18804470008D2223 /* PRCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PRCell.h; sourceTree = "<group>"; };
 		16FDD6DC18804470008D2223 /* PRCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = PRCell.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 /* End PBXFileReference section */
@@ -435,17 +433,15 @@
 		16FD14D11881C82400FDC960 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
-				169CEB9A1879D5BB0083A068 /* AdvancedSettingsViewController.h */,
-				169CEB9B1879D5BB0083A068 /* AdvancedSettingsViewController.m */,
 				1628A6FA1878B64E005EDA69 /* RespositoriesViewController.h */,
 				1628A6FB1878B64E005EDA69 /* RespositoriesViewController.m */,
-				16FD14D51881CBC400FDC960 /* PickerViewController.h */,
-				16FD14D61881CBC400FDC960 /* PickerViewController.m */,
 				16C9A2751A44D12600EE54EC /* AboutTrailerViewController.swift */,
 				16C9A2771A44D86B00EE54EC /* GithubViewController.swift */,
 				16C9A2791A44DD0200EE54EC /* CommentBlacklistViewController.swift */,
 				166A84BD1A457CA700A3B292 /* ServersViewController.swift */,
 				166A84BF1A4582C100A3B292 /* ServerDetailViewController.swift */,
+				166A84C11A45A37700A3B292 /* AdvancedSettingsViewController.swift */,
+				166A84C31A45CEE000A3B292 /* PickerViewController.swift */,
 			);
 			name = Settings;
 			sourceTree = "<group>";
@@ -561,7 +557,6 @@
 			files = (
 				16B3B31C1A34E8E2000BE6CC /* PRComment.swift in Sources */,
 				16C9A27C1A44EBCF00EE54EC /* DetailViewController.swift in Sources */,
-				169CEB9C1879D5BB0083A068 /* AdvancedSettingsViewController.m in Sources */,
 				16B3B3201A34E8E2000BE6CC /* PRStatus.swift in Sources */,
 				164785AB1A2CE7BD00297764 /* Globals.swift in Sources */,
 				164785B11A2CE7CD00297764 /* NSStringExtensions.swift in Sources */,
@@ -576,6 +571,8 @@
 				16C9A2781A44D86B00EE54EC /* GithubViewController.swift in Sources */,
 				1628A6FC1878B64E005EDA69 /* RespositoriesViewController.m in Sources */,
 				169FB2341A3DAFED00E00771 /* GlobalsObjC.m in Sources */,
+				166A84C41A45CEE000A3B292 /* PickerViewController.swift in Sources */,
+				166A84C21A45A37700A3B292 /* AdvancedSettingsViewController.swift in Sources */,
 				16CBE1C21A2DBB2700485053 /* DataManager.swift in Sources */,
 				16B3B3221A34E8E2000BE6CC /* PullRequest.swift in Sources */,
 				16B3B3241A34E8E2000BE6CC /* Repo.swift in Sources */,
@@ -585,7 +582,6 @@
 				16B3B3581A34E9F7000BE6CC /* Reachability.m in Sources */,
 				168FD0121A2A8C28005929CB /* PopTimer.swift in Sources */,
 				16B3B35B1A34EAEE000BE6CC /* main.swift in Sources */,
-				16FD14D71881CBC400FDC960 /* PickerViewController.m in Sources */,
 				166A84BE1A457CA700A3B292 /* ServersViewController.swift in Sources */,
 				16B3B31A1A34E8E2000BE6CC /* DataItem.swift in Sources */,
 				166A84C01A4582C100A3B292 /* ServerDetailViewController.swift in Sources */,
