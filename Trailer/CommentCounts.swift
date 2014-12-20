@@ -74,6 +74,10 @@ class CommentCounts: NSView {
 		}
 	}
 
+	func allowsVibrancy() -> Bool {
+		return true
+	}
+
 	required init?(coder: NSCoder) {
 	    fatalError("init(coder:) has not been implemented")
 	}

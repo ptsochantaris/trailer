@@ -31,4 +31,8 @@ class AvatarView: NSImageView {
 		spinner?.removeFromSuperview()
 		spinner = nil
 	}
+
+	func allowsVibrancy() -> Bool {
+		return true
+	}
 }

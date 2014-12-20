@@ -1306,7 +1306,7 @@ Enter to select and ⌘, for preferences.
                     <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" id="Pt5-SE-vDM">
                         <rect key="frame" x="0.0" y="-1" width="376" height="671"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <clipView key="contentView" drawsBackground="NO" id="vnN-hG-F71">
+                        <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="vnN-hG-F71">
                             <rect key="frame" x="1" y="0.0" width="238" height="134"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>

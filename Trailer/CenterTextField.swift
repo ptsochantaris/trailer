@@ -18,4 +18,8 @@ class CenterTextField: NSTextField {
 		setCellClass(CenterTextFieldCell)
 	}
 
+	func allowsVibrancy() -> Bool {
+		return true
+	}
+
 }
