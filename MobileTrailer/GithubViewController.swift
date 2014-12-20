@@ -41,6 +41,10 @@ class GithubViewController: UIViewController, WKNavigationDelegate {
 
 	}
 
+	@IBAction func doneSelected(sender: UIBarButtonItem) {
+		dismissViewControllerAnimated(true, completion: nil)
+	}
+
 	func webView(webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
 		webView.hidden = true
 		self.spinner.startAnimating()

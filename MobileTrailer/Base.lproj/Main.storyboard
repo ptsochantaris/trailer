@@ -339,7 +339,7 @@
         <!--Servers-->
         <scene sceneID="dTo-Cu-ELq">
             <objects>
-                <tableViewController id="Ny5-Q9-wJN" customClass="ServersViewController" sceneMemberID="viewController">
+                <tableViewController id="Ny5-Q9-wJN" customClass="ServersViewController" customModule="PocketTrailer" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="70" sectionHeaderHeight="44" sectionFooterHeight="22" id="osF-HF-13f">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -375,12 +375,12 @@
                     <navigationItem key="navigationItem" title="Servers" id="xL8-Y9-77V">
                         <barButtonItem key="leftBarButtonItem" style="done" systemItem="done" id="3yS-pI-1hb">
                             <connections>
-                                <action selector="done:" destination="Ny5-Q9-wJN" id="apW-GM-iMg"/>
+                                <action selector="doneSelected" destination="Ny5-Q9-wJN" id="MVl-LW-Jyc"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="w7v-i7-rs4">
                             <connections>
-                                <action selector="newServer:" destination="Ny5-Q9-wJN" id="LV7-JY-XMa"/>
+                                <action selector="newServer" destination="Ny5-Q9-wJN" id="qAI-Ok-FBy"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -396,7 +396,7 @@
         <!--API Server Details-->
         <scene sceneID="Mrr-Mu-sAc">
             <objects>
-                <viewController automaticallyAdjustsScrollViewInsets="NO" id="iSf-H9-TPW" customClass="ServerDetailViewController" sceneMemberID="viewController">
+                <viewController automaticallyAdjustsScrollViewInsets="NO" id="iSf-H9-TPW" customClass="ServerDetailViewController" customModule="PocketTrailer" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="6JD-Od-MMA"/>
                         <viewControllerLayoutGuide type="bottom" id="YAK-Zg-OTM"/>
@@ -576,7 +576,7 @@
                         <outlet property="scrollView" destination="bZU-nh-qhg" id="CHr-1c-Bhf"/>
                         <outlet property="testButton" destination="FSU-dH-Zb1" id="FQx-x9-gB9"/>
                         <outlet property="webFrontEnd" destination="jgQ-9E-dxw" id="7Sp-Ty-RY9"/>
-                        <segue destination="kWj-6b-yq2" kind="show" identifier="openGithub" id="OaO-SO-2eE"/>
+                        <segue destination="RXN-WD-g0o" kind="presentation" identifier="openGithub" id="OaO-SO-2eE"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="IqD-pm-wNg" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -737,14 +737,20 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
                             <constraint firstAttribute="centerY" secondItem="00q-SG-a6I" secondAttribute="centerY" id="ncU-h5-TJb"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" title="GitHub" id="uon-TC-PDK"/>
+                    <navigationItem key="navigationItem" title="GitHub" id="uon-TC-PDK">
+                        <barButtonItem key="leftBarButtonItem" style="done" systemItem="done" id="1iC-A2-mcd">
+                            <connections>
+                                <action selector="doneSelected:" destination="kWj-6b-yq2" id="F6J-ph-f4D"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="spinner" destination="00q-SG-a6I" id="fN9-ae-kq1"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="BoF-TD-ccs" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4381" y="1553"/>
+            <point key="canvasLocation" x="5193" y="1553"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="hQr-lF-Zam">
@@ -847,6 +853,24 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vrx-7J-Ot5" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1934" y="1553"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="eCB-19-D57">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="RXN-WD-g0o" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="W9W-Qy-yeh">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="kWj-6b-yq2" kind="relationship" relationship="rootViewController" id="odA-2r-6xW"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="aSk-Jo-buz" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="4381" y="1553"/>
         </scene>
     </scenes>
     <resources>

@@ -1,8 +1,4 @@
 
-#define REFRESH_STARTED_NOTIFICATION @"RefreshStartedNotification"
-#define REFRESH_ENDED_NOTIFICATION @"RefreshEndedNotification"
-#define RECEIVED_NOTIFICATION_KEY @"ReceivedNotificationKey"
-
 @interface MasterViewController : UITableViewController
 <NSFetchedResultsControllerDelegate, UITextFieldDelegate,
 UIActionSheetDelegate, UITabBarControllerDelegate>
