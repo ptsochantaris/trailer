@@ -71,6 +71,8 @@ class LinkField: CenterTextField {
 		}
 	}
 
+	override func mouseUp(theEvent: NSEvent) { }
+
 	override func mouseDown(theEvent: NSEvent) {
 		if targetUrl == nil {
 			nextResponder?.mouseDown(theEvent)
@@ -80,14 +82,14 @@ class LinkField: CenterTextField {
 					if theEvent.modifierFlags & NSEventModifierFlags.AlternateKeyMask == NSEventModifierFlags.AlternateKeyMask {
 						app.ignoreNextFocusLoss = true
 					}
-					NSWorkspace.sharedWorkspace().openURL(NSURL(string:targetUrl!)!)
 					mouseExited(theEvent)
+					NSWorkspace.sharedWorkspace().openURL(NSURL(string:targetUrl!)!)
 				} else {
 					nextResponder?.mouseDown(theEvent)
 				}
 			} else {
-				NSWorkspace.sharedWorkspace().openURL(NSURL(string:targetUrl!)!)
 				mouseExited(theEvent)
+				NSWorkspace.sharedWorkspace().openURL(NSURL(string:targetUrl!)!)
 			}
 		}
 	}

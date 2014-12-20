@@ -358,7 +358,7 @@ class API: NSOperationQueue {
 			parameters: nil,
 			extraHeaders: extraHeaders,
 			perPageCallback: { (data, lastPage) in
-				for d in data as [NSDictionary] {
+				for d in data ?? [] {
 					let eventDate = self.syncDateFormatter.dateFromString(d.ofk("created_at") as String!)!
 					if latestDate.compare(eventDate) == NSComparisonResult.OrderedAscending { // this is where we came in
 						DLog("New event at %@", eventDate)
@@ -406,7 +406,7 @@ class API: NSOperationQueue {
 			parameters: nil,
 			extraHeaders: extraHeaders,
 			perPageCallback: { (data, lastPage) in
-				for d in data as [NSDictionary] {
+				for d in data ?? [] {
 					let eventDate = self.syncDateFormatter.dateFromString(d.ofk("created_at") as String!)!
 					if latestDate.compare(eventDate) == NSComparisonResult.OrderedAscending { // this is where we came in
 						DLog("New event at %@", eventDate)
@@ -496,7 +496,7 @@ class API: NSOperationQueue {
 			let repoFullName = r.fullName ?? "NoRepoFullName"
 			getPagedDataInPath("/repos/\(repoFullName)/pulls", fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
 				perPageCallback: { (data, lastPage) in
-					for info in data as [NSDictionary] {
+					for info in data ?? [] {
 						let p = PullRequest.pullRequestWithInfo(info, fromServer:apiServer)
 						p.repo = r
 					}
@@ -567,7 +567,7 @@ class API: NSOperationQueue {
 
 				getPagedDataInPath(link, fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
 					perPageCallback: { (data, lastPage) -> Bool in
-						for info in data as [NSDictionary] {
+						for info in data ?? [] {
 							let c = PRComment.commentWithInfo(info, fromServer: apiServer)
 							c.pullRequest = p
 
@@ -619,7 +619,7 @@ class API: NSOperationQueue {
 
 				getPagedDataInPath(link, fromServer: p.apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
 					perPageCallback: { (data, lastPage) in
-						for info in data as [NSDictionary] {
+						for info in data ?? [] {
 							PRLabel.labelWithInfo(info, forPullRequest:p)
 						}
 						return false
@@ -660,7 +660,7 @@ class API: NSOperationQueue {
 		var completionCount = 0
 
 		for p in prs {
-			for s in p.statuses.allObjects as [PullRequest] {
+			for s in p.statuses.allObjects as [PRStatus] {
 				s.postSyncAction = PostSyncAction.Delete.rawValue
 			}
 
@@ -668,8 +668,7 @@ class API: NSOperationQueue {
 
 			getPagedDataInPath(p.statusesLink!, fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
 				perPageCallback: { (data, lastPage) -> Bool in
-					for info in data as [NSDictionary]
-					{
+					for info in data ?? [] {
 						let s = PRStatus.statusWithInfo(info, fromServer: apiServer)
 						s.pullRequest = p
 					}
@@ -911,7 +910,7 @@ class API: NSOperationQueue {
 		getPagedDataInPath("/user/subscriptions", fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
 			perPageCallback: { (data, lastPage) -> Bool in
 
-				if let d = data as? [NSDictionary] {
+				if let d = data ?? [] {
 					for info in d {
 						if (info.ofk("private") as? NSNumber)?.boolValue ?? false {
 							if let permissions = info.ofk("permissions") as? NSDictionary {
@@ -1002,7 +1001,7 @@ class API: NSOperationQueue {
 		startingFromPage: Int,
 		parameters: Dictionary<String, String>?,
 		extraHeaders: Dictionary<String, String>?,
-		perPageCallback: ((data: AnyObject?, lastPage: Bool)->Bool)?,
+		perPageCallback: ((data: [NSDictionary]?, lastPage: Bool)->Bool)?,
 		finalCallback: ((success: Bool, resultCode: Int, etag: String?)->Void)?) {
 
 			if path.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) == 0 {
@@ -1027,7 +1026,7 @@ class API: NSOperationQueue {
 			getDataInPath(path, fromServer: fromServer, parameters: mutableParams, extraHeaders: extraHeaders) {
 				(data, lastPage, resultCode, etag) in
 
-				if let d: AnyObject = data {
+				if let d = data as? [NSDictionary] {
 					var isLastPage = lastPage
 					if let p = perPageCallback {
 						if p(data: d, lastPage: lastPage) { isLastPage = true }
