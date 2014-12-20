@@ -1,4 +1,3 @@
-#import "DetailViewController.h"
 
 #define REFRESH_STARTED_NOTIFICATION @"RefreshStartedNotification"
 #define REFRESH_ENDED_NOTIFICATION @"RefreshEndedNotification"

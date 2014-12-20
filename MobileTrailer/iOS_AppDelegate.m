@@ -8,12 +8,6 @@ NSString *currentAppVersion;
 	UIPopoverController *sharePopover;
 }
 
-- (void)applicationDidReceiveMemoryWarning:(UIApplication *)application
-{
-	DLog(@"Memory warning");
-	[[NSURLCache sharedURLCache] removeAllCachedResponses];
-}
-
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
 	app = self;

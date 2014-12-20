@@ -21,7 +21,6 @@
 		1628A6C518789E73005EDA69 /* iOS_AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1628A6C418789E73005EDA69 /* iOS_AppDelegate.m */; };
 		1628A6CB18789E73005EDA69 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1628A6C918789E73005EDA69 /* Main.storyboard */; };
 		1628A6D118789E73005EDA69 /* MasterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1628A6D018789E73005EDA69 /* MasterViewController.m */; };
-		1628A6D418789E73005EDA69 /* DetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1628A6D318789E73005EDA69 /* DetailViewController.m */; };
 		1628A6D618789E73005EDA69 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1628A6D518789E73005EDA69 /* Images.xcassets */; };
 		1628A6FC1878B64E005EDA69 /* RespositoriesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1628A6FB1878B64E005EDA69 /* RespositoriesViewController.m */; };
 		162A29D91A4085FD008F41A9 /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162A29D81A4085FD008F41A9 /* API.swift */; };
@@ -74,6 +73,7 @@
 		16C9A2761A44D12600EE54EC /* AboutTrailerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C9A2751A44D12600EE54EC /* AboutTrailerViewController.swift */; };
 		16C9A2781A44D86B00EE54EC /* GithubViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C9A2771A44D86B00EE54EC /* GithubViewController.swift */; };
 		16C9A27A1A44DD0200EE54EC /* CommentBlacklistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C9A2791A44DD0200EE54EC /* CommentBlacklistViewController.swift */; };
+		16C9A27C1A44EBCF00EE54EC /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C9A27B1A44EBCF00EE54EC /* DetailViewController.swift */; };
 		16CBE1C11A2DBB2700485053 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C01A2DBB2700485053 /* DataManager.swift */; };
 		16CBE1C21A2DBB2700485053 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C01A2DBB2700485053 /* DataManager.swift */; };
 		16CBE1C51A2DFBA500485053 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C41A2DFBA500485053 /* Settings.swift */; };
@@ -121,8 +121,6 @@
 		1628A6CA18789E73005EDA69 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		1628A6CF18789E73005EDA69 /* MasterViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MasterViewController.h; sourceTree = "<group>"; };
 		1628A6D018789E73005EDA69 /* MasterViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = MasterViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
-		1628A6D218789E73005EDA69 /* DetailViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DetailViewController.h; sourceTree = "<group>"; };
-		1628A6D318789E73005EDA69 /* DetailViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DetailViewController.m; sourceTree = "<group>"; };
 		1628A6D518789E73005EDA69 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		1628A6FA1878B64E005EDA69 /* RespositoriesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RespositoriesViewController.h; sourceTree = "<group>"; };
 		1628A6FB1878B64E005EDA69 /* RespositoriesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = RespositoriesViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
@@ -189,6 +187,7 @@
 		16C9A2751A44D12600EE54EC /* AboutTrailerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutTrailerViewController.swift; sourceTree = "<group>"; };
 		16C9A2771A44D86B00EE54EC /* GithubViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GithubViewController.swift; sourceTree = "<group>"; };
 		16C9A2791A44DD0200EE54EC /* CommentBlacklistViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentBlacklistViewController.swift; sourceTree = "<group>"; };
+		16C9A27B1A44EBCF00EE54EC /* DetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
 		16CBE1C01A2DBB2700485053 /* DataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = DataManager.swift; path = Shared/DataManager.swift; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16CBE1C31A2DF61C00485053 /* GlobalsObjC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GlobalsObjC.h; path = Shared/GlobalsObjC.h; sourceTree = "<group>"; };
 		16CBE1C41A2DFBA500485053 /* Settings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Settings.swift; path = Shared/Settings.swift; sourceTree = "<group>"; };
@@ -380,13 +379,12 @@
 		16B069711882EA1D0053620E /* UI */ = {
 			isa = PBXGroup;
 			children = (
-				1628A6D218789E73005EDA69 /* DetailViewController.h */,
-				1628A6D318789E73005EDA69 /* DetailViewController.m */,
 				1628A6CF18789E73005EDA69 /* MasterViewController.h */,
 				1628A6D018789E73005EDA69 /* MasterViewController.m */,
 				16FDD6DB18804470008D2223 /* PRCell.h */,
 				16FDD6DC18804470008D2223 /* PRCell.m */,
 				16EE871A1A446BFE00A1D16F /* EmptyView.swift */,
+				16C9A27B1A44EBCF00EE54EC /* DetailViewController.swift */,
 			);
 			name = UI;
 			sourceTree = "<group>";
@@ -566,8 +564,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				16B3B31C1A34E8E2000BE6CC /* PRComment.swift in Sources */,
+				16C9A27C1A44EBCF00EE54EC /* DetailViewController.swift in Sources */,
 				169CEB9C1879D5BB0083A068 /* AdvancedSettingsViewController.m in Sources */,
-				1628A6D418789E73005EDA69 /* DetailViewController.m in Sources */,
 				16B3B3201A34E8E2000BE6CC /* PRStatus.swift in Sources */,
 				164785AB1A2CE7BD00297764 /* Globals.swift in Sources */,
 				164785B11A2CE7CD00297764 /* NSStringExtensions.swift in Sources */,
