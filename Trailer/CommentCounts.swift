@@ -23,7 +23,7 @@ class CommentCounts: NSView {
 
 			let countString = NSAttributedString(string: numberFormatter.stringFromNumber(totalCount)!, attributes: [
 				NSFontAttributeName: NSFont.menuFontOfSize(11),
-				NSForegroundColorAttributeName: darkMode ? COLOR_CLASS.controlLightHighlightColor() : COLOR_CLASS.controlTextColor(),
+				NSForegroundColorAttributeName: darkMode ? NSColor.controlLightHighlightColor() : NSColor.controlTextColor(),
 				NSParagraphStyleAttributeName: pCenter])
 
 			var width = max(CGFloat(BASE_BADGE_SIZE), CGFloat(countString.size.width)+10)
@@ -36,7 +36,7 @@ class CommentCounts: NSView {
 			countBackground.layer!.cornerRadius = 4.0
 			let color = MAKECOLOR(0.94, 0.94, 0.94, 1.0).CGColor;
 			if MenuWindow.usingVibrancy() && statusView.darkMode {
-				countBackground.layer!.backgroundColor = COLOR_CLASS.clearColor().CGColor
+				countBackground.layer!.backgroundColor = NSColor.clearColor().CGColor
 				countBackground.layer!.borderColor = color
 				countBackground.layer!.borderWidth = 0.5
 			} else {

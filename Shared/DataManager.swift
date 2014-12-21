@@ -206,7 +206,7 @@ class DataManager : NSObject {
 		} else if filterValue != nil && filterValue?.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 0 {
 			message = "There are no PRs matching this filter."
 		} else if openRequests > 0 {
-			message = "\(openRequests) PRs are hidden by your Settings."
+			message = "\(openRequests) PRs are hidden by your settings."
 		} else if Repo.countVisibleReposInMoc(mainObjectContext)==0 {
 			messageColor = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
 			message = "There are no watched repositories, please watch or unhide some."

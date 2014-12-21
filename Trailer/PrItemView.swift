@@ -4,8 +4,8 @@ class PrItemView: NSTableCellView {
 	var trackingArea: NSTrackingArea!
 	var pullRequestId: NSManagedObjectID
 	var title: CenterTextField!
-	var unselectedTitleColor: COLOR_CLASS
-	var detailFont: FONT_CLASS, titleFont: FONT_CLASS
+	var unselectedTitleColor: NSColor
+	var detailFont: NSFont, titleFont: NSFont
 
 	init(pullRequest: PullRequest) {
 		pullRequestId = pullRequest.objectID
@@ -14,7 +14,7 @@ class PrItemView: NSTableCellView {
 
 		let v = app.statusItem.view as StatusItemView
 		let goneDark = MenuWindow.usingVibrancy() && v.darkMode
-		unselectedTitleColor = goneDark ? COLOR_CLASS.controlHighlightColor() : COLOR_CLASS.controlTextColor()
+		unselectedTitleColor = goneDark ? NSColor.controlHighlightColor() : NSColor.controlTextColor()
 
 		super.init(frame: NSZeroRect)
 		canDrawSubviewsIntoLayer = true
@@ -29,8 +29,8 @@ class PrItemView: NSTableCellView {
 		let _title = pullRequest.titleWithFont(titleFont, labelFont: detailFont, titleColor: unselectedTitleColor)
 
 		let _subtitle = pullRequest.subtitleWithFont(detailFont,
-			lightColor: goneDark ? COLOR_CLASS.lightGrayColor() : COLOR_CLASS.grayColor(),
-			darkColor: goneDark ? COLOR_CLASS.grayColor() : COLOR_CLASS.darkGrayColor())
+			lightColor: goneDark ? NSColor.lightGrayColor() : NSColor.grayColor(),
+			darkColor: goneDark ? NSColor.grayColor() : NSColor.darkGrayColor())
 
 		var W = CGFloat(MENU_WIDTH-LEFTPADDING)-CGFloat(app.scrollBarWidth)
 		let showUnpin = (pullRequest.condition?.integerValue != PullRequestCondition.Open.rawValue) || pullRequest.markUnmergeable()
@@ -95,7 +95,7 @@ class PrItemView: NSTableCellView {
 		if(showUnpin) {
 			if((pullRequest.condition?.integerValue ?? 0)==PullRequestCondition.Open.rawValue) {
 				let unmergeableLabel = CenterTextField(frame: pinRect)
-				unmergeableLabel.textColor = COLOR_CLASS.redColor()
+				unmergeableLabel.textColor = NSColor.redColor()
 				unmergeableLabel.font = NSFont(name: "Monaco", size: 8.0)
 				unmergeableLabel.alignment = NSTextAlignment.CenterTextAlignment
 				unmergeableLabel.stringValue = "Cannot be merged"
@@ -162,10 +162,10 @@ class PrItemView: NSTableCellView {
 
 	var selected: Bool = false {
 		didSet {
-			var finalColor: COLOR_CLASS = unselectedTitleColor
+			var finalColor: NSColor = unselectedTitleColor
 			if selected {
 				app.mainMenu.prTable.selectRowIndexes(NSIndexSet(index: app.mainMenu.prTable.rowForView(self)), byExtendingSelection: false)
-				if (app.statusItem.view as StatusItemView).darkMode { finalColor = COLOR_CLASS.darkGrayColor() }
+				if (app.statusItem.view as StatusItemView).darkMode { finalColor = NSColor.darkGrayColor() }
 			} else {
 				app.mainMenu.prTable.deselectRow(app.mainMenu.prTable.rowForView(self))
 			}

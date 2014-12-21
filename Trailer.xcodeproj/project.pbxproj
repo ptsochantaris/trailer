@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		160823F51A44997F006F91AD /* UINavigationControllerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160823F31A44982F006F91AD /* UINavigationControllerExtensions.swift */; };
+		1615045E1A464656001CF50C /* PRCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1615045D1A464656001CF50C /* PRCell.swift */; };
 		16154E2F19C43E8E00E49139 /* Launch.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 16154E2E19C43E8E00E49139 /* Launch.storyboard */; };
 		161C959E1A3A36020019A577 /* MenuWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 161C959D1A3A36020019A577 /* MenuWindow.swift */; };
 		162002D01A2A3E2100FF95F3 /* Application.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002CF1A2A3E2100FF95F3 /* Application.swift */; };
@@ -82,7 +83,6 @@
 		16CBE1CA1A2E13A400485053 /* StatusItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C91A2E13A400485053 /* StatusItemView.swift */; };
 		16DC40FC1A3F591200BB361A /* PrItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16DC40FB1A3F591200BB361A /* PrItemView.swift */; };
 		16EE871B1A446BFE00A1D16F /* EmptyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16EE871A1A446BFE00A1D16F /* EmptyView.swift */; };
-		16FDD6DD18804470008D2223 /* PRCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 16FDD6DC18804470008D2223 /* PRCell.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -101,6 +101,7 @@
 
 /* Begin PBXFileReference section */
 		160823F31A44982F006F91AD /* UINavigationControllerExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UINavigationControllerExtensions.swift; sourceTree = "<group>"; };
+		1615045D1A464656001CF50C /* PRCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PRCell.swift; sourceTree = "<group>"; };
 		16154E2E19C43E8E00E49139 /* Launch.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Launch.storyboard; sourceTree = "<group>"; };
 		161C959D1A3A36020019A577 /* MenuWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuWindow.swift; sourceTree = "<group>"; };
 		162002CF1A2A3E2100FF95F3 /* Application.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Application.swift; sourceTree = "<group>"; };
@@ -193,8 +194,6 @@
 		16DC40FB1A3F591200BB361A /* PrItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrItemView.swift; sourceTree = "<group>"; };
 		16EE871A1A446BFE00A1D16F /* EmptyView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmptyView.swift; sourceTree = "<group>"; };
 		16F51FA019DE8C78007B0BB1 /* PRIVACY */ = {isa = PBXFileReference; lastKnownFileType = text; path = PRIVACY; sourceTree = "<group>"; };
-		16FDD6DB18804470008D2223 /* PRCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PRCell.h; sourceTree = "<group>"; };
-		16FDD6DC18804470008D2223 /* PRCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = PRCell.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -377,10 +376,9 @@
 			children = (
 				1628A6CF18789E73005EDA69 /* MasterViewController.h */,
 				1628A6D018789E73005EDA69 /* MasterViewController.m */,
-				16FDD6DB18804470008D2223 /* PRCell.h */,
-				16FDD6DC18804470008D2223 /* PRCell.m */,
 				16EE871A1A446BFE00A1D16F /* EmptyView.swift */,
 				16C9A27B1A44EBCF00EE54EC /* DetailViewController.swift */,
+				1615045D1A464656001CF50C /* PRCell.swift */,
 			);
 			name = UI;
 			sourceTree = "<group>";
@@ -578,7 +576,7 @@
 				16B3B3241A34E8E2000BE6CC /* Repo.swift in Sources */,
 				16B3B31E1A34E8E2000BE6CC /* PRLabel.swift in Sources */,
 				16EE871B1A446BFE00A1D16F /* EmptyView.swift in Sources */,
-				16FDD6DD18804470008D2223 /* PRCell.m in Sources */,
+				1615045E1A464656001CF50C /* PRCell.swift in Sources */,
 				16B3B3581A34E9F7000BE6CC /* Reachability.m in Sources */,
 				168FD0121A2A8C28005929CB /* PopTimer.swift in Sources */,
 				16B3B35B1A34EAEE000BE6CC /* main.swift in Sources */,

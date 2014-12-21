@@ -40,7 +40,7 @@ class MenuWindow: NSWindow {
 			scrollView.frame = contentView.bounds
 			scrollView.contentInsets = NSEdgeInsetsMake(CGFloat(TOP_HEADER_HEIGHT), 0, 0, 0)
 
-			bgColor = COLOR_CLASS.clearColor().CGColor
+			bgColor = NSColor.clearColor().CGColor
 
 			appearance = NSAppearance(named: (app.statusItem.view as StatusItemView).darkMode ? NSAppearanceNameVibrantDark : NSAppearanceNameVibrantLight)
 			prTable.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.SourceList
@@ -53,7 +53,7 @@ class MenuWindow: NSWindow {
 			let windowSize = contentView.bounds.size
 			scrollView.frame = CGRectMake(0, 0, windowSize.width, windowSize.height-CGFloat(TOP_HEADER_HEIGHT))
 
-			bgColor = COLOR_CLASS.controlBackgroundColor().CGColor
+			bgColor = NSColor.controlBackgroundColor().CGColor
 
 			if(NSAppKitVersionNumber>Double(NSAppKitVersionNumber10_9)) {
 				appearance = NSAppearance(named: NSAppearanceNameAqua)

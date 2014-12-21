@@ -43,7 +43,7 @@ class DetailViewController: UIViewController, WKNavigationDelegate {
 	}
 
 	private func setEmpty() {
-		statusLabel.textColor = COLOR_CLASS.lightGrayColor()
+		statusLabel.textColor = UIColor.lightGrayColor()
 		statusLabel.text = "Please select a Pull Request from the list on the left, or select 'Settings' to change your repository selection.\n\n(You may have to login to GitHub the first time you visit a page)"
 		statusLabel.hidden = false
 		navigationItem.rightBarButtonItem?.enabled = false
@@ -114,7 +114,7 @@ class DetailViewController: UIViewController, WKNavigationDelegate {
 
 	private func loadFailed(error: NSError) {
 		spinner.stopAnimating()
-		statusLabel.textColor = COLOR_CLASS.redColor()
+		statusLabel.textColor = UIColor.redColor()
 		statusLabel.text = "There was an error loading this pull request page: " + error.localizedDescription
 		statusLabel.hidden = false
 		_webView?.hidden = true

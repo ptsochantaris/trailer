@@ -14,7 +14,7 @@ OSX_AppDelegate *app;
 {
 	app = self;
 
-	self.mainMenu.backgroundColor = [COLOR_CLASS whiteColor];
+	self.mainMenu.backgroundColor = [NSColor whiteColor];
 	self.lastRepoCheck = [NSDate distantPast];
 
 	filterTimer = [[PopTimer alloc] initWithTimeInterval:0.2
@@ -1506,7 +1506,7 @@ OSX_AppDelegate *app;
 		else
 		{
 			attributes = @{ NSFontAttributeName: [NSFont menuBarFontOfSize:10.0],
-							NSForegroundColorAttributeName: [COLOR_CLASS controlTextColor] };
+							NSForegroundColorAttributeName: [NSColor controlTextColor] };
 		}
 	}
 

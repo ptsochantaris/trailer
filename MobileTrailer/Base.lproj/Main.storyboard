@@ -90,7 +90,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" id="WCw-Qf-5nD" customClass="PRCell">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" id="WCw-Qf-5nD" customClass="PRCell" customModule="PocketTrailer">
                                 <rect key="frame" x="0.0" y="119" width="320" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="WCw-Qf-5nD" id="Ccv-UH-bok">
@@ -152,10 +152,9 @@
                                 </tableViewCellContentView>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <connections>
-                                    <outlet property="_description" destination="AQh-N4-Eak" id="aLC-20-ZZR"/>
-                                    <outlet property="_image" destination="dbg-hz-tPt" id="lei-9c-Pf1"/>
-                                    <outlet property="_title" destination="7Vv-dH-kVA" id="Qu2-jz-ly3"/>
-                                    <outlet property="description" destination="AQh-N4-Eak" id="Ce4-qr-jsQ"/>
+                                    <outlet property="_description" destination="AQh-N4-Eak" id="z6l-de-7ea"/>
+                                    <outlet property="_image" destination="dbg-hz-tPt" id="ip5-bc-vaF"/>
+                                    <outlet property="_title" destination="7Vv-dH-kVA" id="eZa-b3-NJm"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>

@@ -29,13 +29,13 @@ class SectionHeader: NSTableRowView {
 		titleView = CenterTextField(frame: NSMakeRect(12, 4, x, titleHeight))
 		titleView.attributedStringValue = NSAttributedString(string: title, attributes: [
 				NSFontAttributeName: NSFont.boldSystemFontOfSize(14),
-				NSForegroundColorAttributeName: COLOR_CLASS.controlShadowColor()])
+				NSForegroundColorAttributeName: NSColor.controlShadowColor()])
 		addSubview(titleView)
 
 		let offset = (MenuWindow.usingVibrancy() ? 2.5 : 3.5) as CGFloat
 		let dividerView = NSView(frame: CGRectMake(1.0, offset, menuWidth-2, 0.5))
 		dividerView.wantsLayer = true
-		dividerView.layer?.backgroundColor = COLOR_CLASS.controlShadowColor().CGColor
+		dividerView.layer?.backgroundColor = NSColor.controlShadowColor().CGColor
 		addSubview(dividerView)
 	}
 

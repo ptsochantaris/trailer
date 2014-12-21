@@ -72,12 +72,12 @@ class StatusItemView: NSView {
 
 		if(highlighted) {
 			icon = NSImage(named: "menuIconBright")!
-			displayAttributes[NSForegroundColorAttributeName] = COLOR_CLASS.selectedMenuItemTextColor()
+			displayAttributes[NSForegroundColorAttributeName] = NSColor.selectedMenuItemTextColor()
 		} else {
 			if(darkMode) {
 				icon = NSImage(named: "menuIconBright")!
-				if(displayAttributes[NSForegroundColorAttributeName] as COLOR_CLASS == COLOR_CLASS.controlTextColor()) {
-					displayAttributes[NSForegroundColorAttributeName] = COLOR_CLASS.selectedMenuItemTextColor()
+				if(displayAttributes[NSForegroundColorAttributeName] as NSColor == NSColor.controlTextColor()) {
+					displayAttributes[NSForegroundColorAttributeName] = NSColor.selectedMenuItemTextColor()
 				}
 			} else {
 				icon = NSImage(named: "menuIcon")!
@@ -85,7 +85,7 @@ class StatusItemView: NSView {
 		}
 
 		if(grayOut) {
-			displayAttributes[NSForegroundColorAttributeName] = COLOR_CLASS.disabledControlTextColor()
+			displayAttributes[NSForegroundColorAttributeName] = NSColor.disabledControlTextColor()
 		}
 
 		icon.drawAtPoint(imagePoint, fromRect: NSZeroRect, operation: NSCompositingOperation.CompositeSourceOver, fraction: 1.0)
