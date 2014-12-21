@@ -1,3 +1,5 @@
 
+@import UIKit;
+
 #import <CommonCrypto/CommonCrypto.h>
-#import "iOS_Globals.h"
+#import "GlobalsObjC.h"

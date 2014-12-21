@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1606F1BB1A4703E60088368E /* iOS_AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1606F1BA1A4703E60088368E /* iOS_AppDelegate.swift */; };
+		1606F1BD1A471CDC0088368E /* RespositoriesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1606F1BC1A471CDC0088368E /* RespositoriesViewController.swift */; };
 		160823F51A44997F006F91AD /* UINavigationControllerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160823F31A44982F006F91AD /* UINavigationControllerExtensions.swift */; };
 		1615045E1A464656001CF50C /* PRCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1615045D1A464656001CF50C /* PRCell.swift */; };
 		161504601A4651CB001CF50C /* MasterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1615045F1A4651CB001CF50C /* MasterViewController.swift */; };
@@ -20,10 +22,8 @@
 		162002E71A2A75BD00FF95F3 /* AvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002E61A2A75BD00FF95F3 /* AvatarView.swift */; };
 		16259BCE1A449400009C5745 /* OpenInSafariActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16259BCD1A449400009C5745 /* OpenInSafariActivity.swift */; };
 		1628A6BF18789E73005EDA69 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1628A6BD18789E73005EDA69 /* InfoPlist.strings */; };
-		1628A6C518789E73005EDA69 /* iOS_AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1628A6C418789E73005EDA69 /* iOS_AppDelegate.m */; };
 		1628A6CB18789E73005EDA69 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1628A6C918789E73005EDA69 /* Main.storyboard */; };
 		1628A6D618789E73005EDA69 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1628A6D518789E73005EDA69 /* Images.xcassets */; };
-		1628A6FC1878B64E005EDA69 /* RespositoriesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1628A6FB1878B64E005EDA69 /* RespositoriesViewController.m */; };
 		162A29D91A4085FD008F41A9 /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162A29D81A4085FD008F41A9 /* API.swift */; };
 		162A29DA1A4085FD008F41A9 /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162A29D81A4085FD008F41A9 /* API.swift */; };
 		164785AA1A2CE7BD00297764 /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785A91A2CE7BD00297764 /* Globals.swift */; };
@@ -100,6 +100,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1606F1BA1A4703E60088368E /* iOS_AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = iOS_AppDelegate.swift; sourceTree = "<group>"; };
+		1606F1BC1A471CDC0088368E /* RespositoriesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RespositoriesViewController.swift; sourceTree = "<group>"; };
 		160823F31A44982F006F91AD /* UINavigationControllerExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UINavigationControllerExtensions.swift; sourceTree = "<group>"; };
 		1615045D1A464656001CF50C /* PRCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PRCell.swift; sourceTree = "<group>"; };
 		1615045F1A4651CB001CF50C /* MasterViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MasterViewController.swift; sourceTree = "<group>"; };
@@ -108,7 +110,6 @@
 		162002CF1A2A3E2100FF95F3 /* Application.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Application.swift; sourceTree = "<group>"; };
 		162002D21A2A40B800FF95F3 /* OSX_Globals.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OSX_Globals.h; sourceTree = "<group>"; };
 		162002D51A2A49A300FF95F3 /* ViewAllowsVibrancy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewAllowsVibrancy.swift; sourceTree = "<group>"; };
-		162002D91A2A4D9E00FF95F3 /* iOS_Globals.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = iOS_Globals.h; sourceTree = "<group>"; };
 		162002DA1A2A545C00FF95F3 /* CenterTextFieldCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CenterTextFieldCell.swift; sourceTree = "<group>"; };
 		162002DC1A2A58B900FF95F3 /* CenterTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CenterTextField.swift; sourceTree = "<group>"; };
 		162002DE1A2A5C9200FF95F3 /* LinkField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinkField.swift; sourceTree = "<group>"; };
@@ -118,12 +119,8 @@
 		1628A6BC18789E73005EDA69 /* PocketTrailer-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "PocketTrailer-Info.plist"; sourceTree = "<group>"; };
 		1628A6BE18789E73005EDA69 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1628A6C218789E73005EDA69 /* PocketTrailer-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PocketTrailer-Prefix.pch"; sourceTree = "<group>"; };
-		1628A6C318789E73005EDA69 /* iOS_AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = iOS_AppDelegate.h; sourceTree = "<group>"; };
-		1628A6C418789E73005EDA69 /* iOS_AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = iOS_AppDelegate.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		1628A6CA18789E73005EDA69 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		1628A6D518789E73005EDA69 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		1628A6FA1878B64E005EDA69 /* RespositoriesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RespositoriesViewController.h; sourceTree = "<group>"; };
-		1628A6FB1878B64E005EDA69 /* RespositoriesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = RespositoriesViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		162A29D81A4085FD008F41A9 /* API.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = API.swift; path = Shared/API.swift; sourceTree = "<group>"; };
 		164785A91A2CE7BD00297764 /* Globals.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = Globals.swift; path = Shared/Globals.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		164785AC1A2CE7CD00297764 /* NSDictionaryExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NSDictionaryExtensions.swift; path = Shared/NSDictionaryExtensions.swift; sourceTree = "<group>"; };
@@ -231,11 +228,9 @@
 		162002D11A2A409900FF95F3 /* Core */ = {
 			isa = PBXGroup;
 			children = (
-				162002D91A2A4D9E00FF95F3 /* iOS_Globals.h */,
 				1628A6C218789E73005EDA69 /* PocketTrailer-Prefix.pch */,
 				164785B21A2CE7FB00297764 /* PocketTrailer-Bridging-Header.h */,
-				1628A6C318789E73005EDA69 /* iOS_AppDelegate.h */,
-				1628A6C418789E73005EDA69 /* iOS_AppDelegate.m */,
+				1606F1BA1A4703E60088368E /* iOS_AppDelegate.swift */,
 			);
 			name = Core;
 			sourceTree = "<group>";
@@ -429,8 +424,6 @@
 		16FD14D11881C82400FDC960 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
-				1628A6FA1878B64E005EDA69 /* RespositoriesViewController.h */,
-				1628A6FB1878B64E005EDA69 /* RespositoriesViewController.m */,
 				16C9A2751A44D12600EE54EC /* AboutTrailerViewController.swift */,
 				16C9A2771A44D86B00EE54EC /* GithubViewController.swift */,
 				16C9A2791A44DD0200EE54EC /* CommentBlacklistViewController.swift */,
@@ -438,6 +431,7 @@
 				166A84BF1A4582C100A3B292 /* ServerDetailViewController.swift */,
 				166A84C11A45A37700A3B292 /* AdvancedSettingsViewController.swift */,
 				166A84C31A45CEE000A3B292 /* PickerViewController.swift */,
+				1606F1BC1A471CDC0088368E /* RespositoriesViewController.swift */,
 			);
 			name = Settings;
 			sourceTree = "<group>";
@@ -553,18 +547,18 @@
 			files = (
 				16B3B31C1A34E8E2000BE6CC /* PRComment.swift in Sources */,
 				16C9A27C1A44EBCF00EE54EC /* DetailViewController.swift in Sources */,
+				1606F1BB1A4703E60088368E /* iOS_AppDelegate.swift in Sources */,
 				16B3B3201A34E8E2000BE6CC /* PRStatus.swift in Sources */,
 				164785AB1A2CE7BD00297764 /* Globals.swift in Sources */,
 				164785B11A2CE7CD00297764 /* NSStringExtensions.swift in Sources */,
 				16C9A2761A44D12600EE54EC /* AboutTrailerViewController.swift in Sources */,
 				16CBE1C61A2DFBA500485053 /* Settings.swift in Sources */,
 				164785AF1A2CE7CD00297764 /* NSDictionaryExtensions.swift in Sources */,
-				1628A6C518789E73005EDA69 /* iOS_AppDelegate.m in Sources */,
 				16B3B3181A34E8E2000BE6CC /* ApiServer.swift in Sources */,
 				16259BCE1A449400009C5745 /* OpenInSafariActivity.swift in Sources */,
 				16C9A27A1A44DD0200EE54EC /* CommentBlacklistViewController.swift in Sources */,
 				16C9A2781A44D86B00EE54EC /* GithubViewController.swift in Sources */,
-				1628A6FC1878B64E005EDA69 /* RespositoriesViewController.m in Sources */,
+				1606F1BD1A471CDC0088368E /* RespositoriesViewController.swift in Sources */,
 				169FB2341A3DAFED00E00771 /* GlobalsObjC.m in Sources */,
 				166A84C41A45CEE000A3B292 /* PickerViewController.swift in Sources */,
 				166A84C21A45A37700A3B292 /* AdvancedSettingsViewController.swift in Sources */,

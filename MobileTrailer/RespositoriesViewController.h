@@ -1,4 +1,0 @@
-
-@interface RespositoriesViewController : UITableViewController
-
-@end

@@ -2,8 +2,5 @@
 #import <Availability.h>
 
 #ifdef __OBJC__
-
-#import "iOS_Globals.h"
 #import "PocketTrailer-Swift.h"
-
 #endif

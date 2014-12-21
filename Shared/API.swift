@@ -274,10 +274,10 @@ class API: NSOperationQueue {
 		}
 
 		if(Settings.showStatusItems) {
-			self.successfulRefreshesSinceLastStatusCheck++
+			successfulRefreshesSinceLastStatusCheck++
 		}
 		if(Settings.showLabels) {
-			self.successfulRefreshesSinceLastLabelCheck++
+			successfulRefreshesSinceLastLabelCheck++
 		}
 	}
 
@@ -894,7 +894,7 @@ class API: NSOperationQueue {
 	private func shouldScanForStatusesInMoc(moc: NSManagedObjectContext) -> Bool {
 		if successfulRefreshesSinceLastStatusCheck % Settings.statusItemRefreshInterval == 0 {
 			if Settings.showStatusItems { return true }
-			for s in DataItem.allItemsOfType("PRStatus", inMoc:moc) as [PRStatus] { moc.deleteObject(s) }
+			for s in DataItem.allItemsOfType("PRStatus", inMoc: moc) { moc.deleteObject(s) }
 		}
 		return false
 	}
@@ -902,7 +902,7 @@ class API: NSOperationQueue {
 	private func shouldScanForLabelsInMoc(moc: NSManagedObjectContext) -> Bool {
 		if successfulRefreshesSinceLastLabelCheck % Settings.labelRefreshInterval == 0 {
 			if Settings.showLabels { return true }
-			for l in DataItem.allItemsOfType("PRLabel", inMoc:moc) as [PRLabel] { moc.deleteObject(l) }
+			for l in DataItem.allItemsOfType("PRLabel", inMoc: moc) { moc.deleteObject(l) }
 		}
 		return false
 	}

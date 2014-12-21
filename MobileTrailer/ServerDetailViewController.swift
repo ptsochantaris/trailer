@@ -174,7 +174,7 @@ class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 	}
 
 	private func deleteServer() {
-		if let a = mainObjectContext.existingObjectWithID(serverId!, error: nil) as? ApiServer {
+		if let a = mainObjectContext.existingObjectWithID(serverId!, error: nil) {
 			mainObjectContext.deleteObject(a)
 			DataManager.saveDB()
 		}

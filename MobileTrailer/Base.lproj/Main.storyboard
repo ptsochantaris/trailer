@@ -206,7 +206,7 @@
         <!--Repositories-->
         <scene sceneID="mBS-8s-j5u">
             <objects>
-                <tableViewController id="qen-v7-82i" customClass="RespositoriesViewController" sceneMemberID="viewController">
+                <tableViewController id="qen-v7-82i" customClass="RespositoriesViewController" customModule="PocketTrailer" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="m0P-9W-9Zs">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

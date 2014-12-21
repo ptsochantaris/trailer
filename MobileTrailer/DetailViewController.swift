@@ -125,6 +125,8 @@ class DetailViewController: UIViewController, WKNavigationDelegate {
 
 
 	func shareSelected() {
-		app.shareFromView(self, buttonItem: navigationItem.rightBarButtonItem, url: _webView?.URL)
+		if let u = _webView?.URL {
+			app.shareFromView(self, buttonItem: navigationItem.rightBarButtonItem!, url: u)
+		}
 	}
 }
