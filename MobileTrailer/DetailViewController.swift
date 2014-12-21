@@ -44,7 +44,7 @@ class DetailViewController: UIViewController, WKNavigationDelegate {
 
 	private func setEmpty() {
 		statusLabel.textColor = UIColor.lightGrayColor()
-		statusLabel.text = "Please select a Pull Request from the list on the left, or select 'Settings' to change your repository selection.\n\n(You may have to login to GitHub the first time you visit a page)"
+		statusLabel.text = "Please select a Pull Request from the list on the left, or select 'Settings' to add servers, or show/hide repositories.\n\n(You may have to login to GitHub the first time you visit a private PR)"
 		statusLabel.hidden = false
 		navigationItem.rightBarButtonItem?.enabled = false
 		title = nil;
@@ -54,6 +54,7 @@ class DetailViewController: UIViewController, WKNavigationDelegate {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		_detail_view_controller_shared = self
+		configureView()
 	}
 
 	override func traitCollectionDidChange(previousTraitCollection: UITraitCollection?) {

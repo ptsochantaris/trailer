@@ -9,10 +9,10 @@ func _pr_cell_make_item_count_formatter() -> NSNumberFormatter {
 
 class PRCell: UITableViewCell {
 
-	let unreadCount = UILabel(frame: CGRectZero)
-	let readCount = UILabel(frame: CGRectZero)
-	var failedToLoadImage: NSString?
-	var waitingForImageInPath: NSString?
+	private let unreadCount = UILabel(frame: CGRectZero)
+	private let readCount = UILabel(frame: CGRectZero)
+	private var failedToLoadImage: NSString?
+	private var waitingForImageInPath: NSString?
 	@IBOutlet var _image: UIImageView!
 	@IBOutlet var _title: UILabel!
 	@IBOutlet var _description: UILabel!

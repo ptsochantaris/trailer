@@ -1,4 +1,3 @@
-#import "MasterViewController.h"
 
 iOS_AppDelegate *app;
 NSString *currentAppVersion;
@@ -151,7 +150,7 @@ collapseSecondaryViewController:(UIViewController *)secondaryViewController
 	UISplitViewController *splitViewController = (UISplitViewController *)self.window.rootViewController;
 	UINavigationController *masterNavigationController = splitViewController.viewControllers[0];
 	MasterViewController *controller = (MasterViewController *)masterNavigationController.viewControllers[0];
-	[controller reloadData];
+	[controller reloadDataWithAnimation:YES];
 }
 
 - (void)application:(UIApplication *)application performFetchWithCompletionHandler:(backgroundFetchCompletionCallback)completionHandler
