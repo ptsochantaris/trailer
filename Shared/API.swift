@@ -630,7 +630,7 @@ class API: NSOperationQueue {
 						if success {
 							self.successfulRefreshesSinceLastLabelCheck = 0
 						} else {
-							// 404/410 means the PR has been deleted
+							// 404/410 means the label has been deleted
 							if !(resultCode==404 || resultCode==410) {
 								p.apiServer.lastSyncSucceeded = false
 							}
@@ -680,7 +680,7 @@ class API: NSOperationQueue {
 					if success {
 						self.successfulRefreshesSinceLastStatusCheck = 0
 					} else {
-						// 404/410 means the PR has been deleted
+						// 404/410 means the status has been deleted
 						if !(resultCode==404 || resultCode==410) {
 							apiServer.lastSyncSucceeded = false
 						}
@@ -788,7 +788,7 @@ class API: NSOperationQueue {
 		DLog("Checking closed PR to see if it was merged: %@", r.title)
 
 		let repoFullName = r.repo.fullName ?? "NoRepoFullName"
-		let repoNumber = r.number ?? "NoRepoNumber"
+		let repoNumber = r.number?.stringValue ?? "NoRepoNumber"
 		get("/repos/\(repoFullName)/pulls/\(repoNumber)", fromServer: r.apiServer, ignoreLastSync: false, parameters: nil, extraHeaders: nil,
 			success: { (response, data) in
 
@@ -845,7 +845,7 @@ class API: NSOperationQueue {
 		})
 	}
 
-	func getRateLimitFromServer(apiServer:ApiServer, andCallback: ((Int64, Int64, Int64)->Void)?)
+	func getRateLimitFromServer(apiServer: ApiServer, andCallback: ((Int64, Int64, Int64)->Void)?)
 	{
 		get("/rate_limit", fromServer: apiServer, ignoreLastSync: true, parameters: nil, extraHeaders: nil,
 			success: { (response, data) in
@@ -1048,7 +1048,6 @@ class API: NSOperationQueue {
 			}
 	}
 
-
 	private func getDataInPath(
 		path: String,
 		fromServer: ApiServer,
@@ -1094,7 +1093,7 @@ class API: NSOperationQueue {
 		failure: ((response: NSHTTPURLResponse?, data: AnyObject?, error: NSError?)->Void)?) {
 
 			var apiServerLabel: String
-			if fromServer.lastSyncSucceeded?.boolValue ?? ignoreLastSync {
+			if (fromServer.lastSyncSucceeded?.boolValue ?? false) || ignoreLastSync {
 				apiServerLabel = fromServer.label ?? "(untitled server)"
 			} else {
 				if let fail = failure {
