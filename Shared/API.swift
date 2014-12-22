@@ -1179,7 +1179,7 @@ class API: NSOperationQueue {
 							existingBackOff!.nextAttemptAt = NSDate(timeInterval: existingBackOff!.duration, sinceDate:NSDate())
 						} else {
 							DLog("(%@) placing URL %@ on the throttled list", apiServerLabel, fullUrlPath)
-							let newDuration = existingBackOff!.duration + BACKOFF_STEP
+							let newDuration = BACKOFF_STEP
 							self.badLinks[fullUrlPath] = UrlBackOffEntry(
 								nextAttemptAt: NSDate(timeInterval: newDuration, sinceDate: NSDate()),
 								duration: newDuration)
