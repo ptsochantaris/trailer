@@ -1,3 +1,4 @@
 
 #import <CommonCrypto/CommonCrypto.h>
-#import "OSX_Globals.h"
+#import "Reachability.h"
+#import <Sparkle/Sparkle.h>

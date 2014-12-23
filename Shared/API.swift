@@ -52,8 +52,6 @@ class API: NSOperationQueue {
 		}
 
 		maxConcurrentOperationCount = 4
-
-		api = self
 	}
 
 	/////////////////////////////////////////////////////// Utilities
@@ -804,11 +802,11 @@ class API: NSOperationQueue {
 						DLog("detected merged PR: %@", r.title)
 						switch Settings.mergeHandlingPolicy {
 
-						case PRHandlingPolicy.PullRequestHandlingKeepMine.rawValue:
+						case PRHandlingPolicy.KeepMine.rawValue:
 							if (r.sectionIndex?.integerValue ?? 0)==PullRequestSection.All.rawValue { break }
 							fallthrough
 
-						case PRHandlingPolicy.PullRequestHandlingKeepAll.rawValue:
+						case PRHandlingPolicy.KeepAll.rawValue:
 							r.postSyncAction = PostSyncAction.DoNothing.rawValue // don't delete this
 							r.condition = PullRequestCondition.Merged.rawValue
 							app.postNotificationOfType(PRNotificationType.PrMerged, forItem: r)
@@ -823,11 +821,11 @@ class API: NSOperationQueue {
 					DLog("detected closed PR: %@", r.title)
 					switch(Settings.closeHandlingPolicy) {
 
-					case PRHandlingPolicy.PullRequestHandlingKeepMine.rawValue:
+					case PRHandlingPolicy.KeepMine.rawValue:
 						if (r.sectionIndex?.integerValue ?? 0) == PullRequestSection.All.rawValue { break }
 						fallthrough
 
-					case PRHandlingPolicy.PullRequestHandlingKeepAll.rawValue:
+					case PRHandlingPolicy.KeepAll.rawValue:
 						r.postSyncAction = PostSyncAction.DoNothing.rawValue // don't delete this
 						r.condition = PullRequestCondition.Closed.rawValue
 						app.postNotificationOfType(PRNotificationType.PrClosed, forItem:r)

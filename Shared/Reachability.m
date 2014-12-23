@@ -45,6 +45,7 @@
 
  */
 
+#import "Reachability.h"
 #import <SystemConfiguration/SystemConfiguration.h>
 #import <netinet/in.h>
 #import <arpa/inet.h>

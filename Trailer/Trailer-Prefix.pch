@@ -3,7 +3,4 @@
 
 #ifdef __OBJC__
 
-#import "OSX_Globals.h"
-#import "Trailer-Swift.h"
-
 #endif

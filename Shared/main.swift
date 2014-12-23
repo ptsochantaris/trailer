@@ -1,8 +1,8 @@
 
-kPullRequestSectionNames = ["", "Mine", "Participated", "Recently Merged", "Recently Closed", "All Pull Requests"]
-currentAppVersion = NSBundle.mainBundle().infoDictionary!["CFBundleShortVersionString"] as String
+import CoreData
+
 DataManager.checkMigration()
-api = API()
+let api = API()
 
 //debugging sections
 //let _prs = PullRequest.allItemsOfType("PullRequest", inMoc: mainObjectContext) as [PullRequest]

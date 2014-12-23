@@ -1203,9 +1203,9 @@ Enter to select and ⌘, for preferences.
             <connections>
                 <outlet property="delegate" destination="494" id="wwK-Xp-Xzn"/>
             </connections>
-            <point key="canvasLocation" x="256" y="291"/>
+            <point key="canvasLocation" x="327" y="121"/>
         </window>
-        <customObject id="494" customClass="OSX_AppDelegate">
+        <customObject id="494" customClass="OSX_AppDelegate" customModule="Trailer">
             <connections>
                 <outlet property="aboutVersion" destination="S57-NF-ZQw" id="Rsc-c3-NPJ"/>
                 <outlet property="activityDisplay" destination="Lax-cU-vqe" id="jxh-1P-ph0"/>
