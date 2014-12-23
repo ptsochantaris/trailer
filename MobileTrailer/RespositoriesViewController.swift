@@ -162,6 +162,7 @@ class RespositoriesViewController: UITableViewController, UITextFieldDelegate, N
 		return fc;
 	}
 
+	/*
 	func controllerWillChangeContent(controller: NSFetchedResultsController) {
 		tableView.beginUpdates()
 	}
@@ -169,11 +170,14 @@ class RespositoriesViewController: UITableViewController, UITextFieldDelegate, N
 	func controller(controller: NSFetchedResultsController, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
 		switch(type) {
 
-		case NSFetchedResultsChangeType.Insert:
+		case .Insert:
 			tableView.insertSections(NSIndexSet(index: sectionIndex), withRowAnimation: UITableViewRowAnimation.Fade)
 
-		case NSFetchedResultsChangeType.Delete:
+		case .Delete:
 			tableView.deleteSections(NSIndexSet(index: sectionIndex), withRowAnimation: UITableViewRowAnimation.Fade)
+
+		case .Update:
+			tableView.reloadSections(NSIndexSet(index: sectionIndex), withRowAnimation: UITableViewRowAnimation.Fade)
 
 		default:
 			break;
@@ -186,22 +190,18 @@ class RespositoriesViewController: UITableViewController, UITextFieldDelegate, N
 
 			switch(type) {
 
-			case NSFetchedResultsChangeType.Insert:
-				tableView.insertRowsAtIndexPaths([i], withRowAnimation: UITableViewRowAnimation.Fade)
+			case .Insert:
+				tableView.insertRowsAtIndexPaths([newIndexPath ?? i], withRowAnimation: UITableViewRowAnimation.Fade)
 
-			case NSFetchedResultsChangeType.Delete:
+			case .Delete:
 				tableView.deleteRowsAtIndexPaths([i], withRowAnimation:UITableViewRowAnimation.Fade)
 
-			case NSFetchedResultsChangeType.Update:
-				if let cell = tableView.cellForRowAtIndexPath(i) {
-					if let n = newIndexPath {
-						configureCell(cell, atIndexPath: n)
-					} else {
-						configureCell(cell, atIndexPath: i)
-					}
+			case .Update:
+				if let cell = tableView.cellForRowAtIndexPath(newIndexPath ?? i) {
+					configureCell(cell, atIndexPath: newIndexPath ?? i)
 				}
 
-			case NSFetchedResultsChangeType.Move:
+			case .Move:
 				tableView.deleteRowsAtIndexPaths([i], withRowAnimation:UITableViewRowAnimation.Fade)
 				if let n = newIndexPath {
 					tableView.insertRowsAtIndexPaths([n], withRowAnimation:UITableViewRowAnimation.Fade)
@@ -209,9 +209,10 @@ class RespositoriesViewController: UITableViewController, UITextFieldDelegate, N
 			}
 		}
 	}
-
+	*/
 	func controllerDidChangeContent(controller: NSFetchedResultsController) {
-		tableView.endUpdates()
+		//tableView.endUpdates()
+		tableView.reloadData()
 	}
 
 	private func configureCell(cell: UITableViewCell, atIndexPath: NSIndexPath) {

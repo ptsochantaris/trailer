@@ -280,7 +280,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 	}
 
 	override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		let sectionInfo = self.fetchedResultsController.sections?[section] as NSFetchedResultsSectionInfo
+		let sectionInfo = fetchedResultsController.sections?[section] as NSFetchedResultsSectionInfo
 		return sectionInfo.numberOfObjects
 	}
 
@@ -349,6 +349,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 		return aFetchedResultsController
 	}
 
+	/*
 	func controllerWillChangeContent(controller: NSFetchedResultsController) {
 		tableView.beginUpdates()
 	}
@@ -356,14 +357,18 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 	func controller(controller: NSFetchedResultsController, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
 		switch(type) {
 
-		case NSFetchedResultsChangeType.Insert:
-			tableView.insertSections(NSIndexSet(index: sectionIndex), withRowAnimation: UITableViewRowAnimation.Fade)
+		case .Insert:
+			tableView.insertSections(NSIndexSet(index: sectionIndex), withRowAnimation: UITableViewRowAnimation.Automatic)
 
-		case NSFetchedResultsChangeType.Delete:
-			tableView.deleteSections(NSIndexSet(index: sectionIndex), withRowAnimation: UITableViewRowAnimation.Fade)
+		case .Delete:
+			tableView.deleteSections(NSIndexSet(index: sectionIndex), withRowAnimation: UITableViewRowAnimation.Automatic)
+
+		case .Update:
+			tableView.reloadSections(NSIndexSet(index: sectionIndex), withRowAnimation: UITableViewRowAnimation.Automatic)
 
 		default:
 			break
+
 		}
 	}
 
@@ -373,32 +378,29 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
 			switch(type) {
 
-			case NSFetchedResultsChangeType.Insert:
-				tableView.insertRowsAtIndexPaths([i], withRowAnimation: UITableViewRowAnimation.Fade)
+			case .Insert:
+				tableView.insertRowsAtIndexPaths([newIndexPath ?? i], withRowAnimation: UITableViewRowAnimation.Automatic)
 
-			case NSFetchedResultsChangeType.Delete:
-				tableView.deleteRowsAtIndexPaths([i], withRowAnimation:UITableViewRowAnimation.Fade)
+			case .Delete:
+				tableView.deleteRowsAtIndexPaths([i], withRowAnimation:UITableViewRowAnimation.Automatic)
 
-			case NSFetchedResultsChangeType.Update:
-				if let cell = tableView.cellForRowAtIndexPath(i) {
-					if let n = newIndexPath {
-						configureCell(cell, atIndexPath: n)
-					} else {
-						configureCell(cell, atIndexPath: i)
-					}
+			case .Update:
+				if let cell = tableView.cellForRowAtIndexPath(newIndexPath ?? i) {
+					configureCell(cell, atIndexPath: newIndexPath ?? i)
 				}
 
-			case NSFetchedResultsChangeType.Move:
-				tableView.deleteRowsAtIndexPaths([i], withRowAnimation:UITableViewRowAnimation.Fade)
+			case .Move:
+				tableView.deleteRowsAtIndexPaths([i], withRowAnimation:UITableViewRowAnimation.Automatic)
 				if let n = newIndexPath {
-					tableView.insertRowsAtIndexPaths([n], withRowAnimation:UITableViewRowAnimation.Fade)
+					tableView.insertRowsAtIndexPaths([n], withRowAnimation:UITableViewRowAnimation.Automatic)
 				}
 			}
 		}
 	}
-
+	*/
 	func controllerDidChangeContent(controller: NSFetchedResultsController) {
-		tableView.endUpdates()
+		//tableView.endUpdates()
+		tableView.reloadData()
 		updateStatus()
 	}
 

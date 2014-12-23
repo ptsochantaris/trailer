@@ -28,7 +28,7 @@ func DLog(messageFormat:@autoclosure () -> String, args:LazyVarArgClosure...) {
 	typealias COLOR_CLASS = UIColor
 	typealias FONT_CLASS = UIFont
 	typealias IMAGE_CLASS = UIImage
-	let stringDrawingOptions = NSStringDrawingOptions(rawValue: NSStringDrawingOptions.UsesLineFragmentOrigin.rawValue | NSStringDrawingOptions.UsesFontLeading.rawValue)!
+	let stringDrawingOptions = NSStringDrawingOptions.UsesLineFragmentOrigin
 #elseif os(OSX)
 	let STATUSITEM_PADDING: CGFloat = 1.0
 	let TOP_HEADER_HEIGHT: CGFloat = 28.0
