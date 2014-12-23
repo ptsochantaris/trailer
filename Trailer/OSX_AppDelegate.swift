@@ -54,6 +54,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	// Preferences - Display
 	@IBOutlet var useVibrancy: NSButton!
 	@IBOutlet var includeLabelsInFiltering: NSButton!
+	@IBOutlet weak var includeStatusesInFiltering: NSButton!
 
 	// Preferences - Labels
 	@IBOutlet var labelRescanLabel: NSTextField!
@@ -102,9 +103,10 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	private var globalKeyMonitor: AnyObject?
 	private var localKeyMonitor: AnyObject?
+	private var messageView: NSView?
 	private var mouseIgnoreTimer: PopTimer!
 	private var filterTimer: PopTimer!
-	private var messageView: NSView?
+	private var deferredUpdateTimer: PopTimer!
 
 	func applicationDidFinishLaunching(notification: NSNotification) {
 		app = self
@@ -116,6 +118,10 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		filterTimer = PopTimer(timeInterval: 0.2, callback: {
 			app.updateMenu()
 			app.scrollToTop()
+		})
+
+		deferredUpdateTimer = PopTimer(timeInterval: 0.5, callback: {
+			app.updateMenu()
 		})
 
 		mouseIgnoreTimer = PopTimer(timeInterval: 0.4, callback: {
@@ -170,9 +176,13 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		sortModeSelect.selectItemAtIndex(Settings.sortMethod)
 	}
 
+	private func deferredUpdate() {
+		deferredUpdateTimer.push()
+	}
+
 	@IBAction func showLabelsSelected(sender: NSButton) {
 		Settings.showLabels = (sender.integerValue==1)
-		updateMenu()
+		deferredUpdate()
 		updateLabelOptions()
 		api.successfulRefreshesSinceLastLabelCheck = 0
 		if Settings.showLabels {
@@ -191,17 +201,17 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	@IBAction func hideAllPrsSection(sender: NSButton) {
 		Settings.hideAllPrsSection = (sender.integerValue==1)
 		DataManager.postProcessAllPrs()
-		updateMenu()
+		deferredUpdate()
 	}
 
 	@IBAction func markUnmergeableOnUserSectionsOnlySelected(sender: NSButton) {
 		Settings.markUnmergeableOnUserSectionsOnly = (sender.integerValue==1)
-		updateMenu()
+		deferredUpdate()
 	}
 
 	@IBAction func displayRepositoryNameSelected(sender: NSButton) {
 		Settings.showReposInName = (sender.integerValue==1)
-		updateMenu()
+		deferredUpdate()
 	}
 
 	@IBAction func useVibrancySelected(sender: NSButton) {
@@ -224,6 +234,10 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		Settings.includeLabelsInFilter = (sender.integerValue==1)
 	}
 
+	@IBAction func includeStatusesInFilteringSelected(sender: NSButton) {
+		Settings.includeStatusesInFilter = (sender.integerValue==1)
+	}
+
 	@IBAction func includeRepositoriesInfilterSelected(sender: NSButton) {
 		Settings.includeReposInFilter = (sender.integerValue==1)
 	}
@@ -235,7 +249,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	@IBAction func autoParticipateOnMentionSelected(sender: NSButton) {
 		Settings.autoParticipateInMentions = (sender.integerValue==1)
 		DataManager.postProcessAllPrs()
-		updateMenu()
+		deferredUpdate()
 	}
 
 	@IBAction func dontKeepMyPrsSelected(sender: NSButton) {
@@ -245,32 +259,32 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	@IBAction func hideAvatarsSelected(sender: NSButton) {
 		Settings.hideAvatars = (sender.integerValue==1)
 		DataManager.postProcessAllPrs()
-		updateMenu()
+		deferredUpdate()
 	}
 
 	@IBAction func hidePrsSelected(sender: NSButton) {
 		Settings.shouldHideUncommentedRequests = (sender.integerValue==1)
 		DataManager.postProcessAllPrs()
-		updateMenu()
+		deferredUpdate()
 	}
 
 	@IBAction func showAllCommentsSelected(sender: NSButton) {
 		Settings.showCommentsEverywhere = (sender.integerValue==1);
 		DataManager.postProcessAllPrs()
-		updateMenu()
+		deferredUpdate()
 	}
 
 	@IBAction func sortOrderSelected(sender: NSButton) {
 		Settings.sortDescending = (sender.integerValue==1)
 		setupSortMethodMenu()
 		DataManager.postProcessAllPrs()
-		updateMenu()
+		deferredUpdate()
 	}
 
 	@IBAction func countOnlyListedPrsSelected(sender: NSButton) {
 		Settings.countOnlyListedPrs = (sender.integerValue==1)
 		DataManager.postProcessAllPrs()
-		updateMenu()
+		deferredUpdate()
 	}
 
 	@IBAction func hideNewRespositoriesSelected(sender: NSButton) {
@@ -284,12 +298,12 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	@IBAction func sortMethodChanged(sender: AnyObject) {
 		Settings.sortMethod = sortModeSelect.indexOfSelectedItem
 		DataManager.postProcessAllPrs()
-		updateMenu()
+		deferredUpdate()
 	}
 
 	@IBAction func showStatusItemsSelected(sender: NSButton) {
 		Settings.showStatusItems = (sender.integerValue==1)
-		updateMenu()
+		deferredUpdate()
 		updateStatusItemsOptions()
 
 		api.successfulRefreshesSinceLastStatusCheck = 0
@@ -339,24 +353,24 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	@IBAction func makeStatusItemsSelectableSelected(sender: NSButton) {
 		Settings.makeStatusItemsSelectable = (sender.integerValue==1)
-		updateMenu()
+		deferredUpdate()
 	}
 
 	@IBAction func showCreationSelected(sender: NSButton) {
 		Settings.showCreatedInsteadOfUpdated = (sender.integerValue==1)
 		DataManager.postProcessAllPrs()
-		updateMenu()
+		deferredUpdate()
 	}
 
 	@IBAction func groupbyRepoSelected(sender: NSButton) {
 		Settings.groupByRepo = (sender.integerValue==1)
-		updateMenu()
+		deferredUpdate()
 	}
 
 	@IBAction func moveAssignedPrsToMySectionSelected(sender: NSButton) {
 		Settings.moveAssignedPrsToMySection = (sender.integerValue==1)
 		DataManager.postProcessAllPrs()
-		updateMenu()
+		deferredUpdate()
 	}
 
 	@IBAction func checkForUpdatesAutomaticallySelected(sender: NSButton) {
@@ -693,7 +707,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 				serverList.reloadData()
 				serverList.selectRowIndexes(NSIndexSet(index: min(index, serverList.numberOfRows-1)), byExtendingSelection: false)
 				fillServerApiFormFromSelectedServer()
-				updateMenu()
+				deferredUpdate()
 				DataManager.saveDB()
 			}
 		}
@@ -741,7 +755,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 				let newTokens = statusTermsField.objectValue as [String]
 				if existingTokens != newTokens {
 					Settings.statusFilteringTerms = newTokens
-					updateMenu()
+					deferredUpdate()
 				}
 			} else if obj===commentAuthorBlacklist {
 				let existingTokens = Settings.commentAuthorBlacklist
@@ -761,7 +775,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		lastRepoCheck = NSDate.distantPast() as NSDate
 		projectsTable.reloadData()
 		refreshButton.enabled = ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext)
-		updateMenu()
+		deferredUpdate()
 	}
 
 	@IBAction func markAllReadSelected(sender: NSMenuItem) {
@@ -792,6 +806,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		displayRepositoryNames.integerValue = Settings.showReposInName ? 1 : 0
 		includeRepositoriesInFiltering.integerValue = Settings.includeReposInFilter ? 1 : 0
 		includeLabelsInFiltering.integerValue = Settings.includeLabelsInFilter ? 1 : 0
+		includeStatusesInFiltering.integerValue = Settings.includeStatusesInFilter ? 1 : 0
 		dontConfirmRemoveAllMerged.integerValue = Settings.dontAskBeforeWipingMerged ? 1 : 0
 		hideUncommentedPrs.integerValue = Settings.shouldHideUncommentedRequests ? 1 : 0
 		autoParticipateWhenMentioned.integerValue = Settings.autoParticipateInMentions ? 1 : 0
@@ -1314,6 +1329,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		Settings.statusFilteringMode = sender.indexOfSelectedItem
 		Settings.statusFilteringTerms = statusTermsField.objectValue as [String]
 		updateStatusTermPreferenceControls()
+		deferredUpdate()
 	}
 
 	@IBAction func testApiServerSelected(sender: NSButton) {

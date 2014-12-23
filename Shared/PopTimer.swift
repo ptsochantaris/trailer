@@ -24,7 +24,7 @@ class PopTimer : NSObject {
 		popTimer = nil
 	}
 
-	init(timeInterval: NSTimeInterval, callback: ()->()) {
+	init(timeInterval: NSTimeInterval, callback: ()->Void) {
 		self.timeInterval = timeInterval
 		self.callback = callback
 		super.init()

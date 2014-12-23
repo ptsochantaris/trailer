@@ -107,6 +107,9 @@ class PullRequest: DataItem {
 				if Settings.includeLabelsInFilter {
 					orPredicates.append(NSPredicate(format: "any labels.name contains[cd] %@", fi)!)
 				}
+				if Settings.includeStatusesInFilter {
+					orPredicates.append(NSPredicate(format: "any statuses.descriptionText contains[cd] %@", fi)!)
+				}
 				andPredicates.append(NSCompoundPredicate.orPredicateWithSubpredicates(orPredicates))
 			}
 		}

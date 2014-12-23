@@ -247,6 +247,11 @@ class Settings: NSObject {
 		set { set("INCLUDE_LABELS_IN_FILTER", newValue) }
 	}
 
+	class var includeStatusesInFilter: Bool {
+		get { return get("INCLUDE_STATUSES_IN_FILTER") as? Bool ?? true }
+		set { set("INCLUDE_STATUSES_IN_FILTER", newValue) }
+	}
+
 	class var hotkeyCommandModifier: Bool {
 		get { return get("HOTKEY_COMMAND_MODIFIER") as? Bool ?? true }
 		set { set("HOTKEY_COMMAND_MODIFIER", newValue) }
