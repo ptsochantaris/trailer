@@ -271,7 +271,7 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 			switch indexPath.row {
 			case 0:
 				Settings.showLabels = !Settings.showLabels
-				api.successfulRefreshesSinceLastLabelCheck = 0
+				api.resetAllLabelChecks()
 				if Settings.showLabels {
 					for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as [Repo] {
 						r.dirty = true

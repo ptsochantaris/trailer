@@ -7,8 +7,8 @@ struct UrlBackOffEntry {
 class API: NSOperationQueue {
 
 	var reachability = Reachability.reachabilityForInternetConnection()
-	var successfulRefreshesSinceLastStatusCheck: Int = 0
-	var successfulRefreshesSinceLastLabelCheck: Int = 0
+	var refreshesSinceLastStatusCheck = [NSManagedObjectID:Int]()
+	var refreshesSinceLastLabelsCheck = [NSManagedObjectID:Int]()
 
 	private let mediumFormatter: NSDateFormatter
 	private let syncDateFormatter: NSDateFormatter
@@ -270,13 +270,14 @@ class API: NSOperationQueue {
 		if error != nil {
 			DLog("Comitting sync failed: %@", error)
 		}
+	}
 
-		if(Settings.showStatusItems) {
-			successfulRefreshesSinceLastStatusCheck++
-		}
-		if(Settings.showLabels) {
-			successfulRefreshesSinceLastLabelCheck++
-		}
+	func resetAllLabelChecks() {
+		refreshesSinceLastLabelsCheck.removeAll()
+	}
+
+	func resetAllStatusChecks() {
+		refreshesSinceLastStatusCheck.removeAll()
 	}
 
 	private func updatePullRequestsInMoc(moc: NSManagedObjectContext, andCallback: completionBlockType) {
@@ -600,7 +601,18 @@ class API: NSOperationQueue {
 
 	private func fetchLabelsForForCurrentPullRequestsToMoc(moc: NSManagedObjectContext, andCallback: completionBlockType) {
 
-		let prs = DataItem.allItemsOfType("PullRequest", inMoc: moc) as [PullRequest]
+		let prs = (DataItem.allItemsOfType("PullRequest", inMoc: moc) as [PullRequest]).filter { (pr) in
+			let oid = pr.objectID
+			let refreshes = self.refreshesSinceLastLabelsCheck[oid]
+			if refreshes == nil || refreshes! >= Settings.labelRefreshInterval {
+				DLog("Will check labels for PR: '%@'", pr.title)
+				return true
+			} else {
+				DLog("No need to get labels for PR: '%@' (%d refreshes since last check)", pr.title, refreshes)
+				self.refreshesSinceLastLabelsCheck[oid] = (refreshes ?? 0)+1
+				return false
+			}
+		}
 
 		let total = prs.count
 		if total==0 {
@@ -625,13 +637,17 @@ class API: NSOperationQueue {
 						return false
 					}, finalCallback: { (success, resultCode, etag) in
 						completionCount++
-						if success {
-							self.successfulRefreshesSinceLastLabelCheck = 0
-						} else {
+						var allGood = success
+						if !success {
 							// 404/410 means the label has been deleted
 							if !(resultCode==404 || resultCode==410) {
 								p.apiServer.lastSyncSucceeded = false
+							} else {
+								allGood = true
 							}
+						}
+						if allGood {
+							self.refreshesSinceLastLabelsCheck[p.objectID] = 1
 						}
 						if completionCount == total {
 							self.CALLBACK(andCallback)
@@ -649,7 +665,18 @@ class API: NSOperationQueue {
 
 	private func fetchStatusesForCurrentPullRequestsToMoc(moc: NSManagedObjectContext, andCallback: completionBlockType) {
 
-		let prs = DataItem.allItemsOfType("PullRequest", inMoc:moc) as [PullRequest]
+		let prs = (DataItem.allItemsOfType("PullRequest", inMoc: moc) as [PullRequest]).filter { (pr) in
+			let oid = pr.objectID
+			let refreshes = self.refreshesSinceLastStatusCheck[oid]
+			if refreshes == nil || refreshes! >= Settings.statusItemRefreshInterval {
+				DLog("Will check statuses for PR: '%@'", pr.title)
+				return true
+			} else {
+				DLog("No need to get statuses for PR: '%@' (%d refreshes since last check)", pr.title, refreshes)
+				self.refreshesSinceLastStatusCheck[oid] = (refreshes ?? 0)+1
+				return false
+			}
+		}
 
 		let total = prs.count;
 		if total==0 {
@@ -675,13 +702,17 @@ class API: NSOperationQueue {
 					return false
 				}, finalCallback: { (success, resultCode, etag) in
 					completionCount++
-					if success {
-						self.successfulRefreshesSinceLastStatusCheck = 0
-					} else {
+					var allGood = success
+					if !success {
 						// 404/410 means the status has been deleted
 						if !(resultCode==404 || resultCode==410) {
 							apiServer.lastSyncSucceeded = false
+						} else {
+							allGood = true
 						}
+					}
+					if allGood {
+						self.refreshesSinceLastStatusCheck[p.objectID] = 1
 					}
 					if(completionCount==total) {
 						self.CALLBACK(andCallback)
@@ -890,19 +921,27 @@ class API: NSOperationQueue {
 	}
 
 	private func shouldScanForStatusesInMoc(moc: NSManagedObjectContext) -> Bool {
-		if successfulRefreshesSinceLastStatusCheck % Settings.statusItemRefreshInterval == 0 {
-			if Settings.showStatusItems { return true }
-			for s in DataItem.allItemsOfType("PRStatus", inMoc: moc) { moc.deleteObject(s) }
+		if Settings.showStatusItems {
+			return true
+		} else {
+			refreshesSinceLastStatusCheck.removeAll()
+			for s in DataItem.allItemsOfType("PRStatus", inMoc: moc) {
+				moc.deleteObject(s)
+			}
+			return false
 		}
-		return false
 	}
 
 	private func shouldScanForLabelsInMoc(moc: NSManagedObjectContext) -> Bool {
-		if successfulRefreshesSinceLastLabelCheck % Settings.labelRefreshInterval == 0 {
-			if Settings.showLabels { return true }
-			for l in DataItem.allItemsOfType("PRLabel", inMoc: moc) { moc.deleteObject(l) }
+		if Settings.showLabels {
+			return true
+		} else {
+			refreshesSinceLastLabelsCheck.removeAll()
+			for l in DataItem.allItemsOfType("PRLabel", inMoc: moc) {
+				moc.deleteObject(l)
+			}
+			return false
 		}
-		return false
 	}
 
 	func syncWatchedReposFromServer(apiServer: ApiServer, andCallback:completionBlockType) {

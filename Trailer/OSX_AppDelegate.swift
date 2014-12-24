@@ -184,7 +184,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		Settings.showLabels = (sender.integerValue==1)
 		deferredUpdate()
 		updateLabelOptions()
-		api.successfulRefreshesSinceLastLabelCheck = 0
+		api.resetAllLabelChecks()
 		if Settings.showLabels {
 			for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as [Repo] {
 				r.dirty = true
@@ -306,7 +306,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		deferredUpdate()
 		updateStatusItemsOptions()
 
-		api.successfulRefreshesSinceLastStatusCheck = 0
+		api.resetAllStatusChecks()
 		if Settings.showStatusItems {
 			for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as [Repo] {
 				r.dirty = true
@@ -769,8 +769,8 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	private func reset() {
 		preferencesDirty = true
-		api.successfulRefreshesSinceLastStatusCheck = 0
-		api.successfulRefreshesSinceLastLabelCheck = 0
+		api.resetAllStatusChecks()
+		api.resetAllLabelChecks()
 		lastSuccessfulRefresh = nil
 		lastRepoCheck = NSDate.distantPast() as NSDate
 		projectsTable.reloadData()

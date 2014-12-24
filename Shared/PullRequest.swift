@@ -69,16 +69,23 @@ class PullRequest: DataItem {
 				p.statusesLink = (linkInfo.ofk("statuses") as? NSDictionary)?.ofk("href") as? String
 				p.issueUrl = (linkInfo.ofk("issue") as? NSDictionary)?.ofk("href") as? String
 			}
-		}
 
+			api.refreshesSinceLastLabelsCheck[p.objectID] = nil
+			api.refreshesSinceLastStatusCheck[p.objectID] = nil
+		}
 		if let c = p.condition {
 			p.reopened = (c.integerValue == PullRequestCondition.Closed.rawValue)
 		} else {
 			p.reopened = false
 		}
 		p.condition = PullRequestCondition.Open.rawValue
-
 		return p;
+	}
+
+	override func prepareForDeletion() {
+		api.refreshesSinceLastLabelsCheck[objectID] = nil
+		api.refreshesSinceLastStatusCheck[objectID] = nil
+		super.prepareForDeletion()
 	}
 
 	class func sortField() -> String? {
