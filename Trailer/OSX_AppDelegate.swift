@@ -1253,7 +1253,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		}
 	}
 
-	private func updateMenu() {
+	func updateMenu() {
 		var countString: String
 		var attributes: Dictionary<String, AnyObject>
 		if ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext) {
@@ -1567,7 +1567,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	
 	////////////// scrollbars
 	
-	private func updateScrollBarWidth() {
+	func updateScrollBarWidth() {
 		if let s = mainMenu.scrollView.verticalScroller {
 			if s.scrollerStyle == NSScrollerStyle.Legacy {
 				scrollBarWidth = s.frame.size.width
