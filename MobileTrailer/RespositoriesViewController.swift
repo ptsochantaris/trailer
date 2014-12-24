@@ -39,8 +39,11 @@ class RespositoriesViewController: UITableViewController, UITextFieldDelegate, N
 		searchHolder.autoresizesSubviews = true
 		searchHolder.autoresizingMask = UIViewAutoresizing.FlexibleWidth
 		tableView.tableHeaderView = searchHolder
+	}
 
+	override func viewDidAppear(animated: Bool) {
 		actionsButton.enabled = ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext)
+		super.viewDidAppear(animated)
 	}
 
 	@IBAction func actionSelected(sender: UIBarButtonItem) {
@@ -91,7 +94,7 @@ class RespositoriesViewController: UITableViewController, UITextFieldDelegate, N
 				tempContext.save(nil)
 			}
 			self.navigationItem.title = originalName
-			self.actionsButton.enabled = true
+			self.actionsButton.enabled = ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext)
 			self.tableView.alpha = 1.0
 			self.tableView.userInteractionEnabled = true
 			app.preferencesDirty = true
@@ -162,57 +165,44 @@ class RespositoriesViewController: UITableViewController, UITextFieldDelegate, N
 		return fc;
 	}
 
-	/*
 	func controllerWillChangeContent(controller: NSFetchedResultsController) {
 		tableView.beginUpdates()
 	}
 
 	func controller(controller: NSFetchedResultsController, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
 		switch(type) {
-
 		case .Insert:
-			tableView.insertSections(NSIndexSet(index: sectionIndex), withRowAnimation: UITableViewRowAnimation.Fade)
-
+			tableView.insertSections(NSIndexSet(index: sectionIndex), withRowAnimation: UITableViewRowAnimation.Automatic)
 		case .Delete:
-			tableView.deleteSections(NSIndexSet(index: sectionIndex), withRowAnimation: UITableViewRowAnimation.Fade)
-
+			tableView.deleteSections(NSIndexSet(index: sectionIndex), withRowAnimation: UITableViewRowAnimation.Automatic)
 		case .Update:
-			tableView.reloadSections(NSIndexSet(index: sectionIndex), withRowAnimation: UITableViewRowAnimation.Fade)
-
+			tableView.reloadSections(NSIndexSet(index: sectionIndex), withRowAnimation: UITableViewRowAnimation.Automatic)
 		default:
-			break;
+			break
 		}
 	}
 
 	func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
 
-		if let i = indexPath {
-
-			switch(type) {
-
-			case .Insert:
-				tableView.insertRowsAtIndexPaths([newIndexPath ?? i], withRowAnimation: UITableViewRowAnimation.Fade)
-
-			case .Delete:
-				tableView.deleteRowsAtIndexPaths([i], withRowAnimation:UITableViewRowAnimation.Fade)
-
-			case .Update:
-				if let cell = tableView.cellForRowAtIndexPath(newIndexPath ?? i) {
-					configureCell(cell, atIndexPath: newIndexPath ?? i)
-				}
-
-			case .Move:
-				tableView.deleteRowsAtIndexPaths([i], withRowAnimation:UITableViewRowAnimation.Fade)
-				if let n = newIndexPath {
-					tableView.insertRowsAtIndexPaths([n], withRowAnimation:UITableViewRowAnimation.Fade)
-				}
+		switch(type) {
+		case .Insert:
+			tableView.insertRowsAtIndexPaths([newIndexPath ?? indexPath!], withRowAnimation: UITableViewRowAnimation.Automatic)
+		case .Delete:
+			tableView.deleteRowsAtIndexPaths([indexPath!], withRowAnimation:UITableViewRowAnimation.Automatic)
+		case .Update:
+			if let cell = tableView.cellForRowAtIndexPath(newIndexPath ?? indexPath!) {
+				configureCell(cell, atIndexPath: newIndexPath ?? indexPath!)
+			}
+		case .Move:
+			tableView.deleteRowsAtIndexPaths([indexPath!], withRowAnimation:UITableViewRowAnimation.Automatic)
+			if let n = newIndexPath {
+				tableView.insertRowsAtIndexPaths([n], withRowAnimation:UITableViewRowAnimation.Automatic)
 			}
 		}
 	}
-	*/
+
 	func controllerDidChangeContent(controller: NSFetchedResultsController) {
-		//tableView.endUpdates()
-		tableView.reloadData()
+		tableView.endUpdates()
 	}
 
 	private func configureCell(cell: UITableViewCell, atIndexPath: NSIndexPath) {

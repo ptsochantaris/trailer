@@ -349,58 +349,44 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 		return aFetchedResultsController
 	}
 
-	/*
 	func controllerWillChangeContent(controller: NSFetchedResultsController) {
 		tableView.beginUpdates()
 	}
 
 	func controller(controller: NSFetchedResultsController, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
 		switch(type) {
-
 		case .Insert:
 			tableView.insertSections(NSIndexSet(index: sectionIndex), withRowAnimation: UITableViewRowAnimation.Automatic)
-
 		case .Delete:
 			tableView.deleteSections(NSIndexSet(index: sectionIndex), withRowAnimation: UITableViewRowAnimation.Automatic)
-
 		case .Update:
 			tableView.reloadSections(NSIndexSet(index: sectionIndex), withRowAnimation: UITableViewRowAnimation.Automatic)
-
 		default:
 			break
-
 		}
 	}
 
 	func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
 
-		if let i = indexPath {
-
-			switch(type) {
-
-			case .Insert:
-				tableView.insertRowsAtIndexPaths([newIndexPath ?? i], withRowAnimation: UITableViewRowAnimation.Automatic)
-
-			case .Delete:
-				tableView.deleteRowsAtIndexPaths([i], withRowAnimation:UITableViewRowAnimation.Automatic)
-
-			case .Update:
-				if let cell = tableView.cellForRowAtIndexPath(newIndexPath ?? i) {
-					configureCell(cell, atIndexPath: newIndexPath ?? i)
-				}
-
-			case .Move:
-				tableView.deleteRowsAtIndexPaths([i], withRowAnimation:UITableViewRowAnimation.Automatic)
-				if let n = newIndexPath {
-					tableView.insertRowsAtIndexPaths([n], withRowAnimation:UITableViewRowAnimation.Automatic)
-				}
+		switch(type) {
+		case .Insert:
+			tableView.insertRowsAtIndexPaths([newIndexPath ?? indexPath!], withRowAnimation: UITableViewRowAnimation.Automatic)
+		case .Delete:
+			tableView.deleteRowsAtIndexPaths([indexPath!], withRowAnimation:UITableViewRowAnimation.Automatic)
+		case .Update:
+			if let cell = tableView.cellForRowAtIndexPath(newIndexPath ?? indexPath!) {
+				configureCell(cell, atIndexPath: newIndexPath ?? indexPath!)
+			}
+		case .Move:
+			tableView.deleteRowsAtIndexPaths([indexPath!], withRowAnimation:UITableViewRowAnimation.Automatic)
+			if let n = newIndexPath {
+				tableView.insertRowsAtIndexPaths([n], withRowAnimation:UITableViewRowAnimation.Automatic)
 			}
 		}
 	}
-	*/
+
 	func controllerDidChangeContent(controller: NSFetchedResultsController) {
-		//tableView.endUpdates()
-		tableView.reloadData()
+		tableView.endUpdates()
 		updateStatus()
 	}
 
