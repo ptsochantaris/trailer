@@ -141,7 +141,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 		searchField.autoresizingMask = UIViewAutoresizing.FlexibleWidth
 		searchField.setTranslatesAutoresizingMaskIntoConstraints(true)
 		searchField.placeholder = "Filter..."
-		searchField.returnKeyType = UIReturnKeyType.Search
+		searchField.returnKeyType = UIReturnKeyType.Done
 		searchField.font = UIFont.systemFontOfSize(17)
 		searchField.borderStyle = UITextBorderStyle.RoundedRect
 		searchField.contentVerticalAlignment = UIControlContentVerticalAlignment.Center

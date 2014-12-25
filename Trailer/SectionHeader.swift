@@ -5,16 +5,13 @@ class SectionHeader: NSTableRowView {
 
 	init(title: String, showRemoveAllButton: Bool) {
 
-		let menuWidth = CGFloat(MENU_WIDTH)
-		let titleHeight = CGFloat(TITLE_HEIGHT)
-
-		super.init(frame: NSMakeRect(0, 0, menuWidth, titleHeight))
+		super.init(frame: NSMakeRect(0, 0, MENU_WIDTH, TITLE_HEIGHT))
 
 		canDrawSubviewsIntoLayer = true
 
-		let W = menuWidth - CGFloat(app.scrollBarWidth)
+		let W = MENU_WIDTH - app.scrollBarWidth
 		if showRemoveAllButton {
-			let buttonRect = NSMakeRect(W-100, 5, 90, titleHeight)
+			let buttonRect = NSMakeRect(W-100, 5, 90, TITLE_HEIGHT)
 			let unpin = NSButton(frame: buttonRect)
 			unpin.title = "Remove All"
 			unpin.target = self
@@ -25,15 +22,15 @@ class SectionHeader: NSTableRowView {
 			addSubview(unpin)
 		}
 
-		let x = W-120-CGFloat(AVATAR_SIZE-LEFTPADDING)
-		titleView = CenterTextField(frame: NSMakeRect(12, 4, x, titleHeight))
+		let x = W-120-AVATAR_SIZE-LEFTPADDING
+		titleView = CenterTextField(frame: NSMakeRect(12, 4, x, TITLE_HEIGHT))
 		titleView.attributedStringValue = NSAttributedString(string: title, attributes: [
 				NSFontAttributeName: NSFont.boldSystemFontOfSize(14),
 				NSForegroundColorAttributeName: NSColor.controlShadowColor()])
 		addSubview(titleView)
 
 		let offset = (MenuWindow.usingVibrancy() ? 2.5 : 3.5) as CGFloat
-		let dividerView = NSView(frame: CGRectMake(1.0, offset, menuWidth-2, 0.5))
+		let dividerView = NSView(frame: CGRectMake(1.0, offset, MENU_WIDTH-2, 0.5))
 		dividerView.wantsLayer = true
 		dividerView.layer?.backgroundColor = NSColor.controlShadowColor().CGColor
 		addSubview(dividerView)

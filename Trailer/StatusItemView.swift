@@ -65,7 +65,7 @@ class StatusItemView: NSView {
 
 		darkMode = StatusItemView.checkDarkMode()
 
-		let imagePoint = NSMakePoint(CGFloat(STATUSITEM_PADDING), CGFloat(0))
+		let imagePoint = NSMakePoint(STATUSITEM_PADDING, 0)
 		let labelRect = CGRectMake(bounds.size.height, -5, bounds.size.width, bounds.size.height)
 		var displayAttributes = textAttributes
 		var icon: NSImage

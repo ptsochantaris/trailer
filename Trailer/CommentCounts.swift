@@ -26,8 +26,8 @@ class CommentCounts: NSView {
 				NSForegroundColorAttributeName: darkMode ? NSColor.controlLightHighlightColor() : NSColor.controlTextColor(),
 				NSParagraphStyleAttributeName: pCenter])
 
-			var width = max(CGFloat(BASE_BADGE_SIZE), CGFloat(countString.size.width)+10)
-			var height = CGFloat(BASE_BADGE_SIZE)
+			var width = max(BASE_BADGE_SIZE, countString.size.width+10)
+			var height = BASE_BADGE_SIZE
 			var bottom = (self.bounds.size.height-height)*0.5
 			var left = (self.bounds.size.width-width)*0.5
 
@@ -56,15 +56,15 @@ class CommentCounts: NSView {
 					NSParagraphStyleAttributeName: pCenter])
 
 				bottom += height
-				width = max(CGFloat(SMALL_BADGE_SIZE), alertString.size.width+8)
-				height = CGFloat(SMALL_BADGE_SIZE)
+				width = max(SMALL_BADGE_SIZE, alertString.size.width+8)
+				height = SMALL_BADGE_SIZE
 				bottom -= height * 0.5 + 1
 				left -= width * 0.5
 
 				let alertBackground = NSView(frame: NSIntegralRect(NSMakeRect(left, bottom, width, height)))
 				alertBackground.wantsLayer = true
 				alertBackground.layer!.backgroundColor = redFill.CGColor
-				alertBackground.layer!.cornerRadius = CGFloat(floor(SMALL_BADGE_SIZE*0.5))
+				alertBackground.layer!.cornerRadius = floor(SMALL_BADGE_SIZE*0.5)
 				self.addSubview(alertBackground, positioned: NSWindowOrderingMode.Below, relativeTo: countBackground)
 
 				let alertView = CenterTextField(frame: NSOffsetRect(alertBackground.bounds, 0, 1))

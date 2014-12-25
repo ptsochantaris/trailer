@@ -143,7 +143,7 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 						delegate: nil,
 						cancelButtonTitle: "OK").show()
 					return
-				} else if ((apiServer.requestsRemaining?.doubleValue ?? 0.0) / (apiServer.requestsLimit?.doubleValue ?? 1.0)) < Double(LOW_API_WARNING) {
+				} else if ((apiServer.requestsRemaining?.doubleValue ?? 0.0) / (apiServer.requestsLimit?.doubleValue ?? 1.0)) < LOW_API_WARNING {
 					UIAlertView(title: (apiServer.label ?? "Untitled Server's") + " API request usage is close to full",
 						message: "Try to make fewer manual refreshes, increasing the automatic refresh time, or reducing the number of repos you are monitoring.\n\nYour allowance will be reset by Github on \(apiServer.resetDate).\n\nYou can check your API usage from the bottom of the preferences pane.",
 						delegate: nil,

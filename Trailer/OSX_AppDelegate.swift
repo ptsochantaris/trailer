@@ -1150,7 +1150,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 					alert.informativeText = "Your request cannot be completed until your hourly API allowance is reset at \(resetDateString).\n\nIf you get this error often, try to make fewer manual refreshes or reducing the number of repos you are monitoring.\n\nYou can check your API usage at any time from 'Servers' preferences pane at any time."
 					alert.addButtonWithTitle("OK")
 					alert.runModal()
-				} else if(( (apiServer.requestsRemaining?.doubleValue ?? 0.0) / (apiServer.requestsLimit?.doubleValue ?? 1.0) ) < Double(LOW_API_WARNING)) {
+				} else if(( (apiServer.requestsRemaining?.doubleValue ?? 0.0) / (apiServer.requestsLimit?.doubleValue ?? 1.0) ) < LOW_API_WARNING) {
 					let apiLabel = apiServer.label ?? "NoApiServerLabel"
 					let dateFormatter = NSDateFormatter()
 					dateFormatter.doesRelativeDateFormatting = true

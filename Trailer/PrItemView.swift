@@ -32,15 +32,15 @@ class PrItemView: NSTableCellView {
 			lightColor: goneDark ? NSColor.lightGrayColor() : NSColor.grayColor(),
 			darkColor: goneDark ? NSColor.grayColor() : NSColor.darkGrayColor())
 
-		var W = CGFloat(MENU_WIDTH-LEFTPADDING)-CGFloat(app.scrollBarWidth)
+		var W = MENU_WIDTH-LEFTPADDING-app.scrollBarWidth
 		let showUnpin = (pullRequest.condition?.integerValue != PullRequestCondition.Open.rawValue) || pullRequest.markUnmergeable()
-		if(showUnpin) { W -= CGFloat(REMOVE_BUTTON_WIDTH) }
+		if(showUnpin) { W -= REMOVE_BUTTON_WIDTH }
 		let showAvatar = (pullRequest.userAvatarUrl?.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) ?? 0) > 0 && !Settings.hideAvatars
-		if(showAvatar) { W -= CGFloat(AVATAR_SIZE+AVATAR_PADDING) } else { W += 4.0 }
+		if(showAvatar) { W -= AVATAR_SIZE+AVATAR_PADDING } else { W += 4.0 }
 
 		let drawingOptions = stringDrawingOptions
-		let titleHeight = ceil(_title.boundingRectWithSize(CGSizeMake(W, CGFloat(FLT_MAX)), options: drawingOptions).size.height)
-		let subtitleHeight = ceil(_subtitle.boundingRectWithSize(CGSizeMake(W, CGFloat(FLT_MAX)), options: drawingOptions).size.height+4.0)
+		let titleHeight = ceil(_title.boundingRectWithSize(CGSizeMake(W, CGFloat.max), options: drawingOptions).size.height)
+		let subtitleHeight = ceil(_subtitle.boundingRectWithSize(CGSizeMake(W, CGFloat.max), options: drawingOptions).size.height+4.0)
 
 		var statusRects = [NSValue]()
 		var statuses: [PRStatus]? = nil
@@ -59,10 +59,10 @@ class PrItemView: NSTableCellView {
 			bottom = ceil(CELL_PADDING * 0.5)
 			statuses = pullRequest.displayedStatuses()
 			for s in statuses! {
-				let H = ceil(s.displayText().boundingRectWithSize(CGSizeMake(W, CGFloat(FLT_MAX)),
+				let H = ceil(s.displayText().boundingRectWithSize(CGSizeMake(W, CGFloat.max),
 					options: stringDrawingOptions,
 					attributes: statusAttributes).size.height)
-				statusRects.append(NSValue(rect: NSMakeRect(CGFloat(LEFTPADDING), bottom+statusBottom, W, H)))
+				statusRects.append(NSValue(rect: NSMakeRect(LEFTPADDING, bottom+statusBottom, W, H)))
 				statusBottom += H
 			}
 		} else {
@@ -70,18 +70,18 @@ class PrItemView: NSTableCellView {
 			bottom = ceil(CELL_PADDING * 0.5)
 		}
 
-		frame = NSMakeRect(0, 0, CGFloat(MENU_WIDTH), titleHeight+subtitleHeight+statusBottom+CGFloat(CELL_PADDING))
-		var titleRect = NSMakeRect(CGFloat(LEFTPADDING), subtitleHeight+bottom+statusBottom, W, titleHeight)
-		var dateRect = NSMakeRect(CGFloat(LEFTPADDING), statusBottom+bottom, W, subtitleHeight)
-		var pinRect = NSMakeRect(CGFloat(LEFTPADDING)+W, floor((bounds.size.height-24)*0.5), CGFloat(REMOVE_BUTTON_WIDTH-10), 24)
+		frame = NSMakeRect(0, 0, MENU_WIDTH, titleHeight+subtitleHeight+statusBottom+CELL_PADDING)
+		var titleRect = NSMakeRect(LEFTPADDING, subtitleHeight+bottom+statusBottom, W, titleHeight)
+		var dateRect = NSMakeRect(LEFTPADDING, statusBottom+bottom, W, subtitleHeight)
+		var pinRect = NSMakeRect(LEFTPADDING+W, floor((bounds.size.height-24)*0.5), REMOVE_BUTTON_WIDTH-10, 24)
 
 		var shift: CGFloat = -4
 		if(showAvatar) {
 			let userImage = AvatarView(
-				frame: NSMakeRect(CGFloat(LEFTPADDING), (bounds.size.height-CGFloat(AVATAR_SIZE))*0.5, CGFloat(AVATAR_SIZE), CGFloat(AVATAR_SIZE)),
+				frame: NSMakeRect(LEFTPADDING, (bounds.size.height-AVATAR_SIZE)*0.5, AVATAR_SIZE, AVATAR_SIZE),
 				url: pullRequest.userAvatarUrl ?? "")
 			addSubview(userImage)
-			shift = CGFloat(AVATAR_PADDING+AVATAR_SIZE)
+			shift = AVATAR_PADDING+AVATAR_SIZE
 		}
 		pinRect = NSOffsetRect(pinRect, shift, 0)
 		dateRect = NSOffsetRect(dateRect, shift, 0)
@@ -136,7 +136,7 @@ class PrItemView: NSTableCellView {
 			}
 		}
 
-		let commentCounts = CommentCounts(frame: NSMakeRect(0, 0, CGFloat(LEFTPADDING), bounds.size.height), unreadCount:_commentsNew, totalCount:_commentsTotal)
+		let commentCounts = CommentCounts(frame: NSMakeRect(0, 0, LEFTPADDING, bounds.size.height), unreadCount:_commentsNew, totalCount:_commentsTotal)
 		addSubview(commentCounts)
 
 		menu = NSMenu(title: "PR Options")

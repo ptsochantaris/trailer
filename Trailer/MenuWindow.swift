@@ -38,7 +38,7 @@ class MenuWindow: NSWindow {
 
 		if MenuWindow.usingVibrancy() { // we're on 10.10+ here
 			scrollView.frame = contentView.bounds
-			scrollView.contentInsets = NSEdgeInsetsMake(CGFloat(TOP_HEADER_HEIGHT), 0, 0, 0)
+			scrollView.contentInsets = NSEdgeInsetsMake(TOP_HEADER_HEIGHT, 0, 0, 0)
 
 			bgColor = NSColor.clearColor().CGColor
 
@@ -51,7 +51,7 @@ class MenuWindow: NSWindow {
 			header.addSubview(headerVibrant!, positioned:NSWindowOrderingMode.Below, relativeTo:nil)
 		} else {
 			let windowSize = contentView.bounds.size
-			scrollView.frame = CGRectMake(0, 0, windowSize.width, windowSize.height-CGFloat(TOP_HEADER_HEIGHT))
+			scrollView.frame = CGRectMake(0, 0, windowSize.width, windowSize.height-TOP_HEADER_HEIGHT)
 
 			bgColor = NSColor.controlBackgroundColor().CGColor
 

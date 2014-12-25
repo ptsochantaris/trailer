@@ -59,7 +59,7 @@ let DARK_MODE_CHANGED = "DarkModeChangedNotificationKey"
 let PR_ITEM_FOCUSED_STATE_KEY = "PrItemFocusedStateKey"
 let UPDATE_VIBRANCY_NOTIFICATION = "UpdateVibrancyNotfication"
 
-let LOW_API_WARNING: CGFloat = 0.20
+let LOW_API_WARNING: Double = 0.20
 let NETWORK_TIMEOUT: NSTimeInterval = 120.0
 let BACKOFF_STEP: NSTimeInterval = 120.0
 
