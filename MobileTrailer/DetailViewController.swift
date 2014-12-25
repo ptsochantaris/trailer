@@ -31,7 +31,9 @@ class DetailViewController: UIViewController, WKNavigationDelegate {
 		_webView!.hidden = true
 		view.addSubview(_webView!)
 
-		if detailItem != nil {
+		if detailItem == nil {
+			showEmpty()
+		} else {
 			configureView()
 		}
 	}
@@ -41,13 +43,17 @@ class DetailViewController: UIViewController, WKNavigationDelegate {
 			DLog("Will load: %@", d.absoluteString)
 			_webView!.loadRequest(NSURLRequest(URL: d))
 		} else {
-			statusLabel.textColor = UIColor.lightGrayColor()
-			statusLabel.text = "Please select a Pull Request from the list on the left, or select 'Settings' to add servers, or show/hide repositories.\n\n(You may have to login to GitHub the first time you visit a private PR)"
-			statusLabel.hidden = false
-			navigationItem.rightBarButtonItem?.enabled = false
-			title = nil
-			_webView?.hidden = true
+			showEmpty()
 		}
+	}
+
+	private func showEmpty() {
+		statusLabel.textColor = UIColor.lightGrayColor()
+		statusLabel.text = "Please select a Pull Request from the list on the left, or select 'Settings' to add servers, or show/hide repositories.\n\n(You may have to login to GitHub the first time you visit a private PR)"
+		statusLabel.hidden = false
+		navigationItem.rightBarButtonItem?.enabled = false
+		title = nil
+		_webView?.hidden = true
 	}
 
 	override func traitCollectionDidChange(previousTraitCollection: UITraitCollection?) {
