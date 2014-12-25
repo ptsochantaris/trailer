@@ -14,6 +14,7 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 	var lastSuccessfulRefresh: NSDate?
 	var lastRepoCheck = NSDate.distantPast() as NSDate
 	var window: UIWindow!
+	var backgroundTask = UIBackgroundTaskInvalid
 
 	var refreshTimer: NSTimer?
 	var backgroundCallback: ((UIBackgroundFetchResult) -> Void)?
@@ -157,19 +158,16 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 		refreshTimer = nil;
 
 		isRefreshing = true
+
+		backgroundTask = UIApplication.sharedApplication().beginBackgroundTaskWithName("com.housetrip.Trailer.refresh", expirationHandler: {
+			self.endBGTask()
+		})
+
 		NSNotificationCenter.defaultCenter().postNotificationName(REFRESH_STARTED_NOTIFICATION, object: nil)
 		DLog("Starting refresh")
 
 		api.expireOldImageCacheEntries()
 		DataManager.postMigrationTasks()
-	}
-
-	private func completeRefresh() {
-		checkApiUsage()
-		isRefreshing = false
-		NSNotificationCenter.defaultCenter().postNotificationName(REFRESH_ENDED_NOTIFICATION, object: nil)
-		DataManager.saveDB()
-		DataManager.sendNotifications()
 	}
 
 	func startRefresh() -> Bool {
@@ -179,7 +177,7 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 
 		prepareForRefresh()
 
-		api.fetchPullRequestsForActiveReposAndCallback { () -> Void in
+		api.fetchPullRequestsForActiveReposAndCallback {
 
 			let success = !ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext)
 
@@ -190,7 +188,11 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 				self.preferencesDirty = false
 			}
 
-			self.completeRefresh()
+			self.checkApiUsage()
+			self.isRefreshing = false
+			NSNotificationCenter.defaultCenter().postNotificationName(REFRESH_ENDED_NOTIFICATION, object: nil)
+			DataManager.saveDB()
+			DataManager.sendNotifications()
 
 			if let bc = self.backgroundCallback {
 				if success && mainObjectContext.hasChanges {
@@ -212,9 +214,18 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 
 			self.refreshTimer = NSTimer.scheduledTimerWithTimeInterval(NSTimeInterval(Settings.refreshPeriod), target: self, selector: Selector("refreshTimerDone"), userInfo: nil, repeats:false)
 			DLog("Refresh done")
+
+			self.endBGTask()
 		}
 
 		return true
+	}
+
+	private func endBGTask() {
+		if self.backgroundTask != UIBackgroundTaskInvalid {
+			UIApplication.sharedApplication().endBackgroundTask(self.backgroundTask)
+			self.backgroundTask = UIBackgroundTaskInvalid
+		}
 	}
 
 	func refreshTimerDone() {

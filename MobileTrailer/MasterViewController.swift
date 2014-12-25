@@ -260,7 +260,9 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
 		if let u = urlToOpen {
 			detailViewController.detailItem = NSURL(string: u)
-			showDetailViewController(detailViewController.navigationController!, sender: self)
+			if !detailViewController.isVisible {
+				showDetailViewController(detailViewController.navigationController!, sender: self)
+			}
 		}
 	}
 

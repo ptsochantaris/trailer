@@ -8,6 +8,8 @@ class DetailViewController: UIViewController, WKNavigationDelegate {
 	@IBOutlet var spinner: UIActivityIndicatorView!
 	@IBOutlet var statusLabel: UILabel!
 
+	var isVisible: Bool = false
+
 	class func shared() -> DetailViewController {
 		return _detail_view_controller_shared!
 	}
@@ -69,11 +71,14 @@ class DetailViewController: UIViewController, WKNavigationDelegate {
 		} else {
 			spinner.stopAnimating()
 		}
+		isVisible = true
 	}
 
 	override func viewDidDisappear(animated: Bool) {
 		_webView?.removeFromSuperview()
+		_webView?.navigationDelegate = nil
 		_webView = nil
+		isVisible = false
 		super.viewDidDisappear(animated)
 	}
 
