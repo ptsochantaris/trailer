@@ -325,7 +325,7 @@ class API: NSOperationQueue {
 			if completionCount==totalOperations {
 				Repo.markDirtyReposWithIds(repoIdsToMarkDirty, inMoc:moc)
 				if repoIdsToMarkDirty.count>0 {
-					DLog("Marked dirty %d repos which have events in their event stream", repoIdsToMarkDirty.count)
+					DLog("Marked %d dirty repos that have new events in their event stream", repoIdsToMarkDirty.count)
 				}
 				self.markLongCleanReposAsDirtyInMoc(moc)
 				self.CALLBACK(andCallback)
@@ -1266,7 +1266,7 @@ class API: NSOperationQueue {
 		#endif
 	}
 
-	private func networkIndicationStart() {
+	func networkIndicationStart() {
 		#if os(iOS)
 			dispatch_async(dispatch_get_main_queue(), {
 			if ++self.networkIndicationCount==1 {
@@ -1276,7 +1276,7 @@ class API: NSOperationQueue {
 		#endif
 	}
 	
-	private func networkIndicationEnd() {
+	func networkIndicationEnd() {
 		#if os(iOS)
 			dispatch_async(dispatch_get_main_queue(), {
 			if --self.networkIndicationCount==0 {

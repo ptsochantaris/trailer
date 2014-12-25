@@ -268,8 +268,10 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
 	private func catchUp(pullRequest: PullRequest) {
 		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
-			pullRequest.catchUpWithComments()
-			DataManager.saveDB()
+			if (pullRequest.unreadComments?.integerValue ?? 0) > 0 {
+				pullRequest.catchUpWithComments()
+				DataManager.saveDB()
+			}
 		}
 	}
 

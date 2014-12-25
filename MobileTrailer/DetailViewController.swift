@@ -1,62 +1,53 @@
 import WebKit
 
-var _detail_view_controller_shared: DetailViewController?
-
 class DetailViewController: UIViewController, WKNavigationDelegate {
 
-	private var _webView: WKWebView?
 	@IBOutlet var spinner: UIActivityIndicatorView!
 	@IBOutlet var statusLabel: UILabel!
 
-	var isVisible: Bool = false
+	private var _webView: WKWebView?
 
-	class func shared() -> DetailViewController {
-		return _detail_view_controller_shared!
-	}
+	var isVisible: Bool = false
 
 	var detailItem: NSURL? {
 		didSet {
-			if detailItem != oldValue || _webView == nil || _webView!.hidden {
+			if detailItem != oldValue && _webView != nil {
 				configureView()
 			}
+		}
+	}
+
+	override func viewDidLoad() {
+		super.viewDidLoad()
+
+		title = "Loading..."
+
+		let webConfiguration = WKWebViewConfiguration()
+		_webView = WKWebView(frame: view.bounds, configuration: webConfiguration)
+		_webView!.navigationDelegate = self
+		_webView!.scrollView.contentInset = UIEdgeInsetsMake(64, 0, 0, 0)
+		_webView!.autoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight
+		_webView!.setTranslatesAutoresizingMaskIntoConstraints(true)
+		_webView!.hidden = true
+		view.addSubview(_webView!)
+
+		if detailItem != nil {
+			configureView()
 		}
 	}
 
 	func configureView() {
 		if let d = detailItem {
 			DLog("Will load: %@", d.absoluteString)
-
-			if _webView == nil {
-				let webConfiguration = WKWebViewConfiguration()
-				_webView = WKWebView(frame: view.bounds, configuration: webConfiguration)
-				_webView!.navigationDelegate = self
-				_webView!.scrollView.contentInset = UIEdgeInsetsMake(64, 0, 0, 0)
-				_webView!.autoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight
-				_webView!.setTranslatesAutoresizingMaskIntoConstraints(true)
-				view.addSubview(_webView!)
-			}
-
 			_webView!.loadRequest(NSURLRequest(URL: d))
-			statusLabel.text = "";
-			statusLabel.hidden = true
 		} else {
-			setEmpty()
+			statusLabel.textColor = UIColor.lightGrayColor()
+			statusLabel.text = "Please select a Pull Request from the list on the left, or select 'Settings' to add servers, or show/hide repositories.\n\n(You may have to login to GitHub the first time you visit a private PR)"
+			statusLabel.hidden = false
+			navigationItem.rightBarButtonItem?.enabled = false
+			title = nil
+			_webView?.hidden = true
 		}
-	}
-
-	private func setEmpty() {
-		statusLabel.textColor = UIColor.lightGrayColor()
-		statusLabel.text = "Please select a Pull Request from the list on the left, or select 'Settings' to add servers, or show/hide repositories.\n\n(You may have to login to GitHub the first time you visit a private PR)"
-		statusLabel.hidden = false
-		navigationItem.rightBarButtonItem?.enabled = false
-		title = nil;
-		_webView?.hidden = true
-	}
-
-	override func viewDidLoad() {
-		super.viewDidLoad()
-		_detail_view_controller_shared = self
-		configureView()
 	}
 
 	override func traitCollectionDidChange(previousTraitCollection: UITraitCollection?) {
@@ -75,9 +66,6 @@ class DetailViewController: UIViewController, WKNavigationDelegate {
 	}
 
 	override func viewDidDisappear(animated: Bool) {
-		_webView?.removeFromSuperview()
-		_webView?.navigationDelegate = nil
-		_webView = nil
 		isVisible = false
 		super.viewDidDisappear(animated)
 	}
@@ -85,9 +73,11 @@ class DetailViewController: UIViewController, WKNavigationDelegate {
 	func webView(webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
 		spinner.startAnimating()
 		statusLabel.hidden = true
-		webView.hidden = true
+		statusLabel.text = "";
+		_webView?.hidden = true
 		title = "Loading..."
 		navigationItem.rightBarButtonItem = nil
+		api.networkIndicationStart()
 	}
 
 	func webView(webView: WKWebView, decidePolicyForNavigationResponse navigationResponse: WKNavigationResponse, decisionHandler: (WKNavigationResponsePolicy) -> Void) {
@@ -104,10 +94,11 @@ class DetailViewController: UIViewController, WKNavigationDelegate {
 	func webView(webView: WKWebView, didFinishNavigation navigation: WKNavigation!) {
 		spinner.stopAnimating()
 		statusLabel.hidden = true
-		webView.hidden = false
+		_webView?.hidden = false
 		navigationItem.rightBarButtonItem?.enabled = true
-		title = webView.title
+		title = _webView?.title
 		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Action, target: self, action: Selector("shareSelected"))
+		api.networkIndicationEnd()
 	}
 
 	func webView(webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: NSError) {
@@ -126,6 +117,7 @@ class DetailViewController: UIViewController, WKNavigationDelegate {
 		_webView?.hidden = true
 		title = "Error"
 		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Refresh, target: self, action: Selector("configureView"))
+		api.networkIndicationEnd()
 	}
 
 
