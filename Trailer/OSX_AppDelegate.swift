@@ -148,7 +148,6 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 			preferencesSelected(nil)
 		}
 
-		NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("networkStateChanged"), name: kReachabilityChangedNotification, object: nil)
 		NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("updateScrollBarWidth"), name: NSPreferredScrollerStyleDidChangeNotification, object: nil)
 		NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("updateMenu"), name: DARK_MODE_CHANGED, object: nil)
 
@@ -1102,14 +1101,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		DLog("Check for updates set to %d every %f seconds", s.automaticallyChecksForUpdates, s.updateCheckInterval)
 	}
 
-	func networkStateChanged() {
-		if api.reachability.currentReachabilityStatus() != NetworkStatus.NotReachable {
-			DLog("Network is back")
-			startRefreshIfItIsDue()
-		}
-	}
-
-	private func startRefreshIfItIsDue() {
+	func startRefreshIfItIsDue() {
 		if let l = lastSuccessfulRefresh {
 			let howLongAgo = NSDate().timeIntervalSinceDate(l)
 			if howLongAgo > NSTimeInterval(Settings.refreshPeriod) {

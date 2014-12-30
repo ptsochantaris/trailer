@@ -38,8 +38,6 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 		let m = (splitViewController.viewControllers[0] as UINavigationController).topViewController as MasterViewController
 		m.clearsSelectionOnViewWillAppear = false // for iPad
 
-		NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("networkStateChanged"), name: kReachabilityChangedNotification, object: nil)
-
 		UIApplication.sharedApplication().setMinimumBackgroundFetchInterval(NSTimeInterval(Settings.backgroundRefreshPeriod))
 
 		let localNotification = launchOptions?[UIApplicationLaunchOptionsLocalNotificationKey] as? UILocalNotification
@@ -97,14 +95,7 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 		m.performSegueWithIdentifier("showPreferences", sender: self)
 	}
 
-	func networkStateChanged() {
-		if api.reachability.currentReachabilityStatus() != NetworkStatus.NotReachable {
-			DLog("Network is back")
-			startRefreshIfItIsDue()
-		}
-	}
-
-	private func startRefreshIfItIsDue() {
+	func startRefreshIfItIsDue() {
 
 		refreshTimer?.invalidate()
 		refreshTimer = nil

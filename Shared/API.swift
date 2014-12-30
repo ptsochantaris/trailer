@@ -14,6 +14,7 @@ class API: NSOperationQueue {
 	private let syncDateFormatter: NSDateFormatter
 	private let cacheDirectory: String
 	private var badLinks = [String:UrlBackOffEntry]()
+	private var currentNetworkStatus: NetworkStatus
 	#if os(iOS)
 	private var networkIndicationCount: Int = 0
 	private let GLOBAL_SCREEN_SCALE = UIScreen.mainScreen().scale
@@ -43,6 +44,8 @@ class API: NSOperationQueue {
 		let appSupportURL = fileManager.URLsForDirectory(NSSearchPathDirectory.CachesDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask).first! as NSURL
 		cacheDirectory = appSupportURL.URLByAppendingPathComponent("com.housetrip.Trailer").path!
 
+		currentNetworkStatus = reachability.currentReachabilityStatus()
+
 		super.init()
 
 		if fileManager.fileExistsAtPath(cacheDirectory) {
@@ -52,6 +55,22 @@ class API: NSOperationQueue {
 		}
 
 		maxConcurrentOperationCount = 4
+
+		NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("networkStateChanged"), name: kReachabilityChangedNotification, object: nil)
+	}
+
+	func networkStateChanged() {
+		dispatch_async(dispatch_get_main_queue()) {
+			let newStatus = api.reachability.currentReachabilityStatus()
+			if newStatus != NetworkStatus.NotReachable && newStatus != self.currentNetworkStatus {
+				DLog("Network came up: %d", newStatus.rawValue)
+				self.currentNetworkStatus = newStatus
+				app.startRefreshIfItIsDue()
+			} else {
+				DLog("Network went down: %d", newStatus.rawValue)
+				self.currentNetworkStatus = newStatus
+			}
+		}
 	}
 
 	/////////////////////////////////////////////////////// Utilities
@@ -212,7 +231,7 @@ class API: NSOperationQueue {
 
 	////////////////////////////////////// API interface
 
-	func fetchPullRequestsForActiveReposAndCallback(callback: completionBlockType) {
+	func fetchPullRequestsForActiveReposAndCallback(callback: (()->Void)?) {
 		let syncContext = DataManager.tempContext()
 
 		let shouldRefreshReposToo = (app.lastRepoCheck.isEqualToDate(NSDate.distantPast() as NSDate)
@@ -231,7 +250,7 @@ class API: NSOperationQueue {
 		}
 	}
 
-	private func syncToMoc(moc: NSManagedObjectContext, andCallback: completionBlockType) {
+	private func syncToMoc(moc: NSManagedObjectContext, andCallback: (()->Void)?) {
 		markDirtyReposInMoc(moc, andCallback: {
 
 			for r in Repo.unsyncableReposInMoc(moc) {
@@ -243,7 +262,7 @@ class API: NSOperationQueue {
 			self.fetchPullRequestsForRepos(Repo.syncableReposInMoc(moc), toMoc: moc, andCallback: {
 				self.updatePullRequestsInMoc(moc, andCallback: {
 					self.completeSyncInMoc(moc)
-					self.CALLBACK(andCallback)
+					andCallback?()
 				})
 			})
 		})
@@ -280,7 +299,7 @@ class API: NSOperationQueue {
 		refreshesSinceLastStatusCheck.removeAll()
 	}
 
-	private func updatePullRequestsInMoc(moc: NSManagedObjectContext, andCallback: completionBlockType) {
+	private func updatePullRequestsInMoc(moc: NSManagedObjectContext, andCallback: (()->Void)?) {
 
 		let willScanForStatuses = shouldScanForStatusesInMoc(moc)
 		let willScanForLabels = shouldScanForLabelsInMoc(moc)
@@ -293,7 +312,7 @@ class API: NSOperationQueue {
 		let completionCallback = { () -> Void in
 			completionCount++
 			if completionCount == totalOperations {
-				self.CALLBACK(andCallback)
+				andCallback?()
 			}
 		}
 
@@ -308,12 +327,12 @@ class API: NSOperationQueue {
 		detectAssignedPullRequestsInMoc(moc, andCallback: completionCallback)
 	}
 
-	private func markDirtyReposInMoc(moc: NSManagedObjectContext, andCallback: completionBlockType) {
+	private func markDirtyReposInMoc(moc: NSManagedObjectContext, andCallback: (()->Void)?) {
 
 		let allApiServers = ApiServer.allApiServersInMoc(moc)
 		let totalOperations = 2*allApiServers.count
 		if totalOperations==0 {
-			CALLBACK(andCallback)
+			andCallback?()
 			return
 		}
 
@@ -328,7 +347,7 @@ class API: NSOperationQueue {
 					DLog("Marked %d dirty repos that have new events in their event stream", repoIdsToMarkDirty.count)
 				}
 				self.markLongCleanReposAsDirtyInMoc(moc)
-				self.CALLBACK(andCallback)
+				andCallback?()
 			}
 		}
 
@@ -343,7 +362,7 @@ class API: NSOperationQueue {
 		}
 	}
 
-	private func markDirtyRepoIds(repoIdsToMarkDirty: NSMutableSet, usingUserEventsFromServer: ApiServer, andCallback: completionBlockType) {
+	private func markDirtyRepoIds(repoIdsToMarkDirty: NSMutableSet, usingUserEventsFromServer: ApiServer, andCallback: (()->Void)?) {
 		let latestEtag = usingUserEventsFromServer.latestUserEventEtag
 		let latestDate = usingUserEventsFromServer.latestUserEventDateProcessed ?? NSDate.distantPast() as NSDate
 
@@ -385,11 +404,11 @@ class API: NSOperationQueue {
 				if !success {
 					usingUserEventsFromServer.lastSyncSucceeded = false
 				}
-				self.CALLBACK(andCallback)
+				andCallback?()
 		})
 	}
 
-	private func markDirtyRepoIds(repoIdsToMarkDirty: NSMutableSet, usingReceivedEventsFromServer: ApiServer, andCallback: completionBlockType) {
+	private func markDirtyRepoIds(repoIdsToMarkDirty: NSMutableSet, usingReceivedEventsFromServer: ApiServer, andCallback: (()->Void)?) {
 		let latestEtag = usingReceivedEventsFromServer.latestReceivedEventEtag
 		let latestDate = usingReceivedEventsFromServer.latestReceivedEventDateProcessed ?? NSDate.distantPast() as NSDate
 
@@ -433,11 +452,11 @@ class API: NSOperationQueue {
 				if !success {
 					usingReceivedEventsFromServer.lastSyncSucceeded = false
 				}
-				self.CALLBACK(andCallback)
+				andCallback?()
 		})
 	}
 
-	func fetchRepositoriesToMoc(moc: NSManagedObjectContext, andCallback:completionBlockType) {
+	func fetchRepositoriesToMoc(moc: NSManagedObjectContext, andCallback: (()->Void)?) {
 
 		ApiServer.resetSyncSuccessInMoc(moc)
 
@@ -462,7 +481,7 @@ class API: NSOperationQueue {
 						}
 					}
 					app.lastRepoCheck = NSDate()
-					self.CALLBACK(andCallback)
+					andCallback?()
 				}
 			}
 
@@ -476,10 +495,10 @@ class API: NSOperationQueue {
 		})
 	}
 
-	private func fetchPullRequestsForRepos(repos: [Repo], toMoc:NSManagedObjectContext, andCallback: completionBlockType) {
+	private func fetchPullRequestsForRepos(repos: [Repo], toMoc:NSManagedObjectContext, andCallback: (()->Void)?) {
 
 		if repos.count==0 {
-			CALLBACK(andCallback)
+			andCallback?()
 			return
 		}
 		let total = repos.count
@@ -519,17 +538,17 @@ class API: NSOperationQueue {
 						}
 					}
 					if completionCount==total {
-						self.CALLBACK(andCallback)
+						andCallback?()
 					}
 			})
 		}
 	}
 
-	private func fetchCommentsForCurrentPullRequestsToMoc(moc: NSManagedObjectContext, andCallback: completionBlockType) {
+	private func fetchCommentsForCurrentPullRequestsToMoc(moc: NSManagedObjectContext, andCallback: (()->Void)?) {
 
 		let prs = DataItem.newOrUpdatedItemsOfType("PullRequest", inMoc:moc) as [PullRequest]
 		if(prs.count==0) {
-			CALLBACK(andCallback)
+			andCallback?()
 			return
 		}
 
@@ -544,18 +563,18 @@ class API: NSOperationQueue {
 
 		let completionCallback = { () -> Void in
 			completionCount++
-			if completionCount == totalOperations { self.CALLBACK(andCallback) }
+			if completionCount == totalOperations { andCallback?() }
 		}
 
 		_fetchCommentsForPullRequests(prs, issues: true, inMoc: moc, andCallback: completionCallback)
 		_fetchCommentsForPullRequests(prs, issues: false, inMoc: moc, andCallback: completionCallback)
 	}
 
-	private func _fetchCommentsForPullRequests(prs: [PullRequest], issues: Bool, inMoc: NSManagedObjectContext, andCallback: completionBlockType) {
+	private func _fetchCommentsForPullRequests(prs: [PullRequest], issues: Bool, inMoc: NSManagedObjectContext, andCallback: (()->Void)?) {
 
 		let total = prs.count
 		if total==0 {
-			CALLBACK(andCallback)
+			andCallback?()
 			return
 		}
 
@@ -587,19 +606,19 @@ class API: NSOperationQueue {
 							apiServer.lastSyncSucceeded = false
 						}
 						if completionCount == total {
-							self.CALLBACK(andCallback)
+							andCallback?()
 						}
 				})
 			} else {
 				completionCount++
 				if completionCount == total {
-					CALLBACK(andCallback)
+					andCallback?()
 				}
 			}
 		}
 	}
 
-	private func fetchLabelsForForCurrentPullRequestsToMoc(moc: NSManagedObjectContext, andCallback: completionBlockType) {
+	private func fetchLabelsForForCurrentPullRequestsToMoc(moc: NSManagedObjectContext, andCallback: (()->Void)?) {
 
 		let prs = (DataItem.allItemsOfType("PullRequest", inMoc: moc) as [PullRequest]).filter { (pr) in
 			let oid = pr.objectID
@@ -616,7 +635,7 @@ class API: NSOperationQueue {
 
 		let total = prs.count
 		if total==0 {
-			CALLBACK(andCallback)
+			andCallback?()
 			return
 		}
 
@@ -650,20 +669,20 @@ class API: NSOperationQueue {
 							self.refreshesSinceLastLabelsCheck[p.objectID] = 1
 						}
 						if completionCount == total {
-							self.CALLBACK(andCallback)
+							andCallback?()
 						}
 				})
 			} else {
 				// no issues link, so presumably no labels
 				completionCount++
 				if completionCount == total {
-					CALLBACK(andCallback)
+					andCallback?()
 				}
 			}
 		}
 	}
 
-	private func fetchStatusesForCurrentPullRequestsToMoc(moc: NSManagedObjectContext, andCallback: completionBlockType) {
+	private func fetchStatusesForCurrentPullRequestsToMoc(moc: NSManagedObjectContext, andCallback: (()->Void)?) {
 
 		let prs = (DataItem.allItemsOfType("PullRequest", inMoc: moc) as [PullRequest]).filter { (pr) in
 			let oid = pr.objectID
@@ -680,7 +699,7 @@ class API: NSOperationQueue {
 
 		let total = prs.count;
 		if total==0 {
-			CALLBACK(andCallback)
+			andCallback?()
 			return
 		}
 
@@ -715,13 +734,13 @@ class API: NSOperationQueue {
 						self.refreshesSinceLastStatusCheck[p.objectID] = 1
 					}
 					if(completionCount==total) {
-						self.CALLBACK(andCallback)
+						andCallback?()
 					}
 			})
 		}
 	}
 
-	private func checkPrClosuresInMoc(moc: NSManagedObjectContext, andCallback: completionBlockType) {
+	private func checkPrClosuresInMoc(moc: NSManagedObjectContext, andCallback: (()->Void)?) {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		f.predicate = NSPredicate(format: "postSyncAction == %d and condition == %d", PostSyncAction.Delete.rawValue, PullRequestCondition.Open.rawValue)
 		f.returnsObjectsAsFaults = false
@@ -734,7 +753,7 @@ class API: NSOperationQueue {
 
 		let totalOperations = prsToCheck.count
 		if totalOperations==0 {
-			CALLBACK(andCallback)
+			andCallback?()
 			return
 		}
 
@@ -742,7 +761,7 @@ class API: NSOperationQueue {
 		let completionCallback = { () -> Void in
 			completionCount++
 			if completionCount == totalOperations {
-				self.CALLBACK(andCallback)
+				andCallback?()
 			}
 		}
 
@@ -751,11 +770,11 @@ class API: NSOperationQueue {
 		}
 	}
 
-	private func detectAssignedPullRequestsInMoc(moc: NSManagedObjectContext, andCallback: completionBlockType) {
+	private func detectAssignedPullRequestsInMoc(moc: NSManagedObjectContext, andCallback: (()->Void)?) {
 
 		let prs = DataItem.newOrUpdatedItemsOfType("PullRequest", inMoc:moc) as [PullRequest]
 		if prs.count==0 {
-			CALLBACK(andCallback)
+			andCallback?()
 			return
 		}
 
@@ -765,7 +784,7 @@ class API: NSOperationQueue {
 		let completionCallback = { () -> Void in
 			completionCount++
 			if completionCount == totalOperations {
-				self.CALLBACK(andCallback)
+				andCallback?()
 			}
 		}
 
@@ -796,7 +815,7 @@ class API: NSOperationQueue {
 		}
 	}
 
-	private func ensureApiServersHaveUserIdsInMoc(moc: NSManagedObjectContext, andCallback: completionBlockType) {
+	private func ensureApiServersHaveUserIdsInMoc(moc: NSManagedObjectContext, andCallback: (()->Void)?) {
 		var needToCheck = false
 		for apiServer in ApiServer.allApiServersInMoc(moc) {
 			if (apiServer.userId?.integerValue ?? 0) == 0 {
@@ -809,11 +828,11 @@ class API: NSOperationQueue {
 			DLog("Some API servers don't have user details yet, will bring user credentials down for them")
 			syncUserDetailsInMoc(moc, andCallback: andCallback)
 		} else {
-			CALLBACK(andCallback)
+			andCallback?()
 		}
 	}
 
-	private func investigatePrClosureForPr(r: PullRequest, andCallback: completionBlockType) {
+	private func investigatePrClosureForPr(r: PullRequest, andCallback: (()->Void)?) {
 		DLog("Checking closed PR to see if it was merged: %@", r.title)
 
 		let repoFullName = r.repo.fullName ?? "NoRepoFullName"
@@ -865,12 +884,12 @@ class API: NSOperationQueue {
 						break
 					}
 				}
-				self.CALLBACK(andCallback)
+				andCallback?()
 
 			}, failure: { (response, data, error) in
 				r.postSyncAction = PostSyncAction.DoNothing.rawValue // don't delete this, we couldn't check, play it safe
 				r.apiServer.lastSyncSucceeded = false
-				self.CALLBACK(andCallback)
+				andCallback?()
 		})
 	}
 
@@ -915,11 +934,6 @@ class API: NSOperationQueue {
 		}
 	}
 
-	typealias completionBlockType = (()->Void)?
-	private func CALLBACK(c: completionBlockType) {
-		if let cExists = c { cExists() }
-	}
-
 	private func shouldScanForStatusesInMoc(moc: NSManagedObjectContext) -> Bool {
 		if Settings.showStatusItems {
 			return true
@@ -944,7 +958,7 @@ class API: NSOperationQueue {
 		}
 	}
 
-	func syncWatchedReposFromServer(apiServer: ApiServer, andCallback:completionBlockType) {
+	func syncWatchedReposFromServer(apiServer: ApiServer, andCallback: (()->Void)?) {
 
 		getPagedDataInPath("/user/subscriptions", fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
 			perPageCallback: { (data, lastPage) -> Bool in
@@ -976,15 +990,15 @@ class API: NSOperationQueue {
 					DLog("Error while fetching data from %@", apiServer.label)
 					apiServer.lastSyncSucceeded = false
 				}
-				self.CALLBACK(andCallback)
+				andCallback?()
 		})
 	}
 
-	func syncUserDetailsInMoc(moc: NSManagedObjectContext, andCallback:completionBlockType) {
+	func syncUserDetailsInMoc(moc: NSManagedObjectContext, andCallback: (()->Void)?) {
 
 		let allApiServers = ApiServer.allApiServersInMoc(moc)
 		if allApiServers.count==0 {
-			CALLBACK(andCallback)
+			andCallback?()
 			return
 		}
 		var completionCount = 0
@@ -1001,11 +1015,11 @@ class API: NSOperationQueue {
 						apiServer.lastSyncSucceeded = false
 					}
 					completionCount++
-					if completionCount==allApiServers.count { self.CALLBACK(andCallback) }
+					if completionCount==allApiServers.count { andCallback?() }
 				})
 			} else {
 				completionCount++
-				if(completionCount==allApiServers.count) { CALLBACK(andCallback) }
+				if(completionCount==allApiServers.count) { andCallback?() }
 			}
 		}
 	}
@@ -1215,10 +1229,9 @@ class API: NSOperationQueue {
 							existingBackOff!.nextAttemptAt = NSDate(timeInterval: existingBackOff!.duration, sinceDate:NSDate())
 						} else {
 							DLog("(%@) placing URL %@ on the throttled list", apiServerLabel, fullUrlPath)
-							let newDuration = BACKOFF_STEP
 							self.badLinks[fullUrlPath] = UrlBackOffEntry(
-								nextAttemptAt: NSDate(timeInterval: newDuration, sinceDate: NSDate()),
-								duration: newDuration)
+								nextAttemptAt: NSDate(timeInterval: BACKOFF_STEP, sinceDate: NSDate()),
+								duration: BACKOFF_STEP)
 						}
 					}
 				}
