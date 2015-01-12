@@ -4,7 +4,7 @@ struct UrlBackOffEntry {
 	var duration: NSTimeInterval
 }
 
-class API: NSOperationQueue {
+class API {
 
 	var reachability = Reachability.reachabilityForInternetConnection()
 	var refreshesSinceLastStatusCheck = [NSManagedObjectID:Int]()
@@ -13,6 +13,7 @@ class API: NSOperationQueue {
 	private let mediumFormatter: NSDateFormatter
 	private let syncDateFormatter: NSDateFormatter
 	private let cacheDirectory: String
+	private let urlSession: NSURLSession
 	private var badLinks = [String:UrlBackOffEntry]()
 	private var currentNetworkStatus: NetworkStatus
 	#if os(iOS)
@@ -20,7 +21,7 @@ class API: NSOperationQueue {
 	private let GLOBAL_SCREEN_SCALE = UIScreen.mainScreen().scale
 	#endif
 
-	override init() {
+	init() {
 
 		#if os(iOS)
 			let cache = NSURLCache(memoryCapacity: 1024*1024*2, diskCapacity: 1024*1024*32, diskPath: nil)
@@ -46,15 +47,18 @@ class API: NSOperationQueue {
 
 		currentNetworkStatus = reachability.currentReachabilityStatus()
 
-		super.init()
+		let config = NSURLSessionConfiguration.defaultSessionConfiguration()
+		config.HTTPMaximumConnectionsPerHost = 4
+		config.HTTPShouldUsePipelining = true
+		config.timeoutIntervalForResource = NETWORK_TIMEOUT
+		config.timeoutIntervalForRequest = NETWORK_TIMEOUT
+		urlSession = NSURLSession(configuration: config)
 
 		if fileManager.fileExistsAtPath(cacheDirectory) {
 			clearImageCache()
 		} else {
 			fileManager.createDirectoryAtPath(cacheDirectory, withIntermediateDirectories: true, attributes: nil, error: nil)
 		}
-
-		maxConcurrentOperationCount = 4
 
 		NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("networkStateChanged"), name: kReachabilityChangedNotification, object: nil)
 	}
@@ -139,21 +143,21 @@ class API: NSOperationQueue {
 	// warning: now calls back on thread!!
 	func getImage(url: NSURL,
 		success:((response: NSHTTPURLResponse?, data: NSData?)->Void)?,
-		failure:((response: NSHTTPURLResponse?, error: NSError?)->Void)?) -> NSBlockOperation {
+		failure:((response: NSHTTPURLResponse?, error: NSError?)->Void)?) {
 
+			#if os(iOS)
 			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
 				self.networkIndicationStart()
 			}
+			#endif
 
-			let o = NSBlockOperation {
+			let r = NSMutableURLRequest(URL: url, cachePolicy: NSURLRequestCachePolicy.UseProtocolCachePolicy, timeoutInterval: NETWORK_TIMEOUT)
+			r.setValue(userAgent(), forHTTPHeaderField: "User-Agent")
 
-				let r = NSMutableURLRequest(URL: url, cachePolicy: NSURLRequestCachePolicy.UseProtocolCachePolicy, timeoutInterval: NETWORK_TIMEOUT)
-				r.setValue(self.userAgent(), forHTTPHeaderField: "User-Agent")
+			let task = urlSession.dataTaskWithRequest(r) { (data, res, e) in
 
-				var error: NSError?
-				var res: NSURLResponse?
-				let data = NSURLConnection.sendSynchronousRequest(r, returningResponse: &res, error: &error)
 				let response = res as? NSHTTPURLResponse
+				var error = e
 				if error == nil && response?.statusCode>299 {
 					error = NSError(domain: "Error response received", code: response!.statusCode, userInfo: nil)
 				}
@@ -165,16 +169,17 @@ class API: NSOperationQueue {
 				} else {
 					//DLog("IMAGE %@ - RESULT: %d", url.absoluteString, response.statusCode)
 					if data != nil && data!.length > 0 {
-						if let c = success { c(response: response, data: data!) }
+						success?(response: response, data: data!)
 					} else {
-						if let c = failure { c(response: response, error: error) }
+						failure?(response: response, error: error)
 					}
 				}
-				self.networkIndicationEnd()
+				#if os(iOS)
+					self.networkIndicationEnd()
+				#endif
 			}
-			o.queuePriority = NSOperationQueuePriority.VeryLow
-			addOperation(o)
-			return o
+			task.priority = NSURLSessionTaskPriorityHigh
+			task.resume()
 	}
 
 	func haveCachedAvatar(path: String, tryLoadAndCallback: ((IMAGE_CLASS?)->Void)?) -> Bool
@@ -1176,70 +1181,61 @@ class API: NSOperationQueue {
 				return
 			}
 
-			networkIndicationStart()
+			#if os(iOS)
+				networkIndicationStart()
+			#endif
+
 			let authToken = fromServer.authToken
-			let apiPath = fromServer.apiPath ?? ""
+			var expandedPath = startsWith(path, "/") ? (fromServer.apiPath ?? "").stringByAppendingPathComponent(path) : path
 
-			let o = NSBlockOperation {
-
-				var expandedPath = startsWith(path, "/") ? apiPath.stringByAppendingPathComponent(path) : path
-
-				if let params = parameters {
-					var pairs = [String]()
-					for (key, value) in params {
-						pairs.append(key + "=" + value)
-					}
-					expandedPath = expandedPath + "?" + "&".join(pairs)
+			if let params = parameters {
+				var pairs = [String]()
+				for (key, value) in params {
+					pairs.append(key + "=" + value)
 				}
+				expandedPath = expandedPath + "?" + "&".join(pairs)
+			}
 
-				let r = NSMutableURLRequest(URL: NSURL(string: expandedPath)!, cachePolicy: NSURLRequestCachePolicy.UseProtocolCachePolicy, timeoutInterval: NETWORK_TIMEOUT)
-				r.setValue(self.userAgent(), forHTTPHeaderField: "User-Agent")
-				r.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-				if authToken != nil { r.setValue("token " + authToken!, forHTTPHeaderField: "Authorization") }
+			let r = NSMutableURLRequest(URL: NSURL(string: expandedPath)!, cachePolicy: NSURLRequestCachePolicy.UseProtocolCachePolicy, timeoutInterval: NETWORK_TIMEOUT)
+			r.setValue(userAgent(), forHTTPHeaderField: "User-Agent")
+			r.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+			if authToken != nil { r.setValue("token " + authToken!, forHTTPHeaderField: "Authorization") }
 
-				if let headers = extraHeaders {
-					for (key,value) in headers {
-						DLog("(%@) custom header: %@=%@", apiServerLabel, key, value)
-						r.setValue(value, forHTTPHeaderField:key)
-					}
+			if let headers = extraHeaders {
+				for (key,value) in headers {
+					DLog("(%@) custom header: %@=%@", apiServerLabel, key, value)
+					r.setValue(value, forHTTPHeaderField:key)
 				}
+			}
 
-				////////////////////////// preempt with error backoff algorithm
-				let fullUrlPath = r.URL!.absoluteString!
-				var existingBackOff = self.badLinks[fullUrlPath]
-				if existingBackOff != nil {
-					if NSDate().compare(existingBackOff!.nextAttemptAt) == NSComparisonResult.OrderedAscending {
-						// report failure and return
-						DLog("(%@) preempted fetch to previously broken link %@, won't actually access this URL until %@", apiServerLabel, fullUrlPath, existingBackOff!.nextAttemptAt)
-						if let fail = failure {
-							let error = NSError(domain: "Preempted fetch because of throttling", code: 400, userInfo: nil)
-							dispatch_async(dispatch_get_main_queue(), {
-								fail(response: nil, data: nil, error: error)
-							});
-						}
-						self.networkIndicationEnd()
-						return
+			////////////////////////// preempt with error backoff algorithm
+			let fullUrlPath = r.URL!.absoluteString!
+			var existingBackOff = self.badLinks[fullUrlPath]
+			if existingBackOff != nil {
+				if NSDate().compare(existingBackOff!.nextAttemptAt) == NSComparisonResult.OrderedAscending {
+					// report failure and return
+					DLog("(%@) preempted fetch to previously broken link %@, won't actually access this URL until %@", apiServerLabel, fullUrlPath, existingBackOff!.nextAttemptAt)
+					if let fail = failure {
+						let error = NSError(domain: "Preempted fetch because of throttling", code: 400, userInfo: nil)
+						dispatch_async(dispatch_get_main_queue(), {
+							fail(response: nil, data: nil, error: error)
+						});
 					}
+					#if os(iOS)
+						networkIndicationEnd()
+					#endif
+					return
 				}
+			}
 
-				#if DEBUG
-					let startTime = NSDate()
-				#endif
+			urlSession.dataTaskWithRequest(r) { (data, res, e) in
 
-				var error: NSError?
-				var res: NSURLResponse?
-				let data = NSURLConnection.sendSynchronousRequest(r, returningResponse: &res, error: &error)
 				let response = res as? NSHTTPURLResponse
-
-				#if DEBUG
-					let networkTime = NSDate().timeIntervalSinceDate(startTime)
-				#endif
-
 				var parsedData: AnyObject?
 				if data?.length > 0 {
 					parsedData = NSJSONSerialization.JSONObjectWithData(data!, options: NSJSONReadingOptions.allZeros, error:nil)
 				}
-
+				var error = e
 				if error == nil && response?.statusCode > 299 {
 					error = NSError(domain: "Error response received", code:response!.statusCode, userInfo:nil)
 					if(response?.statusCode >= 400) {
@@ -1266,11 +1262,7 @@ class API: NSOperationQueue {
 						})
 					}
 				} else {
-					#if DEBUG
-						DLog("(%@) GET %@ - RESULT: %d, %f sec.", apiServerLabel, fullUrlPath, response?.statusCode, networkTime)
-						#else
-						DLog("(%@) GET %@ - RESULT: %d", apiServerLabel, fullUrlPath, response?.statusCode)
-					#endif
+					DLog("(%@) GET %@ - RESULT: %d", apiServerLabel, fullUrlPath, response?.statusCode)
 					self.badLinks.removeValueForKey(fullUrlPath)
 					if let succeeded = success {
 						dispatch_async(dispatch_get_main_queue(), {
@@ -1279,10 +1271,10 @@ class API: NSOperationQueue {
 					}
 				}
 
-				self.networkIndicationEnd()
-			}
-			o.queuePriority = NSOperationQueuePriority.High
-			addOperation(o)
+				#if os(iOS)
+					self.networkIndicationEnd()
+				#endif
+			}.resume()
 	}
 
 	private func userAgent() -> String {
@@ -1292,32 +1284,30 @@ class API: NSOperationQueue {
 				#else
 				return "HouseTrip-Trailer-v\(currentAppVersion)-OSX-Development"
 			#endif
-			#else
+		#else
 			#if os(iOS)
-			return "HouseTrip-Trailer-v\(currentAppVersion)-iOS-Release"
+				return "HouseTrip-Trailer-v\(currentAppVersion)-iOS-Release"
 			#else
-			return "HouseTrip-Trailer-v\(currentAppVersion)-OSX-Release"
+				return "HouseTrip-Trailer-v\(currentAppVersion)-OSX-Release"
 			#endif
 		#endif
 	}
 
+	#if os(iOS)
 	func networkIndicationStart() {
-		#if os(iOS)
-			dispatch_async(dispatch_get_main_queue(), {
+		dispatch_async(dispatch_get_main_queue(), {
 			if ++self.networkIndicationCount==1 {
-			UIApplication.sharedApplication().networkActivityIndicatorVisible = true
+				UIApplication.sharedApplication().networkActivityIndicatorVisible = true
 			}
-			})
-		#endif
+		})
 	}
 	
 	func networkIndicationEnd() {
-		#if os(iOS)
-			dispatch_async(dispatch_get_main_queue(), {
+		dispatch_async(dispatch_get_main_queue(), {
 			if --self.networkIndicationCount==0 {
-			UIApplication.sharedApplication().networkActivityIndicatorVisible = false
+				UIApplication.sharedApplication().networkActivityIndicatorVisible = false
 			}
-			})
-		#endif
+		})
 	}
+	#endif
 }
