@@ -4,6 +4,20 @@ struct UrlBackOffEntry {
 	var duration: NSTimeInterval
 }
 
+#if DEBUG
+	#if os(iOS)
+		let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-iOS-Development"
+	#else
+		let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-OSX-Development"
+	#endif
+#else
+	#if os(iOS)
+		let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-iOS-Release"
+	#else
+		let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-OSX-Release"
+	#endif
+#endif
+
 class API {
 
 	var reachability = Reachability.reachabilityForInternetConnection()
@@ -52,6 +66,7 @@ class API {
 		config.HTTPShouldUsePipelining = true
 		config.timeoutIntervalForResource = NETWORK_TIMEOUT
 		config.timeoutIntervalForRequest = NETWORK_TIMEOUT
+		config.HTTPAdditionalHeaders = ["User-Agent" : userAgent]
 		urlSession = NSURLSession(configuration: config)
 
 		if fileManager.fileExistsAtPath(cacheDirectory) {
@@ -146,15 +161,12 @@ class API {
 		failure:((response: NSHTTPURLResponse?, error: NSError?)->Void)?) {
 
 			#if os(iOS)
-			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
-				self.networkIndicationStart()
-			}
+				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
+					self.networkIndicationStart()
+				}
 			#endif
 
-			let r = NSMutableURLRequest(URL: url, cachePolicy: NSURLRequestCachePolicy.UseProtocolCachePolicy, timeoutInterval: NETWORK_TIMEOUT)
-			r.setValue(userAgent(), forHTTPHeaderField: "User-Agent")
-
-			let task = urlSession.dataTaskWithRequest(r) { (data, res, e) in
+			let task = urlSession.dataTaskWithURL(url) { (data, res, e)  in
 
 				let response = res as? NSHTTPURLResponse
 				var error = e
@@ -178,6 +190,7 @@ class API {
 					self.networkIndicationEnd()
 				#endif
 			}
+
 			task.priority = NSURLSessionTaskPriorityHigh
 			task.resume()
 	}
@@ -1197,7 +1210,6 @@ class API {
 			}
 
 			let r = NSMutableURLRequest(URL: NSURL(string: expandedPath)!, cachePolicy: NSURLRequestCachePolicy.UseProtocolCachePolicy, timeoutInterval: NETWORK_TIMEOUT)
-			r.setValue(userAgent(), forHTTPHeaderField: "User-Agent")
 			r.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
 			if authToken != nil { r.setValue("token " + authToken!, forHTTPHeaderField: "Authorization") }
 
@@ -1275,22 +1287,6 @@ class API {
 					self.networkIndicationEnd()
 				#endif
 			}.resume()
-	}
-
-	private func userAgent() -> String {
-		#if DEBUG
-			#if os(iOS)
-				return "HouseTrip-Trailer-v\(currentAppVersion)-iOS-Development"
-				#else
-				return "HouseTrip-Trailer-v\(currentAppVersion)-OSX-Development"
-			#endif
-		#else
-			#if os(iOS)
-				return "HouseTrip-Trailer-v\(currentAppVersion)-iOS-Release"
-			#else
-				return "HouseTrip-Trailer-v\(currentAppVersion)-OSX-Release"
-			#endif
-		#endif
 	}
 
 	#if os(iOS)
