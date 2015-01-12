@@ -849,48 +849,61 @@ class API: NSOperationQueue {
 					let mergedByMyself = mergeUserId.isEqualToNumber(r.apiServer.userId ?? NSNumber(int: -1))
 
 					if !(mergedByMyself && Settings.dontKeepPrsMergedByMe) {
-						DLog("detected merged PR: %@", r.title)
-						switch Settings.mergeHandlingPolicy {
-
-						case PRHandlingPolicy.KeepMine.rawValue:
-							if (r.sectionIndex?.integerValue ?? 0)==PullRequestSection.All.rawValue { break }
-							fallthrough
-
-						case PRHandlingPolicy.KeepAll.rawValue:
-							r.postSyncAction = PostSyncAction.DoNothing.rawValue // don't delete this
-							r.condition = PullRequestCondition.Merged.rawValue
-							app.postNotificationOfType(PRNotificationType.PrMerged, forItem: r)
-
-						default:
-							break
-						}
+						self.prWasMerged(r)
 					} else {
 						DLog("will not announce merged PR: %@", r.title)
 					}
 				} else {
-					DLog("detected closed PR: %@", r.title)
-					switch(Settings.closeHandlingPolicy) {
-
-					case PRHandlingPolicy.KeepMine.rawValue:
-						if (r.sectionIndex?.integerValue ?? 0) == PullRequestSection.All.rawValue { break }
-						fallthrough
-
-					case PRHandlingPolicy.KeepAll.rawValue:
-						r.postSyncAction = PostSyncAction.DoNothing.rawValue // don't delete this
-						r.condition = PullRequestCondition.Closed.rawValue
-						app.postNotificationOfType(PRNotificationType.PrClosed, forItem:r)
-
-					default:
-						break
-					}
+					self.prWasClosed(r)
 				}
 				andCallback?()
 
 			}, failure: { (response, data, error) in
-				r.postSyncAction = PostSyncAction.DoNothing.rawValue // don't delete this, we couldn't check, play it safe
-				r.apiServer.lastSyncSucceeded = false
+				let resultCode = response?.statusCode ?? 0
+				if resultCode == 404 || resultCode==410 { // PR gone for good
+					self.prWasClosed(r)
+				} else { // fetch problem
+					r.postSyncAction = PostSyncAction.DoNothing.rawValue // don't delete this, we couldn't check, play it safe
+					r.apiServer.lastSyncSucceeded = false
+				}
 				andCallback?()
 		})
+	}
+
+	private func prWasMerged(r: PullRequest) {
+		DLog("detected merged PR: %@", r.title)
+		switch Settings.mergeHandlingPolicy {
+
+		case PRHandlingPolicy.KeepMine.rawValue:
+			if (r.sectionIndex?.integerValue ?? 0)==PullRequestSection.All.rawValue { break }
+			fallthrough
+
+		case PRHandlingPolicy.KeepAll.rawValue:
+			r.postSyncAction = PostSyncAction.DoNothing.rawValue // don't delete this
+			r.condition = PullRequestCondition.Merged.rawValue
+			app.postNotificationOfType(PRNotificationType.PrMerged, forItem: r)
+
+		default:
+			break
+		}
+	}
+
+	private func prWasClosed(r: PullRequest) {
+		DLog("detected closed PR: %@", r.title)
+		switch(Settings.closeHandlingPolicy) {
+
+		case PRHandlingPolicy.KeepMine.rawValue:
+			if (r.sectionIndex?.integerValue ?? 0) == PullRequestSection.All.rawValue { break }
+			fallthrough
+
+		case PRHandlingPolicy.KeepAll.rawValue:
+			r.postSyncAction = PostSyncAction.DoNothing.rawValue // don't delete this
+			r.condition = PullRequestCondition.Closed.rawValue
+			app.postNotificationOfType(PRNotificationType.PrClosed, forItem:r)
+
+		default:
+			break
+		}
 	}
 
 	func getRateLimitFromServer(apiServer: ApiServer, andCallback: ((Int64, Int64, Int64)->Void)?)

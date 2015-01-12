@@ -39,9 +39,9 @@ class PRCell: UITableViewCell {
 
 	func networkStateChanged() {
 		dispatch_async(dispatch_get_main_queue()) {
-			if failedToLoadImage == nil { return }
+			if self.failedToLoadImage == nil { return }
 			if api.reachability.currentReachabilityStatus() != NetworkStatus.NotReachable {
-				loadImageAtPath(failedToLoadImage)
+				self.loadImageAtPath(self.failedToLoadImage)
 			}
 		}
 	}
