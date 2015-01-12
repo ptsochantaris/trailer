@@ -252,24 +252,15 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
 		if let p = pullRequest {
 			if let ip = fetchedResultsController.indexPathForObject(p) {
+				detailViewController.catchupWithPrWhenLoaded = p.objectID
 				tableView.selectRowAtIndexPath(ip, animated: false, scrollPosition: UITableViewScrollPosition.Middle)
 			}
-			catchUp(p)
 		}
 
 		if let u = urlToOpen {
 			detailViewController.detailItem = NSURL(string: u)
 			if !detailViewController.isVisible {
 				showDetailViewController(detailViewController.navigationController!, sender: self)
-			}
-		}
-	}
-
-	private func catchUp(pullRequest: PullRequest) {
-		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
-			if (pullRequest.unreadComments?.integerValue ?? 0) > 0 {
-				pullRequest.catchUpWithComments()
-				DataManager.saveDB()
 			}
 		}
 	}
@@ -297,8 +288,8 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 		let pullRequest = fetchedResultsController.objectAtIndexPath(indexPath) as PullRequest
 		if let p = pullRequest.urlForOpening() {
 			detailViewController.detailItem = NSURL(string: p)
+			detailViewController.catchupWithPrWhenLoaded = pullRequest.objectID
 			showDetailViewController(detailViewController.navigationController!, sender: self)
-			catchUp(pullRequest)
 		}
 	}
 

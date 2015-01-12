@@ -8,6 +8,7 @@ class DetailViewController: UIViewController, WKNavigationDelegate {
 	private var _webView: WKWebView?
 
 	var isVisible: Bool = false
+	var catchupWithPrWhenLoaded : NSManagedObjectID?
 
 	var detailItem: NSURL? {
 		didSet {
@@ -105,6 +106,16 @@ class DetailViewController: UIViewController, WKNavigationDelegate {
 		title = _webView?.title
 		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Action, target: self, action: Selector("shareSelected"))
 		api.networkIndicationEnd()
+
+		if let oid = catchupWithPrWhenLoaded {
+			if let pr = mainObjectContext.existingObjectWithID(oid, error: nil) as? PullRequest {
+				if (pr.unreadComments?.integerValue ?? 0) > 0 {
+					pr.catchUpWithComments()
+					DataManager.saveDB()
+				}
+			}
+			catchupWithPrWhenLoaded = nil
+		}
 	}
 
 	func webView(webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: NSError) {
