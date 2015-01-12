@@ -244,7 +244,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 			}
 		}
 
-		if urlToOpen != nil && searchField.text.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 0 {
+		if urlToOpen != nil && !(searchField.text ?? "").isEmpty {
 			searchField.text = nil
 			searchField.resignFirstResponder()
 			reloadDataWithAnimation(false)

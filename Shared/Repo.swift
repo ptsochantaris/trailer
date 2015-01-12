@@ -71,7 +71,7 @@ class Repo: DataItem {
 		let f = NSFetchRequest(entityName: "Repo")
 		f.returnsObjectsAsFaults = false
 		if let filterText = filter {
-			if filterText.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 0 {
+			if !filterText.isEmpty {
 				f.predicate = NSPredicate(format: "fullName contains [cd] %@", filterText)
 			}
 		}

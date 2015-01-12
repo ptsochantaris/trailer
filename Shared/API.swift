@@ -673,7 +673,8 @@ class API: NSOperationQueue {
 						}
 				})
 			} else {
-				// no issues link, so presumably no labels
+				// no labels link, so presumably no labels
+				self.refreshesSinceLastLabelsCheck[p.objectID] = 1
 				completionCount++
 				if completionCount == total {
 					andCallback?()
@@ -712,31 +713,39 @@ class API: NSOperationQueue {
 
 			let apiServer = p.apiServer
 
-			getPagedDataInPath(p.statusesLink!, fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
-				perPageCallback: { (data, lastPage) -> Bool in
-					for info in data ?? [] {
-						let s = PRStatus.statusWithInfo(info, fromServer: apiServer)
-						s.pullRequest = p
-					}
-					return false
-				}, finalCallback: { (success, resultCode, etag) in
-					completionCount++
-					var allGood = success
-					if !success {
-						// 404/410 means the status has been deleted
-						if !(resultCode==404 || resultCode==410) {
-							apiServer.lastSyncSucceeded = false
-						} else {
-							allGood = true
+			if let statusLink = p.statusesLink {
+				getPagedDataInPath(statusLink, fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
+					perPageCallback: { (data, lastPage) -> Bool in
+						for info in data ?? [] {
+							let s = PRStatus.statusWithInfo(info, fromServer: apiServer)
+							s.pullRequest = p
 						}
-					}
-					if allGood {
-						self.refreshesSinceLastStatusCheck[p.objectID] = 1
-					}
-					if(completionCount==total) {
-						andCallback?()
-					}
-			})
+						return false
+					}, finalCallback: { (success, resultCode, etag) in
+						completionCount++
+						var allGood = success
+						if !success {
+							// 404/410 means the status has been deleted
+							if !(resultCode==404 || resultCode==410) {
+								apiServer.lastSyncSucceeded = false
+							} else {
+								allGood = true
+							}
+						}
+						if allGood {
+							self.refreshesSinceLastStatusCheck[p.objectID] = 1
+						}
+						if(completionCount==total) {
+							andCallback?()
+						}
+				})
+			} else {
+				self.refreshesSinceLastStatusCheck[p.objectID] = 1
+				completionCount++
+				if completionCount==total {
+					andCallback?()
+				}
+			}
 		}
 	}
 
@@ -1070,7 +1079,7 @@ class API: NSOperationQueue {
 		perPageCallback: ((data: [NSDictionary]?, lastPage: Bool)->Bool)?,
 		finalCallback: ((success: Bool, resultCode: Int, etag: String?)->Void)?) {
 
-			if path.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) == 0 {
+			if path.isEmpty {
 				// handling empty or null fields as success, since we don't want syncs to fail, we simply have nothing to process
 				dispatch_async(dispatch_get_main_queue(), {
 					if let c = finalCallback {

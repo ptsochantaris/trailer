@@ -103,7 +103,7 @@ class PullRequest: DataItem {
 		andPredicates.append(NSPredicate(format: "sectionIndex > 0")!)
 
 		if let fi = filter {
-			if fi.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 0 {
+			if !fi.isEmpty {
 
 				var orPredicates = [NSPredicate]()
 				orPredicates.append(NSPredicate(format: "title contains[cd] %@", fi)!)
@@ -134,7 +134,7 @@ class PullRequest: DataItem {
 		if let fieldName = sortField() {
 			if fieldName == "title" {
 				sortDescriptiors.append(NSSortDescriptor(key: fieldName, ascending: !Settings.sortDescending, selector: Selector("caseInsensitiveCompare:")))
-			} else if fieldName.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 0 {
+			} else if !fieldName.isEmpty {
 				sortDescriptiors.append(NSSortDescriptor(key: fieldName, ascending: !Settings.sortDescending))
 			}
 		}

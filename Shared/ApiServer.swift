@@ -76,7 +76,7 @@ class ApiServer: NSManagedObject {
 
 	class func someServersHaveAuthTokensInMoc(moc: NSManagedObjectContext) -> Bool {
 		for apiServer in allApiServersInMoc(moc) {
-			if apiServer.authToken?.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 0 {
+			if !(apiServer.authToken ?? "").isEmpty {
 				return true
 			}
 		}
@@ -125,6 +125,6 @@ class ApiServer: NSManagedObject {
 	}
 
 	func goodToGo() -> Bool {
-		return authToken?.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 0
+		return !(authToken ?? "").isEmpty
 	}
 }

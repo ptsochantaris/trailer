@@ -146,7 +146,7 @@ class RespositoriesViewController: UITableViewController, UITextFieldDelegate, N
 		}
 
 		let fetchRequest = NSFetchRequest(entityName: "Repo")
-		if searchField!.text.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 0 {
+		if !(searchField!.text.isEmpty) {
 			fetchRequest.predicate = NSPredicate(format: "fullName contains [cd] %@", searchField!.text)
 		}
 		fetchRequest.fetchBatchSize = 20

@@ -81,7 +81,7 @@ class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 	}
 
 	private func processTokenStateFrom(tokenText: String?) {
-		if tokenText == nil || tokenText!.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) == 0 {
+		if (tokenText ?? "").isEmpty {
 			authTokenLabel.textColor =  UIColor.redColor()
 			testButton.enabled = false
 			testButton.alpha = 0.6

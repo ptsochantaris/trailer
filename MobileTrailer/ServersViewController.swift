@@ -40,7 +40,6 @@ class ServersViewController: UITableViewController {
 		return 1
 	}
 
-
 	override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		return allServers.count
 	}
@@ -48,7 +47,7 @@ class ServersViewController: UITableViewController {
 	override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
 		let cell = tableView.dequeueReusableCellWithIdentifier("ServerCell", forIndexPath: indexPath) as UITableViewCell
 		let a = allServers[indexPath.row]
-		if a.authToken==nil || a.authToken!.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) == 0 {
+		if (a.authToken ?? "").isEmpty {
 			cell.textLabel?.textColor = UIColor.redColor()
 			cell.textLabel?.text = (a.label ?? "") + " (needs token!)"
 		} else if !(a.lastSyncSucceeded?.boolValue ?? false) {

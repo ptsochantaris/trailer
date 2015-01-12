@@ -909,7 +909,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	}
 
 	@IBAction func createTokenSelected(sender: NSButton) {
-		if apiServerWebPath.stringValue.lengthOfBytesUsingEncoding(NSUTF8StringEncoding)==0 {
+		if apiServerWebPath.stringValue.isEmpty {
 			reportNeedFrontEnd()
 		} else {
 			let address = apiServerWebPath.stringValue + "/settings/tokens/new"
@@ -918,7 +918,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	}
 
 	@IBAction func viewExistingTokensSelected(sender: NSButton) {
-		if apiServerWebPath.stringValue.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) == 0 {
+		if apiServerWebPath.stringValue.isEmpty {
 			reportNeedFrontEnd()
 		} else {
 			let address = apiServerWebPath.stringValue + "/settings/applications"
@@ -927,7 +927,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	}
 
 	@IBAction func viewWatchlistSelected(sender: NSButton) {
-		if apiServerWebPath.stringValue.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) == 0 {
+		if apiServerWebPath.stringValue.isEmpty {
 			reportNeedFrontEnd()
 		} else {
 			let address = apiServerWebPath.stringValue + "/watching"
@@ -1358,7 +1358,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 			apiServerApiPath.stringValue = apiServer.apiPath ?? ""
 			apiServerAuthToken.stringValue = apiServer.authToken ?? ""
 			apiServerSelectedBox.title = apiServer.label ?? "New Server"
-			apiServerTestButton.enabled = (apiServer.authToken?.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 0)
+			apiServerTestButton.enabled = !(apiServer.authToken ?? "").isEmpty
 			apiServerDeleteButton.enabled = (ApiServer.countApiServersInMoc(mainObjectContext) > 1)
 			apiServerReportError.integerValue = apiServer.reportRefreshFailures.boolValue ? 1 : 0
 		}
@@ -1370,7 +1370,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 			apiServer.apiPath = apiServerApiPath.stringValue
 			apiServer.webPath = apiServerWebPath.stringValue
 			apiServer.authToken = apiServerAuthToken.stringValue
-			apiServerTestButton.enabled = ((apiServer.authToken?.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) ?? 0) > 0)
+			apiServerTestButton.enabled = !(apiServer.authToken ?? "").isEmpty
 			serverList.reloadData()
 		}
 	}

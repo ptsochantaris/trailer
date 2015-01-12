@@ -13,27 +13,19 @@ class DataManager : NSObject {
 	class func performVersionChangedTasks() {
 		let d = NSUserDefaults.standardUserDefaults()
 		if let legacyAuthToken = d.objectForKey("GITHUB_AUTH_TOKEN") as? String {
-			var legacyApiHost = d.objectForKey("API_BACKEND_SERVER") as? String
-			if(legacyApiHost == nil || legacyApiHost?.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) == 0) {
-				legacyApiHost = "api.github.com"
-			}
+			var legacyApiHost = d.objectForKey("API_BACKEND_SERVER") as? String ?? ""
+			if legacyApiHost.isEmpty { legacyApiHost = "api.github.com" }
 
-			var legacyApiPath = d.objectForKey("API_SERVER_PATH") as? String
-			if(legacyApiPath == nil || legacyApiPath?.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) == 0) {
-				legacyApiPath = ""
-			}
+			var legacyApiPath = d.objectForKey("API_SERVER_PATH") as? String ?? ""
 
-			var legacyWebHost = d.objectForKey("API_FRONTEND_SERVER") as? String
-			if(legacyWebHost == nil || legacyWebHost?.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) == 0) {
-				legacyWebHost = "github.com"
-			}
+			var legacyWebHost = d.objectForKey("API_FRONTEND_SERVER") as? String ?? ""
+			if legacyWebHost.isEmpty { legacyWebHost = "github.com" }
 
-			var actualApiPath = legacyApiHost! + "/" + legacyApiPath!
-			actualApiPath = actualApiPath.stringByReplacingOccurrencesOfString("//", withString:"/")
+			var actualApiPath = (legacyApiHost + "/" + legacyApiPath).stringByReplacingOccurrencesOfString("//", withString:"/")
 
 			let newApiServer = ApiServer.addDefaultGithubInMoc(mainObjectContext)
 			newApiServer.apiPath = "https://" + actualApiPath
-			newApiServer.webPath = "https://" + legacyWebHost!
+			newApiServer.webPath = "https://" + legacyWebHost
 			newApiServer.authToken = legacyAuthToken
 			newApiServer.lastSyncSucceeded = true
 
@@ -203,7 +195,7 @@ class DataManager : NSObject {
 			message = "There are no configured API servers in your settings, please ensure you have added at least one server with a valid API token."
 		} else if app.isRefreshing {
 			message = "Refreshing PR information, please wait a moment..."
-		} else if filterValue != nil && filterValue?.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 0 {
+		} else if !(filterValue ?? "").isEmpty {
 			message = "There are no PRs matching this filter."
 		} else if openRequests > 0 {
 			message = "\(openRequests) PRs are hidden by your settings."
@@ -253,10 +245,10 @@ class DataManager : NSObject {
 
 	class func countParentRepos(filter: String?) -> Int {
 		let f = NSFetchRequest(entityName: "Repo")
-		if filter != nil && filter!.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 0 {
-			f.predicate = NSPredicate(format: "fork == NO and fullName contains [cd] %@", filter!)
-		} else {
+		if (filter ?? "").isEmpty {
 			f.predicate = NSPredicate(format: "fork == NO")
+		} else {
+			f.predicate = NSPredicate(format: "fork == NO and fullName contains [cd] %@", filter!)
 		}
 		return mainObjectContext.countForFetchRequest(f, error:nil)
 	}
