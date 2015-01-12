@@ -172,7 +172,7 @@
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="edit" id="vlQ-6x-FuM">
                             <connections>
-                                <action selector="phoneRefreshSelected:" destination="7bK-jq-Zjz" id="Vwd-s6-rP9"/>
+                                <action selector="editSelected:" destination="7bK-jq-Zjz" id="ciS-ir-tQR"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -180,9 +180,6 @@
                         <autoresizingMask key="autoresizingMask"/>
                         <attributedString key="attributedTitle"/>
                     </refreshControl>
-                    <connections>
-                        <outlet property="refreshButton" destination="vlQ-6x-FuM" id="BOB-KG-GBV"/>
-                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Rux-fX-hf1" sceneMemberID="firstResponder"/>
             </objects>

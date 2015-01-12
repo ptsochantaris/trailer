@@ -1,8 +1,6 @@
 
 class MasterViewController: UITableViewController, NSFetchedResultsControllerDelegate, UITextFieldDelegate, UIActionSheetDelegate, UITabBarControllerDelegate {
 
-	@IBOutlet var refreshButton: UIBarButtonItem!
-
 	private var detailViewController: DetailViewController!
 	private var _fetchedResultsController: NSFetchedResultsController?
 
@@ -13,7 +11,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 	// Refreshing
 	private var refreshOnRelease: Bool
 
-	@IBAction func phoneRefreshSelected(sender: UIBarButtonItem ) {
+	@IBAction func editSelected(sender: UIBarButtonItem ) {
 		if traitCollection.userInterfaceIdiom==UIUserInterfaceIdiom.Pad && UIInterfaceOrientationIsPortrait(UIApplication.sharedApplication().statusBarOrientation) {
 			let a = UIAlertController(title: "Action", message: nil, preferredStyle: UIAlertControllerStyle.Alert)
 
@@ -48,11 +46,12 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 		switch buttonIndex {
 		case 0:
 			self.markAllAsRead()
-		case 1:
-			self.removeAllMerged()
 		case 2:
+			self.removeAllMerged()
+		case 3:
 			self.removeAllClosed()
-		default: break
+		default:
+			break
 		}
 	}
 
