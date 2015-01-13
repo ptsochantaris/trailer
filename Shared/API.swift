@@ -75,19 +75,16 @@ class API {
 			fileManager.createDirectoryAtPath(cacheDirectory, withIntermediateDirectories: true, attributes: nil, error: nil)
 		}
 
-		NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("networkStateChanged"), name: kReachabilityChangedNotification, object: nil)
-	}
-
-	func networkStateChanged() {
-		dispatch_async(dispatch_get_main_queue()) {
+		weak var weakSelf = self
+		NSNotificationCenter.defaultCenter().addObserverForName(kReachabilityChangedNotification, object: nil, queue: NSOperationQueue.mainQueue()) { (n) in
 			let newStatus = api.reachability.currentReachabilityStatus()
 			if newStatus != NetworkStatus.NotReachable && newStatus != self.currentNetworkStatus {
 				DLog("Network came up: %d", newStatus.rawValue)
-				self.currentNetworkStatus = newStatus
+				weakSelf?.currentNetworkStatus = newStatus
 				app.startRefreshIfItIsDue()
 			} else {
 				DLog("Network went down: %d", newStatus.rawValue)
-				self.currentNetworkStatus = newStatus
+				weakSelf?.currentNetworkStatus = newStatus
 			}
 		}
 	}
@@ -175,9 +172,7 @@ class API {
 				}
 				if error != nil {
 					//DLog("IMAGE %@ - FAILED: %@", url.absoluteString, error)
-					if let fail = failure {
-						fail(response: response, error: error)
-					}
+					failure?(response: response, error: error)
 				} else {
 					//DLog("IMAGE %@ - RESULT: %d", url.absoluteString, response.statusCode)
 					if data != nil && data!.length > 0 {
@@ -218,7 +213,7 @@ class API {
 				let ret = NSImage(contentsOfFile: cachePath)
 			#endif
 			if let r = ret {
-				if let c = tryLoadAndCallback { c(r) }
+				tryLoadAndCallback?(r)
 				return true
 			} else {
 				fileManager.removeItemAtPath(cachePath, error: nil)
@@ -937,21 +932,17 @@ class API {
 	{
 		get("/rate_limit", fromServer: apiServer, ignoreLastSync: true, parameters: nil, extraHeaders: nil,
 			success: { (response, data) in
-				if let c = andCallback {
-					let allHeaders = response!.allHeaderFields
-					let requestsRemaining = (allHeaders["X-RateLimit-Remaining"] as NSString).longLongValue
-					let requestLimit = (allHeaders["X-RateLimit-Limit"] as NSString).longLongValue
-					let epochSeconds = (allHeaders["X-RateLimit-Reset"] as NSString).longLongValue
-					c(requestsRemaining, requestLimit, epochSeconds)
-				}
+				let allHeaders = response!.allHeaderFields
+				let requestsRemaining = (allHeaders["X-RateLimit-Remaining"] as NSString).longLongValue
+				let requestLimit = (allHeaders["X-RateLimit-Limit"] as NSString).longLongValue
+				let epochSeconds = (allHeaders["X-RateLimit-Reset"] as NSString).longLongValue
+				andCallback?(requestsRemaining, requestLimit, epochSeconds)
 			},
 			failure: { (response, data, error) in
-				if let c = andCallback {
-					if response?.statusCode == 404 && data != nil && !((data as NSDictionary).ofk("message") as String == "Not Found") {
-						c(10000, 10000, 0)
-					} else {
-						c(-1, -1, -1)
-					}
+				if response?.statusCode == 404 && data != nil && !((data as NSDictionary).ofk("message") as String == "Not Found") {
+					andCallback?(10000, 10000, 0)
+				} else {
+					andCallback?(-1, -1, -1)
 				}
 		})
 	}
@@ -1066,14 +1057,15 @@ class API {
 
 	func testApiToServer(apiServer: ApiServer, andCallback:((NSError?)->())?) {
 		get("/rate_limit", fromServer: apiServer, ignoreLastSync: true, parameters: nil, extraHeaders: nil,
-			success: { (_, _) -> Void in
-				if let c = andCallback { c(nil) }
+			success: { (_, _) in
+				andCallback?(nil)
+				return // compiler seems to need this for some reason
 			},
 			failure: { (response, data, error) in
 				if response?.statusCode == 404 && data != nil && !((data as NSDictionary).ofk("message") as String == "Not Found") {
-					if let c = andCallback { c(nil) }
+					andCallback?(nil)
 				} else {
-					if let c = andCallback { c(error) }
+					andCallback?(error)
 				}
 		})
 	}
@@ -1099,11 +1091,10 @@ class API {
 
 			if path.isEmpty {
 				// handling empty or null fields as success, since we don't want syncs to fail, we simply have nothing to process
-				dispatch_async(dispatch_get_main_queue(), {
-					if let c = finalCallback {
-						c(success: true, resultCode: -1, etag: nil)
-					}
-				})
+				dispatch_async(dispatch_get_main_queue()) {
+					finalCallback?(success: true, resultCode: -1, etag: nil)
+					return
+				}
 				return
 			}
 
@@ -1124,17 +1115,13 @@ class API {
 					if let p = perPageCallback {
 						if p(data: d, lastPage: lastPage) { isLastPage = true }
 						if isLastPage {
-							if let c = finalCallback {
-								c(success: true, resultCode: resultCode, etag: etag)
-							}
+							finalCallback?(success: true, resultCode: resultCode, etag: etag)
 						} else {
 							self.getPagedDataInPath(path, fromServer: fromServer, startingFromPage: startingFromPage+1, parameters: parameters, extraHeaders: extraHeaders, perPageCallback: perPageCallback, finalCallback: finalCallback)
 						}
 					}
 				} else {
-					if let c = finalCallback {
-						c(success: resultCode==304, resultCode: resultCode, etag: etag)
-					}
+					finalCallback?(success: resultCode==304, resultCode: resultCode, etag: etag)
 				}
 			}
 	}
@@ -1156,11 +1143,10 @@ class API {
 					fromServer.resetDate = NSDate(timeIntervalSince1970: epochSeconds)
 					NSNotificationCenter.defaultCenter().postNotificationName(API_USAGE_UPDATE, object: fromServer, userInfo: nil)
 
-					if let c = andCallback {
-						let etag = allHeaders["Etag"] as String?
-						let code = response!.statusCode ?? 0
-						c(data: data, lastPage: self.lastPage(response!), resultCode: code, etag: etag)
-					}
+					let etag = allHeaders["Etag"] as String?
+					let code = response!.statusCode ?? 0
+					andCallback?(data: data, lastPage: self.lastPage(response!), resultCode: code, etag: etag)
+
 				}, failure: { (response, data, error) in
 					let code = response?.statusCode ?? 0
 					if code == 304 {
@@ -1168,9 +1154,7 @@ class API {
 					} else {
 						DLog("(%@) failure for %@: %@", fromServer.label, path,error)
 					}
-					if let c = andCallback {
-						c(data: nil, lastPage: false, resultCode: code, etag: nil)
-					}
+					andCallback?(data: nil, lastPage: false, resultCode: code, etag: nil)
 			})
 	}
 
@@ -1187,9 +1171,9 @@ class API {
 			if (fromServer.lastSyncSucceeded?.boolValue ?? false) || ignoreLastSync {
 				apiServerLabel = fromServer.label ?? "(untitled server)"
 			} else {
-				if let fail = failure {
-					let error = NSError(domain: "Server already inaccessible, saving the network call", code: -1, userInfo: nil)
-					fail(response: nil, data: nil, error: error)
+				dispatch_async(dispatch_get_main_queue()) {
+					failure?(response: nil, data: nil, error: NSError(domain: "Server already inaccessible, saving the network call", code: -1, userInfo: nil))
+					return
 				}
 				return
 			}
@@ -1227,11 +1211,9 @@ class API {
 				if NSDate().compare(existingBackOff!.nextAttemptAt) == NSComparisonResult.OrderedAscending {
 					// report failure and return
 					DLog("(%@) preempted fetch to previously broken link %@, won't actually access this URL until %@", apiServerLabel, fullUrlPath, existingBackOff!.nextAttemptAt)
-					if let fail = failure {
-						let error = NSError(domain: "Preempted fetch because of throttling", code: 400, userInfo: nil)
-						dispatch_async(dispatch_get_main_queue(), {
-							fail(response: nil, data: nil, error: error)
-						});
+					dispatch_async(dispatch_get_main_queue()) {
+						let e = NSError(domain: "Preempted fetch because of throttling", code: 400, userInfo: nil)
+						failure?(response: nil, data: nil, error: e)
 					}
 					#if os(iOS)
 						networkIndicationEnd()
@@ -1268,18 +1250,16 @@ class API {
 
 				if error != nil {
 					DLog("(%@) GET %@ - FAILED: %@", apiServerLabel, fullUrlPath, error!.localizedDescription)
-					if let failed = failure {
-						dispatch_async(dispatch_get_main_queue(), {
-							failed(response: response, data: parsedData, error: error)
-						})
+					dispatch_async(dispatch_get_main_queue()) {
+						failure?(response: response, data: parsedData, error: error)
+						return // compiler is acting weird, seems to need this
 					}
 				} else {
 					DLog("(%@) GET %@ - RESULT: %d", apiServerLabel, fullUrlPath, response?.statusCode)
 					self.badLinks.removeValueForKey(fullUrlPath)
-					if let succeeded = success {
-						dispatch_async(dispatch_get_main_queue(), {
-							succeeded(response: response, data: parsedData)
-						})
+					dispatch_async(dispatch_get_main_queue()) {
+						success?(response: response, data: parsedData)
+						return // compiler is acting weird, seems to need this
 					}
 				}
 
