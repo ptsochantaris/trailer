@@ -1,4 +1,6 @@
 
+import CoreData
+
 @objc (Repo)
 class Repo: DataItem {
 
