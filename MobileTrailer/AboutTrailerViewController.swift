@@ -1,4 +1,6 @@
 
+import UIKit
+
 class AboutTrailerViewController: UIViewController {
 	@IBOutlet var versionNumber: UILabel!
 	@IBOutlet var licenseText: UITextView!

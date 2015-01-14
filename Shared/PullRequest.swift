@@ -1,4 +1,8 @@
 
+#if os(iOS)
+	import UIKit
+#endif
+
 let itemDateFormatter = createItemDateFormatter()
 
 func createItemDateFormatter() -> NSDateFormatter {

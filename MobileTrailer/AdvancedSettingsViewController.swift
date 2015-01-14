@@ -1,4 +1,6 @@
 
+import UIKit
+
 class AdvancedSettingsViewController: UITableViewController, PickerViewControllerDelegate {
 
 	required init(coder aDecoder: NSCoder) {

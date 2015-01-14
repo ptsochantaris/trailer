@@ -1,4 +1,6 @@
 
+import CoreData
+
 @objc(ApiServer)
 class ApiServer: NSManagedObject {
 

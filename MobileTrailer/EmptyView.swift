@@ -1,4 +1,6 @@
 
+import UIKit
+
 class EmptyView: UIView {
 
 	init(message: NSAttributedString, parentWidth: CGFloat) {

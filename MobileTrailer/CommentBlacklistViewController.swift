@@ -1,4 +1,6 @@
 
+import UIKit
+
 class CommentBlacklistViewController: UITableViewController {
 
 	override func numberOfSectionsInTableView(tableView: UITableView) -> Int {

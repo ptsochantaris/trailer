@@ -1,6 +1,0 @@
-
-#import <Availability.h>
-
-#ifdef __OBJC__
-
-#endif

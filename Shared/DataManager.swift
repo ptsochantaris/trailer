@@ -1,4 +1,9 @@
 
+import CoreData
+#if os(iOS)
+	import UIKit
+#endif
+
 class DataManager : NSObject {
 
 	class func checkMigration() {

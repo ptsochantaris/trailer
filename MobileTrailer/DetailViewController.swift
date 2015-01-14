@@ -1,4 +1,5 @@
 import WebKit
+import CoreData
 
 class DetailViewController: UIViewController, WKNavigationDelegate {
 

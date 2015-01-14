@@ -1,4 +1,6 @@
 
+import UIKit
+
 var app: iOS_AppDelegate!
 
 let REFRESH_STARTED_NOTIFICATION = "RefreshStartedNotification"

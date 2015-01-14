@@ -1,4 +1,7 @@
 
+import UIKit
+import CoreData
+
 class RespositoriesViewController: UITableViewController, UITextFieldDelegate, NSFetchedResultsControllerDelegate {
 
 	// Filtering

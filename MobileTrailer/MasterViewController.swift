@@ -1,4 +1,7 @@
 
+import UIKit
+import CoreData
+
 class MasterViewController: UITableViewController, NSFetchedResultsControllerDelegate, UITextFieldDelegate, UIActionSheetDelegate, UITabBarControllerDelegate {
 
 	private var detailViewController: DetailViewController!

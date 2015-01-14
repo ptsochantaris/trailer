@@ -1,4 +1,6 @@
 
+import UIKit
+
 protocol PickerViewControllerDelegate: class {
 	func pickerViewController(picker: PickerViewController, didSelectIndexPath: NSIndexPath)
 }

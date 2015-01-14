@@ -1,4 +1,8 @@
 
+#if os(iOS)
+	import UIKit
+#endif
+
 ///////////// Logging, with thanks to Transition.io: http://transition.io/logging-in-swift-without-overhead-in-production/
 
 typealias LazyVarArgClosure = @autoclosure () -> CVarArgType?

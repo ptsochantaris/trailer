@@ -1,4 +1,8 @@
 
+#if os(iOS)
+	import UIKit
+#endif
+
 @objc (PRLabel)
 class PRLabel: DataItem {
 

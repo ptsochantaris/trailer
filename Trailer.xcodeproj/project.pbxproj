@@ -116,7 +116,6 @@
 		1628A6B118789E73005EDA69 /* PocketTrailer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PocketTrailer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1628A6BC18789E73005EDA69 /* PocketTrailer-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "PocketTrailer-Info.plist"; sourceTree = "<group>"; };
 		1628A6BE18789E73005EDA69 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		1628A6C218789E73005EDA69 /* PocketTrailer-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PocketTrailer-Prefix.pch"; sourceTree = "<group>"; };
 		1628A6CA18789E73005EDA69 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		1628A6D518789E73005EDA69 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		162A29D81A4085FD008F41A9 /* API.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = API.swift; path = Shared/API.swift; sourceTree = "<group>"; };
@@ -132,7 +131,6 @@
 		168BC6AA17EC2DF000BC4584 /* Trailer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Trailer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		168BC6B517EC2DF000BC4584 /* Trailer-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Trailer-Info.plist"; sourceTree = "<group>"; };
 		168BC6B717EC2DF000BC4584 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		168BC6BB17EC2DF000BC4584 /* Trailer-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Trailer-Prefix.pch"; sourceTree = "<group>"; };
 		168BC6C317EC2DF000BC4584 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		168BC6C817EC2DF000BC4584 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		168C6ECC18B2104100E41D85 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
@@ -210,7 +208,6 @@
 		162002CE1A2A3E0100FF95F3 /* Core */ = {
 			isa = PBXGroup;
 			children = (
-				168BC6BB17EC2DF000BC4584 /* Trailer-Prefix.pch */,
 				164785B31A2CE80800297764 /* Trailer-Bridging-Header.h */,
 				162002CF1A2A3E2100FF95F3 /* Application.swift */,
 				16A505E31A39B2DD005DD3B7 /* PullRequestDelegate.swift */,
@@ -223,7 +220,6 @@
 		162002D11A2A409900FF95F3 /* Core */ = {
 			isa = PBXGroup;
 			children = (
-				1628A6C218789E73005EDA69 /* PocketTrailer-Prefix.pch */,
 				164785B21A2CE7FB00297764 /* PocketTrailer-Bridging-Header.h */,
 				1606F1BA1A4703E60088368E /* iOS_AppDelegate.swift */,
 			);
@@ -649,7 +645,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COMPRESS_PNG_FILES = NO;
-				GCC_PREFIX_HEADER = "MobileTrailer/PocketTrailer-Prefix.pch";
 				INFOPLIST_FILE = "MobileTrailer/PocketTrailer-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
@@ -666,7 +661,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Distribution: PAVLOS TSOHANTARIS (X727JSJUGJ)";
 				COMPRESS_PNG_FILES = NO;
-				GCC_PREFIX_HEADER = "MobileTrailer/PocketTrailer-Prefix.pch";
 				INFOPLIST_FILE = "MobileTrailer/PocketTrailer-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "8f4c3fa9-1a0d-4555-8a8a-c027cec25618";
@@ -693,7 +687,6 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -730,7 +723,6 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_OPTIMIZATION_LEVEL = fast;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -754,7 +746,6 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Trailer",
 				);
-				GCC_PREFIX_HEADER = "Trailer/Trailer-Prefix.pch";
 				INFOPLIST_FILE = "Trailer/Trailer-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -772,7 +763,6 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Trailer",
 				);
-				GCC_PREFIX_HEADER = "Trailer/Trailer-Prefix.pch";
 				INFOPLIST_FILE = "Trailer/Trailer-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;

@@ -1,4 +1,9 @@
 
+import CoreData
+#if os(iOS)
+import UIKit
+#endif
+
 struct UrlBackOffEntry {
 	var nextAttemptAt: NSDate
 	var duration: NSTimeInterval
@@ -1173,7 +1178,7 @@ class API {
 			} else {
 				dispatch_async(dispatch_get_main_queue()) {
 					failure?(response: nil, data: nil, error: NSError(domain: "Server already inaccessible, saving the network call", code: -1, userInfo: nil))
-					return
+					return // compiler is acting weird, seems to need this
 				}
 				return
 			}

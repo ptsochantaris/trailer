@@ -1,4 +1,7 @@
 
+import UIKit
+import CoreData
+
 class ServersViewController: UITableViewController {
 
 	private var selectedServerId: NSManagedObjectID?

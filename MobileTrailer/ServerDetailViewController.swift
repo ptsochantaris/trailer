@@ -1,4 +1,7 @@
 
+import UIKit
+import CoreData
+
 class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 
 	@IBOutlet var name: UITextField!

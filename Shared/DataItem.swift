@@ -1,4 +1,6 @@
 
+import CoreData
+
 let syncDateFormatter = createSyncFormatter()
 
 func createSyncFormatter() -> NSDateFormatter {
@@ -45,7 +47,7 @@ class DataItem: NSManagedObject {
 		let updatedDate = syncDateFormatter.dateFromString(info.ofk("updated_at") as String)
 		var existingItem = itemOfType(type, serverId: serverId, fromServer: fromServer)
 		if existingItem == nil {
-			DLog("Creating new %@: %@",type,serverId);
+			DLog("Creating %@: %@",type,serverId);
 			existingItem = NSEntityDescription.insertNewObjectForEntityForName(type, inManagedObjectContext: fromServer.managedObjectContext!) as? DataItem
 			existingItem!.serverId = serverId
 			existingItem!.createdAt = syncDateFormatter.dateFromString(info.ofk("created_at") as String)
@@ -53,7 +55,7 @@ class DataItem: NSManagedObject {
 			existingItem!.updatedAt = updatedDate
 			existingItem!.apiServer = fromServer
 		} else if updatedDate != existingItem!.updatedAt {
-			DLog("Updating existing %@: %@",type,serverId)
+			DLog("Updating %@: %@",type,serverId)
 			existingItem!.postSyncAction = PostSyncAction.NoteUpdated.rawValue
 			existingItem!.updatedAt = updatedDate
 		} else {

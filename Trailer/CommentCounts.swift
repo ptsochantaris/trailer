@@ -1,5 +1,4 @@
 
-
 class CommentCounts: NSView {
 
 	init(frame: NSRect, unreadCount: Int, totalCount: Int) {

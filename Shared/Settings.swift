@@ -1,4 +1,8 @@
 
+#if os(iOS)
+import UIKit
+#endif
+
 let _settings_defaults = NSUserDefaults.standardUserDefaults()
 var _settings_valuesCache = Dictionary<String, AnyObject>()
 
