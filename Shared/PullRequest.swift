@@ -4,15 +4,13 @@ import CoreData
 	import UIKit
 #endif
 
-let itemDateFormatter = createItemDateFormatter()
-
-func createItemDateFormatter() -> NSDateFormatter {
+let itemDateFormatter = { () -> NSDateFormatter in
 	let f = NSDateFormatter()
 	f.doesRelativeDateFormatting = true
 	f.dateStyle = NSDateFormatterStyle.MediumStyle
 	f.timeStyle = NSDateFormatterStyle.ShortStyle
 	return f
-}
+}()
 
 @objc (PullRequest)
 class PullRequest: DataItem {

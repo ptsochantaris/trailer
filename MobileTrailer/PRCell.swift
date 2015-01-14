@@ -1,13 +1,11 @@
 
 import UIKit
 
-let itemCountFormatter = _pr_cell_make_item_count_formatter()
-
-func _pr_cell_make_item_count_formatter() -> NSNumberFormatter {
+let itemCountFormatter = { () -> NSNumberFormatter in
 	let f = NSNumberFormatter()
 	f.numberStyle = NSNumberFormatterStyle.DecimalStyle
 	return f
-}
+}()
 
 class PRCell: UITableViewCell {
 

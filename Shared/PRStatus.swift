@@ -6,14 +6,12 @@ let lightStatusRed = MAKECOLOR(0.5, 0.2, 0.2, 1.0)
 let lightStatusYellow = MAKECOLOR(0.6, 0.5, 0.0, 1.0)
 let lightStatusGreen = MAKECOLOR(0.3, 0.5, 0.3, 1.0)
 
-let dateFormatter = createDateFormatter()
-
-func createDateFormatter() -> NSDateFormatter {
+let dateFormatter = { () -> NSDateFormatter in
 	let dateFormatter = NSDateFormatter()
 	dateFormatter.dateStyle = NSDateFormatterStyle.ShortStyle
 	dateFormatter.timeStyle = NSDateFormatterStyle.ShortStyle
 	return dateFormatter
-}
+}()
 
 @objc(PRStatus)
 class PRStatus: DataItem {

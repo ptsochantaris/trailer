@@ -1,15 +1,13 @@
 
 import CoreData
 
-let syncDateFormatter = createSyncFormatter()
-
-func createSyncFormatter() -> NSDateFormatter {
+let syncDateFormatter = { () -> NSDateFormatter in
 	let syncDateFormatter = NSDateFormatter()
 	syncDateFormatter.dateFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'"
 	syncDateFormatter.timeZone = NSTimeZone(abbreviation: "UTC")
 	syncDateFormatter.locale = NSLocale(localeIdentifier: "en_US")
 	return syncDateFormatter
-}
+}()
 
 @objc(DataItem)
 class DataItem: NSManagedObject {
