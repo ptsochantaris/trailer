@@ -228,9 +228,12 @@ class DataManager : NSObject {
 	}
 
 	class func idForUriPath(uriPath: String?) -> NSManagedObjectID? {
-		if uriPath == nil { return nil }
-		let u = NSURL(string: uriPath!)
-		return persistentStoreCoordinator()!.managedObjectIDForURIRepresentation(u!)
+		if let up = uriPath {
+			if let u = NSURL(string: up) {
+				return persistentStoreCoordinator()!.managedObjectIDForURIRepresentation(u)
+			}
+		}
+		return nil
 	}
 
 	class func versionBumpComplete() {

@@ -411,24 +411,28 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		case NSUserNotificationActivationType.ActionButtonClicked: fallthrough
 		case NSUserNotificationActivationType.ContentsClicked:
 			NSUserNotificationCenter.defaultUserNotificationCenter().removeDeliveredNotification(notification)
-			var urlToOpen = notification.userInfo?[NOTIFICATION_URL_KEY] as String?
+			var urlToOpen = notification.userInfo?[NOTIFICATION_URL_KEY] as? String
 			if urlToOpen == nil {
-				var itemId = DataManager.idForUriPath(notification.userInfo?[PULL_REQUEST_ID_KEY] as String?)
 				var pullRequest: PullRequest?
-				if itemId != nil { // it's a pull request
-					pullRequest = mainObjectContext.existingObjectWithID(itemId!, error: nil) as PullRequest?
+				if let itemId = DataManager.idForUriPath(notification.userInfo?[PULL_REQUEST_ID_KEY] as? String) {
+					// it's a pull request
+					pullRequest = mainObjectContext.existingObjectWithID(itemId, error: nil) as? PullRequest
 					urlToOpen = pullRequest?.webUrl
-				} else { // it's a comment
-					itemId = DataManager.idForUriPath(notification.userInfo?[COMMENT_ID_KEY] as String?)
-					if let c = mainObjectContext.existingObjectWithID(itemId!, error: nil) as? PRComment {
-						urlToOpen = c.webUrl
+				} else if let itemId = DataManager.idForUriPath(notification.userInfo?[COMMENT_ID_KEY] as? String) {
+					// it's a comment
+					if let c = mainObjectContext.existingObjectWithID(itemId, error: nil) as? PRComment {
 						pullRequest = c.pullRequest
+						urlToOpen = c.webUrl
 					}
 				}
 				pullRequest?.catchUpWithComments()
 			}
-			NSWorkspace.sharedWorkspace().openURL(NSURL(string: urlToOpen!)!)
-			updateMenu()
+			if let up = urlToOpen {
+				if let u = NSURL(string: up) {
+					NSWorkspace.sharedWorkspace().openURL(u)
+					updateMenu()
+				}
+			}
 		default: break
 		}
 	}
@@ -506,7 +510,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	}
 
 	func statusItemTapped() {
-		let v = statusItem.view! as StatusItemView
+		let v = statusItem.view as StatusItemView
 		if v.highlighted {
 			closeMenu()
 		} else {
@@ -526,7 +530,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	private func sizeMenuAndShow(show: Bool) {
 		let screen = NSScreen.mainScreen()!
 		let rightSide = screen.visibleFrame.origin.x + screen.visibleFrame.size.width
-		let siv = statusItem.view! as StatusItemView
+		let siv = statusItem.view as StatusItemView
 		var menuLeft = siv.window!.frame.origin.x
 		let overflow = (menuLeft+MENU_WIDTH)-rightSide
 		if overflow>0 {

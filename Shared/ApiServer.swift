@@ -119,11 +119,11 @@ class ApiServer: NSManagedObject {
 	}
 
 	func resetToGithub() {
-		webPath = "https://github.com";
-		apiPath = "https://api.github.com";
-		label = "GitHub";
-		latestReceivedEventDateProcessed = NSDate.distantPast() as? NSDate;
-		latestUserEventDateProcessed = NSDate.distantPast() as? NSDate;
+		webPath = "https://github.com"
+		apiPath = "https://api.github.com"
+		label = "GitHub"
+		latestReceivedEventDateProcessed = NSDate.distantPast() as? NSDate
+		latestUserEventDateProcessed = NSDate.distantPast() as? NSDate
 	}
 
 	func goodToGo() -> Bool {

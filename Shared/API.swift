@@ -397,12 +397,11 @@ class API {
 			extraHeaders: extraHeaders,
 			perPageCallback: { (data, lastPage) in
 				for d in data ?? [] {
-					let eventDate = self.syncDateFormatter.dateFromString(d.ofk("created_at") as String!)!
+					let eventDate = self.syncDateFormatter.dateFromString(d.ofk("created_at") as String)!
 					if latestDate.compare(eventDate) == NSComparisonResult.OrderedAscending { // this is where we came in
 						DLog("New event at %@", eventDate)
-						let repoId = d["repo"]?["id"] as NSNumber?
-						if let r = repoId {
-							repoIdsToMarkDirty.addObject(r)
+						if let repoId = d["repo"]?["id"] as? NSNumber {
+							repoIdsToMarkDirty.addObject(repoId)
 						}
 						if latestDate.compare(eventDate) == NSComparisonResult.OrderedAscending {
 							usingUserEventsFromServer.latestUserEventDateProcessed = eventDate
@@ -445,12 +444,11 @@ class API {
 			extraHeaders: extraHeaders,
 			perPageCallback: { (data, lastPage) in
 				for d in data ?? [] {
-					let eventDate = self.syncDateFormatter.dateFromString(d.ofk("created_at") as String!)!
+					let eventDate = self.syncDateFormatter.dateFromString(d.ofk("created_at") as String)!
 					if latestDate.compare(eventDate) == NSComparisonResult.OrderedAscending { // this is where we came in
 						DLog("New event at %@", eventDate)
-						let repoId = d["repo"]?["id"] as NSNumber?
-						if let r = repoId {
-							repoIdsToMarkDirty.addObject(r)
+						if let repoId = d["repo"]?["id"] as? NSNumber {
+							repoIdsToMarkDirty.addObject(repoId)
 						}
 						if latestDate.compare(eventDate) == NSComparisonResult.OrderedAscending {
 							usingReceivedEventsFromServer.latestReceivedEventDateProcessed = eventDate
@@ -867,10 +865,10 @@ class API {
 		get("/repos/\(repoFullName)/pulls/\(repoNumber)", fromServer: r.apiServer, ignoreLastSync: false, parameters: nil, extraHeaders: nil,
 			success: { (response, data) in
 
-				if let mergeInfo = (data as? NSDictionary)?.ofk("merged_by") as NSDictionary? {
+				if let mergeInfo = (data as? NSDictionary)?.ofk("merged_by") as? NSDictionary {
 					DLog("detected merged PR: %@", r.title)
 
-					let mergeUserId = mergeInfo.ofk("id") as NSNumber? ?? NSNumber(int: -2)
+					let mergeUserId = mergeInfo.ofk("id") as? NSNumber ?? NSNumber(int: -2)
 					DLog("merged by user id: %@, our id is: %@", mergeUserId, r.apiServer.userId)
 
 					let mergedByMyself = mergeUserId.isEqualToNumber(r.apiServer.userId ?? NSNumber(int: -1))
@@ -1043,7 +1041,7 @@ class API {
 				getDataInPath("/user", fromServer:apiServer, parameters: nil, extraHeaders:nil, andCallback: {
 					(data, lastPage, resultCode, etag) in
 
-					if let d = data as NSDictionary? {
+					if let d = data as? NSDictionary {
 						apiServer.userName = d.ofk("login") as? String
 						apiServer.userId = d.ofk("id") as? NSNumber
 					} else {
@@ -1148,7 +1146,7 @@ class API {
 					fromServer.resetDate = NSDate(timeIntervalSince1970: epochSeconds)
 					NSNotificationCenter.defaultCenter().postNotificationName(API_USAGE_UPDATE, object: fromServer, userInfo: nil)
 
-					let etag = allHeaders["Etag"] as String?
+					let etag = allHeaders["Etag"] as? String
 					let code = response!.statusCode ?? 0
 					andCallback?(data: data, lastPage: self.lastPage(response!), resultCode: code, etag: etag)
 

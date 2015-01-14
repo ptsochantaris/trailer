@@ -226,11 +226,11 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
 	func localNotification(notification: NSNotification) {
 		//DLog("local notification: %@", notification.userInfo)
-		var urlToOpen = notification.userInfo?[NOTIFICATION_URL_KEY] as String?
+		var urlToOpen = notification.userInfo?[NOTIFICATION_URL_KEY] as? String
 
 		var pullRequest: PullRequest?
 
-		if let commentId = DataManager.idForUriPath(notification.userInfo?[COMMENT_ID_KEY] as String?) {
+		if let commentId = DataManager.idForUriPath(notification.userInfo?[COMMENT_ID_KEY] as? String) {
 			if let c = mainObjectContext.existingObjectWithID(commentId, error:nil) as? PRComment {
 				pullRequest = c.pullRequest
 				if urlToOpen == nil {
@@ -238,7 +238,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 				}
 			}
 		}
-		else if let pullRequestId = DataManager.idForUriPath(notification.userInfo?[PULL_REQUEST_ID_KEY] as String?) {
+		else if let pullRequestId = DataManager.idForUriPath(notification.userInfo?[PULL_REQUEST_ID_KEY] as? String) {
 			pullRequest = mainObjectContext.existingObjectWithID(pullRequestId, error:nil) as? PullRequest
 			if pullRequest == nil {
 				UIAlertView(title: "PR not found", message: "Could not locale the PR related to this notification", delegate: nil, cancelButtonTitle: "OK").show()
