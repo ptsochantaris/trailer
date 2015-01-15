@@ -584,7 +584,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	}
 
 	func sectionHeaderRemoveSelected(headerTitle: NSString) {
-		if headerTitle == kPullRequestSectionNames[PullRequestSection.Merged.rawValue] as String {
+		if headerTitle == PullRequestSection.Merged.name() {
 			if Settings.dontAskBeforeWipingMerged {
 				removeAllMergedRequests()
 			} else {
@@ -604,7 +604,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 					}
 				}
 			}
-		} else if headerTitle == kPullRequestSectionNames[PullRequestSection.Closed.rawValue] as String {
+		} else if headerTitle == PullRequestSection.Closed.name() {
 			if Settings.dontAskBeforeWipingClosed {
 				removeAllClosedRequests()
 			} else {

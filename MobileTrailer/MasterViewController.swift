@@ -304,9 +304,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 	override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
 		if let sectionInfo = fetchedResultsController.sections?[indexPath.section] as? NSFetchedResultsSectionInfo {
 			let sectionName = sectionInfo.name
-			let mergedName = kPullRequestSectionNames[PullRequestSection.Merged.rawValue] as String
-			let closedName = kPullRequestSectionNames[PullRequestSection.Closed.rawValue] as String
-			return sectionName == mergedName || sectionName == closedName
+			return sectionName == PullRequestSection.Merged.name() || sectionName == PullRequestSection.Closed.name()
 		} else {
 			return false
 		}

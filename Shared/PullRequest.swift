@@ -470,7 +470,7 @@ class PullRequest: DataItem {
 	}
 
 	func sectionName() -> String {
-		return kPullRequestSectionNames[sectionIndex!.integerValue] as String
+		return PullRequestSection.allTitles[sectionIndex?.integerValue ?? 0]
 	}
 
 	func postProcess() {
@@ -492,8 +492,7 @@ class PullRequest: DataItem {
 			if refersToMe() {
 				section = PullRequestSection.Participated.rawValue;
 				f.predicate = predicateForOthersCommentsSinceDate(latestDate)
-				let count = managedObjectContext?.countForFetchRequest(f, error: nil)
-				unreadComments = count!
+				unreadComments = managedObjectContext?.countForFetchRequest(f, error: nil)
 			} else {
 				f.predicate = predicateForOthersCommentsSinceDate(nil)
 				var unreadCommentCount: Int = 0
@@ -511,11 +510,10 @@ class PullRequest: DataItem {
 			}
 		} else {
 			f.predicate = predicateForOthersCommentsSinceDate(latestDate)
-			let count = managedObjectContext?.countForFetchRequest(f, error: nil)
-			unreadComments = count!
+			unreadComments = managedObjectContext?.countForFetchRequest(f, error: nil)
 		}
 
-		sectionIndex = Int(section)
+		sectionIndex = section
 		totalComments = comments.count
 
 		if title==nil { title = "(No title)" }

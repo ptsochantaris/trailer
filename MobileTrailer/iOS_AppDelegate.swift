@@ -3,10 +3,6 @@ import UIKit
 
 var app: iOS_AppDelegate!
 
-let REFRESH_STARTED_NOTIFICATION = "RefreshStartedNotification"
-let REFRESH_ENDED_NOTIFICATION = "RefreshEndedNotification"
-let RECEIVED_NOTIFICATION_KEY = "ReceivedNotificationKey"
-
 class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDelegate, UISplitViewControllerDelegate {
 
 	var preferencesDirty: Bool = false
