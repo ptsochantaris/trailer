@@ -277,8 +277,8 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 	}
 
 	override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		let sectionInfo = fetchedResultsController.sections?[section] as NSFetchedResultsSectionInfo
-		return sectionInfo.numberOfObjects
+		let sectionInfo = fetchedResultsController.sections?[section] as? NSFetchedResultsSectionInfo
+		return sectionInfo?.numberOfObjects ?? 0
 	}
 
 	override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
