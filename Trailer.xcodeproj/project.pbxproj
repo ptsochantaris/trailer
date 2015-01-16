@@ -666,6 +666,7 @@
 				PROVISIONING_PROFILE = "8f4c3fa9-1a0d-4555-8a8a-c027cec25618";
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "MobileTrailer/PocketTrailer-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Ounchecked";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;

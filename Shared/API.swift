@@ -161,12 +161,12 @@ class API {
 		failure:((response: NSHTTPURLResponse?, error: NSError?)->Void)?) {
 
 			#if os(iOS)
-				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) { [weak self] in
-					self!.networkIndicationStart()
+				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
+					self.networkIndicationStart()
 				}
 			#endif
 
-			let task = urlSession.dataTaskWithURL(url) { (data, res, e)  in
+			let task = urlSession.dataTaskWithURL(url) { [weak self] (data, res, e)  in
 
 				let response = res as? NSHTTPURLResponse
 				var error = e

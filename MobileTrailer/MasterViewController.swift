@@ -72,31 +72,31 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
 	func removeAllMerged()
 	{
-		dispatch_async(dispatch_get_main_queue(), {
+		dispatch_async(dispatch_get_main_queue(), { [weak self] in
 			if Settings.dontAskBeforeWipingMerged {
-				removeAllMergedConfirmed()
+				self!.removeAllMergedConfirmed()
 			} else {
 				let a = UIAlertController(title: "Sure?", message: "Remove all PRs in the Merged section?", preferredStyle: UIAlertControllerStyle.Alert)
 				a.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil))
 				a.addAction(UIAlertAction(title: "Remove", style: UIAlertActionStyle.Destructive, handler: { [weak self] (action) in
 					self!.removeAllMergedConfirmed()
 				}))
-				presentViewController(a, animated: true, completion: nil)
+				self!.presentViewController(a, animated: true, completion: nil)
 			}
 		})
 	}
 
 	func removeAllClosed() {
-		dispatch_async(dispatch_get_main_queue(), {
+		dispatch_async(dispatch_get_main_queue(), { [weak self] in
 			if Settings.dontAskBeforeWipingClosed {
-				removeAllClosedConfirmed()
+				self!.removeAllClosedConfirmed()
 			} else {
 				let a = UIAlertController(title: "Sure?", message: "Remove all PRs in the Closed section?", preferredStyle: UIAlertControllerStyle.Alert)
 				a.addAction(UIAlertAction(title: "Cancel", style:UIAlertActionStyle.Cancel, handler: nil))
 				a.addAction(UIAlertAction(title: "Remove", style:UIAlertActionStyle.Destructive, handler: { [weak self] (action) in
 					self!.removeAllClosedConfirmed()
 				}))
-				presentViewController(a, animated: true, completion: nil)
+				self!.presentViewController(a, animated: true, completion: nil)
 			}
 		})
 	}
