@@ -185,7 +185,7 @@ class API {
 					}
 				}
 				#if os(iOS)
-					networkIndicationEnd()
+					self!.networkIndicationEnd()
 				#endif
 			}
 
