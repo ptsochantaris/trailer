@@ -38,10 +38,10 @@ class PRCell: UITableViewCell {
 	}
 
 	func networkStateChanged() {
-		dispatch_async(dispatch_get_main_queue()) {
-			if self.failedToLoadImage == nil { return }
+		dispatch_async(dispatch_get_main_queue()) { [weak self] in
+			if self!.failedToLoadImage == nil { return }
 			if api.reachability.currentReachabilityStatus() != NetworkStatus.NotReachable {
-				self.loadImageAtPath(self.failedToLoadImage)
+				self!.loadImageAtPath(self!.failedToLoadImage)
 			}
 		}
 	}
@@ -82,18 +82,18 @@ class PRCell: UITableViewCell {
 	private func loadImageAtPath(imagePath: NSString?) {
 		waitingForImageInPath = imagePath
 		if let path = imagePath {
-			if !api.haveCachedAvatar(path, tryLoadAndCallback: { (image) in
-				if self.waitingForImageInPath == path {
+			if !api.haveCachedAvatar(path, tryLoadAndCallback: { [weak self] (image) in
+				if self!.waitingForImageInPath == path {
 					if image != nil {
 						// image loaded
-						self._image.image = image
-						self.failedToLoadImage = nil
+						self!._image.image = image
+						self!.failedToLoadImage = nil
 					} else {
 						// load failed / no image
-						self._image.image = UIImage(named: "avatarPlaceHolder")
-						self.failedToLoadImage = imagePath
+						self!._image.image = UIImage(named: "avatarPlaceHolder")
+						self!.failedToLoadImage = imagePath
 					}
-					self.waitingForImageInPath = nil
+					self!.waitingForImageInPath = nil
 				}
 			}) {
 				// prepare UI for over-the-network load

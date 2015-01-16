@@ -40,13 +40,13 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 
 		let localNotification = launchOptions?[UIApplicationLaunchOptionsLocalNotificationKey] as? UILocalNotification
 
-		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
+		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) { [weak self] in
 			if Repo.visibleReposInMoc(mainObjectContext).count > 0 && ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
 				if localNotification != nil {
-					self.handleLocalNotification(localNotification!)
+					self!.handleLocalNotification(localNotification!)
 				}
 			} else {
-				self.forcePreferences()
+				self!.forcePreferences()
 			}
 		}
 
@@ -148,8 +148,8 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 
 		isRefreshing = true
 
-		backgroundTask = UIApplication.sharedApplication().beginBackgroundTaskWithName("com.housetrip.Trailer.refresh", expirationHandler: {
-			self.endBGTask()
+		backgroundTask = UIApplication.sharedApplication().beginBackgroundTaskWithName("com.housetrip.Trailer.refresh", expirationHandler: { [weak self] in
+			self!.endBGTask()
 		})
 
 		NSNotificationCenter.defaultCenter().postNotificationName(REFRESH_STARTED_NOTIFICATION, object: nil)
@@ -166,24 +166,24 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 
 		prepareForRefresh()
 
-		api.fetchPullRequestsForActiveReposAndCallback {
+		api.fetchPullRequestsForActiveReposAndCallback { [weak self] in
 
 			let success = !ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext)
 
-			self.lastUpdateFailed = !success
+			self!.lastUpdateFailed = !success
 
 			if success {
-				self.lastSuccessfulRefresh = NSDate()
-				self.preferencesDirty = false
+				self!.lastSuccessfulRefresh = NSDate()
+				self!.preferencesDirty = false
 			}
 
-			self.checkApiUsage()
-			self.isRefreshing = false
+			self!.checkApiUsage()
+			self!.isRefreshing = false
 			NSNotificationCenter.defaultCenter().postNotificationName(REFRESH_ENDED_NOTIFICATION, object: nil)
 			DataManager.saveDB()
 			DataManager.sendNotifications()
 
-			if let bc = self.backgroundCallback {
+			if let bc = self!.backgroundCallback {
 				if success && mainObjectContext.hasChanges {
 					DLog("Background fetch: Got new data")
 					bc(UIBackgroundFetchResult.NewData)
@@ -194,26 +194,26 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 					DLog("Background fetch: FAILED")
 					bc(UIBackgroundFetchResult.Failed);
 				}
-				self.backgroundCallback = nil
+				self!.backgroundCallback = nil
 			}
 
 			if !success && UIApplication.sharedApplication().applicationState==UIApplicationState.Active {
 				UIAlertView(title: "Refresh failed", message: "Loading the latest data from Github failed", delegate: nil, cancelButtonTitle: "OK").show()
 			}
 
-			self.refreshTimer = NSTimer.scheduledTimerWithTimeInterval(NSTimeInterval(Settings.refreshPeriod), target: self, selector: Selector("refreshTimerDone"), userInfo: nil, repeats:false)
+			self!.refreshTimer = NSTimer.scheduledTimerWithTimeInterval(NSTimeInterval(Settings.refreshPeriod), target: self!, selector: Selector("refreshTimerDone"), userInfo: nil, repeats:false)
 			DLog("Refresh done")
 
-			self.endBGTask()
+			self!.endBGTask()
 		}
 
 		return true
 	}
 
 	private func endBGTask() {
-		if self.backgroundTask != UIBackgroundTaskInvalid {
-			UIApplication.sharedApplication().endBackgroundTask(self.backgroundTask)
-			self.backgroundTask = UIBackgroundTaskInvalid
+		if backgroundTask != UIBackgroundTaskInvalid {
+			UIApplication.sharedApplication().endBackgroundTask(backgroundTask)
+			backgroundTask = UIBackgroundTaskInvalid
 		}
 	}
 

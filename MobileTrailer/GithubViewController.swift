@@ -20,11 +20,11 @@ class GithubViewController: UIViewController, WKNavigationDelegate {
 	}
 
 	func webView(webView: WKWebView, didFailNavigation navigation: WKNavigation!, withError error: NSError) {
-		self.loadingFailed()
+		loadingFailed()
 	}
 
 	func webView(webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: NSError) {
-		self.loadingFailed()
+		loadingFailed()
 	}
 
 	private func loadingFailed() {
@@ -36,8 +36,8 @@ class GithubViewController: UIViewController, WKNavigationDelegate {
 
 	func webView(webView: WKWebView, didFinishNavigation navigation: WKNavigation!) {
 		webView.hidden = false
-		self.spinner.stopAnimating()
-		self.title = webView.title
+		spinner.stopAnimating()
+		title = webView.title
 
 	}
 
@@ -47,6 +47,6 @@ class GithubViewController: UIViewController, WKNavigationDelegate {
 
 	func webView(webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
 		webView.hidden = true
-		self.spinner.startAnimating()
+		spinner.startAnimating()
 	}
 }

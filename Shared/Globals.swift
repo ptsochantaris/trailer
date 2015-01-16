@@ -38,6 +38,7 @@ func DLog(messageFormat:@autoclosure () -> String, args:LazyVarArgClosure...) {
 	let REFRESH_STARTED_NOTIFICATION = "RefreshStartedNotification"
 	let REFRESH_ENDED_NOTIFICATION = "RefreshEndedNotification"
 	let RECEIVED_NOTIFICATION_KEY = "ReceivedNotificationKey"
+	let GLOBAL_SCREEN_SCALE = UIScreen.mainScreen().scale
 
 #elseif os(OSX)
 
@@ -86,7 +87,7 @@ enum PullRequestSection: Int {
 	case None, Mine, Participated, Merged, Closed, All
 	static let allTitles = ["", "Mine", "Participated", "Recently Merged", "Recently Closed", "All Pull Requests"]
 	func name() -> String {
-		return PullRequestSection.allTitles[self.rawValue]
+		return PullRequestSection.allTitles[rawValue]
 	}
 }
 

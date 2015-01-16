@@ -1,32 +1,32 @@
 
 class PopTimer : NSObject {
 
-	var popTimer: NSTimer?
-	let timeInterval: NSTimeInterval
-	let callback: ()->()
+	var _popTimer: NSTimer?
+	let _timeInterval: NSTimeInterval
+	let _callback: ()->()
 
 	var isRunning: Bool {
-		return popTimer != nil
+		return _popTimer != nil
 	}
 
 	func push() {
-		popTimer?.invalidate()
-		popTimer = NSTimer.scheduledTimerWithTimeInterval(timeInterval, target:self, selector:Selector("popped"), userInfo:nil, repeats:false)
+		_popTimer?.invalidate()
+		_popTimer = NSTimer.scheduledTimerWithTimeInterval(_timeInterval, target: self, selector: Selector("popped"), userInfo: nil, repeats: false)
 	}
 
 	func popped() {
 		invalidate()
-		callback()
+		_callback()
 	}
 
 	func invalidate() {
-		popTimer?.invalidate()
-		popTimer = nil
+		_popTimer?.invalidate()
+		_popTimer = nil
 	}
 
 	init(timeInterval: NSTimeInterval, callback: ()->Void) {
-		self.timeInterval = timeInterval
-		self.callback = callback
+		_timeInterval = timeInterval
+		_callback = callback
 		super.init()
 	}
 }

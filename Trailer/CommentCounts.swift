@@ -15,7 +15,7 @@ class CommentCounts: NSView {
 			let numberFormatter = NSNumberFormatter()
 			numberFormatter.numberStyle = NSNumberFormatterStyle.DecimalStyle;
 
-			self.canDrawSubviewsIntoLayer = true
+			canDrawSubviewsIntoLayer = true
 
 			let statusView = app.statusItem.view as StatusItemView
 			let darkMode = statusView.darkMode
@@ -27,8 +27,8 @@ class CommentCounts: NSView {
 
 			var width = max(BASE_BADGE_SIZE, countString.size.width+10)
 			var height = BASE_BADGE_SIZE
-			var bottom = (self.bounds.size.height-height)*0.5
-			var left = (self.bounds.size.width-width)*0.5
+			var bottom = (bounds.size.height-height)*0.5
+			var left = (bounds.size.width-width)*0.5
 
 			let countBackground = NSView(frame: NSIntegralRect(NSMakeRect(left, bottom, width, height)))
 			countBackground.wantsLayer = true
@@ -41,7 +41,7 @@ class CommentCounts: NSView {
 			} else {
 				countBackground.layer!.backgroundColor = color
 			}
-			self.addSubview(countBackground)
+			addSubview(countBackground)
 
 			let countView = CenterTextField(frame: countBackground.bounds)
 			countView.attributedStringValue = countString
@@ -64,7 +64,7 @@ class CommentCounts: NSView {
 				alertBackground.wantsLayer = true
 				alertBackground.layer!.backgroundColor = redFill.CGColor
 				alertBackground.layer!.cornerRadius = floor(SMALL_BADGE_SIZE*0.5)
-				self.addSubview(alertBackground, positioned: NSWindowOrderingMode.Below, relativeTo: countBackground)
+				addSubview(alertBackground, positioned: NSWindowOrderingMode.Below, relativeTo: countBackground)
 
 				let alertView = CenterTextField(frame: NSOffsetRect(alertBackground.bounds, 0, 1))
 				alertView.attributedStringValue = alertString

@@ -43,8 +43,8 @@ class PullRequestDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource 
 		}
 	}
 
-	func tableView(tableView: NSTableView, heightOfRow row: Int) -> CGFloat {
-		let prView = self.tableView(tableView, viewForTableColumn: nil, row: row)
+	func tableView(tv: NSTableView, heightOfRow row: Int) -> CGFloat {
+		let prView = tableView(tv, viewForTableColumn: nil, row: row)
 		return prView!.frame.size.height
 	}
 

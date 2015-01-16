@@ -16,7 +16,7 @@ class EmptyView: UIView {
 		text.autoresizingMask = UIViewAutoresizing.FlexibleWidth
 		text.numberOfLines = 0
 		text.attributedText = message
-		self.addSubview(text)
+		addSubview(text)
 	}
 
 	required init(coder aDecoder: NSCoder) {

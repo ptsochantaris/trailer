@@ -33,7 +33,7 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 		case Age, Activity, Name
 		static let allTitles = ["Youngest first", "Most recently active", "Reverse alphabetically"]
 		func name() -> String {
-			return NormalSorting.allTitles[self.rawValue]
+			return NormalSorting.allTitles[rawValue]
 		}
 	}
 
@@ -41,7 +41,7 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 		case Age, Activity, Name
 		static let allTitles = ["Oldest first", "Inactive for longest", "Alphabetically"]
 		func name() -> String {
-			return ReverseSorting.allTitles[self.rawValue]
+			return ReverseSorting.allTitles[rawValue]
 		}
 	}
 
@@ -49,7 +49,7 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 		case Own, All, None
 		static let allTitles = ["Keep My Own", "Keep All", "Don't Keep"]
 		func name() -> String {
-			return HandlingPolicy.allTitles[self.rawValue]
+			return HandlingPolicy.allTitles[rawValue]
 		}
 	}
 

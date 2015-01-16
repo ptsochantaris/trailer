@@ -120,11 +120,11 @@ class DetailViewController: UIViewController, WKNavigationDelegate {
 	}
 
 	func webView(webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: NSError) {
-		self.loadFailed(error)
+		loadFailed(error)
 	}
 
 	func webView(webView: WKWebView, didFailNavigation navigation: WKNavigation!, withError error: NSError) {
-		self.loadFailed(error)
+		loadFailed(error)
 	}
 
 	private func loadFailed(error: NSError) {

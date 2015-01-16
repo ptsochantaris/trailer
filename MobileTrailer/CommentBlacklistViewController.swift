@@ -53,16 +53,16 @@ class CommentBlacklistViewController: UITableViewController {
 				name = name.substringFromIndex(advance(name.startIndex, 1))
 			}
 
-			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
+			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) { [weak self] in
 				if !name.isEmpty && !contains(Settings.commentAuthorBlacklist, name) {
 					var blackList = Settings.commentAuthorBlacklist
 					blackList.append(name)
 					Settings.commentAuthorBlacklist = blackList
 					let ip = NSIndexPath(forRow: blackList.count-1, inSection: 0)
 					if blackList.count == 1 { // first insert
-						self.tableView.insertSections(NSIndexSet(index: 0), withRowAnimation:UITableViewRowAnimation.Automatic)
+						self!.tableView.insertSections(NSIndexSet(index: 0), withRowAnimation:UITableViewRowAnimation.Automatic)
 					} else {
-						self.tableView.insertRowsAtIndexPaths([ip], withRowAnimation:UITableViewRowAnimation.Automatic)
+						self!.tableView.insertRowsAtIndexPaths([ip], withRowAnimation:UITableViewRowAnimation.Automatic)
 					}
 				}
 			}

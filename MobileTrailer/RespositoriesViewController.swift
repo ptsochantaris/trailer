@@ -33,11 +33,11 @@ class RespositoriesViewController: UITableViewController, UITextFieldDelegate, N
 		searchField!.delegate = self
 		searchField!.autoresizingMask = UIViewAutoresizing.FlexibleWidth
 
-		searchTimer = PopTimer(timeInterval: 0.5, callback: {
-			self.reloadData()
+		searchTimer = PopTimer(timeInterval: 0.5, callback: { [weak self] in
+			self!.reloadData()
 		})
 
-		let searchHolder = UIView(frame: CGRectMake(0, 0, self.view.bounds.size.width, 51))
+		let searchHolder = UIView(frame: CGRectMake(0, 0, view.bounds.size.width, 51))
 		searchHolder.addSubview(searchField!)
 		searchHolder.autoresizesSubviews = true
 		searchHolder.autoresizingMask = UIViewAutoresizing.FlexibleWidth
@@ -51,18 +51,18 @@ class RespositoriesViewController: UITableViewController, UITextFieldDelegate, N
 
 	@IBAction func actionSelected(sender: UIBarButtonItem) {
 		let a = UIAlertController(title: nil, message: nil, preferredStyle: UIAlertControllerStyle.ActionSheet)
-		a.addAction(UIAlertAction(title: "Refresh List", style: UIAlertActionStyle.Destructive, handler: { (action) in
-			self.refreshList()
+		a.addAction(UIAlertAction(title: "Refresh List", style: UIAlertActionStyle.Destructive, handler: { [weak self] (action) in
+			self!.refreshList()
 		}))
-		a.addAction(UIAlertAction(title: "Hide All", style: UIAlertActionStyle.Default, handler: { (action) in
-			for r in self.fetchedResultsController.fetchedObjects as [Repo] {
+		a.addAction(UIAlertAction(title: "Hide All", style: UIAlertActionStyle.Default, handler: { [weak self] (action) in
+			for r in self!.fetchedResultsController.fetchedObjects as [Repo] {
 				r.hidden = true
 				r.dirty = false
 			}
 			app.preferencesDirty = true
 		}))
-		a.addAction(UIAlertAction(title: "Show All", style: UIAlertActionStyle.Default, handler: { (action) in
-			for r in self.fetchedResultsController.fetchedObjects as [Repo] {
+		a.addAction(UIAlertAction(title: "Show All", style: UIAlertActionStyle.Default, handler: { [weak self] (action) in
+			for r in self!.fetchedResultsController.fetchedObjects as [Repo] {
 				r.hidden = false
 				r.dirty = true
 				r.lastDirtied = NSDate()
@@ -82,7 +82,7 @@ class RespositoriesViewController: UITableViewController, UITextFieldDelegate, N
 		tableView.alpha = 0.5
 
 		let tempContext = DataManager.tempContext()
-		api.fetchRepositoriesToMoc(tempContext, andCallback: {
+		api.fetchRepositoriesToMoc(tempContext, andCallback: { [weak self] in
 			if ApiServer.shouldReportRefreshFailureInMoc(tempContext) {
 				var errorServers = [String]()
 				for apiServer in ApiServer.allApiServersInMoc(tempContext) {
@@ -96,10 +96,10 @@ class RespositoriesViewController: UITableViewController, UITextFieldDelegate, N
 			} else {
 				tempContext.save(nil)
 			}
-			self.navigationItem.title = originalName
-			self.actionsButton.enabled = ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext)
-			self.tableView.alpha = 1.0
-			self.tableView.userInteractionEnabled = true
+			self!.navigationItem.title = originalName
+			self!.actionsButton.enabled = ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext)
+			self!.tableView.alpha = 1.0
+			self!.tableView.userInteractionEnabled = true
 			app.preferencesDirty = true
 		})
 	}

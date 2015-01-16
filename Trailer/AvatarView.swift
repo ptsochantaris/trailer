@@ -6,9 +6,11 @@ class AvatarView: NSImageView {
 	init(frame frameRect:NSRect, url:NSString) {
 		super.init(frame: frameRect)
 		imageAlignment = NSImageAlignment.AlignCenter
-		if !api.haveCachedAvatar(url, tryLoadAndCallback: { img in
-			self.image = img
-			self.done()
+		if !api.haveCachedAvatar(url, tryLoadAndCallback: { [weak self] img in
+			if let weakSelf = self {
+				weakSelf.image = img
+				weakSelf.done()
+			}
 		}) {
 			startSpinner()
 		}

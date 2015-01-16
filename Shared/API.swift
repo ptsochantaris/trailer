@@ -37,7 +37,6 @@ class API {
 	private var currentNetworkStatus: NetworkStatus
 	#if os(iOS)
 	private var networkIndicationCount: Int = 0
-	private let GLOBAL_SCREEN_SCALE = UIScreen.mainScreen().scale
 	#endif
 
 	init() {
@@ -80,16 +79,15 @@ class API {
 			fileManager.createDirectoryAtPath(cacheDirectory, withIntermediateDirectories: true, attributes: nil, error: nil)
 		}
 
-		weak var weakSelf = self
-		NSNotificationCenter.defaultCenter().addObserverForName(kReachabilityChangedNotification, object: nil, queue: NSOperationQueue.mainQueue()) { (n) in
-			let newStatus = api.reachability.currentReachabilityStatus()
-			if newStatus != NetworkStatus.NotReachable && newStatus != self.currentNetworkStatus {
+		NSNotificationCenter.defaultCenter().addObserverForName(kReachabilityChangedNotification, object: nil, queue: NSOperationQueue.mainQueue()) { [weak self] (n) in
+			let newStatus = self!.reachability.currentReachabilityStatus()
+			if newStatus != NetworkStatus.NotReachable && newStatus != self!.currentNetworkStatus {
 				DLog("Network came up: %d", newStatus.rawValue)
-				weakSelf?.currentNetworkStatus = newStatus
+				self!.currentNetworkStatus = newStatus
 				app.startRefreshIfItIsDue()
 			} else {
 				DLog("Network went down: %d", newStatus.rawValue)
-				weakSelf?.currentNetworkStatus = newStatus
+				self!.currentNetworkStatus = newStatus
 			}
 		}
 	}
@@ -163,8 +161,8 @@ class API {
 		failure:((response: NSHTTPURLResponse?, error: NSError?)->Void)?) {
 
 			#if os(iOS)
-				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
-					self.networkIndicationStart()
+				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) { [weak self] in
+					self!.networkIndicationStart()
 				}
 			#endif
 
@@ -187,7 +185,7 @@ class API {
 					}
 				}
 				#if os(iOS)
-					self.networkIndicationEnd()
+					networkIndicationEnd()
 				#endif
 			}
 
@@ -231,7 +229,7 @@ class API {
 					var image: IMAGE_CLASS?
 					if data != nil {
 						#if os(iOS)
-							image = IMAGE_CLASS(data: data!, scale: self.GLOBAL_SCREEN_SCALE)
+							image = IMAGE_CLASS(data: data!, scale:GLOBAL_SCREEN_SCALE)
 							UIImageJPEGRepresentation(image!, 1.0).writeToFile(cachePath, atomically: true)
 							#else
 							image = IMAGE_CLASS(data: data!)
@@ -257,19 +255,19 @@ class API {
 			|| (Repo.countVisibleReposInMoc(syncContext)==0))
 
 		if shouldRefreshReposToo {
-			self.fetchRepositoriesToMoc(syncContext, andCallback: {
-				self.syncToMoc(syncContext, andCallback: callback)
+			fetchRepositoriesToMoc(syncContext, andCallback: { [weak self] in
+				self!.syncToMoc(syncContext, andCallback: callback)
 			})
 		} else {
 			ApiServer.resetSyncSuccessInMoc(syncContext)
-			ensureApiServersHaveUserIdsInMoc(syncContext, andCallback: {
-				self.syncToMoc(syncContext, andCallback: callback)
+			ensureApiServersHaveUserIdsInMoc(syncContext, andCallback: { [weak self] in
+				self!.syncToMoc(syncContext, andCallback: callback)
 			})
 		}
 	}
 
 	private func syncToMoc(moc: NSManagedObjectContext, andCallback: (()->Void)?) {
-		markDirtyReposInMoc(moc, andCallback: {
+		markDirtyReposInMoc(moc, andCallback: { [weak self] in
 
 			for r in Repo.unsyncableReposInMoc(moc) {
 				for p in r.pullRequests.allObjects as [PullRequest] {
@@ -277,11 +275,13 @@ class API {
 				}
 			}
 
-			self.fetchPullRequestsForRepos(Repo.syncableReposInMoc(moc), toMoc: moc, andCallback: {
-				self.updatePullRequestsInMoc(moc, andCallback: {
-					self.completeSyncInMoc(moc)
+			self!.fetchPullRequestsForRepos(Repo.syncableReposInMoc(moc), toMoc: moc, andCallback: { [weak self] in
+				self!.updatePullRequestsInMoc(moc, andCallback: { [weak self] in
+					self!.completeSyncInMoc(moc)
 					andCallback?()
+					return
 				})
+				return
 			})
 		})
 	}
@@ -357,14 +357,14 @@ class API {
 		var completionCount = 0
 		let repoIdsToMarkDirty = NSMutableSet()
 
-		let completionCallback = { () -> Void in
+		let completionCallback = { [weak self] () -> Void in
 			completionCount++
 			if completionCount==totalOperations {
 				Repo.markDirtyReposWithIds(repoIdsToMarkDirty, inMoc:moc)
 				if repoIdsToMarkDirty.count>0 {
 					DLog("Marked %d dirty repos that have new events in their event stream", repoIdsToMarkDirty.count)
 				}
-				self.markLongCleanReposAsDirtyInMoc(moc)
+				self!.markLongCleanReposAsDirtyInMoc(moc)
 				andCallback?()
 			}
 		}
@@ -395,9 +395,9 @@ class API {
 			startingFromPage: 1,
 			parameters: nil,
 			extraHeaders: extraHeaders,
-			perPageCallback: { (data, lastPage) in
+			perPageCallback: { [weak self] (data, lastPage) in
 				for d in data ?? [] {
-					let eventDate = self.syncDateFormatter.dateFromString(d.ofk("created_at") as String)!
+					let eventDate = self!.syncDateFormatter.dateFromString(d.ofk("created_at") as String)!
 					if latestDate.compare(eventDate) == NSComparisonResult.OrderedAscending { // this is where we came in
 						DLog("New event at %@", eventDate)
 						if let repoId = d["repo"]?["id"] as? NSNumber {
@@ -442,9 +442,9 @@ class API {
 			startingFromPage: 1,
 			parameters: nil,
 			extraHeaders: extraHeaders,
-			perPageCallback: { (data, lastPage) in
+			perPageCallback: { [weak self] (data, lastPage) in
 				for d in data ?? [] {
-					let eventDate = self.syncDateFormatter.dateFromString(d.ofk("created_at") as String)!
+					let eventDate = self!.syncDateFormatter.dateFromString(d.ofk("created_at") as String)!
 					if latestDate.compare(eventDate) == NSComparisonResult.OrderedAscending { // this is where we came in
 						DLog("New event at %@", eventDate)
 						if let repoId = d["repo"]?["id"] as? NSNumber {
@@ -476,7 +476,7 @@ class API {
 
 		ApiServer.resetSyncSuccessInMoc(moc)
 
-		syncUserDetailsInMoc(moc, andCallback: {
+		syncUserDetailsInMoc(moc, andCallback: { [weak self] in
 			for r in DataItem.itemsOfType("Repo", surviving: true, inMoc: moc) as [Repo] {
 				r.postSyncAction = PostSyncAction.Delete.rawValue
 				r.inaccessible = false
@@ -503,7 +503,7 @@ class API {
 
 			for apiServer in allApiServers {
 				if apiServer.goodToGo() {
-					self.syncWatchedReposFromServer(apiServer, andCallback: completionCallback)
+					self!.syncWatchedReposFromServer(apiServer, andCallback: completionCallback)
 				} else {
 					completionCallback()
 				}
@@ -636,15 +636,15 @@ class API {
 
 	private func fetchLabelsForForCurrentPullRequestsToMoc(moc: NSManagedObjectContext, andCallback: (()->Void)?) {
 
-		let prs = (DataItem.allItemsOfType("PullRequest", inMoc: moc) as [PullRequest]).filter { (pr) in
+		let prs = (DataItem.allItemsOfType("PullRequest", inMoc: moc) as [PullRequest]).filter { [weak self] (pr) in
 			let oid = pr.objectID
-			let refreshes = self.refreshesSinceLastLabelsCheck[oid]
+			let refreshes = self!.refreshesSinceLastLabelsCheck[oid]
 			if refreshes == nil || refreshes! >= Settings.labelRefreshInterval {
 				DLog("Will check labels for PR: '%@'", pr.title)
 				return true
 			} else {
 				DLog("No need to get labels for PR: '%@' (%d refreshes since last check)", pr.title, refreshes)
-				self.refreshesSinceLastLabelsCheck[oid] = (refreshes ?? 0)+1
+				self!.refreshesSinceLastLabelsCheck[oid] = (refreshes ?? 0)+1
 				return false
 			}
 		}
@@ -670,7 +670,7 @@ class API {
 							PRLabel.labelWithInfo(info, forPullRequest:p)
 						}
 						return false
-					}, finalCallback: { (success, resultCode, etag) in
+					}, finalCallback: { [weak self] (success, resultCode, etag) in
 						completionCount++
 						var allGood = success
 						if !success {
@@ -682,7 +682,7 @@ class API {
 							}
 						}
 						if allGood {
-							self.refreshesSinceLastLabelsCheck[p.objectID] = 1
+							self!.refreshesSinceLastLabelsCheck[p.objectID] = 1
 						}
 						if completionCount == total {
 							andCallback?()
@@ -690,7 +690,7 @@ class API {
 				})
 			} else {
 				// no labels link, so presumably no labels
-				self.refreshesSinceLastLabelsCheck[p.objectID] = 1
+				refreshesSinceLastLabelsCheck[p.objectID] = 1
 				completionCount++
 				if completionCount == total {
 					andCallback?()
@@ -701,15 +701,15 @@ class API {
 
 	private func fetchStatusesForCurrentPullRequestsToMoc(moc: NSManagedObjectContext, andCallback: (()->Void)?) {
 
-		let prs = (DataItem.allItemsOfType("PullRequest", inMoc: moc) as [PullRequest]).filter { (pr) in
+		let prs = (DataItem.allItemsOfType("PullRequest", inMoc: moc) as [PullRequest]).filter { [weak self] (pr) in
 			let oid = pr.objectID
-			let refreshes = self.refreshesSinceLastStatusCheck[oid]
+			let refreshes = self!.refreshesSinceLastStatusCheck[oid]
 			if refreshes == nil || refreshes! >= Settings.statusItemRefreshInterval {
 				DLog("Will check statuses for PR: '%@'", pr.title)
 				return true
 			} else {
 				DLog("No need to get statuses for PR: '%@' (%d refreshes since last check)", pr.title, refreshes)
-				self.refreshesSinceLastStatusCheck[oid] = (refreshes ?? 0)+1
+				self!.refreshesSinceLastStatusCheck[oid] = (refreshes ?? 0)+1
 				return false
 			}
 		}
@@ -737,7 +737,7 @@ class API {
 							s.pullRequest = p
 						}
 						return false
-					}, finalCallback: { (success, resultCode, etag) in
+					}, finalCallback: { [weak self] (success, resultCode, etag) in
 						completionCount++
 						var allGood = success
 						if !success {
@@ -749,14 +749,14 @@ class API {
 							}
 						}
 						if allGood {
-							self.refreshesSinceLastStatusCheck[p.objectID] = 1
+							self!.refreshesSinceLastStatusCheck[p.objectID] = 1
 						}
 						if(completionCount==total) {
 							andCallback?()
 						}
 				})
 			} else {
-				self.refreshesSinceLastStatusCheck[p.objectID] = 1
+				refreshesSinceLastStatusCheck[p.objectID] = 1
 				completionCount++
 				if completionCount==total {
 					andCallback?()
@@ -863,7 +863,7 @@ class API {
 		let repoFullName = r.repo.fullName ?? "NoRepoFullName"
 		let repoNumber = r.number?.stringValue ?? "NoRepoNumber"
 		get("/repos/\(repoFullName)/pulls/\(repoNumber)", fromServer: r.apiServer, ignoreLastSync: false, parameters: nil, extraHeaders: nil,
-			success: { (response, data) in
+			success: { [weak self] (response, data) in
 
 				if let mergeInfo = (data as? NSDictionary)?.ofk("merged_by") as? NSDictionary {
 					DLog("detected merged PR: %@", r.title)
@@ -874,19 +874,19 @@ class API {
 					let mergedByMyself = mergeUserId.isEqualToNumber(r.apiServer.userId ?? NSNumber(int: -1))
 
 					if !(mergedByMyself && Settings.dontKeepPrsMergedByMe) {
-						self.prWasMerged(r)
+						self!.prWasMerged(r)
 					} else {
 						DLog("will not announce merged PR: %@", r.title)
 					}
 				} else {
-					self.prWasClosed(r)
+					self!.prWasClosed(r)
 				}
 				andCallback?()
 
-			}, failure: { (response, data, error) in
+			}, failure: { [weak self] (response, data, error) in
 				let resultCode = response?.statusCode ?? 0
 				if resultCode == 404 || resultCode==410 { // PR gone for good
-					self.prWasClosed(r)
+					self!.prWasClosed(r)
 				} else { // fetch problem
 					r.postSyncAction = PostSyncAction.DoNothing.rawValue // don't delete this, we couldn't check, play it safe
 					r.apiServer.lastSyncSucceeded = false
@@ -1111,7 +1111,7 @@ class API {
 			mutableParams["per_page"] = "100"
 
 			getDataInPath(path, fromServer: fromServer, parameters: mutableParams, extraHeaders: extraHeaders) {
-				(data, lastPage, resultCode, etag) in
+				[weak self] (data, lastPage, resultCode, etag) in
 
 				if let d = data as? [NSDictionary] {
 					var isLastPage = lastPage
@@ -1120,7 +1120,7 @@ class API {
 						if isLastPage {
 							finalCallback?(success: true, resultCode: resultCode, etag: etag)
 						} else {
-							self.getPagedDataInPath(path, fromServer: fromServer, startingFromPage: startingFromPage+1, parameters: parameters, extraHeaders: extraHeaders, perPageCallback: perPageCallback, finalCallback: finalCallback)
+							self!.getPagedDataInPath(path, fromServer: fromServer, startingFromPage: startingFromPage+1, parameters: parameters, extraHeaders: extraHeaders, perPageCallback: perPageCallback, finalCallback: finalCallback)
 						}
 					}
 				} else {
@@ -1137,7 +1137,7 @@ class API {
 		andCallback:((data: AnyObject?, lastPage: Bool, resultCode: Int, etag: String?)->Void)?) {
 
 			get(path, fromServer: fromServer, ignoreLastSync: false, parameters: parameters, extraHeaders: extraHeaders,
-				success: { (response, data) in
+				success: { [weak self] (response, data) in
 
 					let allHeaders = response!.allHeaderFields
 					fromServer.requestsRemaining = NSNumber(longLong: (allHeaders["X-RateLimit-Remaining"] as NSString).longLongValue)
@@ -1148,7 +1148,7 @@ class API {
 
 					let etag = allHeaders["Etag"] as? String
 					let code = response!.statusCode ?? 0
-					andCallback?(data: data, lastPage: self.lastPage(response!), resultCode: code, etag: etag)
+					andCallback?(data: data, lastPage: self!.lastPage(response!), resultCode: code, etag: etag)
 
 				}, failure: { (response, data, error) in
 					let code = response?.statusCode ?? 0
@@ -1174,10 +1174,8 @@ class API {
 			if (fromServer.lastSyncSucceeded?.boolValue ?? false) || ignoreLastSync {
 				apiServerLabel = fromServer.label ?? "(untitled server)"
 			} else {
-				dispatch_async(dispatch_get_main_queue()) {
-					failure?(response: nil, data: nil, error: NSError(domain: "Server already inaccessible, saving the network call", code: -1, userInfo: nil))
-					return // compiler is acting weird, seems to need this
-				}
+				let e = NSError(domain: "Server already inaccessible, saving the network call", code: -1, userInfo: nil)
+				failure?(response: nil, data: nil, error: e)
 				return
 			}
 
@@ -1209,7 +1207,7 @@ class API {
 
 			////////////////////////// preempt with error backoff algorithm
 			let fullUrlPath = r.URL!.absoluteString!
-			var existingBackOff = self.badLinks[fullUrlPath]
+			var existingBackOff = badLinks[fullUrlPath]
 			if existingBackOff != nil {
 				if NSDate().compare(existingBackOff!.nextAttemptAt) == NSComparisonResult.OrderedAscending {
 					// report failure and return
@@ -1225,7 +1223,7 @@ class API {
 				}
 			}
 
-			urlSession.dataTaskWithRequest(r) { (data, res, e) in
+			urlSession.dataTaskWithRequest(r) { [weak self] (data, res, e) in
 
 				let response = res as? NSHTTPURLResponse
 				var parsedData: AnyObject?
@@ -1244,7 +1242,7 @@ class API {
 							existingBackOff!.nextAttemptAt = NSDate(timeInterval: existingBackOff!.duration, sinceDate:NSDate())
 						} else {
 							DLog("(%@) placing URL %@ on the throttled list", apiServerLabel, fullUrlPath)
-							self.badLinks[fullUrlPath] = UrlBackOffEntry(
+							self!.badLinks[fullUrlPath] = UrlBackOffEntry(
 								nextAttemptAt: NSDate(timeInterval: BACKOFF_STEP, sinceDate: NSDate()),
 								duration: BACKOFF_STEP)
 						}
@@ -1259,7 +1257,7 @@ class API {
 					}
 				} else {
 					DLog("(%@) GET %@ - RESULT: %d", apiServerLabel, fullUrlPath, response?.statusCode)
-					self.badLinks.removeValueForKey(fullUrlPath)
+					self!.badLinks.removeValueForKey(fullUrlPath)
 					dispatch_async(dispatch_get_main_queue()) {
 						success?(response: response, data: parsedData)
 						return // compiler is acting weird, seems to need this
@@ -1267,23 +1265,23 @@ class API {
 				}
 
 				#if os(iOS)
-					self.networkIndicationEnd()
+					self!.networkIndicationEnd()
 				#endif
 			}.resume()
 	}
 
 	#if os(iOS)
 	func networkIndicationStart() {
-		dispatch_async(dispatch_get_main_queue(), {
-			if ++self.networkIndicationCount==1 {
+		dispatch_async(dispatch_get_main_queue(), { [weak self] in
+			if ++self!.networkIndicationCount==1 {
 				UIApplication.sharedApplication().networkActivityIndicatorVisible = true
 			}
 		})
 	}
 	
 	func networkIndicationEnd() {
-		dispatch_async(dispatch_get_main_queue(), {
-			if --self.networkIndicationCount==0 {
+		dispatch_async(dispatch_get_main_queue(), { [weak self] in
+			if --self!.networkIndicationCount==0 {
 				UIApplication.sharedApplication().networkActivityIndicatorVisible = false
 			}
 		})

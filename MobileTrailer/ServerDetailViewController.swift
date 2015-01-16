@@ -21,7 +21,7 @@ class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		var a: ApiServer
-		if let sid = self.serverId {
+		if let sid = serverId {
 			a = mainObjectContext.existingObjectWithID(sid, error: nil) as ApiServer
 		} else {
 			a = ApiServer.addDefaultGithubInMoc(mainObjectContext)
@@ -169,8 +169,8 @@ class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 			preferredStyle: UIAlertControllerStyle.Alert)
 
 		a.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil))
-		a.addAction(UIAlertAction(title: "Delete", style: UIAlertActionStyle.Destructive, handler: { (action) in
-			self.deleteServer()
+		a.addAction(UIAlertAction(title: "Delete", style: UIAlertActionStyle.Destructive, handler: { [weak self] (action) in
+			self!.deleteServer()
 		}))
 
 		presentViewController(a, animated: true, completion: nil)

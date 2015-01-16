@@ -22,16 +22,16 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 				a.dismissViewControllerAnimated(true, completion: nil)
 			}))
 
-			a.addAction(UIAlertAction(title: "Mark all as read", style: UIAlertActionStyle.Destructive, handler: { (action) in
-				self.markAllAsRead()
+			a.addAction(UIAlertAction(title: "Mark all as read", style: UIAlertActionStyle.Destructive, handler: { [weak self] (action) in
+				self!.markAllAsRead()
 			}))
-			a.addAction(UIAlertAction(title: "Remove all merged", style:UIAlertActionStyle.Default, handler: { (action) in
-				self.removeAllMerged()
+			a.addAction(UIAlertAction(title: "Remove all merged", style:UIAlertActionStyle.Default, handler: { [weak self] (action) in
+				self!.removeAllMerged()
 			}))
-			a.addAction(UIAlertAction(title: "Remove all closed", style:UIAlertActionStyle.Default, handler: { (action) in
-				self.removeAllClosed()
+			a.addAction(UIAlertAction(title: "Remove all closed", style:UIAlertActionStyle.Default, handler: { [weak self] (action) in
+				self!.removeAllClosed()
 			}))
-			self.presentViewController(a, animated: true, completion: nil)
+			presentViewController(a, animated: true, completion: nil)
 		}
 		else
 		{
@@ -48,11 +48,11 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 	func actionSheet(actionSheet: UIActionSheet, willDismissWithButtonIndex buttonIndex: Int) {
 		switch buttonIndex {
 		case 0:
-			self.markAllAsRead()
+			markAllAsRead()
 		case 2:
-			self.removeAllMerged()
+			removeAllMerged()
 		case 3:
-			self.removeAllClosed()
+			removeAllClosed()
 		default:
 			break
 		}
@@ -74,14 +74,14 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 	{
 		dispatch_async(dispatch_get_main_queue(), {
 			if Settings.dontAskBeforeWipingMerged {
-				self.removeAllMergedConfirmed()
+				removeAllMergedConfirmed()
 			} else {
 				let a = UIAlertController(title: "Sure?", message: "Remove all PRs in the Merged section?", preferredStyle: UIAlertControllerStyle.Alert)
 				a.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil))
-				a.addAction(UIAlertAction(title: "Remove", style: UIAlertActionStyle.Destructive, handler: { (action) in
-					self.removeAllMergedConfirmed()
+				a.addAction(UIAlertAction(title: "Remove", style: UIAlertActionStyle.Destructive, handler: { [weak self] (action) in
+					self!.removeAllMergedConfirmed()
 				}))
-				self.presentViewController(a, animated: true, completion: nil)
+				presentViewController(a, animated: true, completion: nil)
 			}
 		})
 	}
@@ -89,14 +89,14 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 	func removeAllClosed() {
 		dispatch_async(dispatch_get_main_queue(), {
 			if Settings.dontAskBeforeWipingClosed {
-				self.removeAllClosedConfirmed()
+				removeAllClosedConfirmed()
 			} else {
 				let a = UIAlertController(title: "Sure?", message: "Remove all PRs in the Closed section?", preferredStyle: UIAlertControllerStyle.Alert)
 				a.addAction(UIAlertAction(title: "Cancel", style:UIAlertActionStyle.Cancel, handler: nil))
-				a.addAction(UIAlertAction(title: "Remove", style:UIAlertActionStyle.Destructive, handler: { (action) in
-					self.removeAllClosedConfirmed()
+				a.addAction(UIAlertAction(title: "Remove", style:UIAlertActionStyle.Destructive, handler: { [weak self] (action) in
+					self!.removeAllClosedConfirmed()
 				}))
-				self.presentViewController(a, animated: true, completion: nil)
+				presentViewController(a, animated: true, completion: nil)
 			}
 		})
 	}
@@ -155,8 +155,8 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
 		super.init(coder: aDecoder)
 
-		searchTimer = PopTimer(timeInterval: 0.5, callback: {
-			self.reloadDataWithAnimation(true)
+		searchTimer = PopTimer(timeInterval: 0.5, callback: { [weak self] in
+			self!.reloadDataWithAnimation(true)
 		})
 	}
 
@@ -395,8 +395,8 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 			title = "Refreshing..."
 			tableView.tableFooterView = EmptyView(message: DataManager.reasonForEmptyWithFilter(searchField.text), parentWidth: view.bounds.size.width)
 			if !(refreshControl?.refreshing ?? false) {
-				dispatch_async(dispatch_get_main_queue(), {
-					self.refreshControl!.beginRefreshing()
+				dispatch_async(dispatch_get_main_queue(), { [weak self] in
+					self!.refreshControl!.beginRefreshing()
 				})
 			}
 		} else {
@@ -411,8 +411,8 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 				tableView.tableFooterView = EmptyView(message: DataManager.reasonForEmptyWithFilter(searchField.text), parentWidth: view.bounds.size.width)
 			}
 
-			dispatch_async(dispatch_get_main_queue(), {
-				self.refreshControl!.endRefreshing()
+			dispatch_async(dispatch_get_main_queue(), { [weak self] in
+				self!.refreshControl!.endRefreshing()
 			})
 		}
 

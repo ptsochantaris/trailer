@@ -662,7 +662,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		controlTextDidChange(nil)
 
 		let tempContext = DataManager.tempContext()
-		api.fetchRepositoriesToMoc(tempContext, andCallback: {
+		api.fetchRepositoriesToMoc(tempContext, andCallback: { [weak self] in
 
 			if ApiServer.shouldReportRefreshFailureInMoc(tempContext) {
 				var errorServers = [String]()
@@ -682,7 +682,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 			} else {
 				tempContext.save(nil)
 			}
-			self.completeRefresh()
+			self!.completeRefresh()
 		})
 	}
 
@@ -963,12 +963,12 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		fillServerApiFormFromSelectedServer()
 	}
 
-	func tableView(tableView: NSTableView, objectValueForTableColumn tableColumn: NSTableColumn?, row: Int) -> AnyObject? {
+	func tableView(tv: NSTableView, objectValueForTableColumn tableColumn: NSTableColumn?, row: Int) -> AnyObject? {
 		let cell = tableColumn!.dataCellForRow(row) as NSCell
 
-		if tableView === projectsTable {
+		if tv === projectsTable {
 			if tableColumn?.identifier == "hide" {
-				if self.tableView(tableView, isGroupRow:row) {
+				if tableView(tv, isGroupRow:row) {
 					(cell as NSButtonCell).imagePosition = NSCellImagePosition.NoImage
 					cell.state = NSMixedState
 					cell.enabled = false
@@ -983,7 +983,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 					cell.enabled = true
 				}
 			} else {
-				if self.tableView(tableView, isGroupRow:row) {
+				if tableView(tv, isGroupRow:row) {
 					cell.title = row==0 ? "Parent Repositories" : "Forked Repositories"
 					cell.state = NSMixedState
 					cell.enabled = false
@@ -1035,9 +1035,9 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		}
 	}
 
-	func tableView(tableView: NSTableView, setObjectValue object: AnyObject?, forTableColumn tableColumn: NSTableColumn?, row: Int) {
-		if tableView === projectsTable {
-			if !self.tableView(tableView, isGroupRow: row) {
+	func tableView(tv: NSTableView, setObjectValue object: AnyObject?, forTableColumn tableColumn: NSTableColumn?, row: Int) {
+		if tv === projectsTable {
+			if !tableView(tv, isGroupRow: row) {
 				let r = repoForRow(row)
 				let hideNow = object?.boolValue ?? false
 				r.hidden = hideNow
@@ -1221,15 +1221,15 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		refreshNow.action = nil
 		refreshNow.target = nil
 
-		api.fetchPullRequestsForActiveReposAndCallback {
-			self.refreshNow.target = oldTarget
-			self.refreshNow.action = oldAction
+		api.fetchPullRequestsForActiveReposAndCallback { [weak self] in
+			self!.refreshNow.target = oldTarget
+			self!.refreshNow.action = oldAction
 			if ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext) {
-				self.lastSuccessfulRefresh = NSDate()
-				self.preferencesDirty = false
+				self!.lastSuccessfulRefresh = NSDate()
+				self!.preferencesDirty = false
 			}
-			self.completeRefresh()
-			self.refreshTimer = NSTimer.scheduledTimerWithTimeInterval(NSTimeInterval(Settings.refreshPeriod), target: self, selector: Selector("refreshTimerDone"), userInfo: nil, repeats: false)
+			self!.completeRefresh()
+			self!.refreshTimer = NSTimer.scheduledTimerWithTimeInterval(NSTimeInterval(Settings.refreshPeriod), target: self!, selector: Selector("refreshTimerDone"), userInfo: nil, repeats: false)
 		}
 	}
 
@@ -1287,9 +1287,9 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		let siv = StatusItemView(frame: CGRectMake(0, 0, length, H), label: countString, attributes: attributes)
 		siv.highlighted = mainMenu.visible
 		siv.grayOut = isRefreshing
-		weak var weakSelf = self
-		siv.tappedCallback = {
-			weakSelf!.statusItemTapped()
+		siv.tappedCallback = { [weak self] in
+			self!.statusItemTapped()
+			return
 		};
 		statusItem.view = siv
 
@@ -1402,8 +1402,9 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 				let key = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String
 				let options = [key: NSNumber(bool: (AXIsProcessTrusted() == 0))]
 				if AXIsProcessTrustedWithOptions(options) != 0 {
-					globalKeyMonitor = NSEvent.addGlobalMonitorForEventsMatchingMask(NSEventMask.KeyDownMask, handler: { (incomingEvent) in
-						self.globalEvent(incomingEvent)
+					globalKeyMonitor = NSEvent.addGlobalMonitorForEventsMatchingMask(NSEventMask.KeyDownMask, handler: { [weak self] (incomingEvent) in
+						self!.globalEvent(incomingEvent)
+						return
 					})
 				}
 			}
@@ -1420,57 +1421,56 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 			return
 		}
 
-		localKeyMonitor = NSEvent.addLocalMonitorForEventsMatchingMask(NSEventMask.KeyDownMask, handler: { (incomingEvent) -> NSEvent! in
+		localKeyMonitor = NSEvent.addLocalMonitorForEventsMatchingMask(NSEventMask.KeyDownMask, handler: { [weak self] (incomingEvent) -> NSEvent! in
 
-			if self.checkForHotkey(incomingEvent) {
+			if self!.checkForHotkey(incomingEvent) {
 				return nil
 			}
 
-			if incomingEvent.window != self.mainMenu {
+			if incomingEvent.window != self!.mainMenu {
 				return incomingEvent
 			}
 
 			switch incomingEvent.keyCode {
 			case 125: // down
-				if app.isManuallyScrolling && self.mainMenu.prTable.selectedRow == -1 {
+				if app.isManuallyScrolling && self!.mainMenu.prTable.selectedRow == -1 {
 					return nil
 				}
-				var i = self.mainMenu.prTable.selectedRow + 1
-				if i < self.mainMenu.prTable.numberOfRows {
-					while self.pullRequestDelegate.pullRequestAtRow(i) == nil {
+				var i = self!.mainMenu.prTable.selectedRow + 1
+				if i < self!.mainMenu.prTable.numberOfRows {
+					while self!.pullRequestDelegate.pullRequestAtRow(i) == nil {
 						i++
 					}
-					self.scrollToIndex(i)
+					self!.scrollToIndex(i)
 				}
 				return nil
 			case 126: // up
-				if app.isManuallyScrolling && self.mainMenu.prTable.selectedRow == -1 {
+				if app.isManuallyScrolling && self!.mainMenu.prTable.selectedRow == -1 {
 					return nil
 				}
-				var i = self.mainMenu.prTable.selectedRow - 1
+				var i = self!.mainMenu.prTable.selectedRow - 1
 				if i > 0 {
-					while self.pullRequestDelegate.pullRequestAtRow(i) == nil {
+					while self!.pullRequestDelegate.pullRequestAtRow(i) == nil {
 						i--
 					}
-					self.scrollToIndex(i)
+					self!.scrollToIndex(i)
 				}
 				return nil
 			case 36: // enter
-				let i = self.mainMenu.prTable.selectedRow
+				let i = self!.mainMenu.prTable.selectedRow
 				if i >= 0 {
-					if let v = self.mainMenu.prTable.rowViewAtRow(i, makeIfNecessary: false) as? PrItemView {
+					if let v = self!.mainMenu.prTable.rowViewAtRow(i, makeIfNecessary: false) as? PrItemView {
 						let isAlternative = ((incomingEvent.modifierFlags & NSEventModifierFlags.AlternateKeyMask) == NSEventModifierFlags.AlternateKeyMask)
-						self.prItemSelected(v.associatedPullRequest(), alternativeSelect: isAlternative)
+						self!.prItemSelected(v.associatedPullRequest(), alternativeSelect: isAlternative)
 					}
 				}
 				return nil
 			case 53: // escape
-				self.closeMenu()
+				self!.closeMenu()
 				return nil
 			default:
 				break
 			}
-
 			return incomingEvent
 		})
 	}
@@ -1479,8 +1479,9 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		app.isManuallyScrolling = true
 		mouseIgnoreTimer.push()
 		mainMenu.prTable.scrollRowToVisible(i)
-		dispatch_async(dispatch_get_main_queue(), {
-			self.mainMenu.prTable.selectRowIndexes(NSIndexSet(index: i), byExtendingSelection: false)
+		dispatch_async(dispatch_get_main_queue(), { [weak self] in
+			self!.mainMenu.prTable.selectRowIndexes(NSIndexSet(index: i), byExtendingSelection: false)
+			return
 		})
 	}
 
@@ -1491,8 +1492,9 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 			mainMenu.prTable.deselectAll(nil)
 			pr = pullRequestDelegate.pullRequestAtRow(row)
 		}
-		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
-			self.mainMenu.prTable.selectRowIndexes(NSIndexSet(index: row), byExtendingSelection: false)
+		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) { [weak self] in
+			self!.mainMenu.prTable.selectRowIndexes(NSIndexSet(index: row), byExtendingSelection: false)
+			return
 		}
 		return pr?.webUrl
 	}
