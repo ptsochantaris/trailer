@@ -13,9 +13,8 @@ func DLog(messageFormat: String, args: LazyVarArgClosure...) {
 		withVaList(
 			args.map { (lazyArg: LazyVarArgClosure) in
 				return lazyArg() ?? "(nil)"
-			},
-			{ (valist: CVaListPointer) in
-				NSLogv(messageFormat, valist)
+			}, {
+				NSLogv(messageFormat, $0)
 			}
 		)
 	}
