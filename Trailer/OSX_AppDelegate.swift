@@ -1106,6 +1106,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	}
 
 	func startRefreshIfItIsDue() {
+
 		if let l = lastSuccessfulRefresh {
 			let howLongAgo = NSDate().timeIntervalSinceDate(l)
 			if howLongAgo > NSTimeInterval(Settings.refreshPeriod) {
@@ -1211,7 +1212,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	private func startRefresh() {
 		if isRefreshing {
-		return
+			return
 		}
 
 		prepareForRefresh()
@@ -1224,7 +1225,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		api.fetchPullRequestsForActiveReposAndCallback { [weak self] in
 			self!.refreshNow.target = oldTarget
 			self!.refreshNow.action = oldAction
-			if ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext) {
+			if !ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext) {
 				self!.lastSuccessfulRefresh = NSDate()
 				self!.preferencesDirty = false
 			}

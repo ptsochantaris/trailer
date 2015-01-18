@@ -25,7 +25,6 @@ struct UrlBackOffEntry {
 
 class API {
 
-	var reachability = Reachability.reachabilityForInternetConnection()
 	var refreshesSinceLastStatusCheck = [NSManagedObjectID:Int]()
 	var refreshesSinceLastLabelsCheck = [NSManagedObjectID:Int]()
 
@@ -57,13 +56,13 @@ class API {
 		syncDateFormatter.timeZone = NSTimeZone(abbreviation: "UTC")
 		syncDateFormatter.locale = NSLocale(localeIdentifier: "en_US")
 
+		var reachability = Reachability.reachabilityForInternetConnection()
 		reachability.startNotifier()
+		currentNetworkStatus = reachability.currentReachabilityStatus()
 
 		let fileManager = NSFileManager.defaultManager()
 		let appSupportURL = fileManager.URLsForDirectory(NSSearchPathDirectory.CachesDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask).first! as NSURL
 		cacheDirectory = appSupportURL.URLByAppendingPathComponent("com.housetrip.Trailer").path!
-
-		currentNetworkStatus = reachability.currentReachabilityStatus()
 
 		let config = NSURLSessionConfiguration.defaultSessionConfiguration()
 		config.HTTPMaximumConnectionsPerHost = 4
@@ -80,14 +79,15 @@ class API {
 		}
 
 		NSNotificationCenter.defaultCenter().addObserverForName(kReachabilityChangedNotification, object: nil, queue: NSOperationQueue.mainQueue()) { [weak self] (n) in
-			let newStatus = self!.reachability.currentReachabilityStatus()
-			if newStatus != NetworkStatus.NotReachable && newStatus != self!.currentNetworkStatus {
-				DLog("Network came up: %d", newStatus.rawValue)
+			let newStatus = (n.object as Reachability).currentReachabilityStatus()
+			if  newStatus != self!.currentNetworkStatus {
 				self!.currentNetworkStatus = newStatus
-				app.startRefreshIfItIsDue()
-			} else {
-				DLog("Network went down: %d", newStatus.rawValue)
-				self!.currentNetworkStatus = newStatus
+				if newStatus == NetworkStatus.NotReachable {
+					DLog("Network went down: %d", newStatus.rawValue)
+				} else {
+					DLog("Network came up: %d", newStatus.rawValue)
+					app.startRefreshIfItIsDue()
+				}
 			}
 		}
 	}
@@ -1155,7 +1155,7 @@ class API {
 					if code == 304 {
 						DLog("(%@) no change reported (304)", fromServer.label)
 					} else {
-						DLog("(%@) failure for %@: %@", fromServer.label, path,error)
+						DLog("(%@) failure for %@: %@", fromServer.label, path, error?.localizedDescription)
 					}
 					andCallback?(data: nil, lastPage: false, resultCode: code, etag: nil)
 			})
@@ -1174,8 +1174,10 @@ class API {
 			if (fromServer.lastSyncSucceeded?.boolValue ?? false) || ignoreLastSync {
 				apiServerLabel = fromServer.label ?? "(untitled server)"
 			} else {
-				let e = NSError(domain: "Server already inaccessible, saving the network call", code: -1, userInfo: nil)
-				failure?(response: nil, data: nil, error: e)
+				dispatch_async(dispatch_get_main_queue()) {
+					let e = NSError(domain: "Sync has failed, skipping this call", code: -1, userInfo: nil)
+					failure?(response: nil, data: nil, error: e)
+				}
 				return
 			}
 
