@@ -1,34 +1,29 @@
 
-#if os(iOS)
-	import UIKit
-#endif
-
 ///////////// Logging, with thanks to Transition.io: http://transition.io/logging-in-swift-without-overhead-in-production/
 
 typealias LazyVarArgClosure = @autoclosure () -> CVarArgType?
 
-func DLog(messageFormat:@autoclosure () -> String, args:LazyVarArgClosure...) {
-	var shouldLog: Bool
+func DLog(messageFormat: String, args: LazyVarArgClosure...) {
 	#if DEBUG
-		shouldLog = true
+		let shouldLog = true
 	#else
-		shouldLog = Settings.logActivityToConsole
+		let shouldLog = Settings.logActivityToConsole
 	#endif
 	if shouldLog {
-		let realArgs:[CVarArgType] = args.map { (lazyArg:LazyVarArgClosure) in
-			if let l = lazyArg() { return l } else { return "(nil)" }
-		}
-
-		func curriedStringWithFormat(valist:CVaListPointer) -> String {
-			return NSString(format:messageFormat(), arguments:valist)
-		}
-
-		var s = withVaList(realArgs, curriedStringWithFormat)
-		NSLog("%@", s)
+		withVaList(
+			args.map { (lazyArg: LazyVarArgClosure) in
+				return lazyArg() ?? "(nil)"
+			},
+			{ (valist: CVaListPointer) in
+				NSLogv(messageFormat, valist)
+			}
+		)
 	}
 }
 
 #if os(iOS)
+
+	import UIKit
 
 	typealias COLOR_CLASS = UIColor
 	typealias FONT_CLASS = UIFont
