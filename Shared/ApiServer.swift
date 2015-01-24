@@ -27,6 +27,14 @@ class ApiServer: NSManagedObject {
     @NSManaged var repos: NSSet
     @NSManaged var statuses: NSSet
 
+	var syncIsGood: Bool {
+		return self.lastSyncSucceeded?.boolValue ?? true
+	}
+
+	var goodToGo: Bool {
+		return !(authToken ?? "").isEmpty
+	}
+
 	class func insertNewServerInMoc(moc: NSManagedObjectContext) -> ApiServer {
 		let githubServer: ApiServer = NSEntityDescription.insertNewObjectForEntityForName("ApiServer", inManagedObjectContext: moc) as ApiServer
 		githubServer.createdAt = NSDate()
@@ -35,7 +43,7 @@ class ApiServer: NSManagedObject {
 
 	class func resetSyncSuccessInMoc(moc: NSManagedObjectContext) {
 		for apiServer in allApiServersInMoc(moc) {
-			if apiServer.goodToGo() {
+			if apiServer.goodToGo {
 				apiServer.lastSyncSucceeded = true
 			}
 		}
@@ -47,7 +55,7 @@ class ApiServer: NSManagedObject {
 			var lastSyncSucceeded = apiServer.lastSyncSucceeded?.boolValue
 			if(lastSyncSucceeded==nil) { lastSyncSucceeded!=false }
 
-			if apiServer.goodToGo() && !(lastSyncSucceeded!) && (apiServer.reportRefreshFailures.boolValue) {
+			if apiServer.goodToGo && !(lastSyncSucceeded!) && (apiServer.reportRefreshFailures.boolValue) {
 				return true
 			}
 		}
@@ -91,7 +99,7 @@ class ApiServer: NSManagedObject {
 	}
 
 	func rollBackAllUpdatesInMoc(moc: NSManagedObjectContext) {
-		DLog("Rolling back changes for failed sync on API server %@",label);
+		DLog("Rolling back changes for failed sync on API server '%@'",label);
 		for set in [repos, pullRequests, comments, statuses, labels] {
 			for dataItem: DataItem in set.allObjects as [DataItem] {
 				if let action = dataItem.postSyncAction?.integerValue {
@@ -124,9 +132,5 @@ class ApiServer: NSManagedObject {
 		label = "GitHub"
 		latestReceivedEventDateProcessed = NSDate.distantPast() as? NSDate
 		latestUserEventDateProcessed = NSDate.distantPast() as? NSDate
-	}
-
-	func goodToGo() -> Bool {
-		return !(authToken ?? "").isEmpty
 	}
 }

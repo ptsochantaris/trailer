@@ -53,7 +53,7 @@ class ServersViewController: UITableViewController {
 		if (a.authToken ?? "").isEmpty {
 			cell.textLabel?.textColor = UIColor.redColor()
 			cell.textLabel?.text = (a.label ?? "") + " (needs token!)"
-		} else if !(a.lastSyncSucceeded?.boolValue ?? false) {
+		} else if !a.syncIsGood {
 			cell.textLabel?.textColor = UIColor.redColor()
 			cell.textLabel?.text = (a.label ?? "") + " (last sync failed)"
 		} else {

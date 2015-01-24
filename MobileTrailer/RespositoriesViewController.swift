@@ -82,11 +82,11 @@ class RespositoriesViewController: UITableViewController, UITextFieldDelegate, N
 		tableView.alpha = 0.5
 
 		let tempContext = DataManager.tempContext()
-		api.fetchRepositoriesToMoc(tempContext, andCallback: { [weak self] in
+		api.fetchRepositoriesToMoc(tempContext, callback: { [weak self] in
 			if ApiServer.shouldReportRefreshFailureInMoc(tempContext) {
 				var errorServers = [String]()
 				for apiServer in ApiServer.allApiServersInMoc(tempContext) {
-					if apiServer.goodToGo() && !(apiServer.lastSyncSucceeded?.boolValue ?? false) {
+					if apiServer.goodToGo && !apiServer.syncIsGood {
 						errorServers.append(apiServer.label ?? "Untitled Server")
 					}
 				}

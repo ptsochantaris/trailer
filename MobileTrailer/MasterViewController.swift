@@ -452,7 +452,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 	override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
 		var allServersHaveTokens = true
 		for a in ApiServer.allApiServersInMoc(mainObjectContext) {
-			if !a.goodToGo() {
+			if !a.goodToGo {
 				allServersHaveTokens = false
 				break
 			}

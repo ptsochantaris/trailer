@@ -662,12 +662,12 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		controlTextDidChange(nil)
 
 		let tempContext = DataManager.tempContext()
-		api.fetchRepositoriesToMoc(tempContext, andCallback: { [weak self] in
+		api.fetchRepositoriesToMoc(tempContext, callback: { [weak self] in
 
 			if ApiServer.shouldReportRefreshFailureInMoc(tempContext) {
 				var errorServers = [String]()
 				for apiServer in ApiServer.allApiServersInMoc(tempContext) {
-					if apiServer.goodToGo() && !(apiServer.lastSyncSucceeded?.boolValue ?? false) {
+					if apiServer.goodToGo && !apiServer.syncIsGood {
 						errorServers.append(apiServer.label ?? "NoServerName")
 					}
 				}
@@ -1333,7 +1333,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		sender.enabled = false
 		let apiServer = selectedServer()!
 
-		api.testApiToServer(apiServer, andCallback: { error in
+		api.testApiToServer(apiServer, callback: { error in
 			let alert = NSAlert()
 			if error != nil {
 				alert.messageText = "The test failed for " + (apiServer.apiPath ?? "NoApiPath")

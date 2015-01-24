@@ -55,7 +55,7 @@ class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 	@IBAction func testConnectionSelected(sender: UIButton) {
 		if let a = updateServerFromForm() {
 			sender.enabled = false
-			api.testApiToServer(a, andCallback: { error in
+			api.testApiToServer(a, callback: { error in
 				sender.enabled = true
 				UIAlertView(title: error != nil ? "Failed" : "Success",
 					message: error?.localizedDescription,
