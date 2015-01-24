@@ -160,7 +160,7 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 	}
 
 	func startRefresh() -> Bool {
-		if isRefreshing || api.reachability.currentReachabilityStatus()==NetworkStatus.NotReachable || !ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
+		if isRefreshing || api.currentNetworkStatus == NetworkStatus.NotReachable || !ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
 			return false
 		}
 

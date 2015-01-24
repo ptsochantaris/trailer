@@ -61,7 +61,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 	private func tryRefresh() {
 		refreshOnRelease = false
 
-		if api.reachability.currentReachabilityStatus()==NetworkStatus.NotReachable {
+		if api.currentNetworkStatus == NetworkStatus.NotReachable {
 			UIAlertView(title: "No Network", message: "There is no network connectivity, please try again later", delegate: nil, cancelButtonTitle: "OK").show()
 		} else {
 			if !app.startRefresh() {

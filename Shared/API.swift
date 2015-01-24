@@ -27,13 +27,13 @@ class API {
 
 	var refreshesSinceLastStatusCheck = [NSManagedObjectID:Int]()
 	var refreshesSinceLastLabelsCheck = [NSManagedObjectID:Int]()
+	var currentNetworkStatus: NetworkStatus
 
 	private let mediumFormatter: NSDateFormatter
 	private let syncDateFormatter: NSDateFormatter
 	private let cacheDirectory: String
 	private let urlSession: NSURLSession
 	private var badLinks = [String:UrlBackOffEntry]()
-	private var currentNetworkStatus: NetworkStatus
 	#if os(iOS)
 	private var networkIndicationCount: Int = 0
 	#endif
