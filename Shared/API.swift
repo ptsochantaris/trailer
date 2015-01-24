@@ -78,7 +78,7 @@ class API {
 			fileManager.createDirectoryAtPath(cacheDirectory, withIntermediateDirectories: true, attributes: nil, error: nil)
 		}
 
-		NSNotificationCenter.defaultCenter().addObserverForName(kReachabilityChangedNotification, object: nil, queue: NSOperationQueue.mainQueue()) { [weak self] (n) in
+		NSNotificationCenter.defaultCenter().addObserverForName(kReachabilityChangedNotification, object: nil, queue: NSOperationQueue.mainQueue()) { [weak self] n in
 			let newStatus = (n.object as Reachability).currentReachabilityStatus()
 			if  newStatus != self!.currentNetworkStatus {
 				self!.currentNetworkStatus = newStatus
@@ -225,7 +225,7 @@ class API {
 
 		if let c = tryLoadAndCallback {
 			getImage(NSURL(string: absolutePath)!,
-				success: { (response, data) in
+				success: { response, data in
 					var image: IMAGE_CLASS?
 					if data != nil {
 						#if os(iOS)
@@ -237,7 +237,7 @@ class API {
 						#endif
 					}
 					dispatch_async(dispatch_get_main_queue(), { c(image) })
-				}, failure: { (response, error) in
+				}, failure: { response, error in
 					dispatch_async(dispatch_get_main_queue(), { c(nil) })
 			})
 		}
@@ -395,7 +395,7 @@ class API {
 			startingFromPage: 1,
 			parameters: nil,
 			extraHeaders: extraHeaders,
-			perPageCallback: { [weak self] (data, lastPage) in
+			perPageCallback: { [weak self] data, lastPage in
 				for d in data ?? [] {
 					let eventDate = self!.syncDateFormatter.dateFromString(d.ofk("created_at") as String)!
 					if latestDate.compare(eventDate) == NSComparisonResult.OrderedAscending { // this is where we came in
@@ -416,7 +416,7 @@ class API {
 					}
 				}
 				return false
-			}, finalCallback: { (success, resultCode, etag) in
+			}, finalCallback: { success, resultCode, etag in
 				usingUserEventsFromServer.latestUserEventEtag = etag
 				if !success {
 					usingUserEventsFromServer.lastSyncSucceeded = false
@@ -442,7 +442,7 @@ class API {
 			startingFromPage: 1,
 			parameters: nil,
 			extraHeaders: extraHeaders,
-			perPageCallback: { [weak self] (data, lastPage) in
+			perPageCallback: { [weak self] data, lastPage in
 				for d in data ?? [] {
 					let eventDate = self!.syncDateFormatter.dateFromString(d.ofk("created_at") as String)!
 					if latestDate.compare(eventDate) == NSComparisonResult.OrderedAscending { // this is where we came in
@@ -463,7 +463,7 @@ class API {
 					}
 				}
 				return false
-			}, finalCallback: { (success, resultCode, etag) in
+			}, finalCallback: { success, resultCode, etag in
 				usingReceivedEventsFromServer.latestReceivedEventEtag = etag
 				if !success {
 					usingReceivedEventsFromServer.lastSyncSucceeded = false
@@ -531,13 +531,13 @@ class API {
 
 			let repoFullName = r.fullName ?? "NoRepoFullName"
 			getPagedDataInPath("/repos/\(repoFullName)/pulls", fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
-				perPageCallback: { (data, lastPage) in
+				perPageCallback: { data, lastPage in
 					for info in data ?? [] {
 						let p = PullRequest.pullRequestWithInfo(info, fromServer:apiServer)
 						p.repo = r
 					}
 					return false
-				}, finalCallback: { (success, resultCode, etag) in
+				}, finalCallback: { success, resultCode, etag in
 					completionCount++
 					r.dirty = false
 					if !success {
@@ -616,7 +616,7 @@ class API {
 							}
 						}
 						return false
-					}, finalCallback: { (success, resultCode, etag) in
+					}, finalCallback: { success, resultCode, etag in
 						completionCount++
 						if !success {
 							apiServer.lastSyncSucceeded = false
@@ -636,7 +636,7 @@ class API {
 
 	private func fetchLabelsForForCurrentPullRequestsToMoc(moc: NSManagedObjectContext, andCallback: (()->Void)?) {
 
-		let prs = (DataItem.allItemsOfType("PullRequest", inMoc: moc) as [PullRequest]).filter { [weak self] (pr) in
+		let prs = (DataItem.allItemsOfType("PullRequest", inMoc: moc) as [PullRequest]).filter { [weak self] pr in
 			let oid = pr.objectID
 			let refreshes = self!.refreshesSinceLastLabelsCheck[oid]
 			if refreshes == nil || refreshes! >= Settings.labelRefreshInterval {
@@ -665,12 +665,12 @@ class API {
 			if let link = p.labelsLink() {
 
 				getPagedDataInPath(link, fromServer: p.apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
-					perPageCallback: { (data, lastPage) in
+					perPageCallback: { data, lastPage in
 						for info in data ?? [] {
 							PRLabel.labelWithInfo(info, forPullRequest:p)
 						}
 						return false
-					}, finalCallback: { [weak self] (success, resultCode, etag) in
+					}, finalCallback: { [weak self] success, resultCode, etag in
 						completionCount++
 						var allGood = success
 						if !success {
@@ -701,7 +701,7 @@ class API {
 
 	private func fetchStatusesForCurrentPullRequestsToMoc(moc: NSManagedObjectContext, andCallback: (()->Void)?) {
 
-		let prs = (DataItem.allItemsOfType("PullRequest", inMoc: moc) as [PullRequest]).filter { [weak self] (pr) in
+		let prs = (DataItem.allItemsOfType("PullRequest", inMoc: moc) as [PullRequest]).filter { [weak self] pr in
 			let oid = pr.objectID
 			let refreshes = self!.refreshesSinceLastStatusCheck[oid]
 			if refreshes == nil || refreshes! >= Settings.statusItemRefreshInterval {
@@ -737,7 +737,7 @@ class API {
 							s.pullRequest = p
 						}
 						return false
-					}, finalCallback: { [weak self] (success, resultCode, etag) in
+					}, finalCallback: { [weak self] success, resultCode, etag in
 						completionCount++
 						var allGood = success
 						if !success {
@@ -817,7 +817,7 @@ class API {
 			let apiServer = p.apiServer
 			if let issueLink = p.issueUrl {
 				getDataInPath(issueLink, fromServer: apiServer, parameters: nil, extraHeaders: nil,
-					andCallback: { (data, lastPage, resultCode, etag) in
+					andCallback: { data, lastPage, resultCode, etag in
 						if data != nil {
 							let assignee = ((data as NSDictionary).ofk("assignee") as NSDictionary?)?.ofk("login") as? String ?? "NoAssignedUserName"
 							let assigned = (assignee == (apiServer.userName ?? "NoApiUser"))
@@ -863,7 +863,7 @@ class API {
 		let repoFullName = r.repo.fullName ?? "NoRepoFullName"
 		let repoNumber = r.number?.stringValue ?? "NoRepoNumber"
 		get("/repos/\(repoFullName)/pulls/\(repoNumber)", fromServer: r.apiServer, ignoreLastSync: false, parameters: nil, extraHeaders: nil,
-			success: { [weak self] (response, data) in
+			success: { [weak self] response, data in
 
 				if let mergeInfo = (data as? NSDictionary)?.ofk("merged_by") as? NSDictionary {
 					DLog("detected merged PR: %@", r.title)
@@ -883,7 +883,7 @@ class API {
 				}
 				andCallback?()
 
-			}, failure: { [weak self] (response, data, error) in
+			}, failure: { [weak self] response, data, error in
 				let resultCode = response?.statusCode ?? 0
 				if resultCode == 404 || resultCode==410 { // PR gone for good
 					self!.prWasClosed(r)
@@ -934,14 +934,14 @@ class API {
 	func getRateLimitFromServer(apiServer: ApiServer, andCallback: ((Int64, Int64, Int64)->Void)?)
 	{
 		get("/rate_limit", fromServer: apiServer, ignoreLastSync: true, parameters: nil, extraHeaders: nil,
-			success: { (response, data) in
+			success: { response, data in
 				let allHeaders = response!.allHeaderFields
 				let requestsRemaining = (allHeaders["X-RateLimit-Remaining"] as NSString).longLongValue
 				let requestLimit = (allHeaders["X-RateLimit-Limit"] as NSString).longLongValue
 				let epochSeconds = (allHeaders["X-RateLimit-Reset"] as NSString).longLongValue
 				andCallback?(requestsRemaining, requestLimit, epochSeconds)
 			},
-			failure: { (response, data, error) in
+			failure: { response, data, error in
 				if response?.statusCode == 404 && data != nil && !((data as NSDictionary).ofk("message") as String == "Not Found") {
 					andCallback?(10000, 10000, 0)
 				} else {
@@ -956,7 +956,7 @@ class API {
 		var count = 0
 		for apiServer in allApiServers {
 			if apiServer.goodToGo() {
-				getRateLimitFromServer(apiServer, andCallback: { (remaining, limit, reset) in
+				getRateLimitFromServer(apiServer, andCallback: { remaining, limit, reset in
 					apiServer.requestsRemaining = NSNumber(longLong: remaining)
 					apiServer.requestsLimit = NSNumber(longLong: limit)
 					count++
@@ -1019,7 +1019,7 @@ class API {
 				}
 				return false
 
-			}, finalCallback: { (success, resultCode, etag) in
+			}, finalCallback: { success, resultCode, etag in
 				if !success {
 					DLog("Error while fetching data from %@", apiServer.label)
 					apiServer.lastSyncSucceeded = false
@@ -1039,7 +1039,7 @@ class API {
 		for apiServer in allApiServers {
 			if apiServer.goodToGo() {
 				getDataInPath("/user", fromServer:apiServer, parameters: nil, extraHeaders:nil, andCallback: {
-					(data, lastPage, resultCode, etag) in
+					data, lastPage, resultCode, etag in
 
 					if let d = data as? NSDictionary {
 						apiServer.userName = d.ofk("login") as? String
@@ -1060,11 +1060,11 @@ class API {
 
 	func testApiToServer(apiServer: ApiServer, andCallback:((NSError?)->())?) {
 		get("/rate_limit", fromServer: apiServer, ignoreLastSync: true, parameters: nil, extraHeaders: nil,
-			success: { (_, _) in
+			success: { _, _ in
 				andCallback?(nil)
 				return // compiler seems to need this for some reason
 			},
-			failure: { (response, data, error) in
+			failure: { response, data, error in
 				if response?.statusCode == 404 && data != nil && !((data as NSDictionary).ofk("message") as String == "Not Found") {
 					andCallback?(nil)
 				} else {
@@ -1111,7 +1111,7 @@ class API {
 			mutableParams["per_page"] = "100"
 
 			getDataInPath(path, fromServer: fromServer, parameters: mutableParams, extraHeaders: extraHeaders) {
-				[weak self] (data, lastPage, resultCode, etag) in
+				[weak self] data, lastPage, resultCode, etag in
 
 				if let d = data as? [NSDictionary] {
 					var isLastPage = lastPage
@@ -1137,7 +1137,7 @@ class API {
 		andCallback:((data: AnyObject?, lastPage: Bool, resultCode: Int, etag: String?)->Void)?) {
 
 			get(path, fromServer: fromServer, ignoreLastSync: false, parameters: parameters, extraHeaders: extraHeaders,
-				success: { [weak self] (response, data) in
+				success: { [weak self] response, data in
 
 					let allHeaders = response!.allHeaderFields
 					fromServer.requestsRemaining = NSNumber(longLong: (allHeaders["X-RateLimit-Remaining"] as NSString).longLongValue)
@@ -1150,7 +1150,7 @@ class API {
 					let code = response!.statusCode ?? 0
 					andCallback?(data: data, lastPage: self!.lastPage(response!), resultCode: code, etag: etag)
 
-				}, failure: { (response, data, error) in
+				}, failure: { response, data, error in
 					let code = response?.statusCode ?? 0
 					if code == 304 {
 						DLog("(%@) no change reported (304)", fromServer.label)
@@ -1225,7 +1225,7 @@ class API {
 				}
 			}
 
-			urlSession.dataTaskWithRequest(r) { [weak self] (data, res, e) in
+			urlSession.dataTaskWithRequest(r) { [weak self] data, res, e in
 
 				let response = res as? NSHTTPURLResponse
 				var parsedData: AnyObject?

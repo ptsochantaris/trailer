@@ -481,7 +481,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 		if (type == .NewComment || type == .NewMention) && !Settings.hideAvatars && notification.respondsToSelector(Selector("setContentImage:")) { // let's add an avatar on this!
 			if let url = (forItem as PRComment).avatarUrl {
-				api.haveCachedAvatar(url, tryLoadAndCallback: { (image) in
+				api.haveCachedAvatar(url, tryLoadAndCallback: { image in
 					notification.contentImage = image
 					NSUserNotificationCenter.defaultUserNotificationCenter().deliverNotification(notification)
 				})
@@ -695,8 +695,8 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	}
 
 	private func indexOfObject(array: [AnyObject], _ value: AnyObject) -> Int? {
-		for (index, elem) in enumerate(array) {
-			if elem === value {
+		for (index, element) in enumerate(array) {
+			if element === value {
 				return index
 			}
 		}
@@ -1333,7 +1333,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		sender.enabled = false
 		let apiServer = selectedServer()!
 
-		api.testApiToServer(apiServer, andCallback: { (error) in
+		api.testApiToServer(apiServer, andCallback: { error in
 			let alert = NSAlert()
 			if error != nil {
 				alert.messageText = "The test failed for " + (apiServer.apiPath ?? "NoApiPath")
@@ -1403,7 +1403,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 				let key = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String
 				let options = [key: NSNumber(bool: (AXIsProcessTrusted() == 0))]
 				if AXIsProcessTrustedWithOptions(options) != 0 {
-					globalKeyMonitor = NSEvent.addGlobalMonitorForEventsMatchingMask(NSEventMask.KeyDownMask, handler: { [weak self] (incomingEvent) in
+					globalKeyMonitor = NSEvent.addGlobalMonitorForEventsMatchingMask(NSEventMask.KeyDownMask, handler: { [weak self] incomingEvent in
 						self!.globalEvent(incomingEvent)
 						return
 					})

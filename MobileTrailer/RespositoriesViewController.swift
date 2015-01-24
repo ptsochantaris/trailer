@@ -51,17 +51,17 @@ class RespositoriesViewController: UITableViewController, UITextFieldDelegate, N
 
 	@IBAction func actionSelected(sender: UIBarButtonItem) {
 		let a = UIAlertController(title: nil, message: nil, preferredStyle: UIAlertControllerStyle.ActionSheet)
-		a.addAction(UIAlertAction(title: "Refresh List", style: UIAlertActionStyle.Destructive, handler: { [weak self] (action) in
+		a.addAction(UIAlertAction(title: "Refresh List", style: UIAlertActionStyle.Destructive, handler: { [weak self] action in
 			self!.refreshList()
 		}))
-		a.addAction(UIAlertAction(title: "Hide All", style: UIAlertActionStyle.Default, handler: { [weak self] (action) in
+		a.addAction(UIAlertAction(title: "Hide All", style: UIAlertActionStyle.Default, handler: { [weak self] action in
 			for r in self!.fetchedResultsController.fetchedObjects as [Repo] {
 				r.hidden = true
 				r.dirty = false
 			}
 			app.preferencesDirty = true
 		}))
-		a.addAction(UIAlertAction(title: "Show All", style: UIAlertActionStyle.Default, handler: { [weak self] (action) in
+		a.addAction(UIAlertAction(title: "Show All", style: UIAlertActionStyle.Default, handler: { [weak self] action in
 			for r in self!.fetchedResultsController.fetchedObjects as [Repo] {
 				r.hidden = false
 				r.dirty = true

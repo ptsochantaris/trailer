@@ -18,17 +18,17 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 		if traitCollection.userInterfaceIdiom==UIUserInterfaceIdiom.Pad && UIInterfaceOrientationIsPortrait(UIApplication.sharedApplication().statusBarOrientation) {
 			let a = UIAlertController(title: "Action", message: nil, preferredStyle: UIAlertControllerStyle.Alert)
 
-			a.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: { (action) in
+			a.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: { action in
 				a.dismissViewControllerAnimated(true, completion: nil)
 			}))
 
-			a.addAction(UIAlertAction(title: "Mark all as read", style: UIAlertActionStyle.Destructive, handler: { [weak self] (action) in
+			a.addAction(UIAlertAction(title: "Mark all as read", style: UIAlertActionStyle.Destructive, handler: { [weak self] action in
 				self!.markAllAsRead()
 			}))
-			a.addAction(UIAlertAction(title: "Remove all merged", style:UIAlertActionStyle.Default, handler: { [weak self] (action) in
+			a.addAction(UIAlertAction(title: "Remove all merged", style:UIAlertActionStyle.Default, handler: { [weak self] action in
 				self!.removeAllMerged()
 			}))
-			a.addAction(UIAlertAction(title: "Remove all closed", style:UIAlertActionStyle.Default, handler: { [weak self] (action) in
+			a.addAction(UIAlertAction(title: "Remove all closed", style:UIAlertActionStyle.Default, handler: { [weak self] action in
 				self!.removeAllClosed()
 			}))
 			presentViewController(a, animated: true, completion: nil)
@@ -78,7 +78,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 			} else {
 				let a = UIAlertController(title: "Sure?", message: "Remove all PRs in the Merged section?", preferredStyle: UIAlertControllerStyle.Alert)
 				a.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil))
-				a.addAction(UIAlertAction(title: "Remove", style: UIAlertActionStyle.Destructive, handler: { [weak self] (action) in
+				a.addAction(UIAlertAction(title: "Remove", style: UIAlertActionStyle.Destructive, handler: { [weak self] action in
 					self!.removeAllMergedConfirmed()
 				}))
 				self!.presentViewController(a, animated: true, completion: nil)
@@ -93,7 +93,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 			} else {
 				let a = UIAlertController(title: "Sure?", message: "Remove all PRs in the Closed section?", preferredStyle: UIAlertControllerStyle.Alert)
 				a.addAction(UIAlertAction(title: "Cancel", style:UIAlertActionStyle.Cancel, handler: nil))
-				a.addAction(UIAlertAction(title: "Remove", style:UIAlertActionStyle.Destructive, handler: { [weak self] (action) in
+				a.addAction(UIAlertAction(title: "Remove", style:UIAlertActionStyle.Destructive, handler: { [weak self] action in
 					self!.removeAllClosedConfirmed()
 				}))
 				self!.presentViewController(a, animated: true, completion: nil)
@@ -471,8 +471,8 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 	}
 
 	private func indexOfObject(array: [AnyObject], _ value: AnyObject) -> Int? {
-		for (index, elem) in enumerate(array) {
-			if elem === value {
+		for (index, element) in enumerate(array) {
+			if element === value {
 				return index
 			}
 		}

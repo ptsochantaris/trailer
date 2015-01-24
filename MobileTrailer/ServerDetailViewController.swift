@@ -55,7 +55,7 @@ class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 	@IBAction func testConnectionSelected(sender: UIButton) {
 		if let a = updateServerFromForm() {
 			sender.enabled = false
-			api.testApiToServer(a, andCallback: { (error) in
+			api.testApiToServer(a, andCallback: { error in
 				sender.enabled = true
 				UIAlertView(title: error != nil ? "Failed" : "Success",
 					message: error?.localizedDescription,
@@ -169,7 +169,7 @@ class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 			preferredStyle: UIAlertControllerStyle.Alert)
 
 		a.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil))
-		a.addAction(UIAlertAction(title: "Delete", style: UIAlertActionStyle.Destructive, handler: { [weak self] (action) in
+		a.addAction(UIAlertAction(title: "Delete", style: UIAlertActionStyle.Destructive, handler: { [weak self] action in
 			self!.deleteServer()
 		}))
 

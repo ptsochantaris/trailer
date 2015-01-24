@@ -40,11 +40,11 @@ class CommentBlacklistViewController: UITableViewController {
 			message: "Enter the username of the poster whose comments you don't want to be notified about",
 			preferredStyle: UIAlertControllerStyle.Alert)
 
-		a.addTextFieldWithConfigurationHandler({ (textField) in
+		a.addTextFieldWithConfigurationHandler({ textField in
 			textField.placeholder = "Username"
 		})
 		a.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil))
-		a.addAction(UIAlertAction(title: "Block", style: UIAlertActionStyle.Default, handler: { (action) in
+		a.addAction(UIAlertAction(title: "Block", style: UIAlertActionStyle.Default, handler: { action in
 
 			let tf = a.textFields?.first as UITextField
 			var name = tf.text.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
