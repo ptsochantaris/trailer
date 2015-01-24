@@ -562,7 +562,9 @@ class API {
 
 	private func fetchCommentsForCurrentPullRequestsToMoc(moc: NSManagedObjectContext, andCallback: (()->Void)?) {
 
-		let prs = DataItem.newOrUpdatedItemsOfType("PullRequest", inMoc:moc) as [PullRequest]
+		let prs = (DataItem.newOrUpdatedItemsOfType("PullRequest", inMoc:moc) as [PullRequest]).filter({ pr in
+			return pr.apiServer.lastSyncSucceeded?.boolValue ?? false
+		})
 		if(prs.count==0) {
 			andCallback?()
 			return
@@ -637,6 +639,9 @@ class API {
 	private func fetchLabelsForForCurrentPullRequestsToMoc(moc: NSManagedObjectContext, andCallback: (()->Void)?) {
 
 		let prs = (DataItem.allItemsOfType("PullRequest", inMoc: moc) as [PullRequest]).filter { [weak self] pr in
+			if pr.apiServer.lastSyncSucceeded?.boolValue ?? false {
+				return false
+			}
 			let oid = pr.objectID
 			let refreshes = self!.refreshesSinceLastLabelsCheck[oid]
 			if refreshes == nil || refreshes! >= Settings.labelRefreshInterval {
@@ -702,6 +707,9 @@ class API {
 	private func fetchStatusesForCurrentPullRequestsToMoc(moc: NSManagedObjectContext, andCallback: (()->Void)?) {
 
 		let prs = (DataItem.allItemsOfType("PullRequest", inMoc: moc) as [PullRequest]).filter { [weak self] pr in
+			if pr.apiServer.lastSyncSucceeded?.boolValue ?? false {
+				return false
+			}
 			let oid = pr.objectID
 			let refreshes = self!.refreshesSinceLastStatusCheck[oid]
 			if refreshes == nil || refreshes! >= Settings.statusItemRefreshInterval {
@@ -773,7 +781,7 @@ class API {
 
 		let prsToCheck = pullRequests.filter { r -> Bool in
 			let parent = r.repo
-			return (!parent.hidden.boolValue) && ((parent.postSyncAction?.integerValue ?? 0) != PostSyncAction.Delete.rawValue)
+			return (!parent.hidden.boolValue) && ((parent.postSyncAction?.integerValue ?? 0) != PostSyncAction.Delete.rawValue) && (r.apiServer.lastSyncSucceeded?.boolValue ?? false)
 		}
 
 		let totalOperations = prsToCheck.count
@@ -787,6 +795,7 @@ class API {
 			completionCount++
 			if completionCount == totalOperations {
 				andCallback?()
+				return
 			}
 		}
 
@@ -797,7 +806,9 @@ class API {
 
 	private func detectAssignedPullRequestsInMoc(moc: NSManagedObjectContext, andCallback: (()->Void)?) {
 
-		let prs = DataItem.newOrUpdatedItemsOfType("PullRequest", inMoc:moc) as [PullRequest]
+		let prs = (DataItem.newOrUpdatedItemsOfType("PullRequest", inMoc:moc) as [PullRequest]).filter({ pr in
+			return pr.apiServer.lastSyncSucceeded?.boolValue ?? false
+		})
 		if prs.count==0 {
 			andCallback?()
 			return
