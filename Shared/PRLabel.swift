@@ -23,9 +23,10 @@ class PRLabel: DataItem {
 	}
 
 	class func labelWithInfo(info: NSDictionary, forPullRequest: PullRequest) -> PRLabel {
-		let name = info.ofk("name") as? String
-		var l = PRLabel.labelWithName(name!, forPullRequest: forPullRequest)
+		let name = info.ofk("name") as? String ?? "(unnamed label)"
+		var l = PRLabel.labelWithName(name, forPullRequest: forPullRequest)
 		if(l==nil) {
+			DLog("Creating PRLabel: %@", name);
 			l = NSEntityDescription.insertNewObjectForEntityForName("PRLabel", inManagedObjectContext: forPullRequest.managedObjectContext!) as? PRLabel
 			l!.name = name
 			l!.serverId = 0
@@ -33,6 +34,8 @@ class PRLabel: DataItem {
 			l!.createdAt = NSDate.distantPast() as? NSDate
 			l!.pullRequest = forPullRequest
 			l!.apiServer = forPullRequest.apiServer
+		} else {
+			DLog("Updating PRLabel: %@", name);
 		}
 		l!.url = info.ofk("url") as? String
 		if let c = info.ofk("color") as? String {

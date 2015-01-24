@@ -271,7 +271,7 @@ class API {
 
 			for r in Repo.unsyncableReposInMoc(moc) {
 				for p in r.pullRequests.allObjects as [PullRequest] {
-					moc.deleteObject(p)
+					p.postSyncAction = PostSyncAction.Delete.rawValue
 				}
 			}
 
@@ -545,7 +545,7 @@ class API {
 							r.inaccessible = true
 							r.postSyncAction = PostSyncAction.DoNothing.rawValue
 							for p in r.pullRequests.allObjects as [PullRequest] {
-								toMoc.deleteObject(p)
+								p.postSyncAction = PostSyncAction.Delete.rawValue
 							}
 						} else if resultCode==410 { // repo gone for good
 							r.postSyncAction = PostSyncAction.Delete.rawValue
@@ -639,7 +639,7 @@ class API {
 	private func fetchLabelsForForCurrentPullRequestsToMoc(moc: NSManagedObjectContext, andCallback: (()->Void)?) {
 
 		let prs = (DataItem.allItemsOfType("PullRequest", inMoc: moc) as [PullRequest]).filter { [weak self] pr in
-			if pr.apiServer.lastSyncSucceeded?.boolValue ?? false {
+			if !(pr.apiServer.lastSyncSucceeded?.boolValue ?? false) {
 				return false
 			}
 			let oid = pr.objectID
@@ -707,7 +707,7 @@ class API {
 	private func fetchStatusesForCurrentPullRequestsToMoc(moc: NSManagedObjectContext, andCallback: (()->Void)?) {
 
 		let prs = (DataItem.allItemsOfType("PullRequest", inMoc: moc) as [PullRequest]).filter { [weak self] pr in
-			if pr.apiServer.lastSyncSucceeded?.boolValue ?? false {
+			if !(pr.apiServer.lastSyncSucceeded?.boolValue ?? false) {
 				return false
 			}
 			let oid = pr.objectID
@@ -985,7 +985,7 @@ class API {
 		} else {
 			refreshesSinceLastStatusCheck.removeAll()
 			for s in DataItem.allItemsOfType("PRStatus", inMoc: moc) {
-				moc.deleteObject(s)
+				s.postSyncAction = PostSyncAction.Delete.rawValue
 			}
 			return false
 		}
@@ -997,7 +997,7 @@ class API {
 		} else {
 			refreshesSinceLastLabelsCheck.removeAll()
 			for l in DataItem.allItemsOfType("PRLabel", inMoc: moc) {
-				moc.deleteObject(l)
+				l.postSyncAction = PostSyncAction.Delete.rawValue
 			}
 			return false
 		}

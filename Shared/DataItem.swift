@@ -101,13 +101,15 @@ class DataItem: NSManagedObject {
 		var count = 0
 		for type in types {
 			let discarded = itemsOfType(type, surviving: false, inMoc: moc)
-			count += discarded.count
-			for i in discarded {
-				DLog("Nuking unused %@: %@", type, i.serverId);
-				moc.deleteObject(i)
+			if discarded.count > 0 {
+				count += discarded.count
+				DLog("Nuking %d %@ items marked for deletion", discarded.count, type);
+				for i in discarded {
+					moc.deleteObject(i)
+				}
 			}
 		}
-		DLog("Nuked %d deleted items",count);
+		DLog("Nuked total %d items marked for deletion", count);
 	}
 
 	class func countItemsOfType(type: String, moc: NSManagedObjectContext) -> Int {
@@ -115,10 +117,10 @@ class DataItem: NSManagedObject {
 		return moc.countForFetchRequest(f, error: nil)
 	}
 
+	/*
 	override func prepareForDeletion() {
-		if postSyncAction?.integerValue==PostSyncAction.Delete.rawValue {
-			DLog("Deleting %@ ID: %@", entity.name, serverId)
-		}
+		DLog("Deleting %@ ID: %@", entity.name, serverId)
 		super.prepareForDeletion()
 	}
+	*/
 }
