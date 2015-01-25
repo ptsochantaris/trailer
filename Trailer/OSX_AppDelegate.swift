@@ -1211,7 +1211,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	}
 
 	private func startRefresh() {
-		if isRefreshing {
+		if isRefreshing || api.currentNetworkStatus == NetworkStatus.NotReachable || !ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
 			return
 		}
 
