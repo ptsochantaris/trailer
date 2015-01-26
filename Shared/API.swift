@@ -143,7 +143,7 @@ class API {
 		let fileManager = NSFileManager.defaultManager()
 		let files = fileManager.contentsOfDirectoryAtPath(cacheDirectory, error:nil) as? [String]
 		let now = NSDate()
-		for f in files! {
+		for f in files ?? [] {
 			if startsWith(f, "imgcache-") {
 				let path = cacheDirectory.stringByAppendingPathComponent(f)
 				let attributes = fileManager.attributesOfItemAtPath(path, error: nil)!
