@@ -60,15 +60,12 @@ class CommentCounts: NSView {
 				bottom -= height * 0.5 + 1
 				left -= width * 0.5
 
-				let alertBackground = NSView(frame: NSIntegralRect(NSMakeRect(left, bottom, width, height)))
+				let alertBackground = CenterTextField(frame: NSIntegralRect(NSMakeRect(left, bottom, width, height)))
 				alertBackground.wantsLayer = true
 				alertBackground.layer!.backgroundColor = redFill.CGColor
 				alertBackground.layer!.cornerRadius = floor(SMALL_BADGE_SIZE*0.5)
+				alertBackground.attributedStringValue = alertString
 				addSubview(alertBackground, positioned: NSWindowOrderingMode.Below, relativeTo: countBackground)
-
-				let alertView = CenterTextField(frame: NSOffsetRect(alertBackground.bounds, 0, 1))
-				alertView.attributedStringValue = alertString
-				alertBackground.addSubview(alertView)
 			}
 		}
 	}
