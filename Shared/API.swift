@@ -1025,7 +1025,7 @@ class API {
 	func syncWatchedReposFromServer(apiServer: ApiServer, callback: (()->Void)?) {
 
 		if !apiServer.syncIsGood {
-			callback?
+			callback?()
 			return
 		}
 
