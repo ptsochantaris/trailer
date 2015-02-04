@@ -1,7 +1,7 @@
 Trailer
 =======
 
-Copyright (c) 2014 Paul Tsochantaris
+Copyright (c) 2014-2015 Paul Tsochantaris
 
 Parts copyright (c) 2012-2014 HouseTrip Ltd.
 

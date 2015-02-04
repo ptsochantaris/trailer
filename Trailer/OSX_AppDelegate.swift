@@ -138,7 +138,8 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 		NSUserNotificationCenter.defaultUserNotificationCenter().delegate = self
 
-		let cav = "Version " + currentAppVersion
+        var buildNumber = NSBundle.mainBundle().infoDictionary!["CFBundleVersion"] as String
+		let cav = "Version \(currentAppVersion) (\(buildNumber))"
 		versionNumber.stringValue = cav
 		aboutVersion.stringValue = cav
 

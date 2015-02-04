@@ -7,7 +7,8 @@ class AboutTrailerViewController: UIViewController {
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		versionNumber.text = "Version " + currentAppVersion
+        var buildNumber = NSBundle.mainBundle().infoDictionary!["CFBundleVersion"] as String
+		versionNumber.text = "\(currentAppVersion) (\(buildNumber))";
 		licenseText.textContainerInset = UIEdgeInsetsMake(0, 10, 10, 10)
 	}
 
