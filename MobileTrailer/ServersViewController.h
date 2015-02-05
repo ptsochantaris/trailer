@@ -1,4 +1,0 @@
-
-@interface ServersViewController : UITableViewController
-
-@end

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6250" systemVersion="14A389" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="H1p-Uh-vWS">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14C109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="H1p-Uh-vWS">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6244"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
@@ -23,7 +23,7 @@
         <!--Detail-->
         <scene sceneID="yUG-lL-AsK">
             <objects>
-                <viewController title="Detail" id="JEX-9P-axG" customClass="DetailViewController" sceneMemberID="viewController">
+                <viewController title="Detail" id="JEX-9P-axG" customClass="DetailViewController" customModule="PocketTrailer" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="4Ib-n3-jTB"/>
                         <viewControllerLayoutGuide type="bottom" id="UUU-nP-EaO"/>
@@ -84,13 +84,13 @@
         <!--Master-->
         <scene sceneID="smW-Zh-WAh">
             <objects>
-                <tableViewController title="Master" clearsSelectionOnViewWillAppear="NO" id="7bK-jq-Zjz" customClass="MasterViewController" sceneMemberID="viewController">
+                <tableViewController title="Master" clearsSelectionOnViewWillAppear="NO" id="7bK-jq-Zjz" customClass="MasterViewController" customModule="PocketTrailer" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="120" sectionHeaderHeight="10" sectionFooterHeight="10" id="r7i-6Z-zg0">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" id="WCw-Qf-5nD" customClass="PRCell">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" id="WCw-Qf-5nD" customClass="PRCell" customModule="PocketTrailer">
                                 <rect key="frame" x="0.0" y="119" width="320" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="WCw-Qf-5nD" id="Ccv-UH-bok">
@@ -152,10 +152,9 @@
                                 </tableViewCellContentView>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <connections>
-                                    <outlet property="_description" destination="AQh-N4-Eak" id="aLC-20-ZZR"/>
-                                    <outlet property="_image" destination="dbg-hz-tPt" id="lei-9c-Pf1"/>
-                                    <outlet property="_title" destination="7Vv-dH-kVA" id="Qu2-jz-ly3"/>
-                                    <outlet property="description" destination="AQh-N4-Eak" id="Ce4-qr-jsQ"/>
+                                    <outlet property="_description" destination="AQh-N4-Eak" id="z6l-de-7ea"/>
+                                    <outlet property="_image" destination="dbg-hz-tPt" id="ip5-bc-vaF"/>
+                                    <outlet property="_title" destination="7Vv-dH-kVA" id="eZa-b3-NJm"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -173,7 +172,7 @@
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="edit" id="vlQ-6x-FuM">
                             <connections>
-                                <action selector="phoneRefreshSelected:" destination="7bK-jq-Zjz" id="Vwd-s6-rP9"/>
+                                <action selector="editSelected:" destination="7bK-jq-Zjz" id="ciS-ir-tQR"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -181,9 +180,6 @@
                         <autoresizingMask key="autoresizingMask"/>
                         <attributedString key="attributedTitle"/>
                     </refreshControl>
-                    <connections>
-                        <outlet property="refreshButton" destination="vlQ-6x-FuM" id="BOB-KG-GBV"/>
-                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Rux-fX-hf1" sceneMemberID="firstResponder"/>
             </objects>
@@ -207,7 +203,7 @@
         <!--Repositories-->
         <scene sceneID="mBS-8s-j5u">
             <objects>
-                <tableViewController id="qen-v7-82i" customClass="RespositoriesViewController" sceneMemberID="viewController">
+                <tableViewController id="qen-v7-82i" customClass="RespositoriesViewController" customModule="PocketTrailer" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="m0P-9W-9Zs">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -240,7 +236,7 @@
                     </navigationItem>
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
-                        <outlet property="actionsButton" destination="kBh-JC-HZv" id="ymr-Xd-DMK"/>
+                        <outlet property="actionsButton" destination="kBh-JC-HZv" id="Niq-mx-ZmL"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="6O3-4c-cEn" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -250,7 +246,7 @@
         <!--Comment Blocking-->
         <scene sceneID="L4e-B0-eWh">
             <objects>
-                <tableViewController id="QXf-Ap-v0o" customClass="CommentBlacklistViewController" sceneMemberID="viewController">
+                <tableViewController id="QXf-Ap-v0o" customClass="CommentBlacklistViewController" customModule="PocketTrailer" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="60" sectionHeaderHeight="22" sectionFooterHeight="22" id="OK3-GS-b9l">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -272,7 +268,7 @@
                     <navigationItem key="navigationItem" title="Comment Blocking" id="Juw-ZJ-mYS">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="lmw-zy-yiu">
                             <connections>
-                                <action selector="addSelected:" destination="QXf-Ap-v0o" id="SZi-P3-L2c"/>
+                                <action selector="addSelected" destination="QXf-Ap-v0o" id="P67-d6-O7I"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -284,7 +280,7 @@
         <!--Advanced-->
         <scene sceneID="13M-SK-H8U">
             <objects>
-                <tableViewController modalPresentationStyle="currentContext" id="ls6-NX-hye" customClass="AdvancedSettingsViewController" sceneMemberID="viewController">
+                <tableViewController modalPresentationStyle="currentContext" id="ls6-NX-hye" customClass="AdvancedSettingsViewController" customModule="PocketTrailer" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="54" sectionHeaderHeight="10" sectionFooterHeight="10" id="Q1r-gB-XEK">
                         <rect key="frame" x="0.0" y="64" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -339,7 +335,7 @@
         <!--Servers-->
         <scene sceneID="dTo-Cu-ELq">
             <objects>
-                <tableViewController id="Ny5-Q9-wJN" customClass="ServersViewController" sceneMemberID="viewController">
+                <tableViewController id="Ny5-Q9-wJN" customClass="ServersViewController" customModule="PocketTrailer" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="70" sectionHeaderHeight="44" sectionFooterHeight="22" id="osF-HF-13f">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -375,12 +371,12 @@
                     <navigationItem key="navigationItem" title="Servers" id="xL8-Y9-77V">
                         <barButtonItem key="leftBarButtonItem" style="done" systemItem="done" id="3yS-pI-1hb">
                             <connections>
-                                <action selector="done:" destination="Ny5-Q9-wJN" id="apW-GM-iMg"/>
+                                <action selector="doneSelected" destination="Ny5-Q9-wJN" id="MVl-LW-Jyc"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="w7v-i7-rs4">
                             <connections>
-                                <action selector="newServer:" destination="Ny5-Q9-wJN" id="LV7-JY-XMa"/>
+                                <action selector="newServer" destination="Ny5-Q9-wJN" id="qAI-Ok-FBy"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -396,7 +392,7 @@
         <!--API Server Details-->
         <scene sceneID="Mrr-Mu-sAc">
             <objects>
-                <viewController automaticallyAdjustsScrollViewInsets="NO" id="iSf-H9-TPW" customClass="ServerDetailViewController" sceneMemberID="viewController">
+                <viewController automaticallyAdjustsScrollViewInsets="NO" id="iSf-H9-TPW" customClass="ServerDetailViewController" customModule="PocketTrailer" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="6JD-Od-MMA"/>
                         <viewControllerLayoutGuide type="bottom" id="YAK-Zg-OTM"/>
@@ -481,7 +477,7 @@
                                     </textField>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="btD-7d-z1H">
                                         <rect key="frame" x="11" y="324" width="578" height="26.5"/>
-                                        <string key="text">Paste your GitHub personal access token above; use the links below to view or create one.  You can use 'Test' to verify your settings.</string>
+                                        <string key="text">Paste your GitHub personal access token above; use the links below to view or create one.  You can use 'Test' to verify your Settings.</string>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
                                         <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                         <nil key="highlightedColor"/>
@@ -576,7 +572,7 @@
                         <outlet property="scrollView" destination="bZU-nh-qhg" id="CHr-1c-Bhf"/>
                         <outlet property="testButton" destination="FSU-dH-Zb1" id="FQx-x9-gB9"/>
                         <outlet property="webFrontEnd" destination="jgQ-9E-dxw" id="7Sp-Ty-RY9"/>
-                        <segue destination="kWj-6b-yq2" kind="show" identifier="openGithub" id="OaO-SO-2eE"/>
+                        <segue destination="RXN-WD-g0o" kind="presentation" identifier="openGithub" id="OaO-SO-2eE"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="IqD-pm-wNg" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -586,7 +582,7 @@
         <!--Picker View Controller-->
         <scene sceneID="5Tx-Cn-3zg">
             <objects>
-                <tableViewController modalPresentationStyle="currentContext" id="UM1-Tl-R50" customClass="PickerViewController" sceneMemberID="viewController">
+                <tableViewController modalPresentationStyle="currentContext" id="UM1-Tl-R50" customClass="PickerViewController" customModule="PocketTrailer" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" id="JIf-tM-OPO">
                         <rect key="frame" x="0.0" y="64" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -615,7 +611,7 @@
         <!--About-->
         <scene sceneID="gk8-1F-TsH">
             <objects>
-                <viewController automaticallyAdjustsScrollViewInsets="NO" modalPresentationStyle="currentContext" id="yvK-be-nK4" customClass="AboutTrailerViewController" sceneMemberID="viewController">
+                <viewController automaticallyAdjustsScrollViewInsets="NO" modalPresentationStyle="currentContext" id="yvK-be-nK4" customClass="AboutTrailerViewController" customModule="PocketTrailer" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="sc4-NU-7KZ"/>
                         <viewControllerLayoutGuide type="bottom" id="rvX-Ad-77Q"/>
@@ -644,7 +640,7 @@
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="top" showsHorizontalScrollIndicator="NO" editable="NO" textAlignment="center" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cun-Cw-EIG">
                                 <rect key="frame" x="0.0" y="171" width="600" height="380"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                <string key="text">Copyright (c) 2014 Paul Tsochantaris
+                                <mutableString key="text">Copyright (c) 2014-2015 Paul Tsochantaris
 Parts copyright (c) 2012-2014 HouseTrip Ltd.
 
 Released under the terms of the MIT licence:
@@ -654,7 +650,7 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</string>
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</mutableString>
                                 <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="13"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
@@ -697,12 +693,12 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
                     <navigationItem key="navigationItem" title="About" id="0uQ-oM-T56">
                         <barButtonItem key="leftBarButtonItem" style="done" systemItem="done" id="ZkS-hs-qdL">
                             <connections>
-                                <action selector="done:" destination="yvK-be-nK4" id="VKV-NS-dY0"/>
+                                <action selector="doneSelected" destination="yvK-be-nK4" id="eke-6y-5OQ"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" title="Web Site" id="DsZ-7N-eAb">
                             <connections>
-                                <action selector="ipadLink:" destination="yvK-be-nK4" id="Uvr-sW-ypB"/>
+                                <action selector="linkSelected" destination="yvK-be-nK4" id="IO2-cZ-Stq"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -718,7 +714,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
         <!--GitHub-->
         <scene sceneID="ocq-RM-6Ci">
             <objects>
-                <viewController modalPresentationStyle="currentContext" hidesBottomBarWhenPushed="YES" id="kWj-6b-yq2" customClass="GithubViewController" sceneMemberID="viewController">
+                <viewController modalPresentationStyle="currentContext" hidesBottomBarWhenPushed="YES" id="kWj-6b-yq2" customClass="GithubViewController" customModule="PocketTrailer" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="zic-tr-u8O"/>
                         <viewControllerLayoutGuide type="bottom" id="UhO-5W-ZzH"/>
@@ -737,14 +733,20 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
                             <constraint firstAttribute="centerY" secondItem="00q-SG-a6I" secondAttribute="centerY" id="ncU-h5-TJb"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" title="GitHub" id="uon-TC-PDK"/>
+                    <navigationItem key="navigationItem" title="GitHub" id="uon-TC-PDK">
+                        <barButtonItem key="leftBarButtonItem" style="done" systemItem="done" id="1iC-A2-mcd">
+                            <connections>
+                                <action selector="doneSelected:" destination="kWj-6b-yq2" id="F6J-ph-f4D"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="spinner" destination="00q-SG-a6I" id="fN9-ae-kq1"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="BoF-TD-ccs" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4381" y="1553"/>
+            <point key="canvasLocation" x="5193" y="1553"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="hQr-lF-Zam">
@@ -847,6 +849,24 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vrx-7J-Ot5" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1934" y="1553"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="eCB-19-D57">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="RXN-WD-g0o" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="W9W-Qy-yeh">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="kWj-6b-yq2" kind="relationship" relationship="rootViewController" id="odA-2r-6xW"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="aSk-Jo-buz" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="4381" y="1553"/>
         </scene>
     </scenes>
     <resources>

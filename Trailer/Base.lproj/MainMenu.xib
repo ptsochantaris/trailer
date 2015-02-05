@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6250" systemVersion="14B25" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6254" systemVersion="14C109" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6250"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6254"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -11,7 +11,7 @@
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
-        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customObject id="-3" userLabel="Application" customClass="Application" customModule="Trailer" customModuleProvider="target"/>
         <window title="Trailer Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="371">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" resizable="YES"/>
             <rect key="contentRect" x="335" y="390" width="782" height="460"/>
@@ -450,7 +450,7 @@ user you can add more servers from the left.</string>
                                         <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="cA3-l8-9ga">
                                             <rect key="frame" x="703" y="51" width="19" height="27"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                                            <stepperCell key="cell" continuous="YES" alignment="left" minValue="1" maxValue="99999" doubleValue="2" id="cqd-bh-Lwg"/>
+                                            <stepperCell key="cell" continuous="YES" alignment="left" minValue="2" maxValue="99999" doubleValue="2" id="cqd-bh-Lwg"/>
                                             <connections>
                                                 <action selector="newRepoCheckChanged:" target="494" id="kF0-jm-0IT"/>
                                             </connections>
@@ -465,7 +465,7 @@ user you can add more servers from the left.</string>
                                             </textFieldCell>
                                         </textField>
                                         <button id="AEB-MY-2H6">
-                                            <rect key="frame" x="51" y="240" width="507" height="18"/>
+                                            <rect key="frame" x="51" y="262" width="507" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Display PR creation time instead of most recent activity time" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="FUA-CI-tqc">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -476,7 +476,7 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="ZD1-Lw-zpW">
-                                            <rect key="frame" x="51" y="215" width="507" height="18"/>
+                                            <rect key="frame" x="51" y="239" width="507" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Move PRs assigned to me to the &quot;My Pull Requests&quot; section" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="4g6-XV-fVn">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -487,7 +487,7 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="SoW-AJ-5kD">
-                                            <rect key="frame" x="51" y="190" width="507" height="18"/>
+                                            <rect key="frame" x="51" y="216" width="507" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Mark PRs as un-mergeable only in my own or participated sections" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="yfb-m7-og2">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -498,7 +498,7 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="y7T-zw-tAa">
-                                            <rect key="frame" x="51" y="149" width="405" height="18"/>
+                                            <rect key="frame" x="51" y="180" width="405" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Count only currently displayed PRs in the menubar" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="pnZ-CL-lVd">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -509,7 +509,7 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="KdG-4v-vf7">
-                                            <rect key="frame" x="51" y="308" width="246" height="18"/>
+                                            <rect key="frame" x="51" y="322" width="246" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Hide user avatars" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="eW5-mR-deV">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -520,7 +520,7 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="4E0-iw-eoN">
-                                            <rect key="frame" x="51" y="283" width="246" height="18"/>
+                                            <rect key="frame" x="51" y="299" width="246" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Hide the &quot;All PRs&quot; section" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="JA8-t0-2Rt">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -531,9 +531,9 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="cyW-kN-E51">
-                                            <rect key="frame" x="51" y="82" width="405" height="18"/>
+                                            <rect key="frame" x="51" y="121" width="405" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Include repository names when filtering" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="iJ5-8d-ZYv">
+                                            <buttonCell key="cell" type="check" title="Check repository names when filtering" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="iJ5-8d-ZYv">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -542,7 +542,7 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="NO0-4G-QWM">
-                                            <rect key="frame" x="51" y="108" width="405" height="18"/>
+                                            <rect key="frame" x="51" y="144" width="405" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Display repository names in PR list" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Xz9-oA-gKh">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -553,7 +553,7 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="oFz-4f-O57">
-                                            <rect key="frame" x="51" y="40" width="405" height="18"/>
+                                            <rect key="frame" x="51" y="41" width="405" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Use vibrancy" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="O1m-Zd-WBS">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -564,14 +564,36 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="QnS-B8-gM0">
-                                            <rect key="frame" x="68" y="22" width="311" height="17"/>
+                                            <rect key="frame" x="68" y="23" width="311" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="(recommended only for Retina, requires Yosemite)" id="BTV-aU-Bud">
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="(best on Retina, requires Yosemite)" id="BTV-aU-Bud">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
+                                        <button id="RHn-2t-RE9">
+                                            <rect key="frame" x="51" y="75" width="405" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Check labels when filtering" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="JHp-kD-eTB">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="includeLabelsInFilteringSelected:" target="494" id="0id-g0-6DS"/>
+                                            </connections>
+                                        </button>
+                                        <button id="L8W-1o-Hm9">
+                                            <rect key="frame" x="51" y="98" width="405" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Check status items when filtering" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="huL-dT-gm6">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="includeStatusesInFilteringSelected:" target="494" id="rtG-TO-iNb"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                 </view>
                             </tabViewItem>
@@ -1192,9 +1214,9 @@ Enter to select and ⌘, for preferences.
             <connections>
                 <outlet property="delegate" destination="494" id="wwK-Xp-Xzn"/>
             </connections>
-            <point key="canvasLocation" x="626" y="488"/>
+            <point key="canvasLocation" x="327" y="121"/>
         </window>
-        <customObject id="494" customClass="AppDelegate">
+        <customObject id="494" customClass="OSX_AppDelegate" customModule="Trailer">
             <connections>
                 <outlet property="aboutVersion" destination="S57-NF-ZQw" id="Rsc-c3-NPJ"/>
                 <outlet property="activityDisplay" destination="Lax-cU-vqe" id="jxh-1P-ph0"/>
@@ -1229,14 +1251,15 @@ Enter to select and ⌘, for preferences.
                 <outlet property="hotkeyLetter" destination="pbg-9Q-ZfJ" id="Ged-cj-g77"/>
                 <outlet property="hotkeyOptionModifier" destination="AEc-A8-j0N" id="x87-Qj-1cP"/>
                 <outlet property="hotkeyShiftModifier" destination="ha7-N5-qJl" id="OLt-Ca-P0D"/>
+                <outlet property="includeLabelsInFiltering" destination="RHn-2t-RE9" id="BVq-QK-7El"/>
                 <outlet property="includeRepositoriesInFiltering" destination="cyW-kN-E51" id="aSH-jQ-z0u"/>
+                <outlet property="includeStatusesInFiltering" destination="L8W-1o-Hm9" id="xyl-ht-abg"/>
                 <outlet property="labelRefreshCounter" destination="d21-jw-T4f" id="kdK-DV-zuS"/>
                 <outlet property="labelRefreshNote" destination="D5z-BQ-8db" id="Ui3-KC-zhW"/>
                 <outlet property="labelRescanLabel" destination="PFs-0N-Roc" id="qu3-V4-Jge"/>
                 <outlet property="launchAtStartup" destination="qqE-Ib-sQ9" id="brX-S8-Ge0"/>
                 <outlet property="logActivityToConsole" destination="bpi-er-6rE" id="akm-SR-jfL"/>
                 <outlet property="mainMenu" destination="b2W-dJ-ldg" id="8t8-8X-oYH"/>
-                <outlet property="mainMenuFilter" destination="gaD-Aj-14T" id="1vn-8Q-OCo"/>
                 <outlet property="makeStatusItemsSelectable" destination="yD7-Y4-ZaZ" id="rgg-se-o4u"/>
                 <outlet property="markUnmergeableOnUserSectionsOnly" destination="SoW-AJ-5kD" id="UTu-Bf-nOY"/>
                 <outlet property="moveAssignedPrsToMySection" destination="ZD1-Lw-zpW" id="btl-cm-k5r"/>
@@ -1283,7 +1306,7 @@ Enter to select and ⌘, for preferences.
                 </menuItem>
             </items>
         </menu>
-        <window title="Trailer Menu" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="none" id="b2W-dJ-ldg" customClass="MenuWindow">
+        <window title="Trailer Menu" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="none" id="b2W-dJ-ldg" customClass="MenuWindow" customModule="Trailer">
             <windowCollectionBehavior key="collectionBehavior" transient="YES" ignoresCycle="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="0.0" y="0.0" width="376" height="710"/>
@@ -1292,30 +1315,43 @@ Enter to select and ⌘, for preferences.
                 <rect key="frame" x="0.0" y="0.0" width="376" height="710"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <scrollView focusRingType="none" borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="1jc-DF-1GW" customClass="MenuScrollView">
-                        <rect key="frame" x="0.0" y="0.0" width="376" height="710"/>
+                    <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" horizontalScrollElasticity="none" id="Pt5-SE-vDM">
+                        <rect key="frame" x="0.0" y="-1" width="376" height="671"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="e4g-XR-7jB">
-                            <rect key="frame" x="0.0" y="0.0" width="376" height="682"/>
+                        <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="vnN-hG-F71">
+                            <rect key="frame" x="1" y="0.0" width="238" height="134"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <view id="lMY-YH-Amm">
-                                    <rect key="frame" x="0.0" y="0.0" width="376" height="794"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                </view>
+                                <tableView appearanceType="vibrantLight" verticalHuggingPriority="750" allowsExpansionToolTips="YES" selectionHighlightStyle="sourceList" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowSizeStyle="automatic" viewBased="YES" floatsGroupRows="NO" id="IHt-gy-nte" customClass="PrTable" customModule="Trailer" customModuleProvider="target">
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <size key="intercellSpacing" width="3" height="2"/>
+                                    <color key="backgroundColor" name="_sourceListBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
+                                    <tableColumns>
+                                        <tableColumn editable="NO" width="373" minWidth="40" maxWidth="1000" id="BdR-ZU-1PY">
+                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                            </tableHeaderCell>
+                                            <customCell key="dataCell" alignment="left" id="Rs8-au-ZH4"/>
+                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
+                                        </tableColumn>
+                                    </tableColumns>
+                                </tableView>
                             </subviews>
-                            <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            <nil key="backgroundColor"/>
                         </clipView>
-                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="jNH-CK-1Qp">
-                            <rect key="frame" x="-100" y="-100" width="376" height="16"/>
+                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="aJ2-5W-rhM">
+                            <rect key="frame" x="1" y="116.55263048410416" width="235" height="16"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
-                        <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="vQq-6N-Tac">
-                            <rect key="frame" x="361" y="0.0" width="15" height="682"/>
+                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="t6F-8G-XKK">
+                            <rect key="frame" x="224" y="17" width="15" height="102"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
-                    <customView id="8KA-D9-rJV" customClass="NSViewAllowsVibrancy">
+                    <customView id="8KA-D9-rJV" customClass="ViewAllowsVibrancy" customModule="Trailer" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="678" width="376" height="32"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <subviews>
@@ -1334,7 +1370,7 @@ Enter to select and ⌘, for preferences.
                             <popUpButton horizontalHuggingPriority="750" verticalHuggingPriority="750" id="pTb-UR-Euf">
                                 <rect key="frame" x="7" y="3" width="22" height="26"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <popUpButtonCell key="cell" type="disclosure" bezelStyle="roundedDisclosure" imagePosition="only" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" id="j86-0c-T7i">
+                                <popUpButtonCell key="cell" type="disclosure" title=" Mark All As Read" bezelStyle="roundedDisclosure" imagePosition="only" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="HVf-zs-7iK" id="j86-0c-T7i">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
                                     <menu key="menu" title="Options" showsStateColumn="NO" id="TJQ-rB-fHm">
@@ -1344,7 +1380,7 @@ Enter to select and ⌘, for preferences.
                                                     <action selector="refreshNowSelected:" target="494" id="AiB-dg-t4e"/>
                                                 </connections>
                                             </menuItem>
-                                            <menuItem title=" Mark All As Read" keyEquivalent="a" id="HVf-zs-7iK">
+                                            <menuItem title=" Mark All As Read" state="on" keyEquivalent="a" id="HVf-zs-7iK">
                                                 <modifierMask key="keyEquivalentModifierMask" control="YES" option="YES" command="YES"/>
                                                 <connections>
                                                     <action selector="markAllReadSelected:" target="494" id="vWk-YR-lXO"/>
@@ -1379,10 +1415,12 @@ Enter to select and ⌘, for preferences.
             </view>
             <connections>
                 <outlet property="delegate" destination="494" id="jEY-vW-iEx"/>
+                <outlet property="filter" destination="gaD-Aj-14T" id="Qbr-Ga-h5T"/>
                 <outlet property="header" destination="8KA-D9-rJV" id="Xeo-0o-2k5"/>
-                <outlet property="scrollView" destination="1jc-DF-1GW" id="3OM-0g-ri5"/>
+                <outlet property="prTable" destination="IHt-gy-nte" id="nMh-ug-azv"/>
+                <outlet property="scrollView" destination="Pt5-SE-vDM" id="ccZ-Jx-ngK"/>
             </connections>
-            <point key="canvasLocation" x="589" y="103"/>
+            <point key="canvasLocation" x="639" y="-28"/>
         </window>
         <window allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="jQi-BK-oDc" userLabel="About">
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
@@ -1429,10 +1467,10 @@ Enter to select and ⌘, for preferences.
                                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="htLogo" id="KpQ-AW-sNf"/>
                                 </imageView>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="5vr-fx-ivU">
-                                    <rect key="frame" x="14" y="255" width="86" height="17"/>
+                                    <rect key="frame" x="12" y="254" width="86" height="17"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Team Octopus" id="7Mc-yk-hkr">
-                                        <font key="font" metaFont="miniSystemBold"/>
+                                        <font key="font" metaFont="miniSystem"/>
                                         <color key="textColor" name="controlShadowColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
@@ -1442,7 +1480,7 @@ Enter to select and ⌘, for preferences.
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="justified" id="QyU-WN-WeW">
                                         <font key="font" metaFont="system" size="8"/>
-                                        <string key="title">Copyright (c) 2014 Paul Tsochantaris
+                                        <mutableString key="title">Copyright (c) 2014-2015 Paul Tsochantaris
 Parts copyright (c) 2012-2014 HouseTrip Ltd.
 
 Released under the terms of the MIT licence:
@@ -1451,7 +1489,7 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</string>
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</mutableString>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
@@ -1485,6 +1523,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
                     </button>
                 </subviews>
             </view>
+            <point key="canvasLocation" x="114" y="479.5"/>
         </window>
     </objects>
     <resources>

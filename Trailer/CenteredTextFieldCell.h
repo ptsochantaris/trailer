@@ -1,4 +1,0 @@
-
-@interface CenteredTextFieldCell : NSTextFieldCell
-
-@end
