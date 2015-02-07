@@ -144,7 +144,7 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 
 	private func prepareForRefresh() {
 		refreshTimer?.invalidate()
-		refreshTimer = nil;
+		refreshTimer = nil
 
 		isRefreshing = true
 
@@ -189,10 +189,10 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 					bc(UIBackgroundFetchResult.NewData)
 				} else if success {
 					DLog("Background fetch: No new data")
-					bc(UIBackgroundFetchResult.NoData);
+					bc(UIBackgroundFetchResult.NoData)
 				} else {
 					DLog("Background fetch: FAILED")
-					bc(UIBackgroundFetchResult.Failed);
+					bc(UIBackgroundFetchResult.Failed)
 				}
 				self!.backgroundCallback = nil
 			}

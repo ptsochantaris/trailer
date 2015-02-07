@@ -45,7 +45,7 @@ class DataItem: NSManagedObject {
 		let updatedDate = syncDateFormatter.dateFromString(info.ofk("updated_at") as String)
 		var existingItem = itemOfType(type, serverId: serverId, fromServer: fromServer)
 		if existingItem == nil {
-			DLog("Creating %@: %@",type,serverId);
+			DLog("Creating %@: %@",type,serverId)
 			existingItem = NSEntityDescription.insertNewObjectForEntityForName(type, inManagedObjectContext: fromServer.managedObjectContext!) as? DataItem
 			existingItem!.serverId = serverId
 			existingItem!.createdAt = syncDateFormatter.dateFromString(info.ofk("created_at") as String)
@@ -93,7 +93,7 @@ class DataItem: NSManagedObject {
 		let f = NSFetchRequest(entityName: type)
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "postSyncAction = %d", PostSyncAction.NoteNew.rawValue)
-		return inMoc.executeFetchRequest(f, error: nil) as [DataItem];
+		return inMoc.executeFetchRequest(f, error: nil) as [DataItem]
 	}
 
 	class func nukeDeletedItemsInMoc(moc: NSManagedObjectContext) {
@@ -103,13 +103,13 @@ class DataItem: NSManagedObject {
 			let discarded = itemsOfType(type, surviving: false, inMoc: moc)
 			if discarded.count > 0 {
 				count += discarded.count
-				DLog("Nuking %d %@ items marked for deletion", discarded.count, type);
+				DLog("Nuking %d %@ items marked for deletion", discarded.count, type)
 				for i in discarded {
 					moc.deleteObject(i)
 				}
 			}
 		}
-		DLog("Nuked total %d items marked for deletion", count);
+		DLog("Nuked total %d items marked for deletion", count)
 	}
 
 	class func countItemsOfType(type: String, moc: NSManagedObjectContext) -> Int {

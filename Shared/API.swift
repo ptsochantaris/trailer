@@ -160,13 +160,7 @@ class API {
 		success:((response: NSHTTPURLResponse?, data: NSData?)->Void)?,
 		failure:((response: NSHTTPURLResponse?, error: NSError?)->Void)?) {
 
-			#if os(iOS)
-				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
-					self.networkIndicationStart()
-				}
-			#endif
-
-			let task = urlSession.dataTaskWithURL(url) { [weak self] (data, res, e)  in
+            let task = urlSession.dataTaskWithURL(url) { [weak self] (data, res, e)  in
 
 				let response = res as? NSHTTPURLResponse
 				var error = e
@@ -174,10 +168,10 @@ class API {
 					error = NSError(domain: "Error response received", code: response!.statusCode, userInfo: nil)
 				}
 				if error != nil {
-					//DLog("IMAGE %@ - FAILED: %@", url.absoluteString, error)
+                    //DLog("IMAGE %@ - FAILED: %@", url.absoluteString, error)
 					failure?(response: response, error: error)
 				} else {
-					//DLog("IMAGE %@ - RESULT: %d", url.absoluteString, response.statusCode)
+					//DLog("IMAGE %@ - RESULT: %d", url.absoluteString, response?.statusCode)
 					if data != nil && data!.length > 0 {
 						success?(response: response, data: data!)
 					} else {
@@ -189,8 +183,14 @@ class API {
 				#endif
 			}
 
-			task.priority = NSURLSessionTaskPriorityHigh
-			task.resume()
+            #if os(iOS)
+                task.priority = NSURLSessionTaskPriorityHigh
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
+                self.networkIndicationStart()
+                }
+            #endif
+
+            task.resume()
 	}
 
 	func haveCachedAvatar(path: String, tryLoadAndCallback: ((IMAGE_CLASS?)->Void)?) -> Bool
@@ -741,7 +741,7 @@ class API {
 			}
 		}
 
-		let total = prs.count;
+		let total = prs.count
 		if total==0 {
 			callback?()
 			return

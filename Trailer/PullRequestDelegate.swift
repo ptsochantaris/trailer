@@ -57,7 +57,7 @@ class PullRequestDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource 
 		if object.isKindOfClass(NSManagedObjectID) {
 			return mainObjectContext.existingObjectWithID(object as NSManagedObjectID, error: nil) as? PullRequest
 		} else {
-			return nil;
+			return nil
 		}
 	}
 }

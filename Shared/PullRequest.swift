@@ -82,7 +82,7 @@ class PullRequest: DataItem {
 			p.reopened = false
 		}
 		p.condition = PullRequestCondition.Open.rawValue
-		return p;
+		return p
 	}
 
 	override func prepareForDeletion() {
@@ -182,7 +182,7 @@ class PullRequest: DataItem {
 				}
 			}
 		}
-		return badgeCount;
+		return badgeCount
 	}
 
 	func catchUpWithComments() {
@@ -267,12 +267,12 @@ class PullRequest: DataItem {
 
 					let lp = NSMutableParagraphStyle()
 					#if os(iOS)
-						lp.lineHeightMultiple = 1.15;
+						lp.lineHeightMultiple = 1.15
 						let labelAttributes = [NSFontAttributeName: labelFont,
 						NSBaselineOffsetAttributeName: 2.0,
 						NSParagraphStyleAttributeName: lp]
 						#elseif os(OSX)
-						lp.minimumLineHeight = labelFont.pointSize+6.0;
+						lp.minimumLineHeight = labelFont.pointSize+6.0
 						let labelAttributes = [NSFontAttributeName: labelFont,
 							NSBaselineOffsetAttributeName: 1.0,
 							NSParagraphStyleAttributeName: lp]
@@ -286,8 +286,8 @@ class PullRequest: DataItem {
 					for l in allLabels {
 						var a = labelAttributes
 						let color = l.colorForDisplay()
-						a[NSBackgroundColorAttributeName] = color;
-						a[NSForegroundColorAttributeName] = isDarkColor(color) ? COLOR_CLASS.whiteColor() : COLOR_CLASS.blackColor();
+						a[NSBackgroundColorAttributeName] = color
+						a[NSForegroundColorAttributeName] = isDarkColor(color) ? COLOR_CLASS.whiteColor() : COLOR_CLASS.blackColor()
 						let name = l.name!.stringByReplacingOccurrencesOfString(" ", withString: "\u{a0}")
 						_title.appendAttributedString(NSAttributedString(string: "\u{a0}", attributes: a))
 						_title.appendAttributedString(NSAttributedString(string: name, attributes: a))
@@ -303,10 +303,10 @@ class PullRequest: DataItem {
 	}
 
 	func isDarkColor(color: COLOR_CLASS) -> Bool {
-		var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0;
+		var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0
 		color.getRed(&r, green: &g, blue: &b, alpha: nil)
-		let lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-		return (lum < 0.5);
+		let lum = 0.2126 * r + 0.7152 * g + 0.0722 * b
+		return (lum < 0.5)
 	}
 
 	func subtitleWithFont(font: FONT_CLASS, lightColor: COLOR_CLASS, darkColor: COLOR_CLASS) -> NSMutableAttributedString {
@@ -326,9 +326,9 @@ class PullRequest: DataItem {
 
 		if Settings.showReposInName {
 			if let n = repo.fullName {
-				var darkSubtitle = lightSubtitle;
+				var darkSubtitle = lightSubtitle
 				darkSubtitle[NSForegroundColorAttributeName] = darkColor
-				_subtitle.appendAttributedString(NSAttributedString(string:n, attributes:darkSubtitle));
+				_subtitle.appendAttributedString(NSAttributedString(string:n, attributes:darkSubtitle))
 				_subtitle.appendAttributedString(separator)
 			}
 		}
@@ -349,7 +349,7 @@ class PullRequest: DataItem {
 			if !m {
 				_subtitle.appendAttributedString(separator)
 				var redSubtitle = lightSubtitle
-				redSubtitle[NSForegroundColorAttributeName] = COLOR_CLASS.redColor();
+				redSubtitle[NSForegroundColorAttributeName] = COLOR_CLASS.redColor()
 				_subtitle.appendAttributedString(NSAttributedString(string: "Cannot be merged!", attributes:redSubtitle))
 			}
 		}
@@ -410,7 +410,7 @@ class PullRequest: DataItem {
 				for t in terms {
 					subPredicates.append(NSPredicate(format: "descriptionText contains[cd] %@", t)!)
 				}
-				let orPredicate = NSCompoundPredicate.orPredicateWithSubpredicates(subPredicates);
+				let orPredicate = NSCompoundPredicate.orPredicateWithSubpredicates(subPredicates)
 				let selfPredicate = NSPredicate(format: "pullRequest == %@", self)!
 
 				if mode==StatusFilter.Include.rawValue {
@@ -466,7 +466,7 @@ class PullRequest: DataItem {
 	}
 
 	func labelsLink() -> String? {
-		return issueUrl?.stringByAppendingPathComponent("labels");
+		return issueUrl?.stringByAppendingPathComponent("labels")
 	}
 
 	func sectionName() -> String {
@@ -487,10 +487,10 @@ class PullRequest: DataItem {
 		let f = NSFetchRequest(entityName: "PRComment")
 		f.returnsObjectsAsFaults = false
 
-		let latestDate = latestReadCommentDate;
+		let latestDate = latestReadCommentDate
 		if (section == PullRequestSection.All.rawValue || section == PullRequestSection.None.rawValue) && Settings.autoParticipateInMentions {
 			if refersToMe() {
-				section = PullRequestSection.Participated.rawValue;
+				section = PullRequestSection.Participated.rawValue
 				f.predicate = predicateForOthersCommentsSinceDate(latestDate)
 				unreadComments = managedObjectContext?.countForFetchRequest(f, error: nil)
 			} else {

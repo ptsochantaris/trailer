@@ -74,7 +74,7 @@ class PRCell: UITableViewCell {
 
 		loadImageAtPath(pullRequest.userAvatarUrl)
 
-		accessibilityLabel = "\(pullRequest.accessibleTitle()), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(pullRequest.accessibleSubtitle())";
+		accessibilityLabel = "\(pullRequest.accessibleTitle()), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(pullRequest.accessibleSubtitle())"
 
 		setNeedsLayout()
 	}

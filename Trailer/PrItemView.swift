@@ -19,7 +19,7 @@ class PrItemView: NSTableCellView {
 		super.init(frame: NSZeroRect)
 		canDrawSubviewsIntoLayer = true
 
-		var _commentsNew = 0;
+		var _commentsNew = 0
 		let _commentsTotal = pullRequest.totalComments?.integerValue ?? 0
 		let sectionIndex = pullRequest.sectionIndex?.integerValue ?? 0
 		if(sectionIndex==PullRequestSection.Mine.rawValue || sectionIndex==PullRequestSection.Participated.rawValue || Settings.showCommentsEverywhere) {
@@ -48,7 +48,7 @@ class PrItemView: NSTableCellView {
 		var statusBottom = CGFloat(0)
 
 		let paragraphStyle = NSMutableParagraphStyle()
-		paragraphStyle.headIndent = 92.0;
+		paragraphStyle.headIndent = 92.0
 
 		var statusAttributes = [NSObject:AnyObject]()
 		statusAttributes[NSFontAttributeName] = NSFont(name: "Monaco", size: 9)

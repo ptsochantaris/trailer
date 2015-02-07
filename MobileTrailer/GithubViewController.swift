@@ -13,7 +13,7 @@ class GithubViewController: UIViewController, WKNavigationDelegate {
 		_webView = WKWebView(frame: view.bounds, configuration: webConfiguration)
 		_webView!.navigationDelegate = self
 		_webView!.scrollView.contentInset = UIEdgeInsetsMake(64, 0, 0, 0)
-		_webView!.autoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight;
+		_webView!.autoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight
 		_webView!.setTranslatesAutoresizingMaskIntoConstraints(true)
 		view.addSubview(_webView!)
 		_webView!.loadRequest(NSURLRequest(URL: NSURL(string: pathToLoad!)!))

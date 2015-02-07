@@ -99,7 +99,7 @@ class ApiServer: NSManagedObject {
 	}
 
 	func rollBackAllUpdatesInMoc(moc: NSManagedObjectContext) {
-		DLog("Rolling back changes for failed sync on API server '%@'",label);
+		DLog("Rolling back changes for failed sync on API server '%@'",label)
 		for set in [repos, pullRequests, comments, statuses, labels] {
 			for dataItem: DataItem in set.allObjects as [DataItem] {
 				if let action = dataItem.postSyncAction?.integerValue {
@@ -110,7 +110,7 @@ class ApiServer: NSManagedObject {
 						moc.deleteObject(dataItem)
 					case PostSyncAction.NoteUpdated.rawValue:
 						moc.refreshObject(dataItem, mergeChanges: false)
-					default: break;
+					default: break
 					}
 				}
 			}

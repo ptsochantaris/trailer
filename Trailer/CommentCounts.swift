@@ -13,7 +13,7 @@ class CommentCounts: NSView {
 			let redFill = MAKECOLOR(1.0, 0.4, 0.4, 1.0)
 
 			let numberFormatter = NSNumberFormatter()
-			numberFormatter.numberStyle = NSNumberFormatterStyle.DecimalStyle;
+			numberFormatter.numberStyle = NSNumberFormatterStyle.DecimalStyle
 
 			canDrawSubviewsIntoLayer = true
 
@@ -33,7 +33,7 @@ class CommentCounts: NSView {
 			let countBackground = NSView(frame: NSIntegralRect(NSMakeRect(left, bottom, width, height)))
 			countBackground.wantsLayer = true
 			countBackground.layer!.cornerRadius = 4.0
-			let color = MAKECOLOR(0.94, 0.94, 0.94, 1.0).CGColor;
+			let color = MAKECOLOR(0.94, 0.94, 0.94, 1.0).CGColor
 			if MenuWindow.usingVibrancy() && statusView.darkMode {
 				countBackground.layer!.backgroundColor = NSColor.clearColor().CGColor
 				countBackground.layer!.borderColor = color

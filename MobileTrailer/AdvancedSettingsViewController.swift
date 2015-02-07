@@ -308,7 +308,7 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 				performSegueWithIdentifier("showPicker", sender: self)
 			case 1:
 				selectedIndexPath = indexPath;
-				previousValue = Settings.closeHandlingPolicy;
+				previousValue = Settings.closeHandlingPolicy
 				pickerName = tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text ?? "Unknown Picker"
 				valuesToPush = HandlingPolicy.allTitles
 				performSegueWithIdentifier("showPicker", sender: self)

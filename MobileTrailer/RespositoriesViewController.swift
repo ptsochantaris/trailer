@@ -165,7 +165,7 @@ class RespositoriesViewController: UITableViewController, UITextFieldDelegate, N
 			abort()
 		}
 
-		return fc;
+		return fc
 	}
 
 	func controllerWillChangeContent(controller: NSFetchedResultsController) {

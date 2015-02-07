@@ -26,7 +26,7 @@ class PRLabel: DataItem {
 		let name = info.ofk("name") as? String ?? "(unnamed label)"
 		var l = PRLabel.labelWithName(name, forPullRequest: forPullRequest)
 		if(l==nil) {
-			DLog("Creating PRLabel: %@", name);
+			DLog("Creating PRLabel: %@", name)
 			l = NSEntityDescription.insertNewObjectForEntityForName("PRLabel", inManagedObjectContext: forPullRequest.managedObjectContext!) as? PRLabel
 			l!.name = name
 			l!.serverId = 0
@@ -35,7 +35,7 @@ class PRLabel: DataItem {
 			l!.pullRequest = forPullRequest
 			l!.apiServer = forPullRequest.apiServer
 		} else {
-			DLog("Updating PRLabel: %@", name);
+			DLog("Updating PRLabel: %@", name)
 		}
 		l!.url = info.ofk("url") as? String
 		if let c = info.ofk("color") as? String {

@@ -94,13 +94,13 @@ class DataManager : NSObject {
 						for blockedAuthor in Settings.commentAuthorBlacklist as [String] {
 							if authorName.compare(blockedAuthor, options: NSStringCompareOptions.CaseInsensitiveSearch|NSStringCompareOptions.DiacriticInsensitiveSearch)==NSComparisonResult.OrderedSame {
 								blocked = true
-								break;
+								break
 							}
 						}
 						if blocked {
-							DLog("Blocked notification for user '%@' as their name is on the blacklist",authorName);
+							DLog("Blocked notification for user '%@' as their name is on the blacklist",authorName)
 						} else {
-							DLog("user '%@' not on blacklist, can post notification",authorName);
+							DLog("user '%@' not on blacklist, can post notification",authorName)
 							app.postNotificationOfType(PRNotificationType.NewComment, forItem:c)
 						}
 					}
@@ -139,8 +139,8 @@ class DataManager : NSObject {
 					if name != "ApiServer" {
 						autoreleasepool {
 							let f = NSFetchRequest(entityName: name)
-							f.includesPropertyValues = false;
-							f.includesSubentities = false;
+							f.includesPropertyValues = false
+							f.includesSubentities = false
 							for o in tempMoc.executeFetchRequest(f, error:nil) as [NSManagedObject] {
 								tempMoc.deleteObject(o)
 							}
@@ -214,11 +214,11 @@ class DataManager : NSObject {
 		let p = NSMutableParagraphStyle()
 		p.lineBreakMode = NSLineBreakMode.ByWordWrapping
 		#if os(OSX)
-			p.alignment = NSTextAlignment.CenterTextAlignment;
+			p.alignment = NSTextAlignment.CenterTextAlignment
 			return NSAttributedString(string: message,
 				attributes: [NSForegroundColorAttributeName: messageColor, NSParagraphStyleAttributeName: p])
 			#elseif os(iOS)
-			p.alignment = NSTextAlignment.Center;
+			p.alignment = NSTextAlignment.Center
 			return NSAttributedString(string: message,
 			attributes: [	NSForegroundColorAttributeName: messageColor,
 			NSParagraphStyleAttributeName: p,
@@ -273,7 +273,7 @@ func buildMainContext() -> NSManagedObjectContext {
 
 	if let coordinator = persistentStoreCoordinator() {
 		let m = NSManagedObjectContext(concurrencyType:NSManagedObjectContextConcurrencyType.MainQueueConcurrencyType)
-		m.undoManager = nil;
+		m.undoManager = nil
 		m.persistentStoreCoordinator = coordinator
 		DLog("Database setup complete")
 		return m
@@ -319,7 +319,7 @@ func persistentStoreCoordinator() -> NSPersistentStoreCoordinator? {
 	let m = NSPersistentStoreCoordinator.metadataForPersistentStoreOfType(NSSQLiteStoreType, URL: sqlStorePath, error: &error)
 	_justMigrated = !mom.isConfiguration(nil, compatibleWithStoreMetadata: m)
 	if !addStorePath(sqlStorePath) {
-		DLog("Failed to migrate/load DB store - will nuke it and retry");
+		DLog("Failed to migrate/load DB store - will nuke it and retry")
 		removeDatabaseFiles()
 		if !addStorePath(sqlStorePath) {
 			DLog("Catastrophic failure, app is probably corrupted and needs reinstall")
@@ -364,7 +364,7 @@ func removeDatabaseFiles() {
 	if let files = fm.contentsOfDirectoryAtPath(documentsDirectory, error: nil) as? [String] {
 		for file in files {
 			if file.rangeOfString("Trailer.sqlite") != nil {
-				DLog("Removing old database file: %@",file);
+				DLog("Removing old database file: %@",file)
 				fm.removeItemAtPath(documentsDirectory.stringByAppendingPathComponent(file), error:nil)
 			}
 		}

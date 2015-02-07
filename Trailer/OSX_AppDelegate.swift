@@ -269,7 +269,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	}
 
 	@IBAction func showAllCommentsSelected(sender: NSButton) {
-		Settings.showCommentsEverywhere = (sender.integerValue==1);
+		Settings.showCommentsEverywhere = (sender.integerValue==1)
 		DataManager.postProcessAllPrs()
 		deferredUpdate()
 	}
@@ -1292,7 +1292,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		siv.tappedCallback = { [weak self] in
 			self!.statusItemTapped()
 			return
-		};
+		}
 		statusItem.view = siv
 
 		pullRequestDelegate.reloadData(mainMenu.filter.stringValue)

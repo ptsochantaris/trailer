@@ -28,6 +28,6 @@ class Application: NSApplication {
 				}
 			}
 		}
-		super.sendEvent(theEvent);
+		super.sendEvent(theEvent)
 	}
 }

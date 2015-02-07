@@ -165,7 +165,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
 		refreshControl?.addTarget(self, action: Selector("refreshControlChanged"), forControlEvents: UIControlEvents.ValueChanged)
 
-		searchField.delegate = self;
+		searchField.delegate = self
 
 		let searchHolder = UIView(frame: CGRectMake(0, 0, 320, 41))
 		searchHolder.addSubview(searchField)
@@ -460,7 +460,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
 		if let destination = segue.destinationViewController as? UITabBarController {
 			if allServersHaveTokens {
-				destination.selectedIndex = min(Settings.lastPreferencesTabSelected, (destination.viewControllers?.count ?? 1)-1);
+				destination.selectedIndex = min(Settings.lastPreferencesTabSelected, (destination.viewControllers?.count ?? 1)-1)
 				destination.delegate = self
 			}
 		}

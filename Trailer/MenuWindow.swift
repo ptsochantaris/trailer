@@ -1,4 +1,6 @@
 
+let newSystem = (floor(NSAppKitVersionNumber) > Double(NSAppKitVersionNumber10_9))
+
 class MenuWindow: NSWindow {
 
 	@IBOutlet var scrollView: NSScrollView!
@@ -6,17 +8,16 @@ class MenuWindow: NSWindow {
 	@IBOutlet var prTable: NSTableView!
 	@IBOutlet weak var filter: NSSearchField!
 
-	var headerVibrant: NSVisualEffectView?
+	private var headerVibrant: NSVisualEffectView?
 
 	override func awakeFromNib() {
 
 		super.awakeFromNib()
 
-		(contentView as NSView).wantsLayer = true
-
-		if scrollView.respondsToSelector(Selector("setAutomaticallyAdjustsContentInsets:")) {
-			scrollView.automaticallyAdjustsContentInsets = false
-		}
+        if newSystem {
+            (contentView as NSView).wantsLayer = true
+            scrollView.automaticallyAdjustsContentInsets = false
+        }
 
 		let n = NSNotificationCenter.defaultCenter()
 		n.addObserver(self, selector: Selector("updateVibrancy"), name: UPDATE_VIBRANCY_NOTIFICATION, object: nil)
@@ -24,19 +25,19 @@ class MenuWindow: NSWindow {
 	}
 
 	class func usingVibrancy() -> Bool {
-		return (NSAppKitVersionNumber>Double(NSAppKitVersionNumber10_9))
-			&& (Settings.useVibrancy == true)
-			&& (NSClassFromString("NSVisualEffectView") != nil)
+		return newSystem && Settings.useVibrancy
 	}
 
 	func updateVibrancy() {
 
-		headerVibrant?.removeFromSuperview()
-		headerVibrant = nil
+        if newSystem {
+            headerVibrant?.removeFromSuperview()
+            headerVibrant = nil
+        }
 
 		var bgColor: CGColorRef
 
-		if MenuWindow.usingVibrancy() { // we're on 10.10+ here
+		if MenuWindow.usingVibrancy() {
 			scrollView.frame = contentView.bounds
 			scrollView.contentInsets = NSEdgeInsetsMake(TOP_HEADER_HEIGHT, 0, 0, 0)
 
@@ -55,19 +56,18 @@ class MenuWindow: NSWindow {
 
 			bgColor = NSColor.controlBackgroundColor().CGColor
 
-			if(NSAppKitVersionNumber>Double(NSAppKitVersionNumber10_9)) {
+			if newSystem {
 				appearance = NSAppearance(named: NSAppearanceNameAqua)
-			}
-			prTable.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.Regular
-
-			if scrollView.respondsToSelector(Selector("setContentInsets:")) {
-				scrollView.contentInsets = NSEdgeInsetsMake(0, 0, 0, 0)
-			}
+                scrollView.contentInsets = NSEdgeInsetsMake(0, 0, 0, 0)
+                prTable.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.Regular
+            } else {
+                prTable.backgroundColor = NSColor.whiteColor()
+            }
 		}
 
-		header.layer!.backgroundColor = bgColor;
+		header.layer?.backgroundColor = bgColor
 
-		if scrollView.respondsToSelector(Selector("setScrollerInsets:")) {
+		if newSystem {
 			scrollView.scrollerInsets = NSEdgeInsetsMake(4.0, 0, 0.0, 0)
 		}
 	}

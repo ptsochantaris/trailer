@@ -49,7 +49,7 @@ class StartupLaunch: NSObject {
 				}
 			} else if !launch && isSet {
 				if let itemRef = itemReferences.existingReference {
-					LSSharedFileListItemRemove(loginItemsRef,itemRef);
+					LSSharedFileListItemRemove(loginItemsRef,itemRef)
 					DLog("Trailer was removed from login items")
 				}
 			}

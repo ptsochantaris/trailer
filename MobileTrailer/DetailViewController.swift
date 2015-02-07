@@ -81,7 +81,7 @@ class DetailViewController: UIViewController, WKNavigationDelegate {
 	func webView(webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
 		spinner.startAnimating()
 		statusLabel.hidden = true
-		statusLabel.text = "";
+		statusLabel.text = ""
 		_webView?.hidden = true
 		title = "Loading..."
 		navigationItem.rightBarButtonItem = nil
