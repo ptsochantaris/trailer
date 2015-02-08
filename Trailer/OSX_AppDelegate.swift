@@ -1393,10 +1393,6 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	/////////////////////// keyboard shortcuts
 
-	private func globalEvent(incomingEvent: NSEvent) {
-		checkForHotkey(incomingEvent)
-	}
-
 	private func addHotKeySupport() {
 		if(Settings.hotkeyEnable)
 		{
@@ -1405,7 +1401,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 				let options = [key: NSNumber(bool: (AXIsProcessTrusted() == 0))]
 				if AXIsProcessTrustedWithOptions(options) != 0 {
 					globalKeyMonitor = NSEvent.addGlobalMonitorForEventsMatchingMask(NSEventMask.KeyDownMask, handler: { [weak self] incomingEvent in
-						self!.globalEvent(incomingEvent)
+						self!.checkForHotkey(incomingEvent)
 						return
 					})
 				}
