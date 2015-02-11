@@ -1,12 +1,15 @@
 
 class CommentCounts: NSView {
 
-	init(frame: NSRect, unreadCount: Int, totalCount: Int) {
+    let countBackground: NSView?
+    let countView: CenterTextField?
+    let countColor: NSColor?
+
+    init(frame: NSRect, unreadCount: Int, totalCount: Int, goneDark: Bool) {
 
 		super.init(frame: frame)
 
 		if totalCount > 0 {
-
 			let pCenter = NSMutableParagraphStyle()
 			pCenter.alignment = NSTextAlignment.CenterTextAlignment
 
@@ -17,12 +20,11 @@ class CommentCounts: NSView {
 
 			canDrawSubviewsIntoLayer = true
 
-			let statusView = app.statusItem.view as StatusItemView
-			let darkMode = statusView.darkMode
+            countColor = goneDark ? NSColor.controlLightHighlightColor() : NSColor.controlTextColor()
 
 			let countString = NSAttributedString(string: numberFormatter.stringFromNumber(totalCount)!, attributes: [
 				NSFontAttributeName: NSFont.menuFontOfSize(11),
-				NSForegroundColorAttributeName: darkMode ? NSColor.controlLightHighlightColor() : NSColor.controlTextColor(),
+				NSForegroundColorAttributeName: countColor!,
 				NSParagraphStyleAttributeName: pCenter])
 
 			var width = max(BASE_BADGE_SIZE, countString.size.width+10)
@@ -30,22 +32,17 @@ class CommentCounts: NSView {
 			var bottom = (bounds.size.height-height)*0.5
 			var left = (bounds.size.width-width)*0.5
 
-			let countBackground = NSView(frame: NSIntegralRect(NSMakeRect(left, bottom, width, height)))
-			countBackground.wantsLayer = true
-			countBackground.layer!.cornerRadius = 4.0
-			let color = MAKECOLOR(0.94, 0.94, 0.94, 1.0).CGColor
-			if MenuWindow.usingVibrancy() && statusView.darkMode {
-				countBackground.layer!.backgroundColor = NSColor.clearColor().CGColor
-				countBackground.layer!.borderColor = color
-				countBackground.layer!.borderWidth = 0.5
-			} else {
-				countBackground.layer!.backgroundColor = color
-			}
-			addSubview(countBackground)
+			let c = NSView(frame: NSIntegralRect(NSMakeRect(left, bottom, width, height)))
+			c.wantsLayer = true
+			c.layer!.cornerRadius = 4.0
+			addSubview(c)
 
-			let countView = CenterTextField(frame: countBackground.bounds)
-			countView.attributedStringValue = countString
-			countBackground.addSubview(countView)
+            countView = CenterTextField(frame: c.bounds)
+			countView!.attributedStringValue = countString
+			c.addSubview(countView!)
+
+            countBackground = c
+            highlight(false)
 
 			if unreadCount > 0 {
 
@@ -69,6 +66,25 @@ class CommentCounts: NSView {
 			}
 		}
 	}
+
+    func highlight(on: Bool) -> Void {
+        if let c = countBackground {
+            var color: NSColor
+            if MenuWindow.usingVibrancy() && (app.statusItem.view as StatusItemView).darkMode {
+                color = on ? NSColor.blackColor() : MAKECOLOR(0.94, 0.94, 0.94, 1.0)
+                c.layer!.backgroundColor = NSColor.clearColor().CGColor
+                c.layer!.borderColor = color.CGColor
+                c.layer!.borderWidth = 0.5
+            } else {
+                color = self.countColor!
+                c.layer!.backgroundColor = MAKECOLOR(0.94, 0.94, 0.94, 1.0).CGColor
+            }
+            if let a = countView?.attributedStringValue.mutableCopy() as? NSMutableAttributedString {
+                a.addAttribute(NSForegroundColorAttributeName, value: color, range: NSMakeRange(0, a.length))
+                countView?.attributedStringValue = a
+            }
+        }
+    }
 
 	func allowsVibrancy() -> Bool {
 		return true

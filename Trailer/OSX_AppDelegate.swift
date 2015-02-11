@@ -1495,7 +1495,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		}
 		return pr?.webUrl
 	}
-
+    
 	private func checkForHotkey(incomingEvent: NSEvent) -> Bool {
 		var check = 0
 

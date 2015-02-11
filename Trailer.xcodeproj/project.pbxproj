@@ -473,7 +473,7 @@
 						};
 					};
 					168BC6A917EC2DF000BC4584 = {
-						DevelopmentTeam = 47UMK8NJEK;
+						DevelopmentTeam = X727JSJUGJ;
 					};
 				};
 			};

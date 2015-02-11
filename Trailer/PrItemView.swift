@@ -6,6 +6,7 @@ class PrItemView: NSTableCellView {
 	var title: CenterTextField!
 	var unselectedTitleColor: NSColor
 	var detailFont: NSFont, titleFont: NSFont
+    let commentCounts: CommentCounts!
 
 	init(pullRequest: PullRequest) {
 		pullRequestId = pullRequest.objectID
@@ -136,7 +137,7 @@ class PrItemView: NSTableCellView {
 			}
 		}
 
-		let commentCounts = CommentCounts(frame: NSMakeRect(0, 0, LEFTPADDING, bounds.size.height), unreadCount:_commentsNew, totalCount:_commentsTotal)
+        commentCounts = CommentCounts(frame: NSMakeRect(0, 0, LEFTPADDING, bounds.size.height), unreadCount: _commentsNew, totalCount: _commentsTotal, goneDark: goneDark)
 		addSubview(commentCounts)
 
 		menu = NSMenu(title: "PR Options")
@@ -170,6 +171,7 @@ class PrItemView: NSTableCellView {
 				app.mainMenu.prTable.deselectRow(app.mainMenu.prTable.rowForView(self))
 			}
 			title.attributedStringValue = associatedPullRequest().titleWithFont(titleFont, labelFont: detailFont, titleColor: finalColor)
+            commentCounts.highlight(selected)
 		}
 	}
 
