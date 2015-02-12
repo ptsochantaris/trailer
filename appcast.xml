@@ -8,6 +8,7 @@
 
         <item>
             <title>Version 1.2.0</title>
+            <sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
             <description><![CDATA[<font face="sans-serif" size="3"><ul>
                 <li>A major re-write in Swift, with a cleaned up codebase, meaning more performance, maintainability and stability. A big callout to @cheba and @mauricerkelly for their testing and feedback during this big undertaking!</li>
                 <li>Using native table views on OS X for big memory and performance wins</li>
