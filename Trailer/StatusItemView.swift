@@ -3,7 +3,7 @@ class StatusItemView: NSView {
 
 	let statusLabel: String
 	let textAttributes: Dictionary<String, AnyObject>
-	var tappedCallback: (() -> Void)?
+    var tappedCallback: (() -> Void)?
 
 	init(frame: NSRect, label: String, attributes: Dictionary<String, AnyObject>) {
 		statusLabel = label

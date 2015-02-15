@@ -3,9 +3,9 @@ let newSystem = (floor(NSAppKitVersionNumber) > Double(NSAppKitVersionNumber10_9
 
 class MenuWindow: NSWindow {
 
-	@IBOutlet var scrollView: NSScrollView!
-	@IBOutlet var header: ViewAllowsVibrancy!
-	@IBOutlet var prTable: NSTableView!
+	@IBOutlet weak var scrollView: NSScrollView!
+	@IBOutlet weak var header: ViewAllowsVibrancy!
+	@IBOutlet weak var prTable: NSTableView!
 	@IBOutlet weak var filter: NSSearchField!
 
 	private var headerVibrant: NSVisualEffectView?

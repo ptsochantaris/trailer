@@ -3,8 +3,8 @@ import CoreData
 
 class DetailViewController: UIViewController, WKNavigationDelegate {
 
-	@IBOutlet var spinner: UIActivityIndicatorView!
-	@IBOutlet var statusLabel: UILabel!
+	@IBOutlet weak var spinner: UIActivityIndicatorView!
+	@IBOutlet weak var statusLabel: UILabel!
 
 	private var _webView: WKWebView?
 

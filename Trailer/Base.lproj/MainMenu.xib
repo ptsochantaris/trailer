@@ -594,6 +594,17 @@ user you can add more servers from the left.</string>
                                                 <action selector="includeStatusesInFilteringSelected:" target="494" id="rtG-TO-iNb"/>
                                             </connections>
                                         </button>
+                                        <button id="3Lq-pH-9d8">
+                                            <rect key="frame" x="428" y="88" width="293" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Gray-out PR count to indicate refreshing" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="Ww0-O4-g3a">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="grayOutWhenRefreshingSelected:" target="494" id="Ard-VC-Rd7"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                 </view>
                             </tabViewItem>
@@ -1238,6 +1249,7 @@ Enter to select and ⌘, for preferences.
                 <outlet property="dontConfirmRemoveAllClosed" destination="a8N-EM-mQf" id="coj-EZ-aEM"/>
                 <outlet property="dontConfirmRemoveAllMerged" destination="fU7-ye-zZ9" id="bYB-om-tew"/>
                 <outlet property="dontKeepPrsMergedByMe" destination="sNq-fA-PLU" id="Si3-5T-6vs"/>
+                <outlet property="grayOutWhenRefreshing" destination="3Lq-pH-9d8" id="xpZ-zs-JHa"/>
                 <outlet property="groupByRepo" destination="gkF-k1-8Ig" id="zua-wi-PGi"/>
                 <outlet property="hideAllPrsSection" destination="4E0-iw-eoN" id="d3m-yT-lxi"/>
                 <outlet property="hideAvatars" destination="KdG-4v-vf7" id="Ncu-kQ-2Gi"/>
@@ -1480,7 +1492,7 @@ Enter to select and ⌘, for preferences.
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="justified" id="QyU-WN-WeW">
                                         <font key="font" metaFont="system" size="8"/>
-                                        <mutableString key="title">Copyright (c) 2014-2015 Paul Tsochantaris
+                                        <string key="title">Copyright (c) 2014-2015 Paul Tsochantaris
 Parts copyright (c) 2012-2014 HouseTrip Ltd.
 
 Released under the terms of the MIT licence:
@@ -1489,7 +1501,7 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</mutableString>
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</string>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>

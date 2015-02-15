@@ -13,9 +13,9 @@ class PRCell: UITableViewCell {
 	private let readCount = UILabel(frame: CGRectZero)
 	private var failedToLoadImage: NSString?
 	private var waitingForImageInPath: NSString?
-	@IBOutlet var _image: UIImageView!
-	@IBOutlet var _title: UILabel!
-	@IBOutlet var _description: UILabel!
+	@IBOutlet weak var _image: UIImageView!
+	@IBOutlet weak var _title: UILabel!
+	@IBOutlet weak var _description: UILabel!
 
 	override func awakeFromNib() {
 		unreadCount.textColor = UIColor.whiteColor()

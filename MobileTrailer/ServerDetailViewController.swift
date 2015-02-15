@@ -4,14 +4,14 @@ import CoreData
 
 class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 
-	@IBOutlet var name: UITextField!
-	@IBOutlet var apiPath: UITextField!
-	@IBOutlet var webFrontEnd: UITextField!
-	@IBOutlet var authToken: UITextField!
-	@IBOutlet var reportErrors: UISwitch!
-	@IBOutlet var scrollView: UIScrollView!
-	@IBOutlet var authTokenLabel: UILabel!
-	@IBOutlet var testButton: UIButton!
+	@IBOutlet weak var name: UITextField!
+	@IBOutlet weak var apiPath: UITextField!
+	@IBOutlet weak var webFrontEnd: UITextField!
+	@IBOutlet weak var authToken: UITextField!
+	@IBOutlet weak var reportErrors: UISwitch!
+	@IBOutlet weak var scrollView: UIScrollView!
+	@IBOutlet weak var authTokenLabel: UILabel!
+	@IBOutlet weak var testButton: UIButton!
 
 	var serverId: NSManagedObjectID?
 

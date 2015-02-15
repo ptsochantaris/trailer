@@ -643,7 +643,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iOS Development: PAVLOS TSOHANTARIS (L384ZL7X6G)";
 				COMPRESS_PNG_FILES = NO;
 				INFOPLIST_FILE = "MobileTrailer/PocketTrailer-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -659,7 +659,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: PAVLOS TSOHANTARIS (X727JSJUGJ)";
 				COMPRESS_PNG_FILES = NO;
 				INFOPLIST_FILE = "MobileTrailer/PocketTrailer-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";

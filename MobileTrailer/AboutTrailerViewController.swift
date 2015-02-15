@@ -2,8 +2,8 @@
 import UIKit
 
 class AboutTrailerViewController: UIViewController {
-	@IBOutlet var versionNumber: UILabel!
-	@IBOutlet var licenseText: UITextView!
+	@IBOutlet weak var versionNumber: UILabel!
+	@IBOutlet weak var licenseText: UITextView!
 
 	override func viewDidLoad() {
 		super.viewDidLoad()

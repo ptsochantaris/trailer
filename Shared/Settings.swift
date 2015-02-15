@@ -270,4 +270,9 @@ class Settings: NSObject {
 		get { return get("HOTKEY_SHIFT_MODIFIER") as? Bool ?? true }
 		set { set("HOTKEY_SHIFT_MODIFIER", newValue) }
 	}
+
+    class var grayOutWhenRefreshing: Bool {
+		get { return get("GRAY_OUT_WHEN_REFRESHING") as? Bool ?? true }
+		set { set("GRAY_OUT_WHEN_REFRESHING", newValue) }
+    }
 }

@@ -9,7 +9,7 @@ class RespositoriesViewController: UITableViewController, UITextFieldDelegate, N
 	private var searchTimer: PopTimer?
 	private var _fetchedResultsController: NSFetchedResultsController?
 
-	@IBOutlet var actionsButton: UIBarButtonItem!
+	@IBOutlet weak var actionsButton: UIBarButtonItem!
 
 	@IBAction func done(sender: UIBarButtonItem) {
 		if app.preferencesDirty {

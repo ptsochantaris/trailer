@@ -4,90 +4,91 @@ var app: OSX_AppDelegate!
 class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUserNotificationCenterDelegate, NSTableViewDelegate, NSTableViewDataSource, NSTabViewDelegate {
 
 	// Preferences window
-	@IBOutlet var preferencesWindow: NSWindow!
-	@IBOutlet var refreshButton: NSButton!
-	@IBOutlet var activityDisplay: NSProgressIndicator!
-	@IBOutlet var projectsTable: NSTableView!
-	@IBOutlet var refreshNow: NSMenuItem!
-	@IBOutlet var versionNumber: NSTextField!
-	@IBOutlet var launchAtStartup: NSButton!
-	@IBOutlet var refreshDurationLabel: NSTextField!
-	@IBOutlet var refreshDurationStepper: NSStepper!
-	@IBOutlet var hideUncommentedPrs: NSButton!
-	@IBOutlet var repoFilter: NSTextField!
-	@IBOutlet var showAllComments: NSButton!
-	@IBOutlet var sortingOrder: NSButton!
-	@IBOutlet var sortModeSelect: NSPopUpButton!
-	@IBOutlet var showCreationDates: NSButton!
-	@IBOutlet var dontKeepPrsMergedByMe: NSButton!
-	@IBOutlet var hideAvatars: NSButton!
-	@IBOutlet var autoParticipateWhenMentioned: NSButton!
-	@IBOutlet var dontConfirmRemoveAllMerged: NSButton!
-	@IBOutlet var dontConfirmRemoveAllClosed: NSButton!
-	@IBOutlet var displayRepositoryNames: NSButton!
-	@IBOutlet var includeRepositoriesInFiltering: NSButton!
-	@IBOutlet var groupByRepo: NSButton!
-	@IBOutlet var hideAllPrsSection: NSButton!
-	@IBOutlet var showStatusItems: NSButton!
-	@IBOutlet var makeStatusItemsSelectable: NSButton!
-	@IBOutlet var statusTermMenu: NSPopUpButton!
-	@IBOutlet var statusTermsField: NSTokenField!
-	@IBOutlet var moveAssignedPrsToMySection: NSButton!
-	@IBOutlet var markUnmergeableOnUserSectionsOnly: NSButton!
-	@IBOutlet var repoCheckLabel: NSTextField!
-	@IBOutlet var repoCheckStepper: NSStepper!
-	@IBOutlet var countOnlyListedPrs: NSButton!
-	@IBOutlet var prMergedPolicy: NSPopUpButton!
-	@IBOutlet var prClosedPolicy: NSPopUpButton!
-	@IBOutlet var checkForUpdatesAutomatically: NSButton!
-	@IBOutlet var checkForUpdatesLabel: NSTextField!
-	@IBOutlet var checkForUpdatesSelector: NSStepper!
-	@IBOutlet var statusItemRescanLabel: NSTextField!
-	@IBOutlet var statusItemRefreshCounter: NSStepper!
-	@IBOutlet var statusItemsRefreshNote: NSTextField!
-	@IBOutlet var hideNewRepositories: NSButton!
-	@IBOutlet var openPrAtFirstUnreadComment: NSButton!
-	@IBOutlet var logActivityToConsole: NSButton!
-	@IBOutlet var commentAuthorBlacklist: NSTokenField!
-	@IBOutlet var showLabels: NSButton!
+	@IBOutlet weak var preferencesWindow: NSWindow!
+	@IBOutlet weak var refreshButton: NSButton!
+	@IBOutlet weak var activityDisplay: NSProgressIndicator!
+	@IBOutlet weak var projectsTable: NSTableView!
+	@IBOutlet weak var refreshNow: NSMenuItem!
+	@IBOutlet weak var versionNumber: NSTextField!
+	@IBOutlet weak var launchAtStartup: NSButton!
+	@IBOutlet weak var refreshDurationLabel: NSTextField!
+	@IBOutlet weak var refreshDurationStepper: NSStepper!
+	@IBOutlet weak var hideUncommentedPrs: NSButton!
+	@IBOutlet weak var repoFilter: NSTextField!
+	@IBOutlet weak var showAllComments: NSButton!
+	@IBOutlet weak var sortingOrder: NSButton!
+	@IBOutlet weak var sortModeSelect: NSPopUpButton!
+	@IBOutlet weak var showCreationDates: NSButton!
+	@IBOutlet weak var dontKeepPrsMergedByMe: NSButton!
+	@IBOutlet weak var hideAvatars: NSButton!
+	@IBOutlet weak var autoParticipateWhenMentioned: NSButton!
+	@IBOutlet weak var dontConfirmRemoveAllMerged: NSButton!
+	@IBOutlet weak var dontConfirmRemoveAllClosed: NSButton!
+	@IBOutlet weak var displayRepositoryNames: NSButton!
+	@IBOutlet weak var includeRepositoriesInFiltering: NSButton!
+	@IBOutlet weak var groupByRepo: NSButton!
+	@IBOutlet weak var hideAllPrsSection: NSButton!
+	@IBOutlet weak var showStatusItems: NSButton!
+	@IBOutlet weak var makeStatusItemsSelectable: NSButton!
+	@IBOutlet weak var statusTermMenu: NSPopUpButton!
+	@IBOutlet weak var statusTermsField: NSTokenField!
+	@IBOutlet weak var moveAssignedPrsToMySection: NSButton!
+	@IBOutlet weak var markUnmergeableOnUserSectionsOnly: NSButton!
+	@IBOutlet weak var repoCheckLabel: NSTextField!
+	@IBOutlet weak var repoCheckStepper: NSStepper!
+	@IBOutlet weak var countOnlyListedPrs: NSButton!
+	@IBOutlet weak var prMergedPolicy: NSPopUpButton!
+	@IBOutlet weak var prClosedPolicy: NSPopUpButton!
+	@IBOutlet weak var checkForUpdatesAutomatically: NSButton!
+	@IBOutlet weak var checkForUpdatesLabel: NSTextField!
+	@IBOutlet weak var checkForUpdatesSelector: NSStepper!
+	@IBOutlet weak var statusItemRescanLabel: NSTextField!
+	@IBOutlet weak var statusItemRefreshCounter: NSStepper!
+	@IBOutlet weak var statusItemsRefreshNote: NSTextField!
+	@IBOutlet weak var hideNewRepositories: NSButton!
+	@IBOutlet weak var openPrAtFirstUnreadComment: NSButton!
+	@IBOutlet weak var logActivityToConsole: NSButton!
+	@IBOutlet weak var commentAuthorBlacklist: NSTokenField!
+	@IBOutlet weak var showLabels: NSButton!
+    @IBOutlet weak var grayOutWhenRefreshing: NSButton!
 
 	// Preferences - Display
-	@IBOutlet var useVibrancy: NSButton!
-	@IBOutlet var includeLabelsInFiltering: NSButton!
+	@IBOutlet weak var useVibrancy: NSButton!
+	@IBOutlet weak var includeLabelsInFiltering: NSButton!
 	@IBOutlet weak var includeStatusesInFiltering: NSButton!
 
 	// Preferences - Labels
-	@IBOutlet var labelRescanLabel: NSTextField!
-	@IBOutlet var labelRefreshNote: NSTextField!
-	@IBOutlet var labelRefreshCounter: NSStepper!
+	@IBOutlet weak var labelRescanLabel: NSTextField!
+	@IBOutlet weak var labelRefreshNote: NSTextField!
+	@IBOutlet weak var labelRefreshCounter: NSStepper!
 
 	// Preferences - Servers
-	@IBOutlet var serverList: NSTableView!
-	@IBOutlet var apiServerName: NSTextField!
-	@IBOutlet var apiServerApiPath: NSTextField!
-	@IBOutlet var apiServerWebPath: NSTextField!
-	@IBOutlet var apiServerAuthToken: NSTextField!
-	@IBOutlet var apiServerSelectedBox: NSBox!
-	@IBOutlet var apiServerTestButton: NSButton!
-	@IBOutlet var apiServerDeleteButton: NSButton!
-	@IBOutlet var apiServerReportError: NSButton!
+	@IBOutlet weak var serverList: NSTableView!
+	@IBOutlet weak var apiServerName: NSTextField!
+	@IBOutlet weak var apiServerApiPath: NSTextField!
+	@IBOutlet weak var apiServerWebPath: NSTextField!
+	@IBOutlet weak var apiServerAuthToken: NSTextField!
+	@IBOutlet weak var apiServerSelectedBox: NSBox!
+	@IBOutlet weak var apiServerTestButton: NSButton!
+	@IBOutlet weak var apiServerDeleteButton: NSButton!
+	@IBOutlet weak var apiServerReportError: NSButton!
 
 	// Keyboard
-	@IBOutlet var hotkeyEnable: NSButton!
-	@IBOutlet var hotkeyCommandModifier: NSButton!
-	@IBOutlet var hotkeyOptionModifier: NSButton!
-	@IBOutlet var hotkeyShiftModifier: NSButton!
-	@IBOutlet var hotkeyLetter: NSPopUpButton!
-	@IBOutlet var hotKeyHelp: NSTextField!
-	@IBOutlet var hotKeyContainer: NSBox!
-	@IBOutlet var hotkeyControlModifier: NSButton!
+	@IBOutlet weak var hotkeyEnable: NSButton!
+	@IBOutlet weak var hotkeyCommandModifier: NSButton!
+	@IBOutlet weak var hotkeyOptionModifier: NSButton!
+	@IBOutlet weak var hotkeyShiftModifier: NSButton!
+	@IBOutlet weak var hotkeyLetter: NSPopUpButton!
+	@IBOutlet weak var hotKeyHelp: NSTextField!
+	@IBOutlet weak var hotKeyContainer: NSBox!
+	@IBOutlet weak var hotkeyControlModifier: NSButton!
 
 	// About window
-	@IBOutlet var aboutVersion: NSTextField!
+	@IBOutlet weak var aboutVersion: NSTextField!
 	
 	// Menu
 	var statusItem: NSStatusItem!
-	@IBOutlet var mainMenu: MenuWindow!
+	@IBOutlet weak var mainMenu: MenuWindow!
 
 	// Globals
 	weak var refreshTimer: NSTimer?
@@ -255,6 +256,10 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	@IBAction func dontKeepMyPrsSelected(sender: NSButton) {
 		Settings.dontKeepPrsMergedByMe = (sender.integerValue==1)
 	}
+
+    @IBAction func grayOutWhenRefreshingSelected(sender: NSButton) {
+        Settings.grayOutWhenRefreshing = (sender.integerValue==1)
+    }
 
 	@IBAction func hideAvatarsSelected(sender: NSButton) {
 		Settings.hideAvatars = (sender.integerValue==1)
@@ -816,6 +821,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		autoParticipateWhenMentioned.integerValue = Settings.autoParticipateInMentions ? 1 : 0
 		hideAvatars.integerValue = Settings.hideAvatars ? 1 : 0
 		dontKeepPrsMergedByMe.integerValue = Settings.dontKeepPrsMergedByMe ? 1 : 0
+        grayOutWhenRefreshing.integerValue = Settings.grayOutWhenRefreshing ? 1 : 0
 		showAllComments.integerValue = Settings.showCommentsEverywhere ? 1 : 0
 		sortingOrder.integerValue = Settings.sortDescending ? 1 : 0
 		showCreationDates.integerValue = Settings.showCreatedInsteadOfUpdated ? 1 : 0
@@ -1181,7 +1187,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		refreshButton.enabled = false
 		projectsTable.enabled = false
 		activityDisplay.startAnimation(nil)
-		(statusItem.view as StatusItemView).grayOut = true
+		(statusItem.view as StatusItemView).grayOut = Settings.grayOutWhenRefreshing
 
 		api.expireOldImageCacheEntries()
 		DataManager.postMigrationTasks()
@@ -1282,18 +1288,27 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		let statusBar = NSStatusBar.systemStatusBar()
 		let H = statusBar.thickness
 		let length = H + width + STATUSITEM_PADDING*3
-		if statusItem == nil {
-			statusItem = statusBar.statusItemWithLength(-1) // should be NSVariableStatusItemLength but Swift can't compile this yet
-		}
+        var updateStatusItem = true
+        let shouldGray = Settings.grayOutWhenRefreshing && isRefreshing
+		if let s = statusItem?.view as? StatusItemView {
+            if compareDict(s.textAttributes, to: attributes) && s.statusLabel == countString && s.grayOut == shouldGray {
+                updateStatusItem = false
+            }
+        } else {
+            statusItem = statusBar.statusItemWithLength(-1) // should be NSVariableStatusItemLength but Swift can't compile this yet
+        }
 
-		let siv = StatusItemView(frame: CGRectMake(0, 0, length, H), label: countString, attributes: attributes)
-		siv.highlighted = mainMenu.visible
-		siv.grayOut = isRefreshing
-		siv.tappedCallback = { [weak self] in
-			self!.statusItemTapped()
-			return
-		}
-		statusItem.view = siv
+        if updateStatusItem {
+            DLog("Updating status item");
+            let siv = StatusItemView(frame: CGRectMake(0, 0, length, H), label: countString, attributes: attributes)
+            siv.highlighted = mainMenu.visible
+            siv.grayOut = shouldGray
+            siv.tappedCallback = { [weak self] in
+                self!.statusItemTapped()
+                return
+            }
+            statusItem.view = siv
+        }
 
 		pullRequestDelegate.reloadData(mainMenu.filter.stringValue)
 		mainMenu.prTable.reloadData()
@@ -1307,6 +1322,19 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 		sizeMenuAndShow(false)
 	}
+
+    private func compareDict(from: Dictionary<String, AnyObject>, to: Dictionary<String, AnyObject>) -> Bool {
+        for (key, value) in from {
+            if let v: AnyObject = to[key] {
+                if !v.isEqual(value) {
+                    return false
+                }
+            } else {
+                return false
+            }
+        }
+        return true
+    }
 
 	private func updateStatusTermPreferenceControls() {
 		let mode = Settings.statusFilteringMode
