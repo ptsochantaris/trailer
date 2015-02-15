@@ -597,7 +597,7 @@ user you can add more servers from the left.</string>
                                         <button id="3Lq-pH-9d8">
                                             <rect key="frame" x="428" y="88" width="293" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Gray-out PR count to indicate refreshing" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="Ww0-O4-g3a">
+                                            <buttonCell key="cell" type="check" title="Gray PR count while refreshing" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="Ww0-O4-g3a">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
