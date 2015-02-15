@@ -255,19 +255,19 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 			}
 		case .NewPr:
 			if let p = forItem as? PullRequest {
-				notification.alertBody = "New PR: " + (p.title ?? "(untitled)")
+				notification.alertBody = "New PR: " + (p.title ?? "(untitled)") + " in " + (p.repo.fullName ?? "(untitled)")
 			}
 		case .PrReopened:
 			if let p = forItem as? PullRequest {
-				notification.alertBody = "Re-Opened PR: " + (p.title ?? "(untitled)")
+				notification.alertBody = "Re-Opened PR: " + (p.title ?? "(untitled)") + " in " + (p.repo.fullName ?? "(untitled)")
 			}
 		case .PrMerged:
 			if let p = forItem as? PullRequest {
-				notification.alertBody = "PR Merged! " + (p.title ?? "(untitled)")
+				notification.alertBody = "PR Merged! " + (p.title ?? "(untitled)") + " in " + (p.repo.fullName ?? "(untitled)")
 			}
 		case .PrClosed:
 			if let p = forItem as? PullRequest {
-				notification.alertBody = "PR Closed: " + (p.title ?? "(untitled)")
+				notification.alertBody = "PR Closed: " + (p.title ?? "(untitled)") + " in " + (p.repo.fullName ?? "(untitled)")
 			}
 		case .NewRepoSubscribed:
 			if let r = forItem as? Repo {
@@ -279,7 +279,7 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 			}
 		case .NewPrAssigned:
 			if let p = forItem as? PullRequest {
-				notification.alertBody = "PR Assigned: " + (p.title ?? "(untitled)")
+				notification.alertBody = "PR Assigned: " + (p.title ?? "(untitled)") + " in " + (p.repo.fullName ?? "(untitled)")
 			}
 		}
 
