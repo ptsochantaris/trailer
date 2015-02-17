@@ -793,14 +793,14 @@ user you can add more servers from the left.</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" borderType="none" titlePosition="noTitle" id="TPK-e4-WCR">
-                                            <rect key="frame" x="32" y="59" width="673" height="237"/>
+                                            <rect key="frame" x="32" y="40" width="673" height="266"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <view key="contentView">
-                                                <rect key="frame" x="0.0" y="0.0" width="673" height="237"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="673" height="266"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button id="c6m-8a-CRl">
-                                                        <rect key="frame" x="10" y="173" width="325" height="18"/>
+                                                        <rect key="frame" x="10" y="202" width="317" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Only display PRs with unread comments" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="djW-U3-Ae9">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -811,7 +811,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </button>
                                                     <button id="CPe-TS-qPS">
-                                                        <rect key="frame" x="10" y="208" width="325" height="18"/>
+                                                        <rect key="frame" x="10" y="237" width="317" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Display comment badges &amp; alerts for all PRs" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="EcZ-Ov-Dct">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -822,7 +822,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </button>
                                                     <button id="lTI-8Y-voD">
-                                                        <rect key="frame" x="339" y="208" width="317" height="18"/>
+                                                        <rect key="frame" x="344" y="237" width="317" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Move PRs that mention me to 'Participated'" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="dIf-8Y-axW">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -833,7 +833,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </button>
                                                     <button id="UE2-cu-KR1">
-                                                        <rect key="frame" x="339" y="173" width="317" height="18"/>
+                                                        <rect key="frame" x="344" y="202" width="317" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Open PRs at first unread comment" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="OvZ-nc-wRD">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -844,7 +844,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </button>
                                                     <tokenField verticalHuggingPriority="750" id="sXw-Dp-4Fc">
-                                                        <rect key="frame" x="19" y="15" width="635" height="96"/>
+                                                        <rect key="frame" x="12" y="49" width="651" height="96"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <tokenFieldCell key="cell" selectable="YES" editable="YES" borderStyle="bezel" alignment="left" placeholderString="Comma separated list of usernames (case/accent insensitive, without the '@' prefix)" drawsBackground="YES" allowsEditingTextAttributes="YES" id="G8I-x9-GhN">
                                                             <font key="font" metaFont="cellTitle"/>
@@ -856,7 +856,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </tokenField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="oQy-Dc-Qvp">
-                                                        <rect key="frame" x="17" y="124" width="525" height="17"/>
+                                                        <rect key="frame" x="17" y="158" width="525" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Do not present notifications for comments from the following usernames:" id="xyy-eR-l2v">
                                                             <font key="font" metaFont="system"/>
@@ -864,6 +864,17 @@ user you can add more servers from the left.</string>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
+                                                    <button id="QzE-VU-f44">
+                                                        <rect key="frame" x="10" y="15" width="317" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Disable all comment notifications" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="ASe-Cd-swQ">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="disableAllCommentNotificationsSelected:" target="494" id="NLD-am-5ZB"/>
+                                                        </connections>
+                                                    </button>
                                                 </subviews>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
@@ -1245,6 +1256,7 @@ Enter to select and ⌘, for preferences.
                 <outlet property="checkForUpdatesSelector" destination="VSJ-4k-oD4" id="Upd-8P-Dkw"/>
                 <outlet property="commentAuthorBlacklist" destination="sXw-Dp-4Fc" id="kRg-1n-FyC"/>
                 <outlet property="countOnlyListedPrs" destination="y7T-zw-tAa" id="NtB-ef-IsY"/>
+                <outlet property="disableAllCommentNotifications" destination="QzE-VU-f44" id="Ooi-8A-DX0"/>
                 <outlet property="displayRepositoryNames" destination="NO0-4G-QWM" id="gry-RG-iOC"/>
                 <outlet property="dontConfirmRemoveAllClosed" destination="a8N-EM-mQf" id="coj-EZ-aEM"/>
                 <outlet property="dontConfirmRemoveAllMerged" destination="fU7-ye-zZ9" id="bYB-om-tew"/>
@@ -1293,7 +1305,7 @@ Enter to select and ⌘, for preferences.
                 <outlet property="showLabels" destination="Mi5-4X-8AB" id="N1E-ip-A1x"/>
                 <outlet property="showStatusItems" destination="217-Vi-ReC" id="Gu1-wa-hE2"/>
                 <outlet property="sortModeSelect" destination="geS-Jc-8P2" id="L5a-K5-3PH"/>
-                <outlet property="sortingOrder" destination="B8S-t3-bHc" id="K24-7i-FqU"/>
+                <outlet property="sortingOrder" destination="B8S-t3-bHc" id="e7L-59-Qg2"/>
                 <outlet property="statusItemRefreshCounter" destination="O6x-Fv-9vm" id="Wcv-lG-Xlm"/>
                 <outlet property="statusItemRescanLabel" destination="XBq-82-2L8" id="B84-w5-Stj"/>
                 <outlet property="statusItemsRefreshNote" destination="Ud3-8I-IKZ" id="7qy-EF-8Cd"/>

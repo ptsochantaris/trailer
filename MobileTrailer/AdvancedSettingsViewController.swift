@@ -25,7 +25,7 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 
 	private enum Section: Int {
 		case Refresh, Display, Comments, Repos, Label, History, Confirm, Sort, Misc
-		static let rowCounts = [3, 7, 5, 1, 2, 3, 2, 3, 1]
+		static let rowCounts = [3, 7, 6, 1, 2, 3, 2, 3, 1]
 		static let allNames = ["Auto Refresh", "Display","Comments", "Repositories", "PR Labels", "History", "Don't confirm when", "Sorting", "Misc"]
 	}
 
@@ -117,6 +117,9 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 			case 4:
 				cell.textLabel?.text = "Block comment notifications from usernames..."
 				cell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
+            case 5:
+                cell.textLabel?.text = "Disable all comment notifications"
+                cell.accessoryType = check(Settings.disableAllCommentNotifications)
 			default: break
 			}
 		} else if indexPath.section == Section.Repos.rawValue {
@@ -261,6 +264,8 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 				Settings.openPrAtFirstUnreadComment = !Settings.openPrAtFirstUnreadComment
 			case 4:
 				performSegueWithIdentifier("showBlacklist", sender: self)
+            case 5:
+                Settings.disableAllCommentNotifications = !Settings.disableAllCommentNotifications
 			default: break
 			}
 		} else if indexPath.section == Section.Repos.rawValue {

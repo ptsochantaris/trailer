@@ -88,7 +88,9 @@ class DataManager : NSObject {
 			if p.postSyncAction?.integerValue == PostSyncAction.NoteUpdated.rawValue {
 				if c.refersToMe() {
 					app.postNotificationOfType(PRNotificationType.NewMention, forItem: c)
-				} else if (Settings.showCommentsEverywhere || p.isMine() || p.commentedByMe()) && !c.isMine() {
+				} else if !Settings.disableAllCommentNotifications
+                    && (Settings.showCommentsEverywhere || p.isMine() || p.commentedByMe())
+                    && !c.isMine() {
 					if let authorName = c.userName {
 						var blocked = false
 						for blockedAuthor in Settings.commentAuthorBlacklist as [String] {

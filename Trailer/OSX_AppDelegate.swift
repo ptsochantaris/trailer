@@ -52,6 +52,9 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	@IBOutlet weak var showLabels: NSButton!
     @IBOutlet weak var grayOutWhenRefreshing: NSButton!
 
+    // Preferences - Comments
+    @IBOutlet weak var disableAllCommentNotifications: NSButton!
+
 	// Preferences - Display
 	@IBOutlet weak var useVibrancy: NSButton!
 	@IBOutlet weak var includeLabelsInFiltering: NSButton!
@@ -259,6 +262,10 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
     @IBAction func grayOutWhenRefreshingSelected(sender: NSButton) {
         Settings.grayOutWhenRefreshing = (sender.integerValue==1)
+    }
+
+    @IBAction func disableAllCommentNotificationsSelected(sender: NSButton) {
+        Settings.disableAllCommentNotifications = (sender.integerValue==1)
     }
 
 	@IBAction func hideAvatarsSelected(sender: NSButton) {
@@ -822,6 +829,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		hideAvatars.integerValue = Settings.hideAvatars ? 1 : 0
 		dontKeepPrsMergedByMe.integerValue = Settings.dontKeepPrsMergedByMe ? 1 : 0
         grayOutWhenRefreshing.integerValue = Settings.grayOutWhenRefreshing ? 1 : 0
+        disableAllCommentNotifications.integerValue = Settings.disableAllCommentNotifications ? 1 : 0
 		showAllComments.integerValue = Settings.showCommentsEverywhere ? 1 : 0
 		sortingOrder.integerValue = Settings.sortDescending ? 1 : 0
 		showCreationDates.integerValue = Settings.showCreatedInsteadOfUpdated ? 1 : 0

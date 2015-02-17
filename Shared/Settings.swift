@@ -234,6 +234,11 @@ class Settings: NSObject {
 		set { set("USE_VIBRANCY_UI", newValue) }
 	}
 
+    class var disableAllCommentNotifications: Bool {
+        get { return get("DISABLE_ALL_COMMENT_NOTIFICATIONS") as? Bool ?? false }
+        set { set("DISABLE_ALL_COMMENT_NOTIFICATIONS", newValue) }
+    }
+
 	//////////////////////////////
 
 	class var showReposInName: Bool {
