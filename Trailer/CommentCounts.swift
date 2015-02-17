@@ -9,6 +9,9 @@ class CommentCounts: NSView {
 
 		super.init(frame: frame)
 
+        wantsLayer = true
+        canDrawSubviewsIntoLayer = true
+
 		if totalCount > 0 {
 			let pCenter = NSMutableParagraphStyle()
 			pCenter.alignment = NSTextAlignment.CenterTextAlignment
@@ -35,11 +38,10 @@ class CommentCounts: NSView {
 			let c = NSView(frame: NSIntegralRect(NSMakeRect(left, bottom, width, height)))
 			c.wantsLayer = true
 			c.layer!.cornerRadius = 4.0
-			addSubview(c)
-
             countView = CenterTextField(frame: c.bounds)
 			countView!.attributedStringValue = countString
-			c.addSubview(countView!)
+            c.addSubview(countView!)
+            addSubview(c, positioned: NSWindowOrderingMode.Below, relativeTo: nil)
 
             countBackground = c
             highlight(false)
@@ -62,7 +64,7 @@ class CommentCounts: NSView {
 				alertBackground.layer!.backgroundColor = redFill.CGColor
 				alertBackground.layer!.cornerRadius = floor(SMALL_BADGE_SIZE*0.5)
 				alertBackground.attributedStringValue = alertString
-				addSubview(alertBackground, positioned: NSWindowOrderingMode.Below, relativeTo: countBackground)
+				addSubview(alertBackground, positioned: NSWindowOrderingMode.Above, relativeTo: c)
 			}
 		}
 	}
