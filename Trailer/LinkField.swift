@@ -75,7 +75,7 @@ class LinkField: CenterTextField {
 
 	override func mouseDown(theEvent: NSEvent) {
 		if targetUrl == nil {
-			nextResponder?.mouseDown(theEvent)
+            selectParentPr(theEvent)
 		} else {
 			if needsCommand {
 				if theEvent.modifierFlags & NSEventModifierFlags.CommandKeyMask == NSEventModifierFlags.CommandKeyMask {
@@ -85,7 +85,7 @@ class LinkField: CenterTextField {
 					mouseExited(theEvent)
 					NSWorkspace.sharedWorkspace().openURL(NSURL(string:targetUrl!)!)
 				} else {
-					nextResponder?.mouseDown(theEvent)
+                    selectParentPr(theEvent)
 				}
 			} else {
 				mouseExited(theEvent)
@@ -93,5 +93,13 @@ class LinkField: CenterTextField {
 			}
 		}
 	}
+
+    private func selectParentPr(theEvent: NSEvent) {
+        if let prView = nextResponder as? PrItemView {
+            let pr = prView.associatedPullRequest()
+            let isAlternative = ((theEvent.modifierFlags & NSEventModifierFlags.AlternateKeyMask) == NSEventModifierFlags.AlternateKeyMask)
+            app.prItemSelected(pr, alternativeSelect: isAlternative)
+        }
+    }
 
 }
