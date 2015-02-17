@@ -35,7 +35,7 @@
 	<key>NSPrincipalClass</key>
 	<string>Trailer.Application</string>
 	<key>NSUserNotificationAlertStyle</key>
-	<string>alert</string>
+	<string>banner</string>
 	<key>SUFeedURL</key>
 	<string>http://ptsochantaris.github.io/trailer/appcast.xml</string>
 	<key>SUPublicDSAKeyFile</key>
