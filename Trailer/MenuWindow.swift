@@ -15,7 +15,6 @@ class MenuWindow: NSWindow {
 		super.awakeFromNib()
 
         if newSystem {
-            (contentView as NSView).wantsLayer = true
             scrollView.automaticallyAdjustsContentInsets = false
         }
 
@@ -30,14 +29,17 @@ class MenuWindow: NSWindow {
 
 	func updateVibrancy() {
 
+		let vibrancy = MenuWindow.usingVibrancy()
+
         if newSystem {
             headerVibrant?.removeFromSuperview()
             headerVibrant = nil
+			(contentView as NSView).wantsLayer = vibrancy
         }
 
 		var bgColor: CGColorRef
 
-		if MenuWindow.usingVibrancy() {
+		if vibrancy {
 			scrollView.frame = contentView.bounds
 			scrollView.contentInsets = NSEdgeInsetsMake(TOP_HEADER_HEIGHT, 0, 0, 0)
 
