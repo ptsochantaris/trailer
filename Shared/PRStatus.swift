@@ -31,7 +31,10 @@ class PRStatus: DataItem {
 			s.url = info.ofk("url") as? String
 			s.state = info.ofk("state") as? String
 			s.targetUrl = info.ofk("target_url") as? String
-			s.descriptionText = info.ofk("description") as? String
+
+            if let ds = info.ofk("description") as? String {
+                s.descriptionText = ds.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+            }
 
 			if let userInfo = info.ofk("creator") as? NSDictionary {
 				s.userName = userInfo.ofk("login") as? String

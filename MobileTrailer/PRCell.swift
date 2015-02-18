@@ -1,12 +1,6 @@
 
 import UIKit
 
-let itemCountFormatter = { () -> NSNumberFormatter in
-	let f = NSNumberFormatter()
-	f.numberStyle = NSNumberFormatterStyle.DecimalStyle
-	return f
-}()
-
 class PRCell: UITableViewCell {
 
 	private let unreadCount = UILabel(frame: CGRectZero)

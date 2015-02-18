@@ -58,6 +58,20 @@ func DLog(messageFormat: String, args: LazyVarArgClosure...) {
 
 #endif
 
+let itemCountFormatter = { () -> NSNumberFormatter in
+    let n = NSNumberFormatter()
+    n.numberStyle = NSNumberFormatterStyle.DecimalStyle
+    return n
+}()
+
+let syncDateFormatter = { () -> NSDateFormatter in
+    let d = NSDateFormatter()
+    d.dateFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'"
+    d.timeZone = NSTimeZone(abbreviation: "UTC")
+    d.locale = NSLocale(localeIdentifier: "en_US")
+    return d
+}()
+
 func MAKECOLOR(red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat) -> COLOR_CLASS {
 	return COLOR_CLASS(red: red, green: green, blue: blue, alpha: alpha)
 }

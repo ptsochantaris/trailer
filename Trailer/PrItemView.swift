@@ -1,12 +1,11 @@
 
 class PrItemView: NSTableCellView {
 
-	var trackingArea: NSTrackingArea!
-	var pullRequestId: NSManagedObjectID
-	var title: CenterTextField!
-	var unselectedTitleColor: NSColor
-	var detailFont: NSFont, titleFont: NSFont
-    let commentCounts: CommentCounts!
+	private var trackingArea: NSTrackingArea!
+	private var pullRequestId: NSManagedObjectID
+	private var title: CenterTextField!
+	private var unselectedTitleColor: NSColor
+	private var detailFont: NSFont, titleFont: NSFont
 
 	init(pullRequest: PullRequest) {
 		pullRequestId = pullRequest.objectID
@@ -16,9 +15,6 @@ class PrItemView: NSTableCellView {
 		let v = app.statusItem.view as StatusItemView
 		let goneDark = MenuWindow.usingVibrancy() && v.darkMode
 		unselectedTitleColor = goneDark ? NSColor.controlHighlightColor() : NSColor.controlTextColor()
-
-		super.init(frame: NSZeroRect)
-		canDrawSubviewsIntoLayer = true
 
 		var _commentsNew = 0
 		let _commentsTotal = pullRequest.totalComments?.integerValue ?? 0
@@ -71,7 +67,9 @@ class PrItemView: NSTableCellView {
 			bottom = ceil(CELL_PADDING * 0.5)
 		}
 
-		frame = NSMakeRect(0, 0, MENU_WIDTH, titleHeight+subtitleHeight+statusBottom+CELL_PADDING)
+		super.init(frame: NSMakeRect(0, 0, MENU_WIDTH, titleHeight+subtitleHeight+statusBottom+CELL_PADDING))
+		addCounts(_commentsTotal, _commentsNew, goneDark)
+
 		var titleRect = NSMakeRect(LEFTPADDING, subtitleHeight+bottom+statusBottom, W, titleHeight)
 		var dateRect = NSMakeRect(LEFTPADDING, statusBottom+bottom, W, subtitleHeight)
 		var pinRect = NSMakeRect(LEFTPADDING+W, floor((bounds.size.height-24)*0.5), REMOVE_BUTTON_WIDTH-10, 24)
@@ -137,16 +135,13 @@ class PrItemView: NSTableCellView {
 			}
 		}
 
-        commentCounts = CommentCounts(frame: NSMakeRect(0, 0, LEFTPADDING, bounds.size.height), unreadCount: _commentsNew, totalCount: _commentsTotal, goneDark: goneDark)
-		addSubview(commentCounts)
-
 		menu = NSMenu(title: "PR Options")
 		let i = menu!.insertItemWithTitle("Copy URL", action: Selector("copyThisPr"), keyEquivalent: "c", atIndex: 0)
 		i?.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
 	}
 
 	required init?(coder: NSCoder) {
-	    fatalError("init(coder:) has not been implemented")
+		fatalError("init(coder:) has not been implemented")
 	}
 
 	func unPinSelected() {
@@ -171,7 +166,7 @@ class PrItemView: NSTableCellView {
 				app.mainMenu.prTable.deselectRow(app.mainMenu.prTable.rowForView(self))
 			}
 			title.attributedStringValue = associatedPullRequest().titleWithFont(titleFont, labelFont: detailFont, titleColor: finalColor)
-            commentCounts.highlight(selected)
+			highlight(selected)
 		}
 	}
 
@@ -206,6 +201,95 @@ class PrItemView: NSTableCellView {
 			mouseEntered(nil)
 		} else if !selected {
 			mouseExited(nil)
+		}
+	}
+
+	//////////////////////////// Counts
+
+	private var countBackground: NSView?
+	private var newBackground: NSView?
+	private var countView: CenterTextField?
+	private var countColor: NSColor?
+
+	private func addCounts(totalCount: Int, _ unreadCount: Int, _ goneDark: Bool) {
+
+		if totalCount == 0 {
+			return
+		}
+
+		let pCenter = NSMutableParagraphStyle()
+		pCenter.alignment = NSTextAlignment.CenterTextAlignment
+
+		countColor = goneDark ? NSColor.controlLightHighlightColor() : NSColor.controlTextColor()
+
+		let countString = NSAttributedString(string: itemCountFormatter.stringFromNumber(totalCount)!, attributes: [
+			NSFontAttributeName: NSFont.menuFontOfSize(11),
+			NSForegroundColorAttributeName: countColor!,
+			NSParagraphStyleAttributeName: pCenter])
+
+		var width = max(BASE_BADGE_SIZE, countString.size.width+10)
+		var height = BASE_BADGE_SIZE
+		var bottom = (bounds.size.height-height)*0.5
+		var left = (LEFTPADDING-width)*0.5
+
+		let c = NSView(frame: NSIntegralRect(NSMakeRect(left, bottom, width, height)))
+		c.wantsLayer = true
+		c.layer!.cornerRadius = 4.0
+
+		countView = CenterTextField(frame: c.bounds)
+		countView!.attributedStringValue = countString
+		c.addSubview(countView!)
+		addSubview(c)
+
+		countBackground = c
+
+		if unreadCount > 0 {
+
+			let alertString = NSAttributedString(string: itemCountFormatter.stringFromNumber(unreadCount)!, attributes: [
+				NSFontAttributeName: NSFont.menuFontOfSize(8),
+				NSForegroundColorAttributeName: NSColor.whiteColor(),
+				NSParagraphStyleAttributeName: pCenter])
+
+			bottom += height
+			width = max(SMALL_BADGE_SIZE, alertString.size.width+8)
+			height = SMALL_BADGE_SIZE
+			bottom -= height * 0.5 + 1
+			left -= width * 0.5
+
+			let cc = NSView(frame: NSIntegralRect(NSMakeRect(left, bottom, width, height)))
+			cc.wantsLayer = true
+			cc.layer!.cornerRadius = floor(SMALL_BADGE_SIZE*0.5)
+
+			let alertCount = CenterTextField(frame: cc.bounds)
+			alertCount.attributedStringValue = alertString
+			cc.addSubview(alertCount)
+			addSubview(cc)
+
+			newBackground = cc;
+		}
+
+		highlight(false)
+	}
+
+	private func highlight(on: Bool) -> Void {
+		if let c = countBackground {
+			var color: NSColor
+			let l = c.layer!
+			if MenuWindow.usingVibrancy() && (app.statusItem.view as StatusItemView).darkMode {
+				color = on ? NSColor.blackColor() : MAKECOLOR(0.94, 0.94, 0.94, 1.0)
+				l.backgroundColor = NSColor.clearColor().CGColor
+				l.borderColor = color.CGColor
+				l.borderWidth = 0.5
+				newBackground?.layer!.backgroundColor = MAKECOLOR(1.0, 0.1, 0.1, 1.0).CGColor
+			} else {
+				color = countColor!
+				l.backgroundColor = MAKECOLOR(0.94, 0.94, 0.94, 1.0).CGColor
+				newBackground?.layer!.backgroundColor = MAKECOLOR(1.0, 0.4, 0.4, 1.0).CGColor
+			}
+			if let a = countView?.attributedStringValue.mutableCopy() as? NSMutableAttributedString {
+				a.addAttribute(NSForegroundColorAttributeName, value: color, range: NSMakeRange(0, a.length))
+				countView?.attributedStringValue = a
+			}
 		}
 	}
 }

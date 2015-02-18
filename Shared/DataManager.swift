@@ -49,8 +49,6 @@ class DataManager : NSObject {
 		}
 	}
 
-	class func managedObjectContext() -> NSManagedObjectContext { return mainObjectContext }
-
 	class func sendNotifications() {
 
 		let newPrs = PullRequest.newItemsOfType("PullRequest", inMoc: mainObjectContext) as [PullRequest]

@@ -7,8 +7,6 @@ class SectionHeader: NSTableRowView {
 
 		super.init(frame: NSMakeRect(0, 0, MENU_WIDTH, TITLE_HEIGHT))
 
-		canDrawSubviewsIntoLayer = true
-
 		let W = MENU_WIDTH - app.scrollBarWidth
 		if showRemoveAllButton {
 			let buttonRect = NSMakeRect(W-100, 5, 90, TITLE_HEIGHT)

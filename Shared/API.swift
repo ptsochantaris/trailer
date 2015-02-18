@@ -30,7 +30,6 @@ class API {
 	var currentNetworkStatus: NetworkStatus
 
 	private let mediumFormatter: NSDateFormatter
-	private let syncDateFormatter: NSDateFormatter
 	private let cacheDirectory: String
 	private let urlSession: NSURLSession
 	private var badLinks = [String:UrlBackOffEntry]()
@@ -50,11 +49,6 @@ class API {
 		mediumFormatter = NSDateFormatter()
 		mediumFormatter.dateStyle = NSDateFormatterStyle.MediumStyle
 		mediumFormatter.timeStyle = NSDateFormatterStyle.MediumStyle
-
-		syncDateFormatter = NSDateFormatter()
-		syncDateFormatter.dateFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'"
-		syncDateFormatter.timeZone = NSTimeZone(abbreviation: "UTC")
-		syncDateFormatter.locale = NSLocale(localeIdentifier: "en_US")
 
 		var reachability = Reachability.reachabilityForInternetConnection()
 		reachability.startNotifier()
@@ -402,7 +396,7 @@ class API {
 			extraHeaders: extraHeaders,
 			perPageCallback: { [weak self] data, lastPage in
 				for d in data ?? [] {
-					let eventDate = self!.syncDateFormatter.dateFromString(d.ofk("created_at") as String)!
+					let eventDate = syncDateFormatter.dateFromString(d.ofk("created_at") as String)!
 					if latestDate.compare(eventDate) == NSComparisonResult.OrderedAscending { // this is where we came in
 						DLog("New event at %@", eventDate)
 						if let repoId = d["repo"]?["id"] as? NSNumber {
@@ -455,7 +449,7 @@ class API {
 			extraHeaders: extraHeaders,
 			perPageCallback: { [weak self] data, lastPage in
 				for d in data ?? [] {
-					let eventDate = self!.syncDateFormatter.dateFromString(d.ofk("created_at") as String)!
+					let eventDate = syncDateFormatter.dateFromString(d.ofk("created_at") as String)!
 					if latestDate.compare(eventDate) == NSComparisonResult.OrderedAscending { // this is where we came in
 						DLog("New event at %@", eventDate)
 						if let repoId = d["repo"]?["id"] as? NSNumber {
