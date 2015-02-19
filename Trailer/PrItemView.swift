@@ -206,8 +206,8 @@ class PrItemView: NSTableCellView {
 
 	//////////////////////////// Counts
 
-	private var countBackground: NSView?
-	private var newBackground: NSView?
+	private var countBackground: FilledView?
+	private var newBackground: FilledView?
 	private var countView: CenterTextField?
 	private var countColor: NSColor?
 
@@ -232,9 +232,8 @@ class PrItemView: NSTableCellView {
 		var bottom = (bounds.size.height-height)*0.5
 		var left = (LEFTPADDING-width)*0.5
 
-		let c = NSView(frame: NSIntegralRect(NSMakeRect(left, bottom, width, height)))
-		c.wantsLayer = true
-		c.layer!.cornerRadius = 4.0
+		let c = FilledView(frame: NSIntegralRect(NSMakeRect(left, bottom, width, height)))
+		c.cornerRadius = 4.0
 
 		countView = CenterTextField(frame: c.bounds)
 		countView!.attributedStringValue = countString
@@ -256,9 +255,8 @@ class PrItemView: NSTableCellView {
 			bottom -= height * 0.5 + 1
 			left -= width * 0.5
 
-			let cc = NSView(frame: NSIntegralRect(NSMakeRect(left, bottom, width, height)))
-			cc.wantsLayer = true
-			cc.layer!.cornerRadius = floor(SMALL_BADGE_SIZE*0.5)
+			let cc = FilledView(frame: NSIntegralRect(NSMakeRect(left, bottom, width, height)))
+			cc.cornerRadius = floor(SMALL_BADGE_SIZE*0.5)
 
 			let alertCount = CenterTextField(frame: cc.bounds)
 			alertCount.attributedStringValue = alertString
@@ -274,17 +272,14 @@ class PrItemView: NSTableCellView {
 	private func highlight(on: Bool) -> Void {
 		if let c = countBackground {
 			var color: NSColor
-			let l = c.layer!
 			if MenuWindow.usingVibrancy() && (app.statusItem.view as StatusItemView).darkMode {
 				color = on ? NSColor.blackColor() : MAKECOLOR(0.94, 0.94, 0.94, 1.0)
-				l.backgroundColor = NSColor.clearColor().CGColor
-				l.borderColor = color.CGColor
-				l.borderWidth = 0.5
-				newBackground?.layer!.backgroundColor = MAKECOLOR(1.0, 0.1, 0.1, 1.0).CGColor
+				c.borderColor = color
+				newBackground?.backgroundColor = MAKECOLOR(1.0, 0.1, 0.1, 1.0)
 			} else {
 				color = countColor!
-				l.backgroundColor = MAKECOLOR(0.94, 0.94, 0.94, 1.0).CGColor
-				newBackground?.layer!.backgroundColor = MAKECOLOR(1.0, 0.4, 0.4, 1.0).CGColor
+				c.backgroundColor = MAKECOLOR(0.94, 0.94, 0.94, 1.0)
+				newBackground?.backgroundColor = MAKECOLOR(1.0, 0.4, 0.4, 1.0)
 			}
 			if let a = countView?.attributedStringValue.mutableCopy() as? NSMutableAttributedString {
 				a.addAttribute(NSForegroundColorAttributeName, value: color, range: NSMakeRange(0, a.length))

@@ -28,9 +28,9 @@ class SectionHeader: NSTableRowView {
 		addSubview(titleView)
 
 		let offset = (MenuWindow.usingVibrancy() ? 2.5 : 3.5) as CGFloat
-		let dividerView = NSView(frame: CGRectMake(1.0, offset, MENU_WIDTH-2, 0.5))
-		dividerView.wantsLayer = true
-		dividerView.layer?.backgroundColor = NSColor.controlShadowColor().CGColor
+		let dividerFrame = CGRectMake(1.0, offset, MENU_WIDTH-2, 0.5)
+		let dividerView = FilledView(frame: dividerFrame)
+		dividerView.backgroundColor = NSColor.controlShadowColor()
 		addSubview(dividerView)
 	}
 
