@@ -71,9 +71,9 @@ class LinkField: CenterTextField {
 		}
 	}
 
-	override func mouseUp(theEvent: NSEvent) { }
+	override func mouseDown(theEvent: NSEvent) { }
 
-	override func mouseDown(theEvent: NSEvent) {
+	override func mouseUp(theEvent: NSEvent) {
 		if targetUrl == nil {
             selectParentPr(theEvent)
 		} else {
