@@ -24,9 +24,9 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 	}
 
 	private enum Section: Int {
-		case Refresh, Display, Comments, Repos, Label, History, Confirm, Sort, Misc
-		static let rowCounts = [3, 7, 6, 1, 2, 3, 2, 3, 1]
-		static let allNames = ["Auto Refresh", "Display","Comments", "Repositories", "PR Labels", "History", "Don't confirm when", "Sorting", "Misc"]
+		case Refresh, Display, Comments, Repos, StausesAndLabels, History, Confirm, Sort, Misc
+		static let rowCounts = [3, 7, 6, 1, 4, 3, 2, 3, 1]
+		static let allNames = ["Auto Refresh", "Display","Comments", "Repositories", "Statuses & Labels", "History", "Don't confirm when", "Sorting", "Misc"]
 	}
 
 	private enum NormalSorting: Int {
@@ -129,12 +129,18 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 				cell.accessoryType = check(Settings.hideNewRepositories)
 			default: break
 			}
-		} else if indexPath.section == Section.Label.rawValue {
+		} else if indexPath.section == Section.StausesAndLabels.rawValue {
 			switch indexPath.row {
 			case 0:
+				cell.textLabel?.text = "Show statuses"
+				cell.accessoryType = check(Settings.showStatusItems)
+			case 1:
+				cell.textLabel?.text = "Re-query statuses"
+				cell.detailTextLabel?.text = Settings.statusItemRefreshInterval == 1 ? "Every refresh" : "Every \(Settings.statusItemRefreshInterval) refreshes"
+			case 2:
 				cell.textLabel?.text = "Show labels"
 				cell.accessoryType = check(Settings.showLabels)
-			case 1:
+			case 3:
 				cell.textLabel?.text = "Re-query labels"
 				cell.detailTextLabel?.text = Settings.labelRefreshInterval == 1 ? "Every refresh" : "Every \(Settings.labelRefreshInterval) refreshes"
 			default: break
@@ -274,9 +280,34 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 				Settings.hideNewRepositories = !Settings.hideNewRepositories
 			default: break
 			}
-		} else if indexPath.section == Section.Label.rawValue {
+		} else if indexPath.section == Section.StausesAndLabels.rawValue {
 			switch indexPath.row {
 			case 0:
+				Settings.showStatusItems = !Settings.showStatusItems
+				api.resetAllStatusChecks()
+				if Settings.showStatusItems {
+					for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as [Repo] {
+						r.dirty = true
+						r.lastDirtied = NSDate.distantPast() as? NSDate
+					}
+				}
+				settingsChangedTimer.push()
+				app.preferencesDirty = true
+			case 1:
+				selectedIndexPath = indexPath
+				pickerName = tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text ?? "Unknown Picker"
+				var values = [String]()
+				var count = 1
+				values.append("Every refresh")
+				previousValue = 0
+				for f in 2..<100 {
+					if f == Settings.statusItemRefreshInterval { previousValue = count }
+					values.append("Every \(f) refreshes")
+					count++
+				}
+				valuesToPush = values
+				performSegueWithIdentifier("showPicker", sender: self)
+			case 2:
 				Settings.showLabels = !Settings.showLabels
 				api.resetAllLabelChecks()
 				if Settings.showLabels {
@@ -285,9 +316,9 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 						r.lastDirtied = NSDate.distantPast() as? NSDate
 					}
 				}
-				app.preferencesDirty = true
 				settingsChangedTimer.push()
-			case 1:
+				app.preferencesDirty = true
+			case 3:
 				selectedIndexPath = indexPath
 				pickerName = tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text ?? "Unknown Picker"
 				var values = [String]()
@@ -405,8 +436,12 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 				} else if sip.row == 1 {
 					Settings.closeHandlingPolicy = Int(didSelectIndexPath.row)
 				}
-			} else if sip.section == Section.Label.rawValue {
-				Settings.labelRefreshInterval = Int(didSelectIndexPath.row+1)
+			} else if sip.section == Section.StausesAndLabels.rawValue {
+				if sip.row == 1 {
+					Settings.statusItemRefreshInterval = Int(didSelectIndexPath.row+1)
+				} else  if sip.row == 3 {
+					Settings.labelRefreshInterval = Int(didSelectIndexPath.row+1)
+				}
 			}
 			tableView.reloadData()
 			selectedIndexPath = nil

@@ -3,32 +3,69 @@ import UIKit
 
 class PRCell: UITableViewCell {
 
-	private let unreadCount = UILabel(frame: CGRectZero)
-	private let readCount = UILabel(frame: CGRectZero)
+	private let unreadCount = CountLabel(frame: CGRectZero)
+	private let readCount = CountLabel(frame: CGRectZero)
 	private var failedToLoadImage: NSString?
 	private var waitingForImageInPath: NSString?
+
 	@IBOutlet weak var _image: UIImageView!
 	@IBOutlet weak var _title: UILabel!
 	@IBOutlet weak var _description: UILabel!
+	@IBOutlet weak var _statuses: UILabel!
 
 	override func awakeFromNib() {
 		unreadCount.textColor = UIColor.whiteColor()
-		unreadCount.textAlignment = NSTextAlignment.Center
-		unreadCount.layer.cornerRadius = 8.5
-		unreadCount.clipsToBounds = true
-		unreadCount.font = UIFont.boldSystemFontOfSize(12)
-		unreadCount.hidden = true
 		contentView.addSubview(unreadCount)
 
 		readCount.textColor = UIColor.darkGrayColor()
-		readCount.textAlignment = NSTextAlignment.Center
-		readCount.layer.cornerRadius = 9.0
-		readCount.clipsToBounds = true
-		readCount.font = UIFont.systemFontOfSize(12)
-		readCount.hidden = true
 		contentView.addSubview(readCount)
-		
+
 		NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("networkStateChanged"), name: kReachabilityChangedNotification, object: nil)
+	}
+
+	private var needsConstraints = true
+
+	override func updateConstraints() {
+
+		if needsConstraints {
+			needsConstraints = false
+
+			contentView.addConstraints([
+
+				NSLayoutConstraint(item: _image,
+					attribute: NSLayoutAttribute.CenterX,
+					relatedBy: NSLayoutRelation.Equal,
+					toItem: readCount,
+					attribute: NSLayoutAttribute.CenterX,
+					multiplier: 1,
+					constant: -23),
+
+				NSLayoutConstraint(item: _image,
+					attribute: NSLayoutAttribute.CenterY,
+					relatedBy: NSLayoutRelation.Equal,
+					toItem: readCount,
+					attribute: NSLayoutAttribute.CenterY,
+					multiplier: 1,
+					constant: -23),
+
+				NSLayoutConstraint(item: _image,
+					attribute: NSLayoutAttribute.CenterX,
+					relatedBy: NSLayoutRelation.Equal,
+					toItem: unreadCount,
+					attribute: NSLayoutAttribute.CenterX,
+					multiplier: 1,
+					constant: 23),
+
+				NSLayoutConstraint(item: _image,
+					attribute: NSLayoutAttribute.CenterY,
+					relatedBy: NSLayoutRelation.Equal,
+					toItem: unreadCount,
+					attribute: NSLayoutAttribute.CenterY,
+					multiplier: 1,
+					constant: 23)
+				])
+		}
+		super.updateConstraints()
 	}
 
 	func networkStateChanged() {
@@ -48,6 +85,36 @@ class PRCell: UITableViewCell {
 		let detailFont = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
 		_title.attributedText = pullRequest.titleWithFont(_title.font, labelFont: detailFont.fontWithSize(detailFont.pointSize-2), titleColor: UIColor.darkTextColor())
 		_description.attributedText = pullRequest.subtitleWithFont(detailFont, lightColor: UIColor.lightGrayColor(), darkColor: UIColor.darkGrayColor())
+		var statusText : NSMutableAttributedString?
+		var statusCount = 0
+		if Settings.showStatusItems {
+			let statusItems = pullRequest.displayedStatuses() + pullRequest.displayedStatuses()
+			statusCount = statusItems.count
+			if statusCount > 0 {
+
+				let paragraphStyle = NSMutableParagraphStyle()
+				paragraphStyle.headIndent = 103.0
+				paragraphStyle.paragraphSpacing = 6.0
+
+				let statusAttributes = [
+					NSFontAttributeName: UIFont(name: "Courier", size: 10)!,
+					NSParagraphStyleAttributeName: paragraphStyle]
+
+				statusText = NSMutableAttributedString()
+				statusText?.appendAttributedString(NSAttributedString(string: "\n", attributes: statusAttributes))
+
+				for status in statusItems {
+					var lineAttributes = statusAttributes
+					lineAttributes[NSForegroundColorAttributeName] = status.colorForDisplay()
+					let text = status.displayText()
+					statusText?.appendAttributedString(NSAttributedString(string: text, attributes: lineAttributes))
+					if --statusCount > 0 {
+						statusText?.appendAttributedString(NSAttributedString(string: "\n", attributes: lineAttributes))
+					}
+				}
+			}
+		}
+		_statuses.attributedText = statusText
 
 		var _commentsNew = 0
 		let _commentsTotal = pullRequest.totalComments?.integerValue ?? 0
@@ -58,17 +125,18 @@ class PRCell: UITableViewCell {
 
 		readCount.text = itemCountFormatter.stringFromNumber(_commentsTotal)
 		let readSize = readCount.sizeThatFits(CGSizeMake(200, 14))
-		readCount.frame = CGRectMake(0, 0, readSize.width+10, 17)
 		readCount.hidden = (_commentsTotal == 0)
 
 		unreadCount.hidden = (_commentsNew == 0)
 		unreadCount.text = itemCountFormatter.stringFromNumber(_commentsNew)
-		let unreadSize = unreadCount.sizeThatFits(CGSizeMake(200, 18))
-		unreadCount.frame = CGRectMake(0, 0, unreadSize.width+10, 17)
 
 		loadImageAtPath(pullRequest.userAvatarUrl)
 
-		accessibilityLabel = "\(pullRequest.accessibleTitle()), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(pullRequest.accessibleSubtitle())"
+		if let statusString = statusText?.string {
+			accessibilityLabel = "\(pullRequest.accessibleTitle()), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(pullRequest.accessibleSubtitle()). \(statusCount) statuses: \(statusString)"
+		} else {
+			accessibilityLabel = "\(pullRequest.accessibleTitle()), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(pullRequest.accessibleSubtitle())"
+		}
 
 		setNeedsLayout()
 	}
@@ -102,13 +170,9 @@ class PRCell: UITableViewCell {
 	override func layoutSubviews() {
 		super.layoutSubviews()
 
-		let topLeft = CGPointMake(_image.frame.origin.x, _image.frame.origin.y)
-		unreadCount.center = topLeft
-		contentView.bringSubviewToFront(unreadCount)
-
-		let bottomRight = CGPointMake(topLeft.x+_image.frame.size.width, topLeft.y+_image.frame.size.height)
-		readCount.center = bottomRight
-		contentView.bringSubviewToFront(readCount)
+		_title.preferredMaxLayoutWidth = _title.bounds.size.width
+		_description.preferredMaxLayoutWidth = _description.bounds.size.width
+		_statuses.preferredMaxLayoutWidth = _statuses.bounds.size.width
 	}
 
 	override func setSelected(selected: Bool, animated: Bool) {
