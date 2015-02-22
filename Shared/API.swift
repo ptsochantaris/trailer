@@ -655,6 +655,10 @@ class API {
 			if !pr.apiServer.syncIsGood {
 				return false
 			}
+			if pr.condition?.integerValue != PullRequestCondition.Open.rawValue {
+				DLog("Won't check labels for closed/merged PR: %@", pr.title)
+				return false
+			}
 			let oid = pr.objectID
 			let refreshes = self!.refreshesSinceLastLabelsCheck[oid]
 			if refreshes == nil || refreshes! >= Settings.labelRefreshInterval {
@@ -721,6 +725,10 @@ class API {
 
 		let prs = (DataItem.allItemsOfType("PullRequest", inMoc: moc) as [PullRequest]).filter { [weak self] pr in
 			if !pr.apiServer.syncIsGood {
+				return false
+			}
+			if pr.condition?.integerValue != PullRequestCondition.Open.rawValue {
+				DLog("Won't check statuses for closed/merged PR: %@", pr.title)
 				return false
 			}
 			let oid = pr.objectID
