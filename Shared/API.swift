@@ -197,7 +197,7 @@ class API {
 
 		let imageKey = absolutePath + " " + currentAppVersion
 
-		let cachePath = cacheDirectory.stringByAppendingPathComponent("imgcache-%@" + imageKey.md5hash())
+		let cachePath = cacheDirectory.stringByAppendingPathComponent("imgcache-" + imageKey.md5hash())
 
 		let fileManager = NSFileManager.defaultManager()
 		if fileManager.fileExistsAtPath(cachePath) {
@@ -1034,7 +1034,7 @@ class API {
 		getPagedDataInPath("/user/subscriptions", fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
 			perPageCallback: { (data, lastPage) -> Bool in
 
-				if let d = data ?? [] {
+				if let d = data {
 					for info in d {
 						if (info.ofk("private") as? NSNumber)?.boolValue ?? false {
 							if let permissions = info.ofk("permissions") as? NSDictionary {
