@@ -36,5 +36,8 @@ class FilledView: NSView {
 			path.stroke()
 		}
     }
-    
+
+	func allowsVibrancy() -> Bool {
+		return true
+	}
 }
