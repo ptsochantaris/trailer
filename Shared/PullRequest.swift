@@ -504,7 +504,9 @@ class PullRequest: DataItem {
 						if c.createdAt?.compare(l)==NSComparisonResult.OrderedDescending {
 							unreadCommentCount++
 						}
-					}
+                    } else {
+                        unreadCommentCount++;
+                    }
 				}
 				unreadComments = unreadCommentCount
 			}
