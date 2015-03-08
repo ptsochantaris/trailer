@@ -1029,7 +1029,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                     </button>
                                                     <button id="Li0-62-iiT">
                                                         <rect key="frame" x="301" y="133" width="116" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="...on all PRs" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="C0r-ce-l94">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
