@@ -109,6 +109,22 @@ class DataManager : NSObject {
 			c.postSyncAction = PostSyncAction.DoNothing.rawValue
 		}
 
+		if(Settings.notifyOnStatusUpdates) {
+			var latestStatuses = PRStatus.newItemsOfType("PRStatus", inMoc: mainObjectContext) as [PRStatus]
+			let coveredPrs = NSMutableSet()
+			for s in latestStatuses {
+				if Settings.notifyOnStatusUpdatesForAllPrs || s.pullRequest.isMine() {
+					let pr = s.pullRequest
+					if !coveredPrs.containsObject(pr) {
+						if let s = pr.displayedStatuses().first {
+							app.postNotificationOfType(PRNotificationType.NewStatus, forItem: s)
+						}
+						coveredPrs.addObject(pr)
+					}
+				}
+			}
+		}
+
 		for p in allTouchedPrs {
 			p.postSyncAction = PostSyncAction.DoNothing.rawValue
 		}
@@ -160,16 +176,16 @@ class DataManager : NSObject {
 			return [COMMENT_ID_KEY : item.objectID.URIRepresentation().absoluteString!]
 		case .NewPr: fallthrough
 		case .PrReopened: fallthrough
-		case .NewPrAssigned:
-			return [PULL_REQUEST_ID_KEY : item.objectID.URIRepresentation().absoluteString!]
+		case .NewPrAssigned: fallthrough
 		case .PrClosed: fallthrough
 		case .PrMerged:
 			return [NOTIFICATION_URL_KEY : (item as PullRequest).webUrl!, PULL_REQUEST_ID_KEY: item.objectID.URIRepresentation().absoluteString!]
 		case .NewRepoSubscribed: fallthrough
 		case .NewRepoAnnouncement:
 			return [NOTIFICATION_URL_KEY : (item as Repo).webUrl!]
-		default:
-			break
+		case .NewStatus:
+			let pr = (item as PRStatus).pullRequest
+			return [NOTIFICATION_URL_KEY : pr.webUrl!, STATUS_ID_KEY: item.objectID.URIRepresentation().absoluteString!]
 		}
 	}
 

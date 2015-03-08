@@ -77,6 +77,7 @@ func MAKECOLOR(red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat) -> C
 }
 
 let PULL_REQUEST_ID_KEY = "pullRequestIdKey"
+let STATUS_ID_KEY = "statusIdKey"
 let COMMENT_ID_KEY = "commentIdKey"
 let NOTIFICATION_URL_KEY = "urlKey"
 let API_USAGE_UPDATE = "RateUpdateNotification"
@@ -108,7 +109,7 @@ enum PostSyncAction: Int {
 }
 
 enum PRNotificationType: Int {
-	case NewComment, NewPr, PrMerged, PrReopened, NewMention, PrClosed, NewRepoSubscribed, NewRepoAnnouncement, NewPrAssigned
+	case NewComment, NewPr, PrMerged, PrReopened, NewMention, PrClosed, NewRepoSubscribed, NewRepoAnnouncement, NewPrAssigned, NewStatus
 }
 
 enum PRSortingMethod: Int {

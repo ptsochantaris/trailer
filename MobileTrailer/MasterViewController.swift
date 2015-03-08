@@ -31,6 +31,10 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 			a.addAction(UIAlertAction(title: "Remove all closed", style:UIAlertActionStyle.Default, handler: { [weak self] action in
 				self!.removeAllClosed()
 			}))
+			a.addAction(UIAlertAction(title: "Refresh Now", style:UIAlertActionStyle.Default, handler: { action in
+				app.startRefresh()
+				return
+			}))
 			presentViewController(a, animated: true, completion: nil)
 		}
 		else
@@ -39,7 +43,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 				delegate:self,
 				cancelButtonTitle: "Cancel",
 				destructiveButtonTitle: "Mark all as read",
-				otherButtonTitles: "Remove all merged",  "Remove all closed")
+				otherButtonTitles: "Remove all merged",  "Remove all closed", "Refresh Now")
 
 			a.showFromBarButtonItem(sender, animated: true)
 		}
@@ -53,6 +57,8 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 			removeAllMerged()
 		case 3:
 			removeAllClosed()
+		case 4:
+			app.startRefresh()
 		default:
 			break
 		}

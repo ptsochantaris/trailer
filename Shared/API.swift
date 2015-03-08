@@ -1098,7 +1098,7 @@ class API {
 		get("/rate_limit", fromServer: apiServer, ignoreLastSync: true, parameters: nil, extraHeaders: nil,
 			success: { response, data in
 				callback?(nil)
-				return // compiler seems to need this for some reason
+				return
 			},
 			failure: { response, data, error in
 				let allOk = (response?.statusCode == 404 && data != nil && !((data as NSDictionary).ofk("message") as String == "Not Found"))
@@ -1126,7 +1126,7 @@ class API {
 		finalCallback: ((success: Bool, resultCode: Int, etag: String?)->Void)?) {
 
 			if path.isEmpty {
-				// handling empty or null fields as success, since we don't want syncs to fail, we simply have nothing to process
+				// handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
 				dispatch_async(dispatch_get_main_queue()) {
 					finalCallback?(success: true, resultCode: -1, etag: nil)
 					return
@@ -1288,14 +1288,14 @@ class API {
 					DLog("(%@) GET %@ - FAILED: %@", apiServerLabel, fullUrlPath, error!.localizedDescription)
 					dispatch_async(dispatch_get_main_queue()) {
 						failure?(response: response, data: parsedData, error: error)
-						return // compiler is acting weird, seems to need this
+						return
 					}
 				} else {
 					DLog("(%@) GET %@ - RESULT: %d", apiServerLabel, fullUrlPath, response?.statusCode)
 					self!.badLinks.removeValueForKey(fullUrlPath)
 					dispatch_async(dispatch_get_main_queue()) {
 						success?(response: response, data: parsedData)
-						return // compiler is acting weird, seems to need this
+						return
 					}
 				}
 

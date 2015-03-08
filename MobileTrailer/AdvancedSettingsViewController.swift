@@ -25,7 +25,7 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 
 	private enum Section: Int {
 		case Refresh, Display, Comments, Repos, StausesAndLabels, History, Confirm, Sort, Misc
-		static let rowCounts = [3, 7, 6, 1, 4, 3, 2, 3, 1]
+		static let rowCounts = [3, 7, 6, 1, 6, 3, 2, 3, 1]
 		static let allNames = ["Auto Refresh", "Display","Comments", "Repositories", "Statuses & Labels", "History", "Don't confirm when", "Sorting", "Misc"]
 	}
 
@@ -143,6 +143,12 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 			case 3:
 				cell.textLabel?.text = "Re-query labels"
 				cell.detailTextLabel?.text = Settings.labelRefreshInterval == 1 ? "Every refresh" : "Every \(Settings.labelRefreshInterval) refreshes"
+			case 4:
+				cell.textLabel?.text = "Notifications for new statuses"
+				cell.accessoryType = check(Settings.notifyOnStatusUpdates)
+			case 5:
+				cell.textLabel?.text = "... new statuses for all PRs"
+				cell.accessoryType = check(Settings.notifyOnStatusUpdatesForAllPrs)
 			default: break
 			}
 		} else if indexPath.section == Section.History.rawValue {
@@ -332,6 +338,10 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 				}
 				valuesToPush = values
 				performSegueWithIdentifier("showPicker", sender: self)
+			case 4:
+				Settings.notifyOnStatusUpdates = !Settings.notifyOnStatusUpdates
+			case 5:
+				Settings.notifyOnStatusUpdatesForAllPrs = !Settings.notifyOnStatusUpdatesForAllPrs
 			default: break
 			}
 		} else if indexPath.section == Section.History.rawValue {

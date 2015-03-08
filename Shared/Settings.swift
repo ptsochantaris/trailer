@@ -280,4 +280,14 @@ class Settings: NSObject {
 		get { return get("GRAY_OUT_WHEN_REFRESHING") as? Bool ?? true }
 		set { set("GRAY_OUT_WHEN_REFRESHING", newValue) }
     }
+
+	class var notifyOnStatusUpdates: Bool {
+		get { return get("NOTIFY_ON_STATUS_UPDATES") as? Bool ?? false }
+		set { set("NOTIFY_ON_STATUS_UPDATES", newValue) }
+	}
+
+	class var notifyOnStatusUpdatesForAllPrs: Bool {
+		get { return get("NOTIFY_ON_STATUS_UPDATES_ALL") as? Bool ?? false }
+		set { set("NOTIFY_ON_STATUS_UPDATES_ALL", newValue) }
+	}
 }

@@ -28,10 +28,6 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	@IBOutlet weak var includeRepositoriesInFiltering: NSButton!
 	@IBOutlet weak var groupByRepo: NSButton!
 	@IBOutlet weak var hideAllPrsSection: NSButton!
-	@IBOutlet weak var showStatusItems: NSButton!
-	@IBOutlet weak var makeStatusItemsSelectable: NSButton!
-	@IBOutlet weak var statusTermMenu: NSPopUpButton!
-	@IBOutlet weak var statusTermsField: NSTokenField!
 	@IBOutlet weak var moveAssignedPrsToMySection: NSButton!
 	@IBOutlet weak var markUnmergeableOnUserSectionsOnly: NSButton!
 	@IBOutlet weak var repoCheckLabel: NSTextField!
@@ -42,16 +38,22 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	@IBOutlet weak var checkForUpdatesAutomatically: NSButton!
 	@IBOutlet weak var checkForUpdatesLabel: NSTextField!
 	@IBOutlet weak var checkForUpdatesSelector: NSStepper!
-	@IBOutlet weak var statusItemRescanLabel: NSTextField!
-	@IBOutlet weak var statusItemRefreshCounter: NSStepper!
-	@IBOutlet weak var statusItemsRefreshNote: NSTextField!
 	@IBOutlet weak var hideNewRepositories: NSButton!
 	@IBOutlet weak var openPrAtFirstUnreadComment: NSButton!
 	@IBOutlet weak var logActivityToConsole: NSButton!
 	@IBOutlet weak var commentAuthorBlacklist: NSTokenField!
-	@IBOutlet weak var showLabels: NSButton!
-    @IBOutlet weak var grayOutWhenRefreshing: NSButton!
 
+	// Preferences - Statuses
+	@IBOutlet weak var showStatusItems: NSButton!
+	@IBOutlet weak var makeStatusItemsSelectable: NSButton!
+	@IBOutlet weak var statusItemRescanLabel: NSTextField!
+	@IBOutlet weak var statusItemRefreshCounter: NSStepper!
+	@IBOutlet weak var statusItemsRefreshNote: NSTextField!
+	@IBOutlet weak var notifyOnStatusUpdates: NSButton!
+	@IBOutlet weak var notifyOnStatusUpdatesForAllPrs: NSButton!
+	@IBOutlet weak var statusTermMenu: NSPopUpButton!
+	@IBOutlet weak var statusTermsField: NSTokenField!
+	
     // Preferences - Comments
     @IBOutlet weak var disableAllCommentNotifications: NSButton!
 
@@ -59,11 +61,13 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	@IBOutlet weak var useVibrancy: NSButton!
 	@IBOutlet weak var includeLabelsInFiltering: NSButton!
 	@IBOutlet weak var includeStatusesInFiltering: NSButton!
+    @IBOutlet weak var grayOutWhenRefreshing: NSButton!
 
 	// Preferences - Labels
 	@IBOutlet weak var labelRescanLabel: NSTextField!
 	@IBOutlet weak var labelRefreshNote: NSTextField!
 	@IBOutlet weak var labelRefreshCounter: NSStepper!
+	@IBOutlet weak var showLabels: NSButton!
 
 	// Preferences - Servers
 	@IBOutlet weak var serverList: NSTableView!
@@ -268,6 +272,14 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
         Settings.disableAllCommentNotifications = (sender.integerValue==1)
     }
 
+	@IBAction func notifyOnStatusUpdates(sender: NSButton) {
+		Settings.notifyOnStatusUpdates = (sender.integerValue==1)
+	}
+
+	@IBAction func notifyOnStatusUpdatesOnAllPrsSelected(sender: NSButton) {
+		Settings.notifyOnStatusUpdatesForAllPrs = (sender.integerValue==1)
+	}
+
 	@IBAction func hideAvatarsSelected(sender: NSButton) {
 		Settings.hideAvatars = (sender.integerValue==1)
 		DataManager.postProcessAllPrs()
@@ -331,6 +343,8 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	private func updateStatusItemsOptions() {
 		let enable = Settings.showStatusItems
 		makeStatusItemsSelectable.enabled = enable
+		notifyOnStatusUpdates.enabled = enable
+		notifyOnStatusUpdatesForAllPrs.enabled = enable
 		statusTermMenu.enabled = enable
 		statusTermsField.enabled = enable
 		statusItemRefreshCounter.enabled = enable
@@ -462,13 +476,13 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		case .NewMention:
 			let c = forItem as PRComment
 			notification.title = "@" + (c.userName ?? "NoUserName") + " mentioned you:"
-			notification.informativeText = c.body
 			notification.subtitle = c.pullRequest.title
+			notification.informativeText = c.body
 		case .NewComment:
 			let c = forItem as PRComment
 			notification.title = "@" + (c.userName ?? "NoUserName") + " commented:"
-			notification.informativeText = c.body
 			notification.subtitle = c.pullRequest.title
+			notification.informativeText = c.body
 		case .NewPr:
 			notification.title = "New PR"
 			notification.subtitle = (forItem as PullRequest).title
@@ -490,6 +504,11 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		case .NewPrAssigned:
 			notification.title = "PR Assigned"
 			notification.subtitle = (forItem as PullRequest).title
+		case .NewStatus:
+			let c = forItem as PRStatus
+			notification.title = "New PR Status"
+			notification.subtitle = c.pullRequest.title
+			notification.informativeText = c.descriptionText
 		}
 
 		if (type == .NewComment || type == .NewMention) && !Settings.hideAvatars && notification.respondsToSelector(Selector("setContentImage:")) { // let's add an avatar on this!
@@ -829,6 +848,8 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		hideAvatars.integerValue = Settings.hideAvatars ? 1 : 0
 		dontKeepPrsMergedByMe.integerValue = Settings.dontKeepPrsMergedByMe ? 1 : 0
         grayOutWhenRefreshing.integerValue = Settings.grayOutWhenRefreshing ? 1 : 0
+		notifyOnStatusUpdates.integerValue = Settings.notifyOnStatusUpdates ? 1 : 0
+		notifyOnStatusUpdatesForAllPrs.integerValue = Settings.notifyOnStatusUpdatesForAllPrs ? 1 : 0
         disableAllCommentNotifications.integerValue = Settings.disableAllCommentNotifications ? 1 : 0
 		showAllComments.integerValue = Settings.showCommentsEverywhere ? 1 : 0
 		sortingOrder.integerValue = Settings.sortDescending ? 1 : 0

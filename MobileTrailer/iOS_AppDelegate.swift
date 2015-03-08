@@ -281,6 +281,10 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 			if let p = forItem as? PullRequest {
 				notification.alertBody = "PR Assigned: " + (p.title ?? "(untitled)") + " in " + (p.repo.fullName ?? "(untitled)")
 			}
+		case .NewStatus:
+			if let s = forItem as? PRStatus {
+				notification.alertBody = "New Status: " + (s.descriptionText ?? "(untitled)") + " in " + (s.pullRequest.repo.fullName ?? "(untitled)")
+			}
 		}
 
 		// Present notifications only if the user isn't currenty reading notifications in the notification center, over the open app, a corner case
