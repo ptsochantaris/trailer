@@ -109,20 +109,30 @@ class DataManager : NSObject {
 			c.postSyncAction = PostSyncAction.DoNothing.rawValue
 		}
 
+		var latestStatuses = PRStatus.newItemsOfType("PRStatus", inMoc: mainObjectContext) as [PRStatus]
 		if(Settings.notifyOnStatusUpdates) {
-			var latestStatuses = PRStatus.newItemsOfType("PRStatus", inMoc: mainObjectContext) as [PRStatus]
 			let coveredPrs = NSMutableSet()
 			for s in latestStatuses {
 				if Settings.notifyOnStatusUpdatesForAllPrs || s.pullRequest.isMine() {
 					let pr = s.pullRequest
 					if !coveredPrs.containsObject(pr) {
 						if let s = pr.displayedStatuses().first {
-							app.postNotificationOfType(PRNotificationType.NewStatus, forItem: s)
-						}
+                            let displayText = s.displayText()
+                            if pr.lastStatusNotified != displayText && pr.postSyncAction?.integerValue != PostSyncAction.NoteNew.rawValue {
+                                app.postNotificationOfType(PRNotificationType.NewStatus, forItem: s)
+                                pr.lastStatusNotified = displayText
+                            }
+                        } else {
+                            pr.lastStatusNotified = nil
+                        }
 						coveredPrs.addObject(pr)
 					}
 				}
 			}
+		}
+
+		for s in latestStatuses {
+			s.postSyncAction = PostSyncAction.DoNothing.rawValue
 		}
 
 		for p in allTouchedPrs {

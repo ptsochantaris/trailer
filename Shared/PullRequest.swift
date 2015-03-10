@@ -38,6 +38,7 @@ class PullRequest: DataItem {
     @NSManaged var userId: NSNumber?
     @NSManaged var userLogin: String?
     @NSManaged var webUrl: String?
+    @NSManaged var lastStatusNotified: String?
 
     @NSManaged var comments: NSSet
     @NSManaged var labels: NSSet

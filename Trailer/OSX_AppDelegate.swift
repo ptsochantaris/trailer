@@ -272,7 +272,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
         Settings.disableAllCommentNotifications = (sender.integerValue==1)
     }
 
-	@IBAction func notifyOnStatusUpdates(sender: NSButton) {
+	@IBAction func notifyOnStatusUpdatesSelected(sender: NSButton) {
 		Settings.notifyOnStatusUpdates = (sender.integerValue==1)
 	}
 

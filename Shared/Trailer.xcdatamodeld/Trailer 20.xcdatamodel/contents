@@ -72,6 +72,7 @@
         <attribute name="isNewAssignment" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="issueCommentLink" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="issueUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="lastStatusNotified" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="latestReadCommentDate" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="mergeable" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="number" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
@@ -134,7 +135,7 @@
         <element name="PRComment" positionX="0" positionY="0" width="128" height="253"/>
         <element name="PRLabel" positionX="9" positionY="153" width="128" height="178"/>
         <element name="PRStatus" positionX="0" positionY="0" width="128" height="223"/>
-        <element name="PullRequest" positionX="0" positionY="0" width="128" height="525"/>
+        <element name="PullRequest" positionX="0" positionY="0" width="128" height="540"/>
         <element name="Repo" positionX="0" positionY="0" width="128" height="240"/>
     </elements>
 </model>
