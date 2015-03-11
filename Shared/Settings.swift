@@ -102,7 +102,7 @@ class Settings: NSObject {
 		set {
 			set("IOS_BACKGROUND_REFRESH_PERIOD_KEY", newValue)
 			#if os(iOS)
-			UIApplication.sharedApplication().setMinimumBackgroundFetchInterval(NSTimeInterval(newValue))
+            app.setMinimumBackgroundFetchInterval(NSTimeInterval(newValue))
 			#endif
 		}
 	}
@@ -239,6 +239,16 @@ class Settings: NSObject {
         set { set("DISABLE_ALL_COMMENT_NOTIFICATIONS", newValue) }
     }
 
+    class var notifyOnStatusUpdates: Bool {
+        get { return get("NOTIFY_ON_STATUS_UPDATES") as? Bool ?? false }
+        set { set("NOTIFY_ON_STATUS_UPDATES", newValue) }
+    }
+
+    class var notifyOnStatusUpdatesForAllPrs: Bool {
+        get { return get("NOTIFY_ON_STATUS_UPDATES_ALL") as? Bool ?? false }
+        set { set("NOTIFY_ON_STATUS_UPDATES_ALL", newValue) }
+    }
+
 	//////////////////////////////
 
 	class var showReposInName: Bool {
@@ -280,14 +290,4 @@ class Settings: NSObject {
 		get { return get("GRAY_OUT_WHEN_REFRESHING") as? Bool ?? true }
 		set { set("GRAY_OUT_WHEN_REFRESHING", newValue) }
     }
-
-	class var notifyOnStatusUpdates: Bool {
-		get { return get("NOTIFY_ON_STATUS_UPDATES") as? Bool ?? false }
-		set { set("NOTIFY_ON_STATUS_UPDATES", newValue) }
-	}
-
-	class var notifyOnStatusUpdatesForAllPrs: Bool {
-		get { return get("NOTIFY_ON_STATUS_UPDATES_ALL") as? Bool ?? false }
-		set { set("NOTIFY_ON_STATUS_UPDATES_ALL", newValue) }
-	}
 }

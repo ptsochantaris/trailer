@@ -170,6 +170,29 @@ class PullRequest: DataItem {
 		return moc.countForFetchRequest(f, error: nil)
 	}
 
+    class func countAllRequestsInMoc(moc: NSManagedObjectContext) -> Int {
+        let f = NSFetchRequest(entityName: "PullRequest")
+        f.predicate = NSPredicate(format: "sectionIndex == %d or sectionIndex == %d or sectionIndex == %d",
+            PullRequestSection.Mine.rawValue,
+            PullRequestSection.Participated.rawValue,
+            PullRequestSection.All.rawValue)
+        return moc.countForFetchRequest(f, error: nil)
+    }
+
+    class func countOwnRequestsInMoc(moc: NSManagedObjectContext) -> Int {
+        let f = NSFetchRequest(entityName: "PullRequest")
+        f.predicate = NSPredicate(format: "sectionIndex == %d",
+            PullRequestSection.Mine.rawValue)
+        return moc.countForFetchRequest(f, error: nil)
+    }
+
+    class func countParticipatedRequestsInMoc(moc: NSManagedObjectContext) -> Int {
+        let f = NSFetchRequest(entityName: "PullRequest")
+        f.predicate = NSPredicate(format: "sectionIndex == %d",
+            PullRequestSection.Participated.rawValue)
+        return moc.countForFetchRequest(f, error: nil)
+    }
+
 	class func badgeCountInMoc(moc: NSManagedObjectContext) -> Int {
 		let f = requestForPullRequestsWithFilter(nil)
 		var badgeCount:Int = 0

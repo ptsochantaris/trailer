@@ -7,6 +7,10 @@ import CoreData
 class DataManager : NSObject {
 
 	class func checkMigration() {
+        #if os(iOS)
+            migrateDatabaseToShared()
+        #endif
+
 		if DataManager.versionBumpOccured() {
 			DLog("VERSION UPDATE MAINTENANCE NEEDED")
 			DataManager.performVersionChangedTasks()
@@ -16,6 +20,7 @@ class DataManager : NSObject {
 	}
 
 	class func performVersionChangedTasks() {
+
 		let d = NSUserDefaults.standardUserDefaults()
 		if let legacyAuthToken = d.objectForKey("GITHUB_AUTH_TOKEN") as? String {
 			var legacyApiHost = d.objectForKey("API_BACKEND_SERVER") as? String ?? ""
@@ -48,6 +53,31 @@ class DataManager : NSObject {
 			r.lastDirtied = NSDate()
 		}
 	}
+
+    class func migrateDatabaseToShared() {
+        let oldDocumentsDirectory = legacyFilesDirectory().path!
+        let fm = NSFileManager.defaultManager()
+        if fm.fileExistsAtPath(oldDocumentsDirectory) {
+            DLog("Migrating DB files into group container")
+            if let files = fm.contentsOfDirectoryAtPath(oldDocumentsDirectory, error: nil) as? [String] {
+                let newDocumentsDirectory = sharedFilesDirectory().path!
+                for file in files {
+                    if file.rangeOfString("Trailer.sqlite") != nil {
+                        DLog("Moving database file: %@",file)
+                        let oldPath = oldDocumentsDirectory.stringByAppendingPathComponent(file)
+                        let newPath = newDocumentsDirectory.stringByAppendingPathComponent(file)
+                        if fm.fileExistsAtPath(newPath) {
+                            fm.removeItemAtPath(newPath, error: nil)
+                        }
+                        fm.moveItemAtPath(oldPath, toPath: newPath, error: nil)
+                    }
+                }
+            }
+            fm.removeItemAtPath(oldDocumentsDirectory, error: nil)
+        } else {
+            DLog("No need to migrate DB into shared container")
+        }
+    }
 
 	class func sendNotifications() {
 
@@ -117,7 +147,7 @@ class DataManager : NSObject {
 					let pr = s.pullRequest
 					if !coveredPrs.containsObject(pr) {
 						if let s = pr.displayedStatuses().first {
-                            let displayText = s.displayText()
+                            let displayText = s.descriptionText
                             if pr.lastStatusNotified != displayText && pr.postSyncAction?.integerValue != PostSyncAction.NoteNew.rawValue {
                                 app.postNotificationOfType(PRNotificationType.NewStatus, forItem: s)
                                 pr.lastStatusNotified = displayText
@@ -356,11 +386,25 @@ func persistentStoreCoordinator() -> NSPersistentStoreCoordinator? {
 }
 
 func applicationFilesDirectory() -> NSURL {
+    #if os(iOS)
+        return sharedFilesDirectory()
+    #else
+        return legacyFilesDirectory()
+    #endif
+}
+
+private func legacyFilesDirectory() -> NSURL {
 	let f = NSFileManager.defaultManager()
 	var appSupportURL = f.URLsForDirectory(NSSearchPathDirectory.ApplicationSupportDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask).last! as NSURL
 	appSupportURL = appSupportURL.URLByAppendingPathComponent("com.housetrip.Trailer")
 	DLog("Files in %@", appSupportURL)
 	return appSupportURL
+}
+
+private func sharedFilesDirectory() -> NSURL {
+    var appSupportURL = NSFileManager.defaultManager().containerURLForSecurityApplicationGroupIdentifier("group.PocketTrailer")!
+    DLog("Shared files in %@", appSupportURL)
+    return appSupportURL
 }
 
 func managedObjectModel() -> NSManagedObjectModel {

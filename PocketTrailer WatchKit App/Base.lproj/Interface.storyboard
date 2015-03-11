@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="6751" systemVersion="14C1510" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="AgC-eL-Hgc">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6736"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="3737"/>
+    </dependencies>
+    <scenes>
+        <!--Interface Controller-->
+        <scene sceneID="aou-V4-d1y">
+            <objects>
+                <controller id="AgC-eL-Hgc" customClass="InterfaceController" customModule="PocketTrailer_WatchKit_App" customModuleProvider="target"/>
+            </objects>
+            <point key="canvasLocation" x="164" y="217"/>
+        </scene>
+        <!--Glance Interface Controller-->
+        <scene sceneID="rjY-Ar-IMT">
+            <objects>
+                <glanceController spacing="0.0" id="Sv0-Ai-Zie" customClass="GlanceController" customModule="PocketTrailer_WatchKit_App" customModuleProvider="target">
+                    <items>
+                        <group alignment="left" id="gv7-I2-MZq">
+                            <items>
+                                <imageView width="32" height="32" alignment="center" verticalAlignment="center" alpha="0.79999999999999982" image="GlanceIcon" contentMode="scaleAspectFit" id="xYb-hC-O7D"/>
+                                <label alignment="center" verticalAlignment="center" text="43" textAlignment="center" id="3wl-rh-8m0">
+                                    <fontDescription key="font" type="system" weight="medium" pointSize="28"/>
+                                </label>
+                            </items>
+                        </group>
+                        <group alignment="left" layout="vertical" spacing="10" id="eew-Gs-W6Y">
+                            <items>
+                                <label alignment="center" text="XX MINE" numberOfLines="0" id="fJB-oa-687">
+                                    <fontDescription key="font" type="system" pointSize="14"/>
+                                </label>
+                                <group width="1" alignment="left" layout="vertical" id="27I-dC-3gQ">
+                                    <items>
+                                        <label alignment="center" text="XX PARTICIPATED" numberOfLines="0" id="E1B-vS-NEB">
+                                            <fontDescription key="font" type="system" pointSize="9"/>
+                                        </label>
+                                        <label alignment="center" text="XX UNREAD COMMENTS" numberOfLines="0" id="haI-qm-CXj">
+                                            <color key="textColor" red="1" green="0.0" blue="0.070606581870000004" alpha="1" colorSpace="calibratedRGB"/>
+                                            <fontDescription key="font" type="system" pointSize="9"/>
+                                        </label>
+                                    </items>
+                                </group>
+                            </items>
+                        </group>
+                    </items>
+                    <edgeInsets key="margins" left="0.0" right="0.0" top="0.0" bottom="14"/>
+                    <connections>
+                        <outlet property="myCount" destination="fJB-oa-687" id="s3p-Ev-MQm"/>
+                        <outlet property="participatedCount" destination="E1B-vS-NEB" id="gwl-jI-qUt"/>
+                        <outlet property="totalCount" destination="3wl-rh-8m0" id="BgR-8y-n1Z"/>
+                        <outlet property="unreadCount" destination="haI-qm-CXj" id="djY-l5-Twe"/>
+                    </connections>
+                </glanceController>
+            </objects>
+            <point key="canvasLocation" x="164" y="514"/>
+        </scene>
+    </scenes>
+</document>

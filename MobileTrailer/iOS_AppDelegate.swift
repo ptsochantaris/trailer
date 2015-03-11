@@ -323,4 +323,7 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 		sharePopover = nil
 	}
 
+    func setMinimumBackgroundFetchInterval(interval: NSTimeInterval) -> Void {
+        UIApplication.sharedApplication().setMinimumBackgroundFetchInterval(NSTimeInterval(interval))
+    }
 }

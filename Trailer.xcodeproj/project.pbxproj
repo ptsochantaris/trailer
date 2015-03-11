@@ -33,10 +33,32 @@
 		164785AF1A2CE7CD00297764 /* NSDictionaryExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785AC1A2CE7CD00297764 /* NSDictionaryExtensions.swift */; };
 		164785B01A2CE7CD00297764 /* NSStringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785AD1A2CE7CD00297764 /* NSStringExtensions.swift */; };
 		164785B11A2CE7CD00297764 /* NSStringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785AD1A2CE7CD00297764 /* NSStringExtensions.swift */; };
+		16522D751AB03AE500B1C3FB /* InterfaceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16522D741AB03AE500B1C3FB /* InterfaceController.swift */; };
+		16522D771AB03AE500B1C3FB /* GlanceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16522D761AB03AE500B1C3FB /* GlanceController.swift */; };
+		16522D791AB03AE500B1C3FB /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 16522D781AB03AE500B1C3FB /* Images.xcassets */; };
+		16522D7D1AB03AE500B1C3FB /* PocketTrailer WatchKit App.app in Resources */ = {isa = PBXBuildFile; fileRef = 16522D7C1AB03AE500B1C3FB /* PocketTrailer WatchKit App.app */; };
+		16522D851AB03AE500B1C3FB /* Interface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 16522D831AB03AE500B1C3FB /* Interface.storyboard */; };
+		16522D871AB03AE500B1C3FB /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 16522D861AB03AE500B1C3FB /* Images.xcassets */; };
+		16522D8A1AB03AE500B1C3FB /* PocketTrailer WatchKit Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 16522D701AB03AE500B1C3FB /* PocketTrailer WatchKit Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		16522D931AB0423700B1C3FB /* octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 16522D921AB0423700B1C3FB /* octicons.ttf */; };
 		166A84BE1A457CA700A3B292 /* ServersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166A84BD1A457CA700A3B292 /* ServersViewController.swift */; };
 		166A84C01A4582C100A3B292 /* ServerDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166A84BF1A4582C100A3B292 /* ServerDetailViewController.swift */; };
 		166A84C21A45A37700A3B292 /* AdvancedSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166A84C11A45A37700A3B292 /* AdvancedSettingsViewController.swift */; };
 		166A84C41A45CEE000A3B292 /* PickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166A84C31A45CEE000A3B292 /* PickerViewController.swift */; };
+		1672DF3A1AB0E8C600381AEB /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785A91A2CE7BD00297764 /* Globals.swift */; };
+		1672DF3C1AB0E8CD00381AEB /* NSDictionaryExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785AC1A2CE7CD00297764 /* NSDictionaryExtensions.swift */; };
+		1672DF3E1AB0E8CD00381AEB /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C41A2DFBA500485053 /* Settings.swift */; };
+		1672DF3F1AB0E8DE00381AEB /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C01A2DBB2700485053 /* DataManager.swift */; };
+		1672DF401AB0E8E300381AEB /* Trailer.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B33B1A34E990000BE6CC /* Trailer.xcdatamodeld */; };
+		1672DF411AB0E8EA00381AEB /* ApiServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3101A34E8E2000BE6CC /* ApiServer.swift */; };
+		1672DF421AB0E8EA00381AEB /* DataItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3111A34E8E2000BE6CC /* DataItem.swift */; };
+		1672DF431AB0E8EA00381AEB /* PRComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3121A34E8E2000BE6CC /* PRComment.swift */; };
+		1672DF441AB0E8EA00381AEB /* PRLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3131A34E8E2000BE6CC /* PRLabel.swift */; };
+		1672DF451AB0E8EA00381AEB /* PRStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3141A34E8E2000BE6CC /* PRStatus.swift */; };
+		1672DF461AB0E8EA00381AEB /* PullRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3151A34E8E2000BE6CC /* PullRequest.swift */; };
+		1672DF471AB0E8EA00381AEB /* Repo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3161A34E8E2000BE6CC /* Repo.swift */; };
+		1672DF481AB0E9C900381AEB /* NSStringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785AD1A2CE7CD00297764 /* NSStringExtensions.swift */; };
+		1672DF4B1AB0EB9200381AEB /* WatchKitGlobals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1672DF4A1AB0EB9200381AEB /* WatchKitGlobals.swift */; };
 		168BC6B817EC2DF000BC4584 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 168BC6B617EC2DF000BC4584 /* InfoPlist.strings */; };
 		168BC6C417EC2DF000BC4584 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 168BC6C217EC2DF000BC4584 /* MainMenu.xib */; };
 		168BC6C917EC2DF000BC4584 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 168BC6C817EC2DF000BC4584 /* Images.xcassets */; };
@@ -85,7 +107,35 @@
 		16EE871B1A446BFE00A1D16F /* EmptyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16EE871A1A446BFE00A1D16F /* EmptyView.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		16522D7E1AB03AE500B1C3FB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 168BC6A217EC2DF000BC4584 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 16522D7B1AB03AE500B1C3FB;
+			remoteInfo = "PocketTrailer WatchKit App";
+		};
+		16522D881AB03AE500B1C3FB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 168BC6A217EC2DF000BC4584 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 16522D6F1AB03AE500B1C3FB;
+			remoteInfo = "PocketTrailer WatchKit Extension";
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXCopyFilesBuildPhase section */
+		16522D911AB03AE500B1C3FB /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				16522D8A1AB03AE500B1C3FB /* PocketTrailer WatchKit Extension.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		16A505D71A387C99005DD3B7 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -127,10 +177,23 @@
 		164785AD1A2CE7CD00297764 /* NSStringExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NSStringExtensions.swift; path = Shared/NSStringExtensions.swift; sourceTree = "<group>"; };
 		164785B21A2CE7FB00297764 /* PocketTrailer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PocketTrailer-Bridging-Header.h"; sourceTree = "<group>"; };
 		164785B31A2CE80800297764 /* Trailer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Trailer-Bridging-Header.h"; sourceTree = "<group>"; };
+		16522D701AB03AE500B1C3FB /* PocketTrailer WatchKit Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "PocketTrailer WatchKit Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		16522D731AB03AE500B1C3FB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		16522D741AB03AE500B1C3FB /* InterfaceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterfaceController.swift; sourceTree = "<group>"; };
+		16522D761AB03AE500B1C3FB /* GlanceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlanceController.swift; sourceTree = "<group>"; };
+		16522D781AB03AE500B1C3FB /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		16522D7C1AB03AE500B1C3FB /* PocketTrailer WatchKit App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "PocketTrailer WatchKit App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		16522D821AB03AE500B1C3FB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		16522D841AB03AE500B1C3FB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Interface.storyboard; sourceTree = "<group>"; };
+		16522D861AB03AE500B1C3FB /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		16522D921AB0423700B1C3FB /* octicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = octicons.ttf; sourceTree = "<group>"; };
 		166A84BD1A457CA700A3B292 /* ServersViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServersViewController.swift; sourceTree = "<group>"; };
 		166A84BF1A4582C100A3B292 /* ServerDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ServerDetailViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		166A84C11A45A37700A3B292 /* AdvancedSettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdvancedSettingsViewController.swift; sourceTree = "<group>"; };
 		166A84C31A45CEE000A3B292 /* PickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerViewController.swift; sourceTree = "<group>"; };
+		1672DF2C1AB0D78500381AEB /* PocketTrailer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PocketTrailer.entitlements; sourceTree = SOURCE_ROOT; };
+		1672DF2D1AB0D7CC00381AEB /* PocketTrailer WatchKit Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "PocketTrailer WatchKit Extension.entitlements"; sourceTree = "<group>"; };
+		1672DF4A1AB0EB9200381AEB /* WatchKitGlobals.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WatchKitGlobals.swift; sourceTree = "<group>"; };
 		168BC6AA17EC2DF000BC4584 /* Trailer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Trailer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		168BC6B517EC2DF000BC4584 /* Trailer-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Trailer-Info.plist"; sourceTree = "<group>"; };
 		168BC6B717EC2DF000BC4584 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -197,6 +260,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		16522D6D1AB03AE500B1C3FB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		168BC6A717EC2DF000BC4584 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -229,7 +299,7 @@
 			name = Core;
 			sourceTree = "<group>";
 		};
-		1628A6BA18789E73005EDA69 /* iOS - PocketTrailer */ = {
+		1628A6BA18789E73005EDA69 /* PocketTrailer */ = {
 			isa = PBXGroup;
 			children = (
 				162002D11A2A409900FF95F3 /* Core */,
@@ -241,7 +311,7 @@
 				1628A6D518789E73005EDA69 /* Images.xcassets */,
 				1628A6BB18789E73005EDA69 /* Supporting Files */,
 			);
-			name = "iOS - PocketTrailer";
+			name = PocketTrailer;
 			path = MobileTrailer;
 			sourceTree = "<group>";
 		};
@@ -249,6 +319,7 @@
 			isa = PBXGroup;
 			children = (
 				1628A6BC18789E73005EDA69 /* PocketTrailer-Info.plist */,
+				1672DF2C1AB0D78500381AEB /* PocketTrailer.entitlements */,
 				1628A6BD18789E73005EDA69 /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
@@ -281,6 +352,46 @@
 			name = Logic;
 			sourceTree = "<group>";
 		};
+		16522D711AB03AE500B1C3FB /* PocketTrailer WatchKit Extension */ = {
+			isa = PBXGroup;
+			children = (
+				16522D741AB03AE500B1C3FB /* InterfaceController.swift */,
+				16522D761AB03AE500B1C3FB /* GlanceController.swift */,
+				1672DF4A1AB0EB9200381AEB /* WatchKitGlobals.swift */,
+				16522D781AB03AE500B1C3FB /* Images.xcassets */,
+				16522D721AB03AE500B1C3FB /* Supporting Files */,
+			);
+			path = "PocketTrailer WatchKit Extension";
+			sourceTree = "<group>";
+		};
+		16522D721AB03AE500B1C3FB /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				1672DF2D1AB0D7CC00381AEB /* PocketTrailer WatchKit Extension.entitlements */,
+				16522D731AB03AE500B1C3FB /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		16522D801AB03AE500B1C3FB /* PocketTrailer WatchKit App */ = {
+			isa = PBXGroup;
+			children = (
+				16522D861AB03AE500B1C3FB /* Images.xcassets */,
+				16522D811AB03AE500B1C3FB /* Supporting Files */,
+			);
+			path = "PocketTrailer WatchKit App";
+			sourceTree = "<group>";
+		};
+		16522D811AB03AE500B1C3FB /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				16522D831AB03AE500B1C3FB /* Interface.storyboard */,
+				16522D921AB0423700B1C3FB /* octicons.ttf */,
+				16522D821AB03AE500B1C3FB /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
 		168A5C74185BB9D900CB6B02 /* UI Components */ = {
 			isa = PBXGroup;
 			children = (
@@ -304,8 +415,10 @@
 			isa = PBXGroup;
 			children = (
 				1628A6F218789EA3005EDA69 /* Shared */,
-				1628A6BA18789E73005EDA69 /* iOS - PocketTrailer */,
-				168BC6B317EC2DF000BC4584 /* OSX - Trailer */,
+				168BC6B317EC2DF000BC4584 /* Trailer */,
+				1628A6BA18789E73005EDA69 /* PocketTrailer */,
+				16522D711AB03AE500B1C3FB /* PocketTrailer WatchKit Extension */,
+				16522D801AB03AE500B1C3FB /* PocketTrailer WatchKit App */,
 				168BC6AC17EC2DF000BC4584 /* Frameworks */,
 				168BC6AB17EC2DF000BC4584 /* Products */,
 			);
@@ -316,6 +429,8 @@
 			children = (
 				168BC6AA17EC2DF000BC4584 /* Trailer.app */,
 				1628A6B118789E73005EDA69 /* PocketTrailer.app */,
+				16522D701AB03AE500B1C3FB /* PocketTrailer WatchKit Extension.appex */,
+				16522D7C1AB03AE500B1C3FB /* PocketTrailer WatchKit App.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -328,7 +443,7 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		168BC6B317EC2DF000BC4584 /* OSX - Trailer */ = {
+		168BC6B317EC2DF000BC4584 /* Trailer */ = {
 			isa = PBXGroup;
 			children = (
 				162002CE1A2A3E0100FF95F3 /* Core */,
@@ -337,7 +452,6 @@
 				168BC6C817EC2DF000BC4584 /* Images.xcassets */,
 				168BC6B417EC2DF000BC4584 /* Supporting Files */,
 			);
-			name = "OSX - Trailer";
 			path = Trailer;
 			sourceTree = "<group>";
 		};
@@ -431,15 +545,50 @@
 				1628A6AD18789E73005EDA69 /* Sources */,
 				1628A6AE18789E73005EDA69 /* Frameworks */,
 				1628A6AF18789E73005EDA69 /* Resources */,
+				16522D911AB03AE500B1C3FB /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				16522D891AB03AE500B1C3FB /* PBXTargetDependency */,
 			);
 			name = PocketTrailer;
 			productName = MobileTrailer;
 			productReference = 1628A6B118789E73005EDA69 /* PocketTrailer.app */;
 			productType = "com.apple.product-type.application";
+		};
+		16522D6F1AB03AE500B1C3FB /* PocketTrailer WatchKit Extension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 16522D901AB03AE500B1C3FB /* Build configuration list for PBXNativeTarget "PocketTrailer WatchKit Extension" */;
+			buildPhases = (
+				16522D6C1AB03AE500B1C3FB /* Sources */,
+				16522D6D1AB03AE500B1C3FB /* Frameworks */,
+				16522D6E1AB03AE500B1C3FB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				16522D7F1AB03AE500B1C3FB /* PBXTargetDependency */,
+			);
+			name = "PocketTrailer WatchKit Extension";
+			productName = "PocketTrailer WatchKit Extension";
+			productReference = 16522D701AB03AE500B1C3FB /* PocketTrailer WatchKit Extension.appex */;
+			productType = "com.apple.product-type.watchkit-extension";
+		};
+		16522D7B1AB03AE500B1C3FB /* PocketTrailer WatchKit App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 16522D8F1AB03AE500B1C3FB /* Build configuration list for PBXNativeTarget "PocketTrailer WatchKit App" */;
+			buildPhases = (
+				16522D7A1AB03AE500B1C3FB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "PocketTrailer WatchKit App";
+			productName = "PocketTrailer WatchKit App";
+			productReference = 16522D7C1AB03AE500B1C3FB /* PocketTrailer WatchKit App.app */;
+			productType = "com.apple.product-type.application.watchapp";
 		};
 		168BC6A917EC2DF000BC4584 /* Trailer */ = {
 			isa = PBXNativeTarget;
@@ -471,10 +620,25 @@
 					1628A6B018789E73005EDA69 = {
 						DevelopmentTeam = X727JSJUGJ;
 						SystemCapabilities = {
+							com.apple.ApplicationGroups.iOS = {
+								enabled = 1;
+							};
 							com.apple.BackgroundModes = {
 								enabled = 1;
 							};
 						};
+					};
+					16522D6F1AB03AE500B1C3FB = {
+						CreatedOnToolsVersion = 6.2;
+						DevelopmentTeam = X727JSJUGJ;
+						SystemCapabilities = {
+							com.apple.ApplicationGroups.iOS = {
+								enabled = 1;
+							};
+						};
+					};
+					16522D7B1AB03AE500B1C3FB = {
+						CreatedOnToolsVersion = 6.2;
 					};
 					168BC6A917EC2DF000BC4584 = {
 						DevelopmentTeam = X727JSJUGJ;
@@ -496,6 +660,8 @@
 			targets = (
 				168BC6A917EC2DF000BC4584 /* Trailer */,
 				1628A6B018789E73005EDA69 /* PocketTrailer */,
+				16522D6F1AB03AE500B1C3FB /* PocketTrailer WatchKit Extension */,
+				16522D7B1AB03AE500B1C3FB /* PocketTrailer WatchKit App */,
 			);
 		};
 /* End PBXProject section */
@@ -509,6 +675,25 @@
 				1628A6D618789E73005EDA69 /* Images.xcassets in Resources */,
 				1628A6BF18789E73005EDA69 /* InfoPlist.strings in Resources */,
 				16154E2F19C43E8E00E49139 /* Launch.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		16522D6E1AB03AE500B1C3FB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				16522D7D1AB03AE500B1C3FB /* PocketTrailer WatchKit App.app in Resources */,
+				16522D791AB03AE500B1C3FB /* Images.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		16522D7A1AB03AE500B1C3FB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				16522D851AB03AE500B1C3FB /* Interface.storyboard in Resources */,
+				16522D931AB0423700B1C3FB /* octicons.ttf in Resources */,
+				16522D871AB03AE500B1C3FB /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -566,6 +751,29 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		16522D6C1AB03AE500B1C3FB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				16522D751AB03AE500B1C3FB /* InterfaceController.swift in Sources */,
+				1672DF3F1AB0E8DE00381AEB /* DataManager.swift in Sources */,
+				1672DF401AB0E8E300381AEB /* Trailer.xcdatamodeld in Sources */,
+				1672DF4B1AB0EB9200381AEB /* WatchKitGlobals.swift in Sources */,
+				1672DF461AB0E8EA00381AEB /* PullRequest.swift in Sources */,
+				1672DF421AB0E8EA00381AEB /* DataItem.swift in Sources */,
+				1672DF3C1AB0E8CD00381AEB /* NSDictionaryExtensions.swift in Sources */,
+				1672DF3E1AB0E8CD00381AEB /* Settings.swift in Sources */,
+				16522D771AB03AE500B1C3FB /* GlanceController.swift in Sources */,
+				1672DF3A1AB0E8C600381AEB /* Globals.swift in Sources */,
+				1672DF471AB0E8EA00381AEB /* Repo.swift in Sources */,
+				1672DF441AB0E8EA00381AEB /* PRLabel.swift in Sources */,
+				1672DF451AB0E8EA00381AEB /* PRStatus.swift in Sources */,
+				1672DF481AB0E9C900381AEB /* NSStringExtensions.swift in Sources */,
+				1672DF411AB0E8EA00381AEB /* ApiServer.swift in Sources */,
+				1672DF431AB0E8EA00381AEB /* PRComment.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		168BC6A617EC2DF000BC4584 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -608,6 +816,19 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		16522D7F1AB03AE500B1C3FB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 16522D7B1AB03AE500B1C3FB /* PocketTrailer WatchKit App */;
+			targetProxy = 16522D7E1AB03AE500B1C3FB /* PBXContainerItemProxy */;
+		};
+		16522D891AB03AE500B1C3FB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 16522D6F1AB03AE500B1C3FB /* PocketTrailer WatchKit Extension */;
+			targetProxy = 16522D881AB03AE500B1C3FB /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXVariantGroup section */
 		1628A6BD18789E73005EDA69 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
@@ -623,6 +844,14 @@
 				1628A6CA18789E73005EDA69 /* Base */,
 			);
 			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		16522D831AB03AE500B1C3FB /* Interface.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				16522D841AB03AE500B1C3FB /* Base */,
+			);
+			name = Interface.storyboard;
 			sourceTree = "<group>";
 		};
 		168BC6B617EC2DF000BC4584 /* InfoPlist.strings */ = {
@@ -648,8 +877,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = PocketTrailer.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COMPRESS_PNG_FILES = NO;
+				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				INFOPLIST_FILE = "MobileTrailer/PocketTrailer-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
@@ -664,8 +896,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = PocketTrailer.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COMPRESS_PNG_FILES = NO;
+				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				INFOPLIST_FILE = "MobileTrailer/PocketTrailer-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
@@ -675,6 +910,118 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		16522D8B1AB03AE500B1C3FB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CODE_SIGN_ENTITLEMENTS = "PocketTrailer WatchKit Extension/PocketTrailer WatchKit Extension.entitlements";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = "PocketTrailer WatchKit Extension/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_NAME = "${TARGET_NAME}";
+				PROVISIONING_PROFILE = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "MobileTrailer/PocketTrailer-Bridging-Header.h";
+			};
+			name = Debug;
+		};
+		16522D8C1AB03AE500B1C3FB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CODE_SIGN_ENTITLEMENTS = "PocketTrailer WatchKit Extension/PocketTrailer WatchKit Extension.entitlements";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = "PocketTrailer WatchKit Extension/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = "${TARGET_NAME}";
+				PROVISIONING_PROFILE = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "MobileTrailer/PocketTrailer-Bridging-Header.h";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		16522D8D1AB03AE500B1C3FB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				IBSC_MODULE = PocketTrailer_WatchKit_Extension;
+				INFOPLIST_FILE = "PocketTrailer WatchKit App/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				"TARGETED_DEVICE_FAMILY[sdk=iphonesimulator*]" = "1,4";
+			};
+			name = Debug;
+		};
+		16522D8E1AB03AE500B1C3FB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				IBSC_MODULE = PocketTrailer_WatchKit_Extension;
+				INFOPLIST_FILE = "PocketTrailer WatchKit App/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				"TARGETED_DEVICE_FAMILY[sdk=iphonesimulator*]" = "1,4";
+				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
@@ -787,6 +1134,24 @@
 			buildConfigurations = (
 				1628A6EA18789E74005EDA69 /* Debug */,
 				1628A6EB18789E74005EDA69 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		16522D8F1AB03AE500B1C3FB /* Build configuration list for PBXNativeTarget "PocketTrailer WatchKit App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				16522D8D1AB03AE500B1C3FB /* Debug */,
+				16522D8E1AB03AE500B1C3FB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		16522D901AB03AE500B1C3FB /* Build configuration list for PBXNativeTarget "PocketTrailer WatchKit Extension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				16522D8B1AB03AE500B1C3FB /* Debug */,
+				16522D8C1AB03AE500B1C3FB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -4,6 +4,16 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
+		<key>Glance - PocketTrailer WatchKit App.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>3</integer>
+		</dict>
+		<key>PocketTrailer WatchKit App.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>2</integer>
+		</dict>
 		<key>PocketTrailer.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
@@ -23,6 +33,11 @@
 			<true/>
 		</dict>
 		<key>1628A6DA18789E73005EDA69</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>16522D7B1AB03AE500B1C3FB</key>
 		<dict>
 			<key>primary</key>
 			<true/>

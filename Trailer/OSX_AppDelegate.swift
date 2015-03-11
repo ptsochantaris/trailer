@@ -506,7 +506,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 			notification.subtitle = (forItem as PullRequest).title
 		case .NewStatus:
 			let c = forItem as PRStatus
-			notification.title = "New PR Status"
+			notification.title = "PR Status Update"
 			notification.subtitle = c.pullRequest.title
 			notification.informativeText = c.descriptionText
 		}
