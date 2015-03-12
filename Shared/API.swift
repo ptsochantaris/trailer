@@ -94,7 +94,7 @@ class API {
 		} else if ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext) {
 			return "Last update failed"
 		} else {
-			let lastSuccess = app.lastSuccessfulRefresh ?? NSDate()
+			let lastSuccess = Settings.lastSuccessfulRefresh ?? NSDate()
 			let ago = NSDate().timeIntervalSinceDate(lastSuccess)
 			if ago<10 {
 				return "Just updated"

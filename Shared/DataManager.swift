@@ -19,7 +19,7 @@ class DataManager : NSObject {
 		ApiServer.ensureAtLeastGithubInMoc(mainObjectContext)
 	}
 
-	class func performVersionChangedTasks() {
+	private class func performVersionChangedTasks() {
 
 		let d = NSUserDefaults.standardUserDefaults()
 		if let legacyAuthToken = d.objectForKey("GITHUB_AUTH_TOKEN") as? String {
@@ -54,7 +54,7 @@ class DataManager : NSObject {
 		}
 	}
 
-    class func migrateDatabaseToShared() {
+    private class func migrateDatabaseToShared() {
         let oldDocumentsDirectory = legacyFilesDirectory().path!
         let fm = NSFileManager.defaultManager()
         if fm.fileExistsAtPath(oldDocumentsDirectory) {

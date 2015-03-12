@@ -99,7 +99,6 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	// Globals
 	weak var refreshTimer: NSTimer?
-	var lastSuccessfulRefresh: NSDate?
 	var lastRepoCheck = NSDate.distantPast() as NSDate
 	var preferencesDirty: Bool = false
 	var isRefreshing: Bool = false
@@ -806,7 +805,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		preferencesDirty = true
 		api.resetAllStatusChecks()
 		api.resetAllLabelChecks()
-		lastSuccessfulRefresh = nil
+		Settings.lastSuccessfulRefresh = nil
 		lastRepoCheck = NSDate.distantPast() as NSDate
 		projectsTable.reloadData()
 		refreshButton.enabled = ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext)
@@ -1143,7 +1142,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	func startRefreshIfItIsDue() {
 
-		if let l = lastSuccessfulRefresh {
+		if let l = Settings.lastSuccessfulRefresh {
 			let howLongAgo = NSDate().timeIntervalSinceDate(l)
 			if howLongAgo > NSTimeInterval(Settings.refreshPeriod) {
 				startRefresh()
@@ -1262,7 +1261,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 			self!.refreshNow.target = oldTarget
 			self!.refreshNow.action = oldAction
 			if !ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext) {
-				self!.lastSuccessfulRefresh = NSDate()
+				Settings.lastSuccessfulRefresh = NSDate()
 				self!.preferencesDirty = false
 			}
 			self!.completeRefresh()

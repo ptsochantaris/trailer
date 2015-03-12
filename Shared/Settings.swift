@@ -6,7 +6,23 @@ import UIKit
 let _settings_defaults = NSUserDefaults.standardUserDefaults()
 var _settings_valuesCache = Dictionary<String, AnyObject>()
 
+#if os(iOS)
+    let _settings_shared = NSUserDefaults(suiteName: "group.PocketTrailer")!
+#else
+    let _settings_shared = _settings_defaults
+#endif
+
 class Settings: NSObject {
+
+    class var lastSuccessfulRefresh: NSDate? {
+        get {
+            return _settings_shared.objectForKey("LAST_SUCCESSFUL_REFRESH") as? NSDate
+        }
+        set {
+            _settings_shared.setObject(newValue, forKey: "LAST_SUCCESSFUL_REFRESH")
+            _settings_shared.synchronize()
+        }
+    }
 
 	private class func set(key: String, _ value: NSObject?) {
 		if let v = value {

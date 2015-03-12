@@ -9,7 +9,6 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 	var isRefreshing: Bool = false
 	var lastUpdateFailed: Bool = false
 	var enteringForeground: Bool = true
-	var lastSuccessfulRefresh: NSDate?
 	var lastRepoCheck = NSDate.distantPast() as NSDate
 	var window: UIWindow!
 	var backgroundTask = UIBackgroundTaskInvalid
@@ -98,7 +97,7 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 		refreshTimer?.invalidate()
 		refreshTimer = nil
 
-		if let l = lastSuccessfulRefresh {
+		if let l = Settings.lastSuccessfulRefresh {
 			let howLongAgo = NSDate().timeIntervalSinceDate(l)
 			if howLongAgo > NSTimeInterval(Settings.refreshPeriod) {
 				startRefresh()
@@ -173,7 +172,7 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 			self!.lastUpdateFailed = !success
 
 			if success {
-				self!.lastSuccessfulRefresh = NSDate()
+				Settings.lastSuccessfulRefresh = NSDate()
 				self!.preferencesDirty = false
 			}
 
