@@ -157,6 +157,7 @@
 		1615045D1A464656001CF50C /* PRCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PRCell.swift; sourceTree = "<group>"; };
 		1615045F1A4651CB001CF50C /* MasterViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MasterViewController.swift; sourceTree = "<group>"; };
 		16154E2E19C43E8E00E49139 /* Launch.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Launch.storyboard; sourceTree = "<group>"; };
+		161852761AB25DFB00526D81 /* Trailer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Trailer.entitlements; sourceTree = "<group>"; };
 		161C959D1A3A36020019A577 /* MenuWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuWindow.swift; sourceTree = "<group>"; };
 		162002CF1A2A3E2100FF95F3 /* Application.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Application.swift; sourceTree = "<group>"; };
 		162002D51A2A49A300FF95F3 /* ViewAllowsVibrancy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewAllowsVibrancy.swift; sourceTree = "<group>"; };
@@ -458,6 +459,7 @@
 		168BC6B417EC2DF000BC4584 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				161852761AB25DFB00526D81 /* Trailer.entitlements */,
 				16B94070182D136700F32061 /* dsa_pub.pem */,
 				168BC6B517EC2DF000BC4584 /* Trailer-Info.plist */,
 				168BC6B617EC2DF000BC4584 /* InfoPlist.strings */,
@@ -639,9 +641,15 @@
 					};
 					16522D7B1AB03AE500B1C3FB = {
 						CreatedOnToolsVersion = 6.2;
+						DevelopmentTeam = X727JSJUGJ;
 					};
 					168BC6A917EC2DF000BC4584 = {
 						DevelopmentTeam = X727JSJUGJ;
+						SystemCapabilities = {
+							com.apple.ApplicationGroups.Mac = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -979,6 +987,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1008,6 +1017,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -1093,6 +1103,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Trailer/Trailer.entitlements;
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1111,6 +1122,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Trailer/Trailer.entitlements;
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (

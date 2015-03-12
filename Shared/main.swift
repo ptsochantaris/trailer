@@ -1,4 +1,5 @@
 
+Settings.checkMigration()
 DataManager.checkMigration()
 let api = API()
 

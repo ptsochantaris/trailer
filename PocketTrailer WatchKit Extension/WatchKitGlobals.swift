@@ -11,6 +11,10 @@ import CoreData
 
 class WatchKitGlobals {
 
+    func go() {
+        DataManager.checkMigration()
+    }
+
     var refreshesSinceLastLabelsCheck = [NSManagedObjectID:Int]()
     var refreshesSinceLastStatusCheck = [NSManagedObjectID:Int]()
     var isRefreshing = false

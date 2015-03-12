@@ -3,42 +3,53 @@
 import UIKit
 #endif
 
-let _settings_defaults = NSUserDefaults.standardUserDefaults()
 var _settings_valuesCache = Dictionary<String, AnyObject>()
-
-#if os(iOS)
-    let _settings_shared = NSUserDefaults(suiteName: "group.PocketTrailer")!
-#else
-    let _settings_shared = _settings_defaults
-#endif
+let _settings_shared = NSUserDefaults(suiteName: "group.Trailer")!
 
 class Settings: NSObject {
 
-    class var lastSuccessfulRefresh: NSDate? {
-        get {
-            return _settings_shared.objectForKey("LAST_SUCCESSFUL_REFRESH") as? NSDate
-        }
-        set {
-            _settings_shared.setObject(newValue, forKey: "LAST_SUCCESSFUL_REFRESH")
+    class func checkMigration() {
+
+        let allFields = [
+            "SORT_METHOD_KEY", "STATUS_FILTERING_METHOD_KEY", "LAST_PREFS_TAB_SELECTED", "CLOSE_HANDLING_POLICY", "MERGE_HANDLING_POLICY", "STATUS_ITEM_REFRESH_COUNT", "LABEL_REFRESH_COUNT", "UPDATE_CHECK_INTERVAL_KEY",
+            "STATUS_FILTERING_TERMS_KEY", "COMMENT_AUTHOR_BLACKLIST", "HOTKEY_LETTER", "REFRESH_PERIOD_KEY", "IOS_BACKGROUND_REFRESH_PERIOD_KEY", "NEW_REPO_CHECK_PERIOD", "LAST_SUCCESSFUL_REFRESH",
+            "LAST_RUN_VERSION_KEY", "UPDATE_CHECK_AUTO_KEY", "HIDE_UNCOMMENTED_PRS_KEY", "SHOW_COMMENTS_EVERYWHERE_KEY", "SORT_ORDER_KEY", "SHOW_UPDATED_KEY", "DONT_KEEP_MY_PRS_KEY", "HIDE_AVATARS_KEY",
+            "AUTO_PARTICIPATE_IN_MENTIONS_KEY", "DONT_ASK_BEFORE_WIPING_MERGED", "DONT_ASK_BEFORE_WIPING_CLOSED", "HIDE_NEW_REPOS_KEY", "GROUP_BY_REPO", "HIDE_ALL_SECTION", "SHOW_LABELS", "SHOW_STATUS_ITEMS",
+            "MAKE_STATUS_ITEMS_SELECTABLE", "MOVE_ASSIGNED_PRS_TO_MY_SECTION", "MARK_UNMERGEABLE_ON_USER_SECTIONS_ONLY", "COUNT_ONLY_LISTED_PRS", "OPEN_PR_AT_FIRST_UNREAD_COMMENT_KEY", "LOG_ACTIVITY_TO_CONSOLE_KEY",
+            "HOTKEY_ENABLE", "HOTKEY_CONTROL_MODIFIER", "USE_VIBRANCY_UI", "DISABLE_ALL_COMMENT_NOTIFICATIONS", "NOTIFY_ON_STATUS_UPDATES", "NOTIFY_ON_STATUS_UPDATES_ALL", "SHOW_REPOS_IN_NAME", "INCLUDE_REPOS_IN_FILTER",
+            "INCLUDE_LABELS_IN_FILTER", "INCLUDE_STATUSES_IN_FILTER", "HOTKEY_COMMAND_MODIFIER", "HOTKEY_OPTION_MODIFIER", "HOTKEY_SHIFT_MODIFIER", "GRAY_OUT_WHEN_REFRESHING"]
+
+        let d = NSUserDefaults.standardUserDefaults()
+        if d.objectForKey("LAST_RUN_VERSION_KEY") != nil {
+            for k in allFields {
+                if let v: AnyObject = d.objectForKey(k) {
+                    _settings_shared.setObject(v, forKey: k)
+                    DLog("Migrating setting '%@'", k)
+                    d.removeObjectForKey(k)
+                }
+            }
             _settings_shared.synchronize()
+            DLog("Settings migrated to shared container")
+        } else {
+            DLog("No need to migrate settings into shared container")
         }
     }
 
 	private class func set(key: String, _ value: NSObject?) {
 		if let v = value {
-			_settings_defaults.setObject(v, forKey: key)
+			_settings_shared.setObject(v, forKey: key)
 		} else {
-			_settings_defaults.removeObjectForKey(key)
+			_settings_shared.removeObjectForKey(key)
 		}
 		_settings_valuesCache[key] = value
-		_settings_defaults.synchronize()
+		_settings_shared.synchronize()
 	}
 
 	private class func get(key: String) -> AnyObject? {
 		if let v: AnyObject = _settings_valuesCache[key] {
 			return v
 		} else {
-			if let vv: AnyObject = _settings_defaults.objectForKey(key) {
+			if let vv: AnyObject = _settings_shared.objectForKey(key) {
 				_settings_valuesCache[key] = vv
 				return vv
 			} else {
@@ -129,6 +140,18 @@ class Settings: NSObject {
 	}
 
 	///////////////////////////
+
+    class var lastSuccessfulRefresh: NSDate? {
+        get { return get("LAST_SUCCESSFUL_REFRESH") as? NSDate }
+        set { set("LAST_SUCCESSFUL_REFRESH", newValue) }
+    }
+
+    class var lastRunVersion: String? {
+        get { return get("LAST_RUN_VERSION_KEY") as? String }
+        set { set("LAST_RUN_VERSION_KEY", newValue) }
+    }
+
+    ///////////////////////////
 
 	class var checkForUpdatesAutomatically: Bool {
 		get { return get("UPDATE_CHECK_AUTO_KEY") as? Bool ?? true }

@@ -7,14 +7,13 @@ import CoreData
 class DataManager : NSObject {
 
 	class func checkMigration() {
-        #if os(iOS)
-            migrateDatabaseToShared()
-        #endif
-
 		if DataManager.versionBumpOccured() {
 			DLog("VERSION UPDATE MAINTENANCE NEEDED")
+            #if os(iOS)
+                migrateDatabaseToShared()
+            #endif
 			DataManager.performVersionChangedTasks()
-			DataManager.versionBumpComplete()
+            Settings.lastRunVersion = currentAppVersion;
 		}
 		ApiServer.ensureAtLeastGithubInMoc(mainObjectContext)
 	}
@@ -292,15 +291,8 @@ class DataManager : NSObject {
 		return nil
 	}
 
-	class func versionBumpComplete() {
-		let d = NSUserDefaults.standardUserDefaults()
-		d.setObject(currentAppVersion, forKey: "LAST_RUN_VERSION_KEY")
-		d.synchronize()
-	}
-
 	class func versionBumpOccured() -> Bool {
-		let d = NSUserDefaults.standardUserDefaults()
-		if let thisVersion = d.objectForKey("LAST_RUN_VERSION_KEY") as? String {
+		if let thisVersion = Settings.lastRunVersion {
 			return !(thisVersion == currentAppVersion)
 		} else {
 			return true
@@ -402,7 +394,7 @@ private func legacyFilesDirectory() -> NSURL {
 }
 
 private func sharedFilesDirectory() -> NSURL {
-    var appSupportURL = NSFileManager.defaultManager().containerURLForSecurityApplicationGroupIdentifier("group.PocketTrailer")!
+    var appSupportURL = NSFileManager.defaultManager().containerURLForSecurityApplicationGroupIdentifier("group.Trailer")!
     DLog("Shared files in %@", appSupportURL)
     return appSupportURL
 }

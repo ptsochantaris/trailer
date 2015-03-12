@@ -26,6 +26,8 @@ class GlanceController: WKInterfaceController {
     override func awakeWithContext(context: AnyObject?) {
         super.awakeWithContext(context)
 
+        app.go()
+
         totalCount.setText(NSString(format: "%d", PullRequest.countAllRequestsInMoc(mainObjectContext)))
 
         setCountOfLabel(myCount,
@@ -65,7 +67,7 @@ class GlanceController: WKInterfaceController {
             label.setAlpha(0.9)
             label.setText("\(toCount) \(appending)")
         } else {
-            label.setText("NO \(appending)")
+            label.setText("0 \(appending)")
             label.setAlpha(0.4)
         }
     }
