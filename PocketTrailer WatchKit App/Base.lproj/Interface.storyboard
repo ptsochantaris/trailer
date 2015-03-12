@@ -19,7 +19,7 @@
                     <items>
                         <group alignment="left" id="gv7-I2-MZq">
                             <items>
-                                <imageView width="32" height="32" alignment="center" verticalAlignment="center" alpha="0.69999999999999973" image="GlanceIcon" contentMode="scaleAspectFit" id="xYb-hC-O7D"/>
+                                <imageView width="32" height="32" alignment="center" verticalAlignment="center" alpha="0.89999999999999991" image="GlanceIcon" contentMode="scaleAspectFit" id="xYb-hC-O7D"/>
                                 <label alignment="center" verticalAlignment="center" text="43" textAlignment="center" id="3wl-rh-8m0">
                                     <fontDescription key="font" type="system" weight="medium" pointSize="28"/>
                                 </label>
@@ -49,7 +49,7 @@
                                 </group>
                                 <group width="1" alignment="left" id="g1Y-Uf-14E">
                                     <items>
-                                        <label alignment="center" alpha="0.69999999999999973" text="Updated:" numberOfLines="0" id="Qer-7L-pJ7">
+                                        <label alignment="center" alpha="0.89999999999999991" text="Updated:" numberOfLines="0" id="Qer-7L-pJ7">
                                             <fontDescription key="font" type="system" pointSize="9"/>
                                         </label>
                                     </items>

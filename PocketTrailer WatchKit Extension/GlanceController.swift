@@ -53,20 +53,20 @@ class GlanceController: WKInterfaceController {
             d.dateStyle = NSDateFormatterStyle.ShortStyle
             d.timeStyle = NSDateFormatterStyle.ShortStyle
             lastUpdate.setText("Updated "+d.stringFromDate(lastRefresh))
-            lastUpdate.setAlpha(0.7)
+            lastUpdate.setAlpha(0.9)
         } else {
             lastUpdate.setText("Not updated yet")
-            lastUpdate.setAlpha(0.5)
+            lastUpdate.setAlpha(0.4)
         }
     }
 
     func setCountOfLabel(label: WKInterfaceLabel, toCount: Int, appending: String) {
         if toCount > 0 {
-            label.setAlpha(0.7)
+            label.setAlpha(0.9)
             label.setText("\(toCount) \(appending)")
         } else {
             label.setText("NO \(appending)")
-            label.setAlpha(0.5)
+            label.setAlpha(0.4)
         }
     }
 
