@@ -17,8 +17,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="quz-Tb-Fw0">
-                                <rect key="frame" x="16" y="11" width="288" height="557"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="quz-Tb-Fw0">
+                                <rect key="frame" x="16" y="0.0" width="288" height="568"/>
                                 <attributedString key="attributedText">
                                     <fragment content="Loading...">
                                         <attributes>
@@ -32,10 +32,10 @@
                             </label>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="FKl-LY-JtV" firstAttribute="bottom" secondItem="quz-Tb-Fw0" secondAttribute="bottom" id="4wg-qo-CMs"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="quz-Tb-Fw0" secondAttribute="trailing" id="Gnw-xG-C49"/>
-                            <constraint firstItem="quz-Tb-Fw0" firstAttribute="leading" secondItem="S3S-Oj-5AN" secondAttribute="leadingMargin" id="HCf-Kn-Idi"/>
-                            <constraint firstItem="quz-Tb-Fw0" firstAttribute="top" secondItem="Ft6-oW-KC0" secondAttribute="top" constant="11" id="X6V-bn-am1"/>
+                            <constraint firstItem="FKl-LY-JtV" firstAttribute="top" secondItem="quz-Tb-Fw0" secondAttribute="bottom" id="Kd3-Dq-bTx"/>
+                            <constraint firstItem="quz-Tb-Fw0" firstAttribute="leading" secondItem="S3S-Oj-5AN" secondAttribute="leadingMargin" id="YNF-78-zCh"/>
+                            <constraint firstItem="quz-Tb-Fw0" firstAttribute="top" secondItem="Ft6-oW-KC0" secondAttribute="bottom" id="nVp-Pw-FlT"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="quz-Tb-Fw0" secondAttribute="trailing" id="yzD-LQ-eIX"/>
                         </constraints>
                     </view>
                     <extendedEdge key="edgesForExtendedLayout"/>

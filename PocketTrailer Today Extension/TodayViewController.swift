@@ -16,12 +16,7 @@ var api: ExtensionGlobals!
 class TodayViewController: UIViewController, NCWidgetProviding {
         
     @IBOutlet weak var label: UILabel!
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        paragraph.paragraphSpacingBefore = 6
-        self.update()
-    }
+    var button: UIButton!
 
     private let paragraph = NSMutableParagraphStyle()
 
@@ -39,7 +34,7 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 
     private var dimAttributes: [NSObject: AnyObject] {
         return [
-            NSForegroundColorAttributeName: UIColor.darkGrayColor(),
+            NSForegroundColorAttributeName: UIColor.grayColor(),
             NSParagraphStyleAttributeName: paragraph ]
     }
 
@@ -56,38 +51,63 @@ class TodayViewController: UIViewController, NCWidgetProviding {
             NSParagraphStyleAttributeName: paragraph ]
     }
 
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        paragraph.paragraphSpacing = 6
+
+        button = UIButton.buttonWithType(UIButtonType.Custom) as UIButton
+        button.addTarget(self, action: Selector("tapped"), forControlEvents: UIControlEvents.TouchUpInside)
+        button.setBackgroundImage(imageFromColor(UIColor(white: 1.0, alpha: 0.2)), forState: UIControlState.Highlighted)
+        self.view.addSubview(button)
+
+        self.update()
+    }
+
+    func tapped() {
+        self.extensionContext?.openURL(NSURL(string: "pockettrailer://")!, completionHandler: nil)
+    }
+
+    override func viewDidLayoutSubviews() {
+        label.preferredMaxLayoutWidth = label.frame.size.width
+        button.frame = self.view.bounds
+    }
+
+    func widgetMarginInsetsForProposedMarginInsets(defaultMarginInsets: UIEdgeInsets) -> UIEdgeInsets {
+        return UIEdgeInsetsMake(defaultMarginInsets.top+11, defaultMarginInsets.left+10, defaultMarginInsets.bottom-11, defaultMarginInsets.right+10)
+    }
+
     private func update() {
 
         ExtensionGlobals.go()
 
-        let a = NSMutableAttributedString(string: NSString(format: "%d Total PRs",
-            PullRequest.countAllRequestsInMoc(mainObjectContext)),
-            attributes: brightAttributes)
+        let totalCount = PullRequest.countAllRequestsInMoc(mainObjectContext)
 
-        let colon = NSAttributedString(string: ": ", attributes: normalAttributes)
-        a.appendAttributedString(colon)
+        let a = NSMutableAttributedString(string: NSString(format: "%d Total PRs", totalCount), attributes: brightAttributes)
 
-        append(a,
-            toCount: PullRequest.countRequestsInSection(PullRequestSection.Mine.rawValue, moc: mainObjectContext),
-            appending: "Mine, ")
+        a.appendAttributedString(NSAttributedString(string: ": ", attributes: normalAttributes))
 
-        append(a,
-            toCount: PullRequest.countRequestsInSection(PullRequestSection.Participated.rawValue, moc: mainObjectContext),
-            appending: "Participated, ")
+        append(a, toCount: PullRequest.countRequestsInSection(PullRequestSection.Mine.rawValue,         moc: mainObjectContext), appending: "Mine, ")
+        append(a, toCount: PullRequest.countRequestsInSection(PullRequestSection.Participated.rawValue, moc: mainObjectContext), appending: "Participated, ")
+        append(a, toCount: PullRequest.countRequestsInSection(PullRequestSection.Merged.rawValue,       moc: mainObjectContext), appending: "Merged, ")
+        append(a, toCount: PullRequest.countRequestsInSection(PullRequestSection.Closed.rawValue,       moc: mainObjectContext), appending: "Closed, ")
 
-        append(a,
-            toCount: PullRequest.countRequestsInSection(PullRequestSection.Merged.rawValue, moc: mainObjectContext),
-            appending: "Merged, ")
-
-        append(a,
-            toCount: PullRequest.countRequestsInSection(PullRequestSection.Closed.rawValue, moc: mainObjectContext),
-            appending: "Closed, ")
-
-        append(a,
-            toCount: PullRequest.badgeCountInMoc(mainObjectContext),
-            appending: "Unread comments")
+        ////////////////////////////
 
         var text: String
+        var attributes: [NSObject: AnyObject]
+
+        let toCount = PullRequest.badgeCountInMoc(mainObjectContext)
+        if toCount > 0 {
+            attributes = redAttributes
+            text = "\(toCount)\u{a0}unread\u{a0}comments"
+        } else {
+            attributes = dimAttributes
+            text = "No\u{a0}unread\u{a0}comments"
+        }
+        a.appendAttributedString(NSAttributedString(string: text, attributes: attributes))
+
+        ////////////////////////////
 
         if let lastRefresh = Settings.lastSuccessfulRefresh {
             let d = NSDateFormatter()
@@ -98,12 +118,10 @@ class TodayViewController: UIViewController, NCWidgetProviding {
             text = "\nNot updated yet"
         }
         a.appendAttributedString(NSAttributedString(string: text, attributes: smallAttributes))
-        
+
         label.attributedText = a
 
         ExtensionGlobals.done()
-        
-        self.view.setNeedsUpdateConstraints()
     }
 
     func widgetPerformUpdateWithCompletionHandler(completionHandler: ((NCUpdateResult) -> Void)!) {
