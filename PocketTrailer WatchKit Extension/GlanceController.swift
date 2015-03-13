@@ -10,8 +10,8 @@ import WatchKit
 import Foundation
 import CoreData
 
-let app = ExtensionGlobals()
-let api = app
+var app: ExtensionGlobals!
+var api: ExtensionGlobals!
 
 class GlanceController: WKInterfaceController {
 
@@ -26,7 +26,7 @@ class GlanceController: WKInterfaceController {
     override func awakeWithContext(context: AnyObject?) {
         super.awakeWithContext(context)
 
-        app.go()
+        ExtensionGlobals.go()
 
         totalCount.setText(NSString(format: "%d", PullRequest.countAllRequestsInMoc(mainObjectContext)))
 
@@ -60,6 +60,8 @@ class GlanceController: WKInterfaceController {
             lastUpdate.setText("Not updated yet")
             lastUpdate.setAlpha(0.4)
         }
+
+        ExtensionGlobals.done()
     }
 
     func setCountOfLabel(label: WKInterfaceLabel, toCount: Int, appending: String) {

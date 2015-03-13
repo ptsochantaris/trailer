@@ -11,8 +11,16 @@ import CoreData
 
 class ExtensionGlobals {
 
-    func go() {
+    class func go() {
+        app = ExtensionGlobals()
+        api = app
         DataManager.checkMigration()
+    }
+
+    class func done()
+    {
+        app = nil
+        api = nil
     }
 
     var refreshesSinceLastLabelsCheck = [NSManagedObjectID:Int]()

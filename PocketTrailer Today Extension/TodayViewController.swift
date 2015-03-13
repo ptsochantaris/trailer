@@ -10,8 +10,8 @@ import UIKit
 import Foundation
 import NotificationCenter
 
-let app = ExtensionGlobals()
-let api = app
+var app: ExtensionGlobals!
+var api: ExtensionGlobals!
 
 class TodayViewController: UIViewController, NCWidgetProviding {
         
@@ -19,8 +19,6 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        app.go()
-
         paragraph.paragraphSpacingBefore = 6
         self.update()
     }
@@ -59,6 +57,9 @@ class TodayViewController: UIViewController, NCWidgetProviding {
     }
 
     private func update() {
+
+        ExtensionGlobals.go()
+
         let a = NSMutableAttributedString(string: NSString(format: "%d Total PRs",
             PullRequest.countAllRequestsInMoc(mainObjectContext)),
             attributes: brightAttributes)
@@ -99,6 +100,8 @@ class TodayViewController: UIViewController, NCWidgetProviding {
         a.appendAttributedString(NSAttributedString(string: text, attributes: smallAttributes))
         
         label.attributedText = a
+
+        ExtensionGlobals.done()
         
         self.view.setNeedsUpdateConstraints()
     }
