@@ -1,6 +1,8 @@
 
 class CenterTextField: NSTextField {
 
+    var vibrant = true
+
 	override init(frame frameRect: NSRect) {
 		super.init(frame: frameRect)
 		bezeled = false
@@ -19,7 +21,7 @@ class CenterTextField: NSTextField {
 	}
 
 	func allowsVibrancy() -> Bool {
-		return true
+		return vibrant
 	}
 
 }

@@ -236,6 +236,7 @@ class PrItemView: NSTableCellView {
 		c.cornerRadius = 4.0
 
 		countView = CenterTextField(frame: c.bounds)
+        countView?.vibrant = false
 		countView!.attributedStringValue = countString
 		c.addSubview(countView!)
 		addSubview(c)
@@ -259,6 +260,7 @@ class PrItemView: NSTableCellView {
 			cc.cornerRadius = floor(SMALL_BADGE_SIZE*0.5)
 
 			let alertCount = CenterTextField(frame: cc.bounds)
+            alertCount.vibrant = false
 			alertCount.attributedStringValue = alertString
 			cc.addSubview(alertCount)
 			addSubview(cc)

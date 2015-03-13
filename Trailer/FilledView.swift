@@ -38,6 +38,6 @@ class FilledView: NSView {
     }
 
 	func allowsVibrancy() -> Bool {
-		return true
+		return false
 	}
 }
