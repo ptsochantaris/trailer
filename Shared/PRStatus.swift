@@ -1,3 +1,4 @@
+import Foundation
 
 let darkStatusRed = MAKECOLOR(0.8, 0.5, 0.5, 1.0)
 let darkStatusYellow = MAKECOLOR(0.9, 0.8, 0.3, 1.0)

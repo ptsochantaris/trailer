@@ -9,6 +9,11 @@
 			<key>orderHint</key>
 			<integer>3</integer>
 		</dict>
+		<key>PocketTrailer Today Extension.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>4</integer>
+		</dict>
 		<key>PocketTrailer WatchKit App.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
@@ -27,6 +32,11 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>1618527A1AB2CB9000526D81</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>1628A6B018789E73005EDA69</key>
 		<dict>
 			<key>primary</key>

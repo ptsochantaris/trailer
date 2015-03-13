@@ -9,7 +9,7 @@
 import UIKit
 import CoreData
 
-class WatchKitGlobals {
+class ExtensionGlobals {
 
     func go() {
         DataManager.checkMigration()

@@ -10,7 +10,7 @@ import WatchKit
 import Foundation
 import CoreData
 
-let app = WatchKitGlobals()
+let app = ExtensionGlobals()
 let api = app
 
 class GlanceController: WKInterfaceController {
