@@ -68,28 +68,19 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 
         append(a,
             toCount: PullRequest.countRequestsInSection(PullRequestSection.Mine.rawValue, moc: mainObjectContext),
-            appending: "Mine")
-
-        let spacer = NSAttributedString(string: ", ", attributes: dimAttributes)
-        a.appendAttributedString(spacer)
+            appending: "Mine, ")
 
         append(a,
             toCount: PullRequest.countRequestsInSection(PullRequestSection.Participated.rawValue, moc: mainObjectContext),
-            appending: "Participated")
-
-        a.appendAttributedString(spacer)
+            appending: "Participated, ")
 
         append(a,
             toCount: PullRequest.countRequestsInSection(PullRequestSection.Merged.rawValue, moc: mainObjectContext),
-            appending: "Merged")
-
-        a.appendAttributedString(spacer)
+            appending: "Merged, ")
 
         append(a,
             toCount: PullRequest.countRequestsInSection(PullRequestSection.Closed.rawValue, moc: mainObjectContext),
-            appending: "Closed")
-
-        a.appendAttributedString(spacer)
+            appending: "Closed, ")
 
         append(a,
             toCount: PullRequest.badgeCountInMoc(mainObjectContext),
@@ -129,10 +120,10 @@ class TodayViewController: UIViewController, NCWidgetProviding {
         var attributes: [NSObject: AnyObject]
         if toCount > 0 {
             attributes = normalAttributes
-            text = "\(toCount) \(appending)"
+            text = "\(toCount)\u{a0}\(appending)"
         } else {
             attributes = dimAttributes
-            text = "0 \(appending)"
+            text = "0\u{a0}\(appending)"
         }
         a.appendAttributedString(NSAttributedString(string: text, attributes: attributes))
     }
