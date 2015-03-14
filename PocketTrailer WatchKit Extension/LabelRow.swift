@@ -8,6 +8,6 @@
 
 import WatchKit
 
-class FieldRow: NSObject {
-    @IBOutlet weak var titleL: WKInterfaceLabel!
+class LabelRow: NSObject {
+    @IBOutlet weak var labelL: WKInterfaceLabel!
 }
