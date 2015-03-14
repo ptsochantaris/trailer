@@ -8,9 +8,93 @@
         <!--Interface Controller-->
         <scene sceneID="aou-V4-d1y">
             <objects>
-                <controller id="AgC-eL-Hgc" customClass="InterfaceController" customModule="PocketTrailer_WatchKit_App" customModuleProvider="target"/>
+                <controller id="AgC-eL-Hgc" customClass="InterfaceController" customModule="PocketTrailer_WatchKit_Extension">
+                    <items>
+                        <label alignment="center" verticalAlignment="center" hidden="YES" text="Label" textAlignment="center" numberOfLines="0" id="MO0-Ee-aHD"/>
+                        <table alignment="center" verticalAlignment="center" id="be2-ie-h5R">
+                            <items>
+                                <tableRow identifier="TopRow" id="ql1-oS-xZe" customClass="TopRow" customModule="PocketTrailer_WatchKit_Extension">
+                                    <group key="rootItem" width="1" height="0.0" alignment="left" id="Uft-cP-lJ6">
+                                        <items>
+                                            <label alignment="left" verticalAlignment="center" text="Label" id="m26-4w-XIn"/>
+                                        </items>
+                                    </group>
+                                    <connections>
+                                        <outlet property="titleL" destination="m26-4w-XIn" id="Gwd-kA-TWi"/>
+                                        <segue destination="Sqe-dw-Y9B" kind="push" id="65c-yz-7QC"/>
+                                    </connections>
+                                </tableRow>
+                            </items>
+                        </table>
+                    </items>
+                    <menu key="menu" id="FvI-zq-Wrb">
+                        <items>
+                            <menuItem title="Merged" icon="trash" id="QVP-Uy-Uq0">
+                                <connections>
+                                    <action selector="clearMergedSelected" destination="AgC-eL-Hgc" id="hYL-Bu-k6C"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Closed" icon="trash" id="dwd-8r-puY">
+                                <connections>
+                                    <action selector="clearClosedSelected" destination="AgC-eL-Hgc" id="SIg-1X-7Em"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="All Read" icon="accept" id="q8E-ew-SbG">
+                                <connections>
+                                    <action selector="markAllReadSelected" destination="AgC-eL-Hgc" id="fW1-vU-1ry"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Refresh" icon="repeat" id="JUU-7X-dfp">
+                                <connections>
+                                    <action selector="markAllReadSelected" destination="AgC-eL-Hgc" id="4an-aC-Zk8"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                    <connections>
+                        <outlet property="emptyLabel" destination="MO0-Ee-aHD" id="DXw-3I-WQY"/>
+                        <outlet property="table" destination="be2-ie-h5R" id="Lhy-Wj-Csa"/>
+                    </connections>
+                </controller>
             </objects>
             <point key="canvasLocation" x="164" y="217"/>
+        </scene>
+        <!--List Controller-->
+        <scene sceneID="ox7-bJ-gA7">
+            <objects>
+                <controller id="Sqe-dw-Y9B" customClass="PRListController" customModule="PocketTrailer_WatchKit_Extension">
+                    <items>
+                        <table alignment="left" id="XeC-bN-XlT">
+                            <items>
+                                <tableRow id="qcu-Df-oql">
+                                    <group key="rootItem" width="1" alignment="left" id="Uwj-Y1-PON"/>
+                                    <connections>
+                                        <segue destination="Hgm-oe-oa5" kind="push" id="DhF-WS-hec"/>
+                                    </connections>
+                                </tableRow>
+                            </items>
+                        </table>
+                    </items>
+                </controller>
+            </objects>
+            <point key="canvasLocation" x="412" y="221"/>
+        </scene>
+        <!--Detail Controller-->
+        <scene sceneID="Y5a-NZ-okm">
+            <objects>
+                <controller id="Hgm-oe-oa5" customClass="PRDetailController" customModule="PocketTrailer_WatchKit_Extension">
+                    <items>
+                        <table alignment="left" id="nDu-Js-IyV">
+                            <items>
+                                <tableRow id="IWp-rT-BP5">
+                                    <group key="rootItem" width="1" alignment="left" id="lVf-k4-WHR"/>
+                                </tableRow>
+                            </items>
+                        </table>
+                    </items>
+                </controller>
+            </objects>
+            <point key="canvasLocation" x="660" y="225"/>
         </scene>
         <!--Glance Interface Controller-->
         <scene sceneID="rjY-Ar-IMT">

@@ -22,10 +22,6 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>1190</string>
-	<key>UIAppFonts</key>
-	<array>
-		<string>octicons.ttf</string>
-	</array>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

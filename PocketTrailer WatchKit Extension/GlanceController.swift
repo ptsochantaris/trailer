@@ -10,9 +10,6 @@ import WatchKit
 import Foundation
 import CoreData
 
-var app: ExtensionGlobals!
-var api: ExtensionGlobals!
-
 class GlanceController: WKInterfaceController {
 
     @IBOutlet weak var totalCount: WKInterfaceLabel!
@@ -28,37 +25,61 @@ class GlanceController: WKInterfaceController {
 
         ExtensionGlobals.go()
 
-        totalCount.setText(NSString(format: "%d", PullRequest.countAllRequestsInMoc(mainObjectContext)))
+        let totalPrs = PullRequest.countAllRequestsInMoc(mainObjectContext)
 
-        setCountOfLabel(myCount,
-            toCount: PullRequest.countRequestsInSection(PullRequestSection.Mine.rawValue, moc: mainObjectContext),
-            appending: "MINE")
+        if totalPrs == 0 {
 
-        setCountOfLabel(participatedCount,
-            toCount: PullRequest.countRequestsInSection(PullRequestSection.Participated.rawValue, moc: mainObjectContext),
-            appending: "PARTICIPATED")
+            totalCount.setHidden(true)
+            mergedCount.setHidden(true)
+            closedCount.setHidden(true)
+            participatedCount.setHidden(true)
+            unreadCount.setHidden(true)
+            lastUpdate.setHidden(true)
 
-        setCountOfLabel(mergedCount,
-            toCount: PullRequest.countRequestsInSection(PullRequestSection.Merged.rawValue, moc: mainObjectContext),
-            appending: "MERGED")
+            let a = DataManager.reasonForEmptyWithFilter(nil)
+            myCount.setAttributedText(a)
 
-        setCountOfLabel(closedCount,
-            toCount: PullRequest.countRequestsInSection(PullRequestSection.Closed.rawValue, moc: mainObjectContext),
-            appending: "CLOSED")
-
-        setCountOfLabel(unreadCount,
-            toCount: PullRequest.badgeCountInMoc(mainObjectContext),
-            appending: "UNREAD COMMENTS")
-
-        if let lastRefresh = Settings.lastSuccessfulRefresh {
-            let d = NSDateFormatter()
-            d.dateStyle = NSDateFormatterStyle.ShortStyle
-            d.timeStyle = NSDateFormatterStyle.ShortStyle
-            lastUpdate.setText("Updated "+d.stringFromDate(lastRefresh))
-            lastUpdate.setAlpha(0.9)
         } else {
-            lastUpdate.setText("Not updated yet")
-            lastUpdate.setAlpha(0.4)
+
+            totalCount.setHidden(false)
+            mergedCount.setHidden(false)
+            closedCount.setHidden(false)
+            participatedCount.setHidden(false)
+            unreadCount.setHidden(false)
+            lastUpdate.setHidden(false)
+
+            totalCount.setText(NSString(format: "%d", totalPrs))
+
+            setCountOfLabel(myCount,
+                toCount: PullRequest.countRequestsInSection(PullRequestSection.Mine.rawValue, moc: mainObjectContext),
+                appending: "MINE")
+
+            setCountOfLabel(participatedCount,
+                toCount: PullRequest.countRequestsInSection(PullRequestSection.Participated.rawValue, moc: mainObjectContext),
+                appending: "PARTICIPATED")
+
+            setCountOfLabel(mergedCount,
+                toCount: PullRequest.countRequestsInSection(PullRequestSection.Merged.rawValue, moc: mainObjectContext),
+                appending: "MERGED")
+
+            setCountOfLabel(closedCount,
+                toCount: PullRequest.countRequestsInSection(PullRequestSection.Closed.rawValue, moc: mainObjectContext),
+                appending: "CLOSED")
+
+            setCountOfLabel(unreadCount,
+                toCount: PullRequest.badgeCountInMoc(mainObjectContext),
+                appending: "UNREAD COMMENTS")
+
+            if let lastRefresh = Settings.lastSuccessfulRefresh {
+                let d = NSDateFormatter()
+                d.dateStyle = NSDateFormatterStyle.ShortStyle
+                d.timeStyle = NSDateFormatterStyle.ShortStyle
+                lastUpdate.setText("Updated "+d.stringFromDate(lastRefresh))
+                lastUpdate.setAlpha(0.9)
+            } else {
+                lastUpdate.setText("Not updated yet")
+                lastUpdate.setAlpha(0.4)
+            }
         }
 
         ExtensionGlobals.done()

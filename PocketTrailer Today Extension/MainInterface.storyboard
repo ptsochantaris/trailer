@@ -2,7 +2,6 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6751" systemVersion="14C1510" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="M4Y-Lb-cyx">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6736"/>
-        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
         <!--Today View Controller-->
@@ -17,8 +16,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="quz-Tb-Fw0">
-                                <rect key="frame" x="16" y="0.0" width="288" height="568"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="260" verticalHuggingPriority="260" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="quz-Tb-Fw0">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                                 <attributedString key="attributedText">
                                     <fragment content="Loading...">
                                         <attributes>
@@ -32,10 +31,10 @@
                             </label>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="FKl-LY-JtV" firstAttribute="top" secondItem="quz-Tb-Fw0" secondAttribute="bottom" id="Kd3-Dq-bTx"/>
-                            <constraint firstItem="quz-Tb-Fw0" firstAttribute="leading" secondItem="S3S-Oj-5AN" secondAttribute="leadingMargin" id="YNF-78-zCh"/>
-                            <constraint firstItem="quz-Tb-Fw0" firstAttribute="top" secondItem="Ft6-oW-KC0" secondAttribute="bottom" id="nVp-Pw-FlT"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="quz-Tb-Fw0" secondAttribute="trailing" id="yzD-LQ-eIX"/>
+                            <constraint firstAttribute="trailing" secondItem="quz-Tb-Fw0" secondAttribute="trailing" id="J3Y-D6-ek8"/>
+                            <constraint firstItem="quz-Tb-Fw0" firstAttribute="top" secondItem="Ft6-oW-KC0" secondAttribute="bottom" id="dfr-Es-jlJ"/>
+                            <constraint firstItem="quz-Tb-Fw0" firstAttribute="leading" secondItem="S3S-Oj-5AN" secondAttribute="leading" id="gyk-CB-KUo"/>
+                            <constraint firstItem="FKl-LY-JtV" firstAttribute="top" secondItem="quz-Tb-Fw0" secondAttribute="bottom" id="yir-hv-cLd"/>
                         </constraints>
                     </view>
                     <extendedEdge key="edgesForExtendedLayout"/>
