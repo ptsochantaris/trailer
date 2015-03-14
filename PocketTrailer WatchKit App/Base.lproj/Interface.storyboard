@@ -96,13 +96,37 @@
                             </items>
                         </table>
                     </items>
+                    <menu key="menu" id="dyj-Bd-XZp">
+                        <items>
+                            <menuItem title="Closed" icon="trash" id="bX5-eA-GZy">
+                                <connections>
+                                    <action selector="clearClosedSelected" destination="Sqe-dw-Y9B" id="2QX-ah-j9s"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="All Read" icon="accept" id="ht7-Y3-Qkk">
+                                <connections>
+                                    <action selector="markAllReadSelected" destination="Sqe-dw-Y9B" id="OO3-8A-VBq"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Merged" icon="trash" id="lIo-JU-RDV">
+                                <connections>
+                                    <action selector="clearMergedSelected" destination="Sqe-dw-Y9B" id="bb1-Bo-LdL"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Refresh" icon="repeat" id="pbf-Br-uiM">
+                                <connections>
+                                    <action selector="refreshSelected" destination="Sqe-dw-Y9B" id="On1-u5-oWO"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
                     <connections>
                         <outlet property="emptyLabel" destination="PLW-UR-bJ2" id="c3I-dN-bDl"/>
                         <outlet property="table" destination="XeC-bN-XlT" id="eNr-td-1B9"/>
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="412" y="221"/>
+            <point key="canvasLocation" x="409" y="225"/>
         </scene>
         <!--Detail Controller-->
         <scene sceneID="Y5a-NZ-okm">
@@ -124,6 +148,15 @@
                             </items>
                         </table>
                     </items>
+                    <menu key="menu" id="VYe-CG-2Yp">
+                        <items>
+                            <menuItem title="Refresh" icon="repeat" id="cqe-Ie-HAm">
+                                <connections>
+                                    <action selector="refreshSelected" destination="Hgm-oe-oa5" id="GnJ-EP-gnj"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
                     <connections>
                         <outlet property="table" destination="nDu-Js-IyV" id="LiY-op-bsm"/>
                     </connections>

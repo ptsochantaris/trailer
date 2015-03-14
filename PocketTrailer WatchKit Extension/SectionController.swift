@@ -69,11 +69,11 @@ class SectionController: WKInterfaceController {
     }
 
     @IBAction func clearMergedSelected() {
-
+        presentControllerWithName("Command Controller", context: "clearAllMerged")
     }
 
     @IBAction func clearClosedSelected() {
-
+        presentControllerWithName("Command Controller", context: "clearAllClosed")
     }
 
     @IBAction func markAllReadSelected() {
@@ -85,7 +85,6 @@ class SectionController: WKInterfaceController {
     }
 
     override func contextForSegueWithIdentifier(segueIdentifier: String, inTable table: WKInterfaceTable, rowIndex: Int) -> AnyObject? {
-        let controller = table.rowControllerAtIndex(rowIndex) as SectionRow
         return [ TITLE_KEY: titles[rowIndex], SECTION_KEY: rowIndex+1 ]
     }
 }

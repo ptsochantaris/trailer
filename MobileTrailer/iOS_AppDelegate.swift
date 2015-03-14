@@ -330,25 +330,46 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 
     func application(application: UIApplication!, handleWatchKitExtensionRequest userInfo: [NSObject : AnyObject]!, reply: (([NSObject : AnyObject]!) -> Void)!) {
 
-        self.startRefresh()
+        if userInfo["command"] as? String == "refresh" {
 
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
-            [weak self] () -> Void in
+            self.startRefresh()
 
-            let lastSuccessfulSync = Settings.lastSuccessfulRefresh ?? NSDate()
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
+                [weak self] () -> Void in
 
-            while (self?.isRefreshing ?? false) {
-                NSThread.sleepForTimeInterval(0.1)
-            }
+                let lastSuccessfulSync = Settings.lastSuccessfulRefresh ?? NSDate()
 
-            dispatch_async(dispatch_get_main_queue(), { () -> Void in
-
-                if Settings.lastSuccessfulRefresh == nil || lastSuccessfulSync.isEqualToDate(Settings.lastSuccessfulRefresh!) {
-                    reply(["status": "Refresh failed", "color": "red"])
-                } else {
-                    reply(["status": "Success", "color": "green"])
+                while (self?.isRefreshing ?? false) {
+                    NSThread.sleepForTimeInterval(0.1)
                 }
+
+                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+
+                    if Settings.lastSuccessfulRefresh == nil || lastSuccessfulSync.isEqualToDate(Settings.lastSuccessfulRefresh!) {
+                        reply(["status": "Refresh failed", "color": "red"])
+                    } else {
+                        reply(["status": "Success", "color": "green"])
+                    }
+                })
             })
-        })
+
+        } else if userInfo["command"] as? String == "clearAllMerged" {
+            let splitViewController = window.rootViewController as UISplitViewController
+            let m = (splitViewController.viewControllers[0] as UINavigationController).topViewController as MasterViewController
+            m.removeAllMergedConfirmed()
+            reply(["status": "Success", "color": "green"])
+
+        } else if userInfo["command"] as? String == "clearAllClosed" {
+            let splitViewController = window.rootViewController as UISplitViewController
+            let m = (splitViewController.viewControllers[0] as UINavigationController).topViewController as MasterViewController
+            m.removeAllClosedConfirmed()
+            reply(["status": "Success", "color": "green"])
+
+        } else if userInfo["command"] as? String == "markAllRead" {
+            let splitViewController = window.rootViewController as UISplitViewController
+            let m = (splitViewController.viewControllers[0] as UINavigationController).topViewController as MasterViewController
+            m.markAllAsRead()
+            reply(["status": "Success", "color": "green"])
+        }
     }
 }

@@ -14,11 +14,15 @@ class PRDetailController: WKInterfaceController {
 
     @IBOutlet weak var table: WKInterfaceTable!
 
+    var pullRequest: PullRequest!
+
     override func awakeWithContext(context: AnyObject?) {
         super.awakeWithContext(context)
 
         let contextData = context as NSDictionary
-        setTitle(contextData[TITLE_KEY] as? String)
+        pullRequest = contextData[PULL_REQUEST_KEY] as PullRequest
+
+        self.setTitle(pullRequest.title)
     }
 
     override func willActivate() {
@@ -29,4 +33,7 @@ class PRDetailController: WKInterfaceController {
         super.didDeactivate()
     }
 
+    @IBAction func refreshSelected() {
+        presentControllerWithName("Command Controller", context: "refresh")
+    }
 }

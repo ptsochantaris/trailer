@@ -15,6 +15,8 @@ class PRListController: WKInterfaceController {
     @IBOutlet weak var emptyLabel: WKInterfaceLabel!
     @IBOutlet weak var table: WKInterfaceTable!
 
+    var prsInSection: [PullRequest]!
+
     override func awakeWithContext(context: AnyObject?) {
         super.awakeWithContext(context)
 
@@ -24,7 +26,7 @@ class PRListController: WKInterfaceController {
         let sectionIndex = contextData[SECTION_KEY] as Int
 
         let f = PullRequest.requestForPullRequestsWithFilter(nil, sectionIndex: sectionIndex)
-        let prsInSection = mainObjectContext.executeFetchRequest(f, error: nil) as [PullRequest]
+        prsInSection = mainObjectContext.executeFetchRequest(f, error: nil) as [PullRequest]
 
         table.setNumberOfRows(prsInSection.count, withRowType: "PRRow")
 
@@ -51,4 +53,23 @@ class PRListController: WKInterfaceController {
         super.didDeactivate()
     }
 
+    @IBAction func clearMergedSelected() {
+        presentControllerWithName("Command Controller", context: "clearAllMerged")
+    }
+
+    @IBAction func clearClosedSelected() {
+        presentControllerWithName("Command Controller", context: "clearAllClosed")
+    }
+
+    @IBAction func markAllReadSelected() {
+        presentControllerWithName("Command Controller", context: "markAllRead")
+    }
+
+    @IBAction func refreshSelected() {
+        presentControllerWithName("Command Controller", context: "refresh")
+    }
+
+    override func contextForSegueWithIdentifier(segueIdentifier: String, inTable table: WKInterfaceTable, rowIndex: Int) -> AnyObject? {
+        return [ PULL_REQUEST_KEY: prsInSection[rowIndex] ]
+    }
 }
