@@ -15,6 +15,8 @@ class InterfaceController: WKInterfaceController {
     @IBOutlet weak var emptyLabel: WKInterfaceLabel!
     @IBOutlet weak var table: WKInterfaceTable!
 
+    var titles = [String]()
+
     override func awakeWithContext(context: AnyObject?) {
         super.awakeWithContext(context)
 
@@ -39,23 +41,21 @@ class InterfaceController: WKInterfaceController {
             table.setHidden(false)
             emptyLabel.setHidden(true)
 
-            table.setNumberOfRows(6, withRowType: "TopRow")
+            table.setNumberOfRows(5, withRowType: "TopRow")
 
-            for f in 0..<6 {
+            for f in MINE_INDEX...OTHER_INDEX {
                 let controller = table.rowControllerAtIndex(f) as TopRow
                 switch(f) {
-                case 0:
-                    controller.setRow(PullRequest.countRequestsInSection(PullRequestSection.Mine.rawValue, moc: mainObjectContext), "Mine")
-                case 1:
-                    controller.setRow(PullRequest.countRequestsInSection(PullRequestSection.Participated.rawValue, moc: mainObjectContext), "Participated")
-                case 2:
-                    controller.setRow(PullRequest.countRequestsInSection(PullRequestSection.Merged.rawValue, moc: mainObjectContext), "Merged")
-                case 3:
-                    controller.setRow(PullRequest.countRequestsInSection(PullRequestSection.Closed.rawValue, moc: mainObjectContext), "Closed")
-                case 4:
-                    controller.setRow(PullRequest.badgeCountInMoc(mainObjectContext), "Unread")
-                case 5:
-                    controller.setRow(PullRequest.countRequestsInSection(PullRequestSection.All.rawValue, moc: mainObjectContext), "Others")
+                case MINE_INDEX:
+                    titles.append(controller.setRow(PullRequestSection.Mine, "Mine"))
+                case PARTICIPATED_INDEX:
+                    titles.append(controller.setRow(PullRequestSection.Participated, "Participated"))
+                case MERGED_INDEX:
+                    titles.append(controller.setRow(PullRequestSection.Merged, "Merged"))
+                case CLOSED_INDEX:
+                    titles.append(controller.setRow(PullRequestSection.Closed, "Closed"))
+                case OTHER_INDEX:
+                    titles.append(controller.setRow(PullRequestSection.All, "Others"))
                 default: break
                 }
             }
@@ -82,5 +82,10 @@ class InterfaceController: WKInterfaceController {
 
     @IBAction func markAllReadSelected() {
 
+    }
+
+    override func contextForSegueWithIdentifier(segueIdentifier: String, inTable table: WKInterfaceTable, rowIndex: Int) -> AnyObject? {
+        let controller = table.rowControllerAtIndex(rowIndex) as TopRow
+        return [ TITLE_KEY: titles[rowIndex], SECTION_KEY: rowIndex+1 ]
     }
 }

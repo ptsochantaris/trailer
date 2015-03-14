@@ -125,6 +125,8 @@
 		16DC40FC1A3F591200BB361A /* PrItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16DC40FB1A3F591200BB361A /* PrItemView.swift */; };
 		16E93D121AB467DA00CA967E /* PRListController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E93D111AB467DA00CA967E /* PRListController.swift */; };
 		16E93D141AB4680F00CA967E /* PRDetailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E93D131AB4680F00CA967E /* PRDetailController.swift */; };
+		16E93D171AB46CE600CA967E /* FieldRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E93D161AB46CE600CA967E /* FieldRow.swift */; };
+		16E93D191AB46CEE00CA967E /* PRRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E93D181AB46CEE00CA967E /* PRRow.swift */; };
 		16EE6AD01A9A711C000A8483 /* CountLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16EE6ACF1A9A711C000A8483 /* CountLabel.swift */; };
 		16EE871B1A446BFE00A1D16F /* EmptyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16EE871A1A446BFE00A1D16F /* EmptyView.swift */; };
 /* End PBXBuildFile section */
@@ -288,6 +290,8 @@
 		16DC40FB1A3F591200BB361A /* PrItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrItemView.swift; sourceTree = "<group>"; };
 		16E93D111AB467DA00CA967E /* PRListController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PRListController.swift; sourceTree = "<group>"; };
 		16E93D131AB4680F00CA967E /* PRDetailController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PRDetailController.swift; sourceTree = "<group>"; };
+		16E93D161AB46CE600CA967E /* FieldRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FieldRow.swift; sourceTree = "<group>"; };
+		16E93D181AB46CEE00CA967E /* PRRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PRRow.swift; sourceTree = "<group>"; };
 		16EE6ACF1A9A711C000A8483 /* CountLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CountLabel.swift; sourceTree = "<group>"; };
 		16EE871A1A446BFE00A1D16F /* EmptyView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmptyView.swift; sourceTree = "<group>"; };
 		16F51FA019DE8C78007B0BB1 /* PRIVACY */ = {isa = PBXFileReference; lastKnownFileType = text; path = PRIVACY; sourceTree = "<group>"; };
@@ -594,6 +598,7 @@
 			isa = PBXGroup;
 			children = (
 				16E93D111AB467DA00CA967E /* PRListController.swift */,
+				16E93D181AB46CEE00CA967E /* PRRow.swift */,
 			);
 			name = PRList;
 			sourceTree = "<group>";
@@ -602,6 +607,7 @@
 			isa = PBXGroup;
 			children = (
 				16E93D131AB4680F00CA967E /* PRDetailController.swift */,
+				16E93D161AB46CE600CA967E /* FieldRow.swift */,
 			);
 			name = PRDetail;
 			sourceTree = "<group>";
@@ -922,6 +928,7 @@
 				16E93D141AB4680F00CA967E /* PRDetailController.swift in Sources */,
 				16143E7F1AB44BFD00BAC070 /* ExtensionGlobals.swift in Sources */,
 				16143E831AB44E9F00BAC070 /* TopRow.swift in Sources */,
+				16E93D171AB46CE600CA967E /* FieldRow.swift in Sources */,
 				1672DF3F1AB0E8DE00381AEB /* DataManager.swift in Sources */,
 				1672DF401AB0E8E300381AEB /* Trailer.xcdatamodeld in Sources */,
 				1672DF461AB0E8EA00381AEB /* PullRequest.swift in Sources */,
@@ -938,6 +945,7 @@
 				16E93D121AB467DA00CA967E /* PRListController.swift in Sources */,
 				1672DF481AB0E9C900381AEB /* NSStringExtensions.swift in Sources */,
 				1672DF411AB0E8EA00381AEB /* ApiServer.swift in Sources */,
+				16E93D191AB46CEE00CA967E /* PRRow.swift in Sources */,
 				1672DF431AB0E8EA00381AEB /* PRComment.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

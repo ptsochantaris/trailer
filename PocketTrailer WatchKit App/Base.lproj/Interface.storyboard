@@ -11,16 +11,23 @@
                 <controller id="AgC-eL-Hgc" customClass="InterfaceController" customModule="PocketTrailer_WatchKit_Extension">
                     <items>
                         <label alignment="center" verticalAlignment="center" hidden="YES" text="Label" textAlignment="center" numberOfLines="0" id="MO0-Ee-aHD"/>
-                        <table alignment="center" verticalAlignment="center" id="be2-ie-h5R">
+                        <table alignment="left" id="be2-ie-h5R">
                             <items>
                                 <tableRow identifier="TopRow" id="ql1-oS-xZe" customClass="TopRow" customModule="PocketTrailer_WatchKit_Extension">
                                     <group key="rootItem" width="1" height="0.0" alignment="left" id="Uft-cP-lJ6">
                                         <items>
-                                            <label alignment="left" verticalAlignment="center" text="Label" id="m26-4w-XIn"/>
+                                            <label alignment="left" verticalAlignment="center" text="Title" id="m26-4w-XIn">
+                                                <fontDescription key="font" style="UICTFontTextStyleHeadline"/>
+                                            </label>
+                                            <label alignment="right" verticalAlignment="center" text="Count" id="YSb-rO-7SF">
+                                                <color key="textColor" red="1" green="0.0" blue="0.070606581870000004" alpha="1" colorSpace="calibratedRGB"/>
+                                                <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
+                                            </label>
                                         </items>
                                     </group>
                                     <connections>
-                                        <outlet property="titleL" destination="m26-4w-XIn" id="Gwd-kA-TWi"/>
+                                        <outlet property="countL" destination="YSb-rO-7SF" id="Cpc-eB-Bi7"/>
+                                        <outlet property="titleL" destination="m26-4w-XIn" id="abe-vu-sBX"/>
                                         <segue destination="Sqe-dw-Y9B" kind="push" id="65c-yz-7QC"/>
                                     </connections>
                                 </tableRow>
@@ -64,17 +71,34 @@
             <objects>
                 <controller id="Sqe-dw-Y9B" customClass="PRListController" customModule="PocketTrailer_WatchKit_Extension">
                     <items>
+                        <label alignment="center" verticalAlignment="center" hidden="YES" text="No PRs in this section" textAlignment="center" numberOfLines="0" id="PLW-UR-bJ2"/>
                         <table alignment="left" id="XeC-bN-XlT">
                             <items>
-                                <tableRow id="qcu-Df-oql">
-                                    <group key="rootItem" width="1" alignment="left" id="Uwj-Y1-PON"/>
+                                <tableRow identifier="PRRow" id="qcu-Df-oql" customClass="PRRow" customModule="PocketTrailer_WatchKit_Extension">
+                                    <group key="rootItem" width="1" height="0.0" alignment="left" layout="vertical" id="Uwj-Y1-PON">
+                                        <items>
+                                            <label alignment="left" text="Title" numberOfLines="0" id="18g-kn-5Ie">
+                                                <fontDescription key="font" style="UICTFontTextStyleBody"/>
+                                            </label>
+                                            <label alignment="left" text="Details" numberOfLines="0" id="jYX-bA-AMh">
+                                                <color key="textColor" red="1" green="1" blue="1" alpha="0.59999999999999998" colorSpace="calibratedRGB"/>
+                                                <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
+                                            </label>
+                                        </items>
+                                    </group>
                                     <connections>
+                                        <outlet property="detailsL" destination="jYX-bA-AMh" id="quv-Me-8yM"/>
+                                        <outlet property="titleL" destination="18g-kn-5Ie" id="ckR-qC-atT"/>
                                         <segue destination="Hgm-oe-oa5" kind="push" id="DhF-WS-hec"/>
                                     </connections>
                                 </tableRow>
                             </items>
                         </table>
                     </items>
+                    <connections>
+                        <outlet property="emptyLabel" destination="PLW-UR-bJ2" id="c3I-dN-bDl"/>
+                        <outlet property="table" destination="XeC-bN-XlT" id="eNr-td-1B9"/>
+                    </connections>
                 </controller>
             </objects>
             <point key="canvasLocation" x="412" y="221"/>
@@ -86,12 +110,22 @@
                     <items>
                         <table alignment="left" id="nDu-Js-IyV">
                             <items>
-                                <tableRow id="IWp-rT-BP5">
-                                    <group key="rootItem" width="1" alignment="left" id="lVf-k4-WHR"/>
+                                <tableRow identifier="FieldRow" id="IWp-rT-BP5" customClass="FieldRow" customModule="PocketTrailer_WatchKit_Extension">
+                                    <group key="rootItem" width="1" height="0.0" alignment="left" id="lVf-k4-WHR">
+                                        <items>
+                                            <label alignment="left" text="Label" numberOfLines="0" id="htJ-iu-xQa"/>
+                                        </items>
+                                    </group>
+                                    <connections>
+                                        <outlet property="titleL" destination="htJ-iu-xQa" id="ZVp-jk-HNR"/>
+                                    </connections>
                                 </tableRow>
                             </items>
                         </table>
                     </items>
+                    <connections>
+                        <outlet property="table" destination="nDu-Js-IyV" id="LiY-op-bsm"/>
+                    </connections>
                 </controller>
             </objects>
             <point key="canvasLocation" x="660" y="225"/>

@@ -101,10 +101,18 @@ class PullRequest: DataItem {
 		}
 	}
 
-	class func requestForPullRequestsWithFilter(filter: String?) -> NSFetchRequest {
+    class func requestForPullRequestsWithFilter(filter: String?) -> NSFetchRequest {
+        return requestForPullRequestsWithFilter(filter, sectionIndex: -1)
+    }
+
+	class func requestForPullRequestsWithFilter(filter: String?, sectionIndex: Int) -> NSFetchRequest {
 
 		var andPredicates = [NSPredicate]()
-		andPredicates.append(NSPredicate(format: "sectionIndex > 0")!)
+        if sectionIndex<0 {
+            andPredicates.append(NSPredicate(format: "sectionIndex > 0")!)
+        } else {
+            andPredicates.append(NSPredicate(format: "sectionIndex == %d", sectionIndex)!)
+        }
 
 		if let fi = filter {
 			if !fi.isEmpty {
@@ -183,6 +191,23 @@ class PullRequest: DataItem {
         let f = NSFetchRequest(entityName: "PullRequest")
         f.predicate = NSPredicate(format: "sectionIndex == %d", section)
         return moc.countForFetchRequest(f, error: nil)
+    }
+
+    class func badgeCountInSection(section: Int, moc: NSManagedObjectContext) -> Int {
+        let f = NSFetchRequest(entityName: "PullRequest")
+        f.predicate = NSPredicate(format: "sectionIndex == %d", section)
+        var badgeCount:Int = 0
+        let showCommentsEverywhere = Settings.showCommentsEverywhere
+        for p in moc.executeFetchRequest(f, error: nil) as [PullRequest] {
+            if let sectionIndex = p.sectionIndex?.integerValue {
+                if showCommentsEverywhere || sectionIndex==PullRequestSection.Mine.rawValue || sectionIndex==PullRequestSection.Participated.rawValue {
+                    if let c = p.unreadComments?.integerValue {
+                        badgeCount += c
+                    }
+                }
+            }
+        }
+        return badgeCount
     }
 
 	class func badgeCountInMoc(moc: NSManagedObjectContext) -> Int {
