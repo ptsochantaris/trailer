@@ -44,10 +44,12 @@ class PRListController: WKInterfaceController {
     }
 
     @IBAction func clearMergedSelected() {
+        refreshWhenBack = true
         presentControllerWithName("Command Controller", context: "clearAllMerged")
     }
 
     @IBAction func clearClosedSelected() {
+        refreshWhenBack = true
         presentControllerWithName("Command Controller", context: "clearAllClosed")
     }
 

@@ -15,11 +15,52 @@ class SectionController: WKInterfaceController {
 
     var titles = [String]()
 
+    var refreshWhenBack = false
+
     override func awakeWithContext(context: AnyObject?) {
         super.awakeWithContext(context)
 
         dataReadonly = true
 
+        buildUI()
+    }
+
+    override func willActivate() {
+        if refreshWhenBack {
+            buildUI()
+        }
+        super.willActivate()
+    }
+
+    override func didDeactivate() {
+        super.didDeactivate()
+    }
+
+    @IBAction func clearMergedSelected() {
+        refreshWhenBack = true
+        presentControllerWithName("Command Controller", context: "clearAllMerged")
+    }
+
+    @IBAction func clearClosedSelected() {
+        refreshWhenBack = true
+        presentControllerWithName("Command Controller", context: "clearAllClosed")
+    }
+
+    @IBAction func markAllReadSelected() {
+        refreshWhenBack = true
+        presentControllerWithName("Command Controller", context: "markAllRead")
+    }
+
+    @IBAction func refreshSelected() {
+        refreshWhenBack = true
+        presentControllerWithName("Command Controller", context: "refresh")
+    }
+
+    override func contextForSegueWithIdentifier(segueIdentifier: String, inTable table: WKInterfaceTable, rowIndex: Int) -> AnyObject? {
+        return [ SECTION_KEY: rowIndex+1 ]
+    }
+
+    private func buildUI() {
         let totalPrs = PullRequest.countAllRequestsInMoc(mainObjectContext)
 
         if totalPrs==0 {
@@ -58,33 +99,5 @@ class SectionController: WKInterfaceController {
                 }
             }
         }
-    }
-
-    override func willActivate() {
-        super.willActivate()
-    }
-
-    override func didDeactivate() {
-        super.didDeactivate()
-    }
-
-    @IBAction func clearMergedSelected() {
-        presentControllerWithName("Command Controller", context: "clearAllMerged")
-    }
-
-    @IBAction func clearClosedSelected() {
-        presentControllerWithName("Command Controller", context: "clearAllClosed")
-    }
-
-    @IBAction func markAllReadSelected() {
-        presentControllerWithName("Command Controller", context: "markAllRead")
-    }
-
-    @IBAction func refreshSelected() {
-        presentControllerWithName("Command Controller", context: "refresh")
-    }
-
-    override func contextForSegueWithIdentifier(segueIdentifier: String, inTable table: WKInterfaceTable, rowIndex: Int) -> AnyObject? {
-        return [ SECTION_KEY: rowIndex+1 ]
     }
 }
