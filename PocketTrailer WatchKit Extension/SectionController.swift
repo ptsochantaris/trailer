@@ -7,10 +7,8 @@
 //
 
 import WatchKit
-import Foundation
 
-
-class InterfaceController: WKInterfaceController {
+class SectionController: WKInterfaceController {
 
     @IBOutlet weak var emptyLabel: WKInterfaceLabel!
     @IBOutlet weak var table: WKInterfaceTable!
@@ -20,7 +18,7 @@ class InterfaceController: WKInterfaceController {
     override func awakeWithContext(context: AnyObject?) {
         super.awakeWithContext(context)
 
-        ExtensionGlobals.go()
+        dataReadonly = true
 
         let totalPrs = PullRequest.countAllRequestsInMoc(mainObjectContext)
 
@@ -41,10 +39,10 @@ class InterfaceController: WKInterfaceController {
             table.setHidden(false)
             emptyLabel.setHidden(true)
 
-            table.setNumberOfRows(5, withRowType: "TopRow")
+            table.setNumberOfRows(5, withRowType: "SectionRow")
 
             for f in MINE_INDEX...OTHER_INDEX {
-                let controller = table.rowControllerAtIndex(f) as TopRow
+                let controller = table.rowControllerAtIndex(f) as SectionRow
                 switch(f) {
                 case MINE_INDEX:
                     titles.append(controller.setRow(PullRequestSection.Mine, "Mine"))
@@ -60,8 +58,6 @@ class InterfaceController: WKInterfaceController {
                 }
             }
         }
-
-        ExtensionGlobals.done()
     }
 
     override func willActivate() {
@@ -81,11 +77,15 @@ class InterfaceController: WKInterfaceController {
     }
 
     @IBAction func markAllReadSelected() {
+        presentControllerWithName("Command Controller", context: "markAllRead")
+    }
 
+    @IBAction func refreshSelected() {
+        presentControllerWithName("Command Controller", context: "refresh")
     }
 
     override func contextForSegueWithIdentifier(segueIdentifier: String, inTable table: WKInterfaceTable, rowIndex: Int) -> AnyObject? {
-        let controller = table.rowControllerAtIndex(rowIndex) as TopRow
+        let controller = table.rowControllerAtIndex(rowIndex) as SectionRow
         return [ TITLE_KEY: titles[rowIndex], SECTION_KEY: rowIndex+1 ]
     }
 }

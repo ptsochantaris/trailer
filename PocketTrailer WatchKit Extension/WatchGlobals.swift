@@ -6,9 +6,6 @@
 //
 //
 
-var app: ExtensionGlobals!
-var api: ExtensionGlobals!
-
 let TITLE_KEY = "TITLE_KEY"
 let SECTION_KEY = "INDEX_KEY"
 

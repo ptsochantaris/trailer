@@ -325,4 +325,30 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
     func setMinimumBackgroundFetchInterval(interval: NSTimeInterval) -> Void {
         UIApplication.sharedApplication().setMinimumBackgroundFetchInterval(NSTimeInterval(interval))
     }
+
+    /////////////// Watchkit commands
+
+    func application(application: UIApplication!, handleWatchKitExtensionRequest userInfo: [NSObject : AnyObject]!, reply: (([NSObject : AnyObject]!) -> Void)!) {
+
+        self.startRefresh()
+
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
+            [weak self] () -> Void in
+
+            let lastSuccessfulSync = Settings.lastSuccessfulRefresh ?? NSDate()
+
+            while (self?.isRefreshing ?? false) {
+                NSThread.sleepForTimeInterval(0.1)
+            }
+
+            dispatch_async(dispatch_get_main_queue(), { () -> Void in
+
+                if Settings.lastSuccessfulRefresh == nil || lastSuccessfulSync.isEqualToDate(Settings.lastSuccessfulRefresh!) {
+                    reply(["status": "Refresh failed", "color": "red"])
+                } else {
+                    reply(["status": "Success", "color": "green"])
+                }
+            })
+        })
+    }
 }

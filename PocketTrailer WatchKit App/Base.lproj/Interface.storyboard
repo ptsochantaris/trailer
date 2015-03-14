@@ -5,15 +5,15 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="3737"/>
     </dependencies>
     <scenes>
-        <!--Interface Controller-->
+        <!--Section Controller-->
         <scene sceneID="aou-V4-d1y">
             <objects>
-                <controller id="AgC-eL-Hgc" customClass="InterfaceController" customModule="PocketTrailer_WatchKit_Extension">
+                <controller id="AgC-eL-Hgc" customClass="SectionController" customModule="PocketTrailer_WatchKit_Extension">
                     <items>
                         <label alignment="center" verticalAlignment="center" hidden="YES" text="Label" textAlignment="center" numberOfLines="0" id="MO0-Ee-aHD"/>
-                        <table alignment="left" id="be2-ie-h5R">
+                        <table alignment="left" verticalAlignment="center" id="be2-ie-h5R">
                             <items>
-                                <tableRow identifier="TopRow" id="ql1-oS-xZe" customClass="TopRow" customModule="PocketTrailer_WatchKit_Extension">
+                                <tableRow identifier="SectionRow" id="ql1-oS-xZe" customClass="SectionRow" customModule="PocketTrailer_WatchKit_Extension">
                                     <group key="rootItem" width="1" height="0.0" alignment="left" id="Uft-cP-lJ6">
                                         <items>
                                             <label alignment="left" verticalAlignment="center" text="Title" id="m26-4w-XIn">
@@ -24,6 +24,7 @@
                                                 <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
                                             </label>
                                         </items>
+                                        <edgeInsets key="margins" left="4" right="4" top="4" bottom="4"/>
                                     </group>
                                     <connections>
                                         <outlet property="countL" destination="YSb-rO-7SF" id="Cpc-eB-Bi7"/>
@@ -53,7 +54,7 @@
                             </menuItem>
                             <menuItem title="Refresh" icon="repeat" id="JUU-7X-dfp">
                                 <connections>
-                                    <action selector="markAllReadSelected" destination="AgC-eL-Hgc" id="4an-aC-Zk8"/>
+                                    <action selector="refreshSelected" destination="AgC-eL-Hgc" id="T4H-b9-mvE"/>
                                 </connections>
                             </menuItem>
                         </items>
@@ -188,6 +189,25 @@
                 </glanceController>
             </objects>
             <point key="canvasLocation" x="164" y="514"/>
+        </scene>
+        <!--Command Controller-->
+        <scene sceneID="3pa-8N-Joz">
+            <objects>
+                <controller identifier="Command Controller" id="Aye-qq-uqB" customClass="CommandController" customModule="PocketTrailer_WatchKit_Extension">
+                    <items>
+                        <group width="1" alignment="center" verticalAlignment="center" id="okz-U3-TVg">
+                            <items>
+                                <imageView width="32" height="32" alignment="center" verticalAlignment="center" alpha="0.89999999999999991" image="GlanceIcon" contentMode="scaleAspectFit" id="wXB-qA-npf"/>
+                                <label alignment="center" verticalAlignment="center" text="One moment please..." numberOfLines="0" id="TaB-Gc-8NT"/>
+                            </items>
+                        </group>
+                    </items>
+                    <connections>
+                        <outlet property="feedbackLabel" destination="TaB-Gc-8NT" id="3Xa-tS-sUy"/>
+                    </connections>
+                </controller>
+            </objects>
+            <point key="canvasLocation" x="422" y="515"/>
         </scene>
     </scenes>
 </document>

@@ -7,14 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		16062CED1AB488BE00AB1F66 /* CommandController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16062CEC1AB488BE00AB1F66 /* CommandController.swift */; };
 		1606F1BB1A4703E60088368E /* iOS_AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1606F1BA1A4703E60088368E /* iOS_AppDelegate.swift */; };
 		1606F1BD1A471CDC0088368E /* RespositoriesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1606F1BC1A471CDC0088368E /* RespositoriesViewController.swift */; };
 		160823F51A44997F006F91AD /* UINavigationControllerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160823F31A44982F006F91AD /* UINavigationControllerExtensions.swift */; };
 		160D312C1A9619CE006B74BC /* FilledView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160D312B1A9619CE006B74BC /* FilledView.swift */; };
-		16143E7B1AB435EC00BAC070 /* InterfaceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16143E7A1AB435EC00BAC070 /* InterfaceController.swift */; };
+		16143E7B1AB435EC00BAC070 /* SectionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16143E7A1AB435EC00BAC070 /* SectionController.swift */; };
 		16143E7F1AB44BFD00BAC070 /* ExtensionGlobals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1672DF4A1AB0EB9200381AEB /* ExtensionGlobals.swift */; };
 		16143E811AB44C3F00BAC070 /* WatchGlobals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16143E801AB44C3F00BAC070 /* WatchGlobals.swift */; };
-		16143E831AB44E9F00BAC070 /* TopRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16143E821AB44E9F00BAC070 /* TopRow.swift */; };
+		16143E831AB44E9F00BAC070 /* SectionRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16143E821AB44E9F00BAC070 /* SectionRow.swift */; };
 		1615045E1A464656001CF50C /* PRCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1615045D1A464656001CF50C /* PRCell.swift */; };
 		161504601A4651CB001CF50C /* MasterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1615045F1A4651CB001CF50C /* MasterViewController.swift */; };
 		16154E2F19C43E8E00E49139 /* Launch.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 16154E2E19C43E8E00E49139 /* Launch.storyboard */; };
@@ -182,13 +183,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		16062CEC1AB488BE00AB1F66 /* CommandController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommandController.swift; sourceTree = "<group>"; };
 		1606F1BA1A4703E60088368E /* iOS_AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = iOS_AppDelegate.swift; sourceTree = "<group>"; };
 		1606F1BC1A471CDC0088368E /* RespositoriesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = RespositoriesViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		160823F31A44982F006F91AD /* UINavigationControllerExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UINavigationControllerExtensions.swift; sourceTree = "<group>"; };
 		160D312B1A9619CE006B74BC /* FilledView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilledView.swift; sourceTree = "<group>"; };
-		16143E7A1AB435EC00BAC070 /* InterfaceController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InterfaceController.swift; sourceTree = "<group>"; };
+		16143E7A1AB435EC00BAC070 /* SectionController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SectionController.swift; sourceTree = "<group>"; };
 		16143E801AB44C3F00BAC070 /* WatchGlobals.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WatchGlobals.swift; sourceTree = "<group>"; };
-		16143E821AB44E9F00BAC070 /* TopRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TopRow.swift; sourceTree = "<group>"; };
+		16143E821AB44E9F00BAC070 /* SectionRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SectionRow.swift; sourceTree = "<group>"; };
 		1615045D1A464656001CF50C /* PRCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PRCell.swift; sourceTree = "<group>"; };
 		1615045F1A4651CB001CF50C /* MasterViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MasterViewController.swift; sourceTree = "<group>"; };
 		16154E2E19C43E8E00E49139 /* Launch.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Launch.storyboard; sourceTree = "<group>"; };
@@ -430,6 +432,7 @@
 			children = (
 				16143E801AB44C3F00BAC070 /* WatchGlobals.swift */,
 				16522D761AB03AE500B1C3FB /* GlanceController.swift */,
+				16062CEC1AB488BE00AB1F66 /* CommandController.swift */,
 				16E93D151AB4681800CA967E /* PRDetail */,
 				16E93D101AB467BF00CA967E /* PRList */,
 				16D845381AB4513F0098FB65 /* Top */,
@@ -588,8 +591,8 @@
 		16D845381AB4513F0098FB65 /* Top */ = {
 			isa = PBXGroup;
 			children = (
-				16143E7A1AB435EC00BAC070 /* InterfaceController.swift */,
-				16143E821AB44E9F00BAC070 /* TopRow.swift */,
+				16143E7A1AB435EC00BAC070 /* SectionController.swift */,
+				16143E821AB44E9F00BAC070 /* SectionRow.swift */,
 			);
 			name = Top;
 			sourceTree = "<group>";
@@ -927,16 +930,17 @@
 			files = (
 				16E93D141AB4680F00CA967E /* PRDetailController.swift in Sources */,
 				16143E7F1AB44BFD00BAC070 /* ExtensionGlobals.swift in Sources */,
-				16143E831AB44E9F00BAC070 /* TopRow.swift in Sources */,
+				16143E831AB44E9F00BAC070 /* SectionRow.swift in Sources */,
 				16E93D171AB46CE600CA967E /* FieldRow.swift in Sources */,
 				1672DF3F1AB0E8DE00381AEB /* DataManager.swift in Sources */,
 				1672DF401AB0E8E300381AEB /* Trailer.xcdatamodeld in Sources */,
 				1672DF461AB0E8EA00381AEB /* PullRequest.swift in Sources */,
 				1672DF421AB0E8EA00381AEB /* DataItem.swift in Sources */,
-				16143E7B1AB435EC00BAC070 /* InterfaceController.swift in Sources */,
+				16143E7B1AB435EC00BAC070 /* SectionController.swift in Sources */,
 				1672DF3C1AB0E8CD00381AEB /* NSDictionaryExtensions.swift in Sources */,
 				1672DF3E1AB0E8CD00381AEB /* Settings.swift in Sources */,
 				16522D771AB03AE500B1C3FB /* GlanceController.swift in Sources */,
+				16062CED1AB488BE00AB1F66 /* CommandController.swift in Sources */,
 				1672DF3A1AB0E8C600381AEB /* Globals.swift in Sources */,
 				1672DF471AB0E8EA00381AEB /* Repo.swift in Sources */,
 				1672DF441AB0E8EA00381AEB /* PRLabel.swift in Sources */,

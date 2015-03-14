@@ -23,7 +23,7 @@ class GlanceController: WKInterfaceController {
     override func awakeWithContext(context: AnyObject?) {
         super.awakeWithContext(context)
 
-        ExtensionGlobals.go()
+        dataReadonly = true
 
         let totalPrs = PullRequest.countAllRequestsInMoc(mainObjectContext)
 
@@ -81,8 +81,6 @@ class GlanceController: WKInterfaceController {
                 lastUpdate.setAlpha(0.4)
             }
         }
-
-        ExtensionGlobals.done()
     }
 
     func setCountOfLabel(label: WKInterfaceLabel, toCount: Int, appending: String) {

@@ -4,6 +4,8 @@ import CoreData
 	import UIKit
 #endif
 
+var dataReadonly = false
+
 class DataManager : NSObject {
 
 	class func checkMigration() {
@@ -412,9 +414,10 @@ func addStorePath(sqlStore: NSURL) -> Bool {
 		configuration:nil,
 		URL:sqlStore,
 		options:[
-			NSMigratePersistentStoresAutomaticallyOption:true,
-			NSInferMappingModelAutomaticallyOption:true,
-			NSSQLitePragmasOption:["synchronous":"OFF", "fullfsync":"0"]],
+			NSMigratePersistentStoresAutomaticallyOption: true,
+			NSInferMappingModelAutomaticallyOption: true,
+            NSReadOnlyPersistentStoreOption: dataReadonly,
+			NSSQLitePragmasOption: ["synchronous":"OFF", "fullfsync":"0"]],
 		error:&error)
 	if(error != nil) { DLog("%@",error) }
 	return store != nil

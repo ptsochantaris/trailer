@@ -10,9 +10,6 @@ import UIKit
 import Foundation
 import NotificationCenter
 
-var app: ExtensionGlobals!
-var api: ExtensionGlobals!
-
 class TodayViewController: UIViewController, NCWidgetProviding {
         
     @IBOutlet weak var label: UILabel!
@@ -54,6 +51,8 @@ class TodayViewController: UIViewController, NCWidgetProviding {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        dataReadonly = true
+
         paragraph.paragraphSpacing = 4
 
         button = UIButton.buttonWithType(UIButtonType.Custom) as UIButton
@@ -74,8 +73,6 @@ class TodayViewController: UIViewController, NCWidgetProviding {
     }
 
     private func update() {
-
-        ExtensionGlobals.go()
 
         let totalCount = PullRequest.countAllRequestsInMoc(mainObjectContext)
 
@@ -124,8 +121,6 @@ class TodayViewController: UIViewController, NCWidgetProviding {
             a.addAttribute(NSParagraphStyleAttributeName, value: paragraph, range: NSMakeRange(0, a.length))
             label.attributedText = a
         }
-
-        ExtensionGlobals.done()
     }
 
     func widgetPerformUpdateWithCompletionHandler(completionHandler: ((NCUpdateResult) -> Void)!) {

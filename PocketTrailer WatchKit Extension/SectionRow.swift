@@ -8,7 +8,7 @@
 
 import WatchKit
 
-class TopRow: NSObject {
+class SectionRow: NSObject {
     
     @IBOutlet weak var titleL: WKInterfaceLabel!
     @IBOutlet weak var countL: WKInterfaceLabel!

@@ -23,8 +23,6 @@ class PRListController: WKInterfaceController {
 
         let sectionIndex = contextData[SECTION_KEY] as Int
 
-        ExtensionGlobals.go()
-
         let f = PullRequest.requestForPullRequestsWithFilter(nil, sectionIndex: sectionIndex)
         let prsInSection = mainObjectContext.executeFetchRequest(f, error: nil) as [PullRequest]
 
@@ -43,8 +41,6 @@ class PRListController: WKInterfaceController {
                 controller.setPullRequest(pr)
             }
         }
-
-        ExtensionGlobals.done()
     }
 
     override func willActivate() {

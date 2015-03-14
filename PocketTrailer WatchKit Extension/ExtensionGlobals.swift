@@ -9,19 +9,14 @@
 import UIKit
 import CoreData
 
+let app = { () -> ExtensionGlobals in
+    DataManager.checkMigration()
+    return ExtensionGlobals()
+}()
+
+let api = app
+
 class ExtensionGlobals {
-
-    class func go() {
-        app = ExtensionGlobals()
-        api = app
-        DataManager.checkMigration()
-    }
-
-    class func done()
-    {
-        app = nil
-        api = nil
-    }
 
     var refreshesSinceLastLabelsCheck = [NSManagedObjectID:Int]()
     var refreshesSinceLastStatusCheck = [NSManagedObjectID:Int]()
