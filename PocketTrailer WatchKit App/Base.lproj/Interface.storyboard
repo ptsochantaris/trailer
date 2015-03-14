@@ -147,6 +147,18 @@
                                         <outlet property="labelL" destination="htJ-iu-xQa" id="vAb-Bg-wc1"/>
                                     </connections>
                                 </tableRow>
+                                <tableRow identifier="StatusRow" selectable="NO" id="O5R-Ty-nOY" customClass="StatusRow" customModule="PocketTrailer_WatchKit_Extension">
+                                    <group key="rootItem" width="1" height="0.0" alignment="left" id="gDg-ep-B9d">
+                                        <items>
+                                            <label alignment="left" text="Status" numberOfLines="0" id="EuO-JH-OaC">
+                                                <fontDescription key="font" type="system" pointSize="10"/>
+                                            </label>
+                                        </items>
+                                    </group>
+                                    <connections>
+                                        <outlet property="labelL" destination="EuO-JH-OaC" id="7wS-YW-VI7"/>
+                                    </connections>
+                                </tableRow>
                                 <tableRow identifier="CommentRow" selectable="NO" id="7vR-Gf-9Vf" customClass="CommentRow" customModule="PocketTrailer_WatchKit_Extension">
                                     <group key="rootItem" width="1" height="0.0" alignment="left" layout="vertical" id="WCb-Rn-fOj">
                                         <items>

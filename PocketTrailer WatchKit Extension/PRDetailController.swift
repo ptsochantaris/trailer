@@ -30,16 +30,31 @@ class PRDetailController: WKInterfaceController {
 
         self.setTitle(pullRequest.title)
 
-        var rowTypes = ["LabelRow"]
+        var displayedStatuses = pullRequest.displayedStatuses()
+
+        var rowTypes = [String]()
+
+        for s in displayedStatuses {
+            rowTypes.append("StatusRow")
+        }
+
+        rowTypes.append("LabelRow")
 
         for c in pullRequest.comments.allObjects as [PRComment] {
             rowTypes.append("CommentRow")
         }
         table.setRowTypes(rowTypes)
 
-        (table.rowControllerAtIndex(0) as LabelRow).labelL.setText(pullRequest.body)
+        var index = 0
 
-        var index = 1
+        for s in displayedStatuses {
+            let controller = table.rowControllerAtIndex(index++) as StatusRow
+            controller.labelL.setText(s.displayText())
+            controller.labelL.setTextColor(s.colorForDarkDisplay())
+        }
+
+        (table.rowControllerAtIndex(index++) as LabelRow).labelL.setText(pullRequest.body)
+
         for c in pullRequest.comments.allObjects as [PRComment] {
             let controller = table.rowControllerAtIndex(index++) as CommentRow
             controller.usernameL.setText((c.userName ?? "(unknown)") + " " + shortDateFormatter.stringFromDate(c.createdAt ?? NSDate()))
