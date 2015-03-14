@@ -135,23 +135,11 @@
                     <items>
                         <table alignment="left" id="nDu-Js-IyV">
                             <items>
-                                <tableRow identifier="LabelRow" selectable="NO" id="IWp-rT-BP5" customClass="LabelRow" customModule="PocketTrailer_WatchKit_Extension">
-                                    <group key="rootItem" width="1" height="0.0" alignment="left" id="lVf-k4-WHR">
-                                        <items>
-                                            <label alignment="left" text="Description" numberOfLines="0" id="htJ-iu-xQa">
-                                                <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
-                                            </label>
-                                        </items>
-                                    </group>
-                                    <connections>
-                                        <outlet property="labelL" destination="htJ-iu-xQa" id="vAb-Bg-wc1"/>
-                                    </connections>
-                                </tableRow>
                                 <tableRow identifier="StatusRow" selectable="NO" id="O5R-Ty-nOY" customClass="StatusRow" customModule="PocketTrailer_WatchKit_Extension">
                                     <group key="rootItem" width="1" height="0.0" alignment="left" id="gDg-ep-B9d">
                                         <items>
                                             <label alignment="left" text="Status" numberOfLines="0" id="EuO-JH-OaC">
-                                                <fontDescription key="font" type="system" pointSize="10"/>
+                                                <fontDescription key="font" type="system" pointSize="11"/>
                                             </label>
                                         </items>
                                     </group>
@@ -159,15 +147,27 @@
                                         <outlet property="labelL" destination="EuO-JH-OaC" id="7wS-YW-VI7"/>
                                     </connections>
                                 </tableRow>
+                                <tableRow identifier="LabelRow" selectable="NO" id="IWp-rT-BP5" customClass="LabelRow" customModule="PocketTrailer_WatchKit_Extension">
+                                    <group key="rootItem" width="1" height="0.0" alignment="left" id="lVf-k4-WHR">
+                                        <items>
+                                            <label alignment="left" text="Description" numberOfLines="0" id="htJ-iu-xQa">
+                                                <fontDescription key="font" type="system" pointSize="11"/>
+                                            </label>
+                                        </items>
+                                    </group>
+                                    <connections>
+                                        <outlet property="labelL" destination="htJ-iu-xQa" id="vAb-Bg-wc1"/>
+                                    </connections>
+                                </tableRow>
                                 <tableRow identifier="CommentRow" selectable="NO" id="7vR-Gf-9Vf" customClass="CommentRow" customModule="PocketTrailer_WatchKit_Extension">
                                     <group key="rootItem" width="1" height="0.0" alignment="left" layout="vertical" id="WCb-Rn-fOj">
                                         <items>
                                             <label alignment="left" text="Username" numberOfLines="0" id="YGw-DU-AAO">
                                                 <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
-                                                <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
+                                                <fontDescription key="font" type="system" pointSize="12"/>
                                             </label>
                                             <label alignment="left" text="Comment" numberOfLines="0" id="wh3-Fx-D4A">
-                                                <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
+                                                <fontDescription key="font" type="system" pointSize="12"/>
                                             </label>
                                         </items>
                                     </group>

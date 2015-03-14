@@ -95,6 +95,7 @@ enum PullRequestCondition: Int {
 enum PullRequestSection: Int {
 	case None, Mine, Participated, Merged, Closed, All
 	static let allTitles = ["", "Mine", "Participated", "Recently Merged", "Recently Closed", "All Pull Requests"]
+    static let shortTitles = ["", "Mine", "Participated", "Merged", "Closed", "Other"]
 	func name() -> String {
 		return PullRequestSection.allTitles[rawValue]
 	}

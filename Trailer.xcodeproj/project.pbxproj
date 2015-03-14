@@ -439,7 +439,7 @@
 				16062CEC1AB488BE00AB1F66 /* CommandController.swift */,
 				16E93D151AB4681800CA967E /* PRDetail */,
 				16E93D101AB467BF00CA967E /* PRList */,
-				16D845381AB4513F0098FB65 /* Top */,
+				16D845381AB4513F0098FB65 /* PRSections */,
 				16522D781AB03AE500B1C3FB /* Images.xcassets */,
 				16522D721AB03AE500B1C3FB /* Supporting Files */,
 			);
@@ -592,13 +592,13 @@
 			path = Trailer;
 			sourceTree = "<group>";
 		};
-		16D845381AB4513F0098FB65 /* Top */ = {
+		16D845381AB4513F0098FB65 /* PRSections */ = {
 			isa = PBXGroup;
 			children = (
 				16143E7A1AB435EC00BAC070 /* SectionController.swift */,
 				16143E821AB44E9F00BAC070 /* SectionRow.swift */,
 			);
-			name = Top;
+			name = PRSections;
 			sourceTree = "<group>";
 		};
 		16E93D101AB467BF00CA967E /* PRList */ = {

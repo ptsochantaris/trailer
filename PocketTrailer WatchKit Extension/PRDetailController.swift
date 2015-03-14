@@ -21,6 +21,7 @@ class PRDetailController: WKInterfaceController {
     @IBOutlet weak var table: WKInterfaceTable!
 
     var pullRequest: PullRequest!
+    var refreshWhenBack = false
 
     override func awakeWithContext(context: AnyObject?) {
         super.awakeWithContext(context)
@@ -28,6 +29,28 @@ class PRDetailController: WKInterfaceController {
         let contextData = context as NSDictionary
         pullRequest = contextData[PULL_REQUEST_KEY] as PullRequest
 
+        buildUI()
+    }
+
+    override func willActivate() {
+        if refreshWhenBack {
+            mainObjectContext.refreshObject(pullRequest, mergeChanges: false)
+            buildUI()
+            refreshWhenBack = false
+        }
+        super.willActivate()
+    }
+
+    override func didDeactivate() {
+        super.didDeactivate()
+    }
+
+    @IBAction func refreshSelected() {
+        refreshWhenBack = true
+        presentControllerWithName("Command Controller", context: "refresh")
+    }
+
+    private func buildUI() {
         self.setTitle(pullRequest.title)
 
         var displayedStatuses = pullRequest.displayedStatuses()
@@ -38,7 +61,9 @@ class PRDetailController: WKInterfaceController {
             rowTypes.append("StatusRow")
         }
 
-        rowTypes.append("LabelRow")
+        if !(pullRequest.body ?? "").isEmpty {
+            rowTypes.append("LabelRow")
+        }
 
         for c in pullRequest.comments.allObjects as [PRComment] {
             rowTypes.append("CommentRow")
@@ -53,24 +78,14 @@ class PRDetailController: WKInterfaceController {
             controller.labelL.setTextColor(s.colorForDarkDisplay())
         }
 
-        (table.rowControllerAtIndex(index++) as LabelRow).labelL.setText(pullRequest.body)
+        if !(pullRequest.body ?? "").isEmpty {
+            (table.rowControllerAtIndex(index++) as LabelRow).labelL.setText(pullRequest.body)
+        }
 
         for c in pullRequest.comments.allObjects as [PRComment] {
             let controller = table.rowControllerAtIndex(index++) as CommentRow
             controller.usernameL.setText((c.userName ?? "(unknown)") + " " + shortDateFormatter.stringFromDate(c.createdAt ?? NSDate()))
             controller.commentL.setText(c.body)
         }
-    }
-
-    override func willActivate() {
-        super.willActivate()
-    }
-
-    override func didDeactivate() {
-        super.didDeactivate()
-    }
-
-    @IBAction func refreshSelected() {
-        presentControllerWithName("Command Controller", context: "refresh")
     }
 }
