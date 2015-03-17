@@ -22,6 +22,7 @@
         <relationship name="pullRequests" toMany="YES" deletionRule="Cascade" destinationEntity="PullRequest" inverseName="apiServer" inverseEntity="PullRequest" syncable="YES"/>
         <relationship name="repos" toMany="YES" deletionRule="Cascade" destinationEntity="Repo" inverseName="apiServer" inverseEntity="Repo" syncable="YES"/>
         <relationship name="statuses" toMany="YES" deletionRule="Cascade" destinationEntity="PRStatus" inverseName="apiServer" inverseEntity="PRStatus" syncable="YES"/>
+        <relationship name="teams" toMany="YES" deletionRule="Cascade" destinationEntity="Team" inverseName="apiServer" inverseEntity="Team" syncable="YES"/>
     </entity>
     <entity name="PRComment" representedClassName="PRComment" syncable="YES">
         <attribute name="avatarUrl" optional="YES" attributeType="String" syncable="YES"/>
@@ -130,12 +131,22 @@
             </compoundIndex>
         </compoundIndexes>
     </entity>
+    <entity name="Team" representedClassName="Team" syncable="YES">
+        <attribute name="createdAt" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="organisationLogin" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="postSyncAction" optional="YES" attributeType="Integer 16" indexed="YES" syncable="YES"/>
+        <attribute name="serverId" optional="YES" attributeType="Integer 64" defaultValueString="0" indexed="YES" syncable="YES"/>
+        <attribute name="slug" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="updatedAt" optional="YES" attributeType="Date" syncable="YES"/>
+        <relationship name="apiServer" maxCount="1" deletionRule="Nullify" destinationEntity="ApiServer" inverseName="teams" inverseEntity="ApiServer" syncable="YES"/>
+    </entity>
     <elements>
-        <element name="ApiServer" positionX="9" positionY="153" width="128" height="358"/>
+        <element name="ApiServer" positionX="9" positionY="153" width="128" height="375"/>
         <element name="PRComment" positionX="0" positionY="0" width="128" height="253"/>
         <element name="PRLabel" positionX="9" positionY="153" width="128" height="178"/>
         <element name="PRStatus" positionX="0" positionY="0" width="128" height="223"/>
         <element name="PullRequest" positionX="0" positionY="0" width="128" height="540"/>
         <element name="Repo" positionX="0" positionY="0" width="128" height="240"/>
+        <element name="Team" positionX="9" positionY="153" width="128" height="148"/>
     </elements>
 </model>

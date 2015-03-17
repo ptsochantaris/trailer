@@ -57,7 +57,7 @@ class DataItem: NSManagedObject {
 
 	class func itemsOfType(type: String, surviving: Bool, inMoc: NSManagedObjectContext) -> [DataItem] {
 		let f = NSFetchRequest(entityName: type)
-		if(surviving) {
+		if surviving {
 			f.returnsObjectsAsFaults = false
 			f.predicate = NSPredicate(format: "postSyncAction != %d", PostSyncAction.Delete.rawValue)
 		} else {

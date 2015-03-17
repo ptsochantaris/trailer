@@ -195,7 +195,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 	}
 
 	func reloadDataWithAnimation(animated: Bool) {
-		if(animated) {
+		if animated {
 			let currentIndexes = NSIndexSet(indexesInRange: NSMakeRange(0, fetchedResultsController.sections?.count ?? 0))
 
 			_fetchedResultsController = nil

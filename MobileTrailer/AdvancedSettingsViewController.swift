@@ -19,7 +19,7 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 	private var previousValue: Int?
 
 	@IBAction func done(sender: UIBarButtonItem) {
-		if(app.preferencesDirty) { app.startRefresh() }
+		if app.preferencesDirty { app.startRefresh() }
 		dismissViewControllerAnimated(true, completion: nil)
 	}
 

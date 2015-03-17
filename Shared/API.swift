@@ -89,7 +89,7 @@ class API {
 	/////////////////////////////////////////////////////// Utilities
 
 	func lastUpdateDescription() -> String {
-		if(app.isRefreshing) {
+		if app.isRefreshing {
 			return "Refreshing..."
 		} else if ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext) {
 			return "Last update failed"
@@ -341,7 +341,7 @@ class API {
 	private func markDirtyReposInMoc(moc: NSManagedObjectContext, callback: (()->Void)?) {
 
 		let allApiServers = ApiServer.allApiServersInMoc(moc)
-		let totalOperations = 2*allApiServers.count
+		let totalOperations = 3*allApiServers.count
 		if totalOperations==0 {
 			callback?()
 			return
@@ -364,13 +364,34 @@ class API {
 
 		for apiServer in allApiServers {
 			if apiServer.goodToGo && apiServer.syncIsGood {
+				fetchUserTeamsFromApiServer(apiServer, callback: completionCallback)
 				markDirtyRepoIds(repoIdsToMarkDirty, usingUserEventsFromServer: apiServer, callback: completionCallback)
 				markDirtyRepoIds(repoIdsToMarkDirty, usingReceivedEventsFromServer: apiServer, callback:completionCallback)
 			} else {
 				completionCallback()
 				completionCallback()
+				completionCallback()
 			}
 		}
+	}
+
+	private func fetchUserTeamsFromApiServer(apiServer: ApiServer, callback: (()->Void)?) {
+		getPagedDataInPath("/user/teams",
+			fromServer: apiServer,
+			startingFromPage: 1,
+			parameters: nil,
+			extraHeaders: nil,
+			perPageCallback: { [weak self] data, lastPage -> Bool in
+				for d in data ?? [] {
+					Team.teamWithInfo(d, fromApiServer: apiServer)
+				}
+				return false
+			}, finalCallback: { success, resultCode, etag -> Void in
+				if !success {
+					apiServer.lastSyncSucceeded = false
+				}
+				callback?()
+		})
 	}
 
 	private func markDirtyRepoIds(repoIdsToMarkDirty: NSMutableSet, usingUserEventsFromServer: ApiServer, callback: (()->Void)?) {
@@ -578,7 +599,7 @@ class API {
 		let prs = (DataItem.newOrUpdatedItemsOfType("PullRequest", inMoc:moc) as [PullRequest]).filter({ pr in
 			return pr.apiServer.syncIsGood
 		})
-		if(prs.count==0) {
+		if prs.count==0 {
 			callback?()
 			return
 		}
@@ -780,7 +801,7 @@ class API {
 						if allGood {
 							self!.refreshesSinceLastStatusCheck[p.objectID] = 1
 						}
-						if(completionCount==total) {
+						if completionCount==total {
 							callback?()
 						}
 				})
@@ -1089,7 +1110,7 @@ class API {
 				})
 			} else {
 				completionCount++
-				if(completionCount==operationCount) { callback?() }
+				if completionCount==operationCount { callback?() }
 			}
 		}
 	}
@@ -1268,7 +1289,7 @@ class API {
 				var error = e
 				if error == nil && response?.statusCode > 299 {
 					error = NSError(domain: "Error response received", code:response!.statusCode, userInfo:nil)
-					if(response?.statusCode >= 400) {
+					if response?.statusCode >= 400 {
 						if existingBackOff != nil {
 							DLog("(%@) extending backoff for already throttled URL %@ by %f seconds", apiServerLabel, fullUrlPath, BACKOFF_STEP)
 							if existingBackOff!.duration < 3600.0 {

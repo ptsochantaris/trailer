@@ -19,7 +19,7 @@ class PrItemView: NSTableCellView {
 		var _commentsNew = 0
 		let _commentsTotal = pullRequest.totalComments?.integerValue ?? 0
 		let sectionIndex = pullRequest.sectionIndex?.integerValue ?? 0
-		if(sectionIndex==PullRequestSection.Mine.rawValue || sectionIndex==PullRequestSection.Participated.rawValue || Settings.showCommentsEverywhere) {
+		if sectionIndex==PullRequestSection.Mine.rawValue || sectionIndex==PullRequestSection.Participated.rawValue || Settings.showCommentsEverywhere {
 			_commentsNew = pullRequest.unreadComments?.integerValue ?? 0
 		}
 
@@ -31,9 +31,9 @@ class PrItemView: NSTableCellView {
 
 		var W = MENU_WIDTH-LEFTPADDING-app.scrollBarWidth
 		let showUnpin = (pullRequest.condition?.integerValue != PullRequestCondition.Open.rawValue) || pullRequest.markUnmergeable()
-		if(showUnpin) { W -= REMOVE_BUTTON_WIDTH }
+		if showUnpin { W -= REMOVE_BUTTON_WIDTH }
 		let showAvatar = !(pullRequest.userAvatarUrl ?? "").isEmpty && !Settings.hideAvatars
-		if(showAvatar) { W -= AVATAR_SIZE+AVATAR_PADDING } else { W += 4.0 }
+		if showAvatar { W -= AVATAR_SIZE+AVATAR_PADDING } else { W += 4.0 }
 
 		let drawingOptions = stringDrawingOptions
 		let titleHeight = ceil(_title.boundingRectWithSize(CGSizeMake(W, CGFloat.max), options: drawingOptions).size.height)
@@ -51,7 +51,7 @@ class PrItemView: NSTableCellView {
 		statusAttributes[NSFontAttributeName] = NSFont(name: "Monaco", size: 9)
 		statusAttributes[NSParagraphStyleAttributeName] = paragraphStyle
 
-		if(Settings.showStatusItems) {
+		if Settings.showStatusItems {
 			CELL_PADDING = 10
 			bottom = ceil(CELL_PADDING * 0.5)
 			statuses = pullRequest.displayedStatuses()
@@ -75,7 +75,7 @@ class PrItemView: NSTableCellView {
 		var pinRect = NSMakeRect(LEFTPADDING+W, floor((bounds.size.height-24)*0.5), REMOVE_BUTTON_WIDTH-10, 24)
 
 		var shift: CGFloat = -4
-		if(showAvatar) {
+		if showAvatar {
 			let userImage = AvatarView(
 				frame: NSMakeRect(LEFTPADDING, (bounds.size.height-AVATAR_SIZE)*0.5, AVATAR_SIZE, AVATAR_SIZE),
 				url: pullRequest.userAvatarUrl ?? "")
@@ -91,8 +91,8 @@ class PrItemView: NSTableCellView {
 		}
 		statusRects = replacementRects
 
-		if(showUnpin) {
-			if((pullRequest.condition?.integerValue ?? 0)==PullRequestCondition.Open.rawValue) {
+		if showUnpin {
+			if (pullRequest.condition?.integerValue ?? 0)==PullRequestCondition.Open.rawValue {
 				let unmergeableLabel = CenterTextField(frame: pinRect)
 				unmergeableLabel.textColor = NSColor.redColor()
 				unmergeableLabel.font = NSFont(name: "Monaco", size: 8.0)
@@ -149,7 +149,7 @@ class PrItemView: NSTableCellView {
 	}
 
 	override func mouseEntered(theEvent: NSEvent?) {
-		if(!app.isManuallyScrolling) { selected = true }
+		if !app.isManuallyScrolling { selected = true }
 	}
 
 	override func mouseExited(theEvent: NSEvent?) {

@@ -25,7 +25,7 @@ class PRLabel: DataItem {
 	class func labelWithInfo(info: NSDictionary, forPullRequest: PullRequest) -> PRLabel {
 		let name = info.ofk("name") as? String ?? "(unnamed label)"
 		var l = PRLabel.labelWithName(name, forPullRequest: forPullRequest)
-		if(l==nil) {
+		if l==nil {
 			DLog("Creating PRLabel: %@", name)
 			l = NSEntityDescription.insertNewObjectForEntityForName("PRLabel", inManagedObjectContext: forPullRequest.managedObjectContext!) as? PRLabel
 			l!.name = name

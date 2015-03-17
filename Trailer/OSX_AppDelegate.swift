@@ -1182,7 +1182,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 					alert.informativeText = "Your request cannot be completed until your hourly API allowance is reset at \(resetDateString).\n\nIf you get this error often, try to make fewer manual refreshes or reducing the number of repos you are monitoring.\n\nYou can check your API usage at any time from 'Servers' preferences pane at any time."
 					alert.addButtonWithTitle("OK")
 					alert.runModal()
-				} else if(( (apiServer.requestsRemaining?.doubleValue ?? 0.0) / (apiServer.requestsLimit?.doubleValue ?? 1.0) ) < LOW_API_WARNING) {
+				} else if ((apiServer.requestsRemaining?.doubleValue ?? 0.0) / (apiServer.requestsLimit?.doubleValue ?? 1.0)) < LOW_API_WARNING {
 					let apiLabel = apiServer.label ?? "NoApiServerLabel"
 					let dateFormatter = NSDateFormatter()
 					dateFormatter.doesRelativeDateFormatting = true
@@ -1450,8 +1450,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	/////////////////////// keyboard shortcuts
 
 	private func addHotKeySupport() {
-		if(Settings.hotkeyEnable)
-		{
+		if Settings.hotkeyEnable {
 			if globalKeyMonitor == nil {
 				let key = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String
 				let options = [key: NSNumber(bool: (AXIsProcessTrusted() == 0))]
@@ -1462,9 +1461,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 					})
 				}
 			}
-		}
-		else
-		{
+		} else {
 			if globalKeyMonitor != nil {
 				NSEvent.removeMonitor(globalKeyMonitor!)
 				globalKeyMonitor = nil
@@ -1556,27 +1553,27 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		var check = 0
 
 		if Settings.hotkeyCommandModifier {
-			if((incomingEvent.modifierFlags & NSEventModifierFlags.CommandKeyMask) == NSEventModifierFlags.CommandKeyMask) { check++ } else { check-- }
+			if (incomingEvent.modifierFlags & NSEventModifierFlags.CommandKeyMask) == NSEventModifierFlags.CommandKeyMask { check++ } else { check-- }
 		} else {
-			if((incomingEvent.modifierFlags & NSEventModifierFlags.CommandKeyMask) == NSEventModifierFlags.CommandKeyMask) { check-- } else { check++ }
+			if (incomingEvent.modifierFlags & NSEventModifierFlags.CommandKeyMask) == NSEventModifierFlags.CommandKeyMask { check-- } else { check++ }
 		}
 
 		if Settings.hotkeyControlModifier {
-			if((incomingEvent.modifierFlags & NSEventModifierFlags.ControlKeyMask) == NSEventModifierFlags.ControlKeyMask) { check++ } else { check-- }
+			if (incomingEvent.modifierFlags & NSEventModifierFlags.ControlKeyMask) == NSEventModifierFlags.ControlKeyMask { check++ } else { check-- }
 		} else {
-			if((incomingEvent.modifierFlags & NSEventModifierFlags.ControlKeyMask) == NSEventModifierFlags.ControlKeyMask) { check-- } else { check++ }
+			if (incomingEvent.modifierFlags & NSEventModifierFlags.ControlKeyMask) == NSEventModifierFlags.ControlKeyMask { check-- } else { check++ }
 		}
 
 		if Settings.hotkeyOptionModifier {
-			if((incomingEvent.modifierFlags & NSEventModifierFlags.AlternateKeyMask) == NSEventModifierFlags.AlternateKeyMask) { check++ } else { check-- }
+			if (incomingEvent.modifierFlags & NSEventModifierFlags.AlternateKeyMask) == NSEventModifierFlags.AlternateKeyMask { check++ } else { check-- }
 		} else {
-			if((incomingEvent.modifierFlags & NSEventModifierFlags.AlternateKeyMask) == NSEventModifierFlags.AlternateKeyMask) { check-- } else { check++ }
+			if (incomingEvent.modifierFlags & NSEventModifierFlags.AlternateKeyMask) == NSEventModifierFlags.AlternateKeyMask { check-- } else { check++ }
 		}
 
 		if Settings.hotkeyShiftModifier {
-			if((incomingEvent.modifierFlags & NSEventModifierFlags.ShiftKeyMask) == NSEventModifierFlags.ShiftKeyMask) { check++ } else { check-- }
+			if (incomingEvent.modifierFlags & NSEventModifierFlags.ShiftKeyMask) == NSEventModifierFlags.ShiftKeyMask { check++ } else { check-- }
 		} else {
-			if((incomingEvent.modifierFlags & NSEventModifierFlags.ShiftKeyMask) == NSEventModifierFlags.ShiftKeyMask) { check-- } else { check++ }
+			if (incomingEvent.modifierFlags & NSEventModifierFlags.ShiftKeyMask) == NSEventModifierFlags.ShiftKeyMask { check-- } else { check++ }
 		}
 
 		if check==4 {

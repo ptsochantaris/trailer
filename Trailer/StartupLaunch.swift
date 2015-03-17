@@ -12,8 +12,7 @@ class StartupLaunch: NSObject {
 			let loginItemsRef = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems.takeRetainedValue(), nil).takeRetainedValue() as LSSharedFileListRef?
 			if loginItemsRef != nil {
 				let loginItems: NSArray = LSSharedFileListCopySnapshot(loginItemsRef, nil).takeRetainedValue() as NSArray
-				if(loginItems.count > 0)
-				{
+				if loginItems.count > 0 {
 					let lastItemRef: LSSharedFileListItemRef = loginItems.lastObject as LSSharedFileListItemRef
 					for var i = 0; i < loginItems.count; ++i {
 						let currentItemRef: LSSharedFileListItemRef = loginItems.objectAtIndex(i) as LSSharedFileListItemRef

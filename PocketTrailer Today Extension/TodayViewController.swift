@@ -76,8 +76,7 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 
         let totalCount = PullRequest.countAllRequestsInMoc(mainObjectContext)
 
-        if(totalCount>0)
-        {
+        if totalCount>0 {
             let a = NSMutableAttributedString(string: NSString(format: "%d Total PRs", totalCount), attributes: brightAttributes)
             a.appendAttributedString(NSAttributedString(string: ": ",                                           attributes: normalAttributes))
 

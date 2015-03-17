@@ -55,7 +55,7 @@ class LinkField: CenterTextField {
 
 	private func checkMove(theEvent: NSEvent) {
 		if targetUrl != nil {
-			if(highlight) {
+			if highlight {
 				if needsCommand && (theEvent.modifierFlags & NSEventModifierFlags.CommandKeyMask != NSEventModifierFlags.CommandKeyMask) {
 					highlight = false
 					textColor = normalColor

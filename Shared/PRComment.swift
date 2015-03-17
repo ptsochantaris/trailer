@@ -16,7 +16,7 @@ class PRComment: DataItem {
 	
 	class func commentWithInfo(info:NSDictionary, fromServer:ApiServer) -> PRComment {
 		let c = DataItem.itemWithInfo(info, type: "PRComment", fromServer: fromServer) as PRComment
-		if(c.postSyncAction?.integerValue != PostSyncAction.DoNothing.rawValue) {
+		if c.postSyncAction?.integerValue != PostSyncAction.DoNothing.rawValue {
 			c.body = info.ofk("body") as? String
 			c.position = info.ofk("position") as? NSNumber
 			c.path = info.ofk("path") as? String
@@ -31,7 +31,7 @@ class PRComment: DataItem {
 
 			if let links = info.ofk("links") as? NSDictionary {
 				c.url = links.ofk("self")?.ofk("href") as? String
-				if(c.webUrl==nil) { c.webUrl = links.ofk("html")?.ofk("href") as? String }
+				if c.webUrl==nil { c.webUrl = links.ofk("html")?.ofk("href") as? String }
 			}
 		}
 		return c

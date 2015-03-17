@@ -141,7 +141,7 @@ class DataManager : NSObject {
 		}
 
 		var latestStatuses = PRStatus.newItemsOfType("PRStatus", inMoc: mainObjectContext) as [PRStatus]
-		if(Settings.notifyOnStatusUpdates) {
+		if Settings.notifyOnStatusUpdates {
 			let coveredPrs = NSMutableSet()
 			for s in latestStatuses {
 				if Settings.notifyOnStatusUpdatesForAllPrs || s.pullRequest.isMine() {
@@ -346,7 +346,7 @@ func persistentStoreCoordinator() -> NSPersistentStoreCoordinator? {
 
 	var error:NSError?
 	let properties = applicationDirectory.resourceValuesForKeys([NSURLIsDirectoryKey], error:&error)
-	if(properties != nil && properties!.count > 0) {
+	if properties != nil && properties!.count > 0 {
 		let isDir = properties![NSURLIsDirectoryKey] as NSNumber
 		if !isDir.boolValue {
 			let description = "Expected a folder to store application data, found a file (\(applicationDirectory.path))."
@@ -419,7 +419,7 @@ func addStorePath(sqlStore: NSURL) -> Bool {
             NSReadOnlyPersistentStoreOption: dataReadonly,
 			NSSQLitePragmasOption: ["synchronous":"OFF", "fullfsync":"0"]],
 		error:&error)
-	if(error != nil) { DLog("%@",error) }
+	if error != nil { DLog("%@",error) }
 	return store != nil
 }
 

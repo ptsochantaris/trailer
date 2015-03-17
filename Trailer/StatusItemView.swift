@@ -39,7 +39,7 @@ class StatusItemView: NSView {
 
 	var darkMode: Bool {
 		didSet {
-			if(darkMode != oldValue) {
+			if darkMode != oldValue {
 				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
 					NSNotificationCenter.defaultCenter().postNotificationName(DARK_MODE_CHANGED, object:nil)
 				}
@@ -70,13 +70,13 @@ class StatusItemView: NSView {
 		var displayAttributes = textAttributes
 		var icon: NSImage
 
-		if(highlighted) {
+		if highlighted {
 			icon = NSImage(named: "menuIconBright")!
 			displayAttributes[NSForegroundColorAttributeName] = NSColor.selectedMenuItemTextColor()
 		} else {
-			if(darkMode) {
+			if darkMode {
 				icon = NSImage(named: "menuIconBright")!
-				if(displayAttributes[NSForegroundColorAttributeName] as NSColor == NSColor.controlTextColor()) {
+				if displayAttributes[NSForegroundColorAttributeName] as NSColor == NSColor.controlTextColor() {
 					displayAttributes[NSForegroundColorAttributeName] = NSColor.selectedMenuItemTextColor()
 				}
 			} else {
@@ -84,7 +84,7 @@ class StatusItemView: NSView {
 			}
 		}
 
-		if(grayOut) {
+		if grayOut {
 			displayAttributes[NSForegroundColorAttributeName] = NSColor.disabledControlTextColor()
 		}
 

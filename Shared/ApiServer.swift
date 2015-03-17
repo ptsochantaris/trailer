@@ -53,7 +53,7 @@ class ApiServer: NSManagedObject {
 		for apiServer in allApiServersInMoc(moc) {
 
 			var lastSyncSucceeded = apiServer.lastSyncSucceeded?.boolValue
-			if(lastSyncSucceeded==nil) { lastSyncSucceeded!=false }
+			if lastSyncSucceeded==nil { lastSyncSucceeded!=false }
 
 			if apiServer.goodToGo && !(lastSyncSucceeded!) && (apiServer.reportRefreshFailures.boolValue) {
 				return true

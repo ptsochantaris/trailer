@@ -60,7 +60,7 @@ class ServersViewController: UITableViewController {
 			cell.textLabel?.textColor = UIColor.darkTextColor()
 			cell.textLabel?.text = a.label
 		}
-		if(a.requestsLimit==nil || a.requestsLimit!.doubleValue==0.0) {
+		if a.requestsLimit==nil || a.requestsLimit!.doubleValue==0.0 {
 			cell.detailTextLabel?.text = nil
 		} else
 		{

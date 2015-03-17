@@ -38,6 +38,10 @@
 		161852981AB2CE3200526D81 /* PullRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3151A34E8E2000BE6CC /* PullRequest.swift */; };
 		161852991AB2CE3200526D81 /* Repo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3161A34E8E2000BE6CC /* Repo.swift */; };
 		1618529A1AB2D36D00526D81 /* Trailer.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B33B1A34E990000BE6CC /* Trailer.xcdatamodeld */; };
+		161B851C1AB8E12C00AD4C5D /* Team.swift in Sources */ = {isa = PBXBuildFile; fileRef = 161B851B1AB8E12C00AD4C5D /* Team.swift */; };
+		161B851D1AB8E12C00AD4C5D /* Team.swift in Sources */ = {isa = PBXBuildFile; fileRef = 161B851B1AB8E12C00AD4C5D /* Team.swift */; };
+		161B851E1AB8E12C00AD4C5D /* Team.swift in Sources */ = {isa = PBXBuildFile; fileRef = 161B851B1AB8E12C00AD4C5D /* Team.swift */; };
+		161B851F1AB8E12C00AD4C5D /* Team.swift in Sources */ = {isa = PBXBuildFile; fileRef = 161B851B1AB8E12C00AD4C5D /* Team.swift */; };
 		161C959E1A3A36020019A577 /* MenuWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 161C959D1A3A36020019A577 /* MenuWindow.swift */; };
 		162002D01A2A3E2100FF95F3 /* Application.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002CF1A2A3E2100FF95F3 /* Application.swift */; };
 		162002D61A2A49A300FF95F3 /* ViewAllowsVibrancy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162002D51A2A49A300FF95F3 /* ViewAllowsVibrancy.swift */; };
@@ -204,6 +208,7 @@
 		161852831AB2CB9000526D81 /* MainInterface.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = MainInterface.storyboard; sourceTree = "<group>"; };
 		1618528B1AB2CC8200526D81 /* Media.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Media.xcassets; sourceTree = "<group>"; };
 		1618529B1AB2D43C00526D81 /* PocketTrailer Today Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "PocketTrailer Today Extension.entitlements"; sourceTree = "<group>"; };
+		161B851B1AB8E12C00AD4C5D /* Team.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Team.swift; path = ../Shared/Team.swift; sourceTree = "<group>"; };
 		161C959D1A3A36020019A577 /* MenuWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuWindow.swift; sourceTree = "<group>"; };
 		162002CF1A2A3E2100FF95F3 /* Application.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Application.swift; sourceTree = "<group>"; };
 		162002D51A2A49A300FF95F3 /* ViewAllowsVibrancy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewAllowsVibrancy.swift; sourceTree = "<group>"; };
@@ -631,6 +636,7 @@
 				16B3B3141A34E8E2000BE6CC /* PRStatus.swift */,
 				16B3B3151A34E8E2000BE6CC /* PullRequest.swift */,
 				16B3B3161A34E8E2000BE6CC /* Repo.swift */,
+				161B851B1AB8E12C00AD4C5D /* Team.swift */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -884,6 +890,7 @@
 				161852941AB2CE3200526D81 /* DataItem.swift in Sources */,
 				161852971AB2CE3200526D81 /* PRStatus.swift in Sources */,
 				161852921AB2CE3200526D81 /* DataManager.swift in Sources */,
+				161B851F1AB8E12C00AD4C5D /* Team.swift in Sources */,
 				161852901AB2CE3200526D81 /* NSStringExtensions.swift in Sources */,
 				1618528F1AB2CE3200526D81 /* NSDictionaryExtensions.swift in Sources */,
 				1618528E1AB2CE3200526D81 /* Globals.swift in Sources */,
@@ -902,6 +909,7 @@
 				164785B11A2CE7CD00297764 /* NSStringExtensions.swift in Sources */,
 				16C9A2761A44D12600EE54EC /* AboutTrailerViewController.swift in Sources */,
 				16CBE1C61A2DFBA500485053 /* Settings.swift in Sources */,
+				161B851D1AB8E12C00AD4C5D /* Team.swift in Sources */,
 				164785AF1A2CE7CD00297764 /* NSDictionaryExtensions.swift in Sources */,
 				16EE6AD01A9A711C000A8483 /* CountLabel.swift in Sources */,
 				16B3B3181A34E8E2000BE6CC /* ApiServer.swift in Sources */,
@@ -936,6 +944,7 @@
 			files = (
 				16E93D141AB4680F00CA967E /* PRDetailController.swift in Sources */,
 				16143E7F1AB44BFD00BAC070 /* ExtensionGlobals.swift in Sources */,
+				161B851E1AB8E12C00AD4C5D /* Team.swift in Sources */,
 				16143E831AB44E9F00BAC070 /* SectionRow.swift in Sources */,
 				16E93D171AB46CE600CA967E /* LabelRow.swift in Sources */,
 				1672DF3F1AB0E8DE00381AEB /* DataManager.swift in Sources */,
@@ -974,6 +983,7 @@
 				162002D61A2A49A300FF95F3 /* ViewAllowsVibrancy.swift in Sources */,
 				162002DF1A2A5C9200FF95F3 /* LinkField.swift in Sources */,
 				16A0B0371A48AC7900B3452D /* OSX_AppDelegate.swift in Sources */,
+				161B851C1AB8E12C00AD4C5D /* Team.swift in Sources */,
 				16B3B31D1A34E8E2000BE6CC /* PRLabel.swift in Sources */,
 				16B3B3231A34E8E2000BE6CC /* Repo.swift in Sources */,
 				16CBE1CA1A2E13A400485053 /* StatusItemView.swift in Sources */,

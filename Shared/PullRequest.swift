@@ -416,14 +416,14 @@ class PullRequest: DataItem {
 	func accessibleSubtitle() -> String {
 		var components = [String]()
 
-		if(Settings.showReposInName) {
+		if Settings.showReposInName {
 			let repoFullName = repo.fullName ?? "NoRepoFullName"
 			components.append("Repository: \(repoFullName)")
 		}
 
 		if let l = userLogin { components.append("Author: \(l)") }
 
-		if(Settings.showCreatedInsteadOfUpdated) {
+		if Settings.showCreatedInsteadOfUpdated {
 			components.append("Created \(itemDateFormatter.stringFromDate(createdAt!))")
 		} else {
 			components.append("Updated \(itemDateFormatter.stringFromDate(updatedAt!))")
@@ -489,7 +489,7 @@ class PullRequest: DataItem {
 	func urlForOpening() -> String? {
 		var unreadCount = unreadComments?.integerValue ?? 0
 
-		if(unreadCount > 0 && Settings.openPrAtFirstUnreadComment) {
+		if unreadCount > 0 && Settings.openPrAtFirstUnreadComment {
 			let f = NSFetchRequest(entityName: "PRComment")
 			f.returnsObjectsAsFaults = false
 			f.fetchLimit = 1

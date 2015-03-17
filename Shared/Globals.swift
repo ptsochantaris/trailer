@@ -121,13 +121,15 @@ enum PRHandlingPolicy: Int {
 	case KeepMine, KeepAll, KeepNone
 }
 
-func imageFromColor(color: UIColor) -> UIImage {
-    let rect = CGRectMake(0, 0, 1, 1)
-    UIGraphicsBeginImageContext(rect.size)
-    let context = UIGraphicsGetCurrentContext()
-    CGContextSetFillColorWithColor(context, color.CGColor)
-    CGContextFillRect(context, rect)
-    let img = UIGraphicsGetImageFromCurrentImageContext()
-    UIGraphicsEndImageContext()
-    return img
-}
+#if os(iOS)
+	func imageFromColor(color: UIColor) -> UIImage {
+		let rect = CGRectMake(0, 0, 1, 1)
+		UIGraphicsBeginImageContext(rect.size)
+		let context = UIGraphicsGetCurrentContext()
+		CGContextSetFillColorWithColor(context, color.CGColor)
+		CGContextFillRect(context, rect)
+		let img = UIGraphicsGetImageFromCurrentImageContext()
+		UIGraphicsEndImageContext()
+		return img
+	}
+#endif
