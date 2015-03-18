@@ -12,6 +12,7 @@ class SectionRow: NSObject {
     
     @IBOutlet weak var titleL: WKInterfaceLabel!
     @IBOutlet weak var countL: WKInterfaceLabel!
+    @IBOutlet weak var countHolder: WKInterfaceGroup!
 
     func setRow(section: PullRequestSection, _ suffix: String) -> String {
 
@@ -23,7 +24,7 @@ class SectionRow: NSObject {
 
         let unreadCount = PullRequest.badgeCountInSection(section.rawValue, moc: mainObjectContext)
         countL.setText("\(unreadCount)")
-        countL.setHidden(unreadCount==0)
+        countHolder.setHidden(unreadCount==0)
 
         return titleText
     }

@@ -75,7 +75,9 @@ class PRDetailController: WKInterfaceController {
         for s in displayedStatuses {
             let controller = table.rowControllerAtIndex(index++) as StatusRow
             controller.labelL.setText(s.displayText())
-            controller.labelL.setTextColor(s.colorForDarkDisplay())
+            let color = s.colorForDarkDisplay()
+            controller.labelL.setTextColor(color)
+            controller.margin.setBackgroundColor(color)
         }
 
         if !(pullRequest.body ?? "").isEmpty {
