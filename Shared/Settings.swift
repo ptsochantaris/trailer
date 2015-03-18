@@ -43,6 +43,8 @@ class Settings: NSObject {
 		}
 		_settings_valuesCache[key] = value
 		_settings_shared.synchronize()
+
+		DLog("Setting %@ to %@", key, value)
 	}
 
 	private class func get(key: String) -> AnyObject? {
@@ -56,6 +58,10 @@ class Settings: NSObject {
 				return nil
 			}
 		}
+	}
+
+	class func clearCache() {
+		_settings_valuesCache.removeAll(keepCapacity: false)
 	}
 
 	/////////////////////////////////
@@ -287,6 +293,11 @@ class Settings: NSObject {
         get { return get("NOTIFY_ON_STATUS_UPDATES_ALL") as? Bool ?? false }
         set { set("NOTIFY_ON_STATUS_UPDATES_ALL", newValue) }
     }
+
+	class var autoParticipateOnTeamMentions: Bool {
+		get { return get("AUTO_PARTICIPATE_ON_TEAM_MENTIONS") as? Bool ?? false }
+		set { set("AUTO_PARTICIPATE_ON_TEAM_MENTIONS", newValue) }
+	}
 
 	//////////////////////////////
 

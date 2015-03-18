@@ -50,4 +50,16 @@ class PRComment: DataItem {
 			return false
 		}
 	}
+
+	func refersToMyTeams() -> Bool {
+		if let b = body {
+			for t in apiServer.teams.allObjects as [Team] {
+				if let r = t.calculatedReferral {
+					let range = b.rangeOfString(r, options: NSStringCompareOptions.CaseInsensitiveSearch | NSStringCompareOptions.DiacriticInsensitiveSearch)
+					if range != nil { return true }
+				}
+			}
+		}
+		return false
+	}
 }

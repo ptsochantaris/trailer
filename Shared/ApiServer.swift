@@ -26,6 +26,7 @@ class ApiServer: NSManagedObject {
     @NSManaged var pullRequests: NSSet
     @NSManaged var repos: NSSet
     @NSManaged var statuses: NSSet
+	@NSManaged var teams: NSSet
 
 	var syncIsGood: Bool {
 		return self.lastSyncSucceeded?.boolValue ?? true

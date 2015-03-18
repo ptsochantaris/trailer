@@ -645,13 +645,13 @@
 			isa = PBXGroup;
 			children = (
 				16C9A2751A44D12600EE54EC /* AboutTrailerViewController.swift */,
-				16C9A2771A44D86B00EE54EC /* GithubViewController.swift */,
-				16C9A2791A44DD0200EE54EC /* CommentBlacklistViewController.swift */,
-				166A84BD1A457CA700A3B292 /* ServersViewController.swift */,
-				166A84BF1A4582C100A3B292 /* ServerDetailViewController.swift */,
 				166A84C11A45A37700A3B292 /* AdvancedSettingsViewController.swift */,
+				16C9A2791A44DD0200EE54EC /* CommentBlacklistViewController.swift */,
+				16C9A2771A44D86B00EE54EC /* GithubViewController.swift */,
 				166A84C31A45CEE000A3B292 /* PickerViewController.swift */,
 				1606F1BC1A471CDC0088368E /* RespositoriesViewController.swift */,
+				166A84BF1A4582C100A3B292 /* ServerDetailViewController.swift */,
+				166A84BD1A457CA700A3B292 /* ServersViewController.swift */,
 			);
 			name = Settings;
 			sourceTree = "<group>";

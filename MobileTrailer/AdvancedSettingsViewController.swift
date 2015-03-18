@@ -25,7 +25,7 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 
 	private enum Section: Int {
 		case Refresh, Display, Comments, Repos, StausesAndLabels, History, Confirm, Sort, Misc
-		static let rowCounts = [3, 7, 6, 1, 6, 3, 2, 3, 1]
+		static let rowCounts = [3, 7, 7, 1, 6, 3, 2, 3, 1]
 		static let allNames = ["Auto Refresh", "Display","Comments", "Repositories", "Statuses & Labels", "History", "Don't confirm when", "Sorting", "Misc"]
 	}
 
@@ -112,12 +112,15 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 				cell.textLabel?.text = "Move PRs that mention me to 'Participated'"
 				cell.accessoryType = check(Settings.autoParticipateInMentions)
 			case 3:
+				cell.textLabel?.text = "Move PRs that mention my teams to 'Participated'"
+				cell.accessoryType = check(Settings.autoParticipateOnTeamMentions)
+			case 4:
 				cell.textLabel?.text = "Open PRs at first unread comment"
 				cell.accessoryType = check(Settings.openPrAtFirstUnreadComment)
-			case 4:
+			case 5:
 				cell.textLabel?.text = "Block comment notifications from usernames..."
 				cell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
-            case 5:
+            case 6:
                 cell.textLabel?.text = "Disable all comment notifications"
                 cell.accessoryType = check(Settings.disableAllCommentNotifications)
 			default: break
@@ -273,10 +276,13 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 				Settings.autoParticipateInMentions = !Settings.autoParticipateInMentions
 				settingsChangedTimer.push()
 			case 3:
-				Settings.openPrAtFirstUnreadComment = !Settings.openPrAtFirstUnreadComment
+				Settings.autoParticipateOnTeamMentions = !Settings.autoParticipateOnTeamMentions
+				settingsChangedTimer.push()
 			case 4:
+				Settings.openPrAtFirstUnreadComment = !Settings.openPrAtFirstUnreadComment
+			case 5:
 				performSegueWithIdentifier("showBlacklist", sender: self)
-            case 5:
+            case 6:
                 Settings.disableAllCommentNotifications = !Settings.disableAllCommentNotifications
 			default: break
 			}

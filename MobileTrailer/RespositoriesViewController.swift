@@ -46,6 +46,9 @@ class RespositoriesViewController: UITableViewController, UITextFieldDelegate, N
 
 	override func viewDidAppear(animated: Bool) {
 		actionsButton.enabled = ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext)
+		if actionsButton.enabled && fetchedResultsController.fetchedObjects?.count==0 {
+			refreshList()
+		}
 		super.viewDidAppear(animated)
 	}
 

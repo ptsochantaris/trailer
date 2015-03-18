@@ -21,7 +21,6 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	@IBOutlet weak var showCreationDates: NSButton!
 	@IBOutlet weak var dontKeepPrsMergedByMe: NSButton!
 	@IBOutlet weak var hideAvatars: NSButton!
-	@IBOutlet weak var autoParticipateWhenMentioned: NSButton!
 	@IBOutlet weak var dontConfirmRemoveAllMerged: NSButton!
 	@IBOutlet weak var dontConfirmRemoveAllClosed: NSButton!
 	@IBOutlet weak var displayRepositoryNames: NSButton!
@@ -56,6 +55,8 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	
     // Preferences - Comments
     @IBOutlet weak var disableAllCommentNotifications: NSButton!
+	@IBOutlet weak var autoParticipateOnTeamMentions: NSButton!
+	@IBOutlet weak var autoParticipateWhenMentioned: NSButton!
 
 	// Preferences - Display
 	@IBOutlet weak var useVibrancy: NSButton!
@@ -255,6 +256,12 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	@IBAction func autoParticipateOnMentionSelected(sender: NSButton) {
 		Settings.autoParticipateInMentions = (sender.integerValue==1)
+		DataManager.postProcessAllPrs()
+		deferredUpdate()
+	}
+
+	@IBAction func autoParticipateOnTeamMentionSelected(sender: NSButton) {
+		Settings.autoParticipateOnTeamMentions = (sender.integerValue==1)
 		DataManager.postProcessAllPrs()
 		deferredUpdate()
 	}
@@ -844,6 +851,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		dontConfirmRemoveAllMerged.integerValue = Settings.dontAskBeforeWipingMerged ? 1 : 0
 		hideUncommentedPrs.integerValue = Settings.shouldHideUncommentedRequests ? 1 : 0
 		autoParticipateWhenMentioned.integerValue = Settings.autoParticipateInMentions ? 1 : 0
+		autoParticipateOnTeamMentions.integerValue = Settings.autoParticipateOnTeamMentions ? 1 : 0
 		hideAvatars.integerValue = Settings.hideAvatars ? 1 : 0
 		dontKeepPrsMergedByMe.integerValue = Settings.dontKeepPrsMergedByMe ? 1 : 0
         grayOutWhenRefreshing.integerValue = Settings.grayOutWhenRefreshing ? 1 : 0

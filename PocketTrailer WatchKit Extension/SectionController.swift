@@ -21,6 +21,7 @@ class SectionController: WKInterfaceController {
         super.awakeWithContext(context)
 
         dataReadonly = true
+		Settings.clearCache()
 
         buildUI()
     }

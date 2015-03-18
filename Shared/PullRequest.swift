@@ -258,8 +258,7 @@ class PullRequest: DataItem {
 	func refersToMe() -> Bool {
 		if let apiName = apiServer.userName {
 			if let b = body {
-				let range = b.rangeOfString("@"+apiName,
-					options: NSStringCompareOptions.CaseInsensitiveSearch | NSStringCompareOptions.DiacriticInsensitiveSearch)
+				let range = b.rangeOfString("@"+apiName, options: NSStringCompareOptions.CaseInsensitiveSearch | NSStringCompareOptions.DiacriticInsensitiveSearch)
 				return range != nil
 			}
 		}
@@ -269,6 +268,23 @@ class PullRequest: DataItem {
 	func commentedByMe() -> Bool {
 		for c in comments.allObjects as [PRComment] {
 			if c.isMine() {
+				return true
+			}
+		}
+		return false
+	}
+
+	func refersToMyTeams() -> Bool {
+		if let b = body {
+			for t in apiServer.teams.allObjects as [Team] {
+				if let r = t.calculatedReferral {
+					let range = b.rangeOfString(r, options: NSStringCompareOptions.CaseInsensitiveSearch | NSStringCompareOptions.DiacriticInsensitiveSearch)
+					if range != nil { return true }
+				}
+			}
+		}
+		for c in comments.allObjects as [PRComment] {
+			if c.refersToMyTeams() {
 				return true
 			}
 		}
@@ -530,7 +546,7 @@ class PullRequest: DataItem {
 
 		let latestDate = latestReadCommentDate
 		if (section == PullRequestSection.All.rawValue || section == PullRequestSection.None.rawValue) && Settings.autoParticipateInMentions {
-			if refersToMe() {
+			if refersToMe() || (Settings.autoParticipateOnTeamMentions && refersToMyTeams()) {
 				section = PullRequestSection.Participated.rawValue
 				f.predicate = predicateForOthersCommentsSinceDate(latestDate)
 				unreadComments = managedObjectContext?.countForFetchRequest(f, error: nil)

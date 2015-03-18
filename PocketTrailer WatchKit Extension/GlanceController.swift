@@ -24,6 +24,7 @@ class GlanceController: WKInterfaceController {
         super.awakeWithContext(context)
 
         dataReadonly = true
+		Settings.clearCache()
 
         let totalPrs = PullRequest.countAllRequestsInMoc(mainObjectContext)
 

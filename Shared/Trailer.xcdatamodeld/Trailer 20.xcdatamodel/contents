@@ -132,6 +132,7 @@
         </compoundIndexes>
     </entity>
     <entity name="Team" representedClassName="Team" syncable="YES">
+        <attribute name="calculatedReferral" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="createdAt" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="organisationLogin" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="postSyncAction" optional="YES" attributeType="Integer 16" indexed="YES" syncable="YES"/>
@@ -147,6 +148,6 @@
         <element name="PRStatus" positionX="0" positionY="0" width="128" height="223"/>
         <element name="PullRequest" positionX="0" positionY="0" width="128" height="540"/>
         <element name="Repo" positionX="0" positionY="0" width="128" height="240"/>
-        <element name="Team" positionX="9" positionY="153" width="128" height="148"/>
+        <element name="Team" positionX="9" positionY="153" width="128" height="163"/>
     </elements>
 </model>

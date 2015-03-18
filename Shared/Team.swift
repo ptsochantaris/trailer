@@ -6,6 +6,7 @@ class Team: DataItem {
 
     @NSManaged var slug: String?
     @NSManaged var organisationLogin: String?
+	@NSManaged var calculatedReferral: String?
 
 	class func teamWithInfo(info: NSDictionary, fromApiServer: ApiServer) -> Team {
 		let serverId = info.ofk("id") as NSNumber
@@ -21,8 +22,11 @@ class Team: DataItem {
 			DLog("Updating Team: %@", serverId)
 		}
 
-		t!.slug = info.ofk("slug") as? String
-		t!.organisationLogin = info.ofk("organization")?.ofk("login") as? String
+		let slug = info.ofk("slug") as? String
+		let org = info.ofk("organization")?.ofk("login") as? String
+		t!.slug = slug
+		t!.organisationLogin = org
+		t!.calculatedReferral = "@\(org)/\(slug)"
 		t!.postSyncAction = PostSyncAction.DoNothing.rawValue
 		return t!
 	}

@@ -74,6 +74,8 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 
     private func update() {
 
+		Settings.clearCache()
+
         let totalCount = PullRequest.countAllRequestsInMoc(mainObjectContext)
 
         if totalCount>0 {
