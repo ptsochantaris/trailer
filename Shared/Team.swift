@@ -22,11 +22,15 @@ class Team: DataItem {
 			DLog("Updating Team: %@", serverId)
 		}
 
-		let slug = info.ofk("slug") as? String
-		let org = info.ofk("organization")?.ofk("login") as? String
+		let slug = info.ofk("slug") as? String ?? ""
+		let org = info.ofk("organization")?.ofk("login") as? String ?? ""
 		t!.slug = slug
 		t!.organisationLogin = org
-		t!.calculatedReferral = "@\(org)/\(slug)"
+		if slug.isEmpty || org.isEmpty {
+			t!.calculatedReferral = nil
+		} else {
+			t!.calculatedReferral = "@\(org)/\(slug)"
+		}
 		t!.postSyncAction = PostSyncAction.DoNothing.rawValue
 		return t!
 	}

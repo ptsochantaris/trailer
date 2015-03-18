@@ -541,32 +541,50 @@ class PullRequest: DataItem {
 		else if Settings.hideAllPrsSection									{ section = PullRequestSection.None.rawValue }
 		else																{ section = PullRequestSection.All.rawValue }
 
+		var needsManualCount = false
+		var moveToParticipated = false
+		let outsideMySections = (section == PullRequestSection.All.rawValue || section == PullRequestSection.None.rawValue)
+
+		if outsideMySections && Settings.autoParticipateOnTeamMentions {
+			if refersToMyTeams() {
+				moveToParticipated = true
+			} else {
+				needsManualCount = true
+			}
+		}
+
+		if !moveToParticipated && outsideMySections && Settings.autoParticipateInMentions {
+			if refersToMe() {
+				moveToParticipated = true
+			} else {
+				needsManualCount = true
+			}
+		}
+
 		let f = NSFetchRequest(entityName: "PRComment")
 		f.returnsObjectsAsFaults = false
-
 		let latestDate = latestReadCommentDate
-		if (section == PullRequestSection.All.rawValue || section == PullRequestSection.None.rawValue) && Settings.autoParticipateInMentions {
-			if refersToMe() || (Settings.autoParticipateOnTeamMentions && refersToMyTeams()) {
-				section = PullRequestSection.Participated.rawValue
-				f.predicate = predicateForOthersCommentsSinceDate(latestDate)
-				unreadComments = managedObjectContext?.countForFetchRequest(f, error: nil)
-			} else {
-				f.predicate = predicateForOthersCommentsSinceDate(nil)
-				var unreadCommentCount: Int = 0
-				for c in managedObjectContext?.executeFetchRequest(f, error: nil) as [PRComment] {
-					if c.refersToMe() {
-						section = PullRequestSection.Participated.rawValue
-					}
-					if let l = latestDate {
-						if c.createdAt?.compare(l)==NSComparisonResult.OrderedDescending {
-							unreadCommentCount++
-						}
-                    } else {
-                        unreadCommentCount++;
-                    }
+		
+		if moveToParticipated {
+			section = PullRequestSection.Participated.rawValue
+			f.predicate = predicateForOthersCommentsSinceDate(latestDate)
+			unreadComments = managedObjectContext?.countForFetchRequest(f, error: nil)
+		} else if needsManualCount {
+			f.predicate = predicateForOthersCommentsSinceDate(nil)
+			var unreadCommentCount: Int = 0
+			for c in managedObjectContext?.executeFetchRequest(f, error: nil) as [PRComment] {
+				if c.refersToMe() {
+					section = PullRequestSection.Participated.rawValue
 				}
-				unreadComments = unreadCommentCount
+				if let l = latestDate {
+					if c.createdAt?.compare(l)==NSComparisonResult.OrderedDescending {
+						unreadCommentCount++
+					}
+				} else {
+					unreadCommentCount++;
+				}
 			}
+			unreadComments = unreadCommentCount
 		} else {
 			f.predicate = predicateForOthersCommentsSinceDate(latestDate)
 			unreadComments = managedObjectContext?.countForFetchRequest(f, error: nil)
