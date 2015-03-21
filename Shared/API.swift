@@ -263,17 +263,18 @@ class API {
 	private func syncToMoc(moc: NSManagedObjectContext, callback: (()->Void)?) {
 		markDirtyReposInMoc(moc, callback: { [weak self] in
 
+			let repos = Repo.syncableReposInMoc(moc)
+
 			var completionCount = 0
 			let totalOperations = 2
 			let completionCallback = { () -> Void in
 				completionCount++
 				if completionCount == totalOperations {
+					for r in repos { r.dirty = false }
 					self!.completeSyncInMoc(moc)
 					callback?()
 				}
 			}
-
-			let repos = Repo.syncableReposInMoc(moc)
 
 			self!.fetchIssuesForRepos(repos, toMoc: moc, callback: { [weak self] in
 				self!.fetchCommentsForCurrentIssuesToMoc(moc, callback: { [weak self] in
@@ -287,7 +288,6 @@ class API {
 					completionCallback()
 				})
 			})
-
 		})
 	}
 
@@ -599,14 +599,12 @@ class API {
 							}
 						}
 						completionCount++
-						r.dirty = false
 						if completionCount==total {
 							callback?()
 						}
 				})
 			} else {
 				completionCount++
-				r.dirty = false
 				if completionCount==total {
 					callback?()
 				}
@@ -622,7 +620,7 @@ class API {
 			}
 		}
 
-		if repos.count==0 {
+		if repos.count==0 || !Settings.showIssuesMenu {
 			callback?()
 			return
 		}
@@ -663,14 +661,12 @@ class API {
 							}
 						}
 						completionCount++
-						r.dirty = false
 						if completionCount==total {
 							callback?()
 						}
 				})
 			} else {
 				completionCount++
-				r.dirty = false
 				if completionCount==total {
 					callback?()
 				}

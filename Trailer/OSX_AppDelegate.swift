@@ -318,6 +318,12 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 				r.lastDirtied = NSDate.distantPast() as? NSDate
 			}
 			preferencesDirty = true
+		} else {
+			for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as [Repo] {
+				for i in r.issues.allObjects as [Issue] {
+					i.postSyncAction = PostSyncAction.Delete.rawValue
+				}
+			}
 		}
 		deferredUpdate()
 	}
@@ -967,6 +973,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		logActivityToConsole.integerValue = Settings.logActivityToConsole ? 1 : 0
 		showLabels.integerValue = Settings.showLabels ? 1 : 0
 		useVibrancy.integerValue = Settings.useVibrancy ? 1 : 0
+		showIssuesMenu.integerValue = Settings.showIssuesMenu ? 1 : 0
 
 		hotkeyEnable.integerValue = Settings.hotkeyEnable ? 1 : 0
 		hotkeyControlModifier.integerValue = Settings.hotkeyControlModifier ? 1 : 0
@@ -1520,7 +1527,9 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
             siv.highlighted = prMenu.visible
             siv.grayOut = shouldGray
             siv.tappedCallback = { [weak self] in
-				self!.closeMenu(self!.issuesMenu, statusItem: self!.issuesStatusItem!)
+				if let i = self!.issuesStatusItem {
+					self!.closeMenu(self!.issuesMenu, statusItem: i)
+				}
 				self!.toggleVisibilityOfMenu(self!.prMenu, fromStatusItem: self!.prStatusItem)
                 return
             }
