@@ -29,12 +29,15 @@ class TrailerCell: NSTableCellView {
 
 	var selected: Bool = false {
 		didSet {
+
+			let table = app.prMenu.visible ? app.prMenu.table : app.issuesMenu.table
+
 			var finalColor: NSColor = unselectedTitleColor
 			if selected {
-				app.prMenu.table.selectRowIndexes(NSIndexSet(index: app.prMenu.table.rowForView(self)), byExtendingSelection: false)
+				table.selectRowIndexes(NSIndexSet(index: table.rowForView(self)), byExtendingSelection: false)
 				if (app.prStatusItem.view as StatusItemView).darkMode { finalColor = NSColor.darkGrayColor() }
 			} else {
-				app.prMenu.table.deselectRow(app.prMenu.table.rowForView(self))
+				table.deselectRow(table.rowForView(self))
 			}
 
 			let item = associatedDataItem()

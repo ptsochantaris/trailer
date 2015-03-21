@@ -1647,12 +1647,10 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 					}
 					return nil
 				case 36: // enter
-					let i = w.table.selectedRow
-					if i >= 0 {
-						if let v = w.table.rowViewAtRow(i, makeIfNecessary: false) as? PullRequestCell {
-							let isAlternative = ((incomingEvent.modifierFlags & NSEventModifierFlags.AlternateKeyMask) == NSEventModifierFlags.AlternateKeyMask)
-							self!.dataItemSelected(v.associatedDataItem(), alternativeSelect: isAlternative)
-						}
+					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
+					if let dataItem = self!.dataItemAtRow(w.table.selectedRow, inMenu: w) {
+						let isAlternative = ((incomingEvent.modifierFlags & NSEventModifierFlags.AlternateKeyMask) == NSEventModifierFlags.AlternateKeyMask)
+						self!.dataItemSelected(dataItem, alternativeSelect: isAlternative)
 					}
 					return nil
 				case 53: // escape
