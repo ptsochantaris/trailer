@@ -113,29 +113,10 @@ class DataManager : NSObject {
 
 		var latestComments = PRComment.newItemsOfType("PRComment", inMoc: mainObjectContext) as [PRComment]
 		for c in latestComments {
-			let p = c.pullRequest
-			if p.postSyncAction?.integerValue == PostSyncAction.NoteUpdated.rawValue {
-				if c.refersToMe() {
-					app.postNotificationOfType(PRNotificationType.NewMention, forItem: c)
-				} else if !Settings.disableAllCommentNotifications
-                    && (Settings.showCommentsEverywhere || p.isMine() || p.commentedByMe())
-                    && !c.isMine() {
-					if let authorName = c.userName {
-						var blocked = false
-						for blockedAuthor in Settings.commentAuthorBlacklist as [String] {
-							if authorName.compare(blockedAuthor, options: NSStringCompareOptions.CaseInsensitiveSearch|NSStringCompareOptions.DiacriticInsensitiveSearch)==NSComparisonResult.OrderedSame {
-								blocked = true
-								break
-							}
-						}
-						if blocked {
-							DLog("Blocked notification for user '%@' as their name is on the blacklist",authorName)
-						} else {
-							DLog("user '%@' not on blacklist, can post notification",authorName)
-							app.postNotificationOfType(PRNotificationType.NewComment, forItem:c)
-						}
-					}
-				}
+			if let p = c.pullRequest {
+				processNotificationsForComment(c, ofPullRequest: p)
+			} else if let i = c.issue {
+				processNotificationsForComment(c, ofIssue: i)
 			}
 			c.postSyncAction = PostSyncAction.DoNothing.rawValue
 		}
@@ -168,6 +149,48 @@ class DataManager : NSObject {
 
 		for p in allTouchedPrs {
 			p.postSyncAction = PostSyncAction.DoNothing.rawValue
+		}
+	}
+
+	class func processNotificationsForComment(c: PRComment, ofPullRequest: PullRequest) {
+		if ofPullRequest.postSyncAction?.integerValue == PostSyncAction.NoteUpdated.rawValue {
+			if c.refersToMe() {
+				app.postNotificationOfType(PRNotificationType.NewMention, forItem: c)
+			} else if !Settings.disableAllCommentNotifications
+				&& (Settings.showCommentsEverywhere || ofPullRequest.isMine() || ofPullRequest.commentedByMe())
+				&& !c.isMine() {
+					notifyNewComment(c)
+			}
+		}
+	}
+
+	class func processNotificationsForComment(c: PRComment, ofIssue: Issue) {
+		if ofIssue.postSyncAction?.integerValue == PostSyncAction.NoteUpdated.rawValue {
+			if c.refersToMe() {
+				app.postNotificationOfType(PRNotificationType.NewMention, forItem: c)
+			} else if !Settings.disableAllCommentNotifications
+				&& (Settings.showCommentsEverywhere || ofIssue.isMine() || ofIssue.commentedByMe())
+				&& !c.isMine() {
+					notifyNewComment(c)
+			}
+		}
+	}
+
+	class func notifyNewComment(c: PRComment) {
+		if let authorName = c.userName {
+			var blocked = false
+			for blockedAuthor in Settings.commentAuthorBlacklist as [String] {
+				if authorName.compare(blockedAuthor, options: NSStringCompareOptions.CaseInsensitiveSearch|NSStringCompareOptions.DiacriticInsensitiveSearch)==NSComparisonResult.OrderedSame {
+					blocked = true
+					break
+				}
+			}
+			if blocked {
+				DLog("Blocked notification for user '%@' as their name is on the blacklist",authorName)
+			} else {
+				DLog("user '%@' not on blacklist, can post notification",authorName)
+				app.postNotificationOfType(PRNotificationType.NewComment, forItem:c)
+			}
 		}
 	}
 
@@ -227,6 +250,11 @@ class DataManager : NSObject {
 		case .NewStatus:
 			let pr = (item as PRStatus).pullRequest
 			return [NOTIFICATION_URL_KEY : pr.webUrl!, STATUS_ID_KEY: item.objectID.URIRepresentation().absoluteString!]
+		case .NewIssue: fallthrough
+		case .IssueReopened: fallthrough
+		case .NewIssueAssigned: fallthrough
+		case .IssueClosed:
+			return [NOTIFICATION_URL_KEY : (item as Issue).webUrl!]
 		}
 	}
 
@@ -240,9 +268,12 @@ class DataManager : NSObject {
 		}
 	}
 
-	class func postProcessAllPrs() {
-		for p in PullRequest.allItemsOfType("PullRequest", inMoc:mainObjectContext) as [PullRequest] {
+	class func postProcessAllItems() {
+		for p in PullRequest.allItemsOfType("PullRequest", inMoc: mainObjectContext) as [PullRequest] {
 			p.postProcess()
+		}
+		for i in PullRequest.allItemsOfType("Issue", inMoc: mainObjectContext) as [Issue] {
+			i.postProcess()
 		}
 	}
 

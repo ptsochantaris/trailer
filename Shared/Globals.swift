@@ -110,7 +110,7 @@ enum PostSyncAction: Int {
 }
 
 enum PRNotificationType: Int {
-	case NewComment, NewPr, PrMerged, PrReopened, NewMention, PrClosed, NewRepoSubscribed, NewRepoAnnouncement, NewPrAssigned, NewStatus
+	case NewComment, NewPr, PrMerged, PrReopened, NewMention, PrClosed, NewRepoSubscribed, NewRepoAnnouncement, NewPrAssigned, NewStatus, NewIssue, IssueClosed, NewIssueAssigned, IssueReopened
 }
 
 enum PRSortingMethod: Int {
@@ -133,3 +133,10 @@ enum PRHandlingPolicy: Int {
 		return img
 	}
 #endif
+
+func isDarkColor(color: COLOR_CLASS) -> Bool {
+	var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0
+	color.getRed(&r, green: &g, blue: &b, alpha: nil)
+	let lum = 0.2126 * r + 0.7152 * g + 0.0722 * b
+	return (lum < 0.5)
+}

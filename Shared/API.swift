@@ -263,20 +263,31 @@ class API {
 	private func syncToMoc(moc: NSManagedObjectContext, callback: (()->Void)?) {
 		markDirtyReposInMoc(moc, callback: { [weak self] in
 
-			for r in Repo.unsyncableReposInMoc(moc) {
-				for p in r.pullRequests.allObjects as [PullRequest] {
-					p.postSyncAction = PostSyncAction.Delete.rawValue
+			var completionCount = 0
+			let totalOperations = 2
+			let completionCallback = { () -> Void in
+				completionCount++
+				if completionCount == totalOperations {
+					self!.completeSyncInMoc(moc)
+					callback?()
 				}
 			}
 
-			self!.fetchPullRequestsForRepos(Repo.syncableReposInMoc(moc), toMoc: moc, callback: { [weak self] in
-				self!.updatePullRequestsInMoc(moc, callback: { [weak self] in
-					self!.completeSyncInMoc(moc)
-					callback?()
-					return
+			let repos = Repo.syncableReposInMoc(moc)
+
+			self!.fetchIssuesForRepos(repos, toMoc: moc, callback: { [weak self] in
+				self!.fetchCommentsForCurrentIssuesToMoc(moc, callback: { [weak self] in
+					self!.checkIssueClosuresInMoc(moc)
+					completionCallback()
 				})
-				return
 			})
+
+			self!.fetchPullRequestsForRepos(repos, toMoc: moc, callback: { [weak self] in
+				self!.updatePullRequestsInMoc(moc, callback: { [weak self] in
+					completionCallback()
+				})
+			})
+
 		})
 	}
 
@@ -539,6 +550,12 @@ class API {
 
 	private func fetchPullRequestsForRepos(repos: [Repo], toMoc:NSManagedObjectContext, callback: (()->Void)?) {
 
+		for r in Repo.unsyncableReposInMoc(toMoc) {
+			for p in r.pullRequests.allObjects as [PullRequest] {
+				p.postSyncAction = PostSyncAction.Delete.rawValue
+			}
+		}
+
 		if repos.count==0 {
 			callback?()
 			return
@@ -560,8 +577,7 @@ class API {
 				getPagedDataInPath("/repos/\(repoFullName)/pulls", fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
 					perPageCallback: { data, lastPage in
 						for info in data ?? [] {
-							let p = PullRequest.pullRequestWithInfo(info, fromServer:apiServer)
-							p.repo = r
+							PullRequest.pullRequestWithInfo(info, fromServer:apiServer, inRepo:r)
 						}
 						return false
 					}, finalCallback: { success, resultCode, etag in
@@ -570,6 +586,68 @@ class API {
 								r.inaccessible = true
 								r.postSyncAction = PostSyncAction.DoNothing.rawValue
 								for p in r.pullRequests.allObjects as [PullRequest] {
+									p.postSyncAction = PostSyncAction.Delete.rawValue
+								}
+							} else if resultCode==410 { // repo gone for good
+								r.postSyncAction = PostSyncAction.Delete.rawValue
+							} else { // fetch problem
+								apiServer.lastSyncSucceeded = false
+							}
+						}
+						completionCount++
+						r.dirty = false
+						if completionCount==total {
+							callback?()
+						}
+				})
+			} else {
+				completionCount++
+				r.dirty = false
+				if completionCount==total {
+					callback?()
+				}
+			}
+		}
+	}
+
+	private func fetchIssuesForRepos(repos: [Repo], toMoc:NSManagedObjectContext, callback: (()->Void)?) {
+
+		for r in Repo.unsyncableReposInMoc(toMoc) {
+			for i in r.issues.allObjects as [Issue] {
+				i.postSyncAction = PostSyncAction.Delete.rawValue
+			}
+		}
+
+		if repos.count==0 {
+			callback?()
+			return
+		}
+		let total = repos.count
+		var completionCount = 0
+		for r in repos {
+
+			for pr in r.issues.allObjects as [Issue] {
+				if (pr.condition?.integerValue ?? 0) == PullRequestCondition.Open.rawValue {
+					pr.postSyncAction = PostSyncAction.Delete.rawValue
+				}
+			}
+
+			let apiServer = r.apiServer
+
+			if apiServer.syncIsGood {
+				let repoFullName = r.fullName ?? "NoRepoFullName"
+				getPagedDataInPath("/repos/\(repoFullName)/issues", fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
+					perPageCallback: { data, lastPage in
+						for info in data ?? [] {
+							Issue.issueWithInfo(info, fromServer:apiServer, inRepo:r)
+						}
+						return false
+					}, finalCallback: { success, resultCode, etag in
+						if !success {
+							if resultCode == 404 { // repo disabled
+								r.inaccessible = true
+								r.postSyncAction = PostSyncAction.DoNothing.rawValue
+								for p in r.issues.allObjects as [Issue] {
 									p.postSyncAction = PostSyncAction.Delete.rawValue
 								}
 							} else if resultCode==410 { // repo gone for good
@@ -604,8 +682,8 @@ class API {
 			return
 		}
 
-		for r in prs {
-			for c in r.comments.allObjects as [PRComment] {
+		for p in prs {
+			for c in p.comments.allObjects as [PRComment] {
 				c.postSyncAction = PostSyncAction.Delete.rawValue
 			}
 		}
@@ -670,6 +748,67 @@ class API {
 		}
 	}
 
+	private func fetchCommentsForCurrentIssuesToMoc(moc: NSManagedObjectContext, callback: (()->Void)?) {
+
+		let allIssues = DataItem.newOrUpdatedItemsOfType("Issue", inMoc:moc) as [Issue]
+
+		for i in allIssues {
+			for c in i.comments.allObjects as [PRComment] {
+				c.postSyncAction = PostSyncAction.Delete.rawValue
+			}
+		}
+
+		let issues = allIssues.filter({ pr in
+			return pr.apiServer.syncIsGood
+		})
+
+		let total = issues.count
+		if total==0 {
+			callback?()
+			return
+		}
+
+		var completionCount = 0
+
+		for i in issues {
+
+			if let link = i.commentsLink {
+
+				let apiServer = i.apiServer
+
+				getPagedDataInPath(link, fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
+					perPageCallback: { (data, lastPage) -> Bool in
+						for info in data ?? [] {
+							let c = PRComment.commentWithInfo(info, fromServer: apiServer)
+							c.issue = i
+
+							// check if we're assigned to a just created pull request, in which case we want to "fast forward" its latest comment dates to our own if we're newer
+							if (i.postSyncAction?.integerValue ?? 0) == PostSyncAction.NoteNew.rawValue {
+								let commentCreation = c.createdAt!
+								if i.latestReadCommentDate == nil || i.latestReadCommentDate!.compare(commentCreation) == NSComparisonResult.OrderedAscending {
+									i.latestReadCommentDate = commentCreation
+								}
+							}
+						}
+						return false
+					}, finalCallback: { success, resultCode, etag in
+						completionCount++
+						if !success {
+							apiServer.lastSyncSucceeded = false
+						}
+						if completionCount == total {
+							callback?()
+						}
+				})
+			} else {
+				completionCount++
+				if completionCount == total {
+					callback?()
+				}
+			}
+		}
+	}
+
 	private func fetchLabelsForForCurrentPullRequestsToMoc(moc: NSManagedObjectContext, callback: (()->Void)?) {
 
 		let prs = (DataItem.allItemsOfType("PullRequest", inMoc: moc) as [PullRequest]).filter { [weak self] pr in
@@ -710,7 +849,7 @@ class API {
 				getPagedDataInPath(link, fromServer: p.apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
 					perPageCallback: { data, lastPage in
 						for info in data ?? [] {
-							PRLabel.labelWithInfo(info, forPullRequest:p)
+							PRLabel.labelWithInfo(info, withParent: p)
 						}
 						return false
 					}, finalCallback: { [weak self] success, resultCode, etag in
@@ -842,7 +981,23 @@ class API {
 		}
 
 		for r in prsToCheck {
-			investigatePrClosureForPr(r, callback: completionCallback)
+			investigatePrClosureFor(r, callback: completionCallback)
+		}
+	}
+
+	private func checkIssueClosuresInMoc(moc: NSManagedObjectContext) {
+		let f = NSFetchRequest(entityName: "Issue")
+		f.predicate = NSPredicate(format: "postSyncAction == %d and condition == %d", PostSyncAction.Delete.rawValue, PullRequestCondition.Open.rawValue)
+		f.returnsObjectsAsFaults = false
+		let issues = moc.executeFetchRequest(f, error: nil) as [Issue]
+
+		let issuesToCheck = issues.filter { r -> Bool in
+			let parent = r.repo
+			return (!parent.hidden.boolValue) && ((parent.postSyncAction?.integerValue ?? 0) != PostSyncAction.Delete.rawValue) && r.apiServer.syncIsGood
+		}
+
+		for i in issuesToCheck {
+			issueWasClosed(i)
 		}
 	}
 
@@ -910,7 +1065,7 @@ class API {
 		}
 	}
 
-	private func investigatePrClosureForPr(r: PullRequest, callback: (()->Void)?) {
+	private func investigatePrClosureFor(r: PullRequest, callback: (()->Void)?) {
 		DLog("Checking closed PR to see if it was merged: %@", r.title)
 
 		let repoFullName = r.repo.fullName ?? "NoRepoFullName"
@@ -967,7 +1122,7 @@ class API {
 	}
 
 	private func prWasClosed(r: PullRequest) {
-		DLog("detected closed PR: %@", r.title)
+		DLog("Detected closed PR: %@", r.title)
 		switch(Settings.closeHandlingPolicy) {
 
 		case PRHandlingPolicy.KeepMine.rawValue:
@@ -978,6 +1133,24 @@ class API {
 			r.postSyncAction = PostSyncAction.DoNothing.rawValue // don't delete this
 			r.condition = PullRequestCondition.Closed.rawValue
 			app.postNotificationOfType(PRNotificationType.PrClosed, forItem:r)
+
+		default:
+			break
+		}
+	}
+
+	private func issueWasClosed(i: Issue) {
+		DLog("Detected closed Issue: %@", i.title)
+		switch(Settings.closeHandlingPolicy) {
+
+		case PRHandlingPolicy.KeepMine.rawValue:
+			if (i.sectionIndex?.integerValue ?? 0) == PullRequestSection.All.rawValue { break }
+			fallthrough
+
+		case PRHandlingPolicy.KeepAll.rawValue:
+			i.postSyncAction = PostSyncAction.DoNothing.rawValue // don't delete this
+			i.condition = PullRequestCondition.Closed.rawValue
+			app.postNotificationOfType(PRNotificationType.IssueClosed, forItem:i)
 
 		default:
 			break

@@ -12,8 +12,9 @@ class PRComment: DataItem {
     @NSManaged var userName: String?
     @NSManaged var webUrl: String?
 
-    @NSManaged var pullRequest: PullRequest
-	
+    @NSManaged var pullRequest: PullRequest?
+	@NSManaged var issue: Issue?
+
 	class func commentWithInfo(info:NSDictionary, fromServer:ApiServer) -> PRComment {
 		let c = DataItem.itemWithInfo(info, type: "PRComment", fromServer: fromServer) as PRComment
 		if c.postSyncAction?.integerValue != PostSyncAction.DoNothing.rawValue {
@@ -35,6 +36,15 @@ class PRComment: DataItem {
 			}
 		}
 		return c
+	}
+
+	func notificationSubtitle() -> String {
+		if let pr = pullRequest {
+			if let title = pr.title {
+				return title
+			}
+		}
+		return "(untitled)"
 	}
 
 	func isMine() -> Bool {

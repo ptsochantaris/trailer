@@ -333,7 +333,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 			return c
 		}
 
-		let fetchRequest = PullRequest.requestForPullRequestsWithFilter(searchField.text)
+		let fetchRequest = PullRequest.requestForPullRequestsWithFilter(searchField.text, sectionIndex: -1)
 
 		let aFetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: mainObjectContext, sectionNameKeyPath: "sectionName", cacheName: nil)
 		aFetchedResultsController.delegate = self

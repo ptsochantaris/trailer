@@ -127,7 +127,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 		prMenu.backgroundColor = NSColor.whiteColor()
 		setupSortMethodMenu()
-		DataManager.postProcessAllPrs()
+		DataManager.postProcessAllItems()
 
 		prFilterTimer = PopTimer(timeInterval: 0.2, callback: {
 			app.updatePrMenu()
@@ -226,7 +226,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	@IBAction func hideAllPrsSection(sender: NSButton) {
 		Settings.hideAllPrsSection = (sender.integerValue==1)
-		DataManager.postProcessAllPrs()
+		DataManager.postProcessAllItems()
 		deferredUpdate()
 	}
 
@@ -274,13 +274,13 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	@IBAction func autoParticipateOnMentionSelected(sender: NSButton) {
 		Settings.autoParticipateInMentions = (sender.integerValue==1)
-		DataManager.postProcessAllPrs()
+		DataManager.postProcessAllItems()
 		deferredUpdate()
 	}
 
 	@IBAction func autoParticipateOnTeamMentionSelected(sender: NSButton) {
 		Settings.autoParticipateOnTeamMentions = (sender.integerValue==1)
-		DataManager.postProcessAllPrs()
+		DataManager.postProcessAllItems()
 		deferredUpdate()
 	}
 
@@ -306,7 +306,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	@IBAction func hideAvatarsSelected(sender: NSButton) {
 		Settings.hideAvatars = (sender.integerValue==1)
-		DataManager.postProcessAllPrs()
+		DataManager.postProcessAllItems()
 		deferredUpdate()
 	}
 
@@ -317,26 +317,26 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	@IBAction func hidePrsSelected(sender: NSButton) {
 		Settings.shouldHideUncommentedRequests = (sender.integerValue==1)
-		DataManager.postProcessAllPrs()
+		DataManager.postProcessAllItems()
 		deferredUpdate()
 	}
 
 	@IBAction func showAllCommentsSelected(sender: NSButton) {
 		Settings.showCommentsEverywhere = (sender.integerValue==1)
-		DataManager.postProcessAllPrs()
+		DataManager.postProcessAllItems()
 		deferredUpdate()
 	}
 
 	@IBAction func sortOrderSelected(sender: NSButton) {
 		Settings.sortDescending = (sender.integerValue==1)
 		setupSortMethodMenu()
-		DataManager.postProcessAllPrs()
+		DataManager.postProcessAllItems()
 		deferredUpdate()
 	}
 
 	@IBAction func countOnlyListedPrsSelected(sender: NSButton) {
 		Settings.countOnlyListedPrs = (sender.integerValue==1)
-		DataManager.postProcessAllPrs()
+		DataManager.postProcessAllItems()
 		deferredUpdate()
 	}
 
@@ -350,7 +350,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	@IBAction func sortMethodChanged(sender: AnyObject) {
 		Settings.sortMethod = sortModeSelect.indexOfSelectedItem
-		DataManager.postProcessAllPrs()
+		DataManager.postProcessAllItems()
 		deferredUpdate()
 	}
 
@@ -413,7 +413,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	@IBAction func showCreationSelected(sender: NSButton) {
 		Settings.showCreatedInsteadOfUpdated = (sender.integerValue==1)
-		DataManager.postProcessAllPrs()
+		DataManager.postProcessAllItems()
 		deferredUpdate()
 	}
 
@@ -424,7 +424,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	@IBAction func moveAssignedPrsToMySectionSelected(sender: NSButton) {
 		Settings.moveAssignedPrsToMySection = (sender.integerValue==1)
-		DataManager.postProcessAllPrs()
+		DataManager.postProcessAllItems()
 		deferredUpdate()
 	}
 
@@ -505,12 +505,12 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		case .NewMention:
 			let c = forItem as PRComment
 			notification.title = "@" + (c.userName ?? "NoUserName") + " mentioned you:"
-			notification.subtitle = c.pullRequest.title
+			notification.subtitle = c.notificationSubtitle()
 			notification.informativeText = c.body
 		case .NewComment:
 			let c = forItem as PRComment
 			notification.title = "@" + (c.userName ?? "NoUserName") + " commented:"
-			notification.subtitle = c.pullRequest.title
+			notification.subtitle = c.notificationSubtitle()
 			notification.informativeText = c.body
 		case .NewPr:
 			notification.title = "New PR"
@@ -538,9 +538,21 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 			notification.title = "PR Status Update"
 			notification.subtitle = c.pullRequest.title
 			notification.informativeText = c.descriptionText
+		case .NewIssue:
+			notification.title = "New Issue"
+			notification.subtitle = (forItem as Issue).title
+		case .IssueReopened:
+			notification.title = "Re-Opened Issue"
+			notification.subtitle = (forItem as Issue).title
+		case .IssueClosed:
+			notification.title = "Issue Closed"
+			notification.subtitle = (forItem as Issue).title
+		case .NewIssueAssigned:
+			notification.title = "Issue Assigned"
+			notification.subtitle = (forItem as Issue).title
 		}
 
-		if (type == .NewComment || type == .NewMention) && !Settings.hideAvatars && notification.respondsToSelector(Selector("setContentImage:")) { // let's add an avatar on this!
+		if (type == .NewComment || type == .NewMention) && !Settings.hideAvatars && notification.respondsToSelector(Selector("setContentImage:")) {
 			if let url = (forItem as PRComment).avatarUrl {
 				api.haveCachedAvatar(url, tryLoadAndCallback: { image in
 					notification.contentImage = image
@@ -552,14 +564,21 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		}
 	}
 
-	func prItemSelected(pullRequest: PullRequest, alternativeSelect: Bool) {
+	func dataItemSelected(item: DataItem, alternativeSelect: Bool) {
 		prMenu.filter.becomeFirstResponder()
 		ignoreNextFocusLoss = alternativeSelect
 
-		if let url = pullRequest.urlForOpening() {
-			NSWorkspace.sharedWorkspace().openURL(NSURL(string: url)!)
+		if let pullRequest = item as? PullRequest {
+			if let url = pullRequest.urlForOpening() {
+				NSWorkspace.sharedWorkspace().openURL(NSURL(string: url)!)
+			}
+			pullRequest.catchUpWithComments()
+		} else if let issue = item as? Issue {
+			if let url = issue.urlForOpening() {
+				NSWorkspace.sharedWorkspace().openURL(NSURL(string: url)!)
+			}
+			issue.catchUpWithComments()
 		}
-		pullRequest.catchUpWithComments()
 
 		let reSelectIndex = alternativeSelect ? prMenu.table.selectedRow : -1
 
@@ -707,10 +726,14 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		updatePrMenu()
 	}
 
-	func unPinSelectedFor(pullRequest: PullRequest) {
-		mainObjectContext.deleteObject(pullRequest)
+	func unPinSelectedFor(item: DataItem) {
+		mainObjectContext.deleteObject(item)
 		DataManager.saveDB()
-		updatePrMenu()
+		if item is PullRequest {
+			updatePrMenu()
+		} else if item is Issue {
+			updateIssuesMenu()
+		}
 	}
 
 	private func startRateLimitHandling() {
@@ -843,7 +866,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	}
 
 	@IBAction func markAllReadSelected(sender: NSMenuItem) {
-		let f = PullRequest.requestForPullRequestsWithFilter(prMenu.filter.stringValue)
+		let f = PullRequest.requestForPullRequestsWithFilter(prMenu.filter.stringValue, sectionIndex: -1)
 		for r in mainObjectContext.executeFetchRequest(f, error: nil) as [PullRequest] {
 			r.catchUpWithComments()
 		}
@@ -1094,7 +1117,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		if tableView === projectsTable {
 			return Repo.reposForFilter(repoFilter.stringValue).count + 2
 		} else if tableView === prMenu.table {
-			let f = PullRequest.requestForPullRequestsWithFilter(prMenu.filter.stringValue)
+			let f = PullRequest.requestForPullRequestsWithFilter(prMenu.filter.stringValue, sectionIndex: -1)
 			return mainObjectContext.countForFetchRequest(f, error: nil)
 		} else {
 			return ApiServer.countApiServersInMoc(mainObjectContext)
@@ -1339,7 +1362,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 				attributes = [ NSFontAttributeName: NSFont.boldSystemFontOfSize(10),
 					NSForegroundColorAttributeName: MAKECOLOR(0.8, 0.0, 0.0, 1.0) ]
 			} else {
-				let f = Issue.requestForIssuesWithFilter(issuesMenu.filter.stringValue)
+				let f = Issue.requestForIssuesWithFilter(issuesMenu.filter.stringValue, sectionIndex: -1)
 				countString = String(mainObjectContext.countForFetchRequest(f, error: nil))
 
 				if Issue.badgeCountInMoc(mainObjectContext) > 0 {
@@ -1408,7 +1431,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 				NSForegroundColorAttributeName: MAKECOLOR(0.8, 0.0, 0.0, 1.0) ]
 		} else {
 			if Settings.countOnlyListedPrs {
-				let f = PullRequest.requestForPullRequestsWithFilter(prMenu.filter.stringValue)
+				let f = PullRequest.requestForPullRequestsWithFilter(prMenu.filter.stringValue, sectionIndex: -1)
 				countString = String(mainObjectContext.countForFetchRequest(f, error: nil))
 			} else {
 				countString = String(PullRequest.countOpenRequestsInMoc(mainObjectContext))
@@ -1625,9 +1648,9 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 			case 36: // enter
 				let i = self!.prMenu.table.selectedRow
 				if i >= 0 {
-					if let v = self!.prMenu.table.rowViewAtRow(i, makeIfNecessary: false) as? PrItemView {
+					if let v = self!.prMenu.table.rowViewAtRow(i, makeIfNecessary: false) as? PullRequestCell {
 						let isAlternative = ((incomingEvent.modifierFlags & NSEventModifierFlags.AlternateKeyMask) == NSEventModifierFlags.AlternateKeyMask)
-						self!.prItemSelected(v.associatedPullRequest(), alternativeSelect: isAlternative)
+						self!.dataItemSelected(v.associatedDataItem(), alternativeSelect: isAlternative)
 					}
 				}
 				return nil

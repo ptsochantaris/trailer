@@ -45,7 +45,7 @@ class PullRequest: DataItem {
     @NSManaged var repo: Repo
     @NSManaged var statuses: NSSet
 
-	class func pullRequestWithInfo(info: NSDictionary, fromServer: ApiServer) -> PullRequest {
+	class func pullRequestWithInfo(info: NSDictionary, fromServer: ApiServer, inRepo: Repo) -> PullRequest {
 		let p = DataItem.itemWithInfo(info, type: "PullRequest", fromServer: fromServer) as PullRequest
 		if p.postSyncAction?.integerValue != PostSyncAction.DoNothing.rawValue {
 			p.url = info.ofk("url") as? String
@@ -54,12 +54,8 @@ class PullRequest: DataItem {
 			p.state = info.ofk("state") as? String
 			p.title = info.ofk("title") as? String
 			p.body = info.ofk("body") as? String
-
-			if let m = info.ofk("mergeable") as? NSNumber {
-				p.mergeable = m
-			} else {
-				p.mergeable = true
-			}
+			p.repo = inRepo
+			p.mergeable = info.ofk("mergeable") as? NSNumber ?? true
 
 			if let userInfo = info.ofk("user") as? NSDictionary {
 				p.userId = userInfo.ofk("id") as? NSNumber
@@ -77,11 +73,7 @@ class PullRequest: DataItem {
 			api.refreshesSinceLastLabelsCheck[p.objectID] = nil
 			api.refreshesSinceLastStatusCheck[p.objectID] = nil
 		}
-		if let c = p.condition {
-			p.reopened = (c.integerValue == PullRequestCondition.Closed.rawValue)
-		} else {
-			p.reopened = false
-		}
+		p.reopened = ((p.condition?.integerValue ?? 0) == PullRequestCondition.Closed.rawValue)
 		p.condition = PullRequestCondition.Open.rawValue
 		return p
 	}
@@ -100,10 +92,6 @@ class PullRequest: DataItem {
 		default: return nil
 		}
 	}
-
-    class func requestForPullRequestsWithFilter(filter: String?) -> NSFetchRequest {
-        return requestForPullRequestsWithFilter(filter, sectionIndex: -1)
-    }
 
 	class func requestForPullRequestsWithFilter(filter: String?, sectionIndex: Int) -> NSFetchRequest {
 
@@ -211,7 +199,7 @@ class PullRequest: DataItem {
     }
 
 	class func badgeCountInMoc(moc: NSManagedObjectContext) -> Int {
-		let f = requestForPullRequestsWithFilter(nil)
+		let f = requestForPullRequestsWithFilter(nil, sectionIndex: -1)
 		var badgeCount:Int = 0
 		let showCommentsEverywhere = Settings.showCommentsEverywhere
 		for p in moc.executeFetchRequest(f, error: nil) as [PullRequest] {
@@ -357,13 +345,6 @@ class PullRequest: DataItem {
 			}
 		}
 		return _title
-	}
-
-	func isDarkColor(color: COLOR_CLASS) -> Bool {
-		var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0
-		color.getRed(&r, green: &g, blue: &b, alpha: nil)
-		let lum = 0.2126 * r + 0.7152 * g + 0.0722 * b
-		return (lum < 0.5)
 	}
 
 	func subtitleWithFont(font: FONT_CLASS, lightColor: COLOR_CLASS, darkColor: COLOR_CLASS) -> NSMutableAttributedString {
@@ -597,12 +578,7 @@ class PullRequest: DataItem {
 	}
 
 	func predicateForOthersCommentsSinceDate(optionalDate: NSDate?) -> NSPredicate {
-		var userNumber: Int64
-		if let lld = apiServer.userId?.longLongValue {
-			userNumber = lld
-		} else {
-			userNumber = 0
-		}
+		var userNumber = apiServer.userId?.longLongValue ?? 0
 		if let date = optionalDate {
 			return NSPredicate(format: "userId != %lld and pullRequest == %@ and createdAt > %@", userNumber, self, date)!
 		} else {

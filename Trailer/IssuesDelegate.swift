@@ -13,7 +13,7 @@ class IssuesDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 
 		issueIds.removeAll(keepCapacity: false)
 
-		let f = Issue.requestForIssuesWithFilter(filter)
+		let f = Issue.requestForIssuesWithFilter(filter, sectionIndex: -1)
 		let allIssues = mainObjectContext.executeFetchRequest(f, error: nil) as [Issue]
 
 		if let firstIssue = allIssues.first {
@@ -34,7 +34,8 @@ class IssuesDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 	func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
 		let object = issueIds[row]
 		if object.isKindOfClass(NSManagedObjectID) {
-			return nil
+			let i = mainObjectContext.existingObjectWithID(object as NSManagedObjectID, error: nil) as Issue
+			return IssueCell(issue: i)
 		} else {
 			let title = object as String
 			let showButton = (title == PullRequestSection.Merged.name() || title == PullRequestSection.Closed.name())

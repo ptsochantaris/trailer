@@ -13,6 +13,7 @@ class Repo: DataItem {
     @NSManaged var webUrl: String?
 
 	@NSManaged var pullRequests: NSSet
+	@NSManaged var issues: NSSet
 
 	class func repoWithInfo(info: NSDictionary, fromServer: ApiServer) -> Repo {
 		let r = DataItem.itemWithInfo(info, type: "Repo", fromServer: fromServer) as Repo

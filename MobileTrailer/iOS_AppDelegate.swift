@@ -21,7 +21,7 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 	func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject : AnyObject]?) -> Bool {
 		app = self
 
-		DataManager.postProcessAllPrs()
+		DataManager.postProcessAllItems()
 
 		if ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
 			api.updateLimitsFromServer()
@@ -241,14 +241,14 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 		case .NewMention:
 			if let c = forItem as? PRComment {
 				let name = c.userName ?? "(unnamed)"
-				let title = c.pullRequest.title ?? "(untitled)"
+				let title = c.notificationSubtitle()
 				let body = c.body ?? "(no description)"
 				notification.alertBody = "@\(name) mentioned you in '\(title)': \(body)"
 			}
 		case .NewComment:
 			if let c = forItem as? PRComment {
 				let name = c.userName ?? "(unnamed)"
-				let title = c.pullRequest.title ?? "(untitled)"
+				let title = c.notificationSubtitle()
 				let body = c.body ?? "(no description)"
 				notification.alertBody = "@\(name) commented on '\(title)': \(body)"
 			}
@@ -283,6 +283,22 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 		case .NewStatus:
 			if let s = forItem as? PRStatus {
 				notification.alertBody = "New Status: " + (s.descriptionText ?? "(untitled)") + " in " + (s.pullRequest.repo.fullName ?? "(untitled)")
+			}
+		case .NewIssue:
+			if let i = forItem as? Issue {
+				notification.alertBody = "New Issue: " + (i.title ?? "(untitled)") + " in " + (i.repo.fullName ?? "(untitled)")
+			}
+		case .IssueReopened:
+			if let i = forItem as? Issue {
+				notification.alertBody = "Re-Opened Issue: " + (i.title ?? "(untitled)") + " in " + (i.repo.fullName ?? "(untitled)")
+			}
+		case .IssueClosed:
+			if let i = forItem as? Issue {
+				notification.alertBody = "Issue Closed: " + (i.title ?? "(untitled)") + " in " + (i.repo.fullName ?? "(untitled)")
+			}
+		case .NewIssueAssigned:
+			if let i = forItem as? Issue {
+				notification.alertBody = "Issue Assigned: " + (i.title ?? "(untitled)") + " in " + (i.repo.fullName ?? "(untitled)")
 			}
 		}
 
