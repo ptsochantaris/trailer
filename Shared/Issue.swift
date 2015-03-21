@@ -287,10 +287,6 @@ class Issue: DataItem {
 		return url?.stringByAppendingPathComponent("labels")
 	}
 
-	func sectionName() -> String {
-		return PullRequestSection.allTitles[sectionIndex?.integerValue ?? 0]
-	}
-
 	func postProcess() {
 		var section: Int
 		var currentCondition = condition?.integerValue ?? PullRequestCondition.Open.rawValue
@@ -360,9 +356,9 @@ class Issue: DataItem {
 	func predicateForOthersCommentsSinceDate(optionalDate: NSDate?) -> NSPredicate {
 		var userNumber = apiServer.userId?.longLongValue ?? 0
 		if let date = optionalDate {
-			return NSPredicate(format: "userId != %lld and pullRequest == %@ and createdAt > %@", userNumber, self, date)!
+			return NSPredicate(format: "userId != %lld and issue == %@ and createdAt > %@", userNumber, self, date)!
 		} else {
-			return NSPredicate(format: "userId != %lld and pullRequest == %@", userNumber, self)!
+			return NSPredicate(format: "userId != %lld and issue == %@", userNumber, self)!
 		}
 	}
 
@@ -414,5 +410,12 @@ class Issue: DataItem {
 			}
 		}
 		return false
+	}
+
+	class func allClosedIssuesInMoc(moc: NSManagedObjectContext) -> [Issue] {
+		let f = NSFetchRequest(entityName: "Issue")
+		f.returnsObjectsAsFaults = false
+		f.predicate = NSPredicate(format: "condition == %d", PullRequestCondition.Closed.rawValue)
+		return moc.executeFetchRequest(f, error: nil) as [Issue]
 	}
 }

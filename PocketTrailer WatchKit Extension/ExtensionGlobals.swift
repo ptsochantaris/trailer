@@ -1,10 +1,3 @@
-//
-//  WatchKitGlobals.swift
-//  Trailer
-//
-//  Created by Paul Tsochantaris on 11/03/2015.
-//
-//
 
 import UIKit
 import CoreData

@@ -43,6 +43,10 @@ class PRComment: DataItem {
 			if let title = pr.title {
 				return title
 			}
+		} else if let i = issue {
+			if let title = i.title {
+				return title
+			}
 		}
 		return "(untitled)"
 	}

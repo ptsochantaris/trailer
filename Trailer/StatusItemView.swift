@@ -67,7 +67,7 @@ class StatusItemView: NSView {
 		if(app.prStatusItem.view==self) {
 			app.prStatusItem.drawStatusBarBackgroundInRect(dirtyRect, withHighlight: highlighted)
 		} else {
-			app.issuesStatusItem!.drawStatusBarBackgroundInRect(dirtyRect, withHighlight: highlighted)
+			app.issuesStatusItem?.drawStatusBarBackgroundInRect(dirtyRect, withHighlight: highlighted)
 		}
 
 		darkMode = StatusItemView.checkDarkMode()

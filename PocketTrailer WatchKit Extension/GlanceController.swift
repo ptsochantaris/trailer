@@ -1,10 +1,3 @@
-//
-//  GlanceController.swift
-//  PocketTrailer WatchKit Extension
-//
-//  Created by Paul Tsochantaris on 11/03/2015.
-//
-//
 
 import WatchKit
 import Foundation

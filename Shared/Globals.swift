@@ -94,10 +94,17 @@ enum PullRequestCondition: Int {
 
 enum PullRequestSection: Int {
 	case None, Mine, Participated, Merged, Closed, All
-	static let allTitles = ["", "Mine", "Participated", "Recently Merged", "Recently Closed", "All Pull Requests"]
-    static let shortTitles = ["", "Mine", "Participated", "Merged", "Closed", "Other"]
-	func name() -> String {
-		return PullRequestSection.allTitles[rawValue]
+	static let prMenuTitles = ["", "Mine", "Participated", "Recently Merged", "Recently Closed", "All Pull Requests"]
+	static let issueMenuTitles = ["", "Mine", "Participated", "Recently Merged", "Recently Closed", "All Pull Requests"]
+    static let watchMenuTitles = ["", "Mine", "Participated", "Merged", "Closed", "Other"]
+	func prMenuName() -> String {
+		return PullRequestSection.prMenuTitles[rawValue]
+	}
+	func issuesMenuName() -> String {
+		return PullRequestSection.issueMenuTitles[rawValue]
+	}
+	func watchMenuName() -> String {
+		return PullRequestSection.watchMenuTitles[rawValue]
 	}
 }
 

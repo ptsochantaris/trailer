@@ -1,10 +1,3 @@
-//
-//  WatchGlobals.swift
-//  Trailer
-//
-//  Created by Paul Tsochantaris on 14/03/2015.
-//
-//
 
 let SECTION_KEY = "INDEX_KEY"
 let PULL_REQUEST_KEY = "PULL_REQUEST_KEY"

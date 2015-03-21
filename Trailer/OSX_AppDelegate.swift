@@ -125,7 +125,6 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	func applicationDidFinishLaunching(notification: NSNotification) {
 		app = self
 
-		prMenu.backgroundColor = NSColor.whiteColor()
 		setupSortMethodMenu()
 		DataManager.postProcessAllItems()
 
@@ -474,31 +473,31 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		switch notification.activationType {
 		case NSUserNotificationActivationType.ActionButtonClicked: fallthrough
 		case NSUserNotificationActivationType.ContentsClicked:
-			NSUserNotificationCenter.defaultUserNotificationCenter().removeDeliveredNotification(notification)
-			var urlToOpen = notification.userInfo?[NOTIFICATION_URL_KEY] as? String
-			if urlToOpen == nil {
-				var pullRequest: PullRequest?
-				if let itemId = DataManager.idForUriPath(notification.userInfo?[PULL_REQUEST_ID_KEY] as? String) {
-					// it's a pull request
-					pullRequest = mainObjectContext.existingObjectWithID(itemId, error: nil) as? PullRequest
-					urlToOpen = pullRequest?.webUrl
-				} else if let itemId = DataManager.idForUriPath(notification.userInfo?[COMMENT_ID_KEY] as? String) {
-					// it's a comment
-					if let c = mainObjectContext.existingObjectWithID(itemId, error: nil) as? PRComment {
-						pullRequest = c.pullRequest
-						urlToOpen = c.webUrl
+			if let userInfo = notification.userInfo {
+				var urlToOpen = userInfo[NOTIFICATION_URL_KEY] as? String
+				if urlToOpen == nil {
+					var pullRequest: PullRequest?
+					if let itemId = DataManager.idForUriPath(userInfo[PULL_REQUEST_ID_KEY] as? String) {
+						pullRequest = mainObjectContext.existingObjectWithID(itemId, error: nil) as? PullRequest
+						urlToOpen = pullRequest?.webUrl
+					} else if let itemId = DataManager.idForUriPath(userInfo[COMMENT_ID_KEY] as? String) {
+						if let c = mainObjectContext.existingObjectWithID(itemId, error: nil) as? PRComment {
+							pullRequest = c.pullRequest
+							urlToOpen = c.webUrl
+						}
 					}
+					pullRequest?.catchUpWithComments()
 				}
-				pullRequest?.catchUpWithComments()
-			}
-			if let up = urlToOpen {
-				if let u = NSURL(string: up) {
-					NSWorkspace.sharedWorkspace().openURL(u)
-					updatePrMenu()
+				if let up = urlToOpen {
+					if let u = NSURL(string: up) {
+						NSWorkspace.sharedWorkspace().openURL(u)
+						updatePrMenu()
+					}
 				}
 			}
 		default: break
 		}
+		NSUserNotificationCenter.defaultUserNotificationCenter().removeDeliveredNotification(notification)
 	}
 
 	func postNotificationOfType(type: PRNotificationType, forItem: DataItem) {
@@ -672,49 +671,81 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	}
 
 	func sectionHeaderRemoveSelected(headerTitle: NSString) {
-		if headerTitle == PullRequestSection.Merged.name() {
-			if Settings.dontAskBeforeWipingMerged {
-				removeAllMergedRequests()
-			} else {
-				let mergedRequests = PullRequest.allMergedRequestsInMoc(mainObjectContext)
 
-				let alert = NSAlert()
-				alert.messageText = "Clear \(mergedRequests.count) merged PRs?"
-				alert.informativeText = "This will clear \(mergedRequests.count) merged PRs from your list.  This action cannot be undone, are you sure?"
-				alert.addButtonWithTitle("No")
-				alert.addButtonWithTitle("Yes")
-				alert.showsSuppressionButton = true
+		let inMenu = prMenu.visible ? prMenu : issuesMenu
 
-				if alert.runModal()==NSAlertSecondButtonReturn {
+		if inMenu == prMenu {
+			if headerTitle == PullRequestSection.Merged.prMenuName() {
+				if Settings.dontAskBeforeWipingMerged {
 					removeAllMergedRequests()
-					if alert.suppressionButton!.state == NSOnState {
-						Settings.dontAskBeforeWipingMerged = true
+				} else {
+					let mergedRequests = PullRequest.allMergedRequestsInMoc(mainObjectContext)
+
+					let alert = NSAlert()
+					alert.messageText = "Clear \(mergedRequests.count) merged PRs?"
+					alert.informativeText = "This will clear \(mergedRequests.count) merged PRs from your list.  This action cannot be undone, are you sure?"
+					alert.addButtonWithTitle("No")
+					alert.addButtonWithTitle("Yes")
+					alert.showsSuppressionButton = true
+
+					if alert.runModal()==NSAlertSecondButtonReturn {
+						removeAllMergedRequests()
+						if alert.suppressionButton!.state == NSOnState {
+							Settings.dontAskBeforeWipingMerged = true
+						}
 					}
 				}
-			}
-		} else if headerTitle == PullRequestSection.Closed.name() {
-			if Settings.dontAskBeforeWipingClosed {
-				removeAllClosedRequests()
-			} else {
-				let closedRequests = PullRequest.allClosedRequestsInMoc(mainObjectContext)
-
-				let alert = NSAlert()
-				alert.messageText = "Clear \(closedRequests.count) closed PRs?"
-				alert.informativeText = "This will clear \(closedRequests.count) closed PRs from your list.  This action cannot be undone, are you sure?"
-				alert.addButtonWithTitle("No")
-				alert.addButtonWithTitle("Yes")
-				alert.showsSuppressionButton = true
-
-				if alert.runModal()==NSAlertSecondButtonReturn {
+			} else if headerTitle == PullRequestSection.Closed.prMenuName() {
+				if Settings.dontAskBeforeWipingClosed {
 					removeAllClosedRequests()
-					if alert.suppressionButton!.state == NSOnState {
-						Settings.dontAskBeforeWipingClosed = true
+				} else {
+					let closedRequests = PullRequest.allClosedRequestsInMoc(mainObjectContext)
+
+					let alert = NSAlert()
+					alert.messageText = "Clear \(closedRequests.count) closed PRs?"
+					alert.informativeText = "This will remove \(closedRequests.count) closed PRs from your list.  This action cannot be undone, are you sure?"
+					alert.addButtonWithTitle("No")
+					alert.addButtonWithTitle("Yes")
+					alert.showsSuppressionButton = true
+
+					if alert.runModal()==NSAlertSecondButtonReturn {
+						removeAllClosedRequests()
+						if alert.suppressionButton!.state == NSOnState {
+							Settings.dontAskBeforeWipingClosed = true
+						}
 					}
 				}
 			}
-		}
-		if !prMenu.visible {
-			toggleVisibilityOfMenu(prMenu, fromStatusItem: prStatusItem)
+			if !prMenu.visible {
+				toggleVisibilityOfMenu(prMenu, fromStatusItem: prStatusItem)
+			}
+		} else if inMenu == issuesMenu {
+			if headerTitle == PullRequestSection.Closed.issuesMenuName() {
+				if Settings.dontAskBeforeWipingClosed {
+					removeAllClosedIssues()
+				} else {
+					let closedIssues = Issue.allClosedIssuesInMoc(mainObjectContext)
+
+					let alert = NSAlert()
+					alert.messageText = "Clear \(closedIssues.count) closed issues?"
+					alert.informativeText = "This will remove \(closedIssues.count) closed issues from your list.  This action cannot be undone, are you sure?"
+					alert.addButtonWithTitle("No")
+					alert.addButtonWithTitle("Yes")
+					alert.showsSuppressionButton = true
+
+					if alert.runModal()==NSAlertSecondButtonReturn {
+						removeAllClosedIssues()
+						if alert.suppressionButton!.state == NSOnState {
+							Settings.dontAskBeforeWipingClosed = true
+						}
+					}
+				}
+			}
+			if !issuesMenu.visible {
+				if let i = issuesStatusItem {
+					toggleVisibilityOfMenu(issuesMenu, fromStatusItem: i)
+				}
+			}
 		}
 	}
 
@@ -732,6 +763,14 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		}
 		DataManager.saveDB()
 		updatePrMenu()
+	}
+
+	private func removeAllClosedIssues() {
+		for i in Issue.allClosedIssuesInMoc(mainObjectContext) {
+			mainObjectContext.deleteObject(i)
+		}
+		DataManager.saveDB()
+		updateIssuesMenu()
 	}
 
 	func unPinSelectedFor(item: DataItem) {

@@ -18,12 +18,12 @@ class PullRequestDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource 
 
 		if let firstPr = allPrs.first {
 			var lastSection = firstPr.sectionIndex!.integerValue
-			pullRequestIds.append(PullRequestSection.allTitles[lastSection])
+			pullRequestIds.append(PullRequestSection.prMenuTitles[lastSection])
 
 			for pr in allPrs {
 				let i = pr.sectionIndex!.integerValue
 				if lastSection < i {
-					pullRequestIds.append(PullRequestSection.allTitles[i])
+					pullRequestIds.append(PullRequestSection.prMenuTitles[i])
 					lastSection = i
 				}
 				pullRequestIds.append(pr.objectID)
@@ -38,7 +38,7 @@ class PullRequestDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource 
 			return PullRequestCell(pullRequest: pr)
 		} else {
 			let title = object as String
-			let showButton = (title == PullRequestSection.Merged.name() || title == PullRequestSection.Closed.name())
+			let showButton = (title == PullRequestSection.Merged.prMenuName() || title == PullRequestSection.Closed.prMenuName())
 			return SectionHeader(title: title, showRemoveAllButton: showButton)
 		}
 	}

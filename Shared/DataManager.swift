@@ -188,7 +188,7 @@ class DataManager : NSObject {
 			if blocked {
 				DLog("Blocked notification for user '%@' as their name is on the blacklist",authorName)
 			} else {
-				DLog("user '%@' not on blacklist, can post notification",authorName)
+				DLog("User '%@' not on blacklist, can post notification",authorName)
 				app.postNotificationOfType(PRNotificationType.NewComment, forItem:c)
 			}
 		}

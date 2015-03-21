@@ -14,8 +14,11 @@ class MenuWindow: NSWindow {
 
 		super.awakeFromNib()
 
+		backgroundColor = NSColor.whiteColor()
+
         if newSystem {
             scrollView.automaticallyAdjustsContentInsets = false
+			(contentView as NSView).wantsLayer = true
         }
 
 		let n = NSNotificationCenter.defaultCenter()
@@ -31,46 +34,26 @@ class MenuWindow: NSWindow {
 
 		let vibrancy = MenuWindow.usingVibrancy()
 
-        if newSystem {
-            headerVibrant?.removeFromSuperview()
-            headerVibrant = nil
-			(contentView as NSView).wantsLayer = vibrancy
-        }
-
-		var bgColor: CGColorRef
+		if newSystem {
+			headerVibrant?.removeFromSuperview()
+			headerVibrant = nil
+		}
 
 		if vibrancy {
-			scrollView.frame = contentView.bounds
-			scrollView.contentInsets = NSEdgeInsetsMake(TOP_HEADER_HEIGHT, 0, 0, 0)
-
-			bgColor = NSColor.clearColor().CGColor
+			headerVibrant = NSVisualEffectView(frame: header.bounds)
+			headerVibrant!.autoresizingMask = NSAutoresizingMaskOptions.ViewHeightSizable | NSAutoresizingMaskOptions.ViewWidthSizable
+			headerVibrant!.blendingMode = NSVisualEffectBlendingMode.BehindWindow
+			header.addSubview(headerVibrant!, positioned:NSWindowOrderingMode.Below, relativeTo:nil)
 
 			appearance = NSAppearance(named: (app.prStatusItem.view as StatusItemView).darkMode ? NSAppearanceNameVibrantDark : NSAppearanceNameVibrantLight)
 			table.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.SourceList
-
-			headerVibrant = NSVisualEffectView(frame: header.bounds)
-			headerVibrant!.autoresizingMask = NSAutoresizingMaskOptions.ViewHeightSizable | NSAutoresizingMaskOptions.ViewWidthSizable
-			headerVibrant!.blendingMode = NSVisualEffectBlendingMode.WithinWindow
-			header.addSubview(headerVibrant!, positioned:NSWindowOrderingMode.Below, relativeTo:nil)
 		} else {
-			let windowSize = contentView.bounds.size
-			scrollView.frame = CGRectMake(0, 0, windowSize.width, windowSize.height-TOP_HEADER_HEIGHT)
-
-			bgColor = NSColor.controlBackgroundColor().CGColor
-
 			if newSystem {
 				appearance = NSAppearance(named: NSAppearanceNameAqua)
-                scrollView.contentInsets = NSEdgeInsetsMake(0, 0, 0, 0)
                 table.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.Regular
             } else {
                 table.backgroundColor = NSColor.whiteColor()
             }
-		}
-
-		header.layer?.backgroundColor = bgColor
-
-		if newSystem {
-			scrollView.scrollerInsets = NSEdgeInsetsMake(4.0, 0, 0.0, 0)
 		}
 	}
 

@@ -507,10 +507,6 @@ class PullRequest: DataItem {
 		return issueUrl?.stringByAppendingPathComponent("labels")
 	}
 
-	func sectionName() -> String {
-		return PullRequestSection.allTitles[sectionIndex?.integerValue ?? 0]
-	}
-
 	func postProcess() {
 		var section: Int
 		var currentCondition = condition?.integerValue ?? PullRequestCondition.Open.rawValue

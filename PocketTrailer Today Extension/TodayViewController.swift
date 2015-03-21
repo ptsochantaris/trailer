@@ -1,10 +1,3 @@
-//
-//  TodayViewController.swift
-//  PocketTrailer Today Extension
-//
-//  Created by Paul Tsochantaris on 13/03/2015.
-//
-//
 
 import UIKit
 import Foundation

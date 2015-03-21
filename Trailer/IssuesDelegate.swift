@@ -18,12 +18,12 @@ class IssuesDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 
 		if let firstIssue = allIssues.first {
 			var lastSection = firstIssue.sectionIndex!.integerValue
-			issueIds.append(PullRequestSection.allTitles[lastSection])
+			issueIds.append(PullRequestSection.issueMenuTitles[lastSection])
 
 			for issue in allIssues {
 				let i = issue.sectionIndex!.integerValue
 				if lastSection < i {
-					issueIds.append(PullRequestSection.allTitles[i])
+					issueIds.append(PullRequestSection.issueMenuTitles[i])
 					lastSection = i
 				}
 				issueIds.append(issue.objectID)
@@ -38,7 +38,7 @@ class IssuesDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 			return IssueCell(issue: i)
 		} else {
 			let title = object as String
-			let showButton = (title == PullRequestSection.Merged.name() || title == PullRequestSection.Closed.name())
+			let showButton = (title == PullRequestSection.Closed.issuesMenuName())
 			return SectionHeader(title: title, showRemoveAllButton: showButton)
 		}
 	}
