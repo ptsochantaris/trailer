@@ -307,6 +307,10 @@ class API {
 			r.postProcess()
 		}
 
+		for i in DataItem.itemsOfType("Issue", surviving: true, inMoc: moc) as [Issue] {
+			i.postProcess()
+		}
+
 		var error: NSError?
 		if !moc.save(&error) {
 			DLog("Comitting sync failed: %@", error)
@@ -626,9 +630,9 @@ class API {
 		var completionCount = 0
 		for r in repos {
 
-			for pr in r.issues.allObjects as [Issue] {
-				if (pr.condition?.integerValue ?? 0) == PullRequestCondition.Open.rawValue {
-					pr.postSyncAction = PostSyncAction.Delete.rawValue
+			for i in r.issues.allObjects as [Issue] {
+				if (i.condition?.integerValue ?? 0) == PullRequestCondition.Open.rawValue {
+					i.postSyncAction = PostSyncAction.Delete.rawValue
 				}
 			}
 
@@ -639,7 +643,9 @@ class API {
 				getPagedDataInPath("/repos/\(repoFullName)/issues", fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
 					perPageCallback: { data, lastPage in
 						for info in data ?? [] {
-							Issue.issueWithInfo(info, fromServer:apiServer, inRepo:r)
+							if info.ofk("pull_request") == nil { // don't sync issues which are pull requests, they are already synced
+								Issue.issueWithInfo(info, fromServer:apiServer, inRepo:r)
+							}
 						}
 						return false
 					}, finalCallback: { success, resultCode, etag in

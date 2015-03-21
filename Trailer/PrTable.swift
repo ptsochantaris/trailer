@@ -30,7 +30,8 @@ class PrTable: NSTableView, NSPasteboardItemDataProvider {
 
 		draggingUrl = nil
 
-		if let prView = cellAtEvent(theEvent) as? PullRequestCell {
+		if let prView = cellAtEvent(theEvent) as? TrailerCell {
+
 			draggingUrl = prView.stringForCopy()
 
 			let dragIcon = scaleImage(NSApp.applicationIconImage, toFillSize: CGSizeMake(32, 32))

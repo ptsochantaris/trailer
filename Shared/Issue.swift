@@ -72,19 +72,10 @@ class Issue: DataItem {
 				i.assignedToMe = false
 				i.isNewAssignment = false
 			}
-
-			//api.refreshesSinceLastLabelsCheck[i.objectID] = nil
-			//api.refreshesSinceLastStatusCheck[i.objectID] = nil
 		}
 		i.reopened = ((i.condition?.integerValue ?? 0) == PullRequestCondition.Closed.rawValue)
 		i.condition = PullRequestCondition.Open.rawValue
 		return i
-	}
-
-	override func prepareForDeletion() {
-		//api.refreshesSinceLastLabelsCheck[objectID] = nil
-		//api.refreshesSinceLastStatusCheck[objectID] = nil
-		super.prepareForDeletion()
 	}
 
 	class func requestForIssuesWithFilter(filter: String?, sectionIndex: Int) -> NSFetchRequest {

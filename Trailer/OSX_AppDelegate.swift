@@ -312,7 +312,15 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	@IBAction func showIssuesMenuSelected(sender: NSButton) {
 		Settings.showIssuesMenu = (sender.integerValue==1)
-		updateIssuesMenu()
+		DataManager.postProcessAllItems()
+		if Settings.showIssuesMenu {
+			for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as [Repo] {
+				r.dirty = true
+				r.lastDirtied = NSDate.distantPast() as? NSDate
+			}
+			preferencesDirty = true
+		}
+		deferredUpdate()
 	}
 
 	@IBAction func hidePrsSelected(sender: NSButton) {
@@ -837,6 +845,8 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 				projectsTable.reloadData()
 			} else if obj===prMenu.filter {
 				prFilterTimer.push()
+			} else if obj===issuesMenu.filter {
+				issuesFilterTimer.push()
 			} else if obj===statusTermsField {
 				let existingTokens = Settings.statusFilteringTerms
 				let newTokens = statusTermsField.objectValue as [String]
@@ -1149,14 +1159,14 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	}
 
 	func windowDidBecomeKey(notification: NSNotification) {
-		if notification.object === prMenu {
+		if let window = notification.object as? MenuWindow {
 			if ignoreNextFocusLoss {
 				ignoreNextFocusLoss = false
 			} else {
-				scrollToTop(prMenu)
-				prMenu.table.deselectAll(nil)
+				scrollToTop(window)
+				window.table.deselectAll(nil)
 			}
-			prMenu.filter.becomeFirstResponder()
+			window.filter.becomeFirstResponder()
 		}
 	}
 
@@ -1393,7 +1403,8 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 			if updateStatusItem {
 				DLog("Updating issues status item");
-				let siv = StatusItemView(frame: CGRectMake(0, 0, length, H), label: countString, prefix: "issues", attributes: attributes)
+				let siv = StatusItemView(frame: CGRectMake(0, 0, length+2, H), label: countString, prefix: "issues", attributes: attributes)
+				siv.labelOffset = 2
 				siv.highlighted = issuesMenu.visible
 				siv.grayOut = shouldGray
 				siv.tappedCallback = { [weak self] in
@@ -1418,6 +1429,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		} else {
 			if let i = issuesStatusItem {
 				i.statusBar.removeStatusItem(i)
+				issuesStatusItem = nil
 			}
 		}
 	}
@@ -1616,67 +1628,67 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 				return nil
 			}
 
-			if incomingEvent.window != self!.prMenu {
-				return incomingEvent
-			}
-
-			switch incomingEvent.keyCode {
-			case 125: // down
-				if app.isManuallyScrolling && self!.prMenu.table.selectedRow == -1 {
+			if let w = incomingEvent.window as? MenuWindow {
+				switch incomingEvent.keyCode {
+				case 125: // down
+					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
+					var i = w.table.selectedRow + 1
+					if i < w.table.numberOfRows {
+						while self!.dataItemAtRow(i, inMenu: w) == nil { i++ }
+						self!.scrollToIndex(i, inMenu: w)
+					}
 					return nil
-				}
-				var i = self!.prMenu.table.selectedRow + 1
-				if i < self!.prMenu.table.numberOfRows {
-					while self!.pullRequestDelegate.pullRequestAtRow(i) == nil {
-						i++
+				case 126: // up
+					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
+					var i = w.table.selectedRow - 1
+					if i > 0 {
+						while self!.dataItemAtRow(i, inMenu: w) == nil { i-- }
+						self!.scrollToIndex(i, inMenu: w)
 					}
-					self!.scrollToIndex(i)
-				}
-				return nil
-			case 126: // up
-				if app.isManuallyScrolling && self!.prMenu.table.selectedRow == -1 {
 					return nil
-				}
-				var i = self!.prMenu.table.selectedRow - 1
-				if i > 0 {
-					while self!.pullRequestDelegate.pullRequestAtRow(i) == nil {
-						i--
+				case 36: // enter
+					let i = w.table.selectedRow
+					if i >= 0 {
+						if let v = w.table.rowViewAtRow(i, makeIfNecessary: false) as? PullRequestCell {
+							let isAlternative = ((incomingEvent.modifierFlags & NSEventModifierFlags.AlternateKeyMask) == NSEventModifierFlags.AlternateKeyMask)
+							self!.dataItemSelected(v.associatedDataItem(), alternativeSelect: isAlternative)
+						}
 					}
-					self!.scrollToIndex(i)
-				}
-				return nil
-			case 36: // enter
-				let i = self!.prMenu.table.selectedRow
-				if i >= 0 {
-					if let v = self!.prMenu.table.rowViewAtRow(i, makeIfNecessary: false) as? PullRequestCell {
-						let isAlternative = ((incomingEvent.modifierFlags & NSEventModifierFlags.AlternateKeyMask) == NSEventModifierFlags.AlternateKeyMask)
-						self!.dataItemSelected(v.associatedDataItem(), alternativeSelect: isAlternative)
+					return nil
+				case 53: // escape
+					if w == self!.prMenu {
+						self!.closeMenu(w, statusItem: self!.prStatusItem)
 					}
-				}
-				return nil
-			case 53: // escape
-				if self!.prMenu.visible {
-					self!.closeMenu(self!.prMenu, statusItem: self!.prStatusItem)
-				}
-				if self!.issuesMenu.visible {
-					if let isi = self!.issuesStatusItem {
-						self!.closeMenu(self!.issuesMenu, statusItem: isi)
+					if w == self!.issuesMenu {
+						if let isi = self!.issuesStatusItem {
+							self!.closeMenu(w, statusItem: isi)
+						}
 					}
+					return nil
+				default:
+					break
 				}
-				return nil
-			default:
-				break
 			}
 			return incomingEvent
 		})
 	}
 
-	private func scrollToIndex(i: Int) {
+	private func dataItemAtRow(row: Int, inMenu: MenuWindow) -> DataItem? {
+		if inMenu == prMenu {
+			return pullRequestDelegate.pullRequestAtRow(row)
+		} else if inMenu == issuesMenu {
+			return issuesDelegate.issueAtRow(row)
+		} else {
+			return nil
+		}
+	}
+
+	private func scrollToIndex(i: Int, inMenu: MenuWindow) {
 		app.isManuallyScrolling = true
 		mouseIgnoreTimer.push()
-		prMenu.table.scrollRowToVisible(i)
+		inMenu.table.scrollRowToVisible(i)
 		dispatch_async(dispatch_get_main_queue(), { [weak self] in
-			self!.prMenu.table.selectRowIndexes(NSIndexSet(index: i), byExtendingSelection: false)
+			inMenu.table.selectRowIndexes(NSIndexSet(index: i), byExtendingSelection: false)
 			return
 		})
 	}

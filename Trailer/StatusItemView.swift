@@ -5,6 +5,7 @@ class StatusItemView: NSView {
 	let textAttributes: Dictionary<String, AnyObject>
     var tappedCallback: (() -> Void)?
 	let imagePrefix: String
+	var labelOffset: CGFloat = 0
 
 	init(frame: NSRect, label: String, prefix: String, attributes: Dictionary<String, AnyObject>) {
 		imagePrefix = prefix
@@ -72,7 +73,7 @@ class StatusItemView: NSView {
 		darkMode = StatusItemView.checkDarkMode()
 
 		let imagePoint = NSMakePoint(STATUSITEM_PADDING, 0)
-		let labelRect = CGRectMake(bounds.size.height, -5, bounds.size.width, bounds.size.height)
+		let labelRect = CGRectMake(bounds.size.height + labelOffset, -5, bounds.size.width, bounds.size.height)
 		var displayAttributes = textAttributes
 		var icon: NSImage
 
