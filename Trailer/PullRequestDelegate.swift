@@ -11,7 +11,7 @@ class PullRequestDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource 
 
 	func reloadData(filter: String?) {
 
-		pullRequestIds = [NSObject]()
+		pullRequestIds.removeAll(keepCapacity: false)
 
 		let f = PullRequest.requestForPullRequestsWithFilter(filter)
 		let allPrs = mainObjectContext.executeFetchRequest(f, error: nil) as [PullRequest]

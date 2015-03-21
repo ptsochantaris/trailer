@@ -159,9 +159,9 @@ class Settings: NSObject {
 
     ///////////////////////////
 
-	class var checkForUpdatesAutomatically: Bool {
-		get { return get("UPDATE_CHECK_AUTO_KEY") as? Bool ?? true }
-		set { set("UPDATE_CHECK_AUTO_KEY", newValue) }
+	class var showIssuesMenu: Bool {
+		get { return get("SHOW_ISSUES_MENU") as? Bool ?? false }
+		set { set("SHOW_ISSUES_MENU", newValue) }
 	}
 
 	class var shouldHideUncommentedRequests: Bool {
@@ -300,6 +300,11 @@ class Settings: NSObject {
 	}
 
 	//////////////////////////////
+
+	class var checkForUpdatesAutomatically: Bool {
+		get { return get("UPDATE_CHECK_AUTO_KEY") as? Bool ?? true }
+		set { set("UPDATE_CHECK_AUTO_KEY", newValue) }
+	}
 
 	class var showReposInName: Bool {
 		get { return get("SHOW_REPOS_IN_NAME") as? Bool ?? true }

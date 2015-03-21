@@ -5,7 +5,7 @@ class MenuWindow: NSWindow {
 
 	@IBOutlet weak var scrollView: NSScrollView!
 	@IBOutlet weak var header: ViewAllowsVibrancy!
-	@IBOutlet weak var prTable: NSTableView!
+	@IBOutlet weak var table: NSTableView!
 	@IBOutlet weak var filter: NSSearchField!
 
 	private var headerVibrant: NSVisualEffectView?
@@ -45,8 +45,8 @@ class MenuWindow: NSWindow {
 
 			bgColor = NSColor.clearColor().CGColor
 
-			appearance = NSAppearance(named: (app.statusItem.view as StatusItemView).darkMode ? NSAppearanceNameVibrantDark : NSAppearanceNameVibrantLight)
-			prTable.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.SourceList
+			appearance = NSAppearance(named: (app.prStatusItem.view as StatusItemView).darkMode ? NSAppearanceNameVibrantDark : NSAppearanceNameVibrantLight)
+			table.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.SourceList
 
 			headerVibrant = NSVisualEffectView(frame: header.bounds)
 			headerVibrant!.autoresizingMask = NSAutoresizingMaskOptions.ViewHeightSizable | NSAutoresizingMaskOptions.ViewWidthSizable
@@ -61,9 +61,9 @@ class MenuWindow: NSWindow {
 			if newSystem {
 				appearance = NSAppearance(named: NSAppearanceNameAqua)
                 scrollView.contentInsets = NSEdgeInsetsMake(0, 0, 0, 0)
-                prTable.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.Regular
+                table.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.Regular
             } else {
-                prTable.backgroundColor = NSColor.whiteColor()
+                table.backgroundColor = NSColor.whiteColor()
             }
 		}
 

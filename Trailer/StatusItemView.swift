@@ -4,8 +4,10 @@ class StatusItemView: NSView {
 	let statusLabel: String
 	let textAttributes: Dictionary<String, AnyObject>
     var tappedCallback: (() -> Void)?
+	let imagePrefix: String
 
-	init(frame: NSRect, label: String, attributes: Dictionary<String, AnyObject>) {
+	init(frame: NSRect, label: String, prefix: String, attributes: Dictionary<String, AnyObject>) {
+		imagePrefix = prefix
 		statusLabel = label
 		textAttributes = attributes
 		highlighted = false
@@ -61,7 +63,11 @@ class StatusItemView: NSView {
 
 	override func drawRect(dirtyRect: NSRect) {
 
-		app.statusItem.drawStatusBarBackgroundInRect(dirtyRect, withHighlight: highlighted)
+		if(app.prStatusItem.view==self) {
+			app.prStatusItem.drawStatusBarBackgroundInRect(dirtyRect, withHighlight: highlighted)
+		} else {
+			app.issuesStatusItem!.drawStatusBarBackgroundInRect(dirtyRect, withHighlight: highlighted)
+		}
 
 		darkMode = StatusItemView.checkDarkMode()
 
@@ -71,16 +77,16 @@ class StatusItemView: NSView {
 		var icon: NSImage
 
 		if highlighted {
-			icon = NSImage(named: "menuIconBright")!
+			icon = NSImage(named: "\(imagePrefix)IconBright")!
 			displayAttributes[NSForegroundColorAttributeName] = NSColor.selectedMenuItemTextColor()
 		} else {
 			if darkMode {
-				icon = NSImage(named: "menuIconBright")!
+				icon = NSImage(named: "\(imagePrefix)IconBright")!
 				if displayAttributes[NSForegroundColorAttributeName] as NSColor == NSColor.controlTextColor() {
 					displayAttributes[NSForegroundColorAttributeName] = NSColor.selectedMenuItemTextColor()
 				}
 			} else {
-				icon = NSImage(named: "menuIcon")!
+				icon = NSImage(named: "\(imagePrefix)Icon")!
 			}
 		}
 

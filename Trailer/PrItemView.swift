@@ -12,7 +12,7 @@ class PrItemView: NSTableCellView {
 		detailFont = NSFont.menuFontOfSize(10.0)
 		titleFont = NSFont.menuFontOfSize(13.0)
 
-		let v = app.statusItem.view as StatusItemView
+		let v = app.prStatusItem.view as StatusItemView
 		let goneDark = MenuWindow.usingVibrancy() && v.darkMode
 		unselectedTitleColor = goneDark ? NSColor.controlHighlightColor() : NSColor.controlTextColor()
 
@@ -160,10 +160,10 @@ class PrItemView: NSTableCellView {
 		didSet {
 			var finalColor: NSColor = unselectedTitleColor
 			if selected {
-				app.mainMenu.prTable.selectRowIndexes(NSIndexSet(index: app.mainMenu.prTable.rowForView(self)), byExtendingSelection: false)
-				if (app.statusItem.view as StatusItemView).darkMode { finalColor = NSColor.darkGrayColor() }
+				app.prMenu.table.selectRowIndexes(NSIndexSet(index: app.prMenu.table.rowForView(self)), byExtendingSelection: false)
+				if (app.prStatusItem.view as StatusItemView).darkMode { finalColor = NSColor.darkGrayColor() }
 			} else {
-				app.mainMenu.prTable.deselectRow(app.mainMenu.prTable.rowForView(self))
+				app.prMenu.table.deselectRow(app.prMenu.table.rowForView(self))
 			}
 			title.attributedStringValue = associatedPullRequest().titleWithFont(titleFont, labelFont: detailFont, titleColor: finalColor)
 			highlight(selected)
@@ -274,7 +274,7 @@ class PrItemView: NSTableCellView {
 	private func highlight(on: Bool) -> Void {
 		if let c = countBackground {
 			var color: NSColor
-			if MenuWindow.usingVibrancy() && (app.statusItem.view as StatusItemView).darkMode {
+			if MenuWindow.usingVibrancy() && (app.prStatusItem.view as StatusItemView).darkMode {
 				color = on ? NSColor.blackColor() : MAKECOLOR(0.94, 0.94, 0.94, 1.0)
 				c.borderColor = color
 				newBackground?.backgroundColor = MAKECOLOR(1.0, 0.1, 0.1, 1.0)

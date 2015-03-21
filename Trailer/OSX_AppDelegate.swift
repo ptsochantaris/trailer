@@ -63,6 +63,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	@IBOutlet weak var includeLabelsInFiltering: NSButton!
 	@IBOutlet weak var includeStatusesInFiltering: NSButton!
     @IBOutlet weak var grayOutWhenRefreshing: NSButton!
+	@IBOutlet weak var showIssuesMenu: NSButton!
 
 	// Preferences - Labels
 	@IBOutlet weak var labelRescanLabel: NSTextField!
@@ -93,10 +94,12 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	// About window
 	@IBOutlet weak var aboutVersion: NSTextField!
-	
+
 	// Menu
-	var statusItem: NSStatusItem!
-	@IBOutlet weak var mainMenu: MenuWindow!
+	var prStatusItem: NSStatusItem!
+	var issuesStatusItem: NSStatusItem?
+	@IBOutlet weak var prMenu: MenuWindow!
+	@IBOutlet weak var issuesMenu: MenuWindow!
 
 	// Globals
 	weak var refreshTimer: NSTimer?
@@ -107,41 +110,55 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	var ignoreNextFocusLoss: Bool = false
 	var scrollBarWidth: CGFloat = 0.0
 	var pullRequestDelegate = PullRequestDelegate()
+	var issuesDelegate = IssuesDelegate()
 	var opening: Bool  = false
 
 	private var globalKeyMonitor: AnyObject?
 	private var localKeyMonitor: AnyObject?
-	private var messageView: NSView?
+	private var prMessageView: NSView?
+	private var issuesMessageView: NSView?
 	private var mouseIgnoreTimer: PopTimer!
-	private var filterTimer: PopTimer!
+	private var prFilterTimer: PopTimer!
+	private var issuesFilterTimer: PopTimer!
 	private var deferredUpdateTimer: PopTimer!
 
 	func applicationDidFinishLaunching(notification: NSNotification) {
 		app = self
 
-		mainMenu.backgroundColor = NSColor.whiteColor()
+		prMenu.backgroundColor = NSColor.whiteColor()
 		setupSortMethodMenu()
 		DataManager.postProcessAllPrs()
 
-		filterTimer = PopTimer(timeInterval: 0.2, callback: {
-			app.updateMenu()
-			app.scrollToTop()
+		prFilterTimer = PopTimer(timeInterval: 0.2, callback: {
+			app.updatePrMenu()
+			app.scrollToTop(app.prMenu)
+		})
+
+		issuesFilterTimer = PopTimer(timeInterval: 0.2, callback: {
+			app.updateIssuesMenu()
+			app.scrollToTop(app.issuesMenu)
 		})
 
 		deferredUpdateTimer = PopTimer(timeInterval: 0.5, callback: {
-			app.updateMenu()
+			app.updatePrMenu()
+			app.updateIssuesMenu()
 		})
 
 		mouseIgnoreTimer = PopTimer(timeInterval: 0.4, callback: {
 			app.isManuallyScrolling = false
 		})
 
-		mainMenu.prTable.setDataSource(pullRequestDelegate)
-		mainMenu.prTable.setDelegate(pullRequestDelegate)
+		prMenu.table.setDataSource(pullRequestDelegate)
+		prMenu.table.setDelegate(pullRequestDelegate)
+
+		issuesMenu.table.setDataSource(issuesDelegate)
+		issuesMenu.table.setDelegate(issuesDelegate)
 
 		updateScrollBarWidth() // also updates menu
-		scrollToTop()
-		mainMenu.updateVibrancy()
+		scrollToTop(prMenu)
+		scrollToTop(issuesMenu)
+		prMenu.updateVibrancy()
+		issuesMenu.updateVibrancy()
 		startRateLimitHandling()
 
 		NSUserNotificationCenter.defaultUserNotificationCenter().delegate = self
@@ -158,7 +175,8 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		}
 
 		NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("updateScrollBarWidth"), name: NSPreferredScrollerStyleDidChangeNotification, object: nil)
-		NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("updateMenu"), name: DARK_MODE_CHANGED, object: nil)
+		NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("updatePrMenu"), name: DARK_MODE_CHANGED, object: nil)
+		NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("updateIssuesMenu"), name: DARK_MODE_CHANGED, object: nil)
 
 		addHotKeySupport()
 
@@ -290,6 +308,11 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		Settings.hideAvatars = (sender.integerValue==1)
 		DataManager.postProcessAllPrs()
 		deferredUpdate()
+	}
+
+	@IBAction func showIssuesMenuSelected(sender: NSButton) {
+		Settings.showIssuesMenu = (sender.integerValue==1)
+		updateIssuesMenu()
 	}
 
 	@IBAction func hidePrsSelected(sender: NSButton) {
@@ -463,7 +486,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 			if let up = urlToOpen {
 				if let u = NSURL(string: up) {
 					NSWorkspace.sharedWorkspace().openURL(u)
-					updateMenu()
+					updatePrMenu()
 				}
 			}
 		default: break
@@ -530,7 +553,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	}
 
 	func prItemSelected(pullRequest: PullRequest, alternativeSelect: Bool) {
-		mainMenu.filter.becomeFirstResponder()
+		prMenu.filter.becomeFirstResponder()
 		ignoreNextFocusLoss = alternativeSelect
 
 		if let url = pullRequest.urlForOpening() {
@@ -538,22 +561,22 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		}
 		pullRequest.catchUpWithComments()
 
-		let reSelectIndex = alternativeSelect ? mainMenu.prTable.selectedRow : -1
+		let reSelectIndex = alternativeSelect ? prMenu.table.selectedRow : -1
 
-		updateMenu()
+		updatePrMenu()
 
-		if reSelectIndex > -1 && reSelectIndex < mainMenu.prTable.numberOfRows {
-			mainMenu.prTable.selectRowIndexes(NSIndexSet(index: reSelectIndex), byExtendingSelection: false)
+		if reSelectIndex > -1 && reSelectIndex < prMenu.table.numberOfRows {
+			prMenu.table.selectRowIndexes(NSIndexSet(index: reSelectIndex), byExtendingSelection: false)
 		}
 	}
 
-	func statusItemTapped() {
-		let v = statusItem.view as StatusItemView
+	func toggleVisibilityOfMenu(menu: MenuWindow, fromStatusItem: NSStatusItem) {
+		let v = fromStatusItem.view as StatusItemView
 		if v.highlighted {
-			closeMenu()
+			closeMenu(menu, statusItem: fromStatusItem)
 		} else {
 			v.highlighted = true
-			sizeMenuAndShow(true)
+			sizeMenu(menu, fromStatusItem: fromStatusItem, andShow: true)
 		}
 	}
 
@@ -565,10 +588,10 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		}
 	}
 
-	private func sizeMenuAndShow(show: Bool) {
+	private func sizeMenu(window: MenuWindow, fromStatusItem: NSStatusItem, andShow: Bool) {
 		let screen = NSScreen.mainScreen()!
 		let rightSide = screen.visibleFrame.origin.x + screen.visibleFrame.size.width
-		let siv = statusItem.view as StatusItemView
+		let siv = fromStatusItem.view as StatusItemView
 		var menuLeft = siv.window!.frame.origin.x
 		let overflow = (menuLeft+MENU_WIDTH)-rightSide
 		if overflow>0 {
@@ -576,14 +599,14 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		}
 
 		var menuHeight = TOP_HEADER_HEIGHT
-		let rowCount = mainMenu.prTable.numberOfRows
+		let rowCount = window.table.numberOfRows
 		let screenHeight = screen.visibleFrame.size.height
 		if rowCount==0 {
 			menuHeight += 95
 		} else {
 			menuHeight += 10
 			for f in 0..<rowCount {
-				let rowView = mainMenu.prTable.viewAtColumn(0, row: f, makeIfNecessary: true) as NSView
+				let rowView = window.table.viewAtColumn(0, row: f, makeIfNecessary: true) as NSView
 				menuHeight += rowView.frame.size.height + 2
 				if menuHeight >= screenHeight {
 					break
@@ -598,27 +621,27 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 			menuHeight = screenHeight
 		}
 
-		mainMenu.setFrame(CGRectMake(menuLeft, bottom, MENU_WIDTH, menuHeight), display: false, animate: false)
+		window.setFrame(CGRectMake(menuLeft, bottom, MENU_WIDTH, menuHeight), display: false, animate: false)
 
-		if show {
-			mainMenu.prTable.deselectAll(nil)
-			displayMenu()
+		if andShow {
+			window.table.deselectAll(nil)
+			displayMenu(window)
 		}
 	}
 
-	private func displayMenu() {
+	private func displayMenu(menu: MenuWindow) {
 		opening = true
-		mainMenu.level = Int(CGWindowLevelForKey(CGWindowLevelKey(kCGFloatingWindowLevelKey)))
-		mainMenu.makeKeyAndOrderFront(self)
+		menu.level = Int(CGWindowLevelForKey(CGWindowLevelKey(kCGFloatingWindowLevelKey)))
+		menu.makeKeyAndOrderFront(self)
 		NSApp.activateIgnoringOtherApps(true)
 		opening = false
 	}
 
-	private func closeMenu() {
+	private func closeMenu(menu: MenuWindow, statusItem: NSStatusItem) {
 		let siv = statusItem.view as StatusItemView
 		siv.highlighted = false
-		mainMenu.orderOut(nil)
-		mainMenu.prTable.deselectAll(nil)
+		menu.orderOut(nil)
+		menu.table.deselectAll(nil)
 	}
 
 	func sectionHeaderRemoveSelected(headerTitle: NSString) {
@@ -663,8 +686,8 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 				}
 			}
 		}
-		if !mainMenu.visible {
-			statusItemTapped()
+		if !prMenu.visible {
+			toggleVisibilityOfMenu(prMenu, fromStatusItem: prStatusItem)
 		}
 	}
 
@@ -673,7 +696,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 			mainObjectContext.deleteObject(r)
 		}
 		DataManager.saveDB()
-		updateMenu()
+		updatePrMenu()
 	}
 
 	private func removeAllClosedRequests() {
@@ -681,13 +704,13 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 			mainObjectContext.deleteObject(r)
 		}
 		DataManager.saveDB()
-		updateMenu()
+		updatePrMenu()
 	}
 
 	func unPinSelectedFor(pullRequest: PullRequest) {
 		mainObjectContext.deleteObject(pullRequest)
 		DataManager.saveDB()
-		updateMenu()
+		updatePrMenu()
 	}
 
 	private func startRateLimitHandling() {
@@ -789,8 +812,8 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 				}
 			} else if obj===repoFilter {
 				projectsTable.reloadData()
-			} else if obj===mainMenu.filter {
-				filterTimer.push()
+			} else if obj===prMenu.filter {
+				prFilterTimer.push()
 			} else if obj===statusTermsField {
 				let existingTokens = Settings.statusFilteringTerms
 				let newTokens = statusTermsField.objectValue as [String]
@@ -820,11 +843,11 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	}
 
 	@IBAction func markAllReadSelected(sender: NSMenuItem) {
-		let f = PullRequest.requestForPullRequestsWithFilter(mainMenu.filter.stringValue)
+		let f = PullRequest.requestForPullRequestsWithFilter(prMenu.filter.stringValue)
 		for r in mainObjectContext.executeFetchRequest(f, error: nil) as [PullRequest] {
 			r.catchUpWithComments()
 		}
-		updateMenu()
+		updatePrMenu()
 	}
 
 	@IBAction func preferencesSelected(sender: NSMenuItem?) {
@@ -1070,8 +1093,8 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	func numberOfRowsInTableView(tableView: NSTableView) -> Int {
 		if tableView === projectsTable {
 			return Repo.reposForFilter(repoFilter.stringValue).count + 2
-		} else if tableView === mainMenu.prTable {
-			let f = PullRequest.requestForPullRequestsWithFilter(mainMenu.filter.stringValue)
+		} else if tableView === prMenu.table {
+			let f = PullRequest.requestForPullRequestsWithFilter(prMenu.filter.stringValue)
 			return mainObjectContext.countForFetchRequest(f, error: nil)
 		} else {
 			return ApiServer.countApiServersInMoc(mainObjectContext)
@@ -1096,30 +1119,37 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		return NSApplicationTerminateReply.TerminateNow
 	}
 
-	private func scrollToTop() {
-		mainMenu.prTable.scrollToBeginningOfDocument(nil)
+	private func scrollToTop(menu: MenuWindow?) {
+		if let m = menu {
+			m.table.scrollToBeginningOfDocument(nil)
+		}
 	}
 
 	func windowDidBecomeKey(notification: NSNotification) {
-		if notification.object === mainMenu {
+		if notification.object === prMenu {
 			if ignoreNextFocusLoss {
 				ignoreNextFocusLoss = false
 			} else {
-				scrollToTop()
-				mainMenu.prTable.deselectAll(nil)
+				scrollToTop(prMenu)
+				prMenu.table.deselectAll(nil)
 			}
-			mainMenu.filter.becomeFirstResponder()
+			prMenu.filter.becomeFirstResponder()
 		}
 	}
 
 	func windowDidResignKey(notification: NSNotification) {
 		if ignoreNextFocusLoss {
-			displayMenu()
+			displayMenu(prMenu)
 			return
 		}
 		if !opening {
-			if notification.object === mainMenu {
-				closeMenu()
+			if notification.object === prMenu {
+				closeMenu(prMenu, statusItem: prStatusItem)
+			}
+			if notification.object === issuesMenu {
+				if let i = issuesStatusItem {
+					closeMenu(issuesMenu, statusItem: i)
+				}
 			}
 		}
 	}
@@ -1223,15 +1253,20 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		refreshButton.enabled = false
 		projectsTable.enabled = false
 		activityDisplay.startAnimation(nil)
-		(statusItem.view as StatusItemView).grayOut = Settings.grayOutWhenRefreshing
+		(prStatusItem.view as StatusItemView).grayOut = Settings.grayOutWhenRefreshing
+		(issuesStatusItem?.view as? StatusItemView)?.grayOut = Settings.grayOutWhenRefreshing
 
 		api.expireOldImageCacheEntries()
 		DataManager.postMigrationTasks()
 
 		isRefreshing = true
 
-		if messageView != nil {
-			updateMenu()
+		if prMessageView != nil {
+			updatePrMenu()
+		}
+
+		if issuesMessageView != nil {
+			updateIssuesMenu()
 		}
 
 		refreshNow.title = " Refreshing..."
@@ -1246,7 +1281,8 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		activityDisplay.stopAnimation(nil)
 		DataManager.saveDB()
 		projectsTable.reloadData()
-		updateMenu()
+		updatePrMenu()
+		updateIssuesMenu()
 		checkApiUsage()
 		DataManager.saveDB()
 		DataManager.sendNotifications()
@@ -1293,7 +1329,77 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		}
 	}
 
-	func updateMenu() {
+	func updateIssuesMenu() {
+		if Settings.showIssuesMenu {
+
+			var countString: String
+			var attributes: Dictionary<String, AnyObject>
+			if ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext) {
+				countString = "X"
+				attributes = [ NSFontAttributeName: NSFont.boldSystemFontOfSize(10),
+					NSForegroundColorAttributeName: MAKECOLOR(0.8, 0.0, 0.0, 1.0) ]
+			} else {
+				let f = Issue.requestForIssuesWithFilter(issuesMenu.filter.stringValue)
+				countString = String(mainObjectContext.countForFetchRequest(f, error: nil))
+
+				if Issue.badgeCountInMoc(mainObjectContext) > 0 {
+					attributes = [ NSFontAttributeName: NSFont.menuBarFontOfSize(10),
+						NSForegroundColorAttributeName: MAKECOLOR(0.8, 0.0, 0.0, 1.0) ]
+				} else {
+					attributes = [ NSFontAttributeName: NSFont.menuBarFontOfSize(10),
+						NSForegroundColorAttributeName: NSColor.controlTextColor() ]
+				}
+			}
+
+			DLog("Updating Issues menu, \(countString) total items")
+
+			let width = countString.sizeWithAttributes(attributes).width
+
+			let statusBar = NSStatusBar.systemStatusBar()
+			let H = statusBar.thickness
+			let length = H + width + STATUSITEM_PADDING*3
+			var updateStatusItem = true
+			let shouldGray = Settings.grayOutWhenRefreshing && isRefreshing
+			if let s = issuesStatusItem?.view as? StatusItemView {
+				if compareDict(s.textAttributes, to: attributes) && s.statusLabel == countString && s.grayOut == shouldGray {
+					updateStatusItem = false
+				}
+			} else {
+				issuesStatusItem = statusBar.statusItemWithLength(-1) // should be NSVariableStatusItemLength but Swift can't compile this yet
+			}
+
+			if updateStatusItem {
+				DLog("Updating issues status item");
+				let siv = StatusItemView(frame: CGRectMake(0, 0, length, H), label: countString, prefix: "issues", attributes: attributes)
+				siv.highlighted = issuesMenu.visible
+				siv.grayOut = shouldGray
+				siv.tappedCallback = { [weak self] in
+					self!.closeMenu(self!.prMenu, statusItem: self!.prStatusItem)
+					self!.toggleVisibilityOfMenu(self!.issuesMenu, fromStatusItem: self!.issuesStatusItem!)
+					return
+				}
+				issuesStatusItem!.view = siv
+			}
+
+			issuesDelegate.reloadData(issuesMenu.filter.stringValue)
+			issuesMenu.table.reloadData()
+
+			issuesMessageView?.removeFromSuperview()
+
+			if issuesMenu.table.numberOfRows == 0 {
+				issuesMessageView = MessageView(frame: CGRectMake(0, 0, MENU_WIDTH, 100), message: DataManager.reasonForEmptyIssuesWithFilter(issuesMenu.filter.stringValue))
+				issuesMenu.contentView.addSubview(issuesMessageView!)
+			}
+
+			sizeMenu(issuesMenu, fromStatusItem: issuesStatusItem!, andShow: false)
+		} else {
+			if let i = issuesStatusItem {
+				i.statusBar.removeStatusItem(i)
+			}
+		}
+	}
+
+	func updatePrMenu() {
 		var countString: String
 		var attributes: Dictionary<String, AnyObject>
 		if ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext) {
@@ -1302,7 +1408,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 				NSForegroundColorAttributeName: MAKECOLOR(0.8, 0.0, 0.0, 1.0) ]
 		} else {
 			if Settings.countOnlyListedPrs {
-				let f = PullRequest.requestForPullRequestsWithFilter(mainMenu.filter.stringValue)
+				let f = PullRequest.requestForPullRequestsWithFilter(prMenu.filter.stringValue)
 				countString = String(mainObjectContext.countForFetchRequest(f, error: nil))
 			} else {
 				countString = String(PullRequest.countOpenRequestsInMoc(mainObjectContext))
@@ -1317,7 +1423,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 			}
 		}
 
-		DLog("Updating menu, \(countString) total PRs")
+		DLog("Updating PR menu, \(countString) total items")
 
 		let width = countString.sizeWithAttributes(attributes).width
 
@@ -1326,37 +1432,38 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		let length = H + width + STATUSITEM_PADDING*3
         var updateStatusItem = true
         let shouldGray = Settings.grayOutWhenRefreshing && isRefreshing
-		if let s = statusItem?.view as? StatusItemView {
+		if let s = prStatusItem?.view as? StatusItemView {
             if compareDict(s.textAttributes, to: attributes) && s.statusLabel == countString && s.grayOut == shouldGray {
                 updateStatusItem = false
             }
         } else {
-            statusItem = statusBar.statusItemWithLength(-1) // should be NSVariableStatusItemLength but Swift can't compile this yet
+            prStatusItem = statusBar.statusItemWithLength(-1) // should be NSVariableStatusItemLength but Swift can't compile this yet
         }
 
         if updateStatusItem {
-            DLog("Updating status item");
-            let siv = StatusItemView(frame: CGRectMake(0, 0, length, H), label: countString, attributes: attributes)
-            siv.highlighted = mainMenu.visible
+            DLog("Updating PR status item");
+			let siv = StatusItemView(frame: CGRectMake(0, 0, length, H), label: countString, prefix: "pr", attributes: attributes)
+            siv.highlighted = prMenu.visible
             siv.grayOut = shouldGray
             siv.tappedCallback = { [weak self] in
-                self!.statusItemTapped()
+				self!.closeMenu(self!.issuesMenu, statusItem: self!.issuesStatusItem!)
+				self!.toggleVisibilityOfMenu(self!.prMenu, fromStatusItem: self!.prStatusItem)
                 return
             }
-            statusItem.view = siv
+            prStatusItem.view = siv
         }
 
-		pullRequestDelegate.reloadData(mainMenu.filter.stringValue)
-		mainMenu.prTable.reloadData()
+		pullRequestDelegate.reloadData(prMenu.filter.stringValue)
+		prMenu.table.reloadData()
 
-		messageView?.removeFromSuperview()
+		prMessageView?.removeFromSuperview()
 
-		if mainMenu.prTable.numberOfRows == 0 {
-			messageView = MessageView(frame: CGRectMake(0, 0, MENU_WIDTH, 100), message: DataManager.reasonForEmptyWithFilter(mainMenu.filter.stringValue))
-			mainMenu.contentView.addSubview(messageView!)
+		if prMenu.table.numberOfRows == 0 {
+			prMessageView = MessageView(frame: CGRectMake(0, 0, MENU_WIDTH, 100), message: DataManager.reasonForEmptyWithFilter(prMenu.filter.stringValue))
+			prMenu.contentView.addSubview(prMessageView!)
 		}
 
-		sizeMenuAndShow(false)
+		sizeMenu(prMenu, fromStatusItem: prStatusItem, andShow: false)
 	}
 
     private func compareDict(from: Dictionary<String, AnyObject>, to: Dictionary<String, AnyObject>) -> Bool {
@@ -1486,17 +1593,17 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 				return nil
 			}
 
-			if incomingEvent.window != self!.mainMenu {
+			if incomingEvent.window != self!.prMenu {
 				return incomingEvent
 			}
 
 			switch incomingEvent.keyCode {
 			case 125: // down
-				if app.isManuallyScrolling && self!.mainMenu.prTable.selectedRow == -1 {
+				if app.isManuallyScrolling && self!.prMenu.table.selectedRow == -1 {
 					return nil
 				}
-				var i = self!.mainMenu.prTable.selectedRow + 1
-				if i < self!.mainMenu.prTable.numberOfRows {
+				var i = self!.prMenu.table.selectedRow + 1
+				if i < self!.prMenu.table.numberOfRows {
 					while self!.pullRequestDelegate.pullRequestAtRow(i) == nil {
 						i++
 					}
@@ -1504,10 +1611,10 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 				}
 				return nil
 			case 126: // up
-				if app.isManuallyScrolling && self!.mainMenu.prTable.selectedRow == -1 {
+				if app.isManuallyScrolling && self!.prMenu.table.selectedRow == -1 {
 					return nil
 				}
-				var i = self!.mainMenu.prTable.selectedRow - 1
+				var i = self!.prMenu.table.selectedRow - 1
 				if i > 0 {
 					while self!.pullRequestDelegate.pullRequestAtRow(i) == nil {
 						i--
@@ -1516,16 +1623,23 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 				}
 				return nil
 			case 36: // enter
-				let i = self!.mainMenu.prTable.selectedRow
+				let i = self!.prMenu.table.selectedRow
 				if i >= 0 {
-					if let v = self!.mainMenu.prTable.rowViewAtRow(i, makeIfNecessary: false) as? PrItemView {
+					if let v = self!.prMenu.table.rowViewAtRow(i, makeIfNecessary: false) as? PrItemView {
 						let isAlternative = ((incomingEvent.modifierFlags & NSEventModifierFlags.AlternateKeyMask) == NSEventModifierFlags.AlternateKeyMask)
 						self!.prItemSelected(v.associatedPullRequest(), alternativeSelect: isAlternative)
 					}
 				}
 				return nil
 			case 53: // escape
-				self!.closeMenu()
+				if self!.prMenu.visible {
+					self!.closeMenu(self!.prMenu, statusItem: self!.prStatusItem)
+				}
+				if self!.issuesMenu.visible {
+					if let isi = self!.issuesStatusItem {
+						self!.closeMenu(self!.issuesMenu, statusItem: isi)
+					}
+				}
 				return nil
 			default:
 				break
@@ -1537,26 +1651,41 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	private func scrollToIndex(i: Int) {
 		app.isManuallyScrolling = true
 		mouseIgnoreTimer.push()
-		mainMenu.prTable.scrollRowToVisible(i)
+		prMenu.table.scrollRowToVisible(i)
 		dispatch_async(dispatch_get_main_queue(), { [weak self] in
-			self!.mainMenu.prTable.selectRowIndexes(NSIndexSet(index: i), byExtendingSelection: false)
+			self!.prMenu.table.selectRowIndexes(NSIndexSet(index: i), byExtendingSelection: false)
 			return
 		})
 	}
 
 	func focusedItemUrl() -> String? {
-		let row = mainMenu.prTable.selectedRow
-		var pr: PullRequest?
-		if row >= 0 {
-			mainMenu.prTable.deselectAll(nil)
-			pr = pullRequestDelegate.pullRequestAtRow(row)
+		if prMenu.visible {
+			let row = prMenu.table.selectedRow
+			var pr: PullRequest?
+			if row >= 0 {
+				prMenu.table.deselectAll(nil)
+				pr = pullRequestDelegate.pullRequestAtRow(row)
+			}
+			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
+				self.prMenu.table.selectRowIndexes(NSIndexSet(index: row), byExtendingSelection: false)
+			}
+			return pr?.webUrl
+		} else if issuesMenu.visible {
+			let row = issuesMenu.table.selectedRow
+			var i: Issue?
+			if row >= 0 {
+				issuesMenu.table.deselectAll(nil)
+				i = issuesDelegate.issueAtRow(row)
+			}
+			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
+				self.issuesMenu.table.selectRowIndexes(NSIndexSet(index: row), byExtendingSelection: false)
+			}
+			return i?.webUrl
+		} else {
+			return nil
 		}
-		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
-			self.mainMenu.prTable.selectRowIndexes(NSIndexSet(index: row), byExtendingSelection: false)
-		}
-		return pr?.webUrl
 	}
-    
+
 	private func checkForHotkey(incomingEvent: NSEvent) -> Bool {
 		var check = 0
 
@@ -1614,7 +1743,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 				"Z": 6 ][Settings.hotkeyLetter]
 
 			if incomingEvent.keyCode==UInt16(n!) {
-				statusItemTapped()
+				toggleVisibilityOfMenu(prMenu, fromStatusItem: prStatusItem)
 				return true
 			}
 		}
@@ -1624,13 +1753,14 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	////////////// scrollbars
 	
 	func updateScrollBarWidth() {
-		if let s = mainMenu.scrollView.verticalScroller {
+		if let s = prMenu.scrollView.verticalScroller {
 			if s.scrollerStyle == NSScrollerStyle.Legacy {
 				scrollBarWidth = s.frame.size.width
 			} else {
 				scrollBarWidth = 0
 			}
 		}
-		updateMenu()
+		updatePrMenu()
+		updateIssuesMenu()
 	}
 }
