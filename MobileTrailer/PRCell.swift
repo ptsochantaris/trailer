@@ -137,8 +137,31 @@ class PRCell: UITableViewCell {
 		} else {
 			accessibilityLabel = "\(pullRequest.accessibleTitle()), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(pullRequest.accessibleSubtitle())"
 		}
+	}
 
-		setNeedsLayout()
+	func setIssue(issue: Issue) {
+		let detailFont = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
+		_title.attributedText = issue.titleWithFont(_title.font, labelFont: detailFont.fontWithSize(detailFont.pointSize-2), titleColor: UIColor.darkTextColor())
+		_description.attributedText = issue.subtitleWithFont(detailFont, lightColor: UIColor.lightGrayColor(), darkColor: UIColor.darkGrayColor())
+		_statuses.attributedText = nil
+
+		var _commentsNew = 0
+		let _commentsTotal = issue.totalComments?.integerValue ?? 0
+
+		if Settings.showCommentsEverywhere || issue.isMine() || issue.commentedByMe() {
+			_commentsNew = issue.unreadComments?.integerValue ?? 0
+		}
+
+		readCount.text = itemCountFormatter.stringFromNumber(_commentsTotal)
+		let readSize = readCount.sizeThatFits(CGSizeMake(200, 14))
+		readCount.hidden = (_commentsTotal == 0)
+
+		unreadCount.hidden = (_commentsNew == 0)
+		unreadCount.text = itemCountFormatter.stringFromNumber(_commentsNew)
+
+		loadImageAtPath(issue.userAvatarUrl)
+
+		accessibilityLabel = "\(issue.accessibleTitle()), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(issue.accessibleSubtitle())"
 	}
 
 	private func loadImageAtPath(imagePath: NSString?) {

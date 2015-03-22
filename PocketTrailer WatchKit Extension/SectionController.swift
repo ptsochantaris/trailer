@@ -80,15 +80,15 @@ class SectionController: WKInterfaceController {
                 let controller = table.rowControllerAtIndex(f) as SectionRow
                 switch(f) {
                 case MINE_INDEX:
-                    titles.append(controller.setRow(PullRequestSection.Mine, PullRequestSection.shortTitles[f+1]))
+                    titles.append(controller.setRow(PullRequestSection.Mine, PullRequestSection.watchMenuTitles[f+1]))
                 case PARTICIPATED_INDEX:
-                    titles.append(controller.setRow(PullRequestSection.Participated, PullRequestSection.shortTitles[f+1]))
+                    titles.append(controller.setRow(PullRequestSection.Participated, PullRequestSection.watchMenuTitles[f+1]))
                 case MERGED_INDEX:
-                    titles.append(controller.setRow(PullRequestSection.Merged, PullRequestSection.shortTitles[f+1]))
+                    titles.append(controller.setRow(PullRequestSection.Merged, PullRequestSection.watchMenuTitles[f+1]))
                 case CLOSED_INDEX:
-                    titles.append(controller.setRow(PullRequestSection.Closed, PullRequestSection.shortTitles[f+1]))
+                    titles.append(controller.setRow(PullRequestSection.Closed, PullRequestSection.watchMenuTitles[f+1]))
                 case OTHER_INDEX:
-                    titles.append(controller.setRow(PullRequestSection.All, PullRequestSection.shortTitles[f+1]))
+                    titles.append(controller.setRow(PullRequestSection.All, PullRequestSection.watchMenuTitles[f+1]))
                 default: break
                 }
             }

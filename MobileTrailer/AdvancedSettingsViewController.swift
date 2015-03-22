@@ -25,8 +25,8 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 
 	private enum Section: Int {
 		case Refresh, Display, Comments, Repos, StausesAndLabels, History, Confirm, Sort, Misc
-		static let rowCounts = [3, 7, 7, 1, 6, 3, 2, 3, 1]
-		static let allNames = ["Auto Refresh", "Display","Comments", "Repositories", "Statuses & Labels", "History", "Don't confirm when", "Sorting", "Misc"]
+		static let rowCounts = [3, 8, 7, 1, 6, 3, 2, 3, 1]
+		static let allNames = ["Auto Refresh", "Display", "Comments", "Repositories", "Statuses & Labels", "History", "Don't confirm when", "Sorting", "Misc"]
 	}
 
 	private enum NormalSorting: Int {
@@ -98,6 +98,9 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 			case 6:
 				cell.textLabel?.text = "Include labels in filtering"
 				cell.accessoryType = check(Settings.includeLabelsInFilter)
+			case 7:
+				cell.textLabel?.text = "Show issues section"
+				cell.accessoryType = check(Settings.showIssuesMenu)
 			default: break
 			}
 		} else if indexPath.section == Section.Comments.rawValue {
@@ -120,9 +123,9 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 			case 5:
 				cell.textLabel?.text = "Block comment notifications from usernames..."
 				cell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
-            case 6:
-                cell.textLabel?.text = "Disable all comment notifications"
-                cell.accessoryType = check(Settings.disableAllCommentNotifications)
+			case 6:
+				cell.textLabel?.text = "Disable all comment notifications"
+				cell.accessoryType = check(Settings.disableAllCommentNotifications)
 			default: break
 			}
 		} else if indexPath.section == Section.Repos.rawValue {
@@ -244,24 +247,27 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 		} else if indexPath.section == Section.Display.rawValue {
 			switch indexPath.row {
 			case 0:
-					Settings.showCreatedInsteadOfUpdated = !Settings.showCreatedInsteadOfUpdated
-					settingsChangedTimer.push()
+				Settings.showCreatedInsteadOfUpdated = !Settings.showCreatedInsteadOfUpdated
+				settingsChangedTimer.push()
 			case 1:
-					Settings.hideAllPrsSection = !Settings.hideAllPrsSection
-					settingsChangedTimer.push()
+				Settings.hideAllPrsSection = !Settings.hideAllPrsSection
+				settingsChangedTimer.push()
 			case 2:
-					Settings.moveAssignedPrsToMySection = !Settings.moveAssignedPrsToMySection
-					settingsChangedTimer.push()
+				Settings.moveAssignedPrsToMySection = !Settings.moveAssignedPrsToMySection
+				settingsChangedTimer.push()
 			case 3:
-					Settings.markUnmergeableOnUserSectionsOnly = !Settings.markUnmergeableOnUserSectionsOnly
-					settingsChangedTimer.push()
+				Settings.markUnmergeableOnUserSectionsOnly = !Settings.markUnmergeableOnUserSectionsOnly
+				settingsChangedTimer.push()
 			case 4:
-					Settings.showReposInName = !Settings.showReposInName
-					settingsChangedTimer.push()
+				Settings.showReposInName = !Settings.showReposInName
+				settingsChangedTimer.push()
 			case 5:
-					Settings.includeReposInFilter = !Settings.includeReposInFilter
+				Settings.includeReposInFilter = !Settings.includeReposInFilter
 			case 6:
-					Settings.includeLabelsInFilter = !Settings.includeLabelsInFilter
+				Settings.includeLabelsInFilter = !Settings.includeLabelsInFilter
+			case 7:
+				Settings.showIssuesMenu = !Settings.showIssuesMenu
+				settingsChangedTimer.push()
 			default: break
 			}
 		} else if indexPath.section == Section.Comments.rawValue {
@@ -282,8 +288,8 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 				Settings.openPrAtFirstUnreadComment = !Settings.openPrAtFirstUnreadComment
 			case 5:
 				performSegueWithIdentifier("showBlacklist", sender: self)
-            case 6:
-                Settings.disableAllCommentNotifications = !Settings.disableAllCommentNotifications
+			case 6:
+				Settings.disableAllCommentNotifications = !Settings.disableAllCommentNotifications
 			default: break
 			}
 		} else if indexPath.section == Section.Repos.rawValue {
@@ -400,9 +406,9 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 				tableView.reloadData()
 				if Settings.logActivityToConsole {
 					UIAlertView(title: "Warning",
-					message: "Logging is a feature meant for error reporting, having it constantly enabled will cause this app to be less responsive and use more battery",
-					delegate: nil,
-					cancelButtonTitle: "OK").show()
+						message: "Logging is a feature meant for error reporting, having it constantly enabled will cause this app to be less responsive and use more battery",
+						delegate: nil,
+						cancelButtonTitle: "OK").show()
 				}
 			default: break
 			}

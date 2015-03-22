@@ -7,6 +7,9 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 	private var detailViewController: DetailViewController!
 	private var _fetchedResultsController: NSFetchedResultsController?
 
+	@IBOutlet weak var showPullRequests: UIBarButtonItem!
+	@IBOutlet weak var showIssues: UIBarButtonItem!
+
 	// Filtering
 	private let searchField: UITextField
 	private let searchTimer: PopTimer?
@@ -21,7 +24,6 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 			a.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: { action in
 				a.dismissViewControllerAnimated(true, completion: nil)
 			}))
-
 			a.addAction(UIAlertAction(title: "Mark all as read", style: UIAlertActionStyle.Destructive, handler: { [weak self] action in
 				self!.markAllAsRead()
 			}))
@@ -82,7 +84,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 			if Settings.dontAskBeforeWipingMerged {
 				self!.removeAllMergedConfirmed()
 			} else {
-				let a = UIAlertController(title: "Sure?", message: "Remove all PRs in the Merged section?", preferredStyle: UIAlertControllerStyle.Alert)
+				let a = UIAlertController(title: "Sure?", message: "Remove all \(self!.viewMode.namePlural()) in the Merged section?", preferredStyle: UIAlertControllerStyle.Alert)
 				a.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil))
 				a.addAction(UIAlertAction(title: "Remove", style: UIAlertActionStyle.Destructive, handler: { [weak self] action in
 					self!.removeAllMergedConfirmed()
@@ -97,7 +99,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 			if Settings.dontAskBeforeWipingClosed {
 				self!.removeAllClosedConfirmed()
 			} else {
-				let a = UIAlertController(title: "Sure?", message: "Remove all PRs in the Closed section?", preferredStyle: UIAlertControllerStyle.Alert)
+				let a = UIAlertController(title: "Sure?", message: "Remove all \(self!.viewMode.namePlural()) in the Closed section?", preferredStyle: UIAlertControllerStyle.Alert)
 				a.addAction(UIAlertAction(title: "Cancel", style:UIAlertActionStyle.Cancel, handler: nil))
 				a.addAction(UIAlertAction(title: "Remove", style:UIAlertActionStyle.Destructive, handler: { [weak self] action in
 					self!.removeAllClosedConfirmed()
@@ -108,22 +110,36 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 	}
 
 	func removeAllClosedConfirmed() {
-		for p in PullRequest.allClosedRequestsInMoc(mainObjectContext) {
-			mainObjectContext.deleteObject(p)
+		if viewMode == MasterViewMode.PullRequests {
+			for p in PullRequest.allClosedRequestsInMoc(mainObjectContext) {
+				mainObjectContext.deleteObject(p)
+			}
+		} else {
+			for p in Issue.allClosedIssuesInMoc(mainObjectContext) {
+				mainObjectContext.deleteObject(p)
+			}
 		}
 		DataManager.saveDB()
 	}
 
 	func removeAllMergedConfirmed() {
-		for p in PullRequest.allMergedRequestsInMoc(mainObjectContext) {
-			mainObjectContext.deleteObject(p)
+		if viewMode == MasterViewMode.PullRequests {
+			for p in PullRequest.allMergedRequestsInMoc(mainObjectContext) {
+				mainObjectContext.deleteObject(p)
+			}
+			DataManager.saveDB()
 		}
-		DataManager.saveDB()
 	}
 
 	func markAllAsRead() {
-		for p in fetchedResultsController.fetchedObjects as [PullRequest] {
-			p.catchUpWithComments()
+		if viewMode == MasterViewMode.PullRequests {
+			for p in fetchedResultsController.fetchedObjects as [PullRequest] {
+				p.catchUpWithComments()
+			}
+		} else {
+			for p in fetchedResultsController.fetchedObjects as [Issue] {
+				p.catchUpWithComments()
+			}
 		}
 		DataManager.saveDB()
 	}
@@ -192,9 +208,17 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 	override func viewWillAppear(animated: Bool) {
 		super.viewWillAppear(animated)
 		updateStatus()
+		updateToolbar(animated)
 	}
 
 	func reloadDataWithAnimation(animated: Bool) {
+
+		if !Settings.showIssuesMenu && viewMode == MasterViewMode.Issues {
+			updateToolbar(animated)
+			viewMode = MasterViewMode.PullRequests
+			return
+		}
+
 		if animated {
 			let currentIndexes = NSIndexSet(indexesInRange: NSMakeRange(0, fetchedResultsController.sections?.count ?? 0))
 
@@ -228,17 +252,24 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 		} else {
 			tableView.reloadData()
 		}
+
+		updateToolbar(animated)
+	}
+
+	private func updateToolbar(animated: Bool) {
+		navigationController?.setToolbarHidden(!Settings.showIssuesMenu, animated: animated)
 	}
 
 	func localNotification(notification: NSNotification) {
-		//DLog("local notification: %@", notification.userInfo)
 		var urlToOpen = notification.userInfo?[NOTIFICATION_URL_KEY] as? String
 
 		var pullRequest: PullRequest?
+		var issue: Issue?
 
 		if let commentId = DataManager.idForUriPath(notification.userInfo?[COMMENT_ID_KEY] as? String) {
 			if let c = mainObjectContext.existingObjectWithID(commentId, error:nil) as? PRComment {
 				pullRequest = c.pullRequest
+				issue = c.issue
 				if urlToOpen == nil {
 					urlToOpen = c.webUrl
 				}
@@ -260,8 +291,17 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 		}
 
 		if let p = pullRequest {
+			viewMode = MasterViewMode.PullRequests
 			if let ip = fetchedResultsController.indexPathForObject(p) {
-				detailViewController.catchupWithPrWhenLoaded = p.objectID
+				detailViewController.catchupWithDataItemWhenLoaded = p.objectID
+				tableView.selectRowAtIndexPath(ip, animated: false, scrollPosition: UITableViewScrollPosition.Middle)
+			}
+		}
+
+		if let i = issue {
+			viewMode = MasterViewMode.Issues
+			if let ip = fetchedResultsController.indexPathForObject(i) {
+				detailViewController.catchupWithDataItemWhenLoaded = i.objectID
 				tableView.selectRowAtIndexPath(ip, animated: false, scrollPosition: UITableViewScrollPosition.Middle)
 			}
 		}
@@ -294,12 +334,20 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 	}
 
 	override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-		let pullRequest = fetchedResultsController.objectAtIndexPath(indexPath) as PullRequest
-		if let p = pullRequest.urlForOpening() {
-			detailViewController.detailItem = NSURL(string: p)
-			detailViewController.catchupWithPrWhenLoaded = pullRequest.objectID
-			showDetailViewController(detailViewController.navigationController!, sender: self)
+		if viewMode == MasterViewMode.PullRequests {
+			let pullRequest = fetchedResultsController.objectAtIndexPath(indexPath) as PullRequest
+			if let p = pullRequest.urlForOpening() {
+				detailViewController.detailItem = NSURL(string: p)
+				detailViewController.catchupWithDataItemWhenLoaded = pullRequest.objectID
+			}
+		} else {
+			let issue = fetchedResultsController.objectAtIndexPath(indexPath) as Issue
+			if let p = issue.urlForOpening() {
+				detailViewController.detailItem = NSURL(string: p)
+				detailViewController.catchupWithDataItemWhenLoaded = issue.objectID
+			}
 		}
+		showDetailViewController(detailViewController.navigationController!, sender: self)
 	}
 
 	override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -310,7 +358,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 	override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
 		if let sectionInfo = fetchedResultsController.sections?[indexPath.section] as? NSFetchedResultsSectionInfo {
 			let sectionName = sectionInfo.name
-			return sectionName == PullRequestSection.Merged.name() || sectionName == PullRequestSection.Closed.name()
+			return sectionName == PullRequestSection.Merged.prMenuName() || sectionName == PullRequestSection.Closed.prMenuName()
 		} else {
 			return false
 		}
@@ -333,7 +381,13 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 			return c
 		}
 
-		let fetchRequest = PullRequest.requestForPullRequestsWithFilter(searchField.text, sectionIndex: -1)
+		var fetchRequest: NSFetchRequest
+
+		if viewMode == MasterViewMode.PullRequests {
+			fetchRequest = PullRequest.requestForPullRequestsWithFilter(searchField.text, sectionIndex: -1)
+		} else {
+			fetchRequest = Issue.requestForIssuesWithFilter(searchField.text, sectionIndex: -1)
+		}
 
 		let aFetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: mainObjectContext, sectionNameKeyPath: "sectionName", cacheName: nil)
 		aFetchedResultsController.delegate = self
@@ -392,8 +446,13 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 	}
 
 	private func configureCell(cell: UITableViewCell, atIndexPath: NSIndexPath) {
-		let pr = fetchedResultsController.objectAtIndexPath(atIndexPath) as PullRequest
-		(cell as PRCell).setPullRequest(pr)
+		if viewMode == MasterViewMode.PullRequests {
+			let pr = fetchedResultsController.objectAtIndexPath(atIndexPath) as PullRequest
+			(cell as PRCell).setPullRequest(pr)
+		} else {
+			let i = fetchedResultsController.objectAtIndexPath(atIndexPath) as Issue
+			(cell as PRCell).setIssue(i)
+		}
 	}
 
 	func updateStatus() {
@@ -406,16 +465,15 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 				})
 			}
 		} else {
+
+			if viewMode == MasterViewMode.PullRequests {
+				title = pullRequestsTitle()
+			} else {
+				title = issuesTitle()
+			}
+
 			let count = fetchedResultsController.fetchedObjects?.count ?? 0
-			if count>0 {
-				title = count == 1 ? "1 Pull Request" : "\(count) Pull Requests"
-				tableView.tableFooterView = nil
-			}
-			else
-			{
-				title = "No PRs"
-				tableView.tableFooterView = EmptyView(message: DataManager.reasonForEmptyWithFilter(searchField.text), parentWidth: view.bounds.size.width)
-			}
+			tableView.tableFooterView = (count == 0) ? EmptyView(message: DataManager.reasonForEmptyWithFilter(searchField.text), parentWidth: view.bounds.size.width) : nil
 
 			dispatch_async(dispatch_get_main_queue(), { [weak self] in
 				self!.refreshControl!.endRefreshing()
@@ -424,14 +482,42 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
 		refreshControl?.attributedTitle = NSAttributedString(string: api.lastUpdateDescription(), attributes: nil)
 
-		UIApplication.sharedApplication().applicationIconBadgeNumber = PullRequest.badgeCountInMoc(mainObjectContext)
+		UIApplication.sharedApplication().applicationIconBadgeNumber = PullRequest.badgeCountInMoc(mainObjectContext) + Issue.badgeCountInMoc(mainObjectContext)
 
 		if splitViewController?.displayMode != UISplitViewControllerDisplayMode.AllVisible {
 			detailViewController.navigationItem.leftBarButtonItem?.title = title
 		}
+
+		showPullRequests.title = pullRequestsTitle()
+		showIssues.title = issuesTitle()
 	}
 
-		///////////////////////////// filtering
+	private func pullRequestsTitle() -> String {
+
+		let f = PullRequest.requestForPullRequestsWithFilter(nil, sectionIndex: -1)
+		let count = mainObjectContext.countForFetchRequest(f, error: nil)
+		if count == 0 {
+			return "No " + MasterViewMode.PullRequests.namePlural()
+		} else if count == 1 {
+			return "1 " + MasterViewMode.PullRequests.nameSingular()
+		} else {
+			return "\(count) " + MasterViewMode.PullRequests.namePlural()
+		}
+	}
+
+	private func issuesTitle() -> String {
+		let f = Issue.requestForIssuesWithFilter(nil, sectionIndex: -1)
+		let count = mainObjectContext.countForFetchRequest(f, error: nil)
+		if count == 0 {
+			return "No " + MasterViewMode.Issues.namePlural()
+		} else if count == 1 {
+			return "1 " + MasterViewMode.Issues.nameSingular()
+		} else {
+			return "\(count) " + MasterViewMode.Issues.namePlural()
+		}
+	}
+
+	///////////////////////////// filtering
 
 	override func scrollViewWillBeginDragging(scrollView: UIScrollView) {
 		if searchField.isFirstResponder() {
@@ -451,6 +537,24 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 			searchTimer!.push()
 		}
 		return true
+	}
+
+	////////////////// mode
+
+	@IBAction func showPullRequestsSelected(sender: AnyObject) {
+		viewMode = MasterViewMode.PullRequests
+	}
+
+	@IBAction func showIssuesSelected(sender: AnyObject) {
+		viewMode = MasterViewMode.Issues
+	}
+
+	private var viewMode: MasterViewMode = .PullRequests {
+		didSet {
+			_fetchedResultsController = nil
+			tableView.reloadData()
+			updateStatus()
+		}
 	}
 
 	////////////////// opening prefs
@@ -476,12 +580,4 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 		Settings.lastPreferencesTabSelected = indexOfObject(tabBarController.viewControllers!, viewController) ?? 0
 	}
 
-	private func indexOfObject(array: [AnyObject], _ value: AnyObject) -> Int? {
-		for (index, element) in enumerate(array) {
-			if element === value {
-				return index
-			}
-		}
-		return nil
-	}
 }

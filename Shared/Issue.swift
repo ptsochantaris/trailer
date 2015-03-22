@@ -283,8 +283,8 @@ class Issue: DataItem {
 		postProcess()
 	}
 
-	func labelsLink() -> String? {
-		return url?.stringByAppendingPathComponent("labels")
+	func sectionName() -> String {
+		return PullRequestSection.prMenuTitles[sectionIndex?.integerValue ?? 0]
 	}
 
 	func postProcess() {
@@ -417,5 +417,38 @@ class Issue: DataItem {
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "condition == %d", PullRequestCondition.Closed.rawValue)
 		return moc.executeFetchRequest(f, error: nil) as [Issue]
+	}
+
+	func accessibleTitle() -> String {
+		var components = [String]()
+		if let t = title { components.append(t) }
+		if Settings.showLabels {
+			var allLabels = labels.allObjects as [PRLabel]
+			allLabels.sort({ (l1: PRLabel, l2: PRLabel) -> Bool in
+				return l1.name<l2.name
+			})
+			components.append("\(allLabels.count) labels:")
+			for l in allLabels { if let n = l.name { components.append(n) } }
+		}
+		return ",".join(components)
+	}
+
+	func accessibleSubtitle() -> String {
+		var components = [String]()
+
+		if Settings.showReposInName {
+			let repoFullName = repo.fullName ?? "NoRepoFullName"
+			components.append("Repository: \(repoFullName)")
+		}
+
+		if let l = userLogin { components.append("Author: \(l)") }
+
+		if Settings.showCreatedInsteadOfUpdated {
+			components.append("Created \(itemDateFormatter.stringFromDate(createdAt!))")
+		} else {
+			components.append("Updated \(itemDateFormatter.stringFromDate(updatedAt!))")
+		}
+
+		return ",".join(components)
 	}
 }

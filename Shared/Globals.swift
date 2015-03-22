@@ -129,6 +129,18 @@ enum PRHandlingPolicy: Int {
 }
 
 #if os(iOS)
+	enum MasterViewMode: Int {
+		case PullRequests, Issues
+		static let namesPlural = ["Pull Requests", "Issues"]
+		func namePlural() -> String {
+			return MasterViewMode.namesPlural[rawValue]
+		}
+		static let namesSingular = ["Pull Request", "Issue"]
+		func nameSingular() -> String {
+			return MasterViewMode.namesSingular[rawValue]
+		}
+	}
+
 	func imageFromColor(color: UIColor) -> UIImage {
 		let rect = CGRectMake(0, 0, 1, 1)
 		UIGraphicsBeginImageContext(rect.size)
@@ -146,4 +158,13 @@ func isDarkColor(color: COLOR_CLASS) -> Bool {
 	color.getRed(&r, green: &g, blue: &b, alpha: nil)
 	let lum = 0.2126 * r + 0.7152 * g + 0.0722 * b
 	return (lum < 0.5)
+}
+
+func indexOfObject(array: [AnyObject], value: AnyObject) -> Int? {
+	for (index, element) in enumerate(array) {
+		if element === value {
+			return index
+		}
+	}
+	return nil
 }

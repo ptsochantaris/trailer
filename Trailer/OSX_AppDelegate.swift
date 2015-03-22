@@ -831,15 +831,6 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		return nil
 	}
 
-	private func indexOfObject(array: [AnyObject], _ value: AnyObject) -> Int? {
-		for (index, element) in enumerate(array) {
-			if element === value {
-				return index
-			}
-		}
-		return nil
-	}
-
 	@IBAction func deleteSelectedServerSelected(sender: NSButton) {
 		if let selectedServer = selectedServer() {
 			if let index = indexOfObject(ApiServer.allApiServersInMoc(mainObjectContext), selectedServer) {

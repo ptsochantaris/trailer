@@ -19,7 +19,7 @@ class PRListController: WKInterfaceController {
 
         sectionIndex = (context as NSDictionary)[SECTION_KEY] as Int
 
-        setTitle(PullRequestSection.shortTitles[sectionIndex])
+        setTitle(PullRequestSection.watchMenuTitles[sectionIndex])
 
         buildUI()
     }

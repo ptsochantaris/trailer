@@ -32,7 +32,7 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 		splitViewController.maximumPrimaryColumnWidth = 320
 		splitViewController.delegate = self
 
-		let m = (splitViewController.viewControllers[0] as UINavigationController).topViewController as MasterViewController
+		let m = getMasterController()
 		m.clearsSelectionOnViewWillAppear = false // for iPad
 
 		UIApplication.sharedApplication().setMinimumBackgroundFetchInterval(NSTimeInterval(Settings.backgroundRefreshPeriod))
@@ -88,7 +88,7 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 	}
 
 	private func forcePreferences() {
-		let m = ((window.rootViewController as UISplitViewController).viewControllers.first as UINavigationController).viewControllers.first as MasterViewController
+		let m = getMasterController()
 		m.performSegueWithIdentifier("showPreferences", sender: self)
 	}
 
@@ -112,9 +112,8 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 	}
 
 	func refreshMainList() {
-		DataManager.postProcessAllPrs()
-		let m = ((window.rootViewController as UISplitViewController).viewControllers.first as UINavigationController).viewControllers.first as MasterViewController
-		m.reloadDataWithAnimation(true)
+		DataManager.postProcessAllItems()
+		getMasterController().reloadDataWithAnimation(true)
 	}
 
 	func application(application: UIApplication, performFetchWithCompletionHandler completionHandler: (UIBackgroundFetchResult) -> Void) {
@@ -342,6 +341,11 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
         UIApplication.sharedApplication().setMinimumBackgroundFetchInterval(NSTimeInterval(interval))
     }
 
+	func getMasterController() -> MasterViewController {
+		let s = window.rootViewController as UISplitViewController
+		return (s.viewControllers.first as UINavigationController).viewControllers.first as MasterViewController
+	}
+
     /////////////// Watchkit commands
 
     func application(application: UIApplication!, handleWatchKitExtensionRequest userInfo: [NSObject : AnyObject]!, reply: (([NSObject : AnyObject]!) -> Void)!) {
@@ -370,20 +374,17 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
             })
 
         } else if userInfo["command"] as? String == "clearAllMerged" {
-            let splitViewController = window.rootViewController as UISplitViewController
-            let m = (splitViewController.viewControllers[0] as UINavigationController).topViewController as MasterViewController
+            let m = getMasterController()
             m.removeAllMergedConfirmed()
             reply(["status": "Success", "color": "green"])
 
         } else if userInfo["command"] as? String == "clearAllClosed" {
-            let splitViewController = window.rootViewController as UISplitViewController
-            let m = (splitViewController.viewControllers[0] as UINavigationController).topViewController as MasterViewController
+			let m = getMasterController()
             m.removeAllClosedConfirmed()
             reply(["status": "Success", "color": "green"])
 
         } else if userInfo["command"] as? String == "markAllRead" {
-            let splitViewController = window.rootViewController as UISplitViewController
-            let m = (splitViewController.viewControllers[0] as UINavigationController).topViewController as MasterViewController
+			let m = getMasterController()
             m.markAllAsRead()
             reply(["status": "Success", "color": "green"])
         }
