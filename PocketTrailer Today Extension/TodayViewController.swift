@@ -69,16 +69,15 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 
 		Settings.clearCache()
 
-        let totalCount = PullRequest.countAllRequestsInMoc(mainObjectContext)
+		let totalCount = PullRequest.countAllRequestsInMoc(mainObjectContext)
+		let a = NSMutableAttributedString(string: NSString(format: "%d PRs: ", totalCount), attributes: brightAttributes)
 
         if totalCount>0 {
-            let a = NSMutableAttributedString(string: NSString(format: "%d Total PRs", totalCount), attributes: brightAttributes)
-            a.appendAttributedString(NSAttributedString(string: ": ",                                           attributes: normalAttributes))
-
-            append(a, toCount: PullRequest.countRequestsInSection(PullRequestSection.Mine.rawValue,         moc: mainObjectContext), appending: "Mine, ")
-            append(a, toCount: PullRequest.countRequestsInSection(PullRequestSection.Participated.rawValue, moc: mainObjectContext), appending: "Participated, ")
-            append(a, toCount: PullRequest.countRequestsInSection(PullRequestSection.Merged.rawValue,       moc: mainObjectContext), appending: "Merged, ")
-            append(a, toCount: PullRequest.countRequestsInSection(PullRequestSection.Closed.rawValue,       moc: mainObjectContext), appending: "Closed, ")
+            appendPr(a, section: PullRequestSection.Mine.rawValue)
+            appendPr(a, section: PullRequestSection.Participated.rawValue)
+            appendPr(a, section: PullRequestSection.Merged.rawValue)
+			appendPr(a, section: PullRequestSection.Closed.rawValue)
+			appendPr(a, section: PullRequestSection.All.rawValue)
 
             ////////////////////////////
 
@@ -94,28 +93,60 @@ class TodayViewController: UIViewController, NCWidgetProviding {
                 text = "No\u{a0}unread\u{a0}comments"
             }
             a.appendAttributedString(NSAttributedString(string: text, attributes: attributes))
-
-            ////////////////////////////
-
-            if let lastRefresh = Settings.lastSuccessfulRefresh {
-                let d = NSDateFormatter()
-                d.dateStyle = NSDateFormatterStyle.ShortStyle
-                d.timeStyle = NSDateFormatterStyle.ShortStyle
-                text = "\nUpdated " + d.stringFromDate(lastRefresh)
-            } else {
-                text = "\nNot updated yet"
-            }
-            a.appendAttributedString(NSAttributedString(string: text, attributes: smallAttributes))
-
-            label.attributedText = a
         }
         else
         {
-            let a = DataManager.reasonForEmptyWithFilter(nil).mutableCopy() as NSMutableAttributedString
-            a.addAttribute(NSParagraphStyleAttributeName, value: paragraph, range: NSMakeRange(0, a.length))
-            label.attributedText = a
+            let reason = DataManager.reasonForEmptyWithFilter(nil).mutableCopy() as NSMutableAttributedString
+            reason.addAttribute(NSParagraphStyleAttributeName, value: paragraph, range: NSMakeRange(0, a.length))
+			a.appendAttributedString(reason)
         }
-    }
+
+		if Settings.showIssuesMenu {
+
+			let totalCount = Issue.countAllIssuesInMoc(mainObjectContext)
+			a.appendAttributedString(NSAttributedString(string: NSString(format: "\n%d Issues: ", totalCount), attributes: brightAttributes))
+
+			if totalCount>0 {
+				appendIssue(a, section: PullRequestSection.Mine.rawValue)
+				appendIssue(a, section: PullRequestSection.Participated.rawValue)
+				appendIssue(a, section: PullRequestSection.Merged.rawValue)
+				appendIssue(a, section: PullRequestSection.Closed.rawValue)
+				appendIssue(a, section: PullRequestSection.All.rawValue)
+
+				////////////////////////////
+
+				var text: String
+				var attributes: [NSObject: AnyObject]
+
+				let toCount = Issue.badgeCountInMoc(mainObjectContext)
+				if toCount > 0 {
+					attributes = redAttributes
+					text = "\(toCount)\u{a0}unread\u{a0}comments"
+				} else {
+					attributes = dimAttributes
+					text = "No\u{a0}unread\u{a0}comments"
+				}
+				a.appendAttributedString(NSAttributedString(string: text, attributes: attributes))
+			}
+			else
+			{
+				let reason = DataManager.reasonForEmptyIssuesWithFilter(nil).mutableCopy() as NSMutableAttributedString
+				reason.addAttribute(NSParagraphStyleAttributeName, value: paragraph, range: NSMakeRange(0, a.length))
+				a.appendAttributedString(reason)
+			}
+		}
+
+		if let lastRefresh = Settings.lastSuccessfulRefresh {
+			let d = NSDateFormatter()
+			d.dateStyle = NSDateFormatterStyle.ShortStyle
+			d.timeStyle = NSDateFormatterStyle.ShortStyle
+			a.appendAttributedString(NSAttributedString(string: "\nUpdated " + d.stringFromDate(lastRefresh), attributes: smallAttributes))
+		} else {
+			a.appendAttributedString(NSAttributedString(string: "\nNot updated yet", attributes: smallAttributes))
+		}
+
+		label.attributedText = a
+	}
 
     func widgetPerformUpdateWithCompletionHandler(completionHandler: ((NCUpdateResult) -> Void)!) {
         // Perform any setup necessary in order to update the view.
@@ -129,18 +160,27 @@ class TodayViewController: UIViewController, NCWidgetProviding {
         completionHandler(NCUpdateResult.NewData)
     }
 
-    func append(a: NSMutableAttributedString, toCount: Int, appending: String) {
-        var text: String
-        var attributes: [NSObject: AnyObject]
-        if toCount > 0 {
-            attributes = normalAttributes
-            text = "\(toCount)\u{a0}\(appending)"
+    func appendPr(a: NSMutableAttributedString, section: Int) {
+		let count = PullRequest.countRequestsInSection(section, moc: mainObjectContext)
+        if count > 0 {
+            let text = "\(count)\u{a0}\(PullRequestSection.watchMenuTitles[section]), "
+			a.appendAttributedString(NSAttributedString(string: text, attributes: normalAttributes))
         } else {
-            attributes = dimAttributes
-            text = "0\u{a0}\(appending)"
+            let text = "0\u{a0}\(PullRequestSection.watchMenuTitles[section]), "
+			a.appendAttributedString(NSAttributedString(string: text, attributes: dimAttributes))
         }
-        a.appendAttributedString(NSAttributedString(string: text, attributes: attributes))
     }
+
+	func appendIssue(a: NSMutableAttributedString, section: Int) {
+		let count = Issue.countIssuesInSection(section, moc: mainObjectContext)
+		if count > 0 {
+			let text = "\(count)\u{a0}\(PullRequestSection.watchMenuTitles[section]), "
+			a.appendAttributedString(NSAttributedString(string: text, attributes: normalAttributes))
+		} else {
+			let text = "0\u{a0}\(PullRequestSection.watchMenuTitles[section]), "
+			a.appendAttributedString(NSAttributedString(string: text, attributes: dimAttributes))
+		}
+	}
 
     ////////////////// With many thanks to http://stackoverflow.com/questions/27679096/how-to-determine-the-today-extension-left-margin-properly-in-ios-8
 

@@ -137,6 +137,18 @@ class Issue: DataItem {
 		}
 	}
 
+	class func countAllIssuesInMoc(moc: NSManagedObjectContext) -> Int {
+		let f = NSFetchRequest(entityName: "Issue")
+		f.predicate = NSPredicate(format: "sectionIndex > 0")
+		return moc.countForFetchRequest(f, error: nil)
+	}
+
+	class func countIssuesInSection(section: Int, moc: NSManagedObjectContext) -> Int {
+		let f = NSFetchRequest(entityName: "Issue")
+		f.predicate = NSPredicate(format: "sectionIndex == %d", section)
+		return moc.countForFetchRequest(f, error: nil)
+	}
+
 	class func badgeCountInMoc(moc: NSManagedObjectContext) -> Int {
 		let f = requestForIssuesWithFilter(nil, sectionIndex: -1)
 		var badgeCount:Int = 0

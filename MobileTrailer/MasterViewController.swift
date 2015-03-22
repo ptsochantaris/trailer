@@ -466,11 +466,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 			}
 		} else {
 
-			if viewMode == MasterViewMode.PullRequests {
-				title = pullRequestsTitle()
-			} else {
-				title = issuesTitle()
-			}
+			title = viewMode == MasterViewMode.PullRequests ? pullRequestsTitle() : issuesTitle()
 
 			let count = fetchedResultsController.fetchedObjects?.count ?? 0
 			tableView.tableFooterView = (count == 0) ? EmptyView(message: DataManager.reasonForEmptyIssuesWithFilter(searchField.text), parentWidth: view.bounds.size.width) : nil
@@ -489,31 +485,36 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 		}
 
 		showPullRequests.title = pullRequestsTitle()
+		showPullRequests.tintColor = viewMode == MasterViewMode.Issues ? self.view.tintColor : UIColor.lightGrayColor()
+
 		showIssues.title = issuesTitle()
+		showIssues.tintColor = viewMode == MasterViewMode.PullRequests ? self.view.tintColor : UIColor.lightGrayColor()
 	}
 
 	private func pullRequestsTitle() -> String {
 
 		let f = PullRequest.requestForPullRequestsWithFilter(nil, sectionIndex: -1)
 		let count = mainObjectContext.countForFetchRequest(f, error: nil)
+		let unreadCount = PullRequest.badgeCountInMoc(mainObjectContext)
 		if count == 0 {
-			return "No " + MasterViewMode.PullRequests.namePlural()
+			return "No PRs"
 		} else if count == 1 {
-			return "1 " + MasterViewMode.PullRequests.nameSingular()
+			return "1 PR" + (unreadCount > 0 ? " (unread)" : "")
 		} else {
-			return "\(count) " + MasterViewMode.PullRequests.namePlural()
+			return "\(count) PRs" + (unreadCount > 0 ? " (\(unreadCount) unread)" : "")
 		}
 	}
 
 	private func issuesTitle() -> String {
 		let f = Issue.requestForIssuesWithFilter(nil, sectionIndex: -1)
 		let count = mainObjectContext.countForFetchRequest(f, error: nil)
+		let unreadCount = Issue.badgeCountInMoc(mainObjectContext)
 		if count == 0 {
-			return "No " + MasterViewMode.Issues.namePlural()
+			return "No Issues"
 		} else if count == 1 {
-			return "1 " + MasterViewMode.Issues.nameSingular()
+			return "1 Issue" + (unreadCount > 0 ? " (unread)" : "")
 		} else {
-			return "\(count) " + MasterViewMode.Issues.namePlural()
+			return "\(count) Issues" + (unreadCount > 0 ? " (\(unreadCount) unread)" : "")
 		}
 	}
 

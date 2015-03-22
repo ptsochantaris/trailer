@@ -168,10 +168,7 @@ class PullRequest: DataItem {
 
     class func countAllRequestsInMoc(moc: NSManagedObjectContext) -> Int {
         let f = NSFetchRequest(entityName: "PullRequest")
-        f.predicate = NSPredicate(format: "sectionIndex == %d or sectionIndex == %d or sectionIndex == %d",
-            PullRequestSection.Mine.rawValue,
-            PullRequestSection.Participated.rawValue,
-            PullRequestSection.All.rawValue)
+        f.predicate = NSPredicate(format: "sectionIndex > 0")
         return moc.countForFetchRequest(f, error: nil)
     }
 
