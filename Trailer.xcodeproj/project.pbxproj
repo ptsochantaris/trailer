@@ -356,7 +356,6 @@
 		1618527E1AB2CB9000526D81 /* PocketTrailer Today Extension */ = {
 			isa = PBXGroup;
 			children = (
-				1618529B1AB2D43C00526D81 /* PocketTrailer Today Extension.entitlements */,
 				161852811AB2CB9000526D81 /* TodayViewController.swift */,
 				161852831AB2CB9000526D81 /* MainInterface.storyboard */,
 				1618528B1AB2CC8200526D81 /* Media.xcassets */,
@@ -368,6 +367,7 @@
 		1618527F1AB2CB9000526D81 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				1618529B1AB2D43C00526D81 /* PocketTrailer Today Extension.entitlements */,
 				161852801AB2CB9000526D81 /* Info.plist */,
 			);
 			name = "Supporting Files";
