@@ -99,7 +99,7 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 				cell.textLabel?.text = "Include labels in filtering"
 				cell.accessoryType = check(Settings.includeLabelsInFilter)
 			case 7:
-				cell.textLabel?.text = "Sync and display issues section"
+				cell.textLabel?.text = "Sync and display issues"
 				cell.accessoryType = check(Settings.showIssuesMenu)
 			default: break
 			}

@@ -486,18 +486,10 @@
 			isa = PBXGroup;
 			children = (
 				16522D861AB03AE500B1C3FB /* Images.xcassets */,
-				16522D811AB03AE500B1C3FB /* Supporting Files */,
-			);
-			path = "PocketTrailer WatchKit App";
-			sourceTree = "<group>";
-		};
-		16522D811AB03AE500B1C3FB /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
 				16522D831AB03AE500B1C3FB /* Interface.storyboard */,
 				16522D821AB03AE500B1C3FB /* Info.plist */,
 			);
-			name = "Supporting Files";
+			path = "PocketTrailer WatchKit App";
 			sourceTree = "<group>";
 		};
 		168A5C74185BB9D900CB6B02 /* UI Components */ = {

@@ -479,16 +479,37 @@ func managedObjectModel() -> NSManagedObjectModel {
 
 func addStorePath(sqlStore: NSURL) -> Bool {
 	var error:NSError?
+
+	if dataReadonly && !NSFileManager.defaultManager().fileExistsAtPath(sqlStore.path!) {
+		let tempStore = _persistentStoreCoordinator?.addPersistentStoreWithType(NSSQLiteStoreType,
+			configuration: nil,
+			URL: sqlStore,
+			options: nil,
+			error: &error)
+		if error != nil || tempStore == nil {
+			DLog("Error while creating DB store before mounting readonly %@", error)
+			return false
+		} else {
+			_persistentStoreCoordinator?.removePersistentStore(tempStore!, error: &error)
+			if error != nil {
+				DLog("Error while unmounting newly created DB store before mounting readonly %@",error)
+				return false
+			}
+		}
+	}
+
 	let store = _persistentStoreCoordinator!.addPersistentStoreWithType(NSSQLiteStoreType,
-		configuration:nil,
-		URL:sqlStore,
-		options:[
+		configuration: nil,
+		URL: sqlStore,
+		options: [
 			NSMigratePersistentStoresAutomaticallyOption: true,
 			NSInferMappingModelAutomaticallyOption: true,
             NSReadOnlyPersistentStoreOption: dataReadonly,
 			NSSQLitePragmasOption: ["synchronous":"OFF", "fullfsync":"0"]],
-		error:&error)
-	if error != nil { DLog("%@",error) }
+		error: &error)
+
+	if error != nil { DLog("Error while mounting DB store %@",error) }
+
 	return store != nil
 }
 

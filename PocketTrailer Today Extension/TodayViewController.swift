@@ -78,21 +78,7 @@ class TodayViewController: UIViewController, NCWidgetProviding {
             appendPr(a, section: PullRequestSection.Merged.rawValue)
 			appendPr(a, section: PullRequestSection.Closed.rawValue)
 			appendPr(a, section: PullRequestSection.All.rawValue)
-
-            ////////////////////////////
-
-            var text: String
-            var attributes: [NSObject: AnyObject]
-
-            let toCount = PullRequest.badgeCountInMoc(mainObjectContext)
-            if toCount > 0 {
-                attributes = redAttributes
-                text = "\(toCount)\u{a0}unread\u{a0}comments"
-            } else {
-                attributes = dimAttributes
-                text = "No\u{a0}unread\u{a0}comments"
-            }
-            a.appendAttributedString(NSAttributedString(string: text, attributes: attributes))
+			appendCommentCount(a, number: PullRequest.badgeCountInMoc(mainObjectContext))
         }
         else
         {
@@ -112,21 +98,7 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 				appendIssue(a, section: PullRequestSection.Merged.rawValue)
 				appendIssue(a, section: PullRequestSection.Closed.rawValue)
 				appendIssue(a, section: PullRequestSection.All.rawValue)
-
-				////////////////////////////
-
-				var text: String
-				var attributes: [NSObject: AnyObject]
-
-				let toCount = Issue.badgeCountInMoc(mainObjectContext)
-				if toCount > 0 {
-					attributes = redAttributes
-					text = "\(toCount)\u{a0}unread\u{a0}comments"
-				} else {
-					attributes = dimAttributes
-					text = "No\u{a0}unread\u{a0}comments"
-				}
-				a.appendAttributedString(NSAttributedString(string: text, attributes: attributes))
+				appendCommentCount(a, number: Issue.badgeCountInMoc(mainObjectContext))
 			}
 			else
 			{
@@ -159,6 +131,16 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 
         completionHandler(NCUpdateResult.NewData)
     }
+
+	private func appendCommentCount(a: NSMutableAttributedString, number: Int) {
+		if number > 1 {
+			a.appendAttributedString(NSAttributedString(string: "\(number)\u{a0}unread\u{a0}comments", attributes: redAttributes))
+		} else if number == 1 {
+			a.appendAttributedString(NSAttributedString(string: "1\u{a0}unread\u{a0}comment", attributes: redAttributes))
+		} else {
+			a.appendAttributedString(NSAttributedString(string: "No\u{a0}unread\u{a0}comments", attributes: dimAttributes))
+		}
+	}
 
     func appendPr(a: NSMutableAttributedString, section: Int) {
 		let count = PullRequest.countRequestsInSection(section, moc: mainObjectContext)

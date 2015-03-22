@@ -10,6 +10,7 @@ class GlanceController: WKInterfaceController {
     @IBOutlet weak var mergedCount: WKInterfaceLabel!
     @IBOutlet weak var closedCount: WKInterfaceLabel!
     @IBOutlet weak var participatedCount: WKInterfaceLabel!
+	@IBOutlet weak var otherCount: WKInterfaceLabel!
     @IBOutlet weak var unreadCount: WKInterfaceLabel!
     @IBOutlet weak var lastUpdate: WKInterfaceLabel!
 
@@ -21,48 +22,36 @@ class GlanceController: WKInterfaceController {
 
         let totalPrs = PullRequest.countAllRequestsInMoc(mainObjectContext)
 
-        if totalPrs == 0 {
+		for l in [totalCount, mergedCount, closedCount, participatedCount, otherCount, unreadCount, lastUpdate] {
+			l.setHidden(totalPrs == 0)
+		}
 
-            totalCount.setHidden(true)
-            mergedCount.setHidden(true)
-            closedCount.setHidden(true)
-            participatedCount.setHidden(true)
-            unreadCount.setHidden(true)
-            lastUpdate.setHidden(true)
+        if totalPrs == 0 {
 
             let a = DataManager.reasonForEmptyWithFilter(nil)
             myCount.setAttributedText(a)
 
         } else {
 
-            totalCount.setHidden(false)
-            mergedCount.setHidden(false)
-            closedCount.setHidden(false)
-            participatedCount.setHidden(false)
-            unreadCount.setHidden(false)
-            lastUpdate.setHidden(false)
-
             totalCount.setText(NSString(format: "%d", totalPrs))
 
-            setCountOfLabel(myCount,
-                toCount: PullRequest.countRequestsInSection(PullRequestSection.Mine.rawValue, moc: mainObjectContext),
-                appending: "MINE")
+			setCountOfLabel(myCount, forSection: PullRequestSection.Mine)
+            setCountOfLabel(participatedCount, forSection: PullRequestSection.Participated)
+			setCountOfLabel(mergedCount, forSection: PullRequestSection.Merged)
+            setCountOfLabel(closedCount, forSection: PullRequestSection.Closed)
+			setCountOfLabel(otherCount, forSection: PullRequestSection.All)
 
-            setCountOfLabel(participatedCount,
-                toCount: PullRequest.countRequestsInSection(PullRequestSection.Participated.rawValue, moc: mainObjectContext),
-                appending: "PARTICIPATED")
-
-            setCountOfLabel(mergedCount,
-                toCount: PullRequest.countRequestsInSection(PullRequestSection.Merged.rawValue, moc: mainObjectContext),
-                appending: "MERGED")
-
-            setCountOfLabel(closedCount,
-                toCount: PullRequest.countRequestsInSection(PullRequestSection.Closed.rawValue, moc: mainObjectContext),
-                appending: "CLOSED")
-
-            setCountOfLabel(unreadCount,
-                toCount: PullRequest.badgeCountInMoc(mainObjectContext),
-                appending: "UNREAD COMMENTS")
+			let badgeCount = PullRequest.badgeCountInMoc(mainObjectContext)
+			if badgeCount == 0 {
+				unreadCount.setText("NO UNREAD COMMENTS")
+				unreadCount.setAlpha(0.4)
+			} else if badgeCount == 1 {
+				unreadCount.setText("1 UNREAD COMMENT")
+				unreadCount.setAlpha(1.0)
+			} else {
+				unreadCount.setText("\(badgeCount) UNREAD COMMENTS")
+				unreadCount.setAlpha(1.0)
+			}
 
             if let lastRefresh = Settings.lastSuccessfulRefresh {
                 let d = NSDateFormatter()
@@ -77,7 +66,9 @@ class GlanceController: WKInterfaceController {
         }
     }
 
-    func setCountOfLabel(label: WKInterfaceLabel, toCount: Int, appending: String) {
+	func setCountOfLabel(label: WKInterfaceLabel, forSection: PullRequestSection) {
+		let toCount = PullRequest.countRequestsInSection(forSection.rawValue, moc: mainObjectContext)
+		let appending = forSection.watchMenuName().uppercaseString
         if toCount > 0 {
             label.setAlpha(0.9)
             label.setText("\(toCount) \(appending)")
