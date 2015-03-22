@@ -267,6 +267,19 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 				Settings.includeLabelsInFilter = !Settings.includeLabelsInFilter
 			case 7:
 				Settings.showIssuesMenu = !Settings.showIssuesMenu
+				if Settings.showIssuesMenu {
+					for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as [Repo] {
+						r.dirty = true
+						r.lastDirtied = NSDate.distantPast() as? NSDate
+					}
+					app.preferencesDirty = true
+				} else {
+					for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as [Repo] {
+						for i in r.issues.allObjects as [Issue] {
+							i.postSyncAction = PostSyncAction.Delete.rawValue
+						}
+					}
+				}
 				settingsChangedTimer.push()
 			default: break
 			}

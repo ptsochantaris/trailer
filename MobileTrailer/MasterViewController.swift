@@ -473,7 +473,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 			}
 
 			let count = fetchedResultsController.fetchedObjects?.count ?? 0
-			tableView.tableFooterView = (count == 0) ? EmptyView(message: DataManager.reasonForEmptyWithFilter(searchField.text), parentWidth: view.bounds.size.width) : nil
+			tableView.tableFooterView = (count == 0) ? EmptyView(message: DataManager.reasonForEmptyIssuesWithFilter(searchField.text), parentWidth: view.bounds.size.width) : nil
 
 			dispatch_async(dispatch_get_main_queue(), { [weak self] in
 				self!.refreshControl!.endRefreshing()
