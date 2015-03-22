@@ -498,6 +498,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 					if let u = NSURL(string: up) {
 						NSWorkspace.sharedWorkspace().openURL(u)
 						updatePrMenu()
+						updateIssuesMenu()
 					}
 				}
 			}
@@ -578,7 +579,12 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	}
 
 	func dataItemSelected(item: DataItem, alternativeSelect: Bool) {
-		prMenu.filter.becomeFirstResponder()
+
+		let isPr = item is PullRequest
+
+		var window = isPr ? prMenu : issuesMenu
+		window.filter.becomeFirstResponder()
+
 		ignoreNextFocusLoss = alternativeSelect
 
 		if let pullRequest = item as? PullRequest {
@@ -593,12 +599,16 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 			issue.catchUpWithComments()
 		}
 
-		let reSelectIndex = alternativeSelect ? prMenu.table.selectedRow : -1
+		let reSelectIndex = alternativeSelect ? window.table.selectedRow : -1
 
-		updatePrMenu()
+		if isPr {
+			updatePrMenu()
+		} else {
+			updateIssuesMenu()
+		}
 
-		if reSelectIndex > -1 && reSelectIndex < prMenu.table.numberOfRows {
-			prMenu.table.selectRowIndexes(NSIndexSet(index: reSelectIndex), byExtendingSelection: false)
+		if reSelectIndex > -1 && reSelectIndex < window.table.numberOfRows {
+			window.table.selectRowIndexes(NSIndexSet(index: reSelectIndex), byExtendingSelection: false)
 		}
 	}
 
@@ -917,6 +927,13 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 			r.catchUpWithComments()
 		}
 		updatePrMenu()
+		if issuesStatusItem != nil {
+			let isf = Issue.requestForIssuesWithFilter(issuesMenu.filter.stringValue, sectionIndex: -1)
+			for i in mainObjectContext.executeFetchRequest(isf, error: nil) as [Issue] {
+				i.catchUpWithComments()
+			}
+			updateIssuesMenu()
+		}
 	}
 
 	@IBAction func preferencesSelected(sender: NSMenuItem?) {

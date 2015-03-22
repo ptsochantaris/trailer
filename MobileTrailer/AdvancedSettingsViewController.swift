@@ -81,10 +81,10 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 				cell.textLabel?.text = "Display creation instead of activity times"
 				cell.accessoryType = check(Settings.showCreatedInsteadOfUpdated)
 			case 1:
-				cell.textLabel?.text = "Hide 'All PRs' section"
+				cell.textLabel?.text = "Hide 'All' section"
 				cell.accessoryType = check(Settings.hideAllPrsSection)
 			case 2:
-				cell.textLabel?.text = "Move assigned PRs to 'Mine'"
+				cell.textLabel?.text = "Move assigned items to 'Mine'"
 				cell.accessoryType = check(Settings.moveAssignedPrsToMySection)
 			case 3:
 				cell.textLabel?.text = "Announce unmergeable PRs only in 'Mine'/'Participated'"
@@ -99,26 +99,26 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 				cell.textLabel?.text = "Include labels in filtering"
 				cell.accessoryType = check(Settings.includeLabelsInFilter)
 			case 7:
-				cell.textLabel?.text = "Show issues section"
+				cell.textLabel?.text = "Sync and display issues section"
 				cell.accessoryType = check(Settings.showIssuesMenu)
 			default: break
 			}
 		} else if indexPath.section == Section.Comments.rawValue {
 			switch indexPath.row {
 			case 0:
-				cell.textLabel?.text = "Display comment badges and alerts for all PRs"
+				cell.textLabel?.text = "Display comment badges and alerts for all items"
 				cell.accessoryType = check(Settings.showCommentsEverywhere)
 			case 1:
-				cell.textLabel?.text = "Only display PRs with unread comments"
+				cell.textLabel?.text = "Only display items with unread comments"
 				cell.accessoryType = check(Settings.shouldHideUncommentedRequests)
 			case 2:
-				cell.textLabel?.text = "Move PRs that mention me to 'Participated'"
+				cell.textLabel?.text = "Move items menitoning me to 'Participated'"
 				cell.accessoryType = check(Settings.autoParticipateInMentions)
 			case 3:
-				cell.textLabel?.text = "Move PRs that mention my teams to 'Participated'"
+				cell.textLabel?.text = "Move items menitoning my teams to 'Participated'"
 				cell.accessoryType = check(Settings.autoParticipateOnTeamMentions)
 			case 4:
-				cell.textLabel?.text = "Open PRs at first unread comment"
+				cell.textLabel?.text = "Open items at first unread comment"
 				cell.accessoryType = check(Settings.openPrAtFirstUnreadComment)
 			case 5:
 				cell.textLabel?.text = "Block comment notifications from usernames..."
@@ -160,10 +160,10 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 		} else if indexPath.section == Section.History.rawValue {
 			switch indexPath.row {
 			case 0:
-				cell.textLabel?.text = "When a PR is merged"
+				cell.textLabel?.text = "When something is merged"
 				cell.detailTextLabel?.text = HandlingPolicy(rawValue: Settings.mergeHandlingPolicy)?.name()
 			case 1:
-				cell.textLabel?.text = "When a PR is closed"
+				cell.textLabel?.text = "When something is closed"
 				cell.detailTextLabel?.text = HandlingPolicy(rawValue: Settings.closeHandlingPolicy)?.name()
 			case 2:
 				cell.textLabel?.text = "Don't keep PRs merged by me"
@@ -173,10 +173,10 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 		} else if indexPath.section == Section.Confirm.rawValue {
 			switch indexPath.row {
 			case 0:
-				cell.textLabel?.text = "Removing all merged PRs"
+				cell.textLabel?.text = "Removing all merged items"
 				cell.accessoryType = check(Settings.dontAskBeforeWipingMerged)
 			case 1:
-				cell.textLabel?.text = "Removing all closed PRs"
+				cell.textLabel?.text = "Removing all closed items"
 				cell.accessoryType = check(Settings.dontAskBeforeWipingClosed)
 			default: break
 			}
@@ -419,7 +419,7 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 				tableView.reloadData()
 				if Settings.logActivityToConsole {
 					UIAlertView(title: "Warning",
-						message: "Logging is a feature meant for error reporting, having it constantly enabled will cause this app to be less responsive and use more battery",
+						message: "Logging is a feature meant to aid error reporting, having it constantly enabled will cause this app to be less responsive and use more battery",
 						delegate: nil,
 						cancelButtonTitle: "OK").show()
 				}
