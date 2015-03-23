@@ -165,6 +165,23 @@ class Issue: DataItem {
 		return badgeCount
 	}
 
+	class func badgeCountInSection(section: Int, moc: NSManagedObjectContext) -> Int {
+		let f = NSFetchRequest(entityName: "Issue")
+		f.predicate = NSPredicate(format: "sectionIndex == %d", section)
+		var badgeCount:Int = 0
+		let showCommentsEverywhere = Settings.showCommentsEverywhere
+		for p in moc.executeFetchRequest(f, error: nil) as [Issue] {
+			if let sectionIndex = p.sectionIndex?.integerValue {
+				if showCommentsEverywhere || sectionIndex==PullRequestSection.Mine.rawValue || sectionIndex==PullRequestSection.Participated.rawValue {
+					if let c = p.unreadComments?.integerValue {
+						badgeCount += c
+					}
+				}
+			}
+		}
+		return badgeCount
+	}
+
 	class func countOpenIssuesInMoc(moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest(entityName: "Issue")
 		f.predicate = NSPredicate(format: "condition == %d or condition == nil", PullRequestCondition.Open.rawValue)

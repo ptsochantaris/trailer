@@ -3,10 +3,7 @@ import WatchKit
 
 class SectionController: WKInterfaceController {
 
-    @IBOutlet weak var emptyLabel: WKInterfaceLabel!
     @IBOutlet weak var table: WKInterfaceTable!
-
-    var titles = [String]()
 
     var refreshWhenBack = false
 
@@ -54,44 +51,81 @@ class SectionController: WKInterfaceController {
         return [ SECTION_KEY: rowIndex+1 ]
     }
 
+	class titleEntry {
+		var title: String
+		init(_ title: String) { self.title = title }
+	}
+
+	class attributedTitleEntry {
+		var title: NSAttributedString
+		init(_ title: NSAttributedString) { self.title = title }
+	}
+
+	class prEntry {
+		var section: PullRequestSection
+		init(_ section: PullRequestSection) { self.section = section }
+	}
+
+	class issueEntry {
+		var section: PullRequestSection
+		init(_ section: PullRequestSection) { self.section = section }
+	}
+
     private func buildUI() {
-        let totalPrs = PullRequest.countAllRequestsInMoc(mainObjectContext)
 
+		var rowTypes = [AnyObject]()
+
+		let totalPrs = PullRequest.countAllRequestsInMoc(mainObjectContext)
         if totalPrs==0 {
-
-            table.setHidden(true)
-            table.setNumberOfRows(0, withRowType: "TopRow")
-            emptyLabel.setHidden(false)
-
-            let a = DataManager.reasonForEmptyWithFilter(nil)
-            emptyLabel.setAttributedText(a)
-            setTitle("No PRs")
-
+            rowTypes.append(attributedTitleEntry(DataManager.reasonForEmptyWithFilter(nil)))
         } else {
-
-            setTitle("\(totalPrs) PRs")
-
-            table.setHidden(false)
-            emptyLabel.setHidden(true)
-
-            table.setNumberOfRows(5, withRowType: "SectionRow")
-
-            for f in MINE_INDEX...OTHER_INDEX {
-                let controller = table.rowControllerAtIndex(f) as SectionRow
-                switch(f) {
-                case MINE_INDEX:
-                    titles.append(controller.setRow(PullRequestSection.Mine, PullRequestSection.watchMenuTitles[f+1]))
-                case PARTICIPATED_INDEX:
-                    titles.append(controller.setRow(PullRequestSection.Participated, PullRequestSection.watchMenuTitles[f+1]))
-                case MERGED_INDEX:
-                    titles.append(controller.setRow(PullRequestSection.Merged, PullRequestSection.watchMenuTitles[f+1]))
-                case CLOSED_INDEX:
-                    titles.append(controller.setRow(PullRequestSection.Closed, PullRequestSection.watchMenuTitles[f+1]))
-                case OTHER_INDEX:
-                    titles.append(controller.setRow(PullRequestSection.All, PullRequestSection.watchMenuTitles[f+1]))
-                default: break
-                }
-            }
+			if Settings.showIssuesMenu { rowTypes.append(titleEntry("\(totalPrs) Pull Requests")) }
+			rowTypes.append(prEntry(PullRequestSection.Mine))
+			rowTypes.append(prEntry(PullRequestSection.Participated))
+			rowTypes.append(prEntry(PullRequestSection.Merged))
+			rowTypes.append(prEntry(PullRequestSection.Closed))
+			rowTypes.append(prEntry(PullRequestSection.All))
         }
+
+		if Settings.showIssuesMenu {
+			let totalIssues = Settings.showStatusItems ? 0 : Issue.countAllIssuesInMoc(mainObjectContext)
+			if totalIssues==0 {
+				rowTypes.append(attributedTitleEntry(DataManager.reasonForEmptyIssuesWithFilter(nil)))
+			} else {
+				rowTypes.append(titleEntry("\(totalIssues) Issues"))
+				rowTypes.append(issueEntry(PullRequestSection.Mine))
+				rowTypes.append(issueEntry(PullRequestSection.Participated))
+				rowTypes.append(issueEntry(PullRequestSection.Merged))
+				rowTypes.append(issueEntry(PullRequestSection.Closed))
+				rowTypes.append(issueEntry(PullRequestSection.All))
+			}
+			setTitle("Sections")
+		} else {
+			setTitle("\(totalPrs) PRs")
+		}
+
+		var rowControllerTypes = [String]()
+		for type in rowTypes {
+			if type is titleEntry || type is attributedTitleEntry{
+				rowControllerTypes.append("TitleRow")
+			} else if type is prEntry || type is issueEntry {
+				rowControllerTypes.append("SectionRow")
+			}
+		}
+		table.setRowTypes(rowControllerTypes)
+
+		var index = 0
+		for type in rowTypes {
+			if let t = type as? titleEntry {
+				(table.rowControllerAtIndex(index) as TitleRow).titleL.setText(t.title)
+			} else if let t = type as? attributedTitleEntry {
+				(table.rowControllerAtIndex(index) as TitleRow).titleL.setAttributedText(t.title)
+			} else if let t = type as? prEntry {
+				(table.rowControllerAtIndex(index) as SectionRow).setPr(t.section)
+			} else if let t = type as? issueEntry {
+				(table.rowControllerAtIndex(index) as SectionRow).setIssue(t.section)
+			}
+			index++
+		}
     }
 }

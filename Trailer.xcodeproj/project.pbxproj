@@ -139,6 +139,7 @@
 		16E93D141AB4680F00CA967E /* PRDetailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E93D131AB4680F00CA967E /* PRDetailController.swift */; };
 		16E93D171AB46CE600CA967E /* LabelRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E93D161AB46CE600CA967E /* LabelRow.swift */; };
 		16E93D191AB46CEE00CA967E /* PRRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E93D181AB46CEE00CA967E /* PRRow.swift */; };
+		16EA4A351AC0CAA3001AC9D0 /* TitleRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16EA4A341AC0CAA3001AC9D0 /* TitleRow.swift */; };
 		16EDAB1A1AB4C2D4009B38DD /* CommentRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16EDAB191AB4C2D4009B38DD /* CommentRow.swift */; };
 		16EDAB1C1AB4CB6F009B38DD /* StatusRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16EDAB1B1AB4CB6F009B38DD /* StatusRow.swift */; };
 		16EE6AD01A9A711C000A8483 /* CountLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16EE6ACF1A9A711C000A8483 /* CountLabel.swift */; };
@@ -312,6 +313,7 @@
 		16E93D131AB4680F00CA967E /* PRDetailController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PRDetailController.swift; sourceTree = "<group>"; };
 		16E93D161AB46CE600CA967E /* LabelRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LabelRow.swift; sourceTree = "<group>"; };
 		16E93D181AB46CEE00CA967E /* PRRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PRRow.swift; sourceTree = "<group>"; };
+		16EA4A341AC0CAA3001AC9D0 /* TitleRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TitleRow.swift; sourceTree = "<group>"; };
 		16EDAB191AB4C2D4009B38DD /* CommentRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentRow.swift; sourceTree = "<group>"; };
 		16EDAB1B1AB4CB6F009B38DD /* StatusRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatusRow.swift; sourceTree = "<group>"; };
 		16EE6ACF1A9A711C000A8483 /* CountLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CountLabel.swift; sourceTree = "<group>"; };
@@ -353,7 +355,7 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		1618527E1AB2CB9000526D81 /* PocketTrailer Today Extension */ = {
+		1618527E1AB2CB9000526D81 /* Today Extension */ = {
 			isa = PBXGroup;
 			children = (
 				161852811AB2CB9000526D81 /* TodayViewController.swift */,
@@ -361,6 +363,7 @@
 				1618528B1AB2CC8200526D81 /* Media.xcassets */,
 				1618527F1AB2CB9000526D81 /* Supporting Files */,
 			);
+			name = "Today Extension";
 			path = "PocketTrailer Today Extension";
 			sourceTree = "<group>";
 		};
@@ -395,7 +398,7 @@
 			name = Core;
 			sourceTree = "<group>";
 		};
-		1628A6BA18789E73005EDA69 /* PocketTrailer */ = {
+		1628A6BA18789E73005EDA69 /* App */ = {
 			isa = PBXGroup;
 			children = (
 				162002D11A2A409900FF95F3 /* Core */,
@@ -407,7 +410,7 @@
 				1628A6D518789E73005EDA69 /* Images.xcassets */,
 				1628A6BB18789E73005EDA69 /* Supporting Files */,
 			);
-			name = PocketTrailer;
+			name = App;
 			path = MobileTrailer;
 			sourceTree = "<group>";
 		};
@@ -458,7 +461,18 @@
 			name = Cells;
 			sourceTree = "<group>";
 		};
-		16522D711AB03AE500B1C3FB /* PocketTrailer WatchKit Extension */ = {
+		164DEAFA1AC0C8BB00AA6F73 /* PocketTrailer */ = {
+			isa = PBXGroup;
+			children = (
+				1628A6BA18789E73005EDA69 /* App */,
+				16522D711AB03AE500B1C3FB /* WatchKit Extension */,
+				16522D801AB03AE500B1C3FB /* WatchKit App */,
+				1618527E1AB2CB9000526D81 /* Today Extension */,
+			);
+			name = PocketTrailer;
+			sourceTree = "<group>";
+		};
+		16522D711AB03AE500B1C3FB /* WatchKit Extension */ = {
 			isa = PBXGroup;
 			children = (
 				16143E801AB44C3F00BAC070 /* WatchGlobals.swift */,
@@ -470,6 +484,7 @@
 				16522D781AB03AE500B1C3FB /* Images.xcassets */,
 				16522D721AB03AE500B1C3FB /* Supporting Files */,
 			);
+			name = "WatchKit Extension";
 			path = "PocketTrailer WatchKit Extension";
 			sourceTree = "<group>";
 		};
@@ -482,13 +497,14 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		16522D801AB03AE500B1C3FB /* PocketTrailer WatchKit App */ = {
+		16522D801AB03AE500B1C3FB /* WatchKit App */ = {
 			isa = PBXGroup;
 			children = (
 				16522D861AB03AE500B1C3FB /* Images.xcassets */,
 				16522D831AB03AE500B1C3FB /* Interface.storyboard */,
 				16522D821AB03AE500B1C3FB /* Info.plist */,
 			);
+			name = "WatchKit App";
 			path = "PocketTrailer WatchKit App";
 			sourceTree = "<group>";
 		};
@@ -516,10 +532,7 @@
 			children = (
 				1628A6F218789EA3005EDA69 /* Shared */,
 				168BC6B317EC2DF000BC4584 /* Trailer */,
-				1628A6BA18789E73005EDA69 /* PocketTrailer */,
-				16522D711AB03AE500B1C3FB /* PocketTrailer WatchKit Extension */,
-				16522D801AB03AE500B1C3FB /* PocketTrailer WatchKit App */,
-				1618527E1AB2CB9000526D81 /* PocketTrailer Today Extension */,
+				164DEAFA1AC0C8BB00AA6F73 /* PocketTrailer */,
 				168BC6AC17EC2DF000BC4584 /* Frameworks */,
 				168BC6AB17EC2DF000BC4584 /* Products */,
 			);
@@ -616,6 +629,7 @@
 			children = (
 				16143E7A1AB435EC00BAC070 /* SectionController.swift */,
 				16143E821AB44E9F00BAC070 /* SectionRow.swift */,
+				16EA4A341AC0CAA3001AC9D0 /* TitleRow.swift */,
 			);
 			name = PRSections;
 			sourceTree = "<group>";
@@ -962,6 +976,7 @@
 				16E93D141AB4680F00CA967E /* PRDetailController.swift in Sources */,
 				16143E7F1AB44BFD00BAC070 /* ExtensionGlobals.swift in Sources */,
 				161B851E1AB8E12C00AD4C5D /* Team.swift in Sources */,
+				16EA4A351AC0CAA3001AC9D0 /* TitleRow.swift in Sources */,
 				16143E831AB44E9F00BAC070 /* SectionRow.swift in Sources */,
 				16E93D171AB46CE600CA967E /* LabelRow.swift in Sources */,
 				1672DF3F1AB0E8DE00381AEB /* DataManager.swift in Sources */,
@@ -1107,7 +1122,6 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CODE_SIGN_ENTITLEMENTS = "PocketTrailer Today Extension/PocketTrailer Today Extension.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1137,8 +1151,7 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CODE_SIGN_ENTITLEMENTS = "PocketTrailer Today Extension/PocketTrailer Today Extension.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -1148,7 +1161,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "2088641f-34b1-4c82-bc0e-1ceaa0594f52";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "MobileTrailer/PocketTrailer-Bridging-Header.h";
@@ -1162,7 +1175,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = PocketTrailer.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COMPRESS_PNG_FILES = NO;
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				INFOPLIST_FILE = "MobileTrailer/PocketTrailer-Info.plist";
@@ -1180,13 +1192,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = PocketTrailer.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				COMPRESS_PNG_FILES = NO;
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				INFOPLIST_FILE = "MobileTrailer/PocketTrailer-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "8f4c3fa9-1a0d-4555-8a8a-c027cec25618";
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "MobileTrailer/PocketTrailer-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Ounchecked";
@@ -1205,7 +1216,6 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CODE_SIGN_ENTITLEMENTS = "PocketTrailer WatchKit Extension/PocketTrailer WatchKit Extension.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1235,8 +1245,7 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CODE_SIGN_ENTITLEMENTS = "PocketTrailer WatchKit Extension/PocketTrailer WatchKit Extension.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -1246,7 +1255,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = "${TARGET_NAME}";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "7406651d-10d1-4223-9a9d-3df7fc105aeb";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "MobileTrailer/PocketTrailer-Bridging-Header.h";

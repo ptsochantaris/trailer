@@ -10,14 +10,27 @@
             <objects>
                 <controller id="AgC-eL-Hgc" customClass="SectionController" customModule="PocketTrailer_WatchKit_Extension">
                     <items>
-                        <label alignment="center" verticalAlignment="center" hidden="YES" text="Label" textAlignment="center" numberOfLines="0" id="MO0-Ee-aHD"/>
                         <table alignment="left" verticalAlignment="center" id="be2-ie-h5R">
                             <items>
+                                <tableRow identifier="TitleRow" selectable="NO" id="tHv-Jj-a9y" customClass="TitleRow" customModule="PocketTrailer_WatchKit_Extension">
+                                    <group key="rootItem" width="1" height="0.0" alignment="left" id="mWo-dt-dzr">
+                                        <items>
+                                            <label alignment="center" text="Pull Requests" textAlignment="left" numberOfLines="0" id="dy2-9S-MJp">
+                                                <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                                <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
+                                            </label>
+                                        </items>
+                                        <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                    </group>
+                                    <connections>
+                                        <outlet property="titleL" destination="dy2-9S-MJp" id="mX0-PC-TAL"/>
+                                    </connections>
+                                </tableRow>
                                 <tableRow identifier="SectionRow" id="ql1-oS-xZe" customClass="SectionRow" customModule="PocketTrailer_WatchKit_Extension">
                                     <group key="rootItem" width="1" height="0.0" alignment="left" id="Uft-cP-lJ6">
                                         <items>
                                             <label alignment="left" verticalAlignment="center" text="Title" id="m26-4w-XIn">
-                                                <fontDescription key="font" style="UICTFontTextStyleHeadline"/>
+                                                <fontDescription key="font" style="UICTFontTextStyleSubhead"/>
                                             </label>
                                             <group height="1" alignment="right" radius="9" id="VK1-qB-Emf">
                                                 <items>
@@ -67,7 +80,6 @@
                         </items>
                     </menu>
                     <connections>
-                        <outlet property="emptyLabel" destination="MO0-Ee-aHD" id="DXw-3I-WQY"/>
                         <outlet property="table" destination="be2-ie-h5R" id="Lhy-Wj-Csa"/>
                     </connections>
                 </controller>

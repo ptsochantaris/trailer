@@ -7,18 +7,26 @@ class SectionRow: NSObject {
     @IBOutlet weak var countL: WKInterfaceLabel!
     @IBOutlet weak var countHolder: WKInterfaceGroup!
 
-    func setRow(section: PullRequestSection, _ suffix: String) -> String {
+    func setPr(section: PullRequestSection) {
 
-        let prCount = PullRequest.countRequestsInSection(section.rawValue, moc: mainObjectContext)
-
-        let titleText = "\(prCount) \(suffix)"
-        titleL.setText(titleText)
-        titleL.setAlpha(prCount==0 ? 0.4 : 1.0)
+        let count = PullRequest.countRequestsInSection(section.rawValue, moc: mainObjectContext)
+        titleL.setText("\(count) \(section.watchMenuName())")
+        titleL.setAlpha(count==0 ? 0.4 : 1.0)
 
         let unreadCount = PullRequest.badgeCountInSection(section.rawValue, moc: mainObjectContext)
         countL.setText("\(unreadCount)")
         countHolder.setHidden(unreadCount==0)
-
-        return titleText
     }
+
+	func setIssue(section: PullRequestSection) {
+
+		let count = Issue.countIssuesInSection(section.rawValue, moc: mainObjectContext)
+		titleL.setText("\(count) \(section.watchMenuName())")
+		titleL.setAlpha(count==0 ? 0.4 : 1.0)
+
+		let unreadCount = Issue.badgeCountInSection(section.rawValue, moc: mainObjectContext)
+		countL.setText("\(unreadCount)")
+		countHolder.setHidden(unreadCount==0)
+	}
+
 }
