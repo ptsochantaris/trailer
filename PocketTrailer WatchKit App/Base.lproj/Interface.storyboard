@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="6751" systemVersion="14C1514" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="AgC-eL-Hgc">
+<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="7528.3" systemVersion="14C1514" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="AgC-eL-Hgc">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6736"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7518.3"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="3737"/>
     </dependencies>
     <scenes>
-        <!--Section Controller-->
+        <!--SectionController-->
         <scene sceneID="aou-V4-d1y">
             <objects>
-                <controller id="AgC-eL-Hgc" customClass="SectionController" customModule="PocketTrailer_WatchKit_Extension">
+                <controller identifier="SectionController" id="AgC-eL-Hgc" customClass="SectionController" customModule="PocketTrailer_WatchKit_Extension">
                     <items>
                         <table alignment="left" verticalAlignment="center" id="be2-ie-h5R">
                             <items>
@@ -49,7 +49,6 @@
                                         <outlet property="countHolder" destination="VK1-qB-Emf" id="ghB-It-VlJ"/>
                                         <outlet property="countL" destination="YSb-rO-7SF" id="Cpc-eB-Bi7"/>
                                         <outlet property="titleL" destination="m26-4w-XIn" id="abe-vu-sBX"/>
-                                        <segue destination="Sqe-dw-Y9B" kind="push" id="65c-yz-7QC"/>
                                     </connections>
                                 </tableRow>
                             </items>
@@ -86,12 +85,12 @@
             </objects>
             <point key="canvasLocation" x="164" y="217"/>
         </scene>
-        <!--List Controller-->
+        <!--ListController-->
         <scene sceneID="ox7-bJ-gA7">
             <objects>
-                <controller id="Sqe-dw-Y9B" customClass="PRListController" customModule="PocketTrailer_WatchKit_Extension">
+                <controller identifier="ListController" id="Sqe-dw-Y9B" customClass="PRListController" customModule="PocketTrailer_WatchKit_Extension">
                     <items>
-                        <label alignment="center" verticalAlignment="center" hidden="YES" text="No PRs in this section" textAlignment="center" numberOfLines="0" id="PLW-UR-bJ2"/>
+                        <label alignment="center" verticalAlignment="center" hidden="YES" text="No items in this section" textAlignment="center" numberOfLines="0" id="PLW-UR-bJ2"/>
                         <table alignment="left" id="XeC-bN-XlT">
                             <items>
                                 <tableRow identifier="PRRow" id="qcu-Df-oql" customClass="PRRow" customModule="PocketTrailer_WatchKit_Extension">
@@ -138,7 +137,6 @@
                                         <outlet property="totalCommentsL" destination="zum-4e-Nxi" id="dcY-NT-d69"/>
                                         <outlet property="unreadCommentsGroup" destination="FFB-8c-hj1" id="qXk-dh-8Ah"/>
                                         <outlet property="unreadCommentsL" destination="bd9-NV-xBM" id="llp-lY-CsN"/>
-                                        <segue destination="Hgm-oe-oa5" kind="push" id="DhF-WS-hec"/>
                                     </connections>
                                 </tableRow>
                             </items>
@@ -176,10 +174,10 @@
             </objects>
             <point key="canvasLocation" x="409" y="225"/>
         </scene>
-        <!--Detail Controller-->
+        <!--DetailController-->
         <scene sceneID="Y5a-NZ-okm">
             <objects>
-                <controller id="Hgm-oe-oa5" customClass="PRDetailController" customModule="PocketTrailer_WatchKit_Extension">
+                <controller identifier="DetailController" id="Hgm-oe-oa5" customClass="PRDetailController" customModule="PocketTrailer_WatchKit_Extension">
                     <items>
                         <table alignment="left" id="nDu-Js-IyV">
                             <items>

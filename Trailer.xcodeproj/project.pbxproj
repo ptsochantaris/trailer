@@ -478,9 +478,9 @@
 				16143E801AB44C3F00BAC070 /* WatchGlobals.swift */,
 				16522D761AB03AE500B1C3FB /* GlanceController.swift */,
 				16062CEC1AB488BE00AB1F66 /* CommandController.swift */,
-				16E93D151AB4681800CA967E /* PRDetail */,
-				16E93D101AB467BF00CA967E /* PRList */,
-				16D845381AB4513F0098FB65 /* PRSections */,
+				16E93D151AB4681800CA967E /* Detail */,
+				16E93D101AB467BF00CA967E /* List */,
+				16D845381AB4513F0098FB65 /* Sections */,
 				16522D781AB03AE500B1C3FB /* Images.xcassets */,
 				16522D721AB03AE500B1C3FB /* Supporting Files */,
 			);
@@ -624,26 +624,26 @@
 			path = Trailer;
 			sourceTree = "<group>";
 		};
-		16D845381AB4513F0098FB65 /* PRSections */ = {
+		16D845381AB4513F0098FB65 /* Sections */ = {
 			isa = PBXGroup;
 			children = (
 				16143E7A1AB435EC00BAC070 /* SectionController.swift */,
 				16143E821AB44E9F00BAC070 /* SectionRow.swift */,
 				16EA4A341AC0CAA3001AC9D0 /* TitleRow.swift */,
 			);
-			name = PRSections;
+			name = Sections;
 			sourceTree = "<group>";
 		};
-		16E93D101AB467BF00CA967E /* PRList */ = {
+		16E93D101AB467BF00CA967E /* List */ = {
 			isa = PBXGroup;
 			children = (
 				16E93D111AB467DA00CA967E /* PRListController.swift */,
 				16E93D181AB46CEE00CA967E /* PRRow.swift */,
 			);
-			name = PRList;
+			name = List;
 			sourceTree = "<group>";
 		};
-		16E93D151AB4681800CA967E /* PRDetail */ = {
+		16E93D151AB4681800CA967E /* Detail */ = {
 			isa = PBXGroup;
 			children = (
 				16E93D131AB4680F00CA967E /* PRDetailController.swift */,
@@ -651,7 +651,7 @@
 				16EDAB191AB4C2D4009B38DD /* CommentRow.swift */,
 				16EDAB1B1AB4CB6F009B38DD /* StatusRow.swift */,
 			);
-			name = PRDetail;
+			name = Detail;
 			sourceTree = "<group>";
 		};
 		16EE562219B857C90031DF6D /* Models */ = {

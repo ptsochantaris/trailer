@@ -47,10 +47,6 @@ class SectionController: WKInterfaceController {
         presentControllerWithName("Command Controller", context: "refresh")
     }
 
-    override func contextForSegueWithIdentifier(segueIdentifier: String, inTable table: WKInterfaceTable, rowIndex: Int) -> AnyObject? {
-        return [ SECTION_KEY: rowIndex+1 ]
-    }
-
 	class titleEntry {
 		var title: String
 		init(_ title: String) { self.title = title }
@@ -71,6 +67,21 @@ class SectionController: WKInterfaceController {
 		init(_ section: PullRequestSection) { self.section = section }
 	}
 
+	override func table(table: WKInterfaceTable, didSelectRowAtIndex rowIndex: Int) {
+		if Settings.showIssuesMenu {
+			var ri = rowIndex
+			var type = "PRS"
+			if ri > PullRequestSection.All.rawValue {
+				ri -= PullRequestSection.All.rawValue
+				ri--
+				type = "ISSUES"
+			}
+			pushControllerWithName("ListController", context: [ SECTION_KEY: ri, TYPE_KEY: type ] )
+		} else {
+			pushControllerWithName("ListController", context: [ SECTION_KEY: rowIndex+1 ] )
+		}
+	}
+
     private func buildUI() {
 
 		var rowTypes = [AnyObject]()
@@ -88,7 +99,7 @@ class SectionController: WKInterfaceController {
         }
 
 		if Settings.showIssuesMenu {
-			let totalIssues = Settings.showStatusItems ? 0 : Issue.countAllIssuesInMoc(mainObjectContext)
+			let totalIssues = Issue.countAllIssuesInMoc(mainObjectContext)
 			if totalIssues==0 {
 				rowTypes.append(attributedTitleEntry(DataManager.reasonForEmptyIssuesWithFilter(nil)))
 			} else {

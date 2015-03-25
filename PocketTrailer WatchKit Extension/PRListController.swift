@@ -2,22 +2,26 @@
 import WatchKit
 import Foundation
 
-
 class PRListController: WKInterfaceController {
 
     @IBOutlet weak var emptyLabel: WKInterfaceLabel!
     @IBOutlet weak var table: WKInterfaceTable!
 
-    var prsInSection: [PullRequest]!
+    var itemsInSection: [AnyObject]!
 
     var refreshWhenBack = false
 
     var sectionIndex: Int!
 
+	var prs: Bool!
+
     override func awakeWithContext(context: AnyObject?) {
         super.awakeWithContext(context)
 
-        sectionIndex = (context as! NSDictionary)[SECTION_KEY] as! Int
+		let c = context as! NSDictionary
+        sectionIndex = c[SECTION_KEY] as! Int
+
+		prs = ((c[TYPE_KEY] as! String)=="PRS")
 
         setTitle(PullRequestSection.watchMenuTitles[sectionIndex])
 
@@ -56,17 +60,27 @@ class PRListController: WKInterfaceController {
         presentControllerWithName("Command Controller", context: "refresh")
     }
 
-    override func contextForSegueWithIdentifier(segueIdentifier: String, inTable table: WKInterfaceTable, rowIndex: Int) -> AnyObject? {
-        return [ PULL_REQUEST_KEY: prsInSection[rowIndex] ]
-    }
+	override func table(table: WKInterfaceTable, didSelectRowAtIndex rowIndex: Int) {
+		if prs==true {
+			pushControllerWithName("DetailController", context: [ PULL_REQUEST_KEY: itemsInSection[rowIndex] ])
+		} else {
+			pushControllerWithName("DetailController", context: [ ISSUE_KEY: itemsInSection[rowIndex] ])
+		}
+	}
 
     private func buildUI() {
-        let f = PullRequest.requestForPullRequestsWithFilter(nil, sectionIndex: sectionIndex)
-        prsInSection = mainObjectContext.executeFetchRequest(f, error: nil) as! [PullRequest]
 
-        table.setNumberOfRows(prsInSection.count, withRowType: "PRRow")
+		if prs==true {
+			let f = PullRequest.requestForPullRequestsWithFilter(nil, sectionIndex: sectionIndex)
+			itemsInSection = mainObjectContext.executeFetchRequest(f, error: nil) as! [PullRequest]
+		} else {
+			let f = Issue.requestForIssuesWithFilter(nil, sectionIndex: sectionIndex)
+			itemsInSection = mainObjectContext.executeFetchRequest(f, error: nil) as! [Issue]
+		}
 
-        if prsInSection.count==0 {
+        table.setNumberOfRows(itemsInSection.count, withRowType: "PRRow")
+
+        if itemsInSection.count==0 {
             table.setHidden(true)
             emptyLabel.setHidden(false)
         } else {
@@ -74,9 +88,13 @@ class PRListController: WKInterfaceController {
             emptyLabel.setHidden(true)
 
             var index = 0
-            for pr in prsInSection {
+            for item in itemsInSection {
                 let controller = table.rowControllerAtIndex(index++) as! PRRow
-                controller.setPullRequest(pr)
+				if prs==true {
+					controller.setPullRequest(item as! PullRequest)
+				} else {
+					controller.setIssue(item as! Issue)
+				}
             }
         }
     }

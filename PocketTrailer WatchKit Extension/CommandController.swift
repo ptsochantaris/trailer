@@ -11,6 +11,8 @@ class CommandController: WKInterfaceController {
 
         super.awakeWithContext(context)
 
+		Settings.clearCache()
+
         let result = WKInterfaceController.openParentApplication(["command": context as! String], reply: {
             [weak self] result, error -> Void in
             if let e = error {
