@@ -54,6 +54,21 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 		return true
 	}
 
+	func application(application: UIApplication, handleOpenURL url: NSURL) -> Bool {
+		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
+			if let host = NSURLComponents(URL: url, resolvingAgainstBaseURL: false)?.host {
+				let m = self.getMasterController()
+				DLog(host)
+				if host == "pullRequests" {
+					m.showPullRequestsSelected(self)
+				} else if host == "issues" {
+					m.showIssuesSelected(self)
+				}
+			}
+		}
+		return true
+	}
+
 	func splitViewController(splitViewController: UISplitViewController, collapseSecondaryViewController secondaryViewController: UIViewController!, ontoPrimaryViewController primaryViewController: UIViewController!) -> Bool {
 		let m = (primaryViewController as! UINavigationController).viewControllers.first as! MasterViewController
 		m.clearsSelectionOnViewWillAppear = true

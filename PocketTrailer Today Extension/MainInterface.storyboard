@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6751" systemVersion="14C1510" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="M4Y-Lb-cyx">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7528.3" systemVersion="14C1514" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="M4Y-Lb-cyx">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6736"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7518.3"/>
     </dependencies>
     <scenes>
         <!--Today View Controller-->
@@ -12,12 +12,38 @@
                         <viewControllerLayoutGuide type="top" id="Ft6-oW-KC0"/>
                         <viewControllerLayoutGuide type="bottom" id="FKl-LY-JtV"/>
                     </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" simulatedAppContext="notificationCenter" id="S3S-Oj-5AN">
+                    <view key="view" contentMode="scaleToFill" verticalHuggingPriority="251" simulatedAppContext="notificationCenter" id="S3S-Oj-5AN">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="260" verticalHuggingPriority="260" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="quz-Tb-Fw0">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="quz-Tb-Fw0" userLabel="Prs">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="20"/>
+                                <attributedString key="attributedText">
+                                    <fragment content="Loading...">
+                                        <attributes>
+                                            <color key="NSColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                            <font key="NSFont" size="17" name="HelveticaNeue"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
+                                        </attributes>
+                                    </fragment>
+                                </attributedString>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LSV-z6-vQv" userLabel="Issues">
+                                <rect key="frame" x="0.0" y="28" width="320" height="20"/>
+                                <attributedString key="attributedText">
+                                    <fragment content="Loading...">
+                                        <attributes>
+                                            <color key="NSColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                            <font key="NSFont" size="17" name="HelveticaNeue"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
+                                        </attributes>
+                                    </fragment>
+                                </attributedString>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="249" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Yh8-Pg-XrK" userLabel="Lastupdated">
+                                <rect key="frame" x="0.0" y="56" width="320" height="512"/>
                                 <attributedString key="attributedText">
                                     <fragment content="Loading...">
                                         <attributes>
@@ -31,10 +57,16 @@
                             </label>
                         </subviews>
                         <constraints>
-                            <constraint firstAttribute="trailing" secondItem="quz-Tb-Fw0" secondAttribute="trailing" id="J3Y-D6-ek8"/>
-                            <constraint firstItem="quz-Tb-Fw0" firstAttribute="top" secondItem="Ft6-oW-KC0" secondAttribute="bottom" id="dfr-Es-jlJ"/>
-                            <constraint firstItem="quz-Tb-Fw0" firstAttribute="leading" secondItem="S3S-Oj-5AN" secondAttribute="leading" id="gyk-CB-KUo"/>
-                            <constraint firstItem="FKl-LY-JtV" firstAttribute="top" secondItem="quz-Tb-Fw0" secondAttribute="bottom" id="yir-hv-cLd"/>
+                            <constraint firstItem="LSV-z6-vQv" firstAttribute="width" secondItem="Yh8-Pg-XrK" secondAttribute="width" id="2NH-oS-xrV"/>
+                            <constraint firstItem="quz-Tb-Fw0" firstAttribute="leading" secondItem="LSV-z6-vQv" secondAttribute="leading" id="7i9-hM-MP2"/>
+                            <constraint firstItem="quz-Tb-Fw0" firstAttribute="leading" secondItem="S3S-Oj-5AN" secondAttribute="leading" id="BgO-OO-DPb"/>
+                            <constraint firstItem="Yh8-Pg-XrK" firstAttribute="top" secondItem="LSV-z6-vQv" secondAttribute="bottom" constant="8" id="GNa-lm-Bbv"/>
+                            <constraint firstItem="LSV-z6-vQv" firstAttribute="top" secondItem="quz-Tb-Fw0" secondAttribute="bottom" constant="8" id="KOH-rw-7Uy"/>
+                            <constraint firstItem="quz-Tb-Fw0" firstAttribute="width" secondItem="LSV-z6-vQv" secondAttribute="width" id="MIH-BK-XIw"/>
+                            <constraint firstAttribute="trailing" secondItem="quz-Tb-Fw0" secondAttribute="trailing" id="PPr-gX-8BW"/>
+                            <constraint firstItem="LSV-z6-vQv" firstAttribute="leading" secondItem="Yh8-Pg-XrK" secondAttribute="leading" id="Rgb-Mh-1Pg"/>
+                            <constraint firstItem="FKl-LY-JtV" firstAttribute="top" secondItem="Yh8-Pg-XrK" secondAttribute="bottom" id="xqD-0h-sWf"/>
+                            <constraint firstItem="quz-Tb-Fw0" firstAttribute="top" secondItem="Ft6-oW-KC0" secondAttribute="bottom" id="y0U-BB-Zzd"/>
                         </constraints>
                     </view>
                     <extendedEdge key="edgesForExtendedLayout"/>
@@ -42,7 +74,9 @@
                     <nil key="simulatedTopBarMetrics"/>
                     <nil key="simulatedBottomBarMetrics"/>
                     <connections>
-                        <outlet property="label" destination="quz-Tb-Fw0" id="eWJ-3V-DSL"/>
+                        <outlet property="issuesLabel" destination="LSV-z6-vQv" id="T9t-kT-XQf"/>
+                        <outlet property="prLabel" destination="quz-Tb-Fw0" id="5UC-2b-Ur4"/>
+                        <outlet property="updatedLabel" destination="Yh8-Pg-XrK" id="Pil-bP-f1q"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vXp-U4-Rya" userLabel="First Responder" sceneMemberID="firstResponder"/>

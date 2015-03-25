@@ -469,7 +469,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 			}
 		} else {
 
-			title = viewMode == MasterViewMode.PullRequests ? pullRequestsTitle() : issuesTitle()
+			title = viewMode == MasterViewMode.PullRequests ? pullRequestsTitle(true) : issuesTitle()
 
 			let count = fetchedResultsController.fetchedObjects?.count ?? 0
 			tableView.tableFooterView = (count == 0) ? EmptyView(message: DataManager.reasonForEmptyIssuesWithFilter(searchField.text), parentWidth: view.bounds.size.width) : nil
@@ -487,24 +487,25 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 			detailViewController.navigationItem.leftBarButtonItem?.title = title
 		}
 
-		showPullRequests.title = pullRequestsTitle()
+		showPullRequests.title = pullRequestsTitle(false)
 		showPullRequests.tintColor = viewMode == MasterViewMode.Issues ? blueTint : UIColor.lightGrayColor()
 
 		showIssues.title = issuesTitle()
 		showIssues.tintColor = viewMode == MasterViewMode.PullRequests ? blueTint : UIColor.lightGrayColor()
 	}
 
-	private func pullRequestsTitle() -> String {
+	private func pullRequestsTitle(long: Bool) -> String {
 
 		let f = PullRequest.requestForPullRequestsWithFilter(nil, sectionIndex: -1)
 		let count = mainObjectContext.countForFetchRequest(f, error: nil)
 		let unreadCount = PullRequest.badgeCountInMoc(mainObjectContext)
+		let pr = long ? "Pull Request" : "PR"
 		if count == 0 {
-			return "No PRs"
+			return "No \(pr)s"
 		} else if count == 1 {
-			return "1 PR" + (unreadCount > 0 ? " (unread)" : "")
+			return "1 " + (unreadCount > 0 ? "PR (unread)" : pr)
 		} else {
-			return "\(count) PRs" + (unreadCount > 0 ? " (\(unreadCount) unread)" : "")
+			return "\(count) " + (unreadCount > 0 ? "PRs (\(unreadCount) unread)" : pr + "s")
 		}
 	}
 
