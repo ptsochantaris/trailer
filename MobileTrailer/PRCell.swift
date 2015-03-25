@@ -190,14 +190,6 @@ class PRCell: UITableViewCell {
 		}
 	}
 
-	override func layoutSubviews() {
-		super.layoutSubviews()
-
-		_title.preferredMaxLayoutWidth = _title.bounds.size.width
-		_description.preferredMaxLayoutWidth = _description.bounds.size.width
-		_statuses.preferredMaxLayoutWidth = _statuses.bounds.size.width
-	}
-
 	override func setSelected(selected: Bool, animated: Bool) {
 		super.setSelected(selected, animated:animated)
 		tone(selected)
