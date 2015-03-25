@@ -9,7 +9,7 @@ class Team: DataItem {
 	@NSManaged var calculatedReferral: String?
 
 	class func teamWithInfo(info: NSDictionary, fromApiServer: ApiServer) -> Team {
-		let serverId = info.ofk("id") as NSNumber
+		let serverId = info.ofk("id") as! NSNumber
 		var t = Team.itemOfType("Team", serverId: serverId, fromServer: fromApiServer) as? Team
 		if t==nil {
 			DLog("Creating Team: %@", serverId)

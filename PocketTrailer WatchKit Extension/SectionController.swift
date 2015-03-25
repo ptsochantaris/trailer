@@ -117,13 +117,13 @@ class SectionController: WKInterfaceController {
 		var index = 0
 		for type in rowTypes {
 			if let t = type as? titleEntry {
-				(table.rowControllerAtIndex(index) as TitleRow).titleL.setText(t.title)
+				(table.rowControllerAtIndex(index) as! TitleRow).titleL.setText(t.title)
 			} else if let t = type as? attributedTitleEntry {
-				(table.rowControllerAtIndex(index) as TitleRow).titleL.setAttributedText(t.title)
+				(table.rowControllerAtIndex(index) as! TitleRow).titleL.setAttributedText(t.title)
 			} else if let t = type as? prEntry {
-				(table.rowControllerAtIndex(index) as SectionRow).setPr(t.section)
+				(table.rowControllerAtIndex(index) as! SectionRow).setPr(t.section)
 			} else if let t = type as? issueEntry {
-				(table.rowControllerAtIndex(index) as SectionRow).setIssue(t.section)
+				(table.rowControllerAtIndex(index) as! SectionRow).setIssue(t.section)
 			}
 			index++
 		}

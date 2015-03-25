@@ -5,7 +5,7 @@ let api = API()
 
 #if os(iOS)
 	import UIKit
-	UIApplicationMain(C_ARGC, C_ARGV, nil, NSStringFromClass(iOS_AppDelegate))
+	UIApplicationMain(Process.argc, Process.unsafeArgv, nil, NSStringFromClass(iOS_AppDelegate))
 #else
-	NSApplicationMain(C_ARGC, C_ARGV)
+	NSApplicationMain(Process.argc, Process.unsafeArgv)
 #endif

@@ -260,7 +260,13 @@ class Settings: NSObject {
 	}
 
 	class var logActivityToConsole: Bool {
-		get { return get("LOG_ACTIVITY_TO_CONSOLE_KEY") as? Bool ?? false }
+		get {
+        #if DEBUG
+            return true
+        #else
+            return get("LOG_ACTIVITY_TO_CONSOLE_KEY") as? Bool ?? false
+        #endif
+        }
 		set { set("LOG_ACTIVITY_TO_CONSOLE_KEY", newValue) }
 	}
 

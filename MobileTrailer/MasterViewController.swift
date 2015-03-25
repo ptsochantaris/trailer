@@ -12,10 +12,11 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
 	// Filtering
 	private let searchField: UITextField
-	private let searchTimer: PopTimer?
+	private var searchTimer: PopTimer?
 
 	// Refreshing
 	private var refreshOnRelease: Bool
+	private var blueTint: UIColor!
 
 	@IBAction func editSelected(sender: UIBarButtonItem ) {
 		if traitCollection.userInterfaceIdiom==UIUserInterfaceIdiom.Pad && UIInterfaceOrientationIsPortrait(UIApplication.sharedApplication().statusBarOrientation) {
@@ -133,11 +134,11 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
 	func markAllAsRead() {
 		if viewMode == MasterViewMode.PullRequests {
-			for p in fetchedResultsController.fetchedObjects as [PullRequest] {
+			for p in fetchedResultsController.fetchedObjects as! [PullRequest] {
 				p.catchUpWithComments()
 			}
 		} else {
-			for p in fetchedResultsController.fetchedObjects as [Issue] {
+			for p in fetchedResultsController.fetchedObjects as! [Issue] {
 				p.catchUpWithComments()
 			}
 		}
@@ -189,6 +190,8 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
 		searchField.delegate = self
 
+		blueTint = self.view.tintColor
+
 		let searchHolder = UIView(frame: CGRectMake(0, 0, 320, 41))
 		searchHolder.addSubview(searchField)
 		tableView.tableHeaderView = searchHolder
@@ -196,7 +199,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 		tableView.estimatedRowHeight = 110
 		tableView.rowHeight = UITableViewAutomaticDimension
 
-		detailViewController = splitViewController?.viewControllers.last?.topViewController as DetailViewController
+		detailViewController = splitViewController?.viewControllers.last?.topViewController as! DetailViewController
 
 		let n = NSNotificationCenter.defaultCenter()
 
@@ -328,20 +331,20 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 	}
 
 	override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as UITableViewCell
+		let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! UITableViewCell
 		configureCell(cell, atIndexPath: indexPath)
 		return cell
 	}
 
 	override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
 		if viewMode == MasterViewMode.PullRequests {
-			let pullRequest = fetchedResultsController.objectAtIndexPath(indexPath) as PullRequest
+			let pullRequest = fetchedResultsController.objectAtIndexPath(indexPath) as! PullRequest
 			if let p = pullRequest.urlForOpening() {
 				detailViewController.detailItem = NSURL(string: p)
 				detailViewController.catchupWithDataItemWhenLoaded = pullRequest.objectID
 			}
 		} else {
-			let issue = fetchedResultsController.objectAtIndexPath(indexPath) as Issue
+			let issue = fetchedResultsController.objectAtIndexPath(indexPath) as! Issue
 			if let p = issue.urlForOpening() {
 				detailViewController.detailItem = NSURL(string: p)
 				detailViewController.catchupWithDataItemWhenLoaded = issue.objectID
@@ -370,7 +373,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
 	override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
 		if editingStyle == UITableViewCellEditingStyle.Delete {
-			let pr = fetchedResultsController.objectAtIndexPath(indexPath) as NSManagedObject
+			let pr = fetchedResultsController.objectAtIndexPath(indexPath) as! NSManagedObject
 			mainObjectContext.deleteObject(pr)
 			DataManager.saveDB()
 		}
@@ -447,11 +450,11 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
 	private func configureCell(cell: UITableViewCell, atIndexPath: NSIndexPath) {
 		if viewMode == MasterViewMode.PullRequests {
-			let pr = fetchedResultsController.objectAtIndexPath(atIndexPath) as PullRequest
-			(cell as PRCell).setPullRequest(pr)
+			let pr = fetchedResultsController.objectAtIndexPath(atIndexPath) as! PullRequest
+			(cell as! PRCell).setPullRequest(pr)
 		} else {
-			let i = fetchedResultsController.objectAtIndexPath(atIndexPath) as Issue
-			(cell as PRCell).setIssue(i)
+			let i = fetchedResultsController.objectAtIndexPath(atIndexPath) as! Issue
+			(cell as! PRCell).setIssue(i)
 		}
 	}
 
@@ -485,10 +488,10 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 		}
 
 		showPullRequests.title = pullRequestsTitle()
-		showPullRequests.tintColor = viewMode == MasterViewMode.Issues ? self.view.tintColor : UIColor.lightGrayColor()
+		showPullRequests.tintColor = viewMode == MasterViewMode.Issues ? blueTint : UIColor.lightGrayColor()
 
 		showIssues.title = issuesTitle()
-		showIssues.tintColor = viewMode == MasterViewMode.PullRequests ? self.view.tintColor : UIColor.lightGrayColor()
+		showIssues.tintColor = viewMode == MasterViewMode.PullRequests ? blueTint : UIColor.lightGrayColor()
 	}
 
 	private func pullRequestsTitle() -> String {

@@ -16,7 +16,7 @@ class PRComment: DataItem {
 	@NSManaged var issue: Issue?
 
 	class func commentWithInfo(info:NSDictionary, fromServer:ApiServer) -> PRComment {
-		let c = DataItem.itemWithInfo(info, type: "PRComment", fromServer: fromServer) as PRComment
+		let c = DataItem.itemWithInfo(info, type: "PRComment", fromServer: fromServer) as! PRComment
 		if c.postSyncAction?.integerValue != PostSyncAction.DoNothing.rawValue {
 			c.body = info.ofk("body") as? String
 			c.position = info.ofk("position") as? NSNumber
@@ -67,7 +67,7 @@ class PRComment: DataItem {
 
 	func refersToMyTeams() -> Bool {
 		if let b = body {
-			for t in apiServer.teams.allObjects as [Team] {
+			for t in apiServer.teams.allObjects as! [Team] {
 				if let r = t.calculatedReferral {
 					let range = b.rangeOfString(r, options: NSStringCompareOptions.CaseInsensitiveSearch | NSStringCompareOptions.DiacriticInsensitiveSearch)
 					if range != nil { return true }

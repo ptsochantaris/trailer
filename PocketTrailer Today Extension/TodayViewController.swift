@@ -48,7 +48,7 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 
         paragraph.paragraphSpacing = 4
 
-        button = UIButton.buttonWithType(UIButtonType.Custom) as UIButton
+        button = UIButton.buttonWithType(UIButtonType.Custom) as! UIButton
         button.addTarget(self, action: Selector("tapped"), forControlEvents: UIControlEvents.TouchUpInside)
         button.setBackgroundImage(imageFromColor(UIColor(white: 1.0, alpha: 0.2)), forState: UIControlState.Highlighted)
         self.view.addSubview(button)
@@ -70,7 +70,7 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 		Settings.clearCache()
 
 		let totalCount = PullRequest.countAllRequestsInMoc(mainObjectContext)
-		let a = NSMutableAttributedString(string: NSString(format: "%d PRs: ", totalCount), attributes: brightAttributes)
+		let a = NSMutableAttributedString(string: NSString(format: "%d PRs: ", totalCount) as String, attributes: brightAttributes)
 
         if totalCount>0 {
             appendPr(a, section: PullRequestSection.Mine.rawValue)
@@ -82,7 +82,7 @@ class TodayViewController: UIViewController, NCWidgetProviding {
         }
         else
         {
-            let reason = DataManager.reasonForEmptyWithFilter(nil).mutableCopy() as NSMutableAttributedString
+            let reason = DataManager.reasonForEmptyWithFilter(nil).mutableCopy() as! NSMutableAttributedString
             reason.addAttribute(NSParagraphStyleAttributeName, value: paragraph, range: NSMakeRange(0, a.length))
 			a.appendAttributedString(reason)
         }
@@ -90,7 +90,7 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 		if Settings.showIssuesMenu {
 
 			let totalCount = Issue.countAllIssuesInMoc(mainObjectContext)
-			a.appendAttributedString(NSAttributedString(string: NSString(format: "\n%d Issues: ", totalCount), attributes: brightAttributes))
+			a.appendAttributedString(NSAttributedString(string: NSString(format: "\n%d Issues: ", totalCount) as String, attributes: brightAttributes))
 
 			if totalCount>0 {
 				appendIssue(a, section: PullRequestSection.Mine.rawValue)
@@ -102,7 +102,7 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 			}
 			else
 			{
-				let reason = DataManager.reasonForEmptyIssuesWithFilter(nil).mutableCopy() as NSMutableAttributedString
+				let reason = DataManager.reasonForEmptyIssuesWithFilter(nil).mutableCopy() as! NSMutableAttributedString
 				reason.addAttribute(NSParagraphStyleAttributeName, value: paragraph, range: NSMakeRange(0, a.length))
 				a.appendAttributedString(reason)
 			}

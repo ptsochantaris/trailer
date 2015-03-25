@@ -1,6 +1,6 @@
 
 class ViewAllowsVibrancy: NSView {
-	func allowsVibrancy() -> Bool {
-		return true
-	}
+    override var allowsVibrancy: Bool {
+        return true
+    }
 }

@@ -11,7 +11,7 @@ class CommandController: WKInterfaceController {
 
         super.awakeWithContext(context)
 
-        let result = WKInterfaceController.openParentApplication(["command": context as String], reply: {
+        let result = WKInterfaceController.openParentApplication(["command": context as! String], reply: {
             [weak self] result, error -> Void in
             if let e = error {
                 self?.feedbackLabel.setTextColor(UIColor.redColor())
@@ -19,7 +19,7 @@ class CommandController: WKInterfaceController {
                 self?.dismissAfterPause(2.0)
             } else {
                 self?.feedbackLabel.setText(result["status"] as? String)
-                if result["color"] as String == "red" {
+                if result["color"] as! String == "red" {
                     self?.feedbackLabel.setTextColor(UIColor.redColor())
                     self?.dismissAfterPause(2.0)
                 } else {

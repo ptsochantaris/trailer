@@ -31,7 +31,7 @@ class Issue: DataItem {
 	@NSManaged var repo: Repo
 
 	class func issueWithInfo(info: NSDictionary, fromServer: ApiServer, inRepo: Repo) -> Issue {
-		let i = DataItem.itemWithInfo(info, type: "Issue", fromServer: fromServer) as Issue
+		let i = DataItem.itemWithInfo(info, type: "Issue", fromServer: fromServer) as! Issue
 		if i.postSyncAction?.integerValue != PostSyncAction.DoNothing.rawValue {
 			i.url = info.ofk("url") as? String
 			i.webUrl = info.ofk("html_url") as? String
@@ -53,7 +53,7 @@ class Issue: DataItem {
 				}
 			}
 
-			for existingLabel in i.labels.allObjects as [PRLabel] {
+			for existingLabel in i.labels.allObjects as! [PRLabel] {
 				existingLabel.postSyncAction = PostSyncAction.Delete.rawValue
 			}
 
@@ -82,29 +82,29 @@ class Issue: DataItem {
 
 		var andPredicates = [NSPredicate]()
 		if sectionIndex<0 {
-			andPredicates.append(NSPredicate(format: "sectionIndex > 0")!)
+			andPredicates.append(NSPredicate(format: "sectionIndex > 0"))
 		} else {
-			andPredicates.append(NSPredicate(format: "sectionIndex == %d", sectionIndex)!)
+			andPredicates.append(NSPredicate(format: "sectionIndex == %d", sectionIndex))
 		}
 
 		if let fi = filter {
 			if !fi.isEmpty {
 
 				var orPredicates = [NSPredicate]()
-				orPredicates.append(NSPredicate(format: "title contains[cd] %@", fi)!)
-				orPredicates.append(NSPredicate(format: "userLogin contains[cd] %@", fi)!)
+				orPredicates.append(NSPredicate(format: "title contains[cd] %@", fi))
+				orPredicates.append(NSPredicate(format: "userLogin contains[cd] %@", fi))
 				if Settings.includeReposInFilter {
-					orPredicates.append(NSPredicate(format: "repo.fullName contains[cd] %@", fi)!)
+					orPredicates.append(NSPredicate(format: "repo.fullName contains[cd] %@", fi))
 				}
 				if Settings.includeLabelsInFilter {
-					orPredicates.append(NSPredicate(format: "any labels.name contains[cd] %@", fi)!)
+					orPredicates.append(NSPredicate(format: "any labels.name contains[cd] %@", fi))
 				}
 				andPredicates.append(NSCompoundPredicate.orPredicateWithSubpredicates(orPredicates))
 			}
 		}
 
 		if Settings.shouldHideUncommentedRequests {
-			andPredicates.append(NSPredicate(format: "unreadComments > 0")!)
+			andPredicates.append(NSPredicate(format: "unreadComments > 0"))
 		}
 
 		var sortDescriptiors = [NSSortDescriptor]()
@@ -153,7 +153,7 @@ class Issue: DataItem {
 		let f = requestForIssuesWithFilter(nil, sectionIndex: -1)
 		var badgeCount:Int = 0
 		let showCommentsEverywhere = Settings.showCommentsEverywhere
-		for i in moc.executeFetchRequest(f, error: nil) as [Issue] {
+		for i in moc.executeFetchRequest(f, error: nil) as! [Issue] {
 			if let sectionIndex = i.sectionIndex?.integerValue {
 				if showCommentsEverywhere || sectionIndex==PullRequestSection.Mine.rawValue || sectionIndex==PullRequestSection.Participated.rawValue {
 					if let c = i.unreadComments?.integerValue {
@@ -170,7 +170,7 @@ class Issue: DataItem {
 		f.predicate = NSPredicate(format: "sectionIndex == %d", section)
 		var badgeCount:Int = 0
 		let showCommentsEverywhere = Settings.showCommentsEverywhere
-		for p in moc.executeFetchRequest(f, error: nil) as [Issue] {
+		for p in moc.executeFetchRequest(f, error: nil) as! [Issue] {
 			if let sectionIndex = p.sectionIndex?.integerValue {
 				if showCommentsEverywhere || sectionIndex==PullRequestSection.Mine.rawValue || sectionIndex==PullRequestSection.Participated.rawValue {
 					if let c = p.unreadComments?.integerValue {
@@ -197,7 +197,7 @@ class Issue: DataItem {
 		if let t = title {
 			_title.appendAttributedString(NSAttributedString(string: t, attributes: titleAttributes))
 			if Settings.showLabels {
-				var allLabels = labels.allObjects as [PRLabel]
+				var allLabels = labels.allObjects as! [PRLabel]
 				if allLabels.count > 0 {
 
 					_title.appendAttributedString(NSAttributedString(string: "\n", attributes: titleAttributes))
@@ -286,7 +286,7 @@ class Issue: DataItem {
 			f.fetchLimit = 1
 			f.predicate = predicateForOthersCommentsSinceDate(latestReadCommentDate)
 			f.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: true)]
-			let ret = managedObjectContext?.executeFetchRequest(f, error: nil) as [PRComment]
+			let ret = managedObjectContext?.executeFetchRequest(f, error: nil) as! [PRComment]
 			if let firstComment = ret.first {
 				if let url = firstComment.webUrl {
 					return url
@@ -298,7 +298,7 @@ class Issue: DataItem {
 	}
 
 	func catchUpWithComments() {
-		for c in comments.allObjects as [PRComment] {
+		for c in comments.allObjects as! [PRComment] {
 			if let creation = c.createdAt {
 				if let latestRead = latestReadCommentDate {
 					if latestRead.compare(creation)==NSComparisonResult.OrderedAscending {
@@ -358,7 +358,7 @@ class Issue: DataItem {
 		} else if needsManualCount {
 			f.predicate = predicateForOthersCommentsSinceDate(nil)
 			var unreadCommentCount: Int = 0
-			for c in managedObjectContext?.executeFetchRequest(f, error: nil) as [PRComment] {
+			for c in managedObjectContext?.executeFetchRequest(f, error: nil) as! [PRComment] {
 				if c.refersToMe() {
 					section = PullRequestSection.Participated.rawValue
 				}
@@ -385,9 +385,9 @@ class Issue: DataItem {
 	func predicateForOthersCommentsSinceDate(optionalDate: NSDate?) -> NSPredicate {
 		var userNumber = apiServer.userId?.longLongValue ?? 0
 		if let date = optionalDate {
-			return NSPredicate(format: "userId != %lld and issue == %@ and createdAt > %@", userNumber, self, date)!
+			return NSPredicate(format: "userId != %lld and issue == %@ and createdAt > %@", userNumber, self, date)
 		} else {
-			return NSPredicate(format: "userId != %lld and issue == %@", userNumber, self)!
+			return NSPredicate(format: "userId != %lld and issue == %@", userNumber, self)
 		}
 	}
 
@@ -416,7 +416,7 @@ class Issue: DataItem {
 	}
 
 	func commentedByMe() -> Bool {
-		for c in comments.allObjects as [PRComment] {
+		for c in comments.allObjects as! [PRComment] {
 			if c.isMine() {
 				return true
 			}
@@ -426,14 +426,14 @@ class Issue: DataItem {
 
 	func refersToMyTeams() -> Bool {
 		if let b = body {
-			for t in apiServer.teams.allObjects as [Team] {
+			for t in apiServer.teams.allObjects as! [Team] {
 				if let r = t.calculatedReferral {
 					let range = b.rangeOfString(r, options: NSStringCompareOptions.CaseInsensitiveSearch | NSStringCompareOptions.DiacriticInsensitiveSearch)
 					if range != nil { return true }
 				}
 			}
 		}
-		for c in comments.allObjects as [PRComment] {
+		for c in comments.allObjects as! [PRComment] {
 			if c.refersToMyTeams() {
 				return true
 			}
@@ -445,14 +445,14 @@ class Issue: DataItem {
 		let f = NSFetchRequest(entityName: "Issue")
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "condition == %d", PullRequestCondition.Closed.rawValue)
-		return moc.executeFetchRequest(f, error: nil) as [Issue]
+		return moc.executeFetchRequest(f, error: nil) as! [Issue]
 	}
 
 	func accessibleTitle() -> String {
 		var components = [String]()
 		if let t = title { components.append(t) }
 		if Settings.showLabels {
-			var allLabels = labels.allObjects as [PRLabel]
+			var allLabels = labels.allObjects as! [PRLabel]
 			allLabels.sort({ (l1: PRLabel, l2: PRLabel) -> Bool in
 				return l1.name<l2.name
 			})

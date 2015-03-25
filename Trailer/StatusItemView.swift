@@ -83,7 +83,7 @@ class StatusItemView: NSView {
 		} else {
 			if darkMode {
 				icon = NSImage(named: "\(imagePrefix)IconBright")!
-				if displayAttributes[NSForegroundColorAttributeName] as NSColor == NSColor.controlTextColor() {
+				if displayAttributes[NSForegroundColorAttributeName] as! NSColor == NSColor.controlTextColor() {
 					displayAttributes[NSForegroundColorAttributeName] = NSColor.selectedMenuItemTextColor()
 				}
 			} else {

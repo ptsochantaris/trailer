@@ -89,7 +89,7 @@ class DetailViewController: UIViewController, WKNavigationDelegate {
 	}
 
 	func webView(webView: WKWebView, decidePolicyForNavigationResponse navigationResponse: WKNavigationResponse, decisionHandler: (WKNavigationResponsePolicy) -> Void) {
-		let res = navigationResponse.response as NSHTTPURLResponse
+		let res = navigationResponse.response as! NSHTTPURLResponse
 		if res.statusCode == 404 {
 			UIAlertView(title: "Not Found",
 			message: "\nPlease ensure you are logged in with the correct account on GitHub\n\nIf you are using two-factor auth: There is a bug between Github and iOS which may cause your login to fail.  If it happens, temporarily disable two-factor auth and log in from here, then re-enable it afterwards.  You will only need to do this once.",

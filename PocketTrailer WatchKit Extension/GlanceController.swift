@@ -33,7 +33,7 @@ class GlanceController: WKInterfaceController {
 
         } else {
 
-            totalCount.setText(NSString(format: "%d", totalPrs))
+            totalCount.setText(NSString(format: "%d", totalPrs) as String)
 
 			setCountOfLabel(myCount, forSection: PullRequestSection.Mine)
             setCountOfLabel(participatedCount, forSection: PullRequestSection.Participated)

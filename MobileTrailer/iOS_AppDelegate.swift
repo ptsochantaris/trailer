@@ -9,8 +9,8 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 	var isRefreshing: Bool = false
 	var lastUpdateFailed: Bool = false
 	var enteringForeground: Bool = true
-	var lastRepoCheck = NSDate.distantPast() as NSDate
-	var window: UIWindow!
+	var lastRepoCheck = NSDate.distantPast() as! NSDate
+	var window: UIWindow?
 	var backgroundTask = UIBackgroundTaskInvalid
 
 	var refreshTimer: NSTimer?
@@ -27,7 +27,7 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 			api.updateLimitsFromServer()
 		}
 
-		let splitViewController = window.rootViewController as UISplitViewController
+		let splitViewController = window!.rootViewController as! UISplitViewController
 		splitViewController.minimumPrimaryColumnWidth = 320
 		splitViewController.maximumPrimaryColumnWidth = 320
 		splitViewController.delegate = self
@@ -55,14 +55,14 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 	}
 
 	func splitViewController(splitViewController: UISplitViewController, collapseSecondaryViewController secondaryViewController: UIViewController!, ontoPrimaryViewController primaryViewController: UIViewController!) -> Bool {
-		let m = (primaryViewController as UINavigationController).viewControllers.first as MasterViewController
+		let m = (primaryViewController as! UINavigationController).viewControllers.first as! MasterViewController
 		m.clearsSelectionOnViewWillAppear = true
-		let d = (secondaryViewController as UINavigationController).viewControllers.first as DetailViewController
+		let d = (secondaryViewController as! UINavigationController).viewControllers.first as! DetailViewController
 		return d.detailItem==nil
 	}
 
 	func splitViewController(splitViewController: UISplitViewController, separateSecondaryViewControllerFromPrimaryViewController primaryViewController: UIViewController!) -> UIViewController? {
-		let m = (primaryViewController as UINavigationController).viewControllers.first as MasterViewController
+		let m = (primaryViewController as! UINavigationController).viewControllers.first as! MasterViewController
 		m.clearsSelectionOnViewWillAppear = false
 		return nil
 	}
@@ -148,7 +148,7 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 
 		backgroundTask = UIApplication.sharedApplication().beginBackgroundTaskWithName("com.housetrip.Trailer.refresh", expirationHandler: { [weak self] in
 			self!.endBGTask()
-		})
+			})
 
 		NSNotificationCenter.defaultCenter().postNotificationName(REFRESH_STARTED_NOTIFICATION, object: nil)
 		DLog("Starting refresh")
@@ -337,56 +337,55 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 		sharePopover = nil
 	}
 
-    func setMinimumBackgroundFetchInterval(interval: NSTimeInterval) -> Void {
-        UIApplication.sharedApplication().setMinimumBackgroundFetchInterval(NSTimeInterval(interval))
-    }
-
-	func getMasterController() -> MasterViewController {
-		let s = window.rootViewController as UISplitViewController
-		return (s.viewControllers.first as UINavigationController).viewControllers.first as MasterViewController
+	func setMinimumBackgroundFetchInterval(interval: NSTimeInterval) -> Void {
+		UIApplication.sharedApplication().setMinimumBackgroundFetchInterval(NSTimeInterval(interval))
 	}
 
-    /////////////// Watchkit commands
+	func getMasterController() -> MasterViewController {
+		let s = window!.rootViewController as! UISplitViewController
+		return (s.viewControllers.first as! UINavigationController).viewControllers.first as! MasterViewController
+	}
 
-    func application(application: UIApplication!, handleWatchKitExtensionRequest userInfo: [NSObject : AnyObject]!, reply: (([NSObject : AnyObject]!) -> Void)!) {
+	/////////////// Watchkit commands
 
-        if userInfo["command"] as? String == "refresh" {
+	func application(application: UIApplication, handleWatchKitExtensionRequest userInfo: [NSObject : AnyObject]?, reply: (([NSObject : AnyObject]!) -> Void)!) {
 
-            self.startRefresh()
+		if let command = userInfo?["command"] as? String {
+			switch(command) {
+			case "refresh":
+				self.startRefresh()
 
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
-                [weak self] () -> Void in
+				dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)) {
+					[weak self] () -> Void in
 
-                let lastSuccessfulSync = Settings.lastSuccessfulRefresh ?? NSDate()
+					let lastSuccessfulSync = Settings.lastSuccessfulRefresh ?? NSDate()
 
-                while (self?.isRefreshing ?? false) {
-                    NSThread.sleepForTimeInterval(0.1)
-                }
+					while (self?.isRefreshing ?? false) {
+						NSThread.sleepForTimeInterval(0.1)
+					}
 
-                dispatch_async(dispatch_get_main_queue(), { () -> Void in
-
-                    if Settings.lastSuccessfulRefresh == nil || lastSuccessfulSync.isEqualToDate(Settings.lastSuccessfulRefresh!) {
-                        reply(["status": "Refresh failed", "color": "red"])
-                    } else {
-                        reply(["status": "Success", "color": "green"])
-                    }
-                })
-            })
-
-        } else if userInfo["command"] as? String == "clearAllMerged" {
-            let m = getMasterController()
-            m.removeAllMergedConfirmed()
-            reply(["status": "Success", "color": "green"])
-
-        } else if userInfo["command"] as? String == "clearAllClosed" {
-			let m = getMasterController()
-            m.removeAllClosedConfirmed()
-            reply(["status": "Success", "color": "green"])
-
-        } else if userInfo["command"] as? String == "markAllRead" {
-			let m = getMasterController()
-            m.markAllAsRead()
-            reply(["status": "Success", "color": "green"])
-        }
-    }
+					dispatch_async(dispatch_get_main_queue()) { () -> Void in
+						if Settings.lastSuccessfulRefresh == nil || lastSuccessfulSync.isEqualToDate(Settings.lastSuccessfulRefresh!) {
+							reply(["status": "Refresh failed", "color": "red"])
+						} else {
+							reply(["status": "Success", "color": "green"])
+						}
+					}
+				}
+			case "clearAllMerged":
+				let m = getMasterController()
+				m.removeAllMergedConfirmed()
+				reply(["status": "Success", "color": "green"])
+			case "clearAllClosed":
+				let m = getMasterController()
+				m.removeAllClosedConfirmed()
+				reply(["status": "Success", "color": "green"])
+			case "markAllRead":
+				let m = getMasterController()
+				m.markAllAsRead()
+				reply(["status": "Success", "color": "green"])
+			default: break;
+			}
+		}
+	}
 }

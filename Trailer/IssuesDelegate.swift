@@ -14,7 +14,7 @@ class IssuesDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 		issueIds.removeAll(keepCapacity: false)
 
 		let f = Issue.requestForIssuesWithFilter(filter, sectionIndex: -1)
-		let allIssues = mainObjectContext.executeFetchRequest(f, error: nil) as [Issue]
+		let allIssues = mainObjectContext.executeFetchRequest(f, error: nil) as! [Issue]
 
 		if let firstIssue = allIssues.first {
 			var lastSection = firstIssue.sectionIndex!.integerValue
@@ -34,10 +34,10 @@ class IssuesDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 	func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
 		let object = issueIds[row]
 		if object.isKindOfClass(NSManagedObjectID) {
-			let i = mainObjectContext.existingObjectWithID(object as NSManagedObjectID, error: nil) as Issue
+			let i = mainObjectContext.existingObjectWithID(object as! NSManagedObjectID, error: nil) as! Issue
 			return IssueCell(issue: i)
 		} else {
-			let title = object as String
+			let title = object as! String
 			let showButton = (title == PullRequestSection.Closed.issuesMenuName())
 			return SectionHeader(title: title, showRemoveAllButton: showButton)
 		}
@@ -55,7 +55,7 @@ class IssuesDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 	func issueAtRow(row: Int) -> Issue? {
 		let object = issueIds[row]
 		if object.isKindOfClass(NSManagedObjectID) {
-			return mainObjectContext.existingObjectWithID(object as NSManagedObjectID, error: nil) as? Issue
+			return mainObjectContext.existingObjectWithID(object as! NSManagedObjectID, error: nil) as? Issue
 		} else {
 			return nil
 		}

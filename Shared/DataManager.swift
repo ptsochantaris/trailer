@@ -49,7 +49,7 @@ class DataManager : NSObject {
 		}
 
 		DLog("Marking all repos as dirty")
-		for r in Repo.allItemsOfType("Repo", inMoc:mainObjectContext) as [Repo] {
+		for r in Repo.allItemsOfType("Repo", inMoc:mainObjectContext) as! [Repo] {
 			r.dirty = true
 			r.lastDirtied = NSDate()
 		}
@@ -82,14 +82,14 @@ class DataManager : NSObject {
 
 	class func sendNotifications() {
 
-		let newPrs = PullRequest.newItemsOfType("PullRequest", inMoc: mainObjectContext) as [PullRequest]
+		let newPrs = PullRequest.newItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest]
 		for p in newPrs {
 			if !p.isMine() {
 				app.postNotificationOfType(PRNotificationType.NewPr, forItem: p)
 			}
 		}
 
-		let updatedPrs = PullRequest.updatedItemsOfType("PullRequest", inMoc: mainObjectContext) as [PullRequest]
+		let updatedPrs = PullRequest.updatedItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest]
 		for p in updatedPrs {
 			if let reopened = p.reopened?.boolValue {
 				if reopened {
@@ -111,7 +111,7 @@ class DataManager : NSObject {
 			}
 		}
 
-		var latestComments = PRComment.newItemsOfType("PRComment", inMoc: mainObjectContext) as [PRComment]
+		var latestComments = PRComment.newItemsOfType("PRComment", inMoc: mainObjectContext) as! [PRComment]
 		for c in latestComments {
 			if let p = c.pullRequest {
 				processNotificationsForComment(c, ofPullRequest: p)
@@ -121,7 +121,7 @@ class DataManager : NSObject {
 			c.postSyncAction = PostSyncAction.DoNothing.rawValue
 		}
 
-		var latestStatuses = PRStatus.newItemsOfType("PRStatus", inMoc: mainObjectContext) as [PRStatus]
+		var latestStatuses = PRStatus.newItemsOfType("PRStatus", inMoc: mainObjectContext) as! [PRStatus]
 		if Settings.notifyOnStatusUpdates {
 			let coveredPrs = NSMutableSet()
 			for s in latestStatuses {
@@ -221,7 +221,7 @@ class DataManager : NSObject {
 							let f = NSFetchRequest(entityName: name)
 							f.includesPropertyValues = false
 							f.includesSubentities = false
-							for o in tempMoc.executeFetchRequest(f, error:nil) as [NSManagedObject] {
+							for o in tempMoc.executeFetchRequest(f, error:nil) as! [NSManagedObject] {
 								tempMoc.deleteObject(o)
 							}
 						}
@@ -243,25 +243,25 @@ class DataManager : NSObject {
 		case .NewPrAssigned: fallthrough
 		case .PrClosed: fallthrough
 		case .PrMerged:
-			return [NOTIFICATION_URL_KEY : (item as PullRequest).webUrl!, PULL_REQUEST_ID_KEY: item.objectID.URIRepresentation().absoluteString!]
+			return [NOTIFICATION_URL_KEY : (item as! PullRequest).webUrl!, PULL_REQUEST_ID_KEY: item.objectID.URIRepresentation().absoluteString!]
 		case .NewRepoSubscribed: fallthrough
 		case .NewRepoAnnouncement:
-			return [NOTIFICATION_URL_KEY : (item as Repo).webUrl!]
+			return [NOTIFICATION_URL_KEY : (item as! Repo).webUrl!]
 		case .NewStatus:
-			let pr = (item as PRStatus).pullRequest
+			let pr = (item as! PRStatus).pullRequest
 			return [NOTIFICATION_URL_KEY : pr.webUrl!, STATUS_ID_KEY: item.objectID.URIRepresentation().absoluteString!]
 		case .NewIssue: fallthrough
 		case .IssueReopened: fallthrough
 		case .NewIssueAssigned: fallthrough
 		case .IssueClosed:
-			return [NOTIFICATION_URL_KEY : (item as Issue).webUrl!]
+			return [NOTIFICATION_URL_KEY : (item as! Issue).webUrl!]
 		}
 	}
 
 	class func postMigrationTasks() {
 		if _justMigrated {
 			DLog("FORCING ALL PRS TO BE REFETCHED")
-			for p in PullRequest.allItemsOfType("PullRequest", inMoc:mainObjectContext) as [PullRequest] {
+			for p in PullRequest.allItemsOfType("PullRequest", inMoc:mainObjectContext) as! [PullRequest] {
 				p.updatedAt = NSDate.distantPast() as? NSDate
 			}
 			_justMigrated = false
@@ -269,10 +269,10 @@ class DataManager : NSObject {
 	}
 
 	class func postProcessAllItems() {
-		for p in PullRequest.allItemsOfType("PullRequest", inMoc: mainObjectContext) as [PullRequest] {
+		for p in PullRequest.allItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest] {
 			p.postProcess()
 		}
-		for i in PullRequest.allItemsOfType("Issue", inMoc: mainObjectContext) as [Issue] {
+		for i in PullRequest.allItemsOfType("Issue", inMoc: mainObjectContext) as! [Issue] {
 			i.postProcess()
 		}
 	}
@@ -416,7 +416,7 @@ func persistentStoreCoordinator() -> NSPersistentStoreCoordinator? {
 	var error:NSError?
 	let properties = applicationDirectory.resourceValuesForKeys([NSURLIsDirectoryKey], error:&error)
 	if properties != nil && properties!.count > 0 {
-		let isDir = properties![NSURLIsDirectoryKey] as NSNumber
+		let isDir = properties![NSURLIsDirectoryKey] as! NSNumber
 		if !isDir.boolValue {
 			let description = "Expected a folder to store application data, found a file (\(applicationDirectory.path))."
 			error = NSError(domain: "TRAILER_DB_ERROR", code: 101, userInfo: [NSLocalizedDescriptionKey:description])
@@ -458,7 +458,7 @@ func applicationFilesDirectory() -> NSURL {
 
 private func legacyFilesDirectory() -> NSURL {
 	let f = NSFileManager.defaultManager()
-	var appSupportURL = f.URLsForDirectory(NSSearchPathDirectory.ApplicationSupportDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask).last! as NSURL
+	var appSupportURL = f.URLsForDirectory(NSSearchPathDirectory.ApplicationSupportDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask).last! as! NSURL
 	appSupportURL = appSupportURL.URLByAppendingPathComponent("com.housetrip.Trailer")
 	DLog("Files in %@", appSupportURL)
 	return appSupportURL

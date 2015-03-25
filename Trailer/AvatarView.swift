@@ -6,7 +6,7 @@ class AvatarView: NSImageView {
 	init(frame frameRect:NSRect, url:NSString) {
 		super.init(frame: frameRect)
 		imageAlignment = NSImageAlignment.AlignCenter
-		if !api.haveCachedAvatar(url, tryLoadAndCallback: { [weak self] img in
+		if !api.haveCachedAvatar(url as String, tryLoadAndCallback: { [weak self] img in
 			if let weakSelf = self {
 				weakSelf.image = img
 				weakSelf.done()
@@ -34,7 +34,7 @@ class AvatarView: NSImageView {
 		spinner = nil
 	}
 
-	func allowsVibrancy() -> Bool {
+    override var allowsVibrancy: Bool {
 		return true
 	}
 }

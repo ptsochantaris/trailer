@@ -46,7 +46,7 @@ class PullRequest: DataItem {
     @NSManaged var statuses: NSSet
 
 	class func pullRequestWithInfo(info: NSDictionary, fromServer: ApiServer, inRepo: Repo) -> PullRequest {
-		let p = DataItem.itemWithInfo(info, type: "PullRequest", fromServer: fromServer) as PullRequest
+		let p = DataItem.itemWithInfo(info, type: "PullRequest", fromServer: fromServer) as! PullRequest
 		if p.postSyncAction?.integerValue != PostSyncAction.DoNothing.rawValue {
 			p.url = info.ofk("url") as? String
 			p.webUrl = info.ofk("html_url") as? String
@@ -97,32 +97,32 @@ class PullRequest: DataItem {
 
 		var andPredicates = [NSPredicate]()
         if sectionIndex<0 {
-            andPredicates.append(NSPredicate(format: "sectionIndex > 0")!)
+            andPredicates.append(NSPredicate(format: "sectionIndex > 0"))
         } else {
-            andPredicates.append(NSPredicate(format: "sectionIndex == %d", sectionIndex)!)
+            andPredicates.append(NSPredicate(format: "sectionIndex == %d", sectionIndex))
         }
 
 		if let fi = filter {
 			if !fi.isEmpty {
 
 				var orPredicates = [NSPredicate]()
-				orPredicates.append(NSPredicate(format: "title contains[cd] %@", fi)!)
-				orPredicates.append(NSPredicate(format: "userLogin contains[cd] %@", fi)!)
+				orPredicates.append(NSPredicate(format: "title contains[cd] %@", fi))
+				orPredicates.append(NSPredicate(format: "userLogin contains[cd] %@", fi))
 				if Settings.includeReposInFilter {
-					orPredicates.append(NSPredicate(format: "repo.fullName contains[cd] %@", fi)!)
+					orPredicates.append(NSPredicate(format: "repo.fullName contains[cd] %@", fi))
 				}
 				if Settings.includeLabelsInFilter {
-					orPredicates.append(NSPredicate(format: "any labels.name contains[cd] %@", fi)!)
+					orPredicates.append(NSPredicate(format: "any labels.name contains[cd] %@", fi))
 				}
 				if Settings.includeStatusesInFilter {
-					orPredicates.append(NSPredicate(format: "any statuses.descriptionText contains[cd] %@", fi)!)
+					orPredicates.append(NSPredicate(format: "any statuses.descriptionText contains[cd] %@", fi))
 				}
 				andPredicates.append(NSCompoundPredicate.orPredicateWithSubpredicates(orPredicates))
 			}
 		}
 
 		if Settings.shouldHideUncommentedRequests {
-			andPredicates.append(NSPredicate(format: "unreadComments > 0")!)
+			andPredicates.append(NSPredicate(format: "unreadComments > 0"))
 		}
 
 		var sortDescriptiors = [NSSortDescriptor]()
@@ -150,14 +150,14 @@ class PullRequest: DataItem {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "condition == %d", PullRequestCondition.Merged.rawValue)
-		return moc.executeFetchRequest(f, error: nil) as [PullRequest]
+		return moc.executeFetchRequest(f, error: nil) as! [PullRequest]
 	}
 
 	class func allClosedRequestsInMoc(moc: NSManagedObjectContext) -> [PullRequest] {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "condition == %d", PullRequestCondition.Closed.rawValue)
-		return moc.executeFetchRequest(f, error: nil) as [PullRequest]
+		return moc.executeFetchRequest(f, error: nil) as! [PullRequest]
 	}
 
 	class func countOpenRequestsInMoc(moc: NSManagedObjectContext) -> Int {
@@ -183,7 +183,7 @@ class PullRequest: DataItem {
         f.predicate = NSPredicate(format: "sectionIndex == %d", section)
         var badgeCount:Int = 0
         let showCommentsEverywhere = Settings.showCommentsEverywhere
-        for p in moc.executeFetchRequest(f, error: nil) as [PullRequest] {
+        for p in moc.executeFetchRequest(f, error: nil) as! [PullRequest] {
             if let sectionIndex = p.sectionIndex?.integerValue {
                 if showCommentsEverywhere || sectionIndex==PullRequestSection.Mine.rawValue || sectionIndex==PullRequestSection.Participated.rawValue {
                     if let c = p.unreadComments?.integerValue {
@@ -199,7 +199,7 @@ class PullRequest: DataItem {
 		let f = requestForPullRequestsWithFilter(nil, sectionIndex: -1)
 		var badgeCount:Int = 0
 		let showCommentsEverywhere = Settings.showCommentsEverywhere
-		for p in moc.executeFetchRequest(f, error: nil) as [PullRequest] {
+		for p in moc.executeFetchRequest(f, error: nil) as! [PullRequest] {
 			if let sectionIndex = p.sectionIndex?.integerValue {
 				if showCommentsEverywhere || sectionIndex==PullRequestSection.Mine.rawValue || sectionIndex==PullRequestSection.Participated.rawValue {
 					if let c = p.unreadComments?.integerValue {
@@ -212,7 +212,7 @@ class PullRequest: DataItem {
 	}
 
 	func catchUpWithComments() {
-		for c in comments.allObjects as [PRComment] {
+		for c in comments.allObjects as! [PRComment] {
 			if let creation = c.createdAt {
 				if let latestRead = latestReadCommentDate {
 					if latestRead.compare(creation)==NSComparisonResult.OrderedAscending {
@@ -251,7 +251,7 @@ class PullRequest: DataItem {
 	}
 
 	func commentedByMe() -> Bool {
-		for c in comments.allObjects as [PRComment] {
+		for c in comments.allObjects as! [PRComment] {
 			if c.isMine() {
 				return true
 			}
@@ -261,14 +261,14 @@ class PullRequest: DataItem {
 
 	func refersToMyTeams() -> Bool {
 		if let b = body {
-			for t in apiServer.teams.allObjects as [Team] {
+			for t in apiServer.teams.allObjects as! [Team] {
 				if let r = t.calculatedReferral {
 					let range = b.rangeOfString(r, options: NSStringCompareOptions.CaseInsensitiveSearch | NSStringCompareOptions.DiacriticInsensitiveSearch)
 					if range != nil { return true }
 				}
 			}
 		}
-		for c in comments.allObjects as [PRComment] {
+		for c in comments.allObjects as! [PRComment] {
 			if c.refersToMyTeams() {
 				return true
 			}
@@ -302,7 +302,7 @@ class PullRequest: DataItem {
 		if let t = title {
 			_title.appendAttributedString(NSAttributedString(string: t, attributes: titleAttributes))
 			if Settings.showLabels {
-				var allLabels = labels.allObjects as [PRLabel]
+				var allLabels = labels.allObjects as! [PRLabel]
 				if allLabels.count > 0 {
 
 					_title.appendAttributedString(NSAttributedString(string: "\n", attributes: titleAttributes))
@@ -397,7 +397,7 @@ class PullRequest: DataItem {
 		var components = [String]()
 		if let t = title { components.append(t) }
 		if Settings.showLabels {
-			var allLabels = labels.allObjects as [PRLabel]
+			var allLabels = labels.allObjects as! [PRLabel]
 			allLabels.sort({ (l1: PRLabel, l2: PRLabel) -> Bool in
 				return l1.name<l2.name
 			})
@@ -443,10 +443,10 @@ class PullRequest: DataItem {
 			if terms.count > 0 {
 				var subPredicates = [NSPredicate]()
 				for t in terms {
-					subPredicates.append(NSPredicate(format: "descriptionText contains[cd] %@", t)!)
+					subPredicates.append(NSPredicate(format: "descriptionText contains[cd] %@", t))
 				}
 				let orPredicate = NSCompoundPredicate.orPredicateWithSubpredicates(subPredicates)
-				let selfPredicate = NSPredicate(format: "pullRequest == %@", self)!
+				let selfPredicate = NSPredicate(format: "pullRequest == %@", self)
 
 				if mode==StatusFilter.Include.rawValue {
 					f.predicate = NSCompoundPredicate.andPredicateWithSubpredicates([selfPredicate, orPredicate])
@@ -463,7 +463,7 @@ class PullRequest: DataItem {
 		var result = [PRStatus]()
 		let targetUrls = NSMutableSet()
 		let descriptions = NSMutableSet()
-		for s in managedObjectContext?.executeFetchRequest(f, error: nil) as [PRStatus] {
+		for s in managedObjectContext?.executeFetchRequest(f, error: nil) as! [PRStatus] {
 			var targetUrl: String
 			if let t = s.targetUrl { targetUrl = t } else { targetUrl = "" }
 			var desc: String
@@ -489,7 +489,7 @@ class PullRequest: DataItem {
 			f.fetchLimit = 1
 			f.predicate = predicateForOthersCommentsSinceDate(latestReadCommentDate)
 			f.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: true)]
-			let ret = managedObjectContext?.executeFetchRequest(f, error: nil) as [PRComment]
+			let ret = managedObjectContext?.executeFetchRequest(f, error: nil) as! [PRComment]
 			if let firstComment = ret.first {
 				if let url = firstComment.webUrl {
 					return url
@@ -550,7 +550,7 @@ class PullRequest: DataItem {
 		} else if needsManualCount {
 			f.predicate = predicateForOthersCommentsSinceDate(nil)
 			var unreadCommentCount: Int = 0
-			for c in managedObjectContext?.executeFetchRequest(f, error: nil) as [PRComment] {
+			for c in managedObjectContext?.executeFetchRequest(f, error: nil) as! [PRComment] {
 				if c.refersToMe() {
 					section = PullRequestSection.Participated.rawValue
 				}
@@ -577,9 +577,9 @@ class PullRequest: DataItem {
 	func predicateForOthersCommentsSinceDate(optionalDate: NSDate?) -> NSPredicate {
 		var userNumber = apiServer.userId?.longLongValue ?? 0
 		if let date = optionalDate {
-			return NSPredicate(format: "userId != %lld and pullRequest == %@ and createdAt > %@", userNumber, self, date)!
+			return NSPredicate(format: "userId != %lld and pullRequest == %@ and createdAt > %@", userNumber, self, date)
 		} else {
-			return NSPredicate(format: "userId != %lld and pullRequest == %@", userNumber, self)!
+			return NSPredicate(format: "userId != %lld and pullRequest == %@", userNumber, self)
 		}
 	}
 }

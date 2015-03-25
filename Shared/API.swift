@@ -55,7 +55,7 @@ class API {
 		currentNetworkStatus = reachability.currentReachabilityStatus()
 
 		let fileManager = NSFileManager.defaultManager()
-		let appSupportURL = fileManager.URLsForDirectory(NSSearchPathDirectory.CachesDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask).first! as NSURL
+		let appSupportURL = fileManager.URLsForDirectory(NSSearchPathDirectory.CachesDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask).first! as! NSURL
 		cacheDirectory = appSupportURL.URLByAppendingPathComponent("com.housetrip.Trailer").path!
 
 		let config = NSURLSessionConfiguration.defaultSessionConfiguration()
@@ -73,7 +73,7 @@ class API {
 		}
 
 		NSNotificationCenter.defaultCenter().addObserverForName(kReachabilityChangedNotification, object: nil, queue: NSOperationQueue.mainQueue()) { [weak self] n in
-			let newStatus = (n.object as Reachability).currentReachabilityStatus()
+			let newStatus = (n.object as! Reachability).currentReachabilityStatus()
 			if  newStatus != self!.currentNetworkStatus {
 				self!.currentNetworkStatus = newStatus
 				if newStatus == NetworkStatus.NotReachable {
@@ -109,7 +109,7 @@ class API {
 		f.predicate = NSPredicate(format: "dirty != YES and lastDirtied < %@", NSDate(timeInterval: -3600, sinceDate: NSDate()))
 		f.includesPropertyValues = false
 		f.returnsObjectsAsFaults = false
-		let reposNotFetchedRecently = moc.executeFetchRequest(f, error: nil) as [Repo]
+		let reposNotFetchedRecently = moc.executeFetchRequest(f, error: nil) as! [Repo]
 		for r in reposNotFetchedRecently {
 			r.dirty = true
 			r.lastDirtied = NSDate()
@@ -141,7 +141,7 @@ class API {
 			if startsWith(f, "imgcache-") {
 				let path = cacheDirectory.stringByAppendingPathComponent(f)
 				let attributes = fileManager.attributesOfItemAtPath(path, error: nil)!
-				let date = attributes[NSFileCreationDate] as NSDate
+				let date = attributes[NSFileCreationDate] as! NSDate
 				if now.timeIntervalSinceDate(date) > (3600.0*24) {
 					fileManager.removeItemAtPath(path, error:nil)
 				}
@@ -197,7 +197,7 @@ class API {
 
 		let imageKey = absolutePath + " " + currentAppVersion
 
-		let cachePath = cacheDirectory.stringByAppendingPathComponent("imgcache-" + imageKey.md5hash())
+		let cachePath = cacheDirectory.stringByAppendingPathComponent("imgcache-" + (imageKey.md5hash() as String))
 
 		let fileManager = NSFileManager.defaultManager()
 		if fileManager.fileExistsAtPath(cachePath) {
@@ -244,7 +244,7 @@ class API {
 	func fetchPullRequestsForActiveReposAndCallback(callback: (()->Void)?) {
 		let syncContext = DataManager.tempContext()
 
-		let shouldRefreshReposToo = (app.lastRepoCheck.isEqualToDate(NSDate.distantPast() as NSDate)
+		let shouldRefreshReposToo = (app.lastRepoCheck.isEqualToDate(NSDate.distantPast() as! NSDate)
 			|| (NSDate().timeIntervalSinceDate(app.lastRepoCheck) < NSTimeInterval(Settings.newRepoCheckPeriod*3600.0))
 			|| (Repo.countVisibleReposInMoc(syncContext)==0))
 
@@ -303,11 +303,11 @@ class API {
 
 		DataItem.nukeDeletedItemsInMoc(moc)
 
-		for r in DataItem.itemsOfType("PullRequest", surviving: true, inMoc: moc) as [PullRequest] {
+		for r in DataItem.itemsOfType("PullRequest", surviving: true, inMoc: moc) as! [PullRequest] {
 			r.postProcess()
 		}
 
-		for i in DataItem.itemsOfType("Issue", surviving: true, inMoc: moc) as [Issue] {
+		for i in DataItem.itemsOfType("Issue", surviving: true, inMoc: moc) as! [Issue] {
 			i.postProcess()
 		}
 
@@ -417,7 +417,7 @@ class API {
 		}
 
 		let latestEtag = usingUserEventsFromServer.latestUserEventEtag
-		let latestDate = usingUserEventsFromServer.latestUserEventDateProcessed ?? NSDate.distantPast() as NSDate
+		let latestDate = usingUserEventsFromServer.latestUserEventDateProcessed ?? NSDate.distantPast() as! NSDate
 
 		var extraHeaders: Dictionary<String, String>?
 		if let e = latestEtag {
@@ -432,7 +432,7 @@ class API {
 			extraHeaders: extraHeaders,
 			perPageCallback: { [weak self] data, lastPage in
 				for d in data ?? [] {
-					let eventDate = syncDateFormatter.dateFromString(d.ofk("created_at") as String)!
+					let eventDate = syncDateFormatter.dateFromString(d.ofk("created_at") as! String)!
 					if latestDate.compare(eventDate) == NSComparisonResult.OrderedAscending { // this is where we came in
 						DLog("New event at %@", eventDate)
 						if let repoId = d["repo"]?["id"] as? NSNumber {
@@ -440,7 +440,7 @@ class API {
 						}
 						if latestDate.compare(eventDate) == NSComparisonResult.OrderedAscending {
 							usingUserEventsFromServer.latestUserEventDateProcessed = eventDate
-							if latestDate.isEqualToDate(NSDate.distantPast() as NSDate) {
+							if latestDate.isEqualToDate(NSDate.distantPast() as! NSDate) {
 								DLog("First sync, all repos are dirty so we don't need to read further, we have the latest user event date: %@", eventDate)
 								return true
 							}
@@ -468,7 +468,7 @@ class API {
 		}
 
 		let latestEtag = usingReceivedEventsFromServer.latestReceivedEventEtag
-		let latestDate = usingReceivedEventsFromServer.latestReceivedEventDateProcessed ?? NSDate.distantPast() as NSDate
+		let latestDate = usingReceivedEventsFromServer.latestReceivedEventDateProcessed ?? NSDate.distantPast() as! NSDate
 
 		var extraHeaders: Dictionary<String, String>?
 		if let e = latestEtag {
@@ -485,7 +485,7 @@ class API {
 			extraHeaders: extraHeaders,
 			perPageCallback: { [weak self] data, lastPage in
 				for d in data ?? [] {
-					let eventDate = syncDateFormatter.dateFromString(d.ofk("created_at") as String)!
+					let eventDate = syncDateFormatter.dateFromString(d.ofk("created_at") as! String)!
 					if latestDate.compare(eventDate) == NSComparisonResult.OrderedAscending { // this is where we came in
 						DLog("New event at %@", eventDate)
 						if let repoId = d["repo"]?["id"] as? NSNumber {
@@ -493,7 +493,7 @@ class API {
 						}
 						if latestDate.compare(eventDate) == NSComparisonResult.OrderedAscending {
 							usingReceivedEventsFromServer.latestReceivedEventDateProcessed = eventDate
-							if latestDate.isEqualToDate(NSDate.distantPast() as NSDate) {
+							if latestDate.isEqualToDate(NSDate.distantPast() as! NSDate) {
 								DLog("First sync, all repos are dirty so we don't need to read further, we have the latest received event date: %@", latestDate)
 								return true
 							}
@@ -518,7 +518,7 @@ class API {
 		ApiServer.resetSyncSuccessInMoc(moc)
 
 		syncUserDetailsInMoc(moc, callback: { [weak self] in
-			for r in DataItem.itemsOfType("Repo", surviving: true, inMoc: moc) as [Repo] {
+			for r in DataItem.itemsOfType("Repo", surviving: true, inMoc: moc) as! [Repo] {
 				r.postSyncAction = PostSyncAction.Delete.rawValue
 				r.inaccessible = false
 			}
@@ -531,7 +531,7 @@ class API {
 				completionCount++
 				if completionCount == totalOperations {
 					let shouldHideByDefault = Settings.hideNewRepositories
-					for r in DataItem.newItemsOfType("Repo", inMoc: moc) as [Repo] {
+					for r in DataItem.newItemsOfType("Repo", inMoc: moc) as! [Repo] {
 						r.hidden = shouldHideByDefault
 						if !shouldHideByDefault {
 							app.postNotificationOfType(PRNotificationType.NewRepoAnnouncement, forItem:r)
@@ -555,7 +555,7 @@ class API {
 	private func fetchPullRequestsForRepos(repos: [Repo], toMoc:NSManagedObjectContext, callback: (()->Void)?) {
 
 		for r in Repo.unsyncableReposInMoc(toMoc) {
-			for p in r.pullRequests.allObjects as [PullRequest] {
+			for p in r.pullRequests.allObjects as! [PullRequest] {
 				p.postSyncAction = PostSyncAction.Delete.rawValue
 			}
 		}
@@ -568,7 +568,7 @@ class API {
 		var completionCount = 0
 		for r in repos {
 
-			for pr in r.pullRequests.allObjects as [PullRequest] {
+			for pr in r.pullRequests.allObjects as! [PullRequest] {
 				if (pr.condition?.integerValue ?? 0) == PullRequestCondition.Open.rawValue {
 					pr.postSyncAction = PostSyncAction.Delete.rawValue
 				}
@@ -589,7 +589,7 @@ class API {
 							if resultCode == 404 { // repo disabled
 								r.inaccessible = true
 								r.postSyncAction = PostSyncAction.DoNothing.rawValue
-								for p in r.pullRequests.allObjects as [PullRequest] {
+								for p in r.pullRequests.allObjects as! [PullRequest] {
 									p.postSyncAction = PostSyncAction.Delete.rawValue
 								}
 							} else if resultCode==410 { // repo gone for good
@@ -615,7 +615,7 @@ class API {
 	private func fetchIssuesForRepos(repos: [Repo], toMoc:NSManagedObjectContext, callback: (()->Void)?) {
 
 		for r in Repo.unsyncableReposInMoc(toMoc) {
-			for i in r.issues.allObjects as [Issue] {
+			for i in r.issues.allObjects as! [Issue] {
 				i.postSyncAction = PostSyncAction.Delete.rawValue
 			}
 		}
@@ -628,7 +628,7 @@ class API {
 		var completionCount = 0
 		for r in repos {
 
-			for i in r.issues.allObjects as [Issue] {
+			for i in r.issues.allObjects as! [Issue] {
 				if (i.condition?.integerValue ?? 0) == PullRequestCondition.Open.rawValue {
 					i.postSyncAction = PostSyncAction.Delete.rawValue
 				}
@@ -651,7 +651,7 @@ class API {
 							if resultCode == 404 { // repo disabled
 								r.inaccessible = true
 								r.postSyncAction = PostSyncAction.DoNothing.rawValue
-								for p in r.issues.allObjects as [Issue] {
+								for p in r.issues.allObjects as! [Issue] {
 									p.postSyncAction = PostSyncAction.Delete.rawValue
 								}
 							} else if resultCode==410 { // repo gone for good
@@ -676,7 +676,7 @@ class API {
 
 	private func fetchCommentsForCurrentPullRequestsToMoc(moc: NSManagedObjectContext, callback: (()->Void)?) {
 
-		let prs = (DataItem.newOrUpdatedItemsOfType("PullRequest", inMoc:moc) as [PullRequest]).filter({ pr in
+		let prs = (DataItem.newOrUpdatedItemsOfType("PullRequest", inMoc:moc) as! [PullRequest]).filter({ pr in
 			return pr.apiServer.syncIsGood
 		})
 		if prs.count==0 {
@@ -685,7 +685,7 @@ class API {
 		}
 
 		for p in prs {
-			for c in p.comments.allObjects as [PRComment] {
+			for c in p.comments.allObjects as! [PRComment] {
 				c.postSyncAction = PostSyncAction.Delete.rawValue
 			}
 		}
@@ -752,10 +752,10 @@ class API {
 
 	private func fetchCommentsForCurrentIssuesToMoc(moc: NSManagedObjectContext, callback: (()->Void)?) {
 
-		let allIssues = DataItem.newOrUpdatedItemsOfType("Issue", inMoc:moc) as [Issue]
+		let allIssues = DataItem.newOrUpdatedItemsOfType("Issue", inMoc:moc) as! [Issue]
 
 		for i in allIssues {
-			for c in i.comments.allObjects as [PRComment] {
+			for c in i.comments.allObjects as! [PRComment] {
 				c.postSyncAction = PostSyncAction.Delete.rawValue
 			}
 		}
@@ -813,7 +813,7 @@ class API {
 
 	private func fetchLabelsForForCurrentPullRequestsToMoc(moc: NSManagedObjectContext, callback: (()->Void)?) {
 
-		let prs = (DataItem.allItemsOfType("PullRequest", inMoc: moc) as [PullRequest]).filter { [weak self] pr in
+		let prs = (DataItem.allItemsOfType("PullRequest", inMoc: moc) as! [PullRequest]).filter { [weak self] pr in
 			if !pr.apiServer.syncIsGood {
 				return false
 			}
@@ -842,7 +842,7 @@ class API {
 		var completionCount = 0
 
 		for p in prs {
-			for l in p.labels.allObjects as [PRLabel] {
+			for l in p.labels.allObjects as! [PRLabel] {
 				l.postSyncAction = PostSyncAction.Delete.rawValue
 			}
 
@@ -885,7 +885,7 @@ class API {
 
 	private func fetchStatusesForCurrentPullRequestsToMoc(moc: NSManagedObjectContext, callback: (()->Void)?) {
 
-		let prs = (DataItem.allItemsOfType("PullRequest", inMoc: moc) as [PullRequest]).filter { [weak self] pr in
+		let prs = (DataItem.allItemsOfType("PullRequest", inMoc: moc) as! [PullRequest]).filter { [weak self] pr in
 			if !pr.apiServer.syncIsGood {
 				return false
 			}
@@ -914,7 +914,7 @@ class API {
 		var completionCount = 0
 
 		for p in prs {
-			for s in p.statuses.allObjects as [PRStatus] {
+			for s in p.statuses.allObjects as! [PRStatus] {
 				s.postSyncAction = PostSyncAction.Delete.rawValue
 			}
 
@@ -960,7 +960,7 @@ class API {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		f.predicate = NSPredicate(format: "postSyncAction == %d and condition == %d", PostSyncAction.Delete.rawValue, PullRequestCondition.Open.rawValue)
 		f.returnsObjectsAsFaults = false
-		let pullRequests = moc.executeFetchRequest(f, error: nil) as [PullRequest]
+		let pullRequests = moc.executeFetchRequest(f, error: nil) as! [PullRequest]
 
 		let prsToCheck = pullRequests.filter { r -> Bool in
 			let parent = r.repo
@@ -991,7 +991,7 @@ class API {
 		let f = NSFetchRequest(entityName: "Issue")
 		f.predicate = NSPredicate(format: "postSyncAction == %d and condition == %d", PostSyncAction.Delete.rawValue, PullRequestCondition.Open.rawValue)
 		f.returnsObjectsAsFaults = false
-		let issues = moc.executeFetchRequest(f, error: nil) as [Issue]
+		let issues = moc.executeFetchRequest(f, error: nil) as! [Issue]
 
 		let issuesToCheck = issues.filter { r -> Bool in
 			let parent = r.repo
@@ -1005,7 +1005,7 @@ class API {
 
 	private func detectAssignedPullRequestsInMoc(moc: NSManagedObjectContext, callback: (()->Void)?) {
 
-		let prs = (DataItem.newOrUpdatedItemsOfType("PullRequest", inMoc:moc) as [PullRequest]).filter({ pr in
+		let prs = (DataItem.newOrUpdatedItemsOfType("PullRequest", inMoc:moc) as! [PullRequest]).filter({ pr in
 			return pr.apiServer.syncIsGood
 		})
 		if prs.count==0 {
@@ -1029,7 +1029,7 @@ class API {
 				getDataInPath(issueLink, fromServer: apiServer, parameters: nil, extraHeaders: nil,
 					callback: { data, lastPage, resultCode, etag in
 						if data != nil {
-							let assignee = ((data as NSDictionary).ofk("assignee") as NSDictionary?)?.ofk("login") as? String ?? "NoAssignedUserName"
+							let assignee = ((data as? NSDictionary)?.ofk("assignee") as? NSDictionary)?.ofk("login") as? String ?? "NoAssignedUserName"
 							let assigned = (assignee == (apiServer.userName ?? "NoApiUser"))
 							p.isNewAssignment = (assigned && !(p.assignedToMe?.boolValue ?? false))
 							p.assignedToMe = assigned
@@ -1164,13 +1164,13 @@ class API {
 		get("/rate_limit", fromServer: apiServer, ignoreLastSync: true, parameters: nil, extraHeaders: nil,
 			success: { response, data in
 				let allHeaders = response!.allHeaderFields
-				let requestsRemaining = (allHeaders["X-RateLimit-Remaining"] as NSString).longLongValue
-				let requestLimit = (allHeaders["X-RateLimit-Limit"] as NSString).longLongValue
-				let epochSeconds = (allHeaders["X-RateLimit-Reset"] as NSString).longLongValue
+				let requestsRemaining = (allHeaders["X-RateLimit-Remaining"] as! NSString).longLongValue
+				let requestLimit = (allHeaders["X-RateLimit-Limit"] as! NSString).longLongValue
+				let epochSeconds = (allHeaders["X-RateLimit-Reset"] as! NSString).longLongValue
 				callback?(requestsRemaining, requestLimit, epochSeconds)
 			},
 			failure: { response, data, error in
-				if response?.statusCode == 404 && data != nil && !((data as NSDictionary).ofk("message") as String == "Not Found") {
+				if response?.statusCode == 404 && data != nil && !((data as! NSDictionary).ofk("message") as! String == "Not Found") {
 					callback?(10000, 10000, 0)
 				} else {
 					callback?(-1, -1, -1)
@@ -1234,13 +1234,13 @@ class API {
 					for info in d {
 						if (info.ofk("private") as? NSNumber)?.boolValue ?? false {
 							if let permissions = info.ofk("permissions") as? NSDictionary {
-								if (permissions.ofk("pull") as NSNumber).boolValue ||
-									(permissions.ofk("push") as NSNumber).boolValue ||
-									(permissions.ofk("admin") as NSNumber).boolValue {
+								if (permissions.ofk("pull") as! NSNumber).boolValue ||
+									(permissions.ofk("push") as! NSNumber).boolValue ||
+									(permissions.ofk("admin") as! NSNumber).boolValue {
 										let r = Repo.repoWithInfo(info, fromServer: apiServer)
 										r.apiServer = apiServer
 								} else {
-									DLog("Watched private repository '%@' seems to be inaccessible, skipping", info.ofk("full_name") as String?)
+									DLog("Watched private repository '%@' seems to be inaccessible, skipping", info.ofk("full_name") as? String)
 									continue
 								}
 							}
@@ -1297,7 +1297,7 @@ class API {
 				return
 			},
 			failure: { response, data, error in
-				let allOk = (response?.statusCode == 404 && data != nil && !((data as NSDictionary).ofk("message") as String == "Not Found"))
+				let allOk = (response?.statusCode == 404 && data != nil && !((data as! NSDictionary).ofk("message") as! String == "Not Found"))
 				callback?(allOk ? nil : error)
 		})
 	}
@@ -1369,9 +1369,9 @@ class API {
 				success: { [weak self] response, data in
 
 					let allHeaders = response!.allHeaderFields
-					fromServer.requestsRemaining = NSNumber(longLong: (allHeaders["X-RateLimit-Remaining"] as NSString).longLongValue)
-					fromServer.requestsLimit = NSNumber(longLong: (allHeaders["X-RateLimit-Limit"] as NSString).longLongValue)
-					let epochSeconds = (allHeaders["X-RateLimit-Reset"] as NSString).doubleValue
+					fromServer.requestsRemaining = NSNumber(longLong: (allHeaders["X-RateLimit-Remaining"] as! NSString).longLongValue)
+					fromServer.requestsLimit = NSNumber(longLong: (allHeaders["X-RateLimit-Limit"] as! NSString).longLongValue)
+					let epochSeconds = (allHeaders["X-RateLimit-Reset"] as! NSString).doubleValue
 					fromServer.resetDate = NSDate(timeIntervalSince1970: epochSeconds)
 					NSNotificationCenter.defaultCenter().postNotificationName(API_USAGE_UPDATE, object: fromServer, userInfo: nil)
 

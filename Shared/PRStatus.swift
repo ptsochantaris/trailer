@@ -27,7 +27,7 @@ class PRStatus: DataItem {
 	@NSManaged var pullRequest: PullRequest
 
 	class func statusWithInfo(info: NSDictionary, fromServer: ApiServer) -> PRStatus {
-		let s = DataItem.itemWithInfo(info, type: "PRStatus", fromServer: fromServer) as PRStatus
+		let s = DataItem.itemWithInfo(info, type: "PRStatus", fromServer: fromServer) as! PRStatus
 		if s.postSyncAction?.integerValue != PostSyncAction.DoNothing.rawValue {
 			s.url = info.ofk("url") as? String
 			s.state = info.ofk("state") as? String
@@ -69,7 +69,7 @@ class PRStatus: DataItem {
 
 	func displayText() -> String {
 		if let desc = descriptionText {
-			return NSString(format: "%@ %@", dateFormatter.stringFromDate(createdAt!), desc)
+			return NSString(format: "%@ %@", dateFormatter.stringFromDate(createdAt!), desc) as String
 		} else {
 			return "(No description)"
 		}

@@ -17,7 +17,7 @@ class PRListController: WKInterfaceController {
     override func awakeWithContext(context: AnyObject?) {
         super.awakeWithContext(context)
 
-        sectionIndex = (context as NSDictionary)[SECTION_KEY] as Int
+        sectionIndex = (context as! NSDictionary)[SECTION_KEY] as! Int
 
         setTitle(PullRequestSection.watchMenuTitles[sectionIndex])
 
@@ -62,7 +62,7 @@ class PRListController: WKInterfaceController {
 
     private func buildUI() {
         let f = PullRequest.requestForPullRequestsWithFilter(nil, sectionIndex: sectionIndex)
-        prsInSection = mainObjectContext.executeFetchRequest(f, error: nil) as [PullRequest]
+        prsInSection = mainObjectContext.executeFetchRequest(f, error: nil) as! [PullRequest]
 
         table.setNumberOfRows(prsInSection.count, withRowType: "PRRow")
 
@@ -75,7 +75,7 @@ class PRListController: WKInterfaceController {
 
             var index = 0
             for pr in prsInSection {
-                let controller = table.rowControllerAtIndex(index++) as PRRow
+                let controller = table.rowControllerAtIndex(index++) as! PRRow
                 controller.setPullRequest(pr)
             }
         }

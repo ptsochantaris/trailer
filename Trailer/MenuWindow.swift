@@ -18,7 +18,7 @@ class MenuWindow: NSWindow {
 
         if newSystem {
             scrollView.automaticallyAdjustsContentInsets = false
-			(contentView as NSView).wantsLayer = true
+			(contentView as! NSView).wantsLayer = true
         }
 
 		let n = NSNotificationCenter.defaultCenter()
@@ -45,7 +45,7 @@ class MenuWindow: NSWindow {
 			headerVibrant!.blendingMode = NSVisualEffectBlendingMode.BehindWindow
 			header.addSubview(headerVibrant!, positioned:NSWindowOrderingMode.Below, relativeTo:nil)
 
-			appearance = NSAppearance(named: (app.prStatusItem.view as StatusItemView).darkMode ? NSAppearanceNameVibrantDark : NSAppearanceNameVibrantLight)
+			appearance = NSAppearance(named: (app.prStatusItem.view as! StatusItemView).darkMode ? NSAppearanceNameVibrantDark : NSAppearanceNameVibrantLight)
 			table.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.SourceList
 		} else {
 			if newSystem {
@@ -57,7 +57,7 @@ class MenuWindow: NSWindow {
 		}
 	}
 
-	func canBecomeKeyWindow() -> Bool {
+    override var canBecomeKeyWindow: Bool {
 		return true
 	}
 

@@ -9,7 +9,7 @@ class IssueCell: TrailerCell {
 		detailFont = NSFont.menuFontOfSize(10.0)
 		titleFont = NSFont.menuFontOfSize(13.0)
 
-		let v = app.prStatusItem.view as StatusItemView
+		let v = app.prStatusItem.view as! StatusItemView
 		let goneDark = MenuWindow.usingVibrancy() && v.darkMode
 		unselectedTitleColor = goneDark ? NSColor.controlHighlightColor() : NSColor.controlTextColor()
 
@@ -125,7 +125,7 @@ class IssueCell: TrailerCell {
 	}
 
 	override func stringForCopy() -> String? {
-		return (associatedDataItem() as Issue).webUrl
+		return (associatedDataItem() as! Issue).webUrl
 	}
 
 	required init?(coder: NSCoder) {

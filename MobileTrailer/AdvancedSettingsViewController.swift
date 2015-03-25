@@ -24,9 +24,9 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 	}
 
 	private enum Section: Int {
-		case Refresh, Display, Comments, Repos, StausesAndLabels, History, Confirm, Sort, Misc
-		static let rowCounts = [3, 8, 7, 1, 6, 3, 2, 3, 1]
-		static let allNames = ["Auto Refresh", "Display", "Comments", "Repositories", "Statuses & Labels", "History", "Don't confirm when", "Sorting", "Misc"]
+		case Refresh, Display, Issues, Comments, Repos, StausesAndLabels, History, Confirm, Sort, Misc
+		static let rowCounts = [3, 7, 1, 7, 1, 6, 3, 2, 3, 1]
+		static let allNames = ["Auto Refresh", "Display", "Issues", "Comments", "Repositories", "Statuses & Labels", "History", "Don't confirm when", "Sorting", "Misc"]
 	}
 
 	private enum NormalSorting: Int {
@@ -58,7 +58,7 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 	}
 
 	override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCellWithIdentifier("Cell") as UITableViewCell
+		let cell = tableView.dequeueReusableCellWithIdentifier("Cell") as! UITableViewCell
 		cell.accessoryType = UITableViewCellAccessoryType.None
 		cell.detailTextLabel?.text = " "
 
@@ -98,7 +98,11 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 			case 6:
 				cell.textLabel?.text = "Include labels in filtering"
 				cell.accessoryType = check(Settings.includeLabelsInFilter)
-			case 7:
+			default: break
+			}
+		} else if indexPath.section == Section.Issues.rawValue {
+			switch indexPath.row {
+			case 0:
 				cell.textLabel?.text = "Sync and display issues"
 				cell.accessoryType = check(Settings.showIssuesMenu)
 			default: break
@@ -265,17 +269,21 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 				Settings.includeReposInFilter = !Settings.includeReposInFilter
 			case 6:
 				Settings.includeLabelsInFilter = !Settings.includeLabelsInFilter
-			case 7:
+			default: break
+			}
+		} else if indexPath.section == Section.Issues.rawValue {
+			switch indexPath.row {
+			case 0:
 				Settings.showIssuesMenu = !Settings.showIssuesMenu
 				if Settings.showIssuesMenu {
-					for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as [Repo] {
+					for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
 						r.dirty = true
 						r.lastDirtied = NSDate.distantPast() as? NSDate
 					}
 					app.preferencesDirty = true
 				} else {
-					for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as [Repo] {
-						for i in r.issues.allObjects as [Issue] {
+					for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
+						for i in r.issues.allObjects as! [Issue] {
 							i.postSyncAction = PostSyncAction.Delete.rawValue
 						}
 					}
@@ -317,7 +325,7 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 				Settings.showStatusItems = !Settings.showStatusItems
 				api.resetAllStatusChecks()
 				if Settings.showStatusItems {
-					for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as [Repo] {
+					for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
 						r.dirty = true
 						r.lastDirtied = NSDate.distantPast() as? NSDate
 					}
@@ -342,7 +350,7 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 				Settings.showLabels = !Settings.showLabels
 				api.resetAllLabelChecks()
 				if Settings.showLabels {
-					for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as [Repo] {
+					for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
 						r.dirty = true
 						r.lastDirtied = NSDate.distantPast() as? NSDate
 					}

@@ -48,7 +48,7 @@ class ServersViewController: UITableViewController {
 	}
 
 	override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCellWithIdentifier("ServerCell", forIndexPath: indexPath) as UITableViewCell
+		let cell = tableView.dequeueReusableCellWithIdentifier("ServerCell", forIndexPath: indexPath) as! UITableViewCell
 		let a = allServers[indexPath.row]
 		if (a.authToken ?? "").isEmpty {
 			cell.textLabel?.textColor = UIColor.redColor()

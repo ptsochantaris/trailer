@@ -58,14 +58,14 @@ class RespositoriesViewController: UITableViewController, UITextFieldDelegate, N
 			self!.refreshList()
 		}))
 		a.addAction(UIAlertAction(title: "Hide All", style: UIAlertActionStyle.Default, handler: { [weak self] action in
-			for r in self!.fetchedResultsController.fetchedObjects as [Repo] {
+			for r in self!.fetchedResultsController.fetchedObjects as! [Repo] {
 				r.hidden = true
 				r.dirty = false
 			}
 			app.preferencesDirty = true
 		}))
 		a.addAction(UIAlertAction(title: "Show All", style: UIAlertActionStyle.Default, handler: { [weak self] action in
-			for r in self!.fetchedResultsController.fetchedObjects as [Repo] {
+			for r in self!.fetchedResultsController.fetchedObjects as! [Repo] {
 				r.hidden = false
 				r.dirty = true
 				r.lastDirtied = NSDate()
@@ -117,7 +117,7 @@ class RespositoriesViewController: UITableViewController, UITextFieldDelegate, N
 	}
 
 	override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as UITableViewCell
+		let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! UITableViewCell
 		configureCell(cell, atIndexPath: indexPath)
 		return cell
 	}
@@ -137,7 +137,7 @@ class RespositoriesViewController: UITableViewController, UITextFieldDelegate, N
 		if section==1 {
 			return "Forked Repos"
 		} else {
-			let repo = fetchedResultsController.objectAtIndexPath(NSIndexPath(forRow: 0, inSection: section)) as Repo
+			let repo = fetchedResultsController.objectAtIndexPath(NSIndexPath(forRow: 0, inSection: section)) as! Repo
 			if (repo.fork?.boolValue ?? false) {
 				return "Forked Repos"
 			} else {
@@ -212,7 +212,7 @@ class RespositoriesViewController: UITableViewController, UITextFieldDelegate, N
 	}
 
 	private func configureCell(cell: UITableViewCell, atIndexPath: NSIndexPath) {
-		let repo = fetchedResultsController.objectAtIndexPath(atIndexPath) as Repo
+		let repo = fetchedResultsController.objectAtIndexPath(atIndexPath) as! Repo
 		let fullName = repo.fullName ?? "(Untitled Repo)"
 		let text = (repo.inaccessible?.boolValue ?? false) ? (fullName + " (inaccessible)") : fullName
 		cell.textLabel?.text = text

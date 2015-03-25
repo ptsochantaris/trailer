@@ -37,7 +37,7 @@ class FilledView: NSView {
 		}
     }
 
-	func allowsVibrancy() -> Bool {
+    override var allowsVibrancy: Bool {
 		return false
 	}
 }

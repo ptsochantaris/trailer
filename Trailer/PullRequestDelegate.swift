@@ -14,7 +14,7 @@ class PullRequestDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource 
 		pullRequestIds.removeAll(keepCapacity: false)
 
 		let f = PullRequest.requestForPullRequestsWithFilter(filter, sectionIndex: -1)
-		let allPrs = mainObjectContext.executeFetchRequest(f, error: nil) as [PullRequest]
+		let allPrs = mainObjectContext.executeFetchRequest(f, error: nil) as! [PullRequest]
 
 		if let firstPr = allPrs.first {
 			var lastSection = firstPr.sectionIndex!.integerValue
@@ -34,10 +34,10 @@ class PullRequestDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource 
 	func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
 		let object = pullRequestIds[row]
 		if object.isKindOfClass(NSManagedObjectID) {
-			let pr = mainObjectContext.existingObjectWithID(object as NSManagedObjectID, error: nil) as PullRequest
+			let pr = mainObjectContext.existingObjectWithID(object as! NSManagedObjectID, error: nil) as! PullRequest
 			return PullRequestCell(pullRequest: pr)
 		} else {
-			let title = object as String
+			let title = object as! String
 			let showButton = (title == PullRequestSection.Merged.prMenuName() || title == PullRequestSection.Closed.prMenuName())
 			return SectionHeader(title: title, showRemoveAllButton: showButton)
 		}
@@ -55,7 +55,7 @@ class PullRequestDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource 
 	func pullRequestAtRow(row: Int) -> PullRequest? {
 		let object = pullRequestIds[row]
 		if object.isKindOfClass(NSManagedObjectID) {
-			return mainObjectContext.existingObjectWithID(object as NSManagedObjectID, error: nil) as? PullRequest
+			return mainObjectContext.existingObjectWithID(object as! NSManagedObjectID, error: nil) as? PullRequest
 		} else {
 			return nil
 		}

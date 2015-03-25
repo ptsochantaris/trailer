@@ -37,7 +37,7 @@ class ApiServer: NSManagedObject {
 	}
 
 	class func insertNewServerInMoc(moc: NSManagedObjectContext) -> ApiServer {
-		let githubServer: ApiServer = NSEntityDescription.insertNewObjectForEntityForName("ApiServer", inManagedObjectContext: moc) as ApiServer
+		let githubServer: ApiServer = NSEntityDescription.insertNewObjectForEntityForName("ApiServer", inManagedObjectContext: moc) as! ApiServer
 		githubServer.createdAt = NSDate()
 		return githubServer
 	}
@@ -82,7 +82,7 @@ class ApiServer: NSManagedObject {
 		let f = NSFetchRequest(entityName: "ApiServer")
 		f.returnsObjectsAsFaults = false
 		f.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: true)]
-		return moc.executeFetchRequest(f, error: nil) as [ApiServer]
+		return moc.executeFetchRequest(f, error: nil) as! [ApiServer]
 	}
 
 	class func someServersHaveAuthTokensInMoc(moc: NSManagedObjectContext) -> Bool {
@@ -102,7 +102,7 @@ class ApiServer: NSManagedObject {
 	func rollBackAllUpdatesInMoc(moc: NSManagedObjectContext) {
 		DLog("Rolling back changes for failed sync on API server '%@'",label)
 		for set in [repos, pullRequests, comments, statuses, labels] {
-			for dataItem: DataItem in set.allObjects as [DataItem] {
+			for dataItem: DataItem in set.allObjects as! [DataItem] {
 				if let action = dataItem.postSyncAction?.integerValue {
 					switch action {
 					case PostSyncAction.Delete.rawValue:
@@ -121,7 +121,7 @@ class ApiServer: NSManagedObject {
 
 	func clearAllRelatedInfo() {
 		if let moc = managedObjectContext {
-			for repo in repos.allObjects as [Repo] {
+			for repo in repos.allObjects as! [Repo] {
 				moc.deleteObject(repo)
 			}
 		}

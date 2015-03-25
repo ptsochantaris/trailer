@@ -22,7 +22,7 @@ class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 		super.viewDidLoad()
 		var a: ApiServer
 		if let sid = serverId {
-			a = mainObjectContext.existingObjectWithID(sid, error: nil) as ApiServer
+			a = mainObjectContext.existingObjectWithID(sid, error: nil) as! ApiServer
 		} else {
 			a = ApiServer.addDefaultGithubInMoc(mainObjectContext)
 			mainObjectContext.save(nil)
@@ -67,7 +67,7 @@ class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 
 	private func updateServerFromForm() -> ApiServer? {
 		if let sid = serverId {
-			let a = mainObjectContext.existingObjectWithID(sid, error: nil) as ApiServer
+			let a = mainObjectContext.existingObjectWithID(sid, error: nil) as! ApiServer
 			a.label = name.text.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
 			a.apiPath = apiPath.text.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
 			a.webPath = webFrontEnd.text.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
@@ -191,7 +191,7 @@ class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 		if focusedField?.superview == nil { return }
 
 		let info = notification.userInfo as NSDictionary!
-		let keyboardFrame = (info.objectForKey(UIKeyboardFrameEndUserInfoKey) as NSValue).CGRectValue()
+		let keyboardFrame = (info.objectForKey(UIKeyboardFrameEndUserInfoKey) as! NSValue).CGRectValue()
 		let keyboardHeight = max(0, view.bounds.size.height-keyboardFrame.origin.y)
 		let firstResponderFrame = view.convertRect(focusedField!.frame, fromView: focusedField!.superview)
 		let bottomOfFirstResponder = (firstResponderFrame.origin.y + firstResponderFrame.size.height) + 36

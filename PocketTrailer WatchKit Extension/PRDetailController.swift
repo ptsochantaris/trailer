@@ -19,8 +19,8 @@ class PRDetailController: WKInterfaceController {
     override func awakeWithContext(context: AnyObject?) {
         super.awakeWithContext(context)
 
-        let contextData = context as NSDictionary
-        pullRequest = contextData[PULL_REQUEST_KEY] as PullRequest
+        let contextData = context as! NSDictionary
+        pullRequest = contextData[PULL_REQUEST_KEY] as! PullRequest
 
         buildUI()
     }
@@ -58,7 +58,7 @@ class PRDetailController: WKInterfaceController {
             rowTypes.append("LabelRow")
         }
 
-        for c in pullRequest.comments.allObjects as [PRComment] {
+        for c in pullRequest.comments.allObjects as! [PRComment] {
             rowTypes.append("CommentRow")
         }
         table.setRowTypes(rowTypes)
@@ -66,7 +66,7 @@ class PRDetailController: WKInterfaceController {
         var index = 0
 
         for s in displayedStatuses {
-            let controller = table.rowControllerAtIndex(index++) as StatusRow
+            let controller = table.rowControllerAtIndex(index++) as! StatusRow
             controller.labelL.setText(s.displayText())
             let color = s.colorForDarkDisplay()
             controller.labelL.setTextColor(color)
@@ -74,11 +74,11 @@ class PRDetailController: WKInterfaceController {
         }
 
         if !(pullRequest.body ?? "").isEmpty {
-            (table.rowControllerAtIndex(index++) as LabelRow).labelL.setText(pullRequest.body)
+            (table.rowControllerAtIndex(index++) as! LabelRow).labelL.setText(pullRequest.body)
         }
 
-        for c in pullRequest.comments.allObjects as [PRComment] {
-            let controller = table.rowControllerAtIndex(index++) as CommentRow
+        for c in pullRequest.comments.allObjects as! [PRComment] {
+            let controller = table.rowControllerAtIndex(index++) as! CommentRow
             controller.usernameL.setText((c.userName ?? "(unknown)") + " " + shortDateFormatter.stringFromDate(c.createdAt ?? NSDate()))
             controller.commentL.setText(c.body)
         }

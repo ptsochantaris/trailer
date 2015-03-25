@@ -16,7 +16,7 @@ class CommentBlacklistViewController: UITableViewController {
 	}
 
 	override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCellWithIdentifier("UsernameCell", forIndexPath: indexPath) as UITableViewCell
+		let cell = tableView.dequeueReusableCellWithIdentifier("UsernameCell", forIndexPath: indexPath) as! UITableViewCell
 		cell.textLabel?.text = Settings.commentAuthorBlacklist[indexPath.row]
 		return cell
 	}
@@ -46,7 +46,7 @@ class CommentBlacklistViewController: UITableViewController {
 		a.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil))
 		a.addAction(UIAlertAction(title: "Block", style: UIAlertActionStyle.Default, handler: { action in
 
-			let tf = a.textFields?.first as UITextField
+			let tf = a.textFields?.first as! UITextField
 			var name = tf.text.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
 
 			if startsWith(name, "@") {

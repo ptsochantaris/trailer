@@ -103,7 +103,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	// Globals
 	weak var refreshTimer: NSTimer?
-	var lastRepoCheck = NSDate.distantPast() as NSDate
+	var lastRepoCheck = NSDate.distantPast() as! NSDate
 	var preferencesDirty: Bool = false
 	var isRefreshing: Bool = false
 	var isManuallyScrolling: Bool = false
@@ -162,7 +162,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 		NSUserNotificationCenter.defaultUserNotificationCenter().delegate = self
 
-        var buildNumber = NSBundle.mainBundle().infoDictionary!["CFBundleVersion"] as String
+        var buildNumber = NSBundle.mainBundle().infoDictionary!["CFBundleVersion"] as! String
 		let cav = "Version \(currentAppVersion) (\(buildNumber))"
 		versionNumber.stringValue = cav
 		aboutVersion.stringValue = cav
@@ -211,7 +211,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		updateLabelOptions()
 		api.resetAllLabelChecks()
 		if Settings.showLabels {
-			for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as [Repo] {
+			for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
 				r.dirty = true
 				r.lastDirtied = NSDate.distantPast() as? NSDate
 			}
@@ -313,14 +313,14 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		Settings.showIssuesMenu = (sender.integerValue==1)
 		DataManager.postProcessAllItems()
 		if Settings.showIssuesMenu {
-			for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as [Repo] {
+			for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
 				r.dirty = true
 				r.lastDirtied = NSDate.distantPast() as? NSDate
 			}
 			preferencesDirty = true
 		} else {
-			for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as [Repo] {
-				for i in r.issues.allObjects as [Issue] {
+			for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
+				for i in r.issues.allObjects as! [Issue] {
 					i.postSyncAction = PostSyncAction.Delete.rawValue
 				}
 			}
@@ -374,7 +374,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 		api.resetAllStatusChecks()
 		if Settings.showStatusItems {
-			for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as [Repo] {
+			for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
 				r.dirty = true
 				r.lastDirtied = NSDate.distantPast() as? NSDate
 			}
@@ -517,57 +517,57 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 		switch type {
 		case .NewMention:
-			let c = forItem as PRComment
+			let c = forItem as! PRComment
 			notification.title = "@" + (c.userName ?? "NoUserName") + " mentioned you:"
 			notification.subtitle = c.notificationSubtitle()
 			notification.informativeText = c.body
 		case .NewComment:
-			let c = forItem as PRComment
+			let c = forItem as! PRComment
 			notification.title = "@" + (c.userName ?? "NoUserName") + " commented:"
 			notification.subtitle = c.notificationSubtitle()
 			notification.informativeText = c.body
 		case .NewPr:
 			notification.title = "New PR"
-			notification.subtitle = (forItem as PullRequest).title
+			notification.subtitle = (forItem as! PullRequest).title
 		case .PrReopened:
 			notification.title = "Re-Opened PR"
-			notification.subtitle = (forItem as PullRequest).title
+			notification.subtitle = (forItem as! PullRequest).title
 		case .PrMerged:
 			notification.title = "PR Merged!"
-			notification.subtitle = (forItem as PullRequest).title
+			notification.subtitle = (forItem as! PullRequest).title
 		case .PrClosed:
 			notification.title = "PR Closed"
-			notification.subtitle = (forItem as PullRequest).title
+			notification.subtitle = (forItem as! PullRequest).title
 		case .NewRepoSubscribed:
 			notification.title = "New Repository Subscribed"
-			notification.subtitle = (forItem as Repo).fullName
+			notification.subtitle = (forItem as! Repo).fullName
 		case .NewRepoAnnouncement:
 			notification.title = "New Repository"
-			notification.subtitle = (forItem as Repo).fullName
+			notification.subtitle = (forItem as! Repo).fullName
 		case .NewPrAssigned:
 			notification.title = "PR Assigned"
-			notification.subtitle = (forItem as PullRequest).title
+			notification.subtitle = (forItem as! PullRequest).title
 		case .NewStatus:
-			let c = forItem as PRStatus
+			let c = forItem as! PRStatus
 			notification.title = "PR Status Update"
 			notification.subtitle = c.pullRequest.title
 			notification.informativeText = c.descriptionText
 		case .NewIssue:
 			notification.title = "New Issue"
-			notification.subtitle = (forItem as Issue).title
+			notification.subtitle = (forItem as! Issue).title
 		case .IssueReopened:
 			notification.title = "Re-Opened Issue"
-			notification.subtitle = (forItem as Issue).title
+			notification.subtitle = (forItem as! Issue).title
 		case .IssueClosed:
 			notification.title = "Issue Closed"
-			notification.subtitle = (forItem as Issue).title
+			notification.subtitle = (forItem as! Issue).title
 		case .NewIssueAssigned:
 			notification.title = "Issue Assigned"
-			notification.subtitle = (forItem as Issue).title
+			notification.subtitle = (forItem as! Issue).title
 		}
 
 		if (type == .NewComment || type == .NewMention) && !Settings.hideAvatars && notification.respondsToSelector(Selector("setContentImage:")) {
-			if let url = (forItem as PRComment).avatarUrl {
+			if let url = (forItem as! PRComment).avatarUrl {
 				api.haveCachedAvatar(url, tryLoadAndCallback: { image in
 					notification.contentImage = image
 					NSUserNotificationCenter.defaultUserNotificationCenter().deliverNotification(notification)
@@ -613,7 +613,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	}
 
 	func toggleVisibilityOfMenu(menu: MenuWindow, fromStatusItem: NSStatusItem) {
-		let v = fromStatusItem.view as StatusItemView
+		let v = fromStatusItem.view as! StatusItemView
 		if v.highlighted {
 			closeMenu(menu, statusItem: fromStatusItem)
 		} else {
@@ -633,7 +633,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	private func sizeMenu(window: MenuWindow, fromStatusItem: NSStatusItem, andShow: Bool) {
 		let screen = NSScreen.mainScreen()!
 		let rightSide = screen.visibleFrame.origin.x + screen.visibleFrame.size.width
-		let siv = fromStatusItem.view as StatusItemView
+		let siv = fromStatusItem.view as! StatusItemView
 		var menuLeft = siv.window!.frame.origin.x
 		let overflow = (menuLeft+MENU_WIDTH)-rightSide
 		if overflow>0 {
@@ -648,7 +648,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		} else {
 			menuHeight += 10
 			for f in 0..<rowCount {
-				let rowView = window.table.viewAtColumn(0, row: f, makeIfNecessary: true) as NSView
+				let rowView = window.table.viewAtColumn(0, row: f, makeIfNecessary: true) as! NSView
 				menuHeight += rowView.frame.size.height + 2
 				if menuHeight >= screenHeight {
 					break
@@ -680,7 +680,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	}
 
 	private func closeMenu(menu: MenuWindow, statusItem: NSStatusItem) {
-		let siv = statusItem.view as StatusItemView
+		let siv = statusItem.view as! StatusItemView
 		siv.highlighted = false
 		menu.orderOut(nil)
 		menu.table.deselectAll(nil)
@@ -895,14 +895,14 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 				issuesFilterTimer.push()
 			} else if obj===statusTermsField {
 				let existingTokens = Settings.statusFilteringTerms
-				let newTokens = statusTermsField.objectValue as [String]
+				let newTokens = statusTermsField.objectValue as! [String]
 				if existingTokens != newTokens {
 					Settings.statusFilteringTerms = newTokens
 					deferredUpdate()
 				}
 			} else if obj===commentAuthorBlacklist {
 				let existingTokens = Settings.commentAuthorBlacklist
-				let newTokens = commentAuthorBlacklist.objectValue as [String]
+				let newTokens = commentAuthorBlacklist.objectValue as! [String]
 				if existingTokens != newTokens {
 					Settings.commentAuthorBlacklist = newTokens
 				}
@@ -915,7 +915,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		api.resetAllStatusChecks()
 		api.resetAllLabelChecks()
 		Settings.lastSuccessfulRefresh = nil
-		lastRepoCheck = NSDate.distantPast() as NSDate
+		lastRepoCheck = NSDate.distantPast() as! NSDate
 		projectsTable.reloadData()
 		refreshButton.enabled = ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext)
 		deferredUpdate()
@@ -923,13 +923,13 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	@IBAction func markAllReadSelected(sender: NSMenuItem) {
 		let f = PullRequest.requestForPullRequestsWithFilter(prMenu.filter.stringValue, sectionIndex: -1)
-		for r in mainObjectContext.executeFetchRequest(f, error: nil) as [PullRequest] {
+		for r in mainObjectContext.executeFetchRequest(f, error: nil) as! [PullRequest] {
 			r.catchUpWithComments()
 		}
 		updatePrMenu()
 		if issuesStatusItem != nil {
 			let isf = Issue.requestForIssuesWithFilter(issuesMenu.filter.stringValue, sectionIndex: -1)
-			for i in mainObjectContext.executeFetchRequest(isf, error: nil) as [Issue] {
+			for i in mainObjectContext.executeFetchRequest(isf, error: nil) as! [Issue] {
 				i.catchUpWithComments()
 			}
 			updateIssuesMenu()
@@ -1012,7 +1012,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	}
 
 	private func colorButton(button: NSButton, withColor: NSColor) {
-		let title = button.attributedTitle.mutableCopy() as NSMutableAttributedString
+		let title = button.attributedTitle.mutableCopy() as! NSMutableAttributedString
 		title.addAttribute(NSForegroundColorAttributeName, value: withColor, range: NSMakeRange(0, title.length))
 		button.attributedTitle = title
 	}
@@ -1117,16 +1117,16 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	}
 
 	func tableView(tv: NSTableView, objectValueForTableColumn tableColumn: NSTableColumn?, row: Int) -> AnyObject? {
-		let cell = tableColumn!.dataCellForRow(row) as NSCell
+		let cell = tableColumn!.dataCellForRow(row) as! NSCell
 
 		if tv === projectsTable {
 			if tableColumn?.identifier == "hide" {
 				if tableView(tv, isGroupRow:row) {
-					(cell as NSButtonCell).imagePosition = NSCellImagePosition.NoImage
+					(cell as! NSButtonCell).imagePosition = NSCellImagePosition.NoImage
 					cell.state = NSMixedState
 					cell.enabled = false
 				} else {
-					(cell as NSButtonCell).imagePosition = NSCellImagePosition.ImageOnly
+					(cell as! NSButtonCell).imagePosition = NSCellImagePosition.ImageOnly
 					let r = repoForRow(row)
 					if r.hidden.boolValue {
 						cell.state = NSOnState
@@ -1157,7 +1157,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 			if tableColumn?.identifier == "server" {
 				cell.title = apiServer.label ?? "NoApiServer"
 			} else { // api usage
-				let c = cell as NSLevelIndicatorCell
+				let c = cell as! NSLevelIndicatorCell
 				c.minValue = 0
 				let rl = apiServer.requestsLimit?.doubleValue ?? 0.0
 				c.maxValue = rl
@@ -1327,7 +1327,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	func tabView(tabView: NSTabView, willSelectTabViewItem tabViewItem: NSTabViewItem?) {
 		if tabView.indexOfTabViewItem(tabViewItem!) == 1 {
-			if (lastRepoCheck.isEqualToDate(NSDate.distantPast() as NSDate) || Repo.countVisibleReposInMoc(mainObjectContext) == 0) && ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
+			if (lastRepoCheck.isEqualToDate(NSDate.distantPast() as! NSDate) || Repo.countVisibleReposInMoc(mainObjectContext) == 0) && ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
 				refreshReposSelected(nil)
 			}
 		}
@@ -1340,7 +1340,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		refreshButton.enabled = false
 		projectsTable.enabled = false
 		activityDisplay.startAnimation(nil)
-		(prStatusItem.view as StatusItemView).grayOut = Settings.grayOutWhenRefreshing
+		(prStatusItem.view as! StatusItemView).grayOut = Settings.grayOutWhenRefreshing
 		(issuesStatusItem?.view as? StatusItemView)?.grayOut = Settings.grayOutWhenRefreshing
 
 		api.expireOldImageCacheEntries()
@@ -1587,7 +1587,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	@IBAction func statusFilterMenuChanged(sender: NSPopUpButton) {
 		Settings.statusFilteringMode = sender.indexOfSelectedItem
-		Settings.statusFilteringTerms = statusTermsField.objectValue as [String]
+		Settings.statusFilteringTerms = statusTermsField.objectValue as! [String]
 		updateStatusTermPreferenceControls()
 		deferredUpdate()
 	}

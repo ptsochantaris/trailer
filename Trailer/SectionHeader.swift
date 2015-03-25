@@ -1,7 +1,7 @@
 
 class SectionHeader: NSTableRowView {
 
-	let titleView: CenterTextField!
+	var titleView: CenterTextField!
 
 	init(title: String, showRemoveAllButton: Bool) {
 

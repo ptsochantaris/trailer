@@ -1,24 +1,31 @@
 
-///////////// Logging, with thanks to Transition.io: http://transition.io/logging-in-swift-without-overhead-in-production/
+//////////////////////// Logging: Ugly as hell but works and is fast
 
-typealias LazyVarArgClosure = @autoclosure () -> CVarArgType?
-
-func DLog(messageFormat: String, args: LazyVarArgClosure...) {
-	#if DEBUG
-		let shouldLog = true
-	#else
-		let shouldLog = Settings.logActivityToConsole
-	#endif
-	if shouldLog {
-		withVaList(
-			args.map { (lazyArg: LazyVarArgClosure) in
-				return lazyArg() ?? "(nil)"
-			}, {
-				NSLogv(messageFormat, $0)
-			}
-		)
-	}
+func DLog(message: String) {
+    if Settings.logActivityToConsole {
+        NSLog(message)
+    }
 }
+
+func DLog(message: String, @autoclosure arg1: ()->CVarArgType?) {
+    if Settings.logActivityToConsole {
+        NSLog(message, arg1() ?? "(nil)")
+    }
+}
+
+func DLog(message: String, @autoclosure arg1: ()->CVarArgType?, @autoclosure arg2: ()->CVarArgType?) {
+    if Settings.logActivityToConsole {
+        NSLog(message, arg1() ?? "(nil)", arg2() ?? "(nil)")
+    }
+}
+
+func DLog(message: String, @autoclosure arg1: ()->CVarArgType?, @autoclosure arg2: ()->CVarArgType?, @autoclosure arg3: ()->CVarArgType?) {
+    if Settings.logActivityToConsole {
+        NSLog(message, arg1() ?? "(nil)", arg2() ?? "(nil)", arg3() ?? "(nil)")
+    }
+}
+
+////////////////////////////////////
 
 #if os(iOS)
 
@@ -86,7 +93,7 @@ let LOW_API_WARNING: Double = 0.20
 let NETWORK_TIMEOUT: NSTimeInterval = 120.0
 let BACKOFF_STEP: NSTimeInterval = 120.0
 
-let currentAppVersion = NSBundle.mainBundle().infoDictionary!["CFBundleShortVersionString"] as String
+let currentAppVersion = NSBundle.mainBundle().infoDictionary!["CFBundleShortVersionString"] as! String
 
 enum PullRequestCondition: Int {
 	case Open, Closed, Merged
