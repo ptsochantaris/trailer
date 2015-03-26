@@ -15,12 +15,13 @@
                                 <tableRow identifier="TitleRow" selectable="NO" id="tHv-Jj-a9y" customClass="TitleRow" customModule="PocketTrailer_WatchKit_Extension">
                                     <group key="rootItem" width="1" height="0.0" alignment="left" id="mWo-dt-dzr">
                                         <items>
-                                            <label alignment="center" text="Pull Requests" textAlignment="left" numberOfLines="0" id="dy2-9S-MJp">
+                                            <label alignment="left" verticalAlignment="bottom" text="Pull Requests" textAlignment="left" numberOfLines="0" id="dy2-9S-MJp">
                                                 <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
-                                                <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
+                                                <fontDescription key="font" style="UICTFontTextStyleSubhead"/>
                                             </label>
                                         </items>
                                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                        <edgeInsets key="margins" left="3" right="0.0" top="4" bottom="0.0"/>
                                     </group>
                                     <connections>
                                         <outlet property="titleL" destination="dy2-9S-MJp" id="mX0-PC-TAL"/>
@@ -30,7 +31,7 @@
                                     <group key="rootItem" width="1" height="0.0" alignment="left" id="Uft-cP-lJ6">
                                         <items>
                                             <label alignment="left" verticalAlignment="center" text="Title" id="m26-4w-XIn">
-                                                <fontDescription key="font" style="UICTFontTextStyleSubhead"/>
+                                                <fontDescription key="font" style="UICTFontTextStyleHeadline"/>
                                             </label>
                                             <group height="1" alignment="right" radius="9" id="VK1-qB-Emf">
                                                 <items>
@@ -261,10 +262,11 @@
             <objects>
                 <glanceController spacing="0.0" id="Sv0-Ai-Zie" customClass="GlanceController" customModule="PocketTrailer_WatchKit_App" customModuleProvider="target">
                     <items>
-                        <group alignment="left" id="gv7-I2-MZq">
+                        <group alignment="left" spacing="6" id="gv7-I2-MZq">
                             <items>
-                                <imageView width="38" height="38" alignment="center" verticalAlignment="bottom" alpha="0.59999999999999964" image="GlanceIcon" contentMode="scaleAspectFit" id="xYb-hC-O7D"/>
-                                <label alignment="center" verticalAlignment="bottom" text="43" textAlignment="center" id="3wl-rh-8m0">
+                                <imageView width="30" height="30" alignment="center" verticalAlignment="center" alpha="0.59999999999999964" image="GlacePrs" contentMode="scaleAspectFit" id="xYb-hC-O7D"/>
+                                <imageView width="28" height="28" alignment="center" verticalAlignment="center" alpha="0.59999999999999964" image="GlanceIssues" contentMode="scaleAspectFit" id="J0s-24-eqf"/>
+                                <label alignment="center" verticalAlignment="center" text="43" textAlignment="center" id="3wl-rh-8m0">
                                     <fontDescription key="font" type="system" weight="medium" pointSize="31"/>
                                 </label>
                             </items>
@@ -279,13 +281,13 @@
                                         <label alignment="center" text="XX PARTICIPATED" numberOfLines="0" id="E1B-vS-NEB">
                                             <fontDescription key="font" type="system" pointSize="10"/>
                                         </label>
-                                        <label alignment="center" alpha="0.69999999999999973" text="XX MERGED" numberOfLines="0" id="8hY-30-ORl">
+                                        <label alignment="center" alpha="0.59999999999999998" text="XX MERGED" numberOfLines="0" id="8hY-30-ORl">
                                             <fontDescription key="font" type="system" pointSize="10"/>
                                         </label>
-                                        <label alignment="center" alpha="0.69999999999999973" text="XX CLOSED" numberOfLines="0" id="tvP-EF-DnR">
+                                        <label alignment="center" alpha="0.59999999999999998" text="XX CLOSED" numberOfLines="0" id="tvP-EF-DnR">
                                             <fontDescription key="font" type="system" pointSize="10"/>
                                         </label>
-                                        <label alignment="center" alpha="0.69999999999999973" text="XX OTHER" numberOfLines="0" id="UFt-fx-TSE">
+                                        <label alignment="center" alpha="0.59999999999999998" text="XX OTHER" numberOfLines="0" id="UFt-fx-TSE">
                                             <fontDescription key="font" type="system" pointSize="10"/>
                                         </label>
                                         <label alignment="center" text="XX UNREAD COMMENTS" numberOfLines="0" id="haI-qm-CXj">
@@ -303,11 +305,13 @@
                     <edgeInsets key="margins" left="0.0" right="0.0" top="0.0" bottom="14"/>
                     <connections>
                         <outlet property="closedCount" destination="tvP-EF-DnR" id="hbB-mi-2Lo"/>
+                        <outlet property="issueIcon" destination="J0s-24-eqf" id="m9V-84-tH5"/>
                         <outlet property="lastUpdate" destination="Qer-7L-pJ7" id="LK4-aR-MUG"/>
                         <outlet property="mergedCount" destination="8hY-30-ORl" id="Jas-dU-HsL"/>
                         <outlet property="myCount" destination="fJB-oa-687" id="s3p-Ev-MQm"/>
                         <outlet property="otherCount" destination="UFt-fx-TSE" id="aiy-S8-LLd"/>
                         <outlet property="participatedCount" destination="E1B-vS-NEB" id="gwl-jI-qUt"/>
+                        <outlet property="prIcon" destination="xYb-hC-O7D" id="xyq-S7-npK"/>
                         <outlet property="totalCount" destination="3wl-rh-8m0" id="BgR-8y-n1Z"/>
                         <outlet property="unreadCount" destination="haI-qm-CXj" id="djY-l5-Twe"/>
                     </connections>
@@ -322,7 +326,7 @@
                     <items>
                         <group width="1" alignment="center" verticalAlignment="center" id="okz-U3-TVg">
                             <items>
-                                <imageView width="32" height="32" alignment="center" verticalAlignment="center" alpha="0.89999999999999991" image="GlanceIcon" contentMode="scaleAspectFit" id="wXB-qA-npf"/>
+                                <imageView width="30" height="30" alignment="center" verticalAlignment="center" alpha="0.79999999999999982" image="GlanceIssues" contentMode="scaleAspectFit" id="wXB-qA-npf"/>
                                 <label alignment="center" verticalAlignment="center" text="One moment please..." numberOfLines="0" id="TaB-Gc-8NT"/>
                             </items>
                         </group>

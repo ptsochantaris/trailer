@@ -305,6 +305,11 @@ class Settings: NSObject {
 		set { set("AUTO_PARTICIPATE_ON_TEAM_MENTIONS", newValue) }
 	}
 
+	class var showIssuesInGlance: Bool {
+		get { return get("SHOW_ISSUES_IN_WATCH_GLANCE") as? Bool ?? false }
+		set { set("SHOW_ISSUES_IN_WATCH_GLANCE", newValue) }
+	}
+
 	//////////////////////////////
 
 	class var checkForUpdatesAutomatically: Bool {

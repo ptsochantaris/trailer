@@ -25,7 +25,7 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 
 	private enum Section: Int {
 		case Refresh, Display, Issues, Comments, Repos, StausesAndLabels, History, Confirm, Sort, Misc
-		static let rowCounts = [3, 7, 1, 7, 1, 6, 3, 2, 3, 1]
+		static let rowCounts = [3, 7, 2, 7, 1, 6, 3, 2, 3, 1]
 		static let allNames = ["Auto Refresh", "Display", "Issues", "Comments", "Repositories", "Statuses & Labels", "History", "Don't confirm when", "Sorting", "Misc"]
 	}
 
@@ -105,6 +105,9 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 			case 0:
 				cell.textLabel?.text = "Sync and display issues"
 				cell.accessoryType = check(Settings.showIssuesMenu)
+			case 1:
+				cell.textLabel?.text = "Show issues instead of PRs in Watch Glance"
+				cell.accessoryType = check(Settings.showIssuesInGlance)
 			default: break
 			}
 		} else if indexPath.section == Section.Comments.rawValue {
@@ -289,6 +292,8 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 					}
 				}
 				settingsChangedTimer.push()
+			case 1:
+				Settings.showIssuesInGlance = !Settings.showIssuesInGlance
 			default: break
 			}
 		} else if indexPath.section == Section.Comments.rawValue {

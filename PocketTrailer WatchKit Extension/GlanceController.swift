@@ -14,26 +14,33 @@ class GlanceController: WKInterfaceController {
     @IBOutlet weak var unreadCount: WKInterfaceLabel!
     @IBOutlet weak var lastUpdate: WKInterfaceLabel!
 
+	@IBOutlet weak var prIcon: WKInterfaceImage!
+	@IBOutlet weak var issueIcon: WKInterfaceImage!
+
     override func awakeWithContext(context: AnyObject?) {
         super.awakeWithContext(context)
 
         dataReadonly = true
 		Settings.clearCache()
 
-        let totalPrs = PullRequest.countAllRequestsInMoc(mainObjectContext)
+		prIcon.setHidden(Settings.showIssuesInGlance)
+		issueIcon.setHidden(!Settings.showIssuesInGlance)
+		mergedCount.setHidden(Settings.showIssuesInGlance)
+
+		let totalItems = Settings.showIssuesInGlance ? Issue.countAllIssuesInMoc(mainObjectContext) : PullRequest.countAllRequestsInMoc(mainObjectContext)
 
 		for l in [totalCount, mergedCount, closedCount, participatedCount, otherCount, unreadCount, lastUpdate] {
-			l.setHidden(totalPrs == 0)
+			l.setHidden(totalItems == 0)
 		}
 
-        if totalPrs == 0 {
+        if totalItems == 0 {
 
-            let a = DataManager.reasonForEmptyWithFilter(nil)
+			let a = Settings.showIssuesInGlance ? DataManager.reasonForEmptyIssuesWithFilter(nil) : DataManager.reasonForEmptyWithFilter(nil)
             myCount.setAttributedText(a)
 
         } else {
 
-            totalCount.setText(NSString(format: "%d", totalPrs) as String)
+            totalCount.setText(NSString(format: "%d", totalItems) as String)
 
 			setCountOfLabel(myCount, forSection: PullRequestSection.Mine)
             setCountOfLabel(participatedCount, forSection: PullRequestSection.Participated)
@@ -41,7 +48,7 @@ class GlanceController: WKInterfaceController {
             setCountOfLabel(closedCount, forSection: PullRequestSection.Closed)
 			setCountOfLabel(otherCount, forSection: PullRequestSection.All)
 
-			let badgeCount = PullRequest.badgeCountInMoc(mainObjectContext)
+			let badgeCount = Settings.showIssuesInGlance ? Issue.badgeCountInMoc(mainObjectContext) : PullRequest.badgeCountInMoc(mainObjectContext)
 			if badgeCount == 0 {
 				unreadCount.setText("NO UNREAD COMMENTS")
 				unreadCount.setAlpha(0.4)
@@ -67,7 +74,12 @@ class GlanceController: WKInterfaceController {
     }
 
 	func setCountOfLabel(label: WKInterfaceLabel, forSection: PullRequestSection) {
-		let toCount = PullRequest.countRequestsInSection(forSection.rawValue, moc: mainObjectContext)
+		let toCount: Int
+		if Settings.showIssuesInGlance {
+			toCount = Issue.countIssuesInSection(forSection.rawValue, moc: mainObjectContext)
+		} else {
+			toCount = PullRequest.countRequestsInSection(forSection.rawValue, moc: mainObjectContext)
+		}
 		let appending = forSection.watchMenuName().uppercaseString
         if toCount > 0 {
             label.setAlpha(0.9)
