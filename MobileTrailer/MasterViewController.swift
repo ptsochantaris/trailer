@@ -2,13 +2,10 @@
 import UIKit
 import CoreData
 
-class MasterViewController: UITableViewController, NSFetchedResultsControllerDelegate, UITextFieldDelegate, UIActionSheetDelegate, UITabBarControllerDelegate {
+class MasterViewController: UITableViewController, NSFetchedResultsControllerDelegate, UITextFieldDelegate, UIActionSheetDelegate, UITabBarControllerDelegate, UITabBarDelegate {
 
 	private var detailViewController: DetailViewController!
 	private var _fetchedResultsController: NSFetchedResultsController?
-
-	@IBOutlet weak var showPullRequests: UIBarButtonItem!
-	@IBOutlet weak var showIssues: UIBarButtonItem!
 
 	// Filtering
 	private let searchField: UITextField
@@ -17,6 +14,10 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 	// Refreshing
 	private var refreshOnRelease: Bool
 	private var blueTint: UIColor!
+
+	private let pullRequestsItem = UITabBarItem()
+	private let issuesItem = UITabBarItem()
+	private var tabBar: UITabBar?
 
 	@IBAction func editSelected(sender: UIBarButtonItem ) {
 		if traitCollection.userInterfaceIdiom==UIUserInterfaceIdiom.Pad && UIInterfaceOrientationIsPortrait(UIApplication.sharedApplication().statusBarOrientation) {
@@ -206,6 +207,15 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 		n.addObserver(self, selector: Selector("updateStatus"), name:REFRESH_STARTED_NOTIFICATION, object: nil)
 		n.addObserver(self, selector: Selector("updateStatus"), name:REFRESH_ENDED_NOTIFICATION, object: nil)
 		n.addObserver(self, selector: Selector("localNotification:"), name:RECEIVED_NOTIFICATION_KEY, object: nil)
+
+		pullRequestsItem.title = "Pull Requests"
+		pullRequestsItem.image = UIImage(named: "prsTab")
+		issuesItem.title = "Issues"
+		issuesItem.image = UIImage(named: "issuesTab")
+	}
+
+	func tabBar(tabBar: UITabBar, didSelectItem item: UITabBarItem!) {
+		viewMode = indexOfObject(tabBar.items!, item)==0 ? MasterViewMode.PullRequests : MasterViewMode.Issues
 	}
 
 	override func viewWillAppear(animated: Bool) {
@@ -260,7 +270,54 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 	}
 
 	private func updateToolbar(animated: Bool) {
-		navigationController?.setToolbarHidden(!Settings.showIssuesMenu, animated: animated)
+		if Settings.showIssuesMenu {
+
+			tableView.contentInset = UIEdgeInsetsMake(tableView.contentInset.top, 0, 49, 0)
+			tableView.scrollIndicatorInsets = UIEdgeInsetsMake(tableView.contentInset.top, 0, 49, 0)
+
+			if tabBar == nil {
+				if let s = self.navigationController?.view {
+					let t = UITabBar(frame: CGRectMake(0, s.bounds.size.height-49, s.bounds.size.width, 49))
+					t.autoresizingMask = UIViewAutoresizing.FlexibleTopMargin | UIViewAutoresizing.FlexibleBottomMargin | UIViewAutoresizing.FlexibleWidth
+					t.items = [pullRequestsItem, issuesItem]
+					t.delegate = self
+					t.tintColor = blueTint
+					s.addSubview(t)
+					tabBar = t
+
+					if animated {
+						t.transform = CGAffineTransformMakeTranslation(0, 49)
+						UIView.animateWithDuration(0.2,
+							delay: 0.0,
+							options: UIViewAnimationOptions.CurveEaseInOut,
+							animations: { () -> Void in
+								t.transform = CGAffineTransformIdentity
+							}, completion: nil);
+					}
+				}
+			}
+		} else {
+
+			tableView.contentInset = UIEdgeInsetsMake(tableView.contentInset.top, 0, 0, 0)
+			tableView.scrollIndicatorInsets = UIEdgeInsetsMake(tableView.contentInset.top, 0, 0, 0)
+
+			if let t = tabBar {
+				if animated {
+					UIView.animateWithDuration(0.2,
+						delay: 0.0,
+						options: UIViewAnimationOptions.CurveEaseInOut,
+						animations: { () -> Void in
+							t.transform = CGAffineTransformMakeTranslation(0, 49)
+						}, completion: { (Bool) -> Void in
+							t.removeFromSuperview()
+							self.tabBar = nil
+					});
+				} else {
+					t.removeFromSuperview()
+					tabBar = nil
+				}
+			}
+		}
 	}
 
 	func localNotification(notification: NSNotification) {
@@ -459,6 +516,13 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 	}
 
 	func updateStatus() {
+
+		let prUnreadCount = PullRequest.badgeCountInMoc(mainObjectContext)
+		pullRequestsItem.badgeValue = prUnreadCount > 0 ? "\(prUnreadCount)" : nil
+
+		let issuesUnreadCount = Issue.badgeCountInMoc(mainObjectContext)
+		issuesItem.badgeValue = issuesUnreadCount > 0 ? "\(issuesUnreadCount)" : nil
+
 		if app.isRefreshing {
 			title = "Refreshing..."
 			tableView.tableFooterView = EmptyView(message: DataManager.reasonForEmptyWithFilter(searchField.text), parentWidth: view.bounds.size.width)
@@ -487,18 +551,15 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 			detailViewController.navigationItem.leftBarButtonItem?.title = title
 		}
 
-		showPullRequests.title = pullRequestsTitle(false)
-		showPullRequests.tintColor = viewMode == MasterViewMode.Issues ? blueTint : UIColor.lightGrayColor()
-
-		showIssues.title = issuesTitle()
-		showIssues.tintColor = viewMode == MasterViewMode.PullRequests ? blueTint : UIColor.lightGrayColor()
+		tabBar?.selectedItem = (viewMode==MasterViewMode.PullRequests) ? pullRequestsItem : issuesItem
 	}
 
 	private func pullRequestsTitle(long: Bool) -> String {
 
 		let f = PullRequest.requestForPullRequestsWithFilter(nil, sectionIndex: -1)
 		let count = mainObjectContext.countForFetchRequest(f, error: nil)
-		let unreadCount = PullRequest.badgeCountInMoc(mainObjectContext)
+		let unreadCount = pullRequestsItem.badgeValue?.toInt()
+
 		let pr = long ? "Pull Request" : "PR"
 		if count == 0 {
 			return "No \(pr)s"
@@ -512,7 +573,8 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 	private func issuesTitle() -> String {
 		let f = Issue.requestForIssuesWithFilter(nil, sectionIndex: -1)
 		let count = mainObjectContext.countForFetchRequest(f, error: nil)
-		let unreadCount = Issue.badgeCountInMoc(mainObjectContext)
+		let unreadCount = issuesItem.badgeValue?.toInt()
+
 		if count == 0 {
 			return "No Issues"
 		} else if count == 1 {
@@ -546,11 +608,11 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
 	////////////////// mode
 
-	@IBAction func showPullRequestsSelected(sender: AnyObject) {
+	func showPullRequestsSelected(sender: AnyObject) {
 		viewMode = MasterViewMode.PullRequests
 	}
 
-	@IBAction func showIssuesSelected(sender: AnyObject) {
+	func showIssuesSelected(sender: AnyObject) {
 		viewMode = MasterViewMode.Issues
 	}
 

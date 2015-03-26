@@ -20,6 +20,10 @@ class PRCell: UITableViewCell {
 		readCount.textColor = UIColor.darkGrayColor()
 		contentView.addSubview(readCount)
 
+		let bg = UIView()
+		bg.backgroundColor = UIColor(red: 0.82, green: 0.88, blue: 0.97, alpha: 1.0)
+		selectedBackgroundView = bg
+
 		NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("networkStateChanged"), name: kReachabilityChangedNotification, object: nil)
 	}
 
