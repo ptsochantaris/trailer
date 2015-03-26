@@ -143,9 +143,9 @@ class Issue: DataItem {
 		return moc.countForFetchRequest(f, error: nil)
 	}
 
-	class func countIssuesInSection(section: Int, moc: NSManagedObjectContext) -> Int {
+	class func countIssuesInSection(section: PullRequestSection, moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest(entityName: "Issue")
-		f.predicate = NSPredicate(format: "sectionIndex == %d", section)
+		f.predicate = NSPredicate(format: "sectionIndex == %d", section.rawValue)
 		return moc.countForFetchRequest(f, error: nil)
 	}
 
@@ -165,9 +165,9 @@ class Issue: DataItem {
 		return badgeCount
 	}
 
-	class func badgeCountInSection(section: Int, moc: NSManagedObjectContext) -> Int {
+	class func badgeCountInSection(section: PullRequestSection, moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest(entityName: "Issue")
-		f.predicate = NSPredicate(format: "sectionIndex == %d", section)
+		f.predicate = NSPredicate(format: "sectionIndex == %d", section.rawValue)
 		var badgeCount:Int = 0
 		let showCommentsEverywhere = Settings.showCommentsEverywhere
 		for p in moc.executeFetchRequest(f, error: nil) as! [Issue] {
@@ -317,19 +317,19 @@ class Issue: DataItem {
 	}
 
 	func postProcess() {
-		var section: Int
+		var section: PullRequestSection
 		var currentCondition = condition?.integerValue ?? PullRequestCondition.Open.rawValue
 
-		if currentCondition == PullRequestCondition.Merged.rawValue			{ section = PullRequestSection.Merged.rawValue }
-		else if currentCondition == PullRequestCondition.Closed.rawValue	{ section = PullRequestSection.Closed.rawValue }
-		else if isMine()													{ section = PullRequestSection.Mine.rawValue }
-		else if commentedByMe()												{ section = PullRequestSection.Participated.rawValue }
-		else if Settings.hideAllPrsSection									{ section = PullRequestSection.None.rawValue }
-		else																{ section = PullRequestSection.All.rawValue }
+		if currentCondition == PullRequestCondition.Merged.rawValue			{ section = PullRequestSection.Merged }
+		else if currentCondition == PullRequestCondition.Closed.rawValue	{ section = PullRequestSection.Closed }
+		else if isMine()													{ section = PullRequestSection.Mine }
+		else if commentedByMe()												{ section = PullRequestSection.Participated }
+		else if Settings.hideAllPrsSection									{ section = PullRequestSection.None }
+		else																{ section = PullRequestSection.All }
 
 		var needsManualCount = false
 		var moveToParticipated = false
-		let outsideMySections = (section == PullRequestSection.All.rawValue || section == PullRequestSection.None.rawValue)
+		let outsideMySections = (section == PullRequestSection.All || section == PullRequestSection.None)
 
 		if outsideMySections && Settings.autoParticipateOnTeamMentions {
 			if refersToMyTeams() {
@@ -352,7 +352,7 @@ class Issue: DataItem {
 		let latestDate = latestReadCommentDate
 
 		if moveToParticipated {
-			section = PullRequestSection.Participated.rawValue
+			section = PullRequestSection.Participated
 			f.predicate = predicateForOthersCommentsSinceDate(latestDate)
 			unreadComments = managedObjectContext?.countForFetchRequest(f, error: nil)
 		} else if needsManualCount {
@@ -360,7 +360,7 @@ class Issue: DataItem {
 			var unreadCommentCount: Int = 0
 			for c in managedObjectContext?.executeFetchRequest(f, error: nil) as! [PRComment] {
 				if c.refersToMe() {
-					section = PullRequestSection.Participated.rawValue
+					section = PullRequestSection.Participated
 				}
 				if let l = latestDate {
 					if c.createdAt?.compare(l)==NSComparisonResult.OrderedDescending {
@@ -376,7 +376,7 @@ class Issue: DataItem {
 			unreadComments = managedObjectContext?.countForFetchRequest(f, error: nil)
 		}
 
-		sectionIndex = section
+		sectionIndex = section.rawValue
 		totalComments = comments.count
 
 		if title==nil { title = "(No title)" }

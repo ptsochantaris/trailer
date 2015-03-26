@@ -9,22 +9,22 @@ class SectionRow: NSObject {
 
     func setPr(section: PullRequestSection) {
 
-        let count = PullRequest.countRequestsInSection(section.rawValue, moc: mainObjectContext)
+        let count = PullRequest.countRequestsInSection(section, moc: mainObjectContext)
         titleL.setText("\(count) \(section.watchMenuName())")
         titleL.setAlpha(count==0 ? 0.4 : 1.0)
 
-        let unreadCount = PullRequest.badgeCountInSection(section.rawValue, moc: mainObjectContext)
+        let unreadCount = PullRequest.badgeCountInSection(section, moc: mainObjectContext)
         countL.setText("\(unreadCount)")
         countHolder.setHidden(unreadCount==0)
     }
 
 	func setIssue(section: PullRequestSection) {
 
-		let count = Issue.countIssuesInSection(section.rawValue, moc: mainObjectContext)
+		let count = Issue.countIssuesInSection(section, moc: mainObjectContext)
 		titleL.setText("\(count) \(section.watchMenuName())")
 		titleL.setAlpha(count==0 ? 0.4 : 1.0)
 
-		let unreadCount = Issue.badgeCountInSection(section.rawValue, moc: mainObjectContext)
+		let unreadCount = Issue.badgeCountInSection(section, moc: mainObjectContext)
 		countL.setText("\(unreadCount)")
 		countHolder.setHidden(unreadCount==0)
 	}

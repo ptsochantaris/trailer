@@ -88,11 +88,11 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 		let totalCount = PullRequest.countAllRequestsInMoc(mainObjectContext)
 		var a = NSMutableAttributedString(string: NSString(format: "%d PRs: ", totalCount) as String, attributes: brightAttributes)
 		if totalCount>0 {
-			appendPr(a, section: PullRequestSection.Mine.rawValue)
-			appendPr(a, section: PullRequestSection.Participated.rawValue)
-			appendPr(a, section: PullRequestSection.Merged.rawValue)
-			appendPr(a, section: PullRequestSection.Closed.rawValue)
-			appendPr(a, section: PullRequestSection.All.rawValue)
+			appendPr(a, section: PullRequestSection.Mine)
+			appendPr(a, section: PullRequestSection.Participated)
+			appendPr(a, section: PullRequestSection.Merged)
+			appendPr(a, section: PullRequestSection.Closed)
+			appendPr(a, section: PullRequestSection.All)
 			appendCommentCount(a, number: PullRequest.badgeCountInMoc(mainObjectContext))
 		}
 		else
@@ -107,11 +107,11 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 			let totalCount = Issue.countAllIssuesInMoc(mainObjectContext)
 			a = NSMutableAttributedString(string: NSString(format: "%d Issues: ", totalCount) as String, attributes: brightAttributes)
 			if totalCount>0 {
-				appendIssue(a, section: PullRequestSection.Mine.rawValue)
-				appendIssue(a, section: PullRequestSection.Participated.rawValue)
-				appendIssue(a, section: PullRequestSection.Merged.rawValue)
-				appendIssue(a, section: PullRequestSection.Closed.rawValue)
-				appendIssue(a, section: PullRequestSection.All.rawValue)
+				appendIssue(a, section: PullRequestSection.Mine)
+				appendIssue(a, section: PullRequestSection.Participated)
+				appendIssue(a, section: PullRequestSection.Merged)
+				appendIssue(a, section: PullRequestSection.Closed)
+				appendIssue(a, section: PullRequestSection.All)
 				appendCommentCount(a, number: Issue.badgeCountInMoc(mainObjectContext))
 			}
 			else
@@ -157,24 +157,24 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 		}
 	}
 
-	func appendPr(a: NSMutableAttributedString, section: Int) {
+	func appendPr(a: NSMutableAttributedString, section: PullRequestSection) {
 		let count = PullRequest.countRequestsInSection(section, moc: mainObjectContext)
 		if count > 0 {
-			let text = "\(count)\u{a0}\(PullRequestSection.watchMenuTitles[section]), "
+			let text = "\(count)\u{a0}\(section.watchMenuName()), "
 			a.appendAttributedString(NSAttributedString(string: text, attributes: normalAttributes))
 		} else {
-			let text = "0\u{a0}\(PullRequestSection.watchMenuTitles[section]), "
+			let text = "0\u{a0}\(section.watchMenuName()), "
 			a.appendAttributedString(NSAttributedString(string: text, attributes: dimAttributes))
 		}
 	}
 
-	func appendIssue(a: NSMutableAttributedString, section: Int) {
+	func appendIssue(a: NSMutableAttributedString, section: PullRequestSection) {
 		let count = Issue.countIssuesInSection(section, moc: mainObjectContext)
 		if count > 0 {
-			let text = "\(count)\u{a0}\(PullRequestSection.watchMenuTitles[section]), "
+			let text = "\(count)\u{a0}\(section.watchMenuName()), "
 			a.appendAttributedString(NSAttributedString(string: text, attributes: normalAttributes))
 		} else {
-			let text = "0\u{a0}\(PullRequestSection.watchMenuTitles[section]), "
+			let text = "0\u{a0}\(section.watchMenuName()), "
 			a.appendAttributedString(NSAttributedString(string: text, attributes: dimAttributes))
 		}
 	}

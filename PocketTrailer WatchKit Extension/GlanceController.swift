@@ -76,9 +76,9 @@ class GlanceController: WKInterfaceController {
 	func setCountOfLabel(label: WKInterfaceLabel, forSection: PullRequestSection) {
 		let toCount: Int
 		if Settings.showIssuesInGlance {
-			toCount = Issue.countIssuesInSection(forSection.rawValue, moc: mainObjectContext)
+			toCount = Issue.countIssuesInSection(forSection, moc: mainObjectContext)
 		} else {
-			toCount = PullRequest.countRequestsInSection(forSection.rawValue, moc: mainObjectContext)
+			toCount = PullRequest.countRequestsInSection(forSection, moc: mainObjectContext)
 		}
 		let appending = forSection.watchMenuName().uppercaseString
         if toCount > 0 {
