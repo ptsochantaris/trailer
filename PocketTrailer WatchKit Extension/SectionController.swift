@@ -68,18 +68,16 @@ class SectionController: WKInterfaceController {
 	}
 
 	override func table(table: WKInterfaceTable, didSelectRowAtIndex rowIndex: Int) {
+		var ri = rowIndex
+		var type = "PRS"
 		if Settings.showIssuesMenu {
-			var ri = rowIndex
-			var type = "PRS"
 			if ri > PullRequestSection.All.rawValue {
 				ri -= PullRequestSection.All.rawValue
 				ri--
 				type = "ISSUES"
 			}
-			pushControllerWithName("ListController", context: [ SECTION_KEY: ri, TYPE_KEY: type ] )
-		} else {
-			pushControllerWithName("ListController", context: [ SECTION_KEY: rowIndex+1 ] )
 		}
+		pushControllerWithName("ListController", context: [ SECTION_KEY: rowIndex, TYPE_KEY: type ] )
 	}
 
     private func buildUI() {
@@ -90,7 +88,7 @@ class SectionController: WKInterfaceController {
         if totalPrs==0 {
             rowTypes.append(attributedTitleEntry(DataManager.reasonForEmptyWithFilter(nil)))
         } else {
-			if Settings.showIssuesMenu { rowTypes.append(titleEntry("\(totalPrs) Pull Requests")) }
+			rowTypes.append(titleEntry("\(totalPrs) PULL REQUESTS"))
 			rowTypes.append(prEntry(PullRequestSection.Mine))
 			rowTypes.append(prEntry(PullRequestSection.Participated))
 			rowTypes.append(prEntry(PullRequestSection.Merged))
@@ -103,17 +101,16 @@ class SectionController: WKInterfaceController {
 			if totalIssues==0 {
 				rowTypes.append(attributedTitleEntry(DataManager.reasonForEmptyIssuesWithFilter(nil)))
 			} else {
-				rowTypes.append(titleEntry("\(totalIssues) Issues"))
+				rowTypes.append(titleEntry("\(totalIssues) ISSUES"))
 				rowTypes.append(issueEntry(PullRequestSection.Mine))
 				rowTypes.append(issueEntry(PullRequestSection.Participated))
 				rowTypes.append(issueEntry(PullRequestSection.Merged))
 				rowTypes.append(issueEntry(PullRequestSection.Closed))
 				rowTypes.append(issueEntry(PullRequestSection.All))
 			}
-			setTitle("Sections")
-		} else {
-			setTitle("\(totalPrs) PRs")
 		}
+
+		setTitle("Sections")
 
 		var rowControllerTypes = [String]()
 		for type in rowTypes {
@@ -128,9 +125,15 @@ class SectionController: WKInterfaceController {
 		var index = 0
 		for type in rowTypes {
 			if let t = type as? titleEntry {
-				(table.rowControllerAtIndex(index) as! TitleRow).titleL.setText(t.title)
+				let r = table.rowControllerAtIndex(index) as! TitleRow
+				//r.group.setBackgroundColor(UIColor.whiteColor())
+				//r.group.setAlpha(0.4)
+				r.titleL.setText(t.title)
 			} else if let t = type as? attributedTitleEntry {
-				(table.rowControllerAtIndex(index) as! TitleRow).titleL.setAttributedText(t.title)
+				let r = table.rowControllerAtIndex(index) as! TitleRow
+				//r.group.setBackgroundColor(UIColor.whiteColor())
+				//r.group.setAlpha(0.4)
+				r.titleL.setAttributedText(t.title)
 			} else if let t = type as? prEntry {
 				(table.rowControllerAtIndex(index) as! SectionRow).setPr(t.section)
 			} else if let t = type as? issueEntry {

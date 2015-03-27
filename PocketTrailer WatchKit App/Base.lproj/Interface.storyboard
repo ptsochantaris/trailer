@@ -10,50 +10,64 @@
             <objects>
                 <controller identifier="SectionController" id="AgC-eL-Hgc" customClass="SectionController" customModule="PocketTrailer_WatchKit_Extension">
                     <items>
-                        <table alignment="left" verticalAlignment="center" id="be2-ie-h5R">
+                        <group width="120" alignment="center" verticalAlignment="center" radius="0.0" id="AJn-j1-vO3">
                             <items>
-                                <tableRow identifier="TitleRow" selectable="NO" id="tHv-Jj-a9y" customClass="TitleRow" customModule="PocketTrailer_WatchKit_Extension">
-                                    <group key="rootItem" width="1" height="0.0" alignment="left" id="mWo-dt-dzr">
-                                        <items>
-                                            <label alignment="left" verticalAlignment="bottom" text="Pull Requests" textAlignment="left" numberOfLines="0" id="dy2-9S-MJp">
-                                                <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
-                                                <fontDescription key="font" style="UICTFontTextStyleSubhead"/>
-                                            </label>
-                                        </items>
-                                        <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
-                                        <edgeInsets key="margins" left="3" right="0.0" top="4" bottom="0.0"/>
-                                    </group>
-                                    <connections>
-                                        <outlet property="titleL" destination="dy2-9S-MJp" id="mX0-PC-TAL"/>
-                                    </connections>
-                                </tableRow>
-                                <tableRow identifier="SectionRow" id="ql1-oS-xZe" customClass="SectionRow" customModule="PocketTrailer_WatchKit_Extension">
-                                    <group key="rootItem" width="1" height="0.0" alignment="left" id="Uft-cP-lJ6">
-                                        <items>
-                                            <label alignment="left" verticalAlignment="center" text="Title" id="m26-4w-XIn">
-                                                <fontDescription key="font" style="UICTFontTextStyleHeadline"/>
-                                            </label>
-                                            <group height="1" alignment="right" radius="9" id="VK1-qB-Emf">
+                                <table alignment="left" verticalAlignment="center" id="be2-ie-h5R">
+                                    <items>
+                                        <tableRow identifier="TitleRow" selectable="NO" id="tHv-Jj-a9y" customClass="TitleRow" customModule="PocketTrailer_WatchKit_Extension">
+                                            <group key="rootItem" width="1" height="0.0" alignment="left" id="mWo-dt-dzr">
                                                 <items>
-                                                    <label alignment="center" verticalAlignment="center" text="Count" id="YSb-rO-7SF">
-                                                        <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                                        <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
-                                                    </label>
+                                                    <group alignment="left" radius="2" id="Kau-36-YJy">
+                                                        <items>
+                                                            <label alignment="left" verticalAlignment="bottom" text="Pull Requests" textAlignment="left" numberOfLines="0" id="dy2-9S-MJp">
+                                                                <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                                                <fontDescription key="font" type="system" weight="black" pointSize="9"/>
+                                                            </label>
+                                                        </items>
+                                                        <color key="backgroundColor" red="0.25490197539999998" green="0.51372551919999998" blue="0.76862752440000004" alpha="1" colorSpace="deviceRGB"/>
+                                                        <edgeInsets key="margins" left="3" right="3" top="1" bottom="1"/>
+                                                    </group>
                                                 </items>
-                                                <color key="backgroundColor" red="1" green="0.0" blue="0.070606581870000004" alpha="1" colorSpace="calibratedRGB"/>
-                                                <edgeInsets key="margins" left="7" right="7" top="0.0" bottom="0.0"/>
+                                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                                <edgeInsets key="margins" left="2" right="0.0" top="8" bottom="0.0"/>
                                             </group>
-                                        </items>
-                                        <edgeInsets key="margins" left="4" right="4" top="4" bottom="4"/>
-                                    </group>
-                                    <connections>
-                                        <outlet property="countHolder" destination="VK1-qB-Emf" id="ghB-It-VlJ"/>
-                                        <outlet property="countL" destination="YSb-rO-7SF" id="Cpc-eB-Bi7"/>
-                                        <outlet property="titleL" destination="m26-4w-XIn" id="abe-vu-sBX"/>
-                                    </connections>
-                                </tableRow>
+                                            <connections>
+                                                <outlet property="group" destination="Kau-36-YJy" id="eBg-XO-5vG"/>
+                                                <outlet property="titleL" destination="dy2-9S-MJp" id="mX0-PC-TAL"/>
+                                            </connections>
+                                        </tableRow>
+                                        <tableRow identifier="SectionRow" id="ql1-oS-xZe" customClass="SectionRow" customModule="PocketTrailer_WatchKit_Extension">
+                                            <group key="rootItem" width="1" height="0.0" alignment="left" radius="2" id="Uft-cP-lJ6">
+                                                <items>
+                                                    <label alignment="left" verticalAlignment="center" text="Title" id="m26-4w-XIn">
+                                                        <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                                        <fontDescription key="font" type="system" weight="thin" pointSize="11"/>
+                                                    </label>
+                                                    <group height="1" alignment="right" radius="7" id="VK1-qB-Emf">
+                                                        <items>
+                                                            <label alignment="center" verticalAlignment="center" text="Count" id="YSb-rO-7SF">
+                                                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                                <fontDescription key="font" type="system" weight="thin" pointSize="11"/>
+                                                            </label>
+                                                        </items>
+                                                        <color key="backgroundColor" red="1" green="0.0" blue="0.070606581870000004" alpha="1" colorSpace="calibratedRGB"/>
+                                                        <edgeInsets key="margins" left="7" right="7" top="0.0" bottom="0.0"/>
+                                                    </group>
+                                                </items>
+                                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                <edgeInsets key="margins" left="5" right="3" top="3" bottom="3"/>
+                                            </group>
+                                            <connections>
+                                                <outlet property="countHolder" destination="VK1-qB-Emf" id="ghB-It-VlJ"/>
+                                                <outlet property="countL" destination="YSb-rO-7SF" id="Cpc-eB-Bi7"/>
+                                                <outlet property="group" destination="Uft-cP-lJ6" id="Ttt-Mr-ncP"/>
+                                                <outlet property="titleL" destination="m26-4w-XIn" id="abe-vu-sBX"/>
+                                            </connections>
+                                        </tableRow>
+                                    </items>
+                                </table>
                             </items>
-                        </table>
+                        </group>
                     </items>
                     <menu key="menu" id="FvI-zq-Wrb">
                         <items>
@@ -95,7 +109,7 @@
                         <table alignment="left" id="XeC-bN-XlT">
                             <items>
                                 <tableRow identifier="PRRow" id="qcu-Df-oql" customClass="PRRow" customModule="PocketTrailer_WatchKit_Extension">
-                                    <group key="rootItem" width="1" height="0.0" alignment="left" layout="vertical" id="Uwj-Y1-PON">
+                                    <group key="rootItem" width="1" height="0.0" alignment="left" layout="vertical" radius="2" id="Uwj-Y1-PON">
                                         <items>
                                             <label alignment="left" verticalAlignment="center" text="Title" numberOfLines="0" id="18g-kn-5Ie">
                                                 <fontDescription key="font" style="UICTFontTextStyleBody"/>
@@ -112,7 +126,7 @@
                                                         <color key="backgroundColor" red="0.93725490199999995" green="0.93725490199999995" blue="0.95686274510000002" alpha="1" colorSpace="calibratedRGB"/>
                                                         <edgeInsets key="margins" left="5" right="5" top="0.0" bottom="0.0"/>
                                                     </group>
-                                                    <group alignment="left" verticalAlignment="center" radius="7" id="FFB-8c-hj1">
+                                                    <group width="18" alignment="left" verticalAlignment="center" radius="7" id="FFB-8c-hj1">
                                                         <items>
                                                             <label alignment="center" verticalAlignment="center" text="2" id="bd9-NV-xBM">
                                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -128,7 +142,12 @@
                                                 <color key="textColor" red="1" green="1" blue="1" alpha="0.59999999999999998" colorSpace="calibratedRGB"/>
                                                 <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
                                             </label>
+                                            <separator width="1" alignment="center" id="7Wr-VC-T3H">
+                                                <color key="color" white="0.18509615384615388" alpha="1" colorSpace="calibratedWhite"/>
+                                            </separator>
                                         </items>
+                                        <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                        <edgeInsets key="margins" left="1" right="1" top="1" bottom="1"/>
                                     </group>
                                     <connections>
                                         <outlet property="counterGroup" destination="lLA-39-zIL" id="c8q-hf-RoI"/>
@@ -221,10 +240,16 @@
                                             </group>
                                             <group width="1" alignment="left" verticalAlignment="center" layout="vertical" id="taf-1t-g2x">
                                                 <items>
-                                                    <label alignment="left" text="Username" numberOfLines="0" id="YGw-DU-AAO">
-                                                        <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
-                                                        <fontDescription key="font" type="system" pointSize="12"/>
-                                                    </label>
+                                                    <group alignment="left" radius="2" id="X19-Q9-hsv">
+                                                        <items>
+                                                            <label alignment="left" text="Username" numberOfLines="0" id="YGw-DU-AAO">
+                                                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                                <fontDescription key="font" type="system" pointSize="10"/>
+                                                            </label>
+                                                        </items>
+                                                        <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                                        <edgeInsets key="margins" left="2" right="2" top="0.0" bottom="0.0"/>
+                                                    </group>
                                                     <label alignment="left" text="Comment" numberOfLines="0" id="wh3-Fx-D4A">
                                                         <fontDescription key="font" type="system" pointSize="12"/>
                                                     </label>
@@ -264,40 +289,81 @@
                     <items>
                         <group alignment="left" spacing="6" id="gv7-I2-MZq">
                             <items>
-                                <imageView width="30" height="30" alignment="center" verticalAlignment="center" alpha="0.59999999999999964" image="GlacePrs" contentMode="scaleAspectFit" id="xYb-hC-O7D"/>
-                                <imageView width="28" height="28" alignment="center" verticalAlignment="center" alpha="0.59999999999999964" image="GlanceIssues" contentMode="scaleAspectFit" id="J0s-24-eqf"/>
+                                <imageView width="30" height="30" alignment="center" verticalAlignment="center" alpha="0.59999999999999964" image="GlacePrs" contentMode="scaleAspectFit" id="xYb-hC-O7D">
+                                    <color key="tintColor" red="0.25490197539999998" green="0.51372551919999998" blue="0.76862752440000004" alpha="1" colorSpace="deviceRGB"/>
+                                </imageView>
+                                <imageView width="28" height="28" alignment="center" verticalAlignment="center" alpha="0.59999999999999964" image="GlanceIssues" contentMode="scaleAspectFit" id="J0s-24-eqf">
+                                    <color key="tintColor" red="0.25490197539999998" green="0.51372551919999998" blue="0.76862752440000004" alpha="1" colorSpace="deviceRGB"/>
+                                </imageView>
                                 <label alignment="center" verticalAlignment="center" text="43" textAlignment="center" id="3wl-rh-8m0">
                                     <fontDescription key="font" type="system" weight="medium" pointSize="31"/>
                                 </label>
                             </items>
                         </group>
-                        <group alignment="left" layout="vertical" spacing="5" id="eew-Gs-W6Y">
+                        <group alignment="left" layout="vertical" spacing="2" id="eew-Gs-W6Y">
                             <items>
-                                <label alignment="center" text="XX MINE" numberOfLines="0" id="fJB-oa-687">
-                                    <fontDescription key="font" type="system" pointSize="14"/>
-                                </label>
-                                <group width="1" alignment="left" layout="vertical" spacing="0.0" id="27I-dC-3gQ">
+                                <group width="103" alignment="center" radius="2" id="pi7-1E-Nwe">
                                     <items>
-                                        <label alignment="center" text="XX PARTICIPATED" numberOfLines="0" id="E1B-vS-NEB">
-                                            <fontDescription key="font" type="system" pointSize="10"/>
-                                        </label>
-                                        <label alignment="center" alpha="0.59999999999999998" text="XX MERGED" numberOfLines="0" id="8hY-30-ORl">
-                                            <fontDescription key="font" type="system" pointSize="10"/>
-                                        </label>
-                                        <label alignment="center" alpha="0.59999999999999998" text="XX CLOSED" numberOfLines="0" id="tvP-EF-DnR">
-                                            <fontDescription key="font" type="system" pointSize="10"/>
-                                        </label>
-                                        <label alignment="center" alpha="0.59999999999999998" text="XX OTHER" numberOfLines="0" id="UFt-fx-TSE">
-                                            <fontDescription key="font" type="system" pointSize="10"/>
-                                        </label>
-                                        <label alignment="center" text="XX UNREAD COMMENTS" numberOfLines="0" id="haI-qm-CXj">
-                                            <color key="textColor" red="1" green="0.0" blue="0.070606581870000004" alpha="1" colorSpace="calibratedRGB"/>
-                                            <fontDescription key="font" type="system" pointSize="10"/>
+                                        <label alignment="center" text="XX PARTICIPATED" textAlignment="center" id="E1B-vS-NEB">
+                                            <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                            <fontDescription key="font" type="system" weight="thin" pointSize="9"/>
                                         </label>
                                     </items>
+                                    <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    <edgeInsets key="margins" left="0.0" right="0.0" top="1" bottom="1"/>
                                 </group>
-                                <label alignment="center" alpha="0.89999999999999991" text="Updated:" numberOfLines="0" id="Qer-7L-pJ7">
-                                    <fontDescription key="font" type="system" pointSize="9"/>
+                                <group width="103" alignment="center" radius="2" id="uLm-0J-NPT">
+                                    <items>
+                                        <label alignment="center" text="XX MINE" textAlignment="center" id="fJB-oa-687">
+                                            <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                            <fontDescription key="font" type="system" weight="thin" pointSize="9"/>
+                                        </label>
+                                    </items>
+                                    <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    <edgeInsets key="margins" left="0.0" right="0.0" top="1" bottom="1"/>
+                                </group>
+                                <group width="103" alignment="center" radius="2" id="eKt-iR-WRT">
+                                    <items>
+                                        <label alignment="center" text="XX MERGED" textAlignment="center" id="8hY-30-ORl">
+                                            <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                            <fontDescription key="font" type="system" weight="thin" pointSize="9"/>
+                                        </label>
+                                    </items>
+                                    <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    <edgeInsets key="margins" left="0.0" right="0.0" top="1" bottom="1"/>
+                                </group>
+                                <group width="103" alignment="center" radius="2" id="EHK-bL-jTG">
+                                    <items>
+                                        <label alignment="center" text="XX CLOSED" textAlignment="center" id="tvP-EF-DnR">
+                                            <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                            <fontDescription key="font" type="system" weight="thin" pointSize="9"/>
+                                        </label>
+                                    </items>
+                                    <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    <edgeInsets key="margins" left="0.0" right="0.0" top="1" bottom="1"/>
+                                </group>
+                                <group width="103" alignment="center" radius="2" id="DRK-15-McU">
+                                    <items>
+                                        <label alignment="center" text="XX OTHER" textAlignment="center" id="UFt-fx-TSE">
+                                            <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                            <fontDescription key="font" type="system" weight="thin" pointSize="9"/>
+                                        </label>
+                                    </items>
+                                    <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    <edgeInsets key="margins" left="0.0" right="0.0" top="1" bottom="1"/>
+                                </group>
+                                <group width="103" alignment="center" radius="2" id="0Cl-jo-zPe">
+                                    <items>
+                                        <label alignment="center" text="XX UNREAD" textAlignment="center" id="haI-qm-CXj">
+                                            <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                            <fontDescription key="font" type="system" weight="thin" pointSize="9"/>
+                                        </label>
+                                    </items>
+                                    <color key="backgroundColor" red="1" green="0.0" blue="0.070606581870000004" alpha="1" colorSpace="calibratedRGB"/>
+                                    <edgeInsets key="margins" left="0.0" right="0.0" top="1" bottom="1"/>
+                                </group>
+                                <label alignment="center" alpha="0.89999999999999991" text="Updated:" id="Qer-7L-pJ7">
+                                    <fontDescription key="font" type="system" pointSize="7"/>
                                 </label>
                             </items>
                         </group>
@@ -305,15 +371,21 @@
                     <edgeInsets key="margins" left="0.0" right="0.0" top="0.0" bottom="14"/>
                     <connections>
                         <outlet property="closedCount" destination="tvP-EF-DnR" id="hbB-mi-2Lo"/>
+                        <outlet property="closedGroup" destination="EHK-bL-jTG" id="n1R-bX-sgj"/>
                         <outlet property="issueIcon" destination="J0s-24-eqf" id="m9V-84-tH5"/>
                         <outlet property="lastUpdate" destination="Qer-7L-pJ7" id="LK4-aR-MUG"/>
                         <outlet property="mergedCount" destination="8hY-30-ORl" id="Jas-dU-HsL"/>
+                        <outlet property="mergedGroup" destination="eKt-iR-WRT" id="1lf-L1-BYa"/>
                         <outlet property="myCount" destination="fJB-oa-687" id="s3p-Ev-MQm"/>
+                        <outlet property="myGroup" destination="uLm-0J-NPT" id="TAR-rU-4Ux"/>
                         <outlet property="otherCount" destination="UFt-fx-TSE" id="aiy-S8-LLd"/>
+                        <outlet property="otherGroup" destination="DRK-15-McU" id="ke6-3P-tzo"/>
                         <outlet property="participatedCount" destination="E1B-vS-NEB" id="gwl-jI-qUt"/>
+                        <outlet property="participatedGroup" destination="pi7-1E-Nwe" id="xaG-ec-KND"/>
                         <outlet property="prIcon" destination="xYb-hC-O7D" id="xyq-S7-npK"/>
                         <outlet property="totalCount" destination="3wl-rh-8m0" id="BgR-8y-n1Z"/>
                         <outlet property="unreadCount" destination="haI-qm-CXj" id="djY-l5-Twe"/>
+                        <outlet property="unreadGroup" destination="0Cl-jo-zPe" id="Mpv-kh-MHE"/>
                     </connections>
                 </glanceController>
             </objects>
@@ -324,11 +396,15 @@
             <objects>
                 <controller identifier="Command Controller" id="Aye-qq-uqB" customClass="CommandController" customModule="PocketTrailer_WatchKit_Extension">
                     <items>
-                        <group width="1" alignment="center" verticalAlignment="center" id="okz-U3-TVg">
+                        <group alignment="center" verticalAlignment="center" id="okz-U3-TVg">
                             <items>
-                                <imageView width="30" height="30" alignment="center" verticalAlignment="center" alpha="0.79999999999999982" image="GlanceIssues" contentMode="scaleAspectFit" id="wXB-qA-npf"/>
-                                <label alignment="center" verticalAlignment="center" text="One moment please..." numberOfLines="0" id="TaB-Gc-8NT"/>
+                                <label alignment="center" verticalAlignment="center" text="One moment please..." textAlignment="center" numberOfLines="0" id="TaB-Gc-8NT">
+                                    <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                    <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
+                                </label>
                             </items>
+                            <color key="backgroundColor" red="0.25490197539999998" green="0.51372551919999998" blue="0.76862752440000004" alpha="1" colorSpace="deviceRGB"/>
+                            <edgeInsets key="margins" left="4" right="4" top="3" bottom="3"/>
                         </group>
                     </items>
                     <connections>
@@ -339,4 +415,5 @@
             <point key="canvasLocation" x="422" y="515"/>
         </scene>
     </scenes>
+    <color key="tintColor" red="0.25490197539999998" green="0.51372551919999998" blue="0.76862752440000004" alpha="1" colorSpace="deviceRGB"/>
 </document>

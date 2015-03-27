@@ -107,7 +107,7 @@ class PRDetailController: WKInterfaceController {
 			}
 			for c in p.comments.allObjects as! [PRComment] {
 				let controller = table.rowControllerAtIndex(index++) as! CommentRow
-				controller.usernameL.setText((c.userName ?? "(unknown)") + " " + shortDateFormatter.stringFromDate(c.createdAt ?? NSDate()))
+				controller.usernameL.setText((c.userName ?? "(unknown)") + "\n" + shortDateFormatter.stringFromDate(c.createdAt ?? NSDate()))
 				controller.commentL.setText(c.body)
 			}
 		} else if let i = issue {
@@ -116,7 +116,7 @@ class PRDetailController: WKInterfaceController {
 			}
 			for c in i.comments.allObjects as! [PRComment] {
 				let controller = table.rowControllerAtIndex(index++) as! CommentRow
-				controller.usernameL.setText((c.userName ?? "(unknown)") + " " + shortDateFormatter.stringFromDate(c.createdAt ?? NSDate()))
+				controller.usernameL.setText((c.userName ?? "(unknown)") + "\n" + shortDateFormatter.stringFromDate(c.createdAt ?? NSDate()))
 				controller.commentL.setText(c.body)
 			}
 		}

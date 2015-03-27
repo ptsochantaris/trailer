@@ -280,6 +280,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 					let t = UITabBar(frame: CGRectMake(0, s.bounds.size.height-49, s.bounds.size.width, 49))
 					t.autoresizingMask = UIViewAutoresizing.FlexibleTopMargin | UIViewAutoresizing.FlexibleBottomMargin | UIViewAutoresizing.FlexibleWidth
 					t.items = [pullRequestsItem, issuesItem]
+					t.selectedItem = self.viewMode==MasterViewMode.PullRequests ? pullRequestsItem : issuesItem
 					t.delegate = self
 					t.tintColor = blueTint
 					s.addSubview(t)

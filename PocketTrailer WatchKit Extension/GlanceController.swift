@@ -6,13 +6,26 @@ import CoreData
 class GlanceController: WKInterfaceController {
 
     @IBOutlet weak var totalCount: WKInterfaceLabel!
-    @IBOutlet weak var myCount: WKInterfaceLabel!
-    @IBOutlet weak var mergedCount: WKInterfaceLabel!
-    @IBOutlet weak var closedCount: WKInterfaceLabel!
-    @IBOutlet weak var participatedCount: WKInterfaceLabel!
+
+	@IBOutlet weak var myCount: WKInterfaceLabel!
+	@IBOutlet weak var myGroup: WKInterfaceGroup!
+
+	@IBOutlet weak var mergedCount: WKInterfaceLabel!
+	@IBOutlet weak var mergedGroup: WKInterfaceGroup!
+
+	@IBOutlet weak var closedCount: WKInterfaceLabel!
+	@IBOutlet weak var closedGroup: WKInterfaceGroup!
+
+	@IBOutlet weak var participatedCount: WKInterfaceLabel!
+	@IBOutlet weak var participatedGroup: WKInterfaceGroup!
+
 	@IBOutlet weak var otherCount: WKInterfaceLabel!
-    @IBOutlet weak var unreadCount: WKInterfaceLabel!
-    @IBOutlet weak var lastUpdate: WKInterfaceLabel!
+	@IBOutlet weak var otherGroup: WKInterfaceGroup!
+
+	@IBOutlet weak var unreadCount: WKInterfaceLabel!
+	@IBOutlet weak var unreadGroup: WKInterfaceGroup!
+
+	@IBOutlet weak var lastUpdate: WKInterfaceLabel!
 
 	@IBOutlet weak var prIcon: WKInterfaceImage!
 	@IBOutlet weak var issueIcon: WKInterfaceImage!
@@ -42,22 +55,22 @@ class GlanceController: WKInterfaceController {
 
             totalCount.setText(NSString(format: "%d", totalItems) as String)
 
-			setCountOfLabel(myCount, forSection: PullRequestSection.Mine)
-            setCountOfLabel(participatedCount, forSection: PullRequestSection.Participated)
-			setCountOfLabel(mergedCount, forSection: PullRequestSection.Merged)
-            setCountOfLabel(closedCount, forSection: PullRequestSection.Closed)
-			setCountOfLabel(otherCount, forSection: PullRequestSection.All)
+			setCountOfLabel(myCount, forSection: PullRequestSection.Mine, group: myGroup)
+            setCountOfLabel(participatedCount, forSection: PullRequestSection.Participated, group: participatedGroup)
+			setCountOfLabel(mergedCount, forSection: PullRequestSection.Merged, group: mergedGroup)
+            setCountOfLabel(closedCount, forSection: PullRequestSection.Closed, group: closedGroup)
+			setCountOfLabel(otherCount, forSection: PullRequestSection.All, group: otherGroup)
 
 			let badgeCount = Settings.showIssuesInGlance ? Issue.badgeCountInMoc(mainObjectContext) : PullRequest.badgeCountInMoc(mainObjectContext)
 			if badgeCount == 0 {
-				unreadCount.setText("NO UNREAD COMMENTS")
-				unreadCount.setAlpha(0.4)
+				unreadCount.setText("NONE UNREAD")
+				unreadGroup.setAlpha(0.3)
 			} else if badgeCount == 1 {
-				unreadCount.setText("1 UNREAD COMMENT")
-				unreadCount.setAlpha(1.0)
+				unreadCount.setText("1 COMMENT")
+				unreadGroup.setAlpha(1.0)
 			} else {
-				unreadCount.setText("\(badgeCount) UNREAD COMMENTS")
-				unreadCount.setAlpha(1.0)
+				unreadCount.setText("\(badgeCount) COMMENTS")
+				unreadGroup.setAlpha(1.0)
 			}
 
             if let lastRefresh = Settings.lastSuccessfulRefresh {
@@ -65,15 +78,15 @@ class GlanceController: WKInterfaceController {
                 d.dateStyle = NSDateFormatterStyle.ShortStyle
                 d.timeStyle = NSDateFormatterStyle.ShortStyle
                 lastUpdate.setText("Updated "+d.stringFromDate(lastRefresh))
-                lastUpdate.setAlpha(0.9)
+                lastUpdate.setAlpha(0.7)
             } else {
                 lastUpdate.setText("Not updated yet")
-                lastUpdate.setAlpha(0.4)
+                lastUpdate.setAlpha(0.3)
             }
         }
     }
 
-	func setCountOfLabel(label: WKInterfaceLabel, forSection: PullRequestSection) {
+	func setCountOfLabel(label: WKInterfaceLabel, forSection: PullRequestSection, group: WKInterfaceGroup) {
 		let toCount: Int
 		if Settings.showIssuesInGlance {
 			toCount = Issue.countIssuesInSection(forSection, moc: mainObjectContext)
@@ -82,11 +95,11 @@ class GlanceController: WKInterfaceController {
 		}
 		let appending = forSection.watchMenuName().uppercaseString
         if toCount > 0 {
-            label.setAlpha(0.9)
+            group.setAlpha(1.0)
             label.setText("\(toCount) \(appending)")
         } else {
             label.setText("0 \(appending)")
-            label.setAlpha(0.4)
+            group.setAlpha(0.4)
         }
     }
 
