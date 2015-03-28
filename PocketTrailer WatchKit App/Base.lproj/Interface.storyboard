@@ -232,7 +232,7 @@
                                         <outlet property="labelL" destination="htJ-iu-xQa" id="vAb-Bg-wc1"/>
                                     </connections>
                                 </tableRow>
-                                <tableRow identifier="CommentRow" selectable="NO" id="7vR-Gf-9Vf" customClass="CommentRow" customModule="PocketTrailer_WatchKit_Extension">
+                                <tableRow identifier="CommentRow" id="7vR-Gf-9Vf" customClass="CommentRow" customModule="PocketTrailer_WatchKit_Extension">
                                     <group key="rootItem" width="1" height="0.0" alignment="left" spacing="3" id="WCb-Rn-fOj">
                                         <items>
                                             <group width="2" height="1" heightAdjustment="-4" alignment="left" verticalAlignment="center" radius="1" id="qDh-AS-kOq">
@@ -271,6 +271,11 @@
                             <menuItem title="Refresh" icon="repeat" id="cqe-Ie-HAm">
                                 <connections>
                                     <action selector="refreshSelected" destination="Hgm-oe-oa5" id="GnJ-EP-gnj"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="View In PocketTrailer" icon="info" id="GEJ-q9-0tT">
+                                <connections>
+                                    <action selector="openOnDeviceSelected" destination="Hgm-oe-oa5" id="JZO-fC-lyj"/>
                                 </connections>
                             </menuItem>
                         </items>
@@ -396,7 +401,7 @@
             <objects>
                 <controller identifier="Command Controller" id="Aye-qq-uqB" customClass="CommandController" customModule="PocketTrailer_WatchKit_Extension">
                     <items>
-                        <group alignment="center" verticalAlignment="center" id="okz-U3-TVg">
+                        <group width="100" alignment="center" verticalAlignment="center" id="okz-U3-TVg">
                             <items>
                                 <label alignment="center" verticalAlignment="center" text="One moment please..." textAlignment="center" numberOfLines="0" id="TaB-Gc-8NT">
                                     <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
@@ -408,6 +413,7 @@
                         </group>
                     </items>
                     <connections>
+                        <outlet property="feedbackGroup" destination="okz-U3-TVg" id="2Ba-uc-5cB"/>
                         <outlet property="feedbackLabel" destination="TaB-Gc-8NT" id="3Xa-tS-sUy"/>
                     </connections>
                 </controller>

@@ -1,40 +1,44 @@
 
 import WatchKit
-import Foundation
-
 
 class CommandController: WKInterfaceController {
 
     @IBOutlet weak var feedbackLabel: WKInterfaceLabel!
+	@IBOutlet weak var feedbackGroup: WKInterfaceGroup!
 
     override func awakeWithContext(context: AnyObject?) {
 
         super.awakeWithContext(context)
 
-		Settings.clearCache()
+		if let cd = context as? [NSObject: AnyObject] {
 
-        let result = WKInterfaceController.openParentApplication(["command": context as! String], reply: {
-            [weak self] result, error -> Void in
-            if let e = error {
-                self?.feedbackLabel.setTextColor(UIColor.redColor())
-                self?.feedbackLabel.setText("Error: \(e.localizedDescription)")
-                self?.dismissAfterPause(2.0)
-            } else {
-                self?.feedbackLabel.setText(result["status"] as? String)
-                if result["color"] as! String == "red" {
-                    self?.feedbackLabel.setTextColor(UIColor.redColor())
-                    self?.dismissAfterPause(2.0)
-                } else {
-                    self?.feedbackLabel.setTextColor(UIColor.greenColor())
-                    self?.dismissAfterPause(0.5)
-                }
-            }
-        })
-        if !result {
-            self.feedbackLabel.setTextColor(UIColor.redColor())
-            self.feedbackLabel.setText("Could not send request to the parent app")
-            self.dismissAfterPause(2.0)
-        }
+			Settings.clearCache()
+
+			let result = WKInterfaceController.openParentApplication(cd, reply: {
+				[weak self] result, error -> Void in
+				if let e = error {
+					self?.feedbackGroup.setBackgroundColor(UIColor.redColor())
+					self?.feedbackLabel.setText("Error: \(e.localizedDescription)")
+					self?.dismissAfterPause(2.0)
+				} else {
+					self?.feedbackLabel.setText(result["status"] as? String)
+					if result["color"] as! String == "red" {
+						self?.feedbackGroup.setBackgroundColor(UIColor.redColor())
+						self?.dismissAfterPause(2.0)
+					} else {
+						self?.feedbackGroup.setBackgroundColor(UIColor.greenColor())
+						self?.dismissAfterPause(0.5)
+					}
+				}
+			})
+			if !result {
+				self.feedbackLabel.setTextColor(UIColor.redColor())
+				self.feedbackLabel.setText("Could not send request to the parent app")
+				self.dismissAfterPause(2.0)
+			}
+		} else {
+			self.dismissController()
+		}
     }
 
     func dismissAfterPause(pause: Double) {

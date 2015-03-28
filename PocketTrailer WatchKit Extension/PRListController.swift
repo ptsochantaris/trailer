@@ -42,22 +42,22 @@ class PRListController: WKInterfaceController {
 
     @IBAction func clearMergedSelected() {
         refreshWhenBack = true
-        presentControllerWithName("Command Controller", context: "clearAllMerged")
+		presentControllerWithName("Command Controller", context: ["command": "clearAllMerged"])
     }
 
     @IBAction func clearClosedSelected() {
         refreshWhenBack = true
-        presentControllerWithName("Command Controller", context: "clearAllClosed")
+		presentControllerWithName("Command Controller", context: ["command": "clearAllClosed"])
     }
 
     @IBAction func markAllReadSelected() {
         refreshWhenBack = true
-        presentControllerWithName("Command Controller", context: "markAllRead")
+		presentControllerWithName("Command Controller", context: ["command": "markAllRead"])
     }
 
     @IBAction func refreshSelected() {
         refreshWhenBack = true
-        presentControllerWithName("Command Controller", context: "refresh")
+		presentControllerWithName("Command Controller", context: ["command": "refresh"])
     }
 
 	override func table(table: WKInterfaceTable, didSelectRowAtIndex rowIndex: Int) {

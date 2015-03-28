@@ -254,7 +254,7 @@ class DataManager : NSObject {
 		case .IssueReopened: fallthrough
 		case .NewIssueAssigned: fallthrough
 		case .IssueClosed:
-			return [NOTIFICATION_URL_KEY : (item as! Issue).webUrl!]
+			return [NOTIFICATION_URL_KEY : (item as! Issue).webUrl!, ISSUE_ID_KEY: item.objectID.URIRepresentation().absoluteString!]
 		}
 	}
 

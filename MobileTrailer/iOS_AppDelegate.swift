@@ -387,6 +387,24 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 						}
 					}
 				}
+			case "openpr":
+				if let itemId = userInfo?["id"] as? String {
+					let m = self.getMasterController()
+					m.openPrWithId(itemId)
+					reply(["status": "Success", "color": "green"])
+				}
+			case "openissue":
+				if let itemId = userInfo?["id"] as? String {
+					let m = self.getMasterController()
+					m.openIssueWithId(itemId)
+					reply(["status": "Success", "color": "green"])
+				}
+			case "opencomment":
+				if let itemId = userInfo?["id"] as? String {
+					let m = self.getMasterController()
+					m.openCommentWithId(itemId)
+					reply(["status": "Success", "color": "green"])
+				}
 			case "clearAllMerged":
 				let m = getMasterController()
 				m.removeAllMergedConfirmed()

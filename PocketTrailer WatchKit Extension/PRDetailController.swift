@@ -47,8 +47,26 @@ class PRDetailController: WKInterfaceController {
 
     @IBAction func refreshSelected() {
         refreshWhenBack = true
-        presentControllerWithName("Command Controller", context: "refresh")
+        presentControllerWithName("Command Controller", context: ["command": "refresh"])
     }
+
+	@IBAction func openOnDeviceSelected() {
+		if let i = issue?.objectID.URIRepresentation().absoluteString {
+			presentControllerWithName("Command Controller", context: ["command": "openissue", "id": i])
+		} else if let p = pullRequest?.objectID.URIRepresentation().absoluteString {
+			presentControllerWithName("Command Controller", context: ["command": "openpr", "id": p])
+		}
+	}
+
+	override func table(table: WKInterfaceTable, didSelectRowAtIndex rowIndex: Int) {
+		let r: AnyObject? = table.rowControllerAtIndex(rowIndex)
+		if let
+			c = r as? CommentRow,
+			commentId = c.commentId
+		{
+			presentControllerWithName("Command Controller", context: ["command": "opencomment", "id": commentId])
+		}
+	}
 
     private func buildUI() {
 
@@ -109,6 +127,7 @@ class PRDetailController: WKInterfaceController {
 				let controller = table.rowControllerAtIndex(index++) as! CommentRow
 				controller.usernameL.setText((c.userName ?? "(unknown)") + "\n" + shortDateFormatter.stringFromDate(c.createdAt ?? NSDate()))
 				controller.commentL.setText(c.body)
+				controller.commentId = c.objectID.URIRepresentation().absoluteString
 			}
 		} else if let i = issue {
 			if !(i.body ?? "").isEmpty {
@@ -118,6 +137,7 @@ class PRDetailController: WKInterfaceController {
 				let controller = table.rowControllerAtIndex(index++) as! CommentRow
 				controller.usernameL.setText((c.userName ?? "(unknown)") + "\n" + shortDateFormatter.stringFromDate(c.createdAt ?? NSDate()))
 				controller.commentL.setText(c.body)
+				controller.commentId = c.objectID.URIRepresentation().absoluteString
 			}
 		}
     }

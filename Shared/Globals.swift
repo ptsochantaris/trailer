@@ -84,6 +84,7 @@ func MAKECOLOR(red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat) -> C
 }
 
 let PULL_REQUEST_ID_KEY = "pullRequestIdKey"
+let ISSUE_ID_KEY = "issueIdKey"
 let STATUS_ID_KEY = "statusIdKey"
 let COMMENT_ID_KEY = "commentIdKey"
 let NOTIFICATION_URL_KEY = "urlKey"

@@ -323,25 +323,30 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
 	func localNotification(notification: NSNotification) {
 		var urlToOpen = notification.userInfo?[NOTIFICATION_URL_KEY] as? String
-
 		var pullRequest: PullRequest?
 		var issue: Issue?
 
-		if let commentId = DataManager.idForUriPath(notification.userInfo?[COMMENT_ID_KEY] as? String) {
-			if let c = mainObjectContext.existingObjectWithID(commentId, error:nil) as? PRComment {
+		if let
+			commentId = DataManager.idForUriPath(notification.userInfo?[COMMENT_ID_KEY] as? String),
+			c = mainObjectContext.existingObjectWithID(commentId, error:nil) as? PRComment {
 				pullRequest = c.pullRequest
 				issue = c.issue
 				if urlToOpen == nil {
 					urlToOpen = c.webUrl
 				}
-			}
-		}
-		else if let pullRequestId = DataManager.idForUriPath(notification.userInfo?[PULL_REQUEST_ID_KEY] as? String) {
+		} else if let pullRequestId = DataManager.idForUriPath(notification.userInfo?[PULL_REQUEST_ID_KEY] as? String) {
 			pullRequest = mainObjectContext.existingObjectWithID(pullRequestId, error:nil) as? PullRequest
 			if pullRequest == nil {
 				UIAlertView(title: "PR not found", message: "Could not locale the PR related to this notification", delegate: nil, cancelButtonTitle: "OK").show()
 			} else if urlToOpen == nil {
 				urlToOpen = pullRequest!.webUrl
+			}
+		} else if let issueId = DataManager.idForUriPath(notification.userInfo?[ISSUE_ID_KEY] as? String) {
+			issue = mainObjectContext.existingObjectWithID(issueId, error:nil) as? Issue
+			if issue == nil {
+				UIAlertView(title: "Issue not found", message: "Could not locale the issue related to this notification", delegate: nil, cancelButtonTitle: "OK").show()
+			} else if urlToOpen == nil {
+				urlToOpen = issue!.webUrl
 			}
 		}
 
@@ -351,26 +356,71 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 			reloadDataWithAnimation(false)
 		}
 
-		if let p = pullRequest {
+		if let p = pullRequest, ip = fetchedResultsController.indexPathForObject(p) {
 			viewMode = MasterViewMode.PullRequests
-			if let ip = fetchedResultsController.indexPathForObject(p) {
-				detailViewController.catchupWithDataItemWhenLoaded = p.objectID
-				tableView.selectRowAtIndexPath(ip, animated: false, scrollPosition: UITableViewScrollPosition.Middle)
-			}
-		}
-
-		if let i = issue {
+			detailViewController.catchupWithDataItemWhenLoaded = p.objectID
+			tableView.selectRowAtIndexPath(ip, animated: false, scrollPosition: UITableViewScrollPosition.Middle)
+		} else if let i = issue, ip = fetchedResultsController.indexPathForObject(i) where Settings.showIssuesMenu {
 			viewMode = MasterViewMode.Issues
-			if let ip = fetchedResultsController.indexPathForObject(i) {
-				detailViewController.catchupWithDataItemWhenLoaded = i.objectID
-				tableView.selectRowAtIndexPath(ip, animated: false, scrollPosition: UITableViewScrollPosition.Middle)
-			}
+			detailViewController.catchupWithDataItemWhenLoaded = i.objectID
+			tableView.selectRowAtIndexPath(ip, animated: false, scrollPosition: UITableViewScrollPosition.Middle)
 		}
 
 		if let u = urlToOpen {
 			detailViewController.detailItem = NSURL(string: u)
 			if !detailViewController.isVisible {
 				showDetailViewController(detailViewController.navigationController!, sender: self)
+			}
+		}
+	}
+
+	func openPrWithId(prId: String) {
+		viewMode = MasterViewMode.PullRequests
+		if let
+			pullRequestId = DataManager.idForUriPath(prId),
+			pr = mainObjectContext.existingObjectWithID(pullRequestId, error:nil) as? PullRequest,
+			ip = fetchedResultsController.indexPathForObject(pr)
+		{
+			tableView.selectRowAtIndexPath(ip, animated: false, scrollPosition: UITableViewScrollPosition.Middle)
+			self.tableView(tableView, didSelectRowAtIndexPath: ip)
+		}
+	}
+
+	func openIssueWithId(iId: String) {
+		viewMode = MasterViewMode.Issues
+		if let
+			issueId = DataManager.idForUriPath(iId),
+			issue = mainObjectContext.existingObjectWithID(issueId, error:nil) as? Issue,
+			ip = fetchedResultsController.indexPathForObject(issue)
+		{
+			tableView.selectRowAtIndexPath(ip, animated: false, scrollPosition: UITableViewScrollPosition.Middle)
+			self.tableView(tableView, didSelectRowAtIndexPath: ip)
+		}
+	}
+
+	func openCommentWithId(cId: String) {
+		if let
+		itemId = DataManager.idForUriPath(cId),
+		comment = mainObjectContext.existingObjectWithID(itemId, error:nil) as? PRComment
+		{
+			if let url = comment.webUrl {
+				var ip: NSIndexPath?
+				if let pr = comment.pullRequest {
+					viewMode = MasterViewMode.PullRequests
+					ip = fetchedResultsController.indexPathForObject(pr)
+					detailViewController.catchupWithDataItemWhenLoaded = pr.objectID
+				} else if let issue = comment.issue {
+					viewMode = MasterViewMode.Issues
+					ip = fetchedResultsController.indexPathForObject(issue)
+					detailViewController.catchupWithDataItemWhenLoaded = issue.objectID
+				}
+				if let i = ip {
+					tableView.selectRowAtIndexPath(i, animated: false, scrollPosition: UITableViewScrollPosition.Middle)
+					detailViewController.detailItem = NSURL(string: url)
+					if !detailViewController.isVisible {
+						showDetailViewController(detailViewController.navigationController!, sender: self)
+					}
+				}
 			}
 		}
 	}
@@ -395,20 +445,25 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 	}
 
 	override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-		if viewMode == MasterViewMode.PullRequests {
-			let pullRequest = fetchedResultsController.objectAtIndexPath(indexPath) as! PullRequest
-			if let p = pullRequest.urlForOpening() {
-				detailViewController.detailItem = NSURL(string: p)
-				detailViewController.catchupWithDataItemWhenLoaded = pullRequest.objectID
-			}
-		} else {
-			let issue = fetchedResultsController.objectAtIndexPath(indexPath) as! Issue
-			if let p = issue.urlForOpening() {
-				detailViewController.detailItem = NSURL(string: p)
-				detailViewController.catchupWithDataItemWhenLoaded = issue.objectID
-			}
+		if let
+			p = fetchedResultsController.objectAtIndexPath(indexPath) as? PullRequest,
+			u = p.urlForOpening()
+			where viewMode == MasterViewMode.PullRequests
+		{
+			detailViewController.detailItem = NSURL(string: u)
+			detailViewController.catchupWithDataItemWhenLoaded = p.objectID
+		} else if let
+			i = fetchedResultsController.objectAtIndexPath(indexPath) as? Issue,
+			u = i.urlForOpening()
+			where viewMode == MasterViewMode.Issues
+		{
+			detailViewController.detailItem = NSURL(string: u)
+			detailViewController.catchupWithDataItemWhenLoaded = i.objectID
 		}
-		showDetailViewController(detailViewController.navigationController!, sender: self)
+
+		if !detailViewController.isVisible {
+			showDetailViewController(detailViewController.navigationController!, sender: self)
+		}
 	}
 
 	override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
