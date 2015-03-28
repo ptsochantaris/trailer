@@ -78,6 +78,8 @@
 		166A84C01A4582C100A3B292 /* ServerDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166A84BF1A4582C100A3B292 /* ServerDetailViewController.swift */; };
 		166A84C21A45A37700A3B292 /* AdvancedSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166A84C11A45A37700A3B292 /* AdvancedSettingsViewController.swift */; };
 		166A84C41A45CEE000A3B292 /* PickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166A84C31A45CEE000A3B292 /* PickerViewController.swift */; };
+		1671A11F1AC73CCB0047440A /* SetupAssistant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1671A11E1AC73CCB0047440A /* SetupAssistant.swift */; };
+		1671A1231AC74BC30047440A /* SetupAssistant.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1671A1221AC74BC30047440A /* SetupAssistant.xib */; };
 		1672DF3A1AB0E8C600381AEB /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785A91A2CE7BD00297764 /* Globals.swift */; };
 		1672DF3C1AB0E8CD00381AEB /* NSDictionaryExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785AC1A2CE7CD00297764 /* NSDictionaryExtensions.swift */; };
 		1672DF3E1AB0E8CD00381AEB /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C41A2DFBA500485053 /* Settings.swift */; };
@@ -253,6 +255,8 @@
 		166A84BF1A4582C100A3B292 /* ServerDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ServerDetailViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		166A84C11A45A37700A3B292 /* AdvancedSettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdvancedSettingsViewController.swift; sourceTree = "<group>"; };
 		166A84C31A45CEE000A3B292 /* PickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerViewController.swift; sourceTree = "<group>"; };
+		1671A11E1AC73CCB0047440A /* SetupAssistant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SetupAssistant.swift; sourceTree = "<group>"; };
+		1671A1221AC74BC30047440A /* SetupAssistant.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SetupAssistant.xib; sourceTree = "<group>"; };
 		1672DF2C1AB0D78500381AEB /* PocketTrailer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PocketTrailer.entitlements; sourceTree = SOURCE_ROOT; };
 		1672DF2D1AB0D7CC00381AEB /* PocketTrailer WatchKit Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "PocketTrailer WatchKit Extension.entitlements"; sourceTree = "<group>"; };
 		1672DF4A1AB0EB9200381AEB /* ExtensionGlobals.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ExtensionGlobals.swift; path = "PocketTrailer WatchKit Extension/ExtensionGlobals.swift"; sourceTree = "<group>"; };
@@ -385,6 +389,7 @@
 				1633C18F1ABCEAA00086C692 /* IssuesDelegate.swift */,
 				16A0B0361A48AC7900B3452D /* OSX_AppDelegate.swift */,
 				16A0B03B1A49AEC200B3452D /* StartupLaunch.swift */,
+				1671A11E1AC73CCB0047440A /* SetupAssistant.swift */,
 			);
 			name = Core;
 			sourceTree = "<group>";
@@ -565,6 +570,7 @@
 				162002CE1A2A3E0100FF95F3 /* Core */,
 				168A5C74185BB9D900CB6B02 /* UI Components */,
 				168BC6C217EC2DF000BC4584 /* MainMenu.xib */,
+				1671A1221AC74BC30047440A /* SetupAssistant.xib */,
 				168BC6C817EC2DF000BC4584 /* Images.xcassets */,
 				168BC6B417EC2DF000BC4584 /* Supporting Files */,
 			);
@@ -893,6 +899,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1671A1231AC74BC30047440A /* SetupAssistant.xib in Resources */,
 				168BC6B817EC2DF000BC4584 /* InfoPlist.strings in Resources */,
 				16B94072182D136700F32061 /* dsa_pub.pem in Resources */,
 				168BC6C917EC2DF000BC4584 /* Images.xcassets in Resources */,
@@ -1016,6 +1023,7 @@
 				16B3B3211A34E8E2000BE6CC /* PullRequest.swift in Sources */,
 				162002D61A2A49A300FF95F3 /* ViewAllowsVibrancy.swift in Sources */,
 				162002DF1A2A5C9200FF95F3 /* LinkField.swift in Sources */,
+				1671A11F1AC73CCB0047440A /* SetupAssistant.swift in Sources */,
 				1633C19D1ABD84180086C692 /* IssueCell.swift in Sources */,
 				16A0B0371A48AC7900B3452D /* OSX_AppDelegate.swift in Sources */,
 				161B851C1AB8E12C00AD4C5D /* Team.swift in Sources */,

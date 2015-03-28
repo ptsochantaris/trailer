@@ -88,6 +88,10 @@ class API {
 
 	/////////////////////////////////////////////////////// Utilities
 
+	func resetBadLinks() {
+		badLinks.removeAll(keepCapacity: false)
+	}
+
 	func lastUpdateDescription() -> String {
 		if app.isRefreshing {
 			return "Refreshing..."

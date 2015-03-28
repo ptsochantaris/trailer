@@ -126,13 +126,11 @@ class SectionController: WKInterfaceController {
 		for type in rowTypes {
 			if let t = type as? titleEntry {
 				let r = table.rowControllerAtIndex(index) as! TitleRow
-				//r.group.setBackgroundColor(UIColor.whiteColor())
-				//r.group.setAlpha(0.4)
 				r.titleL.setText(t.title)
 			} else if let t = type as? attributedTitleEntry {
 				let r = table.rowControllerAtIndex(index) as! TitleRow
-				//r.group.setBackgroundColor(UIColor.whiteColor())
-				//r.group.setAlpha(0.4)
+				r.group.setBackgroundColor(UIColor.whiteColor())
+				r.group.setAlpha(1.0)
 				r.titleL.setAttributedText(t.title)
 			} else if let t = type as? prEntry {
 				(table.rowControllerAtIndex(index) as! SectionRow).setPr(t.section)

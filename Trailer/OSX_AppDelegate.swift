@@ -169,8 +169,12 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 		if ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
 			startRefresh()
-		} else {
-			preferencesSelected(nil)
+		} else if ApiServer.countApiServersInMoc(mainObjectContext) == 1 {
+			if let a = ApiServer.allApiServersInMoc(mainObjectContext).first {
+				if a.authToken == nil || a.authToken!.isEmpty {
+					startupAssistant()
+				}
+			}
 		}
 
 		NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("updateScrollBarWidth"), name: NSPreferredScrollerStyleDidChangeNotification, object: nil)
@@ -184,6 +188,16 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		if !s.updateInProgress && Settings.checkForUpdatesAutomatically {
 			s.checkForUpdatesInBackground()
 		}
+	}
+
+	private var startupAssistantController: NSWindowController?
+	private func startupAssistant() {
+		startupAssistantController = NSWindowController(windowNibName:"SetupAssistant")
+		startupAssistantController!.window!.level = Int(CGWindowLevelForKey(CGWindowLevelKey(kCGFloatingWindowLevelKey)))
+		startupAssistantController!.window!.makeKeyAndOrderFront(self)
+	}
+	func closedSetupAssistant() {
+		startupAssistantController = nil
 	}
 
 	private func setupSortMethodMenu() {
@@ -1299,12 +1313,12 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 					let dateFormatter = NSDateFormatter()
 					dateFormatter.doesRelativeDateFormatting = true
 					dateFormatter.dateStyle = NSDateFormatterStyle.MediumStyle
-					dateFormatter.dateStyle = NSDateFormatterStyle.MediumStyle
+					dateFormatter.timeStyle = NSDateFormatterStyle.MediumStyle
 					let resetDateString = apiServer.resetDate == nil ? "(unspecified date)" : dateFormatter.stringFromDate(apiServer.resetDate!)
 
 					let alert = NSAlert()
 					alert.messageText = "Your API request usage for '\(apiLabel)' is over the limit!"
-					alert.informativeText = "Your request cannot be completed until your hourly API allowance is reset at \(resetDateString).\n\nIf you get this error often, try to make fewer manual refreshes or reducing the number of repos you are monitoring.\n\nYou can check your API usage at any time from 'Servers' preferences pane at any time."
+					alert.informativeText = "Your request cannot be completed until your hourly API allowance is reset \(resetDateString).\n\nIf you get this error often, try to make fewer manual refreshes or reducing the number of repos you are monitoring.\n\nYou can check your API usage at any time from 'Servers' preferences pane at any time."
 					alert.addButtonWithTitle("OK")
 					alert.runModal()
 				} else if ((apiServer.requestsRemaining?.doubleValue ?? 0.0) / (apiServer.requestsLimit?.doubleValue ?? 1.0)) < LOW_API_WARNING {
@@ -1312,12 +1326,12 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 					let dateFormatter = NSDateFormatter()
 					dateFormatter.doesRelativeDateFormatting = true
 					dateFormatter.dateStyle = NSDateFormatterStyle.MediumStyle
-					dateFormatter.dateStyle = NSDateFormatterStyle.MediumStyle
+					dateFormatter.timeStyle = NSDateFormatterStyle.MediumStyle
 					let resetDateString = apiServer.resetDate == nil ? "(unspecified date)" : dateFormatter.stringFromDate(apiServer.resetDate!)
 
 					let alert = NSAlert()
 					alert.messageText = "Your API request usage for '\(apiLabel)' is close to full"
-					alert.informativeText = "Try to make fewer manual refreshes, increasing the automatic refresh time, or reducing the number of repos you are monitoring.\n\nYour allowance will be reset by Github on \(resetDateString).\n\nYou can check your API usage from the 'Servers' preferences pane at any time."
+					alert.informativeText = "Try to make fewer manual refreshes, increasing the automatic refresh time, or reducing the number of repos you are monitoring.\n\nYour allowance will be reset by Github \(resetDateString).\n\nYou can check your API usage from the 'Servers' preferences pane at any time."
 					alert.addButtonWithTitle("OK")
 					alert.runModal()
 				}
