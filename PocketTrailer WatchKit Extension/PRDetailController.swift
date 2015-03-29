@@ -124,43 +124,42 @@ class PRDetailController: WKInterfaceController {
 		}
 
 		if let p = pullRequest {
-			if showDescription==true {
-				(table.rowControllerAtIndex(index++) as! LabelRow).labelL.setText(p.body)
-			}
-			var unreadCount = p.unreadComments?.integerValue ?? 0
-			for c in p.sortedComments(NSComparisonResult.OrderedDescending) {
-				let controller = table.rowControllerAtIndex(index++) as! CommentRow
-				controller.usernameL.setText((c.userName ?? "(unknown)") + "\n" + shortDateFormatter.stringFromDate(c.createdAt ?? NSDate()))
-				controller.commentL.setText(c.body)
-
-				controller.commentId = c.objectID.URIRepresentation().absoluteString
-
-				if unreadCount > 0 {
-					unreadCount--
-					controller.margin.setBackgroundColor(UIColor.redColor())
-				} else {
-					controller.margin.setBackgroundColor(UIColor.lightGrayColor())
-				}
-			}
+			setDisplayForBody(showDescription ? p.body : nil,
+				unreadComments: p.unreadComments?.integerValue ?? 0,
+				comments: p.sortedComments(NSComparisonResult.OrderedDescending),
+				startingAtIndex: index)
 		} else if let i = issue {
-			if showDescription==true {
-				(table.rowControllerAtIndex(index++) as! LabelRow).labelL.setText(i.body)
-			}
-			var unreadCount = i.unreadComments?.integerValue ?? 0
-			for c in i.sortedComments(NSComparisonResult.OrderedDescending) {
-				let controller = table.rowControllerAtIndex(index++) as! CommentRow
-				controller.usernameL.setText((c.userName ?? "(unknown)") + "\n" + shortDateFormatter.stringFromDate(c.createdAt ?? NSDate()))
-				controller.commentL.setText(c.body)
+			setDisplayForBody(showDescription ? i.body : nil,
+				unreadComments: i.unreadComments?.integerValue ?? 0,
+				comments: i.sortedComments(NSComparisonResult.OrderedDescending),
+				startingAtIndex: index)
+		}
+	}
 
-				controller.commentId = c.objectID.URIRepresentation().absoluteString
+	private func setDisplayForBody(body: String?, unreadComments: Int, comments: [PRComment], startingAtIndex: Int) {
+		var index = startingAtIndex
+		if let b = body {
+			(table.rowControllerAtIndex(index++) as! LabelRow).labelL.setText(b)
+		}
+		var unreadCount = unreadComments
+		for c in comments {
+			setCommentRow(table.rowControllerAtIndex(index++) as! CommentRow, comment: c, unreadCount: &unreadCount)
+		}
+	}
 
-				if unreadCount > 0 {
-					unreadCount--
-					controller.margin.setBackgroundColor(UIColor.redColor())
-				} else {
-					controller.margin.setBackgroundColor(UIColor.lightGrayColor())
-				}
-			}
+	private func setCommentRow(controller: CommentRow, comment: PRComment, inout unreadCount: Int) {
+		let date = comment.createdAt ?? NSDate()
+
+		controller.usernameL.setText("@" + (comment.userName?.uppercaseString ?? "(unknown)"))
+		controller.dateL.setText(shortDateFormatter.stringFromDate(date))
+		controller.commentL.setText(comment.body)
+		controller.commentId = comment.objectID.URIRepresentation().absoluteString
+
+		if unreadCount > 0 {
+			unreadCount--
+			controller.margin.setBackgroundColor(UIColor.redColor())
+		} else {
+			controller.margin.setBackgroundColor(UIColor(white: 0.86, alpha: 1.0))
 		}
 	}
 }

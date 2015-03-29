@@ -19,7 +19,7 @@
                                                 <items>
                                                     <group alignment="left" radius="2" id="Kau-36-YJy">
                                                         <items>
-                                                            <label alignment="left" verticalAlignment="bottom" text="Pull Requests" textAlignment="left" numberOfLines="0" id="dy2-9S-MJp">
+                                                            <label alignment="left" verticalAlignment="bottom" text="PULL REQUESTS" textAlignment="left" numberOfLines="0" id="dy2-9S-MJp">
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                                                 <fontDescription key="font" type="system" weight="black" pointSize="9"/>
                                                             </label>
@@ -236,19 +236,23 @@
                                     <group key="rootItem" width="1" height="0.0" alignment="left" spacing="3" id="WCb-Rn-fOj">
                                         <items>
                                             <group width="2" height="1" heightAdjustment="-4" alignment="left" verticalAlignment="center" radius="1" id="qDh-AS-kOq">
-                                                <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                             </group>
                                             <group width="1" alignment="left" verticalAlignment="center" layout="vertical" id="taf-1t-g2x">
                                                 <items>
-                                                    <group alignment="left" radius="2" id="X19-Q9-hsv">
+                                                    <group alignment="left" layout="vertical" radius="2" spacing="0.0" id="X19-Q9-hsv">
                                                         <items>
-                                                            <label alignment="left" text="Username" numberOfLines="0" id="YGw-DU-AAO">
+                                                            <label alignment="left" verticalAlignment="center" text="Username" numberOfLines="0" id="YGw-DU-AAO">
+                                                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                                <fontDescription key="font" type="system" weight="semibold" pointSize="10"/>
+                                                            </label>
+                                                            <label alignment="left" verticalAlignment="center" text="Date" numberOfLines="0" id="F8u-hY-oVq">
                                                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                                 <fontDescription key="font" type="system" pointSize="10"/>
                                                             </label>
                                                         </items>
-                                                        <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
-                                                        <edgeInsets key="margins" left="2" right="2" top="0.0" bottom="0.0"/>
+                                                        <color key="backgroundColor" red="0.85520006613756616" green="0.85520006613756616" blue="0.85520006613756616" alpha="1" colorSpace="calibratedRGB"/>
+                                                        <edgeInsets key="margins" left="2" right="3" top="0.0" bottom="1"/>
                                                     </group>
                                                     <label alignment="left" text="Comment" numberOfLines="0" id="wh3-Fx-D4A">
                                                         <fontDescription key="font" type="system" pointSize="12"/>
@@ -260,6 +264,7 @@
                                     </group>
                                     <connections>
                                         <outlet property="commentL" destination="wh3-Fx-D4A" id="Zhx-Vt-2t9"/>
+                                        <outlet property="dateL" destination="F8u-hY-oVq" id="ULx-Gw-eOb"/>
                                         <outlet property="margin" destination="qDh-AS-kOq" id="siS-F3-buF"/>
                                         <outlet property="usernameBackground" destination="X19-Q9-hsv" id="jOP-LQ-5zX"/>
                                         <outlet property="usernameL" destination="YGw-DU-AAO" id="F6s-BO-Ssb"/>
