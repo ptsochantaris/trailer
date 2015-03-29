@@ -24,7 +24,7 @@
                                                                 <fontDescription key="font" type="system" weight="black" pointSize="9"/>
                                                             </label>
                                                         </items>
-                                                        <color key="backgroundColor" red="0.25490197539999998" green="0.51372551919999998" blue="0.76862752440000004" alpha="1" colorSpace="deviceRGB"/>
+                                                        <color key="backgroundColor" red="0.20784313730000001" green="0.4823529412" blue="0.82352941180000006" alpha="1" colorSpace="calibratedRGB"/>
                                                         <edgeInsets key="margins" left="3" right="3" top="1" bottom="1"/>
                                                     </group>
                                                 </items>
@@ -296,16 +296,25 @@
                     <items>
                         <group alignment="left" spacing="6" id="gv7-I2-MZq">
                             <items>
-                                <imageView width="30" height="30" alignment="center" verticalAlignment="center" alpha="0.59999999999999964" image="GlacePrs" contentMode="scaleAspectFit" id="xYb-hC-O7D">
-                                    <color key="tintColor" red="0.25490197539999998" green="0.51372551919999998" blue="0.76862752440000004" alpha="1" colorSpace="deviceRGB"/>
-                                </imageView>
-                                <imageView width="28" height="28" alignment="center" verticalAlignment="center" alpha="0.59999999999999964" image="GlanceIssues" contentMode="scaleAspectFit" id="J0s-24-eqf">
-                                    <color key="tintColor" red="0.25490197539999998" green="0.51372551919999998" blue="0.76862752440000004" alpha="1" colorSpace="deviceRGB"/>
-                                </imageView>
-                                <label alignment="center" verticalAlignment="center" text="43" textAlignment="center" id="3wl-rh-8m0">
-                                    <fontDescription key="font" type="system" weight="medium" pointSize="31"/>
-                                </label>
+                                <group width="100" alignment="right" verticalAlignment="center" id="qSU-4X-8av">
+                                    <items>
+                                        <group alignment="center" verticalAlignment="center" radius="10" spacing="4" id="aEt-R2-txt">
+                                            <items>
+                                                <imageView width="20" height="20" alignment="left" verticalAlignment="center" image="GlacePrs" contentMode="scaleAspectFit" id="xYb-hC-O7D"/>
+                                                <imageView width="20" height="20" alignment="left" verticalAlignment="center" image="GlanceIssues" contentMode="scaleAspectFit" id="J0s-24-eqf"/>
+                                                <label alignment="right" verticalAlignment="center" text="43" textAlignment="center" id="3wl-rh-8m0">
+                                                    <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                                    <fontDescription key="font" type="system" weight="medium" pointSize="28"/>
+                                                </label>
+                                            </items>
+                                            <color key="backgroundColor" red="0.20784313730000001" green="0.4823529412" blue="0.82352941180000006" alpha="1" colorSpace="calibratedRGB"/>
+                                            <edgeInsets key="margins" left="6" right="6" top="0.0" bottom="0.0"/>
+                                        </group>
+                                    </items>
+                                    <edgeInsets key="margins" left="0.0" right="0.0" top="0.0" bottom="0.0"/>
+                                </group>
                             </items>
+                            <edgeInsets key="margins" left="0.0" right="0.0" top="0.0" bottom="0.0"/>
                         </group>
                         <group alignment="left" layout="vertical" spacing="2" id="eew-Gs-W6Y">
                             <items>
@@ -405,12 +414,12 @@
                     <items>
                         <group width="100" alignment="center" verticalAlignment="center" id="okz-U3-TVg">
                             <items>
-                                <label alignment="center" verticalAlignment="center" text="One moment please..." textAlignment="center" numberOfLines="0" id="TaB-Gc-8NT">
+                                <label alignment="center" verticalAlignment="center" text="ONE MOMENT PLEASE" textAlignment="center" numberOfLines="0" id="TaB-Gc-8NT">
                                     <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
-                                    <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
+                                    <fontDescription key="font" style="UICTFontTextStyleHeadline"/>
                                 </label>
                             </items>
-                            <color key="backgroundColor" red="0.25490197539999998" green="0.51372551919999998" blue="0.76862752440000004" alpha="1" colorSpace="deviceRGB"/>
+                            <color key="backgroundColor" red="0.20784313730000001" green="0.4823529412" blue="0.82352941180000006" alpha="1" colorSpace="calibratedRGB"/>
                             <edgeInsets key="margins" left="4" right="4" top="3" bottom="3"/>
                         </group>
                     </items>
@@ -423,5 +432,5 @@
             <point key="canvasLocation" x="422" y="515"/>
         </scene>
     </scenes>
-    <color key="tintColor" red="0.25490197539999998" green="0.51372551919999998" blue="0.76862752440000004" alpha="1" colorSpace="deviceRGB"/>
+    <color key="tintColor" red="0.20784313730000001" green="0.4823529412" blue="0.82352941180000006" alpha="1" colorSpace="calibratedRGB"/>
 </document>
