@@ -1,7 +1,6 @@
 
 import CoreData
 
-@objc(DataItem)
 class DataItem: NSManagedObject {
 
 	@NSManaged var serverId: NSNumber?
