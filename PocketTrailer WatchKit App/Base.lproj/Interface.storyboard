@@ -323,9 +323,9 @@
                         </group>
                         <group alignment="left" layout="vertical" spacing="2" id="eew-Gs-W6Y">
                             <items>
-                                <group width="103" alignment="center" radius="2" id="pi7-1E-Nwe">
+                                <group width="103" alignment="center" radius="2" id="uLm-0J-NPT">
                                     <items>
-                                        <label alignment="center" text="XX PARTICIPATED" textAlignment="center" id="E1B-vS-NEB">
+                                        <label alignment="center" text="XX MINE" textAlignment="center" id="fJB-oa-687">
                                             <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                             <fontDescription key="font" type="system" weight="thin" pointSize="9"/>
                                         </label>
@@ -333,9 +333,9 @@
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     <edgeInsets key="margins" left="0.0" right="0.0" top="1" bottom="1"/>
                                 </group>
-                                <group width="103" alignment="center" radius="2" id="uLm-0J-NPT">
+                                <group width="103" alignment="center" radius="2" id="pi7-1E-Nwe">
                                     <items>
-                                        <label alignment="center" text="XX MINE" textAlignment="center" id="fJB-oa-687">
+                                        <label alignment="center" text="XX PARTICIPATED" textAlignment="center" id="E1B-vS-NEB">
                                             <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                             <fontDescription key="font" type="system" weight="thin" pointSize="9"/>
                                         </label>
