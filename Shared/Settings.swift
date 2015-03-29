@@ -310,6 +310,11 @@ class Settings: NSObject {
 		set { set("SHOW_ISSUES_IN_WATCH_GLANCE", newValue) }
 	}
 
+	class var hideDescriptionInWatchDetail: Bool {
+		get { return get("HIDE_DESCRIPTION_IN_WATCH_DETAIL_VIEW") as? Bool ?? false }
+		set { set("HIDE_DESCRIPTION_IN_WATCH_DETAIL_VIEW", newValue) }
+	}
+
 	//////////////////////////////
 
 	class var checkForUpdatesAutomatically: Bool {

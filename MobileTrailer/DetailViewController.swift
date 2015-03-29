@@ -69,6 +69,7 @@ class DetailViewController: UIViewController, WKNavigationDelegate {
 			spinner.startAnimating()
 		} else {
 			spinner.stopAnimating()
+			catchupWithComments()
 		}
 		isVisible = true
 	}
@@ -108,6 +109,11 @@ class DetailViewController: UIViewController, WKNavigationDelegate {
 		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Action, target: self, action: Selector("shareSelected"))
 		api.networkIndicationEnd()
 
+		catchupWithComments()
+	}
+
+	private func catchupWithComments()
+	{
 		if let oid = catchupWithDataItemWhenLoaded {
 			let dataItem = mainObjectContext.existingObjectWithID(oid, error: nil)
 			if let pr = dataItem as? PullRequest {

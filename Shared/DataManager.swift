@@ -394,6 +394,9 @@ func buildMainContext() -> NSManagedObjectContext {
 		let m = NSManagedObjectContext(concurrencyType:NSManagedObjectContextConcurrencyType.MainQueueConcurrencyType)
 		m.undoManager = nil
 		m.persistentStoreCoordinator = coordinator
+		if dataReadonly==true {
+			m.stalenessInterval = 0.0
+		}
 		DLog("Database setup complete")
 		return m
 	} else {

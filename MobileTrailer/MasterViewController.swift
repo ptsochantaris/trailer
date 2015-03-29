@@ -221,13 +221,13 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 	override func viewWillAppear(animated: Bool) {
 		super.viewWillAppear(animated)
 		updateStatus()
-		updateToolbar(animated)
+		showTabBar(Settings.showIssuesMenu, animated: animated)
 	}
 
 	func reloadDataWithAnimation(animated: Bool) {
 
 		if !Settings.showIssuesMenu && viewMode == MasterViewMode.Issues {
-			updateToolbar(animated)
+			showTabBar(Settings.showIssuesMenu, animated: animated)
 			viewMode = MasterViewMode.PullRequests
 			return
 		}
@@ -266,11 +266,11 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 			tableView.reloadData()
 		}
 
-		updateToolbar(animated)
+		showTabBar(Settings.showIssuesMenu, animated: animated)
 	}
 
-	private func updateToolbar(animated: Bool) {
-		if Settings.showIssuesMenu {
+	private func showTabBar(show: Bool, animated: Bool) {
+		if show==true {
 
 			tableView.contentInset = UIEdgeInsetsMake(tableView.contentInset.top, 0, 49, 0)
 			tableView.scrollIndicatorInsets = UIEdgeInsetsMake(tableView.contentInset.top, 0, 49, 0)
@@ -299,8 +299,10 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 			}
 		} else {
 
-			tableView.contentInset = UIEdgeInsetsMake(tableView.contentInset.top, 0, 0, 0)
-			tableView.scrollIndicatorInsets = UIEdgeInsetsMake(tableView.contentInset.top, 0, 0, 0)
+			if !Settings.showIssuesMenu {
+				tableView.contentInset = UIEdgeInsetsMake(tableView.contentInset.top, 0, 0, 0)
+				tableView.scrollIndicatorInsets = UIEdgeInsetsMake(tableView.contentInset.top, 0, 0, 0)
+			}
 
 			if let t = tabBar {
 				if animated {
@@ -369,6 +371,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 		if let u = urlToOpen {
 			detailViewController.detailItem = NSURL(string: u)
 			if !detailViewController.isVisible {
+				showTabBar(false, animated: true)
 				showDetailViewController(detailViewController.navigationController!, sender: self)
 			}
 		}
@@ -418,6 +421,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 					tableView.selectRowAtIndexPath(i, animated: false, scrollPosition: UITableViewScrollPosition.Middle)
 					detailViewController.detailItem = NSURL(string: url)
 					if !detailViewController.isVisible {
+						showTabBar(false, animated: true)
 						showDetailViewController(detailViewController.navigationController!, sender: self)
 					}
 				}
@@ -462,6 +466,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 		}
 
 		if !detailViewController.isVisible {
+			showTabBar(false, animated: true)
 			showDetailViewController(detailViewController.navigationController!, sender: self)
 		}
 	}
@@ -614,7 +619,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
 		let f = PullRequest.requestForPullRequestsWithFilter(nil, sectionIndex: -1)
 		let count = mainObjectContext.countForFetchRequest(f, error: nil)
-		let unreadCount = pullRequestsItem.badgeValue?.toInt()
+		let unreadCount = pullRequestsItem.badgeValue?.toInt() ?? 0
 
 		let pr = long ? "Pull Request" : "PR"
 		if count == 0 {
@@ -629,7 +634,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 	private func issuesTitle() -> String {
 		let f = Issue.requestForIssuesWithFilter(nil, sectionIndex: -1)
 		let count = mainObjectContext.countForFetchRequest(f, error: nil)
-		let unreadCount = issuesItem.badgeValue?.toInt()
+		let unreadCount = issuesItem.badgeValue?.toInt() ?? 0
 
 		if count == 0 {
 			return "No Issues"

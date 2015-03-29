@@ -25,7 +25,7 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 
 	private enum Section: Int {
 		case Refresh, Display, Issues, Comments, Repos, StausesAndLabels, History, Confirm, Sort, Misc
-		static let rowCounts = [3, 7, 2, 7, 1, 6, 3, 2, 3, 1]
+		static let rowCounts = [3, 8, 2, 7, 1, 6, 3, 2, 3, 1]
 		static let allNames = ["Auto Refresh", "Display", "Issues", "Comments", "Repositories", "Statuses & Labels", "History", "Don't confirm when", "Sorting", "Misc"]
 	}
 
@@ -98,6 +98,9 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 			case 6:
 				cell.textLabel?.text = "Include labels in filtering"
 				cell.accessoryType = check(Settings.includeLabelsInFilter)
+			case 7:
+				cell.textLabel?.text = "Hide descriptions in watch detail views"
+				cell.accessoryType = check(Settings.hideDescriptionInWatchDetail)
 			default: break
 			}
 		} else if indexPath.section == Section.Issues.rawValue {
@@ -106,7 +109,7 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 				cell.textLabel?.text = "Sync and display issues"
 				cell.accessoryType = check(Settings.showIssuesMenu)
 			case 1:
-				cell.textLabel?.text = "Show issues instead of PRs in Watch Glance"
+				cell.textLabel?.text = "Show issues instead of PRs in watch glances"
 				cell.accessoryType = check(Settings.showIssuesInGlance)
 			default: break
 			}
@@ -272,6 +275,8 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 				Settings.includeReposInFilter = !Settings.includeReposInFilter
 			case 6:
 				Settings.includeLabelsInFilter = !Settings.includeLabelsInFilter
+			case 7:
+				Settings.hideDescriptionInWatchDetail = !Settings.hideDescriptionInWatchDetail
 			default: break
 			}
 		} else if indexPath.section == Section.Issues.rawValue {

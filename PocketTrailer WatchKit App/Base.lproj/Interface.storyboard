@@ -260,6 +260,8 @@
                                     </group>
                                     <connections>
                                         <outlet property="commentL" destination="wh3-Fx-D4A" id="Zhx-Vt-2t9"/>
+                                        <outlet property="margin" destination="qDh-AS-kOq" id="siS-F3-buF"/>
+                                        <outlet property="usernameBackground" destination="X19-Q9-hsv" id="jOP-LQ-5zX"/>
                                         <outlet property="usernameL" destination="YGw-DU-AAO" id="F6s-BO-Ssb"/>
                                     </connections>
                                 </tableRow>
@@ -268,14 +270,14 @@
                     </items>
                     <menu key="menu" id="VYe-CG-2Yp">
                         <items>
-                            <menuItem title="Refresh" icon="repeat" id="cqe-Ie-HAm">
-                                <connections>
-                                    <action selector="refreshSelected" destination="Hgm-oe-oa5" id="GnJ-EP-gnj"/>
-                                </connections>
-                            </menuItem>
                             <menuItem title="View In PocketTrailer" icon="info" id="GEJ-q9-0tT">
                                 <connections>
                                     <action selector="openOnDeviceSelected" destination="Hgm-oe-oa5" id="JZO-fC-lyj"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Refresh" icon="repeat" id="cqe-Ie-HAm">
+                                <connections>
+                                    <action selector="refreshSelected" destination="Hgm-oe-oa5" id="GnJ-EP-gnj"/>
                                 </connections>
                             </menuItem>
                         </items>
