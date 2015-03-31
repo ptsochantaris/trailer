@@ -51,7 +51,7 @@
                                                             </label>
                                                         </items>
                                                         <color key="backgroundColor" red="1" green="0.0" blue="0.070606581870000004" alpha="1" colorSpace="calibratedRGB"/>
-                                                        <edgeInsets key="margins" left="7" right="7" top="0.0" bottom="0.0"/>
+                                                        <edgeInsets key="margins" left="4" right="4" top="0.0" bottom="0.0"/>
                                                     </group>
                                                 </items>
                                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -164,19 +164,9 @@
                     </items>
                     <menu key="menu" id="dyj-Bd-XZp">
                         <items>
-                            <menuItem title="Closed" icon="trash" id="bX5-eA-GZy">
-                                <connections>
-                                    <action selector="clearClosedSelected" destination="Sqe-dw-Y9B" id="2QX-ah-j9s"/>
-                                </connections>
-                            </menuItem>
                             <menuItem title="All Read" icon="accept" id="ht7-Y3-Qkk">
                                 <connections>
                                     <action selector="markAllReadSelected" destination="Sqe-dw-Y9B" id="OO3-8A-VBq"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Merged" icon="trash" id="lIo-JU-RDV">
-                                <connections>
-                                    <action selector="clearMergedSelected" destination="Sqe-dw-Y9B" id="bb1-Bo-LdL"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Refresh" icon="repeat" id="pbf-Br-uiM">
@@ -278,6 +268,11 @@
                             <menuItem title="View In PocketTrailer" icon="info" id="GEJ-q9-0tT">
                                 <connections>
                                     <action selector="openOnDeviceSelected" destination="Hgm-oe-oa5" id="JZO-fC-lyj"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="All Read" icon="accept" id="k8l-cP-NWU">
+                                <connections>
+                                    <action selector="markAllReadSelected" destination="Hgm-oe-oa5" id="WKv-dl-KVs"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Refresh" icon="repeat" id="cqe-Ie-HAm">

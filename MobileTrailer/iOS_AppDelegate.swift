@@ -387,36 +387,86 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 						}
 					}
 				}
+
 			case "openpr":
 				if let itemId = userInfo?["id"] as? String {
 					let m = self.getMasterController()
 					m.openPrWithId(itemId)
-					reply(["status": "Success", "color": "green"])
+					DataManager.saveDB()
 				}
+				reply(["status": "Success", "color": "green"])
+
 			case "openissue":
 				if let itemId = userInfo?["id"] as? String {
 					let m = self.getMasterController()
 					m.openIssueWithId(itemId)
-					reply(["status": "Success", "color": "green"])
+					DataManager.saveDB()
 				}
+				reply(["status": "Success", "color": "green"])
+
 			case "opencomment":
 				if let itemId = userInfo?["id"] as? String {
 					let m = self.getMasterController()
 					m.openCommentWithId(itemId)
-					reply(["status": "Success", "color": "green"])
+					DataManager.saveDB()
 				}
+				reply(["status": "Success", "color": "green"])
+
 			case "clearAllMerged":
 				let m = getMasterController()
 				m.removeAllMergedConfirmed()
 				reply(["status": "Success", "color": "green"])
+
 			case "clearAllClosed":
 				let m = getMasterController()
 				m.removeAllClosedConfirmed()
 				reply(["status": "Success", "color": "green"])
-			case "markAllRead":
-				let m = getMasterController()
-				m.markAllAsRead()
+
+			case "markPrRead":
+				if let
+					itemId = userInfo?["id"] as? String,
+					oid = DataManager.idForUriPath(itemId),
+					pr = mainObjectContext.existingObjectWithID(oid, error:nil) as? PullRequest {
+						pr.catchUpWithComments()
+						getMasterController().reloadDataWithAnimation(false)
+						DataManager.saveDB()
+				}
 				reply(["status": "Success", "color": "green"])
+
+			case "markIssueRead":
+				if let
+					itemId = userInfo?["id"] as? String,
+					oid = DataManager.idForUriPath(itemId),
+					i = mainObjectContext.existingObjectWithID(oid, error:nil) as? Issue {
+						i.catchUpWithComments()
+						getMasterController().reloadDataWithAnimation(false)
+						DataManager.saveDB()
+				}
+				reply(["status": "Success", "color": "green"])
+
+			case "markEverythingRead":
+				PullRequest.markEverythingRead(PullRequestSection.None, moc: mainObjectContext)
+				Issue.markEverythingRead(PullRequestSection.None, moc: mainObjectContext)
+				getMasterController().reloadDataWithAnimation(false)
+				DataManager.saveDB()
+                reply(["status": "Success", "color": "green"])
+
+            case "markAllPrsRead":
+				if let s = userInfo?["sectionIndex"] as? Int {
+					PullRequest.markEverythingRead(PullRequestSection(rawValue: s)!, moc: mainObjectContext)
+					getMasterController().reloadDataWithAnimation(false)
+					DataManager.saveDB()
+				}
+                reply(["status": "Success", "color": "green"])
+
+            case "markAllIssuesRead":
+				if let s = userInfo?["sectionIndex"] as? Int {
+					Issue.markEverythingRead(PullRequestSection(rawValue: s)!, moc: mainObjectContext)
+					getMasterController().reloadDataWithAnimation(false)
+					DataManager.saveDB()
+				}
+                reply(["status": "Success", "color": "green"])
+
 			default: break;
 			}
 		}

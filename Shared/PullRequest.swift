@@ -7,15 +7,15 @@ import CoreData
 @objc (PullRequest)
 class PullRequest: ListableItem {
 
-    @NSManaged var issueCommentLink: String?
-    @NSManaged var issueUrl: String?
-    @NSManaged var mergeable: NSNumber?
-    @NSManaged var pinned: NSNumber?
-    @NSManaged var reviewCommentLink: String?
-    @NSManaged var statusesLink: String?
-    @NSManaged var lastStatusNotified: String?
+	@NSManaged var issueCommentLink: String?
+	@NSManaged var issueUrl: String?
+	@NSManaged var mergeable: NSNumber?
+	@NSManaged var pinned: NSNumber?
+	@NSManaged var reviewCommentLink: String?
+	@NSManaged var statusesLink: String?
+	@NSManaged var lastStatusNotified: String?
 
-    @NSManaged var statuses: NSSet
+	@NSManaged var statuses: NSSet
 
 	class func pullRequestWithInfo(info: NSDictionary, fromServer: ApiServer, inRepo: Repo) -> PullRequest {
 		let p = DataItem.itemWithInfo(info, type: "PullRequest", fromServer: fromServer) as! PullRequest
@@ -53,11 +53,11 @@ class PullRequest: ListableItem {
 	class func requestForPullRequestsWithFilter(filter: String?, sectionIndex: Int) -> NSFetchRequest {
 
 		var andPredicates = [NSPredicate]()
-        if sectionIndex<0 {
-            andPredicates.append(NSPredicate(format: "sectionIndex > 0"))
-        } else {
-            andPredicates.append(NSPredicate(format: "sectionIndex == %d", sectionIndex))
-        }
+		if sectionIndex<0 {
+			andPredicates.append(NSPredicate(format: "sectionIndex > 0"))
+		} else {
+			andPredicates.append(NSPredicate(format: "sectionIndex == %d", sectionIndex))
+		}
 
 		if let fi = filter {
 			if !fi.isEmpty {
@@ -123,34 +123,44 @@ class PullRequest: ListableItem {
 		return moc.countForFetchRequest(f, error: nil)
 	}
 
-    class func countAllRequestsInMoc(moc: NSManagedObjectContext) -> Int {
-        let f = NSFetchRequest(entityName: "PullRequest")
-        f.predicate = NSPredicate(format: "sectionIndex > 0")
-        return moc.countForFetchRequest(f, error: nil)
-    }
+	class func countAllRequestsInMoc(moc: NSManagedObjectContext) -> Int {
+		let f = NSFetchRequest(entityName: "PullRequest")
+		f.predicate = NSPredicate(format: "sectionIndex > 0")
+		return moc.countForFetchRequest(f, error: nil)
+	}
 
-    class func countRequestsInSection(section: PullRequestSection, moc: NSManagedObjectContext) -> Int {
-        let f = NSFetchRequest(entityName: "PullRequest")
-        f.predicate = NSPredicate(format: "sectionIndex == %d", section.rawValue)
-        return moc.countForFetchRequest(f, error: nil)
-    }
+	class func countRequestsInSection(section: PullRequestSection, moc: NSManagedObjectContext) -> Int {
+		let f = NSFetchRequest(entityName: "PullRequest")
+		f.predicate = NSPredicate(format: "sectionIndex == %d", section.rawValue)
+		return moc.countForFetchRequest(f, error: nil)
+	}
 
-    class func badgeCountInSection(section: PullRequestSection, moc: NSManagedObjectContext) -> Int {
-        let f = NSFetchRequest(entityName: "PullRequest")
-        f.predicate = NSPredicate(format: "sectionIndex == %d", section.rawValue)
-        var badgeCount:Int = 0
-        let showCommentsEverywhere = Settings.showCommentsEverywhere
-        for p in moc.executeFetchRequest(f, error: nil) as! [PullRequest] {
-            if let sectionIndex = p.sectionIndex?.integerValue {
-                if showCommentsEverywhere || sectionIndex==PullRequestSection.Mine.rawValue || sectionIndex==PullRequestSection.Participated.rawValue {
-                    if let c = p.unreadComments?.integerValue {
-                        badgeCount += c
-                    }
-                }
-            }
-        }
-        return badgeCount
-    }
+	class func markEverythingRead(section: PullRequestSection, moc: NSManagedObjectContext) {
+		let f = NSFetchRequest(entityName: "PullRequest")
+		if section != PullRequestSection.None {
+			f.predicate = NSPredicate(format: "sectionIndex == %d", section.rawValue)
+		}
+		for pr in moc.executeFetchRequest(f, error: nil) as! [PullRequest] {
+			pr.catchUpWithComments()
+		}
+	}
+
+	class func badgeCountInSection(section: PullRequestSection, moc: NSManagedObjectContext) -> Int {
+		let f = NSFetchRequest(entityName: "PullRequest")
+		f.predicate = NSPredicate(format: "sectionIndex == %d", section.rawValue)
+		var badgeCount:Int = 0
+		let showCommentsEverywhere = Settings.showCommentsEverywhere
+		for p in moc.executeFetchRequest(f, error: nil) as! [PullRequest] {
+			if let sectionIndex = p.sectionIndex?.integerValue {
+				if showCommentsEverywhere || sectionIndex==PullRequestSection.Mine.rawValue || sectionIndex==PullRequestSection.Participated.rawValue {
+					if let c = p.unreadComments?.integerValue {
+						badgeCount += c
+					}
+				}
+			}
+		}
+		return badgeCount
+	}
 
 	class func badgeCountInMoc(moc: NSManagedObjectContext) -> Int {
 		let f = requestForPullRequestsWithFilter(nil, sectionIndex: -1)
@@ -196,7 +206,7 @@ class PullRequest: ListableItem {
 
 		#if os(iOS)
 			let separator = NSAttributedString(string:"\n", attributes:lightSubtitle)
-		#elseif os(OSX)
+			#elseif os(OSX)
 			let separator = NSAttributedString(string:"   ", attributes:lightSubtitle)
 		#endif
 
@@ -221,14 +231,14 @@ class PullRequest: ListableItem {
 		}
 
 		#if os(iOS)
-		if let m = mergeable?.boolValue {
-			if !m {
-				_subtitle.appendAttributedString(separator)
-				var redSubtitle = lightSubtitle
-				redSubtitle[NSForegroundColorAttributeName] = COLOR_CLASS.redColor()
-				_subtitle.appendAttributedString(NSAttributedString(string: "Cannot be merged!", attributes:redSubtitle))
+			if let m = mergeable?.boolValue {
+				if !m {
+					_subtitle.appendAttributedString(separator)
+					var redSubtitle = lightSubtitle
+					redSubtitle[NSForegroundColorAttributeName] = COLOR_CLASS.redColor()
+					_subtitle.appendAttributedString(NSAttributedString(string: "Cannot be merged!", attributes:redSubtitle))
+				}
 			}
-		}
 		#endif
 
 		return _subtitle

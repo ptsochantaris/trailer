@@ -3,49 +3,50 @@ import WatchKit
 
 class SectionController: WKInterfaceController {
 
-    @IBOutlet weak var table: WKInterfaceTable!
+	@IBOutlet weak var table: WKInterfaceTable!
 
-    var refreshWhenBack = false
+	static var stateIsDirty = false
 
-    override func awakeWithContext(context: AnyObject?) {
-        super.awakeWithContext(context)
+	override func awakeWithContext(context: AnyObject?) {
+		super.awakeWithContext(context)
 
-        dataReadonly = true
+		dataReadonly = true
 		Settings.clearCache()
 
-        buildUI()
-    }
+		buildUI()
+	}
 
-    override func willActivate() {
-        if refreshWhenBack {
-            buildUI()
-        }
-        super.willActivate()
-    }
+	override func willActivate() {
+		if SectionController.stateIsDirty {
+			buildUI()
+			SectionController.stateIsDirty = false
+		}
+		super.willActivate()
+	}
 
-    override func didDeactivate() {
-        super.didDeactivate()
-    }
+	override func didDeactivate() {
+		super.didDeactivate()
+	}
 
-    @IBAction func clearMergedSelected() {
-        refreshWhenBack = true
+	@IBAction func clearMergedSelected() {
+		SectionController.stateIsDirty = true
 		presentControllerWithName("Command Controller", context: ["command": "clearAllMerged"])
-    }
+	}
 
-    @IBAction func clearClosedSelected() {
-        refreshWhenBack = true
+	@IBAction func clearClosedSelected() {
+		SectionController.stateIsDirty = true
 		presentControllerWithName("Command Controller", context: ["command": "clearAllClosed"])
-    }
+	}
 
-    @IBAction func markAllReadSelected() {
-        refreshWhenBack = true
-		presentControllerWithName("Command Controller", context: ["command": "markAllRead"])
-    }
+	@IBAction func markAllReadSelected() {
+		SectionController.stateIsDirty = true
+		presentControllerWithName("Command Controller", context: ["command": "markEverythingRead"])
+	}
 
-    @IBAction func refreshSelected() {
-        refreshWhenBack = true
+	@IBAction func refreshSelected() {
+		SectionController.stateIsDirty = true
 		presentControllerWithName("Command Controller", context: ["command": "refresh"])
-    }
+	}
 
 	class titleEntry {
 		var title: String
@@ -80,21 +81,21 @@ class SectionController: WKInterfaceController {
 		pushControllerWithName("ListController", context: [ SECTION_KEY: ri, TYPE_KEY: type ] )
 	}
 
-    private func buildUI() {
+	private func buildUI() {
 
 		var rowTypes = [AnyObject]()
 
 		let totalPrs = PullRequest.countAllRequestsInMoc(mainObjectContext)
-        if totalPrs==0 {
-            rowTypes.append(attributedTitleEntry(DataManager.reasonForEmptyWithFilter(nil)))
-        } else {
+		if totalPrs==0 {
+			rowTypes.append(attributedTitleEntry(DataManager.reasonForEmptyWithFilter(nil)))
+		} else {
 			rowTypes.append(titleEntry("\(totalPrs) PULL REQUESTS"))
 			rowTypes.append(prEntry(PullRequestSection.Mine))
 			rowTypes.append(prEntry(PullRequestSection.Participated))
 			rowTypes.append(prEntry(PullRequestSection.Merged))
 			rowTypes.append(prEntry(PullRequestSection.Closed))
 			rowTypes.append(prEntry(PullRequestSection.All))
-        }
+		}
 
 		if Settings.showIssuesMenu {
 			let totalIssues = Issue.countAllIssuesInMoc(mainObjectContext)
@@ -139,5 +140,5 @@ class SectionController: WKInterfaceController {
 			}
 			index++
 		}
-    }
+	}
 }

@@ -28,13 +28,13 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 			}))
 			a.addAction(UIAlertAction(title: "Mark all as read", style: UIAlertActionStyle.Destructive, handler: { [weak self] action in
 				self!.markAllAsRead()
-			}))
+				}))
 			a.addAction(UIAlertAction(title: "Remove all merged", style:UIAlertActionStyle.Default, handler: { [weak self] action in
 				self!.removeAllMerged()
-			}))
+				}))
 			a.addAction(UIAlertAction(title: "Remove all closed", style:UIAlertActionStyle.Default, handler: { [weak self] action in
 				self!.removeAllClosed()
-			}))
+				}))
 			a.addAction(UIAlertAction(title: "Refresh Now", style:UIAlertActionStyle.Default, handler: { action in
 				app.startRefresh()
 				return
@@ -90,10 +90,10 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 				a.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil))
 				a.addAction(UIAlertAction(title: "Remove", style: UIAlertActionStyle.Destructive, handler: { [weak self] action in
 					self!.removeAllMergedConfirmed()
-				}))
+					}))
 				self!.presentViewController(a, animated: true, completion: nil)
 			}
-		})
+			})
 	}
 
 	func removeAllClosed() {
@@ -105,10 +105,10 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 				a.addAction(UIAlertAction(title: "Cancel", style:UIAlertActionStyle.Cancel, handler: nil))
 				a.addAction(UIAlertAction(title: "Remove", style:UIAlertActionStyle.Destructive, handler: { [weak self] action in
 					self!.removeAllClosedConfirmed()
-				}))
+					}))
 				self!.presentViewController(a, animated: true, completion: nil)
 			}
-		})
+			})
 	}
 
 	func removeAllClosedConfirmed() {
@@ -181,7 +181,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
 		searchTimer = PopTimer(timeInterval: 0.5, callback: { [weak self] in
 			self!.reloadDataWithAnimation(true)
-		})
+			})
 	}
 
 	override func viewDidLoad() {
@@ -384,6 +384,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 			pr = mainObjectContext.existingObjectWithID(pullRequestId, error:nil) as? PullRequest,
 			ip = fetchedResultsController.indexPathForObject(pr)
 		{
+			pr.catchUpWithComments()
 			tableView.selectRowAtIndexPath(ip, animated: false, scrollPosition: UITableViewScrollPosition.Middle)
 			self.tableView(tableView, didSelectRowAtIndexPath: ip)
 		}
@@ -396,6 +397,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 			issue = mainObjectContext.existingObjectWithID(issueId, error:nil) as? Issue,
 			ip = fetchedResultsController.indexPathForObject(issue)
 		{
+			issue.catchUpWithComments()
 			tableView.selectRowAtIndexPath(ip, animated: false, scrollPosition: UITableViewScrollPosition.Middle)
 			self.tableView(tableView, didSelectRowAtIndexPath: ip)
 		}
@@ -403,19 +405,21 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
 	func openCommentWithId(cId: String) {
 		if let
-		itemId = DataManager.idForUriPath(cId),
-		comment = mainObjectContext.existingObjectWithID(itemId, error:nil) as? PRComment
+			itemId = DataManager.idForUriPath(cId),
+			comment = mainObjectContext.existingObjectWithID(itemId, error:nil) as? PRComment
 		{
 			if let url = comment.webUrl {
 				var ip: NSIndexPath?
 				if let pr = comment.pullRequest {
 					viewMode = MasterViewMode.PullRequests
 					ip = fetchedResultsController.indexPathForObject(pr)
-					detailViewController.catchupWithDataItemWhenLoaded = pr.objectID
+					detailViewController.catchupWithDataItemWhenLoaded = nil
+					pr.catchUpWithComments()
 				} else if let issue = comment.issue {
 					viewMode = MasterViewMode.Issues
 					ip = fetchedResultsController.indexPathForObject(issue)
-					detailViewController.catchupWithDataItemWhenLoaded = issue.objectID
+					detailViewController.catchupWithDataItemWhenLoaded = nil
+					issue.catchUpWithComments()
 				}
 				if let i = ip {
 					tableView.selectRowAtIndexPath(i, animated: false, scrollPosition: UITableViewScrollPosition.Middle)
@@ -590,7 +594,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 			if !(refreshControl?.refreshing ?? false) {
 				dispatch_async(dispatch_get_main_queue(), { [weak self] in
 					self!.refreshControl!.beginRefreshing()
-				})
+					})
 			}
 		} else {
 
@@ -601,7 +605,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
 			dispatch_async(dispatch_get_main_queue(), { [weak self] in
 				self!.refreshControl!.endRefreshing()
-			})
+				})
 		}
 
 		refreshControl?.attributedTitle = NSAttributedString(string: api.lastUpdateDescription(), attributes: nil)
@@ -677,7 +681,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 		viewMode = MasterViewMode.Issues
 	}
 
-	private var viewMode: MasterViewMode = .PullRequests {
+	var viewMode: MasterViewMode = .PullRequests {
 		didSet {
 			_fetchedResultsController = nil
 			tableView.reloadData()
@@ -707,5 +711,5 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 	func tabBarController(tabBarController: UITabBarController, didSelectViewController viewController: UIViewController) {
 		Settings.lastPreferencesTabSelected = indexOfObject(tabBarController.viewControllers!, viewController) ?? 0
 	}
-
+	
 }

@@ -14,8 +14,10 @@ class PRDetailController: WKInterfaceController {
 	@IBOutlet weak var table: WKInterfaceTable!
 
 	var pullRequest: PullRequest?
+
 	var issue: Issue?
-	var refreshWhenBack = false
+
+	static var stateIsDirty = false
 
 	override func awakeWithContext(context: AnyObject?) {
 		super.awakeWithContext(context)
@@ -28,7 +30,7 @@ class PRDetailController: WKInterfaceController {
 	}
 
 	override func willActivate() {
-		if refreshWhenBack {
+		if PRDetailController.stateIsDirty {
 			if let p = pullRequest {
 				mainObjectContext.refreshObject(p, mergeChanges: false)
 			}
@@ -36,7 +38,7 @@ class PRDetailController: WKInterfaceController {
 				mainObjectContext.refreshObject(i, mergeChanges: false)
 			}
 			buildUI()
-			refreshWhenBack = false
+			PRDetailController.stateIsDirty = false
 		}
 		super.willActivate()
 	}
@@ -46,11 +48,27 @@ class PRDetailController: WKInterfaceController {
 	}
 
 	@IBAction func refreshSelected() {
-		refreshWhenBack = true
+		PRListController.stateIsDirty = true
+		SectionController.stateIsDirty = true
+		PRDetailController.stateIsDirty = true
 		presentControllerWithName("Command Controller", context: ["command": "refresh"])
 	}
 
+	@IBAction func markAllReadSelected() {
+		PRListController.stateIsDirty = true
+		SectionController.stateIsDirty = true
+		PRDetailController.stateIsDirty = true
+		if let i = issue {
+			presentControllerWithName("Command Controller", context: ["command": "markIssueRead", "id": i.objectID.URIRepresentation().absoluteString!])
+		} else if let p = pullRequest {
+			presentControllerWithName("Command Controller", context: ["command": "markPrRead", "id": p.objectID.URIRepresentation().absoluteString!])
+		}
+	}
+
 	@IBAction func openOnDeviceSelected() {
+		PRListController.stateIsDirty = true
+		SectionController.stateIsDirty = true
+		PRDetailController.stateIsDirty = true
 		if let i = issue?.objectID.URIRepresentation().absoluteString {
 			presentControllerWithName("Command Controller", context: ["command": "openissue", "id": i])
 		} else if let p = pullRequest?.objectID.URIRepresentation().absoluteString {

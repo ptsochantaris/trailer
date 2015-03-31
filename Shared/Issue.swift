@@ -119,6 +119,16 @@ class Issue: ListableItem {
 		return moc.countForFetchRequest(f, error: nil)
 	}
 
+	class func markEverythingRead(section: PullRequestSection, moc: NSManagedObjectContext) {
+		let f = NSFetchRequest(entityName: "Issue")
+		if section != PullRequestSection.None {
+			f.predicate = NSPredicate(format: "sectionIndex == %d", section.rawValue)
+		}
+		for pr in moc.executeFetchRequest(f, error: nil) as! [Issue] {
+			pr.catchUpWithComments()
+		}
+	}
+
 	class func badgeCountInMoc(moc: NSManagedObjectContext) -> Int {
 		let f = requestForIssuesWithFilter(nil, sectionIndex: -1)
 		var badgeCount:Int = 0
