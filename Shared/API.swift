@@ -9,6 +9,8 @@ struct UrlBackOffEntry {
 	var duration: NSTimeInterval
 }
 
+typealias Completion = ()->Void
+
 #if DEBUG
 	#if os(iOS)
 		let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-iOS-Development"
@@ -191,7 +193,7 @@ class API {
             task.resume()
 	}
 
-	func haveCachedAvatar(path: String, tryLoadAndCallback: ((IMAGE_CLASS?)->Void)?) -> Bool
+	func haveCachedAvatar(path: String, tryLoadAndCallback: (IMAGE_CLASS?) -> Void) -> Bool
 	{
 		#if os(iOS)
 			let absolutePath = path + (contains(path, "?") ? "&" : "?") + "s=\(40.0*GLOBAL_SCREEN_SCALE)"
@@ -214,38 +216,36 @@ class API {
 				let ret = NSImage(contentsOfFile: cachePath)
 			#endif
 			if let r = ret {
-				tryLoadAndCallback?(r)
+				tryLoadAndCallback(r)
 				return true
 			} else {
 				fileManager.removeItemAtPath(cachePath, error: nil)
 			}
 		}
 
-		if let c = tryLoadAndCallback {
-			getImage(NSURL(string: absolutePath)!,
-				success: { response, data in
-					var image: IMAGE_CLASS?
-					if data != nil {
-						#if os(iOS)
-							image = IMAGE_CLASS(data: data!, scale:GLOBAL_SCREEN_SCALE)
-							UIImageJPEGRepresentation(image!, 1.0).writeToFile(cachePath, atomically: true)
-							#else
-							image = IMAGE_CLASS(data: data!)
-							image!.TIFFRepresentation!.writeToFile(cachePath, atomically: true)
-						#endif
-					}
-					dispatch_async(dispatch_get_main_queue(), { c(image) })
-				}, failure: { response, error in
-					dispatch_async(dispatch_get_main_queue(), { c(nil) })
-			})
-		}
+		getImage(NSURL(string: absolutePath)!,
+			success: { response, data in
+				var image: IMAGE_CLASS?
+				if data != nil {
+					#if os(iOS)
+						image = IMAGE_CLASS(data: data!, scale:GLOBAL_SCREEN_SCALE)
+						UIImageJPEGRepresentation(image!, 1.0).writeToFile(cachePath, atomically: true)
+						#else
+						image = IMAGE_CLASS(data: data!)
+						image!.TIFFRepresentation!.writeToFile(cachePath, atomically: true)
+					#endif
+				}
+				dispatch_async(dispatch_get_main_queue(), { tryLoadAndCallback(image) })
+			}, failure: { response, error in
+				dispatch_async(dispatch_get_main_queue(), { tryLoadAndCallback(nil) })
+		})
 
 		return false
 	}
 
 	////////////////////////////////////// API interface
 
-	func fetchPullRequestsForActiveReposAndCallback(callback: (()->Void)?) {
+	func fetchPullRequestsForActiveReposAndCallback(callback: Completion) {
 		let syncContext = DataManager.tempContext()
 
 		let shouldRefreshReposToo = (app.lastRepoCheck.isEqualToDate(NSDate.distantPast() as! NSDate)
@@ -264,19 +264,19 @@ class API {
 		}
 	}
 
-	private func syncToMoc(moc: NSManagedObjectContext, callback: (()->Void)?) {
+	private func syncToMoc(moc: NSManagedObjectContext, callback: Completion) {
 		markDirtyReposInMoc(moc, callback: { [weak self] in
 
 			let repos = Repo.syncableReposInMoc(moc)
 
 			var completionCount = 0
 			let totalOperations = 2
-			let completionCallback = { () -> Void in
+			let completionCallback: Completion = { [weak self] in
 				completionCount++
 				if completionCount == totalOperations {
 					for r in repos { r.dirty = false }
 					self!.completeSyncInMoc(moc)
-					callback?()
+					callback()
 				}
 			}
 
@@ -329,7 +329,7 @@ class API {
 		refreshesSinceLastStatusCheck.removeAll()
 	}
 
-	private func updatePullRequestsInMoc(moc: NSManagedObjectContext, callback: (()->Void)?) {
+	private func updatePullRequestsInMoc(moc: NSManagedObjectContext, callback: Completion) {
 
 		let willScanForStatuses = shouldScanForStatusesInMoc(moc)
 		let willScanForLabels = shouldScanForLabelsInMoc(moc)
@@ -339,10 +339,10 @@ class API {
 		if willScanForLabels { totalOperations++ }
 
 		var completionCount = 0
-		let completionCallback = { () -> Void in
+		let completionCallback: Completion = {
 			completionCount++
 			if completionCount == totalOperations {
-				callback?()
+				callback()
 			}
 		}
 
@@ -357,19 +357,19 @@ class API {
 		detectAssignedPullRequestsInMoc(moc, callback: completionCallback)
 	}
 
-	private func markDirtyReposInMoc(moc: NSManagedObjectContext, callback: (()->Void)?) {
+	private func markDirtyReposInMoc(moc: NSManagedObjectContext, callback: Completion) {
 
 		let allApiServers = ApiServer.allApiServersInMoc(moc)
 		let totalOperations = 3*allApiServers.count
 		if totalOperations==0 {
-			callback?()
+			callback()
 			return
 		}
 
 		var completionCount = 0
 		let repoIdsToMarkDirty = NSMutableSet()
 
-		let completionCallback = { [weak self] () -> Void in
+		let completionCallback: Completion = { [weak self] in
 			completionCount++
 			if completionCount==totalOperations {
 				Repo.markDirtyReposWithIds(repoIdsToMarkDirty, inMoc:moc)
@@ -377,7 +377,7 @@ class API {
 					DLog("Marked %d dirty repos that have new events in their event stream", repoIdsToMarkDirty.count)
 				}
 				self!.markLongCleanReposAsDirtyInMoc(moc)
-				callback?()
+				callback()
 			}
 		}
 
@@ -394,7 +394,7 @@ class API {
 		}
 	}
 
-	private func fetchUserTeamsFromApiServer(apiServer: ApiServer, callback: (()->Void)?) {
+	private func fetchUserTeamsFromApiServer(apiServer: ApiServer, callback: Completion) {
 		getPagedDataInPath("/user/teams",
 			fromServer: apiServer,
 			startingFromPage: 1,
@@ -409,14 +409,14 @@ class API {
 				if !success {
 					apiServer.lastSyncSucceeded = false
 				}
-				callback?()
+				callback()
 		})
 	}
 
-	private func markDirtyRepoIds(repoIdsToMarkDirty: NSMutableSet, usingUserEventsFromServer: ApiServer, callback: (()->Void)?) {
+	private func markDirtyRepoIds(repoIdsToMarkDirty: NSMutableSet, usingUserEventsFromServer: ApiServer, callback: Completion) {
 
 		if !usingUserEventsFromServer.syncIsGood {
-			callback?()
+			callback()
 			return
 		}
 
@@ -460,14 +460,14 @@ class API {
 				if !success {
 					usingUserEventsFromServer.lastSyncSucceeded = false
 				}
-				callback?()
+				callback()
 		})
 	}
 
-	private func markDirtyRepoIds(repoIdsToMarkDirty: NSMutableSet, usingReceivedEventsFromServer: ApiServer, callback: (()->Void)?) {
+	private func markDirtyRepoIds(repoIdsToMarkDirty: NSMutableSet, usingReceivedEventsFromServer: ApiServer, callback: Completion) {
 
 		if !usingReceivedEventsFromServer.syncIsGood {
-			callback?()
+			callback()
 			return
 		}
 
@@ -513,11 +513,11 @@ class API {
 				if !success {
 					usingReceivedEventsFromServer.lastSyncSucceeded = false
 				}
-				callback?()
+				callback()
 		})
 	}
 
-	func fetchRepositoriesToMoc(moc: NSManagedObjectContext, callback: (()->Void)?) {
+	func fetchRepositoriesToMoc(moc: NSManagedObjectContext, callback: Completion) {
 
 		ApiServer.resetSyncSuccessInMoc(moc)
 
@@ -531,7 +531,7 @@ class API {
 			let totalOperations = allApiServers.count
 			var completionCount = 0
 
-			let completionCallback = { () -> Void in
+			let completionCallback: Completion = {
 				completionCount++
 				if completionCount == totalOperations {
 					let shouldHideByDefault = Settings.hideNewRepositories
@@ -542,7 +542,7 @@ class API {
 						}
 					}
 					app.lastRepoCheck = NSDate()
-					callback?()
+					callback()
 				}
 			}
 
@@ -556,7 +556,7 @@ class API {
 		})
 	}
 
-	private func fetchPullRequestsForRepos(repos: [Repo], toMoc:NSManagedObjectContext, callback: (()->Void)?) {
+	private func fetchPullRequestsForRepos(repos: [Repo], toMoc:NSManagedObjectContext, callback: Completion) {
 
 		for r in Repo.unsyncableReposInMoc(toMoc) {
 			for p in r.pullRequests.allObjects as! [PullRequest] {
@@ -565,7 +565,7 @@ class API {
 		}
 
 		if repos.count==0 {
-			callback?()
+			callback()
 			return
 		}
 		let total = repos.count
@@ -604,19 +604,19 @@ class API {
 						}
 						completionCount++
 						if completionCount==total {
-							callback?()
+							callback()
 						}
 				})
 			} else {
 				completionCount++
 				if completionCount==total {
-					callback?()
+					callback()
 				}
 			}
 		}
 	}
 
-	private func fetchIssuesForRepos(repos: [Repo], toMoc:NSManagedObjectContext, callback: (()->Void)?) {
+	private func fetchIssuesForRepos(repos: [Repo], toMoc:NSManagedObjectContext, callback: Completion) {
 
 		for r in Repo.unsyncableReposInMoc(toMoc) {
 			for i in r.issues.allObjects as! [Issue] {
@@ -625,7 +625,7 @@ class API {
 		}
 
 		if repos.count==0 || !Settings.showIssuesMenu {
-			callback?()
+			callback()
 			return
 		}
 		let total = repos.count
@@ -666,25 +666,25 @@ class API {
 						}
 						completionCount++
 						if completionCount==total {
-							callback?()
+							callback()
 						}
 				})
 			} else {
 				completionCount++
 				if completionCount==total {
-					callback?()
+					callback()
 				}
 			}
 		}
 	}
 
-	private func fetchCommentsForCurrentPullRequestsToMoc(moc: NSManagedObjectContext, callback: (()->Void)?) {
+	private func fetchCommentsForCurrentPullRequestsToMoc(moc: NSManagedObjectContext, callback: Completion) {
 
 		let prs = (DataItem.newOrUpdatedItemsOfType("PullRequest", inMoc:moc) as! [PullRequest]).filter({ pr in
 			return pr.apiServer.syncIsGood
 		})
 		if prs.count==0 {
-			callback?()
+			callback()
 			return
 		}
 
@@ -697,20 +697,20 @@ class API {
 		let totalOperations = 2
 		var completionCount = 0
 
-		let completionCallback = { () -> Void in
+		let completionCallback: Completion = {
 			completionCount++
-			if completionCount == totalOperations { callback?() }
+			if completionCount == totalOperations { callback() }
 		}
 
 		_fetchCommentsForPullRequests(prs, issues: true, inMoc: moc, callback: completionCallback)
 		_fetchCommentsForPullRequests(prs, issues: false, inMoc: moc, callback: completionCallback)
 	}
 
-	private func _fetchCommentsForPullRequests(prs: [PullRequest], issues: Bool, inMoc: NSManagedObjectContext, callback: (()->Void)?) {
+	private func _fetchCommentsForPullRequests(prs: [PullRequest], issues: Bool, inMoc: NSManagedObjectContext, callback: Completion) {
 
 		let total = prs.count
 		if total==0 {
-			callback?()
+			callback()
 			return
 		}
 
@@ -742,19 +742,19 @@ class API {
 							apiServer.lastSyncSucceeded = false
 						}
 						if completionCount == total {
-							callback?()
+							callback()
 						}
 				})
 			} else {
 				completionCount++
 				if completionCount == total {
-					callback?()
+					callback()
 				}
 			}
 		}
 	}
 
-	private func fetchCommentsForCurrentIssuesToMoc(moc: NSManagedObjectContext, callback: (()->Void)?) {
+	private func fetchCommentsForCurrentIssuesToMoc(moc: NSManagedObjectContext, callback: Completion) {
 
 		let allIssues = DataItem.newOrUpdatedItemsOfType("Issue", inMoc:moc) as! [Issue]
 
@@ -770,7 +770,7 @@ class API {
 
 		let total = issues.count
 		if total==0 {
-			callback?()
+			callback()
 			return
 		}
 
@@ -803,19 +803,19 @@ class API {
 							apiServer.lastSyncSucceeded = false
 						}
 						if completionCount == total {
-							callback?()
+							callback()
 						}
 				})
 			} else {
 				completionCount++
 				if completionCount == total {
-					callback?()
+					callback()
 				}
 			}
 		}
 	}
 
-	private func fetchLabelsForForCurrentPullRequestsToMoc(moc: NSManagedObjectContext, callback: (()->Void)?) {
+	private func fetchLabelsForForCurrentPullRequestsToMoc(moc: NSManagedObjectContext, callback: Completion) {
 
 		let prs = (DataItem.allItemsOfType("PullRequest", inMoc: moc) as! [PullRequest]).filter { [weak self] pr in
 			if !pr.apiServer.syncIsGood {
@@ -839,7 +839,7 @@ class API {
 
 		let total = prs.count
 		if total==0 {
-			callback?()
+			callback()
 			return
 		}
 
@@ -873,7 +873,7 @@ class API {
 							self!.refreshesSinceLastLabelsCheck[p.objectID] = 1
 						}
 						if completionCount == total {
-							callback?()
+							callback()
 						}
 				})
 			} else {
@@ -881,13 +881,13 @@ class API {
 				refreshesSinceLastLabelsCheck[p.objectID] = 1
 				completionCount++
 				if completionCount == total {
-					callback?()
+					callback()
 				}
 			}
 		}
 	}
 
-	private func fetchStatusesForCurrentPullRequestsToMoc(moc: NSManagedObjectContext, callback: (()->Void)?) {
+	private func fetchStatusesForCurrentPullRequestsToMoc(moc: NSManagedObjectContext, callback: Completion) {
 
 		let prs = (DataItem.allItemsOfType("PullRequest", inMoc: moc) as! [PullRequest]).filter { [weak self] pr in
 			if !pr.apiServer.syncIsGood {
@@ -911,7 +911,7 @@ class API {
 
 		let total = prs.count
 		if total==0 {
-			callback?()
+			callback()
 			return
 		}
 
@@ -947,20 +947,20 @@ class API {
 							self!.refreshesSinceLastStatusCheck[p.objectID] = 1
 						}
 						if completionCount==total {
-							callback?()
+							callback()
 						}
 				})
 			} else {
 				refreshesSinceLastStatusCheck[p.objectID] = 1
 				completionCount++
 				if completionCount==total {
-					callback?()
+					callback()
 				}
 			}
 		}
 	}
 
-	private func checkPrClosuresInMoc(moc: NSManagedObjectContext, callback: (()->Void)?) {
+	private func checkPrClosuresInMoc(moc: NSManagedObjectContext, callback: Completion) {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		f.predicate = NSPredicate(format: "postSyncAction == %d and condition == %d", PostSyncAction.Delete.rawValue, PullRequestCondition.Open.rawValue)
 		f.returnsObjectsAsFaults = false
@@ -973,16 +973,15 @@ class API {
 
 		let totalOperations = prsToCheck.count
 		if totalOperations==0 {
-			callback?()
+			callback()
 			return
 		}
 
 		var completionCount = 0
-		let completionCallback = { () -> Void in
+		let completionCallback: Completion = {
 			completionCount++
 			if completionCount == totalOperations {
-				callback?()
-				return
+				callback()
 			}
 		}
 
@@ -1007,23 +1006,23 @@ class API {
 		}
 	}
 
-	private func detectAssignedPullRequestsInMoc(moc: NSManagedObjectContext, callback: (()->Void)?) {
+	private func detectAssignedPullRequestsInMoc(moc: NSManagedObjectContext, callback: Completion) {
 
 		let prs = (DataItem.newOrUpdatedItemsOfType("PullRequest", inMoc:moc) as! [PullRequest]).filter({ pr in
 			return pr.apiServer.syncIsGood
 		})
 		if prs.count==0 {
-			callback?()
+			callback()
 			return
 		}
 
 		let totalOperations = prs.count
 		var completionCount = 0
 
-		let completionCallback = { () -> Void in
+		let completionCallback: Completion = {
 			completionCount++
 			if completionCount == totalOperations {
-				callback?()
+				callback()
 			}
 		}
 
@@ -1054,7 +1053,7 @@ class API {
 		}
 	}
 
-	private func ensureApiServersHaveUserIdsInMoc(moc: NSManagedObjectContext, callback: (()->Void)?) {
+	private func ensureApiServersHaveUserIdsInMoc(moc: NSManagedObjectContext, callback: Completion) {
 		var needToCheck = false
 		for apiServer in ApiServer.allApiServersInMoc(moc) {
 			if (apiServer.userId?.integerValue ?? 0) == 0 {
@@ -1067,11 +1066,11 @@ class API {
 			DLog("Some API servers don't have user details yet, will bring user credentials down for them")
 			syncUserDetailsInMoc(moc, callback: callback)
 		} else {
-			callback?()
+			callback()
 		}
 	}
 
-	private func investigatePrClosureFor(r: PullRequest, callback: (()->Void)?) {
+	private func investigatePrClosureFor(r: PullRequest, callback: Completion) {
 		DLog("Checking closed PR to see if it was merged: %@", r.title)
 
 		let repoFullName = r.repo.fullName ?? "NoRepoFullName"
@@ -1095,7 +1094,7 @@ class API {
 				} else {
 					self!.prWasClosed(r)
 				}
-				callback?()
+				callback()
 
 			}, failure: { [weak self] response, data, error in
 				let resultCode = response?.statusCode ?? 0
@@ -1105,7 +1104,7 @@ class API {
 					r.postSyncAction = PostSyncAction.DoNothing.rawValue // don't delete this, we couldn't check, play it safe
 					r.apiServer.lastSyncSucceeded = false
 				}
-				callback?()
+				callback()
 		})
 	}
 
@@ -1163,7 +1162,7 @@ class API {
 		}
 	}
 
-	func getRateLimitFromServer(apiServer: ApiServer, callback: ((Int64, Int64, Int64)->Void)?)
+	func getRateLimitFromServer(apiServer: ApiServer, callback: (Int64, Int64, Int64)->Void)
 	{
 		get("/rate_limit", fromServer: apiServer, ignoreLastSync: true, parameters: nil, extraHeaders: nil,
 			success: { response, data in
@@ -1171,13 +1170,13 @@ class API {
 				let requestsRemaining = (allHeaders["X-RateLimit-Remaining"] as! NSString).longLongValue
 				let requestLimit = (allHeaders["X-RateLimit-Limit"] as! NSString).longLongValue
 				let epochSeconds = (allHeaders["X-RateLimit-Reset"] as! NSString).longLongValue
-				callback?(requestsRemaining, requestLimit, epochSeconds)
+				callback(requestsRemaining, requestLimit, epochSeconds)
 			},
 			failure: { response, data, error in
 				if response?.statusCode == 404 && data != nil && !((data as! NSDictionary).ofk("message") as! String == "Not Found") {
-					callback?(10000, 10000, 0)
+					callback(10000, 10000, 0)
 				} else {
-					callback?(-1, -1, -1)
+					callback(-1, -1, -1)
 				}
 		})
 	}
@@ -1224,10 +1223,10 @@ class API {
 		}
 	}
 
-	func syncWatchedReposFromServer(apiServer: ApiServer, callback: (()->Void)?) {
+	func syncWatchedReposFromServer(apiServer: ApiServer, callback: Completion) {
 
 		if !apiServer.syncIsGood {
-			callback?()
+			callback()
 			return
 		}
 
@@ -1260,16 +1259,16 @@ class API {
 				if !success {
 					apiServer.lastSyncSucceeded = false
 				}
-				callback?()
+				callback()
 		})
 	}
 
-	func syncUserDetailsInMoc(moc: NSManagedObjectContext, callback: (()->Void)?) {
+	func syncUserDetailsInMoc(moc: NSManagedObjectContext, callback: Completion) {
 
 		let allApiServers = ApiServer.allApiServersInMoc(moc)
 		let operationCount = allApiServers.count
 		if operationCount==0 {
-			callback?()
+			callback()
 			return
 		}
 		var completionCount = 0
@@ -1285,24 +1284,24 @@ class API {
 						apiServer.lastSyncSucceeded = false
 					}
 					completionCount++
-					if completionCount==operationCount { callback?() }
+					if completionCount==operationCount { callback() }
 				})
 			} else {
 				completionCount++
-				if completionCount==operationCount { callback?() }
+				if completionCount==operationCount { callback() }
 			}
 		}
 	}
 
-	func testApiToServer(apiServer: ApiServer, callback:((NSError?)->())?) {
+	func testApiToServer(apiServer: ApiServer, callback: (NSError?) -> ()) {
 		get("/rate_limit", fromServer: apiServer, ignoreLastSync: true, parameters: nil, extraHeaders: nil,
 			success: { response, data in
-				callback?(nil)
+				callback(nil)
 				return
 			},
 			failure: { response, data, error in
 				let allOk = (response?.statusCode == 404 && data != nil && !((data as! NSDictionary).ofk("message") as! String == "Not Found"))
-				callback?(allOk ? nil : error)
+				callback(allOk ? nil : error)
 		})
 	}
 
@@ -1322,13 +1321,13 @@ class API {
 		startingFromPage: Int,
 		parameters: Dictionary<String, String>?,
 		extraHeaders: Dictionary<String, String>?,
-		perPageCallback: ((data: [NSDictionary]?, lastPage: Bool)->Bool)?,
-		finalCallback: ((success: Bool, resultCode: Int, etag: String?)->Void)?) {
+		perPageCallback: (data: [NSDictionary]?, lastPage: Bool) -> Bool,
+		finalCallback: (success: Bool, resultCode: Int, etag: String?) -> Void) {
 
 			if path.isEmpty {
 				// handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
 				dispatch_async(dispatch_get_main_queue()) {
-					finalCallback?(success: true, resultCode: -1, etag: nil)
+					finalCallback(success: true, resultCode: -1, etag: nil)
 					return
 				}
 				return
@@ -1348,16 +1347,14 @@ class API {
 
 				if let d = data as? [NSDictionary] {
 					var isLastPage = lastPage
-					if let p = perPageCallback {
-						if p(data: d, lastPage: lastPage) { isLastPage = true }
-						if isLastPage {
-							finalCallback?(success: true, resultCode: resultCode, etag: etag)
-						} else {
-							self!.getPagedDataInPath(path, fromServer: fromServer, startingFromPage: startingFromPage+1, parameters: parameters, extraHeaders: extraHeaders, perPageCallback: perPageCallback, finalCallback: finalCallback)
-						}
+					if perPageCallback(data: d, lastPage: lastPage) { isLastPage = true }
+					if isLastPage {
+						finalCallback(success: true, resultCode: resultCode, etag: etag)
+					} else {
+						self!.getPagedDataInPath(path, fromServer: fromServer, startingFromPage: startingFromPage+1, parameters: parameters, extraHeaders: extraHeaders, perPageCallback: perPageCallback, finalCallback: finalCallback)
 					}
 				} else {
-					finalCallback?(success: resultCode==304, resultCode: resultCode, etag: etag)
+					finalCallback(success: resultCode==304, resultCode: resultCode, etag: etag)
 				}
 			}
 	}
@@ -1367,7 +1364,7 @@ class API {
 		fromServer: ApiServer,
 		parameters: Dictionary<String, String>?,
 		extraHeaders: Dictionary<String, String>?,
-		callback:((data: AnyObject?, lastPage: Bool, resultCode: Int, etag: String?)->Void)?) {
+		callback:(data: AnyObject?, lastPage: Bool, resultCode: Int, etag: String?) -> Void) {
 
 			get(path, fromServer: fromServer, ignoreLastSync: false, parameters: parameters, extraHeaders: extraHeaders,
 				success: { [weak self] response, data in
@@ -1381,7 +1378,7 @@ class API {
 
 					let etag = allHeaders["Etag"] as? String
 					let code = response!.statusCode ?? 0
-					callback?(data: data, lastPage: self!.lastPage(response!), resultCode: code, etag: etag)
+					callback(data: data, lastPage: self!.lastPage(response!), resultCode: code, etag: etag)
 
 				}, failure: { response, data, error in
 					let code = response?.statusCode ?? 0
@@ -1390,7 +1387,7 @@ class API {
 					} else {
 						DLog("(%@) failure for %@: %@", fromServer.label, path, error?.localizedDescription)
 					}
-					callback?(data: nil, lastPage: false, resultCode: code, etag: nil)
+					callback(data: nil, lastPage: false, resultCode: code, etag: nil)
 			})
 	}
 
@@ -1400,8 +1397,8 @@ class API {
 		ignoreLastSync: Bool,
 		parameters: Dictionary<String, String>?,
 		extraHeaders: Dictionary<String, String>?,
-		success: ((response: NSHTTPURLResponse?, data: AnyObject?)->Void)?,
-		failure: ((response: NSHTTPURLResponse?, data: AnyObject?, error: NSError?)->Void)?) {
+		success: ((response: NSHTTPURLResponse?, data: AnyObject?) -> Void)?,
+		failure: ((response: NSHTTPURLResponse?, data: AnyObject?, error: NSError?) -> Void)?) {
 
 			var apiServerLabel: String
 			if fromServer.syncIsGood || ignoreLastSync {
@@ -1488,14 +1485,12 @@ class API {
 					DLog("(%@) GET %@ - FAILED: %@", apiServerLabel, fullUrlPath, error!.localizedDescription)
 					dispatch_async(dispatch_get_main_queue()) {
 						failure?(response: response, data: parsedData, error: error)
-						return
 					}
 				} else {
 					DLog("(%@) GET %@ - RESULT: %d", apiServerLabel, fullUrlPath, response?.statusCode)
 					self!.badLinks.removeValueForKey(fullUrlPath)
 					dispatch_async(dispatch_get_main_queue()) {
 						success?(response: response, data: parsedData)
-						return
 					}
 				}
 
