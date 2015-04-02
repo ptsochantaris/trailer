@@ -27,6 +27,7 @@ class ApiServer: NSManagedObject {
     @NSManaged var repos: NSSet
     @NSManaged var statuses: NSSet
 	@NSManaged var teams: NSSet
+    @NSManaged var issues: NSSet
 
 	var syncIsGood: Bool {
 		return self.lastSyncSucceeded?.boolValue ?? true
@@ -101,7 +102,7 @@ class ApiServer: NSManagedObject {
 
 	func rollBackAllUpdatesInMoc(moc: NSManagedObjectContext) {
 		DLog("Rolling back changes for failed sync on API server '%@'",label)
-		for set in [repos, pullRequests, comments, statuses, labels] {
+		for set in [repos, pullRequests, comments, statuses, labels, issues, teams] {
 			for dataItem: DataItem in set.allObjects as! [DataItem] {
 				if let action = dataItem.postSyncAction?.integerValue {
 					switch action {
