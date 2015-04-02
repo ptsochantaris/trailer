@@ -1460,7 +1460,7 @@ class API {
 				let response = res as? NSHTTPURLResponse
 				var parsedData: AnyObject?
 				if data?.length > 0 {
-					parsedData = NSJSONSerialization.JSONObjectWithData(data!, options: NSJSONReadingOptions.allZeros, error:nil)
+					parsedData = NSJSONSerialization.JSONObjectWithData(data!, options: NSJSONReadingOptions.allZeros, error: nil)
 				}
 				var error = e
 				if error == nil && response?.statusCode > 299 {
