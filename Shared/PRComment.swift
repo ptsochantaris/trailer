@@ -39,14 +39,10 @@ class PRComment: DataItem {
 	}
 
 	func notificationSubtitle() -> String {
-		if let pr = pullRequest {
-			if let title = pr.title {
-				return title
-			}
-		} else if let i = issue {
-			if let title = i.title {
-				return title
-			}
+		if let pr = pullRequest, title = pr.title {
+			return title
+		} else if let i = issue, title = i.title {
+			return title
 		}
 		return "(untitled)"
 	}

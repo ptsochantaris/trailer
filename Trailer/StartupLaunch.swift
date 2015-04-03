@@ -9,18 +9,15 @@ class StartupLaunch: NSObject {
 	class func itemReferencesInLoginItems() -> (existingReference: LSSharedFileListItemRef?, lastReference: LSSharedFileListItemRef?) {
 		var itemUrl : UnsafeMutablePointer<Unmanaged<CFURL>?> = UnsafeMutablePointer<Unmanaged<CFURL>?>.alloc(1)
 		if let appUrl : NSURL = NSURL.fileURLWithPath(NSBundle.mainBundle().bundlePath) {
-			let loginItemsRef = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems.takeRetainedValue(), nil).takeRetainedValue() as LSSharedFileListRef?
-			if loginItemsRef != nil {
+			if let loginItemsRef = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems.takeRetainedValue(), nil).takeRetainedValue() as LSSharedFileListRef? {
 				let loginItems: NSArray = LSSharedFileListCopySnapshot(loginItemsRef, nil).takeRetainedValue() as NSArray
 				if loginItems.count > 0 {
 					let lastItemRef: LSSharedFileListItemRef = loginItems.lastObject as! LSSharedFileListItemRef
 					for var i = 0; i < loginItems.count; ++i {
 						let currentItemRef: LSSharedFileListItemRef = loginItems.objectAtIndex(i) as! LSSharedFileListItemRef
 						if LSSharedFileListItemResolve(currentItemRef, 0, itemUrl, nil) == noErr {
-							if let urlRef: NSURL =  itemUrl.memory?.takeRetainedValue() {
-								if urlRef.isEqual(appUrl) {
-									return (currentItemRef, lastItemRef)
-								}
+							if let urlRef: NSURL =  itemUrl.memory?.takeRetainedValue() where urlRef.isEqual(appUrl) {
+								return (currentItemRef, lastItemRef)
 							}
 						}
 					}
@@ -39,8 +36,7 @@ class StartupLaunch: NSObject {
 	class func setLaunchOnLogin(launch: Bool) {
 		let itemReferences = itemReferencesInLoginItems()
 		let isSet = (itemReferences.existingReference != nil)
-		let loginItemsRef = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems.takeRetainedValue(), nil).takeRetainedValue() as LSSharedFileListRef?
-		if loginItemsRef != nil {
+		if let loginItemsRef = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems.takeRetainedValue(), nil).takeRetainedValue() as LSSharedFileListRef? {
 			if launch && !isSet {
 				if let appUrl : CFURLRef = NSURL.fileURLWithPath(NSBundle.mainBundle().bundlePath) {
 					LSSharedFileListInsertItemURL(loginItemsRef, itemReferences.lastReference, nil, nil, appUrl, nil, nil)

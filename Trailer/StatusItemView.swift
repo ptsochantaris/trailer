@@ -59,7 +59,7 @@ class StatusItemView: NSView {
 	}
 
 	override func mouseDown(theEvent: NSEvent) {
-		if let t = tappedCallback { t() }
+		tappedCallback?()
 	}
 
 	override func drawRect(dirtyRect: NSRect) {

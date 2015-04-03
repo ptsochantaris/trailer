@@ -78,9 +78,7 @@ class PRDetailController: WKInterfaceController {
 
 	override func table(table: WKInterfaceTable, didSelectRowAtIndex rowIndex: Int) {
 		let r: AnyObject? = table.rowControllerAtIndex(rowIndex)
-		if let
-			c = r as? CommentRow,
-			commentId = c.commentId
+		if let c = r as? CommentRow, commentId = c.commentId
 		{
 			presentControllerWithName("Command Controller", context: ["command": "opencomment", "id": commentId])
 		}

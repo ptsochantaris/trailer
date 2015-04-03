@@ -19,10 +19,8 @@ class LinkField: CenterTextField {
 
 		addTrackingArea(newArea)
 
-		if let point = window?.mouseLocationOutsideOfEventStream {
-			if NSPointInRect(point, check) {
-				mouseEntered(NSEvent())
-			}
+		if let point = window?.mouseLocationOutsideOfEventStream where NSPointInRect(point, check) {
+			mouseEntered(NSEvent())
 		}
 	}
 

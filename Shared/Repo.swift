@@ -73,10 +73,8 @@ class Repo: DataItem {
 	class func reposForFilter(filter: String?) -> [Repo] {
 		let f = NSFetchRequest(entityName: "Repo")
 		f.returnsObjectsAsFaults = false
-		if let filterText = filter {
-			if !filterText.isEmpty {
-				f.predicate = NSPredicate(format: "fullName contains [cd] %@", filterText)
-			}
+		if let filterText = filter where !filterText.isEmpty {
+			f.predicate = NSPredicate(format: "fullName contains [cd] %@", filterText)
 		}
 		f.sortDescriptors = [
 			NSSortDescriptor(key: "fork", ascending: true),

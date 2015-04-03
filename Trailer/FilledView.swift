@@ -25,8 +25,7 @@ class FilledView: NSView {
 		if let b = backgroundColor {
 			b.set()
 			if let c = cornerRadius {
-				let path = NSBezierPath(roundedRect: dirtyRect, xRadius: c, yRadius: c)
-				path.addClip()
+				NSBezierPath(roundedRect: dirtyRect, xRadius: c, yRadius: c).addClip()
 			}
 			NSRectFill(dirtyRect)
 		} else if let b = borderColor {

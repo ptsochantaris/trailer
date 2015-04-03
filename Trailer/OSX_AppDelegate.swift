@@ -170,10 +170,8 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		if ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
 			startRefresh()
 		} else if ApiServer.countApiServersInMoc(mainObjectContext) == 1 {
-			if let a = ApiServer.allApiServersInMoc(mainObjectContext).first {
-				if a.authToken == nil || a.authToken!.isEmpty {
-					startupAssistant()
-				}
+			if let a = ApiServer.allApiServersInMoc(mainObjectContext).first where a.authToken == nil || a.authToken!.isEmpty {
+				startupAssistant()
 			}
 		}
 
@@ -500,20 +498,16 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 					if let itemId = DataManager.idForUriPath(userInfo[PULL_REQUEST_ID_KEY] as? String) {
 						pullRequest = mainObjectContext.existingObjectWithID(itemId, error: nil) as? PullRequest
 						urlToOpen = pullRequest?.webUrl
-					} else if let itemId = DataManager.idForUriPath(userInfo[COMMENT_ID_KEY] as? String) {
-						if let c = mainObjectContext.existingObjectWithID(itemId, error: nil) as? PRComment {
-							pullRequest = c.pullRequest
-							urlToOpen = c.webUrl
-						}
+					} else if let itemId = DataManager.idForUriPath(userInfo[COMMENT_ID_KEY] as? String), c = mainObjectContext.existingObjectWithID(itemId, error: nil) as? PRComment {
+						pullRequest = c.pullRequest
+						urlToOpen = c.webUrl
 					}
 					pullRequest?.catchUpWithComments()
 				}
-				if let up = urlToOpen {
-					if let u = NSURL(string: up) {
-						NSWorkspace.sharedWorkspace().openURL(u)
-						updatePrMenu()
-						updateIssuesMenu()
-					}
+				if let up = urlToOpen, u = NSURL(string: up) {
+					NSWorkspace.sharedWorkspace().openURL(u)
+					updatePrMenu()
+					updateIssuesMenu()
 				}
 			}
 		default: break
@@ -856,15 +850,13 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	}
 
 	@IBAction func deleteSelectedServerSelected(sender: NSButton) {
-		if let selectedServer = selectedServer() {
-			if let index = indexOfObject(ApiServer.allApiServersInMoc(mainObjectContext), selectedServer) {
-				mainObjectContext.deleteObject(selectedServer)
-				serverList.reloadData()
-				serverList.selectRowIndexes(NSIndexSet(index: min(index, serverList.numberOfRows-1)), byExtendingSelection: false)
-				fillServerApiFormFromSelectedServer()
-				deferredUpdate()
-				DataManager.saveDB()
-			}
+		if let selectedServer = selectedServer(), index = indexOfObject(ApiServer.allApiServersInMoc(mainObjectContext), selectedServer) {
+			mainObjectContext.deleteObject(selectedServer)
+			serverList.reloadData()
+			serverList.selectRowIndexes(NSIndexSet(index: min(index, serverList.numberOfRows-1)), byExtendingSelection: false)
+			fillServerApiFormFromSelectedServer()
+			deferredUpdate()
+			DataManager.saveDB()
 		}
 	}
 

@@ -332,10 +332,8 @@ class DataManager : NSObject {
 	}
 
 	class func idForUriPath(uriPath: String?) -> NSManagedObjectID? {
-		if let up = uriPath {
-			if let u = NSURL(string: up) {
-				return persistentStoreCoordinator()!.managedObjectIDForURIRepresentation(u)
-			}
+		if let up = uriPath, u = NSURL(string: up) {
+			return persistentStoreCoordinator()!.managedObjectIDForURIRepresentation(u)
 		}
 		return nil
 	}
@@ -362,7 +360,6 @@ class DataManager : NSObject {
 ///////////////////////////////////////
 
 let mainObjectContext = buildMainContext()
-var _managedObjectModel: NSManagedObjectModel?
 var _persistentStoreCoordinator: NSPersistentStoreCoordinator?
 var _justMigrated: Bool = false
 
@@ -389,7 +386,8 @@ func persistentStoreCoordinator() -> NSPersistentStoreCoordinator? {
 
 	if let p = _persistentStoreCoordinator { return p }
 
-	let mom = managedObjectModel()
+	let modelURL = NSBundle.mainBundle().URLForResource("Trailer", withExtension: "momd")!
+	let mom = NSManagedObjectModel(contentsOfURL: modelURL)!
 	_persistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel:mom)
 	let fileManager = NSFileManager.defaultManager()
 	let applicationDirectory = applicationFilesDirectory()
@@ -449,13 +447,6 @@ private func sharedFilesDirectory() -> NSURL {
     var appSupportURL = NSFileManager.defaultManager().containerURLForSecurityApplicationGroupIdentifier("group.Trailer")!
     DLog("Shared files in %@", appSupportURL)
     return appSupportURL
-}
-
-func managedObjectModel() -> NSManagedObjectModel {
-	if let m = _managedObjectModel { return m }
-	let modelURL = NSBundle.mainBundle().URLForResource("Trailer", withExtension: "momd")!
-	_managedObjectModel = NSManagedObjectModel(contentsOfURL: modelURL)
-	return _managedObjectModel!
 }
 
 func addStorePath(sqlStore: NSURL) -> Bool {

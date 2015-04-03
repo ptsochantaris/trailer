@@ -75,25 +75,19 @@ class ListableItem: DataItem {
 	}
 
 	func isMine() -> Bool {
-		if let assigned = assignedToMe?.boolValue {
-			if assigned && Settings.moveAssignedPrsToMySection {
-				return true
-			}
+		if let assigned = assignedToMe?.boolValue where assigned && Settings.moveAssignedPrsToMySection {
+			return true
 		}
-		if let userId = userId {
-			if let apiId = apiServer.userId {
-				return userId == apiId
-			}
+		if let userId = userId, apiId = apiServer.userId where userId == apiId {
+			return true
 		}
 		return false
 	}
 
 	func refersToMe() -> Bool {
-		if let apiName = apiServer.userName {
-			if let b = body {
-				let range = b.rangeOfString("@"+apiName, options: NSStringCompareOptions.CaseInsensitiveSearch | NSStringCompareOptions.DiacriticInsensitiveSearch)
-				return range != nil
-			}
+		if let apiName = apiServer.userName, b = body {
+			let range = b.rangeOfString("@"+apiName, options: NSStringCompareOptions.CaseInsensitiveSearch | NSStringCompareOptions.DiacriticInsensitiveSearch)
+			return range != nil
 		}
 		return false
 	}
@@ -200,10 +194,8 @@ class ListableItem: DataItem {
 			f.predicate = predicateForOthersCommentsSinceDate(latestReadCommentDate)
 			f.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: true)]
 			let ret = managedObjectContext?.executeFetchRequest(f, error: nil) as! [PRComment]
-			if let firstComment = ret.first {
-				if let url = firstComment.webUrl {
-					return url
-				}
+			if let firstComment = ret.first, url = firstComment.webUrl {
+				return url
 			}
 		}
 
@@ -281,5 +273,20 @@ class ListableItem: DataItem {
 
 	func predicateForOthersCommentsSinceDate(optionalDate: NSDate?) -> NSPredicate {
 		return NSPredicate() // should never reach here, always override
+	}
+
+	class func badgeCountFromFetch(f: NSFetchRequest, inMoc: NSManagedObjectContext) -> Int {
+		var badgeCount:Int = 0
+		let showCommentsEverywhere = Settings.showCommentsEverywhere
+		for i in inMoc.executeFetchRequest(f, error: nil) as! [ListableItem] {
+			if let sectionIndex = i.sectionIndex?.integerValue {
+				if showCommentsEverywhere || sectionIndex==PullRequestSection.Mine.rawValue || sectionIndex==PullRequestSection.Participated.rawValue {
+					if let c = i.unreadComments?.integerValue {
+						badgeCount += c
+					}
+				}
+			}
+		}
+		return badgeCount
 	}
 }

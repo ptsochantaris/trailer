@@ -26,10 +26,8 @@ class Issue: ListableItem {
 				i.userAvatarUrl = userInfo.ofk("avatar_url") as? String
 			}
 
-			if let N = i.number {
-				if let R = inRepo.fullName {
-					i.commentsLink = "/repos/\(R)/issues/\(N)/comments"
-				}
+			if let N = i.number, R = inRepo.fullName {
+				i.commentsLink = "/repos/\(R)/issues/\(N)/comments"
 			}
 
 			for l in i.labels {
@@ -66,20 +64,18 @@ class Issue: ListableItem {
 			andPredicates.append(NSPredicate(format: "sectionIndex == %d", sectionIndex))
 		}
 
-		if let fi = filter {
-			if !fi.isEmpty {
+		if let fi = filter where !fi.isEmpty {
 
-				var orPredicates = [NSPredicate]()
-				orPredicates.append(NSPredicate(format: "title contains[cd] %@", fi))
-				orPredicates.append(NSPredicate(format: "userLogin contains[cd] %@", fi))
-				if Settings.includeReposInFilter {
-					orPredicates.append(NSPredicate(format: "repo.fullName contains[cd] %@", fi))
-				}
-				if Settings.includeLabelsInFilter {
-					orPredicates.append(NSPredicate(format: "any labels.name contains[cd] %@", fi))
-				}
-				andPredicates.append(NSCompoundPredicate.orPredicateWithSubpredicates(orPredicates))
+			var orPredicates = [NSPredicate]()
+			orPredicates.append(NSPredicate(format: "title contains[cd] %@", fi))
+			orPredicates.append(NSPredicate(format: "userLogin contains[cd] %@", fi))
+			if Settings.includeReposInFilter {
+				orPredicates.append(NSPredicate(format: "repo.fullName contains[cd] %@", fi))
 			}
+			if Settings.includeLabelsInFilter {
+				orPredicates.append(NSPredicate(format: "any labels.name contains[cd] %@", fi))
+			}
+			andPredicates.append(NSCompoundPredicate.orPredicateWithSubpredicates(orPredicates))
 		}
 
 		if Settings.shouldHideUncommentedRequests {
@@ -131,35 +127,13 @@ class Issue: ListableItem {
 
 	class func badgeCountInMoc(moc: NSManagedObjectContext) -> Int {
 		let f = requestForIssuesWithFilter(nil, sectionIndex: -1)
-		var badgeCount:Int = 0
-		let showCommentsEverywhere = Settings.showCommentsEverywhere
-		for i in moc.executeFetchRequest(f, error: nil) as! [Issue] {
-			if let sectionIndex = i.sectionIndex?.integerValue {
-				if showCommentsEverywhere || sectionIndex==PullRequestSection.Mine.rawValue || sectionIndex==PullRequestSection.Participated.rawValue {
-					if let c = i.unreadComments?.integerValue {
-						badgeCount += c
-					}
-				}
-			}
-		}
-		return badgeCount
+		return badgeCountFromFetch(f, inMoc: moc)
 	}
 
 	class func badgeCountInSection(section: PullRequestSection, moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest(entityName: "Issue")
 		f.predicate = NSPredicate(format: "sectionIndex == %d", section.rawValue)
-		var badgeCount:Int = 0
-		let showCommentsEverywhere = Settings.showCommentsEverywhere
-		for p in moc.executeFetchRequest(f, error: nil) as! [Issue] {
-			if let sectionIndex = p.sectionIndex?.integerValue {
-				if showCommentsEverywhere || sectionIndex==PullRequestSection.Mine.rawValue || sectionIndex==PullRequestSection.Participated.rawValue {
-					if let c = p.unreadComments?.integerValue {
-						badgeCount += c
-					}
-				}
-			}
-		}
-		return badgeCount
+		return badgeCountFromFetch(f, inMoc: moc)
 	}
 
 	class func countOpenIssuesInMoc(moc: NSManagedObjectContext) -> Int {

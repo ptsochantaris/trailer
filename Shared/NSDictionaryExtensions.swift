@@ -3,10 +3,8 @@ import Foundation
 extension NSDictionary {
 	
 	func ofk(key:AnyObject) -> AnyObject? {
-		if let o:AnyObject = objectForKey(key) {
-			if !o.isKindOfClass(NSNull) {
-				return o
-			}
+		if let o:AnyObject = objectForKey(key) where !o.isKindOfClass(NSNull) {
+			return o
 		}
 		return nil
 	}

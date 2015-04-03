@@ -116,16 +116,12 @@ class DetailViewController: UIViewController, WKNavigationDelegate {
 	{
 		if let oid = catchupWithDataItemWhenLoaded {
 			let dataItem = mainObjectContext.existingObjectWithID(oid, error: nil)
-			if let pr = dataItem as? PullRequest {
-				if (pr.unreadComments?.integerValue ?? 0) > 0 {
-					pr.catchUpWithComments()
-					DataManager.saveDB()
-				}
-			} else if let i = dataItem as? Issue {
-				if (i.unreadComments?.integerValue ?? 0) > 0 {
-					i.catchUpWithComments()
-					DataManager.saveDB()
-				}
+			if let pr = dataItem as? PullRequest where (pr.unreadComments?.integerValue ?? 0) > 0 {
+				pr.catchUpWithComments()
+				DataManager.saveDB()
+			} else if let i = dataItem as? Issue where (i.unreadComments?.integerValue ?? 0) > 0 {
+				i.catchUpWithComments()
+				DataManager.saveDB()
 			}
 			catchupWithDataItemWhenLoaded = nil
 		}

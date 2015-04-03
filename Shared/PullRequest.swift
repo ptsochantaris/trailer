@@ -59,23 +59,21 @@ class PullRequest: ListableItem {
 			andPredicates.append(NSPredicate(format: "sectionIndex == %d", sectionIndex))
 		}
 
-		if let fi = filter {
-			if !fi.isEmpty {
+		if let fi = filter where !fi.isEmpty {
 
-				var orPredicates = [NSPredicate]()
-				orPredicates.append(NSPredicate(format: "title contains[cd] %@", fi))
-				orPredicates.append(NSPredicate(format: "userLogin contains[cd] %@", fi))
-				if Settings.includeReposInFilter {
-					orPredicates.append(NSPredicate(format: "repo.fullName contains[cd] %@", fi))
-				}
-				if Settings.includeLabelsInFilter {
-					orPredicates.append(NSPredicate(format: "any labels.name contains[cd] %@", fi))
-				}
-				if Settings.includeStatusesInFilter {
-					orPredicates.append(NSPredicate(format: "any statuses.descriptionText contains[cd] %@", fi))
-				}
-				andPredicates.append(NSCompoundPredicate.orPredicateWithSubpredicates(orPredicates))
+			var orPredicates = [NSPredicate]()
+			orPredicates.append(NSPredicate(format: "title contains[cd] %@", fi))
+			orPredicates.append(NSPredicate(format: "userLogin contains[cd] %@", fi))
+			if Settings.includeReposInFilter {
+				orPredicates.append(NSPredicate(format: "repo.fullName contains[cd] %@", fi))
 			}
+			if Settings.includeLabelsInFilter {
+				orPredicates.append(NSPredicate(format: "any labels.name contains[cd] %@", fi))
+			}
+			if Settings.includeStatusesInFilter {
+				orPredicates.append(NSPredicate(format: "any statuses.descriptionText contains[cd] %@", fi))
+			}
+			andPredicates.append(NSCompoundPredicate.orPredicateWithSubpredicates(orPredicates))
 		}
 
 		if Settings.shouldHideUncommentedRequests {
@@ -148,48 +146,24 @@ class PullRequest: ListableItem {
 	class func badgeCountInSection(section: PullRequestSection, moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		f.predicate = NSPredicate(format: "sectionIndex == %d", section.rawValue)
-		var badgeCount:Int = 0
-		let showCommentsEverywhere = Settings.showCommentsEverywhere
-		for p in moc.executeFetchRequest(f, error: nil) as! [PullRequest] {
-			if let sectionIndex = p.sectionIndex?.integerValue {
-				if showCommentsEverywhere || sectionIndex==PullRequestSection.Mine.rawValue || sectionIndex==PullRequestSection.Participated.rawValue {
-					if let c = p.unreadComments?.integerValue {
-						badgeCount += c
-					}
-				}
-			}
-		}
-		return badgeCount
+		return badgeCountFromFetch(f, inMoc: moc)
 	}
 
 	class func badgeCountInMoc(moc: NSManagedObjectContext) -> Int {
 		let f = requestForPullRequestsWithFilter(nil, sectionIndex: -1)
-		var badgeCount:Int = 0
-		let showCommentsEverywhere = Settings.showCommentsEverywhere
-		for p in moc.executeFetchRequest(f, error: nil) as! [PullRequest] {
-			if let sectionIndex = p.sectionIndex?.integerValue {
-				if showCommentsEverywhere || sectionIndex==PullRequestSection.Mine.rawValue || sectionIndex==PullRequestSection.Participated.rawValue {
-					if let c = p.unreadComments?.integerValue {
-						badgeCount += c
-					}
-				}
-			}
-		}
-		return badgeCount
+		return badgeCountFromFetch(f, inMoc: moc)
 	}
 
 	func markUnmergeable() -> Bool {
-		if let m = mergeable?.boolValue {
-			if !m {
-				if let s = sectionIndex?.integerValue {
-					if s == PullRequestCondition.Merged.rawValue || s == PullRequestCondition.Closed.rawValue {
-						return false
-					}
-					if s == PullRequestSection.All.rawValue && Settings.markUnmergeableOnUserSectionsOnly {
-						return false
-					}
-					return true
+		if let m = mergeable?.boolValue where m == false {
+			if let s = sectionIndex?.integerValue {
+				if s == PullRequestCondition.Merged.rawValue || s == PullRequestCondition.Closed.rawValue {
+					return false
 				}
+				if s == PullRequestSection.All.rawValue && Settings.markUnmergeableOnUserSectionsOnly {
+					return false
+				}
+				return true
 			}
 		}
 		return false
@@ -214,7 +188,7 @@ class PullRequest: ListableItem {
 			if let n = repo.fullName {
 				var darkSubtitle = lightSubtitle
 				darkSubtitle[NSForegroundColorAttributeName] = darkColor
-				_subtitle.appendAttributedString(NSAttributedString(string:n, attributes:darkSubtitle))
+				_subtitle.appendAttributedString(NSAttributedString(string: n, attributes: darkSubtitle))
 				_subtitle.appendAttributedString(separator)
 			}
 		}
@@ -231,13 +205,11 @@ class PullRequest: ListableItem {
 		}
 
 		#if os(iOS)
-			if let m = mergeable?.boolValue {
-				if !m {
-					_subtitle.appendAttributedString(separator)
-					var redSubtitle = lightSubtitle
-					redSubtitle[NSForegroundColorAttributeName] = COLOR_CLASS.redColor()
-					_subtitle.appendAttributedString(NSAttributedString(string: "Cannot be merged!", attributes:redSubtitle))
-				}
+			if let m = mergeable?.boolValue where m == false {
+				_subtitle.appendAttributedString(separator)
+				var redSubtitle = lightSubtitle
+				redSubtitle[NSForegroundColorAttributeName] = COLOR_CLASS.redColor()
+				_subtitle.appendAttributedString(NSAttributedString(string: "Cannot be merged!", attributes:redSubtitle))
 			}
 		#endif
 
@@ -260,10 +232,8 @@ class PullRequest: ListableItem {
 			components.append("Updated \(itemDateFormatter.stringFromDate(updatedAt!))")
 		}
 
-		if let m = mergeable?.boolValue {
-			if !m {
-				components.append("Cannot be merged!")
-			}
+		if let m = mergeable?.boolValue where m == false {
+			components.append("Cannot be merged!")
 		}
 
 		return ",".join(components)
