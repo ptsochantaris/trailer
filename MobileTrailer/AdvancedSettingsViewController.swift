@@ -291,7 +291,7 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 					app.preferencesDirty = true
 				} else {
 					for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
-						for i in r.issues.allObjects as! [Issue] {
+						for i in r.issues {
 							i.postSyncAction = PostSyncAction.Delete.rawValue
 						}
 					}
