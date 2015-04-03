@@ -123,11 +123,12 @@ class DataManager : NSObject {
 
 		var latestStatuses = PRStatus.newItemsOfType("PRStatus", inMoc: mainObjectContext) as! [PRStatus]
 		if Settings.notifyOnStatusUpdates {
-			let coveredPrs = NSMutableSet()
+			var coveredPrs = Set<NSManagedObjectID>()
 			for s in latestStatuses {
 				if Settings.notifyOnStatusUpdatesForAllPrs || s.pullRequest.isMine() {
 					let pr = s.pullRequest
-					if !coveredPrs.containsObject(pr) {
+					if !coveredPrs.contains(pr.objectID) {
+						coveredPrs.insert(pr.objectID)
 						if let s = pr.displayedStatuses().first {
                             let displayText = s.descriptionText
                             if pr.lastStatusNotified != displayText && pr.postSyncAction?.integerValue != PostSyncAction.NoteNew.rawValue {
@@ -137,7 +138,6 @@ class DataManager : NSObject {
                         } else {
                             pr.lastStatusNotified = nil
                         }
-						coveredPrs.addObject(pr)
 					}
 				}
 			}

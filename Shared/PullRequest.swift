@@ -298,18 +298,16 @@ class PullRequest: ListableItem {
 		f.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: false)]
 
 		var result = [PRStatus]()
-		let targetUrls = NSMutableSet()
-		let descriptions = NSMutableSet()
+		var targetUrls = Set<String>()
+		var descriptions = Set<String>()
 		for s in managedObjectContext?.executeFetchRequest(f, error: nil) as! [PRStatus] {
-			var targetUrl: String
-			if let t = s.targetUrl { targetUrl = t } else { targetUrl = "" }
-			var desc: String
-			if let d = s.descriptionText { desc = d } else { desc = "(No status description)" }
+			let targetUrl = s.targetUrl ?? ""
+			let desc = s.descriptionText ?? "(No status description)"
 
-			if !descriptions.containsObject(desc) {
-				descriptions.addObject(desc)
-				if !targetUrls.containsObject(targetUrl) {
-					targetUrls.addObject(targetUrl)
+			if !descriptions.contains(desc) {
+				descriptions.insert(desc)
+				if !targetUrls.contains(targetUrl) {
+					targetUrls.insert(targetUrl)
 					result.append(s)
 				}
 			}
