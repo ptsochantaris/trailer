@@ -211,28 +211,6 @@ class DataManager : NSObject {
 		return c
 	}
 
-	class func deleteEverything() {
-		autoreleasepool {
-			let tempMoc = DataManager.tempContext()
-			for entity in managedObjectModel().entities {
-				if let name = entity.name {
-					if name != "ApiServer" {
-						autoreleasepool {
-							let f = NSFetchRequest(entityName: name)
-							f.includesPropertyValues = false
-							f.includesSubentities = false
-							for o in tempMoc.executeFetchRequest(f, error:nil) as! [NSManagedObject] {
-								tempMoc.deleteObject(o)
-							}
-						}
-					}
-				}
-			}
-			tempMoc.save(nil)
-		}
-		DataManager.saveDB()
-	}
-
 	class func infoForType(type: PRNotificationType, item: NSManagedObject) -> Dictionary<String, AnyObject> {
 		switch type {
 		case .NewMention: fallthrough
