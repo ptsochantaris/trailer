@@ -12,8 +12,8 @@ class Repo: DataItem {
     @NSManaged var lastDirtied: NSDate?
     @NSManaged var webUrl: String?
 
-	@NSManaged var pullRequests: NSSet
-	@NSManaged var issues: NSSet
+	@NSManaged var pullRequests: Set<PullRequest>
+	@NSManaged var issues: Set<Issue>
 
 	class func repoWithInfo(info: NSDictionary, fromServer: ApiServer) -> Repo {
 		let r = DataItem.itemWithInfo(info, type: "Repo", fromServer: fromServer) as! Repo
@@ -61,7 +61,7 @@ class Repo: DataItem {
 		return moc.executeFetchRequest(f, error: nil) as! [Repo]
 	}
 
-	class func markDirtyReposWithIds(ids: NSSet, inMoc: NSManagedObjectContext) {
+	class func markDirtyReposWithIds(ids: Set<NSNumber>, inMoc: NSManagedObjectContext) {
 		let f = NSFetchRequest(entityName: "Repo")
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "serverId IN %@", ids)

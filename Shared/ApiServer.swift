@@ -21,13 +21,13 @@ class ApiServer: NSManagedObject {
     @NSManaged var webPath: String?
 	@NSManaged var createdAt: NSDate?
 
-    @NSManaged var comments: NSSet
-    @NSManaged var labels: NSSet
-    @NSManaged var pullRequests: NSSet
-    @NSManaged var repos: NSSet
-    @NSManaged var statuses: NSSet
-	@NSManaged var teams: NSSet
-    @NSManaged var issues: NSSet
+    @NSManaged var comments: Set<PRComment>
+    @NSManaged var labels: Set<PRLabel>
+    @NSManaged var pullRequests: Set<PullRequest>
+    @NSManaged var repos: Set<Repo>
+    @NSManaged var statuses: Set<PRStatus>
+	@NSManaged var teams: Set<Team>
+    @NSManaged var issues: Set<Issue>
 
 	var syncIsGood: Bool {
 		return self.lastSyncSucceeded?.boolValue ?? true
@@ -122,8 +122,8 @@ class ApiServer: NSManagedObject {
 
 	func clearAllRelatedInfo() {
 		if let moc = managedObjectContext {
-			for repo in repos.allObjects as! [Repo] {
-				moc.deleteObject(repo)
+			for r in repos {
+				moc.deleteObject(r)
 			}
 		}
 	}

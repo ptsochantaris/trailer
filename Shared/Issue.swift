@@ -32,8 +32,8 @@ class Issue: ListableItem {
 				}
 			}
 
-			for existingLabel in i.labels.allObjects as! [PRLabel] {
-				existingLabel.postSyncAction = PostSyncAction.Delete.rawValue
+			for l in i.labels {
+				l.postSyncAction = PostSyncAction.Delete.rawValue
 			}
 
 			if let labelsList = info.ofk("labels") as? [NSDictionary] {

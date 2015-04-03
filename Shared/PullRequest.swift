@@ -15,7 +15,7 @@ class PullRequest: ListableItem {
 	@NSManaged var statusesLink: String?
 	@NSManaged var lastStatusNotified: String?
 
-	@NSManaged var statuses: NSSet
+	@NSManaged var statuses: Set<PRStatus>
 
 	class func pullRequestWithInfo(info: NSDictionary, fromServer: ApiServer, inRepo: Repo) -> PullRequest {
 		let p = DataItem.itemWithInfo(info, type: "PullRequest", fromServer: fromServer) as! PullRequest

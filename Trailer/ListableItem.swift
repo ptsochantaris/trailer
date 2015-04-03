@@ -19,8 +19,6 @@ class ListableItem: DataItem {
 	@NSManaged var webUrl: String?
 	@NSManaged var condition: NSNumber?
 	@NSManaged var isNewAssignment: NSNumber?
-	@NSManaged var comments: NSSet
-	@NSManaged var labels: NSSet
 	@NSManaged var repo: Repo
 	@NSManaged var title: String?
 	@NSManaged var totalComments: NSNumber?
@@ -34,6 +32,9 @@ class ListableItem: DataItem {
 	@NSManaged var state: String?
 	@NSManaged var reopened: NSNumber?
 	@NSManaged var number: NSNumber?
+
+	@NSManaged var comments: Set<PRComment>
+	@NSManaged var labels: Set<PRLabel>
 
 	override func prepareForDeletion() {
 		api.refreshesSinceLastLabelsCheck[objectID] = nil
@@ -51,7 +52,7 @@ class ListableItem: DataItem {
 	}
 
 	func sortedComments(comparison: NSComparisonResult) -> [PRComment] {
-		return (comments.allObjects as! [PRComment]).sorted({ (c1, c2) -> Bool in
+		return Array(comments).sorted({ (c1, c2) -> Bool in
 			let d1 = c1.createdAt ?? NSDate.distantPast() as! NSDate
 			let d2 = c2.createdAt ?? NSDate.distantPast() as! NSDate
 			return d1.compare(d2) == comparison
@@ -59,7 +60,7 @@ class ListableItem: DataItem {
 	}
 
 	func catchUpWithComments() {
-		for c in comments.allObjects as! [PRComment] {
+		for c in comments {
 			if let creation = c.createdAt {
 				if let latestRead = latestReadCommentDate {
 					if latestRead.compare(creation)==NSComparisonResult.OrderedAscending {
@@ -98,7 +99,7 @@ class ListableItem: DataItem {
 	}
 
 	func commentedByMe() -> Bool {
-		for c in comments.allObjects as! [PRComment] {
+		for c in comments {
 			if c.isMine() {
 				return true
 			}
@@ -108,14 +109,14 @@ class ListableItem: DataItem {
 
 	func refersToMyTeams() -> Bool {
 		if let b = body {
-			for t in apiServer.teams.allObjects as! [Team] {
+			for t in apiServer.teams {
 				if let r = t.calculatedReferral {
 					let range = b.rangeOfString(r, options: NSStringCompareOptions.CaseInsensitiveSearch | NSStringCompareOptions.DiacriticInsensitiveSearch)
 					if range != nil { return true }
 				}
 			}
 		}
-		for c in comments.allObjects as! [PRComment] {
+		for c in comments {
 			if c.refersToMyTeams() {
 				return true
 			}
@@ -211,16 +212,24 @@ class ListableItem: DataItem {
 
 	func accessibleTitle() -> String {
 		var components = [String]()
-		if let t = title { components.append(t) }
+		if let t = title {
+			components.append(t)
+		}
 		if Settings.showLabels {
-			var allLabels = labels.allObjects as! [PRLabel]
-			allLabels.sort({ (l1: PRLabel, l2: PRLabel) -> Bool in
-				return l1.name<l2.name
-			})
-			components.append("\(allLabels.count) labels:")
-			for l in allLabels { if let n = l.name { components.append(n) } }
+			components.append("\(labels.count) labels:")
+			for l in sortedLabels() {
+				if let n = l.name {
+					components.append(n)
+				}
+			}
 		}
 		return ",".join(components)
+	}
+
+	func sortedLabels() -> [PRLabel] {
+		return Array(labels).sorted({ (l1: PRLabel, l2: PRLabel) -> Bool in
+			return l1.name!.compare(l2.name!)==NSComparisonResult.OrderedAscending
+		})
 	}
 
 	func titleWithFont(font: FONT_CLASS, labelFont: FONT_CLASS, titleColor: COLOR_CLASS) -> NSMutableAttributedString {
@@ -232,8 +241,8 @@ class ListableItem: DataItem {
 		if let t = title {
 			_title.appendAttributedString(NSAttributedString(string: t, attributes: titleAttributes))
 			if Settings.showLabels {
-				var allLabels = labels.allObjects as! [PRLabel]
-				if allLabels.count > 0 {
+				let labelCount = labels.count
+				if labelCount > 0 {
 
 					_title.appendAttributedString(NSAttributedString(string: "\n", attributes: titleAttributes))
 
@@ -250,12 +259,8 @@ class ListableItem: DataItem {
 							NSParagraphStyleAttributeName: lp]
 					#endif
 
-					allLabels.sort({ (l1: PRLabel, l2: PRLabel) -> Bool in
-						return l1.name!.compare(l2.name!)==NSComparisonResult.OrderedAscending
-					})
-
 					var count = 0
-					for l in allLabels {
+					for l in sortedLabels() {
 						var a = labelAttributes
 						let color = l.colorForDisplay()
 						a[NSBackgroundColorAttributeName] = color
@@ -264,7 +269,7 @@ class ListableItem: DataItem {
 						_title.appendAttributedString(NSAttributedString(string: "\u{a0}", attributes: a))
 						_title.appendAttributedString(NSAttributedString(string: name, attributes: a))
 						_title.appendAttributedString(NSAttributedString(string: "\u{a0}", attributes: a))
-						if count<allLabels.count {
+						if count < labelCount {
 							_title.appendAttributedString(NSAttributedString(string: " ", attributes: labelAttributes))
 						}
 					}

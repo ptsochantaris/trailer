@@ -559,7 +559,7 @@ class API {
 	private func fetchPullRequestsForRepos(repos: [Repo], toMoc:NSManagedObjectContext, callback: Completion) {
 
 		for r in Repo.unsyncableReposInMoc(toMoc) {
-			for p in r.pullRequests.allObjects as! [PullRequest] {
+			for p in r.pullRequests {
 				p.postSyncAction = PostSyncAction.Delete.rawValue
 			}
 		}
@@ -572,9 +572,9 @@ class API {
 		var completionCount = 0
 		for r in repos {
 
-			for pr in r.pullRequests.allObjects as! [PullRequest] {
-				if (pr.condition?.integerValue ?? 0) == PullRequestCondition.Open.rawValue {
-					pr.postSyncAction = PostSyncAction.Delete.rawValue
+			for p in r.pullRequests {
+				if (p.condition?.integerValue ?? 0) == PullRequestCondition.Open.rawValue {
+					p.postSyncAction = PostSyncAction.Delete.rawValue
 				}
 			}
 
@@ -593,7 +593,7 @@ class API {
 							if resultCode == 404 { // repo disabled
 								r.inaccessible = true
 								r.postSyncAction = PostSyncAction.DoNothing.rawValue
-								for p in r.pullRequests.allObjects as! [PullRequest] {
+								for p in r.pullRequests {
 									p.postSyncAction = PostSyncAction.Delete.rawValue
 								}
 							} else if resultCode==410 { // repo gone for good
@@ -619,7 +619,7 @@ class API {
 	private func fetchIssuesForRepos(repos: [Repo], toMoc:NSManagedObjectContext, callback: Completion) {
 
 		for r in Repo.unsyncableReposInMoc(toMoc) {
-			for i in r.issues.allObjects as! [Issue] {
+			for i in r.issues {
 				i.postSyncAction = PostSyncAction.Delete.rawValue
 			}
 		}
@@ -632,7 +632,7 @@ class API {
 		var completionCount = 0
 		for r in repos {
 
-			for i in r.issues.allObjects as! [Issue] {
+			for i in r.issues {
 				if (i.condition?.integerValue ?? 0) == PullRequestCondition.Open.rawValue {
 					i.postSyncAction = PostSyncAction.Delete.rawValue
 				}
@@ -655,7 +655,7 @@ class API {
 							if resultCode == 404 { // repo disabled
 								r.inaccessible = true
 								r.postSyncAction = PostSyncAction.DoNothing.rawValue
-								for p in r.issues.allObjects as! [Issue] {
+								for p in r.issues {
 									p.postSyncAction = PostSyncAction.Delete.rawValue
 								}
 							} else if resultCode==410 { // repo gone for good
@@ -689,7 +689,7 @@ class API {
 		}
 
 		for p in prs {
-			for c in p.comments.allObjects as! [PRComment] {
+			for c in p.comments {
 				c.postSyncAction = PostSyncAction.Delete.rawValue
 			}
 		}
@@ -759,7 +759,7 @@ class API {
 		let allIssues = DataItem.newOrUpdatedItemsOfType("Issue", inMoc:moc) as! [Issue]
 
 		for i in allIssues {
-			for c in i.comments.allObjects as! [PRComment] {
+			for c in i.comments {
 				c.postSyncAction = PostSyncAction.Delete.rawValue
 			}
 		}
@@ -846,7 +846,7 @@ class API {
 		var completionCount = 0
 
 		for p in prs {
-			for l in p.labels.allObjects as! [PRLabel] {
+			for l in p.labels {
 				l.postSyncAction = PostSyncAction.Delete.rawValue
 			}
 
@@ -918,7 +918,7 @@ class API {
 		var completionCount = 0
 
 		for p in prs {
-			for s in p.statuses.allObjects as! [PRStatus] {
+			for s in p.statuses {
 				s.postSyncAction = PostSyncAction.Delete.rawValue
 			}
 
