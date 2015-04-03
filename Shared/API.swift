@@ -157,8 +157,8 @@ class API {
 
 	// warning: now calls back on thread!!
 	func getImage(url: NSURL,
-		success:((response: NSHTTPURLResponse?, data: NSData?)->Void)?,
-		failure:((response: NSHTTPURLResponse?, error: NSError?)->Void)?) {
+		success:(response: NSHTTPURLResponse?, data: NSData?) -> Void,
+		failure:(response: NSHTTPURLResponse?, error: NSError?) -> Void) {
 
             let task = urlSession.dataTaskWithURL(url) { [weak self] (data, res, e)  in
 
@@ -169,13 +169,13 @@ class API {
 				}
 				if error != nil {
                     //DLog("IMAGE %@ - FAILED: %@", url.absoluteString, error)
-					failure?(response: response, error: error)
+					failure(response: response, error: error)
 				} else {
 					//DLog("IMAGE %@ - RESULT: %d", url.absoluteString, response?.statusCode)
 					if data != nil && data!.length > 0 {
-						success?(response: response, data: data!)
+						success(response: response, data: data!)
 					} else {
-						failure?(response: response, error: error)
+						failure(response: response, error: error)
 					}
 				}
 				#if os(iOS)
@@ -1397,16 +1397,16 @@ class API {
 		ignoreLastSync: Bool,
 		parameters: Dictionary<String, String>?,
 		extraHeaders: Dictionary<String, String>?,
-		success: ((response: NSHTTPURLResponse?, data: AnyObject?) -> Void)?,
-		failure: ((response: NSHTTPURLResponse?, data: AnyObject?, error: NSError?) -> Void)?) {
-
+		success: (response: NSHTTPURLResponse?, data: AnyObject?) -> Void,
+		failure: (response: NSHTTPURLResponse?, data: AnyObject?, error: NSError?) -> Void
+	) {
 			var apiServerLabel: String
 			if fromServer.syncIsGood || ignoreLastSync {
 				apiServerLabel = fromServer.label ?? "(untitled server)"
 			} else {
 				dispatch_async(dispatch_get_main_queue()) {
 					let e = NSError(domain: "Sync has failed, skipping this call", code: -1, userInfo: nil)
-					failure?(response: nil, data: nil, error: e)
+					failure(response: nil, data: nil, error: e)
 				}
 				return
 			}
@@ -1446,7 +1446,7 @@ class API {
 					DLog("(%@) preempted fetch to previously broken link %@, won't actually access this URL until %@", apiServerLabel, fullUrlPath, existingBackOff!.nextAttemptAt)
 					dispatch_async(dispatch_get_main_queue()) {
 						let e = NSError(domain: "Preempted fetch because of throttling", code: 400, userInfo: nil)
-						failure?(response: nil, data: nil, error: e)
+						failure(response: nil, data: nil, error: e)
 					}
 					#if os(iOS)
 						networkIndicationEnd()
@@ -1484,13 +1484,13 @@ class API {
 				if error != nil {
 					DLog("(%@) GET %@ - FAILED: %@", apiServerLabel, fullUrlPath, error!.localizedDescription)
 					dispatch_async(dispatch_get_main_queue()) {
-						failure?(response: response, data: parsedData, error: error)
+						failure(response: response, data: parsedData, error: error)
 					}
 				} else {
 					DLog("(%@) GET %@ - RESULT: %d", apiServerLabel, fullUrlPath, response?.statusCode)
 					self!.badLinks.removeValueForKey(fullUrlPath)
 					dispatch_async(dispatch_get_main_queue()) {
-						success?(response: response, data: parsedData)
+						success(response: response, data: parsedData)
 					}
 				}
 
