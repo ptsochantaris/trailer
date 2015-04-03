@@ -1691,7 +1691,28 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 			}
 
 			if let w = incomingEvent.window as? MenuWindow {
+				//DLog("Keycode: %d", incomingEvent.keyCode)
 				switch incomingEvent.keyCode {
+				case 123: // left
+					fallthrough
+				case 124: // right
+					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
+					if Settings.showIssuesMenu {
+						if w == self!.prMenu {
+							self!.closeMenu(w, statusItem: self!.prStatusItem)
+							if let i = self!.issuesStatusItem {
+								self!.toggleVisibilityOfMenu(self!.issuesMenu, fromStatusItem: i)
+							}
+						} else if w == self!.issuesMenu {
+							if let isi = self!.issuesStatusItem {
+								self!.closeMenu(w, statusItem: isi)
+							}
+							if let i = self!.prStatusItem {
+								self!.toggleVisibilityOfMenu(self!.prMenu, fromStatusItem: i)
+							}
+						}
+					}
+					return nil
 				case 125: // down
 					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
 					var i = w.table.selectedRow + 1
@@ -1785,62 +1806,40 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		var check = 0
 
 		if Settings.hotkeyCommandModifier {
-			if (incomingEvent.modifierFlags & NSEventModifierFlags.CommandKeyMask) == NSEventModifierFlags.CommandKeyMask { check++ } else { check-- }
+			check += (incomingEvent.modifierFlags & NSEventModifierFlags.CommandKeyMask) == NSEventModifierFlags.CommandKeyMask ? 1 : -1
 		} else {
-			if (incomingEvent.modifierFlags & NSEventModifierFlags.CommandKeyMask) == NSEventModifierFlags.CommandKeyMask { check-- } else { check++ }
+			check += (incomingEvent.modifierFlags & NSEventModifierFlags.CommandKeyMask) == NSEventModifierFlags.CommandKeyMask ? -1 : 1
 		}
 
 		if Settings.hotkeyControlModifier {
-			if (incomingEvent.modifierFlags & NSEventModifierFlags.ControlKeyMask) == NSEventModifierFlags.ControlKeyMask { check++ } else { check-- }
+			check += (incomingEvent.modifierFlags & NSEventModifierFlags.ControlKeyMask) == NSEventModifierFlags.ControlKeyMask ? 1 : -1
 		} else {
-			if (incomingEvent.modifierFlags & NSEventModifierFlags.ControlKeyMask) == NSEventModifierFlags.ControlKeyMask { check-- } else { check++ }
+			check += (incomingEvent.modifierFlags & NSEventModifierFlags.ControlKeyMask) == NSEventModifierFlags.ControlKeyMask ? -1 : 1
 		}
 
 		if Settings.hotkeyOptionModifier {
-			if (incomingEvent.modifierFlags & NSEventModifierFlags.AlternateKeyMask) == NSEventModifierFlags.AlternateKeyMask { check++ } else { check-- }
+			check += (incomingEvent.modifierFlags & NSEventModifierFlags.AlternateKeyMask) == NSEventModifierFlags.AlternateKeyMask ? 1 : -1
 		} else {
-			if (incomingEvent.modifierFlags & NSEventModifierFlags.AlternateKeyMask) == NSEventModifierFlags.AlternateKeyMask { check-- } else { check++ }
+			check += (incomingEvent.modifierFlags & NSEventModifierFlags.AlternateKeyMask) == NSEventModifierFlags.AlternateKeyMask ? -1 : 1
 		}
 
 		if Settings.hotkeyShiftModifier {
-			if (incomingEvent.modifierFlags & NSEventModifierFlags.ShiftKeyMask) == NSEventModifierFlags.ShiftKeyMask { check++ } else { check-- }
+			check += (incomingEvent.modifierFlags & NSEventModifierFlags.ShiftKeyMask) == NSEventModifierFlags.ShiftKeyMask ? 1 : -1
 		} else {
-			if (incomingEvent.modifierFlags & NSEventModifierFlags.ShiftKeyMask) == NSEventModifierFlags.ShiftKeyMask { check-- } else { check++ }
+			check += (incomingEvent.modifierFlags & NSEventModifierFlags.ShiftKeyMask) == NSEventModifierFlags.ShiftKeyMask ? -1 : 1
 		}
 
-		if check==4 {
-			let n = [
-				"A": 0,
-				"B": 11,
-				"C": 8,
-				"D": 2,
-				"E": 14,
-				"F": 3,
-				"G": 5,
-				"H": 4,
-				"I": 34,
-				"J": 38,
-				"K": 40,
-				"L": 37,
-				"M": 46,
-				"N": 45,
-				"O": 31,
-				"P": 35,
-				"Q": 12,
-				"R": 15,
-				"S": 1,
-				"T": 17,
-				"U": 32,
-				"V": 9,
-				"W": 13,
-				"X": 7,
-				"Y": 16,
-				"Z": 6 ][Settings.hotkeyLetter]
+		let keyMap = [
+			"A": 0, "B": 11, "C": 8, "D": 2, "E": 14, "F": 3, "G": 5, "H": 4, "I": 34, "J": 38,
+			"K": 40, "L": 37, "M": 46, "N": 45, "O": 31, "P": 35, "Q": 12, "R": 15, "S": 1,
+			"T": 17, "U": 32, "V": 9, "W": 13, "X": 7, "Y": 16, "Z": 6 ];
 
-			if incomingEvent.keyCode==UInt16(n!) {
-				toggleVisibilityOfMenu(prMenu, fromStatusItem: prStatusItem)
-				return true
+		if check==4, let n = keyMap[Settings.hotkeyLetter] where incomingEvent.keyCode == UInt16(n) {
+			if let isi = self.issuesStatusItem {
+				self.closeMenu(issuesMenu, statusItem: isi)
 			}
+			toggleVisibilityOfMenu(prMenu, fromStatusItem: prStatusItem)
+			return true
 		}
 		return false
 	}
