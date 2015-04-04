@@ -96,9 +96,6 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	@IBOutlet weak var hotKeyContainer: NSBox!
 	@IBOutlet weak var hotkeyControlModifier: NSButton!
 
-	// About window
-	@IBOutlet weak var aboutVersion: NSTextField!
-
 	// Menu
 	var prStatusItem: NSStatusItem!
 	var issuesStatusItem: NSStatusItem?
@@ -169,7 +166,6 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
         var buildNumber = NSBundle.mainBundle().infoDictionary!["CFBundleVersion"] as! String
 		let cav = "Version \(currentAppVersion) (\(buildNumber))"
 		versionNumber.stringValue = cav
-		aboutVersion.stringValue = cav
 
 		if ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
 			startRefresh()
@@ -192,16 +188,6 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		if !s.updateInProgress && Settings.checkForUpdatesAutomatically {
 			s.checkForUpdatesInBackground()
 		}
-	}
-
-	private var startupAssistantController: NSWindowController?
-	private func startupAssistant() {
-		startupAssistantController = NSWindowController(windowNibName:"SetupAssistant")
-		startupAssistantController!.window!.level = Int(CGWindowLevelForKey(CGWindowLevelKey(kCGFloatingWindowLevelKey)))
-		startupAssistantController!.window!.makeKeyAndOrderFront(self)
-	}
-	func closedSetupAssistant() {
-		startupAssistantController = nil
 	}
 
 	private func setupSortMethodMenu() {
@@ -484,10 +470,6 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	@IBAction func launchAtStartSelected(sender: NSButton) {
 		StartupLaunch.setLaunchOnLogin(sender.integerValue==1)
-	}
-
-	@IBAction func aboutLinkSelected(sender: NSButton) {
-		NSWorkspace.sharedWorkspace().openURL(NSURL(string: "https://github.com/ptsochantaris/trailer")!)
 	}
 
 	func userNotificationCenter(center: NSUserNotificationCenter, shouldPresentNotification notification: NSUserNotification) -> Bool {
@@ -1968,4 +1950,33 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		updatePrMenu()
 		updateIssuesMenu()
 	}
+
+
+	////////////////////// windows
+
+	private var startupAssistantController: NSWindowController?
+	private func startupAssistant() {
+		startupAssistantController = NSWindowController(windowNibName:"SetupAssistant")
+		if let w = startupAssistantController!.window {
+			w.level = Int(CGWindowLevelForKey(CGWindowLevelKey(kCGFloatingWindowLevelKey)))
+			w.makeKeyAndOrderFront(self)
+		}
+	}
+	func closedSetupAssistant() {
+		startupAssistantController = nil
+	}
+
+	private var aboutWindowController: NSWindowController?
+	@IBAction func aboutSelected(sender: NSMenuItem) {
+		aboutWindowController = NSWindowController(windowNibName:"AboutWindow")
+		if let w = aboutWindowController!.window as? AboutWindow {
+			w.level = Int(CGWindowLevelForKey(CGWindowLevelKey(kCGFloatingWindowLevelKey)))
+			w.version.stringValue = versionNumber.stringValue
+			w.makeKeyAndOrderFront(self)
+		}
+	}
+	func closedAboutWindow() {
+		aboutWindowController = nil
+	}
+
 }

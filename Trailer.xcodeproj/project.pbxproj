@@ -68,6 +68,8 @@
 		164785AF1A2CE7CD00297764 /* NSDictionaryExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785AC1A2CE7CD00297764 /* NSDictionaryExtensions.swift */; };
 		164785B01A2CE7CD00297764 /* NSStringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785AD1A2CE7CD00297764 /* NSStringExtensions.swift */; };
 		164785B11A2CE7CD00297764 /* NSStringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785AD1A2CE7CD00297764 /* NSStringExtensions.swift */; };
+		164840BF1ACFEA45009E6383 /* AboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 164840BE1ACFEA45009E6383 /* AboutWindow.xib */; };
+		164840C11ACFEA5A009E6383 /* AboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164840C01ACFEA5A009E6383 /* AboutWindow.swift */; };
 		16519EB41ACF0E91002171D0 /* Trailer.icns in Resources */ = {isa = PBXBuildFile; fileRef = 16519EB31ACF0E91002171D0 /* Trailer.icns */; };
 		16522D771AB03AE500B1C3FB /* GlanceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16522D761AB03AE500B1C3FB /* GlanceController.swift */; };
 		16522D791AB03AE500B1C3FB /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 16522D781AB03AE500B1C3FB /* Images.xcassets */; };
@@ -248,6 +250,8 @@
 		164785AD1A2CE7CD00297764 /* NSStringExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NSStringExtensions.swift; path = Shared/NSStringExtensions.swift; sourceTree = "<group>"; };
 		164785B21A2CE7FB00297764 /* PocketTrailer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PocketTrailer-Bridging-Header.h"; sourceTree = "<group>"; };
 		164785B31A2CE80800297764 /* Trailer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Trailer-Bridging-Header.h"; sourceTree = "<group>"; };
+		164840BE1ACFEA45009E6383 /* AboutWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AboutWindow.xib; sourceTree = "<group>"; };
+		164840C01ACFEA5A009E6383 /* AboutWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutWindow.swift; sourceTree = "<group>"; };
 		16519EB31ACF0E91002171D0 /* Trailer.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Trailer.icns; sourceTree = "<group>"; };
 		16522D701AB03AE500B1C3FB /* PocketTrailer WatchKit Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "PocketTrailer WatchKit Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		16522D731AB03AE500B1C3FB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -396,7 +400,6 @@
 				1633C18F1ABCEAA00086C692 /* IssuesDelegate.swift */,
 				16A0B0361A48AC7900B3452D /* OSX_AppDelegate.swift */,
 				16A0B03B1A49AEC200B3452D /* StartupLaunch.swift */,
-				1671A11E1AC73CCB0047440A /* SetupAssistant.swift */,
 			);
 			name = Core;
 			sourceTree = "<group>";
@@ -471,6 +474,17 @@
 				1633C1A11ABD84370086C692 /* PullRequestCell.swift */,
 			);
 			name = Cells;
+			sourceTree = "<group>";
+		};
+		164840B91ACFE3CB009E6383 /* Windows */ = {
+			isa = PBXGroup;
+			children = (
+				1671A1221AC74BC30047440A /* SetupAssistant.xib */,
+				1671A11E1AC73CCB0047440A /* SetupAssistant.swift */,
+				164840BE1ACFEA45009E6383 /* AboutWindow.xib */,
+				164840C01ACFEA5A009E6383 /* AboutWindow.swift */,
+			);
+			name = Windows;
 			sourceTree = "<group>";
 		};
 		164DEAFA1AC0C8BB00AA6F73 /* PocketTrailer */ = {
@@ -574,10 +588,10 @@
 		168BC6B317EC2DF000BC4584 /* Trailer */ = {
 			isa = PBXGroup;
 			children = (
+				164840B91ACFE3CB009E6383 /* Windows */,
 				162002CE1A2A3E0100FF95F3 /* Core */,
 				168A5C74185BB9D900CB6B02 /* UI Components */,
 				168BC6C217EC2DF000BC4584 /* MainMenu.xib */,
-				1671A1221AC74BC30047440A /* SetupAssistant.xib */,
 				168BC6C817EC2DF000BC4584 /* Images.xcassets */,
 				16519EB31ACF0E91002171D0 /* Trailer.icns */,
 				168BC6B417EC2DF000BC4584 /* Supporting Files */,
@@ -910,6 +924,7 @@
 			files = (
 				1671A1231AC74BC30047440A /* SetupAssistant.xib in Resources */,
 				168BC6B817EC2DF000BC4584 /* InfoPlist.strings in Resources */,
+				164840BF1ACFEA45009E6383 /* AboutWindow.xib in Resources */,
 				16B94072182D136700F32061 /* dsa_pub.pem in Resources */,
 				168BC6C917EC2DF000BC4584 /* Images.xcassets in Resources */,
 				16519EB41ACF0E91002171D0 /* Trailer.icns in Resources */,
@@ -1033,6 +1048,7 @@
 				16A0B03C1A49AEC200B3452D /* StartupLaunch.swift in Sources */,
 				16B3B3571A34E9F7000BE6CC /* Reachability.m in Sources */,
 				16A505E41A39B2DD005DD3B7 /* PullRequestDelegate.swift in Sources */,
+				164840C11ACFEA5A009E6383 /* AboutWindow.swift in Sources */,
 				16B3B3211A34E8E2000BE6CC /* PullRequest.swift in Sources */,
 				162002D61A2A49A300FF95F3 /* ViewAllowsVibrancy.swift in Sources */,
 				162002DF1A2A5C9200FF95F3 /* LinkField.swift in Sources */,

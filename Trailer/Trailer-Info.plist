@@ -4,6 +4,23 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>trailerSettings</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>Trailer.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>Trailer Settings File</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSHandlerRank</key>
+			<string>Default</string>
+		</dict>
+	</array>
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
 	<key>CFBundleIconFile</key>
@@ -21,7 +38,7 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>1195</string>
+	<string>1197</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.developer-tools</string>
 	<key>LSMinimumSystemVersion</key>
@@ -38,23 +55,6 @@
 	<string>banner</string>
 	<key>SUFeedURL</key>
 	<string>http://ptsochantaris.github.io/trailer/appcast.xml</string>
-	<key>CFBundleDocumentTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Viewer</string>
-			<key>CFBundleTypeIconFile</key>
-			<string>Trailer.icns</string>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>trailerSettings</string>
-			</array>
-			<key>CFBundleTypeName</key>
-			<string>Trailer Settings File</string>
-			<key>LSHandlerRank</key>
-			<string>Default</string>
-		</dict>
-	</array>
 	<key>SUPublicDSAKeyFile</key>
 	<string>dsa_pub.pem</string>
 </dict>
