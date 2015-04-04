@@ -45,7 +45,15 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 					self.handleLocalNotification(localNotification!)
 				}
 			} else {
-				self.forcePreferences()
+
+				if !ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
+					if ApiServer.countApiServersInMoc(mainObjectContext) == 1, let a = ApiServer.allApiServersInMoc(mainObjectContext).first where a.authToken == nil || a.authToken!.isEmpty {
+						m.performSegueWithIdentifier("showQuickstart", sender: self)
+					} else {
+						m.performSegueWithIdentifier("showPreferences", sender: self)
+					}
+				}
+
 			}
 		}
 
@@ -100,11 +108,6 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UIPopoverControllerDe
 		DLog("Received local notification: %@", notification.userInfo)
 		NSNotificationCenter.defaultCenter().postNotificationName(RECEIVED_NOTIFICATION_KEY, object: nil, userInfo: notification.userInfo)
 		UIApplication.sharedApplication().cancelLocalNotification(notification)
-	}
-
-	private func forcePreferences() {
-		let m = getMasterController()
-		m.performSegueWithIdentifier("showPreferences", sender: self)
 	}
 
 	func startRefreshIfItIsDue() {

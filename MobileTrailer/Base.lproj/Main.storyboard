@@ -176,6 +176,9 @@
                         <autoresizingMask key="autoresizingMask"/>
                         <attributedString key="attributedTitle"/>
                     </refreshControl>
+                    <connections>
+                        <segue destination="8Eb-eH-MUP" kind="presentation" identifier="showQuickstart" modalPresentationStyle="formSheet" id="noo-V8-yYe"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Rux-fX-hf1" sceneMemberID="firstResponder"/>
             </objects>
@@ -326,7 +329,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="5U3-kt-wt7" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2746" y="723"/>
+            <point key="canvasLocation" x="2758" y="747"/>
         </scene>
         <!--Servers-->
         <scene sceneID="dTo-Cu-ELq">
@@ -602,7 +605,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="qm4-CU-PPj" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3575" y="723"/>
+            <point key="canvasLocation" x="3587" y="747"/>
         </scene>
         <!--About-->
         <scene sceneID="gk8-1F-TsH">
@@ -744,6 +747,108 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
             </objects>
             <point key="canvasLocation" x="5193" y="1553"/>
         </scene>
+        <!--Welcome!-->
+        <scene sceneID="Agj-LB-cw9">
+            <objects>
+                <viewController id="ZQR-qN-jZ1" customClass="QuickStartViewController" customModule="PocketTrailer" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="Q4l-wo-9l3"/>
+                        <viewControllerLayoutGuide type="bottom" id="G7i-B8-JHX"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="uTk-8X-jov">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Quick Start" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wfK-es-Q2m">
+                                <rect key="frame" x="150" y="168" width="300" height="22"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="300" id="K0m-V1-SA9"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="51v-nc-Xtf">
+                                <rect key="frame" x="193" y="369" width="212" height="31"/>
+                                <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="16"/>
+                                <state key="normal" title="Test Token &amp; Complete Setup"/>
+                                <connections>
+                                    <action selector="testSelected:" destination="ZQR-qN-jZ1" eventType="touchUpInside" id="o0H-Ih-bdv"/>
+                                </connections>
+                            </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kTk-WK-GaF">
+                                <rect key="frame" x="149" y="291" width="300" height="58"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="300" id="q2B-Yz-7Mf"/>
+                                </constraints>
+                                <string key="text">Use this link to open a web view to your GitHub tokens page - you may have to sign in to GitHub first. You only need the default access permissions for the token you create.</string>
+                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Copy &amp; paste your GitHub token in here" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="EED-i1-JTF">
+                                <rect key="frame" x="149" y="210" width="300" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="300" id="gIg-bN-9MJ"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" keyboardType="alphabet" returnKeyType="done"/>
+                                <connections>
+                                    <outlet property="delegate" destination="ZQR-qN-jZ1" id="aLz-WU-eH9"/>
+                                </connections>
+                            </textField>
+                            <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="5rH-Zj-pcO">
+                                <rect key="frame" x="290" y="350" width="20" height="20"/>
+                            </activityIndicatorView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="v1a-vB-r8u">
+                                <rect key="frame" x="159" y="260" width="281" height="31"/>
+                                <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="16"/>
+                                <state key="normal" title="Create a GitHub personal access token"/>
+                                <connections>
+                                    <segue destination="RXN-WD-g0o" kind="presentation" id="oce-70-FTR"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="v1a-vB-r8u" firstAttribute="top" secondItem="EED-i1-JTF" secondAttribute="bottom" constant="20" id="2Ok-nJ-b6R"/>
+                            <constraint firstAttribute="centerX" secondItem="wfK-es-Q2m" secondAttribute="centerX" id="5hd-UN-nNp"/>
+                            <constraint firstItem="v1a-vB-r8u" firstAttribute="centerX" secondItem="EED-i1-JTF" secondAttribute="centerX" constant="0.5" id="Ccm-lQ-dnP"/>
+                            <constraint firstItem="EED-i1-JTF" firstAttribute="centerX" secondItem="51v-nc-Xtf" secondAttribute="centerX" id="Ewp-xo-9qn"/>
+                            <constraint firstItem="51v-nc-Xtf" firstAttribute="top" secondItem="kTk-WK-GaF" secondAttribute="bottom" constant="20" id="IvI-KZ-yUb"/>
+                            <constraint firstItem="v1a-vB-r8u" firstAttribute="centerX" secondItem="wfK-es-Q2m" secondAttribute="centerX" id="Nea-7C-DFb"/>
+                            <constraint firstItem="kTk-WK-GaF" firstAttribute="top" secondItem="v1a-vB-r8u" secondAttribute="bottom" id="TsC-JS-2B8"/>
+                            <constraint firstAttribute="centerY" secondItem="kTk-WK-GaF" secondAttribute="centerY" priority="500" constant="-20" id="U4Q-eQ-ysz"/>
+                            <constraint firstItem="EED-i1-JTF" firstAttribute="top" secondItem="wfK-es-Q2m" secondAttribute="bottom" constant="20" id="cX5-Oe-oVl"/>
+                            <constraint firstAttribute="centerX" secondItem="5rH-Zj-pcO" secondAttribute="centerX" id="gpF-zd-RU6"/>
+                            <constraint firstItem="wfK-es-Q2m" firstAttribute="top" relation="greaterThanOrEqual" secondItem="Q4l-wo-9l3" secondAttribute="bottom" constant="20" id="keW-Jb-vYS"/>
+                            <constraint firstAttribute="centerY" secondItem="5rH-Zj-pcO" secondAttribute="centerY" constant="-60" id="shf-Al-rdE"/>
+                            <constraint firstItem="EED-i1-JTF" firstAttribute="centerX" secondItem="kTk-WK-GaF" secondAttribute="centerX" id="x0r-ur-l5x"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="Welcome!" id="cOg-SY-AQN">
+                        <barButtonItem key="leftBarButtonItem" title="Skip" id="TOi-p0-I4W">
+                            <connections>
+                                <action selector="skipSelected:" destination="ZQR-qN-jZ1" id="Bxo-oH-Lh4"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="feedback" destination="wfK-es-Q2m" id="Wiw-fn-QpE"/>
+                        <outlet property="link" destination="v1a-vB-r8u" id="4Wh-gF-zwx"/>
+                        <outlet property="skip" destination="TOi-p0-I4W" id="nI2-ml-HQT"/>
+                        <outlet property="spinner" destination="5rH-Zj-pcO" id="o2t-tw-WNl"/>
+                        <outlet property="testButton" destination="51v-nc-Xtf" id="emm-LZ-CaT"/>
+                        <outletCollection property="otherViews" destination="kTk-WK-GaF" collectionClass="NSMutableArray" id="0wu-hQ-SRt"/>
+                        <outletCollection property="otherViews" destination="EED-i1-JTF" collectionClass="NSMutableArray" id="xJM-ot-hfL"/>
+                        <outletCollection property="otherViews" destination="v1a-vB-r8u" collectionClass="NSMutableArray" id="VLf-up-I0J"/>
+                        <outletCollection property="otherViews" destination="51v-nc-Xtf" collectionClass="NSMutableArray" id="vbm-4s-UrQ"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="5Bv-33-6Zi" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3575" y="2454"/>
+        </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="hQr-lF-Zam">
             <objects>
@@ -764,7 +869,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="scD-nX-LYc" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1118" y="723"/>
+            <point key="canvasLocation" x="1130" y="747"/>
         </scene>
         <!--Repositories-->
         <scene sceneID="4VK-bY-2jl">
@@ -825,7 +930,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="c0P-j6-Vc1" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1934" y="723"/>
+            <point key="canvasLocation" x="1946" y="747"/>
         </scene>
         <!--Servers-->
         <scene sceneID="O8y-pt-1Ow">
@@ -864,6 +969,24 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
             </objects>
             <point key="canvasLocation" x="4381" y="1553"/>
         </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="yPw-1E-BUg">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="8Eb-eH-MUP" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="mva-8G-sSM">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="ZQR-qN-jZ1" kind="relationship" relationship="rootViewController" id="Dh6-6j-cjp"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="xpq-Rw-jAR" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="478" y="1434"/>
+        </scene>
     </scenes>
     <resources>
         <image name="about" width="30" height="28"/>
@@ -872,5 +995,8 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
         <image name="repos" width="32" height="32"/>
         <image name="servers" width="32" height="32"/>
     </resources>
+    <inferredMetricsTieBreakers>
+        <segue reference="oce-70-FTR"/>
+    </inferredMetricsTieBreakers>
     <color key="tintColor" red="0.25490197539329529" green="0.51372551918029785" blue="0.76862752437591553" alpha="1" colorSpace="deviceRGB"/>
 </document>

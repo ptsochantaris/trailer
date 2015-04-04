@@ -71,6 +71,7 @@
 		164840BF1ACFEA45009E6383 /* AboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 164840BE1ACFEA45009E6383 /* AboutWindow.xib */; };
 		164840C11ACFEA5A009E6383 /* AboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164840C01ACFEA5A009E6383 /* AboutWindow.swift */; };
 		164840C31ACFEFA9009E6383 /* MenuWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 164840C21ACFEFA9009E6383 /* MenuWindow.xib */; };
+		164840C51AD04C3C009E6383 /* QuickStartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164840C41AD04C3C009E6383 /* QuickStartViewController.swift */; };
 		16519EB41ACF0E91002171D0 /* Trailer.icns in Resources */ = {isa = PBXBuildFile; fileRef = 16519EB31ACF0E91002171D0 /* Trailer.icns */; };
 		16522D771AB03AE500B1C3FB /* GlanceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16522D761AB03AE500B1C3FB /* GlanceController.swift */; };
 		16522D791AB03AE500B1C3FB /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 16522D781AB03AE500B1C3FB /* Images.xcassets */; };
@@ -252,6 +253,7 @@
 		164840BE1ACFEA45009E6383 /* AboutWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AboutWindow.xib; sourceTree = "<group>"; };
 		164840C01ACFEA5A009E6383 /* AboutWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutWindow.swift; sourceTree = "<group>"; };
 		164840C21ACFEFA9009E6383 /* MenuWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MenuWindow.xib; sourceTree = "<group>"; };
+		164840C41AD04C3C009E6383 /* QuickStartViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuickStartViewController.swift; sourceTree = "<group>"; };
 		16519EB31ACF0E91002171D0 /* Trailer.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Trailer.icns; sourceTree = "<group>"; };
 		16522D701AB03AE500B1C3FB /* PocketTrailer WatchKit Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "PocketTrailer WatchKit Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		16522D731AB03AE500B1C3FB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -617,6 +619,7 @@
 				1615045D1A464656001CF50C /* PRCell.swift */,
 				1615045F1A4651CB001CF50C /* MasterViewController.swift */,
 				16EE6ACF1A9A711C000A8483 /* CountLabel.swift */,
+				164840C41AD04C3C009E6383 /* QuickStartViewController.swift */,
 			);
 			name = UI;
 			sourceTree = "<group>";
@@ -991,6 +994,7 @@
 				16EE871B1A446BFE00A1D16F /* EmptyView.swift in Sources */,
 				1615045E1A464656001CF50C /* PRCell.swift in Sources */,
 				16B3B3581A34E9F7000BE6CC /* Reachability.m in Sources */,
+				164840C51AD04C3C009E6383 /* QuickStartViewController.swift in Sources */,
 				16B3B35B1A34EAEE000BE6CC /* main.swift in Sources */,
 				166A84BE1A457CA700A3B292 /* ServersViewController.swift in Sources */,
 				161504601A4651CB001CF50C /* MasterViewController.swift in Sources */,

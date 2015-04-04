@@ -10,8 +10,8 @@ class SetupAssistant: NSWindow, NSWindowDelegate {
 	@IBOutlet weak var spinner: NSProgressIndicator!
 	@IBOutlet weak var welcomeLabel: NSTextField!
 
-	private var state = 0
 	private let newServer = ApiServer.allApiServersInMoc(mainObjectContext).first!
+	private var checkTimer: NSTimer?
 
 	override func awakeFromNib() {
 		StartupLaunch.setLaunchOnLogin(true)
@@ -64,16 +64,17 @@ class SetupAssistant: NSWindow, NSWindowDelegate {
 			api.testApiToServer(newServer, callback: { error in
 				if let e = error {
 					let alert = NSAlert()
-					alert.messageText = "Testing this server failed - please check that you have pasted your token correctly"
+					alert.messageText = "Testing the token failed - please check that you have pasted your token correctly"
 					alert.informativeText = e.localizedDescription
 					alert.addButtonWithTitle("OK")
 					alert.beginSheetModalForWindow(self, completionHandler: { response in
 						self.normalState()
 					})
 				} else {
+					quickstart.stringValue = "\nSyncing your GitHub info for the first time.\n\nThis could take a little while, please wait..."
 					Settings.lastSuccessfulRefresh = nil
-					app.refreshReposSelected(nil)
-					NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: Selector("checkRefreshDone:"), userInfo: nil, repeats: true)
+					app.startRefreshIfItIsDue()
+					self!.checkTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: Selector("checkRefreshDone:"), userInfo: nil, repeats: true)
 				}
 			})
 		}
@@ -82,28 +83,23 @@ class SetupAssistant: NSWindow, NSWindowDelegate {
 	func checkRefreshDone(t: NSTimer) {
 		if !app.isRefreshing {
 
-			state++
+			checkTimer?.invalidate()
+			checkTimer = nil
 
-			if state==1 {
-				quickstart.stringValue = "\nSyncing your GitHub PR info for the first time.\n\nThis could take a little while, please wait..."
-				Settings.lastSuccessfulRefresh = nil
-				app.startRefreshIfItIsDue()
-			} else if state==2 {
-				if newServer.lastSyncSucceeded?.boolValue ?? false {
-					self.close()
-					let alert = NSAlert()
-					alert.messageText = "Setup complete!"
-					alert.informativeText = "You can tweak settings & behaviour from the preferences window.\n\nTrailer will only read from your Github data, so feel free to experiment with settings and options, you can't hurt your data or settings on GitHub."
-					alert.addButtonWithTitle("OK")
-					alert.runModal()
-				} else {
-					let alert = NSAlert()
-					alert.messageText = "Syncing withg this server failed - please check that your network connection is working and that you have pasted your token correctly"
-					alert.addButtonWithTitle("OK")
-					alert.beginSheetModalForWindow(self, completionHandler: { response in
-						self.normalState()
-					})
-				}
+			if newServer.lastSyncSucceeded?.boolValue ?? false {
+				self.close()
+				let alert = NSAlert()
+				alert.messageText = "Setup complete!"
+				alert.informativeText = "You can tweak settings & behaviour from the preferences window.\n\nPocketTrailer will only read from your Github data, so feel free to experiment with settings and options, you can't damage your data or settings on GitHub."
+				alert.addButtonWithTitle("OK")
+				alert.runModal()
+			} else {
+				let alert = NSAlert()
+				alert.messageText = "Syncing with this server failed - please check that your network connection is working and that you have pasted your token correctly"
+				alert.addButtonWithTitle("OK")
+				alert.beginSheetModalForWindow(self, completionHandler: { response in
+					self.normalState()
+				})
 			}
 		}
 	}

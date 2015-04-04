@@ -170,10 +170,10 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 		if ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
 			startRefresh()
-		} else if ApiServer.countApiServersInMoc(mainObjectContext) == 1 {
-			if let a = ApiServer.allApiServersInMoc(mainObjectContext).first where a.authToken == nil || a.authToken!.isEmpty {
-				startupAssistant()
-			}
+		} else if ApiServer.countApiServersInMoc(mainObjectContext) == 1, let a = ApiServer.allApiServersInMoc(mainObjectContext).first where a.authToken == nil || a.authToken!.isEmpty {
+			startupAssistant()
+		} else {
+			preferencesSelected()
 		}
 
 		let n = NSNotificationCenter.defaultCenter()
