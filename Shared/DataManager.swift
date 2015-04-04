@@ -274,7 +274,7 @@ class DataManager : NSObject {
 			messageColor = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
 			message = "There are no watched repositories, please watch or unhide some."
 		} else if openRequests==0 {
-			message = "There are no open PRs in your non-hidden repositories."
+			message = "No open PRs in your visible repositories."
 		}
 
 		let p = NSMutableParagraphStyle()
@@ -312,7 +312,7 @@ class DataManager : NSObject {
 			messageColor = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
 			message = "There are no watched repositories, please watch or unhide some."
 		} else if openIssues==0 {
-			message = "There are no open issues in your non-hidden repositories."
+			message = "No open issues in your visible repositories."
 		}
 
 		let p = NSMutableParagraphStyle()

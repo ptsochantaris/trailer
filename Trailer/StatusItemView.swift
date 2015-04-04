@@ -13,39 +13,17 @@ class StatusItemView: NSView {
 		textAttributes = attributes
 		highlighted = false
 		grayOut = false
-		darkMode = false
 		super.init(frame: frame)
-		darkMode = StatusItemView.checkDarkMode()
 	}
 
 	required init?(coder: NSCoder) {
 	    fatalError("init(coder:) has not been implemented")
 	}
 
-	class func checkDarkMode() -> Bool {
-		if NSAppKitVersionNumber>Double(NSAppKitVersionNumber10_9) {
-			let c = NSAppearance.currentAppearance()
-			if c.respondsToSelector(Selector("allowsVibrancy")) {
-				return c.name.rangeOfString(NSAppearanceNameVibrantDark) != nil
-			}
-		}
-		return false
-	}
-
 	var grayOut: Bool {
 		didSet {
 			if grayOut != oldValue {
 				needsDisplay = true
-			}
-		}
-	}
-
-	var darkMode: Bool {
-		didSet {
-			if darkMode != oldValue {
-				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
-					NSNotificationCenter.defaultCenter().postNotificationName(DARK_MODE_CHANGED, object:nil)
-				}
 			}
 		}
 	}
@@ -64,13 +42,11 @@ class StatusItemView: NSView {
 
 	override func drawRect(dirtyRect: NSRect) {
 
-		if(app.prStatusItem.view==self) {
-			app.prStatusItem.drawStatusBarBackgroundInRect(dirtyRect, withHighlight: highlighted)
+		if(app.prMenu.statusItem!.view==self) {
+			app.prMenu.statusItem!.drawStatusBarBackgroundInRect(dirtyRect, withHighlight: highlighted)
 		} else {
-			app.issuesStatusItem?.drawStatusBarBackgroundInRect(dirtyRect, withHighlight: highlighted)
+			app.issuesMenu.statusItem!.drawStatusBarBackgroundInRect(dirtyRect, withHighlight: highlighted)
 		}
-
-		darkMode = StatusItemView.checkDarkMode()
 
 		let imagePoint = NSMakePoint(STATUSITEM_PADDING, 0)
 		let labelRect = CGRectMake(bounds.size.height + labelOffset, -5, bounds.size.width, bounds.size.height)
@@ -81,7 +57,7 @@ class StatusItemView: NSView {
 			icon = NSImage(named: "\(imagePrefix)IconBright")!
 			displayAttributes[NSForegroundColorAttributeName] = NSColor.selectedMenuItemTextColor()
 		} else {
-			if darkMode {
+			if app.checkDarkMode() {
 				icon = NSImage(named: "\(imagePrefix)IconBright")!
 				if displayAttributes[NSForegroundColorAttributeName] as! NSColor == NSColor.controlTextColor() {
 					displayAttributes[NSForegroundColorAttributeName] = NSColor.selectedMenuItemTextColor()

@@ -290,11 +290,10 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 					}
 					app.preferencesDirty = true
 				} else {
-					for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
-						for i in r.issues {
-							i.postSyncAction = PostSyncAction.Delete.rawValue
-						}
+					for i in DataItem.allItemsOfType("Issue", inMoc: mainObjectContext) as! [Issue] {
+						i.postSyncAction = PostSyncAction.Delete.rawValue
 					}
+					DataItem.nukeDeletedItemsInMoc(mainObjectContext)
 				}
 				settingsChangedTimer.push()
 			case 1:

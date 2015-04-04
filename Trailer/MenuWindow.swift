@@ -7,6 +7,10 @@ class MenuWindow: NSWindow {
 	@IBOutlet weak var header: ViewAllowsVibrancy!
 	@IBOutlet weak var table: NSTableView!
 	@IBOutlet weak var filter: NSSearchField!
+	@IBOutlet weak var refreshMenuItem: NSMenuItem!
+
+	var statusItem: NSStatusItem?
+	var messageView: MessageView?
 
 	private var headerVibrant: NSVisualEffectView?
 
@@ -30,6 +34,10 @@ class MenuWindow: NSWindow {
 		return newSystem && Settings.useVibrancy
 	}
 
+	override func controlTextDidChange(obj: NSNotification) {
+		app.controlTextDidChange(obj)
+	}
+
 	func updateVibrancy() {
 
 		let vibrancy = MenuWindow.usingVibrancy()
@@ -45,7 +53,7 @@ class MenuWindow: NSWindow {
 			headerVibrant!.blendingMode = NSVisualEffectBlendingMode.BehindWindow
 			header.addSubview(headerVibrant!, positioned:NSWindowOrderingMode.Below, relativeTo:nil)
 
-			appearance = NSAppearance(named: (app.prStatusItem.view as! StatusItemView).darkMode ? NSAppearanceNameVibrantDark : NSAppearanceNameVibrantLight)
+			appearance = NSAppearance(named: app.darkMode ? NSAppearanceNameVibrantDark : NSAppearanceNameVibrantLight)
 			table.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.SourceList
 		} else {
 			if newSystem {
@@ -57,11 +65,54 @@ class MenuWindow: NSWindow {
 		}
 	}
 
+	func showStatusItem() {
+		if statusItem == nil {
+			statusItem = NSStatusBar.systemStatusBar().statusItemWithLength(-1) //NSVariableStatusItemLength
+		}
+	}
+
+	func hideStatusItem() {
+		if let s = statusItem {
+			s.statusBar.removeStatusItem(s)
+			statusItem = nil
+		}
+	}
+
     override var canBecomeKeyWindow: Bool {
 		return true
 	}
 
+	func menuWillOpen(menu: NSMenu) {
+		if !app.isRefreshing {
+			refreshMenuItem.title = " Refresh - " + api.lastUpdateDescription()
+		}
+	}
+
+	func scrollToTop() {
+		table.scrollToBeginningOfDocument(nil)
+	}
+
 	deinit {
 		NSNotificationCenter.defaultCenter().removeObserver(self)
+	}
+
+	@IBAction func markAllReadSelected(sender: NSMenuItem) {
+		app.markAllReadSelectedFrom(self)
+	}
+
+	@IBAction func preferencesSelected(sender: NSMenuItem) {
+		app.preferencesSelected()
+	}
+
+	@IBAction func refreshSelected(sender: NSMenuItem) {
+		if Repo.countVisibleReposInMoc(mainObjectContext) == 0 {
+			app.preferencesSelected()
+			return
+		}
+		app.startRefresh()
+	}
+
+	@IBAction func aboutSelected(sender: AnyObject) {
+		app.showAboutWindow()
 	}
 }

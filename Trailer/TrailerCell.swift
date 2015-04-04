@@ -35,7 +35,7 @@ class TrailerCell: NSTableCellView {
 			var finalColor: NSColor = unselectedTitleColor
 			if selected {
 				table.selectRowIndexes(NSIndexSet(index: table.rowForView(self)), byExtendingSelection: false)
-				if (app.prStatusItem.view as! StatusItemView).darkMode { finalColor = NSColor.darkGrayColor() }
+				if app.darkMode { finalColor = NSColor.darkGrayColor() }
 			} else {
 				table.deselectRow(table.rowForView(self))
 			}
@@ -158,7 +158,7 @@ class TrailerCell: NSTableCellView {
 	private func highlight(on: Bool) -> Void {
 		if let c = countBackground {
 			var color: NSColor
-			if MenuWindow.usingVibrancy() && (app.prStatusItem.view as! StatusItemView).darkMode {
+			if app.darkMode {
 				color = on ? NSColor.blackColor() : MAKECOLOR(0.94, 0.94, 0.94, 1.0)
 				c.borderColor = color
 				newBackground?.backgroundColor = MAKECOLOR(1.0, 0.1, 0.1, 1.0)

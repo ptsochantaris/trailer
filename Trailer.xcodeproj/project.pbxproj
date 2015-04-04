@@ -70,6 +70,7 @@
 		164785B11A2CE7CD00297764 /* NSStringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785AD1A2CE7CD00297764 /* NSStringExtensions.swift */; };
 		164840BF1ACFEA45009E6383 /* AboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 164840BE1ACFEA45009E6383 /* AboutWindow.xib */; };
 		164840C11ACFEA5A009E6383 /* AboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164840C01ACFEA5A009E6383 /* AboutWindow.swift */; };
+		164840C31ACFEFA9009E6383 /* MenuWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 164840C21ACFEFA9009E6383 /* MenuWindow.xib */; };
 		16519EB41ACF0E91002171D0 /* Trailer.icns in Resources */ = {isa = PBXBuildFile; fileRef = 16519EB31ACF0E91002171D0 /* Trailer.icns */; };
 		16522D771AB03AE500B1C3FB /* GlanceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16522D761AB03AE500B1C3FB /* GlanceController.swift */; };
 		16522D791AB03AE500B1C3FB /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 16522D781AB03AE500B1C3FB /* Images.xcassets */; };
@@ -252,6 +253,7 @@
 		164785B31A2CE80800297764 /* Trailer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Trailer-Bridging-Header.h"; sourceTree = "<group>"; };
 		164840BE1ACFEA45009E6383 /* AboutWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AboutWindow.xib; sourceTree = "<group>"; };
 		164840C01ACFEA5A009E6383 /* AboutWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutWindow.swift; sourceTree = "<group>"; };
+		164840C21ACFEFA9009E6383 /* MenuWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MenuWindow.xib; sourceTree = "<group>"; };
 		16519EB31ACF0E91002171D0 /* Trailer.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Trailer.icns; sourceTree = "<group>"; };
 		16522D701AB03AE500B1C3FB /* PocketTrailer WatchKit Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "PocketTrailer WatchKit Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		16522D731AB03AE500B1C3FB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -483,6 +485,8 @@
 				1671A11E1AC73CCB0047440A /* SetupAssistant.swift */,
 				164840BE1ACFEA45009E6383 /* AboutWindow.xib */,
 				164840C01ACFEA5A009E6383 /* AboutWindow.swift */,
+				164840C21ACFEFA9009E6383 /* MenuWindow.xib */,
+				161C959D1A3A36020019A577 /* MenuWindow.swift */,
 			);
 			name = Windows;
 			sourceTree = "<group>";
@@ -544,7 +548,6 @@
 				162002DE1A2A5C9200FF95F3 /* LinkField.swift */,
 				162002E61A2A75BD00FF95F3 /* AvatarView.swift */,
 				16CBE1C91A2E13A400485053 /* StatusItemView.swift */,
-				161C959D1A3A36020019A577 /* MenuWindow.swift */,
 				16B74E471A3B4AC800410EF6 /* PrTable.swift */,
 				168FD00D1A2A7AD1005929CB /* MessageView.swift */,
 				169FB2351A3DBD7D00E00771 /* SectionHeader.swift */,
@@ -926,6 +929,7 @@
 				168BC6B817EC2DF000BC4584 /* InfoPlist.strings in Resources */,
 				164840BF1ACFEA45009E6383 /* AboutWindow.xib in Resources */,
 				16B94072182D136700F32061 /* dsa_pub.pem in Resources */,
+				164840C31ACFEFA9009E6383 /* MenuWindow.xib in Resources */,
 				168BC6C917EC2DF000BC4584 /* Images.xcassets in Resources */,
 				16519EB41ACF0E91002171D0 /* Trailer.icns in Resources */,
 				168BC6C417EC2DF000BC4584 /* MainMenu.xib in Resources */,

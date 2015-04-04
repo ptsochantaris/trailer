@@ -9,8 +9,7 @@ class PullRequestCell: TrailerCell {
 		detailFont = NSFont.menuFontOfSize(10.0)
 		titleFont = NSFont.menuFontOfSize(13.0)
 
-		let v = app.prStatusItem.view as! StatusItemView
-		let goneDark = MenuWindow.usingVibrancy() && v.darkMode
+		let goneDark = MenuWindow.usingVibrancy() && app.darkMode
 		unselectedTitleColor = goneDark ? NSColor.controlHighlightColor() : NSColor.controlTextColor()
 
 		var _commentsNew = 0
