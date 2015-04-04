@@ -9,8 +9,6 @@ struct UrlBackOffEntry {
 	var duration: NSTimeInterval
 }
 
-typealias Completion = ()->Void
-
 #if DEBUG
 	#if os(iOS)
 		let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-iOS-Development"

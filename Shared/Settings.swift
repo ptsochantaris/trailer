@@ -3,12 +3,50 @@
 import UIKit
 #endif
 
+//////////////////////////////// Somehow this won't compile if it's not here...
+
+typealias Completion = ()->Void
+
+class PopTimer : NSObject {
+
+	var _popTimer: NSTimer?
+	let _timeInterval: NSTimeInterval
+	let _callback: ()->()
+
+	var isRunning: Bool {
+		return _popTimer != nil
+	}
+
+	func push() {
+		_popTimer?.invalidate()
+		_popTimer = NSTimer.scheduledTimerWithTimeInterval(_timeInterval, target: self, selector: Selector("popped"), userInfo: nil, repeats: false)
+	}
+
+	func popped() {
+		invalidate()
+		_callback()
+	}
+
+	func invalidate() {
+		_popTimer?.invalidate()
+		_popTimer = nil
+	}
+
+	init(timeInterval: NSTimeInterval, callback: Completion) {
+		_timeInterval = timeInterval
+		_callback = callback
+		super.init()
+	}
+}
+
+/////////////////////////////
+
 let SETTINGS_EXPORTED = "SETTINGS_EXPORTED"
 
 var _settings_valuesCache = Dictionary<String, AnyObject>()
 let _settings_shared = NSUserDefaults(suiteName: "group.Trailer")!
 
-class Settings: NSObject {
+class Settings {
 
 	class func allFields() -> [String] {
 		return [

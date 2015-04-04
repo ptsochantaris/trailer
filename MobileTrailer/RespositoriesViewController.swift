@@ -124,7 +124,7 @@ class RespositoriesViewController: UITableViewController, UITextFieldDelegate, N
 
 	override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
 		if let repo = fetchedResultsController.objectAtIndexPath(indexPath) as? Repo {
-			let hideNow = !repo.hidden.boolValue
+			let hideNow = !(repo.hidden?.boolValue ?? false)
 			repo.hidden = hideNow
 			repo.dirty = !hideNow
 			DataManager.saveDB()
@@ -216,7 +216,7 @@ class RespositoriesViewController: UITableViewController, UITextFieldDelegate, N
 		let fullName = repo.fullName ?? "(Untitled Repo)"
 		let text = (repo.inaccessible?.boolValue ?? false) ? (fullName + " (inaccessible)") : fullName
 		cell.textLabel?.text = text
-		if repo.hidden.boolValue {
+		if (repo.hidden?.boolValue ?? false) {
 			cell.accessoryView = makeX()
 			cell.textLabel?.textColor = UIColor.lightGrayColor()
 			cell.accessibilityLabel = "Hidden: " + text
