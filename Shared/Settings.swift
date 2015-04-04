@@ -43,7 +43,7 @@ class PopTimer : NSObject {
 
 let SETTINGS_EXPORTED = "SETTINGS_EXPORTED"
 
-var _settings_valuesCache = Dictionary<String, AnyObject>()
+var _settings_valuesCache = [String : AnyObject]()
 let _settings_shared = NSUserDefaults(suiteName: "group.Trailer")!
 
 class Settings {

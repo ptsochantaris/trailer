@@ -283,6 +283,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 					t.selectedItem = self.viewMode==MasterViewMode.PullRequests ? pullRequestsItem : issuesItem
 					t.delegate = self
 					t.tintColor = blueTint
+					t.itemPositioning = UITabBarItemPositioning.Fill
 					s.addSubview(t)
 					tabBar = t
 

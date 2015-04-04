@@ -1032,13 +1032,13 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		return false
 	}
 
-	private func tryLoadSettings(url: NSURL, skipConfirm: Bool) {
+	func tryLoadSettings(url: NSURL, skipConfirm: Bool) -> Bool {
 		if isRefreshing {
 			let alert = NSAlert()
 			alert.messageText = "Trailer is currently refreshing data, please wait until it's done and try importing your settings again"
 			alert.addButtonWithTitle("OK")
 			alert.runModal()
-			return
+			return false
 
 		} else if !skipConfirm {
 			let alert = NSAlert()
@@ -1052,7 +1052,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 					Settings.dontConfirmSettingsImport = true
 				}
 			} else {
-				return
+				return false
 			}
 		}
 
@@ -1061,13 +1061,15 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 			alert.messageText = "The selected settings file could not be imported due to an error"
 			alert.addButtonWithTitle("OK")
 			alert.runModal()
-			return
+			return false
 		}
 		DataManager.postProcessAllItems()
 		DataManager.saveDB()
 		preparePreferencesWindow()
 		preferencesDirty = true
 		startRefresh()
+
+		return true
 	}
 
 	@IBAction func exportCurrentSettingsSelected(sender: NSButton) {
@@ -1438,6 +1440,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	private func completeRefresh() {
 		isRefreshing = false
+		preferencesDirty = false
 		refreshButton.enabled = true
 		projectsTable.enabled = true
 		activityDisplay.stopAnimation(nil)
@@ -1476,7 +1479,6 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 			if !ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext) {
 				Settings.lastSuccessfulRefresh = NSDate()
-				self!.preferencesDirty = false
 			}
 			self!.completeRefresh()
 			self!.refreshTimer = NSTimer.scheduledTimerWithTimeInterval(NSTimeInterval(Settings.refreshPeriod), target: self!, selector: Selector("refreshTimerDone"), userInfo: nil, repeats: false)
