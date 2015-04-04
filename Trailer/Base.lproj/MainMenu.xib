@@ -1207,14 +1207,14 @@ and press Enter to select.
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" borderType="none" titlePosition="noTitle" id="pyS-ma-X4O">
-                                            <rect key="frame" x="130" y="70" width="476" height="240"/>
+                                            <rect key="frame" x="6" y="21" width="724" height="310"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <view key="contentView">
-                                                <rect key="frame" x="0.0" y="0.0" width="476" height="240"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="724" height="310"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button id="884-i6-3Qz">
-                                                        <rect key="frame" x="89" y="101" width="315" height="18"/>
+                                                        <rect key="frame" x="212" y="200" width="315" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Check for new Trailer releases automatically" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Bty-E4-KMD">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1225,7 +1225,7 @@ and press Enter to select.
                                                         </connections>
                                                     </button>
                                                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="VSJ-4k-oD4">
-                                                        <rect key="frame" x="370" y="70" width="19" height="27"/>
+                                                        <rect key="frame" x="493" y="169" width="19" height="27"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                                         <stepperCell key="cell" continuous="YES" alignment="left" minValue="1" maxValue="1024" doubleValue="1" id="7GS-Kl-F8N"/>
                                                         <connections>
@@ -1233,16 +1233,16 @@ and press Enter to select.
                                                         </connections>
                                                     </stepper>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="bIt-Bu-LYU">
-                                                        <rect key="frame" x="102" y="76" width="265" height="17"/>
+                                                        <rect key="frame" x="225" y="175" width="265" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Check every X hours" id="Ygh-by-o2s">
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="...every X hours" id="Ygh-by-o2s">
                                                             <font key="font" metaFont="system"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
                                                     <button id="bpi-er-6rE">
-                                                        <rect key="frame" x="89" y="151" width="315" height="18"/>
+                                                        <rect key="frame" x="211" y="261" width="315" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Log activity to the console" bezelStyle="regularSquare" imagePosition="left" inset="2" id="fuS-vj-d1E">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1250,6 +1250,48 @@ and press Enter to select.
                                                         </buttonCell>
                                                         <connections>
                                                             <action selector="logActivityToConsoleSelected:" target="494" id="7oH-Nw-4ze"/>
+                                                        </connections>
+                                                    </button>
+                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" id="5mP-nr-RGf">
+                                                        <rect key="frame" x="17" y="15" width="690" height="41"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Settings last exported to 'fileName.trailerSettings' at 11/22/33 11:22:33PM" id="Sui-yc-ZnJ">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <button verticalHuggingPriority="750" id="ih4-rX-RgV">
+                                                        <rect key="frame" x="193" y="97" width="193" height="32"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                                        <buttonCell key="cell" type="push" title="Export current settings..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="vIJ-dh-Ky0">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="exportCurrentSettingsSelected:" target="494" id="wgf-8h-tAq"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" id="QP8-lG-tgJ">
+                                                        <rect key="frame" x="386" y="97" width="145" height="32"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                                        <buttonCell key="cell" type="push" title="Import settings..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="q7G-GR-59H">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="importSettingsSelected:" target="494" id="GRU-gX-HJg"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button id="AeL-oa-GCO">
+                                                        <rect key="frame" x="212" y="70" width="300" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Repeat last export whenever settings change" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="vnr-bk-KP0">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="repeatLastExportSelected:" target="494" id="2Ji-7p-Ytf"/>
                                                         </connections>
                                                     </button>
                                                 </subviews>
@@ -1327,6 +1369,7 @@ and press Enter to select.
                 <outlet property="labelRefreshCounter" destination="d21-jw-T4f" id="kdK-DV-zuS"/>
                 <outlet property="labelRefreshNote" destination="D5z-BQ-8db" id="Ui3-KC-zhW"/>
                 <outlet property="labelRescanLabel" destination="PFs-0N-Roc" id="qu3-V4-Jge"/>
+                <outlet property="lastExportReport" destination="5mP-nr-RGf" id="b1i-qJ-cyR"/>
                 <outlet property="launchAtStartup" destination="qqE-Ib-sQ9" id="brX-S8-Ge0"/>
                 <outlet property="logActivityToConsole" destination="bpi-er-6rE" id="akm-SR-jfL"/>
                 <outlet property="makeStatusItemsSelectable" destination="yD7-Y4-ZaZ" id="rgg-se-o4u"/>
@@ -1344,6 +1387,7 @@ and press Enter to select.
                 <outlet property="refreshDurationLabel" destination="wFz-AT-nev" id="9Wu-mf-TNq"/>
                 <outlet property="refreshDurationStepper" destination="Tbh-2L-zvn" id="Sq1-ai-4BZ"/>
                 <outlet property="refreshNow" destination="asb-Mc-b5c" id="aSx-vn-F0X"/>
+                <outlet property="repeatLastExportAutomatically" destination="AeL-oa-GCO" id="iem-WI-iMy"/>
                 <outlet property="repoCheckLabel" destination="Xbq-lU-hpp" id="0uf-pm-h9d"/>
                 <outlet property="repoCheckStepper" destination="cA3-l8-9ga" id="Iip-kN-dTc"/>
                 <outlet property="repoFilter" destination="pEa-FD-K1R" id="bxl-Ii-j5p"/>
@@ -1444,7 +1488,7 @@ and press Enter to select.
                             <popUpButton horizontalHuggingPriority="750" verticalHuggingPriority="750" id="pTb-UR-Euf">
                                 <rect key="frame" x="7" y="3" width="22" height="26"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <popUpButtonCell key="cell" type="disclosure" bezelStyle="roundedDisclosure" imagePosition="only" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="HVf-zs-7iK" id="j86-0c-T7i">
+                                <popUpButtonCell key="cell" type="disclosure" bezelStyle="roundedDisclosure" imagePosition="only" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" id="j86-0c-T7i">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
                                     <menu key="menu" title="Options" showsStateColumn="NO" id="TJQ-rB-fHm">
@@ -1454,7 +1498,7 @@ and press Enter to select.
                                                     <action selector="refreshNowSelected:" target="494" id="AiB-dg-t4e"/>
                                                 </connections>
                                             </menuItem>
-                                            <menuItem state="on" keyEquivalent="a" id="HVf-zs-7iK">
+                                            <menuItem title="Mark All As Read" keyEquivalent="a" id="HVf-zs-7iK">
                                                 <modifierMask key="keyEquivalentModifierMask" control="YES" option="YES" command="YES"/>
                                                 <connections>
                                                     <action selector="markAllReadSelected:" target="494" id="vWk-YR-lXO"/>
@@ -1524,7 +1568,7 @@ and press Enter to select.
                             <popUpButton horizontalHuggingPriority="750" verticalHuggingPriority="750" id="4uP-aY-FUB">
                                 <rect key="frame" x="7" y="3" width="22" height="26"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <popUpButtonCell key="cell" type="disclosure" bezelStyle="roundedDisclosure" imagePosition="only" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" id="CFe-Vf-3Ie">
+                                <popUpButtonCell key="cell" type="disclosure" title=" Mark All As Read" bezelStyle="roundedDisclosure" imagePosition="only" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="bCQ-Vl-1Ll" id="CFe-Vf-3Ie">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
                                     <menu key="menu" title="Options" showsStateColumn="NO" id="hfn-lO-VCI">
@@ -1534,7 +1578,7 @@ and press Enter to select.
                                                     <action selector="refreshNowSelected:" target="494" id="lmC-w3-Z7p"/>
                                                 </connections>
                                             </menuItem>
-                                            <menuItem title=" Mark All As Read" keyEquivalent="a" id="bCQ-Vl-1Ll">
+                                            <menuItem title=" Mark All As Read" state="on" keyEquivalent="a" id="bCQ-Vl-1Ll">
                                                 <modifierMask key="keyEquivalentModifierMask" control="YES" option="YES" command="YES"/>
                                                 <connections>
                                                     <action selector="markAllReadSelected:" target="494" id="FAL-0r-tKy"/>

@@ -1,7 +1,7 @@
 
 var app: OSX_AppDelegate!
 
-class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUserNotificationCenterDelegate, NSTableViewDelegate, NSTableViewDataSource, NSTabViewDelegate {
+class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUserNotificationCenterDelegate, NSTableViewDelegate, NSTableViewDataSource, NSTabViewDelegate, NSOpenSavePanelDelegate {
 
 	// Preferences window
 	@IBOutlet weak var preferencesWindow: NSWindow!
@@ -82,7 +82,11 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	@IBOutlet weak var apiServerDeleteButton: NSButton!
 	@IBOutlet weak var apiServerReportError: NSButton!
 
-	// Keyboard
+	// Preferences - Misc
+	@IBOutlet weak var repeatLastExportAutomatically: NSButton!
+	@IBOutlet weak var lastExportReport: NSTextField!
+
+	// Preferences - Keyboard
 	@IBOutlet weak var hotkeyEnable: NSButton!
 	@IBOutlet weak var hotkeyCommandModifier: NSButton!
 	@IBOutlet weak var hotkeyOptionModifier: NSButton!
@@ -175,9 +179,11 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 			}
 		}
 
-		NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("updateScrollBarWidth"), name: NSPreferredScrollerStyleDidChangeNotification, object: nil)
-		NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("updatePrMenu"), name: DARK_MODE_CHANGED, object: nil)
-		NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("updateIssuesMenu"), name: DARK_MODE_CHANGED, object: nil)
+		let n = NSNotificationCenter.defaultCenter()
+		n.addObserver(self, selector: Selector("updateScrollBarWidth"), name: NSPreferredScrollerStyleDidChangeNotification, object: nil)
+		n.addObserver(self, selector: Selector("updatePrMenu"), name: DARK_MODE_CHANGED, object: nil)
+		n.addObserver(self, selector: Selector("updateIssuesMenu"), name: DARK_MODE_CHANGED, object: nil)
+		n.addObserver(self, selector: Selector("updateImportExportSettings"), name: SETTINGS_EXPORTED, object: nil)
 
 		addHotKeySupport()
 
@@ -258,6 +264,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	@IBAction func logActivityToConsoleSelected(sender: NSButton) {
 		Settings.logActivityToConsole = (sender.integerValue==1)
+		logActivityToConsole.integerValue = Settings.logActivityToConsole ? 1 : 0
 		if Settings.logActivityToConsole {
 			let alert = NSAlert()
 			alert.messageText = "Warning"
@@ -942,11 +949,9 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		}
 	}
 
-	@IBAction func preferencesSelected(sender: NSMenuItem?) {
-		refreshTimer?.invalidate()
-		refreshTimer = nil
-
+	private func preparePreferencesWindow() {
 		serverList.selectRowIndexes(NSIndexSet(index: 0), byExtendingSelection: false)
+		fillServerApiFormFromSelectedServer()
 
 		api.updateLimitsFromServer()
 		updateStatusTermPreferenceControls()
@@ -969,10 +974,10 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		autoParticipateOnTeamMentions.integerValue = Settings.autoParticipateOnTeamMentions ? 1 : 0
 		hideAvatars.integerValue = Settings.hideAvatars ? 1 : 0
 		dontKeepPrsMergedByMe.integerValue = Settings.dontKeepPrsMergedByMe ? 1 : 0
-        grayOutWhenRefreshing.integerValue = Settings.grayOutWhenRefreshing ? 1 : 0
+		grayOutWhenRefreshing.integerValue = Settings.grayOutWhenRefreshing ? 1 : 0
 		notifyOnStatusUpdates.integerValue = Settings.notifyOnStatusUpdates ? 1 : 0
 		notifyOnStatusUpdatesForAllPrs.integerValue = Settings.notifyOnStatusUpdatesForAllPrs ? 1 : 0
-        disableAllCommentNotifications.integerValue = Settings.disableAllCommentNotifications ? 1 : 0
+		disableAllCommentNotifications.integerValue = Settings.disableAllCommentNotifications ? 1 : 0
 		showAllComments.integerValue = Settings.showCommentsEverywhere ? 1 : 0
 		sortingOrder.integerValue = Settings.sortDescending ? 1 : 0
 		showCreationDates.integerValue = Settings.showCreatedInsteadOfUpdated ? 1 : 0
@@ -1013,8 +1018,115 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		refreshDurationStepper.floatValue = min(Settings.refreshPeriod, 3600)
 		refreshDurationChanged(nil)
 
+		projectsTable.reloadData()
+
+		updateImportExportSettings()
+	}
+
+	@IBAction func preferencesSelected(sender: NSMenuItem?) {
+		refreshTimer?.invalidate()
+		refreshTimer = nil
+
+		preparePreferencesWindow()
+
 		preferencesWindow.level = Int(CGWindowLevelForKey(CGWindowLevelKey(kCGFloatingWindowLevelKey)))
 		preferencesWindow.makeKeyAndOrderFront(self)
+	}
+
+	func updateImportExportSettings() {
+		repeatLastExportAutomatically.integerValue = Settings.autoRepeatSettingsExport ? 1 : 0
+		if let lastExportDate = Settings.lastExportDate, fileName = Settings.lastExportUrl?.absoluteString {
+			let time = itemDateFormatter.stringFromDate(lastExportDate)
+			lastExportReport.stringValue = "Last export \(time) -> \(fileName)"
+		} else {
+			lastExportReport.stringValue = ""
+		}
+	}
+
+	@IBAction func repeatLastExportSelected(sender: AnyObject) {
+		Settings.autoRepeatSettingsExport = (repeatLastExportAutomatically.integerValue==1)
+	}
+
+	func application(sender: NSApplication, openFile filename: String) -> Bool {
+		let url = NSURL(fileURLWithPath: filename)!
+		let ext = filename.lastPathComponent.pathExtension
+		if ext == "trailerSettings" {
+			DLog("Will open %@", url.absoluteString)
+			tryLoadSettings(url, skipConfirm: Settings.dontConfirmSettingsImport)
+			return true
+		}
+		return false
+	}
+
+	private func tryLoadSettings(url: NSURL, skipConfirm: Bool) {
+		if isRefreshing {
+			let alert = NSAlert()
+			alert.messageText = "Trailer is currently refreshing data, please wait until it's done and try importing your settings again"
+			alert.addButtonWithTitle("OK")
+			alert.runModal()
+			return
+
+		} else if !skipConfirm {
+			let alert = NSAlert()
+			alert.messageText = "Import settings from this file?"
+			alert.informativeText = "This will overwrite all your current Trailer settings, are you sure?"
+			alert.addButtonWithTitle("No")
+			alert.addButtonWithTitle("Yes")
+			alert.showsSuppressionButton = true
+			if alert.runModal()==NSAlertSecondButtonReturn {
+				if alert.suppressionButton!.state == NSOnState {
+					Settings.dontConfirmSettingsImport = true
+				}
+			} else {
+				return
+			}
+		}
+
+		if !Settings.readFromURL(url) {
+			let alert = NSAlert()
+			alert.messageText = "The selected settings file could not be imported due to an error"
+			alert.addButtonWithTitle("OK")
+			alert.runModal()
+			return
+		}
+		DataManager.postProcessAllItems()
+		DataManager.saveDB()
+		preparePreferencesWindow()
+		startRefresh()
+	}
+
+	@IBAction func exportCurrentSettingsSelected(sender: NSButton) {
+		let s = NSSavePanel()
+		s.title = "Export Current Settings..."
+		s.prompt = "Export"
+		s.nameFieldLabel = "Settings File"
+		s.message = "Export Current Settings..."
+		s.extensionHidden = false
+		s.nameFieldStringValue = "Trailer Settings"
+		s.allowedFileTypes = ["trailerSettings"]
+		s.beginSheetModalForWindow(preferencesWindow, completionHandler: { [weak self] response in
+			if response == NSFileHandlingPanelOKButton, let url = s.URL {
+				Settings.writeToURL(url)
+				DLog("Exported settings to %@", url.absoluteString!)
+			}
+		})
+	}
+
+	@IBAction func importSettingsSelected(sender: NSButton) {
+		let o = NSOpenPanel()
+		o.title = "Import Settings From File..."
+		o.prompt = "Import"
+		o.nameFieldLabel = "Settings File"
+		o.message = "Import Settings From File..."
+		o.extensionHidden = false
+		o.allowedFileTypes = ["trailerSettings"]
+		o.beginSheetModalForWindow(preferencesWindow, completionHandler: { [weak self] response in
+			if response == NSFileHandlingPanelOKButton, let url = o.URL {
+				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
+					self!.tryLoadSettings(url, skipConfirm: Settings.dontConfirmSettingsImport)
+				}
+			}
+		})
 	}
 
 	private func colorButton(button: NSButton, withColor: NSColor) {
@@ -1042,6 +1154,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		}
 		preferencesDirty = true
 		projectsTable.reloadData()
+		Settings.possibleExport(nil)
 	}
 
 	@IBAction func hideAllRepositoriesSelected(sender: NSButton) {
@@ -1051,6 +1164,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		}
 		preferencesDirty = true
 		projectsTable.reloadData()
+		Settings.possibleExport(nil)
 	}
 
 	@IBAction func enableHotkeySelected(sender: NSButton) {
@@ -1109,7 +1223,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	/////////////////////////////////// Repo table
 
 	private func repoForRow(row: Int) -> Repo {
-		let parentCount = DataManager.countParentRepos(repoFilter.stringValue)
+		let parentCount = Repo.countParentRepos(repoFilter.stringValue)
 		var r = row
 		if r > parentCount {
 			r--
@@ -1134,11 +1248,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 				} else {
 					(cell as! NSButtonCell).imagePosition = NSCellImagePosition.ImageOnly
 					let r = repoForRow(row)
-					if r.hidden.boolValue {
-						cell.state = NSOnState
-					} else {
-						cell.state = NSOffState
-					}
+					cell.state = (r.hidden?.boolValue ?? false) ? NSOnState : NSOffState
 					cell.enabled = true
 				}
 			} else {
@@ -1177,7 +1287,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	func tableView(tableView: NSTableView, isGroupRow row: Int) -> Bool {
 		if tableView === projectsTable {
-			return (row == 0 || row == DataManager.countParentRepos(repoFilter.stringValue) + 1)
+			return (row == 0 || row == Repo.countParentRepos(repoFilter.stringValue) + 1)
 		} else {
 			return false
 		}
@@ -1204,6 +1314,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 			}
 			DataManager.saveDB()
 			preferencesDirty = true
+			Settings.possibleExport(nil)
 		}
 	}
 

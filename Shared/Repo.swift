@@ -7,7 +7,7 @@ class Repo: DataItem {
     @NSManaged var dirty: NSNumber?
     @NSManaged var fork: NSNumber?
     @NSManaged var fullName: String?
-    @NSManaged var hidden: NSNumber
+    @NSManaged var hidden: NSNumber?
     @NSManaged var inaccessible: NSNumber?
     @NSManaged var lastDirtied: NSDate?
     @NSManaged var webUrl: String?
@@ -66,7 +66,7 @@ class Repo: DataItem {
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "serverId IN %@", ids)
 		for repo in inMoc.executeFetchRequest(f, error: nil) as! [Repo] {
-			repo.dirty = !repo.hidden.boolValue
+			repo.dirty = !(repo.hidden?.boolValue ?? false)
 		}
 	}
 
@@ -81,5 +81,16 @@ class Repo: DataItem {
 			NSSortDescriptor(key: "fullName", ascending: true)
 		]
 		return mainObjectContext.executeFetchRequest(f, error: nil) as! [Repo]
+	}
+
+	class func countParentRepos(filter: String?) -> Int {
+		let f = NSFetchRequest(entityName: "Repo")
+
+		if let fi = filter where !fi.isEmpty {
+			f.predicate = NSPredicate(format: "fork == NO and fullName contains [cd] %@", fi)
+		} else {
+			f.predicate = NSPredicate(format: "fork == NO")
+		}
+		return mainObjectContext.countForFetchRequest(f, error:nil)
 	}
 }

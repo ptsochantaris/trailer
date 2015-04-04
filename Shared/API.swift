@@ -968,7 +968,7 @@ class API {
 
 		let prsToCheck = pullRequests.filter { r -> Bool in
 			let parent = r.repo
-			return (!parent.hidden.boolValue) && ((parent.postSyncAction?.integerValue ?? 0) != PostSyncAction.Delete.rawValue) && r.apiServer.syncIsGood
+			return !(parent.hidden?.boolValue ?? false) && ((parent.postSyncAction?.integerValue ?? 0) != PostSyncAction.Delete.rawValue) && r.apiServer.syncIsGood
 		}
 
 		let totalOperations = prsToCheck.count
@@ -998,7 +998,7 @@ class API {
 
 		let issuesToCheck = issues.filter { r -> Bool in
 			let parent = r.repo
-			return (!parent.hidden.boolValue) && ((parent.postSyncAction?.integerValue ?? 0) != PostSyncAction.Delete.rawValue) && r.apiServer.syncIsGood
+			return !(parent.hidden?.boolValue ?? false) && ((parent.postSyncAction?.integerValue ?? 0) != PostSyncAction.Delete.rawValue) && r.apiServer.syncIsGood
 		}
 
 		for i in issuesToCheck {

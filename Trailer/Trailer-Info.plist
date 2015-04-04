@@ -38,6 +38,23 @@
 	<string>banner</string>
 	<key>SUFeedURL</key>
 	<string>http://ptsochantaris.github.io/trailer/appcast.xml</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>CFBundleTypeIconFile</key>
+			<string>Trailer.icns</string>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>trailerSettings</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>Trailer Settings File</string>
+			<key>LSHandlerRank</key>
+			<string>Default</string>
+		</dict>
+	</array>
 	<key>SUPublicDSAKeyFile</key>
 	<string>dsa_pub.pem</string>
 </dict>

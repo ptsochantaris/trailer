@@ -345,16 +345,6 @@ class DataManager : NSObject {
 			return true
 		}
 	}
-
-	class func countParentRepos(filter: String?) -> Int {
-		let f = NSFetchRequest(entityName: "Repo")
-		if (filter ?? "").isEmpty {
-			f.predicate = NSPredicate(format: "fork == NO")
-		} else {
-			f.predicate = NSPredicate(format: "fork == NO and fullName contains [cd] %@", filter!)
-		}
-		return mainObjectContext.countForFetchRequest(f, error:nil)
-	}
 }
 
 ///////////////////////////////////////

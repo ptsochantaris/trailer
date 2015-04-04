@@ -3,25 +3,30 @@
 import UIKit
 #endif
 
+let SETTINGS_EXPORTED = "SETTINGS_EXPORTED"
+
 var _settings_valuesCache = Dictionary<String, AnyObject>()
 let _settings_shared = NSUserDefaults(suiteName: "group.Trailer")!
 
 class Settings: NSObject {
 
-    class func checkMigration() {
+	class func allFields() -> [String] {
+		return [
+			"SORT_METHOD_KEY", "STATUS_FILTERING_METHOD_KEY", "LAST_PREFS_TAB_SELECTED", "CLOSE_HANDLING_POLICY", "MERGE_HANDLING_POLICY", "STATUS_ITEM_REFRESH_COUNT", "LABEL_REFRESH_COUNT", "UPDATE_CHECK_INTERVAL_KEY",
+			"STATUS_FILTERING_TERMS_KEY", "COMMENT_AUTHOR_BLACKLIST", "HOTKEY_LETTER", "REFRESH_PERIOD_KEY", "IOS_BACKGROUND_REFRESH_PERIOD_KEY", "NEW_REPO_CHECK_PERIOD", "LAST_SUCCESSFUL_REFRESH",
+			"LAST_RUN_VERSION_KEY", "UPDATE_CHECK_AUTO_KEY", "HIDE_UNCOMMENTED_PRS_KEY", "SHOW_COMMENTS_EVERYWHERE_KEY", "SORT_ORDER_KEY", "SHOW_UPDATED_KEY", "DONT_KEEP_MY_PRS_KEY", "HIDE_AVATARS_KEY",
+			"AUTO_PARTICIPATE_IN_MENTIONS_KEY", "DONT_ASK_BEFORE_WIPING_MERGED", "DONT_ASK_BEFORE_WIPING_CLOSED", "HIDE_NEW_REPOS_KEY", "GROUP_BY_REPO", "HIDE_ALL_SECTION", "SHOW_LABELS", "SHOW_STATUS_ITEMS",
+			"MAKE_STATUS_ITEMS_SELECTABLE", "MOVE_ASSIGNED_PRS_TO_MY_SECTION", "MARK_UNMERGEABLE_ON_USER_SECTIONS_ONLY", "COUNT_ONLY_LISTED_PRS", "OPEN_PR_AT_FIRST_UNREAD_COMMENT_KEY", "LOG_ACTIVITY_TO_CONSOLE_KEY",
+			"HOTKEY_ENABLE", "HOTKEY_CONTROL_MODIFIER", "USE_VIBRANCY_UI", "DISABLE_ALL_COMMENT_NOTIFICATIONS", "NOTIFY_ON_STATUS_UPDATES", "NOTIFY_ON_STATUS_UPDATES_ALL", "SHOW_REPOS_IN_NAME", "INCLUDE_REPOS_IN_FILTER",
+			"INCLUDE_LABELS_IN_FILTER", "INCLUDE_STATUSES_IN_FILTER", "HOTKEY_COMMAND_MODIFIER", "HOTKEY_OPTION_MODIFIER", "HOTKEY_SHIFT_MODIFIER", "GRAY_OUT_WHEN_REFRESHING", "SHOW_ISSUES_MENU",
+			"AUTO_PARTICIPATE_ON_TEAM_MENTIONS", "SHOW_ISSUES_IN_WATCH_GLANCE", "HIDE_DESCRIPTION_IN_WATCH_DETAIL_VIEW", "AUTO_REPEAT_SETTINGS_EXPORT", "DONT_CONFIRM_SETTINGS_IMPORT", "LAST_EXPORT_URL", "LAST_EXPORT_TIME"]
+	}
 
-        let allFields = [
-            "SORT_METHOD_KEY", "STATUS_FILTERING_METHOD_KEY", "LAST_PREFS_TAB_SELECTED", "CLOSE_HANDLING_POLICY", "MERGE_HANDLING_POLICY", "STATUS_ITEM_REFRESH_COUNT", "LABEL_REFRESH_COUNT", "UPDATE_CHECK_INTERVAL_KEY",
-            "STATUS_FILTERING_TERMS_KEY", "COMMENT_AUTHOR_BLACKLIST", "HOTKEY_LETTER", "REFRESH_PERIOD_KEY", "IOS_BACKGROUND_REFRESH_PERIOD_KEY", "NEW_REPO_CHECK_PERIOD", "LAST_SUCCESSFUL_REFRESH",
-            "LAST_RUN_VERSION_KEY", "UPDATE_CHECK_AUTO_KEY", "HIDE_UNCOMMENTED_PRS_KEY", "SHOW_COMMENTS_EVERYWHERE_KEY", "SORT_ORDER_KEY", "SHOW_UPDATED_KEY", "DONT_KEEP_MY_PRS_KEY", "HIDE_AVATARS_KEY",
-            "AUTO_PARTICIPATE_IN_MENTIONS_KEY", "DONT_ASK_BEFORE_WIPING_MERGED", "DONT_ASK_BEFORE_WIPING_CLOSED", "HIDE_NEW_REPOS_KEY", "GROUP_BY_REPO", "HIDE_ALL_SECTION", "SHOW_LABELS", "SHOW_STATUS_ITEMS",
-            "MAKE_STATUS_ITEMS_SELECTABLE", "MOVE_ASSIGNED_PRS_TO_MY_SECTION", "MARK_UNMERGEABLE_ON_USER_SECTIONS_ONLY", "COUNT_ONLY_LISTED_PRS", "OPEN_PR_AT_FIRST_UNREAD_COMMENT_KEY", "LOG_ACTIVITY_TO_CONSOLE_KEY",
-            "HOTKEY_ENABLE", "HOTKEY_CONTROL_MODIFIER", "USE_VIBRANCY_UI", "DISABLE_ALL_COMMENT_NOTIFICATIONS", "NOTIFY_ON_STATUS_UPDATES", "NOTIFY_ON_STATUS_UPDATES_ALL", "SHOW_REPOS_IN_NAME", "INCLUDE_REPOS_IN_FILTER",
-            "INCLUDE_LABELS_IN_FILTER", "INCLUDE_STATUSES_IN_FILTER", "HOTKEY_COMMAND_MODIFIER", "HOTKEY_OPTION_MODIFIER", "HOTKEY_SHIFT_MODIFIER", "GRAY_OUT_WHEN_REFRESHING"]
+    class func checkMigration() {
 
         let d = NSUserDefaults.standardUserDefaults()
         if d.objectForKey("LAST_RUN_VERSION_KEY") != nil {
-            for k in allFields {
+            for k in allFields() {
                 if let v: AnyObject = d.objectForKey(k) {
                     _settings_shared.setObject(v, forKey: k)
                     DLog("Migrating setting '%@'", k)
@@ -35,6 +40,8 @@ class Settings: NSObject {
         }
     }
 
+	static var saveTimer: PopTimer?
+
 	private class func set(key: String, _ value: NSObject?) {
 		if let v = value {
 			_settings_shared.setObject(v, forKey: key)
@@ -45,6 +52,25 @@ class Settings: NSObject {
 		_settings_shared.synchronize()
 
 		DLog("Setting %@ to %@", key, value)
+
+		possibleExport(key)
+	}
+
+	class func possibleExport(key: String?) {
+		var keyIsGood: Bool
+		if let k = key {
+			keyIsGood = !contains(["LAST_SUCCESSFUL_REFRESH", "LAST_EXPORT_URL", "LAST_EXPORT_TIME"], k)
+		} else {
+			keyIsGood = true
+		}
+		if Settings.autoRepeatSettingsExport && keyIsGood, let url = Settings.lastExportUrl {
+			if saveTimer == nil {
+				saveTimer = PopTimer(timeInterval: 2.0, callback: {
+					Settings.writeToURL(url)
+				})
+			}
+			saveTimer?.push()
+		}
 	}
 
 	private class func get(key: String) -> AnyObject? {
@@ -60,8 +86,58 @@ class Settings: NSObject {
 		}
 	}
 
+	/////////////////////////////////
+
 	class func clearCache() {
 		_settings_valuesCache.removeAll(keepCapacity: false)
+	}
+
+	class func writeToURL(url: NSURL) -> Bool {
+
+		if let s = saveTimer {
+			s.invalidate()
+		}
+
+		Settings.lastExportUrl = url
+		Settings.lastExportDate = NSDate()
+		let settings = NSMutableDictionary()
+		for k in allFields() {
+			if let v: AnyObject = _settings_shared.objectForKey(k) where k != "AUTO_REPEAT_SETTINGS_EXPORT" {
+				settings[k] = v
+			}
+		}
+		settings["DB_CONFIG_OBJECTS"] = ApiServer.archiveApiServers()
+		if !settings.writeToURL(url, atomically: true) {
+			DLog("Warning, exporting settings failed")
+			return false
+		}
+		NSNotificationCenter.defaultCenter().postNotificationName(SETTINGS_EXPORTED, object: nil)
+		DLog("Written settings to %@", url.absoluteString!)
+		return true
+	}
+
+	class func readFromURL(url: NSURL) -> Bool {
+		if let settings = NSDictionary(contentsOfURL: url) {
+			DLog("Reading settings from %@", url.absoluteString!)
+			resetAllSettings()
+			for k in allFields() {
+				if let v: AnyObject = settings[k] {
+					_settings_shared.setObject(v, forKey: k)
+				}
+			}
+			_settings_shared.synchronize()
+			clearCache()
+			return ApiServer.configureFromArchive(settings["DB_CONFIG_OBJECTS"] as! [String : [String : NSObject]])
+		}
+		return false
+	}
+
+	class func resetAllSettings() {
+		for k in allFields() {
+			_settings_shared.removeObjectForKey(k);
+		}
+		_settings_shared.synchronize()
+		clearCache()
 	}
 
 	/////////////////////////////////
@@ -152,10 +228,26 @@ class Settings: NSObject {
         set { set("LAST_SUCCESSFUL_REFRESH", newValue) }
     }
 
+	class var lastExportDate: NSDate? {
+		get { return get("LAST_EXPORT_TIME") as? NSDate }
+		set { set("LAST_EXPORT_TIME", newValue) }
+	}
+
     class var lastRunVersion: String? {
         get { return get("LAST_RUN_VERSION_KEY") as? String }
         set { set("LAST_RUN_VERSION_KEY", newValue) }
     }
+
+	class var lastExportUrl: NSURL? {
+		get {
+			if let s = get("LAST_EXPORT_URL") as? String {
+				return NSURL(string: s)
+			} else {
+				return nil
+			}
+		}
+		set { set("LAST_EXPORT_URL", newValue?.absoluteString) }
+	}
 
     ///////////////////////////
 
@@ -315,6 +407,16 @@ class Settings: NSObject {
 		set { set("HIDE_DESCRIPTION_IN_WATCH_DETAIL_VIEW", newValue) }
 	}
 
+	class var autoRepeatSettingsExport: Bool {
+		get { return get("AUTO_REPEAT_SETTINGS_EXPORT") as? Bool ?? false }
+		set { set("AUTO_REPEAT_SETTINGS_EXPORT", newValue) }
+	}
+
+	class var dontConfirmSettingsImport: Bool {
+		get { return get("DONT_CONFIRM_SETTINGS_IMPORT") as? Bool ?? false }
+		set { set("DONT_CONFIRM_SETTINGS_IMPORT", newValue) }
+	}
+
 	//////////////////////////////
 
 	class var checkForUpdatesAutomatically: Bool {
@@ -361,4 +463,5 @@ class Settings: NSObject {
 		get { return get("GRAY_OUT_WHEN_REFRESHING") as? Bool ?? true }
 		set { set("GRAY_OUT_WHEN_REFRESHING", newValue) }
     }
+
 }
