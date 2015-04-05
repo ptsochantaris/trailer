@@ -1013,9 +1013,9 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	func updateImportExportSettings() {
 		repeatLastExportAutomatically.integerValue = Settings.autoRepeatSettingsExport ? 1 : 0
-		if let lastExportDate = Settings.lastExportDate, fileName = Settings.lastExportUrl?.absoluteString {
+		if let lastExportDate = Settings.lastExportDate, fileName = Settings.lastExportUrl?.absoluteString, unescapedName = fileName.stringByReplacingPercentEscapesUsingEncoding(NSUTF8StringEncoding) {
 			let time = itemDateFormatter.stringFromDate(lastExportDate)
-			lastExportReport.stringValue = "Last export \(time) to \(fileName)"
+			lastExportReport.stringValue = "Last exported \(time) to \(unescapedName)"
 		} else {
 			lastExportReport.stringValue = ""
 		}
