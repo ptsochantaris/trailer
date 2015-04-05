@@ -101,10 +101,10 @@ class Settings {
 		} else {
 			keyIsGood = true
 		}
-		if Settings.autoRepeatSettingsExport && keyIsGood, let url = Settings.lastExportUrl {
+		if Settings.autoRepeatSettingsExport && keyIsGood && Settings.lastExportUrl != nil {
 			if saveTimer == nil {
 				saveTimer = PopTimer(timeInterval: 2.0, callback: {
-					Settings.writeToURL(url)
+					Settings.writeToURL(Settings.lastExportUrl!)
 				})
 			}
 			saveTimer?.push()

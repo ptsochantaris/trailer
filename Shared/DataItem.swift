@@ -107,11 +107,4 @@ class DataItem: NSManagedObject {
 		let f = NSFetchRequest(entityName: type)
 		return moc.countForFetchRequest(f, error: nil)
 	}
-
-	/*
-	override func prepareForDeletion() {
-		DLog("Deleting %@ ID: %@", entity.name, serverId)
-		super.prepareForDeletion()
-	}
-	*/
 }

@@ -93,6 +93,7 @@ class ListableItem: DataItem {
 	}
 
 	func commentedByMe() -> Bool {
+
 		for c in comments {
 			if c.isMine() {
 				return true

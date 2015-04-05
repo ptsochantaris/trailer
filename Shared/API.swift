@@ -762,8 +762,8 @@ class API {
 			}
 		}
 
-		let issues = allIssues.filter({ pr in
-			return pr.apiServer.syncIsGood
+		let issues = allIssues.filter({ i in
+			return i.apiServer.syncIsGood
 		})
 
 		let total = issues.count

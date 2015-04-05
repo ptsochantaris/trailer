@@ -7,12 +7,6 @@
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
-			<key>LSItemContentTypes</key>
-			<array>
-				<string>com.housetrip.mobile.trailer.ios.settings</string>
-			</array>
-			<key>LSHandlerRank</key>
-			<string>Owner</string>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>trailerSettings</string>
@@ -23,6 +17,12 @@
 			<string>Trailer Settings File</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.housetrip.mobile.trailer.ios.settings</string>
+			</array>
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
@@ -42,7 +42,7 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>1197</string>
+	<string>1198</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.developer-tools</string>
 	<key>LSMinimumSystemVersion</key>

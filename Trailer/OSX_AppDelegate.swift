@@ -251,9 +251,13 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		if Settings.logActivityToConsole {
 			let alert = NSAlert()
 			alert.messageText = "Warning"
+			#if DEBUG
+			alert.informativeText = "Sorry, logging is always active in debug builds"
+			#else
 			alert.informativeText = "Logging is a feature meant for error reporting, having it constantly enabled will cause this app to be less responsive and use more power"
+			#endif
 			alert.addButtonWithTitle("OK")
-			alert.runModal()
+			alert.beginSheetModalForWindow(preferencesWindow, completionHandler: nil)
 		}
 	}
 
@@ -1011,7 +1015,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		repeatLastExportAutomatically.integerValue = Settings.autoRepeatSettingsExport ? 1 : 0
 		if let lastExportDate = Settings.lastExportDate, fileName = Settings.lastExportUrl?.absoluteString {
 			let time = itemDateFormatter.stringFromDate(lastExportDate)
-			lastExportReport.stringValue = "Last export \(time) -> \(fileName)"
+			lastExportReport.stringValue = "Last export \(time) to \(fileName)"
 		} else {
 			lastExportReport.stringValue = ""
 		}
