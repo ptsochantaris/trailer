@@ -176,3 +176,9 @@ func indexOfObject(array: [AnyObject], value: AnyObject) -> Int? {
 	}
 	return nil
 }
+
+func atNextEvent(completion: Completion) {
+	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
+		completion()
+	}
+}

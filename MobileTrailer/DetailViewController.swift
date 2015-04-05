@@ -149,7 +149,7 @@ class DetailViewController: UIViewController, WKNavigationDelegate {
 
 	func shareSelected() {
 		if let u = _webView?.URL {
-			app.shareFromView(self, buttonItem: navigationItem.rightBarButtonItem!, url: u)
+			popupManager.shareFromView(self, buttonItem: navigationItem.rightBarButtonItem!, url: u)
 		}
 	}
 }

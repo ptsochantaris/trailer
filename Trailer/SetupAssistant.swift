@@ -61,20 +61,20 @@ class SetupAssistant: NSWindow, NSWindowDelegate {
 			})
 		} else {
 			testingState()
-			api.testApiToServer(newServer, callback: { error in
+			api.testApiToServer(newServer, callback: { [weak self] error in
 				if let e = error {
 					let alert = NSAlert()
 					alert.messageText = "Testing the token failed - please check that you have pasted your token correctly"
 					alert.informativeText = e.localizedDescription
 					alert.addButtonWithTitle("OK")
-					alert.beginSheetModalForWindow(self, completionHandler: { response in
-						self.normalState()
+					alert.beginSheetModalForWindow(self!, completionHandler: { response in
+						self!.normalState()
 					})
 				} else {
-					quickstart.stringValue = "\nSyncing your GitHub info for the first time.\n\nThis could take a little while, please wait..."
+					self!.quickstart.stringValue = "\nSyncing your GitHub info for the first time.\n\nThis could take a little while, please wait..."
 					Settings.lastSuccessfulRefresh = nil
 					app.startRefreshIfItIsDue()
-					self!.checkTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: Selector("checkRefreshDone:"), userInfo: nil, repeats: true)
+					self!.checkTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self!, selector: Selector("checkRefreshDone:"), userInfo: nil, repeats: true)
 				}
 			})
 		}

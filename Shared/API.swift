@@ -183,8 +183,8 @@ class API {
 
             #if os(iOS)
                 task.priority = NSURLSessionTaskPriorityHigh
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
-                self.networkIndicationStart()
+                atNextEvent() {
+					self.networkIndicationStart()
                 }
             #endif
 

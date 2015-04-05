@@ -1,11 +1,12 @@
 
 import UIKit
 
-class AdvancedSettingsViewController: UITableViewController, PickerViewControllerDelegate {
+class AdvancedSettingsViewController: UITableViewController, PickerViewControllerDelegate, UIDocumentPickerDelegate, UIActionSheetDelegate {
 
 	required init(coder aDecoder: NSCoder) {
 		settingsChangedTimer = PopTimer(timeInterval: 1.0) {
-			app.refreshMainList()
+			DataManager.postProcessAllItems()
+			popupManager.getMasterController().reloadDataWithAnimation(true)
 		}
 		super.init(coder: aDecoder)
 	}
@@ -17,6 +18,8 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 	private var pickerName: String?
 	private var selectedIndexPath: NSIndexPath?
 	private var previousValue: Int?
+
+	@IBOutlet var importExportButton: UIBarButtonItem!
 
 	@IBAction func done(sender: UIBarButtonItem) {
 		if app.preferencesDirty { app.startRefresh() }
@@ -497,6 +500,77 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 			}
 			tableView.reloadData()
 			selectedIndexPath = nil
+		}
+	}
+
+	/////////////////// Import / Export
+
+	private var tempUrl: NSURL?
+
+	@IBAction func importExportSelected(sender: UIBarButtonItem) {
+		let a = UIActionSheet(title: "Action",
+			delegate:self,
+			cancelButtonTitle: "Cancel",
+			destructiveButtonTitle: "Import New Settings",
+			otherButtonTitles: "Export Settings")
+		a.showFromBarButtonItem(sender, animated: true)
+	}
+
+	func actionSheet(actionSheet: UIActionSheet, didDismissWithButtonIndex buttonIndex: Int) {
+		if buttonIndex==0 {
+			importSelected()
+		} else if buttonIndex==2 {
+			exportSelected()
+		}
+	}
+
+	private func importSelected() {
+		tempUrl = nil
+		let menu = UIDocumentPickerViewController(documentTypes: ["com.housetrip.mobile.trailer.ios.settings"], inMode: UIDocumentPickerMode.Import)
+		menu.delegate = self
+		menu.modalPresentationStyle = UIModalPresentationStyle.Popover
+		popupManager.showPopoverFromViewController(self, fromItem: importExportButton, viewController: menu)
+	}
+
+	private func exportSelected() {
+		let tempFilePath = NSTemporaryDirectory().stringByAppendingPathComponent("PocketTrailer Settings.trailerSettings")
+		tempUrl = NSURL(fileURLWithPath: tempFilePath)!
+		Settings.writeToURL(tempUrl!)
+
+		let menu = UIDocumentPickerViewController(URL: tempUrl!, inMode: UIDocumentPickerMode.ExportToService)
+		menu.delegate = self
+		menu.modalPresentationStyle = UIModalPresentationStyle.Popover
+		popupManager.showPopoverFromViewController(self, fromItem: importExportButton, viewController: menu)
+	}
+
+	func documentPicker(controller: UIDocumentPickerViewController, didPickDocumentAtURL url: NSURL) {
+		if tempUrl == nil {
+			DLog("Will import settings from %@", url.absoluteString)
+			settingsManager.loadSettingsFrom(url, confirmFromView: self, withCompletion: {[weak self] confirmed in
+				if confirmed {
+					self!.dismissViewControllerAnimated(false, completion: nil)
+				}
+				self!.documentInteractionCleanup()
+			})
+		} else {
+			DLog("Saved settings to %@", url.absoluteString)
+			documentInteractionCleanup()
+		}
+	}
+
+	func documentPickerWasCancelled(controller: UIDocumentPickerViewController) {
+		DLog("Document picker cancelled")
+		documentInteractionCleanup()
+	}
+
+	func documentInteractionCleanup() {
+		if let t = tempUrl {
+			var error: NSError?
+			NSFileManager.defaultManager().removeItemAtURL(t, error: &error)
+			if error != nil {
+				DLog("Temporary file cleanup error: %@", error!)
+			}
+			tempUrl = nil
 		}
 	}
 }

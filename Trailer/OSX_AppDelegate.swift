@@ -1099,7 +1099,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		o.allowedFileTypes = ["trailerSettings"]
 		o.beginSheetModalForWindow(preferencesWindow, completionHandler: { [weak self] response in
 			if response == NSFileHandlingPanelOKButton, let url = o.URL {
-				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
+				atNextEvent() {
 					self!.tryLoadSettings(url, skipConfirm: Settings.dontConfirmSettingsImport)
 				}
 			}
@@ -1852,7 +1852,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 				prMenu.table.deselectAll(nil)
 				pr = pullRequestDelegate.pullRequestAtRow(row)
 			}
-			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
+			atNextEvent() {
 				self.prMenu.table.selectRowIndexes(NSIndexSet(index: row), byExtendingSelection: false)
 			}
 			return pr?.webUrl
@@ -1863,7 +1863,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 				issuesMenu.table.deselectAll(nil)
 				i = issuesDelegate.issueAtRow(row)
 			}
-			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
+			atNextEvent() {
 				self.issuesMenu.table.selectRowIndexes(NSIndexSet(index: row), byExtendingSelection: false)
 			}
 			return i?.webUrl
@@ -1963,7 +1963,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	var darkMode: Bool = false {
 		didSet {
 			if darkMode != oldValue {
-				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
+				atNextEvent() {
 					NSNotificationCenter.defaultCenter().postNotificationName(DARK_MODE_CHANGED, object:nil)
 				}
 			}

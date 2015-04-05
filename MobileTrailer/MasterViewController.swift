@@ -37,7 +37,6 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 				}))
 			a.addAction(UIAlertAction(title: "Refresh Now", style:UIAlertActionStyle.Default, handler: { action in
 				app.startRefresh()
-				return
 			}))
 			presentViewController(a, animated: true, completion: nil)
 		}
