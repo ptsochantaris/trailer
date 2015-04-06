@@ -240,7 +240,7 @@ class DataManager : NSObject {
 		if _justMigrated {
 			DLog("FORCING ALL PRS TO BE REFETCHED")
 			for p in PullRequest.allItemsOfType("PullRequest", inMoc:mainObjectContext) as! [PullRequest] {
-				p.updatedAt = NSDate.distantPast() as? NSDate
+				p.resetSyncState()
 			}
 			_justMigrated = false
 		}

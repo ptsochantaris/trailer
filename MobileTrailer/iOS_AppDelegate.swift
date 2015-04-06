@@ -9,7 +9,7 @@ class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 	var isRefreshing: Bool = false
 	var lastUpdateFailed: Bool = false
 	var enteringForeground: Bool = true
-	var lastRepoCheck = NSDate.distantPast() as! NSDate
+	var lastRepoCheck = never()
 	var window: UIWindow?
 	var backgroundTask = UIBackgroundTaskInvalid
 

@@ -9,6 +9,10 @@ class DataItem: NSManagedObject {
 	@NSManaged var updatedAt: NSDate?
 	@NSManaged var apiServer: ApiServer
 
+	func resetSyncState() {
+		updatedAt = never()
+	}
+
 	class func allItemsOfType(type: String, inMoc: NSManagedObjectContext) -> [DataItem] {
 		let f = NSFetchRequest(entityName: type)
 		f.returnsObjectsAsFaults = false

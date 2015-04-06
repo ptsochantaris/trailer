@@ -103,7 +103,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	// Globals
 	weak var refreshTimer: NSTimer?
-	var lastRepoCheck = NSDate.distantPast() as! NSDate
+	var lastRepoCheck = never()
 	var preferencesDirty: Bool = false
 	var isRefreshing: Bool = false
 	var isManuallyScrolling: Bool = false
@@ -213,8 +213,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		api.resetAllLabelChecks()
 		if Settings.showLabels {
 			for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
-				r.dirty = true
-				r.lastDirtied = NSDate.distantPast() as? NSDate
+				r.resetSyncState()
 			}
 			preferencesDirty = true
 		}
@@ -320,8 +319,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		DataManager.postProcessAllItems()
 		if Settings.showIssuesMenu {
 			for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
-				r.dirty = true
-				r.lastDirtied = NSDate.distantPast() as? NSDate
+				r.resetSyncState()
 			}
 			preferencesDirty = true
 		} else {
@@ -380,8 +378,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		api.resetAllStatusChecks()
 		if Settings.showStatusItems {
 			for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
-				r.dirty = true
-				r.lastDirtied = NSDate.distantPast() as? NSDate
+				r.resetSyncState()
 			}
 			preferencesDirty = true
 		}
@@ -905,7 +902,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		api.resetAllStatusChecks()
 		api.resetAllLabelChecks()
 		Settings.lastSuccessfulRefresh = nil
-		lastRepoCheck = NSDate.distantPast() as! NSDate
+		lastRepoCheck = never()
 		projectsTable.reloadData()
 		refreshButton.enabled = ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext)
 		deferredUpdateTimer.push()
@@ -1408,7 +1405,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	func tabView(tabView: NSTabView, willSelectTabViewItem tabViewItem: NSTabViewItem?) {
 		if tabView.indexOfTabViewItem(tabViewItem!) == 1 {
-			if (lastRepoCheck.isEqualToDate(NSDate.distantPast() as! NSDate) || Repo.countVisibleReposInMoc(mainObjectContext) == 0) && ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
+			if (lastRepoCheck.isEqualToDate(never()) || Repo.countVisibleReposInMoc(mainObjectContext) == 0) && ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
 				refreshReposSelected(nil)
 			}
 		}

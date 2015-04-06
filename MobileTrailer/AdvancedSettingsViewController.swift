@@ -288,8 +288,7 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 				Settings.showIssuesMenu = !Settings.showIssuesMenu
 				if Settings.showIssuesMenu {
 					for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
-						r.dirty = true
-						r.lastDirtied = NSDate.distantPast() as? NSDate
+						r.resetSyncState()
 					}
 					app.preferencesDirty = true
 				} else {
@@ -338,8 +337,7 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 				api.resetAllStatusChecks()
 				if Settings.showStatusItems {
 					for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
-						r.dirty = true
-						r.lastDirtied = NSDate.distantPast() as? NSDate
+						r.resetSyncState()
 					}
 				}
 				settingsChangedTimer.push()
@@ -363,8 +361,7 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 				api.resetAllLabelChecks()
 				if Settings.showLabels {
 					for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
-						r.dirty = true
-						r.lastDirtied = NSDate.distantPast() as? NSDate
+						r.resetSyncState()
 					}
 				}
 				settingsChangedTimer.push()

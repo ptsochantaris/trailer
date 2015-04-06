@@ -182,3 +182,7 @@ func atNextEvent(completion: Completion) {
 		completion()
 	}
 }
+
+func never() -> NSDate {
+	return NSDate.distantPast() as! NSDate
+}

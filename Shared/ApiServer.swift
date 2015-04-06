@@ -132,8 +132,15 @@ class ApiServer: NSManagedObject {
 		webPath = "https://github.com"
 		apiPath = "https://api.github.com"
 		label = "GitHub"
-		latestReceivedEventDateProcessed = NSDate.distantPast() as? NSDate
-		latestUserEventDateProcessed = NSDate.distantPast() as? NSDate
+		resetSyncState()
+	}
+
+	func resetSyncState() {
+		lastSyncSucceeded = true
+		latestReceivedEventDateProcessed = never()
+		latestReceivedEventEtag = nil
+		latestUserEventDateProcessed = never()
+		latestUserEventEtag = nil
 	}
 
 	class func archiveApiServers() -> [String:[String:NSObject]] {
@@ -190,6 +197,7 @@ class ApiServer: NSManagedObject {
 					}
 				}
 			}
+			a.resetSyncState()
 		}
 
 		return tempMoc.save(nil)
@@ -206,6 +214,7 @@ class ApiServer: NSManagedObject {
 				}
 				r.apiServer = self
 			}
+			r.resetSyncState()
 		}
 	}
 

@@ -5,11 +5,11 @@ let api = API()
 
 
 //debugging sections
-//let _apis = ApiServer.allApiServersInMoc(mainObjectContext)
-//_prs[0].condition = NSNumber(integer: PullRequestCondition.Merged.rawValue)
-//_prs[1].condition = NSNumber(integer: PullRequestCondition.Closed.rawValue)
-//_prs[2].condition = NSNumber(integer: PullRequestCondition.Merged.rawValue)
-//_prs[3].condition = NSNumber(integer: PullRequestCondition.Closed.rawValue)
+//let _apis = ApiServer.allApiServersInMoc(mainObjectContext
+//_prs[0].condition = PullRequestCondition.Merged.rawValue
+//_prs[1].condition = PullRequestCondition.Closed.rawValue
+//_prs[2].condition = PullRequestCondition.Merged.rawValue
+//_prs[3].condition = PullRequestCondition.Closed.rawValue
 
 /*let _prs = PullRequest.allItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest]
 for p in _prs {
@@ -17,9 +17,9 @@ for p in _prs {
         mainObjectContext.deleteObject(c)
     }
 	p.latestReadCommentDate = nil
-	p.updatedAt = NSDate.distantPast() as? NSDate
+	p.updatedAt = never()
 	p.repo.dirty = true
-	p.repo.updatedAt = NSDate.distantPast() as? NSDate
+	p.repo.updatedAt = never()
 }
 DataManager.saveDB()
 */

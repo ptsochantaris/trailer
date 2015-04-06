@@ -27,6 +27,13 @@ class Repo: DataItem {
 		return r
 	}
 
+	override func resetSyncState() {
+		super.resetSyncState()
+		dirty = true
+		inaccessible = false
+		lastDirtied = never()
+	}
+
 	class func visibleReposInMoc(moc: NSManagedObjectContext) -> [Repo] {
 		let f = NSFetchRequest(entityName: "Repo")
 		f.returnsObjectsAsFaults = false

@@ -15,8 +15,8 @@ class Team: DataItem {
 			DLog("Creating Team: %@", serverId)
 			t = NSEntityDescription.insertNewObjectForEntityForName("Team", inManagedObjectContext: fromApiServer.managedObjectContext!) as? Team
 			t!.serverId = serverId
-			t!.updatedAt = NSDate.distantPast() as? NSDate
-			t!.createdAt = NSDate.distantPast() as? NSDate
+			t!.updatedAt = never()
+			t!.createdAt = never()
 			t!.apiServer = fromApiServer
 		} else {
 			DLog("Updating Team: %@", serverId)

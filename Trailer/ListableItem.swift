@@ -53,8 +53,8 @@ class ListableItem: DataItem {
 
 	func sortedComments(comparison: NSComparisonResult) -> [PRComment] {
 		return Array(comments).sorted({ (c1, c2) -> Bool in
-			let d1 = c1.createdAt ?? NSDate.distantPast() as! NSDate
-			let d2 = c2.createdAt ?? NSDate.distantPast() as! NSDate
+			let d1 = c1.createdAt ?? never()
+			let d2 = c2.createdAt ?? never()
 			return d1.compare(d2) == comparison
 		})
 	}

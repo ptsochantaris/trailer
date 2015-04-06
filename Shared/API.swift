@@ -246,7 +246,7 @@ class API {
 	func fetchPullRequestsForActiveReposAndCallback(callback: Completion) {
 		let syncContext = DataManager.tempContext()
 
-		let shouldRefreshReposToo = (app.lastRepoCheck.isEqualToDate(NSDate.distantPast() as! NSDate)
+		let shouldRefreshReposToo = (app.lastRepoCheck.isEqualToDate(never())
 			|| (NSDate().timeIntervalSinceDate(app.lastRepoCheck) < NSTimeInterval(Settings.newRepoCheckPeriod*3600.0))
 			|| (Repo.countVisibleReposInMoc(syncContext)==0))
 
@@ -419,7 +419,7 @@ class API {
 		}
 
 		let latestEtag = usingUserEventsFromServer.latestUserEventEtag
-		let latestDate = usingUserEventsFromServer.latestUserEventDateProcessed ?? NSDate.distantPast() as! NSDate
+		let latestDate = usingUserEventsFromServer.latestUserEventDateProcessed ?? never()
 
 		var extraHeaders: Dictionary<String, String>?
 		if let e = latestEtag {
@@ -442,7 +442,7 @@ class API {
 						}
 						if latestDate.compare(eventDate) == NSComparisonResult.OrderedAscending {
 							usingUserEventsFromServer.latestUserEventDateProcessed = eventDate
-							if latestDate.isEqualToDate(NSDate.distantPast() as! NSDate) {
+							if latestDate.isEqualToDate(never()) {
 								DLog("First sync, all repos are dirty so we don't need to read further, we have the latest user event date: %@", eventDate)
 								return true
 							}
@@ -470,7 +470,7 @@ class API {
 		}
 
 		let latestEtag = usingReceivedEventsFromServer.latestReceivedEventEtag
-		let latestDate = usingReceivedEventsFromServer.latestReceivedEventDateProcessed ?? NSDate.distantPast() as! NSDate
+		let latestDate = usingReceivedEventsFromServer.latestReceivedEventDateProcessed ?? never()
 
 		var extraHeaders: Dictionary<String, String>?
 		if let e = latestEtag {
@@ -495,7 +495,7 @@ class API {
 						}
 						if latestDate.compare(eventDate) == NSComparisonResult.OrderedAscending {
 							usingReceivedEventsFromServer.latestReceivedEventDateProcessed = eventDate
-							if latestDate.isEqualToDate(NSDate.distantPast() as! NSDate) {
+							if latestDate.isEqualToDate(never()) {
 								DLog("First sync, all repos are dirty so we don't need to read further, we have the latest received event date: %@", latestDate)
 								return true
 							}
@@ -1079,10 +1079,10 @@ class API {
 				if let mergeInfo = (data as? NSDictionary)?.ofk("merged_by") as? NSDictionary {
 					DLog("detected merged PR: %@", r.title)
 
-					let mergeUserId = mergeInfo.ofk("id") as? NSNumber ?? NSNumber(int: -2)
+					let mergeUserId = mergeInfo.ofk("id") as? NSNumber ?? -2
 					DLog("merged by user id: %@, our id is: %@", mergeUserId, r.apiServer.userId)
 
-					let mergedByMyself = mergeUserId.isEqualToNumber(r.apiServer.userId ?? NSNumber(int: -1))
+					let mergedByMyself = mergeUserId.isEqualToNumber(r.apiServer.userId ?? -1)
 
 					if !(mergedByMyself && Settings.dontKeepPrsMergedByMe) {
 						self!.prWasMerged(r)
