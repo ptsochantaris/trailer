@@ -9,6 +9,7 @@ class QuickStartViewController: UIViewController, UITextFieldDelegate {
 	@IBOutlet weak var feedback: UILabel!
 	@IBOutlet weak var skip: UIBarButtonItem!
 	@IBOutlet weak var link: UIButton!
+	@IBOutlet weak var trackIssues: UIBarButtonItem!
 
 	private let newServer = ApiServer.allApiServersInMoc(mainObjectContext).first!
 	private var token = ""
@@ -17,7 +18,24 @@ class QuickStartViewController: UIViewController, UITextFieldDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
 		normalMode()
+		Settings.showIssuesMenu = true
+		updateSettings()
     }
+
+	func updateSettings() {
+		if Settings.showIssuesMenu {
+			trackIssues.title = "Should track issues as well: Yes"
+			trackIssues.tintColor = view.tintColor
+		} else {
+			trackIssues.title = "Should track issues as well: No"
+			trackIssues.tintColor = UIColor.lightGrayColor()
+		}
+	}
+
+	@IBAction func willAlsoTrackSelected(sender: UIBarButtonItem) {
+		Settings.showIssuesMenu = !Settings.showIssuesMenu
+		updateSettings()
+	}
 
 	@IBAction func skipSelected(sender: UIBarButtonItem) {
 		self.dismissViewControllerAnimated(true, completion: nil)
@@ -96,6 +114,8 @@ class QuickStartViewController: UIViewController, UITextFieldDelegate {
 		spinner.startAnimating()
 		feedback.text = "\nTesting the token..."
 
+		navigationController?.setToolbarHidden(true, animated: true)
+
 		api.resetBadLinks()
 		newServer.authToken = token
 		newServer.lastSyncSucceeded = true
@@ -108,5 +128,7 @@ class QuickStartViewController: UIViewController, UITextFieldDelegate {
 			v.hidden = false
 		}
 		spinner.stopAnimating()
+
+		navigationController?.setToolbarHidden(false, animated: true)
 	}
 }

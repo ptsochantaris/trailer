@@ -9,13 +9,17 @@ class SetupAssistant: NSWindow, NSWindowDelegate {
 	@IBOutlet weak var completeSetup: NSButton!
 	@IBOutlet weak var spinner: NSProgressIndicator!
 	@IBOutlet weak var welcomeLabel: NSTextField!
+	@IBOutlet weak var trackIssues: NSButton!
 
 	private let newServer = ApiServer.allApiServersInMoc(mainObjectContext).first!
 	private var checkTimer: NSTimer?
 
 	override func awakeFromNib() {
 		StartupLaunch.setLaunchOnLogin(true)
+		Settings.showIssuesMenu = true
 		startAtLogin.integerValue = 1
+		trackIssues.integerValue = 1
+		app.updateIssuesMenu()
 	}
 
 	override init(contentRect: NSRect, styleMask aStyle: Int, backing bufferingType: NSBackingStoreType, defer flag: Bool) {
@@ -25,10 +29,6 @@ class SetupAssistant: NSWindow, NSWindowDelegate {
 
 	required init?(coder: NSCoder) {
 	    fatalError("init(coder:) has not been implemented")
-	}
-
-	@IBAction func startAtLoginSelected(sender: NSButton) {
-		StartupLaunch.setLaunchOnLogin(sender.integerValue==1)
 	}
 
 	func windowWillClose(notification: NSNotification) {
@@ -50,7 +50,17 @@ class SetupAssistant: NSWindow, NSWindowDelegate {
 		}
 	}
 
+	@IBAction func startAtLoginSelected(sender: NSButton) {
+		StartupLaunch.setLaunchOnLogin(startAtLogin.integerValue==1)
+	}
+
+	@IBAction func trackIssuesSelected(sender: NSButton) {
+		Settings.showIssuesMenu = (trackIssues.integerValue==1)
+		app.updateIssuesMenu()
+	}
+
 	@IBAction func testAndCompleteSelected(sender: NSButton) {
+
 		let token = (tokenHolder.stringValue as NSString).stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
 		if token.isEmpty {
 			let alert = NSAlert()
@@ -113,6 +123,7 @@ class SetupAssistant: NSWindow, NSWindowDelegate {
 		startAtLogin.hidden = false
 		completeSetup.hidden = false
 		welcomeLabel.hidden = false
+		trackIssues.hidden = false
 		spinner.hidden = true
 	}
 
@@ -126,6 +137,7 @@ class SetupAssistant: NSWindow, NSWindowDelegate {
 		startAtLogin.hidden = true
 		completeSetup.hidden = true
 		welcomeLabel.hidden = true
+		trackIssues.hidden = true
 		api.resetBadLinks()
 		let token = (tokenHolder.stringValue as NSString).stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
 		newServer.authToken = token

@@ -499,6 +499,7 @@
 				164840C01ACFEA5A009E6383 /* AboutWindow.swift */,
 				164840C21ACFEFA9009E6383 /* MenuWindow.xib */,
 				161C959D1A3A36020019A577 /* MenuWindow.swift */,
+				168BC6C217EC2DF000BC4584 /* MainMenu.xib */,
 			);
 			name = Windows;
 			sourceTree = "<group>";
@@ -620,7 +621,6 @@
 				164840B91ACFE3CB009E6383 /* Windows */,
 				162002CE1A2A3E0100FF95F3 /* Core */,
 				168A5C74185BB9D900CB6B02 /* UI Components */,
-				168BC6C217EC2DF000BC4584 /* MainMenu.xib */,
 				168BC6C817EC2DF000BC4584 /* Images.xcassets */,
 				16519EB31ACF0E91002171D0 /* Trailer.icns */,
 				168BC6B417EC2DF000BC4584 /* Supporting Files */,

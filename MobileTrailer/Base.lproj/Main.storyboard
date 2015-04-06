@@ -832,6 +832,13 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
                             <constraint firstItem="EED-i1-JTF" firstAttribute="centerX" secondItem="kTk-WK-GaF" secondAttribute="centerX" id="x0r-ur-l5x"/>
                         </constraints>
                     </view>
+                    <toolbarItems>
+                        <barButtonItem title="Should track issues as well: Yes" id="Pyo-9m-17L">
+                            <connections>
+                                <action selector="willAlsoTrackSelected:" destination="ZQR-qN-jZ1" id="TOU-aS-vMC"/>
+                            </connections>
+                        </barButtonItem>
+                    </toolbarItems>
                     <navigationItem key="navigationItem" title="Welcome!" id="cOg-SY-AQN">
                         <barButtonItem key="leftBarButtonItem" title="Skip" id="TOi-p0-I4W">
                             <connections>
@@ -839,12 +846,14 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
                             </connections>
                         </barButtonItem>
                     </navigationItem>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="feedback" destination="wfK-es-Q2m" id="Wiw-fn-QpE"/>
                         <outlet property="link" destination="v1a-vB-r8u" id="4Wh-gF-zwx"/>
                         <outlet property="skip" destination="TOi-p0-I4W" id="nI2-ml-HQT"/>
                         <outlet property="spinner" destination="5rH-Zj-pcO" id="o2t-tw-WNl"/>
                         <outlet property="testButton" destination="51v-nc-Xtf" id="emm-LZ-CaT"/>
+                        <outlet property="trackIssues" destination="Pyo-9m-17L" id="5P8-PR-mOP"/>
                         <outletCollection property="otherViews" destination="kTk-WK-GaF" collectionClass="NSMutableArray" id="0wu-hQ-SRt"/>
                         <outletCollection property="otherViews" destination="EED-i1-JTF" collectionClass="NSMutableArray" id="xJM-ot-hfL"/>
                         <outletCollection property="otherViews" destination="v1a-vB-r8u" collectionClass="NSMutableArray" id="VLf-up-I0J"/>

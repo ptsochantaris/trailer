@@ -95,6 +95,7 @@ class Settings {
 	}
 
 	class func possibleExport(key: String?) {
+		#if os(OSX)
 		var keyIsGood: Bool
 		if let k = key {
 			keyIsGood = !contains(["LAST_SUCCESSFUL_REFRESH", "LAST_EXPORT_URL", "LAST_EXPORT_TIME"], k)
@@ -109,6 +110,7 @@ class Settings {
 			}
 			saveTimer?.push()
 		}
+		#endif
 	}
 
 	private class func get(key: String) -> AnyObject? {
