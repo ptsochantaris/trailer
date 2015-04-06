@@ -113,15 +113,41 @@
 			<key>UTTypeConformsTo</key>
 			<array>
 				<string>public.data</string>
+				<string>public.xml</string>
 			</array>
 			<key>UTTypeDescription</key>
 			<string>Trailer Settings File</string>
 			<key>UTTypeIdentifier</key>
 			<string>com.housetrip.mobile.trailer.ios.settings</string>
 			<key>UTTypeSize320IconFile</key>
-			<string>trailerDoc320</string>
+			<string>trailerDoc320.png</string>
 			<key>UTTypeSize64IconFile</key>
-			<string>trailerDoc64</string>
+			<string>trailerDoc64.png</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>trailerSettings</string>
+				</array>
+			</dict>
+		</dict>
+	</array>
+	<key>UTImportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+				<string>public.xml</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>Trailer Settings File</string>
+			<key>UTTypeIdentifier</key>
+			<string>com.housetrip.mobile.trailer.ios.settings</string>
+			<key>UTTypeSize320IconFile</key>
+			<string>trailerDoc320.png</string>
+			<key>UTTypeSize64IconFile</key>
+			<string>trailerDoc64.png</string>
 			<key>UTTypeTagSpecification</key>
 			<dict>
 				<key>public.filename-extension</key>

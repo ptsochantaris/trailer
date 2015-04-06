@@ -11,6 +11,7 @@ class PopupManager: NSObject, UIPopoverControllerDelegate, UISplitViewController
 
 	func showPopoverFromViewController(parentViewController: UIViewController, fromItem: UIBarButtonItem, viewController: UIViewController) {
 		if UIDevice.currentDevice().userInterfaceIdiom == UIUserInterfaceIdiom.Pad {
+			viewController.modalPresentationStyle = UIModalPresentationStyle.Popover
 			currentPopover = UIPopoverController(contentViewController: viewController)
 			currentPopover!.delegate = self
 			currentPopover!.presentPopoverFromBarButtonItem(fromItem, permittedArrowDirections: UIPopoverArrowDirection.Any, animated: true)

@@ -526,9 +526,9 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 
 	private func importSelected() {
 		tempUrl = nil
+
 		let menu = UIDocumentPickerViewController(documentTypes: ["com.housetrip.mobile.trailer.ios.settings"], inMode: UIDocumentPickerMode.Import)
 		menu.delegate = self
-		menu.modalPresentationStyle = UIModalPresentationStyle.Popover
 		popupManager.showPopoverFromViewController(self, fromItem: importExportButton, viewController: menu)
 	}
 
@@ -539,7 +539,6 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 
 		let menu = UIDocumentPickerViewController(URL: tempUrl!, inMode: UIDocumentPickerMode.ExportToService)
 		menu.delegate = self
-		menu.modalPresentationStyle = UIModalPresentationStyle.Popover
 		popupManager.showPopoverFromViewController(self, fromItem: importExportButton, viewController: menu)
 	}
 

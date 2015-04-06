@@ -62,6 +62,10 @@
 		1633C1951ABCEC4A0086C692 /* Issue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1633C1911ABCEC4A0086C692 /* Issue.swift */; };
 		1633C19D1ABD84180086C692 /* IssueCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1633C19C1ABD84180086C692 /* IssueCell.swift */; };
 		1633C1A21ABD84370086C692 /* PullRequestCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1633C1A11ABD84370086C692 /* PullRequestCell.swift */; };
+		1633EF5E1AD1F97F008E9DAB /* trailerDoc22.png in Resources */ = {isa = PBXBuildFile; fileRef = 16E511731AD1F2E30067593D /* trailerDoc22.png */; };
+		1633EF5F1AD1F97F008E9DAB /* trailerDoc44.png in Resources */ = {isa = PBXBuildFile; fileRef = 16E511741AD1F2E30067593D /* trailerDoc44.png */; };
+		1633EF601AD1F97F008E9DAB /* trailerDoc64.png in Resources */ = {isa = PBXBuildFile; fileRef = 16E511751AD1F2E30067593D /* trailerDoc64.png */; };
+		1633EF611AD1F97F008E9DAB /* trailerDoc320.png in Resources */ = {isa = PBXBuildFile; fileRef = 16E511761AD1F2E30067593D /* trailerDoc320.png */; };
 		164785AA1A2CE7BD00297764 /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785A91A2CE7BD00297764 /* Globals.swift */; };
 		164785AB1A2CE7BD00297764 /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785A91A2CE7BD00297764 /* Globals.swift */; };
 		164785AE1A2CE7CD00297764 /* NSDictionaryExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785AC1A2CE7CD00297764 /* NSDictionaryExtensions.swift */; };
@@ -72,10 +76,6 @@
 		164840C11ACFEA5A009E6383 /* AboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164840C01ACFEA5A009E6383 /* AboutWindow.swift */; };
 		164840C31ACFEFA9009E6383 /* MenuWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 164840C21ACFEFA9009E6383 /* MenuWindow.xib */; };
 		164840C51AD04C3C009E6383 /* QuickStartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164840C41AD04C3C009E6383 /* QuickStartViewController.swift */; };
-		164840D31AD1586C009E6383 /* trailerDoc22.png in Resources */ = {isa = PBXBuildFile; fileRef = 164840CF1AD1586C009E6383 /* trailerDoc22.png */; };
-		164840D41AD1586C009E6383 /* trailerDoc44.png in Resources */ = {isa = PBXBuildFile; fileRef = 164840D01AD1586C009E6383 /* trailerDoc44.png */; };
-		164840D51AD1586C009E6383 /* trailerDoc64.png in Resources */ = {isa = PBXBuildFile; fileRef = 164840D11AD1586C009E6383 /* trailerDoc64.png */; };
-		164840D61AD1586C009E6383 /* trailerDoc320.png in Resources */ = {isa = PBXBuildFile; fileRef = 164840D21AD1586C009E6383 /* trailerDoc320.png */; };
 		164840FC1AD196D6009E6383 /* SettingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164840FB1AD196D6009E6383 /* SettingsManager.swift */; };
 		164840FE1AD19837009E6383 /* PopupManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164840FD1AD19837009E6383 /* PopupManager.swift */; };
 		164841001AD198A6009E6383 /* WatchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164840FF1AD198A6009E6383 /* WatchManager.swift */; };
@@ -262,10 +262,6 @@
 		164840C01ACFEA5A009E6383 /* AboutWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutWindow.swift; sourceTree = "<group>"; };
 		164840C21ACFEFA9009E6383 /* MenuWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MenuWindow.xib; sourceTree = "<group>"; };
 		164840C41AD04C3C009E6383 /* QuickStartViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuickStartViewController.swift; sourceTree = "<group>"; };
-		164840CF1AD1586C009E6383 /* trailerDoc22.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = trailerDoc22.png; sourceTree = "<group>"; };
-		164840D01AD1586C009E6383 /* trailerDoc44.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = trailerDoc44.png; sourceTree = "<group>"; };
-		164840D11AD1586C009E6383 /* trailerDoc64.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = trailerDoc64.png; sourceTree = "<group>"; };
-		164840D21AD1586C009E6383 /* trailerDoc320.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = trailerDoc320.png; sourceTree = "<group>"; };
 		164840FB1AD196D6009E6383 /* SettingsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsManager.swift; sourceTree = "<group>"; };
 		164840FD1AD19837009E6383 /* PopupManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PopupManager.swift; sourceTree = "<group>"; };
 		164840FF1AD198A6009E6383 /* WatchManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WatchManager.swift; sourceTree = "<group>"; };
@@ -341,6 +337,10 @@
 		16CBE1C41A2DFBA500485053 /* Settings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Settings.swift; path = Shared/Settings.swift; sourceTree = "<group>"; };
 		16CBE1C91A2E13A400485053 /* StatusItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatusItemView.swift; sourceTree = "<group>"; };
 		16DC40FB1A3F591200BB361A /* TrailerCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrailerCell.swift; sourceTree = "<group>"; };
+		16E511731AD1F2E30067593D /* trailerDoc22.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = trailerDoc22.png; sourceTree = "<group>"; };
+		16E511741AD1F2E30067593D /* trailerDoc44.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = trailerDoc44.png; sourceTree = "<group>"; };
+		16E511751AD1F2E30067593D /* trailerDoc64.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = trailerDoc64.png; sourceTree = "<group>"; };
+		16E511761AD1F2E30067593D /* trailerDoc320.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = trailerDoc320.png; sourceTree = "<group>"; };
 		16E93D111AB467DA00CA967E /* PRListController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PRListController.swift; sourceTree = "<group>"; };
 		16E93D131AB4680F00CA967E /* PRDetailController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PRDetailController.swift; sourceTree = "<group>"; };
 		16E93D161AB46CE600CA967E /* LabelRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LabelRow.swift; sourceTree = "<group>"; };
@@ -508,10 +508,10 @@
 			children = (
 				1628A6C918789E73005EDA69 /* Main.storyboard */,
 				16154E2E19C43E8E00E49139 /* Launch.storyboard */,
-				164840CF1AD1586C009E6383 /* trailerDoc22.png */,
-				164840D01AD1586C009E6383 /* trailerDoc44.png */,
-				164840D11AD1586C009E6383 /* trailerDoc64.png */,
-				164840D21AD1586C009E6383 /* trailerDoc320.png */,
+				16E511731AD1F2E30067593D /* trailerDoc22.png */,
+				16E511741AD1F2E30067593D /* trailerDoc44.png */,
+				16E511751AD1F2E30067593D /* trailerDoc64.png */,
+				16E511761AD1F2E30067593D /* trailerDoc320.png */,
 				1628A6D518789E73005EDA69 /* Images.xcassets */,
 			);
 			name = Resources;
@@ -932,12 +932,12 @@
 			files = (
 				1628A6CB18789E73005EDA69 /* Main.storyboard in Resources */,
 				1628A6D618789E73005EDA69 /* Images.xcassets in Resources */,
-				164840D61AD1586C009E6383 /* trailerDoc320.png in Resources */,
-				164840D31AD1586C009E6383 /* trailerDoc22.png in Resources */,
+				1633EF611AD1F97F008E9DAB /* trailerDoc320.png in Resources */,
+				1633EF5E1AD1F97F008E9DAB /* trailerDoc22.png in Resources */,
 				1628A6BF18789E73005EDA69 /* InfoPlist.strings in Resources */,
-				164840D41AD1586C009E6383 /* trailerDoc44.png in Resources */,
+				1633EF5F1AD1F97F008E9DAB /* trailerDoc44.png in Resources */,
 				16154E2F19C43E8E00E49139 /* Launch.storyboard in Resources */,
-				164840D51AD1586C009E6383 /* trailerDoc64.png in Resources */,
+				1633EF601AD1F97F008E9DAB /* trailerDoc64.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
