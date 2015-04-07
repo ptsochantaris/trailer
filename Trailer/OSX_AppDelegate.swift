@@ -251,7 +251,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 			let alert = NSAlert()
 			alert.messageText = "Warning"
 			#if DEBUG
-			alert.informativeText = "Sorry, logging is always active in debug builds"
+			alert.informativeText = "Sorry, logging is always active in development versions"
 			#else
 			alert.informativeText = "Logging is a feature meant for error reporting, having it constantly enabled will cause this app to be less responsive and use more power"
 			#endif
@@ -1127,8 +1127,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	@IBAction func showAllRepositoriesSelected(sender: NSButton) {
 		for r in Repo.reposForFilter(repoFilter.stringValue) {
 			r.hidden = false
-			r.dirty = true
-			r.lastDirtied = NSDate()
+			r.resetSyncState()
 		}
 		preferencesDirty = true
 		projectsTable.reloadData()

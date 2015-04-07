@@ -115,8 +115,7 @@ class API {
 		f.returnsObjectsAsFaults = false
 		let reposNotFetchedRecently = moc.executeFetchRequest(f, error: nil) as! [Repo]
 		for r in reposNotFetchedRecently {
-			r.dirty = true
-			r.lastDirtied = NSDate()
+			r.resetSyncState()
 		}
 
 		if reposNotFetchedRecently.count>0 {
@@ -1380,10 +1379,8 @@ class API {
 
 				}, failure: { response, data, error in
 					let code = response?.statusCode ?? 0
-					if code == 304 {
-						DLog("(%@) no change reported (304)", fromServer.label)
-					} else {
-						DLog("(%@) failure for %@: %@", fromServer.label, path, error?.localizedDescription)
+					if code != 304 {
+						DLog("(%@) Failure for %@: %@", fromServer.label, path, error?.localizedDescription)
 					}
 					callback(data: nil, lastPage: false, resultCode: code, etag: nil)
 			})
@@ -1430,7 +1427,7 @@ class API {
 
 			if let headers = extraHeaders {
 				for (key,value) in headers {
-					DLog("(%@) custom header: %@=%@", apiServerLabel, key, value)
+					//DLog("(%@) custom header: %@=%@", apiServerLabel, key, value)
 					r.setValue(value, forHTTPHeaderField:key)
 				}
 			}
@@ -1441,7 +1438,7 @@ class API {
 			if existingBackOff != nil {
 				if NSDate().compare(existingBackOff!.nextAttemptAt) == NSComparisonResult.OrderedAscending {
 					// report failure and return
-					DLog("(%@) preempted fetch to previously broken link %@, won't actually access this URL until %@", apiServerLabel, fullUrlPath, existingBackOff!.nextAttemptAt)
+					DLog("(%@) Preempted fetch to previously broken link %@, won't actually access this URL until %@", apiServerLabel, fullUrlPath, existingBackOff!.nextAttemptAt)
 					dispatch_async(dispatch_get_main_queue()) {
 						let e = NSError(domain: "Preempted fetch because of throttling", code: 400, userInfo: nil)
 						failure(response: nil, data: nil, error: e)
@@ -1465,13 +1462,13 @@ class API {
 					error = NSError(domain: "Error response received", code:response!.statusCode, userInfo:nil)
 					if response?.statusCode >= 400 {
 						if existingBackOff != nil {
-							DLog("(%@) extending backoff for already throttled URL %@ by %f seconds", apiServerLabel, fullUrlPath, BACKOFF_STEP)
+							DLog("(%@) Extending backoff for already throttled URL %@ by %f seconds", apiServerLabel, fullUrlPath, BACKOFF_STEP)
 							if existingBackOff!.duration < 3600.0 {
 								existingBackOff!.duration += BACKOFF_STEP
 							}
 							existingBackOff!.nextAttemptAt = NSDate(timeInterval: existingBackOff!.duration, sinceDate:NSDate())
 						} else {
-							DLog("(%@) placing URL %@ on the throttled list", apiServerLabel, fullUrlPath)
+							DLog("(%@) Placing URL %@ on the throttled list", apiServerLabel, fullUrlPath)
 							self!.badLinks[fullUrlPath] = UrlBackOffEntry(
 								nextAttemptAt: NSDate(timeInterval: BACKOFF_STEP, sinceDate: NSDate()),
 								duration: BACKOFF_STEP)
@@ -1480,7 +1477,11 @@ class API {
 				}
 
 				if error != nil {
-					DLog("(%@) GET %@ - FAILED: %@", apiServerLabel, fullUrlPath, error!.localizedDescription)
+					if response?.statusCode == 304 {
+						DLog("(%@) GET %@ - WAS SERVER CACHED", apiServerLabel, fullUrlPath)
+					} else {
+						DLog("(%@) GET %@ - FAILED: %@", apiServerLabel, fullUrlPath, error!.localizedDescription)
+					}
 					dispatch_async(dispatch_get_main_queue()) {
 						failure(response: response, data: parsedData, error: error)
 					}

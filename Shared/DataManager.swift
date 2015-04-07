@@ -50,8 +50,7 @@ class DataManager : NSObject {
 
 		DLog("Marking all repos as dirty")
 		for r in Repo.allItemsOfType("Repo", inMoc:mainObjectContext) as! [Repo] {
-			r.dirty = true
-			r.lastDirtied = NSDate()
+			r.resetSyncState()
 		}
 	}
 

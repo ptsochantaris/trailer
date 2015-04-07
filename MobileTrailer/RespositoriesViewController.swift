@@ -67,8 +67,7 @@ class RespositoriesViewController: UITableViewController, UITextFieldDelegate, N
 		a.addAction(UIAlertAction(title: "Show All", style: UIAlertActionStyle.Default, handler: { [weak self] action in
 			for r in self!.fetchedResultsController.fetchedObjects as! [Repo] {
 				r.hidden = false
-				r.dirty = true
-				r.lastDirtied = NSDate()
+				r.resetSyncState()
 			}
 			app.preferencesDirty = true
 		}))
