@@ -572,37 +572,32 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		}
 	}
 
-	func dataItemSelected(item: DataItem, alternativeSelect: Bool) {
-
-		let isPr = item is PullRequest
-
-		var window = isPr ? prMenu : issuesMenu
-		window.filter.becomeFirstResponder()
+	func dataItemSelected(item: ListableItem, alternativeSelect: Bool) {
 
 		ignoreNextFocusLoss = alternativeSelect
 
-		if let pullRequest = item as? PullRequest {
-			if let url = pullRequest.urlForOpening() {
-				NSWorkspace.sharedWorkspace().openURL(NSURL(string: url)!)
-			}
-			pullRequest.catchUpWithComments()
-		} else if let issue = item as? Issue {
-			if let url = issue.urlForOpening() {
-				NSWorkspace.sharedWorkspace().openURL(NSURL(string: url)!)
-			}
-			issue.catchUpWithComments()
+		var urlToOpen = item.urlForOpening()
+		item.catchUpWithComments()
+
+		var window: MenuWindow
+
+		if item is PullRequest {
+			updatePrMenu()
+			window = prMenu
+		} else {
+			updateIssuesMenu()
+			window = issuesMenu
 		}
 
 		let reSelectIndex = alternativeSelect ? window.table.selectedRow : -1
-
-		if isPr {
-			updatePrMenu()
-		} else {
-			updateIssuesMenu()
-		}
+		window.filter.becomeFirstResponder()
 
 		if reSelectIndex > -1 && reSelectIndex < window.table.numberOfRows {
 			window.table.selectRowIndexes(NSIndexSet(index: reSelectIndex), byExtendingSelection: false)
+		}
+
+		if let u = urlToOpen {
+			NSWorkspace.sharedWorkspace().openURL(NSURL(string: u)!)
 		}
 	}
 
@@ -1314,7 +1309,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	func windowDidResignKey(notification: NSNotification) {
 		if ignoreNextFocusLoss {
-			showMenu(prMenu)
+			showMenu(notification.object as! MenuWindow)
 			return
 		}
 		if !opening {
@@ -1544,22 +1539,22 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		}
 
 		if updateStatusItem {
-			DLog("Updating issues status item");
-			let siv = StatusItemView(frame: CGRectMake(0, 0, length+2, H), label: countString, prefix: "issues", attributes: attributes)
-			siv.labelOffset = 2
-			siv.highlighted = issuesMenu.visible
-			siv.grayOut = shouldGray
-			siv.tappedCallback = { [weak self] in
-				let m = self!.issuesMenu
-				if m.visible {
-					self!.closeMenu(m)
-				} else {
-					self!.showMenu(m)
+			dispatch_async(dispatch_get_main_queue()) { [weak self] in
+				DLog("Updating issues status item");
+				let siv = StatusItemView(frame: CGRectMake(0, 0, length+2, H), label: countString, prefix: "issues", attributes: attributes)
+				siv.labelOffset = 2
+				siv.highlighted = self!.issuesMenu.visible
+				siv.grayOut = shouldGray
+				siv.tappedCallback = { [weak self] in
+					let m = self!.issuesMenu
+					if m.visible {
+						self!.closeMenu(m)
+					} else {
+						self!.showMenu(m)
+					}
+					return
 				}
-				return
-			}
-			dispatch_async(dispatch_get_main_queue()) {
-				issuesMenu.statusItem?.view = siv
+				self!.issuesMenu.statusItem?.view = siv
 			}
 		}
 
@@ -1617,21 +1612,21 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		}
 
         if updateStatusItem {
-            DLog("Updating PR status item");
-			let siv = StatusItemView(frame: CGRectMake(0, 0, length, H), label: countString, prefix: "pr", attributes: attributes)
-            siv.highlighted = prMenu.visible
-            siv.grayOut = shouldGray
-            siv.tappedCallback = { [weak self] in
-				let m = self!.prMenu
-				if m.visible {
-					self!.closeMenu(m)
-				} else {
-					self!.showMenu(m)
+			dispatch_async(dispatch_get_main_queue()) { [weak self] in
+				DLog("Updating PR status item");
+				let siv = StatusItemView(frame: CGRectMake(0, 0, length, H), label: countString, prefix: "pr", attributes: attributes)
+				siv.highlighted = self!.prMenu.visible
+				siv.grayOut = shouldGray
+				siv.tappedCallback = { [weak self] in
+					let m = self!.prMenu
+					if m.visible {
+						self!.closeMenu(m)
+					} else {
+						self!.showMenu(m)
+					}
+					return
 				}
-                return
-            }
-			dispatch_async(dispatch_get_main_queue()) {
-				prMenu.statusItem?.view = siv
+				self!.prMenu.statusItem?.view = siv
 			}
         }
 
@@ -1824,7 +1819,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		})
 	}
 
-	private func dataItemAtRow(row: Int, inMenu: MenuWindow) -> DataItem? {
+	private func dataItemAtRow(row: Int, inMenu: MenuWindow) -> ListableItem? {
 		if inMenu == prMenu {
 			return pullRequestDelegate.pullRequestAtRow(row)
 		} else if inMenu == issuesMenu {

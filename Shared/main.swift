@@ -13,28 +13,15 @@ let api = API()
 
 /*let _prs = PullRequest.allItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest]
 for p in _prs {
-    for c in p.comments.allObjects as! [PRComment] {
+    for c in p.comments {
         mainObjectContext.deleteObject(c)
     }
 	p.latestReadCommentDate = nil
 	p.updatedAt = never()
-	p.repo.dirty = true
-	p.repo.updatedAt = never()
+	p.repo.resetSyncState()
 }
 DataManager.saveDB()
 */
-
-/*
-let dataTest = NSString(contentsOfFile: "/Users/ptsochantaris/Desktop/json.txt", encoding: NSUTF8StringEncoding, error: nil)!
-let ddTest = dataTest.dataUsingEncoding(NSUTF8StringEncoding)!
-var ddd:AnyObject = NSJSONSerialization.JSONObjectWithData(ddTest, options:NSJSONReadingOptions.allZeros, error:nil)!
-
-for i in (ddd as [NSDictionary]) {
-let s = PRStatus.statusWithInfo(i, fromServer: _apis[0])
-s.pullRequest = _prs[0]
-}
-*/
-
 
 #if os(iOS)
 	import UIKit

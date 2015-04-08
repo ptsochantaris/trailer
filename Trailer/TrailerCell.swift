@@ -59,8 +59,8 @@ class TrailerCell: NSTableCellView {
 		}
 	}
 
-	func associatedDataItem() -> DataItem {
-		return mainObjectContext.existingObjectWithID(dataItemId, error: nil) as! DataItem
+	func associatedDataItem() -> ListableItem {
+		return mainObjectContext.existingObjectWithID(dataItemId, error: nil) as! ListableItem
 	}
 
 	func stringForCopy() -> String? {
