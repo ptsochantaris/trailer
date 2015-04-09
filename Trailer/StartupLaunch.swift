@@ -1,6 +1,6 @@
 // with many thanks to: http://stackoverflow.com/questions/26475008/swift-getting-a-mac-app-to-launch-on-startup
 
-class StartupLaunch: NSObject {
+final class StartupLaunch: NSObject {
 
 	class func isAppLoginItem() -> Bool {
 		return (itemReferencesInLoginItems().existingReference != nil)

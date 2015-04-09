@@ -1,5 +1,5 @@
 
-class AboutWindow: NSWindow, NSWindowDelegate {
+final class AboutWindow: NSWindow, NSWindowDelegate {
 
 	@IBOutlet weak var version: NSTextField!
 

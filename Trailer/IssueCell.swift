@@ -1,5 +1,5 @@
 
-class IssueCell: TrailerCell {
+final class IssueCell: TrailerCell {
 
 	init(issue: Issue) {
 

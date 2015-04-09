@@ -2,7 +2,7 @@
 import UIKit
 import CoreData
 
-class ServersViewController: UITableViewController {
+final class ServersViewController: UITableViewController {
 
 	private var selectedServerId: NSManagedObjectID?
 	private var allServers: [ApiServer]!

@@ -1,5 +1,5 @@
 
-class LinkField: CenterTextField {
+final class LinkField: CenterTextField {
 
 	var targetUrl: String?
 	var needsCommand: Bool = false

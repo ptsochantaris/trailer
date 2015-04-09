@@ -1,7 +1,7 @@
 import WebKit
 import CoreData
 
-class DetailViewController: UIViewController, WKNavigationDelegate {
+final class DetailViewController: UIViewController, WKNavigationDelegate {
 
 	@IBOutlet weak var spinner: UIActivityIndicatorView!
 	@IBOutlet weak var statusLabel: UILabel!

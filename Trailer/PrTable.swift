@@ -1,5 +1,5 @@
 
-class PrTable: NSTableView, NSPasteboardItemDataProvider {
+final class PrTable: NSTableView, NSPasteboardItemDataProvider {
 
 	func cellAtEvent(theEvent: NSEvent) -> NSView? {
 		let globalLocation = theEvent.locationInWindow

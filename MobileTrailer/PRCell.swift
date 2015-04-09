@@ -1,7 +1,7 @@
 
 import UIKit
 
-class PRCell: UITableViewCell {
+final class PRCell: UITableViewCell {
 
 	private let unreadCount = CountLabel(frame: CGRectZero)
 	private let readCount = CountLabel(frame: CGRectZero)

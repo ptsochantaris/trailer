@@ -1,7 +1,7 @@
 import Foundation
 
 @objc(PRComment)
-class PRComment: DataItem {
+final class PRComment: DataItem {
 
     @NSManaged var avatarUrl: String?
     @NSManaged var body: String?

@@ -2,7 +2,7 @@
 import UIKit
 import CoreData
 
-class MasterViewController: UITableViewController, NSFetchedResultsControllerDelegate, UITextFieldDelegate, UIActionSheetDelegate, UITabBarControllerDelegate, UITabBarDelegate {
+final class MasterViewController: UITableViewController, NSFetchedResultsControllerDelegate, UITextFieldDelegate, UIActionSheetDelegate, UITabBarControllerDelegate, UITabBarDelegate {
 
 	private var detailViewController: DetailViewController!
 	private var _fetchedResultsController: NSFetchedResultsController?

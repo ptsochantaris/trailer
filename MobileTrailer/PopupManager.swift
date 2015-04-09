@@ -3,7 +3,7 @@ import UIKit
 
 let popupManager = PopupManager()
 
-class PopupManager: NSObject, UIPopoverControllerDelegate, UISplitViewControllerDelegate {
+final class PopupManager: NSObject, UIPopoverControllerDelegate, UISplitViewControllerDelegate {
 
 	private var currentPopover: UIPopoverController?
 

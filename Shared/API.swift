@@ -23,7 +23,7 @@ struct UrlBackOffEntry {
 	#endif
 #endif
 
-class API {
+final class API {
 
 	var refreshesSinceLastStatusCheck = [NSManagedObjectID:Int]()
 	var refreshesSinceLastLabelsCheck = [NSManagedObjectID:Int]()

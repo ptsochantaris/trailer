@@ -1,5 +1,5 @@
 
-class PullRequestDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
+final class PullRequestDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 
 	private var pullRequestIds: [NSObject]
 

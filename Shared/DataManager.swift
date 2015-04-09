@@ -6,7 +6,7 @@ import CoreData
 
 var dataReadonly = false
 
-class DataManager : NSObject {
+final class DataManager : NSObject {
 
 	class func checkMigration() {
 		if DataManager.versionBumpOccured() {

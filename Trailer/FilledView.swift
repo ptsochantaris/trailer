@@ -1,5 +1,5 @@
 
-class FilledView: NSView {
+final class FilledView: NSView {
 
 	var backgroundColor: NSColor? {
 		didSet {

@@ -9,7 +9,7 @@ let shortDateFormatter = { () -> NSDateFormatter in
 	return d
 	}()
 
-class PRDetailController: WKInterfaceController {
+final class PRDetailController: WKInterfaceController {
 
 	@IBOutlet weak var table: WKInterfaceTable!
 

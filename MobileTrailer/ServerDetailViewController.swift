@@ -2,7 +2,7 @@
 import UIKit
 import CoreData
 
-class ServerDetailViewController: UIViewController, UITextFieldDelegate {
+final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 
 	@IBOutlet weak var name: UITextField!
 	@IBOutlet weak var apiPath: UITextField!

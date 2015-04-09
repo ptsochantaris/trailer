@@ -1,5 +1,5 @@
 
-class StatusItemView: NSView {
+final class StatusItemView: NSView {
 
 	let statusLabel: String
 	let textAttributes: Dictionary<String, AnyObject>

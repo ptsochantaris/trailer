@@ -1,7 +1,7 @@
 
 import UIKit
 
-class QuickStartViewController: UIViewController, UITextFieldDelegate {
+final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 
 	@IBOutlet weak var testButton: UIButton!
 	@IBOutlet var otherViews: [UIView]!

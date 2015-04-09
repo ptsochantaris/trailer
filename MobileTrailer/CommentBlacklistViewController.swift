@@ -1,7 +1,7 @@
 
 import UIKit
 
-class CommentBlacklistViewController: UITableViewController {
+final class CommentBlacklistViewController: UITableViewController {
 
 	override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
 		return Settings.commentAuthorBlacklist.count == 0 ? 0 : 1

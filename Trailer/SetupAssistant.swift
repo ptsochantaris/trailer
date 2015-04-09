@@ -1,5 +1,5 @@
 
-class SetupAssistant: NSWindow, NSWindowDelegate {
+final class SetupAssistant: NSWindow, NSWindowDelegate {
 
 	@IBOutlet weak var quickstart: NSTextField!
 	@IBOutlet weak var buttonLink: NSButton!

@@ -3,7 +3,7 @@ import UIKit
 
 var app: iOS_AppDelegate!
 
-class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
+final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 
 	var preferencesDirty: Bool = false
 	var isRefreshing: Bool = false

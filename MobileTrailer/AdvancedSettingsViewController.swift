@@ -1,7 +1,7 @@
 
 import UIKit
 
-class AdvancedSettingsViewController: UITableViewController, PickerViewControllerDelegate, UIDocumentPickerDelegate, UIActionSheetDelegate {
+final class AdvancedSettingsViewController: UITableViewController, PickerViewControllerDelegate, UIDocumentPickerDelegate, UIActionSheetDelegate {
 
 	required init(coder aDecoder: NSCoder) {
 		settingsChangedTimer = PopTimer(timeInterval: 1.0) {

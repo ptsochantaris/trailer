@@ -3,7 +3,7 @@ import WatchKit
 import Foundation
 import CoreData
 
-class GlanceController: WKInterfaceController {
+final class GlanceController: WKInterfaceController {
 
     @IBOutlet weak var totalCount: WKInterfaceLabel!
 

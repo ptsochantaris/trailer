@@ -1,7 +1,7 @@
 
 import UIKit
 
-class AboutTrailerViewController: UIViewController {
+final class AboutTrailerViewController: UIViewController {
 	@IBOutlet weak var versionNumber: UILabel!
 	@IBOutlet weak var licenseText: UITextView!
 

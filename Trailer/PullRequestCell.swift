@@ -1,5 +1,5 @@
 
-class PullRequestCell: TrailerCell {
+final class PullRequestCell: TrailerCell {
 
 	init(pullRequest: PullRequest) {
 

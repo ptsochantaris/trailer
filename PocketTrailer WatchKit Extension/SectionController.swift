@@ -1,7 +1,7 @@
 
 import WatchKit
 
-class SectionController: WKInterfaceController {
+final class SectionController: WKInterfaceController {
 
 	@IBOutlet weak var table: WKInterfaceTable!
 

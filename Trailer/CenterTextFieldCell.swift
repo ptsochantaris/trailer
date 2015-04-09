@@ -1,5 +1,5 @@
 
-class CenterTextFieldCell: NSTextFieldCell {
+final class CenterTextFieldCell: NSTextFieldCell {
 	override func drawingRectForBounds(theRect: NSRect) -> NSRect {
 		var newRect = super.drawingRectForBounds(theRect)
 		let textSize = cellSizeForBounds(theRect)

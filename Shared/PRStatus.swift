@@ -15,7 +15,7 @@ let dateFormatter = { () -> NSDateFormatter in
 }()
 
 @objc(PRStatus)
-class PRStatus: DataItem {
+final class PRStatus: DataItem {
 
     @NSManaged var descriptionText: String?
     @NSManaged var state: String?

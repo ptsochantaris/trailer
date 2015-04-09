@@ -1,7 +1,7 @@
 
 import WatchKit
 
-class CommandController: WKInterfaceController {
+final class CommandController: WKInterfaceController {
 
     @IBOutlet weak var feedbackLabel: WKInterfaceLabel!
 	@IBOutlet weak var feedbackGroup: WKInterfaceGroup!

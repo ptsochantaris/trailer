@@ -3,7 +3,7 @@ import UIKit
 
 let settingsManager = SettingsManager()
 
-class SettingsManager {
+final class SettingsManager {
 
 	private func loadSettingsFrom(url: NSURL) {
 		if Settings.readFromURL(url) {

@@ -1,5 +1,5 @@
 
-class IssuesDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
+final class IssuesDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 
 	private var issueIds: [NSObject]
 

@@ -1,7 +1,7 @@
 
 import WatchKit
 
-class PRRow: NSObject {
+final class PRRow: NSObject {
 
     @IBOutlet weak var titleL: WKInterfaceLabel!
     @IBOutlet weak var detailsL: WKInterfaceLabel!

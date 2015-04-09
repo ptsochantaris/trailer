@@ -1,7 +1,7 @@
 
 import UIKit
 
-class NotificationManager {
+final class NotificationManager {
 
 	class func handleLocalNotification(notification: UILocalNotification) {
 		DLog("Received local notification: %@", notification.userInfo)

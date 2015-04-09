@@ -7,7 +7,7 @@ import UIKit
 
 typealias Completion = ()->Void
 
-class PopTimer : NSObject {
+final class PopTimer : NSObject {
 
 	var _popTimer: NSTimer?
 	let _timeInterval: NSTimeInterval
@@ -46,7 +46,7 @@ let SETTINGS_EXPORTED = "SETTINGS_EXPORTED"
 var _settings_valuesCache = [String : AnyObject]()
 let _settings_shared = NSUserDefaults(suiteName: "group.Trailer")!
 
-class Settings {
+final class Settings {
 
 	class func allFields() -> [String] {
 		return [

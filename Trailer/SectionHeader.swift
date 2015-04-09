@@ -1,5 +1,5 @@
 
-class SectionHeader: NSTableRowView {
+final class SectionHeader: NSTableRowView {
 
 	var titleView: CenterTextField!
 

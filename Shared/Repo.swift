@@ -2,7 +2,7 @@
 import CoreData
 
 @objc (Repo)
-class Repo: DataItem {
+final class Repo: DataItem {
 
     @NSManaged var dirty: NSNumber?
     @NSManaged var fork: NSNumber?

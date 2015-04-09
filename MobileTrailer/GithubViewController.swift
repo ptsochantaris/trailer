@@ -1,6 +1,6 @@
 import WebKit
 
-class GithubViewController: UIViewController, WKNavigationDelegate {
+final class GithubViewController: UIViewController, WKNavigationDelegate {
 	
 	@IBOutlet weak var spinner: UIActivityIndicatorView!
 	var pathToLoad: String?

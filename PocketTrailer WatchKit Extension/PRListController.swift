@@ -2,7 +2,7 @@
 import WatchKit
 import Foundation
 
-class PRListController: WKInterfaceController {
+final class PRListController: WKInterfaceController {
 
 	@IBOutlet weak var emptyLabel: WKInterfaceLabel!
 	@IBOutlet weak var table: WKInterfaceTable!

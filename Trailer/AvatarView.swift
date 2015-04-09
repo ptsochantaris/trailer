@@ -1,5 +1,5 @@
 
-class AvatarView: NSImageView {
+final class AvatarView: NSImageView {
 
 	var spinner: NSProgressIndicator?
 

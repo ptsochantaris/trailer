@@ -1,7 +1,7 @@
 
 import UIKit
 
-class CountLabel: UILabel {
+final class CountLabel: UILabel {
 
 	override init(frame: CGRect) {
 		super.init(frame: frame)

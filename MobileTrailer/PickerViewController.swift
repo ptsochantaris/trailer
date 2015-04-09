@@ -5,7 +5,7 @@ protocol PickerViewControllerDelegate: class {
 	func pickerViewController(picker: PickerViewController, didSelectIndexPath: NSIndexPath)
 }
 
-class PickerViewController: UITableViewController {
+final class PickerViewController: UITableViewController {
 
 	required init(coder aDecoder: NSCoder) {
 		super.init(coder: aDecoder)

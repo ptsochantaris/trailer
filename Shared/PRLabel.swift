@@ -5,7 +5,7 @@ import CoreData
 #endif
 
 @objc (PRLabel)
-class PRLabel: DataItem {
+final class PRLabel: DataItem {
 
     @NSManaged var color: NSNumber?
     @NSManaged var name: String?

@@ -1,5 +1,5 @@
 
-class ViewAllowsVibrancy: NSView {
+final class ViewAllowsVibrancy: NSView {
     override var allowsVibrancy: Bool {
         return true
     }

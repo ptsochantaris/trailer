@@ -5,7 +5,7 @@ import CoreData
 #endif
 
 @objc (Issue)
-class Issue: ListableItem {
+final class Issue: ListableItem {
 
 	@NSManaged var commentsLink: String?
 

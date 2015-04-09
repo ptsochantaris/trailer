@@ -1,7 +1,7 @@
 
 import WatchKit
 
-class StatusRow: NSObject {
+final class StatusRow: NSObject {
     @IBOutlet weak var labelL: WKInterfaceLabel!
     @IBOutlet weak var margin: WKInterfaceGroup!
 }

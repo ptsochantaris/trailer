@@ -1,7 +1,7 @@
 
 let newSystem = (floor(NSAppKitVersionNumber) > Double(NSAppKitVersionNumber10_9))
 
-class MenuWindow: NSWindow {
+final class MenuWindow: NSWindow {
 
 	@IBOutlet weak var scrollView: NSScrollView!
 	@IBOutlet weak var header: ViewAllowsVibrancy!

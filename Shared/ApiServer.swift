@@ -2,7 +2,7 @@
 import CoreData
 
 @objc(ApiServer)
-class ApiServer: NSManagedObject {
+final class ApiServer: NSManagedObject {
 
     @NSManaged var apiPath: String?
     @NSManaged var authToken: String?

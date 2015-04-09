@@ -2,7 +2,7 @@
 import UIKit
 import CoreData
 
-class RespositoriesViewController: UITableViewController, UITextFieldDelegate, NSFetchedResultsControllerDelegate {
+final class RespositoriesViewController: UITableViewController, UITextFieldDelegate, NSFetchedResultsControllerDelegate {
 
 	// Filtering
 	private var searchField: UITextField?

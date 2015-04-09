@@ -1,5 +1,5 @@
 
-class WatchManager {
+final class WatchManager {
 
 	class func handleWatchKitExtensionRequest(userInfo: [NSObject : AnyObject]?, reply: (([NSObject : AnyObject]!) -> Void)!) {
 

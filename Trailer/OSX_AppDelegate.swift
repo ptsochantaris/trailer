@@ -1,7 +1,7 @@
 
 var app: OSX_AppDelegate!
 
-class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUserNotificationCenterDelegate, NSTableViewDelegate, NSTableViewDataSource, NSTabViewDelegate, NSOpenSavePanelDelegate {
+final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUserNotificationCenterDelegate, NSTableViewDelegate, NSTableViewDataSource, NSTabViewDelegate, NSOpenSavePanelDelegate {
 
 	// Preferences window
 	@IBOutlet weak var preferencesWindow: NSWindow!

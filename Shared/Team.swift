@@ -2,7 +2,7 @@
 import CoreData
 
 @objc (Team)
-class Team: DataItem {
+final class Team: DataItem {
 
     @NSManaged var slug: String?
     @NSManaged var organisationLogin: String?

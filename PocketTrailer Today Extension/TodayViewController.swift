@@ -3,7 +3,7 @@ import UIKit
 import Foundation
 import NotificationCenter
 
-class TodayViewController: UIViewController, NCWidgetProviding {
+final class TodayViewController: UIViewController, NCWidgetProviding {
 
 	@IBOutlet weak var prLabel: UILabel!
 	@IBOutlet weak var issuesLabel: UILabel!
