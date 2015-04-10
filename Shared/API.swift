@@ -435,8 +435,8 @@ final class API {
 				for d in data ?? [] {
 					let eventDate = syncDateFormatter.dateFromString(d.ofk("created_at") as! String)!
 					if latestDate.compare(eventDate) == NSComparisonResult.OrderedAscending { // this is where we came in
-						DLog("New event at %@", eventDate)
 						if let repoId = d["repo"]?["id"] as? NSNumber {
+							DLog("New event at %@ from Repo ID %@", eventDate, repoId)
 							repoIdsToMarkDirty.insert(repoId)
 						}
 						if latestDate.compare(eventDate) == NSComparisonResult.OrderedAscending {
@@ -488,8 +488,8 @@ final class API {
 				for d in data ?? [] {
 					let eventDate = syncDateFormatter.dateFromString(d.ofk("created_at") as! String)!
 					if latestDate.compare(eventDate) == NSComparisonResult.OrderedAscending { // this is where we came in
-						DLog("New event at %@", eventDate)
 						if let repoId = d["repo"]?["id"] as? NSNumber {
+							DLog("New event at %@ from Repo ID %@", eventDate, repoId)
 							repoIdsToMarkDirty.insert(repoId)
 						}
 						if latestDate.compare(eventDate) == NSComparisonResult.OrderedAscending {
@@ -1073,36 +1073,36 @@ final class API {
 		let repoFullName = r.repo.fullName ?? "NoRepoFullName"
 		let repoNumber = r.number?.stringValue ?? "NoRepoNumber"
 		get("/repos/\(repoFullName)/pulls/\(repoNumber)", fromServer: r.apiServer, ignoreLastSync: false, parameters: nil, extraHeaders: nil,
-			success: { [weak self] response, data in
+			completion: { [weak self] response, data, error in
 
-				if let mergeInfo = (data as? NSDictionary)?.ofk("merged_by") as? NSDictionary {
-					DLog("detected merged PR: %@", r.title)
+				if error == nil {
+					if let mergeInfo = (data as? NSDictionary)?.ofk("merged_by") as? NSDictionary {
+						DLog("detected merged PR: %@", r.title)
 
-					let mergeUserId = mergeInfo.ofk("id") as? NSNumber ?? -2
-					DLog("merged by user id: %@, our id is: %@", mergeUserId, r.apiServer.userId)
+						let mergeUserId = mergeInfo.ofk("id") as? NSNumber ?? -2
+						DLog("merged by user id: %@, our id is: %@", mergeUserId, r.apiServer.userId)
 
-					let mergedByMyself = mergeUserId.isEqualToNumber(r.apiServer.userId ?? -1)
+						let mergedByMyself = mergeUserId.isEqualToNumber(r.apiServer.userId ?? -1)
 
-					if !(mergedByMyself && Settings.dontKeepPrsMergedByMe) {
-						self!.prWasMerged(r)
+						if !(mergedByMyself && Settings.dontKeepPrsMergedByMe) {
+							self!.prWasMerged(r)
+						} else {
+							DLog("will not announce merged PR: %@", r.title)
+						}
 					} else {
-						DLog("will not announce merged PR: %@", r.title)
+						self!.prWasClosed(r)
 					}
 				} else {
-					self!.prWasClosed(r)
+					let resultCode = response?.statusCode ?? 0
+					if resultCode == 404 || resultCode==410 { // PR gone for good
+						self!.prWasClosed(r)
+					} else { // fetch problem
+						r.postSyncAction = PostSyncAction.DoNothing.rawValue // don't delete this, we couldn't check, play it safe
+						r.apiServer.lastSyncSucceeded = false
+					}
 				}
 				callback()
-
-			}, failure: { [weak self] response, data, error in
-				let resultCode = response?.statusCode ?? 0
-				if resultCode == 404 || resultCode==410 { // PR gone for good
-					self!.prWasClosed(r)
-				} else { // fetch problem
-					r.postSyncAction = PostSyncAction.DoNothing.rawValue // don't delete this, we couldn't check, play it safe
-					r.apiServer.lastSyncSucceeded = false
-				}
-				callback()
-		})
+			})
 	}
 
 	private func prWasMerged(r: PullRequest) {
@@ -1162,18 +1162,20 @@ final class API {
 	func getRateLimitFromServer(apiServer: ApiServer, callback: (Int64, Int64, Int64)->Void)
 	{
 		get("/rate_limit", fromServer: apiServer, ignoreLastSync: true, parameters: nil, extraHeaders: nil,
-			success: { response, data in
-				let allHeaders = response!.allHeaderFields
-				let requestsRemaining = (allHeaders["X-RateLimit-Remaining"] as! NSString).longLongValue
-				let requestLimit = (allHeaders["X-RateLimit-Limit"] as! NSString).longLongValue
-				let epochSeconds = (allHeaders["X-RateLimit-Reset"] as! NSString).longLongValue
-				callback(requestsRemaining, requestLimit, epochSeconds)
-			},
-			failure: { response, data, error in
-				if response?.statusCode == 404 && data != nil && !((data as! NSDictionary).ofk("message") as! String == "Not Found") {
-					callback(10000, 10000, 0)
+			completion: { response, data, error in
+
+				if error == nil {
+					let allHeaders = response!.allHeaderFields
+					let requestsRemaining = (allHeaders["X-RateLimit-Remaining"] as! NSString).longLongValue
+					let requestLimit = (allHeaders["X-RateLimit-Limit"] as! NSString).longLongValue
+					let epochSeconds = (allHeaders["X-RateLimit-Reset"] as! NSString).longLongValue
+					callback(requestsRemaining, requestLimit, epochSeconds)
 				} else {
-					callback(-1, -1, -1)
+					if response?.statusCode == 404 && data != nil && !((data as! NSDictionary).ofk("message") as! String == "Not Found") {
+						callback(10000, 10000, 0)
+					} else {
+						callback(-1, -1, -1)
+					}
 				}
 		})
 	}
@@ -1292,17 +1294,11 @@ final class API {
 
 	func testApiToServer(apiServer: ApiServer, callback: (NSError?) -> ()) {
 		get("/rate_limit", fromServer: apiServer, ignoreLastSync: true, parameters: nil, extraHeaders: nil,
-			success: { response, data in
-				callback(nil)
-				return
-			},
-			failure: { response, data, error in
+			completion: { response, data, error in
 				let allOk = (response?.statusCode == 404 && data != nil && !((data as! NSDictionary).ofk("message") as! String == "Not Found"))
 				callback(allOk ? nil : error)
 		})
 	}
-
-
 
 	//////////////////////////////////////////////////////////// low level
 
@@ -1364,26 +1360,24 @@ final class API {
 		callback:(data: AnyObject?, lastPage: Bool, resultCode: Int, etag: String?) -> Void) {
 
 			get(path, fromServer: fromServer, ignoreLastSync: false, parameters: parameters, extraHeaders: extraHeaders,
-				success: { [weak self] response, data in
+				completion: { [weak self] response, data, error in
 
-					let allHeaders = response!.allHeaderFields
-					fromServer.requestsRemaining = NSNumber(longLong: (allHeaders["X-RateLimit-Remaining"] as! NSString).longLongValue)
-					fromServer.requestsLimit = NSNumber(longLong: (allHeaders["X-RateLimit-Limit"] as! NSString).longLongValue)
-					let epochSeconds = (allHeaders["X-RateLimit-Reset"] as! NSString).doubleValue
-					fromServer.resetDate = NSDate(timeIntervalSince1970: epochSeconds)
-					NSNotificationCenter.defaultCenter().postNotificationName(API_USAGE_UPDATE, object: fromServer, userInfo: nil)
-
-					let etag = allHeaders["Etag"] as? String
-					let code = response!.statusCode ?? 0
-					callback(data: data, lastPage: self!.lastPage(response!), resultCode: code, etag: etag)
-
-				}, failure: { response, data, error in
 					let code = response?.statusCode ?? 0
-					if code != 304 {
-						DLog("(%@) Failure for %@: %@", fromServer.label, path, error?.localizedDescription)
+
+					if error == nil {
+						let allHeaders = response!.allHeaderFields
+						fromServer.requestsRemaining = NSNumber(longLong: (allHeaders["X-RateLimit-Remaining"] as! NSString).longLongValue)
+						fromServer.requestsLimit = NSNumber(longLong: (allHeaders["X-RateLimit-Limit"] as! NSString).longLongValue)
+						let epochSeconds = (allHeaders["X-RateLimit-Reset"] as! NSString).doubleValue
+						fromServer.resetDate = NSDate(timeIntervalSince1970: epochSeconds)
+						NSNotificationCenter.defaultCenter().postNotificationName(API_USAGE_UPDATE, object: fromServer, userInfo: nil)
+
+						let etag = allHeaders["Etag"] as? String
+						callback(data: data, lastPage: self!.lastPage(response!), resultCode: code, etag: etag)
+					} else {
+						callback(data: nil, lastPage: false, resultCode: code, etag: nil)
 					}
-					callback(data: nil, lastPage: false, resultCode: code, etag: nil)
-			})
+				})
 	}
 
 	private func get(
@@ -1392,8 +1386,7 @@ final class API {
 		ignoreLastSync: Bool,
 		parameters: Dictionary<String, String>?,
 		extraHeaders: Dictionary<String, String>?,
-		success: (response: NSHTTPURLResponse?, data: AnyObject?) -> Void,
-		failure: (response: NSHTTPURLResponse?, data: AnyObject?, error: NSError?) -> Void
+		completion: (response: NSHTTPURLResponse?, data: AnyObject?, error: NSError?) -> Void
 	) {
 			var apiServerLabel: String
 			if fromServer.syncIsGood || ignoreLastSync {
@@ -1401,7 +1394,7 @@ final class API {
 			} else {
 				dispatch_async(dispatch_get_main_queue()) {
 					let e = NSError(domain: "Sync has failed, skipping this call", code: -1, userInfo: nil)
-					failure(response: nil, data: nil, error: e)
+					completion(response: nil, data: nil, error: e)
 				}
 				return
 			}
@@ -1441,12 +1434,15 @@ final class API {
 					DLog("(%@) Preempted fetch to previously broken link %@, won't actually access this URL until %@", apiServerLabel, fullUrlPath, existingBackOff!.nextAttemptAt)
 					dispatch_async(dispatch_get_main_queue()) {
 						let e = NSError(domain: "Preempted fetch because of throttling", code: 400, userInfo: nil)
-						failure(response: nil, data: nil, error: e)
+						completion(response: nil, data: nil, error: e)
 					}
 					#if os(iOS)
 						networkIndicationEnd()
 					#endif
 					return
+				}
+				else {
+					badLinks.removeValueForKey(fullUrlPath)
 				}
 			}
 
@@ -1454,13 +1450,19 @@ final class API {
 
 				let response = res as? NSHTTPURLResponse
 				var parsedData: AnyObject?
-				if data?.length > 0 {
-					parsedData = NSJSONSerialization.JSONObjectWithData(data!, options: NSJSONReadingOptions.allZeros, error: nil)
-				}
 				var error = e
-				if error == nil && response?.statusCode > 299 {
+
+				if error == nil && (response == nil || response?.statusCode > 399) {
 					error = NSError(domain: "Error response received", code:response!.statusCode, userInfo:nil)
-					if response?.statusCode >= 400 {
+				}
+
+				if error == nil {
+					DLog("(%@) GET %@ - RESULT: %d", apiServerLabel, fullUrlPath, response?.statusCode)
+					if let d = data {
+						parsedData = NSJSONSerialization.JSONObjectWithData(d, options: NSJSONReadingOptions.allZeros, error: nil)
+					}
+				} else {
+					if self?.currentNetworkStatus != NetworkStatus.NotReachable {
 						if existingBackOff != nil {
 							DLog("(%@) Extending backoff for already throttled URL %@ by %f seconds", apiServerLabel, fullUrlPath, BACKOFF_STEP)
 							if existingBackOff!.duration < 3600.0 {
@@ -1469,28 +1471,17 @@ final class API {
 							existingBackOff!.nextAttemptAt = NSDate(timeInterval: existingBackOff!.duration, sinceDate:NSDate())
 						} else {
 							DLog("(%@) Placing URL %@ on the throttled list", apiServerLabel, fullUrlPath)
-							self!.badLinks[fullUrlPath] = UrlBackOffEntry(
+							existingBackOff = UrlBackOffEntry(
 								nextAttemptAt: NSDate(timeInterval: BACKOFF_STEP, sinceDate: NSDate()),
 								duration: BACKOFF_STEP)
 						}
+						self!.badLinks[fullUrlPath] = existingBackOff
 					}
+					DLog("(%@) GET %@ - FAILED: %@", apiServerLabel, fullUrlPath, error!.localizedDescription)
 				}
 
-				if error != nil {
-					if response?.statusCode == 304 {
-						DLog("(%@) GET %@ - WAS SERVER CACHED", apiServerLabel, fullUrlPath)
-					} else {
-						DLog("(%@) GET %@ - FAILED: %@", apiServerLabel, fullUrlPath, error!.localizedDescription)
-					}
-					dispatch_async(dispatch_get_main_queue()) {
-						failure(response: response, data: parsedData, error: error)
-					}
-				} else {
-					DLog("(%@) GET %@ - RESULT: %d", apiServerLabel, fullUrlPath, response?.statusCode)
-					self!.badLinks.removeValueForKey(fullUrlPath)
-					dispatch_async(dispatch_get_main_queue()) {
-						success(response: response, data: parsedData)
-					}
+				dispatch_async(dispatch_get_main_queue()) {
+					completion(response: response, data: parsedData, error: error)
 				}
 
 				#if os(iOS)
