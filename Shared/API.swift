@@ -417,12 +417,15 @@ final class API {
 			return
 		}
 
-		let latestEtag = usingUserEventsFromServer.latestUserEventEtag
-		let latestDate = usingUserEventsFromServer.latestUserEventDateProcessed ?? never()
-
 		var extraHeaders: Dictionary<String, String>?
-		if let e = latestEtag {
+		if let e = usingUserEventsFromServer.latestUserEventEtag {
 			extraHeaders = ["If-None-Match": e]
+		}
+
+		var latestDate = usingUserEventsFromServer.latestUserEventDateProcessed
+		if latestDate == nil {
+			latestDate = never()
+			usingUserEventsFromServer.latestUserEventDateProcessed = latestDate
 		}
 
 		let userName = usingUserEventsFromServer.userName ?? "NoApiUserName"
@@ -434,14 +437,14 @@ final class API {
 			perPageCallback: { [weak self] data, lastPage in
 				for d in data ?? [] {
 					let eventDate = syncDateFormatter.dateFromString(d.ofk("created_at") as! String)!
-					if latestDate.compare(eventDate) == NSComparisonResult.OrderedAscending { // this is where we came in
+					if latestDate!.compare(eventDate) == NSComparisonResult.OrderedAscending { // this is where we came in
 						if let repoId = d["repo"]?["id"] as? NSNumber {
 							DLog("New event at %@ from Repo ID %@", eventDate, repoId)
 							repoIdsToMarkDirty.insert(repoId)
 						}
-						if latestDate.compare(eventDate) == NSComparisonResult.OrderedAscending {
+						if latestDate!.compare(eventDate) == NSComparisonResult.OrderedAscending {
 							usingUserEventsFromServer.latestUserEventDateProcessed = eventDate
-							if latestDate.isEqualToDate(never()) {
+							if latestDate!.isEqualToDate(never()) {
 								DLog("First sync, all repos are dirty so we don't need to read further, we have the latest user event date: %@", eventDate)
 								return true
 							}
@@ -468,15 +471,16 @@ final class API {
 			return
 		}
 
-		let latestEtag = usingReceivedEventsFromServer.latestReceivedEventEtag
-		let latestDate = usingReceivedEventsFromServer.latestReceivedEventDateProcessed ?? never()
-
 		var extraHeaders: Dictionary<String, String>?
-		if let e = latestEtag {
+		if let e = usingReceivedEventsFromServer.latestReceivedEventEtag {
 			extraHeaders = ["If-None-Match": e]
 		}
 
-		usingReceivedEventsFromServer.latestReceivedEventDateProcessed = latestDate
+		var latestDate = usingReceivedEventsFromServer.latestReceivedEventDateProcessed
+		if latestDate == nil {
+			latestDate = never()
+			usingReceivedEventsFromServer.latestReceivedEventDateProcessed = latestDate
+		}
 
 		let userName = usingReceivedEventsFromServer.userName ?? "NoApiUserName"
 		getPagedDataInPath("/users/\(userName)/received_events",
@@ -487,14 +491,14 @@ final class API {
 			perPageCallback: { [weak self] data, lastPage in
 				for d in data ?? [] {
 					let eventDate = syncDateFormatter.dateFromString(d.ofk("created_at") as! String)!
-					if latestDate.compare(eventDate) == NSComparisonResult.OrderedAscending { // this is where we came in
+					if latestDate!.compare(eventDate) == NSComparisonResult.OrderedAscending { // this is where we came in
 						if let repoId = d["repo"]?["id"] as? NSNumber {
 							DLog("New event at %@ from Repo ID %@", eventDate, repoId)
 							repoIdsToMarkDirty.insert(repoId)
 						}
-						if latestDate.compare(eventDate) == NSComparisonResult.OrderedAscending {
+						if latestDate!.compare(eventDate) == NSComparisonResult.OrderedAscending {
 							usingReceivedEventsFromServer.latestReceivedEventDateProcessed = eventDate
-							if latestDate.isEqualToDate(never()) {
+							if latestDate!.isEqualToDate(never()) {
 								DLog("First sync, all repos are dirty so we don't need to read further, we have the latest received event date: %@", latestDate)
 								return true
 							}
