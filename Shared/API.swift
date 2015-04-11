@@ -364,7 +364,7 @@ final class API {
 		}
 
 		var completionCount = 0
-		var repoIdsToMarkDirty = Set<NSNumber>()
+		let repoIdsToMarkDirty = NSMutableSet()
 
 		let completionCallback: Completion = { [weak self] in
 			completionCount++
@@ -381,8 +381,8 @@ final class API {
 		for apiServer in allApiServers {
 			if apiServer.goodToGo && apiServer.syncIsGood {
 				fetchUserTeamsFromApiServer(apiServer, callback: completionCallback)
-				markDirtyRepoIds(&repoIdsToMarkDirty, usingUserEventsFromServer: apiServer, callback: completionCallback)
-				markDirtyRepoIds(&repoIdsToMarkDirty, usingReceivedEventsFromServer: apiServer, callback:completionCallback)
+				markDirtyRepoIds(repoIdsToMarkDirty, usingUserEventsFromServer: apiServer, callback: completionCallback)
+				markDirtyRepoIds(repoIdsToMarkDirty, usingReceivedEventsFromServer: apiServer, callback:completionCallback)
 			} else {
 				completionCallback()
 				completionCallback()
@@ -410,7 +410,7 @@ final class API {
 		})
 	}
 
-	private func markDirtyRepoIds(inout repoIdsToMarkDirty: Set<NSNumber>, usingUserEventsFromServer: ApiServer, callback: Completion) {
+	private func markDirtyRepoIds(repoIdsToMarkDirty: NSMutableSet, usingUserEventsFromServer: ApiServer, callback: Completion) {
 
 		if !usingUserEventsFromServer.syncIsGood {
 			callback()
@@ -440,7 +440,7 @@ final class API {
 					if latestDate!.compare(eventDate) == NSComparisonResult.OrderedAscending { // this is where we came in
 						if let repoId = d["repo"]?["id"] as? NSNumber {
 							DLog("New event at %@ from Repo ID %@", eventDate, repoId)
-							repoIdsToMarkDirty.insert(repoId)
+							repoIdsToMarkDirty.addObject(repoId)
 						}
 						if latestDate!.compare(eventDate) == NSComparisonResult.OrderedAscending {
 							usingUserEventsFromServer.latestUserEventDateProcessed = eventDate
@@ -464,7 +464,7 @@ final class API {
 		})
 	}
 
-	private func markDirtyRepoIds(inout repoIdsToMarkDirty: Set<NSNumber>, usingReceivedEventsFromServer: ApiServer, callback: Completion) {
+	private func markDirtyRepoIds(repoIdsToMarkDirty: NSMutableSet, usingReceivedEventsFromServer: ApiServer, callback: Completion) {
 
 		if !usingReceivedEventsFromServer.syncIsGood {
 			callback()
@@ -494,7 +494,7 @@ final class API {
 					if latestDate!.compare(eventDate) == NSComparisonResult.OrderedAscending { // this is where we came in
 						if let repoId = d["repo"]?["id"] as? NSNumber {
 							DLog("New event at %@ from Repo ID %@", eventDate, repoId)
-							repoIdsToMarkDirty.insert(repoId)
+							repoIdsToMarkDirty.addObject(repoId)
 						}
 						if latestDate!.compare(eventDate) == NSComparisonResult.OrderedAscending {
 							usingReceivedEventsFromServer.latestReceivedEventDateProcessed = eventDate

@@ -68,7 +68,7 @@ final class Repo: DataItem {
 		return moc.executeFetchRequest(f, error: nil) as! [Repo]
 	}
 
-	class func markDirtyReposWithIds(ids: Set<NSNumber>, inMoc: NSManagedObjectContext) {
+	class func markDirtyReposWithIds(ids: NSSet, inMoc: NSManagedObjectContext) {
 		let f = NSFetchRequest(entityName: "Repo")
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "serverId IN %@", ids)
