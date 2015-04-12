@@ -316,7 +316,7 @@ final class DataManager : NSObject {
 		#if os(OSX)
 			p.alignment = NSTextAlignment.CenterTextAlignment
 			return NSAttributedString(string: message,
-			attributes: [NSForegroundColorAttributeName: messageColor, NSParagraphStyleAttributeName: p])
+			attributes: [NSForegroundColorAttributeName: color, NSParagraphStyleAttributeName: p])
 		#elseif os(iOS)
 			p.alignment = NSTextAlignment.Center
 			return NSAttributedString(string: message, attributes: [

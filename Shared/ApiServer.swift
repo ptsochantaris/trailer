@@ -148,7 +148,7 @@ final class ApiServer: NSManagedObject {
 		for a in ApiServer.allApiServersInMoc(mainObjectContext) {
 			if let authToken = a.authToken where !authToken.isEmpty {
 				var apiServerData = [String:NSObject]()
-				for (k , _) in a.entity.attributesByName as! [String:NSObject] {
+				for (k , _) in a.entity.attributesByName as! [String : NSObject] {
 					if let v = a.valueForKey(k) as? NSObject {
 						apiServerData[k] = v
 					}
