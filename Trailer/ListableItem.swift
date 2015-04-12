@@ -63,7 +63,7 @@ class ListableItem: DataItem {
 		for c in comments {
 			if let creation = c.createdAt {
 				if let latestRead = latestReadCommentDate {
-					if latestRead.compare(creation)==NSComparisonResult.OrderedAscending {
+					if latestRead.compare(creation) == NSComparisonResult.OrderedAscending {
 						latestReadCommentDate = creation
 					}
 				} else {

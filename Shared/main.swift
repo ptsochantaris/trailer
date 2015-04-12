@@ -11,7 +11,8 @@ let api = API()
 //_prs[2].condition = PullRequestCondition.Merged.rawValue
 //_prs[3].condition = PullRequestCondition.Closed.rawValue
 
-/*let _prs = PullRequest.allItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest]
+/*
+let _prs = PullRequest.allItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest]
 for p in _prs {
     for c in p.comments {
         mainObjectContext.deleteObject(c)

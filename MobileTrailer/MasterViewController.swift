@@ -325,30 +325,26 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	func localNotification(notification: NSNotification) {
 		var urlToOpen = notification.userInfo?[NOTIFICATION_URL_KEY] as? String
-		var pullRequest: PullRequest?
-		var issue: Issue?
+		var relatedItem: ListableItem?
 
-		if let
-			commentId = DataManager.idForUriPath(notification.userInfo?[COMMENT_ID_KEY] as? String),
-			c = mainObjectContext.existingObjectWithID(commentId, error:nil) as? PRComment {
-				pullRequest = c.pullRequest
-				issue = c.issue
+		if let commentId = DataManager.idForUriPath(notification.userInfo?[COMMENT_ID_KEY] as? String), c = mainObjectContext.existingObjectWithID(commentId, error:nil) as? PRComment {
+				relatedItem = c.pullRequest ?? c.issue
 				if urlToOpen == nil {
 					urlToOpen = c.webUrl
 				}
 		} else if let pullRequestId = DataManager.idForUriPath(notification.userInfo?[PULL_REQUEST_ID_KEY] as? String) {
-			pullRequest = mainObjectContext.existingObjectWithID(pullRequestId, error:nil) as? PullRequest
-			if pullRequest == nil {
+			relatedItem = mainObjectContext.existingObjectWithID(pullRequestId, error:nil) as? ListableItem
+			if relatedItem == nil {
 				UIAlertView(title: "PR not found", message: "Could not locale the PR related to this notification", delegate: nil, cancelButtonTitle: "OK").show()
 			} else if urlToOpen == nil {
-				urlToOpen = pullRequest!.webUrl
+				urlToOpen = relatedItem!.webUrl
 			}
 		} else if let issueId = DataManager.idForUriPath(notification.userInfo?[ISSUE_ID_KEY] as? String) {
-			issue = mainObjectContext.existingObjectWithID(issueId, error:nil) as? Issue
-			if issue == nil {
+			relatedItem = mainObjectContext.existingObjectWithID(issueId, error:nil) as? ListableItem
+			if relatedItem == nil {
 				UIAlertView(title: "Issue not found", message: "Could not locale the issue related to this notification", delegate: nil, cancelButtonTitle: "OK").show()
 			} else if urlToOpen == nil {
-				urlToOpen = issue!.webUrl
+				urlToOpen = relatedItem!.webUrl
 			}
 		}
 
@@ -358,14 +354,18 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			reloadDataWithAnimation(false)
 		}
 
-		if let p = pullRequest, ip = fetchedResultsController.indexPathForObject(p) {
+		if let p = relatedItem as? PullRequest {
 			viewMode = MasterViewMode.PullRequests
 			detailViewController.catchupWithDataItemWhenLoaded = p.objectID
-			tableView.selectRowAtIndexPath(ip, animated: false, scrollPosition: UITableViewScrollPosition.Middle)
-		} else if let i = issue, ip = fetchedResultsController.indexPathForObject(i) where Settings.showIssuesMenu {
+			if let ip = fetchedResultsController.indexPathForObject(p) {
+				tableView.selectRowAtIndexPath(ip, animated: false, scrollPosition: UITableViewScrollPosition.Middle)
+			}
+		} else if let i = relatedItem as? Issue where Settings.showIssuesMenu {
 			viewMode = MasterViewMode.Issues
 			detailViewController.catchupWithDataItemWhenLoaded = i.objectID
-			tableView.selectRowAtIndexPath(ip, animated: false, scrollPosition: UITableViewScrollPosition.Middle)
+			if let ip = fetchedResultsController.indexPathForObject(i) {
+				tableView.selectRowAtIndexPath(ip, animated: false, scrollPosition: UITableViewScrollPosition.Middle)
+			}
 		}
 
 		if let u = urlToOpen {

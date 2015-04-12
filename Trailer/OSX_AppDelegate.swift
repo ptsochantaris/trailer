@@ -480,20 +480,29 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			if let userInfo = notification.userInfo {
 				var urlToOpen = userInfo[NOTIFICATION_URL_KEY] as? String
 				if urlToOpen == nil {
-					var pullRequest: PullRequest?
-					if let itemId = DataManager.idForUriPath(userInfo[PULL_REQUEST_ID_KEY] as? String) {
-						pullRequest = mainObjectContext.existingObjectWithID(itemId, error: nil) as? PullRequest
-						urlToOpen = pullRequest?.webUrl
-					} else if let itemId = DataManager.idForUriPath(userInfo[COMMENT_ID_KEY] as? String), c = mainObjectContext.existingObjectWithID(itemId, error: nil) as? PRComment {
-						pullRequest = c.pullRequest
+					var relatedItem: ListableItem?
+					if let itemId = DataManager.idForUriPath(userInfo[COMMENT_ID_KEY] as? String), c = mainObjectContext.existingObjectWithID(itemId, error: nil) as? PRComment {
+						relatedItem = c.pullRequest ?? c.issue
 						urlToOpen = c.webUrl
+					} else if let itemId = DataManager.idForUriPath(userInfo[PULL_REQUEST_ID_KEY] as? String) {
+						relatedItem = mainObjectContext.existingObjectWithID(itemId, error: nil) as? ListableItem
+						urlToOpen = relatedItem?.webUrl
+					} else if let itemId = DataManager.idForUriPath(userInfo[ISSUE_ID_KEY] as? String) {
+						relatedItem = mainObjectContext.existingObjectWithID(itemId, error: nil) as? ListableItem
+						urlToOpen = relatedItem?.webUrl
 					}
-					pullRequest?.catchUpWithComments()
+					if let r = relatedItem {
+						r.catchUpWithComments()
+						DataManager.saveDB()
+						if r is PullRequest {
+							updatePrMenu()
+						} else if r is Issue {
+							updateIssuesMenu()
+						}
+					}
 				}
 				if let up = urlToOpen, u = NSURL(string: up) {
 					NSWorkspace.sharedWorkspace().openURL(u)
-					updatePrMenu()
-					updateIssuesMenu()
 				}
 			}
 		default: break
