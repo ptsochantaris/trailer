@@ -54,9 +54,7 @@ func DLog(message: String, @autoclosure arg1: ()->CVarArgType?, @autoclosure arg
 	let AVATAR_PADDING: CGFloat = 8.0
 	let REMOVE_BUTTON_WIDTH: CGFloat = 80.0
 
-	let DARK_MODE_CHANGED = "DarkModeChangedNotificationKey"
 	let PR_ITEM_FOCUSED_STATE_KEY = "PrItemFocusedStateKey"
-	let UPDATE_VIBRANCY_NOTIFICATION = "UpdateVibrancyNotfication"
 
 	typealias COLOR_CLASS = NSColor
 	typealias FONT_CLASS = NSFont

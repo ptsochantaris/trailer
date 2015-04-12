@@ -178,8 +178,6 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 		let n = NSNotificationCenter.defaultCenter()
 		n.addObserver(self, selector: Selector("updateScrollBarWidth"), name: NSPreferredScrollerStyleDidChangeNotification, object: nil)
-		n.addObserver(self, selector: Selector("updatePrMenu"), name: DARK_MODE_CHANGED, object: nil)
-		n.addObserver(self, selector: Selector("updateIssuesMenu"), name: DARK_MODE_CHANGED, object: nil)
 		n.addObserver(self, selector: Selector("updateImportExportSettings"), name: SETTINGS_EXPORTED, object: nil)
 
 		addHotKeySupport()
@@ -241,7 +239,8 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 	@IBAction func useVibrancySelected(sender: NSButton) {
 		Settings.useVibrancy = (sender.integerValue==1)
-		NSNotificationCenter.defaultCenter().postNotificationName(UPDATE_VIBRANCY_NOTIFICATION, object: nil)
+		prMenu.updateVibrancy()
+		issuesMenu.updateVibrancy()
 	}
 
 	@IBAction func logActivityToConsoleSelected(sender: NSButton) {
@@ -1968,25 +1967,32 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	var darkMode: Bool = false {
 		didSet {
 			if darkMode != oldValue {
-				atNextEvent() {
-					NSNotificationCenter.defaultCenter().postNotificationName(DARK_MODE_CHANGED, object:nil)
-				}
+				prMenu.statusItem?.view = nil
+				prMenu.updateVibrancy()
+				updatePrMenu()
+
+				issuesMenu.statusItem?.view = nil
+				issuesMenu.updateVibrancy()
+				updateIssuesMenu()
 			}
 		}
 	}
 
 	func checkDarkMode() {
-		if NSAppKitVersionNumber>Double(NSAppKitVersionNumber10_9) {
-			let c = NSAppearance.currentAppearance()
-			if c.respondsToSelector(Selector("allowsVibrancy")) {
-				darkMode = c.name.rangeOfString(NSAppearanceNameVibrantDark) != nil
+		atNextEvent() { [weak self] in
+			if NSAppKitVersionNumber>Double(NSAppKitVersionNumber10_9) {
+				let c = NSAppearance.currentAppearance()
+				if c.respondsToSelector(Selector("allowsVibrancy")) {
+					self!.darkMode = c.name.rangeOfString(NSAppearanceNameVibrantDark) != nil
+					return
+				}
 			}
+			self!.darkMode = false
 		}
-		darkMode = false
 	}
 
 	private func setupDarkModeMonitoring() {
-		checkDarkMode()
 		NSDistributedNotificationCenter.defaultCenter().addObserver(self, selector: Selector("checkDarkMode"), name: "AppleInterfaceThemeChangedNotification", object: nil)
+		checkDarkMode()
 	}
 }

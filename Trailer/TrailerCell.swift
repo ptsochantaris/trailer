@@ -7,6 +7,10 @@ class TrailerCell: NSTableCellView {
 	var unselectedTitleColor: NSColor!
 	var detailFont: NSFont!, titleFont: NSFont!
 
+	var goneDark: Bool {
+		return MenuWindow.usingVibrancy() && app.darkMode
+	}
+
 	override init(frame frameRect: NSRect) {
 		super.init(frame: frameRect)
 	}
@@ -35,7 +39,7 @@ class TrailerCell: NSTableCellView {
 			var finalColor: NSColor = unselectedTitleColor
 			if selected {
 				table.selectRowIndexes(NSIndexSet(index: table.rowForView(self)), byExtendingSelection: false)
-				if app.darkMode { finalColor = NSColor.darkGrayColor() }
+				if goneDark { finalColor = NSColor.darkGrayColor() }
 			} else {
 				table.deselectRow(table.rowForView(self))
 			}
@@ -93,7 +97,7 @@ class TrailerCell: NSTableCellView {
 	private var countView: CenterTextField?
 	private var countColor: NSColor?
 
-	func addCounts(totalCount: Int, _ unreadCount: Int, _ goneDark: Bool) {
+	func addCounts(totalCount: Int, _ unreadCount: Int) {
 
 		if totalCount == 0 {
 			return
@@ -158,7 +162,7 @@ class TrailerCell: NSTableCellView {
 	private func highlight(on: Bool) -> Void {
 		if let c = countBackground {
 			var color: NSColor
-			if app.darkMode {
+			if goneDark {
 				color = on ? NSColor.blackColor() : MAKECOLOR(0.94, 0.94, 0.94, 1.0)
 				c.borderColor = color
 				newBackground?.backgroundColor = MAKECOLOR(1.0, 0.1, 0.1, 1.0)

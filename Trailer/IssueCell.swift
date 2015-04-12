@@ -9,7 +9,6 @@ final class IssueCell: TrailerCell {
 		detailFont = NSFont.menuFontOfSize(10.0)
 		titleFont = NSFont.menuFontOfSize(13.0)
 
-		let goneDark = MenuWindow.usingVibrancy() && app.darkMode
 		unselectedTitleColor = goneDark ? NSColor.controlHighlightColor() : NSColor.controlTextColor()
 
 		var _commentsNew = 0
@@ -51,7 +50,7 @@ final class IssueCell: TrailerCell {
 		bottom = ceil(CELL_PADDING * 0.5)
 
 		frame = NSMakeRect(0, 0, MENU_WIDTH, titleHeight+subtitleHeight+statusBottom+CELL_PADDING)
-		addCounts(_commentsTotal, _commentsNew, goneDark)
+		addCounts(_commentsTotal, _commentsNew)
 
 		var titleRect = NSMakeRect(LEFTPADDING, subtitleHeight+bottom+statusBottom, W, titleHeight)
 		var dateRect = NSMakeRect(LEFTPADDING, statusBottom+bottom, W, subtitleHeight)

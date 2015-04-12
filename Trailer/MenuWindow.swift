@@ -12,7 +12,7 @@ final class MenuWindow: NSWindow {
 	var statusItem: NSStatusItem?
 	var messageView: MessageView?
 
-	private var windowVibrancy: NSVisualEffectView?
+	private var windowVibrancy: NSView?
 
 	override func awakeFromNib() {
 
@@ -24,10 +24,6 @@ final class MenuWindow: NSWindow {
             scrollView.automaticallyAdjustsContentInsets = false
 			(contentView as! NSView).wantsLayer = true
         }
-
-		let n = NSNotificationCenter.defaultCenter()
-		n.addObserver(self, selector: Selector("updateVibrancy"), name: UPDATE_VIBRANCY_NOTIFICATION, object: nil)
-		n.addObserver(self, selector: Selector("updateVibrancy"), name: DARK_MODE_CHANGED, object: nil)
 	}
 
 	class func usingVibrancy() -> Bool {
@@ -45,19 +41,20 @@ final class MenuWindow: NSWindow {
 			appearance = NSAppearance(named: app.darkMode ? NSAppearanceNameVibrantDark : NSAppearanceNameVibrantLight)
 
 			if windowVibrancy == nil {
-				windowVibrancy = NSVisualEffectView(frame: contentView.bounds)
-				windowVibrancy!.autoresizingMask = NSAutoresizingMaskOptions.ViewHeightSizable | NSAutoresizingMaskOptions.ViewWidthSizable
-				windowVibrancy!.blendingMode = NSVisualEffectBlendingMode.BehindWindow
-				windowVibrancy!.state = NSVisualEffectState.Active
-				contentView.addSubview(windowVibrancy!, positioned:NSWindowOrderingMode.Below, relativeTo:table)
+				let w = NSVisualEffectView(frame: contentView.bounds)
+				w.autoresizingMask = NSAutoresizingMaskOptions.ViewHeightSizable | NSAutoresizingMaskOptions.ViewWidthSizable
+				w.blendingMode = NSVisualEffectBlendingMode.BehindWindow
+				w.state = NSVisualEffectState.Active
+				contentView.addSubview(w, positioned:NSWindowOrderingMode.Below, relativeTo:table)
+				windowVibrancy = w
 
 				table.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.SourceList
 			}
 
 		} else {
 
-			if windowVibrancy != nil {
-				windowVibrancy!.removeFromSuperview()
+			if let w = windowVibrancy {
+				w.removeFromSuperview()
 				windowVibrancy = nil
 
 				table.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.Regular
