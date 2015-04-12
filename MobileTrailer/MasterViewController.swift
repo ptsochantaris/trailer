@@ -190,7 +190,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		searchField.delegate = self
 
-		blueTint = self.view.tintColor
+		blueTint = view.tintColor
 
 		let searchHolder = UIView(frame: CGRectMake(0, 0, 320, 41))
 		searchHolder.addSubview(searchField)
@@ -275,11 +275,11 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			tableView.scrollIndicatorInsets = UIEdgeInsetsMake(tableView.contentInset.top, 0, 49, 0)
 
 			if tabBar == nil {
-				if let s = self.navigationController?.view {
+				if let s = navigationController?.view {
 					let t = UITabBar(frame: CGRectMake(0, s.bounds.size.height-49, s.bounds.size.width, 49))
 					t.autoresizingMask = UIViewAutoresizing.FlexibleTopMargin | UIViewAutoresizing.FlexibleBottomMargin | UIViewAutoresizing.FlexibleWidth
 					t.items = [pullRequestsItem, issuesItem]
-					t.selectedItem = self.viewMode==MasterViewMode.PullRequests ? pullRequestsItem : issuesItem
+					t.selectedItem = viewMode==MasterViewMode.PullRequests ? pullRequestsItem : issuesItem
 					t.delegate = self
 					t.tintColor = blueTint
 					t.itemPositioning = UITabBarItemPositioning.Fill
@@ -311,9 +311,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 						options: UIViewAnimationOptions.CurveEaseInOut,
 						animations: { () -> Void in
 							t.transform = CGAffineTransformMakeTranslation(0, 49)
-						}, completion: { (Bool) -> Void in
+						}, completion: { [weak self] finished in
 							t.removeFromSuperview()
-							self.tabBar = nil
+							self!.tabBar = nil
 					});
 				} else {
 					t.removeFromSuperview()
@@ -386,7 +386,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		{
 			pr.catchUpWithComments()
 			tableView.selectRowAtIndexPath(ip, animated: false, scrollPosition: UITableViewScrollPosition.Middle)
-			self.tableView(tableView, didSelectRowAtIndexPath: ip)
+			tableView(tableView, didSelectRowAtIndexPath: ip)
 		}
 	}
 
@@ -399,7 +399,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		{
 			issue.catchUpWithComments()
 			tableView.selectRowAtIndexPath(ip, animated: false, scrollPosition: UITableViewScrollPosition.Middle)
-			self.tableView(tableView, didSelectRowAtIndexPath: ip)
+			tableView(tableView, didSelectRowAtIndexPath: ip)
 		}
 	}
 

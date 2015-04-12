@@ -210,7 +210,7 @@ final class DataManager : NSObject {
 		return c
 	}
 
-	class func infoForType(type: PRNotificationType, item: NSManagedObject) -> Dictionary<String, AnyObject> {
+	class func infoForType(type: PRNotificationType, item: NSManagedObject) -> [String : AnyObject] {
 		switch type {
 		case .NewMention: fallthrough
 		case .NewComment:
@@ -257,11 +257,11 @@ final class DataManager : NSObject {
 	class func reasonForEmptyWithFilter(filterValue: String?) -> NSAttributedString {
 		let openRequests = PullRequest.countOpenRequestsInMoc(mainObjectContext)
 
-		var messageColor = COLOR_CLASS.lightGrayColor()
+		var color = COLOR_CLASS.lightGrayColor()
 		var message: String = ""
 
 		if !ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
-			messageColor = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
+			color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
 			message = "There are no configured API servers in your settings, please ensure you have added at least one server with a valid API token."
 		} else if app.isRefreshing {
 			message = "Refreshing PR information, please wait a moment..."
@@ -269,37 +269,27 @@ final class DataManager : NSObject {
 			message = "There are no PRs matching this filter."
 		} else if openRequests > 0 {
 			message = "\(openRequests) PRs are hidden by your settings."
+		} else if Repo.allReposAreHiddenInMoc(mainObjectContext) {
+			color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
+			message = "All your watched repositories are maked as hidden, please unhide some!"
 		} else if Repo.countVisibleReposInMoc(mainObjectContext)==0 {
-			messageColor = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
-			message = "There are no watched repositories, please watch or unhide some."
+			color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
+			message = "You have no watched repositories, please add some to your watchlist and refresh in a little while."
 		} else if openRequests==0 {
 			message = "No open PRs in your visible repositories."
 		}
 
-		let p = NSMutableParagraphStyle()
-		p.lineBreakMode = NSLineBreakMode.ByWordWrapping
-		#if os(OSX)
-			p.alignment = NSTextAlignment.CenterTextAlignment
-			return NSAttributedString(string: message,
-				attributes: [NSForegroundColorAttributeName: messageColor, NSParagraphStyleAttributeName: p])
-			#elseif os(iOS)
-			p.alignment = NSTextAlignment.Center
-			return NSAttributedString(string: message,
-			attributes: [	NSForegroundColorAttributeName: messageColor,
-			NSParagraphStyleAttributeName: p,
-			NSFontAttributeName: FONT_CLASS.systemFontOfSize(FONT_CLASS.smallSystemFontSize())])
-		#endif
-
+		return emptyMessage(message, color: color)
 	}
 
 	class func reasonForEmptyIssuesWithFilter(filterValue: String?) -> NSAttributedString {
 		let openIssues = Issue.countOpenIssuesInMoc(mainObjectContext)
 
-		var messageColor = COLOR_CLASS.lightGrayColor()
+		var color = COLOR_CLASS.lightGrayColor()
 		var message: String = ""
 
 		if !ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
-			messageColor = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
+			color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
 			message = "There are no configured API servers in your settings, please ensure you have added at least one server with a valid API token."
 		} else if app.isRefreshing {
 			message = "Refreshing issue information, please wait a moment..."
@@ -307,27 +297,34 @@ final class DataManager : NSObject {
 			message = "There are no issues matching this filter."
 		} else if openIssues > 0 {
 			message = "\(openIssues) issues are hidden by your settings."
+		} else if Repo.allReposAreHiddenInMoc(mainObjectContext) {
+			color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
+			message = "All your watched repositories are maked as hidden, please unhide some!"
 		} else if Repo.countVisibleReposInMoc(mainObjectContext)==0 {
-			messageColor = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
-			message = "There are no watched repositories, please watch or unhide some."
+			color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
+			message = "You have no watched repositories, please add some to your watchlist and refresh in a little while."
 		} else if openIssues==0 {
 			message = "No open issues in your visible repositories."
 		}
 
+		return emptyMessage(message, color: color)
+	}
+
+	class func emptyMessage(message: String, color: COLOR_CLASS) -> NSAttributedString {
 		let p = NSMutableParagraphStyle()
 		p.lineBreakMode = NSLineBreakMode.ByWordWrapping
 		#if os(OSX)
 			p.alignment = NSTextAlignment.CenterTextAlignment
 			return NSAttributedString(string: message,
-				attributes: [NSForegroundColorAttributeName: messageColor, NSParagraphStyleAttributeName: p])
-			#elseif os(iOS)
+			attributes: [NSForegroundColorAttributeName: messageColor, NSParagraphStyleAttributeName: p])
+		#elseif os(iOS)
 			p.alignment = NSTextAlignment.Center
-			return NSAttributedString(string: message,
-			attributes: [	NSForegroundColorAttributeName: messageColor,
-			NSParagraphStyleAttributeName: p,
-			NSFontAttributeName: FONT_CLASS.systemFontOfSize(FONT_CLASS.smallSystemFontSize())])
+			return NSAttributedString(string: message, attributes: [
+				NSForegroundColorAttributeName: color,
+				NSParagraphStyleAttributeName: p,
+				NSFontAttributeName: FONT_CLASS.systemFontOfSize(FONT_CLASS.smallSystemFontSize())
+			])
 		#endif
-		
 	}
 
 	class func idForUriPath(uriPath: String?) -> NSManagedObjectID? {

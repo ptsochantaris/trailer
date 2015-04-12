@@ -61,13 +61,13 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 
 	@IBAction func testAndCompleteSelected(sender: NSButton) {
 
-		let token = (tokenHolder.stringValue as NSString).stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+		let token = tokenHolder.stringValue.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
 		if token.isEmpty {
 			let alert = NSAlert()
 			alert.messageText = "Please enter your personal access token first"
 			alert.addButtonWithTitle("OK")
-			alert.beginSheetModalForWindow(self, completionHandler: { response in
-				self.normalState()
+			alert.beginSheetModalForWindow(self, completionHandler: { [weak self] response in
+				self!.normalState()
 			})
 		} else {
 			testingState()
@@ -81,7 +81,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 						self!.normalState()
 					})
 				} else {
-					self!.quickstart.stringValue = "\nSyncing your GitHub info for the first time.\n\nThis could take a little while, please wait..."
+					self!.quickstart.stringValue = "\nSyncing GitHub data for the first time.\n\nThis could take a little while, please wait..."
 					Settings.lastSuccessfulRefresh = nil
 					app.startRefreshIfItIsDue()
 					self!.checkTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self!, selector: Selector("checkRefreshDone:"), userInfo: nil, repeats: true)
@@ -97,7 +97,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 			checkTimer = nil
 
 			if newServer.lastSyncSucceeded?.boolValue ?? false {
-				self.close()
+				close()
 				let alert = NSAlert()
 				alert.messageText = "Setup complete!"
 				alert.informativeText = "You can tweak settings & behaviour from the preferences window.\n\nPocketTrailer will only read from your Github data, so feel free to experiment with settings and options, you can't damage your data or settings on GitHub."
@@ -107,8 +107,8 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 				let alert = NSAlert()
 				alert.messageText = "Syncing with this server failed - please check that your network connection is working and that you have pasted your token correctly"
 				alert.addButtonWithTitle("OK")
-				alert.beginSheetModalForWindow(self, completionHandler: { response in
-					self.normalState()
+				alert.beginSheetModalForWindow(self, completionHandler: { [weak self] response in
+					self!.normalState()
 				})
 			}
 		}
@@ -139,7 +139,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 		welcomeLabel.hidden = true
 		trackIssues.hidden = true
 		api.resetBadLinks()
-		let token = (tokenHolder.stringValue as NSString).stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+		let token = tokenHolder.stringValue.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
 		newServer.authToken = token
 		newServer.lastSyncSucceeded = true
 	}

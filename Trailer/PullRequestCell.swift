@@ -63,7 +63,7 @@ final class PullRequestCell: TrailerCell {
 			bottom = ceil(CELL_PADDING * 0.5)
 		}
 
-		self.frame = NSMakeRect(0, 0, MENU_WIDTH, titleHeight+subtitleHeight+statusBottom+CELL_PADDING)
+		frame = NSMakeRect(0, 0, MENU_WIDTH, titleHeight+subtitleHeight+statusBottom+CELL_PADDING)
 		addCounts(_commentsTotal, _commentsNew, goneDark)
 
 		var titleRect = NSMakeRect(LEFTPADDING, subtitleHeight+bottom+statusBottom, W, titleHeight)

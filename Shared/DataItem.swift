@@ -35,15 +35,15 @@ class DataItem: NSManagedObject {
 		return items?.first as? DataItem
 	}
 
-	class func itemWithInfo(info: NSDictionary, type: String, fromServer: ApiServer) -> DataItem {
-		let serverId = info.ofk("id") as! NSNumber
-		let updatedDate = syncDateFormatter.dateFromString(info.ofk("updated_at") as! String)
+	class func itemWithInfo(info: [NSObject : AnyObject], type: String, fromServer: ApiServer) -> DataItem {
+		let serverId = N(info, "id") as! NSNumber
+		let updatedDate = syncDateFormatter.dateFromString(N(info, "updated_at") as! String)
 		var existingItem = itemOfType(type, serverId: serverId, fromServer: fromServer)
 		if existingItem == nil {
 			DLog("Creating %@: %@",type,serverId)
 			existingItem = NSEntityDescription.insertNewObjectForEntityForName(type, inManagedObjectContext: fromServer.managedObjectContext!) as? DataItem
 			existingItem!.serverId = serverId
-			existingItem!.createdAt = syncDateFormatter.dateFromString(info.ofk("created_at") as! String)
+			existingItem!.createdAt = syncDateFormatter.dateFromString(N(info, "created_at") as! String)
 			existingItem!.postSyncAction = PostSyncAction.NoteNew.rawValue
 			existingItem!.updatedAt = updatedDate
 			existingItem!.apiServer = fromServer

@@ -38,7 +38,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 	}
 
 	@IBAction func skipSelected(sender: UIBarButtonItem) {
-		self.dismissViewControllerAnimated(true, completion: nil)
+		dismissViewControllerAnimated(true, completion: nil)
 	}
 
 	override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
@@ -62,7 +62,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 				a.show()
 				self!.normalMode()
 			} else {
-				self!.feedback.text = "Syncing your GitHub info for the first time.\n\nThis could take a little while, please wait..."
+				self!.feedback.text = "Syncing GitHub data for the first time.\n\nThis could take a little while, please wait..."
 				Settings.lastSuccessfulRefresh = nil
 				app.startRefreshIfItIsDue()
 				self!.checkTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self!, selector: Selector("checkRefreshDone:"), userInfo: nil, repeats: true)
@@ -87,7 +87,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 					message: nil,
 					delegate: nil,
 					cancelButtonTitle: "OK").show()
-				self.normalMode()
+				normalMode()
 			}
 		}
 	}
@@ -105,7 +105,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 	}
 
 	private func testMode() {
-		self.view.endEditing(true)
+		view.endEditing(true)
 
 		for v in otherViews {
 			v.hidden = true

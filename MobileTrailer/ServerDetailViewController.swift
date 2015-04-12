@@ -190,16 +190,17 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 	func keyboardWillShow(notification: NSNotification) {
 		if focusedField?.superview == nil { return }
 
-		let info = notification.userInfo as NSDictionary!
-		let keyboardFrame = (info.objectForKey(UIKeyboardFrameEndUserInfoKey) as! NSValue).CGRectValue()
-		let keyboardHeight = max(0, view.bounds.size.height-keyboardFrame.origin.y)
-		let firstResponderFrame = view.convertRect(focusedField!.frame, fromView: focusedField!.superview)
-		let bottomOfFirstResponder = (firstResponderFrame.origin.y + firstResponderFrame.size.height) + 36
+		if let info = notification.userInfo as [NSObject : AnyObject]?, keyboardFrameValue = info[UIKeyboardFrameEndUserInfoKey] as? NSValue {
+			let keyboardFrame = keyboardFrameValue.CGRectValue()
+			let keyboardHeight = max(0, view.bounds.size.height-keyboardFrame.origin.y)
+			let firstResponderFrame = view.convertRect(focusedField!.frame, fromView: focusedField!.superview)
+			let bottomOfFirstResponder = (firstResponderFrame.origin.y + firstResponderFrame.size.height) + 36
 
-		let topOfKeyboard = view.bounds.size.height - keyboardHeight
-		if bottomOfFirstResponder > topOfKeyboard {
-			let distance = bottomOfFirstResponder - topOfKeyboard
-			scrollView.contentOffset = CGPointMake(0, scrollView.contentOffset.y + distance)
+			let topOfKeyboard = view.bounds.size.height - keyboardHeight
+			if bottomOfFirstResponder > topOfKeyboard {
+				let distance = bottomOfFirstResponder - topOfKeyboard
+				scrollView.contentOffset = CGPointMake(0, scrollView.contentOffset.y + distance)
+			}
 		}
 	}
 

@@ -26,20 +26,20 @@ final class PRStatus: DataItem {
 
 	@NSManaged var pullRequest: PullRequest
 
-	class func statusWithInfo(info: NSDictionary, fromServer: ApiServer) -> PRStatus {
+	class func statusWithInfo(info: [NSObject : AnyObject], fromServer: ApiServer) -> PRStatus {
 		let s = DataItem.itemWithInfo(info, type: "PRStatus", fromServer: fromServer) as! PRStatus
 		if s.postSyncAction?.integerValue != PostSyncAction.DoNothing.rawValue {
-			s.url = info.ofk("url") as? String
-			s.state = info.ofk("state") as? String
-			s.targetUrl = info.ofk("target_url") as? String
+			s.url = N(info, "url") as? String
+			s.state = N(info, "state") as? String
+			s.targetUrl = N(info, "target_url") as? String
 
-            if let ds = info.ofk("description") as? String {
+            if let ds = N(info, "description") as? String {
                 s.descriptionText = ds.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
             }
 
-			if let userInfo = info.ofk("creator") as? NSDictionary {
-				s.userName = userInfo.ofk("login") as? String
-				s.userId = userInfo.ofk("id") as? NSNumber
+			if let userInfo = N(info, "creator") as? [NSObject : AnyObject] {
+				s.userName = N(userInfo, "login") as? String
+				s.userId = N(userInfo, "id") as? NSNumber
 			}
 		}
 		return s
@@ -69,7 +69,7 @@ final class PRStatus: DataItem {
 
 	func displayText() -> String {
 		if let desc = descriptionText {
-			return NSString(format: "%@ %@", dateFormatter.stringFromDate(createdAt!), desc) as String
+			return String(format: "%@ %@", dateFormatter.stringFromDate(createdAt!), desc)
 		} else {
 			return "(No description)"
 		}

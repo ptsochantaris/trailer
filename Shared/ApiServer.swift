@@ -30,7 +30,7 @@ final class ApiServer: NSManagedObject {
     @NSManaged var issues: Set<Issue>
 
 	var syncIsGood: Bool {
-		return self.lastSyncSucceeded?.boolValue ?? true
+		return lastSyncSucceeded?.boolValue ?? true
 	}
 
 	var goodToGo: Bool {
@@ -206,7 +206,7 @@ final class ApiServer: NSManagedObject {
 	func configureReposFromArchive(archive: [String : [String : NSObject]]) {
 		for (repoIdString, repoData) in archive {
 			let repoId = NSNumber(longLong: (repoIdString as NSString).longLongValue)
-			let r = NSEntityDescription.insertNewObjectForEntityForName("Repo", inManagedObjectContext: self.managedObjectContext!) as! Repo
+			let r = NSEntityDescription.insertNewObjectForEntityForName("Repo", inManagedObjectContext: managedObjectContext!) as! Repo
 			for (k,v) in repoData {
 				let attributes = r.entity.attributesByName.keys.array
 				if contains(attributes, k) {

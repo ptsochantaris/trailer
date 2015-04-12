@@ -9,21 +9,21 @@ final class Issue: ListableItem {
 
 	@NSManaged var commentsLink: String?
 
-	class func issueWithInfo(info: NSDictionary, fromServer: ApiServer, inRepo: Repo) -> Issue {
+	class func issueWithInfo(info: [NSObject : AnyObject], fromServer: ApiServer, inRepo: Repo) -> Issue {
 		let i = DataItem.itemWithInfo(info, type: "Issue", fromServer: fromServer) as! Issue
 		if i.postSyncAction?.integerValue != PostSyncAction.DoNothing.rawValue {
-			i.url = info.ofk("url") as? String
-			i.webUrl = info.ofk("html_url") as? String
-			i.number = info.ofk("number") as? NSNumber
-			i.state = info.ofk("state") as? String
-			i.title = info.ofk("title") as? String
-			i.body = info.ofk("body") as? String
+			i.url = N(info, "url") as? String
+			i.webUrl = N(info, "html_url") as? String
+			i.number = N(info, "number") as? NSNumber
+			i.state = N(info, "state") as? String
+			i.title = N(info, "title") as? String
+			i.body = N(info, "body") as? String
 			i.repo = inRepo
 
-			if let userInfo = info.ofk("user") as? NSDictionary {
-				i.userId = userInfo.ofk("id") as? NSNumber
-				i.userLogin = userInfo.ofk("login") as? String
-				i.userAvatarUrl = userInfo.ofk("avatar_url") as? String
+			if let userInfo = N(info, "user") as? [NSObject: AnyObject] {
+				i.userId = N(userInfo, "id") as? NSNumber
+				i.userLogin = N(userInfo, "login") as? String
+				i.userAvatarUrl = N(userInfo, "avatar_url") as? String
 			}
 
 			if let N = i.number, R = inRepo.fullName {
@@ -34,14 +34,14 @@ final class Issue: ListableItem {
 				l.postSyncAction = PostSyncAction.Delete.rawValue
 			}
 
-			if let labelsList = info.ofk("labels") as? [NSDictionary] {
+			if let labelsList = N(info, "labels") as? [[NSObject: AnyObject]] {
 				for labelInfo in labelsList {
 					PRLabel.labelWithInfo(labelInfo, withParent: i)
 				}
 			}
 
-			if let assignee = info.ofk("assignee") as? NSDictionary {
-				let assigneeName = assignee.ofk("login") as? String ?? "NoAssignedUserName"
+			if let assignee = N(info, "assignee") as? [NSObject: AnyObject] {
+				let assigneeName = N(assignee, "login") as? String ?? "NoAssignedUserName"
 				let assigned = (assigneeName == (fromServer.userName ?? "NoApiUser"))
 				i.isNewAssignment = (assigned && !(i.assignedToMe?.boolValue ?? false))
 				i.assignedToMe = assigned

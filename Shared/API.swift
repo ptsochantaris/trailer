@@ -182,8 +182,8 @@ final class API {
 
             #if os(iOS)
                 task.priority = NSURLSessionTaskPriorityHigh
-                atNextEvent() {
-					self.networkIndicationStart()
+                atNextEvent() { [weak self] in
+					self!.networkIndicationStart()
                 }
             #endif
 
@@ -200,7 +200,7 @@ final class API {
 
 		let imageKey = absolutePath + " " + currentAppVersion
 
-		let cachePath = cacheDirectory.stringByAppendingPathComponent("imgcache-" + (imageKey.md5hash() as String))
+		let cachePath = cacheDirectory.stringByAppendingPathComponent("imgcache-" + (md5hash(imageKey) as String))
 
 		let fileManager = NSFileManager.defaultManager()
 		if fileManager.fileExistsAtPath(cachePath) {
@@ -242,7 +242,7 @@ final class API {
 
 	////////////////////////////////////// API interface
 
-	func fetchPullRequestsForActiveReposAndCallback(callback: Completion) {
+	func syncItemsForActiveReposAndCallback(callback: Completion) {
 		let syncContext = DataManager.tempContext()
 
 		let shouldRefreshReposToo = (app.lastRepoCheck.isEqualToDate(never())
@@ -417,7 +417,7 @@ final class API {
 			return
 		}
 
-		var extraHeaders: Dictionary<String, String>?
+		var extraHeaders: [String : String]?
 		if let e = usingUserEventsFromServer.latestUserEventEtag {
 			extraHeaders = ["If-None-Match": e]
 		}
@@ -436,7 +436,7 @@ final class API {
 			extraHeaders: extraHeaders,
 			perPageCallback: { [weak self] data, lastPage in
 				for d in data ?? [] {
-					let eventDate = syncDateFormatter.dateFromString(d.ofk("created_at") as! String)!
+					let eventDate = syncDateFormatter.dateFromString(N(d, "created_at") as! String)!
 					if latestDate!.compare(eventDate) == NSComparisonResult.OrderedAscending { // this is where we came in
 						if let repoId = d["repo"]?["id"] as? NSNumber {
 							DLog("New event at %@ from Repo ID %@", eventDate, repoId)
@@ -471,7 +471,7 @@ final class API {
 			return
 		}
 
-		var extraHeaders: Dictionary<String, String>?
+		var extraHeaders: [String : String]?
 		if let e = usingReceivedEventsFromServer.latestReceivedEventEtag {
 			extraHeaders = ["If-None-Match": e]
 		}
@@ -490,7 +490,7 @@ final class API {
 			extraHeaders: extraHeaders,
 			perPageCallback: { [weak self] data, lastPage in
 				for d in data ?? [] {
-					let eventDate = syncDateFormatter.dateFromString(d.ofk("created_at") as! String)!
+					let eventDate = syncDateFormatter.dateFromString(N(d, "created_at") as! String)!
 					if latestDate!.compare(eventDate) == NSComparisonResult.OrderedAscending { // this is where we came in
 						if let repoId = d["repo"]?["id"] as? NSNumber {
 							DLog("New event at %@ from Repo ID %@", eventDate, repoId)
@@ -646,7 +646,7 @@ final class API {
 				getPagedDataInPath("/repos/\(repoFullName)/issues", fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
 					perPageCallback: { data, lastPage in
 						for info in data ?? [] {
-							if info.ofk("pull_request") == nil { // don't sync issues which are pull requests, they are already synced
+							if N(info, "pull_request") == nil { // don't sync issues which are pull requests, they are already synced
 								Issue.issueWithInfo(info, fromServer:apiServer, inRepo:r)
 							}
 						}
@@ -1032,19 +1032,18 @@ final class API {
 			if let issueLink = p.issueUrl {
 				getDataInPath(issueLink, fromServer: apiServer, parameters: nil, extraHeaders: nil,
 					callback: { data, lastPage, resultCode, etag in
-						if data != nil {
-							let assignee = ((data as? NSDictionary)?.ofk("assignee") as? NSDictionary)?.ofk("login") as? String ?? "NoAssignedUserName"
+						if let let assigneeInfo = N(data, "assignee") as? [NSObject : AnyObject] {
+							let assignee = N(assigneeInfo, "login") as? String ?? "NoAssignedUserName"
 							let assigned = (assignee == (apiServer.userName ?? "NoApiUser"))
 							p.isNewAssignment = (assigned && !(p.assignedToMe?.boolValue ?? false))
 							p.assignedToMe = assigned
+						} else if resultCode == 200 || resultCode == 404 || resultCode == 410 {
+							// 200 means PR is not assigned to anyone, there was no asgineee info
+							// 404/410 is fine, it means issue entry doesn't exist
+							p.assignedToMe = false
+							p.isNewAssignment = false
 						} else {
-							if resultCode == 404 || resultCode == 410 {
-								// 404/410 is fine, it means issue entry doesn't exist
-								p.assignedToMe = false
-								p.isNewAssignment = false
-							} else {
-								apiServer.lastSyncSucceeded = false
-							}
+							apiServer.lastSyncSucceeded = false
 						}
 						completionCallback()
 				})
@@ -1080,10 +1079,10 @@ final class API {
 			completion: { [weak self] response, data, error in
 
 				if error == nil {
-					if let mergeInfo = (data as? NSDictionary)?.ofk("merged_by") as? NSDictionary {
+					if let mergeInfo = N(data, "merged_by") as? [NSObject: AnyObject] {
 						DLog("detected merged PR: %@", r.title)
 
-						let mergeUserId = mergeInfo.ofk("id") as? NSNumber ?? -2
+						let mergeUserId = N(mergeInfo, "id") as? NSNumber ?? -2
 						DLog("merged by user id: %@, our id is: %@", mergeUserId, r.apiServer.userId)
 
 						let mergedByMyself = mergeUserId.isEqualToNumber(r.apiServer.userId ?? -1)
@@ -1175,7 +1174,7 @@ final class API {
 					let epochSeconds = (allHeaders["X-RateLimit-Reset"] as! NSString).longLongValue
 					callback(requestsRemaining, requestLimit, epochSeconds)
 				} else {
-					if response?.statusCode == 404 && data != nil && !((data as! NSDictionary).ofk("message") as! String == "Not Found") {
+					if response?.statusCode == 404 && data != nil && !(N(data, "message") as? String == "Not Found") {
 						callback(10000, 10000, 0)
 					} else {
 						callback(-1, -1, -1)
@@ -1238,15 +1237,15 @@ final class API {
 
 				if let d = data {
 					for info in d {
-						if (info.ofk("private") as? NSNumber)?.boolValue ?? false {
-							if let permissions = info.ofk("permissions") as? NSDictionary {
-								if (permissions.ofk("pull") as! NSNumber).boolValue ||
-									(permissions.ofk("push") as! NSNumber).boolValue ||
-									(permissions.ofk("admin") as! NSNumber).boolValue {
+						if (N(info, "private") as? NSNumber)?.boolValue ?? false {
+							if let permissions = N(info, "permissions") as? [NSObject: AnyObject] {
+								if	(N(permissions, "pull") as! NSNumber).boolValue ||
+									(N(permissions, "push") as! NSNumber).boolValue ||
+									(N(permissions, "admin") as! NSNumber).boolValue {
 										let r = Repo.repoWithInfo(info, fromServer: apiServer)
 										r.apiServer = apiServer
 								} else {
-									DLog("Watched private repository '%@' seems to be inaccessible, skipping", info.ofk("full_name") as? String)
+									DLog("Watched private repository '%@' seems to be inaccessible, skipping", N(info, "full_name") as? String)
 									continue
 								}
 							}
@@ -1274,15 +1273,15 @@ final class API {
 			callback()
 			return
 		}
+
 		var completionCount = 0
 		for apiServer in allApiServers {
 			if apiServer.goodToGo {
-				getDataInPath("/user", fromServer:apiServer, parameters: nil, extraHeaders:nil, callback: {
-					data, lastPage, resultCode, etag in
+				getDataInPath("/user", fromServer:apiServer, parameters: nil, extraHeaders:nil, callback: { [weak self] data, lastPage, resultCode, etag in
 
-					if let d = data as? NSDictionary {
-						apiServer.userName = d.ofk("login") as? String
-						apiServer.userId = d.ofk("id") as? NSNumber
+					if let d = data as? [NSObject : AnyObject] {
+						apiServer.userName = N(d, "login") as? String
+						apiServer.userId = N(d, "id") as? NSNumber
 					} else {
 						apiServer.lastSyncSucceeded = false
 					}
@@ -1294,31 +1293,34 @@ final class API {
 				if completionCount==operationCount { callback() }
 			}
 		}
+
 	}
 
 	func testApiToServer(apiServer: ApiServer, callback: (NSError?) -> ()) {
 		get("/rate_limit", fromServer: apiServer, ignoreLastSync: true, parameters: nil, extraHeaders: nil,
 			completion: { response, data, error in
-				let allOk = (response?.statusCode == 404 && data != nil && !((data as! NSDictionary).ofk("message") as! String == "Not Found"))
+				let allOk = (response?.statusCode == 404 && data != nil && !(N(data, "message") as? String == "Not Found"))
 				callback(allOk ? nil : error)
 		})
 	}
 
 	//////////////////////////////////////////////////////////// low level
 
-	private func lastPage(response: NSHTTPURLResponse) -> Bool {
-		let linkHeader = (response.allHeaderFields as NSDictionary).ofk("Link") as? String
-		if linkHeader == nil { return true }
-		return linkHeader!.rangeOfString("rel=\"next\"") == nil
+	class func lastPage(response: NSHTTPURLResponse?) -> Bool {
+		let allHeaders = response?.allHeaderFields as [NSObject : AnyObject]?
+		if let linkHeader = N(allHeaders, "Link") as? String {
+			return linkHeader.rangeOfString("rel=\"next\"") == nil
+		}
+		return true
 	}
 
 	private func getPagedDataInPath(
 		path: String,
 		fromServer: ApiServer,
 		startingFromPage: Int,
-		parameters: Dictionary<String, String>?,
-		extraHeaders: Dictionary<String, String>?,
-		perPageCallback: (data: [NSDictionary]?, lastPage: Bool) -> Bool,
+		parameters: [String : String]?,
+		extraHeaders: [String : String]?,
+		perPageCallback: (data: [[NSObject: AnyObject]]?, lastPage: Bool) -> Bool,
 		finalCallback: (success: Bool, resultCode: Int, etag: String?) -> Void) {
 
 			if path.isEmpty {
@@ -1342,7 +1344,7 @@ final class API {
 			getDataInPath(path, fromServer: fromServer, parameters: mutableParams, extraHeaders: extraHeaders) {
 				[weak self] data, lastPage, resultCode, etag in
 
-				if let d = data as? [NSDictionary] {
+				if let d = data as? [[NSObject: AnyObject]] {
 					var isLastPage = lastPage
 					if perPageCallback(data: d, lastPage: lastPage) { isLastPage = true }
 					if isLastPage {
@@ -1359,8 +1361,8 @@ final class API {
 	private func getDataInPath(
 		path: String,
 		fromServer: ApiServer,
-		parameters: Dictionary<String, String>?,
-		extraHeaders: Dictionary<String, String>?,
+		parameters: [String : String]?,
+		extraHeaders: [String : String]?,
 		callback:(data: AnyObject?, lastPage: Bool, resultCode: Int, etag: String?) -> Void) {
 
 			get(path, fromServer: fromServer, ignoreLastSync: false, parameters: parameters, extraHeaders: extraHeaders,
@@ -1369,15 +1371,17 @@ final class API {
 					let code = response?.statusCode ?? 0
 
 					if error == nil {
-						let allHeaders = response!.allHeaderFields
-						fromServer.requestsRemaining = NSNumber(longLong: (allHeaders["X-RateLimit-Remaining"] as! NSString).longLongValue)
-						fromServer.requestsLimit = NSNumber(longLong: (allHeaders["X-RateLimit-Limit"] as! NSString).longLongValue)
-						let epochSeconds = (allHeaders["X-RateLimit-Reset"] as! NSString).doubleValue
-						fromServer.resetDate = NSDate(timeIntervalSince1970: epochSeconds)
-						NSNotificationCenter.defaultCenter().postNotificationName(API_USAGE_UPDATE, object: fromServer, userInfo: nil)
+						var etag: String? = nil
+						if let allHeaders = response?.allHeaderFields {
+							
+							fromServer.requestsRemaining = NSNumber(longLong: (allHeaders["X-RateLimit-Remaining"] as! NSString).longLongValue)
+							fromServer.requestsLimit = NSNumber(longLong: (allHeaders["X-RateLimit-Limit"] as! NSString).longLongValue)
+							fromServer.resetDate = NSDate(timeIntervalSince1970: (allHeaders["X-RateLimit-Reset"] as! NSString).doubleValue)
+							NSNotificationCenter.defaultCenter().postNotificationName(API_USAGE_UPDATE, object: fromServer, userInfo: nil)
 
-						let etag = allHeaders["Etag"] as? String
-						callback(data: data, lastPage: self!.lastPage(response!), resultCode: code, etag: etag)
+							let etag = allHeaders["Etag"] as? String
+						}
+						callback(data: data, lastPage: API.lastPage(response), resultCode: code, etag: etag)
 					} else {
 						callback(data: nil, lastPage: false, resultCode: code, etag: nil)
 					}
@@ -1388,8 +1392,8 @@ final class API {
 		path:String,
 		fromServer: ApiServer,
 		ignoreLastSync: Bool,
-		parameters: Dictionary<String, String>?,
-		extraHeaders: Dictionary<String, String>?,
+		parameters: [String : String]?,
+		extraHeaders: [String : String]?,
 		completion: (response: NSHTTPURLResponse?, data: AnyObject?, error: NSError?) -> Void
 	) {
 			var apiServerLabel: String
@@ -1484,7 +1488,7 @@ final class API {
 					DLog("(%@) GET %@ - FAILED: %@", apiServerLabel, fullUrlPath, error!.localizedDescription)
 				}
 
-				dispatch_async(dispatch_get_main_queue()) {
+				dispatch_sync(dispatch_get_main_queue()) {
 					completion(response: response, data: parsedData, error: error)
 				}
 

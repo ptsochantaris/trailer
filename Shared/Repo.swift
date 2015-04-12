@@ -15,12 +15,12 @@ final class Repo: DataItem {
 	@NSManaged var pullRequests: Set<PullRequest>
 	@NSManaged var issues: Set<Issue>
 
-	class func repoWithInfo(info: NSDictionary, fromServer: ApiServer) -> Repo {
+	class func repoWithInfo(info: [NSObject : AnyObject], fromServer: ApiServer) -> Repo {
 		let r = DataItem.itemWithInfo(info, type: "Repo", fromServer: fromServer) as! Repo
 		if r.postSyncAction?.integerValue != PostSyncAction.DoNothing.rawValue {
-			r.fullName = info.ofk("full_name") as? String
-			r.fork = (info.ofk("fork") as? NSNumber)?.boolValue
-			r.webUrl = info.ofk("html_url") as? String
+			r.fullName = N(info, "full_name") as? String
+			r.fork = (N(info, "fork") as? NSNumber)?.boolValue
+			r.webUrl = N(info, "html_url") as? String
 			r.dirty = true
 			r.lastDirtied = NSDate()
 		}
@@ -45,6 +45,17 @@ final class Repo: DataItem {
 		let f = NSFetchRequest(entityName: "Repo")
 		f.predicate = NSPredicate(format: "hidden = NO")
 		return moc.countForFetchRequest(f, error: nil)
+	}
+
+	class func allReposAreHiddenInMoc(moc: NSManagedObjectContext) -> Bool {
+		let allRepos = DataItem.allItemsOfType("Repo", inMoc: moc) as! [Repo]
+		var hiddenRepos = 0
+		for r in allRepos {
+			if r.hidden?.boolValue ?? false {
+				hiddenRepos++
+			}
+		}
+		return allRepos.count > 0 && (hiddenRepos == allRepos.count)
 	}
 
 	class func syncableReposInMoc(moc: NSManagedObjectContext) -> [Repo] {

@@ -8,8 +8,8 @@ final class Team: DataItem {
     @NSManaged var organisationLogin: String?
 	@NSManaged var calculatedReferral: String?
 
-	class func teamWithInfo(info: NSDictionary, fromApiServer: ApiServer) -> Team {
-		let serverId = info.ofk("id") as! NSNumber
+	class func teamWithInfo(info: [NSObject : AnyObject], fromApiServer: ApiServer) -> Team {
+		let serverId = N(info, "id") as! NSNumber
 		var t = Team.itemOfType("Team", serverId: serverId, fromServer: fromApiServer) as? Team
 		if t==nil {
 			DLog("Creating Team: %@", serverId)
@@ -22,8 +22,8 @@ final class Team: DataItem {
 			DLog("Updating Team: %@", serverId)
 		}
 
-		let slug = info.ofk("slug") as? String ?? ""
-		let org = info.ofk("organization")?.ofk("login") as? String ?? ""
+		let slug = N(info, "slug") as? String ?? ""
+		let org = N(N(info, "organization"), "login") as? String ?? ""
 		t!.slug = slug
 		t!.organisationLogin = org
 		if slug.isEmpty || org.isEmpty {

@@ -50,22 +50,22 @@ final class SectionController: WKInterfaceController {
 
 	class titleEntry {
 		var title: String
-		init(_ title: String) { self.title = title }
+		init(_ t: String) { title = t }
 	}
 
 	class attributedTitleEntry {
 		var title: NSAttributedString
-		init(_ title: NSAttributedString) { self.title = title }
+		init(_ t: NSAttributedString) { title = t }
 	}
 
 	class prEntry {
 		var section: PullRequestSection
-		init(_ section: PullRequestSection) { self.section = section }
+		init(_ s: PullRequestSection) { section = s }
 	}
 
 	class issueEntry {
 		var section: PullRequestSection
-		init(_ section: PullRequestSection) { self.section = section }
+		init(_ s: PullRequestSection) { section = s }
 	}
 
 	override func table(table: WKInterfaceTable, didSelectRowAtIndex rowIndex: Int) {

@@ -3,10 +3,10 @@ final class AvatarView: NSImageView {
 
 	var spinner: NSProgressIndicator?
 
-	init(frame frameRect:NSRect, url:NSString) {
+	init(frame frameRect: NSRect, url: String) {
 		super.init(frame: frameRect)
 		imageAlignment = NSImageAlignment.AlignCenter
-		if !api.haveCachedAvatar(url as String, tryLoadAndCallback: { [weak self] img in
+		if !api.haveCachedAvatar(url, tryLoadAndCallback: { [weak self] img in
 			if let weakSelf = self {
 				weakSelf.image = img
 				weakSelf.done()

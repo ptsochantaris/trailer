@@ -2,12 +2,12 @@
 final class StatusItemView: NSView {
 
 	let statusLabel: String
-	let textAttributes: Dictionary<String, AnyObject>
+	let textAttributes: [String : AnyObject]
     var tappedCallback: (() -> Void)?
 	let imagePrefix: String
 	var labelOffset: CGFloat = 0
 
-	init(frame: NSRect, label: String, prefix: String, attributes: Dictionary<String, AnyObject>) {
+	init(frame: NSRect, label: String, prefix: String, attributes: [String : AnyObject]) {
 		imagePrefix = prefix
 		statusLabel = label
 		textAttributes = attributes
@@ -57,7 +57,7 @@ final class StatusItemView: NSView {
 			icon = NSImage(named: "\(imagePrefix)IconBright")!
 			displayAttributes[NSForegroundColorAttributeName] = NSColor.selectedMenuItemTextColor()
 		} else {
-			if app.checkDarkMode() {
+			if app.darkMode {
 				icon = NSImage(named: "\(imagePrefix)IconBright")!
 				if displayAttributes[NSForegroundColorAttributeName] as! NSColor == NSColor.controlTextColor() {
 					displayAttributes[NSForegroundColorAttributeName] = NSColor.selectedMenuItemTextColor()

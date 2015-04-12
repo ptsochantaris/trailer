@@ -186,3 +186,38 @@ func atNextEvent(completion: Completion) {
 func never() -> NSDate {
 	return NSDate.distantPast() as! NSDate
 }
+
+func N(data: AnyObject?, key: String) -> AnyObject? {
+	if let d = data as? [NSObject : AnyObject], o: AnyObject = d[key] where !(o is NSNull) {
+		return o
+	}
+	return nil
+}
+
+func md5hash(s: String) -> String {
+	let digestLen = Int(CC_MD5_DIGEST_LENGTH)
+	let result = UnsafeMutablePointer<CUnsignedChar>.alloc(digestLen)
+
+	CC_MD5(
+		s.cStringUsingEncoding(NSUTF8StringEncoding)!,
+		CC_LONG(s.lengthOfBytesUsingEncoding(NSUTF8StringEncoding)),
+		result)
+
+	var hash = NSMutableString()
+	for i in 0..<digestLen {
+		hash.appendFormat("%02X", result[i])
+	}
+
+	result.destroy()
+
+	return String(hash)
+}
+
+func parseFromHex(s: String) -> UInt32 {
+	var safe = s.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+	safe = safe.stringByTrimmingCharactersInSet(NSCharacterSet.symbolCharacterSet())
+	let s = NSScanner(string: safe)
+	var result:UInt32 = 0
+	s.scanHexInt(&result)
+	return result
+}

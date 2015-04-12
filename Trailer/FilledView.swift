@@ -3,19 +3,19 @@ final class FilledView: NSView {
 
 	var backgroundColor: NSColor? {
 		didSet {
-			self.setNeedsDisplayInRect(self.bounds)
+			setNeedsDisplayInRect(bounds)
 		}
 	}
 
 	var cornerRadius: CGFloat? {
 		didSet {
-			self.setNeedsDisplayInRect(self.bounds)
+			setNeedsDisplayInRect(bounds)
 		}
 	}
 
 	var borderColor: NSColor? {
 		didSet {
-			self.setNeedsDisplayInRect(self.bounds)
+			setNeedsDisplayInRect(bounds)
 		}
 	}
 

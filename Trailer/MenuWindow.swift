@@ -12,7 +12,7 @@ final class MenuWindow: NSWindow {
 	var statusItem: NSStatusItem?
 	var messageView: MessageView?
 
-	private var headerVibrant: NSVisualEffectView?
+	private var windowVibrancy: NSVisualEffectView?
 
 	override func awakeFromNib() {
 
@@ -40,27 +40,31 @@ final class MenuWindow: NSWindow {
 
 	func updateVibrancy() {
 
-		let vibrancy = MenuWindow.usingVibrancy()
-
-		if newSystem {
-			headerVibrant?.removeFromSuperview()
-			headerVibrant = nil
-		}
-
-		if vibrancy {
-			headerVibrant = NSVisualEffectView(frame: header.bounds)
-			headerVibrant!.autoresizingMask = NSAutoresizingMaskOptions.ViewHeightSizable | NSAutoresizingMaskOptions.ViewWidthSizable
-			headerVibrant!.blendingMode = NSVisualEffectBlendingMode.BehindWindow
-			header.addSubview(headerVibrant!, positioned:NSWindowOrderingMode.Below, relativeTo:nil)
+		if MenuWindow.usingVibrancy() {
 
 			appearance = NSAppearance(named: app.darkMode ? NSAppearanceNameVibrantDark : NSAppearanceNameVibrantLight)
-			table.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.SourceList
+
+			if windowVibrancy == nil {
+				windowVibrancy = NSVisualEffectView(frame: contentView.bounds)
+				windowVibrancy!.autoresizingMask = NSAutoresizingMaskOptions.ViewHeightSizable | NSAutoresizingMaskOptions.ViewWidthSizable
+				windowVibrancy!.blendingMode = NSVisualEffectBlendingMode.BehindWindow
+				windowVibrancy!.state = NSVisualEffectState.Active
+				contentView.addSubview(windowVibrancy!, positioned:NSWindowOrderingMode.Below, relativeTo:table)
+
+				table.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.SourceList
+			}
+
 		} else {
+
+			if windowVibrancy != nil {
+				windowVibrancy!.removeFromSuperview()
+				windowVibrancy = nil
+
+				table.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.Regular
+			}
+
 			if newSystem {
 				appearance = NSAppearance(named: NSAppearanceNameAqua)
-                table.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.Regular
-            } else {
-                table.backgroundColor = NSColor.whiteColor()
             }
 		}
 	}

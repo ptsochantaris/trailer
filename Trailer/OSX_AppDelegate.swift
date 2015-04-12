@@ -123,7 +123,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	func applicationDidFinishLaunching(notification: NSNotification) {
 		app = self
 
-		darkMode = checkDarkMode()
+		setupDarkModeMonitoring()
 
 		setupSortMethodMenu()
 		DataManager.postProcessAllItems()
@@ -619,6 +619,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	private func sizeMenu(window: MenuWindow, andShow: Bool) {
+
 		if let siv = window.statusItem?.view as? StatusItemView {
 			var menuLeft = siv.window!.frame.origin.x
 			let screen = NSScreen.mainScreen()!
@@ -672,7 +673,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 	}
 
-	func sectionHeaderRemoveSelected(headerTitle: NSString) {
+	func sectionHeaderRemoveSelected(headerTitle: String) {
 
 		let inMenu = prMenu.visible ? prMenu : issuesMenu
 
@@ -1465,7 +1466,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		issuesMenu.refreshMenuItem.action = nil
 		issuesMenu.refreshMenuItem.target = nil
 
-		api.fetchPullRequestsForActiveReposAndCallback { [weak self] in
+		api.syncItemsForActiveReposAndCallback { [weak self] in
 
 			self!.prMenu.refreshMenuItem.target = oldPrTarget
 			self!.prMenu.refreshMenuItem.action = oldPrAction
@@ -1506,7 +1507,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 
 		var countString: String
-		var attributes: Dictionary<String, AnyObject>
+		var attributes: [String : AnyObject]
 		if ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext) {
 			countString = "X"
 			attributes = [ NSFontAttributeName: NSFont.boldSystemFontOfSize(10),
@@ -1576,7 +1577,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		prMenu.showStatusItem()
 
 		var countString: String
-		var attributes: Dictionary<String, AnyObject>
+		var attributes: [String : AnyObject]
 		if ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext) {
 			countString = "X"
 			attributes = [ NSFontAttributeName: NSFont.boldSystemFontOfSize(10),
@@ -1643,7 +1644,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		sizeMenu(prMenu, andShow: false)
 	}
 
-    private func compareDict(from: Dictionary<String, AnyObject>, to: Dictionary<String, AnyObject>) -> Bool {
+	private func compareDict(from: [String : AnyObject], to: [String : AnyObject]) -> Bool {
         for (key, value) in from {
             if let v: AnyObject = to[key] {
                 if !v.isEqual(value) {
@@ -1847,8 +1848,8 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				prMenu.table.deselectAll(nil)
 				pr = pullRequestDelegate.pullRequestAtRow(row)
 			}
-			atNextEvent() {
-				self.prMenu.table.selectRowIndexes(NSIndexSet(index: row), byExtendingSelection: false)
+			atNextEvent() { [weak self] in
+				self!.prMenu.table.selectRowIndexes(NSIndexSet(index: row), byExtendingSelection: false)
 			}
 			return pr?.webUrl
 		} else if issuesMenu.visible {
@@ -1858,8 +1859,8 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				issuesMenu.table.deselectAll(nil)
 				i = issuesDelegate.issueAtRow(row)
 			}
-			atNextEvent() {
-				self.issuesMenu.table.selectRowIndexes(NSIndexSet(index: row), byExtendingSelection: false)
+			atNextEvent() { [weak self] in
+				self!.issuesMenu.table.selectRowIndexes(NSIndexSet(index: row), byExtendingSelection: false)
 			}
 			return i?.webUrl
 		} else {
@@ -1965,14 +1966,18 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 	}
 
-	func checkDarkMode() -> Bool {
+	func checkDarkMode() {
 		if NSAppKitVersionNumber>Double(NSAppKitVersionNumber10_9) {
 			let c = NSAppearance.currentAppearance()
 			if c.respondsToSelector(Selector("allowsVibrancy")) {
-				return c.name.rangeOfString(NSAppearanceNameVibrantDark) != nil
+				darkMode = c.name.rangeOfString(NSAppearanceNameVibrantDark) != nil
 			}
 		}
-		return false
+		darkMode = false
 	}
 
+	private func setupDarkModeMonitoring() {
+		checkDarkMode()
+		NSDistributedNotificationCenter.defaultCenter().addObserver(self, selector: Selector("checkDarkMode"), name: "AppleInterfaceThemeChangedNotification", object: nil)
+	}
 }

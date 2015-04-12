@@ -5,8 +5,8 @@ final class PRCell: UITableViewCell {
 
 	private let unreadCount = CountLabel(frame: CGRectZero)
 	private let readCount = CountLabel(frame: CGRectZero)
-	private var failedToLoadImage: NSString?
-	private var waitingForImageInPath: NSString?
+	private var failedToLoadImage: String?
+	private var waitingForImageInPath: String?
 
 	@IBOutlet weak var _image: UIImageView!
 	@IBOutlet weak var _title: UILabel!
@@ -168,7 +168,7 @@ final class PRCell: UITableViewCell {
 		accessibilityLabel = "\(issue.accessibleTitle()), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(issue.accessibleSubtitle())"
 	}
 
-	private func loadImageAtPath(imagePath: NSString?) {
+	private func loadImageAtPath(imagePath: String?) {
 		waitingForImageInPath = imagePath
 		if let path = imagePath {
 			if !api.haveCachedAvatar(path as String, tryLoadAndCallback: { [weak self] image in

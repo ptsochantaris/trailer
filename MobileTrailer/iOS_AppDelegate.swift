@@ -169,7 +169,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 
 		prepareForRefresh()
 
-		api.fetchPullRequestsForActiveReposAndCallback { [weak self] in
+		api.syncItemsForActiveReposAndCallback { [weak self] in
 
 			let success = !ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext)
 

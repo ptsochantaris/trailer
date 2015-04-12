@@ -18,7 +18,7 @@ final class PRListController: WKInterfaceController {
 	override func awakeWithContext(context: AnyObject?) {
 		super.awakeWithContext(context)
 
-		let c = context as! NSDictionary
+		let c = context as! [NSObject : AnyObject]
 		sectionIndex = c[SECTION_KEY] as! Int
 
 		prs = ((c[TYPE_KEY] as! String)=="PRS")

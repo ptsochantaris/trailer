@@ -32,18 +32,18 @@ final class CommandController: WKInterfaceController {
 				}
 			})
 			if !result {
-				self.feedbackLabel.setTextColor(UIColor.redColor())
-				self.feedbackLabel.setText("Could not send request to the parent app")
-				self.dismissAfterPause(2.0)
+				feedbackLabel.setTextColor(UIColor.redColor())
+				feedbackLabel.setText("Could not send request to the parent app")
+				dismissAfterPause(2.0)
 			}
 		} else {
-			self.dismissController()
+			dismissController()
 		}
     }
 
     func dismissAfterPause(pause: Double) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(pause * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
-            self.dismissController()
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(pause * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) { [weak self] in
+            self!.dismissController()
         }
     }
 

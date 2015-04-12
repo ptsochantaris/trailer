@@ -27,8 +27,8 @@ final class PRLabel: DataItem {
 		return res.first
 	}
 
-	class func labelWithInfo(info: NSDictionary, withParent: DataItem) -> PRLabel {
-		let name = info.ofk("name") as? String ?? "(unnamed label)"
+	class func labelWithInfo(info: [NSObject : AnyObject], withParent: DataItem) -> PRLabel {
+		let name = N(info, "name") as? String ?? "(unnamed label)"
 		var l = PRLabel.labelWithName(name, withParent: withParent)
 		if l==nil {
 			DLog("Creating PRLabel: %@", name)
@@ -46,9 +46,9 @@ final class PRLabel: DataItem {
 		} else {
 			DLog("Updating PRLabel: %@", name)
 		}
-		l!.url = info.ofk("url") as? String
-		if let c = info.ofk("color") as? String {
-			l!.color = NSNumber(unsignedInt: c.parseFromHex())
+		l!.url = N(info, "url") as? String
+		if let c = N(info, "color") as? String {
+			l!.color = NSNumber(unsignedInt: parseFromHex(c))
 		} else {
 			l!.color = 0
 		}

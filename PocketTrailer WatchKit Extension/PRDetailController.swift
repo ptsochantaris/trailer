@@ -22,7 +22,7 @@ final class PRDetailController: WKInterfaceController {
 	override func awakeWithContext(context: AnyObject?) {
 		super.awakeWithContext(context)
 
-		let c = context as! NSDictionary
+		let c = context as! [NSObject : AnyObject]
 		issue = c[ISSUE_KEY] as? Issue
 		pullRequest = c[PULL_REQUEST_KEY] as? PullRequest
 
@@ -89,11 +89,11 @@ final class PRDetailController: WKInterfaceController {
 		var displayedStatuses: [PRStatus]?
 
 		if let p = pullRequest {
-			self.setTitle(p.title)
+			setTitle(p.title)
 			displayedStatuses = p.displayedStatuses()
 		}
 		if let i = issue {
-			self.setTitle(i.title)
+			setTitle(i.title)
 		}
 
 		var rowTypes = [String]()

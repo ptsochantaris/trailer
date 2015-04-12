@@ -17,29 +17,29 @@ final class PullRequest: ListableItem {
 
 	@NSManaged var statuses: Set<PRStatus>
 
-	class func pullRequestWithInfo(info: NSDictionary, fromServer: ApiServer, inRepo: Repo) -> PullRequest {
+	class func pullRequestWithInfo(info: [NSObject : AnyObject], fromServer: ApiServer, inRepo: Repo) -> PullRequest {
 		let p = DataItem.itemWithInfo(info, type: "PullRequest", fromServer: fromServer) as! PullRequest
 		if p.postSyncAction?.integerValue != PostSyncAction.DoNothing.rawValue {
-			p.url = info.ofk("url") as? String
-			p.webUrl = info.ofk("html_url") as? String
-			p.number = info.ofk("number") as? NSNumber
-			p.state = info.ofk("state") as? String
-			p.title = info.ofk("title") as? String
-			p.body = info.ofk("body") as? String
+			p.url = N(info, "url") as? String
+			p.webUrl = N(info, "html_url") as? String
+			p.number = N(info, "number") as? NSNumber
+			p.state = N(info, "state") as? String
+			p.title = N(info, "title") as? String
+			p.body = N(info, "body") as? String
 			p.repo = inRepo
-			p.mergeable = info.ofk("mergeable") as? NSNumber ?? true
+			p.mergeable = N(info, "mergeable") as? NSNumber ?? true
 
-			if let userInfo = info.ofk("user") as? NSDictionary {
-				p.userId = userInfo.ofk("id") as? NSNumber
-				p.userLogin = userInfo.ofk("login") as? String
-				p.userAvatarUrl = userInfo.ofk("avatar_url") as? String
+			if let userInfo = N(info, "user") as? [NSObject : AnyObject] {
+				p.userId = N(userInfo, "id") as? NSNumber
+				p.userLogin = N(userInfo, "login") as? String
+				p.userAvatarUrl = N(userInfo, "avatar_url") as? String
 			}
 
-			if let linkInfo = info.ofk("_links") as? NSDictionary {
-				p.issueCommentLink = (linkInfo.ofk("comments") as? NSDictionary)?.ofk("href") as? String
-				p.reviewCommentLink = (linkInfo.ofk("review_comments") as? NSDictionary)?.ofk("href") as? String
-				p.statusesLink = (linkInfo.ofk("statuses") as? NSDictionary)?.ofk("href") as? String
-				p.issueUrl = (linkInfo.ofk("issue") as? NSDictionary)?.ofk("href") as? String
+			if let linkInfo = N(info, "_links") as? [NSObject : AnyObject] {
+				p.issueCommentLink = N(N(linkInfo, "comments"), "href") as? String
+				p.reviewCommentLink = N(N(linkInfo, "review_comments"), "href") as? String
+				p.statusesLink = N(N(linkInfo, "statuses"), "href") as? String
+				p.issueUrl = N(N(linkInfo, "issue"), "href") as? String
 			}
 
 			api.refreshesSinceLastLabelsCheck[p.objectID] = nil

@@ -17,24 +17,28 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 	private var brightAttributes: [NSObject: AnyObject] {
 		return [
 			NSForegroundColorAttributeName: UIColor.whiteColor(),
+			NSFontAttributeName: UIFont.systemFontOfSize(UIFont.systemFontSize()+2.0),
 			NSParagraphStyleAttributeName: paragraph ]
 	}
 
 	private var normalAttributes: [NSObject: AnyObject] {
 		return [
 			NSForegroundColorAttributeName: UIColor.lightGrayColor(),
+			NSFontAttributeName: UIFont.systemFontOfSize(UIFont.systemFontSize()+2.0),
 			NSParagraphStyleAttributeName: paragraph ]
 	}
 
 	private var dimAttributes: [NSObject: AnyObject] {
 		return [
 			NSForegroundColorAttributeName: UIColor.grayColor(),
+			NSFontAttributeName: UIFont.systemFontOfSize(UIFont.systemFontSize()+2.0),
 			NSParagraphStyleAttributeName: paragraph ]
 	}
 
 	private var redAttributes: [NSObject: AnyObject] {
 		return [
 			NSForegroundColorAttributeName: UIColor.redColor(),
+			NSFontAttributeName: UIFont.systemFontOfSize(UIFont.systemFontSize()+2.0),
 			NSParagraphStyleAttributeName: paragraph ]
 	}
 
@@ -55,22 +59,22 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 		prButton = UIButton.buttonWithType(UIButtonType.Custom) as! UIButton
 		prButton.addTarget(self, action: Selector("prTapped"), forControlEvents: UIControlEvents.TouchUpInside)
 		prButton.setBackgroundImage(imageFromColor(UIColor(white: 1.0, alpha: 0.2)), forState: UIControlState.Highlighted)
-		self.view.addSubview(prButton)
+		view.addSubview(prButton)
 
 		issuesButton = UIButton.buttonWithType(UIButtonType.Custom) as! UIButton
 		issuesButton.addTarget(self, action: Selector("issuesTapped"), forControlEvents: UIControlEvents.TouchUpInside)
 		issuesButton.setBackgroundImage(imageFromColor(UIColor(white: 1.0, alpha: 0.2)), forState: UIControlState.Highlighted)
-		self.view.addSubview(issuesButton)
+		view.addSubview(issuesButton)
 
-		self.update()
+		update()
 	}
 
 	func prTapped() {
-		self.extensionContext?.openURL(NSURL(string: "pockettrailer://pullRequests")!, completionHandler: nil)
+		extensionContext?.openURL(NSURL(string: "pockettrailer://pullRequests")!, completionHandler: nil)
 	}
 
 	func issuesTapped() {
-		self.extensionContext?.openURL(NSURL(string: "pockettrailer://issues")!, completionHandler: nil)
+		extensionContext?.openURL(NSURL(string: "pockettrailer://issues")!, completionHandler: nil)
 	}
 
 	override func viewDidLayoutSubviews() {
@@ -86,7 +90,7 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 		Settings.clearCache()
 
 		let totalCount = PullRequest.countAllRequestsInMoc(mainObjectContext)
-		var a = NSMutableAttributedString(string: NSString(format: "%d PRs: ", totalCount) as String, attributes: brightAttributes)
+		var a = NSMutableAttributedString(string: "\(totalCount) PRs: ", attributes: brightAttributes)
 		if totalCount>0 {
 			appendPr(a, section: PullRequestSection.Mine)
 			appendPr(a, section: PullRequestSection.Participated)
@@ -105,7 +109,7 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 
 		if Settings.showIssuesMenu {
 			let totalCount = Issue.countAllIssuesInMoc(mainObjectContext)
-			a = NSMutableAttributedString(string: NSString(format: "%d Issues: ", totalCount) as String, attributes: brightAttributes)
+			a = NSMutableAttributedString(string: "\(totalCount) Issues: ", attributes: brightAttributes)
 			if totalCount>0 {
 				appendIssue(a, section: PullRequestSection.Mine)
 				appendIssue(a, section: PullRequestSection.Participated)
@@ -142,7 +146,7 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 		// If there's no update required, use NCUpdateResult.NoData
 		// If there's an update, use NCUpdateResult.NewData
 
-		self.update()
+		update()
 
 		completionHandler(NCUpdateResult.NewData)
 	}
