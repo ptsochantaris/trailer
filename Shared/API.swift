@@ -157,7 +157,7 @@ final class API {
 		success:(response: NSHTTPURLResponse?, data: NSData?) -> Void,
 		failure:(response: NSHTTPURLResponse?, error: NSError?) -> Void) {
 
-            let task = urlSession.dataTaskWithURL(url) { [weak self] (data, res, e)  in
+            let task = urlSession.dataTaskWithURL(url) { [weak self] data, res, e in
 
 				let response = res as? NSHTTPURLResponse
 				var error = e
@@ -397,12 +397,12 @@ final class API {
 			startingFromPage: 1,
 			parameters: nil,
 			extraHeaders: nil,
-			perPageCallback: { [weak self] data, lastPage -> Bool in
+			perPageCallback: { [weak self] data, lastPage in
 				for d in data ?? [] {
 					Team.teamWithInfo(d, fromApiServer: apiServer)
 				}
 				return false
-			}, finalCallback: { success, resultCode, etag -> Void in
+			}, finalCallback: { [weak self] success, resultCode, etag in
 				if !success {
 					apiServer.lastSyncSucceeded = false
 				}
@@ -455,7 +455,7 @@ final class API {
 					}
 				}
 				return false
-			}, finalCallback: { success, resultCode, etag in
+			}, finalCallback: { [weak self] success, resultCode, etag in
 				usingUserEventsFromServer.latestUserEventEtag = etag
 				if !success {
 					usingUserEventsFromServer.lastSyncSucceeded = false
@@ -509,7 +509,7 @@ final class API {
 					}
 				}
 				return false
-			}, finalCallback: { success, resultCode, etag in
+			}, finalCallback: { [weak self] success, resultCode, etag in
 				usingReceivedEventsFromServer.latestReceivedEventEtag = etag
 				if !success {
 					usingReceivedEventsFromServer.lastSyncSucceeded = false
@@ -584,12 +584,12 @@ final class API {
 			if apiServer.syncIsGood {
 				let repoFullName = r.fullName ?? "NoRepoFullName"
 				getPagedDataInPath("/repos/\(repoFullName)/pulls", fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
-					perPageCallback: { data, lastPage in
+					perPageCallback: { [weak self] data, lastPage in
 						for info in data ?? [] {
 							PullRequest.pullRequestWithInfo(info, fromServer:apiServer, inRepo:r)
 						}
 						return false
-					}, finalCallback: { success, resultCode, etag in
+					}, finalCallback: { [weak self] success, resultCode, etag in
 						if !success {
 							if resultCode == 404 { // repo disabled
 								r.inaccessible = true
@@ -644,14 +644,14 @@ final class API {
 			if apiServer.syncIsGood {
 				let repoFullName = r.fullName ?? "NoRepoFullName"
 				getPagedDataInPath("/repos/\(repoFullName)/issues", fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
-					perPageCallback: { data, lastPage in
+					perPageCallback: { [weak self] data, lastPage in
 						for info in data ?? [] {
 							if N(info, "pull_request") == nil { // don't sync issues which are pull requests, they are already synced
 								Issue.issueWithInfo(info, fromServer:apiServer, inRepo:r)
 							}
 						}
 						return false
-					}, finalCallback: { success, resultCode, etag in
+					}, finalCallback: { [weak self] success, resultCode, etag in
 						if !success {
 							if resultCode == 404 { // repo disabled
 								r.inaccessible = true
@@ -723,7 +723,7 @@ final class API {
 				let apiServer = p.apiServer
 
 				getPagedDataInPath(link, fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
-					perPageCallback: { (data, lastPage) -> Bool in
+					perPageCallback: { [weak self] data, lastPage in
 						for info in data ?? [] {
 							let c = PRComment.commentWithInfo(info, fromServer: apiServer)
 							c.pullRequest = p
@@ -737,7 +737,7 @@ final class API {
 							}
 						}
 						return false
-					}, finalCallback: { success, resultCode, etag in
+					}, finalCallback: { [weak self] success, resultCode, etag in
 						completionCount++
 						if !success {
 							apiServer.lastSyncSucceeded = false
@@ -784,7 +784,7 @@ final class API {
 				let apiServer = i.apiServer
 
 				getPagedDataInPath(link, fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
-					perPageCallback: { (data, lastPage) -> Bool in
+					perPageCallback: { [weak self] data, lastPage in
 						for info in data ?? [] {
 							let c = PRComment.commentWithInfo(info, fromServer: apiServer)
 							c.issue = i
@@ -798,7 +798,7 @@ final class API {
 							}
 						}
 						return false
-					}, finalCallback: { success, resultCode, etag in
+					}, finalCallback: { [weak self] success, resultCode, etag in
 						completionCount++
 						if !success {
 							apiServer.lastSyncSucceeded = false
@@ -854,7 +854,7 @@ final class API {
 			if let link = p.labelsLink() {
 
 				getPagedDataInPath(link, fromServer: p.apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
-					perPageCallback: { data, lastPage in
+					perPageCallback: { [weak self] data, lastPage in
 						for info in data ?? [] {
 							PRLabel.labelWithInfo(info, withParent: p)
 						}
@@ -927,7 +927,7 @@ final class API {
 
 			if let statusLink = p.statusesLink {
 				getPagedDataInPath(statusLink, fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
-					perPageCallback: { (data, lastPage) -> Bool in
+					perPageCallback: { [weak self] data, lastPage in
 						for info in data ?? [] {
 							let s = PRStatus.statusWithInfo(info, fromServer: apiServer)
 							s.pullRequest = p
@@ -1233,7 +1233,7 @@ final class API {
 		}
 
 		getPagedDataInPath("/user/subscriptions", fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
-			perPageCallback: { (data, lastPage) -> Bool in
+			perPageCallback: { [weak self] data, lastPage in
 
 				if let d = data {
 					for info in d {
@@ -1257,7 +1257,7 @@ final class API {
 				}
 				return false
 
-			}, finalCallback: { success, resultCode, etag in
+			}, finalCallback: { [weak self] success, resultCode, etag in
 				if !success {
 					apiServer.lastSyncSucceeded = false
 				}
