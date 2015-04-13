@@ -184,15 +184,6 @@ final class Issue: ListableItem {
 		return PullRequestSection.prMenuTitles[sectionIndex?.integerValue ?? 0]
 	}
 
-	override func predicateForOthersCommentsSinceDate(optionalDate: NSDate?) -> NSPredicate {
-		var userNumber = apiServer.userId?.longLongValue ?? 0
-		if let date = optionalDate {
-			return NSPredicate(format: "userId != %lld and issue == %@ and createdAt > %@", userNumber, self, date)
-		} else {
-			return NSPredicate(format: "userId != %lld and issue == %@", userNumber, self)
-		}
-	}
-
 	class func allClosedIssuesInMoc(moc: NSManagedObjectContext) -> [Issue] {
 		let f = NSFetchRequest(entityName: "Issue")
 		f.returnsObjectsAsFaults = false

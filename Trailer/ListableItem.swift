@@ -273,7 +273,24 @@ class ListableItem: DataItem {
 	}
 
 	func predicateForOthersCommentsSinceDate(optionalDate: NSDate?) -> NSPredicate {
-		return NSPredicate() // should never reach here, always override
+
+		var userNumber = apiServer.userId?.longLongValue ?? 0
+
+		if self is Issue {
+			if let date = optionalDate {
+				return NSPredicate(format: "userId != %lld and issue == %@ and createdAt > %@", userNumber, self, date)
+			} else {
+				return NSPredicate(format: "userId != %lld and issue == %@", userNumber, self)
+			}
+		} else if self is PullRequest {
+			if let date = optionalDate {
+				return NSPredicate(format: "userId != %lld and pullRequest == %@ and createdAt > %@", userNumber, self, date)
+			} else {
+				return NSPredicate(format: "userId != %lld and pullRequest == %@", userNumber, self)
+			}
+		} else {
+			abort()
+		}
 	}
 
 	class func badgeCountFromFetch(f: NSFetchRequest, inMoc: NSManagedObjectContext) -> Int {

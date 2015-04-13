@@ -49,7 +49,7 @@ final class DataManager : NSObject {
 		}
 
 		DLog("Marking all repos as dirty")
-		for r in Repo.allItemsOfType("Repo", inMoc:mainObjectContext) as! [Repo] {
+		for r in DataItem.allItemsOfType("Repo", inMoc:mainObjectContext) as! [Repo] {
 			r.resetSyncState()
 		}
 	}
@@ -238,7 +238,7 @@ final class DataManager : NSObject {
 	class func postMigrationTasks() {
 		if _justMigrated {
 			DLog("FORCING ALL PRS TO BE REFETCHED")
-			for p in PullRequest.allItemsOfType("PullRequest", inMoc:mainObjectContext) as! [PullRequest] {
+			for p in DataItem.allItemsOfType("PullRequest", inMoc:mainObjectContext) as! [PullRequest] {
 				p.resetSyncState()
 			}
 			_justMigrated = false
@@ -246,10 +246,10 @@ final class DataManager : NSObject {
 	}
 
 	class func postProcessAllItems() {
-		for p in PullRequest.allItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest] {
+		for p in DataItem.allItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest] {
 			p.postProcess()
 		}
-		for i in PullRequest.allItemsOfType("Issue", inMoc: mainObjectContext) as! [Issue] {
+		for i in DataItem.allItemsOfType("Issue", inMoc: mainObjectContext) as! [Issue] {
 			i.postProcess()
 		}
 	}

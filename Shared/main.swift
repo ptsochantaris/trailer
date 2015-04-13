@@ -12,7 +12,7 @@ let api = API()
 //_prs[3].condition = PullRequestCondition.Closed.rawValue
 
 /*
-let _prs = PullRequest.allItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest]
+let _prs = DataItem.allItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest]
 for p in _prs {
     for c in p.comments {
         mainObjectContext.deleteObject(c)
