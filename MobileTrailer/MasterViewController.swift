@@ -178,9 +178,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		super.init(coder: aDecoder)
 
-		searchTimer = PopTimer(timeInterval: 0.5, callback: { [weak self] in
+		searchTimer = PopTimer(timeInterval: 0.5) { [weak self] in
 			self!.reloadDataWithAnimation(true)
-			})
+		}
 	}
 
 	override func viewDidLoad() {
@@ -309,12 +309,12 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 					UIView.animateWithDuration(0.2,
 						delay: 0.0,
 						options: UIViewAnimationOptions.CurveEaseInOut,
-						animations: { () -> Void in
+						animations: { 
 							t.transform = CGAffineTransformMakeTranslation(0, 49)
 						}, completion: { [weak self] finished in
 							t.removeFromSuperview()
 							self!.tabBar = nil
-					});
+						})
 				} else {
 					t.removeFromSuperview()
 					tabBar = nil

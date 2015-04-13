@@ -71,7 +71,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 			})
 		} else {
 			testingState()
-			api.testApiToServer(newServer, callback: { [weak self] error in
+			api.testApiToServer(newServer) { [weak self] error in
 				if let e = error {
 					let alert = NSAlert()
 					alert.messageText = "Testing the token failed - please check that you have pasted your token correctly"
@@ -86,7 +86,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 					app.startRefreshIfItIsDue()
 					self!.checkTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self!, selector: Selector("checkRefreshDone:"), userInfo: nil, repeats: true)
 				}
-			})
+			}
 		}
 	}
 

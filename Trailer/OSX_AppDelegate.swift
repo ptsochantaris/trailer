@@ -128,24 +128,24 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		setupSortMethodMenu()
 		DataManager.postProcessAllItems()
 
-		prFilterTimer = PopTimer(timeInterval: 0.2, callback: {
+		prFilterTimer = PopTimer(timeInterval: 0.2) {
 			app.updatePrMenu()
 			app.prMenu.scrollToTop()
-		})
+		}
 
-		issuesFilterTimer = PopTimer(timeInterval: 0.2, callback: {
+		issuesFilterTimer = PopTimer(timeInterval: 0.2) {
 			app.updateIssuesMenu()
 			app.issuesMenu.scrollToTop()
-		})
+		}
 
-		deferredUpdateTimer = PopTimer(timeInterval: 0.5, callback: {
+		deferredUpdateTimer = PopTimer(timeInterval: 0.5) {
 			app.updatePrMenu()
 			app.updateIssuesMenu()
-		})
+		}
 
-		mouseIgnoreTimer = PopTimer(timeInterval: 0.4, callback: {
+		mouseIgnoreTimer = PopTimer(timeInterval: 0.4) {
 			app.isManuallyScrolling = false
-		})
+		}
 
 		prMenu.table.setDataSource(pullRequestDelegate)
 		prMenu.table.setDelegate(pullRequestDelegate)
@@ -570,10 +570,10 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 		if (type == .NewComment || type == .NewMention) && !Settings.hideAvatars && notification.respondsToSelector(Selector("setContentImage:")) {
 			if let url = (forItem as! PRComment).avatarUrl {
-				api.haveCachedAvatar(url, tryLoadAndCallback: { image in
+				api.haveCachedAvatar(url) { image in
 					notification.contentImage = image
 					NSUserNotificationCenter.defaultUserNotificationCenter().deliverNotification(notification)
-				})
+				}
 			}
 		} else { // proceed as normal
 			NSUserNotificationCenter.defaultUserNotificationCenter().deliverNotification(notification)
@@ -802,7 +802,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		controlTextDidChange(nil)
 
 		let tempContext = DataManager.tempContext()
-		api.fetchRepositoriesToMoc(tempContext, callback: { [weak self] in
+		api.fetchRepositoriesToMoc(tempContext) { [weak self] in
 
 			if ApiServer.shouldReportRefreshFailureInMoc(tempContext) {
 				var errorServers = [String]()
@@ -823,7 +823,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				tempContext.save(nil)
 			}
 			self!.completeRefresh()
-		})
+		}
 	}
 
 	private func selectedServer() -> ApiServer? {
@@ -1691,7 +1691,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		sender.enabled = false
 		let apiServer = selectedServer()!
 
-		api.testApiToServer(apiServer, callback: { error in
+		api.testApiToServer(apiServer) { error in
 			let alert = NSAlert()
 			if error != nil {
 				alert.messageText = "The test failed for " + (apiServer.apiPath ?? "NoApiPath")
@@ -1702,7 +1702,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			alert.addButtonWithTitle("OK")
 			alert.runModal()
 			sender.enabled = true
-		})
+		}
 	}
 
 	@IBAction func apiRestoreDefaultsSelected(sender: NSButton)

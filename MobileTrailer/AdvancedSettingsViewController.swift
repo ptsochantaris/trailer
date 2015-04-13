@@ -542,12 +542,12 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	func documentPicker(controller: UIDocumentPickerViewController, didPickDocumentAtURL url: NSURL) {
 		if tempUrl == nil {
 			DLog("Will import settings from %@", url.absoluteString)
-			settingsManager.loadSettingsFrom(url, confirmFromView: self, withCompletion: {[weak self] confirmed in
+			settingsManager.loadSettingsFrom(url, confirmFromView: self) { [weak self] confirmed in
 				if confirmed {
 					self!.dismissViewControllerAnimated(false, completion: nil)
 				}
 				self!.documentInteractionCleanup()
-			})
+			}
 		} else {
 			DLog("Saved settings to %@", url.absoluteString)
 			documentInteractionCleanup()

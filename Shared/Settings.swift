@@ -104,9 +104,9 @@ final class Settings {
 		}
 		if Settings.autoRepeatSettingsExport && keyIsGood && Settings.lastExportUrl != nil {
 			if saveTimer == nil {
-				saveTimer = PopTimer(timeInterval: 2.0, callback: {
+				saveTimer = PopTimer(timeInterval: 2.0) {
 					Settings.writeToURL(Settings.lastExportUrl!)
-				})
+				}
 			}
 			saveTimer?.push()
 		}

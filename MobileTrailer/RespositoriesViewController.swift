@@ -33,9 +33,9 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 		searchField!.delegate = self
 		searchField!.autoresizingMask = UIViewAutoresizing.FlexibleWidth
 
-		searchTimer = PopTimer(timeInterval: 0.5, callback: { [weak self] in
+		searchTimer = PopTimer(timeInterval: 0.5) { [weak self] in
 			self!.reloadData()
-		})
+		}
 
 		let searchHolder = UIView(frame: CGRectMake(0, 0, view.bounds.size.width, 51))
 		searchHolder.addSubview(searchField!)
@@ -84,7 +84,7 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 		tableView.alpha = 0.5
 
 		let tempContext = DataManager.tempContext()
-		api.fetchRepositoriesToMoc(tempContext, callback: { [weak self] in
+		api.fetchRepositoriesToMoc(tempContext) { [weak self] in
 			if ApiServer.shouldReportRefreshFailureInMoc(tempContext) {
 				var errorServers = [String]()
 				for apiServer in ApiServer.allApiServersInMoc(tempContext) {
@@ -103,7 +103,7 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 			self!.tableView.alpha = 1.0
 			self!.tableView.userInteractionEnabled = true
 			app.preferencesDirty = true
-		})
+		}
 	}
 
 	override func numberOfSectionsInTableView(tableView: UITableView) -> Int {

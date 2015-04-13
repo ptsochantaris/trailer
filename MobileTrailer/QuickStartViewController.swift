@@ -52,7 +52,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 
 	@IBAction func testSelected(sender: UIButton) {
 		testMode()
-		api.testApiToServer(newServer, callback: { [weak self] error in
+		api.testApiToServer(newServer) { [weak self] error in
 			if let e = error {
 				let a = UIAlertView(
 					title: "Testing the token failed - please check that you have pasted your token correctly",
@@ -67,7 +67,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 				app.startRefreshIfItIsDue()
 				self!.checkTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self!, selector: Selector("checkRefreshDone:"), userInfo: nil, repeats: true)
 			}
-		})
+		}
 	}
 
 	func checkRefreshDone(t: NSTimer) {

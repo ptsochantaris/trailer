@@ -250,19 +250,19 @@ final class API {
 			|| (Repo.countVisibleReposInMoc(syncContext)==0))
 
 		if shouldRefreshReposToo {
-			fetchRepositoriesToMoc(syncContext, callback: { [weak self] in
+			fetchRepositoriesToMoc(syncContext) { [weak self] in
 				self!.syncToMoc(syncContext, callback: callback)
-			})
+			}
 		} else {
 			ApiServer.resetSyncSuccessInMoc(syncContext)
-			ensureApiServersHaveUserIdsInMoc(syncContext, callback: { [weak self] in
+			ensureApiServersHaveUserIdsInMoc(syncContext) { [weak self] in
 				self!.syncToMoc(syncContext, callback: callback)
-			})
+			}
 		}
 	}
 
 	private func syncToMoc(moc: NSManagedObjectContext, callback: Completion) {
-		markDirtyReposInMoc(moc, callback: { [weak self] in
+		markDirtyReposInMoc(moc) { [weak self] in
 
 			let repos = Repo.syncableReposInMoc(moc)
 
@@ -277,19 +277,19 @@ final class API {
 				}
 			}
 
-			self!.fetchIssuesForRepos(repos, toMoc: moc, callback: { [weak self] in
-				self!.fetchCommentsForCurrentIssuesToMoc(moc, callback: { [weak self] in
+			self!.fetchIssuesForRepos(repos, toMoc: moc) { [weak self] in
+				self!.fetchCommentsForCurrentIssuesToMoc(moc) { [weak self] in
 					self!.checkIssueClosuresInMoc(moc)
 					completionCallback()
-				})
-			})
+				}
+			}
 
-			self!.fetchPullRequestsForRepos(repos, toMoc: moc, callback: { [weak self] in
-				self!.updatePullRequestsInMoc(moc, callback: { [weak self] in
+			self!.fetchPullRequestsForRepos(repos, toMoc: moc) { [weak self] in
+				self!.updatePullRequestsInMoc(moc) { [weak self] in
 					completionCallback()
-				})
-			})
-		})
+				}
+			}
+		}
 	}
 
 	private func completeSyncInMoc(moc: NSManagedObjectContext) {
@@ -522,7 +522,7 @@ final class API {
 
 		ApiServer.resetSyncSuccessInMoc(moc)
 
-		syncUserDetailsInMoc(moc, callback: { [weak self] in
+		syncUserDetailsInMoc(moc) { [weak self] in
 			for r in DataItem.itemsOfType("Repo", surviving: true, inMoc: moc) as! [Repo] {
 				r.postSyncAction = PostSyncAction.Delete.rawValue
 				r.inaccessible = false
@@ -554,7 +554,7 @@ final class API {
 					completionCallback()
 				}
 			}
-		})
+		}
 	}
 
 	private func fetchPullRequestsForRepos(repos: [Repo], toMoc:NSManagedObjectContext, callback: Completion) {
@@ -1030,8 +1030,7 @@ final class API {
 		for p in prs {
 			let apiServer = p.apiServer
 			if let issueLink = p.issueUrl {
-				getDataInPath(issueLink, fromServer: apiServer, parameters: nil, extraHeaders: nil,
-					callback: { data, lastPage, resultCode, etag in
+				getDataInPath(issueLink, fromServer: apiServer, parameters: nil, extraHeaders: nil) { [weak self] data, lastPage, resultCode, etag in
 						if let let assigneeInfo = N(data, "assignee") as? [NSObject : AnyObject] {
 							let assignee = N(assigneeInfo, "login") as? String ?? "NoAssignedUserName"
 							let assigned = (assignee == (apiServer.userName ?? "NoApiUser"))
@@ -1046,7 +1045,7 @@ final class API {
 							apiServer.lastSyncSucceeded = false
 						}
 						completionCallback()
-				})
+				}
 			} else {
 				completionCallback()
 			}
@@ -1075,37 +1074,36 @@ final class API {
 
 		let repoFullName = r.repo.fullName ?? "NoRepoFullName"
 		let repoNumber = r.number?.stringValue ?? "NoRepoNumber"
-		get("/repos/\(repoFullName)/pulls/\(repoNumber)", fromServer: r.apiServer, ignoreLastSync: false, parameters: nil, extraHeaders: nil,
-			completion: { [weak self] response, data, error in
+		get("/repos/\(repoFullName)/pulls/\(repoNumber)", fromServer: r.apiServer, ignoreLastSync: false, parameters: nil, extraHeaders: nil) { [weak self] response, data, error in
 
-				if error == nil {
-					if let mergeInfo = N(data, "merged_by") as? [NSObject: AnyObject] {
-						DLog("detected merged PR: %@", r.title)
+			if error == nil {
+				if let mergeInfo = N(data, "merged_by") as? [NSObject: AnyObject] {
+					DLog("detected merged PR: %@", r.title)
 
-						let mergeUserId = N(mergeInfo, "id") as? NSNumber ?? -2
-						DLog("merged by user id: %@, our id is: %@", mergeUserId, r.apiServer.userId)
+					let mergeUserId = N(mergeInfo, "id") as? NSNumber ?? -2
+					DLog("merged by user id: %@, our id is: %@", mergeUserId, r.apiServer.userId)
 
-						let mergedByMyself = mergeUserId.isEqualToNumber(r.apiServer.userId ?? -1)
+					let mergedByMyself = mergeUserId.isEqualToNumber(r.apiServer.userId ?? -1)
 
-						if !(mergedByMyself && Settings.dontKeepPrsMergedByMe) {
-							self!.prWasMerged(r)
-						} else {
-							DLog("will not announce merged PR: %@", r.title)
-						}
+					if !(mergedByMyself && Settings.dontKeepPrsMergedByMe) {
+						self!.prWasMerged(r)
 					} else {
-						self!.prWasClosed(r)
+						DLog("will not announce merged PR: %@", r.title)
 					}
 				} else {
-					let resultCode = response?.statusCode ?? 0
-					if resultCode == 404 || resultCode==410 { // PR gone for good
-						self!.prWasClosed(r)
-					} else { // fetch problem
-						r.postSyncAction = PostSyncAction.DoNothing.rawValue // don't delete this, we couldn't check, play it safe
-						r.apiServer.lastSyncSucceeded = false
-					}
+					self!.prWasClosed(r)
 				}
-				callback()
-			})
+			} else {
+				let resultCode = response?.statusCode ?? 0
+				if resultCode == 404 || resultCode==410 { // PR gone for good
+					self!.prWasClosed(r)
+				} else { // fetch problem
+					r.postSyncAction = PostSyncAction.DoNothing.rawValue // don't delete this, we couldn't check, play it safe
+					r.apiServer.lastSyncSucceeded = false
+				}
+			}
+			callback()
+		}
 	}
 
 	private func prWasMerged(r: PullRequest) {
@@ -1164,23 +1162,22 @@ final class API {
 
 	func getRateLimitFromServer(apiServer: ApiServer, callback: (Int64, Int64, Int64)->Void)
 	{
-		get("/rate_limit", fromServer: apiServer, ignoreLastSync: true, parameters: nil, extraHeaders: nil,
-			completion: { response, data, error in
+		get("/rate_limit", fromServer: apiServer, ignoreLastSync: true, parameters: nil, extraHeaders: nil) { response, data, error in
 
-				if error == nil {
-					let allHeaders = response!.allHeaderFields
-					let requestsRemaining = (allHeaders["X-RateLimit-Remaining"] as! NSString).longLongValue
-					let requestLimit = (allHeaders["X-RateLimit-Limit"] as! NSString).longLongValue
-					let epochSeconds = (allHeaders["X-RateLimit-Reset"] as! NSString).longLongValue
-					callback(requestsRemaining, requestLimit, epochSeconds)
+			if error == nil {
+				let allHeaders = response!.allHeaderFields
+				let requestsRemaining = (allHeaders["X-RateLimit-Remaining"] as! NSString).longLongValue
+				let requestLimit = (allHeaders["X-RateLimit-Limit"] as! NSString).longLongValue
+				let epochSeconds = (allHeaders["X-RateLimit-Reset"] as! NSString).longLongValue
+				callback(requestsRemaining, requestLimit, epochSeconds)
+			} else {
+				if response?.statusCode == 404 && data != nil && !(N(data, "message") as? String == "Not Found") {
+					callback(10000, 10000, 0)
 				} else {
-					if response?.statusCode == 404 && data != nil && !(N(data, "message") as? String == "Not Found") {
-						callback(10000, 10000, 0)
-					} else {
-						callback(-1, -1, -1)
-					}
+					callback(-1, -1, -1)
 				}
-		})
+			}
+		}
 	}
 
 	func updateLimitsFromServer() {
@@ -1189,14 +1186,14 @@ final class API {
 		var count = 0
 		for apiServer in allApiServers {
 			if apiServer.goodToGo {
-				getRateLimitFromServer(apiServer, callback: { remaining, limit, reset in
+				getRateLimitFromServer(apiServer) { remaining, limit, reset in
 					apiServer.requestsRemaining = NSNumber(longLong: remaining)
 					apiServer.requestsLimit = NSNumber(longLong: limit)
 					count++
 					if count==total {
 						NSNotificationCenter.defaultCenter().postNotificationName(API_USAGE_UPDATE, object: apiServer, userInfo: nil)
 					}
-				})
+				}
 			}
 		}
 	}
@@ -1277,7 +1274,7 @@ final class API {
 		var completionCount = 0
 		for apiServer in allApiServers {
 			if apiServer.goodToGo {
-				getDataInPath("/user", fromServer:apiServer, parameters: nil, extraHeaders:nil, callback: { [weak self] data, lastPage, resultCode, etag in
+				getDataInPath("/user", fromServer:apiServer, parameters: nil, extraHeaders:nil) { [weak self] data, lastPage, resultCode, etag in
 
 					if let d = data as? [NSObject : AnyObject] {
 						apiServer.userName = N(d, "login") as? String
@@ -1287,7 +1284,7 @@ final class API {
 					}
 					completionCount++
 					if completionCount==operationCount { callback() }
-				})
+				}
 			} else {
 				completionCount++
 				if completionCount==operationCount { callback() }
@@ -1297,11 +1294,10 @@ final class API {
 	}
 
 	func testApiToServer(apiServer: ApiServer, callback: (NSError?) -> ()) {
-		get("/rate_limit", fromServer: apiServer, ignoreLastSync: true, parameters: nil, extraHeaders: nil,
-			completion: { response, data, error in
-				let allOk = (response?.statusCode == 404 && data != nil && !(N(data, "message") as? String == "Not Found"))
-				callback(allOk ? nil : error)
-		})
+		get("/rate_limit", fromServer: apiServer, ignoreLastSync: true, parameters: nil, extraHeaders: nil) { response, data, error in
+			let allOk = (response?.statusCode == 404 && data != nil && !(N(data, "message") as? String == "Not Found"))
+			callback(allOk ? nil : error)
+		}
 	}
 
 	//////////////////////////////////////////////////////////// low level
@@ -1365,27 +1361,26 @@ final class API {
 		extraHeaders: [String : String]?,
 		callback:(data: AnyObject?, lastPage: Bool, resultCode: Int, etag: String?) -> Void) {
 
-			get(path, fromServer: fromServer, ignoreLastSync: false, parameters: parameters, extraHeaders: extraHeaders,
-				completion: { [weak self] response, data, error in
+			get(path, fromServer: fromServer, ignoreLastSync: false, parameters: parameters, extraHeaders: extraHeaders) { [weak self] response, data, error in
 
-					let code = response?.statusCode ?? 0
+				let code = response?.statusCode ?? 0
 
-					if error == nil {
-						var etag: String? = nil
-						if let allHeaders = response?.allHeaderFields {
-							
-							fromServer.requestsRemaining = NSNumber(longLong: (allHeaders["X-RateLimit-Remaining"] as! NSString).longLongValue)
-							fromServer.requestsLimit = NSNumber(longLong: (allHeaders["X-RateLimit-Limit"] as! NSString).longLongValue)
-							fromServer.resetDate = NSDate(timeIntervalSince1970: (allHeaders["X-RateLimit-Reset"] as! NSString).doubleValue)
-							NSNotificationCenter.defaultCenter().postNotificationName(API_USAGE_UPDATE, object: fromServer, userInfo: nil)
+				if error == nil {
+					var etag: String? = nil
+					if let allHeaders = response?.allHeaderFields {
 
-							let etag = allHeaders["Etag"] as? String
-						}
-						callback(data: data, lastPage: API.lastPage(response), resultCode: code, etag: etag)
-					} else {
-						callback(data: nil, lastPage: false, resultCode: code, etag: nil)
+						fromServer.requestsRemaining = NSNumber(longLong: (allHeaders["X-RateLimit-Remaining"] as! NSString).longLongValue)
+						fromServer.requestsLimit = NSNumber(longLong: (allHeaders["X-RateLimit-Limit"] as! NSString).longLongValue)
+						fromServer.resetDate = NSDate(timeIntervalSince1970: (allHeaders["X-RateLimit-Reset"] as! NSString).doubleValue)
+						NSNotificationCenter.defaultCenter().postNotificationName(API_USAGE_UPDATE, object: fromServer, userInfo: nil)
+
+						let etag = allHeaders["Etag"] as? String
 					}
-				})
+					callback(data: data, lastPage: API.lastPage(response), resultCode: code, etag: etag)
+				} else {
+					callback(data: nil, lastPage: false, resultCode: code, etag: nil)
+				}
+			}
 	}
 
 	private func get(
