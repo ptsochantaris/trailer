@@ -309,7 +309,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 					UIView.animateWithDuration(0.2,
 						delay: 0.0,
 						options: UIViewAnimationOptions.CurveEaseInOut,
-						animations: { 
+						animations: {
 							t.transform = CGAffineTransformMakeTranslation(0, 49)
 						}, completion: { [weak self] finished in
 							t.removeFromSuperview()
