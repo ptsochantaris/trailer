@@ -291,7 +291,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 						UIView.animateWithDuration(0.2,
 							delay: 0.0,
 							options: UIViewAnimationOptions.CurveEaseInOut,
-							animations: { () -> Void in
+							animations: {
 								t.transform = CGAffineTransformIdentity
 							}, completion: nil);
 					}

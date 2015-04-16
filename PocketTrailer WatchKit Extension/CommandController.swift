@@ -14,8 +14,7 @@ final class CommandController: WKInterfaceController {
 
 			Settings.clearCache()
 
-			let result = WKInterfaceController.openParentApplication(cd, reply: {
-				[weak self] result, error -> Void in
+			let result = WKInterfaceController.openParentApplication(cd, reply: { [weak self] result, error in
 				if let e = error {
 					self?.feedbackGroup.setBackgroundColor(UIColor.redColor())
 					self?.feedbackLabel.setText("Error: \(e.localizedDescription)")

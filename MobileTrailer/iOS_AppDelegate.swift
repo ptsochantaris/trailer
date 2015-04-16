@@ -68,13 +68,13 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 			if let scheme = c.scheme {
 				if scheme == "pockettrailer", let host = c.host {
 					if host == "pullRequests" {
-						dispatch_async(dispatch_get_main_queue()) { () -> Void in
+						dispatch_async(dispatch_get_main_queue()) {
 							let m = popupManager.getMasterController()
 							m.showPullRequestsSelected(self)
 						}
 						return true
 					} else if host == "issues" {
-						dispatch_async(dispatch_get_main_queue()) { () -> Void in
+						dispatch_async(dispatch_get_main_queue()) {
 							let m = popupManager.getMasterController()
 							m.showIssuesSelected(self)
 						}
