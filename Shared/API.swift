@@ -9,20 +9,6 @@ struct UrlBackOffEntry {
 	var duration: NSTimeInterval
 }
 
-#if DEBUG
-	#if os(iOS)
-		let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-iOS-Development"
-	#else
-		let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-OSX-Development"
-	#endif
-#else
-	#if os(iOS)
-		let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-iOS-Release"
-	#else
-		let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-OSX-Release"
-	#endif
-#endif
-
 final class API {
 
 	var refreshesSinceLastStatusCheck = [NSManagedObjectID:Int]()
@@ -39,13 +25,6 @@ final class API {
 
 	init() {
 
-		#if os(iOS)
-			let cache = NSURLCache(memoryCapacity: 1024*1024*2, diskCapacity: 1024*1024*32, diskPath: nil)
-			#else
-			let cache = NSURLCache(memoryCapacity: 1024*1024*4, diskCapacity: 1024*1024*128, diskPath: nil)
-		#endif
-		NSURLCache.setSharedURLCache(cache)
-
 		mediumFormatter = NSDateFormatter()
 		mediumFormatter.dateStyle = NSDateFormatterStyle.MediumStyle
 		mediumFormatter.timeStyle = NSDateFormatterStyle.MediumStyle
@@ -57,6 +36,20 @@ final class API {
 		let fileManager = NSFileManager.defaultManager()
 		let appSupportURL = fileManager.URLsForDirectory(NSSearchPathDirectory.CachesDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask).first! as! NSURL
 		cacheDirectory = appSupportURL.URLByAppendingPathComponent("com.housetrip.Trailer").path!
+
+        #if DEBUG
+            #if os(iOS)
+                let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-iOS-Development"
+            #else
+                let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-OSX-Development"
+            #endif
+        #else
+            #if os(iOS)
+                let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-iOS-Release"
+            #else
+                let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-OSX-Release"
+            #endif
+        #endif
 
 		let config = NSURLSessionConfiguration.defaultSessionConfiguration()
 		config.HTTPMaximumConnectionsPerHost = 4

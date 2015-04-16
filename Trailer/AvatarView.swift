@@ -35,6 +35,6 @@ final class AvatarView: NSImageView {
 	}
 
     override var allowsVibrancy: Bool {
-		return true
+		return false
 	}
 }

@@ -21,8 +21,7 @@ final class MenuWindow: NSWindow {
 		backgroundColor = NSColor.whiteColor()
 
         if newSystem {
-            scrollView.automaticallyAdjustsContentInsets = false
-			(contentView as! NSView).wantsLayer = true
+            scrollView.contentView.wantsLayer = true
         }
 	}
 
@@ -41,11 +40,11 @@ final class MenuWindow: NSWindow {
 			appearance = NSAppearance(named: app.darkMode ? NSAppearanceNameVibrantDark : NSAppearanceNameVibrantLight)
 
 			if windowVibrancy == nil {
-				let w = NSVisualEffectView(frame: contentView.bounds)
+				let w = NSVisualEffectView(frame: header.bounds)
 				w.autoresizingMask = NSAutoresizingMaskOptions.ViewHeightSizable | NSAutoresizingMaskOptions.ViewWidthSizable
 				w.blendingMode = NSVisualEffectBlendingMode.BehindWindow
 				w.state = NSVisualEffectState.Active
-				contentView.addSubview(w, positioned:NSWindowOrderingMode.Below, relativeTo:table)
+				header.addSubview(w, positioned:NSWindowOrderingMode.Below, relativeTo:filter)
 				windowVibrancy = w
 
 				table.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.SourceList
@@ -53,15 +52,12 @@ final class MenuWindow: NSWindow {
 
 		} else {
 
-			if let w = windowVibrancy {
-				w.removeFromSuperview()
-				windowVibrancy = nil
+            if let w = windowVibrancy {
 
-				table.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.Regular
-			}
-
-			if newSystem {
-				appearance = NSAppearance(named: NSAppearanceNameAqua)
+                appearance = NSAppearance(named: NSAppearanceNameAqua)
+                w.removeFromSuperview()
+                windowVibrancy = nil
+                table.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.Regular
             }
 		}
 	}
