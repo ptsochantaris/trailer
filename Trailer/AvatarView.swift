@@ -6,7 +6,7 @@ final class AvatarView: NSImageView {
 	init(frame frameRect: NSRect, url: String) {
 		super.init(frame: frameRect)
 		imageAlignment = NSImageAlignment.AlignCenter
-		if !api.haveCachedAvatar(url, tryLoadAndCallback: { [weak self] img in
+		if (!api.haveCachedAvatar(url) { [weak self] img in
 			if let weakSelf = self {
 				weakSelf.image = img
 				weakSelf.done()
@@ -29,7 +29,7 @@ final class AvatarView: NSImageView {
 	}
 
 	func done() {
-		spinner?.stopAnimation(self)
+		spinner?.stopAnimation(nil)
 		spinner?.removeFromSuperview()
 		spinner = nil
 	}

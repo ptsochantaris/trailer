@@ -1104,7 +1104,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		o.allowedFileTypes = ["trailerSettings"]
 		o.beginSheetModalForWindow(preferencesWindow, completionHandler: { [weak self] response in
 			if response == NSFileHandlingPanelOKButton, let url = o.URL {
-				atNextEvent() {
+				atNextEvent {
 					self!.tryLoadSettings(url, skipConfirm: Settings.dontConfirmSettingsImport)
 				}
 			}
@@ -1856,7 +1856,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				prMenu.table.deselectAll(nil)
 				pr = pullRequestDelegate.pullRequestAtRow(row)
 			}
-			atNextEvent() { [weak self] in
+			atNextEvent { [weak self] in
 				self!.prMenu.table.selectRowIndexes(NSIndexSet(index: row), byExtendingSelection: false)
 			}
 			return pr?.webUrl
@@ -1867,7 +1867,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				issuesMenu.table.deselectAll(nil)
 				i = issuesDelegate.issueAtRow(row)
 			}
-			atNextEvent() { [weak self] in
+			atNextEvent { [weak self] in
 				self!.issuesMenu.table.selectRowIndexes(NSIndexSet(index: row), byExtendingSelection: false)
 			}
 			return i?.webUrl
@@ -1979,7 +1979,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	func checkDarkMode() {
-		atNextEvent() { [weak self] in
+		atNextEvent { [weak self] in
 			if NSAppKitVersionNumber>Double(NSAppKitVersionNumber10_9) {
 				let c = NSAppearance.currentAppearance()
 				if c.respondsToSelector(Selector("allowsVibrancy")) {

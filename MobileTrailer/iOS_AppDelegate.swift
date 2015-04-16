@@ -41,7 +41,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 
 		let localNotification = launchOptions?[UIApplicationLaunchOptionsLocalNotificationKey] as? UILocalNotification
 
-		atNextEvent() {
+		atNextEvent {
 			if Repo.visibleReposInMoc(mainObjectContext).count > 0 && ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
 				if localNotification != nil {
 					NotificationManager.handleLocalNotification(localNotification!)

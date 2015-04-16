@@ -153,28 +153,16 @@ final class API {
 	}
 
 	// warning: now calls back on thread!!
-	func getImage(url: NSURL,
-		success:(response: NSHTTPURLResponse?, data: NSData?) -> Void,
-		failure:(response: NSHTTPURLResponse?, error: NSError?) -> Void) {
+	func getImage(url: NSURL, completion:(response: NSHTTPURLResponse?, data: NSData?, error: NSError?) -> Void) {
 
             let task = urlSession.dataTaskWithURL(url) { [weak self] data, res, e in
 
 				let response = res as? NSHTTPURLResponse
 				var error = e
-				if error == nil && response?.statusCode>299 {
+				if error == nil && response?.statusCode>399 {
 					error = NSError(domain: "Error response received", code: response!.statusCode, userInfo: nil)
 				}
-				if error != nil {
-                    //DLog("IMAGE %@ - FAILED: %@", url.absoluteString, error)
-					failure(response: response, error: error)
-				} else {
-					//DLog("IMAGE %@ - RESULT: %d", url.absoluteString, response?.statusCode)
-					if data != nil && data!.length > 0 {
-						success(response: response, data: data!)
-					} else {
-						failure(response: response, error: error)
-					}
-				}
+                completion(response: response, data: data, error: error)
 				#if os(iOS)
 					self!.networkIndicationEnd()
 				#endif
@@ -182,7 +170,7 @@ final class API {
 
             #if os(iOS)
                 task.priority = NSURLSessionTaskPriorityHigh
-                atNextEvent() { [weak self] in
+                atNextEvent { [weak self] in
 					self!.networkIndicationStart()
                 }
             #endif
@@ -190,17 +178,16 @@ final class API {
             task.resume()
 	}
 
-	func haveCachedAvatar(path: String, tryLoadAndCallback: (IMAGE_CLASS?) -> Void) -> Bool
-	{
+	func haveCachedAvatar(path: String, tryLoadAndCallback: (IMAGE_CLASS?) -> Void) -> Bool {
+
 		#if os(iOS)
 			let absolutePath = path + (contains(path, "?") ? "&" : "?") + "s=\(40.0*GLOBAL_SCREEN_SCALE)"
-			#else
+        #else
 			let absolutePath = path + (contains(path, "?") ? "&" : "?") + "s=88"
 		#endif
 
 		let imageKey = absolutePath + " " + currentAppVersion
-
-		let cachePath = cacheDirectory.stringByAppendingPathComponent("imgcache-" + (md5hash(imageKey) as String))
+		let cachePath = cacheDirectory.stringByAppendingPathComponent("imgcache-" + md5hash(imageKey))
 
 		let fileManager = NSFileManager.defaultManager()
 		if fileManager.fileExistsAtPath(cachePath) {
@@ -209,7 +196,7 @@ final class API {
 				let imgDataProvider = CGDataProviderCreateWithCFData(imgData)
 				let cfImage = CGImageCreateWithJPEGDataProvider(imgDataProvider, nil, false, kCGRenderingIntentDefault)
 				let ret = UIImage(CGImage: cfImage, scale: GLOBAL_SCREEN_SCALE, orientation:UIImageOrientation.Up)
-				#else
+            #else
 				let ret = NSImage(contentsOfFile: cachePath)
 			#endif
 			if let r = ret {
@@ -220,23 +207,20 @@ final class API {
 			}
 		}
 
-		getImage(NSURL(string: absolutePath)!,
-			success: { response, data in
-				var image: IMAGE_CLASS?
-				if data != nil {
-					#if os(iOS)
-						image = IMAGE_CLASS(data: data!, scale:GLOBAL_SCREEN_SCALE)
-						UIImageJPEGRepresentation(image!, 1.0).writeToFile(cachePath, atomically: true)
-						#else
-						image = IMAGE_CLASS(data: data!)
-						image!.TIFFRepresentation!.writeToFile(cachePath, atomically: true)
-					#endif
-				}
-				dispatch_async(dispatch_get_main_queue(), { tryLoadAndCallback(image) })
-			}, failure: { response, error in
-				dispatch_async(dispatch_get_main_queue(), { tryLoadAndCallback(nil) })
-		})
+        getImage(NSURL(string: absolutePath)!) { response, data, error in
 
+            #if os(iOS)
+                if let d = data, i = IMAGE_CLASS(data: d, scale:GLOBAL_SCREEN_SCALE) {
+                    UIImageJPEGRepresentation(i, 1.0).writeToFile(cachePath, atomically: true)
+                    dispatch_sync(dispatch_get_main_queue()) { tryLoadAndCallback(i) }
+                }
+            #else
+                if let d = data, i = IMAGE_CLASS(data: d) {
+                    i.TIFFRepresentation?.writeToFile(cachePath, atomically: true)
+                    dispatch_sync(dispatch_get_main_queue()) { tryLoadAndCallback(i) }
+                }
+            #endif
+        }
 		return false
 	}
 

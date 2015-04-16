@@ -35,7 +35,7 @@ final class PickerViewController: UITableViewController {
 		previousValue = indexPath.row
 		tableView.reloadData()
 
-		atNextEvent() { [weak self] in
+		atNextEvent { [weak self] in
 			self!.navigationController?.popViewControllerAnimated(true)
 			self!.delegate.pickerViewController(self!, didSelectIndexPath: indexPath)
 		}

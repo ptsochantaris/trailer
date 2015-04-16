@@ -53,7 +53,7 @@ final class CommentBlacklistViewController: UITableViewController {
 				name = name.substringFromIndex(advance(name.startIndex, 1))
 			}
 
-			atNextEvent() { [weak self] in
+			atNextEvent { [weak self] in
 				if !name.isEmpty && !contains(Settings.commentAuthorBlacklist, name) {
 					var blackList = Settings.commentAuthorBlacklist
 					blackList.append(name)

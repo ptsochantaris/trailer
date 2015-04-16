@@ -171,7 +171,7 @@ final class PRCell: UITableViewCell {
 	private func loadImageAtPath(imagePath: String?) {
 		waitingForImageInPath = imagePath
 		if let path = imagePath {
-			if !api.haveCachedAvatar(path as String, tryLoadAndCallback: { [weak self] image in
+			if (!api.haveCachedAvatar(path) { [weak self] image in
 				if self!.waitingForImageInPath == path {
 					if image != nil {
 						// image loaded
