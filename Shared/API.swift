@@ -541,7 +541,7 @@ final class API {
 		}
 	}
 
-	private func fetchPullRequestsForRepos(repos: [Repo], toMoc:NSManagedObjectContext, callback: Completion) {
+	private func fetchPullRequestsForRepos(repos: [Repo], toMoc: NSManagedObjectContext, callback: Completion) {
 
 		for r in Repo.unsyncableReposInMoc(toMoc) {
 			for p in r.pullRequests {
@@ -601,7 +601,7 @@ final class API {
 		}
 	}
 
-	private func fetchIssuesForRepos(repos: [Repo], toMoc:NSManagedObjectContext, callback: Completion) {
+	private func fetchIssuesForRepos(repos: [Repo], toMoc: NSManagedObjectContext, callback: Completion) {
 
 		for r in Repo.unsyncableReposInMoc(toMoc) {
 			for i in r.issues {
@@ -1286,14 +1286,6 @@ final class API {
 
 	//////////////////////////////////////////////////////////// low level
 
-	class func lastPage(response: NSHTTPURLResponse?) -> Bool {
-		let allHeaders = response?.allHeaderFields as [NSObject : AnyObject]?
-		if let linkHeader = N(allHeaders, "Link") as? String {
-			return linkHeader.rangeOfString("rel=\"next\"") == nil
-		}
-		return true
-	}
-
 	private func getPagedDataInPath(
 		path: String,
 		fromServer: ApiServer,
@@ -1353,14 +1345,19 @@ final class API {
 					var etag: String? = nil
 					if let allHeaders = response?.allHeaderFields {
 
+                        etag = allHeaders["Etag"] as? String
+
 						fromServer.requestsRemaining = NSNumber(longLong: (allHeaders["X-RateLimit-Remaining"] as! NSString).longLongValue)
 						fromServer.requestsLimit = NSNumber(longLong: (allHeaders["X-RateLimit-Limit"] as! NSString).longLongValue)
 						fromServer.resetDate = NSDate(timeIntervalSince1970: (allHeaders["X-RateLimit-Reset"] as! NSString).doubleValue)
 						NSNotificationCenter.defaultCenter().postNotificationName(API_USAGE_UPDATE, object: fromServer, userInfo: nil)
-
-						let etag = allHeaders["Etag"] as? String
 					}
-					callback(data: data, lastPage: API.lastPage(response), resultCode: code, etag: etag)
+                    var lastPage = true
+                    let allHeaders = response?.allHeaderFields as [NSObject : AnyObject]?
+                    if let linkHeader = N(allHeaders, "Link") as? String {
+                        lastPage = linkHeader.rangeOfString("rel=\"next\"") == nil
+                    }
+					callback(data: data, lastPage: lastPage, resultCode: code, etag: etag)
 				} else {
 					callback(data: nil, lastPage: false, resultCode: code, etag: nil)
 				}
