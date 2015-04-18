@@ -1,7 +1,7 @@
 
 import UIKit
 
-final class AdvancedSettingsViewController: UITableViewController, PickerViewControllerDelegate, UIDocumentPickerDelegate, UIActionSheetDelegate {
+final class AdvancedSettingsViewController: UITableViewController, PickerViewControllerDelegate, UIDocumentPickerDelegate {
 
 	required init(coder aDecoder: NSCoder) {
 		settingsChangedTimer = PopTimer(timeInterval: 1.0) {
@@ -19,11 +19,17 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	private var selectedIndexPath: NSIndexPath?
 	private var previousValue: Int?
 
-	@IBOutlet var importExportButton: UIBarButtonItem!
-
 	@IBAction func done(sender: UIBarButtonItem) {
 		if app.preferencesDirty { app.startRefresh() }
 		dismissViewControllerAnimated(true, completion: nil)
+	}
+
+	override func viewDidLoad() {
+		super.viewDidLoad()
+		navigationItem.rightBarButtonItems = [
+			UIBarButtonItem(image: UIImage(named: "export"), style: UIBarButtonItemStyle.Plain, target: self, action: Selector("exportSelected:")),
+			UIBarButtonItem(image: UIImage(named: "import"), style: UIBarButtonItemStyle.Plain, target: self, action: Selector("importSelected:"))
+		]
 	}
 
 	private enum Section: Int {
@@ -102,7 +108,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.textLabel?.text = "Include labels in filtering"
 				cell.accessoryType = check(Settings.includeLabelsInFilter)
 			case 7:
-				cell.textLabel?.text = "Hide descriptions in watch detail views"
+				cell.textLabel?.text = "Hide descriptions in Apple Watch detail views"
 				cell.accessoryType = check(Settings.hideDescriptionInWatchDetail)
 			default: break
 			}
@@ -112,7 +118,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.textLabel?.text = "Sync and display issues"
 				cell.accessoryType = check(Settings.showIssuesMenu)
 			case 1:
-				cell.textLabel?.text = "Show issues instead of PRs in watch glances"
+				cell.textLabel?.text = "Show issues instead of PRs in Apple Watch glances"
 				cell.accessoryType = check(Settings.showIssuesInGlance)
 			default: break
 			}
@@ -504,39 +510,22 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 	private var tempUrl: NSURL?
 
-	@IBAction func importExportSelected(sender: UIBarButtonItem) {
-		let a = UIActionSheet(title: "Action",
-			delegate:self,
-			cancelButtonTitle: "Cancel",
-			destructiveButtonTitle: "Import New Settings",
-			otherButtonTitles: "Export Settings")
-		a.showFromBarButtonItem(sender, animated: true)
-	}
-
-	func actionSheet(actionSheet: UIActionSheet, didDismissWithButtonIndex buttonIndex: Int) {
-		if buttonIndex==0 {
-			importSelected()
-		} else if buttonIndex==2 {
-			exportSelected()
-		}
-	}
-
-	private func importSelected() {
+	func importSelected(sender: UIBarButtonItem) {
 		tempUrl = nil
 
 		let menu = UIDocumentPickerViewController(documentTypes: ["com.housetrip.mobile.trailer.ios.settings"], inMode: UIDocumentPickerMode.Import)
 		menu.delegate = self
-		popupManager.showPopoverFromViewController(self, fromItem: importExportButton, viewController: menu)
+		popupManager.showPopoverFromViewController(self, fromItem: sender, viewController: menu)
 	}
 
-	private func exportSelected() {
+	func exportSelected(sender: UIBarButtonItem) {
 		let tempFilePath = NSTemporaryDirectory().stringByAppendingPathComponent("PocketTrailer Settings.trailerSettings")
 		tempUrl = NSURL(fileURLWithPath: tempFilePath)!
 		Settings.writeToURL(tempUrl!)
 
 		let menu = UIDocumentPickerViewController(URL: tempUrl!, inMode: UIDocumentPickerMode.ExportToService)
 		menu.delegate = self
-		popupManager.showPopoverFromViewController(self, fromItem: importExportButton, viewController: menu)
+		popupManager.showPopoverFromViewController(self, fromItem: sender, viewController: menu)
 	}
 
 	func documentPicker(controller: UIDocumentPickerViewController, didPickDocumentAtURL url: NSURL) {

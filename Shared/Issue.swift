@@ -181,7 +181,7 @@ final class Issue: ListableItem {
 	}
 
 	func sectionName() -> String {
-		return PullRequestSection.prMenuTitles[sectionIndex?.integerValue ?? 0]
+		return PullRequestSection.issueMenuTitles[sectionIndex?.integerValue ?? 0]
 	}
 
 	class func allClosedIssuesInMoc(moc: NSManagedObjectContext) -> [Issue] {

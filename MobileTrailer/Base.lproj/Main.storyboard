@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7528.3" systemVersion="14C1514" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="H1p-Uh-vWS">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7531" systemVersion="14D136" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="H1p-Uh-vWS">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7518.3"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7520"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
@@ -161,12 +161,12 @@
                     </tableView>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" title="Pull Requests" id="Zdf-7t-Un8">
-                        <barButtonItem key="leftBarButtonItem" title="Settings" id="uCG-Gj-QGq">
+                        <barButtonItem key="leftBarButtonItem" image="settings" id="uCG-Gj-QGq">
                             <connections>
                                 <segue destination="D5t-dR-eFB" kind="presentation" identifier="showPreferences" modalPresentationStyle="formSheet" id="Z9a-R6-dGL"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" systemItem="edit" id="vlQ-6x-FuM">
+                        <barButtonItem key="rightBarButtonItem" image="actions" id="vlQ-6x-FuM">
                             <connections>
                                 <action selector="editSelected:" destination="7bK-jq-Zjz" id="ciS-ir-tQR"/>
                             </connections>
@@ -222,12 +222,12 @@
                     </tableView>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" title="Repositories" id="QfX-C1-a3i">
-                        <barButtonItem key="leftBarButtonItem" style="done" systemItem="done" id="mYI-Lo-soT">
+                        <barButtonItem key="leftBarButtonItem" image="close" style="done" id="mYI-Lo-soT">
                             <connections>
                                 <action selector="done:" destination="qen-v7-82i" id="W4S-ba-b5i"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" title="Actions" id="kBh-JC-HZv">
+                        <barButtonItem key="rightBarButtonItem" image="actions" id="kBh-JC-HZv">
                             <connections>
                                 <action selector="actionSelected:" destination="qen-v7-82i" id="LdD-A8-dPl"/>
                             </connections>
@@ -316,19 +316,13 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Advanced" id="0ij-Vd-OcD">
-                        <barButtonItem key="leftBarButtonItem" style="done" systemItem="done" id="cbh-rc-sSM">
+                        <barButtonItem key="leftBarButtonItem" image="close" style="done" id="cbh-rc-sSM">
                             <connections>
                                 <action selector="done:" destination="ls6-NX-hye" id="WNJ-zz-WqT"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" title="Import/Export" id="K2P-GJ-KDL">
-                            <connections>
-                                <action selector="importExportSelected:" destination="ls6-NX-hye" id="0UF-tf-rDo"/>
-                            </connections>
-                        </barButtonItem>
                     </navigationItem>
                     <connections>
-                        <outlet property="importExportButton" destination="K2P-GJ-KDL" id="ky9-Mn-zA2"/>
                         <segue destination="UM1-Tl-R50" kind="show" identifier="showPicker" id="jwG-rd-TEN"/>
                         <segue destination="QXf-Ap-v0o" kind="show" identifier="showBlacklist" id="V4L-hY-j8o"/>
                     </connections>
@@ -374,7 +368,7 @@
                     </tableView>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" title="Servers" id="xL8-Y9-77V">
-                        <barButtonItem key="leftBarButtonItem" style="done" systemItem="done" id="3yS-pI-1hb">
+                        <barButtonItem key="leftBarButtonItem" image="close" style="done" id="3yS-pI-1hb">
                             <connections>
                                 <action selector="doneSelected" destination="Ny5-Q9-wJN" id="MVl-LW-Jyc"/>
                             </connections>
@@ -696,7 +690,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
                     </view>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" title="About" id="0uQ-oM-T56">
-                        <barButtonItem key="leftBarButtonItem" style="done" systemItem="done" id="ZkS-hs-qdL">
+                        <barButtonItem key="leftBarButtonItem" image="close" style="done" id="ZkS-hs-qdL">
                             <connections>
                                 <action selector="doneSelected" destination="yvK-be-nK4" id="eke-6y-5OQ"/>
                             </connections>
@@ -739,7 +733,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="GitHub" id="uon-TC-PDK">
-                        <barButtonItem key="leftBarButtonItem" style="done" systemItem="done" id="1iC-A2-mcd">
+                        <barButtonItem key="leftBarButtonItem" image="close" style="done" id="1iC-A2-mcd">
                             <connections>
                                 <action selector="doneSelected:" destination="kWj-6b-yq2" id="F6J-ph-f4D"/>
                             </connections>
@@ -1005,10 +999,13 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
     </scenes>
     <resources>
         <image name="about" width="30" height="28"/>
+        <image name="actions" width="28" height="6"/>
         <image name="advanced" width="32" height="32"/>
+        <image name="close" width="28" height="28"/>
         <image name="htLogo" width="200" height="108"/>
         <image name="repos" width="32" height="32"/>
         <image name="servers" width="32" height="32"/>
+        <image name="settings" width="28" height="28"/>
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="oce-70-FTR"/>
