@@ -1,185 +1,208 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle"  xmlns:dc="http://purl.org/dc/elements/1.1/">
-    <channel>
-        <title>Trailer Changelog</title>
-        <link>http://ptsochantaris.github.io/trailer/appcast.xml</link>
-        <description>Most recent changes with links to updates.</description>
-        <language>en</language>
+	<channel>
+		<title>Trailer Changelog</title>
+		<link>http://ptsochantaris.github.io/trailer/appcast.xml</link>
+		<description>Most recent changes with links to updates.</description>
+		<language>en</language>
 
-        <item>
-            <title>Version 1.2.2</title>
-            <sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
-            <description><![CDATA[<font face="sans-serif" size="3"><ul>
-                <li>Correction for unread badging issue when "auto-participate" and "show all comments" are both enabled</li>
-                <li>Correction of appearance of new comment badges on certain Macs, when in vibrancy mode</li>
-                <li>From 1.2.x:</li>
-                <li>Option to mute all comment notifications</li>
-                <li>Option to disable greying-out of the menubar item when refreshing (useful if you use Bartender!)</li>
-                <li>Reverted back to the “Banner” notification style as default</li>
-                <li>Fixed issues related to clicking/dragging through status item links</li>
-                <li>Optimised menubar item redrawing</li>
-                <li>Improved non-translucent mode in Yosemite</li>
-                <li>Corrected graphical glitches in Mavericks</li>
-                <li>A major re-write in Swift, with a cleaned up codebase, meaning more performance, maintainability and stability. A big callout to @cheba and @mauricerkelly for their testing and feedback during this big undertaking!</li>
-                <li>Using native table views on OS X for big memory and performance wins</li>
-                <li>New option to filter using labels and statuses</li>
-                <li>Lots of small bug and corner-case fixes, especially in syncing and labels and statuses</li>
-                <li>Important performance improvements throughout</li>
-                <li>Properly signed, no longer need to right-click open on first download</li>
-                </ul></font>]]></description>
-            <pubDate>Thu, 25 Feb 2015 09:00:00 +0000</pubDate>
-            <enclosure
-            url="http://ptsochantaris.github.io/trailer/trailer122.zip"
-            sparkle:version="1187"
-            sparkle:shortVersionString="1.2.2"
-            sparkle:dsaSignature="MCwCFECqMqY0lA35Cnio2HZuo9buc1krAhRfxwmtWViJBbiXojmiBbVXTPPYMA=="
-            type="application/octet-stream"/>
-        </item>
+		<item>
+			<title>Version 1.3.0</title>
+			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Many thanks to @akalman @bkuhlmann @pedrocunha @gdehmlow for their help in testing and suggesting features for this version!</li>
+				<li>Support for issues as a second menu - can be turned on from the Display options</li>
+				<li>Simpler one-step quickstart for fresh installs</li>
+				<li>CI / Status items notifications, know when your PR is good to go</li>
+				<li>Support for team mentions</li>
+				<li>Import and export settings (compatible with the next version of PocketTrailer as well)</li>
+				<li>Slightly cleaner appearance</li>
+				<li>Corrections for vibrancy issues</li>
+				<li>Codebase moved to Swift 1.2 for extra stability and performance<li>
+				</ul></font>]]></description>
+			<pubDate>Sat, 18 Apr 2015 09:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer130.zip"
+			sparkle:version="1208"
+			sparkle:shortVersionString="1.3.0"
+			sparkle:dsaSignature="MCwCFBK654V10rKDPTlvWeEz9pwDCE8mAhQnJUVmSihSB8lNqWLh/kfQGXA7eQ=="
+			type="application/octet-stream"/>
+		</item>
 
-        <item>
-            <title>Version 1.2.1</title>
-            <sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
-            <description><![CDATA[<font face="sans-serif" size="3"><ul>
-                <li>Option to mute all comment notifications</li>
-                <li>Option to disable greying-out of the menubar item when refreshing (useful if you use Bartender!)</li>
-                <li>Reverted back to the “Banner” notification style as default</li>
-                <li>Fixed issues related to clicking/dragging through status item links</li>
-                <li>Optimised menubar item redrawing</li>
-                <li>Improved non-translucent mode in Yosemite</li>
-                <li>Corrected graphical glitches in Mavericks</li>
-                <li>From 1.2.0:</li>
-                <li>A major re-write in Swift, with a cleaned up codebase, meaning more performance, maintainability and stability. A big callout to @cheba and @mauricerkelly for their testing and feedback during this big undertaking!</li>
-                <li>Using native table views on OS X for big memory and performance wins</li>
-                <li>New option to filter using labels and statuses</li>
-                <li>Lots of small bug and corner-case fixes, especially in syncing and labels and statuses</li>
-                <li>Important performance improvements throughout</li>
-                <li>Properly signed, no longer need to right-click open on first download</li>
-                </ul></font>]]></description>
-            <pubDate>Thu, 19 Feb 2015 19:00:00 +0000</pubDate>
-            <enclosure
-            url="http://ptsochantaris.github.io/trailer/trailer121.zip"
-            sparkle:version="1183"
-            sparkle:shortVersionString="1.2.1"
-            sparkle:dsaSignature="MC4CFQCCqP18X5locsX8eIPjjc8W0wFHFgIVAMTh2pQk95Fy12MrSVCJj1sx3cw3"
-            type="application/octet-stream"/>
-        </item>
+		<item>
+			<title>Version 1.2.2</title>
+			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Correction for unread badging issue when "auto-participate" and "show all comments" are both enabled</li>
+				<li>Correction of appearance of new comment badges on certain Macs, when in vibrancy mode</li>
+				<li>From 1.2.x:</li>
+				<li>Option to mute all comment notifications</li>
+				<li>Option to disable greying-out of the menubar item when refreshing (useful if you use Bartender!)</li>
+				<li>Reverted back to the “Banner” notification style as default</li>
+				<li>Fixed issues related to clicking/dragging through status item links</li>
+				<li>Optimised menubar item redrawing</li>
+				<li>Improved non-translucent mode in Yosemite</li>
+				<li>Corrected graphical glitches in Mavericks</li>
+				<li>A major re-write in Swift, with a cleaned up codebase, meaning more performance, maintainability and stability. A big callout to @cheba and @mauricerkelly for their testing and feedback during this big undertaking!</li>
+				<li>Using native table views on OS X for big memory and performance wins</li>
+				<li>New option to filter using labels and statuses</li>
+				<li>Lots of small bug and corner-case fixes, especially in syncing and labels and statuses</li>
+				<li>Important performance improvements throughout</li>
+				<li>Properly signed, no longer need to right-click open on first download</li>
+				</ul></font>]]></description>
+			<pubDate>Thu, 25 Feb 2015 09:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer122.zip"
+			sparkle:version="1187"
+			sparkle:shortVersionString="1.2.2"
+			sparkle:dsaSignature="MCwCFECqMqY0lA35Cnio2HZuo9buc1krAhRfxwmtWViJBbiXojmiBbVXTPPYMA=="
+			type="application/octet-stream"/>
+		</item>
 
-        <item>
-            <title>Version 1.2.0</title>
-            <sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
-            <description><![CDATA[<font face="sans-serif" size="3"><ul>
-                <li>A major re-write in Swift, with a cleaned up codebase, meaning more performance, maintainability and stability. A big callout to @cheba and @mauricerkelly for their testing and feedback during this big undertaking!</li>
-                <li>Using native table views on OS X for big memory and performance wins</li>
-                <li>New option to filter using labels and statuses</li>
-                <li>Lots of small bug and corner-case fixes, especially in syncing and labels and statuses</li>
-                <li>Important performance improvements throughout</li>
-                <li>Properly signed, no longer need to right-click open on first download</li>
-                </ul></font>]]></description>
-            <pubDate>Thu, 12 Feb 2015 21:00:00 +0000</pubDate>
-            <enclosure
-            url="http://ptsochantaris.github.io/trailer/trailer120.zip"
-            sparkle:version="1176"
-            sparkle:shortVersionString="1.2.0"
-            sparkle:dsaSignature="MCwCFHrbN45PZG/5kywCZKBs/tfo47WKAhQuRfrx/PE+jpRp61LaxZztLPC5UQ=="
-            type="application/octet-stream"/>
-        </item>
+		<item>
+			<title>Version 1.2.1</title>
+			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Option to mute all comment notifications</li>
+				<li>Option to disable greying-out of the menubar item when refreshing (useful if you use Bartender!)</li>
+				<li>Reverted back to the “Banner” notification style as default</li>
+				<li>Fixed issues related to clicking/dragging through status item links</li>
+				<li>Optimised menubar item redrawing</li>
+				<li>Improved non-translucent mode in Yosemite</li>
+				<li>Corrected graphical glitches in Mavericks</li>
+				<li>From 1.2.0:</li>
+				<li>A major re-write in Swift, with a cleaned up codebase, meaning more performance, maintainability and stability. A big callout to @cheba and @mauricerkelly for their testing and feedback during this big undertaking!</li>
+				<li>Using native table views on OS X for big memory and performance wins</li>
+				<li>New option to filter using labels and statuses</li>
+				<li>Lots of small bug and corner-case fixes, especially in syncing and labels and statuses</li>
+				<li>Important performance improvements throughout</li>
+				<li>Properly signed, no longer need to right-click open on first download</li>
+				</ul></font>]]></description>
+			<pubDate>Thu, 19 Feb 2015 19:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer121.zip"
+			sparkle:version="1183"
+			sparkle:shortVersionString="1.2.1"
+			sparkle:dsaSignature="MC4CFQCCqP18X5locsX8eIPjjc8W0wFHFgIVAMTh2pQk95Fy12MrSVCJj1sx3cw3"
+			type="application/octet-stream"/>
+		</item>
 
-        <item>
-            <title>Version 1.1.5</title>
-            <description><![CDATA[<font face="sans-serif" size="3"><ul>
-                <li>Performance improvements for vibrancy mode, and some appearance simplifications</li>
-                <li>Readability improvements for non-retina screens using vibrancy</li>
-                <li>Possible corrections to some OS X 10.9 rendering issues</li>
-                </ul></font>]]></description>
-            <pubDate>Thu, 20 Nov 2014 17:00:00 +0000</pubDate>
-            <enclosure
-            url="http://ptsochantaris.github.io/trailer/trailer115.zip"
-            sparkle:version="1164"
-            sparkle:shortVersionString="1.1.5"
-            sparkle:dsaSignature="MC0CFQCaVuXtScGC4MwBlJejZqY5YlSgZAIUbsSJEzzmn6iaoC98Ni0tKr4iN/4="
-            type="application/octet-stream"/>
-        </item>
+		<item>
+			<title>Version 1.2.0</title>
+			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>A major re-write in Swift, with a cleaned up codebase, meaning more performance, maintainability and stability. A big callout to @cheba and @mauricerkelly for their testing and feedback during this big undertaking!</li>
+				<li>Using native table views on OS X for big memory and performance wins</li>
+				<li>New option to filter using labels and statuses</li>
+				<li>Lots of small bug and corner-case fixes, especially in syncing and labels and statuses</li>
+				<li>Important performance improvements throughout</li>
+				<li>Properly signed, no longer need to right-click open on first download</li>
+				</ul></font>]]></description>
+			<pubDate>Thu, 12 Feb 2015 21:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer120.zip"
+			sparkle:version="1176"
+			sparkle:shortVersionString="1.2.0"
+			sparkle:dsaSignature="MCwCFHrbN45PZG/5kywCZKBs/tfo47WKAhQuRfrx/PE+jpRp61LaxZztLPC5UQ=="
+			type="application/octet-stream"/>
+		</item>
 
-        <item>
-            <title>Version 1.1.4</title>
-            <description><![CDATA[<font face="sans-serif" size="3"><ul>
-                <li>Added optional support for vibrancy in Yosemite, which also allows extended dark mode support</li>
-                <li>Status filtering crash corrected (thank you @ypresto!)</li>
-                <li>Status and label fetching-related bugs corrected</li>
-                <li>Readability colour tweaks and small Retina-related improvements</li>
-                <li>Image display corrections under OS X 10.8</li>
-                <li>Preference layout improvements for OS X < 10.10</li>
-                </ul></font>]]></description>
-            <pubDate>Mon, 17 Nov 2014 11:00:00 +0000</pubDate>
-            <enclosure
-            url="http://ptsochantaris.github.io/trailer/trailer114.zip"
-            sparkle:version="1163"
-            sparkle:shortVersionString="1.1.4"
-            sparkle:dsaSignature="MC0CFDH9QKYL2TpC9BzzujWdIs0wrRHrAhUAgSi855l6LMxjaVuZs3suOLEKuac="
-            type="application/octet-stream"/>
-        </item>
+		<item>
+			<title>Version 1.1.5</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Performance improvements for vibrancy mode, and some appearance simplifications</li>
+				<li>Readability improvements for non-retina screens using vibrancy</li>
+				<li>Possible corrections to some OS X 10.9 rendering issues</li>
+				</ul></font>]]></description>
+			<pubDate>Thu, 20 Nov 2014 17:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer115.zip"
+			sparkle:version="1164"
+			sparkle:shortVersionString="1.1.5"
+			sparkle:dsaSignature="MC0CFQCaVuXtScGC4MwBlJejZqY5YlSgZAIUbsSJEzzmn6iaoC98Ni0tKr4iN/4="
+			type="application/octet-stream"/>
+		</item>
 
-        <item>
-            <title>Version 1.1.3</title>
-            <description><![CDATA[<font face="sans-serif" size="3"><ul>
-                <li>Auto-updater now pointing for new trailer repository</li>
-                <li>Layout corrections in preferences</li>
-                </ul></font>]]></description>
-            <pubDate>Thu, 6 Nov 2014 15:00:00 +0000</pubDate>
-            <enclosure
-            url="http://ptsochantaris.github.io/trailer/trailer113.zip"
-            sparkle:version="1159"
-            sparkle:shortVersionString="1.1.3"
-            sparkle:dsaSignature="MCwCFC3YPMM3vpw/7f5IcSZw/B2l2kBfAhRZw5+HKOxOttaeWH6zn5T8/dWAMg=="
-            type="application/octet-stream"/>
-        </item>
+		<item>
+			<title>Version 1.1.4</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Added optional support for vibrancy in Yosemite, which also allows extended dark mode support</li>
+				<li>Status filtering crash corrected (thank you @ypresto!)</li>
+				<li>Status and label fetching-related bugs corrected</li>
+				<li>Readability colour tweaks and small Retina-related improvements</li>
+				<li>Image display corrections under OS X 10.8</li>
+				<li>Preference layout improvements for OS X < 10.10</li>
+				</ul></font>]]></description>
+			<pubDate>Mon, 17 Nov 2014 11:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer114.zip"
+			sparkle:version="1163"
+			sparkle:shortVersionString="1.1.4"
+			sparkle:dsaSignature="MC0CFDH9QKYL2TpC9BzzujWdIs0wrRHrAhUAgSi855l6LMxjaVuZs3suOLEKuac="
+			type="application/octet-stream"/>
+		</item>
 
-        <item>
-            <title>Version 1.1.2</title>
-            <description><![CDATA[<font face="sans-serif" size="3"><ul>
-                <li>Added option for displaying PR labels in preferences</li>
-                </ul></font>]]></description>
-            <pubDate>Wed, 5 Nov 2014 19:30:00 +0000</pubDate>
-            <enclosure
-            url="http://ptsochantaris.github.io/trailer/trailer112.zip"
-            sparkle:version="1158"
-            sparkle:shortVersionString="1.1.2"
-            sparkle:dsaSignature="MC0CFBYNfLOg8/N5HbbVAdTVUTRxKEW4AhUAmgDlYC0P7sONKSFB2xRYPt7h+ME="
-            type="application/octet-stream"/>
-        </item>
+		<item>
+			<title>Version 1.1.3</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Auto-updater now pointing for new trailer repository</li>
+				<li>Layout corrections in preferences</li>
+				</ul></font>]]></description>
+			<pubDate>Thu, 6 Nov 2014 15:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer113.zip"
+			sparkle:version="1159"
+			sparkle:shortVersionString="1.1.3"
+			sparkle:dsaSignature="MCwCFC3YPMM3vpw/7f5IcSZw/B2l2kBfAhRZw5+HKOxOttaeWH6zn5T8/dWAMg=="
+			type="application/octet-stream"/>
+		</item>
 
-        <item>
-            <title>Version 1.1.1</title>
-            <description><![CDATA[<font face="sans-serif" size="3"><ul>
-                <li>Additional updates and cleanups from v1.1.0:</li>
-                <li>New support for multiple API servers, with optional error reporting per-server</li>
-                <li>API server settings should no longer reset after updates</li>
-                </ul></font>]]></description>
-            <pubDate>Sat, 1 Nov 2014 19:00:00 +0000</pubDate>
-            <enclosure
-            url="http://ptsochantaris.github.io/trailer/trailer111.zip"
-            sparkle:version="1155"
-            sparkle:shortVersionString="1.1.1"
-            sparkle:dsaSignature="MC0CFHtqhhl0QqvcwFZBBjHlZ8tx8JtkAhUAmD44DahHqzNkQH6fPpjYYCgP6pc="
-            type="application/octet-stream"/>
-        </item>
-        
-        <item>
-            <title>Version 1.0.40</title>
-            <description><![CDATA[<font face="sans-serif" size="3"><ul>
-                <li>Correct status item appearance in all themes & display modes (including dark mode in Yosemite)</li>
-                <li>Inaccessible repositories will no longer be repeatedly reported every time watchlists are refreshed</li>
-                <li>PR dragging improvements</li>
-                <li>Sparkle auto-updater bumped up to v1.8</li>
-                </ul></font>]]></description>
-            <pubDate>Mon, 06 Oct 2014 09:00:00 +0000</pubDate>
-            <enclosure
-            url="http://ptsochantaris.github.io/trailer/trailer1040.zip"
-            sparkle:version="1147"
-            sparkle:shortVersionString="1.0.40"
-            sparkle:dsaSignature="MC4CFQCOX4/NAUMp+1HUQHkV5n2Fpyl/GQIVAMK/ZtSApXj+r/oxw6qWlX50FIp2"
-            type="application/octet-stream"/>
-        </item>
-        
-    </channel>
+		<item>
+			<title>Version 1.1.2</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Added option for displaying PR labels in preferences</li>
+				</ul></font>]]></description>
+			<pubDate>Wed, 5 Nov 2014 19:30:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer112.zip"
+			sparkle:version="1158"
+			sparkle:shortVersionString="1.1.2"
+			sparkle:dsaSignature="MC0CFBYNfLOg8/N5HbbVAdTVUTRxKEW4AhUAmgDlYC0P7sONKSFB2xRYPt7h+ME="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
+			<title>Version 1.1.1</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Additional updates and cleanups from v1.1.0:</li>
+				<li>New support for multiple API servers, with optional error reporting per-server</li>
+				<li>API server settings should no longer reset after updates</li>
+				</ul></font>]]></description>
+			<pubDate>Sat, 1 Nov 2014 19:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer111.zip"
+			sparkle:version="1155"
+			sparkle:shortVersionString="1.1.1"
+			sparkle:dsaSignature="MC0CFHtqhhl0QqvcwFZBBjHlZ8tx8JtkAhUAmD44DahHqzNkQH6fPpjYYCgP6pc="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
+			<title>Version 1.0.40</title>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Correct status item appearance in all themes & display modes (including dark mode in Yosemite)</li>
+				<li>Inaccessible repositories will no longer be repeatedly reported every time watchlists are refreshed</li>
+				<li>PR dragging improvements</li>
+				<li>Sparkle auto-updater bumped up to v1.8</li>
+				</ul></font>]]></description>
+			<pubDate>Mon, 06 Oct 2014 09:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer1040.zip"
+			sparkle:version="1147"
+			sparkle:shortVersionString="1.0.40"
+			sparkle:dsaSignature="MC4CFQCOX4/NAUMp+1HUQHkV5n2Fpyl/GQIVAMK/ZtSApXj+r/oxw6qWlX50FIp2"
+			type="application/octet-stream"/>
+		</item>
+
+	</channel>
 </rss>
