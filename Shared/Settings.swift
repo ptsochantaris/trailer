@@ -116,13 +116,11 @@ final class Settings {
 	private class func get(key: String) -> AnyObject? {
 		if let v: AnyObject = _settings_valuesCache[key] {
 			return v
+		} else if let v: AnyObject = _settings_shared.objectForKey(key) {
+			_settings_valuesCache[key] = v
+			return v
 		} else {
-			if let vv: AnyObject = _settings_shared.objectForKey(key) {
-				_settings_valuesCache[key] = vv
-				return vv
-			} else {
-				return nil
-			}
+			return nil
 		}
 	}
 
