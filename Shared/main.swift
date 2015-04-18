@@ -10,16 +10,14 @@ let api = API()
 //_prs[1].condition = PullRequestCondition.Closed.rawValue
 //_prs[2].condition = PullRequestCondition.Merged.rawValue
 //_prs[3].condition = PullRequestCondition.Closed.rawValue
-
 /*
 let _prs = DataItem.allItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest]
 for p in _prs {
-    for c in p.comments {
-        mainObjectContext.deleteObject(c)
-    }
-	p.latestReadCommentDate = nil
-	p.updatedAt = never()
-	p.repo.resetSyncState()
+	p.latestReadCommentDate = never()
+}
+let _issues = DataItem.allItemsOfType("Issue", inMoc: mainObjectContext) as! [Issue]
+for p in _issues {
+	p.latestReadCommentDate = never()
 }
 DataManager.saveDB()
 */
