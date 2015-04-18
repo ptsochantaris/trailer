@@ -5,7 +5,7 @@ protocol PickerViewControllerDelegate: class {
 	func pickerViewController(picker: PickerViewController, didSelectIndexPath: NSIndexPath)
 }
 
-class PickerViewController: UITableViewController {
+final class PickerViewController: UITableViewController {
 
 	required init(coder aDecoder: NSCoder) {
 		super.init(coder: aDecoder)
@@ -24,9 +24,9 @@ class PickerViewController: UITableViewController {
 	}
 
 	override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as UITableViewCell
+		let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! UITableViewCell
 		cell.textLabel?.text = values[indexPath.row]
-		cell.accessoryType = indexPath.row == previousValue? ? UITableViewCellAccessoryType.Checkmark : UITableViewCellAccessoryType.None
+		cell.accessoryType = indexPath.row == previousValue ? UITableViewCellAccessoryType.Checkmark : UITableViewCellAccessoryType.None
 		return cell
 	}
 
@@ -35,9 +35,9 @@ class PickerViewController: UITableViewController {
 		previousValue = indexPath.row
 		tableView.reloadData()
 
-		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
-			self.navigationController?.popViewControllerAnimated(true)
-			self.delegate.pickerViewController(self, didSelectIndexPath: indexPath)
+		atNextEvent { [weak self] in
+			self!.navigationController?.popViewControllerAnimated(true)
+			self!.delegate.pickerViewController(self!, didSelectIndexPath: indexPath)
 		}
 	}
 

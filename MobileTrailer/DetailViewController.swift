@@ -1,7 +1,7 @@
 import WebKit
 import CoreData
 
-class DetailViewController: UIViewController, WKNavigationDelegate {
+final class DetailViewController: UIViewController, WKNavigationDelegate {
 
 	@IBOutlet weak var spinner: UIActivityIndicatorView!
 	@IBOutlet weak var statusLabel: UILabel!
@@ -9,7 +9,7 @@ class DetailViewController: UIViewController, WKNavigationDelegate {
 	private var _webView: WKWebView?
 
 	var isVisible: Bool = false
-	var catchupWithPrWhenLoaded : NSManagedObjectID?
+	var catchupWithDataItemWhenLoaded : NSManagedObjectID?
 
 	var detailItem: NSURL? {
 		didSet {
@@ -69,6 +69,7 @@ class DetailViewController: UIViewController, WKNavigationDelegate {
 			spinner.startAnimating()
 		} else {
 			spinner.stopAnimating()
+			catchupWithComments()
 		}
 		isVisible = true
 	}
@@ -89,7 +90,7 @@ class DetailViewController: UIViewController, WKNavigationDelegate {
 	}
 
 	func webView(webView: WKWebView, decidePolicyForNavigationResponse navigationResponse: WKNavigationResponse, decisionHandler: (WKNavigationResponsePolicy) -> Void) {
-		let res = navigationResponse.response as NSHTTPURLResponse
+		let res = navigationResponse.response as! NSHTTPURLResponse
 		if res.statusCode == 404 {
 			UIAlertView(title: "Not Found",
 			message: "\nPlease ensure you are logged in with the correct account on GitHub\n\nIf you are using two-factor auth: There is a bug between Github and iOS which may cause your login to fail.  If it happens, temporarily disable two-factor auth and log in from here, then re-enable it afterwards.  You will only need to do this once.",
@@ -108,14 +109,17 @@ class DetailViewController: UIViewController, WKNavigationDelegate {
 		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Action, target: self, action: Selector("shareSelected"))
 		api.networkIndicationEnd()
 
-		if let oid = catchupWithPrWhenLoaded {
-			if let pr = mainObjectContext.existingObjectWithID(oid, error: nil) as? PullRequest {
-				if (pr.unreadComments?.integerValue ?? 0) > 0 {
-					pr.catchUpWithComments()
-					DataManager.saveDB()
-				}
+		catchupWithComments()
+	}
+
+	private func catchupWithComments()
+	{
+		if let oid = catchupWithDataItemWhenLoaded, dataItem = mainObjectContext.existingObjectWithID(oid, error: nil) as? ListableItem {
+			catchupWithDataItemWhenLoaded = nil
+			if let count = dataItem.unreadComments?.integerValue where count > 0 {
+				dataItem.catchUpWithComments()
+				DataManager.saveDB()
 			}
-			catchupWithPrWhenLoaded = nil
 		}
 	}
 
@@ -141,7 +145,7 @@ class DetailViewController: UIViewController, WKNavigationDelegate {
 
 	func shareSelected() {
 		if let u = _webView?.URL {
-			app.shareFromView(self, buttonItem: navigationItem.rightBarButtonItem!, url: u)
+			popupManager.shareFromView(self, buttonItem: navigationItem.rightBarButtonItem!, url: u)
 		}
 	}
 }

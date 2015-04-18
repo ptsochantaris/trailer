@@ -5,41 +5,50 @@ import CoreData
 #endif
 
 @objc (PRLabel)
-class PRLabel: DataItem {
+final class PRLabel: DataItem {
 
     @NSManaged var color: NSNumber?
     @NSManaged var name: String?
     @NSManaged var url: String?
 
-    @NSManaged var pullRequest: PullRequest
+    @NSManaged var pullRequest: PullRequest?
+	@NSManaged var issue: Issue?
 
-	class func labelWithName(name: String, forPullRequest: PullRequest) -> PRLabel? {
+	class func labelWithName(name: String, withParent: DataItem) -> PRLabel? {
 		let f = NSFetchRequest(entityName: "PRLabel")
 		f.fetchLimit = 1
 		f.returnsObjectsAsFaults = false
-		f.predicate = NSPredicate(format: "name == %@ and pullRequest == %@", name, forPullRequest)
-		let res = forPullRequest.managedObjectContext?.executeFetchRequest(f, error: nil) as [PRLabel]
+		if withParent is PullRequest {
+			f.predicate = NSPredicate(format: "name == %@ and pullRequest == %@", name, withParent)
+		} else {
+			f.predicate = NSPredicate(format: "name == %@ and issue == %@", name, withParent)
+		}
+		let res = withParent.managedObjectContext?.executeFetchRequest(f, error: nil) as! [PRLabel]
 		return res.first
 	}
 
-	class func labelWithInfo(info: NSDictionary, forPullRequest: PullRequest) -> PRLabel {
-		let name = info.ofk("name") as? String ?? "(unnamed label)"
-		var l = PRLabel.labelWithName(name, forPullRequest: forPullRequest)
-		if(l==nil) {
+	class func labelWithInfo(info: [NSObject : AnyObject], withParent: DataItem) -> PRLabel {
+		let name = N(info, "name") as? String ?? "(unnamed label)"
+		var l = PRLabel.labelWithName(name, withParent: withParent)
+		if l==nil {
 			DLog("Creating PRLabel: %@", name)
-			l = NSEntityDescription.insertNewObjectForEntityForName("PRLabel", inManagedObjectContext: forPullRequest.managedObjectContext!) as? PRLabel
+			l = NSEntityDescription.insertNewObjectForEntityForName("PRLabel", inManagedObjectContext: withParent.managedObjectContext!) as? PRLabel
 			l!.name = name
 			l!.serverId = 0
-			l!.updatedAt = NSDate.distantPast() as? NSDate
-			l!.createdAt = NSDate.distantPast() as? NSDate
-			l!.pullRequest = forPullRequest
-			l!.apiServer = forPullRequest.apiServer
+			l!.updatedAt = never()
+			l!.createdAt = never()
+			l!.apiServer = withParent.apiServer
+			if let p = withParent as? PullRequest {
+				l!.pullRequest = p
+			} else if let i = withParent as? Issue {
+				l!.issue = i
+			}
 		} else {
 			DLog("Updating PRLabel: %@", name)
 		}
-		l!.url = info.ofk("url") as? String
-		if let c = info.ofk("color") as? String {
-			l!.color = NSNumber(unsignedInt: c.parseFromHex())
+		l!.url = N(info, "url") as? String
+		if let c = N(info, "color") as? String {
+			l!.color = NSNumber(unsignedInt: parseFromHex(c))
 		} else {
 			l!.color = 0
 		}

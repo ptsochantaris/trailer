@@ -1,5 +1,5 @@
 
-class PullRequestDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
+final class PullRequestDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 
 	private var pullRequestIds: [NSObject]
 
@@ -11,19 +11,19 @@ class PullRequestDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource 
 
 	func reloadData(filter: String?) {
 
-		pullRequestIds = [NSObject]()
+		pullRequestIds.removeAll(keepCapacity: false)
 
-		let f = PullRequest.requestForPullRequestsWithFilter(filter)
-		let allPrs = mainObjectContext.executeFetchRequest(f, error: nil) as [PullRequest]
+		let f = PullRequest.requestForPullRequestsWithFilter(filter, sectionIndex: -1)
+		let allPrs = mainObjectContext.executeFetchRequest(f, error: nil) as! [PullRequest]
 
 		if let firstPr = allPrs.first {
 			var lastSection = firstPr.sectionIndex!.integerValue
-			pullRequestIds.append(PullRequestSection.allTitles[lastSection])
+			pullRequestIds.append(PullRequestSection.prMenuTitles[lastSection])
 
 			for pr in allPrs {
 				let i = pr.sectionIndex!.integerValue
 				if lastSection < i {
-					pullRequestIds.append(PullRequestSection.allTitles[i])
+					pullRequestIds.append(PullRequestSection.prMenuTitles[i])
 					lastSection = i
 				}
 				pullRequestIds.append(pr.objectID)
@@ -34,11 +34,11 @@ class PullRequestDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource 
 	func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
 		let object = pullRequestIds[row]
 		if object.isKindOfClass(NSManagedObjectID) {
-			let pr = mainObjectContext.existingObjectWithID(object as NSManagedObjectID, error: nil) as? PullRequest
-			return PrItemView(pullRequest: pr!)
+			let pr = mainObjectContext.existingObjectWithID(object as! NSManagedObjectID, error: nil) as! PullRequest
+			return PullRequestCell(pullRequest: pr)
 		} else {
-			let title = object as String
-			let showButton = (title == PullRequestSection.Merged.name() || title == PullRequestSection.Closed.name())
+			let title = object as! String
+			let showButton = (title == PullRequestSection.Merged.prMenuName() || title == PullRequestSection.Closed.prMenuName())
 			return SectionHeader(title: title, showRemoveAllButton: showButton)
 		}
 	}
@@ -55,7 +55,7 @@ class PullRequestDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource 
 	func pullRequestAtRow(row: Int) -> PullRequest? {
 		let object = pullRequestIds[row]
 		if object.isKindOfClass(NSManagedObjectID) {
-			return mainObjectContext.existingObjectWithID(object as NSManagedObjectID, error: nil) as? PullRequest
+			return mainObjectContext.existingObjectWithID(object as! NSManagedObjectID, error: nil) as? PullRequest
 		} else {
 			return nil
 		}

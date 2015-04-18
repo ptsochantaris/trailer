@@ -1,12 +1,12 @@
 
 import UIKit
 
-class PRCell: UITableViewCell {
+final class PRCell: UITableViewCell {
 
 	private let unreadCount = CountLabel(frame: CGRectZero)
 	private let readCount = CountLabel(frame: CGRectZero)
-	private var failedToLoadImage: NSString?
-	private var waitingForImageInPath: NSString?
+	private var failedToLoadImage: String?
+	private var waitingForImageInPath: String?
 
 	@IBOutlet weak var _image: UIImageView!
 	@IBOutlet weak var _title: UILabel!
@@ -19,6 +19,10 @@ class PRCell: UITableViewCell {
 
 		readCount.textColor = UIColor.darkGrayColor()
 		contentView.addSubview(readCount)
+
+		let bg = UIView()
+		bg.backgroundColor = UIColor(red: 0.82, green: 0.88, blue: 0.97, alpha: 1.0)
+		selectedBackgroundView = bg
 
 		NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("networkStateChanged"), name: kReachabilityChangedNotification, object: nil)
 	}
@@ -137,14 +141,37 @@ class PRCell: UITableViewCell {
 		} else {
 			accessibilityLabel = "\(pullRequest.accessibleTitle()), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(pullRequest.accessibleSubtitle())"
 		}
-
-		setNeedsLayout()
 	}
 
-	private func loadImageAtPath(imagePath: NSString?) {
+	func setIssue(issue: Issue) {
+		let detailFont = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
+		_title.attributedText = issue.titleWithFont(_title.font, labelFont: detailFont.fontWithSize(detailFont.pointSize-2), titleColor: UIColor.darkTextColor())
+		_description.attributedText = issue.subtitleWithFont(detailFont, lightColor: UIColor.lightGrayColor(), darkColor: UIColor.darkGrayColor())
+		_statuses.attributedText = nil
+
+		var _commentsNew = 0
+		let _commentsTotal = issue.totalComments?.integerValue ?? 0
+
+		if Settings.showCommentsEverywhere || issue.isMine() || issue.commentedByMe() {
+			_commentsNew = issue.unreadComments?.integerValue ?? 0
+		}
+
+		readCount.text = itemCountFormatter.stringFromNumber(_commentsTotal)
+		let readSize = readCount.sizeThatFits(CGSizeMake(200, 14))
+		readCount.hidden = (_commentsTotal == 0)
+
+		unreadCount.hidden = (_commentsNew == 0)
+		unreadCount.text = itemCountFormatter.stringFromNumber(_commentsNew)
+
+		loadImageAtPath(issue.userAvatarUrl)
+
+		accessibilityLabel = "\(issue.accessibleTitle()), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(issue.accessibleSubtitle())"
+	}
+
+	private func loadImageAtPath(imagePath: String?) {
 		waitingForImageInPath = imagePath
 		if let path = imagePath {
-			if !api.haveCachedAvatar(path, tryLoadAndCallback: { [weak self] image in
+			if (!api.haveCachedAvatar(path) { [weak self] image in
 				if self!.waitingForImageInPath == path {
 					if image != nil {
 						// image loaded
@@ -165,14 +192,6 @@ class PRCell: UITableViewCell {
 		} else {
 			failedToLoadImage = nil
 		}
-	}
-
-	override func layoutSubviews() {
-		super.layoutSubviews()
-
-		_title.preferredMaxLayoutWidth = _title.bounds.size.width
-		_description.preferredMaxLayoutWidth = _description.bounds.size.width
-		_statuses.preferredMaxLayoutWidth = _statuses.bounds.size.width
 	}
 
 	override func setSelected(selected: Bool, animated: Bool) {

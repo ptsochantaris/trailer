@@ -1,11 +1,12 @@
 
 import UIKit
 
-class AdvancedSettingsViewController: UITableViewController, PickerViewControllerDelegate {
+final class AdvancedSettingsViewController: UITableViewController, PickerViewControllerDelegate, UIDocumentPickerDelegate, UIActionSheetDelegate {
 
 	required init(coder aDecoder: NSCoder) {
 		settingsChangedTimer = PopTimer(timeInterval: 1.0) {
-			app.refreshMainList()
+			DataManager.postProcessAllItems()
+			popupManager.getMasterController().reloadDataWithAnimation(true)
 		}
 		super.init(coder: aDecoder)
 	}
@@ -18,15 +19,17 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 	private var selectedIndexPath: NSIndexPath?
 	private var previousValue: Int?
 
+	@IBOutlet var importExportButton: UIBarButtonItem!
+
 	@IBAction func done(sender: UIBarButtonItem) {
-		if(app.preferencesDirty) { app.startRefresh() }
+		if app.preferencesDirty { app.startRefresh() }
 		dismissViewControllerAnimated(true, completion: nil)
 	}
 
 	private enum Section: Int {
-		case Refresh, Display, Comments, Repos, StausesAndLabels, History, Confirm, Sort, Misc
-		static let rowCounts = [3, 7, 6, 1, 6, 3, 2, 3, 1]
-		static let allNames = ["Auto Refresh", "Display","Comments", "Repositories", "Statuses & Labels", "History", "Don't confirm when", "Sorting", "Misc"]
+		case Refresh, Display, Issues, Comments, Repos, StausesAndLabels, History, Confirm, Sort, Misc
+		static let rowCounts = [3, 8, 2, 7, 1, 6, 3, 2, 3, 1]
+		static let allNames = ["Auto Refresh", "Display", "Issues", "Comments", "Repositories", "Statuses & Labels", "History", "Don't confirm when", "Sorting", "Misc"]
 	}
 
 	private enum NormalSorting: Int {
@@ -58,7 +61,7 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 	}
 
 	override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCellWithIdentifier("Cell") as UITableViewCell
+		let cell = tableView.dequeueReusableCellWithIdentifier("Cell") as! UITableViewCell
 		cell.accessoryType = UITableViewCellAccessoryType.None
 		cell.detailTextLabel?.text = " "
 
@@ -81,10 +84,10 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 				cell.textLabel?.text = "Display creation instead of activity times"
 				cell.accessoryType = check(Settings.showCreatedInsteadOfUpdated)
 			case 1:
-				cell.textLabel?.text = "Hide 'All PRs' section"
+				cell.textLabel?.text = "Hide 'All' section"
 				cell.accessoryType = check(Settings.hideAllPrsSection)
 			case 2:
-				cell.textLabel?.text = "Move assigned PRs to 'Mine'"
+				cell.textLabel?.text = "Move assigned items to 'Mine'"
 				cell.accessoryType = check(Settings.moveAssignedPrsToMySection)
 			case 3:
 				cell.textLabel?.text = "Announce unmergeable PRs only in 'Mine'/'Participated'"
@@ -98,28 +101,44 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 			case 6:
 				cell.textLabel?.text = "Include labels in filtering"
 				cell.accessoryType = check(Settings.includeLabelsInFilter)
+			case 7:
+				cell.textLabel?.text = "Hide descriptions in watch detail views"
+				cell.accessoryType = check(Settings.hideDescriptionInWatchDetail)
+			default: break
+			}
+		} else if indexPath.section == Section.Issues.rawValue {
+			switch indexPath.row {
+			case 0:
+				cell.textLabel?.text = "Sync and display issues"
+				cell.accessoryType = check(Settings.showIssuesMenu)
+			case 1:
+				cell.textLabel?.text = "Show issues instead of PRs in watch glances"
+				cell.accessoryType = check(Settings.showIssuesInGlance)
 			default: break
 			}
 		} else if indexPath.section == Section.Comments.rawValue {
 			switch indexPath.row {
 			case 0:
-				cell.textLabel?.text = "Display comment badges and alerts for all PRs"
+				cell.textLabel?.text = "Display comment badges and alerts for all items"
 				cell.accessoryType = check(Settings.showCommentsEverywhere)
 			case 1:
-				cell.textLabel?.text = "Only display PRs with unread comments"
+				cell.textLabel?.text = "Only display items with unread comments"
 				cell.accessoryType = check(Settings.shouldHideUncommentedRequests)
 			case 2:
-				cell.textLabel?.text = "Move PRs that mention me to 'Participated'"
+				cell.textLabel?.text = "Move items menitoning me to 'Participated'"
 				cell.accessoryType = check(Settings.autoParticipateInMentions)
 			case 3:
-				cell.textLabel?.text = "Open PRs at first unread comment"
-				cell.accessoryType = check(Settings.openPrAtFirstUnreadComment)
+				cell.textLabel?.text = "Move items menitoning my teams to 'Participated'"
+				cell.accessoryType = check(Settings.autoParticipateOnTeamMentions)
 			case 4:
+				cell.textLabel?.text = "Open items at first unread comment"
+				cell.accessoryType = check(Settings.openPrAtFirstUnreadComment)
+			case 5:
 				cell.textLabel?.text = "Block comment notifications from usernames..."
 				cell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
-            case 5:
-                cell.textLabel?.text = "Disable all comment notifications"
-                cell.accessoryType = check(Settings.disableAllCommentNotifications)
+			case 6:
+				cell.textLabel?.text = "Disable all comment notifications"
+				cell.accessoryType = check(Settings.disableAllCommentNotifications)
 			default: break
 			}
 		} else if indexPath.section == Section.Repos.rawValue {
@@ -154,10 +173,10 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 		} else if indexPath.section == Section.History.rawValue {
 			switch indexPath.row {
 			case 0:
-				cell.textLabel?.text = "When a PR is merged"
+				cell.textLabel?.text = "When something is merged"
 				cell.detailTextLabel?.text = HandlingPolicy(rawValue: Settings.mergeHandlingPolicy)?.name()
 			case 1:
-				cell.textLabel?.text = "When a PR is closed"
+				cell.textLabel?.text = "When something is closed"
 				cell.detailTextLabel?.text = HandlingPolicy(rawValue: Settings.closeHandlingPolicy)?.name()
 			case 2:
 				cell.textLabel?.text = "Don't keep PRs merged by me"
@@ -167,10 +186,10 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 		} else if indexPath.section == Section.Confirm.rawValue {
 			switch indexPath.row {
 			case 0:
-				cell.textLabel?.text = "Removing all merged PRs"
+				cell.textLabel?.text = "Removing all merged items"
 				cell.accessoryType = check(Settings.dontAskBeforeWipingMerged)
 			case 1:
-				cell.textLabel?.text = "Removing all closed PRs"
+				cell.textLabel?.text = "Removing all closed items"
 				cell.accessoryType = check(Settings.dontAskBeforeWipingClosed)
 			default: break
 			}
@@ -241,24 +260,46 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 		} else if indexPath.section == Section.Display.rawValue {
 			switch indexPath.row {
 			case 0:
-					Settings.showCreatedInsteadOfUpdated = !Settings.showCreatedInsteadOfUpdated
-					settingsChangedTimer.push()
+				Settings.showCreatedInsteadOfUpdated = !Settings.showCreatedInsteadOfUpdated
+				settingsChangedTimer.push()
 			case 1:
-					Settings.hideAllPrsSection = !Settings.hideAllPrsSection
-					settingsChangedTimer.push()
+				Settings.hideAllPrsSection = !Settings.hideAllPrsSection
+				settingsChangedTimer.push()
 			case 2:
-					Settings.moveAssignedPrsToMySection = !Settings.moveAssignedPrsToMySection
-					settingsChangedTimer.push()
+				Settings.moveAssignedPrsToMySection = !Settings.moveAssignedPrsToMySection
+				settingsChangedTimer.push()
 			case 3:
-					Settings.markUnmergeableOnUserSectionsOnly = !Settings.markUnmergeableOnUserSectionsOnly
-					settingsChangedTimer.push()
+				Settings.markUnmergeableOnUserSectionsOnly = !Settings.markUnmergeableOnUserSectionsOnly
+				settingsChangedTimer.push()
 			case 4:
-					Settings.showReposInName = !Settings.showReposInName
-					settingsChangedTimer.push()
+				Settings.showReposInName = !Settings.showReposInName
+				settingsChangedTimer.push()
 			case 5:
-					Settings.includeReposInFilter = !Settings.includeReposInFilter
+				Settings.includeReposInFilter = !Settings.includeReposInFilter
 			case 6:
-					Settings.includeLabelsInFilter = !Settings.includeLabelsInFilter
+				Settings.includeLabelsInFilter = !Settings.includeLabelsInFilter
+			case 7:
+				Settings.hideDescriptionInWatchDetail = !Settings.hideDescriptionInWatchDetail
+			default: break
+			}
+		} else if indexPath.section == Section.Issues.rawValue {
+			switch indexPath.row {
+			case 0:
+				Settings.showIssuesMenu = !Settings.showIssuesMenu
+				if Settings.showIssuesMenu {
+					for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
+						r.resetSyncState()
+					}
+					app.preferencesDirty = true
+				} else {
+					for i in DataItem.allItemsOfType("Issue", inMoc: mainObjectContext) as! [Issue] {
+						i.postSyncAction = PostSyncAction.Delete.rawValue
+					}
+					DataItem.nukeDeletedItemsInMoc(mainObjectContext)
+				}
+				settingsChangedTimer.push()
+			case 1:
+				Settings.showIssuesInGlance = !Settings.showIssuesInGlance
 			default: break
 			}
 		} else if indexPath.section == Section.Comments.rawValue {
@@ -273,11 +314,14 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 				Settings.autoParticipateInMentions = !Settings.autoParticipateInMentions
 				settingsChangedTimer.push()
 			case 3:
-				Settings.openPrAtFirstUnreadComment = !Settings.openPrAtFirstUnreadComment
+				Settings.autoParticipateOnTeamMentions = !Settings.autoParticipateOnTeamMentions
+				settingsChangedTimer.push()
 			case 4:
+				Settings.openPrAtFirstUnreadComment = !Settings.openPrAtFirstUnreadComment
+			case 5:
 				performSegueWithIdentifier("showBlacklist", sender: self)
-            case 5:
-                Settings.disableAllCommentNotifications = !Settings.disableAllCommentNotifications
+			case 6:
+				Settings.disableAllCommentNotifications = !Settings.disableAllCommentNotifications
 			default: break
 			}
 		} else if indexPath.section == Section.Repos.rawValue {
@@ -292,9 +336,8 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 				Settings.showStatusItems = !Settings.showStatusItems
 				api.resetAllStatusChecks()
 				if Settings.showStatusItems {
-					for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as [Repo] {
-						r.dirty = true
-						r.lastDirtied = NSDate.distantPast() as? NSDate
+					for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
+						r.resetSyncState()
 					}
 				}
 				settingsChangedTimer.push()
@@ -317,9 +360,8 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 				Settings.showLabels = !Settings.showLabels
 				api.resetAllLabelChecks()
 				if Settings.showLabels {
-					for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as [Repo] {
-						r.dirty = true
-						r.lastDirtied = NSDate.distantPast() as? NSDate
+					for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
+						r.resetSyncState()
 					}
 				}
 				settingsChangedTimer.push()
@@ -394,9 +436,9 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 				tableView.reloadData()
 				if Settings.logActivityToConsole {
 					UIAlertView(title: "Warning",
-					message: "Logging is a feature meant for error reporting, having it constantly enabled will cause this app to be less responsive and use more battery",
-					delegate: nil,
-					cancelButtonTitle: "OK").show()
+						message: "Logging is a feature meant to aid error reporting, having it constantly enabled will cause this app to be less responsive and use more battery",
+						delegate: nil,
+						cancelButtonTitle: "OK").show()
 				}
 			default: break
 			}
@@ -455,6 +497,76 @@ class AdvancedSettingsViewController: UITableViewController, PickerViewControlle
 			}
 			tableView.reloadData()
 			selectedIndexPath = nil
+		}
+	}
+
+	/////////////////// Import / Export
+
+	private var tempUrl: NSURL?
+
+	@IBAction func importExportSelected(sender: UIBarButtonItem) {
+		let a = UIActionSheet(title: "Action",
+			delegate:self,
+			cancelButtonTitle: "Cancel",
+			destructiveButtonTitle: "Import New Settings",
+			otherButtonTitles: "Export Settings")
+		a.showFromBarButtonItem(sender, animated: true)
+	}
+
+	func actionSheet(actionSheet: UIActionSheet, didDismissWithButtonIndex buttonIndex: Int) {
+		if buttonIndex==0 {
+			importSelected()
+		} else if buttonIndex==2 {
+			exportSelected()
+		}
+	}
+
+	private func importSelected() {
+		tempUrl = nil
+
+		let menu = UIDocumentPickerViewController(documentTypes: ["com.housetrip.mobile.trailer.ios.settings"], inMode: UIDocumentPickerMode.Import)
+		menu.delegate = self
+		popupManager.showPopoverFromViewController(self, fromItem: importExportButton, viewController: menu)
+	}
+
+	private func exportSelected() {
+		let tempFilePath = NSTemporaryDirectory().stringByAppendingPathComponent("PocketTrailer Settings.trailerSettings")
+		tempUrl = NSURL(fileURLWithPath: tempFilePath)!
+		Settings.writeToURL(tempUrl!)
+
+		let menu = UIDocumentPickerViewController(URL: tempUrl!, inMode: UIDocumentPickerMode.ExportToService)
+		menu.delegate = self
+		popupManager.showPopoverFromViewController(self, fromItem: importExportButton, viewController: menu)
+	}
+
+	func documentPicker(controller: UIDocumentPickerViewController, didPickDocumentAtURL url: NSURL) {
+		if tempUrl == nil {
+			DLog("Will import settings from %@", url.absoluteString)
+			settingsManager.loadSettingsFrom(url, confirmFromView: self) { [weak self] confirmed in
+				if confirmed {
+					self!.dismissViewControllerAnimated(false, completion: nil)
+				}
+				self!.documentInteractionCleanup()
+			}
+		} else {
+			DLog("Saved settings to %@", url.absoluteString)
+			documentInteractionCleanup()
+		}
+	}
+
+	func documentPickerWasCancelled(controller: UIDocumentPickerViewController) {
+		DLog("Document picker cancelled")
+		documentInteractionCleanup()
+	}
+
+	func documentInteractionCleanup() {
+		if let t = tempUrl {
+			var error: NSError?
+			NSFileManager.defaultManager().removeItemAtURL(t, error: &error)
+			if error != nil {
+				DLog("Temporary file cleanup error: %@", error!)
+			}
+			tempUrl = nil
 		}
 	}
 }

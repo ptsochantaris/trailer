@@ -1,14 +1,13 @@
 
 var app: OSX_AppDelegate!
 
-class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUserNotificationCenterDelegate, NSTableViewDelegate, NSTableViewDataSource, NSTabViewDelegate {
+final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUserNotificationCenterDelegate, NSTableViewDelegate, NSTableViewDataSource, NSTabViewDelegate, NSOpenSavePanelDelegate {
 
 	// Preferences window
 	@IBOutlet weak var preferencesWindow: NSWindow!
 	@IBOutlet weak var refreshButton: NSButton!
 	@IBOutlet weak var activityDisplay: NSProgressIndicator!
 	@IBOutlet weak var projectsTable: NSTableView!
-	@IBOutlet weak var refreshNow: NSMenuItem!
 	@IBOutlet weak var versionNumber: NSTextField!
 	@IBOutlet weak var launchAtStartup: NSButton!
 	@IBOutlet weak var refreshDurationLabel: NSTextField!
@@ -21,7 +20,6 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	@IBOutlet weak var showCreationDates: NSButton!
 	@IBOutlet weak var dontKeepPrsMergedByMe: NSButton!
 	@IBOutlet weak var hideAvatars: NSButton!
-	@IBOutlet weak var autoParticipateWhenMentioned: NSButton!
 	@IBOutlet weak var dontConfirmRemoveAllMerged: NSButton!
 	@IBOutlet weak var dontConfirmRemoveAllClosed: NSButton!
 	@IBOutlet weak var displayRepositoryNames: NSButton!
@@ -56,12 +54,15 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	
     // Preferences - Comments
     @IBOutlet weak var disableAllCommentNotifications: NSButton!
+	@IBOutlet weak var autoParticipateOnTeamMentions: NSButton!
+	@IBOutlet weak var autoParticipateWhenMentioned: NSButton!
 
 	// Preferences - Display
 	@IBOutlet weak var useVibrancy: NSButton!
 	@IBOutlet weak var includeLabelsInFiltering: NSButton!
 	@IBOutlet weak var includeStatusesInFiltering: NSButton!
     @IBOutlet weak var grayOutWhenRefreshing: NSButton!
+	@IBOutlet weak var showIssuesMenu: NSButton!
 
 	// Preferences - Labels
 	@IBOutlet weak var labelRescanLabel: NSTextField!
@@ -80,7 +81,11 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	@IBOutlet weak var apiServerDeleteButton: NSButton!
 	@IBOutlet weak var apiServerReportError: NSButton!
 
-	// Keyboard
+	// Preferences - Misc
+	@IBOutlet weak var repeatLastExportAutomatically: NSButton!
+	@IBOutlet weak var lastExportReport: NSTextField!
+
+	// Preferences - Keyboard
 	@IBOutlet weak var hotkeyEnable: NSButton!
 	@IBOutlet weak var hotkeyCommandModifier: NSButton!
 	@IBOutlet weak var hotkeyOptionModifier: NSButton!
@@ -90,75 +95,90 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	@IBOutlet weak var hotKeyContainer: NSBox!
 	@IBOutlet weak var hotkeyControlModifier: NSButton!
 
-	// About window
-	@IBOutlet weak var aboutVersion: NSTextField!
-	
 	// Menu
-	var statusItem: NSStatusItem!
-	@IBOutlet weak var mainMenu: MenuWindow!
+	static let prMenuController = NSWindowController(windowNibName:"MenuWindow")
+	static let issuesMenuController = NSWindowController(windowNibName:"MenuWindow")
+	let prMenu = prMenuController.window as! MenuWindow
+	let issuesMenu = issuesMenuController.window as! MenuWindow
 
 	// Globals
 	weak var refreshTimer: NSTimer?
-	var lastSuccessfulRefresh: NSDate?
-	var lastRepoCheck = NSDate.distantPast() as NSDate
+	var lastRepoCheck = never()
 	var preferencesDirty: Bool = false
 	var isRefreshing: Bool = false
 	var isManuallyScrolling: Bool = false
 	var ignoreNextFocusLoss: Bool = false
 	var scrollBarWidth: CGFloat = 0.0
 	var pullRequestDelegate = PullRequestDelegate()
+	var issuesDelegate = IssuesDelegate()
 	var opening: Bool  = false
 
 	private var globalKeyMonitor: AnyObject?
 	private var localKeyMonitor: AnyObject?
-	private var messageView: NSView?
 	private var mouseIgnoreTimer: PopTimer!
-	private var filterTimer: PopTimer!
+	private var prFilterTimer: PopTimer!
+	private var issuesFilterTimer: PopTimer!
 	private var deferredUpdateTimer: PopTimer!
 
 	func applicationDidFinishLaunching(notification: NSNotification) {
 		app = self
 
-		mainMenu.backgroundColor = NSColor.whiteColor()
+		setupDarkModeMonitoring()
+
 		setupSortMethodMenu()
-		DataManager.postProcessAllPrs()
+		DataManager.postProcessAllItems()
 
-		filterTimer = PopTimer(timeInterval: 0.2, callback: {
-			app.updateMenu()
-			app.scrollToTop()
-		})
+		prFilterTimer = PopTimer(timeInterval: 0.2) {
+			app.updatePrMenu()
+			app.prMenu.scrollToTop()
+		}
 
-		deferredUpdateTimer = PopTimer(timeInterval: 0.5, callback: {
-			app.updateMenu()
-		})
+		issuesFilterTimer = PopTimer(timeInterval: 0.2) {
+			app.updateIssuesMenu()
+			app.issuesMenu.scrollToTop()
+		}
 
-		mouseIgnoreTimer = PopTimer(timeInterval: 0.4, callback: {
+		deferredUpdateTimer = PopTimer(timeInterval: 0.5) {
+			app.updatePrMenu()
+			app.updateIssuesMenu()
+		}
+
+		mouseIgnoreTimer = PopTimer(timeInterval: 0.4) {
 			app.isManuallyScrolling = false
-		})
+		}
 
-		mainMenu.prTable.setDataSource(pullRequestDelegate)
-		mainMenu.prTable.setDelegate(pullRequestDelegate)
+		prMenu.table.setDataSource(pullRequestDelegate)
+		prMenu.table.setDelegate(pullRequestDelegate)
+		prMenu.delegate = self
+
+		issuesMenu.table.setDataSource(issuesDelegate)
+		issuesMenu.table.setDelegate(issuesDelegate)
+		issuesMenu.delegate = self
 
 		updateScrollBarWidth() // also updates menu
-		scrollToTop()
-		mainMenu.updateVibrancy()
+		prMenu.scrollToTop()
+		issuesMenu.scrollToTop()
+		prMenu.updateVibrancy()
+		issuesMenu.updateVibrancy()
 		startRateLimitHandling()
 
 		NSUserNotificationCenter.defaultUserNotificationCenter().delegate = self
 
-        var buildNumber = NSBundle.mainBundle().infoDictionary!["CFBundleVersion"] as String
+        var buildNumber = NSBundle.mainBundle().infoDictionary!["CFBundleVersion"] as! String
 		let cav = "Version \(currentAppVersion) (\(buildNumber))"
 		versionNumber.stringValue = cav
-		aboutVersion.stringValue = cav
 
 		if ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
 			startRefresh()
+		} else if ApiServer.countApiServersInMoc(mainObjectContext) == 1, let a = ApiServer.allApiServersInMoc(mainObjectContext).first where a.authToken == nil || a.authToken!.isEmpty {
+			startupAssistant()
 		} else {
-			preferencesSelected(nil)
+			preferencesSelected()
 		}
 
-		NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("updateScrollBarWidth"), name: NSPreferredScrollerStyleDidChangeNotification, object: nil)
-		NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("updateMenu"), name: DARK_MODE_CHANGED, object: nil)
+		let n = NSNotificationCenter.defaultCenter()
+		n.addObserver(self, selector: Selector("updateScrollBarWidth"), name: NSPreferredScrollerStyleDidChangeNotification, object: nil)
+		n.addObserver(self, selector: Selector("updateImportExportSettings"), name: SETTINGS_EXPORTED, object: nil)
 
 		addHotKeySupport()
 
@@ -184,19 +204,14 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		sortModeSelect.selectItemAtIndex(Settings.sortMethod)
 	}
 
-	private func deferredUpdate() {
-		deferredUpdateTimer.push()
-	}
-
 	@IBAction func showLabelsSelected(sender: NSButton) {
 		Settings.showLabels = (sender.integerValue==1)
-		deferredUpdate()
+		deferredUpdateTimer.push()
 		updateLabelOptions()
 		api.resetAllLabelChecks()
 		if Settings.showLabels {
-			for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as [Repo] {
-				r.dirty = true
-				r.lastDirtied = NSDate.distantPast() as? NSDate
+			for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
+				r.resetSyncState()
 			}
 			preferencesDirty = true
 		}
@@ -208,33 +223,39 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	@IBAction func hideAllPrsSection(sender: NSButton) {
 		Settings.hideAllPrsSection = (sender.integerValue==1)
-		DataManager.postProcessAllPrs()
-		deferredUpdate()
+		DataManager.postProcessAllItems()
+		deferredUpdateTimer.push()
 	}
 
 	@IBAction func markUnmergeableOnUserSectionsOnlySelected(sender: NSButton) {
 		Settings.markUnmergeableOnUserSectionsOnly = (sender.integerValue==1)
-		deferredUpdate()
+		deferredUpdateTimer.push()
 	}
 
 	@IBAction func displayRepositoryNameSelected(sender: NSButton) {
 		Settings.showReposInName = (sender.integerValue==1)
-		deferredUpdate()
+		deferredUpdateTimer.push()
 	}
 
 	@IBAction func useVibrancySelected(sender: NSButton) {
 		Settings.useVibrancy = (sender.integerValue==1)
-		NSNotificationCenter.defaultCenter().postNotificationName(UPDATE_VIBRANCY_NOTIFICATION, object: nil)
+		prMenu.updateVibrancy()
+		issuesMenu.updateVibrancy()
 	}
 
 	@IBAction func logActivityToConsoleSelected(sender: NSButton) {
 		Settings.logActivityToConsole = (sender.integerValue==1)
+		logActivityToConsole.integerValue = Settings.logActivityToConsole ? 1 : 0
 		if Settings.logActivityToConsole {
 			let alert = NSAlert()
 			alert.messageText = "Warning"
+			#if DEBUG
+			alert.informativeText = "Sorry, logging is always active in development versions"
+			#else
 			alert.informativeText = "Logging is a feature meant for error reporting, having it constantly enabled will cause this app to be less responsive and use more power"
+			#endif
 			alert.addButtonWithTitle("OK")
-			alert.runModal()
+			alert.beginSheetModalForWindow(preferencesWindow, completionHandler: nil)
 		}
 	}
 
@@ -256,8 +277,14 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	@IBAction func autoParticipateOnMentionSelected(sender: NSButton) {
 		Settings.autoParticipateInMentions = (sender.integerValue==1)
-		DataManager.postProcessAllPrs()
-		deferredUpdate()
+		DataManager.postProcessAllItems()
+		deferredUpdateTimer.push()
+	}
+
+	@IBAction func autoParticipateOnTeamMentionSelected(sender: NSButton) {
+		Settings.autoParticipateOnTeamMentions = (sender.integerValue==1)
+		DataManager.postProcessAllItems()
+		deferredUpdateTimer.push()
 	}
 
 	@IBAction func dontKeepMyPrsSelected(sender: NSButton) {
@@ -282,33 +309,50 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	@IBAction func hideAvatarsSelected(sender: NSButton) {
 		Settings.hideAvatars = (sender.integerValue==1)
-		DataManager.postProcessAllPrs()
-		deferredUpdate()
+		DataManager.postProcessAllItems()
+		deferredUpdateTimer.push()
+	}
+
+	@IBAction func showIssuesMenuSelected(sender: NSButton) {
+		Settings.showIssuesMenu = (sender.integerValue==1)
+		DataManager.postProcessAllItems()
+		if Settings.showIssuesMenu {
+			for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
+				r.resetSyncState()
+			}
+			preferencesDirty = true
+		} else {
+			for i in DataItem.allItemsOfType("Issue", inMoc: mainObjectContext) as! [Issue] {
+				i.postSyncAction = PostSyncAction.Delete.rawValue
+			}
+			DataItem.nukeDeletedItemsInMoc(mainObjectContext)
+		}
+		deferredUpdateTimer.push()
 	}
 
 	@IBAction func hidePrsSelected(sender: NSButton) {
 		Settings.shouldHideUncommentedRequests = (sender.integerValue==1)
-		DataManager.postProcessAllPrs()
-		deferredUpdate()
+		DataManager.postProcessAllItems()
+		deferredUpdateTimer.push()
 	}
 
 	@IBAction func showAllCommentsSelected(sender: NSButton) {
 		Settings.showCommentsEverywhere = (sender.integerValue==1)
-		DataManager.postProcessAllPrs()
-		deferredUpdate()
+		DataManager.postProcessAllItems()
+		deferredUpdateTimer.push()
 	}
 
 	@IBAction func sortOrderSelected(sender: NSButton) {
 		Settings.sortDescending = (sender.integerValue==1)
 		setupSortMethodMenu()
-		DataManager.postProcessAllPrs()
-		deferredUpdate()
+		DataManager.postProcessAllItems()
+		deferredUpdateTimer.push()
 	}
 
 	@IBAction func countOnlyListedPrsSelected(sender: NSButton) {
 		Settings.countOnlyListedPrs = (sender.integerValue==1)
-		DataManager.postProcessAllPrs()
-		deferredUpdate()
+		DataManager.postProcessAllItems()
+		deferredUpdateTimer.push()
 	}
 
 	@IBAction func hideNewRespositoriesSelected(sender: NSButton) {
@@ -321,20 +365,19 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	@IBAction func sortMethodChanged(sender: AnyObject) {
 		Settings.sortMethod = sortModeSelect.indexOfSelectedItem
-		DataManager.postProcessAllPrs()
-		deferredUpdate()
+		DataManager.postProcessAllItems()
+		deferredUpdateTimer.push()
 	}
 
 	@IBAction func showStatusItemsSelected(sender: NSButton) {
 		Settings.showStatusItems = (sender.integerValue==1)
-		deferredUpdate()
+		deferredUpdateTimer.push()
 		updateStatusItemsOptions()
 
 		api.resetAllStatusChecks()
 		if Settings.showStatusItems {
-			for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as [Repo] {
-				r.dirty = true
-				r.lastDirtied = NSDate.distantPast() as? NSDate
+			for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
+				r.resetSyncState()
 			}
 			preferencesDirty = true
 		}
@@ -379,24 +422,24 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	@IBAction func makeStatusItemsSelectableSelected(sender: NSButton) {
 		Settings.makeStatusItemsSelectable = (sender.integerValue==1)
-		deferredUpdate()
+		deferredUpdateTimer.push()
 	}
 
 	@IBAction func showCreationSelected(sender: NSButton) {
 		Settings.showCreatedInsteadOfUpdated = (sender.integerValue==1)
-		DataManager.postProcessAllPrs()
-		deferredUpdate()
+		DataManager.postProcessAllItems()
+		deferredUpdateTimer.push()
 	}
 
 	@IBAction func groupbyRepoSelected(sender: NSButton) {
 		Settings.groupByRepo = (sender.integerValue==1)
-		deferredUpdate()
+		deferredUpdateTimer.push()
 	}
 
 	@IBAction func moveAssignedPrsToMySectionSelected(sender: NSButton) {
 		Settings.moveAssignedPrsToMySection = (sender.integerValue==1)
-		DataManager.postProcessAllPrs()
-		deferredUpdate()
+		DataManager.postProcessAllItems()
+		deferredUpdateTimer.push()
 	}
 
 	@IBAction func checkForUpdatesAutomaticallySelected(sender: NSButton) {
@@ -425,10 +468,6 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		StartupLaunch.setLaunchOnLogin(sender.integerValue==1)
 	}
 
-	@IBAction func aboutLinkSelected(sender: NSButton) {
-		NSWorkspace.sharedWorkspace().openURL(NSURL(string: "https://github.com/ptsochantaris/trailer")!)
-	}
-
 	func userNotificationCenter(center: NSUserNotificationCenter, shouldPresentNotification notification: NSUserNotification) -> Bool {
 		return true
 	}
@@ -437,31 +476,37 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		switch notification.activationType {
 		case NSUserNotificationActivationType.ActionButtonClicked: fallthrough
 		case NSUserNotificationActivationType.ContentsClicked:
-			NSUserNotificationCenter.defaultUserNotificationCenter().removeDeliveredNotification(notification)
-			var urlToOpen = notification.userInfo?[NOTIFICATION_URL_KEY] as? String
-			if urlToOpen == nil {
-				var pullRequest: PullRequest?
-				if let itemId = DataManager.idForUriPath(notification.userInfo?[PULL_REQUEST_ID_KEY] as? String) {
-					// it's a pull request
-					pullRequest = mainObjectContext.existingObjectWithID(itemId, error: nil) as? PullRequest
-					urlToOpen = pullRequest?.webUrl
-				} else if let itemId = DataManager.idForUriPath(notification.userInfo?[COMMENT_ID_KEY] as? String) {
-					// it's a comment
-					if let c = mainObjectContext.existingObjectWithID(itemId, error: nil) as? PRComment {
-						pullRequest = c.pullRequest
+			if let userInfo = notification.userInfo {
+				var urlToOpen = userInfo[NOTIFICATION_URL_KEY] as? String
+				if urlToOpen == nil {
+					var relatedItem: ListableItem?
+					if let itemId = DataManager.idForUriPath(userInfo[COMMENT_ID_KEY] as? String), c = mainObjectContext.existingObjectWithID(itemId, error: nil) as? PRComment {
+						relatedItem = c.pullRequest ?? c.issue
 						urlToOpen = c.webUrl
+					} else if let itemId = DataManager.idForUriPath(userInfo[PULL_REQUEST_ID_KEY] as? String) {
+						relatedItem = mainObjectContext.existingObjectWithID(itemId, error: nil) as? ListableItem
+						urlToOpen = relatedItem?.webUrl
+					} else if let itemId = DataManager.idForUriPath(userInfo[ISSUE_ID_KEY] as? String) {
+						relatedItem = mainObjectContext.existingObjectWithID(itemId, error: nil) as? ListableItem
+						urlToOpen = relatedItem?.webUrl
+					}
+					if let r = relatedItem {
+						r.catchUpWithComments()
+						DataManager.saveDB()
+						if r is PullRequest {
+							updatePrMenu()
+						} else if r is Issue {
+							updateIssuesMenu()
+						}
 					}
 				}
-				pullRequest?.catchUpWithComments()
-			}
-			if let up = urlToOpen {
-				if let u = NSURL(string: up) {
+				if let up = urlToOpen, u = NSURL(string: up) {
 					NSWorkspace.sharedWorkspace().openURL(u)
-					updateMenu()
 				}
 			}
 		default: break
 		}
+		NSUserNotificationCenter.defaultUserNotificationCenter().removeDeliveredNotification(notification)
 	}
 
 	func postNotificationOfType(type: PRNotificationType, forItem: DataItem) {
@@ -474,191 +519,242 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 		switch type {
 		case .NewMention:
-			let c = forItem as PRComment
+			let c = forItem as! PRComment
 			notification.title = "@" + (c.userName ?? "NoUserName") + " mentioned you:"
-			notification.subtitle = c.pullRequest.title
+			notification.subtitle = c.notificationSubtitle()
 			notification.informativeText = c.body
 		case .NewComment:
-			let c = forItem as PRComment
+			let c = forItem as! PRComment
 			notification.title = "@" + (c.userName ?? "NoUserName") + " commented:"
-			notification.subtitle = c.pullRequest.title
+			notification.subtitle = c.notificationSubtitle()
 			notification.informativeText = c.body
 		case .NewPr:
 			notification.title = "New PR"
-			notification.subtitle = (forItem as PullRequest).title
+			notification.subtitle = (forItem as! PullRequest).title
 		case .PrReopened:
 			notification.title = "Re-Opened PR"
-			notification.subtitle = (forItem as PullRequest).title
+			notification.subtitle = (forItem as! PullRequest).title
 		case .PrMerged:
 			notification.title = "PR Merged!"
-			notification.subtitle = (forItem as PullRequest).title
+			notification.subtitle = (forItem as! PullRequest).title
 		case .PrClosed:
 			notification.title = "PR Closed"
-			notification.subtitle = (forItem as PullRequest).title
+			notification.subtitle = (forItem as! PullRequest).title
 		case .NewRepoSubscribed:
 			notification.title = "New Repository Subscribed"
-			notification.subtitle = (forItem as Repo).fullName
+			notification.subtitle = (forItem as! Repo).fullName
 		case .NewRepoAnnouncement:
 			notification.title = "New Repository"
-			notification.subtitle = (forItem as Repo).fullName
+			notification.subtitle = (forItem as! Repo).fullName
 		case .NewPrAssigned:
 			notification.title = "PR Assigned"
-			notification.subtitle = (forItem as PullRequest).title
+			notification.subtitle = (forItem as! PullRequest).title
 		case .NewStatus:
-			let c = forItem as PRStatus
-			notification.title = "New PR Status"
+			let c = forItem as! PRStatus
+			notification.title = "PR Status Update"
 			notification.subtitle = c.pullRequest.title
 			notification.informativeText = c.descriptionText
+		case .NewIssue:
+			notification.title = "New Issue"
+			notification.subtitle = (forItem as! Issue).title
+		case .IssueReopened:
+			notification.title = "Re-Opened Issue"
+			notification.subtitle = (forItem as! Issue).title
+		case .IssueClosed:
+			notification.title = "Issue Closed"
+			notification.subtitle = (forItem as! Issue).title
+		case .NewIssueAssigned:
+			notification.title = "Issue Assigned"
+			notification.subtitle = (forItem as! Issue).title
 		}
 
-		if (type == .NewComment || type == .NewMention) && !Settings.hideAvatars && notification.respondsToSelector(Selector("setContentImage:")) { // let's add an avatar on this!
-			if let url = (forItem as PRComment).avatarUrl {
-				api.haveCachedAvatar(url, tryLoadAndCallback: { image in
+		if (type == .NewComment || type == .NewMention) && !Settings.hideAvatars && notification.respondsToSelector(Selector("setContentImage:")) {
+			if let url = (forItem as! PRComment).avatarUrl {
+				api.haveCachedAvatar(url) { image in
 					notification.contentImage = image
 					NSUserNotificationCenter.defaultUserNotificationCenter().deliverNotification(notification)
-				})
+				}
 			}
 		} else { // proceed as normal
 			NSUserNotificationCenter.defaultUserNotificationCenter().deliverNotification(notification)
 		}
 	}
 
-	func prItemSelected(pullRequest: PullRequest, alternativeSelect: Bool) {
-		mainMenu.filter.becomeFirstResponder()
+	func dataItemSelected(item: ListableItem, alternativeSelect: Bool) {
+
 		ignoreNextFocusLoss = alternativeSelect
 
-		if let url = pullRequest.urlForOpening() {
-			NSWorkspace.sharedWorkspace().openURL(NSURL(string: url)!)
+		var urlToOpen = item.urlForOpening()
+		item.catchUpWithComments()
+
+		var window: MenuWindow
+
+		if item is PullRequest {
+			updatePrMenu()
+			window = prMenu
+		} else {
+			updateIssuesMenu()
+			window = issuesMenu
 		}
-		pullRequest.catchUpWithComments()
 
-		let reSelectIndex = alternativeSelect ? mainMenu.prTable.selectedRow : -1
+		let reSelectIndex = alternativeSelect ? window.table.selectedRow : -1
+		window.filter.becomeFirstResponder()
 
-		updateMenu()
+		if reSelectIndex > -1 && reSelectIndex < window.table.numberOfRows {
+			window.table.selectRowIndexes(NSIndexSet(index: reSelectIndex), byExtendingSelection: false)
+		}
 
-		if reSelectIndex > -1 && reSelectIndex < mainMenu.prTable.numberOfRows {
-			mainMenu.prTable.selectRowIndexes(NSIndexSet(index: reSelectIndex), byExtendingSelection: false)
+		if let u = urlToOpen {
+			NSWorkspace.sharedWorkspace().openURL(NSURL(string: u)!)
 		}
 	}
 
-	func statusItemTapped() {
-		let v = statusItem.view as StatusItemView
-		if v.highlighted {
-			closeMenu()
-		} else {
+	func showMenu(menu: MenuWindow) {
+		if !menu.visible, let v = menu.statusItem?.view as? StatusItemView {
+			if menu == prMenu && issuesMenu.visible {
+				closeMenu(issuesMenu)
+			} else if menu == issuesMenu && prMenu.visible {
+				closeMenu(prMenu)
+			}
 			v.highlighted = true
-			sizeMenuAndShow(true)
+			sizeMenu(menu, andShow: true)
 		}
 	}
 
-	func menuWillOpen(menu: NSMenu) {
-		if menu.title == "Options" {
-			if !isRefreshing {
-				refreshNow.title = " Refresh - " + api.lastUpdateDescription()
+	private func setRefreshLabel(l: String) {
+		prMenu.refreshMenuItem.title = l
+		issuesMenu.refreshMenuItem.title = l
+	}
+
+	private func sizeMenu(window: MenuWindow, andShow: Bool) {
+
+		if let siv = window.statusItem?.view as? StatusItemView {
+			var menuLeft = siv.window!.frame.origin.x
+			let screen = NSScreen.mainScreen()!
+			let rightSide = screen.visibleFrame.origin.x + screen.visibleFrame.size.width
+			let overflow = (menuLeft+MENU_WIDTH)-rightSide
+			if overflow > 0 {
+				menuLeft -= overflow
 			}
-		}
-	}
 
-	private func sizeMenuAndShow(show: Bool) {
-		let screen = NSScreen.mainScreen()!
-		let rightSide = screen.visibleFrame.origin.x + screen.visibleFrame.size.width
-		let siv = statusItem.view as StatusItemView
-		var menuLeft = siv.window!.frame.origin.x
-		let overflow = (menuLeft+MENU_WIDTH)-rightSide
-		if overflow>0 {
-			menuLeft -= overflow
-		}
-
-		var menuHeight = TOP_HEADER_HEIGHT
-		let rowCount = mainMenu.prTable.numberOfRows
-		let screenHeight = screen.visibleFrame.size.height
-		if rowCount==0 {
-			menuHeight += 95
-		} else {
-			menuHeight += 10
-			for f in 0..<rowCount {
-				let rowView = mainMenu.prTable.viewAtColumn(0, row: f, makeIfNecessary: true) as NSView
-				menuHeight += rowView.frame.size.height + 2
-				if menuHeight >= screenHeight {
-					break
+			var menuHeight = TOP_HEADER_HEIGHT
+			let rowCount = window.table.numberOfRows
+			let screenHeight = screen.visibleFrame.size.height
+			if rowCount==0 {
+				menuHeight += 95
+			} else {
+				menuHeight += 10
+				for f in 0..<rowCount {
+					let rowView = window.table.viewAtColumn(0, row: f, makeIfNecessary: true) as! NSView
+					menuHeight += rowView.frame.size.height + 2
+					if menuHeight >= screenHeight {
+						break
+					}
 				}
 			}
-		}
 
-		var bottom = screen.visibleFrame.origin.y
-		if menuHeight < screenHeight {
-			bottom += screenHeight-menuHeight
-		} else {
-			menuHeight = screenHeight
-		}
-
-		mainMenu.setFrame(CGRectMake(menuLeft, bottom, MENU_WIDTH, menuHeight), display: false, animate: false)
-
-		if show {
-			mainMenu.prTable.deselectAll(nil)
-			displayMenu()
-		}
-	}
-
-	private func displayMenu() {
-		opening = true
-		mainMenu.level = Int(CGWindowLevelForKey(CGWindowLevelKey(kCGFloatingWindowLevelKey)))
-		mainMenu.makeKeyAndOrderFront(self)
-		NSApp.activateIgnoringOtherApps(true)
-		opening = false
-	}
-
-	private func closeMenu() {
-		let siv = statusItem.view as StatusItemView
-		siv.highlighted = false
-		mainMenu.orderOut(nil)
-		mainMenu.prTable.deselectAll(nil)
-	}
-
-	func sectionHeaderRemoveSelected(headerTitle: NSString) {
-		if headerTitle == PullRequestSection.Merged.name() {
-			if Settings.dontAskBeforeWipingMerged {
-				removeAllMergedRequests()
+			var bottom = screen.visibleFrame.origin.y
+			if menuHeight < screenHeight {
+				bottom += screenHeight-menuHeight
 			} else {
-				let mergedRequests = PullRequest.allMergedRequestsInMoc(mainObjectContext)
+				menuHeight = screenHeight
+			}
 
-				let alert = NSAlert()
-				alert.messageText = "Clear \(mergedRequests.count) merged PRs?"
-				alert.informativeText = "This will clear \(mergedRequests.count) merged PRs from your list.  This action cannot be undone, are you sure?"
-				alert.addButtonWithTitle("No")
-				alert.addButtonWithTitle("Yes")
-				alert.showsSuppressionButton = true
+			window.setFrame(CGRectMake(menuLeft, bottom, MENU_WIDTH, menuHeight), display: false, animate: false)
 
-				if alert.runModal()==NSAlertSecondButtonReturn {
+			if andShow {
+				window.table.deselectAll(nil)
+				opening = true
+				window.level = Int(CGWindowLevelForKey(CGWindowLevelKey(kCGFloatingWindowLevelKey)))
+				window.makeKeyAndOrderFront(self)
+				NSApp.activateIgnoringOtherApps(true)
+				opening = false
+			}
+		}
+	}
+
+	private func closeMenu(menu: MenuWindow) {
+		if menu.visible, let siv = menu.statusItem?.view as? StatusItemView {
+			siv.highlighted = false
+			menu.orderOut(nil)
+			menu.table.deselectAll(nil)
+		}
+	}
+
+	func sectionHeaderRemoveSelected(headerTitle: String) {
+
+		let inMenu = prMenu.visible ? prMenu : issuesMenu
+
+		if inMenu == prMenu {
+			if headerTitle == PullRequestSection.Merged.prMenuName() {
+				if Settings.dontAskBeforeWipingMerged {
 					removeAllMergedRequests()
-					if alert.suppressionButton!.state == NSOnState {
-						Settings.dontAskBeforeWipingMerged = true
+				} else {
+					let mergedRequests = PullRequest.allMergedRequestsInMoc(mainObjectContext)
+
+					let alert = NSAlert()
+					alert.messageText = "Clear \(mergedRequests.count) merged PRs?"
+					alert.informativeText = "This will clear \(mergedRequests.count) merged PRs from your list.  This action cannot be undone, are you sure?"
+					alert.addButtonWithTitle("No")
+					alert.addButtonWithTitle("Yes")
+					alert.showsSuppressionButton = true
+
+					if alert.runModal()==NSAlertSecondButtonReturn {
+						removeAllMergedRequests()
+						if alert.suppressionButton!.state == NSOnState {
+							Settings.dontAskBeforeWipingMerged = true
+						}
 					}
 				}
-			}
-		} else if headerTitle == PullRequestSection.Closed.name() {
-			if Settings.dontAskBeforeWipingClosed {
-				removeAllClosedRequests()
-			} else {
-				let closedRequests = PullRequest.allClosedRequestsInMoc(mainObjectContext)
-
-				let alert = NSAlert()
-				alert.messageText = "Clear \(closedRequests.count) closed PRs?"
-				alert.informativeText = "This will clear \(closedRequests.count) closed PRs from your list.  This action cannot be undone, are you sure?"
-				alert.addButtonWithTitle("No")
-				alert.addButtonWithTitle("Yes")
-				alert.showsSuppressionButton = true
-
-				if alert.runModal()==NSAlertSecondButtonReturn {
+			} else if headerTitle == PullRequestSection.Closed.prMenuName() {
+				if Settings.dontAskBeforeWipingClosed {
 					removeAllClosedRequests()
-					if alert.suppressionButton!.state == NSOnState {
-						Settings.dontAskBeforeWipingClosed = true
+				} else {
+					let closedRequests = PullRequest.allClosedRequestsInMoc(mainObjectContext)
+
+					let alert = NSAlert()
+					alert.messageText = "Clear \(closedRequests.count) closed PRs?"
+					alert.informativeText = "This will remove \(closedRequests.count) closed PRs from your list.  This action cannot be undone, are you sure?"
+					alert.addButtonWithTitle("No")
+					alert.addButtonWithTitle("Yes")
+					alert.showsSuppressionButton = true
+
+					if alert.runModal()==NSAlertSecondButtonReturn {
+						removeAllClosedRequests()
+						if alert.suppressionButton!.state == NSOnState {
+							Settings.dontAskBeforeWipingClosed = true
+						}
 					}
 				}
 			}
-		}
-		if !mainMenu.visible {
-			statusItemTapped()
+			if !prMenu.visible {
+				showMenu(prMenu)
+			}
+		} else if inMenu == issuesMenu {
+			if headerTitle == PullRequestSection.Closed.issuesMenuName() {
+				if Settings.dontAskBeforeWipingClosed {
+					removeAllClosedIssues()
+				} else {
+					let closedIssues = Issue.allClosedIssuesInMoc(mainObjectContext)
+
+					let alert = NSAlert()
+					alert.messageText = "Clear \(closedIssues.count) closed issues?"
+					alert.informativeText = "This will remove \(closedIssues.count) closed issues from your list.  This action cannot be undone, are you sure?"
+					alert.addButtonWithTitle("No")
+					alert.addButtonWithTitle("Yes")
+					alert.showsSuppressionButton = true
+
+					if alert.runModal()==NSAlertSecondButtonReturn {
+						removeAllClosedIssues()
+						if alert.suppressionButton!.state == NSOnState {
+							Settings.dontAskBeforeWipingClosed = true
+						}
+					}
+				}
+			}
+			if !issuesMenu.visible {
+				showMenu(issuesMenu)
+			}
 		}
 	}
 
@@ -667,7 +763,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 			mainObjectContext.deleteObject(r)
 		}
 		DataManager.saveDB()
-		updateMenu()
+		updatePrMenu()
 	}
 
 	private func removeAllClosedRequests() {
@@ -675,13 +771,25 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 			mainObjectContext.deleteObject(r)
 		}
 		DataManager.saveDB()
-		updateMenu()
+		updatePrMenu()
 	}
 
-	func unPinSelectedFor(pullRequest: PullRequest) {
-		mainObjectContext.deleteObject(pullRequest)
+	private func removeAllClosedIssues() {
+		for i in Issue.allClosedIssuesInMoc(mainObjectContext) {
+			mainObjectContext.deleteObject(i)
+		}
 		DataManager.saveDB()
-		updateMenu()
+		updateIssuesMenu()
+	}
+
+	func unPinSelectedFor(item: DataItem) {
+		mainObjectContext.deleteObject(item)
+		DataManager.saveDB()
+		if item is PullRequest {
+			updatePrMenu()
+		} else if item is Issue {
+			updateIssuesMenu()
+		}
 	}
 
 	private func startRateLimitHandling() {
@@ -694,7 +802,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		controlTextDidChange(nil)
 
 		let tempContext = DataManager.tempContext()
-		api.fetchRepositoriesToMoc(tempContext, callback: { [weak self] in
+		api.fetchRepositoriesToMoc(tempContext) { [weak self] in
 
 			if ApiServer.shouldReportRefreshFailureInMoc(tempContext) {
 				var errorServers = [String]()
@@ -715,7 +823,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 				tempContext.save(nil)
 			}
 			self!.completeRefresh()
-		})
+		}
 	}
 
 	private func selectedServer() -> ApiServer? {
@@ -726,25 +834,14 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		return nil
 	}
 
-	private func indexOfObject(array: [AnyObject], _ value: AnyObject) -> Int? {
-		for (index, element) in enumerate(array) {
-			if element === value {
-				return index
-			}
-		}
-		return nil
-	}
-
 	@IBAction func deleteSelectedServerSelected(sender: NSButton) {
-		if let selectedServer = selectedServer() {
-			if let index = indexOfObject(ApiServer.allApiServersInMoc(mainObjectContext), selectedServer) {
-				mainObjectContext.deleteObject(selectedServer)
-				serverList.reloadData()
-				serverList.selectRowIndexes(NSIndexSet(index: min(index, serverList.numberOfRows-1)), byExtendingSelection: false)
-				fillServerApiFormFromSelectedServer()
-				deferredUpdate()
-				DataManager.saveDB()
-			}
+		if let selectedServer = selectedServer(), index = indexOfObject(ApiServer.allApiServersInMoc(mainObjectContext), selectedServer) {
+			mainObjectContext.deleteObject(selectedServer)
+			serverList.reloadData()
+			serverList.selectRowIndexes(NSIndexSet(index: min(index, serverList.numberOfRows-1)), byExtendingSelection: false)
+			fillServerApiFormFromSelectedServer()
+			deferredUpdateTimer.push()
+			DataManager.saveDB()
 		}
 	}
 
@@ -783,18 +880,20 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 				}
 			} else if obj===repoFilter {
 				projectsTable.reloadData()
-			} else if obj===mainMenu.filter {
-				filterTimer.push()
+			} else if obj===prMenu.filter {
+				prFilterTimer.push()
+			} else if obj===issuesMenu.filter {
+				issuesFilterTimer.push()
 			} else if obj===statusTermsField {
 				let existingTokens = Settings.statusFilteringTerms
-				let newTokens = statusTermsField.objectValue as [String]
+				let newTokens = statusTermsField.objectValue as! [String]
 				if existingTokens != newTokens {
 					Settings.statusFilteringTerms = newTokens
-					deferredUpdate()
+					deferredUpdateTimer.push()
 				}
 			} else if obj===commentAuthorBlacklist {
 				let existingTokens = Settings.commentAuthorBlacklist
-				let newTokens = commentAuthorBlacklist.objectValue as [String]
+				let newTokens = commentAuthorBlacklist.objectValue as! [String]
 				if existingTokens != newTokens {
 					Settings.commentAuthorBlacklist = newTokens
 				}
@@ -806,26 +905,32 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		preferencesDirty = true
 		api.resetAllStatusChecks()
 		api.resetAllLabelChecks()
-		lastSuccessfulRefresh = nil
-		lastRepoCheck = NSDate.distantPast() as NSDate
+		Settings.lastSuccessfulRefresh = nil
+		lastRepoCheck = never()
 		projectsTable.reloadData()
 		refreshButton.enabled = ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext)
-		deferredUpdate()
+		deferredUpdateTimer.push()
 	}
 
-	@IBAction func markAllReadSelected(sender: NSMenuItem) {
-		let f = PullRequest.requestForPullRequestsWithFilter(mainMenu.filter.stringValue)
-		for r in mainObjectContext.executeFetchRequest(f, error: nil) as [PullRequest] {
-			r.catchUpWithComments()
+	func markAllReadSelectedFrom(window: MenuWindow) {
+		if window == prMenu {
+			let f = PullRequest.requestForPullRequestsWithFilter(prMenu.filter.stringValue, sectionIndex: -1)
+			for r in mainObjectContext.executeFetchRequest(f, error: nil) as! [PullRequest] {
+				r.catchUpWithComments()
+			}
+			updatePrMenu()
+		} else {
+			let isf = Issue.requestForIssuesWithFilter(issuesMenu.filter.stringValue, sectionIndex: -1)
+			for i in mainObjectContext.executeFetchRequest(isf, error: nil) as! [Issue] {
+				i.catchUpWithComments()
+			}
+			updateIssuesMenu()
 		}
-		updateMenu()
 	}
 
-	@IBAction func preferencesSelected(sender: NSMenuItem?) {
-		refreshTimer?.invalidate()
-		refreshTimer = nil
-
+	private func preparePreferencesWindow() {
 		serverList.selectRowIndexes(NSIndexSet(index: 0), byExtendingSelection: false)
+		fillServerApiFormFromSelectedServer()
 
 		api.updateLimitsFromServer()
 		updateStatusTermPreferenceControls()
@@ -845,12 +950,13 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		dontConfirmRemoveAllMerged.integerValue = Settings.dontAskBeforeWipingMerged ? 1 : 0
 		hideUncommentedPrs.integerValue = Settings.shouldHideUncommentedRequests ? 1 : 0
 		autoParticipateWhenMentioned.integerValue = Settings.autoParticipateInMentions ? 1 : 0
+		autoParticipateOnTeamMentions.integerValue = Settings.autoParticipateOnTeamMentions ? 1 : 0
 		hideAvatars.integerValue = Settings.hideAvatars ? 1 : 0
 		dontKeepPrsMergedByMe.integerValue = Settings.dontKeepPrsMergedByMe ? 1 : 0
-        grayOutWhenRefreshing.integerValue = Settings.grayOutWhenRefreshing ? 1 : 0
+		grayOutWhenRefreshing.integerValue = Settings.grayOutWhenRefreshing ? 1 : 0
 		notifyOnStatusUpdates.integerValue = Settings.notifyOnStatusUpdates ? 1 : 0
 		notifyOnStatusUpdatesForAllPrs.integerValue = Settings.notifyOnStatusUpdatesForAllPrs ? 1 : 0
-        disableAllCommentNotifications.integerValue = Settings.disableAllCommentNotifications ? 1 : 0
+		disableAllCommentNotifications.integerValue = Settings.disableAllCommentNotifications ? 1 : 0
 		showAllComments.integerValue = Settings.showCommentsEverywhere ? 1 : 0
 		sortingOrder.integerValue = Settings.sortDescending ? 1 : 0
 		showCreationDates.integerValue = Settings.showCreatedInsteadOfUpdated ? 1 : 0
@@ -865,6 +971,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		logActivityToConsole.integerValue = Settings.logActivityToConsole ? 1 : 0
 		showLabels.integerValue = Settings.showLabels ? 1 : 0
 		useVibrancy.integerValue = Settings.useVibrancy ? 1 : 0
+		showIssuesMenu.integerValue = Settings.showIssuesMenu ? 1 : 0
 
 		hotkeyEnable.integerValue = Settings.hotkeyEnable ? 1 : 0
 		hotkeyControlModifier.integerValue = Settings.hotkeyControlModifier ? 1 : 0
@@ -890,12 +997,122 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		refreshDurationStepper.floatValue = min(Settings.refreshPeriod, 3600)
 		refreshDurationChanged(nil)
 
+		projectsTable.reloadData()
+
+		updateImportExportSettings()
+	}
+
+	func preferencesSelected() {
+		refreshTimer?.invalidate()
+		refreshTimer = nil
+
+		preparePreferencesWindow()
+
 		preferencesWindow.level = Int(CGWindowLevelForKey(CGWindowLevelKey(kCGFloatingWindowLevelKey)))
 		preferencesWindow.makeKeyAndOrderFront(self)
 	}
 
+	func updateImportExportSettings() {
+		repeatLastExportAutomatically.integerValue = Settings.autoRepeatSettingsExport ? 1 : 0
+		if let lastExportDate = Settings.lastExportDate, fileName = Settings.lastExportUrl?.absoluteString, unescapedName = fileName.stringByReplacingPercentEscapesUsingEncoding(NSUTF8StringEncoding) {
+			let time = itemDateFormatter.stringFromDate(lastExportDate)
+			lastExportReport.stringValue = "Last exported \(time) to \(unescapedName)"
+		} else {
+			lastExportReport.stringValue = ""
+		}
+	}
+
+	@IBAction func repeatLastExportSelected(sender: AnyObject) {
+		Settings.autoRepeatSettingsExport = (repeatLastExportAutomatically.integerValue==1)
+	}
+
+	func application(sender: NSApplication, openFile filename: String) -> Bool {
+		let url = NSURL(fileURLWithPath: filename)!
+		let ext = filename.lastPathComponent.pathExtension
+		if ext == "trailerSettings" {
+			DLog("Will open %@", url.absoluteString)
+			tryLoadSettings(url, skipConfirm: Settings.dontConfirmSettingsImport)
+			return true
+		}
+		return false
+	}
+
+	func tryLoadSettings(url: NSURL, skipConfirm: Bool) -> Bool {
+		if isRefreshing {
+			let alert = NSAlert()
+			alert.messageText = "Trailer is currently refreshing data, please wait until it's done and try importing your settings again"
+			alert.addButtonWithTitle("OK")
+			alert.runModal()
+			return false
+
+		} else if !skipConfirm {
+			let alert = NSAlert()
+			alert.messageText = "Import settings from this file?"
+			alert.informativeText = "This will overwrite all your current Trailer settings, are you sure?"
+			alert.addButtonWithTitle("No")
+			alert.addButtonWithTitle("Yes")
+			alert.showsSuppressionButton = true
+			if alert.runModal()==NSAlertSecondButtonReturn {
+				if alert.suppressionButton!.state == NSOnState {
+					Settings.dontConfirmSettingsImport = true
+				}
+			} else {
+				return false
+			}
+		}
+
+		if !Settings.readFromURL(url) {
+			let alert = NSAlert()
+			alert.messageText = "The selected settings file could not be imported due to an error"
+			alert.addButtonWithTitle("OK")
+			alert.runModal()
+			return false
+		}
+		DataManager.postProcessAllItems()
+		DataManager.saveDB()
+		preparePreferencesWindow()
+		preferencesDirty = true
+		startRefresh()
+
+		return true
+	}
+
+	@IBAction func exportCurrentSettingsSelected(sender: NSButton) {
+		let s = NSSavePanel()
+		s.title = "Export Current Settings..."
+		s.prompt = "Export"
+		s.nameFieldLabel = "Settings File"
+		s.message = "Export Current Settings..."
+		s.extensionHidden = false
+		s.nameFieldStringValue = "Trailer Settings"
+		s.allowedFileTypes = ["trailerSettings"]
+		s.beginSheetModalForWindow(preferencesWindow, completionHandler: { [weak self] response in
+			if response == NSFileHandlingPanelOKButton, let url = s.URL {
+				Settings.writeToURL(url)
+				DLog("Exported settings to %@", url.absoluteString!)
+			}
+		})
+	}
+
+	@IBAction func importSettingsSelected(sender: NSButton) {
+		let o = NSOpenPanel()
+		o.title = "Import Settings From File..."
+		o.prompt = "Import"
+		o.nameFieldLabel = "Settings File"
+		o.message = "Import Settings From File..."
+		o.extensionHidden = false
+		o.allowedFileTypes = ["trailerSettings"]
+		o.beginSheetModalForWindow(preferencesWindow, completionHandler: { [weak self] response in
+			if response == NSFileHandlingPanelOKButton, let url = o.URL {
+				atNextEvent {
+					self!.tryLoadSettings(url, skipConfirm: Settings.dontConfirmSettingsImport)
+				}
+			}
+		})
+	}
+
 	private func colorButton(button: NSButton, withColor: NSColor) {
-		let title = button.attributedTitle.mutableCopy() as NSMutableAttributedString
+		let title = button.attributedTitle.mutableCopy() as! NSMutableAttributedString
 		title.addAttribute(NSForegroundColorAttributeName, value: withColor, range: NSMakeRange(0, title.length))
 		button.attributedTitle = title
 	}
@@ -914,11 +1131,11 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	@IBAction func showAllRepositoriesSelected(sender: NSButton) {
 		for r in Repo.reposForFilter(repoFilter.stringValue) {
 			r.hidden = false
-			r.dirty = true
-			r.lastDirtied = NSDate()
+			r.resetSyncState()
 		}
 		preferencesDirty = true
 		projectsTable.reloadData()
+		Settings.possibleExport(nil)
 	}
 
 	@IBAction func hideAllRepositoriesSelected(sender: NSButton) {
@@ -928,6 +1145,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		}
 		preferencesDirty = true
 		projectsTable.reloadData()
+		Settings.possibleExport(nil)
 	}
 
 	@IBAction func enableHotkeySelected(sender: NSButton) {
@@ -986,7 +1204,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	/////////////////////////////////// Repo table
 
 	private func repoForRow(row: Int) -> Repo {
-		let parentCount = DataManager.countParentRepos(repoFilter.stringValue)
+		let parentCount = Repo.countParentRepos(repoFilter.stringValue)
 		var r = row
 		if r > parentCount {
 			r--
@@ -1000,22 +1218,18 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	}
 
 	func tableView(tv: NSTableView, objectValueForTableColumn tableColumn: NSTableColumn?, row: Int) -> AnyObject? {
-		let cell = tableColumn!.dataCellForRow(row) as NSCell
+		let cell = tableColumn!.dataCellForRow(row) as! NSCell
 
 		if tv === projectsTable {
 			if tableColumn?.identifier == "hide" {
 				if tableView(tv, isGroupRow:row) {
-					(cell as NSButtonCell).imagePosition = NSCellImagePosition.NoImage
+					(cell as! NSButtonCell).imagePosition = NSCellImagePosition.NoImage
 					cell.state = NSMixedState
 					cell.enabled = false
 				} else {
-					(cell as NSButtonCell).imagePosition = NSCellImagePosition.ImageOnly
+					(cell as! NSButtonCell).imagePosition = NSCellImagePosition.ImageOnly
 					let r = repoForRow(row)
-					if r.hidden.boolValue {
-						cell.state = NSOnState
-					} else {
-						cell.state = NSOffState
-					}
+					cell.state = (r.hidden?.boolValue ?? false) ? NSOnState : NSOffState
 					cell.enabled = true
 				}
 			} else {
@@ -1040,7 +1254,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 			if tableColumn?.identifier == "server" {
 				cell.title = apiServer.label ?? "NoApiServer"
 			} else { // api usage
-				let c = cell as NSLevelIndicatorCell
+				let c = cell as! NSLevelIndicatorCell
 				c.minValue = 0
 				let rl = apiServer.requestsLimit?.doubleValue ?? 0.0
 				c.maxValue = rl
@@ -1054,7 +1268,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	func tableView(tableView: NSTableView, isGroupRow row: Int) -> Bool {
 		if tableView === projectsTable {
-			return (row == 0 || row == DataManager.countParentRepos(repoFilter.stringValue) + 1)
+			return (row == 0 || row == Repo.countParentRepos(repoFilter.stringValue) + 1)
 		} else {
 			return false
 		}
@@ -1063,8 +1277,8 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	func numberOfRowsInTableView(tableView: NSTableView) -> Int {
 		if tableView === projectsTable {
 			return Repo.reposForFilter(repoFilter.stringValue).count + 2
-		} else if tableView === mainMenu.prTable {
-			let f = PullRequest.requestForPullRequestsWithFilter(mainMenu.filter.stringValue)
+		} else if tableView === prMenu.table {
+			let f = PullRequest.requestForPullRequestsWithFilter(prMenu.filter.stringValue, sectionIndex: -1)
 			return mainObjectContext.countForFetchRequest(f, error: nil)
 		} else {
 			return ApiServer.countApiServersInMoc(mainObjectContext)
@@ -1081,6 +1295,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 			}
 			DataManager.saveDB()
 			preferencesDirty = true
+			Settings.possibleExport(nil)
 		}
 	}
 
@@ -1089,30 +1304,28 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		return NSApplicationTerminateReply.TerminateNow
 	}
 
-	private func scrollToTop() {
-		mainMenu.prTable.scrollToBeginningOfDocument(nil)
-	}
-
 	func windowDidBecomeKey(notification: NSNotification) {
-		if notification.object === mainMenu {
+		if let window = notification.object as? MenuWindow {
 			if ignoreNextFocusLoss {
 				ignoreNextFocusLoss = false
 			} else {
-				scrollToTop()
-				mainMenu.prTable.deselectAll(nil)
+				window.scrollToTop()
+				window.table.deselectAll(nil)
 			}
-			mainMenu.filter.becomeFirstResponder()
+			window.filter.becomeFirstResponder()
 		}
 	}
 
 	func windowDidResignKey(notification: NSNotification) {
 		if ignoreNextFocusLoss {
-			displayMenu()
+			showMenu(notification.object as! MenuWindow)
 			return
 		}
 		if !opening {
-			if notification.object === mainMenu {
-				closeMenu()
+			if notification.object === prMenu {
+				closeMenu(prMenu)
+			} else if notification.object === issuesMenu {
+				closeMenu(issuesMenu)
 			}
 		}
 	}
@@ -1143,7 +1356,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	func startRefreshIfItIsDue() {
 
-		if let l = lastSuccessfulRefresh {
+		if let l = Settings.lastSuccessfulRefresh {
 			let howLongAgo = NSDate().timeIntervalSinceDate(l)
 			if howLongAgo > NSTimeInterval(Settings.refreshPeriod) {
 				startRefresh()
@@ -1159,14 +1372,6 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		}
 	}
 
-	@IBAction func refreshNowSelected(sender: NSMenuItem) {
-		if Repo.countVisibleReposInMoc(mainObjectContext) == 0 {
-			preferencesSelected(nil)
-			return
-		}
-		startRefresh()
-	}
-
 	private func checkApiUsage() {
 		for apiServer in ApiServer.allApiServersInMoc(mainObjectContext) {
 			if apiServer.requestsLimit?.doubleValue > 0 {
@@ -1175,25 +1380,25 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 					let dateFormatter = NSDateFormatter()
 					dateFormatter.doesRelativeDateFormatting = true
 					dateFormatter.dateStyle = NSDateFormatterStyle.MediumStyle
-					dateFormatter.dateStyle = NSDateFormatterStyle.MediumStyle
+					dateFormatter.timeStyle = NSDateFormatterStyle.MediumStyle
 					let resetDateString = apiServer.resetDate == nil ? "(unspecified date)" : dateFormatter.stringFromDate(apiServer.resetDate!)
 
 					let alert = NSAlert()
 					alert.messageText = "Your API request usage for '\(apiLabel)' is over the limit!"
-					alert.informativeText = "Your request cannot be completed until your hourly API allowance is reset at \(resetDateString).\n\nIf you get this error often, try to make fewer manual refreshes or reducing the number of repos you are monitoring.\n\nYou can check your API usage at any time from 'Servers' preferences pane at any time."
+					alert.informativeText = "Your request cannot be completed until your hourly API allowance is reset \(resetDateString).\n\nIf you get this error often, try to make fewer manual refreshes or reducing the number of repos you are monitoring.\n\nYou can check your API usage at any time from 'Servers' preferences pane at any time."
 					alert.addButtonWithTitle("OK")
 					alert.runModal()
-				} else if(( (apiServer.requestsRemaining?.doubleValue ?? 0.0) / (apiServer.requestsLimit?.doubleValue ?? 1.0) ) < LOW_API_WARNING) {
+				} else if ((apiServer.requestsRemaining?.doubleValue ?? 0.0) / (apiServer.requestsLimit?.doubleValue ?? 1.0)) < LOW_API_WARNING {
 					let apiLabel = apiServer.label ?? "NoApiServerLabel"
 					let dateFormatter = NSDateFormatter()
 					dateFormatter.doesRelativeDateFormatting = true
 					dateFormatter.dateStyle = NSDateFormatterStyle.MediumStyle
-					dateFormatter.dateStyle = NSDateFormatterStyle.MediumStyle
+					dateFormatter.timeStyle = NSDateFormatterStyle.MediumStyle
 					let resetDateString = apiServer.resetDate == nil ? "(unspecified date)" : dateFormatter.stringFromDate(apiServer.resetDate!)
 
 					let alert = NSAlert()
 					alert.messageText = "Your API request usage for '\(apiLabel)' is close to full"
-					alert.informativeText = "Try to make fewer manual refreshes, increasing the automatic refresh time, or reducing the number of repos you are monitoring.\n\nYour allowance will be reset by Github on \(resetDateString).\n\nYou can check your API usage from the 'Servers' preferences pane at any time."
+					alert.informativeText = "Try to make fewer manual refreshes, increasing the automatic refresh time, or reducing the number of repos you are monitoring.\n\nYour allowance will be reset by Github \(resetDateString).\n\nYou can check your API usage from the 'Servers' preferences pane at any time."
 					alert.addButtonWithTitle("OK")
 					alert.runModal()
 				}
@@ -1203,7 +1408,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	func tabView(tabView: NSTabView, willSelectTabViewItem tabViewItem: NSTabViewItem?) {
 		if tabView.indexOfTabViewItem(tabViewItem!) == 1 {
-			if (lastRepoCheck.isEqualToDate(NSDate.distantPast() as NSDate) || Repo.countVisibleReposInMoc(mainObjectContext) == 0) && ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
+			if (lastRepoCheck.isEqualToDate(never()) || Repo.countVisibleReposInMoc(mainObjectContext) == 0) && ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
 				refreshReposSelected(nil)
 			}
 		}
@@ -1216,54 +1421,68 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		refreshButton.enabled = false
 		projectsTable.enabled = false
 		activityDisplay.startAnimation(nil)
-		(statusItem.view as StatusItemView).grayOut = Settings.grayOutWhenRefreshing
+		(prMenu.statusItem?.view as? StatusItemView)?.grayOut = Settings.grayOutWhenRefreshing
+		(issuesMenu.statusItem?.view as? StatusItemView)?.grayOut = Settings.grayOutWhenRefreshing
 
 		api.expireOldImageCacheEntries()
 		DataManager.postMigrationTasks()
 
 		isRefreshing = true
 
-		if messageView != nil {
-			updateMenu()
+		if prMenu.messageView != nil {
+			updatePrMenu()
 		}
 
-		refreshNow.title = " Refreshing..."
+		if issuesMenu.messageView != nil {
+			updateIssuesMenu()
+		}
+
+		setRefreshLabel(" Refreshing...")
 
 		DLog("Starting refresh")
 	}
 
 	private func completeRefresh() {
 		isRefreshing = false
+		preferencesDirty = false
 		refreshButton.enabled = true
 		projectsTable.enabled = true
 		activityDisplay.stopAnimation(nil)
 		DataManager.saveDB()
 		projectsTable.reloadData()
-		updateMenu()
+		updatePrMenu()
+		updateIssuesMenu()
 		checkApiUsage()
 		DataManager.saveDB()
 		DataManager.sendNotifications()
 		DLog("Refresh done")
 	}
 
-	private func startRefresh() {
+	func startRefresh() {
 		if isRefreshing || api.currentNetworkStatus == NetworkStatus.NotReachable || !ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
 			return
 		}
 
 		prepareForRefresh()
 
-		let oldTarget: AnyObject? = refreshNow.target
-		let oldAction = refreshNow.action
-		refreshNow.action = nil
-		refreshNow.target = nil
+		let oldPrTarget: AnyObject? = prMenu.refreshMenuItem.target
+		let oldPrAction = prMenu.refreshMenuItem.action
+		prMenu.refreshMenuItem.action = nil
+		prMenu.refreshMenuItem.target = nil
+		let oldIssuesTarget: AnyObject? = issuesMenu.refreshMenuItem.target
+		let oldIssuesAction = issuesMenu.refreshMenuItem.action
+		issuesMenu.refreshMenuItem.action = nil
+		issuesMenu.refreshMenuItem.target = nil
 
-		api.fetchPullRequestsForActiveReposAndCallback { [weak self] in
-			self!.refreshNow.target = oldTarget
-			self!.refreshNow.action = oldAction
+		api.syncItemsForActiveReposAndCallback { [weak self] in
+
+			self!.prMenu.refreshMenuItem.target = oldPrTarget
+			self!.prMenu.refreshMenuItem.action = oldPrAction
+			self!.issuesMenu.refreshMenuItem.target = oldIssuesTarget
+			self!.issuesMenu.refreshMenuItem.action = oldIssuesAction
+
 			if !ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext) {
-				self!.lastSuccessfulRefresh = NSDate()
-				self!.preferencesDirty = false
+				Settings.lastSuccessfulRefresh = NSDate()
 			}
 			self!.completeRefresh()
 			self!.refreshTimer = NSTimer.scheduledTimerWithTimeInterval(NSTimeInterval(Settings.refreshPeriod), target: self!, selector: Selector("refreshTimerDone"), userInfo: nil, repeats: false)
@@ -1286,16 +1505,94 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		}
 	}
 
-	func updateMenu() {
+	func updateIssuesMenu() {
+
+		if Settings.showIssuesMenu {
+			issuesMenu.showStatusItem()
+		} else {
+			issuesMenu.hideStatusItem()
+			return
+		}
+
 		var countString: String
-		var attributes: Dictionary<String, AnyObject>
+		var attributes: [String : AnyObject]
+		if ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext) {
+			countString = "X"
+			attributes = [ NSFontAttributeName: NSFont.boldSystemFontOfSize(10),
+				NSForegroundColorAttributeName: MAKECOLOR(0.8, 0.0, 0.0, 1.0) ]
+		} else {
+			let f = Issue.requestForIssuesWithFilter(issuesMenu.filter.stringValue, sectionIndex: -1)
+			countString = String(mainObjectContext.countForFetchRequest(f, error: nil))
+
+			if Issue.badgeCountInMoc(mainObjectContext) > 0 {
+				attributes = [ NSFontAttributeName: NSFont.menuBarFontOfSize(10),
+					NSForegroundColorAttributeName: MAKECOLOR(0.8, 0.0, 0.0, 1.0) ]
+			} else {
+				attributes = [ NSFontAttributeName: NSFont.menuBarFontOfSize(10),
+					NSForegroundColorAttributeName: NSColor.controlTextColor() ]
+			}
+		}
+
+		DLog("Updating issues menu, \(countString) total items")
+
+		let width = countString.sizeWithAttributes(attributes).width
+
+		let statusBar = NSStatusBar.systemStatusBar()
+		let H = statusBar.thickness
+		let length = H + width + STATUSITEM_PADDING*3
+		var updateStatusItem = true
+		let shouldGray = Settings.grayOutWhenRefreshing && isRefreshing
+
+		if let s = issuesMenu.statusItem?.view as? StatusItemView where compareDict(s.textAttributes, to: attributes) && s.statusLabel == countString && s.grayOut == shouldGray {
+			updateStatusItem = false
+		}
+
+		if updateStatusItem {
+			dispatch_async(dispatch_get_main_queue()) { [weak self] in
+				DLog("Updating issues status item");
+				let siv = StatusItemView(frame: CGRectMake(0, 0, length+2, H), label: countString, prefix: "issues", attributes: attributes)
+				siv.labelOffset = 2
+				siv.highlighted = self!.issuesMenu.visible
+				siv.grayOut = shouldGray
+				siv.tappedCallback = { [weak self] in
+					let m = self!.issuesMenu
+					if m.visible {
+						self!.closeMenu(m)
+					} else {
+						self!.showMenu(m)
+					}
+					return
+				}
+				self!.issuesMenu.statusItem?.view = siv
+			}
+		}
+
+		issuesDelegate.reloadData(issuesMenu.filter.stringValue)
+		issuesMenu.table.reloadData()
+
+		issuesMenu.messageView?.removeFromSuperview()
+
+		if issuesMenu.table.numberOfRows == 0 {
+			issuesMenu.messageView = MessageView(frame: CGRectMake(0, 0, MENU_WIDTH, 100), message: DataManager.reasonForEmptyIssuesWithFilter(issuesMenu.filter.stringValue))
+			issuesMenu.contentView.addSubview(issuesMenu.messageView!)
+		}
+
+		sizeMenu(issuesMenu, andShow: false)
+	}
+
+	func updatePrMenu() {
+
+		prMenu.showStatusItem()
+
+		var countString: String
+		var attributes: [String : AnyObject]
 		if ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext) {
 			countString = "X"
 			attributes = [ NSFontAttributeName: NSFont.boldSystemFontOfSize(10),
 				NSForegroundColorAttributeName: MAKECOLOR(0.8, 0.0, 0.0, 1.0) ]
 		} else {
 			if Settings.countOnlyListedPrs {
-				let f = PullRequest.requestForPullRequestsWithFilter(mainMenu.filter.stringValue)
+				let f = PullRequest.requestForPullRequestsWithFilter(prMenu.filter.stringValue, sectionIndex: -1)
 				countString = String(mainObjectContext.countForFetchRequest(f, error: nil))
 			} else {
 				countString = String(PullRequest.countOpenRequestsInMoc(mainObjectContext))
@@ -1310,7 +1607,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 			}
 		}
 
-		DLog("Updating menu, \(countString) total PRs")
+		DLog("Updating PR menu, \(countString) total items")
 
 		let width = countString.sizeWithAttributes(attributes).width
 
@@ -1319,40 +1616,43 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 		let length = H + width + STATUSITEM_PADDING*3
         var updateStatusItem = true
         let shouldGray = Settings.grayOutWhenRefreshing && isRefreshing
-		if let s = statusItem?.view as? StatusItemView {
-            if compareDict(s.textAttributes, to: attributes) && s.statusLabel == countString && s.grayOut == shouldGray {
-                updateStatusItem = false
-            }
-        } else {
-            statusItem = statusBar.statusItemWithLength(-1) // should be NSVariableStatusItemLength but Swift can't compile this yet
-        }
-
-        if updateStatusItem {
-            DLog("Updating status item");
-            let siv = StatusItemView(frame: CGRectMake(0, 0, length, H), label: countString, attributes: attributes)
-            siv.highlighted = mainMenu.visible
-            siv.grayOut = shouldGray
-            siv.tappedCallback = { [weak self] in
-                self!.statusItemTapped()
-                return
-            }
-            statusItem.view = siv
-        }
-
-		pullRequestDelegate.reloadData(mainMenu.filter.stringValue)
-		mainMenu.prTable.reloadData()
-
-		messageView?.removeFromSuperview()
-
-		if mainMenu.prTable.numberOfRows == 0 {
-			messageView = MessageView(frame: CGRectMake(0, 0, MENU_WIDTH, 100), message: DataManager.reasonForEmptyWithFilter(mainMenu.filter.stringValue))
-			mainMenu.contentView.addSubview(messageView!)
+		if let s = prMenu.statusItem?.view as? StatusItemView where compareDict(s.textAttributes, to: attributes) && s.statusLabel == countString && s.grayOut == shouldGray {
+			updateStatusItem = false
 		}
 
-		sizeMenuAndShow(false)
+        if updateStatusItem {
+			dispatch_async(dispatch_get_main_queue()) { [weak self] in
+				DLog("Updating PR status item");
+				let siv = StatusItemView(frame: CGRectMake(0, 0, length, H), label: countString, prefix: "pr", attributes: attributes)
+				siv.highlighted = self!.prMenu.visible
+				siv.grayOut = shouldGray
+				siv.tappedCallback = { [weak self] in
+					let m = self!.prMenu
+					if m.visible {
+						self!.closeMenu(m)
+					} else {
+						self!.showMenu(m)
+					}
+					return
+				}
+				self!.prMenu.statusItem?.view = siv
+			}
+        }
+
+		pullRequestDelegate.reloadData(prMenu.filter.stringValue)
+		prMenu.table.reloadData()
+
+		prMenu.messageView?.removeFromSuperview()
+
+		if prMenu.table.numberOfRows == 0 {
+			prMenu.messageView = MessageView(frame: CGRectMake(0, 0, MENU_WIDTH, 100), message: DataManager.reasonForEmptyWithFilter(prMenu.filter.stringValue))
+			prMenu.contentView.addSubview(prMenu.messageView!)
+		}
+
+		sizeMenu(prMenu, andShow: false)
 	}
 
-    private func compareDict(from: Dictionary<String, AnyObject>, to: Dictionary<String, AnyObject>) -> Bool {
+	private func compareDict(from: [String : AnyObject], to: [String : AnyObject]) -> Bool {
         for (key, value) in from {
             if let v: AnyObject = to[key] {
                 if !v.isEqual(value) {
@@ -1382,16 +1682,16 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 
 	@IBAction func statusFilterMenuChanged(sender: NSPopUpButton) {
 		Settings.statusFilteringMode = sender.indexOfSelectedItem
-		Settings.statusFilteringTerms = statusTermsField.objectValue as [String]
+		Settings.statusFilteringTerms = statusTermsField.objectValue as! [String]
 		updateStatusTermPreferenceControls()
-		deferredUpdate()
+		deferredUpdateTimer.push()
 	}
 
 	@IBAction func testApiServerSelected(sender: NSButton) {
 		sender.enabled = false
 		let apiServer = selectedServer()!
 
-		api.testApiToServer(apiServer, callback: { error in
+		api.testApiToServer(apiServer) { error in
 			let alert = NSAlert()
 			if error != nil {
 				alert.messageText = "The test failed for " + (apiServer.apiPath ?? "NoApiPath")
@@ -1402,7 +1702,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 			alert.addButtonWithTitle("OK")
 			alert.runModal()
 			sender.enabled = true
-		})
+		}
 	}
 
 	@IBAction func apiRestoreDefaultsSelected(sender: NSButton)
@@ -1451,8 +1751,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	/////////////////////// keyboard shortcuts
 
 	private func addHotKeySupport() {
-		if(Settings.hotkeyEnable)
-		{
+		if Settings.hotkeyEnable {
 			if globalKeyMonitor == nil {
 				let key = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String
 				let options = [key: NSNumber(bool: (AXIsProcessTrusted() == 0))]
@@ -1463,9 +1762,7 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 					})
 				}
 			}
-		}
-		else
-		{
+		} else {
 			if globalKeyMonitor != nil {
 				NSEvent.removeMonitor(globalKeyMonitor!)
 				globalKeyMonitor = nil
@@ -1482,137 +1779,138 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 				return nil
 			}
 
-			if incomingEvent.window != self!.mainMenu {
-				return incomingEvent
-			}
-
-			switch incomingEvent.keyCode {
-			case 125: // down
-				if app.isManuallyScrolling && self!.mainMenu.prTable.selectedRow == -1 {
-					return nil
-				}
-				var i = self!.mainMenu.prTable.selectedRow + 1
-				if i < self!.mainMenu.prTable.numberOfRows {
-					while self!.pullRequestDelegate.pullRequestAtRow(i) == nil {
-						i++
+			if let w = incomingEvent.window as? MenuWindow {
+				//DLog("Keycode: %d", incomingEvent.keyCode)
+				switch incomingEvent.keyCode {
+				case 123: // left
+					fallthrough
+				case 124: // right
+					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
+					if Settings.showIssuesMenu {
+						if w == self!.prMenu {
+							self!.showMenu(self!.issuesMenu)
+						} else if w == self!.issuesMenu {
+							self!.showMenu(self!.prMenu)
+						}
 					}
-					self!.scrollToIndex(i)
-				}
-				return nil
-			case 126: // up
-				if app.isManuallyScrolling && self!.mainMenu.prTable.selectedRow == -1 {
 					return nil
-				}
-				var i = self!.mainMenu.prTable.selectedRow - 1
-				if i > 0 {
-					while self!.pullRequestDelegate.pullRequestAtRow(i) == nil {
-						i--
+				case 125: // down
+					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
+					var i = w.table.selectedRow + 1
+					if i < w.table.numberOfRows {
+						while self!.dataItemAtRow(i, inMenu: w) == nil { i++ }
+						self!.scrollToIndex(i, inMenu: w)
 					}
-					self!.scrollToIndex(i)
-				}
-				return nil
-			case 36: // enter
-				let i = self!.mainMenu.prTable.selectedRow
-				if i >= 0 {
-					if let v = self!.mainMenu.prTable.rowViewAtRow(i, makeIfNecessary: false) as? PrItemView {
+					return nil
+				case 126: // up
+					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
+					var i = w.table.selectedRow - 1
+					if i > 0 {
+						while self!.dataItemAtRow(i, inMenu: w) == nil { i-- }
+						self!.scrollToIndex(i, inMenu: w)
+					}
+					return nil
+				case 36: // enter
+					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
+					if let dataItem = self!.dataItemAtRow(w.table.selectedRow, inMenu: w) {
 						let isAlternative = ((incomingEvent.modifierFlags & NSEventModifierFlags.AlternateKeyMask) == NSEventModifierFlags.AlternateKeyMask)
-						self!.prItemSelected(v.associatedPullRequest(), alternativeSelect: isAlternative)
+						self!.dataItemSelected(dataItem, alternativeSelect: isAlternative)
 					}
+					return nil
+				case 53: // escape
+					self!.closeMenu(w)
+					return nil
+				default:
+					break
 				}
-				return nil
-			case 53: // escape
-				self!.closeMenu()
-				return nil
-			default:
-				break
 			}
 			return incomingEvent
 		})
 	}
 
-	private func scrollToIndex(i: Int) {
+	private func dataItemAtRow(row: Int, inMenu: MenuWindow) -> ListableItem? {
+		if inMenu == prMenu {
+			return pullRequestDelegate.pullRequestAtRow(row)
+		} else if inMenu == issuesMenu {
+			return issuesDelegate.issueAtRow(row)
+		} else {
+			return nil
+		}
+	}
+
+	private func scrollToIndex(i: Int, inMenu: MenuWindow) {
 		app.isManuallyScrolling = true
 		mouseIgnoreTimer.push()
-		mainMenu.prTable.scrollRowToVisible(i)
+		inMenu.table.scrollRowToVisible(i)
 		dispatch_async(dispatch_get_main_queue(), { [weak self] in
-			self!.mainMenu.prTable.selectRowIndexes(NSIndexSet(index: i), byExtendingSelection: false)
+			inMenu.table.selectRowIndexes(NSIndexSet(index: i), byExtendingSelection: false)
 			return
 		})
 	}
 
 	func focusedItemUrl() -> String? {
-		let row = mainMenu.prTable.selectedRow
-		var pr: PullRequest?
-		if row >= 0 {
-			mainMenu.prTable.deselectAll(nil)
-			pr = pullRequestDelegate.pullRequestAtRow(row)
+		if prMenu.visible {
+			let row = prMenu.table.selectedRow
+			var pr: PullRequest?
+			if row >= 0 {
+				prMenu.table.deselectAll(nil)
+				pr = pullRequestDelegate.pullRequestAtRow(row)
+			}
+			atNextEvent { [weak self] in
+				self!.prMenu.table.selectRowIndexes(NSIndexSet(index: row), byExtendingSelection: false)
+			}
+			return pr?.webUrl
+		} else if issuesMenu.visible {
+			let row = issuesMenu.table.selectedRow
+			var i: Issue?
+			if row >= 0 {
+				issuesMenu.table.deselectAll(nil)
+				i = issuesDelegate.issueAtRow(row)
+			}
+			atNextEvent { [weak self] in
+				self!.issuesMenu.table.selectRowIndexes(NSIndexSet(index: row), byExtendingSelection: false)
+			}
+			return i?.webUrl
+		} else {
+			return nil
 		}
-		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
-			self.mainMenu.prTable.selectRowIndexes(NSIndexSet(index: row), byExtendingSelection: false)
-		}
-		return pr?.webUrl
 	}
-    
+
 	private func checkForHotkey(incomingEvent: NSEvent) -> Bool {
 		var check = 0
 
 		if Settings.hotkeyCommandModifier {
-			if((incomingEvent.modifierFlags & NSEventModifierFlags.CommandKeyMask) == NSEventModifierFlags.CommandKeyMask) { check++ } else { check-- }
+			check += (incomingEvent.modifierFlags & NSEventModifierFlags.CommandKeyMask) == NSEventModifierFlags.CommandKeyMask ? 1 : -1
 		} else {
-			if((incomingEvent.modifierFlags & NSEventModifierFlags.CommandKeyMask) == NSEventModifierFlags.CommandKeyMask) { check-- } else { check++ }
+			check += (incomingEvent.modifierFlags & NSEventModifierFlags.CommandKeyMask) == NSEventModifierFlags.CommandKeyMask ? -1 : 1
 		}
 
 		if Settings.hotkeyControlModifier {
-			if((incomingEvent.modifierFlags & NSEventModifierFlags.ControlKeyMask) == NSEventModifierFlags.ControlKeyMask) { check++ } else { check-- }
+			check += (incomingEvent.modifierFlags & NSEventModifierFlags.ControlKeyMask) == NSEventModifierFlags.ControlKeyMask ? 1 : -1
 		} else {
-			if((incomingEvent.modifierFlags & NSEventModifierFlags.ControlKeyMask) == NSEventModifierFlags.ControlKeyMask) { check-- } else { check++ }
+			check += (incomingEvent.modifierFlags & NSEventModifierFlags.ControlKeyMask) == NSEventModifierFlags.ControlKeyMask ? -1 : 1
 		}
 
 		if Settings.hotkeyOptionModifier {
-			if((incomingEvent.modifierFlags & NSEventModifierFlags.AlternateKeyMask) == NSEventModifierFlags.AlternateKeyMask) { check++ } else { check-- }
+			check += (incomingEvent.modifierFlags & NSEventModifierFlags.AlternateKeyMask) == NSEventModifierFlags.AlternateKeyMask ? 1 : -1
 		} else {
-			if((incomingEvent.modifierFlags & NSEventModifierFlags.AlternateKeyMask) == NSEventModifierFlags.AlternateKeyMask) { check-- } else { check++ }
+			check += (incomingEvent.modifierFlags & NSEventModifierFlags.AlternateKeyMask) == NSEventModifierFlags.AlternateKeyMask ? -1 : 1
 		}
 
 		if Settings.hotkeyShiftModifier {
-			if((incomingEvent.modifierFlags & NSEventModifierFlags.ShiftKeyMask) == NSEventModifierFlags.ShiftKeyMask) { check++ } else { check-- }
+			check += (incomingEvent.modifierFlags & NSEventModifierFlags.ShiftKeyMask) == NSEventModifierFlags.ShiftKeyMask ? 1 : -1
 		} else {
-			if((incomingEvent.modifierFlags & NSEventModifierFlags.ShiftKeyMask) == NSEventModifierFlags.ShiftKeyMask) { check-- } else { check++ }
+			check += (incomingEvent.modifierFlags & NSEventModifierFlags.ShiftKeyMask) == NSEventModifierFlags.ShiftKeyMask ? -1 : 1
 		}
 
-		if check==4 {
-			let n = [
-				"A": 0,
-				"B": 11,
-				"C": 8,
-				"D": 2,
-				"E": 14,
-				"F": 3,
-				"G": 5,
-				"H": 4,
-				"I": 34,
-				"J": 38,
-				"K": 40,
-				"L": 37,
-				"M": 46,
-				"N": 45,
-				"O": 31,
-				"P": 35,
-				"Q": 12,
-				"R": 15,
-				"S": 1,
-				"T": 17,
-				"U": 32,
-				"V": 9,
-				"W": 13,
-				"X": 7,
-				"Y": 16,
-				"Z": 6 ][Settings.hotkeyLetter]
+		let keyMap = [
+			"A": 0, "B": 11, "C": 8, "D": 2, "E": 14, "F": 3, "G": 5, "H": 4, "I": 34, "J": 38,
+			"K": 40, "L": 37, "M": 46, "N": 45, "O": 31, "P": 35, "Q": 12, "R": 15, "S": 1,
+			"T": 17, "U": 32, "V": 9, "W": 13, "X": 7, "Y": 16, "Z": 6 ];
 
-			if incomingEvent.keyCode==UInt16(n!) {
-				statusItemTapped()
-				return true
-			}
+		if check==4, let n = keyMap[Settings.hotkeyLetter] where incomingEvent.keyCode == UInt16(n) {
+			showMenu(prMenu)
+			return true
 		}
 		return false
 	}
@@ -1620,13 +1918,81 @@ class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUser
 	////////////// scrollbars
 	
 	func updateScrollBarWidth() {
-		if let s = mainMenu.scrollView.verticalScroller {
+		if let s = prMenu.scrollView.verticalScroller {
 			if s.scrollerStyle == NSScrollerStyle.Legacy {
 				scrollBarWidth = s.frame.size.width
 			} else {
 				scrollBarWidth = 0
 			}
 		}
-		updateMenu()
+		updatePrMenu()
+		updateIssuesMenu()
+	}
+
+	////////////////////// windows
+
+	private var startupAssistantController: NSWindowController?
+	private func startupAssistant() {
+		if startupAssistantController == nil {
+			startupAssistantController = NSWindowController(windowNibName:"SetupAssistant")
+			if let w = startupAssistantController!.window as? SetupAssistant {
+				w.level = Int(CGWindowLevelForKey(CGWindowLevelKey(kCGFloatingWindowLevelKey)))
+				w.center()
+				w.makeKeyAndOrderFront(self)
+			}
+		}
+	}
+	func closedSetupAssistant() {
+		startupAssistantController = nil
+	}
+
+	private var aboutWindowController: NSWindowController?
+	func showAboutWindow() {
+		if aboutWindowController == nil {
+			aboutWindowController = NSWindowController(windowNibName:"AboutWindow")
+		}
+		if let w = aboutWindowController!.window as? AboutWindow {
+			w.level = Int(CGWindowLevelForKey(CGWindowLevelKey(kCGFloatingWindowLevelKey)))
+			w.version.stringValue = versionNumber.stringValue
+			w.center()
+			w.makeKeyAndOrderFront(self)
+		}
+	}
+	func closedAboutWindow() {
+		aboutWindowController = nil
+	}
+
+	//////////////////////// Dark mode
+
+	var darkMode: Bool = false {
+		didSet {
+			if darkMode != oldValue {
+				prMenu.statusItem?.view = nil
+				prMenu.updateVibrancy()
+				updatePrMenu()
+
+				issuesMenu.statusItem?.view = nil
+				issuesMenu.updateVibrancy()
+				updateIssuesMenu()
+			}
+		}
+	}
+
+	func checkDarkMode() {
+		atNextEvent { [weak self] in
+			if NSAppKitVersionNumber>Double(NSAppKitVersionNumber10_9) {
+				let c = NSAppearance.currentAppearance()
+				if c.respondsToSelector(Selector("allowsVibrancy")) {
+					self!.darkMode = c.name.rangeOfString(NSAppearanceNameVibrantDark) != nil
+					return
+				}
+			}
+			self!.darkMode = false
+		}
+	}
+
+	private func setupDarkModeMonitoring() {
+		NSDistributedNotificationCenter.defaultCenter().addObserver(self, selector: Selector("checkDarkMode"), name: "AppleInterfaceThemeChangedNotification", object: nil)
+		checkDarkMode()
 	}
 }

@@ -1,7 +1,6 @@
 
 import CoreData
 
-@objc(DataItem)
 class DataItem: NSManagedObject {
 
 	@NSManaged var serverId: NSNumber?
@@ -10,17 +9,21 @@ class DataItem: NSManagedObject {
 	@NSManaged var updatedAt: NSDate?
 	@NSManaged var apiServer: ApiServer
 
+	func resetSyncState() {
+		updatedAt = never()
+	}
+
 	class func allItemsOfType(type: String, inMoc: NSManagedObjectContext) -> [DataItem] {
 		let f = NSFetchRequest(entityName: type)
 		f.returnsObjectsAsFaults = false
-		return inMoc.executeFetchRequest(f, error: nil) as [DataItem]
+		return inMoc.executeFetchRequest(f, error: nil) as! [DataItem]
 	}
 
 	class func allItemsOfType(type: String, fromServer: ApiServer) -> [DataItem] {
 		let f = NSFetchRequest(entityName: type)
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "apiServer == %@", fromServer)
-		return fromServer.managedObjectContext?.executeFetchRequest(f, error: nil) as [DataItem]
+		return fromServer.managedObjectContext?.executeFetchRequest(f, error: nil) as! [DataItem]
 	}
 
 	class func itemOfType(type: String, serverId: NSNumber, fromServer: ApiServer) -> DataItem? {
@@ -32,15 +35,15 @@ class DataItem: NSManagedObject {
 		return items?.first as? DataItem
 	}
 
-	class func itemWithInfo(info: NSDictionary, type: String, fromServer: ApiServer) -> DataItem {
-		let serverId = info.ofk("id") as NSNumber
-		let updatedDate = syncDateFormatter.dateFromString(info.ofk("updated_at") as String)
+	class func itemWithInfo(info: [NSObject : AnyObject], type: String, fromServer: ApiServer) -> DataItem {
+		let serverId = N(info, "id") as! NSNumber
+		let updatedDate = syncDateFormatter.dateFromString(N(info, "updated_at") as! String)
 		var existingItem = itemOfType(type, serverId: serverId, fromServer: fromServer)
 		if existingItem == nil {
 			DLog("Creating %@: %@",type,serverId)
 			existingItem = NSEntityDescription.insertNewObjectForEntityForName(type, inManagedObjectContext: fromServer.managedObjectContext!) as? DataItem
 			existingItem!.serverId = serverId
-			existingItem!.createdAt = syncDateFormatter.dateFromString(info.ofk("created_at") as String)
+			existingItem!.createdAt = syncDateFormatter.dateFromString(N(info, "created_at") as! String)
 			existingItem!.postSyncAction = PostSyncAction.NoteNew.rawValue
 			existingItem!.updatedAt = updatedDate
 			existingItem!.apiServer = fromServer
@@ -57,39 +60,39 @@ class DataItem: NSManagedObject {
 
 	class func itemsOfType(type: String, surviving: Bool, inMoc: NSManagedObjectContext) -> [DataItem] {
 		let f = NSFetchRequest(entityName: type)
-		if(surviving) {
+		if surviving {
 			f.returnsObjectsAsFaults = false
 			f.predicate = NSPredicate(format: "postSyncAction != %d", PostSyncAction.Delete.rawValue)
 		} else {
 			f.returnsObjectsAsFaults = true
 			f.predicate = NSPredicate(format: "postSyncAction = %d", PostSyncAction.Delete.rawValue)
 		}
-		return inMoc.executeFetchRequest(f, error: nil) as [DataItem]
+		return inMoc.executeFetchRequest(f, error: nil) as! [DataItem]
 	}
 
 	class func newOrUpdatedItemsOfType(type: String, inMoc: NSManagedObjectContext) -> [DataItem] {
 		let f = NSFetchRequest(entityName: type)
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "postSyncAction = %d or postSyncAction = %d", PostSyncAction.NoteNew.rawValue, PostSyncAction.NoteUpdated.rawValue)
-		return inMoc.executeFetchRequest(f, error: nil) as [DataItem]
+		return inMoc.executeFetchRequest(f, error: nil) as! [DataItem]
 	}
 
 	class func updatedItemsOfType(type: String, inMoc: NSManagedObjectContext) -> [DataItem] {
 		let f = NSFetchRequest(entityName: type)
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "postSyncAction = %d", PostSyncAction.NoteUpdated.rawValue)
-		return inMoc.executeFetchRequest(f, error: nil) as [DataItem]
+		return inMoc.executeFetchRequest(f, error: nil) as! [DataItem]
 	}
 
 	class func newItemsOfType(type: String, inMoc: NSManagedObjectContext) -> [DataItem] {
 		let f = NSFetchRequest(entityName: type)
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "postSyncAction = %d", PostSyncAction.NoteNew.rawValue)
-		return inMoc.executeFetchRequest(f, error: nil) as [DataItem]
+		return inMoc.executeFetchRequest(f, error: nil) as! [DataItem]
 	}
 
 	class func nukeDeletedItemsInMoc(moc: NSManagedObjectContext) {
-		let types = ["Repo", "PullRequest", "PRStatus", "PRComment", "PRLabel"]
+		let types = ["Repo", "PullRequest", "PRStatus", "PRComment", "PRLabel", "Issue"]
 		var count = 0
 		for type in types {
 			let discarded = itemsOfType(type, surviving: false, inMoc: moc)
@@ -108,11 +111,4 @@ class DataItem: NSManagedObject {
 		let f = NSFetchRequest(entityName: type)
 		return moc.countForFetchRequest(f, error: nil)
 	}
-
-	/*
-	override func prepareForDeletion() {
-		DLog("Deleting %@ ID: %@", entity.name, serverId)
-		super.prepareForDeletion()
-	}
-	*/
 }

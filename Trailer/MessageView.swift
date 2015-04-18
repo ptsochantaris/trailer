@@ -1,5 +1,5 @@
 
-class MessageView: NSView {
+final class MessageView: NSView {
 
 	init(frame frameRect:NSRect, message:NSAttributedString) {
 		super.init(frame:frameRect)

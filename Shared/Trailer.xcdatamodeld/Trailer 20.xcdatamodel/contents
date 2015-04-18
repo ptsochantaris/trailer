@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="6751" systemVersion="14C1510" minimumToolsVersion="Xcode 4.5" macOSVersion="Automatic" iOSVersion="Automatic">
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="6751" systemVersion="14C1514" minimumToolsVersion="Xcode 4.5" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="ApiServer" representedClassName="ApiServer" syncable="YES">
         <attribute name="apiPath" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="authToken" optional="YES" attributeType="String" syncable="YES"/>
@@ -18,10 +18,40 @@
         <attribute name="userName" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="webPath" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="comments" toMany="YES" deletionRule="Cascade" destinationEntity="PRComment" inverseName="apiServer" inverseEntity="PRComment" syncable="YES"/>
+        <relationship name="issues" toMany="YES" deletionRule="Cascade" destinationEntity="Issue" inverseName="apiServer" inverseEntity="Issue" syncable="YES"/>
         <relationship name="labels" toMany="YES" deletionRule="Cascade" destinationEntity="PRLabel" inverseName="apiServer" inverseEntity="PRLabel" syncable="YES"/>
         <relationship name="pullRequests" toMany="YES" deletionRule="Cascade" destinationEntity="PullRequest" inverseName="apiServer" inverseEntity="PullRequest" syncable="YES"/>
         <relationship name="repos" toMany="YES" deletionRule="Cascade" destinationEntity="Repo" inverseName="apiServer" inverseEntity="Repo" syncable="YES"/>
         <relationship name="statuses" toMany="YES" deletionRule="Cascade" destinationEntity="PRStatus" inverseName="apiServer" inverseEntity="PRStatus" syncable="YES"/>
+        <relationship name="teams" toMany="YES" deletionRule="Cascade" destinationEntity="Team" inverseName="apiServer" inverseEntity="Team" syncable="YES"/>
+    </entity>
+    <entity name="Issue" representedClassName="Issue" syncable="YES">
+        <attribute name="assignedToMe" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="body" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="commentsLink" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="condition" optional="YES" attributeType="Integer 16" defaultValueString="0" indexed="YES" syncable="YES"/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="isNewAssignment" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="latestReadCommentDate" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="number" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="postSyncAction" optional="YES" attributeType="Integer 16" indexed="YES" syncable="YES"/>
+        <attribute name="reopened" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="sectionIndex" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="serverId" optional="YES" attributeType="Integer 64" defaultValueString="0" indexed="YES" syncable="YES"/>
+        <attribute name="state" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="totalComments" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="unreadComments" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="updatedAt" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userAvatarUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userId" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="userLogin" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="webUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="apiServer" maxCount="1" deletionRule="Nullify" destinationEntity="ApiServer" inverseName="issues" inverseEntity="ApiServer" syncable="YES"/>
+        <relationship name="comments" toMany="YES" deletionRule="Cascade" destinationEntity="PRComment" inverseName="issue" inverseEntity="PRComment" syncable="YES"/>
+        <relationship name="labels" toMany="YES" deletionRule="Cascade" destinationEntity="PRLabel" inverseName="issue" inverseEntity="PRLabel" syncable="YES"/>
+        <relationship name="repo" maxCount="1" deletionRule="Nullify" destinationEntity="Repo" inverseName="issues" inverseEntity="Repo" syncable="YES"/>
     </entity>
     <entity name="PRComment" representedClassName="PRComment" syncable="YES">
         <attribute name="avatarUrl" optional="YES" attributeType="String" syncable="YES"/>
@@ -37,7 +67,8 @@
         <attribute name="userName" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="webUrl" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="apiServer" maxCount="1" deletionRule="Nullify" destinationEntity="ApiServer" inverseName="comments" inverseEntity="ApiServer" syncable="YES"/>
-        <relationship name="pullRequest" maxCount="1" deletionRule="Nullify" destinationEntity="PullRequest" inverseName="comments" inverseEntity="PullRequest" syncable="YES"/>
+        <relationship name="issue" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Issue" inverseName="comments" inverseEntity="Issue" syncable="YES"/>
+        <relationship name="pullRequest" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="PullRequest" inverseName="comments" inverseEntity="PullRequest" syncable="YES"/>
     </entity>
     <entity name="PRLabel" representedClassName="PRLabel" syncable="YES">
         <attribute name="color" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
@@ -48,7 +79,8 @@
         <attribute name="updatedAt" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="apiServer" maxCount="1" deletionRule="Nullify" destinationEntity="ApiServer" inverseName="labels" inverseEntity="ApiServer" syncable="YES"/>
-        <relationship name="pullRequest" maxCount="1" deletionRule="Nullify" destinationEntity="PullRequest" inverseName="labels" inverseEntity="PullRequest" syncable="YES"/>
+        <relationship name="issue" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Issue" inverseName="labels" inverseEntity="Issue" syncable="YES"/>
+        <relationship name="pullRequest" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="PullRequest" inverseName="labels" inverseEntity="PullRequest" syncable="YES"/>
     </entity>
     <entity name="PRStatus" representedClassName="PRStatus" syncable="YES">
         <attribute name="createdAt" optional="YES" attributeType="Date" syncable="YES"/>
@@ -118,6 +150,7 @@
         <attribute name="updatedAt" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="webUrl" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="apiServer" maxCount="1" deletionRule="Nullify" destinationEntity="ApiServer" inverseName="repos" inverseEntity="ApiServer" syncable="YES"/>
+        <relationship name="issues" toMany="YES" deletionRule="Cascade" destinationEntity="Issue" inverseName="repo" inverseEntity="Issue" syncable="YES"/>
         <relationship name="pullRequests" toMany="YES" deletionRule="Cascade" destinationEntity="PullRequest" inverseName="repo" inverseEntity="PullRequest" syncable="YES"/>
         <compoundIndexes>
             <compoundIndex>
@@ -130,12 +163,24 @@
             </compoundIndex>
         </compoundIndexes>
     </entity>
+    <entity name="Team" representedClassName="Team" syncable="YES">
+        <attribute name="calculatedReferral" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="organisationLogin" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="postSyncAction" optional="YES" attributeType="Integer 16" indexed="YES" syncable="YES"/>
+        <attribute name="serverId" optional="YES" attributeType="Integer 64" defaultValueString="0" indexed="YES" syncable="YES"/>
+        <attribute name="slug" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="updatedAt" optional="YES" attributeType="Date" syncable="YES"/>
+        <relationship name="apiServer" maxCount="1" deletionRule="Nullify" destinationEntity="ApiServer" inverseName="teams" inverseEntity="ApiServer" syncable="YES"/>
+    </entity>
     <elements>
-        <element name="ApiServer" positionX="9" positionY="153" width="128" height="358"/>
-        <element name="PRComment" positionX="0" positionY="0" width="128" height="253"/>
-        <element name="PRLabel" positionX="9" positionY="153" width="128" height="178"/>
+        <element name="ApiServer" positionX="9" positionY="153" width="128" height="390"/>
+        <element name="PRComment" positionX="0" positionY="0" width="128" height="268"/>
+        <element name="PRLabel" positionX="9" positionY="153" width="128" height="193"/>
         <element name="PRStatus" positionX="0" positionY="0" width="128" height="223"/>
         <element name="PullRequest" positionX="0" positionY="0" width="128" height="540"/>
-        <element name="Repo" positionX="0" positionY="0" width="128" height="240"/>
+        <element name="Repo" positionX="0" positionY="0" width="128" height="255"/>
+        <element name="Team" positionX="9" positionY="153" width="128" height="163"/>
+        <element name="Issue" positionX="9" positionY="153" width="128" height="433"/>
     </elements>
 </model>

@@ -1,5 +1,5 @@
 
-class LinkField: CenterTextField {
+final class LinkField: CenterTextField {
 
 	var targetUrl: String?
 	var needsCommand: Bool = false
@@ -19,10 +19,8 @@ class LinkField: CenterTextField {
 
 		addTrackingArea(newArea)
 
-		if let point = window?.mouseLocationOutsideOfEventStream {
-			if NSPointInRect(point, check) {
-				mouseEntered(NSEvent())
-			}
+		if let point = window?.mouseLocationOutsideOfEventStream where NSPointInRect(point, check) {
+			mouseEntered(NSEvent())
 		}
 	}
 
@@ -55,7 +53,7 @@ class LinkField: CenterTextField {
 
 	private func checkMove(theEvent: NSEvent) {
 		if targetUrl != nil {
-			if(highlight) {
+			if highlight {
 				if needsCommand && (theEvent.modifierFlags & NSEventModifierFlags.CommandKeyMask != NSEventModifierFlags.CommandKeyMask) {
 					highlight = false
 					textColor = normalColor
@@ -95,10 +93,10 @@ class LinkField: CenterTextField {
 	}
 
     private func selectParentPr(theEvent: NSEvent) {
-        if let prView = nextResponder as? PrItemView {
-            let pr = prView.associatedPullRequest()
+        if let parentView = nextResponder as? TrailerCell {
+            let pr = parentView.associatedDataItem()
             let isAlternative = ((theEvent.modifierFlags & NSEventModifierFlags.AlternateKeyMask) == NSEventModifierFlags.AlternateKeyMask)
-            app.prItemSelected(pr, alternativeSelect: isAlternative)
+            app.dataItemSelected(pr, alternativeSelect: isAlternative)
         }
     }
 

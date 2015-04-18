@@ -1,12 +1,12 @@
 
-class AvatarView: NSImageView {
+final class AvatarView: NSImageView {
 
 	var spinner: NSProgressIndicator?
 
-	init(frame frameRect:NSRect, url:NSString) {
+	init(frame frameRect: NSRect, url: String) {
 		super.init(frame: frameRect)
 		imageAlignment = NSImageAlignment.AlignCenter
-		if !api.haveCachedAvatar(url, tryLoadAndCallback: { [weak self] img in
+		if (!api.haveCachedAvatar(url) { [weak self] img in
 			if let weakSelf = self {
 				weakSelf.image = img
 				weakSelf.done()
@@ -29,12 +29,12 @@ class AvatarView: NSImageView {
 	}
 
 	func done() {
-		spinner?.stopAnimation(self)
+		spinner?.stopAnimation(nil)
 		spinner?.removeFromSuperview()
 		spinner = nil
 	}
 
-	func allowsVibrancy() -> Bool {
-		return true
+    override var allowsVibrancy: Bool {
+		return false
 	}
 }

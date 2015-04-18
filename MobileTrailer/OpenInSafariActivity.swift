@@ -2,7 +2,7 @@ import UIKit
 
 // with many thanks to https://github.com/davbeck/TUSafariActivity for the example and the icon
 
-class OpenInSafariActivity: UIActivity {
+final class OpenInSafariActivity: UIActivity {
 
 	private var _URL: NSURL?
 

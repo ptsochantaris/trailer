@@ -1,84 +1,115 @@
 
 let newSystem = (floor(NSAppKitVersionNumber) > Double(NSAppKitVersionNumber10_9))
 
-class MenuWindow: NSWindow {
+final class MenuWindow: NSWindow {
 
 	@IBOutlet weak var scrollView: NSScrollView!
 	@IBOutlet weak var header: ViewAllowsVibrancy!
-	@IBOutlet weak var prTable: NSTableView!
+	@IBOutlet weak var table: NSTableView!
 	@IBOutlet weak var filter: NSSearchField!
+	@IBOutlet weak var refreshMenuItem: NSMenuItem!
 
-	private var headerVibrant: NSVisualEffectView?
+	var statusItem: NSStatusItem?
+	var messageView: MessageView?
+
+	private var windowVibrancy: NSView?
 
 	override func awakeFromNib() {
 
 		super.awakeFromNib()
 
-        if newSystem {
-            scrollView.automaticallyAdjustsContentInsets = false
-        }
+		backgroundColor = NSColor.whiteColor()
 
-		let n = NSNotificationCenter.defaultCenter()
-		n.addObserver(self, selector: Selector("updateVibrancy"), name: UPDATE_VIBRANCY_NOTIFICATION, object: nil)
-		n.addObserver(self, selector: Selector("updateVibrancy"), name: DARK_MODE_CHANGED, object: nil)
+        if newSystem {
+            scrollView.contentView.wantsLayer = true
+        }
 	}
 
 	class func usingVibrancy() -> Bool {
 		return newSystem && Settings.useVibrancy
 	}
 
+	override func controlTextDidChange(obj: NSNotification) {
+		app.controlTextDidChange(obj)
+	}
+
 	func updateVibrancy() {
 
-		let vibrancy = MenuWindow.usingVibrancy()
+		if MenuWindow.usingVibrancy() {
 
-        if newSystem {
-            headerVibrant?.removeFromSuperview()
-            headerVibrant = nil
-			(contentView as NSView).wantsLayer = vibrancy
-        }
+			appearance = NSAppearance(named: app.darkMode ? NSAppearanceNameVibrantDark : NSAppearanceNameVibrantLight)
 
-		var bgColor: CGColorRef
+			if windowVibrancy == nil {
+				let w = NSVisualEffectView(frame: header.bounds)
+				w.autoresizingMask = NSAutoresizingMaskOptions.ViewHeightSizable | NSAutoresizingMaskOptions.ViewWidthSizable
+				w.blendingMode = NSVisualEffectBlendingMode.BehindWindow
+				w.state = NSVisualEffectState.Active
+				header.addSubview(w, positioned:NSWindowOrderingMode.Below, relativeTo:filter)
+				windowVibrancy = w
 
-		if vibrancy {
-			scrollView.frame = contentView.bounds
-			scrollView.contentInsets = NSEdgeInsetsMake(TOP_HEADER_HEIGHT, 0, 0, 0)
+				table.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.SourceList
+			}
 
-			bgColor = NSColor.clearColor().CGColor
-
-			appearance = NSAppearance(named: (app.statusItem.view as StatusItemView).darkMode ? NSAppearanceNameVibrantDark : NSAppearanceNameVibrantLight)
-			prTable.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.SourceList
-
-			headerVibrant = NSVisualEffectView(frame: header.bounds)
-			headerVibrant!.autoresizingMask = NSAutoresizingMaskOptions.ViewHeightSizable | NSAutoresizingMaskOptions.ViewWidthSizable
-			headerVibrant!.blendingMode = NSVisualEffectBlendingMode.WithinWindow
-			header.addSubview(headerVibrant!, positioned:NSWindowOrderingMode.Below, relativeTo:nil)
 		} else {
-			let windowSize = contentView.bounds.size
-			scrollView.frame = CGRectMake(0, 0, windowSize.width, windowSize.height-TOP_HEADER_HEIGHT)
 
-			bgColor = NSColor.controlBackgroundColor().CGColor
+            if let w = windowVibrancy {
 
-			if newSystem {
-				appearance = NSAppearance(named: NSAppearanceNameAqua)
-                scrollView.contentInsets = NSEdgeInsetsMake(0, 0, 0, 0)
-                prTable.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.Regular
-            } else {
-                prTable.backgroundColor = NSColor.whiteColor()
+                appearance = NSAppearance(named: NSAppearanceNameAqua)
+                w.removeFromSuperview()
+                windowVibrancy = nil
+                table.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.Regular
             }
-		}
-
-		header.layer?.backgroundColor = bgColor
-
-		if newSystem {
-			scrollView.scrollerInsets = NSEdgeInsetsMake(4.0, 0, 0.0, 0)
 		}
 	}
 
-	func canBecomeKeyWindow() -> Bool {
+	func showStatusItem() {
+		if statusItem == nil {
+			statusItem = NSStatusBar.systemStatusBar().statusItemWithLength(-1) //NSVariableStatusItemLength
+		}
+	}
+
+	func hideStatusItem() {
+		if let s = statusItem {
+			s.statusBar.removeStatusItem(s)
+			statusItem = nil
+		}
+	}
+
+    override var canBecomeKeyWindow: Bool {
 		return true
+	}
+
+	func menuWillOpen(menu: NSMenu) {
+		if !app.isRefreshing {
+			refreshMenuItem.title = " Refresh - " + api.lastUpdateDescription()
+		}
+	}
+
+	func scrollToTop() {
+		table.scrollToBeginningOfDocument(nil)
 	}
 
 	deinit {
 		NSNotificationCenter.defaultCenter().removeObserver(self)
+	}
+
+	@IBAction func markAllReadSelected(sender: NSMenuItem) {
+		app.markAllReadSelectedFrom(self)
+	}
+
+	@IBAction func preferencesSelected(sender: NSMenuItem) {
+		app.preferencesSelected()
+	}
+
+	@IBAction func refreshSelected(sender: NSMenuItem) {
+		if Repo.countVisibleReposInMoc(mainObjectContext) == 0 {
+			app.preferencesSelected()
+			return
+		}
+		app.startRefresh()
+	}
+
+	@IBAction func aboutSelected(sender: AnyObject) {
+		app.showAboutWindow()
 	}
 }

@@ -1,5 +1,5 @@
 
-class Application: NSApplication {
+final class Application: NSApplication {
 	override func sendEvent(theEvent: NSEvent) {
 		if theEvent.type == NSEventType.KeyDown {
 			let modifiers = theEvent.modifierFlags & NSEventModifierFlags.DeviceIndependentModifierFlagsMask

@@ -6,6 +6,28 @@
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
 	<string>${PRODUCT_NAME}</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeIconFiles</key>
+			<array>
+				<string>trailerDoc22.png</string>
+				<string>trailerDoc44.png</string>
+				<string>trailerDoc64.png</string>
+				<string>trailerDoc320.png</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>Trailer Settings File</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.housetrip.mobile.trailer.ios.settings</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
 	<key>CFBundleIdentifier</key>
@@ -17,13 +39,36 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.2.3</string>
+	<string>1.3.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.housetrip.mobile.trailer.ios.pockettrailer</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>pockettrailer</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
-	<string>1188</string>
+	<string>1207</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSUbiquitousContainers</key>
+	<dict>
+		<key>iCloud.com.housetrip.mobile.ios.PocketTrailer</key>
+		<dict>
+			<key>NSUbiquitousContainerIsDocumentScopePublic</key>
+			<true/>
+			<key>NSUbiquitousContainerName</key>
+			<string>PocketTrailer</string>
+			<key>NSUbiquitousContainerSupportedFolderLevels</key>
+			<string>Any</string>
+		</dict>
+	</dict>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
@@ -61,6 +106,56 @@
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+				<string>public.xml</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>Trailer Settings File</string>
+			<key>UTTypeIdentifier</key>
+			<string>com.housetrip.mobile.trailer.ios.settings</string>
+			<key>UTTypeSize320IconFile</key>
+			<string>trailerDoc320.png</string>
+			<key>UTTypeSize64IconFile</key>
+			<string>trailerDoc64.png</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>trailerSettings</string>
+				</array>
+			</dict>
+		</dict>
+	</array>
+	<key>UTImportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+				<string>public.xml</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>Trailer Settings File</string>
+			<key>UTTypeIdentifier</key>
+			<string>com.housetrip.mobile.trailer.ios.settings</string>
+			<key>UTTypeSize320IconFile</key>
+			<string>trailerDoc320.png</string>
+			<key>UTTypeSize64IconFile</key>
+			<string>trailerDoc64.png</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>trailerSettings</string>
+				</array>
+			</dict>
+		</dict>
 	</array>
 </dict>
 </plist>

@@ -1,5 +1,5 @@
 
-class PrTable: NSTableView, NSPasteboardItemDataProvider {
+final class PrTable: NSTableView, NSPasteboardItemDataProvider {
 
 	func cellAtEvent(theEvent: NSEvent) -> NSView? {
 		let globalLocation = theEvent.locationInWindow
@@ -10,9 +10,9 @@ class PrTable: NSTableView, NSPasteboardItemDataProvider {
 	override func mouseDown(theEvent: NSEvent) { }
 
 	override func mouseUp(theEvent: NSEvent) {
-		if let prView = cellAtEvent(theEvent) as? PrItemView {
+		if let prView = cellAtEvent(theEvent) as? TrailerCell {
 			let isAlternative = ((theEvent.modifierFlags & NSEventModifierFlags.AlternateKeyMask) == NSEventModifierFlags.AlternateKeyMask)
-			app.prItemSelected(prView.associatedPullRequest(), alternativeSelect:isAlternative)
+			app.dataItemSelected(prView.associatedDataItem(), alternativeSelect:isAlternative)
 		}
 	}
 
@@ -30,7 +30,8 @@ class PrTable: NSTableView, NSPasteboardItemDataProvider {
 
 		draggingUrl = nil
 
-		if let prView = cellAtEvent(theEvent) as? PrItemView {
+		if let prView = cellAtEvent(theEvent) as? TrailerCell {
+
 			draggingUrl = prView.stringForCopy()
 
 			let dragIcon = scaleImage(NSApp.applicationIconImage, toFillSize: CGSizeMake(32, 32))

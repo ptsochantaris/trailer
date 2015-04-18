@@ -2,7 +2,7 @@
 import UIKit
 import CoreData
 
-class ServersViewController: UITableViewController {
+final class ServersViewController: UITableViewController {
 
 	private var selectedServerId: NSManagedObjectID?
 	private var allServers: [ApiServer]!
@@ -48,7 +48,7 @@ class ServersViewController: UITableViewController {
 	}
 
 	override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCellWithIdentifier("ServerCell", forIndexPath: indexPath) as UITableViewCell
+		let cell = tableView.dequeueReusableCellWithIdentifier("ServerCell", forIndexPath: indexPath) as! UITableViewCell
 		let a = allServers[indexPath.row]
 		if (a.authToken ?? "").isEmpty {
 			cell.textLabel?.textColor = UIColor.redColor()
@@ -60,7 +60,7 @@ class ServersViewController: UITableViewController {
 			cell.textLabel?.textColor = UIColor.darkTextColor()
 			cell.textLabel?.text = a.label
 		}
-		if(a.requestsLimit==nil || a.requestsLimit!.doubleValue==0.0) {
+		if a.requestsLimit==nil || a.requestsLimit!.doubleValue==0.0 {
 			cell.detailTextLabel?.text = nil
 		} else
 		{

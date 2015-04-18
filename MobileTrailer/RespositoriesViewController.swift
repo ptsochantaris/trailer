@@ -2,7 +2,7 @@
 import UIKit
 import CoreData
 
-class RespositoriesViewController: UITableViewController, UITextFieldDelegate, NSFetchedResultsControllerDelegate {
+final class RespositoriesViewController: UITableViewController, UITextFieldDelegate, NSFetchedResultsControllerDelegate {
 
 	// Filtering
 	private var searchField: UITextField?
@@ -33,9 +33,9 @@ class RespositoriesViewController: UITableViewController, UITextFieldDelegate, N
 		searchField!.delegate = self
 		searchField!.autoresizingMask = UIViewAutoresizing.FlexibleWidth
 
-		searchTimer = PopTimer(timeInterval: 0.5, callback: { [weak self] in
+		searchTimer = PopTimer(timeInterval: 0.5) { [weak self] in
 			self!.reloadData()
-		})
+		}
 
 		let searchHolder = UIView(frame: CGRectMake(0, 0, view.bounds.size.width, 51))
 		searchHolder.addSubview(searchField!)
@@ -46,6 +46,9 @@ class RespositoriesViewController: UITableViewController, UITextFieldDelegate, N
 
 	override func viewDidAppear(animated: Bool) {
 		actionsButton.enabled = ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext)
+		if actionsButton.enabled && fetchedResultsController.fetchedObjects?.count==0 {
+			refreshList()
+		}
 		super.viewDidAppear(animated)
 	}
 
@@ -55,17 +58,16 @@ class RespositoriesViewController: UITableViewController, UITextFieldDelegate, N
 			self!.refreshList()
 		}))
 		a.addAction(UIAlertAction(title: "Hide All", style: UIAlertActionStyle.Default, handler: { [weak self] action in
-			for r in self!.fetchedResultsController.fetchedObjects as [Repo] {
+			for r in self!.fetchedResultsController.fetchedObjects as! [Repo] {
 				r.hidden = true
 				r.dirty = false
 			}
 			app.preferencesDirty = true
 		}))
 		a.addAction(UIAlertAction(title: "Show All", style: UIAlertActionStyle.Default, handler: { [weak self] action in
-			for r in self!.fetchedResultsController.fetchedObjects as [Repo] {
+			for r in self!.fetchedResultsController.fetchedObjects as! [Repo] {
 				r.hidden = false
-				r.dirty = true
-				r.lastDirtied = NSDate()
+				r.resetSyncState()
 			}
 			app.preferencesDirty = true
 		}))
@@ -82,7 +84,7 @@ class RespositoriesViewController: UITableViewController, UITextFieldDelegate, N
 		tableView.alpha = 0.5
 
 		let tempContext = DataManager.tempContext()
-		api.fetchRepositoriesToMoc(tempContext, callback: { [weak self] in
+		api.fetchRepositoriesToMoc(tempContext) { [weak self] in
 			if ApiServer.shouldReportRefreshFailureInMoc(tempContext) {
 				var errorServers = [String]()
 				for apiServer in ApiServer.allApiServersInMoc(tempContext) {
@@ -101,7 +103,7 @@ class RespositoriesViewController: UITableViewController, UITextFieldDelegate, N
 			self!.tableView.alpha = 1.0
 			self!.tableView.userInteractionEnabled = true
 			app.preferencesDirty = true
-		})
+		}
 	}
 
 	override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
@@ -114,14 +116,14 @@ class RespositoriesViewController: UITableViewController, UITextFieldDelegate, N
 	}
 
 	override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as UITableViewCell
+		let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! UITableViewCell
 		configureCell(cell, atIndexPath: indexPath)
 		return cell
 	}
 
 	override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
 		if let repo = fetchedResultsController.objectAtIndexPath(indexPath) as? Repo {
-			let hideNow = !repo.hidden.boolValue
+			let hideNow = !(repo.hidden?.boolValue ?? false)
 			repo.hidden = hideNow
 			repo.dirty = !hideNow
 			DataManager.saveDB()
@@ -134,7 +136,7 @@ class RespositoriesViewController: UITableViewController, UITextFieldDelegate, N
 		if section==1 {
 			return "Forked Repos"
 		} else {
-			let repo = fetchedResultsController.objectAtIndexPath(NSIndexPath(forRow: 0, inSection: section)) as Repo
+			let repo = fetchedResultsController.objectAtIndexPath(NSIndexPath(forRow: 0, inSection: section)) as! Repo
 			if (repo.fork?.boolValue ?? false) {
 				return "Forked Repos"
 			} else {
@@ -209,11 +211,11 @@ class RespositoriesViewController: UITableViewController, UITextFieldDelegate, N
 	}
 
 	private func configureCell(cell: UITableViewCell, atIndexPath: NSIndexPath) {
-		let repo = fetchedResultsController.objectAtIndexPath(atIndexPath) as Repo
+		let repo = fetchedResultsController.objectAtIndexPath(atIndexPath) as! Repo
 		let fullName = repo.fullName ?? "(Untitled Repo)"
 		let text = (repo.inaccessible?.boolValue ?? false) ? (fullName + " (inaccessible)") : fullName
 		cell.textLabel?.text = text
-		if repo.hidden.boolValue {
+		if (repo.hidden?.boolValue ?? false) {
 			cell.accessoryView = makeX()
 			cell.textLabel?.textColor = UIColor.lightGrayColor()
 			cell.accessibilityLabel = "Hidden: " + text

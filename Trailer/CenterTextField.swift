@@ -1,13 +1,15 @@
 
 class CenterTextField: NSTextField {
 
+    var vibrant = true
+
 	override init(frame frameRect: NSRect) {
 		super.init(frame: frameRect)
 		bezeled = false
 		editable = false
 		selectable = false
 		drawsBackground = false
-		(cell() as CenterTextFieldCell).scrollable = false
+		(cell() as! CenterTextFieldCell).scrollable = false
 	}
 
 	required init?(coder: NSCoder) {
@@ -18,8 +20,8 @@ class CenterTextField: NSTextField {
 		setCellClass(CenterTextFieldCell)
 	}
 
-	func allowsVibrancy() -> Bool {
-		return true
+    override var allowsVibrancy: Bool {
+		return vibrant
 	}
 
 }
