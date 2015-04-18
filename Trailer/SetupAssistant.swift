@@ -100,7 +100,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 				close()
 				let alert = NSAlert()
 				alert.messageText = "Setup complete!"
-				alert.informativeText = "You can tweak settings & behaviour from the preferences window.\n\nPocketTrailer will only read from your Github data, so feel free to experiment with settings and options, you can't damage your data or settings on GitHub."
+				alert.informativeText = "You can tweak settings & behaviour from the preferences window.\n\nPocketTrailer only had read-only access to your Github data, so feel free to experiment, you can't damage your data or settings on GitHub."
 				alert.addButtonWithTitle("OK")
 				alert.runModal()
 			} else {
