@@ -92,7 +92,7 @@ class DataItem: NSManagedObject {
 	}
 
 	class func nukeDeletedItemsInMoc(moc: NSManagedObjectContext) {
-		let types = ["Repo", "PullRequest", "PRStatus", "PRComment", "PRLabel", "Issue"]
+		let types = ["Repo", "PullRequest", "PRStatus", "PRComment", "PRLabel", "Issue", "Team"]
 		var count = 0
 		for type in types {
 			let discarded = itemsOfType(type, surviving: false, inMoc: moc)

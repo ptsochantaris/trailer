@@ -369,6 +369,11 @@ final class API {
 	}
 
 	private func fetchUserTeamsFromApiServer(apiServer: ApiServer, callback: Completion) {
+
+		for t in apiServer.teams {
+			t.postSyncAction = PostSyncAction.Delete.rawValue
+		}
+
 		getPagedDataInPath("/user/teams",
 			fromServer: apiServer,
 			startingFromPage: 1,
