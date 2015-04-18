@@ -1397,7 +1397,6 @@ final class API {
 			}
 
 			let r = NSMutableURLRequest(URL: NSURL(string: expandedPath)!, cachePolicy: NSURLRequestCachePolicy.UseProtocolCachePolicy, timeoutInterval: NETWORK_TIMEOUT)
-			r.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
 			if authToken != nil { r.setValue("token " + authToken!, forHTTPHeaderField: "Authorization") }
 
 			if let headers = extraHeaders {
