@@ -1,12 +1,1410 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7531" systemVersion="14D136" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7531" systemVersion="14D136" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7531"/>
     </dependencies>
     <objects>
-        <customObject id="-2" userLabel="File's Owner"/>
+        <customObject id="-2" userLabel="File's Owner" customClass="NSWindowController">
+            <connections>
+                <outlet property="window" destination="vQH-WF-vh2" id="6po-xz-NJA"/>
+            </connections>
+        </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <window title="Trailer Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="vQH-WF-vh2" customClass="PreferencesWindow" customModule="Trailer" customModuleProvider="target">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" resizable="YES"/>
+            <rect key="contentRect" x="335" y="390" width="782" height="460"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+            <value key="minSize" type="size" width="782" height="460"/>
+            <view key="contentView" id="nDu-sJ-Klg">
+                <rect key="frame" x="0.0" y="0.0" width="782" height="460"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <button id="H3d-cL-Izf">
+                        <rect key="frame" x="7" y="3" width="174" height="26"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="check" title="Start Trailer at Login" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" scrollable="YES" lineBreakMode="clipping" state="on" inset="2" id="qbn-he-5QB">
+                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                            <font key="font" metaFont="smallSystem"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="launchAtStartSelected:" target="vQH-WF-vh2" id="neu-tk-tNn"/>
+                        </connections>
+                    </button>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="iqF-Fz-LyV">
+                        <rect key="frame" x="615" y="3" width="158" height="20"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Version" id="YMV-pm-TMh">
+                            <font key="font" metaFont="smallSystem"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <tabView id="RGK-bv-JXB">
+                        <rect key="frame" x="13" y="42" width="756" height="412"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <font key="font" metaFont="system"/>
+                        <tabViewItems>
+                            <tabViewItem label="Servers" identifier="" id="SOc-1o-tdR">
+                                <view key="view" id="qLY-Ye-wy7">
+                                    <rect key="frame" x="10" y="33" width="736" height="366"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <scrollView autohidesScrollers="YES" horizontalLineScroll="26" horizontalPageScroll="10" verticalLineScroll="26" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="FEq-Qw-Vgd">
+                                            <rect key="frame" x="17" y="46" width="240" height="317"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <clipView key="contentView" id="0eh-Pe-UwN">
+                                                <rect key="frame" x="1" y="0.0" width="238" height="134"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" headerView="GLY-La-oaP" id="wPh-gi-N9t">
+                                                        <rect key="frame" x="0.0" y="0.0" width="238" height="26"/>
+                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <size key="intercellSpacing" width="3" height="9"/>
+                                                        <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
+                                                        <tableColumns>
+                                                            <tableColumn identifier="server" editable="NO" width="170" minWidth="40" maxWidth="1000" id="8yd-Ed-e1H">
+                                                                <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Server">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                                                </tableHeaderCell>
+                                                                <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" alignment="left" title="Text Cell" id="Tqp-Ew-QIP">
+                                                                    <font key="font" metaFont="system"/>
+                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                                <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                                            </tableColumn>
+                                                            <tableColumn identifier="api_use" editable="NO" width="62" minWidth="10" maxWidth="3.4028234663852886e+38" id="pbE-pE-euq">
+                                                                <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="API use">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                                                </tableHeaderCell>
+                                                                <levelIndicatorCell key="dataCell" state="on" alignment="left" doubleValue="3" maxValue="3" warningValue="3" criticalValue="3" levelIndicatorStyle="continuousCapacity" id="Ry4-3X-AnE">
+                                                                    <font key="font" metaFont="system"/>
+                                                                </levelIndicatorCell>
+                                                                <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                                            </tableColumn>
+                                                        </tableColumns>
+                                                        <connections>
+                                                            <outlet property="dataSource" destination="vQH-WF-vh2" id="zJW-Qu-2oi"/>
+                                                            <outlet property="delegate" destination="vQH-WF-vh2" id="znt-98-s6f"/>
+                                                        </connections>
+                                                    </tableView>
+                                                </subviews>
+                                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </clipView>
+                                            <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="NXP-Pe-zjP">
+                                                <rect key="frame" x="1" y="119" width="223" height="15"/>
+                                                <autoresizingMask key="autoresizingMask"/>
+                                            </scroller>
+                                            <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="ktq-74-h3c">
+                                                <rect key="frame" x="224" y="17" width="15" height="102"/>
+                                                <autoresizingMask key="autoresizingMask"/>
+                                            </scroller>
+                                            <tableHeaderView key="headerView" id="GLY-La-oaP">
+                                                <rect key="frame" x="0.0" y="0.0" width="10000" height="17"/>
+                                                <autoresizingMask key="autoresizingMask"/>
+                                            </tableHeaderView>
+                                        </scrollView>
+                                        <button verticalHuggingPriority="750" id="T55-Fy-0Gf">
+                                            <rect key="frame" x="17" y="16" width="240" height="32"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="smallSquare" title="+ Add API Server" bezelStyle="smallSquare" imagePosition="overlaps" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="7aw-xD-7EL">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="label"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="addNewApiServerSelected:" target="vQH-WF-vh2" id="twq-Bg-WX4"/>
+                                            </connections>
+                                        </button>
+                                        <box autoresizesSubviews="NO" title="Selected Server" borderType="line" id="Zjr-Bg-vY8">
+                                            <rect key="frame" x="263" y="13" width="468" height="350"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <view key="contentView">
+                                                <rect key="frame" x="1" y="1" width="466" height="334"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <button verticalHuggingPriority="750" id="k1C-rR-Wxu">
+                                                        <rect key="frame" x="141" y="7" width="80" height="32"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="push" title="Delete" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="y4c-TX-UeH">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="deleteSelectedServerSelected:" target="vQH-WF-vh2" id="fhb-tP-g5A"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" id="Tu3-cb-beM">
+                                                        <rect key="frame" x="12" y="7" width="66" height="32"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="push" title="Test" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="QdL-bA-0NX">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="testApiServerSelected:" target="vQH-WF-vh2" id="zWu-7v-tCd"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" id="ifm-A1-rdj">
+                                                        <rect key="frame" x="262" y="7" width="192" height="32"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="push" title="Reset to Github Defaults" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="zqK-DJ-JcO">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="apiRestoreDefaultsSelected:" target="vQH-WF-vh2" id="GtT-rJ-omW"/>
+                                                        </connections>
+                                                    </button>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="2GE-sm-VZ0">
+                                                        <rect key="frame" x="6" y="265" width="90" height="20"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="API Path" id="3XX-k0-LtU">
+                                                            <font key="font" metaFont="label"/>
+                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="cAh-gg-Wqn">
+                                                        <rect key="frame" x="6" y="233" width="90" height="20"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Web Front End" id="vhl-W9-zqM">
+                                                            <font key="font" metaFont="label"/>
+                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="4td-hc-6rZ">
+                                                        <rect key="frame" x="6" y="163" width="90" height="28"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" id="Bam-mX-Su4">
+                                                            <font key="font" metaFont="smallSystemBold"/>
+                                                            <string key="title">Authorization
+Token</string>
+                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="1id-1Q-2Pc">
+                                                        <rect key="frame" x="6" y="297" width="90" height="20"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Name" id="Wcj-U6-Jja">
+                                                            <font key="font" metaFont="label"/>
+                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField verticalHuggingPriority="750" id="yUS-Pw-j0m">
+                                                        <rect key="frame" x="102" y="77" width="346" height="118"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="border" drawsBackground="YES" id="9um-Bk-bLh">
+                                                            <font key="font" metaFont="system"/>
+                                                            <string key="placeholderString">Paste your GitHub personal access token in here; use
+the links below to view or create one.
+
+You can use 'Test' to verify your settings and move on
+to 'Repositories' from above, or if you are an advanced
+user you can add more servers from the left.</string>
+                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <outlet property="delegate" destination="vQH-WF-vh2" id="gaY-Gq-h5L"/>
+                                                        </connections>
+                                                    </textField>
+                                                    <textField verticalHuggingPriority="750" id="9xz-I3-HQw">
+                                                        <rect key="frame" x="102" y="268" width="346" height="24"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="https://api.github.com (for GE: https://server/api/v3)" drawsBackground="YES" usesSingleLineMode="YES" id="DuA-I1-PSV">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <outlet property="delegate" destination="vQH-WF-vh2" id="8YT-sX-k5B"/>
+                                                        </connections>
+                                                    </textField>
+                                                    <textField verticalHuggingPriority="750" id="Bi3-xh-wlg">
+                                                        <rect key="frame" x="102" y="300" width="346" height="24"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="GitHub" drawsBackground="YES" usesSingleLineMode="YES" id="rBJ-1n-RRX">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <outlet property="delegate" destination="vQH-WF-vh2" id="UtI-ry-dEq"/>
+                                                        </connections>
+                                                    </textField>
+                                                    <button verticalHuggingPriority="750" id="q1S-M3-nh6">
+                                                        <rect key="frame" x="167" y="52" width="130" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="inline" title="Existing Tokens" bezelStyle="inline" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="OhE-A7-jdY">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="smallSystemBold"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="viewExistingTokensSelected:" target="vQH-WF-vh2" id="tKa-hy-UsC"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" id="8qJ-4h-rPj">
+                                                        <rect key="frame" x="318" y="52" width="130" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="inline" title="Watchlist" bezelStyle="inline" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="gyy-PC-Gia">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="smallSystemBold"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="viewWatchlistSelected:" target="vQH-WF-vh2" id="FWN-q0-qVI"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" id="9sX-2X-O8K">
+                                                        <rect key="frame" x="18" y="52" width="130" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="inline" title="Create Token" bezelStyle="inline" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2vK-1D-pyW">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="smallSystemBold"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="createTokenSelected:" target="vQH-WF-vh2" id="77H-5d-fm4"/>
+                                                        </connections>
+                                                    </button>
+                                                    <textField verticalHuggingPriority="750" id="CT9-ev-oP0">
+                                                        <rect key="frame" x="102" y="236" width="346" height="24"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="https://github.com" drawsBackground="YES" usesSingleLineMode="YES" id="5Ai-jn-gsl">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <outlet property="delegate" destination="vQH-WF-vh2" id="x9J-c3-bhR"/>
+                                                        </connections>
+                                                    </textField>
+                                                    <button id="97p-7q-Kd5">
+                                                        <rect key="frame" x="110" y="207" width="340" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Report syncing problems with this server" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="SQa-fC-sUh">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="label"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="apiServerReportErrorSelected:" target="vQH-WF-vh2" id="if5-14-f5r"/>
+                                                        </connections>
+                                                    </button>
+                                                </subviews>
+                                            </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </box>
+                                    </subviews>
+                                </view>
+                            </tabViewItem>
+                            <tabViewItem label="Repositories" identifier="1" id="8ZQ-7Z-tCc">
+                                <view key="view" id="SdJ-82-U77">
+                                    <rect key="frame" x="10" y="33" width="736" height="366"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <button id="rNO-7f-eIw">
+                                            <rect key="frame" x="15" y="8" width="438" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Auto-hide new repositories detected on your watchlists" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="o9Z-sA-KO7">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="hideNewRespositoriesSelected:" target="vQH-WF-vh2" id="soF-kK-JQB"/>
+                                            </connections>
+                                        </button>
+                                        <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="dPG-Wd-B7N">
+                                            <rect key="frame" x="17" y="67" width="709" height="296"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <clipView key="contentView" id="hCD-zR-3bF">
+                                                <rect key="frame" x="1" y="17" width="684" height="152"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" typeSelect="NO" headerView="qia-ub-v1J" id="6pK-a1-URw">
+                                                        <rect key="frame" x="0.0" y="0.0" width="707" height="19"/>
+                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <size key="intercellSpacing" width="3" height="2"/>
+                                                        <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
+                                                        <tableColumns>
+                                                            <tableColumn identifier="hide" width="37" minWidth="10" maxWidth="3.4028234663852886e+38" id="2tx-VA-z8W">
+                                                                <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="Hide">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                                                </tableHeaderCell>
+                                                                <buttonCell key="dataCell" type="check" bezelStyle="regularSquare" imagePosition="overlaps" alignment="center" inset="2" id="XuT-NP-jCY">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                            </tableColumn>
+                                                            <tableColumn identifier="repos" editable="NO" width="664" minWidth="40" maxWidth="1000" id="nW5-Ng-D0l">
+                                                                <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Watched Repository">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" white="0.33333298560000002" alpha="1" colorSpace="calibratedWhite"/>
+                                                                </tableHeaderCell>
+                                                                <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" title="Text" id="JvB-Co-4ka">
+                                                                    <font key="font" metaFont="system"/>
+                                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                                <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                                            </tableColumn>
+                                                        </tableColumns>
+                                                        <connections>
+                                                            <outlet property="dataSource" destination="vQH-WF-vh2" id="ojM-Ce-GaY"/>
+                                                            <outlet property="delegate" destination="vQH-WF-vh2" id="WWz-mj-G6t"/>
+                                                        </connections>
+                                                    </tableView>
+                                                </subviews>
+                                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </clipView>
+                                            <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="SMx-sS-Tdd">
+                                                <rect key="frame" x="1" y="153" width="684" height="16"/>
+                                                <autoresizingMask key="autoresizingMask"/>
+                                            </scroller>
+                                            <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="IrO-ah-oEe">
+                                                <rect key="frame" x="224" y="17" width="15" height="102"/>
+                                                <autoresizingMask key="autoresizingMask"/>
+                                            </scroller>
+                                            <tableHeaderView key="headerView" id="qia-ub-v1J">
+                                                <rect key="frame" x="0.0" y="0.0" width="684" height="17"/>
+                                                <autoresizingMask key="autoresizingMask"/>
+                                            </tableHeaderView>
+                                        </scrollView>
+                                        <button verticalHuggingPriority="750" id="u1W-mu-uId">
+                                            <rect key="frame" x="644" y="30" width="88" height="32"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="push" title="Refresh" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="rFG-sc-WB2">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="refreshReposSelected:" target="vQH-WF-vh2" id="PE1-3B-9jc"/>
+                                            </connections>
+                                        </button>
+                                        <searchField wantsLayer="YES" verticalHuggingPriority="750" id="Qfh-lH-HFg">
+                                            <rect key="frame" x="195" y="37" width="171" height="22"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" placeholderString="Filter..." usesSingleLineMode="YES" bezelStyle="round" id="dZ4-dF-dkV">
+                                                <font key="font" metaFont="titleBar" size="12"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </searchFieldCell>
+                                            <connections>
+                                                <outlet property="delegate" destination="vQH-WF-vh2" id="wSo-04-QiJ"/>
+                                            </connections>
+                                        </searchField>
+                                        <button verticalHuggingPriority="750" id="I3M-ve-HGK">
+                                            <rect key="frame" x="11" y="30" width="90" height="32"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="push" title="Hide All" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="bRK-h6-fiX">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="hideAllRepositoriesSelected:" target="vQH-WF-vh2" id="pV4-Tt-r9u"/>
+                                            </connections>
+                                        </button>
+                                        <button verticalHuggingPriority="750" id="QIt-EX-s8m">
+                                            <rect key="frame" x="99" y="30" width="94" height="32"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="push" title="Show All" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="0pF-fA-gVg">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="showAllRepositoriesSelected:" target="vQH-WF-vh2" id="wTD-ru-bUC"/>
+                                            </connections>
+                                        </button>
+                                        <progressIndicator horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" id="5Hk-e1-cSC">
+                                            <rect key="frame" x="626" y="39" width="16" height="16"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        </progressIndicator>
+                                    </subviews>
+                                </view>
+                            </tabViewItem>
+                            <tabViewItem label="Display" identifier="" id="eo7-T1-mRS">
+                                <view key="view" id="fNr-eq-ZlF">
+                                    <rect key="frame" x="10" y="33" width="736" height="366"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="INA-l0-fZh">
+                                            <rect key="frame" x="702" y="18" width="19" height="27"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <stepperCell key="cell" continuous="YES" alignment="left" increment="10" minValue="60" maxValue="3600" doubleValue="60" id="EvF-c3-Alv"/>
+                                            <connections>
+                                                <action selector="refreshDurationChanged:" target="vQH-WF-vh2" id="y1L-xR-vLZ"/>
+                                            </connections>
+                                        </stepper>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Zu0-k7-csJ">
+                                            <rect key="frame" x="427" y="24" width="275" height="17"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Refresh items every 3600 seconds" id="tcS-Fj-NKu">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="ThS-Id-Gqm">
+                                            <rect key="frame" x="702" y="51" width="19" height="27"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <stepperCell key="cell" continuous="YES" alignment="left" minValue="2" maxValue="99999" doubleValue="2" id="hrN-wT-iMM"/>
+                                            <connections>
+                                                <action selector="newRepoCheckChanged:" target="vQH-WF-vh2" id="bLc-qI-O36"/>
+                                            </connections>
+                                        </stepper>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="XcM-W3-Ec0">
+                                            <rect key="frame" x="427" y="57" width="275" height="17"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Refresh repositories every 2 hours" id="0Sb-5H-BRV">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <button id="ueT-Kq-j9E">
+                                            <rect key="frame" x="427" y="88" width="293" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Gray menubar count when refreshing" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="4bJ-dN-Uhp">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="grayOutWhenRefreshingSelected:" target="vQH-WF-vh2" id="fCv-C1-fWf"/>
+                                            </connections>
+                                        </button>
+                                        <button id="CxD-CQ-bRP">
+                                            <rect key="frame" x="20" y="323" width="293" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Sync issues, and display issues menu" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="7aO-Jk-hQ9">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="showIssuesMenuSelected:" target="vQH-WF-vh2" id="bRT-en-Efq"/>
+                                            </connections>
+                                        </button>
+                                        <button id="Efg-Id-lOP">
+                                            <rect key="frame" x="20" y="265" width="413" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Display creation times instead of most recent activity times" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="yUS-qR-eV4">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="showCreationSelected:" target="vQH-WF-vh2" id="ie4-88-nBp"/>
+                                            </connections>
+                                        </button>
+                                        <button id="RNE-Xe-Xwy">
+                                            <rect key="frame" x="20" y="237" width="338" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Move items assigned to me to &quot;My&quot; section" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="4kL-OQ-kaE">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="moveAssignedPrsToMySectionSelected:" target="vQH-WF-vh2" id="Rve-Xu-fEL"/>
+                                            </connections>
+                                        </button>
+                                        <button id="Y5g-gh-uLn">
+                                            <rect key="frame" x="20" y="208" width="387" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Mark un-mergeable PRs only in &quot;My&quot; or &quot;Participated&quot;" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="rZv-TW-Nxj">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="markUnmergeableOnUserSectionsOnlySelected:" target="vQH-WF-vh2" id="5X6-AW-0x9"/>
+                                            </connections>
+                                        </button>
+                                        <button id="rEz-q1-QZq">
+                                            <rect key="frame" x="20" y="155" width="387" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Count only currently displayed items in the menubar" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="23T-vx-oJZ">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="countOnlyListedPrsSelected:" target="vQH-WF-vh2" id="rKK-z5-pKH"/>
+                                            </connections>
+                                        </button>
+                                        <button id="yK4-xL-QRu">
+                                            <rect key="frame" x="20" y="101" width="262" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Display repository names" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="oZY-hH-Udu">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="displayRepositoryNameSelected:" target="vQH-WF-vh2" id="PMz-8Z-bde"/>
+                                            </connections>
+                                        </button>
+                                        <button id="onl-1T-RTg">
+                                            <rect key="frame" x="20" y="47" width="238" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Use vibrancy" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="Mtr-gs-YsM">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="useVibrancySelected:" target="vQH-WF-vh2" id="tWv-cu-dmX"/>
+                                            </connections>
+                                        </button>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="gXJ-Co-1FC">
+                                            <rect key="frame" x="37" y="29" width="221" height="17"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="(best on Retina, requires Yosemite)" id="n79-46-oFL">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <box autoresizesSubviews="NO" title="Hide" borderType="line" id="rbT-qf-DIe">
+                                            <rect key="frame" x="463" y="293" width="267" height="54"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <view key="contentView">
+                                                <rect key="frame" x="1" y="1" width="265" height="38"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <button id="9wb-oI-R5I">
+                                                        <rect key="frame" x="16" y="12" width="122" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="&quot;All&quot; sections" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="Rzg-zZ-93n">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="hideAllPrsSection:" target="vQH-WF-vh2" id="ae2-I2-j1m"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button id="3CV-9S-gLw">
+                                                        <rect key="frame" x="142" y="12" width="88" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Avatars" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="UOs-3D-XyL">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="hideAvatarsSelected:" target="vQH-WF-vh2" id="45w-QA-Tcd"/>
+                                                        </connections>
+                                                    </button>
+                                                </subviews>
+                                            </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </box>
+                                        <box autoresizesSubviews="NO" title="When filtering, also scan" borderType="line" id="iei-ab-K9r">
+                                            <rect key="frame" x="463" y="221" width="267" height="54"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <view key="contentView">
+                                                <rect key="frame" x="1" y="1" width="265" height="38"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <button id="dTw-ed-XkE">
+                                                        <rect key="frame" x="16" y="12" width="74" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Repos" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="gO1-Ad-AhD">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="includeRepositoriesInfilterSelected:" target="vQH-WF-vh2" id="mxT-kL-vT4"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button id="Jr3-YU-DrS">
+                                                        <rect key="frame" x="93" y="12" width="88" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Statuses" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="Dds-V9-uRU">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="includeStatusesInFilteringSelected:" target="vQH-WF-vh2" id="99K-Kf-87w"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button id="eFR-P1-MxA">
+                                                        <rect key="frame" x="184" y="12" width="72" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Labels" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="6Za-6G-OIl">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="includeLabelsInFilteringSelected:" target="vQH-WF-vh2" id="YrY-h8-hA2"/>
+                                                        </connections>
+                                                    </button>
+                                                </subviews>
+                                            </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </box>
+                                    </subviews>
+                                </view>
+                            </tabViewItem>
+                            <tabViewItem label="Sorting" identifier="2" id="60W-IN-VZ2">
+                                <view key="view" id="MPC-FP-HmM">
+                                    <rect key="frame" x="10" y="33" width="736" height="366"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <box autoresizesSubviews="NO" borderType="none" titlePosition="noTitle" id="WfS-TK-dZa">
+                                            <rect key="frame" x="235" y="128" width="267" height="123"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <view key="contentView">
+                                                <rect key="frame" x="0.0" y="0.0" width="267" height="123"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <button id="afo-70-80J">
+                                                        <rect key="frame" x="23" y="48" width="149" height="25"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Reverse direction" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="6ye-0C-sLV">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="sortOrderSelected:" target="vQH-WF-vh2" id="tjk-D1-1ga"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button id="TqD-G8-E24">
+                                                        <rect key="frame" x="23" y="14" width="164" height="25"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Group by repository" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="AYd-ds-ReS">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="groupbyRepoSelected:" target="vQH-WF-vh2" id="rlf-CZ-Cee"/>
+                                                        </connections>
+                                                    </button>
+                                                    <popUpButton verticalHuggingPriority="750" id="bWX-fP-uhd">
+                                                        <rect key="frame" x="17" y="89" width="234" height="26"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <popUpButtonCell key="cell" type="push" title="Sorting" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="PQf-4J-ChU">
+                                                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="menu"/>
+                                                            <menu key="menu" title="OtherViews" id="oX1-2z-FQn">
+                                                                <items>
+                                                                    <menuItem title="Sorting" state="on" id="DAj-5M-Ln1"/>
+                                                                    <menuItem title="Item 2" id="n4v-z6-mEm"/>
+                                                                    <menuItem title="Item 3" id="Hiu-2H-1c4"/>
+                                                                </items>
+                                                            </menu>
+                                                        </popUpButtonCell>
+                                                        <connections>
+                                                            <action selector="sortMethodChanged:" target="vQH-WF-vh2" id="SNP-Ce-rEB"/>
+                                                        </connections>
+                                                    </popUpButton>
+                                                </subviews>
+                                            </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </box>
+                                    </subviews>
+                                </view>
+                            </tabViewItem>
+                            <tabViewItem label="History" identifier="" id="g1R-BW-1ix">
+                                <view key="view" id="IqF-nu-n45">
+                                    <rect key="frame" x="10" y="33" width="736" height="366"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <box autoresizesSubviews="NO" borderType="none" titlePosition="noTitle" id="HAA-q5-qyx">
+                                            <rect key="frame" x="156" y="83" width="427" height="212"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <view key="contentView">
+                                                <rect key="frame" x="0.0" y="0.0" width="427" height="212"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <button id="ZiV-Lz-lSl">
+                                                        <rect key="frame" x="107" y="95" width="244" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Don't keep items merged by me" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="XHX-lg-c6B">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="dontKeepMyPrsSelected:" target="vQH-WF-vh2" id="Rdm-9D-K5g"/>
+                                                        </connections>
+                                                    </button>
+                                                    <box autoresizesSubviews="NO" title="Don't confirm when selecting to remove..." borderType="line" id="KkY-YC-hC1">
+                                                        <rect key="frame" x="14" y="11" width="397" height="54"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <view key="contentView">
+                                                            <rect key="frame" x="1" y="1" width="395" height="38"/>
+                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                            <subviews>
+                                                                <button id="ptr-tf-eNM">
+                                                                    <rect key="frame" x="53" y="12" width="166" height="18"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <buttonCell key="cell" type="check" title="...all merged items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="XJl-yt-Rm9">
+                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                        <font key="font" metaFont="system"/>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="dontConfirmRemoveAllMergedSelected:" target="vQH-WF-vh2" id="jV4-g4-vGg"/>
+                                                                    </connections>
+                                                                </button>
+                                                                <button id="w0K-BS-Gti">
+                                                                    <rect key="frame" x="223" y="12" width="156" height="18"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <buttonCell key="cell" type="check" title="...all closed items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="oXu-x0-6b5">
+                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                        <font key="font" metaFont="system"/>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="dontConfirmRemoveAllClosedSelected:" target="vQH-WF-vh2" id="yu2-rU-uBH"/>
+                                                                    </connections>
+                                                                </button>
+                                                            </subviews>
+                                                        </view>
+                                                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                    </box>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="6Rs-G3-8sn">
+                                                        <rect key="frame" x="29" y="181" width="185" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="When something is merged:" id="oev-O5-Yz8">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <popUpButton verticalHuggingPriority="750" id="DVS-bf-HmU">
+                                                        <rect key="frame" x="218" y="175" width="134" height="26"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <popUpButtonCell key="cell" type="push" title="Keep My Own" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="d5e-nv-C7o">
+                                                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="menu"/>
+                                                            <menu key="menu" title="OtherViews" id="R4i-KU-iWz">
+                                                                <items>
+                                                                    <menuItem title="Keep My Own" state="on" id="cgN-3d-2Wt"/>
+                                                                    <menuItem title="Keep All" id="3S5-2j-Zli"/>
+                                                                    <menuItem title="Don't Keep" id="XdV-Lf-khp"/>
+                                                                </items>
+                                                            </menu>
+                                                        </popUpButtonCell>
+                                                        <connections>
+                                                            <action selector="prMergePolicySelected:" target="vQH-WF-vh2" id="TtC-wI-FBz"/>
+                                                        </connections>
+                                                    </popUpButton>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="4ns-RA-qwP">
+                                                        <rect key="frame" x="29" y="145" width="185" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="When something is closed:" id="a60-VD-gfW">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <popUpButton verticalHuggingPriority="750" id="MUp-kA-DZp">
+                                                        <rect key="frame" x="218" y="139" width="134" height="26"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <popUpButtonCell key="cell" type="push" title="Keep My Own" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="exr-ek-OWA">
+                                                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="menu"/>
+                                                            <menu key="menu" title="OtherViews" id="OrW-A7-Xc2">
+                                                                <items>
+                                                                    <menuItem title="Keep My Own" state="on" id="cyB-qf-6Eu"/>
+                                                                    <menuItem title="Keep All" id="r2G-KA-S7R"/>
+                                                                    <menuItem title="Don't Keep" id="9gv-FQ-txC"/>
+                                                                </items>
+                                                            </menu>
+                                                        </popUpButtonCell>
+                                                        <connections>
+                                                            <action selector="prClosePolicySelected:" target="vQH-WF-vh2" id="ga5-ah-Ijc"/>
+                                                        </connections>
+                                                    </popUpButton>
+                                                </subviews>
+                                            </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </box>
+                                    </subviews>
+                                </view>
+                            </tabViewItem>
+                            <tabViewItem label="Comments" identifier="" id="62J-pw-ytj">
+                                <view key="view" id="Coh-zT-J58">
+                                    <rect key="frame" x="10" y="33" width="736" height="366"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <box autoresizesSubviews="NO" borderType="none" titlePosition="noTitle" id="9l1-g0-3Pv">
+                                            <rect key="frame" x="32" y="36" width="673" height="296"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <view key="contentView">
+                                                <rect key="frame" x="0.0" y="0.0" width="673" height="296"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <button id="gjf-cd-s24">
+                                                        <rect key="frame" x="10" y="234" width="317" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Only display items with unread comments" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="MxE-lL-IWo">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="hideUncommentedRequestsSelected:" target="vQH-WF-vh2" id="lWs-IO-dif"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button id="UGp-d4-lNW">
+                                                        <rect key="frame" x="10" y="267" width="317" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Display comment badges &amp; alerts for all items" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="z6Z-nh-Y6O">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="showAllCommentsSelected:" target="vQH-WF-vh2" id="Hsq-qd-D3i"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button id="Afp-0h-LBr">
+                                                        <rect key="frame" x="337" y="267" width="317" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Move items mentioning me to 'Participated'" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="28l-3y-WDO">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="autoParticipateOnMentionSelected:" target="vQH-WF-vh2" id="j2G-Jw-jzl"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button id="ZXi-oc-EhW">
+                                                        <rect key="frame" x="10" y="201" width="317" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Open items at first unread comment" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="DWF-3M-url">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="openPrAtFirstUnreadCommentSelected:" target="vQH-WF-vh2" id="c6Q-Pd-dqe"/>
+                                                        </connections>
+                                                    </button>
+                                                    <tokenField verticalHuggingPriority="750" id="DTL-cq-VaA">
+                                                        <rect key="frame" x="12" y="47" width="651" height="96"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <tokenFieldCell key="cell" selectable="YES" editable="YES" borderStyle="bezel" alignment="left" placeholderString="Comma separated list of usernames (case/accent insensitive, without the '@' prefix)" drawsBackground="YES" allowsEditingTextAttributes="YES" id="i7v-35-449">
+                                                            <font key="font" metaFont="titleBar" size="12"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </tokenFieldCell>
+                                                        <connections>
+                                                            <outlet property="delegate" destination="vQH-WF-vh2" id="Muu-MZ-9WO"/>
+                                                        </connections>
+                                                    </tokenField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="4pT-UE-7Vr">
+                                                        <rect key="frame" x="17" y="151" width="525" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Do not present notifications for comments from the following usernames:" id="mJo-ih-vPO">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <button id="xXn-f2-021">
+                                                        <rect key="frame" x="10" y="13" width="317" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Disable all comment notifications" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="jFq-LJ-pnu">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="disableAllCommentNotificationsSelected:" target="vQH-WF-vh2" id="G2t-lg-bKn"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button id="Hmq-ch-Jqa">
+                                                        <rect key="frame" x="337" y="234" width="332" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Move items mentioning my teams to 'Participated'" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="RD7-9b-mMf">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="autoParticipateOnTeamMentionSelected:" target="vQH-WF-vh2" id="Meu-Gi-nGr"/>
+                                                        </connections>
+                                                    </button>
+                                                </subviews>
+                                            </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </box>
+                                    </subviews>
+                                </view>
+                            </tabViewItem>
+                            <tabViewItem label="Labels &amp; Statuses" identifier="" id="q4f-6k-kbo">
+                                <view key="view" id="JDe-Yc-l44">
+                                    <rect key="frame" x="10" y="33" width="736" height="366"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <box autoresizesSubviews="NO" borderType="none" titlePosition="noTitle" id="lHO-RU-wff">
+                                            <rect key="frame" x="107" y="10" width="522" height="349"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <view key="contentView">
+                                                <rect key="frame" x="0.0" y="0.0" width="522" height="349"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="0eZ-9u-qmt">
+                                                        <rect key="frame" x="200" y="236" width="284" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="...re-scan all statuses every X refreshes" id="RuW-TF-DmH">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <button id="ANN-xo-ud5">
+                                                        <rect key="frame" x="17" y="234" width="189" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Show PR CI / statuses" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="uz2-FE-mKJ">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="showStatusItemsSelected:" target="vQH-WF-vh2" id="o8b-hu-8z0"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button id="KjN-FO-XTd">
+                                                        <rect key="frame" x="17" y="164" width="488" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Make status items always selectable (don't require command-click)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="tnU-bc-se6">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="makeStatusItemsSelectableSelected:" target="vQH-WF-vh2" id="8aC-yz-v5g"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button id="lAL-hp-XJt">
+                                                        <rect key="frame" x="17" y="133" width="288" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Show notifications for new status items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="5Yc-fv-0lA">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="notifyOnStatusUpdatesSelected:" target="vQH-WF-vh2" id="xMh-YT-y8X"/>
+                                                        </connections>
+                                                    </button>
+                                                    <popUpButton verticalHuggingPriority="750" id="irr-Zv-gfS">
+                                                        <rect key="frame" x="17" y="94" width="489" height="26"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="cqY-EB-jjP">
+                                                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="menu"/>
+                                                            <menu key="menu" title="StatusFiltering" showsStateColumn="NO" id="x9N-6I-pDY">
+                                                                <items>
+                                                                    <menuItem title="Show all status items" id="WSn-zq-R94"/>
+                                                                    <menuItem title="Only show status items that include any of the following terms" id="c1f-8Q-BIX"/>
+                                                                    <menuItem title="Exclude status items that include any of the following terms" id="7G3-tH-zp4"/>
+                                                                </items>
+                                                            </menu>
+                                                        </popUpButtonCell>
+                                                        <connections>
+                                                            <action selector="statusFilterMenuChanged:" target="vQH-WF-vh2" id="8Ua-bI-K9Z"/>
+                                                        </connections>
+                                                    </popUpButton>
+                                                    <tokenField verticalHuggingPriority="750" id="oW9-uY-e0m">
+                                                        <rect key="frame" x="19" y="15" width="484" height="71"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <tokenFieldCell key="cell" selectable="YES" editable="YES" borderStyle="bezel" alignment="left" placeholderString="Comma separated list of terms" drawsBackground="YES" allowsEditingTextAttributes="YES" id="5ep-1e-o3q">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </tokenFieldCell>
+                                                        <connections>
+                                                            <outlet property="delegate" destination="vQH-WF-vh2" id="nVV-N5-jew"/>
+                                                        </connections>
+                                                    </tokenField>
+                                                    <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="98O-9a-RJR">
+                                                        <rect key="frame" x="487" y="229" width="19" height="27"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <stepperCell key="cell" continuous="YES" alignment="left" minValue="1" maxValue="1000" doubleValue="1" id="r9b-4g-VVM"/>
+                                                        <connections>
+                                                            <action selector="statusItemRefreshCountChanged:" target="vQH-WF-vh2" id="7C6-8L-ggg"/>
+                                                        </connections>
+                                                    </stepper>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="4P5-8J-j5N">
+                                                        <rect key="frame" x="103" y="190" width="381" height="44"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" id="ITh-gE-qyn">
+                                                            <font key="font" metaFont="miniSystem"/>
+                                                            <string key="title">Status items need to be rescanned fully in order be updated.  If you
+usually manage alot of PRs, then you may want to set this value
+to a higher number in order to keep your API usage reasonable</string>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="awU-SO-Gwd">
+                                                        <rect key="frame" x="188" y="308" width="296" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="...re-scan PR labels every X refreshes" id="Jlv-T3-UQ9">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="omI-5I-heJ">
+                                                        <rect key="frame" x="487" y="301" width="19" height="27"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <stepperCell key="cell" continuous="YES" alignment="left" minValue="1" maxValue="1000" doubleValue="1" id="dky-1e-6lk"/>
+                                                        <connections>
+                                                            <action selector="labelRefreshCounterChanged:" target="vQH-WF-vh2" id="zvx-8M-EcK"/>
+                                                        </connections>
+                                                    </stepper>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="l28-ij-akN">
+                                                        <rect key="frame" x="103" y="262" width="381" height="44"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" id="Aaw-4h-ESu">
+                                                            <font key="font" metaFont="miniSystem"/>
+                                                            <string key="title">Labels need to be rescanned fully in order be updated.  If you
+usually manage alot of items, then you may want to set this value
+to a higher number in order to keep your API usage reasonable</string>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <button id="GGQ-fB-uWX">
+                                                        <rect key="frame" x="17" y="306" width="160" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Show labels" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="fbv-gG-Lv3">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="showLabelsSelected:" target="vQH-WF-vh2" id="VCh-eE-iBC"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button id="UVq-TH-zaK">
+                                                        <rect key="frame" x="301" y="133" width="116" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="...on all PRs" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="bjn-sR-CJj">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="notifyOnStatusUpdatesOnAllPrsSelected:" target="vQH-WF-vh2" id="PPW-Gz-Zf5"/>
+                                                        </connections>
+                                                    </button>
+                                                </subviews>
+                                            </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </box>
+                                    </subviews>
+                                </view>
+                            </tabViewItem>
+                            <tabViewItem label="Keyboard" identifier="" id="IwB-kY-rW2">
+                                <view key="view" id="nfd-Kr-NnB">
+                                    <rect key="frame" x="10" y="33" width="736" height="366"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <box autoresizesSubviews="NO" borderType="none" titlePosition="noTitle" id="Opr-Qr-4c9">
+                                            <rect key="frame" x="16" y="42" width="705" height="300"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <view key="contentView">
+                                                <rect key="frame" x="0.0" y="0.0" width="705" height="300"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="DCt-xr-FhG">
+                                                        <rect key="frame" x="36" y="65" width="632" height="42"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" id="av8-ls-mGW">
+                                                            <font key="font" metaFont="toolTip"/>
+                                                            <string key="title">Important: When enabling this for the first time you will be asked to provide permission for Trailer to use the
+keyboard in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the permission to take effect.
+Available on OS X Mavericks onwards</string>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <box autoresizesSubviews="NO" title="Hotkey" borderType="line" titlePosition="noTitle" id="wtA-9k-J8p">
+                                                        <rect key="frame" x="197" y="49" width="311" height="72"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <view key="contentView">
+                                                            <rect key="frame" x="1" y="1" width="309" height="70"/>
+                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                            <subviews>
+                                                                <button id="OTk-Ox-H64">
+                                                                    <rect key="frame" x="65" y="12" width="32" height="48"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <buttonCell key="cell" type="check" title="⌘" bezelStyle="regularSquare" imagePosition="below" alignment="center" state="on" inset="2" id="2C7-5G-Bbq">
+                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                        <font key="font" metaFont="system" size="24"/>
+                                                                    </buttonCell>
+                                                                </button>
+                                                                <button id="O1l-SB-DuQ">
+                                                                    <rect key="frame" x="16" y="12" width="47" height="49"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <buttonCell key="cell" type="check" title="Ctrl" bezelStyle="regularSquare" imagePosition="below" alignment="center" state="on" inset="2" id="BAQ-zu-sCJ">
+                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                        <font key="font" metaFont="system" size="16"/>
+                                                                    </buttonCell>
+                                                                </button>
+                                                                <button id="bU3-sU-lpP">
+                                                                    <rect key="frame" x="107" y="12" width="32" height="48"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <buttonCell key="cell" type="check" title="⌥" bezelStyle="regularSquare" imagePosition="below" alignment="center" state="on" inset="2" id="1Dw-J0-OqT">
+                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                        <font key="font" metaFont="system" size="23"/>
+                                                                    </buttonCell>
+                                                                </button>
+                                                                <button id="lZd-Lq-W4x">
+                                                                    <rect key="frame" x="149" y="12" width="32" height="48"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <buttonCell key="cell" type="check" title="⇧" bezelStyle="regularSquare" imagePosition="below" alignment="center" state="on" inset="2" id="mH2-wN-xSJ">
+                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                        <font key="font" metaFont="system" size="24"/>
+                                                                    </buttonCell>
+                                                                </button>
+                                                                <popUpButton verticalHuggingPriority="750" id="x9b-Wa-04i">
+                                                                    <rect key="frame" x="219" y="34" width="75" height="26"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="kAr-DO-sx7">
+                                                                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                                        <font key="font" metaFont="menu"/>
+                                                                        <menu key="menu" title="Keys" id="l5g-AF-aoK"/>
+                                                                    </popUpButtonCell>
+                                                                </popUpButton>
+                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="3nJ-Zt-Ieo">
+                                                                    <rect key="frame" x="191" y="33" width="24" height="29"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="+" id="JnN-B0-qck">
+                                                                        <font key="font" metaFont="system" size="24"/>
+                                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                    </textFieldCell>
+                                                                </textField>
+                                                            </subviews>
+                                                        </view>
+                                                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                    </box>
+                                                    <button id="9o8-NV-RgQ">
+                                                        <rect key="frame" x="191" y="125" width="337" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Enable global hotkey to toggle the Trailer menu" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="tST-Hi-NeJ">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="enableHotkeySelected:" target="vQH-WF-vh2" id="j3U-Ti-yaS"/>
+                                                        </connections>
+                                                    </button>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="FiK-cy-VNg">
+                                                        <rect key="frame" x="80" y="177" width="544" height="79"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" id="mud-rS-urC">
+                                                            <font key="font" metaFont="system"/>
+                                                            <string key="title">When Trailer's menu is open you can use the arrow keys to navigate,
+and press Enter to select.
+
+⌘C over a highlighted item will copy its web URL to the clipboard.</string>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                </subviews>
+                                            </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </box>
+                                    </subviews>
+                                </view>
+                            </tabViewItem>
+                            <tabViewItem label="Misc" identifier="" id="MQq-26-EJI">
+                                <view key="view" id="1XC-Vs-6nF">
+                                    <rect key="frame" x="10" y="33" width="736" height="366"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <box autoresizesSubviews="NO" borderType="none" titlePosition="noTitle" id="YKc-0b-31j">
+                                            <rect key="frame" x="6" y="21" width="724" height="310"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <view key="contentView">
+                                                <rect key="frame" x="0.0" y="0.0" width="724" height="310"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <button id="vcg-xx-N3A">
+                                                        <rect key="frame" x="212" y="200" width="315" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Check for new Trailer releases automatically" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="a4y-qa-v3Z">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="checkForUpdatesAutomaticallySelected:" target="vQH-WF-vh2" id="1fT-2D-aEs"/>
+                                                        </connections>
+                                                    </button>
+                                                    <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="AT5-aS-AgQ">
+                                                        <rect key="frame" x="493" y="169" width="19" height="27"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <stepperCell key="cell" continuous="YES" alignment="left" minValue="1" maxValue="1024" doubleValue="1" id="Lkq-hS-bCt"/>
+                                                        <connections>
+                                                            <action selector="checkForUpdatesIntervalChanged:" target="vQH-WF-vh2" id="otw-3K-qgX"/>
+                                                        </connections>
+                                                    </stepper>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="hkX-Jd-o2h">
+                                                        <rect key="frame" x="225" y="175" width="265" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="...every X hours" id="WVl-6O-rdk">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <button id="3fA-qA-38f">
+                                                        <rect key="frame" x="211" y="261" width="315" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Log activity to the console" bezelStyle="regularSquare" imagePosition="left" inset="2" id="MMo-8R-lBl">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="logActivityToConsoleSelected:" target="vQH-WF-vh2" id="Ya2-VW-6pr"/>
+                                                        </connections>
+                                                    </button>
+                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" id="zef-fb-l71">
+                                                        <rect key="frame" x="17" y="15" width="690" height="41"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Settings last exported to 'fileName.trailerSettings' at 11/22/33 11:22:33PM" id="Amb-JA-EhL">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <button verticalHuggingPriority="750" id="nki-sn-lQo">
+                                                        <rect key="frame" x="193" y="97" width="193" height="32"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="push" title="Export current settings..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="7Ff-bF-xyw">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="exportCurrentSettingsSelected:" target="vQH-WF-vh2" id="cTO-Bv-dZo"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" id="Jbm-ZN-x5E">
+                                                        <rect key="frame" x="386" y="97" width="145" height="32"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="push" title="Import settings..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="GTK-8s-emk">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="importSettingsSelected:" target="vQH-WF-vh2" id="Y31-ye-fIU"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button id="pwT-Fi-3FC">
+                                                        <rect key="frame" x="212" y="70" width="300" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Repeat last export whenever settings change" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="vNH-wV-xlW">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="repeatLastExportSelected:" target="vQH-WF-vh2" id="WZG-AG-LaP"/>
+                                                        </connections>
+                                                    </button>
+                                                </subviews>
+                                            </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </box>
+                                    </subviews>
+                                </view>
+                            </tabViewItem>
+                        </tabViewItems>
+                    </tabView>
+                </subviews>
+            </view>
+            <contentBorderThickness minY="32"/>
+            <connections>
+                <outlet property="activityDisplay" destination="5Hk-e1-cSC" id="0LR-Kz-dDV"/>
+                <outlet property="apiServerApiPath" destination="9xz-I3-HQw" id="Qbx-W0-uWC"/>
+                <outlet property="apiServerAuthToken" destination="yUS-Pw-j0m" id="TGP-GL-t5j"/>
+                <outlet property="apiServerDeleteButton" destination="k1C-rR-Wxu" id="Czy-Ke-ibg"/>
+                <outlet property="apiServerName" destination="Bi3-xh-wlg" id="74f-LX-0j3"/>
+                <outlet property="apiServerReportError" destination="97p-7q-Kd5" id="YZT-aN-za3"/>
+                <outlet property="apiServerSelectedBox" destination="Zjr-Bg-vY8" id="n7z-EM-8EF"/>
+                <outlet property="apiServerTestButton" destination="Tu3-cb-beM" id="tmV-b8-rij"/>
+                <outlet property="apiServerWebPath" destination="CT9-ev-oP0" id="Cr5-z4-MfR"/>
+                <outlet property="autoParticipateOnTeamMentions" destination="Hmq-ch-Jqa" id="siv-Py-TNp"/>
+                <outlet property="autoParticipateWhenMentioned" destination="Afp-0h-LBr" id="LFc-Y4-Hqr"/>
+                <outlet property="checkForUpdatesAutomatically" destination="vcg-xx-N3A" id="G9B-Yw-7hB"/>
+                <outlet property="checkForUpdatesLabel" destination="hkX-Jd-o2h" id="X6n-gD-voM"/>
+                <outlet property="checkForUpdatesSelector" destination="AT5-aS-AgQ" id="s48-Pe-cgZ"/>
+                <outlet property="commentAuthorBlacklist" destination="DTL-cq-VaA" id="xWf-YT-bda"/>
+                <outlet property="countOnlyListedPrs" destination="rEz-q1-QZq" id="WMt-Z6-QdJ"/>
+                <outlet property="disableAllCommentNotifications" destination="xXn-f2-021" id="OJl-UW-ZWi"/>
+                <outlet property="displayRepositoryNames" destination="yK4-xL-QRu" id="yVB-df-7TT"/>
+                <outlet property="dontConfirmRemoveAllClosed" destination="w0K-BS-Gti" id="jaB-In-zbi"/>
+                <outlet property="dontConfirmRemoveAllMerged" destination="ptr-tf-eNM" id="KHp-pR-L6T"/>
+                <outlet property="dontKeepPrsMergedByMe" destination="ZiV-Lz-lSl" id="oZV-a8-3NT"/>
+                <outlet property="grayOutWhenRefreshing" destination="ueT-Kq-j9E" id="0DE-vy-hy2"/>
+                <outlet property="groupByRepo" destination="TqD-G8-E24" id="nQt-v1-4Mx"/>
+                <outlet property="hideAll" destination="I3M-ve-HGK" id="Nm8-z1-K0h"/>
+                <outlet property="hideAllPrsSection" destination="9wb-oI-R5I" id="xch-Qv-3wP"/>
+                <outlet property="hideAvatars" destination="3CV-9S-gLw" id="KZR-Gl-2lg"/>
+                <outlet property="hideNewRepositories" destination="rNO-7f-eIw" id="Uv0-x1-dqd"/>
+                <outlet property="hideUncommentedPrs" destination="gjf-cd-s24" id="fkW-dA-W8L"/>
+                <outlet property="hotKeyContainer" destination="wtA-9k-J8p" id="O04-dn-Ilm"/>
+                <outlet property="hotKeyHelp" destination="DCt-xr-FhG" id="x3V-6H-BO0"/>
+                <outlet property="hotkeyCommandModifier" destination="OTk-Ox-H64" id="tc7-zs-NCE"/>
+                <outlet property="hotkeyControlModifier" destination="O1l-SB-DuQ" id="CUC-hp-qh6"/>
+                <outlet property="hotkeyEnable" destination="9o8-NV-RgQ" id="hmY-V6-MO0"/>
+                <outlet property="hotkeyLetter" destination="x9b-Wa-04i" id="AvK-2Q-Mks"/>
+                <outlet property="hotkeyOptionModifier" destination="bU3-sU-lpP" id="jbh-IW-ykt"/>
+                <outlet property="hotkeyShiftModifier" destination="lZd-Lq-W4x" id="K49-OF-eZU"/>
+                <outlet property="includeLabelsInFiltering" destination="eFR-P1-MxA" id="saA-nS-bNY"/>
+                <outlet property="includeRepositoriesInFiltering" destination="dTw-ed-XkE" id="auv-go-5jM"/>
+                <outlet property="includeStatusesInFiltering" destination="Jr3-YU-DrS" id="48Y-gR-fNe"/>
+                <outlet property="labelRefreshCounter" destination="omI-5I-heJ" id="ZB6-4B-2tU"/>
+                <outlet property="labelRefreshNote" destination="l28-ij-akN" id="HUl-So-xgU"/>
+                <outlet property="labelRescanLabel" destination="awU-SO-Gwd" id="mHs-Uc-l8O"/>
+                <outlet property="lastExportReport" destination="zef-fb-l71" id="ld1-mW-3n5"/>
+                <outlet property="launchAtStartup" destination="H3d-cL-Izf" id="3dL-Lp-v9U"/>
+                <outlet property="logActivityToConsole" destination="3fA-qA-38f" id="Vph-lO-Ng2"/>
+                <outlet property="makeStatusItemsSelectable" destination="KjN-FO-XTd" id="qFV-nW-SWA"/>
+                <outlet property="markUnmergeableOnUserSectionsOnly" destination="Y5g-gh-uLn" id="ka6-Ll-b9Q"/>
+                <outlet property="moveAssignedPrsToMySection" destination="RNE-Xe-Xwy" id="ej7-kX-n2E"/>
+                <outlet property="notifyOnStatusUpdates" destination="lAL-hp-XJt" id="Amv-PJ-TtL"/>
+                <outlet property="notifyOnStatusUpdatesForAllPrs" destination="UVq-TH-zaK" id="0WQ-3a-2C6"/>
+                <outlet property="openPrAtFirstUnreadComment" destination="ZXi-oc-EhW" id="KHQ-wg-7VG"/>
+                <outlet property="prClosedPolicy" destination="MUp-kA-DZp" id="DGy-L6-M2g"/>
+                <outlet property="prMergedPolicy" destination="DVS-bf-HmU" id="Gwx-ca-3c7"/>
+                <outlet property="projectsTable" destination="6pK-a1-URw" id="QBD-3b-mDC"/>
+                <outlet property="refreshButton" destination="u1W-mu-uId" id="hOr-8y-HxK"/>
+                <outlet property="refreshDurationLabel" destination="Zu0-k7-csJ" id="5yQ-AM-EsR"/>
+                <outlet property="refreshDurationStepper" destination="INA-l0-fZh" id="35s-aN-LXk"/>
+                <outlet property="repeatLastExportAutomatically" destination="pwT-Fi-3FC" id="KcG-kA-cIo"/>
+                <outlet property="repoCheckLabel" destination="XcM-W3-Ec0" id="xdn-MT-IXs"/>
+                <outlet property="repoCheckStepper" destination="ThS-Id-Gqm" id="Cfs-Fa-4ac"/>
+                <outlet property="repoFilter" destination="Qfh-lH-HFg" id="Ezf-Zw-jxe"/>
+                <outlet property="serverList" destination="wPh-gi-N9t" id="B6u-Jh-imO"/>
+                <outlet property="showAll" destination="QIt-EX-s8m" id="luC-3Q-hdM"/>
+                <outlet property="showAllComments" destination="UGp-d4-lNW" id="nt3-bL-T3b"/>
+                <outlet property="showCreationDates" destination="Efg-Id-lOP" id="cZu-0h-5hD"/>
+                <outlet property="showIssuesMenu" destination="CxD-CQ-bRP" id="DO5-0U-FrT"/>
+                <outlet property="showLabels" destination="GGQ-fB-uWX" id="OqS-V0-V7c"/>
+                <outlet property="showStatusItems" destination="ANN-xo-ud5" id="z7y-d1-UkL"/>
+                <outlet property="sortModeSelect" destination="bWX-fP-uhd" id="pVu-Ye-Dai"/>
+                <outlet property="sortingOrder" destination="afo-70-80J" id="F6p-FC-uZh"/>
+                <outlet property="statusItemRefreshCounter" destination="98O-9a-RJR" id="yJJ-RE-9ck"/>
+                <outlet property="statusItemRescanLabel" destination="0eZ-9u-qmt" id="aCe-h1-HFM"/>
+                <outlet property="statusItemsRefreshNote" destination="4P5-8J-j5N" id="5Kj-d9-gHG"/>
+                <outlet property="statusTermMenu" destination="irr-Zv-gfS" id="Aoi-h9-I2e"/>
+                <outlet property="statusTermsField" destination="oW9-uY-e0m" id="xZo-19-rE2"/>
+                <outlet property="useVibrancy" destination="onl-1T-RTg" id="7Tr-3j-g1y"/>
+                <outlet property="versionNumber" destination="iqF-Fz-LyV" id="3wx-Ff-ShS"/>
+            </connections>
+            <point key="canvasLocation" x="327" y="121"/>
+        </window>
     </objects>
 </document>

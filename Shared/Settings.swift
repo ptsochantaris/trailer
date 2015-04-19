@@ -81,10 +81,23 @@ final class Settings {
 	static var saveTimer: PopTimer?
 
 	private class func set(key: String, _ value: NSObject?) {
+
+		let previousValue = _settings_shared.objectForKey(key) as? NSObject
+
 		if let v = value {
-			_settings_shared.setObject(v, forKey: key)
+			if let p = previousValue where p.isEqual(v) {
+				DLog("Setting %@ to identical value (%@), skipping", key, value)
+				return
+			} else {
+				_settings_shared.setObject(v, forKey: key)
+			}
 		} else {
-			_settings_shared.removeObjectForKey(key)
+			if previousValue == nil {
+				DLog("Setting %@ to identical value (nil), skipping", key)
+				return
+			} else {
+				_settings_shared.removeObjectForKey(key)
+			}
 		}
 		_settings_valuesCache[key] = value
 		_settings_shared.synchronize()

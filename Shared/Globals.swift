@@ -159,6 +159,11 @@ enum PRHandlingPolicy: Int {
 	}
 #endif
 
+func versionString() -> String {
+	var buildNumber = NSBundle.mainBundle().infoDictionary!["CFBundleVersion"] as! String
+	return "Version \(currentAppVersion) (\(buildNumber))"
+}
+
 func isDarkColor(color: COLOR_CLASS) -> Bool {
 	var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0
 	color.getRed(&r, green: &g, blue: &b, alpha: nil)
