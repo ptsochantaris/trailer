@@ -8,13 +8,13 @@
         <!--SectionController-->
         <scene sceneID="aou-V4-d1y">
             <objects>
-                <controller identifier="SectionController" id="AgC-eL-Hgc" customClass="SectionController" customModule="Trailer" customModuleProvider="target">
+                <controller identifier="SectionController" id="AgC-eL-Hgc" customClass="SectionController" customModule="Trailer">
                     <items>
                         <group width="120" alignment="center" verticalAlignment="center" radius="0.0" id="AJn-j1-vO3">
                             <items>
                                 <table alignment="left" verticalAlignment="center" id="be2-ie-h5R">
                                     <items>
-                                        <tableRow identifier="TitleRow" selectable="NO" id="tHv-Jj-a9y" customClass="TitleRow" customModule="PocketTrailer_WatchKit_Extension">
+                                        <tableRow identifier="TitleRow" selectable="NO" id="tHv-Jj-a9y" customClass="TitleRow" customModule="Trailer">
                                             <group key="rootItem" width="1" height="0.0" alignment="left" id="mWo-dt-dzr">
                                                 <items>
                                                     <group alignment="left" radius="2" id="Kau-36-YJy">
@@ -36,7 +36,7 @@
                                                 <outlet property="titleL" destination="dy2-9S-MJp" id="mX0-PC-TAL"/>
                                             </connections>
                                         </tableRow>
-                                        <tableRow identifier="SectionRow" id="ql1-oS-xZe" customClass="SectionRow" customModule="PocketTrailer_WatchKit_Extension">
+                                        <tableRow identifier="SectionRow" id="ql1-oS-xZe" customClass="SectionRow" customModule="Trailer">
                                             <group key="rootItem" width="1" height="0.0" alignment="left" radius="2" id="Uft-cP-lJ6">
                                                 <items>
                                                     <label alignment="left" verticalAlignment="center" text="Title" id="m26-4w-XIn">
@@ -103,12 +103,12 @@
         <!--ListController-->
         <scene sceneID="ox7-bJ-gA7">
             <objects>
-                <controller identifier="ListController" id="Sqe-dw-Y9B" customClass="PRListController" customModule="Trailer" customModuleProvider="target">
+                <controller identifier="ListController" id="Sqe-dw-Y9B" customClass="PRListController" customModule="Trailer">
                     <items>
                         <label alignment="center" verticalAlignment="center" hidden="YES" text="No items in this section" textAlignment="center" numberOfLines="0" id="PLW-UR-bJ2"/>
                         <table alignment="left" id="XeC-bN-XlT">
                             <items>
-                                <tableRow identifier="PRRow" id="qcu-Df-oql" customClass="PRRow" customModule="PocketTrailer_WatchKit_Extension">
+                                <tableRow identifier="PRRow" id="qcu-Df-oql" customClass="PRRow" customModule="Trailer">
                                     <group key="rootItem" width="1" height="0.0" alignment="left" layout="vertical" radius="2" id="Uwj-Y1-PON">
                                         <items>
                                             <label alignment="left" verticalAlignment="center" text="Title" numberOfLines="0" id="18g-kn-5Ie">
@@ -187,11 +187,11 @@
         <!--DetailController-->
         <scene sceneID="Y5a-NZ-okm">
             <objects>
-                <controller identifier="DetailController" id="Hgm-oe-oa5" customClass="PRDetailController" customModule="Trailer" customModuleProvider="target">
+                <controller identifier="DetailController" id="Hgm-oe-oa5" customClass="PRDetailController" customModule="Trailer">
                     <items>
                         <table alignment="left" id="nDu-Js-IyV">
                             <items>
-                                <tableRow identifier="StatusRow" selectable="NO" id="O5R-Ty-nOY" customClass="StatusRow" customModule="PocketTrailer_WatchKit_Extension">
+                                <tableRow identifier="StatusRow" selectable="NO" id="O5R-Ty-nOY" customClass="StatusRow" customModule="Trailer">
                                     <group key="rootItem" width="1" height="0.0" alignment="left" spacing="3" id="gDg-ep-B9d">
                                         <items>
                                             <group width="2" height="1" heightAdjustment="-4" alignment="left" verticalAlignment="center" radius="1" id="K7J-4q-5nn">
@@ -208,7 +208,7 @@
                                         <outlet property="margin" destination="K7J-4q-5nn" id="yFk-vo-uir"/>
                                     </connections>
                                 </tableRow>
-                                <tableRow identifier="LabelRow" selectable="NO" id="IWp-rT-BP5" customClass="LabelRow" customModule="PocketTrailer_WatchKit_Extension">
+                                <tableRow identifier="LabelRow" selectable="NO" id="IWp-rT-BP5" customClass="LabelRow" customModule="Trailer">
                                     <group key="rootItem" width="1" height="0.0" alignment="left" spacing="3" id="lVf-k4-WHR">
                                         <items>
                                             <label alignment="left" text="Description" numberOfLines="0" id="htJ-iu-xQa">
@@ -222,7 +222,7 @@
                                         <outlet property="labelL" destination="htJ-iu-xQa" id="vAb-Bg-wc1"/>
                                     </connections>
                                 </tableRow>
-                                <tableRow identifier="CommentRow" id="7vR-Gf-9Vf" customClass="CommentRow" customModule="PocketTrailer_WatchKit_Extension">
+                                <tableRow identifier="CommentRow" id="7vR-Gf-9Vf" customClass="CommentRow" customModule="Trailer">
                                     <group key="rootItem" width="1" height="0.0" alignment="left" spacing="3" id="WCb-Rn-fOj">
                                         <items>
                                             <group width="2" height="1" heightAdjustment="-4" alignment="left" verticalAlignment="center" radius="1" id="qDh-AS-kOq">
@@ -292,7 +292,7 @@
         <!--Glance Interface Controller-->
         <scene sceneID="rjY-Ar-IMT">
             <objects>
-                <glanceController spacing="0.0" id="Sv0-Ai-Zie" customClass="GlanceController" customModule="Trailer" customModuleProvider="target">
+                <glanceController spacing="0.0" id="Sv0-Ai-Zie" customClass="GlanceController" customModule="Trailer">
                     <items>
                         <group alignment="left" spacing="6" id="gv7-I2-MZq">
                             <items>
@@ -410,7 +410,7 @@
         <!--Command Controller-->
         <scene sceneID="3pa-8N-Joz">
             <objects>
-                <controller identifier="Command Controller" id="Aye-qq-uqB" customClass="CommandController" customModule="Trailer" customModuleProvider="target">
+                <controller identifier="Command Controller" id="Aye-qq-uqB" customClass="CommandController" customModule="Trailer">
                     <items>
                         <group width="100" alignment="center" verticalAlignment="center" id="okz-U3-TVg">
                             <items>

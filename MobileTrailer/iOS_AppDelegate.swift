@@ -16,6 +16,10 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 	var refreshTimer: NSTimer?
 	var backgroundCallback: ((UIBackgroundFetchResult) -> Void)?
 
+	func updateBadge() {
+		UIApplication.sharedApplication().applicationIconBadgeNumber = PullRequest.badgeCountInMoc(mainObjectContext) + Issue.badgeCountInMoc(mainObjectContext)
+	}
+
 	func application(application: UIApplication, willFinishLaunchingWithOptions launchOptions: [NSObject : AnyObject]?) -> Bool {
 		app = self
 		return true

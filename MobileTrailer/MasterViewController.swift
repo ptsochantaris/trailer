@@ -610,7 +610,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		refreshControl?.attributedTitle = NSAttributedString(string: api.lastUpdateDescription(), attributes: nil)
 
-		UIApplication.sharedApplication().applicationIconBadgeNumber = PullRequest.badgeCountInMoc(mainObjectContext) + Issue.badgeCountInMoc(mainObjectContext)
+		app.updateBadge()
 
 		if splitViewController?.displayMode != UISplitViewControllerDisplayMode.AllVisible {
 			detailViewController.navigationItem.leftBarButtonItem?.title = title
