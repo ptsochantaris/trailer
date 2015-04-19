@@ -1,7 +1,6 @@
 
 import CoreData
 
-@objc(ApiServer)
 final class ApiServer: NSManagedObject {
 
     @NSManaged var apiPath: String?

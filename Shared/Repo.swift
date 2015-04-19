@@ -1,7 +1,6 @@
 
 import CoreData
 
-@objc (Repo)
 final class Repo: DataItem {
 
     @NSManaged var dirty: NSNumber?

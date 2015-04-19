@@ -1,6 +1,5 @@
 import Foundation
 
-@objc(PRComment)
 final class PRComment: DataItem {
 
     @NSManaged var avatarUrl: String?

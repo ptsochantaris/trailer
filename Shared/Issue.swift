@@ -4,7 +4,6 @@ import CoreData
 	import UIKit
 #endif
 
-@objc (Issue)
 final class Issue: ListableItem {
 
 	@NSManaged var commentsLink: String?

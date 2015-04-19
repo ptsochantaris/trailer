@@ -4,7 +4,6 @@ import CoreData
 	import UIKit
 #endif
 
-@objc (PullRequest)
 final class PullRequest: ListableItem {
 
 	@NSManaged var issueCommentLink: String?

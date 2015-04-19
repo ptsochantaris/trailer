@@ -12,6 +12,8 @@
 		1606F1BD1A471CDC0088368E /* RespositoriesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1606F1BC1A471CDC0088368E /* RespositoriesViewController.swift */; };
 		160823F51A44997F006F91AD /* UINavigationControllerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160823F31A44982F006F91AD /* UINavigationControllerExtensions.swift */; };
 		160D312C1A9619CE006B74BC /* FilledView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160D312B1A9619CE006B74BC /* FilledView.swift */; };
+		160FB1401AE3F78E00EB5C8E /* PreferencesWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160FB13F1AE3F78E00EB5C8E /* PreferencesWindow.swift */; };
+		160FB1421AE3F7C700EB5C8E /* PreferencesWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 160FB1411AE3F7C700EB5C8E /* PreferencesWindow.xib */; };
 		16143E7B1AB435EC00BAC070 /* SectionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16143E7A1AB435EC00BAC070 /* SectionController.swift */; };
 		16143E7F1AB44BFD00BAC070 /* ExtensionGlobals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1672DF4A1AB0EB9200381AEB /* ExtensionGlobals.swift */; };
 		16143E811AB44C3F00BAC070 /* WatchGlobals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16143E801AB44C3F00BAC070 /* WatchGlobals.swift */; };
@@ -211,6 +213,8 @@
 		1606F1BC1A471CDC0088368E /* RespositoriesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = RespositoriesViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		160823F31A44982F006F91AD /* UINavigationControllerExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UINavigationControllerExtensions.swift; sourceTree = "<group>"; };
 		160D312B1A9619CE006B74BC /* FilledView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilledView.swift; sourceTree = "<group>"; };
+		160FB13F1AE3F78E00EB5C8E /* PreferencesWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferencesWindow.swift; sourceTree = "<group>"; };
+		160FB1411AE3F7C700EB5C8E /* PreferencesWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PreferencesWindow.xib; sourceTree = "<group>"; };
 		16143E7A1AB435EC00BAC070 /* SectionController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SectionController.swift; sourceTree = "<group>"; };
 		16143E801AB44C3F00BAC070 /* WatchGlobals.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WatchGlobals.swift; sourceTree = "<group>"; };
 		16143E821AB44E9F00BAC070 /* SectionRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SectionRow.swift; sourceTree = "<group>"; };
@@ -488,6 +492,8 @@
 				164840C21ACFEFA9009E6383 /* MenuWindow.xib */,
 				161C959D1A3A36020019A577 /* MenuWindow.swift */,
 				168BC6C217EC2DF000BC4584 /* MainMenu.xib */,
+				160FB13F1AE3F78E00EB5C8E /* PreferencesWindow.swift */,
+				160FB1411AE3F7C700EB5C8E /* PreferencesWindow.xib */,
 			);
 			name = Windows;
 			sourceTree = "<group>";
@@ -955,6 +961,7 @@
 				168BC6B817EC2DF000BC4584 /* InfoPlist.strings in Resources */,
 				164840BF1ACFEA45009E6383 /* AboutWindow.xib in Resources */,
 				16B94072182D136700F32061 /* dsa_pub.pem in Resources */,
+				160FB1421AE3F7C700EB5C8E /* PreferencesWindow.xib in Resources */,
 				164840C31ACFEFA9009E6383 /* MenuWindow.xib in Resources */,
 				168BC6C917EC2DF000BC4584 /* Images.xcassets in Resources */,
 				16519EB41ACF0E91002171D0 /* Trailer.icns in Resources */,
@@ -1081,6 +1088,7 @@
 				162002D61A2A49A300FF95F3 /* ViewAllowsVibrancy.swift in Sources */,
 				162002DF1A2A5C9200FF95F3 /* LinkField.swift in Sources */,
 				1671A11F1AC73CCB0047440A /* SetupAssistant.swift in Sources */,
+				160FB1401AE3F78E00EB5C8E /* PreferencesWindow.swift in Sources */,
 				1633C19D1ABD84180086C692 /* IssueCell.swift in Sources */,
 				16A0B0371A48AC7900B3452D /* OSX_AppDelegate.swift in Sources */,
 				161B851C1AB8E12C00AD4C5D /* Team.swift in Sources */,
@@ -1399,6 +1407,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_SWIFT_FLAGS = "-D DEBUG";
+				PRODUCT_MODULE_NAME = Trailer;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_WHOLE_MODULE_OPTIMIZATION = YES;
 			};
@@ -1431,6 +1440,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../Frameworks";
 				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				PRODUCT_MODULE_NAME = Trailer;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_WHOLE_MODULE_OPTIMIZATION = YES;
 			};

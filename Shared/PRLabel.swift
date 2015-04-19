@@ -4,7 +4,6 @@ import CoreData
 	import UIKit
 #endif
 
-@objc (PRLabel)
 final class PRLabel: DataItem {
 
     @NSManaged var color: NSNumber?

@@ -1,7 +1,6 @@
 
 import CoreData
 
-@objc (Team)
 final class Team: DataItem {
 
     @NSManaged var slug: String?
