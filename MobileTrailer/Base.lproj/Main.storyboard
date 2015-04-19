@@ -23,7 +23,7 @@
         <!--Detail-->
         <scene sceneID="yUG-lL-AsK">
             <objects>
-                <viewController title="Detail" id="JEX-9P-axG" customClass="DetailViewController" customModule="PocketTrailer" sceneMemberID="viewController">
+                <viewController title="Detail" id="JEX-9P-axG" customClass="DetailViewController" customModule="Trailer" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="4Ib-n3-jTB"/>
                         <viewControllerLayoutGuide type="bottom" id="UUU-nP-EaO"/>
@@ -84,13 +84,13 @@
         <!--Master-->
         <scene sceneID="smW-Zh-WAh">
             <objects>
-                <tableViewController title="Master" clearsSelectionOnViewWillAppear="NO" id="7bK-jq-Zjz" customClass="MasterViewController" customModule="PocketTrailer" sceneMemberID="viewController">
+                <tableViewController title="Master" clearsSelectionOnViewWillAppear="NO" id="7bK-jq-Zjz" customClass="MasterViewController" customModule="Trailer" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="308" sectionHeaderHeight="10" sectionFooterHeight="10" id="r7i-6Z-zg0">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="0.93725490196078431" green="0.93725490196078431" blue="0.95686274509803926" alpha="1" colorSpace="calibratedRGB"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" rowHeight="308" id="WCw-Qf-5nD" customClass="PRCell" customModule="PocketTrailer">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" rowHeight="308" id="WCw-Qf-5nD" customClass="PRCell" customModule="Trailer" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="119" width="320" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="WCw-Qf-5nD" id="Ccv-UH-bok">
@@ -202,7 +202,7 @@
         <!--Repositories-->
         <scene sceneID="mBS-8s-j5u">
             <objects>
-                <tableViewController id="qen-v7-82i" customClass="RespositoriesViewController" customModule="PocketTrailer" sceneMemberID="viewController">
+                <tableViewController id="qen-v7-82i" customClass="RespositoriesViewController" customModule="Trailer" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="m0P-9W-9Zs">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -245,7 +245,7 @@
         <!--Comment Blocking-->
         <scene sceneID="L4e-B0-eWh">
             <objects>
-                <tableViewController id="QXf-Ap-v0o" customClass="CommentBlacklistViewController" customModule="PocketTrailer" sceneMemberID="viewController">
+                <tableViewController id="QXf-Ap-v0o" customClass="CommentBlacklistViewController" customModule="Trailer" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="60" sectionHeaderHeight="22" sectionFooterHeight="22" id="OK3-GS-b9l">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -279,7 +279,7 @@
         <!--Advanced-->
         <scene sceneID="13M-SK-H8U">
             <objects>
-                <tableViewController modalPresentationStyle="currentContext" id="ls6-NX-hye" customClass="AdvancedSettingsViewController" customModule="PocketTrailer" sceneMemberID="viewController">
+                <tableViewController modalPresentationStyle="currentContext" id="ls6-NX-hye" customClass="AdvancedSettingsViewController" customModule="Trailer" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="54" sectionHeaderHeight="10" sectionFooterHeight="10" id="Q1r-gB-XEK">
                         <rect key="frame" x="0.0" y="64" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -334,7 +334,7 @@
         <!--Servers-->
         <scene sceneID="dTo-Cu-ELq">
             <objects>
-                <tableViewController id="Ny5-Q9-wJN" customClass="ServersViewController" customModule="PocketTrailer" sceneMemberID="viewController">
+                <tableViewController id="Ny5-Q9-wJN" customClass="ServersViewController" customModule="Trailer" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="70" sectionHeaderHeight="44" sectionFooterHeight="22" id="osF-HF-13f">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -391,7 +391,7 @@
         <!--API Server Details-->
         <scene sceneID="Mrr-Mu-sAc">
             <objects>
-                <viewController automaticallyAdjustsScrollViewInsets="NO" id="iSf-H9-TPW" customClass="ServerDetailViewController" customModule="PocketTrailer" sceneMemberID="viewController">
+                <viewController automaticallyAdjustsScrollViewInsets="NO" id="iSf-H9-TPW" customClass="ServerDetailViewController" customModule="Trailer" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="6JD-Od-MMA"/>
                         <viewControllerLayoutGuide type="bottom" id="YAK-Zg-OTM"/>
@@ -581,7 +581,7 @@
         <!--Picker View Controller-->
         <scene sceneID="5Tx-Cn-3zg">
             <objects>
-                <tableViewController modalPresentationStyle="currentContext" id="UM1-Tl-R50" customClass="PickerViewController" customModule="PocketTrailer" sceneMemberID="viewController">
+                <tableViewController modalPresentationStyle="currentContext" id="UM1-Tl-R50" customClass="PickerViewController" customModule="Trailer" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="10" sectionFooterHeight="10" id="JIf-tM-OPO">
                         <rect key="frame" x="0.0" y="64" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -610,7 +610,7 @@
         <!--About-->
         <scene sceneID="gk8-1F-TsH">
             <objects>
-                <viewController automaticallyAdjustsScrollViewInsets="NO" modalPresentationStyle="currentContext" id="yvK-be-nK4" customClass="AboutTrailerViewController" customModule="PocketTrailer" sceneMemberID="viewController">
+                <viewController automaticallyAdjustsScrollViewInsets="NO" modalPresentationStyle="currentContext" id="yvK-be-nK4" customClass="AboutTrailerViewController" customModule="Trailer" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="sc4-NU-7KZ"/>
                         <viewControllerLayoutGuide type="bottom" id="rvX-Ad-77Q"/>
@@ -713,7 +713,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
         <!--GitHub-->
         <scene sceneID="ocq-RM-6Ci">
             <objects>
-                <viewController modalPresentationStyle="currentContext" hidesBottomBarWhenPushed="YES" id="kWj-6b-yq2" customClass="GithubViewController" customModule="PocketTrailer" sceneMemberID="viewController">
+                <viewController modalPresentationStyle="currentContext" hidesBottomBarWhenPushed="YES" id="kWj-6b-yq2" customClass="GithubViewController" customModule="Trailer" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="zic-tr-u8O"/>
                         <viewControllerLayoutGuide type="bottom" id="UhO-5W-ZzH"/>
@@ -750,7 +750,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
         <!--Welcome!-->
         <scene sceneID="Agj-LB-cw9">
             <objects>
-                <viewController id="ZQR-qN-jZ1" customClass="QuickStartViewController" customModule="PocketTrailer" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="ZQR-qN-jZ1" customClass="QuickStartViewController" customModule="Trailer" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="Q4l-wo-9l3"/>
                         <viewControllerLayoutGuide type="bottom" id="G7i-B8-JHX"/>

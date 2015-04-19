@@ -8,7 +8,7 @@
         <!--SectionController-->
         <scene sceneID="aou-V4-d1y">
             <objects>
-                <controller identifier="SectionController" id="AgC-eL-Hgc" customClass="SectionController" customModule="PocketTrailer_WatchKit_Extension">
+                <controller identifier="SectionController" id="AgC-eL-Hgc" customClass="SectionController" customModule="Trailer" customModuleProvider="target">
                     <items>
                         <group width="120" alignment="center" verticalAlignment="center" radius="0.0" id="AJn-j1-vO3">
                             <items>
@@ -103,7 +103,7 @@
         <!--ListController-->
         <scene sceneID="ox7-bJ-gA7">
             <objects>
-                <controller identifier="ListController" id="Sqe-dw-Y9B" customClass="PRListController" customModule="PocketTrailer_WatchKit_Extension">
+                <controller identifier="ListController" id="Sqe-dw-Y9B" customClass="PRListController" customModule="Trailer" customModuleProvider="target">
                     <items>
                         <label alignment="center" verticalAlignment="center" hidden="YES" text="No items in this section" textAlignment="center" numberOfLines="0" id="PLW-UR-bJ2"/>
                         <table alignment="left" id="XeC-bN-XlT">
@@ -187,7 +187,7 @@
         <!--DetailController-->
         <scene sceneID="Y5a-NZ-okm">
             <objects>
-                <controller identifier="DetailController" id="Hgm-oe-oa5" customClass="PRDetailController" customModule="PocketTrailer_WatchKit_Extension">
+                <controller identifier="DetailController" id="Hgm-oe-oa5" customClass="PRDetailController" customModule="Trailer" customModuleProvider="target">
                     <items>
                         <table alignment="left" id="nDu-Js-IyV">
                             <items>
@@ -292,7 +292,7 @@
         <!--Glance Interface Controller-->
         <scene sceneID="rjY-Ar-IMT">
             <objects>
-                <glanceController spacing="0.0" id="Sv0-Ai-Zie" customClass="GlanceController" customModule="PocketTrailer_WatchKit_App" customModuleProvider="target">
+                <glanceController spacing="0.0" id="Sv0-Ai-Zie" customClass="GlanceController" customModule="Trailer" customModuleProvider="target">
                     <items>
                         <group alignment="left" spacing="6" id="gv7-I2-MZq">
                             <items>
@@ -410,7 +410,7 @@
         <!--Command Controller-->
         <scene sceneID="3pa-8N-Joz">
             <objects>
-                <controller identifier="Command Controller" id="Aye-qq-uqB" customClass="CommandController" customModule="PocketTrailer_WatchKit_Extension">
+                <controller identifier="Command Controller" id="Aye-qq-uqB" customClass="CommandController" customModule="Trailer" customModuleProvider="target">
                     <items>
                         <group width="100" alignment="center" verticalAlignment="center" id="okz-U3-TVg">
                             <items>
