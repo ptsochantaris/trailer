@@ -272,9 +272,9 @@
 		166A84C31A45CEE000A3B292 /* PickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerViewController.swift; sourceTree = "<group>"; };
 		1671A11E1AC73CCB0047440A /* SetupAssistant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SetupAssistant.swift; sourceTree = "<group>"; };
 		1671A1221AC74BC30047440A /* SetupAssistant.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SetupAssistant.xib; sourceTree = "<group>"; };
-		1672DF2C1AB0D78500381AEB /* PocketTrailer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PocketTrailer.entitlements; sourceTree = SOURCE_ROOT; };
 		1672DF2D1AB0D7CC00381AEB /* PocketTrailer WatchKit Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "PocketTrailer WatchKit Extension.entitlements"; sourceTree = "<group>"; };
 		1672DF4A1AB0EB9200381AEB /* ExtensionGlobals.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ExtensionGlobals.swift; path = "PocketTrailer WatchKit Extension/ExtensionGlobals.swift"; sourceTree = "<group>"; };
+		1686B1D41AE59AED009118C5 /* PocketTrailer.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PocketTrailer.entitlements; sourceTree = "<group>"; };
 		168BC6AA17EC2DF000BC4584 /* Trailer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Trailer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		168BC6B517EC2DF000BC4584 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		168BC6C317EC2DF000BC4584 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
@@ -431,14 +431,14 @@
 				1628A6BB18789E73005EDA69 /* Supporting Files */,
 			);
 			name = App;
-			path = MobileTrailer;
+			path = PocketTrailer;
 			sourceTree = "<group>";
 		};
 		1628A6BB18789E73005EDA69 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
 				1628A6BC18789E73005EDA69 /* Info.plist */,
-				1672DF2C1AB0D78500381AEB /* PocketTrailer.entitlements */,
+				1686B1D41AE59AED009118C5 /* PocketTrailer.entitlements */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -772,7 +772,7 @@
 				161852861AB2CB9000526D81 /* PBXTargetDependency */,
 			);
 			name = PocketTrailer;
-			productName = MobileTrailer;
+			productName = PocketTrailer;
 			productReference = 1628A6B118789E73005EDA69 /* PocketTrailer.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -1182,7 +1182,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "MobileTrailer/PocketTrailer-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "PocketTrailer/PocketTrailer-Bridging-Header.h";
 			};
 			name = Debug;
 		};
@@ -1202,7 +1202,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "MobileTrailer/PocketTrailer-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "PocketTrailer/PocketTrailer-Bridging-Header.h";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -1211,12 +1211,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = PocketTrailer.entitlements;
+				CODE_SIGN_ENTITLEMENTS = PocketTrailer/PocketTrailer.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				INFOPLIST_FILE = MobileTrailer/Info.plist;
+				INFOPLIST_FILE = PocketTrailer/Info.plist;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				SWIFT_OBJC_BRIDGING_HEADER = "MobileTrailer/PocketTrailer-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "PocketTrailer/PocketTrailer-Bridging-Header.h";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1226,12 +1226,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = PocketTrailer.entitlements;
+				CODE_SIGN_ENTITLEMENTS = PocketTrailer/PocketTrailer.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				INFOPLIST_FILE = MobileTrailer/Info.plist;
+				INFOPLIST_FILE = PocketTrailer/Info.plist;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				SWIFT_OBJC_BRIDGING_HEADER = "MobileTrailer/PocketTrailer-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "PocketTrailer/PocketTrailer-Bridging-Header.h";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
@@ -1260,7 +1260,7 @@
 				PRODUCT_NAME = "${TARGET_NAME}";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "MobileTrailer/PocketTrailer-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "PocketTrailer/PocketTrailer-Bridging-Header.h";
 			};
 			name = Debug;
 		};
@@ -1280,7 +1280,7 @@
 				PRODUCT_NAME = "${TARGET_NAME}";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "MobileTrailer/PocketTrailer-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "PocketTrailer/PocketTrailer-Bridging-Header.h";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
