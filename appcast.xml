@@ -7,6 +7,35 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.3.1</title>
+			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Improved layout of display options</li>
+				<li>Preferences window is no longer constantly in-memory, further improving memory use</li>
+				<li>Corrected repository refresh interval checking</li>
+				<li>Corrected a team syncing issue, as well as syncing teams together with repos now, not at every refresh</li>
+				<li>Won't auto-export settings if no actual changes were made</li>
+				<li>From 1.3.0:</li>
+				<li>Many thanks to @akalman @bkuhlmann @pedrocunha @gdehmlow for their help in testing and suggesting features for this version!</li>
+				<li>Support for issues as a second menu - can be turned on from the Display options</li>
+				<li>Simpler one-step quickstart for fresh installs</li>
+				<li>CI / Status items notifications, know when your PR is good to go</li>
+				<li>Support for team mentions</li>
+				<li>Import and export settings (compatible with the next version of PocketTrailer as well)</li>
+				<li>Slightly cleaner appearance</li>
+				<li>Corrections for vibrancy issues</li>
+				<li>Codebase moved to Swift 1.2 for extra stability and performance</li>
+				</ul></font>]]></description>
+			<pubDate>Tue, 21 Apr 2015 06:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer131.zip"
+			sparkle:version="1212"
+			sparkle:shortVersionString="1.3.1"
+			sparkle:dsaSignature="MCwCFGZDwjrdxKEmLxm24oR7MIc8QAG1AhQKoV5Viiozta5Z4JZk+0ByHRdgXA=="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.3.0</title>
 			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
@@ -203,6 +232,6 @@
 			sparkle:dsaSignature="MC4CFQCOX4/NAUMp+1HUQHkV5n2Fpyl/GQIVAMK/ZtSApXj+r/oxw6qWlX50FIp2"
 			type="application/octet-stream"/>
 		</item>
-
+		
 	</channel>
 </rss>
