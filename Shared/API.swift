@@ -223,7 +223,7 @@ final class API {
 		let syncContext = DataManager.tempContext()
 
 		let shouldRefreshReposToo = (app.lastRepoCheck.isEqualToDate(never())
-			|| (NSDate().timeIntervalSinceDate(app.lastRepoCheck) < NSTimeInterval(Settings.newRepoCheckPeriod*3600.0))
+			|| (NSDate().timeIntervalSinceDate(app.lastRepoCheck) > NSTimeInterval(Settings.newRepoCheckPeriod*3600.0))
 			|| (Repo.countVisibleReposInMoc(syncContext)==0))
 
 		if shouldRefreshReposToo {
