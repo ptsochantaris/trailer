@@ -29,7 +29,6 @@ final class Repo: DataItem {
 	override func resetSyncState() {
 		super.resetSyncState()
 		dirty = true
-		inaccessible = false
 		lastDirtied = never()
 	}
 

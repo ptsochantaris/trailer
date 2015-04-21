@@ -579,6 +579,9 @@ final class API {
 								for p in r.pullRequests {
 									p.postSyncAction = PostSyncAction.Delete.rawValue
 								}
+								for i in r.issues {
+									i.postSyncAction = PostSyncAction.Delete.rawValue
+								}
 							} else if resultCode==410 { // repo gone for good
 								r.postSyncAction = PostSyncAction.Delete.rawValue
 							} else { // fetch problem
