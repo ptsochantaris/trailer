@@ -596,14 +596,14 @@ user you can add more servers from the left.</string>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <box autoresizesSubviews="NO" title="Refreshing" borderType="line" id="zpr-xa-Rug">
-                                            <rect key="frame" x="447" y="5" width="283" height="148"/>
+                                            <rect key="frame" x="403" y="5" width="327" height="148"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                             <view key="contentView">
-                                                <rect key="frame" x="1" y="1" width="281" height="132"/>
+                                                <rect key="frame" x="1" y="1" width="325" height="132"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="INA-l0-fZh">
-                                                        <rect key="frame" x="247" y="24" width="19" height="27"/>
+                                                        <rect key="frame" x="291" y="24" width="19" height="27"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <stepperCell key="cell" continuous="YES" alignment="left" increment="10" minValue="60" maxValue="3600" doubleValue="60" id="EvF-c3-Alv"/>
                                                         <connections>
@@ -611,7 +611,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </stepper>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Zu0-k7-csJ">
-                                                        <rect key="frame" x="-28" y="30" width="275" height="17"/>
+                                                        <rect key="frame" x="16" y="30" width="275" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Refresh items every 3600 seconds" id="tcS-Fj-NKu">
                                                             <font key="font" metaFont="system"/>
@@ -620,7 +620,7 @@ user you can add more servers from the left.</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="ThS-Id-Gqm">
-                                                        <rect key="frame" x="247" y="57" width="19" height="27"/>
+                                                        <rect key="frame" x="291" y="57" width="19" height="27"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <stepperCell key="cell" continuous="YES" alignment="left" minValue="2" maxValue="99999" doubleValue="2" id="hrN-wT-iMM"/>
                                                         <connections>
@@ -628,16 +628,16 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </stepper>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="XcM-W3-Ec0">
-                                                        <rect key="frame" x="-28" y="63" width="275" height="17"/>
+                                                        <rect key="frame" x="16" y="63" width="275" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Refresh repositories every 2 hours" id="0Sb-5H-BRV">
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Refresh repositories &amp; teams every 2 hours" id="0Sb-5H-BRV">
                                                             <font key="font" metaFont="system"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
                                                     <button id="ueT-Kq-j9E">
-                                                        <rect key="frame" x="-28" y="94" width="293" height="18"/>
+                                                        <rect key="frame" x="16" y="94" width="293" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Gray menubar count when refreshing" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="4bJ-dN-Uhp">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>

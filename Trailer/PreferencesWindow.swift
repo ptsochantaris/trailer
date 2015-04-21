@@ -774,7 +774,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction func newRepoCheckChanged(sender: NSStepper?) {
 		Settings.newRepoCheckPeriod = repoCheckStepper.floatValue
-		repoCheckLabel.stringValue = "Refresh repositories every \(repoCheckStepper.integerValue) hours"
+		repoCheckLabel.stringValue = "Refresh repositories & teams every \(repoCheckStepper.integerValue) hours"
 	}
 
 	func windowWillClose(notification: NSNotification) {

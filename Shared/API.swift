@@ -334,7 +334,7 @@ final class API {
 	private func markDirtyReposInMoc(moc: NSManagedObjectContext, callback: Completion) {
 
 		let allApiServers = ApiServer.allApiServersInMoc(moc)
-		let totalOperations = 3*allApiServers.count
+		let totalOperations = 2*allApiServers.count
 		if totalOperations==0 {
 			callback()
 			return
@@ -357,11 +357,9 @@ final class API {
 
 		for apiServer in allApiServers {
 			if apiServer.goodToGo && apiServer.syncIsGood {
-				fetchUserTeamsFromApiServer(apiServer, callback: completionCallback)
 				markDirtyRepoIds(repoIdsToMarkDirty, usingUserEventsFromServer: apiServer, callback: completionCallback)
 				markDirtyRepoIds(repoIdsToMarkDirty, usingReceivedEventsFromServer: apiServer, callback:completionCallback)
 			} else {
-				completionCallback()
 				completionCallback()
 				completionCallback()
 			}
@@ -511,7 +509,7 @@ final class API {
 			}
 
 			let allApiServers = ApiServer.allApiServersInMoc(moc)
-			let totalOperations = allApiServers.count
+			let totalOperations = allApiServers.count*2
 			var completionCount = 0
 
 			let completionCallback: Completion = {
@@ -532,7 +530,9 @@ final class API {
 			for apiServer in allApiServers {
 				if apiServer.goodToGo {
 					self!.syncWatchedReposFromServer(apiServer, callback: completionCallback)
+					self!.fetchUserTeamsFromApiServer(apiServer, callback: completionCallback)
 				} else {
+					completionCallback()
 					completionCallback()
 				}
 			}

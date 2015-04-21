@@ -80,7 +80,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.textLabel?.text = "Background refresh interval (minimum)"
 				cell.detailTextLabel?.text = String(format: "%.0f minutes", Settings.backgroundRefreshPeriod/60.0)
 			case 2:
-				cell.textLabel?.text = "Watchlist refresh interval"
+				cell.textLabel?.text = "Watchlist & team list refresh interval"
 				cell.detailTextLabel?.text = String(format: "%.0f hours", Settings.newRepoCheckPeriod)
 			default: break
 			}
