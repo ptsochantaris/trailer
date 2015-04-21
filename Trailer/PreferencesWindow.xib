@@ -23,7 +23,7 @@
                 <subviews>
                     <button id="H3d-cL-Izf">
                         <rect key="frame" x="7" y="3" width="174" height="26"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <buttonCell key="cell" type="check" title="Start Trailer at Login" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" scrollable="YES" lineBreakMode="clipping" state="on" inset="2" id="qbn-he-5QB">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="smallSystem"/>
@@ -34,7 +34,7 @@
                     </button>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="iqF-Fz-LyV">
                         <rect key="frame" x="615" y="3" width="158" height="20"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Version" id="YMV-pm-TMh">
                             <font key="font" metaFont="smallSystem"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -43,7 +43,7 @@
                     </textField>
                     <tabView id="RGK-bv-JXB">
                         <rect key="frame" x="13" y="42" width="756" height="412"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
                             <tabViewItem label="Servers" identifier="" id="SOc-1o-tdR">
@@ -53,7 +53,7 @@
                                     <subviews>
                                         <scrollView autohidesScrollers="YES" horizontalLineScroll="26" horizontalPageScroll="10" verticalLineScroll="26" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="FEq-Qw-Vgd">
                                             <rect key="frame" x="17" y="46" width="240" height="317"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" heightSizable="YES"/>
                                             <clipView key="contentView" id="0eh-Pe-UwN">
                                                 <rect key="frame" x="1" y="0.0" width="238" height="134"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -113,7 +113,7 @@
                                         </scrollView>
                                         <button verticalHuggingPriority="750" id="T55-Fy-0Gf">
                                             <rect key="frame" x="17" y="16" width="240" height="32"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <buttonCell key="cell" type="smallSquare" title="+ Add API Server" bezelStyle="smallSquare" imagePosition="overlaps" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="7aw-xD-7EL">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="label"/>
@@ -124,14 +124,14 @@
                                         </button>
                                         <box autoresizesSubviews="NO" title="Selected Server" borderType="line" id="Zjr-Bg-vY8">
                                             <rect key="frame" x="263" y="13" width="468" height="350"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="466" height="334"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button verticalHuggingPriority="750" id="k1C-rR-Wxu">
                                                         <rect key="frame" x="141" y="7" width="80" height="32"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                         <buttonCell key="cell" type="push" title="Delete" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="y4c-TX-UeH">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="system"/>
@@ -142,7 +142,7 @@
                                                     </button>
                                                     <button verticalHuggingPriority="750" id="Tu3-cb-beM">
                                                         <rect key="frame" x="12" y="7" width="66" height="32"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                         <buttonCell key="cell" type="push" title="Test" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="QdL-bA-0NX">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="system"/>
@@ -153,7 +153,7 @@
                                                     </button>
                                                     <button verticalHuggingPriority="750" id="ifm-A1-rdj">
                                                         <rect key="frame" x="262" y="7" width="192" height="32"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                         <buttonCell key="cell" type="push" title="Reset to Github Defaults" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="zqK-DJ-JcO">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="system"/>
@@ -202,7 +202,7 @@ Token</string>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" id="yUS-Pw-j0m">
                                                         <rect key="frame" x="102" y="77" width="346" height="118"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="border" drawsBackground="YES" id="9um-Bk-bLh">
                                                             <font key="font" metaFont="system"/>
                                                             <string key="placeholderString">Paste your GitHub personal access token in here; use
@@ -220,7 +220,7 @@ user you can add more servers from the left.</string>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" id="9xz-I3-HQw">
                                                         <rect key="frame" x="102" y="268" width="346" height="24"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="https://api.github.com (for GE: https://server/api/v3)" drawsBackground="YES" usesSingleLineMode="YES" id="DuA-I1-PSV">
                                                             <font key="font" metaFont="system"/>
                                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -232,7 +232,7 @@ user you can add more servers from the left.</string>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" id="Bi3-xh-wlg">
                                                         <rect key="frame" x="102" y="300" width="346" height="24"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="GitHub" drawsBackground="YES" usesSingleLineMode="YES" id="rBJ-1n-RRX">
                                                             <font key="font" metaFont="system"/>
                                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -244,7 +244,7 @@ user you can add more servers from the left.</string>
                                                     </textField>
                                                     <button verticalHuggingPriority="750" id="q1S-M3-nh6">
                                                         <rect key="frame" x="167" y="52" width="130" height="17"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                         <buttonCell key="cell" type="inline" title="Existing Tokens" bezelStyle="inline" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="OhE-A7-jdY">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystemBold"/>
@@ -255,7 +255,7 @@ user you can add more servers from the left.</string>
                                                     </button>
                                                     <button verticalHuggingPriority="750" id="8qJ-4h-rPj">
                                                         <rect key="frame" x="318" y="52" width="130" height="17"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                         <buttonCell key="cell" type="inline" title="Watchlist" bezelStyle="inline" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="gyy-PC-Gia">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystemBold"/>
@@ -266,7 +266,7 @@ user you can add more servers from the left.</string>
                                                     </button>
                                                     <button verticalHuggingPriority="750" id="9sX-2X-O8K">
                                                         <rect key="frame" x="18" y="52" width="130" height="17"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                         <buttonCell key="cell" type="inline" title="Create Token" bezelStyle="inline" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2vK-1D-pyW">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystemBold"/>
@@ -275,9 +275,20 @@ user you can add more servers from the left.</string>
                                                             <action selector="createTokenSelected:" target="vQH-WF-vh2" id="77H-5d-fm4"/>
                                                         </connections>
                                                     </button>
+                                                    <button id="97p-7q-Kd5">
+                                                        <rect key="frame" x="110" y="207" width="340" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Report syncing problems with this server" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="SQa-fC-sUh">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="label"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="apiServerReportErrorSelected:" target="vQH-WF-vh2" id="if5-14-f5r"/>
+                                                        </connections>
+                                                    </button>
                                                     <textField verticalHuggingPriority="750" id="CT9-ev-oP0">
                                                         <rect key="frame" x="102" y="236" width="346" height="24"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="https://github.com" drawsBackground="YES" usesSingleLineMode="YES" id="5Ai-jn-gsl">
                                                             <font key="font" metaFont="system"/>
                                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -287,17 +298,6 @@ user you can add more servers from the left.</string>
                                                             <outlet property="delegate" destination="vQH-WF-vh2" id="x9J-c3-bhR"/>
                                                         </connections>
                                                     </textField>
-                                                    <button id="97p-7q-Kd5">
-                                                        <rect key="frame" x="110" y="207" width="340" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Report syncing problems with this server" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="SQa-fC-sUh">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="label"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="apiServerReportErrorSelected:" target="vQH-WF-vh2" id="if5-14-f5r"/>
-                                                        </connections>
-                                                    </button>
                                                 </subviews>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
@@ -313,7 +313,7 @@ user you can add more servers from the left.</string>
                                     <subviews>
                                         <button id="rNO-7f-eIw">
                                             <rect key="frame" x="15" y="8" width="438" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <buttonCell key="cell" type="check" title="Auto-hide new repositories detected on your watchlists" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="o9Z-sA-KO7">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -324,7 +324,7 @@ user you can add more servers from the left.</string>
                                         </button>
                                         <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="dPG-Wd-B7N">
                                             <rect key="frame" x="17" y="67" width="709" height="296"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <clipView key="contentView" id="hCD-zR-3bF">
                                                 <rect key="frame" x="1" y="17" width="684" height="152"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -384,7 +384,7 @@ user you can add more servers from the left.</string>
                                         </scrollView>
                                         <button verticalHuggingPriority="750" id="u1W-mu-uId">
                                             <rect key="frame" x="644" y="30" width="88" height="32"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                             <buttonCell key="cell" type="push" title="Refresh" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="rFG-sc-WB2">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -395,9 +395,9 @@ user you can add more servers from the left.</string>
                                         </button>
                                         <searchField wantsLayer="YES" verticalHuggingPriority="750" id="Qfh-lH-HFg">
                                             <rect key="frame" x="195" y="37" width="171" height="22"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" placeholderString="Filter..." usesSingleLineMode="YES" bezelStyle="round" id="dZ4-dF-dkV">
-                                                <font key="font" metaFont="titleBar" size="12"/>
+                                                <font key="font" metaFont="cellTitle"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </searchFieldCell>
@@ -407,7 +407,7 @@ user you can add more servers from the left.</string>
                                         </searchField>
                                         <button verticalHuggingPriority="750" id="I3M-ve-HGK">
                                             <rect key="frame" x="11" y="30" width="90" height="32"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <buttonCell key="cell" type="push" title="Hide All" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="bRK-h6-fiX">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -418,7 +418,7 @@ user you can add more servers from the left.</string>
                                         </button>
                                         <button verticalHuggingPriority="750" id="QIt-EX-s8m">
                                             <rect key="frame" x="99" y="30" width="94" height="32"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <buttonCell key="cell" type="push" title="Show All" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="0pF-fA-gVg">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -429,7 +429,7 @@ user you can add more servers from the left.</string>
                                         </button>
                                         <progressIndicator horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" id="5Hk-e1-cSC">
                                             <rect key="frame" x="626" y="39" width="16" height="16"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                         </progressIndicator>
                                     </subviews>
                                 </view>
@@ -439,51 +439,6 @@ user you can add more servers from the left.</string>
                                     <rect key="frame" x="10" y="33" width="736" height="366"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="INA-l0-fZh">
-                                            <rect key="frame" x="702" y="18" width="19" height="27"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <stepperCell key="cell" continuous="YES" alignment="left" increment="10" minValue="60" maxValue="3600" doubleValue="60" id="EvF-c3-Alv"/>
-                                            <connections>
-                                                <action selector="refreshDurationChanged:" target="vQH-WF-vh2" id="y1L-xR-vLZ"/>
-                                            </connections>
-                                        </stepper>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Zu0-k7-csJ">
-                                            <rect key="frame" x="427" y="24" width="275" height="17"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Refresh items every 3600 seconds" id="tcS-Fj-NKu">
-                                                <font key="font" metaFont="system"/>
-                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                        <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="ThS-Id-Gqm">
-                                            <rect key="frame" x="702" y="51" width="19" height="27"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <stepperCell key="cell" continuous="YES" alignment="left" minValue="2" maxValue="99999" doubleValue="2" id="hrN-wT-iMM"/>
-                                            <connections>
-                                                <action selector="newRepoCheckChanged:" target="vQH-WF-vh2" id="bLc-qI-O36"/>
-                                            </connections>
-                                        </stepper>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="XcM-W3-Ec0">
-                                            <rect key="frame" x="427" y="57" width="275" height="17"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Refresh repositories every 2 hours" id="0Sb-5H-BRV">
-                                                <font key="font" metaFont="system"/>
-                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                        <button id="ueT-Kq-j9E">
-                                            <rect key="frame" x="427" y="88" width="293" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Gray menubar count when refreshing" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="4bJ-dN-Uhp">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="grayOutWhenRefreshingSelected:" target="vQH-WF-vh2" id="fCv-C1-fWf"/>
-                                            </connections>
-                                        </button>
                                         <button id="CxD-CQ-bRP">
                                             <rect key="frame" x="20" y="323" width="293" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -509,7 +464,7 @@ user you can add more servers from the left.</string>
                                         <button id="RNE-Xe-Xwy">
                                             <rect key="frame" x="20" y="237" width="338" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Move items assigned to me to &quot;My&quot; section" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="4kL-OQ-kaE">
+                                            <buttonCell key="cell" type="check" title="Move assigned items to &quot;My&quot; section" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="4kL-OQ-kaE">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -561,26 +516,17 @@ user you can add more servers from the left.</string>
                                                 <action selector="useVibrancySelected:" target="vQH-WF-vh2" id="tWv-cu-dmX"/>
                                             </connections>
                                         </button>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="gXJ-Co-1FC">
-                                            <rect key="frame" x="37" y="29" width="221" height="17"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="(best on Retina, requires Yosemite)" id="n79-46-oFL">
-                                                <font key="font" metaFont="smallSystem"/>
-                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                        <box autoresizesSubviews="NO" title="Hide" borderType="line" id="rbT-qf-DIe">
-                                            <rect key="frame" x="463" y="293" width="267" height="54"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <box autoresizesSubviews="NO" title="Hide..." borderType="line" id="rbT-qf-DIe">
+                                            <rect key="frame" x="447" y="274" width="283" height="73"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                             <view key="contentView">
-                                                <rect key="frame" x="1" y="1" width="265" height="38"/>
+                                                <rect key="frame" x="1" y="1" width="281" height="57"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button id="9wb-oI-R5I">
-                                                        <rect key="frame" x="16" y="12" width="122" height="18"/>
+                                                        <rect key="frame" x="16" y="21" width="122" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="&quot;All&quot; sections" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="Rzg-zZ-93n">
+                                                        <buttonCell key="cell" type="check" title="&quot;All&quot; sections" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="Rzg-zZ-93n">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
@@ -589,9 +535,9 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </button>
                                                     <button id="3CV-9S-gLw">
-                                                        <rect key="frame" x="142" y="12" width="88" height="18"/>
+                                                        <rect key="frame" x="142" y="21" width="88" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Avatars" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="UOs-3D-XyL">
+                                                        <buttonCell key="cell" type="check" title="Avatars" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="UOs-3D-XyL">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
@@ -604,28 +550,17 @@ user you can add more servers from the left.</string>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
-                                        <box autoresizesSubviews="NO" title="When filtering, also scan" borderType="line" id="iei-ab-K9r">
-                                            <rect key="frame" x="463" y="221" width="267" height="54"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <box autoresizesSubviews="NO" title="When filtering, include..." borderType="line" id="iei-ab-K9r">
+                                            <rect key="frame" x="447" y="176" width="283" height="73"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                             <view key="contentView">
-                                                <rect key="frame" x="1" y="1" width="265" height="38"/>
+                                                <rect key="frame" x="1" y="1" width="281" height="57"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <button id="dTw-ed-XkE">
-                                                        <rect key="frame" x="16" y="12" width="74" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Repos" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="gO1-Ad-AhD">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="includeRepositoriesInfilterSelected:" target="vQH-WF-vh2" id="mxT-kL-vT4"/>
-                                                        </connections>
-                                                    </button>
                                                     <button id="Jr3-YU-DrS">
-                                                        <rect key="frame" x="93" y="12" width="88" height="18"/>
+                                                        <rect key="frame" x="92" y="21" width="88" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Statuses" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="Dds-V9-uRU">
+                                                        <buttonCell key="cell" type="check" title="Statuses" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="Dds-V9-uRU">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
@@ -634,9 +569,9 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </button>
                                                     <button id="eFR-P1-MxA">
-                                                        <rect key="frame" x="184" y="12" width="72" height="18"/>
+                                                        <rect key="frame" x="185" y="21" width="72" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Labels" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="6Za-6G-OIl">
+                                                        <buttonCell key="cell" type="check" title="Labels" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="6Za-6G-OIl">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
@@ -644,11 +579,88 @@ user you can add more servers from the left.</string>
                                                             <action selector="includeLabelsInFilteringSelected:" target="vQH-WF-vh2" id="YrY-h8-hA2"/>
                                                         </connections>
                                                     </button>
+                                                    <button id="dTw-ed-XkE">
+                                                        <rect key="frame" x="16" y="21" width="74" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Repos" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="gO1-Ad-AhD">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="includeRepositoriesInfilterSelected:" target="vQH-WF-vh2" id="mxT-kL-vT4"/>
+                                                        </connections>
+                                                    </button>
                                                 </subviews>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
+                                        <box autoresizesSubviews="NO" title="Refreshing" borderType="line" id="zpr-xa-Rug">
+                                            <rect key="frame" x="447" y="5" width="283" height="148"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                                            <view key="contentView">
+                                                <rect key="frame" x="1" y="1" width="281" height="132"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="INA-l0-fZh">
+                                                        <rect key="frame" x="247" y="24" width="19" height="27"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <stepperCell key="cell" continuous="YES" alignment="left" increment="10" minValue="60" maxValue="3600" doubleValue="60" id="EvF-c3-Alv"/>
+                                                        <connections>
+                                                            <action selector="refreshDurationChanged:" target="vQH-WF-vh2" id="y1L-xR-vLZ"/>
+                                                        </connections>
+                                                    </stepper>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Zu0-k7-csJ">
+                                                        <rect key="frame" x="-28" y="30" width="275" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Refresh items every 3600 seconds" id="tcS-Fj-NKu">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="ThS-Id-Gqm">
+                                                        <rect key="frame" x="247" y="57" width="19" height="27"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <stepperCell key="cell" continuous="YES" alignment="left" minValue="2" maxValue="99999" doubleValue="2" id="hrN-wT-iMM"/>
+                                                        <connections>
+                                                            <action selector="newRepoCheckChanged:" target="vQH-WF-vh2" id="bLc-qI-O36"/>
+                                                        </connections>
+                                                    </stepper>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="XcM-W3-Ec0">
+                                                        <rect key="frame" x="-28" y="63" width="275" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Refresh repositories every 2 hours" id="0Sb-5H-BRV">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <button id="ueT-Kq-j9E">
+                                                        <rect key="frame" x="-28" y="94" width="293" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Gray menubar count when refreshing" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="4bJ-dN-Uhp">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="grayOutWhenRefreshingSelected:" target="vQH-WF-vh2" id="fCv-C1-fWf"/>
+                                                        </connections>
+                                                    </button>
+                                                </subviews>
+                                            </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </box>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="gXJ-Co-1FC">
+                                            <rect key="frame" x="37" y="29" width="221" height="17"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="(best on Retina, requires Yosemite)" id="n79-46-oFL">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
                                     </subviews>
                                 </view>
                             </tabViewItem>
@@ -659,7 +671,7 @@ user you can add more servers from the left.</string>
                                     <subviews>
                                         <box autoresizesSubviews="NO" borderType="none" titlePosition="noTitle" id="WfS-TK-dZa">
                                             <rect key="frame" x="235" y="128" width="267" height="123"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="0.0" y="0.0" width="267" height="123"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -689,12 +701,12 @@ user you can add more servers from the left.</string>
                                                     <popUpButton verticalHuggingPriority="750" id="bWX-fP-uhd">
                                                         <rect key="frame" x="17" y="89" width="234" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <popUpButtonCell key="cell" type="push" title="Sorting" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="PQf-4J-ChU">
+                                                        <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="PQf-4J-ChU">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="menu"/>
                                                             <menu key="menu" title="OtherViews" id="oX1-2z-FQn">
                                                                 <items>
-                                                                    <menuItem title="Sorting" state="on" id="DAj-5M-Ln1"/>
+                                                                    <menuItem title="Sorting" id="DAj-5M-Ln1"/>
                                                                     <menuItem title="Item 2" id="n4v-z6-mEm"/>
                                                                     <menuItem title="Item 3" id="Hiu-2H-1c4"/>
                                                                 </items>
@@ -719,7 +731,7 @@ user you can add more servers from the left.</string>
                                     <subviews>
                                         <box autoresizesSubviews="NO" borderType="none" titlePosition="noTitle" id="HAA-q5-qyx">
                                             <rect key="frame" x="156" y="83" width="427" height="212"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="0.0" y="0.0" width="427" height="212"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -781,12 +793,12 @@ user you can add more servers from the left.</string>
                                                     <popUpButton verticalHuggingPriority="750" id="DVS-bf-HmU">
                                                         <rect key="frame" x="218" y="175" width="134" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <popUpButtonCell key="cell" type="push" title="Keep My Own" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="d5e-nv-C7o">
+                                                        <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="d5e-nv-C7o">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="menu"/>
                                                             <menu key="menu" title="OtherViews" id="R4i-KU-iWz">
                                                                 <items>
-                                                                    <menuItem title="Keep My Own" state="on" id="cgN-3d-2Wt"/>
+                                                                    <menuItem title="Keep My Own" id="cgN-3d-2Wt"/>
                                                                     <menuItem title="Keep All" id="3S5-2j-Zli"/>
                                                                     <menuItem title="Don't Keep" id="XdV-Lf-khp"/>
                                                                 </items>
@@ -808,12 +820,12 @@ user you can add more servers from the left.</string>
                                                     <popUpButton verticalHuggingPriority="750" id="MUp-kA-DZp">
                                                         <rect key="frame" x="218" y="139" width="134" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <popUpButtonCell key="cell" type="push" title="Keep My Own" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="exr-ek-OWA">
+                                                        <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="exr-ek-OWA">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="menu"/>
                                                             <menu key="menu" title="OtherViews" id="OrW-A7-Xc2">
                                                                 <items>
-                                                                    <menuItem title="Keep My Own" state="on" id="cyB-qf-6Eu"/>
+                                                                    <menuItem title="Keep My Own" id="cyB-qf-6Eu"/>
                                                                     <menuItem title="Keep All" id="r2G-KA-S7R"/>
                                                                     <menuItem title="Don't Keep" id="9gv-FQ-txC"/>
                                                                 </items>
@@ -838,7 +850,7 @@ user you can add more servers from the left.</string>
                                     <subviews>
                                         <box autoresizesSubviews="NO" borderType="none" titlePosition="noTitle" id="9l1-g0-3Pv">
                                             <rect key="frame" x="32" y="36" width="673" height="296"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="0.0" y="0.0" width="673" height="296"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -891,7 +903,7 @@ user you can add more servers from the left.</string>
                                                         <rect key="frame" x="12" y="47" width="651" height="96"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <tokenFieldCell key="cell" selectable="YES" editable="YES" borderStyle="bezel" alignment="left" placeholderString="Comma separated list of usernames (case/accent insensitive, without the '@' prefix)" drawsBackground="YES" allowsEditingTextAttributes="YES" id="i7v-35-449">
-                                                            <font key="font" metaFont="titleBar" size="12"/>
+                                                            <font key="font" metaFont="cellTitle"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </tokenFieldCell>
@@ -945,7 +957,7 @@ user you can add more servers from the left.</string>
                                     <subviews>
                                         <box autoresizesSubviews="NO" borderType="none" titlePosition="noTitle" id="lHO-RU-wff">
                                             <rect key="frame" x="107" y="10" width="522" height="349"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="0.0" y="0.0" width="522" height="349"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1108,7 +1120,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                     <subviews>
                                         <box autoresizesSubviews="NO" borderType="none" titlePosition="noTitle" id="Opr-Qr-4c9">
                                             <rect key="frame" x="16" y="42" width="705" height="300"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="0.0" y="0.0" width="705" height="300"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1226,7 +1238,7 @@ and press Enter to select.
                                     <subviews>
                                         <box autoresizesSubviews="NO" borderType="none" titlePosition="noTitle" id="YKc-0b-31j">
                                             <rect key="frame" x="6" y="21" width="724" height="310"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <view key="contentView">
                                                 <rect key="frame" x="0.0" y="0.0" width="724" height="310"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1404,7 +1416,7 @@ and press Enter to select.
                 <outlet property="useVibrancy" destination="onl-1T-RTg" id="7Tr-3j-g1y"/>
                 <outlet property="versionNumber" destination="iqF-Fz-LyV" id="3wx-Ff-ShS"/>
             </connections>
-            <point key="canvasLocation" x="327" y="121"/>
+            <point key="canvasLocation" x="179" y="134"/>
         </window>
     </objects>
 </document>
