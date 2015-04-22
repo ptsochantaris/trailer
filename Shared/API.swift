@@ -1217,19 +1217,20 @@ final class API {
 					for info in d {
 						if (N(info, "private") as? NSNumber)?.boolValue ?? false {
 							if let permissions = N(info, "permissions") as? [NSObject: AnyObject] {
-								if	(N(permissions, "pull") as! NSNumber).boolValue ||
-									(N(permissions, "push") as! NSNumber).boolValue ||
-									(N(permissions, "admin") as! NSNumber).boolValue {
-										let r = Repo.repoWithInfo(info, fromServer: apiServer)
-										r.apiServer = apiServer
+
+								let pull = (N(permissions, "pull") as? NSNumber)?.boolValue ?? false
+								let push = (N(permissions, "push") as? NSNumber)?.boolValue ?? false
+								let admin = (N(permissions, "admin") as? NSNumber)?.boolValue ?? false
+
+								if	pull || push || admin {
+										Repo.repoWithInfo(info, fromServer: apiServer)
 								} else {
 									DLog("Watched private repository '%@' seems to be inaccessible, skipping", N(info, "full_name") as? String)
 									continue
 								}
 							}
 						} else {
-							let r = Repo.repoWithInfo(info, fromServer: apiServer)
-							r.apiServer = apiServer
+							Repo.repoWithInfo(info, fromServer: apiServer)
 						}
 					}
 				}
