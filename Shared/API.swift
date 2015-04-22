@@ -1348,9 +1348,24 @@ final class API {
 
                         etag = allHeaders["Etag"] as? String
 
-						fromServer.requestsRemaining = NSNumber(longLong: (allHeaders["X-RateLimit-Remaining"] as! NSString).longLongValue)
-						fromServer.requestsLimit = NSNumber(longLong: (allHeaders["X-RateLimit-Limit"] as! NSString).longLongValue)
-						fromServer.resetDate = NSDate(timeIntervalSince1970: (allHeaders["X-RateLimit-Reset"] as! NSString).doubleValue)
+						if let hv = allHeaders["X-RateLimit-Remaining"] as? NSString {
+							fromServer.requestsRemaining = NSNumber(longLong: hv.longLongValue)
+						} else {
+							fromServer.requestsRemaining = 10000
+						}
+
+						if let hv = allHeaders["X-RateLimit-Limit"] as? NSString {
+							fromServer.requestsLimit = NSNumber(longLong: hv.longLongValue)
+						} else {
+							fromServer.requestsLimit = 10000
+						}
+
+						if let hv = allHeaders["X-RateLimit-Reset"] as? NSString {
+							fromServer.resetDate = NSDate(timeIntervalSince1970: hv.doubleValue)
+						} else {
+							fromServer.resetDate = nil
+						}
+
 						NSNotificationCenter.defaultCenter().postNotificationName(API_USAGE_UPDATE, object: fromServer, userInfo: nil)
 					}
                     var lastPage = true
