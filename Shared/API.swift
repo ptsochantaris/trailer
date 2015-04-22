@@ -81,10 +81,6 @@ final class API {
 
 	/////////////////////////////////////////////////////// Utilities
 
-	func resetBadLinks() {
-		badLinks.removeAll(keepCapacity: false)
-	}
-
 	func lastUpdateDescription() -> String {
 		if app.isRefreshing {
 			return "Refreshing..."
@@ -1279,6 +1275,7 @@ final class API {
 	}
 
 	func testApiToServer(apiServer: ApiServer, callback: (NSError?) -> ()) {
+		badLinks.removeAll(keepCapacity: false)
 		get("/rate_limit", fromServer: apiServer, ignoreLastSync: true, parameters: nil, extraHeaders: nil) { response, data, error in
 			let allOk = (response?.statusCode == 404 && data != nil && !(N(data, "message") as? String == "Not Found"))
 			callback(allOk ? nil : error)

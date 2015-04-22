@@ -116,7 +116,6 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 
 		navigationController?.setToolbarHidden(true, animated: true)
 
-		api.resetBadLinks()
 		newServer.authToken = token
 		newServer.lastSyncSucceeded = true
 	}

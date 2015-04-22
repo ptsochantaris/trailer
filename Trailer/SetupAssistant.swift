@@ -138,7 +138,6 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 		completeSetup.hidden = true
 		welcomeLabel.hidden = true
 		trackIssues.hidden = true
-		api.resetBadLinks()
 		let token = tokenHolder.stringValue.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
 		newServer.authToken = token
 		newServer.lastSyncSucceeded = true

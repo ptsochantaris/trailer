@@ -709,7 +709,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBAction func testApiServerSelected(sender: NSButton) {
 		sender.enabled = false
 		let apiServer = selectedServer()!
-
 		api.testApiToServer(apiServer) { error in
 			let alert = NSAlert()
 			if error != nil {
