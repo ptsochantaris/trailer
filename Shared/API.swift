@@ -135,7 +135,7 @@ final class API {
 				let response = res as? NSHTTPURLResponse
 				var error = e
 				if error == nil && response?.statusCode>399 {
-					error = NSError(domain: "Error response received", code: response!.statusCode, userInfo: nil)
+					error = NSError(domain: "Error response", code: response!.statusCode, userInfo: nil)
 				}
                 completion(response: response, data: data, error: error)
 				#if os(iOS)
@@ -1438,7 +1438,7 @@ final class API {
 				var error = e
 
 				if error == nil && (response == nil || response?.statusCode > 399) {
-					error = NSError(domain: "Error response received", code:response!.statusCode, userInfo:nil)
+					error = NSError(domain: "Error response", code:response!.statusCode, userInfo:nil)
 				}
 
 				if error == nil {
