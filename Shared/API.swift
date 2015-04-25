@@ -4,12 +4,12 @@ import CoreData
 import UIKit
 #endif
 
-struct UrlBackOffEntry {
-	var nextAttemptAt: NSDate
-	var duration: NSTimeInterval
-}
-
 final class API {
+
+	private struct UrlBackOffEntry {
+		var nextAttemptAt: NSDate
+		var duration: NSTimeInterval
+	}
 
 	var refreshesSinceLastStatusCheck = [NSManagedObjectID:Int]()
 	var refreshesSinceLastLabelsCheck = [NSManagedObjectID:Int]()
@@ -19,9 +19,6 @@ final class API {
 	private let cacheDirectory: String
 	private let urlSession: NSURLSession
 	private var badLinks = [String:UrlBackOffEntry]()
-	#if os(iOS)
-	private var networkIndicationCount: Int = 0
-	#endif
 
 	init() {
 
@@ -60,7 +57,7 @@ final class API {
 		urlSession = NSURLSession(configuration: config)
 
 		if fileManager.fileExistsAtPath(cacheDirectory) {
-			clearImageCache()
+			expireOldImageCacheEntries()
 		} else {
 			fileManager.createDirectoryAtPath(cacheDirectory, withIntermediateDirectories: true, attributes: nil, error: nil)
 		}
@@ -114,17 +111,6 @@ final class API {
 
 	///////////////////////////////////////////////////////// Images
 
-	private func clearImageCache() {
-		let fileManager = NSFileManager.defaultManager()
-		let files = fileManager.contentsOfDirectoryAtPath(cacheDirectory, error:nil) as? [String]
-		for f in files! {
-			if startsWith(f, "imgcache-") {
-				let path = cacheDirectory.stringByAppendingPathComponent(f)
-				fileManager.removeItemAtPath(path, error:nil)
-			}
-		}
-	}
-
 	func expireOldImageCacheEntries() {
 		let fileManager = NSFileManager.defaultManager()
 		let files = fileManager.contentsOfDirectoryAtPath(cacheDirectory, error:nil) as? [String]
@@ -141,8 +127,8 @@ final class API {
 		}
 	}
 
-	// warning: now calls back on thread!!
-	func getImage(url: NSURL, completion:(response: NSHTTPURLResponse?, data: NSData?, error: NSError?) -> Void) {
+	// Warning: Calls back on thread!!
+	private func getImage(url: NSURL, completion:(response: NSHTTPURLResponse?, data: NSData?, error: NSError?) -> Void) {
 
             let task = urlSession.dataTaskWithURL(url) { [weak self] data, res, e in
 
@@ -153,7 +139,9 @@ final class API {
 				}
                 completion(response: response, data: data, error: error)
 				#if os(iOS)
-					self!.networkIndicationEnd()
+					dispatch_sync(dispatch_get_main_queue()) { [weak self] in
+						self!.networkIndicationEnd()
+					}
 				#endif
 			}
 
@@ -1141,7 +1129,7 @@ final class API {
 		}
 	}
 
-	func getRateLimitFromServer(apiServer: ApiServer, callback: (Int64, Int64, Int64)->Void)
+	private func getRateLimitFromServer(apiServer: ApiServer, callback: (Int64, Int64, Int64)->Void)
 	{
 		get("/rate_limit", fromServer: apiServer, ignoreLastSync: true, parameters: nil, extraHeaders: nil) { response, data, error in
 
@@ -1203,7 +1191,7 @@ final class API {
 		}
 	}
 
-	func syncWatchedReposFromServer(apiServer: ApiServer, callback: Completion) {
+	private func syncWatchedReposFromServer(apiServer: ApiServer, callback: Completion) {
 
 		if !apiServer.syncIsGood {
 			callback()
@@ -1244,7 +1232,7 @@ final class API {
 		})
 	}
 
-	func syncUserDetailsInMoc(moc: NSManagedObjectContext, callback: Completion) {
+	private func syncUserDetailsInMoc(moc: NSManagedObjectContext, callback: Completion) {
 
 		let allApiServers = ApiServer.allApiServersInMoc(moc)
 		let operationCount = allApiServers.count
@@ -1277,9 +1265,8 @@ final class API {
 
 	func testApiToServer(apiServer: ApiServer, callback: (NSError?) -> ()) {
 		badLinks.removeAll(keepCapacity: false)
-		get("/rate_limit", fromServer: apiServer, ignoreLastSync: true, parameters: nil, extraHeaders: nil) { response, data, error in
-			let allOk = (response?.statusCode == 404 && data != nil && !(N(data, "message") as? String == "Not Found"))
-			callback(allOk ? nil : error)
+		get("/user", fromServer: apiServer, ignoreLastSync: true, parameters: nil, extraHeaders: nil) { response, data, error in
+			callback(error)
 		}
 	}
 
@@ -1384,9 +1371,9 @@ final class API {
 		ignoreLastSync: Bool,
 		parameters: [String : String]?,
 		extraHeaders: [String : String]?,
-		completion: (response: NSHTTPURLResponse?, data: AnyObject?, error: NSError?) -> Void
-	) {
-			var apiServerLabel: String
+		completion: (response: NSHTTPURLResponse?, data: AnyObject?, error: NSError?) -> Void) {
+
+			let apiServerLabel: String
 			if fromServer.syncIsGood || ignoreLastSync {
 				apiServerLabel = fromServer.label ?? "(untitled server)"
 			} else {
@@ -1401,7 +1388,6 @@ final class API {
 				networkIndicationStart()
 			#endif
 
-			let authToken = fromServer.authToken
 			var expandedPath = startsWith(path, "/") ? (fromServer.apiPath ?? "").stringByAppendingPathComponent(path) : path
 
 			if let params = parameters {
@@ -1413,7 +1399,9 @@ final class API {
 			}
 
 			let r = NSMutableURLRequest(URL: NSURL(string: expandedPath)!, cachePolicy: NSURLRequestCachePolicy.UseProtocolCachePolicy, timeoutInterval: NETWORK_TIMEOUT)
-			if authToken != nil { r.setValue("token " + authToken!, forHTTPHeaderField: "Authorization") }
+			if let a = fromServer.authToken {
+				r.setValue("token " + a, forHTTPHeaderField: "Authorization")
+			}
 
 			if let headers = extraHeaders {
 				for (key,value) in headers {
@@ -1429,13 +1417,13 @@ final class API {
 				if NSDate().compare(existingBackOff!.nextAttemptAt) == NSComparisonResult.OrderedAscending {
 					// report failure and return
 					DLog("(%@) Preempted fetch to previously broken link %@, won't actually access this URL until %@", apiServerLabel, fullUrlPath, existingBackOff!.nextAttemptAt)
-					dispatch_async(dispatch_get_main_queue()) {
+					dispatch_async(dispatch_get_main_queue()) { [weak self] in
 						let e = NSError(domain: "Preempted fetch because of throttling", code: 400, userInfo: nil)
 						completion(response: nil, data: nil, error: e)
+						#if os(iOS)
+							self!.networkIndicationEnd()
+						#endif
 					}
-					#if os(iOS)
-						networkIndicationEnd()
-					#endif
 					return
 				}
 				else {
@@ -1477,31 +1465,30 @@ final class API {
 					DLog("(%@) GET %@ - FAILED: %@", apiServerLabel, fullUrlPath, error!.localizedDescription)
 				}
 
-				dispatch_sync(dispatch_get_main_queue()) {
+				dispatch_sync(dispatch_get_main_queue()) { [weak self] in
 					completion(response: response, data: parsedData, error: error)
+					#if os(iOS)
+						self!.networkIndicationEnd()
+					#endif
 				}
-
-				#if os(iOS)
-					self!.networkIndicationEnd()
-				#endif
 			}.resume()
 	}
 
 	#if os(iOS)
+
+	private var networkIndicationCount: Int = 0
+
 	func networkIndicationStart() {
-		dispatch_async(dispatch_get_main_queue(), { [weak self] in
-			if ++self!.networkIndicationCount==1 {
-				UIApplication.sharedApplication().networkActivityIndicatorVisible = true
-			}
-		})
+		if ++networkIndicationCount == 1 {
+			UIApplication.sharedApplication().networkActivityIndicatorVisible = true
+		}
 	}
 	
 	func networkIndicationEnd() {
-		dispatch_async(dispatch_get_main_queue(), { [weak self] in
-			if --self!.networkIndicationCount==0 {
-				UIApplication.sharedApplication().networkActivityIndicatorVisible = false
-			}
-		})
+		if --networkIndicationCount == 0 {
+			UIApplication.sharedApplication().networkActivityIndicatorVisible = false
+		}
 	}
+	
 	#endif
 }
