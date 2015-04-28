@@ -134,8 +134,9 @@ final class API {
 
 				let response = res as? NSHTTPURLResponse
 				var error = e
-				if error == nil && response?.statusCode>399 {
-					error = NSError(domain: "Error response", code: response!.statusCode, userInfo: nil)
+				if error == nil && (response == nil || response?.statusCode > 399) {
+					let code = response?.statusCode ?? -1
+					error = self!.apiError("Server responded with \(code)")
 				}
                 completion(response: response, data: data, error: error)
 				#if os(iOS)
@@ -1265,9 +1266,23 @@ final class API {
 
 	func testApiToServer(apiServer: ApiServer, callback: (NSError?) -> ()) {
 		badLinks.removeAll(keepCapacity: false)
-		get("/user", fromServer: apiServer, ignoreLastSync: true, parameters: nil, extraHeaders: nil) { response, data, error in
-			callback(error)
+		get("/user", fromServer: apiServer, ignoreLastSync: true, parameters: nil, extraHeaders: nil) { [weak self] response, data, error in
+
+			if let d = data as? [NSObject : AnyObject], userName = N(d, "login") as? String, userId = N(d, "id") as? NSNumber where error == nil {
+				if userName.isEmpty || userId.longLongValue <= 0 {
+					let localError = self!.apiError("Could not read a valid user record from this endpoint")
+					callback(localError)
+				} else {
+					callback(error)
+				}
+			} else {
+				callback(error)
+			}
 		}
+	}
+
+	private func apiError(message: String) -> NSError {
+		return NSError(domain: "API Error", code: -1, userInfo: [NSLocalizedDescriptionKey: message])
 	}
 
 	//////////////////////////////////////////////////////////// low level
@@ -1377,8 +1392,8 @@ final class API {
 			if fromServer.syncIsGood || ignoreLastSync {
 				apiServerLabel = fromServer.label ?? "(untitled server)"
 			} else {
-				dispatch_async(dispatch_get_main_queue()) {
-					let e = NSError(domain: "Sync has failed, skipping this call", code: -1, userInfo: nil)
+				dispatch_async(dispatch_get_main_queue()) { [weak self] in
+					let e = self!.apiError("Sync has failed, skipping this call")
 					completion(response: nil, data: nil, error: e)
 				}
 				return
@@ -1418,7 +1433,7 @@ final class API {
 					// report failure and return
 					DLog("(%@) Preempted fetch to previously broken link %@, won't actually access this URL until %@", apiServerLabel, fullUrlPath, existingBackOff!.nextAttemptAt)
 					dispatch_async(dispatch_get_main_queue()) { [weak self] in
-						let e = NSError(domain: "Preempted fetch because of throttling", code: 400, userInfo: nil)
+						let e = self!.apiError("Preempted fetch because of throttling")
 						completion(response: nil, data: nil, error: e)
 						#if os(iOS)
 							self!.networkIndicationEnd()
@@ -1438,7 +1453,8 @@ final class API {
 				var error = e
 
 				if error == nil && (response == nil || response?.statusCode > 399) {
-					error = NSError(domain: "Error response", code:response!.statusCode, userInfo:nil)
+					let code = response?.statusCode ?? -1
+					error = self!.apiError("Server responded with \(code)")
 				}
 
 				if error == nil {
