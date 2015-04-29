@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="7531" systemVersion="14D136" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="AgC-eL-Hgc">
+<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="7702" systemVersion="14D136" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="AgC-eL-Hgc">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7520"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7701"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="3737"/>
     </dependencies>
     <scenes>
@@ -300,7 +300,7 @@
                                     <items>
                                         <group alignment="center" verticalAlignment="center" radius="10" spacing="4" id="aEt-R2-txt">
                                             <items>
-                                                <imageView width="20" height="20" alignment="left" verticalAlignment="center" image="GlacePrs" contentMode="scaleAspectFit" id="xYb-hC-O7D"/>
+                                                <imageView width="20" height="20" alignment="left" verticalAlignment="center" image="GlancePrs" contentMode="scaleAspectFit" id="xYb-hC-O7D"/>
                                                 <imageView width="20" height="20" alignment="left" verticalAlignment="center" image="GlanceIssues" contentMode="scaleAspectFit" id="J0s-24-eqf"/>
                                                 <label alignment="right" verticalAlignment="center" text="43" textAlignment="center" id="3wl-rh-8m0">
                                                     <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>

@@ -50,16 +50,27 @@ final class WatchManager {
 					reply(["status": "Success", "color": "green"])
 				}
 			case "clearAllMerged":
+				for p in PullRequest.allMergedRequestsInMoc(mainObjectContext) {
+					mainObjectContext.deleteObject(p)
+				}
+				DataManager.saveDB()
 				let m = popupManager.getMasterController()
-				m.removeAllMergedConfirmed()
-				app.updateBadge()
+				m.reloadDataWithAnimation(false)
+				m.updateStatus()
 				atNextEvent() {
 					reply(["status": "Success", "color": "green"])
 				}
 			case "clearAllClosed":
+				for p in PullRequest.allClosedRequestsInMoc(mainObjectContext) {
+					mainObjectContext.deleteObject(p)
+				}
+				for i in Issue.allClosedIssuesInMoc(mainObjectContext) {
+					mainObjectContext.deleteObject(i)
+				}
+				DataManager.saveDB()
 				let m = popupManager.getMasterController()
-				m.removeAllClosedConfirmed()
-				app.updateBadge()
+				m.reloadDataWithAnimation(false)
+				m.updateStatus()
 				atNextEvent() {
 					reply(["status": "Success", "color": "green"])
 				}
