@@ -130,37 +130,37 @@ final class API {
 	// Warning: Calls back on thread!!
 	private func getImage(url: NSURL, completion:(response: NSHTTPURLResponse?, data: NSData?, error: NSError?) -> Void) {
 
-            let task = urlSession.dataTaskWithURL(url) { [weak self] data, res, e in
+		let task = urlSession.dataTaskWithURL(url) { [weak self] data, res, e in
 
-				let response = res as? NSHTTPURLResponse
-				var error = e
-				if error == nil && (response == nil || response?.statusCode > 399) {
-					let code = response?.statusCode ?? -1
-					error = self!.apiError("Server responded with \(code)")
-				}
-                completion(response: response, data: data, error: error)
-				#if os(iOS)
-					dispatch_sync(dispatch_get_main_queue()) { [weak self] in
-						self!.networkIndicationEnd()
-					}
-				#endif
+			let response = res as? NSHTTPURLResponse
+			var error = e
+			if error == nil && (response == nil || response?.statusCode > 399) {
+				let code = response?.statusCode ?? -1
+				error = self!.apiError("Server responded with \(code)")
 			}
+			completion(response: response, data: data, error: error)
+			#if os(iOS)
+				dispatch_sync(dispatch_get_main_queue()) { [weak self] in
+					self!.networkIndicationEnd()
+				}
+			#endif
+		}
 
-            #if os(iOS)
-                task.priority = NSURLSessionTaskPriorityHigh
-                atNextEvent { [weak self] in
-					self!.networkIndicationStart()
-                }
-            #endif
+		#if os(iOS)
+			task.priority = NSURLSessionTaskPriorityHigh
+			atNextEvent { [weak self] in
+				self!.networkIndicationStart()
+			}
+		#endif
 
-            task.resume()
+		task.resume()
 	}
 
 	func haveCachedAvatar(path: String, tryLoadAndCallback: (IMAGE_CLASS?) -> Void) -> Bool {
 
 		#if os(iOS)
 			let absolutePath = path + (contains(path, "?") ? "&" : "?") + "s=\(40.0*GLOBAL_SCREEN_SCALE)"
-        #else
+		#else
 			let absolutePath = path + (contains(path, "?") ? "&" : "?") + "s=88"
 		#endif
 
@@ -185,7 +185,7 @@ final class API {
 			}
 		}
 
-        getImage(NSURL(string: absolutePath)!) { response, data, error in
+		getImage(NSURL(string: absolutePath)!) { response, data, error in
 
             #if os(iOS)
                 if let d = data, i = IMAGE_CLASS(data: d, scale:GLOBAL_SCREEN_SCALE) {

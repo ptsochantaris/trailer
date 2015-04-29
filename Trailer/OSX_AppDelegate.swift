@@ -203,7 +203,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 
 		if (type == .NewComment || type == .NewMention) && !Settings.hideAvatars && notification.respondsToSelector(Selector("setContentImage:")) {
-			if let url = (forItem as! PRComment).avatarUrl {
+			if let c = forItem as? PRComment, url = c.avatarUrl {
 				api.haveCachedAvatar(url) { image in
 					notification.contentImage = image
 					NSUserNotificationCenter.defaultUserNotificationCenter().deliverNotification(notification)
