@@ -187,17 +187,17 @@ final class API {
 
 		getImage(NSURL(string: absolutePath)!) { response, data, error in
 
+			var image: IMAGE_CLASS?
             #if os(iOS)
-                if let d = data, i = IMAGE_CLASS(data: d, scale:GLOBAL_SCREEN_SCALE) {
-                    UIImageJPEGRepresentation(i, 1.0).writeToFile(cachePath, atomically: true)
-                    dispatch_sync(dispatch_get_main_queue()) { tryLoadAndCallback(i) }
-                }
+                if let d = data, image = IMAGE_CLASS(data: d, scale:GLOBAL_SCREEN_SCALE) {
+                    UIImageJPEGRepresentation(image, 1.0).writeToFile(cachePath, atomically: true)
+				}
             #else
-                if let d = data, i = IMAGE_CLASS(data: d) {
-                    i.TIFFRepresentation?.writeToFile(cachePath, atomically: true)
-                    dispatch_sync(dispatch_get_main_queue()) { tryLoadAndCallback(i) }
-                }
+                if let d = data, image = IMAGE_CLASS(data: d) {
+                    image.TIFFRepresentation?.writeToFile(cachePath, atomically: true)
+				}
             #endif
+			dispatch_sync(dispatch_get_main_queue()) { tryLoadAndCallback(image) }
         }
 		return false
 	}
