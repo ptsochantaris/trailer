@@ -170,6 +170,10 @@ final class DataManager : NSObject {
 		for p in allTouchedPrs {
 			p.postSyncAction = PostSyncAction.DoNothing.rawValue
 		}
+
+		for i in allTouchedIssues {
+			i.postSyncAction = PostSyncAction.DoNothing.rawValue
+		}
 	}
 
 	class func processNotificationsForComment(c: PRComment, ofPullRequest: PullRequest) {
