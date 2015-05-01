@@ -90,23 +90,44 @@ final class DataManager : NSObject {
 
 		let updatedPrs = PullRequest.updatedItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest]
 		for p in updatedPrs {
-			if let reopened = p.reopened?.boolValue {
-				if reopened {
-					if !p.isMine() {
-						app.postNotificationOfType(PRNotificationType.PrReopened, forItem: p)
-					}
-					p.reopened = false
+			if let reopened = p.reopened?.boolValue where reopened == true {
+				if !p.isMine() {
+					app.postNotificationOfType(PRNotificationType.PrReopened, forItem: p)
 				}
+				p.reopened = false
 			}
 		}
 
 		let allTouchedPrs = newPrs + updatedPrs
 		for p in allTouchedPrs {
-			if let newAssignment = p.isNewAssignment?.boolValue {
-				if newAssignment {
-					app.postNotificationOfType(PRNotificationType.NewPrAssigned, forItem: p)
-					p.isNewAssignment = false
+			if let newAssignment = p.isNewAssignment?.boolValue where newAssignment == true {
+				app.postNotificationOfType(PRNotificationType.NewPrAssigned, forItem: p)
+				p.isNewAssignment = false
+			}
+		}
+
+		let newIssues = Issue.newItemsOfType("Issue", inMoc: mainObjectContext) as! [Issue]
+		for i in newIssues {
+			if !i.isMine() {
+				app.postNotificationOfType(PRNotificationType.NewIssue, forItem: i)
+			}
+		}
+
+		let updatedIssues = Issue.updatedItemsOfType("Issue", inMoc: mainObjectContext) as! [Issue]
+		for i in updatedIssues {
+			if let reopened = i.reopened?.boolValue where reopened == true {
+				if !i.isMine() {
+					app.postNotificationOfType(PRNotificationType.IssueReopened, forItem: i)
 				}
+				i.reopened = false
+			}
+		}
+
+		let allTouchedIssues = newIssues + updatedIssues
+		for i in allTouchedIssues {
+			if let newAssignment = i.isNewAssignment?.boolValue where newAssignment == true {
+				app.postNotificationOfType(PRNotificationType.NewIssueAssigned, forItem: i)
+				i.isNewAssignment = false
 			}
 		}
 
@@ -210,7 +231,7 @@ final class DataManager : NSObject {
 		return c
 	}
 
-	class func infoForType(type: PRNotificationType, item: NSManagedObject) -> [String : AnyObject] {
+	class func infoForType(type: PRNotificationType, item: DataItem) -> [String : AnyObject] {
 		switch type {
 		case .NewMention: fallthrough
 		case .NewComment:

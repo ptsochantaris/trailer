@@ -1078,55 +1078,28 @@ final class API {
 
 	private func prWasMerged(r: PullRequest) {
 		DLog("detected merged PR: %@", r.title)
-		switch Settings.mergeHandlingPolicy {
-
-		case PRHandlingPolicy.KeepMine.rawValue:
-			if (r.sectionIndex?.integerValue ?? 0)==PullRequestSection.All.rawValue { break }
-			fallthrough
-
-		case PRHandlingPolicy.KeepAll.rawValue:
+		if Settings.mergeHandlingPolicy==PRHandlingPolicy.KeepAll.rawValue || (Settings.mergeHandlingPolicy==PRHandlingPolicy.KeepMine.rawValue && (r.sectionIndex?.integerValue ?? 0)==PullRequestSection.Mine.rawValue) {
 			r.postSyncAction = PostSyncAction.DoNothing.rawValue // don't delete this
 			r.condition = PullRequestCondition.Merged.rawValue
 			app.postNotificationOfType(PRNotificationType.PrMerged, forItem: r)
-
-		default:
-			break
 		}
 	}
 
 	private func prWasClosed(r: PullRequest) {
 		DLog("Detected closed PR: %@", r.title)
-		switch(Settings.closeHandlingPolicy) {
-
-		case PRHandlingPolicy.KeepMine.rawValue:
-			if (r.sectionIndex?.integerValue ?? 0) == PullRequestSection.All.rawValue { break }
-			fallthrough
-
-		case PRHandlingPolicy.KeepAll.rawValue:
+		if Settings.closeHandlingPolicy==PRHandlingPolicy.KeepAll.rawValue || (Settings.closeHandlingPolicy==PRHandlingPolicy.KeepMine.rawValue && (r.sectionIndex?.integerValue ?? 0)==PullRequestSection.Mine.rawValue) {
 			r.postSyncAction = PostSyncAction.DoNothing.rawValue // don't delete this
 			r.condition = PullRequestCondition.Closed.rawValue
 			app.postNotificationOfType(PRNotificationType.PrClosed, forItem:r)
-
-		default:
-			break
 		}
 	}
 
 	private func issueWasClosed(i: Issue) {
 		DLog("Detected closed Issue: %@", i.title)
-		switch(Settings.closeHandlingPolicy) {
-
-		case PRHandlingPolicy.KeepMine.rawValue:
-			if (i.sectionIndex?.integerValue ?? 0) == PullRequestSection.All.rawValue { break }
-			fallthrough
-
-		case PRHandlingPolicy.KeepAll.rawValue:
+		if Settings.closeHandlingPolicy==PRHandlingPolicy.KeepAll.rawValue || (Settings.closeHandlingPolicy==PRHandlingPolicy.KeepMine.rawValue && (i.sectionIndex?.integerValue ?? 0)==PullRequestSection.Mine.rawValue) {
 			i.postSyncAction = PostSyncAction.DoNothing.rawValue // don't delete this
 			i.condition = PullRequestCondition.Closed.rawValue
 			app.postNotificationOfType(PRNotificationType.IssueClosed, forItem:i)
-
-		default:
-			break
 		}
 	}
 
