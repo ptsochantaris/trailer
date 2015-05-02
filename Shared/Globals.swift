@@ -25,6 +25,18 @@ func DLog(message: String, @autoclosure arg1: ()->CVarArgType?, @autoclosure arg
     }
 }
 
+func DLog(message: String, @autoclosure arg1: ()->CVarArgType?, @autoclosure arg2: ()->CVarArgType?, @autoclosure arg3: ()->CVarArgType?, @autoclosure arg4: ()->CVarArgType?) {
+	if Settings.logActivityToConsole {
+		NSLog(message, arg1() ?? "(nil)", arg2() ?? "(nil)", arg3() ?? "(nil)", arg4() ?? "(nil)")
+	}
+}
+
+func DLog(message: String, @autoclosure arg1: ()->CVarArgType?, @autoclosure arg2: ()->CVarArgType?, @autoclosure arg3: ()->CVarArgType?, @autoclosure arg4: ()->CVarArgType?, @autoclosure arg5: ()->CVarArgType?) {
+	if Settings.logActivityToConsole {
+		NSLog(message, arg1() ?? "(nil)", arg2() ?? "(nil)", arg3() ?? "(nil)", arg4() ?? "(nil)", arg5() ?? "(nil)")
+	}
+}
+
 ////////////////////////////////////
 
 #if os(iOS)
