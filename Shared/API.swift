@@ -965,15 +965,12 @@ final class API {
 		let f = NSFetchRequest(entityName: "Issue")
 		f.predicate = NSPredicate(format: "postSyncAction == %d and condition == %d", PostSyncAction.Delete.rawValue, PullRequestCondition.Open.rawValue)
 		f.returnsObjectsAsFaults = false
-		let issues = moc.executeFetchRequest(f, error: nil) as! [Issue]
 
-		let issuesToCheck = issues.filter { r -> Bool in
-			let parent = r.repo
-			return !(parent.hidden?.boolValue ?? false) && ((parent.postSyncAction?.integerValue ?? 0) != PostSyncAction.Delete.rawValue) && r.apiServer.syncIsGood
-		}
-
-		for i in issuesToCheck {
-			issueWasClosed(i)
+		for i in moc.executeFetchRequest(f, error: nil) as! [Issue] {
+			let r = i.repo
+			if !(r.hidden?.boolValue ?? false) && ((r.postSyncAction?.integerValue ?? 0) != PostSyncAction.Delete.rawValue) && r.apiServer.syncIsGood {
+				issueWasClosed(i)
+			}
 		}
 	}
 
@@ -1047,25 +1044,13 @@ final class API {
 		get("/repos/\(repoFullName)/pulls/\(repoNumber)", fromServer: r.apiServer, ignoreLastSync: false, parameters: nil, extraHeaders: nil) { [weak self] response, data, error in
 
 			if error == nil {
-				if let mergeInfo = N(data, "merged_by") as? [NSObject: AnyObject] {
-					DLog("detected merged PR: %@", r.title)
-
-					let mergeUserId = N(mergeInfo, "id") as? NSNumber ?? -2
-					DLog("merged by user id: %@, our id is: %@", mergeUserId, r.apiServer.userId)
-
-					let mergedByMyself = mergeUserId.isEqualToNumber(r.apiServer.userId ?? -1)
-
-					if !(mergedByMyself && Settings.dontKeepPrsMergedByMe) {
-						self!.prWasMerged(r)
-					} else {
-						DLog("will not announce merged PR: %@", r.title)
-					}
+				if let mergeInfo = N(data, "merged_by") as? [NSObject: AnyObject], mergeUserId = N(mergeInfo, "id") as? NSNumber {
+					self!.prWasMerged(r, byUserId: mergeUserId)
 				} else {
 					self!.prWasClosed(r)
 				}
 			} else {
-				let resultCode = response?.statusCode ?? 0
-				if resultCode == 404 || resultCode==410 { // PR gone for good
+				if let resultCode = response?.statusCode where resultCode == 404 || resultCode==410 { // PR gone for good
 					self!.prWasClosed(r)
 				} else { // fetch problem
 					r.postSyncAction = PostSyncAction.DoNothing.rawValue // don't delete this, we couldn't check, play it safe
@@ -1076,30 +1061,46 @@ final class API {
 		}
 	}
 
-	private func prWasMerged(r: PullRequest) {
-		DLog("detected merged PR: %@", r.title)
-		if Settings.mergeHandlingPolicy==PRHandlingPolicy.KeepAll.rawValue || (Settings.mergeHandlingPolicy==PRHandlingPolicy.KeepMine.rawValue && (r.sectionIndex?.integerValue ?? 0)==PullRequestSection.Mine.rawValue) {
-			r.postSyncAction = PostSyncAction.DoNothing.rawValue // don't delete this
-			r.condition = PullRequestCondition.Merged.rawValue
-			app.postNotificationOfType(PRNotificationType.PrMerged, forItem: r)
+	private func prWasMerged(r: PullRequest, byUserId: NSNumber) {
+
+		let myUserId = r.apiServer.userId ?? -1
+		DLog("Detected merged PR: %@ by user %@, local user id is: %@", r.title, byUserId, myUserId)
+		let mergedByMe = byUserId.isEqualToNumber(myUserId)
+
+		if !(mergedByMe && Settings.dontKeepPrsMergedByMe) {
+			DLog("Checking if we want to keep this merged PR")
+			if Settings.mergeHandlingPolicy==PRHandlingPolicy.KeepAll.rawValue || (Settings.mergeHandlingPolicy==PRHandlingPolicy.KeepMine.rawValue && (r.sectionIndex?.integerValue ?? 0)==PullRequestSection.Mine.rawValue) {
+				DLog("Will keep merged PR")
+				r.postSyncAction = PostSyncAction.DoNothing.rawValue
+				r.condition = PullRequestCondition.Merged.rawValue
+				app.postNotificationOfType(PRNotificationType.PrMerged, forItem: r)
+				return
+			}
 		}
+		DLog("Will not keep merged PR")
 	}
 
 	private func prWasClosed(r: PullRequest) {
 		DLog("Detected closed PR: %@", r.title)
 		if Settings.closeHandlingPolicy==PRHandlingPolicy.KeepAll.rawValue || (Settings.closeHandlingPolicy==PRHandlingPolicy.KeepMine.rawValue && (r.sectionIndex?.integerValue ?? 0)==PullRequestSection.Mine.rawValue) {
-			r.postSyncAction = PostSyncAction.DoNothing.rawValue // don't delete this
+			DLog("Will keep closed PR")
+			r.postSyncAction = PostSyncAction.DoNothing.rawValue
 			r.condition = PullRequestCondition.Closed.rawValue
 			app.postNotificationOfType(PRNotificationType.PrClosed, forItem:r)
+		} else {
+			DLog("Will not keep closed PR")
 		}
 	}
 
 	private func issueWasClosed(i: Issue) {
-		DLog("Detected closed Issue: %@", i.title)
+		DLog("Detected closed issue: %@", i.title)
 		if Settings.closeHandlingPolicy==PRHandlingPolicy.KeepAll.rawValue || (Settings.closeHandlingPolicy==PRHandlingPolicy.KeepMine.rawValue && (i.sectionIndex?.integerValue ?? 0)==PullRequestSection.Mine.rawValue) {
-			i.postSyncAction = PostSyncAction.DoNothing.rawValue // don't delete this
+			DLog("Will keep closed issue")
+			i.postSyncAction = PostSyncAction.DoNothing.rawValue
 			i.condition = PullRequestCondition.Closed.rawValue
 			app.postNotificationOfType(PRNotificationType.IssueClosed, forItem:i)
+		} else {
+			DLog("Will not keep closed issue")
 		}
 	}
 
