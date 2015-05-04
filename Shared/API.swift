@@ -1063,8 +1063,14 @@ final class API {
 
 	private func prWasMerged(r: PullRequest, byUserId: NSNumber) {
 
-		let myUserId = r.apiServer.userId ?? -1
-		DLog("Detected merged PR: %@ by user %@, local user id is: %@, handling policy is %@, coming from section %@", r.title, byUserId, myUserId, Settings.mergeHandlingPolicy, r.sectionIndex ?? 0)
+		let myUserId = r.apiServer.userId ?? NSNumber(integer: -1)
+		DLog("Detected merged PR: %@ by user %@, local user id is: %@, handling policy is %@, coming from section %@",
+			r.title,
+			byUserId,
+			myUserId,
+			NSNumber(integer: Settings.mergeHandlingPolicy),
+			r.sectionIndex ?? NSNumber(integer: 0))
+
 		let mergedByMe = byUserId.isEqualToNumber(myUserId)
 
 		if !(mergedByMe && Settings.dontKeepPrsMergedByMe) {
@@ -1081,7 +1087,11 @@ final class API {
 	}
 
 	private func prWasClosed(r: PullRequest) {
-		DLog("Detected closed PR: %@, handling policy is %@, coming from section %@", r.title, Settings.mergeHandlingPolicy, r.sectionIndex ?? 0)
+		DLog("Detected closed PR: %@, handling policy is %@, coming from section %@",
+			r.title,
+			NSNumber(integer: Settings.mergeHandlingPolicy),
+			r.sectionIndex ?? NSNumber(integer: 0))
+
 		if Settings.closeHandlingPolicy==PRHandlingPolicy.KeepAll.rawValue || (Settings.closeHandlingPolicy==PRHandlingPolicy.KeepMine.rawValue && (r.sectionIndex?.integerValue ?? 0)==PullRequestSection.Mine.rawValue) {
 			DLog("Will keep closed PR")
 			r.postSyncAction = PostSyncAction.DoNothing.rawValue
@@ -1093,7 +1103,11 @@ final class API {
 	}
 
 	private func issueWasClosed(i: Issue) {
-		DLog("Detected closed issue: %@, handling policy is %@, coming from section %@", i.title, Settings.mergeHandlingPolicy, i.sectionIndex ?? 0)
+		DLog("Detected closed issue: %@, handling policy is %@, coming from section %@",
+			i.title,
+			NSNumber(integer: Settings.mergeHandlingPolicy),
+			i.sectionIndex ?? NSNumber(integer: 0))
+
 		if Settings.closeHandlingPolicy==PRHandlingPolicy.KeepAll.rawValue || (Settings.closeHandlingPolicy==PRHandlingPolicy.KeepMine.rawValue && (i.sectionIndex?.integerValue ?? 0)==PullRequestSection.Mine.rawValue) {
 			DLog("Will keep closed issue")
 			i.postSyncAction = PostSyncAction.DoNothing.rawValue
