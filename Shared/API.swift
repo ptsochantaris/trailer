@@ -63,13 +63,13 @@ final class API {
 		}
 
 		NSNotificationCenter.defaultCenter().addObserverForName(kReachabilityChangedNotification, object: nil, queue: NSOperationQueue.mainQueue()) { [weak self] n in
-			let newStatus = (n.object as! Reachability).currentReachabilityStatus()
-			if  newStatus != self!.currentNetworkStatus {
+			if let newStatus = (n.object as? Reachability)?.currentReachabilityStatus() where newStatus != self!.currentNetworkStatus {
 				self!.currentNetworkStatus = newStatus
 				if newStatus == NetworkStatus.NotReachable {
 					DLog("Network went down: %d", newStatus.rawValue)
 				} else {
 					DLog("Network came up: %d", newStatus.rawValue)
+					self!.badLinks.removeAll(keepCapacity: false)
 					app.startRefreshIfItIsDue()
 				}
 			}

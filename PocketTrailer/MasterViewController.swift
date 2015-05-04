@@ -29,10 +29,10 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			a.addAction(UIAlertAction(title: "Mark all as read", style: UIAlertActionStyle.Destructive, handler: { [weak self] action in
 				self!.markAllAsRead()
 				}))
-			a.addAction(UIAlertAction(title: "Remove all merged", style:UIAlertActionStyle.Default, handler: { [weak self] action in
+			a.addAction(UIAlertAction(title: "Remove merged", style:UIAlertActionStyle.Default, handler: { [weak self] action in
 				self!.removeAllMerged()
 				}))
-			a.addAction(UIAlertAction(title: "Remove all closed", style:UIAlertActionStyle.Default, handler: { [weak self] action in
+			a.addAction(UIAlertAction(title: "Remove closed", style:UIAlertActionStyle.Default, handler: { [weak self] action in
 				self!.removeAllClosed()
 				}))
 			a.addAction(UIAlertAction(title: "Refresh Now", style:UIAlertActionStyle.Default, handler: { action in
@@ -46,7 +46,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 				delegate:self,
 				cancelButtonTitle: "Cancel",
 				destructiveButtonTitle: "Mark all as read",
-				otherButtonTitles: "Remove all merged",  "Remove all closed", "Refresh Now")
+				otherButtonTitles: "Remove merged",  "Remove closed", "Refresh Now")
 
 			a.showFromBarButtonItem(sender, animated: true)
 		}
