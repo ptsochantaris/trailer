@@ -52,6 +52,7 @@ func DLog(message: String, @autoclosure arg1: ()->CVarArgType?, @autoclosure arg
 	let REFRESH_ENDED_NOTIFICATION = "RefreshEndedNotification"
 	let RECEIVED_NOTIFICATION_KEY = "ReceivedNotificationKey"
 	let GLOBAL_SCREEN_SCALE = UIScreen.mainScreen().scale
+	let GLOBAL_TINT = UIColor(red: 52.0/255.0, green: 110.0/255.0, blue: 183.0/255.0, alpha: 1.0)
 
 #elseif os(OSX)
 

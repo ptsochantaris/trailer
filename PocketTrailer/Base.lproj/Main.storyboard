@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7531" systemVersion="14D136" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="H1p-Uh-vWS">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7702" systemVersion="14D136" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="H1p-Uh-vWS">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7520"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7701"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
@@ -555,7 +555,7 @@
                         </barButtonItem>
                     </toolbarItems>
                     <navigationItem key="navigationItem" title="API Server Details" id="WuN-oo-IBq">
-                        <barButtonItem key="rightBarButtonItem" title="Delete" id="uhq-Gt-M9L">
+                        <barButtonItem key="rightBarButtonItem" image="delete" id="uhq-Gt-M9L">
                             <connections>
                                 <action selector="deleteSelected:" destination="iSf-H9-TPW" id="yQC-jA-dGI"/>
                             </connections>
@@ -1002,6 +1002,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
         <image name="actions" width="28" height="6"/>
         <image name="advanced" width="32" height="32"/>
         <image name="close" width="28" height="28"/>
+        <image name="delete" width="21" height="28"/>
         <image name="htLogo" width="200" height="108"/>
         <image name="repos" width="32" height="32"/>
         <image name="servers" width="32" height="32"/>
@@ -1010,5 +1011,5 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
     <inferredMetricsTieBreakers>
         <segue reference="oce-70-FTR"/>
     </inferredMetricsTieBreakers>
-    <color key="tintColor" red="0.25490197539329529" green="0.51372551918029785" blue="0.76862752437591553" alpha="1" colorSpace="deviceRGB"/>
+    <color key="tintColor" red="0.25490196078431371" green="0.51372549019607838" blue="0.7686274509803922" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
 </document>

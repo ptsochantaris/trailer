@@ -13,7 +13,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	// Refreshing
 	private var refreshOnRelease: Bool
-	private var blueTint: UIColor!
 
 	private let pullRequestsItem = UITabBarItem()
 	private let issuesItem = UITabBarItem()
@@ -190,8 +189,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		searchField.delegate = self
 
-		blueTint = view.tintColor
-
 		let searchHolder = UIView(frame: CGRectMake(0, 0, 320, 41))
 		searchHolder.addSubview(searchField)
 		tableView.tableHeaderView = searchHolder
@@ -281,7 +278,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 					t.items = [pullRequestsItem, issuesItem]
 					t.selectedItem = viewMode==MasterViewMode.PullRequests ? pullRequestsItem : issuesItem
 					t.delegate = self
-					t.tintColor = blueTint
 					t.itemPositioning = UITabBarItemPositioning.Fill
 					s.addSubview(t)
 					tabBar = t

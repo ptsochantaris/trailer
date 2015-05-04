@@ -33,6 +33,9 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 			api.updateLimitsFromServer()
 		}
 
+		UITabBar.appearance().tintColor = GLOBAL_TINT
+		UIBarButtonItem.appearance().tintColor = GLOBAL_TINT
+
 		let splitViewController = window!.rootViewController as! UISplitViewController
 		splitViewController.minimumPrimaryColumnWidth = 320
 		splitViewController.maximumPrimaryColumnWidth = 320

@@ -25,7 +25,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 	func updateSettings() {
 		if Settings.showIssuesMenu {
 			trackIssues.title = "Should track issues as well: Yes"
-			trackIssues.tintColor = view.tintColor
+			trackIssues.tintColor = GLOBAL_TINT
 		} else {
 			trackIssues.title = "Should track issues as well: No"
 			trackIssues.tintColor = UIColor.lightGrayColor()
