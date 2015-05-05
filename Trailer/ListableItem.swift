@@ -119,6 +119,10 @@ class ListableItem: DataItem {
 		return false
 	}
 
+	func isVisibleOnMenu() -> Bool {
+		return self.sectionIndex?.integerValue != PullRequestSection.None.rawValue
+	}
+
 	func postProcess() {
 		var section: PullRequestSection
 		var currentCondition = condition?.integerValue ?? PullRequestCondition.Open.rawValue

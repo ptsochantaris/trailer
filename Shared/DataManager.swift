@@ -83,7 +83,7 @@ final class DataManager : NSObject {
 
 		let newPrs = PullRequest.newItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest]
 		for p in newPrs {
-			if !p.isMine() {
+			if !p.isMine() && p.isVisibleOnMenu() {
 				app.postNotificationOfType(PRNotificationType.NewPr, forItem: p)
 			}
 		}
@@ -91,7 +91,7 @@ final class DataManager : NSObject {
 		let updatedPrs = PullRequest.updatedItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest]
 		for p in updatedPrs {
 			if let reopened = p.reopened?.boolValue where reopened == true {
-				if !p.isMine() {
+				if !p.isMine() && p.isVisibleOnMenu() {
 					app.postNotificationOfType(PRNotificationType.PrReopened, forItem: p)
 				}
 				p.reopened = false
@@ -108,7 +108,7 @@ final class DataManager : NSObject {
 
 		let newIssues = Issue.newItemsOfType("Issue", inMoc: mainObjectContext) as! [Issue]
 		for i in newIssues {
-			if !i.isMine() {
+			if !i.isMine() && i.isVisibleOnMenu() {
 				app.postNotificationOfType(PRNotificationType.NewIssue, forItem: i)
 			}
 		}
@@ -116,7 +116,7 @@ final class DataManager : NSObject {
 		let updatedIssues = Issue.updatedItemsOfType("Issue", inMoc: mainObjectContext) as! [Issue]
 		for i in updatedIssues {
 			if let reopened = i.reopened?.boolValue where reopened == true {
-				if !i.isMine() {
+				if !i.isMine() && i.isVisibleOnMenu() {
 					app.postNotificationOfType(PRNotificationType.IssueReopened, forItem: i)
 				}
 				i.reopened = false
@@ -133,10 +133,8 @@ final class DataManager : NSObject {
 
 		var latestComments = PRComment.newItemsOfType("PRComment", inMoc: mainObjectContext) as! [PRComment]
 		for c in latestComments {
-			if let p = c.pullRequest {
-				processNotificationsForComment(c, ofPullRequest: p)
-			} else if let i = c.issue {
-				processNotificationsForComment(c, ofIssue: i)
+			if let i = c.pullRequest ?? c.issue {
+				processNotificationsForComment(c, ofItem: c.pullRequest ?? i)
 			}
 			c.postSyncAction = PostSyncAction.DoNothing.rawValue
 		}
@@ -145,19 +143,19 @@ final class DataManager : NSObject {
 		if Settings.notifyOnStatusUpdates {
 			var coveredPrs = Set<NSManagedObjectID>()
 			for s in latestStatuses {
-				if Settings.notifyOnStatusUpdatesForAllPrs || s.pullRequest.isMine() {
-					let pr = s.pullRequest
+				let pr = s.pullRequest
+				if pr.isVisibleOnMenu() && (Settings.notifyOnStatusUpdatesForAllPrs || pr.isMine()) {
 					if !coveredPrs.contains(pr.objectID) {
 						coveredPrs.insert(pr.objectID)
 						if let s = pr.displayedStatuses().first {
-                            let displayText = s.descriptionText
-                            if pr.lastStatusNotified != displayText && pr.postSyncAction?.integerValue != PostSyncAction.NoteNew.rawValue {
-                                app.postNotificationOfType(PRNotificationType.NewStatus, forItem: s)
-                                pr.lastStatusNotified = displayText
-                            }
-                        } else {
-                            pr.lastStatusNotified = nil
-                        }
+							let displayText = s.descriptionText
+							if pr.lastStatusNotified != displayText && pr.postSyncAction?.integerValue != PostSyncAction.NoteNew.rawValue {
+								app.postNotificationOfType(PRNotificationType.NewStatus, forItem: s)
+								pr.lastStatusNotified = displayText
+							}
+						} else {
+							pr.lastStatusNotified = nil
+						}
 					}
 				}
 			}
@@ -176,24 +174,12 @@ final class DataManager : NSObject {
 		}
 	}
 
-	class func processNotificationsForComment(c: PRComment, ofPullRequest: PullRequest) {
-		if ofPullRequest.postSyncAction?.integerValue == PostSyncAction.NoteUpdated.rawValue {
+	class func processNotificationsForComment(c: PRComment, ofItem: ListableItem) {
+		if ofItem.postSyncAction?.integerValue == PostSyncAction.NoteUpdated.rawValue && ofItem.isVisibleOnMenu() {
 			if c.refersToMe() {
 				app.postNotificationOfType(PRNotificationType.NewMention, forItem: c)
 			} else if !Settings.disableAllCommentNotifications
-				&& (Settings.showCommentsEverywhere || ofPullRequest.isMine() || ofPullRequest.commentedByMe())
-				&& !c.isMine() {
-					notifyNewComment(c)
-			}
-		}
-	}
-
-	class func processNotificationsForComment(c: PRComment, ofIssue: Issue) {
-		if ofIssue.postSyncAction?.integerValue == PostSyncAction.NoteUpdated.rawValue {
-			if c.refersToMe() {
-				app.postNotificationOfType(PRNotificationType.NewMention, forItem: c)
-			} else if !Settings.disableAllCommentNotifications
-				&& (Settings.showCommentsEverywhere || ofIssue.isMine() || ofIssue.commentedByMe())
+				&& (Settings.showCommentsEverywhere || ofItem.isMine() || ofItem.commentedByMe())
 				&& !c.isMine() {
 					notifyNewComment(c)
 			}
