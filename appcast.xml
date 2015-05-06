@@ -7,6 +7,26 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.3.2</title>
+			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Notifications for issues</li>
+				<li>Will no longer show notifications for items which are not visible (except assignments)</li>
+				<li>Correction to logic for keeping merged items</li>
+				<li>Correction for an infinite image loading state when an avatar could not be loaded fixed</li>
+				<li>Test API server improved to work correctly in GE servers</li>
+				<li>Improved handling of bad network links when network status fluctuates</li>
+				</ul></font>]]></description>
+			<pubDate>Wed, 6 May 2015 19:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer132.zip"
+			sparkle:version="1215"
+			sparkle:shortVersionString="1.3.2"
+			sparkle:dsaSignature="MC0CFQCCpGX5Bbr2unN4Okjt97VDoesWqQIUI5H8jfEYnXyhTAus6+1Og6cxTTs="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.3.1</title>
 			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
@@ -234,6 +254,6 @@
 			sparkle:dsaSignature="MC4CFQCOX4/NAUMp+1HUQHkV5n2Fpyl/GQIVAMK/ZtSApXj+r/oxw6qWlX50FIp2"
 			type="application/octet-stream"/>
 		</item>
-		
+
 	</channel>
 </rss>
