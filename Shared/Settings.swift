@@ -392,7 +392,7 @@ final class Settings {
 		set { set("MARK_UNMERGEABLE_ON_USER_SECTIONS_ONLY", newValue) }
 	}
 
-	class var countOnlyListedPrs: Bool {
+	class var countOnlyListedItems: Bool {
 		get { return get("COUNT_ONLY_LISTED_PRS") as? Bool ?? false }
 		set { set("COUNT_ONLY_LISTED_PRS", newValue) }
 	}

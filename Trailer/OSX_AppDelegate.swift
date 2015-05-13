@@ -695,8 +695,13 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			attributes = [ NSFontAttributeName: NSFont.boldSystemFontOfSize(10),
 				NSForegroundColorAttributeName: MAKECOLOR(0.8, 0.0, 0.0, 1.0) ]
 		} else {
-			let f = Issue.requestForIssuesWithFilter(issuesMenu.filter.stringValue, sectionIndex: -1)
-			countString = String(mainObjectContext.countForFetchRequest(f, error: nil))
+            
+            if Settings.countOnlyListedItems {
+                let f = Issue.requestForIssuesWithFilter(issuesMenu.filter.stringValue, sectionIndex: -1)
+                countString = String(mainObjectContext.countForFetchRequest(f, error: nil))
+            } else {
+                countString = String(Issue.countOpenIssuesInMoc(mainObjectContext))
+            }
 
 			if Issue.badgeCountInMoc(mainObjectContext) > 0 {
 				attributes = [ NSFontAttributeName: NSFont.menuBarFontOfSize(10),
@@ -765,7 +770,8 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			attributes = [ NSFontAttributeName: NSFont.boldSystemFontOfSize(10),
 				NSForegroundColorAttributeName: MAKECOLOR(0.8, 0.0, 0.0, 1.0) ]
 		} else {
-			if Settings.countOnlyListedPrs {
+
+			if Settings.countOnlyListedItems {
 				let f = PullRequest.requestForPullRequestsWithFilter(prMenu.filter.stringValue, sectionIndex: -1)
 				countString = String(mainObjectContext.countForFetchRequest(f, error: nil))
 			} else {

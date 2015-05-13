@@ -29,7 +29,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var markUnmergeableOnUserSectionsOnly: NSButton!
 	@IBOutlet weak var repoCheckLabel: NSTextField!
 	@IBOutlet weak var repoCheckStepper: NSStepper!
-	@IBOutlet weak var countOnlyListedPrs: NSButton!
+	@IBOutlet weak var countOnlyListedItems: NSButton!
 	@IBOutlet weak var prMergedPolicy: NSPopUpButton!
 	@IBOutlet weak var prClosedPolicy: NSPopUpButton!
 	@IBOutlet weak var checkForUpdatesAutomatically: NSButton!
@@ -156,7 +156,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		showStatusItems.integerValue = Settings.showStatusItems ? 1 : 0
 		makeStatusItemsSelectable.integerValue = Settings.makeStatusItemsSelectable ? 1 : 0
 		markUnmergeableOnUserSectionsOnly.integerValue = Settings.markUnmergeableOnUserSectionsOnly ? 1 : 0
-		countOnlyListedPrs.integerValue = Settings.countOnlyListedPrs ? 1 : 0
+		countOnlyListedItems.integerValue = Settings.countOnlyListedItems ? 1 : 0
 		hideNewRepositories.integerValue = Settings.hideNewRepositories ? 1 : 0
 		openPrAtFirstUnreadComment.integerValue = Settings.openPrAtFirstUnreadComment ? 1 : 0
 		logActivityToConsole.integerValue = Settings.logActivityToConsole ? 1 : 0
@@ -358,8 +358,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		app.deferredUpdateTimer.push()
 	}
 
-	@IBAction func countOnlyListedPrsSelected(sender: NSButton) {
-		Settings.countOnlyListedPrs = (sender.integerValue==1)
+	@IBAction func countOnlyListedItemsSelected(sender: NSButton) {
+		Settings.countOnlyListedItems = (sender.integerValue==1)
 		DataManager.postProcessAllItems()
 		app.deferredUpdateTimer.push()
 	}

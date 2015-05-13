@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7531" systemVersion="14D136" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7702" systemVersion="14D136" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7531"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7702"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSWindowController">
@@ -491,7 +491,7 @@ user you can add more servers from the left.</string>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="countOnlyListedPrsSelected:" target="vQH-WF-vh2" id="rKK-z5-pKH"/>
+                                                <action selector="countOnlyListedItemsSelected:" target="vQH-WF-vh2" id="lwo-3S-huG"/>
                                             </connections>
                                         </button>
                                         <button id="yK4-xL-QRu">
@@ -1353,7 +1353,7 @@ and press Enter to select.
                 <outlet property="checkForUpdatesLabel" destination="hkX-Jd-o2h" id="X6n-gD-voM"/>
                 <outlet property="checkForUpdatesSelector" destination="AT5-aS-AgQ" id="s48-Pe-cgZ"/>
                 <outlet property="commentAuthorBlacklist" destination="DTL-cq-VaA" id="xWf-YT-bda"/>
-                <outlet property="countOnlyListedPrs" destination="rEz-q1-QZq" id="WMt-Z6-QdJ"/>
+                <outlet property="countOnlyListedItems" destination="rEz-q1-QZq" id="wAM-fd-WAq"/>
                 <outlet property="disableAllCommentNotifications" destination="xXn-f2-021" id="OJl-UW-ZWi"/>
                 <outlet property="displayRepositoryNames" destination="yK4-xL-QRu" id="yVB-df-7TT"/>
                 <outlet property="dontConfirmRemoveAllClosed" destination="w0K-BS-Gti" id="jaB-In-zbi"/>
