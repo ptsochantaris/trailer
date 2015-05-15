@@ -72,14 +72,15 @@ final class SectionController: WKInterfaceController {
 		var ri = rowIndex
 		var type = "PRS"
 		if Settings.showIssuesMenu {
-			if ri > PullRequestSection.All.rawValue {
-				ri -= PullRequestSection.All.rawValue
-				ri--
+			if ri >= boundaryIndex {
+				ri -= boundaryIndex
 				type = "ISSUES"
 			}
 		}
 		pushControllerWithName("ListController", context: [ SECTION_KEY: ri, TYPE_KEY: type ] )
 	}
+
+	private var boundaryIndex:Int = 0
 
 	private func buildUI() {
 
@@ -96,6 +97,8 @@ final class SectionController: WKInterfaceController {
 			rowTypes.append(prEntry(PullRequestSection.Closed))
 			rowTypes.append(prEntry(PullRequestSection.All))
 		}
+
+		boundaryIndex = rowTypes.count
 
 		if Settings.showIssuesMenu {
 			let totalIssues = Issue.countAllIssuesInMoc(mainObjectContext)

@@ -30,62 +30,6 @@ final class GlanceController: WKInterfaceController {
 	@IBOutlet weak var prIcon: WKInterfaceImage!
 	@IBOutlet weak var issueIcon: WKInterfaceImage!
 
-    override func awakeWithContext(context: AnyObject?) {
-        super.awakeWithContext(context)
-
-        dataReadonly = true
-		Settings.clearCache()
-
-		prIcon.setHidden(Settings.showIssuesInGlance)
-		issueIcon.setHidden(!Settings.showIssuesInGlance)
-		mergedCount.setHidden(Settings.showIssuesInGlance)
-
-		let totalItems = Settings.showIssuesInGlance ? Issue.countAllIssuesInMoc(mainObjectContext) : PullRequest.countAllRequestsInMoc(mainObjectContext)
-
-		for l in [totalCount, mergedCount, closedCount, participatedCount, otherCount, unreadCount, lastUpdate] {
-			l.setHidden(totalItems == 0)
-		}
-
-        if totalItems == 0 {
-
-			let a = Settings.showIssuesInGlance ? DataManager.reasonForEmptyIssuesWithFilter(nil) : DataManager.reasonForEmptyWithFilter(nil)
-            myCount.setAttributedText(a)
-
-        } else {
-
-            totalCount.setText("\(totalItems)")
-
-			setCountOfLabel(myCount, forSection: PullRequestSection.Mine, group: myGroup)
-            setCountOfLabel(participatedCount, forSection: PullRequestSection.Participated, group: participatedGroup)
-			setCountOfLabel(mergedCount, forSection: PullRequestSection.Merged, group: mergedGroup)
-            setCountOfLabel(closedCount, forSection: PullRequestSection.Closed, group: closedGroup)
-			setCountOfLabel(otherCount, forSection: PullRequestSection.All, group: otherGroup)
-
-			let badgeCount = Settings.showIssuesInGlance ? Issue.badgeCountInMoc(mainObjectContext) : PullRequest.badgeCountInMoc(mainObjectContext)
-			if badgeCount == 0 {
-				unreadCount.setText("NONE UNREAD")
-				unreadGroup.setAlpha(0.3)
-			} else if badgeCount == 1 {
-				unreadCount.setText("1 COMMENT")
-				unreadGroup.setAlpha(1.0)
-			} else {
-				unreadCount.setText("\(badgeCount) COMMENTS")
-				unreadGroup.setAlpha(1.0)
-			}
-
-            if let lastRefresh = Settings.lastSuccessfulRefresh {
-                let d = NSDateFormatter()
-                d.dateStyle = NSDateFormatterStyle.ShortStyle
-                d.timeStyle = NSDateFormatterStyle.ShortStyle
-                lastUpdate.setText("Updated "+d.stringFromDate(lastRefresh))
-                lastUpdate.setAlpha(0.7)
-            } else {
-                lastUpdate.setText("Not updated yet")
-                lastUpdate.setAlpha(0.3)
-            }
-        }
-    }
-
 	func setCountOfLabel(label: WKInterfaceLabel, forSection: PullRequestSection, group: WKInterfaceGroup) {
 		let toCount: Int
 		if Settings.showIssuesInGlance {
@@ -105,6 +49,58 @@ final class GlanceController: WKInterfaceController {
 
     override func willActivate() {
         super.willActivate()
+
+		dataReadonly = true
+		Settings.clearCache()
+
+		let totalItems = Settings.showIssuesInGlance ? Issue.countAllIssuesInMoc(mainObjectContext) : PullRequest.countAllRequestsInMoc(mainObjectContext)
+
+		for l in [mergedGroup, closedGroup, participatedGroup, otherGroup, unreadGroup, lastUpdate] {
+			l.setHidden(totalItems == 0)
+		}
+		mergedGroup.setHidden(Settings.showIssuesInGlance)
+		prIcon.setHidden(Settings.showIssuesInGlance)
+		issueIcon.setHidden(!Settings.showIssuesInGlance)
+
+		totalCount.setText("\(totalItems)")
+
+		if totalItems == 0 {
+
+			let a = Settings.showIssuesInGlance ? DataManager.reasonForEmptyIssuesWithFilter(nil) : DataManager.reasonForEmptyWithFilter(nil)
+			myCount.setAttributedText(a)
+			myGroup.setAlpha(1.0)
+
+		} else {
+
+			setCountOfLabel(myCount, forSection: PullRequestSection.Mine, group: myGroup)
+			setCountOfLabel(participatedCount, forSection: PullRequestSection.Participated, group: participatedGroup)
+			setCountOfLabel(mergedCount, forSection: PullRequestSection.Merged, group: mergedGroup)
+			setCountOfLabel(closedCount, forSection: PullRequestSection.Closed, group: closedGroup)
+			setCountOfLabel(otherCount, forSection: PullRequestSection.All, group: otherGroup)
+
+			let badgeCount = Settings.showIssuesInGlance ? Issue.badgeCountInMoc(mainObjectContext) : PullRequest.badgeCountInMoc(mainObjectContext)
+			if badgeCount == 0 {
+				unreadCount.setText("NONE UNREAD")
+				unreadGroup.setAlpha(0.3)
+			} else if badgeCount == 1 {
+				unreadCount.setText("1 COMMENT")
+				unreadGroup.setAlpha(1.0)
+			} else {
+				unreadCount.setText("\(badgeCount) COMMENTS")
+				unreadGroup.setAlpha(1.0)
+			}
+
+			if let lastRefresh = Settings.lastSuccessfulRefresh {
+				let d = NSDateFormatter()
+				d.dateStyle = NSDateFormatterStyle.ShortStyle
+				d.timeStyle = NSDateFormatterStyle.ShortStyle
+				lastUpdate.setText("Updated "+d.stringFromDate(lastRefresh))
+				lastUpdate.setAlpha(0.7)
+			} else {
+				lastUpdate.setText("Not updated yet")
+				lastUpdate.setAlpha(0.3)
+			}
+		}
     }
 
     override func didDeactivate() {

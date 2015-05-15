@@ -10,7 +10,7 @@
             <objects>
                 <controller identifier="SectionController" id="AgC-eL-Hgc" customClass="SectionController" customModule="Trailer">
                     <items>
-                        <group width="120" alignment="center" verticalAlignment="center" radius="0.0" id="AJn-j1-vO3">
+                        <group width="1" alignment="center" verticalAlignment="center" radius="0.0" id="AJn-j1-vO3">
                             <items>
                                 <table alignment="left" verticalAlignment="center" id="be2-ie-h5R">
                                     <items>
@@ -41,13 +41,13 @@
                                                 <items>
                                                     <label alignment="left" verticalAlignment="center" text="Title" id="m26-4w-XIn">
                                                         <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
-                                                        <fontDescription key="font" type="system" weight="thin" pointSize="11"/>
+                                                        <fontDescription key="font" type="system" weight="thin" pointSize="16"/>
                                                     </label>
                                                     <group height="1" alignment="right" radius="7" id="VK1-qB-Emf">
                                                         <items>
                                                             <label alignment="center" verticalAlignment="center" text="Count" id="YSb-rO-7SF">
                                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                                                <fontDescription key="font" type="system" weight="thin" pointSize="11"/>
+                                                                <fontDescription key="font" type="system" weight="thin" pointSize="16"/>
                                                             </label>
                                                         </items>
                                                         <color key="backgroundColor" red="1" green="0.0" blue="0.070606581870000004" alpha="1" colorSpace="calibratedRGB"/>
@@ -55,7 +55,7 @@
                                                     </group>
                                                 </items>
                                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                                <edgeInsets key="margins" left="5" right="3" top="3" bottom="3"/>
+                                                <edgeInsets key="margins" left="5" right="3" top="7" bottom="7"/>
                                             </group>
                                             <connections>
                                                 <outlet property="countHolder" destination="VK1-qB-Emf" id="ghB-It-VlJ"/>
@@ -320,7 +320,7 @@
                             <items>
                                 <group width="103" alignment="center" radius="2" id="uLm-0J-NPT">
                                     <items>
-                                        <label alignment="center" text="XX MINE" textAlignment="center" id="fJB-oa-687">
+                                        <label alignment="center" text="XX MINE" textAlignment="center" numberOfLines="0" id="fJB-oa-687">
                                             <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                             <fontDescription key="font" type="system" weight="thin" pointSize="9"/>
                                         </label>
@@ -330,7 +330,7 @@
                                 </group>
                                 <group width="103" alignment="center" radius="2" id="pi7-1E-Nwe">
                                     <items>
-                                        <label alignment="center" text="XX PARTICIPATED" textAlignment="center" id="E1B-vS-NEB">
+                                        <label alignment="center" text="XX PARTICIPATED" textAlignment="center" numberOfLines="0" id="E1B-vS-NEB">
                                             <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                             <fontDescription key="font" type="system" weight="thin" pointSize="9"/>
                                         </label>
@@ -340,7 +340,7 @@
                                 </group>
                                 <group width="103" alignment="center" radius="2" id="eKt-iR-WRT">
                                     <items>
-                                        <label alignment="center" text="XX MERGED" textAlignment="center" id="8hY-30-ORl">
+                                        <label alignment="center" text="XX MERGED" textAlignment="center" numberOfLines="0" id="8hY-30-ORl">
                                             <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                             <fontDescription key="font" type="system" weight="thin" pointSize="9"/>
                                         </label>
@@ -350,7 +350,7 @@
                                 </group>
                                 <group width="103" alignment="center" radius="2" id="EHK-bL-jTG">
                                     <items>
-                                        <label alignment="center" text="XX CLOSED" textAlignment="center" id="tvP-EF-DnR">
+                                        <label alignment="center" text="XX CLOSED" textAlignment="center" numberOfLines="0" id="tvP-EF-DnR">
                                             <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                             <fontDescription key="font" type="system" weight="thin" pointSize="9"/>
                                         </label>
@@ -360,7 +360,7 @@
                                 </group>
                                 <group width="103" alignment="center" radius="2" id="DRK-15-McU">
                                     <items>
-                                        <label alignment="center" text="XX OTHER" textAlignment="center" id="UFt-fx-TSE">
+                                        <label alignment="center" text="XX OTHER" textAlignment="center" numberOfLines="0" id="UFt-fx-TSE">
                                             <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                             <fontDescription key="font" type="system" weight="thin" pointSize="9"/>
                                         </label>
@@ -370,7 +370,7 @@
                                 </group>
                                 <group width="103" alignment="center" radius="2" id="0Cl-jo-zPe">
                                     <items>
-                                        <label alignment="center" text="XX UNREAD" textAlignment="center" id="haI-qm-CXj">
+                                        <label alignment="center" text="XX UNREAD" textAlignment="center" numberOfLines="0" id="haI-qm-CXj">
                                             <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                             <fontDescription key="font" type="system" weight="thin" pointSize="9"/>
                                         </label>
@@ -378,7 +378,7 @@
                                     <color key="backgroundColor" red="1" green="0.0" blue="0.070606581870000004" alpha="1" colorSpace="calibratedRGB"/>
                                     <edgeInsets key="margins" left="0.0" right="0.0" top="1" bottom="1"/>
                                 </group>
-                                <label alignment="center" alpha="0.89999999999999991" text="Updated:" id="Qer-7L-pJ7">
+                                <label alignment="center" alpha="0.89999999999999991" text="Updated:" numberOfLines="0" id="Qer-7L-pJ7">
                                     <fontDescription key="font" type="system" pointSize="7"/>
                                 </label>
                             </items>
