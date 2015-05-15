@@ -14,7 +14,7 @@ final class WatchManager {
 					while app.isRefreshing {
 						NSThread.sleepForTimeInterval(0.1)
 					}
-					dispatch_async(dispatch_get_main_queue()) {
+					atNextEvent() {
 						if Settings.lastSuccessfulRefresh == nil || lastSuccessfulSync.isEqualToDate(Settings.lastSuccessfulRefresh!) {
 							reply(["status": "Refresh failed", "color": "red"])
 						} else {
