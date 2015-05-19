@@ -55,10 +55,10 @@ final class GlanceController: WKInterfaceController {
 
 		let totalItems = Settings.showIssuesInGlance ? Issue.countAllIssuesInMoc(mainObjectContext) : PullRequest.countAllRequestsInMoc(mainObjectContext)
 
-		for l in [mergedGroup, closedGroup, participatedGroup, otherGroup, unreadGroup, lastUpdate] {
+		for l in [closedGroup, participatedGroup, otherGroup, unreadGroup, lastUpdate] {
 			l.setHidden(totalItems == 0)
 		}
-		mergedGroup.setHidden(Settings.showIssuesInGlance)
+		mergedGroup.setHidden(Settings.showIssuesInGlance || totalItems == 0)
 		prIcon.setHidden(Settings.showIssuesInGlance)
 		issueIcon.setHidden(!Settings.showIssuesInGlance)
 
