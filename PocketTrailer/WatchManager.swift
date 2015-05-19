@@ -1,7 +1,26 @@
 
+import UIKit
+
 final class WatchManager {
 
+	static var backgroundTask = UIBackgroundTaskInvalid
+
+	class func startBGTask() {
+		backgroundTask = UIApplication.sharedApplication().beginBackgroundTaskWithName("com.housetrip.Trailer.watchrequest", expirationHandler: {
+			self.endBGTask()
+		})
+	}
+
+	class func endBGTask() {
+		if backgroundTask != UIBackgroundTaskInvalid {
+			UIApplication.sharedApplication().endBackgroundTask(backgroundTask)
+			backgroundTask = UIBackgroundTaskInvalid
+		}
+	}
+
 	class func handleWatchKitExtensionRequest(userInfo: [NSObject : AnyObject]?, reply: (([NSObject : AnyObject]!) -> Void)!) {
+
+		startBGTask()
 
 		if let command = userInfo?["command"] as? String {
 			switch(command) {
@@ -20,6 +39,7 @@ final class WatchManager {
 						} else {
 							reply(["status": "Success", "color": "green"])
 						}
+						self.endBGTask()
 					}
 				}
 			case "openpr":
@@ -30,6 +50,7 @@ final class WatchManager {
 				}
 				atNextEvent() {
 					reply(["status": "Success", "color": "green"])
+					self.endBGTask()
 				}
 			case "openissue":
 				if let itemId = userInfo?["id"] as? String {
@@ -39,6 +60,7 @@ final class WatchManager {
 				}
 				atNextEvent() {
 					reply(["status": "Success", "color": "green"])
+					self.endBGTask()
 				}
 			case "opencomment":
 				if let itemId = userInfo?["id"] as? String {
@@ -48,6 +70,7 @@ final class WatchManager {
 				}
 				atNextEvent() {
 					reply(["status": "Success", "color": "green"])
+					self.endBGTask()
 				}
 			case "clearAllMerged":
 				for p in PullRequest.allMergedRequestsInMoc(mainObjectContext) {
@@ -59,6 +82,7 @@ final class WatchManager {
 				m.updateStatus()
 				atNextEvent() {
 					reply(["status": "Success", "color": "green"])
+					self.endBGTask()
 				}
 			case "clearAllClosed":
 				for p in PullRequest.allClosedRequestsInMoc(mainObjectContext) {
@@ -73,6 +97,7 @@ final class WatchManager {
 				m.updateStatus()
 				atNextEvent() {
 					reply(["status": "Success", "color": "green"])
+					self.endBGTask()
 				}
 			case "markPrRead":
 				if let
@@ -86,6 +111,7 @@ final class WatchManager {
 				}
 				atNextEvent() {
 					reply(["status": "Success", "color": "green"])
+					self.endBGTask()
 				}
 			case "markIssueRead":
 				if let
@@ -99,6 +125,7 @@ final class WatchManager {
 				}
 				atNextEvent() {
 					reply(["status": "Success", "color": "green"])
+					self.endBGTask()
 				}
 			case "markEverythingRead":
 				PullRequest.markEverythingRead(PullRequestSection.None, moc: mainObjectContext)
@@ -108,6 +135,7 @@ final class WatchManager {
 				app.updateBadge()
 				atNextEvent() {
 					reply(["status": "Success", "color": "green"])
+					self.endBGTask()
 				}
 			case "markAllPrsRead":
 				if let s = userInfo?["sectionIndex"] as? Int {
@@ -118,6 +146,7 @@ final class WatchManager {
 				}
 				atNextEvent() {
 					reply(["status": "Success", "color": "green"])
+					self.endBGTask()
 				}
 			case "markAllIssuesRead":
 				if let s = userInfo?["sectionIndex"] as? Int {
@@ -128,8 +157,12 @@ final class WatchManager {
 				}
 				atNextEvent() {
 					reply(["status": "Success", "color": "green"])
+					self.endBGTask()
 				}
-			default: break;
+			default:
+				atNextEvent() {
+					self.endBGTask()
+				}
 			}
 		}
 	}
