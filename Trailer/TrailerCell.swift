@@ -54,21 +54,30 @@ class TrailerCell: NSTableCellView {
 		}
 	}
 
+    func openRepo() {
+        if let u = associatedDataItem().repo.webUrl, url = NSURL(string: u) {
+            NSWorkspace.sharedWorkspace().openURL(url)
+        }
+    }
+
 	func copyToClipboard() {
 		let p = NSPasteboard.generalPasteboard()
 		p.clearContents()
 		p.declareTypes([NSStringPboardType], owner: self)
-		if let s = stringForCopy() {
+		if let s = associatedDataItem().webUrl {
 			p.setString(s, forType: NSStringPboardType)
 		}
 	}
 
+    func addMenuWithTitle(title: String) {
+        menu = NSMenu(title: title)
+        let c = menu!.insertItemWithTitle("Copy URL", action: Selector("copyToClipboard"), keyEquivalent: "c", atIndex: 0)
+        c?.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
+        menu!.insertItemWithTitle("Open Repo", action: Selector("openRepo"), keyEquivalent: "", atIndex: 1)
+    }
+
 	func associatedDataItem() -> ListableItem {
 		return mainObjectContext.existingObjectWithID(dataItemId, error: nil) as! ListableItem
-	}
-
-	func stringForCopy() -> String? {
-		return nil
 	}
 
 	override func updateTrackingAreas() {

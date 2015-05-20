@@ -32,7 +32,7 @@ final class PrTable: NSTableView, NSPasteboardItemDataProvider {
 
 		if let prView = cellAtEvent(theEvent) as? TrailerCell {
 
-			draggingUrl = prView.stringForCopy()
+			draggingUrl = prView.associatedDataItem().webUrl
 
 			let dragIcon = scaleImage(NSApp.applicationIconImage, toFillSize: CGSizeMake(32, 32))
 			let pbItem = NSPasteboardItem()

@@ -130,13 +130,7 @@ final class PullRequestCell: TrailerCell {
 			}
 		}
 
-		menu = NSMenu(title: "PR Options")
-		let i = menu!.insertItemWithTitle("Copy URL", action: Selector("copyToClipboard"), keyEquivalent: "c", atIndex: 0)
-		i?.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
-	}
-
-	override func stringForCopy() -> String? {
-		return (associatedDataItem() as! PullRequest).webUrl
+        addMenuWithTitle("PR Options")
 	}
 
 	required init?(coder: NSCoder) {

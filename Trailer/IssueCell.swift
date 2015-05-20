@@ -117,13 +117,7 @@ final class IssueCell: TrailerCell {
 			}
 		}
 
-		menu = NSMenu(title: "Issue Options")
-		let i = menu!.insertItemWithTitle("Copy URL", action: Selector("copyToClipboard"), keyEquivalent: "c", atIndex: 0)
-		i?.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
-	}
-
-	override func stringForCopy() -> String? {
-		return (associatedDataItem() as! Issue).webUrl
+        addMenuWithTitle("Issue Options")
 	}
 
 	required init?(coder: NSCoder) {
