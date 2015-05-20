@@ -7,6 +7,22 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.3.3</title>
+			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Corrected "count only visible items" option for issues</li>
+				<li>Added "Open Repo" option on items' contextual menus</li>
+				</ul></font>]]></description>
+			<pubDate>Wed, 20 May 2015 22:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer133.zip"
+			sparkle:version="1219"
+			sparkle:shortVersionString="1.3.3"
+			sparkle:dsaSignature="MCwCFCiqDZlmQ9vOkdbrw3+ZFLyYxQpGAhQlOLWmUe7tsrkibIq+VCuAHRHPmA=="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.3.2</title>
 			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
