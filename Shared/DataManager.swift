@@ -83,7 +83,7 @@ final class DataManager : NSObject {
 
 		let newPrs = PullRequest.newItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest]
 		for p in newPrs {
-			if !p.isMine() && p.isVisibleOnMenu() {
+			if !p.createdByMe() && !(p.isNewAssignment?.boolValue ?? false) && p.isVisibleOnMenu() {
 				app.postNotificationOfType(PRNotificationType.NewPr, forItem: p)
 			}
 		}
@@ -91,10 +91,27 @@ final class DataManager : NSObject {
 		let updatedPrs = PullRequest.updatedItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest]
 		for p in updatedPrs {
 			if let reopened = p.reopened?.boolValue where reopened == true {
-				if !p.isMine() && p.isVisibleOnMenu() {
+				if !p.createdByMe() && p.isVisibleOnMenu() {
 					app.postNotificationOfType(PRNotificationType.PrReopened, forItem: p)
 				}
 				p.reopened = false
+			}
+		}
+
+		let newIssues = Issue.newItemsOfType("Issue", inMoc: mainObjectContext) as! [Issue]
+		for i in newIssues {
+			if !i.createdByMe() && !(i.isNewAssignment?.boolValue ?? false) && i.isVisibleOnMenu() {
+				app.postNotificationOfType(PRNotificationType.NewIssue, forItem: i)
+			}
+		}
+
+		let updatedIssues = Issue.updatedItemsOfType("Issue", inMoc: mainObjectContext) as! [Issue]
+		for i in updatedIssues {
+			if let reopened = i.reopened?.boolValue where reopened == true {
+				if !i.createdByMe() && i.isVisibleOnMenu() {
+					app.postNotificationOfType(PRNotificationType.IssueReopened, forItem: i)
+				}
+				i.reopened = false
 			}
 		}
 
@@ -103,23 +120,6 @@ final class DataManager : NSObject {
 			if let newAssignment = p.isNewAssignment?.boolValue where newAssignment == true {
 				app.postNotificationOfType(PRNotificationType.NewPrAssigned, forItem: p)
 				p.isNewAssignment = false
-			}
-		}
-
-		let newIssues = Issue.newItemsOfType("Issue", inMoc: mainObjectContext) as! [Issue]
-		for i in newIssues {
-			if !i.isMine() && i.isVisibleOnMenu() {
-				app.postNotificationOfType(PRNotificationType.NewIssue, forItem: i)
-			}
-		}
-
-		let updatedIssues = Issue.updatedItemsOfType("Issue", inMoc: mainObjectContext) as! [Issue]
-		for i in updatedIssues {
-			if let reopened = i.reopened?.boolValue where reopened == true {
-				if !i.isMine() && i.isVisibleOnMenu() {
-					app.postNotificationOfType(PRNotificationType.IssueReopened, forItem: i)
-				}
-				i.reopened = false
 			}
 		}
 
@@ -144,7 +144,7 @@ final class DataManager : NSObject {
 			var coveredPrs = Set<NSManagedObjectID>()
 			for s in latestStatuses {
 				let pr = s.pullRequest
-				if pr.isVisibleOnMenu() && (Settings.notifyOnStatusUpdatesForAllPrs || pr.isMine()) {
+				if pr.isVisibleOnMenu() && (Settings.notifyOnStatusUpdatesForAllPrs || pr.createdByMe() || pr.assignedToParticipated() || pr.assignedToMySection()) {
 					if !coveredPrs.contains(pr.objectID) {
 						coveredPrs.insert(pr.objectID)
 						if let s = pr.displayedStatuses().first {
@@ -178,10 +178,8 @@ final class DataManager : NSObject {
 		if ofItem.postSyncAction?.integerValue == PostSyncAction.NoteUpdated.rawValue && ofItem.isVisibleOnMenu() {
 			if c.refersToMe() {
 				app.postNotificationOfType(PRNotificationType.NewMention, forItem: c)
-			} else if !Settings.disableAllCommentNotifications
-				&& (Settings.showCommentsEverywhere || ofItem.isMine() || ofItem.commentedByMe())
-				&& !c.isMine() {
-					notifyNewComment(c)
+			} else if !Settings.disableAllCommentNotifications && ofItem.showNewComments() && !c.isMine() {
+				notifyNewComment(c)
 			}
 		}
 	}

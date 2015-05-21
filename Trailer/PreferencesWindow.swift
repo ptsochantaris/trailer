@@ -25,7 +25,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var includeRepositoriesInFiltering: NSButton!
 	@IBOutlet weak var groupByRepo: NSButton!
 	@IBOutlet weak var hideAllPrsSection: NSButton!
-	@IBOutlet weak var moveAssignedPrsToMySection: NSButton!
 	@IBOutlet weak var markUnmergeableOnUserSectionsOnly: NSButton!
 	@IBOutlet weak var repoCheckLabel: NSTextField!
 	@IBOutlet weak var repoCheckStepper: NSStepper!
@@ -66,6 +65,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var includeStatusesInFiltering: NSButton!
 	@IBOutlet weak var grayOutWhenRefreshing: NSButton!
 	@IBOutlet weak var showIssuesMenu: NSButton!
+	@IBOutlet weak var assignedPrHandlingPolicy: NSPopUpButton!
 
 	// Labels
 	@IBOutlet weak var labelRescanLabel: NSTextField!
@@ -152,7 +152,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		sortingOrder.integerValue = Settings.sortDescending ? 1 : 0
 		showCreationDates.integerValue = Settings.showCreatedInsteadOfUpdated ? 1 : 0
 		groupByRepo.integerValue = Settings.groupByRepo ? 1 : 0
-		moveAssignedPrsToMySection.integerValue = Settings.moveAssignedPrsToMySection ? 1 : 0
+		assignedPrHandlingPolicy.selectItemAtIndex(Settings.assignedPrHandlingPolicy)
 		showStatusItems.integerValue = Settings.showStatusItems ? 1 : 0
 		makeStatusItemsSelectable.integerValue = Settings.makeStatusItemsSelectable ? 1 : 0
 		markUnmergeableOnUserSectionsOnly.integerValue = Settings.markUnmergeableOnUserSectionsOnly ? 1 : 0
@@ -460,8 +460,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		app.deferredUpdateTimer.push()
 	}
 
-	@IBAction func moveAssignedPrsToMySectionSelected(sender: NSButton) {
-		Settings.moveAssignedPrsToMySection = (sender.integerValue==1)
+	@IBAction func assignedPrHandlingPolicySelected(sender: NSPopUpButton) {
+		Settings.assignedPrHandlingPolicy = sender.indexOfSelectedItem;
 		DataManager.postProcessAllItems()
 		app.deferredUpdateTimer.push()
 	}

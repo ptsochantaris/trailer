@@ -57,7 +57,8 @@ final class Settings {
 			"MAKE_STATUS_ITEMS_SELECTABLE", "MOVE_ASSIGNED_PRS_TO_MY_SECTION", "MARK_UNMERGEABLE_ON_USER_SECTIONS_ONLY", "COUNT_ONLY_LISTED_PRS", "OPEN_PR_AT_FIRST_UNREAD_COMMENT_KEY", "LOG_ACTIVITY_TO_CONSOLE_KEY",
 			"HOTKEY_ENABLE", "HOTKEY_CONTROL_MODIFIER", "USE_VIBRANCY_UI", "DISABLE_ALL_COMMENT_NOTIFICATIONS", "NOTIFY_ON_STATUS_UPDATES", "NOTIFY_ON_STATUS_UPDATES_ALL", "SHOW_REPOS_IN_NAME", "INCLUDE_REPOS_IN_FILTER",
 			"INCLUDE_LABELS_IN_FILTER", "INCLUDE_STATUSES_IN_FILTER", "HOTKEY_COMMAND_MODIFIER", "HOTKEY_OPTION_MODIFIER", "HOTKEY_SHIFT_MODIFIER", "GRAY_OUT_WHEN_REFRESHING", "SHOW_ISSUES_MENU",
-			"AUTO_PARTICIPATE_ON_TEAM_MENTIONS", "SHOW_ISSUES_IN_WATCH_GLANCE", "HIDE_DESCRIPTION_IN_WATCH_DETAIL_VIEW", "AUTO_REPEAT_SETTINGS_EXPORT", "DONT_CONFIRM_SETTINGS_IMPORT", "LAST_EXPORT_URL", "LAST_EXPORT_TIME"]
+			"AUTO_PARTICIPATE_ON_TEAM_MENTIONS", "SHOW_ISSUES_IN_WATCH_GLANCE", "ASSIGNED_PR_HANDLING_POLICY", "HIDE_DESCRIPTION_IN_WATCH_DETAIL_VIEW", "AUTO_REPEAT_SETTINGS_EXPORT", "DONT_CONFIRM_SETTINGS_IMPORT",
+			"LAST_EXPORT_URL", "LAST_EXPORT_TIME", "CLOSE_HANDLING_POLICY_2", "MERGE_HANDLING_POLICY_2"]
 	}
 
     class func checkMigration() {
@@ -76,6 +77,28 @@ final class Settings {
         } else {
             DLog("No need to migrate settings into shared container")
         }
+
+		if let moveAssignedPrsToMySectionLegacySetting = _settings_shared.objectForKey("MOVE_ASSIGNED_PRS_TO_MY_SECTION") as? Bool {
+			if(moveAssignedPrsToMySectionLegacySetting) {
+				_settings_shared.setObject(0, forKey: "ASSIGNED_PR_HANDLING_POLICY")
+			} else {
+				_settings_shared.setObject(2, forKey: "ASSIGNED_PR_HANDLING_POLICY")
+			}
+			_settings_shared.removeObjectForKey("MOVE_ASSIGNED_PRS_TO_MY_SECTION")
+			_settings_shared.synchronize()
+		}
+
+		if let mergeHandlingPolicyLegacy = _settings_shared.objectForKey("MERGE_HANDLING_POLICY") as? Int {
+			_settings_shared.setObject(mergeHandlingPolicyLegacy + (mergeHandlingPolicyLegacy > 0 ? 1 : 0), forKey: "MERGE_HANDLING_POLICY_2")
+			_settings_shared.removeObjectForKey("MERGE_HANDLING_POLICY")
+			_settings_shared.synchronize()
+		}
+
+		if let closeHandlingPolicyLegacy = _settings_shared.objectForKey("CLOSE_HANDLING_POLICY") as? Int {
+			_settings_shared.setObject(closeHandlingPolicyLegacy + (closeHandlingPolicyLegacy > 0 ? 1 : 0), forKey: "CLOSE_HANDLING_POLICY_2")
+			_settings_shared.removeObjectForKey("CLOSE_HANDLING_POLICY")
+			_settings_shared.synchronize()
+		}
     }
 
 	static var saveTimer: PopTimer?
@@ -209,13 +232,13 @@ final class Settings {
 	}
 
 	class var closeHandlingPolicy: Int {
-		get { return get("CLOSE_HANDLING_POLICY") as? Int ?? 0 }
-		set { set("CLOSE_HANDLING_POLICY", newValue) }
+		get { return get("CLOSE_HANDLING_POLICY_2") as? Int ?? 0 }
+		set { set("CLOSE_HANDLING_POLICY_2", newValue) }
 	}
 
 	class var mergeHandlingPolicy: Int {
-		get { return get("MERGE_HANDLING_POLICY") as? Int ?? 0 }
-		set { set("MERGE_HANDLING_POLICY", newValue) }
+		get { return get("MERGE_HANDLING_POLICY_2") as? Int ?? 0 }
+		set { set("MERGE_HANDLING_POLICY_2", newValue) }
 	}
 
 	class var statusItemRefreshInterval: Int {
@@ -231,6 +254,11 @@ final class Settings {
 	class var checkForUpdatesInterval: Int {
 		get { return get("UPDATE_CHECK_INTERVAL_KEY") as? Int ?? 8 }
 		set { set("UPDATE_CHECK_INTERVAL_KEY", newValue) }
+	}
+
+	class var assignedPrHandlingPolicy: Int {
+		get { return get("ASSIGNED_PR_HANDLING_POLICY") as? Int ?? 1 }
+		set { set("ASSIGNED_PR_HANDLING_POLICY", newValue) }
 	}
 
 	///////////////////////////
@@ -380,11 +408,6 @@ final class Settings {
 	class var makeStatusItemsSelectable: Bool {
 		get { return get("MAKE_STATUS_ITEMS_SELECTABLE") as? Bool ?? false }
 		set { set("MAKE_STATUS_ITEMS_SELECTABLE", newValue) }
-	}
-
-	class var moveAssignedPrsToMySection: Bool {
-		get { return get("MOVE_ASSIGNED_PRS_TO_MY_SECTION") as? Bool ?? false }
-		set { set("MOVE_ASSIGNED_PRS_TO_MY_SECTION", newValue) }
 	}
 
 	class var markUnmergeableOnUserSectionsOnly: Bool {

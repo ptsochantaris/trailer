@@ -74,12 +74,24 @@ class ListableItem: DataItem {
 		postProcess()
 	}
 
-	func isMine() -> Bool {
-		if let assigned = assignedToMe?.boolValue where assigned && Settings.moveAssignedPrsToMySection {
-			return true
-		}
-		if let userId = userId, apiId = apiServer.userId where userId == apiId {
-			return true
+	func shouldKeepForPolicy(policy: Int) -> Bool {
+		let index = (sectionIndex?.integerValue ?? 0)
+		return policy==PRHandlingPolicy.KeepAll.rawValue
+			|| (policy==PRHandlingPolicy.KeepMineAndParticipated.rawValue && (index==PullRequestSection.Mine.rawValue || index==PullRequestSection.Participated.rawValue))
+			|| (policy==PRHandlingPolicy.KeepMine.rawValue && index==PullRequestSection.Mine.rawValue)
+	}
+
+	func assignedToMySection() -> Bool {
+		return (assignedToMe?.boolValue ?? false) && Settings.assignedPrHandlingPolicy==PRAssignmentPolicy.MoveToMine.rawValue
+	}
+
+	func assignedToParticipated() -> Bool {
+		return (assignedToMe?.boolValue ?? false) && Settings.assignedPrHandlingPolicy==PRAssignmentPolicy.MoveToParticipated.rawValue
+	}
+
+	func createdByMe() -> Bool {
+		if let userId = userId, apiId = apiServer.userId {
+			return userId == apiId
 		}
 		return false
 	}
@@ -93,7 +105,6 @@ class ListableItem: DataItem {
 	}
 
 	func commentedByMe() -> Bool {
-
 		for c in comments {
 			if c.isMine() {
 				return true
@@ -123,20 +134,24 @@ class ListableItem: DataItem {
 		return self.sectionIndex?.integerValue != PullRequestSection.None.rawValue
 	}
 
+	func showNewComments() -> Bool {
+		return Settings.showCommentsEverywhere || sectionIndex?.integerValue == PullRequestSection.Mine.rawValue || sectionIndex?.integerValue == PullRequestSection.Participated.rawValue
+	}
+
 	func postProcess() {
-		var section: PullRequestSection
+		var targetSection: PullRequestSection
 		var currentCondition = condition?.integerValue ?? PullRequestCondition.Open.rawValue
 
-		if currentCondition == PullRequestCondition.Merged.rawValue			{ section = PullRequestSection.Merged }
-		else if currentCondition == PullRequestCondition.Closed.rawValue	{ section = PullRequestSection.Closed }
-		else if isMine()													{ section = PullRequestSection.Mine }
-		else if commentedByMe()												{ section = PullRequestSection.Participated }
-		else if Settings.hideAllPrsSection									{ section = PullRequestSection.None }
-		else																{ section = PullRequestSection.All }
+		if currentCondition == PullRequestCondition.Merged.rawValue			{ targetSection = PullRequestSection.Merged }
+		else if currentCondition == PullRequestCondition.Closed.rawValue	{ targetSection = PullRequestSection.Closed }
+		else if createdByMe() || assignedToMySection()						{ targetSection = PullRequestSection.Mine }
+		else if assignedToParticipated() || commentedByMe()					{ targetSection = PullRequestSection.Participated }
+		else if Settings.hideAllPrsSection									{ targetSection = PullRequestSection.None }
+		else																{ targetSection = PullRequestSection.All }
 
 		var needsManualCount = false
 		var moveToParticipated = false
-		let outsideMySections = (section == PullRequestSection.All || section == PullRequestSection.None)
+		let outsideMySections = (targetSection == PullRequestSection.All || targetSection == PullRequestSection.None)
 
 		if outsideMySections && Settings.autoParticipateOnTeamMentions {
 			if refersToMyTeams() {
@@ -159,7 +174,7 @@ class ListableItem: DataItem {
 		let latestDate = latestReadCommentDate
 
 		if moveToParticipated {
-			section = PullRequestSection.Participated
+			targetSection = PullRequestSection.Participated
 			f.predicate = predicateForOthersCommentsSinceDate(latestDate)
 			unreadComments = managedObjectContext?.countForFetchRequest(f, error: nil)
 		} else if needsManualCount {
@@ -167,7 +182,7 @@ class ListableItem: DataItem {
 			var unreadCommentCount: Int = 0
 			for c in managedObjectContext?.executeFetchRequest(f, error: nil) as! [PRComment] {
 				if c.refersToMe() {
-					section = PullRequestSection.Participated
+					targetSection = PullRequestSection.Participated
 				}
 				if let l = latestDate {
 					if c.createdAt?.compare(l)==NSComparisonResult.OrderedDescending {
@@ -183,7 +198,7 @@ class ListableItem: DataItem {
 			unreadComments = managedObjectContext?.countForFetchRequest(f, error: nil)
 		}
 
-		sectionIndex = section.rawValue
+		sectionIndex = targetSection.rawValue
 		totalComments = comments.count
 
 		if title==nil { title = "(No title)" }

@@ -144,7 +144,19 @@ enum PRSortingMethod: Int {
 }
 
 enum PRHandlingPolicy: Int {
-	case KeepMine, KeepAll, KeepNone
+	case KeepMine, KeepMineAndParticipated, KeepAll, KeepNone
+	static let labels = ["Keep Mine", "Keep Mine & Participated", "Keep All", "Don't Keep"]
+	func name() -> String {
+		return PRHandlingPolicy.labels[rawValue]
+	}
+}
+
+enum PRAssignmentPolicy: Int {
+	case MoveToMine, MoveToParticipated, DoNothing
+	static let labels = ["Move To Mine", "Move To Participated", "Do Nothing"]
+	func name() -> String {
+		return PRAssignmentPolicy.labels[rawValue]
+	}
 }
 
 #if os(iOS)

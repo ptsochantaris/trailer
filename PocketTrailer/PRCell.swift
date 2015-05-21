@@ -120,21 +120,7 @@ final class PRCell: UITableViewCell {
 		}
 		_statuses.attributedText = statusText
 
-		var _commentsNew = 0
-		let _commentsTotal = pullRequest.totalComments?.integerValue ?? 0
-
-		if Settings.showCommentsEverywhere || pullRequest.isMine() || pullRequest.commentedByMe() {
-			_commentsNew = pullRequest.unreadComments?.integerValue ?? 0
-		}
-
-		readCount.text = itemCountFormatter.stringFromNumber(_commentsTotal)
-		let readSize = readCount.sizeThatFits(CGSizeMake(200, 14))
-		readCount.hidden = (_commentsTotal == 0)
-
-		unreadCount.hidden = (_commentsNew == 0)
-		unreadCount.text = itemCountFormatter.stringFromNumber(_commentsNew)
-
-		loadImageAtPath(pullRequest.userAvatarUrl)
+		setCountsAndImage(pullRequest)
 
 		if let statusString = statusText?.string {
 			accessibilityLabel = "\(pullRequest.accessibleTitle()), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(pullRequest.accessibleSubtitle()). \(statusCount) statuses: \(statusString)"
@@ -149,12 +135,14 @@ final class PRCell: UITableViewCell {
 		_description.attributedText = issue.subtitleWithFont(detailFont, lightColor: UIColor.lightGrayColor(), darkColor: UIColor.darkGrayColor())
 		_statuses.attributedText = nil
 
-		var _commentsNew = 0
-		let _commentsTotal = issue.totalComments?.integerValue ?? 0
+		setCountsAndImage(issue)
 
-		if Settings.showCommentsEverywhere || issue.isMine() || issue.commentedByMe() {
-			_commentsNew = issue.unreadComments?.integerValue ?? 0
-		}
+		accessibilityLabel = "\(issue.accessibleTitle()), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(issue.accessibleSubtitle())"
+	}
+
+	private func setCountsAndImage(item: ListableItem) {
+		let _commentsTotal = item.totalComments?.integerValue ?? 0
+		let _commentsNew = item.showNewComments() ? item.unreadComments?.integerValue ?? 0 : 0
 
 		readCount.text = itemCountFormatter.stringFromNumber(_commentsTotal)
 		let readSize = readCount.sizeThatFits(CGSizeMake(200, 14))
@@ -163,9 +151,7 @@ final class PRCell: UITableViewCell {
 		unreadCount.hidden = (_commentsNew == 0)
 		unreadCount.text = itemCountFormatter.stringFromNumber(_commentsNew)
 
-		loadImageAtPath(issue.userAvatarUrl)
-
-		accessibilityLabel = "\(issue.accessibleTitle()), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(issue.accessibleSubtitle())"
+		loadImageAtPath(item.userAvatarUrl)
 	}
 
 	private func loadImageAtPath(imagePath: String?) {

@@ -54,14 +54,6 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		}
 	}
 
-	private enum HandlingPolicy: Int {
-		case Own, All, None
-		static let allTitles = ["Keep My Own", "Keep All", "Don't Keep"]
-		func name() -> String {
-			return HandlingPolicy.allTitles[rawValue]
-		}
-	}
-
 	private func check(setting: Bool) -> UITableViewCellAccessoryType {
 		return setting ? UITableViewCellAccessoryType.Checkmark : UITableViewCellAccessoryType.None
 	}
@@ -93,10 +85,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.textLabel?.text = "Hide 'All' section"
 				cell.accessoryType = check(Settings.hideAllPrsSection)
 			case 2:
-				cell.textLabel?.text = "Move assigned items to 'Mine'"
-				cell.accessoryType = check(Settings.moveAssignedPrsToMySection)
+				cell.textLabel?.text = "Assigned items"
+				cell.detailTextLabel?.text = PRAssignmentPolicy(rawValue: Settings.assignedPrHandlingPolicy)?.name()
 			case 3:
-				cell.textLabel?.text = "Announce unmergeable PRs only in 'Mine'/'Participated'"
+				cell.textLabel?.text = "Mark unmergeable PRs only in 'My' or 'Participated'"
 				cell.accessoryType = check(Settings.markUnmergeableOnUserSectionsOnly)
 			case 4:
 				cell.textLabel?.text = "Display repository names"
@@ -118,7 +110,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.textLabel?.text = "Sync and display issues"
 				cell.accessoryType = check(Settings.showIssuesMenu)
 			case 1:
-				cell.textLabel?.text = "Show issues instead of PRs in Apple Watch glances"
+				cell.textLabel?.text = "Show issues instead of PRs in Apple Watch glance"
 				cell.accessoryType = check(Settings.showIssuesInGlance)
 			default: break
 			}
@@ -180,10 +172,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			switch indexPath.row {
 			case 0:
 				cell.textLabel?.text = "When something is merged"
-				cell.detailTextLabel?.text = HandlingPolicy(rawValue: Settings.mergeHandlingPolicy)?.name()
+				cell.detailTextLabel?.text = PRHandlingPolicy(rawValue: Settings.mergeHandlingPolicy)?.name()
 			case 1:
 				cell.textLabel?.text = "When something is closed"
-				cell.detailTextLabel?.text = HandlingPolicy(rawValue: Settings.closeHandlingPolicy)?.name()
+				cell.detailTextLabel?.text = PRHandlingPolicy(rawValue: Settings.closeHandlingPolicy)?.name()
 			case 2:
 				cell.textLabel?.text = "Don't keep PRs merged by me"
 				cell.accessoryType = check(Settings.dontKeepPrsMergedByMe)
@@ -272,8 +264,11 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				Settings.hideAllPrsSection = !Settings.hideAllPrsSection
 				settingsChangedTimer.push()
 			case 2:
-				Settings.moveAssignedPrsToMySection = !Settings.moveAssignedPrsToMySection
-				settingsChangedTimer.push()
+				pickerName = tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text ?? "Unknown Value"
+				selectedIndexPath = indexPath
+				valuesToPush = PRAssignmentPolicy.labels
+				previousValue = Settings.assignedPrHandlingPolicy
+				performSegueWithIdentifier("showPicker", sender: self)
 			case 3:
 				Settings.markUnmergeableOnUserSectionsOnly = !Settings.markUnmergeableOnUserSectionsOnly
 				settingsChangedTimer.push()
@@ -398,13 +393,13 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				selectedIndexPath = indexPath
 				previousValue = Settings.mergeHandlingPolicy
 				pickerName = tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text ?? "Unknown Picker"
-				valuesToPush = HandlingPolicy.allTitles
+				valuesToPush = PRHandlingPolicy.labels
 				performSegueWithIdentifier("showPicker", sender: self)
 			case 1:
 				selectedIndexPath = indexPath;
 				previousValue = Settings.closeHandlingPolicy
 				pickerName = tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text ?? "Unknown Picker"
-				valuesToPush = HandlingPolicy.allTitles
+				valuesToPush = PRHandlingPolicy.labels
 				performSegueWithIdentifier("showPicker", sender: self)
 			case 2:
 				Settings.dontKeepPrsMergedByMe = !Settings.dontKeepPrsMergedByMe
@@ -485,6 +480,9 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				} else if sip.row == 2 {
 					Settings.newRepoCheckPeriod = Float(didSelectIndexPath.row+2)
 				}
+			} else if sip.section == Section.Display.rawValue {
+				Settings.assignedPrHandlingPolicy = didSelectIndexPath.row
+				settingsChangedTimer.push()
 			} else if sip.section == Section.Sort.rawValue {
 				Settings.sortMethod = Int(didSelectIndexPath.row)
 				settingsChangedTimer.push()

@@ -120,7 +120,7 @@ final class API {
 				let path = cacheDirectory.stringByAppendingPathComponent(f)
 				let attributes = fileManager.attributesOfItemAtPath(path, error: nil)!
 				let date = attributes[NSFileCreationDate] as! NSDate
-				if now.timeIntervalSinceDate(date) > (3600.0*24) {
+				if now.timeIntervalSinceDate(date) > (3600.0*24.0) {
 					fileManager.removeItemAtPath(path, error:nil)
 				}
 			}
@@ -187,17 +187,19 @@ final class API {
 
 		getImage(NSURL(string: absolutePath)!) { response, data, error in
 
-			var image: IMAGE_CLASS?
+			var result: IMAGE_CLASS?
             #if os(iOS)
-                if let d = data, image = IMAGE_CLASS(data: d, scale:GLOBAL_SCREEN_SCALE) {
-                    UIImageJPEGRepresentation(image, 1.0).writeToFile(cachePath, atomically: true)
+                if let d = data, i = IMAGE_CLASS(data: d, scale:GLOBAL_SCREEN_SCALE) {
+					result = i
+                    UIImageJPEGRepresentation(i, 1.0).writeToFile(cachePath, atomically: true)
 				}
             #else
-                if let d = data, image = IMAGE_CLASS(data: d) {
-                    image.TIFFRepresentation?.writeToFile(cachePath, atomically: true)
+                if let d = data, i = IMAGE_CLASS(data: d) {
+					result = i
+                    i.TIFFRepresentation?.writeToFile(cachePath, atomically: true)
 				}
             #endif
-			dispatch_sync(dispatch_get_main_queue()) { tryLoadAndCallback(image) }
+			dispatch_sync(dispatch_get_main_queue()) { tryLoadAndCallback(result) }
         }
 		return false
 	}
@@ -1062,7 +1064,6 @@ final class API {
 	}
 
 	private func prWasMerged(r: PullRequest, byUserId: NSNumber) {
-
 		let myUserId = r.apiServer.userId ?? NSNumber(integer: -1)
 		DLog("Detected merged PR: %@ by user %@, local user id is: %@, handling policy is %@, coming from section %@",
 			r.title,
@@ -1072,10 +1073,9 @@ final class API {
 			r.sectionIndex ?? NSNumber(integer: 0))
 
 		let mergedByMe = byUserId.isEqualToNumber(myUserId)
-
 		if !(mergedByMe && Settings.dontKeepPrsMergedByMe) {
 			DLog("Checking if we want to keep this merged PR")
-			if Settings.mergeHandlingPolicy==PRHandlingPolicy.KeepAll.rawValue || (Settings.mergeHandlingPolicy==PRHandlingPolicy.KeepMine.rawValue && (r.sectionIndex?.integerValue ?? 0)==PullRequestSection.Mine.rawValue) {
+			if r.shouldKeepForPolicy(Settings.mergeHandlingPolicy) {
 				DLog("Will keep merged PR")
 				r.postSyncAction = PostSyncAction.DoNothing.rawValue
 				r.condition = PullRequestCondition.Merged.rawValue
@@ -1089,10 +1089,10 @@ final class API {
 	private func prWasClosed(r: PullRequest) {
 		DLog("Detected closed PR: %@, handling policy is %@, coming from section %@",
 			r.title,
-			NSNumber(integer: Settings.mergeHandlingPolicy),
+			NSNumber(integer: Settings.closeHandlingPolicy),
 			r.sectionIndex ?? NSNumber(integer: 0))
 
-		if Settings.closeHandlingPolicy==PRHandlingPolicy.KeepAll.rawValue || (Settings.closeHandlingPolicy==PRHandlingPolicy.KeepMine.rawValue && (r.sectionIndex?.integerValue ?? 0)==PullRequestSection.Mine.rawValue) {
+		if r.shouldKeepForPolicy(Settings.closeHandlingPolicy) {
 			DLog("Will keep closed PR")
 			r.postSyncAction = PostSyncAction.DoNothing.rawValue
 			r.condition = PullRequestCondition.Closed.rawValue
@@ -1105,10 +1105,10 @@ final class API {
 	private func issueWasClosed(i: Issue) {
 		DLog("Detected closed issue: %@, handling policy is %@, coming from section %@",
 			i.title,
-			NSNumber(integer: Settings.mergeHandlingPolicy),
+			NSNumber(integer: Settings.closeHandlingPolicy),
 			i.sectionIndex ?? NSNumber(integer: 0))
 
-		if Settings.closeHandlingPolicy==PRHandlingPolicy.KeepAll.rawValue || (Settings.closeHandlingPolicy==PRHandlingPolicy.KeepMine.rawValue && (i.sectionIndex?.integerValue ?? 0)==PullRequestSection.Mine.rawValue) {
+		if i.shouldKeepForPolicy(Settings.closeHandlingPolicy) {
 			DLog("Will keep closed issue")
 			i.postSyncAction = PostSyncAction.DoNothing.rawValue
 			i.condition = PullRequestCondition.Closed.rawValue
