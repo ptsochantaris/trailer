@@ -1003,7 +1003,7 @@ final class API {
 						if let let assigneeInfo = N(data, "assignee") as? [NSObject : AnyObject] {
 							let assignee = N(assigneeInfo, "login") as? String ?? "NoAssignedUserName"
 							let assigned = (assignee == (apiServer.userName ?? "NoApiUser"))
-							p.isNewAssignment = (assigned && !(p.assignedToMe?.boolValue ?? false))
+							p.isNewAssignment = (assigned && !p.createdByMe() && !(p.assignedToMe?.boolValue ?? false))
 							p.assignedToMe = assigned
 						} else if resultCode == 200 || resultCode == 404 || resultCode == 410 {
 							// 200 means PR is not assigned to anyone, there was no asgineee info

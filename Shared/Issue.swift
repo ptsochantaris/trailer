@@ -42,7 +42,7 @@ final class Issue: ListableItem {
 			if let assignee = N(info, "assignee") as? [NSObject: AnyObject] {
 				let assigneeName = N(assignee, "login") as? String ?? "NoAssignedUserName"
 				let assigned = (assigneeName == (fromServer.userName ?? "NoApiUser"))
-				i.isNewAssignment = (assigned && !(i.assignedToMe?.boolValue ?? false))
+				i.isNewAssignment = (assigned && !i.createdByMe() && !(i.assignedToMe?.boolValue ?? false))
 				i.assignedToMe = assigned
 			} else {
 				i.assignedToMe = false
