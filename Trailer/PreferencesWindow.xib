@@ -1344,6 +1344,9 @@ and press Enter to select.
                                 </view>
                             </tabViewItem>
                         </tabViewItems>
+                        <connections>
+                            <outlet property="delegate" destination="vQH-WF-vh2" id="bkZ-1Z-BSc"/>
+                        </connections>
                     </tabView>
                 </subviews>
             </view>
@@ -1424,6 +1427,7 @@ and press Enter to select.
                 <outlet property="statusItemsRefreshNote" destination="4P5-8J-j5N" id="5Kj-d9-gHG"/>
                 <outlet property="statusTermMenu" destination="irr-Zv-gfS" id="Aoi-h9-I2e"/>
                 <outlet property="statusTermsField" destination="oW9-uY-e0m" id="xZo-19-rE2"/>
+                <outlet property="tabs" destination="RGK-bv-JXB" id="B5b-gW-VDa"/>
                 <outlet property="useVibrancy" destination="onl-1T-RTg" id="7Tr-3j-g1y"/>
                 <outlet property="versionNumber" destination="iqF-Fz-LyV" id="3wx-Ff-ShS"/>
             </connections>

@@ -98,6 +98,9 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var hotKeyContainer: NSBox!
 	@IBOutlet weak var hotkeyControlModifier: NSButton!
 
+	// Tabs
+	@IBOutlet weak var tabs: NSTabView!
+
 	override init(contentRect: NSRect, styleMask aStyle: Int, backing bufferingType: NSBackingStoreType, defer flag: Bool) {
 		super.init(contentRect: contentRect, styleMask: aStyle, backing: bufferingType, defer: flag)
 	}
@@ -110,6 +113,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		let n = NSNotificationCenter.defaultCenter()
 		n.addObserver(serverList, selector: Selector("reloadData"), name: API_USAGE_UPDATE, object: nil)
 		n.addObserver(self, selector: Selector("updateImportExportSettings"), name: SETTINGS_EXPORTED, object: nil)
+		let selectedIndex = min(tabs.numberOfTabViewItems-1, Settings.lastPreferencesTabSelectedOSX)
+		tabs.selectTabViewItem(tabs.tabViewItemAtIndex(selectedIndex))
 	}
 
 	deinit {
@@ -837,10 +842,14 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	///////////// Tabs
 
 	func tabView(tabView: NSTabView, willSelectTabViewItem tabViewItem: NSTabViewItem?) {
-		if tabView.indexOfTabViewItem(tabViewItem!) == 1 {
-			if (app.lastRepoCheck.isEqualToDate(never()) || Repo.countVisibleReposInMoc(mainObjectContext) == 0) && ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
-				refreshReposSelected(nil)
+		if let item = tabViewItem {
+			let newIndex = tabView.indexOfTabViewItem(item)
+			if newIndex == 1 {
+				if (app.lastRepoCheck.isEqualToDate(never()) || Repo.countVisibleReposInMoc(mainObjectContext) == 0) && ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
+					refreshReposSelected(nil)
+				}
 			}
+			Settings.lastPreferencesTabSelectedOSX = newIndex
 		}
 	}
 
