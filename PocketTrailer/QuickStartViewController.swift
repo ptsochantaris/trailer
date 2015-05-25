@@ -14,16 +14,16 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 	private let newServer = ApiServer.allApiServersInMoc(mainObjectContext).first!
 	private var token = ""
 	private var checkTimer: NSTimer?
+	private var showIssues = true
 
     override func viewDidLoad() {
         super.viewDidLoad()
 		normalMode()
-		Settings.showIssuesMenu = true
 		updateSettings()
     }
 
-	func updateSettings() {
-		if Settings.showIssuesMenu {
+	private func updateSettings() {
+		if showIssues {
 			trackIssues.title = "Should track issues as well: Yes"
 			trackIssues.tintColor = GLOBAL_TINT
 			Settings.displayPolicyForNewIssues = RepoDisplayPolicy.All.rawValue
@@ -35,7 +35,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 	}
 
 	@IBAction func willAlsoTrackSelected(sender: UIBarButtonItem) {
-		Settings.showIssuesMenu = !Settings.showIssuesMenu
+		showIssues = !showIssues
 		updateSettings()
 	}
 

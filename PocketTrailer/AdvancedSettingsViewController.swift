@@ -34,7 +34,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 	private enum Section: Int {
 		case Refresh, Display, Issues, Comments, Repos, StausesAndLabels, History, Confirm, Sort, Misc
-		static let rowCounts = [3, 8, 2, 7, 1, 6, 3, 2, 3, 1]
+		static let rowCounts = [3, 7, 1, 7, 2, 6, 3, 2, 3, 1]
 		static let allNames = ["Auto Refresh", "Display", "Issues", "Comments", "Repositories", "Statuses & Labels", "History", "Don't confirm when", "Sorting", "Misc"]
 	}
 
@@ -82,24 +82,21 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.textLabel?.text = "Display creation instead of activity times"
 				cell.accessoryType = check(Settings.showCreatedInsteadOfUpdated)
 			case 1:
-				cell.textLabel?.text = "Hide 'All' section"
-				cell.accessoryType = check(Settings.hideAllPrsSection)
-			case 2:
 				cell.textLabel?.text = "Assigned items"
 				cell.detailTextLabel?.text = PRAssignmentPolicy(rawValue: Settings.assignedPrHandlingPolicy)?.name()
-			case 3:
+			case 2:
 				cell.textLabel?.text = "Mark unmergeable PRs only in 'My' or 'Participated'"
 				cell.accessoryType = check(Settings.markUnmergeableOnUserSectionsOnly)
-			case 4:
+			case 3:
 				cell.textLabel?.text = "Display repository names"
 				cell.accessoryType = check(Settings.showReposInName)
-			case 5:
+			case 4:
 				cell.textLabel?.text = "Include repository names in filtering"
 				cell.accessoryType = check(Settings.includeReposInFilter)
-			case 6:
+			case 5:
 				cell.textLabel?.text = "Include labels in filtering"
 				cell.accessoryType = check(Settings.includeLabelsInFilter)
-			case 7:
+			case 6:
 				cell.textLabel?.text = "Hide descriptions in Apple Watch detail views"
 				cell.accessoryType = check(Settings.hideDescriptionInWatchDetail)
 			default: break
@@ -107,9 +104,6 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		} else if indexPath.section == Section.Issues.rawValue {
 			switch indexPath.row {
 			case 0:
-				cell.textLabel?.text = "Sync and display issues"
-				cell.accessoryType = check(Settings.showIssuesMenu)
-			case 1:
 				cell.textLabel?.text = "Show issues instead of PRs in Apple Watch glance"
 				cell.accessoryType = check(Settings.showIssuesInGlance)
 			default: break
@@ -142,8 +136,11 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		} else if indexPath.section == Section.Repos.rawValue {
 			switch indexPath.row {
 			case 0:
-				cell.textLabel?.text = "Auto-hide new repositories in your watchlist"
-				cell.accessoryType = check(Settings.hideNewRepositories)
+				cell.textLabel?.text = "PR visibility for new repos"
+				cell.detailTextLabel?.text = RepoDisplayPolicy(rawValue: Settings.displayPolicyForNewPrs)?.name()
+			case 1:
+				cell.textLabel?.text = "Issue visibility for new repos"
+				cell.detailTextLabel?.text = RepoDisplayPolicy(rawValue: Settings.displayPolicyForNewIssues)?.name()
 			default: break
 			}
 		} else if indexPath.section == Section.StausesAndLabels.rawValue {
@@ -261,45 +258,28 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				Settings.showCreatedInsteadOfUpdated = !Settings.showCreatedInsteadOfUpdated
 				settingsChangedTimer.push()
 			case 1:
-				Settings.hideAllPrsSection = !Settings.hideAllPrsSection
-				settingsChangedTimer.push()
-			case 2:
 				pickerName = tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text ?? "Unknown Value"
 				selectedIndexPath = indexPath
 				valuesToPush = PRAssignmentPolicy.labels
 				previousValue = Settings.assignedPrHandlingPolicy
 				performSegueWithIdentifier("showPicker", sender: self)
-			case 3:
+			case 2:
 				Settings.markUnmergeableOnUserSectionsOnly = !Settings.markUnmergeableOnUserSectionsOnly
 				settingsChangedTimer.push()
-			case 4:
+			case 3:
 				Settings.showReposInName = !Settings.showReposInName
 				settingsChangedTimer.push()
-			case 5:
+			case 4:
 				Settings.includeReposInFilter = !Settings.includeReposInFilter
-			case 6:
+			case 5:
 				Settings.includeLabelsInFilter = !Settings.includeLabelsInFilter
-			case 7:
+			case 6:
 				Settings.hideDescriptionInWatchDetail = !Settings.hideDescriptionInWatchDetail
 			default: break
 			}
 		} else if indexPath.section == Section.Issues.rawValue {
 			switch indexPath.row {
 			case 0:
-				Settings.showIssuesMenu = !Settings.showIssuesMenu
-				if Settings.showIssuesMenu {
-					for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
-						r.resetSyncState()
-					}
-					app.preferencesDirty = true
-				} else {
-					for i in DataItem.allItemsOfType("Issue", inMoc: mainObjectContext) as! [Issue] {
-						i.postSyncAction = PostSyncAction.Delete.rawValue
-					}
-					DataItem.nukeDeletedItemsInMoc(mainObjectContext)
-				}
-				settingsChangedTimer.push()
-			case 1:
 				Settings.showIssuesInGlance = !Settings.showIssuesInGlance
 			default: break
 			}
@@ -326,11 +306,17 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			default: break
 			}
 		} else if indexPath.section == Section.Repos.rawValue {
+			pickerName = tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text ?? "Unknown Value"
+			valuesToPush = RepoDisplayPolicy.labels
+			selectedIndexPath = indexPath
 			switch indexPath.row {
 			case 0:
-				Settings.hideNewRepositories = !Settings.hideNewRepositories
+				previousValue = Settings.displayPolicyForNewPrs
+			case 1:
+				previousValue = Settings.displayPolicyForNewIssues
 			default: break
 			}
+			performSegueWithIdentifier("showPicker", sender: self)
 		} else if indexPath.section == Section.StausesAndLabels.rawValue {
 			switch indexPath.row {
 			case 0:
@@ -363,6 +349,9 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				if Settings.showLabels {
 					for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
 						r.resetSyncState()
+						for i in r.issues {
+							i.resetSyncState()
+						}
 					}
 				}
 				settingsChangedTimer.push()
@@ -486,6 +475,12 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			} else if sip.section == Section.Sort.rawValue {
 				Settings.sortMethod = Int(didSelectIndexPath.row)
 				settingsChangedTimer.push()
+			} else if sip.section == Section.Repos.rawValue {
+				if sip.row == 0 {
+					Settings.displayPolicyForNewPrs = Int(didSelectIndexPath.row)
+				} else if sip.row == 1 {
+					Settings.displayPolicyForNewIssues = Int(didSelectIndexPath.row)
+				}
 			} else if sip.section == Section.History.rawValue {
 				if sip.row == 0 {
 					Settings.mergeHandlingPolicy = Int(didSelectIndexPath.row)

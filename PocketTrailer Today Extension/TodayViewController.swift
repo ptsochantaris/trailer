@@ -107,7 +107,7 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 		}
 		prLabel.attributedText = a
 
-		if Settings.showIssuesMenu {
+		if Repo.interestedInIssues() {
 			let totalCount = Issue.countAllIssuesInMoc(mainObjectContext)
 			a = NSMutableAttributedString(string: "\(totalCount) Issues: ", attributes: brightAttributes)
 			if totalCount>0 {

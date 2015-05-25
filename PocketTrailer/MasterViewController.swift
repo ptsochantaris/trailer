@@ -217,14 +217,20 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	override func viewWillAppear(animated: Bool) {
 		super.viewWillAppear(animated)
 		updateStatus()
-		showTabBar(Settings.showIssuesMenu, animated: animated)
+		showTabBar(Repo.interestedInIssues() && Repo.interestedInPrs(), animated: animated)
 	}
 
 	func reloadDataWithAnimation(animated: Bool) {
 
-		if !Settings.showIssuesMenu && viewMode == MasterViewMode.Issues {
-			showTabBar(Settings.showIssuesMenu, animated: animated)
+		if !Repo.interestedInIssues() && Repo.interestedInPrs() && viewMode == MasterViewMode.Issues {
+			showTabBar(false, animated: animated)
 			viewMode = MasterViewMode.PullRequests
+			return
+		}
+
+		if !Repo.interestedInPrs() && Repo.interestedInIssues() && viewMode == MasterViewMode.PullRequests {
+			showTabBar(false, animated: animated)
+			viewMode = MasterViewMode.Issues
 			return
 		}
 
@@ -262,7 +268,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			tableView.reloadData()
 		}
 
-		showTabBar(Settings.showIssuesMenu, animated: animated)
+		showTabBar(Repo.interestedInPrs() && Repo.interestedInIssues(), animated: animated)
 	}
 
 	private func showTabBar(show: Bool, animated: Bool) {
@@ -295,7 +301,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			}
 		} else {
 
-			if !Settings.showIssuesMenu {
+			if !(Repo.interestedInPrs() && Repo.interestedInIssues()) {
 				tableView.contentInset = UIEdgeInsetsMake(tableView.contentInset.top, 0, 0, 0)
 				tableView.scrollIndicatorInsets = UIEdgeInsetsMake(tableView.contentInset.top, 0, 0, 0)
 			}
@@ -356,7 +362,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			if let ip = fetchedResultsController.indexPathForObject(p) {
 				tableView.selectRowAtIndexPath(ip, animated: false, scrollPosition: UITableViewScrollPosition.Middle)
 			}
-		} else if let i = relatedItem as? Issue where Settings.showIssuesMenu {
+		} else if let i = relatedItem as? Issue {
 			viewMode = MasterViewMode.Issues
 			detailViewController.catchupWithDataItemWhenLoaded = i.objectID
 			if let ip = fetchedResultsController.indexPathForObject(i) {
@@ -618,6 +624,10 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		tabBar?.selectedItem = (viewMode==MasterViewMode.PullRequests) ? pullRequestsItem : issuesItem
 	}
 
+	private func unreadCommentCount(count: Int) -> String {
+		return count == 0 ? "" : count == 1 ? " (1 new comment)" : " (\(count) new comments)"
+	}
+
 	private func pullRequestsTitle(long: Bool) -> String {
 
 		let f = PullRequest.requestForPullRequestsWithFilter(nil, sectionIndex: -1)
@@ -628,9 +638,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		if count == 0 {
 			return "No \(pr)s"
 		} else if count == 1 {
-			return "1 " + (unreadCount > 0 ? "PR (unread)" : pr)
+			return "1 " + (unreadCount > 0 ? "PR\(unreadCommentCount(unreadCount))" : pr)
 		} else {
-			return "\(count) " + (unreadCount > 0 ? "PRs (\(unreadCount) unread)" : pr + "s")
+			return "\(count) " + (unreadCount > 0 ? "PRs\(unreadCommentCount(unreadCount))" : pr + "s")
 		}
 	}
 
@@ -642,9 +652,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		if count == 0 {
 			return "No Issues"
 		} else if count == 1 {
-			return "1 Issue" + (unreadCount > 0 ? " (unread)" : "")
+			return "1 Issue\(unreadCommentCount(unreadCount))"
 		} else {
-			return "\(count) Issues" + (unreadCount > 0 ? " (\(unreadCount) unread)" : "")
+			return "\(count) Issues\(unreadCommentCount(unreadCount))"
 		}
 	}
 

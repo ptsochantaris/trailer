@@ -48,35 +48,18 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 		actionsButton.enabled = ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext)
 		if actionsButton.enabled && fetchedResultsController.fetchedObjects?.count==0 {
 			refreshList()
+		} else if let selectedIndex = tableView.indexPathForSelectedRow() {
+			tableView.deselectRowAtIndexPath(selectedIndex, animated: true)
 		}
 		super.viewDidAppear(animated)
 	}
 
 	@IBAction func actionSelected(sender: UIBarButtonItem) {
-		let a = UIAlertController(title: nil, message: nil, preferredStyle: UIAlertControllerStyle.ActionSheet)
-		a.addAction(UIAlertAction(title: "Refresh List", style: UIAlertActionStyle.Destructive, handler: { [weak self] action in
-			self!.refreshList()
-		}))
-		a.addAction(UIAlertAction(title: "Hide All", style: UIAlertActionStyle.Default, handler: { [weak self] action in
-			for r in self!.fetchedResultsController.fetchedObjects as! [Repo] {
-				r.hidden = true
-				r.dirty = false
-			}
-			app.preferencesDirty = true
-		}))
-		a.addAction(UIAlertAction(title: "Show All", style: UIAlertActionStyle.Default, handler: { [weak self] action in
-			for r in self!.fetchedResultsController.fetchedObjects as! [Repo] {
-				r.hidden = false
-				r.resetSyncState()
-			}
-			app.preferencesDirty = true
-		}))
-		a.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil))
-		a.popoverPresentationController?.barButtonItem = sender
-		presentViewController(a, animated: true, completion: nil)
+		refreshList()
 	}
-	
+
 	private func refreshList() {
+		self.navigationItem.rightBarButtonItem?.enabled = false
 		let originalName = navigationItem.title
 		navigationItem.title = "Loading..."
 		actionsButton.enabled = false
@@ -103,6 +86,7 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 			self!.tableView.alpha = 1.0
 			self!.tableView.userInteractionEnabled = true
 			app.preferencesDirty = true
+			self!.navigationItem.rightBarButtonItem?.enabled = true
 		}
 	}
 
@@ -121,15 +105,12 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 		return cell
 	}
 
-	override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-		if let repo = fetchedResultsController.objectAtIndexPath(indexPath) as? Repo {
-			let hideNow = !(repo.hidden?.boolValue ?? false)
-			repo.hidden = hideNow
-			repo.dirty = !hideNow
-			DataManager.saveDB()
+	override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+		if let indexPath = tableView.indexPathForSelectedRow(),
+			repo = fetchedResultsController.objectAtIndexPath(indexPath) as? Repo,
+			vc = segue.destinationViewController as? RepoSettingsViewController {
+			vc.repo = repo
 		}
-		tableView.deselectRowAtIndexPath(indexPath, animated: false)
-		app.preferencesDirty = true
 	}
 
 	override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -215,23 +196,16 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 		let fullName = repo.fullName ?? "(Untitled Repo)"
 		let text = (repo.inaccessible?.boolValue ?? false) ? (fullName + " (inaccessible)") : fullName
 		cell.textLabel?.text = text
-		if (repo.hidden?.boolValue ?? false) {
-			cell.accessoryView = makeX()
-			cell.textLabel?.textColor = UIColor.lightGrayColor()
-			cell.accessibilityLabel = "Hidden: " + text
-		} else {
-			cell.accessoryView = nil
-			cell.textLabel?.textColor = UIColor.darkTextColor()
-			cell.accessibilityLabel = text
-		}
+		cell.detailTextLabel?.text = subtitleForRepo(repo)
+		cell.accessibilityLabel = "\(text), \(subtitleForRepo(repo))"
+		cell.textLabel?.textColor = repo.shouldSync() ? UIColor.darkTextColor() : UIColor.lightGrayColor()
+		cell.detailTextLabel?.textColor = repo.shouldSync() ? UIColor.darkTextColor() : UIColor.lightGrayColor()
 	}
 
-	private func makeX() -> UIView {
-		let x = UILabel(frame: CGRectMake(0, 0, 16, 16))
-		x.textColor = UIColor.redColor()
-		x.font = UIFont.systemFontOfSize(14)
-		x.text = "X"
-		return x
+	private func subtitleForRepo(repo: Repo) -> String {
+		let prsText = RepoDisplayPolicy(rawValue: repo.displayPolicyForPrs?.integerValue ?? 0)?.name() ?? "Unknown"
+		let issuesText = RepoDisplayPolicy(rawValue: repo.displayPolicyForIssues?.integerValue ?? 0)?.name() ?? "Unknown"
+		return "PRs: \(prsText), Issues: \(issuesText)"
 	}
 
 	///////////////////////////// filtering

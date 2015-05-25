@@ -71,7 +71,7 @@ final class SectionController: WKInterfaceController {
 	override func table(table: WKInterfaceTable, didSelectRowAtIndex rowIndex: Int) {
 		var ri = rowIndex
 		var type = "PRS"
-		if Settings.showIssuesMenu {
+		if Repo.interestedInIssues() {
 			if ri >= boundaryIndex {
 				ri -= boundaryIndex
 				type = "ISSUES"
@@ -100,7 +100,7 @@ final class SectionController: WKInterfaceController {
 
 		boundaryIndex = rowTypes.count
 
-		if Settings.showIssuesMenu {
+		if Repo.interestedInIssues() {
 			let totalIssues = Issue.countAllIssuesInMoc(mainObjectContext)
 			if totalIssues==0 {
 				rowTypes.append(attributedTitleEntry(DataManager.reasonForEmptyIssuesWithFilter(nil)))
