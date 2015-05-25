@@ -105,7 +105,9 @@ let LOW_API_WARNING: Double = 0.20
 let NETWORK_TIMEOUT: NSTimeInterval = 120.0
 let BACKOFF_STEP: NSTimeInterval = 120.0
 
-let currentAppVersion = NSBundle.mainBundle().infoDictionary!["CFBundleShortVersionString"] as! String
+func currentAppVersion() -> String {
+	return NSBundle.mainBundle().infoDictionary!["CFBundleShortVersionString"] as? String ?? "(unknown version)"
+}
 
 enum PullRequestCondition: Int {
 	case Open, Closed, Merged
@@ -159,6 +161,14 @@ enum PRAssignmentPolicy: Int {
 	}
 }
 
+enum RepoDisplayPolicy: Int {
+	case Hide, Mine, MineAndPaticipated, All
+	static let labels = ["Hide", "Mine", "Participated", "All"]
+	func name() -> String {
+		return RepoDisplayPolicy.labels[rawValue]
+	}
+}
+
 #if os(iOS)
 	enum MasterViewMode: Int {
 		case PullRequests, Issues
@@ -185,8 +195,8 @@ enum PRAssignmentPolicy: Int {
 #endif
 
 func versionString() -> String {
-	var buildNumber = NSBundle.mainBundle().infoDictionary!["CFBundleVersion"] as! String
-	return "Version \(currentAppVersion) (\(buildNumber))"
+	var buildNumber = NSBundle.mainBundle().infoDictionary!["CFBundleVersion"] as? String ?? "unknown build"
+	return "Version \(currentAppVersion()) (\(buildNumber))"
 }
 
 func isDarkColor(color: COLOR_CLASS) -> Bool {

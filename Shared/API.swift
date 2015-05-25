@@ -36,15 +36,15 @@ final class API {
 
         #if DEBUG
             #if os(iOS)
-                let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-iOS-Development"
+                let userAgent = "HouseTrip-Trailer-v\(currentAppVersion())-iOS-Development"
             #else
-                let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-OSX-Development"
+                let userAgent = "HouseTrip-Trailer-v\(currentAppVersion())-OSX-Development"
             #endif
         #else
             #if os(iOS)
-                let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-iOS-Release"
+                let userAgent = "HouseTrip-Trailer-v\(currentAppVersion())-iOS-Release"
             #else
-                let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-OSX-Release"
+                let userAgent = "HouseTrip-Trailer-v\(currentAppVersion())-OSX-Release"
             #endif
         #endif
 
@@ -164,7 +164,7 @@ final class API {
 			let absolutePath = path + (contains(path, "?") ? "&" : "?") + "s=88"
 		#endif
 
-		let imageKey = absolutePath + " " + currentAppVersion
+		let imageKey = absolutePath + " " + currentAppVersion()
 		let cachePath = cacheDirectory.stringByAppendingPathComponent("imgcache-" + md5hash(imageKey))
 
 		let fileManager = NSFileManager.defaultManager()
@@ -502,10 +502,10 @@ final class API {
 			let completionCallback: Completion = {
 				completionCount++
 				if completionCount == totalOperations {
-					let shouldHideByDefault = Settings.hideNewRepositories
 					for r in DataItem.newItemsOfType("Repo", inMoc: moc) as! [Repo] {
-						r.hidden = shouldHideByDefault
-						if !shouldHideByDefault {
+						r.displayPolicyForPrs = Settings.displayPolicyForNewPrs
+						r.displayPolicyForIssues = Settings.displayPolicyForNewIssues
+						if r.shouldSync() {
 							app.postNotificationOfType(PRNotificationType.NewRepoAnnouncement, forItem:r)
 						}
 					}
@@ -597,7 +597,7 @@ final class API {
 			}
 		}
 
-		if repos.count==0 || !Settings.showIssuesMenu {
+		if repos.count==0 || !Repo.interestedInIssues() {
 			callback()
 			return
 		}
@@ -941,7 +941,7 @@ final class API {
 
 		let prsToCheck = pullRequests.filter { r -> Bool in
 			let parent = r.repo
-			return !(parent.hidden?.boolValue ?? false) && ((parent.postSyncAction?.integerValue ?? 0) != PostSyncAction.Delete.rawValue) && r.apiServer.syncIsGood
+			return parent.shouldSync() && ((parent.postSyncAction?.integerValue ?? 0) != PostSyncAction.Delete.rawValue) && r.apiServer.syncIsGood
 		}
 
 		let totalOperations = prsToCheck.count
@@ -970,7 +970,7 @@ final class API {
 
 		for i in moc.executeFetchRequest(f, error: nil) as! [Issue] {
 			let r = i.repo
-			if !(r.hidden?.boolValue ?? false) && ((r.postSyncAction?.integerValue ?? 0) != PostSyncAction.Delete.rawValue) && r.apiServer.syncIsGood {
+			if r.shouldSync() && ((r.postSyncAction?.integerValue ?? 0) != PostSyncAction.Delete.rawValue) && r.apiServer.syncIsGood {
 				issueWasClosed(i)
 			}
 		}

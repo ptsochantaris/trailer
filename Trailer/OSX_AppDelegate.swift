@@ -675,13 +675,17 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 	func refreshTimerDone() {
 		if ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) && Repo.countVisibleReposInMoc(mainObjectContext) > 0 {
-			startRefresh()
+			if preferencesWindow != nil {
+				preferencesDirty = true
+			} else {
+				startRefresh()
+			}
 		}
 	}
 
 	func updateIssuesMenu() {
 
-		if Settings.showIssuesMenu {
+		if Repo.interestedInIssues() {
 			issuesMenu.showStatusItem()
 		} else {
 			issuesMenu.hideStatusItem()
@@ -883,7 +887,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					fallthrough
 				case 124: // right
 					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
-					if Settings.showIssuesMenu {
+					if Repo.interestedInIssues() {
 						if w == self!.prMenu {
 							self!.showMenu(self!.issuesMenu)
 						} else if w == self!.issuesMenu {

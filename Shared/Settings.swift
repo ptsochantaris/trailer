@@ -58,7 +58,7 @@ final class Settings {
 			"HOTKEY_ENABLE", "HOTKEY_CONTROL_MODIFIER", "USE_VIBRANCY_UI", "DISABLE_ALL_COMMENT_NOTIFICATIONS", "NOTIFY_ON_STATUS_UPDATES", "NOTIFY_ON_STATUS_UPDATES_ALL", "SHOW_REPOS_IN_NAME", "INCLUDE_REPOS_IN_FILTER",
 			"INCLUDE_LABELS_IN_FILTER", "INCLUDE_STATUSES_IN_FILTER", "HOTKEY_COMMAND_MODIFIER", "HOTKEY_OPTION_MODIFIER", "HOTKEY_SHIFT_MODIFIER", "GRAY_OUT_WHEN_REFRESHING", "SHOW_ISSUES_MENU",
 			"AUTO_PARTICIPATE_ON_TEAM_MENTIONS", "SHOW_ISSUES_IN_WATCH_GLANCE", "ASSIGNED_PR_HANDLING_POLICY", "HIDE_DESCRIPTION_IN_WATCH_DETAIL_VIEW", "AUTO_REPEAT_SETTINGS_EXPORT", "DONT_CONFIRM_SETTINGS_IMPORT",
-			"LAST_EXPORT_URL", "LAST_EXPORT_TIME", "CLOSE_HANDLING_POLICY_2", "MERGE_HANDLING_POLICY_2", "LAST_PREFS_TAB_SELECTED_OSX"]
+			"LAST_EXPORT_URL", "LAST_EXPORT_TIME", "CLOSE_HANDLING_POLICY_2", "MERGE_HANDLING_POLICY_2", "LAST_PREFS_TAB_SELECTED_OSX", "NEW_PR_DISPLAY_POLICY_INDEX", "NEW_ISSUE_DISPLAY_POLICY_INDEX"]
 	}
 
     class func checkMigration() {
@@ -78,28 +78,59 @@ final class Settings {
             DLog("No need to migrate settings into shared container")
         }
 
-		if let moveAssignedPrsToMySectionLegacySetting = _settings_shared.objectForKey("MOVE_ASSIGNED_PRS_TO_MY_SECTION") as? Bool {
-			if(moveAssignedPrsToMySectionLegacySetting) {
-				_settings_shared.setObject(0, forKey: "ASSIGNED_PR_HANDLING_POLICY")
-			} else {
-				_settings_shared.setObject(2, forKey: "ASSIGNED_PR_HANDLING_POLICY")
-			}
+		if let moveAssignedPrs = _settings_shared.objectForKey("MOVE_ASSIGNED_PRS_TO_MY_SECTION") as? Bool {
+			_settings_shared.setObject(moveAssignedPrs ? PRAssignmentPolicy.MoveToMine.rawValue : PRAssignmentPolicy.DoNothing.rawValue, forKey: "ASSIGNED_PR_HANDLING_POLICY")
 			_settings_shared.removeObjectForKey("MOVE_ASSIGNED_PRS_TO_MY_SECTION")
-			_settings_shared.synchronize()
 		}
 
 		if let mergeHandlingPolicyLegacy = _settings_shared.objectForKey("MERGE_HANDLING_POLICY") as? Int {
 			_settings_shared.setObject(mergeHandlingPolicyLegacy + (mergeHandlingPolicyLegacy > 0 ? 1 : 0), forKey: "MERGE_HANDLING_POLICY_2")
 			_settings_shared.removeObjectForKey("MERGE_HANDLING_POLICY")
-			_settings_shared.synchronize()
 		}
 
 		if let closeHandlingPolicyLegacy = _settings_shared.objectForKey("CLOSE_HANDLING_POLICY") as? Int {
 			_settings_shared.setObject(closeHandlingPolicyLegacy + (closeHandlingPolicyLegacy > 0 ? 1 : 0), forKey: "CLOSE_HANDLING_POLICY_2")
 			_settings_shared.removeObjectForKey("CLOSE_HANDLING_POLICY")
-			_settings_shared.synchronize()
 		}
-    }
+
+		DataManager.postMigrationRepoPrPolicy = RepoDisplayPolicy.All
+		DataManager.postMigrationRepoIssuePolicy = RepoDisplayPolicy.Hide
+
+		if let showIssues = _settings_shared.objectForKey("SHOW_ISSUES_MENU") as? Bool {
+			_settings_shared.setObject(showIssues ? RepoDisplayPolicy.All.rawValue : RepoDisplayPolicy.Hide.rawValue, forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX")
+			DataManager.postMigrationRepoIssuePolicy = showIssues ? RepoDisplayPolicy.All : RepoDisplayPolicy.Hide
+			_settings_shared.removeObjectForKey("SHOW_ISSUES_MENU")
+		}
+
+		if let hideNewRepositories = _settings_shared.objectForKey("HIDE_NEW_REPOS_KEY") as? Bool {
+			_settings_shared.setObject(hideNewRepositories ? RepoDisplayPolicy.Hide.rawValue : RepoDisplayPolicy.All.rawValue, forKey: "NEW_PR_DISPLAY_POLICY_INDEX")
+			_settings_shared.setObject(hideNewRepositories ? RepoDisplayPolicy.Hide.rawValue : RepoDisplayPolicy.All.rawValue, forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX")
+			_settings_shared.removeObjectForKey("HIDE_NEW_REPOS_KEY")
+		}
+
+		if let hideAllSection = _settings_shared.objectForKey("HIDE_ALL_SECTION") as? Bool {
+			if hideAllSection {
+				if DataManager.postMigrationRepoPrPolicy == RepoDisplayPolicy.All {
+					DataManager.postMigrationRepoPrPolicy = RepoDisplayPolicy.MineAndPaticipated
+				}
+				if DataManager.postMigrationRepoIssuePolicy == RepoDisplayPolicy.All {
+					DataManager.postMigrationRepoIssuePolicy = RepoDisplayPolicy.MineAndPaticipated
+				}
+
+				let newPrPolicy = _settings_shared.objectForKey("NEW_PR_DISPLAY_POLICY_INDEX") as? Int ?? RepoDisplayPolicy.All.rawValue
+				if newPrPolicy == RepoDisplayPolicy.All.rawValue {
+					_settings_shared.setObject(RepoDisplayPolicy.MineAndPaticipated.rawValue, forKey: "NEW_PR_DISPLAY_POLICY_INDEX")
+				}
+				let newIssuePolicy = _settings_shared.objectForKey("NEW_ISSUE_DISPLAY_POLICY_INDEX") as? Int ?? RepoDisplayPolicy.All.rawValue
+				if newIssuePolicy == RepoDisplayPolicy.All.rawValue {
+					_settings_shared.setObject(RepoDisplayPolicy.MineAndPaticipated.rawValue, forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX")
+				}
+			}
+			_settings_shared.removeObjectForKey("HIDE_ALL_SECTION")
+		}
+
+		_settings_shared.synchronize()
+	}
 
 	static var saveTimer: PopTimer?
 
@@ -214,7 +245,7 @@ final class Settings {
 		clearCache()
 	}
 
-	/////////////////////////////////
+	///////////////////////////////// NUMBERS
 
 	class var sortMethod: Int {
 		get { return get("SORT_METHOD_KEY") as? Int ?? 0 }
@@ -237,12 +268,12 @@ final class Settings {
 	}
 
 	class var closeHandlingPolicy: Int {
-		get { return get("CLOSE_HANDLING_POLICY_2") as? Int ?? 0 }
+		get { return get("CLOSE_HANDLING_POLICY_2") as? Int ?? PRHandlingPolicy.KeepMine.rawValue }
 		set { set("CLOSE_HANDLING_POLICY_2", newValue) }
 	}
 
 	class var mergeHandlingPolicy: Int {
-		get { return get("MERGE_HANDLING_POLICY_2") as? Int ?? 0 }
+		get { return get("MERGE_HANDLING_POLICY_2") as? Int ?? PRHandlingPolicy.KeepMine.rawValue }
 		set { set("MERGE_HANDLING_POLICY_2", newValue) }
 	}
 
@@ -266,7 +297,17 @@ final class Settings {
 		set { set("ASSIGNED_PR_HANDLING_POLICY", newValue) }
 	}
 
-	///////////////////////////
+	class var displayPolicyForNewPrs: Int {
+		get { return get("NEW_PR_DISPLAY_POLICY_INDEX") as? Int ?? RepoDisplayPolicy.All.rawValue }
+		set { set("NEW_PR_DISPLAY_POLICY_INDEX", newValue) }
+	}
+
+	class var displayPolicyForNewIssues: Int {
+		get { return get("NEW_ISSUE_DISPLAY_POLICY_INDEX") as? Int ?? RepoDisplayPolicy.Hide.rawValue }
+		set { set("NEW_ISSUE_DISPLAY_POLICY_INDEX", newValue) }
+	}
+
+	/////////////////////////// STRINGS
 
 	class var statusFilteringTerms: [String] {
 		get { return get("STATUS_FILTERING_TERMS_KEY") as? [String] ?? [] }
@@ -283,7 +324,12 @@ final class Settings {
 		set { set("HOTKEY_LETTER", newValue) }
 	}
 
-	///////////////////////////
+	class var lastRunVersion: String {
+		get { return get("LAST_RUN_VERSION_KEY") as? String ?? "" }
+		set { set("LAST_RUN_VERSION_KEY", newValue) }
+	}
+
+	/////////////////////////// FLOATS
 
 	class var refreshPeriod: Float {
 		get { if let n = get("REFRESH_PERIOD_KEY") as? Float { return n < 60 ? 120 : n } else { return 120 } }
@@ -305,7 +351,7 @@ final class Settings {
 		set { set("NEW_REPO_CHECK_PERIOD", newValue) }
 	}
 
-	///////////////////////////
+	/////////////////////////// DATES
 
     class var lastSuccessfulRefresh: NSDate? {
         get { return get("LAST_SUCCESSFUL_REFRESH") as? NSDate }
@@ -317,10 +363,7 @@ final class Settings {
 		set { set("LAST_EXPORT_TIME", newValue) }
 	}
 
-    class var lastRunVersion: String? {
-        get { return get("LAST_RUN_VERSION_KEY") as? String }
-        set { set("LAST_RUN_VERSION_KEY", newValue) }
-    }
+	/////////////////////////// URLs
 
 	class var lastExportUrl: NSURL? {
 		get {
@@ -333,12 +376,7 @@ final class Settings {
 		set { set("LAST_EXPORT_URL", newValue?.absoluteString) }
 	}
 
-    ///////////////////////////
-
-	class var showIssuesMenu: Bool {
-		get { return get("SHOW_ISSUES_MENU") as? Bool ?? false }
-		set { set("SHOW_ISSUES_MENU", newValue) }
-	}
+    /////////////////////////// DEFAULT FALSE
 
 	class var shouldHideUncommentedRequests: Bool {
 		get { return get("HIDE_UNCOMMENTED_PRS_KEY") as? Bool ?? false }
@@ -385,19 +423,9 @@ final class Settings {
 		set { set("DONT_ASK_BEFORE_WIPING_CLOSED", newValue) }
 	}
 
-	class var hideNewRepositories: Bool {
-		get { return get("HIDE_NEW_REPOS_KEY") as? Bool ?? false }
-		set { set("HIDE_NEW_REPOS_KEY", newValue) }
-	}
-
 	class var groupByRepo: Bool {
 		get { return get("GROUP_BY_REPO") as? Bool ?? false }
 		set { set("GROUP_BY_REPO", newValue) }
-	}
-
-	class var hideAllPrsSection: Bool {
-		get { return get("HIDE_ALL_SECTION") as? Bool ?? false }
-		set { set("HIDE_ALL_SECTION", newValue) }
 	}
 
 	class var showLabels: Bool {
@@ -496,7 +524,7 @@ final class Settings {
 		set { set("DONT_CONFIRM_SETTINGS_IMPORT", newValue) }
 	}
 
-	//////////////////////////////
+	////////////////////////////// DEFAULT TRUE
 
 	class var checkForUpdatesAutomatically: Bool {
 		get { return get("UPDATE_CHECK_AUTO_KEY") as? Bool ?? true }

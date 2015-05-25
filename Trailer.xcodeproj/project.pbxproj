@@ -257,6 +257,7 @@
 		164840FD1AD19837009E6383 /* PopupManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PopupManager.swift; sourceTree = "<group>"; };
 		164840FF1AD198A6009E6383 /* WatchManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WatchManager.swift; sourceTree = "<group>"; };
 		164841011AD19933009E6383 /* NotificationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
+		164997471B127ED500D135A2 /* Trailer 21.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 21.xcdatamodel"; sourceTree = "<group>"; };
 		16519EB31ACF0E91002171D0 /* Trailer.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Trailer.icns; sourceTree = "<group>"; };
 		16522D701AB03AE500B1C3FB /* PocketTrailer WatchKit Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "PocketTrailer WatchKit Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		16522D731AB03AE500B1C3FB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -1508,6 +1509,7 @@
 		16B3B33B1A34E990000BE6CC /* Trailer.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				164997471B127ED500D135A2 /* Trailer 21.xcdatamodel */,
 				163D1F7F1AAFA54800E080D7 /* Trailer 20.xcdatamodel */,
 				16B3B33C1A34E990000BE6CC /* Trailer 10.xcdatamodel */,
 				16B3B33D1A34E990000BE6CC /* Trailer 11.xcdatamodel */,
@@ -1529,7 +1531,7 @@
 				16B3B34D1A34E990000BE6CC /* Trailer 9.xcdatamodel */,
 				16B3B34E1A34E990000BE6CC /* Trailer.xcdatamodel */,
 			);
-			currentVersion = 163D1F7F1AAFA54800E080D7 /* Trailer 20.xcdatamodel */;
+			currentVersion = 164997471B127ED500D135A2 /* Trailer 21.xcdatamodel */;
 			name = Trailer.xcdatamodeld;
 			path = ../Shared/Trailer.xcdatamodeld;
 			sourceTree = "<group>";

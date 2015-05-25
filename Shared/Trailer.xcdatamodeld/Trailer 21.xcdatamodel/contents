@@ -140,9 +140,11 @@
     <entity name="Repo" representedClassName="Trailer.Repo" syncable="YES">
         <attribute name="createdAt" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="dirty" optional="YES" attributeType="Boolean" indexed="YES" syncable="YES"/>
+        <attribute name="displayPolicyForIssues" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="displayPolicyForPrs" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
         <attribute name="fork" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="fullName" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="hidden" attributeType="Boolean" defaultValueString="NO" indexed="YES" syncable="YES"/>
+        <attribute name="hidden" optional="YES" attributeType="Boolean" indexed="YES" syncable="YES"/>
         <attribute name="inaccessible" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="lastDirtied" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="postSyncAction" optional="YES" attributeType="Integer 16" indexed="YES" syncable="YES"/>
@@ -180,7 +182,7 @@
         <element name="PRLabel" positionX="9" positionY="153" width="128" height="195"/>
         <element name="PRStatus" positionX="0" positionY="0" width="128" height="225"/>
         <element name="PullRequest" positionX="0" positionY="0" width="128" height="540"/>
-        <element name="Repo" positionX="0" positionY="0" width="128" height="255"/>
+        <element name="Repo" positionX="0" positionY="0" width="128" height="285"/>
         <element name="Team" positionX="9" positionY="153" width="128" height="165"/>
     </elements>
 </model>

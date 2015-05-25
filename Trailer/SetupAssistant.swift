@@ -16,10 +16,9 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 
 	override func awakeFromNib() {
 		StartupLaunch.setLaunchOnLogin(true)
-		Settings.showIssuesMenu = true
 		startAtLogin.integerValue = 1
 		trackIssues.integerValue = 1
-		app.updateIssuesMenu()
+		Settings.displayPolicyForNewIssues = RepoDisplayPolicy.All.rawValue
 	}
 
 	override init(contentRect: NSRect, styleMask aStyle: Int, backing bufferingType: NSBackingStoreType, defer flag: Bool) {
@@ -55,8 +54,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 	}
 
 	@IBAction func trackIssuesSelected(sender: NSButton) {
-		Settings.showIssuesMenu = (trackIssues.integerValue==1)
-		app.updateIssuesMenu()
+		Settings.displayPolicyForNewIssues = sender.integerValue==1 ? RepoDisplayPolicy.All.rawValue : RepoDisplayPolicy.Hide.rawValue
 	}
 
 	@IBAction func testAndCompleteSelected(sender: NSButton) {
@@ -100,7 +98,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 				close()
 				let alert = NSAlert()
 				alert.messageText = "Setup complete!"
-				alert.informativeText = "You can tweak settings & behaviour from the preferences window.\n\nPocketTrailer only had read-only access to your Github data, so feel free to experiment, you can't damage your data or settings on GitHub."
+				alert.informativeText = "You can tweak settings & behaviour from the preferences window.\n\nTrailer only has read-only access to your Github data, so feel free to experiment, you can't damage your data or settings on GitHub."
 				alert.addButtonWithTitle("OK")
 				alert.runModal()
 			} else {

@@ -26,9 +26,11 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 		if Settings.showIssuesMenu {
 			trackIssues.title = "Should track issues as well: Yes"
 			trackIssues.tintColor = GLOBAL_TINT
+			Settings.displayPolicyForNewIssues = RepoDisplayPolicy.All.rawValue
 		} else {
 			trackIssues.title = "Should track issues as well: No"
 			trackIssues.tintColor = UIColor.lightGrayColor()
+			Settings.displayPolicyForNewIssues = RepoDisplayPolicy.Hide.rawValue
 		}
 	}
 
@@ -77,7 +79,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 			if newServer.lastSyncSucceeded?.boolValue ?? false {
 				UIAlertView(
 					title: "Setup complete!",
-					message: "You can tweak options & behaviour from the settings.\n\nTrailer only has read-only access to your Github data, so feel free to experiment, you can't damage your data or settings on GitHub.",
+					message: "You can tweak options & behaviour from the settings.\n\nPocketTrailer only has read-only access to your Github data, so feel free to experiment, you can't damage your data or settings on GitHub.",
 					delegate: nil,
 					cancelButtonTitle: "OK").show()
 				dismissViewControllerAnimated(true, completion: nil)

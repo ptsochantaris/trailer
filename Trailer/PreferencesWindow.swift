@@ -24,7 +24,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var displayRepositoryNames: NSButton!
 	@IBOutlet weak var includeRepositoriesInFiltering: NSButton!
 	@IBOutlet weak var groupByRepo: NSButton!
-	@IBOutlet weak var hideAllPrsSection: NSButton!
 	@IBOutlet weak var markUnmergeableOnUserSectionsOnly: NSButton!
 	@IBOutlet weak var repoCheckLabel: NSTextField!
 	@IBOutlet weak var repoCheckStepper: NSStepper!
@@ -34,14 +33,9 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var checkForUpdatesAutomatically: NSButton!
 	@IBOutlet weak var checkForUpdatesLabel: NSTextField!
 	@IBOutlet weak var checkForUpdatesSelector: NSStepper!
-	@IBOutlet weak var hideNewRepositories: NSButton!
 	@IBOutlet weak var openPrAtFirstUnreadComment: NSButton!
 	@IBOutlet weak var logActivityToConsole: NSButton!
 	@IBOutlet weak var commentAuthorBlacklist: NSTokenField!
-
-	// Repos
-	@IBOutlet weak var showAll: NSButton!
-	@IBOutlet weak var hideAll: NSButton!
 
 	// Statuses
 	@IBOutlet weak var showStatusItems: NSButton!
@@ -64,7 +58,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var includeLabelsInFiltering: NSButton!
 	@IBOutlet weak var includeStatusesInFiltering: NSButton!
 	@IBOutlet weak var grayOutWhenRefreshing: NSButton!
-	@IBOutlet weak var showIssuesMenu: NSButton!
 	@IBOutlet weak var assignedPrHandlingPolicy: NSPopUpButton!
 
 	// Labels
@@ -98,6 +91,12 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var hotKeyContainer: NSBox!
 	@IBOutlet weak var hotkeyControlModifier: NSButton!
 
+	// Repos
+	@IBOutlet weak var allPrsSetting: NSPopUpButton!
+	@IBOutlet weak var allIssuesSetting: NSPopUpButton!
+	@IBOutlet weak var allNewPrsSetting: NSPopUpButton!
+	@IBOutlet weak var allNewIssuesSetting: NSPopUpButton!
+
 	// Tabs
 	@IBOutlet weak var tabs: NSTabView!
 
@@ -108,13 +107,26 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	override func awakeFromNib() {
 		super.awakeFromNib()
 		delegate = self
+
+		allPrsSetting.addItemWithTitle("All PRs...")
+		allPrsSetting.addItemsWithTitles(RepoDisplayPolicy.labels)
+
+		allIssuesSetting.addItemWithTitle("All issues...")
+		allIssuesSetting.addItemsWithTitles(RepoDisplayPolicy.labels)
+
+		allNewPrsSetting.addItemsWithTitles(RepoDisplayPolicy.labels)
+		allNewIssuesSetting.addItemsWithTitles(RepoDisplayPolicy.labels)
+
 		reloadSettings()
+
 		versionNumber.stringValue = versionString()
+
+		let selectedIndex = min(tabs.numberOfTabViewItems-1, Settings.lastPreferencesTabSelectedOSX)
+		tabs.selectTabViewItem(tabs.tabViewItemAtIndex(selectedIndex))
+
 		let n = NSNotificationCenter.defaultCenter()
 		n.addObserver(serverList, selector: Selector("reloadData"), name: API_USAGE_UPDATE, object: nil)
 		n.addObserver(self, selector: Selector("updateImportExportSettings"), name: SETTINGS_EXPORTED, object: nil)
-		let selectedIndex = min(tabs.numberOfTabViewItems-1, Settings.lastPreferencesTabSelectedOSX)
-		tabs.selectTabViewItem(tabs.tabViewItemAtIndex(selectedIndex))
 	}
 
 	deinit {
@@ -137,7 +149,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		prClosedPolicy.selectItemAtIndex(Settings.closeHandlingPolicy)
 
 		launchAtStartup.integerValue = StartupLaunch.isAppLoginItem() ? 1 : 0
-		hideAllPrsSection.integerValue = Settings.hideAllPrsSection ? 1 : 0
 		dontConfirmRemoveAllClosed.integerValue = Settings.dontAskBeforeWipingClosed ? 1 : 0
 		displayRepositoryNames.integerValue = Settings.showReposInName ? 1 : 0
 		includeRepositoriesInFiltering.integerValue = Settings.includeReposInFilter ? 1 : 0
@@ -162,12 +173,13 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		makeStatusItemsSelectable.integerValue = Settings.makeStatusItemsSelectable ? 1 : 0
 		markUnmergeableOnUserSectionsOnly.integerValue = Settings.markUnmergeableOnUserSectionsOnly ? 1 : 0
 		countOnlyListedItems.integerValue = Settings.countOnlyListedItems ? 1 : 0
-		hideNewRepositories.integerValue = Settings.hideNewRepositories ? 1 : 0
 		openPrAtFirstUnreadComment.integerValue = Settings.openPrAtFirstUnreadComment ? 1 : 0
 		logActivityToConsole.integerValue = Settings.logActivityToConsole ? 1 : 0
 		showLabels.integerValue = Settings.showLabels ? 1 : 0
 		useVibrancy.integerValue = Settings.useVibrancy ? 1 : 0
-		showIssuesMenu.integerValue = Settings.showIssuesMenu ? 1 : 0
+
+		allNewPrsSetting.selectItemAtIndex(Settings.displayPolicyForNewPrs)
+		allNewIssuesSetting.selectItemAtIndex(Settings.displayPolicyForNewIssues)
 
 		hotkeyEnable.integerValue = Settings.hotkeyEnable ? 1 : 0
 		hotkeyControlModifier.integerValue = Settings.hotkeyControlModifier ? 1 : 0
@@ -202,14 +214,14 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		if app.isRefreshing {
 			refreshButton.enabled = false
 			projectsTable.enabled = false
-			hideAll.enabled = false
-			showAll.enabled = false
+			allPrsSetting.enabled = false
+			allIssuesSetting.enabled = false
 			activityDisplay.startAnimation(nil)
 		} else {
 			refreshButton.enabled = ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext)
 			projectsTable.enabled = true
-			hideAll.enabled = true
-			showAll.enabled = true
+			allPrsSetting.enabled = true
+			allIssuesSetting.enabled = true
 			activityDisplay.stopAnimation(nil)
 		}
 	}
@@ -233,12 +245,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction func dontConfirmRemoveAllMergedSelected(sender: NSButton) {
 		Settings.dontAskBeforeWipingMerged = (sender.integerValue==1)
-	}
-
-	@IBAction func hideAllPrsSection(sender: NSButton) {
-		Settings.hideAllPrsSection = (sender.integerValue==1)
-		DataManager.postProcessAllItems()
-		app.deferredUpdateTimer.push()
 	}
 
 	@IBAction func markUnmergeableOnUserSectionsOnlySelected(sender: NSButton) {
@@ -327,10 +333,43 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		app.deferredUpdateTimer.push()
 	}
 
-	@IBAction func showIssuesMenuSelected(sender: NSButton) {
-		Settings.showIssuesMenu = (sender.integerValue==1)
+	@IBAction func allPrsPolicySelected(sender: NSPopUpButton) {
+		let index = sender.indexOfSelectedItem - 1
+		if index < 0 {
+			return
+		}
+
+		for r in Repo.reposForFilter(repoFilter.stringValue) {
+			r.displayPolicyForPrs = index
+			r.dirty = index > 0
+		}
+		app.preferencesDirty = true
+		projectsTable.reloadData()
+		sender.selectItemAtIndex(0)
+		updateDisplayIssuesSetting()
+		Settings.possibleExport(nil)
+	}
+
+	@IBAction func allIssuesPolicySelected(sender: NSPopUpButton) {
+		let index = sender.indexOfSelectedItem - 1
+		if index < 0 {
+			return
+		}
+
+		for r in Repo.reposForFilter(repoFilter.stringValue) {
+			r.displayPolicyForIssues = index
+			r.dirty = index > 0
+		}
+		app.preferencesDirty = true
+		projectsTable.reloadData()
+		sender.selectItemAtIndex(0)
+		updateDisplayIssuesSetting()
+		Settings.possibleExport(nil)
+	}
+
+	private func updateDisplayIssuesSetting() {
 		DataManager.postProcessAllItems()
-		if Settings.showIssuesMenu {
+		if Repo.interestedInIssues() {
 			for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
 				r.resetSyncState()
 			}
@@ -342,6 +381,14 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			DataItem.nukeDeletedItemsInMoc(mainObjectContext)
 		}
 		app.deferredUpdateTimer.push()
+	}
+
+	@IBAction func allNewPrsPolicySelected(sender: NSPopUpButton) {
+		Settings.displayPolicyForNewPrs = sender.indexOfSelectedItem
+	}
+
+	@IBAction func allNewIssuesPolicySelected(sender: NSPopUpButton) {
+		Settings.displayPolicyForNewIssues = sender.indexOfSelectedItem
 	}
 
 	@IBAction func hideUncommentedRequestsSelected(sender: NSButton) {
@@ -367,10 +414,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		Settings.countOnlyListedItems = (sender.integerValue==1)
 		DataManager.postProcessAllItems()
 		app.deferredUpdateTimer.push()
-	}
-
-	@IBAction func hideNewRespositoriesSelected(sender: NSButton) {
-		Settings.hideNewRepositories = (sender.integerValue==1)
 	}
 
 	@IBAction func openPrAtFirstUnreadCommentSelected(sender: NSButton) {
@@ -616,26 +659,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		hotKeyHelp.hidden = Settings.hotkeyEnable
 	}
 
-	@IBAction func showAllRepositoriesSelected(sender: NSButton) {
-		for r in Repo.reposForFilter(repoFilter.stringValue) {
-			r.hidden = false
-			r.resetSyncState()
-		}
-		app.preferencesDirty = true
-		projectsTable.reloadData()
-		Settings.possibleExport(nil)
-	}
-
-	@IBAction func hideAllRepositoriesSelected(sender: NSButton) {
-		for r in Repo.reposForFilter(repoFilter.stringValue) {
-			r.hidden = true
-			r.dirty = false
-		}
-		app.preferencesDirty = true
-		projectsTable.reloadData()
-		Settings.possibleExport(nil)
-	}
-
 	@IBAction func enableHotkeySelected(sender: NSButton) {
 		Settings.hotkeyEnable = hotkeyEnable.integerValue != 0
 		Settings.hotkeyLetter = hotkeyLetter.titleOfSelectedItem ?? "T"
@@ -869,33 +892,44 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		return filteredRepos[r-1]
 	}
 
-	func tableView(tv: NSTableView, objectValueForTableColumn tableColumn: NSTableColumn?, row: Int) -> AnyObject? {
-		let cell = tableColumn!.dataCellForRow(row) as! NSCell
+	func tableView(tv: NSTableView, shouldSelectRow row: Int) -> Bool {
+		return !tableView(tv, isGroupRow:row)
+	}
 
+	func tableView(tv: NSTableView, willDisplayCell c: AnyObject, forTableColumn tableColumn: NSTableColumn?, row: Int) {
+		let cell = c as! NSCell
 		if tv === projectsTable {
-			if tableColumn?.identifier == "hide" {
-				if tableView(tv, isGroupRow:row) {
-					(cell as! NSButtonCell).imagePosition = NSCellImagePosition.NoImage
-					cell.state = NSMixedState
-					cell.enabled = false
-				} else {
-					(cell as! NSButtonCell).imagePosition = NSCellImagePosition.ImageOnly
-					let r = repoForRow(row)
-					cell.state = (r.hidden?.boolValue ?? false) ? NSOnState : NSOffState
-					cell.enabled = true
-				}
-			} else {
+			if tableColumn?.identifier == "repos" {
 				if tableView(tv, isGroupRow:row) {
 					cell.title = row==0 ? "Parent Repositories" : "Forked Repositories"
-					cell.state = NSMixedState
 					cell.enabled = false
-				}
-				else
-				{
+				} else {
 					let r = repoForRow(row)
 					let repoName = r.fullName ?? "NoRepoName"
 					cell.title = (r.inaccessible?.boolValue ?? false) ? repoName + " (inaccessible)" : repoName
 					cell.enabled = true
+				}
+			} else {
+				if let menuCell = cell as? NSPopUpButtonCell {
+					menuCell.removeAllItems()
+					if tableView(tv, isGroupRow:row) {
+						menuCell.selectItemAtIndex(-1)
+						menuCell.enabled = false
+						menuCell.arrowPosition = NSPopUpArrowPosition.NoArrow
+					} else {
+						let r = repoForRow(row)
+						menuCell.enabled = true
+						menuCell.arrowPosition = NSPopUpArrowPosition.ArrowAtBottom
+						menuCell.addItemsWithTitles(RepoDisplayPolicy.labels)
+						let index = tableColumn?.identifier == "prs" ? (r.displayPolicyForPrs?.integerValue ?? 0) : (r.displayPolicyForIssues?.integerValue ?? 0)
+						menuCell.selectItemAtIndex(index)
+						let fontSize = NSFont.systemFontSizeForControlSize(NSControlSize.SmallControlSize)
+						if index == 0 {
+							menuCell.font = NSFont.systemFontOfSize(fontSize)
+						} else {
+							menuCell.font = NSFont.boldSystemFontOfSize(fontSize)
+						}
+					}
 				}
 			}
 		}
@@ -915,7 +949,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 				c.doubleValue = rl - (apiServer.requestsRemaining?.doubleValue ?? 0)
 			}
 		}
-		return cell
 	}
 
 	func tableView(tableView: NSTableView, isGroupRow row: Int) -> Bool {
@@ -934,17 +967,27 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
+	func tableView(tableView: NSTableView, objectValueForTableColumn tableColumn: NSTableColumn?, row: Int) -> AnyObject? {
+		return nil
+	}
+
 	func tableView(tv: NSTableView, setObjectValue object: AnyObject?, forTableColumn tableColumn: NSTableColumn?, row: Int) {
 		if tv === projectsTable {
 			if !tableView(tv, isGroupRow: row) {
 				let r = repoForRow(row)
-				let hideNow = object?.boolValue ?? false
-				r.hidden = hideNow
-				r.dirty = !hideNow
+				if let index = object?.integerValue {
+					if tableColumn?.identifier == "prs" {
+						r.displayPolicyForPrs = index
+					} else if tableColumn?.identifier == "issues" {
+						r.displayPolicyForIssues = index
+					}
+					r.dirty = index>0
+					DataManager.saveDB()
+					app.preferencesDirty = true
+					Settings.possibleExport(nil)
+					updateDisplayIssuesSetting()
+				}
 			}
-			DataManager.saveDB()
-			app.preferencesDirty = true
-			Settings.possibleExport(nil)
 		}
 	}
 }

@@ -10,7 +10,8 @@ final class Repo: DataItem {
     @NSManaged var inaccessible: NSNumber?
     @NSManaged var lastDirtied: NSDate?
     @NSManaged var webUrl: String?
-
+	@NSManaged var displayPolicyForPrs: NSNumber?
+	@NSManaged var displayPolicyForIssues: NSNumber?
 	@NSManaged var pullRequests: Set<PullRequest>
 	@NSManaged var issues: Set<Issue>
 
@@ -26,6 +27,10 @@ final class Repo: DataItem {
 		return r
 	}
 
+	func shouldSync() -> Bool {
+		return (self.displayPolicyForPrs?.integerValue ?? 0) > 0 || (self.displayPolicyForIssues?.integerValue ?? 0) > 0
+	}
+
 	override func resetSyncState() {
 		super.resetSyncState()
 		dirty = true
@@ -35,13 +40,13 @@ final class Repo: DataItem {
 	class func visibleReposInMoc(moc: NSManagedObjectContext) -> [Repo] {
 		let f = NSFetchRequest(entityName: "Repo")
 		f.returnsObjectsAsFaults = false
-		f.predicate = NSPredicate(format: "hidden = NO")
+		f.predicate = NSPredicate(format: "displayPolicyForPrs > 0 or displayPolicyForIssues > 0")
 		return moc.executeFetchRequest(f, error: nil) as! [Repo]
 	}
 
 	class func countVisibleReposInMoc(moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest(entityName: "Repo")
-		f.predicate = NSPredicate(format: "hidden = NO")
+		f.predicate = NSPredicate(format: "displayPolicyForPrs > 0 or displayPolicyForIssues > 0")
 		return moc.countForFetchRequest(f, error: nil)
 	}
 
@@ -49,24 +54,33 @@ final class Repo: DataItem {
 		let allRepos = DataItem.allItemsOfType("Repo", inMoc: moc) as! [Repo]
 		var hiddenRepos = 0
 		for r in allRepos {
-			if r.hidden?.boolValue ?? false {
+			if !r.shouldSync() {
 				hiddenRepos++
 			}
 		}
 		return allRepos.count > 0 && (hiddenRepos == allRepos.count)
 	}
 
+	class func interestedInIssues() -> Bool {
+		for r in Repo.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
+			if r.displayPolicyForIssues?.integerValue > 0 {
+				return true
+			}
+		}
+		return false
+	}
+
 	class func syncableReposInMoc(moc: NSManagedObjectContext) -> [Repo] {
 		let f = NSFetchRequest(entityName: "Repo")
 		f.returnsObjectsAsFaults = false
-		f.predicate = NSPredicate(format: "dirty = YES and hidden = NO and inaccessible != YES")
+		f.predicate = NSPredicate(format: "dirty = YES and (displayPolicyForPrs > 0 or displayPolicyForIssues > 0) and inaccessible != YES")
 		return moc.executeFetchRequest(f, error: nil) as! [Repo]
 	}
 
 	class func unsyncableReposInMoc(moc: NSManagedObjectContext) -> [Repo] {
 		let f = NSFetchRequest(entityName: "Repo")
 		f.returnsObjectsAsFaults = false
-		f.predicate = NSPredicate(format: "hidden = YES or inaccessible = YES")
+		f.predicate = NSPredicate(format: "(not (displayPolicyForPrs > 0 or displayPolicyForIssues > 0)) or inaccessible = YES")
 		return moc.executeFetchRequest(f, error: nil) as! [Repo]
 	}
 
@@ -82,7 +96,7 @@ final class Repo: DataItem {
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "serverId IN %@", ids)
 		for repo in inMoc.executeFetchRequest(f, error: nil) as! [Repo] {
-			repo.dirty = !(repo.hidden?.boolValue ?? false)
+			repo.dirty = repo.shouldSync()
 		}
 	}
 

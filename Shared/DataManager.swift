@@ -8,14 +8,17 @@ var dataReadonly = false
 
 final class DataManager : NSObject {
 
+	static var postMigrationRepoPrPolicy: RepoDisplayPolicy?
+	static var postMigrationRepoIssuePolicy: RepoDisplayPolicy?
+
 	class func checkMigration() {
-		if DataManager.versionBumpOccured() {
+		if Settings.lastRunVersion != versionString() {
 			DLog("VERSION UPDATE MAINTENANCE NEEDED")
             #if os(iOS)
                 migrateDatabaseToShared()
             #endif
 			DataManager.performVersionChangedTasks()
-            Settings.lastRunVersion = currentAppVersion;
+            Settings.lastRunVersion = versionString()
 		}
 		ApiServer.ensureAtLeastGithubInMoc(mainObjectContext)
 	}
@@ -44,6 +47,7 @@ final class DataManager : NSObject {
 			d.removeObjectForKey("API_SERVER_PATH")
 			d.removeObjectForKey("API_FRONTEND_SERVER")
 			d.removeObjectForKey("GITHUB_AUTH_TOKEN")
+			d.synchronize()
 		} else {
 			ApiServer.ensureAtLeastGithubInMoc(mainObjectContext)
 		}
@@ -51,6 +55,20 @@ final class DataManager : NSObject {
 		DLog("Marking all repos as dirty")
 		for r in DataItem.allItemsOfType("Repo", inMoc:mainObjectContext) as! [Repo] {
 			r.resetSyncState()
+			if let markedAsHidden = r.hidden?.boolValue where markedAsHidden == true {
+				r.displayPolicyForPrs = RepoDisplayPolicy.Hide.rawValue
+				r.displayPolicyForIssues = RepoDisplayPolicy.Hide.rawValue
+			} else {
+				if let prDisplayPolicy = postMigrationRepoPrPolicy where r.displayPolicyForPrs == nil {
+					r.displayPolicyForPrs = prDisplayPolicy.rawValue
+				}
+				if let issueDisplayPolicy = postMigrationRepoIssuePolicy where r.displayPolicyForIssues == nil {
+					r.displayPolicyForIssues = issueDisplayPolicy.rawValue
+				}
+			}
+			if r.hidden != nil {
+				r.hidden = nil
+			}
 		}
 	}
 
@@ -341,14 +359,6 @@ final class DataManager : NSObject {
 			return persistentStoreCoordinator()!.managedObjectIDForURIRepresentation(u)
 		}
 		return nil
-	}
-
-	class func versionBumpOccured() -> Bool {
-		if let thisVersion = Settings.lastRunVersion {
-			return !(thisVersion == currentAppVersion)
-		} else {
-			return true
-		}
 	}
 }
 

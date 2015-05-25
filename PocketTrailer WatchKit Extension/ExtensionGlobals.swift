@@ -3,6 +3,7 @@ import UIKit
 import CoreData
 
 let app = { () -> ExtensionGlobals in
+	Settings.checkMigration()
     DataManager.checkMigration()
     return ExtensionGlobals()
 }()

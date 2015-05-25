@@ -146,7 +146,6 @@ class ListableItem: DataItem {
 		else if currentCondition == PullRequestCondition.Closed.rawValue	{ targetSection = PullRequestSection.Closed }
 		else if createdByMe() || assignedToMySection()						{ targetSection = PullRequestSection.Mine }
 		else if assignedToParticipated() || commentedByMe()					{ targetSection = PullRequestSection.Participated }
-		else if Settings.hideAllPrsSection									{ targetSection = PullRequestSection.None }
 		else																{ targetSection = PullRequestSection.All }
 
 		var needsManualCount = false
@@ -198,8 +197,26 @@ class ListableItem: DataItem {
 			unreadComments = managedObjectContext?.countForFetchRequest(f, error: nil)
 		}
 
-		sectionIndex = targetSection.rawValue
 		totalComments = comments.count
+
+		if let displayPolicy = RepoDisplayPolicy(rawValue: self is Issue ? (repo.displayPolicyForIssues?.integerValue ?? 0) : (repo.displayPolicyForPrs?.integerValue ?? 0)) {
+			switch displayPolicy {
+			case .Hide:
+				targetSection = PullRequestSection.None
+			case .Mine:
+				if targetSection == PullRequestSection.All || targetSection == PullRequestSection.Participated {
+					targetSection = PullRequestSection.None
+				}
+			case .MineAndPaticipated:
+				if targetSection == PullRequestSection.All {
+					targetSection = PullRequestSection.None
+				}
+			case .All:
+				break
+			}
+		}
+
+		sectionIndex = targetSection.rawValue
 
 		if title==nil { title = "(No title)" }
 	}
