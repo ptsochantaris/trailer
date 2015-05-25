@@ -228,7 +228,7 @@
                                     </subviews>
                                 </tableViewCellContentView>
                                 <connections>
-                                    <segue destination="PYB-Of-hHO" kind="show" id="GvK-Do-aPb"/>
+                                    <segue destination="PYB-Of-hHO" kind="show" identifier="showRepoSelection" id="GvK-Do-aPb"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -237,7 +237,13 @@
                             <outlet property="delegate" destination="qen-v7-82i" id="kSd-Gk-a1f"/>
                         </connections>
                     </tableView>
-                    <toolbarItems/>
+                    <toolbarItems>
+                        <barButtonItem title="Set visibility of all repos..." id="bFa-EW-2H2">
+                            <connections>
+                                <action selector="setAllPrsSelected:" destination="qen-v7-82i" id="JkG-zn-Plz"/>
+                            </connections>
+                        </barButtonItem>
+                    </toolbarItems>
                     <navigationItem key="navigationItem" title="Repositories" id="QfX-C1-a3i">
                         <barButtonItem key="leftBarButtonItem" image="close" style="done" id="mYI-Lo-soT">
                             <connections>

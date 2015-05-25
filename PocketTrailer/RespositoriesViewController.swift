@@ -54,8 +54,25 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 		super.viewDidAppear(animated)
 	}
 
+	override func viewWillAppear(animated: Bool) {
+		super.viewWillAppear(animated)
+		self.navigationController?.setToolbarHidden(false, animated: animated)
+	}
+
+	override func viewWillDisappear(animated: Bool) {
+		super.viewWillDisappear(animated)
+		self.navigationController?.setToolbarHidden(true, animated: animated)
+	}
+
 	@IBAction func actionSelected(sender: UIBarButtonItem) {
 		refreshList()
+	}
+
+	@IBAction func setAllPrsSelected(sender: UIBarButtonItem) {
+		if let ip = tableView.indexPathForSelectedRow() {
+			tableView.deselectRowAtIndexPath(ip, animated: false)
+		}
+		performSegueWithIdentifier("showRepoSelection", sender: self)
 	}
 
 	private func refreshList() {
