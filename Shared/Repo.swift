@@ -50,20 +50,18 @@ final class Repo: DataItem {
 		return moc.countForFetchRequest(f, error: nil)
 	}
 
-	class func allReposAreHiddenInMoc(moc: NSManagedObjectContext) -> Bool {
-		let allRepos = DataItem.allItemsOfType("Repo", inMoc: moc) as! [Repo]
-		var hiddenRepos = 0
-		for r in allRepos {
-			if !r.shouldSync() {
-				hiddenRepos++
-			}
-		}
-		return allRepos.count > 0 && (hiddenRepos == allRepos.count)
-	}
-
 	class func interestedInIssues() -> Bool {
 		for r in Repo.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
 			if r.displayPolicyForIssues?.integerValue > 0 {
+				return true
+			}
+		}
+		return false
+	}
+
+	class func interestedInPrs() -> Bool {
+		for r in Repo.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
+			if r.displayPolicyForPrs?.integerValue > 0 {
 				return true
 			}
 		}

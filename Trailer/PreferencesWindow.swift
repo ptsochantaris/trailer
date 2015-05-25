@@ -108,10 +108,10 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		super.awakeFromNib()
 		delegate = self
 
-		allPrsSetting.addItemWithTitle("All PRs...")
+		allPrsSetting.addItemWithTitle("Set all PRs...")
 		allPrsSetting.addItemsWithTitles(RepoDisplayPolicy.labels)
 
-		allIssuesSetting.addItemWithTitle("All issues...")
+		allIssuesSetting.addItemWithTitle("Set all issues...")
 		allIssuesSetting.addItemsWithTitles(RepoDisplayPolicy.labels)
 
 		allNewPrsSetting.addItemsWithTitles(RepoDisplayPolicy.labels)
@@ -335,52 +335,36 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction func allPrsPolicySelected(sender: NSPopUpButton) {
 		let index = sender.indexOfSelectedItem - 1
-		if index < 0 {
-			return
-		}
+		if index < 0 { return }
 
 		for r in Repo.reposForFilter(repoFilter.stringValue) {
 			r.displayPolicyForPrs = index
-			r.dirty = index > 0
+			if index > 0 { r.resetSyncState() }
 		}
-		app.preferencesDirty = true
 		projectsTable.reloadData()
 		sender.selectItemAtIndex(0)
 		updateDisplayIssuesSetting()
-		Settings.possibleExport(nil)
 	}
 
 	@IBAction func allIssuesPolicySelected(sender: NSPopUpButton) {
 		let index = sender.indexOfSelectedItem - 1
-		if index < 0 {
-			return
-		}
+		if index < 0 { return }
 
 		for r in Repo.reposForFilter(repoFilter.stringValue) {
 			r.displayPolicyForIssues = index
-			r.dirty = index > 0
+			if index > 0 { r.resetSyncState() }
 		}
-		app.preferencesDirty = true
 		projectsTable.reloadData()
 		sender.selectItemAtIndex(0)
 		updateDisplayIssuesSetting()
-		Settings.possibleExport(nil)
 	}
 
 	private func updateDisplayIssuesSetting() {
 		DataManager.postProcessAllItems()
-		if Repo.interestedInIssues() {
-			for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
-				r.resetSyncState()
-			}
-			app.preferencesDirty = true
-		} else {
-			for i in DataItem.allItemsOfType("Issue", inMoc: mainObjectContext) as! [Issue] {
-				i.postSyncAction = PostSyncAction.Delete.rawValue
-			}
-			DataItem.nukeDeletedItemsInMoc(mainObjectContext)
-		}
+		app.preferencesDirty = true
 		app.deferredUpdateTimer.push()
+		DataManager.saveDB()
+		Settings.possibleExport(nil)
 	}
 
 	@IBAction func allNewPrsPolicySelected(sender: NSPopUpButton) {
@@ -904,10 +888,12 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 					cell.title = row==0 ? "Parent Repositories" : "Forked Repositories"
 					cell.enabled = false
 				} else {
+					cell.enabled = true
 					let r = repoForRow(row)
 					let repoName = r.fullName ?? "NoRepoName"
-					cell.title = (r.inaccessible?.boolValue ?? false) ? repoName + " (inaccessible)" : repoName
-					cell.enabled = true
+					let title = (r.inaccessible?.boolValue ?? false) ? repoName + " (inaccessible)" : repoName
+					let textColor = (row == tv.selectedRow) ? NSColor.selectedControlTextColor() : (r.shouldSync() ? NSColor.textColor() : NSColor.textColor().colorWithAlphaComponent(0.4))
+					cell.attributedStringValue = NSAttributedString(string: title, attributes: [NSForegroundColorAttributeName: textColor])
 				}
 			} else {
 				if let menuCell = cell as? NSPopUpButtonCell {
@@ -920,15 +906,22 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 						let r = repoForRow(row)
 						menuCell.enabled = true
 						menuCell.arrowPosition = NSPopUpArrowPosition.ArrowAtBottom
-						menuCell.addItemsWithTitles(RepoDisplayPolicy.labels)
-						let index = tableColumn?.identifier == "prs" ? (r.displayPolicyForPrs?.integerValue ?? 0) : (r.displayPolicyForIssues?.integerValue ?? 0)
-						menuCell.selectItemAtIndex(index)
+
+						var count = 0
 						let fontSize = NSFont.systemFontSizeForControlSize(NSControlSize.SmallControlSize)
-						if index == 0 {
-							menuCell.font = NSFont.systemFontOfSize(fontSize)
-						} else {
-							menuCell.font = NSFont.boldSystemFontOfSize(fontSize)
+						for label in RepoDisplayPolicy.labels {
+							let m = NSMenuItem()
+							let textColor = (row == tv.selectedRow) ? NSColor.selectedControlTextColor() : (count==0 ? NSColor.textColor().colorWithAlphaComponent(0.4) : NSColor.textColor())
+							m.attributedTitle = NSAttributedString(string: label, attributes: [
+								NSFontAttributeName: count==0 ? NSFont.systemFontOfSize(fontSize) : NSFont.boldSystemFontOfSize(fontSize),
+								NSForegroundColorAttributeName: textColor,
+								])
+							menuCell.menu?.addItem(m)
+							count++
 						}
+
+						let selectedIndex = tableColumn?.identifier == "prs" ? (r.displayPolicyForPrs?.integerValue ?? 0) : (r.displayPolicyForIssues?.integerValue ?? 0)
+						menuCell.selectItemAtIndex(selectedIndex)
 					}
 				}
 			}
@@ -981,10 +974,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 					} else if tableColumn?.identifier == "issues" {
 						r.displayPolicyForIssues = index
 					}
-					r.dirty = index>0
-					DataManager.saveDB()
-					app.preferencesDirty = true
-					Settings.possibleExport(nil)
+					if index > 0 { r.resetSyncState() }
 					updateDisplayIssuesSetting()
 				}
 			}

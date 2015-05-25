@@ -42,7 +42,7 @@ final class StatusItemView: NSView {
 
 	override func drawRect(dirtyRect: NSRect) {
 
-		if(app.prMenu.statusItem!.view==self) {
+		if app.prMenu.statusItem?.view==self {
 			app.prMenu.statusItem!.drawStatusBarBackgroundInRect(dirtyRect, withHighlight: highlighted)
 		} else {
 			app.issuesMenu.statusItem!.drawStatusBarBackgroundInRect(dirtyRect, withHighlight: highlighted)

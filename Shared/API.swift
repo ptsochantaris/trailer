@@ -550,7 +550,7 @@ final class API {
 
 			let apiServer = r.apiServer
 
-			if apiServer.syncIsGood {
+			if apiServer.syncIsGood && r.displayPolicyForPrs?.integerValue != RepoDisplayPolicy.Hide.rawValue {
 				let repoFullName = r.fullName ?? "NoRepoFullName"
 				getPagedDataInPath("/repos/\(repoFullName)/pulls", fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
 					perPageCallback: { [weak self] data, lastPage in
@@ -597,7 +597,7 @@ final class API {
 			}
 		}
 
-		if repos.count==0 || !Repo.interestedInIssues() {
+		if repos.count==0 {
 			callback()
 			return
 		}
@@ -613,7 +613,7 @@ final class API {
 
 			let apiServer = r.apiServer
 
-			if apiServer.syncIsGood {
+			if apiServer.syncIsGood && r.displayPolicyForIssues?.integerValue != RepoDisplayPolicy.Hide.rawValue {
 				let repoFullName = r.fullName ?? "NoRepoFullName"
 				getPagedDataInPath("/repos/\(repoFullName)/issues", fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
 					perPageCallback: { [weak self] data, lastPage in

@@ -296,14 +296,14 @@ final class DataManager : NSObject {
 			message = "There are no PRs matching this filter."
 		} else if openRequests > 0 {
 			message = "\(openRequests) PRs are hidden by your settings."
-		} else if Repo.allReposAreHiddenInMoc(mainObjectContext) {
+		} else if !Repo.interestedInPrs() && !Repo.interestedInIssues() {
 			color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
-			message = "All your watched repositories are maked as hidden, please unhide some!"
+			message = "All your watched repositories are marked as hidden, please enable issues or PRs for some of them."
 		} else if Repo.countVisibleReposInMoc(mainObjectContext)==0 {
 			color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
 			message = "You have no watched repositories, please add some to your watchlist and refresh in a little while."
 		} else if openRequests==0 {
-			message = "No open PRs in your visible repositories."
+			message = "No open PRs in your configured repositories."
 		}
 
 		return emptyMessage(message, color: color)
@@ -324,14 +324,14 @@ final class DataManager : NSObject {
 			message = "There are no issues matching this filter."
 		} else if openIssues > 0 {
 			message = "\(openIssues) issues are hidden by your settings."
-		} else if Repo.allReposAreHiddenInMoc(mainObjectContext) {
+		} else if !Repo.interestedInPrs() && !Repo.interestedInIssues() {
 			color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
-			message = "All your watched repositories are maked as hidden, please unhide some!"
+			message = "All your watched repositories are marked as hidden, please enable issues or PRs for some of them."
 		} else if Repo.countVisibleReposInMoc(mainObjectContext)==0 {
 			color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
 			message = "You have no watched repositories, please add some to your watchlist and refresh in a little while."
 		} else if openIssues==0 {
-			message = "No open issues in your visible repositories."
+			message = "No open issues in your configured repositories."
 		}
 
 		return emptyMessage(message, color: color)

@@ -765,7 +765,12 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 	func updatePrMenu() {
 
-		prMenu.showStatusItem()
+		if Repo.interestedInPrs() || !Repo.interestedInIssues() {
+			prMenu.showStatusItem()
+		} else {
+			prMenu.hideStatusItem()
+			return
+		}
 
 		var countString: String
 		var attributes: [String : AnyObject]
@@ -887,7 +892,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					fallthrough
 				case 124: // right
 					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
-					if Repo.interestedInIssues() {
+					if Repo.interestedInPrs() && Repo.interestedInIssues() {
 						if w == self!.prMenu {
 							self!.showMenu(self!.issuesMenu)
 						} else if w == self!.issuesMenu {
