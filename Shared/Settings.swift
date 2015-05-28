@@ -448,11 +448,6 @@ final class Settings {
 		set { set("MARK_UNMERGEABLE_ON_USER_SECTIONS_ONLY", newValue) }
 	}
 
-	class var countOnlyListedItems: Bool {
-		get { return get("COUNT_ONLY_LISTED_PRS") as? Bool ?? false }
-		set { set("COUNT_ONLY_LISTED_PRS", newValue) }
-	}
-
 	class var openPrAtFirstUnreadComment: Bool {
 		get { return get("OPEN_PR_AT_FIRST_UNREAD_COMMENT_KEY") as? Bool ?? false }
 		set { set("OPEN_PR_AT_FIRST_UNREAD_COMMENT_KEY", newValue) }
@@ -525,6 +520,11 @@ final class Settings {
 	}
 
 	////////////////////////////// DEFAULT TRUE
+
+    class var countOnlyListedItems: Bool {
+        get { return get("COUNT_ONLY_LISTED_PRS") as? Bool ?? true }
+        set { set("COUNT_ONLY_LISTED_PRS", newValue) }
+    }
 
 	class var checkForUpdatesAutomatically: Bool {
 		get { return get("UPDATE_CHECK_AUTO_KEY") as? Bool ?? true }

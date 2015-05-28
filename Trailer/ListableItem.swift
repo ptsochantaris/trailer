@@ -298,9 +298,10 @@ class ListableItem: DataItem {
 						_title.appendAttributedString(NSAttributedString(string: "\u{a0}", attributes: a))
 						_title.appendAttributedString(NSAttributedString(string: name, attributes: a))
 						_title.appendAttributedString(NSAttributedString(string: "\u{a0}", attributes: a))
-						if count < labelCount {
+						if count < labelCount-1 {
 							_title.appendAttributedString(NSAttributedString(string: " ", attributes: labelAttributes))
-						}
+                        }
+                        count++
 					}
 				}
 			}

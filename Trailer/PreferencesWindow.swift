@@ -172,7 +172,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		showStatusItems.integerValue = Settings.showStatusItems ? 1 : 0
 		makeStatusItemsSelectable.integerValue = Settings.makeStatusItemsSelectable ? 1 : 0
 		markUnmergeableOnUserSectionsOnly.integerValue = Settings.markUnmergeableOnUserSectionsOnly ? 1 : 0
-		countOnlyListedItems.integerValue = Settings.countOnlyListedItems ? 1 : 0
+		countOnlyListedItems.integerValue = Settings.countOnlyListedItems ? 0 : 1
 		openPrAtFirstUnreadComment.integerValue = Settings.openPrAtFirstUnreadComment ? 1 : 0
 		logActivityToConsole.integerValue = Settings.logActivityToConsole ? 1 : 0
 		showLabels.integerValue = Settings.showLabels ? 1 : 0
@@ -398,7 +398,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	@IBAction func countOnlyListedItemsSelected(sender: NSButton) {
-		Settings.countOnlyListedItems = (sender.integerValue==1)
+		Settings.countOnlyListedItems = (sender.integerValue==0)
 		DataManager.postProcessAllItems()
 		app.deferredUpdateTimer.push()
 	}

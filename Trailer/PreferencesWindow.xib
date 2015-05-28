@@ -524,7 +524,7 @@ user you can add more servers from the left.</string>
                                         <button id="rEz-q1-QZq">
                                             <rect key="frame" x="20" y="263" width="366" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Count only currently displayed items in the menubar" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="23T-vx-oJZ">
+                                            <buttonCell key="cell" type="check" title="Count all open items of synced repos in the menubar" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="23T-vx-oJZ">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>

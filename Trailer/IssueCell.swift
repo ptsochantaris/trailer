@@ -30,9 +30,8 @@ final class IssueCell: TrailerCell {
 		let showAvatar = !(issue.userAvatarUrl ?? "").isEmpty && !Settings.hideAvatars
 		if showAvatar { W -= AVATAR_SIZE+AVATAR_PADDING } else { W += 4.0 }
 
-		let drawingOptions = stringDrawingOptions
-		let titleHeight = ceil(_title.boundingRectWithSize(CGSizeMake(W, CGFloat.max), options: drawingOptions).size.height)
-		let subtitleHeight = ceil(_subtitle.boundingRectWithSize(CGSizeMake(W, CGFloat.max), options: drawingOptions).size.height+4.0)
+		let titleHeight = ceil(_title.boundingRectWithSize(CGSizeMake(W-4.0, CGFloat.max), options: stringDrawingOptions).size.height)
+		let subtitleHeight = ceil(_subtitle.boundingRectWithSize(CGSizeMake(W-4.0, CGFloat.max), options: stringDrawingOptions).size.height+4.0)
 
 		var statusRects = [NSValue]()
 		var statuses: [PRStatus]? = nil
