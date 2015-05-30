@@ -314,8 +314,8 @@
                                 <group width="1" alignment="center" verticalAlignment="bottom" id="7EC-U2-2Hw">
                                     <items>
                                         <label alignment="center" verticalAlignment="center" alpha="0.89999999999999991" text="Refreshed" numberOfLines="0" id="Qer-7L-pJ7">
-                                            <color key="textColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
-                                            <fontDescription key="font" type="system" pointSize="7"/>
+                                            <color key="textColor" red="0.20784313730000001" green="0.4823529412" blue="0.82352941180000006" alpha="1" colorSpace="calibratedRGB"/>
+                                            <fontDescription key="font" type="system" pointSize="8"/>
                                         </label>
                                     </items>
                                     <edgeInsets key="margins" left="17" right="0.0" top="0.0" bottom="0.0"/>
