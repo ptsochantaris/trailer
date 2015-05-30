@@ -4,6 +4,7 @@ import WatchKit
 final class SectionController: WKInterfaceController {
 
 	@IBOutlet weak var table: WKInterfaceTable!
+	private var selectedIndex: Int?
 
 	override func awakeWithContext(context: AnyObject?) {
 		super.awakeWithContext(context)
@@ -13,8 +14,14 @@ final class SectionController: WKInterfaceController {
 	}
 
 	override func willActivate() {
-		buildUI()
 		super.willActivate()
+		buildUI()
+		atNextEvent() { [weak self] in
+			if let i = self!.selectedIndex {
+				self!.table.scrollToRowAtIndex(i)
+				self!.selectedIndex = nil
+			}
+		}
 	}
 
 	@IBAction func clearMergedSelected() {
@@ -54,6 +61,7 @@ final class SectionController: WKInterfaceController {
 	}
 
 	override func table(table: WKInterfaceTable, didSelectRowAtIndex rowIndex: Int) {
+		selectedIndex = rowIndex
 		if let t = rowTypes[rowIndex] as? prEntry {
 			pushControllerWithName("ListController", context: [ SECTION_KEY: t.section.rawValue, TYPE_KEY: "PRS" ] )
 		} else if let t = rowTypes[rowIndex] as? issueEntry {

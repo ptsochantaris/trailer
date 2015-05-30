@@ -6,6 +6,7 @@ let shortDateFormatter = { () -> NSDateFormatter in
 	let d = NSDateFormatter()
 	d.dateStyle = NSDateFormatterStyle.ShortStyle
 	d.timeStyle = NSDateFormatterStyle.ShortStyle
+	d.doesRelativeDateFormatting = true
 	return d
 	}()
 
@@ -13,7 +14,7 @@ let bodyAttributes = { () -> [NSObject : AnyObject] in
 	let commentParagraph = NSMutableParagraphStyle()
 	commentParagraph.hyphenationFactor = 1
 	commentParagraph.alignment = NSTextAlignment.Justified
-	return [	NSFontAttributeName: UIFont.systemFontOfSize(11),
+	return [	NSFontAttributeName: UIFont.systemFontOfSize(12),
 		NSForegroundColorAttributeName: UIColor.whiteColor(),
 		NSParagraphStyleAttributeName: commentParagraph]
 	}()
@@ -22,8 +23,9 @@ final class PRDetailController: WKInterfaceController {
 
 	@IBOutlet weak var table: WKInterfaceTable!
 
-	var pullRequest: PullRequest?
-	var issue: Issue?
+	private var pullRequest: PullRequest?
+	private var issue: Issue?
+	private var selectedIndex: Int?
 
 	override func awakeWithContext(context: AnyObject?) {
 		super.awakeWithContext(context)
@@ -34,6 +36,7 @@ final class PRDetailController: WKInterfaceController {
 	}
 
 	override func willActivate() {
+		super.willActivate()
 		if let p = pullRequest {
 			mainObjectContext.refreshObject(p, mergeChanges: false)
 		}
@@ -41,7 +44,12 @@ final class PRDetailController: WKInterfaceController {
 			mainObjectContext.refreshObject(i, mergeChanges: false)
 		}
 		buildUI()
-		super.willActivate()
+		atNextEvent() { [weak self] in
+			if let i = self!.selectedIndex {
+				self!.table.scrollToRowAtIndex(i)
+				self!.selectedIndex = nil
+			}
+		}
 	}
 
 	@IBAction func refreshSelected() {
@@ -68,6 +76,7 @@ final class PRDetailController: WKInterfaceController {
 		let r: AnyObject? = table.rowControllerAtIndex(rowIndex)
 		if let c = r as? CommentRow, commentId = c.commentId
 		{
+			selectedIndex = rowIndex
 			presentControllerWithName("Command Controller", context: ["command": "opencomment", "id": commentId])
 		}
 	}

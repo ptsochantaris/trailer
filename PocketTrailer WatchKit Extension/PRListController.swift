@@ -7,9 +7,10 @@ final class PRListController: WKInterfaceController {
 	@IBOutlet weak var emptyLabel: WKInterfaceLabel!
 	@IBOutlet weak var table: WKInterfaceTable!
 
-	var itemsInSection: [AnyObject]!
-	var sectionIndex: Int!
-	var prs: Bool!
+	private var itemsInSection: [AnyObject]!
+	private var sectionIndex: Int!
+	private var prs: Bool!
+	private var selectedIndex: Int?
 
 	override func awakeWithContext(context: AnyObject?) {
 		super.awakeWithContext(context)
@@ -23,8 +24,14 @@ final class PRListController: WKInterfaceController {
 	}
 
 	override func willActivate() {
-		buildUI()
 		super.willActivate()
+		buildUI()
+		atNextEvent() { [weak self] in
+			if let i = self!.selectedIndex {
+				self!.table.scrollToRowAtIndex(i)
+				self!.selectedIndex = nil
+			}
+		}
 	}
 
 	@IBAction func markAllReadSelected() {
@@ -40,6 +47,7 @@ final class PRListController: WKInterfaceController {
 	}
 
 	override func table(table: WKInterfaceTable, didSelectRowAtIndex rowIndex: Int) {
+		selectedIndex = rowIndex
 		if prs==true {
 			pushControllerWithName("DetailController", context: [ PULL_REQUEST_KEY: itemsInSection[rowIndex] ])
 		} else {
