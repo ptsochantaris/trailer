@@ -9,6 +9,15 @@ let shortDateFormatter = { () -> NSDateFormatter in
 	return d
 	}()
 
+let bodyAttributes = { () -> [NSObject : AnyObject] in
+	let commentParagraph = NSMutableParagraphStyle()
+	commentParagraph.hyphenationFactor = 1
+	commentParagraph.alignment = NSTextAlignment.Justified
+	return [	NSFontAttributeName: UIFont.systemFontOfSize(11),
+		NSForegroundColorAttributeName: UIColor.whiteColor(),
+		NSParagraphStyleAttributeName: commentParagraph]
+	}()
+
 final class PRDetailController: WKInterfaceController {
 
 	@IBOutlet weak var table: WKInterfaceTable!
@@ -134,7 +143,9 @@ final class PRDetailController: WKInterfaceController {
 	private func setDisplayForBody(body: String?, unreadComments: Int, comments: [PRComment], startingAtIndex: Int) {
 		var index = startingAtIndex
 		if let b = body {
-			(table.rowControllerAtIndex(index++) as! LabelRow).labelL.setText(b)
+			(table.rowControllerAtIndex(index++) as! LabelRow).labelL.setAttributedText(NSAttributedString(string: b, attributes: bodyAttributes))
+		} else {
+			(table.rowControllerAtIndex(index++) as! LabelRow).labelL.setAttributedText(nil)
 		}
 		var unreadCount = unreadComments
 		for c in comments {
@@ -145,10 +156,14 @@ final class PRDetailController: WKInterfaceController {
 	private func setCommentRow(controller: CommentRow, comment: PRComment, inout unreadCount: Int) {
 		let date = comment.createdAt ?? NSDate()
 
+		controller.commentId = comment.objectID.URIRepresentation().absoluteString
 		controller.usernameL.setText("@" + (comment.userName?.uppercaseString ?? "(unknown)"))
 		controller.dateL.setText(shortDateFormatter.stringFromDate(date))
-		controller.commentL.setText(comment.body)
-		controller.commentId = comment.objectID.URIRepresentation().absoluteString
+		if let b = comment.body {
+			controller.commentL.setAttributedText(NSAttributedString(string: b, attributes: bodyAttributes))
+		} else {
+			controller.commentL.setAttributedText(nil)
+		}
 
 		if unreadCount > 0 {
 			unreadCount--
