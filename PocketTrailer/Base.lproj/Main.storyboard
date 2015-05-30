@@ -85,54 +85,70 @@
         <scene sceneID="smW-Zh-WAh">
             <objects>
                 <tableViewController title="Master" clearsSelectionOnViewWillAppear="NO" id="7bK-jq-Zjz" customClass="MasterViewController" customModule="Trailer" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="308" sectionHeaderHeight="10" sectionFooterHeight="10" id="r7i-6Z-zg0">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="110" sectionHeaderHeight="10" sectionFooterHeight="10" id="r7i-6Z-zg0">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="0.93725490196078431" green="0.93725490196078431" blue="0.95686274509803926" alpha="1" colorSpace="calibratedRGB"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" rowHeight="308" id="WCw-Qf-5nD" customClass="PRCell" customModule="Trailer" customModuleProvider="target">
+                            <tableViewCell contentMode="scaleToFill" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" selectionStyle="default" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" rowHeight="308" id="WCw-Qf-5nD" customClass="PRCell" customModule="Trailer" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="119" width="320" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="WCw-Qf-5nD" id="Ccv-UH-bok">
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" tableViewCell="WCw-Qf-5nD" id="Ccv-UH-bok">
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="750" placeholderIntrinsicWidth="50" placeholderIntrinsicHeight="50" text="Title" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Vv-dH-kVA" userLabel="TitleLabel">
-                                            <rect key="frame" x="10" y="10" width="580" height="181"/>
-                                            <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="16"/>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" placeholderIntrinsicWidth="50" placeholderIntrinsicHeight="50" usesAttributedText="YES" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Vv-dH-kVA" userLabel="TitleLabel">
+                                            <rect key="frame" x="10" y="10" width="580" height="175.5"/>
+                                            <attributedString key="attributedText">
+                                                <fragment content="Title">
+                                                    <attributes>
+                                                        <color key="NSColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                                        <font key="NSFont" size="16" name="HelveticaNeue"/>
+                                                        <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
+                                                    </attributes>
+                                                </fragment>
+                                            </attributedString>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dbg-hz-tPt" userLabel="Avatar">
-                                            <rect key="frame" x="10" y="195" width="50" height="50"/>
+                                            <rect key="frame" x="10" y="189.5" width="50" height="50"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="50" id="DHz-HD-pc2"/>
                                                 <constraint firstAttribute="height" constant="50" id="IhZ-E9-ELG"/>
                                             </constraints>
                                         </imageView>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="751" placeholderIntrinsicWidth="50" placeholderIntrinsicHeight="50" text="Description" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AQh-N4-Eak" userLabel="DescriptionLabel">
-                                            <rect key="frame" x="70" y="191" width="520" height="54"/>
-                                            <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="12"/>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="252" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" placeholderIntrinsicWidth="50" placeholderIntrinsicHeight="50" usesAttributedText="YES" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AQh-N4-Eak" userLabel="DescriptionLabel">
+                                            <rect key="frame" x="70" y="185.5" width="520" height="54"/>
+                                            <attributedString key="attributedText">
+                                                <fragment content="Description">
+                                                    <attributes>
+                                                        <color key="NSColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                                        <font key="NSFont" size="12" name="HelveticaNeue"/>
+                                                        <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
+                                                    </attributes>
+                                                </fragment>
+                                            </attributedString>
                                             <nil key="highlightedColor"/>
                                         </label>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="751" placeholderIntrinsicWidth="50" placeholderIntrinsicHeight="50" text="Statuses" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wDD-T8-hhR" userLabel="StatusLabel">
-                                            <rect key="frame" x="10" y="245" width="580" height="50"/>
-                                            <constraints>
-                                                <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="4" id="h4w-Z7-aq9"/>
-                                            </constraints>
-                                            <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="12"/>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="252" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" placeholderIntrinsicWidth="50" placeholderIntrinsicHeight="50" usesAttributedText="YES" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wDD-T8-hhR" userLabel="StatusLabel">
+                                            <rect key="frame" x="10" y="247.5" width="580" height="50"/>
+                                            <attributedString key="attributedText">
+                                                <fragment content="Statuses">
+                                                    <attributes>
+                                                        <color key="NSColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                                        <font key="NSFont" size="10" name="Courier"/>
+                                                        <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
+                                                    </attributes>
+                                                </fragment>
+                                            </attributedString>
                                             <nil key="highlightedColor"/>
-                                            <variation key="default">
-                                                <mask key="constraints">
-                                                    <exclude reference="h4w-Z7-aq9"/>
-                                                </mask>
-                                            </variation>
                                         </label>
                                     </subviews>
                                     <constraints>
                                         <constraint firstAttribute="trailing" secondItem="AQh-N4-Eak" secondAttribute="trailing" constant="10" id="12q-LP-jnA"/>
-                                        <constraint firstItem="wDD-T8-hhR" firstAttribute="top" relation="greaterThanOrEqual" secondItem="dbg-hz-tPt" secondAttribute="bottom" id="BRE-qK-Il3"/>
+                                        <constraint firstItem="wDD-T8-hhR" firstAttribute="top" relation="greaterThanOrEqual" secondItem="dbg-hz-tPt" secondAttribute="bottom" constant="8" id="BRE-qK-Il3"/>
                                         <constraint firstItem="AQh-N4-Eak" firstAttribute="top" secondItem="dbg-hz-tPt" secondAttribute="top" constant="-4" id="E1d-yH-pZX"/>
-                                        <constraint firstItem="wDD-T8-hhR" firstAttribute="top" secondItem="AQh-N4-Eak" secondAttribute="bottom" id="E4U-f8-fuT"/>
+                                        <constraint firstItem="wDD-T8-hhR" firstAttribute="top" secondItem="AQh-N4-Eak" secondAttribute="bottom" constant="8" id="E4U-f8-fuT"/>
                                         <constraint firstAttribute="trailing" secondItem="7Vv-dH-kVA" secondAttribute="trailing" constant="10" id="Fjg-5Q-GIv"/>
                                         <constraint firstAttribute="trailing" secondItem="wDD-T8-hhR" secondAttribute="trailing" constant="10" id="IKp-5J-Zt3"/>
                                         <constraint firstItem="dbg-hz-tPt" firstAttribute="leading" secondItem="Ccv-UH-bok" secondAttribute="leading" constant="10" id="JTr-OQ-e3m"/>
@@ -140,7 +156,7 @@
                                         <constraint firstItem="7Vv-dH-kVA" firstAttribute="leading" secondItem="Ccv-UH-bok" secondAttribute="leading" constant="10" id="kZt-X7-cDG"/>
                                         <constraint firstItem="wDD-T8-hhR" firstAttribute="leading" secondItem="Ccv-UH-bok" secondAttribute="leading" constant="10" id="pDg-O7-zIk"/>
                                         <constraint firstItem="AQh-N4-Eak" firstAttribute="top" secondItem="7Vv-dH-kVA" secondAttribute="bottom" id="rrt-8p-u3r"/>
-                                        <constraint firstAttribute="bottomMargin" secondItem="wDD-T8-hhR" secondAttribute="bottom" constant="4" id="vn5-7Z-GKj"/>
+                                        <constraint firstAttribute="bottomMargin" secondItem="wDD-T8-hhR" secondAttribute="bottom" constant="2" id="vn5-7Z-GKj"/>
                                         <constraint firstItem="7Vv-dH-kVA" firstAttribute="top" secondItem="Ccv-UH-bok" secondAttribute="top" constant="10" id="yxl-jY-T7O"/>
                                     </constraints>
                                 </tableViewCellContentView>
@@ -150,6 +166,9 @@
                                     <outlet property="_image" destination="dbg-hz-tPt" id="ip5-bc-vaF"/>
                                     <outlet property="_statuses" destination="wDD-T8-hhR" id="yxt-cA-JJx"/>
                                     <outlet property="_title" destination="7Vv-dH-kVA" id="eZa-b3-NJm"/>
+                                    <outlet property="statusToAvatarDistance" destination="BRE-qK-Il3" id="wyI-kq-ARC"/>
+                                    <outlet property="statusToBottomDistance" destination="vn5-7Z-GKj" id="LSG-Ma-CI5"/>
+                                    <outlet property="statusToDescriptionDistance" destination="E4U-f8-fuT" id="uZW-Ce-6Qb"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>

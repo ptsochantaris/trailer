@@ -573,12 +573,18 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	private func configureCell(cell: UITableViewCell, atIndexPath: NSIndexPath) {
+		let c = cell as! PRCell
+
+		c._statuses.preferredMaxLayoutWidth = tableView.bounds.size.width - 20
+		c._title.preferredMaxLayoutWidth = tableView.bounds.size.width - 20
+		c._description.preferredMaxLayoutWidth = tableView.bounds.size.width - 80
+
 		if viewMode == MasterViewMode.PullRequests {
 			let pr = fetchedResultsController.objectAtIndexPath(atIndexPath) as! PullRequest
-			(cell as! PRCell).setPullRequest(pr)
+			c.setPullRequest(pr)
 		} else {
 			let i = fetchedResultsController.objectAtIndexPath(atIndexPath) as! Issue
-			(cell as! PRCell).setIssue(i)
+			c.setIssue(i)
 		}
 	}
 

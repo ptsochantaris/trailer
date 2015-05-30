@@ -907,7 +907,7 @@ user you can add more servers from the left.</string>
                                                     <button id="UGp-d4-lNW">
                                                         <rect key="frame" x="10" y="267" width="317" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Display comment badges &amp; alerts for all items" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="z6Z-nh-Y6O">
+                                                        <buttonCell key="cell" type="check" title="Comment badges &amp; alerts for items in &quot;all&quot;" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="z6Z-nh-Y6O">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>

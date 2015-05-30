@@ -95,10 +95,8 @@ final class GlanceController: WKInterfaceController {
 				d.timeStyle = NSDateFormatterStyle.ShortStyle
 				d.doesRelativeDateFormatting = true
 				lastUpdate.setText("Refreshed "+d.stringFromDate(lastRefresh))
-				lastUpdate.setAlpha(0.7)
 			} else {
 				lastUpdate.setText("Not refreshed yet")
-				lastUpdate.setAlpha(0.3)
 			}
 		}
 

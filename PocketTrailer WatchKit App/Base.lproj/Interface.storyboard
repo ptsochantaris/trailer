@@ -294,6 +294,15 @@
                     <items>
                         <group alignment="left" layout="vertical" spacing="3" id="gv7-I2-MZq">
                             <items>
+                                <group width="1" alignment="center" id="7EC-U2-2Hw">
+                                    <items>
+                                        <label alignment="center" verticalAlignment="center" text="Refreshed" numberOfLines="0" id="Qer-7L-pJ7">
+                                            <color key="textColor" red="0.24918844710512633" green="0.58109372512270352" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                            <fontDescription key="font" type="system" weight="thin" pointSize="7"/>
+                                        </label>
+                                    </items>
+                                    <edgeInsets key="margins" left="17" right="0.0" top="0.0" bottom="0.0"/>
+                                </group>
                                 <group alignment="center" verticalAlignment="center" id="qSU-4X-8av">
                                     <items>
                                         <group alignment="center" verticalAlignment="center" radius="10" spacing="4" id="aEt-R2-txt">
@@ -308,15 +317,6 @@
                                             <color key="backgroundColor" red="0.20784313730000001" green="0.4823529412" blue="0.82352941180000006" alpha="1" colorSpace="calibratedRGB"/>
                                             <edgeInsets key="margins" left="6" right="6" top="0.0" bottom="0.0"/>
                                         </group>
-                                    </items>
-                                    <edgeInsets key="margins" left="17" right="0.0" top="0.0" bottom="0.0"/>
-                                </group>
-                                <group width="1" alignment="center" verticalAlignment="bottom" id="7EC-U2-2Hw">
-                                    <items>
-                                        <label alignment="center" verticalAlignment="center" alpha="0.89999999999999991" text="Refreshed" numberOfLines="0" id="Qer-7L-pJ7">
-                                            <color key="textColor" red="0.20784313730000001" green="0.4823529412" blue="0.82352941180000006" alpha="1" colorSpace="calibratedRGB"/>
-                                            <fontDescription key="font" type="system" pointSize="8"/>
-                                        </label>
                                     </items>
                                     <edgeInsets key="margins" left="17" right="0.0" top="0.0" bottom="0.0"/>
                                 </group>

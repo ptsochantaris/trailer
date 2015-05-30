@@ -1,6 +1,16 @@
 
 import UIKit
 
+let statusAttributes: [NSObject : AnyObject] = {
+	let paragraphStyle = NSMutableParagraphStyle()
+	paragraphStyle.paragraphSpacing = 6.0
+
+	return [
+		NSFontAttributeName: UIFont(name: "Courier", size: 10)!,
+		NSParagraphStyleAttributeName: paragraphStyle
+	]
+}()
+
 final class PRCell: UITableViewCell {
 
 	private let unreadCount = CountLabel(frame: CGRectZero)
@@ -12,6 +22,9 @@ final class PRCell: UITableViewCell {
 	@IBOutlet weak var _title: UILabel!
 	@IBOutlet weak var _description: UILabel!
 	@IBOutlet weak var _statuses: UILabel!
+	@IBOutlet weak var statusToAvatarDistance: NSLayoutConstraint!
+	@IBOutlet weak var statusToDescriptionDistance: NSLayoutConstraint!
+	@IBOutlet weak var statusToBottomDistance: NSLayoutConstraint!
 
 	override func awakeFromNib() {
 		unreadCount.textColor = UIColor.whiteColor()
@@ -24,52 +37,42 @@ final class PRCell: UITableViewCell {
 		bg.backgroundColor = UIColor(red: 0.82, green: 0.88, blue: 0.97, alpha: 1.0)
 		selectedBackgroundView = bg
 
+		contentView.addConstraints([
+
+			NSLayoutConstraint(item: _image,
+				attribute: NSLayoutAttribute.CenterX,
+				relatedBy: NSLayoutRelation.Equal,
+				toItem: readCount,
+				attribute: NSLayoutAttribute.CenterX,
+				multiplier: 1,
+				constant: -23),
+
+			NSLayoutConstraint(item: _image,
+				attribute: NSLayoutAttribute.CenterY,
+				relatedBy: NSLayoutRelation.Equal,
+				toItem: readCount,
+				attribute: NSLayoutAttribute.CenterY,
+				multiplier: 1,
+				constant: -23),
+
+			NSLayoutConstraint(item: _image,
+				attribute: NSLayoutAttribute.CenterX,
+				relatedBy: NSLayoutRelation.Equal,
+				toItem: unreadCount,
+				attribute: NSLayoutAttribute.CenterX,
+				multiplier: 1,
+				constant: 23),
+
+			NSLayoutConstraint(item: _image,
+				attribute: NSLayoutAttribute.CenterY,
+				relatedBy: NSLayoutRelation.Equal,
+				toItem: unreadCount,
+				attribute: NSLayoutAttribute.CenterY,
+				multiplier: 1,
+				constant: 23)
+			])
+
 		NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("networkStateChanged"), name: kReachabilityChangedNotification, object: nil)
-	}
-
-	private var needsConstraints = true
-
-	override func updateConstraints() {
-
-		if needsConstraints {
-			needsConstraints = false
-
-			contentView.addConstraints([
-
-				NSLayoutConstraint(item: _image,
-					attribute: NSLayoutAttribute.CenterX,
-					relatedBy: NSLayoutRelation.Equal,
-					toItem: readCount,
-					attribute: NSLayoutAttribute.CenterX,
-					multiplier: 1,
-					constant: -23),
-
-				NSLayoutConstraint(item: _image,
-					attribute: NSLayoutAttribute.CenterY,
-					relatedBy: NSLayoutRelation.Equal,
-					toItem: readCount,
-					attribute: NSLayoutAttribute.CenterY,
-					multiplier: 1,
-					constant: -23),
-
-				NSLayoutConstraint(item: _image,
-					attribute: NSLayoutAttribute.CenterX,
-					relatedBy: NSLayoutRelation.Equal,
-					toItem: unreadCount,
-					attribute: NSLayoutAttribute.CenterX,
-					multiplier: 1,
-					constant: 23),
-
-				NSLayoutConstraint(item: _image,
-					attribute: NSLayoutAttribute.CenterY,
-					relatedBy: NSLayoutRelation.Equal,
-					toItem: unreadCount,
-					attribute: NSLayoutAttribute.CenterY,
-					multiplier: 1,
-					constant: 23)
-				])
-		}
-		super.updateConstraints()
 	}
 
 	func networkStateChanged() {
@@ -89,29 +92,20 @@ final class PRCell: UITableViewCell {
 		let detailFont = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
 		_title.attributedText = pullRequest.titleWithFont(_title.font, labelFont: detailFont.fontWithSize(detailFont.pointSize-2), titleColor: UIColor.darkTextColor())
 		_description.attributedText = pullRequest.subtitleWithFont(detailFont, lightColor: UIColor.lightGrayColor(), darkColor: UIColor.darkGrayColor())
+
+		setCountsAndImage(pullRequest)
+
 		var statusText : NSMutableAttributedString?
 		var statusCount = 0
 		if Settings.showStatusItems {
 			let statusItems = pullRequest.displayedStatuses()
 			statusCount = statusItems.count
-			if statusCount > 0 {
-
-				let paragraphStyle = NSMutableParagraphStyle()
-				paragraphStyle.headIndent = 103.0
-				paragraphStyle.paragraphSpacing = 6.0
-
-				let statusAttributes = [
-					NSFontAttributeName: UIFont(name: "Courier", size: 10)!,
-					NSParagraphStyleAttributeName: paragraphStyle]
-
+			while statusCount > 0 {
 				statusText = NSMutableAttributedString()
-				statusText?.appendAttributedString(NSAttributedString(string: "\n", attributes: statusAttributes))
-
 				for status in statusItems {
 					var lineAttributes = statusAttributes
 					lineAttributes[NSForegroundColorAttributeName] = status.colorForDisplay()
-					let text = status.displayText()
-					statusText?.appendAttributedString(NSAttributedString(string: text, attributes: lineAttributes))
+					statusText?.appendAttributedString(NSAttributedString(string: status.displayText(), attributes: lineAttributes))
 					if --statusCount > 0 {
 						statusText?.appendAttributedString(NSAttributedString(string: "\n", attributes: lineAttributes))
 					}
@@ -120,11 +114,15 @@ final class PRCell: UITableViewCell {
 		}
 		_statuses.attributedText = statusText
 
-		setCountsAndImage(pullRequest)
-
 		if let statusString = statusText?.string {
+			statusToAvatarDistance.constant = 8.0
+			statusToDescriptionDistance.constant = 8.0
+			statusToBottomDistance.constant = 2.0
 			accessibilityLabel = "\(pullRequest.accessibleTitle()), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(pullRequest.accessibleSubtitle()). \(statusCount) statuses: \(statusString)"
 		} else {
+			statusToAvatarDistance.constant = 0.0
+			statusToDescriptionDistance.constant = 0.0
+			statusToBottomDistance.constant = 0.0
 			accessibilityLabel = "\(pullRequest.accessibleTitle()), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(pullRequest.accessibleSubtitle())"
 		}
 	}
@@ -182,15 +180,15 @@ final class PRCell: UITableViewCell {
 
 	override func setSelected(selected: Bool, animated: Bool) {
 		super.setSelected(selected, animated:animated)
-		tone(selected)
+		tone()
 	}
 
 	override func setHighlighted(highlighted: Bool, animated: Bool) {
 		super.setHighlighted(highlighted, animated:animated)
-		tone(highlighted)
+		tone()
 	}
 
-	func tone(tone: Bool)
+	func tone()
 	{
 		unreadCount.backgroundColor = UIColor.redColor()
 		readCount.backgroundColor = UIColor(white: 0.9, alpha: 1.0)
