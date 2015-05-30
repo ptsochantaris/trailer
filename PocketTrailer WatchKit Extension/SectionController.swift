@@ -5,46 +5,31 @@ final class SectionController: WKInterfaceController {
 
 	@IBOutlet weak var table: WKInterfaceTable!
 
-	static var stateIsDirty = false
-
 	override func awakeWithContext(context: AnyObject?) {
 		super.awakeWithContext(context)
 
 		dataReadonly = true
 		Settings.clearCache()
-
-		buildUI()
 	}
 
 	override func willActivate() {
-		if SectionController.stateIsDirty {
-			buildUI()
-			SectionController.stateIsDirty = false
-		}
+		buildUI()
 		super.willActivate()
 	}
 
-	override func didDeactivate() {
-		super.didDeactivate()
-	}
-
 	@IBAction func clearMergedSelected() {
-		SectionController.stateIsDirty = true
 		presentControllerWithName("Command Controller", context: ["command": "clearAllMerged"])
 	}
 
 	@IBAction func clearClosedSelected() {
-		SectionController.stateIsDirty = true
 		presentControllerWithName("Command Controller", context: ["command": "clearAllClosed"])
 	}
 
 	@IBAction func markAllReadSelected() {
-		SectionController.stateIsDirty = true
 		presentControllerWithName("Command Controller", context: ["command": "markEverythingRead"])
 	}
 
 	@IBAction func refreshSelected() {
-		SectionController.stateIsDirty = true
 		presentControllerWithName("Command Controller", context: ["command": "refresh"])
 	}
 
@@ -69,33 +54,42 @@ final class SectionController: WKInterfaceController {
 	}
 
 	override func table(table: WKInterfaceTable, didSelectRowAtIndex rowIndex: Int) {
-		var ri = rowIndex
-		var type = "PRS"
-		if Repo.interestedInIssues() {
-			if ri >= boundaryIndex {
-				ri -= boundaryIndex
-				type = "ISSUES"
-			}
+		if let t = rowTypes[rowIndex] as? prEntry {
+			pushControllerWithName("ListController", context: [ SECTION_KEY: t.section.rawValue, TYPE_KEY: "PRS" ] )
+		} else if let t = rowTypes[rowIndex] as? issueEntry {
+			pushControllerWithName("ListController", context: [ SECTION_KEY: t.section.rawValue, TYPE_KEY: "ISSUES" ] )
 		}
-		pushControllerWithName("ListController", context: [ SECTION_KEY: ri, TYPE_KEY: type ] )
 	}
 
 	private var boundaryIndex:Int = 0
+    private var rowTypes = [AnyObject]()
 
 	private func buildUI() {
 
-		var rowTypes = [AnyObject]()
+		rowTypes.removeAll(keepCapacity: false)
+
+		func appendNonZeroPrs(s: PullRequestSection) {
+			if PullRequest.countRequestsInSection(s, moc: mainObjectContext) > 0 {
+				rowTypes.append(prEntry(s))
+			}
+		}
+
+		func appendNonZeroIssues(s: PullRequestSection) {
+			if Issue.countIssuesInSection(s, moc: mainObjectContext) > 0 {
+				rowTypes.append(issueEntry(s))
+			}
+		}
 
 		let totalPrs = PullRequest.countAllRequestsInMoc(mainObjectContext)
 		if totalPrs==0 {
 			rowTypes.append(attributedTitleEntry(DataManager.reasonForEmptyWithFilter(nil)))
 		} else {
-			rowTypes.append(titleEntry("\(totalPrs) PULL REQUESTS"))
-			rowTypes.append(prEntry(PullRequestSection.Mine))
-			rowTypes.append(prEntry(PullRequestSection.Participated))
-			rowTypes.append(prEntry(PullRequestSection.Merged))
-			rowTypes.append(prEntry(PullRequestSection.Closed))
-			rowTypes.append(prEntry(PullRequestSection.All))
+			rowTypes.append(titleEntry(totalPrs==1 ? "1 PULL REQUEST" : "\(totalPrs) PULL REQUESTS"))
+			appendNonZeroPrs(PullRequestSection.Mine)
+			appendNonZeroPrs(PullRequestSection.Participated)
+			appendNonZeroPrs(PullRequestSection.Merged)
+			appendNonZeroPrs(PullRequestSection.Closed)
+			appendNonZeroPrs(PullRequestSection.All)
 		}
 
 		boundaryIndex = rowTypes.count
@@ -105,12 +99,12 @@ final class SectionController: WKInterfaceController {
 			if totalIssues==0 {
 				rowTypes.append(attributedTitleEntry(DataManager.reasonForEmptyIssuesWithFilter(nil)))
 			} else {
-				rowTypes.append(titleEntry("\(totalIssues) ISSUES"))
-				rowTypes.append(issueEntry(PullRequestSection.Mine))
-				rowTypes.append(issueEntry(PullRequestSection.Participated))
-				rowTypes.append(issueEntry(PullRequestSection.Merged))
-				rowTypes.append(issueEntry(PullRequestSection.Closed))
-				rowTypes.append(issueEntry(PullRequestSection.All))
+				rowTypes.append(titleEntry(totalIssues==1 ? "1 ISSUE" : "\(totalIssues) ISSUES"))
+				appendNonZeroIssues(PullRequestSection.Mine)
+				appendNonZeroIssues(PullRequestSection.Participated)
+				appendNonZeroIssues(PullRequestSection.Merged)
+				appendNonZeroIssues(PullRequestSection.Closed)
+				appendNonZeroIssues(PullRequestSection.All)
 			}
 		}
 

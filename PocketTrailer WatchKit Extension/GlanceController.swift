@@ -48,7 +48,6 @@ final class GlanceController: WKInterfaceController {
     }
 
     override func willActivate() {
-        super.willActivate()
 
 		dataReadonly = true
 		Settings.clearCache()
@@ -94,17 +93,14 @@ final class GlanceController: WKInterfaceController {
 				let d = NSDateFormatter()
 				d.dateStyle = NSDateFormatterStyle.ShortStyle
 				d.timeStyle = NSDateFormatterStyle.ShortStyle
-				lastUpdate.setText("Updated "+d.stringFromDate(lastRefresh))
+				lastUpdate.setText("Refreshed "+d.stringFromDate(lastRefresh))
 				lastUpdate.setAlpha(0.7)
 			} else {
 				lastUpdate.setText("Not updated yet")
 				lastUpdate.setAlpha(0.3)
 			}
 		}
-    }
 
-    override func didDeactivate() {
-        super.didDeactivate()
+		super.willActivate()
     }
-
 }

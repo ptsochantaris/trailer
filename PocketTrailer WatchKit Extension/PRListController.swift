@@ -7,12 +7,8 @@ final class PRListController: WKInterfaceController {
 	@IBOutlet weak var emptyLabel: WKInterfaceLabel!
 	@IBOutlet weak var table: WKInterfaceTable!
 
-	static var stateIsDirty = false
-
 	var itemsInSection: [AnyObject]!
-
 	var sectionIndex: Int!
-
 	var prs: Bool!
 
 	override func awakeWithContext(context: AnyObject?) {
@@ -24,25 +20,14 @@ final class PRListController: WKInterfaceController {
 		prs = ((c[TYPE_KEY] as! String)=="PRS")
 
 		setTitle(PullRequestSection.watchMenuTitles[sectionIndex])
-
-		buildUI()
 	}
 
 	override func willActivate() {
-		if PRListController.stateIsDirty {
-			buildUI()
-			PRListController.stateIsDirty = false
-		}
+		buildUI()
 		super.willActivate()
 	}
 
-	override func didDeactivate() {
-		super.didDeactivate()
-	}
-
 	@IBAction func markAllReadSelected() {
-		PRListController.stateIsDirty = true
-		SectionController.stateIsDirty = true
 		if prs==true {
 			presentControllerWithName("Command Controller", context: ["command": "markAllPrsRead", "sectionIndex": sectionIndex!])
 		} else {
@@ -51,8 +36,6 @@ final class PRListController: WKInterfaceController {
 	}
 
 	@IBAction func refreshSelected() {
-		PRListController.stateIsDirty = true
-		SectionController.stateIsDirty = true
 		presentControllerWithName("Command Controller", context: ["command": "refresh"])
 	}
 

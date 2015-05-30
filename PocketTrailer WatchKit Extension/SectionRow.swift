@@ -12,7 +12,6 @@ final class SectionRow: NSObject {
 
         let count = PullRequest.countRequestsInSection(section, moc: mainObjectContext)
         titleL.setText("\(count) \(section.watchMenuName().uppercaseString)")
-        group.setAlpha(count==0 ? 0.3 : 1.0)
 
         let unreadCount = PullRequest.badgeCountInSection(section, moc: mainObjectContext)
         countL.setText("\(unreadCount)")
@@ -23,7 +22,6 @@ final class SectionRow: NSObject {
 
 		let count = Issue.countIssuesInSection(section, moc: mainObjectContext)
 		titleL.setText("\(count) \(section.watchMenuName().uppercaseString)")
-		group.setAlpha(count==0 ? 0.3 : 1.0)
 
 		let unreadCount = Issue.badgeCountInSection(section, moc: mainObjectContext)
 		countL.setText("\(unreadCount)")

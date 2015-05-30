@@ -457,20 +457,46 @@ private func sharedFilesDirectory() -> NSURL {
 func addStorePath(sqlStore: NSURL) -> Bool {
 	var error:NSError?
 
-	if dataReadonly && !NSFileManager.defaultManager().fileExistsAtPath(sqlStore.path!) {
-		let tempStore = _persistentStoreCoordinator?.addPersistentStoreWithType(NSSQLiteStoreType,
-			configuration: nil,
-			URL: sqlStore,
-			options: nil,
-			error: &error)
-		if error != nil || tempStore == nil {
-			DLog("Error while creating DB store before mounting readonly %@", error)
-			return false
-		} else {
-			_persistentStoreCoordinator?.removePersistentStore(tempStore!, error: &error)
-			if error != nil {
-				DLog("Error while unmounting newly created DB store before mounting readonly %@",error)
+	if dataReadonly {
+		if NSFileManager.defaultManager().fileExistsAtPath(sqlStore.path!) { // may need migration
+
+			if let m = NSPersistentStoreCoordinator.metadataForPersistentStoreOfType(NSSQLiteStoreType, URL: sqlStore, error: nil)
+				where _persistentStoreCoordinator?.managedObjectModel.isConfiguration(nil, compatibleWithStoreMetadata: m) == false {
+
+					let tempStore = _persistentStoreCoordinator?.addPersistentStoreWithType(NSSQLiteStoreType,
+						configuration: nil,
+						URL: sqlStore,
+						options: [
+							NSMigratePersistentStoresAutomaticallyOption: true,
+							NSInferMappingModelAutomaticallyOption: true],
+						error: &error)
+					if error != nil || tempStore == nil {
+						DLog("Error while migrating DB store before mounting readonly %@", error)
+						return false
+					} else {
+						_persistentStoreCoordinator?.removePersistentStore(tempStore!, error: &error)
+						if error != nil {
+							DLog("Error while unmounting newly migrated DB store before mounting readonly %@",error)
+							return false
+						}
+					}
+			}
+		} else { // may need creating
+
+			let tempStore = _persistentStoreCoordinator?.addPersistentStoreWithType(NSSQLiteStoreType,
+				configuration: nil,
+				URL: sqlStore,
+				options: nil,
+				error: &error)
+			if error != nil || tempStore == nil {
+				DLog("Error while creating DB store before mounting readonly %@", error)
 				return false
+			} else {
+				_persistentStoreCoordinator?.removePersistentStore(tempStore!, error: &error)
+				if error != nil {
+					DLog("Error while unmounting newly created DB store before mounting readonly %@",error)
+					return false
+				}
 			}
 		}
 	}
