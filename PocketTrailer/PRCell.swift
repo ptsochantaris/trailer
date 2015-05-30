@@ -115,9 +115,9 @@ final class PRCell: UITableViewCell {
 		_statuses.attributedText = statusText
 
 		if let statusString = statusText?.string {
-			statusToAvatarDistance.constant = 8.0
-			statusToDescriptionDistance.constant = 8.0
-			statusToBottomDistance.constant = 2.0
+			statusToAvatarDistance.constant = 9.0
+			statusToDescriptionDistance.constant = 9.0
+			statusToBottomDistance.constant = 4.0
 			accessibilityLabel = "\(pullRequest.accessibleTitle()), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(pullRequest.accessibleSubtitle()). \(statusCount) statuses: \(statusString)"
 		} else {
 			statusToAvatarDistance.constant = 0.0
