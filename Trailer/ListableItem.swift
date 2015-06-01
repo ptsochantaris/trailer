@@ -36,6 +36,11 @@ class ListableItem: DataItem {
 	@NSManaged var comments: Set<PRComment>
 	@NSManaged var labels: Set<PRLabel>
 
+	override func resetSyncState() {
+		super.resetSyncState()
+		repo.resetSyncState()
+	}
+
 	override func prepareForDeletion() {
 		api.refreshesSinceLastLabelsCheck[objectID] = nil
 		api.refreshesSinceLastStatusCheck[objectID] = nil

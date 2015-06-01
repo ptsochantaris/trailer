@@ -237,7 +237,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		api.resetAllLabelChecks()
 		if Settings.showLabels {
 			for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
-				r.resetSyncState()
 				for i in r.issues {
 					i.resetSyncState()
 				}
@@ -342,7 +341,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 		for r in Repo.reposForFilter(repoFilter.stringValue) {
 			r.displayPolicyForPrs = index
-			if index > 0 { r.resetSyncState() }
+			if index != RepoDisplayPolicy.Hide.rawValue { r.resetSyncState() }
 		}
 		projectsTable.reloadData()
 		sender.selectItemAtIndex(0)
@@ -355,7 +354,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 		for r in Repo.reposForFilter(repoFilter.stringValue) {
 			r.displayPolicyForIssues = index
-			if index > 0 { r.resetSyncState() }
+			if index != RepoDisplayPolicy.Hide.rawValue { r.resetSyncState() }
 		}
 		projectsTable.reloadData()
 		sender.selectItemAtIndex(0)
@@ -977,7 +976,9 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 					} else if tableColumn?.identifier == "issues" {
 						r.displayPolicyForIssues = index
 					}
-					if index > 0 { r.resetSyncState() }
+					if index != RepoDisplayPolicy.Hide.rawValue {
+						r.resetSyncState()
+					}
 					updateDisplayIssuesSetting()
 				}
 			}

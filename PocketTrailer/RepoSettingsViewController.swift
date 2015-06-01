@@ -69,21 +69,27 @@ class RepoSettingsViewController: UITableViewController {
 				allPrsIndex = indexPath.row
 				for r in Repo.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
 					r.displayPolicyForPrs = allPrsIndex
+					if allPrsIndex != RepoDisplayPolicy.Hide.rawValue {
+						r.resetSyncState()
+					}
 				}
 			} else {
 				allIssuesIndex = indexPath.row
 				for r in Repo.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
 					r.displayPolicyForIssues = allIssuesIndex
+					if allIssuesIndex != RepoDisplayPolicy.Hide.rawValue {
+						r.resetSyncState()
+					}
 				}
 			}
 		} else if indexPath.section == 0 {
 			repo?.displayPolicyForPrs = indexPath.row
-			if indexPath.row > 0 {
+			if indexPath.row != RepoDisplayPolicy.Hide.rawValue {
 				repo?.resetSyncState()
 			}
 		} else {
 			repo?.displayPolicyForIssues = indexPath.row
-			if indexPath.row > 0 {
+			if indexPath.row != RepoDisplayPolicy.Hide.rawValue {
 				repo?.resetSyncState()
 			}
 		}

@@ -348,7 +348,6 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				api.resetAllLabelChecks()
 				if Settings.showLabels {
 					for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
-						r.resetSyncState()
 						for i in r.issues {
 							i.resetSyncState()
 						}

@@ -11,6 +11,7 @@ class DataItem: NSManagedObject {
 
 	func resetSyncState() {
 		updatedAt = never()
+		apiServer.resetSyncState()
 	}
 
 	class func allItemsOfType(type: String, inMoc: NSManagedObjectContext) -> [DataItem] {
