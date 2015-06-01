@@ -53,8 +53,10 @@ final class DataManager : NSObject {
 		}
 
 		DLog("Marking all repos as dirty")
+		ApiServer.resetSyncOfEverything()
+
+		DLog("Migrating display policies")
 		for r in DataItem.allItemsOfType("Repo", inMoc:mainObjectContext) as! [Repo] {
-			r.resetSyncState()
 			if let markedAsHidden = r.hidden?.boolValue where markedAsHidden == true {
 				r.displayPolicyForPrs = RepoDisplayPolicy.Hide.rawValue
 				r.displayPolicyForIssues = RepoDisplayPolicy.Hide.rawValue
@@ -264,10 +266,7 @@ final class DataManager : NSObject {
 
 	class func postMigrationTasks() {
 		if _justMigrated {
-			DLog("FORCING ALL PRS TO BE REFETCHED")
-			for p in DataItem.allItemsOfType("PullRequest", inMoc:mainObjectContext) as! [PullRequest] {
-				p.resetSyncState()
-			}
+			ApiServer.resetSyncOfEverything()
 			_justMigrated = false
 		}
 	}

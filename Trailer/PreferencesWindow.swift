@@ -234,14 +234,10 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		Settings.showLabels = (sender.integerValue==1)
 		app.deferredUpdateTimer.push()
 		updateLabelOptions()
+
 		api.resetAllLabelChecks()
 		if Settings.showLabels {
-			for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
-				for i in r.issues {
-					i.resetSyncState()
-				}
-			}
-			app.preferencesDirty = true
+			ApiServer.resetSyncOfEverything()
 		}
 	}
 
@@ -419,10 +415,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 		api.resetAllStatusChecks()
 		if Settings.showStatusItems {
-			for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
-				r.resetSyncState()
-			}
-			app.preferencesDirty = true
+			ApiServer.resetSyncOfEverything()
 		}
 	}
 

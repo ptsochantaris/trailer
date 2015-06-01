@@ -36,6 +36,19 @@ final class ApiServer: NSManagedObject {
 		return !(authToken ?? "").isEmpty
 	}
 
+	class func resetSyncOfEverything() {
+		DLog("RESETTING SYNC STATE OF ALL ITEMS")
+		for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
+			for p in r.pullRequests {
+				p.resetSyncState()
+			}
+			for i in r.issues {
+				i.resetSyncState()
+			}
+		}
+		app.preferencesDirty = true
+	}
+
 	class func insertNewServerInMoc(moc: NSManagedObjectContext) -> ApiServer {
 		let githubServer: ApiServer = NSEntityDescription.insertNewObjectForEntityForName("ApiServer", inManagedObjectContext: moc) as! ApiServer
 		githubServer.createdAt = NSDate()
@@ -135,6 +148,7 @@ final class ApiServer: NSManagedObject {
 	}
 
 	func resetSyncState() {
+		app.lastRepoCheck = never()
 		lastSyncSucceeded = true
 		latestReceivedEventDateProcessed = never()
 		latestReceivedEventEtag = nil

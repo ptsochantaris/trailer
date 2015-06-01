@@ -323,9 +323,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				Settings.showStatusItems = !Settings.showStatusItems
 				api.resetAllStatusChecks()
 				if Settings.showStatusItems {
-					for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
-						r.resetSyncState()
-					}
+					ApiServer.resetSyncOfEverything()
 				}
 				settingsChangedTimer.push()
 				app.preferencesDirty = true
@@ -347,11 +345,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				Settings.showLabels = !Settings.showLabels
 				api.resetAllLabelChecks()
 				if Settings.showLabels {
-					for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
-						for i in r.issues {
-							i.resetSyncState()
-						}
-					}
+					ApiServer.resetSyncOfEverything()
 				}
 				settingsChangedTimer.push()
 				app.preferencesDirty = true
