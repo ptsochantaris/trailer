@@ -69,7 +69,7 @@ final class API {
 					DLog("Network went down: %d", newStatus.rawValue)
 				} else {
 					DLog("Network came up: %d", newStatus.rawValue)
-					self!.badLinks.removeAll(keepCapacity: false)
+					self!.clearAllBadLinks()
 					app.startRefreshIfItIsDue()
 				}
 			}
@@ -488,11 +488,11 @@ final class API {
 	func fetchRepositoriesToMoc(moc: NSManagedObjectContext, callback: Completion) {
 
 		ApiServer.resetSyncSuccessInMoc(moc)
+		clearAllBadLinks() // otherwise inaccessible repos may get a cached error response, even if they have become available
 
 		syncUserDetailsInMoc(moc) { [weak self] in
 			for r in DataItem.itemsOfType("Repo", surviving: true, inMoc: moc) as! [Repo] {
 				r.postSyncAction = PostSyncAction.Delete.rawValue
-				r.inaccessible = false
 			}
 
 			let allApiServers = ApiServer.allApiServersInMoc(moc)
@@ -555,25 +555,12 @@ final class API {
 				getPagedDataInPath("/repos/\(repoFullName)/pulls", fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
 					perPageCallback: { [weak self] data, lastPage in
 						for info in data ?? [] {
-							PullRequest.pullRequestWithInfo(info, fromServer:apiServer, inRepo:r)
+							PullRequest.pullRequestWithInfo(info, inRepo:r)
 						}
 						return false
 					}, finalCallback: { [weak self] success, resultCode, etag in
 						if !success {
-							if resultCode == 404 { // repo disabled
-								r.inaccessible = true
-								r.postSyncAction = PostSyncAction.DoNothing.rawValue
-								for p in r.pullRequests {
-									p.postSyncAction = PostSyncAction.Delete.rawValue
-								}
-								for i in r.issues {
-									i.postSyncAction = PostSyncAction.Delete.rawValue
-								}
-							} else if resultCode==410 { // repo gone for good
-								r.postSyncAction = PostSyncAction.Delete.rawValue
-							} else { // fetch problem
-								apiServer.lastSyncSucceeded = false
-							}
+							self!.handleRepoSyncFailure(r, withResultCode: resultCode)
 						}
 						completionCount++
 						if completionCount==total {
@@ -586,6 +573,23 @@ final class API {
 					callback()
 				}
 			}
+		}
+	}
+
+	private func handleRepoSyncFailure(r: Repo, withResultCode: Int) {
+		if withResultCode == 404 { // repo disabled
+			r.inaccessible = true
+			r.postSyncAction = PostSyncAction.DoNothing.rawValue
+			for p in r.pullRequests {
+				p.postSyncAction = PostSyncAction.Delete.rawValue
+			}
+			for i in r.issues {
+				i.postSyncAction = PostSyncAction.Delete.rawValue
+			}
+		} else if withResultCode==410 { // repo gone for good
+			r.postSyncAction = PostSyncAction.Delete.rawValue
+		} else { // fetch problem
+			r.apiServer.lastSyncSucceeded = false
 		}
 	}
 
@@ -619,23 +623,13 @@ final class API {
 					perPageCallback: { [weak self] data, lastPage in
 						for info in data ?? [] {
 							if N(info, "pull_request") == nil { // don't sync issues which are pull requests, they are already synced
-								Issue.issueWithInfo(info, fromServer:apiServer, inRepo:r)
+								Issue.issueWithInfo(info, inRepo:r)
 							}
 						}
 						return false
 					}, finalCallback: { [weak self] success, resultCode, etag in
 						if !success {
-							if resultCode == 404 { // repo disabled
-								r.inaccessible = true
-								r.postSyncAction = PostSyncAction.DoNothing.rawValue
-								for p in r.issues {
-									p.postSyncAction = PostSyncAction.Delete.rawValue
-								}
-							} else if resultCode==410 { // repo gone for good
-								r.postSyncAction = PostSyncAction.Delete.rawValue
-							} else { // fetch problem
-								apiServer.lastSyncSucceeded = false
-							}
+							self!.handleRepoSyncFailure(r, withResultCode: resultCode)
 						}
 						completionCount++
 						if completionCount==total {
@@ -1252,8 +1246,12 @@ final class API {
 
 	}
 
-	func testApiToServer(apiServer: ApiServer, callback: (NSError?) -> ()) {
+	func clearAllBadLinks() {
 		badLinks.removeAll(keepCapacity: false)
+	}
+
+	func testApiToServer(apiServer: ApiServer, callback: (NSError?) -> ()) {
+		clearAllBadLinks()
 		get("/user", fromServer: apiServer, ignoreLastSync: true, parameters: nil, extraHeaders: nil) { [weak self] response, data, error in
 
 			if let d = data as? [NSObject : AnyObject], userName = N(d, "login") as? String, userId = N(d, "id") as? NSNumber where error == nil {

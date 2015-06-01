@@ -8,8 +8,8 @@ final class Issue: ListableItem {
 
 	@NSManaged var commentsLink: String?
 
-	class func issueWithInfo(info: [NSObject : AnyObject], fromServer: ApiServer, inRepo: Repo) -> Issue {
-		let i = DataItem.itemWithInfo(info, type: "Issue", fromServer: fromServer) as! Issue
+	class func issueWithInfo(info: [NSObject : AnyObject], inRepo: Repo) -> Issue {
+		let i = DataItem.itemWithInfo(info, type: "Issue", fromServer: inRepo.apiServer) as! Issue
 		if i.postSyncAction?.integerValue != PostSyncAction.DoNothing.rawValue {
 			i.url = N(info, "url") as? String
 			i.webUrl = N(info, "html_url") as? String
@@ -41,7 +41,7 @@ final class Issue: ListableItem {
 
 			if let assignee = N(info, "assignee") as? [NSObject: AnyObject] {
 				let assigneeName = N(assignee, "login") as? String ?? "NoAssignedUserName"
-				let assigned = (assigneeName == (fromServer.userName ?? "NoApiUser"))
+				let assigned = (assigneeName == (inRepo.apiServer.userName ?? "NoApiUser"))
 				i.isNewAssignment = (assigned && !i.createdByMe() && !(i.assignedToMe?.boolValue ?? false))
 				i.assignedToMe = assigned
 			} else {

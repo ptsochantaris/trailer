@@ -46,7 +46,10 @@ final class ApiServer: NSManagedObject {
 				i.resetSyncState()
 			}
 		}
-		app.preferencesDirty = true
+		if app != nil {
+			app.preferencesDirty = true
+			api.clearAllBadLinks()
+		}
 	}
 
 	class func insertNewServerInMoc(moc: NSManagedObjectContext) -> ApiServer {
@@ -148,7 +151,9 @@ final class ApiServer: NSManagedObject {
 	}
 
 	func resetSyncState() {
-		app.lastRepoCheck = never()
+		if app != nil {
+			app.lastRepoCheck = never()
+		}
 		lastSyncSucceeded = true
 		latestReceivedEventDateProcessed = never()
 		latestReceivedEventEtag = nil

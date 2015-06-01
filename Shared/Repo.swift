@@ -22,6 +22,7 @@ final class Repo: DataItem {
 			r.fork = (N(info, "fork") as? NSNumber)?.boolValue
 			r.webUrl = N(info, "html_url") as? String
 			r.dirty = true
+			r.inaccessible = false
 			r.lastDirtied = NSDate()
 		}
 		return r
@@ -79,13 +80,6 @@ final class Repo: DataItem {
 		let f = NSFetchRequest(entityName: "Repo")
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "(not (displayPolicyForPrs > 0 or displayPolicyForIssues > 0)) or inaccessible = YES")
-		return moc.executeFetchRequest(f, error: nil) as! [Repo]
-	}
-
-	class func inaccessibleReposInMoc(moc: NSManagedObjectContext) -> [Repo] {
-		let f = NSFetchRequest(entityName: "Repo")
-		f.returnsObjectsAsFaults = false
-		f.predicate = NSPredicate(format: "inaccessible = YES")
 		return moc.executeFetchRequest(f, error: nil) as! [Repo]
 	}
 

@@ -16,8 +16,8 @@ final class PullRequest: ListableItem {
 
 	@NSManaged var statuses: Set<PRStatus>
 
-	class func pullRequestWithInfo(info: [NSObject : AnyObject], fromServer: ApiServer, inRepo: Repo) -> PullRequest {
-		let p = DataItem.itemWithInfo(info, type: "PullRequest", fromServer: fromServer) as! PullRequest
+	class func pullRequestWithInfo(info: [NSObject : AnyObject], inRepo: Repo) -> PullRequest {
+		let p = DataItem.itemWithInfo(info, type: "PullRequest", fromServer: inRepo.apiServer) as! PullRequest
 		if p.postSyncAction?.integerValue != PostSyncAction.DoNothing.rawValue {
 			p.url = N(info, "url") as? String
 			p.webUrl = N(info, "html_url") as? String
