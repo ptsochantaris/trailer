@@ -116,7 +116,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 
 		if let l = Settings.lastSuccessfulRefresh {
 			let howLongAgo = NSDate().timeIntervalSinceDate(l)
-			if howLongAgo > NSTimeInterval(Settings.refreshPeriod) {
+			if fabs(howLongAgo) > NSTimeInterval(Settings.refreshPeriod) {
 				startRefresh()
 			} else {
 				let howLongUntilNextSync = NSTimeInterval(Settings.refreshPeriod) - howLongAgo

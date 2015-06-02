@@ -554,7 +554,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 		if let l = Settings.lastSuccessfulRefresh {
 			let howLongAgo = NSDate().timeIntervalSinceDate(l)
-			if howLongAgo > NSTimeInterval(Settings.refreshPeriod) {
+			if fabs(howLongAgo) > NSTimeInterval(Settings.refreshPeriod) {
 				startRefresh()
 			} else {
 				let howLongUntilNextSync = NSTimeInterval(Settings.refreshPeriod) - howLongAgo
