@@ -2,7 +2,7 @@
 import UIKit
 import CoreData
 
-let app = { () -> ExtensionGlobals in
+let app = { () -> ExtensionGlobals! in
 	Settings.checkMigration()
     DataManager.checkMigration()
     return ExtensionGlobals()
@@ -15,8 +15,12 @@ class ExtensionGlobals {
     var refreshesSinceLastLabelsCheck = [NSManagedObjectID:Int]()
     var refreshesSinceLastStatusCheck = [NSManagedObjectID:Int]()
     var isRefreshing = false
+    var preferencesDirty = false
+    var lastRepoCheck = never()
 
     func postNotificationOfType(type: PRNotificationType, forItem: NSManagedObject) {}
 
     func setMinimumBackgroundFetchInterval(interval: NSTimeInterval) -> Void {}
+
+    func clearAllBadLinks() -> Void {}
 }
