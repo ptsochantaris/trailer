@@ -1,11 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle"  xmlns:dc="http://purl.org/dc/elements/1.1/">
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
 	<channel>
 		<title>Trailer Changelog</title>
 		<link>http://ptsochantaris.github.io/trailer/appcast.xml</link>
 		<description>Most recent changes with links to updates.</description>
 		<language>en</language>
 
+        <item>
+            <title>Version 1.3.4</title>
+            <sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[<font face="sans-serif" size="3"><ul>
+                <li>Per-repository PR and issue visibility settings. Display items from various repositories only up to a specific level of involvement. For instance, show only “Mine” from repo A, “Mine & Participated” from repo B, and all sections from repo C.</li>
+                <li>Added the ability to move assigned items to Participated instead of Mine</li>
+                <li>Improved assignment and close/merge handling logic.</li>
+                <li>Correction to stop reporting self-assigned items.</li>
+                <li>Corrections for image loading issue which would sometimes blank user avatars.</li>
+                <li>Corrected for backwards system clock changes when checking for refresh.</li>
+                <li>OS X prefs will remember last tab selected.</li>
+                <li>Corrections for certain layout corner-cases which could cause labels to disappear</li>
+                <li>Changed “count only visible items” option to “count all open items in visible repos” and made that default to off (you existing settings will be migrated).</li>
+                <li>A first attempt at cleaning up the Display preferences tab a bit and making some options a bit more understandable.</li>
+                </ul></font>]]></description>
+            <pubDate>Wed, 3 Jun 2015 23:00:00 +0000</pubDate>
+            <enclosure
+            url="http://ptsochantaris.github.io/trailer/trailer134.zip"
+            sparkle:version="1224"
+            sparkle:shortVersionString="1.3.4"
+            sparkle:dsaSignature="MC0CFGp6YYnHBiP5SWWgf4UuPdge3AqHAhUAth57JOY1335a/EtnAYkVKMXcH8Q="
+            type="application/octet-stream"/>
+        </item>
+        
 		<item>
 			<title>Version 1.3.3</title>
 			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
