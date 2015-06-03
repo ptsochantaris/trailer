@@ -10,6 +10,7 @@
             <title>Version 1.3.4</title>
             <sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
             <description><![CDATA[<font face="sans-serif" size="3"><ul>
+                <li>Many thanks to @bsiegel and @cmluciano for their suggestions and help with testing this release!</li>
                 <li>Per-repository PR and issue visibility settings. Display items from various repositories only up to a specific level of involvement. For instance, show only “Mine” from repo A, “Mine & Participated” from repo B, and all sections from repo C.</li>
                 <li>Added the ability to move assigned items to Participated instead of Mine</li>
                 <li>Improved assignment and close/merge handling logic.</li>
