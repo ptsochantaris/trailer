@@ -217,7 +217,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	override func viewWillAppear(animated: Bool) {
 		super.viewWillAppear(animated)
 		updateStatus()
-		showTabBar(Repo.interestedInIssues() && Repo.interestedInPrs(), animated: animated)
+        updateTabBarVisibility(animated)
 	}
 
 	func reloadDataWithAnimation(animated: Bool) {
@@ -268,8 +268,12 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			tableView.reloadData()
 		}
 
-		showTabBar(Repo.interestedInPrs() && Repo.interestedInIssues(), animated: animated)
+        updateTabBarVisibility(animated)
 	}
+
+    func updateTabBarVisibility(animated: Bool) {
+        showTabBar(Repo.interestedInPrs() && Repo.interestedInIssues(), animated: animated)
+    }
 
 	private func showTabBar(show: Bool, animated: Bool) {
 		if show==true {

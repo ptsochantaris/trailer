@@ -82,7 +82,9 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 					message: "You can tweak options & behaviour from the settings.\n\nPocketTrailer only has read-only access to your Github data, so feel free to experiment, you can't damage your data or settings on GitHub.",
 					delegate: nil,
 					cancelButtonTitle: "OK").show()
-				dismissViewControllerAnimated(true, completion: nil)
+                dismissViewControllerAnimated(true, completion: {
+                    popupManager.getMasterController().updateTabBarVisibility(true)
+                })
 			} else {
 				UIAlertView(
 					title: "Syncing with this server failed - please check that your network connection is working and that you have pasted your token correctly",

@@ -63,7 +63,7 @@ final class NotificationManager {
 			}
 		case .NewStatus:
 			if let s = forItem as? PRStatus {
-				notification.alertBody = "New Status: " + (s.descriptionText ?? "(untitled)") + " in " + (s.pullRequest.repo.fullName ?? "(untitled)")
+				notification.alertBody = "New Status: " + (s.descriptionText ?? "(untitled)") + " for " + (s.pullRequest.title ?? "(untitled)") + " in " + (s.pullRequest.repo.fullName ?? "(untitled)")
 			}
 		case .NewIssue:
 			if let i = forItem as? Issue {

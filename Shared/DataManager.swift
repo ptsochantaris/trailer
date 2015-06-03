@@ -255,7 +255,7 @@ final class DataManager : NSObject {
 			return [NOTIFICATION_URL_KEY : (item as! Repo).webUrl!]
 		case .NewStatus:
 			let pr = (item as! PRStatus).pullRequest
-			return [NOTIFICATION_URL_KEY : pr.webUrl!, STATUS_ID_KEY: item.objectID.URIRepresentation().absoluteString!]
+			return [NOTIFICATION_URL_KEY : pr.webUrl!, STATUS_ID_KEY: pr.objectID.URIRepresentation().absoluteString!]
 		case .NewIssue: fallthrough
 		case .IssueReopened: fallthrough
 		case .NewIssueAssigned: fallthrough
