@@ -775,12 +775,12 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction func refreshDurationChanged(sender: NSStepper?) {
 		Settings.refreshPeriod = refreshDurationStepper.floatValue
-		refreshDurationLabel.stringValue = "Refresh PRs every \(refreshDurationStepper.integerValue) seconds"
+		refreshDurationLabel.stringValue = "Refresh items every \(refreshDurationStepper.integerValue) seconds"
 	}
 
 	@IBAction func newRepoCheckChanged(sender: NSStepper?) {
 		Settings.newRepoCheckPeriod = repoCheckStepper.floatValue
-		repoCheckLabel.stringValue = "Refresh repositories & teams every \(repoCheckStepper.integerValue) hours"
+		repoCheckLabel.stringValue = "Refresh repos & teams every \(repoCheckStepper.integerValue) hours"
 	}
 
 	func windowWillClose(notification: NSNotification) {
