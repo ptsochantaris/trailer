@@ -513,7 +513,7 @@ user you can add more servers from the left.</string>
                                         <button id="Y5g-gh-uLn">
                                             <rect key="frame" x="20" y="293" width="366" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Mark un-mergeable PRs only in &quot;My&quot; or &quot;Partitipated&quot;" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="rZv-TW-Nxj">
+                                            <buttonCell key="cell" type="check" title="Mark un-mergeable PRs only in &quot;My&quot; or &quot;Participated&quot;" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="rZv-TW-Nxj">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
