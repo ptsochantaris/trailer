@@ -155,7 +155,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		includeLabelsInFiltering.integerValue = Settings.includeLabelsInFilter ? 1 : 0
 		includeStatusesInFiltering.integerValue = Settings.includeStatusesInFilter ? 1 : 0
 		dontConfirmRemoveAllMerged.integerValue = Settings.dontAskBeforeWipingMerged ? 1 : 0
-		hideUncommentedPrs.integerValue = Settings.shouldHideUncommentedRequests ? 1 : 0
+		hideUncommentedPrs.integerValue = Settings.hideUncommentedItems ? 1 : 0
 		autoParticipateWhenMentioned.integerValue = Settings.autoParticipateInMentions ? 1 : 0
 		autoParticipateOnTeamMentions.integerValue = Settings.autoParticipateOnTeamMentions ? 1 : 0
 		hideAvatars.integerValue = Settings.hideAvatars ? 1 : 0
@@ -374,7 +374,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	@IBAction func hideUncommentedRequestsSelected(sender: NSButton) {
-		Settings.shouldHideUncommentedRequests = (sender.integerValue==1)
+		Settings.hideUncommentedItems = (sender.integerValue==1)
 		DataManager.postProcessAllItems()
 		app.deferredUpdateTimer.push()
 	}

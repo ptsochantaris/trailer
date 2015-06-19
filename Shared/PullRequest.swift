@@ -75,7 +75,7 @@ final class PullRequest: ListableItem {
 			andPredicates.append(NSCompoundPredicate.orPredicateWithSubpredicates(orPredicates))
 		}
 
-		if Settings.shouldHideUncommentedRequests {
+		if Settings.hideUncommentedItems {
 			andPredicates.append(NSPredicate(format: "unreadComments > 0"))
 		}
 

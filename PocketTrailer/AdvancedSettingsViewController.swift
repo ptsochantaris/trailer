@@ -115,7 +115,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.accessoryType = check(Settings.showCommentsEverywhere)
 			case 1:
 				cell.textLabel?.text = "Only display items with unread comments"
-				cell.accessoryType = check(Settings.shouldHideUncommentedRequests)
+				cell.accessoryType = check(Settings.hideUncommentedItems)
 			case 2:
 				cell.textLabel?.text = "Move items menitoning me to 'Participated'"
 				cell.accessoryType = check(Settings.autoParticipateInMentions)
@@ -289,7 +289,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				Settings.showCommentsEverywhere = !Settings.showCommentsEverywhere
 				settingsChangedTimer.push()
 			case 1:
-				Settings.shouldHideUncommentedRequests = !Settings.shouldHideUncommentedRequests
+				Settings.hideUncommentedItems = !Settings.hideUncommentedItems
 				settingsChangedTimer.push()
 			case 2:
 				Settings.autoParticipateInMentions = !Settings.autoParticipateInMentions

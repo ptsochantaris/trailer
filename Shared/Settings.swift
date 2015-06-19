@@ -378,7 +378,7 @@ final class Settings {
 
     /////////////////////////// DEFAULT FALSE
 
-	class var shouldHideUncommentedRequests: Bool {
+	class var hideUncommentedItems: Bool {
 		get { return get("HIDE_UNCOMMENTED_PRS_KEY") as? Bool ?? false }
 		set { set("HIDE_UNCOMMENTED_PRS_KEY", newValue) }
 	}
