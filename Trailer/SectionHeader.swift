@@ -24,7 +24,7 @@ final class SectionHeader: NSTableRowView {
 		titleView = CenterTextField(frame: NSMakeRect(12, 4, x, TITLE_HEIGHT))
 		titleView.attributedStringValue = NSAttributedString(string: title, attributes: [
 				NSFontAttributeName: NSFont.boldSystemFontOfSize(14),
-				NSForegroundColorAttributeName: NSColor.controlShadowColor()])
+				NSForegroundColorAttributeName: NSColor.controlShadowColor().colorWithAlphaComponent(0.7)])
 		addSubview(titleView)
 	}
 

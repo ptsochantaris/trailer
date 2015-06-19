@@ -19,10 +19,7 @@ final class IssueCell: TrailerCell {
 		}
 
 		let _title = issue.titleWithFont(titleFont, labelFont: detailFont, titleColor: unselectedTitleColor)
-
-		let _subtitle = issue.subtitleWithFont(detailFont,
-			lightColor: goneDark ? NSColor.lightGrayColor() : NSColor.grayColor(),
-			darkColor: goneDark ? NSColor.grayColor() : NSColor.darkGrayColor())
+		let _subtitle = issue.subtitleWithFont(detailFont, lightColor: NSColor.grayColor(), darkColor: NSColor.darkGrayColor())
 
 		var W = MENU_WIDTH-LEFTPADDING-app.scrollBarWidth
 
@@ -113,7 +110,7 @@ final class IssueCell: TrailerCell {
 				statusLabel.targetUrl = status.targetUrl
 				statusLabel.needsCommand = !Settings.makeStatusItemsSelectable
 				statusLabel.attributedStringValue = NSAttributedString(string: status.displayText(), attributes: statusAttributes)
-				statusLabel.textColor = goneDark ? status.colorForDarkDisplay() : status.colorForDisplay()
+				statusLabel.textColor = status.colorForDisplay()
 				addSubview(statusLabel)
 			}
 		}
