@@ -25,8 +25,10 @@ final class IssueCell: TrailerCell {
 			darkColor: goneDark ? NSColor.grayColor() : NSColor.darkGrayColor())
 
 		var W = MENU_WIDTH-LEFTPADDING-app.scrollBarWidth
+
 		let showUnpin = issue.condition?.integerValue != PullRequestCondition.Open.rawValue
-		if showUnpin { W -= REMOVE_BUTTON_WIDTH }
+		if showUnpin { W -= REMOVE_BUTTON_WIDTH } else { W -= 4.0 }
+
 		let showAvatar = !(issue.userAvatarUrl ?? "").isEmpty && !Settings.hideAvatars
 		if showAvatar { W -= AVATAR_SIZE+AVATAR_PADDING } else { W += 4.0 }
 

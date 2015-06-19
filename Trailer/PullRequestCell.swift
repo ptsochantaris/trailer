@@ -25,8 +25,10 @@ final class PullRequestCell: TrailerCell {
 			darkColor: goneDark ? NSColor.grayColor() : NSColor.darkGrayColor())
 
 		var W = MENU_WIDTH-LEFTPADDING-app.scrollBarWidth
+
 		let showUnpin = (pullRequest.condition?.integerValue != PullRequestCondition.Open.rawValue) || pullRequest.markUnmergeable()
-		if showUnpin { W -= REMOVE_BUTTON_WIDTH }
+		if showUnpin { W -= REMOVE_BUTTON_WIDTH } else { W -= 4.0 }
+
 		let showAvatar = !(pullRequest.userAvatarUrl ?? "").isEmpty && !Settings.hideAvatars
 		if showAvatar { W -= AVATAR_SIZE+AVATAR_PADDING } else { W += 4.0 }
 
