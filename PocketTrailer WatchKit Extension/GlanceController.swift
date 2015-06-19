@@ -47,55 +47,43 @@ final class GlanceController: WKInterfaceController {
         }
     }
 
-    override func willActivate() {
+	override func willActivate() {
 
 		dataReadonly = true
 		Settings.clearCache()
 
 		let totalItems = Settings.showIssuesInGlance ? Issue.countAllIssuesInMoc(mainObjectContext) : PullRequest.countAllRequestsInMoc(mainObjectContext)
 
-		for l in [closedGroup, participatedGroup, otherGroup, unreadGroup, lastUpdate] {
-			l.setHidden(totalItems == 0)
-		}
-		mergedGroup.setHidden(Settings.showIssuesInGlance || totalItems == 0)
+		mergedGroup.setHidden(Settings.showIssuesInGlance)
 		prIcon.setHidden(Settings.showIssuesInGlance)
 		issueIcon.setHidden(!Settings.showIssuesInGlance)
 
 		totalCount.setText("\(totalItems)")
 
-		if totalItems == 0 {
+		setCountOfLabel(myCount, forSection: PullRequestSection.Mine, group: myGroup)
+		setCountOfLabel(participatedCount, forSection: PullRequestSection.Participated, group: participatedGroup)
+		setCountOfLabel(mergedCount, forSection: PullRequestSection.Merged, group: mergedGroup)
+		setCountOfLabel(closedCount, forSection: PullRequestSection.Closed, group: closedGroup)
+		setCountOfLabel(otherCount, forSection: PullRequestSection.All, group: otherGroup)
 
-			let a = Settings.showIssuesInGlance ? DataManager.reasonForEmptyIssuesWithFilter(nil) : DataManager.reasonForEmptyWithFilter(nil)
-			myCount.setAttributedText(a)
-			myGroup.setAlpha(1.0)
-
+		let badgeCount = Settings.showIssuesInGlance ? Issue.badgeCountInMoc(mainObjectContext) : PullRequest.badgeCountInMoc(mainObjectContext)
+		if badgeCount == 0 {
+			unreadCount.setText("NONE UNREAD")
+			unreadGroup.setAlpha(0.3)
+		} else if badgeCount == 1 {
+			unreadCount.setText("1 COMMENT")
+			unreadGroup.setAlpha(1.0)
 		} else {
+			unreadCount.setText("\(badgeCount) COMMENTS")
+			unreadGroup.setAlpha(1.0)
+		}
 
-			setCountOfLabel(myCount, forSection: PullRequestSection.Mine, group: myGroup)
-			setCountOfLabel(participatedCount, forSection: PullRequestSection.Participated, group: participatedGroup)
-			setCountOfLabel(mergedCount, forSection: PullRequestSection.Merged, group: mergedGroup)
-			setCountOfLabel(closedCount, forSection: PullRequestSection.Closed, group: closedGroup)
-			setCountOfLabel(otherCount, forSection: PullRequestSection.All, group: otherGroup)
-
-			let badgeCount = Settings.showIssuesInGlance ? Issue.badgeCountInMoc(mainObjectContext) : PullRequest.badgeCountInMoc(mainObjectContext)
-			if badgeCount == 0 {
-				unreadCount.setText("NONE UNREAD")
-				unreadGroup.setAlpha(0.3)
-			} else if badgeCount == 1 {
-				unreadCount.setText("1 COMMENT")
-				unreadGroup.setAlpha(1.0)
-			} else {
-				unreadCount.setText("\(badgeCount) COMMENTS")
-				unreadGroup.setAlpha(1.0)
-			}
-
-			if let lastRefresh = Settings.lastSuccessfulRefresh {
-				lastUpdate.setText(shortDateFormatter.stringFromDate(lastRefresh))
-			} else {
-				lastUpdate.setText("Not refreshed yet")
-			}
+		if let lastRefresh = Settings.lastSuccessfulRefresh {
+			lastUpdate.setText(shortDateFormatter.stringFromDate(lastRefresh))
+		} else {
+			lastUpdate.setText("Not refreshed yet")
 		}
 
 		super.willActivate()
-    }
+	}
 }
