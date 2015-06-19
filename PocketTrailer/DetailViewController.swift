@@ -134,7 +134,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 	private func loadFailed(error: NSError) {
 		spinner.stopAnimating()
 		statusLabel.textColor = UIColor.redColor()
-		statusLabel.text = "There was an error loading this pull request page: " + error.localizedDescription
+		statusLabel.text = "Loading Error: " + error.localizedDescription
 		statusLabel.hidden = false
 		_webView?.hidden = true
 		title = "Error"

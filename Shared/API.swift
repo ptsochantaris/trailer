@@ -1058,6 +1058,7 @@ final class API {
 	}
 
 	private func prWasMerged(r: PullRequest, byUserId: NSNumber) {
+
 		let myUserId = r.apiServer.userId ?? NSNumber(integer: -1)
 		DLog("Detected merged PR: %@ by user %@, local user id is: %@, handling policy is %@, coming from section %@",
 			r.title,
@@ -1065,6 +1066,11 @@ final class API {
 			myUserId,
 			NSNumber(integer: Settings.mergeHandlingPolicy),
 			r.sectionIndex ?? NSNumber(integer: 0))
+
+        if !r.isVisibleOnMenu() {
+            DLog("Merged PR was hidden, won't announce")
+            return
+        }
 
 		let mergedByMe = byUserId.isEqualToNumber(myUserId)
 		if !(mergedByMe && Settings.dontKeepPrsMergedByMe) {
@@ -1086,6 +1092,11 @@ final class API {
 			NSNumber(integer: Settings.closeHandlingPolicy),
 			r.sectionIndex ?? NSNumber(integer: 0))
 
+        if !r.isVisibleOnMenu() {
+            DLog("Closed PR was hidden, won't announce")
+            return
+        }
+
 		if r.shouldKeepForPolicy(Settings.closeHandlingPolicy) {
 			DLog("Will keep closed PR")
 			r.postSyncAction = PostSyncAction.DoNothing.rawValue
@@ -1101,6 +1112,11 @@ final class API {
 			i.title,
 			NSNumber(integer: Settings.closeHandlingPolicy),
 			i.sectionIndex ?? NSNumber(integer: 0))
+
+        if !i.isVisibleOnMenu() {
+            DLog("Closed issue was hidden, won't announce")
+            return
+        }
 
 		if i.shouldKeepForPolicy(Settings.closeHandlingPolicy) {
 			DLog("Will keep closed issue")
