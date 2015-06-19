@@ -61,7 +61,7 @@ func DLog(message: String, @autoclosure arg1: ()->CVarArgType?, @autoclosure arg
 	let AVATAR_SIZE: CGFloat = 26.0
 	let LEFTPADDING: CGFloat = 44.0
 	let TITLE_HEIGHT: CGFloat = 42.0
-	let BASE_BADGE_SIZE: CGFloat = 21.0
+	let BASE_BADGE_SIZE: CGFloat = 20.0
 	let SMALL_BADGE_SIZE: CGFloat = 14.0
 	let MENU_WIDTH: CGFloat = 500.0
 	let AVATAR_PADDING: CGFloat = 8.0

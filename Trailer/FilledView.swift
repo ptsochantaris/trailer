@@ -13,12 +13,6 @@ final class FilledView: NSView {
 		}
 	}
 
-	var borderColor: NSColor? {
-		didSet {
-			setNeedsDisplayInRect(bounds)
-		}
-	}
-
     override func drawRect(dirtyRect: NSRect) {
         super.drawRect(dirtyRect)
 
@@ -28,11 +22,6 @@ final class FilledView: NSView {
 				NSBezierPath(roundedRect: dirtyRect, xRadius: c, yRadius: c).addClip()
 			}
 			NSRectFill(dirtyRect)
-		} else if let b = borderColor {
-			b.set()
-			let path = NSBezierPath(rect: dirtyRect)
-			path.lineWidth = 0.5
-			path.stroke()
 		}
     }
 

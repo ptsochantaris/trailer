@@ -104,7 +104,6 @@ class TrailerCell: NSTableCellView {
 	private var countBackground: FilledView?
 	private var newBackground: FilledView?
 	private var countView: CenterTextField?
-	private var countColor: NSColor?
 
 	func addCounts(totalCount: Int, _ unreadCount: Int) {
 
@@ -115,20 +114,18 @@ class TrailerCell: NSTableCellView {
 		let pCenter = NSMutableParagraphStyle()
 		pCenter.alignment = NSTextAlignment.CenterTextAlignment
 
-		countColor = goneDark ? NSColor.controlLightHighlightColor() : NSColor.controlTextColor()
-
 		let countString = NSAttributedString(string: itemCountFormatter.stringFromNumber(totalCount)!, attributes: [
 			NSFontAttributeName: NSFont.menuFontOfSize(11),
-			NSForegroundColorAttributeName: countColor!,
+			NSForegroundColorAttributeName: goneDark ? NSColor.controlLightHighlightColor() : NSColor.controlTextColor(),
 			NSParagraphStyleAttributeName: pCenter])
 
 		var width = max(BASE_BADGE_SIZE, countString.size.width+10)
 		var height = BASE_BADGE_SIZE
-		var bottom = (bounds.size.height-height)*0.5
+		var bottom = bounds.size.height-height-9.5
 		var left = (LEFTPADDING-width)*0.5
 
 		let c = FilledView(frame: NSIntegralRect(NSMakeRect(left, bottom, width, height)))
-		c.cornerRadius = 4.0
+		c.cornerRadius = floor(height/2.0)
 
 		countView = CenterTextField(frame: c.bounds)
         countView?.vibrant = false
@@ -146,7 +143,7 @@ class TrailerCell: NSTableCellView {
 				NSParagraphStyleAttributeName: pCenter])
 
 			bottom += height
-			width = max(SMALL_BADGE_SIZE, alertString.size.width+8)
+			width = max(SMALL_BADGE_SIZE, alertString.size.width+8.0)
 			height = SMALL_BADGE_SIZE
 			bottom -= height * 0.5 + 1
 			left -= width * 0.5
@@ -166,18 +163,16 @@ class TrailerCell: NSTableCellView {
 		highlight(false)
 	}
 
-	// make abstract class and get tables to use the abtract class, subclassing for PR and issue-based views
-
-	private func highlight(on: Bool) -> Void {
+	private func highlight(on: Bool) {
 		if let c = countBackground {
 			var color: NSColor
 			if goneDark {
 				color = on ? NSColor.blackColor() : MAKECOLOR(0.94, 0.94, 0.94, 1.0)
-				c.borderColor = color
+				c.backgroundColor = on ? NSColor.whiteColor().colorWithAlphaComponent(0.3) : NSColor.blackColor().colorWithAlphaComponent(0.2)
 				newBackground?.backgroundColor = MAKECOLOR(1.0, 0.1, 0.1, 1.0)
 			} else {
-				color = countColor!
-				c.backgroundColor = MAKECOLOR(0.94, 0.94, 0.94, 1.0)
+				color = goneDark ? NSColor.controlLightHighlightColor() : NSColor.controlTextColor()
+				c.backgroundColor = MAKECOLOR(0.92, 0.92, 0.92, 1.0)
 				newBackground?.backgroundColor = MAKECOLOR(1.0, 0.4, 0.4, 1.0)
 			}
 			if let a = countView?.attributedStringValue.mutableCopy() as? NSMutableAttributedString {
