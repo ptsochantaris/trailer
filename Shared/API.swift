@@ -94,21 +94,6 @@ final class API {
 		}
 	}
 
-	private func markLongCleanReposAsDirtyInMoc(moc: NSManagedObjectContext) {
-		let f = NSFetchRequest(entityName: "Repo")
-		f.predicate = NSPredicate(format: "dirty != YES and lastDirtied < %@", NSDate(timeInterval: -3600, sinceDate: NSDate()))
-		f.includesPropertyValues = false
-		f.returnsObjectsAsFaults = false
-		let reposNotFetchedRecently = moc.executeFetchRequest(f, error: nil) as! [Repo]
-		for r in reposNotFetchedRecently {
-			r.resetSyncState()
-		}
-
-		if reposNotFetchedRecently.count>0 {
-			DLog("Marked dirty %d repos which haven't been refreshed in over an hour", reposNotFetchedRecently.count)
-		}
-	}
-
 	///////////////////////////////////////////////////////// Images
 
 	func expireOldImageCacheEntries() {
@@ -209,9 +194,9 @@ final class API {
 	func syncItemsForActiveReposAndCallback(callback: Completion) {
 		let syncContext = DataManager.tempContext()
 
-		let shouldRefreshReposToo = (app.lastRepoCheck.isEqualToDate(never())
+		let shouldRefreshReposToo = app.lastRepoCheck.isEqualToDate(never())
 			|| (NSDate().timeIntervalSinceDate(app.lastRepoCheck) > NSTimeInterval(Settings.newRepoCheckPeriod*3600.0))
-			|| (Repo.countVisibleReposInMoc(syncContext)==0))
+			|| (Repo.countVisibleReposInMoc(syncContext)==0)
 
 		if shouldRefreshReposToo {
 			fetchRepositoriesToMoc(syncContext) { [weak self] in
@@ -333,11 +318,20 @@ final class API {
 		let completionCallback: Completion = { [weak self] in
 			completionCount++
 			if completionCount==totalOperations {
-				Repo.markDirtyReposWithIds(repoIdsToMarkDirty, inMoc:moc)
+
 				if repoIdsToMarkDirty.count>0 {
+					Repo.markDirtyReposWithIds(repoIdsToMarkDirty, inMoc:moc)
 					DLog("Marked %d dirty repos that have new events in their event stream", repoIdsToMarkDirty.count)
 				}
-				self!.markLongCleanReposAsDirtyInMoc(moc)
+
+				let reposNotRecentlyDirtied = Repo.reposNotRecentlyDirtied(moc)
+				if reposNotRecentlyDirtied.count>0 {
+					for r in reposNotRecentlyDirtied {
+						r.resetSyncState()
+					}
+					DLog("Marked dirty %d repos which haven't been refreshed in over an hour", reposNotRecentlyDirtied.count)
+				}
+
 				callback()
 			}
 		}
@@ -1210,10 +1204,9 @@ final class API {
 								let admin = (N(permissions, "admin") as? NSNumber)?.boolValue ?? false
 
 								if	pull || push || admin {
-										Repo.repoWithInfo(info, fromServer: apiServer)
+									Repo.repoWithInfo(info, fromServer: apiServer)
 								} else {
 									DLog("Watched private repository '%@' seems to be inaccessible, skipping", N(info, "full_name") as? String)
-									continue
 								}
 							}
 						} else {

@@ -76,6 +76,14 @@ final class Repo: DataItem {
 		return moc.executeFetchRequest(f, error: nil) as! [Repo]
 	}
 
+	class func reposNotRecentlyDirtied(moc: NSManagedObjectContext) -> [Repo] {
+		let f = NSFetchRequest(entityName: "Repo")
+		f.predicate = NSPredicate(format: "dirty != YES and lastDirtied < %@ and postSyncAction != %d and (displayPolicyForPrs > 0 or displayPolicyForIssues > 0)", NSDate(timeInterval: -3600, sinceDate: NSDate()), PostSyncAction.Delete.rawValue)
+		f.includesPropertyValues = false
+		f.returnsObjectsAsFaults = false
+		return moc.executeFetchRequest(f, error: nil) as! [Repo]
+	}
+
 	class func unsyncableReposInMoc(moc: NSManagedObjectContext) -> [Repo] {
 		let f = NSFetchRequest(entityName: "Repo")
 		f.returnsObjectsAsFaults = false
