@@ -49,6 +49,13 @@ final class PullRequest: ListableItem {
 		return p
 	}
 
+	class func visibleAndActivePullRequestsInMoc(moc: NSManagedObjectContext) -> [PullRequest] {
+		let f = NSFetchRequest(entityName: "PullRequest")
+		f.returnsObjectsAsFaults = false
+		f.predicate = NSPredicate(format: "sectionIndex == %d || sectionIndex == %d || sectionIndex == %d", PullRequestSection.Mine.rawValue, PullRequestSection.Participated.rawValue, PullRequestSection.All.rawValue)
+		return moc.executeFetchRequest(f, error: nil) as! [PullRequest]
+	}
+
 	class func requestForPullRequestsWithFilter(filter: String?, sectionIndex: Int) -> NSFetchRequest {
 
 		var andPredicates = [NSPredicate]()

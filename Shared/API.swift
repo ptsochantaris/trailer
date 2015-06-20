@@ -778,7 +778,7 @@ final class API {
 
 	private func fetchLabelsForForCurrentPullRequestsToMoc(moc: NSManagedObjectContext, callback: Completion) {
 
-		let prs = (DataItem.allItemsOfType("PullRequest", inMoc: moc) as! [PullRequest]).filter { [weak self] pr in
+		let prs = PullRequest.visibleAndActivePullRequestsInMoc(moc).filter { [weak self] pr in
 			if !pr.apiServer.syncIsGood {
 				return false
 			}
@@ -850,12 +850,8 @@ final class API {
 
 	private func fetchStatusesForCurrentPullRequestsToMoc(moc: NSManagedObjectContext, callback: Completion) {
 
-		let prs = (DataItem.allItemsOfType("PullRequest", inMoc: moc) as! [PullRequest]).filter { [weak self] pr in
+		let prs = PullRequest.visibleAndActivePullRequestsInMoc(moc).filter { [weak self] pr in
 			if !pr.apiServer.syncIsGood {
-				return false
-			}
-			if pr.condition?.integerValue != PullRequestCondition.Open.rawValue {
-				DLog("Won't check statuses for closed/merged PR: %@", pr.title)
 				return false
 			}
 			let oid = pr.objectID

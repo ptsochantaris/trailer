@@ -19,7 +19,8 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	var scrollBarWidth: CGFloat = 0.0
 	var pullRequestDelegate = PullRequestDelegate()
 	var issuesDelegate = IssuesDelegate()
-	var opening: Bool  = false
+	var opening: Bool = false
+	var systemSleeping = false
 
 	private var globalKeyMonitor: AnyObject?
 	private var localKeyMonitor: AnyObject?
@@ -90,6 +91,20 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		if !s.updateInProgress && Settings.checkForUpdatesAutomatically {
 			s.checkForUpdatesInBackground()
 		}
+
+		let wn = NSWorkspace.sharedWorkspace().notificationCenter
+		wn.addObserver(self, selector: Selector("systemWillSleep"), name: NSWorkspaceWillSleepNotification, object: nil)
+		wn.addObserver(self, selector: Selector("systemDidWake"), name: NSWorkspaceDidWakeNotification, object: nil)
+	}
+
+	func systemWillSleep() {
+		systemSleeping = true
+		DLog("System is going to sleep");
+	}
+
+	func systemDidWake() {
+		DLog("System woke up");
+		systemSleeping = false
 	}
 
 	func setUpdateCheckParameters() {
@@ -643,7 +658,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	func startRefresh() {
-		if isRefreshing || api.currentNetworkStatus == NetworkStatus.NotReachable || !ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
+		if isRefreshing || systemSleeping || api.currentNetworkStatus == NetworkStatus.NotReachable || !ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
 			return
 		}
 
