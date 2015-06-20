@@ -121,7 +121,7 @@ class TrailerCell: NSTableCellView {
 
 		var width = max(BASE_BADGE_SIZE, countString.size.width+10)
 		var height = BASE_BADGE_SIZE
-		var bottom = bounds.size.height-height-9.5
+		var bottom = bounds.size.height-height-10.0
 		var left = (LEFTPADDING-width)*0.5
 
 		let c = FilledView(frame: NSIntegralRect(NSMakeRect(left, bottom, width, height)))
