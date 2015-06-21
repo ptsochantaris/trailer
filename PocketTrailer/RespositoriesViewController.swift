@@ -210,19 +210,43 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 
 	private func configureCell(cell: UITableViewCell, atIndexPath: NSIndexPath) {
 		let repo = fetchedResultsController.objectAtIndexPath(atIndexPath) as! Repo
-		let fullName = repo.fullName ?? "(Untitled Repo)"
-		let text = (repo.inaccessible?.boolValue ?? false) ? (fullName + " (inaccessible)") : fullName
-		cell.textLabel?.text = text
-		cell.detailTextLabel?.text = subtitleForRepo(repo)
-		cell.accessibilityLabel = "\(text), \(subtitleForRepo(repo))"
+
+		let title = titleForRepo(repo)
+		cell.textLabel?.text = title
 		cell.textLabel?.textColor = repo.shouldSync() ? UIColor.darkTextColor() : UIColor.lightGrayColor()
-		cell.detailTextLabel?.textColor = repo.shouldSync() ? UIColor.darkTextColor() : UIColor.lightGrayColor()
+
+		let subtitle = subtitleForRepo(repo)
+		cell.detailTextLabel?.attributedText = subtitle
+
+		cell.accessibilityLabel = "\(title), \(subtitle.string)"
 	}
 
-	private func subtitleForRepo(repo: Repo) -> String {
-		let prsText = RepoDisplayPolicy(rawValue: repo.displayPolicyForPrs?.integerValue ?? 0)?.name() ?? "Unknown"
-		let issuesText = RepoDisplayPolicy(rawValue: repo.displayPolicyForIssues?.integerValue ?? 0)?.name() ?? "Unknown"
-		return "PRs: \(prsText), Issues: \(issuesText)"
+	private func titleForRepo(repo: Repo) -> String {
+		let fullName = repo.fullName ?? "(Untitled Repo)"
+		return (repo.inaccessible?.boolValue ?? false) ? (fullName + " (inaccessible)") : fullName
+	}
+
+	private func subtitleForRepo(repo: Repo) -> NSAttributedString {
+		let a = NSMutableAttributedString()
+
+		let prPolicy = RepoDisplayPolicy(rawValue: repo.displayPolicyForPrs?.integerValue ?? 0) ?? RepoDisplayPolicy.Hide
+		var attributes = attributesForEntryWithPolicy(prPolicy)
+		a.appendAttributedString(NSAttributedString(string: prPolicy.name(), attributes: attributes))
+		a.appendAttributedString(NSAttributedString(string: " PRs  ", attributes: attributes))
+
+		let issuePolicy = RepoDisplayPolicy(rawValue: repo.displayPolicyForIssues?.integerValue ?? 0) ?? RepoDisplayPolicy.Hide
+		attributes = attributesForEntryWithPolicy(issuePolicy)
+		a.appendAttributedString(NSAttributedString(string: issuePolicy.name(), attributes: attributes))
+		a.appendAttributedString(NSAttributedString(string: " Issues", attributes: attributes))
+
+		return a
+	}
+
+	private func attributesForEntryWithPolicy(policy: RepoDisplayPolicy) -> [NSObject : AnyObject] {
+		return [
+			NSFontAttributeName: UIFont.systemFontOfSize(UIFont.smallSystemFontSize()),
+			NSForegroundColorAttributeName: (policy == RepoDisplayPolicy.Hide) ? UIColor.lightGrayColor() : UIColor.blackColor()
+		];
 	}
 
 	///////////////////////////// filtering
