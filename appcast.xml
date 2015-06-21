@@ -6,6 +6,29 @@
 		<description>Most recent changes with links to updates.</description>
 		<language>en</language>
 
+		<item>
+			<title>Version 1.3.5</title>
+			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<ul>Fixed merged/closed notifications being received for items which were not currently visible</ul>
+				<ul>Fixed wrong message being displayed if there are no watched repos</ul>
+				<ul>Won’t check labels or statuses for items which are not currently visible</ul>
+				<ul>Slightly muted intensity of text not part of item titles</ul>
+				<ul>Updated appearance and alignment of avatars and comment counts</ul>
+				<ul>Fixed repo table not resizing correctly</ul>
+				<ul>Will not attempt syncs during power naps</ul>
+				<ul>Corrected option typo (many thanks to @brandonblack)</ul>
+				<ul>Slight padding on the right of the menu to avoid text sticking right to the edge</ul>
+				</ul></font>]]></description>
+			<pubDate>Sun, 21 Jun 2015 02:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer135.zip"
+			sparkle:version="1225"
+			sparkle:shortVersionString="1.3.5"
+			sparkle:dsaSignature="MCwCFAqjZOlcPUQVC+TEpQuLMSTWwzhJAhQtVXokzpndh0vSHIx13B1v0pw9Uw=="
+			type="application/octet-stream"/>
+		</item>
+
         <item>
             <title>Version 1.3.4</title>
             <sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
