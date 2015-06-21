@@ -13,7 +13,7 @@ final class PullRequestDelegate: NSObject, NSTableViewDelegate, NSTableViewDataS
 
 		pullRequestIds.removeAll(keepCapacity: false)
 
-		let f = PullRequest.requestForPullRequestsWithFilter(filter, sectionIndex: -1)
+		let f = ListableItem.requestForItemsOfType("PullRequest", withFilter: filter, sectionIndex: -1)
 		let allPrs = mainObjectContext.executeFetchRequest(f, error: nil) as! [PullRequest]
 
 		if let firstPr = allPrs.first {

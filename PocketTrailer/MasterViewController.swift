@@ -515,9 +515,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		var fetchRequest: NSFetchRequest
 
 		if viewMode == MasterViewMode.PullRequests {
-			fetchRequest = PullRequest.requestForPullRequestsWithFilter(searchField.text, sectionIndex: -1)
+			fetchRequest = ListableItem.requestForItemsOfType("PullRequest", withFilter: searchField.text, sectionIndex: -1)
 		} else {
-			fetchRequest = Issue.requestForIssuesWithFilter(searchField.text, sectionIndex: -1)
+			fetchRequest = ListableItem.requestForItemsOfType("Issue", withFilter: searchField.text, sectionIndex: -1)
 		}
 
 		let aFetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: mainObjectContext, sectionNameKeyPath: "sectionName", cacheName: nil)
@@ -640,7 +640,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	private func pullRequestsTitle(long: Bool) -> String {
 
-		let f = PullRequest.requestForPullRequestsWithFilter(nil, sectionIndex: -1)
+		let f = ListableItem.requestForItemsOfType("PullRequest", withFilter: nil, sectionIndex: -1)
 		let count = mainObjectContext.countForFetchRequest(f, error: nil)
 		let unreadCount = pullRequestsItem.badgeValue?.toInt() ?? 0
 
@@ -655,7 +655,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	private func issuesTitle() -> String {
-		let f = Issue.requestForIssuesWithFilter(nil, sectionIndex: -1)
+		let f = ListableItem.requestForItemsOfType("Issue", withFilter: nil, sectionIndex: -1)
 		let count = mainObjectContext.countForFetchRequest(f, error: nil)
 		let unreadCount = issuesItem.badgeValue?.toInt() ?? 0
 

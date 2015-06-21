@@ -13,7 +13,7 @@ final class IssuesDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource
 
 		issueIds.removeAll(keepCapacity: false)
 
-		let f = Issue.requestForIssuesWithFilter(filter, sectionIndex: -1)
+		let f = ListableItem.requestForItemsOfType("Issue", withFilter: filter, sectionIndex: -1)
 		let allIssues = mainObjectContext.executeFetchRequest(f, error: nil) as! [Issue]
 
 		if let firstIssue = allIssues.first {

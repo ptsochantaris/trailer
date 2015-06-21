@@ -7,7 +7,7 @@ final class PRListController: WKInterfaceController {
 	@IBOutlet weak var emptyLabel: WKInterfaceLabel!
 	@IBOutlet weak var table: WKInterfaceTable!
 
-	private var itemsInSection: [AnyObject]!
+	private var itemsInSection: [ListableItem]!
 	private var sectionIndex: Int!
 	private var prs: Bool!
 	private var selectedIndex: Int?
@@ -58,10 +58,10 @@ final class PRListController: WKInterfaceController {
 	private func buildUI() {
 
 		if prs==true {
-			let f = PullRequest.requestForPullRequestsWithFilter(nil, sectionIndex: sectionIndex)
+			let f = ListableItem.requestForItemsOfType("PullRequest", withFilter: nil, sectionIndex: sectionIndex)
 			itemsInSection = mainObjectContext.executeFetchRequest(f, error: nil) as! [PullRequest]
 		} else {
-			let f = Issue.requestForIssuesWithFilter(nil, sectionIndex: sectionIndex)
+			let f = ListableItem.requestForItemsOfType("Issue", withFilter: nil, sectionIndex: sectionIndex)
 			itemsInSection = mainObjectContext.executeFetchRequest(f, error: nil) as! [Issue]
 		}
 

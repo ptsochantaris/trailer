@@ -466,14 +466,14 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 	func markAllReadSelectedFrom(window: MenuWindow) {
 		if window == prMenu {
-			let f = PullRequest.requestForPullRequestsWithFilter(prMenu.filter.stringValue, sectionIndex: -1)
+			let f = ListableItem.requestForItemsOfType("PullRequest", withFilter: prMenu.filter.stringValue, sectionIndex: -1)
 			for r in mainObjectContext.executeFetchRequest(f, error: nil) as! [PullRequest] {
 				r.catchUpWithComments()
 			}
 			updatePrMenu()
 		} else {
-			let isf = Issue.requestForIssuesWithFilter(issuesMenu.filter.stringValue, sectionIndex: -1)
-			for i in mainObjectContext.executeFetchRequest(isf, error: nil) as! [Issue] {
+			let f = ListableItem.requestForItemsOfType("Issue", withFilter: issuesMenu.filter.stringValue, sectionIndex: -1)
+			for i in mainObjectContext.executeFetchRequest(f, error: nil) as! [Issue] {
 				i.catchUpWithComments()
 			}
 			updateIssuesMenu()
@@ -719,7 +719,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		} else {
             
             if Settings.countOnlyListedItems {
-                let f = Issue.requestForIssuesWithFilter(issuesMenu.filter.stringValue, sectionIndex: -1)
+				let f = ListableItem.requestForItemsOfType("Issue", withFilter: issuesMenu.filter.stringValue, sectionIndex: -1)
                 countString = String(mainObjectContext.countForFetchRequest(f, error: nil))
             } else {
                 countString = String(Issue.countOpenIssuesInMoc(mainObjectContext))
@@ -799,7 +799,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		} else {
 
 			if Settings.countOnlyListedItems {
-				let f = PullRequest.requestForPullRequestsWithFilter(prMenu.filter.stringValue, sectionIndex: -1)
+				let f = ListableItem.requestForItemsOfType("PullRequest", withFilter: prMenu.filter.stringValue, sectionIndex: -1)
 				countString = String(mainObjectContext.countForFetchRequest(f, error: nil))
 			} else {
 				countString = String(PullRequest.countOpenRequestsInMoc(mainObjectContext))

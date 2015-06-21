@@ -56,57 +56,6 @@ final class PullRequest: ListableItem {
 		return moc.executeFetchRequest(f, error: nil) as! [PullRequest]
 	}
 
-	class func requestForPullRequestsWithFilter(filter: String?, sectionIndex: Int) -> NSFetchRequest {
-
-		var andPredicates = [NSPredicate]()
-		if sectionIndex<0 {
-			andPredicates.append(NSPredicate(format: "sectionIndex > 0"))
-		} else {
-			andPredicates.append(NSPredicate(format: "sectionIndex == %d", sectionIndex))
-		}
-
-		if let fi = filter where !fi.isEmpty {
-
-			var orPredicates = [NSPredicate]()
-			orPredicates.append(NSPredicate(format: "title contains[cd] %@", fi))
-			orPredicates.append(NSPredicate(format: "userLogin contains[cd] %@", fi))
-			if Settings.includeReposInFilter {
-				orPredicates.append(NSPredicate(format: "repo.fullName contains[cd] %@", fi))
-			}
-			if Settings.includeLabelsInFilter {
-				orPredicates.append(NSPredicate(format: "any labels.name contains[cd] %@", fi))
-			}
-			if Settings.includeStatusesInFilter {
-				orPredicates.append(NSPredicate(format: "any statuses.descriptionText contains[cd] %@", fi))
-			}
-			andPredicates.append(NSCompoundPredicate.orPredicateWithSubpredicates(orPredicates))
-		}
-
-		if Settings.hideUncommentedItems {
-			andPredicates.append(NSPredicate(format: "unreadComments > 0"))
-		}
-
-		var sortDescriptiors = [NSSortDescriptor]()
-		sortDescriptiors.append(NSSortDescriptor(key: "sectionIndex", ascending: true))
-		if Settings.groupByRepo {
-			sortDescriptiors.append(NSSortDescriptor(key: "repo.fullName", ascending: true, selector: Selector("caseInsensitiveCompare:")))
-		}
-
-		if let fieldName = sortField() {
-			if fieldName == "title" {
-				sortDescriptiors.append(NSSortDescriptor(key: fieldName, ascending: !Settings.sortDescending, selector: Selector("caseInsensitiveCompare:")))
-			} else if !fieldName.isEmpty {
-				sortDescriptiors.append(NSSortDescriptor(key: fieldName, ascending: !Settings.sortDescending))
-			}
-		}
-
-		let f = NSFetchRequest(entityName: "PullRequest")
-		f.fetchBatchSize = 100
-		f.predicate = NSCompoundPredicate.andPredicateWithSubpredicates(andPredicates)
-		f.sortDescriptors = sortDescriptiors
-		return f
-	}
-
 	class func allMergedRequestsInMoc(moc: NSManagedObjectContext) -> [PullRequest] {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
@@ -156,7 +105,7 @@ final class PullRequest: ListableItem {
 	}
 
 	class func badgeCountInMoc(moc: NSManagedObjectContext) -> Int {
-		let f = requestForPullRequestsWithFilter(nil, sectionIndex: -1)
+		let f = requestForItemsOfType("PullRequest", withFilter: nil, sectionIndex: -1)
 		return badgeCountFromFetch(f, inMoc: moc)
 	}
 
