@@ -211,9 +211,7 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 	private func configureCell(cell: UITableViewCell, atIndexPath: NSIndexPath) {
 		let repo = fetchedResultsController.objectAtIndexPath(atIndexPath) as! Repo
 
-		let title = titleForRepo(repo)
-		cell.textLabel?.text = title
-		cell.textLabel?.textColor = repo.shouldSync() ? UIColor.darkTextColor() : UIColor.lightGrayColor()
+		cell.textLabel?.attributedText = titleForRepo(repo)
 
 		let subtitle = subtitleForRepo(repo)
 		cell.detailTextLabel?.attributedText = subtitle
@@ -221,9 +219,11 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 		cell.accessibilityLabel = "\(title), \(subtitle.string)"
 	}
 
-	private func titleForRepo(repo: Repo) -> String {
+	private func titleForRepo(repo: Repo) -> NSAttributedString {
 		let fullName = repo.fullName ?? "(Untitled Repo)"
-		return (repo.inaccessible?.boolValue ?? false) ? (fullName + " (inaccessible)") : fullName
+		let text = (repo.inaccessible?.boolValue ?? false) ? (fullName + " (inaccessible)") : fullName
+		let color = repo.shouldSync() ? UIColor.darkTextColor() : UIColor.lightGrayColor()
+		return NSAttributedString(string: text, attributes: [ NSForegroundColorAttributeName: color ])
 	}
 
 	private func subtitleForRepo(repo: Repo) -> NSAttributedString {
@@ -232,7 +232,8 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 		let prPolicy = RepoDisplayPolicy(rawValue: repo.displayPolicyForPrs?.integerValue ?? 0) ?? RepoDisplayPolicy.Hide
 		var attributes = attributesForEntryWithPolicy(prPolicy)
 		a.appendAttributedString(NSAttributedString(string: prPolicy.name(), attributes: attributes))
-		a.appendAttributedString(NSAttributedString(string: " PRs  ", attributes: attributes))
+		a.appendAttributedString(NSAttributedString(string: " PRs", attributes: attributes))
+		a.appendAttributedString(NSAttributedString(string: " | ", attributes: [ NSForegroundColorAttributeName: UIColor.lightGrayColor() ]));
 
 		let issuePolicy = RepoDisplayPolicy(rawValue: repo.displayPolicyForIssues?.integerValue ?? 0) ?? RepoDisplayPolicy.Hide
 		attributes = attributesForEntryWithPolicy(issuePolicy)
