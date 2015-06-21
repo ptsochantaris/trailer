@@ -12,7 +12,7 @@ let shortDateFormatter = { () -> NSDateFormatter in
 
 let bodyAttributes = { () -> [NSObject : AnyObject] in
 	let commentParagraph = NSMutableParagraphStyle()
-	commentParagraph.hyphenationFactor = 1
+	commentParagraph.hyphenationFactor = 0.75
 	commentParagraph.alignment = NSTextAlignment.Justified
 	return [	NSFontAttributeName: UIFont.systemFontOfSize(12),
 		NSForegroundColorAttributeName: UIColor.whiteColor(),
