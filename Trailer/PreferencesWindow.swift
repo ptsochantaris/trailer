@@ -59,6 +59,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var includeStatusesInFiltering: NSButton!
 	@IBOutlet weak var grayOutWhenRefreshing: NSButton!
 	@IBOutlet weak var assignedPrHandlingPolicy: NSPopUpButton!
+    @IBOutlet weak var includeServersInFiltering: NSButton!
+    @IBOutlet weak var includeUsersInFiltering: NSButton!
 
 	// Labels
 	@IBOutlet weak var labelRescanLabel: NSTextField!
@@ -153,6 +155,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		displayRepositoryNames.integerValue = Settings.showReposInName ? 1 : 0
 		includeRepositoriesInFiltering.integerValue = Settings.includeReposInFilter ? 1 : 0
 		includeLabelsInFiltering.integerValue = Settings.includeLabelsInFilter ? 1 : 0
+        includeUsersInFiltering.integerValue = Settings.includeUsersInFilter ? 1 : 0
+        includeServersInFiltering.integerValue = Settings.includeServersInFilter ? 1 : 0
 		includeStatusesInFiltering.integerValue = Settings.includeStatusesInFilter ? 1 : 0
 		dontConfirmRemoveAllMerged.integerValue = Settings.dontAskBeforeWipingMerged ? 1 : 0
 		hideUncommentedPrs.integerValue = Settings.hideUncommentedItems ? 1 : 0
@@ -276,6 +280,14 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			alert.beginSheetModalForWindow(self, completionHandler: nil)
 		}
 	}
+
+    @IBAction func includeServersInFilteringSelected(sender: NSButton) {
+        Settings.includeServersInFilter = (sender.integerValue==1)
+    }
+
+    @IBAction func includeUsersInFilteringSelected(sender: NSButton) {
+        Settings.includeUsersInFilter = (sender.integerValue==1)
+    }
 
 	@IBAction func includeLabelsInFilteringSelected(sender: NSButton) {
 		Settings.includeLabelsInFilter = (sender.integerValue==1)
