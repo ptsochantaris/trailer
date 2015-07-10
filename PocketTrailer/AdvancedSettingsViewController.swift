@@ -33,9 +33,9 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	}
 
 	private enum Section: Int {
-		case Refresh, Display, Issues, Comments, Repos, StausesAndLabels, History, Confirm, Sort, Misc
-		static let rowCounts = [3, 7, 1, 7, 2, 6, 3, 2, 3, 1]
-		static let allNames = ["Auto Refresh", "Display", "Issues", "Comments", "Repositories", "Statuses & Labels", "History", "Don't confirm when", "Sorting", "Misc"]
+		case Refresh, Display, Filtering, Issues, Comments, Repos, StausesAndLabels, History, Confirm, Sort, Misc
+		static let rowCounts = [3, 5, 5, 1, 7, 2, 6, 3, 2, 3, 1]
+		static let allNames = ["Auto Refresh", "Display", "Filtering", "Issues", "Comments", "Repositories", "Statuses & Labels", "History", "Don't confirm when", "Sorting", "Misc"]
 	}
 
 	private enum NormalSorting: Int {
@@ -56,6 +56,38 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 	private func check(setting: Bool) -> UITableViewCellAccessoryType {
 		return setting ? UITableViewCellAccessoryType.Checkmark : UITableViewCellAccessoryType.None
+	}
+
+	private func filteringSectionFooter() -> UILabel {
+		let p = NSMutableParagraphStyle()
+		p.headIndent = 15.0
+		p.firstLineHeadIndent = 15.0
+		p.tailIndent = -15.0
+
+		let l = UILabel()
+		l.attributedText = NSAttributedString(
+			string: "Tip - use server: label: repo: user: and status: to filter specifically for certain item properties, e.g. label:bug",
+			attributes: [
+				NSFontAttributeName: UIFont.systemFontOfSize(UIFont.smallSystemFontSize()),
+				NSForegroundColorAttributeName: UIColor.lightGrayColor(),
+				NSParagraphStyleAttributeName: p,
+			])
+		l.numberOfLines = 0
+		return l
+	}
+
+	override func tableView(tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+		if section==Section.Filtering.rawValue {
+			return filteringSectionFooter()
+		}
+		return nil
+	}
+
+	override func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+		if section==Section.Filtering.rawValue {
+			return filteringSectionFooter().sizeThatFits(CGSizeMake(tableView.bounds.size.width, 500.0)).height + 15.0
+		}
+		return 0.0
 	}
 
 	override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -91,14 +123,27 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.textLabel?.text = "Display repository names"
 				cell.accessoryType = check(Settings.showReposInName)
 			case 4:
-				cell.textLabel?.text = "Include repository names in filtering"
-				cell.accessoryType = check(Settings.includeReposInFilter)
-			case 5:
-				cell.textLabel?.text = "Include labels in filtering"
-				cell.accessoryType = check(Settings.includeLabelsInFilter)
-			case 6:
 				cell.textLabel?.text = "Hide descriptions in Apple Watch detail views"
 				cell.accessoryType = check(Settings.hideDescriptionInWatchDetail)
+			default: break
+			}
+		} else if indexPath.section == Section.Filtering.rawValue {
+			switch indexPath.row {
+			case 0:
+				cell.textLabel?.text = "Include repository names in filtering"
+				cell.accessoryType = check(Settings.includeReposInFilter)
+			case 1:
+				cell.textLabel?.text = "Include labels in filtering"
+				cell.accessoryType = check(Settings.includeLabelsInFilter)
+			case 2:
+				cell.textLabel?.text = "Include statuses in filtering"
+				cell.accessoryType = check(Settings.includeLabelsInFilter)
+			case 3:
+				cell.textLabel?.text = "Include servers in filtering"
+				cell.accessoryType = check(Settings.includeLabelsInFilter)
+			case 4:
+				cell.textLabel?.text = "Include usernames in filtering"
+				cell.accessoryType = check(Settings.includeLabelsInFilter)
 			default: break
 			}
 		} else if indexPath.section == Section.Issues.rawValue {
@@ -270,11 +315,21 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				Settings.showReposInName = !Settings.showReposInName
 				settingsChangedTimer.push()
 			case 4:
-				Settings.includeReposInFilter = !Settings.includeReposInFilter
-			case 5:
-				Settings.includeLabelsInFilter = !Settings.includeLabelsInFilter
-			case 6:
 				Settings.hideDescriptionInWatchDetail = !Settings.hideDescriptionInWatchDetail
+			default: break
+			}
+		} else if indexPath.section == Section.Filtering.rawValue {
+			switch indexPath.row {
+			case 0:
+				Settings.includeReposInFilter = !Settings.includeReposInFilter
+			case 1:
+				Settings.includeLabelsInFilter = !Settings.includeLabelsInFilter
+			case 2:
+				Settings.includeStatusesInFilter = !Settings.includeStatusesInFilter
+			case 3:
+				Settings.includeServersInFilter = !Settings.includeServersInFilter
+			case 4:
+				Settings.includeUsersInFilter = !Settings.includeUsersInFilter
 			default: break
 			}
 		} else if indexPath.section == Section.Issues.rawValue {

@@ -14,11 +14,11 @@ final class DataManager : NSObject {
 	class func checkMigration() {
 		if Settings.lastRunVersion != versionString() {
 			DLog("VERSION UPDATE MAINTENANCE NEEDED")
-            #if os(iOS)
-                migrateDatabaseToShared()
-            #endif
+			#if os(iOS)
+				migrateDatabaseToShared()
+			#endif
 			DataManager.performVersionChangedTasks()
-            Settings.lastRunVersion = versionString()
+			Settings.lastRunVersion = versionString()
 		}
 		ApiServer.ensureAtLeastGithubInMoc(mainObjectContext)
 	}
@@ -74,30 +74,30 @@ final class DataManager : NSObject {
 		}
 	}
 
-    private class func migrateDatabaseToShared() {
-        let oldDocumentsDirectory = legacyFilesDirectory().path!
-        let fm = NSFileManager.defaultManager()
-        if fm.fileExistsAtPath(oldDocumentsDirectory) {
-            DLog("Migrating DB files into group container")
-            if let files = fm.contentsOfDirectoryAtPath(oldDocumentsDirectory, error: nil) as? [String] {
-                let newDocumentsDirectory = sharedFilesDirectory().path!
-                for file in files {
-                    if file.rangeOfString("Trailer.sqlite") != nil {
-                        DLog("Moving database file: %@",file)
-                        let oldPath = oldDocumentsDirectory.stringByAppendingPathComponent(file)
-                        let newPath = newDocumentsDirectory.stringByAppendingPathComponent(file)
-                        if fm.fileExistsAtPath(newPath) {
-                            fm.removeItemAtPath(newPath, error: nil)
-                        }
-                        fm.moveItemAtPath(oldPath, toPath: newPath, error: nil)
-                    }
-                }
-            }
-            fm.removeItemAtPath(oldDocumentsDirectory, error: nil)
-        } else {
-            DLog("No need to migrate DB into shared container")
-        }
-    }
+	private class func migrateDatabaseToShared() {
+		let oldDocumentsDirectory = legacyFilesDirectory().path!
+		let fm = NSFileManager.defaultManager()
+		if fm.fileExistsAtPath(oldDocumentsDirectory) {
+			DLog("Migrating DB files into group container")
+			if let files = fm.contentsOfDirectoryAtPath(oldDocumentsDirectory, error: nil) as? [String] {
+				let newDocumentsDirectory = sharedFilesDirectory().path!
+				for file in files {
+					if file.rangeOfString("Trailer.sqlite") != nil {
+						DLog("Moving database file: %@",file)
+						let oldPath = oldDocumentsDirectory.stringByAppendingPathComponent(file)
+						let newPath = newDocumentsDirectory.stringByAppendingPathComponent(file)
+						if fm.fileExistsAtPath(newPath) {
+							fm.removeItemAtPath(newPath, error: nil)
+						}
+						fm.moveItemAtPath(oldPath, toPath: newPath, error: nil)
+					}
+				}
+			}
+			fm.removeItemAtPath(oldDocumentsDirectory, error: nil)
+		} else {
+			DLog("No need to migrate DB into shared container")
+		}
+	}
 
 	class func sendNotifications() {
 
@@ -432,11 +432,11 @@ func persistentStoreCoordinator() -> NSPersistentStoreCoordinator? {
 }
 
 func applicationFilesDirectory() -> NSURL {
-    #if os(iOS)
-        return sharedFilesDirectory()
-    #else
-        return legacyFilesDirectory()
-    #endif
+	#if os(iOS)
+		return sharedFilesDirectory()
+	#else
+		return legacyFilesDirectory()
+	#endif
 }
 
 private func legacyFilesDirectory() -> NSURL {
@@ -448,9 +448,9 @@ private func legacyFilesDirectory() -> NSURL {
 }
 
 private func sharedFilesDirectory() -> NSURL {
-    var appSupportURL = NSFileManager.defaultManager().containerURLForSecurityApplicationGroupIdentifier("group.Trailer")!
-    DLog("Shared files in %@", appSupportURL)
-    return appSupportURL
+	let appSupportURL = NSFileManager.defaultManager().containerURLForSecurityApplicationGroupIdentifier("group.Trailer")!
+	DLog("Shared files in %@", appSupportURL)
+	return appSupportURL
 }
 
 func addStorePath(sqlStore: NSURL) -> Bool {
@@ -506,7 +506,7 @@ func addStorePath(sqlStore: NSURL) -> Bool {
 		options: [
 			NSMigratePersistentStoresAutomaticallyOption: true,
 			NSInferMappingModelAutomaticallyOption: true,
-            NSReadOnlyPersistentStoreOption: dataReadonly,
+			NSReadOnlyPersistentStoreOption: dataReadonly,
 			NSSQLitePragmasOption: ["synchronous":"OFF", "fullfsync":"0"]],
 		error: &error)
 
