@@ -475,11 +475,6 @@ final class Settings {
 		set { set("HOTKEY_CONTROL_MODIFIER", newValue) }
 	}
 
-	class var useVibrancy: Bool {
-		get { return get("USE_VIBRANCY_UI") as? Bool ?? false }
-		set { set("USE_VIBRANCY_UI", newValue) }
-	}
-
     class var disableAllCommentNotifications: Bool {
         get { return get("DISABLE_ALL_COMMENT_NOTIFICATIONS") as? Bool ?? false }
         set { set("DISABLE_ALL_COMMENT_NOTIFICATIONS", newValue) }
@@ -526,6 +521,11 @@ final class Settings {
     }
 
 	////////////////////////////// DEFAULT TRUE
+
+	class var useVibrancy: Bool {
+		get { return get("USE_VIBRANCY_UI") as? Bool ?? true }
+		set { set("USE_VIBRANCY_UI", newValue) }
+	}
 
     class var countOnlyListedItems: Bool {
         get { return get("COUNT_ONLY_LISTED_PRS") as? Bool ?? true }

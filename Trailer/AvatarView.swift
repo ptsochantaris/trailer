@@ -16,6 +16,13 @@ final class AvatarView: NSImageView {
 		}
 	}
 
+	override func drawRect(dirtyRect: NSRect) {
+		let radius = floor(AVATAR_SIZE/2.0)
+		let path = NSBezierPath(roundedRect: dirtyRect, xRadius: radius, yRadius: radius)
+		path.addClip()
+		super.drawRect(dirtyRect)
+	}
+
 	required init?(coder: NSCoder) {
 	    fatalError("init(coder:) has not been implemented")
 	}

@@ -59,8 +59,6 @@ final class IssueCell: TrailerCell {
 			let userImage = AvatarView(
 				frame: NSMakeRect(LEFTPADDING, bounds.size.height-AVATAR_SIZE-7.0, AVATAR_SIZE, AVATAR_SIZE),
 				url: issue.userAvatarUrl ?? "")
-			userImage.wantsLayer = true
-			userImage.layer?.cornerRadius = floor(AVATAR_SIZE/2.0)
 			addSubview(userImage)
 			shift = AVATAR_PADDING+AVATAR_SIZE
 		}
