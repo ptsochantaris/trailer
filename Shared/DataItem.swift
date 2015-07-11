@@ -14,20 +14,20 @@ class DataItem: NSManagedObject {
 		apiServer.resetSyncState()
 	}
 
-	class func allItemsOfType(type: String, inMoc: NSManagedObjectContext) -> [DataItem] {
+	final class func allItemsOfType(type: String, inMoc: NSManagedObjectContext) -> [DataItem] {
 		let f = NSFetchRequest(entityName: type)
 		f.returnsObjectsAsFaults = false
 		return inMoc.executeFetchRequest(f, error: nil) as! [DataItem]
 	}
 
-	class func allItemsOfType(type: String, fromServer: ApiServer) -> [DataItem] {
+	final class func allItemsOfType(type: String, fromServer: ApiServer) -> [DataItem] {
 		let f = NSFetchRequest(entityName: type)
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "apiServer == %@", fromServer)
 		return fromServer.managedObjectContext?.executeFetchRequest(f, error: nil) as! [DataItem]
 	}
 
-	class func itemOfType(type: String, serverId: NSNumber, fromServer: ApiServer) -> DataItem? {
+	final class func itemOfType(type: String, serverId: NSNumber, fromServer: ApiServer) -> DataItem? {
 		let f = NSFetchRequest(entityName: type)
 		f.returnsObjectsAsFaults = false
 		f.fetchLimit = 1
@@ -36,7 +36,7 @@ class DataItem: NSManagedObject {
 		return items?.first as? DataItem
 	}
 
-	class func itemWithInfo(info: [NSObject : AnyObject], type: String, fromServer: ApiServer) -> DataItem {
+	final class func itemWithInfo(info: [NSObject : AnyObject], type: String, fromServer: ApiServer) -> DataItem {
 		let serverId = N(info, "id") as! NSNumber
 		let updatedDate = syncDateFormatter.dateFromString(N(info, "updated_at") as! String)
 		var existingItem = itemOfType(type, serverId: serverId, fromServer: fromServer)
@@ -59,7 +59,7 @@ class DataItem: NSManagedObject {
 		return existingItem!
 	}
 
-	class func itemsOfType(type: String, surviving: Bool, inMoc: NSManagedObjectContext) -> [DataItem] {
+	final class func itemsOfType(type: String, surviving: Bool, inMoc: NSManagedObjectContext) -> [DataItem] {
 		let f = NSFetchRequest(entityName: type)
 		if surviving {
 			f.returnsObjectsAsFaults = false
@@ -71,28 +71,28 @@ class DataItem: NSManagedObject {
 		return inMoc.executeFetchRequest(f, error: nil) as! [DataItem]
 	}
 
-	class func newOrUpdatedItemsOfType(type: String, inMoc: NSManagedObjectContext) -> [DataItem] {
+	final class func newOrUpdatedItemsOfType(type: String, inMoc: NSManagedObjectContext) -> [DataItem] {
 		let f = NSFetchRequest(entityName: type)
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "postSyncAction = %d or postSyncAction = %d", PostSyncAction.NoteNew.rawValue, PostSyncAction.NoteUpdated.rawValue)
 		return inMoc.executeFetchRequest(f, error: nil) as! [DataItem]
 	}
 
-	class func updatedItemsOfType(type: String, inMoc: NSManagedObjectContext) -> [DataItem] {
+	final class func updatedItemsOfType(type: String, inMoc: NSManagedObjectContext) -> [DataItem] {
 		let f = NSFetchRequest(entityName: type)
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "postSyncAction = %d", PostSyncAction.NoteUpdated.rawValue)
 		return inMoc.executeFetchRequest(f, error: nil) as! [DataItem]
 	}
 
-	class func newItemsOfType(type: String, inMoc: NSManagedObjectContext) -> [DataItem] {
+	final class func newItemsOfType(type: String, inMoc: NSManagedObjectContext) -> [DataItem] {
 		let f = NSFetchRequest(entityName: type)
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "postSyncAction = %d", PostSyncAction.NoteNew.rawValue)
 		return inMoc.executeFetchRequest(f, error: nil) as! [DataItem]
 	}
 
-	class func nukeDeletedItemsInMoc(moc: NSManagedObjectContext) {
+	final class func nukeDeletedItemsInMoc(moc: NSManagedObjectContext) {
 		let types = ["Repo", "PullRequest", "PRStatus", "PRComment", "PRLabel", "Issue", "Team"]
 		var count = 0
 		for type in types {
@@ -108,7 +108,7 @@ class DataItem: NSManagedObject {
 		DLog("Nuked total %d items marked for deletion", count)
 	}
 
-	class func countItemsOfType(type: String, moc: NSManagedObjectContext) -> Int {
+	final class func countItemsOfType(type: String, moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest(entityName: type)
 		return moc.countForFetchRequest(f, error: nil)
 	}

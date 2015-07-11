@@ -36,18 +36,18 @@ class ListableItem: DataItem {
 	@NSManaged var comments: Set<PRComment>
 	@NSManaged var labels: Set<PRLabel>
 
-	override func resetSyncState() {
+	final override func resetSyncState() {
 		super.resetSyncState()
 		repo.resetSyncState()
 	}
 
-	override func prepareForDeletion() {
+	final override func prepareForDeletion() {
 		api.refreshesSinceLastLabelsCheck[objectID] = nil
 		api.refreshesSinceLastStatusCheck[objectID] = nil
 		super.prepareForDeletion()
 	}
 
-	class func sortField() -> String? {
+	final class func sortField() -> String? {
 		switch (Settings.sortMethod) {
 		case PRSortingMethod.CreationDate.rawValue: return "createdAt"
 		case PRSortingMethod.RecentActivity.rawValue: return "updatedAt"
@@ -56,7 +56,7 @@ class ListableItem: DataItem {
 		}
 	}
 
-	func sortedComments(comparison: NSComparisonResult) -> [PRComment] {
+	final func sortedComments(comparison: NSComparisonResult) -> [PRComment] {
 		return Array(comments).sorted({ (c1, c2) -> Bool in
 			let d1 = c1.createdAt ?? never()
 			let d2 = c2.createdAt ?? never()
@@ -64,7 +64,7 @@ class ListableItem: DataItem {
 		})
 	}
 
-	func catchUpWithComments() {
+	final func catchUpWithComments() {
 		for c in comments {
 			if let creation = c.createdAt {
 				if let latestRead = latestReadCommentDate {
@@ -79,29 +79,29 @@ class ListableItem: DataItem {
 		postProcess()
 	}
 
-	func shouldKeepForPolicy(policy: Int) -> Bool {
+	final func shouldKeepForPolicy(policy: Int) -> Bool {
 		let index = (sectionIndex?.integerValue ?? 0)
 		return policy==PRHandlingPolicy.KeepAll.rawValue
 			|| (policy==PRHandlingPolicy.KeepMineAndParticipated.rawValue && (index==PullRequestSection.Mine.rawValue || index==PullRequestSection.Participated.rawValue))
 			|| (policy==PRHandlingPolicy.KeepMine.rawValue && index==PullRequestSection.Mine.rawValue)
 	}
 
-	func assignedToMySection() -> Bool {
+	final func assignedToMySection() -> Bool {
 		return (assignedToMe?.boolValue ?? false) && Settings.assignedPrHandlingPolicy==PRAssignmentPolicy.MoveToMine.rawValue
 	}
 
-	func assignedToParticipated() -> Bool {
+	final func assignedToParticipated() -> Bool {
 		return (assignedToMe?.boolValue ?? false) && Settings.assignedPrHandlingPolicy==PRAssignmentPolicy.MoveToParticipated.rawValue
 	}
 
-	func createdByMe() -> Bool {
+	final func createdByMe() -> Bool {
 		if let userId = userId, apiId = apiServer.userId {
 			return userId == apiId
 		}
 		return false
 	}
 
-	func refersToMe() -> Bool {
+	final func refersToMe() -> Bool {
 		if let apiName = apiServer.userName, b = body {
 			let range = b.rangeOfString("@"+apiName, options: NSStringCompareOptions.CaseInsensitiveSearch | NSStringCompareOptions.DiacriticInsensitiveSearch)
 			return range != nil
@@ -109,7 +109,7 @@ class ListableItem: DataItem {
 		return false
 	}
 
-	func commentedByMe() -> Bool {
+	final func commentedByMe() -> Bool {
 		for c in comments {
 			if c.isMine() {
 				return true
@@ -118,7 +118,7 @@ class ListableItem: DataItem {
 		return false
 	}
 
-	func refersToMyTeams() -> Bool {
+	final func refersToMyTeams() -> Bool {
 		if let b = body {
 			for t in apiServer.teams {
 				if let r = t.calculatedReferral {
@@ -135,15 +135,15 @@ class ListableItem: DataItem {
 		return false
 	}
 
-	func isVisibleOnMenu() -> Bool {
+	final func isVisibleOnMenu() -> Bool {
 		return self.sectionIndex?.integerValue != PullRequestSection.None.rawValue
 	}
 
-	func showNewComments() -> Bool {
+	final func showNewComments() -> Bool {
 		return Settings.showCommentsEverywhere || sectionIndex?.integerValue == PullRequestSection.Mine.rawValue || sectionIndex?.integerValue == PullRequestSection.Participated.rawValue
 	}
 
-	func postProcess() {
+	final func postProcess() {
 		var targetSection: PullRequestSection
 		var currentCondition = condition?.integerValue ?? PullRequestCondition.Open.rawValue
 
@@ -226,7 +226,7 @@ class ListableItem: DataItem {
 		if title==nil { title = "(No title)" }
 	}
 
-	func urlForOpening() -> String? {
+	final func urlForOpening() -> String? {
 		var unreadCount = unreadComments?.integerValue ?? 0
 
 		if unreadCount > 0 && Settings.openPrAtFirstUnreadComment {
@@ -244,7 +244,7 @@ class ListableItem: DataItem {
 		return webUrl
 	}
 
-	func accessibleTitle() -> String {
+	final func accessibleTitle() -> String {
 		var components = [String]()
 		if let t = title {
 			components.append(t)
@@ -260,13 +260,13 @@ class ListableItem: DataItem {
 		return ",".join(components)
 	}
 
-	func sortedLabels() -> [PRLabel] {
+	final func sortedLabels() -> [PRLabel] {
 		return Array(labels).sorted({ (l1: PRLabel, l2: PRLabel) -> Bool in
 			return l1.name!.compare(l2.name!)==NSComparisonResult.OrderedAscending
 		})
 	}
 
-	func titleWithFont(font: FONT_CLASS, labelFont: FONT_CLASS, titleColor: COLOR_CLASS) -> NSMutableAttributedString {
+	final func titleWithFont(font: FONT_CLASS, labelFont: FONT_CLASS, titleColor: COLOR_CLASS) -> NSMutableAttributedString {
 		let p = NSMutableParagraphStyle()
 		p.paragraphSpacing = 1.0
 
@@ -314,7 +314,7 @@ class ListableItem: DataItem {
 		return _title
 	}
 
-	func predicateForOthersCommentsSinceDate(optionalDate: NSDate?) -> NSPredicate {
+	final func predicateForOthersCommentsSinceDate(optionalDate: NSDate?) -> NSPredicate {
 
 		var userNumber = apiServer.userId?.longLongValue ?? 0
 
@@ -335,7 +335,7 @@ class ListableItem: DataItem {
 		}
 	}
 
-	class func badgeCountFromFetch(f: NSFetchRequest, inMoc: NSManagedObjectContext) -> Int {
+	final class func badgeCountFromFetch(f: NSFetchRequest, inMoc: NSManagedObjectContext) -> Int {
 		var badgeCount:Int = 0
 		let showCommentsEverywhere = Settings.showCommentsEverywhere
 		for i in inMoc.executeFetchRequest(f, error: nil) as! [ListableItem] {
@@ -350,7 +350,7 @@ class ListableItem: DataItem {
 		return badgeCount
 	}
 
-	class func serverPredicateFromFilterString(string: String) -> NSPredicate? {
+	final class func serverPredicateFromFilterString(string: String) -> NSPredicate? {
 		if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 7 {
 			let serverNames = string.substringFromIndex(advance(string.startIndex, 7))
 			if !isEmpty(serverNames) {
@@ -364,7 +364,7 @@ class ListableItem: DataItem {
 		return nil
 	}
 
-    class func repoPredicateFromFilterString(string: String) -> NSPredicate? {
+    final class func repoPredicateFromFilterString(string: String) -> NSPredicate? {
         if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 5 {
             let repoNames = string.substringFromIndex(advance(string.startIndex, 5))
             if !isEmpty(repoNames) {
@@ -378,7 +378,7 @@ class ListableItem: DataItem {
         return nil
     }
 
-    class func labelPredicateFromFilterString(string: String) -> NSPredicate? {
+    final class func labelPredicateFromFilterString(string: String) -> NSPredicate? {
         if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 6 {
             let labelNames = string.substringFromIndex(advance(string.startIndex, 6))
             if !isEmpty(labelNames) {
@@ -392,7 +392,7 @@ class ListableItem: DataItem {
         return nil
     }
 
-    class func statusPredicateFromFilterString(string: String) -> NSPredicate? {
+    final class func statusPredicateFromFilterString(string: String) -> NSPredicate? {
         if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 7 {
             let statusNames = string.substringFromIndex(advance(string.startIndex, 7))
             if !isEmpty(statusNames) {
@@ -406,7 +406,7 @@ class ListableItem: DataItem {
         return nil
     }
 
-    class func userPredicateFromFilterString(string: String) -> NSPredicate? {
+    final class func userPredicateFromFilterString(string: String) -> NSPredicate? {
         if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 5 {
             let userNames = string.substringFromIndex(advance(string.startIndex, 5))
             if !isEmpty(userNames) {
@@ -420,7 +420,7 @@ class ListableItem: DataItem {
         return nil
     }
 
-	class func requestForItemsOfType(itemType: String, withFilter: String?, sectionIndex: Int) -> NSFetchRequest {
+	final class func requestForItemsOfType(itemType: String, withFilter: String?, sectionIndex: Int) -> NSFetchRequest {
 
 		var andPredicates = [NSPredicate]()
 		if sectionIndex<0 {
