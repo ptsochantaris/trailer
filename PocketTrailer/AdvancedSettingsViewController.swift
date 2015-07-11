@@ -66,7 +66,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 		let l = UILabel()
 		l.attributedText = NSAttributedString(
-			string: "Tip - use server: label: repo: user: and status: to filter specifically for certain item properties, e.g. label:bug",
+			string: "Tip - use server: label: repo: user: and status: to filter specifically for properties, e.g. \"label:bug,critical\"",
 			attributes: [
 				NSFontAttributeName: UIFont.systemFontOfSize(UIFont.smallSystemFontSize()),
 				NSForegroundColorAttributeName: UIColor.lightGrayColor(),

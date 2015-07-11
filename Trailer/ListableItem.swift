@@ -352,9 +352,13 @@ class ListableItem: DataItem {
 
 	class func serverPredicateFromFilterString(string: String) -> NSPredicate? {
 		if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 7 {
-			let serverName = string.substringFromIndex(advance(string.startIndex, 7))
-			if !isEmpty(serverName) {
-				return NSPredicate(format: "apiServer.label contains [cd] %@", serverName)
+			let serverNames = string.substringFromIndex(advance(string.startIndex, 7))
+			if !isEmpty(serverNames) {
+				var orTerms = [NSPredicate]()
+				for term in serverNames.componentsSeparatedByString(",") {
+					orTerms.append(NSPredicate(format: "apiServer.label contains [cd] %@", term))
+				}
+				return NSCompoundPredicate(type: NSCompoundPredicateType.OrPredicateType, subpredicates: orTerms)
 			}
 		}
 		return nil
@@ -362,9 +366,13 @@ class ListableItem: DataItem {
 
     class func repoPredicateFromFilterString(string: String) -> NSPredicate? {
         if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 5 {
-            let repoName = string.substringFromIndex(advance(string.startIndex, 5))
-            if !isEmpty(repoName) {
-                return NSPredicate(format: "repo.fullName contains [cd] %@", repoName)
+            let repoNames = string.substringFromIndex(advance(string.startIndex, 5))
+            if !isEmpty(repoNames) {
+				var orTerms = [NSPredicate]()
+				for term in repoNames.componentsSeparatedByString(",") {
+					orTerms.append(NSPredicate(format: "repo.fullName contains [cd] %@", term))
+				}
+				return NSCompoundPredicate(type: NSCompoundPredicateType.OrPredicateType, subpredicates: orTerms)
             }
         }
         return nil
@@ -372,9 +380,13 @@ class ListableItem: DataItem {
 
     class func labelPredicateFromFilterString(string: String) -> NSPredicate? {
         if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 6 {
-            let labelName = string.substringFromIndex(advance(string.startIndex, 6))
-            if !isEmpty(labelName) {
-                return NSPredicate(format: "any labels.name contains[cd] %@", labelName)
+            let labelNames = string.substringFromIndex(advance(string.startIndex, 6))
+            if !isEmpty(labelNames) {
+				var orTerms = [NSPredicate]()
+				for term in labelNames.componentsSeparatedByString(",") {
+					orTerms.append(NSPredicate(format: "any labels.name contains[cd] %@", term))
+				}
+				return NSCompoundPredicate(type: NSCompoundPredicateType.OrPredicateType, subpredicates: orTerms)
             }
         }
         return nil
@@ -382,9 +394,13 @@ class ListableItem: DataItem {
 
     class func statusPredicateFromFilterString(string: String) -> NSPredicate? {
         if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 7 {
-            let statusName = string.substringFromIndex(advance(string.startIndex, 7))
-            if !isEmpty(statusName) {
-                return NSPredicate(format: "any statuses.descriptionText contains[cd] %@", statusName)
+            let statusNames = string.substringFromIndex(advance(string.startIndex, 7))
+            if !isEmpty(statusNames) {
+				var orTerms = [NSPredicate]()
+				for term in statusNames.componentsSeparatedByString(",") {
+					orTerms.append(NSPredicate(format: "any statuses.descriptionText contains[cd] %@", term))
+				}
+				return NSCompoundPredicate(type: NSCompoundPredicateType.OrPredicateType, subpredicates: orTerms)
             }
         }
         return nil
@@ -392,9 +408,13 @@ class ListableItem: DataItem {
 
     class func userPredicateFromFilterString(string: String) -> NSPredicate? {
         if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 5 {
-            let userName = string.substringFromIndex(advance(string.startIndex, 5))
-            if !isEmpty(userName) {
-                return NSPredicate(format: "userLogin contains[cd] %@", userName)
+            let userNames = string.substringFromIndex(advance(string.startIndex, 5))
+            if !isEmpty(userNames) {
+				var orTerms = [NSPredicate]()
+				for term in userNames.componentsSeparatedByString(",") {
+					orTerms.append(NSPredicate(format: "userLogin contains[cd] %@", term))
+				}
+				return NSCompoundPredicate(type: NSCompoundPredicateType.OrPredicateType, subpredicates: orTerms)
             }
         }
         return nil
@@ -413,24 +433,29 @@ class ListableItem: DataItem {
 
 			var fi = f
 
-            func checkForPredicate(tagString: String, process: String->NSPredicate?) {
-                for word in fi.componentsSeparatedByString(" ") {
-                    if startsWith(word, tagString+":") {
-                        if let p = process(word) {
-                            andPredicates.append(p)
-                        }
-                        fi = fi.stringByReplacingOccurrencesOfString(word, withString: "")
-                        fi = fi.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
-                        break
-                    }
-                }
+            func checkForPredicates(tagString: String, process: String->NSPredicate?) {
+				var foundOne: Bool
+				do {
+					foundOne = false
+					for word in fi.componentsSeparatedByString(" ") {
+						if startsWith(word, tagString+":") {
+							if let p = process(word) {
+								andPredicates.append(p)
+							}
+							fi = fi.stringByReplacingOccurrencesOfString(word, withString: "")
+							fi = fi.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+							foundOne = true
+							break
+						}
+					}
+				} while(foundOne)
             }
 
-            checkForPredicate("server", serverPredicateFromFilterString)
-            checkForPredicate("repo", repoPredicateFromFilterString)
-            checkForPredicate("label", labelPredicateFromFilterString)
-            checkForPredicate("status", statusPredicateFromFilterString)
-            checkForPredicate("user", userPredicateFromFilterString)
+            checkForPredicates("server", serverPredicateFromFilterString)
+            checkForPredicates("repo", repoPredicateFromFilterString)
+            checkForPredicates("label", labelPredicateFromFilterString)
+            checkForPredicates("status", statusPredicateFromFilterString)
+            checkForPredicates("user", userPredicateFromFilterString)
 
 			if !fi.isEmpty {
 				var orPredicates = [NSPredicate]()

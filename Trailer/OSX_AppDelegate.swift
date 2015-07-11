@@ -905,11 +905,20 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 			if let w = incomingEvent.window as? MenuWindow {
 				//DLog("Keycode: %d", incomingEvent.keyCode)
+
 				switch incomingEvent.keyCode {
 				case 123: // left
 					fallthrough
 				case 124: // right
+					if !(
+						(incomingEvent.modifierFlags & NSEventModifierFlags.CommandKeyMask) == NSEventModifierFlags.CommandKeyMask
+						&& (incomingEvent.modifierFlags & NSEventModifierFlags.AlternateKeyMask) == NSEventModifierFlags.AlternateKeyMask
+						) {
+							return incomingEvent
+					}
+
 					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
+
 					if Repo.interestedInPrs() && Repo.interestedInIssues() {
 						if w == self!.prMenu {
 							self!.showMenu(self!.issuesMenu)
@@ -919,6 +928,9 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					}
 					return nil
 				case 125: // down
+					if incomingEvent.modifierFlags & NSEventModifierFlags.ShiftKeyMask == NSEventModifierFlags.ShiftKeyMask {
+						return incomingEvent
+					}
 					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
 					var i = w.table.selectedRow + 1
 					if i < w.table.numberOfRows {
@@ -927,6 +939,9 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					}
 					return nil
 				case 126: // up
+					if incomingEvent.modifierFlags & NSEventModifierFlags.ShiftKeyMask == NSEventModifierFlags.ShiftKeyMask {
+						return incomingEvent
+					}
 					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
 					var i = w.table.selectedRow - 1
 					if i > 0 {
@@ -1033,7 +1048,11 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			"T": 17, "U": 32, "V": 9, "W": 13, "X": 7, "Y": 16, "Z": 6 ];
 
 		if check==4, let n = keyMap[Settings.hotkeyLetter] where incomingEvent.keyCode == UInt16(n) {
-			showMenu(prMenu)
+			if Repo.interestedInPrs() {
+				showMenu(prMenu)
+			} else if Repo.interestedInIssues() {
+				showMenu(issuesMenu)
+			}
 			return true
 		}
 		return false
