@@ -364,6 +364,20 @@ class ListableItem: DataItem {
 		return nil
 	}
 
+	final class func titlePredicateFromFilterString(string: String) -> NSPredicate? {
+		if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 6 {
+			let titleTerms = string.substringFromIndex(advance(string.startIndex, 6))
+			if !isEmpty(titleTerms) {
+				var orTerms = [NSPredicate]()
+				for term in titleTerms.componentsSeparatedByString(",") {
+					orTerms.append(NSPredicate(format: "title contains [cd] %@", term))
+				}
+				return NSCompoundPredicate(type: NSCompoundPredicateType.OrPredicateType, subpredicates: orTerms)
+			}
+		}
+		return nil
+	}
+
     final class func repoPredicateFromFilterString(string: String) -> NSPredicate? {
         if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 5 {
             let repoNames = string.substringFromIndex(advance(string.startIndex, 5))
@@ -451,6 +465,7 @@ class ListableItem: DataItem {
 				} while(foundOne)
             }
 
+			checkForPredicates("title", titlePredicateFromFilterString)
             checkForPredicates("server", serverPredicateFromFilterString)
             checkForPredicates("repo", repoPredicateFromFilterString)
             checkForPredicates("label", labelPredicateFromFilterString)
@@ -459,8 +474,9 @@ class ListableItem: DataItem {
 
 			if !fi.isEmpty {
 				var orPredicates = [NSPredicate]()
-				orPredicates.append(NSPredicate(format: "title contains[cd] %@", fi))
-				orPredicates.append(NSPredicate(format: "userLogin contains[cd] %@", fi))
+				if Settings.includeTitlesInFilter {
+					orPredicates.append(NSPredicate(format: "title contains[cd] %@", fi))
+				}
 				if Settings.includeReposInFilter {
 					orPredicates.append(NSPredicate(format: "repo.fullName contains[cd] %@", fi))
 				}

@@ -34,7 +34,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 	private enum Section: Int {
 		case Refresh, Display, Filtering, Issues, Comments, Repos, StausesAndLabels, History, Confirm, Sort, Misc
-		static let rowCounts = [3, 5, 5, 1, 7, 2, 6, 3, 2, 3, 1]
+		static let rowCounts = [3, 5, 6, 1, 7, 2, 6, 3, 2, 3, 1]
 		static let allNames = ["Auto Refresh", "Display", "Filtering", "Issues", "Comments", "Repositories", "Statuses & Labels", "History", "Don't confirm when", "Sorting", "Misc"]
 	}
 
@@ -66,7 +66,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 		let l = UILabel()
 		l.attributedText = NSAttributedString(
-			string: "Tip - use server: label: repo: user: and status: to filter specifically for properties, e.g. \"label:bug,critical\"",
+			string: "Additionally, you can use title: server: label: repo: user: and status: to filter specific properties, e.g. \"label:bug,suggestion\"",
 			attributes: [
 				NSFontAttributeName: UIFont.systemFontOfSize(UIFont.smallSystemFontSize()),
 				NSForegroundColorAttributeName: UIColor.lightGrayColor(),
@@ -130,19 +130,22 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		} else if indexPath.section == Section.Filtering.rawValue {
 			switch indexPath.row {
 			case 0:
-				cell.textLabel?.text = "Include repository names in filtering"
-				cell.accessoryType = check(Settings.includeReposInFilter)
+				cell.textLabel?.text = "Include item titles"
+				cell.accessoryType = check(Settings.includeTitlesInFilter)
 			case 1:
-				cell.textLabel?.text = "Include labels in filtering"
-				cell.accessoryType = check(Settings.includeLabelsInFilter)
+				cell.textLabel?.text = "Include repository names "
+				cell.accessoryType = check(Settings.includeReposInFilter)
 			case 2:
-				cell.textLabel?.text = "Include statuses in filtering"
+				cell.textLabel?.text = "Include labels"
 				cell.accessoryType = check(Settings.includeLabelsInFilter)
 			case 3:
-				cell.textLabel?.text = "Include servers in filtering"
+				cell.textLabel?.text = "Include statuses"
 				cell.accessoryType = check(Settings.includeLabelsInFilter)
 			case 4:
-				cell.textLabel?.text = "Include usernames in filtering"
+				cell.textLabel?.text = "Include servers"
+				cell.accessoryType = check(Settings.includeLabelsInFilter)
+			case 5:
+				cell.textLabel?.text = "Include usernames"
 				cell.accessoryType = check(Settings.includeLabelsInFilter)
 			default: break
 			}
@@ -321,17 +324,20 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		} else if indexPath.section == Section.Filtering.rawValue {
 			switch indexPath.row {
 			case 0:
-				Settings.includeReposInFilter = !Settings.includeReposInFilter
+				Settings.includeTitlesInFilter = !Settings.includeTitlesInFilter
 			case 1:
-				Settings.includeLabelsInFilter = !Settings.includeLabelsInFilter
+				Settings.includeReposInFilter = !Settings.includeReposInFilter
 			case 2:
-				Settings.includeStatusesInFilter = !Settings.includeStatusesInFilter
+				Settings.includeLabelsInFilter = !Settings.includeLabelsInFilter
 			case 3:
-				Settings.includeServersInFilter = !Settings.includeServersInFilter
+				Settings.includeStatusesInFilter = !Settings.includeStatusesInFilter
 			case 4:
+				Settings.includeServersInFilter = !Settings.includeServersInFilter
+			case 5:
 				Settings.includeUsersInFilter = !Settings.includeUsersInFilter
 			default: break
 			}
+			settingsChangedTimer.push()
 		} else if indexPath.section == Section.Issues.rawValue {
 			switch indexPath.row {
 			case 0:

@@ -56,6 +56,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	// Display
 	@IBOutlet weak var useVibrancy: NSButton!
 	@IBOutlet weak var includeLabelsInFiltering: NSButton!
+	@IBOutlet weak var includeTitlesInFiltering: NSButton!
 	@IBOutlet weak var includeStatusesInFiltering: NSButton!
 	@IBOutlet weak var grayOutWhenRefreshing: NSButton!
 	@IBOutlet weak var assignedPrHandlingPolicy: NSPopUpButton!
@@ -155,6 +156,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		displayRepositoryNames.integerValue = Settings.showReposInName ? 1 : 0
 		includeRepositoriesInFiltering.integerValue = Settings.includeReposInFilter ? 1 : 0
 		includeLabelsInFiltering.integerValue = Settings.includeLabelsInFilter ? 1 : 0
+		includeTitlesInFiltering.integerValue = Settings.includeTitlesInFilter ? 1 : 0
         includeUsersInFiltering.integerValue = Settings.includeUsersInFilter ? 1 : 0
         includeServersInFiltering.integerValue = Settings.includeServersInFilter ? 1 : 0
 		includeStatusesInFiltering.integerValue = Settings.includeStatusesInFilter ? 1 : 0
@@ -283,22 +285,32 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
     @IBAction func includeServersInFilteringSelected(sender: NSButton) {
         Settings.includeServersInFilter = (sender.integerValue==1)
+		app.deferredUpdateTimer.push()
     }
 
     @IBAction func includeUsersInFilteringSelected(sender: NSButton) {
         Settings.includeUsersInFilter = (sender.integerValue==1)
+		app.deferredUpdateTimer.push()
     }
 
 	@IBAction func includeLabelsInFilteringSelected(sender: NSButton) {
 		Settings.includeLabelsInFilter = (sender.integerValue==1)
+		app.deferredUpdateTimer.push()
 	}
 
 	@IBAction func includeStatusesInFilteringSelected(sender: NSButton) {
 		Settings.includeStatusesInFilter = (sender.integerValue==1)
+		app.deferredUpdateTimer.push()
+	}
+
+	@IBAction func includeTitlesInFilteringSelected(sender: NSButton) {
+		Settings.includeTitlesInFilter = (sender.integerValue==1)
+		app.deferredUpdateTimer.push()
 	}
 
 	@IBAction func includeRepositoriesInfilterSelected(sender: NSButton) {
 		Settings.includeReposInFilter = (sender.integerValue==1)
+		app.deferredUpdateTimer.push()
 	}
 
 	@IBAction func dontConfirmRemoveAllClosedSelected(sender: NSButton) {
