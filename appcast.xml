@@ -15,6 +15,7 @@
 				<li>Query specific properties with keywords such as “title:”, “label:”, “user:”, “repo:”, “status:”, or even “server:” - For instance “label:feature” lists only items with a “feature” label.</li>
 				<li>Combine terms: “title:fix,feature user:david,john” (show fixes and features for both David and John)</li>
 				<li>Chain properties: “user:john label:frontend label:css” (show items from John that have both the “frontend” and “css” labels)</li>
+				<li>Many thanks to @Luzifer for his help with testing and feedback for this feature</li>
 				</ul></font>]]></description>
 			<pubDate>Sun, 13 Jul 2015 11:00:00 +0000</pubDate>
 			<enclosure
