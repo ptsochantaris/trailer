@@ -14,3 +14,5 @@ For maintained binaries and/or more info:
 - [Latest iOS version](https://itunes.apple.com/US/app/id806104975?mt=8)
 
 - [Trailer for Android](https://github.com/amencarini/droidtrailer)
+
+Note: Only watched repositories will be listed. To reduce notification noise open Trailer > Preferences to change the display settings of each repository. To change the settings for all visible repositories use "set all PR…" and "Set all issues…". Filter first to only modify a sub set of repositories.
