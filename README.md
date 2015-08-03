@@ -15,4 +15,4 @@ For maintained binaries and/or more info:
 
 - [Trailer for Android](https://github.com/amencarini/droidtrailer)
 
-Note: Only watched repositories will be listed. To reduce notification noise open Trailer > Preferences to change the display settings of each repository. To change the settings for all visible repositories use "set all PR…" and "Set all issues…". Filter first to only modify a sub set of repositories.
+Note: Trailer lists all your [watched repositories](http://github.com/watching). To reduce notification noise (and speed up your sync) visit the Preferences and change the display settings of each repository. To change the settings for all visible repositories use "Set all PRs…" and "Set all issues…". Filter first to only modify a subset.
