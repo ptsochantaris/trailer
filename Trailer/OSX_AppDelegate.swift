@@ -132,14 +132,14 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				var urlToOpen = userInfo[NOTIFICATION_URL_KEY] as? String
 				if urlToOpen == nil {
 					var relatedItem: ListableItem?
-					if let itemId = DataManager.idForUriPath(userInfo[COMMENT_ID_KEY] as? String), c = mainObjectContext.existingObjectWithID(itemId) as? PRComment {
+					if let itemId = DataManager.idForUriPath(userInfo[COMMENT_ID_KEY] as? String), c = existingObjectWithID(itemId) as? PRComment {
 						relatedItem = c.pullRequest ?? c.issue
 						urlToOpen = c.webUrl
 					} else if let itemId = DataManager.idForUriPath(userInfo[PULL_REQUEST_ID_KEY] as? String) {
-						relatedItem = mainObjectContext.existingObjectWithID(itemId) as? ListableItem
+						relatedItem = existingObjectWithID(itemId) as? ListableItem
 						urlToOpen = relatedItem?.webUrl
 					} else if let itemId = DataManager.idForUriPath(userInfo[ISSUE_ID_KEY] as? String) {
-						relatedItem = mainObjectContext.existingObjectWithID(itemId) as? ListableItem
+						relatedItem = existingObjectWithID(itemId) as? ListableItem
 						urlToOpen = relatedItem?.webUrl
 					}
 					if let r = relatedItem {

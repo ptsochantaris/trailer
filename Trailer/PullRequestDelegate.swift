@@ -53,9 +53,8 @@ final class PullRequestDelegate: NSObject, NSTableViewDelegate, NSTableViewDataS
 	}
 
 	func pullRequestAtRow(row: Int) -> PullRequest? {
-		let object = pullRequestIds[row]
-		if object.isKindOfClass(NSManagedObjectID) {
-			return mainObjectContext.existingObjectWithID(object as! NSManagedObjectID) as? PullRequest
+		if let object = pullRequestIds[row] as? NSManagedObjectID {
+			return existingObjectWithID(object) as? PullRequest
 		} else {
 			return nil
 		}

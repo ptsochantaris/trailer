@@ -75,36 +75,26 @@ final class DataManager : NSObject {
 	}
 
 	private class func migrateDatabaseToShared() {
-		let oldDocumentsDirectory = legacyFilesDirectory().path!
-		let fm = NSFileManager.defaultManager()
-		if fm.fileExistsAtPath(oldDocumentsDirectory) {
-			DLog("Migrating DB files into group container")
-			if let files = fm.contentsOfDirectoryAtPath(oldDocumentsDirectory) {
-				let newDocumentsDirectory = sharedFilesDirectory().path!
-				for file in files {
-					if file.rangeOfString("Trailer.sqlite") != nil {
-						DLog("Moving database file: %@",file)
-						let oldPath = oldDocumentsDirectory.stringByAppendingPathComponent(file)
-						let newPath = newDocumentsDirectory.stringByAppendingPathComponent(file)
-						if fm.fileExistsAtPath(newPath) {
-							do {
-								try fm.removeItemAtPath(newPath)
-							} catch _ {
-							}
-						}
-						do {
-							try fm.moveItemAtPath(oldPath, toPath: newPath)
-						} catch _ {
-						}
+		do {
+			let oldDocumentsDirectory = legacyFilesDirectory().path!
+			let newDocumentsDirectory = sharedFilesDirectory().path!
+			let fm = NSFileManager.defaultManager()
+			let files = try fm.contentsOfDirectoryAtPath(oldDocumentsDirectory)
+			DLog("Migrating DB files into group container from %@ to %@", oldDocumentsDirectory, newDocumentsDirectory)
+			for file in files {
+				if file.rangeOfString("Trailer.sqlite") != nil {
+					DLog("Moving database file: %@",file)
+					let oldPath = oldDocumentsDirectory.stringByAppendingPathComponent(file)
+					let newPath = newDocumentsDirectory.stringByAppendingPathComponent(file)
+					if fm.fileExistsAtPath(newPath) {
+						try! fm.removeItemAtPath(newPath)
 					}
+					try! fm.moveItemAtPath(oldPath, toPath: newPath)
 				}
 			}
-			do {
-				try fm.removeItemAtPath(oldDocumentsDirectory)
-			} catch _ {
-			}
-		} else {
-			DLog("No need to migrate DB into shared container")
+			try! fm.removeItemAtPath(oldDocumentsDirectory)
+		} catch {
+			/* No legacy directory */
 		}
 	}
 
@@ -575,20 +565,25 @@ func addStorePath(sqlStore: NSURL) -> Bool {
 	return store != nil
 }
 
+func existingObjectWithID(id: NSManagedObjectID) -> NSManagedObject? {
+	do {
+		return try mainObjectContext.existingObjectWithID(id)
+	} catch {
+		return nil
+	}
+}
+
 func removeDatabaseFiles() {
 	let fm = NSFileManager.defaultManager()
 	let documentsDirectory = applicationFilesDirectory().path!
-	if let files = fm.contentsOfDirectoryAtPath(documentsDirectory) {
-		for file in files {
+	do {
+		for file in try fm.contentsOfDirectoryAtPath(documentsDirectory) {
 			if file.rangeOfString("Trailer.sqlite") != nil {
 				DLog("Removing old database file: %@",file)
-				do {
-					try fm.removeItemAtPath(documentsDirectory.stringByAppendingPathComponent(file))
-				} catch _ {
-				}
+				try! fm.removeItemAtPath(documentsDirectory.stringByAppendingPathComponent(file))
 			}
 		}
-	}
+	} catch { /* no directory */ }
 }
 
 ////////////////////////////////

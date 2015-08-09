@@ -100,22 +100,25 @@ final class API {
 	///////////////////////////////////////////////////////// Images
 
 	func expireOldImageCacheEntries() {
-		let fileManager = NSFileManager.defaultManager()
-		let files = fileManager.contentsOfDirectoryAtPath(cacheDirectory)
-		let now = NSDate()
-		for f in files ?? [] {
-			if f.characters.startsWith("imgcache-".characters) {
-				let path = cacheDirectory.stringByAppendingPathComponent(f)
-				let attributes = try! fileManager.attributesOfItemAtPath(path)
-				let date = attributes[NSFileCreationDate] as! NSDate
-				if now.timeIntervalSinceDate(date) > (3600.0*24.0) {
+
+		do {
+			let now = NSDate()
+			let fileManager = NSFileManager.defaultManager()
+			for f in try fileManager.contentsOfDirectoryAtPath(cacheDirectory) {
+				if f.characters.startsWith("imgcache-".characters) {
 					do {
-						try fileManager.removeItemAtPath(path)
-					} catch _ {
+						let path = cacheDirectory.stringByAppendingPathComponent(f)
+						let attributes = try fileManager.attributesOfItemAtPath(path)
+						let date = attributes[NSFileCreationDate] as! NSDate
+						if now.timeIntervalSinceDate(date) > (3600.0*24.0) {
+							try fileManager.removeItemAtPath(path)
+						}
+					} catch let fileError as NSError {
+						DLog("File error when cleaning old cached image: %@", fileError.localizedDescription)
 					}
 				}
 			}
-		}
+		} catch { /* No directory */ }
 	}
 
 	// Warning: Calls back on thread!!
