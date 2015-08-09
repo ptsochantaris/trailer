@@ -4,6 +4,8 @@ import WatchKit
 final class SectionController: WKInterfaceController {
 
 	@IBOutlet weak var table: WKInterfaceTable!
+
+	/*
 	private var selectedIndex: Int?
 
 	override func awakeWithContext(context: AnyObject?) {
@@ -22,6 +24,7 @@ final class SectionController: WKInterfaceController {
 			}
 		}
 	}
+*/
 
 	@IBAction func clearMergedSelected() {
 		presentControllerWithName("Command Controller", context: ["command": "clearAllMerged"])
@@ -39,6 +42,7 @@ final class SectionController: WKInterfaceController {
 		presentControllerWithName("Command Controller", context: ["command": "refresh"])
 	}
 
+	/*
 	class titleEntry {
 		var title: String
 		init(_ t: String) { title = t }
@@ -145,4 +149,5 @@ final class SectionController: WKInterfaceController {
 			index++
 		}
 	}
+*/
 }

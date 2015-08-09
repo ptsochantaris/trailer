@@ -12,6 +12,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 	var lastRepoCheck = never()
 	var window: UIWindow?
 	var backgroundTask = UIBackgroundTaskInvalid
+	var watchManager: WatchManager?
 
 	var refreshTimer: NSTimer?
 	var backgroundCallback: ((UIBackgroundFetchResult) -> Void)?
@@ -48,7 +49,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 
 		let localNotification = launchOptions?[UIApplicationLaunchOptionsLocalNotificationKey] as? UILocalNotification
 
-		atNextEvent {
+		atNextEvent { [weak self] in
 			if Repo.visibleReposInMoc(mainObjectContext).count > 0 && ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
 				if localNotification != nil {
 					NotificationManager.handleLocalNotification(localNotification!)
@@ -63,6 +64,8 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 					}
 				}
 			}
+
+			self!.watchManager = WatchManager()
 		}
 
 		let notificationSettings = UIUserNotificationSettings(forTypes: UIUserNotificationType.Alert.union(UIUserNotificationType.Badge).union(UIUserNotificationType.Sound), categories: nil)
@@ -236,10 +239,6 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 
 	func setMinimumBackgroundFetchInterval(interval: NSTimeInterval) -> Void {
 		UIApplication.sharedApplication().setMinimumBackgroundFetchInterval(NSTimeInterval(interval))
-	}
-
-	func application(application: UIApplication, handleWatchKitExtensionRequest userInfo: [NSObject : AnyObject]?, reply: (([NSObject : AnyObject]!) -> Void)!) {
-		WatchManager.handleWatchKitExtensionRequest(userInfo, reply: reply)
 	}
 
 	func postNotificationOfType(type: PRNotificationType, forItem: DataItem) {

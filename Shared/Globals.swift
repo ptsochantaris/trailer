@@ -246,5 +246,8 @@ extension String {
 	func stringByReplacingCharactersInRange(range: NSRange, withString string: String) -> String {
 		return (self as NSString).stringByReplacingCharactersInRange(range, withString: string)
 	}
+	func toInt() -> Int {
+		return (self as NSString).integerValue
+	}
 }
 

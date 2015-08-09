@@ -1,168 +1,177 @@
 
 import UIKit
+import WatchConnectivity
 
-final class WatchManager {
+final class WatchManager : NSObject, WCSessionDelegate {
 
-	static var backgroundTask = UIBackgroundTaskInvalid
+	var backgroundTask = UIBackgroundTaskInvalid
+	var session: WCSession?
 
-	class func startBGTask() {
+	override init() {
+		super.init()
+		if WCSession.isSupported() {
+			session = WCSession.defaultSession()
+			session?.delegate = self
+			session?.activateSession()
+		}
+	}
+
+	func startBGTask() {
 		backgroundTask = UIApplication.sharedApplication().beginBackgroundTaskWithName("com.housetrip.Trailer.watchrequest", expirationHandler: {
 			self.endBGTask()
 		})
 	}
 
-	class func endBGTask() {
+	func endBGTask() {
 		if backgroundTask != UIBackgroundTaskInvalid {
 			UIApplication.sharedApplication().endBackgroundTask(backgroundTask)
 			backgroundTask = UIBackgroundTaskInvalid
 		}
 	}
 
-	class func handleWatchKitExtensionRequest(userInfo: [NSObject : AnyObject]?, reply: (([NSObject : AnyObject]!) -> Void)!) {
+	func session(session: WCSession, didReceiveMessage message: [String : AnyObject], replyHandler: ([String : AnyObject]) -> Void) {
 
 		startBGTask()
 
-		if let command = userInfo?["command"] as? String {
-			switch(command) {
-			case "refresh":
-				app.startRefresh()
-				dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)) {
+		switch(message["command"] as? String ?? "") {
+		case "refresh":
+			app.startRefresh()
+			dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)) {
 
-					let lastSuccessfulSync = Settings.lastSuccessfulRefresh ?? NSDate()
+				let lastSuccessfulSync = Settings.lastSuccessfulRefresh ?? NSDate()
 
-					while app.isRefreshing {
-						NSThread.sleepForTimeInterval(0.1)
+				while app.isRefreshing {
+					NSThread.sleepForTimeInterval(0.1)
+				}
+				atNextEvent() {
+					if Settings.lastSuccessfulRefresh == nil || lastSuccessfulSync.isEqualToDate(Settings.lastSuccessfulRefresh!) {
+						replyHandler(["status": "Refresh failed", "color": "red"])
+					} else {
+						replyHandler(["status": "Success", "color": "green"])
 					}
-					atNextEvent() {
-						if Settings.lastSuccessfulRefresh == nil || lastSuccessfulSync.isEqualToDate(Settings.lastSuccessfulRefresh!) {
-							reply(["status": "Refresh failed", "color": "red"])
-						} else {
-							reply(["status": "Success", "color": "green"])
-						}
-						self.endBGTask()
-					}
-				}
-			case "openpr":
-				if let itemId = userInfo?["id"] as? String {
-					let m = popupManager.getMasterController()
-					m.openPrWithId(itemId)
-					DataManager.saveDB()
-				}
-				atNextEvent() {
-					reply(["status": "Success", "color": "green"])
 					self.endBGTask()
 				}
-			case "openissue":
-				if let itemId = userInfo?["id"] as? String {
-					let m = popupManager.getMasterController()
-					m.openIssueWithId(itemId)
-					DataManager.saveDB()
-				}
-				atNextEvent() {
-					reply(["status": "Success", "color": "green"])
-					self.endBGTask()
-				}
-			case "opencomment":
-				if let itemId = userInfo?["id"] as? String {
-					let m = popupManager.getMasterController()
-					m.openCommentWithId(itemId)
-					DataManager.saveDB()
-				}
-				atNextEvent() {
-					reply(["status": "Success", "color": "green"])
-					self.endBGTask()
-				}
-			case "clearAllMerged":
-				for p in PullRequest.allMergedRequestsInMoc(mainObjectContext) {
-					mainObjectContext.deleteObject(p)
-				}
-				DataManager.saveDB()
+			}
+		case "openpr":
+			if let itemId = message["id"] as? String {
 				let m = popupManager.getMasterController()
-				m.reloadDataWithAnimation(false)
-				m.updateStatus()
-				atNextEvent() {
-					reply(["status": "Success", "color": "green"])
-					self.endBGTask()
-				}
-			case "clearAllClosed":
-				for p in PullRequest.allClosedRequestsInMoc(mainObjectContext) {
-					mainObjectContext.deleteObject(p)
-				}
-				for i in Issue.allClosedIssuesInMoc(mainObjectContext) {
-					mainObjectContext.deleteObject(i)
-				}
+				m.openPrWithId(itemId)
 				DataManager.saveDB()
+			}
+			atNextEvent() {
+				replyHandler(["status": "Success", "color": "green"])
+				self.endBGTask()
+			}
+		case "openissue":
+			if let itemId = message["id"] as? String {
 				let m = popupManager.getMasterController()
-				m.reloadDataWithAnimation(false)
-				m.updateStatus()
-				atNextEvent() {
-					reply(["status": "Success", "color": "green"])
-					self.endBGTask()
-				}
-			case "markPrRead":
-				if let
-					itemId = userInfo?["id"] as? String,
-					oid = DataManager.idForUriPath(itemId),
-					pr = existingObjectWithID(oid) as? PullRequest {
-						pr.catchUpWithComments()
-						popupManager.getMasterController().reloadDataWithAnimation(false)
-						DataManager.saveDB()
-						app.updateBadge()
-				}
-				atNextEvent() {
-					reply(["status": "Success", "color": "green"])
-					self.endBGTask()
-				}
-			case "markIssueRead":
-				if let
-					itemId = userInfo?["id"] as? String,
-					oid = DataManager.idForUriPath(itemId),
-					i = existingObjectWithID(oid) as? Issue {
-						i.catchUpWithComments()
-						popupManager.getMasterController().reloadDataWithAnimation(false)
-						DataManager.saveDB()
-						app.updateBadge()
-				}
-				atNextEvent() {
-					reply(["status": "Success", "color": "green"])
-					self.endBGTask()
-				}
-			case "markEverythingRead":
-				PullRequest.markEverythingRead(PullRequestSection.None, moc: mainObjectContext)
-				Issue.markEverythingRead(PullRequestSection.None, moc: mainObjectContext)
+				m.openIssueWithId(itemId)
+				DataManager.saveDB()
+			}
+			atNextEvent() {
+				replyHandler(["status": "Success", "color": "green"])
+				self.endBGTask()
+			}
+		case "opencomment":
+			if let itemId = message["id"] as? String {
+				let m = popupManager.getMasterController()
+				m.openCommentWithId(itemId)
+				DataManager.saveDB()
+			}
+			atNextEvent() {
+				replyHandler(["status": "Success", "color": "green"])
+				self.endBGTask()
+			}
+		case "clearAllMerged":
+			for p in PullRequest.allMergedRequestsInMoc(mainObjectContext) {
+				mainObjectContext.deleteObject(p)
+			}
+			DataManager.saveDB()
+			let m = popupManager.getMasterController()
+			m.reloadDataWithAnimation(false)
+			m.updateStatus()
+			atNextEvent() {
+				replyHandler(["status": "Success", "color": "green"])
+				self.endBGTask()
+			}
+		case "clearAllClosed":
+			for p in PullRequest.allClosedRequestsInMoc(mainObjectContext) {
+				mainObjectContext.deleteObject(p)
+			}
+			for i in Issue.allClosedIssuesInMoc(mainObjectContext) {
+				mainObjectContext.deleteObject(i)
+			}
+			DataManager.saveDB()
+			let m = popupManager.getMasterController()
+			m.reloadDataWithAnimation(false)
+			m.updateStatus()
+			atNextEvent() {
+				replyHandler(["status": "Success", "color": "green"])
+				self.endBGTask()
+			}
+		case "markPrRead":
+			if let
+				itemId = message["id"] as? String,
+				oid = DataManager.idForUriPath(itemId),
+				pr = existingObjectWithID(oid) as? PullRequest {
+					pr.catchUpWithComments()
+					popupManager.getMasterController().reloadDataWithAnimation(false)
+					DataManager.saveDB()
+					app.updateBadge()
+			}
+			atNextEvent() {
+				replyHandler(["status": "Success", "color": "green"])
+				self.endBGTask()
+			}
+		case "markIssueRead":
+			if let
+				itemId = message["id"] as? String,
+				oid = DataManager.idForUriPath(itemId),
+				i = existingObjectWithID(oid) as? Issue {
+					i.catchUpWithComments()
+					popupManager.getMasterController().reloadDataWithAnimation(false)
+					DataManager.saveDB()
+					app.updateBadge()
+			}
+			atNextEvent() {
+				replyHandler(["status": "Success", "color": "green"])
+				self.endBGTask()
+			}
+		case "markEverythingRead":
+			PullRequest.markEverythingRead(PullRequestSection.None, moc: mainObjectContext)
+			Issue.markEverythingRead(PullRequestSection.None, moc: mainObjectContext)
+			popupManager.getMasterController().reloadDataWithAnimation(false)
+			DataManager.saveDB()
+			app.updateBadge()
+			atNextEvent() {
+				replyHandler(["status": "Success", "color": "green"])
+				self.endBGTask()
+			}
+		case "markAllPrsRead":
+			if let s = message["sectionIndex"] as? Int {
+				PullRequest.markEverythingRead(PullRequestSection(rawValue: s)!, moc: mainObjectContext)
 				popupManager.getMasterController().reloadDataWithAnimation(false)
 				DataManager.saveDB()
 				app.updateBadge()
-				atNextEvent() {
-					reply(["status": "Success", "color": "green"])
-					self.endBGTask()
-				}
-			case "markAllPrsRead":
-				if let s = userInfo?["sectionIndex"] as? Int {
-					PullRequest.markEverythingRead(PullRequestSection(rawValue: s)!, moc: mainObjectContext)
-					popupManager.getMasterController().reloadDataWithAnimation(false)
-					DataManager.saveDB()
-					app.updateBadge()
-				}
-				atNextEvent() {
-					reply(["status": "Success", "color": "green"])
-					self.endBGTask()
-				}
-			case "markAllIssuesRead":
-				if let s = userInfo?["sectionIndex"] as? Int {
-					Issue.markEverythingRead(PullRequestSection(rawValue: s)!, moc: mainObjectContext)
-					popupManager.getMasterController().reloadDataWithAnimation(false)
-					DataManager.saveDB()
-					app.updateBadge()
-				}
-				atNextEvent() {
-					reply(["status": "Success", "color": "green"])
-					self.endBGTask()
-				}
-			default:
-				atNextEvent() {
-					self.endBGTask()
-				}
+			}
+			atNextEvent() {
+				replyHandler(["status": "Success", "color": "green"])
+				self.endBGTask()
+			}
+		case "markAllIssuesRead":
+			if let s = message["sectionIndex"] as? Int {
+				Issue.markEverythingRead(PullRequestSection(rawValue: s)!, moc: mainObjectContext)
+				popupManager.getMasterController().reloadDataWithAnimation(false)
+				DataManager.saveDB()
+				app.updateBadge()
+			}
+			atNextEvent() {
+				replyHandler(["status": "Success", "color": "green"])
+				self.endBGTask()
+			}
+		default:
+			atNextEvent() {
+				self.endBGTask()
 			}
 		}
 	}

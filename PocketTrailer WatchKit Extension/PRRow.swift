@@ -14,6 +14,7 @@ final class PRRow: NSObject {
 
     @IBOutlet weak var counterGroup: WKInterfaceGroup!
 
+	/*
     func setPullRequest(pr: PullRequest) {
 
         let smallSize = UIFont.smallSystemFontSize()-2
@@ -77,4 +78,5 @@ final class PRRow: NSObject {
 
 		counterGroup.setHidden(totalCount+unreadCount==0)
 	}
+*/
 }

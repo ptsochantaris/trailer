@@ -7,6 +7,7 @@ final class PRListController: WKInterfaceController {
 	@IBOutlet weak var emptyLabel: WKInterfaceLabel!
 	@IBOutlet weak var table: WKInterfaceTable!
 
+	/*
 	private var itemsInSection: [ListableItem]!
 	private var sectionIndex: Int!
 	private var prs: Bool!
@@ -33,19 +34,22 @@ final class PRListController: WKInterfaceController {
 			}
 		}
 	}
+*/
 
 	@IBAction func markAllReadSelected() {
+		/*
 		if prs==true {
 			presentControllerWithName("Command Controller", context: ["command": "markAllPrsRead", "sectionIndex": sectionIndex!])
 		} else {
 			presentControllerWithName("Command Controller", context: ["command": "markAllIssuesRead", "sectionIndex": sectionIndex!])
-		}
+		}*/
 	}
 
 	@IBAction func refreshSelected() {
 		presentControllerWithName("Command Controller", context: ["command": "refresh"])
 	}
 
+	/*
 	override func table(table: WKInterfaceTable, didSelectRowAtIndex rowIndex: Int) {
 		selectedIndex = rowIndex
 		if prs==true {
@@ -85,4 +89,5 @@ final class PRListController: WKInterfaceController {
 			}
 		}
 	}
+*/
 }

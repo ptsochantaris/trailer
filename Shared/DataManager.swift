@@ -383,18 +383,16 @@ let mainObjectContext = { () -> NSManagedObjectContext in
 var _justMigrated: Bool = false
 let persistentStoreCoordinator = { ()-> NSPersistentStoreCoordinator in
 
-	let fileManager = NSFileManager.defaultManager()
-	let applicationDirectory = applicationFilesDirectory()
-	let applicationPath = applicationDirectory.absoluteString
-	let sqlStorePath = applicationDirectory.URLByAppendingPathComponent("Trailer.sqlite")
-	let modelURL = NSBundle.mainBundle().URLForResource("Trailer", withExtension: "momd")!
-	let mom = NSManagedObjectModel(contentsOfURL: modelURL)!
+	let dataDir = dataFilesDirectory()
+	let sqlStorePath = dataDir.URLByAppendingPathComponent("Trailer.sqlite")
+	let mom = NSManagedObjectModel(contentsOfURL: NSBundle.mainBundle().URLForResource("Trailer", withExtension: "momd")!)!
 
-	if fileManager.fileExistsAtPath(applicationPath) {
+	let fileManager = NSFileManager.defaultManager()
+	if fileManager.fileExistsAtPath(sqlStorePath.path!) {
 		let m = try! NSPersistentStoreCoordinator.metadataForPersistentStoreOfType(NSSQLiteStoreType, URL: sqlStorePath, options: nil)
 		_justMigrated = !mom.isConfiguration(nil, compatibleWithStoreMetadata: m)
 	} else {
-		try! fileManager.createDirectoryAtPath(applicationPath, withIntermediateDirectories: true, attributes: nil)
+		try! fileManager.createDirectoryAtPath(dataDir.path!, withIntermediateDirectories: true, attributes: nil)
 	}
 
 	var newCoordinator = NSPersistentStoreCoordinator(managedObjectModel:mom)
@@ -411,7 +409,7 @@ let persistentStoreCoordinator = { ()-> NSPersistentStoreCoordinator in
 	return newCoordinator
 }()
 
-func applicationFilesDirectory() -> NSURL {
+func dataFilesDirectory() -> NSURL {
 	#if os(iOS)
 		return sharedFilesDirectory()
 	#else
@@ -493,7 +491,7 @@ func existingObjectWithID(id: NSManagedObjectID) -> NSManagedObject? {
 
 func removeDatabaseFiles() {
 	let fm = NSFileManager.defaultManager()
-	let documentsDirectory = applicationFilesDirectory().path!
+	let documentsDirectory = dataFilesDirectory().path!
 	do {
 		for file in try fm.contentsOfDirectoryAtPath(documentsDirectory) {
 			if file.rangeOfString("Trailer.sqlite") != nil {

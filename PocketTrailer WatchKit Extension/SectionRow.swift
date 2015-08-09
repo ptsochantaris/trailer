@@ -8,6 +8,7 @@ final class SectionRow: NSObject {
     @IBOutlet weak var countHolder: WKInterfaceGroup!
 	@IBOutlet weak var group: WKInterfaceGroup!
 
+	/*
     func setPr(section: PullRequestSection) {
 
         let count = PullRequest.countRequestsInSection(section, moc: mainObjectContext)
@@ -27,5 +28,5 @@ final class SectionRow: NSObject {
 		countL.setText("\(unreadCount)")
 		countHolder.setHidden(unreadCount==0)
 	}
-
+*/
 }

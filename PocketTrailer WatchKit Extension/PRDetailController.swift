@@ -2,6 +2,7 @@
 import WatchKit
 import Foundation
 
+/*
 let shortDateFormatter = { () -> NSDateFormatter in
 	let d = NSDateFormatter()
 	d.dateStyle = NSDateFormatterStyle.ShortStyle
@@ -18,11 +19,13 @@ let bodyAttributes = { () -> [String : AnyObject] in
 		NSForegroundColorAttributeName: UIColor.whiteColor(),
 		NSParagraphStyleAttributeName: commentParagraph]
 	}()
+*/
 
 final class PRDetailController: WKInterfaceController {
 
 	@IBOutlet weak var table: WKInterfaceTable!
 
+	/*
 	private var pullRequest: PullRequest?
 	private var issue: Issue?
 	private var selectedIndex: Int?
@@ -51,27 +54,29 @@ final class PRDetailController: WKInterfaceController {
 			}
 		}
 	}
+	*/
 
 	@IBAction func refreshSelected() {
-		presentControllerWithName("Command Controller", context: ["command": "refresh"])
+		//presentControllerWithName("Command Controller", context: ["command": "refresh"])
 	}
 
 	@IBAction func markAllReadSelected() {
-		if let i = issue {
+		/*if let i = issue {
 			presentControllerWithName("Command Controller", context: ["command": "markIssueRead", "id": i.objectID.URIRepresentation().absoluteString])
 		} else if let p = pullRequest {
 			presentControllerWithName("Command Controller", context: ["command": "markPrRead", "id": p.objectID.URIRepresentation().absoluteString])
-		}
+		}*/
 	}
 
 	@IBAction func openOnDeviceSelected() {
-		if let i = issue?.objectID.URIRepresentation().absoluteString {
+		/*if let i = issue?.objectID.URIRepresentation().absoluteString {
 			presentControllerWithName("Command Controller", context: ["command": "openissue", "id": i])
 		} else if let p = pullRequest?.objectID.URIRepresentation().absoluteString {
 			presentControllerWithName("Command Controller", context: ["command": "openpr", "id": p])
-		}
+		}*/
 	}
 
+	/*
 	override func table(table: WKInterfaceTable, didSelectRowAtIndex rowIndex: Int) {
 		let r: AnyObject? = table.rowControllerAtIndex(rowIndex)
 		if let c = r as? CommentRow, commentId = c.commentId
@@ -181,4 +186,5 @@ final class PRDetailController: WKInterfaceController {
 			controller.margin.setBackgroundColor(UIColor(white: 0.86, alpha: 1.0))
 		}
 	}
+	*/
 }

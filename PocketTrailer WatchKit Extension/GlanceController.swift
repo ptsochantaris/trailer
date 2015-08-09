@@ -29,6 +29,7 @@ final class GlanceController: WKInterfaceController {
 	@IBOutlet weak var prIcon: WKInterfaceImage!
 	@IBOutlet weak var issueIcon: WKInterfaceImage!
 
+	/*
 	func setCountOfLabel(label: WKInterfaceLabel, forSection: PullRequestSection, group: WKInterfaceGroup) {
 		let toCount: Int
 		if Settings.showIssuesInGlance {
@@ -84,4 +85,5 @@ final class GlanceController: WKInterfaceController {
 
 		super.willActivate()
 	}
+	*/
 }

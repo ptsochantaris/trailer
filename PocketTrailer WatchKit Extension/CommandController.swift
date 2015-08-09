@@ -6,6 +6,7 @@ final class CommandController: WKInterfaceController {
     @IBOutlet weak var feedbackLabel: WKInterfaceLabel!
 	@IBOutlet weak var feedbackGroup: WKInterfaceGroup!
 
+	/*
 	override func awakeWithContext(context: AnyObject?) {
 
 		super.awakeWithContext(context)
@@ -43,4 +44,5 @@ final class CommandController: WKInterfaceController {
             self!.dismissController()
         }
     }
+	*/
 }

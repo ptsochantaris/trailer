@@ -8,11 +8,11 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	private var _fetchedResultsController: NSFetchedResultsController?
 
 	// Filtering
-	private let searchField: UITextField
-	private var searchTimer: PopTimer?
+	private var searchField: UITextField!
+	private var searchTimer: PopTimer!
 
 	// Refreshing
-	private var refreshOnRelease: Bool
+	private var refreshOnRelease: Bool = false
 
 	private let pullRequestsItem = UITabBarItem()
 	private let issuesItem = UITabBarItem()
@@ -134,10 +134,18 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 	}
 
-	required init(coder aDecoder: NSCoder) {
+	override func viewDidLoad() {
+		super.viewDidLoad()
+
+		searchTimer = PopTimer(timeInterval: 0.5) { [weak self] in
+			self!.reloadDataWithAnimation(true)
+		}
+
+		refreshControl?.addTarget(self, action: Selector("refreshControlChanged"), forControlEvents: UIControlEvents.ValueChanged)
+
 		searchField = UITextField(frame: CGRectMake(10, 10, 300, 31))
 		searchField.autoresizingMask = UIViewAutoresizing.FlexibleWidth
-		searchField.setTranslatesAutoresizingMaskIntoConstraints(true)
+		searchField.translatesAutoresizingMaskIntoConstraints = true
 		searchField.placeholder = "Filter..."
 		searchField.returnKeyType = UIReturnKeyType.Done
 		searchField.font = UIFont.systemFontOfSize(17)
@@ -146,21 +154,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		searchField.clearButtonMode = UITextFieldViewMode.Always
 		searchField.autocapitalizationType = UITextAutocapitalizationType.None
 		searchField.autocorrectionType = UITextAutocorrectionType.No
-
-		refreshOnRelease = false
-
-		super.init(coder: aDecoder)
-
-		searchTimer = PopTimer(timeInterval: 0.5) { [weak self] in
-			self!.reloadDataWithAnimation(true)
-		}
-	}
-
-	override func viewDidLoad() {
-		super.viewDidLoad()
-
-		refreshControl?.addTarget(self, action: Selector("refreshControlChanged"), forControlEvents: UIControlEvents.ValueChanged)
-
 		searchField.delegate = self
 
 		let searchHolder = UIView(frame: CGRectMake(0, 0, 320, 41))
@@ -170,7 +163,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		tableView.estimatedRowHeight = 110
 		tableView.rowHeight = UITableViewAutomaticDimension
 
-		detailViewController = splitViewController?.viewControllers.last?.topViewController as! DetailViewController
+		if let detailNav = splitViewController?.viewControllers.last as? UINavigationController {
+			detailViewController = detailNav.topViewController as? DetailViewController
+		}
 
 		let n = NSNotificationCenter.defaultCenter()
 
@@ -184,8 +179,8 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		issuesItem.image = UIImage(named: "issuesTab")
 	}
 
-	func tabBar(tabBar: UITabBar, didSelectItem item: UITabBarItem!) {
-		viewMode = indexOfObject(tabBar.items!, item)==0 ? MasterViewMode.PullRequests : MasterViewMode.Issues
+	func tabBar(tabBar: UITabBar, didSelectItem item: UITabBarItem) {
+		viewMode = indexOfObject(tabBar.items!, value: item)==0 ? MasterViewMode.PullRequests : MasterViewMode.Issues
 	}
 
 	override func viewWillAppear(animated: Bool) {
@@ -258,7 +253,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			if tabBar == nil {
 				if let s = navigationController?.view {
 					let t = UITabBar(frame: CGRectMake(0, s.bounds.size.height-49, s.bounds.size.width, 49))
-					t.autoresizingMask = UIViewAutoresizing.FlexibleTopMargin | UIViewAutoresizing.FlexibleBottomMargin | UIViewAutoresizing.FlexibleWidth
+					t.autoresizingMask = UIViewAutoresizing.FlexibleTopMargin.union(UIViewAutoresizing.FlexibleBottomMargin).union(UIViewAutoresizing.FlexibleWidth)
 					t.items = [pullRequestsItem, issuesItem]
 					t.selectedItem = viewMode==MasterViewMode.PullRequests ? pullRequestsItem : issuesItem
 					t.delegate = self
@@ -422,12 +417,11 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		let sectionInfo = fetchedResultsController.sections?[section] as? NSFetchedResultsSectionInfo
-		return sectionInfo?.numberOfObjects ?? 0
+		return fetchedResultsController.sections?[section].numberOfObjects ?? 0
 	}
 
 	override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! UITableViewCell
+		let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath)
 		configureCell(cell, atIndexPath: indexPath)
 		return cell
 	}
@@ -456,13 +450,11 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-		let sectionInfo = fetchedResultsController.sections?[section] as? NSFetchedResultsSectionInfo
-		return sectionInfo?.name ?? "Unknown Section"
+		return fetchedResultsController.sections?[section].name ?? "Unknown Section"
 	}
 
 	override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-		if let sectionInfo = fetchedResultsController.sections?[indexPath.section] as? NSFetchedResultsSectionInfo {
-			let sectionName = sectionInfo.name
+		if let sectionName = fetchedResultsController.sections?[indexPath.section].name {
 			return sectionName == PullRequestSection.Merged.prMenuName() || sectionName == PullRequestSection.Closed.prMenuName()
 		} else {
 			return false
@@ -498,13 +490,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		aFetchedResultsController.delegate = self
 		_fetchedResultsController = aFetchedResultsController
 
-		var error: NSError?
-		if !aFetchedResultsController.performFetch(&error) {
-			if let e = error {
-				DLog( "Fetch request error %@, %@", e, e.userInfo)
-				abort()
-			}
-		}
+		try! aFetchedResultsController.performFetch()
 
 		return aFetchedResultsController
 	}
@@ -702,7 +688,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	func tabBarController(tabBarController: UITabBarController, didSelectViewController viewController: UIViewController) {
-		Settings.lastPreferencesTabSelected = indexOfObject(tabBarController.viewControllers!, viewController) ?? 0
+		Settings.lastPreferencesTabSelected = indexOfObject(tabBarController.viewControllers!, value: viewController) ?? 0
 	}
 	
 }

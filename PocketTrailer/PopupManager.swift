@@ -3,21 +3,18 @@ import UIKit
 
 let popupManager = PopupManager()
 
-final class PopupManager: NSObject, UIPopoverControllerDelegate, UISplitViewControllerDelegate {
-
-	private var currentPopover: UIPopoverController?
+final class PopupManager: NSObject, UISplitViewControllerDelegate {
 
 	/////////////// Popovers
 
 	func showPopoverFromViewController(parentViewController: UIViewController, fromItem: UIBarButtonItem, viewController: UIViewController) {
 		if UIDevice.currentDevice().userInterfaceIdiom == UIUserInterfaceIdiom.Pad {
 			viewController.modalPresentationStyle = UIModalPresentationStyle.Popover
-			currentPopover = UIPopoverController(contentViewController: viewController)
-			currentPopover!.delegate = self
-			currentPopover!.presentPopoverFromBarButtonItem(fromItem, permittedArrowDirections: UIPopoverArrowDirection.Any, animated: true)
+			parentViewController.presentViewController(viewController, animated: true, completion: nil)
+			viewController.popoverPresentationController?.barButtonItem = fromItem
 		} else {
 			viewController.modalPresentationStyle = UIModalPresentationStyle.CurrentContext
-			let v = parentViewController.tabBarController ?? (parentViewController.navigationController ?? parentViewController)
+			let v = (parentViewController.tabBarController ?? parentViewController.navigationController) ?? parentViewController
 			v.presentViewController(viewController, animated: true, completion: nil)
 		}
 	}
@@ -28,10 +25,6 @@ final class PopupManager: NSObject, UIPopoverControllerDelegate, UISplitViewCont
 		let a = OpenInSafariActivity()
 		let v = UIActivityViewController(activityItems: [url], applicationActivities:[a])
 		showPopoverFromViewController(view, fromItem: buttonItem, viewController: v)
-	}
-
-	func popoverControllerDidDismissPopover(popoverController: UIPopoverController) {
-		currentPopover = nil
 	}
 
 	////////////// Master view
@@ -56,7 +49,6 @@ final class PopupManager: NSObject, UIPopoverControllerDelegate, UISplitViewCont
 }
 
 func showMessage(title: String, _ message: String?) {
-
 	let a = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.Alert)
 	a.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil))
 	app.window?.rootViewController?.presentViewController(a, animated: true, completion: nil)
