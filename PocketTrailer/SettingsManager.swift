@@ -21,7 +21,7 @@ final class SettingsManager {
 			}
 		} else {
 			atNextEvent {
-				UIAlertView(title: "Error", message: "These settings could not be imported due to an error", delegate: nil, cancelButtonTitle: "OK").show()
+				showMessage("Error", "These settings could not be imported due to an error")
 			}
 		}
 	}

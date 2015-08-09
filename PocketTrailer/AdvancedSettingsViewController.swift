@@ -3,15 +3,7 @@ import UIKit
 
 final class AdvancedSettingsViewController: UITableViewController, PickerViewControllerDelegate, UIDocumentPickerDelegate {
 
-	required init(coder aDecoder: NSCoder) {
-		settingsChangedTimer = PopTimer(timeInterval: 1.0) {
-			DataManager.postProcessAllItems()
-			popupManager.getMasterController().reloadDataWithAnimation(true)
-		}
-		super.init(coder: aDecoder)
-	}
-
-	private var settingsChangedTimer: PopTimer
+	private var settingsChangedTimer: PopTimer!
 
 	// for the picker
 	private var valuesToPush: [String]?
@@ -26,6 +18,12 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
+
+		settingsChangedTimer = PopTimer(timeInterval: 1.0) {
+			DataManager.postProcessAllItems()
+			popupManager.getMasterController().reloadDataWithAnimation(true)
+		}
+
 		navigationItem.rightBarButtonItems = [
 			UIBarButtonItem(image: UIImage(named: "export"), style: UIBarButtonItemStyle.Plain, target: self, action: Selector("exportSelected:")),
 			UIBarButtonItem(image: UIImage(named: "import"), style: UIBarButtonItemStyle.Plain, target: self, action: Selector("importSelected:"))
@@ -91,7 +89,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	}
 
 	override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCellWithIdentifier("Cell") as! UITableViewCell
+		let cell = tableView.dequeueReusableCellWithIdentifier("Cell")!
 		cell.accessoryType = UITableViewCellAccessoryType.None
 		cell.detailTextLabel?.text = " "
 
@@ -479,10 +477,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				Settings.logActivityToConsole = !Settings.logActivityToConsole
 				tableView.reloadData()
 				if Settings.logActivityToConsole {
-					UIAlertView(title: "Warning",
-						message: "Logging is a feature meant to aid error reporting, having it constantly enabled will cause this app to be less responsive and use more battery",
-						delegate: nil,
-						cancelButtonTitle: "OK").show()
+					showMessage("Warning", "Logging is a feature meant to aid error reporting, having it constantly enabled will cause this app to be less responsive and use more battery")
 				}
 			default: break
 			}
@@ -597,10 +592,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 	func documentInteractionCleanup() {
 		if let t = tempUrl {
-			var error: NSError?
-			NSFileManager.defaultManager().removeItemAtURL(t, error: &error)
-			if error != nil {
-				DLog("Temporary file cleanup error: %@", error!)
+			do {
+				try NSFileManager.defaultManager().removeItemAtURL(t)
+			} catch let error as NSError {
+				DLog("Temporary file cleanup error: %@", error.localizedDescription)
 			}
 			tempUrl = nil
 		}

@@ -93,10 +93,9 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 					}
 				}
 				let serverNames = ", ".join(errorServers)
-				let message = "Could not refresh repository list from \(serverNames), please ensure that the tokens you are using are valid"
-				UIAlertView(title: "Error", message: message, delegate: nil, cancelButtonTitle: "OK").show()
+				showMessage("Error", "Could not refresh repository list from \(serverNames), please ensure that the tokens you are using are valid")
 			} else {
-				tempContext.save(nil)
+				try! tempContext.save()
 			}
 			self!.navigationItem.title = originalName
 			self!.actionsButton.enabled = ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext)
@@ -112,8 +111,7 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 	}
 
 	override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		let sectionInfo = fetchedResultsController.sections?[section] as? NSFetchedResultsSectionInfo
-		return sectionInfo?.numberOfObjects ?? 0
+		return fetchedResultsController.sections?[section].numberOfObjects ?? 0
 	}
 
 	override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -149,8 +147,8 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 		}
 
 		let fetchRequest = NSFetchRequest(entityName: "Repo")
-		if !(searchField!.text.isEmpty) {
-			fetchRequest.predicate = NSPredicate(format: "fullName contains [cd] %@", searchField!.text)
+		if let text = searchField?.text where !text.isEmpty {
+			fetchRequest.predicate = NSPredicate(format: "fullName contains [cd] %@", text)
 		}
 		fetchRequest.fetchBatchSize = 20
 		fetchRequest.sortDescriptors = [NSSortDescriptor(key: "fork", ascending: true), NSSortDescriptor(key: "fullName", ascending: true)]
@@ -159,12 +157,7 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 		fc.delegate = self
 		_fetchedResultsController = fc
 
-		var error: NSError?
-		if !fc.performFetch(&error) {
-			DLog("Fetch error %@, %@", error!, error!.userInfo)
-			abort()
-		}
-
+		try! fc.performFetch()
 		return fc
 	}
 
@@ -243,7 +236,7 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 		return a
 	}
 
-	private func attributesForEntryWithPolicy(policy: RepoDisplayPolicy) -> [NSObject : AnyObject] {
+	private func attributesForEntryWithPolicy(policy: RepoDisplayPolicy) -> [String : AnyObject] {
 		return [
 			NSFontAttributeName: UIFont.systemFontOfSize(UIFont.smallSystemFontSize()),
 			NSForegroundColorAttributeName: (policy == RepoDisplayPolicy.Hide) ? UIColor.lightGrayColor() : UIColor.blackColor()

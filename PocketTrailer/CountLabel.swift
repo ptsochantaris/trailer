@@ -10,7 +10,7 @@ final class CountLabel: UILabel {
 		clipsToBounds = true
 		font = UIFont.systemFontOfSize(12)
 		textAlignment = NSTextAlignment.Center
-		setTranslatesAutoresizingMaskIntoConstraints(false)
+		translatesAutoresizingMaskIntoConstraints = false
 	}
 
 	required init(coder aDecoder: NSCoder) {

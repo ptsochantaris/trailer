@@ -34,7 +34,7 @@ final class PullRequestDelegate: NSObject, NSTableViewDelegate, NSTableViewDataS
 	func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
 		let object = pullRequestIds[row]
 		if object.isKindOfClass(NSManagedObjectID) {
-			let pr = try! mainObjectContext.existingObjectWithID(object as! NSManagedObjectID) as! PullRequest
+			let pr = existingObjectWithID(object as! NSManagedObjectID) as! PullRequest
 			return PullRequestCell(pullRequest: pr)
 		} else {
 			let title = object as! String

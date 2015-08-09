@@ -145,26 +145,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		161852851AB2CB9000526D81 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 168BC6A217EC2DF000BC4584 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 1618527A1AB2CB9000526D81;
-			remoteInfo = "PocketTrailer Today Extension";
-		};
 		16CE47831B7755E00086F4DC /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 168BC6A217EC2DF000BC4584 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 16522D6F1AB03AE500B1C3FB;
 			remoteInfo = "PocketTrailer WatchKit Extension";
-		};
-		16CE47861B7755E00086F4DC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 168BC6A217EC2DF000BC4584 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 16522D7B1AB03AE500B1C3FB;
-			remoteInfo = "PocketTrailer WatchKit App";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -782,8 +768,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				161852861AB2CB9000526D81 /* PBXTargetDependency */,
-				16CE47871B7755E00086F4DC /* PBXTargetDependency */,
 			);
 			name = PocketTrailer;
 			productName = PocketTrailer;
@@ -1120,20 +1104,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		161852861AB2CB9000526D81 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 1618527A1AB2CB9000526D81 /* PocketTrailer Today Extension */;
-			targetProxy = 161852851AB2CB9000526D81 /* PBXContainerItemProxy */;
-		};
 		16CE47841B7755E00086F4DC /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 16522D6F1AB03AE500B1C3FB /* PocketTrailer WatchKit Extension */;
 			targetProxy = 16CE47831B7755E00086F4DC /* PBXContainerItemProxy */;
-		};
-		16CE47871B7755E00086F4DC /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 16522D7B1AB03AE500B1C3FB /* PocketTrailer WatchKit App */;
-			targetProxy = 16CE47861B7755E00086F4DC /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 

@@ -28,8 +28,8 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 		_webView = WKWebView(frame: view.bounds, configuration: webConfiguration)
 		_webView!.navigationDelegate = self
 		_webView!.scrollView.contentInset = UIEdgeInsetsMake(64, 0, 0, 0)
-		_webView!.autoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight
-		_webView!.setTranslatesAutoresizingMaskIntoConstraints(true)
+		_webView!.autoresizingMask = UIViewAutoresizing.FlexibleWidth.union(UIViewAutoresizing.FlexibleHeight)
+		_webView!.translatesAutoresizingMaskIntoConstraints = true
 		_webView!.hidden = true
 		view.addSubview(_webView!)
 
@@ -92,10 +92,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 	func webView(webView: WKWebView, decidePolicyForNavigationResponse navigationResponse: WKNavigationResponse, decisionHandler: (WKNavigationResponsePolicy) -> Void) {
 		let res = navigationResponse.response as! NSHTTPURLResponse
 		if res.statusCode == 404 {
-			UIAlertView(title: "Not Found",
-			message: "\nPlease ensure you are logged in with the correct account on GitHub\n\nIf you are using two-factor auth: There is a bug between Github and iOS which may cause your login to fail.  If it happens, temporarily disable two-factor auth and log in from here, then re-enable it afterwards.  You will only need to do this once.",
-			delegate: nil,
-			cancelButtonTitle: "OK").show()
+			showMessage("Not Found", "\nPlease ensure you are logged in with the correct account on GitHub\n\nIf you are using two-factor auth: There is a bug between Github and iOS which may cause your login to fail.  If it happens, temporarily disable two-factor auth and log in from here, then re-enable it afterwards.  You will only need to do this once.")
 		}
 		decisionHandler(WKNavigationResponsePolicy.Allow)
 	}
@@ -114,7 +111,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 
 	private func catchupWithComments()
 	{
-		if let oid = catchupWithDataItemWhenLoaded, dataItem = mainObjectContext.existingObjectWithID(oid, error: nil) as? ListableItem {
+		if let oid = catchupWithDataItemWhenLoaded, dataItem = existingObjectWithID(oid) as? ListableItem {
 			catchupWithDataItemWhenLoaded = nil
 			if let count = dataItem.unreadComments?.integerValue where count > 0 {
 				dataItem.catchUpWithComments()

@@ -77,7 +77,7 @@ class TrailerCell: NSTableCellView {
     }
 
 	func associatedDataItem() -> ListableItem {
-		return try! mainObjectContext.existingObjectWithID(dataItemId) as! ListableItem
+		return existingObjectWithID(dataItemId) as! ListableItem
 	}
 
 	override func updateTrackingAreas() {

@@ -34,7 +34,7 @@ final class IssuesDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource
 	func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
 		let object = issueIds[row]
 		if object.isKindOfClass(NSManagedObjectID) {
-			let i = try! mainObjectContext.existingObjectWithID(object as! NSManagedObjectID) as! Issue
+			let i = existingObjectWithID(object as! NSManagedObjectID) as! Issue
 			return IssueCell(issue: i)
 		} else {
 			let title = object as! String

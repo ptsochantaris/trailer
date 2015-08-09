@@ -7,10 +7,6 @@ protocol PickerViewControllerDelegate: class {
 
 final class PickerViewController: UITableViewController {
 
-	required init(coder aDecoder: NSCoder) {
-		super.init(coder: aDecoder)
-	}
-
 	var values: [String]!
 	weak var delegate: PickerViewControllerDelegate!
 	var previousValue: Int?

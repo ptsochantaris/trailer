@@ -41,16 +41,23 @@ final class PopupManager: NSObject, UIPopoverControllerDelegate, UISplitViewCont
 		return (s.viewControllers.first as! UINavigationController).viewControllers.first as! MasterViewController
 	}
 
-	func splitViewController(splitViewController: UISplitViewController, collapseSecondaryViewController secondaryViewController: UIViewController!, ontoPrimaryViewController primaryViewController: UIViewController!) -> Bool {
+	func splitViewController(splitViewController: UISplitViewController, collapseSecondaryViewController secondaryViewController: UIViewController, ontoPrimaryViewController primaryViewController: UIViewController) -> Bool {
 		let m = (primaryViewController as! UINavigationController).viewControllers.first as! MasterViewController
 		m.clearsSelectionOnViewWillAppear = true
 		let d = (secondaryViewController as! UINavigationController).viewControllers.first as! DetailViewController
 		return d.detailItem==nil
 	}
 
-	func splitViewController(splitViewController: UISplitViewController, separateSecondaryViewControllerFromPrimaryViewController primaryViewController: UIViewController!) -> UIViewController? {
+	func splitViewController(splitViewController: UISplitViewController, separateSecondaryViewControllerFromPrimaryViewController primaryViewController: UIViewController) -> UIViewController? {
 		let m = (primaryViewController as! UINavigationController).viewControllers.first as! MasterViewController
 		m.clearsSelectionOnViewWillAppear = false
 		return nil
 	}
+}
+
+func showMessage(title: String, _ message: String?) {
+
+	let a = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.Alert)
+	a.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil))
+	app.window?.rootViewController?.presentViewController(a, animated: true, completion: nil)
 }

@@ -243,5 +243,8 @@ extension String {
 	func stringByAppendingPathExtension(ext: String) -> String? {
 		return (self as NSString).stringByAppendingPathExtension(ext)
 	}
+	func stringByReplacingCharactersInRange(range: NSRange, withString string: String) -> String {
+		return (self as NSString).stringByReplacingCharactersInRange(range, withString: string)
+	}
 }
 

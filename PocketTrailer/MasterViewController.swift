@@ -2,7 +2,7 @@
 import UIKit
 import CoreData
 
-final class MasterViewController: UITableViewController, NSFetchedResultsControllerDelegate, UITextFieldDelegate, UIActionSheetDelegate, UITabBarControllerDelegate, UITabBarDelegate {
+final class MasterViewController: UITableViewController, NSFetchedResultsControllerDelegate, UITextFieldDelegate, UITabBarControllerDelegate, UITabBarDelegate {
 
 	private var detailViewController: DetailViewController!
 	private var _fetchedResultsController: NSFetchedResultsController?
@@ -19,58 +19,32 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	private var tabBar: UITabBar?
 
 	@IBAction func editSelected(sender: UIBarButtonItem ) {
-		if traitCollection.userInterfaceIdiom==UIUserInterfaceIdiom.Pad && UIInterfaceOrientationIsPortrait(UIApplication.sharedApplication().statusBarOrientation) {
-			let a = UIAlertController(title: "Action", message: nil, preferredStyle: UIAlertControllerStyle.Alert)
 
-			a.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: { action in
-				a.dismissViewControllerAnimated(true, completion: nil)
+		let a = UIAlertController(title: "Action", message: nil, preferredStyle: UIAlertControllerStyle.Alert)
+
+		a.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: { action in
+			a.dismissViewControllerAnimated(true, completion: nil)
+		}))
+		a.addAction(UIAlertAction(title: "Mark all as read", style: UIAlertActionStyle.Destructive, handler: { [weak self] action in
+			self!.markAllAsRead()
 			}))
-			a.addAction(UIAlertAction(title: "Mark all as read", style: UIAlertActionStyle.Destructive, handler: { [weak self] action in
-				self!.markAllAsRead()
-				}))
-			a.addAction(UIAlertAction(title: "Remove merged", style:UIAlertActionStyle.Default, handler: { [weak self] action in
-				self!.removeAllMerged()
-				}))
-			a.addAction(UIAlertAction(title: "Remove closed", style:UIAlertActionStyle.Default, handler: { [weak self] action in
-				self!.removeAllClosed()
-				}))
-			a.addAction(UIAlertAction(title: "Refresh Now", style:UIAlertActionStyle.Default, handler: { action in
-				app.startRefresh()
+		a.addAction(UIAlertAction(title: "Remove merged", style:UIAlertActionStyle.Default, handler: { [weak self] action in
+			self!.removeAllMerged()
 			}))
-			presentViewController(a, animated: true, completion: nil)
-		}
-		else
-		{
-			let a = UIActionSheet(title: "Action",
-				delegate:self,
-				cancelButtonTitle: "Cancel",
-				destructiveButtonTitle: "Mark all as read",
-				otherButtonTitles: "Remove merged",  "Remove closed", "Refresh Now")
-
-			a.showFromBarButtonItem(sender, animated: true)
-		}
-	}
-
-	func actionSheet(actionSheet: UIActionSheet, willDismissWithButtonIndex buttonIndex: Int) {
-		switch buttonIndex {
-		case 0:
-			markAllAsRead()
-		case 2:
-			removeAllMerged()
-		case 3:
-			removeAllClosed()
-		case 4:
+		a.addAction(UIAlertAction(title: "Remove closed", style:UIAlertActionStyle.Default, handler: { [weak self] action in
+			self!.removeAllClosed()
+			}))
+		a.addAction(UIAlertAction(title: "Refresh Now", style:UIAlertActionStyle.Default, handler: { action in
 			app.startRefresh()
-		default:
-			break
-		}
+		}))
+		presentViewController(a, animated: true, completion: nil)
 	}
 
 	private func tryRefresh() {
 		refreshOnRelease = false
 
 		if api.currentNetworkStatus == NetworkStatus.NotReachable {
-			UIAlertView(title: "No Network", message: "There is no network connectivity, please try again later", delegate: nil, cancelButtonTitle: "OK").show()
+			showMessage("No Network", "There is no network connectivity, please try again later")
 		} else {
 			if !app.startRefresh() {
 				updateStatus()
@@ -333,22 +307,22 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		var urlToOpen = notification.userInfo?[NOTIFICATION_URL_KEY] as? String
 		var relatedItem: ListableItem?
 
-		if let commentId = DataManager.idForUriPath(notification.userInfo?[COMMENT_ID_KEY] as? String), c = mainObjectContext.existingObjectWithID(commentId, error:nil) as? PRComment {
+		if let commentId = DataManager.idForUriPath(notification.userInfo?[COMMENT_ID_KEY] as? String), c = existingObjectWithID(commentId) as? PRComment {
 				relatedItem = c.pullRequest ?? c.issue
 				if urlToOpen == nil {
 					urlToOpen = c.webUrl
 				}
 		} else if let pullRequestId = DataManager.idForUriPath(notification.userInfo?[PULL_REQUEST_ID_KEY] as? String) {
-			relatedItem = mainObjectContext.existingObjectWithID(pullRequestId, error:nil) as? ListableItem
+			relatedItem = existingObjectWithID(pullRequestId) as? ListableItem
 			if relatedItem == nil {
-				UIAlertView(title: "PR not found", message: "Could not locale the PR related to this notification", delegate: nil, cancelButtonTitle: "OK").show()
+				showMessage("PR not found", "Could not locale the PR related to this notification")
 			} else if urlToOpen == nil {
 				urlToOpen = relatedItem!.webUrl
 			}
 		} else if let issueId = DataManager.idForUriPath(notification.userInfo?[ISSUE_ID_KEY] as? String) {
-			relatedItem = mainObjectContext.existingObjectWithID(issueId, error:nil) as? ListableItem
+			relatedItem = existingObjectWithID(issueId) as? ListableItem
 			if relatedItem == nil {
-				UIAlertView(title: "Issue not found", message: "Could not locale the issue related to this notification", delegate: nil, cancelButtonTitle: "OK").show()
+				showMessage("Issue not found", "Could not locale the issue related to this notification")
 			} else if urlToOpen == nil {
 				urlToOpen = relatedItem!.webUrl
 			}
@@ -387,7 +361,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		viewMode = MasterViewMode.PullRequests
 		if let
 			pullRequestId = DataManager.idForUriPath(prId),
-			pr = mainObjectContext.existingObjectWithID(pullRequestId, error:nil) as? PullRequest,
+			pr = existingObjectWithID(pullRequestId) as? PullRequest,
 			ip = fetchedResultsController.indexPathForObject(pr)
 		{
 			pr.catchUpWithComments()
@@ -400,7 +374,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		viewMode = MasterViewMode.Issues
 		if let
 			issueId = DataManager.idForUriPath(iId),
-			issue = mainObjectContext.existingObjectWithID(issueId, error:nil) as? Issue,
+			issue = existingObjectWithID(issueId) as? Issue,
 			ip = fetchedResultsController.indexPathForObject(issue)
 		{
 			issue.catchUpWithComments()
@@ -412,7 +386,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	func openCommentWithId(cId: String) {
 		if let
 			itemId = DataManager.idForUriPath(cId),
-			comment = mainObjectContext.existingObjectWithID(itemId, error:nil) as? PRComment
+			comment = existingObjectWithID(itemId) as? PRComment
 		{
 			if let url = comment.webUrl {
 				var ip: NSIndexPath?

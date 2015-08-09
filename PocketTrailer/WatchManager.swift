@@ -103,7 +103,7 @@ final class WatchManager {
 				if let
 					itemId = userInfo?["id"] as? String,
 					oid = DataManager.idForUriPath(itemId),
-					pr = mainObjectContext.existingObjectWithID(oid, error:nil) as? PullRequest {
+					pr = existingObjectWithID(oid) as? PullRequest {
 						pr.catchUpWithComments()
 						popupManager.getMasterController().reloadDataWithAnimation(false)
 						DataManager.saveDB()
@@ -117,7 +117,7 @@ final class WatchManager {
 				if let
 					itemId = userInfo?["id"] as? String,
 					oid = DataManager.idForUriPath(itemId),
-					i = mainObjectContext.existingObjectWithID(oid, error:nil) as? Issue {
+					i = existingObjectWithID(oid) as? Issue {
 						i.catchUpWithComments()
 						popupManager.getMasterController().reloadDataWithAnimation(false)
 						DataManager.saveDB()

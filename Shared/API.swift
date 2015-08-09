@@ -153,7 +153,7 @@ final class API {
 	func haveCachedAvatar(path: String, tryLoadAndCallback: (IMAGE_CLASS?) -> Void) -> Bool {
 
 		#if os(iOS)
-			let absolutePath = path + (contains(path, "?") ? "&" : "?") + "s=\(40.0*GLOBAL_SCREEN_SCALE)"
+			let absolutePath = path + (path.characters.contains("?") ? "&" : "?") + "s=\(40.0*GLOBAL_SCREEN_SCALE)"
 		#else
 			let absolutePath = path + (path.characters.contains("?") ? "&" : "?") + "s=88"
 		#endif
@@ -166,8 +166,10 @@ final class API {
 			#if os(iOS)
 				let imgData = NSData(contentsOfFile: cachePath)
 				let imgDataProvider = CGDataProviderCreateWithCFData(imgData)
-				let cfImage = CGImageCreateWithJPEGDataProvider(imgDataProvider, nil, false, kCGRenderingIntentDefault)
-				let ret = UIImage(CGImage: cfImage, scale: GLOBAL_SCREEN_SCALE, orientation:UIImageOrientation.Up)
+				var ret: UIImage?
+				if let cfImage = CGImageCreateWithJPEGDataProvider(imgDataProvider, nil, false, CGColorRenderingIntent.RenderingIntentDefault) {
+					ret = UIImage(CGImage: cfImage, scale: GLOBAL_SCREEN_SCALE, orientation:UIImageOrientation.Up)
+				}
             #else
 				let ret = NSImage(contentsOfFile: cachePath)
 			#endif
@@ -175,10 +177,7 @@ final class API {
 				tryLoadAndCallback(r)
 				return true
 			} else {
-				do {
-					try fileManager.removeItemAtPath(cachePath)
-				} catch _ {
-				}
+				try! fileManager.removeItemAtPath(cachePath)
 			}
 		}
 
@@ -188,7 +187,7 @@ final class API {
             #if os(iOS)
                 if let d = data, i = IMAGE_CLASS(data: d, scale:GLOBAL_SCREEN_SCALE) {
 					result = i
-                    UIImageJPEGRepresentation(i, 1.0).writeToFile(cachePath, atomically: true)
+                    UIImageJPEGRepresentation(i, 1.0)?.writeToFile(cachePath, atomically: true)
 				}
             #else
                 if let d = data, i = IMAGE_CLASS(data: d) {

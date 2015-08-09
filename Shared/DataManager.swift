@@ -239,7 +239,7 @@ final class DataManager : NSObject {
 	}
 
 	class func tempContext() -> NSManagedObjectContext {
-		let c = NSManagedObjectContext(concurrencyType: NSManagedObjectContextConcurrencyType.ConfinementConcurrencyType)
+		let c = NSManagedObjectContext(concurrencyType: NSManagedObjectContextConcurrencyType.MainQueueConcurrencyType)
 		c.parentContext = mainObjectContext
 		c.undoManager = nil
 		return c
@@ -391,7 +391,7 @@ let persistentStoreCoordinator = { ()-> NSPersistentStoreCoordinator in
 	let mom = NSManagedObjectModel(contentsOfURL: modelURL)!
 
 	if fileManager.fileExistsAtPath(applicationPath) {
-		let m = try! NSPersistentStoreCoordinator.metadataForPersistentStoreOfType(NSSQLiteStoreType, URL: sqlStorePath)
+		let m = try! NSPersistentStoreCoordinator.metadataForPersistentStoreOfType(NSSQLiteStoreType, URL: sqlStorePath, options: nil)
 		_justMigrated = !mom.isConfiguration(nil, compatibleWithStoreMetadata: m)
 	} else {
 		try! fileManager.createDirectoryAtPath(applicationPath, withIntermediateDirectories: true, attributes: nil)
@@ -438,7 +438,7 @@ func addStorePath(sqlStore: NSURL, _ newCoordinator: NSPersistentStoreCoordinato
 	if DATA_READONLY {
 		if NSFileManager.defaultManager().fileExistsAtPath(sqlStore.path!) { // may need migration
 
-			let m = try! NSPersistentStoreCoordinator.metadataForPersistentStoreOfType(NSSQLiteStoreType, URL: sqlStore)
+			let m = try! NSPersistentStoreCoordinator.metadataForPersistentStoreOfType(NSSQLiteStoreType, URL: sqlStore, options: nil)
 			if newCoordinator.managedObjectModel.isConfiguration(nil, compatibleWithStoreMetadata: m) == false {
 
 				do {

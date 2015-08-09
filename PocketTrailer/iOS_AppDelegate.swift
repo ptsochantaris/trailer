@@ -65,12 +65,12 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 			}
 		}
 
-		let notificationSettings = UIUserNotificationSettings(forTypes: UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound, categories: nil)
+		let notificationSettings = UIUserNotificationSettings(forTypes: UIUserNotificationType.Alert.union(UIUserNotificationType.Badge).union(UIUserNotificationType.Sound), categories: nil)
 		UIApplication.sharedApplication().registerUserNotificationSettings(notificationSettings)
 		return true
 	}
 
-	func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject?) -> Bool {
+	func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject) -> Bool {
 		if let c = NSURLComponents(URL: url, resolvingAgainstBaseURL: false) {
 			if let scheme = c.scheme {
 				if scheme == "pockettrailer", let host = c.host {
@@ -137,16 +137,12 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 		for apiServer in ApiServer.allApiServersInMoc(mainObjectContext) {
 			if apiServer.goodToGo && (apiServer.requestsLimit?.doubleValue ?? 0) > 0 {
 				if (apiServer.requestsRemaining?.doubleValue ?? 0) == 0 {
-					UIAlertView(title: (apiServer.label ?? "Untitled Server's") + " API request usage is over the limit!",
-						message: "Your request cannot be completed until GitHub resets your hourly API allowance at \(apiServer.resetDate).\n\nIf you get this error often, try to make fewer manual refreshes or reducing the number of repos you are monitoring.\n\nYou can check your API usage at any time from the bottom of the preferences pane at any time.",
-						delegate: nil,
-						cancelButtonTitle: "OK").show()
+					showMessage((apiServer.label ?? "Untitled Server's") + " API request usage is over the limit!",
+						"Your request cannot be completed until GitHub resets your hourly API allowance at \(apiServer.resetDate).\n\nIf you get this error often, try to make fewer manual refreshes or reducing the number of repos you are monitoring.\n\nYou can check your API usage at any time from the bottom of the preferences pane at any time.")
 					return
 				} else if ((apiServer.requestsRemaining?.doubleValue ?? 0.0) / (apiServer.requestsLimit?.doubleValue ?? 1.0)) < LOW_API_WARNING {
-					UIAlertView(title: (apiServer.label ?? "Untitled Server's") + " API request usage is close to full",
-						message: "Try to make fewer manual refreshes, increasing the automatic refresh time, or reducing the number of repos you are monitoring.\n\nYour allowance will be reset by Github on \(apiServer.resetDate).\n\nYou can check your API usage from the bottom of the preferences pane.",
-						delegate: nil,
-						cancelButtonTitle: "OK").show()
+					showMessage((apiServer.label ?? "Untitled Server's") + " API request usage is close to full",
+						"Try to make fewer manual refreshes, increasing the automatic refresh time, or reducing the number of repos you are monitoring.\n\nYour allowance will be reset by Github on \(apiServer.resetDate).\n\nYou can check your API usage from the bottom of the preferences pane.")
 				}
 			}
 		}
@@ -208,7 +204,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 			}
 
 			if !success && UIApplication.sharedApplication().applicationState==UIApplicationState.Active {
-				UIAlertView(title: "Refresh failed", message: "Loading the latest data from Github failed", delegate: nil, cancelButtonTitle: "OK").show()
+				showMessage("Refresh failed", "Loading the latest data from Github failed")
 			}
 
 			self!.refreshTimer = NSTimer.scheduledTimerWithTimeInterval(NSTimeInterval(Settings.refreshPeriod), target: self!, selector: Selector("refreshTimerDone"), userInfo: nil, repeats:false)
@@ -250,3 +246,4 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 		NotificationManager.postNotificationOfType(type, forItem: forItem)
 	}
 }
+

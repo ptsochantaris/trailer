@@ -1,7 +1,7 @@
 
 import UIKit
 
-let statusAttributes: [NSObject : AnyObject] = {
+let statusAttributes: [String : AnyObject] = {
 	let paragraphStyle = NSMutableParagraphStyle()
 	paragraphStyle.paragraphSpacing = 6.0
 
@@ -143,7 +143,6 @@ final class PRCell: UITableViewCell {
 		let _commentsNew = item.showNewComments() ? item.unreadComments?.integerValue ?? 0 : 0
 
 		readCount.text = itemCountFormatter.stringFromNumber(_commentsTotal)
-		let readSize = readCount.sizeThatFits(CGSizeMake(200, 14))
 		readCount.hidden = (_commentsTotal == 0)
 
 		unreadCount.hidden = (_commentsNew == 0)

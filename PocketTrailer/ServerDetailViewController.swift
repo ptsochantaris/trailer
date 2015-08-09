@@ -22,10 +22,10 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 		super.viewDidLoad()
 		var a: ApiServer
 		if let sid = serverId {
-			a = mainObjectContext.existingObjectWithID(sid, error: nil) as! ApiServer
+			a = existingObjectWithID(sid) as! ApiServer
 		} else {
 			a = ApiServer.addDefaultGithubInMoc(mainObjectContext)
-			mainObjectContext.save(nil)
+			try! mainObjectContext.save()
 			serverId = a.objectID
 		}
 		name.text = a.label
@@ -57,21 +57,18 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 			sender.enabled = false
 			api.testApiToServer(a) { error in
 				sender.enabled = true
-				UIAlertView(title: error != nil ? "Failed" : "Success",
-					message: error?.localizedDescription,
-					delegate: nil,
-					cancelButtonTitle: "OK").show()
+				showMessage(error != nil ? "Failed" : "Success", error?.localizedDescription)
 			}
 		}
 	}
 
 	private func updateServerFromForm() -> ApiServer? {
 		if let sid = serverId {
-			let a = mainObjectContext.existingObjectWithID(sid, error: nil) as! ApiServer
-			a.label = name.text.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
-			a.apiPath = apiPath.text.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
-			a.webPath = webFrontEnd.text.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
-			a.authToken = authToken.text.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+			let a = existingObjectWithID(sid) as! ApiServer
+			a.label = name.text?.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+			a.apiPath = apiPath.text?.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+			a.webPath = webFrontEnd.text?.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+			a.authToken = authToken.text?.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
 			a.reportRefreshFailures = reportErrors.on
 			a.lastSyncSucceeded = true
 			app.preferencesDirty = true
@@ -115,7 +112,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 			return false
 		}
 		if textField == authToken {
-			let newToken = (textField.text as NSString).stringByReplacingCharactersInRange(range, withString: string)
+			let newToken = textField.text?.stringByReplacingCharactersInRange(range, withString: string)
 			processTokenStateFrom(newToken)
 		}
 		return true
@@ -143,13 +140,10 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 	}
 
 	private func checkForValidPath() -> NSURL? {
-		if let u = NSURL(string: webFrontEnd.text) {
+		if let text = webFrontEnd.text, u = NSURL(string: text) {
 			return u
 		} else {
-			UIAlertView(title: "Need a valid web server",
-				message: "Please specify a valid URL for the 'Web Front End' for this server in order to visit it",
-				delegate: nil,
-				cancelButtonTitle: "OK").show()
+			showMessage("Need a valid web server", "Please specify a valid URL for the 'Web Front End' for this server in order to visit it")
 			return nil
 		}
 	}
@@ -177,7 +171,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 	}
 
 	private func deleteServer() {
-		if let a = mainObjectContext.existingObjectWithID(serverId!, error: nil) {
+		if let a = existingObjectWithID(serverId!) {
 			mainObjectContext.deleteObject(a)
 			DataManager.saveDB()
 		}
