@@ -2,6 +2,8 @@
 import UIKit
 import CoreData
 
+let DATA_READONLY = true
+
 let app = { () -> ExtensionGlobals! in
 	Settings.checkMigration()
     DataManager.checkMigration()

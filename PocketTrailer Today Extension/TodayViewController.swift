@@ -52,8 +52,6 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 
-		dataReadonly = true
-
 		paragraph.paragraphSpacing = 4
 
 		prButton = UIButton.buttonWithType(UIButtonType.Custom) as! UIButton

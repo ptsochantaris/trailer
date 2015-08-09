@@ -49,7 +49,6 @@ final class GlanceController: WKInterfaceController {
 
 	override func willActivate() {
 
-		dataReadonly = true
 		Settings.clearCache()
 
 		let totalItems = Settings.showIssuesInGlance ? Issue.countAllIssuesInMoc(mainObjectContext) : PullRequest.countAllRequestsInMoc(mainObjectContext)

@@ -104,6 +104,7 @@ let API_USAGE_UPDATE = "RateUpdateNotification"
 let LOW_API_WARNING: Double = 0.20
 let NETWORK_TIMEOUT: NSTimeInterval = 120.0
 let BACKOFF_STEP: NSTimeInterval = 120.0
+let DATA_READONLY = false
 
 func currentAppVersion() -> String {
 	return NSBundle.mainBundle().infoDictionary!["CFBundleShortVersionString"] as? String ?? "(unknown version)"

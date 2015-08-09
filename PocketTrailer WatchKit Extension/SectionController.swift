@@ -9,7 +9,6 @@ final class SectionController: WKInterfaceController {
 	override func awakeWithContext(context: AnyObject?) {
 		super.awakeWithContext(context)
 
-		dataReadonly = true
 		Settings.clearCache()
 	}
 
