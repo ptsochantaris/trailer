@@ -9,7 +9,7 @@ class CenterTextField: NSTextField {
 		editable = false
 		selectable = false
 		drawsBackground = false
-		(cell() as! CenterTextFieldCell).scrollable = false
+		(cell as! CenterTextFieldCell).scrollable = false
 	}
 
 	required init?(coder: NSCoder) {

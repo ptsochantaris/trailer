@@ -42,7 +42,7 @@ final class Repo: DataItem {
 		let f = NSFetchRequest(entityName: "Repo")
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "displayPolicyForPrs > 0 or displayPolicyForIssues > 0")
-		return moc.executeFetchRequest(f, error: nil) as! [Repo]
+		return try! moc.executeFetchRequest(f) as! [Repo]
 	}
 
 	class func countVisibleReposInMoc(moc: NSManagedObjectContext) -> Int {
@@ -73,7 +73,7 @@ final class Repo: DataItem {
 		let f = NSFetchRequest(entityName: "Repo")
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "dirty = YES and (displayPolicyForPrs > 0 or displayPolicyForIssues > 0) and inaccessible != YES")
-		return moc.executeFetchRequest(f, error: nil) as! [Repo]
+		return try! moc.executeFetchRequest(f) as! [Repo]
 	}
 
 	class func reposNotRecentlyDirtied(moc: NSManagedObjectContext) -> [Repo] {
@@ -81,21 +81,21 @@ final class Repo: DataItem {
 		f.predicate = NSPredicate(format: "dirty != YES and lastDirtied < %@ and postSyncAction != %d and (displayPolicyForPrs > 0 or displayPolicyForIssues > 0)", NSDate(timeInterval: -3600, sinceDate: NSDate()), PostSyncAction.Delete.rawValue)
 		f.includesPropertyValues = false
 		f.returnsObjectsAsFaults = false
-		return moc.executeFetchRequest(f, error: nil) as! [Repo]
+		return try! moc.executeFetchRequest(f) as! [Repo]
 	}
 
 	class func unsyncableReposInMoc(moc: NSManagedObjectContext) -> [Repo] {
 		let f = NSFetchRequest(entityName: "Repo")
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "(not (displayPolicyForPrs > 0 or displayPolicyForIssues > 0)) or inaccessible = YES")
-		return moc.executeFetchRequest(f, error: nil) as! [Repo]
+		return try! moc.executeFetchRequest(f) as! [Repo]
 	}
 
 	class func markDirtyReposWithIds(ids: NSSet, inMoc: NSManagedObjectContext) {
 		let f = NSFetchRequest(entityName: "Repo")
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "serverId IN %@", ids)
-		for repo in inMoc.executeFetchRequest(f, error: nil) as! [Repo] {
+		for repo in try! inMoc.executeFetchRequest(f) as! [Repo] {
 			repo.dirty = repo.shouldSync()
 		}
 	}
@@ -110,7 +110,7 @@ final class Repo: DataItem {
 			NSSortDescriptor(key: "fork", ascending: true),
 			NSSortDescriptor(key: "fullName", ascending: true)
 		]
-		return mainObjectContext.executeFetchRequest(f, error: nil) as! [Repo]
+		return try! mainObjectContext.executeFetchRequest(f) as! [Repo]
 	}
 
 	class func countParentRepos(filter: String?) -> Int {

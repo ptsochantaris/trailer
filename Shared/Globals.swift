@@ -7,31 +7,31 @@ func DLog(message: String) {
     }
 }
 
-func DLog(message: String, @autoclosure arg1: ()->CVarArgType?) {
+func DLog(message: String, @autoclosure _ arg1: ()->CVarArgType?) {
     if Settings.logActivityToConsole {
         NSLog(message, arg1() ?? "(nil)")
     }
 }
 
-func DLog(message: String, @autoclosure arg1: ()->CVarArgType?, @autoclosure arg2: ()->CVarArgType?) {
+func DLog(message: String, @autoclosure _ arg1: ()->CVarArgType?, @autoclosure _ arg2: ()->CVarArgType?) {
     if Settings.logActivityToConsole {
         NSLog(message, arg1() ?? "(nil)", arg2() ?? "(nil)")
     }
 }
 
-func DLog(message: String, @autoclosure arg1: ()->CVarArgType?, @autoclosure arg2: ()->CVarArgType?, @autoclosure arg3: ()->CVarArgType?) {
+func DLog(message: String, @autoclosure _ arg1: ()->CVarArgType?, @autoclosure _ arg2: ()->CVarArgType?, @autoclosure _ arg3: ()->CVarArgType?) {
     if Settings.logActivityToConsole {
         NSLog(message, arg1() ?? "(nil)", arg2() ?? "(nil)", arg3() ?? "(nil)")
     }
 }
 
-func DLog(message: String, @autoclosure arg1: ()->CVarArgType?, @autoclosure arg2: ()->CVarArgType?, @autoclosure arg3: ()->CVarArgType?, @autoclosure arg4: ()->CVarArgType?) {
+func DLog(message: String, @autoclosure _ arg1: ()->CVarArgType?, @autoclosure _ arg2: ()->CVarArgType?, @autoclosure _ arg3: ()->CVarArgType?, @autoclosure _ arg4: ()->CVarArgType?) {
 	if Settings.logActivityToConsole {
 		NSLog(message, arg1() ?? "(nil)", arg2() ?? "(nil)", arg3() ?? "(nil)", arg4() ?? "(nil)")
 	}
 }
 
-func DLog(message: String, @autoclosure arg1: ()->CVarArgType?, @autoclosure arg2: ()->CVarArgType?, @autoclosure arg3: ()->CVarArgType?, @autoclosure arg4: ()->CVarArgType?, @autoclosure arg5: ()->CVarArgType?) {
+func DLog(message: String, @autoclosure _ arg1: ()->CVarArgType?, @autoclosure _ arg2: ()->CVarArgType?, @autoclosure _ arg3: ()->CVarArgType?, @autoclosure _ arg4: ()->CVarArgType?, @autoclosure _ arg5: ()->CVarArgType?) {
 	if Settings.logActivityToConsole {
 		NSLog(message, arg1() ?? "(nil)", arg2() ?? "(nil)", arg3() ?? "(nil)", arg4() ?? "(nil)", arg5() ?? "(nil)")
 	}
@@ -46,7 +46,6 @@ func DLog(message: String, @autoclosure arg1: ()->CVarArgType?, @autoclosure arg
 	typealias COLOR_CLASS = UIColor
 	typealias FONT_CLASS = UIFont
 	typealias IMAGE_CLASS = UIImage
-	let stringDrawingOptions = NSStringDrawingOptions.UsesLineFragmentOrigin
 
 	let REFRESH_STARTED_NOTIFICATION = "RefreshStartedNotification"
 	let REFRESH_ENDED_NOTIFICATION = "RefreshEndedNotification"
@@ -72,9 +71,10 @@ func DLog(message: String, @autoclosure arg1: ()->CVarArgType?, @autoclosure arg
 	typealias COLOR_CLASS = NSColor
 	typealias FONT_CLASS = NSFont
 	typealias IMAGE_CLASS = NSImage
-	let stringDrawingOptions = NSStringDrawingOptions.UsesLineFragmentOrigin | NSStringDrawingOptions.UsesFontLeading
 
 #endif
+
+let stringDrawingOptions: NSStringDrawingOptions = [NSStringDrawingOptions.UsesLineFragmentOrigin, NSStringDrawingOptions.UsesFontLeading]
 
 let itemCountFormatter = { () -> NSNumberFormatter in
     let n = NSNumberFormatter()
@@ -90,7 +90,7 @@ let syncDateFormatter = { () -> NSDateFormatter in
     return d
 }()
 
-func MAKECOLOR(red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat) -> COLOR_CLASS {
+func MAKECOLOR(red: CGFloat, _ green: CGFloat, _ blue: CGFloat, _ alpha: CGFloat) -> COLOR_CLASS {
 	return COLOR_CLASS(red: red, green: green, blue: blue, alpha: alpha)
 }
 
@@ -195,7 +195,7 @@ enum RepoDisplayPolicy: Int {
 #endif
 
 func versionString() -> String {
-	var buildNumber = NSBundle.mainBundle().infoDictionary!["CFBundleVersion"] as? String ?? "unknown build"
+	let buildNumber = NSBundle.mainBundle().infoDictionary!["CFBundleVersion"] as? String ?? "unknown build"
 	return "Version \(currentAppVersion()) (\(buildNumber))"
 }
 
@@ -207,7 +207,7 @@ func isDarkColor(color: COLOR_CLASS) -> Bool {
 }
 
 func indexOfObject(array: [AnyObject], value: AnyObject) -> Int? {
-	for (index, element) in enumerate(array) {
+	for (index, element) in array.enumerate() {
 		if element === value {
 			return index
 		}
@@ -222,10 +222,10 @@ func atNextEvent(completion: Completion) {
 }
 
 func never() -> NSDate {
-	return NSDate.distantPast() as! NSDate
+	return NSDate.distantPast() 
 }
 
-func N(data: AnyObject?, key: String) -> AnyObject? {
+func N(data: AnyObject?, _ key: String) -> AnyObject? {
 	if let d = data as? [NSObject : AnyObject], o: AnyObject = d[key] where !(o is NSNull) {
 		return o
 	}
@@ -241,7 +241,7 @@ func md5hash(s: String) -> String {
 		CC_LONG(s.lengthOfBytesUsingEncoding(NSUTF8StringEncoding)),
 		result)
 
-	var hash = NSMutableString()
+	let hash = NSMutableString()
 	for i in 0..<digestLen {
 		hash.appendFormat("%02X", result[i])
 	}
@@ -259,3 +259,43 @@ func parseFromHex(s: String) -> UInt32 {
 	s.scanHexInt(&result)
 	return result
 }
+
+//////////////////////// From tieferbegabt's post on https://forums.developer.apple.com/message/37935, with thanks!
+extension String {
+	var lastPathComponent: String {
+		get {
+			return (self as NSString).lastPathComponent
+		}
+	}
+	var pathExtension: String {
+		get {
+
+			return (self as NSString).pathExtension
+		}
+	}
+	var stringByDeletingLastPathComponent: String {
+		get {
+
+			return (self as NSString).stringByDeletingLastPathComponent
+		}
+	}
+	var stringByDeletingPathExtension: String {
+		get {
+
+			return (self as NSString).stringByDeletingPathExtension
+		}
+	}
+	var pathComponents: [String] {
+		get {
+
+			return (self as NSString).pathComponents
+		}
+	}
+	func stringByAppendingPathComponent(path: String) -> String {
+		return (self as NSString).stringByAppendingPathComponent(path)
+	}
+	func stringByAppendingPathExtension(ext: String) -> String? {
+		return (self as NSString).stringByAppendingPathExtension(ext)
+	}
+}
+

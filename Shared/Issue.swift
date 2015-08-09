@@ -71,7 +71,7 @@ final class Issue: ListableItem {
 		if section != PullRequestSection.None {
 			f.predicate = NSPredicate(format: "sectionIndex == %d", section.rawValue)
 		}
-		for pr in moc.executeFetchRequest(f, error: nil) as! [Issue] {
+		for pr in try! moc.executeFetchRequest(f) as! [Issue] {
 			pr.catchUpWithComments()
 		}
 	}
@@ -139,7 +139,7 @@ final class Issue: ListableItem {
 		let f = NSFetchRequest(entityName: "Issue")
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "condition == %d", PullRequestCondition.Closed.rawValue)
-		return moc.executeFetchRequest(f, error: nil) as! [Issue]
+		return try! moc.executeFetchRequest(f) as! [Issue]
 	}
 
 	func accessibleSubtitle() -> String {

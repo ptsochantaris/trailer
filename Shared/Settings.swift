@@ -166,7 +166,7 @@ final class Settings {
 		#if os(OSX)
 		var keyIsGood: Bool
 		if let k = key {
-			keyIsGood = !contains(["LAST_SUCCESSFUL_REFRESH", "LAST_EXPORT_URL", "LAST_EXPORT_TIME"], k)
+			keyIsGood = !["LAST_SUCCESSFUL_REFRESH", "LAST_EXPORT_URL", "LAST_EXPORT_TIME"].contains(k)
 		} else {
 			keyIsGood = true
 		}
@@ -218,13 +218,13 @@ final class Settings {
 			return false
 		}
 		NSNotificationCenter.defaultCenter().postNotificationName(SETTINGS_EXPORTED, object: nil)
-		DLog("Written settings to %@", url.absoluteString!)
+		DLog("Written settings to %@", url.absoluteString)
 		return true
 	}
 
 	class func readFromURL(url: NSURL) -> Bool {
 		if let settings = NSDictionary(contentsOfURL: url) {
-			DLog("Reading settings from %@", url.absoluteString!)
+			DLog("Reading settings from %@", url.absoluteString)
 			resetAllSettings()
 			for k in allFields() {
 				if let v: AnyObject = settings[k] {

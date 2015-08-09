@@ -2,7 +2,7 @@
 final class Application: NSApplication {
 	override func sendEvent(theEvent: NSEvent) {
 		if theEvent.type == NSEventType.KeyDown {
-			let modifiers = theEvent.modifierFlags & NSEventModifierFlags.DeviceIndependentModifierFlagsMask
+			let modifiers = theEvent.modifierFlags.intersect(NSEventModifierFlags.DeviceIndependentModifierFlagsMask)
 			if modifiers == NSEventModifierFlags.CommandKeyMask {
 				if let char = theEvent.charactersIgnoringModifiers {
 					switch char {
@@ -22,7 +22,7 @@ final class Application: NSApplication {
 					default: break
 					}
 				}
-			} else if modifiers == NSEventModifierFlags.CommandKeyMask | NSEventModifierFlags.ShiftKeyMask {
+			} else if modifiers == NSEventModifierFlags.CommandKeyMask.union(NSEventModifierFlags.ShiftKeyMask) {
 				if let char = theEvent.charactersIgnoringModifiers {
 					if char == "Z" && sendAction(Selector("redo:"), to:nil, from:self) { return }
 				}

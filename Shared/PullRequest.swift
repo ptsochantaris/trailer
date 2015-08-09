@@ -53,21 +53,21 @@ final class PullRequest: ListableItem {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "sectionIndex == %d || sectionIndex == %d || sectionIndex == %d", PullRequestSection.Mine.rawValue, PullRequestSection.Participated.rawValue, PullRequestSection.All.rawValue)
-		return moc.executeFetchRequest(f, error: nil) as! [PullRequest]
+		return try! moc.executeFetchRequest(f) as! [PullRequest]
 	}
 
 	class func allMergedRequestsInMoc(moc: NSManagedObjectContext) -> [PullRequest] {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "condition == %d", PullRequestCondition.Merged.rawValue)
-		return moc.executeFetchRequest(f, error: nil) as! [PullRequest]
+		return try! moc.executeFetchRequest(f) as! [PullRequest]
 	}
 
 	class func allClosedRequestsInMoc(moc: NSManagedObjectContext) -> [PullRequest] {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "condition == %d", PullRequestCondition.Closed.rawValue)
-		return moc.executeFetchRequest(f, error: nil) as! [PullRequest]
+		return try! moc.executeFetchRequest(f) as! [PullRequest]
 	}
 
 	class func countOpenRequestsInMoc(moc: NSManagedObjectContext) -> Int {
@@ -93,7 +93,7 @@ final class PullRequest: ListableItem {
 		if section != PullRequestSection.None {
 			f.predicate = NSPredicate(format: "sectionIndex == %d", section.rawValue)
 		}
-		for pr in moc.executeFetchRequest(f, error: nil) as! [PullRequest] {
+		for pr in try! moc.executeFetchRequest(f) as! [PullRequest] {
 			pr.catchUpWithComments()
 		}
 	}
@@ -207,14 +207,14 @@ final class PullRequest: ListableItem {
 				for t in terms {
 					subPredicates.append(NSPredicate(format: "descriptionText contains[cd] %@", t))
 				}
-				let orPredicate = NSCompoundPredicate.orPredicateWithSubpredicates(subPredicates)
+				let orPredicate = NSCompoundPredicate(orPredicateWithSubpredicates: subPredicates)
 				let selfPredicate = NSPredicate(format: "pullRequest == %@", self)
 
 				if mode==StatusFilter.Include.rawValue {
-					f.predicate = NSCompoundPredicate.andPredicateWithSubpredicates([selfPredicate, orPredicate])
+					f.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [selfPredicate, orPredicate])
 				} else {
-					let notOrPredicate = NSCompoundPredicate.notPredicateWithSubpredicate(orPredicate)
-					f.predicate = NSCompoundPredicate.andPredicateWithSubpredicates([selfPredicate, notOrPredicate])
+					let notOrPredicate = NSCompoundPredicate(notPredicateWithSubpredicate: orPredicate)
+					f.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [selfPredicate, notOrPredicate])
 				}
 			} else {
 				f.predicate = NSPredicate(format: "pullRequest == %@", self)
@@ -225,7 +225,7 @@ final class PullRequest: ListableItem {
 		var result = [PRStatus]()
 		var targetUrls = Set<String>()
 		var descriptions = Set<String>()
-		for s in managedObjectContext?.executeFetchRequest(f, error: nil) as! [PRStatus] {
+		for s in try! managedObjectContext?.executeFetchRequest(f) as! [PRStatus] {
 			let targetUrl = s.targetUrl ?? ""
 			let desc = s.descriptionText ?? "(No status description)"
 

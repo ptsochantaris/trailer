@@ -37,17 +37,18 @@ final class MenuWindow: NSWindow {
 
 		if MenuWindow.usingVibrancy() {
 
-			appearance = NSAppearance(named: app.darkMode ? NSAppearanceNameVibrantDark : NSAppearanceNameVibrantLight)
+			if #available(OSX 10.10, *) {
+			    appearance = NSAppearance(named: app.darkMode ? NSAppearanceNameVibrantDark : NSAppearanceNameVibrantLight)
+				if windowVibrancy == nil {
+					let w = NSVisualEffectView(frame: header.bounds)
+					w.autoresizingMask = [NSAutoresizingMaskOptions.ViewHeightSizable, NSAutoresizingMaskOptions.ViewWidthSizable]
+					w.blendingMode = NSVisualEffectBlendingMode.BehindWindow
+					w.state = NSVisualEffectState.Active
+					header.addSubview(w, positioned:NSWindowOrderingMode.Below, relativeTo:filter)
+					windowVibrancy = w
 
-			if windowVibrancy == nil {
-				let w = NSVisualEffectView(frame: header.bounds)
-				w.autoresizingMask = NSAutoresizingMaskOptions.ViewHeightSizable | NSAutoresizingMaskOptions.ViewWidthSizable
-				w.blendingMode = NSVisualEffectBlendingMode.BehindWindow
-				w.state = NSVisualEffectState.Active
-				header.addSubview(w, positioned:NSWindowOrderingMode.Below, relativeTo:filter)
-				windowVibrancy = w
-
-				table.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.SourceList
+					table.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.SourceList
+				}
 			}
 
 		} else {
@@ -64,7 +65,7 @@ final class MenuWindow: NSWindow {
 
 	func showStatusItem() {
 		if statusItem == nil {
-			statusItem = NSStatusBar.systemStatusBar().statusItemWithLength(-1) //NSVariableStatusItemLength
+			statusItem = NSStatusBar.systemStatusBar().statusItemWithLength(NSVariableStatusItemLength)
 		}
 	}
 

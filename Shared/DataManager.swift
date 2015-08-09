@@ -30,12 +30,12 @@ final class DataManager : NSObject {
 			var legacyApiHost = d.objectForKey("API_BACKEND_SERVER") as? String ?? ""
 			if legacyApiHost.isEmpty { legacyApiHost = "api.github.com" }
 
-			var legacyApiPath = d.objectForKey("API_SERVER_PATH") as? String ?? ""
+			let legacyApiPath = d.objectForKey("API_SERVER_PATH") as? String ?? ""
 
 			var legacyWebHost = d.objectForKey("API_FRONTEND_SERVER") as? String ?? ""
 			if legacyWebHost.isEmpty { legacyWebHost = "github.com" }
 
-			var actualApiPath = (legacyApiHost + "/" + legacyApiPath).stringByReplacingOccurrencesOfString("//", withString:"/")
+			let actualApiPath = (legacyApiHost + "/" + legacyApiPath).stringByReplacingOccurrencesOfString("//", withString:"/")
 
 			let newApiServer = ApiServer.addDefaultGithubInMoc(mainObjectContext)
 			newApiServer.apiPath = "https://" + actualApiPath
@@ -79,7 +79,7 @@ final class DataManager : NSObject {
 		let fm = NSFileManager.defaultManager()
 		if fm.fileExistsAtPath(oldDocumentsDirectory) {
 			DLog("Migrating DB files into group container")
-			if let files = fm.contentsOfDirectoryAtPath(oldDocumentsDirectory, error: nil) as? [String] {
+			if let files = fm.contentsOfDirectoryAtPath(oldDocumentsDirectory) {
 				let newDocumentsDirectory = sharedFilesDirectory().path!
 				for file in files {
 					if file.rangeOfString("Trailer.sqlite") != nil {
@@ -87,13 +87,22 @@ final class DataManager : NSObject {
 						let oldPath = oldDocumentsDirectory.stringByAppendingPathComponent(file)
 						let newPath = newDocumentsDirectory.stringByAppendingPathComponent(file)
 						if fm.fileExistsAtPath(newPath) {
-							fm.removeItemAtPath(newPath, error: nil)
+							do {
+								try fm.removeItemAtPath(newPath)
+							} catch _ {
+							}
 						}
-						fm.moveItemAtPath(oldPath, toPath: newPath, error: nil)
+						do {
+							try fm.moveItemAtPath(oldPath, toPath: newPath)
+						} catch _ {
+						}
 					}
 				}
 			}
-			fm.removeItemAtPath(oldDocumentsDirectory, error: nil)
+			do {
+				try fm.removeItemAtPath(oldDocumentsDirectory)
+			} catch _ {
+			}
 		} else {
 			DLog("No need to migrate DB into shared container")
 		}
@@ -151,7 +160,7 @@ final class DataManager : NSObject {
 			}
 		}
 
-		var latestComments = PRComment.newItemsOfType("PRComment", inMoc: mainObjectContext) as! [PRComment]
+		let latestComments = PRComment.newItemsOfType("PRComment", inMoc: mainObjectContext) as! [PRComment]
 		for c in latestComments {
 			if let i = c.pullRequest ?? c.issue {
 				processNotificationsForComment(c, ofItem: c.pullRequest ?? i)
@@ -159,7 +168,7 @@ final class DataManager : NSObject {
 			c.postSyncAction = PostSyncAction.DoNothing.rawValue
 		}
 
-		var latestStatuses = PRStatus.newItemsOfType("PRStatus", inMoc: mainObjectContext) as! [PRStatus]
+		let latestStatuses = PRStatus.newItemsOfType("PRStatus", inMoc: mainObjectContext) as! [PRStatus]
 		if Settings.notifyOnStatusUpdates {
 			var coveredPrs = Set<NSManagedObjectID>()
 			for s in latestStatuses {
@@ -208,7 +217,7 @@ final class DataManager : NSObject {
 		if let authorName = c.userName {
 			var blocked = false
 			for blockedAuthor in Settings.commentAuthorBlacklist as [String] {
-				if authorName.compare(blockedAuthor, options: NSStringCompareOptions.CaseInsensitiveSearch|NSStringCompareOptions.DiacriticInsensitiveSearch)==NSComparisonResult.OrderedSame {
+				if authorName.compare(blockedAuthor, options: [NSStringCompareOptions.CaseInsensitiveSearch, NSStringCompareOptions.DiacriticInsensitiveSearch])==NSComparisonResult.OrderedSame {
 					blocked = true
 					break
 				}
@@ -226,7 +235,14 @@ final class DataManager : NSObject {
 		if mainObjectContext.hasChanges {
 			DLog("Saving DB")
 			var error: NSError?
-			var ok = mainObjectContext.save(&error)
+			var ok: Bool
+			do {
+				try mainObjectContext.save()
+				ok = true
+			} catch let error1 as NSError {
+				error = error1
+				ok = false
+			}
 			if !ok { DLog("Error while saving DB: %@", error) }
 		}
 		return true
@@ -243,24 +259,24 @@ final class DataManager : NSObject {
 		switch type {
 		case .NewMention: fallthrough
 		case .NewComment:
-			return [COMMENT_ID_KEY : item.objectID.URIRepresentation().absoluteString!]
+			return [COMMENT_ID_KEY : item.objectID.URIRepresentation().absoluteString]
 		case .NewPr: fallthrough
 		case .PrReopened: fallthrough
 		case .NewPrAssigned: fallthrough
 		case .PrClosed: fallthrough
 		case .PrMerged:
-			return [NOTIFICATION_URL_KEY : (item as! PullRequest).webUrl!, PULL_REQUEST_ID_KEY: item.objectID.URIRepresentation().absoluteString!]
+			return [NOTIFICATION_URL_KEY : (item as! PullRequest).webUrl!, PULL_REQUEST_ID_KEY: item.objectID.URIRepresentation().absoluteString]
 		case .NewRepoSubscribed: fallthrough
 		case .NewRepoAnnouncement:
 			return [NOTIFICATION_URL_KEY : (item as! Repo).webUrl!]
 		case .NewStatus:
 			let pr = (item as! PRStatus).pullRequest
-			return [NOTIFICATION_URL_KEY : pr.webUrl!, STATUS_ID_KEY: pr.objectID.URIRepresentation().absoluteString!]
+			return [NOTIFICATION_URL_KEY : pr.webUrl!, STATUS_ID_KEY: pr.objectID.URIRepresentation().absoluteString]
 		case .NewIssue: fallthrough
 		case .IssueReopened: fallthrough
 		case .NewIssueAssigned: fallthrough
 		case .IssueClosed:
-			return [NOTIFICATION_URL_KEY : (item as! Issue).webUrl!, ISSUE_ID_KEY: item.objectID.URIRepresentation().absoluteString!]
+			return [NOTIFICATION_URL_KEY : (item as! Issue).webUrl!, ISSUE_ID_KEY: item.objectID.URIRepresentation().absoluteString]
 		}
 	}
 
@@ -340,7 +356,7 @@ final class DataManager : NSObject {
 		let p = NSMutableParagraphStyle()
 		p.lineBreakMode = NSLineBreakMode.ByWordWrapping
 		#if os(OSX)
-			p.alignment = NSTextAlignment.CenterTextAlignment
+			p.alignment = NSTextAlignment.Center
 			return NSAttributedString(string: message,
 			attributes: [NSForegroundColorAttributeName: color, NSParagraphStyleAttributeName: p])
 		#elseif os(iOS)
@@ -381,7 +397,10 @@ func buildMainContext() -> NSManagedObjectContext {
 	} else {
 		let fm = NSFileManager.defaultManager()
 		let url = applicationFilesDirectory().URLByAppendingPathComponent("Trailer.storedata")
-		fm.removeItemAtURL(url, error: nil)
+		do {
+			try fm.removeItemAtURL(url)
+		} catch _ {
+		}
 		return buildMainContext()
 	}
 }
@@ -397,7 +416,13 @@ func persistentStoreCoordinator() -> NSPersistentStoreCoordinator? {
 	let applicationDirectory = applicationFilesDirectory()
 
 	var error:NSError?
-	let properties = applicationDirectory.resourceValuesForKeys([NSURLIsDirectoryKey], error:&error)
+	let properties: [NSObject: AnyObject]?
+	do {
+		properties = try applicationDirectory.resourceValuesForKeys([NSURLIsDirectoryKey])
+	} catch var error1 as NSError {
+		error = error1
+		properties = nil
+	}
 	if properties != nil && properties!.count > 0 {
 		let isDir = properties![NSURLIsDirectoryKey] as! NSNumber
 		if !isDir.boolValue {
@@ -409,7 +434,13 @@ func persistentStoreCoordinator() -> NSPersistentStoreCoordinator? {
 	} else {
 		var ok = false
 		if error != nil && error!.code == NSFileReadNoSuchFileError {
-			ok = fileManager.createDirectoryAtURL(applicationDirectory, withIntermediateDirectories: true, attributes: nil, error: &error)
+			do {
+				try fileManager.createDirectoryAtURL(applicationDirectory, withIntermediateDirectories: true, attributes: nil)
+				ok = true
+			} catch var error1 as NSError {
+				error = error1
+				ok = false
+			}
 		}
 		if !ok {
 			DLog("%@", error)
@@ -418,7 +449,13 @@ func persistentStoreCoordinator() -> NSPersistentStoreCoordinator? {
 	}
 
 	let sqlStorePath = applicationDirectory.URLByAppendingPathComponent("Trailer.sqlite")
-	let m = NSPersistentStoreCoordinator.metadataForPersistentStoreOfType(NSSQLiteStoreType, URL: sqlStorePath, error: &error)
+	let m: [NSObject: AnyObject]?
+	do {
+		m = try NSPersistentStoreCoordinator.metadataForPersistentStoreOfType(NSSQLiteStoreType, URL: sqlStorePath)
+	} catch var error1 as NSError {
+		error = error1
+		m = nil
+	}
 	_justMigrated = !mom.isConfiguration(nil, compatibleWithStoreMetadata: m)
 	if !addStorePath(sqlStorePath) {
 		DLog("Failed to migrate/load DB store - will nuke it and retry")
@@ -441,7 +478,7 @@ func applicationFilesDirectory() -> NSURL {
 
 private func legacyFilesDirectory() -> NSURL {
 	let f = NSFileManager.defaultManager()
-	var appSupportURL = f.URLsForDirectory(NSSearchPathDirectory.ApplicationSupportDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask).last! as! NSURL
+	var appSupportURL = f.URLsForDirectory(NSSearchPathDirectory.ApplicationSupportDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask).last! 
 	appSupportURL = appSupportURL.URLByAppendingPathComponent("com.housetrip.Trailer")
 	DLog("Files in %@", appSupportURL)
 	return appSupportURL
@@ -459,21 +496,30 @@ func addStorePath(sqlStore: NSURL) -> Bool {
 	if dataReadonly {
 		if NSFileManager.defaultManager().fileExistsAtPath(sqlStore.path!) { // may need migration
 
-			if let m = NSPersistentStoreCoordinator.metadataForPersistentStoreOfType(NSSQLiteStoreType, URL: sqlStore, error: nil)
+			if let m = NSPersistentStoreCoordinator.metadataForPersistentStoreOfType(NSSQLiteStoreType, URL: sqlStore)
 				where _persistentStoreCoordinator?.managedObjectModel.isConfiguration(nil, compatibleWithStoreMetadata: m) == false {
 
-					let tempStore = _persistentStoreCoordinator?.addPersistentStoreWithType(NSSQLiteStoreType,
-						configuration: nil,
-						URL: sqlStore,
-						options: [
-							NSMigratePersistentStoresAutomaticallyOption: true,
-							NSInferMappingModelAutomaticallyOption: true],
-						error: &error)
+				let tempStore: NSPersistentStore?
+				do {
+					tempStore = try _persistentStoreCoordinator?.addPersistentStoreWithType(NSSQLiteStoreType,
+											configuration: nil,
+											URL: sqlStore,
+											options: [
+												NSMigratePersistentStoresAutomaticallyOption: true,
+												NSInferMappingModelAutomaticallyOption: true])
+				} catch var error1 as NSError {
+					error = error1
+					tempStore = nil
+				}
 					if error != nil || tempStore == nil {
 						DLog("Error while migrating DB store before mounting readonly %@", error)
 						return false
 					} else {
-						_persistentStoreCoordinator?.removePersistentStore(tempStore!, error: &error)
+						do {
+							try _persistentStoreCoordinator?.removePersistentStore(tempStore!)
+						} catch var error1 as NSError {
+							error = error1
+						}
 						if error != nil {
 							DLog("Error while unmounting newly migrated DB store before mounting readonly %@",error)
 							return false
@@ -482,16 +528,25 @@ func addStorePath(sqlStore: NSURL) -> Bool {
 			}
 		} else { // may need creating
 
-			let tempStore = _persistentStoreCoordinator?.addPersistentStoreWithType(NSSQLiteStoreType,
-				configuration: nil,
-				URL: sqlStore,
-				options: nil,
-				error: &error)
+			let tempStore: NSPersistentStore?
+			do {
+				tempStore = try _persistentStoreCoordinator?.addPersistentStoreWithType(NSSQLiteStoreType,
+								configuration: nil,
+								URL: sqlStore,
+								options: nil)
+			} catch var error1 as NSError {
+				error = error1
+				tempStore = nil
+			}
 			if error != nil || tempStore == nil {
 				DLog("Error while creating DB store before mounting readonly %@", error)
 				return false
 			} else {
-				_persistentStoreCoordinator?.removePersistentStore(tempStore!, error: &error)
+				do {
+					try _persistentStoreCoordinator?.removePersistentStore(tempStore!)
+				} catch var error1 as NSError {
+					error = error1
+				}
 				if error != nil {
 					DLog("Error while unmounting newly created DB store before mounting readonly %@",error)
 					return false
@@ -500,15 +555,20 @@ func addStorePath(sqlStore: NSURL) -> Bool {
 		}
 	}
 
-	let store = _persistentStoreCoordinator!.addPersistentStoreWithType(NSSQLiteStoreType,
-		configuration: nil,
-		URL: sqlStore,
-		options: [
-			NSMigratePersistentStoresAutomaticallyOption: true,
-			NSInferMappingModelAutomaticallyOption: true,
-			NSReadOnlyPersistentStoreOption: dataReadonly,
-			NSSQLitePragmasOption: ["synchronous":"OFF", "fullfsync":"0"]],
-		error: &error)
+	let store: NSPersistentStore?
+	do {
+		store = try _persistentStoreCoordinator!.addPersistentStoreWithType(NSSQLiteStoreType,
+				configuration: nil,
+				URL: sqlStore,
+				options: [
+					NSMigratePersistentStoresAutomaticallyOption: true,
+					NSInferMappingModelAutomaticallyOption: true,
+					NSReadOnlyPersistentStoreOption: dataReadonly,
+					NSSQLitePragmasOption: ["synchronous":"OFF", "fullfsync":"0"]])
+	} catch var error1 as NSError {
+		error = error1
+		store = nil
+	}
 
 	if error != nil { DLog("Error while mounting DB store %@",error) }
 
@@ -518,11 +578,14 @@ func addStorePath(sqlStore: NSURL) -> Bool {
 func removeDatabaseFiles() {
 	let fm = NSFileManager.defaultManager()
 	let documentsDirectory = applicationFilesDirectory().path!
-	if let files = fm.contentsOfDirectoryAtPath(documentsDirectory, error: nil) as? [String] {
+	if let files = fm.contentsOfDirectoryAtPath(documentsDirectory) {
 		for file in files {
 			if file.rangeOfString("Trailer.sqlite") != nil {
 				DLog("Removing old database file: %@",file)
-				fm.removeItemAtPath(documentsDirectory.stringByAppendingPathComponent(file), error:nil)
+				do {
+					try fm.removeItemAtPath(documentsDirectory.stringByAppendingPathComponent(file))
+				} catch _ {
+				}
 			}
 		}
 	}

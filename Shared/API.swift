@@ -26,12 +26,12 @@ final class API {
 		mediumFormatter.dateStyle = NSDateFormatterStyle.MediumStyle
 		mediumFormatter.timeStyle = NSDateFormatterStyle.MediumStyle
 
-		var reachability = Reachability.reachabilityForInternetConnection()
+		let reachability = Reachability.reachabilityForInternetConnection()
 		reachability.startNotifier()
 		currentNetworkStatus = reachability.currentReachabilityStatus()
 
 		let fileManager = NSFileManager.defaultManager()
-		let appSupportURL = fileManager.URLsForDirectory(NSSearchPathDirectory.CachesDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask).first! as! NSURL
+		let appSupportURL = fileManager.URLsForDirectory(NSSearchPathDirectory.CachesDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask).first! 
 		cacheDirectory = appSupportURL.URLByAppendingPathComponent("com.housetrip.Trailer").path!
 
         #if DEBUG
@@ -59,7 +59,10 @@ final class API {
 		if fileManager.fileExistsAtPath(cacheDirectory) {
 			expireOldImageCacheEntries()
 		} else {
-			fileManager.createDirectoryAtPath(cacheDirectory, withIntermediateDirectories: true, attributes: nil, error: nil)
+			do {
+				try fileManager.createDirectoryAtPath(cacheDirectory, withIntermediateDirectories: true, attributes: nil)
+			} catch _ {
+			}
 		}
 
 		NSNotificationCenter.defaultCenter().addObserverForName(kReachabilityChangedNotification, object: nil, queue: NSOperationQueue.mainQueue()) { [weak self] n in
@@ -98,15 +101,18 @@ final class API {
 
 	func expireOldImageCacheEntries() {
 		let fileManager = NSFileManager.defaultManager()
-		let files = fileManager.contentsOfDirectoryAtPath(cacheDirectory, error:nil) as? [String]
+		let files = fileManager.contentsOfDirectoryAtPath(cacheDirectory)
 		let now = NSDate()
 		for f in files ?? [] {
-			if startsWith(f, "imgcache-") {
+			if f.characters.startsWith("imgcache-".characters) {
 				let path = cacheDirectory.stringByAppendingPathComponent(f)
-				let attributes = fileManager.attributesOfItemAtPath(path, error: nil)!
+				let attributes = try! fileManager.attributesOfItemAtPath(path)
 				let date = attributes[NSFileCreationDate] as! NSDate
 				if now.timeIntervalSinceDate(date) > (3600.0*24.0) {
-					fileManager.removeItemAtPath(path, error:nil)
+					do {
+						try fileManager.removeItemAtPath(path)
+					} catch _ {
+					}
 				}
 			}
 		}
@@ -146,7 +152,7 @@ final class API {
 		#if os(iOS)
 			let absolutePath = path + (contains(path, "?") ? "&" : "?") + "s=\(40.0*GLOBAL_SCREEN_SCALE)"
 		#else
-			let absolutePath = path + (contains(path, "?") ? "&" : "?") + "s=88"
+			let absolutePath = path + (path.characters.contains("?") ? "&" : "?") + "s=88"
 		#endif
 
 		let imageKey = absolutePath + " " + currentAppVersion()
@@ -166,7 +172,10 @@ final class API {
 				tryLoadAndCallback(r)
 				return true
 			} else {
-				fileManager.removeItemAtPath(cachePath, error: nil)
+				do {
+					try fileManager.removeItemAtPath(cachePath)
+				} catch _ {
+				}
 			}
 		}
 
@@ -233,8 +242,8 @@ final class API {
 				}
 			}
 
-			self!.fetchPullRequestsForRepos(repos, toMoc: moc) { [weak self] in
-				self!.updatePullRequestsInMoc(moc) { [weak self] in
+			self!.fetchPullRequestsForRepos(repos, toMoc: moc) {
+				self!.updatePullRequestsInMoc(moc) {
 					completionCallback()
 				}
 			}
@@ -262,7 +271,10 @@ final class API {
 		}
 
 		var error: NSError?
-		if !moc.save(&error) {
+		do {
+			try moc.save()
+		} catch let error1 as NSError {
+			error = error1
 			DLog("Comitting sync failed: %@", error)
 		}
 	}
@@ -315,7 +327,7 @@ final class API {
 		var completionCount = 0
 		let repoIdsToMarkDirty = NSMutableSet()
 
-		let completionCallback: Completion = { [weak self] in
+		let completionCallback: Completion = {
 			completionCount++
 			if completionCount==totalOperations {
 
@@ -358,12 +370,12 @@ final class API {
 			startingFromPage: 1,
 			parameters: nil,
 			extraHeaders: nil,
-			perPageCallback: { [weak self] data, lastPage in
+			perPageCallback: { data, lastPage in
 				for d in data ?? [] {
 					Team.teamWithInfo(d, fromApiServer: apiServer)
 				}
 				return false
-			}, finalCallback: { [weak self] success, resultCode, etag in
+			}, finalCallback: { success, resultCode, etag in
 				if !success {
 					apiServer.lastSyncSucceeded = false
 				}
@@ -395,7 +407,7 @@ final class API {
 			startingFromPage: 1,
 			parameters: nil,
 			extraHeaders: extraHeaders,
-			perPageCallback: { [weak self] data, lastPage in
+			perPageCallback: { data, lastPage in
 				for d in data ?? [] {
 					let eventDate = syncDateFormatter.dateFromString(N(d, "created_at") as! String)!
 					if latestDate!.compare(eventDate) == NSComparisonResult.OrderedAscending { // this is where we came in
@@ -416,7 +428,7 @@ final class API {
 					}
 				}
 				return false
-			}, finalCallback: { [weak self] success, resultCode, etag in
+			}, finalCallback: { success, resultCode, etag in
 				usingUserEventsFromServer.latestUserEventEtag = etag
 				if !success {
 					usingUserEventsFromServer.lastSyncSucceeded = false
@@ -449,7 +461,7 @@ final class API {
 			startingFromPage: 1,
 			parameters: nil,
 			extraHeaders: extraHeaders,
-			perPageCallback: { [weak self] data, lastPage in
+			perPageCallback: { data, lastPage in
 				for d in data ?? [] {
 					let eventDate = syncDateFormatter.dateFromString(N(d, "created_at") as! String)!
 					if latestDate!.compare(eventDate) == NSComparisonResult.OrderedAscending { // this is where we came in
@@ -470,7 +482,7 @@ final class API {
 					}
 				}
 				return false
-			}, finalCallback: { [weak self] success, resultCode, etag in
+			}, finalCallback: { success, resultCode, etag in
 				usingReceivedEventsFromServer.latestReceivedEventEtag = etag
 				if !success {
 					usingReceivedEventsFromServer.lastSyncSucceeded = false
@@ -547,7 +559,7 @@ final class API {
 			if apiServer.syncIsGood && r.displayPolicyForPrs?.integerValue != RepoDisplayPolicy.Hide.rawValue {
 				let repoFullName = r.fullName ?? "NoRepoFullName"
 				getPagedDataInPath("/repos/\(repoFullName)/pulls", fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
-					perPageCallback: { [weak self] data, lastPage in
+					perPageCallback: { data, lastPage in
 						for info in data ?? [] {
 							PullRequest.pullRequestWithInfo(info, inRepo:r)
 						}
@@ -614,7 +626,7 @@ final class API {
 			if apiServer.syncIsGood && r.displayPolicyForIssues?.integerValue != RepoDisplayPolicy.Hide.rawValue {
 				let repoFullName = r.fullName ?? "NoRepoFullName"
 				getPagedDataInPath("/repos/\(repoFullName)/issues", fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
-					perPageCallback: { [weak self] data, lastPage in
+					perPageCallback: { data, lastPage in
 						for info in data ?? [] {
 							if N(info, "pull_request") == nil { // don't sync issues which are pull requests, they are already synced
 								Issue.issueWithInfo(info, inRepo:r)
@@ -683,7 +695,7 @@ final class API {
 				let apiServer = p.apiServer
 
 				getPagedDataInPath(link, fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
-					perPageCallback: { [weak self] data, lastPage in
+					perPageCallback: { data, lastPage in
 						for info in data ?? [] {
 							let c = PRComment.commentWithInfo(info, fromServer: apiServer)
 							c.pullRequest = p
@@ -697,7 +709,7 @@ final class API {
 							}
 						}
 						return false
-					}, finalCallback: { [weak self] success, resultCode, etag in
+					}, finalCallback: { success, resultCode, etag in
 						completionCount++
 						if !success {
 							apiServer.lastSyncSucceeded = false
@@ -744,7 +756,7 @@ final class API {
 				let apiServer = i.apiServer
 
 				getPagedDataInPath(link, fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
-					perPageCallback: { [weak self] data, lastPage in
+					perPageCallback: { data, lastPage in
 						for info in data ?? [] {
 							let c = PRComment.commentWithInfo(info, fromServer: apiServer)
 							c.issue = i
@@ -758,7 +770,7 @@ final class API {
 							}
 						}
 						return false
-					}, finalCallback: { [weak self] success, resultCode, etag in
+					}, finalCallback: { success, resultCode, etag in
 						completionCount++
 						if !success {
 							apiServer.lastSyncSucceeded = false
@@ -814,7 +826,7 @@ final class API {
 			if let link = p.labelsLink() {
 
 				getPagedDataInPath(link, fromServer: p.apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
-					perPageCallback: { [weak self] data, lastPage in
+					perPageCallback: { data, lastPage in
 						for info in data ?? [] {
 							PRLabel.labelWithInfo(info, withParent: p)
 						}
@@ -883,7 +895,7 @@ final class API {
 
 			if let statusLink = p.statusesLink {
 				getPagedDataInPath(statusLink, fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
-					perPageCallback: { [weak self] data, lastPage in
+					perPageCallback: { data, lastPage in
 						for info in data ?? [] {
 							let s = PRStatus.statusWithInfo(info, fromServer: apiServer)
 							s.pullRequest = p
@@ -921,7 +933,7 @@ final class API {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		f.predicate = NSPredicate(format: "postSyncAction == %d and condition == %d", PostSyncAction.Delete.rawValue, PullRequestCondition.Open.rawValue)
 		f.returnsObjectsAsFaults = false
-		let pullRequests = moc.executeFetchRequest(f, error: nil) as! [PullRequest]
+		let pullRequests = try! moc.executeFetchRequest(f) as! [PullRequest]
 
 		let prsToCheck = pullRequests.filter { r -> Bool in
 			let parent = r.repo
@@ -952,7 +964,7 @@ final class API {
 		f.predicate = NSPredicate(format: "postSyncAction == %d and condition == %d", PostSyncAction.Delete.rawValue, PullRequestCondition.Open.rawValue)
 		f.returnsObjectsAsFaults = false
 
-		for i in moc.executeFetchRequest(f, error: nil) as! [Issue] {
+		for i in try! moc.executeFetchRequest(f) as! [Issue] {
 			let r = i.repo
 			if r.shouldSync() && ((r.postSyncAction?.integerValue ?? 0) != PostSyncAction.Delete.rawValue) && r.apiServer.syncIsGood {
 				issueWasClosed(i)
@@ -983,8 +995,8 @@ final class API {
 		for p in prs {
 			let apiServer = p.apiServer
 			if let issueLink = p.issueUrl {
-				getDataInPath(issueLink, fromServer: apiServer, parameters: nil, extraHeaders: nil) { [weak self] data, lastPage, resultCode, etag in
-						if let let assigneeInfo = N(data, "assignee") as? [NSObject : AnyObject] {
+				getDataInPath(issueLink, fromServer: apiServer, parameters: nil, extraHeaders: nil) { data, lastPage, resultCode, etag in
+						if let assigneeInfo = N(data, "assignee") as? [NSObject : AnyObject] {
 							let assignee = N(assigneeInfo, "login") as? String ?? "NoAssignedUserName"
 							let assigned = (assignee == (apiServer.userName ?? "NoApiUser"))
 							p.isNewAssignment = (assigned && !p.createdByMe() && !(p.assignedToMe?.boolValue ?? false))
@@ -1188,7 +1200,7 @@ final class API {
 		}
 
 		getPagedDataInPath("/user/subscriptions", fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
-			perPageCallback: { [weak self] data, lastPage in
+			perPageCallback: { data, lastPage in
 
 				if let d = data {
 					for info in d {
@@ -1212,7 +1224,7 @@ final class API {
 				}
 				return false
 
-			}, finalCallback: { [weak self] success, resultCode, etag in
+			}, finalCallback: { success, resultCode, etag in
 				if !success {
 					apiServer.lastSyncSucceeded = false
 				}
@@ -1232,7 +1244,7 @@ final class API {
 		var completionCount = 0
 		for apiServer in allApiServers {
 			if apiServer.goodToGo {
-				getDataInPath("/user", fromServer:apiServer, parameters: nil, extraHeaders:nil) { [weak self] data, lastPage, resultCode, etag in
+				getDataInPath("/user", fromServer:apiServer, parameters: nil, extraHeaders:nil) { data, lastPage, resultCode, etag in
 
 					if let d = data as? [NSObject : AnyObject] {
 						apiServer.userName = N(d, "login") as? String
@@ -1329,7 +1341,7 @@ final class API {
 		extraHeaders: [String : String]?,
 		callback:(data: AnyObject?, lastPage: Bool, resultCode: Int, etag: String?) -> Void) {
 
-			get(path, fromServer: fromServer, ignoreLastSync: false, parameters: parameters, extraHeaders: extraHeaders) { [weak self] response, data, error in
+			get(path, fromServer: fromServer, ignoreLastSync: false, parameters: parameters, extraHeaders: extraHeaders) { response, data, error in
 
 				let code = response?.statusCode ?? 0
 
@@ -1394,7 +1406,7 @@ final class API {
 				networkIndicationStart()
 			#endif
 
-			var expandedPath = startsWith(path, "/") ? (fromServer.apiPath ?? "").stringByAppendingPathComponent(path) : path
+			var expandedPath = path.characters.startsWith("/".characters) ? (fromServer.apiPath ?? "").stringByAppendingPathComponent(path) : path
 
 			if let params = parameters {
 				var pairs = [String]()
@@ -1417,7 +1429,7 @@ final class API {
 			}
 
 			////////////////////////// preempt with error backoff algorithm
-			let fullUrlPath = r.URL!.absoluteString!
+			let fullUrlPath = r.URL!.absoluteString
 			var existingBackOff = badLinks[fullUrlPath]
 			if existingBackOff != nil {
 				if NSDate().compare(existingBackOff!.nextAttemptAt) == NSComparisonResult.OrderedAscending {
@@ -1451,7 +1463,11 @@ final class API {
 				if error == nil {
 					DLog("(%@) GET %@ - RESULT: %d", apiServerLabel, fullUrlPath, response?.statusCode)
 					if let d = data {
-						parsedData = NSJSONSerialization.JSONObjectWithData(d, options: NSJSONReadingOptions.allZeros, error: nil)
+						do {
+							parsedData = try NSJSONSerialization.JSONObjectWithData(d, options: NSJSONReadingOptions())
+						} catch _ {
+							parsedData = nil
+						}
 					}
 				} else {
 					if self?.currentNetworkStatus != NetworkStatus.NotReachable {

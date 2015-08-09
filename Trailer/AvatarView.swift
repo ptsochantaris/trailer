@@ -28,7 +28,7 @@ final class AvatarView: NSImageView {
 	}
 
 	func startSpinner() {
-		var s = NSProgressIndicator(frame: CGRectInset(bounds, 6.0, 6.0))
+		let s = NSProgressIndicator(frame: CGRectInset(bounds, 6.0, 6.0))
 		s.style = NSProgressIndicatorStyle.SpinningStyle
 		addSubview(s)
 		s.startAnimation(self)

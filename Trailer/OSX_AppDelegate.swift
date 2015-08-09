@@ -132,14 +132,14 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				var urlToOpen = userInfo[NOTIFICATION_URL_KEY] as? String
 				if urlToOpen == nil {
 					var relatedItem: ListableItem?
-					if let itemId = DataManager.idForUriPath(userInfo[COMMENT_ID_KEY] as? String), c = mainObjectContext.existingObjectWithID(itemId, error: nil) as? PRComment {
+					if let itemId = DataManager.idForUriPath(userInfo[COMMENT_ID_KEY] as? String), c = mainObjectContext.existingObjectWithID(itemId) as? PRComment {
 						relatedItem = c.pullRequest ?? c.issue
 						urlToOpen = c.webUrl
 					} else if let itemId = DataManager.idForUriPath(userInfo[PULL_REQUEST_ID_KEY] as? String) {
-						relatedItem = mainObjectContext.existingObjectWithID(itemId, error: nil) as? ListableItem
+						relatedItem = mainObjectContext.existingObjectWithID(itemId) as? ListableItem
 						urlToOpen = relatedItem?.webUrl
 					} else if let itemId = DataManager.idForUriPath(userInfo[ISSUE_ID_KEY] as? String) {
-						relatedItem = mainObjectContext.existingObjectWithID(itemId, error: nil) as? ListableItem
+						relatedItem = mainObjectContext.existingObjectWithID(itemId) as? ListableItem
 						urlToOpen = relatedItem?.webUrl
 					}
 					if let r = relatedItem {
@@ -236,7 +236,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 		ignoreNextFocusLoss = alternativeSelect
 
-		var urlToOpen = item.urlForOpening()
+		let urlToOpen = item.urlForOpening()
 		item.catchUpWithComments()
 
 		var window: MenuWindow
@@ -297,7 +297,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			} else {
 				menuHeight += 10
 				for f in 0..<rowCount {
-					let rowView = window.table.viewAtColumn(0, row: f, makeIfNecessary: true) as! NSView
+					let rowView = window.table.viewAtColumn(0, row: f, makeIfNecessary: true)!
 					menuHeight += rowView.frame.size.height + 2
 					if menuHeight >= screenHeight {
 						break
@@ -317,7 +317,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			if andShow {
 				window.table.deselectAll(nil)
 				opening = true
-				window.level = Int(CGWindowLevelForKey(CGWindowLevelKey(kCGFloatingWindowLevelKey)))
+				window.level = Int(CGWindowLevelForKey(CGWindowLevelKey.FloatingWindowLevelKey))
 				window.makeKeyAndOrderFront(self)
 				NSApp.activateIgnoringOtherApps(true)
 				opening = false
@@ -467,13 +467,13 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	func markAllReadSelectedFrom(window: MenuWindow) {
 		if window == prMenu {
 			let f = ListableItem.requestForItemsOfType("PullRequest", withFilter: prMenu.filter.stringValue, sectionIndex: -1)
-			for r in mainObjectContext.executeFetchRequest(f, error: nil) as! [PullRequest] {
+			for r in try! mainObjectContext.executeFetchRequest(f) as! [PullRequest] {
 				r.catchUpWithComments()
 			}
 			updatePrMenu()
 		} else {
 			let f = ListableItem.requestForItemsOfType("Issue", withFilter: issuesMenu.filter.stringValue, sectionIndex: -1)
-			for i in mainObjectContext.executeFetchRequest(f, error: nil) as! [Issue] {
+			for i in try! mainObjectContext.executeFetchRequest(f) as! [Issue] {
 				i.catchUpWithComments()
 			}
 			updateIssuesMenu()
@@ -487,7 +487,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	func application(sender: NSApplication, openFile filename: String) -> Bool {
-		let url = NSURL(fileURLWithPath: filename)!
+		let url = NSURL(fileURLWithPath: filename)
 		let ext = filename.lastPathComponent.pathExtension
 		if ext == "trailerSettings" {
 			DLog("Will open %@", url.absoluteString)
@@ -774,8 +774,9 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		issuesMenu.messageView?.removeFromSuperview()
 
 		if issuesMenu.table.numberOfRows == 0 {
-			issuesMenu.messageView = MessageView(frame: CGRectMake(0, 0, MENU_WIDTH, 100), message: DataManager.reasonForEmptyIssuesWithFilter(issuesMenu.filter.stringValue))
-			issuesMenu.contentView.addSubview(issuesMenu.messageView!)
+			let m = MessageView(frame: CGRectMake(0, 0, MENU_WIDTH, 100), message: DataManager.reasonForEmptyIssuesWithFilter(issuesMenu.filter.stringValue))
+			issuesMenu.messageView = m
+			issuesMenu.contentView!.addSubview(m)
 		}
 
 		sizeMenu(issuesMenu, andShow: false)
@@ -852,8 +853,9 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		prMenu.messageView?.removeFromSuperview()
 
 		if prMenu.table.numberOfRows == 0 {
-			prMenu.messageView = MessageView(frame: CGRectMake(0, 0, MENU_WIDTH, 100), message: DataManager.reasonForEmptyWithFilter(prMenu.filter.stringValue))
-			prMenu.contentView.addSubview(prMenu.messageView!)
+			let m = MessageView(frame: CGRectMake(0, 0, MENU_WIDTH, 100), message: DataManager.reasonForEmptyWithFilter(prMenu.filter.stringValue))
+			prMenu.messageView = m
+			prMenu.contentView!.addSubview(m)
 		}
 
 		sizeMenu(prMenu, andShow: false)
@@ -878,8 +880,8 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		if Settings.hotkeyEnable {
 			if globalKeyMonitor == nil {
 				let key = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String
-				let options = [key: NSNumber(bool: (AXIsProcessTrusted() == 0))]
-				if AXIsProcessTrustedWithOptions(options) != 0 {
+				let options = [key: NSNumber(bool: (AXIsProcessTrusted() == false))]
+				if AXIsProcessTrustedWithOptions(options) == true {
 					globalKeyMonitor = NSEvent.addGlobalMonitorForEventsMatchingMask(NSEventMask.KeyDownMask, handler: { [weak self] incomingEvent in
 						self!.checkForHotkey(incomingEvent)
 						return
@@ -911,8 +913,8 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					fallthrough
 				case 124: // right
 					if !(
-						(incomingEvent.modifierFlags & NSEventModifierFlags.CommandKeyMask) == NSEventModifierFlags.CommandKeyMask
-						&& (incomingEvent.modifierFlags & NSEventModifierFlags.AlternateKeyMask) == NSEventModifierFlags.AlternateKeyMask
+						(incomingEvent.modifierFlags.intersect(NSEventModifierFlags.CommandKeyMask)) == NSEventModifierFlags.CommandKeyMask
+						&& (incomingEvent.modifierFlags.intersect(NSEventModifierFlags.AlternateKeyMask)) == NSEventModifierFlags.AlternateKeyMask
 						) {
 							return incomingEvent
 					}
@@ -928,7 +930,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					}
 					return nil
 				case 125: // down
-					if incomingEvent.modifierFlags & NSEventModifierFlags.ShiftKeyMask == NSEventModifierFlags.ShiftKeyMask {
+					if incomingEvent.modifierFlags.intersect(NSEventModifierFlags.ShiftKeyMask) == NSEventModifierFlags.ShiftKeyMask {
 						return incomingEvent
 					}
 					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
@@ -939,7 +941,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					}
 					return nil
 				case 126: // up
-					if incomingEvent.modifierFlags & NSEventModifierFlags.ShiftKeyMask == NSEventModifierFlags.ShiftKeyMask {
+					if incomingEvent.modifierFlags.intersect(NSEventModifierFlags.ShiftKeyMask) == NSEventModifierFlags.ShiftKeyMask {
 						return incomingEvent
 					}
 					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
@@ -952,7 +954,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				case 36: // enter
 					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
 					if let dataItem = self!.dataItemAtRow(w.table.selectedRow, inMenu: w) {
-						let isAlternative = ((incomingEvent.modifierFlags & NSEventModifierFlags.AlternateKeyMask) == NSEventModifierFlags.AlternateKeyMask)
+						let isAlternative = ((incomingEvent.modifierFlags.intersect(NSEventModifierFlags.AlternateKeyMask)) == NSEventModifierFlags.AlternateKeyMask)
 						self!.dataItemSelected(dataItem, alternativeSelect: isAlternative)
 					}
 					return nil
@@ -981,7 +983,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		app.isManuallyScrolling = true
 		mouseIgnoreTimer.push()
 		inMenu.table.scrollRowToVisible(i)
-		dispatch_async(dispatch_get_main_queue(), { [weak self] in
+		dispatch_async(dispatch_get_main_queue(), {
 			inMenu.table.selectRowIndexes(NSIndexSet(index: i), byExtendingSelection: false)
 			return
 		})
@@ -1019,27 +1021,27 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		var check = 0
 
 		if Settings.hotkeyCommandModifier {
-			check += (incomingEvent.modifierFlags & NSEventModifierFlags.CommandKeyMask) == NSEventModifierFlags.CommandKeyMask ? 1 : -1
+			check += (incomingEvent.modifierFlags.intersect(NSEventModifierFlags.CommandKeyMask)) == NSEventModifierFlags.CommandKeyMask ? 1 : -1
 		} else {
-			check += (incomingEvent.modifierFlags & NSEventModifierFlags.CommandKeyMask) == NSEventModifierFlags.CommandKeyMask ? -1 : 1
+			check += (incomingEvent.modifierFlags.intersect(NSEventModifierFlags.CommandKeyMask)) == NSEventModifierFlags.CommandKeyMask ? -1 : 1
 		}
 
 		if Settings.hotkeyControlModifier {
-			check += (incomingEvent.modifierFlags & NSEventModifierFlags.ControlKeyMask) == NSEventModifierFlags.ControlKeyMask ? 1 : -1
+			check += (incomingEvent.modifierFlags.intersect(NSEventModifierFlags.ControlKeyMask)) == NSEventModifierFlags.ControlKeyMask ? 1 : -1
 		} else {
-			check += (incomingEvent.modifierFlags & NSEventModifierFlags.ControlKeyMask) == NSEventModifierFlags.ControlKeyMask ? -1 : 1
+			check += (incomingEvent.modifierFlags.intersect(NSEventModifierFlags.ControlKeyMask)) == NSEventModifierFlags.ControlKeyMask ? -1 : 1
 		}
 
 		if Settings.hotkeyOptionModifier {
-			check += (incomingEvent.modifierFlags & NSEventModifierFlags.AlternateKeyMask) == NSEventModifierFlags.AlternateKeyMask ? 1 : -1
+			check += (incomingEvent.modifierFlags.intersect(NSEventModifierFlags.AlternateKeyMask)) == NSEventModifierFlags.AlternateKeyMask ? 1 : -1
 		} else {
-			check += (incomingEvent.modifierFlags & NSEventModifierFlags.AlternateKeyMask) == NSEventModifierFlags.AlternateKeyMask ? -1 : 1
+			check += (incomingEvent.modifierFlags.intersect(NSEventModifierFlags.AlternateKeyMask)) == NSEventModifierFlags.AlternateKeyMask ? -1 : 1
 		}
 
 		if Settings.hotkeyShiftModifier {
-			check += (incomingEvent.modifierFlags & NSEventModifierFlags.ShiftKeyMask) == NSEventModifierFlags.ShiftKeyMask ? 1 : -1
+			check += (incomingEvent.modifierFlags.intersect(NSEventModifierFlags.ShiftKeyMask)) == NSEventModifierFlags.ShiftKeyMask ? 1 : -1
 		} else {
-			check += (incomingEvent.modifierFlags & NSEventModifierFlags.ShiftKeyMask) == NSEventModifierFlags.ShiftKeyMask ? -1 : 1
+			check += (incomingEvent.modifierFlags.intersect(NSEventModifierFlags.ShiftKeyMask)) == NSEventModifierFlags.ShiftKeyMask ? -1 : 1
 		}
 
 		let keyMap = [
@@ -1079,7 +1081,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		if startupAssistantController == nil {
 			startupAssistantController = NSWindowController(windowNibName:"SetupAssistant")
 			if let w = startupAssistantController!.window as? SetupAssistant {
-				w.level = Int(CGWindowLevelForKey(CGWindowLevelKey(kCGFloatingWindowLevelKey)))
+				w.level = Int(CGWindowLevelForKey(CGWindowLevelKey.FloatingWindowLevelKey))
 				w.center()
 				w.makeKeyAndOrderFront(self)
 			}
@@ -1095,7 +1097,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			aboutWindowController = NSWindowController(windowNibName:"AboutWindow")
 		}
 		if let w = aboutWindowController!.window as? AboutWindow {
-			w.level = Int(CGWindowLevelForKey(CGWindowLevelKey(kCGFloatingWindowLevelKey)))
+			w.level = Int(CGWindowLevelForKey(CGWindowLevelKey.FloatingWindowLevelKey))
 			w.version.stringValue = versionString()
 			w.center()
 			w.makeKeyAndOrderFront(self)
@@ -1112,7 +1114,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			preferencesWindowController = NSWindowController(windowNibName:"PreferencesWindow")
 		}
 		if let w = preferencesWindowController!.window as? PreferencesWindow {
-			w.level = Int(CGWindowLevelForKey(CGWindowLevelKey(kCGFloatingWindowLevelKey)))
+			w.level = Int(CGWindowLevelForKey(CGWindowLevelKey.FloatingWindowLevelKey))
 			w.center()
 			w.makeKeyAndOrderFront(self)
 			preferencesWindow = w
@@ -1141,7 +1143,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 	func checkDarkMode() {
 		atNextEvent { [weak self] in
-			if NSAppKitVersionNumber>Double(NSAppKitVersionNumber10_9) {
+			if #available(OSX 10.10, *) {
 				let c = NSAppearance.currentAppearance()
 				if c.respondsToSelector(Selector("allowsVibrancy")) {
 					self!.darkMode = c.name.rangeOfString(NSAppearanceNameVibrantDark) != nil

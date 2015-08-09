@@ -103,8 +103,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	// Tabs
 	@IBOutlet weak var tabs: NSTabView!
 
-	override init(contentRect: NSRect, styleMask aStyle: Int, backing bufferingType: NSBackingStoreType, defer flag: Bool) {
-		super.init(contentRect: contentRect, styleMask: aStyle, backing: bufferingType, defer: flag)
+	override init(contentRect: NSRect, styleMask aStyle: Int, backing bufferingType: NSBackingStoreType, `defer` flag: Bool) {
+		super.init(contentRect: contentRect, styleMask: aStyle, backing: bufferingType, `defer`: flag)
 	}
 
 	override func awakeFromNib() {
@@ -565,7 +565,10 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 				alert.addButtonWithTitle("OK")
 				alert.runModal()
 			} else {
-				tempContext.save(nil)
+				do {
+					try tempContext.save()
+				} catch _ {
+				}
 			}
 			app.completeRefresh()
 		}
@@ -580,7 +583,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	@IBAction func deleteSelectedServerSelected(sender: NSButton) {
-		if let selectedServer = selectedServer(), index = indexOfObject(ApiServer.allApiServersInMoc(mainObjectContext), selectedServer) {
+		if let selectedServer = selectedServer(), index = indexOfObject(ApiServer.allApiServersInMoc(mainObjectContext), value: selectedServer) {
 			mainObjectContext.deleteObject(selectedServer)
 			serverList.reloadData()
 			serverList.selectRowIndexes(NSIndexSet(index: min(index, serverList.numberOfRows-1)), byExtendingSelection: false)
@@ -599,7 +602,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	func updateImportExportSettings() {
 		repeatLastExportAutomatically.integerValue = Settings.autoRepeatSettingsExport ? 1 : 0
-		if let lastExportDate = Settings.lastExportDate, fileName = Settings.lastExportUrl?.absoluteString, unescapedName = fileName.stringByReplacingPercentEscapesUsingEncoding(NSUTF8StringEncoding) {
+		if let lastExportDate = Settings.lastExportDate, fileName = Settings.lastExportUrl?.absoluteString, unescapedName = fileName.stringByRemovingPercentEncoding {
 			let time = itemDateFormatter.stringFromDate(lastExportDate)
 			lastExportReport.stringValue = "Last exported \(time) to \(unescapedName)"
 		} else {
@@ -623,7 +626,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		s.beginSheetModalForWindow(self, completionHandler: { response in
 			if response == NSFileHandlingPanelOKButton, let url = s.URL {
 				Settings.writeToURL(url)
-				DLog("Exported settings to %@", url.absoluteString!)
+				DLog("Exported settings to %@", url.absoluteString)
 			}
 			})
 	}
@@ -791,7 +794,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		let a = ApiServer.insertNewServerInMoc(mainObjectContext)
 		a.label = "New API Server"
 		serverList.reloadData()
-		if let index = indexOfObject(ApiServer.allApiServersInMoc(mainObjectContext), a) {
+		if let index = indexOfObject(ApiServer.allApiServersInMoc(mainObjectContext), value: a) {
 			serverList.selectRowIndexes(NSIndexSet(index: index), byExtendingSelection: false)
 			fillServerApiFormFromSelectedServer()
 		}

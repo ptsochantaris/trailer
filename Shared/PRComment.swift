@@ -53,7 +53,7 @@ final class PRComment: DataItem {
 	func refersToMe() -> Bool {
 		if let userForServer = apiServer.userName {
 			let rangeOfHandle = body?.rangeOfString("@"+userForServer,
-				options: NSStringCompareOptions.CaseInsensitiveSearch|NSStringCompareOptions.DiacriticInsensitiveSearch)
+				options: [NSStringCompareOptions.CaseInsensitiveSearch, NSStringCompareOptions.DiacriticInsensitiveSearch])
 			return rangeOfHandle != nil
 		} else {
 			return false
@@ -64,7 +64,7 @@ final class PRComment: DataItem {
 		if let b = body {
 			for t in apiServer.teams {
 				if let r = t.calculatedReferral {
-					let range = b.rangeOfString(r, options: NSStringCompareOptions.CaseInsensitiveSearch | NSStringCompareOptions.DiacriticInsensitiveSearch)
+					let range = b.rangeOfString(r, options: [NSStringCompareOptions.CaseInsensitiveSearch, NSStringCompareOptions.DiacriticInsensitiveSearch])
 					if range != nil { return true }
 				}
 			}

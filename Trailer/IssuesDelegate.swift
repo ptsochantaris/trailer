@@ -14,7 +14,7 @@ final class IssuesDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource
 		issueIds.removeAll(keepCapacity: false)
 
 		let f = ListableItem.requestForItemsOfType("Issue", withFilter: filter, sectionIndex: -1)
-		let allIssues = mainObjectContext.executeFetchRequest(f, error: nil) as! [Issue]
+		let allIssues = try! mainObjectContext.executeFetchRequest(f) as! [Issue]
 
 		if let firstIssue = allIssues.first {
 			var lastSection = firstIssue.sectionIndex!.integerValue
@@ -34,7 +34,7 @@ final class IssuesDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource
 	func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
 		let object = issueIds[row]
 		if object.isKindOfClass(NSManagedObjectID) {
-			let i = mainObjectContext.existingObjectWithID(object as! NSManagedObjectID, error: nil) as! Issue
+			let i = try! mainObjectContext.existingObjectWithID(object as! NSManagedObjectID) as! Issue
 			return IssueCell(issue: i)
 		} else {
 			let title = object as! String
@@ -55,7 +55,7 @@ final class IssuesDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource
 	func issueAtRow(row: Int) -> Issue? {
 		let object = issueIds[row]
 		if object.isKindOfClass(NSManagedObjectID) {
-			return mainObjectContext.existingObjectWithID(object as! NSManagedObjectID, error: nil) as? Issue
+			return mainObjectContext.existingObjectWithID(object as! NSManagedObjectID) as? Issue
 		} else {
 			return nil
 		}

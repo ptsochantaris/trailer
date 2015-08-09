@@ -57,7 +57,7 @@ class ListableItem: DataItem {
 	}
 
 	final func sortedComments(comparison: NSComparisonResult) -> [PRComment] {
-		return Array(comments).sorted({ (c1, c2) -> Bool in
+		return Array(comments).sort({ (c1, c2) -> Bool in
 			let d1 = c1.createdAt ?? never()
 			let d2 = c2.createdAt ?? never()
 			return d1.compare(d2) == comparison
@@ -103,7 +103,7 @@ class ListableItem: DataItem {
 
 	final func refersToMe() -> Bool {
 		if let apiName = apiServer.userName, b = body {
-			let range = b.rangeOfString("@"+apiName, options: NSStringCompareOptions.CaseInsensitiveSearch | NSStringCompareOptions.DiacriticInsensitiveSearch)
+			let range = b.rangeOfString("@"+apiName, options: [NSStringCompareOptions.CaseInsensitiveSearch, NSStringCompareOptions.DiacriticInsensitiveSearch])
 			return range != nil
 		}
 		return false
@@ -122,7 +122,7 @@ class ListableItem: DataItem {
 		if let b = body {
 			for t in apiServer.teams {
 				if let r = t.calculatedReferral {
-					let range = b.rangeOfString(r, options: NSStringCompareOptions.CaseInsensitiveSearch | NSStringCompareOptions.DiacriticInsensitiveSearch)
+					let range = b.rangeOfString(r, options: [NSStringCompareOptions.CaseInsensitiveSearch, NSStringCompareOptions.DiacriticInsensitiveSearch])
 					if range != nil { return true }
 				}
 			}
@@ -145,7 +145,7 @@ class ListableItem: DataItem {
 
 	final func postProcess() {
 		var targetSection: PullRequestSection
-		var currentCondition = condition?.integerValue ?? PullRequestCondition.Open.rawValue
+		let currentCondition = condition?.integerValue ?? PullRequestCondition.Open.rawValue
 
 		if currentCondition == PullRequestCondition.Merged.rawValue			{ targetSection = PullRequestSection.Merged }
 		else if currentCondition == PullRequestCondition.Closed.rawValue	{ targetSection = PullRequestSection.Closed }
@@ -184,7 +184,7 @@ class ListableItem: DataItem {
 		} else if needsManualCount {
 			f.predicate = predicateForOthersCommentsSinceDate(nil)
 			var unreadCommentCount: Int = 0
-			for c in managedObjectContext?.executeFetchRequest(f, error: nil) as! [PRComment] {
+			for c in try! managedObjectContext?.executeFetchRequest(f) as! [PRComment] {
 				if c.refersToMe() {
 					targetSection = PullRequestSection.Participated
 				}
@@ -227,7 +227,7 @@ class ListableItem: DataItem {
 	}
 
 	final func urlForOpening() -> String? {
-		var unreadCount = unreadComments?.integerValue ?? 0
+		let unreadCount = unreadComments?.integerValue ?? 0
 
 		if unreadCount > 0 && Settings.openPrAtFirstUnreadComment {
 			let f = NSFetchRequest(entityName: "PRComment")
@@ -235,7 +235,7 @@ class ListableItem: DataItem {
 			f.fetchLimit = 1
 			f.predicate = predicateForOthersCommentsSinceDate(latestReadCommentDate)
 			f.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: true)]
-			let ret = managedObjectContext?.executeFetchRequest(f, error: nil) as! [PRComment]
+			let ret = try! managedObjectContext?.executeFetchRequest(f) as! [PRComment]
 			if let firstComment = ret.first, url = firstComment.webUrl {
 				return url
 			}
@@ -261,7 +261,7 @@ class ListableItem: DataItem {
 	}
 
 	final func sortedLabels() -> [PRLabel] {
-		return Array(labels).sorted({ (l1: PRLabel, l2: PRLabel) -> Bool in
+		return Array(labels).sort({ (l1: PRLabel, l2: PRLabel) -> Bool in
 			return l1.name!.compare(l2.name!)==NSComparisonResult.OrderedAscending
 		})
 	}
@@ -316,7 +316,7 @@ class ListableItem: DataItem {
 
 	final func predicateForOthersCommentsSinceDate(optionalDate: NSDate?) -> NSPredicate {
 
-		var userNumber = apiServer.userId?.longLongValue ?? 0
+		let userNumber = apiServer.userId?.longLongValue ?? 0
 
 		if self is Issue {
 			if let date = optionalDate {
@@ -338,7 +338,7 @@ class ListableItem: DataItem {
 	final class func badgeCountFromFetch(f: NSFetchRequest, inMoc: NSManagedObjectContext) -> Int {
 		var badgeCount:Int = 0
 		let showCommentsEverywhere = Settings.showCommentsEverywhere
-		for i in inMoc.executeFetchRequest(f, error: nil) as! [ListableItem] {
+		for i in try! inMoc.executeFetchRequest(f) as! [ListableItem] {
 			if let sectionIndex = i.sectionIndex?.integerValue {
 				if showCommentsEverywhere || sectionIndex==PullRequestSection.Mine.rawValue || sectionIndex==PullRequestSection.Participated.rawValue {
 					if let c = i.unreadComments?.integerValue {
@@ -353,7 +353,7 @@ class ListableItem: DataItem {
 	final class func serverPredicateFromFilterString(string: String) -> NSPredicate? {
 		if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 7 {
 			let serverNames = string.substringFromIndex(advance(string.startIndex, 7))
-			if !isEmpty(serverNames) {
+			if !serverNames.characters.isEmpty {
 				var orTerms = [NSPredicate]()
 				for term in serverNames.componentsSeparatedByString(",") {
 					orTerms.append(NSPredicate(format: "apiServer.label contains [cd] %@", term))
@@ -367,7 +367,7 @@ class ListableItem: DataItem {
 	final class func titlePredicateFromFilterString(string: String) -> NSPredicate? {
 		if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 6 {
 			let titleTerms = string.substringFromIndex(advance(string.startIndex, 6))
-			if !isEmpty(titleTerms) {
+			if !titleTerms.characters.isEmpty {
 				var orTerms = [NSPredicate]()
 				for term in titleTerms.componentsSeparatedByString(",") {
 					orTerms.append(NSPredicate(format: "title contains [cd] %@", term))
@@ -381,7 +381,7 @@ class ListableItem: DataItem {
     final class func repoPredicateFromFilterString(string: String) -> NSPredicate? {
         if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 5 {
             let repoNames = string.substringFromIndex(advance(string.startIndex, 5))
-            if !isEmpty(repoNames) {
+            if !repoNames.characters.isEmpty {
 				var orTerms = [NSPredicate]()
 				for term in repoNames.componentsSeparatedByString(",") {
 					orTerms.append(NSPredicate(format: "repo.fullName contains [cd] %@", term))
@@ -395,7 +395,7 @@ class ListableItem: DataItem {
     final class func labelPredicateFromFilterString(string: String) -> NSPredicate? {
         if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 6 {
             let labelNames = string.substringFromIndex(advance(string.startIndex, 6))
-            if !isEmpty(labelNames) {
+            if !labelNames.characters.isEmpty {
 				var orTerms = [NSPredicate]()
 				for term in labelNames.componentsSeparatedByString(",") {
 					orTerms.append(NSPredicate(format: "any labels.name contains[cd] %@", term))
@@ -409,7 +409,7 @@ class ListableItem: DataItem {
     final class func statusPredicateFromFilterString(string: String) -> NSPredicate? {
         if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 7 {
             let statusNames = string.substringFromIndex(advance(string.startIndex, 7))
-            if !isEmpty(statusNames) {
+            if !statusNames.characters.isEmpty {
 				var orTerms = [NSPredicate]()
 				for term in statusNames.componentsSeparatedByString(",") {
 					orTerms.append(NSPredicate(format: "any statuses.descriptionText contains[cd] %@", term))
@@ -423,7 +423,7 @@ class ListableItem: DataItem {
     final class func userPredicateFromFilterString(string: String) -> NSPredicate? {
         if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 5 {
             let userNames = string.substringFromIndex(advance(string.startIndex, 5))
-            if !isEmpty(userNames) {
+            if !userNames.characters.isEmpty {
 				var orTerms = [NSPredicate]()
 				for term in userNames.componentsSeparatedByString(",") {
 					orTerms.append(NSPredicate(format: "userLogin contains[cd] %@", term))
@@ -447,12 +447,12 @@ class ListableItem: DataItem {
 
 			var fi = f
 
-            func checkForPredicates(tagString: String, process: String->NSPredicate?) {
+            func checkForPredicates(tagString: String, _ process: String->NSPredicate?) {
 				var foundOne: Bool
-				do {
+				repeat {
 					foundOne = false
 					for word in fi.componentsSeparatedByString(" ") {
-						if startsWith(word, tagString+":") {
+						if word.characters.startsWith((tagString+":").characters) {
 							if let p = process(word) {
 								andPredicates.append(p)
 							}
@@ -492,7 +492,7 @@ class ListableItem: DataItem {
 				if itemType == "PullRequest" && Settings.includeStatusesInFilter {
 					orPredicates.append(NSPredicate(format: "any statuses.descriptionText contains[cd] %@", fi))
 				}
-				andPredicates.append(NSCompoundPredicate.orPredicateWithSubpredicates(orPredicates))
+				andPredicates.append(NSCompoundPredicate(orPredicateWithSubpredicates: orPredicates))
 			}
 		}
 
@@ -516,7 +516,7 @@ class ListableItem: DataItem {
 
 		let f = NSFetchRequest(entityName: itemType)
 		f.fetchBatchSize = 100
-		f.predicate = NSCompoundPredicate.andPredicateWithSubpredicates(andPredicates)
+		f.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: andPredicates)
 		f.sortDescriptors = sortDescriptiors
 		return f
 	}

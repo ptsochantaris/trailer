@@ -21,8 +21,8 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 		Settings.displayPolicyForNewIssues = RepoDisplayPolicy.All.rawValue
 	}
 
-	override init(contentRect: NSRect, styleMask aStyle: Int, backing bufferingType: NSBackingStoreType, defer flag: Bool) {
-		super.init(contentRect: contentRect, styleMask: aStyle, backing: bufferingType, defer: flag)
+	override init(contentRect: NSRect, styleMask aStyle: Int, backing bufferingType: NSBackingStoreType, `defer` flag: Bool) {
+		super.init(contentRect: contentRect, styleMask: aStyle, backing: bufferingType, `defer`: flag)
 		delegate = self
 	}
 

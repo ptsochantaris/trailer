@@ -22,7 +22,7 @@ final class PRLabel: DataItem {
 		} else {
 			f.predicate = NSPredicate(format: "name == %@ and issue == %@", name, withParent)
 		}
-		let res = withParent.managedObjectContext?.executeFetchRequest(f, error: nil) as! [PRLabel]
+		let res = try! withParent.managedObjectContext?.executeFetchRequest(f) as! [PRLabel]
 		return res.first
 	}
 

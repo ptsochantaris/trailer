@@ -98,7 +98,7 @@ final class ApiServer: NSManagedObject {
 		let f = NSFetchRequest(entityName: "ApiServer")
 		f.returnsObjectsAsFaults = false
 		f.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: true)]
-		return moc.executeFetchRequest(f, error: nil) as! [ApiServer]
+		return try! moc.executeFetchRequest(f) as! [ApiServer]
 	}
 
 	class func someServersHaveAuthTokensInMoc(moc: NSManagedObjectContext) -> Bool {
@@ -166,7 +166,7 @@ final class ApiServer: NSManagedObject {
 		for a in ApiServer.allApiServersInMoc(mainObjectContext) {
 			if let authToken = a.authToken where !authToken.isEmpty {
 				var apiServerData = [String:NSObject]()
-				for (k , _) in a.entity.attributesByName as! [String : NSObject] {
+				for (k , _) in a.entity.attributesByName {
 					if let v = a.valueForKey(k) as? NSObject {
 						apiServerData[k] = v
 					}
@@ -183,7 +183,7 @@ final class ApiServer: NSManagedObject {
 		for r in repos {
 			if let sid = r.serverId {
 				var repoData = [String : NSObject]()
-				for (k , _) in r.entity.attributesByName as! [String : NSObject] {
+				for (k , _) in r.entity.attributesByName {
 					if let v = r.valueForKey(k) as? NSObject {
 						repoData[k] = v
 					}
@@ -203,14 +203,14 @@ final class ApiServer: NSManagedObject {
 			tempMoc.deleteObject(apiServer)
 		}
 
-		for (apiServerToken, apiServerData) in archive {
+		for (_, apiServerData) in archive {
 			let a = insertNewServerInMoc(tempMoc)
 			for (k,v) in apiServerData {
 				if k=="repos" {
 					a.configureReposFromArchive(v as! [String : [String : NSObject]])
 				} else {
 					let attributes = a.entity.attributesByName.keys.array
-					if contains(attributes, k) {
+					if attributes.contains(k) {
 						a.setValue(v, forKey: k)
 					}
 				}
@@ -218,16 +218,20 @@ final class ApiServer: NSManagedObject {
 			a.resetSyncState()
 		}
 
-		return tempMoc.save(nil)
+		do {
+			try tempMoc.save()
+			return true
+		} catch _ {
+			return false
+		}
 	}
 
 	func configureReposFromArchive(archive: [String : [String : NSObject]]) {
-		for (repoIdString, repoData) in archive {
-			let repoId = NSNumber(longLong: (repoIdString as NSString).longLongValue)
+		for (_, repoData) in archive {
 			let r = NSEntityDescription.insertNewObjectForEntityForName("Repo", inManagedObjectContext: managedObjectContext!) as! Repo
 			for (k,v) in repoData {
 				let attributes = r.entity.attributesByName.keys.array
-				if contains(attributes, k) {
+				if attributes.contains(k) {
 					r.setValue(v, forKey: k)
 				}
 				r.apiServer = self

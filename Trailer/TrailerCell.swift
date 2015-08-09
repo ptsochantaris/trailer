@@ -77,14 +77,14 @@ class TrailerCell: NSTableCellView {
     }
 
 	func associatedDataItem() -> ListableItem {
-		return mainObjectContext.existingObjectWithID(dataItemId, error: nil) as! ListableItem
+		return try! mainObjectContext.existingObjectWithID(dataItemId) as! ListableItem
 	}
 
 	override func updateTrackingAreas() {
 		if trackingArea != nil { removeTrackingArea(trackingArea) }
 
 		trackingArea = NSTrackingArea(rect: bounds,
-			options: NSTrackingAreaOptions.MouseEnteredAndExited | NSTrackingAreaOptions.ActiveInKeyWindow,
+			options: [NSTrackingAreaOptions.MouseEnteredAndExited, NSTrackingAreaOptions.ActiveInKeyWindow],
 			owner: self,
 			userInfo: nil)
 
@@ -112,14 +112,14 @@ class TrailerCell: NSTableCellView {
 		}
 
 		let pCenter = NSMutableParagraphStyle()
-		pCenter.alignment = NSTextAlignment.CenterTextAlignment
+		pCenter.alignment = NSTextAlignment.Center
 
 		let countString = NSAttributedString(string: itemCountFormatter.stringFromNumber(totalCount)!, attributes: [
 			NSFontAttributeName: NSFont.menuFontOfSize(11),
 			NSForegroundColorAttributeName: goneDark ? NSColor.controlLightHighlightColor() : NSColor.controlTextColor(),
 			NSParagraphStyleAttributeName: pCenter])
 
-		var width = max(BASE_BADGE_SIZE, countString.size.width+10)
+		var width = max(BASE_BADGE_SIZE, countString.size().width+10)
 		var height = BASE_BADGE_SIZE
 		var bottom = bounds.size.height-height-10.0
 		var left = (LEFTPADDING-width)*0.5
@@ -143,7 +143,7 @@ class TrailerCell: NSTableCellView {
 				NSParagraphStyleAttributeName: pCenter])
 
 			bottom += height
-			width = max(SMALL_BADGE_SIZE, alertString.size.width+8.0)
+			width = max(SMALL_BADGE_SIZE, alertString.size().width+8.0)
 			height = SMALL_BADGE_SIZE
 			bottom -= height * 0.5 + 1
 			left -= width * 0.5

@@ -13,7 +13,7 @@ final class LinkField: CenterTextField {
 			options: stringDrawingOptions)
 
 		let newArea = NSTrackingArea(rect: check,
-			options: NSTrackingAreaOptions.MouseEnteredAndExited | NSTrackingAreaOptions.MouseMoved | NSTrackingAreaOptions.ActiveInKeyWindow,
+			options: [NSTrackingAreaOptions.MouseEnteredAndExited, NSTrackingAreaOptions.MouseMoved, NSTrackingAreaOptions.ActiveInKeyWindow],
 			owner: self,
 			userInfo: nil)
 
@@ -54,13 +54,13 @@ final class LinkField: CenterTextField {
 	private func checkMove(theEvent: NSEvent) {
 		if targetUrl != nil {
 			if highlight {
-				if needsCommand && (theEvent.modifierFlags & NSEventModifierFlags.CommandKeyMask != NSEventModifierFlags.CommandKeyMask) {
+				if needsCommand && (theEvent.modifierFlags.intersect(NSEventModifierFlags.CommandKeyMask) != NSEventModifierFlags.CommandKeyMask) {
 					highlight = false
 					textColor = normalColor
 					window?.invalidateCursorRectsForView(self)
 				}
 			} else {
-				if !needsCommand || (theEvent.modifierFlags & NSEventModifierFlags.CommandKeyMask == NSEventModifierFlags.CommandKeyMask) {
+				if !needsCommand || (theEvent.modifierFlags.intersect(NSEventModifierFlags.CommandKeyMask) == NSEventModifierFlags.CommandKeyMask) {
 					highlight = true
 					textColor = NSColor.blueColor()
 					window?.invalidateCursorRectsForView(self)
@@ -76,8 +76,8 @@ final class LinkField: CenterTextField {
             selectParentPr(theEvent)
 		} else {
 			if needsCommand {
-				if theEvent.modifierFlags & NSEventModifierFlags.CommandKeyMask == NSEventModifierFlags.CommandKeyMask {
-					if theEvent.modifierFlags & NSEventModifierFlags.AlternateKeyMask == NSEventModifierFlags.AlternateKeyMask {
+				if theEvent.modifierFlags.intersect(NSEventModifierFlags.CommandKeyMask) == NSEventModifierFlags.CommandKeyMask {
+					if theEvent.modifierFlags.intersect(NSEventModifierFlags.AlternateKeyMask) == NSEventModifierFlags.AlternateKeyMask {
 						app.ignoreNextFocusLoss = true
 					}
 					mouseExited(theEvent)
@@ -95,7 +95,7 @@ final class LinkField: CenterTextField {
     private func selectParentPr(theEvent: NSEvent) {
         if let parentView = nextResponder as? TrailerCell {
             let pr = parentView.associatedDataItem()
-            let isAlternative = ((theEvent.modifierFlags & NSEventModifierFlags.AlternateKeyMask) == NSEventModifierFlags.AlternateKeyMask)
+            let isAlternative = ((theEvent.modifierFlags.intersect(NSEventModifierFlags.AlternateKeyMask)) == NSEventModifierFlags.AlternateKeyMask)
             app.dataItemSelected(pr, alternativeSelect: isAlternative)
         }
     }

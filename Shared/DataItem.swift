@@ -17,14 +17,14 @@ class DataItem: NSManagedObject {
 	final class func allItemsOfType(type: String, inMoc: NSManagedObjectContext) -> [DataItem] {
 		let f = NSFetchRequest(entityName: type)
 		f.returnsObjectsAsFaults = false
-		return inMoc.executeFetchRequest(f, error: nil) as! [DataItem]
+		return try! inMoc.executeFetchRequest(f) as! [DataItem]
 	}
 
 	final class func allItemsOfType(type: String, fromServer: ApiServer) -> [DataItem] {
 		let f = NSFetchRequest(entityName: type)
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "apiServer == %@", fromServer)
-		return fromServer.managedObjectContext?.executeFetchRequest(f, error: nil) as! [DataItem]
+		return try! fromServer.managedObjectContext?.executeFetchRequest(f) as! [DataItem]
 	}
 
 	final class func itemOfType(type: String, serverId: NSNumber, fromServer: ApiServer) -> DataItem? {
@@ -32,7 +32,12 @@ class DataItem: NSManagedObject {
 		f.returnsObjectsAsFaults = false
 		f.fetchLimit = 1
 		f.predicate = NSPredicate(format:"serverId = %@ and apiServer == %@", serverId, fromServer)
-		let items = fromServer.managedObjectContext?.executeFetchRequest(f, error: nil)
+		let items: [AnyObject]?
+		do {
+			items = try fromServer.managedObjectContext?.executeFetchRequest(f)
+		} catch _ {
+			items = nil
+		}
 		return items?.first as? DataItem
 	}
 
@@ -68,28 +73,28 @@ class DataItem: NSManagedObject {
 			f.returnsObjectsAsFaults = true
 			f.predicate = NSPredicate(format: "postSyncAction = %d", PostSyncAction.Delete.rawValue)
 		}
-		return inMoc.executeFetchRequest(f, error: nil) as! [DataItem]
+		return try! inMoc.executeFetchRequest(f) as! [DataItem]
 	}
 
 	final class func newOrUpdatedItemsOfType(type: String, inMoc: NSManagedObjectContext) -> [DataItem] {
 		let f = NSFetchRequest(entityName: type)
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "postSyncAction = %d or postSyncAction = %d", PostSyncAction.NoteNew.rawValue, PostSyncAction.NoteUpdated.rawValue)
-		return inMoc.executeFetchRequest(f, error: nil) as! [DataItem]
+		return try! inMoc.executeFetchRequest(f) as! [DataItem]
 	}
 
 	final class func updatedItemsOfType(type: String, inMoc: NSManagedObjectContext) -> [DataItem] {
 		let f = NSFetchRequest(entityName: type)
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "postSyncAction = %d", PostSyncAction.NoteUpdated.rawValue)
-		return inMoc.executeFetchRequest(f, error: nil) as! [DataItem]
+		return try! inMoc.executeFetchRequest(f) as! [DataItem]
 	}
 
 	final class func newItemsOfType(type: String, inMoc: NSManagedObjectContext) -> [DataItem] {
 		let f = NSFetchRequest(entityName: type)
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "postSyncAction = %d", PostSyncAction.NoteNew.rawValue)
-		return inMoc.executeFetchRequest(f, error: nil) as! [DataItem]
+		return try! inMoc.executeFetchRequest(f) as! [DataItem]
 	}
 
 	final class func nukeDeletedItemsInMoc(moc: NSManagedObjectContext) {

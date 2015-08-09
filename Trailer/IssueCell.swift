@@ -33,25 +33,24 @@ final class IssueCell: TrailerCell {
 		let subtitleHeight = ceil(_subtitle.boundingRectWithSize(CGSizeMake(W-4.0, CGFloat.max), options: stringDrawingOptions).size.height+4.0)
 
 		var statusRects = [NSValue]()
-		var statuses: [PRStatus]? = nil
+		let statuses: [PRStatus]? = nil
 		var bottom: CGFloat, CELL_PADDING: CGFloat
-		var statusBottom = CGFloat(0)
 
 		let paragraphStyle = NSMutableParagraphStyle()
 		paragraphStyle.headIndent = 92.0
 
-		var statusAttributes = [NSObject:AnyObject]()
+		var statusAttributes = [String : AnyObject]()
 		statusAttributes[NSFontAttributeName] = NSFont(name: "Monaco", size: 9)
 		statusAttributes[NSParagraphStyleAttributeName] = paragraphStyle
 
 		CELL_PADDING = 6.0
 		bottom = ceil(CELL_PADDING * 0.5)
 
-		frame = NSMakeRect(0, 0, MENU_WIDTH, titleHeight+subtitleHeight+statusBottom+CELL_PADDING)
+		frame = NSMakeRect(0, 0, MENU_WIDTH, titleHeight+subtitleHeight+CELL_PADDING)
 		addCounts(_commentsTotal, _commentsNew)
 
-		var titleRect = NSMakeRect(LEFTPADDING, subtitleHeight+bottom+statusBottom, W, titleHeight)
-		var dateRect = NSMakeRect(LEFTPADDING, statusBottom+bottom, W, subtitleHeight)
+		var titleRect = NSMakeRect(LEFTPADDING, subtitleHeight+bottom, W, titleHeight)
+		var dateRect = NSMakeRect(LEFTPADDING, bottom, W, subtitleHeight)
 		var pinRect = NSMakeRect(LEFTPADDING+W, floor((bounds.size.height-24)*0.5), REMOVE_BUTTON_WIDTH-10, 24)
 
 		var shift: CGFloat = -4
@@ -76,7 +75,7 @@ final class IssueCell: TrailerCell {
 				let unmergeableLabel = CenterTextField(frame: pinRect)
 				unmergeableLabel.textColor = NSColor.redColor()
 				unmergeableLabel.font = NSFont(name: "Monaco", size: 8.0)
-				unmergeableLabel.alignment = NSTextAlignment.CenterTextAlignment
+				unmergeableLabel.alignment = NSTextAlignment.Center
 				unmergeableLabel.stringValue = "Cannot be merged"
 				addSubview(unmergeableLabel)
 			}

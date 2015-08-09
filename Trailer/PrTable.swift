@@ -4,14 +4,14 @@ final class PrTable: NSTableView, NSPasteboardItemDataProvider {
 	func cellAtEvent(theEvent: NSEvent) -> NSView? {
 		let globalLocation = theEvent.locationInWindow
 		let localLocation = convertPoint(globalLocation, fromView:nil)
-		return viewAtColumn(columnAtPoint(localLocation), row: rowAtPoint(localLocation), makeIfNecessary: false) as? NSView
+		return viewAtColumn(columnAtPoint(localLocation), row: rowAtPoint(localLocation), makeIfNecessary: false)
 	}
 
 	override func mouseDown(theEvent: NSEvent) { }
 
 	override func mouseUp(theEvent: NSEvent) {
 		if let prView = cellAtEvent(theEvent) as? TrailerCell {
-			let isAlternative = ((theEvent.modifierFlags & NSEventModifierFlags.AlternateKeyMask) == NSEventModifierFlags.AlternateKeyMask)
+			let isAlternative = ((theEvent.modifierFlags.intersect(NSEventModifierFlags.AlternateKeyMask)) == NSEventModifierFlags.AlternateKeyMask)
 			app.dataItemSelected(prView.associatedDataItem(), alternativeSelect:isAlternative)
 		}
 	}
@@ -53,8 +53,8 @@ final class PrTable: NSTableView, NSPasteboardItemDataProvider {
 	}
 
 	private var draggingUrl: String?
-	func pasteboard(pasteboard: NSPasteboard!, item: NSPasteboardItem!, provideDataForType type: String!) {
-		if type.compare(NSPasteboardTypeString) == NSComparisonResult.OrderedSame && draggingUrl != nil {
+	func pasteboard(pasteboard: NSPasteboard?, item: NSPasteboardItem, provideDataForType type: String) {
+		if let pasteboard = pasteboard where type.compare(NSPasteboardTypeString) == NSComparisonResult.OrderedSame && draggingUrl != nil {
 			pasteboard.setData(draggingUrl!.dataUsingEncoding(NSUTF8StringEncoding)!, forType: NSPasteboardTypeString)
 			draggingUrl = nil
 		}
