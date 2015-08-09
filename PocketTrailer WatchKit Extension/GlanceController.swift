@@ -1,7 +1,6 @@
 
 import WatchKit
-import Foundation
-import CoreData
+import WatchConnectivity
 
 final class GlanceController: WKInterfaceController {
 
