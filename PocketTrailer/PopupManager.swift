@@ -17,7 +17,7 @@ final class PopupManager: NSObject, UIPopoverControllerDelegate, UISplitViewCont
 			currentPopover!.presentPopoverFromBarButtonItem(fromItem, permittedArrowDirections: UIPopoverArrowDirection.Any, animated: true)
 		} else {
 			viewController.modalPresentationStyle = UIModalPresentationStyle.CurrentContext
-			var v = parentViewController.tabBarController ?? (parentViewController.navigationController ?? parentViewController)
+			let v = parentViewController.tabBarController ?? (parentViewController.navigationController ?? parentViewController)
 			v.presentViewController(viewController, animated: true, completion: nil)
 		}
 	}

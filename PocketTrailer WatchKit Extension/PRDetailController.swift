@@ -10,7 +10,7 @@ let shortDateFormatter = { () -> NSDateFormatter in
 	return d
 	}()
 
-let bodyAttributes = { () -> [NSObject : AnyObject] in
+let bodyAttributes = { () -> [String : AnyObject] in
 	let commentParagraph = NSMutableParagraphStyle()
 	commentParagraph.hyphenationFactor = 0.75
 	commentParagraph.alignment = NSTextAlignment.Justified
@@ -58,9 +58,9 @@ final class PRDetailController: WKInterfaceController {
 
 	@IBAction func markAllReadSelected() {
 		if let i = issue {
-			presentControllerWithName("Command Controller", context: ["command": "markIssueRead", "id": i.objectID.URIRepresentation().absoluteString!])
+			presentControllerWithName("Command Controller", context: ["command": "markIssueRead", "id": i.objectID.URIRepresentation().absoluteString])
 		} else if let p = pullRequest {
-			presentControllerWithName("Command Controller", context: ["command": "markPrRead", "id": p.objectID.URIRepresentation().absoluteString!])
+			presentControllerWithName("Command Controller", context: ["command": "markPrRead", "id": p.objectID.URIRepresentation().absoluteString])
 		}
 	}
 
@@ -95,7 +95,7 @@ final class PRDetailController: WKInterfaceController {
 
 		var rowTypes = [String]()
 
-		for s in displayedStatuses ?? [] {
+		for _ in displayedStatuses ?? [] {
 			rowTypes.append("StatusRow")
 		}
 
@@ -108,7 +108,7 @@ final class PRDetailController: WKInterfaceController {
 				rowTypes.append("LabelRow")
 			}
 
-			for c in 0..<p.comments.count {
+			for _ in 0..<p.comments.count {
 				rowTypes.append("CommentRow")
 			}
 
@@ -119,7 +119,7 @@ final class PRDetailController: WKInterfaceController {
 				rowTypes.append("LabelRow")
 			}
 
-			for c in 0..<i.comments.count {
+			for _ in 0..<i.comments.count {
 				rowTypes.append("CommentRow")
 			}
 		}

@@ -59,10 +59,10 @@ final class PRListController: WKInterfaceController {
 
 		if prs==true {
 			let f = ListableItem.requestForItemsOfType("PullRequest", withFilter: nil, sectionIndex: sectionIndex)
-			itemsInSection = mainObjectContext.executeFetchRequest(f, error: nil) as! [PullRequest]
+			itemsInSection = try! mainObjectContext.executeFetchRequest(f) as! [PullRequest]
 		} else {
 			let f = ListableItem.requestForItemsOfType("Issue", withFilter: nil, sectionIndex: sectionIndex)
-			itemsInSection = mainObjectContext.executeFetchRequest(f, error: nil) as! [Issue]
+			itemsInSection = try! mainObjectContext.executeFetchRequest(f) as! [Issue]
 		}
 
 		table.setNumberOfRows(itemsInSection.count, withRowType: "PRRow")

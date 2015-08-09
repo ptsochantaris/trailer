@@ -567,7 +567,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 	func exportSelected(sender: UIBarButtonItem) {
 		let tempFilePath = NSTemporaryDirectory().stringByAppendingPathComponent("PocketTrailer Settings.trailerSettings")
-		tempUrl = NSURL(fileURLWithPath: tempFilePath)!
+		tempUrl = NSURL(fileURLWithPath: tempFilePath)
 		Settings.writeToURL(tempUrl!)
 
 		let menu = UIDocumentPickerViewController(URL: tempUrl!, inMode: UIDocumentPickerMode.ExportToService)

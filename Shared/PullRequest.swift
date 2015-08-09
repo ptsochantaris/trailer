@@ -2,6 +2,8 @@
 import CoreData
 #if os(iOS)
 	import UIKit
+#elseif os(watchOS)
+	import WatchKit
 #endif
 
 final class PullRequest: ListableItem {
@@ -133,9 +135,9 @@ final class PullRequest: ListableItem {
 
 		let lightSubtitle = [NSForegroundColorAttributeName: lightColor, NSFontAttributeName:font, NSParagraphStyleAttributeName: p]
 
-		#if os(iOS)
+		#if os(iOS) || os(watchOS)
 			let separator = NSAttributedString(string:"\n", attributes:lightSubtitle)
-			#elseif os(OSX)
+		#elseif os(OSX)
 			let separator = NSAttributedString(string:"   ", attributes:lightSubtitle)
 		#endif
 

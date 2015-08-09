@@ -2,6 +2,8 @@
 import CoreData
 #if os(iOS)
 	import UIKit
+#elseif os(watchOS)
+	import WatchKit
 #endif
 
 let itemDateFormatter = { () -> NSDateFormatter in
@@ -281,12 +283,12 @@ class ListableItem: DataItem {
 					_title.appendAttributedString(NSAttributedString(string: "\n", attributes: titleAttributes))
 
 					let lp = NSMutableParagraphStyle()
-					#if os(iOS)
+					#if os(iOS) || os(watchOS)
 						lp.lineHeightMultiple = 1.15
 						let labelAttributes = [NSFontAttributeName: labelFont,
 						NSBaselineOffsetAttributeName: 2.0,
 						NSParagraphStyleAttributeName: lp]
-						#elseif os(OSX)
+					#elseif os(OSX)
 						lp.minimumLineHeight = labelFont.pointSize+6.0
 						let labelAttributes = [NSFontAttributeName: labelFont,
 							NSBaselineOffsetAttributeName: 1.0,

@@ -16,7 +16,7 @@ final class CommentBlacklistViewController: UITableViewController {
 	}
 
 	override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCellWithIdentifier("UsernameCell", forIndexPath: indexPath) as! UITableViewCell
+		let cell = tableView.dequeueReusableCellWithIdentifier("UsernameCell", forIndexPath: indexPath) 
 		cell.textLabel?.text = Settings.commentAuthorBlacklist[indexPath.row]
 		return cell
 	}

@@ -48,7 +48,7 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 		actionsButton.enabled = ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext)
 		if actionsButton.enabled && fetchedResultsController.fetchedObjects?.count==0 {
 			refreshList()
-		} else if let selectedIndex = tableView.indexPathForSelectedRow() {
+		} else if let selectedIndex = tableView.indexPathForSelectedRow {
 			tableView.deselectRowAtIndexPath(selectedIndex, animated: true)
 		}
 		super.viewDidAppear(animated)
@@ -69,7 +69,7 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 	}
 
 	@IBAction func setAllPrsSelected(sender: UIBarButtonItem) {
-		if let ip = tableView.indexPathForSelectedRow() {
+		if let ip = tableView.indexPathForSelectedRow {
 			tableView.deselectRowAtIndexPath(ip, animated: false)
 		}
 		performSegueWithIdentifier("showRepoSelection", sender: self)
@@ -117,13 +117,13 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 	}
 
 	override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! UITableViewCell
+		let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) 
 		configureCell(cell, atIndexPath: indexPath)
 		return cell
 	}
 
 	override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-		if let indexPath = tableView.indexPathForSelectedRow(),
+		if let indexPath = tableView.indexPathForSelectedRow,
 			repo = fetchedResultsController.objectAtIndexPath(indexPath) as? Repo,
 			vc = segue.destinationViewController as? RepoSettingsViewController {
 			vc.repo = repo

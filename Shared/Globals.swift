@@ -43,15 +43,24 @@ func DLog(message: String, @autoclosure _ arg1: ()->CVarArgType?, @autoclosure _
 
 	import UIKit
 
-	typealias COLOR_CLASS = UIColor
-	typealias FONT_CLASS = UIFont
-	typealias IMAGE_CLASS = UIImage
-
 	let REFRESH_STARTED_NOTIFICATION = "RefreshStartedNotification"
 	let REFRESH_ENDED_NOTIFICATION = "RefreshEndedNotification"
 	let RECEIVED_NOTIFICATION_KEY = "ReceivedNotificationKey"
 	let GLOBAL_SCREEN_SCALE = UIScreen.mainScreen().scale
 	let GLOBAL_TINT = UIColor(red: 52.0/255.0, green: 110.0/255.0, blue: 183.0/255.0, alpha: 1.0)
+
+	let stringDrawingOptions: NSStringDrawingOptions = [NSStringDrawingOptions.UsesLineFragmentOrigin, NSStringDrawingOptions.UsesFontLeading]
+	typealias COLOR_CLASS = UIColor
+	typealias FONT_CLASS = UIFont
+	typealias IMAGE_CLASS = UIImage
+
+#elseif os(watchOS)
+
+	import WatchKit
+
+	typealias COLOR_CLASS = UIColor
+	typealias FONT_CLASS = UIFont
+	typealias IMAGE_CLASS = WKImage
 
 #elseif os(OSX)
 
@@ -66,15 +75,12 @@ func DLog(message: String, @autoclosure _ arg1: ()->CVarArgType?, @autoclosure _
 	let AVATAR_PADDING: CGFloat = 8.0
 	let REMOVE_BUTTON_WIDTH: CGFloat = 80.0
 
-	let PR_ITEM_FOCUSED_STATE_KEY = "PrItemFocusedStateKey"
-
+	let stringDrawingOptions: NSStringDrawingOptions = [NSStringDrawingOptions.UsesLineFragmentOrigin, NSStringDrawingOptions.UsesFontLeading]
 	typealias COLOR_CLASS = NSColor
 	typealias FONT_CLASS = NSFont
 	typealias IMAGE_CLASS = NSImage
 
 #endif
-
-let stringDrawingOptions: NSStringDrawingOptions = [NSStringDrawingOptions.UsesLineFragmentOrigin, NSStringDrawingOptions.UsesFontLeading]
 
 let itemCountFormatter = { () -> NSNumberFormatter in
     let n = NSNumberFormatter()
@@ -104,7 +110,6 @@ let API_USAGE_UPDATE = "RateUpdateNotification"
 let LOW_API_WARNING: Double = 0.20
 let NETWORK_TIMEOUT: NSTimeInterval = 120.0
 let BACKOFF_STEP: NSTimeInterval = 120.0
-let DATA_READONLY = false
 
 func currentAppVersion() -> String {
 	return NSBundle.mainBundle().infoDictionary!["CFBundleShortVersionString"] as? String ?? "(unknown version)"
