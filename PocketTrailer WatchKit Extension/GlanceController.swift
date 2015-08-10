@@ -2,7 +2,7 @@
 import WatchKit
 import WatchConnectivity
 
-final class GlanceController: WKInterfaceController {
+final class GlanceController: WKInterfaceController, WCSessionDelegate {
 
     @IBOutlet weak var totalCount: WKInterfaceLabel!
 
@@ -28,6 +28,31 @@ final class GlanceController: WKInterfaceController {
 
 	@IBOutlet weak var prIcon: WKInterfaceImage!
 	@IBOutlet weak var issueIcon: WKInterfaceImage!
+
+	override func awakeWithContext(context: AnyObject?) {
+		let session = WCSession.defaultSession()
+		session.delegate = self
+		session.activateSession()
+	}
+
+	override func willActivate() {
+		super.willActivate()
+		WCSession.defaultSession().sendMessage(["command": "overview"], replyHandler: { data in
+			self.updateFromData(data)
+			}) { error  in
+				self.showError(error)
+		}
+	}
+
+	private func updateFromData(data: [String : AnyObject]) {
+		let showIssues = data["glanceWantsIssues"] as! Bool
+		self.prIcon.setHidden(showIssues)
+		self.issueIcon.setHidden(!showIssues)
+	}
+
+	private func showError(error: NSError) {
+
+	}
 
 	/*
 	func setCountOfLabel(label: WKInterfaceLabel, forSection: PullRequestSection, group: WKInterfaceGroup) {

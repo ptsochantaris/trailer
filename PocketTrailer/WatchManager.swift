@@ -6,14 +6,13 @@ import WatchConnectivity
 final class WatchManager : NSObject, WCSessionDelegate {
 
 	var backgroundTask = UIBackgroundTaskInvalid
-	var session: WCSession?
 
 	override init() {
 		super.init()
 		if WCSession.isSupported() {
-			session = WCSession.defaultSession()
-			session?.delegate = self
-			session?.activateSession()
+			let session = WCSession.defaultSession()
+			session.delegate = self
+			session.activateSession()
 		}
 	}
 
@@ -286,7 +285,9 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			"participated": prCountsForSection(PullRequestSection.Participated),
 			"merged": prCountsForSection(PullRequestSection.Merged),
 			"closed": prCountsForSection(PullRequestSection.Closed),
-			"other": prCountsForSection(PullRequestSection.All)
+			"other": prCountsForSection(PullRequestSection.All),
+			"total": PullRequest.countAllRequestsInMoc(mainObjectContext),
+			"unread": PullRequest.badgeCountInMoc(mainObjectContext)
 		]
 		if prs.count==0 {
 			prs["error"] = DataManager.reasonForEmptyWithFilter(nil).string
@@ -295,7 +296,9 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			"mine": issueCountsForSection(PullRequestSection.Mine),
 			"participated": issueCountsForSection(PullRequestSection.Participated),
 			"closed": issueCountsForSection(PullRequestSection.Closed),
-			"other": issueCountsForSection(PullRequestSection.All)
+			"other": issueCountsForSection(PullRequestSection.All),
+			"total": Issue.countAllIssuesInMoc(mainObjectContext),
+			"unread": Issue.badgeCountInMoc(mainObjectContext)
 		]
 		if issues.count==0 {
 			issues["error"] = DataManager.reasonForEmptyIssuesWithFilter(nil).string
