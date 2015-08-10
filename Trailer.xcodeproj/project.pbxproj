@@ -428,6 +428,7 @@
 			children = (
 				164785B21A2CE7FB00297764 /* PocketTrailer-Bridging-Header.h */,
 				1606F1BA1A4703E60088368E /* iOS_AppDelegate.swift */,
+				164840FF1AD198A6009E6383 /* WatchManager.swift */,
 			);
 			name = Core;
 			sourceTree = "<group>";
@@ -742,7 +743,6 @@
 				166A84BD1A457CA700A3B292 /* ServersViewController.swift */,
 				164840FB1AD196D6009E6383 /* SettingsManager.swift */,
 				164840FD1AD19837009E6383 /* PopupManager.swift */,
-				164840FF1AD198A6009E6383 /* WatchManager.swift */,
 				164841011AD19933009E6383 /* NotificationManager.swift */,
 				16C90F011B13BC180095E8D5 /* RepoSettingsViewController.swift */,
 			);

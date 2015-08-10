@@ -128,6 +128,15 @@ func currentAppVersion() -> String {
 		}
 	}
 
+	func colorToHex(c: UIColor) -> String {
+		var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+		c.getRed(&r, green: &g, blue: &b, alpha: &a)
+		r *= 255.0
+		g *= 255.0
+		b *= 255.0
+		return NSString(format: "%02X%02X%02X", r, g, b) as String
+	}
+
 	func imageFromColor(color: UIColor) -> UIImage {
 		let rect = CGRectMake(0, 0, 1, 1)
 		UIGraphicsBeginImageContext(rect.size)

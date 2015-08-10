@@ -1,5 +1,6 @@
 
 import UIKit
+import CoreData
 import WatchConnectivity
 
 final class WatchManager : NSObject, WCSessionDelegate {
@@ -45,9 +46,9 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				}
 				atNextEvent() {
 					if Settings.lastSuccessfulRefresh == nil || lastSuccessfulSync.isEqualToDate(Settings.lastSuccessfulRefresh!) {
-						replyHandler(["status": "Refresh failed", "color": "red"])
+						replyHandler(["status": "Refresh failed", "color": "FF0000"])
 					} else {
-						replyHandler(["status": "Success", "color": "green"])
+						replyHandler(["status": "Success", "color": "00FF00"])
 					}
 					self.endBGTask()
 				}
@@ -59,7 +60,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				DataManager.saveDB()
 			}
 			atNextEvent() {
-				replyHandler(["status": "Success", "color": "green"])
+				replyHandler(["status": "Success", "color": "00FF00"])
 				self.endBGTask()
 			}
 		case "openissue":
@@ -69,7 +70,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				DataManager.saveDB()
 			}
 			atNextEvent() {
-				replyHandler(["status": "Success", "color": "green"])
+				replyHandler(["status": "Success", "color": "00FF00"])
 				self.endBGTask()
 			}
 		case "opencomment":
@@ -79,7 +80,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				DataManager.saveDB()
 			}
 			atNextEvent() {
-				replyHandler(["status": "Success", "color": "green"])
+				replyHandler(["status": "Success", "color": "00FF00"])
 				self.endBGTask()
 			}
 		case "clearAllMerged":
@@ -91,7 +92,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			m.reloadDataWithAnimation(false)
 			m.updateStatus()
 			atNextEvent() {
-				replyHandler(["status": "Success", "color": "green"])
+				replyHandler(["status": "Success", "color": "00FF00"])
 				self.endBGTask()
 			}
 		case "clearAllClosed":
@@ -106,7 +107,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			m.reloadDataWithAnimation(false)
 			m.updateStatus()
 			atNextEvent() {
-				replyHandler(["status": "Success", "color": "green"])
+				replyHandler(["status": "Success", "color": "00FF00"])
 				self.endBGTask()
 			}
 		case "markPrRead":
@@ -120,7 +121,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 					app.updateBadge()
 			}
 			atNextEvent() {
-				replyHandler(["status": "Success", "color": "green"])
+				replyHandler(["status": "Success", "color": "00FF00"])
 				self.endBGTask()
 			}
 		case "markIssueRead":
@@ -134,7 +135,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 					app.updateBadge()
 			}
 			atNextEvent() {
-				replyHandler(["status": "Success", "color": "green"])
+				replyHandler(["status": "Success", "color": "00FF00"])
 				self.endBGTask()
 			}
 		case "markEverythingRead":
@@ -144,7 +145,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			DataManager.saveDB()
 			app.updateBadge()
 			atNextEvent() {
-				replyHandler(["status": "Success", "color": "green"])
+				replyHandler(["status": "Success", "color": "00FF00"])
 				self.endBGTask()
 			}
 		case "markAllPrsRead":
@@ -155,7 +156,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				app.updateBadge()
 			}
 			atNextEvent() {
-				replyHandler(["status": "Success", "color": "green"])
+				replyHandler(["status": "Success", "color": "00FF00"])
 				self.endBGTask()
 			}
 		case "markAllIssuesRead":
@@ -166,13 +167,153 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				app.updateBadge()
 			}
 			atNextEvent() {
-				replyHandler(["status": "Success", "color": "green"])
+				replyHandler(["status": "Success", "color": "00FF00"])
+				self.endBGTask()
+			}
+		case "overview":
+			atNextEvent() {
+				replyHandler(["status": "Success", "result": self.buildOverview()])
+				self.endBGTask()
+			}
+		case "item_list":
+			atNextEvent() {
+				let type = message["type"] as! String
+				let section = message["section"] as! String
+				replyHandler(["status": "Success", "result": self.buildItemList(type, section)])
+				self.endBGTask()
+			}
+		case "item_detail":
+			atNextEvent() {
+				if let lid = message["localId"] as? String, details = self.buildItemDetail(lid) {
+					replyHandler(["status": "Success", "result": details])
+				} else {
+					replyHandler(["status": "Item Not Found", "color": "FF0000"])
+				}
 				self.endBGTask()
 			}
 		default:
 			atNextEvent() {
+				replyHandler(["status": "Unknown Command", "color": "FF0000"])
 				self.endBGTask()
 			}
 		}
+	}
+
+	////////////////////////////
+
+	private func buildItemList(type: String, _ section: String) -> [[String : AnyObject]] {
+		var items = [[String : AnyObject]]()
+
+		let sectionIndex: PullRequestSection
+		switch section {
+			case "mine": sectionIndex = PullRequestSection.Mine
+			case "participated": sectionIndex = PullRequestSection.Participated
+			case "merged": sectionIndex = PullRequestSection.Merged
+			case "closed": sectionIndex = PullRequestSection.Closed
+			default: sectionIndex = PullRequestSection.All
+		}
+
+		let f: NSFetchRequest
+		var showStatuses = false
+		if type == "prs" {
+			f = ListableItem.requestForItemsOfType("PullRequest", withFilter: nil, sectionIndex: sectionIndex.rawValue)
+			showStatuses = Settings.showStatusItems
+		} else {
+			f = ListableItem.requestForItemsOfType("Issue", withFilter: nil, sectionIndex: sectionIndex.rawValue)
+		}
+		for item in try! mainObjectContext.executeFetchRequest(f) as! [ListableItem] {
+			items.append(baseDataForItem(item, showStatuses: showStatuses))
+		}
+		return items
+	}
+
+	private func baseDataForItem(item: ListableItem, showStatuses: Bool) -> [String : AnyObject] {
+		var itemData = [
+			"title": item.title ?? "NOTITLE",
+			"unreadcount": item.unreadComments ?? 0,
+			"repo": item.repo.fullName ?? "NOREPONAME",
+			"user": item.userLogin ?? "NONAME",
+			"date": (Settings.showCreatedInsteadOfUpdated ? item.createdAt : item.updatedAt) ?? NSDate.distantPast(),
+			"localId": item.objectID.URIRepresentation().absoluteString
+		]
+		if showStatuses {
+			itemData["statuses"] = statusLinesForPr(item as! PullRequest)
+		}
+		return itemData
+	}
+
+	private func statusLinesForPr(pr: PullRequest) -> [[String : AnyObject]] {
+		var statusLines = [[String : AnyObject]]()
+		for status in pr.displayedStatuses() {
+			statusLines.append([
+				"color": colorToHex(status.colorForDarkDisplay()),
+				"text": status.descriptionText ?? "NOTEXT"
+				])
+		}
+		return statusLines
+	}
+
+	/////////////////////////////
+
+	private func buildItemDetail(localId: String) -> [String : AnyObject]? {
+		if let oid = DataManager.idForUriPath(localId), item = existingObjectWithID(oid) as? ListableItem {
+			let showStatuses = (item is PullRequest) ? Settings.showStatusItems : false
+			var result = baseDataForItem(item, showStatuses: showStatuses)
+			result["description"] = item.body
+			result["comments"] = commentsForItem(item)
+			return result
+		}
+		return nil
+	}
+
+	private func commentsForItem(item: ListableItem) -> [[String : AnyObject]] {
+		var comments = [[String : AnyObject]]()
+		for comment in item.comments {
+			comments.append([
+				"user": comment.userName ?? "NOUSER",
+				"date": comment.createdAt ?? NSDate.distantPast(),
+				"text": comment.body ?? "NOBODY",
+				])
+		}
+		return comments
+	}
+
+	//////////////////////////////
+
+	private func buildOverview() -> [String : AnyObject] {
+		var prs: [String : AnyObject] = [
+			"mine": prCountsForSection(PullRequestSection.Mine),
+			"participated": prCountsForSection(PullRequestSection.Participated),
+			"merged": prCountsForSection(PullRequestSection.Merged),
+			"closed": prCountsForSection(PullRequestSection.Closed),
+			"other": prCountsForSection(PullRequestSection.All)
+		]
+		if prs.count==0 {
+			prs["error"] = DataManager.reasonForEmptyWithFilter(nil).string
+		}
+		var issues: [String : AnyObject] = [
+			"mine": issueCountsForSection(PullRequestSection.Mine),
+			"participated": issueCountsForSection(PullRequestSection.Participated),
+			"closed": issueCountsForSection(PullRequestSection.Closed),
+			"other": issueCountsForSection(PullRequestSection.All)
+		]
+		if issues.count==0 {
+			issues["error"] = DataManager.reasonForEmptyIssuesWithFilter(nil).string
+		}
+		return [
+			"prs": prs,
+			"issues": issues,
+			"glanceWantsIssues": Settings.showIssuesInGlance,
+			"lastUpdated": Settings.lastSuccessfulRefresh ?? NSDate.distantPast()
+		]
+	}
+
+	private func prCountsForSection(section: PullRequestSection) -> [String : Int] {
+		return ["total": PullRequest.countRequestsInSection(section, moc: mainObjectContext),
+				"unread": PullRequest.badgeCountInSection(section, moc: mainObjectContext)];
+	}
+	private func issueCountsForSection(section: PullRequestSection) -> [String : Int] {
+		return ["total": Issue.countIssuesInSection(section, moc: mainObjectContext),
+				"unread": Issue.badgeCountInSection(section, moc: mainObjectContext)];
 	}
 }
