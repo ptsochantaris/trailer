@@ -337,7 +337,7 @@
                         <group alignment="left" layout="vertical" spacing="1" id="eew-Gs-W6Y">
                             <items>
                                 <label alignment="center" verticalAlignment="center" text="Error Text" textAlignment="center" numberOfLines="0" id="UEh-Kg-DUS">
-                                    <fontDescription key="font" style="UICTFontTextStyleCaption2"/>
+                                    <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
                                 </label>
                                 <group width="130" alignment="center" verticalAlignment="center" radius="3" id="uLm-0J-NPT">
                                     <items>

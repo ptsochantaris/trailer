@@ -11,6 +11,7 @@ import WatchConnectivity
 class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 
 	let session = WCSession.defaultSession()
+	var appLaunched = false
 
 	func startWatchConnectSessionIfNeeded() {
 		if session.delegate == nil {
@@ -24,6 +25,7 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 	}
 
 	func applicationDidFinishLaunching() {
+		appLaunched = true
 		startWatchConnectSessionIfNeeded()
 	}
 	
