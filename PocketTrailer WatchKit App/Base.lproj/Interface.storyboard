@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="7706" systemVersion="14D136" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="AgC-eL-Hgc">
+<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="8173.3" systemVersion="14E46" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="AgC-eL-Hgc">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="7701"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8142"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="8089"/>
     </dependencies>
     <scenes>
         <!--SectionController-->
@@ -336,6 +336,9 @@
                         </group>
                         <group alignment="left" layout="vertical" spacing="1" id="eew-Gs-W6Y">
                             <items>
+                                <label alignment="center" verticalAlignment="center" text="Error Text" textAlignment="center" numberOfLines="0" id="UEh-Kg-DUS">
+                                    <fontDescription key="font" style="UICTFontTextStyleCaption2"/>
+                                </label>
                                 <group width="130" alignment="center" verticalAlignment="center" radius="3" id="uLm-0J-NPT">
                                     <items>
                                         <label alignment="center" text="XX MINE" textAlignment="center" numberOfLines="0" id="fJB-oa-687">
@@ -422,6 +425,7 @@
                     <connections>
                         <outlet property="closedCount" destination="tvP-EF-DnR" id="hbB-mi-2Lo"/>
                         <outlet property="closedGroup" destination="EHK-bL-jTG" id="n1R-bX-sgj"/>
+                        <outlet property="errorText" destination="UEh-Kg-DUS" id="EXo-cp-gZp"/>
                         <outlet property="issueIcon" destination="J0s-24-eqf" id="m9V-84-tH5"/>
                         <outlet property="lastUpdate" destination="Qer-7L-pJ7" id="LK4-aR-MUG"/>
                         <outlet property="mergedCount" destination="8hY-30-ORl" id="Jas-dU-HsL"/>
@@ -434,6 +438,7 @@
                         <outlet property="participatedGroup" destination="pi7-1E-Nwe" id="xaG-ec-KND"/>
                         <outlet property="prIcon" destination="xYb-hC-O7D" id="xyq-S7-npK"/>
                         <outlet property="totalCount" destination="3wl-rh-8m0" id="BgR-8y-n1Z"/>
+                        <outlet property="totalGroup" destination="aEt-R2-txt" id="csy-mJ-Tf1"/>
                         <outlet property="unreadCount" destination="haI-qm-CXj" id="djY-l5-Twe"/>
                         <outlet property="unreadGroup" destination="0Cl-jo-zPe" id="Mpv-kh-MHE"/>
                     </connections>

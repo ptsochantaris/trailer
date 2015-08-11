@@ -3,13 +3,6 @@ import WatchKit
 import Foundation
 
 /*
-let shortDateFormatter = { () -> NSDateFormatter in
-	let d = NSDateFormatter()
-	d.dateStyle = NSDateFormatterStyle.ShortStyle
-	d.timeStyle = NSDateFormatterStyle.ShortStyle
-	d.doesRelativeDateFormatting = true
-	return d
-	}()
 
 let bodyAttributes = { () -> [String : AnyObject] in
 	let commentParagraph = NSMutableParagraphStyle()

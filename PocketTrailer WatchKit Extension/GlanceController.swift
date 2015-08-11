@@ -2,9 +2,19 @@
 import WatchKit
 import WatchConnectivity
 
-final class GlanceController: WKInterfaceController, WCSessionDelegate {
+let shortDateFormatter = { () -> NSDateFormatter in
+	let d = NSDateFormatter()
+	d.dateStyle = NSDateFormatterStyle.ShortStyle
+	d.timeStyle = NSDateFormatterStyle.ShortStyle
+	d.doesRelativeDateFormatting = true
+	return d
+	}()
+
+final class GlanceController: WKInterfaceController {
 
     @IBOutlet weak var totalCount: WKInterfaceLabel!
+	@IBOutlet var totalGroup: WKInterfaceGroup!
+	@IBOutlet var errorText: WKInterfaceLabel!
 
 	@IBOutlet weak var myCount: WKInterfaceLabel!
 	@IBOutlet weak var myGroup: WKInterfaceGroup!
@@ -30,85 +40,112 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 	@IBOutlet weak var issueIcon: WKInterfaceImage!
 
 	override func awakeWithContext(context: AnyObject?) {
-		let session = WCSession.defaultSession()
-		session.delegate = self
-		session.activateSession()
+		let d = WKExtension.sharedExtension().delegate as! ExtensionDelegate
+		d.startWatchConnectSessionIfNeeded()
+		NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("reachabilityChanged"), name: SESSION_REACHABILITY_CHANGE_KEY, object: nil)
+		errorText.setText("Loading...")
+		setErrorMode(true)
 	}
 
 	override func willActivate() {
 		super.willActivate()
+		requestUpdate()
+	}
+
+	func reachabilityChanged() {
+		requestUpdate()
+	}
+
+	private func requestUpdate() {
 		WCSession.defaultSession().sendMessage(["command": "overview"], replyHandler: { data in
-			self.updateFromData(data)
+			dispatch_async(dispatch_get_main_queue()) {
+				self.updateFromData(data)
+			}
 			}) { error  in
-				self.showError(error)
+				dispatch_async(dispatch_get_main_queue()) {
+					self.showError(error)
+				}
 		}
 	}
 
 	private func updateFromData(data: [String : AnyObject]) {
-		let showIssues = data["glanceWantsIssues"] as! Bool
-		self.prIcon.setHidden(showIssues)
-		self.issueIcon.setHidden(!showIssues)
-	}
 
-	private func showError(error: NSError) {
+		let result = data["result"] as! [String : AnyObject]
 
-	}
+		let showIssues = result["glanceWantsIssues"] as! Bool
+		prIcon.setHidden(showIssues)
+		issueIcon.setHidden(!showIssues)
+		mergedGroup.setHidden(showIssues)
 
-	/*
-	func setCountOfLabel(label: WKInterfaceLabel, forSection: PullRequestSection, group: WKInterfaceGroup) {
-		let toCount: Int
-		if Settings.showIssuesInGlance {
-			toCount = Issue.countIssuesInSection(forSection, moc: mainObjectContext)
-		} else {
-			toCount = PullRequest.countRequestsInSection(forSection, moc: mainObjectContext)
+		let r = result[showIssues ? "issues" : "prs"] as! [String : AnyObject]
+
+		let tc = r["total"] as! Int
+		totalCount.setText("\(tc)")
+
+		let mc = r["mine"]?["total"] as! Int
+		myCount.setText("\(mc) \(PullRequestSection.Mine.watchMenuName().uppercaseString)")
+		myGroup.setAlpha(mc==0 ? 0.4 : 1.0)
+
+		let pc = r["participated"]?["total"] as! Int
+		participatedCount.setText("\(pc) \(PullRequestSection.Participated.watchMenuName().uppercaseString)")
+		participatedGroup.setAlpha(pc==0 ? 0.4 : 1.0)
+
+		if !showIssues {
+			let rc = r["merged"]?["total"] as! Int
+			mergedCount.setText("\(rc) \(PullRequestSection.Merged.watchMenuName().uppercaseString)")
+			mergedGroup.setAlpha(rc==0 ? 0.4 : 1.0)
 		}
-		let appending = forSection.watchMenuName().uppercaseString
-        if toCount > 0 {
-            group.setAlpha(1.0)
-            label.setText("\(toCount) \(appending)")
-        } else {
-            label.setText("0 \(appending)")
-            group.setAlpha(0.4)
-        }
-    }
 
-	override func willActivate() {
+		let cc = r["closed"]?["total"] as! Int
+		closedCount.setText("\(cc) \(PullRequestSection.Closed.watchMenuName().uppercaseString)")
+		closedGroup.setAlpha(cc==0 ? 0.4 : 1.0)
 
-		Settings.clearCache()
+		let oc = r["other"]?["total"] as! Int
+		otherCount.setText("\(oc) \(PullRequestSection.All.watchMenuName().uppercaseString)")
+		otherGroup.setAlpha(oc==0 ? 0.4 : 1.0)
 
-		let totalItems = Settings.showIssuesInGlance ? Issue.countAllIssuesInMoc(mainObjectContext) : PullRequest.countAllRequestsInMoc(mainObjectContext)
-
-		mergedGroup.setHidden(Settings.showIssuesInGlance)
-		prIcon.setHidden(Settings.showIssuesInGlance)
-		issueIcon.setHidden(!Settings.showIssuesInGlance)
-
-		totalCount.setText("\(totalItems)")
-
-		setCountOfLabel(myCount, forSection: PullRequestSection.Mine, group: myGroup)
-		setCountOfLabel(participatedCount, forSection: PullRequestSection.Participated, group: participatedGroup)
-		setCountOfLabel(mergedCount, forSection: PullRequestSection.Merged, group: mergedGroup)
-		setCountOfLabel(closedCount, forSection: PullRequestSection.Closed, group: closedGroup)
-		setCountOfLabel(otherCount, forSection: PullRequestSection.All, group: otherGroup)
-
-		let badgeCount = Settings.showIssuesInGlance ? Issue.badgeCountInMoc(mainObjectContext) : PullRequest.badgeCountInMoc(mainObjectContext)
-		if badgeCount == 0 {
+		let uc = r["participated"]?["unread"] as! Int
+		if uc==0 {
 			unreadCount.setText("NONE UNREAD")
 			unreadGroup.setAlpha(0.3)
-		} else if badgeCount == 1 {
+		} else if uc==1 {
 			unreadCount.setText("1 COMMENT")
 			unreadGroup.setAlpha(1.0)
 		} else {
-			unreadCount.setText("\(badgeCount) COMMENTS")
+			unreadCount.setText("\(uc) COMMENTS")
 			unreadGroup.setAlpha(1.0)
 		}
 
-		if let lastRefresh = Settings.lastSuccessfulRefresh {
-			lastUpdate.setText(shortDateFormatter.stringFromDate(lastRefresh))
-		} else {
+		let lastRefresh = result["lastUpdated"] as! NSDate
+		if lastRefresh.isEqualToDate(NSDate.distantPast()) {
 			lastUpdate.setText("Not refreshed yet")
+		} else {
+			lastUpdate.setText(shortDateFormatter.stringFromDate(lastRefresh))
 		}
 
-		super.willActivate()
+		setErrorMode(false)
 	}
-	*/
+
+	private func showError(error: NSError) {
+		setErrorMode(true)
+		if !WCSession.defaultSession().reachable {
+			errorText.setText("PocketTrailer cannot connect to your iPhone");
+		} else if WCSession.defaultSession().iOSDeviceNeedsUnlockAfterRebootForReachability {
+			errorText.setText("Please unlock your iPhone first");
+		} else {
+			errorText.setText(error.localizedDescription)
+		}
+	}
+
+	private func setErrorMode(mode: Bool) {
+		myGroup.setHidden(mode)
+		participatedGroup.setHidden(mode)
+		mergedGroup.setHidden(mode)
+		closedGroup.setHidden(mode)
+		otherGroup.setHidden(mode)
+		unreadGroup.setHidden(mode)
+		totalGroup.setHidden(mode)
+		lastUpdate.setHidden(mode)
+		errorText.setHidden(!mode)
+	}
 }
