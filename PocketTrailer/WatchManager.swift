@@ -43,15 +43,16 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				while app.isRefreshing {
 					NSThread.sleepForTimeInterval(0.1)
 				}
+
 				atNextEvent() {
 					if Settings.lastSuccessfulRefresh == nil || lastSuccessfulSync.isEqualToDate(Settings.lastSuccessfulRefresh!) {
-						replyHandler(["status": "Refresh failed", "color": "FF0000"])
+						self.reportFailure("Refresh Failed", message, replyHandler)
 					} else {
-						replyHandler(["status": "Success", "color": "00FF00"])
+						self.processList(message, replyHandler)
 					}
-					self.endBGTask()
 				}
 			}
+
 		case "openpr":
 			if let itemId = message["id"] as? String {
 				let m = popupManager.getMasterController()
@@ -59,9 +60,9 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				DataManager.saveDB()
 			}
 			atNextEvent() {
-				replyHandler(["status": "Success", "color": "00FF00"])
-				self.endBGTask()
+				self.processList(message, replyHandler)
 			}
+
 		case "openissue":
 			if let itemId = message["id"] as? String {
 				let m = popupManager.getMasterController()
@@ -69,9 +70,9 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				DataManager.saveDB()
 			}
 			atNextEvent() {
-				replyHandler(["status": "Success", "color": "00FF00"])
-				self.endBGTask()
+				self.processList(message, replyHandler)
 			}
+
 		case "opencomment":
 			if let itemId = message["id"] as? String {
 				let m = popupManager.getMasterController()
@@ -79,9 +80,9 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				DataManager.saveDB()
 			}
 			atNextEvent() {
-				replyHandler(["status": "Success", "color": "00FF00"])
-				self.endBGTask()
+				self.processList(message, replyHandler)
 			}
+
 		case "clearAllMerged":
 			for p in PullRequest.allMergedRequestsInMoc(mainObjectContext) {
 				mainObjectContext.deleteObject(p)
@@ -91,9 +92,9 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			m.reloadDataWithAnimation(false)
 			m.updateStatus()
 			atNextEvent() {
-				replyHandler(["status": "Success", "color": "00FF00"])
-				self.endBGTask()
+				self.processList(message, replyHandler)
 			}
+
 		case "clearAllClosed":
 			for p in PullRequest.allClosedRequestsInMoc(mainObjectContext) {
 				mainObjectContext.deleteObject(p)
@@ -106,9 +107,9 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			m.reloadDataWithAnimation(false)
 			m.updateStatus()
 			atNextEvent() {
-				replyHandler(["status": "Success", "color": "00FF00"])
-				self.endBGTask()
+				self.processList(message, replyHandler)
 			}
+
 		case "markPrRead":
 			if let
 				itemId = message["id"] as? String,
@@ -120,9 +121,9 @@ final class WatchManager : NSObject, WCSessionDelegate {
 					app.updateBadge()
 			}
 			atNextEvent() {
-				replyHandler(["status": "Success", "color": "00FF00"])
-				self.endBGTask()
+				self.processList(message, replyHandler)
 			}
+
 		case "markIssueRead":
 			if let
 				itemId = message["id"] as? String,
@@ -134,9 +135,9 @@ final class WatchManager : NSObject, WCSessionDelegate {
 					app.updateBadge()
 			}
 			atNextEvent() {
-				replyHandler(["status": "Success", "color": "00FF00"])
-				self.endBGTask()
+				self.processList(message, replyHandler)
 			}
+
 		case "markEverythingRead":
 			PullRequest.markEverythingRead(PullRequestSection.None, moc: mainObjectContext)
 			Issue.markEverythingRead(PullRequestSection.None, moc: mainObjectContext)
@@ -144,9 +145,9 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			DataManager.saveDB()
 			app.updateBadge()
 			atNextEvent() {
-				replyHandler(["status": "Success", "color": "00FF00"])
-				self.endBGTask()
+				self.processList(message, replyHandler)
 			}
+
 		case "markAllPrsRead":
 			if let s = message["sectionIndex"] as? Int {
 				PullRequest.markEverythingRead(PullRequestSection(rawValue: s)!, moc: mainObjectContext)
@@ -155,9 +156,9 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				app.updateBadge()
 			}
 			atNextEvent() {
-				replyHandler(["status": "Success", "color": "00FF00"])
-				self.endBGTask()
+				self.processList(message, replyHandler)
 			}
+
 		case "markAllIssuesRead":
 			if let s = message["sectionIndex"] as? Int {
 				Issue.markEverythingRead(PullRequestSection(rawValue: s)!, moc: mainObjectContext)
@@ -166,36 +167,59 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				app.updateBadge()
 			}
 			atNextEvent() {
-				replyHandler(["status": "Success", "color": "00FF00"])
-				self.endBGTask()
+				self.processList(message, replyHandler)
 			}
-		case "overview":
-			atNextEvent() {
-				replyHandler(["status": "Success", "result": self.buildOverview()])
-				self.endBGTask()
-			}
-		case "item_list":
-			atNextEvent() {
-				let type = message["type"] as! String
-				let section = message["section"] as! String
-				replyHandler(["status": "Success", "result": self.buildItemList(type, section)])
-				self.endBGTask()
-			}
-		case "item_detail":
-			atNextEvent() {
-				if let lid = message["localId"] as? String, details = self.buildItemDetail(lid) {
-					replyHandler(["status": "Success", "result": details])
-				} else {
-					replyHandler(["status": "Item Not Found", "color": "FF0000"])
-				}
-				self.endBGTask()
-			}
+
 		default:
 			atNextEvent() {
-				replyHandler(["status": "Unknown Command", "color": "FF0000"])
-				self.endBGTask()
+				self.processList(message, replyHandler)
 			}
 		}
+	}
+
+	private func processList(message: [String : AnyObject], _ replyHandler: ([String : AnyObject]) -> Void) {
+
+		var result = [String : AnyObject]()
+
+		switch(message["list"] as? String ?? "") {
+
+		case "overview":
+			result["result"] = buildOverview()
+			reportSuccess(result, replyHandler)
+
+		case "item_list":
+			let type = message["type"] as! String
+			let section = message["section"] as! String
+			result["result"] = buildItemList(type, section)
+			reportSuccess(result, replyHandler)
+
+		case "item_detail":
+			if let lid = message["localId"] as? String, details = buildItemDetail(lid) {
+				result["result"] = details
+				reportSuccess(result, replyHandler)
+			} else {
+				reportFailure("Item Not Found", result, replyHandler)
+			}
+
+		default:
+			reportSuccess(result, replyHandler)
+		}
+	}
+
+	private func reportFailure(reason: String, _ result: [String : AnyObject], _ replyHandler: ([String : AnyObject]) -> Void) {
+		var r = result
+		r["status"] = reason
+		r["color"] = "FF0000"
+		replyHandler(r)
+		endBGTask()
+	}
+
+	private func reportSuccess(result: [String : AnyObject], _ replyHandler: ([String : AnyObject]) -> Void) {
+		var r = result
+		r["status"] = "Success"
+		r["color"] = "00FF00"
+		replyHandler(r)
+		endBGTask()
 	}
 
 	////////////////////////////

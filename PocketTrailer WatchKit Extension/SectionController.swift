@@ -1,27 +1,25 @@
 
 import WatchKit
+import WatchConnectivity
 
 final class SectionController: WKInterfaceController {
 
 	@IBOutlet weak var table: WKInterfaceTable!
 
-	/*
 	private var selectedIndex: Int?
-
-	override func awakeWithContext(context: AnyObject?) {
-		super.awakeWithContext(context)
-
-		Settings.clearCache()
-	}
 
 	override func willActivate() {
 		super.willActivate()
-		buildUI()
-		atNextEvent() { [weak self] in
-			if let i = self!.selectedIndex {
-				self!.table.scrollToRowAtIndex(i)
-				self!.selectedIndex = nil
-			}
+		//reloadData()
+	}
+
+	/*
+	private func sendCommand(command: String) {
+		showBusy()
+		WCSession.defaultSession().sendMessage(["command" : command, "list": "overview"], replyHandler: { response in
+
+			}) { error in
+				errorMode(error)
 		}
 	}
 */
@@ -75,7 +73,7 @@ final class SectionController: WKInterfaceController {
 	private var boundaryIndex:Int = 0
     private var rowTypes = [AnyObject]()
 
-	private func buildUI() {
+	private func reloadData() {
 
 		rowTypes.removeAll(keepCapacity: false)
 
@@ -147,6 +145,11 @@ final class SectionController: WKInterfaceController {
 				(table.rowControllerAtIndex(index) as! SectionRow).setIssue(t.section)
 			}
 			index++
+		}
+	
+		if let i = self!.selectedIndex {
+			self!.table.scrollToRowAtIndex(i)
+			self!.selectedIndex = nil
 		}
 	}
 */

@@ -57,7 +57,7 @@ final class GlanceController: WKInterfaceController {
 	}
 
 	private func requestUpdate() {
-		WCSession.defaultSession().sendMessage(["command": "overview"], replyHandler: { data in
+		WCSession.defaultSession().sendMessage(["list": "overview"], replyHandler: { data in
 			dispatch_async(dispatch_get_main_queue()) {
 				self.updateFromData(data)
 			}
@@ -129,8 +129,8 @@ final class GlanceController: WKInterfaceController {
 	private func showError(error: NSError) {
 		setErrorMode(true)
 		let d = WKExtension.sharedExtension().delegate as! ExtensionDelegate
-		if d.appLaunched == false {
-			errorText.setText("Please tap to launch PocketTrailer once for this glance to work");
+		if !WCSession.defaultSession().reachable && d.appLaunched == false {
+			errorText.setText("Please tap to open PocketTrailer for the first time to make glance work");
 		} else if !WCSession.defaultSession().reachable {
 			errorText.setText("PocketTrailer cannot connect to your iPhone");
 		} else if WCSession.defaultSession().iOSDeviceNeedsUnlockAfterRebootForReachability {
