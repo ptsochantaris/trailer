@@ -1,5 +1,5 @@
 
-import UIKit
+import SafariServices
 
 final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 
@@ -43,13 +43,10 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 		dismissViewControllerAnimated(true, completion: nil)
 	}
 
-	override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-		let targetUrl = "https://github.com/settings/tokens/new"
-		if let destination = segue.destinationViewController as? GithubViewController {
-			destination.pathToLoad = targetUrl
-		} else if let destination = segue.destinationViewController as? UINavigationController {
-			(destination.topViewController as? GithubViewController)?.pathToLoad = targetUrl
-		}
+	@IBAction func openGitHubSelected(sender: AnyObject) {
+		let s = SFSafariViewController(URL: NSURL(string: "https://github.com/settings/tokens/new")!)
+		s.view.tintColor = self.view.tintColor
+		self.presentViewController(s, animated: true, completion: nil)
 	}
 
 	@IBAction func testSelected(sender: UIButton) {

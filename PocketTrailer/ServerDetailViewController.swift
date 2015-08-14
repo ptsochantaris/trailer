@@ -1,5 +1,5 @@
 
-import UIKit
+import SafariServices
 import CoreData
 
 final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
@@ -15,7 +15,6 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 
 	var serverId: NSManagedObjectID?
 
-	private var targetUrl: String?
 	private var focusedField: UITextField?
 
 	override func viewDidLoad() {
@@ -119,24 +118,15 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 	}
 
 	@IBAction func watchListSelected(sender: UIBarButtonItem) {
-		if let u = checkForValidPath()?.absoluteString {
-			targetUrl = u + "/watching"
-			performSegueWithIdentifier("openGithub", sender: self)
-		}
+		openGitHub("/watching")
 	}
 
 	@IBAction func createTokenSelected(sender: UIBarButtonItem) {
-		if let u = checkForValidPath()?.absoluteString {
-			targetUrl = u + "/settings/tokens/new"
-			performSegueWithIdentifier("openGithub", sender: self)
-		}
+		openGitHub("/settings/tokens/new")
 	}
 
 	@IBAction func existingTokensSelected(sender: UIBarButtonItem) {
-		if let u = checkForValidPath()?.absoluteString {
-			targetUrl = u + "/settings/applications"
-			performSegueWithIdentifier("openGithub", sender: self)
-		}
+		openGitHub("/settings/applications")
 	}
 
 	private func checkForValidPath() -> NSURL? {
@@ -148,13 +138,12 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 		}
 	}
 
-	override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-		if let destination = segue.destinationViewController as? GithubViewController {
-			destination.pathToLoad = targetUrl
-		} else if let destination = segue.destinationViewController as? UINavigationController {
-			(destination.topViewController as? GithubViewController)?.pathToLoad = targetUrl
+	private func openGitHub(url: String) {
+		if let u = checkForValidPath()?.absoluteString {
+			let s = SFSafariViewController(URL: NSURL(string: u + url)!)
+			s.view.tintColor = self.view.tintColor
+			self.navigationController?.pushViewController(s, animated: true)
 		}
-		targetUrl = nil
 	}
 
 	@IBAction func deleteSelected(sender: UIBarButtonItem) {
