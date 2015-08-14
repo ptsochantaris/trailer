@@ -142,7 +142,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 		if let u = checkForValidPath()?.absoluteString {
 			let s = SFSafariViewController(URL: NSURL(string: u + url)!)
 			s.view.tintColor = self.view.tintColor
-			self.navigationController?.pushViewController(s, animated: true)
+			self.presentViewController(s, animated: true, completion: nil)
 		}
 	}
 
