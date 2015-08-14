@@ -4,9 +4,29 @@ import UIKit
 final class NotificationManager {
 
 	class func handleLocalNotification(notification: UILocalNotification) {
-		DLog("Received local notification: %@", notification.userInfo)
-		NSNotificationCenter.defaultCenter().postNotificationName(RECEIVED_NOTIFICATION_KEY, object: nil, userInfo: notification.userInfo)
+		if let userInfo = notification.userInfo {
+			DLog("Received local notification: %@", userInfo)
+			popupManager.getMasterController().localNotification(userInfo)
+		}
 		UIApplication.sharedApplication().cancelLocalNotification(notification)
+	}
+
+	class func handleUserActivity(activity: NSUserActivity) -> Bool {
+
+		if let info = activity.userInfo,
+			uid = info["kCSSearchableItemActivityIdentifier"] as? String,
+			oid = DataManager.idForUriPath(uid),
+			item = existingObjectWithID(oid) {
+
+				let m = popupManager.getMasterController()
+				if item is PullRequest {
+					m.openPrWithId(uid)
+				} else {
+					m.openIssueWithId(uid)
+				}
+				return true
+		}
+		return false
 	}
 
 	class func postNotificationOfType(type: PRNotificationType, forItem: DataItem) {

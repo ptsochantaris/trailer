@@ -45,7 +45,6 @@ func DLog(message: String, @autoclosure _ arg1: ()->CVarArgType?, @autoclosure _
 
 	let REFRESH_STARTED_NOTIFICATION = "RefreshStartedNotification"
 	let REFRESH_ENDED_NOTIFICATION = "RefreshEndedNotification"
-	let RECEIVED_NOTIFICATION_KEY = "ReceivedNotificationKey"
 	let GLOBAL_SCREEN_SCALE = UIScreen.mainScreen().scale
 	let GLOBAL_TINT = UIColor(red: 52.0/255.0, green: 110.0/255.0, blue: 183.0/255.0, alpha: 1.0)
 
@@ -53,14 +52,6 @@ func DLog(message: String, @autoclosure _ arg1: ()->CVarArgType?, @autoclosure _
 	typealias COLOR_CLASS = UIColor
 	typealias FONT_CLASS = UIFont
 	typealias IMAGE_CLASS = UIImage
-
-#elseif os(watchOS)
-
-	import WatchKit
-
-	typealias COLOR_CLASS = UIColor
-	typealias FONT_CLASS = UIFont
-	typealias IMAGE_CLASS = WKImage
 
 #elseif os(OSX)
 

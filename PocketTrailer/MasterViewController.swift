@@ -171,7 +171,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		n.addObserver(self, selector: Selector("updateStatus"), name:REFRESH_STARTED_NOTIFICATION, object: nil)
 		n.addObserver(self, selector: Selector("updateStatus"), name:REFRESH_ENDED_NOTIFICATION, object: nil)
-		n.addObserver(self, selector: Selector("localNotification:"), name:RECEIVED_NOTIFICATION_KEY, object: nil)
 
 		pullRequestsItem.title = "Pull Requests"
 		pullRequestsItem.image = UIImage(named: "prsTab")
@@ -298,23 +297,23 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 	}
 
-	func localNotification(notification: NSNotification) {
-		var urlToOpen = notification.userInfo?[NOTIFICATION_URL_KEY] as? String
+	func localNotification(userInfo: [NSObject : AnyObject]) {
+		var urlToOpen = userInfo[NOTIFICATION_URL_KEY] as? String
 		var relatedItem: ListableItem?
 
-		if let commentId = DataManager.idForUriPath(notification.userInfo?[COMMENT_ID_KEY] as? String), c = existingObjectWithID(commentId) as? PRComment {
+		if let commentId = DataManager.idForUriPath(userInfo[COMMENT_ID_KEY] as? String), c = existingObjectWithID(commentId) as? PRComment {
 				relatedItem = c.pullRequest ?? c.issue
 				if urlToOpen == nil {
 					urlToOpen = c.webUrl
 				}
-		} else if let pullRequestId = DataManager.idForUriPath(notification.userInfo?[PULL_REQUEST_ID_KEY] as? String) {
+		} else if let pullRequestId = DataManager.idForUriPath(userInfo[PULL_REQUEST_ID_KEY] as? String) {
 			relatedItem = existingObjectWithID(pullRequestId) as? ListableItem
 			if relatedItem == nil {
 				showMessage("PR not found", "Could not locale the PR related to this notification")
 			} else if urlToOpen == nil {
 				urlToOpen = relatedItem!.webUrl
 			}
-		} else if let issueId = DataManager.idForUriPath(notification.userInfo?[ISSUE_ID_KEY] as? String) {
+		} else if let issueId = DataManager.idForUriPath(userInfo[ISSUE_ID_KEY] as? String) {
 			relatedItem = existingObjectWithID(issueId) as? ListableItem
 			if relatedItem == nil {
 				showMessage("Issue not found", "Could not locale the issue related to this notification")

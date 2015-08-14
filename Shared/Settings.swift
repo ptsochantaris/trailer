@@ -1,8 +1,6 @@
 
 #if os(iOS)
 	import UIKit
-#elseif os(watchOS)
-	import WatchKit
 #endif
 
 //////////////////////////////// Somehow this won't compile if it's not here...

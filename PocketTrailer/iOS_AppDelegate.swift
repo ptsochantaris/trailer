@@ -98,6 +98,10 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 		return false
 	}
 
+	func application(application: UIApplication, continueUserActivity userActivity: NSUserActivity, restorationHandler: ([AnyObject]?) -> Void) -> Bool {
+		return NotificationManager.handleUserActivity(userActivity)
+	}
+
 	deinit {
 		NSNotificationCenter.defaultCenter().removeObserver(self)
 	}

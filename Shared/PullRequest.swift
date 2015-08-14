@@ -2,8 +2,6 @@
 import CoreData
 #if os(iOS)
 	import UIKit
-#elseif os(watchOS)
-	import WatchKit
 #endif
 
 final class PullRequest: ListableItem {
@@ -50,6 +48,12 @@ final class PullRequest: ListableItem {
 		p.condition = PullRequestCondition.Open.rawValue
 		return p
 	}
+
+	#if os(iOS)
+	override func searchKeywords() -> [String] {
+		return ["PR","Pull Request"]+super.searchKeywords()
+	}
+	#endif
 
 	class func visibleAndActivePullRequestsInMoc(moc: NSManagedObjectContext) -> [PullRequest] {
 		let f = NSFetchRequest(entityName: "PullRequest")
@@ -135,7 +139,7 @@ final class PullRequest: ListableItem {
 
 		let lightSubtitle = [NSForegroundColorAttributeName: lightColor, NSFontAttributeName:font, NSParagraphStyleAttributeName: p]
 
-		#if os(iOS) || os(watchOS)
+		#if os(iOS)
 			let separator = NSAttributedString(string:"\n", attributes:lightSubtitle)
 		#elseif os(OSX)
 			let separator = NSAttributedString(string:"   ", attributes:lightSubtitle)

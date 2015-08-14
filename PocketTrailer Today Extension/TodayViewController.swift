@@ -25,6 +25,7 @@ final class ExtensionGlobals {
 	func postNotificationOfType(type: PRNotificationType, forItem: NSManagedObject) {}
 	func setMinimumBackgroundFetchInterval(interval: NSTimeInterval) -> Void {}
 	func clearAllBadLinks() -> Void {}
+	func cachePathForAvatar(u: String) -> (String, String) { return ("", "") }
 }
 
 final class TodayViewController: UIViewController, NCWidgetProviding {

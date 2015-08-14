@@ -2,8 +2,8 @@
 import CoreData
 #if os(iOS)
 	import UIKit
-#elseif os(watchOS)
-	import WatchKit
+	import CoreSpotlight
+	import MobileCoreServices
 #endif
 
 let itemDateFormatter = { () -> NSDateFormatter in
@@ -46,6 +46,9 @@ class ListableItem: DataItem {
 	final override func prepareForDeletion() {
 		api.refreshesSinceLastLabelsCheck[objectID] = nil
 		api.refreshesSinceLastStatusCheck[objectID] = nil
+		#if os(iOS)
+		deIndexFromSpotlight()
+		#endif
 		super.prepareForDeletion()
 	}
 
@@ -283,7 +286,7 @@ class ListableItem: DataItem {
 					_title.appendAttributedString(NSAttributedString(string: "\n", attributes: titleAttributes))
 
 					let lp = NSMutableParagraphStyle()
-					#if os(iOS) || os(watchOS)
+					#if os(iOS)
 						lp.lineHeightMultiple = 1.15
 						let labelAttributes = [NSFontAttributeName: labelFont,
 						NSBaselineOffsetAttributeName: 2.0,
@@ -522,4 +525,36 @@ class ListableItem: DataItem {
 		f.sortDescriptors = sortDescriptiors
 		return f
 	}
+
+	#if os(iOS)
+	func searchKeywords() -> [String] {
+		return [(userLogin ?? "NO_USERNAME"), "Trailer", "PocketTrailer"] + (repo.fullName?.componentsSeparatedByString("/") ?? [])
+	}
+	final override func didSave() {
+		let s = CSSearchableItemAttributeSet(itemContentType: kUTTypeText as String)
+		s.title = title
+		s.contentCreationDate = createdAt
+		s.contentModificationDate = updatedAt
+		s.keywords = searchKeywords()
+		s.creator = userLogin
+
+		s.contentDescription = (repo.fullName ?? "") +
+			" @" + (userLogin ?? "") +
+			" - " + (body?.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet()) ?? "")
+
+		if let i = self.userAvatarUrl where !Settings.hideAvatars {
+			let (_, cachePath) = api.cachePathForAvatar(i)
+			s.thumbnailURL = NSURL(string: "file://"+cachePath)
+		} else {
+			s.thumbnailURL = nil
+		}
+
+		let i = CSSearchableItem(uniqueIdentifier:objectID.URIRepresentation().absoluteString, domainIdentifier: nil, attributeSet: s)
+		CSSearchableIndex.defaultSearchableIndex().indexSearchableItems([i], completionHandler: nil)
+		super.didSave()
+	}
+	final func deIndexFromSpotlight() {
+			CSSearchableIndex.defaultSearchableIndex().deleteSearchableItemsWithIdentifiers([objectID.URIRepresentation().absoluteString], completionHandler: nil)
+	}
+	#endif
 }

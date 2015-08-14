@@ -2,8 +2,6 @@
 import CoreData
 #if os(iOS)
 	import UIKit
-#elseif os(watchOS)
-	import WatchKit
 #endif
 
 final class PRLabel: DataItem {

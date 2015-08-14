@@ -2,8 +2,6 @@
 import CoreData
 #if os(iOS)
 	import UIKit
-#elseif os(watchOS)
-	import WatchKit
 #endif
 
 final class Issue: ListableItem {
@@ -56,6 +54,12 @@ final class Issue: ListableItem {
 		return i
 	}
 
+	#if os(iOS)
+	override func searchKeywords() -> [String] {
+		return ["Issue"]+super.searchKeywords()
+	}
+	#endif
+
 	class func countAllIssuesInMoc(moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest(entityName: "Issue")
 		f.predicate = NSPredicate(format: "sectionIndex > 0")
@@ -104,7 +108,7 @@ final class Issue: ListableItem {
 
 		let lightSubtitle = [NSForegroundColorAttributeName: lightColor, NSFontAttributeName:font, NSParagraphStyleAttributeName: p]
 
-		#if os(iOS) || os(watchOS)
+		#if os(iOS)
 			let separator = NSAttributedString(string:"\n", attributes:lightSubtitle)
 		#elseif os(OSX)
 			let separator = NSAttributedString(string:"   ", attributes:lightSubtitle)
