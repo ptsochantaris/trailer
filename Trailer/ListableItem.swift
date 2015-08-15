@@ -539,9 +539,8 @@ class ListableItem: DataItem {
 		}
 		var suffix = ""
 		if labelNames.count > 0 {
-			suffix = " "
 			for l in labelNames {
-				suffix += "["+l+"]"
+				suffix += " ["+l+"]"
 			}
 		}
 		return (title ?? "NO TITLE") + suffix
