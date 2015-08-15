@@ -45,7 +45,7 @@
                                                     <label alignment="left" verticalAlignment="center" text="      " id="m26-4w-XIn">
                                                         <fontDescription key="font" type="system" pointSize="15"/>
                                                     </label>
-                                                    <group width="51.5" height="1" alignment="right" verticalAlignment="center" hidden="YES" radius="7" id="VK1-qB-Emf">
+                                                    <group height="1" alignment="right" verticalAlignment="center" radius="7" id="VK1-qB-Emf">
                                                         <items>
                                                             <label alignment="center" verticalAlignment="center" text=" " id="YSb-rO-7SF">
                                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -143,7 +143,6 @@
                                                 </items>
                                             </group>
                                             <label alignment="left" verticalAlignment="center" text="Details" numberOfLines="0" id="jYX-bA-AMh">
-                                                <color key="textColor" red="1" green="1" blue="1" alpha="0.59999999999999998" colorSpace="calibratedRGB"/>
                                                 <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
                                             </label>
                                             <separator width="1" alignment="center" id="7Wr-VC-T3H">

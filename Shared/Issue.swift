@@ -118,7 +118,7 @@ final class Issue: ListableItem {
 			if let n = repo.fullName {
 				var darkSubtitle = lightSubtitle
 				darkSubtitle[NSForegroundColorAttributeName] = darkColor
-				_subtitle.appendAttributedString(NSAttributedString(string:n, attributes:darkSubtitle))
+				_subtitle.appendAttributedString(NSAttributedString(string: n, attributes: darkSubtitle))
 				_subtitle.appendAttributedString(separator)
 			}
 		}

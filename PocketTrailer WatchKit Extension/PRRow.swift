@@ -14,69 +14,30 @@ final class PRRow: NSObject {
 
     @IBOutlet weak var counterGroup: WKInterfaceGroup!
 
-	/*
-    func setPullRequest(pr: PullRequest) {
+	var itemId: String?
 
-        let smallSize = UIFont.smallSystemFontSize()-2
-        let size = UIFont.systemFontSize()
+	func populateFrom(itemData: [String : AnyObject]) {
 
-        titleL.setAttributedText(pr.titleWithFont(
-            UIFont.systemFontOfSize(size),
-            labelFont: UIFont.systemFontOfSize(smallSize),
-            titleColor: UIColor.whiteColor()))
+		let documentType = [NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType]
 
-        let a = pr.subtitleWithFont(
-            UIFont.systemFontOfSize(smallSize),
-            lightColor: UIColor.lightGrayColor(),
-            darkColor: UIColor.grayColor())
+		let titleData = itemData["title"] as! NSData
+		let title = try! NSAttributedString(data: titleData, options: documentType, documentAttributes: nil)
+		titleL.setAttributedText(title)
 
-        let p = NSMutableParagraphStyle()
-        p.lineSpacing = 0
-        a.addAttribute(NSParagraphStyleAttributeName, value: p, range: NSMakeRange(0, a.length))
+		let subtitleData = itemData["subtitle"] as! NSData
+		let subtitle = try! NSAttributedString(data: subtitleData, options: documentType, documentAttributes: nil)
+		detailsL.setAttributedText(subtitle)
 
-        detailsL.setAttributedText(a)
+		itemId = itemData["localId"] as? String
 
-        let totalCount = pr.totalComments?.integerValue ?? 0
-        totalCommentsL.setText("\(totalCount)")
-        totalCommentsGroup.setHidden(totalCount==0)
+		let c = itemData["commentCount"] as? Int ?? 0
+		totalCommentsL.setText("\(c)")
+		totalCommentsGroup.setHidden(c==0)
 
-        let unreadCount = pr.unreadComments?.integerValue ?? 0
-        unreadCommentsL.setText("\(unreadCount)")
-        unreadCommentsGroup.setHidden(unreadCount==0)
+		let u = itemData["unreadCount"] as? Int ?? 0
+		unreadCommentsL.setText("\(u)")
+		unreadCommentsGroup.setHidden(u==0)
 
-        counterGroup.setHidden(totalCount+unreadCount==0)
-    }
-
-	func setIssue(i: Issue) {
-
-		let smallSize = UIFont.smallSystemFontSize()-2
-		let size = UIFont.systemFontSize()
-
-		titleL.setAttributedText(i.titleWithFont(
-			UIFont.systemFontOfSize(size),
-			labelFont: UIFont.systemFontOfSize(smallSize),
-			titleColor: UIColor.whiteColor()))
-
-		let a = i.subtitleWithFont(
-			UIFont.systemFontOfSize(smallSize),
-			lightColor: UIColor.lightGrayColor(),
-			darkColor: UIColor.grayColor())
-
-		let p = NSMutableParagraphStyle()
-		p.lineSpacing = 0
-		a.addAttribute(NSParagraphStyleAttributeName, value: p, range: NSMakeRange(0, a.length))
-
-		detailsL.setAttributedText(a)
-
-		let totalCount = i.totalComments?.integerValue ?? 0
-		totalCommentsL.setText("\(totalCount)")
-		totalCommentsGroup.setHidden(totalCount==0)
-
-		let unreadCount = i.unreadComments?.integerValue ?? 0
-		unreadCommentsL.setText("\(unreadCount)")
-		unreadCommentsGroup.setHidden(unreadCount==0)
-
-		counterGroup.setHidden(totalCount+unreadCount==0)
+		counterGroup.setHidden(c+u==0)
 	}
-*/
 }

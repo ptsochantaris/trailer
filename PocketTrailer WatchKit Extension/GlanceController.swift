@@ -131,7 +131,7 @@ final class GlanceController: WKInterfaceController {
 		}
 
 		let lastRefresh = result["lastUpdated"] as! NSDate
-		if lastRefresh.isEqualToDate(NSDate.distantPast()) {
+		if lastRefresh.isEqualToDate(never()) {
 			lastUpdate.setText("Not refreshed yet")
 		} else {
 			lastUpdate.setText(shortDateFormatter.stringFromDate(lastRefresh))

@@ -208,6 +208,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	private func reportFailure(reason: String, _ result: [String : AnyObject], _ replyHandler: ([String : AnyObject]) -> Void) {
 		var r = result
+		r["error"] = true
 		r["status"] = reason
 		r["color"] = "FF0000"
 		replyHandler(r)
@@ -252,17 +253,42 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	private func baseDataForItem(item: ListableItem, showStatuses: Bool) -> [String : AnyObject] {
 		var itemData = [
-			"title": item.title ?? "NOTITLE",
-			"unreadcount": item.unreadComments ?? 0,
-			"repo": item.repo.fullName ?? "NOREPONAME",
-			"user": item.userLogin ?? "NONAME",
-			"date": (Settings.showCreatedInsteadOfUpdated ? item.createdAt : item.updatedAt) ?? NSDate.distantPast(),
-			"localId": item.objectID.URIRepresentation().absoluteString
+			"commentCount": item.totalComments ?? 0,
+			"unreadCount": item.unreadComments ?? 0,
+			"localId": item.objectID.URIRepresentation().absoluteString,
 		]
+
+		let font = UIFont.systemFontOfSize(UIFont.systemFontSize())
+		let smallFont = UIFont.systemFontOfSize(UIFont.systemFontSize()-4)
+		itemData["title"] = toData(item.titleWithFont(font, labelFont: font, titleColor: UIColor.whiteColor()))
+		if item is PullRequest {
+			itemData["subtitle"] = toData((item as! PullRequest).subtitleWithFont(smallFont, lightColor: UIColor.greenColor(), darkColor: UIColor.blueColor()))
+		} else {
+			itemData["subtitle"] = toData((item as! Issue).subtitleWithFont(smallFont, lightColor: UIColor.greenColor(), darkColor: UIColor.blueColor()))
+		}
+
+		if Settings.showLabels {
+			itemData["labels"] = labelsForItem(item)
+		}
 		if showStatuses {
 			itemData["statuses"] = statusLinesForPr(item as! PullRequest)
 		}
 		return itemData
+	}
+
+	private func toData(s: NSAttributedString) -> NSData {
+		return try! s.dataFromRange(NSMakeRange(0, s.length), documentAttributes: [NSDocumentTypeDocumentAttribute:NSRTFTextDocumentType])
+	}
+
+	private func labelsForItem(item: ListableItem) -> [[String : AnyObject]] {
+		var labels = [[String : AnyObject]]()
+		for l in item.labels {
+			labels.append([
+				"color": colorToHex(l.colorForDisplay()),
+				"text": l.name ?? "NOTEXT"
+				])
+		}
+		return labels
 	}
 
 	private func statusLinesForPr(pr: PullRequest) -> [[String : AnyObject]] {
@@ -294,7 +320,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		for comment in item.comments {
 			comments.append([
 				"user": comment.userName ?? "NOUSER",
-				"date": comment.createdAt ?? NSDate.distantPast(),
+				"date": comment.createdAt ?? never(),
 				"text": comment.body ?? "NOBODY",
 				])
 		}
@@ -331,7 +357,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			"prs": prs,
 			"issues": issues,
 			"glanceWantsIssues": Settings.showIssuesInGlance,
-			"lastUpdated": Settings.lastSuccessfulRefresh ?? NSDate.distantPast()
+			"lastUpdated": Settings.lastSuccessfulRefresh ?? never()
 		]
 	}
 

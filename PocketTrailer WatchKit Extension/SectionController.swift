@@ -7,12 +7,12 @@ final class SectionController: WKInterfaceController {
 	@IBOutlet weak var table: WKInterfaceTable!
 	@IBOutlet weak var statusLabel: WKInterfaceLabel!
 
-	private var selectedIndex: Int?
 	private var firstLoad: Bool = true
+	private var rowControllers = [PopulatableRow]()
+	private var selectedIndex: Int?
 
 	override func awakeWithContext(context: AnyObject?) {
 		setTitle("Sections")
-		showStatus("Loading")
 		sendCommand(nil)
 	}
 
@@ -28,7 +28,7 @@ final class SectionController: WKInterfaceController {
 	}
 
 	override func didAppear() {
-		(WKExtension.sharedExtension().delegate as! ExtensionDelegate).lastView = "SECTION"
+		app.lastView = "SECTION"
 		firstLoad = false
 		super.didAppear()
 	}
@@ -40,18 +40,29 @@ final class SectionController: WKInterfaceController {
 	}
 
 	private func sendCommand(command: String?) {
+		showStatus("Loading")
+
 		var params = ["list": "overview"]
 		if let command = command {
 			params["command"] = command
 		}
 		WCSession.defaultSession().sendMessage(params, replyHandler: { response in
-			self.updateFromData(response)
-			self.showStatus("")
+			if let errorIndicator = response["error"] as? Bool where errorIndicator == true {
+				self.showTemporaryError(response["status"] as! String)
+			} else {
+				self.updateFromData(response)
+			}
 			}) { error in
-				self.showStatus("Error: "+error.localizedDescription)
-				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(3.0 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
-					self.showStatus("")
-				}
+				self.showTemporaryError("Error: "+error.localizedDescription)
+		}
+	}
+
+	private func showTemporaryError(error: String) {
+		self.statusLabel.setTextColor(UIColor.redColor())
+		self.showStatus(error)
+		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(3.0 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
+			self.statusLabel.setTextColor(UIColor.whiteColor())
+			self.showStatus("")
 		}
 	}
 
@@ -81,8 +92,6 @@ final class SectionController: WKInterfaceController {
 		let section = r.section?.rawValue
 		pushControllerWithName("ListController", context: [ SECTION_KEY: section!, TYPE_KEY: r.type! ] )
 	}
-
-    private var rowControllers = [PopulatableRow]()
 
 	private func updateFromData(data: [String : AnyObject]) {
 
@@ -146,6 +155,12 @@ final class SectionController: WKInterfaceController {
 			if let c = table.rowControllerAtIndex(index++) as? PopulatableRow {
 				c.populateFrom(rc)
 			}
+		}
+
+		self.showStatus("")
+		if let s = self.selectedIndex {
+			self.table.scrollToRowAtIndex(s)
+			self.selectedIndex = nil
 		}
 	}
 }
