@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="8173.3" systemVersion="14E46" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="AgC-eL-Hgc">
+<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="8173.3" systemVersion="15A243d" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="AgC-eL-Hgc">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8142"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="8089"/>
@@ -10,6 +10,9 @@
             <objects>
                 <controller identifier="SectionController" id="AgC-eL-Hgc" customClass="SectionController" customModule="Trailer">
                     <items>
+                        <label alignment="center" verticalAlignment="center" text="..." numberOfLines="0" id="tZx-Xo-NwI">
+                            <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
+                        </label>
                         <group width="1" alignment="center" verticalAlignment="center" radius="0.0" id="AJn-j1-vO3">
                             <items>
                                 <table alignment="left" verticalAlignment="center" id="be2-ie-h5R">
@@ -39,12 +42,12 @@
                                         <tableRow identifier="SectionRow" id="ql1-oS-xZe" customClass="SectionRow" customModule="Trailer">
                                             <group key="rootItem" width="1" height="0.0" alignment="left" radius="2" id="Uft-cP-lJ6">
                                                 <items>
-                                                    <label alignment="left" verticalAlignment="center" text="Title" id="m26-4w-XIn">
+                                                    <label alignment="left" verticalAlignment="center" text="      " id="m26-4w-XIn">
                                                         <fontDescription key="font" type="system" pointSize="15"/>
                                                     </label>
-                                                    <group height="1" alignment="right" radius="7" id="VK1-qB-Emf">
+                                                    <group width="51.5" height="1" alignment="right" verticalAlignment="center" hidden="YES" radius="7" id="VK1-qB-Emf">
                                                         <items>
-                                                            <label alignment="center" verticalAlignment="center" text="Count" id="YSb-rO-7SF">
+                                                            <label alignment="center" verticalAlignment="center" text=" " id="YSb-rO-7SF">
                                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                                 <fontDescription key="font" type="system" pointSize="15"/>
                                                             </label>
@@ -92,6 +95,7 @@
                         </items>
                     </menu>
                     <connections>
+                        <outlet property="statusLabel" destination="tZx-Xo-NwI" id="PUL-4Q-1WY"/>
                         <outlet property="table" destination="be2-ie-h5R" id="Lhy-Wj-Csa"/>
                     </connections>
                 </controller>
@@ -103,7 +107,9 @@
             <objects>
                 <controller identifier="ListController" id="Sqe-dw-Y9B" customClass="PRListController" customModule="Trailer">
                     <items>
-                        <label alignment="center" verticalAlignment="center" hidden="YES" text="No items in this section" textAlignment="center" numberOfLines="0" id="PLW-UR-bJ2"/>
+                        <label alignment="center" verticalAlignment="center" text="..." numberOfLines="0" id="2Zp-yv-wv1">
+                            <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
+                        </label>
                         <table alignment="left" id="XeC-bN-XlT">
                             <items>
                                 <tableRow identifier="PRRow" id="qcu-Df-oql" customClass="PRRow" customModule="Trailer">
@@ -175,18 +181,21 @@
                         </items>
                     </menu>
                     <connections>
-                        <outlet property="emptyLabel" destination="PLW-UR-bJ2" id="c3I-dN-bDl"/>
+                        <outlet property="statusLabel" destination="2Zp-yv-wv1" id="HEf-5X-yG4"/>
                         <outlet property="table" destination="XeC-bN-XlT" id="eNr-td-1B9"/>
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="409" y="225"/>
+            <point key="canvasLocation" x="409" y="217"/>
         </scene>
         <!--DetailController-->
         <scene sceneID="Y5a-NZ-okm">
             <objects>
                 <controller identifier="DetailController" id="Hgm-oe-oa5" customClass="PRDetailController" customModule="Trailer">
                     <items>
+                        <label alignment="center" verticalAlignment="center" text="..." numberOfLines="0" id="Adx-ov-WlP">
+                            <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
+                        </label>
                         <table alignment="left" id="nDu-Js-IyV">
                             <items>
                                 <tableRow identifier="StatusRow" selectable="NO" id="O5R-Ty-nOY" customClass="StatusRow" customModule="Trailer">
@@ -282,11 +291,12 @@
                         </items>
                     </menu>
                     <connections>
+                        <outlet property="statusLabel" destination="Adx-ov-WlP" id="yr1-Fc-kGN"/>
                         <outlet property="table" destination="nDu-Js-IyV" id="LiY-op-bsm"/>
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="660" y="225"/>
+            <point key="canvasLocation" x="409" y="502.25"/>
         </scene>
         <!--Glance Interface Controller-->
         <scene sceneID="rjY-Ar-IMT">
@@ -444,31 +454,7 @@
                     </connections>
                 </glanceController>
             </objects>
-            <point key="canvasLocation" x="164" y="514"/>
-        </scene>
-        <!--Command Controller-->
-        <scene sceneID="3pa-8N-Joz">
-            <objects>
-                <controller identifier="Command Controller" id="Aye-qq-uqB" customClass="CommandController" customModule="Trailer">
-                    <items>
-                        <group width="100" alignment="center" verticalAlignment="center" id="okz-U3-TVg">
-                            <items>
-                                <label alignment="center" verticalAlignment="center" text="ONE MOMENT PLEASE" textAlignment="center" numberOfLines="0" id="TaB-Gc-8NT">
-                                    <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
-                                    <fontDescription key="font" style="UICTFontTextStyleHeadline"/>
-                                </label>
-                            </items>
-                            <color key="backgroundColor" red="0.20784313730000001" green="0.4823529412" blue="0.82352941180000006" alpha="1" colorSpace="calibratedRGB"/>
-                            <edgeInsets key="margins" left="4" right="4" top="3" bottom="3"/>
-                        </group>
-                    </items>
-                    <connections>
-                        <outlet property="feedbackGroup" destination="okz-U3-TVg" id="2Ba-uc-5cB"/>
-                        <outlet property="feedbackLabel" destination="TaB-Gc-8NT" id="3Xa-tS-sUy"/>
-                    </connections>
-                </controller>
-            </objects>
-            <point key="canvasLocation" x="422" y="515"/>
+            <point key="canvasLocation" x="164" y="460"/>
         </scene>
     </scenes>
     <color key="tintColor" red="0.20784313730000001" green="0.4823529412" blue="0.82352941180000006" alpha="1" colorSpace="calibratedRGB"/>

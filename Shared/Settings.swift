@@ -3,10 +3,6 @@
 	import UIKit
 #endif
 
-//////////////////////////////// Somehow this won't compile if it's not here...
-
-typealias Completion = ()->Void
-
 final class PopTimer : NSObject {
 
 	var _popTimer: NSTimer?

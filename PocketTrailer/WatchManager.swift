@@ -44,7 +44,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 					NSThread.sleepForTimeInterval(0.1)
 				}
 
-				atNextEvent() {
+				atNextEvent {
 					if Settings.lastSuccessfulRefresh == nil || lastSuccessfulSync.isEqualToDate(Settings.lastSuccessfulRefresh!) {
 						self.reportFailure("Refresh Failed", message, replyHandler)
 					} else {
@@ -59,7 +59,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				m.openPrWithId(itemId)
 				DataManager.saveDB()
 			}
-			atNextEvent() {
+			atNextEvent {
 				self.processList(message, replyHandler)
 			}
 
@@ -69,7 +69,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				m.openIssueWithId(itemId)
 				DataManager.saveDB()
 			}
-			atNextEvent() {
+			atNextEvent {
 				self.processList(message, replyHandler)
 			}
 
@@ -79,7 +79,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				m.openCommentWithId(itemId)
 				DataManager.saveDB()
 			}
-			atNextEvent() {
+			atNextEvent {
 				self.processList(message, replyHandler)
 			}
 
@@ -91,7 +91,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			let m = popupManager.getMasterController()
 			m.reloadDataWithAnimation(false)
 			m.updateStatus()
-			atNextEvent() {
+			atNextEvent {
 				self.processList(message, replyHandler)
 			}
 
@@ -106,7 +106,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			let m = popupManager.getMasterController()
 			m.reloadDataWithAnimation(false)
 			m.updateStatus()
-			atNextEvent() {
+			atNextEvent {
 				self.processList(message, replyHandler)
 			}
 
@@ -120,7 +120,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 					DataManager.saveDB()
 					app.updateBadge()
 			}
-			atNextEvent() {
+			atNextEvent {
 				self.processList(message, replyHandler)
 			}
 
@@ -134,7 +134,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 					DataManager.saveDB()
 					app.updateBadge()
 			}
-			atNextEvent() {
+			atNextEvent {
 				self.processList(message, replyHandler)
 			}
 
@@ -144,7 +144,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			popupManager.getMasterController().reloadDataWithAnimation(false)
 			DataManager.saveDB()
 			app.updateBadge()
-			atNextEvent() {
+			atNextEvent {
 				self.processList(message, replyHandler)
 			}
 
@@ -155,7 +155,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				DataManager.saveDB()
 				app.updateBadge()
 			}
-			atNextEvent() {
+			atNextEvent {
 				self.processList(message, replyHandler)
 			}
 
@@ -166,12 +166,12 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				DataManager.saveDB()
 				app.updateBadge()
 			}
-			atNextEvent() {
+			atNextEvent {
 				self.processList(message, replyHandler)
 			}
 
 		default:
-			atNextEvent() {
+			atNextEvent {
 				self.processList(message, replyHandler)
 			}
 		}

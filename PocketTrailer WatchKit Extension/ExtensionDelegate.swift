@@ -12,6 +12,7 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 
 	let session = WCSession.defaultSession()
 	var appLaunched = false
+	var lastView = ""
 
 	func startWatchConnectSessionIfNeeded() {
 		if session.delegate == nil {
@@ -33,6 +34,7 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 	}
 
 	func applicationWillResignActive() {
+		lastView = ""
 	}
 
 }

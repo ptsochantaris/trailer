@@ -17,6 +17,12 @@ let bodyAttributes = { () -> [String : AnyObject] in
 final class PRDetailController: WKInterfaceController {
 
 	@IBOutlet weak var table: WKInterfaceTable!
+	@IBOutlet var statusLabel: WKInterfaceLabel!
+
+	override func didAppear() {
+		(WKExtension.sharedExtension().delegate as! ExtensionDelegate).lastView = "DETAIL"
+		super.didAppear()
+	}
 
 	/*
 	private var pullRequest: PullRequest?

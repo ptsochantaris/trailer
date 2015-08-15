@@ -4,8 +4,13 @@ import Foundation
 
 final class PRListController: WKInterfaceController {
 
-	@IBOutlet weak var emptyLabel: WKInterfaceLabel!
 	@IBOutlet weak var table: WKInterfaceTable!
+	@IBOutlet var statusLabel: WKInterfaceLabel!
+
+	override func didAppear() {
+		(WKExtension.sharedExtension().delegate as! ExtensionDelegate).lastView = "LIST"
+		super.didAppear()
+	}
 
 	/*
 	private var itemsInSection: [ListableItem]!

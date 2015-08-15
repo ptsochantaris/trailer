@@ -8,6 +8,7 @@ enum PullRequestSection: Int {
 	static let prMenuTitles = ["", "Mine", "Participated", "Recently Merged", "Recently Closed", "All Pull Requests"]
 	static let issueMenuTitles = ["", "Mine", "Participated", "Recently Merged", "Recently Closed", "All Issues"]
 	static let watchMenuTitles = ["", "Mine", "Participated", "Merged", "Closed", "Other"]
+	static let apiTitles = ["", "mine", "participated", "merged", "closed", "other"]
 	func prMenuName() -> String {
 		return PullRequestSection.prMenuTitles[rawValue]
 	}
@@ -17,6 +18,12 @@ enum PullRequestSection: Int {
 	func watchMenuName() -> String {
 		return PullRequestSection.watchMenuTitles[rawValue]
 	}
+	func apiName() -> String {
+		return PullRequestSection.apiTitles[rawValue]
+	}
+}
+func sectionFromApi(apiName: String) -> PullRequestSection {
+	return PullRequestSection(rawValue: PullRequestSection.apiTitles.indexOf(apiName)!)!
 }
 
 enum StatusFilter: Int {

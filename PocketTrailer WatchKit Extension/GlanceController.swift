@@ -39,17 +39,28 @@ final class GlanceController: WKInterfaceController {
 	@IBOutlet weak var prIcon: WKInterfaceImage!
 	@IBOutlet weak var issueIcon: WKInterfaceImage!
 
+	private var firstLoad: Bool = true
+
 	override func awakeWithContext(context: AnyObject?) {
 		let d = WKExtension.sharedExtension().delegate as! ExtensionDelegate
 		d.startWatchConnectSessionIfNeeded()
 		NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("reachabilityChanged"), name: SESSION_REACHABILITY_CHANGE_KEY, object: nil)
 		errorText.setText("Loading...")
 		setErrorMode(true)
+		if firstLoad {
+			requestUpdate()
+		}
 	}
 
 	override func willActivate() {
 		super.willActivate()
-		requestUpdate()
+		if !firstLoad {
+			requestUpdate()
+		}
+	}
+
+	override func didAppear() {
+		firstLoad = false
 	}
 
 	func reachabilityChanged() {
@@ -57,13 +68,16 @@ final class GlanceController: WKInterfaceController {
 	}
 
 	private func requestUpdate() {
+		beginGlanceUpdates()
 		WCSession.defaultSession().sendMessage(["list": "overview"], replyHandler: { data in
 			dispatch_async(dispatch_get_main_queue()) {
 				self.updateFromData(data)
+				self.endGlanceUpdates()
 			}
 			}) { error  in
 				dispatch_async(dispatch_get_main_queue()) {
 					self.showError(error)
+					self.endGlanceUpdates()
 				}
 		}
 	}
@@ -82,29 +96,29 @@ final class GlanceController: WKInterfaceController {
 		let tc = r["total"] as! Int
 		totalCount.setText("\(tc)")
 
-		let mc = r["mine"]?["total"] as! Int
+		let mc = r[PullRequestSection.Mine.apiName()]?["total"] as! Int
 		myCount.setText("\(mc) \(PullRequestSection.Mine.watchMenuName().uppercaseString)")
 		myGroup.setAlpha(mc==0 ? 0.4 : 1.0)
 
-		let pc = r["participated"]?["total"] as! Int
+		let pc = r[PullRequestSection.Participated.apiName()]?["total"] as! Int
 		participatedCount.setText("\(pc) \(PullRequestSection.Participated.watchMenuName().uppercaseString)")
 		participatedGroup.setAlpha(pc==0 ? 0.4 : 1.0)
 
 		if !showIssues {
-			let rc = r["merged"]?["total"] as! Int
+			let rc = r[PullRequestSection.Merged.apiName()]?["total"] as! Int
 			mergedCount.setText("\(rc) \(PullRequestSection.Merged.watchMenuName().uppercaseString)")
 			mergedGroup.setAlpha(rc==0 ? 0.4 : 1.0)
 		}
 
-		let cc = r["closed"]?["total"] as! Int
+		let cc = r[PullRequestSection.Closed.apiName()]?["total"] as! Int
 		closedCount.setText("\(cc) \(PullRequestSection.Closed.watchMenuName().uppercaseString)")
 		closedGroup.setAlpha(cc==0 ? 0.4 : 1.0)
 
-		let oc = r["other"]?["total"] as! Int
+		let oc = r[PullRequestSection.All.apiName()]?["total"] as! Int
 		otherCount.setText("\(oc) \(PullRequestSection.All.watchMenuName().uppercaseString)")
 		otherGroup.setAlpha(oc==0 ? 0.4 : 1.0)
 
-		let uc = r["participated"]?["unread"] as! Int
+		let uc = r["unread"] as! Int
 		if uc==0 {
 			unreadCount.setText("NONE UNREAD")
 			unreadGroup.setAlpha(0.3)
