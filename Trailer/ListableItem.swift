@@ -530,9 +530,25 @@ class ListableItem: DataItem {
 	func searchKeywords() -> [String] {
 		return [(userLogin ?? "NO_USERNAME"), "Trailer", "PocketTrailer"] + (repo.fullName?.componentsSeparatedByString("/") ?? [])
 	}
-	final override func didSave() {
+	final func searchTitle() -> String {
+		var labelNames = [String]()
+		for l in labels {
+			if let l = l.name {
+				labelNames.append(l)
+			}
+		}
+		var suffix = ""
+		if labelNames.count > 0 {
+			suffix = " "
+			for l in labelNames {
+				suffix += "["+l+"]"
+			}
+		}
+		return (title ?? "NO TITLE") + suffix
+	}
+	final func indexForSpotlight() {
 		let s = CSSearchableItemAttributeSet(itemContentType: kUTTypeText as String)
-		s.title = title
+		s.title = searchTitle()
 		s.contentCreationDate = createdAt
 		s.contentModificationDate = updatedAt
 		s.keywords = searchKeywords()
@@ -551,10 +567,9 @@ class ListableItem: DataItem {
 
 		let i = CSSearchableItem(uniqueIdentifier:objectID.URIRepresentation().absoluteString, domainIdentifier: nil, attributeSet: s)
 		CSSearchableIndex.defaultSearchableIndex().indexSearchableItems([i], completionHandler: nil)
-		super.didSave()
 	}
 	final func deIndexFromSpotlight() {
-			CSSearchableIndex.defaultSearchableIndex().deleteSearchableItemsWithIdentifiers([objectID.URIRepresentation().absoluteString], completionHandler: nil)
+		CSSearchableIndex.defaultSearchableIndex().deleteSearchableItemsWithIdentifiers([objectID.URIRepresentation().absoluteString], completionHandler: nil)
 	}
 	#endif
 }

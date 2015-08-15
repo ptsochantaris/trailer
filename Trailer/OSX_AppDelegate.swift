@@ -656,7 +656,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		updateIssuesMenu()
 		checkApiUsage()
 		DataManager.saveDB()
-		DataManager.sendNotifications()
+		DataManager.sendNotificationsAndIndex()
 		DLog("Refresh done")
 	}
 

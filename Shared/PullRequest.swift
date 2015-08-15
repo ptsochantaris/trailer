@@ -51,7 +51,13 @@ final class PullRequest: ListableItem {
 
 	#if os(iOS)
 	override func searchKeywords() -> [String] {
-		return ["PR","Pull Request"]+super.searchKeywords()
+		var labelNames = [String]()
+		for l in labels {
+			if let l = l.name {
+				labelNames.append(l)
+			}
+		}
+		return ["PR","Pull Request"]+super.searchKeywords()+labelNames
 	}
 	#endif
 

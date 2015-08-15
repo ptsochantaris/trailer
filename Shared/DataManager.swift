@@ -96,7 +96,7 @@ final class DataManager : NSObject {
 		}
 	}
 
-	class func sendNotifications() {
+	class func sendNotificationsAndIndex() {
 
 		let newPrs = PullRequest.newItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest]
 		for p in newPrs {
@@ -184,10 +184,16 @@ final class DataManager : NSObject {
 
 		for p in allTouchedPrs {
 			p.postSyncAction = PostSyncAction.DoNothing.rawValue
+			#if os(iOS)
+			p.indexForSpotlight()
+			#endif
 		}
 
 		for i in allTouchedIssues {
 			i.postSyncAction = PostSyncAction.DoNothing.rawValue
+			#if os(iOS)
+			i.indexForSpotlight()
+			#endif
 		}
 	}
 
