@@ -330,29 +330,33 @@ final class WatchManager : NSObject, WCSessionDelegate {
 	//////////////////////////////
 
 	private func buildOverview() -> [String : AnyObject] {
+		let totalPrs = PullRequest.countAllRequestsInMoc(mainObjectContext)
 		var prs: [String : AnyObject] = [
 			"mine": prCountsForSection(PullRequestSection.Mine),
 			"participated": prCountsForSection(PullRequestSection.Participated),
 			"merged": prCountsForSection(PullRequestSection.Merged),
 			"closed": prCountsForSection(PullRequestSection.Closed),
 			"other": prCountsForSection(PullRequestSection.All),
-			"total": PullRequest.countAllRequestsInMoc(mainObjectContext),
+			"total": totalPrs,
 			"unread": PullRequest.badgeCountInMoc(mainObjectContext)
 		]
-		if prs.count==0 {
+		if totalPrs==0 {
 			prs["error"] = DataManager.reasonForEmptyWithFilter(nil).string
 		}
+
+		let totalIssues = Issue.countAllIssuesInMoc(mainObjectContext)
 		var issues: [String : AnyObject] = [
 			"mine": issueCountsForSection(PullRequestSection.Mine),
 			"participated": issueCountsForSection(PullRequestSection.Participated),
 			"closed": issueCountsForSection(PullRequestSection.Closed),
 			"other": issueCountsForSection(PullRequestSection.All),
-			"total": Issue.countAllIssuesInMoc(mainObjectContext),
+			"total": totalIssues,
 			"unread": Issue.badgeCountInMoc(mainObjectContext)
 		]
-		if issues.count==0 {
+		if totalIssues==0 {
 			issues["error"] = DataManager.reasonForEmptyIssuesWithFilter(nil).string
 		}
+
 		return [
 			"prs": prs,
 			"issues": issues,

@@ -22,7 +22,8 @@ final class SectionController: WKInterfaceController {
 
 	override func willActivate() {
 		super.willActivate()
-		if !firstLoad && app.session.reachable && app.lastView != "SECTION" {
+		let session = WCSession.defaultSession()
+		if !firstLoad && session.reachable && app.lastView != "SECTION" {
 			sendCommand(nil)
 		}
 	}
@@ -47,13 +48,17 @@ final class SectionController: WKInterfaceController {
 			params["command"] = command
 		}
 		WCSession.defaultSession().sendMessage(params, replyHandler: { response in
-			if let errorIndicator = response["error"] as? Bool where errorIndicator == true {
-				self.showTemporaryError(response["status"] as! String)
-			} else {
-				self.updateFromData(response)
-			}
+			dispatch_async(dispatch_get_main_queue(), { () -> Void in
+				if let errorIndicator = response["error"] as? Bool where errorIndicator == true {
+					self.showTemporaryError(response["status"] as! String)
+				} else {
+					self.updateFromData(response)
+				}
+			})
 			}) { error in
-				self.showTemporaryError("Error: "+error.localizedDescription)
+				dispatch_async(dispatch_get_main_queue(), { 
+					self.showTemporaryError("Error: "+error.localizedDescription)
+				})
 		}
 	}
 
@@ -159,7 +164,9 @@ final class SectionController: WKInterfaceController {
 
 		self.showStatus("")
 		if let s = self.selectedIndex {
-			self.table.scrollToRowAtIndex(s)
+			dispatch_async(dispatch_get_main_queue(), { () -> Void in
+				self.table.scrollToRowAtIndex(s)
+			})
 			self.selectedIndex = nil
 		}
 	}

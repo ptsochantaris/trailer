@@ -10,7 +10,7 @@ let shortDateFormatter = { () -> NSDateFormatter in
 	return d
 	}()
 
-final class GlanceController: WKInterfaceController {
+final class GlanceController: WKInterfaceController, WCSessionDelegate {
 
     @IBOutlet weak var totalCount: WKInterfaceLabel!
 	@IBOutlet var totalGroup: WKInterfaceGroup!
@@ -42,11 +42,13 @@ final class GlanceController: WKInterfaceController {
 	private var firstLoad: Bool = true
 
 	override func awakeWithContext(context: AnyObject?) {
-		let d = WKExtension.sharedExtension().delegate as! ExtensionDelegate
-		d.startWatchConnectSessionIfNeeded()
-		NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("reachabilityChanged"), name: SESSION_REACHABILITY_CHANGE_KEY, object: nil)
 		errorText.setText("Loading...")
 		setErrorMode(true)
+
+		let session = WCSession.defaultSession()
+		session.delegate = self
+		session.activateSession()
+
 		if firstLoad {
 			requestUpdate()
 		}
@@ -63,7 +65,7 @@ final class GlanceController: WKInterfaceController {
 		firstLoad = false
 	}
 
-	func reachabilityChanged() {
+	func sessionReachabilityDidChange(session: WCSession) {
 		requestUpdate()
 	}
 
@@ -141,13 +143,12 @@ final class GlanceController: WKInterfaceController {
 	}
 
 	private func showError(error: NSError) {
+
 		setErrorMode(true)
-		let d = WKExtension.sharedExtension().delegate as! ExtensionDelegate
-		if !WCSession.defaultSession().reachable && d.appLaunched == false {
-			errorText.setText("Please tap to open PocketTrailer for the first time to make glance work");
-		} else if !WCSession.defaultSession().reachable {
+		let session = WCSession.defaultSession()
+		if !session.reachable {
 			errorText.setText("PocketTrailer cannot connect to your iPhone");
-		} else if WCSession.defaultSession().iOSDeviceNeedsUnlockAfterRebootForReachability {
+		} else if session.iOSDeviceNeedsUnlockAfterRebootForReachability {
 			errorText.setText("Please unlock your iPhone first");
 		} else {
 			errorText.setText(error.localizedDescription)
