@@ -254,7 +254,7 @@ class ListableItem: DataItem {
 				}
 			}
 		}
-		return ",".join(components)
+		return components.joinWithSeparator(",")
 	}
 
 	final func sortedLabels() -> [PRLabel] {
@@ -349,7 +349,7 @@ class ListableItem: DataItem {
 
 	final class func serverPredicateFromFilterString(string: String) -> NSPredicate? {
 		if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 7 {
-			let serverNames = string.substringFromIndex(advance(string.startIndex, 7))
+			let serverNames = string.substringFromIndex(string.startIndex.advancedBy(7))
 			if !serverNames.characters.isEmpty {
 				var orTerms = [NSPredicate]()
 				for term in serverNames.componentsSeparatedByString(",") {
@@ -363,7 +363,7 @@ class ListableItem: DataItem {
 
 	final class func titlePredicateFromFilterString(string: String) -> NSPredicate? {
 		if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 6 {
-			let titleTerms = string.substringFromIndex(advance(string.startIndex, 6))
+			let titleTerms = string.substringFromIndex(string.startIndex.advancedBy(6))
 			if !titleTerms.characters.isEmpty {
 				var orTerms = [NSPredicate]()
 				for term in titleTerms.componentsSeparatedByString(",") {
@@ -377,7 +377,7 @@ class ListableItem: DataItem {
 
     final class func repoPredicateFromFilterString(string: String) -> NSPredicate? {
         if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 5 {
-            let repoNames = string.substringFromIndex(advance(string.startIndex, 5))
+            let repoNames = string.substringFromIndex(string.startIndex.advancedBy(5))
             if !repoNames.characters.isEmpty {
 				var orTerms = [NSPredicate]()
 				for term in repoNames.componentsSeparatedByString(",") {
@@ -391,7 +391,7 @@ class ListableItem: DataItem {
 
     final class func labelPredicateFromFilterString(string: String) -> NSPredicate? {
         if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 6 {
-            let labelNames = string.substringFromIndex(advance(string.startIndex, 6))
+            let labelNames = string.substringFromIndex(string.startIndex.advancedBy(6))
             if !labelNames.characters.isEmpty {
 				var orTerms = [NSPredicate]()
 				for term in labelNames.componentsSeparatedByString(",") {
@@ -405,7 +405,7 @@ class ListableItem: DataItem {
 
     final class func statusPredicateFromFilterString(string: String) -> NSPredicate? {
         if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 7 {
-            let statusNames = string.substringFromIndex(advance(string.startIndex, 7))
+            let statusNames = string.substringFromIndex(string.startIndex.advancedBy(7))
             if !statusNames.characters.isEmpty {
 				var orTerms = [NSPredicate]()
 				for term in statusNames.componentsSeparatedByString(",") {
@@ -419,7 +419,7 @@ class ListableItem: DataItem {
 
     final class func userPredicateFromFilterString(string: String) -> NSPredicate? {
         if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 5 {
-            let userNames = string.substringFromIndex(advance(string.startIndex, 5))
+            let userNames = string.substringFromIndex(string.startIndex.advancedBy(5))
             if !userNames.characters.isEmpty {
 				var orTerms = [NSPredicate]()
 				for term in userNames.componentsSeparatedByString(",") {

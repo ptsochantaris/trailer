@@ -92,7 +92,7 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 						errorServers.append(apiServer.label ?? "Untitled Server")
 					}
 				}
-				let serverNames = ", ".join(errorServers)
+				let serverNames = errorServers.joinWithSeparator(", ")
 				showMessage("Error", "Could not refresh repository list from \(serverNames), please ensure that the tokens you are using are valid")
 			} else {
 				try! tempContext.save()

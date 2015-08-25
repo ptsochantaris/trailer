@@ -209,7 +209,7 @@ final class ApiServer: NSManagedObject {
 				if k=="repos" {
 					a.configureReposFromArchive(v as! [String : [String : NSObject]])
 				} else {
-					let attributes = a.entity.attributesByName.keys.array
+					let attributes = Array(a.entity.attributesByName.keys)
 					if attributes.contains(k) {
 						a.setValue(v, forKey: k)
 					}
@@ -230,7 +230,7 @@ final class ApiServer: NSManagedObject {
 		for (_, repoData) in archive {
 			let r = NSEntityDescription.insertNewObjectForEntityForName("Repo", inManagedObjectContext: managedObjectContext!) as! Repo
 			for (k,v) in repoData {
-				let attributes = r.entity.attributesByName.keys.array
+				let attributes = Array(r.entity.attributesByName.keys)
 				if attributes.contains(k) {
 					r.setValue(v, forKey: k)
 				}

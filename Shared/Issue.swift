@@ -164,6 +164,6 @@ final class Issue: ListableItem {
 			components.append("Updated \(itemDateFormatter.stringFromDate(updatedAt!))")
 		}
 
-		return ",".join(components)
+		return components.joinWithSeparator(",")
 	}
 }

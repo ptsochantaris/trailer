@@ -203,7 +203,7 @@ final class PullRequest: ListableItem {
 			components.append("Cannot be merged!")
 		}
 
-		return ",".join(components)
+		return components.joinWithSeparator(",")
 	}
 
 	func displayedStatuses() -> [PRStatus] {

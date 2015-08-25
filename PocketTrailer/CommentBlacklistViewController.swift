@@ -50,7 +50,7 @@ final class CommentBlacklistViewController: UITableViewController {
 
 				var name: String = n
 				if name.characters.startsWith("@".characters) {
-					name = name.substringFromIndex(advance(name.startIndex, 1))
+					name = name.substringFromIndex(name.startIndex.advancedBy(1))
 				}
 
 				atNextEvent { [weak self] in

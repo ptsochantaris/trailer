@@ -1420,7 +1420,7 @@ final class API {
 				for (key, value) in params {
 					pairs.append(key + "=" + value)
 				}
-				expandedPath = expandedPath + "?" + "&".join(pairs)
+				expandedPath = expandedPath + "?" + pairs.joinWithSeparator("&")
 			}
 
 			let r = NSMutableURLRequest(URL: NSURL(string: expandedPath)!, cachePolicy: NSURLRequestCachePolicy.UseProtocolCachePolicy, timeoutInterval: NETWORK_TIMEOUT)
