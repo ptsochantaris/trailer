@@ -557,7 +557,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 					}
 				}
 
-				let serverNames = ", ".join(errorServers)
+				let serverNames = errorServers.joinWithSeparator(", ")
 
 				let alert = NSAlert()
 				alert.messageText = "Error"

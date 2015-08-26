@@ -128,7 +128,11 @@ final class PullRequestCell: TrailerCell {
 			}
 		}
 
-        addMenuWithTitle("PR Options")
+		if let n = pullRequest.number {
+			addMenuWithTitle("PR #\(n)")
+		} else {
+			addMenuWithTitle("PR Options")
+		}
 	}
 
 	required init?(coder: NSCoder) {

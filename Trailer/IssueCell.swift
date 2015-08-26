@@ -114,7 +114,11 @@ final class IssueCell: TrailerCell {
 			}
 		}
 
-        addMenuWithTitle("Issue Options")
+		if let n = issue.number {
+			addMenuWithTitle("Issue #\(n)")
+		} else {
+			addMenuWithTitle("Issue Options")
+		}
 	}
 
 	required init?(coder: NSCoder) {

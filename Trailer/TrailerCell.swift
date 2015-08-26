@@ -69,11 +69,22 @@ class TrailerCell: NSTableCellView {
 		}
 	}
 
-    func addMenuWithTitle(title: String) {
+	func copyNumberToClipboard() {
+		let p = NSPasteboard.generalPasteboard()
+		p.clearContents()
+		p.declareTypes([NSStringPboardType], owner: self)
+		if let s = associatedDataItem().number {
+			p.setString("#\(s)", forType: NSStringPboardType)
+		}
+	}
+
+	func addMenuWithTitle(title: String) {
         menu = NSMenu(title: title)
-        let c = menu!.insertItemWithTitle("Copy URL", action: Selector("copyToClipboard"), keyEquivalent: "c", atIndex: 0)
+		menu!.insertItemWithTitle(title, action: Selector("copyNumberToClipboard"), keyEquivalent: "", atIndex: 0)
+		menu!.insertItem(NSMenuItem.separatorItem(), atIndex: 1)
+        let c = menu!.insertItemWithTitle("Copy URL", action: Selector("copyToClipboard"), keyEquivalent: "c", atIndex: 2)
         c?.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
-        menu!.insertItemWithTitle("Open Repo", action: Selector("openRepo"), keyEquivalent: "", atIndex: 1)
+        menu!.insertItemWithTitle("Open Repo", action: Selector("openRepo"), keyEquivalent: "", atIndex: 3)
     }
 
 	func associatedDataItem() -> ListableItem {
