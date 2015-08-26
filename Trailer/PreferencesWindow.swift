@@ -954,6 +954,12 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			let apiServer = allServers[row]
 			if tableColumn?.identifier == "server" {
 				cell.title = apiServer.label ?? "NoApiServer"
+				let tc = c as! NSTextFieldCell
+				if apiServer.lastSyncSucceeded?.boolValue ?? false {
+					tc.textColor = NSColor.textColor()
+				} else {
+					tc.textColor = NSColor.redColor()
+				}
 			} else { // api usage
 				let c = cell as! NSLevelIndicatorCell
 				c.minValue = 0
