@@ -1,8 +1,6 @@
 
 // OSX and iOS app init
 
-let DATA_READONLY = false
-
 Settings.checkMigration()
 DataManager.checkMigration()
 let api = API()

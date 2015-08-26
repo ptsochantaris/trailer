@@ -4,8 +4,6 @@ import CoreData
 import Foundation
 import NotificationCenter
 
-let DATA_READONLY = true
-
 let app = { () -> ExtensionGlobals! in
 	Settings.checkMigration()
 	DataManager.checkMigration()

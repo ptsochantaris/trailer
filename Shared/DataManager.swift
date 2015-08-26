@@ -228,16 +228,11 @@ final class DataManager : NSObject {
 	class func saveDB() -> Bool {
 		if mainObjectContext.hasChanges {
 			DLog("Saving DB")
-			var error: NSError?
-			var ok: Bool
 			do {
 				try mainObjectContext.save()
-				ok = true
-			} catch let error1 as NSError {
-				error = error1
-				ok = false
+			} catch {
+				DLog("Error while saving DB: %@", (error as NSError).localizedDescription)
 			}
-			if !ok { DLog("Error while saving DB: %@", error) }
 		}
 		return true
 	}
@@ -377,9 +372,9 @@ let mainObjectContext = { () -> NSManagedObjectContext in
 	let m = NSManagedObjectContext(concurrencyType:NSManagedObjectContextConcurrencyType.MainQueueConcurrencyType)
 	m.undoManager = nil
 	m.persistentStoreCoordinator = persistentStoreCoordinator
-	if DATA_READONLY {
+	#if DATA_READONLY
 		m.stalenessInterval = 0.0
-	}
+	#endif
 	DLog("Database setup complete")
 	return m
 }()
@@ -400,12 +395,12 @@ let persistentStoreCoordinator = { ()-> NSPersistentStoreCoordinator in
 	}
 
 	var newCoordinator = NSPersistentStoreCoordinator(managedObjectModel:mom)
-	if !addStorePath(sqlStorePath, newCoordinator) {
+	if !addStorePath(sqlStorePath, newCoordinator: newCoordinator) {
 		DLog("Failed to migrate/load DB store - will nuke it and retry")
 		removeDatabaseFiles()
 
 		newCoordinator = NSPersistentStoreCoordinator(managedObjectModel:mom)
-		if !addStorePath(sqlStorePath, newCoordinator) {
+		if !addStorePath(sqlStorePath, newCoordinator: newCoordinator) {
 			DLog("Catastrophic failure, app is probably corrupted and needs reinstall")
 			abort()
 		}
@@ -435,9 +430,9 @@ private func sharedFilesDirectory() -> NSURL {
 	return appSupportURL
 }
 
-func addStorePath(sqlStore: NSURL, _ newCoordinator: NSPersistentStoreCoordinator) -> Bool {
+private func addStorePath(sqlStore: NSURL, newCoordinator: NSPersistentStoreCoordinator) -> Bool {
 
-	if DATA_READONLY {
+	#if DATA_READONLY
 		if NSFileManager.defaultManager().fileExistsAtPath(sqlStore.path!) { // may need migration
 
 			let m = try! NSPersistentStoreCoordinator.metadataForPersistentStoreOfType(NSSQLiteStoreType, URL: sqlStore, options: nil)
@@ -451,8 +446,8 @@ func addStorePath(sqlStore: NSURL, _ newCoordinator: NSPersistentStoreCoordinato
 							NSMigratePersistentStoresAutomaticallyOption: true,
 							NSInferMappingModelAutomaticallyOption: true])
 					try newCoordinator.removePersistentStore(tempStore)
-				} catch let error as NSError {
-					DLog("Error while migrating read/write DB store before mounting readonly %@", error)
+				} catch {
+					DLog("Error while migrating read/write DB store before mounting readonly %@", (error as NSError).localizedDescription)
 					return false
 				}
 			}
@@ -461,24 +456,25 @@ func addStorePath(sqlStore: NSURL, _ newCoordinator: NSPersistentStoreCoordinato
 			do {
 				let tempStore = try newCoordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: sqlStore, options: nil)
 				try newCoordinator.removePersistentStore(tempStore)
-			} catch let error as NSError {
-				DLog("Error while creating read/write DB store before mounting readonly %@", error)
+			} catch {
+				DLog("Error while creating read/write DB store before mounting readonly %@", (error as NSError).localizedDescription)
 				return false
 			}
 		}
-	}
+	#endif
 
 	do {
-		try newCoordinator.addPersistentStoreWithType(NSSQLiteStoreType,
-			configuration: nil,
-			URL: sqlStore,
-			options: [
-				NSMigratePersistentStoresAutomaticallyOption: true,
-				NSInferMappingModelAutomaticallyOption: true,
-				NSReadOnlyPersistentStoreOption: DATA_READONLY,
-				NSSQLitePragmasOption: ["synchronous":"OFF", "fullfsync":"0"]])
-	} catch let error as NSError {
-		DLog("Error while mounting DB store %@", error)
+		var storeOptions = [
+			NSMigratePersistentStoresAutomaticallyOption: NSNumber(bool: true),
+			NSInferMappingModelAutomaticallyOption: NSNumber(bool: true),
+			NSSQLitePragmasOption: ["synchronous":"OFF", "fullfsync":"0"]]
+		#if DATA_READONLY
+			storeOptions[NSReadOnlyPersistentStoreOption] = NSNumber(bool: true)
+		#endif
+
+		try newCoordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: sqlStore, options: storeOptions)
+	} catch {
+		DLog("Error while mounting DB store %@", (error as NSError).localizedDescription)
 		return false
 	}
 

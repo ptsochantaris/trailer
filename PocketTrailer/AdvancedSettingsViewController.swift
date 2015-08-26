@@ -594,8 +594,8 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		if let t = tempUrl {
 			do {
 				try NSFileManager.defaultManager().removeItemAtURL(t)
-			} catch let error as NSError {
-				DLog("Temporary file cleanup error: %@", error.localizedDescription)
+			} catch {
+				DLog("Temporary file cleanup error: %@", (error as NSError).localizedDescription)
 			}
 			tempUrl = nil
 		}

@@ -113,8 +113,8 @@ final class API {
 						if now.timeIntervalSinceDate(date) > (3600.0*24.0) {
 							try fileManager.removeItemAtPath(path)
 						}
-					} catch let fileError as NSError {
-						DLog("File error when cleaning old cached image: %@", fileError.localizedDescription)
+					} catch {
+						DLog("File error when cleaning old cached image: %@", (error as NSError).localizedDescription)
 					}
 				}
 			}
@@ -277,12 +277,10 @@ final class API {
 			i.postProcess()
 		}
 
-		var error: NSError?
 		do {
 			try moc.save()
-		} catch let error1 as NSError {
-			error = error1
-			DLog("Comitting sync failed: %@", error)
+		} catch {
+			DLog("Comitting sync failed: %@", (error as NSError).localizedDescription)
 		}
 	}
 
