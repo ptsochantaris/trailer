@@ -111,11 +111,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		super.awakeFromNib()
 		delegate = self
 
-		allPrsSetting.addItemWithTitle("Set all PRs...")
-		allPrsSetting.addItemsWithTitles(RepoDisplayPolicy.labels)
-
-		allIssuesSetting.addItemWithTitle("Set all issues...")
-		allIssuesSetting.addItemsWithTitles(RepoDisplayPolicy.labels)
+		updateAllItemSettingButtons()
 
 		allNewPrsSetting.addItemsWithTitles(RepoDisplayPolicy.labels)
 		allNewIssuesSetting.addItemsWithTitles(RepoDisplayPolicy.labels)
@@ -135,6 +131,24 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	deinit {
 		NSNotificationCenter.defaultCenter().removeObserver(serverList)
 		NSNotificationCenter.defaultCenter().removeObserver(self)
+	}
+
+	private func updateAllItemSettingButtons() {
+
+		allPrsSetting.removeAllItems()
+		allIssuesSetting.removeAllItems()
+
+		let rowCount = projectsTable.selectedRowIndexes.count
+		if rowCount > 1 {
+			allPrsSetting.addItemWithTitle("Set selected PRs...")
+			allIssuesSetting.addItemWithTitle("Set selected issues...")
+		} else {
+			allPrsSetting.addItemWithTitle("Set all PRs...")
+			allIssuesSetting.addItemWithTitle("Set all issues...")
+		}
+
+		allPrsSetting.addItemsWithTitles(RepoDisplayPolicy.labels)
+		allIssuesSetting.addItemsWithTitles(RepoDisplayPolicy.labels)
 	}
 
 	func reloadSettings() {
@@ -355,11 +369,26 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		app.deferredUpdateTimer.push()
 	}
 
+	private func affectedReposFromSelection() -> [Repo] {
+		let selectedRows = projectsTable.selectedRowIndexes
+		var affectedRepos = [Repo]()
+		if selectedRows.count > 1 {
+			for row in selectedRows {
+				if !tableView(projectsTable, isGroupRow: row) {
+					affectedRepos.append(repoForRow(row))
+				}
+			}
+		} else {
+			affectedRepos = Repo.reposForFilter(repoFilter.stringValue)
+		}
+		return affectedRepos
+	}
+
 	@IBAction func allPrsPolicySelected(sender: NSPopUpButton) {
 		let index = sender.indexOfSelectedItem - 1
 		if index < 0 { return }
 
-		for r in Repo.reposForFilter(repoFilter.stringValue) {
+		for r in affectedReposFromSelection() {
 			r.displayPolicyForPrs = index
 			if index != RepoDisplayPolicy.Hide.rawValue { r.resetSyncState() }
 		}
@@ -372,7 +401,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		let index = sender.indexOfSelectedItem - 1
 		if index < 0 { return }
 
-		for r in Repo.reposForFilter(repoFilter.stringValue) {
+		for r in affectedReposFromSelection() {
 			r.displayPolicyForIssues = index
 			if index != RepoDisplayPolicy.Hide.rawValue { r.resetSyncState() }
 		}
@@ -885,7 +914,11 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	///////////// Repo table
 
 	func tableViewSelectionDidChange(notification: NSNotification) {
-		fillServerApiFormFromSelectedServer()
+		if self.serverList === notification.object {
+			fillServerApiFormFromSelectedServer()
+		} else if self.projectsTable === notification.object {
+			updateAllItemSettingButtons()
+		}
 	}
 
 	private func repoForRow(row: Int) -> Repo {
