@@ -661,7 +661,23 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	func startRefresh() {
-		if isRefreshing || systemSleeping || api.currentNetworkStatus == NetworkStatus.NotReachable || !ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
+		if isRefreshing {
+			DLog("Won't start refresh because refresh is already ongoing")
+			return
+		}
+
+		if systemSleeping {
+			DLog("Won't start refresh because the system is in power-nap / sleep")
+			return
+		}
+
+		if api.currentNetworkStatus == NetworkStatus.NotReachable {
+			DLog("Won't start refresh because internet connectivity is down")
+			return
+		}
+
+		if !ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
+			DLog("Won't start refresh because there are no configured API servers")
 			return
 		}
 

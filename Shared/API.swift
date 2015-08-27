@@ -28,7 +28,9 @@ final class API {
 
 		let reachability = Reachability.reachabilityForInternetConnection()
 		reachability.startNotifier()
-		currentNetworkStatus = reachability.currentReachabilityStatus()
+		let n = reachability.currentReachabilityStatus()
+		DLog("Network is %@", n == NetworkStatus.NotReachable ? "down" : "up")
+		currentNetworkStatus = n
 
 		let fileManager = NSFileManager.defaultManager()
 		let appSupportURL = fileManager.URLsForDirectory(NSSearchPathDirectory.CachesDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask).first! 
@@ -1459,23 +1461,24 @@ final class API {
 				let response = res as? NSHTTPURLResponse
 				var parsedData: AnyObject?
 				var error = e
+				var badServerResponse = false
 
-				if error == nil && (response == nil || response?.statusCode > 399) {
-					let code = response?.statusCode ?? -1
-					error = self!.apiError("Server responded with \(code)")
-				}
-
-				if error == nil {
-					DLog("(%@) GET %@ - RESULT: %d", apiServerLabel, fullUrlPath, response?.statusCode)
-					if let d = data {
-						do {
-							parsedData = try NSJSONSerialization.JSONObjectWithData(d, options: NSJSONReadingOptions())
-						} catch _ {
-							parsedData = nil
+				if let code = response?.statusCode {
+					if code > 399 {
+						error = self!.apiError("Server responded with \(code)")
+						badServerResponse = true
+					} else {
+						DLog("(%@) GET %@ - RESULT: %d", apiServerLabel, fullUrlPath, code)
+						if let d = data {
+							parsedData = try? NSJSONSerialization.JSONObjectWithData(d, options: NSJSONReadingOptions())
 						}
 					}
 				} else {
-					if self?.currentNetworkStatus != NetworkStatus.NotReachable {
+					error = self!.apiError("Server did not repond")
+				}
+
+				if error != nil {
+					if badServerResponse {
 						if existingBackOff != nil {
 							DLog("(%@) Extending backoff for already throttled URL %@ by %f seconds", apiServerLabel, fullUrlPath, BACKOFF_STEP)
 							if existingBackOff!.duration < 3600.0 {
