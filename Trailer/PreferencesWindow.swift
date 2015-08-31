@@ -83,6 +83,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	// Misc
 	@IBOutlet weak var repeatLastExportAutomatically: NSButton!
 	@IBOutlet weak var lastExportReport: NSTextField!
+	@IBOutlet weak var dumpApiResponsesToConsole: NSButton!
 
 	// Keyboard
 	@IBOutlet weak var hotkeyEnable: NSButton!
@@ -195,6 +196,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		countOnlyListedItems.integerValue = Settings.countOnlyListedItems ? 0 : 1
 		openPrAtFirstUnreadComment.integerValue = Settings.openPrAtFirstUnreadComment ? 1 : 0
 		logActivityToConsole.integerValue = Settings.logActivityToConsole ? 1 : 0
+		dumpApiResponsesToConsole.integerValue = Settings.dumpAPIResponsesInConsole ? 1 : 0
 		showLabels.integerValue = Settings.showLabels ? 1 : 0
 		useVibrancy.integerValue = Settings.useVibrancy ? 1 : 0
 
@@ -290,8 +292,19 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			#if DEBUG
 				alert.informativeText = "Sorry, logging is always active in development versions"
 				#else
-				alert.informativeText = "Logging is a feature meant for error reporting, having it constantly enabled will cause this app to be less responsive and use more power"
+				alert.informativeText = "Logging is a feature meant for error reporting, having it constantly enabled will cause this app to be less responsive, use more power, and constitute a security risk"
 			#endif
+			alert.addButtonWithTitle("OK")
+			alert.beginSheetModalForWindow(self, completionHandler: nil)
+		}
+	}
+
+	@IBAction func dumpApiResponsesToConsoleSelected(sender: NSButton) {
+		Settings.dumpAPIResponsesInConsole = (sender.integerValue==1)
+		if Settings.dumpAPIResponsesInConsole {
+			let alert = NSAlert()
+			alert.messageText = "Warning"
+			alert.informativeText = "This is a feature meant for error reporting, having it constantly enabled will cause this app to be less responsive, use more power, and constitute a security risk"
 			alert.addButtonWithTitle("OK")
 			alert.beginSheetModalForWindow(self, completionHandler: nil)
 		}

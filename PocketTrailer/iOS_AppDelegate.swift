@@ -173,7 +173,8 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 	}
 
 	func startRefresh() -> Bool {
-		if isRefreshing || api.currentNetworkStatus == NetworkStatus.NotReachable || !ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
+
+		if isRefreshing || api.noNetworkConnection() || !ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
 			return false
 		}
 

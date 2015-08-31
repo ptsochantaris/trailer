@@ -516,6 +516,11 @@ final class Settings {
         set { set("INCLUDE_SERVERS_IN_FILTER", newValue) }
     }
 
+	class var dumpAPIResponsesInConsole: Bool {
+		get { return get("DUMP_API_RESPONSES_IN_CONSOLE") as? Bool ?? false }
+		set { set("DUMP_API_RESPONSES_IN_CONSOLE", newValue) }
+	}
+
 	////////////////////////////// DEFAULT TRUE
 
 	class var useVibrancy: Bool {

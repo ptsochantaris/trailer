@@ -1485,16 +1485,16 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <button id="3fA-qA-38f">
-                                                        <rect key="frame" x="211" y="261" width="315" height="18"/>
+                                                    <button id="qos-T0-XKj">
+                                                        <rect key="frame" x="211" y="230" width="358" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
-                                                        <buttonCell key="cell" type="check" title="Log activity to the console" bezelStyle="regularSquare" imagePosition="left" inset="2" id="MMo-8R-lBl">
+                                                        <buttonCell key="cell" type="check" title="Dump API responses to the console for troubleshooting" bezelStyle="regularSquare" imagePosition="left" inset="2" id="Lyr-pU-rjn">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
                                                         <connections>
-                                                            <action selector="logActivityToConsoleSelected:" target="vQH-WF-vh2" id="Ya2-VW-6pr"/>
+                                                            <action selector="dumpApiResponsesToConsoleSelected:" target="vQH-WF-vh2" id="gGH-xy-vRV"/>
                                                         </connections>
                                                     </button>
                                                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" id="zef-fb-l71">
@@ -1541,6 +1541,18 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                         </buttonCell>
                                                         <connections>
                                                             <action selector="repeatLastExportSelected:" target="vQH-WF-vh2" id="WZG-AG-LaP"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button id="3fA-qA-38f">
+                                                        <rect key="frame" x="211" y="260" width="315" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <animations/>
+                                                        <buttonCell key="cell" type="check" title="Log activity to the console" bezelStyle="regularSquare" imagePosition="left" inset="2" id="MMo-8R-lBl">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="logActivityToConsoleSelected:" target="vQH-WF-vh2" id="Ya2-VW-6pr"/>
                                                         </connections>
                                                     </button>
                                                 </subviews>
@@ -1590,6 +1602,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="dontConfirmRemoveAllClosed" destination="w0K-BS-Gti" id="jaB-In-zbi"/>
                 <outlet property="dontConfirmRemoveAllMerged" destination="ptr-tf-eNM" id="KHp-pR-L6T"/>
                 <outlet property="dontKeepPrsMergedByMe" destination="ZiV-Lz-lSl" id="oZV-a8-3NT"/>
+                <outlet property="dumpApiResponsesToConsole" destination="qos-T0-XKj" id="1Cn-a4-l3d"/>
                 <outlet property="grayOutWhenRefreshing" destination="ueT-Kq-j9E" id="0DE-vy-hy2"/>
                 <outlet property="groupByRepo" destination="TqD-G8-E24" id="nQt-v1-4Mx"/>
                 <outlet property="hideAvatars" destination="3CV-9S-gLw" id="KZR-Gl-2lg"/>

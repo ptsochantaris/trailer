@@ -19,6 +19,7 @@ final class API {
 	private let cacheDirectory: String
 	private let urlSession: NSURLSession
 	private var badLinks = [String:UrlBackOffEntry]()
+	private let reachability = Reachability.reachabilityForInternetConnection()
 
 	init() {
 
@@ -26,7 +27,6 @@ final class API {
 		mediumFormatter.dateStyle = NSDateFormatterStyle.MediumStyle
 		mediumFormatter.timeStyle = NSDateFormatterStyle.MediumStyle
 
-		let reachability = Reachability.reachabilityForInternetConnection()
 		reachability.startNotifier()
 		let n = reachability.currentReachabilityStatus()
 		DLog("Network is %@", n == NetworkStatus.NotReachable ? "down" : "up")
@@ -61,24 +61,40 @@ final class API {
 		if fileManager.fileExistsAtPath(cacheDirectory) {
 			expireOldImageCacheEntries()
 		} else {
-			do {
-				try fileManager.createDirectoryAtPath(cacheDirectory, withIntermediateDirectories: true, attributes: nil)
-			} catch _ {
-			}
+			do { try fileManager.createDirectoryAtPath(cacheDirectory, withIntermediateDirectories: true, attributes: nil) } catch _ {}
 		}
 
 		NSNotificationCenter.defaultCenter().addObserverForName(kReachabilityChangedNotification, object: nil, queue: NSOperationQueue.mainQueue()) { [weak self] n in
-			if let newStatus = (n.object as? Reachability)?.currentReachabilityStatus() where newStatus != self!.currentNetworkStatus {
-				self!.currentNetworkStatus = newStatus
-				if newStatus == NetworkStatus.NotReachable {
-					DLog("Network went down: %d", newStatus.rawValue)
-				} else {
-					DLog("Network came up: %d", newStatus.rawValue)
-					self!.clearAllBadLinks()
-					app.startRefreshIfItIsDue()
-				}
+			self?.checkNetworkAvailability()
+			if self?.currentNetworkStatus != NetworkStatus.NotReachable {
+				app.startRefreshIfItIsDue()
 			}
 		}
+	}
+
+	func checkNetworkAvailability() {
+		let newStatus = reachability.currentReachabilityStatus()
+		if newStatus != currentNetworkStatus {
+			currentNetworkStatus = newStatus
+			if newStatus == NetworkStatus.NotReachable {
+				DLog("Network went down: %d", newStatus.rawValue)
+			} else {
+				DLog("Network came up: %d", newStatus.rawValue)
+			}
+			clearAllBadLinks()
+		}
+	}
+
+	func noNetworkConnection() -> Bool {
+		DLog("Actively verifying reported network availability state...")
+		let previousNetworkStatus = currentNetworkStatus
+		checkNetworkAvailability()
+		if previousNetworkStatus != currentNetworkStatus {
+			DLog("Network state seems to have changed without having been notified, noted")
+		} else {
+			DLog("No change to network state")
+		}
+		return currentNetworkStatus == NetworkStatus.NotReachable
 	}
 
 	/////////////////////////////////////////////////////// Utilities
@@ -1497,6 +1513,9 @@ final class API {
 				}
 
 				dispatch_sync(dispatch_get_main_queue()) { [weak self] in
+					if Settings.dumpAPIResponsesInConsole, let d = data {
+						DLog("API data from %@: %@", fullUrlPath, NSString(data: d, encoding: NSUTF8StringEncoding))
+					}
 					completion(response: response, data: parsedData, error: error)
 					#if os(iOS)
 						self!.networkIndicationEnd()

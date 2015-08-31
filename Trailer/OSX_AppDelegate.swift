@@ -671,7 +671,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			return
 		}
 
-		if api.currentNetworkStatus == NetworkStatus.NotReachable {
+		if api.noNetworkConnection() {
 			DLog("Won't start refresh because internet connectivity is down")
 			return
 		}

@@ -165,16 +165,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     return returnValue;
 }
 
-- (BOOL)connectionRequired
-{
-    SCNetworkReachabilityFlags flags;
-    if (SCNetworkReachabilityGetFlags(reachabilityRef, &flags))
-    {
-        return (flags & kSCNetworkReachabilityFlagsConnectionRequired);
-    }
-    return NO;
-}
-
 - (NetworkStatus)currentReachabilityStatus
 {
     NetworkStatus returnValue = NotReachable;
