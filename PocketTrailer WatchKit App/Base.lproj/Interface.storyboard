@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="8187.4" systemVersion="15A262e" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="AgC-eL-Hgc">
+<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="8191" systemVersion="15A278b" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="AgC-eL-Hgc">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8151.3"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8154"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="8092"/>
     </dependencies>
     <scenes>
@@ -115,12 +115,12 @@
                                 <tableRow identifier="PRRow" id="qcu-Df-oql" customClass="PRRow" customModule="Trailer">
                                     <group key="rootItem" width="1" height="0.0" alignment="left" layout="vertical" radius="2" id="Uwj-Y1-PON">
                                         <items>
-                                            <label alignment="left" verticalAlignment="center" text="Title" numberOfLines="0" id="18g-kn-5Ie">
+                                            <label alignment="left" text="Title" numberOfLines="0" id="18g-kn-5Ie">
                                                 <fontDescription key="font" style="UICTFontTextStyleBody"/>
                                             </label>
-                                            <group alignment="left" verticalAlignment="center" spacing="4" id="lLA-39-zIL">
+                                            <group alignment="left" spacing="4" id="lLA-39-zIL">
                                                 <items>
-                                                    <group alignment="left" verticalAlignment="center" radius="7" id="1NN-Z1-C8E">
+                                                    <group alignment="left" verticalAlignment="center" radius="8" id="1NN-Z1-C8E">
                                                         <items>
                                                             <label alignment="center" verticalAlignment="center" text="11" id="zum-4e-Nxi">
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
@@ -128,9 +128,9 @@
                                                             </label>
                                                         </items>
                                                         <color key="backgroundColor" red="0.93725490199999995" green="0.93725490199999995" blue="0.95686274510000002" alpha="1" colorSpace="calibratedRGB"/>
-                                                        <edgeInsets key="margins" left="5" right="5" top="0.0" bottom="0.0"/>
+                                                        <edgeInsets key="margins" left="4" right="4" top="0.0" bottom="0.0"/>
                                                     </group>
-                                                    <group width="18" alignment="left" verticalAlignment="center" radius="8" id="FFB-8c-hj1">
+                                                    <group alignment="left" verticalAlignment="center" radius="8" id="FFB-8c-hj1">
                                                         <items>
                                                             <label alignment="center" verticalAlignment="center" text="2" id="bd9-NV-xBM">
                                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -138,14 +138,14 @@
                                                             </label>
                                                         </items>
                                                         <color key="backgroundColor" red="1" green="0.0" blue="0.070606581870000004" alpha="1" colorSpace="calibratedRGB"/>
-                                                        <edgeInsets key="margins" left="5" right="5" top="0.0" bottom="0.0"/>
+                                                        <edgeInsets key="margins" left="4" right="4" top="0.0" bottom="0.0"/>
                                                     </group>
                                                 </items>
                                             </group>
-                                            <label alignment="left" verticalAlignment="center" text="Details" numberOfLines="0" id="jYX-bA-AMh">
+                                            <label alignment="left" text="Details" numberOfLines="0" id="jYX-bA-AMh">
                                                 <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
                                             </label>
-                                            <separator width="1" alignment="center" id="7Wr-VC-T3H">
+                                            <separator width="1" alignment="left" id="7Wr-VC-T3H">
                                                 <color key="color" white="0.18509615384615388" alpha="1" colorSpace="calibratedWhite"/>
                                             </separator>
                                         </items>
