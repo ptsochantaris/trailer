@@ -7,7 +7,6 @@ final class PRListController: WKInterfaceController {
 	@IBOutlet weak var table: WKInterfaceTable!
 	@IBOutlet var statusLabel: WKInterfaceLabel!
 
-	private var firstLoad: Bool = true
 	private var section: PullRequestSection!
 	private var type: String!
 	private var selectedIndex: Int?
@@ -19,8 +18,6 @@ final class PRListController: WKInterfaceController {
 		type = c[TYPE_KEY] as! String
 
 		setTitle(section.watchMenuName())
-
-		sendCommand(nil)
 	}
 
 	private var app: ExtensionDelegate {
@@ -29,16 +26,19 @@ final class PRListController: WKInterfaceController {
 
 	override func willActivate() {
 		super.willActivate()
-		let session = WCSession.defaultSession()
-		if !firstLoad && session.reachable && app.lastView != "LIST" {
-			sendCommand(nil)
-		}
+		loadData()
 	}
 
 	override func didAppear() {
-		app.lastView = "LIST"
-		firstLoad = false
+		loadData()
 		super.didAppear()
+	}
+
+	private func loadData() {
+		if app.lastView != "LIST" {
+			app.lastView = "LIST"
+			sendCommand(nil)
+		}
 	}
 
 	private func showStatus(status: String) {
@@ -85,8 +85,6 @@ final class PRListController: WKInterfaceController {
 
 		table.setNumberOfRows(result.count, withRowType: "PRRow")
 
-		showStatus(result.count==0 ? "There are no items in this section" : "")
-
 		var index = 0
 		for itemData in result {
 			if let c = table.rowControllerAtIndex(index++) as? PRRow {
@@ -94,12 +92,11 @@ final class PRListController: WKInterfaceController {
 			}
 		}
 
-		self.showStatus("")
-		if let s = self.selectedIndex {
-			dispatch_async(dispatch_get_main_queue(), {
-				self.table.scrollToRowAtIndex(s)
-			})
-			self.selectedIndex = nil
+		showStatus(result.count==0 ? "There are no items in this section" : "")
+
+		if let s = selectedIndex {
+			table.scrollToRowAtIndex(s)
+			selectedIndex = nil
 		}
 	}
 

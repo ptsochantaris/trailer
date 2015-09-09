@@ -18,14 +18,12 @@ final class PRRow: NSObject {
 
 	func populateFrom(itemData: [String : AnyObject]) {
 
-		let documentType = [NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType]
-
 		let titleData = itemData["title"] as! NSData
-		let title = try! NSAttributedString(data: titleData, options: documentType, documentAttributes: nil)
+		let title = NSKeyedUnarchiver.unarchiveObjectWithData(titleData) as! NSAttributedString
 		titleL.setAttributedText(title)
 
 		let subtitleData = itemData["subtitle"] as! NSData
-		let subtitle = try! NSAttributedString(data: subtitleData, options: documentType, documentAttributes: nil)
+		let subtitle = NSKeyedUnarchiver.unarchiveObjectWithData(subtitleData) as! NSAttributedString
 		detailsL.setAttributedText(subtitle)
 
 		itemId = itemData["localId"] as? String

@@ -262,9 +262,9 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		let smallFont = UIFont.systemFontOfSize(UIFont.systemFontSize()-4)
 		itemData["title"] = toData(item.titleWithFont(font, labelFont: font, titleColor: UIColor.whiteColor()))
 		if item is PullRequest {
-			itemData["subtitle"] = toData((item as! PullRequest).subtitleWithFont(smallFont, lightColor: UIColor.greenColor(), darkColor: UIColor.blueColor()))
+			itemData["subtitle"] = toData((item as! PullRequest).subtitleWithFont(smallFont, lightColor: UIColor.lightGrayColor(), darkColor: UIColor.grayColor()))
 		} else {
-			itemData["subtitle"] = toData((item as! Issue).subtitleWithFont(smallFont, lightColor: UIColor.greenColor(), darkColor: UIColor.blueColor()))
+			itemData["subtitle"] = toData((item as! Issue).subtitleWithFont(smallFont, lightColor: UIColor.lightGrayColor(), darkColor: UIColor.grayColor()))
 		}
 
 		if Settings.showLabels {
@@ -277,7 +277,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 	}
 
 	private func toData(s: NSAttributedString) -> NSData {
-		return try! s.dataFromRange(NSMakeRange(0, s.length), documentAttributes: [NSDocumentTypeDocumentAttribute:NSRTFTextDocumentType])
+		return NSKeyedArchiver.archivedDataWithRootObject(s)
 	}
 
 	private func labelsForItem(item: ListableItem) -> [[String : AnyObject]] {

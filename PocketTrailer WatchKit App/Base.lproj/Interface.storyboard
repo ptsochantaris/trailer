@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="8191" systemVersion="15A278b" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="AgC-eL-Hgc">
+<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="8191" systemVersion="15A263e" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="AgC-eL-Hgc">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8154"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="8092"/>
     </dependencies>
     <scenes>
-        <!--SectionController-->
+        <!--Sections-->
         <scene sceneID="aou-V4-d1y">
             <objects>
-                <controller identifier="SectionController" id="AgC-eL-Hgc" customClass="SectionController" customModule="Trailer">
+                <controller identifier="SectionController" title="Sections" hidesWhenLoading="NO" id="AgC-eL-Hgc" customClass="SectionController" customModule="Trailer">
                     <items>
                         <label alignment="center" verticalAlignment="center" text="..." numberOfLines="0" id="tZx-Xo-NwI">
                             <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
@@ -105,7 +105,7 @@
         <!--ListController-->
         <scene sceneID="ox7-bJ-gA7">
             <objects>
-                <controller identifier="ListController" id="Sqe-dw-Y9B" customClass="PRListController" customModule="Trailer">
+                <controller identifier="ListController" hidesWhenLoading="NO" id="Sqe-dw-Y9B" customClass="PRListController" customModule="Trailer">
                     <items>
                         <label alignment="center" verticalAlignment="center" text="..." numberOfLines="0" id="2Zp-yv-wv1">
                             <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
@@ -190,7 +190,7 @@
         <!--DetailController-->
         <scene sceneID="Y5a-NZ-okm">
             <objects>
-                <controller identifier="DetailController" id="Hgm-oe-oa5" customClass="PRDetailController" customModule="Trailer">
+                <controller identifier="DetailController" hidesWhenLoading="NO" id="Hgm-oe-oa5" customClass="PRDetailController" customModule="Trailer">
                     <items>
                         <label alignment="center" verticalAlignment="center" text="..." numberOfLines="0" id="Adx-ov-WlP">
                             <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
@@ -300,7 +300,7 @@
         <!--Glance Interface Controller-->
         <scene sceneID="rjY-Ar-IMT">
             <objects>
-                <glanceController spacing="0.0" id="Sv0-Ai-Zie" customClass="GlanceController" customModule="Trailer">
+                <glanceController spacing="0.0" hidesWhenLoading="NO" id="Sv0-Ai-Zie" customClass="GlanceController" customModule="Trailer">
                     <items>
                         <group alignment="left" layout="vertical" spacing="3" id="gv7-I2-MZq">
                             <items>

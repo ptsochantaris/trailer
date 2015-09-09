@@ -7,14 +7,8 @@ final class SectionController: WKInterfaceController {
 	@IBOutlet weak var table: WKInterfaceTable!
 	@IBOutlet weak var statusLabel: WKInterfaceLabel!
 
-	private var firstLoad: Bool = true
 	private var rowControllers = [PopulatableRow]()
 	private var selectedIndex: Int?
-
-	override func awakeWithContext(context: AnyObject?) {
-		setTitle("Sections")
-		sendCommand(nil)
-	}
 
 	private var app: ExtensionDelegate {
 		return WKExtension.sharedExtension().delegate as! ExtensionDelegate
@@ -22,16 +16,19 @@ final class SectionController: WKInterfaceController {
 
 	override func willActivate() {
 		super.willActivate()
-		let session = WCSession.defaultSession()
-		if !firstLoad && session.reachable && app.lastView != "SECTION" {
-			sendCommand(nil)
-		}
+		loadData()
 	}
 
 	override func didAppear() {
-		app.lastView = "SECTION"
-		firstLoad = false
+		loadData()
 		super.didAppear()
+	}
+
+	private func loadData() {
+		if app.lastView != "SECTION" {
+			app.lastView = "SECTION"
+			sendCommand(nil)
+		}
 	}
 
 	private func showStatus(status: String) {
@@ -163,11 +160,9 @@ final class SectionController: WKInterfaceController {
 		}
 
 		self.showStatus("")
-		if let s = self.selectedIndex {
-			dispatch_async(dispatch_get_main_queue(), { () -> Void in
-				self.table.scrollToRowAtIndex(s)
-			})
-			self.selectedIndex = nil
+		if let s = selectedIndex {
+			table.scrollToRowAtIndex(s)
+			selectedIndex = nil
 		}
 	}
 }
