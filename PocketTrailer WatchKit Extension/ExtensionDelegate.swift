@@ -12,9 +12,6 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 	var lastView = ""
 
 	func applicationDidFinishLaunching() {
-		let session = WCSession.defaultSession()
-		session.delegate = self
-		session.activateSession()
 	}
 	
 	func applicationDidBecomeActive() {

@@ -45,14 +45,15 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 	override func awakeWithContext(context: AnyObject?) {
 		errorText.setText("Connecting...")
 		setErrorMode(true)
-
-		let session = WCSession.defaultSession()
-		session.delegate = self
-		session.activateSession()
 	}
 
 	override func willActivate() {
 		super.willActivate()
+
+		let session = WCSession.defaultSession()
+		session.delegate = self
+		session.activateSession()
+
 		requestUpdate()
 	}
 
@@ -143,7 +144,7 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 		setErrorMode(true)
 		let session = WCSession.defaultSession()
 		if !session.reachable {
-			errorText.setText("Connecting...");
+			errorText.setText("Cannot connect to your iPhone...");
 		} else if session.iOSDeviceNeedsUnlockAfterRebootForReachability {
 			errorText.setText("Please unlock your iPhone first!");
 		} else {

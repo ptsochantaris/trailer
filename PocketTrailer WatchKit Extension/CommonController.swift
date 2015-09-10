@@ -27,8 +27,11 @@ class CommonController: WKInterfaceController, WCSessionDelegate {
 			if showLoadingFeedback() {
 				showStatus("Connecting...", hideTable: false)
 			}
+
 			let session = WCSession.defaultSession()
 			session.delegate = self
+			session.activateSession()
+
 			if session.reachable && !updating {
 				requestData(nil)
 			}
