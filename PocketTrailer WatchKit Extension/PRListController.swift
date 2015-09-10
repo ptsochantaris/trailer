@@ -10,6 +10,7 @@ final class PRListController: WKInterfaceController {
 	private var section: PullRequestSection!
 	private var type: String!
 	private var selectedIndex: Int?
+	private var lastCount: Int = 0
 
 	override func awakeWithContext(context: AnyObject?) {
 
@@ -18,6 +19,7 @@ final class PRListController: WKInterfaceController {
 		type = c[TYPE_KEY] as! String
 
 		setTitle(section.watchMenuName())
+		showStatus("Loading")
 	}
 
 	private var app: ExtensionDelegate {
@@ -26,30 +28,19 @@ final class PRListController: WKInterfaceController {
 
 	override func willActivate() {
 		super.willActivate()
-		loadData()
-	}
-
-	override func didAppear() {
-		loadData()
-		super.didAppear()
-	}
-
-	private func loadData() {
 		if app.lastView != "LIST" {
-			app.lastView = "LIST"
+			app.lastView == "LIST"
 			sendCommand(nil)
 		}
 	}
 
 	private func showStatus(status: String) {
-		table.setHidden(!status.isEmpty)
+		//table.setHidden(!status.isEmpty)
 		statusLabel.setText(status)
 		statusLabel.setHidden(status.isEmpty)
 	}
 
 	private func sendCommand(command: String?) {
-
-		showStatus("Loading")
 
 		var params = ["list": "item_list", "type": type, "section": section.apiName()]
 		if let command = command {
@@ -83,7 +74,15 @@ final class PRListController: WKInterfaceController {
 
 		let result = data["result"] as! [[String : AnyObject]]
 
-		table.setNumberOfRows(result.count, withRowType: "PRRow")
+		if lastCount == 0 {
+			table.setNumberOfRows(result.count, withRowType: "PRRow")
+		} else if lastCount < result.count {
+			table.removeRowsAtIndexes(NSIndexSet(indexesInRange: NSMakeRange(0, result.count-lastCount)))
+		} else if lastCount > result.count {
+			table.insertRowsAtIndexes(NSIndexSet(indexesInRange: NSMakeRange(0, lastCount-result.count)), withRowType: "PRRow")
+		}
+
+		lastCount = result.count
 
 		var index = 0
 		for itemData in result {

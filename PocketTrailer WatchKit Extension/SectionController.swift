@@ -8,37 +8,31 @@ final class SectionController: WKInterfaceController {
 	@IBOutlet weak var statusLabel: WKInterfaceLabel!
 
 	private var rowControllers = [PopulatableRow]()
-	private var selectedIndex: Int?
 
 	private var app: ExtensionDelegate {
 		return WKExtension.sharedExtension().delegate as! ExtensionDelegate
 	}
 
+	override func awakeWithContext(context: AnyObject?) {
+		super.awakeWithContext(context)
+		showStatus("Loading")
+	}
+
 	override func willActivate() {
 		super.willActivate()
-		loadData()
-	}
-
-	override func didAppear() {
-		loadData()
-		super.didAppear()
-	}
-
-	private func loadData() {
-		if app.lastView != "SECTION" {
-			app.lastView = "SECTION"
+		if app.lastView != "SECTIONS" {
+			app.lastView = "SECTIONS"
 			sendCommand(nil)
 		}
 	}
 
 	private func showStatus(status: String) {
-		table.setHidden(!status.isEmpty)
+		//table.setHidden(!status.isEmpty)
 		statusLabel.setText(status)
 		statusLabel.setHidden(status.isEmpty)
 	}
 
 	private func sendCommand(command: String?) {
-		showStatus("Loading")
 
 		var params = ["list": "overview"]
 		if let command = command {
@@ -89,7 +83,6 @@ final class SectionController: WKInterfaceController {
 	}
 
 	override func table(table: WKInterfaceTable, didSelectRowAtIndex rowIndex: Int) {
-		selectedIndex = rowIndex
 		let r = rowControllers[rowIndex] as! SectionRow
 		let section = r.section?.rawValue
 		pushControllerWithName("ListController", context: [ SECTION_KEY: section!, TYPE_KEY: r.type! ] )
@@ -148,9 +141,7 @@ final class SectionController: WKInterfaceController {
 			it.title = issues["error"] as? String
 		}
 
-
 		table.setRowTypes(rowControllers.map({ $0.rowType() }))
-
 
 		var index = 0
 		for rc in rowControllers {
@@ -160,9 +151,5 @@ final class SectionController: WKInterfaceController {
 		}
 
 		self.showStatus("")
-		if let s = selectedIndex {
-			table.scrollToRowAtIndex(s)
-			selectedIndex = nil
-		}
 	}
 }
