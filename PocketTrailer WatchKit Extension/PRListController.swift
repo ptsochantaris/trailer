@@ -35,7 +35,7 @@ final class PRListController: WKInterfaceController {
 	}
 
 	private func showStatus(status: String) {
-		//table.setHidden(!status.isEmpty)
+		table.setAlpha(status.isEmpty ? 1.0 : 0.5)
 		statusLabel.setText(status)
 		statusLabel.setHidden(status.isEmpty)
 	}
