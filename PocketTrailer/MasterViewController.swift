@@ -244,10 +244,10 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
     }
 
 	private func showTabBar(show: Bool, animated: Bool) {
-		if show==true {
+		if show {
 
 			tableView.contentInset = UIEdgeInsetsMake(tableView.contentInset.top, 0, 49, 0)
-			tableView.scrollIndicatorInsets = UIEdgeInsetsMake(tableView.contentInset.top, 0, 49, 0)
+			tableView.scrollIndicatorInsets = UIEdgeInsetsMake(tableView.scrollIndicatorInsets.top, 0, 49, 0)
 
 			if tabBar == nil {
 				if let s = navigationController?.view {
@@ -275,7 +275,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 			if !(Repo.interestedInPrs() && Repo.interestedInIssues()) {
 				tableView.contentInset = UIEdgeInsetsMake(tableView.contentInset.top, 0, 0, 0)
-				tableView.scrollIndicatorInsets = UIEdgeInsetsMake(tableView.contentInset.top, 0, 0, 0)
+				tableView.scrollIndicatorInsets = UIEdgeInsetsMake(tableView.scrollIndicatorInsets.top, 0, 0, 0)
 			}
 
 			if let t = tabBar {
@@ -538,16 +538,15 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	private func configureCell(cell: UITableViewCell, atIndexPath: NSIndexPath) {
 		let c = cell as! PRCell
 
-		c._statuses.preferredMaxLayoutWidth = tableView.bounds.size.width - 20
-		c._title.preferredMaxLayoutWidth = tableView.bounds.size.width - 20
-		c._description.preferredMaxLayoutWidth = tableView.bounds.size.width - 80
+		//c._statuses.preferredMaxLayoutWidth = tableView.bounds.size.width - 20
+		//c._title.preferredMaxLayoutWidth = tableView.bounds.size.width - 20
+		//c._description.preferredMaxLayoutWidth = tableView.bounds.size.width - 80
 
+		let o = fetchedResultsController.objectAtIndexPath(atIndexPath)
 		if viewMode == MasterViewMode.PullRequests {
-			let pr = fetchedResultsController.objectAtIndexPath(atIndexPath) as! PullRequest
-			c.setPullRequest(pr)
+			c.setPullRequest(o as! PullRequest)
 		} else {
-			let i = fetchedResultsController.objectAtIndexPath(atIndexPath) as! Issue
-			c.setIssue(i)
+			c.setIssue(o as! Issue)
 		}
 	}
 
