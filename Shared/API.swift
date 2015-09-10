@@ -180,7 +180,7 @@ final class API {
 		return (absolutePath, cachePath)
 	}
 
-	func haveCachedAvatar(path: String, tryLoadAndCallback: (IMAGE_CLASS?) -> Void) -> Bool {
+	func haveCachedAvatar(path: String, tryLoadAndCallback: (IMAGE_CLASS?, String) -> Void) -> Bool {
 
 		let (absolutePath, cachePath) = cachePathForAvatar(path)
 
@@ -197,7 +197,7 @@ final class API {
 				let ret = NSImage(contentsOfFile: cachePath)
 			#endif
 			if let r = ret {
-				tryLoadAndCallback(r)
+				tryLoadAndCallback(r, cachePath)
 				return true
 			} else {
 				try! fileManager.removeItemAtPath(cachePath)
@@ -218,7 +218,7 @@ final class API {
                     i.TIFFRepresentation?.writeToFile(cachePath, atomically: true)
 				}
             #endif
-			dispatch_sync(dispatch_get_main_queue()) { tryLoadAndCallback(result) }
+			dispatch_sync(dispatch_get_main_queue()) { tryLoadAndCallback(result, cachePath) }
         }
 		return false
 	}

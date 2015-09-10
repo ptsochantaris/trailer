@@ -23,6 +23,7 @@ final class ExtensionGlobals {
 	func postNotificationOfType(type: PRNotificationType, forItem: NSManagedObject) {}
 	func setMinimumBackgroundFetchInterval(interval: NSTimeInterval) -> Void {}
 	func clearAllBadLinks() -> Void {}
+	func haveCachedAvatar(path: String, tryLoadAndCallback: (IMAGE_CLASS?, String) -> Void) -> Bool { return false }
 	func cachePathForAvatar(u: String) -> (String, String) { return ("", "") }
 }
 

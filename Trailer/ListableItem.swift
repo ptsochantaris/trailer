@@ -549,15 +549,20 @@ class ListableItem: DataItem {
 			" @" + (userLogin ?? "") +
 			" - " + (body?.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet()) ?? "")
 
-		if let i = self.userAvatarUrl where !Settings.hideAvatars {
-			let (_, cachePath) = api.cachePathForAvatar(i)
-			s.thumbnailURL = NSURL(string: "file://"+cachePath)
-		} else {
-			s.thumbnailURL = nil
+		func completeIndex(s: CSSearchableItemAttributeSet) {
+			let i = CSSearchableItem(uniqueIdentifier:objectID.URIRepresentation().absoluteString, domainIdentifier: nil, attributeSet: s)
+			CSSearchableIndex.defaultSearchableIndex().indexSearchableItems([i], completionHandler: nil)
 		}
 
-		let i = CSSearchableItem(uniqueIdentifier:objectID.URIRepresentation().absoluteString, domainIdentifier: nil, attributeSet: s)
-		CSSearchableIndex.defaultSearchableIndex().indexSearchableItems([i], completionHandler: nil)
+		if let i = self.userAvatarUrl where !Settings.hideAvatars {
+			api.haveCachedAvatar(i) { _, cachePath in
+				s.thumbnailURL = NSURL(string: "file://"+cachePath)
+				completeIndex(s)
+			}
+		} else {
+			s.thumbnailURL = nil
+			completeIndex(s)
+		}
 	}
 	final func deIndexFromSpotlight() {
 		CSSearchableIndex.defaultSearchableIndex().deleteSearchableItemsWithIdentifiers([objectID.URIRepresentation().absoluteString], completionHandler: nil)
