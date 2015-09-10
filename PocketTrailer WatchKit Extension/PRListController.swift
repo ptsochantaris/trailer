@@ -27,7 +27,7 @@ final class PRListController: CommonController {
 	}
 
 	override func requestData(command: String?) {
-		var params = ["list": "item_list", "type": type, "section": section.apiName()]
+		var params = ["list": "item_list", "type": type, "sectionIndex": NSNumber(integer: section.rawValue)]
 		if let command = command {
 			params["command"] = command
 		}

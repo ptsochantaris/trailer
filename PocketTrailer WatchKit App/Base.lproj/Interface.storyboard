@@ -118,7 +118,7 @@
                                             <label alignment="left" text="Title" numberOfLines="0" id="18g-kn-5Ie">
                                                 <fontDescription key="font" style="UICTFontTextStyleBody"/>
                                             </label>
-                                            <group width="40" height="16" alignment="left" spacing="4" id="lLA-39-zIL">
+                                            <group alignment="left" spacing="4" id="lLA-39-zIL">
                                                 <items>
                                                     <group alignment="left" verticalAlignment="center" radius="8" id="1NN-Z1-C8E">
                                                         <items>

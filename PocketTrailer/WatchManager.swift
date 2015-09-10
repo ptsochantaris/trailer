@@ -192,8 +192,8 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 		case "item_list":
 			let type = message["type"] as! String
-			let section = message["section"] as! String
-			result["result"] = buildItemList(type, section)
+			let sectionIndex = message["sectionIndex"] as! Int
+			result["result"] = buildItemList(type, sectionIndex)
 			reportSuccess(result, replyHandler)
 
 		case "item_detail":
@@ -228,17 +228,10 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	////////////////////////////
 
-	private func buildItemList(type: String, _ section: String) -> [[String : AnyObject]] {
+	private func buildItemList(type: String, _ sectionIndex: Int) -> [[String : AnyObject]] {
 		var items = [[String : AnyObject]]()
 
-		let sectionIndex: PullRequestSection
-		switch section {
-			case "mine": sectionIndex = PullRequestSection.Mine
-			case "participated": sectionIndex = PullRequestSection.Participated
-			case "merged": sectionIndex = PullRequestSection.Merged
-			case "closed": sectionIndex = PullRequestSection.Closed
-			default: sectionIndex = PullRequestSection.All
-		}
+		let sectionIndex = PullRequestSection(rawValue: sectionIndex)!
 
 		let f: NSFetchRequest
 		var showStatuses = false
