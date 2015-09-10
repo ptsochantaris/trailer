@@ -9,25 +9,38 @@
 import WatchKit
 import WatchConnectivity
 
-class CommonController: WKInterfaceController {
+class CommonController: WKInterfaceController, WCSessionDelegate {
 
 	weak var _table: WKInterfaceTable!
 	weak var _statusLabel: WKInterfaceLabel!
 	var identifier: String!
+	private var updating: Bool = false
 
 	var app: ExtensionDelegate {
 		return WKExtension.sharedExtension().delegate as! ExtensionDelegate
-	}
-
-	override func awakeWithContext(context: AnyObject?) {
-		super.awakeWithContext(context)
 	}
 
 	override func willActivate() {
 		super.willActivate()
 		if app.lastView != identifier {
 			app.lastView = identifier
-			showStatus("Loading", hideTable: false)
+			if showLoadingFeedback() {
+				showStatus("Connecting...", hideTable: false)
+			}
+			let session = WCSession.defaultSession()
+			session.delegate = self
+			if session.reachable && !updating {
+				requestData(nil)
+			}
+		}
+	}
+
+	func showLoadingFeedback() -> Bool {
+		return _table.numberOfRows == 0
+	}
+
+	func sessionReachabilityDidChange(session: WCSession) {
+		if session.reachable && !updating {
 			requestData(nil)
 		}
 	}
@@ -48,6 +61,10 @@ class CommonController: WKInterfaceController {
 
 	func sendRequest(request: [String : AnyObject]) {
 
+		updating = true
+		if showLoadingFeedback() {
+			showStatus("Loading...", hideTable: false)
+		}
 		WCSession.defaultSession().sendMessage(request, replyHandler: { response in
 			dispatch_async(dispatch_get_main_queue(), { () -> Void in
 				if let errorIndicator = response["error"] as? Bool where errorIndicator == true {
@@ -55,10 +72,12 @@ class CommonController: WKInterfaceController {
 				} else {
 					self.updateFromData(response)
 				}
+				self.updating = false
 			})
 			}) { error in
 				dispatch_async(dispatch_get_main_queue(), {
-					self.showTemporaryError("Error: "+error.localizedDescription)
+					//self.showTemporaryError("Error: "+error.localizedDescription)
+					self.updating = false
 				})
 		}
 	}

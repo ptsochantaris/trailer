@@ -233,6 +233,13 @@ func md5hash(s: String) -> String {
 	return String(hash)
 }
 
+func isDarkColor(color: COLOR_CLASS) -> Bool {
+	var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0
+	color.getRed(&r, green: &g, blue: &b, alpha: nil)
+	let lum = 0.2126 * r + 0.7152 * g + 0.0722 * b
+	return (lum < 0.5)
+}
+
 func parseFromHex(s: String) -> UInt32 {
 	var safe = s.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
 	safe = safe.stringByTrimmingCharactersInSet(NSCharacterSet.symbolCharacterSet())
@@ -240,13 +247,6 @@ func parseFromHex(s: String) -> UInt32 {
 	var result:UInt32 = 0
 	s.scanHexInt(&result)
 	return result
-}
-
-func isDarkColor(color: COLOR_CLASS) -> Bool {
-	var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0
-	color.getRed(&r, green: &g, blue: &b, alpha: nil)
-	let lum = 0.2126 * r + 0.7152 * g + 0.0722 * b
-	return (lum < 0.5)
 }
 
 func colorFromUInt32(c: UInt32) -> COLOR_CLASS {

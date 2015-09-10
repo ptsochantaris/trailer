@@ -39,31 +39,21 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 	@IBOutlet weak var prIcon: WKInterfaceImage!
 	@IBOutlet weak var issueIcon: WKInterfaceImage!
 
-	private var firstLoad: Bool = true
 	private var showIssues: Bool = false
+	private var updating: Bool = false
 
 	override func awakeWithContext(context: AnyObject?) {
-		errorText.setText("Loading...")
+		errorText.setText("Connecting...")
 		setErrorMode(true)
 
 		let session = WCSession.defaultSession()
 		session.delegate = self
 		session.activateSession()
-
-		if firstLoad {
-			requestUpdate()
-		}
 	}
 
 	override func willActivate() {
 		super.willActivate()
-		if !firstLoad {
-			requestUpdate()
-		}
-	}
-
-	override func didAppear() {
-		firstLoad = false
+		requestUpdate()
 	}
 
 	func sessionReachabilityDidChange(session: WCSession) {
@@ -71,17 +61,23 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 	}
 
 	private func requestUpdate() {
-		beginGlanceUpdates()
-		WCSession.defaultSession().sendMessage(["list": "overview"], replyHandler: { data in
-			dispatch_async(dispatch_get_main_queue()) {
-				self.updateFromData(data)
-				self.endGlanceUpdates()
-			}
-			}) { error  in
+		let session = WCSession.defaultSession()
+		if session.reachable {
+			updating = true
+			errorText.setText("Loading...")
+			session.sendMessage(["list": "overview"], replyHandler: { data in
 				dispatch_async(dispatch_get_main_queue()) {
-					self.showError(error)
-					self.endGlanceUpdates()
+					self.updateFromData(data)
+					self.updating = false
 				}
+				}) { error  in
+					dispatch_async(dispatch_get_main_queue()) {
+						self.showError(error)
+						self.updating = false
+					}
+			}
+		} else if session.iOSDeviceNeedsUnlockAfterRebootForReachability {
+			errorText.setText("Please unlock your iPhone first")
 		}
 	}
 
@@ -147,9 +143,9 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 		setErrorMode(true)
 		let session = WCSession.defaultSession()
 		if !session.reachable {
-			errorText.setText("PocketTrailer cannot connect to your iPhone");
+			errorText.setText("Connecting...");
 		} else if session.iOSDeviceNeedsUnlockAfterRebootForReachability {
-			errorText.setText("Please unlock your iPhone first");
+			errorText.setText("Please unlock your iPhone first!");
 		} else {
 			errorText.setText(error.localizedDescription)
 		}

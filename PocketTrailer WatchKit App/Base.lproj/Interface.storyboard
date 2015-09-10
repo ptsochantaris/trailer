@@ -53,7 +53,7 @@
                                                             </label>
                                                         </items>
                                                         <color key="backgroundColor" red="1" green="0.0" blue="0.070606581870000004" alpha="1" colorSpace="calibratedRGB"/>
-                                                        <edgeInsets key="margins" left="5" right="5" top="0.0" bottom="0.0"/>
+                                                        <edgeInsets key="margins" left="6" right="6" top="0.0" bottom="0.0"/>
                                                     </group>
                                                 </items>
                                                 <edgeInsets key="margins" left="5" right="3" top="9" bottom="9"/>
@@ -118,7 +118,7 @@
                                             <label alignment="left" text="Title" numberOfLines="0" id="18g-kn-5Ie">
                                                 <fontDescription key="font" style="UICTFontTextStyleBody"/>
                                             </label>
-                                            <group alignment="left" spacing="4" id="lLA-39-zIL">
+                                            <group width="40" height="16" alignment="left" spacing="4" id="lLA-39-zIL">
                                                 <items>
                                                     <group alignment="left" verticalAlignment="center" radius="8" id="1NN-Z1-C8E">
                                                         <items>
@@ -128,7 +128,7 @@
                                                             </label>
                                                         </items>
                                                         <color key="backgroundColor" red="0.93725490199999995" green="0.93725490199999995" blue="0.95686274510000002" alpha="1" colorSpace="calibratedRGB"/>
-                                                        <edgeInsets key="margins" left="4" right="4" top="0.0" bottom="0.0"/>
+                                                        <edgeInsets key="margins" left="5" right="5" top="0.0" bottom="0.0"/>
                                                     </group>
                                                     <group alignment="left" verticalAlignment="center" radius="8" id="FFB-8c-hj1">
                                                         <items>
@@ -138,7 +138,7 @@
                                                             </label>
                                                         </items>
                                                         <color key="backgroundColor" red="1" green="0.0" blue="0.070606581870000004" alpha="1" colorSpace="calibratedRGB"/>
-                                                        <edgeInsets key="margins" left="4" right="4" top="0.0" bottom="0.0"/>
+                                                        <edgeInsets key="margins" left="5" right="5" top="0.0" bottom="0.0"/>
                                                     </group>
                                                 </items>
                                             </group>

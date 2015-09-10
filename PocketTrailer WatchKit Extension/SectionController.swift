@@ -38,7 +38,9 @@ final class SectionController: CommonController {
 
 	override func requestData(command: String?) {
 		var params = ["list": "overview"]
-		params["command"] = command
+		if let command = command {
+			params["command"] = command
+		}
 		sendRequest(params)
 	}
 
