@@ -2,7 +2,7 @@
 import WatchKit
 import WatchConnectivity
 
-final class PRListController: WKInterfaceController {
+final class PRListController: CommonController {
 
 	@IBOutlet weak var table: WKInterfaceTable!
 	@IBOutlet var statusLabel: WKInterfaceLabel!
@@ -18,61 +18,25 @@ final class PRListController: WKInterfaceController {
 		section = PullRequestSection(rawValue: c[SECTION_KEY] as! Int)
 		type = c[TYPE_KEY] as! String
 
+		_table = table
+		_statusLabel = statusLabel
+		identifier = "LIST"
+		super.awakeWithContext(context)
+
 		setTitle(section.watchMenuName())
-		showStatus("Loading")
 	}
 
-	private var app: ExtensionDelegate {
-		return WKExtension.sharedExtension().delegate as! ExtensionDelegate
-	}
-
-	override func willActivate() {
-		super.willActivate()
-		if app.lastView != "LIST" {
-			app.lastView = "LIST"
-			sendCommand(nil)
-		}
-	}
-
-	private func showStatus(status: String) {
-		table.setAlpha(status.isEmpty ? 1.0 : 0.5)
-		statusLabel.setText(status)
-		statusLabel.setHidden(status.isEmpty)
-	}
-
-	private func sendCommand(command: String?) {
-
+	override func requestData(command: String?) {
 		var params = ["list": "item_list", "type": type, "section": section.apiName()]
 		if let command = command {
 			params["command"] = command
 		}
-		WCSession.defaultSession().sendMessage(params, replyHandler: { response in
-			dispatch_async(dispatch_get_main_queue(), {
-				if let errorIndicator = response["error"] as? Bool where errorIndicator == true {
-					self.showTemporaryError(response["status"] as! String)
-				} else {
-					self.updateFromData(response)
-				}
-			})
-			}) { error in
-				dispatch_async(dispatch_get_main_queue(), { 
-					self.showTemporaryError("Error: "+error.localizedDescription)
-				})
-		}
+		sendRequest(params)
 	}
 
-	private func showTemporaryError(error: String) {
-		self.statusLabel.setTextColor(UIColor.redColor())
-		self.showStatus(error)
-		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(3.0 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
-			self.statusLabel.setTextColor(UIColor.whiteColor())
-			self.showStatus("")
-		}
-	}
+	override func updateFromData(response: [NSString : AnyObject]) {
 
-	private func updateFromData(data: [String : AnyObject]) {
-
-		let result = data["result"] as! [[String : AnyObject]]
+		let result = response["result"] as! [[String : AnyObject]]
 
 		if lastCount == 0 {
 			table.setNumberOfRows(result.count, withRowType: "PRRow")
@@ -91,7 +55,11 @@ final class PRListController: WKInterfaceController {
 			}
 		}
 
-		showStatus(result.count==0 ? "There are no items in this section" : "")
+		if result.count == 0 {
+			showStatus("There are no items in this section", hideTable: true)
+		} else {
+			showStatus("", hideTable: false)
+		}
 
 		if let s = selectedIndex {
 			table.scrollToRowAtIndex(s)
@@ -100,17 +68,17 @@ final class PRListController: WKInterfaceController {
 	}
 
 	@IBAction func markAllReadSelected() {
-		showStatus("Marking items as read")
+		showStatus("Marking items as read", hideTable: true)
 		if type=="prs" {
-			sendCommand("markAllPrsRead")
+			requestData("markAllPrsRead")
 		} else {
-			sendCommand("markAllIssuesRead")
+			requestData("markAllIssuesRead")
 		}
 	}
 
 	@IBAction func refreshSelected() {
-		showStatus("Refreshing")
-		sendCommand("refresh")
+		showStatus("Refreshing", hideTable: true)
+		requestData("refresh")
 	}
 
 	override func table(table: WKInterfaceTable, didSelectRowAtIndex rowIndex: Int) {

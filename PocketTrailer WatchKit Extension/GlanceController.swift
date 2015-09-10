@@ -40,6 +40,7 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 	@IBOutlet weak var issueIcon: WKInterfaceImage!
 
 	private var firstLoad: Bool = true
+	private var showIssues: Bool = false
 
 	override func awakeWithContext(context: AnyObject?) {
 		errorText.setText("Loading...")
@@ -88,10 +89,9 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 
 		let result = data["result"] as! [String : AnyObject]
 
-		let showIssues = result["glanceWantsIssues"] as! Bool
+		showIssues = result["glanceWantsIssues"] as! Bool
 		prIcon.setHidden(showIssues)
 		issueIcon.setHidden(!showIssues)
-		mergedGroup.setHidden(showIssues)
 
 		let r = result[showIssues ? "issues" : "prs"] as! [String : AnyObject]
 
@@ -158,7 +158,7 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 	private func setErrorMode(mode: Bool) {
 		myGroup.setHidden(mode)
 		participatedGroup.setHidden(mode)
-		mergedGroup.setHidden(mode)
+		mergedGroup.setHidden(mode ? mode : showIssues)
 		closedGroup.setHidden(mode)
 		otherGroup.setHidden(mode)
 		unreadGroup.setHidden(mode)

@@ -2,84 +2,44 @@
 import WatchKit
 import WatchConnectivity
 
-final class SectionController: WKInterfaceController {
+final class SectionController: CommonController {
 
 	@IBOutlet weak var table: WKInterfaceTable!
 	@IBOutlet weak var statusLabel: WKInterfaceLabel!
 
 	private var rowControllers = [PopulatableRow]()
 
-	private var app: ExtensionDelegate {
-		return WKExtension.sharedExtension().delegate as! ExtensionDelegate
-	}
-
 	override func awakeWithContext(context: AnyObject?) {
+		_statusLabel = statusLabel
+		_table = table
+		identifier = "SECTIONS"
 		super.awakeWithContext(context)
-		showStatus("Loading")
-	}
-
-	override func willActivate() {
-		super.willActivate()
-		if app.lastView != "SECTIONS" {
-			app.lastView = "SECTIONS"
-			sendCommand(nil)
-		}
-	}
-
-	private func showStatus(status: String) {
-		table.setAlpha(status.isEmpty ? 1.0 : 0.5)
-		statusLabel.setText(status)
-		statusLabel.setHidden(status.isEmpty)
-	}
-
-	private func sendCommand(command: String?) {
-
-		var params = ["list": "overview"]
-		if let command = command {
-			params["command"] = command
-		}
-		WCSession.defaultSession().sendMessage(params, replyHandler: { response in
-			dispatch_async(dispatch_get_main_queue(), { () -> Void in
-				if let errorIndicator = response["error"] as? Bool where errorIndicator == true {
-					self.showTemporaryError(response["status"] as! String)
-				} else {
-					self.updateFromData(response)
-				}
-			})
-			}) { error in
-				dispatch_async(dispatch_get_main_queue(), { 
-					self.showTemporaryError("Error: "+error.localizedDescription)
-				})
-		}
-	}
-
-	private func showTemporaryError(error: String) {
-		self.statusLabel.setTextColor(UIColor.redColor())
-		self.showStatus(error)
-		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(3.0 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
-			self.statusLabel.setTextColor(UIColor.whiteColor())
-			self.showStatus("")
-		}
 	}
 
 	@IBAction func clearMergedSelected() {
-		showStatus("Clearing merged")
-		sendCommand("clearAllMerged")
+		showStatus("Clearing merged", hideTable: true)
+		requestData("clearAllMerged")
 	}
 
 	@IBAction func clearClosedSelected() {
-		showStatus("Clearing closed")
-		sendCommand("clearAllClosed")
+		showStatus("Clearing closed", hideTable: true)
+		requestData("clearAllClosed")
 	}
 
 	@IBAction func markAllReadSelected() {
-		showStatus("Marking all as read")
-		sendCommand("markEverythingRead")
+		showStatus("Marking all as read", hideTable: true)
+		requestData("markEverythingRead")
 	}
 
 	@IBAction func refreshSelected() {
-		showStatus("Refreshing")
-		sendCommand("refresh")
+		showStatus("Refreshing", hideTable: true)
+		requestData("refresh")
+	}
+
+	override func requestData(command: String?) {
+		var params = ["list": "overview"]
+		params["command"] = command
+		sendRequest(params)
 	}
 
 	override func table(table: WKInterfaceTable, didSelectRowAtIndex rowIndex: Int) {
@@ -88,10 +48,10 @@ final class SectionController: WKInterfaceController {
 		pushControllerWithName("ListController", context: [ SECTION_KEY: section!, TYPE_KEY: r.type! ] )
 	}
 
-	private func updateFromData(data: [String : AnyObject]) {
+	override func updateFromData(response: [NSString : AnyObject]) {
 
 		rowControllers.removeAll(keepCapacity: false)
-		let result = data["result"] as! [String : AnyObject]
+		let result = response["result"] as! [String : AnyObject]
 
 		let prType = "prs"
 		let prs = result[prType] as! [String : AnyObject]
@@ -150,6 +110,6 @@ final class SectionController: WKInterfaceController {
 			}
 		}
 
-		self.showStatus("")
+		showStatus("", hideTable: false)
 	}
 }

@@ -14,14 +14,16 @@ let bodyAttributes = { () -> [String : AnyObject] in
 	}()
 */
 
-final class PRDetailController: WKInterfaceController {
+final class PRDetailController: CommonController {
 
 	@IBOutlet weak var table: WKInterfaceTable!
 	@IBOutlet var statusLabel: WKInterfaceLabel!
 
-	override func didAppear() {
-		(WKExtension.sharedExtension().delegate as! ExtensionDelegate).lastView = "DETAIL"
-		super.didAppear()
+	override func awakeWithContext(context: AnyObject?) {
+		_statusLabel = statusLabel
+		_table = table
+		identifier = "DETAIL"
+		super.awakeWithContext(context)
 	}
 
 	/*
@@ -55,8 +57,10 @@ final class PRDetailController: WKInterfaceController {
 	}
 	*/
 
+
 	@IBAction func refreshSelected() {
-		//presentControllerWithName("Command Controller", context: ["command": "refresh"])
+		showStatus("Refreshing", hideTable: true)
+		requestData("refresh")
 	}
 
 	@IBAction func markAllReadSelected() {
