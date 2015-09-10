@@ -29,7 +29,7 @@ final class PRListController: WKInterfaceController {
 	override func willActivate() {
 		super.willActivate()
 		if app.lastView != "LIST" {
-			app.lastView == "LIST"
+			app.lastView = "LIST"
 			sendCommand(nil)
 		}
 	}
