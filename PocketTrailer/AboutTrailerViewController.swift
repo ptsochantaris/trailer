@@ -8,12 +8,12 @@ final class AboutTrailerViewController: UIViewController {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		versionNumber.text = versionString()
-		licenseText.textContainerInset = UIEdgeInsetsMake(0, 10, 10, 10)
 	}
 
 	override func viewDidAppear(animated: Bool) {
 		super.viewDidAppear(animated)
 		licenseText.contentOffset = CGPointZero
+		licenseText.textContainerInset = UIEdgeInsetsMake(0, 10, 10, 10)
 	}
 
 	@IBAction func linkSelected() {

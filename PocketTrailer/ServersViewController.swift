@@ -28,7 +28,9 @@ final class ServersViewController: UITableViewController {
 	}
 
 	deinit {
-		NSNotificationCenter.defaultCenter().removeObserver(tableView)
+		if tableView != nil {
+			NSNotificationCenter.defaultCenter().removeObserver(tableView)
+		}
 	}
 
 	override func viewWillAppear(animated: Bool) {
