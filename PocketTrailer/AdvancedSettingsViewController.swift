@@ -124,7 +124,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.textLabel?.text = "Hide descriptions in Apple Watch detail views"
 				cell.accessoryType = check(Settings.hideDescriptionInWatchDetail)
 			case 5:
-				cell.textLabel?.text = "Open items directly in Safari if internal web view is not visible"
+				cell.textLabel?.text = "Open items directly in Safari if internal web view is not already visible"
 				cell.accessoryType = check(Settings.openItemsDirectlyInSafari)
 			default: break
 			}

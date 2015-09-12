@@ -182,6 +182,11 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		viewMode = indexOfObject(tabBar.items!, value: item)==0 ? MasterViewMode.PullRequests : MasterViewMode.Issues
 	}
 
+	override func viewDidLayoutSubviews() {
+		super.viewDidLayoutSubviews()
+		tableView.tableHeaderView?.frame = CGRectMake(0, 0, tableView.bounds.size.width, 41)
+	}
+
 	override func viewWillAppear(animated: Bool) {
 		super.viewWillAppear(animated)
 		updateStatus()
