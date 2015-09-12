@@ -41,12 +41,6 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 
 	private var showIssues: Bool = false
 
-	override func awakeWithContext(context: AnyObject?) {
-		super.awakeWithContext(context)
-		errorText.setText("Loading...")
-		setErrorMode(true)
-	}
-
 	override func willActivate() {
 		super.willActivate()
 
@@ -55,6 +49,12 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 		let session = WCSession.defaultSession()
 		session.delegate = self
 		session.activateSession()
+	}
+
+	func session(session: WCSession, didReceiveApplicationContext applicationContext: [String : AnyObject]) {
+		dispatch_async(dispatch_get_main_queue()) { [weak self] in
+			self?.updateFromContext(applicationContext)
+		}
 	}
 
 	func sessionWatchStateDidChange(session: WCSession) {
