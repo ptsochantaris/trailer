@@ -150,8 +150,8 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		} else if indexPath.section == Section.Issues.rawValue {
 			switch indexPath.row {
 			case 0:
-				cell.textLabel?.text = "Show issues instead of PRs in Apple Watch glance"
-				cell.accessoryType = check(Settings.showIssuesInGlance)
+				cell.textLabel?.text = "Prefer issues instead of PRs in Apple Watch glances & complications"
+				cell.accessoryType = check(Settings.preferIssuesInWatch)
 			default: break
 			}
 		} else if indexPath.section == Section.Comments.rawValue {
@@ -339,7 +339,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		} else if indexPath.section == Section.Issues.rawValue {
 			switch indexPath.row {
 			case 0:
-				Settings.showIssuesInGlance = !Settings.showIssuesInGlance
+				Settings.preferIssuesInWatch = !Settings.preferIssuesInWatch
 			default: break
 			}
 		} else if indexPath.section == Section.Comments.rawValue {

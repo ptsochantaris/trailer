@@ -114,6 +114,7 @@
 		16B3B3581A34E9F7000BE6CC /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3541A34E9F7000BE6CC /* Reachability.m */; };
 		16B3B35A1A34EAEE000BE6CC /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3591A34EAEE000BE6CC /* main.swift */; };
 		16B3B35B1A34EAEE000BE6CC /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3591A34EAEE000BE6CC /* main.swift */; };
+		16B6B7C11BA3B94C006A509F /* ComplicationDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B6B7C01BA3B94C006A509F /* ComplicationDataSource.swift */; settings = {ASSET_TAGS = (); }; };
 		16B74E481A3B4AC800410EF6 /* PrTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B74E471A3B4AC800410EF6 /* PrTable.swift */; };
 		16B94072182D136700F32061 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 16B94070182D136700F32061 /* dsa_pub.pem */; };
 		16C90F021B13BC180095E8D5 /* RepoSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C90F011B13BC180095E8D5 /* RepoSettingsViewController.swift */; };
@@ -327,6 +328,7 @@
 		16B3B3531A34E9F7000BE6CC /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reachability.h; path = Shared/Reachability.h; sourceTree = "<group>"; };
 		16B3B3541A34E9F7000BE6CC /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Reachability.m; path = Shared/Reachability.m; sourceTree = "<group>"; };
 		16B3B3591A34EAEE000BE6CC /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = main.swift; path = Shared/main.swift; sourceTree = "<group>"; };
+		16B6B7C01BA3B94C006A509F /* ComplicationDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComplicationDataSource.swift; sourceTree = "<group>"; };
 		16B74E471A3B4AC800410EF6 /* PrTable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrTable.swift; sourceTree = "<group>"; };
 		16B94070182D136700F32061 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
 		16C90F011B13BC180095E8D5 /* RepoSettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RepoSettingsViewController.swift; sourceTree = "<group>"; };
@@ -532,9 +534,7 @@
 		16522D711AB03AE500B1C3FB /* WatchKit Extension */ = {
 			isa = PBXGroup;
 			children = (
-				162530501B7AAE49000E3F3B /* ExtensionDelegate.swift */,
-				16522D761AB03AE500B1C3FB /* GlanceController.swift */,
-				16813CBE1BA16D660020F8EB /* CommonController.swift */,
+				16B6B7BE1BA3B903006A509F /* Core */,
 				16E93D151AB4681800CA967E /* Detail */,
 				16E93D101AB467BF00CA967E /* List */,
 				16D845381AB4513F0098FB65 /* Sections */,
@@ -668,6 +668,17 @@
 				1664CBC91B7796840006BDE7 /* Enums.swift */,
 			);
 			name = Globals;
+			sourceTree = "<group>";
+		};
+		16B6B7BE1BA3B903006A509F /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				162530501B7AAE49000E3F3B /* ExtensionDelegate.swift */,
+				16813CBE1BA16D660020F8EB /* CommonController.swift */,
+				16B6B7C01BA3B94C006A509F /* ComplicationDataSource.swift */,
+				16522D761AB03AE500B1C3FB /* GlanceController.swift */,
+			);
+			name = Core;
 			sourceTree = "<group>";
 		};
 		16B9552E17EC86D10005118F /* Data */ = {
@@ -1062,6 +1073,7 @@
 				16EDAB1A1AB4C2D4009B38DD /* CommentRow.swift in Sources */,
 				16E93D121AB467DA00CA967E /* PRListController.swift in Sources */,
 				16E93D191AB46CEE00CA967E /* PRRow.swift in Sources */,
+				16B6B7C11BA3B94C006A509F /* ComplicationDataSource.swift in Sources */,
 				16813CBF1BA16D660020F8EB /* CommonController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

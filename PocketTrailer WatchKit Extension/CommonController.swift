@@ -50,6 +50,14 @@ class CommonController: WKInterfaceController, WCSessionDelegate {
 		}
 	}
 
+	func session(session: WCSession, didReceiveMessage message: [String : AnyObject]) {
+		if message["command"] as? String == "updateComplications" {
+			dispatch_async(dispatch_get_main_queue()) { [weak self] in
+				self?.app.updateComplications()
+			}
+		}
+	}
+
 	func showStatus(status: String, hideTable: Bool) {
 		_statusLabel.setText(status)
 		if hideTable {

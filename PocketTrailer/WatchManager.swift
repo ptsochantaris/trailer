@@ -6,14 +6,21 @@ import WatchConnectivity
 final class WatchManager : NSObject, WCSessionDelegate {
 
 	var backgroundTask = UIBackgroundTaskInvalid
+	var session: WCSession?
 
 	override init() {
 		super.init()
 		if WCSession.isSupported() {
-			let session = WCSession.defaultSession()
-			session.delegate = self
-			session.activateSession()
+			session = WCSession.defaultSession()
+			session?.delegate = self
+			session?.activateSession()
 		}
+	}
+
+	func updateContext() {
+		do {
+			try session?.updateApplicationContext(["overview": buildOverview()])
+		} catch {}
 	}
 
 	func startBGTask() {
@@ -31,28 +38,23 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	func session(session: WCSession, didReceiveMessage message: [String : AnyObject], replyHandler: ([String : AnyObject]) -> Void) {
 
-		startBGTask()
-
 		dispatch_async(dispatch_get_main_queue()) {
+
+			self.startBGTask()
 
 			switch(message["command"] as? String ?? "") {
 			case "refresh":
 				app.startRefresh()
 				dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)) {
-
 					let lastSuccessfulSync = Settings.lastSuccessfulRefresh ?? NSDate()
-
-					while app.isRefreshing {
-						NSThread.sleepForTimeInterval(0.1)
-					}
-
-					atNextEvent {
+					while app.isRefreshing { NSThread.sleepForTimeInterval(0.1) }
+					dispatch_sync(dispatch_get_main_queue(), {
 						if Settings.lastSuccessfulRefresh == nil || lastSuccessfulSync.isEqualToDate(Settings.lastSuccessfulRefresh!) {
 							self.reportFailure("Refresh Failed", message, replyHandler)
 						} else {
 							self.processList(message, replyHandler)
 						}
-					}
+					})
 				}
 
 			case "openpr":
@@ -61,9 +63,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 					m.openPrWithId(itemId)
 					DataManager.saveDB()
 				}
-				atNextEvent {
-					self.processList(message, replyHandler)
-				}
+				self.processList(message, replyHandler)
 
 			case "openissue":
 				if let itemId = message["localId"] as? String {
@@ -71,9 +71,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 					m.openIssueWithId(itemId)
 					DataManager.saveDB()
 				}
-				atNextEvent {
-					self.processList(message, replyHandler)
-				}
+				self.processList(message, replyHandler)
 
 			case "opencomment":
 				if let itemId = message["id"] as? String {
@@ -81,9 +79,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 					m.openCommentWithId(itemId)
 					DataManager.saveDB()
 				}
-				atNextEvent {
-					self.processList(message, replyHandler)
-				}
+				self.processList(message, replyHandler)
 
 			case "clearAllMerged":
 				for p in PullRequest.allMergedRequestsInMoc(mainObjectContext) {
@@ -93,9 +89,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				let m = popupManager.getMasterController()
 				m.reloadDataWithAnimation(false)
 				m.updateStatus()
-				atNextEvent {
-					self.processList(message, replyHandler)
-				}
+				self.processList(message, replyHandler)
 
 			case "clearAllClosed":
 				for p in PullRequest.allClosedRequestsInMoc(mainObjectContext) {
@@ -108,9 +102,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				let m = popupManager.getMasterController()
 				m.reloadDataWithAnimation(false)
 				m.updateStatus()
-				atNextEvent {
-					self.processList(message, replyHandler)
-				}
+				self.processList(message, replyHandler)
 
 			case "markPrRead":
 				if let
@@ -122,9 +114,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 						DataManager.saveDB()
 						app.updateBadge()
 				}
-				atNextEvent {
-					self.processList(message, replyHandler)
-				}
+				self.processList(message, replyHandler)
 
 			case "markIssueRead":
 				if let
@@ -136,9 +126,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 						DataManager.saveDB()
 						app.updateBadge()
 				}
-				atNextEvent {
-					self.processList(message, replyHandler)
-				}
+				self.processList(message, replyHandler)
 
 			case "markEverythingRead":
 				PullRequest.markEverythingRead(PullRequestSection.None, moc: mainObjectContext)
@@ -146,9 +134,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				popupManager.getMasterController().reloadDataWithAnimation(false)
 				DataManager.saveDB()
 				app.updateBadge()
-				atNextEvent {
-					self.processList(message, replyHandler)
-				}
+				self.processList(message, replyHandler)
 
 			case "markAllPrsRead":
 				if let s = message["sectionIndex"] as? Int {
@@ -157,9 +143,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 					DataManager.saveDB()
 					app.updateBadge()
 				}
-				atNextEvent {
-					self.processList(message, replyHandler)
-				}
+				self.processList(message, replyHandler)
 
 			case "markAllIssuesRead":
 				if let s = message["sectionIndex"] as? Int {
@@ -168,14 +152,14 @@ final class WatchManager : NSObject, WCSessionDelegate {
 					DataManager.saveDB()
 					app.updateBadge()
 				}
-				atNextEvent {
-					self.processList(message, replyHandler)
-				}
+				self.processList(message, replyHandler)
+
+			case "needsOverview":
+				self.updateContext()
+				self.reportSuccess([:], replyHandler)
 
 			default:
-				atNextEvent {
-					self.processList(message, replyHandler)
-				}
+				self.processList(message, replyHandler)
 			}
 		}
 	}
@@ -356,7 +340,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		return [
 			"prs": prs,
 			"issues": issues,
-			"glanceWantsIssues": Settings.showIssuesInGlance,
+			"preferIssues": Settings.preferIssuesInWatch,
 			"lastUpdated": Settings.lastSuccessfulRefresh ?? never()
 		]
 	}

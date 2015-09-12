@@ -19,6 +19,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 
 	func updateBadge() {
 		UIApplication.sharedApplication().applicationIconBadgeNumber = PullRequest.badgeCountInMoc(mainObjectContext) + Issue.badgeCountInMoc(mainObjectContext)
+		watchManager?.updateContext()
 	}
 
 	func application(application: UIApplication, willFinishLaunchingWithOptions launchOptions: [NSObject : AnyObject]?) -> Bool {
@@ -217,6 +218,8 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 
 			self!.refreshTimer = NSTimer.scheduledTimerWithTimeInterval(NSTimeInterval(Settings.refreshPeriod), target: self!, selector: Selector("refreshTimerDone"), userInfo: nil, repeats:false)
 			DLog("Refresh done")
+
+			self!.updateBadge()
 
 			self!.endBGTask()
 		}
