@@ -20,7 +20,6 @@ final class PRListController: CommonController {
 
 		_table = table
 		_statusLabel = statusLabel
-		identifier = "LIST"
 		super.awakeWithContext(context)
 
 		setTitle(section.watchMenuName())

@@ -1,5 +1,6 @@
 
 import WatchKit
+import ClockKit
 import WatchConnectivity
 
 let shortDateFormatter = { () -> NSDateFormatter in
@@ -41,31 +42,36 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 
 	private var showIssues: Bool = false
 
+	override func awakeWithContext(context: AnyObject?) {
+		super.awakeWithContext(context)
+		errorText.setText("Loading...")
+		setErrorMode(true)
+	}
+
 	override func willActivate() {
 		super.willActivate()
-
-		beginGlanceUpdates()
 
 		let session = WCSession.defaultSession()
 		session.delegate = self
 		session.activateSession()
-	}
 
-	func session(session: WCSession, didReceiveApplicationContext applicationContext: [String : AnyObject]) {
-		dispatch_async(dispatch_get_main_queue()) { [weak self] in
-			self?.updateFromContext(applicationContext)
+		if session.iOSDeviceNeedsUnlockAfterRebootForReachability {
+			errorText.setText("Please unlock your iPhone first")
+			setErrorMode(true)
+		} else if session.receivedApplicationContext.count > 0 {
+			self.updateFromContext(session.receivedApplicationContext)
 		}
 	}
 
-	func sessionWatchStateDidChange(session: WCSession) {
-		dispatch_async(dispatch_get_main_queue()) { [weak self] in
-			if session.iOSDeviceNeedsUnlockAfterRebootForReachability {
-				self?.errorText.setText("Please unlock your iPhone first")
-				self?.setErrorMode(true)
-				self?.endGlanceUpdates()
-			} else {
-				self?.updateFromContext(session.receivedApplicationContext)
-			}
+	func session(session: WCSession, didReceiveApplicationContext applicationContext: [String : AnyObject]) {
+		dispatch_async(dispatch_get_main_queue()) {
+			self.updateFromContext(applicationContext)
+		}
+	}
+
+	func sessionReachabilityDidChange(session: WCSession) {
+		dispatch_async(dispatch_get_main_queue()) {
+			self.updateFromContext(session.receivedApplicationContext)
 		}
 	}
 
@@ -124,7 +130,8 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 
 			errorText.setText(nil)
 			setErrorMode(false)
-			endGlanceUpdates()
+
+			updateComplications()
 		}
 	}
 
@@ -138,5 +145,14 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 		totalGroup.setHidden(mode)
 		lastUpdate.setHidden(mode)
 		errorText.setHidden(!mode)
+	}
+
+	private func updateComplications() {
+		let complicationServer = CLKComplicationServer.sharedInstance()
+		if let activeComplications = complicationServer.activeComplications {
+			for complication in activeComplications {
+				complicationServer.reloadTimelineForComplication(complication)
+			}
+		}
 	}
 }

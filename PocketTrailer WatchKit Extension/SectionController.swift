@@ -12,7 +12,6 @@ final class SectionController: CommonController {
 	override func awakeWithContext(context: AnyObject?) {
 		_statusLabel = statusLabel
 		_table = table
-		identifier = "SECTIONS"
 		super.awakeWithContext(context)
 	}
 
@@ -113,5 +112,6 @@ final class SectionController: CommonController {
 		}
 
 		showStatus("", hideTable: false)
+		(WKExtension.sharedExtension().delegate as! ExtensionDelegate).updateComplications()
 	}
 }

@@ -10,17 +10,43 @@ import ClockKit
 
 class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 
-	var lastView = ""
+	private let session = WCSession.defaultSession()
+
+	weak var lastView: CommonController? {
+		didSet {
+			potentialUpdate()
+		}
+	}
 
 	func applicationDidFinishLaunching() {
+		session.delegate = self
 	}
-	
+
+	func sessionReachabilityDidChange(session: WCSession) {
+		dispatch_async(dispatch_get_main_queue()) {
+			self.potentialUpdate()
+		}
+	}
+
+	func session(session: WCSession, didReceiveApplicationContext applicationContext: [String : AnyObject]) {
+		dispatch_async(dispatch_get_main_queue()) {
+			self.potentialUpdate()
+		}
+	}
+
 	func applicationDidBecomeActive() {
-		updateComplications()
+		session.activateSession()
+		self.potentialUpdate()
+	}
+
+	private func potentialUpdate() {
+		if session.reachable, let l = lastView {
+			l.requestData(nil)
+		}
 	}
 
 	func applicationWillResignActive() {
-		lastView = ""
+		lastView = nil
 	}
 
 	func updateComplications() {

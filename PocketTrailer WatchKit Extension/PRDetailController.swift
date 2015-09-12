@@ -14,7 +14,6 @@ final class PRDetailController: CommonController {
 	override func awakeWithContext(context: AnyObject?) {
 		_statusLabel = statusLabel
 		_table = table
-		identifier = "DETAIL"
 
 		let c = context as! [NSObject : AnyObject]
 		if let i = c[PULL_REQUEST_KEY] as? String {

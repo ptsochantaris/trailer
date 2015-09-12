@@ -1,11 +1,3 @@
-//
-//  RepoSettingsViewController.swift
-//  Trailer
-//
-//  Created by Paul Tsochantaris on 25/05/2015.
-//
-//
-
 import UIKit
 
 class RepoSettingsViewController: UITableViewController {

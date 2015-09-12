@@ -1,61 +1,23 @@
-//
-//  CommonController.swift
-//  Trailer
-//
-//  Created by Paul Tsochantaris on 10/09/2015.
-//
-//
-
 import WatchKit
 import WatchConnectivity
 
-class CommonController: WKInterfaceController, WCSessionDelegate {
+class CommonController: WKInterfaceController {
 
 	weak var _table: WKInterfaceTable!
 	weak var _statusLabel: WKInterfaceLabel!
-	var identifier: String!
-	private var updating: Bool = false
-
-	var app: ExtensionDelegate {
-		return WKExtension.sharedExtension().delegate as! ExtensionDelegate
-	}
 
 	override func willActivate() {
 		super.willActivate()
-		if app.lastView != identifier {
-			app.lastView = identifier
+		if let app = WKExtension.sharedExtension().delegate as? ExtensionDelegate where app.lastView != self {
+			app.lastView = self
 			if showLoadingFeedback() {
 				showStatus("Connecting...", hideTable: false)
-			}
-
-			let session = WCSession.defaultSession()
-			session.delegate = self
-			session.activateSession()
-
-			if session.reachable && !updating {
-				requestData(nil)
 			}
 		}
 	}
 
 	func showLoadingFeedback() -> Bool {
 		return _table.numberOfRows == 0
-	}
-
-	func sessionReachabilityDidChange(session: WCSession) {
-		dispatch_async(dispatch_get_main_queue()) { () -> Void in
-			if session.reachable && !self.updating {
-				self.requestData(nil)
-			}
-		}
-	}
-
-	func session(session: WCSession, didReceiveMessage message: [String : AnyObject]) {
-		if message["command"] as? String == "updateComplications" {
-			dispatch_async(dispatch_get_main_queue()) { [weak self] in
-				self?.app.updateComplications()
-			}
-		}
 	}
 
 	func showStatus(status: String, hideTable: Bool) {
@@ -74,23 +36,20 @@ class CommonController: WKInterfaceController, WCSessionDelegate {
 
 	func sendRequest(request: [String : AnyObject]) {
 
-		updating = true
 		if showLoadingFeedback() {
 			showStatus("Loading...", hideTable: false)
 		}
 		WCSession.defaultSession().sendMessage(request, replyHandler: { response in
-			dispatch_async(dispatch_get_main_queue(), { () -> Void in
+			dispatch_async(dispatch_get_main_queue(), { 
 				if let errorIndicator = response["error"] as? Bool where errorIndicator == true {
 					self.showTemporaryError(response["status"] as! String)
 				} else {
 					self.updateFromData(response)
 				}
-				self.updating = false
 			})
 			}) { error in
 				dispatch_async(dispatch_get_main_queue(), {
 					//self.showTemporaryError("Error: "+error.localizedDescription)
-					self.updating = false
 				})
 		}
 	}
