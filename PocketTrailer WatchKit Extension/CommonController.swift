@@ -43,8 +43,10 @@ class CommonController: WKInterfaceController, WCSessionDelegate {
 	}
 
 	func sessionReachabilityDidChange(session: WCSession) {
-		if session.reachable && !updating {
-			requestData(nil)
+		dispatch_async(dispatch_get_main_queue()) { () -> Void in
+			if session.reachable && !self.updating {
+				self.requestData(nil)
+			}
 		}
 	}
 

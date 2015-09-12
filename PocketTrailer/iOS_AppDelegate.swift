@@ -161,9 +161,9 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 
 		isRefreshing = true
 
-		backgroundTask = UIApplication.sharedApplication().beginBackgroundTaskWithName("com.housetrip.Trailer.refresh", expirationHandler: { [weak self] in
-			self!.endBGTask()
-			})
+		backgroundTask = UIApplication.sharedApplication().beginBackgroundTaskWithName("com.housetrip.Trailer.refresh") { [weak self] in
+			self?.endBGTask()
+		}
 
 		NSNotificationCenter.defaultCenter().postNotificationName(REFRESH_STARTED_NOTIFICATION, object: nil)
 		DLog("Starting refresh")

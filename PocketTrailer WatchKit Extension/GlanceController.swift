@@ -58,10 +58,17 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 	}
 
 	func sessionReachabilityDidChange(session: WCSession) {
-		requestUpdate()
+		dispatch_async(dispatch_get_main_queue()) { () -> Void in
+			self.requestUpdate()
+		}
 	}
 
 	private func requestUpdate() {
+
+		if updating {
+			return
+		}
+
 		let session = WCSession.defaultSession()
 		if session.reachable {
 			updating = true

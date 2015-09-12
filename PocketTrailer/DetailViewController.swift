@@ -51,7 +51,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 
 	private func showEmpty() {
 		statusLabel.textColor = UIColor.lightGrayColor()
-		statusLabel.text = "Please select a Pull Request from the list on the left, or select 'Settings' to add servers, or show/hide repositories.\n\n(You may have to login to GitHub the first time you visit a private item)"
+		statusLabel.text = "Please select an item from the list on the left, or select 'Settings' to add servers, or show/hide repositories.\n\n(You may have to login to GitHub the first time you visit a private item)"
 		statusLabel.hidden = false
 		navigationItem.rightBarButtonItem?.enabled = false
 		title = nil

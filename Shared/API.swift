@@ -1526,17 +1526,35 @@ final class API {
 
 	#if os(iOS)
 
+	private var networkBGTask = UIBackgroundTaskInvalid
+	private var networkBGEndPopTimer: PopTimer?
 	private var networkIndicationCount: Int = 0
 
 	func networkIndicationStart() {
 		if ++networkIndicationCount == 1 {
 			UIApplication.sharedApplication().networkActivityIndicatorVisible = true
+			networkBGTask = UIApplication.sharedApplication().beginBackgroundTaskWithName("com.housetrip.Trailer.imageload") { [weak self] in
+				self?.endNetworkBGTask()
+			}
+			if networkBGEndPopTimer == nil {
+				networkBGEndPopTimer = PopTimer(timeInterval: 1.0) { [weak self] in
+					self?.endNetworkBGTask()
+				}
+			}
 		}
 	}
 	
 	func networkIndicationEnd() {
 		if --networkIndicationCount == 0 {
 			UIApplication.sharedApplication().networkActivityIndicatorVisible = false
+			networkBGEndPopTimer?.push()
+		}
+	}
+
+	private func endNetworkBGTask() {
+		if networkBGTask != UIBackgroundTaskInvalid {
+			UIApplication.sharedApplication().endBackgroundTask(networkBGTask)
+			networkBGTask = UIBackgroundTaskInvalid
 		}
 	}
 	
