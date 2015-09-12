@@ -41,32 +41,30 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 
 	private var showIssues: Bool = false
 
+	override func awakeWithContext(context: AnyObject?) {
+		super.awakeWithContext(context)
+		errorText.setText("Loading...")
+		setErrorMode(true)
+	}
+
 	override func willActivate() {
 		super.willActivate()
 
-		errorText.setText("Connecting...")
-		setErrorMode(true)
+		beginGlanceUpdates()
 
 		let session = WCSession.defaultSession()
 		session.delegate = self
 		session.activateSession()
-		if session.reachable {
-			updateFromContext(session.applicationContext)
-		} else if session.iOSDeviceNeedsUnlockAfterRebootForReachability {
-			errorText.setText("Please unlock your iPhone first")
-		}
 	}
 
-	func session(session: WCSession, didReceiveApplicationContext applicationContext: [String : AnyObject]) {
+	func sessionWatchStateDidChange(session: WCSession) {
 		dispatch_async(dispatch_get_main_queue()) { [weak self] in
-			self?.updateFromContext(applicationContext)
-		}
-	}
-
-	func sessionReachabilityDidChange(session: WCSession) {
-		if session.reachable {
-			dispatch_async(dispatch_get_main_queue()) { [weak self] in
-				self?.updateFromContext(session.applicationContext)
+			if session.iOSDeviceNeedsUnlockAfterRebootForReachability {
+				self?.errorText.setText("Please unlock your iPhone first")
+				self?.setErrorMode(true)
+				self?.endGlanceUpdates()
+			} else {
+				self?.updateFromContext(session.receivedApplicationContext)
 			}
 		}
 	}
@@ -124,11 +122,9 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 				lastUpdate.setText(shortDateFormatter.stringFromDate(lastRefresh))
 			}
 
-			setErrorMode(false)
 			errorText.setText(nil)
-		} else {
-			errorText.setText("Updating...")
-			WCSession.defaultSession().sendMessage(["command": "needsOverview"], replyHandler: nil, errorHandler: nil)
+			setErrorMode(false)
+			endGlanceUpdates()
 		}
 	}
 
