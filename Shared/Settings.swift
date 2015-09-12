@@ -521,6 +521,11 @@ final class Settings {
 		set { set("DUMP_API_RESPONSES_IN_CONSOLE", newValue) }
 	}
 
+	class var openItemsDirectlyInSafari: Bool {
+		get { return get("OPEN_ITEMS_DIRECTLY_IN_SAFARI") as? Bool ?? false }
+		set { set("OPEN_ITEMS_DIRECTLY_IN_SAFARI", newValue) }
+	}
+
 	////////////////////////////// DEFAULT TRUE
 
 	class var useVibrancy: Bool {

@@ -3,17 +3,12 @@ import WatchConnectivity
 
 final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 
-	var firstUpdateDone = false
-
 	func getNextRequestedUpdateDateWithHandler(handler: (NSDate?) -> Void) {
-		handler(firstUpdateDone ? nil : NSDate())
-		firstUpdateDone = true
+		handler(NSDate().dateByAddingTimeInterval(600))
 	}
 
 	func getPlaceholderTemplateForComplication(complication: CLKComplication, withHandler handler: (CLKComplicationTemplate?) -> Void) {
-
-		let issues = true // TODO pick from host app
-		handler(constructTemplateFor(complication, issues: issues, prCount: nil, issueCount: nil, commentCount: nil))
+		handler(constructTemplateFor(complication, issues: false, prCount: nil, issueCount: nil, commentCount: nil))
 	}
 
 	func getPrivacyBehaviorForComplication(complication: CLKComplication, withHandler handler: (CLKComplicationPrivacyBehavior) -> Void) {
@@ -28,8 +23,7 @@ final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 
 	func getTimelineEntriesForComplication(complication: CLKComplication, beforeDate date: NSDate, limit: Int, withHandler handler: ([CLKComplicationTimelineEntry]?) -> Void) {
 
-		let session = WCSession.defaultSession()
-		if let overview = session.applicationContext["overview"] as? [String : AnyObject] {
+		if let overview = WCSession.defaultSession().receivedApplicationContext["overview"] as? [String : AnyObject] {
 
 			let preferIssues = overview["preferIssues"] as! Bool
 

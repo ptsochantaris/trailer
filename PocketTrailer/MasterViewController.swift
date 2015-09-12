@@ -426,25 +426,38 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-		if let
+		if viewMode == MasterViewMode.PullRequests, let
 			p = fetchedResultsController.objectAtIndexPath(indexPath) as? PullRequest,
-			u = p.urlForOpening()
-			where viewMode == MasterViewMode.PullRequests
+			u = p.urlForOpening(),
+			url = NSURL(string: u)
 		{
-			detailViewController.detailItem = NSURL(string: u)
-			detailViewController.catchupWithDataItemWhenLoaded = p.objectID
-		} else if let
+			if openItem(p, url: url, oid: p.objectID) {
+				tableView.deselectRowAtIndexPath(indexPath, animated: true)
+			}
+		} else if viewMode == MasterViewMode.Issues, let
 			i = fetchedResultsController.objectAtIndexPath(indexPath) as? Issue,
-			u = i.urlForOpening()
-			where viewMode == MasterViewMode.Issues
+			u = i.urlForOpening(),
+			url = NSURL(string: u)
 		{
-			detailViewController.detailItem = NSURL(string: u)
-			detailViewController.catchupWithDataItemWhenLoaded = i.objectID
+			if openItem(i, url: url, oid: i.objectID) {
+				tableView.deselectRowAtIndexPath(indexPath, animated: true)
+			}
 		}
+	}
 
-		if !detailViewController.isVisible {
-			showTabBar(false, animated: true)
-			showDetailViewController(detailViewController.navigationController!, sender: self)
+	private func openItem(item: ListableItem, url: NSURL, oid: NSManagedObjectID) -> Bool {
+		if Settings.openItemsDirectlyInSafari && !detailViewController.isVisible {
+			item.catchUpWithComments()
+			UIApplication.sharedApplication().openURL(url)
+			return true
+		} else {
+			detailViewController.detailItem = url
+			detailViewController.catchupWithDataItemWhenLoaded = oid
+			if !detailViewController.isVisible {
+				showTabBar(false, animated: true)
+				showDetailViewController(detailViewController.navigationController!, sender: self)
+			}
+			return false
 		}
 	}
 

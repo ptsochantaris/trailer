@@ -32,7 +32,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 	private enum Section: Int {
 		case Refresh, Display, Filtering, Issues, Comments, Repos, StausesAndLabels, History, Confirm, Sort, Misc
-		static let rowCounts = [3, 5, 6, 1, 7, 2, 6, 3, 2, 3, 1]
+		static let rowCounts = [3, 6, 6, 1, 7, 2, 6, 3, 2, 3, 1]
 		static let allNames = ["Auto Refresh", "Display", "Filtering", "Issues", "Comments", "Repositories", "Statuses & Labels", "History", "Don't confirm when", "Sorting", "Misc"]
 	}
 
@@ -123,6 +123,9 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			case 4:
 				cell.textLabel?.text = "Hide descriptions in Apple Watch detail views"
 				cell.accessoryType = check(Settings.hideDescriptionInWatchDetail)
+			case 5:
+				cell.textLabel?.text = "Open items directly in Safari if internal web view is not visible"
+				cell.accessoryType = check(Settings.openItemsDirectlyInSafari)
 			default: break
 			}
 		} else if indexPath.section == Section.Filtering.rawValue {
@@ -317,6 +320,8 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				settingsChangedTimer.push()
 			case 4:
 				Settings.hideDescriptionInWatchDetail = !Settings.hideDescriptionInWatchDetail
+			case 5:
+				Settings.openItemsDirectlyInSafari = !Settings.openItemsDirectlyInSafari
 			default: break
 			}
 		} else if indexPath.section == Section.Filtering.rawValue {
