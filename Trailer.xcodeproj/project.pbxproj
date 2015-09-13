@@ -142,6 +142,7 @@
 		16EDAB1C1AB4CB6F009B38DD /* StatusRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16EDAB1B1AB4CB6F009B38DD /* StatusRow.swift */; };
 		16EE6AD01A9A711C000A8483 /* CountLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16EE6ACF1A9A711C000A8483 /* CountLabel.swift */; };
 		16EE871B1A446BFE00A1D16F /* EmptyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16EE871A1A446BFE00A1D16F /* EmptyView.swift */; };
+		16F413701BA5850A006B0195 /* RepoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F4136F1BA5850A006B0195 /* RepoCell.swift */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -352,6 +353,7 @@
 		16EDAB1B1AB4CB6F009B38DD /* StatusRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatusRow.swift; sourceTree = "<group>"; };
 		16EE6ACF1A9A711C000A8483 /* CountLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CountLabel.swift; sourceTree = "<group>"; };
 		16EE871A1A446BFE00A1D16F /* EmptyView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmptyView.swift; sourceTree = "<group>"; };
+		16F4136F1BA5850A006B0195 /* RepoCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RepoCell.swift; sourceTree = "<group>"; };
 		16F51FA019DE8C78007B0BB1 /* PRIVACY */ = {isa = PBXFileReference; lastKnownFileType = text; path = PRIVACY; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -753,6 +755,7 @@
 				164840FD1AD19837009E6383 /* PopupManager.swift */,
 				164841011AD19933009E6383 /* NotificationManager.swift */,
 				16C90F011B13BC180095E8D5 /* RepoSettingsViewController.swift */,
+				16F4136F1BA5850A006B0195 /* RepoCell.swift */,
 			);
 			name = Settings;
 			sourceTree = "<group>";
@@ -1030,6 +1033,7 @@
 				16C9A27A1A44DD0200EE54EC /* CommentBlacklistViewController.swift in Sources */,
 				164840FC1AD196D6009E6383 /* SettingsManager.swift in Sources */,
 				1633C1931ABCEC4A0086C692 /* Issue.swift in Sources */,
+				16F413701BA5850A006B0195 /* RepoCell.swift in Sources */,
 				1606F1BD1A471CDC0088368E /* RespositoriesViewController.swift in Sources */,
 				166A84C41A45CEE000A3B292 /* PickerViewController.swift in Sources */,
 				166A84C21A45A37700A3B292 /* AdvancedSettingsViewController.swift in Sources */,

@@ -977,12 +977,11 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 						var count = 0
 						let fontSize = NSFont.systemFontSizeForControlSize(NSControlSize.SmallControlSize)
-						for label in RepoDisplayPolicy.labels {
+						for policy in RepoDisplayPolicy.policies {
 							let m = NSMenuItem()
-							let textColor = (row == tv.selectedRow) ? NSColor.selectedControlTextColor() : (count==0 ? NSColor.textColor().colorWithAlphaComponent(0.4) : NSColor.textColor())
-							m.attributedTitle = NSAttributedString(string: label, attributes: [
+							m.attributedTitle = NSAttributedString(string: policy.name(), attributes: [
 								NSFontAttributeName: count==0 ? NSFont.systemFontOfSize(fontSize) : NSFont.boldSystemFontOfSize(fontSize),
-								NSForegroundColorAttributeName: textColor,
+								NSForegroundColorAttributeName: policy.color(),
 								])
 							menuCell.menu?.addItem(m)
 							count++

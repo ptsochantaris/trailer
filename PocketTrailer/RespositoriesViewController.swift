@@ -21,7 +21,7 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 	override func viewDidLoad() {
 		super.viewDidLoad()
 
-		searchField = UITextField(frame: CGRectMake(10, 10, view.bounds.size.width-20, 31))
+		searchField = UITextField(frame: CGRectMake(9, 10, view.bounds.size.width-18, 31))
 		searchField!.placeholder = "Filter..."
 		searchField!.returnKeyType = UIReturnKeyType.Search
 		searchField!.font = UIFont.systemFontOfSize(18)
@@ -115,7 +115,7 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 	}
 
 	override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) 
+		let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! RepoCell
 		configureCell(cell, atIndexPath: indexPath)
 		return cell
 	}
@@ -186,7 +186,7 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 		case .Delete:
 			tableView.deleteRowsAtIndexPaths([indexPath!], withRowAnimation:UITableViewRowAnimation.Automatic)
 		case .Update:
-			if let cell = tableView.cellForRowAtIndexPath(newIndexPath ?? indexPath!) {
+			if let cell = tableView.cellForRowAtIndexPath(newIndexPath ?? indexPath!) as? RepoCell {
 				configureCell(cell, atIndexPath: newIndexPath ?? indexPath!)
 			}
 		case .Move:
@@ -201,15 +201,33 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 		tableView.endUpdates()
 	}
 
-	private func configureCell(cell: UITableViewCell, atIndexPath: NSIndexPath) {
+	private func configureCell(cell: RepoCell, atIndexPath: NSIndexPath) {
 		let repo = fetchedResultsController.objectAtIndexPath(atIndexPath) as! Repo
 
-		cell.textLabel?.attributedText = titleForRepo(repo)
+		cell.titleLabel.text = repo.fullName
+		let prTitle = prTitleForRepo(repo)
+		let issuesTitle = issueTitleForRepo(repo)
+		cell.prLabel!.attributedText = prTitle
+		cell.issuesLabel!.attributedText = issuesTitle
+		cell.accessibilityLabel = "\(title), \(prTitle.string), \(issuesTitle.string)"
+	}
 
-		let subtitle = subtitleForRepo(repo)
-		cell.detailTextLabel?.attributedText = subtitle
-
-		cell.accessibilityLabel = "\(title), \(subtitle.string)"
+	private var sizer: RepoCell?
+	private var heightCache = [NSIndexPath : CGFloat]()
+	override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+		if sizer == nil {
+			sizer = tableView.dequeueReusableCellWithIdentifier("Cell") as? RepoCell
+		} else if let h = heightCache[indexPath] {
+			//DLog("using cached height for %d - %d", indexPath.section, indexPath.row)
+			return h
+		}
+		configureCell(sizer!, atIndexPath: indexPath)
+		UILayoutPriorityFittingSizeLevel
+		let h = sizer!.systemLayoutSizeFittingSize(CGSizeMake(tableView.bounds.width, UILayoutFittingCompressedSize.height),
+			withHorizontalFittingPriority: UILayoutPriorityRequired,
+			verticalFittingPriority: UILayoutPriorityFittingSizeLevel).height
+		heightCache[indexPath] = h
+		return h
 	}
 
 	private func titleForRepo(repo: Repo) -> NSAttributedString {
@@ -219,33 +237,39 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 		return NSAttributedString(string: text, attributes: [ NSForegroundColorAttributeName: color ])
 	}
 
-	private func subtitleForRepo(repo: Repo) -> NSAttributedString {
+	private func prTitleForRepo(repo: Repo) -> NSAttributedString {
 		let a = NSMutableAttributedString()
 
 		let prPolicy = RepoDisplayPolicy(rawValue: repo.displayPolicyForPrs?.integerValue ?? 0) ?? RepoDisplayPolicy.Hide
-		var attributes = attributesForEntryWithPolicy(prPolicy)
-		a.appendAttributedString(NSAttributedString(string: prPolicy.name(), attributes: attributes))
+		let attributes = attributesForEntryWithPolicy(prPolicy)
+		a.appendAttributedString(NSAttributedString(string: prPolicy.prefixName(), attributes: attributes))
 		a.appendAttributedString(NSAttributedString(string: " PRs", attributes: attributes))
-		a.appendAttributedString(NSAttributedString(string: " | ", attributes: [ NSForegroundColorAttributeName: UIColor.lightGrayColor() ]));
+		return a
+	}
+
+	private func issueTitleForRepo(repo: Repo) -> NSAttributedString {
+		let a = NSMutableAttributedString()
 
 		let issuePolicy = RepoDisplayPolicy(rawValue: repo.displayPolicyForIssues?.integerValue ?? 0) ?? RepoDisplayPolicy.Hide
-		attributes = attributesForEntryWithPolicy(issuePolicy)
-		a.appendAttributedString(NSAttributedString(string: issuePolicy.name(), attributes: attributes))
+		let attributes = attributesForEntryWithPolicy(issuePolicy)
+		a.appendAttributedString(NSAttributedString(string: issuePolicy.prefixName(), attributes: attributes))
 		a.appendAttributedString(NSAttributedString(string: " Issues", attributes: attributes))
-
 		return a
 	}
 
 	private func attributesForEntryWithPolicy(policy: RepoDisplayPolicy) -> [String : AnyObject] {
 		return [
 			NSFontAttributeName: UIFont.systemFontOfSize(UIFont.smallSystemFontSize()),
-			NSForegroundColorAttributeName: (policy == RepoDisplayPolicy.Hide) ? UIColor.lightGrayColor() : UIColor.blackColor()
+			NSForegroundColorAttributeName: policy.color()
 		];
 	}
 
 	///////////////////////////// filtering
 
 	private func reloadData() {
+
+		heightCache.removeAll()
+
 		let currentIndexes = NSIndexSet(indexesInRange: NSMakeRange(0, fetchedResultsController.sections?.count ?? 0))
 
 		_fetchedResultsController = nil
