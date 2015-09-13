@@ -7,6 +7,28 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.3.7</title>
+			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Selecting more than one repository in the preferences list will allow them to be batch-edited from the group buttons below the table</li>
+				<li>Show (and select to copy) PR/Issue numbers from the OSX context menu</li>
+				<li>Option to dump API requests and responses to help diagnose problems</li>
+				<li>Repository sync policies are now colour-coded to help make them more distinct and easier to visually scan</li>
+				<li>Converted codebase to Swift 2 for further speed and stability improvements, plus benefitting from new compiler optimisations</li>
+				<li>Improved network state detection, especially during system startup, with more detailed logging for troubleshooting</li>
+				<li>Improved accuracy of quarantining failed server responses</li>
+				<li>Database initialisation cleanups for stability</li>
+				</ul></font>]]></description>
+			<pubDate>Sun, 13 Sep 2015 23:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer137.zip"
+			sparkle:version="1236"
+			sparkle:shortVersionString="1.3.7"
+			sparkle:dsaSignature="MC0CFQDqWNwTfEXMoXDTvkQvdhzOObSBwgIUDSaMB/k9c97lP2dP5km0vAuetV8="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.3.6</title>
 			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
