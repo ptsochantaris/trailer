@@ -205,6 +205,7 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 		let repo = fetchedResultsController.objectAtIndexPath(atIndexPath) as! Repo
 
 		cell.titleLabel.text = repo.fullName
+		cell.titleLabel.textColor = repo.shouldSync() ? UIColor.blackColor() : UIColor.lightGrayColor()
 		let prTitle = prTitleForRepo(repo)
 		let issuesTitle = issueTitleForRepo(repo)
 		cell.prLabel!.attributedText = prTitle

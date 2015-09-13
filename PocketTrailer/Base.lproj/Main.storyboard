@@ -256,7 +256,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="X5f-oi-V1t">
-                                            <rect key="frame" x="16" y="10" width="456" height="82.5"/>
+                                            <rect key="frame" x="16" y="14" width="456" height="74.5"/>
                                             <animations/>
                                             <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
@@ -296,10 +296,10 @@
                                         <constraint firstAttribute="bottomMargin" relation="greaterThanOrEqual" secondItem="gUI-6X-Umg" secondAttribute="bottom" constant="4" id="TEC-pN-Bni"/>
                                         <constraint firstItem="8Jg-Ke-drL" firstAttribute="leading" secondItem="X5f-oi-V1t" secondAttribute="trailing" constant="12" id="YCf-yl-B4a"/>
                                         <constraint firstItem="she-8D-rp5" firstAttribute="top" secondItem="8Jg-Ke-drL" secondAttribute="bottom" id="ZsQ-Np-rpP"/>
-                                        <constraint firstAttribute="bottomMargin" secondItem="X5f-oi-V1t" secondAttribute="bottom" constant="2" id="euA-Ar-HsP"/>
+                                        <constraint firstAttribute="bottomMargin" secondItem="X5f-oi-V1t" secondAttribute="bottom" constant="6" id="euA-Ar-HsP"/>
                                         <constraint firstAttribute="trailingMargin" secondItem="8Jg-Ke-drL" secondAttribute="trailing" constant="-5" id="jIp-De-mHn"/>
                                         <constraint firstItem="she-8D-rp5" firstAttribute="leading" secondItem="X5f-oi-V1t" secondAttribute="trailing" constant="12" id="p9f-TO-Cpj"/>
-                                        <constraint firstItem="X5f-oi-V1t" firstAttribute="top" secondItem="bgw-3g-6tl" secondAttribute="topMargin" constant="2" id="vNN-Bn-cFN"/>
+                                        <constraint firstItem="X5f-oi-V1t" firstAttribute="top" secondItem="bgw-3g-6tl" secondAttribute="topMargin" constant="6" id="vNN-Bn-cFN"/>
                                     </constraints>
                                 </tableViewCellContentView>
                                 <animations/>

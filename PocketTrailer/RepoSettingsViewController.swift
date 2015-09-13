@@ -44,6 +44,7 @@ class RepoSettingsViewController: UITableViewController {
 		}
 		cell.selectionStyle = cell.accessoryType==UITableViewCellAccessoryType.Checkmark ? UITableViewCellSelectionStyle.None : UITableViewCellSelectionStyle.Default
 		cell.textLabel?.text = RepoDisplayPolicy.labels[indexPath.row]
+		cell.textLabel?.textColor = RepoDisplayPolicy.colors[indexPath.row]
 		return cell
 	}
 
