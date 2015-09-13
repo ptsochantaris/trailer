@@ -160,7 +160,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		searchHolder.addSubview(searchField)
 		tableView.tableHeaderView = searchHolder
 		tableView.contentOffset = CGPointMake(0, searchHolder.frame.size.height)
-		tableView.estimatedRowHeight = 110
 		tableView.rowHeight = UITableViewAutomaticDimension
 
 		if let detailNav = splitViewController?.viewControllers.last as? UINavigationController {
@@ -194,6 +193,8 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	func reloadDataWithAnimation(animated: Bool) {
+
+		heightCache.removeAll()
 
 		if !Repo.interestedInIssues() && Repo.interestedInPrs() && viewMode == MasterViewMode.Issues {
 			showTabBar(false, animated: animated)
@@ -428,6 +429,25 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath)
 		configureCell(cell, atIndexPath: indexPath)
 		return cell
+	}
+
+	private var sizer: PRCell?
+	private var heightCache = [NSIndexPath : CGFloat]()
+	override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+		if sizer == nil {
+			sizer = tableView.dequeueReusableCellWithIdentifier("Cell") as? PRCell
+			sizer?.forDisplay = false
+		} else if let h = heightCache[indexPath] {
+			//DLog("using cached height for %d - %d", indexPath.section, indexPath.row)
+			return h
+		}
+		configureCell(sizer!, atIndexPath: indexPath)
+		UILayoutPriorityFittingSizeLevel
+		let h = sizer!.systemLayoutSizeFittingSize(CGSizeMake(tableView.bounds.width, UILayoutFittingCompressedSize.height),
+			withHorizontalFittingPriority: UILayoutPriorityRequired,
+			verticalFittingPriority: UILayoutPriorityFittingSizeLevel).height
+		heightCache[indexPath] = h
+		return h
 	}
 
 	override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
@@ -676,11 +696,20 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		viewMode = MasterViewMode.Issues
 	}
 
-	var viewMode: MasterViewMode = .PullRequests {
-		didSet {
-			_fetchedResultsController = nil
-			tableView.reloadData()
-			updateStatus()
+	private var _viewMode: MasterViewMode = .PullRequests
+	var viewMode: MasterViewMode {
+		set {
+			if newValue != _viewMode {
+				_viewMode = newValue
+				_fetchedResultsController = nil
+				heightCache.removeAll()
+				tableView.reloadData()
+				tableView.scrollRectToVisible(CGRectMake(0, tableView.tableHeaderView?.frame.size.height ?? tableView.contentInset.top, 1, 1), animated: false)
+				updateStatus()
+			}
+		}
+		get {
+			return _viewMode
 		}
 	}
 

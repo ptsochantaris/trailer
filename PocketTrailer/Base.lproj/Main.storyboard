@@ -110,7 +110,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" placeholderIntrinsicWidth="50" placeholderIntrinsicHeight="50" usesAttributedText="YES" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Vv-dH-kVA" userLabel="TitleLabel">
-                                            <rect key="frame" x="10" y="10" width="580" height="175"/>
+                                            <rect key="frame" x="10" y="10" width="580" height="50"/>
                                             <animations/>
                                             <attributedString key="attributedText">
                                                 <fragment content="Title">
@@ -124,7 +124,7 @@
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dbg-hz-tPt" userLabel="Avatar">
-                                            <rect key="frame" x="10" y="189" width="50" height="50"/>
+                                            <rect key="frame" x="10" y="64" width="50" height="50"/>
                                             <animations/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="50" id="DHz-HD-pc2"/>
@@ -132,7 +132,7 @@
                                             </constraints>
                                         </imageView>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="252" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" placeholderIntrinsicWidth="50" placeholderIntrinsicHeight="50" usesAttributedText="YES" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AQh-N4-Eak" userLabel="DescriptionLabel">
-                                            <rect key="frame" x="70" y="185" width="520" height="54"/>
+                                            <rect key="frame" x="70" y="60" width="520" height="50"/>
                                             <animations/>
                                             <attributedString key="attributedText">
                                                 <fragment content="Description">
@@ -165,7 +165,7 @@
                                         <constraint firstAttribute="trailing" secondItem="AQh-N4-Eak" secondAttribute="trailing" constant="10" id="12q-LP-jnA"/>
                                         <constraint firstItem="wDD-T8-hhR" firstAttribute="top" relation="greaterThanOrEqual" secondItem="dbg-hz-tPt" secondAttribute="bottom" constant="8" id="BRE-qK-Il3"/>
                                         <constraint firstItem="AQh-N4-Eak" firstAttribute="top" secondItem="dbg-hz-tPt" secondAttribute="top" constant="-4" id="E1d-yH-pZX"/>
-                                        <constraint firstItem="wDD-T8-hhR" firstAttribute="top" secondItem="AQh-N4-Eak" secondAttribute="bottom" constant="8" id="E4U-f8-fuT"/>
+                                        <constraint firstItem="wDD-T8-hhR" firstAttribute="top" relation="greaterThanOrEqual" secondItem="AQh-N4-Eak" secondAttribute="bottom" constant="8" id="E4U-f8-fuT"/>
                                         <constraint firstAttribute="trailing" secondItem="7Vv-dH-kVA" secondAttribute="trailing" constant="10" id="Fjg-5Q-GIv"/>
                                         <constraint firstAttribute="trailing" secondItem="wDD-T8-hhR" secondAttribute="trailing" constant="10" id="IKp-5J-Zt3"/>
                                         <constraint firstItem="dbg-hz-tPt" firstAttribute="leading" secondItem="Ccv-UH-bok" secondAttribute="leading" constant="10" id="JTr-OQ-e3m"/>
