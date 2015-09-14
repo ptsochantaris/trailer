@@ -49,7 +49,12 @@ final class PopupManager: NSObject, UISplitViewControllerDelegate {
 }
 
 func showMessage(title: String, _ message: String?) {
+	var viewController = app.window?.rootViewController
+	while viewController?.presentedViewController != nil {
+		viewController = viewController?.presentedViewController
+	}
+
 	let a = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.Alert)
 	a.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil))
-	app.window?.rootViewController?.presentViewController(a, animated: true, completion: nil)
+	viewController?.presentViewController(a, animated: true, completion: nil)
 }
