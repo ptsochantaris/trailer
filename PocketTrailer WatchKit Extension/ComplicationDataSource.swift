@@ -8,7 +8,7 @@ final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 	}
 
 	func getPlaceholderTemplateForComplication(complication: CLKComplication, withHandler handler: (CLKComplicationTemplate?) -> Void) {
-		handler(constructTemplateFor(complication, issues: false, prCount: nil, issueCount: nil, commentCount: nil))
+		handler(constructTemplateFor(complication, issues: false, prCount: nil, issueCount: nil, commentCount: 0))
 	}
 
 	func getPrivacyBehaviorForComplication(complication: CLKComplication, withHandler handler: (CLKComplicationPrivacyBehavior) -> Void) {
@@ -46,7 +46,7 @@ final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 		let issues = overview["issues"] as! [String : AnyObject]
 		let issueCount = issues["total"] as! Int
 
-		let commentCount = (prs["unread"] as! Int) + (issues["unread"] as! Int)
+		let commentCount = (prs["unread"] as? Int ?? 0) + (issues["unread"] as? Int ?? 0)
 		let entry = CLKComplicationTimelineEntry(date: NSDate(), complicationTemplate: constructTemplateFor(complication, issues: preferIssues, prCount: prCount, issueCount: issueCount, commentCount: commentCount))
 		handler([entry])
 	}
@@ -85,7 +85,7 @@ final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 		}
 	}
 
-	private func constructTemplateFor(complication: CLKComplication, issues: Bool, prCount: Int?, issueCount: Int?, commentCount: Int?) -> CLKComplicationTemplate {
+	private func constructTemplateFor(complication: CLKComplication, issues: Bool, prCount: Int?, issueCount: Int?, commentCount: Int) -> CLKComplicationTemplate {
 
 		let image = UIImage(named: issues ? "ComplicationIssues" : "ComplicationPrs")!
 
@@ -110,7 +110,7 @@ final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 		case .UtilitarianLarge:
 			let t = CLKComplicationTemplateUtilitarianLargeFlat()
 			t.imageProvider = CLKImageProvider(onePieceImage: image)
-			if commentCount == nil || commentCount == 0 {
+			if commentCount > 0 {
 				t.textProvider = CLKSimpleTextProvider(text: count(commentCount, unit: "New Comment"))
 			} else if issues {
 				t.textProvider = CLKSimpleTextProvider(text: count(issueCount, unit: "Issue"))
