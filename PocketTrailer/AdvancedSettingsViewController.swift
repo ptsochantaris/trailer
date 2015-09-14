@@ -305,11 +305,11 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			case 0:
 				cell.titleLabel.text = "Log activity to console"
 				cell.accessoryType = check(Settings.logActivityToConsole)
-				cell.descriptionLabel.text = "This is meant for troubleshooting and should be turned off usually, as it is a performance and security concern. It will output detailed messages about the app's behaviour and logic to the device console."
+				cell.descriptionLabel.text = "This is meant for troubleshooting and should be turned off usually, as it is a performance and security concern. It will output detailed messages about the app's behaviour in the device console."
 			case 1:
 				cell.titleLabel.text = "Log API calls to console"
 				cell.accessoryType = check(Settings.dumpAPIResponsesInConsole)
-				cell.descriptionLabel.text = "This is meant for troubleshooting and should be turned off usually, as it is a performance and security concern. It will output the full request and repsonses to the API servers to the device console."
+				cell.descriptionLabel.text = "This is meant for troubleshooting and should be turned off usually, as it is a performance and security concern. It will output the full request and repsonses to and from API servers in the device console."
 			default: break
 			}
 		}
