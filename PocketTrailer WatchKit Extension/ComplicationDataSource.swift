@@ -46,7 +46,7 @@ final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 		let issues = overview["issues"] as! [String : AnyObject]
 		let issueCount = issues["total"] as! Int
 
-		let commentCount = preferIssues ? (prs["unread"] as! Int) : (issues["unread"] as! Int)
+		let commentCount = (prs["unread"] as! Int) + (issues["unread"] as! Int)
 		let entry = CLKComplicationTimelineEntry(date: NSDate(), complicationTemplate: constructTemplateFor(complication, issues: preferIssues, prCount: prCount, issueCount: issueCount, commentCount: commentCount))
 		handler([entry])
 	}
@@ -98,7 +98,7 @@ final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 		case .ModularLarge:
 			let t = CLKComplicationTemplateModularLargeStandardBody()
 			t.headerImageProvider = CLKImageProvider(onePieceImage: image)
-			t.headerTextProvider = CLKSimpleTextProvider(text: count(commentCount, unit: "Comment"))
+			t.headerTextProvider = CLKSimpleTextProvider(text: count(commentCount, unit: "New Comment"))
 			t.body1TextProvider = CLKSimpleTextProvider(text: count(prCount, unit: "Pull Request"))
 			t.body2TextProvider = CLKSimpleTextProvider(text: count(issueCount, unit: "Issue"))
 			return t
@@ -110,7 +110,9 @@ final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 		case .UtilitarianLarge:
 			let t = CLKComplicationTemplateUtilitarianLargeFlat()
 			t.imageProvider = CLKImageProvider(onePieceImage: image)
-			if issues {
+			if commentCount == nil || commentCount == 0 {
+				t.textProvider = CLKSimpleTextProvider(text: count(commentCount, unit: "New Comment"))
+			} else if issues {
 				t.textProvider = CLKSimpleTextProvider(text: count(issueCount, unit: "Issue"))
 			} else {
 				t.textProvider = CLKSimpleTextProvider(text: count(prCount, unit: "Pull Request"))

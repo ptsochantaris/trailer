@@ -166,6 +166,9 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 	}
 
 	func controller(controller: NSFetchedResultsController, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
+
+		heightCache.removeAll()
+
 		switch(type) {
 		case .Insert:
 			tableView.insertSections(NSIndexSet(index: sectionIndex), withRowAnimation: UITableViewRowAnimation.Automatic)
@@ -179,6 +182,8 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 	}
 
 	func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
+
+		heightCache.removeAll()
 
 		switch(type) {
 		case .Insert:
@@ -223,7 +228,6 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 			return h
 		}
 		configureCell(sizer!, atIndexPath: indexPath)
-		UILayoutPriorityFittingSizeLevel
 		let h = sizer!.systemLayoutSizeFittingSize(CGSizeMake(tableView.bounds.width, UILayoutFittingCompressedSize.height),
 			withHorizontalFittingPriority: UILayoutPriorityRequired,
 			verticalFittingPriority: UILayoutPriorityFittingSizeLevel).height
