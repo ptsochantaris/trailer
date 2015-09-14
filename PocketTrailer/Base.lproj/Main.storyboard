@@ -437,14 +437,14 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="252" text="Option Title" textAlignment="natural" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ar9-3E-qS5">
-                                            <rect key="frame" x="15" y="12" width="523" height="19.5"/>
+                                            <rect key="frame" x="15" y="12" width="522" height="19.5"/>
                                             <animations/>
                                             <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" horizontalCompressionResistancePriority="1000" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="y8d-AF-iMJ">
-                                            <rect key="frame" x="545.5" y="12" width="39.5" height="19.5"/>
+                                            <rect key="frame" x="544.5" y="12" width="39.5" height="19.5"/>
                                             <animations/>
                                             <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                             <color key="textColor" red="0.20392156859999999" green="0.43137254899999999" blue="0.71764705880000002" alpha="1" colorSpace="calibratedRGB"/>
@@ -460,7 +460,7 @@
                                     </subviews>
                                     <animations/>
                                     <constraints>
-                                        <constraint firstAttribute="trailingMargin" secondItem="y8d-AF-iMJ" secondAttribute="trailing" constant="7" id="05g-J9-96p"/>
+                                        <constraint firstAttribute="trailingMargin" secondItem="y8d-AF-iMJ" secondAttribute="trailing" constant="8" id="05g-J9-96p"/>
                                         <constraint firstAttribute="leadingMargin" secondItem="ar9-3E-qS5" secondAttribute="leading" constant="-7" id="0lD-yL-Gct"/>
                                         <constraint firstAttribute="bottomMargin" secondItem="naL-Ei-MIR" secondAttribute="bottom" constant="6" id="G91-z0-Tau"/>
                                         <constraint firstAttribute="trailingMargin" secondItem="naL-Ei-MIR" secondAttribute="trailing" constant="8" id="I3N-wU-yxJ"/>
