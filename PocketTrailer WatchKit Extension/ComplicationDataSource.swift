@@ -87,40 +87,39 @@ final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 
 	private func constructTemplateFor(complication: CLKComplication, issues: Bool, prCount: Int?, issueCount: Int?, commentCount: Int) -> CLKComplicationTemplate {
 
-		let image = UIImage(named: issues ? "ComplicationIssues" : "ComplicationPrs")!
-
 		switch complication.family {
 		case .ModularSmall:
 			let t = CLKComplicationTemplateModularSmallStackImage()
-			t.line1ImageProvider = CLKImageProvider(onePieceImage: image)
+			t.line1ImageProvider = CLKImageProvider(onePieceImage: UIImage(named: issues ? "ComplicationIssues" : "ComplicationPrs")!)
 			t.line2TextProvider = CLKSimpleTextProvider(text: count(issues ? issueCount : prCount, unit: nil))
 			return t
 		case .ModularLarge:
 			let t = CLKComplicationTemplateModularLargeStandardBody()
-			t.headerImageProvider = CLKImageProvider(onePieceImage: image)
+			t.headerImageProvider = CLKImageProvider(onePieceImage: UIImage(named: "ComplicationPrs")!)
 			t.headerTextProvider = CLKSimpleTextProvider(text: count(commentCount, unit: "New Comment"))
 			t.body1TextProvider = CLKSimpleTextProvider(text: count(prCount, unit: "Pull Request"))
 			t.body2TextProvider = CLKSimpleTextProvider(text: count(issueCount, unit: "Issue"))
 			return t
 		case .UtilitarianSmall:
 			let t = CLKComplicationTemplateUtilitarianSmallFlat()
-			t.imageProvider = CLKImageProvider(onePieceImage: image)
+			t.imageProvider = CLKImageProvider(onePieceImage: UIImage(named: issues ? "ComplicationIssues" : "ComplicationPrs")!)
 			t.textProvider = CLKSimpleTextProvider(text: count(issues ? issueCount : prCount, unit: nil))
 			return t
 		case .UtilitarianLarge:
 			let t = CLKComplicationTemplateUtilitarianLargeFlat()
-			t.imageProvider = CLKImageProvider(onePieceImage: image)
 			if commentCount > 0 {
 				t.textProvider = CLKSimpleTextProvider(text: count(commentCount, unit: "New Comment"))
 			} else if issues {
+				t.imageProvider = CLKImageProvider(onePieceImage: UIImage(named: "ComplicationIssues")!)
 				t.textProvider = CLKSimpleTextProvider(text: count(issueCount, unit: "Issue"))
 			} else {
+				t.imageProvider = CLKImageProvider(onePieceImage: UIImage(named: "ComplicationPrs")!)
 				t.textProvider = CLKSimpleTextProvider(text: count(prCount, unit: "Pull Request"))
 			}
 			return t
 		case .CircularSmall:
 			let t = CLKComplicationTemplateCircularSmallStackImage()
-			t.line1ImageProvider = CLKImageProvider(onePieceImage: image)
+			t.line1ImageProvider = CLKImageProvider(onePieceImage: UIImage(named: issues ? "ComplicationIssues" : "ComplicationPrs")!)
 			t.line2TextProvider = CLKSimpleTextProvider(text: count(issues ? issueCount : prCount, unit: nil))
 			return t
 		}
