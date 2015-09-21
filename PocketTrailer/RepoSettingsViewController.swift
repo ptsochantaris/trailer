@@ -6,17 +6,28 @@ class RepoSettingsViewController: UITableViewController {
 	var allPrsIndex: Int = -1
 	var allIssuesIndex: Int = -1
 
+	@IBOutlet weak var repoNameTitle: UILabel!
+
 	private var settingsChangedTimer: PopTimer!
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		if repo == nil {
-			title = "All Repos..."
+			repoNameTitle.text = "All Repositories"
+		} else {
+			repoNameTitle.text = repo!.fullName
 		}
 		settingsChangedTimer = PopTimer(timeInterval: 1.0) {
 			DataManager.postProcessAllItems()
 			popupManager.getMasterController().reloadDataWithAnimation(true)
 		}
+	}
+
+	override func viewDidLayoutSubviews() {
+		if let s = tableView.tableHeaderView?.systemLayoutSizeFittingSize(CGSizeMake(tableView.bounds.size.width, 500)) {
+			tableView.tableHeaderView?.frame = CGRectMake(0, 0, tableView.bounds.size.width, s.height)
+		}
+		super.viewDidLayoutSubviews()
 	}
 
 	override func numberOfSectionsInTableView(tableView: UITableView) -> Int {

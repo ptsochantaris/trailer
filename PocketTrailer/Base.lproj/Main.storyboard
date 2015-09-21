@@ -356,9 +356,30 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <animations/>
                         <color key="backgroundColor" red="0.93725490196078431" green="0.93725490196078431" blue="0.95686274509803926" alpha="1" colorSpace="calibratedRGB"/>
+                        <view key="tableHeaderView" contentMode="scaleToFill" id="2RM-hT-lYF">
+                            <rect key="frame" x="0.0" y="44" width="600" height="44"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <subviews>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Fiy-jI-pC7">
+                                    <rect key="frame" x="18" y="18" width="564" height="33"/>
+                                    <animations/>
+                                    <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
+                                    <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                            </subviews>
+                            <animations/>
+                            <color key="backgroundColor" red="0.93725490199999995" green="0.93725490199999995" blue="0.95686274510000002" alpha="1" colorSpace="calibratedRGB"/>
+                            <constraints>
+                                <constraint firstItem="Fiy-jI-pC7" firstAttribute="top" secondItem="2RM-hT-lYF" secondAttribute="topMargin" constant="10" id="7VM-zV-WqV"/>
+                                <constraint firstItem="Fiy-jI-pC7" firstAttribute="leading" secondItem="2RM-hT-lYF" secondAttribute="leadingMargin" constant="10" id="iuc-gx-HaS"/>
+                                <constraint firstItem="Fiy-jI-pC7" firstAttribute="trailing" secondItem="2RM-hT-lYF" secondAttribute="trailingMargin" constant="-10" id="iv7-Kh-6A3"/>
+                                <constraint firstItem="Fiy-jI-pC7" firstAttribute="bottom" secondItem="2RM-hT-lYF" secondAttribute="bottomMargin" constant="15" id="tAe-qd-VSD"/>
+                            </constraints>
+                        </view>
                         <prototypes>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="Cell" id="nWv-dn-x38">
-                                <rect key="frame" x="0.0" y="93.5" width="600" height="44"/>
+                                <rect key="frame" x="0.0" y="137.5" width="600" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="nWv-dn-x38" id="YwR-ML-Nxf">
                                     <rect key="frame" x="0.0" y="0.0" width="600" height="43.5"/>
@@ -374,6 +395,9 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="View Options" id="fc3-fy-icD"/>
+                    <connections>
+                        <outlet property="repoNameTitle" destination="Fiy-jI-pC7" id="nYm-2d-fFN"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="P3q-wd-s8r" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
