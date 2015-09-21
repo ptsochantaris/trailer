@@ -32,25 +32,43 @@ class CommonController: WKInterfaceController {
 	}
 
 	func requestData(command: String?) {
+		// for subclassing
 	}
 
+	private var loading = 0
 	func sendRequest(request: [String : AnyObject]) {
-
-		if showLoadingFeedback() {
-			showStatus("Loading...", hideTable: false)
+		if loading == 0 {
+			if showLoadingFeedback() {
+				showStatus("Loading...", hideTable: false)
+			}
+			attemptRequest(request)
 		}
+	}
+
+	private func attemptRequest(request: [String : AnyObject]) {
+
+		loading++
+
 		WCSession.defaultSession().sendMessage(request, replyHandler: { response in
-			dispatch_async(dispatch_get_main_queue(), { 
+			dispatch_async(dispatch_get_main_queue(), {
 				if let errorIndicator = response["error"] as? Bool where errorIndicator == true {
 					self.showTemporaryError(response["status"] as! String)
 				} else {
 					self.updateFromData(response)
 				}
+				self.loading = 0
 			})
-			}) { error in
-				dispatch_async(dispatch_get_main_queue(), {
-					//self.showTemporaryError("Error: "+error.localizedDescription)
-				})
+		}) { error in
+			if self.loading==5 {
+				dispatch_async(dispatch_get_main_queue()) {
+					self.showTemporaryError("Error: "+error.localizedDescription)
+					self.loading = 0
+				}
+			} else {
+				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.2 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
+					self.attemptRequest(request)
+				}
+			}
 		}
 	}
 
@@ -64,5 +82,6 @@ class CommonController: WKInterfaceController {
 	}
 
 	func updateFromData(response: [NSString : AnyObject]) {
+		// for subclassing
 	}
 }
