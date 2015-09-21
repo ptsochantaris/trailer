@@ -526,7 +526,7 @@ class ListableItem: DataItem {
 				labelNames.append(l)
 			}
 		}
-		return [(userLogin ?? "NO_USERNAME"), "Trailer", "PocketTrailer"] + labelNames + (repo.fullName?.componentsSeparatedByString("/") ?? [])
+		return [(userLogin ?? "NO_USERNAME"), "Trailer", "PocketTrailer", "Pocket Trailer"] + labelNames + (repo.fullName?.componentsSeparatedByString("/") ?? [])
 	}
 	final func searchTitle() -> String {
 		var labelNames = [String]()

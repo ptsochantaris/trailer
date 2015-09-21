@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>${PRODUCT_NAME}</string>
+	<string>Trailer</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
@@ -54,7 +54,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>1238</string>
+	<string>1239</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSUbiquitousContainers</key>
