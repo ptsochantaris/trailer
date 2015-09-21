@@ -75,6 +75,11 @@ final class PRDetailController: CommonController {
 			}
 		}
 
+		let dateFormatter = NSDateFormatter()
+		dateFormatter.doesRelativeDateFormatting = true
+		dateFormatter.timeStyle = NSDateFormatterStyle.ShortStyle
+		dateFormatter.dateStyle = NSDateFormatterStyle.ShortStyle
+
 		if let comments = itemInfo["comments"] as? [[String : AnyObject]] {
 			if comments.count == 0 {
 				setTitle("\(comments.count) Comments")
@@ -87,7 +92,7 @@ final class PRDetailController: CommonController {
 			for comment in comments {
 				if let s = table.rowControllerAtIndex(rowCount++) as? CommentRow {
 					s.usernameL.setText("@" + (comment["user"] as! String))
-					s.dateL.setText(comment["date"] as? String)
+					s.dateL.setText(dateFormatter.stringFromDate(comment["date"] as! NSDate))
 					s.commentL.setText(comment["text"] as? String)
 					if commentCount++ < unreadCount {
 						s.margin.setBackgroundColor(UIColor.redColor())
