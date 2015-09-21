@@ -56,7 +56,7 @@ final class Issue: ListableItem {
 
 	#if os(iOS)
 	override func searchKeywords() -> [String] {
-		return ["Issue"]+super.searchKeywords()
+		return ["Issue","Issues"]+super.searchKeywords()
 	}
 	#endif
 

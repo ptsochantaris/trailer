@@ -520,7 +520,13 @@ class ListableItem: DataItem {
 
 	#if os(iOS)
 	func searchKeywords() -> [String] {
-		return [(userLogin ?? "NO_USERNAME"), "Trailer", "PocketTrailer"] + (repo.fullName?.componentsSeparatedByString("/") ?? [])
+		var labelNames = [String]()
+		for l in labels {
+			if let l = l.name {
+				labelNames.append(l)
+			}
+		}
+		return [(userLogin ?? "NO_USERNAME"), "Trailer", "PocketTrailer"] + labelNames + (repo.fullName?.componentsSeparatedByString("/") ?? [])
 	}
 	final func searchTitle() -> String {
 		var labelNames = [String]()
