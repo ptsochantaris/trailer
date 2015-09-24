@@ -192,17 +192,6 @@ import UIKit
 		b *= 255.0
 		return NSString(format: "%02X%02X%02X", Int(r), Int(g), Int(b)) as String
 	}
-
-	func imageFromColor(color: UIColor) -> UIImage {
-		let rect = CGRectMake(0, 0, 1, 1)
-		UIGraphicsBeginImageContext(rect.size)
-		let context = UIGraphicsGetCurrentContext()
-		CGContextSetFillColorWithColor(context, color.CGColor)
-		CGContextFillRect(context, rect)
-		let img = UIGraphicsGetImageFromCurrentImageContext()
-		UIGraphicsEndImageContext()
-		return img
-	}
 #endif
 
 func versionString() -> String {

@@ -372,9 +372,6 @@ let mainObjectContext = { () -> NSManagedObjectContext in
 	let m = NSManagedObjectContext(concurrencyType:NSManagedObjectContextConcurrencyType.MainQueueConcurrencyType)
 	m.undoManager = nil
 	m.persistentStoreCoordinator = persistentStoreCoordinator
-	#if DATA_READONLY
-		m.stalenessInterval = 0.0
-	#endif
 	DLog("Database setup complete")
 	return m
 }()
@@ -410,7 +407,9 @@ let persistentStoreCoordinator = { ()-> NSPersistentStoreCoordinator in
 
 func dataFilesDirectory() -> NSURL {
 	#if os(iOS)
-		return sharedFilesDirectory()
+		let sharedFiles = sharedFilesDirectory()
+		DLog("Shared files in %@", sharedFiles)
+		return sharedFiles
 	#else
 		return legacyFilesDirectory()
 	#endif
@@ -424,53 +423,17 @@ private func legacyFilesDirectory() -> NSURL {
 	return appSupportURL
 }
 
-private func sharedFilesDirectory() -> NSURL {
-	let appSupportURL = NSFileManager.defaultManager().containerURLForSecurityApplicationGroupIdentifier("group.Trailer")!
-	DLog("Shared files in %@", appSupportURL)
-	return appSupportURL
+func sharedFilesDirectory() -> NSURL {
+	return NSFileManager.defaultManager().containerURLForSecurityApplicationGroupIdentifier("group.Trailer")!
 }
 
 private func addStorePath(sqlStore: NSURL, newCoordinator: NSPersistentStoreCoordinator) -> Bool {
 
-	#if DATA_READONLY
-		if NSFileManager.defaultManager().fileExistsAtPath(sqlStore.path!) { // may need migration
-
-			let m = try! NSPersistentStoreCoordinator.metadataForPersistentStoreOfType(NSSQLiteStoreType, URL: sqlStore, options: nil)
-			if newCoordinator.managedObjectModel.isConfiguration(nil, compatibleWithStoreMetadata: m) == false {
-
-				do {
-					let tempStore = try newCoordinator.addPersistentStoreWithType(NSSQLiteStoreType,
-						configuration: nil,
-						URL: sqlStore,
-						options: [
-							NSMigratePersistentStoresAutomaticallyOption: true,
-							NSInferMappingModelAutomaticallyOption: true])
-					try newCoordinator.removePersistentStore(tempStore)
-				} catch {
-					DLog("Error while migrating read/write DB store before mounting readonly %@", (error as NSError).localizedDescription)
-					return false
-				}
-			}
-		} else { // may need creating
-
-			do {
-				let tempStore = try newCoordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: sqlStore, options: nil)
-				try newCoordinator.removePersistentStore(tempStore)
-			} catch {
-				DLog("Error while creating read/write DB store before mounting readonly %@", (error as NSError).localizedDescription)
-				return false
-			}
-		}
-	#endif
-
 	do {
-		var storeOptions = [
+		let storeOptions = [
 			NSMigratePersistentStoresAutomaticallyOption: NSNumber(bool: true),
 			NSInferMappingModelAutomaticallyOption: NSNumber(bool: true),
 			NSSQLitePragmasOption: ["synchronous":"OFF", "fullfsync":"0"]]
-		#if DATA_READONLY
-			storeOptions[NSReadOnlyPersistentStoreOption] = NSNumber(bool: true)
-		#endif
 
 		try newCoordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: sqlStore, options: storeOptions)
 	} catch {

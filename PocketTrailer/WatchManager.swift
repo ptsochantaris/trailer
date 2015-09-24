@@ -5,8 +5,8 @@ import WatchConnectivity
 
 final class WatchManager : NSObject, WCSessionDelegate {
 
-	var backgroundTask = UIBackgroundTaskInvalid
-	var session: WCSession?
+	private var backgroundTask = UIBackgroundTaskInvalid
+	private var session: WCSession?
 
 	override init() {
 		super.init()
@@ -19,7 +19,9 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	func updateContext() {
 		do {
-			try session?.updateApplicationContext(["overview": buildOverview()])
+			let overview = buildOverview()
+			try session?.updateApplicationContext(["overview": overview])
+			(overview as NSDictionary).writeToURL(sharedFilesDirectory().URLByAppendingPathComponent("overview.plist"), atomically: true)
 		} catch {}
 	}
 

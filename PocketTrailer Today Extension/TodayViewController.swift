@@ -4,29 +4,6 @@ import CoreData
 import Foundation
 import NotificationCenter
 
-let app = { () -> ExtensionGlobals! in
-	Settings.checkMigration()
-	DataManager.checkMigration()
-	return ExtensionGlobals()
-	}()
-
-let api = app
-
-final class ExtensionGlobals {
-
-	var refreshesSinceLastLabelsCheck = [NSManagedObjectID:Int]()
-	var refreshesSinceLastStatusCheck = [NSManagedObjectID:Int]()
-	var isRefreshing = false
-	var preferencesDirty = false
-	var lastRepoCheck = never()
-
-	func postNotificationOfType(type: PRNotificationType, forItem: NSManagedObject) {}
-	func setMinimumBackgroundFetchInterval(interval: NSTimeInterval) -> Void {}
-	func clearAllBadLinks() -> Void {}
-	func haveCachedAvatar(path: String, tryLoadAndCallback: (IMAGE_CLASS?, String) -> Void) -> Bool { return false }
-	func cachePathForAvatar(u: String) -> (String, String) { return ("", "") }
-}
-
 final class TodayViewController: UIViewController, NCWidgetProviding {
 
 	@IBOutlet weak var prLabel: UILabel!
@@ -35,6 +12,9 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 
 	var prButton: UIButton!
 	var issuesButton: UIButton!
+
+	@IBOutlet weak var prImage: UIImageView!
+	@IBOutlet weak var issueImage: UIImageView!
 
 	private let paragraph = NSMutableParagraphStyle()
 
@@ -54,7 +34,7 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 
 	private var dimAttributes: [String: AnyObject] {
 		return [
-			NSForegroundColorAttributeName: UIColor.grayColor(),
+			NSForegroundColorAttributeName: UIColor.darkGrayColor(),
 			NSFontAttributeName: UIFont.systemFontOfSize(UIFont.systemFontSize()+2.0),
 			NSParagraphStyleAttributeName: paragraph ]
 	}
@@ -75,6 +55,9 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
+
+		prImage.image = UIImage(named: "prsTab")?.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate)
+		issueImage.image = UIImage(named: "issuesTab")?.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate)
 
 		paragraph.paragraphSpacing = 4
 
@@ -109,61 +92,56 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 
 	private func update() {
 
-		Settings.clearCache()
+		if let overview = NSDictionary(contentsOfURL: (NSFileManager.defaultManager().containerURLForSecurityApplicationGroupIdentifier("group.Trailer")!).URLByAppendingPathComponent("overview.plist")) {
 
-		let totalCount = PullRequest.countAllRequestsInMoc(mainObjectContext)
-		var a = NSMutableAttributedString(string: "\(totalCount) PRs: ", attributes: brightAttributes)
-		if totalCount>0 {
-			appendPr(a, section: PullRequestSection.Mine)
-			appendPr(a, section: PullRequestSection.Participated)
-			appendPr(a, section: PullRequestSection.Merged)
-			appendPr(a, section: PullRequestSection.Closed)
-			appendPr(a, section: PullRequestSection.All)
-			appendCommentCount(a, number: PullRequest.badgeCountInMoc(mainObjectContext))
-		}
-		else
-		{
-			let reason = DataManager.reasonForEmptyWithFilter(nil).mutableCopy() as! NSMutableAttributedString
-			reason.addAttribute(NSParagraphStyleAttributeName, value: paragraph, range: NSMakeRange(0, a.length))
-			a.appendAttributedString(reason)
-		}
-		prLabel.attributedText = a
-
-		if Repo.interestedInIssues() {
-			let totalCount = Issue.countAllIssuesInMoc(mainObjectContext)
-			a = NSMutableAttributedString(string: "\(totalCount) Issues: ", attributes: brightAttributes)
+			let prs = overview["prs"] as! [String:AnyObject]
+			var totalCount = prs["total"] as! Int
+			var a = NSMutableAttributedString(string: "\(totalCount): ", attributes: brightAttributes)
 			if totalCount>0 {
-				appendIssue(a, section: PullRequestSection.Mine)
-				appendIssue(a, section: PullRequestSection.Participated)
-				appendIssue(a, section: PullRequestSection.Merged)
-				appendIssue(a, section: PullRequestSection.Closed)
-				appendIssue(a, section: PullRequestSection.All)
-				appendCommentCount(a, number: Issue.badgeCountInMoc(mainObjectContext))
+				append(a, from: prs, section: PullRequestSection.Mine)
+				append(a, from: prs, section: PullRequestSection.Participated)
+				append(a, from: prs, section: PullRequestSection.Merged)
+				append(a, from: prs, section: PullRequestSection.Closed)
+				append(a, from: prs, section: PullRequestSection.All)
+				appendCommentCount(a, number: prs["unread"] as! Int)
+			} else {
+				a.appendAttributedString(NSAttributedString(string: prs["error"] as! String, attributes: [NSParagraphStyleAttributeName: paragraph]))
 			}
-			else
-			{
-				let reason = DataManager.reasonForEmptyIssuesWithFilter(nil).mutableCopy() as! NSMutableAttributedString
-				reason.addAttribute(NSParagraphStyleAttributeName, value: paragraph, range: NSMakeRange(0, a.length))
-				a.appendAttributedString(reason)
+			prLabel.attributedText = a
+
+			let issues = overview["issues"] as! [String:AnyObject]
+			totalCount = issues["total"] as! Int
+			a = NSMutableAttributedString(string: "\(totalCount): ", attributes: brightAttributes)
+			if totalCount>0 {
+				append(a, from: issues, section: PullRequestSection.Mine)
+				append(a, from: issues, section: PullRequestSection.Participated)
+				append(a, from: issues, section: PullRequestSection.Closed)
+				append(a, from: issues, section: PullRequestSection.All)
+				appendCommentCount(a, number: issues["unread"] as! Int)
+			} else {
+				a.appendAttributedString(NSAttributedString(string: issues["error"] as! String, attributes: [NSParagraphStyleAttributeName: paragraph]))
 			}
 			issuesLabel.attributedText = a
+
+			let lastRefresh = overview["lastUpdated"] as! NSDate
+			if lastRefresh == NSDate.distantPast() {
+				updatedLabel.attributedText = NSAttributedString(string: "Not updated yet", attributes: smallAttributes)
+			} else {
+				let d = NSDateFormatter()
+				d.dateStyle = NSDateFormatterStyle.ShortStyle
+				d.timeStyle = NSDateFormatterStyle.ShortStyle
+				d.doesRelativeDateFormatting = true
+				updatedLabel.attributedText = NSAttributedString(string: "Updated " + d.stringFromDate(lastRefresh), attributes: smallAttributes)
+			}
 		} else {
 			issuesLabel.attributedText = nil
-		}
-
-		if let lastRefresh = Settings.lastSuccessfulRefresh {
-			let d = NSDateFormatter()
-			d.dateStyle = NSDateFormatterStyle.ShortStyle
-			d.timeStyle = NSDateFormatterStyle.ShortStyle
-			updatedLabel.attributedText = NSAttributedString(string: "Updated " + d.stringFromDate(lastRefresh), attributes: smallAttributes)
-		} else {
-			updatedLabel.attributedText = NSAttributedString(string: "Not updated yet", attributes: smallAttributes)
+			prLabel.attributedText = NSAttributedString(string: "Not updated yet", attributes: dimAttributes)
+			issuesLabel.attributedText = NSAttributedString(string: "Not updated yet", attributes: dimAttributes)
+			updatedLabel.attributedText = nil
 		}
 	}
 
 	func widgetPerformUpdateWithCompletionHandler(completionHandler: ((NCUpdateResult) -> Void)) {
-		// Perform any setup necessary in order to update the view.
-
 		// If an error is encountered, use NCUpdateResult.Failed
 		// If there's no update required, use NCUpdateResult.NoData
 		// If there's an update, use NCUpdateResult.NewData
@@ -183,8 +161,8 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 		}
 	}
 
-	func appendPr(a: NSMutableAttributedString, section: PullRequestSection) {
-		let count = PullRequest.countRequestsInSection(section, moc: mainObjectContext)
+	func append(a: NSMutableAttributedString, from: [String:AnyObject], section: PullRequestSection) {
+		let count = (from[section.apiName()] as! [String:AnyObject])["total"] as! Int
 		if count > 0 {
 			let text = "\(count)\u{a0}\(section.watchMenuName()), "
 			a.appendAttributedString(NSAttributedString(string: text, attributes: normalAttributes))
@@ -194,47 +172,14 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 		}
 	}
 
-	func appendIssue(a: NSMutableAttributedString, section: PullRequestSection) {
-		let count = Issue.countIssuesInSection(section, moc: mainObjectContext)
-		if count > 0 {
-			let text = "\(count)\u{a0}\(section.watchMenuName()), "
-			a.appendAttributedString(NSAttributedString(string: text, attributes: normalAttributes))
-		} else {
-			let text = "0\u{a0}\(section.watchMenuName()), "
-			a.appendAttributedString(NSAttributedString(string: text, attributes: dimAttributes))
-		}
-	}
-
-	////////////////// With many thanks to http://stackoverflow.com/questions/27679096/how-to-determine-the-today-extension-left-margin-properly-in-ios-8
-
-	struct ScreenSize {
-		static let SCREEN_WIDTH = UIScreen.mainScreen().bounds.size.width
-		static let SCREEN_HEIGHT = UIScreen.mainScreen().bounds.size.height
-		static let SCREEN_MAX_LENGTH = max(ScreenSize.SCREEN_WIDTH, ScreenSize.SCREEN_HEIGHT)
-		static let SCREEN_MIN_LENGTH = min(ScreenSize.SCREEN_WIDTH, ScreenSize.SCREEN_HEIGHT)
-	}
-
-	struct DeviceType {
-		static let iPhone4 =  UIDevice.currentDevice().userInterfaceIdiom == .Phone && ScreenSize.SCREEN_MAX_LENGTH < 568.0
-		static let iPhone5 = UIDevice.currentDevice().userInterfaceIdiom == .Phone && ScreenSize.SCREEN_MAX_LENGTH == 568.0
-		static let iPhone6 = UIDevice.currentDevice().userInterfaceIdiom == .Phone && ScreenSize.SCREEN_MAX_LENGTH == 667.0
-		static let iPhone6Plus = UIDevice.currentDevice().userInterfaceIdiom == .Phone && ScreenSize.SCREEN_MAX_LENGTH == 736.0
-		static let iPad = UIDevice.currentDevice().userInterfaceIdiom == .Pad
-	}
-
-	func widgetMarginInsetsForProposedMarginInsets(defaultMarginInsets: UIEdgeInsets) -> UIEdgeInsets {
-
-		var insets = defaultMarginInsets
-		let isPortrait = UIScreen.mainScreen().bounds.size.width < UIScreen.mainScreen().bounds.size.height
-
-		insets.top = 11.0
-		insets.right = 10.0
-		insets.bottom = 29.0
-		if DeviceType.iPhone6Plus { insets.left = isPortrait ? 53.0 : 82.0 }
-		else if DeviceType.iPhone6 { insets.left = 49.0 }
-		else if DeviceType.iPhone5 { insets.left = 49.0 }
-		else if DeviceType.iPhone4 { insets.left = 49.0 }
-		else if DeviceType.iPad { insets.left = 58.0 }
-		return insets
+	private func imageFromColor(color: UIColor) -> UIImage {
+		let rect = CGRectMake(0, 0, 1, 1)
+		UIGraphicsBeginImageContext(rect.size)
+		let context = UIGraphicsGetCurrentContext()
+		CGContextSetFillColorWithColor(context, color.CGColor)
+		CGContextFillRect(context, rect)
+		let img = UIGraphicsGetImageFromCurrentImageContext()
+		UIGraphicsEndImageContext()
+		return img
 	}
 }

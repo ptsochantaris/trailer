@@ -16,8 +16,26 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="quz-Tb-Fw0" userLabel="Prs">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="20"/>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="dX5-UL-dra">
+                                <rect key="frame" x="4" y="38" width="15" height="15"/>
+                                <animations/>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="15" id="a1w-E6-1Cj"/>
+                                    <constraint firstAttribute="height" constant="15" id="zR0-Fa-Hjp"/>
+                                </constraints>
+                            </imageView>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="oQw-hA-EBD">
+                                <rect key="frame" x="2" y="9" width="17" height="17"/>
+                                <animations/>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="17" id="YWE-Aj-drj"/>
+                                    <constraint firstAttribute="width" constant="17" id="izW-WB-Q51"/>
+                                </constraints>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="1000" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="quz-Tb-Fw0" userLabel="Prs">
+                                <rect key="frame" x="24" y="8" width="292" height="20"/>
                                 <animations/>
                                 <attributedString key="attributedText">
                                     <fragment content="Loading...">
@@ -30,8 +48,8 @@
                                 </attributedString>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LSV-z6-vQv" userLabel="Issues">
-                                <rect key="frame" x="0.0" y="28" width="320" height="20"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="1000" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LSV-z6-vQv" userLabel="Issues">
+                                <rect key="frame" x="24" y="36" width="292" height="20"/>
                                 <animations/>
                                 <attributedString key="attributedText">
                                     <fragment content="Loading...">
@@ -44,8 +62,8 @@
                                 </attributedString>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="249" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Yh8-Pg-XrK" userLabel="Lastupdated">
-                                <rect key="frame" x="0.0" y="56" width="320" height="512"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="1000" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Yh8-Pg-XrK" userLabel="Lastupdated">
+                                <rect key="frame" x="24" y="64" width="292" height="20"/>
                                 <animations/>
                                 <attributedString key="attributedText">
                                     <fragment content="Loading...">
@@ -61,16 +79,20 @@
                         </subviews>
                         <animations/>
                         <constraints>
-                            <constraint firstItem="LSV-z6-vQv" firstAttribute="width" secondItem="Yh8-Pg-XrK" secondAttribute="width" id="2NH-oS-xrV"/>
-                            <constraint firstItem="quz-Tb-Fw0" firstAttribute="leading" secondItem="LSV-z6-vQv" secondAttribute="leading" id="7i9-hM-MP2"/>
-                            <constraint firstItem="quz-Tb-Fw0" firstAttribute="leading" secondItem="S3S-Oj-5AN" secondAttribute="leading" id="BgO-OO-DPb"/>
-                            <constraint firstItem="Yh8-Pg-XrK" firstAttribute="top" secondItem="LSV-z6-vQv" secondAttribute="bottom" constant="8" id="GNa-lm-Bbv"/>
-                            <constraint firstItem="LSV-z6-vQv" firstAttribute="top" secondItem="quz-Tb-Fw0" secondAttribute="bottom" constant="8" id="KOH-rw-7Uy"/>
-                            <constraint firstItem="quz-Tb-Fw0" firstAttribute="width" secondItem="LSV-z6-vQv" secondAttribute="width" id="MIH-BK-XIw"/>
-                            <constraint firstAttribute="trailing" secondItem="quz-Tb-Fw0" secondAttribute="trailing" id="PPr-gX-8BW"/>
-                            <constraint firstItem="LSV-z6-vQv" firstAttribute="leading" secondItem="Yh8-Pg-XrK" secondAttribute="leading" id="Rgb-Mh-1Pg"/>
-                            <constraint firstItem="FKl-LY-JtV" firstAttribute="top" secondItem="Yh8-Pg-XrK" secondAttribute="bottom" id="xqD-0h-sWf"/>
-                            <constraint firstItem="quz-Tb-Fw0" firstAttribute="top" secondItem="Ft6-oW-KC0" secondAttribute="bottom" id="y0U-BB-Zzd"/>
+                            <constraint firstItem="Yh8-Pg-XrK" firstAttribute="width" secondItem="LSV-z6-vQv" secondAttribute="width" id="1uX-4t-yh3"/>
+                            <constraint firstItem="Yh8-Pg-XrK" firstAttribute="top" secondItem="LSV-z6-vQv" secondAttribute="bottom" constant="8" id="2cn-xu-RoM"/>
+                            <constraint firstItem="quz-Tb-Fw0" firstAttribute="top" secondItem="Ft6-oW-KC0" secondAttribute="bottom" constant="8" id="AQO-Kn-cf8"/>
+                            <constraint firstItem="oQw-hA-EBD" firstAttribute="leading" secondItem="S3S-Oj-5AN" secondAttribute="leading" constant="2" id="DtG-HF-I5p"/>
+                            <constraint firstItem="FKl-LY-JtV" firstAttribute="top" secondItem="Yh8-Pg-XrK" secondAttribute="bottom" priority="750" id="HL8-wC-9QW"/>
+                            <constraint firstItem="quz-Tb-Fw0" firstAttribute="leading" secondItem="oQw-hA-EBD" secondAttribute="trailing" constant="5" id="J6F-3W-GKR"/>
+                            <constraint firstItem="LSV-z6-vQv" firstAttribute="width" secondItem="quz-Tb-Fw0" secondAttribute="width" id="KpW-De-G8i"/>
+                            <constraint firstItem="dX5-UL-dra" firstAttribute="top" secondItem="LSV-z6-vQv" secondAttribute="top" constant="2" id="MgU-ma-ExW"/>
+                            <constraint firstItem="oQw-hA-EBD" firstAttribute="top" secondItem="quz-Tb-Fw0" secondAttribute="top" constant="1" id="Ptr-J7-r93"/>
+                            <constraint firstItem="Yh8-Pg-XrK" firstAttribute="leading" secondItem="LSV-z6-vQv" secondAttribute="leading" id="Xov-hs-D1j"/>
+                            <constraint firstItem="LSV-z6-vQv" firstAttribute="leading" secondItem="dX5-UL-dra" secondAttribute="trailing" constant="5" id="ZUe-Y7-MjJ"/>
+                            <constraint firstItem="LSV-z6-vQv" firstAttribute="top" secondItem="quz-Tb-Fw0" secondAttribute="bottom" constant="8" id="ZsH-fK-61x"/>
+                            <constraint firstAttribute="trailing" secondItem="quz-Tb-Fw0" secondAttribute="trailing" constant="4" id="bQE-on-uHE"/>
+                            <constraint firstItem="LSV-z6-vQv" firstAttribute="leading" secondItem="quz-Tb-Fw0" secondAttribute="leading" id="oON-JI-UTm"/>
                         </constraints>
                     </view>
                     <extendedEdge key="edgesForExtendedLayout"/>
@@ -78,14 +100,16 @@
                     <nil key="simulatedTopBarMetrics"/>
                     <nil key="simulatedBottomBarMetrics"/>
                     <connections>
+                        <outlet property="issueImage" destination="dX5-UL-dra" id="V7N-R4-BDr"/>
                         <outlet property="issuesLabel" destination="LSV-z6-vQv" id="T9t-kT-XQf"/>
+                        <outlet property="prImage" destination="oQw-hA-EBD" id="Zo8-fH-ZlE"/>
                         <outlet property="prLabel" destination="quz-Tb-Fw0" id="5UC-2b-Ur4"/>
                         <outlet property="updatedLabel" destination="Yh8-Pg-XrK" id="Pil-bP-f1q"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vXp-U4-Rya" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="516" y="285"/>
+            <point key="canvasLocation" x="357" y="296"/>
         </scene>
     </scenes>
 </document>
