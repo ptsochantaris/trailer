@@ -707,7 +707,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		hotKeyHelp.hidden = Settings.hotkeyEnable
 	}
 
-	@IBAction func enableHotkeySelected(sender: NSButton) {
+	@IBAction func enableHotkeySelected(sender: AnyObject) {
 		Settings.hotkeyEnable = hotkeyEnable.integerValue != 0
 		Settings.hotkeyLetter = hotkeyLetter.titleOfSelectedItem ?? "T"
 		Settings.hotkeyControlModifier = hotkeyControlModifier.integerValue != 0

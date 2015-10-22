@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="8187.4" systemVersion="15A262e" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9059" systemVersion="15B42" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="8187.4"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9059"/>
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
@@ -1349,6 +1349,9 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                         <font key="font" metaFont="system" size="24"/>
                                                                     </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="enableHotkeySelected:" target="vQH-WF-vh2" id="kvA-06-WMt"/>
+                                                                    </connections>
                                                                 </button>
                                                                 <button id="O1l-SB-DuQ">
                                                                     <rect key="frame" x="16" y="12" width="47" height="49"/>
@@ -1358,6 +1361,9 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                         <font key="font" metaFont="system" size="16"/>
                                                                     </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="enableHotkeySelected:" target="vQH-WF-vh2" id="vxj-37-4RI"/>
+                                                                    </connections>
                                                                 </button>
                                                                 <button id="bU3-sU-lpP">
                                                                     <rect key="frame" x="107" y="12" width="32" height="48"/>
@@ -1367,6 +1373,9 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                         <font key="font" metaFont="system" size="23"/>
                                                                     </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="enableHotkeySelected:" target="vQH-WF-vh2" id="wJj-gZ-ltu"/>
+                                                                    </connections>
                                                                 </button>
                                                                 <button id="lZd-Lq-W4x">
                                                                     <rect key="frame" x="149" y="12" width="32" height="48"/>
@@ -1376,6 +1385,9 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                         <font key="font" metaFont="system" size="24"/>
                                                                     </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="enableHotkeySelected:" target="vQH-WF-vh2" id="TBi-bw-Oul"/>
+                                                                    </connections>
                                                                 </button>
                                                                 <popUpButton verticalHuggingPriority="750" id="x9b-Wa-04i">
                                                                     <rect key="frame" x="219" y="34" width="75" height="26"/>
@@ -1386,6 +1398,9 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                                         <font key="font" metaFont="menu"/>
                                                                         <menu key="menu" title="Keys" id="l5g-AF-aoK"/>
                                                                     </popUpButtonCell>
+                                                                    <connections>
+                                                                        <action selector="enableHotkeySelected:" target="vQH-WF-vh2" id="yCM-FU-PUO"/>
+                                                                    </connections>
                                                                 </popUpButton>
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="3nJ-Zt-Ieo">
                                                                     <rect key="frame" x="191" y="33" width="24" height="29"/>

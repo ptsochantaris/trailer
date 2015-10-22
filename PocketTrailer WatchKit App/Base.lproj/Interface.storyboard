@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="8191" systemVersion="15A282b" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="AgC-eL-Hgc">
+<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="9059" systemVersion="15B42" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="AgC-eL-Hgc">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8154"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="8092"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9049"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="9019"/>
     </dependencies>
     <scenes>
         <!--Sections-->
@@ -10,7 +10,7 @@
             <objects>
                 <controller identifier="SectionController" title="Sections" hidesWhenLoading="NO" id="AgC-eL-Hgc" customClass="SectionController" customModule="Trailer">
                     <items>
-                        <label alignment="center" verticalAlignment="center" text="..." numberOfLines="0" id="tZx-Xo-NwI">
+                        <label alignment="center" verticalAlignment="center" text="Connecting" numberOfLines="0" id="tZx-Xo-NwI">
                             <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
                         </label>
                         <group width="1" alignment="center" verticalAlignment="center" radius="0.0" id="AJn-j1-vO3">
@@ -107,7 +107,7 @@
             <objects>
                 <controller identifier="ListController" hidesWhenLoading="NO" id="Sqe-dw-Y9B" customClass="PRListController" customModule="Trailer">
                     <items>
-                        <label alignment="center" verticalAlignment="center" text="..." numberOfLines="0" id="2Zp-yv-wv1">
+                        <label alignment="center" verticalAlignment="center" text="Connecting" numberOfLines="0" id="2Zp-yv-wv1">
                             <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
                         </label>
                         <table alignment="left" id="XeC-bN-XlT">
@@ -192,7 +192,7 @@
             <objects>
                 <controller identifier="DetailController" hidesWhenLoading="NO" id="Hgm-oe-oa5" customClass="PRDetailController" customModule="Trailer">
                     <items>
-                        <label alignment="center" verticalAlignment="center" text="..." numberOfLines="0" id="Adx-ov-WlP">
+                        <label alignment="center" verticalAlignment="center" text="Connecting" numberOfLines="0" id="Adx-ov-WlP">
                             <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
                         </label>
                         <table alignment="left" id="nDu-Js-IyV">
