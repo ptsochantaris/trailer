@@ -26,6 +26,7 @@ class ListableItem: DataItem {
 	@NSManaged var state: String?
 	@NSManaged var reopened: NSNumber?
 	@NSManaged var number: NSNumber?
+	@NSManaged var announced: NSNumber?
 
 	@NSManaged var comments: Set<PRComment>
 	@NSManaged var labels: Set<PRLabel>
@@ -144,15 +145,15 @@ class ListableItem: DataItem {
 		var targetSection: PullRequestSection
 		let currentCondition = condition?.integerValue ?? PullRequestCondition.Open.rawValue
 
-		if currentCondition == PullRequestCondition.Merged.rawValue			{ targetSection = PullRequestSection.Merged }
-		else if currentCondition == PullRequestCondition.Closed.rawValue	{ targetSection = PullRequestSection.Closed }
-		else if createdByMe() || assignedToMySection()						{ targetSection = PullRequestSection.Mine }
-		else if assignedToParticipated() || commentedByMe()					{ targetSection = PullRequestSection.Participated }
-		else																{ targetSection = PullRequestSection.All }
+		if currentCondition == PullRequestCondition.Merged.rawValue			{ targetSection = .Merged }
+		else if currentCondition == PullRequestCondition.Closed.rawValue	{ targetSection = .Closed }
+		else if createdByMe() || assignedToMySection()						{ targetSection = .Mine }
+		else if assignedToParticipated() || commentedByMe()					{ targetSection = .Participated }
+		else																{ targetSection = .All }
 
 		var needsManualCount = false
 		var moveToParticipated = false
-		let outsideMySections = (targetSection == PullRequestSection.All || targetSection == PullRequestSection.None)
+		let outsideMySections = (targetSection == .All || targetSection == .None)
 
 		if outsideMySections && Settings.autoParticipateOnTeamMentions {
 			if refersToMyTeams() {
@@ -175,7 +176,7 @@ class ListableItem: DataItem {
 		let latestDate = latestReadCommentDate
 
 		if moveToParticipated {
-			targetSection = PullRequestSection.Participated
+			targetSection = .Participated
 			f.predicate = predicateForOthersCommentsSinceDate(latestDate)
 			unreadComments = managedObjectContext?.countForFetchRequest(f, error: nil)
 		} else if needsManualCount {
@@ -183,7 +184,7 @@ class ListableItem: DataItem {
 			var unreadCommentCount: Int = 0
 			for c in try! managedObjectContext?.executeFetchRequest(f) as! [PRComment] {
 				if c.refersToMe() {
-					targetSection = PullRequestSection.Participated
+					targetSection = .Participated
 				}
 				if let l = latestDate {
 					if c.createdAt?.compare(l)==NSComparisonResult.OrderedDescending {
@@ -204,17 +205,26 @@ class ListableItem: DataItem {
 		if let displayPolicy = RepoDisplayPolicy(rawValue: self is Issue ? (repo.displayPolicyForIssues?.integerValue ?? 0) : (repo.displayPolicyForPrs?.integerValue ?? 0)) {
 			switch displayPolicy {
 			case .Hide:
-				targetSection = PullRequestSection.None
+				targetSection = .None
 			case .Mine:
-				if targetSection == PullRequestSection.All || targetSection == PullRequestSection.Participated {
-					targetSection = PullRequestSection.None
+				if targetSection == .All || targetSection == .Participated {
+					targetSection = .None
 				}
 			case .MineAndPaticipated:
-				if targetSection == PullRequestSection.All {
-					targetSection = PullRequestSection.None
+				if targetSection == .All {
+					targetSection = .None
 				}
 			case .All:
 				break
+			}
+		}
+
+		if let p = self as? PullRequest where (targetSection == .Mine || targetSection == .Participated || targetSection == .All) && Settings.hidePrsThatArentPassing {
+			for s in p.displayedStatuses() {
+				if s.state != "success" {
+					targetSection = PullRequestSection.None
+					break
+				}
 			}
 		}
 

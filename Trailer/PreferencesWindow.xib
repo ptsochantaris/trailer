@@ -1137,14 +1137,14 @@ user you can add more servers from the left.</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" borderType="none" titlePosition="noTitle" id="lHO-RU-wff">
-                                            <rect key="frame" x="107" y="10" width="522" height="349"/>
+                                            <rect key="frame" x="107" y="5" width="522" height="363"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <view key="contentView" id="8fH-5J-WtZ">
-                                                <rect key="frame" x="0.0" y="0.0" width="522" height="349"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="522" height="363"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="0eZ-9u-qmt">
-                                                        <rect key="frame" x="200" y="236" width="284" height="17"/>
+                                                        <rect key="frame" x="200" y="255" width="284" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="...re-scan all statuses every X refreshes" id="RuW-TF-DmH">
@@ -1154,7 +1154,7 @@ user you can add more servers from the left.</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <button id="ANN-xo-ud5">
-                                                        <rect key="frame" x="17" y="234" width="189" height="18"/>
+                                                        <rect key="frame" x="17" y="253" width="189" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <buttonCell key="cell" type="check" title="Show PR CI / statuses" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="uz2-FE-mKJ">
@@ -1166,7 +1166,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </button>
                                                     <button id="KjN-FO-XTd">
-                                                        <rect key="frame" x="17" y="164" width="488" height="18"/>
+                                                        <rect key="frame" x="17" y="185" width="488" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <buttonCell key="cell" type="check" title="Make status items always selectable (don't require command-click)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="tnU-bc-se6">
@@ -1177,20 +1177,8 @@ user you can add more servers from the left.</string>
                                                             <action selector="makeStatusItemsSelectableSelected:" target="vQH-WF-vh2" id="8aC-yz-v5g"/>
                                                         </connections>
                                                     </button>
-                                                    <button id="lAL-hp-XJt">
-                                                        <rect key="frame" x="17" y="133" width="288" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <animations/>
-                                                        <buttonCell key="cell" type="check" title="Show notifications for new status items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="5Yc-fv-0lA">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="notifyOnStatusUpdatesSelected:" target="vQH-WF-vh2" id="xMh-YT-y8X"/>
-                                                        </connections>
-                                                    </button>
                                                     <popUpButton verticalHuggingPriority="750" id="irr-Zv-gfS">
-                                                        <rect key="frame" x="17" y="94" width="489" height="26"/>
+                                                        <rect key="frame" x="16" y="88" width="489" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="cqY-EB-jjP">
@@ -1209,7 +1197,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </popUpButton>
                                                     <tokenField verticalHuggingPriority="750" id="oW9-uY-e0m">
-                                                        <rect key="frame" x="19" y="15" width="484" height="71"/>
+                                                        <rect key="frame" x="18" y="10" width="484" height="71"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <tokenFieldCell key="cell" selectable="YES" editable="YES" borderStyle="bezel" alignment="left" placeholderString="Comma separated list of terms" drawsBackground="YES" allowsEditingTextAttributes="YES" id="5ep-1e-o3q">
@@ -1222,7 +1210,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </tokenField>
                                                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="98O-9a-RJR">
-                                                        <rect key="frame" x="487" y="229" width="19" height="27"/>
+                                                        <rect key="frame" x="487" y="248" width="19" height="27"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <stepperCell key="cell" continuous="YES" alignment="left" minValue="1" maxValue="1000" doubleValue="1" id="r9b-4g-VVM"/>
@@ -1231,7 +1219,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </stepper>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="4P5-8J-j5N">
-                                                        <rect key="frame" x="103" y="190" width="381" height="44"/>
+                                                        <rect key="frame" x="103" y="209" width="381" height="44"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" id="ITh-gE-qyn">
@@ -1244,7 +1232,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="awU-SO-Gwd">
-                                                        <rect key="frame" x="188" y="308" width="296" height="17"/>
+                                                        <rect key="frame" x="188" y="322" width="296" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="...re-scan PR labels every X refreshes" id="Jlv-T3-UQ9">
@@ -1254,7 +1242,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="omI-5I-heJ">
-                                                        <rect key="frame" x="487" y="301" width="19" height="27"/>
+                                                        <rect key="frame" x="487" y="315" width="19" height="27"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <stepperCell key="cell" continuous="YES" alignment="left" minValue="1" maxValue="1000" doubleValue="1" id="dky-1e-6lk"/>
@@ -1263,7 +1251,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </connections>
                                                     </stepper>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="l28-ij-akN">
-                                                        <rect key="frame" x="103" y="262" width="381" height="44"/>
+                                                        <rect key="frame" x="103" y="276" width="381" height="44"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" id="Aaw-4h-ESu">
@@ -1276,7 +1264,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <button id="GGQ-fB-uWX">
-                                                        <rect key="frame" x="17" y="306" width="160" height="18"/>
+                                                        <rect key="frame" x="17" y="320" width="160" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <buttonCell key="cell" type="check" title="Show labels" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="fbv-gG-Lv3">
@@ -1288,7 +1276,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </connections>
                                                     </button>
                                                     <button id="UVq-TH-zaK">
-                                                        <rect key="frame" x="301" y="133" width="116" height="18"/>
+                                                        <rect key="frame" x="301" y="155" width="116" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <buttonCell key="cell" type="check" title="...on all PRs" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="bjn-sR-CJj">
@@ -1297,6 +1285,30 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </buttonCell>
                                                         <connections>
                                                             <action selector="notifyOnStatusUpdatesOnAllPrsSelected:" target="vQH-WF-vh2" id="PPW-Gz-Zf5"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button id="5WZ-7z-gJ2">
+                                                        <rect key="frame" x="17" y="126" width="277" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <animations/>
+                                                        <buttonCell key="cell" type="check" title="Hide PRs whose statuses are not all green" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="cw8-e1-f8e">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="hidePrsThatDontPassSelected:" target="vQH-WF-vh2" id="3pu-u3-h8l"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button id="lAL-hp-XJt">
+                                                        <rect key="frame" x="17" y="155" width="288" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <animations/>
+                                                        <buttonCell key="cell" type="check" title="Show notifications for new status items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="5Yc-fv-0lA">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="notifyOnStatusUpdatesSelected:" target="vQH-WF-vh2" id="xMh-YT-y8X"/>
                                                         </connections>
                                                     </button>
                                                 </subviews>
@@ -1621,6 +1633,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="grayOutWhenRefreshing" destination="ueT-Kq-j9E" id="0DE-vy-hy2"/>
                 <outlet property="groupByRepo" destination="TqD-G8-E24" id="nQt-v1-4Mx"/>
                 <outlet property="hideAvatars" destination="3CV-9S-gLw" id="KZR-Gl-2lg"/>
+                <outlet property="hidePrsThatDontPass" destination="5WZ-7z-gJ2" id="egh-ZU-iS8"/>
                 <outlet property="hideUncommentedPrs" destination="gjf-cd-s24" id="fkW-dA-W8L"/>
                 <outlet property="hotKeyContainer" destination="wtA-9k-J8p" id="O04-dn-Ilm"/>
                 <outlet property="hotKeyHelp" destination="DCt-xr-FhG" id="x3V-6H-BO0"/>

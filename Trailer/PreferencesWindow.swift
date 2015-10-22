@@ -47,6 +47,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var notifyOnStatusUpdatesForAllPrs: NSButton!
 	@IBOutlet weak var statusTermMenu: NSPopUpButton!
 	@IBOutlet weak var statusTermsField: NSTokenField!
+	@IBOutlet weak var hidePrsThatDontPass: NSButton!
 
 	// Comments
 	@IBOutlet weak var disableAllCommentNotifications: NSButton!
@@ -199,6 +200,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		dumpApiResponsesToConsole.integerValue = Settings.dumpAPIResponsesInConsole ? 1 : 0
 		showLabels.integerValue = Settings.showLabels ? 1 : 0
 		useVibrancy.integerValue = Settings.useVibrancy ? 1 : 0
+		hidePrsThatDontPass.integerValue = Settings.hidePrsThatArentPassing ? 1 : 0
 
 		allNewPrsSetting.selectItemAtIndex(Settings.displayPolicyForNewPrs)
 		allNewIssuesSetting.selectItemAtIndex(Settings.displayPolicyForNewIssues)
@@ -376,6 +378,13 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		Settings.notifyOnStatusUpdatesForAllPrs = (sender.integerValue==1)
 	}
 
+	@IBAction func hidePrsThatDontPassSelected(sender: NSButton) {
+		Settings.hidePrsThatArentPassing = (sender.integerValue==1)
+		updateStatusItemsOptions()
+		DataManager.postProcessAllItems()
+		app.deferredUpdateTimer.push()
+	}
+
 	@IBAction func hideAvatarsSelected(sender: NSButton) {
 		Settings.hideAvatars = (sender.integerValue==1)
 		DataManager.postProcessAllItems()
@@ -510,6 +519,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		statusItemRefreshCounter.enabled = enable
 		statusItemRescanLabel.alphaValue = enable ? 1.0 : 0.5
 		statusItemsRefreshNote.alphaValue = enable ? 1.0 : 0.5
+		hidePrsThatDontPass.alphaValue = enable ? 1.0 : 0.5
+		hidePrsThatDontPass.enabled = enable
 
 		let count = Settings.statusItemRefreshInterval
 		statusItemRefreshCounter.integerValue = count

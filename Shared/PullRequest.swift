@@ -55,10 +55,14 @@ final class PullRequest: ListableItem {
 	}
 	#endif
 
-	class func visibleAndActivePullRequestsInMoc(moc: NSManagedObjectContext) -> [PullRequest] {
+	class func activePullRequestsInMoc(moc: NSManagedObjectContext, visibleOnly: Bool) -> [PullRequest] {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
-		f.predicate = NSPredicate(format: "sectionIndex == %d || sectionIndex == %d || sectionIndex == %d", PullRequestSection.Mine.rawValue, PullRequestSection.Participated.rawValue, PullRequestSection.All.rawValue)
+		if visibleOnly {
+			f.predicate = NSPredicate(format: "sectionIndex == %d || sectionIndex == %d || sectionIndex == %d", PullRequestSection.Mine.rawValue, PullRequestSection.Participated.rawValue, PullRequestSection.All.rawValue)
+		} else {
+			f.predicate = NSPredicate(format: "condition == %d", PullRequestCondition.Open.rawValue)
+		}
 		return try! moc.executeFetchRequest(f) as! [PullRequest]
 	}
 

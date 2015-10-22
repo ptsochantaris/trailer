@@ -15,17 +15,12 @@ final class API {
 	var refreshesSinceLastLabelsCheck = [NSManagedObjectID:Int]()
 	var currentNetworkStatus: NetworkStatus
 
-	private let mediumFormatter: NSDateFormatter
 	private let cacheDirectory: String
 	private let urlSession: NSURLSession
 	private var badLinks = [String:UrlBackOffEntry]()
 	private let reachability = Reachability.reachabilityForInternetConnection()
 
 	init() {
-
-		mediumFormatter = NSDateFormatter()
-		mediumFormatter.dateStyle = NSDateFormatterStyle.MediumStyle
-		mediumFormatter.timeStyle = NSDateFormatterStyle.MediumStyle
 
 		reachability.startNotifier()
 		let n = reachability.currentReachabilityStatus()
@@ -813,7 +808,7 @@ final class API {
 
 	private func fetchLabelsForForCurrentPullRequestsToMoc(moc: NSManagedObjectContext, callback: Completion) {
 
-		let prs = PullRequest.visibleAndActivePullRequestsInMoc(moc).filter { [weak self] pr in
+		let prs = PullRequest.activePullRequestsInMoc(moc, visibleOnly: true).filter { [weak self] pr in
 			if !pr.apiServer.syncIsGood {
 				return false
 			}
@@ -885,7 +880,7 @@ final class API {
 
 	private func fetchStatusesForCurrentPullRequestsToMoc(moc: NSManagedObjectContext, callback: Completion) {
 
-		let prs = PullRequest.visibleAndActivePullRequestsInMoc(moc).filter { [weak self] pr in
+		let prs = PullRequest.activePullRequestsInMoc(moc, visibleOnly: !Settings.hidePrsThatArentPassing).filter { [weak self] pr in
 			if !pr.apiServer.syncIsGood {
 				return false
 			}

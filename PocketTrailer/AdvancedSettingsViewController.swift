@@ -34,7 +34,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 	private enum Section: Int {
 		case Refresh, Display, Filtering, Issues, Comments, Repos, StausesAndLabels, History, Confirm, Sort, Misc
-		static let rowCounts = [3, 6, 6, 1, 7, 2, 6, 3, 2, 3, 2]
+		static let rowCounts = [3, 6, 6, 1, 7, 2, 7, 3, 2, 3, 2]
 		static let allNames = ["Auto Refresh", "Display", "Filtering", "Issues", "Comments", "Repositories", "Statuses & Labels", "History", "Don't confirm when", "Sorting", "Misc"]
 	}
 
@@ -250,6 +250,11 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.titleLabel.text = "... new statuses for all PRs"
 				cell.accessoryType = check(Settings.notifyOnStatusUpdatesForAllPrs)
 				cell.descriptionLabel.text = "Notificaitons for status items are sent only for your own and particiapted items by default. Select this to receive status update notifications for the items in the 'all' section too."
+			case 6:
+				cell.titleLabel.text = "Hide PRs whose statuses are not all green"
+				cell.accessoryType = check(Settings.hidePrsThatArentPassing)
+				cell.descriptionLabel.text = "Hide PR items which have status items, but are not all green. Useful for hiding PRs which are not ready to review or those who have not passed certain checks yet."
+
 			default: break
 			}
 		} else if indexPath.section == Section.History.rawValue {
@@ -481,6 +486,8 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				Settings.notifyOnStatusUpdates = !Settings.notifyOnStatusUpdates
 			case 5:
 				Settings.notifyOnStatusUpdatesForAllPrs = !Settings.notifyOnStatusUpdatesForAllPrs
+			case 6:
+				Settings.hidePrsThatArentPassing = !Settings.hidePrsThatArentPassing
 			default: break
 			}
 		} else if indexPath.section == Section.History.rawValue {

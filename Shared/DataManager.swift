@@ -53,6 +53,18 @@ final class DataManager : NSObject {
 		DLog("Marking all repos as dirty")
 		ApiServer.resetSyncOfEverything()
 
+		DLog("Marking all unspecified (nil) anounced flags as announced")
+		for i in DataItem.allItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest] {
+			if i.announced == nil {
+				i.announced = true
+			}
+		}
+		for i in DataItem.allItemsOfType("Issue", inMoc: mainObjectContext) as! [Issue] {
+			if i.announced == nil {
+				i.announced = true
+			}
+		}
+
 		DLog("Migrating display policies")
 		for r in DataItem.allItemsOfType("Repo", inMoc:mainObjectContext) as! [Repo] {
 			if let markedAsHidden = r.hidden?.boolValue where markedAsHidden == true {
@@ -98,53 +110,61 @@ final class DataManager : NSObject {
 
 	class func sendNotificationsAndIndex() {
 
-		let newPrs = PullRequest.newItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest]
-		for p in newPrs {
-			if !p.createdByMe() && !(p.isNewAssignment?.boolValue ?? false) && p.isVisibleOnMenu() {
-				app.postNotificationOfType(PRNotificationType.NewPr, forItem: p)
-			}
-		}
-
-		let updatedPrs = PullRequest.updatedItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest]
-		for p in updatedPrs {
-			if let reopened = p.reopened?.boolValue where reopened == true {
-				if !p.createdByMe() && p.isVisibleOnMenu() {
-					app.postNotificationOfType(PRNotificationType.PrReopened, forItem: p)
+		let allPrs = PullRequest.allItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest]
+		for p in allPrs {
+			if p.isVisibleOnMenu() {
+				if !p.createdByMe() {
+					if !(p.isNewAssignment?.boolValue ?? false) && !(p.announced?.boolValue ?? false) {
+						app.postNotificationOfType(PRNotificationType.NewPr, forItem: p)
+						p.announced = true
+					}
+					if let reopened = p.reopened?.boolValue where reopened == true {
+						app.postNotificationOfType(PRNotificationType.PrReopened, forItem: p)
+						p.reopened = false
+					}
+					if let newAssignment = p.isNewAssignment?.boolValue where newAssignment == true {
+						app.postNotificationOfType(PRNotificationType.NewPrAssigned, forItem: p)
+						p.isNewAssignment = false
+					}
 				}
-				p.reopened = false
+				#if os(iOS)
+					if p.postSyncAction?.integerValue != PostSyncAction.DoNothing.rawValue {
+						p.indexForSpotlight()
+					}
+				#endif
+			} else {
+				#if os(iOS)
+					p.deIndexFromSpotlight()
+				#endif
 			}
 		}
 
-		let newIssues = Issue.newItemsOfType("Issue", inMoc: mainObjectContext) as! [Issue]
-		for i in newIssues {
-			if !i.createdByMe() && !(i.isNewAssignment?.boolValue ?? false) && i.isVisibleOnMenu() {
-				app.postNotificationOfType(PRNotificationType.NewIssue, forItem: i)
-			}
-		}
-
-		let updatedIssues = Issue.updatedItemsOfType("Issue", inMoc: mainObjectContext) as! [Issue]
-		for i in updatedIssues {
-			if let reopened = i.reopened?.boolValue where reopened == true {
-				if !i.createdByMe() && i.isVisibleOnMenu() {
-					app.postNotificationOfType(PRNotificationType.IssueReopened, forItem: i)
+		let allIssues = Issue.allItemsOfType("Issue", inMoc: mainObjectContext) as! [Issue]
+		for i in allIssues {
+			if i.isVisibleOnMenu() {
+				if !i.createdByMe() {
+					if !(i.isNewAssignment?.boolValue ?? false) && !(i.announced?.boolValue ?? false) {
+						app.postNotificationOfType(PRNotificationType.NewIssue, forItem: i)
+						i.announced = true
+					}
+					if let reopened = i.reopened?.boolValue where reopened == true {
+						app.postNotificationOfType(PRNotificationType.IssueReopened, forItem: i)
+						i.reopened = false
+					}
+					if let newAssignment = i.isNewAssignment?.boolValue where newAssignment == true {
+						app.postNotificationOfType(PRNotificationType.NewIssueAssigned, forItem: i)
+						i.isNewAssignment = false
+					}
 				}
-				i.reopened = false
-			}
-		}
-
-		let allTouchedPrs = newPrs + updatedPrs
-		for p in allTouchedPrs {
-			if let newAssignment = p.isNewAssignment?.boolValue where newAssignment == true {
-				app.postNotificationOfType(PRNotificationType.NewPrAssigned, forItem: p)
-				p.isNewAssignment = false
-			}
-		}
-
-		let allTouchedIssues = newIssues + updatedIssues
-		for i in allTouchedIssues {
-			if let newAssignment = i.isNewAssignment?.boolValue where newAssignment == true {
-				app.postNotificationOfType(PRNotificationType.NewIssueAssigned, forItem: i)
-				i.isNewAssignment = false
+				#if os(iOS)
+					if i.postSyncAction?.integerValue != PostSyncAction.DoNothing.rawValue {
+						i.indexForSpotlight()
+					}
+				#endif
+			} else {
+				#if os(iOS)
+					i.deIndexFromSpotlight()
+				#endif
 			}
 		}
 
@@ -182,18 +202,16 @@ final class DataManager : NSObject {
 			s.postSyncAction = PostSyncAction.DoNothing.rawValue
 		}
 
-		for p in allTouchedPrs {
-			p.postSyncAction = PostSyncAction.DoNothing.rawValue
-			#if os(iOS)
-			p.indexForSpotlight()
-			#endif
+		for p in allPrs {
+			if p.postSyncAction?.integerValue != PostSyncAction.DoNothing.rawValue {
+				p.postSyncAction = PostSyncAction.DoNothing.rawValue
+			}
 		}
 
-		for i in allTouchedIssues {
-			i.postSyncAction = PostSyncAction.DoNothing.rawValue
-			#if os(iOS)
-			i.indexForSpotlight()
-			#endif
+		for i in allIssues {
+			if i.postSyncAction?.integerValue != PostSyncAction.DoNothing.rawValue {
+				i.postSyncAction = PostSyncAction.DoNothing.rawValue
+			}
 		}
 	}
 

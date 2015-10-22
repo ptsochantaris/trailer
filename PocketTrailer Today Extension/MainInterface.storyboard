@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="8191" systemVersion="15A282b" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="M4Y-Lb-cyx">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="9059" systemVersion="15B42" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="M4Y-Lb-cyx">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8154"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9049"/>
     </dependencies>
     <scenes>
         <!--Today View Controller-->
@@ -13,11 +13,11 @@
                         <viewControllerLayoutGuide type="bottom" id="FKl-LY-JtV"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" verticalHuggingPriority="251" simulatedAppContext="notificationCenter" id="S3S-Oj-5AN">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="dX5-UL-dra">
-                                <rect key="frame" x="4" y="38" width="15" height="15"/>
+                                <rect key="frame" x="4" y="40" width="15" height="15"/>
                                 <animations/>
                                 <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
@@ -26,7 +26,7 @@
                                 </constraints>
                             </imageView>
                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="oQw-hA-EBD">
-                                <rect key="frame" x="2" y="9" width="17" height="17"/>
+                                <rect key="frame" x="2" y="11" width="17" height="17"/>
                                 <animations/>
                                 <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
@@ -35,7 +35,7 @@
                                 </constraints>
                             </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="1000" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="quz-Tb-Fw0" userLabel="Prs">
-                                <rect key="frame" x="24" y="8" width="292" height="20"/>
+                                <rect key="frame" x="24" y="10" width="292" height="20"/>
                                 <animations/>
                                 <attributedString key="attributedText">
                                     <fragment content="Loading...">
@@ -49,7 +49,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="1000" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LSV-z6-vQv" userLabel="Issues">
-                                <rect key="frame" x="24" y="36" width="292" height="20"/>
+                                <rect key="frame" x="24" y="38" width="292" height="20"/>
                                 <animations/>
                                 <attributedString key="attributedText">
                                     <fragment content="Loading...">
@@ -63,7 +63,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="1000" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Yh8-Pg-XrK" userLabel="Lastupdated">
-                                <rect key="frame" x="24" y="64" width="292" height="20"/>
+                                <rect key="frame" x="24" y="65" width="292" height="20"/>
                                 <animations/>
                                 <attributedString key="attributedText">
                                     <fragment content="Loading...">
@@ -80,8 +80,8 @@
                         <animations/>
                         <constraints>
                             <constraint firstItem="Yh8-Pg-XrK" firstAttribute="width" secondItem="LSV-z6-vQv" secondAttribute="width" id="1uX-4t-yh3"/>
-                            <constraint firstItem="Yh8-Pg-XrK" firstAttribute="top" secondItem="LSV-z6-vQv" secondAttribute="bottom" constant="8" id="2cn-xu-RoM"/>
-                            <constraint firstItem="quz-Tb-Fw0" firstAttribute="top" secondItem="Ft6-oW-KC0" secondAttribute="bottom" constant="8" id="AQO-Kn-cf8"/>
+                            <constraint firstItem="Yh8-Pg-XrK" firstAttribute="top" secondItem="LSV-z6-vQv" secondAttribute="bottom" constant="7" id="2cn-xu-RoM"/>
+                            <constraint firstItem="quz-Tb-Fw0" firstAttribute="top" secondItem="Ft6-oW-KC0" secondAttribute="bottom" constant="10" id="AQO-Kn-cf8"/>
                             <constraint firstItem="oQw-hA-EBD" firstAttribute="leading" secondItem="S3S-Oj-5AN" secondAttribute="leading" constant="2" id="DtG-HF-I5p"/>
                             <constraint firstItem="FKl-LY-JtV" firstAttribute="top" secondItem="Yh8-Pg-XrK" secondAttribute="bottom" priority="750" id="HL8-wC-9QW"/>
                             <constraint firstItem="quz-Tb-Fw0" firstAttribute="leading" secondItem="oQw-hA-EBD" secondAttribute="trailing" constant="5" id="J6F-3W-GKR"/>
@@ -99,6 +99,7 @@
                     <nil key="simulatedStatusBarMetrics"/>
                     <nil key="simulatedTopBarMetrics"/>
                     <nil key="simulatedBottomBarMetrics"/>
+                    <simulatedScreenMetrics key="simulatedDestinationMetrics"/>
                     <connections>
                         <outlet property="issueImage" destination="dX5-UL-dra" id="V7N-R4-BDr"/>
                         <outlet property="issuesLabel" destination="LSV-z6-vQv" id="T9t-kT-XQf"/>

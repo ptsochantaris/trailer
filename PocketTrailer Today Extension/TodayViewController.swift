@@ -88,6 +88,8 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 
 		issuesLabel.preferredMaxLayoutWidth = issuesLabel.frame.size.width
 		issuesButton.frame = issuesLabel.frame
+
+		updatedLabel.preferredMaxLayoutWidth = updatedLabel.frame.size.width
 	}
 
 	private func update() {
@@ -135,9 +137,9 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 			}
 		} else {
 			issuesLabel.attributedText = nil
-			prLabel.attributedText = NSAttributedString(string: "Not updated yet", attributes: dimAttributes)
-			issuesLabel.attributedText = NSAttributedString(string: "Not updated yet", attributes: dimAttributes)
-			updatedLabel.attributedText = nil
+			prLabel.attributedText = NSAttributedString(string: "--", attributes: dimAttributes)
+			issuesLabel.attributedText = NSAttributedString(string: "--", attributes: dimAttributes)
+			updatedLabel.attributedText = NSAttributedString(string: "Not updated yet", attributes: smallAttributes)
 		}
 	}
 
@@ -181,5 +183,11 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 		let img = UIGraphicsGetImageFromCurrentImageContext()
 		UIGraphicsEndImageContext()
 		return img
+	}
+
+	func widgetMarginInsetsForProposedMarginInsets(defaultMarginInsets: UIEdgeInsets) -> UIEdgeInsets {
+		var insets = defaultMarginInsets
+		insets.bottom -= 15.0
+		return insets
 	}
 }
