@@ -369,7 +369,7 @@ final class API {
 		for apiServer in allApiServers {
 			if apiServer.goodToGo && apiServer.syncIsGood {
 				markDirtyRepoIds(repoIdsToMarkDirty, usingUserEventsFromServer: apiServer, callback: completionCallback)
-				markDirtyRepoIds(repoIdsToMarkDirty, usingReceivedEventsFromServer: apiServer, callback:completionCallback)
+				markDirtyRepoIds(repoIdsToMarkDirty, usingReceivedEventsFromServer: apiServer, callback: completionCallback)
 			} else {
 				completionCallback()
 				completionCallback()
