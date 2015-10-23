@@ -13,7 +13,7 @@
 				<li>Option to hide (and defer announcement of) PRs whose statuses are not all green</li>
 				<li>Corrected broken hardware shortcut options screen</li>
 				<li>Fixed update mechanism under El Capitan</li>
-				<li>Fixed signing issues and update Sparkle updater</li>
+				<li>Fixed signing issues and updated the Sparkle updater</li>
 				</ul></font>]]></description>
 			<pubDate>Fri, 24 Oct 2015 9:00:00 +0000</pubDate>
 			<enclosure
