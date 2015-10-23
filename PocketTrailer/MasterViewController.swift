@@ -156,7 +156,12 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		searchField.autocorrectionType = UITextAutocorrectionType.No
 		searchField.delegate = self
 
+		let cover = UIView(frame: CGRectMake(0, 41, 320, 27))
+		cover.backgroundColor = UIColor.groupTableViewBackgroundColor()
+		cover.autoresizingMask = UIViewAutoresizing.FlexibleWidth
+
 		let searchHolder = UIView(frame: CGRectMake(0, 0, 320, 41))
+		searchHolder.addSubview(cover)
 		searchHolder.addSubview(searchField)
 		tableView.tableHeaderView = searchHolder
 		tableView.contentOffset = CGPointMake(0, searchHolder.frame.size.height)
@@ -489,24 +494,26 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		return fetchedResultsController.sections?[section].name ?? "Unknown Section"
 	}
 
-	override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-		if let sectionName = fetchedResultsController.sections?[indexPath.section].name {
-			return sectionName == PullRequestSection.Merged.prMenuName() || sectionName == PullRequestSection.Closed.prMenuName()
-		} else {
-			return false
-		}
-	}
+	override func tableView(tableView: UITableView, editActionsForRowAtIndexPath indexPath: NSIndexPath) -> [UITableViewRowAction]? {
 
-	override func tableView(tableView: UITableView, editingStyleForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCellEditingStyle {
-		return UITableViewCellEditingStyle.Delete
-	}
-
-	override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-		if editingStyle == UITableViewCellEditingStyle.Delete {
-			let pr = fetchedResultsController.objectAtIndexPath(indexPath) as! NSManagedObject
-			mainObjectContext.deleteObject(pr)
-			DataManager.saveDB()
+		let r = UITableViewRowAction(style: .Normal, title: "Read") { [weak self] (action, indexPath) -> Void in
+			if let i = self?.fetchedResultsController.objectAtIndexPath(indexPath) as? ListableItem {
+				app.markItemAsRead(i.objectID.URIRepresentation().absoluteString, reloadView: false)
+				tableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
+			}
 		}
+
+		var actions = [r]
+
+		if let sectionName = fetchedResultsController.sections?[indexPath.section].name where sectionName == PullRequestSection.Merged.prMenuName() || sectionName == PullRequestSection.Closed.prMenuName() {
+			actions.append(UITableViewRowAction(style: .Default, title: "Delete") { [weak self] (action, indexPath) -> Void in
+				let pr = self?.fetchedResultsController.objectAtIndexPath(indexPath) as! NSManagedObject
+				mainObjectContext.deleteObject(pr)
+				DataManager.saveDB()
+				})
+		}
+
+		return actions
 	}
 
 	private var fetchedResultsController: NSFetchedResultsController {
@@ -693,11 +700,17 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	////////////////// mode
 
 	func showPullRequestsSelected(sender: AnyObject) {
+		tableView.scrollRectToVisible(CGRectMake(0, 0, 1, 1), animated: false)
 		viewMode = MasterViewMode.PullRequests
 	}
 
 	func showIssuesSelected(sender: AnyObject) {
+		tableView.scrollRectToVisible(CGRectMake(0, 0, 1, 1), animated: false)
 		viewMode = MasterViewMode.Issues
+	}
+
+	func focusFilter() {
+		searchField.becomeFirstResponder()
 	}
 
 	private var _viewMode: MasterViewMode = .PullRequests

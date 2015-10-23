@@ -510,7 +510,7 @@
 			name = Resources;
 			sourceTree = "<group>";
 		};
-		164DEAFA1AC0C8BB00AA6F73 /* PocketTrailer */ = {
+		164DEAFA1AC0C8BB00AA6F73 /* Pocket Trailer */ = {
 			isa = PBXGroup;
 			children = (
 				1628A6BA18789E73005EDA69 /* App */,
@@ -518,7 +518,7 @@
 				16522D801AB03AE500B1C3FB /* WatchKit App */,
 				1618527E1AB2CB9000526D81 /* Today Extension */,
 			);
-			name = PocketTrailer;
+			name = "Pocket Trailer";
 			sourceTree = "<group>";
 		};
 		16522D711AB03AE500B1C3FB /* WatchKit Extension */ = {
@@ -578,7 +578,7 @@
 			children = (
 				1628A6F218789EA3005EDA69 /* Shared */,
 				168BC6B317EC2DF000BC4584 /* Trailer */,
-				164DEAFA1AC0C8BB00AA6F73 /* PocketTrailer */,
+				164DEAFA1AC0C8BB00AA6F73 /* Pocket Trailer */,
 				168BC6AC17EC2DF000BC4584 /* Frameworks */,
 				168BC6AB17EC2DF000BC4584 /* Products */,
 			);
@@ -1159,7 +1159,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CODE_SIGN_ENTITLEMENTS = "PocketTrailer Today Extension/PocketTrailer Today Extension.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Developer: PAVLOS TSOHANTARIS (L384ZL7X6G)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
@@ -1181,7 +1181,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CODE_SIGN_ENTITLEMENTS = "PocketTrailer Today Extension/PocketTrailer Today Extension.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Developer: PAVLOS TSOHANTARIS (L384ZL7X6G)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = "PocketTrailer Today Extension/Info.plist";
@@ -1201,7 +1201,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = PocketTrailer/PocketTrailer.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer: PAVLOS TSOHANTARIS (L384ZL7X6G)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = PocketTrailer/Info.plist;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.housetrip.mobile.trailer.ios.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1217,7 +1217,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = PocketTrailer/PocketTrailer.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer: PAVLOS TSOHANTARIS (L384ZL7X6G)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				INFOPLIST_FILE = PocketTrailer/Info.plist;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.housetrip.mobile.trailer.ios.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1235,7 +1235,6 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "iPhone Developer";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
@@ -1246,7 +1245,6 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.housetrip.mobile.trailer.ios.PocketTrailer.watchkitapp.watchkitextension;
 				PRODUCT_NAME = "${TARGET_NAME}";
-				PROVISIONING_PROFILE = "";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "PocketTrailer/PocketTrailer-Bridging-Header.h";
@@ -1260,8 +1258,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = "PocketTrailer WatchKit Extension/Info.plist";
@@ -1270,7 +1267,6 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.housetrip.mobile.trailer.ios.PocketTrailer.watchkitapp.watchkitextension;
 				PRODUCT_NAME = "${TARGET_NAME}";
-				PROVISIONING_PROFILE = "";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "PocketTrailer/PocketTrailer-Bridging-Header.h";
@@ -1286,7 +1282,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: PAVLOS TSOHANTARIS (L384ZL7X6G)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1310,7 +1306,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: PAVLOS TSOHANTARIS (L384ZL7X6G)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;

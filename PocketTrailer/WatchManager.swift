@@ -84,58 +84,23 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				self.processList(message, replyHandler)
 
 			case "clearAllMerged":
-				for p in PullRequest.allMergedRequestsInMoc(mainObjectContext) {
-					mainObjectContext.deleteObject(p)
-				}
-				DataManager.saveDB()
-				let m = popupManager.getMasterController()
-				m.reloadDataWithAnimation(false)
-				m.updateStatus()
+				app.clearAllMerged()
 				self.processList(message, replyHandler)
 
 			case "clearAllClosed":
-				for p in PullRequest.allClosedRequestsInMoc(mainObjectContext) {
-					mainObjectContext.deleteObject(p)
-				}
-				for i in Issue.allClosedIssuesInMoc(mainObjectContext) {
-					mainObjectContext.deleteObject(i)
-				}
-				DataManager.saveDB()
-				let m = popupManager.getMasterController()
-				m.reloadDataWithAnimation(false)
-				m.updateStatus()
+				app.clearAllClosed()
 				self.processList(message, replyHandler)
 
 			case "markPrRead":
-				if let
-					itemId = message["localId"] as? String,
-					oid = DataManager.idForUriPath(itemId),
-					pr = existingObjectWithID(oid) as? PullRequest {
-						pr.catchUpWithComments()
-						popupManager.getMasterController().reloadDataWithAnimation(false)
-						DataManager.saveDB()
-						app.updateBadge()
-				}
+				app.markItemAsRead(message["localId"] as? String, reloadView: true)
 				self.processList(message, replyHandler)
 
 			case "markIssueRead":
-				if let
-					itemId = message["localId"] as? String,
-					oid = DataManager.idForUriPath(itemId),
-					i = existingObjectWithID(oid) as? Issue {
-						i.catchUpWithComments()
-						popupManager.getMasterController().reloadDataWithAnimation(false)
-						DataManager.saveDB()
-						app.updateBadge()
-				}
+				app.markItemAsRead(message["localId"] as? String, reloadView: true)
 				self.processList(message, replyHandler)
 
 			case "markEverythingRead":
-				PullRequest.markEverythingRead(PullRequestSection.None, moc: mainObjectContext)
-				Issue.markEverythingRead(PullRequestSection.None, moc: mainObjectContext)
-				popupManager.getMasterController().reloadDataWithAnimation(false)
-				DataManager.saveDB()
-				app.updateBadge()
+				app.markEverythingRead()
 				self.processList(message, replyHandler)
 
 			case "markAllPrsRead":

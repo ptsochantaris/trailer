@@ -6,23 +6,17 @@ DataManager.checkMigration()
 let api = API()
 
 
-//debugging sections
-//let _apis = ApiServer.allApiServersInMoc(mainObjectContext
+//debugging
+/*
+let _prs = PullRequest.activePullRequestsInMoc(mainObjectContext, visibleOnly: true)
 //_prs[0].condition = PullRequestCondition.Merged.rawValue
 //_prs[1].condition = PullRequestCondition.Closed.rawValue
-//_prs[2].condition = PullRequestCondition.Merged.rawValue
-//_prs[3].condition = PullRequestCondition.Closed.rawValue
-/*
-let _prs = DataItem.allItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest]
 for p in _prs {
 	p.latestReadCommentDate = never()
+	p.postProcess()
 }
-let _issues = DataItem.allItemsOfType("Issue", inMoc: mainObjectContext) as! [Issue]
-for p in _issues {
-	p.latestReadCommentDate = never()
-}
-DataManager.saveDB()
 */
+
 
 #if os(iOS)
 	import UIKit

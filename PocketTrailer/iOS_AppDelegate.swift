@@ -74,6 +74,31 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 		return true
 	}
 
+	func application(application: UIApplication, performActionForShortcutItem shortcutItem: UIApplicationShortcutItem, completionHandler: (Bool) -> Void) {
+
+		switch shortcutItem.type {
+
+		case "view-prs":
+			let m = popupManager.getMasterController()
+			m.showPullRequestsSelected(self)
+			m.focusFilter()
+			completionHandler(true)
+
+		case "view-issues":
+			let m = popupManager.getMasterController()
+			m.showIssuesSelected(self)
+			m.focusFilter()
+			completionHandler(true)
+
+		case "mark-all-read":
+			markEverythingRead()
+			completionHandler(true)
+
+		default:
+			completionHandler(false)
+		}
+	}
+
 	func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject) -> Bool {
 		if let c = NSURLComponents(URL: url, resolvingAgainstBaseURL: false) {
 			if let scheme = c.scheme {
@@ -251,6 +276,51 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 
 	func postNotificationOfType(type: PRNotificationType, forItem: DataItem) {
 		NotificationManager.postNotificationOfType(type, forItem: forItem)
+	}
+
+	func markEverythingRead() {
+		PullRequest.markEverythingRead(PullRequestSection.None, moc: mainObjectContext)
+		Issue.markEverythingRead(PullRequestSection.None, moc: mainObjectContext)
+		popupManager.getMasterController().reloadDataWithAnimation(false)
+		DataManager.saveDB()
+		app.updateBadge()
+	}
+
+	func clearAllClosed() {
+		for p in PullRequest.allClosedRequestsInMoc(mainObjectContext) {
+			mainObjectContext.deleteObject(p)
+		}
+		for i in Issue.allClosedIssuesInMoc(mainObjectContext) {
+			mainObjectContext.deleteObject(i)
+		}
+		DataManager.saveDB()
+		let m = popupManager.getMasterController()
+		m.reloadDataWithAnimation(false)
+		m.updateStatus()
+	}
+
+	func clearAllMerged() {
+		for p in PullRequest.allMergedRequestsInMoc(mainObjectContext) {
+			mainObjectContext.deleteObject(p)
+		}
+		DataManager.saveDB()
+		let m = popupManager.getMasterController()
+		m.reloadDataWithAnimation(false)
+		m.updateStatus()
+	}
+
+	func markItemAsRead(itemUri: String?, reloadView: Bool) {
+		if let
+			i = itemUri,
+			oid = DataManager.idForUriPath(i),
+			o = existingObjectWithID(oid) as? ListableItem {
+				o.catchUpWithComments()
+				if reloadView {
+					popupManager.getMasterController().reloadDataWithAnimation(false)
+				}
+				DataManager.saveDB()
+				app.updateBadge()
+		}
 	}
 }
 
