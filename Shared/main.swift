@@ -7,15 +7,18 @@ let api = API()
 
 
 //debugging
-/*
-let _prs = PullRequest.activePullRequestsInMoc(mainObjectContext, visibleOnly: true)
+
+//let _prs = PullRequest.activePullRequestsInMoc(mainObjectContext, visibleOnly: true)
+//for s in _prs[0].statuses {
+//	s.state = "failed"
+//}
 //_prs[0].condition = PullRequestCondition.Merged.rawValue
 //_prs[1].condition = PullRequestCondition.Closed.rawValue
-for p in _prs {
-	p.latestReadCommentDate = never()
-	p.postProcess()
-}
-*/
+//for p in _prs {
+//	p.latestReadCommentDate = never()
+//	p.postProcess()
+//}
+
 
 
 #if os(iOS)

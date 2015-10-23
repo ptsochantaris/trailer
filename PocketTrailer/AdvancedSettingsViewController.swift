@@ -488,6 +488,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				Settings.notifyOnStatusUpdatesForAllPrs = !Settings.notifyOnStatusUpdatesForAllPrs
 			case 6:
 				Settings.hidePrsThatArentPassing = !Settings.hidePrsThatArentPassing
+				settingsChangedTimer.push()
 			default: break
 			}
 		} else if indexPath.section == Section.History.rawValue {
