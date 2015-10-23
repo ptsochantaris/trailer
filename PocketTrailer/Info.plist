@@ -74,6 +74,33 @@
 			<string>Any</string>
 		</dict>
 	</dict>
+	<key>UIApplicationShortcutItems</key>
+	<array>
+		<dict>
+			<key>UIApplicationShortcutItemIconType</key>
+			<string>UIApplicationShortcutIconTypeConfirmation</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>Mark Everything Read</string>
+			<key>UIApplicationShortcutItemType</key>
+			<string>mark-all-read</string>
+		</dict>
+		<dict>
+			<key>UIApplicationShortcutItemIconType</key>
+			<string>UIApplicationShortcutIconTypeSearch</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>Search PRs</string>
+			<key>UIApplicationShortcutItemType</key>
+			<string>view-prs</string>
+		</dict>
+		<dict>
+			<key>UIApplicationShortcutItemIconType</key>
+			<string>UIApplicationShortcutIconTypeSearch</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>Search Issues</string>
+			<key>UIApplicationShortcutItemType</key>
+			<string>view-issues</string>
+		</dict>
+	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
@@ -111,33 +138,6 @@
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>UIApplicationShortcutItems</key>
-	<array>
-		<dict>
-			<key>UIApplicationShortcutItemIconType</key>
-			<string>UIApplicationShortcutIconTypeConfirmation</string>
-			<key>UIApplicationShortcutItemTitle</key>
-			<string>Mark Everything Read</string>
-			<key>UIApplicationShortcutItemType</key>
-			<string>mark-all-read</string>
-		</dict>
-		<dict>
-			<key>UIApplicationShortcutItemIconType</key>
-			<string>UIApplicationShortcutIconTypeSearch</string>
-			<key>UIApplicationShortcutItemTitle</key>
-			<string>Search PRs</string>
-			<key>UIApplicationShortcutItemType</key>
-			<string>view-prs</string>
-		</dict>
-		<dict>
-			<key>UIApplicationShortcutItemIconType</key>
-			<string>UIApplicationShortcutIconTypeSearch</string>
-			<key>UIApplicationShortcutItemTitle</key>
-			<string>Search Issues</string>
-			<key>UIApplicationShortcutItemType</key>
-			<string>view-issues</string>
-		</dict>
 	</array>
 	<key>UTExportedTypeDeclarations</key>
 	<array>
