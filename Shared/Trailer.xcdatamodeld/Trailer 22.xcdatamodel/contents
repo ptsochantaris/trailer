@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="9057" systemVersion="15B42" minimumToolsVersion="Xcode 4.5">
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="9057" systemVersion="15B42" minimumToolsVersion="Automatic">
     <entity name="ApiServer" representedClassName="Trailer.ApiServer" syncable="YES">
         <attribute name="apiPath" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="authToken" optional="YES" attributeType="String" syncable="YES"/>
@@ -26,6 +26,7 @@
         <relationship name="teams" toMany="YES" deletionRule="Cascade" destinationEntity="Team" inverseName="apiServer" inverseEntity="Team" syncable="YES"/>
     </entity>
     <entity name="Issue" representedClassName="Trailer.Issue" syncable="YES">
+        <attribute name="announced" optional="YES" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
         <attribute name="assignedToMe" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="body" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="commentsLink" optional="YES" attributeType="String" syncable="YES"/>
@@ -97,6 +98,7 @@
         <relationship name="pullRequest" maxCount="1" deletionRule="Nullify" destinationEntity="PullRequest" inverseName="statuses" inverseEntity="PullRequest" syncable="YES"/>
     </entity>
     <entity name="PullRequest" representedClassName="Trailer.PullRequest" syncable="YES">
+        <attribute name="announced" optional="YES" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
         <attribute name="assignedToMe" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="body" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="condition" optional="YES" attributeType="Integer 16" defaultValueString="0" indexed="YES" syncable="YES"/>
@@ -177,11 +179,11 @@
     </entity>
     <elements>
         <element name="ApiServer" positionX="9" positionY="153" width="128" height="390"/>
-        <element name="Issue" positionX="9" positionY="153" width="128" height="435"/>
+        <element name="Issue" positionX="9" positionY="153" width="128" height="450"/>
         <element name="PRComment" positionX="0" positionY="0" width="128" height="270"/>
         <element name="PRLabel" positionX="9" positionY="153" width="128" height="195"/>
         <element name="PRStatus" positionX="0" positionY="0" width="128" height="225"/>
-        <element name="PullRequest" positionX="0" positionY="0" width="128" height="540"/>
+        <element name="PullRequest" positionX="0" positionY="0" width="128" height="555"/>
         <element name="Repo" positionX="0" positionY="0" width="128" height="285"/>
         <element name="Team" positionX="9" positionY="153" width="128" height="165"/>
     </elements>
