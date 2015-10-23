@@ -14,12 +14,12 @@
 				<li>Corrected broken hardware shortcut options screen</li>
 				<li>Fixed update mechanism under El Capitan</li>
 				</ul></font>]]></description>
-			<pubDate>Thu, 23 Oct 2015 23:00:00 +0000</pubDate>
+			<pubDate>Fri, 24 Oct 2015 9:00:00 +0000</pubDate>
 			<enclosure
 			url="http://ptsochantaris.github.io/trailer/trailer139.zip"
-			sparkle:version="1244"
+			sparkle:version="1245"
 			sparkle:shortVersionString="1.3.9"
-			sparkle:dsaSignature="MC0CFElP4yHyl1jBs8jGc28AFxdYI3BHAhUAt4UZpiRzAF96QnZ0Jcae57f0SYA="
+			sparkle:dsaSignature=""
 			type="application/octet-stream"/>
 		</item>
 
@@ -41,7 +41,7 @@
 			url="http://ptsochantaris.github.io/trailer/trailer137.zip"
 			sparkle:version="1236"
 			sparkle:shortVersionString="1.3.7"
-			sparkle:dsaSignature="MC0CFQDqWNwTfEXMoXDTvkQvdhzOObSBwgIUDSaMB/k9c97lP2dP5km0vAuetV8="
+			sparkle:dsaSignature="MCwCFG12iJsi6TiuE/qN2ZAGRza6eMKnAhRviRF811qTygrR4KKBnmXi5XvoeA=="
 			type="application/octet-stream"/>
 		</item>
 
