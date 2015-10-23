@@ -13,13 +13,14 @@
 				<li>Option to hide (and defer announcement of) PRs whose statuses are not all green</li>
 				<li>Corrected broken hardware shortcut options screen</li>
 				<li>Fixed update mechanism under El Capitan</li>
+				<li>Fixed signing issues and update Sparkle updater</li>
 				</ul></font>]]></description>
 			<pubDate>Fri, 24 Oct 2015 9:00:00 +0000</pubDate>
 			<enclosure
 			url="http://ptsochantaris.github.io/trailer/trailer139.zip"
-			sparkle:version="1245"
+			sparkle:version="1246"
 			sparkle:shortVersionString="1.3.9"
-			sparkle:dsaSignature=""
+			sparkle:dsaSignature="MC0CFFcfNADaqmFAXGz7nmKZkQPWe4x2AhUA5/eTRJ0ExZBbDe4tlmGQjNhmQL0="
 			type="application/octet-stream"/>
 		</item>
 
