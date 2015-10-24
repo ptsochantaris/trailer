@@ -29,6 +29,7 @@ final class PRCell: UITableViewCell {
 	@IBOutlet weak var statusToBottomDistance: NSLayoutConstraint!
 
 	override func awakeFromNib() {
+
 		unreadCount.textColor = UIColor.whiteColor()
 		contentView.addSubview(unreadCount)
 
@@ -78,6 +79,7 @@ final class PRCell: UITableViewCell {
 	}
 
 	func networkStateChanged() {
+		if !forDisplay { return }
 		dispatch_async(dispatch_get_main_queue()) { [weak self] in
 			if self!.failedToLoadImage == nil { return }
 			if api.currentNetworkStatus != NetworkStatus.NotReachable {
@@ -121,14 +123,14 @@ final class PRCell: UITableViewCell {
 		if let statusString = statusText?.string {
 			statusToAvatarDistance.constant = 9.0
 			statusToDescriptionDistance.constant = 9.0
-			statusToBottomDistance.constant = 4.0
+			statusToBottomDistance.constant = 3.0
 			if forDisplay {
 				accessibilityLabel = "\(pullRequest.accessibleTitle()), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(pullRequest.accessibleSubtitle()). \(statusCount) statuses: \(statusString)"
 			}
 		} else {
 			statusToAvatarDistance.constant = 0.0
 			statusToDescriptionDistance.constant = 0.0
-			statusToBottomDistance.constant = 0.0
+			statusToBottomDistance.constant = 4.0
 			if forDisplay {
 				accessibilityLabel = "\(pullRequest.accessibleTitle()), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(pullRequest.accessibleSubtitle())"
 			}
@@ -140,6 +142,10 @@ final class PRCell: UITableViewCell {
 		_title.attributedText = issue.titleWithFont(_title.font, labelFont: detailFont.fontWithSize(detailFont.pointSize-2), titleColor: UIColor.darkTextColor())
 		_description.attributedText = issue.subtitleWithFont(detailFont, lightColor: UIColor.lightGrayColor(), darkColor: UIColor.darkGrayColor())
 		_statuses.attributedText = nil
+
+		statusToAvatarDistance.constant = 0.0
+		statusToDescriptionDistance.constant = 0.0
+		statusToBottomDistance.constant = 4.0
 
 		if forDisplay {
 			setCountsAndImage(issue)
@@ -196,8 +202,7 @@ final class PRCell: UITableViewCell {
 		tone()
 	}
 
-	func tone()
-	{
+	func tone() {
 		unreadCount.backgroundColor = UIColor.redColor()
 		readCount.backgroundColor = UIColor(white: 0.9, alpha: 1.0)
 	}

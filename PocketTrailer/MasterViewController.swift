@@ -26,17 +26,14 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			a.dismissViewControllerAnimated(true, completion: nil)
 		}))
 		a.addAction(UIAlertAction(title: "Mark all as read", style: UIAlertActionStyle.Destructive, handler: { [weak self] action in
-			self!.markAllAsRead()
+			self?.markAllAsRead()
 			}))
 		a.addAction(UIAlertAction(title: "Remove merged", style:UIAlertActionStyle.Default, handler: { [weak self] action in
-			self!.removeAllMerged()
+			self?.removeAllMerged()
 			}))
 		a.addAction(UIAlertAction(title: "Remove closed", style:UIAlertActionStyle.Default, handler: { [weak self] action in
-			self!.removeAllClosed()
+			self?.removeAllClosed()
 			}))
-		a.addAction(UIAlertAction(title: "Refresh Now", style:UIAlertActionStyle.Default, handler: { action in
-			app.startRefresh()
-		}))
 		presentViewController(a, animated: true, completion: nil)
 	}
 
@@ -187,8 +184,8 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	override func viewDidLayoutSubviews() {
+		heightCache.removeAll(keepCapacity: true)
 		super.viewDidLayoutSubviews()
-		tableView.tableHeaderView?.frame = CGRectMake(0, 0, tableView.bounds.size.width, 41)
 	}
 
 	override func viewWillAppear(animated: Bool) {
@@ -257,10 +254,11 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	private func showTabBar(show: Bool, animated: Bool) {
 		if show {
 
-			tableView.contentInset = UIEdgeInsetsMake(tableView.contentInset.top, 0, 49, 0)
-			tableView.scrollIndicatorInsets = UIEdgeInsetsMake(tableView.scrollIndicatorInsets.top, 0, 49, 0)
-
 			if tabBar == nil {
+
+				tableView.contentInset = UIEdgeInsetsMake(tableView.contentInset.top, 0, 49, 0)
+				tableView.scrollIndicatorInsets = UIEdgeInsetsMake(tableView.scrollIndicatorInsets.top, 0, 49, 0)
+
 				if let s = navigationController?.view {
 					let t = UITabBar(frame: CGRectMake(0, s.bounds.size.height-49, s.bounds.size.width, 49))
 					t.autoresizingMask = UIViewAutoresizing.FlexibleTopMargin.union(UIViewAutoresizing.FlexibleBottomMargin).union(UIViewAutoresizing.FlexibleWidth)
@@ -447,7 +445,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			return h
 		}
 		configureCell(sizer!, atIndexPath: indexPath)
-		let h = sizer!.systemLayoutSizeFittingSize(CGSizeMake(tableView.bounds.width, UILayoutFittingCompressedSize.height),
+		let h = sizer!.systemLayoutSizeFittingSize(CGSizeMake(tableView.bounds.width, 0),
 			withHorizontalFittingPriority: UILayoutPriorityRequired,
 			verticalFittingPriority: UILayoutPriorityFittingSizeLevel).height
 		heightCache[indexPath] = h

@@ -7,8 +7,11 @@ let api = API()
 
 
 //debugging
-
-//let _prs = PullRequest.activePullRequestsInMoc(mainObjectContext, visibleOnly: true)
+//let _items = Issue.allItemsOfType("Issue", inMoc: mainObjectContext) as! [ListableItem]
+//for i in _items {
+	//i.latestReadCommentDate = never()
+	//i.postProcess()
+//}
 //for s in _prs[0].statuses {
 //	s.state = "failed"
 //}
@@ -18,7 +21,6 @@ let api = API()
 //	p.latestReadCommentDate = never()
 //	p.postProcess()
 //}
-
 
 
 #if os(iOS)

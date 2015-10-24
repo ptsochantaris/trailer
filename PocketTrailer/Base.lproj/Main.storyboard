@@ -109,16 +109,16 @@
                                     <rect key="frame" x="0.0" y="0.0" width="600" height="307.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dbg-hz-tPt" userLabel="Avatar">
-                                            <rect key="frame" x="10" y="64" width="50" height="50"/>
+                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="1000" verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="dbg-hz-tPt" userLabel="Avatar">
+                                            <rect key="frame" x="10" y="66" width="50" height="50"/>
                                             <animations/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="50" id="DHz-HD-pc2"/>
                                                 <constraint firstAttribute="height" constant="50" id="IhZ-E9-ELG"/>
                                             </constraints>
                                         </imageView>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="252" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" placeholderIntrinsicWidth="50" placeholderIntrinsicHeight="50" usesAttributedText="YES" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AQh-N4-Eak" userLabel="DescriptionLabel">
-                                            <rect key="frame" x="70" y="60" width="520" height="50"/>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" placeholderIntrinsicWidth="50" placeholderIntrinsicHeight="50" usesAttributedText="YES" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AQh-N4-Eak" userLabel="DescriptionLabel">
+                                            <rect key="frame" x="70" y="62" width="520" height="50"/>
                                             <animations/>
                                             <attributedString key="attributedText">
                                                 <fragment content="Description">
@@ -131,7 +131,7 @@
                                             </attributedString>
                                             <nil key="highlightedColor"/>
                                         </label>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="252" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" placeholderIntrinsicWidth="50" placeholderIntrinsicHeight="50" usesAttributedText="YES" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wDD-T8-hhR" userLabel="StatusLabel">
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" placeholderIntrinsicWidth="50" placeholderIntrinsicHeight="50" usesAttributedText="YES" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wDD-T8-hhR" userLabel="StatusLabel">
                                             <rect key="frame" x="10" y="247" width="580" height="50"/>
                                             <animations/>
                                             <attributedString key="attributedText">
@@ -145,7 +145,7 @@
                                             </attributedString>
                                             <nil key="highlightedColor"/>
                                         </label>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" placeholderIntrinsicWidth="50" placeholderIntrinsicHeight="50" usesAttributedText="YES" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Vv-dH-kVA" userLabel="TitleLabel">
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" placeholderIntrinsicWidth="50" placeholderIntrinsicHeight="50" usesAttributedText="YES" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Vv-dH-kVA" userLabel="TitleLabel">
                                             <rect key="frame" x="10" y="10" width="580" height="50"/>
                                             <animations/>
                                             <attributedString key="attributedText">
@@ -163,16 +163,16 @@
                                     <animations/>
                                     <constraints>
                                         <constraint firstAttribute="trailing" secondItem="AQh-N4-Eak" secondAttribute="trailing" constant="10" id="12q-LP-jnA"/>
-                                        <constraint firstItem="wDD-T8-hhR" firstAttribute="top" relation="greaterThanOrEqual" secondItem="dbg-hz-tPt" secondAttribute="bottom" constant="8" id="BRE-qK-Il3"/>
-                                        <constraint firstItem="AQh-N4-Eak" firstAttribute="top" secondItem="dbg-hz-tPt" secondAttribute="top" constant="-4" id="E1d-yH-pZX"/>
-                                        <constraint firstItem="wDD-T8-hhR" firstAttribute="top" relation="greaterThanOrEqual" secondItem="AQh-N4-Eak" secondAttribute="bottom" constant="8" id="E4U-f8-fuT"/>
+                                        <constraint firstItem="dbg-hz-tPt" firstAttribute="top" secondItem="7Vv-dH-kVA" secondAttribute="bottom" constant="6" id="1Gz-Su-2Yc"/>
+                                        <constraint firstItem="wDD-T8-hhR" firstAttribute="top" relation="greaterThanOrEqual" secondItem="dbg-hz-tPt" secondAttribute="bottom" constant="10" id="BRE-qK-Il3"/>
+                                        <constraint firstItem="wDD-T8-hhR" firstAttribute="top" relation="greaterThanOrEqual" secondItem="AQh-N4-Eak" secondAttribute="bottom" constant="10" id="E4U-f8-fuT"/>
                                         <constraint firstAttribute="trailing" secondItem="7Vv-dH-kVA" secondAttribute="trailing" constant="10" id="Fjg-5Q-GIv"/>
                                         <constraint firstAttribute="trailing" secondItem="wDD-T8-hhR" secondAttribute="trailing" constant="10" id="IKp-5J-Zt3"/>
                                         <constraint firstItem="dbg-hz-tPt" firstAttribute="leading" secondItem="Ccv-UH-bok" secondAttribute="leading" constant="10" id="JTr-OQ-e3m"/>
                                         <constraint firstItem="AQh-N4-Eak" firstAttribute="leading" secondItem="dbg-hz-tPt" secondAttribute="trailing" constant="10" id="Zq0-89-S3m"/>
                                         <constraint firstItem="7Vv-dH-kVA" firstAttribute="leading" secondItem="Ccv-UH-bok" secondAttribute="leading" constant="10" id="kZt-X7-cDG"/>
                                         <constraint firstItem="wDD-T8-hhR" firstAttribute="leading" secondItem="Ccv-UH-bok" secondAttribute="leading" constant="10" id="pDg-O7-zIk"/>
-                                        <constraint firstItem="AQh-N4-Eak" firstAttribute="top" secondItem="7Vv-dH-kVA" secondAttribute="bottom" id="rrt-8p-u3r"/>
+                                        <constraint firstItem="AQh-N4-Eak" firstAttribute="top" secondItem="7Vv-dH-kVA" secondAttribute="bottom" constant="2" id="rrt-8p-u3r"/>
                                         <constraint firstAttribute="bottomMargin" secondItem="wDD-T8-hhR" secondAttribute="bottom" constant="2" id="vn5-7Z-GKj"/>
                                         <constraint firstItem="7Vv-dH-kVA" firstAttribute="top" secondItem="Ccv-UH-bok" secondAttribute="top" constant="10" id="yxl-jY-T7O"/>
                                     </constraints>
