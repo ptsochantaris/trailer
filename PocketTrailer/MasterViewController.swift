@@ -161,8 +161,8 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		searchHolder.addSubview(cover)
 		searchHolder.addSubview(searchField)
 		tableView.tableHeaderView = searchHolder
-		tableView.contentOffset = CGPointMake(0, searchHolder.frame.size.height)
 		tableView.rowHeight = UITableViewAutomaticDimension
+		tableView.estimatedRowHeight = 240
 
 		if let detailNav = splitViewController?.viewControllers.last as? UINavigationController {
 			detailViewController = detailNav.topViewController as? DetailViewController
@@ -180,12 +180,11 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	func tabBar(tabBar: UITabBar, didSelectItem item: UITabBarItem) {
-		viewMode = indexOfObject(tabBar.items!, value: item)==0 ? MasterViewMode.PullRequests : MasterViewMode.Issues
-	}
-
-	override func viewDidLayoutSubviews() {
-		heightCache.removeAll(keepCapacity: true)
-		super.viewDidLayoutSubviews()
+		if indexOfObject(tabBar.items!, value: item)==0 {
+			showPullRequestsSelected(tabBar)
+		} else {
+			showIssuesSelected(tabBar)
+		}
 	}
 
 	override func viewWillAppear(animated: Bool) {
@@ -195,8 +194,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	func reloadDataWithAnimation(animated: Bool) {
-
-		heightCache.removeAll()
 
 		if !Repo.interestedInIssues() && Repo.interestedInPrs() && viewMode == MasterViewMode.Issues {
 			showTabBar(false, animated: animated)
@@ -338,13 +335,13 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 
 		if let p = relatedItem as? PullRequest {
-			viewMode = MasterViewMode.PullRequests
+			viewMode = .PullRequests
 			detailViewController.catchupWithDataItemWhenLoaded = p.objectID
 			if let ip = fetchedResultsController.indexPathForObject(p) {
 				tableView.selectRowAtIndexPath(ip, animated: false, scrollPosition: UITableViewScrollPosition.Middle)
 			}
 		} else if let i = relatedItem as? Issue {
-			viewMode = MasterViewMode.Issues
+			viewMode = .Issues
 			detailViewController.catchupWithDataItemWhenLoaded = i.objectID
 			if let ip = fetchedResultsController.indexPathForObject(i) {
 				tableView.selectRowAtIndexPath(ip, animated: false, scrollPosition: UITableViewScrollPosition.Middle)
@@ -361,7 +358,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	func openPrWithId(prId: String) {
-		viewMode = MasterViewMode.PullRequests
+		viewMode = .PullRequests
 		if let
 			pullRequestId = DataManager.idForUriPath(prId),
 			pr = existingObjectWithID(pullRequestId) as? PullRequest,
@@ -374,7 +371,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	func openIssueWithId(iId: String) {
-		viewMode = MasterViewMode.Issues
+		viewMode = .Issues
 		if let
 			issueId = DataManager.idForUriPath(iId),
 			issue = existingObjectWithID(issueId) as? Issue,
@@ -394,12 +391,12 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			if let url = comment.webUrl {
 				var ip: NSIndexPath?
 				if let pr = comment.pullRequest {
-					viewMode = MasterViewMode.PullRequests
+					viewMode = .PullRequests
 					ip = fetchedResultsController.indexPathForObject(pr)
 					detailViewController.catchupWithDataItemWhenLoaded = nil
 					pr.catchUpWithComments()
 				} else if let issue = comment.issue {
-					viewMode = MasterViewMode.Issues
+					viewMode = .Issues
 					ip = fetchedResultsController.indexPathForObject(issue)
 					detailViewController.catchupWithDataItemWhenLoaded = nil
 					issue.catchUpWithComments()
@@ -434,26 +431,8 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		return cell
 	}
 
-	private var sizer: PRCell?
-	private var heightCache = [NSIndexPath : CGFloat]()
-	override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-		if sizer == nil {
-			sizer = tableView.dequeueReusableCellWithIdentifier("Cell") as? PRCell
-			sizer?.forDisplay = false
-		} else if let h = heightCache[indexPath] {
-			//DLog("using cached height for %d - %d", indexPath.section, indexPath.row)
-			return h
-		}
-		configureCell(sizer!, atIndexPath: indexPath)
-		let h = sizer!.systemLayoutSizeFittingSize(CGSizeMake(tableView.bounds.width, 0),
-			withHorizontalFittingPriority: UILayoutPriorityRequired,
-			verticalFittingPriority: UILayoutPriorityFittingSizeLevel).height
-		heightCache[indexPath] = h
-		return h
-	}
-
 	override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-		if viewMode == MasterViewMode.PullRequests, let
+		if viewMode == .PullRequests, let
 			p = fetchedResultsController.objectAtIndexPath(indexPath) as? PullRequest,
 			u = p.urlForOpening(),
 			url = NSURL(string: u)
@@ -461,7 +440,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			if openItem(p, url: url, oid: p.objectID) {
 				tableView.deselectRowAtIndexPath(indexPath, animated: true)
 			}
-		} else if viewMode == MasterViewMode.Issues, let
+		} else if viewMode == .Issues, let
 			i = fetchedResultsController.objectAtIndexPath(indexPath) as? Issue,
 			u = i.urlForOpening(),
 			url = NSURL(string: u)
@@ -521,7 +500,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		var fetchRequest: NSFetchRequest
 
-		if viewMode == MasterViewMode.PullRequests {
+		if viewMode == .PullRequests {
 			fetchRequest = ListableItem.requestForItemsOfType("PullRequest", withFilter: searchField.text, sectionIndex: -1)
 		} else {
 			fetchRequest = ListableItem.requestForItemsOfType("Issue", withFilter: searchField.text, sectionIndex: -1)
@@ -542,8 +521,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	func controller(controller: NSFetchedResultsController, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
 
-		heightCache.removeAll()
-
 		switch(type) {
 		case .Insert:
 			tableView.insertSections(NSIndexSet(index: sectionIndex), withRowAnimation: UITableViewRowAnimation.Automatic)
@@ -557,8 +534,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
-
-		heightCache.removeAll()
 
 		switch(type) {
 		case .Insert:
@@ -585,12 +560,8 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	private func configureCell(cell: UITableViewCell, atIndexPath: NSIndexPath) {
 		let c = cell as! PRCell
 
-		//c._statuses.preferredMaxLayoutWidth = tableView.bounds.size.width - 20
-		//c._title.preferredMaxLayoutWidth = tableView.bounds.size.width - 20
-		//c._description.preferredMaxLayoutWidth = tableView.bounds.size.width - 80
-
 		let o = fetchedResultsController.objectAtIndexPath(atIndexPath)
-		if viewMode == MasterViewMode.PullRequests {
+		if viewMode == .PullRequests {
 			c.setPullRequest(o as! PullRequest)
 		} else {
 			c.setIssue(o as! Issue)
@@ -608,27 +579,29 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		if app.isRefreshing {
 			title = "Refreshing..."
 			tableView.tableFooterView = EmptyView(message: DataManager.reasonForEmptyWithFilter(searchField.text), parentWidth: view.bounds.size.width)
-			if !(refreshControl?.refreshing ?? false) {
-				dispatch_async(dispatch_get_main_queue(), { [weak self] in
-					self!.refreshControl!.beginRefreshing()
-					})
+			if let r = refreshControl {
+				r.attributedTitle = NSAttributedString(string: api.lastUpdateDescription(), attributes: nil)
+				if !r.refreshing {
+					r.beginRefreshing()
+				}
 			}
 		} else {
 
 			let count = fetchedResultsController.fetchedObjects?.count ?? 0
-			if viewMode == MasterViewMode.PullRequests {
+			if viewMode == .PullRequests {
 				title = pullRequestsTitle(true)
 				tableView.tableFooterView = (count == 0) ? EmptyView(message: DataManager.reasonForEmptyWithFilter(searchField.text), parentWidth: view.bounds.size.width) : nil
 			} else {
 				title = issuesTitle()
 				tableView.tableFooterView = (count == 0) ? EmptyView(message: DataManager.reasonForEmptyIssuesWithFilter(searchField.text), parentWidth: view.bounds.size.width) : nil
 			}
-			dispatch_async(dispatch_get_main_queue(), { [weak self] in
-				self!.refreshControl!.endRefreshing()
-				})
+			if let r = refreshControl {
+				r.attributedTitle = NSAttributedString(string: api.lastUpdateDescription(), attributes: nil)
+				if r.refreshing {
+					r.endRefreshing()
+				}
+			}
 		}
-
-		refreshControl?.attributedTitle = NSAttributedString(string: api.lastUpdateDescription(), attributes: nil)
 
 		app.updateBadge()
 
@@ -698,13 +671,17 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	////////////////// mode
 
 	func showPullRequestsSelected(sender: AnyObject) {
-		tableView.scrollRectToVisible(CGRectMake(0, 0, 1, 1), animated: false)
-		viewMode = MasterViewMode.PullRequests
+		viewMode = .PullRequests
+		dispatch_async(dispatch_get_main_queue()) {
+			self.tableView.scrollRectToVisible(CGRectMake(0, 0, 100, 100), animated: false)
+		}
 	}
 
 	func showIssuesSelected(sender: AnyObject) {
-		tableView.scrollRectToVisible(CGRectMake(0, 0, 1, 1), animated: false)
-		viewMode = MasterViewMode.Issues
+		viewMode = .Issues
+		dispatch_async(dispatch_get_main_queue()) {
+			self.tableView.scrollRectToVisible(CGRectMake(0, 0, 100, 100), animated: false)
+		}
 	}
 
 	func focusFilter() {
@@ -717,9 +694,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			if newValue != _viewMode {
 				_viewMode = newValue
 				_fetchedResultsController = nil
-				heightCache.removeAll()
 				tableView.reloadData()
-				tableView.scrollRectToVisible(CGRectMake(0, tableView.tableHeaderView?.frame.size.height ?? tableView.contentInset.top, 1, 1), animated: false)
 				updateStatus()
 			}
 		}

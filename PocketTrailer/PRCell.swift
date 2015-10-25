@@ -18,8 +18,6 @@ final class PRCell: UITableViewCell {
 	private var failedToLoadImage: String?
 	private var waitingForImageInPath: String?
 
-	var forDisplay = true
-
 	@IBOutlet weak var _image: UIImageView!
 	@IBOutlet weak var _title: UILabel!
 	@IBOutlet weak var _description: UILabel!
@@ -79,7 +77,6 @@ final class PRCell: UITableViewCell {
 	}
 
 	func networkStateChanged() {
-		if !forDisplay { return }
 		dispatch_async(dispatch_get_main_queue()) { [weak self] in
 			if self!.failedToLoadImage == nil { return }
 			if api.currentNetworkStatus != NetworkStatus.NotReachable {
@@ -96,10 +93,7 @@ final class PRCell: UITableViewCell {
 		let detailFont = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
 		_title.attributedText = pullRequest.titleWithFont(_title.font, labelFont: detailFont.fontWithSize(detailFont.pointSize-2), titleColor: UIColor.darkTextColor())
 		_description.attributedText = pullRequest.subtitleWithFont(detailFont, lightColor: UIColor.lightGrayColor(), darkColor: UIColor.darkGrayColor())
-
-		if forDisplay {
-			setCountsAndImage(pullRequest)
-		}
+		setCountsAndImage(pullRequest)
 
 		var statusText : NSMutableAttributedString?
 		var statusCount = 0
@@ -124,16 +118,12 @@ final class PRCell: UITableViewCell {
 			statusToAvatarDistance.constant = 9.0
 			statusToDescriptionDistance.constant = 9.0
 			statusToBottomDistance.constant = 3.0
-			if forDisplay {
-				accessibilityLabel = "\(pullRequest.accessibleTitle()), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(pullRequest.accessibleSubtitle()). \(statusCount) statuses: \(statusString)"
-			}
+			accessibilityLabel = "\(pullRequest.accessibleTitle()), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(pullRequest.accessibleSubtitle()). \(statusCount) statuses: \(statusString)"
 		} else {
 			statusToAvatarDistance.constant = 0.0
 			statusToDescriptionDistance.constant = 0.0
 			statusToBottomDistance.constant = 4.0
-			if forDisplay {
-				accessibilityLabel = "\(pullRequest.accessibleTitle()), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(pullRequest.accessibleSubtitle())"
-			}
+			accessibilityLabel = "\(pullRequest.accessibleTitle()), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(pullRequest.accessibleSubtitle())"
 		}
 	}
 
@@ -147,10 +137,8 @@ final class PRCell: UITableViewCell {
 		statusToDescriptionDistance.constant = 0.0
 		statusToBottomDistance.constant = 4.0
 
-		if forDisplay {
-			setCountsAndImage(issue)
-			accessibilityLabel = "\(issue.accessibleTitle()), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(issue.accessibleSubtitle())"
-		}
+		setCountsAndImage(issue)
+		accessibilityLabel = "\(issue.accessibleTitle()), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(issue.accessibleSubtitle())"
 	}
 
 	private func setCountsAndImage(item: ListableItem) {
