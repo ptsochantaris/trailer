@@ -34,7 +34,7 @@
         <attribute name="createdAt" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="isNewAssignment" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="latestReadCommentDate" optional="YES" attributeType="Date" syncable="YES"/>
-        <attribute name="number" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="number" optional="YES" attributeType="Integer 64" defaultValueString="0" indexed="YES" syncable="YES"/>
         <attribute name="postSyncAction" optional="YES" attributeType="Integer 16" indexed="YES" syncable="YES"/>
         <attribute name="reopened" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="sectionIndex" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
@@ -109,7 +109,7 @@
         <attribute name="lastStatusNotified" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="latestReadCommentDate" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="mergeable" optional="YES" attributeType="Boolean" syncable="YES"/>
-        <attribute name="number" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="number" optional="YES" attributeType="Integer 64" defaultValueString="0" indexed="YES" syncable="YES"/>
         <attribute name="pinned" optional="YES" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
         <attribute name="postSyncAction" optional="YES" attributeType="Integer 16" indexed="YES" syncable="YES"/>
         <attribute name="reopened" optional="YES" attributeType="Boolean" syncable="YES"/>

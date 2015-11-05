@@ -34,7 +34,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 	private enum Section: Int {
 		case Refresh, Display, Filtering, Issues, Comments, Repos, StausesAndLabels, History, Confirm, Sort, Misc
-		static let rowCounts = [3, 6, 6, 1, 7, 2, 7, 3, 2, 3, 2]
+		static let rowCounts = [3, 6, 7, 1, 7, 2, 7, 3, 2, 3, 2]
 		static let allNames = ["Auto Refresh", "Display", "Filtering", "Issues", "Comments", "Repositories", "Statuses & Labels", "History", "Don't confirm when", "Sorting", "Misc"]
 	}
 
@@ -66,7 +66,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 		let l = UILabel()
 		l.attributedText = NSAttributedString(
-			string: "Additionally, you can use title: server: label: repo: user: and status: to filter specific properties, e.g. \"label:bug,suggestion\"",
+			string: "Additionally, you can use title: server: label: repo: user: number: and status: to filter specific properties, e.g. \"label:bug,suggestion\"",
 			attributes: [
 				NSFontAttributeName: UIFont.systemFontOfSize(UIFont.smallSystemFontSize()),
 				NSForegroundColorAttributeName: UIColor.lightGrayColor(),
@@ -170,6 +170,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.titleLabel.text = "Include usernames"
 				cell.accessoryType = check(Settings.includeUsersInFilter)
 				cell.descriptionLabel.text = "Check the name of the author of an item when selecting it for inclusion in filtered results."
+			case 6:
+				cell.titleLabel.text = "Include PR or issue numbers"
+				cell.accessoryType = check(Settings.includeNumbersInFilter)
+				cell.descriptionLabel.text = "Check the PR/Issue number of the item when selecting it for inclusion in filtered results."
 			default: break
 			}
 		} else if indexPath.section == Section.Issues.rawValue {
@@ -393,6 +397,8 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				Settings.includeServersInFilter = !Settings.includeServersInFilter
 			case 5:
 				Settings.includeUsersInFilter = !Settings.includeUsersInFilter
+			case 6:
+				Settings.includeNumbersInFilter = !Settings.includeNumbersInFilter
 			default: break
 			}
 			settingsChangedTimer.push()

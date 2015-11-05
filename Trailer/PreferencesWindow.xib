@@ -714,14 +714,14 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <box autoresizesSubviews="NO" title="When filtering, always include..." boxType="secondary" borderType="line" id="iei-ab-K9r">
-                                            <rect key="frame" x="414" y="141" width="315" height="118"/>
+                                            <rect key="frame" x="414" y="131" width="315" height="140"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                             <view key="contentView" id="Gwd-Lx-fke">
-                                                <rect key="frame" x="1" y="1" width="313" height="102"/>
+                                                <rect key="frame" x="1" y="1" width="313" height="124"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button id="Jr3-YU-DrS">
-                                                        <rect key="frame" x="16" y="16" width="76" height="18"/>
+                                                        <rect key="frame" x="16" y="39" width="76" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <buttonCell key="cell" type="check" title="Statuses" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="Dds-V9-uRU">
@@ -733,7 +733,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </button>
                                                     <button id="eFR-P1-MxA">
-                                                        <rect key="frame" x="105" y="71" width="63" height="18"/>
+                                                        <rect key="frame" x="105" y="93" width="63" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <buttonCell key="cell" type="check" title="Labels" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="6Za-6G-OIl">
@@ -745,7 +745,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </button>
                                                     <button id="dTw-ed-XkE">
-                                                        <rect key="frame" x="30" y="44" width="62" height="18"/>
+                                                        <rect key="frame" x="30" y="66" width="62" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <buttonCell key="cell" type="check" title="Repos" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="gO1-Ad-AhD">
@@ -757,7 +757,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </button>
                                                     <button id="0Tg-YN-sVl">
-                                                        <rect key="frame" x="110" y="16" width="58" height="18"/>
+                                                        <rect key="frame" x="110" y="39" width="58" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <buttonCell key="cell" type="check" title="Users" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="Z30-Co-sRo">
@@ -769,7 +769,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </button>
                                                     <button id="8bu-9K-ALi">
-                                                        <rect key="frame" x="99" y="43" width="69" height="18"/>
+                                                        <rect key="frame" x="99" y="66" width="69" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <buttonCell key="cell" type="check" title="Servers" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="3Gg-aQ-pv0">
@@ -781,18 +781,18 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </button>
                                                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" id="CDe-lj-xrh">
-                                                        <rect key="frame" x="180" y="6" width="117" height="85"/>
+                                                        <rect key="frame" x="180" y="28" width="117" height="85"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" id="ixu-zC-YfY">
                                                             <font key="font" metaFont="miniSystem"/>
-                                                            <string key="title">Additionally, you can use title: server: label: repo: user: and status: to filter specific properties, e.g. "label:bug,suggestion"</string>
+                                                            <string key="title">Additionally, you can use title: server: label: repo: user: number: and status: to filter specific properties, e.g. "label:bug,suggestion"</string>
                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
                                                     <button id="Iwj-YJ-JSd">
-                                                        <rect key="frame" x="37" y="71" width="55" height="18"/>
+                                                        <rect key="frame" x="37" y="93" width="55" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <buttonCell key="cell" type="check" title="Titles" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="ddT-lB-RJ9">
@@ -801,6 +801,18 @@ user you can add more servers from the left.</string>
                                                         </buttonCell>
                                                         <connections>
                                                             <action selector="includeTitlesInFilteringSelected:" target="vQH-WF-vh2" id="dUz-hp-MGj"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button id="xzP-Bb-u07">
+                                                        <rect key="frame" x="21" y="12" width="147" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <animations/>
+                                                        <buttonCell key="cell" type="check" title="PR or Issue numbers" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="5z6-1p-c6d">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="includeNumbersInFilteringSelected:" target="vQH-WF-vh2" id="HOz-7T-URJ"/>
                                                         </connections>
                                                     </button>
                                                 </subviews>
@@ -1644,6 +1656,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="hotkeyOptionModifier" destination="bU3-sU-lpP" id="jbh-IW-ykt"/>
                 <outlet property="hotkeyShiftModifier" destination="lZd-Lq-W4x" id="K49-OF-eZU"/>
                 <outlet property="includeLabelsInFiltering" destination="eFR-P1-MxA" id="saA-nS-bNY"/>
+                <outlet property="includeNumbersInFiltering" destination="xzP-Bb-u07" id="EST-ca-DQG"/>
                 <outlet property="includeRepositoriesInFiltering" destination="dTw-ed-XkE" id="auv-go-5jM"/>
                 <outlet property="includeServersInFiltering" destination="8bu-9K-ALi" id="UkT-yD-LPS"/>
                 <outlet property="includeStatusesInFiltering" destination="Jr3-YU-DrS" id="48Y-gR-fNe"/>

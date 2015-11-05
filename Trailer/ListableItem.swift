@@ -385,6 +385,22 @@ class ListableItem: DataItem {
 		return nil
 	}
 
+	final class func numberPredicateFromFilterString(string: String) -> NSPredicate? {
+		if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 6 {
+			let titleTerms = string.substringFromIndex(string.startIndex.advancedBy(7))
+			if !titleTerms.characters.isEmpty {
+				var orTerms = [NSPredicate]()
+				for term in titleTerms.componentsSeparatedByString(",") {
+					if let number = Int64(term) {
+						orTerms.append(NSPredicate(format: "number = %llu", number))
+					}
+				}
+				return NSCompoundPredicate(type: NSCompoundPredicateType.OrPredicateType, subpredicates: orTerms)
+			}
+		}
+		return nil
+	}
+
     final class func repoPredicateFromFilterString(string: String) -> NSPredicate? {
         if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 5 {
             let repoNames = string.substringFromIndex(string.startIndex.advancedBy(5))
@@ -478,6 +494,7 @@ class ListableItem: DataItem {
             checkForPredicates("label", labelPredicateFromFilterString)
             checkForPredicates("status", statusPredicateFromFilterString)
             checkForPredicates("user", userPredicateFromFilterString)
+			checkForPredicates("number", numberPredicateFromFilterString)
 
 			if !fi.isEmpty {
 				var orPredicates = [NSPredicate]()
@@ -496,6 +513,11 @@ class ListableItem: DataItem {
                 if Settings.includeUsersInFilter {
                     orPredicates.append(NSPredicate(format: "userLogin contains[cd] %@", fi))
                 }
+				if Settings.includeNumbersInFilter {
+					if let number = Int64(fi) {
+						orPredicates.append(NSPredicate(format: "number = %llu", number))
+					}
+				}
 				if itemType == "PullRequest" && Settings.includeStatusesInFilter {
 					orPredicates.append(NSPredicate(format: "any statuses.descriptionText contains[cd] %@", fi))
 				}

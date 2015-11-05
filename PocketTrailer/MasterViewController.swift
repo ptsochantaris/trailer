@@ -262,7 +262,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 					t.items = [pullRequestsItem, issuesItem]
 					t.selectedItem = viewMode==MasterViewMode.PullRequests ? pullRequestsItem : issuesItem
 					t.delegate = self
-					t.itemPositioning = UITabBarItemPositioning.Fill
+					t.itemPositioning = .Fill
 					s.addSubview(t)
 					tabBar = t
 

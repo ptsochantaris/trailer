@@ -63,6 +63,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var assignedPrHandlingPolicy: NSPopUpButton!
     @IBOutlet weak var includeServersInFiltering: NSButton!
     @IBOutlet weak var includeUsersInFiltering: NSButton!
+	@IBOutlet weak var includeNumbersInFiltering: NSButton!
 
 	// Labels
 	@IBOutlet weak var labelRescanLabel: NSTextField!
@@ -174,7 +175,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		includeLabelsInFiltering.integerValue = Settings.includeLabelsInFilter ? 1 : 0
 		includeTitlesInFiltering.integerValue = Settings.includeTitlesInFilter ? 1 : 0
         includeUsersInFiltering.integerValue = Settings.includeUsersInFilter ? 1 : 0
-        includeServersInFiltering.integerValue = Settings.includeServersInFilter ? 1 : 0
+		includeNumbersInFiltering.integerValue = Settings.includeNumbersInFilter ? 1 : 0
+		includeServersInFiltering.integerValue = Settings.includeServersInFilter ? 1 : 0
 		includeStatusesInFiltering.integerValue = Settings.includeStatusesInFilter ? 1 : 0
 		dontConfirmRemoveAllMerged.integerValue = Settings.dontAskBeforeWipingMerged ? 1 : 0
 		hideUncommentedPrs.integerValue = Settings.hideUncommentedItems ? 1 : 0
@@ -316,6 +318,11 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
         Settings.includeServersInFilter = (sender.integerValue==1)
 		app.deferredUpdateTimer.push()
     }
+
+	@IBAction func includeNumbersInFilteringSelected(sender: NSButton) {
+		Settings.includeNumbersInFilter = (sender.integerValue==1)
+		app.deferredUpdateTimer.push()
+	}
 
     @IBAction func includeUsersInFilteringSelected(sender: NSButton) {
         Settings.includeUsersInFilter = (sender.integerValue==1)
