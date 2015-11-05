@@ -41,27 +41,49 @@ class DataItem: NSManagedObject {
 		return items?.first as? DataItem
 	}
 
-	final class func itemWithInfo(info: [NSObject : AnyObject], type: String, fromServer: ApiServer) -> DataItem {
-		let serverId = N(info, "id") as! NSNumber
-		let updatedDate = syncDateFormatter.dateFromString(N(info, "updated_at") as! String)
-		var existingItem = itemOfType(type, serverId: serverId, fromServer: fromServer)
-		if existingItem == nil {
-			DLog("Creating %@: %@",type,serverId)
-			existingItem = NSEntityDescription.insertNewObjectForEntityForName(type, inManagedObjectContext: fromServer.managedObjectContext!) as? DataItem
-			existingItem!.serverId = serverId
-			existingItem!.createdAt = syncDateFormatter.dateFromString(N(info, "created_at") as! String)
-			existingItem!.postSyncAction = PostSyncAction.NoteNew.rawValue
-			existingItem!.updatedAt = updatedDate
-			existingItem!.apiServer = fromServer
-		} else if updatedDate != existingItem!.updatedAt {
-			DLog("Updating %@: %@",type,serverId)
-			existingItem!.postSyncAction = PostSyncAction.NoteUpdated.rawValue
-			existingItem!.updatedAt = updatedDate
-		} else {
-			DLog("Skipping %@: %@",type,serverId)
-			existingItem!.postSyncAction = PostSyncAction.DoNothing.rawValue
+	final class func itemsWithInfo(data: [[NSObject : AnyObject]]?, type: String, fromServer: ApiServer, postProcessCallback: (DataItem, [NSObject : AnyObject], Bool)->Void) {
+
+		var idsOfItems = [NSNumber]()
+		var idsToInfo = [NSNumber : [NSObject : AnyObject]]()
+		for info in data ?? [] {
+			let serverId = N(info, "id") as! NSNumber
+			idsOfItems.append(serverId)
+			idsToInfo[serverId] = info
 		}
-		return existingItem!
+
+		let f = NSFetchRequest(entityName: type)
+		f.returnsObjectsAsFaults = false
+		f.predicate = NSPredicate(format:"serverId in %@ and apiServer == %@", idsOfItems, fromServer)
+		let existingItems = try! fromServer.managedObjectContext?.executeFetchRequest(f) as? [DataItem] ?? []
+
+		for i in existingItems {
+			let serverId = i.serverId!
+			idsOfItems.removeAtIndex(idsOfItems.indexOf(serverId)!)
+			let info = idsToInfo[serverId]!
+			let updatedDate = syncDateFormatter.dateFromString(N(info, "updated_at") as! String)
+			if updatedDate != i.updatedAt {
+				DLog("Updating %@: %@",type,serverId)
+				i.postSyncAction = PostSyncAction.NoteUpdated.rawValue
+				i.updatedAt = updatedDate
+				postProcessCallback(i, info, true)
+			} else {
+				//DLog("Skipping %@: %@",type,serverId)
+				i.postSyncAction = PostSyncAction.DoNothing.rawValue
+				postProcessCallback(i, info, false)
+			}
+		}
+
+		for serverId in idsOfItems {
+			DLog("Creating %@: %@", type, serverId)
+			let info = idsToInfo[serverId]!
+			let i = NSEntityDescription.insertNewObjectForEntityForName(type, inManagedObjectContext: fromServer.managedObjectContext!) as! DataItem
+			i.serverId = serverId
+			i.createdAt = syncDateFormatter.dateFromString(N(info, "created_at") as! String)
+			i.updatedAt = syncDateFormatter.dateFromString(N(info, "updated_at") as! String)
+			i.postSyncAction = PostSyncAction.NoteNew.rawValue
+			i.apiServer = fromServer
+			postProcessCallback(i, info, true)
+		}
 	}
 
 	final class func itemsOfType(type: String, surviving: Bool, inMoc: NSManagedObjectContext) -> [DataItem] {

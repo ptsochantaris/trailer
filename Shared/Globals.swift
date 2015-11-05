@@ -199,15 +199,6 @@ func versionString() -> String {
 	return "Version \(currentAppVersion()) (\(buildNumber))"
 }
 
-func indexOfObject(array: [AnyObject], value: AnyObject) -> Int? {
-	for (index, element) in array.enumerate() {
-		if element === value {
-			return index
-		}
-	}
-	return nil
-}
-
 func N(data: AnyObject?, _ key: String) -> AnyObject? {
 	if let d = data as? [NSObject : AnyObject], o: AnyObject = d[key] where !(o is NSNull) {
 		return o

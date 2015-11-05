@@ -8,50 +8,57 @@ final class Issue: ListableItem {
 
 	@NSManaged var commentsLink: String?
 
-	class func issueWithInfo(info: [NSObject : AnyObject], inRepo: Repo) -> Issue {
-		let i = DataItem.itemWithInfo(info, type: "Issue", fromServer: inRepo.apiServer) as! Issue
-		if i.postSyncAction?.integerValue != PostSyncAction.DoNothing.rawValue {
-			i.url = N(info, "url") as? String
-			i.webUrl = N(info, "html_url") as? String
-			i.number = N(info, "number") as? NSNumber
-			i.state = N(info, "state") as? String
-			i.title = N(info, "title") as? String
-			i.body = N(info, "body") as? String
-			i.repo = inRepo
-
-			if let userInfo = N(info, "user") as? [NSObject: AnyObject] {
-				i.userId = N(userInfo, "id") as? NSNumber
-				i.userLogin = N(userInfo, "login") as? String
-				i.userAvatarUrl = N(userInfo, "avatar_url") as? String
-			}
-
-			if let N = i.number, R = inRepo.fullName {
-				i.commentsLink = "/repos/\(R)/issues/\(N)/comments"
-			}
-
-			for l in i.labels {
-				l.postSyncAction = PostSyncAction.Delete.rawValue
-			}
-
-			if let labelsList = N(info, "labels") as? [[NSObject: AnyObject]] {
-				for labelInfo in labelsList {
-					PRLabel.labelWithInfo(labelInfo, withParent: i)
-				}
-			}
-
-			if let assignee = N(info, "assignee") as? [NSObject: AnyObject] {
-				let assigneeName = N(assignee, "login") as? String ?? "NoAssignedUserName"
-				let assigned = (assigneeName == (inRepo.apiServer.userName ?? "NoApiUser"))
-				i.isNewAssignment = (assigned && !i.createdByMe() && !(i.assignedToMe?.boolValue ?? false))
-				i.assignedToMe = assigned
-			} else {
-				i.assignedToMe = false
-				i.isNewAssignment = false
+	class func syncIssuesFromInfoArray(data: [[NSObject : AnyObject]]?, inRepo: Repo) {
+		var filteredData = [[NSObject : AnyObject]]()
+		for d in data ?? [] {
+			if N(d, "pull_request") == nil { // don't sync issues which are pull requests, they are already synced
+				filteredData.append(d)
 			}
 		}
-		i.reopened = ((i.condition?.integerValue ?? 0) == PullRequestCondition.Closed.rawValue)
-		i.condition = PullRequestCondition.Open.rawValue
-		return i
+		DataItem.itemsWithInfo(filteredData, type: "Issue", fromServer: inRepo.apiServer) { item, info, isNewOrUpdated in
+			let i = item as! Issue
+			if isNewOrUpdated {
+				i.url = N(info, "url") as? String
+				i.webUrl = N(info, "html_url") as? String
+				i.number = N(info, "number") as? NSNumber
+				i.state = N(info, "state") as? String
+				i.title = N(info, "title") as? String
+				i.body = N(info, "body") as? String
+				i.repo = inRepo
+
+				if let userInfo = N(info, "user") as? [NSObject: AnyObject] {
+					i.userId = N(userInfo, "id") as? NSNumber
+					i.userLogin = N(userInfo, "login") as? String
+					i.userAvatarUrl = N(userInfo, "avatar_url") as? String
+				}
+
+				if let N = i.number, R = inRepo.fullName {
+					i.commentsLink = "/repos/\(R)/issues/\(N)/comments"
+				}
+
+				for l in i.labels {
+					l.postSyncAction = PostSyncAction.Delete.rawValue
+				}
+
+				if let labelsList = N(info, "labels") as? [[NSObject: AnyObject]] {
+					for labelInfo in labelsList {
+						PRLabel.labelWithInfo(labelInfo, withParent: i)
+					}
+				}
+
+				if let assignee = N(info, "assignee") as? [NSObject: AnyObject] {
+					let assigneeName = N(assignee, "login") as? String ?? "NoAssignedUserName"
+					let assigned = (assigneeName == (inRepo.apiServer.userName ?? "NoApiUser"))
+					i.isNewAssignment = (assigned && !i.createdByMe() && !(i.assignedToMe?.boolValue ?? false))
+					i.assignedToMe = assigned
+				} else {
+					i.assignedToMe = false
+					i.isNewAssignment = false
+				}
+			}
+			i.reopened = ((i.condition?.integerValue ?? 0) == PullRequestCondition.Closed.rawValue)
+			i.condition = PullRequestCondition.Open.rawValue
+		}
 	}
 
 	#if os(iOS)

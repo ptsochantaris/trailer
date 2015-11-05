@@ -636,7 +636,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	@IBAction func deleteSelectedServerSelected(sender: NSButton) {
-		if let selectedServer = selectedServer(), index = indexOfObject(ApiServer.allApiServersInMoc(mainObjectContext), value: selectedServer) {
+		if let selectedServer = selectedServer(), index = ApiServer.allApiServersInMoc(mainObjectContext).indexOf(selectedServer) {
 			mainObjectContext.deleteObject(selectedServer)
 			serverList.reloadData()
 			serverList.selectRowIndexes(NSIndexSet(index: min(index, serverList.numberOfRows-1)), byExtendingSelection: false)
@@ -847,7 +847,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		let a = ApiServer.insertNewServerInMoc(mainObjectContext)
 		a.label = "New API Server"
 		serverList.reloadData()
-		if let index = indexOfObject(ApiServer.allApiServersInMoc(mainObjectContext), value: a) {
+		if let index = ApiServer.allApiServersInMoc(mainObjectContext).indexOf(a) {
 			serverList.selectRowIndexes(NSIndexSet(index: index), byExtendingSelection: false)
 			fillServerApiFormFromSelectedServer()
 		}

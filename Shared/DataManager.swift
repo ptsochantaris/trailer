@@ -128,13 +128,15 @@ final class DataManager : NSObject {
 					}
 				}
 				#if os(iOS)
-					if p.postSyncAction?.integerValue != PostSyncAction.DoNothing.rawValue {
+					NSOperationQueue.mainQueue().addOperationWithBlock {
 						p.indexForSpotlight()
 					}
 				#endif
 			} else {
 				#if os(iOS)
-					p.deIndexFromSpotlight()
+					NSOperationQueue.mainQueue().addOperationWithBlock {
+						p.deIndexFromSpotlight()
+					}
 				#endif
 			}
 		}
@@ -157,22 +159,22 @@ final class DataManager : NSObject {
 					}
 				}
 				#if os(iOS)
-					if i.postSyncAction?.integerValue != PostSyncAction.DoNothing.rawValue {
+					NSOperationQueue.mainQueue().addOperationWithBlock {
 						i.indexForSpotlight()
 					}
 				#endif
 			} else {
 				#if os(iOS)
-					i.deIndexFromSpotlight()
+					NSOperationQueue.mainQueue().addOperationWithBlock {
+						i.deIndexFromSpotlight()
+					}
 				#endif
 			}
 		}
 
 		let latestComments = PRComment.newItemsOfType("PRComment", inMoc: mainObjectContext) as! [PRComment]
 		for c in latestComments {
-			if let i = c.pullRequest ?? c.issue {
-				processNotificationsForComment(c, ofItem: c.pullRequest ?? i)
-			}
+			c.processNotifications()
 			c.postSyncAction = PostSyncAction.DoNothing.rawValue
 		}
 
@@ -215,34 +217,6 @@ final class DataManager : NSObject {
 		}
 	}
 
-	class func processNotificationsForComment(c: PRComment, ofItem: ListableItem) {
-		if ofItem.postSyncAction?.integerValue == PostSyncAction.NoteUpdated.rawValue && ofItem.isVisibleOnMenu() {
-			if c.refersToMe() {
-				app.postNotificationOfType(PRNotificationType.NewMention, forItem: c)
-			} else if !Settings.disableAllCommentNotifications && ofItem.showNewComments() && !c.isMine() {
-				notifyNewComment(c)
-			}
-		}
-	}
-
-	class func notifyNewComment(c: PRComment) {
-		if let authorName = c.userName {
-			var blocked = false
-			for blockedAuthor in Settings.commentAuthorBlacklist as [String] {
-				if authorName.compare(blockedAuthor, options: [NSStringCompareOptions.CaseInsensitiveSearch, NSStringCompareOptions.DiacriticInsensitiveSearch])==NSComparisonResult.OrderedSame {
-					blocked = true
-					break
-				}
-			}
-			if blocked {
-				DLog("Blocked notification for user '%@' as their name is on the blacklist",authorName)
-			} else {
-				DLog("User '%@' not on blacklist, can post notification",authorName)
-				app.postNotificationOfType(PRNotificationType.NewComment, forItem:c)
-			}
-		}
-	}
-
 	class func saveDB() -> Bool {
 		if mainObjectContext.hasChanges {
 			DLog("Saving DB")
@@ -256,7 +230,7 @@ final class DataManager : NSObject {
 	}
 
 	class func tempContext() -> NSManagedObjectContext {
-		let c = NSManagedObjectContext(concurrencyType: NSManagedObjectContextConcurrencyType.MainQueueConcurrencyType)
+		let c = NSManagedObjectContext(concurrencyType: .MainQueueConcurrencyType)
 		c.parentContext = mainObjectContext
 		c.undoManager = nil
 		return c

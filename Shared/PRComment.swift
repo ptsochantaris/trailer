@@ -14,27 +14,78 @@ final class PRComment: DataItem {
     @NSManaged var pullRequest: PullRequest?
 	@NSManaged var issue: Issue?
 
-	class func commentWithInfo(info:[NSObject : AnyObject], fromServer:ApiServer) -> PRComment {
-		let c = DataItem.itemWithInfo(info, type: "PRComment", fromServer: fromServer) as! PRComment
-		if c.postSyncAction?.integerValue != PostSyncAction.DoNothing.rawValue {
-			c.body = N(info, "body") as? String
-			c.position = N(info, "position") as? NSNumber
-			c.path = N(info, "path") as? String
-			c.url = N(info, "url") as? String
-			c.webUrl = N(info, "html_url") as? String
-
-			if let userInfo = N(info, "user") as? [NSObject : AnyObject] {
-				c.userName = N(userInfo, "login") as? String
-				c.userId = N(userInfo, "id") as? NSNumber
-				c.avatarUrl = N(userInfo, "avatar_url") as? String
-			}
-
-			if let links = N(info, "links") as? [NSObject : AnyObject] {
-				c.url = N(N(links, "self"), "href") as? String
-				if c.webUrl==nil { c.webUrl = N(N(links, "html"), "href") as? String }
+	class func syncCommentsFromInfo(data: [[NSObject : AnyObject]]?, pullRequest: PullRequest) {
+		DataItem.itemsWithInfo(data, type: "PRComment", fromServer: pullRequest.apiServer) { item, info, newOrUpdated in
+			if newOrUpdated {
+				let c = item as! PRComment
+				c.pullRequest = pullRequest
+				c.fillFromInfo(info)
+				c.fastForwardItemIfNeeded(pullRequest)
 			}
 		}
-		return c
+	}
+
+	class func syncCommentsFromInfo(data: [[NSObject : AnyObject]]?, issue: Issue) {
+		DataItem.itemsWithInfo(data, type: "PRComment", fromServer: issue.apiServer) { item, info, newOrUpdated in
+			if newOrUpdated {
+				let c = item as! PRComment
+				c.issue = issue
+				c.fillFromInfo(info)
+				c.fastForwardItemIfNeeded(issue)
+			}
+		}
+	}
+
+	func fastForwardItemIfNeeded(item: ListableItem) {
+		// check if we're assigned to a just created issue, in which case we want to "fast forward" its latest comment dates to our own if we're newer
+		if let commentCreation = createdAt where (item.postSyncAction?.integerValue ?? 0) == PostSyncAction.NoteNew.rawValue {
+			if let latestReadDate = item.latestReadCommentDate where latestReadDate.compare(commentCreation) == NSComparisonResult.OrderedAscending {
+				item.latestReadCommentDate = commentCreation
+			}
+		}
+	}
+
+	func processNotifications() {
+		if let item = pullRequest ?? issue where item.postSyncAction?.integerValue == PostSyncAction.NoteUpdated.rawValue && item.isVisibleOnMenu() {
+			if refersToMe() {
+				app.postNotificationOfType(PRNotificationType.NewMention, forItem: self)
+			} else if !Settings.disableAllCommentNotifications && item.showNewComments() && !isMine() {
+				if let authorName = userName {
+					var blocked = false
+					for blockedAuthor in Settings.commentAuthorBlacklist as [String] {
+						if authorName.compare(blockedAuthor, options: [NSStringCompareOptions.CaseInsensitiveSearch, NSStringCompareOptions.DiacriticInsensitiveSearch])==NSComparisonResult.OrderedSame {
+							blocked = true
+							break
+						}
+					}
+					if blocked {
+						DLog("Blocked notification for user '%@' as their name is on the blacklist",authorName)
+					} else {
+						DLog("User '%@' not on blacklist, can post notification",authorName)
+						app.postNotificationOfType(PRNotificationType.NewComment, forItem:self)
+					}
+				}
+			}
+		}
+	}
+
+	func fillFromInfo(info:[NSObject : AnyObject]) {
+		body = N(info, "body") as? String
+		position = N(info, "position") as? NSNumber
+		path = N(info, "path") as? String
+		url = N(info, "url") as? String
+		webUrl = N(info, "html_url") as? String
+
+		if let userInfo = N(info, "user") as? [NSObject : AnyObject] {
+			userName = N(userInfo, "login") as? String
+			userId = N(userInfo, "id") as? NSNumber
+			avatarUrl = N(userInfo, "avatar_url") as? String
+		}
+
+		if let links = N(info, "links") as? [NSObject : AnyObject] {
+			url = N(N(links, "self"), "href") as? String
+			if webUrl==nil { webUrl = N(N(links, "html"), "href") as? String }
+		}
 	}
 
 	func notificationSubtitle() -> String {

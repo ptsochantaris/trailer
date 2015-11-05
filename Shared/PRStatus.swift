@@ -25,27 +25,29 @@ final class PRStatus: DataItem {
 
 	@NSManaged var pullRequest: PullRequest
 
-	class func statusWithInfo(info: [NSObject : AnyObject], fromServer: ApiServer) -> PRStatus {
-		let s = DataItem.itemWithInfo(info, type: "PRStatus", fromServer: fromServer) as! PRStatus
-		if s.postSyncAction?.integerValue != PostSyncAction.DoNothing.rawValue {
-			s.url = N(info, "url") as? String
-			s.state = N(info, "state") as? String
-			s.targetUrl = N(info, "target_url") as? String
+	class func syncStatusesFromInfo(data: [[NSObject : AnyObject]]?, pullRequest: PullRequest) {
+		DataItem.itemsWithInfo(data, type: "PRStatus", fromServer: pullRequest.apiServer) { item, info, isNewOrUpdated in
+			if isNewOrUpdated {
+				let s = item as! PRStatus
+				s.url = N(info, "url") as? String
+				s.state = N(info, "state") as? String
+				s.targetUrl = N(info, "target_url") as? String
+				s.pullRequest = pullRequest
 
-            if let ds = N(info, "description") as? String {
-                s.descriptionText = ds.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
-            }
+				if let ds = N(info, "description") as? String {
+					s.descriptionText = ds.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+				}
 
-			if let userInfo = N(info, "creator") as? [NSObject : AnyObject] {
-				s.userName = N(userInfo, "login") as? String
-				s.userId = N(userInfo, "id") as? NSNumber
+				if let userInfo = N(info, "creator") as? [NSObject : AnyObject] {
+					s.userName = N(userInfo, "login") as? String
+					s.userId = N(userInfo, "id") as? NSNumber
+				}
 			}
 		}
-		return s
 	}
 
 	func colorForDarkDisplay() -> COLOR_CLASS {
-		switch state! {
+		switch state ?? "" {
 		case "pending":
 			return darkStatusYellow
 		case "success":
@@ -56,7 +58,7 @@ final class PRStatus: DataItem {
 	}
 
 	func colorForDisplay() -> COLOR_CLASS {
-		switch state! {
+		switch state ?? "" {
 		case "pending":
 			return lightStatusYellow
 		case "success":

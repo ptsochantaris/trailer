@@ -16,37 +16,38 @@ final class PullRequest: ListableItem {
 
 	@NSManaged var statuses: Set<PRStatus>
 
-	class func pullRequestWithInfo(info: [NSObject : AnyObject], inRepo: Repo) -> PullRequest {
-		let p = DataItem.itemWithInfo(info, type: "PullRequest", fromServer: inRepo.apiServer) as! PullRequest
-		if p.postSyncAction?.integerValue != PostSyncAction.DoNothing.rawValue {
-			p.url = N(info, "url") as? String
-			p.webUrl = N(info, "html_url") as? String
-			p.number = N(info, "number") as? NSNumber
-			p.state = N(info, "state") as? String
-			p.title = N(info, "title") as? String
-			p.body = N(info, "body") as? String
-			p.repo = inRepo
-			p.mergeable = N(info, "mergeable") as? NSNumber ?? true
+	class func syncPullRequestsFromInfoArray(data: [[NSObject : AnyObject]]?, inRepo: Repo) {
+		DataItem.itemsWithInfo(data, type: "PullRequest", fromServer: inRepo.apiServer) { item, info, isNewOrUpdated in
+			let p = item as! PullRequest
+			if isNewOrUpdated {
+				p.url = N(info, "url") as? String
+				p.webUrl = N(info, "html_url") as? String
+				p.number = N(info, "number") as? NSNumber
+				p.state = N(info, "state") as? String
+				p.title = N(info, "title") as? String
+				p.body = N(info, "body") as? String
+				p.mergeable = N(info, "mergeable") as? NSNumber ?? true
+				p.repo = inRepo
 
-			if let userInfo = N(info, "user") as? [NSObject : AnyObject] {
-				p.userId = N(userInfo, "id") as? NSNumber
-				p.userLogin = N(userInfo, "login") as? String
-				p.userAvatarUrl = N(userInfo, "avatar_url") as? String
+				if let userInfo = N(info, "user") as? [NSObject : AnyObject] {
+					p.userId = N(userInfo, "id") as? NSNumber
+					p.userLogin = N(userInfo, "login") as? String
+					p.userAvatarUrl = N(userInfo, "avatar_url") as? String
+				}
+
+				if let linkInfo = N(info, "_links") as? [NSObject : AnyObject] {
+					p.issueCommentLink = N(N(linkInfo, "comments"), "href") as? String
+					p.reviewCommentLink = N(N(linkInfo, "review_comments"), "href") as? String
+					p.statusesLink = N(N(linkInfo, "statuses"), "href") as? String
+					p.issueUrl = N(N(linkInfo, "issue"), "href") as? String
+				}
+
+				api.refreshesSinceLastLabelsCheck[p.objectID] = nil
+				api.refreshesSinceLastStatusCheck[p.objectID] = nil
 			}
-
-			if let linkInfo = N(info, "_links") as? [NSObject : AnyObject] {
-				p.issueCommentLink = N(N(linkInfo, "comments"), "href") as? String
-				p.reviewCommentLink = N(N(linkInfo, "review_comments"), "href") as? String
-				p.statusesLink = N(N(linkInfo, "statuses"), "href") as? String
-				p.issueUrl = N(N(linkInfo, "issue"), "href") as? String
-			}
-
-			api.refreshesSinceLastLabelsCheck[p.objectID] = nil
-			api.refreshesSinceLastStatusCheck[p.objectID] = nil
+			p.reopened = ((p.condition?.integerValue ?? 0) == PullRequestCondition.Closed.rawValue)
+			p.condition = PullRequestCondition.Open.rawValue
 		}
-		p.reopened = ((p.condition?.integerValue ?? 0) == PullRequestCondition.Closed.rawValue)
-		p.condition = PullRequestCondition.Open.rawValue
-		return p
 	}
 
 	#if os(iOS)

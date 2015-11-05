@@ -9,10 +9,10 @@ class CommonController: WKInterfaceController {
 	override func willActivate() {
 		super.willActivate()
 		if let app = WKExtension.sharedExtension().delegate as? ExtensionDelegate where app.lastView != self {
-			app.lastView = self
 			if showLoadingFeedback() {
 				showStatus("Connecting...", hideTable: false)
 			}
+			app.lastView = self
 		}
 	}
 
@@ -50,17 +50,17 @@ class CommonController: WKInterfaceController {
 		loading++
 
 		WCSession.defaultSession().sendMessage(request, replyHandler: { response in
-			dispatch_async(dispatch_get_main_queue(), {
+			NSOperationQueue.mainQueue().addOperationWithBlock {
 				if let errorIndicator = response["error"] as? Bool where errorIndicator == true {
 					self.showTemporaryError(response["status"] as! String)
 				} else {
 					self.updateFromData(response)
 				}
 				self.loading = 0
-			})
+			}
 		}) { error in
 			if self.loading==5 {
-				dispatch_async(dispatch_get_main_queue()) {
+				NSOperationQueue.mainQueue().addOperationWithBlock {
 					self.showTemporaryError("Error: "+error.localizedDescription)
 					self.loading = 0
 				}

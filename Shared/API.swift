@@ -147,7 +147,7 @@ final class API {
 			}
 			completion(response: response, data: data, error: error)
 			#if os(iOS)
-				dispatch_sync(dispatch_get_main_queue()) { [weak self] in
+				NSOperationQueue.mainQueue().addOperationWithBlock { [weak self] in
 					self!.networkIndicationEnd()
 				}
 			#endif
@@ -250,8 +250,7 @@ final class API {
 				completionCount++
 				if completionCount == totalOperations {
 					for r in repos { r.dirty = false }
-					self!.completeSyncInMoc(moc)
-					callback()
+					self!.completeSyncInMoc(moc, andCallback: callback)
 				}
 			}
 
@@ -270,7 +269,7 @@ final class API {
 		}
 	}
 
-	private func completeSyncInMoc(moc: NSManagedObjectContext) {
+	private func completeSyncInMoc(moc: NSManagedObjectContext, andCallback: Completion) {
 
 		// discard any changes related to any failed API server
 		for apiServer in ApiServer.allApiServersInMoc(moc) {
@@ -280,20 +279,35 @@ final class API {
 			}
 		}
 
-		DataItem.nukeDeletedItemsInMoc(moc)
+		let threadMoc = NSManagedObjectContext(concurrencyType: .PrivateQueueConcurrencyType)
+		threadMoc.undoManager = nil
+		threadMoc.parentContext = moc
+		threadMoc.performBlock {
 
-		for r in DataItem.itemsOfType("PullRequest", surviving: true, inMoc: moc) as! [PullRequest] {
-			r.postProcess()
-		}
+			DataItem.nukeDeletedItemsInMoc(threadMoc)
 
-		for i in DataItem.itemsOfType("Issue", surviving: true, inMoc: moc) as! [Issue] {
-			i.postProcess()
-		}
+			for r in DataItem.itemsOfType("PullRequest", surviving: true, inMoc: threadMoc) as! [PullRequest] {
+				r.postProcess()
+			}
 
-		do {
-			try moc.save()
-		} catch {
-			DLog("Comitting sync failed: %@", (error as NSError).localizedDescription)
+			for i in DataItem.itemsOfType("Issue", surviving: true, inMoc: threadMoc) as! [Issue] {
+				i.postProcess()
+			}
+
+			do {
+				try threadMoc.save()
+			} catch {
+				DLog("Comitting thread sync failed: %@", (error as NSError).localizedDescription)
+			}
+
+			NSOperationQueue.mainQueue().addOperationWithBlock {
+				do {
+					try moc.save()
+				} catch {
+					DLog("Comitting sync failed: %@", (error as NSError).localizedDescription)
+				}
+				andCallback()
+			}
 		}
 	}
 
@@ -578,9 +592,7 @@ final class API {
 				let repoFullName = r.fullName ?? "NoRepoFullName"
 				getPagedDataInPath("/repos/\(repoFullName)/pulls", fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
 					perPageCallback: { data, lastPage in
-						for info in data ?? [] {
-							PullRequest.pullRequestWithInfo(info, inRepo:r)
-						}
+						PullRequest.syncPullRequestsFromInfoArray(data, inRepo: r)
 						return false
 					}, finalCallback: { [weak self] success, resultCode, etag in
 						if !success {
@@ -645,11 +657,7 @@ final class API {
 				let repoFullName = r.fullName ?? "NoRepoFullName"
 				getPagedDataInPath("/repos/\(repoFullName)/issues", fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
 					perPageCallback: { data, lastPage in
-						for info in data ?? [] {
-							if N(info, "pull_request") == nil { // don't sync issues which are pull requests, they are already synced
-								Issue.issueWithInfo(info, inRepo:r)
-							}
-						}
+						Issue.syncIssuesFromInfoArray(data, inRepo: r)
 						return false
 					}, finalCallback: { [weak self] success, resultCode, etag in
 						if !success {
@@ -714,18 +722,7 @@ final class API {
 
 				getPagedDataInPath(link, fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
 					perPageCallback: { data, lastPage in
-						for info in data ?? [] {
-							let c = PRComment.commentWithInfo(info, fromServer: apiServer)
-							c.pullRequest = p
-
-							// check if we're assigned to a just created pull request, in which case we want to "fast forward" its latest comment dates to our own if we're newer
-							if (p.postSyncAction?.integerValue ?? 0) == PostSyncAction.NoteNew.rawValue {
-								let commentCreation = c.createdAt!
-								if p.latestReadCommentDate == nil || p.latestReadCommentDate!.compare(commentCreation) == NSComparisonResult.OrderedAscending {
-									p.latestReadCommentDate = commentCreation
-								}
-							}
-						}
+						PRComment.syncCommentsFromInfo(data, pullRequest: p)
 						return false
 					}, finalCallback: { success, resultCode, etag in
 						completionCount++
@@ -775,18 +772,7 @@ final class API {
 
 				getPagedDataInPath(link, fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
 					perPageCallback: { data, lastPage in
-						for info in data ?? [] {
-							let c = PRComment.commentWithInfo(info, fromServer: apiServer)
-							c.issue = i
-
-							// check if we're assigned to a just created pull request, in which case we want to "fast forward" its latest comment dates to our own if we're newer
-							if (i.postSyncAction?.integerValue ?? 0) == PostSyncAction.NoteNew.rawValue {
-								let commentCreation = c.createdAt!
-								if i.latestReadCommentDate == nil || i.latestReadCommentDate!.compare(commentCreation) == NSComparisonResult.OrderedAscending {
-									i.latestReadCommentDate = commentCreation
-								}
-							}
-						}
+						PRComment.syncCommentsFromInfo(data, issue: i)
 						return false
 					}, finalCallback: { success, resultCode, etag in
 						completionCount++
@@ -914,10 +900,7 @@ final class API {
 			if let statusLink = p.statusesLink {
 				getPagedDataInPath(statusLink, fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
 					perPageCallback: { data, lastPage in
-						for info in data ?? [] {
-							let s = PRStatus.statusWithInfo(info, fromServer: apiServer)
-							s.pullRequest = p
-						}
+						PRStatus.syncStatusesFromInfo(data, pullRequest: p)
 						return false
 					}, finalCallback: { [weak self] success, resultCode, etag in
 						completionCount++
@@ -1219,27 +1202,7 @@ final class API {
 
 		getPagedDataInPath("/user/subscriptions", fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
 			perPageCallback: { data, lastPage in
-
-				if let d = data {
-					for info in d {
-						if (N(info, "private") as? NSNumber)?.boolValue ?? false {
-							if let permissions = N(info, "permissions") as? [NSObject: AnyObject] {
-
-								let pull = (N(permissions, "pull") as? NSNumber)?.boolValue ?? false
-								let push = (N(permissions, "push") as? NSNumber)?.boolValue ?? false
-								let admin = (N(permissions, "admin") as? NSNumber)?.boolValue ?? false
-
-								if	pull || push || admin {
-									Repo.repoWithInfo(info, fromServer: apiServer)
-								} else {
-									DLog("Watched private repository '%@' seems to be inaccessible, skipping", N(info, "full_name") as? String)
-								}
-							}
-						} else {
-							Repo.repoWithInfo(info, fromServer: apiServer)
-						}
-					}
-				}
+				Repo.syncReposFromInfo(data, apiServer: apiServer)
 				return false
 
 			}, finalCallback: { success, resultCode, etag in
@@ -1319,7 +1282,7 @@ final class API {
 
 			if path.isEmpty {
 				// handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
-				dispatch_async(dispatch_get_main_queue()) {
+				NSOperationQueue.mainQueue().addOperationWithBlock {
 					finalCallback(success: true, resultCode: -1, etag: nil)
 					return
 				}
@@ -1413,7 +1376,7 @@ final class API {
 			if fromServer.syncIsGood || ignoreLastSync {
 				apiServerLabel = fromServer.label ?? "(untitled server)"
 			} else {
-				dispatch_async(dispatch_get_main_queue()) { [weak self] in
+				NSOperationQueue.mainQueue().addOperationWithBlock { [weak self] in
 					let e = self!.apiError("Sync has failed, skipping this call")
 					completion(response: nil, data: nil, error: e)
 				}
@@ -1453,7 +1416,7 @@ final class API {
 				if NSDate().compare(existingBackOff!.nextAttemptAt) == NSComparisonResult.OrderedAscending {
 					// report failure and return
 					DLog("(%@) Preempted fetch to previously broken link %@, won't actually access this URL until %@", apiServerLabel, fullUrlPath, existingBackOff!.nextAttemptAt)
-					dispatch_async(dispatch_get_main_queue()) { [weak self] in
+					NSOperationQueue.mainQueue().addOperationWithBlock { [weak self] in
 						let e = self!.apiError("Preempted fetch because of throttling")
 						completion(response: nil, data: nil, error: e)
 						#if os(iOS)
@@ -1507,7 +1470,7 @@ final class API {
 					DLog("(%@) GET %@ - FAILED: %@", apiServerLabel, fullUrlPath, error!.localizedDescription)
 				}
 
-				dispatch_sync(dispatch_get_main_queue()) { [weak self] in
+				NSOperationQueue.mainQueue().addOperationWithBlock { [weak self] in
 					if Settings.dumpAPIResponsesInConsole, let d = data {
 						DLog("API data from %@: %@", fullUrlPath, NSString(data: d, encoding: NSUTF8StringEncoding))
 					}

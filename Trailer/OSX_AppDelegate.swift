@@ -765,7 +765,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 
 		if updateStatusItem {
-			dispatch_async(dispatch_get_main_queue()) { [weak self] in
+			NSOperationQueue.mainQueue().addOperationWithBlock { [weak self] in
 				DLog("Updating issues status item");
 				let siv = StatusItemView(frame: CGRectMake(0, 0, length+2, H), label: countString, prefix: "issues", attributes: attributes)
 				siv.labelOffset = 2
@@ -845,7 +845,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 
         if updateStatusItem {
-			dispatch_async(dispatch_get_main_queue()) { [weak self] in
+			NSOperationQueue.mainQueue().addOperationWithBlock { [weak self] in
 				DLog("Updating PR status item");
 				let siv = StatusItemView(frame: CGRectMake(0, 0, length, H), label: countString, prefix: "pr", attributes: attributes)
 				siv.highlighted = self!.prMenu.visible
@@ -999,10 +999,10 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		app.isManuallyScrolling = true
 		mouseIgnoreTimer.push()
 		inMenu.table.scrollRowToVisible(i)
-		dispatch_async(dispatch_get_main_queue(), {
+		NSOperationQueue.mainQueue().addOperationWithBlock {
 			inMenu.table.selectRowIndexes(NSIndexSet(index: i), byExtendingSelection: false)
 			return
-		})
+		}
 	}
 
 	func focusedItemUrl() -> String? {

@@ -77,7 +77,7 @@ final class PRCell: UITableViewCell {
 	}
 
 	func networkStateChanged() {
-		dispatch_async(dispatch_get_main_queue()) { [weak self] in
+		NSOperationQueue.mainQueue().addOperationWithBlock { [weak self] in
 			if self!.failedToLoadImage == nil { return }
 			if api.currentNetworkStatus != NetworkStatus.NotReachable {
 				self!.loadImageAtPath(self!.failedToLoadImage)

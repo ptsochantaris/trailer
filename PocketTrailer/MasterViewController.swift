@@ -51,7 +51,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	func removeAllMerged()
 	{
-		dispatch_async(dispatch_get_main_queue(), { [weak self] in
+		NSOperationQueue.mainQueue().addOperationWithBlock { [weak self] in
 			if Settings.dontAskBeforeWipingMerged {
 				self!.removeAllMergedConfirmed()
 			} else {
@@ -62,11 +62,11 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 					}))
 				self!.presentViewController(a, animated: true, completion: nil)
 			}
-			})
+		}
 	}
 
 	func removeAllClosed() {
-		dispatch_async(dispatch_get_main_queue(), { [weak self] in
+		NSOperationQueue.mainQueue().addOperationWithBlock {  [weak self] in
 			if Settings.dontAskBeforeWipingClosed {
 				self!.removeAllClosedConfirmed()
 			} else {
@@ -77,7 +77,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 					}))
 				self!.presentViewController(a, animated: true, completion: nil)
 			}
-			})
+		}
 	}
 
 	func removeAllClosedConfirmed() {
@@ -180,7 +180,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	func tabBar(tabBar: UITabBar, didSelectItem item: UITabBarItem) {
-		if indexOfObject(tabBar.items!, value: item)==0 {
+		if tabBar.items?.indexOf(item) == 0 {
 			showPullRequestsSelected(tabBar)
 		} else {
 			showIssuesSelected(tabBar)
@@ -672,14 +672,14 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	func showPullRequestsSelected(sender: AnyObject) {
 		viewMode = .PullRequests
-		dispatch_async(dispatch_get_main_queue()) {
+		NSOperationQueue.mainQueue().addOperationWithBlock {
 			self.tableView.scrollRectToVisible(CGRectMake(0, 0, 100, 100), animated: false)
 		}
 	}
 
 	func showIssuesSelected(sender: AnyObject) {
 		viewMode = .Issues
-		dispatch_async(dispatch_get_main_queue()) {
+		NSOperationQueue.mainQueue().addOperationWithBlock { 
 			self.tableView.scrollRectToVisible(CGRectMake(0, 0, 100, 100), animated: false)
 		}
 	}
@@ -723,7 +723,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	func tabBarController(tabBarController: UITabBarController, didSelectViewController viewController: UIViewController) {
-		Settings.lastPreferencesTabSelected = indexOfObject(tabBarController.viewControllers!, value: viewController) ?? 0
+		Settings.lastPreferencesTabSelected = tabBarController.viewControllers?.indexOf(viewController) ?? 0
 	}
 	
 }

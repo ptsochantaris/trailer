@@ -111,9 +111,9 @@ final class NotificationManager {
 				while UIApplication.sharedApplication().applicationState==UIApplicationState.Inactive {
 					NSThread.sleepForTimeInterval(1.0)
 				}
-				dispatch_sync(dispatch_get_main_queue(), {
+				NSOperationQueue.mainQueue().addOperationWithBlock {
 					UIApplication.sharedApplication().presentLocalNotificationNow(notification)
-				})
+				}
 			})
 		} else {
 			UIApplication.sharedApplication().presentLocalNotificationNow(notification)

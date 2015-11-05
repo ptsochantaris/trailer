@@ -15,17 +15,37 @@ final class Repo: DataItem {
 	@NSManaged var pullRequests: Set<PullRequest>
 	@NSManaged var issues: Set<Issue>
 
-	class func repoWithInfo(info: [NSObject : AnyObject], fromServer: ApiServer) -> Repo {
-		let r = DataItem.itemWithInfo(info, type: "Repo", fromServer: fromServer) as! Repo
-		if r.postSyncAction?.integerValue != PostSyncAction.DoNothing.rawValue {
-			r.fullName = N(info, "full_name") as? String
-			r.fork = (N(info, "fork") as? NSNumber)?.boolValue
-			r.webUrl = N(info, "html_url") as? String
-			r.dirty = true
-			r.inaccessible = false
-			r.lastDirtied = NSDate()
+	class func syncReposFromInfo(data: [[NSObject : AnyObject]]?, apiServer: ApiServer) {
+		var filteredData = [[NSObject : AnyObject]]()
+		for info in data ?? [] {
+			if (N(info, "private") as? NSNumber)?.boolValue ?? false {
+				if let permissions = N(info, "permissions") as? [NSObject: AnyObject] {
+
+					let pull = (N(permissions, "pull") as? NSNumber)?.boolValue ?? false
+					let push = (N(permissions, "push") as? NSNumber)?.boolValue ?? false
+					let admin = (N(permissions, "admin") as? NSNumber)?.boolValue ?? false
+
+					if	pull || push || admin {
+						filteredData.append(info)
+					} else {
+						DLog("Watched private repository '%@' seems to be inaccessible, skipping", N(info, "full_name") as? String)
+					}
+				}
+			} else {
+				filteredData.append(info)
+			}
 		}
-		return r
+		DataItem.itemsWithInfo(filteredData, type: "Repo", fromServer: apiServer) { item, info, newOrUpdated in
+			if newOrUpdated {
+				let r = item as! Repo
+				r.fullName = N(info, "full_name") as? String
+				r.fork = (N(info, "fork") as? NSNumber)?.boolValue
+				r.webUrl = N(info, "html_url") as? String
+				r.dirty = true
+				r.inaccessible = false
+				r.lastDirtied = NSDate()
+			}
+		}
 	}
 
 	func shouldSync() -> Bool {

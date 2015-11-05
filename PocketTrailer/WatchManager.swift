@@ -40,7 +40,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	func session(session: WCSession, didReceiveMessage message: [String : AnyObject], replyHandler: ([String : AnyObject]) -> Void) {
 
-		dispatch_async(dispatch_get_main_queue()) {
+		NSOperationQueue.mainQueue().addOperationWithBlock {
 
 			self.startBGTask()
 
@@ -50,13 +50,13 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)) {
 					let lastSuccessfulSync = Settings.lastSuccessfulRefresh ?? NSDate()
 					while app.isRefreshing { NSThread.sleepForTimeInterval(0.1) }
-					dispatch_sync(dispatch_get_main_queue(), {
+					NSOperationQueue.mainQueue().addOperationWithBlock {
 						if Settings.lastSuccessfulRefresh == nil || lastSuccessfulSync.isEqualToDate(Settings.lastSuccessfulRefresh!) {
 							self.reportFailure("Refresh Failed", message, replyHandler)
 						} else {
 							self.processList(message, replyHandler)
 						}
-					})
+					}
 				}
 
 			case "openpr":
