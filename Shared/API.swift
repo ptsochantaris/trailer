@@ -163,22 +163,17 @@ final class API {
 		task.resume()
 	}
 
-	func cachePathForAvatar(path: String) -> (String, String) {
+	func haveCachedAvatar(path: String, tryLoadAndCallback: (IMAGE_CLASS?, String) -> Void) -> Bool {
+
 		#if os(iOS)
 			let absolutePath = path + (path.characters.contains("?") ? "&" : "?") + "s=\(40.0*GLOBAL_SCREEN_SCALE)"
-			#else
+		#else
 			let absolutePath = path + (path.characters.contains("?") ? "&" : "?") + "s=88"
 		#endif
 
 		let imageKey = absolutePath + " " + currentAppVersion()
 		let cachePath = cacheDirectory.stringByAppendingPathComponent("imgcache-" + md5hash(imageKey))
-		return (absolutePath, cachePath)
-	}
-
-	func haveCachedAvatar(path: String, tryLoadAndCallback: (IMAGE_CLASS?, String) -> Void) -> Bool {
-
-		let (absolutePath, cachePath) = cachePathForAvatar(path)
-
+		
 		let fileManager = NSFileManager.defaultManager()
 		if fileManager.fileExistsAtPath(cachePath) {
 			#if os(iOS)

@@ -673,15 +673,17 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	func showPullRequestsSelected(sender: AnyObject) {
 		viewMode = .PullRequests
-		NSOperationQueue.mainQueue().addOperationWithBlock {
-			self.tableView.scrollRectToVisible(CGRectMake(0, 0, 100, 100), animated: false)
-		}
+		safeScrollToTop()
 	}
 
 	func showIssuesSelected(sender: AnyObject) {
 		viewMode = .Issues
-		NSOperationQueue.mainQueue().addOperationWithBlock { 
-			self.tableView.scrollRectToVisible(CGRectMake(0, 0, 100, 100), animated: false)
+		safeScrollToTop()
+	}
+
+	private func safeScrollToTop() {
+		if self.numberOfSectionsInTableView(self.tableView) > 0 {
+			self.tableView.scrollToRowAtIndexPath(NSIndexPath(forRow: 0, inSection: 0), atScrollPosition: .Top, animated: false)
 		}
 	}
 
