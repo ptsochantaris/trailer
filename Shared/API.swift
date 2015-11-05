@@ -192,7 +192,9 @@ final class API {
 				let ret = NSImage(contentsOfFile: cachePath)
 			#endif
 			if let r = ret {
-				tryLoadAndCallback(r, cachePath)
+				NSOperationQueue.mainQueue().addOperationWithBlock {
+					tryLoadAndCallback(r, cachePath)
+				}
 				return true
 			} else {
 				try! fileManager.removeItemAtPath(cachePath)
@@ -213,7 +215,9 @@ final class API {
                     i.TIFFRepresentation?.writeToFile(cachePath, atomically: true)
 				}
             #endif
-			dispatch_sync(dispatch_get_main_queue()) { tryLoadAndCallback(result, cachePath) }
+			NSOperationQueue.mainQueue().addOperationWithBlock {
+				tryLoadAndCallback(result, cachePath)
+			}
         }
 		return false
 	}
@@ -271,6 +275,8 @@ final class API {
 
 	private func completeSyncInMoc(moc: NSManagedObjectContext, andCallback: Completion) {
 
+		DLog("Wrapping up sync")
+
 		// discard any changes related to any failed API server
 		for apiServer in ApiServer.allApiServersInMoc(moc) {
 			if !apiServer.syncIsGood {
@@ -279,35 +285,33 @@ final class API {
 			}
 		}
 
-		let threadMoc = NSManagedObjectContext(concurrencyType: .PrivateQueueConcurrencyType)
-		threadMoc.undoManager = nil
-		threadMoc.parentContext = moc
-		threadMoc.performBlock {
+		let mainQueue = NSOperationQueue.mainQueue();
 
-			DataItem.nukeDeletedItemsInMoc(threadMoc)
+		mainQueue.addOperationWithBlock {
+			DataItem.nukeDeletedItemsInMoc(moc)
+		}
 
-			for r in DataItem.itemsOfType("PullRequest", surviving: true, inMoc: threadMoc) as! [PullRequest] {
+		for r in DataItem.itemsOfType("PullRequest", surviving: true, inMoc: moc) as! [PullRequest] {
+			mainQueue.addOperationWithBlock {
 				r.postProcess()
 			}
+		}
 
-			for i in DataItem.itemsOfType("Issue", surviving: true, inMoc: threadMoc) as! [Issue] {
+		for i in DataItem.itemsOfType("Issue", surviving: true, inMoc: moc) as! [Issue] {
+			mainQueue.addOperationWithBlock {
 				i.postProcess()
 			}
+		}
 
+		mainQueue.addOperationWithBlock {
 			do {
-				try threadMoc.save()
+				DLog("Comitting synced data")
+				try moc.save()
+				DLog("Synced data comitted")
 			} catch {
-				DLog("Comitting thread sync failed: %@", (error as NSError).localizedDescription)
+				DLog("Comitting sync failed: %@", (error as NSError).localizedDescription)
 			}
-
-			NSOperationQueue.mainQueue().addOperationWithBlock {
-				do {
-					try moc.save()
-				} catch {
-					DLog("Comitting sync failed: %@", (error as NSError).localizedDescription)
-				}
-				andCallback()
-			}
+			andCallback()
 		}
 	}
 

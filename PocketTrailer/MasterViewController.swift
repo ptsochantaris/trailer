@@ -282,6 +282,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			if !(Repo.interestedInPrs() && Repo.interestedInIssues()) {
 				tableView.contentInset = UIEdgeInsetsMake(tableView.contentInset.top, 0, 0, 0)
 				tableView.scrollIndicatorInsets = UIEdgeInsetsMake(tableView.scrollIndicatorInsets.top, 0, 0, 0)
+				self.viewMode = Repo.interestedInIssues() ? .Issues : .PullRequests
 			}
 
 			if let t = tabBar {
