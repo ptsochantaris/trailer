@@ -26,7 +26,7 @@ final class PRStatus: DataItem {
 	@NSManaged var pullRequest: PullRequest
 
 	class func syncStatusesFromInfo(data: [[NSObject : AnyObject]]?, pullRequest: PullRequest) {
-		DataItem.itemsWithInfo(data, type: "PRStatus", fromServer: pullRequest.apiServer) { item, info, isNewOrUpdated in
+		itemsWithInfo(data, type: "PRStatus", fromServer: pullRequest.apiServer) { item, info, isNewOrUpdated in
 			if isNewOrUpdated {
 				let s = item as! PRStatus
 				s.url = N(info, "url") as? String

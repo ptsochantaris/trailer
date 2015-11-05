@@ -43,6 +43,8 @@ class DataItem: NSManagedObject {
 
 	final class func itemsWithInfo(data: [[NSObject : AnyObject]]?, type: String, fromServer: ApiServer, postProcessCallback: (DataItem, [NSObject : AnyObject], Bool)->Void) {
 
+		if data==nil { return }
+
 		var idsOfItems = [NSNumber]()
 		var idsToInfo = [NSNumber : [NSObject : AnyObject]]()
 		for info in data ?? [] {
@@ -60,7 +62,12 @@ class DataItem: NSManagedObject {
 			let serverId = i.serverId!
 			idsOfItems.removeAtIndex(idsOfItems.indexOf(serverId)!)
 			let info = idsToInfo[serverId]!
-			let updatedDate = syncDateFormatter.dateFromString(N(info, "updated_at") as! String)
+			let updatedDate: NSDate
+			if let dateString = N(info, "updated_at") as? String, uDate = syncDateFormatter.dateFromString(dateString) {
+				updatedDate = uDate
+			} else {
+				updatedDate = NSDate()
+			}
 			if updatedDate != i.updatedAt {
 				DLog("Updating %@: %@",type,serverId)
 				i.postSyncAction = PostSyncAction.NoteUpdated.rawValue
@@ -78,10 +85,21 @@ class DataItem: NSManagedObject {
 			let info = idsToInfo[serverId]!
 			let i = NSEntityDescription.insertNewObjectForEntityForName(type, inManagedObjectContext: fromServer.managedObjectContext!) as! DataItem
 			i.serverId = serverId
-			i.createdAt = syncDateFormatter.dateFromString(N(info, "created_at") as! String)
-			i.updatedAt = syncDateFormatter.dateFromString(N(info, "updated_at") as! String)
 			i.postSyncAction = PostSyncAction.NoteNew.rawValue
 			i.apiServer = fromServer
+
+			if let dateString = N(info, "created_at") as? String, cDate = syncDateFormatter.dateFromString(dateString) {
+				i.createdAt = cDate
+			} else {
+				i.createdAt = NSDate()
+			}
+
+			if let dateString = N(info, "updated_at") as? String, uDate = syncDateFormatter.dateFromString(dateString) {
+				i.updatedAt = uDate
+			} else {
+				i.updatedAt = NSDate()
+			}
+
 			postProcessCallback(i, info, true)
 		}
 	}

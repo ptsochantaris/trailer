@@ -15,7 +15,7 @@ final class Issue: ListableItem {
 				filteredData.append(d)
 			}
 		}
-		DataItem.itemsWithInfo(filteredData, type: "Issue", fromServer: inRepo.apiServer) { item, info, isNewOrUpdated in
+		itemsWithInfo(filteredData, type: "Issue", fromServer: inRepo.apiServer) { item, info, isNewOrUpdated in
 			let i = item as! Issue
 			if isNewOrUpdated {
 				i.url = N(info, "url") as? String
@@ -40,11 +40,8 @@ final class Issue: ListableItem {
 					l.postSyncAction = PostSyncAction.Delete.rawValue
 				}
 
-				if let labelsList = N(info, "labels") as? [[NSObject: AnyObject]] {
-					for labelInfo in labelsList {
-						PRLabel.labelWithInfo(labelInfo, withParent: i)
-					}
-				}
+				let labelList = N(info, "labels") as? [[NSObject: AnyObject]]
+				PRLabel.syncLabelsWithInfo(labelList, withParent: i)
 
 				if let assignee = N(info, "assignee") as? [NSObject: AnyObject] {
 					let assigneeName = N(assignee, "login") as? String ?? "NoAssignedUserName"

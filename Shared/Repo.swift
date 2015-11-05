@@ -35,7 +35,7 @@ final class Repo: DataItem {
 				filteredData.append(info)
 			}
 		}
-		DataItem.itemsWithInfo(filteredData, type: "Repo", fromServer: apiServer) { item, info, newOrUpdated in
+		itemsWithInfo(filteredData, type: "Repo", fromServer: apiServer) { item, info, newOrUpdated in
 			if newOrUpdated {
 				let r = item as! Repo
 				r.fullName = N(info, "full_name") as? String

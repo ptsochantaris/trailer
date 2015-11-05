@@ -402,9 +402,7 @@ final class API {
 			parameters: nil,
 			extraHeaders: nil,
 			perPageCallback: { data, lastPage in
-				for d in data ?? [] {
-					Team.teamWithInfo(d, fromApiServer: apiServer)
-				}
+				Team.syncTeamsWithInfo(data, apiServer: apiServer)
 				return false
 			}, finalCallback: { success, resultCode, etag in
 				if !success {
@@ -830,9 +828,7 @@ final class API {
 
 				getPagedDataInPath(link, fromServer: p.apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
 					perPageCallback: { data, lastPage in
-						for info in data ?? [] {
-							PRLabel.labelWithInfo(info, withParent: p)
-						}
+						PRLabel.syncLabelsWithInfo(data, withParent: p)
 						return false
 					}, finalCallback: { [weak self] success, resultCode, etag in
 						completionCount++

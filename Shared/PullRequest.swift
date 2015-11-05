@@ -17,7 +17,7 @@ final class PullRequest: ListableItem {
 	@NSManaged var statuses: Set<PRStatus>
 
 	class func syncPullRequestsFromInfoArray(data: [[NSObject : AnyObject]]?, inRepo: Repo) {
-		DataItem.itemsWithInfo(data, type: "PullRequest", fromServer: inRepo.apiServer) { item, info, isNewOrUpdated in
+		itemsWithInfo(data, type: "PullRequest", fromServer: inRepo.apiServer) { item, info, isNewOrUpdated in
 			let p = item as! PullRequest
 			if isNewOrUpdated {
 				p.url = N(info, "url") as? String

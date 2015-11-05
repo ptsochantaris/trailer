@@ -15,7 +15,7 @@ final class PRComment: DataItem {
 	@NSManaged var issue: Issue?
 
 	class func syncCommentsFromInfo(data: [[NSObject : AnyObject]]?, pullRequest: PullRequest) {
-		DataItem.itemsWithInfo(data, type: "PRComment", fromServer: pullRequest.apiServer) { item, info, newOrUpdated in
+		itemsWithInfo(data, type: "PRComment", fromServer: pullRequest.apiServer) { item, info, newOrUpdated in
 			if newOrUpdated {
 				let c = item as! PRComment
 				c.pullRequest = pullRequest
@@ -26,7 +26,7 @@ final class PRComment: DataItem {
 	}
 
 	class func syncCommentsFromInfo(data: [[NSObject : AnyObject]]?, issue: Issue) {
-		DataItem.itemsWithInfo(data, type: "PRComment", fromServer: issue.apiServer) { item, info, newOrUpdated in
+		itemsWithInfo(data, type: "PRComment", fromServer: issue.apiServer) { item, info, newOrUpdated in
 			if newOrUpdated {
 				let c = item as! PRComment
 				c.issue = issue
