@@ -74,7 +74,9 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		NSUserNotificationCenter.defaultUserNotificationCenter().delegate = self
 
 		if ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
-			startRefresh()
+			atNextEvent {
+				self.startRefresh()
+			}
 		} else if ApiServer.countApiServersInMoc(mainObjectContext) == 1, let a = ApiServer.allApiServersInMoc(mainObjectContext).first where a.authToken == nil || a.authToken!.isEmpty {
 			startupAssistant()
 		} else {
