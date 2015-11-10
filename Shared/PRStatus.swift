@@ -70,7 +70,16 @@ final class PRStatus: DataItem {
 
 	func displayText() -> String {
 		if let desc = descriptionText {
-			return String(format: "%@ %@", dateFormatter.stringFromDate(createdAt!), desc)
+			let prefix: String
+			switch state ?? "" {
+			case "pending":
+				prefix = "⚡️"
+			case "success":
+				prefix = "✅"
+			default:
+				prefix = "❌"
+			}
+			return String(format: "%@ %@ %@", prefix, dateFormatter.stringFromDate(createdAt!), desc)
 		} else {
 			return "(No description)"
 		}

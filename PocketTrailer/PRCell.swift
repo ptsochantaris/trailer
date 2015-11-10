@@ -6,7 +6,7 @@ let statusAttributes: [String : AnyObject] = {
 	paragraphStyle.paragraphSpacing = 6.0
 
 	return [
-		NSFontAttributeName: UIFont(name: "Courier", size: 10)!,
+		NSFontAttributeName: UIFont(name: "Menlo-Regular", size: 10)!,
 		NSParagraphStyleAttributeName: paragraphStyle
 	]
 }()

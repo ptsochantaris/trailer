@@ -67,13 +67,15 @@ final class PullRequestCell: TrailerCell {
 		var dateRect = NSMakeRect(LEFTPADDING, statusBottom+bottom, W, subtitleHeight)
 		var pinRect = NSMakeRect(LEFTPADDING+W, floor((bounds.size.height-24)*0.5), REMOVE_BUTTON_WIDTH-10, 24)
 
-		var shift: CGFloat = -4
+		let shift: CGFloat
 		if showAvatar {
 			let userImage = AvatarView(
 				frame: NSMakeRect(LEFTPADDING, bounds.size.height-AVATAR_SIZE-7.0, AVATAR_SIZE, AVATAR_SIZE),
 				url: pullRequest.userAvatarUrl ?? "")
 			addSubview(userImage)
 			shift = AVATAR_PADDING+AVATAR_SIZE
+		} else {
+			shift = -4
 		}
 		pinRect = NSOffsetRect(pinRect, shift, 0)
 		dateRect = NSOffsetRect(dateRect, shift, 0)
@@ -88,7 +90,7 @@ final class PullRequestCell: TrailerCell {
 			if (pullRequest.condition?.integerValue ?? 0)==PullRequestCondition.Open.rawValue {
 				let unmergeableLabel = CenterTextField(frame: pinRect)
 				unmergeableLabel.textColor = NSColor.redColor()
-				unmergeableLabel.font = NSFont(name: "Monaco", size: 8.0)
+				unmergeableLabel.font = NSFont(name: "Menlo-Regular", size: 8.0)
 				unmergeableLabel.alignment = NSTextAlignment.Center
 				unmergeableLabel.stringValue = "Cannot be merged"
 				addSubview(unmergeableLabel)
