@@ -53,7 +53,7 @@ final class PullRequestDelegate: NSObject, NSTableViewDelegate, NSTableViewDataS
 	}
 
 	func pullRequestAtRow(row: Int) -> PullRequest? {
-		if let object = pullRequestIds[row] as? NSManagedObjectID {
+		if row >= 0 && row < pullRequestIds.count, let object = pullRequestIds[row] as? NSManagedObjectID {
 			return existingObjectWithID(object) as? PullRequest
 		} else {
 			return nil

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9059" systemVersion="15B42" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9060" systemVersion="15B42" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9059"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9060"/>
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
@@ -335,7 +335,7 @@ user you can add more servers from the left.</string>
                                     <animations/>
                                 </view>
                             </tabViewItem>
-                            <tabViewItem label="Repositories" identifier="1" id="8ZQ-7Z-tCc">
+                            <tabViewItem label="Watchlist" identifier="1" id="8ZQ-7Z-tCc">
                                 <view key="view" id="SdJ-82-U77">
                                     <rect key="frame" x="10" y="33" width="736" height="366"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -544,20 +544,8 @@ user you can add more servers from the left.</string>
                                     <rect key="frame" x="10" y="33" width="736" height="366"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <button id="Efg-Id-lOP">
-                                            <rect key="frame" x="20" y="323" width="366" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <animations/>
-                                            <buttonCell key="cell" type="check" title="Display creation time instead of update time" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="yUS-qR-eV4">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="showCreationSelected:" target="vQH-WF-vh2" id="ie4-88-nBp"/>
-                                            </connections>
-                                        </button>
                                         <button id="Y5g-gh-uLn">
-                                            <rect key="frame" x="20" y="293" width="366" height="18"/>
+                                            <rect key="frame" x="20" y="289" width="366" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <animations/>
                                             <buttonCell key="cell" type="check" title="Mark un-mergeable PRs only in &quot;My&quot; or &quot;Participated&quot;" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="rZv-TW-Nxj">
@@ -569,7 +557,7 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="rEz-q1-QZq">
-                                            <rect key="frame" x="20" y="263" width="366" height="18"/>
+                                            <rect key="frame" x="20" y="255" width="366" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <animations/>
                                             <buttonCell key="cell" type="check" title="Count all open items of synced repos in the menubar" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="23T-vx-oJZ">
@@ -581,7 +569,7 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="yK4-xL-QRu">
-                                            <rect key="frame" x="20" y="233" width="366" height="18"/>
+                                            <rect key="frame" x="20" y="221" width="366" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <animations/>
                                             <buttonCell key="cell" type="check" title="Show repository names" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="oZY-hH-Udu">
@@ -593,10 +581,10 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </button>
                                         <button id="onl-1T-RTg">
-                                            <rect key="frame" x="20" y="203" width="366" height="18"/>
+                                            <rect key="frame" x="20" y="187" width="366" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <animations/>
-                                            <buttonCell key="cell" type="check" title="Use vibrancy" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="Mtr-gs-YsM">
+                                            <buttonCell key="cell" type="check" title="Use UI vibrancy in OS X if supported" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="Mtr-gs-YsM">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -668,7 +656,7 @@ user you can add more servers from the left.</string>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
-                                        <box autoresizesSubviews="NO" title="Whan an item in &quot;all&quot; is assigned to me..." borderType="line" id="96h-4X-0sU">
+                                        <box autoresizesSubviews="NO" title="Whan something from &quot;all items&quot; is assigned to me..." borderType="line" id="96h-4X-0sU">
                                             <rect key="frame" x="414" y="275" width="316" height="73"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                             <view key="contentView" id="evv-lI-oOm">
@@ -702,10 +690,10 @@ user you can add more servers from the left.</string>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <button id="3CV-9S-gLw">
-                                            <rect key="frame" x="20" y="173" width="366" height="18"/>
+                                            <rect key="frame" x="20" y="153" width="366" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <animations/>
-                                            <buttonCell key="cell" type="check" title="Hide avatars" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="UOs-3D-XyL">
+                                            <buttonCell key="cell" type="check" title="Hide author avatars" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="UOs-3D-XyL">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -804,10 +792,10 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </button>
                                                     <button id="xzP-Bb-u07">
-                                                        <rect key="frame" x="21" y="12" width="147" height="18"/>
+                                                        <rect key="frame" x="24" y="12" width="144" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
-                                                        <buttonCell key="cell" type="check" title="PR or Issue numbers" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="5z6-1p-c6d">
+                                                        <buttonCell key="cell" type="check" title="PR &amp; Issue numbers" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="5z6-1p-c6d">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
@@ -822,24 +810,15 @@ user you can add more servers from the left.</string>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
-                                    </subviews>
-                                    <animations/>
-                                </view>
-                            </tabViewItem>
-                            <tabViewItem label="Sorting" identifier="2" id="60W-IN-VZ2">
-                                <view key="view" id="MPC-FP-HmM">
-                                    <rect key="frame" x="10" y="33" width="736" height="366"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <subviews>
-                                        <box autoresizesSubviews="NO" borderType="none" titlePosition="noTitle" id="WfS-TK-dZa">
-                                            <rect key="frame" x="235" y="128" width="267" height="123"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                            <view key="contentView" id="1yG-70-8Z2">
-                                                <rect key="frame" x="0.0" y="0.0" width="267" height="123"/>
+                                        <box title="Sorting" borderType="line" id="fNC-DY-p8H">
+                                            <rect key="frame" x="6" y="5" width="406" height="122"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                            <view key="contentView" id="Feb-GG-39G">
+                                                <rect key="frame" x="1" y="1" width="404" height="106"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button id="afo-70-80J">
-                                                        <rect key="frame" x="23" y="48" width="149" height="25"/>
+                                                        <rect key="frame" x="51" y="23" width="149" height="25"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <buttonCell key="cell" type="check" title="Reverse direction" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="6ye-0C-sLV">
@@ -851,7 +830,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </button>
                                                     <button id="TqD-G8-E24">
-                                                        <rect key="frame" x="23" y="14" width="164" height="25"/>
+                                                        <rect key="frame" x="199" y="23" width="164" height="25"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <buttonCell key="cell" type="check" title="Group by repository" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="AYd-ds-ReS">
@@ -863,7 +842,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </button>
                                                     <popUpButton verticalHuggingPriority="750" id="bWX-fP-uhd">
-                                                        <rect key="frame" x="17" y="89" width="234" height="26"/>
+                                                        <rect key="frame" x="41" y="57" width="312" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="PQf-4J-ChU">
@@ -888,6 +867,18 @@ user you can add more servers from the left.</string>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
+                                        <button id="Efg-Id-lOP">
+                                            <rect key="frame" x="20" y="323" width="366" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <animations/>
+                                            <buttonCell key="cell" type="check" title="Display item creation times instead of update times" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="yUS-qR-eV4">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="showCreationSelected:" target="vQH-WF-vh2" id="ie4-88-nBp"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                     <animations/>
                                 </view>
@@ -898,21 +889,21 @@ user you can add more servers from the left.</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" borderType="none" titlePosition="noTitle" id="HAA-q5-qyx">
-                                            <rect key="frame" x="146" y="83" width="445" height="212"/>
+                                            <rect key="frame" x="93" y="83" width="551" height="212"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <view key="contentView" id="cS6-gP-AUp">
-                                                <rect key="frame" x="0.0" y="0.0" width="445" height="212"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="551" height="212"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <box autoresizesSubviews="NO" title="Don't confirm when asked to remove..." borderType="line" id="KkY-YC-hC1">
-                                                        <rect key="frame" x="16" y="11" width="413" height="54"/>
+                                                        <rect key="frame" x="69" y="4" width="413" height="66"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="uFz-cS-CJ4">
-                                                            <rect key="frame" x="1" y="1" width="411" height="38"/>
+                                                            <rect key="frame" x="1" y="1" width="411" height="50"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <button id="ptr-tf-eNM">
-                                                                    <rect key="frame" x="58" y="12" width="166" height="18"/>
+                                                                    <rect key="frame" x="58" y="19" width="166" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <animations/>
                                                                     <buttonCell key="cell" type="check" title="All merged items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="XJl-yt-Rm9">
@@ -924,7 +915,7 @@ user you can add more servers from the left.</string>
                                                                     </connections>
                                                                 </button>
                                                                 <button id="w0K-BS-Gti">
-                                                                    <rect key="frame" x="228" y="12" width="156" height="18"/>
+                                                                    <rect key="frame" x="228" y="19" width="156" height="18"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                     <animations/>
                                                                     <buttonCell key="cell" type="check" title="All closed items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="oXu-x0-6b5">
@@ -953,18 +944,18 @@ user you can add more servers from the left.</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <popUpButton verticalHuggingPriority="750" id="DVS-bf-HmU">
-                                                        <rect key="frame" x="201" y="175" width="228" height="26"/>
+                                                        <rect key="frame" x="201" y="175" width="333" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
-                                                        <popUpButtonCell key="cell" type="push" title="Keep My Own &amp; Participated" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="Rch-KQ-Rk6" id="d5e-nv-C7o">
+                                                        <popUpButtonCell key="cell" type="push" title="Move any merged items to &quot;Merged&quot;" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="3S5-2j-Zli" id="d5e-nv-C7o">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="menu"/>
                                                             <menu key="menu" title="OtherViews" id="R4i-KU-iWz">
                                                                 <items>
-                                                                    <menuItem title="Keep My Own" id="cgN-3d-2Wt"/>
-                                                                    <menuItem title="Keep My Own &amp; Participated" state="on" id="Rch-KQ-Rk6"/>
-                                                                    <menuItem title="Keep All" id="3S5-2j-Zli"/>
-                                                                    <menuItem title="Don't Keep" id="XdV-Lf-khp"/>
+                                                                    <menuItem title="Move only my own items to &quot;Merged&quot;" id="cgN-3d-2Wt"/>
+                                                                    <menuItem title="Move my own &amp; participated items to &quot;Merged&quot;" id="Rch-KQ-Rk6"/>
+                                                                    <menuItem title="Move any merged items to &quot;Merged&quot;" state="on" id="3S5-2j-Zli"/>
+                                                                    <menuItem title="Discard all merged items" id="XdV-Lf-khp"/>
                                                                 </items>
                                                             </menu>
                                                         </popUpButtonCell>
@@ -983,18 +974,18 @@ user you can add more servers from the left.</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <popUpButton verticalHuggingPriority="750" id="MUp-kA-DZp">
-                                                        <rect key="frame" x="201" y="139" width="228" height="26"/>
+                                                        <rect key="frame" x="201" y="139" width="333" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
-                                                        <popUpButtonCell key="cell" type="push" title="Keep My Own &amp; Participated" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="8BB-As-Esu" id="exr-ek-OWA">
+                                                        <popUpButtonCell key="cell" type="push" title="Move any closed items to &quot;Closed&quot;" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="r2G-KA-S7R" id="exr-ek-OWA">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="menu"/>
                                                             <menu key="menu" title="OtherViews" id="OrW-A7-Xc2">
                                                                 <items>
-                                                                    <menuItem title="Keep My Own" id="cyB-qf-6Eu"/>
-                                                                    <menuItem title="Keep My Own &amp; Participated" state="on" id="8BB-As-Esu"/>
-                                                                    <menuItem title="Keep All" id="r2G-KA-S7R"/>
-                                                                    <menuItem title="Don't Keep" id="9gv-FQ-txC"/>
+                                                                    <menuItem title="Move only my own items to &quot;Closed&quot;" id="cyB-qf-6Eu"/>
+                                                                    <menuItem title="Move my own &amp; participated items to &quot;Closed&quot;" id="8BB-As-Esu"/>
+                                                                    <menuItem title="Move any closed items to &quot;Closed&quot;" state="on" id="r2G-KA-S7R"/>
+                                                                    <menuItem title="Discard all closed items" id="9gv-FQ-txC"/>
                                                                 </items>
                                                             </menu>
                                                         </popUpButtonCell>
@@ -1003,10 +994,10 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </popUpButton>
                                                     <button id="ZiV-Lz-lSl">
-                                                        <rect key="frame" x="100" y="94" width="244" height="18"/>
+                                                        <rect key="frame" x="63" y="97" width="424" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
-                                                        <buttonCell key="cell" type="check" title="Don't keep items merged by me" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="XHX-lg-c6B">
+                                                        <buttonCell key="cell" type="check" title="Discard any PRs that I merged myself, regardless of these settings" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="XHX-lg-c6B">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
@@ -1053,7 +1044,7 @@ user you can add more servers from the left.</string>
                                                         <rect key="frame" x="10" y="267" width="317" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
-                                                        <buttonCell key="cell" type="check" title="Comment badges &amp; alerts for items in &quot;all&quot;" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="z6Z-nh-Y6O">
+                                                        <buttonCell key="cell" type="check" title="Badge &amp; send alerts for the &quot;all&quot; sections too" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="z6Z-nh-Y6O">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
@@ -1156,7 +1147,7 @@ user you can add more servers from the left.</string>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="0eZ-9u-qmt">
-                                                        <rect key="frame" x="200" y="255" width="284" height="17"/>
+                                                        <rect key="frame" x="200" y="250" width="284" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="...re-scan all statuses every X refreshes" id="RuW-TF-DmH">
@@ -1166,7 +1157,7 @@ user you can add more servers from the left.</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <button id="ANN-xo-ud5">
-                                                        <rect key="frame" x="17" y="253" width="189" height="18"/>
+                                                        <rect key="frame" x="17" y="248" width="189" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <buttonCell key="cell" type="check" title="Show PR CI / statuses" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="uz2-FE-mKJ">
@@ -1178,10 +1169,10 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </button>
                                                     <button id="KjN-FO-XTd">
-                                                        <rect key="frame" x="17" y="185" width="488" height="18"/>
+                                                        <rect key="frame" x="17" y="180" width="477" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
-                                                        <buttonCell key="cell" type="check" title="Make status items always selectable (don't require command-click)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="tnU-bc-se6">
+                                                        <buttonCell key="cell" type="check" title="Make any displayed PR status line always selectable (don't require ⌘-click)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="tnU-bc-se6">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
@@ -1190,7 +1181,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </button>
                                                     <popUpButton verticalHuggingPriority="750" id="irr-Zv-gfS">
-                                                        <rect key="frame" x="16" y="88" width="489" height="26"/>
+                                                        <rect key="frame" x="16" y="89" width="489" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="cqY-EB-jjP">
@@ -1209,7 +1200,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </popUpButton>
                                                     <tokenField verticalHuggingPriority="750" id="oW9-uY-e0m">
-                                                        <rect key="frame" x="18" y="10" width="484" height="71"/>
+                                                        <rect key="frame" x="18" y="10" width="484" height="78"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <tokenFieldCell key="cell" selectable="YES" editable="YES" borderStyle="bezel" alignment="left" placeholderString="Comma separated list of terms" drawsBackground="YES" allowsEditingTextAttributes="YES" id="5ep-1e-o3q">
@@ -1222,7 +1213,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </tokenField>
                                                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="98O-9a-RJR">
-                                                        <rect key="frame" x="487" y="248" width="19" height="27"/>
+                                                        <rect key="frame" x="487" y="243" width="19" height="27"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <stepperCell key="cell" continuous="YES" alignment="left" minValue="1" maxValue="1000" doubleValue="1" id="r9b-4g-VVM"/>
@@ -1231,7 +1222,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </stepper>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="4P5-8J-j5N">
-                                                        <rect key="frame" x="103" y="209" width="381" height="44"/>
+                                                        <rect key="frame" x="103" y="204" width="381" height="44"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" id="ITh-gE-qyn">
@@ -1244,7 +1235,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="awU-SO-Gwd">
-                                                        <rect key="frame" x="188" y="322" width="296" height="17"/>
+                                                        <rect key="frame" x="188" y="317" width="296" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="...re-scan PR labels every X refreshes" id="Jlv-T3-UQ9">
@@ -1254,7 +1245,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="omI-5I-heJ">
-                                                        <rect key="frame" x="487" y="315" width="19" height="27"/>
+                                                        <rect key="frame" x="487" y="310" width="19" height="27"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <stepperCell key="cell" continuous="YES" alignment="left" minValue="1" maxValue="1000" doubleValue="1" id="dky-1e-6lk"/>
@@ -1263,7 +1254,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </connections>
                                                     </stepper>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="l28-ij-akN">
-                                                        <rect key="frame" x="103" y="276" width="381" height="44"/>
+                                                        <rect key="frame" x="103" y="271" width="381" height="44"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" id="Aaw-4h-ESu">
@@ -1276,7 +1267,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <button id="GGQ-fB-uWX">
-                                                        <rect key="frame" x="17" y="320" width="160" height="18"/>
+                                                        <rect key="frame" x="17" y="315" width="160" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <buttonCell key="cell" type="check" title="Show labels" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="fbv-gG-Lv3">
@@ -1288,10 +1279,10 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </connections>
                                                     </button>
                                                     <button id="UVq-TH-zaK">
-                                                        <rect key="frame" x="301" y="155" width="116" height="18"/>
+                                                        <rect key="frame" x="338" y="152" width="164" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
-                                                        <buttonCell key="cell" type="check" title="...on all PRs" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="bjn-sR-CJj">
+                                                        <buttonCell key="cell" type="check" title="..in the &quot;All&quot; section too" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="bjn-sR-CJj">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
@@ -1300,10 +1291,10 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </connections>
                                                     </button>
                                                     <button id="5WZ-7z-gJ2">
-                                                        <rect key="frame" x="17" y="126" width="277" height="18"/>
+                                                        <rect key="frame" x="17" y="124" width="299" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
-                                                        <buttonCell key="cell" type="check" title="Hide PRs whose statuses are not all green" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="cw8-e1-f8e">
+                                                        <buttonCell key="cell" type="check" title="Hide PRs whose status items are not all green" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="cw8-e1-f8e">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
@@ -1312,10 +1303,10 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </connections>
                                                     </button>
                                                     <button id="lAL-hp-XJt">
-                                                        <rect key="frame" x="17" y="155" width="288" height="18"/>
+                                                        <rect key="frame" x="17" y="152" width="321" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
-                                                        <buttonCell key="cell" type="check" title="Show notifications for new status items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="5Yc-fv-0lA">
+                                                        <buttonCell key="cell" type="check" title="Notify status changes for my &amp; participated PRs.." bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="5Yc-fv-0lA">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>

@@ -35,7 +35,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	private enum Section: Int {
 		case Refresh, Display, Filtering, Issues, Comments, Repos, StausesAndLabels, History, Confirm, Sort, Misc
 		static let rowCounts = [3, 6, 7, 1, 7, 2, 7, 3, 2, 3, 2]
-		static let allNames = ["Auto Refresh", "Display", "Filtering", "Issues", "Comments", "Repositories", "Statuses & Labels", "History", "Don't confirm when", "Sorting", "Misc"]
+		static let allNames = ["Auto Refresh", "Display", "Filtering", "Issues", "Comments", "Watchlist", "Statuses & Labels", "History", "Don't confirm when", "Sorting", "Misc"]
 	}
 
 	private enum NormalSorting: Int {
@@ -105,23 +105,23 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			case 0:
 				cell.titleLabel.text = "Foreground refresh interval"
 				cell.valueLabel.text = String(format: "%.0f seconds", Settings.refreshPeriod)
-				cell.descriptionLabel.text = "How often to refresh items when the app is active and in the foreground."
+				cell.descriptionLabel.text = Settings.refreshPeriodHelp
 			case 1:
 				cell.titleLabel.text = "Background refresh interval (minimum)"
 				cell.valueLabel.text = String(format: "%.0f minutes", Settings.backgroundRefreshPeriod/60.0)
-				cell.descriptionLabel.text = "The minimum amount of time to wait before requesting an update when the app is in the background. Even though this is quite efficient, it's still a good idea to keep this to a high value in order to keep battery and bandwidth use low. The default of half an hour is generally a good number. Please note that iOS may ignore this value and perform background refreshes at longer intervals depending on battery level and other reasons."
+				cell.descriptionLabel.text = Settings.backgroundRefreshPeriodHelp
 			case 2:
 				cell.titleLabel.text = "Watchlist & team list refresh interval"
 				cell.valueLabel.text = String(format: "%.0f hours", Settings.newRepoCheckPeriod)
-				cell.descriptionLabel.text = "How long before reloading your team list and watched repositories from the server. Since this doesn't change often, it's good to keep this as high as possible in order to keep bandwidth use during refreshes as low as possible. Set this to a low value if you often update your watched repositories or teams."
+				cell.descriptionLabel.text = Settings.newRepoCheckPeriodHelp
 			default: break
 			}
 		} else if indexPath.section == Section.Display.rawValue {
 			switch indexPath.row {
 			case 0:
-				cell.titleLabel.text = "Display creation instead of activity times"
+				cell.titleLabel.text = "Display item creation times instead of update times"
 				cell.accessoryType = check(Settings.showCreatedInsteadOfUpdated)
-				cell.descriptionLabel.text = "Trailer will usually display the time of the most recent activity in an item, such as comments. This setting replaces that with the orignal creation time of the item. Together with the sorting options, this is useful for helping prioritise items based on how old, or new, they are."
+				cell.descriptionLabel.text = Settings.showCreatedInsteadOfUpdatedHelp
 			case 1:
 				cell.titleLabel.text = "Assigned items"
 				cell.valueLabel.text = PRAssignmentPolicy(rawValue: Settings.assignedPrHandlingPolicy)?.name()
@@ -129,19 +129,19 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			case 2:
 				cell.titleLabel.text = "Mark unmergeable PRs only in 'My' or 'Participated' sections"
 				cell.accessoryType = check(Settings.markUnmergeableOnUserSectionsOnly)
-				cell.descriptionLabel.text = "If the server reports a PR as un-mergeable, don't tag this on items in the 'all items' section."
+				cell.descriptionLabel.text = Settings.markUnmergeableOnUserSectionsOnlyHelp
 			case 3:
 				cell.titleLabel.text = "Display repository names"
 				cell.accessoryType = check(Settings.showReposInName)
-				cell.descriptionLabel.text = "Show the name of the repository each item comes from."
+				cell.descriptionLabel.text = Settings.showReposInNameHelp
 			case 4:
 				cell.titleLabel.text = "Hide descriptions in Apple Watch detail views"
 				cell.accessoryType = check(Settings.hideDescriptionInWatchDetail)
-				cell.descriptionLabel.text = "When showing the full detail view of items on the Apple Watch, skip showing the description of the item, instead showing only status and comments for it."
+				cell.descriptionLabel.text = Settings.hideDescriptionInWatchDetailHelp
 			case 5:
 				cell.titleLabel.text = "Open items directly in Safari if internal web view is not already visible."
 				cell.accessoryType = check(Settings.openItemsDirectlyInSafari)
-				cell.descriptionLabel.text = "Directly open items in the Safari browser rather than the internal web view. Especially useful on iPad when using split-screen view, where you can pull in PocktetTrailer from the side but stay in Safari, or on iPhone where you can use the status-bar button as a back button. If the detail view is already visible (for instance when runing in full-screen mode on iPad) the internal view will still get used, even if this option is turned on."
+				cell.descriptionLabel.text = Settings.openItemsDirectlyInSafariHelp
 			default: break
 			}
 		} else if indexPath.section == Section.Filtering.rawValue {
@@ -149,31 +149,31 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			case 0:
 				cell.titleLabel.text = "Include item titles"
 				cell.accessoryType = check(Settings.includeTitlesInFilter)
-				cell.descriptionLabel.text = "Check item titles when selecting items for inclusion in filtered results."
+				cell.descriptionLabel.text = Settings.includeTitlesInFilterHelp
 			case 1:
 				cell.titleLabel.text = "Include repository names "
 				cell.accessoryType = check(Settings.includeReposInFilter)
-				cell.descriptionLabel.text = "Check repository names when selecting items for inclusion in filtered results."
+				cell.descriptionLabel.text = Settings.includeReposInFilterHelp
 			case 2:
 				cell.titleLabel.text = "Include labels"
 				cell.accessoryType = check(Settings.includeLabelsInFilter)
-				cell.descriptionLabel.text = "Check labels of items when selecting items for inclusion in filtered results."
+				cell.descriptionLabel.text = Settings.includeLabelsInFilterHelp
 			case 3:
 				cell.titleLabel.text = "Include statuses"
 				cell.accessoryType = check(Settings.includeStatusesInFilter)
-				cell.descriptionLabel.text = "Check status lines of items when selecting items for inclusion in filtered results."
+				cell.descriptionLabel.text = Settings.includeStatusesInFilterHelp
 			case 4:
 				cell.titleLabel.text = "Include servers"
 				cell.accessoryType = check(Settings.includeServersInFilter)
-				cell.descriptionLabel.text = "Check the name of the server an item came from when selecting it for inclusion in filtered results."
+				cell.descriptionLabel.text = Settings.includeServersInFilterHelp
 			case 5:
 				cell.titleLabel.text = "Include usernames"
 				cell.accessoryType = check(Settings.includeUsersInFilter)
-				cell.descriptionLabel.text = "Check the name of the author of an item when selecting it for inclusion in filtered results."
+				cell.descriptionLabel.text = Settings.includeUsersInFilterHelp
 			case 6:
 				cell.titleLabel.text = "Include PR or issue numbers"
 				cell.accessoryType = check(Settings.includeNumbersInFilter)
-				cell.descriptionLabel.text = "Check the PR/Issue number of the item when selecting it for inclusion in filtered results."
+				cell.descriptionLabel.text = Settings.includeNumbersInFilterHelp
 			default: break
 			}
 		} else if indexPath.section == Section.Issues.rawValue {
@@ -181,31 +181,31 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			case 0:
 				cell.titleLabel.text = "Prefer issues instead of PRs in Apple Watch glances & complications"
 				cell.accessoryType = check(Settings.preferIssuesInWatch)
-				cell.descriptionLabel.text = "In the Apple Watch glance, or when there is only enough space to display one count or set of statistics in complications, prefer the ones for issues rather than the ones for PRs."
+				cell.descriptionLabel.text = Settings.preferIssuesInWatchHelp
 			default: break
 			}
 		} else if indexPath.section == Section.Comments.rawValue {
 			switch indexPath.row {
 			case 0:
-				cell.titleLabel.text = "Display comment badges and alerts for all items"
+				cell.titleLabel.text = "Badge & send alerts for the 'all' section too"
 				cell.accessoryType = check(Settings.showCommentsEverywhere)
-				cell.descriptionLabel.text = "Badge and send notificatons for items in the 'all' sections as well as your own and participated ones."
+				cell.descriptionLabel.text = Settings.showCommentsEverywhereHelp
 			case 1:
 				cell.titleLabel.text = "Only display items with unread comments"
 				cell.accessoryType = check(Settings.hideUncommentedItems)
-				cell.descriptionLabel.text = "Hide all items except items which have unread comments (items with a red number badge)."
+				cell.descriptionLabel.text = Settings.hideUncommentedItemsHelp
 			case 2:
 				cell.titleLabel.text = "Move items menitoning me to 'Participated'"
 				cell.accessoryType = check(Settings.autoParticipateInMentions)
-				cell.descriptionLabel.text = "If your username is mentioned in an item's description or a comment posted inside it, move the item to your 'Participated' section."
+				cell.descriptionLabel.text = Settings.autoParticipateInMentionsHelp
 			case 3:
 				cell.titleLabel.text = "Move items menitoning my teams to 'Participated'"
 				cell.accessoryType = check(Settings.autoParticipateOnTeamMentions)
-				cell.descriptionLabel.text = "If the name of one of the teams you belong to is mentioned in an item's description or a comment posted inside it, move the item to your 'Participated' section."
+				cell.descriptionLabel.text = Settings.autoParticipateOnTeamMentionsHelp
 			case 4:
 				cell.titleLabel.text = "Open items at first unread comment"
 				cell.accessoryType = check(Settings.openPrAtFirstUnreadComment)
-				cell.descriptionLabel.text = "When opening the web view for an item, skip directly down to the first comment that has not been read, rather than starting from the top of the item's web page."
+				cell.descriptionLabel.text = Settings.openPrAtFirstUnreadCommentHelp
 			case 5:
 				cell.titleLabel.text = "Block comment notifications from usernames..."
 				cell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
@@ -213,7 +213,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			case 6:
 				cell.titleLabel.text = "Disable all comment notifications"
 				cell.accessoryType = check(Settings.disableAllCommentNotifications)
-				cell.descriptionLabel.text = "Do not get notified about any comments at all."
+				cell.descriptionLabel.text = Settings.disableAllCommentNotificationsHelp
 			default: break
 			}
 		} else if indexPath.section == Section.Repos.rawValue {
@@ -221,11 +221,11 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			case 0:
 				cell.titleLabel.text = "PR visibility for new repos"
 				cell.valueLabel.text = RepoDisplayPolicy(rawValue: Settings.displayPolicyForNewPrs)?.name()
-				cell.descriptionLabel.text = "When a new repository is detected in your watchlist, this display policy will be applied by default to pull requests that come from it. You can further customize the display policy for any individual repository from the 'Repositories' tab."
+				cell.descriptionLabel.text = Settings.displayPolicyForNewPrsHelp
 			case 1:
 				cell.titleLabel.text = "Issue visibility for new repos"
 				cell.valueLabel.text = RepoDisplayPolicy(rawValue: Settings.displayPolicyForNewIssues)?.name()
-				cell.descriptionLabel.text = "When a new repository is detected in your watchlist, this display policy will be applied by default to issues that come from it. You can further customize the display policy for any individual repository from the 'Repositories' tab."
+				cell.descriptionLabel.text = Settings.displayPolicyForNewIssuesHelp
 			default: break
 			}
 		} else if indexPath.section == Section.StausesAndLabels.rawValue {
@@ -233,32 +233,31 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			case 0:
 				cell.titleLabel.text = "Show statuses"
 				cell.accessoryType = check(Settings.showStatusItems)
-				cell.descriptionLabel.text = "Show status items, such as CI results or messages from code review services, that are attached to items on the server."
+				cell.descriptionLabel.text = Settings.showStatusItemsHelp
 			case 1:
 				cell.titleLabel.text = "Re-query statuses"
 				cell.valueLabel.text = Settings.statusItemRefreshInterval == 1 ? "Every refresh" : "Every \(Settings.statusItemRefreshInterval) refreshes"
-				cell.descriptionLabel.text = "Because querying statuses can be bandwidth-intensive, if you have alot of items in your lists, you may want to raise this to a higher value. You can always see how much API usage you have left per-hour from the server tab."
+				cell.descriptionLabel.text = Settings.statusItemRefreshIntervalHelp
 			case 2:
 				cell.titleLabel.text = "Show labels"
 				cell.accessoryType = check(Settings.showLabels)
-				cell.descriptionLabel.text = "Show labels associated with items, usually a good idea"
+				cell.descriptionLabel.text = Settings.showLabelsHelp
 			case 3:
 				cell.titleLabel.text = "Re-query labels"
 				cell.valueLabel.text = Settings.labelRefreshInterval == 1 ? "Every refresh" : "Every \(Settings.labelRefreshInterval) refreshes"
-				cell.descriptionLabel.text = "Querying labels can be moderately bandwidth-intensive, but it does involve making some extra API calls. Since labels don't change often, you may want to raise this to a higher value if you have alot of items on your lists. You can always see how much API usage you have left per-hour from the server tab."
+				cell.descriptionLabel.text = Settings.labelRefreshIntervalHelp
 			case 4:
-				cell.titleLabel.text = "Notifications for new statuses"
+				cell.titleLabel.text = "Notify status changes for my & participated PRs"
 				cell.accessoryType = check(Settings.notifyOnStatusUpdates)
-				cell.descriptionLabel.text = "Post notifications when status items change. Useful for tracking the CI build state of your own items, for instance."
+				cell.descriptionLabel.text = Settings.notifyOnStatusUpdatesHelp
 			case 5:
-				cell.titleLabel.text = "... new statuses for all PRs"
+				cell.titleLabel.text = "...in the 'All' section too"
 				cell.accessoryType = check(Settings.notifyOnStatusUpdatesForAllPrs)
-				cell.descriptionLabel.text = "Notificaitons for status items are sent only for your own and particiapted items by default. Select this to receive status update notifications for the items in the 'all' section too."
+				cell.descriptionLabel.text = Settings.notifyOnStatusUpdatesForAllPrsHelp
 			case 6:
-				cell.titleLabel.text = "Hide PRs whose statuses are not all green"
+				cell.titleLabel.text = "Hide PRs whose status items are not all green"
 				cell.accessoryType = check(Settings.hidePrsThatArentPassing)
-				cell.descriptionLabel.text = "Hide PR items which have status items, but are not all green. Useful for hiding PRs which are not ready to review or those who have not passed certain checks yet."
-
+				cell.descriptionLabel.text = Settings.hidePrsThatArentPassingHelp
 			default: break
 			}
 		} else if indexPath.section == Section.History.rawValue {
@@ -266,15 +265,15 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			case 0:
 				cell.titleLabel.text = "When something is merged"
 				cell.valueLabel.text = PRHandlingPolicy(rawValue: Settings.mergeHandlingPolicy)?.name()
-				cell.descriptionLabel.text = "How to handle an item when it is detected as merged."
+				cell.descriptionLabel.text = Settings.mergeHandlingPolicyHelp
 			case 1:
 				cell.titleLabel.text = "When something is closed"
 				cell.valueLabel.text = PRHandlingPolicy(rawValue: Settings.closeHandlingPolicy)?.name()
-				cell.descriptionLabel.text = "How to handle an item when it is believed to be closed (or has disappeared)."
+				cell.descriptionLabel.text = Settings.closeHandlingPolicyHelp
 			case 2:
 				cell.titleLabel.text = "Don't keep PRs merged by me"
 				cell.accessoryType = check(Settings.dontKeepPrsMergedByMe)
-				cell.descriptionLabel.text = "If a PR is detected as merged by you, remove it immediately from the list of merged items"
+				cell.descriptionLabel.text = Settings.dontKeepPrsMergedByMeHelp
 			default: break
 			}
 		} else if indexPath.section == Section.Confirm.rawValue {
@@ -282,11 +281,11 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			case 0:
 				cell.titleLabel.text = "Removing all merged items"
 				cell.accessoryType = check(Settings.dontAskBeforeWipingMerged)
-				cell.descriptionLabel.text = "Don't ask for confirmation when you select 'Remove all merged items'. Please note there is no confirmation when selecting this from the Apple Watch, irrespective of this setting."
+				cell.descriptionLabel.text = Settings.dontAskBeforeWipingMergedHelp
 			case 1:
 				cell.titleLabel.text = "Removing all closed items"
 				cell.accessoryType = check(Settings.dontAskBeforeWipingClosed)
-				cell.descriptionLabel.text = "Don't ask for confirmation when you select 'Remove all closed items'. Please note there is no confirmation when selecting this from the Apple Watch, irrespective of this setting."
+				cell.descriptionLabel.text = Settings.dontAskBeforeWipingClosedHelp
 			default: break
 			}
 		} else if indexPath.section == Section.Sort.rawValue {
@@ -294,7 +293,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			case 0:
 				cell.titleLabel.text = "Direction"
 				cell.valueLabel.text = Settings.sortDescending ? "Reverse" : "Normal"
-				cell.descriptionLabel.text = "The direction to sort items based on the criterion below. Toggling this option will change the set of options available in the option below to better reflect what that will do."
+				cell.descriptionLabel.text = Settings.sortDescendingHelp
 			case 1:
 				cell.titleLabel.text = "Criterion"
 				if Settings.sortDescending {
@@ -302,11 +301,11 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				} else {
 					cell.valueLabel.text = NormalSorting(rawValue: Settings.sortMethod)?.name()
 				}
-				cell.descriptionLabel.text = "The criterion to use when sorting items."
+				cell.descriptionLabel.text = Settings.sortMethodHelp
 			case 2:
 				cell.titleLabel.text = "Group by repository"
 				cell.accessoryType = check(Settings.groupByRepo)
-				cell.descriptionLabel.text = "Sort and gather items from the same repository next to each other, before applying the criterion specified above."
+				cell.descriptionLabel.text = Settings.groupByRepoHelp
 			default: break
 			}
 		} else if indexPath.section == Section.Misc.rawValue {
@@ -314,11 +313,11 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			case 0:
 				cell.titleLabel.text = "Log activity to console"
 				cell.accessoryType = check(Settings.logActivityToConsole)
-				cell.descriptionLabel.text = "This is meant for troubleshooting and should be turned off usually, as it is a performance and security concern. It will output detailed messages about the app's behaviour in the device console."
+				cell.descriptionLabel.text = Settings.logActivityToConsoleHelp
 			case 1:
 				cell.titleLabel.text = "Log API calls to console"
 				cell.accessoryType = check(Settings.dumpAPIResponsesInConsole)
-				cell.descriptionLabel.text = "This is meant for troubleshooting and should be turned off usually, as it is a performance and security concern. It will output the full request and responses to and from API servers in the device console."
+				cell.descriptionLabel.text = Settings.dumpAPIResponsesInConsoleHelp
 			default: break
 			}
 		}

@@ -222,6 +222,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 		updateStatusItemsOptions()
 		updateLabelOptions()
+		updateHistoryOptions()
 
 		hotkeyEnable.enabled = true
 
@@ -367,6 +368,11 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction func dontKeepMyPrsSelected(sender: NSButton) {
 		Settings.dontKeepPrsMergedByMe = (sender.integerValue==1)
+		updateHistoryOptions()
+	}
+
+	private func updateHistoryOptions() {
+		dontKeepPrsMergedByMe.enabled = Settings.mergeHandlingPolicy != PRHandlingPolicy.KeepNone.rawValue;
 	}
 
 	@IBAction func grayOutWhenRefreshingSelected(sender: NSButton) {
@@ -772,6 +778,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction func prMergePolicySelected(sender: NSPopUpButton) {
 		Settings.mergeHandlingPolicy = sender.indexOfSelectedItem
+		updateHistoryOptions()
 	}
 
 	@IBAction func prClosePolicySelected(sender: NSPopUpButton) {

@@ -244,6 +244,7 @@ final class Settings {
 
 	///////////////////////////////// NUMBERS
 
+	static let sortMethodHelp = "The criterion to use when sorting items."
 	class var sortMethod: Int {
 		get { return get("SORT_METHOD_KEY") as? Int ?? 0 }
 		set { set("SORT_METHOD_KEY", newValue) }
@@ -264,21 +265,25 @@ final class Settings {
 		set { set("LAST_PREFS_TAB_SELECTED_OSX", newValue) }
 	}
 
+	static let closeHandlingPolicyHelp = "How to handle an item when it is believed to be closed (or has disappeared)."
 	class var closeHandlingPolicy: Int {
 		get { return get("CLOSE_HANDLING_POLICY_2") as? Int ?? PRHandlingPolicy.KeepMine.rawValue }
 		set { set("CLOSE_HANDLING_POLICY_2", newValue) }
 	}
 
+	static let mergeHandlingPolicyHelp = "How to handle an item when it is detected as merged."
 	class var mergeHandlingPolicy: Int {
 		get { return get("MERGE_HANDLING_POLICY_2") as? Int ?? PRHandlingPolicy.KeepMine.rawValue }
 		set { set("MERGE_HANDLING_POLICY_2", newValue) }
 	}
 
+	static let statusItemRefreshIntervalHelp = "Because querying statuses can be bandwidth-intensive, if you have alot of items in your lists, you may want to raise this to a higher value. You can always see how much API usage you have left per-hour from the server tab."
 	class var statusItemRefreshInterval: Int {
 		get { if let n = get("STATUS_ITEM_REFRESH_COUNT") as? Int { return n>0 ? n : 10 } else { return 10 } }
 		set { set("STATUS_ITEM_REFRESH_COUNT", newValue) }
 	}
 
+	static let labelRefreshIntervalHelp = "Querying labels can be moderately bandwidth-intensive, but it does involve making some extra API calls. Since labels don't change often, you may want to raise this to a higher value if you have alot of items on your lists. You can always see how much API usage you have left per-hour from the server tab."
 	class var labelRefreshInterval: Int {
 		get { if let n = get("LABEL_REFRESH_COUNT") as? Int { return n>0 ? n : 4 } else { return 4 } }
 		set { set("LABEL_REFRESH_COUNT", newValue) }
@@ -294,11 +299,13 @@ final class Settings {
 		set { set("ASSIGNED_PR_HANDLING_POLICY", newValue) }
 	}
 
+	static let displayPolicyForNewPrsHelp = "When a new repository is detected in your watchlist, this display policy will be applied by default to pull requests that come from it. You can further customize the display policy for any individual repository from the 'Repositories' tab."
 	class var displayPolicyForNewPrs: Int {
 		get { return get("NEW_PR_DISPLAY_POLICY_INDEX") as? Int ?? RepoDisplayPolicy.All.rawValue }
 		set { set("NEW_PR_DISPLAY_POLICY_INDEX", newValue) }
 	}
 
+	static let displayPolicyForNewIssuesHelp = "When a new repository is detected in your watchlist, this display policy will be applied by default to issues that come from it. You can further customize the display policy for any individual repository from the 'Repositories' tab."
 	class var displayPolicyForNewIssues: Int {
 		get { return get("NEW_ISSUE_DISPLAY_POLICY_INDEX") as? Int ?? RepoDisplayPolicy.Hide.rawValue }
 		set { set("NEW_ISSUE_DISPLAY_POLICY_INDEX", newValue) }
@@ -328,11 +335,13 @@ final class Settings {
 
 	/////////////////////////// FLOATS
 
+	static let refreshPeriodHelp = "How often to refresh items when the app is active and in the foreground."
 	class var refreshPeriod: Float {
 		get { if let n = get("REFRESH_PERIOD_KEY") as? Float { return n < 60 ? 120 : n } else { return 120 } }
 		set { set("REFRESH_PERIOD_KEY", newValue) }
 	}
 
+	static let backgroundRefreshPeriodHelp = "The minimum amount of time to wait before requesting an update when the app is in the background. Even though this is quite efficient, it's still a good idea to keep this to a high value in order to keep battery and bandwidth use low. The default of half an hour is generally a good number. Please note that iOS may ignore this value and perform background refreshes at longer intervals depending on battery level and other reasons."
 	class var backgroundRefreshPeriod: Float {
 		get { if let n = get("IOS_BACKGROUND_REFRESH_PERIOD_KEY") as? Float { return n > 0 ? n : 1800 } else { return 1800 } }
 		set {
@@ -343,6 +352,7 @@ final class Settings {
 		}
 	}
 
+	static let newRepoCheckPeriodHelp = "How long before reloading your team list and watched repositories from the server. Since this doesn't change often, it's good to keep this as high as possible in order to keep bandwidth use during refreshes as low as possible. Set this to a low value if you often update your watched repositories or teams."
 	class var newRepoCheckPeriod: Float {
 		get { if let n = get("NEW_REPO_CHECK_PERIOD") as? Float { return max(n, 2) } else { return 2 } }
 		set { set("NEW_REPO_CHECK_PERIOD", newValue) }
@@ -375,26 +385,31 @@ final class Settings {
 
     /////////////////////////// DEFAULT FALSE
 
+	static let hideUncommentedItemsHelp = "Hide all items except items which have unread comments (items with a red number badge)."
 	class var hideUncommentedItems: Bool {
 		get { return get("HIDE_UNCOMMENTED_PRS_KEY") as? Bool ?? false }
 		set { set("HIDE_UNCOMMENTED_PRS_KEY", newValue) }
 	}
 
+	static let showCommentsEverywhereHelp = "Badge and send notificatons for items in the 'all' sections as well as your own and participated ones."
 	class var showCommentsEverywhere: Bool {
 		get { return get("SHOW_COMMENTS_EVERYWHERE_KEY") as? Bool ?? false }
 		set { set("SHOW_COMMENTS_EVERYWHERE_KEY", newValue) }
 	}
 
+	static let sortDescendingHelp = "The direction to sort items based on the criterion below. Toggling this option will change the set of options available in the option below to better reflect what that will do."
 	class var sortDescending: Bool {
 		get { return get("SORT_ORDER_KEY") as? Bool ?? false }
 		set { set("SORT_ORDER_KEY", newValue) }
 	}
 
+	static let showCreatedInsteadOfUpdatedHelp = "Trailer will usually display the time of the most recent activity in an item, such as comments. This setting replaces that with the orignal creation time of the item. Together with the sorting options, this is useful for helping prioritise items based on how old, or new, they are.";
 	class var showCreatedInsteadOfUpdated: Bool {
 		get { return get("SHOW_UPDATED_KEY") as? Bool ?? false }
 		set { set("SHOW_UPDATED_KEY", newValue) }
 	}
 
+	static let dontKeepPrsMergedByMeHelp = "If a PR is detected as merged by you, remove it immediately from the list of merged items"
 	class var dontKeepPrsMergedByMe: Bool {
 		get { return get("DONT_KEEP_MY_PRS_KEY") as? Bool ?? false }
 		set { set("DONT_KEEP_MY_PRS_KEY", newValue) }
@@ -405,31 +420,37 @@ final class Settings {
 		set { set("HIDE_AVATARS_KEY", newValue) }
 	}
 
+	static let autoParticipateInMentionsHelp = "If your username is mentioned in an item's description or a comment posted inside it, move the item to your 'Participated' section."
 	class var autoParticipateInMentions: Bool {
 		get { return get("AUTO_PARTICIPATE_IN_MENTIONS_KEY") as? Bool ?? false }
 		set { set("AUTO_PARTICIPATE_IN_MENTIONS_KEY", newValue) }
 	}
 
+	static let dontAskBeforeWipingMergedHelp = "Don't ask for confirmation when you select 'Remove all merged items'. Please note there is no confirmation when selecting this from the Apple Watch, irrespective of this setting."
 	class var dontAskBeforeWipingMerged: Bool {
 		get { return get("DONT_ASK_BEFORE_WIPING_MERGED") as? Bool ?? false }
 		set { set("DONT_ASK_BEFORE_WIPING_MERGED", newValue) }
 	}
 
+	static let dontAskBeforeWipingClosedHelp = "Don't ask for confirmation when you select 'Remove all closed items'. Please note there is no confirmation when selecting this from the Apple Watch, irrespective of this setting."
 	class var dontAskBeforeWipingClosed: Bool {
 		get { return get("DONT_ASK_BEFORE_WIPING_CLOSED") as? Bool ?? false }
 		set { set("DONT_ASK_BEFORE_WIPING_CLOSED", newValue) }
 	}
 
+	static let groupByRepoHelp = "Sort and gather items from the same repository next to each other, before applying the criterion specified above."
 	class var groupByRepo: Bool {
 		get { return get("GROUP_BY_REPO") as? Bool ?? false }
 		set { set("GROUP_BY_REPO", newValue) }
 	}
 
+	static let showLabelsHelp = "Show labels associated with items, usually a good idea"
 	class var showLabels: Bool {
 		get { return get("SHOW_LABELS") as? Bool ?? false }
 		set { set("SHOW_LABELS", newValue) }
 	}
 
+	static let showStatusItemsHelp = "Show status items, such as CI results or messages from code review services, that are attached to items on the server."
 	class var showStatusItems: Bool {
 		get { return get("SHOW_STATUS_ITEMS") as? Bool ?? false }
 		set { set("SHOW_STATUS_ITEMS", newValue) }
@@ -440,16 +461,19 @@ final class Settings {
 		set { set("MAKE_STATUS_ITEMS_SELECTABLE", newValue) }
 	}
 
+	static let markUnmergeableOnUserSectionsOnlyHelp = "If the server reports a PR as un-mergeable, don't tag this on items in the 'all items' section."
 	class var markUnmergeableOnUserSectionsOnly: Bool {
 		get { return get("MARK_UNMERGEABLE_ON_USER_SECTIONS_ONLY") as? Bool ?? false }
 		set { set("MARK_UNMERGEABLE_ON_USER_SECTIONS_ONLY", newValue) }
 	}
 
+	static let openPrAtFirstUnreadCommentHelp = "When opening the web view for an item, skip directly down to the first comment that has not been read, rather than starting from the top of the item's web page."
 	class var openPrAtFirstUnreadComment: Bool {
 		get { return get("OPEN_PR_AT_FIRST_UNREAD_COMMENT_KEY") as? Bool ?? false }
 		set { set("OPEN_PR_AT_FIRST_UNREAD_COMMENT_KEY", newValue) }
 	}
 
+	static let logActivityToConsoleHelp = "This is meant for troubleshooting and should be turned off usually, as it is a performance and security concern. It will output detailed messages about the app's behaviour in the device console."
 	class var logActivityToConsole: Bool {
 		get {
         #if DEBUG
@@ -471,31 +495,37 @@ final class Settings {
 		set { set("HOTKEY_CONTROL_MODIFIER", newValue) }
 	}
 
+	static let disableAllCommentNotificationsHelp = "Do not get notified about any comments at all."
     class var disableAllCommentNotifications: Bool {
         get { return get("DISABLE_ALL_COMMENT_NOTIFICATIONS") as? Bool ?? false }
         set { set("DISABLE_ALL_COMMENT_NOTIFICATIONS", newValue) }
     }
 
+	static let notifyOnStatusUpdatesHelp = "Post notifications when status items change. Useful for tracking the CI build state of your own items, for instance."
     class var notifyOnStatusUpdates: Bool {
         get { return get("NOTIFY_ON_STATUS_UPDATES") as? Bool ?? false }
         set { set("NOTIFY_ON_STATUS_UPDATES", newValue) }
     }
 
+	static let notifyOnStatusUpdatesForAllPrsHelp = "Notificaitons for status items are sent only for your own and particiapted items by default. Select this to receive status update notifications for the items in the 'all' section too."
     class var notifyOnStatusUpdatesForAllPrs: Bool {
         get { return get("NOTIFY_ON_STATUS_UPDATES_ALL") as? Bool ?? false }
         set { set("NOTIFY_ON_STATUS_UPDATES_ALL", newValue) }
     }
 
+	static let autoParticipateOnTeamMentionsHelp = "If the name of one of the teams you belong to is mentioned in an item's description or a comment posted inside it, move the item to your 'Participated' section."
 	class var autoParticipateOnTeamMentions: Bool {
 		get { return get("AUTO_PARTICIPATE_ON_TEAM_MENTIONS") as? Bool ?? false }
 		set { set("AUTO_PARTICIPATE_ON_TEAM_MENTIONS", newValue) }
 	}
 
+	static let preferIssuesInWatchHelp = "In the Apple Watch glance, or when there is only enough space to display one count or set of statistics in complications, prefer the ones for issues rather than the ones for PRs."
 	class var preferIssuesInWatch: Bool {
 		get { return get("SHOW_ISSUES_IN_WATCH_GLANCE") as? Bool ?? false }
 		set { set("SHOW_ISSUES_IN_WATCH_GLANCE", newValue) }
 	}
 
+	static let hideDescriptionInWatchDetailHelp = "When showing the full detail view of items on the Apple Watch, skip showing the description of the item, instead showing only status and comments for it."
 	class var hideDescriptionInWatchDetail: Bool {
 		get { return get("HIDE_DESCRIPTION_IN_WATCH_DETAIL_VIEW") as? Bool ?? false }
 		set { set("HIDE_DESCRIPTION_IN_WATCH_DETAIL_VIEW", newValue) }
@@ -511,21 +541,25 @@ final class Settings {
 		set { set("DONT_CONFIRM_SETTINGS_IMPORT", newValue) }
 	}
 
+	static let includeServersInFilterHelp = "Check the name of the server an item came from when selecting it for inclusion in filtered results."
     class var includeServersInFilter: Bool {
         get { return get("INCLUDE_SERVERS_IN_FILTER") as? Bool ?? false }
         set { set("INCLUDE_SERVERS_IN_FILTER", newValue) }
     }
 
+	static let dumpAPIResponsesInConsoleHelp = "This is meant for troubleshooting and should be turned off usually, as it is a performance and security concern. It will output the full request and responses to and from API servers in the device console."
 	class var dumpAPIResponsesInConsole: Bool {
 		get { return get("DUMP_API_RESPONSES_IN_CONSOLE") as? Bool ?? false }
 		set { set("DUMP_API_RESPONSES_IN_CONSOLE", newValue) }
 	}
 
+	static let openItemsDirectlyInSafariHelp = "Directly open items in the Safari browser rather than the internal web view. Especially useful on iPad when using split-screen view, where you can pull in PocktetTrailer from the side but stay in Safari, or on iPhone where you can use the status-bar button as a back button. If the detail view is already visible (for instance when runing in full-screen mode on iPad) the internal view will still get used, even if this option is turned on."
 	class var openItemsDirectlyInSafari: Bool {
 		get { return get("OPEN_ITEMS_DIRECTLY_IN_SAFARI") as? Bool ?? false }
 		set { set("OPEN_ITEMS_DIRECTLY_IN_SAFARI", newValue) }
 	}
 
+	static let hidePrsThatArentPassingHelp = "Hide PR items which have status items, but are not all green. Useful for hiding PRs which are not ready to review or those who have not passed certain checks yet."
 	class var hidePrsThatArentPassing: Bool {
 		get { return get("HIDE_PRS_THAT_ARENT_PASSING") as? Bool ?? false }
 		set { set("HIDE_PRS_THAT_ARENT_PASSING", newValue) }
@@ -548,36 +582,43 @@ final class Settings {
 		set { set("UPDATE_CHECK_AUTO_KEY", newValue) }
 	}
 
+	static let showReposInNameHelp = "Show the name of the repository each item comes from."
 	class var showReposInName: Bool {
 		get { return get("SHOW_REPOS_IN_NAME") as? Bool ?? true }
 		set { set("SHOW_REPOS_IN_NAME", newValue) }
 	}
 
+	static let includeTitlesInFilterHelp = "Check item titles when selecting items for inclusion in filtered results."
 	class var includeTitlesInFilter: Bool {
 		get { return get("INCLUDE_TITLES_IN_FILTER") as? Bool ?? true }
 		set { set("INCLUDE_TITLES_IN_FILTER", newValue) }
 	}
 
+	static let includeNumbersInFilterHelp = "Check the PR/Issue number of the item when selecting it for inclusion in filtered results."
 	class var includeNumbersInFilter: Bool {
 		get { return get("INCLUDE_NUMBERS_IN_FILTER") as? Bool ?? false }
 		set { set("INCLUDE_NUMBERS_IN_FILTER", newValue) }
 	}
 
+	static let includeReposInFilterHelp = "Check repository names when selecting items for inclusion in filtered results."
 	class var includeReposInFilter: Bool {
 		get { return get("INCLUDE_REPOS_IN_FILTER") as? Bool ?? true }
 		set { set("INCLUDE_REPOS_IN_FILTER", newValue) }
 	}
 
+	static let includeLabelsInFilterHelp = "Check labels of items when selecting items for inclusion in filtered results."
 	class var includeLabelsInFilter: Bool {
 		get { return get("INCLUDE_LABELS_IN_FILTER") as? Bool ?? true }
 		set { set("INCLUDE_LABELS_IN_FILTER", newValue) }
 	}
 
+	static let includeUsersInFilterHelp = "Check the name of the author of an item when selecting it for inclusion in filtered results."
     class var includeUsersInFilter: Bool {
         get { return get("INCLUDE_USERS_IN_FILTER") as? Bool ?? true }
         set { set("INCLUDE_USERS_IN_FILTER", newValue) }
     }
 
+	static let includeStatusesInFilterHelp = "Check status lines of items when selecting items for inclusion in filtered results."
 	class var includeStatusesInFilter: Bool {
 		get { return get("INCLUDE_STATUSES_IN_FILTER") as? Bool ?? true }
 		set { set("INCLUDE_STATUSES_IN_FILTER", newValue) }

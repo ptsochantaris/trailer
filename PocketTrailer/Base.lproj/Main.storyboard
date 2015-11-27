@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="9059" systemVersion="15B42" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="H1p-Uh-vWS">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="9060" systemVersion="15B42" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="H1p-Uh-vWS">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9049"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9051"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <customFonts key="customFonts">
@@ -238,7 +238,7 @@
             </objects>
             <point key="canvasLocation" x="1130" y="-792"/>
         </scene>
-        <!--Repositories-->
+        <!--Watchlist-->
         <scene sceneID="mBS-8s-j5u">
             <objects>
                 <tableViewController id="qen-v7-82i" customClass="RespositoriesViewController" customModule="Trailer" customModuleProvider="target" sceneMemberID="viewController">
@@ -326,7 +326,7 @@
                             </connections>
                         </barButtonItem>
                     </toolbarItems>
-                    <navigationItem key="navigationItem" title="Repositories" id="QfX-C1-a3i">
+                    <navigationItem key="navigationItem" title="Watchlist" id="QfX-C1-a3i">
                         <barButtonItem key="leftBarButtonItem" image="close" style="done" id="mYI-Lo-soT">
                             <connections>
                                 <action selector="done:" destination="qen-v7-82i" id="W4S-ba-b5i"/>
@@ -1075,11 +1075,11 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY
             </objects>
             <point key="canvasLocation" x="1130" y="747"/>
         </scene>
-        <!--Repositories-->
+        <!--Watchlist-->
         <scene sceneID="4VK-bY-2jl">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="hV5-hQ-Klx" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Repositories" image="repos" id="GbY-BF-5eA"/>
+                    <tabBarItem key="tabBarItem" title="Watchlist" image="repos" id="GbY-BF-5eA"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="zTJ-3E-UPj">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>

@@ -53,7 +53,7 @@ final class IssuesDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource
 	}
 
 	func issueAtRow(row: Int) -> Issue? {
-		if let object = issueIds[row] as? NSManagedObjectID {
+		if row >= 0 && row < issueIds.count, let object = issueIds[row] as? NSManagedObjectID {
 			return existingObjectWithID(object) as? Issue
 		} else {
 			return nil
