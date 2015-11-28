@@ -149,6 +149,25 @@ enum RepoDisplayPolicy: Int {
 	}
 }
 
+enum RepoHidingPolicy: Int {
+	case NoHiding, HideMyAuthoredPrs, HideMyAuthoredIssues, HideAllMyAuthoredItems, HideOthersPrs, HideOthersIssues, HideAllOthersItems
+	static let labels = ["No Filter", "Hide My PRs", "Hide My Issues", "Hide All My Items", "Hide Others PRs", "Hide Others Issues", "Hide All Others Items"]
+	static let policies = [NoHiding, HideMyAuthoredPrs, HideMyAuthoredIssues, HideAllMyAuthoredItems, HideOthersPrs, HideOthersIssues, HideAllOthersItems]
+	static let colors = [	COLOR_CLASS.lightGrayColor(),
+							COLOR_CLASS(red: 0.1, green: 0.1, blue: 0.5, alpha: 1.0),
+							COLOR_CLASS(red: 0.1, green: 0.1, blue: 0.5, alpha: 1.0),
+							COLOR_CLASS(red: 0.1, green: 0.1, blue: 0.5, alpha: 1.0),
+							COLOR_CLASS(red: 0.5, green: 0.1, blue: 0.1, alpha: 1.0),
+							COLOR_CLASS(red: 0.5, green: 0.1, blue: 0.1, alpha: 1.0),
+							COLOR_CLASS(red: 0.5, green: 0.1, blue: 0.1, alpha: 1.0)]
+	func name() -> String {
+		return RepoHidingPolicy.labels[rawValue]
+	}
+	func color() -> COLOR_CLASS {
+		return RepoHidingPolicy.colors[rawValue]
+	}
+}
+
 func MAKECOLOR(red: CGFloat, _ green: CGFloat, _ blue: CGFloat, _ alpha: CGFloat) -> COLOR_CLASS {
 	return COLOR_CLASS(red: red, green: green, blue: blue, alpha: alpha)
 }

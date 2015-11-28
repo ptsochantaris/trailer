@@ -144,10 +144,11 @@ class ListableItem: DataItem {
 	final func postProcess() {
 		var targetSection: PullRequestSection
 		let currentCondition = condition?.integerValue ?? PullRequestCondition.Open.rawValue
+		let isMine = createdByMe()
 
 		if currentCondition == PullRequestCondition.Merged.rawValue			{ targetSection = .Merged }
 		else if currentCondition == PullRequestCondition.Closed.rawValue	{ targetSection = .Closed }
-		else if createdByMe() || assignedToMySection()						{ targetSection = .Mine }
+		else if isMine || assignedToMySection()								{ targetSection = .Mine }
 		else if assignedToParticipated() || commentedByMe()					{ targetSection = .Participated }
 		else																{ targetSection = .All }
 
@@ -216,6 +217,37 @@ class ListableItem: DataItem {
 				}
 			case .All:
 				break
+			}
+		}
+
+		if let hidePolicy = RepoHidingPolicy(rawValue: repo.itemHidingPolicy?.integerValue ?? 0) {
+			switch hidePolicy {
+			case .NoHiding:
+				break
+			case .HideMyAuthoredPrs:
+				if isMine && self is PullRequest {
+					targetSection = .None
+				}
+			case .HideMyAuthoredIssues:
+				if isMine && self is Issue {
+					targetSection = .None
+				}
+			case .HideAllMyAuthoredItems:
+				if isMine {
+					targetSection = .None
+				}
+			case .HideOthersPrs:
+				if !isMine && self is PullRequest {
+					targetSection = .None
+				}
+			case .HideOthersIssues:
+				if !isMine && self is Issue {
+					targetSection = .None
+				}
+			case .HideAllOthersItems:
+				if !isMine {
+					targetSection = .None
+				}
 			}
 		}
 

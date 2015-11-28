@@ -330,7 +330,6 @@ user you can add more servers from the left.</string>
                                             <animations/>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                     </subviews>
                                     <animations/>
@@ -349,14 +348,14 @@ user you can add more servers from the left.</string>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" rowHeight="20" headerView="qia-ub-v1J" id="6pK-a1-URw">
-                                                        <rect key="frame" x="0.0" y="0.0" width="707" height="28"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="707" height="237"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <animations/>
                                                         <size key="intercellSpacing" width="8" height="8"/>
                                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                         <tableColumns>
-                                                            <tableColumn identifier="repos" editable="NO" width="463" minWidth="100" maxWidth="10000" id="nW5-Ng-D0l">
+                                                            <tableColumn identifier="repos" editable="NO" width="310" minWidth="100" maxWidth="10000" id="nW5-Ng-D0l">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Watched Repository">
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -368,6 +367,18 @@ user you can add more servers from the left.</string>
                                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                 </textFieldCell>
                                                                 <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
+                                                            </tableColumn>
+                                                            <tableColumn identifier="hide" width="145" minWidth="10" maxWidth="1000" id="pRg-vg-7bD" userLabel="Hide">
+                                                                <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Author Hiding">
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                    <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                                </tableHeaderCell>
+                                                                <popUpButtonCell key="dataCell" type="bevel" bezelStyle="regularSquare" alignment="left" controlSize="small" lineBreakMode="truncatingTail" borderStyle="bezel" imageScaling="proportionallyDown" inset="2" preferredEdge="maxY" id="PWF-Fg-vUg">
+                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                    <font key="font" metaFont="smallSystemBold"/>
+                                                                    <menu key="menu" id="oIy-Kg-Sr2"/>
+                                                                </popUpButtonCell>
                                                             </tableColumn>
                                                             <tableColumn identifier="prs" editable="NO" width="110" minWidth="40" maxWidth="1000" id="FAL-Ui-K4b" userLabel="Pull Requests">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Pull Requests">
@@ -405,7 +416,7 @@ user you can add more servers from the left.</string>
                                             </clipView>
                                             <animations/>
                                             <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="SMx-sS-Tdd">
-                                                <rect key="frame" x="1" y="153" width="684" height="16"/>
+                                                <rect key="frame" x="1" y="238" width="707" height="16"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                                 <animations/>
                                             </scroller>
@@ -415,7 +426,7 @@ user you can add more servers from the left.</string>
                                                 <animations/>
                                             </scroller>
                                             <tableHeaderView key="headerView" id="qia-ub-v1J">
-                                                <rect key="frame" x="0.0" y="0.0" width="684" height="17"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="707" height="17"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                                 <animations/>
                                             </tableHeaderView>
@@ -479,7 +490,6 @@ user you can add more servers from the left.</string>
                                             <animations/>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                         <button verticalHuggingPriority="750" id="u1W-mu-uId">
                                             <rect key="frame" x="553" y="10" width="176" height="32"/>
@@ -512,7 +522,7 @@ user you can add more servers from the left.</string>
                                             </connections>
                                         </popUpButton>
                                         <searchField wantsLayer="YES" verticalHuggingPriority="750" id="Qfh-lH-HFg">
-                                            <rect key="frame" x="14" y="73" width="461" height="22"/>
+                                            <rect key="frame" x="14" y="73" width="310" height="22"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                             <animations/>
                                             <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" placeholderString="Filter..." usesSingleLineMode="YES" bezelStyle="round" id="dZ4-dF-dkV">
@@ -535,6 +545,19 @@ user you can add more servers from the left.</string>
                                             </popUpButtonCell>
                                             <connections>
                                                 <action selector="allIssuesPolicySelected:" target="vQH-WF-vh2" id="5Ps-b5-xSR"/>
+                                            </connections>
+                                        </popUpButton>
+                                        <popUpButton id="8qH-xP-gTK">
+                                            <rect key="frame" x="330" y="71" width="147" height="26"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                            <animations/>
+                                            <popUpButtonCell key="cell" type="bevel" bezelStyle="regularSquare" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="J36-7q-zgd">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="menu"/>
+                                                <menu key="menu" title="State" showsStateColumn="NO" id="wgs-wx-ojZ"/>
+                                            </popUpButtonCell>
+                                            <connections>
+                                                <action selector="allHidingPolicySelected:" target="vQH-WF-vh2" id="Ntp-YN-OWp"/>
                                             </connections>
                                         </popUpButton>
                                     </subviews>
@@ -657,7 +680,6 @@ user you can add more servers from the left.</string>
                                             <animations/>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                         <box autoresizesSubviews="NO" title="Whan something from &quot;all items&quot; is assigned to me..." borderType="line" id="96h-4X-0sU">
                                             <rect key="frame" x="414" y="275" width="316" height="73"/>
@@ -691,7 +713,6 @@ user you can add more servers from the left.</string>
                                             <animations/>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                         <button id="3CV-9S-gLw">
                                             <rect key="frame" x="20" y="153" width="366" height="18"/>
@@ -813,7 +834,6 @@ user you can add more servers from the left.</string>
                                             <animations/>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                         <box title="Sorting" borderType="line" id="fNC-DY-p8H">
                                             <rect key="frame" x="6" y="5" width="406" height="122"/>
@@ -871,7 +891,6 @@ user you can add more servers from the left.</string>
                                             <animations/>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                         <button id="Efg-Id-lOP">
                                             <rect key="frame" x="20" y="323" width="366" height="18"/>
@@ -938,7 +957,6 @@ user you can add more servers from the left.</string>
                                                         <animations/>
                                                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                                        <font key="titleFont" metaFont="message" size="11"/>
                                                     </box>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="6Rs-G3-8sn">
                                                         <rect key="frame" x="12" y="181" width="185" height="17"/>
@@ -1018,7 +1036,6 @@ user you can add more servers from the left.</string>
                                             <animations/>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                     </subviews>
                                     <animations/>
@@ -1137,7 +1154,6 @@ user you can add more servers from the left.</string>
                                             <animations/>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                     </subviews>
                                     <animations/>
@@ -1329,7 +1345,6 @@ to a higher number in order to keep your API usage reasonable</string>
                                             <animations/>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                     </subviews>
                                     <animations/>
@@ -1443,7 +1458,6 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                         <animations/>
                                                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                                        <font key="titleFont" metaFont="message" size="11"/>
                                                     </box>
                                                     <button id="9o8-NV-RgQ">
                                                         <rect key="frame" x="191" y="109" width="337" height="18"/>
@@ -1478,7 +1492,6 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                             <animations/>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                     </subviews>
                                     <animations/>
@@ -1603,7 +1616,6 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                             <animations/>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                     </subviews>
                                     <animations/>
@@ -1620,6 +1632,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
             <contentBorderThickness minY="32"/>
             <connections>
                 <outlet property="activityDisplay" destination="5Hk-e1-cSC" id="0LR-Kz-dDV"/>
+                <outlet property="allHidingSetting" destination="8qH-xP-gTK" id="0Hn-P8-5So"/>
                 <outlet property="allIssuesSetting" destination="gC3-is-WyN" id="z1A-Ml-Vr8"/>
                 <outlet property="allNewIssuesSetting" destination="ZgQ-VU-aMD" id="I7H-lJ-aUx"/>
                 <outlet property="allNewPrsSetting" destination="mod-Tl-ijj" id="uRk-Fa-jzb"/>

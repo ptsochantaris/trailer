@@ -99,11 +99,13 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var hotKeyContainer: NSBox!
 	@IBOutlet weak var hotkeyControlModifier: NSButton!
 
-	// Repos
+	// Watchlist
 	@IBOutlet weak var allPrsSetting: NSPopUpButton!
 	@IBOutlet weak var allIssuesSetting: NSPopUpButton!
+	@IBOutlet weak var allHidingSetting: NSPopUpButton!
 	@IBOutlet weak var allNewPrsSetting: NSPopUpButton!
 	@IBOutlet weak var allNewIssuesSetting: NSPopUpButton!
+
 
 	// Tabs
 	@IBOutlet weak var tabs: NSTabView!
@@ -153,6 +155,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		launchAtStartup.toolTip = "Automatically launch Trailer when you log in."
 		allPrsSetting.toolTip = "Set the PR visibility of all (or the currently selected/filtered) repositories"
 		allIssuesSetting.toolTip = "Set the issue visibility of all (or the currently selected/filtered) repositories"
+		allHidingSetting.toolTip = "Set the any special hiding settings of all (or the currently selected/filtered) repositories"
 		showCreationDates.toolTip = Settings.showCreatedInsteadOfUpdatedHelp
 		markUnmergeableOnUserSectionsOnly.toolTip = Settings.markUnmergeableOnUserSectionsOnlyHelp
 		countOnlyListedItems.toolTip = Settings.countOnlyListedItemsHelp
@@ -206,21 +209,25 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 		allPrsSetting.removeAllItems()
 		allIssuesSetting.removeAllItems()
+		allHidingSetting.removeAllItems()
 
-		let rowCount = projectsTable.selectedRowIndexes.count
-		if rowCount > 1 {
+		if projectsTable.selectedRowIndexes.count > 1 {
 			allPrsSetting.addItemWithTitle("Set selected PRs...")
 			allIssuesSetting.addItemWithTitle("Set selected issues...")
+			allHidingSetting.addItemWithTitle("Set selected hiding...")
 		} else if !repoFilter.stringValue.isEmpty {
 			allPrsSetting.addItemWithTitle("Set filtered PRs...")
 			allIssuesSetting.addItemWithTitle("Set filtered issues...")
+			allHidingSetting.addItemWithTitle("Set filtered hiding...")
 		} else {
 			allPrsSetting.addItemWithTitle("Set all PRs...")
 			allIssuesSetting.addItemWithTitle("Set all issues...")
+			allHidingSetting.addItemWithTitle("Set all hiding...")
 		}
 
 		allPrsSetting.addItemsWithTitles(RepoDisplayPolicy.labels)
 		allIssuesSetting.addItemsWithTitles(RepoDisplayPolicy.labels)
+		allHidingSetting.addItemsWithTitles(RepoHidingPolicy.labels)
 	}
 
 	func reloadSettings() {
@@ -507,6 +514,18 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		for r in affectedReposFromSelection() {
 			r.displayPolicyForIssues = index
 			if index != RepoDisplayPolicy.Hide.rawValue { r.resetSyncState() }
+		}
+		projectsTable.reloadData()
+		sender.selectItemAtIndex(0)
+		updateDisplayIssuesSetting()
+	}
+
+	@IBAction func allHidingPolicySelected(sender: NSPopUpButton) {
+		let index = sender.indexOfSelectedItem - 1
+		if index < 0 { return }
+
+		for r in affectedReposFromSelection() {
+			r.itemHidingPolicy = index
 		}
 		projectsTable.reloadData()
 		sender.selectItemAtIndex(0)
@@ -1072,18 +1091,30 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 						var count = 0
 						let fontSize = NSFont.systemFontSizeForControlSize(NSControlSize.SmallControlSize)
-						for policy in RepoDisplayPolicy.policies {
-							let m = NSMenuItem()
-							m.attributedTitle = NSAttributedString(string: policy.name(), attributes: [
-								NSFontAttributeName: count==0 ? NSFont.systemFontOfSize(fontSize) : NSFont.boldSystemFontOfSize(fontSize),
-								NSForegroundColorAttributeName: policy.color(),
-								])
-							menuCell.menu?.addItem(m)
-							count++
+						if tableColumn?.identifier == "hide" {
+							for policy in RepoHidingPolicy.policies {
+								let m = NSMenuItem()
+								m.attributedTitle = NSAttributedString(string: policy.name(), attributes: [
+									NSFontAttributeName: count==0 ? NSFont.systemFontOfSize(fontSize) : NSFont.boldSystemFontOfSize(fontSize),
+									NSForegroundColorAttributeName: policy.color(),
+									])
+								menuCell.menu?.addItem(m)
+								count++
+							}
+							menuCell.selectItemAtIndex(r.itemHidingPolicy?.integerValue ?? 0)
+						} else {
+							for policy in RepoDisplayPolicy.policies {
+								let m = NSMenuItem()
+								m.attributedTitle = NSAttributedString(string: policy.name(), attributes: [
+									NSFontAttributeName: count==0 ? NSFont.systemFontOfSize(fontSize) : NSFont.boldSystemFontOfSize(fontSize),
+									NSForegroundColorAttributeName: policy.color(),
+									])
+								menuCell.menu?.addItem(m)
+								count++
+							}
+							let selectedIndex = tableColumn?.identifier == "prs" ? (r.displayPolicyForPrs?.integerValue ?? 0) : (r.displayPolicyForIssues?.integerValue ?? 0)
+							menuCell.selectItemAtIndex(selectedIndex)
 						}
-
-						let selectedIndex = tableColumn?.identifier == "prs" ? (r.displayPolicyForPrs?.integerValue ?? 0) : (r.displayPolicyForIssues?.integerValue ?? 0)
-						menuCell.selectItemAtIndex(selectedIndex)
 					}
 				}
 			}
@@ -1141,6 +1172,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 						r.displayPolicyForPrs = index
 					} else if tableColumn?.identifier == "issues" {
 						r.displayPolicyForIssues = index
+					} else if tableColumn?.identifier == "hide" {
+						r.itemHidingPolicy = index
 					}
 					if index != RepoDisplayPolicy.Hide.rawValue {
 						r.resetSyncState()

@@ -12,6 +12,7 @@ final class Repo: DataItem {
     @NSManaged var webUrl: String?
 	@NSManaged var displayPolicyForPrs: NSNumber?
 	@NSManaged var displayPolicyForIssues: NSNumber?
+	@NSManaged var itemHidingPolicy: NSNumber?
 	@NSManaged var pullRequests: Set<PullRequest>
 	@NSManaged var issues: Set<Issue>
 
