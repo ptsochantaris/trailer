@@ -446,8 +446,8 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 	}
 
-	override func controlTextDidChange(n: NSNotification?) {
-		if let obj: AnyObject = n?.object {
+	override func controlTextDidChange(n: NSNotification) {
+		if let obj = n.object as? NSSearchField {
 			if obj===prMenu.filter {
 				prFilterTimer.push()
 			} else if obj===issuesMenu.filter {
@@ -970,6 +970,9 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					}
 					return nil
 				case 36: // enter
+					if let c = NSTextInputContext.currentInputContext() where c.client.hasMarkedText() {
+						return incomingEvent
+					}
 					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
 					if let dataItem = self!.dataItemAtRow(w.table.selectedRow, inMenu: w) {
 						let isAlternative = ((incomingEvent.modifierFlags.intersect(NSEventModifierFlags.AlternateKeyMask)) == NSEventModifierFlags.AlternateKeyMask)
