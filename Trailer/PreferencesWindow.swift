@@ -64,6 +64,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
     @IBOutlet weak var includeServersInFiltering: NSButton!
     @IBOutlet weak var includeUsersInFiltering: NSButton!
 	@IBOutlet weak var includeNumbersInFiltering: NSButton!
+	@IBOutlet weak var refreshReposLabel: NSTextField!
+	@IBOutlet weak var refreshItemsLabel: NSTextField!
 
 	// Labels
 	@IBOutlet weak var labelRescanLabel: NSTextField!
@@ -119,6 +121,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		allNewPrsSetting.addItemsWithTitles(RepoDisplayPolicy.labels)
 		allNewIssuesSetting.addItemsWithTitles(RepoDisplayPolicy.labels)
 
+		addTooltips()
 		reloadSettings()
 
 		versionNumber.stringValue = versionString()
@@ -134,6 +137,67 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	deinit {
 		NSNotificationCenter.defaultCenter().removeObserver(serverList)
 		NSNotificationCenter.defaultCenter().removeObserver(self)
+	}
+
+	private func addTooltips() {
+		serverList.toolTip = "The list of GitHub API servers that Trailer will attempt to sync data from. You can edit each server's details from the pane on the right. Bear in mind that some servers, like the public GitHub server for instance, have strict API volume limits, and syncing too many repos or items too often can result in API usage going over the limit. You can monitor your usage fro the bar next tot he server's name. If it is red, you're close to maximum. Your API usage is reset every hour."
+		apiServerName.toolTip = "An internal name you want to use to refer to this server."
+		apiServerApiPath.toolTip = "The full URL of the root of the API endpoints for this server. The placeholder text shows examples for GitHub and GitHub Enterprise servers, but your own custom configuration may vary."
+		apiServerWebPath.toolTip = "This is the root of the web front-end of your server. It is used for constructing the paths to open your watchlist and API key management links. Other than that it is not used to sync data."
+		apiServerReportError.toolTip = "If this is checked, Trailer will display a red 'X' symbol on your menubar if sync fails with this server. It is usually a good idea to keep this on, but you may want to turn it off if a specific server isn't always reacahble, for instance."
+		projectsTable.toolTip = "These are all your watched repositories. Trailer scans your watchlist on all the servers you have added and adds your repositories to this combined watchlist. You can visit and edit your watchlist on each server from the link provided on that server's entry on the 'Servers' tab. You can keep clutter low by editing the visibility of items from each repository from the dropdown menus on the right."
+		repoFilter.toolTip = "Quickly find a repository you are looking for by typing some text in there. Productivity tip: If you use the buttons on the right to set visibility of 'all' items, those settings will apply to only the visible filtered items."
+		allNewPrsSetting.toolTip = "The visibility settings you would like to apply by default for Pull Requests if a new repository is added in your watchlist."
+		allNewIssuesSetting.toolTip = "The visibility settings you would like to apply by default for Pull Requests if a new repository is added in your watchlist."
+		refreshButton.toolTip = "Reload all watchlists now. Normally Trailer does this by itself every few hours. You can control how often from the 'Display' tab."
+		launchAtStartup.toolTip = "Automatically launch Trailer when you log in."
+		showCreationDates.toolTip = Settings.showCreatedInsteadOfUpdatedHelp
+		markUnmergeableOnUserSectionsOnly.toolTip = Settings.markUnmergeableOnUserSectionsOnlyHelp
+		countOnlyListedItems.toolTip = Settings.countOnlyListedItemsHelp
+		displayRepositoryNames.toolTip = Settings.showReposInNameHelp
+		useVibrancy.toolTip = Settings.useVibrancyHelp
+		hideAvatars.toolTip = Settings.hideAvatarsHelp
+		sortModeSelect.toolTip = Settings.sortMethodHelp
+		sortingOrder.toolTip = Settings.sortDescendingHelp
+		groupByRepo.toolTip = Settings.groupByRepoHelp
+		assignedPrHandlingPolicy.toolTip = Settings.assignedPrHandlingPolicyHelp
+		includeTitlesInFiltering.toolTip = Settings.includeTitlesInFilterHelp
+		includeLabelsInFiltering.toolTip = Settings.includeLabelsInFilterHelp
+		includeRepositoriesInFiltering.toolTip = Settings.includeReposInFilterHelp
+		includeServersInFiltering.toolTip = Settings.includeServersInFilterHelp
+		includeStatusesInFiltering.toolTip = Settings.includeStatusesInFilterHelp
+		includeUsersInFiltering.toolTip = Settings.includeUsersInFilterHelp
+		includeNumbersInFiltering.toolTip = Settings.includeNumbersInFilterHelp
+		grayOutWhenRefreshing.toolTip = Settings.grayOutWhenRefreshingHelp
+		refreshReposLabel.toolTip = Settings.newRepoCheckPeriodHelp
+		repoCheckStepper.toolTip = Settings.newRepoCheckPeriodHelp
+		refreshItemsLabel.toolTip = Settings.refreshPeriodHelp
+		refreshDurationStepper.toolTip = Settings.refreshPeriodHelp
+		prMergedPolicy.toolTip = Settings.mergeHandlingPolicyHelp
+		prClosedPolicy.toolTip = Settings.closeHandlingPolicyHelp
+		dontKeepPrsMergedByMe.toolTip = Settings.dontKeepPrsMergedByMeHelp
+		dontConfirmRemoveAllClosed.toolTip = Settings.dontAskBeforeWipingClosedHelp
+		dontConfirmRemoveAllMerged.toolTip = Settings.dontAskBeforeWipingMergedHelp
+		showAllComments.toolTip = Settings.showCommentsEverywhereHelp
+		hideUncommentedPrs.toolTip = Settings.hideUncommentedItemsHelp
+		openPrAtFirstUnreadComment.toolTip = Settings.openPrAtFirstUnreadCommentHelp
+		autoParticipateWhenMentioned.toolTip = Settings.autoParticipateInMentionsHelp
+		autoParticipateOnTeamMentions.toolTip = Settings.autoParticipateOnTeamMentionsHelp
+		disableAllCommentNotifications.toolTip = Settings.disableAllCommentNotificationsHelp
+		showLabels.toolTip = Settings.showLabelsHelp
+		showStatusItems.toolTip = Settings.showStatusItemsHelp
+		statusItemRefreshCounter.toolTip = Settings.statusItemRefreshIntervalHelp
+		statusItemRescanLabel.toolTip = Settings.statusItemRefreshIntervalHelp
+		labelRefreshCounter.toolTip = Settings.labelRefreshIntervalHelp
+		labelRescanLabel.toolTip = Settings.labelRefreshIntervalHelp
+		makeStatusItemsSelectable.toolTip = Settings.makeStatusItemsSelectableHelp
+		notifyOnStatusUpdates.toolTip = Settings.notifyOnStatusUpdatesHelp
+		notifyOnStatusUpdatesForAllPrs.toolTip = Settings.notifyOnStatusUpdatesForAllPrsHelp
+		hidePrsThatDontPass.toolTip = Settings.hidePrsThatArentPassingHelp
+		statusTermMenu.toolTip = Settings.statusFilteringTermsHelp
+		logActivityToConsole.toolTip = Settings.logActivityToConsoleHelp
+		dumpApiResponsesToConsole.toolTip = Settings.dumpAPIResponsesInConsoleHelp
+		checkForUpdatesAutomatically.toolTip = Settings.checkForUpdatesAutomaticallyHelp
 	}
 
 	private func updateAllItemSettingButtons() {
@@ -219,7 +283,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		hotkeyLetter.selectItemWithTitle(Settings.hotkeyLetter)
 
 		refreshUpdatePreferences()
-
 		updateStatusItemsOptions()
 		updateLabelOptions()
 		updateHistoryOptions()
@@ -528,7 +591,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		notifyOnStatusUpdates.enabled = enable
 		notifyOnStatusUpdatesForAllPrs.enabled = enable
 		statusTermMenu.enabled = enable
-		statusTermsField.enabled = enable
 		statusItemRefreshCounter.enabled = enable
 		statusItemRescanLabel.alphaValue = enable ? 1.0 : 0.5
 		statusItemsRefreshNote.alphaValue = enable ? 1.0 : 0.5
@@ -538,6 +600,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		let count = Settings.statusItemRefreshInterval
 		statusItemRefreshCounter.integerValue = count
 		statusItemRescanLabel.stringValue = count>1 ? "...and re-scan once every \(count) refreshes" : "...and re-scan on every refresh"
+
+		updateStatusTermPreferenceControls()
 	}
 
 	private func updateLabelOptions() {
@@ -795,7 +859,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		else
 		{
 			statusTermsField.enabled = false
-			statusTermsField.alphaValue = 0.8
+			statusTermsField.alphaValue = 0.5
 		}
 		statusTermsField.objectValue = Settings.statusFilteringTerms
 	}

@@ -277,13 +277,13 @@ final class Settings {
 		set { set("MERGE_HANDLING_POLICY_2", newValue) }
 	}
 
-	static let statusItemRefreshIntervalHelp = "Because querying statuses can be bandwidth-intensive, if you have alot of items in your lists, you may want to raise this to a higher value. You can always see how much API usage you have left per-hour from the server tab."
+	static let statusItemRefreshIntervalHelp = "Because querying statuses can be bandwidth-intensive, if you have alot of items in your lists, you may want to raise this to a higher value. You can always see how much API usage you have left per-hour from the 'Servers' tab."
 	class var statusItemRefreshInterval: Int {
 		get { if let n = get("STATUS_ITEM_REFRESH_COUNT") as? Int { return n>0 ? n : 10 } else { return 10 } }
 		set { set("STATUS_ITEM_REFRESH_COUNT", newValue) }
 	}
 
-	static let labelRefreshIntervalHelp = "Querying labels can be moderately bandwidth-intensive, but it does involve making some extra API calls. Since labels don't change often, you may want to raise this to a higher value if you have alot of items on your lists. You can always see how much API usage you have left per-hour from the server tab."
+	static let labelRefreshIntervalHelp = "Querying labels can be moderately bandwidth-intensive, but it does involve making some extra API calls. Since labels don't change often, you may want to raise this to a higher value if you have alot of items on your lists. You can always see how much API usage you have left per-hour from the 'Servers' tab."
 	class var labelRefreshInterval: Int {
 		get { if let n = get("LABEL_REFRESH_COUNT") as? Int { return n>0 ? n : 4 } else { return 4 } }
 		set { set("LABEL_REFRESH_COUNT", newValue) }
@@ -294,6 +294,7 @@ final class Settings {
 		set { set("UPDATE_CHECK_INTERVAL_KEY", newValue) }
 	}
 
+	static let assignedPrHandlingPolicyHelp = "If an item is assigned to you, Trailer can move it to a specific section or leave it as-is."
 	class var assignedPrHandlingPolicy: Int {
 		get { return get("ASSIGNED_PR_HANDLING_POLICY") as? Int ?? 1 }
 		set { set("ASSIGNED_PR_HANDLING_POLICY", newValue) }
@@ -313,6 +314,7 @@ final class Settings {
 
 	/////////////////////////// STRINGS
 
+	static let statusFilteringTermsHelp = "You can specify specific terms which can then be matched against status items, in order to hide or show them."
 	class var statusFilteringTerms: [String] {
 		get { return get("STATUS_FILTERING_TERMS_KEY") as? [String] ?? [] }
 		set { set("STATUS_FILTERING_TERMS_KEY", newValue) }
@@ -352,7 +354,7 @@ final class Settings {
 		}
 	}
 
-	static let newRepoCheckPeriodHelp = "How long before reloading your team list and watched repositories from the server. Since this doesn't change often, it's good to keep this as high as possible in order to keep bandwidth use during refreshes as low as possible. Set this to a low value if you often update your watched repositories or teams."
+	static let newRepoCheckPeriodHelp = "How long before reloading your team list and watched repositories from a server. Since this doesn't change often, it's good to keep this as high as possible in order to keep bandwidth use as low as possible during refreshes. Set this to a lower value if you often update your watched repositories or teams."
 	class var newRepoCheckPeriod: Float {
 		get { if let n = get("NEW_REPO_CHECK_PERIOD") as? Float { return max(n, 2) } else { return 2 } }
 		set { set("NEW_REPO_CHECK_PERIOD", newValue) }
@@ -415,6 +417,7 @@ final class Settings {
 		set { set("DONT_KEEP_MY_PRS_KEY", newValue) }
 	}
 
+	static let hideAvatarsHelp = "Hide the image of the author's avatar which is usually shown on the left of listed items"
 	class var hideAvatars: Bool {
 		get { return get("HIDE_AVATARS_KEY") as? Bool ?? false }
 		set { set("HIDE_AVATARS_KEY", newValue) }
@@ -456,6 +459,7 @@ final class Settings {
 		set { set("SHOW_STATUS_ITEMS", newValue) }
 	}
 
+	static let makeStatusItemsSelectableHelp = "Normally you have to Cmd-click on status items to visit their relayed links, this option makes them always selectable, but it makes it easier to accidentally end up opening a status item page instead of an item's page."
 	class var makeStatusItemsSelectable: Bool {
 		get { return get("MAKE_STATUS_ITEMS_SELECTABLE") as? Bool ?? false }
 		set { set("MAKE_STATUS_ITEMS_SELECTABLE", newValue) }
@@ -473,7 +477,7 @@ final class Settings {
 		set { set("OPEN_PR_AT_FIRST_UNREAD_COMMENT_KEY", newValue) }
 	}
 
-	static let logActivityToConsoleHelp = "This is meant for troubleshooting and should be turned off usually, as it is a performance and security concern. It will output detailed messages about the app's behaviour in the device console."
+	static let logActivityToConsoleHelp = "This is meant for troubleshooting and should be turned off usually, as it is a performance and security concern when activated. It will output detailed messages about the app's behaviour in the device console."
 	class var logActivityToConsole: Bool {
 		get {
         #if DEBUG
@@ -541,13 +545,13 @@ final class Settings {
 		set { set("DONT_CONFIRM_SETTINGS_IMPORT", newValue) }
 	}
 
-	static let includeServersInFilterHelp = "Check the name of the server an item came from when selecting it for inclusion in filtered results."
+	static let includeServersInFilterHelp = "Check the name of the server an item came from when selecting it for inclusion in filtered results. You can also prefix a search with 'server:' to specifically search for this."
     class var includeServersInFilter: Bool {
         get { return get("INCLUDE_SERVERS_IN_FILTER") as? Bool ?? false }
         set { set("INCLUDE_SERVERS_IN_FILTER", newValue) }
     }
 
-	static let dumpAPIResponsesInConsoleHelp = "This is meant for troubleshooting and should be turned off usually, as it is a performance and security concern. It will output the full request and responses to and from API servers in the device console."
+	static let dumpAPIResponsesInConsoleHelp = "This is meant for troubleshooting and should be turned off usually, as it is a performance and security concern when activated. It will output the full request and responses to and from API servers in the device console."
 	class var dumpAPIResponsesInConsole: Bool {
 		get { return get("DUMP_API_RESPONSES_IN_CONSOLE") as? Bool ?? false }
 		set { set("DUMP_API_RESPONSES_IN_CONSOLE", newValue) }
@@ -567,16 +571,19 @@ final class Settings {
 
 	////////////////////////////// DEFAULT TRUE
 
+	static let useVibrancyHelp = "Use Mac OS X Vibrancy to display the Trailer drop-down menu, if available on the current OS version. If the OS doesn't support this, this setting has no effect."
 	class var useVibrancy: Bool {
 		get { return get("USE_VIBRANCY_UI") as? Bool ?? true }
 		set { set("USE_VIBRANCY_UI", newValue) }
 	}
 
+	static let countOnlyListedItemsHelp = "Show the number of items currently visible in Trailer in the menu bar. If this is unselected, the menubar will display the count of all open items in the current watchlist, irrespective of filters or visibility settings. It's recommended you keep this on."
     class var countOnlyListedItems: Bool {
         get { return get("COUNT_ONLY_LISTED_PRS") as? Bool ?? true }
         set { set("COUNT_ONLY_LISTED_PRS", newValue) }
     }
 
+	static let checkForUpdatesAutomaticallyHelp = "Check for updates to Trailer automatically. It is generally a very good idea to keep this selected, unless you are using an external package manager to manage the updates."
 	class var checkForUpdatesAutomatically: Bool {
 		get { return get("UPDATE_CHECK_AUTO_KEY") as? Bool ?? true }
 		set { set("UPDATE_CHECK_AUTO_KEY", newValue) }
@@ -588,37 +595,37 @@ final class Settings {
 		set { set("SHOW_REPOS_IN_NAME", newValue) }
 	}
 
-	static let includeTitlesInFilterHelp = "Check item titles when selecting items for inclusion in filtered results."
+	static let includeTitlesInFilterHelp = "Check item titles when selecting items for inclusion in filtered results. You can also prefix a search with 'title:' to specifically search for this."
 	class var includeTitlesInFilter: Bool {
 		get { return get("INCLUDE_TITLES_IN_FILTER") as? Bool ?? true }
 		set { set("INCLUDE_TITLES_IN_FILTER", newValue) }
 	}
 
-	static let includeNumbersInFilterHelp = "Check the PR/Issue number of the item when selecting it for inclusion in filtered results."
+	static let includeNumbersInFilterHelp = "Check the PR/Issue number of the item when selecting it for inclusion in filtered results. You can also prefix a search with 'number:' to specifically search for this."
 	class var includeNumbersInFilter: Bool {
 		get { return get("INCLUDE_NUMBERS_IN_FILTER") as? Bool ?? false }
 		set { set("INCLUDE_NUMBERS_IN_FILTER", newValue) }
 	}
 
-	static let includeReposInFilterHelp = "Check repository names when selecting items for inclusion in filtered results."
+	static let includeReposInFilterHelp = "Check repository names when selecting items for inclusion in filtered results. You can also prefix a search with 'repo:' to specifically search for this."
 	class var includeReposInFilter: Bool {
 		get { return get("INCLUDE_REPOS_IN_FILTER") as? Bool ?? true }
 		set { set("INCLUDE_REPOS_IN_FILTER", newValue) }
 	}
 
-	static let includeLabelsInFilterHelp = "Check labels of items when selecting items for inclusion in filtered results."
+	static let includeLabelsInFilterHelp = "Check labels of items when selecting items for inclusion in filtered results. You can also prefix a search with 'label:' to specifically search for this."
 	class var includeLabelsInFilter: Bool {
 		get { return get("INCLUDE_LABELS_IN_FILTER") as? Bool ?? true }
 		set { set("INCLUDE_LABELS_IN_FILTER", newValue) }
 	}
 
-	static let includeUsersInFilterHelp = "Check the name of the author of an item when selecting it for inclusion in filtered results."
+	static let includeUsersInFilterHelp = "Check the name of the author of an item when selecting it for inclusion in filtered results. You can also prefix a search with 'user:' to specifically search for this."
     class var includeUsersInFilter: Bool {
         get { return get("INCLUDE_USERS_IN_FILTER") as? Bool ?? true }
         set { set("INCLUDE_USERS_IN_FILTER", newValue) }
     }
 
-	static let includeStatusesInFilterHelp = "Check status lines of items when selecting items for inclusion in filtered results."
+	static let includeStatusesInFilterHelp = "Check status lines of items when selecting items for inclusion in filtered results. You can also prefix a search with 'status:' to specifically search for this."
 	class var includeStatusesInFilter: Bool {
 		get { return get("INCLUDE_STATUSES_IN_FILTER") as? Bool ?? true }
 		set { set("INCLUDE_STATUSES_IN_FILTER", newValue) }
@@ -639,6 +646,7 @@ final class Settings {
 		set { set("HOTKEY_SHIFT_MODIFIER", newValue) }
 	}
 
+	static let grayOutWhenRefreshingHelp = "Gray out the menubar icon when refreshing data from the configured servers. You may want to turn this off if you find that distracting or use a menu bar management tool that automatically highlights menubar items which get updated"
     class var grayOutWhenRefreshing: Bool {
 		get { return get("GRAY_OUT_WHEN_REFRESHING") as? Bool ?? true }
 		set { set("GRAY_OUT_WHEN_REFRESHING", newValue) }

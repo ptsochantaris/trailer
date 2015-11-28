@@ -483,7 +483,7 @@ user you can add more servers from the left.</string>
                                             <rect key="frame" x="553" y="10" width="176" height="32"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                             <animations/>
-                                            <buttonCell key="cell" type="push" title="Refresh Repos Now" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="rFG-sc-WB2">
+                                            <buttonCell key="cell" type="push" title="Reload Watchlist Now" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="rFG-sc-WB2">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
@@ -775,7 +775,7 @@ user you can add more servers from the left.</string>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" id="ixu-zC-YfY">
                                                             <font key="font" metaFont="miniSystem"/>
                                                             <string key="title">Additionally, you can use title: server: label: repo: user: number: and status: to filter specific properties, e.g. "label:bug,suggestion"</string>
-                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
@@ -792,7 +792,7 @@ user you can add more servers from the left.</string>
                                                         </connections>
                                                     </button>
                                                     <button id="xzP-Bb-u07">
-                                                        <rect key="frame" x="24" y="12" width="144" height="18"/>
+                                                        <rect key="frame" x="16" y="12" width="152" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <buttonCell key="cell" type="check" title="PR &amp; Issue numbers" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="5z6-1p-c6d">
@@ -1184,14 +1184,14 @@ user you can add more servers from the left.</string>
                                                         <rect key="frame" x="16" y="89" width="489" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
-                                                        <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="cqY-EB-jjP">
+                                                        <popUpButtonCell key="cell" type="push" title="Only show status items that include any of the terms below:" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="c1f-8Q-BIX" id="cqY-EB-jjP">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="menu"/>
                                                             <menu key="menu" title="StatusFiltering" showsStateColumn="NO" id="x9N-6I-pDY">
                                                                 <items>
                                                                     <menuItem title="Show all status items" id="WSn-zq-R94"/>
-                                                                    <menuItem title="Only show status items that include any of the following terms" id="c1f-8Q-BIX"/>
-                                                                    <menuItem title="Exclude status items that include any of the following terms" id="7G3-tH-zp4"/>
+                                                                    <menuItem title="Only show status items that include any of the terms below:" state="on" id="c1f-8Q-BIX"/>
+                                                                    <menuItem title="Exclude status items that include any of the terms below:" id="7G3-tH-zp4"/>
                                                                 </items>
                                                             </menu>
                                                         </popUpButtonCell>
@@ -1203,7 +1203,7 @@ user you can add more servers from the left.</string>
                                                         <rect key="frame" x="18" y="10" width="484" height="78"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
-                                                        <tokenFieldCell key="cell" selectable="YES" editable="YES" borderStyle="bezel" alignment="left" placeholderString="Comma separated list of terms" drawsBackground="YES" allowsEditingTextAttributes="YES" id="5ep-1e-o3q">
+                                                        <tokenFieldCell key="cell" selectable="YES" editable="YES" borderStyle="bezel" alignment="left" placeholderString="Comma separated list of terms for the above" drawsBackground="YES" allowsEditingTextAttributes="YES" id="5ep-1e-o3q">
                                                             <font key="font" metaFont="system"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1230,7 +1230,7 @@ user you can add more servers from the left.</string>
                                                             <string key="title">Status items need to be rescanned fully in order be updated.  If you
 usually manage alot of PRs, then you may want to set this value
 to a higher number in order to keep your API usage reasonable</string>
-                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
@@ -1262,7 +1262,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                             <string key="title">Labels need to be rescanned fully in order be updated.  If you
 usually manage alot of items, then you may want to set this value
 to a higher number in order to keep your API usage reasonable</string>
-                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
@@ -1291,10 +1291,10 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </connections>
                                                     </button>
                                                     <button id="5WZ-7z-gJ2">
-                                                        <rect key="frame" x="17" y="124" width="299" height="18"/>
+                                                        <rect key="frame" x="17" y="124" width="306" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
-                                                        <buttonCell key="cell" type="check" title="Hide PRs whose status items are not all green" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="cw8-e1-f8e">
+                                                        <buttonCell key="cell" type="check" title="Hide PRs whose statuss items are not all green" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="cw8-e1-f8e">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
@@ -1345,7 +1345,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                             <font key="font" metaFont="toolTip"/>
                                                             <string key="title">Important: When enabling this for the first time you will be asked to provide permission for Trailer to use the keyboard
 in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the permission to take effect!</string>
-                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
@@ -1670,6 +1670,8 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="refreshButton" destination="u1W-mu-uId" id="hOr-8y-HxK"/>
                 <outlet property="refreshDurationLabel" destination="Zu0-k7-csJ" id="5yQ-AM-EsR"/>
                 <outlet property="refreshDurationStepper" destination="INA-l0-fZh" id="35s-aN-LXk"/>
+                <outlet property="refreshItemsLabel" destination="Zu0-k7-csJ" id="AO0-BB-6OZ"/>
+                <outlet property="refreshReposLabel" destination="XcM-W3-Ec0" id="JeY-7D-ssA"/>
                 <outlet property="repeatLastExportAutomatically" destination="pwT-Fi-3FC" id="KcG-kA-cIo"/>
                 <outlet property="repoCheckLabel" destination="XcM-W3-Ec0" id="xdn-MT-IXs"/>
                 <outlet property="repoCheckStepper" destination="ThS-Id-Gqm" id="Cfs-Fa-4ac"/>
