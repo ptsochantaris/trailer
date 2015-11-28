@@ -145,12 +145,14 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		apiServerApiPath.toolTip = "The full URL of the root of the API endpoints for this server. The placeholder text shows examples for GitHub and GitHub Enterprise servers, but your own custom configuration may vary."
 		apiServerWebPath.toolTip = "This is the root of the web front-end of your server. It is used for constructing the paths to open your watchlist and API key management links. Other than that it is not used to sync data."
 		apiServerReportError.toolTip = "If this is checked, Trailer will display a red 'X' symbol on your menubar if sync fails with this server. It is usually a good idea to keep this on, but you may want to turn it off if a specific server isn't always reacahble, for instance."
-		projectsTable.toolTip = "These are all your watched repositories. Trailer scans your watchlist on all the servers you have added and adds your repositories to this combined watchlist. You can visit and edit your watchlist on each server from the link provided on that server's entry on the 'Servers' tab. You can keep clutter low by editing the visibility of items from each repository from the dropdown menus on the right."
+		projectsTable.toolTip = "These are all your watched repositories.\n\nTrailer scans the watchlists of all the servers you have configured and adds the repositories to this combined watchlist.\n\nYou can visit and edit the watchlist of each server from the link provided on that server's entry on the 'Servers' tab.\n\nYou can keep clutter low by editing the visibility of items from each repository with the dropdown menus on the right."
 		repoFilter.toolTip = "Quickly find a repository you are looking for by typing some text in there. Productivity tip: If you use the buttons on the right to set visibility of 'all' items, those settings will apply to only the visible filtered items."
 		allNewPrsSetting.toolTip = "The visibility settings you would like to apply by default for Pull Requests if a new repository is added in your watchlist."
 		allNewIssuesSetting.toolTip = "The visibility settings you would like to apply by default for Pull Requests if a new repository is added in your watchlist."
 		refreshButton.toolTip = "Reload all watchlists now. Normally Trailer does this by itself every few hours. You can control how often from the 'Display' tab."
 		launchAtStartup.toolTip = "Automatically launch Trailer when you log in."
+		allPrsSetting.toolTip = "Set the PR visibility of all (or the currently selected/filtered) repositories"
+		allIssuesSetting.toolTip = "Set the issue visibility of all (or the currently selected/filtered) repositories"
 		showCreationDates.toolTip = Settings.showCreatedInsteadOfUpdatedHelp
 		markUnmergeableOnUserSectionsOnly.toolTip = Settings.markUnmergeableOnUserSectionsOnlyHelp
 		countOnlyListedItems.toolTip = Settings.countOnlyListedItemsHelp
@@ -209,6 +211,9 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		if rowCount > 1 {
 			allPrsSetting.addItemWithTitle("Set selected PRs...")
 			allIssuesSetting.addItemWithTitle("Set selected issues...")
+		} else if !repoFilter.stringValue.isEmpty {
+			allPrsSetting.addItemWithTitle("Set filtered PRs...")
+			allIssuesSetting.addItemWithTitle("Set filtered issues...")
 		} else {
 			allPrsSetting.addItemWithTitle("Set all PRs...")
 			allIssuesSetting.addItemWithTitle("Set all issues...")
@@ -982,6 +987,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 				}
 			} else if obj===repoFilter {
 				projectsTable.reloadData()
+				updateAllItemSettingButtons()
 			} else if obj===statusTermsField {
 				let existingTokens = Settings.statusFilteringTerms
 				let newTokens = statusTermsField.objectValue as! [String]
