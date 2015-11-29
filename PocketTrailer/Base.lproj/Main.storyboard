@@ -263,43 +263,43 @@
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" horizontalCompressionResistancePriority="1000" text="PRs Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8Jg-Ke-drL">
-                                            <rect key="frame" x="484" y="33" width="80" height="17"/>
+                                            <rect key="frame" x="484" y="24" width="80" height="17"/>
                                             <animations/>
                                             <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="252" horizontalCompressionResistancePriority="1000" text="Issues Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gUI-6X-Umg">
-                                            <rect key="frame" x="484" y="54" width="80" height="17"/>
+                                            <rect key="frame" x="484" y="43" width="80" height="17"/>
                                             <animations/>
                                             <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
-                                        <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="she-8D-rp5" userLabel="Spacing View">
-                                            <rect key="frame" x="484" y="50" width="44" height="4"/>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="252" horizontalCompressionResistancePriority="1000" text="Hiding Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hRe-my-dR9">
+                                            <rect key="frame" x="483" y="62" width="81" height="17"/>
                                             <animations/>
-                                            <color key="backgroundColor" red="0.86274509799999999" green="0.0" blue="0.18039215689999999" alpha="1" colorSpace="calibratedRGB"/>
-                                            <constraints>
-                                                <constraint firstAttribute="height" constant="4" id="DAs-wQ-eRS"/>
-                                                <constraint firstAttribute="width" constant="44" id="ZS2-jH-k9d"/>
-                                            </constraints>
-                                        </view>
+                                            <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
+                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
                                     </subviews>
                                     <animations/>
                                     <constraints>
+                                        <constraint firstItem="hRe-my-dR9" firstAttribute="top" secondItem="gUI-6X-Umg" secondAttribute="bottom" constant="2" id="0pv-wd-ftA"/>
+                                        <constraint firstItem="hRe-my-dR9" firstAttribute="trailing" secondItem="gUI-6X-Umg" secondAttribute="trailing" id="3p9-ys-ZoA"/>
                                         <constraint firstItem="gUI-6X-Umg" firstAttribute="leading" secondItem="X5f-oi-V1t" secondAttribute="trailing" constant="12" id="5sk-N2-bCR"/>
-                                        <constraint firstItem="she-8D-rp5" firstAttribute="centerY" secondItem="X5f-oi-V1t" secondAttribute="centerY" id="8wd-BK-WlL"/>
+                                        <constraint firstItem="8Jg-Ke-drL" firstAttribute="trailing" secondItem="gUI-6X-Umg" secondAttribute="trailing" id="CHN-ft-Oar"/>
                                         <constraint firstAttribute="trailingMargin" secondItem="gUI-6X-Umg" secondAttribute="trailing" constant="-5" id="Ddo-Qp-zL0"/>
-                                        <constraint firstItem="gUI-6X-Umg" firstAttribute="top" secondItem="she-8D-rp5" secondAttribute="bottom" id="J10-1E-eXf"/>
+                                        <constraint firstItem="gUI-6X-Umg" firstAttribute="top" secondItem="8Jg-Ke-drL" secondAttribute="bottom" constant="2" id="NKb-Ae-yH4"/>
                                         <constraint firstAttribute="leadingMargin" secondItem="X5f-oi-V1t" secondAttribute="leading" constant="-8" id="OcK-rV-ify"/>
-                                        <constraint firstAttribute="bottomMargin" relation="greaterThanOrEqual" secondItem="gUI-6X-Umg" secondAttribute="bottom" constant="4" id="TEC-pN-Bni"/>
                                         <constraint firstItem="8Jg-Ke-drL" firstAttribute="leading" secondItem="X5f-oi-V1t" secondAttribute="trailing" constant="12" id="YCf-yl-B4a"/>
-                                        <constraint firstItem="she-8D-rp5" firstAttribute="top" secondItem="8Jg-Ke-drL" secondAttribute="bottom" id="ZsQ-Np-rpP"/>
                                         <constraint firstAttribute="bottomMargin" secondItem="X5f-oi-V1t" secondAttribute="bottom" constant="6" id="euA-Ar-HsP"/>
+                                        <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="hRe-my-dR9" secondAttribute="bottom" constant="15.5" id="fcS-Uw-zx8"/>
                                         <constraint firstAttribute="trailingMargin" secondItem="8Jg-Ke-drL" secondAttribute="trailing" constant="-5" id="jIp-De-mHn"/>
-                                        <constraint firstItem="she-8D-rp5" firstAttribute="leading" secondItem="X5f-oi-V1t" secondAttribute="trailing" constant="12" id="p9f-TO-Cpj"/>
+                                        <constraint firstItem="gUI-6X-Umg" firstAttribute="centerY" secondItem="X5f-oi-V1t" secondAttribute="centerY" id="pPz-lv-pwo"/>
                                         <constraint firstItem="X5f-oi-V1t" firstAttribute="top" secondItem="bgw-3g-6tl" secondAttribute="topMargin" constant="6" id="vNN-Bn-cFN"/>
+                                        <constraint firstItem="hRe-my-dR9" firstAttribute="leading" secondItem="X5f-oi-V1t" secondAttribute="trailing" constant="11" id="vnD-SH-7hu"/>
                                     </constraints>
                                 </tableViewCellContentView>
                                 <animations/>
@@ -307,6 +307,7 @@
                                     <constraint firstItem="8Jg-Ke-drL" firstAttribute="top" relation="greaterThanOrEqual" secondItem="iKr-zg-lam" secondAttribute="top" constant="4" id="g1Y-JI-Um6"/>
                                 </constraints>
                                 <connections>
+                                    <outlet property="hidingLabel" destination="hRe-my-dR9" id="K8q-IP-EyV"/>
                                     <outlet property="issuesLabel" destination="gUI-6X-Umg" id="sWh-qK-bFV"/>
                                     <outlet property="prLabel" destination="8Jg-Ke-drL" id="2yY-iS-Rqg"/>
                                     <outlet property="titleLabel" destination="X5f-oi-V1t" id="CbC-5o-aLA"/>

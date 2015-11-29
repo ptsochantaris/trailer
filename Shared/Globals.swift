@@ -132,7 +132,6 @@ enum PRAssignmentPolicy: Int {
 enum RepoDisplayPolicy: Int {
 	case Hide, Mine, MineAndPaticipated, All
 	static let labels = ["Hide", "Mine", "Participated", "All"]
-	static let prefixLabels = ["Hide", "Only My", "Participated", "All"]
 	static let policies = [Hide, Mine, MineAndPaticipated, All]
 	static let colors = [	COLOR_CLASS(red: 0.8, green: 0.8, blue: 0.8, alpha: 1.0),
 							COLOR_CLASS(red: 0.7, green: 0.0, blue: 0.0, alpha: 1.0),
@@ -140,9 +139,6 @@ enum RepoDisplayPolicy: Int {
 							COLOR_CLASS(red: 0.0, green: 0.5, blue: 0.0, alpha: 1.0)]
 	func name() -> String {
 		return RepoDisplayPolicy.labels[rawValue]
-	}
-	func prefixName() -> String {
-		return RepoDisplayPolicy.prefixLabels[rawValue]
 	}
 	func color() -> COLOR_CLASS {
 		return RepoDisplayPolicy.colors[rawValue]

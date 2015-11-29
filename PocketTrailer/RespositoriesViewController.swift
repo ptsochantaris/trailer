@@ -171,11 +171,11 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 
 		switch(type) {
 		case .Insert:
-			tableView.insertSections(NSIndexSet(index: sectionIndex), withRowAnimation: UITableViewRowAnimation.Automatic)
+			tableView.insertSections(NSIndexSet(index: sectionIndex), withRowAnimation: .Automatic)
 		case .Delete:
-			tableView.deleteSections(NSIndexSet(index: sectionIndex), withRowAnimation: UITableViewRowAnimation.Automatic)
+			tableView.deleteSections(NSIndexSet(index: sectionIndex), withRowAnimation: .Automatic)
 		case .Update:
-			tableView.reloadSections(NSIndexSet(index: sectionIndex), withRowAnimation: UITableViewRowAnimation.Automatic)
+			tableView.reloadSections(NSIndexSet(index: sectionIndex), withRowAnimation: .Automatic)
 		default:
 			break
 		}
@@ -213,9 +213,11 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 		cell.titleLabel.textColor = repo.shouldSync() ? UIColor.blackColor() : UIColor.lightGrayColor()
 		let prTitle = prTitleForRepo(repo)
 		let issuesTitle = issueTitleForRepo(repo)
+		let hidingTitle = hidingTitleForRepo(repo)
 		cell.prLabel!.attributedText = prTitle
 		cell.issuesLabel!.attributedText = issuesTitle
-		cell.accessibilityLabel = "\(title), \(prTitle.string), \(issuesTitle.string)"
+		cell.hidingLabel!.attributedText = hidingTitle
+		cell.accessibilityLabel = "\(title), \(prTitle.string), \(issuesTitle.string), \(hidingTitle.string)"
 	}
 
 	private var sizer: RepoCell?
@@ -236,6 +238,7 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 	}
 
 	private func titleForRepo(repo: Repo) -> NSAttributedString {
+
 		let fullName = repo.fullName ?? "(Untitled Repo)"
 		let text = (repo.inaccessible?.boolValue ?? false) ? (fullName + " (inaccessible)") : fullName
 		let color = repo.shouldSync() ? UIColor.darkTextColor() : UIColor.lightGrayColor()
@@ -243,28 +246,36 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 	}
 
 	private func prTitleForRepo(repo: Repo) -> NSAttributedString {
-		let a = NSMutableAttributedString()
 
-		let prPolicy = RepoDisplayPolicy(rawValue: repo.displayPolicyForPrs?.integerValue ?? 0) ?? RepoDisplayPolicy.Hide
-		let attributes = attributesForEntryWithPolicy(prPolicy)
-		a.appendAttributedString(NSAttributedString(string: prPolicy.prefixName(), attributes: attributes))
-		a.appendAttributedString(NSAttributedString(string: " PRs", attributes: attributes))
-		return a
+		let policy = RepoDisplayPolicy(rawValue: repo.displayPolicyForPrs?.integerValue ?? 0) ?? RepoDisplayPolicy.Hide
+		let attributes = attributesForEntryWithPolicy(policy)
+		return NSAttributedString(string: "PR Sections: \(policy.name())", attributes: attributes)
 	}
 
 	private func issueTitleForRepo(repo: Repo) -> NSAttributedString {
-		let a = NSMutableAttributedString()
 
-		let issuePolicy = RepoDisplayPolicy(rawValue: repo.displayPolicyForIssues?.integerValue ?? 0) ?? RepoDisplayPolicy.Hide
-		let attributes = attributesForEntryWithPolicy(issuePolicy)
-		a.appendAttributedString(NSAttributedString(string: issuePolicy.prefixName(), attributes: attributes))
-		a.appendAttributedString(NSAttributedString(string: " Issues", attributes: attributes))
-		return a
+		let policy = RepoDisplayPolicy(rawValue: repo.displayPolicyForIssues?.integerValue ?? 0) ?? RepoDisplayPolicy.Hide
+		let attributes = attributesForEntryWithPolicy(policy)
+		return NSAttributedString(string: "Issue Sections: \(policy.name())", attributes: attributes)
+	}
+
+	private func hidingTitleForRepo(repo: Repo) -> NSAttributedString {
+
+		let policy = RepoHidingPolicy(rawValue: repo.itemHidingPolicy?.integerValue ?? 0) ?? RepoHidingPolicy.NoHiding
+		let attributes = attributesForEntryWithPolicy(policy)
+		return NSAttributedString(string: policy.name(), attributes: attributes)
 	}
 
 	private func attributesForEntryWithPolicy(policy: RepoDisplayPolicy) -> [String : AnyObject] {
 		return [
-			NSFontAttributeName: UIFont.systemFontOfSize(UIFont.smallSystemFontSize()),
+			NSFontAttributeName: UIFont.systemFontOfSize(UIFont.smallSystemFontSize()-1.0),
+			NSForegroundColorAttributeName: policy.color()
+		];
+	}
+
+	private func attributesForEntryWithPolicy(policy: RepoHidingPolicy) -> [String : AnyObject] {
+		return [
+			NSFontAttributeName: UIFont.systemFontOfSize(UIFont.smallSystemFontSize()-1.0),
 			NSForegroundColorAttributeName: policy.color()
 		];
 	}

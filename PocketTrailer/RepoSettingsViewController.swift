@@ -83,8 +83,8 @@ class RepoSettingsViewController: UITableViewController {
 
 	override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
 		switch section {
-		case 0: return "Pull Requests"
-		case 1: return "Issues"
+		case 0: return "Pull Request Sections"
+		case 1: return "Issue Sections"
 		case 2: return "Author Based Hiding"
 		default: return nil
 		}
