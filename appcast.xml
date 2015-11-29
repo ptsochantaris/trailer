@@ -7,6 +7,25 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.3.11</title>
+			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Added options to hide items based on authorship. Hide all your own items or items of others per-repository.</li>
+				<li>Added success/in-progress/failed icons in front of PR status items to help make them easier to distinguish.</li>
+				<li>Disambiguations and clearer option names in preferences, as well as tooltips with help text for almost every option.</li>
+				<li>Fix for a nasty crash when enter was pressed with no item selected.</li>
+				<li>Corrections for IME character input in the filters field.</li>
+				</ul></font>]]></description>
+			<pubDate>Sun, 29 Nov 2015 22:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer1311.zip"
+			sparkle:version="1258"
+			sparkle:shortVersionString="1.3.11"
+			sparkle:dsaSignature="MC4CFQCsxZ54vEQIELLvLyqi54RKi+rYHAIVAOH24sDso5i1e94eZzoVia/l3h3W"
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.3.10</title>
 			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
