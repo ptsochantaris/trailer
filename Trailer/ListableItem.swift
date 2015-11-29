@@ -605,7 +605,7 @@ class ListableItem: DataItem {
 				suffix += " ["+l+"]"
 			}
 		}
-		return (title ?? "NO TITLE") + suffix
+		return "#\(self.number ?? 0) - " + (title ?? "NO TITLE") + suffix
 	}
 	final func indexForSpotlight() {
 		let s = CSSearchableItemAttributeSet(itemContentType: kUTTypeText as String)

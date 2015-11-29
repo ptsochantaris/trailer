@@ -10,7 +10,10 @@ final class PRListController: CommonController {
 	private var section: PullRequestSection!
 	private var type: String!
 	private var selectedIndex: Int?
+
+	private let PAGE_SIZE = 100
 	private var lastCount: Int = 0
+	private var loadingBuffer: [[String : AnyObject]]?
 
 	override func awakeWithContext(context: AnyObject?) {
 
@@ -26,43 +29,67 @@ final class PRListController: CommonController {
 	}
 
 	override func requestData(command: String?) {
-		var params = ["list": "item_list", "type": type, "sectionIndex": NSNumber(integer: section.rawValue)]
+		var params = ["list": "item_list", "type": type, "sectionIndex": NSNumber(integer: section.rawValue), "count": NSNumber(integer: PAGE_SIZE)]
 		if let command = command {
 			params["command"] = command
+		}
+		if let l = loadingBuffer {
+			params["from"] = NSNumber(integer: l.count)
+		} else {
+			loadingBuffer = [[String : AnyObject]]()
+			params["from"] = NSNumber(integer: 0)
 		}
 		sendRequest(params)
 	}
 
+	override func loadingFailed(error: NSError) {
+		super.loadingFailed(error)
+		loadingBuffer = nil
+	}
+
 	override func updateFromData(response: [NSString : AnyObject]) {
 
-		let result = response["result"] as! [[String : AnyObject]]
+		let page = response["result"] as! [[String : AnyObject]]
 
-		if lastCount == 0 {
-			table.setNumberOfRows(result.count, withRowType: "PRRow")
-		} else if lastCount < result.count {
-			table.removeRowsAtIndexes(NSIndexSet(indexesInRange: NSMakeRange(0, result.count-lastCount)))
-		} else if lastCount > result.count {
-			table.insertRowsAtIndexes(NSIndexSet(indexesInRange: NSMakeRange(0, lastCount-result.count)), withRowType: "PRRow")
+		loadingBuffer?.appendContentsOf(page)
+		if page.count == PAGE_SIZE {
+			NSOperationQueue.mainQueue().addOperationWithBlock({
+				self.requestData(nil)
+				self.showStatus("Loading \(self.loadingBuffer?.count ?? 0) items...", hideTable: true)
+			})
+			return
 		}
 
-		lastCount = result.count
+		if let l = loadingBuffer {
 
-		var index = 0
-		for itemData in result {
-			if let c = table.rowControllerAtIndex(index++) as? PRRow {
-				c.populateFrom(itemData)
+			if lastCount == 0 {
+				table.setNumberOfRows(l.count, withRowType: "PRRow")
+			} else if lastCount < l.count {
+				table.removeRowsAtIndexes(NSIndexSet(indexesInRange: NSMakeRange(0, l.count-lastCount)))
+			} else if lastCount > l.count {
+				table.insertRowsAtIndexes(NSIndexSet(indexesInRange: NSMakeRange(0, lastCount-l.count)), withRowType: "PRRow")
 			}
-		}
 
-		if result.count == 0 {
-			showStatus("There are no items in this section", hideTable: true)
-		} else {
-			showStatus("", hideTable: false)
-		}
+			lastCount = l.count
 
-		if let s = selectedIndex {
-			table.scrollToRowAtIndex(s)
-			selectedIndex = nil
+			var index = 0
+			for itemData in l {
+				if let c = table.rowControllerAtIndex(index++) as? PRRow {
+					c.populateFrom(itemData)
+				}
+			}
+
+			if l.count == 0 {
+				showStatus("There are no items in this section", hideTable: true)
+			} else {
+				showStatus("", hideTable: false)
+			}
+
+			if let s = selectedIndex {
+				table.scrollToRowAtIndex(s)
+				selectedIndex = nil
+			}
+			loadingBuffer = nil
 		}
 	}
 

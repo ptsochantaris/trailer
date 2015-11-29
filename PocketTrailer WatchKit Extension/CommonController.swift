@@ -61,8 +61,7 @@ class CommonController: WKInterfaceController {
 		}) { error in
 			if self.loading==5 {
 				NSOperationQueue.mainQueue().addOperationWithBlock {
-					self.showTemporaryError("Error: "+error.localizedDescription)
-					self.loading = 0
+					self.loadingFailed(error)
 				}
 			} else {
 				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.2 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
@@ -83,5 +82,10 @@ class CommonController: WKInterfaceController {
 
 	func updateFromData(response: [NSString : AnyObject]) {
 		// for subclassing
+	}
+
+	func loadingFailed(error: NSError) {
+		showTemporaryError("Error: "+error.localizedDescription)
+		loading = 0
 	}
 }

@@ -153,7 +153,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		searchField.autocorrectionType = UITextAutocorrectionType.No
 		searchField.delegate = self
 
-		let cover = UIView(frame: CGRectMake(0, 41, 320, 27))
+		let cover = UIView(frame: CGRectMake(0, 41, 320, 30))
 		cover.backgroundColor = UIColor.groupTableViewBackgroundColor()
 		cover.autoresizingMask = UIViewAutoresizing.FlexibleWidth
 

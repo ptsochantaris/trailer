@@ -144,8 +144,9 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		case "item_list":
 			let type = message["type"] as! String
 			let sectionIndex = message["sectionIndex"] as! Int
-			result["result"] = buildItemList(type, sectionIndex)
-			reportSuccess(result, replyHandler)
+			let from = message["from"] as! Int
+			let count = message["count"] as! Int
+			buildItemList(type, sectionIndex: sectionIndex, from: from, count: count, replyHandler: replyHandler)
 
 		case "item_detail":
 			if let lid = message["localId"] as? String, details = buildItemDetail(lid) {
@@ -179,7 +180,8 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	////////////////////////////
 
-	private func buildItemList(type: String, _ sectionIndex: Int) -> [[String : AnyObject]] {
+	private func buildItemList(type: String, sectionIndex: Int, from: Int, count: Int, replyHandler: ([String : AnyObject]) -> Void) {
+
 		var items = [[String : AnyObject]]()
 
 		let sectionIndex = PullRequestSection(rawValue: sectionIndex)!
@@ -192,10 +194,16 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		} else {
 			f = ListableItem.requestForItemsOfType("Issue", withFilter: nil, sectionIndex: sectionIndex.rawValue)
 		}
-		for item in try! mainObjectContext.executeFetchRequest(f) as! [ListableItem] {
-			items.append(baseDataForItem(item, showStatuses: showStatuses))
+		f.fetchOffset = from
+		f.fetchLimit = count
+		let tempMoc = NSManagedObjectContext(concurrencyType: .MainQueueConcurrencyType)
+		tempMoc.persistentStoreCoordinator = mainObjectContext.persistentStoreCoordinator
+		tempMoc.undoManager = nil
+		let r = try! tempMoc.executeFetchRequest(f) as! [ListableItem]
+		for item in r {
+			items.append(self.baseDataForItem(item, showStatuses: showStatuses))
 		}
-		return items
+		replyHandler(["result" : items])
 	}
 
 	private func baseDataForItem(item: ListableItem, showStatuses: Bool) -> [String : AnyObject] {
