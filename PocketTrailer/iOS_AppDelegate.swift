@@ -220,8 +220,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 			self!.checkApiUsage()
 			self!.isRefreshing = false
 			NSNotificationCenter.defaultCenter().postNotificationName(REFRESH_ENDED_NOTIFICATION, object: nil)
-			DataManager.saveDB()
-			DataManager.sendNotificationsAndIndex()
+			DataManager.sendNotificationsIndexAndSave()
 
 			if let bc = self!.backgroundCallback {
 				if success && mainObjectContext.hasChanges {

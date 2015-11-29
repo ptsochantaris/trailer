@@ -108,7 +108,7 @@ final class DataManager : NSObject {
 		}
 	}
 
-	class func sendNotificationsAndIndex() {
+	class func sendNotificationsIndexAndSave() {
 
 		let allPrs = PullRequest.allItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest]
 		for p in allPrs {
@@ -215,6 +215,8 @@ final class DataManager : NSObject {
 				i.postSyncAction = PostSyncAction.DoNothing.rawValue
 			}
 		}
+
+		DataManager.saveDB()
 	}
 
 	class func saveDB() -> Bool {

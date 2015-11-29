@@ -29,6 +29,11 @@ final class PRListController: CommonController {
 	}
 
 	override func requestData(command: String?) {
+
+		if lastCount >= PAGE_SIZE {
+			self.showStatus("Refreshing...", hideTable: true)
+		}
+
 		var params = ["list": "item_list", "type": type, "sectionIndex": NSNumber(integer: section.rawValue), "count": NSNumber(integer: PAGE_SIZE)]
 		if let command = command {
 			params["command"] = command
@@ -39,6 +44,7 @@ final class PRListController: CommonController {
 			loadingBuffer = [[String : AnyObject]]()
 			params["from"] = NSNumber(integer: 0)
 		}
+
 		sendRequest(params)
 	}
 
@@ -53,9 +59,9 @@ final class PRListController: CommonController {
 
 		loadingBuffer?.appendContentsOf(page)
 		if page.count == PAGE_SIZE {
-			NSOperationQueue.mainQueue().addOperationWithBlock({
-				self.requestData(nil)
-				self.showStatus("Loading \(self.loadingBuffer?.count ?? 0) items...", hideTable: true)
+			NSOperationQueue.mainQueue().addOperationWithBlock({ [weak self] in
+				self?.requestData(nil)
+				self?.showStatus("Loading \(self?.loadingBuffer?.count ?? 0) items...", hideTable: true)
 			})
 			return
 		}

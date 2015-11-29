@@ -43,6 +43,7 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 		if session.reachable, let l = lastView {
 			l.requestData(nil)
 		}
+		updateComplications()
 	}
 
 	func applicationWillResignActive() {
