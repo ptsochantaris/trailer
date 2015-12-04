@@ -11,9 +11,10 @@ final class PRListController: CommonController {
 	private var type: String!
 	private var selectedIndex: Int?
 
-	private let PAGE_SIZE = 100
+	private let PAGE_SIZE = 50
 	private var lastCount: Int = 0
 	private var loadingBuffer: [[String : AnyObject]]?
+	private var loading = false
 
 	override func awakeWithContext(context: AnyObject?) {
 
@@ -29,6 +30,13 @@ final class PRListController: CommonController {
 	}
 
 	override func requestData(command: String?) {
+		if !loading {
+			_requestData(command)
+			loading = true
+		}
+	}
+
+	private func _requestData(command: String?) {
 
 		if lastCount >= PAGE_SIZE {
 			self.showStatus("Refreshing...", hideTable: true)
@@ -60,7 +68,7 @@ final class PRListController: CommonController {
 		loadingBuffer?.appendContentsOf(page)
 		if page.count == PAGE_SIZE {
 			NSOperationQueue.mainQueue().addOperationWithBlock({ [weak self] in
-				self?.requestData(nil)
+				self?._requestData(nil)
 				self?.showStatus("Loading \(self?.loadingBuffer?.count ?? 0) items...", hideTable: true)
 			})
 			return
@@ -100,6 +108,7 @@ final class PRListController: CommonController {
 	}
 
 	@IBAction func markAllReadSelected() {
+		loading = false
 		showStatus("Marking items as read", hideTable: true)
 		if type=="prs" {
 			requestData("markAllPrsRead")
@@ -109,11 +118,13 @@ final class PRListController: CommonController {
 	}
 
 	@IBAction func refreshSelected() {
+		loading = false
 		showStatus("Refreshing", hideTable: true)
 		requestData("refresh")
 	}
 
 	override func table(table: WKInterfaceTable, didSelectRowAtIndex rowIndex: Int) {
+		loading = false
 		selectedIndex = rowIndex
 		let row = table.rowControllerAtIndex(rowIndex) as! PRRow
 		let key = (type=="prs" ? PULL_REQUEST_KEY : ISSUE_KEY)

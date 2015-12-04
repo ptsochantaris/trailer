@@ -36,7 +36,6 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 
 	func applicationDidBecomeActive() {
 		session.activateSession()
-		self.potentialUpdate()
 	}
 
 	private func potentialUpdate() {
