@@ -316,14 +316,14 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		} else if let pullRequestId = DataManager.idForUriPath(userInfo[PULL_REQUEST_ID_KEY] as? String) {
 			relatedItem = existingObjectWithID(pullRequestId) as? ListableItem
 			if relatedItem == nil {
-				showMessage("PR not found", "Could not locale the PR related to this notification")
+				showMessage("PR not found", "Could not locate the PR related to this notification")
 			} else if urlToOpen == nil {
 				urlToOpen = relatedItem!.webUrl
 			}
 		} else if let issueId = DataManager.idForUriPath(userInfo[ISSUE_ID_KEY] as? String) {
 			relatedItem = existingObjectWithID(issueId) as? ListableItem
 			if relatedItem == nil {
-				showMessage("Issue not found", "Could not locale the issue related to this notification")
+				showMessage("Issue not found", "Could not locate the issue related to this notification")
 			} else if urlToOpen == nil {
 				urlToOpen = relatedItem!.webUrl
 			}
