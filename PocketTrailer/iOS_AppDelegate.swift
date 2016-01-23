@@ -48,12 +48,10 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 
 		UIApplication.sharedApplication().setMinimumBackgroundFetchInterval(NSTimeInterval(Settings.backgroundRefreshPeriod))
 
-		let localNotification = launchOptions?[UIApplicationLaunchOptionsLocalNotificationKey] as? UILocalNotification
-
 		atNextEvent { [weak self] in
 			if Repo.visibleReposInMoc(mainObjectContext).count > 0 && ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
-				if localNotification != nil {
-					NotificationManager.handleLocalNotification(localNotification!)
+				if let localNotification = launchOptions?[UIApplicationLaunchOptionsLocalNotificationKey] as? UILocalNotification {
+					NotificationManager.handleLocalNotification(localNotification)
 				}
 			} else {
 
@@ -220,6 +218,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 			self!.checkApiUsage()
 			self!.isRefreshing = false
 			NSNotificationCenter.defaultCenter().postNotificationName(REFRESH_ENDED_NOTIFICATION, object: nil)
+			DataManager.saveDB() // Ensure object IDs are permanent before sending notifications
 			DataManager.sendNotificationsIndexAndSave()
 
 			if let bc = self!.backgroundCallback {
