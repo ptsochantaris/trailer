@@ -283,9 +283,21 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	private func sizeMenu(window: MenuWindow, andShow: Bool) {
 
 		if let siv = window.statusItem?.view as? StatusItemView {
+
+			var screen: NSScreen?
+			for s in NSScreen.screens() ?? [] {
+				if CGRectContainsRect(s.frame, siv.window!.frame) {
+					screen = s
+					break;
+				}
+			}
+
+			if(screen==nil) {
+				return
+			}
+
 			var menuLeft = siv.window!.frame.origin.x
-			let screen = NSScreen.mainScreen()!
-			let rightSide = screen.visibleFrame.origin.x + screen.visibleFrame.size.width
+			let rightSide = screen!.visibleFrame.origin.x + screen!.visibleFrame.size.width
 			let overflow = (menuLeft+MENU_WIDTH)-rightSide
 			if overflow > 0 {
 				menuLeft -= overflow
@@ -293,7 +305,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 			var menuHeight = TOP_HEADER_HEIGHT
 			let rowCount = window.table.numberOfRows
-			let screenHeight = screen.visibleFrame.size.height
+			let screenHeight = screen!.visibleFrame.size.height
 			if rowCount==0 {
 				menuHeight += 95
 			} else {
@@ -307,7 +319,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				}
 			}
 
-			var bottom = screen.visibleFrame.origin.y
+			var bottom = screen!.visibleFrame.origin.y
 			if menuHeight < screenHeight {
 				bottom += screenHeight-menuHeight
 			} else {
