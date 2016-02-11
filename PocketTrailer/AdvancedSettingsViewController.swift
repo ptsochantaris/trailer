@@ -34,7 +34,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 	private enum Section: Int {
 		case Refresh, Display, Filtering, Issues, Comments, Repos, StausesAndLabels, History, Confirm, Sort, Misc
-		static let rowCounts = [3, 6, 7, 1, 7, 2, 7, 3, 2, 3, 2]
+		static let rowCounts = [3, 6, 7, 1, 7, 2, 8, 3, 2, 3, 2]
 		static let allNames = ["Auto Refresh", "Display", "Filtering", "Issues", "Comments", "Watchlist", "Statuses & Labels", "History", "Don't confirm when", "Sorting", "Misc"]
 	}
 
@@ -258,6 +258,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.titleLabel.text = "Hide PRs whose status items are not all green"
 				cell.accessoryType = check(Settings.hidePrsThatArentPassing)
 				cell.descriptionLabel.text = Settings.hidePrsThatArentPassingHelp
+			case 7:
+				cell.titleLabel.text = "...only in the 'All' section"
+				cell.accessoryType = check(Settings.hidePrsThatDontPassOnlyInAll)
+				cell.descriptionLabel.text = Settings.hidePrsThatDontPassOnlyInAllHelp
 			default: break
 			}
 		} else if indexPath.section == Section.History.rawValue {
@@ -493,6 +497,9 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				Settings.notifyOnStatusUpdatesForAllPrs = !Settings.notifyOnStatusUpdatesForAllPrs
 			case 6:
 				Settings.hidePrsThatArentPassing = !Settings.hidePrsThatArentPassing
+				settingsChangedTimer.push()
+			case 7:
+				Settings.hidePrsThatDontPassOnlyInAll = !Settings.hidePrsThatDontPassOnlyInAll
 				settingsChangedTimer.push()
 			default: break
 			}

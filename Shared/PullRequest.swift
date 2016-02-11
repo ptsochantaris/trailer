@@ -205,6 +205,17 @@ final class PullRequest: ListableItem {
 		return components.joinWithSeparator(",")
 	}
 
+	func shouldBeCheckedForRedStatusesInSection(targetSection: PullRequestSection) -> Bool {
+		if Settings.hidePrsThatArentPassing {
+			if Settings.hidePrsThatDontPassOnlyInAll {
+				return targetSection == .All
+			} else {
+				return targetSection == .Mine || targetSection == .Participated || targetSection == .All
+			}
+		}
+		return false
+	}
+
 	func displayedStatuses() -> [PRStatus] {
 		let f = NSFetchRequest(entityName: "PRStatus")
 		f.returnsObjectsAsFaults = false

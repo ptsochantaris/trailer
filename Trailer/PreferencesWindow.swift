@@ -48,6 +48,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var statusTermMenu: NSPopUpButton!
 	@IBOutlet weak var statusTermsField: NSTokenField!
 	@IBOutlet weak var hidePrsThatDontPass: NSButton!
+	@IBOutlet weak var hidePrsThatDontPassOnlyInAll: NSButton!
 
 	// Comments
 	@IBOutlet weak var disableAllCommentNotifications: NSButton!
@@ -199,6 +200,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		notifyOnStatusUpdates.toolTip = Settings.notifyOnStatusUpdatesHelp
 		notifyOnStatusUpdatesForAllPrs.toolTip = Settings.notifyOnStatusUpdatesForAllPrsHelp
 		hidePrsThatDontPass.toolTip = Settings.hidePrsThatArentPassingHelp
+		hidePrsThatDontPassOnlyInAll.toolTip = Settings.hidePrsThatDontPassOnlyInAllHelp
 		statusTermMenu.toolTip = Settings.statusFilteringTermsHelp
 		logActivityToConsole.toolTip = Settings.logActivityToConsoleHelp
 		dumpApiResponsesToConsole.toolTip = Settings.dumpAPIResponsesInConsoleHelp
@@ -279,6 +281,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		showLabels.integerValue = Settings.showLabels ? 1 : 0
 		useVibrancy.integerValue = Settings.useVibrancy ? 1 : 0
 		hidePrsThatDontPass.integerValue = Settings.hidePrsThatArentPassing ? 1 : 0
+		hidePrsThatDontPassOnlyInAll.integerValue = Settings.hidePrsThatDontPassOnlyInAll ? 1 : 0
 
 		allNewPrsSetting.selectItemAtIndex(Settings.displayPolicyForNewPrs)
 		allNewIssuesSetting.selectItemAtIndex(Settings.displayPolicyForNewIssues)
@@ -460,10 +463,17 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction func notifyOnStatusUpdatesSelected(sender: NSButton) {
 		Settings.notifyOnStatusUpdates = (sender.integerValue==1)
+		updateStatusItemsOptions()
 	}
 
 	@IBAction func notifyOnStatusUpdatesOnAllPrsSelected(sender: NSButton) {
 		Settings.notifyOnStatusUpdatesForAllPrs = (sender.integerValue==1)
+	}
+
+	@IBAction func hidePrsThatDontPassOnlyInAllSelected(sender: NSButton) {
+		Settings.hidePrsThatDontPassOnlyInAll = (sender.integerValue==1)
+		DataManager.postProcessAllItems()
+		app.deferredUpdateTimer.push()
 	}
 
 	@IBAction func hidePrsThatDontPassSelected(sender: NSButton) {
@@ -620,6 +630,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		statusItemsRefreshNote.alphaValue = enable ? 1.0 : 0.5
 		hidePrsThatDontPass.alphaValue = enable ? 1.0 : 0.5
 		hidePrsThatDontPass.enabled = enable
+		hidePrsThatDontPassOnlyInAll.enabled = enable && Settings.hidePrsThatArentPassing
+		notifyOnStatusUpdatesForAllPrs.enabled = enable && Settings.notifyOnStatusUpdates
 
 		let count = Settings.statusItemRefreshInterval
 		statusItemRefreshCounter.integerValue = count
@@ -1118,9 +1130,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 					}
 				}
 			}
-		}
-		else
-		{
+		} else {
 			let allServers = ApiServer.allApiServersInMoc(mainObjectContext)
 			let apiServer = allServers[row]
 			if tableColumn?.identifier == "server" {

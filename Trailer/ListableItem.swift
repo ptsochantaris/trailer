@@ -251,7 +251,7 @@ class ListableItem: DataItem {
 			}
 		}
 
-		if let p = self as? PullRequest where (targetSection == .Mine || targetSection == .Participated || targetSection == .All) && Settings.hidePrsThatArentPassing {
+		if targetSection != .None, let p = self as? PullRequest where p.shouldBeCheckedForRedStatusesInSection(targetSection) {
 			for s in p.displayedStatuses() {
 				if s.state != "success" {
 					targetSection = PullRequestSection.None
