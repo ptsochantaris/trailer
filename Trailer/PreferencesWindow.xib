@@ -182,11 +182,12 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="4td-hc-6rZ">
-                                                        <rect key="frame" x="6" y="163" width="90" height="28"/>
+                                                        <rect key="frame" x="6" y="155" width="90" height="68"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" id="Bam-mX-Su4">
                                                             <font key="font" metaFont="smallSystemBold"/>
-                                                            <string key="title">Authorization
+                                                            <string key="title">Personal
+Access
 Token</string>
                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -202,16 +203,11 @@ Token</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" id="yUS-Pw-j0m">
-                                                        <rect key="frame" x="102" y="77" width="346" height="118"/>
-                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="border" drawsBackground="YES" id="9um-Bk-bLh">
+                                                        <rect key="frame" x="102" y="155" width="346" height="72"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="border" drawsBackground="YES" id="9um-Bk-bLh">
                                                             <font key="font" metaFont="system"/>
-                                                            <string key="placeholderString">Paste your GitHub personal access token in here; use
-the links below to view or create one.
-
-You can use 'Test' to verify your settings and move on
-to 'Repositories' from above, or if you are an advanced
-user you can add more servers from the left.</string>
+                                                            <string key="placeholderString">Paste a GitHub personal access token above or use the link below to create one. New tokens need at least the 'repo', 'repo:status', 'repo_deployment', 'public_repo' and 'read:org' permissions.</string>
                                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
@@ -276,17 +272,6 @@ user you can add more servers from the left.</string>
                                                             <action selector="createTokenSelected:" target="vQH-WF-vh2" id="77H-5d-fm4"/>
                                                         </connections>
                                                     </button>
-                                                    <button id="97p-7q-Kd5">
-                                                        <rect key="frame" x="110" y="207" width="340" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Report syncing problems with this server" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="SQa-fC-sUh">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="label"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="apiServerReportErrorSelected:" target="vQH-WF-vh2" id="if5-14-f5r"/>
-                                                        </connections>
-                                                    </button>
                                                     <textField verticalHuggingPriority="750" id="CT9-ev-oP0">
                                                         <rect key="frame" x="102" y="236" width="346" height="24"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
@@ -299,10 +284,32 @@ user you can add more servers from the left.</string>
                                                             <outlet property="delegate" destination="vQH-WF-vh2" id="x9J-c3-bhR"/>
                                                         </connections>
                                                     </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="qmh-MC-rEN">
+                                                        <rect key="frame" x="100" y="125" width="350" height="22"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="fPH-KZ-x5J">
+                                                            <font key="font" metaFont="miniSystem"/>
+                                                            <string key="title">You can use 'Test' to verify your settings and move to 'Repositories' from above, or if you are an advanced user, you can add more servers to the left.</string>
+                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <button id="97p-7q-Kd5">
+                                                        <rect key="frame" x="100" y="101" width="350" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Report syncing problems with this server" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="SQa-fC-sUh">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="apiServerReportErrorSelected:" target="vQH-WF-vh2" id="if5-14-f5r"/>
+                                                        </connections>
+                                                    </button>
                                                 </subviews>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                     </subviews>
                                 </view>
@@ -450,6 +457,7 @@ user you can add more servers from the left.</string>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                         <button verticalHuggingPriority="750" id="u1W-mu-uId">
                                             <rect key="frame" x="553" y="10" width="176" height="32"/>
@@ -622,6 +630,7 @@ user you can add more servers from the left.</string>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                         <box autoresizesSubviews="NO" title="Whan something from &quot;all items&quot; is assigned to me..." borderType="line" id="96h-4X-0sU">
                                             <rect key="frame" x="414" y="275" width="316" height="73"/>
@@ -652,6 +661,7 @@ user you can add more servers from the left.</string>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                         <button id="3CV-9S-gLw">
                                             <rect key="frame" x="20" y="153" width="366" height="18"/>
@@ -762,6 +772,7 @@ user you can add more servers from the left.</string>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                         <box title="Sorting" borderType="line" id="fNC-DY-p8H">
                                             <rect key="frame" x="6" y="5" width="406" height="122"/>
@@ -814,6 +825,7 @@ user you can add more servers from the left.</string>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                         <button id="Efg-Id-lOP">
                                             <rect key="frame" x="20" y="323" width="366" height="18"/>
@@ -874,6 +886,7 @@ user you can add more servers from the left.</string>
                                                         </view>
                                                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                        <font key="titleFont" metaFont="message" size="11"/>
                                                     </box>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="6Rs-G3-8sn">
                                                         <rect key="frame" x="12" y="181" width="185" height="17"/>
@@ -946,6 +959,7 @@ user you can add more servers from the left.</string>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                     </subviews>
                                 </view>
@@ -1053,6 +1067,7 @@ user you can add more servers from the left.</string>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                     </subviews>
                                 </view>
@@ -1238,6 +1253,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                     </subviews>
                                 </view>
@@ -1341,6 +1357,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                         </view>
                                                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                        <font key="titleFont" metaFont="message" size="11"/>
                                                     </box>
                                                     <button id="9o8-NV-RgQ">
                                                         <rect key="frame" x="191" y="109" width="337" height="18"/>
@@ -1371,6 +1388,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                     </subviews>
                                 </view>
@@ -1483,6 +1501,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                     </subviews>
                                 </view>
