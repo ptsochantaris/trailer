@@ -207,7 +207,7 @@ Token</string>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="border" drawsBackground="YES" id="9um-Bk-bLh">
                                                             <font key="font" metaFont="system"/>
-                                                            <string key="placeholderString">Paste a GitHub personal access token above or use the link below to create one. New tokens need at least the 'repo', 'repo:status', 'repo_deployment', 'public_repo' and 'read:org' permissions.</string>
+                                                            <string key="placeholderString">Paste a GitHub personal access token or use the link below to create one. New tokens need at least the 'repo', 'repo:status', 'repo_deployment', 'public_repo' and 'read:org' permissions.</string>
                                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>

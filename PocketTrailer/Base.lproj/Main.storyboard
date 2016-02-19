@@ -640,7 +640,7 @@
                                     </textField>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="btD-7d-z1H">
                                         <rect key="frame" x="11" y="324" width="570" height="65.5"/>
-                                        <string key="text">Paste your GitHub personal access token above; use the links below to view or create one.  You can use 'Test' to verify your Settings.
+                                        <string key="text">Paste your GitHub personal access token above or use the links below to view or create one.  You can use 'Test' to verify your Settings.
 
 For new tokens, you need at least the 'repo', 'repo:status', 'repo_deployment', 'public_repo' and 'read:org' permissions.</string>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
