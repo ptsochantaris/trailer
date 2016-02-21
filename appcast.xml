@@ -7,6 +7,24 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.3.14</title>
+			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>New option to limit “only show green PRs” functionality to the “All” section.</li>
+				<li>Preferences & quick-start views will now also provide feedback on the minimum permissions required for a GitHub personal access token.</li>
+				<li>Additional compiler optimisations.</li>
+				<li>Updated Sparkle update-check to 1.13.1</li>
+				</ul></font>]]></description>
+			<pubDate>Sun, 21 Feb 2016 16:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer1314.zip"
+			sparkle:version="1263"
+			sparkle:shortVersionString="1.3.14"
+			sparkle:dsaSignature="MCwCFDif5IrL/pTWXOee6hdcpEm1skxfAhQP6E7Ut3LZnFgAUpQa6bGzcZAVYQ=="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.3.12</title>
 			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
