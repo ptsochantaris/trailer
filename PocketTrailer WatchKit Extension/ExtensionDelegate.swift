@@ -11,6 +11,7 @@ import ClockKit
 class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 
 	private let session = WCSession.defaultSession()
+	private var requestedUpdate = false
 
 	weak var lastView: CommonController? {
 		didSet {
@@ -23,26 +24,29 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 	}
 
 	func sessionReachabilityDidChange(session: WCSession) {
-		dispatch_async(dispatch_get_main_queue()) {
-			self.potentialUpdate()
-		}
+		potentialUpdate()
 	}
 
 	func session(session: WCSession, didReceiveApplicationContext applicationContext: [String : AnyObject]) {
-		dispatch_async(dispatch_get_main_queue()) {
-			self.potentialUpdate()
-		}
+		potentialUpdate()
 	}
 
 	func applicationDidBecomeActive() {
 		session.activateSession()
+		updateComplications()
 	}
 
 	private func potentialUpdate() {
-		if session.reachable, let l = lastView {
-			l.requestData(nil)
+		// Possibly in thread!
+		NSOperationQueue.mainQueue().addOperationWithBlock {
+			if let l = self.lastView where self.session.reachable && !self.requestedUpdate {
+				self.requestedUpdate = true
+				l.requestData(nil)
+				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.5 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
+					self.requestedUpdate = false
+				}
+			}
 		}
-		updateComplications()
 	}
 
 	func applicationWillResignActive() {

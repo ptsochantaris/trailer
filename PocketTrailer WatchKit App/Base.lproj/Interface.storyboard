@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="9059" systemVersion="15B42" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="AgC-eL-Hgc">
+<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="9532" systemVersion="15D21" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="AgC-eL-Hgc">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9049"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="9019"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9530"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="9515"/>
     </dependencies>
     <scenes>
         <!--Sections-->
@@ -42,14 +42,20 @@
                                         <tableRow identifier="SectionRow" id="ql1-oS-xZe" customClass="SectionRow" customModule="Trailer">
                                             <group key="rootItem" width="1" height="0.0" alignment="left" radius="2" id="Uft-cP-lJ6">
                                                 <items>
-                                                    <label alignment="left" verticalAlignment="center" text="      " id="m26-4w-XIn">
-                                                        <fontDescription key="font" type="system" pointSize="15"/>
+                                                    <label alignment="left" verticalAlignment="center" id="m26-4w-XIn">
+                                                        <fontDescription key="font" style="UICTFontTextStyleTitle1"/>
+                                                        <variation key="device=watch38mm">
+                                                            <fontDescription key="font" style="UICTFontTextStyleTitle3"/>
+                                                        </variation>
                                                     </label>
                                                     <group height="1" alignment="right" verticalAlignment="center" radius="8" id="VK1-qB-Emf">
                                                         <items>
                                                             <label alignment="center" verticalAlignment="center" text=" " id="YSb-rO-7SF">
                                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                                                <fontDescription key="font" type="system" pointSize="15"/>
+                                                                <fontDescription key="font" style="UICTFontTextStyleTitle1"/>
+                                                                <variation key="device=watch38mm">
+                                                                    <fontDescription key="font" style="UICTFontTextStyleTitle3"/>
+                                                                </variation>
                                                             </label>
                                                         </items>
                                                         <color key="backgroundColor" red="1" green="0.0" blue="0.070606581870000004" alpha="1" colorSpace="calibratedRGB"/>
@@ -120,9 +126,9 @@
                                             </label>
                                             <group alignment="left" spacing="4" id="lLA-39-zIL">
                                                 <items>
-                                                    <group alignment="left" verticalAlignment="center" radius="8" id="1NN-Z1-C8E">
+                                                    <group alignment="left" verticalAlignment="center" radius="7" id="1NN-Z1-C8E">
                                                         <items>
-                                                            <label alignment="center" verticalAlignment="center" text="11" id="zum-4e-Nxi">
+                                                            <label alignment="center" verticalAlignment="center" text="2" id="zum-4e-Nxi">
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                                                 <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
                                                             </label>
@@ -130,7 +136,7 @@
                                                         <color key="backgroundColor" red="0.93725490199999995" green="0.93725490199999995" blue="0.95686274510000002" alpha="1" colorSpace="calibratedRGB"/>
                                                         <edgeInsets key="margins" left="5" right="5" top="0.0" bottom="0.0"/>
                                                     </group>
-                                                    <group alignment="left" verticalAlignment="center" radius="8" id="FFB-8c-hj1">
+                                                    <group alignment="left" verticalAlignment="center" radius="7" id="FFB-8c-hj1">
                                                         <items>
                                                             <label alignment="center" verticalAlignment="center" text="2" id="bd9-NV-xBM">
                                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
