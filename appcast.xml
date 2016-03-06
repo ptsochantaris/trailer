@@ -7,6 +7,21 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.3.15</title>
+			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Ability to exclude items with negative search terms by prefixing with with ’!’. This can be on simple terms, such as “!WIP” but also on property terms such as “label:feature,!WIP” or “server:!public”.</li>
+				</ul></font>]]></description>
+			<pubDate>Sun, 6 Mar 2016 14:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer1315.zip"
+			sparkle:version="1264"
+			sparkle:shortVersionString="1.3.15"
+			sparkle:dsaSignature="MCwCFH2MNJ22CQqqlGK6auUrHk7RPGQOAhQKyyxK+/t4W0tSJA7BehKrM61PIA=="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.3.14</title>
 			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
