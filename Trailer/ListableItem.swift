@@ -389,104 +389,76 @@ class ListableItem: DataItem {
 		return badgeCount
 	}
 
-	final class func serverPredicateFromFilterString(string: String) -> NSPredicate? {
-		if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 7 {
-			let serverNames = string.substringFromIndex(string.startIndex.advancedBy(7))
-			if !serverNames.characters.isEmpty {
+	final class func buildOrPredicate(string: String, expectedLength: Int, format: String, numeric: Bool) -> NSPredicate? {
+		if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > expectedLength {
+			let items = string.substringFromIndex(string.startIndex.advancedBy(expectedLength))
+			if !items.characters.isEmpty {
 				var orTerms = [NSPredicate]()
-				for term in serverNames.componentsSeparatedByString(",") {
-					orTerms.append(NSPredicate(format: "apiServer.label contains [cd] %@", term))
+				var notTerms = [NSPredicate]()
+				for term in items.componentsSeparatedByString(",") {
+					let T: String
+					let negative: Bool
+					if term.characters.first == "!" {
+						T = term.substringFromIndex(term.startIndex.advancedBy(1))
+						negative = true
+					} else {
+						T = term
+						negative = false
+					}
+					let P: NSPredicate
+					if numeric, let n = UInt64(T) {
+						P = NSPredicate(format: format, n)
+					} else {
+						P = NSPredicate(format: format, T)
+					}
+					if negative {
+						notTerms.append(NSCompoundPredicate(notPredicateWithSubpredicate: P))
+					} else {
+						orTerms.append(P)
+					}
 				}
-				return NSCompoundPredicate(type: NSCompoundPredicateType.OrPredicateType, subpredicates: orTerms)
+				let n = NSCompoundPredicate(andPredicateWithSubpredicates: notTerms)
+				let o = NSCompoundPredicate(orPredicateWithSubpredicates: orTerms)
+				if notTerms.count > 0 && orTerms.count > 0 {
+					return NSCompoundPredicate(andPredicateWithSubpredicates: [n,o])
+				} else if notTerms.count > 0 {
+					return n
+				} else if orTerms.count > 0 {
+					return o
+				} else {
+					return nil
+				}
 			}
 		}
 		return nil
+	}
+
+	final class func serverPredicateFromFilterString(string: String) -> NSPredicate? {
+		return buildOrPredicate(string, expectedLength: 7, format: "apiServer.label contains[cd] %@", numeric: false)
 	}
 
 	final class func titlePredicateFromFilterString(string: String) -> NSPredicate? {
-		if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 6 {
-			let titleTerms = string.substringFromIndex(string.startIndex.advancedBy(6))
-			if !titleTerms.characters.isEmpty {
-				var orTerms = [NSPredicate]()
-				for term in titleTerms.componentsSeparatedByString(",") {
-					orTerms.append(NSPredicate(format: "title contains [cd] %@", term))
-				}
-				return NSCompoundPredicate(type: NSCompoundPredicateType.OrPredicateType, subpredicates: orTerms)
-			}
-		}
-		return nil
+		return buildOrPredicate(string, expectedLength: 6, format: "title contains[cd] %@", numeric: false)
 	}
 
 	final class func numberPredicateFromFilterString(string: String) -> NSPredicate? {
-		if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 6 {
-			let titleTerms = string.substringFromIndex(string.startIndex.advancedBy(7))
-			if !titleTerms.characters.isEmpty {
-				var orTerms = [NSPredicate]()
-				for term in titleTerms.componentsSeparatedByString(",") {
-					if let number = Int64(term) {
-						orTerms.append(NSPredicate(format: "number = %llu", number))
-					}
-				}
-				return NSCompoundPredicate(type: NSCompoundPredicateType.OrPredicateType, subpredicates: orTerms)
-			}
-		}
-		return nil
+		return buildOrPredicate(string, expectedLength: 7, format: "number == %llu", numeric: true)
 	}
 
     final class func repoPredicateFromFilterString(string: String) -> NSPredicate? {
-        if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 5 {
-            let repoNames = string.substringFromIndex(string.startIndex.advancedBy(5))
-            if !repoNames.characters.isEmpty {
-				var orTerms = [NSPredicate]()
-				for term in repoNames.componentsSeparatedByString(",") {
-					orTerms.append(NSPredicate(format: "repo.fullName contains [cd] %@", term))
-				}
-				return NSCompoundPredicate(type: NSCompoundPredicateType.OrPredicateType, subpredicates: orTerms)
-            }
-        }
-        return nil
+		return buildOrPredicate(string, expectedLength: 5, format: "repo.fullName contains[cd] %@", numeric: false)
     }
 
     final class func labelPredicateFromFilterString(string: String) -> NSPredicate? {
-        if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 6 {
-            let labelNames = string.substringFromIndex(string.startIndex.advancedBy(6))
-            if !labelNames.characters.isEmpty {
-				var orTerms = [NSPredicate]()
-				for term in labelNames.componentsSeparatedByString(",") {
-					orTerms.append(NSPredicate(format: "any labels.name contains[cd] %@", term))
-				}
-				return NSCompoundPredicate(type: NSCompoundPredicateType.OrPredicateType, subpredicates: orTerms)
-            }
-        }
-        return nil
+		return buildOrPredicate(string, expectedLength: 6, format: "SUBQUERY(labels, $label, $label.name contains[cd] %@).@count > 0", numeric: false)
     }
 
     final class func statusPredicateFromFilterString(string: String) -> NSPredicate? {
-        if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 7 {
-            let statusNames = string.substringFromIndex(string.startIndex.advancedBy(7))
-            if !statusNames.characters.isEmpty {
-				var orTerms = [NSPredicate]()
-				for term in statusNames.componentsSeparatedByString(",") {
-					orTerms.append(NSPredicate(format: "any statuses.descriptionText contains[cd] %@", term))
-				}
-				return NSCompoundPredicate(type: NSCompoundPredicateType.OrPredicateType, subpredicates: orTerms)
-            }
-        }
-        return nil
+		return buildOrPredicate(string, expectedLength: 7, format: "SUBQUERY(statuses, $status, $status.descriptionText contains[cd] %@).@count > 0", numeric: false)
     }
 
     final class func userPredicateFromFilterString(string: String) -> NSPredicate? {
-        if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > 5 {
-            let userNames = string.substringFromIndex(string.startIndex.advancedBy(5))
-            if !userNames.characters.isEmpty {
-				var orTerms = [NSPredicate]()
-				for term in userNames.componentsSeparatedByString(",") {
-					orTerms.append(NSPredicate(format: "userLogin contains[cd] %@", term))
-				}
-				return NSCompoundPredicate(type: NSCompoundPredicateType.OrPredicateType, subpredicates: orTerms)
-            }
-        }
-        return nil
+		return buildOrPredicate(string, expectedLength: 5, format: "userLogin contains[cd] %@", numeric: false)
     }
 
 	final class func requestForItemsOfType(itemType: String, withFilter: String?, sectionIndex: Int) -> NSFetchRequest {
@@ -498,9 +470,7 @@ class ListableItem: DataItem {
 			andPredicates.append(NSPredicate(format: "sectionIndex == %d", sectionIndex))
 		}
 
-		if let f = withFilter where !f.isEmpty {
-
-			var fi = f
+		if var fi = withFilter where !fi.isEmpty {
 
             func checkForPredicates(tagString: String, _ process: String->NSPredicate?) {
 				var foundOne: Bool
@@ -530,30 +500,54 @@ class ListableItem: DataItem {
 
 			if !fi.isEmpty {
 				var orPredicates = [NSPredicate]()
-				if Settings.includeTitlesInFilter {
-					orPredicates.append(NSPredicate(format: "title contains[cd] %@", fi))
-				}
-				if Settings.includeReposInFilter {
-					orPredicates.append(NSPredicate(format: "repo.fullName contains[cd] %@", fi))
-				}
-				if Settings.includeLabelsInFilter {
-					orPredicates.append(NSPredicate(format: "any labels.name contains[cd] %@", fi))
-				}
-                if Settings.includeServersInFilter {
-                    orPredicates.append(NSPredicate(format: "apiServer.label contains [cd] %@", fi))
-                }
-                if Settings.includeUsersInFilter {
-                    orPredicates.append(NSPredicate(format: "userLogin contains[cd] %@", fi))
-                }
-				if Settings.includeNumbersInFilter {
-					if let number = Int64(fi) {
-						orPredicates.append(NSPredicate(format: "number = %llu", number))
+				let negative = (fi.characters.first == "!")
+
+				func checkOr(format: String, numeric: Bool) {
+					let predicate: NSPredicate
+					let string = negative ? fi.substringFromIndex(fi.startIndex.advancedBy(1)) : fi
+					if numeric {
+						if let number = Int64(fi) {
+							predicate = NSPredicate(format: format, number)
+						} else {
+							return
+						}
+					} else {
+						predicate = NSPredicate(format: format, string)
+					}
+					if negative {
+						orPredicates.append(NSCompoundPredicate(notPredicateWithSubpredicate: predicate))
+					} else {
+						orPredicates.append(predicate)
 					}
 				}
-				if itemType == "PullRequest" && Settings.includeStatusesInFilter {
-					orPredicates.append(NSPredicate(format: "any statuses.descriptionText contains[cd] %@", fi))
+
+				if Settings.includeTitlesInFilter {
+					checkOr("title contains[cd] %@", numeric: false)
 				}
-				andPredicates.append(NSCompoundPredicate(orPredicateWithSubpredicates: orPredicates))
+				if Settings.includeReposInFilter {
+					checkOr("repo.fullName contains[cd] %@", numeric: false)
+				}
+                if Settings.includeServersInFilter {
+					checkOr("apiServer.label contains [cd] %@", numeric: false)
+                }
+                if Settings.includeUsersInFilter {
+					checkOr("userLogin contains[cd] %@", numeric: false)
+                }
+				if Settings.includeNumbersInFilter {
+					checkOr("number == %llu", numeric: true)
+				}
+				if Settings.includeLabelsInFilter {
+					checkOr("SUBQUERY(labels, $label, $label.name contains[cd] %@).@count > 0", numeric: false)
+				}
+				if itemType == "PullRequest" && Settings.includeStatusesInFilter {
+					checkOr("SUBQUERY(statuses, $status, $status.descriptionText contains[cd] %@).@count > 0", numeric: false)
+				}
+
+				if negative {
+					andPredicates.append(NSCompoundPredicate(andPredicateWithSubpredicates: orPredicates))
+				} else {
+					andPredicates.append(NSCompoundPredicate(orPredicateWithSubpredicates: orPredicates))
+				}
 			}
 		}
 
@@ -561,24 +555,26 @@ class ListableItem: DataItem {
 			andPredicates.append(NSPredicate(format: "unreadComments > 0"))
 		}
 
-		var sortDescriptiors = [NSSortDescriptor]()
-		sortDescriptiors.append(NSSortDescriptor(key: "sectionIndex", ascending: true))
+		var sortDescriptors = [NSSortDescriptor]()
+		sortDescriptors.append(NSSortDescriptor(key: "sectionIndex", ascending: true))
 		if Settings.groupByRepo {
-			sortDescriptiors.append(NSSortDescriptor(key: "repo.fullName", ascending: true, selector: Selector("caseInsensitiveCompare:")))
+			sortDescriptors.append(NSSortDescriptor(key: "repo.fullName", ascending: true, selector: Selector("caseInsensitiveCompare:")))
 		}
 
 		if let fieldName = sortField() {
 			if fieldName == "title" {
-				sortDescriptiors.append(NSSortDescriptor(key: fieldName, ascending: !Settings.sortDescending, selector: Selector("caseInsensitiveCompare:")))
+				sortDescriptors.append(NSSortDescriptor(key: fieldName, ascending: !Settings.sortDescending, selector: Selector("caseInsensitiveCompare:")))
 			} else if !fieldName.isEmpty {
-				sortDescriptiors.append(NSSortDescriptor(key: fieldName, ascending: !Settings.sortDescending))
+				sortDescriptors.append(NSSortDescriptor(key: fieldName, ascending: !Settings.sortDescending))
 			}
 		}
+
+		//DLog("%@", andPredicates)
 
 		let f = NSFetchRequest(entityName: itemType)
 		f.fetchBatchSize = 100
 		f.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: andPredicates)
-		f.sortDescriptors = sortDescriptiors
+		f.sortDescriptors = sortDescriptors
 		return f
 	}
 

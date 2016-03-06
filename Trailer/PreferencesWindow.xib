@@ -309,7 +309,6 @@ Token</string>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                     </subviews>
                                 </view>
@@ -457,7 +456,6 @@ Token</string>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                         <button verticalHuggingPriority="750" id="u1W-mu-uId">
                                             <rect key="frame" x="553" y="10" width="176" height="32"/>
@@ -630,7 +628,6 @@ Token</string>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                         <box autoresizesSubviews="NO" title="Whan something from &quot;all items&quot; is assigned to me..." borderType="line" id="96h-4X-0sU">
                                             <rect key="frame" x="414" y="275" width="316" height="73"/>
@@ -661,7 +658,6 @@ Token</string>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                         <button id="3CV-9S-gLw">
                                             <rect key="frame" x="20" y="153" width="366" height="18"/>
@@ -736,16 +732,6 @@ Token</string>
                                                             <action selector="includeServersInFilteringSelected:" target="vQH-WF-vh2" id="IWr-bS-8D9"/>
                                                         </connections>
                                                     </button>
-                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" id="CDe-lj-xrh">
-                                                        <rect key="frame" x="180" y="28" width="117" height="85"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" id="ixu-zC-YfY">
-                                                            <font key="font" metaFont="miniSystem"/>
-                                                            <string key="title">Additionally, you can use title: server: label: repo: user: number: and status: to filter specific properties, e.g. "label:bug,suggestion"</string>
-                                                            <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
                                                     <button id="Iwj-YJ-JSd">
                                                         <rect key="frame" x="37" y="93" width="55" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -768,11 +754,20 @@ Token</string>
                                                             <action selector="includeNumbersInFilteringSelected:" target="vQH-WF-vh2" id="HOz-7T-URJ"/>
                                                         </connections>
                                                     </button>
+                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" id="CDe-lj-xrh">
+                                                        <rect key="frame" x="172" y="0.0" width="123" height="109"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" id="ixu-zC-YfY">
+                                                            <font key="font" metaFont="miniSystem"/>
+                                                            <string key="title">You can also use title: server: label: repo: user: number: and status: to filter specific properties, e.g. "label:bug,suggestion". Prefix with '!' to exclude some terms.</string>
+                                                            <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
                                                 </subviews>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                         <box title="Sorting" borderType="line" id="fNC-DY-p8H">
                                             <rect key="frame" x="6" y="5" width="406" height="122"/>
@@ -825,7 +820,6 @@ Token</string>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                         <button id="Efg-Id-lOP">
                                             <rect key="frame" x="20" y="323" width="366" height="18"/>
@@ -886,7 +880,6 @@ Token</string>
                                                         </view>
                                                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                                        <font key="titleFont" metaFont="message" size="11"/>
                                                     </box>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="6Rs-G3-8sn">
                                                         <rect key="frame" x="12" y="181" width="185" height="17"/>
@@ -959,7 +952,6 @@ Token</string>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                     </subviews>
                                 </view>
@@ -1067,7 +1059,6 @@ Token</string>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                     </subviews>
                                 </view>
@@ -1253,7 +1244,6 @@ to a higher number in order to keep your API usage reasonable</string>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                     </subviews>
                                 </view>
@@ -1357,7 +1347,6 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                         </view>
                                                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                                        <font key="titleFont" metaFont="message" size="11"/>
                                                     </box>
                                                     <button id="9o8-NV-RgQ">
                                                         <rect key="frame" x="191" y="109" width="337" height="18"/>
@@ -1388,7 +1377,6 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                     </subviews>
                                 </view>
@@ -1501,7 +1489,6 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                     </subviews>
                                 </view>

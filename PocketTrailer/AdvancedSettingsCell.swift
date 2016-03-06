@@ -5,6 +5,9 @@ final class AdvancedSettingsCell: UITableViewCell {
 	@IBOutlet weak var descriptionLabel: UILabel!
 	@IBOutlet weak var valueLabel: UILabel!
 
+	@IBOutlet weak var detailsTopAnchor: NSLayoutConstraint!
+	@IBOutlet weak var detailsBottomAnchor: NSLayoutConstraint!
+
 	override func layoutSubviews() {
 		super.layoutSubviews()
 		for v in self.subviews {

@@ -10,6 +10,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	private var pickerName: String?
 	private var selectedIndexPath: NSIndexPath?
 	private var previousValue: Int?
+	private var showHelp = true
 
 	@IBAction func done(sender: UIBarButtonItem) {
 		if app.preferencesDirty { app.startRefresh() }
@@ -28,8 +29,15 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 		navigationItem.rightBarButtonItems = [
 			UIBarButtonItem(image: UIImage(named: "export"), style: UIBarButtonItemStyle.Plain, target: self, action: Selector("exportSelected:")),
-			UIBarButtonItem(image: UIImage(named: "import"), style: UIBarButtonItemStyle.Plain, target: self, action: Selector("importSelected:"))
+			UIBarButtonItem(image: UIImage(named: "import"), style: UIBarButtonItemStyle.Plain, target: self, action: Selector("importSelected:")),
+			UIBarButtonItem(image: UIImage(named: "showHelp"), style: UIBarButtonItemStyle.Plain, target: self, action: Selector("toggleHelp:")),
 		]
+	}
+
+	func toggleHelp(button: UIBarButtonItem) {
+		showHelp = !showHelp
+		heightCache.removeAll()
+		tableView.reloadSections(NSIndexSet(indexesInRange: NSMakeRange(0, Section.allNames.count)), withRowAnimation: .Automatic)
 	}
 
 	private enum Section: Int {
@@ -66,7 +74,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 		let l = UILabel()
 		l.attributedText = NSAttributedString(
-			string: "Additionally, you can use title: server: label: repo: user: number: and status: to filter specific properties, e.g. \"label:bug,suggestion\"",
+			string: "You can also use title: server: label: repo: user: number: and status: to filter specific properties, e.g. \"label:bug,suggestion\". Prefix with '!' to exclude some terms.",
 			attributes: [
 				NSFontAttributeName: UIFont.systemFontOfSize(UIFont.smallSystemFontSize()),
 				NSForegroundColorAttributeName: UIColor.lightGrayColor(),
@@ -324,6 +332,14 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.descriptionLabel.text = Settings.dumpAPIResponsesInConsoleHelp
 			default: break
 			}
+		}
+		if showHelp {
+			cell.detailsBottomAnchor.constant = 6
+			cell.detailsTopAnchor.constant = 6
+		} else {
+			cell.descriptionLabel.text = nil
+			cell.detailsBottomAnchor.constant = 4
+			cell.detailsTopAnchor.constant = 0
 		}
 	}
 

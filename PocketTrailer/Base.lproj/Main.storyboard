@@ -465,6 +465,8 @@
                                 </tableViewCellContentView>
                                 <connections>
                                     <outlet property="descriptionLabel" destination="naL-Ei-MIR" id="JTD-wL-XWb"/>
+                                    <outlet property="detailsBottomAnchor" destination="G91-z0-Tau" id="i8Z-3C-4Yr"/>
+                                    <outlet property="detailsTopAnchor" destination="gTj-1F-85F" id="pvV-yy-JfL"/>
                                     <outlet property="titleLabel" destination="ar9-3E-qS5" id="MT0-9Q-XDZ"/>
                                     <outlet property="valueLabel" destination="y8d-AF-iMJ" id="DMi-s8-l98"/>
                                 </connections>
