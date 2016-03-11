@@ -61,7 +61,8 @@ final class PullRequestCell: TrailerCell {
 		}
 
 		frame = NSMakeRect(0, 0, MENU_WIDTH, titleHeight+subtitleHeight+statusBottom+CELL_PADDING)
-		addCounts(_commentsTotal, _commentsNew)
+		let faded = pullRequest.muted?.boolValue ?? false
+		addCounts(_commentsTotal, _commentsNew, faded)
 
 		var titleRect = NSMakeRect(LEFTPADDING, subtitleHeight+bottom+statusBottom, W, titleHeight)
 		var dateRect = NSMakeRect(LEFTPADDING, statusBottom+bottom, W, subtitleHeight)
@@ -72,6 +73,7 @@ final class PullRequestCell: TrailerCell {
 			let userImage = AvatarView(
 				frame: NSMakeRect(LEFTPADDING, bounds.size.height-AVATAR_SIZE-7.0, AVATAR_SIZE, AVATAR_SIZE),
 				url: pullRequest.userAvatarUrl ?? "")
+			if faded { userImage.alphaValue = DISABLED_FADE }
 			addSubview(userImage)
 			shift = AVATAR_PADDING+AVATAR_SIZE
 		} else {
@@ -116,6 +118,11 @@ final class PullRequestCell: TrailerCell {
 		subtitle.attributedStringValue = _subtitle
 		addSubview(subtitle)
 
+		if faded {
+			title.alphaValue = DISABLED_FADE
+			subtitle.alphaValue = DISABLED_FADE
+		}
+
 		if let s = statuses {
 			for count in 0 ..< statusRects.count {
 				let frame = statusRects[statusRects.count-count-1].rectValue
@@ -126,15 +133,14 @@ final class PullRequestCell: TrailerCell {
 				statusLabel.needsCommand = !Settings.makeStatusItemsSelectable
 				statusLabel.attributedStringValue = NSAttributedString(string: status.displayText(), attributes: statusAttributes)
 				statusLabel.textColor = status.colorForDisplay()
+				if faded {
+					statusLabel.alphaValue = DISABLED_FADE
+				}
 				addSubview(statusLabel)
 			}
 		}
 
-		if let n = pullRequest.number {
-			addMenuWithTitle("PR #\(n)")
-		} else {
-			addMenuWithTitle("PR Options")
-		}
+		updateMenu()
 	}
 
 	required init?(coder: NSCoder) {

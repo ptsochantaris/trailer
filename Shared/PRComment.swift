@@ -97,18 +97,27 @@ final class PRComment: DataItem {
 		return "(untitled)"
 	}
 
+	func parentIsMuted() -> Bool {
+		if pullRequest?.muted?.boolValue ?? false == true {
+			return true
+		}
+		if issue?.muted?.boolValue ?? false == true {
+			return true
+		}
+		return false
+	}
+
 	func isMine() -> Bool {
 		return userId == apiServer.userId
 	}
 
 	func refersToMe() -> Bool {
-		if let userForServer = apiServer.userName {
+		if let userForServer = apiServer.userName where userId != apiServer.userId { // Ignore self-references
 			let rangeOfHandle = body?.rangeOfString("@"+userForServer,
 				options: [NSStringCompareOptions.CaseInsensitiveSearch, NSStringCompareOptions.DiacriticInsensitiveSearch])
 			return rangeOfHandle != nil
-		} else {
-			return false
 		}
+		return false
 	}
 
 	func refersToMyTeams() -> Bool {

@@ -90,10 +90,13 @@ final class PRCell: UITableViewCell {
 	}
 
 	func setPullRequest(pullRequest: PullRequest) {
+
+		let muted = pullRequest.muted?.boolValue ?? false
+
 		let detailFont = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
 		_title.attributedText = pullRequest.titleWithFont(_title.font, labelFont: detailFont.fontWithSize(detailFont.pointSize-2), titleColor: UIColor.darkTextColor())
 		_description.attributedText = pullRequest.subtitleWithFont(detailFont, lightColor: UIColor.lightGrayColor(), darkColor: UIColor.darkGrayColor())
-		setCountsAndImage(pullRequest)
+		setCountsAndImage(pullRequest, muted)
 
 		var statusText : NSMutableAttributedString?
 		var statusCount = 0
@@ -118,7 +121,11 @@ final class PRCell: UITableViewCell {
 			statusToAvatarDistance.constant = 9.0
 			statusToDescriptionDistance.constant = 9.0
 			statusToBottomDistance.constant = 3.0
-			accessibilityLabel = "\(pullRequest.accessibleTitle()), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(pullRequest.accessibleSubtitle()). \(statusCount) statuses: \(statusString)"
+			var title = pullRequest.accessibleTitle()
+			if muted {
+				title = "(Muted) - \(title)"
+			}
+			accessibilityLabel = "\(title), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(pullRequest.accessibleSubtitle()). \(statusCount) statuses: \(statusString)"
 		} else {
 			statusToAvatarDistance.constant = 0.0
 			statusToDescriptionDistance.constant = 0.0
@@ -128,6 +135,9 @@ final class PRCell: UITableViewCell {
 	}
 
 	func setIssue(issue: Issue) {
+
+		let muted = issue.muted?.boolValue ?? false
+
 		let detailFont = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
 		_title.attributedText = issue.titleWithFont(_title.font, labelFont: detailFont.fontWithSize(detailFont.pointSize-2), titleColor: UIColor.darkTextColor())
 		_description.attributedText = issue.subtitleWithFont(detailFont, lightColor: UIColor.lightGrayColor(), darkColor: UIColor.darkGrayColor())
@@ -137,11 +147,15 @@ final class PRCell: UITableViewCell {
 		statusToDescriptionDistance.constant = 0.0
 		statusToBottomDistance.constant = 4.0
 
-		setCountsAndImage(issue)
-		accessibilityLabel = "\(issue.accessibleTitle()), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(issue.accessibleSubtitle())"
+		setCountsAndImage(issue, muted)
+		var title = issue.accessibleTitle()
+		if muted {
+			title = "(Muted) - \(title)"
+		}
+		accessibilityLabel = "\(title), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(issue.accessibleSubtitle())"
 	}
 
-	private func setCountsAndImage(item: ListableItem) {
+	private func setCountsAndImage(item: ListableItem, _ muted: Bool) {
 		let _commentsTotal = item.totalComments?.integerValue ?? 0
 		let _commentsNew = item.showNewComments() ? item.unreadComments?.integerValue ?? 0 : 0
 
@@ -150,6 +164,14 @@ final class PRCell: UITableViewCell {
 
 		unreadCount.hidden = (_commentsNew == 0)
 		unreadCount.text = itemCountFormatter.stringFromNumber(_commentsNew)
+
+		let a:CGFloat = muted ? DISABLED_FADE : 1.0
+		readCount.alpha = a
+		unreadCount.alpha = a
+		_image.alpha = a
+		_title.alpha = a
+		_statuses.alpha = a
+		_description.alpha = a
 
 		loadImageAtPath(item.userAvatarUrl)
 	}

@@ -127,29 +127,66 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	func userNotificationCenter(center: NSUserNotificationCenter, didActivateNotification notification: NSUserNotification) {
-		switch notification.activationType {
-		case NSUserNotificationActivationType.ActionButtonClicked: fallthrough
-		case NSUserNotificationActivationType.ContentsClicked:
-			if let userInfo = notification.userInfo {
+
+		func relatedItems(userInfo: [String : AnyObject?]) -> (PRComment?, ListableItem)? {
+			var item: ListableItem?
+			var comment: PRComment?
+			if let itemId = DataManager.idForUriPath(userInfo[COMMENT_ID_KEY] as? String), c = existingObjectWithID(itemId) as? PRComment {
+				comment = c
+				item = c.pullRequest ?? c.issue
+			} else if let itemId = DataManager.idForUriPath(userInfo[PULL_REQUEST_ID_KEY] as? String) {
+				item = existingObjectWithID(itemId) as? ListableItem
+			} else if let itemId = DataManager.idForUriPath(userInfo[ISSUE_ID_KEY] as? String) {
+				item = existingObjectWithID(itemId) as? ListableItem
+			}
+			if item == nil {
+				return nil
+			} else {
+				return (comment, item!)
+			}
+		}
+
+		if let userInfo = notification.userInfo {
+
+			switch notification.activationType {
+			case .AdditionalActionClicked:
+				if #available(OSX 10.10, *) {
+					if notification.additionalActivationAction?.identifier == "mute" {
+						if let (_,i) = relatedItems(userInfo) {
+							i.muted = true
+							i.postProcess()
+							DataManager.saveDB()
+							if i is PullRequest {
+								updatePrMenu()
+							} else if i is Issue {
+								updateIssuesMenu()
+							}
+						}
+						break
+					} else if notification.additionalActivationAction?.identifier == "read" {
+						if let (_,i) = relatedItems(userInfo) {
+							i.catchUpWithComments()
+							DataManager.saveDB()
+							if i is PullRequest {
+								updatePrMenu()
+							} else if i is Issue {
+								updateIssuesMenu()
+							}
+						}
+						break
+					}
+				}
+			case .ActionButtonClicked: fallthrough
+			case .ContentsClicked:
 				var urlToOpen = userInfo[NOTIFICATION_URL_KEY] as? String
 				if urlToOpen == nil {
-					var relatedItem: ListableItem?
-					if let itemId = DataManager.idForUriPath(userInfo[COMMENT_ID_KEY] as? String), c = existingObjectWithID(itemId) as? PRComment {
-						relatedItem = c.pullRequest ?? c.issue
-						urlToOpen = c.webUrl
-					} else if let itemId = DataManager.idForUriPath(userInfo[PULL_REQUEST_ID_KEY] as? String) {
-						relatedItem = existingObjectWithID(itemId) as? ListableItem
-						urlToOpen = relatedItem?.webUrl
-					} else if let itemId = DataManager.idForUriPath(userInfo[ISSUE_ID_KEY] as? String) {
-						relatedItem = existingObjectWithID(itemId) as? ListableItem
-						urlToOpen = relatedItem?.webUrl
-					}
-					if let r = relatedItem {
-						r.catchUpWithComments()
+					if let (c,i) = relatedItems(userInfo) {
+						urlToOpen = c?.webUrl ?? i.webUrl
+						i.catchUpWithComments()
 						DataManager.saveDB()
-						if r is PullRequest {
+						if i is PullRequest {
 							updatePrMenu()
-						} else if r is Issue {
+						} else if i is Issue {
 							updateIssuesMenu()
 						}
 					}
@@ -157,8 +194,8 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				if let up = urlToOpen, u = NSURL(string: up) {
 					NSWorkspace.sharedWorkspace().openURL(u)
 				}
+			default: break
 			}
-		default: break
 		}
 		NSUserNotificationCenter.defaultUserNotificationCenter().removeDeliveredNotification(notification)
 	}
@@ -174,26 +211,42 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		switch type {
 		case .NewMention:
 			let c = forItem as! PRComment
+			if c.parentIsMuted() { return }
 			notification.title = "@" + (c.userName ?? "NoUserName") + " mentioned you:"
 			notification.subtitle = c.notificationSubtitle()
 			notification.informativeText = c.body
+			addPotentialMute(notification)
 		case .NewComment:
 			let c = forItem as! PRComment
+			if c.parentIsMuted() { return }
 			notification.title = "@" + (c.userName ?? "NoUserName") + " commented:"
 			notification.subtitle = c.notificationSubtitle()
 			notification.informativeText = c.body
+			addPotentialMute(notification)
 		case .NewPr:
+			let p = forItem as! PullRequest
+			if p.muted?.boolValue ?? false { return }
 			notification.title = "New PR"
-			notification.subtitle = (forItem as! PullRequest).title
+			notification.subtitle = p.title
+			addPotentialMute(notification)
 		case .PrReopened:
+			let p = forItem as! PullRequest
+			if p.muted?.boolValue ?? false { return }
 			notification.title = "Re-Opened PR"
-			notification.subtitle = (forItem as! PullRequest).title
+			notification.subtitle = p.title
+			addPotentialMute(notification)
 		case .PrMerged:
+			let p = forItem as! PullRequest
+			if p.muted?.boolValue ?? false { return }
 			notification.title = "PR Merged!"
-			notification.subtitle = (forItem as! PullRequest).title
+			notification.subtitle = p.title
+			addPotentialMute(notification)
 		case .PrClosed:
+			let p = forItem as! PullRequest
+			if p.muted?.boolValue ?? false { return }
 			notification.title = "PR Closed"
-			notification.subtitle = (forItem as! PullRequest).title
+			notification.subtitle = p.title
+			addPotentialMute(notification)
 		case .NewRepoSubscribed:
 			notification.title = "New Repository Subscribed"
 			notification.subtitle = (forItem as! Repo).fullName
@@ -201,36 +254,63 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			notification.title = "New Repository"
 			notification.subtitle = (forItem as! Repo).fullName
 		case .NewPrAssigned:
+			let p = forItem as! PullRequest
+			if p.muted?.boolValue ?? false { return } // unmute on assignment option?
 			notification.title = "PR Assigned"
-			notification.subtitle = (forItem as! PullRequest).title
+			notification.subtitle = p.title
+			addPotentialMute(notification)
 		case .NewStatus:
-			let c = forItem as! PRStatus
+			let s = forItem as! PRStatus
+			if s.parentIsMuted() { return }
 			notification.title = "PR Status Update"
-			notification.subtitle = c.pullRequest.title
-			notification.informativeText = c.descriptionText
+			notification.subtitle = s.pullRequest.title
+			notification.informativeText = s.descriptionText
+			addPotentialMute(notification)
 		case .NewIssue:
+			let i = forItem as! Issue
+			if i.muted?.boolValue ?? false { return }
 			notification.title = "New Issue"
-			notification.subtitle = (forItem as! Issue).title
+			notification.subtitle = i.title
+			addPotentialMute(notification)
 		case .IssueReopened:
+			let i = forItem as! Issue
+			if i.muted?.boolValue ?? false { return }
 			notification.title = "Re-Opened Issue"
-			notification.subtitle = (forItem as! Issue).title
+			notification.subtitle = i.title
+			addPotentialMute(notification)
 		case .IssueClosed:
+			let i = forItem as! Issue
+			if i.muted?.boolValue ?? false { return }
 			notification.title = "Issue Closed"
-			notification.subtitle = (forItem as! Issue).title
+			notification.subtitle = i.title
+			addPotentialMute(notification)
 		case .NewIssueAssigned:
+			let i = forItem as! Issue
+			if i.muted?.boolValue ?? false { return }
 			notification.title = "Issue Assigned"
-			notification.subtitle = (forItem as! Issue).title
+			notification.subtitle = i.title
+			addPotentialMute(notification)
 		}
 
-		if (type == .NewComment || type == .NewMention) && !Settings.hideAvatars && notification.respondsToSelector(Selector("setContentImage:")) {
+		let d = NSUserNotificationCenter.defaultUserNotificationCenter()
+		if (type == .NewComment || type == .NewMention) && !Settings.hideAvatars {
 			if let c = forItem as? PRComment, url = c.avatarUrl {
 				api.haveCachedAvatar(url) { image, _ in
 					notification.contentImage = image
-					NSUserNotificationCenter.defaultUserNotificationCenter().deliverNotification(notification)
+					d.deliverNotification(notification)
 				}
 			}
 		} else { // proceed as normal
-			NSUserNotificationCenter.defaultUserNotificationCenter().deliverNotification(notification)
+			d.deliverNotification(notification)
+		}
+	}
+
+	private func addPotentialMute(n: NSUserNotification) {
+		if #available(OSX 10.10, *) {
+			n.additionalActions = [
+				NSUserNotificationAction(identifier: "mute", title: "Mute this item"),
+				NSUserNotificationAction(identifier: "read", title: "Mark this item as read")
+			]
 		}
 	}
 
@@ -1021,7 +1101,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 	}
 
-	func focusedItemUrl() -> String? {
+	func focusedItem() -> ListableItem? {
 		if prMenu.visible {
 			let row = prMenu.table.selectedRow
 			var pr: PullRequest?
@@ -1032,7 +1112,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			atNextEvent { [weak self] in
 				self!.prMenu.table.selectRowIndexes(NSIndexSet(index: row), byExtendingSelection: false)
 			}
-			return pr?.webUrl
+			return pr
 		} else if issuesMenu.visible {
 			let row = issuesMenu.table.selectedRow
 			var i: Issue?
@@ -1043,7 +1123,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			atNextEvent { [weak self] in
 				self!.issuesMenu.table.selectRowIndexes(NSIndexSet(index: row), byExtendingSelection: false)
 			}
-			return i?.webUrl
+			return i
 		} else {
 			return nil
 		}

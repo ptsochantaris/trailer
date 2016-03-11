@@ -51,7 +51,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 		atNextEvent { [weak self] in
 			if Repo.visibleReposInMoc(mainObjectContext).count > 0 && ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
 				if let localNotification = launchOptions?[UIApplicationLaunchOptionsLocalNotificationKey] as? UILocalNotification {
-					NotificationManager.handleLocalNotification(localNotification)
+					NotificationManager.handleLocalNotification(localNotification, action: nil)
 				}
 			} else {
 
@@ -67,7 +67,40 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 			self!.watchManager = WatchManager()
 		}
 
-		let notificationSettings = UIUserNotificationSettings(forTypes: UIUserNotificationType.Alert.union(UIUserNotificationType.Badge).union(UIUserNotificationType.Sound), categories: nil)
+		let readAction = UIMutableUserNotificationAction()
+		readAction.identifier = "read"
+		readAction.title = "Mark as read"
+		readAction.destructive = false
+		readAction.authenticationRequired = false
+		readAction.activationMode = .Background
+
+		let readShort = UIMutableUserNotificationAction()
+		readShort.identifier = "read"
+		readShort.title = "Read"
+		readShort.destructive = false
+		readShort.authenticationRequired = false
+		readShort.activationMode = .Background
+
+		let muteAction = UIMutableUserNotificationAction()
+		muteAction.identifier = "mute"
+		muteAction.title = "Mute this item"
+		muteAction.destructive = true
+		muteAction.authenticationRequired = false
+		muteAction.activationMode = .Background
+
+		let muteShort = UIMutableUserNotificationAction()
+		muteShort.identifier = "mute"
+		muteShort.title = "Mute"
+		muteShort.destructive = true
+		muteShort.authenticationRequired = false
+		muteShort.activationMode = .Background
+
+		let itemCategory = UIMutableUserNotificationCategory()
+		itemCategory.identifier = "mutable"
+		itemCategory.setActions([readAction, muteAction], forContext: .Default)
+		itemCategory.setActions([readShort, muteShort], forContext: .Minimal)
+
+		let notificationSettings = UIUserNotificationSettings(forTypes: UIUserNotificationType.Alert.union(UIUserNotificationType.Badge).union(UIUserNotificationType.Sound), categories: [itemCategory])
 		UIApplication.sharedApplication().registerUserNotificationSettings(notificationSettings)
 		return true
 	}
@@ -136,7 +169,14 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 
 	func application(application: UIApplication, didReceiveLocalNotification notification: UILocalNotification) {
 		if enteringForeground {
-			NotificationManager.handleLocalNotification(notification)
+			NotificationManager.handleLocalNotification(notification, action: nil)
+		}
+	}
+
+	func application(application: UIApplication, handleActionWithIdentifier identifier: String?, forLocalNotification notification: UILocalNotification, completionHandler: () -> Void) {
+		dispatch_async(dispatch_get_main_queue()) {
+			NotificationManager.handleLocalNotification(notification, action: identifier)
+			completionHandler()
 		}
 	}
 
@@ -313,6 +353,21 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 			oid = DataManager.idForUriPath(i),
 			o = existingObjectWithID(oid) as? ListableItem {
 				o.catchUpWithComments()
+				if reloadView {
+					popupManager.getMasterController().reloadDataWithAnimation(false)
+				}
+				DataManager.saveDB()
+				app.updateBadge()
+		}
+	}
+
+	func markItemAsUnRead(itemUri: String?, reloadView: Bool) {
+		if let
+			i = itemUri,
+			oid = DataManager.idForUriPath(i),
+			o = existingObjectWithID(oid) as? ListableItem {
+				o.latestReadCommentDate = never()
+				o.postProcess()
 				if reloadView {
 					popupManager.getMasterController().reloadDataWithAnimation(false)
 				}

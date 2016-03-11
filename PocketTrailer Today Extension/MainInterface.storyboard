@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="9059" systemVersion="15B42" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="M4Y-Lb-cyx">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="9532" systemVersion="15D21" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="M4Y-Lb-cyx">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9049"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9530"/>
     </dependencies>
     <scenes>
         <!--Today View Controller-->
@@ -18,7 +18,6 @@
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="dX5-UL-dra">
                                 <rect key="frame" x="4" y="40" width="15" height="15"/>
-                                <animations/>
                                 <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="15" id="a1w-E6-1Cj"/>
@@ -27,7 +26,6 @@
                             </imageView>
                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="oQw-hA-EBD">
                                 <rect key="frame" x="2" y="11" width="17" height="17"/>
-                                <animations/>
                                 <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="17" id="YWE-Aj-drj"/>
@@ -36,7 +34,6 @@
                             </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="1000" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="quz-Tb-Fw0" userLabel="Prs">
                                 <rect key="frame" x="24" y="10" width="292" height="20"/>
-                                <animations/>
                                 <attributedString key="attributedText">
                                     <fragment content="Loading...">
                                         <attributes>
@@ -50,7 +47,6 @@
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="1000" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LSV-z6-vQv" userLabel="Issues">
                                 <rect key="frame" x="24" y="38" width="292" height="20"/>
-                                <animations/>
                                 <attributedString key="attributedText">
                                     <fragment content="Loading...">
                                         <attributes>
@@ -64,7 +60,6 @@
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="1000" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Yh8-Pg-XrK" userLabel="Lastupdated">
                                 <rect key="frame" x="24" y="65" width="292" height="20"/>
-                                <animations/>
                                 <attributedString key="attributedText">
                                     <fragment content="Loading...">
                                         <attributes>
@@ -77,7 +72,6 @@
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
-                        <animations/>
                         <constraints>
                             <constraint firstItem="Yh8-Pg-XrK" firstAttribute="width" secondItem="LSV-z6-vQv" secondAttribute="width" id="1uX-4t-yh3"/>
                             <constraint firstItem="Yh8-Pg-XrK" firstAttribute="top" secondItem="LSV-z6-vQv" secondAttribute="bottom" constant="7" id="2cn-xu-RoM"/>

@@ -7,10 +7,13 @@ let api = API()
 
 
 //debugging
-//let _items = Issue.allItemsOfType("Issue", inMoc: mainObjectContext) as! [ListableItem]
+//let _items = PullRequest.allItemsOfType("PullRequest", inMoc: mainObjectContext) as! [ListableItem]
 //for i in _items {
-	//i.latestReadCommentDate = never()
-	//i.postProcess()
+//	i.latestReadCommentDate = never()
+//	for c in i.comments {
+//		mainObjectContext.deleteObject(c)
+//	}
+//	i.postProcess()
 //}
 //for s in _prs[0].statuses {
 //	s.state = "failed"

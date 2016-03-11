@@ -7,6 +7,7 @@ let REFRESH_STARTED_NOTIFICATION = "RefreshStartedNotification"
 let REFRESH_ENDED_NOTIFICATION = "RefreshEndedNotification"
 let GLOBAL_SCREEN_SCALE = UIScreen.mainScreen().scale
 let GLOBAL_TINT = UIColor(red: 52.0/255.0, green: 110.0/255.0, blue: 183.0/255.0, alpha: 1.0)
+let DISABLED_FADE: CGFloat = 0.3
 
 let stringDrawingOptions: NSStringDrawingOptions = [NSStringDrawingOptions.UsesLineFragmentOrigin, NSStringDrawingOptions.UsesFontLeading]
 typealias COLOR_CLASS = UIColor
@@ -25,6 +26,7 @@ let SMALL_BADGE_SIZE: CGFloat = 14.0
 let MENU_WIDTH: CGFloat = 500.0
 let AVATAR_PADDING: CGFloat = 8.0
 let REMOVE_BUTTON_WIDTH: CGFloat = 80.0
+let DISABLED_FADE: CGFloat = 0.4
 
 let stringDrawingOptions: NSStringDrawingOptions = [NSStringDrawingOptions.UsesLineFragmentOrigin, NSStringDrawingOptions.UsesFontLeading]
 typealias COLOR_CLASS = NSColor

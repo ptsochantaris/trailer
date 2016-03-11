@@ -27,6 +27,7 @@ class ListableItem: DataItem {
 	@NSManaged var reopened: NSNumber?
 	@NSManaged var number: NSNumber?
 	@NSManaged var announced: NSNumber?
+	@NSManaged var muted: NSNumber?
 
 	@NSManaged var comments: Set<PRComment>
 	@NSManaged var labels: Set<PRLabel>
@@ -176,29 +177,41 @@ class ListableItem: DataItem {
 		f.returnsObjectsAsFaults = false
 		let latestDate = latestReadCommentDate
 
+		let isMuted = muted?.boolValue ?? false
+
 		if moveToParticipated {
 			targetSection = .Participated
-			f.predicate = predicateForOthersCommentsSinceDate(latestDate)
-			unreadComments = managedObjectContext?.countForFetchRequest(f, error: nil)
+			if isMuted {
+				unreadComments = 0
+			} else {
+				f.predicate = predicateForOthersCommentsSinceDate(latestDate)
+				unreadComments = managedObjectContext?.countForFetchRequest(f, error: nil)
+			}
 		} else if needsManualCount {
 			f.predicate = predicateForOthersCommentsSinceDate(nil)
 			var unreadCommentCount: Int = 0
-			for c in try! managedObjectContext?.executeFetchRequest(f) as! [PRComment] {
-				if c.refersToMe() {
-					targetSection = .Participated
-				}
-				if let l = latestDate {
-					if c.createdAt?.compare(l)==NSComparisonResult.OrderedDescending {
-						unreadCommentCount++
+			if !isMuted {
+				for c in try! managedObjectContext?.executeFetchRequest(f) as! [PRComment] {
+					if c.refersToMe() {
+						targetSection = .Participated
 					}
-				} else {
-					unreadCommentCount++;
+					if let l = latestDate {
+						if c.createdAt?.compare(l)==NSComparisonResult.OrderedDescending {
+							unreadCommentCount++
+						}
+					} else {
+						unreadCommentCount++;
+					}
 				}
 			}
 			unreadComments = unreadCommentCount
 		} else {
-			f.predicate = predicateForOthersCommentsSinceDate(latestDate)
-			unreadComments = managedObjectContext?.countForFetchRequest(f, error: nil)
+			if isMuted {
+				unreadComments = 0
+			} else {
+				f.predicate = predicateForOthersCommentsSinceDate(latestDate)
+				unreadComments = managedObjectContext?.countForFetchRequest(f, error: nil)
+			}
 		}
 
 		totalComments = comments.count

@@ -78,14 +78,94 @@ class TrailerCell: NSTableCellView {
 		}
 	}
 
-	func addMenuWithTitle(title: String) {
+	func updateMenu() {
+
+		let title: String
+		let item = associatedDataItem()
+		let muted = item.muted?.boolValue ?? false
+		if let n = item.number {
+			if item is PullRequest {
+				title = muted ? "PR #\(n) (muted)" : "PR #\(n)"
+			} else {
+				title = muted ? "Issue #\(n) (muted)" : "Issue #\(n)"
+			}
+		} else {
+			title = "PR Options"
+		}
+
         menu = NSMenu(title: title)
 		menu!.insertItemWithTitle(title, action: Selector("copyNumberToClipboard"), keyEquivalent: "", atIndex: 0)
 		menu!.insertItem(NSMenuItem.separatorItem(), atIndex: 1)
-        let c = menu!.insertItemWithTitle("Copy URL", action: Selector("copyToClipboard"), keyEquivalent: "c", atIndex: 2)
-        c?.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
-        menu!.insertItemWithTitle("Open Repo", action: Selector("openRepo"), keyEquivalent: "", atIndex: 3)
+		
+        let c2 = menu!.insertItemWithTitle("Copy URL", action: Selector("copyToClipboard"), keyEquivalent: "c", atIndex: 2)
+        c2!.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
+
+        let c3 = menu!.insertItemWithTitle("Open Repo", action: Selector("openRepo"), keyEquivalent: "o", atIndex: 3)
+		c3!.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
+
+		if muted {
+			let c4 = menu!.insertItemWithTitle("Un-Mute", action: Selector("unMuteSelected"), keyEquivalent: "m", atIndex: 4)
+			c4!.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
+		} else {
+			let c4 = menu!.insertItemWithTitle("Mute", action: Selector("muteSelected"), keyEquivalent: "m", atIndex: 4)
+			c4!.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
+		}
+
+		if item.unreadComments?.integerValue > 0 {
+			let c4 = menu!.insertItemWithTitle("Mark as read", action: Selector("markReadSelected"), keyEquivalent: "a", atIndex: 5)
+			c4!.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
+		} else {
+			let c4 = menu!.insertItemWithTitle("Mark as unread", action: Selector("markUnreadSelected"), keyEquivalent: "a", atIndex: 5)
+			c4!.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
+		}
     }
+
+	func markReadSelected() {
+		let item = associatedDataItem()
+		item.catchUpWithComments()
+		DataManager.saveDB()
+		if item is PullRequest {
+			app.updatePrMenu()
+		} else {
+			app.updateIssuesMenu()
+		}
+	}
+
+	func markUnreadSelected() {
+		let item = associatedDataItem()
+		item.latestReadCommentDate = never()
+		item.postProcess()
+		DataManager.saveDB()
+		if item is PullRequest {
+			app.updatePrMenu()
+		} else {
+			app.updateIssuesMenu()
+		}
+	}
+
+	func muteSelected() {
+		let item = associatedDataItem()
+		item.muted = true
+		item.postProcess()
+		DataManager.saveDB()
+		if item is PullRequest {
+			app.updatePrMenu()
+		} else {
+			app.updateIssuesMenu()
+		}
+	}
+
+	func unMuteSelected() {
+		let item = associatedDataItem()
+		item.muted = false
+		item.postProcess()
+		DataManager.saveDB()
+		if item is PullRequest {
+			app.updatePrMenu()
+		} else {
+			app.updateIssuesMenu()
+		}
+	}
 
 	func associatedDataItem() -> ListableItem {
 		return existingObjectWithID(dataItemId) as! ListableItem
@@ -116,7 +196,7 @@ class TrailerCell: NSTableCellView {
 	private var newBackground: FilledView?
 	private var countView: CenterTextField?
 
-	func addCounts(totalCount: Int, _ unreadCount: Int) {
+	func addCounts(totalCount: Int, _ unreadCount: Int, _ faded: Bool) {
 
 		if totalCount == 0 {
 			return
@@ -139,8 +219,9 @@ class TrailerCell: NSTableCellView {
 		c.cornerRadius = floor(height/2.0)
 
 		countView = CenterTextField(frame: c.bounds)
-        countView?.vibrant = false
+        countView!.vibrant = false
 		countView!.attributedStringValue = countString
+		if faded { countView!.alphaValue = DISABLED_FADE }
 		c.addSubview(countView!)
 		addSubview(c)
 
@@ -165,6 +246,7 @@ class TrailerCell: NSTableCellView {
 			let alertCount = CenterTextField(frame: cc.bounds)
             alertCount.vibrant = false
 			alertCount.attributedStringValue = alertString
+			if faded { alertCount.alphaValue = DISABLED_FADE }
 			cc.addSubview(alertCount)
 			addSubview(cc)
 

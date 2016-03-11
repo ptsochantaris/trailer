@@ -304,15 +304,15 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 	}
 
-	func localNotification(userInfo: [NSObject : AnyObject]) {
+	func localNotification(userInfo: [NSObject : AnyObject], action: String?) {
 		var urlToOpen = userInfo[NOTIFICATION_URL_KEY] as? String
 		var relatedItem: ListableItem?
 
 		if let commentId = DataManager.idForUriPath(userInfo[COMMENT_ID_KEY] as? String), c = existingObjectWithID(commentId) as? PRComment {
-				relatedItem = c.pullRequest ?? c.issue
-				if urlToOpen == nil {
-					urlToOpen = c.webUrl
-				}
+			relatedItem = c.pullRequest ?? c.issue
+			if urlToOpen == nil {
+				urlToOpen = c.webUrl
+			}
 		} else if let pullRequestId = DataManager.idForUriPath(userInfo[PULL_REQUEST_ID_KEY] as? String) {
 			relatedItem = existingObjectWithID(pullRequestId) as? ListableItem
 			if relatedItem == nil {
@@ -327,6 +327,18 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			} else if urlToOpen == nil {
 				urlToOpen = relatedItem!.webUrl
 			}
+		}
+
+		if let a = action, i = relatedItem {
+			if a == "mute" {
+				i.muted = true
+				i.postProcess()
+			} else if a == "read" {
+				i.catchUpWithComments()
+			}
+			DataManager.saveDB()
+			updateStatus()
+			return
 		}
 
 		if urlToOpen != nil && !(searchField.text ?? "").isEmpty {
@@ -474,21 +486,56 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	override func tableView(tableView: UITableView, editActionsForRowAtIndexPath indexPath: NSIndexPath) -> [UITableViewRowAction]? {
 
-		let r = UITableViewRowAction(style: .Normal, title: "Read") { [weak self] (action, indexPath) -> Void in
-			if let i = self?.fetchedResultsController.objectAtIndexPath(indexPath) as? ListableItem {
-				app.markItemAsRead(i.objectID.URIRepresentation().absoluteString, reloadView: false)
-				tableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
+		let item = fetchedResultsController.objectAtIndexPath(indexPath) as! ListableItem
+
+		let r:UITableViewRowAction
+		let m:UITableViewRowAction
+		if item.unreadComments?.longLongValue ?? 0 > 0 {
+			r = UITableViewRowAction(style: .Normal, title: "Read") { [weak self] (action, indexPath) in
+				if let i = self?.fetchedResultsController.objectAtIndexPath(indexPath) as? ListableItem {
+					app.markItemAsRead(i.objectID.URIRepresentation().absoluteString, reloadView: false)
+					tableView.setEditing(false, animated: true)
+				}
+			}
+		} else {
+			r = UITableViewRowAction(style: .Normal, title: "Unread") { [weak self] (action, indexPath) in
+				if let i = self?.fetchedResultsController.objectAtIndexPath(indexPath) as? ListableItem {
+					app.markItemAsUnRead(i.objectID.URIRepresentation().absoluteString, reloadView: false)
+					tableView.setEditing(false, animated: true)
+				}
 			}
 		}
 
-		var actions = [r]
+		if item.muted?.boolValue ?? false {
+			m = UITableViewRowAction(style: .Normal, title: "Unmute") { [weak self] (action, indexPath) in
+				if let i = self?.fetchedResultsController.objectAtIndexPath(indexPath) as? ListableItem {
+					i.muted = false
+					i.postProcess()
+					DataManager.saveDB()
+					tableView.setEditing(false, animated: true)
+				}
+			}
+		} else {
+			m = UITableViewRowAction(style: .Normal, title: "Mute") { [weak self] (action, indexPath) in
+				if let i = self?.fetchedResultsController.objectAtIndexPath(indexPath) as? ListableItem {
+					i.muted = true
+					i.postProcess()
+					DataManager.saveDB()
+					tableView.setEditing(false, animated: true)
+				}
+			}
+		}
+
+		r.backgroundColor = self.view.tintColor
+		var actions = [r,m]
 
 		if let sectionName = fetchedResultsController.sections?[indexPath.section].name where sectionName == PullRequestSection.Merged.prMenuName() || sectionName == PullRequestSection.Closed.prMenuName() {
-			actions.append(UITableViewRowAction(style: .Default, title: "Delete") { [weak self] (action, indexPath) -> Void in
-				let pr = self?.fetchedResultsController.objectAtIndexPath(indexPath) as! NSManagedObject
-				mainObjectContext.deleteObject(pr)
-				DataManager.saveDB()
-				})
+			actions.append(UITableViewRowAction(style: .Destructive, title: "Delete") { [weak self] (action, indexPath) in
+				if let i = self?.fetchedResultsController.objectAtIndexPath(indexPath) as? ListableItem {
+					mainObjectContext.deleteObject(i)
+					DataManager.saveDB()
+				}
+			})
 		}
 
 		return actions

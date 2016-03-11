@@ -33,7 +33,6 @@ final class IssueCell: TrailerCell {
 		let subtitleHeight = ceil(_subtitle.boundingRectWithSize(CGSizeMake(W-4.0, CGFloat.max), options: stringDrawingOptions).size.height+4.0)
 
 		var statusRects = [NSValue]()
-		let statuses: [PRStatus]? = nil
 		var bottom: CGFloat, CELL_PADDING: CGFloat
 
 		let paragraphStyle = NSMutableParagraphStyle()
@@ -47,7 +46,8 @@ final class IssueCell: TrailerCell {
 		bottom = ceil(CELL_PADDING * 0.5)
 
 		frame = NSMakeRect(0, 0, MENU_WIDTH, titleHeight+subtitleHeight+CELL_PADDING)
-		addCounts(_commentsTotal, _commentsNew)
+		let faded = issue.muted?.boolValue ?? false
+		addCounts(_commentsTotal, _commentsNew, faded)
 
 		var titleRect = NSMakeRect(LEFTPADDING, subtitleHeight+bottom, W, titleHeight)
 		var dateRect = NSMakeRect(LEFTPADDING, bottom, W, subtitleHeight)
@@ -58,6 +58,7 @@ final class IssueCell: TrailerCell {
 			let userImage = AvatarView(
 				frame: NSMakeRect(LEFTPADDING, bounds.size.height-AVATAR_SIZE-7.0, AVATAR_SIZE, AVATAR_SIZE),
 				url: issue.userAvatarUrl ?? "")
+			if faded { userImage.alphaValue = DISABLED_FADE }
 			addSubview(userImage)
 			shift = AVATAR_PADDING+AVATAR_SIZE
 		}
@@ -100,25 +101,12 @@ final class IssueCell: TrailerCell {
 		subtitle.attributedStringValue = _subtitle
 		addSubview(subtitle)
 
-		if let s = statuses {
-			for count in 0 ..< statusRects.count {
-				let frame = statusRects[statusRects.count-count-1].rectValue
-				let statusLabel = LinkField(frame: frame)
-				let status = s[count]
-
-				statusLabel.targetUrl = status.targetUrl
-				statusLabel.needsCommand = !Settings.makeStatusItemsSelectable
-				statusLabel.attributedStringValue = NSAttributedString(string: status.displayText(), attributes: statusAttributes)
-				statusLabel.textColor = status.colorForDisplay()
-				addSubview(statusLabel)
-			}
+		if faded {
+			title.alphaValue = DISABLED_FADE
+			subtitle.alphaValue = DISABLED_FADE
 		}
 
-		if let n = issue.number {
-			addMenuWithTitle("Issue #\(n)")
-		} else {
-			addMenuWithTitle("Issue Options")
-		}
+		updateMenu()
 	}
 
 	required init?(coder: NSCoder) {

@@ -85,4 +85,10 @@ final class PRStatus: DataItem {
 		}
 	}
 
+	func parentIsMuted() -> Bool {
+		if pullRequest.muted?.boolValue ?? false == true {
+			return true
+		}
+		return false
+	}
 }
