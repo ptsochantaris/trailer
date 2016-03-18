@@ -67,10 +67,10 @@ final class PRListController: CommonController {
 
 		loadingBuffer?.appendContentsOf(page)
 		if page.count == PAGE_SIZE {
-			NSOperationQueue.mainQueue().addOperationWithBlock({ [weak self] in
+			NSOperationQueue.mainQueue().addOperationWithBlock { [weak self] in
 				self?._requestData(nil)
 				self?.showStatus("Loading \(self?.loadingBuffer?.count ?? 0) items...", hideTable: true)
-			})
+			}
 			return
 		}
 

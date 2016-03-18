@@ -108,7 +108,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		DLog("System woke up");
 		systemSleeping = false
 		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(1.0 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) { [weak self] in
-			self!.startRefreshIfItIsDue()
+			self?.startRefreshIfItIsDue()
 		}
 	}
 
@@ -786,17 +786,18 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		issuesMenu.refreshMenuItem.target = nil
 
 		api.syncItemsForActiveReposAndCallback { [weak self] in
+			if let s = self {
+				s.prMenu.refreshMenuItem.target = oldPrTarget
+				s.prMenu.refreshMenuItem.action = oldPrAction
+				s.issuesMenu.refreshMenuItem.target = oldIssuesTarget
+				s.issuesMenu.refreshMenuItem.action = oldIssuesAction
 
-			self!.prMenu.refreshMenuItem.target = oldPrTarget
-			self!.prMenu.refreshMenuItem.action = oldPrAction
-			self!.issuesMenu.refreshMenuItem.target = oldIssuesTarget
-			self!.issuesMenu.refreshMenuItem.action = oldIssuesAction
-
-			if !ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext) {
-				Settings.lastSuccessfulRefresh = NSDate()
+				if !ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext) {
+					Settings.lastSuccessfulRefresh = NSDate()
+				}
+				s.completeRefresh()
+				s.refreshTimer = NSTimer.scheduledTimerWithTimeInterval(NSTimeInterval(Settings.refreshPeriod), target: s, selector: Selector("refreshTimerDone"), userInfo: nil, repeats: false)
 			}
-			self!.completeRefresh()
-			self!.refreshTimer = NSTimer.scheduledTimerWithTimeInterval(NSTimeInterval(Settings.refreshPeriod), target: self!, selector: Selector("refreshTimerDone"), userInfo: nil, repeats: false)
 		}
 	}
 
@@ -860,20 +861,22 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		if updateStatusItem {
 			NSOperationQueue.mainQueue().addOperationWithBlock { [weak self] in
 				DLog("Updating issues status item");
-				let siv = StatusItemView(frame: CGRectMake(0, 0, length+2, H), label: countString, prefix: "issues", attributes: attributes)
-				siv.labelOffset = 2
-				siv.highlighted = self!.issuesMenu.visible
-				siv.grayOut = shouldGray
-				siv.tappedCallback = { [weak self] in
-					let m = self!.issuesMenu
-					if m.visible {
-						self!.closeMenu(m)
-					} else {
-						self!.showMenu(m)
+				if let im = self?.issuesMenu {
+					let siv = StatusItemView(frame: CGRectMake(0, 0, length+2, H), label: countString, prefix: "issues", attributes: attributes)
+					siv.labelOffset = 2
+					siv.highlighted = im.visible
+					siv.grayOut = shouldGray
+					siv.tappedCallback = { [weak self] in
+						if let m = self?.issuesMenu {
+							if m.visible {
+								self?.closeMenu(m)
+							} else {
+								self?.showMenu(m)
+							}
+						}
 					}
-					return
+					im.statusItem?.view = siv
 				}
-				self!.issuesMenu.statusItem?.view = siv
 			}
 		}
 
@@ -940,19 +943,21 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
         if updateStatusItem {
 			NSOperationQueue.mainQueue().addOperationWithBlock { [weak self] in
 				DLog("Updating PR status item");
-				let siv = StatusItemView(frame: CGRectMake(0, 0, length, H), label: countString, prefix: "pr", attributes: attributes)
-				siv.highlighted = self!.prMenu.visible
-				siv.grayOut = shouldGray
-				siv.tappedCallback = { [weak self] in
-					let m = self!.prMenu
-					if m.visible {
-						self!.closeMenu(m)
-					} else {
-						self!.showMenu(m)
+				if let pm = self?.prMenu {
+					let siv = StatusItemView(frame: CGRectMake(0, 0, length, H), label: countString, prefix: "pr", attributes: attributes)
+					siv.highlighted = pm.visible
+					siv.grayOut = shouldGray
+					siv.tappedCallback = { [weak self] in
+						if let m = self?.prMenu {
+							if m.visible {
+								self?.closeMenu(m)
+							} else {
+								self?.showMenu(m)
+							}
+						}
 					}
-					return
+					pm.statusItem?.view = siv
 				}
-				self!.prMenu.statusItem?.view = siv
 			}
         }
 
@@ -991,10 +996,10 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				let key = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String
 				let options = [key: NSNumber(bool: (AXIsProcessTrusted() == false))]
 				if AXIsProcessTrustedWithOptions(options) == true {
-					globalKeyMonitor = NSEvent.addGlobalMonitorForEventsMatchingMask(NSEventMask.KeyDownMask, handler: { [weak self] incomingEvent in
-						self!.checkForHotkey(incomingEvent)
+					globalKeyMonitor = NSEvent.addGlobalMonitorForEventsMatchingMask(NSEventMask.KeyDownMask) { [weak self] incomingEvent in
+						self?.checkForHotkey(incomingEvent)
 						return
-					})
+					}
 				}
 			}
 		} else {
@@ -1008,9 +1013,9 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			return
 		}
 
-		localKeyMonitor = NSEvent.addLocalMonitorForEventsMatchingMask(NSEventMask.KeyDownMask, handler: { [weak self] (incomingEvent) -> NSEvent! in
+		localKeyMonitor = NSEvent.addLocalMonitorForEventsMatchingMask(NSEventMask.KeyDownMask) { [weak self] (incomingEvent) -> NSEvent! in
 
-			if self!.checkForHotkey(incomingEvent) {
+			if self?.checkForHotkey(incomingEvent) ?? false {
 				return nil
 			}
 
@@ -1030,11 +1035,11 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
 
-					if Repo.interestedInPrs() && Repo.interestedInIssues() {
-						if w == self!.prMenu {
-							self!.showMenu(self!.issuesMenu)
-						} else if w == self!.issuesMenu {
-							self!.showMenu(self!.prMenu)
+					if Repo.interestedInPrs() && Repo.interestedInIssues(), let s = self {
+						if w == s.prMenu {
+							s.showMenu(s.issuesMenu)
+						} else if w == self?.issuesMenu {
+							s.showMenu(s.prMenu)
 						}
 					}
 					return nil
@@ -1045,8 +1050,8 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
 					var i = w.table.selectedRow + 1
 					if i < w.table.numberOfRows {
-						while self!.dataItemAtRow(i, inMenu: w) == nil { i++ }
-						self!.scrollToIndex(i, inMenu: w)
+						while self?.dataItemAtRow(i, inMenu: w) == nil { i++ }
+						self?.scrollToIndex(i, inMenu: w)
 					}
 					return nil
 				case 126: // up
@@ -1056,8 +1061,8 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
 					var i = w.table.selectedRow - 1
 					if i > 0 {
-						while self!.dataItemAtRow(i, inMenu: w) == nil { i-- }
-						self!.scrollToIndex(i, inMenu: w)
+						while self?.dataItemAtRow(i, inMenu: w) == nil { i-- }
+						self?.scrollToIndex(i, inMenu: w)
 					}
 					return nil
 				case 36: // enter
@@ -1065,20 +1070,20 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 						return incomingEvent
 					}
 					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
-					if let dataItem = self!.dataItemAtRow(w.table.selectedRow, inMenu: w) {
+					if let dataItem = self?.dataItemAtRow(w.table.selectedRow, inMenu: w) {
 						let isAlternative = ((incomingEvent.modifierFlags.intersect(NSEventModifierFlags.AlternateKeyMask)) == NSEventModifierFlags.AlternateKeyMask)
-						self!.dataItemSelected(dataItem, alternativeSelect: isAlternative)
+						self?.dataItemSelected(dataItem, alternativeSelect: isAlternative)
 					}
 					return nil
 				case 53: // escape
-					self!.closeMenu(w)
+					self?.closeMenu(w)
 					return nil
 				default:
 					break
 				}
 			}
 			return incomingEvent
-		})
+		}
 	}
 
 	private func dataItemAtRow(row: Int, inMenu: MenuWindow) -> ListableItem? {
@@ -1110,7 +1115,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				pr = pullRequestDelegate.pullRequestAtRow(row)
 			}
 			atNextEvent { [weak self] in
-				self!.prMenu.table.selectRowIndexes(NSIndexSet(index: row), byExtendingSelection: false)
+				self?.prMenu.table.selectRowIndexes(NSIndexSet(index: row), byExtendingSelection: false)
 			}
 			return pr
 		} else if issuesMenu.visible {
@@ -1121,7 +1126,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				i = issuesDelegate.issueAtRow(row)
 			}
 			atNextEvent { [weak self] in
-				self!.issuesMenu.table.selectRowIndexes(NSIndexSet(index: row), byExtendingSelection: false)
+				self?.issuesMenu.table.selectRowIndexes(NSIndexSet(index: row), byExtendingSelection: false)
 			}
 			return i
 		} else {
@@ -1258,11 +1263,11 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			if #available(OSX 10.10, *) {
 				let c = NSAppearance.currentAppearance()
 				if c.respondsToSelector(Selector("allowsVibrancy")) {
-					self!.darkMode = c.name.rangeOfString(NSAppearanceNameVibrantDark) != nil
+					self?.darkMode = c.name.rangeOfString(NSAppearanceNameVibrantDark) != nil
 					return
 				}
 			}
-			self!.darkMode = false
+			self?.darkMode = false
 		}
 	}
 

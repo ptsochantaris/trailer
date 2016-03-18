@@ -64,25 +64,27 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 			let alert = NSAlert()
 			alert.messageText = "Please enter your personal access token first"
 			alert.addButtonWithTitle("OK")
-			alert.beginSheetModalForWindow(self, completionHandler: { [weak self] response in
-				self!.normalState()
-			})
+			alert.beginSheetModalForWindow(self) { [weak self] response in
+				self?.normalState()
+			}
 		} else {
 			testingState()
 			api.testApiToServer(newServer) { [weak self] error in
-				if let e = error {
-					let alert = NSAlert()
-					alert.messageText = "Testing the token failed - please check that you have pasted your token correctly"
-					alert.informativeText = e.localizedDescription
-					alert.addButtonWithTitle("OK")
-					alert.beginSheetModalForWindow(self!, completionHandler: { response in
-						self!.normalState()
-					})
-				} else {
-					self!.quickstart.stringValue = "\nSyncing GitHub data for the first time.\n\nThis could take a little while, please wait..."
-					Settings.lastSuccessfulRefresh = nil
-					app.startRefreshIfItIsDue()
-					self!.checkTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self!, selector: Selector("checkRefreshDone:"), userInfo: nil, repeats: true)
+				if let s = self {
+					if let e = error {
+						let alert = NSAlert()
+						alert.messageText = "Testing the token failed - please check that you have pasted your token correctly"
+						alert.informativeText = e.localizedDescription
+						alert.addButtonWithTitle("OK")
+						alert.beginSheetModalForWindow(s) { response in
+							s.normalState()
+						}
+					} else {
+						s.quickstart.stringValue = "\nSyncing GitHub data for the first time.\n\nThis could take a little while, please wait..."
+						Settings.lastSuccessfulRefresh = nil
+						app.startRefreshIfItIsDue()
+						s.checkTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: s, selector: Selector("checkRefreshDone:"), userInfo: nil, repeats: true)
+					}
 				}
 			}
 		}
@@ -105,9 +107,9 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 				let alert = NSAlert()
 				alert.messageText = "Syncing with this server failed - please check that your network connection is working and that you have pasted your token correctly"
 				alert.addButtonWithTitle("OK")
-				alert.beginSheetModalForWindow(self, completionHandler: { [weak self] response in
-					self!.normalState()
-				})
+				alert.beginSheetModalForWindow(self) { [weak self] response in
+					self?.normalState()
+				}
 			}
 		}
 	}

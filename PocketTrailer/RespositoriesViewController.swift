@@ -34,7 +34,7 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 		searchField!.autoresizingMask = UIViewAutoresizing.FlexibleWidth
 
 		searchTimer = PopTimer(timeInterval: 0.5) { [weak self] in
-			self!.reloadData()
+			self?.reloadData()
 		}
 
 		let searchHolder = UIView(frame: CGRectMake(0, 0, view.bounds.size.width, 51))
@@ -97,12 +97,12 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 			} else {
 				try! tempContext.save()
 			}
-			self!.navigationItem.title = originalName
-			self!.actionsButton.enabled = ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext)
-			self!.tableView.alpha = 1.0
-			self!.tableView.userInteractionEnabled = true
+			self?.navigationItem.title = originalName
+			self?.actionsButton.enabled = ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext)
+			self?.tableView.alpha = 1.0
+			self?.tableView.userInteractionEnabled = true
 			app.preferencesDirty = true
-			self!.navigationItem.rightBarButtonItem?.enabled = true
+			self?.navigationItem.rightBarButtonItem?.enabled = true
 		}
 	}
 

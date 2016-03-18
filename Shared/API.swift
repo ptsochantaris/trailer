@@ -143,12 +143,12 @@ final class API {
 			var error = e
 			if error == nil && (response == nil || response?.statusCode > 399) {
 				let code = response?.statusCode ?? -1
-				error = self!.apiError("Server responded with \(code)")
+				error = self?.apiError("Server responded with \(code)")
 			}
 			completion(response: response, data: data, error: error)
 			#if os(iOS)
 				NSOperationQueue.mainQueue().addOperationWithBlock { [weak self] in
-					self!.networkIndicationEnd()
+					self?.networkIndicationEnd()
 				}
 			#endif
 		}
@@ -156,7 +156,7 @@ final class API {
 		#if os(iOS)
 			task.priority = NSURLSessionTaskPriorityHigh
 			atNextEvent { [weak self] in
-				self!.networkIndicationStart()
+				self?.networkIndicationStart()
 			}
 		#endif
 
@@ -228,12 +228,12 @@ final class API {
 
 		if shouldRefreshReposToo {
 			fetchRepositoriesToMoc(syncContext) { [weak self] in
-				self!.syncToMoc(syncContext, callback: callback)
+				self?.syncToMoc(syncContext, callback: callback)
 			}
 		} else {
 			ApiServer.resetSyncSuccessInMoc(syncContext)
 			ensureApiServersHaveUserIdsInMoc(syncContext) { [weak self] in
-				self!.syncToMoc(syncContext, callback: callback)
+				self?.syncToMoc(syncContext, callback: callback)
 			}
 		}
 	}
@@ -249,19 +249,19 @@ final class API {
 				completionCount++
 				if completionCount == totalOperations {
 					for r in repos { r.dirty = false }
-					self!.completeSyncInMoc(moc, andCallback: callback)
+					self?.completeSyncInMoc(moc, andCallback: callback)
 				}
 			}
 
-			self!.fetchIssuesForRepos(repos, toMoc: moc) { [weak self] in
-				self!.fetchCommentsForCurrentIssuesToMoc(moc) { [weak self] in
-					self!.checkIssueClosuresInMoc(moc)
+			self?.fetchIssuesForRepos(repos, toMoc: moc) { [weak self] in
+				self?.fetchCommentsForCurrentIssuesToMoc(moc) { [weak self] in
+					self?.checkIssueClosuresInMoc(moc)
 					completionCallback()
 				}
 			}
 
-			self!.fetchPullRequestsForRepos(repos, toMoc: moc) {
-				self!.updatePullRequestsInMoc(moc) {
+			self?.fetchPullRequestsForRepos(repos, toMoc: moc) {
+				self?.updatePullRequestsInMoc(moc) {
 					completionCallback()
 				}
 			}
@@ -551,8 +551,8 @@ final class API {
 
 			for apiServer in allApiServers {
 				if apiServer.goodToGo {
-					self!.syncWatchedReposFromServer(apiServer, callback: completionCallback)
-					self!.fetchUserTeamsFromApiServer(apiServer, callback: completionCallback)
+					self?.syncWatchedReposFromServer(apiServer, callback: completionCallback)
+					self?.fetchUserTeamsFromApiServer(apiServer, callback: completionCallback)
 				} else {
 					completionCallback()
 					completionCallback()
@@ -593,7 +593,7 @@ final class API {
 						return false
 					}, finalCallback: { [weak self] success, resultCode, etag in
 						if !success {
-							self!.handleRepoSyncFailure(r, withResultCode: resultCode)
+							self?.handleRepoSyncFailure(r, withResultCode: resultCode)
 						}
 						completionCount++
 						if completionCount==total {
@@ -658,7 +658,7 @@ final class API {
 						return false
 					}, finalCallback: { [weak self] success, resultCode, etag in
 						if !success {
-							self!.handleRepoSyncFailure(r, withResultCode: resultCode)
+							self?.handleRepoSyncFailure(r, withResultCode: resultCode)
 						}
 						completionCount++
 						if completionCount==total {
@@ -800,13 +800,13 @@ final class API {
 				return false
 			}
 			let oid = pr.objectID
-			let refreshes = self!.refreshesSinceLastLabelsCheck[oid]
+			let refreshes = self?.refreshesSinceLastLabelsCheck[oid]
 			if refreshes == nil || refreshes! >= Settings.labelRefreshInterval {
 				DLog("Will check labels for PR: '%@'", pr.title)
 				return true
 			} else {
 				DLog("No need to get labels for PR: '%@' (%d refreshes since last check)", pr.title, refreshes)
-				self!.refreshesSinceLastLabelsCheck[oid] = (refreshes ?? 0)+1
+				self?.refreshesSinceLastLabelsCheck[oid] = (refreshes ?? 0)+1
 				return false
 			}
 		}
@@ -842,7 +842,7 @@ final class API {
 							}
 						}
 						if allGood {
-							self!.refreshesSinceLastLabelsCheck[p.objectID] = 1
+							self?.refreshesSinceLastLabelsCheck[p.objectID] = 1
 						}
 						if completionCount == total {
 							callback()
@@ -866,13 +866,13 @@ final class API {
 				return false
 			}
 			let oid = pr.objectID
-			let refreshes = self!.refreshesSinceLastStatusCheck[oid]
+			let refreshes = self?.refreshesSinceLastStatusCheck[oid]
 			if refreshes == nil || refreshes! >= Settings.statusItemRefreshInterval {
 				DLog("Will check statuses for PR: '%@'", pr.title)
 				return true
 			} else {
 				DLog("No need to get statuses for PR: '%@' (%d refreshes since last check)", pr.title, refreshes)
-				self!.refreshesSinceLastStatusCheck[oid] = (refreshes ?? 0)+1
+				self?.refreshesSinceLastStatusCheck[oid] = (refreshes ?? 0)+1
 				return false
 			}
 		}
@@ -909,7 +909,7 @@ final class API {
 							}
 						}
 						if allGood {
-							self!.refreshesSinceLastStatusCheck[p.objectID] = 1
+							self?.refreshesSinceLastStatusCheck[p.objectID] = 1
 						}
 						if completionCount==total {
 							callback()
@@ -1039,13 +1039,13 @@ final class API {
 
 			if error == nil {
 				if let mergeInfo = N(data, "merged_by") as? [NSObject: AnyObject], mergeUserId = N(mergeInfo, "id") as? NSNumber {
-					self!.prWasMerged(r, byUserId: mergeUserId)
+					self?.prWasMerged(r, byUserId: mergeUserId)
 				} else {
-					self!.prWasClosed(r)
+					self?.prWasClosed(r)
 				}
 			} else {
 				if let resultCode = response?.statusCode where resultCode == 404 || resultCode==410 { // PR gone for good
-					self!.prWasClosed(r)
+					self?.prWasClosed(r)
 				} else { // fetch problem
 					r.postSyncAction = PostSyncAction.DoNothing.rawValue // don't delete this, we couldn't check, play it safe
 					r.apiServer.lastSyncSucceeded = false
@@ -1249,7 +1249,7 @@ final class API {
 
 			if let d = data as? [NSObject : AnyObject], userName = N(d, "login") as? String, userId = N(d, "id") as? NSNumber where error == nil {
 				if userName.isEmpty || userId.longLongValue <= 0 {
-					let localError = self!.apiError("Could not read a valid user record from this endpoint")
+					let localError = self?.apiError("Could not read a valid user record from this endpoint")
 					callback(localError)
 				} else {
 					callback(error)
@@ -1302,7 +1302,7 @@ final class API {
 					if isLastPage {
 						finalCallback(success: true, resultCode: resultCode, etag: etag)
 					} else {
-						self!.getPagedDataInPath(path, fromServer: fromServer, startingFromPage: startingFromPage+1, parameters: parameters, extraHeaders: extraHeaders, perPageCallback: perPageCallback, finalCallback: finalCallback)
+						self?.getPagedDataInPath(path, fromServer: fromServer, startingFromPage: startingFromPage+1, parameters: parameters, extraHeaders: extraHeaders, perPageCallback: perPageCallback, finalCallback: finalCallback)
 					}
 				} else {
 					finalCallback(success: resultCode==304, resultCode: resultCode, etag: etag)
@@ -1372,7 +1372,7 @@ final class API {
 				apiServerLabel = fromServer.label ?? "(untitled server)"
 			} else {
 				NSOperationQueue.mainQueue().addOperationWithBlock { [weak self] in
-					let e = self!.apiError("Sync has failed, skipping this call")
+					let e = self?.apiError("Sync has failed, skipping this call")
 					completion(response: nil, data: nil, error: e)
 				}
 				return
@@ -1412,10 +1412,10 @@ final class API {
 					// report failure and return
 					DLog("(%@) Preempted fetch to previously broken link %@, won't actually access this URL until %@", apiServerLabel, fullUrlPath, existingBackOff!.nextAttemptAt)
 					NSOperationQueue.mainQueue().addOperationWithBlock { [weak self] in
-						let e = self!.apiError("Preempted fetch because of throttling")
+						let e = self?.apiError("Preempted fetch because of throttling")
 						completion(response: nil, data: nil, error: e)
 						#if os(iOS)
-							self!.networkIndicationEnd()
+							self?.networkIndicationEnd()
 						#endif
 					}
 					return
@@ -1434,7 +1434,7 @@ final class API {
 
 				if let code = response?.statusCode {
 					if code > 399 {
-						error = self!.apiError("Server responded with \(code)")
+						error = self?.apiError("Server responded with \(code)")
 						badServerResponse = true
 					} else {
 						DLog("(%@) GET %@ - RESULT: %d", apiServerLabel, fullUrlPath, code)
@@ -1443,7 +1443,7 @@ final class API {
 						}
 					}
 				} else {
-					error = self!.apiError("Server did not repond")
+					error = self?.apiError("Server did not repond")
 				}
 
 				if error != nil {
@@ -1460,7 +1460,7 @@ final class API {
 								nextAttemptAt: NSDate(timeInterval: BACKOFF_STEP, sinceDate: NSDate()),
 								duration: BACKOFF_STEP)
 						}
-						self!.badLinks[fullUrlPath] = existingBackOff
+						self?.badLinks[fullUrlPath] = existingBackOff
 					}
 					DLog("(%@) GET %@ - FAILED: %@", apiServerLabel, fullUrlPath, error!.localizedDescription)
 				}
@@ -1471,7 +1471,7 @@ final class API {
 					}
 					completion(response: response, data: parsedData, error: error)
 					#if os(iOS)
-						self!.networkIndicationEnd()
+						self?.networkIndicationEnd()
 					#endif
 				}
 			}.resume()

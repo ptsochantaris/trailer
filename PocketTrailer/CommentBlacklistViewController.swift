@@ -60,9 +60,9 @@ final class CommentBlacklistViewController: UITableViewController {
 						Settings.commentAuthorBlacklist = blackList
 						let ip = NSIndexPath(forRow: blackList.count-1, inSection: 0)
 						if blackList.count == 1 { // first insert
-							self!.tableView.insertSections(NSIndexSet(index: 0), withRowAnimation:UITableViewRowAnimation.Automatic)
+							self?.tableView.insertSections(NSIndexSet(index: 0), withRowAnimation:UITableViewRowAnimation.Automatic)
 						} else {
-							self!.tableView.insertRowsAtIndexPaths([ip], withRowAnimation:UITableViewRowAnimation.Automatic)
+							self?.tableView.insertRowsAtIndexPaths([ip], withRowAnimation:UITableViewRowAnimation.Automatic)
 						}
 					}
 				}

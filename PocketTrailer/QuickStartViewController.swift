@@ -52,14 +52,16 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 	@IBAction func testSelected(sender: UIButton) {
 		testMode()
 		api.testApiToServer(newServer) { [weak self] error in
-			if let e = error {
-				showMessage("Testing the token failed - please check that you have pasted your token correctly", e.localizedDescription)
-				self!.normalMode()
-			} else {
-				self!.feedback.text = "Syncing GitHub data for the first time.\n\nThis could take a little while, please wait..."
-				Settings.lastSuccessfulRefresh = nil
-				app.startRefreshIfItIsDue()
-				self!.checkTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self!, selector: Selector("checkRefreshDone:"), userInfo: nil, repeats: true)
+			if let s = self {
+				if let e = error {
+					showMessage("Testing the token failed - please check that you have pasted your token correctly", e.localizedDescription)
+					s.normalMode()
+				} else {
+					s.feedback.text = "Syncing GitHub data for the first time.\n\nThis could take a little while, please wait..."
+					Settings.lastSuccessfulRefresh = nil
+					app.startRefreshIfItIsDue()
+					s.checkTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: s, selector: Selector("checkRefreshDone:"), userInfo: nil, repeats: true)
+				}
 			}
 		}
 	}

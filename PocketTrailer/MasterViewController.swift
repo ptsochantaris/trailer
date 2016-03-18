@@ -25,15 +25,15 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		a.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: { action in
 			a.dismissViewControllerAnimated(true, completion: nil)
 		}))
-		a.addAction(UIAlertAction(title: "Mark all as read", style: UIAlertActionStyle.Destructive, handler: { [weak self] action in
+		a.addAction(UIAlertAction(title: "Mark all as read", style: UIAlertActionStyle.Destructive) { [weak self] action in
 			self?.markAllAsRead()
-			}))
-		a.addAction(UIAlertAction(title: "Remove merged", style:UIAlertActionStyle.Default, handler: { [weak self] action in
+			})
+		a.addAction(UIAlertAction(title: "Remove merged", style:UIAlertActionStyle.Default) { [weak self] action in
 			self?.removeAllMerged()
-			}))
-		a.addAction(UIAlertAction(title: "Remove closed", style:UIAlertActionStyle.Default, handler: { [weak self] action in
+			})
+		a.addAction(UIAlertAction(title: "Remove closed", style:UIAlertActionStyle.Default) { [weak self] action in
 			self?.removeAllClosed()
-			}))
+			})
 		presentViewController(a, animated: true, completion: nil)
 	}
 
@@ -53,14 +53,14 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	{
 		NSOperationQueue.mainQueue().addOperationWithBlock { [weak self] in
 			if Settings.dontAskBeforeWipingMerged {
-				self!.removeAllMergedConfirmed()
+				self?.removeAllMergedConfirmed()
 			} else {
-				let a = UIAlertController(title: "Sure?", message: "Remove all \(self!.viewMode.namePlural()) in the Merged section?", preferredStyle: UIAlertControllerStyle.Alert)
+				let a = UIAlertController(title: "Sure?", message: "Remove all \(self?.viewMode.namePlural()) in the Merged section?", preferredStyle: UIAlertControllerStyle.Alert)
 				a.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil))
-				a.addAction(UIAlertAction(title: "Remove", style: UIAlertActionStyle.Destructive, handler: { [weak self] action in
-					self!.removeAllMergedConfirmed()
-					}))
-				self!.presentViewController(a, animated: true, completion: nil)
+				a.addAction(UIAlertAction(title: "Remove", style: UIAlertActionStyle.Destructive) { [weak self] action in
+					self?.removeAllMergedConfirmed()
+					})
+				self?.presentViewController(a, animated: true, completion: nil)
 			}
 		}
 	}
@@ -68,14 +68,14 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	func removeAllClosed() {
 		NSOperationQueue.mainQueue().addOperationWithBlock {  [weak self] in
 			if Settings.dontAskBeforeWipingClosed {
-				self!.removeAllClosedConfirmed()
+				self?.removeAllClosedConfirmed()
 			} else {
-				let a = UIAlertController(title: "Sure?", message: "Remove all \(self!.viewMode.namePlural()) in the Closed section?", preferredStyle: UIAlertControllerStyle.Alert)
+				let a = UIAlertController(title: "Sure?", message: "Remove all \(self?.viewMode.namePlural()) in the Closed section?", preferredStyle: UIAlertControllerStyle.Alert)
 				a.addAction(UIAlertAction(title: "Cancel", style:UIAlertActionStyle.Cancel, handler: nil))
-				a.addAction(UIAlertAction(title: "Remove", style:UIAlertActionStyle.Destructive, handler: { [weak self] action in
-					self!.removeAllClosedConfirmed()
-					}))
-				self!.presentViewController(a, animated: true, completion: nil)
+				a.addAction(UIAlertAction(title: "Remove", style:UIAlertActionStyle.Destructive) { [weak self] action in
+					self?.removeAllClosedConfirmed()
+					})
+				self?.presentViewController(a, animated: true, completion: nil)
 			}
 		}
 	}
@@ -135,7 +135,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		super.viewDidLoad()
 
 		searchTimer = PopTimer(timeInterval: 0.5) { [weak self] in
-			self!.reloadDataWithAnimation(true)
+			self?.reloadDataWithAnimation(true)
 		}
 
 		refreshControl?.addTarget(self, action: Selector("refreshControlChanged"), forControlEvents: UIControlEvents.ValueChanged)
@@ -294,7 +294,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 							t.transform = CGAffineTransformMakeTranslation(0, 49)
 						}, completion: { [weak self] finished in
 							t.removeFromSuperview()
-							self!.tabBar = nil
+							self?.tabBar = nil
 						})
 				} else {
 					t.removeFromSuperview()

@@ -691,9 +691,9 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			DLog("Will import settings from %@", url.absoluteString)
 			settingsManager.loadSettingsFrom(url, confirmFromView: self) { [weak self] confirmed in
 				if confirmed {
-					self!.dismissViewControllerAnimated(false, completion: nil)
+					self?.dismissViewControllerAnimated(false, completion: nil)
 				}
-				self!.documentInteractionCleanup()
+				self?.documentInteractionCleanup()
 			}
 		} else {
 			DLog("Saved settings to %@", url.absoluteString)
