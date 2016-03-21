@@ -1,4 +1,13 @@
 
+extension NSTextField {
+	final func trailerUndo() {
+		self.currentEditor()?.undoManager?.undo()
+	}
+	final func trailerRedo() {
+		self.currentEditor()?.undoManager?.redo()
+	}
+}
+
 final class Application: NSApplication {
 	override func sendEvent(theEvent: NSEvent) {
 		if theEvent.type == NSEventType.KeyDown {
@@ -8,7 +17,7 @@ final class Application: NSApplication {
 					switch char {
 					case "x": if sendAction(#selector(NSText.cut(_:)), to:nil, from:self) { return }
 					case "v": if sendAction(#selector(NSText.paste(_:)), to:nil, from:self) { return }
-					case "z": if sendAction(Selector("undo:"), to:nil, from:self) { return }
+					case "z": if sendAction(#selector(NSTextField.trailerUndo), to:nil, from:self) { return }
 					case "c":
 						if let url = app.focusedItem()?.webUrl {
 							let p = NSPasteboard.generalPasteboard()
@@ -58,7 +67,7 @@ final class Application: NSApplication {
 				}
 			} else if modifiers == NSEventModifierFlags.CommandKeyMask.union(NSEventModifierFlags.ShiftKeyMask) {
 				if let char = theEvent.charactersIgnoringModifiers {
-					if char == "Z" && sendAction(Selector("redo:"), to:nil, from:self) { return }
+					if char == "Z" && sendAction(#selector(NSTextField.trailerRedo), to:nil, from:self) { return }
 				}
 			}
 		}
