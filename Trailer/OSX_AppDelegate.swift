@@ -84,7 +84,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 
 		let n = NSNotificationCenter.defaultCenter()
-		n.addObserver(self, selector: Selector("updateScrollBarWidth"), name: NSPreferredScrollerStyleDidChangeNotification, object: nil)
+		n.addObserver(self, selector: #selector(OSX_AppDelegate.updateScrollBarWidth), name: NSPreferredScrollerStyleDidChangeNotification, object: nil)
 
 		addHotKeySupport()
 
@@ -95,8 +95,8 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 
 		let wn = NSWorkspace.sharedWorkspace().notificationCenter
-		wn.addObserver(self, selector: Selector("systemWillSleep"), name: NSWorkspaceWillSleepNotification, object: nil)
-		wn.addObserver(self, selector: Selector("systemDidWake"), name: NSWorkspaceDidWakeNotification, object: nil)
+		wn.addObserver(self, selector: #selector(OSX_AppDelegate.systemWillSleep), name: NSWorkspaceWillSleepNotification, object: nil)
+		wn.addObserver(self, selector: #selector(OSX_AppDelegate.systemDidWake), name: NSWorkspaceDidWakeNotification, object: nil)
 	}
 
 	func systemWillSleep() {
@@ -671,7 +671,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			} else {
 				let howLongUntilNextSync = NSTimeInterval(Settings.refreshPeriod) - howLongAgo
 				DLog("No need to refresh yet, will refresh in %f", howLongUntilNextSync)
-				refreshTimer = NSTimer.scheduledTimerWithTimeInterval(howLongUntilNextSync, target: self, selector: Selector("refreshTimerDone"), userInfo: nil, repeats: false)
+				refreshTimer = NSTimer.scheduledTimerWithTimeInterval(howLongUntilNextSync, target: self, selector: #selector(OSX_AppDelegate.refreshTimerDone), userInfo: nil, repeats: false)
 			}
 		}
 		else
@@ -796,7 +796,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					Settings.lastSuccessfulRefresh = NSDate()
 				}
 				s.completeRefresh()
-				s.refreshTimer = NSTimer.scheduledTimerWithTimeInterval(NSTimeInterval(Settings.refreshPeriod), target: s, selector: Selector("refreshTimerDone"), userInfo: nil, repeats: false)
+				s.refreshTimer = NSTimer.scheduledTimerWithTimeInterval(NSTimeInterval(Settings.refreshPeriod), target: s, selector: #selector(OSX_AppDelegate.refreshTimerDone), userInfo: nil, repeats: false)
 			}
 		}
 	}
@@ -1050,7 +1050,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
 					var i = w.table.selectedRow + 1
 					if i < w.table.numberOfRows {
-						while self?.dataItemAtRow(i, inMenu: w) == nil { i++ }
+						while self?.dataItemAtRow(i, inMenu: w) == nil { i += 1 }
 						self?.scrollToIndex(i, inMenu: w)
 					}
 					return nil
@@ -1061,7 +1061,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
 					var i = w.table.selectedRow - 1
 					if i > 0 {
-						while self?.dataItemAtRow(i, inMenu: w) == nil { i-- }
+						while self?.dataItemAtRow(i, inMenu: w) == nil { i -= 1 }
 						self?.scrollToIndex(i, inMenu: w)
 					}
 					return nil
@@ -1272,7 +1272,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	private func setupDarkModeMonitoring() {
-		NSDistributedNotificationCenter.defaultCenter().addObserver(self, selector: Selector("checkDarkMode"), name: "AppleInterfaceThemeChangedNotification", object: nil)
+		NSDistributedNotificationCenter.defaultCenter().addObserver(self, selector: #selector(OSX_AppDelegate.checkDarkMode), name: "AppleInterfaceThemeChangedNotification", object: nil)
 		checkDarkMode()
 	}
 }

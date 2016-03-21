@@ -192,7 +192,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 			} else {
 				let howLongUntilNextSync = NSTimeInterval(Settings.refreshPeriod) - howLongAgo
 				DLog("No need to refresh yet, will refresh in %f", howLongUntilNextSync)
-				refreshTimer = NSTimer.scheduledTimerWithTimeInterval(howLongUntilNextSync, target: self, selector: Selector("refreshTimerDone"), userInfo: nil, repeats: false)
+				refreshTimer = NSTimer.scheduledTimerWithTimeInterval(howLongUntilNextSync, target: self, selector: #selector(iOS_AppDelegate.refreshTimerDone), userInfo: nil, repeats: false)
 			}
 		} else {
 			startRefresh()
@@ -280,7 +280,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 					showMessage("Refresh failed", "Loading the latest data from Github failed")
 				}
 
-				s.refreshTimer = NSTimer.scheduledTimerWithTimeInterval(NSTimeInterval(Settings.refreshPeriod), target: s, selector: Selector("refreshTimerDone"), userInfo: nil, repeats:false)
+				s.refreshTimer = NSTimer.scheduledTimerWithTimeInterval(NSTimeInterval(Settings.refreshPeriod), target: s, selector: #selector(iOS_AppDelegate.refreshTimerDone), userInfo: nil, repeats:false)
 				DLog("Refresh done")
 
 				s.updateBadge()

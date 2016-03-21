@@ -28,9 +28,9 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		}
 
 		navigationItem.rightBarButtonItems = [
-			UIBarButtonItem(image: UIImage(named: "export"), style: UIBarButtonItemStyle.Plain, target: self, action: Selector("exportSelected:")),
-			UIBarButtonItem(image: UIImage(named: "import"), style: UIBarButtonItemStyle.Plain, target: self, action: Selector("importSelected:")),
-			UIBarButtonItem(image: UIImage(named: "showHelp"), style: UIBarButtonItemStyle.Plain, target: self, action: Selector("toggleHelp:")),
+			UIBarButtonItem(image: UIImage(named: "export"), style: UIBarButtonItemStyle.Plain, target: self, action: #selector(AdvancedSettingsViewController.exportSelected(_:))),
+			UIBarButtonItem(image: UIImage(named: "import"), style: UIBarButtonItemStyle.Plain, target: self, action: #selector(AdvancedSettingsViewController.importSelected(_:))),
+			UIBarButtonItem(image: UIImage(named: "showHelp"), style: UIBarButtonItemStyle.Plain, target: self, action: #selector(AdvancedSettingsViewController.toggleHelp(_:))),
 		]
 	}
 
@@ -355,24 +355,24 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			switch indexPath.row {
 			case 0:
 				// seconds
-				for var f=60; f<3600; f+=10 {
+				for f in 60.stride(to: 3600, by: 10) {
 					if f == Int(Settings.refreshPeriod) { previousValue = count }
 					values.append("\(f) seconds")
-					count++
+					count += 1
 				}
 			case 1:
 				// minutes
-				for var f=10; f<10000; f+=10 {
+				for f in 10.stride(to: 10000, by: 10) {
 					if f == Int(Settings.backgroundRefreshPeriod/60.0) { previousValue = count }
 					values.append("\(f) minutes")
-					count++
+					count += 1
 				}
 			case 2:
 				// hours
 				for f in 2..<100 {
 					if f == Int(Settings.newRepoCheckPeriod) { previousValue = count }
 					values.append("\(f) hours")
-					count++
+					count += 1
 				}
 			default: break
 			}
@@ -481,7 +481,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				for f in 2..<100 {
 					if f == Settings.statusItemRefreshInterval { previousValue = count }
 					values.append("Every \(f) refreshes")
-					count++
+					count += 1
 				}
 				valuesToPush = values
 				performSegueWithIdentifier("showPicker", sender: self)
@@ -503,7 +503,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				for f in 2..<100 {
 					if f == Settings.labelRefreshInterval { previousValue = count }
 					values.append("Every \(f) refreshes")
-					count++
+					count += 1
 				}
 				valuesToPush = values
 				performSegueWithIdentifier("showPicker", sender: self)

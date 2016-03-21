@@ -8,7 +8,7 @@ final class AboutWindow: NSWindow, NSWindowDelegate {
 	}
 
 	override init(contentRect: NSRect, styleMask aStyle: Int, backing bufferingType: NSBackingStoreType, `defer` flag: Bool) {
-		super.init(contentRect: contentRect, styleMask: aStyle, backing: bufferingType, `defer`: flag)
+		super.init(contentRect: contentRect, styleMask: aStyle, backing: bufferingType, defer: flag)
 		delegate = self
 	}
 

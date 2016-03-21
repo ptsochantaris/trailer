@@ -88,9 +88,10 @@ final class PRListController: CommonController {
 
 			var index = 0
 			for itemData in l {
-				if let c = table.rowControllerAtIndex(index++) as? PRRow {
+				if let c = table.rowControllerAtIndex(index) as? PRRow {
 					c.populateFrom(itemData)
 				}
+				index += 1
 			}
 
 			if l.count == 0 {

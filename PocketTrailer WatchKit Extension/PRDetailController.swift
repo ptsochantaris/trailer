@@ -59,20 +59,22 @@ final class PRDetailController: CommonController {
 		if let statuses = itemInfo["statuses"] as? [[NSString : AnyObject]] {
 			table.insertRowsAtIndexes(NSIndexSet(indexesInRange: NSMakeRange(rowCount, statuses.count)), withRowType: "StatusRow")
 			for status in statuses {
-				if let s = table.rowControllerAtIndex(rowCount++) as? StatusRow {
+				if let s = table.rowControllerAtIndex(rowCount) as? StatusRow {
 					s.labelL.setText(status["text"] as? String)
 					let c = colourFromHex(status["color"] as! String)
 					s.labelL.setTextColor(c)
 					s.margin.setBackgroundColor(c)
 				}
+				rowCount += 1
 			}
 		}
 
 		if let description = itemInfo["description"] as? String {
 			table.insertRowsAtIndexes(NSIndexSet(index: rowCount), withRowType: "LabelRow")
-			if let r = table.rowControllerAtIndex(rowCount++) as? LabelRow {
+			if let r = table.rowControllerAtIndex(rowCount) as? LabelRow {
 				r.labelL.setText(description)
 			}
+			rowCount += 1
 		}
 
 		let dateFormatter = NSDateFormatter()
@@ -90,16 +92,18 @@ final class PRDetailController: CommonController {
 			var commentCount = 0
 			let unreadCount = itemInfo["unreadCount"] as? Int
 			for comment in comments {
-				if let s = table.rowControllerAtIndex(rowCount++) as? CommentRow {
+				if let s = table.rowControllerAtIndex(rowCount) as? CommentRow {
 					s.usernameL.setText("@" + (comment["user"] as! String))
 					s.dateL.setText(dateFormatter.stringFromDate(comment["date"] as! NSDate))
 					s.commentL.setText(comment["text"] as? String)
-					if commentCount++ < unreadCount {
+					if commentCount < unreadCount {
 						s.margin.setBackgroundColor(UIColor.redColor())
 					} else {
 						s.margin.setBackgroundColor(UIColor.lightGrayColor())
 					}
+					commentCount += 1
 				}
+				rowCount += 1
 			}
 		} else {
 			setTitle("Details")

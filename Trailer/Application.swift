@@ -6,8 +6,8 @@ final class Application: NSApplication {
 			if modifiers == NSEventModifierFlags.CommandKeyMask {
 				if let char = theEvent.charactersIgnoringModifiers {
 					switch char {
-					case "x": if sendAction(Selector("cut:"), to:nil, from:self) { return }
-					case "v": if sendAction(Selector("paste:"), to:nil, from:self) { return }
+					case "x": if sendAction(#selector(NSText.cut(_:)), to:nil, from:self) { return }
+					case "v": if sendAction(#selector(NSText.paste(_:)), to:nil, from:self) { return }
 					case "z": if sendAction(Selector("undo:"), to:nil, from:self) { return }
 					case "c":
 						if let url = app.focusedItem()?.webUrl {
@@ -16,7 +16,7 @@ final class Application: NSApplication {
 							p.setString(url, forType:NSStringPboardType)
 							return
 						} else {
-							if sendAction(Selector("copy:"), to:nil, from:self) { return }
+							if sendAction(#selector(NSText.copy(_:)), to:nil, from:self) { return }
 						}
 					case "m":
 						if let i = app.focusedItem() {
@@ -45,7 +45,7 @@ final class Application: NSApplication {
 								app.updateIssuesMenu()
 							}
 							return
-						} else if sendAction(Selector("selectAll:"), to:nil, from:self) {
+						} else if sendAction(#selector(NSResponder.selectAll(_:)), to:nil, from:self) {
 							return
 						}
 					case "o":

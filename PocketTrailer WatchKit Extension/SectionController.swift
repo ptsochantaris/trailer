@@ -111,9 +111,10 @@ final class SectionController: CommonController {
 
 			var index = 0
 			for rc in rowControllers {
-				if let c = table.rowControllerAtIndex(index++) as? PopulatableRow {
+				if let c = table.rowControllerAtIndex(index) as? PopulatableRow {
 					c.populateFrom(rc)
 				}
+				index += 1
 			}
 
 			showStatus("", hideTable: false)

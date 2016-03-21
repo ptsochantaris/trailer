@@ -73,7 +73,7 @@ final class PRCell: UITableViewCell {
 				constant: 23)
 			])
 
-		NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("networkStateChanged"), name: kReachabilityChangedNotification, object: nil)
+		NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PRCell.networkStateChanged), name: kReachabilityChangedNotification, object: nil)
 	}
 
 	func networkStateChanged() {
@@ -109,7 +109,8 @@ final class PRCell: UITableViewCell {
 					var lineAttributes = statusAttributes
 					lineAttributes[NSForegroundColorAttributeName] = status.colorForDisplay()
 					statusText?.appendAttributedString(NSAttributedString(string: status.displayText(), attributes: lineAttributes))
-					if --statusCount > 0 {
+					statusCount -= 1
+					if statusCount > 0 {
 						statusText?.appendAttributedString(NSAttributedString(string: "\n", attributes: lineAttributes))
 					}
 				}

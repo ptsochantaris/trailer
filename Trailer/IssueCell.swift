@@ -85,7 +85,7 @@ final class IssueCell: TrailerCell {
 				let unpin = NSButton(frame: pinRect)
 				unpin.title = "Remove"
 				unpin.target = self
-				unpin.action = Selector("unPinSelected")
+				unpin.action = #selector(TrailerCell.unPinSelected)
 				unpin.setButtonType(NSButtonType.MomentaryLightButton)
 				unpin.bezelStyle = NSBezelStyle.RoundRectBezelStyle
 				unpin.font = NSFont.systemFontOfSize(10.0)

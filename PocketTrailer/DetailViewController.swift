@@ -103,7 +103,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 		_webView?.hidden = false
 		navigationItem.rightBarButtonItem?.enabled = true
 		title = _webView?.title
-		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Action, target: self, action: Selector("shareSelected"))
+		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Action, target: self, action: #selector(DetailViewController.shareSelected))
 		api.networkIndicationEnd()
 
 		catchupWithComments()
@@ -135,7 +135,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 		statusLabel.hidden = false
 		_webView?.hidden = true
 		title = "Error"
-		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Refresh, target: self, action: Selector("configureView"))
+		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Refresh, target: self, action: #selector(DetailViewController.configureView))
 		api.networkIndicationEnd()
 	}
 

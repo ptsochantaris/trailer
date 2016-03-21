@@ -24,7 +24,7 @@ final class ServersViewController: UITableViewController {
 		resetFormatter.dateStyle = NSDateFormatterStyle.ShortStyle
 
 		clearsSelectionOnViewWillAppear = true
-		NSNotificationCenter.defaultCenter().addObserver(tableView, selector: Selector("reloadData"), name: REFRESH_ENDED_NOTIFICATION, object: nil)
+		NSNotificationCenter.defaultCenter().addObserver(tableView, selector: #selector(UITableView.reloadData), name: REFRESH_ENDED_NOTIFICATION, object: nil)
 	}
 
 	deinit {

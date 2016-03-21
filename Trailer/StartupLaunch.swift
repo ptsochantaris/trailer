@@ -13,7 +13,7 @@ final class StartupLaunch: NSObject {
 				let loginItems: NSArray = LSSharedFileListCopySnapshot(loginItemsRef, nil).takeRetainedValue() as NSArray
 				if loginItems.count > 0 {
 					let lastItemRef: LSSharedFileListItemRef = loginItems.lastObject as! LSSharedFileListItemRef
-					for var i = 0; i < loginItems.count; ++i {
+					for i in 0 ..< loginItems.count {
 						let currentItemRef: LSSharedFileListItemRef = loginItems.objectAtIndex(i) as! LSSharedFileListItemRef
 						if LSSharedFileListItemResolve(currentItemRef, 0, itemUrl, nil) == noErr {
 							if let urlRef: NSURL =  itemUrl.memory?.takeRetainedValue() where urlRef.isEqual(appUrl) {

@@ -13,7 +13,7 @@ final class SectionHeader: NSTableRowView {
 			let unpin = NSButton(frame: buttonRect)
 			unpin.title = "Remove All"
 			unpin.target = self
-			unpin.action = Selector("unPinSelected")
+			unpin.action = #selector(SectionHeader.unPinSelected)
 			unpin.setButtonType(NSButtonType.MomentaryLightButton)
 			unpin.bezelStyle = NSBezelStyle.RoundRectBezelStyle
 			unpin.font = NSFont.systemFontOfSize(10)

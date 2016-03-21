@@ -138,7 +138,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			self?.reloadDataWithAnimation(true)
 		}
 
-		refreshControl?.addTarget(self, action: Selector("refreshControlChanged"), forControlEvents: UIControlEvents.ValueChanged)
+		refreshControl?.addTarget(self, action: #selector(MasterViewController.refreshControlChanged), forControlEvents: UIControlEvents.ValueChanged)
 
 		searchField = UITextField(frame: CGRectMake(10, 10, 300, 31))
 		searchField.autoresizingMask = UIViewAutoresizing.FlexibleWidth
@@ -170,8 +170,8 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		let n = NSNotificationCenter.defaultCenter()
 
-		n.addObserver(self, selector: Selector("updateStatus"), name:REFRESH_STARTED_NOTIFICATION, object: nil)
-		n.addObserver(self, selector: Selector("updateStatus"), name:REFRESH_ENDED_NOTIFICATION, object: nil)
+		n.addObserver(self, selector: #selector(MasterViewController.updateStatus), name:REFRESH_STARTED_NOTIFICATION, object: nil)
+		n.addObserver(self, selector: #selector(MasterViewController.updateStatus), name:REFRESH_ENDED_NOTIFICATION, object: nil)
 
 		pullRequestsItem.title = "Pull Requests"
 		pullRequestsItem.image = UIImage(named: "prsTab")

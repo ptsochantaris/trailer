@@ -246,7 +246,7 @@ final class API {
 			var completionCount = 0
 			let totalOperations = 2
 			let completionCallback: Completion = { [weak self] in
-				completionCount++
+				completionCount += 1
 				if completionCount == totalOperations {
 					for r in repos { r.dirty = false }
 					self?.completeSyncInMoc(moc, andCallback: callback)
@@ -324,12 +324,12 @@ final class API {
 		let willScanForLabels = shouldScanForLabelsInMoc(moc)
 
 		var totalOperations = 3
-		if willScanForStatuses { totalOperations++ }
-		if willScanForLabels { totalOperations++ }
+		if willScanForStatuses { totalOperations += 1 }
+		if willScanForLabels { totalOperations += 1 }
 
 		var completionCount = 0
 		let completionCallback: Completion = {
-			completionCount++
+			completionCount += 1
 			if completionCount == totalOperations {
 				callback()
 			}
@@ -359,7 +359,7 @@ final class API {
 		let repoIdsToMarkDirty = NSMutableSet()
 
 		let completionCallback: Completion = {
-			completionCount++
+			completionCount += 1
 			if completionCount==totalOperations {
 
 				if repoIdsToMarkDirty.count>0 {
@@ -535,7 +535,7 @@ final class API {
 			var completionCount = 0
 
 			let completionCallback: Completion = {
-				completionCount++
+				completionCount += 1
 				if completionCount == totalOperations {
 					for r in DataItem.newItemsOfType("Repo", inMoc: moc) as! [Repo] {
 						r.displayPolicyForPrs = Settings.displayPolicyForNewPrs
@@ -595,13 +595,13 @@ final class API {
 						if !success {
 							self?.handleRepoSyncFailure(r, withResultCode: resultCode)
 						}
-						completionCount++
+						completionCount += 1
 						if completionCount==total {
 							callback()
 						}
 				})
 			} else {
-				completionCount++
+				completionCount += 1
 				if completionCount==total {
 					callback()
 				}
@@ -660,13 +660,13 @@ final class API {
 						if !success {
 							self?.handleRepoSyncFailure(r, withResultCode: resultCode)
 						}
-						completionCount++
+						completionCount += 1
 						if completionCount==total {
 							callback()
 						}
 				})
 			} else {
-				completionCount++
+				completionCount += 1
 				if completionCount==total {
 					callback()
 				}
@@ -694,7 +694,7 @@ final class API {
 		var completionCount = 0
 
 		let completionCallback: Completion = {
-			completionCount++
+			completionCount += 1
 			if completionCount == totalOperations { callback() }
 		}
 
@@ -722,7 +722,7 @@ final class API {
 						PRComment.syncCommentsFromInfo(data, pullRequest: p)
 						return false
 					}, finalCallback: { success, resultCode, etag in
-						completionCount++
+						completionCount += 1
 						if !success {
 							apiServer.lastSyncSucceeded = false
 						}
@@ -731,7 +731,7 @@ final class API {
 						}
 				})
 			} else {
-				completionCount++
+				completionCount += 1
 				if completionCount == total {
 					callback()
 				}
@@ -772,7 +772,7 @@ final class API {
 						PRComment.syncCommentsFromInfo(data, issue: i)
 						return false
 					}, finalCallback: { success, resultCode, etag in
-						completionCount++
+						completionCount += 1
 						if !success {
 							apiServer.lastSyncSucceeded = false
 						}
@@ -781,7 +781,7 @@ final class API {
 						}
 				})
 			} else {
-				completionCount++
+				completionCount += 1
 				if completionCount == total {
 					callback()
 				}
@@ -831,7 +831,7 @@ final class API {
 						PRLabel.syncLabelsWithInfo(data, withParent: p)
 						return false
 					}, finalCallback: { [weak self] success, resultCode, etag in
-						completionCount++
+						completionCount += 1
 						var allGood = success
 						if !success {
 							// 404/410 means the label has been deleted
@@ -851,7 +851,7 @@ final class API {
 			} else {
 				// no labels link, so presumably no labels
 				refreshesSinceLastLabelsCheck[p.objectID] = 1
-				completionCount++
+				completionCount += 1
 				if completionCount == total {
 					callback()
 				}
@@ -898,7 +898,7 @@ final class API {
 						PRStatus.syncStatusesFromInfo(data, pullRequest: p)
 						return false
 					}, finalCallback: { [weak self] success, resultCode, etag in
-						completionCount++
+						completionCount += 1
 						var allGood = success
 						if !success {
 							// 404/410 means the status has been deleted
@@ -917,7 +917,7 @@ final class API {
 				})
 			} else {
 				refreshesSinceLastStatusCheck[p.objectID] = 1
-				completionCount++
+				completionCount += 1
 				if completionCount==total {
 					callback()
 				}
@@ -944,7 +944,7 @@ final class API {
 
 		var completionCount = 0
 		let completionCallback: Completion = {
-			completionCount++
+			completionCount += 1
 			if completionCount == totalOperations {
 				callback()
 			}
@@ -982,7 +982,7 @@ final class API {
 		var completionCount = 0
 
 		let completionCallback: Completion = {
-			completionCount++
+			completionCount += 1
 			if completionCount == totalOperations {
 				callback()
 			}
@@ -1155,7 +1155,7 @@ final class API {
 				getRateLimitFromServer(apiServer) { remaining, limit, reset in
 					apiServer.requestsRemaining = NSNumber(longLong: remaining)
 					apiServer.requestsLimit = NSNumber(longLong: limit)
-					count++
+					count += 1
 					if count==total {
 						NSNotificationCenter.defaultCenter().postNotificationName(API_USAGE_UPDATE, object: apiServer, userInfo: nil)
 					}
@@ -1228,11 +1228,11 @@ final class API {
 					} else {
 						apiServer.lastSyncSucceeded = false
 					}
-					completionCount++
+					completionCount += 1
 					if completionCount==operationCount { callback() }
 				}
 			} else {
-				completionCount++
+				completionCount += 1
 				if completionCount==operationCount { callback() }
 			}
 		}
@@ -1484,7 +1484,8 @@ final class API {
 	private var networkIndicationCount: Int = 0
 
 	func networkIndicationStart() {
-		if ++networkIndicationCount == 1 {
+		networkIndicationCount += 1
+		if networkIndicationCount == 1 {
 			UIApplication.sharedApplication().networkActivityIndicatorVisible = true
 			networkBGTask = UIApplication.sharedApplication().beginBackgroundTaskWithName("com.housetrip.Trailer.imageload") { [weak self] in
 				self?.endNetworkBGTask()
@@ -1498,7 +1499,8 @@ final class API {
 	}
 	
 	func networkIndicationEnd() {
-		if --networkIndicationCount == 0 {
+		networkIndicationCount -= 1
+		if networkIndicationCount == 0 {
 			UIApplication.sharedApplication().networkActivityIndicatorVisible = false
 			networkBGEndPopTimer?.push()
 		}

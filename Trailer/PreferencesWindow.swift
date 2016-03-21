@@ -112,7 +112,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var tabs: NSTabView!
 
 	override init(contentRect: NSRect, styleMask aStyle: Int, backing bufferingType: NSBackingStoreType, `defer` flag: Bool) {
-		super.init(contentRect: contentRect, styleMask: aStyle, backing: bufferingType, `defer`: flag)
+		super.init(contentRect: contentRect, styleMask: aStyle, backing: bufferingType, defer: flag)
 	}
 
 	override func awakeFromNib() {
@@ -133,8 +133,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		tabs.selectTabViewItem(tabs.tabViewItemAtIndex(selectedIndex))
 
 		let n = NSNotificationCenter.defaultCenter()
-		n.addObserver(serverList, selector: Selector("reloadData"), name: API_USAGE_UPDATE, object: nil)
-		n.addObserver(self, selector: Selector("updateImportExportSettings"), name: SETTINGS_EXPORTED, object: nil)
+		n.addObserver(serverList, selector: #selector(NSTableView.reloadData), name: API_USAGE_UPDATE, object: nil)
+		n.addObserver(self, selector: #selector(PreferencesWindow.updateImportExportSettings), name: SETTINGS_EXPORTED, object: nil)
 	}
 
 	deinit {
@@ -607,13 +607,13 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	private func setupSortMethodMenu() {
 		let m = NSMenu(title: "Sorting")
 		if Settings.sortDescending {
-			m.addItemWithTitle("Youngest First", action: Selector("sortMethodChanged:"), keyEquivalent: "")
-			m.addItemWithTitle("Most Recently Active", action: Selector("sortMethodChanged:"), keyEquivalent: "")
-			m.addItemWithTitle("Reverse Alphabetically", action: Selector("sortMethodChanged:"), keyEquivalent: "")
+			m.addItemWithTitle("Youngest First", action: #selector(PreferencesWindow.sortMethodChanged(_:)), keyEquivalent: "")
+			m.addItemWithTitle("Most Recently Active", action: #selector(PreferencesWindow.sortMethodChanged(_:)), keyEquivalent: "")
+			m.addItemWithTitle("Reverse Alphabetically", action: #selector(PreferencesWindow.sortMethodChanged(_:)), keyEquivalent: "")
 		} else {
-			m.addItemWithTitle("Oldest First", action: Selector("sortMethodChanged:"), keyEquivalent: "")
-			m.addItemWithTitle("Inactive For Longest", action: Selector("sortMethodChanged:"), keyEquivalent: "")
-			m.addItemWithTitle("Alphabetically", action: Selector("sortMethodChanged:"), keyEquivalent: "")
+			m.addItemWithTitle("Oldest First", action: #selector(PreferencesWindow.sortMethodChanged(_:)), keyEquivalent: "")
+			m.addItemWithTitle("Inactive For Longest", action: #selector(PreferencesWindow.sortMethodChanged(_:)), keyEquivalent: "")
+			m.addItemWithTitle("Alphabetically", action: #selector(PreferencesWindow.sortMethodChanged(_:)), keyEquivalent: "")
 		}
 		sortModeSelect.menu = m
 		sortModeSelect.selectItemAtIndex(Settings.sortMethod)
@@ -1064,7 +1064,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		let parentCount = Repo.countParentRepos(repoFilter.stringValue)
 		var r = row
 		if r > parentCount {
-			r--
+			r -= 1
 		}
 		let filteredRepos = Repo.reposForFilter(repoFilter.stringValue)
 		return filteredRepos[r-1]
@@ -1111,7 +1111,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 									NSForegroundColorAttributeName: policy.color(),
 									])
 								menuCell.menu?.addItem(m)
-								count++
+								count += 1
 							}
 							menuCell.selectItemAtIndex(r.itemHidingPolicy?.integerValue ?? 0)
 						} else {
@@ -1122,7 +1122,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 									NSForegroundColorAttributeName: policy.color(),
 									])
 								menuCell.menu?.addItem(m)
-								count++
+								count += 1
 							}
 							let selectedIndex = tableColumn?.identifier == "prs" ? (r.displayPolicyForPrs?.integerValue ?? 0) : (r.displayPolicyForIssues?.integerValue ?? 0)
 							menuCell.selectItemAtIndex(selectedIndex)

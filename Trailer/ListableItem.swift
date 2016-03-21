@@ -197,10 +197,10 @@ class ListableItem: DataItem {
 					}
 					if let l = latestDate {
 						if c.createdAt?.compare(l)==NSComparisonResult.OrderedDescending {
-							unreadCommentCount++
+							unreadCommentCount += 1
 						}
 					} else {
-						unreadCommentCount++;
+						unreadCommentCount += 1;
 					}
 				}
 			}
@@ -358,7 +358,7 @@ class ListableItem: DataItem {
 						if count < labelCount-1 {
 							_title.appendAttributedString(NSAttributedString(string: " ", attributes: labelAttributes))
                         }
-                        count++
+                        count += 1
 					}
 				}
 			}
@@ -571,12 +571,12 @@ class ListableItem: DataItem {
 		var sortDescriptors = [NSSortDescriptor]()
 		sortDescriptors.append(NSSortDescriptor(key: "sectionIndex", ascending: true))
 		if Settings.groupByRepo {
-			sortDescriptors.append(NSSortDescriptor(key: "repo.fullName", ascending: true, selector: Selector("caseInsensitiveCompare:")))
+			sortDescriptors.append(NSSortDescriptor(key: "repo.fullName", ascending: true, selector: #selector(NSString.caseInsensitiveCompare(_:))))
 		}
 
 		if let fieldName = sortField() {
 			if fieldName == "title" {
-				sortDescriptors.append(NSSortDescriptor(key: fieldName, ascending: !Settings.sortDescending, selector: Selector("caseInsensitiveCompare:")))
+				sortDescriptors.append(NSSortDescriptor(key: fieldName, ascending: !Settings.sortDescending, selector: #selector(NSString.caseInsensitiveCompare(_:))))
 			} else if !fieldName.isEmpty {
 				sortDescriptors.append(NSSortDescriptor(key: fieldName, ascending: !Settings.sortDescending))
 			}

@@ -94,28 +94,28 @@ class TrailerCell: NSTableCellView {
 		}
 
         menu = NSMenu(title: title)
-		menu!.insertItemWithTitle(title, action: Selector("copyNumberToClipboard"), keyEquivalent: "", atIndex: 0)
+		menu!.insertItemWithTitle(title, action: #selector(TrailerCell.copyNumberToClipboard), keyEquivalent: "", atIndex: 0)
 		menu!.insertItem(NSMenuItem.separatorItem(), atIndex: 1)
 		
-        let c2 = menu!.insertItemWithTitle("Copy URL", action: Selector("copyToClipboard"), keyEquivalent: "c", atIndex: 2)
+        let c2 = menu!.insertItemWithTitle("Copy URL", action: #selector(TrailerCell.copyToClipboard), keyEquivalent: "c", atIndex: 2)
         c2!.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
 
-        let c3 = menu!.insertItemWithTitle("Open Repo", action: Selector("openRepo"), keyEquivalent: "o", atIndex: 3)
+        let c3 = menu!.insertItemWithTitle("Open Repo", action: #selector(TrailerCell.openRepo), keyEquivalent: "o", atIndex: 3)
 		c3!.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
 
 		if muted {
-			let c4 = menu!.insertItemWithTitle("Un-Mute", action: Selector("unMuteSelected"), keyEquivalent: "m", atIndex: 4)
+			let c4 = menu!.insertItemWithTitle("Un-Mute", action: #selector(TrailerCell.unMuteSelected), keyEquivalent: "m", atIndex: 4)
 			c4!.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
 		} else {
-			let c4 = menu!.insertItemWithTitle("Mute", action: Selector("muteSelected"), keyEquivalent: "m", atIndex: 4)
+			let c4 = menu!.insertItemWithTitle("Mute", action: #selector(TrailerCell.muteSelected), keyEquivalent: "m", atIndex: 4)
 			c4!.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
 		}
 
 		if item.unreadComments?.integerValue > 0 {
-			let c4 = menu!.insertItemWithTitle("Mark as read", action: Selector("markReadSelected"), keyEquivalent: "a", atIndex: 5)
+			let c4 = menu!.insertItemWithTitle("Mark as read", action: #selector(TrailerCell.markReadSelected), keyEquivalent: "a", atIndex: 5)
 			c4!.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
 		} else {
-			let c4 = menu!.insertItemWithTitle("Mark as unread", action: Selector("markUnreadSelected"), keyEquivalent: "a", atIndex: 5)
+			let c4 = menu!.insertItemWithTitle("Mark as unread", action: #selector(TrailerCell.markUnreadSelected), keyEquivalent: "a", atIndex: 5)
 			c4!.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
 		}
     }

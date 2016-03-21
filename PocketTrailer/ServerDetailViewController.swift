@@ -35,8 +35,8 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 
 		if UIDevice.currentDevice().userInterfaceIdiom != UIUserInterfaceIdiom.Pad {
 			let n = NSNotificationCenter.defaultCenter()
-			n.addObserver(self, selector: Selector("keyboardWillShow:"), name: UIKeyboardWillShowNotification, object: nil)
-			n.addObserver(self, selector: Selector("keyboardWillHide:"), name:UIKeyboardWillHideNotification, object:nil)
+			n.addObserver(self, selector: #selector(ServerDetailViewController.keyboardWillShow(_:)), name: UIKeyboardWillShowNotification, object: nil)
+			n.addObserver(self, selector: #selector(ServerDetailViewController.keyboardWillHide(_:)), name:UIKeyboardWillHideNotification, object:nil)
 		}
 	}
 
