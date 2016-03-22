@@ -71,7 +71,8 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 		api.updateLimitsFromServer()
 
-		NSUserNotificationCenter.defaultUserNotificationCenter().delegate = self
+		let nc = NSUserNotificationCenter.defaultUserNotificationCenter()
+		nc.delegate = self
 
 		if ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
 			atNextEvent {
@@ -97,6 +98,16 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		let wn = NSWorkspace.sharedWorkspace().notificationCenter
 		wn.addObserver(self, selector: #selector(OSX_AppDelegate.systemWillSleep), name: NSWorkspaceWillSleepNotification, object: nil)
 		wn.addObserver(self, selector: #selector(OSX_AppDelegate.systemDidWake), name: NSWorkspaceDidWakeNotification, object: nil)
+
+		// Unstick OS X notifications with custom actions but without an identifier, causes OS X to keep them forever
+		if #available(OSX 10.10, *) {
+			for notification in nc.deliveredNotifications {
+				if notification.additionalActions != nil && notification.identifier == nil {
+					nc.removeAllDeliveredNotifications()
+					break;
+				}
+			}
+		}
 	}
 
 	func systemWillSleep() {
@@ -123,7 +134,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	func userNotificationCenter(center: NSUserNotificationCenter, shouldPresentNotification notification: NSUserNotification) -> Bool {
-		return true
+		return false
 	}
 
 	func userNotificationCenter(center: NSUserNotificationCenter, didActivateNotification notification: NSUserNotification) {
@@ -215,38 +226,38 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			notification.title = "@" + (c.userName ?? "NoUserName") + " mentioned you:"
 			notification.subtitle = c.notificationSubtitle()
 			notification.informativeText = c.body
-			addPotentialMute(notification)
+			addPotentialExtraActions(notification)
 		case .NewComment:
 			let c = forItem as! PRComment
 			if c.parentIsMuted() { return }
 			notification.title = "@" + (c.userName ?? "NoUserName") + " commented:"
 			notification.subtitle = c.notificationSubtitle()
 			notification.informativeText = c.body
-			addPotentialMute(notification)
+			addPotentialExtraActions(notification)
 		case .NewPr:
 			let p = forItem as! PullRequest
 			if p.muted?.boolValue ?? false { return }
 			notification.title = "New PR"
 			notification.subtitle = p.title
-			addPotentialMute(notification)
+			addPotentialExtraActions(notification)
 		case .PrReopened:
 			let p = forItem as! PullRequest
 			if p.muted?.boolValue ?? false { return }
 			notification.title = "Re-Opened PR"
 			notification.subtitle = p.title
-			addPotentialMute(notification)
+			addPotentialExtraActions(notification)
 		case .PrMerged:
 			let p = forItem as! PullRequest
 			if p.muted?.boolValue ?? false { return }
 			notification.title = "PR Merged!"
 			notification.subtitle = p.title
-			addPotentialMute(notification)
+			addPotentialExtraActions(notification)
 		case .PrClosed:
 			let p = forItem as! PullRequest
 			if p.muted?.boolValue ?? false { return }
 			notification.title = "PR Closed"
 			notification.subtitle = p.title
-			addPotentialMute(notification)
+			addPotentialExtraActions(notification)
 		case .NewRepoSubscribed:
 			notification.title = "New Repository Subscribed"
 			notification.subtitle = (forItem as! Repo).fullName
@@ -258,39 +269,44 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			if p.muted?.boolValue ?? false { return } // unmute on assignment option?
 			notification.title = "PR Assigned"
 			notification.subtitle = p.title
-			addPotentialMute(notification)
+			addPotentialExtraActions(notification)
 		case .NewStatus:
 			let s = forItem as! PRStatus
 			if s.parentIsMuted() { return }
 			notification.title = "PR Status Update"
 			notification.subtitle = s.pullRequest.title
 			notification.informativeText = s.descriptionText
-			addPotentialMute(notification)
+			addPotentialExtraActions(notification)
 		case .NewIssue:
 			let i = forItem as! Issue
 			if i.muted?.boolValue ?? false { return }
 			notification.title = "New Issue"
 			notification.subtitle = i.title
-			addPotentialMute(notification)
+			addPotentialExtraActions(notification)
 		case .IssueReopened:
 			let i = forItem as! Issue
 			if i.muted?.boolValue ?? false { return }
 			notification.title = "Re-Opened Issue"
 			notification.subtitle = i.title
-			addPotentialMute(notification)
+			addPotentialExtraActions(notification)
 		case .IssueClosed:
 			let i = forItem as! Issue
 			if i.muted?.boolValue ?? false { return }
 			notification.title = "Issue Closed"
 			notification.subtitle = i.title
-			addPotentialMute(notification)
+			addPotentialExtraActions(notification)
 		case .NewIssueAssigned:
 			let i = forItem as! Issue
 			if i.muted?.boolValue ?? false { return }
 			notification.title = "Issue Assigned"
 			notification.subtitle = i.title
-			addPotentialMute(notification)
+			addPotentialExtraActions(notification)
 		}
+
+		let t = notification.title ?? "notitle"
+		let s = notification.subtitle ?? "nosub"
+		let i = notification.informativeText ?? "noinfo"
+		notification.identifier = "\(t) - \(s) - \(i)"
 
 		let d = NSUserNotificationCenter.defaultUserNotificationCenter()
 		if (type == .NewComment || type == .NewMention) && !Settings.hideAvatars {
@@ -305,7 +321,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 	}
 
-	private func addPotentialMute(n: NSUserNotification) {
+	private func addPotentialExtraActions(n: NSUserNotification) {
 		if #available(OSX 10.10, *) {
 			n.additionalActions = [
 				NSUserNotificationAction(identifier: "mute", title: "Mute this item"),
