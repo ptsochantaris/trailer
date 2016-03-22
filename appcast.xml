@@ -7,6 +7,27 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.3.17</title>
+			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>This version corrects an issue with Trailer notifications becoming stuck on the OS X Notification Center, as well as ensuring notifications will not appear twice about a certain event.</li>
+				<li>From 1.3.16:</li>
+				<li>Ability to mute items so that they don’t provide any notifications or badges until they are un-muted.</li>
+				<li>Custom actions on notifications to mark an item as read immediately, or mute it until further notice (hold down 'Show' on an alert to access these.)</li>
+				<li>New context-menu options to mark a specific item’s comments as read or unread.</li>
+				<li>Added hotkey (Cmd-O) to open parent repo of a focused item.</li>
+				<li>Hold “Show” in OS X Alerts to view the new notification actions.</li>
+				</ul></font>]]></description>
+			<pubDate>Wed, 22 Mar 2016 23:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer1317.zip"
+			sparkle:version="1266"
+			sparkle:shortVersionString="1.3.17"
+			sparkle:dsaSignature="MC0CFQDMU4cJE6OYnf6oCvAA25FtsZjoSwIUAzmfhbfTE87WnWdYbeT4uToDHNo="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.3.16</title>
 			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
