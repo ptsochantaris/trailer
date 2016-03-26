@@ -51,7 +51,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	func removeAllMerged()
 	{
-		NSOperationQueue.mainQueue().addOperationWithBlock { [weak self] in
+		atNextEvent { [weak self] in
 			if Settings.dontAskBeforeWipingMerged {
 				self?.removeAllMergedConfirmed()
 			} else {
@@ -66,7 +66,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	func removeAllClosed() {
-		NSOperationQueue.mainQueue().addOperationWithBlock {  [weak self] in
+		atNextEvent { [weak self] in
 			if Settings.dontAskBeforeWipingClosed {
 				self?.removeAllClosedConfirmed()
 			} else {

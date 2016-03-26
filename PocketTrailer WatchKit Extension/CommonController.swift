@@ -47,10 +47,10 @@ class CommonController: WKInterfaceController {
 
 	private func attemptRequest(request: [String : AnyObject]) {
 
-		loading++
+		loading += 1
 
 		WCSession.defaultSession().sendMessage(request, replyHandler: { response in
-			NSOperationQueue.mainQueue().addOperationWithBlock {
+			atNextEvent {
 				if let errorIndicator = response["error"] as? Bool where errorIndicator == true {
 					self.showTemporaryError(response["status"] as! String)
 				} else {
@@ -60,11 +60,11 @@ class CommonController: WKInterfaceController {
 			}
 		}) { error in
 			if self.loading==5 {
-				NSOperationQueue.mainQueue().addOperationWithBlock {
+				atNextEvent {
 					self.loadingFailed(error)
 				}
 			} else {
-				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.2 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
+				delay(0.2) {
 					self.attemptRequest(request)
 				}
 			}
@@ -74,9 +74,9 @@ class CommonController: WKInterfaceController {
 	private func showTemporaryError(error: String) {
 		_statusLabel.setTextColor(UIColor.redColor())
 		showStatus(error, hideTable: true)
-		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(3.0 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
-			self._statusLabel.setTextColor(UIColor.whiteColor())
-			self.showStatus("", hideTable: false)
+		delay(3.0) { [weak self] in
+			self?._statusLabel.setTextColor(UIColor.whiteColor())
+			self?.showStatus("", hideTable: false)
 		}
 	}
 

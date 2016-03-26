@@ -118,7 +118,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	func systemDidWake() {
 		DLog("System woke up");
 		systemSleeping = false
-		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(1.0 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) { [weak self] in
+		delay(1.0) { [weak self] in
 			self?.startRefreshIfItIsDue()
 		}
 	}
@@ -875,7 +875,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 
 		if updateStatusItem {
-			NSOperationQueue.mainQueue().addOperationWithBlock { [weak self] in
+			atNextEvent { [weak self] in
 				DLog("Updating issues status item");
 				if let im = self?.issuesMenu {
 					let siv = StatusItemView(frame: CGRectMake(0, 0, length+2, H), label: countString, prefix: "issues", attributes: attributes)
@@ -957,7 +957,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 
         if updateStatusItem {
-			NSOperationQueue.mainQueue().addOperationWithBlock { [weak self] in
+			atNextEvent { [weak self] in
 				DLog("Updating PR status item");
 				if let pm = self?.prMenu {
 					let siv = StatusItemView(frame: CGRectMake(0, 0, length, H), label: countString, prefix: "pr", attributes: attributes)
@@ -1116,7 +1116,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		app.isManuallyScrolling = true
 		mouseIgnoreTimer.push()
 		inMenu.table.scrollRowToVisible(i)
-		NSOperationQueue.mainQueue().addOperationWithBlock {
+		atNextEvent {
 			inMenu.table.selectRowIndexes(NSIndexSet(index: i), byExtendingSelection: false)
 			return
 		}

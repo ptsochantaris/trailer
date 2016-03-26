@@ -38,11 +38,11 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 
 	private func potentialUpdate() {
 		// Possibly in thread!
-		NSOperationQueue.mainQueue().addOperationWithBlock {
+		atNextEvent {
 			if let l = self.lastView where self.session.reachable && !self.requestedUpdate {
 				self.requestedUpdate = true
 				l.requestData(nil)
-				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.5 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
+				delay(0.5) {
 					self.requestedUpdate = false
 				}
 			}

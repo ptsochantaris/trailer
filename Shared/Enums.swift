@@ -29,7 +29,12 @@ func never() -> NSDate {
 typealias Completion = ()->Void
 
 func atNextEvent(completion: Completion) {
-	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
-		completion()
+	NSOperationQueue.mainQueue().addOperationWithBlock(completion)
+}
+
+func delay(delay:NSTimeInterval, closure: Completion) {
+	let time = dispatch_time(DISPATCH_TIME_NOW, Int64(delay * Double(NSEC_PER_SEC)))
+	dispatch_after(time, dispatch_get_main_queue()) {
+		atNextEvent(closure)
 	}
 }

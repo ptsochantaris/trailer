@@ -128,13 +128,13 @@ final class DataManager : NSObject {
 					}
 				}
 				#if os(iOS)
-					NSOperationQueue.mainQueue().addOperationWithBlock {
+					atNextEvent {
 						p.indexForSpotlight()
 					}
 				#endif
 			} else {
 				#if os(iOS)
-					NSOperationQueue.mainQueue().addOperationWithBlock {
+					atNextEvent {
 						p.deIndexFromSpotlight()
 					}
 				#endif
@@ -159,13 +159,13 @@ final class DataManager : NSObject {
 					}
 				}
 				#if os(iOS)
-					NSOperationQueue.mainQueue().addOperationWithBlock {
+					atNextEvent {
 						i.indexForSpotlight()
 					}
 				#endif
 			} else {
 				#if os(iOS)
-					NSOperationQueue.mainQueue().addOperationWithBlock {
+					atNextEvent {
 						i.deIndexFromSpotlight()
 					}
 				#endif

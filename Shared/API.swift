@@ -147,7 +147,7 @@ final class API {
 			}
 			completion(response: response, data: data, error: error)
 			#if os(iOS)
-				NSOperationQueue.mainQueue().addOperationWithBlock { [weak self] in
+				atNextEvent { [weak self] in
 					self?.networkIndicationEnd()
 				}
 			#endif
@@ -155,7 +155,7 @@ final class API {
 
 		#if os(iOS)
 			task.priority = NSURLSessionTaskPriorityHigh
-			atNextEvent { [weak self] in
+			delay(0.1) { [weak self] in
 				self?.networkIndicationStart()
 			}
 		#endif
@@ -187,7 +187,7 @@ final class API {
 				let ret = NSImage(contentsOfFile: cachePath)
 			#endif
 			if let r = ret {
-				NSOperationQueue.mainQueue().addOperationWithBlock {
+				atNextEvent {
 					tryLoadAndCallback(r, cachePath)
 				}
 				return true
@@ -210,7 +210,7 @@ final class API {
                     i.TIFFRepresentation?.writeToFile(cachePath, atomically: true)
 				}
             #endif
-			NSOperationQueue.mainQueue().addOperationWithBlock {
+			atNextEvent {
 				tryLoadAndCallback(result, cachePath)
 			}
         }
@@ -1277,7 +1277,7 @@ final class API {
 
 			if path.isEmpty {
 				// handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
-				NSOperationQueue.mainQueue().addOperationWithBlock {
+				atNextEvent {
 					finalCallback(success: true, resultCode: -1, etag: nil)
 					return
 				}
@@ -1371,7 +1371,7 @@ final class API {
 			if fromServer.syncIsGood || ignoreLastSync {
 				apiServerLabel = fromServer.label ?? "(untitled server)"
 			} else {
-				NSOperationQueue.mainQueue().addOperationWithBlock { [weak self] in
+				atNextEvent { [weak self] in
 					let e = self?.apiError("Sync has failed, skipping this call")
 					completion(response: nil, data: nil, error: e)
 				}
@@ -1411,7 +1411,7 @@ final class API {
 				if NSDate().compare(existingBackOff!.nextAttemptAt) == NSComparisonResult.OrderedAscending {
 					// report failure and return
 					DLog("(%@) Preempted fetch to previously broken link %@, won't actually access this URL until %@", apiServerLabel, fullUrlPath, existingBackOff!.nextAttemptAt)
-					NSOperationQueue.mainQueue().addOperationWithBlock { [weak self] in
+					atNextEvent { [weak self] in
 						let e = self?.apiError("Preempted fetch because of throttling")
 						completion(response: nil, data: nil, error: e)
 						#if os(iOS)
@@ -1465,7 +1465,7 @@ final class API {
 					DLog("(%@) GET %@ - FAILED: %@", apiServerLabel, fullUrlPath, error!.localizedDescription)
 				}
 
-				NSOperationQueue.mainQueue().addOperationWithBlock { [weak self] in
+				atNextEvent { [weak self] in
 					if Settings.dumpAPIResponsesInConsole, let d = data {
 						DLog("API data from %@: %@", fullUrlPath, NSString(data: d, encoding: NSUTF8StringEncoding))
 					}
