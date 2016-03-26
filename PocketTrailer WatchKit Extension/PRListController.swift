@@ -70,23 +70,34 @@ final class PRListController: CommonController {
 			atNextEvent { [weak self] in
 				if let s = self {
 					s._requestData(nil)
-					s.showStatus("Loading \(s.loadingBuffer?.count ?? 0) items...", hideTable: true)
+					s.showStatus("Loaded \(s.loadingBuffer?.count ?? 0) items...", hideTable: true)
 				}
 			}
 			return
 		}
 
 		if let l = loadingBuffer {
+			showStatus("Loaded \(l.count) items.\n\nDisplaying...", hideTable: true)
+			atNextEvent { [weak self] in
+				self?.completeLoadingBuffer()
+			}
+		}
+	}
+
+	private func completeLoadingBuffer() {
+
+		if let l = loadingBuffer {
+			let C = l.count
 
 			if lastCount == 0 {
-				table.setNumberOfRows(l.count, withRowType: "PRRow")
-			} else if lastCount < l.count {
-				table.removeRowsAtIndexes(NSIndexSet(indexesInRange: NSMakeRange(0, l.count-lastCount)))
-			} else if lastCount > l.count {
-				table.insertRowsAtIndexes(NSIndexSet(indexesInRange: NSMakeRange(0, lastCount-l.count)), withRowType: "PRRow")
+				table.setNumberOfRows(C, withRowType: "PRRow")
+			} else if lastCount < C {
+				table.removeRowsAtIndexes(NSIndexSet(indexesInRange: NSMakeRange(0, C-lastCount)))
+			} else if lastCount > C {
+				table.insertRowsAtIndexes(NSIndexSet(indexesInRange: NSMakeRange(0, lastCount-C)), withRowType: "PRRow")
 			}
 
-			lastCount = l.count
+			lastCount = C
 
 			var index = 0
 			for itemData in l {
@@ -106,6 +117,7 @@ final class PRListController: CommonController {
 				table.scrollToRowAtIndex(s)
 				selectedIndex = nil
 			}
+
 			loadingBuffer = nil
 		}
 	}

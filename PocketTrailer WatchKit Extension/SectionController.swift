@@ -53,6 +53,11 @@ final class SectionController: CommonController {
 		pushControllerWithName("ListController", context: [ SECTION_KEY: section!, TYPE_KEY: r.type! ] )
 	}
 
+	override func updateFromData(response: [NSString : AnyObject]) {
+		super.updateFromData(response)
+		updateUI()
+	}
+
 	private func updateUI() {
 
 		rowControllers.removeAll(keepCapacity: false)

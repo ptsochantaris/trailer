@@ -280,6 +280,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				"user": comment.userName ?? "NOUSER",
 				"date": comment.createdAt ?? never(),
 				"text": comment.body ?? "NOBODY",
+				"mine": comment.isMine()
 				])
 		}
 		return comments

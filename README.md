@@ -1,4 +1,4 @@
-*Important: Due to security changes under OS X, if you are running a version earlier than 1.3.9 under OS X El Capitan, please upgrade to the latest version manually from [the latest releases page](https://github.com/ptsochantaris/trailer/releases)*
+*Important: Due to security changes under OS X, if you are running v1.3.9 or earlier under OS X El Capitan, please upgrade to the latest version manually from [the latest releases page](https://github.com/ptsochantaris/trailer/releases)*
 
 Trailer
 =======

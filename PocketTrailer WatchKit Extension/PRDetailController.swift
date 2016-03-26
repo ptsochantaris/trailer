@@ -89,19 +89,28 @@ final class PRDetailController: CommonController {
 				setTitle("Details")
 			}
 			table.insertRowsAtIndexes(NSIndexSet(indexesInRange: NSMakeRange(rowCount, comments.count)), withRowType: "CommentRow")
-			var commentCount = 0
+			var unreadIndex = 0
 			let unreadCount = itemInfo["unreadCount"] as? Int
 			for comment in comments {
 				if let s = table.rowControllerAtIndex(rowCount) as? CommentRow {
 					s.usernameL.setText("@" + (comment["user"] as! String))
 					s.dateL.setText(dateFormatter.stringFromDate(comment["date"] as! NSDate))
 					s.commentL.setText(comment["text"] as? String)
-					if commentCount < unreadCount {
-						s.margin.setBackgroundColor(UIColor.redColor())
+					if(comment["mine"] as! Bool) {
+						s.usernameBackground.setBackgroundColor(UIColor.grayColor())
+						s.commentL.setTextColor(UIColor.lightGrayColor())
+						s.margin.setBackgroundColor(UIColor.darkGrayColor())
 					} else {
-						s.margin.setBackgroundColor(UIColor.lightGrayColor())
+						if unreadIndex < unreadCount {
+							s.usernameBackground.setBackgroundColor(UIColor.redColor())
+							s.margin.setBackgroundColor(UIColor.redColor())
+							unreadIndex += 1
+						} else {
+							s.usernameBackground.setBackgroundColor(UIColor.lightGrayColor())
+							s.margin.setBackgroundColor(UIColor.lightGrayColor())
+						}
+						s.commentL.setTextColor(UIColor.whiteColor())
 					}
-					commentCount += 1
 				}
 				rowCount += 1
 			}
