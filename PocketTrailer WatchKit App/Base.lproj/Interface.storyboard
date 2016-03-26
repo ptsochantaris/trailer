@@ -201,7 +201,7 @@
                         <label alignment="center" verticalAlignment="center" text="Connecting" textAlignment="center" numberOfLines="0" id="Adx-ov-WlP">
                             <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
                         </label>
-                        <table alignment="left" id="nDu-Js-IyV">
+                        <table alignment="left" hidden="YES" id="nDu-Js-IyV">
                             <items>
                                 <tableRow identifier="StatusRow" selectable="NO" id="O5R-Ty-nOY" customClass="StatusRow" customModule="Trailer">
                                     <group key="rootItem" width="1" height="0.0" alignment="left" spacing="3" id="gDg-ep-B9d">

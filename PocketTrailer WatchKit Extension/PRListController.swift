@@ -38,10 +38,6 @@ final class PRListController: CommonController {
 
 	private func _requestData(command: String?) {
 
-		if lastCount >= PAGE_SIZE {
-			self.showStatus("Refreshing...", hideTable: true)
-		}
-
 		var params = ["list": "item_list", "type": type, "sectionIndex": NSNumber(integer: section.rawValue), "count": NSNumber(integer: PAGE_SIZE)]
 		if let command = command {
 			params["command"] = command
@@ -61,6 +57,8 @@ final class PRListController: CommonController {
 		loadingBuffer = nil
 	}
 
+	private var progressiveLoading = false
+
 	override func updateFromData(response: [NSString : AnyObject]) {
 
 		let page = response["result"] as! [[String : AnyObject]]
@@ -71,15 +69,20 @@ final class PRListController: CommonController {
 				if let s = self {
 					s._requestData(nil)
 					s.showStatus("Loaded \(s.loadingBuffer?.count ?? 0) items...", hideTable: true)
+					s.progressiveLoading = true
 				}
 			}
 			return
 		}
 
 		if let l = loadingBuffer {
-			showStatus("Loaded \(l.count) items.\n\nDisplaying...", hideTable: true)
-			atNextEvent { [weak self] in
-				self?.completeLoadingBuffer()
+			if progressiveLoading {
+				showStatus("Loaded \(l.count) items.\n\nDisplaying...", hideTable: true)
+				atNextEvent { [weak self] in
+					self?.completeLoadingBuffer()
+				}
+			} else {
+				completeLoadingBuffer()
 			}
 		}
 	}
@@ -134,7 +137,7 @@ final class PRListController: CommonController {
 
 	@IBAction func refreshSelected() {
 		loading = false
-		showStatus("Refreshing", hideTable: true)
+		showStatus("Refreshing...", hideTable: true)
 		requestData("refresh")
 	}
 
@@ -144,5 +147,8 @@ final class PRListController: CommonController {
 		let row = table.rowControllerAtIndex(rowIndex) as! PRRow
 		let key = (type=="prs" ? PULL_REQUEST_KEY : ISSUE_KEY)
 		pushControllerWithName("DetailController", context: [ key: row.itemId! ])
+		if lastCount >= PAGE_SIZE {
+			self.showStatus("Loading...", hideTable: true)
+		}
 	}
 }

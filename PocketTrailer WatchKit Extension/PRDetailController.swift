@@ -35,7 +35,7 @@ final class PRDetailController: CommonController {
 	}
 
 	@IBAction func refreshSelected() {
-		showStatus("Refreshing", hideTable: true)
+		showStatus("Refreshing...", hideTable: true)
 		requestData("refresh")
 	}
 
