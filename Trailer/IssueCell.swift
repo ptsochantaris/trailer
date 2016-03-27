@@ -14,7 +14,7 @@ final class IssueCell: TrailerCell {
 		var _commentsNew = 0
 		let _commentsTotal = issue.totalComments?.integerValue ?? 0
 		let sectionIndex = issue.sectionIndex?.integerValue ?? 0
-		if sectionIndex==PullRequestSection.Mine.rawValue || sectionIndex==PullRequestSection.Participated.rawValue || Settings.showCommentsEverywhere {
+		if sectionIndex==Section.Mine.rawValue || sectionIndex==Section.Participated.rawValue || Settings.showCommentsEverywhere {
 			_commentsNew = issue.unreadComments?.integerValue ?? 0
 		}
 

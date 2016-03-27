@@ -529,7 +529,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		r.backgroundColor = self.view.tintColor
 		var actions = [r,m]
 
-		if let sectionName = fetchedResultsController.sections?[indexPath.section].name where sectionName == PullRequestSection.Merged.prMenuName() || sectionName == PullRequestSection.Closed.prMenuName() {
+		if let sectionName = fetchedResultsController.sections?[indexPath.section].name where sectionName == Section.Merged.prMenuName() || sectionName == Section.Closed.prMenuName() {
 			actions.append(UITableViewRowAction(style: .Destructive, title: "Delete") { [weak self] (action, indexPath) in
 				if let i = self?.fetchedResultsController.objectAtIndexPath(indexPath) as? ListableItem {
 					mainObjectContext.deleteObject(i)

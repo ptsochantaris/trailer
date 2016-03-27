@@ -60,7 +60,7 @@ final class PullRequest: ListableItem {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
 		if visibleOnly {
-			f.predicate = NSPredicate(format: "sectionIndex == %d || sectionIndex == %d || sectionIndex == %d", PullRequestSection.Mine.rawValue, PullRequestSection.Participated.rawValue, PullRequestSection.All.rawValue)
+			f.predicate = NSPredicate(format: "sectionIndex == %d || sectionIndex == %d || sectionIndex == %d", Section.Mine.rawValue, Section.Participated.rawValue, Section.All.rawValue)
 		} else {
 			f.predicate = NSPredicate(format: "condition == %d", PullRequestCondition.Open.rawValue)
 		}
@@ -93,15 +93,15 @@ final class PullRequest: ListableItem {
 		return moc.countForFetchRequest(f, error: nil)
 	}
 
-	class func countRequestsInSection(section: PullRequestSection, moc: NSManagedObjectContext) -> Int {
+	class func countRequestsInSection(section: Section, moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		f.predicate = NSPredicate(format: "sectionIndex == %d", section.rawValue)
 		return moc.countForFetchRequest(f, error: nil)
 	}
 
-	class func markEverythingRead(section: PullRequestSection, moc: NSManagedObjectContext) {
+	class func markEverythingRead(section: Section, moc: NSManagedObjectContext) {
 		let f = NSFetchRequest(entityName: "PullRequest")
-		if section != PullRequestSection.None {
+		if section != Section.None {
 			f.predicate = NSPredicate(format: "sectionIndex == %d", section.rawValue)
 		}
 		for pr in try! moc.executeFetchRequest(f) as! [PullRequest] {
@@ -109,7 +109,7 @@ final class PullRequest: ListableItem {
 		}
 	}
 
-	class func badgeCountInSection(section: PullRequestSection, moc: NSManagedObjectContext) -> Int {
+	class func badgeCountInSection(section: Section, moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		f.predicate = NSPredicate(format: "sectionIndex == %d", section.rawValue)
 		return badgeCountFromFetch(f, inMoc: moc)
@@ -126,7 +126,7 @@ final class PullRequest: ListableItem {
 				if s == PullRequestCondition.Merged.rawValue || s == PullRequestCondition.Closed.rawValue {
 					return false
 				}
-				if s == PullRequestSection.All.rawValue && Settings.markUnmergeableOnUserSectionsOnly {
+				if s == Section.All.rawValue && Settings.markUnmergeableOnUserSectionsOnly {
 					return false
 				}
 				return true
@@ -205,7 +205,7 @@ final class PullRequest: ListableItem {
 		return components.joinWithSeparator(",")
 	}
 
-	func shouldBeCheckedForRedStatusesInSection(targetSection: PullRequestSection) -> Bool {
+	func shouldBeCheckedForRedStatusesInSection(targetSection: Section) -> Bool {
 		if Settings.hidePrsThatArentPassing {
 			if Settings.hidePrsThatDontPassOnlyInAll {
 				return targetSection == .All
@@ -267,6 +267,6 @@ final class PullRequest: ListableItem {
 	}
 
 	func sectionName() -> String {
-		return PullRequestSection.prMenuTitles[sectionIndex?.integerValue ?? 0]
+		return Section.prMenuTitles[sectionIndex?.integerValue ?? 0]
 	}
 }

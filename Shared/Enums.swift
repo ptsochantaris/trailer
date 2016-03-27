@@ -1,25 +1,22 @@
 
-enum PullRequestSection: Int {
+enum Section: Int {
 	case None, Mine, Participated, Merged, Closed, All
 	static let prMenuTitles = ["", "Mine", "Participated", "Recently Merged", "Recently Closed", "All Pull Requests"]
 	static let issueMenuTitles = ["", "Mine", "Participated", "Recently Merged", "Recently Closed", "All Issues"]
 	static let watchMenuTitles = ["", "Mine", "Participated", "Merged", "Closed", "Other"]
 	static let apiTitles = ["", "mine", "participated", "merged", "closed", "other"]
 	func prMenuName() -> String {
-		return PullRequestSection.prMenuTitles[rawValue]
+		return Section.prMenuTitles[rawValue]
 	}
 	func issuesMenuName() -> String {
-		return PullRequestSection.issueMenuTitles[rawValue]
+		return Section.issueMenuTitles[rawValue]
 	}
 	func watchMenuName() -> String {
-		return PullRequestSection.watchMenuTitles[rawValue]
+		return Section.watchMenuTitles[rawValue]
 	}
 	func apiName() -> String {
-		return PullRequestSection.apiTitles[rawValue]
+		return Section.apiTitles[rawValue]
 	}
-}
-func sectionFromApi(apiName: String) -> PullRequestSection {
-	return PullRequestSection(rawValue: PullRequestSection.apiTitles.indexOf(apiName)!)!
 }
 
 func never() -> NSDate {

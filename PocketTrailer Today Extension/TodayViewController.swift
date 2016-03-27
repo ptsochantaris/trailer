@@ -100,11 +100,11 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 			var totalCount = prs["total"] as! Int
 			var a = NSMutableAttributedString(string: "\(totalCount): ", attributes: brightAttributes)
 			if totalCount>0 {
-				append(a, from: prs, section: PullRequestSection.Mine)
-				append(a, from: prs, section: PullRequestSection.Participated)
-				append(a, from: prs, section: PullRequestSection.Merged)
-				append(a, from: prs, section: PullRequestSection.Closed)
-				append(a, from: prs, section: PullRequestSection.All)
+				append(a, from: prs, section: Section.Mine)
+				append(a, from: prs, section: Section.Participated)
+				append(a, from: prs, section: Section.Merged)
+				append(a, from: prs, section: Section.Closed)
+				append(a, from: prs, section: Section.All)
 				appendCommentCount(a, number: prs["unread"] as! Int)
 			} else {
 				a.appendAttributedString(NSAttributedString(string: prs["error"] as! String, attributes: [NSParagraphStyleAttributeName: paragraph]))
@@ -115,10 +115,10 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 			totalCount = issues["total"] as! Int
 			a = NSMutableAttributedString(string: "\(totalCount): ", attributes: brightAttributes)
 			if totalCount>0 {
-				append(a, from: issues, section: PullRequestSection.Mine)
-				append(a, from: issues, section: PullRequestSection.Participated)
-				append(a, from: issues, section: PullRequestSection.Closed)
-				append(a, from: issues, section: PullRequestSection.All)
+				append(a, from: issues, section: Section.Mine)
+				append(a, from: issues, section: Section.Participated)
+				append(a, from: issues, section: Section.Closed)
+				append(a, from: issues, section: Section.All)
 				appendCommentCount(a, number: issues["unread"] as! Int)
 			} else {
 				a.appendAttributedString(NSAttributedString(string: issues["error"] as! String, attributes: [NSParagraphStyleAttributeName: paragraph]))
@@ -163,7 +163,7 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 		}
 	}
 
-	func append(a: NSMutableAttributedString, from: [String:AnyObject], section: PullRequestSection) {
+	func append(a: NSMutableAttributedString, from: [String:AnyObject], section: Section) {
 		let count = (from[section.apiName()] as! [String:AnyObject])["total"] as! Int
 		if count > 0 {
 			let text = "\(count)\u{a0}\(section.watchMenuName()), "

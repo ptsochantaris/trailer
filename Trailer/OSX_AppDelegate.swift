@@ -448,7 +448,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		let inMenu = prMenu.visible ? prMenu : issuesMenu
 
 		if inMenu == prMenu {
-			if headerTitle == PullRequestSection.Merged.prMenuName() {
+			if headerTitle == Section.Merged.prMenuName() {
 				if Settings.dontAskBeforeWipingMerged {
 					removeAllMergedRequests()
 				} else {
@@ -468,7 +468,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 						}
 					}
 				}
-			} else if headerTitle == PullRequestSection.Closed.prMenuName() {
+			} else if headerTitle == Section.Closed.prMenuName() {
 				if Settings.dontAskBeforeWipingClosed {
 					removeAllClosedRequests()
 				} else {
@@ -493,7 +493,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				showMenu(prMenu)
 			}
 		} else if inMenu == issuesMenu {
-			if headerTitle == PullRequestSection.Closed.issuesMenuName() {
+			if headerTitle == Section.Closed.issuesMenuName() {
 				if Settings.dontAskBeforeWipingClosed {
 					removeAllClosedIssues()
 				} else {

@@ -87,26 +87,26 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 			let tc = r["total"] as! Int
 			totalCount.setText("\(tc)")
 
-			let mc = r[PullRequestSection.Mine.apiName()]?["total"] as! Int
-			myCount.setText("\(mc) \(PullRequestSection.Mine.watchMenuName().uppercaseString)")
+			let mc = r[Section.Mine.apiName()]?["total"] as! Int
+			myCount.setText("\(mc) \(Section.Mine.watchMenuName().uppercaseString)")
 			myGroup.setAlpha(mc==0 ? 0.4 : 1.0)
 
-			let pc = r[PullRequestSection.Participated.apiName()]?["total"] as! Int
-			participatedCount.setText("\(pc) \(PullRequestSection.Participated.watchMenuName().uppercaseString)")
+			let pc = r[Section.Participated.apiName()]?["total"] as! Int
+			participatedCount.setText("\(pc) \(Section.Participated.watchMenuName().uppercaseString)")
 			participatedGroup.setAlpha(pc==0 ? 0.4 : 1.0)
 
 			if !showIssues {
-				let rc = r[PullRequestSection.Merged.apiName()]?["total"] as! Int
-				mergedCount.setText("\(rc) \(PullRequestSection.Merged.watchMenuName().uppercaseString)")
+				let rc = r[Section.Merged.apiName()]?["total"] as! Int
+				mergedCount.setText("\(rc) \(Section.Merged.watchMenuName().uppercaseString)")
 				mergedGroup.setAlpha(rc==0 ? 0.4 : 1.0)
 			}
 
-			let cc = r[PullRequestSection.Closed.apiName()]?["total"] as! Int
-			closedCount.setText("\(cc) \(PullRequestSection.Closed.watchMenuName().uppercaseString)")
+			let cc = r[Section.Closed.apiName()]?["total"] as! Int
+			closedCount.setText("\(cc) \(Section.Closed.watchMenuName().uppercaseString)")
 			closedGroup.setAlpha(cc==0 ? 0.4 : 1.0)
 
-			let oc = r[PullRequestSection.All.apiName()]?["total"] as! Int
-			otherCount.setText("\(oc) \(PullRequestSection.All.watchMenuName().uppercaseString)")
+			let oc = r[Section.All.apiName()]?["total"] as! Int
+			otherCount.setText("\(oc) \(Section.All.watchMenuName().uppercaseString)")
 			otherGroup.setAlpha(oc==0 ? 0.4 : 1.0)
 
 			let uc = r["unread"] as! Int

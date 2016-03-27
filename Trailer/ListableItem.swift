@@ -81,8 +81,8 @@ class ListableItem: DataItem {
 	final func shouldKeepForPolicy(policy: Int) -> Bool {
 		let index = (sectionIndex?.integerValue ?? 0)
 		return policy==PRHandlingPolicy.KeepAll.rawValue
-			|| (policy==PRHandlingPolicy.KeepMineAndParticipated.rawValue && (index==PullRequestSection.Mine.rawValue || index==PullRequestSection.Participated.rawValue))
-			|| (policy==PRHandlingPolicy.KeepMine.rawValue && index==PullRequestSection.Mine.rawValue)
+			|| (policy==PRHandlingPolicy.KeepMineAndParticipated.rawValue && (index==Section.Mine.rawValue || index==Section.Participated.rawValue))
+			|| (policy==PRHandlingPolicy.KeepMine.rawValue && index==Section.Mine.rawValue)
 	}
 
 	final func assignedToMySection() -> Bool {
@@ -135,15 +135,15 @@ class ListableItem: DataItem {
 	}
 
 	final func isVisibleOnMenu() -> Bool {
-		return self.sectionIndex?.integerValue != PullRequestSection.None.rawValue
+		return self.sectionIndex?.integerValue != Section.None.rawValue
 	}
 
 	final func showNewComments() -> Bool {
-		return Settings.showCommentsEverywhere || sectionIndex?.integerValue == PullRequestSection.Mine.rawValue || sectionIndex?.integerValue == PullRequestSection.Participated.rawValue
+		return Settings.showCommentsEverywhere || sectionIndex?.integerValue == Section.Mine.rawValue || sectionIndex?.integerValue == Section.Participated.rawValue
 	}
 
 	final func postProcess() {
-		var targetSection: PullRequestSection
+		var targetSection: Section
 		let currentCondition = condition?.integerValue ?? PullRequestCondition.Open.rawValue
 		let isMine = createdByMe()
 
@@ -267,7 +267,7 @@ class ListableItem: DataItem {
 		if targetSection != .None, let p = self as? PullRequest where p.shouldBeCheckedForRedStatusesInSection(targetSection) {
 			for s in p.displayedStatuses() {
 				if s.state != "success" {
-					targetSection = PullRequestSection.None
+					targetSection = Section.None
 					break
 				}
 			}
@@ -392,7 +392,7 @@ class ListableItem: DataItem {
 		let showCommentsEverywhere = Settings.showCommentsEverywhere
 		for i in try! inMoc.executeFetchRequest(f) as! [ListableItem] {
 			if let sectionIndex = i.sectionIndex?.integerValue {
-				if showCommentsEverywhere || sectionIndex==PullRequestSection.Mine.rawValue || sectionIndex==PullRequestSection.Participated.rawValue {
+				if showCommentsEverywhere || sectionIndex==Section.Mine.rawValue || sectionIndex==Section.Participated.rawValue {
 					if let c = i.unreadComments?.integerValue {
 						badgeCount += c
 					}

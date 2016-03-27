@@ -37,10 +37,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	func toggleHelp(button: UIBarButtonItem) {
 		showHelp = !showHelp
 		heightCache.removeAll()
-		tableView.reloadSections(NSIndexSet(indexesInRange: NSMakeRange(0, Section.allNames.count)), withRowAnimation: .Automatic)
+		tableView.reloadSections(NSIndexSet(indexesInRange: NSMakeRange(0, SettingsSection.allNames.count)), withRowAnimation: .Automatic)
 	}
 
-	private enum Section: Int {
+	private enum SettingsSection: Int {
 		case Refresh, Display, Filtering, Issues, Comments, Repos, StausesAndLabels, History, Confirm, Sort, Misc
 		static let rowCounts = [3, 6, 7, 1, 7, 2, 8, 3, 2, 3, 2]
 		static let allNames = ["Auto Refresh", "Display", "Filtering", "Issues", "Comments", "Watchlist", "Statuses & Labels", "History", "Don't confirm when", "Sorting", "Misc"]
@@ -85,14 +85,14 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	}
 
 	override func tableView(tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-		if section==Section.Filtering.rawValue {
+		if section==SettingsSection.Filtering.rawValue {
 			return filteringSectionFooter()
 		}
 		return nil
 	}
 
 	override func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-		if section==Section.Filtering.rawValue {
+		if section==SettingsSection.Filtering.rawValue {
 			return filteringSectionFooter().sizeThatFits(CGSizeMake(tableView.bounds.size.width, 500.0)).height + 15.0
 		}
 		return 0.0
@@ -108,7 +108,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		cell.accessoryType = UITableViewCellAccessoryType.None
 		cell.valueLabel.text = " "
 
-		if indexPath.section == Section.Refresh.rawValue {
+		if indexPath.section == SettingsSection.Refresh.rawValue {
 			switch indexPath.row {
 			case 0:
 				cell.titleLabel.text = "Foreground refresh interval"
@@ -124,7 +124,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.descriptionLabel.text = Settings.newRepoCheckPeriodHelp
 			default: break
 			}
-		} else if indexPath.section == Section.Display.rawValue {
+		} else if indexPath.section == SettingsSection.Display.rawValue {
 			switch indexPath.row {
 			case 0:
 				cell.titleLabel.text = "Display item creation times instead of update times"
@@ -152,7 +152,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.descriptionLabel.text = Settings.openItemsDirectlyInSafariHelp
 			default: break
 			}
-		} else if indexPath.section == Section.Filtering.rawValue {
+		} else if indexPath.section == SettingsSection.Filtering.rawValue {
 			switch indexPath.row {
 			case 0:
 				cell.titleLabel.text = "Include item titles"
@@ -184,7 +184,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.descriptionLabel.text = Settings.includeNumbersInFilterHelp
 			default: break
 			}
-		} else if indexPath.section == Section.Issues.rawValue {
+		} else if indexPath.section == SettingsSection.Issues.rawValue {
 			switch indexPath.row {
 			case 0:
 				cell.titleLabel.text = "Prefer issues instead of PRs in Apple Watch glances & complications"
@@ -192,7 +192,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.descriptionLabel.text = Settings.preferIssuesInWatchHelp
 			default: break
 			}
-		} else if indexPath.section == Section.Comments.rawValue {
+		} else if indexPath.section == SettingsSection.Comments.rawValue {
 			switch indexPath.row {
 			case 0:
 				cell.titleLabel.text = "Badge & send alerts for the 'all' section too"
@@ -224,7 +224,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.descriptionLabel.text = Settings.disableAllCommentNotificationsHelp
 			default: break
 			}
-		} else if indexPath.section == Section.Repos.rawValue {
+		} else if indexPath.section == SettingsSection.Repos.rawValue {
 			switch indexPath.row {
 			case 0:
 				cell.titleLabel.text = "PR visibility for new repos"
@@ -236,7 +236,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.descriptionLabel.text = Settings.displayPolicyForNewIssuesHelp
 			default: break
 			}
-		} else if indexPath.section == Section.StausesAndLabels.rawValue {
+		} else if indexPath.section == SettingsSection.StausesAndLabels.rawValue {
 			switch indexPath.row {
 			case 0:
 				cell.titleLabel.text = "Show statuses"
@@ -272,7 +272,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.descriptionLabel.text = Settings.hidePrsThatDontPassOnlyInAllHelp
 			default: break
 			}
-		} else if indexPath.section == Section.History.rawValue {
+		} else if indexPath.section == SettingsSection.History.rawValue {
 			switch indexPath.row {
 			case 0:
 				cell.titleLabel.text = "When something is merged"
@@ -288,7 +288,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.descriptionLabel.text = Settings.dontKeepPrsMergedByMeHelp
 			default: break
 			}
-		} else if indexPath.section == Section.Confirm.rawValue {
+		} else if indexPath.section == SettingsSection.Confirm.rawValue {
 			switch indexPath.row {
 			case 0:
 				cell.titleLabel.text = "Removing all merged items"
@@ -300,7 +300,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.descriptionLabel.text = Settings.dontAskBeforeWipingClosedHelp
 			default: break
 			}
-		} else if indexPath.section == Section.Sort.rawValue {
+		} else if indexPath.section == SettingsSection.Sort.rawValue {
 			switch indexPath.row {
 			case 0:
 				cell.titleLabel.text = "Direction"
@@ -320,7 +320,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.descriptionLabel.text = Settings.groupByRepoHelp
 			default: break
 			}
-		} else if indexPath.section == Section.Misc.rawValue {
+		} else if indexPath.section == SettingsSection.Misc.rawValue {
 			switch indexPath.row {
 			case 0:
 				cell.titleLabel.text = "Log activity to console"
@@ -347,7 +347,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 		previousValue = nil
 
-		if indexPath.section == Section.Refresh.rawValue {
+		if indexPath.section == SettingsSection.Refresh.rawValue {
 			pickerName = tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text ?? "Unknown Value"
 			selectedIndexPath = indexPath
 			var values = [String]()
@@ -379,7 +379,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			valuesToPush = values
 			performSegueWithIdentifier("showPicker", sender: self)
 
-		} else if indexPath.section == Section.Display.rawValue {
+		} else if indexPath.section == SettingsSection.Display.rawValue {
 			switch indexPath.row {
 			case 0:
 				Settings.showCreatedInsteadOfUpdated = !Settings.showCreatedInsteadOfUpdated
@@ -402,7 +402,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				Settings.openItemsDirectlyInSafari = !Settings.openItemsDirectlyInSafari
 			default: break
 			}
-		} else if indexPath.section == Section.Filtering.rawValue {
+		} else if indexPath.section == SettingsSection.Filtering.rawValue {
 			switch indexPath.row {
 			case 0:
 				Settings.includeTitlesInFilter = !Settings.includeTitlesInFilter
@@ -421,13 +421,13 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			default: break
 			}
 			settingsChangedTimer.push()
-		} else if indexPath.section == Section.Issues.rawValue {
+		} else if indexPath.section == SettingsSection.Issues.rawValue {
 			switch indexPath.row {
 			case 0:
 				Settings.preferIssuesInWatch = !Settings.preferIssuesInWatch
 			default: break
 			}
-		} else if indexPath.section == Section.Comments.rawValue {
+		} else if indexPath.section == SettingsSection.Comments.rawValue {
 			switch indexPath.row {
 			case 0:
 				Settings.showCommentsEverywhere = !Settings.showCommentsEverywhere
@@ -449,7 +449,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				Settings.disableAllCommentNotifications = !Settings.disableAllCommentNotifications
 			default: break
 			}
-		} else if indexPath.section == Section.Repos.rawValue {
+		} else if indexPath.section == SettingsSection.Repos.rawValue {
 			pickerName = tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text ?? "Unknown Value"
 			valuesToPush = RepoDisplayPolicy.labels
 			selectedIndexPath = indexPath
@@ -461,7 +461,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			default: break
 			}
 			performSegueWithIdentifier("showPicker", sender: self)
-		} else if indexPath.section == Section.StausesAndLabels.rawValue {
+		} else if indexPath.section == SettingsSection.StausesAndLabels.rawValue {
 			switch indexPath.row {
 			case 0:
 				Settings.showStatusItems = !Settings.showStatusItems
@@ -519,7 +519,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				settingsChangedTimer.push()
 			default: break
 			}
-		} else if indexPath.section == Section.History.rawValue {
+		} else if indexPath.section == SettingsSection.History.rawValue {
 			switch (indexPath.row) {
 			case 0:
 				selectedIndexPath = indexPath
@@ -537,7 +537,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				Settings.dontKeepPrsMergedByMe = !Settings.dontKeepPrsMergedByMe
 			default: break
 			}
-		} else if indexPath.section == Section.Confirm.rawValue {
+		} else if indexPath.section == SettingsSection.Confirm.rawValue {
 			switch indexPath.row {
 			case 0:
 				Settings.dontAskBeforeWipingMerged = !Settings.dontAskBeforeWipingMerged
@@ -545,7 +545,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				Settings.dontAskBeforeWipingClosed = !Settings.dontAskBeforeWipingClosed
 			default: break
 			}
-		} else if indexPath.section == Section.Sort.rawValue {
+		} else if indexPath.section == SettingsSection.Sort.rawValue {
 			switch (indexPath.row) {
 			case 0:
 				Settings.sortDescending = !Settings.sortDescending
@@ -563,7 +563,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				settingsChangedTimer.push()
 			default: break
 			}
-		} else if indexPath.section == Section.Misc.rawValue {
+		} else if indexPath.section == SettingsSection.Misc.rawValue {
 			switch indexPath.row {
 			case 0:
 				Settings.logActivityToConsole = !Settings.logActivityToConsole
@@ -584,15 +584,15 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	}
 
 	override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		return Section.rowCounts[section]
+		return SettingsSection.rowCounts[section]
 	}
 
 	override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-		return Section.allNames[section]
+		return SettingsSection.allNames[section]
 	}
 
 	override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-		return Section.allNames.count
+		return SettingsSection.allNames.count
 	}
 
 	private var sizer: AdvancedSettingsCell?
@@ -625,7 +625,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 	func pickerViewController(picker: PickerViewController, didSelectIndexPath: NSIndexPath) {
 		if let sip = selectedIndexPath {
-			if sip.section == Section.Refresh.rawValue {
+			if sip.section == SettingsSection.Refresh.rawValue {
 				if sip.row == 0 {
 					Settings.refreshPeriod = Float(didSelectIndexPath.row*10+60)
 				} else if sip.row == 1 {
@@ -633,25 +633,25 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				} else if sip.row == 2 {
 					Settings.newRepoCheckPeriod = Float(didSelectIndexPath.row+2)
 				}
-			} else if sip.section == Section.Display.rawValue {
+			} else if sip.section == SettingsSection.Display.rawValue {
 				Settings.assignedPrHandlingPolicy = didSelectIndexPath.row
 				settingsChangedTimer.push()
-			} else if sip.section == Section.Sort.rawValue {
+			} else if sip.section == SettingsSection.Sort.rawValue {
 				Settings.sortMethod = Int(didSelectIndexPath.row)
 				settingsChangedTimer.push()
-			} else if sip.section == Section.Repos.rawValue {
+			} else if sip.section == SettingsSection.Repos.rawValue {
 				if sip.row == 0 {
 					Settings.displayPolicyForNewPrs = Int(didSelectIndexPath.row)
 				} else if sip.row == 1 {
 					Settings.displayPolicyForNewIssues = Int(didSelectIndexPath.row)
 				}
-			} else if sip.section == Section.History.rawValue {
+			} else if sip.section == SettingsSection.History.rawValue {
 				if sip.row == 0 {
 					Settings.mergeHandlingPolicy = Int(didSelectIndexPath.row)
 				} else if sip.row == 1 {
 					Settings.closeHandlingPolicy = Int(didSelectIndexPath.row)
 				}
-			} else if sip.section == Section.StausesAndLabels.rawValue {
+			} else if sip.section == SettingsSection.StausesAndLabels.rawValue {
 				if sip.row == 1 {
 					Settings.statusItemRefreshInterval = Int(didSelectIndexPath.row+1)
 				} else  if sip.row == 3 {

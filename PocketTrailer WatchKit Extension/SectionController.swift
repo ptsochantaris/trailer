@@ -58,6 +58,10 @@ final class SectionController: CommonController {
 		updateUI()
 	}
 
+	private func sectionFromApi(apiName: String) -> Section {
+		return Section(rawValue: Section.apiTitles.indexOf(apiName)!)!
+	}
+
 	private func updateUI() {
 
 		rowControllers.removeAll(keepCapacity: false)
@@ -71,8 +75,8 @@ final class SectionController: CommonController {
 			rowControllers.append(pt)
 			if totalPrs > 0 {
 				pt.title = "\(totalPrs) PULL REQUESTS"
-				for prSection in PullRequestSection.apiTitles {
-					if prSection == PullRequestSection.None.apiName() { continue }
+				for prSection in Section.apiTitles {
+					if prSection == Section.None.apiName() { continue }
 
 					if let section = prs[prSection], count = section["total"] as? Int, unread = section["unread"] as? Int where count > 0 {
 						let s = SectionRow()
@@ -95,9 +99,9 @@ final class SectionController: CommonController {
 			rowControllers.append(it)
 			if totalIssues > 0 {
 				it.title = "\(totalIssues) ISSUES"
-				for issueSection in PullRequestSection.apiTitles {
-					if issueSection == PullRequestSection.None.apiName() { continue }
-					if issueSection == PullRequestSection.Merged.apiName() { continue }
+				for issueSection in Section.apiTitles {
+					if issueSection == Section.None.apiName() { continue }
+					if issueSection == Section.Merged.apiName() { continue }
 
 					if let section = issues[issueSection], count = section["total"] as? Int, unread = section["unread"] as? Int where count > 0 {
 						let s = SectionRow()

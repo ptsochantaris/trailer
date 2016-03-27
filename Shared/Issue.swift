@@ -70,15 +70,15 @@ final class Issue: ListableItem {
 		return moc.countForFetchRequest(f, error: nil)
 	}
 
-	class func countIssuesInSection(section: PullRequestSection, moc: NSManagedObjectContext) -> Int {
+	class func countIssuesInSection(section: Section, moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest(entityName: "Issue")
 		f.predicate = NSPredicate(format: "sectionIndex == %d", section.rawValue)
 		return moc.countForFetchRequest(f, error: nil)
 	}
 
-	class func markEverythingRead(section: PullRequestSection, moc: NSManagedObjectContext) {
+	class func markEverythingRead(section: Section, moc: NSManagedObjectContext) {
 		let f = NSFetchRequest(entityName: "Issue")
-		if section != PullRequestSection.None {
+		if section != Section.None {
 			f.predicate = NSPredicate(format: "sectionIndex == %d", section.rawValue)
 		}
 		for pr in try! moc.executeFetchRequest(f) as! [Issue] {
@@ -91,7 +91,7 @@ final class Issue: ListableItem {
 		return badgeCountFromFetch(f, inMoc: moc)
 	}
 
-	class func badgeCountInSection(section: PullRequestSection, moc: NSManagedObjectContext) -> Int {
+	class func badgeCountInSection(section: Section, moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest(entityName: "Issue")
 		f.predicate = NSPredicate(format: "sectionIndex == %d", section.rawValue)
 		return badgeCountFromFetch(f, inMoc: moc)
@@ -142,7 +142,7 @@ final class Issue: ListableItem {
 	}
 
 	func sectionName() -> String {
-		return PullRequestSection.issueMenuTitles[sectionIndex?.integerValue ?? 0]
+		return Section.issueMenuTitles[sectionIndex?.integerValue ?? 0]
 	}
 
 	class func allClosedIssuesInMoc(moc: NSManagedObjectContext) -> [Issue] {

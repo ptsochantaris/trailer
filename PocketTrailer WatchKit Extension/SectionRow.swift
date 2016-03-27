@@ -8,7 +8,7 @@ protocol PopulatableRow {
 
 final class SectionRow: NSObject, PopulatableRow {
 
-	var section: PullRequestSection?
+	var section: Section?
 	var totalCount: Int?
 	var unreadCount: Int?
 	var type: String?

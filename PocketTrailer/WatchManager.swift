@@ -107,7 +107,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 				case "markAllPrsRead":
 					if let s = message["sectionIndex"] as? Int {
-						PullRequest.markEverythingRead(PullRequestSection(rawValue: s)!, moc: mainObjectContext)
+						PullRequest.markEverythingRead(Section(rawValue: s)!, moc: mainObjectContext)
 						popupManager.getMasterController().reloadDataWithAnimation(false)
 						DataManager.saveDB()
 						app.updateBadge()
@@ -116,7 +116,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 				case "markAllIssuesRead":
 					if let s = message["sectionIndex"] as? Int {
-						Issue.markEverythingRead(PullRequestSection(rawValue: s)!, moc: mainObjectContext)
+						Issue.markEverythingRead(Section(rawValue: s)!, moc: mainObjectContext)
 						popupManager.getMasterController().reloadDataWithAnimation(false)
 						DataManager.saveDB()
 						app.updateBadge()
@@ -187,7 +187,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 		var items = [[String : AnyObject]]()
 
-		let sectionIndex = PullRequestSection(rawValue: sectionIndex)!
+		let sectionIndex = Section(rawValue: sectionIndex)!
 
 		let f: NSFetchRequest
 		var showStatuses = false
@@ -291,11 +291,11 @@ final class WatchManager : NSObject, WCSessionDelegate {
 	private func buildOverview() -> [String : AnyObject] {
 		let totalPrs = PullRequest.countAllRequestsInMoc(mainObjectContext)
 		var prs: [String : AnyObject] = [
-			"mine": prCountsForSection(PullRequestSection.Mine),
-			"participated": prCountsForSection(PullRequestSection.Participated),
-			"merged": prCountsForSection(PullRequestSection.Merged),
-			"closed": prCountsForSection(PullRequestSection.Closed),
-			"other": prCountsForSection(PullRequestSection.All),
+			"mine": prCountsForSection(Section.Mine),
+			"participated": prCountsForSection(Section.Participated),
+			"merged": prCountsForSection(Section.Merged),
+			"closed": prCountsForSection(Section.Closed),
+			"other": prCountsForSection(Section.All),
 			"total": totalPrs,
 			"unread": PullRequest.badgeCountInMoc(mainObjectContext)
 		]
@@ -305,10 +305,10 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 		let totalIssues = Issue.countAllIssuesInMoc(mainObjectContext)
 		var issues: [String : AnyObject] = [
-			"mine": issueCountsForSection(PullRequestSection.Mine),
-			"participated": issueCountsForSection(PullRequestSection.Participated),
-			"closed": issueCountsForSection(PullRequestSection.Closed),
-			"other": issueCountsForSection(PullRequestSection.All),
+			"mine": issueCountsForSection(Section.Mine),
+			"participated": issueCountsForSection(Section.Participated),
+			"closed": issueCountsForSection(Section.Closed),
+			"other": issueCountsForSection(Section.All),
 			"total": totalIssues,
 			"unread": Issue.badgeCountInMoc(mainObjectContext)
 		]
@@ -324,11 +324,11 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		]
 	}
 
-	private func prCountsForSection(section: PullRequestSection) -> [String : Int] {
+	private func prCountsForSection(section: Section) -> [String : Int] {
 		return ["total": PullRequest.countRequestsInSection(section, moc: mainObjectContext),
 				"unread": PullRequest.badgeCountInSection(section, moc: mainObjectContext)];
 	}
-	private func issueCountsForSection(section: PullRequestSection) -> [String : Int] {
+	private func issueCountsForSection(section: Section) -> [String : Int] {
 		return ["total": Issue.countIssuesInSection(section, moc: mainObjectContext),
 				"unread": Issue.badgeCountInSection(section, moc: mainObjectContext)];
 	}
