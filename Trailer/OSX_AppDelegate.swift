@@ -722,7 +722,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 					let alert = NSAlert()
 					alert.messageText = "Your API request usage for '\(apiLabel)' is close to full"
-					alert.informativeText = "Try to make fewer manual refreshes, increasing the automatic refresh time, or reducing the number of repos you are monitoring.\n\nYour allowance will be reset by Github \(resetDateString).\n\nYou can check your API usage from the 'Servers' preferences pane at any time."
+					alert.informativeText = "Try to make fewer manual refreshes, increasing the automatic refresh time, or reducing the number of repos you are monitoring.\n\nYour allowance will be reset by GitHub \(resetDateString).\n\nYou can check your API usage from the 'Servers' preferences pane at any time."
 					alert.addButtonWithTitle("OK")
 					alert.runModal()
 				}
