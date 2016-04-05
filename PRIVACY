@@ -6,20 +6,20 @@ beyond that.
 
 API Key
 
-Trailer and PocketTrailer require your generated API key in
-order to create API calls to GitHub and fetch your data, as well
-as optional URLs for using Enterprise GitHub API servers.  This
-info is stored locally on your device and never sent or otherwise
+Trailer requires your generated API key in order to create
+API calls to GitHub and fetch your data, as well as optional
+URLs for using Enterprise GitHub API servers.  This info is
+stored locally on your device and never sent or otherwise
 processed in any way, beyond being used inside the locally
 executing app to construct the required API calls to GitHub.
 
 GitHub Login
 
-PocketTrailer, specifically, displays an inline web-view
-where you can directly browse your PRs inside the app.  In
-order to view your PRs you may need to provide login
-information to GitHub's web interface.  This is done directly
-inside the web-view and PocketTrailer never reads, intercepts, or
-stores any of that information, beyond what may be done at a
-lower level by the system web view control, to which
-PocketTrailer has no access to.
+The iOS version of Trailer, specifically, displays an
+inline web-view where you can directly browse your items
+inside the app.  In order to view your private items you may
+need to provide login information to GitHub's web interface.
+This is done directly inside the web-view and Trailer never
+reads, intercepts, or stores any of that information, beyond
+what may be done at a lower level by the system web view
+control, to which Trailer has no access to.
