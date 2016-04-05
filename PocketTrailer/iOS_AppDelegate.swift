@@ -213,7 +213,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 					return
 				} else if ((apiServer.requestsRemaining?.doubleValue ?? 0.0) / (apiServer.requestsLimit?.doubleValue ?? 1.0)) < LOW_API_WARNING {
 					showMessage((apiServer.label ?? "Untitled Server's") + " API request usage is close to full",
-						"Try to make fewer manual refreshes, increasing the automatic refresh time, or reducing the number of repos you are monitoring.\n\nYour allowance will be reset by Github on \(apiServer.resetDate).\n\nYou can check your API usage from the bottom of the preferences pane.")
+						"Try to make fewer manual refreshes, increasing the automatic refresh time, or reducing the number of repos you are monitoring.\n\nYour allowance will be reset by GitHub on \(apiServer.resetDate).\n\nYou can check your API usage from the bottom of the preferences pane.")
 				}
 			}
 		}
@@ -277,7 +277,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 				}
 
 				if !success && UIApplication.sharedApplication().applicationState==UIApplicationState.Active {
-					showMessage("Refresh failed", "Loading the latest data from Github failed")
+					showMessage("Refresh failed", "Loading the latest data from GitHub failed")
 				}
 
 				s.refreshTimer = NSTimer.scheduledTimerWithTimeInterval(NSTimeInterval(Settings.refreshPeriod), target: s, selector: #selector(iOS_AppDelegate.refreshTimerDone), userInfo: nil, repeats:false)
@@ -377,4 +377,3 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 		}
 	}
 }
-
