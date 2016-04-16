@@ -46,9 +46,9 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 		let m = popupManager.getMasterController()
 		m.clearsSelectionOnViewWillAppear = false // for iPad
 
-		UIApplication.sharedApplication().setMinimumBackgroundFetchInterval(NSTimeInterval(Settings.backgroundRefreshPeriod))
+		application.setMinimumBackgroundFetchInterval(NSTimeInterval(Settings.backgroundRefreshPeriod))
 
-		atNextEvent { [weak self] in
+		atNextEvent(self) { S in
 			if Repo.visibleReposInMoc(mainObjectContext).count > 0 && ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
 				if let localNotification = launchOptions?[UIApplicationLaunchOptionsLocalNotificationKey] as? UILocalNotification {
 					NotificationManager.handleLocalNotification(localNotification, action: nil)
@@ -64,7 +64,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 				}
 			}
 
-			self?.watchManager = WatchManager()
+			S.watchManager = WatchManager()
 		}
 
 		let readAction = UIMutableUserNotificationAction()
@@ -100,8 +100,9 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 		itemCategory.setActions([readAction, muteAction], forContext: .Default)
 		itemCategory.setActions([readShort, muteShort], forContext: .Minimal)
 
-		let notificationSettings = UIUserNotificationSettings(forTypes: UIUserNotificationType.Alert.union(UIUserNotificationType.Badge).union(UIUserNotificationType.Sound), categories: [itemCategory])
-		UIApplication.sharedApplication().registerUserNotificationSettings(notificationSettings)
+		let notificationSettings = UIUserNotificationSettings(forTypes: [.Alert, .Badge, .Sound], categories: [itemCategory])
+		application.registerUserNotificationSettings(notificationSettings)
+
 		return true
 	}
 
@@ -135,15 +136,13 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 			if let scheme = c.scheme {
 				if scheme == "pockettrailer", let host = c.host {
 					if host == "pullRequests" {
-						atNextEvent {
-							let m = popupManager.getMasterController()
-							m.showPullRequestsSelected(self)
+						atNextEvent(self) { S in
+							popupManager.getMasterController().showPullRequestsSelected(S)
 						}
 						return true
 					} else if host == "issues" {
-						atNextEvent {
-							let m = popupManager.getMasterController()
-							m.showIssuesSelected(self)
+						atNextEvent(self) { S in
+							popupManager.getMasterController().showIssuesSelected(S)
 						}
 						return true
 					}

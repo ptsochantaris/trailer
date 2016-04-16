@@ -129,18 +129,19 @@ final class NotificationManager {
 
 		// Present notifications only if the user isn't currenty reading notifications in the notification center, over the open app, a corner case
 		// Otherwise the app will end up consuming them
+		let sa = UIApplication.sharedApplication()
 		if app.enteringForeground {
 			dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), {
 
-				while UIApplication.sharedApplication().applicationState==UIApplicationState.Inactive {
+				while sa.applicationState == .Inactive {
 					NSThread.sleepForTimeInterval(1.0)
 				}
 				atNextEvent {
-					UIApplication.sharedApplication().presentLocalNotificationNow(notification)
+					sa.presentLocalNotificationNow(notification)
 				}
 			})
 		} else {
-			UIApplication.sharedApplication().presentLocalNotificationNow(notification)
+			sa.presentLocalNotificationNow(notification)
 		}
 	}
 }

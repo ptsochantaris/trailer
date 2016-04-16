@@ -38,12 +38,12 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 
 	private func potentialUpdate() {
 		// Possibly in thread!
-		atNextEvent {
-			if let l = self.lastView where self.session.reachable && !self.requestedUpdate {
-				self.requestedUpdate = true
+		atNextEvent(self) { S in
+			if let l = S.lastView where S.session.reachable && !S.requestedUpdate {
+				S.requestedUpdate = true
 				l.requestData(nil)
-				delay(0.5) {
-					self.requestedUpdate = false
+				delay(0.5, S) { S in
+					S.requestedUpdate = false
 				}
 			}
 		}

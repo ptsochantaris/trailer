@@ -25,13 +25,42 @@ func never() -> NSDate {
 
 typealias Completion = ()->Void
 
+////
+
 func atNextEvent(completion: Completion) {
 	NSOperationQueue.mainQueue().addOperationWithBlock(completion)
 }
 
-func delay(delay:NSTimeInterval, closure: Completion) {
+func atNextEvent<T: AnyObject>(owner: T?, completion: (T)->()) {
+	if let O = owner {
+		atNextEvent(O, completion: completion)
+	}
+}
+
+func atNextEvent<T: AnyObject>(owner: T, completion: (T)->()) {
+	NSOperationQueue.mainQueue().addOperationWithBlock { [weak owner] in
+		if let o = owner {
+			completion(o)
+		}
+	}
+}
+
+////
+
+func delay(delay: NSTimeInterval, closure: Completion) {
 	let time = dispatch_time(DISPATCH_TIME_NOW, Int64(delay * Double(NSEC_PER_SEC)))
 	dispatch_after(time, dispatch_get_main_queue()) {
 		atNextEvent(closure)
+	}
+}
+
+func delay<T: AnyObject>(time: NSTimeInterval, _ owner: T, completion: (T)->()) {
+	let time = dispatch_time(DISPATCH_TIME_NOW, Int64(time * Double(NSEC_PER_SEC)))
+	dispatch_after(time, dispatch_get_main_queue()) { [weak owner] in
+		atNextEvent { [weak owner] in
+			if let o = owner {
+				completion(o)
+			}
+		}
 	}
 }

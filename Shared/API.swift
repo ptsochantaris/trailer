@@ -24,7 +24,7 @@ final class API {
 
 		reachability.startNotifier()
 		let n = reachability.currentReachabilityStatus()
-		DLog("Network is %@", n == NetworkStatus.NotReachable ? "down" : "up")
+		DLog("Network is %@", n == .NotReachable ? "down" : "up")
 		currentNetworkStatus = n
 
 		let fileManager = NSFileManager.defaultManager()
@@ -61,7 +61,7 @@ final class API {
 
 		NSNotificationCenter.defaultCenter().addObserverForName(kReachabilityChangedNotification, object: nil, queue: NSOperationQueue.mainQueue()) { [weak self] n in
 			self?.checkNetworkAvailability()
-			if self?.currentNetworkStatus != NetworkStatus.NotReachable {
+			if self?.currentNetworkStatus != .NotReachable {
 				app.startRefreshIfItIsDue()
 			}
 		}
@@ -71,7 +71,7 @@ final class API {
 		let newStatus = reachability.currentReachabilityStatus()
 		if newStatus != currentNetworkStatus {
 			currentNetworkStatus = newStatus
-			if newStatus == NetworkStatus.NotReachable {
+			if newStatus == .NotReachable {
 				DLog("Network went down: %d", newStatus.rawValue)
 			} else {
 				DLog("Network came up: %d", newStatus.rawValue)
@@ -89,7 +89,7 @@ final class API {
 		} else {
 			DLog("No change to network state")
 		}
-		return currentNetworkStatus == NetworkStatus.NotReachable
+		return currentNetworkStatus == .NotReachable
 	}
 
 	/////////////////////////////////////////////////////// Utilities
@@ -147,16 +147,16 @@ final class API {
 			}
 			completion(response: response, data: data, error: error)
 			#if os(iOS)
-				atNextEvent { [weak self] in
-					self?.networkIndicationEnd()
+				atNextEvent(self) { S in
+					S.networkIndicationEnd()
 				}
 			#endif
 		}
 
 		#if os(iOS)
 			task.priority = NSURLSessionTaskPriorityHigh
-			delay(0.1) { [weak self] in
-				self?.networkIndicationStart()
+			delay(0.1, self) { S in
+				S.networkIndicationStart()
 			}
 		#endif
 
@@ -1371,8 +1371,8 @@ final class API {
 			if fromServer.syncIsGood || ignoreLastSync {
 				apiServerLabel = fromServer.label ?? "(untitled server)"
 			} else {
-				atNextEvent { [weak self] in
-					let e = self?.apiError("Sync has failed, skipping this call")
+				atNextEvent(self) { S in
+					let e = S.apiError("Sync has failed, skipping this call")
 					completion(response: nil, data: nil, error: e)
 				}
 				return
@@ -1411,11 +1411,11 @@ final class API {
 				if NSDate().compare(existingBackOff!.nextAttemptAt) == NSComparisonResult.OrderedAscending {
 					// report failure and return
 					DLog("(%@) Preempted fetch to previously broken link %@, won't actually access this URL until %@", apiServerLabel, fullUrlPath, existingBackOff!.nextAttemptAt)
-					atNextEvent { [weak self] in
-						let e = self?.apiError("Preempted fetch because of throttling")
+					atNextEvent(self) { S in
+						let e = S.apiError("Preempted fetch because of throttling")
 						completion(response: nil, data: nil, error: e)
 						#if os(iOS)
-							self?.networkIndicationEnd()
+							S.networkIndicationEnd()
 						#endif
 					}
 					return
@@ -1465,13 +1465,13 @@ final class API {
 					DLog("(%@) GET %@ - FAILED: %@", apiServerLabel, fullUrlPath, error!.localizedDescription)
 				}
 
-				atNextEvent { [weak self] in
+				atNextEvent(self) { S in
 					if Settings.dumpAPIResponsesInConsole, let d = data {
 						DLog("API data from %@: %@", fullUrlPath, NSString(data: d, encoding: NSUTF8StringEncoding))
 					}
 					completion(response: response, data: parsedData, error: error)
 					#if os(iOS)
-						self?.networkIndicationEnd()
+						S.networkIndicationEnd()
 					#endif
 				}
 			}.resume()

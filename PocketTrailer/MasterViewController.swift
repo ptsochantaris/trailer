@@ -49,33 +49,32 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 	}
 
-	func removeAllMerged()
-	{
-		atNextEvent { [weak self] in
+	func removeAllMerged() {
+		atNextEvent(self) { S in
 			if Settings.dontAskBeforeWipingMerged {
-				self?.removeAllMergedConfirmed()
+				S.removeAllMergedConfirmed()
 			} else {
-				let a = UIAlertController(title: "Sure?", message: "Remove all \(self?.viewMode.namePlural()) in the Merged section?", preferredStyle: UIAlertControllerStyle.Alert)
+				let a = UIAlertController(title: "Sure?", message: "Remove all \(S.viewMode.namePlural()) in the Merged section?", preferredStyle: UIAlertControllerStyle.Alert)
 				a.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil))
-				a.addAction(UIAlertAction(title: "Remove", style: UIAlertActionStyle.Destructive) { [weak self] action in
-					self?.removeAllMergedConfirmed()
-					})
-				self?.presentViewController(a, animated: true, completion: nil)
+				a.addAction(UIAlertAction(title: "Remove", style: UIAlertActionStyle.Destructive) { [weak S] action in
+					S?.removeAllMergedConfirmed()
+				})
+				S.presentViewController(a, animated: true, completion: nil)
 			}
 		}
 	}
 
 	func removeAllClosed() {
-		atNextEvent { [weak self] in
+		atNextEvent(self) { S in
 			if Settings.dontAskBeforeWipingClosed {
-				self?.removeAllClosedConfirmed()
+				S.removeAllClosedConfirmed()
 			} else {
-				let a = UIAlertController(title: "Sure?", message: "Remove all \(self?.viewMode.namePlural()) in the Closed section?", preferredStyle: UIAlertControllerStyle.Alert)
+				let a = UIAlertController(title: "Sure?", message: "Remove all \(S.viewMode.namePlural()) in the Closed section?", preferredStyle: UIAlertControllerStyle.Alert)
 				a.addAction(UIAlertAction(title: "Cancel", style:UIAlertActionStyle.Cancel, handler: nil))
-				a.addAction(UIAlertAction(title: "Remove", style:UIAlertActionStyle.Destructive) { [weak self] action in
-					self?.removeAllClosedConfirmed()
-					})
-				self?.presentViewController(a, animated: true, completion: nil)
+				a.addAction(UIAlertAction(title: "Remove", style:UIAlertActionStyle.Destructive) { [weak S] action in
+					S?.removeAllClosedConfirmed()
+				})
+				S.presentViewController(a, animated: true, completion: nil)
 			}
 		}
 	}

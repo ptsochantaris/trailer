@@ -50,22 +50,22 @@ class CommonController: WKInterfaceController {
 		loading += 1
 
 		WCSession.defaultSession().sendMessage(request, replyHandler: { response in
-			atNextEvent {
+			atNextEvent(self) { S in
 				if let errorIndicator = response["error"] as? Bool where errorIndicator == true {
-					self.showTemporaryError(response["status"] as! String)
+					S.showTemporaryError(response["status"] as! String)
 				} else {
-					self.updateFromData(response)
+					S.updateFromData(response)
 				}
-				self.loading = 0
+				S.loading = 0
 			}
 		}) { error in
-			if self.loading==5 {
-				atNextEvent {
-					self.loadingFailed(error)
-				}
-			} else {
-				delay(0.2) {
-					self.attemptRequest(request)
+			atNextEvent(self) { S in
+				if S.loading==5 {
+					S.loadingFailed(error)
+				} else {
+					delay(0.3, S) { S in
+						S.attemptRequest(request)
+					}
 				}
 			}
 		}
@@ -74,9 +74,9 @@ class CommonController: WKInterfaceController {
 	private func showTemporaryError(error: String) {
 		_statusLabel.setTextColor(UIColor.redColor())
 		showStatus(error, hideTable: true)
-		delay(3.0) { [weak self] in
-			self?._statusLabel.setTextColor(UIColor.whiteColor())
-			self?.showStatus("", hideTable: false)
+		delay(3, self) { S in
+			S._statusLabel.setTextColor(UIColor.whiteColor())
+			S.showStatus("", hideTable: false)
 		}
 	}
 

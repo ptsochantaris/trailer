@@ -805,13 +805,13 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		o.message = "Import Settings From File..."
 		o.extensionHidden = false
 		o.allowedFileTypes = ["trailerSettings"]
-		o.beginSheetModalForWindow(self, completionHandler: { response in
+		o.beginSheetModalForWindow(self) { response in
 			if response == NSFileHandlingPanelOKButton, let url = o.URL {
 				atNextEvent {
 					app.tryLoadSettings(url, skipConfirm: Settings.dontConfirmSettingsImport)
 				}
 			}
-			})
+		}
 	}
 
 	private func colorButton(button: NSButton, withColor: NSColor) {

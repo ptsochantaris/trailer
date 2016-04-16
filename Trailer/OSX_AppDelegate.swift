@@ -75,8 +75,8 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		nc.delegate = self
 
 		if ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
-			atNextEvent {
-				self.startRefresh()
+			atNextEvent(self) { S in
+				S.startRefresh()
 			}
 		} else if ApiServer.countApiServersInMoc(mainObjectContext) == 1, let a = ApiServer.allApiServersInMoc(mainObjectContext).first where a.authToken == nil || a.authToken!.isEmpty {
 			startupAssistant()
@@ -118,8 +118,8 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	func systemDidWake() {
 		DLog("System woke up");
 		systemSleeping = false
-		delay(1.0) { [weak self] in
-			self?.startRefreshIfItIsDue()
+		delay(1, self) { S in
+			S.startRefreshIfItIsDue()
 		}
 	}
 
@@ -875,19 +875,19 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 
 		if updateStatusItem {
-			atNextEvent { [weak self] in
+			atNextEvent(self) { S in
 				DLog("Updating issues status item");
-				if let im = self?.issuesMenu {
+				if let im = S.issuesMenu {
 					let siv = StatusItemView(frame: CGRectMake(0, 0, length+2, H), label: countString, prefix: "issues", attributes: attributes)
 					siv.labelOffset = 2
 					siv.highlighted = im.visible
 					siv.grayOut = shouldGray
-					siv.tappedCallback = { [weak self] in
-						if let m = self?.issuesMenu {
+					siv.tappedCallback = { [weak S] in
+						if let S = S, m = S.issuesMenu {
 							if m.visible {
-								self?.closeMenu(m)
+								S.closeMenu(m)
 							} else {
-								self?.showMenu(m)
+								S.showMenu(m)
 							}
 						}
 					}
@@ -957,18 +957,18 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 
         if updateStatusItem {
-			atNextEvent { [weak self] in
+			atNextEvent(self) { S in
 				DLog("Updating PR status item");
-				if let pm = self?.prMenu {
+				if let pm = S.prMenu {
 					let siv = StatusItemView(frame: CGRectMake(0, 0, length, H), label: countString, prefix: "pr", attributes: attributes)
 					siv.highlighted = pm.visible
 					siv.grayOut = shouldGray
-					siv.tappedCallback = { [weak self] in
-						if let m = self?.prMenu {
+					siv.tappedCallback = { [weak S] in
+						if let S = S, m = S.prMenu {
 							if m.visible {
-								self?.closeMenu(m)
+								S.closeMenu(m)
 							} else {
-								self?.showMenu(m)
+								S.showMenu(m)
 							}
 						}
 					}
@@ -1118,7 +1118,6 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		inMenu.table.scrollRowToVisible(i)
 		atNextEvent {
 			inMenu.table.selectRowIndexes(NSIndexSet(index: i), byExtendingSelection: false)
-			return
 		}
 	}
 
@@ -1130,8 +1129,8 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				prMenu.table.deselectAll(nil)
 				pr = pullRequestDelegate.pullRequestAtRow(row)
 			}
-			atNextEvent { [weak self] in
-				self?.prMenu.table.selectRowIndexes(NSIndexSet(index: row), byExtendingSelection: false)
+			atNextEvent(self) { S in
+				S.prMenu.table.selectRowIndexes(NSIndexSet(index: row), byExtendingSelection: false)
 			}
 			return pr
 		} else if issuesMenu.visible {
@@ -1141,8 +1140,8 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				issuesMenu.table.deselectAll(nil)
 				i = issuesDelegate.issueAtRow(row)
 			}
-			atNextEvent { [weak self] in
-				self?.issuesMenu.table.selectRowIndexes(NSIndexSet(index: row), byExtendingSelection: false)
+			atNextEvent(self) { S in
+				S.issuesMenu.table.selectRowIndexes(NSIndexSet(index: row), byExtendingSelection: false)
 			}
 			return i
 		} else {
@@ -1275,15 +1274,15 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	func checkDarkMode() {
-		atNextEvent { [weak self] in
+		atNextEvent(self) { S in
 			if #available(OSX 10.10, *) {
 				let c = NSAppearance.currentAppearance()
 				if c.respondsToSelector(Selector("allowsVibrancy")) {
-					self?.darkMode = c.name.rangeOfString(NSAppearanceNameVibrantDark) != nil
+					S.darkMode = c.name.rangeOfString(NSAppearanceNameVibrantDark) != nil
 					return
 				}
 			}
-			self?.darkMode = false
+			S.darkMode = false
 		}
 	}
 

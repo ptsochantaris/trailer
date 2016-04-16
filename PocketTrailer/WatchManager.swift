@@ -40,96 +40,93 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	func session(session: WCSession, didReceiveMessage message: [String : AnyObject], replyHandler: ([String : AnyObject]) -> Void) {
 
-		atNextEvent { [weak self] in
+		atNextEvent(self) { s in
 
-			if let s = self {
+			s.startBGTask()
 
-				s.startBGTask()
-
-				switch(message["command"] as? String ?? "") {
-				case "refresh":
-					app.startRefresh()
-					dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)) {
-						let lastSuccessfulSync = Settings.lastSuccessfulRefresh ?? NSDate()
-						while app.isRefreshing { NSThread.sleepForTimeInterval(0.1) }
-						atNextEvent {
-							if Settings.lastSuccessfulRefresh == nil || lastSuccessfulSync.isEqualToDate(Settings.lastSuccessfulRefresh!) {
-								s.reportFailure("Refresh Failed", message, replyHandler)
-							} else {
-								s.processList(message, replyHandler)
-							}
+			switch(message["command"] as? String ?? "") {
+			case "refresh":
+				let lastSuccessfulSync = Settings.lastSuccessfulRefresh ?? NSDate()
+				app.startRefresh()
+				dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)) {
+					while app.isRefreshing { NSThread.sleepForTimeInterval(0.1) }
+					atNextEvent {
+						if Settings.lastSuccessfulRefresh == nil || lastSuccessfulSync.isEqualToDate(Settings.lastSuccessfulRefresh!) {
+							s.reportFailure("Refresh Failed", message, replyHandler)
+						} else {
+							s.processList(message, replyHandler)
 						}
 					}
-
-				case "openpr":
-					if let itemId = message["localId"] as? String {
-						let m = popupManager.getMasterController()
-						m.openPrWithId(itemId)
-						DataManager.saveDB()
-					}
-					s.processList(message, replyHandler)
-
-				case "openissue":
-					if let itemId = message["localId"] as? String {
-						let m = popupManager.getMasterController()
-						m.openIssueWithId(itemId)
-						DataManager.saveDB()
-					}
-					s.processList(message, replyHandler)
-
-				case "opencomment":
-					if let itemId = message["id"] as? String {
-						let m = popupManager.getMasterController()
-						m.openCommentWithId(itemId)
-						DataManager.saveDB()
-					}
-					s.processList(message, replyHandler)
-
-				case "clearAllMerged":
-					app.clearAllMerged()
-					s.processList(message, replyHandler)
-
-				case "clearAllClosed":
-					app.clearAllClosed()
-					s.processList(message, replyHandler)
-
-				case "markPrRead":
-					app.markItemAsRead(message["localId"] as? String, reloadView: true)
-					s.processList(message, replyHandler)
-
-				case "markIssueRead":
-					app.markItemAsRead(message["localId"] as? String, reloadView: true)
-					s.processList(message, replyHandler)
-
-				case "markEverythingRead":
-					app.markEverythingRead()
-					s.processList(message, replyHandler)
-
-				case "markAllPrsRead":
-					if let s = message["sectionIndex"] as? Int {
-						PullRequest.markEverythingRead(Section(rawValue: s)!, moc: mainObjectContext)
-						popupManager.getMasterController().reloadDataWithAnimation(false)
-						DataManager.saveDB()
-						app.updateBadge()
-					}
-					s.processList(message, replyHandler)
-
-				case "markAllIssuesRead":
-					if let s = message["sectionIndex"] as? Int {
-						Issue.markEverythingRead(Section(rawValue: s)!, moc: mainObjectContext)
-						popupManager.getMasterController().reloadDataWithAnimation(false)
-						DataManager.saveDB()
-						app.updateBadge()
-					}
-					s.processList(message, replyHandler)
-
-				case "needsOverview":
-					s.updateContext()
-					s.reportSuccess([:], replyHandler)
-
-				default:
-					s.processList(message, replyHandler)
 				}
+
+			case "openpr":
+				if let itemId = message["localId"] as? String {
+					let m = popupManager.getMasterController()
+					m.openPrWithId(itemId)
+					DataManager.saveDB()
+				}
+				s.processList(message, replyHandler)
+
+			case "openissue":
+				if let itemId = message["localId"] as? String {
+					let m = popupManager.getMasterController()
+					m.openIssueWithId(itemId)
+					DataManager.saveDB()
+				}
+				s.processList(message, replyHandler)
+
+			case "opencomment":
+				if let itemId = message["id"] as? String {
+					let m = popupManager.getMasterController()
+					m.openCommentWithId(itemId)
+					DataManager.saveDB()
+				}
+				s.processList(message, replyHandler)
+
+			case "clearAllMerged":
+				app.clearAllMerged()
+				s.processList(message, replyHandler)
+
+			case "clearAllClosed":
+				app.clearAllClosed()
+				s.processList(message, replyHandler)
+
+			case "markPrRead":
+				app.markItemAsRead(message["localId"] as? String, reloadView: true)
+				s.processList(message, replyHandler)
+
+			case "markIssueRead":
+				app.markItemAsRead(message["localId"] as? String, reloadView: true)
+				s.processList(message, replyHandler)
+
+			case "markEverythingRead":
+				app.markEverythingRead()
+				s.processList(message, replyHandler)
+
+			case "markAllPrsRead":
+				if let s = message["sectionIndex"] as? Int {
+					PullRequest.markEverythingRead(Section(rawValue: s)!, moc: mainObjectContext)
+					popupManager.getMasterController().reloadDataWithAnimation(false)
+					DataManager.saveDB()
+					app.updateBadge()
+				}
+				s.processList(message, replyHandler)
+
+			case "markAllIssuesRead":
+				if let s = message["sectionIndex"] as? Int {
+					Issue.markEverythingRead(Section(rawValue: s)!, moc: mainObjectContext)
+					popupManager.getMasterController().reloadDataWithAnimation(false)
+					DataManager.saveDB()
+					app.updateBadge()
+				}
+				s.processList(message, replyHandler)
+
+			case "needsOverview":
+				s.updateContext()
+				s.reportSuccess([:], replyHandler)
+
+			default:
+				s.processList(message, replyHandler)
 			}
 		}
 	}

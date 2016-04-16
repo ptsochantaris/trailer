@@ -65,12 +65,10 @@ final class PRListController: CommonController {
 
 		loadingBuffer?.appendContentsOf(page)
 		if page.count == PAGE_SIZE {
-			atNextEvent { [weak self] in
-				if let s = self {
-					s._requestData(nil)
-					s.showStatus("Loaded \(s.loadingBuffer?.count ?? 0) items...", hideTable: true)
-					s.progressiveLoading = true
-				}
+			atNextEvent(self) { S in
+				S._requestData(nil)
+				S.showStatus("Loaded \(S.loadingBuffer?.count ?? 0) items...", hideTable: true)
+				S.progressiveLoading = true
 			}
 			return
 		}
@@ -78,8 +76,8 @@ final class PRListController: CommonController {
 		if let l = loadingBuffer {
 			if progressiveLoading {
 				showStatus("Loaded \(l.count) items.\n\nDisplaying...", hideTable: true)
-				atNextEvent { [weak self] in
-					self?.completeLoadingBuffer()
+				atNextEvent(self) { S in
+					S.completeLoadingBuffer()
 				}
 			} else {
 				completeLoadingBuffer()
