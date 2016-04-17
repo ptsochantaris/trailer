@@ -27,13 +27,13 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}))
 		a.addAction(UIAlertAction(title: "Mark all as read", style: UIAlertActionStyle.Destructive) { [weak self] action in
 			self?.markAllAsRead()
-			})
+		})
 		a.addAction(UIAlertAction(title: "Remove merged", style:UIAlertActionStyle.Default) { [weak self] action in
 			self?.removeAllMerged()
-			})
+		})
 		a.addAction(UIAlertAction(title: "Remove closed", style:UIAlertActionStyle.Default) { [weak self] action in
 			self?.removeAllClosed()
-			})
+		})
 		presentViewController(a, animated: true, completion: nil)
 	}
 
@@ -699,7 +699,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	func textFieldShouldClear(textField: UITextField) -> Bool {
-		searchTimer!.push()
+		searchTimer.push()
 		return true
 	}
 
@@ -707,7 +707,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		if string == "\n" {
 			textField.resignFirstResponder()
 		} else {
-			searchTimer!.push()
+			searchTimer.push()
 		}
 		return true
 	}
