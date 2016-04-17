@@ -40,10 +40,19 @@ class ListableItem: DataItem {
 	final override func prepareForDeletion() {
 		api.refreshesSinceLastLabelsCheck[objectID] = nil
 		api.refreshesSinceLastStatusCheck[objectID] = nil
-		#if os(iOS)
-		deIndexFromSpotlight()
-		#endif
+		ensureInvisible()
 		super.prepareForDeletion()
+	}
+
+	final func ensureInvisible() {
+		#if os(iOS)
+			CSSearchableIndex.defaultSearchableIndex().deleteSearchableItemsWithIdentifiers([objectID.URIRepresentation().absoluteString], completionHandler: nil)
+		#endif
+		#if os(OSX)
+			if Settings.removeNotificationsWhenItemIsRemoved {
+				removeRelatedNotifications()
+			}
+		#endif
 	}
 
 	final class func sortField() -> String? {
@@ -591,7 +600,7 @@ class ListableItem: DataItem {
 		return f
 	}
 
-	class func relatedItemsFromNotificationInfo(userInfo: [String : AnyObject?]) -> (PRComment?, ListableItem)? {
+	final class func relatedItemsFromNotificationInfo(userInfo: [String : AnyObject?]) -> (PRComment?, ListableItem)? {
 		var item: ListableItem?
 		var comment: PRComment?
 		if let itemId = DataManager.idForUriPath(userInfo[COMMENT_ID_KEY] as? String), c = existingObjectWithID(itemId) as? PRComment {
@@ -609,7 +618,7 @@ class ListableItem: DataItem {
 		}
 	}
 
-	func setMute(mute: Bool) {
+	final func setMute(mute: Bool) {
 		muted = mute
 		postProcess()
 		if mute {
@@ -617,7 +626,7 @@ class ListableItem: DataItem {
 		}
 	}
 
-	func removeRelatedNotifications() {
+	final func removeRelatedNotifications() {
 		#if os(OSX)
 		let nc = NSUserNotificationCenter.defaultUserNotificationCenter()
 		for n in nc.deliveredNotifications {
@@ -680,9 +689,6 @@ class ListableItem: DataItem {
 			s.thumbnailURL = nil
 			completeIndex(s)
 		}
-	}
-	final func deIndexFromSpotlight() {
-		CSSearchableIndex.defaultSearchableIndex().deleteSearchableItemsWithIdentifiers([objectID.URIRepresentation().absoluteString], completionHandler: nil)
 	}
 	#endif
 }

@@ -17,10 +17,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var sortingOrder: NSButton!
 	@IBOutlet weak var sortModeSelect: NSPopUpButton!
 	@IBOutlet weak var showCreationDates: NSButton!
-	@IBOutlet weak var dontKeepPrsMergedByMe: NSButton!
 	@IBOutlet weak var hideAvatars: NSButton!
-	@IBOutlet weak var dontConfirmRemoveAllMerged: NSButton!
-	@IBOutlet weak var dontConfirmRemoveAllClosed: NSButton!
 	@IBOutlet weak var displayRepositoryNames: NSButton!
 	@IBOutlet weak var includeRepositoriesInFiltering: NSButton!
 	@IBOutlet weak var groupByRepo: NSButton!
@@ -28,14 +25,20 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var repoCheckLabel: NSTextField!
 	@IBOutlet weak var repoCheckStepper: NSStepper!
 	@IBOutlet weak var countOnlyListedItems: NSButton!
-	@IBOutlet weak var prMergedPolicy: NSPopUpButton!
-	@IBOutlet weak var prClosedPolicy: NSPopUpButton!
 	@IBOutlet weak var checkForUpdatesAutomatically: NSButton!
 	@IBOutlet weak var checkForUpdatesLabel: NSTextField!
 	@IBOutlet weak var checkForUpdatesSelector: NSStepper!
 	@IBOutlet weak var openPrAtFirstUnreadComment: NSButton!
 	@IBOutlet weak var logActivityToConsole: NSButton!
 	@IBOutlet weak var commentAuthorBlacklist: NSTokenField!
+
+	// History
+	@IBOutlet weak var prMergedPolicy: NSPopUpButton!
+	@IBOutlet weak var prClosedPolicy: NSPopUpButton!
+	@IBOutlet weak var dontKeepPrsMergedByMe: NSButton!
+	@IBOutlet weak var dontConfirmRemoveAllMerged: NSButton!
+	@IBOutlet weak var dontConfirmRemoveAllClosed: NSButton!
+	@IBOutlet weak var removeNotificationsWhenItemIsRemoved: NSButton!
 
 	// Statuses
 	@IBOutlet weak var showStatusItems: NSButton!
@@ -182,6 +185,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		prMergedPolicy.toolTip = Settings.mergeHandlingPolicyHelp
 		prClosedPolicy.toolTip = Settings.closeHandlingPolicyHelp
 		dontKeepPrsMergedByMe.toolTip = Settings.dontKeepPrsMergedByMeHelp
+		removeNotificationsWhenItemIsRemoved.toolTip = Settings.removeNotificationsWhenItemIsRemovedHelp
 		dontConfirmRemoveAllClosed.toolTip = Settings.dontAskBeforeWipingClosedHelp
 		dontConfirmRemoveAllMerged.toolTip = Settings.dontAskBeforeWipingMergedHelp
 		showAllComments.toolTip = Settings.showCommentsEverywhereHelp
@@ -262,6 +266,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		autoParticipateOnTeamMentions.integerValue = Settings.autoParticipateOnTeamMentions ? 1 : 0
 		hideAvatars.integerValue = Settings.hideAvatars ? 1 : 0
 		dontKeepPrsMergedByMe.integerValue = Settings.dontKeepPrsMergedByMe ? 1 : 0
+		removeNotificationsWhenItemIsRemoved.integerValue = Settings.removeNotificationsWhenItemIsRemoved ? 1 : 0
 		grayOutWhenRefreshing.integerValue = Settings.grayOutWhenRefreshing ? 1 : 0
 		notifyOnStatusUpdates.integerValue = Settings.notifyOnStatusUpdates ? 1 : 0
 		notifyOnStatusUpdatesForAllPrs.integerValue = Settings.notifyOnStatusUpdatesForAllPrs ? 1 : 0
@@ -442,6 +447,10 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		Settings.autoParticipateOnTeamMentions = (sender.integerValue==1)
 		DataManager.postProcessAllItems()
 		app.deferredUpdateTimer.push()
+	}
+
+	@IBAction func removeNotificationsWhenItemIsRemovedSelected(sender: NSButton) {
+		Settings.removeNotificationsWhenItemIsRemoved = (sender.integerValue==1)
 	}
 
 	@IBAction func dontKeepMyPrsSelected(sender: NSButton) {

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9532" systemVersion="15D21" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9532"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10116"/>
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
@@ -841,14 +841,14 @@ Token</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" borderType="none" titlePosition="noTitle" id="HAA-q5-qyx">
-                                            <rect key="frame" x="93" y="83" width="551" height="212"/>
+                                            <rect key="frame" x="93" y="47" width="551" height="284"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <view key="contentView" id="cS6-gP-AUp">
-                                                <rect key="frame" x="0.0" y="0.0" width="551" height="212"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="551" height="284"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <box autoresizesSubviews="NO" title="Don't confirm when asked to remove..." borderType="line" id="KkY-YC-hC1">
-                                                        <rect key="frame" x="69" y="4" width="413" height="66"/>
+                                                        <rect key="frame" x="72" y="20" width="413" height="66"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="uFz-cS-CJ4">
                                                             <rect key="frame" x="1" y="1" width="411" height="50"/>
@@ -882,7 +882,7 @@ Token</string>
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                     </box>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="6Rs-G3-8sn">
-                                                        <rect key="frame" x="12" y="181" width="185" height="17"/>
+                                                        <rect key="frame" x="15" y="242" width="185" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="When something is merged:" id="oev-O5-Yz8">
                                                             <font key="font" metaFont="system"/>
@@ -891,7 +891,7 @@ Token</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <popUpButton verticalHuggingPriority="750" id="DVS-bf-HmU">
-                                                        <rect key="frame" x="201" y="175" width="333" height="26"/>
+                                                        <rect key="frame" x="204" y="236" width="333" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" title="Move any merged items to &quot;Merged&quot;" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="3S5-2j-Zli" id="d5e-nv-C7o">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -910,7 +910,7 @@ Token</string>
                                                         </connections>
                                                     </popUpButton>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="4ns-RA-qwP">
-                                                        <rect key="frame" x="12" y="145" width="185" height="17"/>
+                                                        <rect key="frame" x="15" y="206" width="185" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="When something is closed:" id="a60-VD-gfW">
                                                             <font key="font" metaFont="system"/>
@@ -919,7 +919,7 @@ Token</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <popUpButton verticalHuggingPriority="750" id="MUp-kA-DZp">
-                                                        <rect key="frame" x="201" y="139" width="333" height="26"/>
+                                                        <rect key="frame" x="204" y="200" width="333" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" title="Move any closed items to &quot;Closed&quot;" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="r2G-KA-S7R" id="exr-ek-OWA">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -938,7 +938,7 @@ Token</string>
                                                         </connections>
                                                     </popUpButton>
                                                     <button id="ZiV-Lz-lSl">
-                                                        <rect key="frame" x="63" y="97" width="424" height="18"/>
+                                                        <rect key="frame" x="66" y="148" width="424" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Discard any PRs that I merged myself, regardless of these settings" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="XHX-lg-c6B">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -946,6 +946,17 @@ Token</string>
                                                         </buttonCell>
                                                         <connections>
                                                             <action selector="dontKeepMyPrsSelected:" target="vQH-WF-vh2" id="Rdm-9D-K5g"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button id="KUQ-Bv-dT9">
+                                                        <rect key="frame" x="80" y="118" width="396" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="When an item is removed, also remove all related notifications" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="phr-Sl-OrT">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="removeNotificationsWhenItemIsRemovedSelected:" target="vQH-WF-vh2" id="RzD-fw-gqc"/>
                                                         </connections>
                                                     </button>
                                                 </subviews>
@@ -1570,6 +1581,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="refreshDurationStepper" destination="INA-l0-fZh" id="35s-aN-LXk"/>
                 <outlet property="refreshItemsLabel" destination="Zu0-k7-csJ" id="AO0-BB-6OZ"/>
                 <outlet property="refreshReposLabel" destination="XcM-W3-Ec0" id="JeY-7D-ssA"/>
+                <outlet property="removeNotificationsWhenItemIsRemoved" destination="KUQ-Bv-dT9" id="RsE-CS-OgZ"/>
                 <outlet property="repeatLastExportAutomatically" destination="pwT-Fi-3FC" id="KcG-kA-cIo"/>
                 <outlet property="repoCheckLabel" destination="XcM-W3-Ec0" id="xdn-MT-IXs"/>
                 <outlet property="repoCheckStepper" destination="ThS-Id-Gqm" id="Cfs-Fa-4ac"/>

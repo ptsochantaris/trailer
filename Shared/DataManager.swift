@@ -133,11 +133,9 @@ final class DataManager : NSObject {
 					}
 				#endif
 			} else {
-				#if os(iOS)
-					atNextEvent {
-						p.deIndexFromSpotlight()
-					}
-				#endif
+				atNextEvent {
+					p.ensureInvisible()
+				}
 			}
 		}
 
@@ -164,11 +162,9 @@ final class DataManager : NSObject {
 					}
 				#endif
 			} else {
-				#if os(iOS)
-					atNextEvent {
-						i.deIndexFromSpotlight()
-					}
-				#endif
+				atNextEvent {
+					i.ensureInvisible()
+				}
 			}
 		}
 
