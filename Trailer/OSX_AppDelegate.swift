@@ -139,33 +139,14 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 	func userNotificationCenter(center: NSUserNotificationCenter, didActivateNotification notification: NSUserNotification) {
 
-		func relatedItems(userInfo: [String : AnyObject?]) -> (PRComment?, ListableItem)? {
-			var item: ListableItem?
-			var comment: PRComment?
-			if let itemId = DataManager.idForUriPath(userInfo[COMMENT_ID_KEY] as? String), c = existingObjectWithID(itemId) as? PRComment {
-				comment = c
-				item = c.pullRequest ?? c.issue
-			} else if let itemId = DataManager.idForUriPath(userInfo[PULL_REQUEST_ID_KEY] as? String) {
-				item = existingObjectWithID(itemId) as? ListableItem
-			} else if let itemId = DataManager.idForUriPath(userInfo[ISSUE_ID_KEY] as? String) {
-				item = existingObjectWithID(itemId) as? ListableItem
-			}
-			if item == nil {
-				return nil
-			} else {
-				return (comment, item!)
-			}
-		}
-
 		if let userInfo = notification.userInfo {
 
 			switch notification.activationType {
 			case .AdditionalActionClicked:
 				if #available(OSX 10.10, *) {
 					if notification.additionalActivationAction?.identifier == "mute" {
-						if let (_,i) = relatedItems(userInfo) {
-							i.muted = true
-							i.postProcess()
+						if let (_,i) = ListableItem.relatedItemsFromNotificationInfo(userInfo) {
+							i.setMute(true)
 							DataManager.saveDB()
 							if i is PullRequest {
 								updatePrMenu()
@@ -175,7 +156,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 						}
 						break
 					} else if notification.additionalActivationAction?.identifier == "read" {
-						if let (_,i) = relatedItems(userInfo) {
+						if let (_,i) = ListableItem.relatedItemsFromNotificationInfo(userInfo) {
 							i.catchUpWithComments()
 							DataManager.saveDB()
 							if i is PullRequest {
@@ -187,11 +168,10 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 						break
 					}
 				}
-			case .ActionButtonClicked: fallthrough
-			case .ContentsClicked:
+			case .ActionButtonClicked, .ContentsClicked:
 				var urlToOpen = userInfo[NOTIFICATION_URL_KEY] as? String
 				if urlToOpen == nil {
-					if let (c,i) = relatedItems(userInfo) {
+					if let (c,i) = ListableItem.relatedItemsFromNotificationInfo(userInfo) {
 						urlToOpen = c?.webUrl ?? i.webUrl
 						i.catchUpWithComments()
 						DataManager.saveDB()
@@ -877,22 +857,22 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		if updateStatusItem {
 			atNextEvent(self) { S in
 				DLog("Updating issues status item");
-				if let im = S.issuesMenu {
-					let siv = StatusItemView(frame: CGRectMake(0, 0, length+2, H), label: countString, prefix: "issues", attributes: attributes)
-					siv.labelOffset = 2
-					siv.highlighted = im.visible
-					siv.grayOut = shouldGray
-					siv.tappedCallback = { [weak S] in
-						if let S = S, m = S.issuesMenu {
-							if m.visible {
-								S.closeMenu(m)
-							} else {
-								S.showMenu(m)
-							}
+				let im = S.issuesMenu
+				let siv = StatusItemView(frame: CGRectMake(0, 0, length+2, H), label: countString, prefix: "issues", attributes: attributes)
+				siv.labelOffset = 2
+				siv.highlighted = im.visible
+				siv.grayOut = shouldGray
+				siv.tappedCallback = { [weak S] in
+					if let S = S {
+						let m = S.issuesMenu
+						if m.visible {
+							S.closeMenu(m)
+						} else {
+							S.showMenu(m)
 						}
 					}
-					im.statusItem?.view = siv
 				}
+				im.statusItem?.view = siv
 			}
 		}
 
@@ -959,21 +939,21 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
         if updateStatusItem {
 			atNextEvent(self) { S in
 				DLog("Updating PR status item");
-				if let pm = S.prMenu {
-					let siv = StatusItemView(frame: CGRectMake(0, 0, length, H), label: countString, prefix: "pr", attributes: attributes)
-					siv.highlighted = pm.visible
-					siv.grayOut = shouldGray
-					siv.tappedCallback = { [weak S] in
-						if let S = S, m = S.prMenu {
-							if m.visible {
-								S.closeMenu(m)
-							} else {
-								S.showMenu(m)
-							}
+				let pm = S.prMenu
+				let siv = StatusItemView(frame: CGRectMake(0, 0, length, H), label: countString, prefix: "pr", attributes: attributes)
+				siv.highlighted = pm.visible
+				siv.grayOut = shouldGray
+				siv.tappedCallback = { [weak S] in
+					if let S = S {
+						let m = S.prMenu
+						if m.visible {
+							S.closeMenu(m)
+						} else {
+							S.showMenu(m)
 						}
 					}
-					pm.statusItem?.view = siv
 				}
+				pm.statusItem?.view = siv
 			}
         }
 
@@ -1039,9 +1019,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				//DLog("Keycode: %d", incomingEvent.keyCode)
 
 				switch incomingEvent.keyCode {
-				case 123: // left
-					fallthrough
-				case 124: // right
+				case 123, 124: // left, right
 					if !(
 						(incomingEvent.modifierFlags.intersect(NSEventModifierFlags.CommandKeyMask)) == NSEventModifierFlags.CommandKeyMask
 						&& (incomingEvent.modifierFlags.intersect(NSEventModifierFlags.AlternateKeyMask)) == NSEventModifierFlags.AlternateKeyMask

@@ -330,8 +330,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		if let a = action, i = relatedItem {
 			if a == "mute" {
-				i.muted = true
-				i.postProcess()
+				i.setMute(true)
 			} else if a == "read" {
 				i.catchUpWithComments()
 			}
@@ -508,8 +507,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		if item.muted?.boolValue ?? false {
 			m = UITableViewRowAction(style: .Normal, title: "Unmute") { [weak self] (action, indexPath) in
 				if let i = self?.fetchedResultsController.objectAtIndexPath(indexPath) as? ListableItem {
-					i.muted = false
-					i.postProcess()
+					i.setMute(false)
 					DataManager.saveDB()
 					tableView.setEditing(false, animated: true)
 				}
@@ -517,8 +515,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		} else {
 			m = UITableViewRowAction(style: .Normal, title: "Mute") { [weak self] (action, indexPath) in
 				if let i = self?.fetchedResultsController.objectAtIndexPath(indexPath) as? ListableItem {
-					i.muted = true
-					i.postProcess()
+					i.setMute(true)
 					DataManager.saveDB()
 					tableView.setEditing(false, animated: true)
 				}

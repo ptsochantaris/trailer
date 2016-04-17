@@ -145,8 +145,7 @@ class TrailerCell: NSTableCellView {
 
 	func muteSelected() {
 		let item = associatedDataItem()
-		item.muted = true
-		item.postProcess()
+		item.setMute(true)
 		DataManager.saveDB()
 		if item is PullRequest {
 			app.updatePrMenu()
@@ -157,8 +156,7 @@ class TrailerCell: NSTableCellView {
 
 	func unMuteSelected() {
 		let item = associatedDataItem()
-		item.muted = false
-		item.postProcess()
+		item.setMute(false)
 		DataManager.saveDB()
 		if item is PullRequest {
 			app.updatePrMenu()

@@ -591,6 +591,44 @@ class ListableItem: DataItem {
 		return f
 	}
 
+	class func relatedItemsFromNotificationInfo(userInfo: [String : AnyObject?]) -> (PRComment?, ListableItem)? {
+		var item: ListableItem?
+		var comment: PRComment?
+		if let itemId = DataManager.idForUriPath(userInfo[COMMENT_ID_KEY] as? String), c = existingObjectWithID(itemId) as? PRComment {
+			comment = c
+			item = c.pullRequest ?? c.issue
+		} else if let itemId = DataManager.idForUriPath(userInfo[PULL_REQUEST_ID_KEY] as? String) {
+			item = existingObjectWithID(itemId) as? ListableItem
+		} else if let itemId = DataManager.idForUriPath(userInfo[ISSUE_ID_KEY] as? String) {
+			item = existingObjectWithID(itemId) as? ListableItem
+		}
+		if let i = item {
+			return (comment, i)
+		} else {
+			return nil
+		}
+	}
+
+	func setMute(mute: Bool) {
+		muted = mute
+		postProcess()
+		if mute {
+			removeRelatedNotifications()
+		}
+	}
+
+	func removeRelatedNotifications() {
+		#if os(OSX)
+		let nc = NSUserNotificationCenter.defaultUserNotificationCenter()
+		for n in nc.deliveredNotifications {
+			if let u = n.userInfo, (_, item) = ListableItem.relatedItemsFromNotificationInfo(u) where item.serverId == serverId {
+				nc.removeDeliveredNotification(n)
+			}
+		}
+		#endif
+		// iOS won't allow access notifications after presenting if the app gets restarted, so behaviour of this would be inconsistent.
+	}
+
 	#if os(iOS)
 	func searchKeywords() -> [String] {
 		var labelNames = [String]()

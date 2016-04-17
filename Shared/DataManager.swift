@@ -240,25 +240,16 @@ final class DataManager : NSObject {
 
 	class func infoForType(type: PRNotificationType, item: DataItem) -> [String : AnyObject] {
 		switch type {
-		case .NewMention: fallthrough
-		case .NewComment:
+		case .NewMention, .NewComment:
 			return [COMMENT_ID_KEY : item.objectID.URIRepresentation().absoluteString]
-		case .NewPr: fallthrough
-		case .PrReopened: fallthrough
-		case .NewPrAssigned: fallthrough
-		case .PrClosed: fallthrough
-		case .PrMerged:
+		case .NewPr, .PrReopened, .NewPrAssigned, .PrClosed, .PrMerged:
 			return [NOTIFICATION_URL_KEY : (item as! PullRequest).webUrl!, PULL_REQUEST_ID_KEY: item.objectID.URIRepresentation().absoluteString]
-		case .NewRepoSubscribed: fallthrough
-		case .NewRepoAnnouncement:
+		case .NewRepoSubscribed, .NewRepoAnnouncement:
 			return [NOTIFICATION_URL_KEY : (item as! Repo).webUrl!]
 		case .NewStatus:
 			let pr = (item as! PRStatus).pullRequest
 			return [NOTIFICATION_URL_KEY : pr.webUrl!, STATUS_ID_KEY: pr.objectID.URIRepresentation().absoluteString]
-		case .NewIssue: fallthrough
-		case .IssueReopened: fallthrough
-		case .NewIssueAssigned: fallthrough
-		case .IssueClosed:
+		case .NewIssue, .IssueReopened, .NewIssueAssigned, .IssueClosed:
 			return [NOTIFICATION_URL_KEY : (item as! Issue).webUrl!, ISSUE_ID_KEY: item.objectID.URIRepresentation().absoluteString]
 		}
 	}

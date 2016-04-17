@@ -29,8 +29,7 @@ final class Application: NSApplication {
 						}
 					case "m":
 						if let i = app.focusedItem() {
-							i.muted = !(i.muted?.boolValue ?? false)
-							i.postProcess()
+							i.setMute(!(i.muted?.boolValue ?? false))
 							DataManager.saveDB()
 							if i is PullRequest {
 								app.updatePrMenu()
