@@ -1,16 +1,16 @@
 
 enum Section: Int {
-	case None, Mine, Participated, Merged, Closed, All
-	static let prMenuTitles = ["", "Mine", "Participated", "Recently Merged", "Recently Closed", "All Pull Requests"]
+	case None, Mine, Participated, Merged, Closed, All, Snoozed
+	static let prMenuTitles = ["", "Mine", "Participated", "Recently Merged", "Recently Closed", "All Pull Requests", "Snoozed"]
 	func prMenuName() -> String { return Section.prMenuTitles[rawValue] }
 
-	static let issueMenuTitles = ["", "Mine", "Participated", "Recently Merged", "Recently Closed", "All Issues"]
+	static let issueMenuTitles = ["", "Mine", "Participated", "Recently Merged", "Recently Closed", "All Issues", "Snoozed"]
 	func issuesMenuName() -> String { return Section.issueMenuTitles[rawValue] }
 
-	static let watchMenuTitles = ["", "Mine", "Participated", "Merged", "Closed", "Other"]
+	static let watchMenuTitles = ["", "Mine", "Participated", "Merged", "Closed", "Other", "Snoozed"]
 	func watchMenuName() -> String { return Section.watchMenuTitles[rawValue] }
 
-	static let apiTitles = ["", "mine", "participated", "merged", "closed", "other"]
+	static let apiTitles = ["", "mine", "participated", "merged", "closed", "other", "snoozed"]
 	func apiName() -> String { return Section.apiTitles[rawValue] }
 }
 

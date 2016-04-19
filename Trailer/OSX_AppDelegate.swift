@@ -130,7 +130,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		if autoCheck {
 			s.updateCheckInterval = NSTimeInterval(3600)*NSTimeInterval(Settings.checkForUpdatesInterval)
 		}
-		DLog("Check for updates set to %d every %f seconds", s.automaticallyChecksForUpdates, s.updateCheckInterval)
+		DLog("Check for updates set to %@, every %f seconds", s.automaticallyChecksForUpdates ? "true" : "false", s.updateCheckInterval)
 	}
 
 	func userNotificationCenter(center: NSUserNotificationCenter, shouldPresentNotification notification: NSUserNotification) -> Bool {
@@ -141,29 +141,28 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 		if let userInfo = notification.userInfo {
 
+			func saveAndRefresh(i: ListableItem) {
+				DataManager.saveDB()
+				if i is PullRequest {
+					updatePrMenu()
+				} else if i is Issue {
+					updateIssuesMenu()
+				}
+			}
+
 			switch notification.activationType {
 			case .AdditionalActionClicked:
 				if #available(OSX 10.10, *) {
 					if notification.additionalActivationAction?.identifier == "mute" {
 						if let (_,i) = ListableItem.relatedItemsFromNotificationInfo(userInfo) {
 							i.setMute(true)
-							DataManager.saveDB()
-							if i is PullRequest {
-								updatePrMenu()
-							} else if i is Issue {
-								updateIssuesMenu()
-							}
+							saveAndRefresh(i)
 						}
 						break
 					} else if notification.additionalActivationAction?.identifier == "read" {
 						if let (_,i) = ListableItem.relatedItemsFromNotificationInfo(userInfo) {
 							i.catchUpWithComments()
-							DataManager.saveDB()
-							if i is PullRequest {
-								updatePrMenu()
-							} else if i is Issue {
-								updateIssuesMenu()
-							}
+							saveAndRefresh(i)
 						}
 						break
 					}
@@ -174,12 +173,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					if let (c,i) = ListableItem.relatedItemsFromNotificationInfo(userInfo) {
 						urlToOpen = c?.webUrl ?? i.webUrl
 						i.catchUpWithComments()
-						DataManager.saveDB()
-						if i is PullRequest {
-							updatePrMenu()
-						} else if i is Issue {
-							updateIssuesMenu()
-						}
+						saveAndRefresh(i)
 					}
 				}
 				if let up = urlToOpen, u = NSURL(string: up) {
@@ -202,39 +196,39 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		switch type {
 		case .NewMention:
 			let c = forItem as! PRComment
-			if c.parentIsMuted() { return }
+			if c.parentShouldSkipNotifications() { return }
 			notification.title = "@" + (c.userName ?? "NoUserName") + " mentioned you:"
 			notification.subtitle = c.notificationSubtitle()
 			notification.informativeText = c.body
 			addPotentialExtraActions(notification)
 		case .NewComment:
 			let c = forItem as! PRComment
-			if c.parentIsMuted() { return }
+			if c.parentShouldSkipNotifications() { return }
 			notification.title = "@" + (c.userName ?? "NoUserName") + " commented:"
 			notification.subtitle = c.notificationSubtitle()
 			notification.informativeText = c.body
 			addPotentialExtraActions(notification)
 		case .NewPr:
 			let p = forItem as! PullRequest
-			if p.muted?.boolValue ?? false { return }
+			if p.shouldSkipNotifications() { return }
 			notification.title = "New PR"
 			notification.subtitle = p.title
 			addPotentialExtraActions(notification)
 		case .PrReopened:
 			let p = forItem as! PullRequest
-			if p.muted?.boolValue ?? false { return }
+			if p.shouldSkipNotifications() { return }
 			notification.title = "Re-Opened PR"
 			notification.subtitle = p.title
 			addPotentialExtraActions(notification)
 		case .PrMerged:
 			let p = forItem as! PullRequest
-			if p.muted?.boolValue ?? false { return }
+			if p.shouldSkipNotifications() { return }
 			notification.title = "PR Merged!"
 			notification.subtitle = p.title
 			addPotentialExtraActions(notification)
 		case .PrClosed:
 			let p = forItem as! PullRequest
-			if p.muted?.boolValue ?? false { return }
+			if p.shouldSkipNotifications() { return }
 			notification.title = "PR Closed"
 			notification.subtitle = p.title
 			addPotentialExtraActions(notification)
@@ -246,38 +240,38 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			notification.subtitle = (forItem as! Repo).fullName
 		case .NewPrAssigned:
 			let p = forItem as! PullRequest
-			if p.muted?.boolValue ?? false { return } // unmute on assignment option?
+			if p.shouldSkipNotifications() { return } // unmute on assignment option?
 			notification.title = "PR Assigned"
 			notification.subtitle = p.title
 			addPotentialExtraActions(notification)
 		case .NewStatus:
 			let s = forItem as! PRStatus
-			if s.parentIsMuted() { return }
+			if s.parentShouldSkipNotifications() { return }
 			notification.title = "PR Status Update"
 			notification.subtitle = s.pullRequest.title
 			notification.informativeText = s.descriptionText
 			addPotentialExtraActions(notification)
 		case .NewIssue:
 			let i = forItem as! Issue
-			if i.muted?.boolValue ?? false { return }
+			if i.shouldSkipNotifications() { return }
 			notification.title = "New Issue"
 			notification.subtitle = i.title
 			addPotentialExtraActions(notification)
 		case .IssueReopened:
 			let i = forItem as! Issue
-			if i.muted?.boolValue ?? false { return }
+			if i.shouldSkipNotifications() { return }
 			notification.title = "Re-Opened Issue"
 			notification.subtitle = i.title
 			addPotentialExtraActions(notification)
 		case .IssueClosed:
 			let i = forItem as! Issue
-			if i.muted?.boolValue ?? false { return }
+			if i.shouldSkipNotifications() { return }
 			notification.title = "Issue Closed"
 			notification.subtitle = i.title
 			addPotentialExtraActions(notification)
 		case .NewIssueAssigned:
 			let i = forItem as! Issue
-			if i.muted?.boolValue ?? false { return }
+			if i.shouldSkipNotifications() { return }
 			notification.title = "Issue Assigned"
 			notification.subtitle = i.title
 			addPotentialExtraActions(notification)
@@ -742,11 +736,11 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		preferencesWindow?.updateActivity()
 		DataManager.saveDB()
 		preferencesWindow?.projectsTable.reloadData()
-		updatePrMenu()
-		updateIssuesMenu()
 		checkApiUsage()
 		DataManager.sendNotificationsIndexAndSave()
 		DLog("Refresh done")
+		updatePrMenu()
+		updateIssuesMenu()
 	}
 
 	func startRefresh() {

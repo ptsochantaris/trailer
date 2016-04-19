@@ -48,21 +48,33 @@ final class PRComment: DataItem {
 	func processNotifications() {
 		if let item = pullRequest ?? issue where item.postSyncAction?.integerValue == PostSyncAction.NoteUpdated.rawValue && item.isVisibleOnMenu() {
 			if refersToMe() {
-				app.postNotificationOfType(PRNotificationType.NewMention, forItem: self)
-			} else if !Settings.disableAllCommentNotifications && item.showNewComments() && !isMine() {
-				if let authorName = userName {
-					var blocked = false
-					for blockedAuthor in Settings.commentAuthorBlacklist as [String] {
-						if authorName.compare(blockedAuthor, options: [NSStringCompareOptions.CaseInsensitiveSearch, NSStringCompareOptions.DiacriticInsensitiveSearch])==NSComparisonResult.OrderedSame {
-							blocked = true
-							break
+				if item.snoozeUntil != nil && Settings.snoozeWakeOnMention {
+					DLog("Waking up snoozed item ID %@ because of mention", item.serverId)
+					item.snoozeUntil = nil
+					item.postProcess()
+				}
+				app.postNotificationOfType(.NewMention, forItem: self)
+			} else if !isMine() {
+				if item.snoozeUntil != nil && Settings.snoozeWakeOnComment {
+					DLog("Waking up snoozed item ID %@ because of posted comment", item.serverId)
+					item.snoozeUntil = nil
+					item.postProcess()
+				}
+				if !Settings.disableAllCommentNotifications && item.showNewComments() && !isMine() {
+					if let authorName = userName {
+						var blocked = false
+						for blockedAuthor in Settings.commentAuthorBlacklist as [String] {
+							if authorName.compare(blockedAuthor, options: [NSStringCompareOptions.CaseInsensitiveSearch, NSStringCompareOptions.DiacriticInsensitiveSearch])==NSComparisonResult.OrderedSame {
+								blocked = true
+								break
+							}
 						}
-					}
-					if blocked {
-						DLog("Blocked notification for user '%@' as their name is on the blacklist",authorName)
-					} else {
-						DLog("User '%@' not on blacklist, can post notification",authorName)
-						app.postNotificationOfType(PRNotificationType.NewComment, forItem:self)
+						if blocked {
+							DLog("Blocked notification for user '%@' as their name is on the blacklist",authorName)
+						} else {
+							DLog("User '%@' not on blacklist, can post notification",authorName)
+							app.postNotificationOfType(.NewComment, forItem:self)
+						}
 					}
 				}
 			}
@@ -97,12 +109,9 @@ final class PRComment: DataItem {
 		return "(untitled)"
 	}
 
-	func parentIsMuted() -> Bool {
-		if pullRequest?.muted?.boolValue ?? false == true {
-			return true
-		}
-		if issue?.muted?.boolValue ?? false == true {
-			return true
+	func parentShouldSkipNotifications() -> Bool {
+		if let item = pullRequest ?? issue {
+			return item.shouldSkipNotifications()
 		}
 		return false
 	}

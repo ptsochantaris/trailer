@@ -28,6 +28,7 @@ class ListableItem: DataItem {
 	@NSManaged var number: NSNumber?
 	@NSManaged var announced: NSNumber?
 	@NSManaged var muted: NSNumber?
+	@NSManaged var snoozeUntil: NSDate?
 
 	@NSManaged var comments: Set<PRComment>
 	@NSManaged var labels: Set<PRLabel>
@@ -85,6 +86,11 @@ class ListableItem: DataItem {
 			}
 		}
 		postProcess()
+	}
+
+	final func shouldSkipNotifications() -> Bool {
+		if stillSnoozing() { return true }
+		return muted?.boolValue ?? false
 	}
 
 	final func shouldKeepForPolicy(policy: Int) -> Bool {
@@ -151,6 +157,18 @@ class ListableItem: DataItem {
 		return Settings.showCommentsEverywhere || sectionIndex?.integerValue == Section.Mine.rawValue || sectionIndex?.integerValue == Section.Participated.rawValue
 	}
 
+	final func stillSnoozing() -> Bool {
+		if let s = snoozeUntil {
+			if s.compare(NSDate()) == .OrderedAscending {
+				snoozeUntil = nil
+				return false
+			} else {
+				return true
+			}
+		}
+		return false
+	}
+
 	final func postProcess() {
 		var targetSection: Section
 		let currentCondition = condition?.integerValue ?? PullRequestCondition.Open.rawValue
@@ -158,15 +176,16 @@ class ListableItem: DataItem {
 
 		if currentCondition == PullRequestCondition.Merged.rawValue			{ targetSection = .Merged }
 		else if currentCondition == PullRequestCondition.Closed.rawValue	{ targetSection = .Closed }
+		else if stillSnoozing()												{ targetSection = .Snoozed }
 		else if isMine || assignedToMySection()								{ targetSection = .Mine }
 		else if assignedToParticipated() || commentedByMe()					{ targetSection = .Participated }
 		else																{ targetSection = .All }
 
 		var needsManualCount = false
 		var moveToParticipated = false
-		let outsideMySections = (targetSection == .All || targetSection == .None)
+		let outsideMySectionsButAwake = (targetSection == .All || targetSection == .None)
 
-		if outsideMySections && Settings.autoParticipateOnTeamMentions {
+		if outsideMySectionsButAwake && Settings.autoParticipateOnTeamMentions {
 			if refersToMyTeams() {
 				moveToParticipated = true
 			} else {
@@ -174,7 +193,7 @@ class ListableItem: DataItem {
 			}
 		}
 
-		if !moveToParticipated && outsideMySections && Settings.autoParticipateInMentions {
+		if !moveToParticipated && outsideMySectionsButAwake && Settings.autoParticipateInMentions {
 			if refersToMe() {
 				moveToParticipated = true
 			} else {
@@ -490,6 +509,10 @@ class ListableItem: DataItem {
 			andPredicates.append(NSPredicate(format: "sectionIndex > 0"))
 		} else {
 			andPredicates.append(NSPredicate(format: "sectionIndex == %d", sectionIndex))
+		}
+
+		if Settings.hideSnoozedItems {
+			andPredicates.append(NSPredicate(format: "sectionIndex != %d", Section.Snoozed.rawValue))
 		}
 
 		if var fi = withFilter where !fi.isEmpty {

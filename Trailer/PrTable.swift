@@ -10,9 +10,9 @@ final class PrTable: NSTableView, NSPasteboardItemDataProvider {
 	override func mouseDown(theEvent: NSEvent) { }
 
 	override func mouseUp(theEvent: NSEvent) {
-		if let prView = cellAtEvent(theEvent) as? TrailerCell {
+		if let prView = cellAtEvent(theEvent) as? TrailerCell, item = prView.associatedDataItem() {
 			let isAlternative = ((theEvent.modifierFlags.intersect(NSEventModifierFlags.AlternateKeyMask)) == NSEventModifierFlags.AlternateKeyMask)
-			app.dataItemSelected(prView.associatedDataItem(), alternativeSelect:isAlternative)
+			app.dataItemSelected(item, alternativeSelect: isAlternative)
 		}
 	}
 
@@ -30,9 +30,9 @@ final class PrTable: NSTableView, NSPasteboardItemDataProvider {
 
 		draggingUrl = nil
 
-		if let prView = cellAtEvent(theEvent) as? TrailerCell {
+		if let prView = cellAtEvent(theEvent) as? TrailerCell, url = prView.associatedDataItem()?.webUrl {
 
-			draggingUrl = prView.associatedDataItem().webUrl
+			draggingUrl = url
 
 			let dragIcon = scaleImage(NSApp.applicationIconImage, toFillSize: CGSizeMake(32, 32))
 			let pbItem = NSPasteboardItem()
@@ -49,7 +49,7 @@ final class PrTable: NSTableView, NSPasteboardItemDataProvider {
 	}
 
 	override func draggingSession(session: NSDraggingSession, sourceOperationMaskForDraggingContext context: NSDraggingContext) -> NSDragOperation {
-		return (context == NSDraggingContext.OutsideApplication) ?  NSDragOperation.Copy : NSDragOperation.None
+		return (context == .OutsideApplication) ?  .Copy : .None
 	}
 
 	private var draggingUrl: String?

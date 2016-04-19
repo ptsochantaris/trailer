@@ -56,7 +56,7 @@ final class Settings {
 			"AUTO_PARTICIPATE_ON_TEAM_MENTIONS", "SHOW_ISSUES_IN_WATCH_GLANCE", "ASSIGNED_PR_HANDLING_POLICY", "HIDE_DESCRIPTION_IN_WATCH_DETAIL_VIEW", "AUTO_REPEAT_SETTINGS_EXPORT", "DONT_CONFIRM_SETTINGS_IMPORT",
 			"LAST_EXPORT_URL", "LAST_EXPORT_TIME", "CLOSE_HANDLING_POLICY_2", "MERGE_HANDLING_POLICY_2", "LAST_PREFS_TAB_SELECTED_OSX", "NEW_PR_DISPLAY_POLICY_INDEX", "NEW_ISSUE_DISPLAY_POLICY_INDEX", "HIDE_PRS_THAT_ARENT_PASSING_ONLY_IN_ALL",
             "INCLUDE_SERVERS_IN_FILTER", "INCLUDE_USERS_IN_FILTER", "INCLUDE_TITLES_IN_FILTER", "INCLUDE_NUMBERS_IN_FILTER", "DUMP_API_RESPONSES_IN_CONSOLE", "OPEN_ITEMS_DIRECTLY_IN_SAFARI", "HIDE_PRS_THAT_ARENT_PASSING",
-            "REMOVE_RELATED_NOTIFICATIONS_ON_ITEM_REMOVE"]
+            "REMOVE_RELATED_NOTIFICATIONS_ON_ITEM_REMOVE", "HIDE_SNOOZED_ITEMS", "SNOOZE_WAKEUP_ON_COMMENT", "SNOOZE_WAKEUP_ON_MENTION", "SNOOZE_WAKEUP_ON_STATUS_UPDATE"]
 	}
 
     class func checkMigration() {
@@ -388,6 +388,12 @@ final class Settings {
 
     /////////////////////////// DEFAULT FALSE
 
+	static let hideSnoozedItemsHelp = "Hide the snoozed items section"
+	class var hideSnoozedItems: Bool {
+		get { return get("HIDE_SNOOZED_ITEMS") as? Bool ?? false }
+		set { set("HIDE_SNOOZED_ITEMS", newValue) }
+	}
+
 	static let hideUncommentedItemsHelp = "Hide all items except items which have unread comments (items with a red number badge)."
 	class var hideUncommentedItems: Bool {
 		get { return get("HIDE_UNCOMMENTED_PRS_KEY") as? Bool ?? false }
@@ -588,6 +594,24 @@ final class Settings {
 	class var useVibrancy: Bool {
 		get { return get("USE_VIBRANCY_UI") as? Bool ?? true }
 		set { set("USE_VIBRANCY_UI", newValue) }
+	}
+
+	static let snoozeWakeOnCommentHelp = "Wake up snoozing items if a new comment is made"
+	class var snoozeWakeOnComment: Bool {
+		get { return get("SNOOZE_WAKEUP_ON_COMMENT") as? Bool ?? true }
+		set { set("SNOOZE_WAKEUP_ON_COMMENT", newValue) }
+	}
+
+	static let snoozeWakeOnMentionHelp = "Wake up snoozing items in you are mentioned in a new comment"
+	class var snoozeWakeOnMention: Bool {
+		get { return get("SNOOZE_WAKEUP_ON_MENTION") as? Bool ?? true }
+		set { set("SNOOZE_WAKEUP_ON_MENTION", newValue) }
+	}
+
+	static let snoozeWakeOnStatusUpdateHelp = "Wake up snoozing items if there is a status or CI update"
+	class var snoozeWakeOnStatusUpdate: Bool {
+		get { return get("SNOOZE_WAKEUP_ON_STATUS_UPDATE") as? Bool ?? true }
+		set { set("SNOOZE_WAKEUP_ON_STATUS_UPDATE", newValue) }
 	}
 
 	static let countOnlyListedItemsHelp = "Show the number of items currently visible in Trailer in the menu bar. If this is unselected, the menubar will display the count of all open items in the current watchlist, irrespective of filters or visibility settings. It's recommended you keep this on."

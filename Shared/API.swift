@@ -302,9 +302,9 @@ final class API {
 			do {
 				DLog("Comitting synced data")
 				try moc.save()
-				DLog("Synced data comitted")
+				DLog("Synced data committed")
 			} catch {
-				DLog("Comitting sync failed: %@", (error as NSError).localizedDescription)
+				DLog("Committing sync failed: %@", (error as NSError).localizedDescription)
 			}
 			andCallback()
 		}
@@ -541,7 +541,7 @@ final class API {
 						r.displayPolicyForPrs = Settings.displayPolicyForNewPrs
 						r.displayPolicyForIssues = Settings.displayPolicyForNewIssues
 						if r.shouldSync() {
-							app.postNotificationOfType(PRNotificationType.NewRepoAnnouncement, forItem:r)
+							app.postNotificationOfType(.NewRepoAnnouncement, forItem:r)
 						}
 					}
 					app.lastRepoCheck = NSDate()
@@ -1077,7 +1077,7 @@ final class API {
 				DLog("Will keep merged PR")
 				r.postSyncAction = PostSyncAction.DoNothing.rawValue
 				r.condition = PullRequestCondition.Merged.rawValue
-				app.postNotificationOfType(PRNotificationType.PrMerged, forItem: r)
+				app.postNotificationOfType(.PrMerged, forItem: r)
 				return
 			}
 		}
@@ -1099,7 +1099,7 @@ final class API {
 			DLog("Will keep closed PR")
 			r.postSyncAction = PostSyncAction.DoNothing.rawValue
 			r.condition = PullRequestCondition.Closed.rawValue
-			app.postNotificationOfType(PRNotificationType.PrClosed, forItem:r)
+			app.postNotificationOfType(.PrClosed, forItem:r)
 		} else {
 			DLog("Will not keep closed PR")
 		}
@@ -1120,7 +1120,7 @@ final class API {
 			DLog("Will keep closed issue")
 			i.postSyncAction = PostSyncAction.DoNothing.rawValue
 			i.condition = PullRequestCondition.Closed.rawValue
-			app.postNotificationOfType(PRNotificationType.IssueClosed, forItem:i)
+			app.postNotificationOfType(.IssueClosed, forItem:i)
 		} else {
 			DLog("Will not keep closed issue")
 		}

@@ -46,7 +46,7 @@ final class IssueCell: TrailerCell {
 		bottom = ceil(CELL_PADDING * 0.5)
 
 		frame = NSMakeRect(0, 0, MENU_WIDTH, titleHeight+subtitleHeight+CELL_PADDING)
-		let faded = issue.muted?.boolValue ?? false
+		let faded = issue.shouldSkipNotifications()
 		addCounts(_commentsTotal, _commentsNew, faded)
 
 		var titleRect = NSMakeRect(LEFTPADDING, subtitleHeight+bottom, W, titleHeight)

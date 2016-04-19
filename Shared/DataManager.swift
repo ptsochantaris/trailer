@@ -115,15 +115,15 @@ final class DataManager : NSObject {
 			if p.isVisibleOnMenu() {
 				if !p.createdByMe() {
 					if !(p.isNewAssignment?.boolValue ?? false) && !(p.announced?.boolValue ?? false) {
-						app.postNotificationOfType(PRNotificationType.NewPr, forItem: p)
+						app.postNotificationOfType(.NewPr, forItem: p)
 						p.announced = true
 					}
 					if let reopened = p.reopened?.boolValue where reopened == true {
-						app.postNotificationOfType(PRNotificationType.PrReopened, forItem: p)
+						app.postNotificationOfType(.PrReopened, forItem: p)
 						p.reopened = false
 					}
 					if let newAssignment = p.isNewAssignment?.boolValue where newAssignment == true {
-						app.postNotificationOfType(PRNotificationType.NewPrAssigned, forItem: p)
+						app.postNotificationOfType(.NewPrAssigned, forItem: p)
 						p.isNewAssignment = false
 					}
 				}
@@ -144,15 +144,15 @@ final class DataManager : NSObject {
 			if i.isVisibleOnMenu() {
 				if !i.createdByMe() {
 					if !(i.isNewAssignment?.boolValue ?? false) && !(i.announced?.boolValue ?? false) {
-						app.postNotificationOfType(PRNotificationType.NewIssue, forItem: i)
+						app.postNotificationOfType(.NewIssue, forItem: i)
 						i.announced = true
 					}
 					if let reopened = i.reopened?.boolValue where reopened == true {
-						app.postNotificationOfType(PRNotificationType.IssueReopened, forItem: i)
+						app.postNotificationOfType(.IssueReopened, forItem: i)
 						i.reopened = false
 					}
 					if let newAssignment = i.isNewAssignment?.boolValue where newAssignment == true {
-						app.postNotificationOfType(PRNotificationType.NewIssueAssigned, forItem: i)
+						app.postNotificationOfType(.NewIssueAssigned, forItem: i)
 						i.isNewAssignment = false
 					}
 				}
@@ -185,7 +185,12 @@ final class DataManager : NSObject {
 						if let s = pr.displayedStatuses().first {
 							let displayText = s.descriptionText
 							if pr.lastStatusNotified != displayText && pr.postSyncAction?.integerValue != PostSyncAction.NoteNew.rawValue {
-								app.postNotificationOfType(PRNotificationType.NewStatus, forItem: s)
+								if pr.snoozeUntil != nil && Settings.snoozeWakeOnStatusUpdate {
+									DLog("Waking up snoozed PR ID %@ because of a status update", pr.serverId)
+									pr.snoozeUntil = nil
+									pr.postProcess()
+								}
+								app.postNotificationOfType(.NewStatus, forItem: s)
 								pr.lastStatusNotified = displayText
 							}
 						} else {
@@ -426,11 +431,7 @@ private func addStorePath(sqlStore: NSURL, newCoordinator: NSPersistentStoreCoor
 }
 
 func existingObjectWithID(id: NSManagedObjectID) -> NSManagedObject? {
-	do {
-		return try mainObjectContext.existingObjectWithID(id)
-	} catch {
-		return nil
-	}
+	return try? mainObjectContext.existingObjectWithID(id)
 }
 
 func removeDatabaseFiles() {

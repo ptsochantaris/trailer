@@ -88,6 +88,24 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var apiServerDeleteButton: NSButton!
 	@IBOutlet weak var apiServerReportError: NSButton!
 
+	// Snoozing
+	@IBOutlet weak var snoozePresetsList: NSTableView!
+	@IBOutlet weak var snoozeTypeDuration: NSButton!
+	@IBOutlet weak var snoozeTypeDateTime: NSButton!
+	@IBOutlet weak var snoozeDurationDays: NSPopUpButton!
+	@IBOutlet weak var snoozeDurationHours: NSPopUpButton!
+	@IBOutlet weak var snoozeDurationMinutes: NSPopUpButton!
+	@IBOutlet weak var snoozeDateTimeDay: NSPopUpButton!
+	@IBOutlet weak var snoozeDateTimeHour: NSPopUpButton!
+	@IBOutlet weak var snoozeDateTimeMinute: NSPopUpButton!
+	@IBOutlet weak var snoozeDeletePreset: NSButton!
+	@IBOutlet weak var snoozeUp: NSButton!
+	@IBOutlet weak var snoozeDown: NSButton!
+	@IBOutlet weak var snoozeWakeOnComment: NSButton!
+	@IBOutlet weak var snoozeWakeOnMention: NSButton!
+	@IBOutlet weak var snoozeWakeOnStatusUpdate: NSButton!
+	@IBOutlet weak var hideSnoozedItems: NSButton!
+
 	// Misc
 	@IBOutlet weak var repeatLastExportAutomatically: NSButton!
 	@IBOutlet weak var lastExportReport: NSTextField!
@@ -123,6 +141,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		delegate = self
 
 		updateAllItemSettingButtons()
+		fillSnoozingDropdowns()
 
 		allNewPrsSetting.addItemsWithTitles(RepoDisplayPolicy.labels)
 		allNewIssuesSetting.addItemsWithTitles(RepoDisplayPolicy.labels)
@@ -146,6 +165,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	private func addTooltips() {
+		snoozePresetsList.toolTip = "The list of presets that will be displayed in the snooze context menu"
 		serverList.toolTip = "The list of GitHub API servers that Trailer will attempt to sync data from. You can edit each server's details from the pane on the right. Bear in mind that some servers, like the public GitHub server for instance, have strict API volume limits, and syncing too many repos or items too often can result in API usage going over the limit. You can monitor your usage fro the bar next tot he server's name. If it is red, you're close to maximum. Your API usage is reset every hour."
 		apiServerName.toolTip = "An internal name you want to use to refer to this server."
 		apiServerApiPath.toolTip = "The full URL of the root of the API endpoints for this server. The placeholder text shows examples for GitHub and GitHub Enterprise servers, but your own custom configuration may vary."
@@ -209,6 +229,10 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		logActivityToConsole.toolTip = Settings.logActivityToConsoleHelp
 		dumpApiResponsesToConsole.toolTip = Settings.dumpAPIResponsesInConsoleHelp
 		checkForUpdatesAutomatically.toolTip = Settings.checkForUpdatesAutomaticallyHelp
+		snoozeWakeOnStatusUpdate.toolTip = Settings.snoozeWakeOnStatusUpdateHelp
+		snoozeWakeOnMention.toolTip = Settings.snoozeWakeOnMentionHelp
+		snoozeWakeOnComment.toolTip = Settings.snoozeWakeOnCommentHelp
+		hideSnoozedItems.toolTip = Settings.hideSnoozedItemsHelp
 	}
 
 	private func updateAllItemSettingButtons() {
@@ -237,8 +261,10 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	func reloadSettings() {
-		serverList.selectRowIndexes(NSIndexSet(index: 0), byExtendingSelection: false)
+		let firstRow = NSIndexSet(index: 0)
+		serverList.selectRowIndexes(firstRow, byExtendingSelection: false)
 		fillServerApiFormFromSelectedServer()
+		fillSnoozeFormFromSelectedPreset()
 
 		api.updateLimitsFromServer()
 		updateStatusTermPreferenceControls()
@@ -287,6 +313,11 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		useVibrancy.integerValue = Settings.useVibrancy ? 1 : 0
 		hidePrsThatDontPass.integerValue = Settings.hidePrsThatArentPassing ? 1 : 0
 		hidePrsThatDontPassOnlyInAll.integerValue = Settings.hidePrsThatDontPassOnlyInAll ? 1 : 0
+
+		snoozeWakeOnComment.integerValue = Settings.snoozeWakeOnComment ? 1 : 0
+		snoozeWakeOnMention.integerValue = Settings.snoozeWakeOnMention ? 1 : 0
+		snoozeWakeOnStatusUpdate.integerValue = Settings.snoozeWakeOnStatusUpdate ? 1 : 0
+		hideSnoozedItems.integerValue = Settings.hideSnoozedItems ? 1 : 0
 
 		allNewPrsSetting.selectItemAtIndex(Settings.displayPolicyForNewPrs)
 		allNewIssuesSetting.selectItemAtIndex(Settings.displayPolicyForNewIssues)
@@ -798,12 +829,12 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		s.extensionHidden = false
 		s.nameFieldStringValue = "Trailer Settings"
 		s.allowedFileTypes = ["trailerSettings"]
-		s.beginSheetModalForWindow(self, completionHandler: { response in
+		s.beginSheetModalForWindow(self) { response in
 			if response == NSFileHandlingPanelOKButton, let url = s.URL {
 				Settings.writeToURL(url)
 				DLog("Exported settings to %@", url.absoluteString)
 			}
-			})
+		}
 	}
 
 	@IBAction func importSettingsSelected(sender: NSButton) {
@@ -1062,10 +1093,12 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	///////////// Repo table
 
 	func tableViewSelectionDidChange(notification: NSNotification) {
-		if self.serverList === notification.object {
+		if serverList === notification.object {
 			fillServerApiFormFromSelectedServer()
-		} else if self.projectsTable === notification.object {
+		} else if projectsTable === notification.object {
 			updateAllItemSettingButtons()
+		} else if snoozePresetsList === notification.object {
+			fillSnoozeFormFromSelectedPreset()
 		}
 	}
 
@@ -1139,7 +1172,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 					}
 				}
 			}
-		} else {
+		} else if tv == serverList {
 			let allServers = ApiServer.allApiServersInMoc(mainObjectContext)
 			let apiServer = allServers[row]
 			if tableColumn?.identifier == "server" {
@@ -1159,6 +1192,12 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 				c.criticalValue = rl*0.8
 				c.doubleValue = rl - (apiServer.requestsRemaining?.doubleValue ?? 0)
 			}
+		} else if tv == snoozePresetsList {
+			let allPresets = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)
+			let preset = allPresets[row]
+			cell.title = preset.listDescription()
+			let tc = c as! NSTextFieldCell
+			tc.textColor = NSColor.textColor()
 		}
 	}
 
@@ -1173,9 +1212,12 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	func numberOfRowsInTableView(tableView: NSTableView) -> Int {
 		if tableView === projectsTable {
 			return Repo.reposForFilter(repoFilter.stringValue).count + 2
-		} else {
+		} else if tableView === serverList {
 			return ApiServer.countApiServersInMoc(mainObjectContext)
+		} else if tableView === snoozePresetsList {
+			return SnoozePreset.allSnoozePresetsInMoc(mainObjectContext).count
 		}
+		return 0
 	}
 
 	func tableView(tableView: NSTableView, objectValueForTableColumn tableColumn: NSTableColumn?, row: Int) -> AnyObject? {
@@ -1201,5 +1243,200 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 				}
 			}
 		}
+	}
+
+	/////////////////////////////// snoozing
+
+	@IBAction func snoozeWakeChanged(sender: NSButton) {
+		Settings.snoozeWakeOnComment = snoozeWakeOnComment.integerValue == 1
+		Settings.snoozeWakeOnMention = snoozeWakeOnMention.integerValue == 1
+		Settings.snoozeWakeOnStatusUpdate = snoozeWakeOnStatusUpdate.integerValue == 1
+	}
+
+	@IBAction func hideSnoozedItemsChanged(sender: NSButton) {
+		Settings.hideSnoozedItems = hideSnoozedItems.integerValue == 1
+		app.deferredUpdateTimer.push()
+	}
+
+	private func fillSnoozingDropdowns() {
+		snoozeDurationDays.addItemWithTitle("")
+		snoozeDurationHours.addItemWithTitle("")
+		snoozeDurationMinutes.addItemWithTitle("")
+
+		snoozeDurationDays.addItemWithTitle("1 day")
+		snoozeDurationHours.addItemWithTitle("1 hour")
+		snoozeDurationMinutes.addItemWithTitle("1 minute")
+
+		var titles = [String]()
+
+		for f in 2..<400 {
+			titles.append("\(f) days")
+		}
+		snoozeDurationDays.addItemsWithTitles(titles)
+		titles.removeAll()
+		for f in 2..<24 {
+			titles.append("\(f) hours")
+		}
+		snoozeDurationHours.addItemsWithTitles(titles)
+		titles.removeAll()
+		for f in 2..<60 {
+			titles.append("\(f) minutes")
+		}
+		snoozeDurationMinutes.addItemsWithTitles(titles)
+		titles.removeAll()
+
+		snoozeDateTimeDay.addItemsWithTitles(["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"])
+		for f in 0..<24 {
+			titles.append(String(format: "%02d", f))
+		}
+		snoozeDateTimeHour.addItemsWithTitles(titles)
+		titles.removeAll()
+		for f in 0..<60 {
+			titles.append(String(format: "%02d", f))
+		}
+		snoozeDateTimeMinute.addItemsWithTitles(titles)
+	}
+
+	func selectedSnoozePreset() -> SnoozePreset? {
+		let selected = snoozePresetsList.selectedRow
+		if selected >= 0 {
+			return SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)[selected]
+		}
+		return nil
+	}
+
+	func fillSnoozeFormFromSelectedPreset() {
+		if let s = selectedSnoozePreset() {
+			if s.duration.boolValue {
+				snoozeTypeDuration.integerValue = 1
+				snoozeTypeDateTime.integerValue = 0
+				snoozeDurationMinutes.enabled = true
+				snoozeDurationHours.enabled = true
+				snoozeDurationDays.enabled = true
+				snoozeDurationMinutes.selectItemAtIndex(s.minute?.integerValue ?? 0)
+				snoozeDurationHours.selectItemAtIndex(s.hour?.integerValue ?? 0)
+				snoozeDurationDays.selectItemAtIndex(s.day?.integerValue ?? 0)
+				snoozeDateTimeMinute.enabled = false
+				snoozeDateTimeMinute.selectItemAtIndex(0)
+				snoozeDateTimeHour.enabled = false
+				snoozeDateTimeHour.selectItemAtIndex(0)
+				snoozeDateTimeDay.enabled = false
+				snoozeDateTimeDay.selectItemAtIndex(0)
+			} else {
+				snoozeTypeDuration.integerValue = 0
+				snoozeTypeDateTime.integerValue = 1
+				snoozeDurationMinutes.enabled = false
+				snoozeDurationMinutes.selectItemAtIndex(0)
+				snoozeDurationHours.enabled = false
+				snoozeDurationHours.selectItemAtIndex(0)
+				snoozeDurationDays.enabled = false
+				snoozeDurationDays.selectItemAtIndex(0)
+				snoozeDateTimeMinute.enabled = true
+				snoozeDateTimeHour.enabled = true
+				snoozeDateTimeDay.enabled = true
+				snoozeDateTimeMinute.selectItemAtIndex(s.minute?.integerValue ?? 0)
+				snoozeDateTimeHour.selectItemAtIndex(s.hour?.integerValue ?? 0)
+				snoozeDateTimeDay.selectItemAtIndex(s.day?.integerValue ?? 0)
+			}
+			snoozeTypeDuration.enabled = true
+			snoozeTypeDateTime.enabled = true
+			snoozeDeletePreset.enabled = true
+			snoozeUp.enabled = true
+			snoozeDown.enabled = true
+		} else {
+			snoozeTypeDuration.enabled = false
+			snoozeTypeDateTime.enabled = false
+			snoozeDateTimeMinute.enabled = false
+			snoozeDateTimeHour.enabled = false
+			snoozeDateTimeDay.enabled = false
+			snoozeDurationMinutes.enabled = false
+			snoozeDurationHours.enabled = false
+			snoozeDurationDays.enabled = false
+			snoozeDeletePreset.enabled = false
+			snoozeUp.enabled = false
+			snoozeDown.enabled = false
+		}
+	}
+
+	@IBAction func createNewSnoozePresetSelected(sender: NSButton) {
+		let s = SnoozePreset.newSnoozePresetInMoc(mainObjectContext)
+		snoozePresetsList.reloadData()
+		if let index = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext).indexOf(s) {
+			snoozePresetsList.selectRowIndexes(NSIndexSet(index: index), byExtendingSelection: false)
+			fillSnoozeFormFromSelectedPreset()
+		}
+		app.deferredUpdateTimer.push()
+	}
+
+	@IBAction func deleteSnoozePresetSelected(sender: NSButton) {
+		if let selectedPreset = selectedSnoozePreset(), index = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext).indexOf(selectedPreset) {
+			mainObjectContext.deleteObject(selectedPreset)
+			snoozePresetsList.reloadData()
+			snoozePresetsList.selectRowIndexes(NSIndexSet(index: min(index, snoozePresetsList.numberOfRows-1)), byExtendingSelection: false)
+			fillSnoozeFormFromSelectedPreset()
+			DataManager.saveDB()
+			app.deferredUpdateTimer.push()
+		}
+	}
+
+	@IBAction func snoozeTypeChanged(sender: NSButton) {
+		if let s = selectedSnoozePreset() {
+			s.duration = NSNumber(bool: (sender == snoozeTypeDuration))
+			fillSnoozeFormFromSelectedPreset()
+			snoozePresetsList.reloadData()
+			DataManager.saveDB()
+			app.deferredUpdateTimer.push()
+		}
+	}
+
+	@IBAction func snoozeOptionsChanged(sender: NSPopUpButton) {
+		if let s = selectedSnoozePreset() {
+			if s.duration.boolValue {
+				s.day = numberOrNil(snoozeDurationDays.indexOfSelectedItem)
+				s.hour = numberOrNil(snoozeDurationHours.indexOfSelectedItem)
+				s.minute = numberOrNil(snoozeDurationMinutes.indexOfSelectedItem)
+			} else {
+				s.day = numberOrNil(snoozeDateTimeDay.indexOfSelectedItem)
+				s.hour = numberOrNil(snoozeDateTimeHour.indexOfSelectedItem)
+				s.minute = numberOrNil(snoozeDateTimeMinute.indexOfSelectedItem)
+			}
+			snoozePresetsList.reloadData()
+			DataManager.saveDB()
+			app.deferredUpdateTimer.push()
+		}
+	}
+
+	@IBAction func snoozeUpSelected(sender: AnyObject) {
+		if let this = selectedSnoozePreset() {
+			let all = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)
+			if let index = all.indexOf(this) where index > 0 {
+				let other = all[index-1]
+				other.sortOrder = NSNumber(integer: index)
+				this.sortOrder = NSNumber(integer: index-1)
+				snoozePresetsList.selectRowIndexes(NSIndexSet(index: index-1), byExtendingSelection: false)
+				snoozePresetsList.reloadData()
+				DataManager.saveDB()
+				app.deferredUpdateTimer.push()
+			}
+		}
+	}
+
+	@IBAction func snoozeDownSelected(sender: AnyObject) {
+		if let this = selectedSnoozePreset() {
+			let all = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)
+			if let index = all.indexOf(this) where index < all.count-1 {
+				let other = all[index+1]
+				other.sortOrder = NSNumber(integer: index)
+				this.sortOrder = NSNumber(integer: index+1)
+				snoozePresetsList.selectRowIndexes(NSIndexSet(index: index+1), byExtendingSelection: false)
+				snoozePresetsList.reloadData()
+				DataManager.saveDB()
+				app.deferredUpdateTimer.push()
+			}
+		}
+	}
+
+	private func numberOrNil(i: Int) -> NSNumber? {
+		return i > 0 ? NSNumber(integer: i) : nil
 	}
 }

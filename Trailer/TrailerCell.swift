@@ -20,7 +20,9 @@ class TrailerCell: NSTableCellView {
 	}
 
 	func unPinSelected() {
-		app.unPinSelectedFor(associatedDataItem())
+		if let i = associatedDataItem() {
+			app.unPinSelectedFor(i)
+		}
 	}
 
 	override func mouseEntered(theEvent: NSEvent?) {
@@ -55,33 +57,37 @@ class TrailerCell: NSTableCellView {
 	}
 
     func openRepo() {
-        if let u = associatedDataItem().repo.webUrl, url = NSURL(string: u) {
+        if let u = associatedDataItem()?.repo.webUrl, url = NSURL(string: u) {
             NSWorkspace.sharedWorkspace().openURL(url)
         }
     }
 
 	func copyToClipboard() {
-		let p = NSPasteboard.generalPasteboard()
-		p.clearContents()
-		p.declareTypes([NSStringPboardType], owner: self)
-		if let s = associatedDataItem().webUrl {
+		if let s = associatedDataItem()?.webUrl {
+			let p = NSPasteboard.generalPasteboard()
+			p.clearContents()
+			p.declareTypes([NSStringPboardType], owner: self)
 			p.setString(s, forType: NSStringPboardType)
 		}
 	}
 
 	func copyNumberToClipboard() {
-		let p = NSPasteboard.generalPasteboard()
-		p.clearContents()
-		p.declareTypes([NSStringPboardType], owner: self)
-		if let s = associatedDataItem().number {
+		if let s = associatedDataItem()?.number {
+			let p = NSPasteboard.generalPasteboard()
+			p.clearContents()
+			p.declareTypes([NSStringPboardType], owner: self)
 			p.setString("#\(s)", forType: NSStringPboardType)
 		}
 	}
 
 	func updateMenu() {
 
+		guard let item = associatedDataItem() else {
+			menu = nil
+			return
+		}
+
 		let title: String
-		let item = associatedDataItem()
 		let muted = item.muted?.boolValue ?? false
 		if let n = item.number {
 			if item is PullRequest {
@@ -93,70 +99,108 @@ class TrailerCell: NSTableCellView {
 			title = "PR Options"
 		}
 
-        menu = NSMenu(title: title)
-		menu!.insertItemWithTitle(title, action: #selector(TrailerCell.copyNumberToClipboard), keyEquivalent: "", atIndex: 0)
-		menu!.insertItem(NSMenuItem.separatorItem(), atIndex: 1)
+        let m = NSMenu(title: title)
+		m.addItemWithTitle(title, action: #selector(TrailerCell.copyNumberToClipboard), keyEquivalent: "")
+		m.addItem(NSMenuItem.separatorItem())
 		
-        let c2 = menu!.insertItemWithTitle("Copy URL", action: #selector(TrailerCell.copyToClipboard), keyEquivalent: "c", atIndex: 2)
-        c2!.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
+		if let c = m.addItemWithTitle("Copy URL", action: #selector(TrailerCell.copyToClipboard), keyEquivalent: "c") {
+			c.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
+		}
 
-        let c3 = menu!.insertItemWithTitle("Open Repo", action: #selector(TrailerCell.openRepo), keyEquivalent: "o", atIndex: 3)
-		c3!.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
+		if let c = m.addItemWithTitle("Open Repo", action: #selector(TrailerCell.openRepo), keyEquivalent: "o") {
+			c.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
+		}
 
 		if muted {
-			let c4 = menu!.insertItemWithTitle("Un-Mute", action: #selector(TrailerCell.unMuteSelected), keyEquivalent: "m", atIndex: 4)
-			c4!.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
+			if let c = m.addItemWithTitle("Un-Mute", action: #selector(TrailerCell.unMuteSelected), keyEquivalent: "m") {
+				c.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
+			}
 		} else {
-			let c4 = menu!.insertItemWithTitle("Mute", action: #selector(TrailerCell.muteSelected), keyEquivalent: "m", atIndex: 4)
-			c4!.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
+			if let c = m.addItemWithTitle("Mute", action: #selector(TrailerCell.muteSelected), keyEquivalent: "m") {
+				c.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
+			}
 		}
 
 		if item.unreadComments?.integerValue > 0 {
-			let c4 = menu!.insertItemWithTitle("Mark as read", action: #selector(TrailerCell.markReadSelected), keyEquivalent: "a", atIndex: 5)
-			c4!.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
+			if let c = m.addItemWithTitle("Mark as read", action: #selector(TrailerCell.markReadSelected), keyEquivalent: "a") {
+				c.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
+			}
 		} else {
-			let c4 = menu!.insertItemWithTitle("Mark as unread", action: #selector(TrailerCell.markUnreadSelected), keyEquivalent: "a", atIndex: 5)
-			c4!.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
+			if let c = m.addItemWithTitle("Mark as unread", action: #selector(TrailerCell.markUnreadSelected), keyEquivalent: "a") {
+				c.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
+			}
 		}
+
+		if let s = item.sectionIndex?.integerValue, section = Section(rawValue: s) where !(section == .Closed || section == .Merged) {
+			if item.snoozeUntil == nil {
+				let snoozeItems = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)
+				if snoozeItems.count > 0 {
+					if let c = m.addItemWithTitle("Snooze...", action: nil, keyEquivalent: "") {
+						let s = NSMenu(title: "Snooze")
+						for i in snoozeItems {
+							if let smi = s.addItemWithTitle(i.listDescription(), action: #selector(TrailerCell.snoozeSelected(_:)), keyEquivalent: "") {
+								smi.representedObject = i.objectID
+							}
+						}
+						c.submenu = s
+					}
+				}
+			} else {
+				if let c = m.addItemWithTitle("Wake up", action: #selector(TrailerCell.wakeUpSelected), keyEquivalent: "s") {
+					c.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
+				}
+			}
+		}
+
+		menu = m
     }
 
+	func snoozeSelected(sender: NSMenuItem) {
+		if let item = associatedDataItem(), oid = sender.representedObject as? NSManagedObjectID, snoozeItem = existingObjectWithID(oid) as? SnoozePreset {
+			item.snoozeUntil = snoozeItem.wakeupDateFromNow()
+			item.postProcess()
+			saveAndRequestMenuUpdate(item)
+		}
+	}
+
+	func wakeUpSelected() {
+		if let item = associatedDataItem() {
+			item.snoozeUntil = nil
+			item.postProcess()
+			saveAndRequestMenuUpdate(item)
+		}
+	}
+
 	func markReadSelected() {
-		let item = associatedDataItem()
-		item.catchUpWithComments()
-		DataManager.saveDB()
-		if item is PullRequest {
-			app.updatePrMenu()
-		} else {
-			app.updateIssuesMenu()
+		if let item = associatedDataItem() {
+			item.catchUpWithComments()
+			saveAndRequestMenuUpdate(item)
 		}
 	}
 
 	func markUnreadSelected() {
-		let item = associatedDataItem()
-		item.latestReadCommentDate = never()
-		item.postProcess()
-		DataManager.saveDB()
-		if item is PullRequest {
-			app.updatePrMenu()
-		} else {
-			app.updateIssuesMenu()
+		if let item = associatedDataItem() {
+			item.latestReadCommentDate = never()
+			item.postProcess()
+			saveAndRequestMenuUpdate(item)
 		}
 	}
 
 	func muteSelected() {
-		let item = associatedDataItem()
-		item.setMute(true)
-		DataManager.saveDB()
-		if item is PullRequest {
-			app.updatePrMenu()
-		} else {
-			app.updateIssuesMenu()
+		if let item = associatedDataItem() {
+			item.setMute(true)
+			saveAndRequestMenuUpdate(item)
 		}
 	}
 
 	func unMuteSelected() {
-		let item = associatedDataItem()
-		item.setMute(false)
+		if let item = associatedDataItem() {
+			item.setMute(false)
+			saveAndRequestMenuUpdate(item)
+		}
+	}
+
+	private func saveAndRequestMenuUpdate(item: ListableItem) {
 		DataManager.saveDB()
 		if item is PullRequest {
 			app.updatePrMenu()
@@ -165,8 +209,8 @@ class TrailerCell: NSTableCellView {
 		}
 	}
 
-	func associatedDataItem() -> ListableItem {
-		return existingObjectWithID(dataItemId) as! ListableItem
+	func associatedDataItem() -> ListableItem? {
+		return existingObjectWithID(dataItemId) as? ListableItem
 	}
 
 	override func updateTrackingAreas() {

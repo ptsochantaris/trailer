@@ -61,7 +61,7 @@ final class PullRequestCell: TrailerCell {
 		}
 
 		frame = NSMakeRect(0, 0, MENU_WIDTH, titleHeight+subtitleHeight+statusBottom+CELL_PADDING)
-		let faded = pullRequest.muted?.boolValue ?? false
+		let faded = pullRequest.shouldSkipNotifications()
 		addCounts(_commentsTotal, _commentsNew, faded)
 
 		var titleRect = NSMakeRect(LEFTPADDING, subtitleHeight+bottom+statusBottom, W, titleHeight)
