@@ -24,7 +24,11 @@ final class SnoozePreset: NSManagedObject {
 				resultItems.append(m > 1 ? "\(m) minutes" : "1 minute")
 			}
 			if resultItems.count == 0 {
-				return "Forever"
+				if Settings.snoozeWakeOnComment || Settings.snoozeWakeOnMention || Settings.snoozeWakeOnStatusUpdate {
+					return "Until event or manual wake"
+				} else {
+					return "Until manual wake"
+				}
 			}
 			return "For " + resultItems.joinWithSeparator(", ")
 		} else {

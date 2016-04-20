@@ -132,7 +132,17 @@ class TrailerCell: NSTableCellView {
 		}
 
 		if let s = item.sectionIndex?.integerValue, section = Section(rawValue: s) where !(section == .Closed || section == .Merged) {
-			if item.snoozeUntil == nil {
+			if let snooze = item.snoozeUntil {
+				let title: String
+				if snooze == NSDate.distantFuture() {
+					title = String(format: "Wake")
+				} else {
+					title = String(format: "Wake (auto: %@)", itemDateFormatter.stringFromDate(snooze))
+				}
+				if let c = m.addItemWithTitle(title, action: #selector(TrailerCell.wakeUpSelected), keyEquivalent: "s") {
+					c.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
+				}
+			} else {
 				let snoozeItems = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)
 				if snoozeItems.count > 0 {
 					if let c = m.addItemWithTitle("Snooze...", action: nil, keyEquivalent: "") {
@@ -142,18 +152,19 @@ class TrailerCell: NSTableCellView {
 								smi.representedObject = i.objectID
 							}
 						}
+						s.addItemWithTitle("Configure...", action: #selector(TrailerCell.snoozeConfigSelected), keyEquivalent: "")
 						c.submenu = s
 					}
-				}
-			} else {
-				if let c = m.addItemWithTitle("Wake up", action: #selector(TrailerCell.wakeUpSelected), keyEquivalent: "s") {
-					c.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
 				}
 			}
 		}
 
 		menu = m
     }
+
+	func snoozeConfigSelected() {
+		app.showPreferencesWindow(6)
+	}
 
 	func snoozeSelected(sender: NSMenuItem) {
 		if let item = associatedDataItem(), oid = sender.representedObject as? NSManagedObjectID, snoozeItem = existingObjectWithID(oid) as? SnoozePreset {

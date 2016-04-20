@@ -567,7 +567,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	func preferencesSelected() {
 		refreshTimer?.invalidate()
 		refreshTimer = nil
-		showPreferencesWindow()
+		showPreferencesWindow(nil)
 	}
 
 	func application(sender: NSApplication, openFile filename: String) -> Bool {
@@ -1213,7 +1213,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 	private var preferencesWindowController: NSWindowController?
 	private var preferencesWindow: PreferencesWindow?
-	func showPreferencesWindow() {
+	func showPreferencesWindow(selectTab: Int?) {
 		if preferencesWindowController == nil {
 			preferencesWindowController = NSWindowController(windowNibName:"PreferencesWindow")
 		}
@@ -1222,6 +1222,9 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			w.center()
 			w.makeKeyAndOrderFront(self)
 			preferencesWindow = w
+			if let s = selectTab {
+				w.tabs.selectTabViewItemAtIndex(s)
+			}
 		}
 	}
 	func closedPreferencesWindow() {

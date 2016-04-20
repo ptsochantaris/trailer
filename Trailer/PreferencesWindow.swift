@@ -1251,6 +1251,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		Settings.snoozeWakeOnComment = snoozeWakeOnComment.integerValue == 1
 		Settings.snoozeWakeOnMention = snoozeWakeOnMention.integerValue == 1
 		Settings.snoozeWakeOnStatusUpdate = snoozeWakeOnStatusUpdate.integerValue == 1
+		snoozePresetsList.reloadData()
+		app.deferredUpdateTimer.push()
 	}
 
 	@IBAction func hideSnoozedItemsChanged(sender: NSButton) {
