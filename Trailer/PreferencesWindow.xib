@@ -629,7 +629,7 @@ Token</string>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
-                                        <box autoresizesSubviews="NO" title="Whan something from &quot;all items&quot; is assigned to me..." borderType="line" id="96h-4X-0sU">
+                                        <box autoresizesSubviews="NO" title="When something from &quot;all items&quot; is assigned to me..." borderType="line" id="96h-4X-0sU">
                                             <rect key="frame" x="414" y="275" width="316" height="73"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                             <view key="contentView" id="evv-lI-oOm">
