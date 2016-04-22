@@ -430,12 +430,6 @@ final class Settings {
 		set { set("HIDE_AVATARS_KEY", newValue) }
 	}
 
-	static let autoParticipateInMentionsHelp = "If your username is mentioned in an item's description or a comment posted inside it, move the item to your 'Participated' section."
-	class var autoParticipateInMentions: Bool {
-		get { return get("AUTO_PARTICIPATE_IN_MENTIONS_KEY") as? Bool ?? false }
-		set { set("AUTO_PARTICIPATE_IN_MENTIONS_KEY", newValue) }
-	}
-
 	static let dontAskBeforeWipingMergedHelp = "Don't ask for confirmation when you select 'Remove all merged items'. Please note there is no confirmation when selecting this from the Apple Watch, irrespective of this setting."
 	class var dontAskBeforeWipingMerged: Bool {
 		get { return get("DONT_ASK_BEFORE_WIPING_MERGED") as? Bool ?? false }
@@ -524,12 +518,6 @@ final class Settings {
         set { set("NOTIFY_ON_STATUS_UPDATES_ALL", newValue) }
     }
 
-	static let autoParticipateOnTeamMentionsHelp = "If the name of one of the teams you belong to is mentioned in an item's description or a comment posted inside it, move the item to your 'Participated' section."
-	class var autoParticipateOnTeamMentions: Bool {
-		get { return get("AUTO_PARTICIPATE_ON_TEAM_MENTIONS") as? Bool ?? false }
-		set { set("AUTO_PARTICIPATE_ON_TEAM_MENTIONS", newValue) }
-	}
-
 	static let preferIssuesInWatchHelp = "In the Apple Watch glance, or when there is only enough space to display one count or set of statistics in complications, prefer the ones for issues rather than the ones for PRs."
 	class var preferIssuesInWatch: Bool {
 		get { return get("SHOW_ISSUES_IN_WATCH_GLANCE") as? Bool ?? false }
@@ -590,6 +578,18 @@ final class Settings {
 
 	////////////////////////////// DEFAULT TRUE
 
+	static let autoMoveOnCommentMentionsHelp = "If your username is mentioned in an item's description or a comment posted inside it, move the item to the 'Mentioned' section."
+	class var autoMoveOnCommentMentions: Bool {
+		get { return get("AUTO_PARTICIPATE_IN_MENTIONS_KEY") as? Bool ?? true }
+		set { set("AUTO_PARTICIPATE_IN_MENTIONS_KEY", newValue) }
+	}
+
+	static let autoMoveOnTeamMentionsHelp = "If the name of one of the teams you belong to is mentioned in an item's description or a comment posted inside it, move the item to the 'Mentioned' section."
+	class var autoMoveOnTeamMentions: Bool {
+		get { return get("AUTO_PARTICIPATE_ON_TEAM_MENTIONS") as? Bool ?? true }
+		set { set("AUTO_PARTICIPATE_ON_TEAM_MENTIONS", newValue) }
+	}
+	
 	static let useVibrancyHelp = "Use Mac OS X Vibrancy to display the Trailer drop-down menu, if available on the current OS version. If the OS doesn't support this, this setting has no effect."
 	class var useVibrancy: Bool {
 		get { return get("USE_VIBRANCY_UI") as? Bool ?? true }

@@ -1004,12 +1004,12 @@ Token</string>
                                                     <button id="Afp-0h-LBr">
                                                         <rect key="frame" x="337" y="267" width="317" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Move items mentioning me to 'Participated'" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="28l-3y-WDO">
+                                                        <buttonCell key="cell" type="check" title="Move items mentioning me to 'Mentioned'" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="28l-3y-WDO">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
                                                         <connections>
-                                                            <action selector="autoParticipateOnMentionSelected:" target="vQH-WF-vh2" id="j2G-Jw-jzl"/>
+                                                            <action selector="autoMoveOnCommentMentionsSelected:" target="vQH-WF-vh2" id="j9z-NN-339"/>
                                                         </connections>
                                                     </button>
                                                     <button id="ZXi-oc-EhW">
@@ -1058,12 +1058,12 @@ Token</string>
                                                     <button id="Hmq-ch-Jqa">
                                                         <rect key="frame" x="337" y="234" width="332" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Move items mentioning my teams to 'Participated'" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="RD7-9b-mMf">
+                                                        <buttonCell key="cell" type="check" title="Move items mentioning my teams to 'Mentioned'" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="RD7-9b-mMf">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
                                                         <connections>
-                                                            <action selector="autoParticipateOnTeamMentionSelected:" target="vQH-WF-vh2" id="Meu-Gi-nGr"/>
+                                                            <action selector="autoMoveOnTeamMentionsSelected:" target="vQH-WF-vh2" id="SIT-OQ-fsI"/>
                                                         </connections>
                                                     </button>
                                                 </subviews>
@@ -1793,8 +1793,8 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="apiServerTestButton" destination="Tu3-cb-beM" id="tmV-b8-rij"/>
                 <outlet property="apiServerWebPath" destination="CT9-ev-oP0" id="Cr5-z4-MfR"/>
                 <outlet property="assignedPrHandlingPolicy" destination="lB5-eS-YSK" id="CV3-XC-bVk"/>
-                <outlet property="autoParticipateOnTeamMentions" destination="Hmq-ch-Jqa" id="siv-Py-TNp"/>
-                <outlet property="autoParticipateWhenMentioned" destination="Afp-0h-LBr" id="LFc-Y4-Hqr"/>
+                <outlet property="autoMoveOnCommentMentions" destination="Afp-0h-LBr" id="lCM-y3-0L3"/>
+                <outlet property="autoMoveOnTeamMentions" destination="Hmq-ch-Jqa" id="ycL-P6-Un3"/>
                 <outlet property="checkForUpdatesAutomatically" destination="vcg-xx-N3A" id="G9B-Yw-7hB"/>
                 <outlet property="checkForUpdatesLabel" destination="hkX-Jd-o2h" id="X6n-gD-voM"/>
                 <outlet property="checkForUpdatesSelector" destination="AT5-aS-AgQ" id="s48-Pe-cgZ"/>

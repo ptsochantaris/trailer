@@ -11,12 +11,8 @@ final class PullRequestCell: TrailerCell {
 
 		unselectedTitleColor = goneDark ? NSColor.controlHighlightColor() : NSColor.controlTextColor()
 
-		var _commentsNew = 0
+		let _commentsNew = pullRequest.showNewComments() ? pullRequest.unreadComments?.integerValue ?? 0 : 0
 		let _commentsTotal = pullRequest.totalComments?.integerValue ?? 0
-		let sectionIndex = pullRequest.sectionIndex?.integerValue ?? 0
-		if sectionIndex==Section.Mine.rawValue || sectionIndex==Section.Participated.rawValue || Settings.showCommentsEverywhere {
-			_commentsNew = pullRequest.unreadComments?.integerValue ?? 0
-		}
 
 		let _title = pullRequest.titleWithFont(titleFont, labelFont: detailFont, titleColor: unselectedTitleColor)
 		let _subtitle = pullRequest.subtitleWithFont(detailFont, lightColor: NSColor.grayColor(), darkColor: NSColor.darkGrayColor())

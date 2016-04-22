@@ -203,13 +203,13 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.accessoryType = check(Settings.hideUncommentedItems)
 				cell.descriptionLabel.text = Settings.hideUncommentedItemsHelp
 			case 2:
-				cell.titleLabel.text = "Move items menitoning me to 'Participated'"
-				cell.accessoryType = check(Settings.autoParticipateInMentions)
-				cell.descriptionLabel.text = Settings.autoParticipateInMentionsHelp
+				cell.titleLabel.text = "Move items menitoning me to 'Mentioned'"
+				cell.accessoryType = check(Settings.autoMoveOnCommentMentions)
+				cell.descriptionLabel.text = Settings.autoMoveOnCommentMentionsHelp
 			case 3:
-				cell.titleLabel.text = "Move items menitoning my teams to 'Participated'"
-				cell.accessoryType = check(Settings.autoParticipateOnTeamMentions)
-				cell.descriptionLabel.text = Settings.autoParticipateOnTeamMentionsHelp
+				cell.titleLabel.text = "Move items menitoning my teams to 'Mentioned'"
+				cell.accessoryType = check(Settings.autoMoveOnTeamMentions)
+				cell.descriptionLabel.text = Settings.autoMoveOnTeamMentionsHelp
 			case 4:
 				cell.titleLabel.text = "Open items at first unread comment"
 				cell.accessoryType = check(Settings.openPrAtFirstUnreadComment)
@@ -436,10 +436,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				Settings.hideUncommentedItems = !Settings.hideUncommentedItems
 				settingsChangedTimer.push()
 			case 2:
-				Settings.autoParticipateInMentions = !Settings.autoParticipateInMentions
+				Settings.autoMoveOnCommentMentions = !Settings.autoMoveOnCommentMentions
 				settingsChangedTimer.push()
 			case 3:
-				Settings.autoParticipateOnTeamMentions = !Settings.autoParticipateOnTeamMentions
+				Settings.autoMoveOnTeamMentions = !Settings.autoMoveOnTeamMentions
 				settingsChangedTimer.push()
 			case 4:
 				Settings.openPrAtFirstUnreadComment = !Settings.openPrAtFirstUnreadComment

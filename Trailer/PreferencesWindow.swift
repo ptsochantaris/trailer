@@ -55,8 +55,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	// Comments
 	@IBOutlet weak var disableAllCommentNotifications: NSButton!
-	@IBOutlet weak var autoParticipateOnTeamMentions: NSButton!
-	@IBOutlet weak var autoParticipateWhenMentioned: NSButton!
+	@IBOutlet weak var autoMoveOnTeamMentions: NSButton!
+	@IBOutlet weak var autoMoveOnCommentMentions: NSButton!
 
 	// Display
 	@IBOutlet weak var useVibrancy: NSButton!
@@ -211,8 +211,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		showAllComments.toolTip = Settings.showCommentsEverywhereHelp
 		hideUncommentedPrs.toolTip = Settings.hideUncommentedItemsHelp
 		openPrAtFirstUnreadComment.toolTip = Settings.openPrAtFirstUnreadCommentHelp
-		autoParticipateWhenMentioned.toolTip = Settings.autoParticipateInMentionsHelp
-		autoParticipateOnTeamMentions.toolTip = Settings.autoParticipateOnTeamMentionsHelp
+		autoMoveOnCommentMentions.toolTip = Settings.autoMoveOnCommentMentionsHelp
+		autoMoveOnTeamMentions.toolTip = Settings.autoMoveOnTeamMentionsHelp
 		disableAllCommentNotifications.toolTip = Settings.disableAllCommentNotificationsHelp
 		showLabels.toolTip = Settings.showLabelsHelp
 		showStatusItems.toolTip = Settings.showStatusItemsHelp
@@ -288,8 +288,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		includeStatusesInFiltering.integerValue = Settings.includeStatusesInFilter ? 1 : 0
 		dontConfirmRemoveAllMerged.integerValue = Settings.dontAskBeforeWipingMerged ? 1 : 0
 		hideUncommentedPrs.integerValue = Settings.hideUncommentedItems ? 1 : 0
-		autoParticipateWhenMentioned.integerValue = Settings.autoParticipateInMentions ? 1 : 0
-		autoParticipateOnTeamMentions.integerValue = Settings.autoParticipateOnTeamMentions ? 1 : 0
+		autoMoveOnCommentMentions.integerValue = Settings.autoMoveOnCommentMentions ? 1 : 0
+		autoMoveOnTeamMentions.integerValue = Settings.autoMoveOnTeamMentions ? 1 : 0
 		hideAvatars.integerValue = Settings.hideAvatars ? 1 : 0
 		dontKeepPrsMergedByMe.integerValue = Settings.dontKeepPrsMergedByMe ? 1 : 0
 		removeNotificationsWhenItemIsRemoved.integerValue = Settings.removeNotificationsWhenItemIsRemoved ? 1 : 0
@@ -468,14 +468,14 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		Settings.dontAskBeforeWipingClosed = (sender.integerValue==1)
 	}
 
-	@IBAction func autoParticipateOnMentionSelected(sender: NSButton) {
-		Settings.autoParticipateInMentions = (sender.integerValue==1)
+	@IBAction func autoMoveOnCommentMentionsSelected(sender: NSButton) {
+		Settings.autoMoveOnCommentMentions = (sender.integerValue==1)
 		DataManager.postProcessAllItems()
 		app.deferredUpdateTimer.push()
 	}
 
-	@IBAction func autoParticipateOnTeamMentionSelected(sender: NSButton) {
-		Settings.autoParticipateOnTeamMentions = (sender.integerValue==1)
+	@IBAction func autoMoveOnTeamMentionsSelected(sender: NSButton) {
+		Settings.autoMoveOnTeamMentions = (sender.integerValue==1)
 		DataManager.postProcessAllItems()
 		app.deferredUpdateTimer.push()
 	}

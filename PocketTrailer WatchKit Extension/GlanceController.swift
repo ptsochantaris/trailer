@@ -20,17 +20,17 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 	@IBOutlet weak var myCount: WKInterfaceLabel!
 	@IBOutlet weak var myGroup: WKInterfaceGroup!
 
-	@IBOutlet weak var mergedCount: WKInterfaceLabel!
-	@IBOutlet weak var mergedGroup: WKInterfaceGroup!
-
-	@IBOutlet weak var closedCount: WKInterfaceLabel!
-	@IBOutlet weak var closedGroup: WKInterfaceGroup!
+	@IBOutlet weak var mentionedCount: WKInterfaceLabel!
+	@IBOutlet weak var mentionedGroup: WKInterfaceGroup!
 
 	@IBOutlet weak var participatedCount: WKInterfaceLabel!
 	@IBOutlet weak var participatedGroup: WKInterfaceGroup!
 
 	@IBOutlet weak var otherCount: WKInterfaceLabel!
 	@IBOutlet weak var otherGroup: WKInterfaceGroup!
+
+	@IBOutlet weak var snoozingCount: WKInterfaceLabel!
+	@IBOutlet weak var snoozingGroup: WKInterfaceGroup!
 
 	@IBOutlet weak var unreadCount: WKInterfaceLabel!
 	@IBOutlet weak var unreadGroup: WKInterfaceGroup!
@@ -84,30 +84,19 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 
 			let r = result[showIssues ? "issues" : "prs"] as! [String : AnyObject]
 
-			let tc = r["total"] as! Int
+			let tc = r["total"] as? Int ?? 0
 			totalCount.setText("\(tc)")
 
-			let mc = r[Section.Mine.apiName()]?["total"] as! Int
-			myCount.setText("\(mc) \(Section.Mine.watchMenuName().uppercaseString)")
-			myGroup.setAlpha(mc==0 ? 0.4 : 1.0)
-
-			let pc = r[Section.Participated.apiName()]?["total"] as! Int
-			participatedCount.setText("\(pc) \(Section.Participated.watchMenuName().uppercaseString)")
-			participatedGroup.setAlpha(pc==0 ? 0.4 : 1.0)
-
-			if !showIssues {
-				let rc = r[Section.Merged.apiName()]?["total"] as! Int
-				mergedCount.setText("\(rc) \(Section.Merged.watchMenuName().uppercaseString)")
-				mergedGroup.setAlpha(rc==0 ? 0.4 : 1.0)
+			func setCount(s: Section, _ count: WKInterfaceLabel, _ group: WKInterfaceGroup) {
+				let c = r[s.apiName()]?["total"] as? Int ?? 0
+				count.setText("\(c) \(s.watchMenuName().uppercaseString)")
+				group.setAlpha(c==0 ? 0.4 : 1.0)
 			}
-
-			let cc = r[Section.Closed.apiName()]?["total"] as! Int
-			closedCount.setText("\(cc) \(Section.Closed.watchMenuName().uppercaseString)")
-			closedGroup.setAlpha(cc==0 ? 0.4 : 1.0)
-
-			let oc = r[Section.All.apiName()]?["total"] as! Int
-			otherCount.setText("\(oc) \(Section.All.watchMenuName().uppercaseString)")
-			otherGroup.setAlpha(oc==0 ? 0.4 : 1.0)
+			setCount(Section.Mine, myCount, myGroup)
+			setCount(Section.Participated, participatedCount, participatedGroup)
+			setCount(Section.Mentioned, mentionedCount, mentionedGroup)
+			setCount(Section.All, otherCount, otherGroup)
+			setCount(Section.Snoozed, snoozingCount, snoozingGroup)
 
 			let uc = r["unread"] as! Int
 			if uc==0 {
@@ -121,11 +110,10 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 				unreadGroup.setAlpha(1.0)
 			}
 
-			let lastRefresh = result["lastUpdated"] as! NSDate
-			if lastRefresh.isEqualToDate(never()) {
-				lastUpdate.setText("Not refreshed yet")
-			} else {
+			if let lastRefresh = result["lastUpdated"] as? NSDate where !lastRefresh.isEqualToDate(never()) {
 				lastUpdate.setText(shortDateFormatter.stringFromDate(lastRefresh))
+			} else {
+				lastUpdate.setText("Not refreshed yet")
 			}
 
 			errorText.setText(nil)
@@ -136,15 +124,9 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 	}
 
 	private func setErrorMode(mode: Bool) {
-		myGroup.setHidden(mode)
-		participatedGroup.setHidden(mode)
-		mergedGroup.setHidden(mode ? mode : showIssues)
-		closedGroup.setHidden(mode)
-		otherGroup.setHidden(mode)
-		unreadGroup.setHidden(mode)
-		totalGroup.setHidden(mode)
-		lastUpdate.setHidden(mode)
-		errorText.setHidden(!mode)
+		for g in [myGroup, participatedGroup, mentionedGroup, otherGroup, unreadGroup, totalGroup, lastUpdate, errorText] {
+			g.setHidden(mode)
+		}
 	}
 
 	private func updateComplications() {

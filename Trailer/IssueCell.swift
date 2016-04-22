@@ -11,12 +11,8 @@ final class IssueCell: TrailerCell {
 
 		unselectedTitleColor = goneDark ? NSColor.controlHighlightColor() : NSColor.controlTextColor()
 
-		var _commentsNew = 0
+		let _commentsNew = issue.showNewComments() ? issue.unreadComments?.integerValue ?? 0 : 0
 		let _commentsTotal = issue.totalComments?.integerValue ?? 0
-		let sectionIndex = issue.sectionIndex?.integerValue ?? 0
-		if sectionIndex==Section.Mine.rawValue || sectionIndex==Section.Participated.rawValue || Settings.showCommentsEverywhere {
-			_commentsNew = issue.unreadComments?.integerValue ?? 0
-		}
 
 		let _title = issue.titleWithFont(titleFont, labelFont: detailFont, titleColor: unselectedTitleColor)
 		let _subtitle = issue.subtitleWithFont(detailFont, lightColor: NSColor.grayColor(), darkColor: NSColor.darkGrayColor())

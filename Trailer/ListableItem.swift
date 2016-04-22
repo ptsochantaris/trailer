@@ -154,7 +154,7 @@ class ListableItem: DataItem {
 	}
 
 	final func showNewComments() -> Bool {
-		return Settings.showCommentsEverywhere || sectionIndex?.integerValue == Section.Mine.rawValue || sectionIndex?.integerValue == Section.Participated.rawValue
+		return Settings.showCommentsEverywhere || sectionIndex?.integerValue == Section.Mine.rawValue || sectionIndex?.integerValue == Section.Participated.rawValue || sectionIndex?.integerValue == Section.Mentioned.rawValue
 	}
 
 	final func stillSnoozing() -> Bool {
@@ -182,20 +182,20 @@ class ListableItem: DataItem {
 		else																{ targetSection = .All }
 
 		var needsManualCount = false
-		var moveToParticipated = false
+		var moveToMentioned = false
 		let outsideMySectionsButAwake = (targetSection == .All || targetSection == .None)
 
-		if outsideMySectionsButAwake && Settings.autoParticipateOnTeamMentions {
+		if outsideMySectionsButAwake && Settings.autoMoveOnTeamMentions {
 			if refersToMyTeams() {
-				moveToParticipated = true
+				moveToMentioned = true
 			} else {
 				needsManualCount = true
 			}
 		}
 
-		if !moveToParticipated && outsideMySectionsButAwake && Settings.autoParticipateInMentions {
+		if !moveToMentioned && outsideMySectionsButAwake && Settings.autoMoveOnCommentMentions {
 			if refersToMe() {
-				moveToParticipated = true
+				moveToMentioned = true
 			} else {
 				needsManualCount = true
 			}
@@ -207,8 +207,8 @@ class ListableItem: DataItem {
 
 		let isMuted = muted?.boolValue ?? false
 
-		if moveToParticipated {
-			targetSection = .Participated
+		if moveToMentioned {
+			targetSection = .Mentioned
 			if isMuted {
 				unreadComments = 0
 			} else {
@@ -221,7 +221,7 @@ class ListableItem: DataItem {
 			if !isMuted {
 				for c in try! managedObjectContext?.executeFetchRequest(f) as! [PRComment] {
 					if c.refersToMe() {
-						targetSection = .Participated
+						targetSection = .Mentioned
 					}
 					if let l = latestDate {
 						if c.createdAt?.compare(l)==NSComparisonResult.OrderedDescending {
@@ -417,14 +417,9 @@ class ListableItem: DataItem {
 
 	final class func badgeCountFromFetch(f: NSFetchRequest, inMoc: NSManagedObjectContext) -> Int {
 		var badgeCount:Int = 0
-		let showCommentsEverywhere = Settings.showCommentsEverywhere
 		for i in try! inMoc.executeFetchRequest(f) as! [ListableItem] {
-			if let sectionIndex = i.sectionIndex?.integerValue {
-				if showCommentsEverywhere || sectionIndex==Section.Mine.rawValue || sectionIndex==Section.Participated.rawValue {
-					if let c = i.unreadComments?.integerValue {
-						badgeCount += c
-					}
-				}
+			if i.showNewComments() {
+				badgeCount += (i.unreadComments?.integerValue ?? 0)
 			}
 		}
 		return badgeCount

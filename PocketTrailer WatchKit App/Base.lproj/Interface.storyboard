@@ -380,22 +380,9 @@
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     <edgeInsets key="margins" left="0.0" right="0.0" top="1" bottom="1"/>
                                 </group>
-                                <group width="130" alignment="center" verticalAlignment="center" radius="3" id="eKt-iR-WRT">
+                                <group width="130" alignment="center" verticalAlignment="center" radius="3" id="5Xx-J5-83g" userLabel="Mentioned Group">
                                     <items>
-                                        <label alignment="center" text="XX MERGED" textAlignment="center" numberOfLines="0" id="8hY-30-ORl">
-                                            <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
-                                            <fontDescription key="font" type="system" pointSize="11"/>
-                                            <variation key="device=watch42mm">
-                                                <fontDescription key="font" type="system" pointSize="12"/>
-                                            </variation>
-                                        </label>
-                                    </items>
-                                    <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    <edgeInsets key="margins" left="0.0" right="0.0" top="1" bottom="1"/>
-                                </group>
-                                <group width="130" alignment="center" verticalAlignment="center" radius="3" id="EHK-bL-jTG">
-                                    <items>
-                                        <label alignment="center" text="XX CLOSED" textAlignment="center" numberOfLines="0" id="tvP-EF-DnR">
+                                        <label alignment="center" text="XX MENTIONED" textAlignment="center" numberOfLines="0" id="ATT-Jm-sxQ" userLabel="XX MENTIONED">
                                             <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                             <fontDescription key="font" type="system" pointSize="11"/>
                                             <variation key="device=watch42mm">
@@ -409,6 +396,19 @@
                                 <group width="130" alignment="center" verticalAlignment="center" radius="3" id="DRK-15-McU">
                                     <items>
                                         <label alignment="center" text="XX OTHER" textAlignment="center" numberOfLines="0" id="UFt-fx-TSE">
+                                            <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                            <fontDescription key="font" type="system" pointSize="11"/>
+                                            <variation key="device=watch42mm">
+                                                <fontDescription key="font" type="system" pointSize="12"/>
+                                            </variation>
+                                        </label>
+                                    </items>
+                                    <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    <edgeInsets key="margins" left="0.0" right="0.0" top="1" bottom="1"/>
+                                </group>
+                                <group width="130" alignment="center" verticalAlignment="center" radius="3" id="W0L-Xq-nYX" userLabel="Snoozing Group">
+                                    <items>
+                                        <label alignment="center" text="XX SNOOZING" textAlignment="center" numberOfLines="0" id="ZOm-Vl-WvK" userLabel="XX SNOOZING">
                                             <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                             <fontDescription key="font" type="system" pointSize="11"/>
                                             <variation key="device=watch42mm">
@@ -438,13 +438,11 @@
                     </items>
                     <edgeInsets key="margins" left="0.0" right="0.0" top="0.0" bottom="14"/>
                     <connections>
-                        <outlet property="closedCount" destination="tvP-EF-DnR" id="hbB-mi-2Lo"/>
-                        <outlet property="closedGroup" destination="EHK-bL-jTG" id="n1R-bX-sgj"/>
                         <outlet property="errorText" destination="UEh-Kg-DUS" id="EXo-cp-gZp"/>
                         <outlet property="issueIcon" destination="J0s-24-eqf" id="m9V-84-tH5"/>
                         <outlet property="lastUpdate" destination="Qer-7L-pJ7" id="LK4-aR-MUG"/>
-                        <outlet property="mergedCount" destination="8hY-30-ORl" id="Jas-dU-HsL"/>
-                        <outlet property="mergedGroup" destination="eKt-iR-WRT" id="1lf-L1-BYa"/>
+                        <outlet property="mentionedCount" destination="ATT-Jm-sxQ" id="nes-UQ-FFF"/>
+                        <outlet property="mentionedGroup" destination="5Xx-J5-83g" id="AKY-Vq-hfT"/>
                         <outlet property="myCount" destination="fJB-oa-687" id="s3p-Ev-MQm"/>
                         <outlet property="myGroup" destination="uLm-0J-NPT" id="TAR-rU-4Ux"/>
                         <outlet property="otherCount" destination="UFt-fx-TSE" id="aiy-S8-LLd"/>
@@ -452,6 +450,8 @@
                         <outlet property="participatedCount" destination="E1B-vS-NEB" id="gwl-jI-qUt"/>
                         <outlet property="participatedGroup" destination="pi7-1E-Nwe" id="xaG-ec-KND"/>
                         <outlet property="prIcon" destination="xYb-hC-O7D" id="xyq-S7-npK"/>
+                        <outlet property="snoozingCount" destination="ZOm-Vl-WvK" id="ESV-BE-X3L"/>
+                        <outlet property="snoozingGroup" destination="W0L-Xq-nYX" id="hbj-zh-fiP"/>
                         <outlet property="totalCount" destination="3wl-rh-8m0" id="BgR-8y-n1Z"/>
                         <outlet property="totalGroup" destination="aEt-R2-txt" id="csy-mJ-Tf1"/>
                         <outlet property="unreadCount" destination="haI-qm-CXj" id="djY-l5-Twe"/>
