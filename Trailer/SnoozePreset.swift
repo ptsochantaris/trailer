@@ -110,4 +110,44 @@ final class SnoozePreset: NSManagedObject {
 			return NSCalendar.currentCalendar().nextDateAfterDate(now, matchingComponents: c, options: .MatchNextTimePreservingSmallerUnits)!
 		}
 	}
+
+	class func archivePresets() -> [[String:NSObject]] {
+		var archivedData = [[String:NSObject]]()
+		for a in SnoozePreset.allSnoozePresetsInMoc(mainObjectContext) {
+			var presetData = [String:NSObject]()
+			for (k , _) in a.entity.attributesByName {
+				if let v = a.valueForKey(k) as? NSObject {
+					presetData[k] = v
+				}
+			}
+			archivedData.append(presetData)
+		}
+		return archivedData
+	}
+
+	class func configureFromArchive(archive: [[String : NSObject]]) -> Bool {
+
+		let tempMoc = DataManager.tempContext()
+
+		for apiServer in allSnoozePresetsInMoc(tempMoc) {
+			tempMoc.deleteObject(apiServer)
+		}
+
+		for presetData in archive {
+			let a = newSnoozePresetInMoc(tempMoc)
+			let attributes = Array(a.entity.attributesByName.keys)
+			for (k,v) in presetData {
+				if attributes.contains(k) {
+					a.setValue(v, forKey: k)
+				}
+			}
+		}
+
+		do {
+			try tempMoc.save()
+			return true
+		} catch _ {
+			return false
+		}
+	}
 }

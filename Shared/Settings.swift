@@ -210,6 +210,7 @@ final class Settings {
 			}
 		}
 		settings["DB_CONFIG_OBJECTS"] = ApiServer.archiveApiServers()
+		settings["DB_SNOOZE_OBJECTS"] = SnoozePreset.archivePresets()
 		if !settings.writeToURL(url, atomically: true) {
 			DLog("Warning, exporting settings failed")
 			return false
@@ -231,6 +232,7 @@ final class Settings {
 			_settings_shared.synchronize()
 			clearCache()
 			return ApiServer.configureFromArchive(settings["DB_CONFIG_OBJECTS"] as! [String : [String : NSObject]])
+			&& SnoozePreset.configureFromArchive(settings["DB_SNOOZE_OBJECTS"] as! [[String : NSObject]])
 		}
 		return false
 	}
