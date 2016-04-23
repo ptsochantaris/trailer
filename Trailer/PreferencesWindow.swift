@@ -131,6 +131,10 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	// Tabs
 	@IBOutlet weak var tabs: NSTabView!
 
+	override init(contentRect: NSRect, styleMask aStyle: Int, backing bufferingType: NSBackingStoreType, `defer` flag: Bool) {
+		super.init(contentRect: contentRect, styleMask: aStyle, backing: bufferingType, defer: flag)
+	}
+
 	override func awakeFromNib() {
 		super.awakeFromNib()
 		delegate = self

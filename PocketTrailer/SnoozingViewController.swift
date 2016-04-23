@@ -75,7 +75,7 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 	func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
 		if section == 0 {
 			return nil
-		} else  if section == 1 {
+		} else if section == 1 {
 			return "Wake up a snoozing item immediately if any of these occur..."
 		} else {
 			return "Existing presets:"
