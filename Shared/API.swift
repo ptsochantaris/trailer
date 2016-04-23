@@ -300,7 +300,7 @@ final class API {
 
 		mainQueue.addOperationWithBlock {
 			do {
-				DLog("Comitting synced data")
+				DLog("Committing synced data")
 				try moc.save()
 				DLog("Synced data committed")
 			} catch {
