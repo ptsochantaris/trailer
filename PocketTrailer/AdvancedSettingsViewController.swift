@@ -48,7 +48,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 	private enum NormalSorting: Int {
 		case Age, Activity, Name
-		static let allTitles = ["Youngest first", "Most recently active", "Reverse alphabetically"]
+		static let allTitles = ["Oldest first", "Inactive for longest", "Alphabetically"]
 		func name() -> String {
 			return NormalSorting.allTitles[rawValue]
 		}
@@ -56,7 +56,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 	private enum ReverseSorting: Int {
 		case Age, Activity, Name
-		static let allTitles = ["Oldest first", "Inactive for longest", "Alphabetically"]
+		static let allTitles = ["Youngest first", "Most recently active", "Reverse alphabetically"]
 		func name() -> String {
 			return ReverseSorting.allTitles[rawValue]
 		}
