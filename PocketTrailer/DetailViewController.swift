@@ -28,7 +28,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 		_webView = WKWebView(frame: view.bounds, configuration: webConfiguration)
 		_webView!.navigationDelegate = self
 		_webView!.scrollView.contentInset = UIEdgeInsetsMake(64, 0, 0, 0)
-		_webView!.autoresizingMask = UIViewAutoresizing.FlexibleWidth.union(UIViewAutoresizing.FlexibleHeight)
+		_webView!.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
 		_webView!.translatesAutoresizingMaskIntoConstraints = true
 		_webView!.hidden = true
 		view.addSubview(_webView!)

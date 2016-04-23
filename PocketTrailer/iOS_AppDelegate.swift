@@ -317,8 +317,8 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 	}
 
 	func markEverythingRead() {
-		PullRequest.markEverythingRead(Section.None, moc: mainObjectContext)
-		Issue.markEverythingRead(Section.None, moc: mainObjectContext)
+		PullRequest.markEverythingRead(.None, moc: mainObjectContext)
+		Issue.markEverythingRead(.None, moc: mainObjectContext)
 		popupManager.getMasterController().reloadDataWithAnimation(false)
 		DataManager.saveDB()
 		app.updateBadge()

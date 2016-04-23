@@ -128,13 +128,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var allNewPrsSetting: NSPopUpButton!
 	@IBOutlet weak var allNewIssuesSetting: NSPopUpButton!
 
-
 	// Tabs
 	@IBOutlet weak var tabs: NSTabView!
-
-	override init(contentRect: NSRect, styleMask aStyle: Int, backing bufferingType: NSBackingStoreType, `defer` flag: Bool) {
-		super.init(contentRect: contentRect, styleMask: aStyle, backing: bufferingType, defer: flag)
-	}
 
 	override func awakeFromNib() {
 		super.awakeFromNib()
@@ -1166,7 +1161,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 								menuCell.menu?.addItem(m)
 								count += 1
 							}
-							let selectedIndex = tableColumn?.identifier == "prs" ? (r.displayPolicyForPrs?.integerValue ?? 0) : (r.displayPolicyForIssues?.integerValue ?? 0)
+							let selectedIndex = (tableColumn?.identifier == "prs" ? r.displayPolicyForPrs : r.displayPolicyForIssues)?.integerValue ?? 0
 							menuCell.selectItemAtIndex(selectedIndex)
 						}
 					}

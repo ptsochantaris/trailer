@@ -1,7 +1,7 @@
 
 import UIKit
 
-class SnoozingEditorViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIPickerViewDataSource, UIPickerViewDelegate {
+final class SnoozingEditorViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIPickerViewDataSource, UIPickerViewDelegate {
 
 	@IBOutlet weak var table: UITableView!
 	@IBOutlet weak var descriptionLabel: UILabel!

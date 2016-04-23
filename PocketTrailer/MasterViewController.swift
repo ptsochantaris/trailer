@@ -80,7 +80,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	func removeAllClosedConfirmed() {
-		if viewMode == MasterViewMode.PullRequests {
+		if viewMode == .PullRequests {
 			for p in PullRequest.allClosedRequestsInMoc(mainObjectContext) {
 				mainObjectContext.deleteObject(p)
 			}
@@ -93,7 +93,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	func removeAllMergedConfirmed() {
-		if viewMode == MasterViewMode.PullRequests {
+		if viewMode == .PullRequests {
 			for p in PullRequest.allMergedRequestsInMoc(mainObjectContext) {
 				mainObjectContext.deleteObject(p)
 			}
@@ -102,7 +102,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	func markAllAsRead() {
-		if viewMode == MasterViewMode.PullRequests {
+		if viewMode == .PullRequests {
 			for p in fetchedResultsController.fetchedObjects as! [PullRequest] {
 				p.catchUpWithComments()
 			}
@@ -194,15 +194,15 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	func reloadDataWithAnimation(animated: Bool) {
 
-		if !Repo.interestedInIssues() && Repo.interestedInPrs() && viewMode == MasterViewMode.Issues {
+		if !Repo.interestedInIssues() && Repo.interestedInPrs() && viewMode == .Issues {
 			showTabBar(false, animated: animated)
-			viewMode = MasterViewMode.PullRequests
+			viewMode = .PullRequests
 			return
 		}
 
-		if !Repo.interestedInPrs() && Repo.interestedInIssues() && viewMode == MasterViewMode.PullRequests {
+		if !Repo.interestedInPrs() && Repo.interestedInIssues() && viewMode == .PullRequests {
 			showTabBar(false, animated: animated)
-			viewMode = MasterViewMode.Issues
+			viewMode = .Issues
 			return
 		}
 
@@ -257,9 +257,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 				if let s = navigationController?.view {
 					let t = UITabBar(frame: CGRectMake(0, s.bounds.size.height-49, s.bounds.size.width, 49))
-					t.autoresizingMask = UIViewAutoresizing.FlexibleTopMargin.union(UIViewAutoresizing.FlexibleBottomMargin).union(UIViewAutoresizing.FlexibleWidth)
+					t.autoresizingMask = [.FlexibleTopMargin, .FlexibleBottomMargin, .FlexibleWidth]
 					t.items = [pullRequestsItem, issuesItem]
-					t.selectedItem = viewMode==MasterViewMode.PullRequests ? pullRequestsItem : issuesItem
+					t.selectedItem = (viewMode == .PullRequests) ? pullRequestsItem : issuesItem
 					t.delegate = self
 					t.itemPositioning = .Fill
 					s.addSubview(t)
@@ -269,7 +269,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 						t.transform = CGAffineTransformMakeTranslation(0, 49)
 						UIView.animateWithDuration(0.2,
 							delay: 0.0,
-							options: UIViewAnimationOptions.CurveEaseInOut,
+							options: .CurveEaseInOut,
 							animations: {
 								t.transform = CGAffineTransformIdentity
 							}, completion: nil);
@@ -288,7 +288,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 				if animated {
 					UIView.animateWithDuration(0.2,
 						delay: 0.0,
-						options: UIViewAnimationOptions.CurveEaseInOut,
+						options: .CurveEaseInOut,
 						animations: {
 							t.transform = CGAffineTransformMakeTranslation(0, 49)
 						}, completion: { [weak self] finished in
@@ -695,7 +695,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			detailViewController.navigationItem.leftBarButtonItem?.title = title
 		}
 
-		tabBar?.selectedItem = (viewMode==MasterViewMode.PullRequests) ? pullRequestsItem : issuesItem
+		tabBar?.selectedItem = (viewMode == .PullRequests) ? pullRequestsItem : issuesItem
 	}
 
 	private func unreadCommentCount(count: Int) -> String {

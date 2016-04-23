@@ -1,11 +1,12 @@
 import UIKit
 
-class RepoSettingsViewController: UITableViewController {
+final class RepoSettingsViewController: UITableViewController {
 
 	var repo: Repo?
-	var allPrsIndex: Int = -1
-	var allIssuesIndex: Int = -1
-	var allHidingIndex: Int = -1
+
+	private var allPrsIndex: Int = -1
+	private var allIssuesIndex: Int = -1
+	private var allHidingIndex: Int = -1
 
 	@IBOutlet weak var repoNameTitle: UILabel!
 
@@ -47,15 +48,15 @@ class RepoSettingsViewController: UITableViewController {
 		if repo == nil {
 			switch indexPath.section {
 			case 0:
-				cell.accessoryType = (allPrsIndex==indexPath.row) ? UITableViewCellAccessoryType.Checkmark : UITableViewCellAccessoryType.None
+				cell.accessoryType = (allPrsIndex==indexPath.row) ? .Checkmark : .None
 				cell.textLabel?.text = RepoDisplayPolicy.labels[indexPath.row]
 				cell.textLabel?.textColor = RepoDisplayPolicy.colors[indexPath.row]
 			case 1:
-				cell.accessoryType = (allIssuesIndex==indexPath.row) ? UITableViewCellAccessoryType.Checkmark : UITableViewCellAccessoryType.None
+				cell.accessoryType = (allIssuesIndex==indexPath.row) ? .Checkmark : .None
 				cell.textLabel?.text = RepoDisplayPolicy.labels[indexPath.row]
 				cell.textLabel?.textColor = RepoDisplayPolicy.colors[indexPath.row]
 			case 2:
-				cell.accessoryType = (allHidingIndex==indexPath.row) ? UITableViewCellAccessoryType.Checkmark : UITableViewCellAccessoryType.None
+				cell.accessoryType = (allHidingIndex==indexPath.row) ? .Checkmark : .None
 				cell.textLabel?.text = RepoHidingPolicy.labels[indexPath.row]
 				cell.textLabel?.textColor = RepoHidingPolicy.colors[indexPath.row]
 			default: break
@@ -63,21 +64,21 @@ class RepoSettingsViewController: UITableViewController {
 		} else {
 			switch indexPath.section {
 			case 0:
-				cell.accessoryType = ((repo?.displayPolicyForPrs?.integerValue ?? 0)==indexPath.row) ? UITableViewCellAccessoryType.Checkmark : UITableViewCellAccessoryType.None
+				cell.accessoryType = ((repo?.displayPolicyForPrs?.integerValue ?? 0)==indexPath.row) ? .Checkmark : .None
 				cell.textLabel?.text = RepoDisplayPolicy.labels[indexPath.row]
 				cell.textLabel?.textColor = RepoDisplayPolicy.colors[indexPath.row]
 			case 1:
-				cell.accessoryType = ((repo?.displayPolicyForIssues?.integerValue ?? 0)==indexPath.row) ? UITableViewCellAccessoryType.Checkmark : UITableViewCellAccessoryType.None
+				cell.accessoryType = ((repo?.displayPolicyForIssues?.integerValue ?? 0)==indexPath.row) ? .Checkmark : .None
 				cell.textLabel?.text = RepoDisplayPolicy.labels[indexPath.row]
 				cell.textLabel?.textColor = RepoDisplayPolicy.colors[indexPath.row]
 			case 2:
-				cell.accessoryType = ((repo?.itemHidingPolicy?.integerValue ?? 0)==indexPath.row) ? UITableViewCellAccessoryType.Checkmark : UITableViewCellAccessoryType.None
+				cell.accessoryType = ((repo?.itemHidingPolicy?.integerValue ?? 0)==indexPath.row) ? .Checkmark : .None
 				cell.textLabel?.text = RepoHidingPolicy.labels[indexPath.row]
 				cell.textLabel?.textColor = RepoHidingPolicy.colors[indexPath.row]
 			default: break
 			}
 		}
-		cell.selectionStyle = cell.accessoryType==UITableViewCellAccessoryType.Checkmark ? UITableViewCellSelectionStyle.None : UITableViewCellSelectionStyle.Default
+		cell.selectionStyle = cell.accessoryType == .Checkmark ? .None : .Default
 		return cell
 	}
 

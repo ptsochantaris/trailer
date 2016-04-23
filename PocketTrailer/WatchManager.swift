@@ -288,13 +288,13 @@ final class WatchManager : NSObject, WCSessionDelegate {
 	private func buildOverview() -> [String : AnyObject] {
 		let totalPrs = PullRequest.countAllRequestsInMoc(mainObjectContext)
 		var prs: [String : AnyObject] = [
-			"mine": prCountsForSection(Section.Mine),
-			"participated": prCountsForSection(Section.Participated),
-			"mentioned": prCountsForSection(Section.Mentioned),
-			"merged": prCountsForSection(Section.Merged),
-			"closed": prCountsForSection(Section.Closed),
-			"other": prCountsForSection(Section.All),
-			"snoozed": prCountsForSection(Section.Snoozed),
+			"mine": prCountsForSection(.Mine),
+			"participated": prCountsForSection(.Participated),
+			"mentioned": prCountsForSection(.Mentioned),
+			"merged": prCountsForSection(.Merged),
+			"closed": prCountsForSection(.Closed),
+			"other": prCountsForSection(.All),
+			"snoozed": prCountsForSection(.Snoozed),
 			"total": totalPrs,
 			"unread": PullRequest.badgeCountInMoc(mainObjectContext)
 		]
@@ -304,12 +304,12 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 		let totalIssues = Issue.countAllIssuesInMoc(mainObjectContext)
 		var issues: [String : AnyObject] = [
-			"mine": issueCountsForSection(Section.Mine),
-			"participated": issueCountsForSection(Section.Participated),
-			"mentioned": issueCountsForSection(Section.Mentioned),
-			"closed": issueCountsForSection(Section.Closed),
-			"other": issueCountsForSection(Section.All),
-			"snoozed": issueCountsForSection(Section.Snoozed),
+			"mine": issueCountsForSection(.Mine),
+			"participated": issueCountsForSection(.Participated),
+			"mentioned": issueCountsForSection(.Mentioned),
+			"closed": issueCountsForSection(.Closed),
+			"other": issueCountsForSection(.All),
+			"snoozed": issueCountsForSection(.Snoozed),
 			"total": totalIssues,
 			"unread": Issue.badgeCountInMoc(mainObjectContext)
 		]

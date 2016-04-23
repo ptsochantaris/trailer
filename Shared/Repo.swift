@@ -50,7 +50,7 @@ final class Repo: DataItem {
 	}
 
 	func shouldSync() -> Bool {
-		return (self.displayPolicyForPrs?.integerValue ?? 0) > 0 || (self.displayPolicyForIssues?.integerValue ?? 0) > 0
+		return (displayPolicyForPrs?.integerValue ?? 0) > 0 || (displayPolicyForIssues?.integerValue ?? 0) > 0
 	}
 
 	override func resetSyncState() {

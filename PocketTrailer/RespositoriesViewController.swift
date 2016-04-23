@@ -247,21 +247,21 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 
 	private func prTitleForRepo(repo: Repo) -> NSAttributedString {
 
-		let policy = RepoDisplayPolicy(rawValue: repo.displayPolicyForPrs?.integerValue ?? 0) ?? RepoDisplayPolicy.Hide
+		let policy = RepoDisplayPolicy(rawValue: repo.displayPolicyForPrs?.integerValue ?? 0) ?? .Hide
 		let attributes = attributesForEntryWithPolicy(policy)
 		return NSAttributedString(string: "PR Sections: \(policy.name())", attributes: attributes)
 	}
 
 	private func issueTitleForRepo(repo: Repo) -> NSAttributedString {
 
-		let policy = RepoDisplayPolicy(rawValue: repo.displayPolicyForIssues?.integerValue ?? 0) ?? RepoDisplayPolicy.Hide
+		let policy = RepoDisplayPolicy(rawValue: repo.displayPolicyForIssues?.integerValue ?? 0) ?? .Hide
 		let attributes = attributesForEntryWithPolicy(policy)
 		return NSAttributedString(string: "Issue Sections: \(policy.name())", attributes: attributes)
 	}
 
 	private func hidingTitleForRepo(repo: Repo) -> NSAttributedString {
 
-		let policy = RepoHidingPolicy(rawValue: repo.itemHidingPolicy?.integerValue ?? 0) ?? RepoHidingPolicy.NoHiding
+		let policy = RepoHidingPolicy(rawValue: repo.itemHidingPolicy?.integerValue ?? 0) ?? .NoHiding
 		let attributes = attributesForEntryWithPolicy(policy)
 		return NSAttributedString(string: policy.name(), attributes: attributes)
 	}

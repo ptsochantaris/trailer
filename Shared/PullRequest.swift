@@ -101,7 +101,7 @@ final class PullRequest: ListableItem {
 
 	class func markEverythingRead(section: Section, moc: NSManagedObjectContext) {
 		let f = NSFetchRequest(entityName: "PullRequest")
-		if section != Section.None {
+		if section != .None {
 			f.predicate = NSPredicate(format: "sectionIndex == %d", section.rawValue)
 		}
 		for pr in try! moc.executeFetchRequest(f) as! [PullRequest] {

@@ -100,11 +100,13 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 			var totalCount = prs["total"] as! Int
 			var a = NSMutableAttributedString(string: "\(totalCount): ", attributes: brightAttributes)
 			if totalCount>0 {
-				append(a, from: prs, section: Section.Mine)
-				append(a, from: prs, section: Section.Participated)
-				append(a, from: prs, section: Section.Merged)
-				append(a, from: prs, section: Section.Closed)
-				append(a, from: prs, section: Section.All)
+				append(a, from: prs, section: .Mine)
+				append(a, from: prs, section: .Participated)
+				append(a, from: prs, section: .Mentioned)
+				append(a, from: prs, section: .Merged)
+				append(a, from: prs, section: .Closed)
+				append(a, from: prs, section: .All)
+				append(a, from: prs, section: .Snoozed)
 				appendCommentCount(a, number: prs["unread"] as! Int)
 			} else {
 				a.appendAttributedString(NSAttributedString(string: prs["error"] as! String, attributes: [NSParagraphStyleAttributeName: paragraph]))
@@ -115,10 +117,12 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 			totalCount = issues["total"] as! Int
 			a = NSMutableAttributedString(string: "\(totalCount): ", attributes: brightAttributes)
 			if totalCount>0 {
-				append(a, from: issues, section: Section.Mine)
-				append(a, from: issues, section: Section.Participated)
-				append(a, from: issues, section: Section.Closed)
-				append(a, from: issues, section: Section.All)
+				append(a, from: issues, section: .Mine)
+				append(a, from: issues, section: .Participated)
+				append(a, from: issues, section: .Mentioned)
+				append(a, from: issues, section: .Closed)
+				append(a, from: issues, section: .All)
+				append(a, from: issues, section: .Snoozed)
 				appendCommentCount(a, number: issues["unread"] as! Int)
 			} else {
 				a.appendAttributedString(NSAttributedString(string: issues["error"] as! String, attributes: [NSParagraphStyleAttributeName: paragraph]))

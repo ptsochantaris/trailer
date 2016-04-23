@@ -92,11 +92,11 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 				count.setText("\(c) \(s.watchMenuName().uppercaseString)")
 				group.setAlpha(c==0 ? 0.4 : 1.0)
 			}
-			setCount(Section.Mine, myCount, myGroup)
-			setCount(Section.Participated, participatedCount, participatedGroup)
-			setCount(Section.Mentioned, mentionedCount, mentionedGroup)
-			setCount(Section.All, otherCount, otherGroup)
-			setCount(Section.Snoozed, snoozingCount, snoozingGroup)
+			setCount(.Mine, myCount, myGroup)
+			setCount(.Participated, participatedCount, participatedGroup)
+			setCount(.Mentioned, mentionedCount, mentionedGroup)
+			setCount(.All, otherCount, otherGroup)
+			setCount(.Snoozed, snoozingCount, snoozingGroup)
 
 			let uc = r["unread"] as! Int
 			if uc==0 {

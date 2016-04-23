@@ -64,7 +64,7 @@ final class Application: NSApplication {
 					default: break
 					}
 				}
-			} else if modifiers == NSEventModifierFlags.CommandKeyMask.union(NSEventModifierFlags.ShiftKeyMask) {
+			} else if modifiers == [.CommandKeyMask, .ShiftKeyMask] {
 				if let char = theEvent.charactersIgnoringModifiers {
 					if char == "Z" && sendAction(#selector(NSTextField.trailerRedo), to:nil, from:self) { return }
 				}

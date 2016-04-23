@@ -1,7 +1,7 @@
 
 import UIKit
 
-class SnoozingViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+final class SnoozingViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
 	@IBOutlet weak var table: UITableView!
 

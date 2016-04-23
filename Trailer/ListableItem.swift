@@ -249,12 +249,13 @@ class ListableItem: DataItem {
 
 		totalComments = comments.count
 
-		if let displayPolicy = RepoDisplayPolicy(rawValue: self is Issue ? (repo.displayPolicyForIssues?.integerValue ?? 0) : (repo.displayPolicyForPrs?.integerValue ?? 0)) {
+		let policy = (self is Issue ? repo.displayPolicyForIssues : repo.displayPolicyForPrs)?.integerValue ?? 0
+		if let displayPolicy = RepoDisplayPolicy(rawValue: policy) {
 			switch displayPolicy {
 			case .Hide:
 				targetSection = .None
 			case .Mine:
-				if targetSection == .All || targetSection == .Participated {
+				if targetSection == .All || targetSection == .Participated || targetSection == .Mentioned {
 					targetSection = .None
 				}
 			case .MineAndPaticipated:
@@ -300,7 +301,7 @@ class ListableItem: DataItem {
 		if targetSection != .None, let p = self as? PullRequest where p.shouldBeCheckedForRedStatusesInSection(targetSection) {
 			for s in p.displayedStatuses() {
 				if s.state != "success" {
-					targetSection = Section.None
+					targetSection = .None
 					break
 				}
 			}
