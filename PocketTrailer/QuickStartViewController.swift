@@ -73,7 +73,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 			if newServer.lastSyncSucceeded?.boolValue ?? false {
                 dismissViewControllerAnimated(true, completion: {
                     popupManager.getMasterController().updateTabBarVisibility(true)
-					showMessage("Setup complete!", "You can tweak options & behaviour from the settings.\n\nPocketTrailer only has read-only access to your GitHub data, so feel free to experiment, you can't damage your data or settings on GitHub.")
+					showMessage("Setup complete!", "You can tweak options & behaviour from the settings.\n\nTrailer has read-only access to your GitHub data, so feel free to experiment, you can't damage your data or settings on GitHub.")
                 })
 			} else {
 				showMessage("Syncing with this server failed - please check that your network connection is working and that you have pasted your token correctly", nil)

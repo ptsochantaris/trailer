@@ -486,8 +486,8 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		let item = fetchedResultsController.objectAtIndexPath(indexPath) as! ListableItem
 
-		let r:UITableViewRowAction
-		let m:UITableViewRowAction
+		let r,m: UITableViewRowAction
+
 		if item.unreadComments?.longLongValue ?? 0 > 0 {
 			r = UITableViewRowAction(style: .Normal, title: "Read") { [weak self] (action, indexPath) in
 				if let i = self?.fetchedResultsController.objectAtIndexPath(indexPath) as? ListableItem {
@@ -526,15 +526,53 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		var actions = [r,m]
 
 		if let sectionName = fetchedResultsController.sections?[indexPath.section].name where sectionName == Section.Merged.prMenuName() || sectionName == Section.Closed.prMenuName() {
-			actions.append(UITableViewRowAction(style: .Destructive, title: "Delete") { [weak self] (action, indexPath) in
+			let d = UITableViewRowAction(style: .Destructive, title: "Delete") { [weak self] (action, indexPath) in
 				if let i = self?.fetchedResultsController.objectAtIndexPath(indexPath) as? ListableItem {
 					mainObjectContext.deleteObject(i)
 					DataManager.saveDB()
 				}
-			})
+			}
+			actions.append(d)
+		} else {
+			let s: UITableViewRowAction
+			if item.snoozeUntil != nil {
+				s = UITableViewRowAction(style: .Normal, title: "Wake") { [weak self] (action, indexPath) in
+					if let i = self?.fetchedResultsController.objectAtIndexPath(indexPath) as? ListableItem {
+						i.wakeUp()
+						DataManager.saveDB()
+						tableView.setEditing(false, animated: true)
+					}
+				}
+			} else {
+				s = UITableViewRowAction(style: .Normal, title: "Snooze") { [weak self] (action, indexPath) in
+					if let i = self?.fetchedResultsController.objectAtIndexPath(indexPath) as? ListableItem {
+						self?.showSnoozeMenuFor(i)
+					}
+				}
+			}
+			s.backgroundColor = UIColor.darkGrayColor()
+			actions.append(s)
 		}
 
 		return actions
+	}
+
+	private func showSnoozeMenuFor(i: ListableItem) {
+		let items = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)
+		let t = i.title ?? "(no title)"
+		let hasPresets = items.count > 0
+		let a = UIAlertController(title: hasPresets ? "Snooze" : nil,
+		                          message: hasPresets ? t : "You do not currently have any snoozing presets configured. Please add some in the relevant preferences tab.",
+		                          preferredStyle: .ActionSheet)
+		for item in items {
+			a.addAction(UIAlertAction(title: item.listDescription(), style: .Default) { action in
+				i.snoozeUntil = item.wakeupDateFromNow()
+				i.postProcess()
+				DataManager.saveDB()
+			})
+		}
+		a.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
+		presentViewController(a, animated: true, completion: nil)
 	}
 
 	private var fetchedResultsController: NSFetchedResultsController {
@@ -622,7 +660,11 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		if app.isRefreshing {
 			title = "Refreshing..."
-			tableView.tableFooterView = EmptyView(message: DataManager.reasonForEmptyWithFilter(searchField.text), parentWidth: view.bounds.size.width)
+			if viewMode == .PullRequests {
+				tableView.tableFooterView = EmptyView(message: DataManager.reasonForEmptyPrsWithFilter(searchField.text), parentWidth: view.bounds.size.width)
+			} else {
+				tableView.tableFooterView = EmptyView(message: DataManager.reasonForEmptyIssuesWithFilter(searchField.text), parentWidth: view.bounds.size.width)
+			}
 			if let r = refreshControl {
 				r.attributedTitle = NSAttributedString(string: api.lastUpdateDescription(), attributes: nil)
 				if !r.refreshing {
@@ -634,7 +676,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			let count = fetchedResultsController.fetchedObjects?.count ?? 0
 			if viewMode == .PullRequests {
 				title = pullRequestsTitle(true)
-				tableView.tableFooterView = (count == 0) ? EmptyView(message: DataManager.reasonForEmptyWithFilter(searchField.text), parentWidth: view.bounds.size.width) : nil
+				tableView.tableFooterView = (count == 0) ? EmptyView(message: DataManager.reasonForEmptyPrsWithFilter(searchField.text), parentWidth: view.bounds.size.width) : nil
 			} else {
 				title = issuesTitle()
 				tableView.tableFooterView = (count == 0) ? EmptyView(message: DataManager.reasonForEmptyIssuesWithFilter(searchField.text), parentWidth: view.bounds.size.width) : nil

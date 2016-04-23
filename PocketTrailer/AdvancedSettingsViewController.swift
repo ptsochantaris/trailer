@@ -41,9 +41,9 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	}
 
 	private enum SettingsSection: Int {
-		case Refresh, Display, Filtering, Issues, Comments, Repos, StausesAndLabels, History, Confirm, Sort, Misc
-		static let rowCounts = [3, 6, 7, 1, 7, 2, 8, 3, 2, 3, 2]
-		static let allNames = ["Auto Refresh", "Display", "Filtering", "Issues", "Comments", "Watchlist", "Statuses & Labels", "History", "Don't confirm when", "Sorting", "Misc"]
+		case Refresh, Display, Filtering, AppleWatch, Comments, Repos, StausesAndLabels, History, Confirm, Sort, Misc
+		static let rowCounts = [3, 5, 7, 2, 7, 2, 8, 3, 2, 3, 2]
+		static let allNames = ["Auto Refresh", "Display", "Filtering", "Apple Watch", "Comments", "Watchlist", "Statuses & Labels", "History", "Don't confirm when", "Sorting", "Misc"]
 	}
 
 	private enum NormalSorting: Int {
@@ -143,10 +143,6 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.accessoryType = check(Settings.showReposInName)
 				cell.descriptionLabel.text = Settings.showReposInNameHelp
 			case 4:
-				cell.titleLabel.text = "Hide descriptions in Apple Watch detail views"
-				cell.accessoryType = check(Settings.hideDescriptionInWatchDetail)
-				cell.descriptionLabel.text = Settings.hideDescriptionInWatchDetailHelp
-			case 5:
 				cell.titleLabel.text = "Open items directly in Safari if internal web view is not already visible."
 				cell.accessoryType = check(Settings.openItemsDirectlyInSafari)
 				cell.descriptionLabel.text = Settings.openItemsDirectlyInSafariHelp
@@ -184,12 +180,16 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.descriptionLabel.text = Settings.includeNumbersInFilterHelp
 			default: break
 			}
-		} else if indexPath.section == SettingsSection.Issues.rawValue {
+		} else if indexPath.section == SettingsSection.AppleWatch.rawValue {
 			switch indexPath.row {
 			case 0:
 				cell.titleLabel.text = "Prefer issues instead of PRs in Apple Watch glances & complications"
 				cell.accessoryType = check(Settings.preferIssuesInWatch)
 				cell.descriptionLabel.text = Settings.preferIssuesInWatchHelp
+			case 1:
+				cell.titleLabel.text = "Hide descriptions in Apple Watch detail views"
+				cell.accessoryType = check(Settings.hideDescriptionInWatchDetail)
+				cell.descriptionLabel.text = Settings.hideDescriptionInWatchDetailHelp
 			default: break
 			}
 		} else if indexPath.section == SettingsSection.Comments.rawValue {
@@ -397,8 +397,6 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				Settings.showReposInName = !Settings.showReposInName
 				settingsChangedTimer.push()
 			case 4:
-				Settings.hideDescriptionInWatchDetail = !Settings.hideDescriptionInWatchDetail
-			case 5:
 				Settings.openItemsDirectlyInSafari = !Settings.openItemsDirectlyInSafari
 			default: break
 			}
@@ -421,10 +419,12 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			default: break
 			}
 			settingsChangedTimer.push()
-		} else if indexPath.section == SettingsSection.Issues.rawValue {
+		} else if indexPath.section == SettingsSection.AppleWatch.rawValue {
 			switch indexPath.row {
 			case 0:
 				Settings.preferIssuesInWatch = !Settings.preferIssuesInWatch
+			case 1:
+				Settings.hideDescriptionInWatchDetail = !Settings.hideDescriptionInWatchDetail
 			default: break
 			}
 		} else if indexPath.section == SettingsSection.Comments.rawValue {

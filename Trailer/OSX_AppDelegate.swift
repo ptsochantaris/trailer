@@ -957,7 +957,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		prMenu.messageView?.removeFromSuperview()
 
 		if prMenu.table.numberOfRows == 0 {
-			let m = MessageView(frame: CGRectMake(0, 0, MENU_WIDTH, 100), message: DataManager.reasonForEmptyWithFilter(prMenu.filter.stringValue))
+			let m = MessageView(frame: CGRectMake(0, 0, MENU_WIDTH, 100), message: DataManager.reasonForEmptyPrsWithFilter(prMenu.filter.stringValue))
 			prMenu.messageView = m
 			prMenu.contentView!.addSubview(m)
 		}

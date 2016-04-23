@@ -187,8 +187,7 @@ final class DataManager : NSObject {
 							if pr.lastStatusNotified != displayText && pr.postSyncAction?.integerValue != PostSyncAction.NoteNew.rawValue {
 								if pr.snoozeUntil != nil && Settings.snoozeWakeOnStatusUpdate {
 									DLog("Waking up snoozed PR ID %@ because of a status update", pr.serverId)
-									pr.snoozeUntil = nil
-									pr.postProcess()
+									pr.wakeUp()
 								}
 								app.postNotificationOfType(.NewStatus, forItem: s)
 								pr.lastStatusNotified = displayText
@@ -271,7 +270,7 @@ final class DataManager : NSObject {
 		}
 	}
 
-	class func reasonForEmptyWithFilter(filterValue: String?) -> NSAttributedString {
+	class func reasonForEmptyPrsWithFilter(filterValue: String?) -> NSAttributedString {
 		let openRequests = PullRequest.countOpenRequestsInMoc(mainObjectContext)
 
 		var color = COLOR_CLASS.lightGrayColor()

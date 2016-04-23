@@ -157,6 +157,11 @@ class ListableItem: DataItem {
 		return Settings.showCommentsEverywhere || sectionIndex?.integerValue == Section.Mine.rawValue || sectionIndex?.integerValue == Section.Participated.rawValue || sectionIndex?.integerValue == Section.Mentioned.rawValue
 	}
 
+	final func wakeUp() {
+		snoozeUntil = nil
+		postProcess()
+	}
+
 	final func stillSnoozing() -> Bool {
 		if let s = snoozeUntil {
 			if s.compare(NSDate()) == .OrderedAscending {

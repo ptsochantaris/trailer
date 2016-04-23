@@ -50,15 +50,13 @@ final class PRComment: DataItem {
 			if refersToMe() {
 				if item.snoozeUntil != nil && Settings.snoozeWakeOnMention {
 					DLog("Waking up snoozed item ID %@ because of mention", item.serverId)
-					item.snoozeUntil = nil
-					item.postProcess()
+					item.wakeUp()
 				}
 				app.postNotificationOfType(.NewMention, forItem: self)
 			} else if !isMine() {
 				if item.snoozeUntil != nil && Settings.snoozeWakeOnComment {
 					DLog("Waking up snoozed item ID %@ because of posted comment", item.serverId)
-					item.snoozeUntil = nil
-					item.postProcess()
+					item.wakeUp()
 				}
 				if !Settings.disableAllCommentNotifications && item.showNewComments() && !isMine() {
 					if let authorName = userName {

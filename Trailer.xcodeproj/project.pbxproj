@@ -67,6 +67,8 @@
 		166A84C01A4582C100A3B292 /* ServerDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166A84BF1A4582C100A3B292 /* ServerDetailViewController.swift */; };
 		166A84C21A45A37700A3B292 /* AdvancedSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166A84C11A45A37700A3B292 /* AdvancedSettingsViewController.swift */; };
 		166A84C41A45CEE000A3B292 /* PickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166A84C31A45CEE000A3B292 /* PickerViewController.swift */; };
+		166ADEC61CCAFF77001BA61F /* SnoozingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166ADEC51CCAFF77001BA61F /* SnoozingViewController.swift */; };
+		166ADEC81CCB009A001BA61F /* SnoozingEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166ADEC71CCB009A001BA61F /* SnoozingEditorViewController.swift */; };
 		1671A11F1AC73CCB0047440A /* SetupAssistant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1671A11E1AC73CCB0047440A /* SetupAssistant.swift */; };
 		1671A1231AC74BC30047440A /* SetupAssistant.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1671A1221AC74BC30047440A /* SetupAssistant.xib */; };
 		16813CBF1BA16D660020F8EB /* CommonController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16813CBE1BA16D660020F8EB /* CommonController.swift */; };
@@ -273,6 +275,8 @@
 		166A84BF1A4582C100A3B292 /* ServerDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ServerDetailViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		166A84C11A45A37700A3B292 /* AdvancedSettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdvancedSettingsViewController.swift; sourceTree = "<group>"; };
 		166A84C31A45CEE000A3B292 /* PickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerViewController.swift; sourceTree = "<group>"; };
+		166ADEC51CCAFF77001BA61F /* SnoozingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SnoozingViewController.swift; sourceTree = "<group>"; };
+		166ADEC71CCB009A001BA61F /* SnoozingEditorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SnoozingEditorViewController.swift; sourceTree = "<group>"; };
 		1671A11E1AC73CCB0047440A /* SetupAssistant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SetupAssistant.swift; sourceTree = "<group>"; };
 		1671A1221AC74BC30047440A /* SetupAssistant.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SetupAssistant.xib; sourceTree = "<group>"; };
 		1672DF2D1AB0D7CC00381AEB /* PocketTrailer WatchKit Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "PocketTrailer WatchKit Extension.entitlements"; sourceTree = "<group>"; };
@@ -753,6 +757,8 @@
 				16C90F011B13BC180095E8D5 /* RepoSettingsViewController.swift */,
 				16F4136F1BA5850A006B0195 /* RepoCell.swift */,
 				165C490F1BA63B45006BBCF5 /* AdvancedSettingsCell.swift */,
+				166ADEC51CCAFF77001BA61F /* SnoozingViewController.swift */,
+				166ADEC71CCB009A001BA61F /* SnoozingEditorViewController.swift */,
 			);
 			name = Settings;
 			sourceTree = "<group>";
@@ -1011,9 +1017,11 @@
 				16CBE1C61A2DFBA500485053 /* Settings.swift in Sources */,
 				161B851D1AB8E12C00AD4C5D /* Team.swift in Sources */,
 				16EE6AD01A9A711C000A8483 /* CountLabel.swift in Sources */,
+				166ADEC61CCAFF77001BA61F /* SnoozingViewController.swift in Sources */,
 				16B3B3181A34E8E2000BE6CC /* ApiServer.swift in Sources */,
 				16259BCE1A449400009C5745 /* OpenInSafariActivity.swift in Sources */,
 				16C9A27A1A44DD0200EE54EC /* CommentBlacklistViewController.swift in Sources */,
+				166ADEC81CCB009A001BA61F /* SnoozingEditorViewController.swift in Sources */,
 				165C49101BA63B45006BBCF5 /* AdvancedSettingsCell.swift in Sources */,
 				164840FC1AD196D6009E6383 /* SettingsManager.swift in Sources */,
 				1633C1931ABCEC4A0086C692 /* Issue.swift in Sources */,

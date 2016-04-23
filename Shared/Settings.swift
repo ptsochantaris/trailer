@@ -558,7 +558,7 @@ final class Settings {
 		set { set("DUMP_API_RESPONSES_IN_CONSOLE", newValue) }
 	}
 
-	static let openItemsDirectlyInSafariHelp = "Directly open items in the Safari browser rather than the internal web view. Especially useful on iPad when using split-screen view, where you can pull in PocktetTrailer from the side but stay in Safari, or on iPhone where you can use the status-bar button as a back button. If the detail view is already visible (for instance when runing in full-screen mode on iPad) the internal view will still get used, even if this option is turned on."
+	static let openItemsDirectlyInSafariHelp = "Directly open items in the Safari browser rather than the internal web view. Especially useful on iPad when using split-screen view, where you can pull in Trailer from the side but stay in Safari, or on iPhone where you can use the status-bar button as a back button. If the detail view is already visible (for instance when runing in full-screen mode on iPad) the internal view will still get used, even if this option is turned on."
 	class var openItemsDirectlyInSafari: Bool {
 		get { return get("OPEN_ITEMS_DIRECTLY_IN_SAFARI") as? Bool ?? false }
 		set { set("OPEN_ITEMS_DIRECTLY_IN_SAFARI", newValue) }

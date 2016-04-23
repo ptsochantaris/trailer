@@ -299,7 +299,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			"unread": PullRequest.badgeCountInMoc(mainObjectContext)
 		]
 		if totalPrs==0 {
-			prs["error"] = DataManager.reasonForEmptyWithFilter(nil).string
+			prs["error"] = DataManager.reasonForEmptyPrsWithFilter(nil).string
 		}
 
 		let totalIssues = Issue.countAllIssuesInMoc(mainObjectContext)

@@ -149,10 +149,10 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 	@IBAction func deleteSelected(sender: UIBarButtonItem) {
 		let a = UIAlertController(title: "Delete API Server",
 			message: "Are you sure you want to remove this API server from your list?",
-			preferredStyle: UIAlertControllerStyle.Alert)
+			preferredStyle: .Alert)
 
-		a.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil))
-		a.addAction(UIAlertAction(title: "Delete", style: UIAlertActionStyle.Destructive) { [weak self] action in
+		a.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
+		a.addAction(UIAlertAction(title: "Delete", style: .Destructive) { [weak self] action in
 			self?.deleteServer()
 		})
 

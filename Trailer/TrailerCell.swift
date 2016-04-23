@@ -176,8 +176,7 @@ class TrailerCell: NSTableCellView {
 
 	func wakeUpSelected() {
 		if let item = associatedDataItem() {
-			item.snoozeUntil = nil
-			item.postProcess()
+			item.wakeUp()
 			saveAndRequestMenuUpdate(item)
 		}
 	}
