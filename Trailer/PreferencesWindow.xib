@@ -1384,64 +1384,53 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </connections>
                                                     </button>
                                                     <popUpButton verticalHuggingPriority="750" id="vch-ax-HsD">
-                                                        <rect key="frame" x="18" y="184" width="105" height="26"/>
+                                                        <rect key="frame" x="18" y="184" width="115" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="dH8-z8-RVI">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="menu"/>
-                                                            <menu key="menu" showsStateColumn="NO" id="ruf-c2-u9t"/>
+                                                            <menu key="menu" id="ruf-c2-u9t"/>
                                                         </popUpButtonCell>
                                                         <connections>
                                                             <action selector="snoozeOptionsChanged:" target="vQH-WF-vh2" id="2cz-k6-NfL"/>
                                                         </connections>
                                                     </popUpButton>
                                                     <popUpButton verticalHuggingPriority="750" id="c3Y-1q-UD3">
-                                                        <rect key="frame" x="141" y="184" width="105" height="26"/>
+                                                        <rect key="frame" x="143" y="184" width="115" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="gau-PU-aUA">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="menu"/>
-                                                            <menu key="menu" showsStateColumn="NO" id="kLu-rj-cM0"/>
+                                                            <menu key="menu" id="kLu-rj-cM0"/>
                                                         </popUpButtonCell>
                                                         <connections>
                                                             <action selector="snoozeOptionsChanged:" target="vQH-WF-vh2" id="iwi-eC-4Df"/>
                                                         </connections>
                                                     </popUpButton>
                                                     <popUpButton verticalHuggingPriority="750" id="Yq0-Of-I1d">
-                                                        <rect key="frame" x="264" y="184" width="105" height="26"/>
+                                                        <rect key="frame" x="268" y="184" width="115" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="1Ge-1e-b8J">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="menu"/>
-                                                            <menu key="menu" showsStateColumn="NO" id="hh1-Z5-vlG"/>
+                                                            <menu key="menu" id="hh1-Z5-vlG"/>
                                                         </popUpButtonCell>
                                                         <connections>
                                                             <action selector="snoozeOptionsChanged:" target="vQH-WF-vh2" id="P8a-6J-tof"/>
                                                         </connections>
                                                     </popUpButton>
                                                     <popUpButton verticalHuggingPriority="750" id="PLV-LI-rNE">
-                                                        <rect key="frame" x="141" y="115" width="105" height="26"/>
+                                                        <rect key="frame" x="143" y="105" width="115" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="H86-ef-er1">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="menu"/>
-                                                            <menu key="menu" showsStateColumn="NO" id="ug6-Ca-YW6"/>
+                                                            <menu key="menu" id="ug6-Ca-YW6"/>
                                                         </popUpButtonCell>
                                                         <connections>
                                                             <action selector="snoozeOptionsChanged:" target="vQH-WF-vh2" id="xeF-rR-Q1h"/>
                                                         </connections>
                                                     </popUpButton>
-                                                    <button verticalHuggingPriority="750" id="RcV-Yx-VNJ">
-                                                        <rect key="frame" x="252" y="13" width="135" height="32"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                                                        <buttonCell key="cell" type="push" title="Delete Preset" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="od7-iX-GEb">
-                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="deleteSnoozePresetSelected:" target="vQH-WF-vh2" id="fkL-Gk-JYI"/>
-                                                        </connections>
-                                                    </button>
                                                     <button verticalHuggingPriority="750" id="aL1-em-nvV">
                                                         <rect key="frame" x="14" y="13" width="58" height="32"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
@@ -1454,14 +1443,14 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </connections>
                                                     </button>
                                                     <popUpButton verticalHuggingPriority="750" id="51F-wD-jRc">
-                                                        <rect key="frame" x="18" y="115" width="105" height="26"/>
+                                                        <rect key="frame" x="18" y="105" width="115" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <popUpButtonCell key="cell" type="push" title="Any Day" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="hol-3F-z8k" id="gl7-xO-9dz">
+                                                        <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="gl7-xO-9dz">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="menu"/>
-                                                            <menu key="menu" showsStateColumn="NO" id="ZuG-Z3-7sc">
+                                                            <menu key="menu" id="ZuG-Z3-7sc">
                                                                 <items>
-                                                                    <menuItem title="Any Day" state="on" id="hol-3F-z8k">
+                                                                    <menuItem title="Any Day" id="hol-3F-z8k">
                                                                         <modifierMask key="keyEquivalentModifierMask"/>
                                                                     </menuItem>
                                                                 </items>
@@ -1472,19 +1461,19 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </connections>
                                                     </popUpButton>
                                                     <popUpButton verticalHuggingPriority="750" id="xLn-A0-wrg">
-                                                        <rect key="frame" x="264" y="115" width="105" height="26"/>
+                                                        <rect key="frame" x="268" y="105" width="115" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="vus-t5-ks8">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="menu"/>
-                                                            <menu key="menu" showsStateColumn="NO" id="S1B-Oe-647"/>
+                                                            <menu key="menu" id="S1B-Oe-647"/>
                                                         </popUpButtonCell>
                                                         <connections>
                                                             <action selector="snoozeOptionsChanged:" target="vQH-WF-vh2" id="9gK-dx-ohn"/>
                                                         </connections>
                                                     </popUpButton>
                                                     <button id="nPv-hg-fBq">
-                                                        <rect key="frame" x="19" y="151" width="257" height="18"/>
+                                                        <rect key="frame" x="19" y="141" width="257" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="radio" title="Snooze until a specific day and/or time" bezelStyle="regularSquare" imagePosition="left" alignment="left" enabled="NO" inset="2" id="rgO-Bp-SJN">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1506,7 +1495,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </connections>
                                                     </button>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="If1-BU-NTa">
-                                                        <rect key="frame" x="249" y="190" width="13" height="17"/>
+                                                        <rect key="frame" x="256" y="190" width="13" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="+" id="59O-bO-PLd">
                                                             <font key="font" metaFont="systemBold"/>
@@ -1515,7 +1504,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="fvg-Jr-yj9">
-                                                        <rect key="frame" x="128" y="121" width="8" height="17"/>
+                                                        <rect key="frame" x="133" y="112" width="8" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title=":" id="kRd-Z6-wfs">
                                                             <font key="font" metaFont="systemBold"/>
@@ -1524,7 +1513,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="izk-el-koB">
-                                                        <rect key="frame" x="251" y="121" width="8" height="17"/>
+                                                        <rect key="frame" x="258" y="112" width="8" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title=":" id="PHm-t1-ITC">
                                                             <font key="font" metaFont="systemBold"/>
@@ -1533,7 +1522,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Erq-u5-k78">
-                                                        <rect key="frame" x="126" y="190" width="13" height="17"/>
+                                                        <rect key="frame" x="131" y="190" width="13" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="+" id="z33-tA-HN2">
                                                             <font key="font" metaFont="systemBold"/>
@@ -1541,6 +1530,17 @@ to a higher number in order to keep your API usage reasonable</string>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
+                                                    <button verticalHuggingPriority="750" id="RcV-Yx-VNJ">
+                                                        <rect key="frame" x="251" y="13" width="135" height="32"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                                        <buttonCell key="cell" type="push" title="Delete Preset" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="od7-iX-GEb">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="deleteSnoozePresetSelected:" target="vQH-WF-vh2" id="fkL-Gk-JYI"/>
+                                                        </connections>
+                                                    </button>
                                                 </subviews>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
@@ -1548,7 +1548,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                         </box>
                                         <button id="YS0-gj-k5Q">
                                             <rect key="frame" x="564" y="24" width="142" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                             <buttonCell key="cell" type="check" title="Hide snoozed items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="faa-p8-d9y">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>

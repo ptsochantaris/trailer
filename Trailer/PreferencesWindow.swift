@@ -1260,28 +1260,28 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	private func fillSnoozingDropdowns() {
-		snoozeDurationDays.addItemWithTitle("")
-		snoozeDurationHours.addItemWithTitle("")
-		snoozeDurationMinutes.addItemWithTitle("")
+		snoozeDurationDays.addItemWithTitle("No Days")
+		snoozeDurationHours.addItemWithTitle("No Hours")
+		snoozeDurationMinutes.addItemWithTitle("No Minutes")
 
-		snoozeDurationDays.addItemWithTitle("1 day")
-		snoozeDurationHours.addItemWithTitle("1 hour")
-		snoozeDurationMinutes.addItemWithTitle("1 minute")
+		snoozeDurationDays.addItemWithTitle("1 Day")
+		snoozeDurationHours.addItemWithTitle("1 Hour")
+		snoozeDurationMinutes.addItemWithTitle("1 Minute")
 
 		var titles = [String]()
 
 		for f in 2..<400 {
-			titles.append("\(f) days")
+			titles.append("\(f) Days")
 		}
 		snoozeDurationDays.addItemsWithTitles(titles)
 		titles.removeAll()
 		for f in 2..<24 {
-			titles.append("\(f) hours")
+			titles.append("\(f) Hours")
 		}
 		snoozeDurationHours.addItemsWithTitles(titles)
 		titles.removeAll()
 		for f in 2..<60 {
-			titles.append("\(f) minutes")
+			titles.append("\(f) Minutes")
 		}
 		snoozeDurationMinutes.addItemsWithTitles(titles)
 		titles.removeAll()
@@ -1359,24 +1359,28 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
+	private func commitSnoozeSettings() {
+		snoozePresetsList.reloadData()
+		DataManager.saveDB()
+		app.deferredUpdateTimer.push()
+		Settings.possibleExport(nil)
+	}
+
 	@IBAction func createNewSnoozePresetSelected(sender: NSButton) {
 		let s = SnoozePreset.newSnoozePresetInMoc(mainObjectContext)
-		snoozePresetsList.reloadData()
+		commitSnoozeSettings()
 		if let index = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext).indexOf(s) {
 			snoozePresetsList.selectRowIndexes(NSIndexSet(index: index), byExtendingSelection: false)
 			fillSnoozeFormFromSelectedPreset()
 		}
-		app.deferredUpdateTimer.push()
 	}
 
 	@IBAction func deleteSnoozePresetSelected(sender: NSButton) {
 		if let selectedPreset = selectedSnoozePreset(), index = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext).indexOf(selectedPreset) {
 			mainObjectContext.deleteObject(selectedPreset)
-			snoozePresetsList.reloadData()
+			commitSnoozeSettings()
 			snoozePresetsList.selectRowIndexes(NSIndexSet(index: min(index, snoozePresetsList.numberOfRows-1)), byExtendingSelection: false)
 			fillSnoozeFormFromSelectedPreset()
-			DataManager.saveDB()
-			app.deferredUpdateTimer.push()
 		}
 	}
 
@@ -1384,9 +1388,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		if let s = selectedSnoozePreset() {
 			s.duration = NSNumber(bool: (sender == snoozeTypeDuration))
 			fillSnoozeFormFromSelectedPreset()
-			snoozePresetsList.reloadData()
-			DataManager.saveDB()
-			app.deferredUpdateTimer.push()
+			commitSnoozeSettings()
 		}
 	}
 
@@ -1401,9 +1403,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 				s.hour = numberOrNil(snoozeDateTimeHour.indexOfSelectedItem)
 				s.minute = numberOrNil(snoozeDateTimeMinute.indexOfSelectedItem)
 			}
-			snoozePresetsList.reloadData()
-			DataManager.saveDB()
-			app.deferredUpdateTimer.push()
+			commitSnoozeSettings()
 		}
 	}
 
@@ -1415,9 +1415,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 				other.sortOrder = NSNumber(integer: index)
 				this.sortOrder = NSNumber(integer: index-1)
 				snoozePresetsList.selectRowIndexes(NSIndexSet(index: index-1), byExtendingSelection: false)
-				snoozePresetsList.reloadData()
-				DataManager.saveDB()
-				app.deferredUpdateTimer.push()
+				commitSnoozeSettings()
 			}
 		}
 	}
@@ -1430,9 +1428,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 				other.sortOrder = NSNumber(integer: index)
 				this.sortOrder = NSNumber(integer: index+1)
 				snoozePresetsList.selectRowIndexes(NSIndexSet(index: index+1), byExtendingSelection: false)
-				snoozePresetsList.reloadData()
-				DataManager.saveDB()
-				app.deferredUpdateTimer.push()
+				commitSnoozeSettings()
 			}
 		}
 	}

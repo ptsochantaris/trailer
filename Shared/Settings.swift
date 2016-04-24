@@ -161,7 +161,7 @@ final class Settings {
 
 	class func possibleExport(key: String?) {
 		#if os(OSX)
-		var keyIsGood: Bool
+		let keyIsGood: Bool
 		if let k = key {
 			keyIsGood = !["LAST_SUCCESSFUL_REFRESH", "LAST_EXPORT_URL", "LAST_EXPORT_TIME"].contains(k)
 		} else {
