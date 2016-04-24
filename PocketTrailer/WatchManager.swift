@@ -286,7 +286,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 	//////////////////////////////
 
 	private func buildOverview() -> [String : AnyObject] {
-		let totalPrs = PullRequest.countAllRequestsInMoc(mainObjectContext)
+		let totalPrs = PullRequest.countAllInMoc(mainObjectContext)
 		var prs: [String : AnyObject] = [
 			"mine": prCountsForSection(.Mine),
 			"participated": prCountsForSection(.Participated),
@@ -296,14 +296,14 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			"other": prCountsForSection(.All),
 			"snoozed": prCountsForSection(.Snoozed),
 			"total": totalPrs,
-			"total_open": PullRequest.countOpenRequestsInMoc(mainObjectContext),
+			"total_open": PullRequest.countOpenAndVisibleInMoc(mainObjectContext),
 			"unread": PullRequest.badgeCountInMoc(mainObjectContext)
 		]
 		if totalPrs==0 {
-			prs["error"] = DataManager.reasonForEmptyPrsWithFilter(nil).string
+			prs["error"] = PullRequest.reasonForEmptyWithFilter(nil).string
 		}
 
-		let totalIssues = Issue.countAllIssuesInMoc(mainObjectContext)
+		let totalIssues = Issue.countAllInMoc(mainObjectContext)
 		var issues: [String : AnyObject] = [
 			"mine": issueCountsForSection(.Mine),
 			"participated": issueCountsForSection(.Participated),
@@ -312,11 +312,11 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			"other": issueCountsForSection(.All),
 			"snoozed": issueCountsForSection(.Snoozed),
 			"total": totalIssues,
-			"total_open": Issue.countOpenIssuesInMoc(mainObjectContext),
+			"total_open": Issue.countOpenAndVisibleInMoc(mainObjectContext),
 			"unread": Issue.badgeCountInMoc(mainObjectContext)
 		]
 		if totalIssues==0 {
-			issues["error"] = DataManager.reasonForEmptyIssuesWithFilter(nil).string
+			issues["error"] = Issue.reasonForEmptyWithFilter(nil).string
 		}
 
 		return [

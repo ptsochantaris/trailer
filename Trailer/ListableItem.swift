@@ -400,6 +400,24 @@ class ListableItem: DataItem {
 		return _title
 	}
 
+	class final func emptyMessage(message: String, color: COLOR_CLASS) -> NSAttributedString {
+		let p = NSMutableParagraphStyle()
+		p.lineBreakMode = .ByWordWrapping
+		p.alignment = .Center
+		#if os(OSX)
+			return NSAttributedString(string: message, attributes: [
+				NSForegroundColorAttributeName: color,
+				NSParagraphStyleAttributeName: p
+			])
+		#elseif os(iOS)
+			return NSAttributedString(string: message, attributes: [
+				NSForegroundColorAttributeName: color,
+				NSParagraphStyleAttributeName: p,
+				NSFontAttributeName: FONT_CLASS.systemFontOfSize(FONT_CLASS.smallSystemFontSize())
+			])
+		#endif
+	}
+
 	final func predicateForOthersCommentsSinceDate(optionalDate: NSDate?) -> NSPredicate {
 
 		let userNumber = apiServer.userId?.longLongValue ?? 0

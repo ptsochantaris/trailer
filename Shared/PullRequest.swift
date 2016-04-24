@@ -56,7 +56,7 @@ final class PullRequest: ListableItem {
 	}
 	#endif
 
-	class func activePullRequestsInMoc(moc: NSManagedObjectContext, visibleOnly: Bool) -> [PullRequest] {
+	class func activeInMoc(moc: NSManagedObjectContext, visibleOnly: Bool) -> [PullRequest] {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
 		if visibleOnly {
@@ -67,27 +67,33 @@ final class PullRequest: ListableItem {
 		return try! moc.executeFetchRequest(f) as! [PullRequest]
 	}
 
-	class func allMergedRequestsInMoc(moc: NSManagedObjectContext) -> [PullRequest] {
+	class func allMergedInMoc(moc: NSManagedObjectContext) -> [PullRequest] {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "condition == %d", PullRequestCondition.Merged.rawValue)
 		return try! moc.executeFetchRequest(f) as! [PullRequest]
 	}
 
-	class func allClosedRequestsInMoc(moc: NSManagedObjectContext) -> [PullRequest] {
+	class func allClosedInMoc(moc: NSManagedObjectContext) -> [PullRequest] {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "condition == %d", PullRequestCondition.Closed.rawValue)
 		return try! moc.executeFetchRequest(f) as! [PullRequest]
 	}
 
-	class func countOpenRequestsInMoc(moc: NSManagedObjectContext) -> Int {
+	class func countOpenInMoc(moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		f.predicate = NSPredicate(format: "condition == %d or condition == nil", PullRequestCondition.Open.rawValue)
 		return moc.countForFetchRequest(f, error: nil)
 	}
 
-	class func countAllRequestsInMoc(moc: NSManagedObjectContext) -> Int {
+	class func countOpenAndVisibleInMoc(moc: NSManagedObjectContext) -> Int {
+		let f = NSFetchRequest(entityName: "PullRequest")
+		f.predicate = NSPredicate(format: "sectionIndex > 0 and (condition == %d or condition == nil)", PullRequestCondition.Open.rawValue)
+		return moc.countForFetchRequest(f, error: nil)
+	}
+
+	class func countAllInMoc(moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		f.predicate = NSPredicate(format: "sectionIndex > 0")
 		return moc.countForFetchRequest(f, error: nil)
@@ -133,6 +139,34 @@ final class PullRequest: ListableItem {
 			}
 		}
 		return false
+	}
+
+	class func reasonForEmptyWithFilter(filterValue: String?) -> NSAttributedString {
+		let openRequests = PullRequest.countOpenInMoc(mainObjectContext)
+
+		var color = COLOR_CLASS.lightGrayColor()
+		var message: String = ""
+
+		if !ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
+			color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
+			message = "There are no configured API servers in your settings, please ensure you have added at least one server with a valid API token."
+		} else if app.isRefreshing {
+			message = "Refreshing PR information, please wait a moment..."
+		} else if !(filterValue ?? "").isEmpty {
+			message = "There are no PRs matching this filter."
+		} else if openRequests > 0 {
+			message = "\(openRequests) PRs are hidden by your settings."
+		} else if Repo.countVisibleReposInMoc(mainObjectContext)==0 {
+			color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
+			message = "You have no watched repositories, please add some to your watchlist and refresh after a little while."
+		} else if !Repo.interestedInPrs() && !Repo.interestedInIssues() {
+			color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
+			message = "All your watched repositories are marked as hidden, please enable issues or PRs for some of them."
+		} else if openRequests==0 {
+			message = "No open PRs in your configured repositories."
+		}
+
+		return emptyMessage(message, color: color)
 	}
 
 	func subtitleWithFont(font: FONT_CLASS, lightColor: COLOR_CLASS, darkColor: COLOR_CLASS) -> NSMutableAttributedString {

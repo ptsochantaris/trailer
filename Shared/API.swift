@@ -791,7 +791,7 @@ final class API {
 
 	private func fetchLabelsForForCurrentPullRequestsToMoc(moc: NSManagedObjectContext, callback: Completion) {
 
-		let prs = PullRequest.activePullRequestsInMoc(moc, visibleOnly: true).filter { [weak self] pr in
+		let prs = PullRequest.activeInMoc(moc, visibleOnly: true).filter { [weak self] pr in
 			if !pr.apiServer.syncIsGood {
 				return false
 			}
@@ -861,18 +861,18 @@ final class API {
 
 	private func fetchStatusesForCurrentPullRequestsToMoc(moc: NSManagedObjectContext, callback: Completion) {
 
-		let prs = PullRequest.activePullRequestsInMoc(moc, visibleOnly: !Settings.hidePrsThatArentPassing).filter { [weak self] pr in
+		let prs = PullRequest.activeInMoc(moc, visibleOnly: !Settings.hidePrsThatArentPassing).filter { [unowned self] pr in
 			if !pr.apiServer.syncIsGood {
 				return false
 			}
 			let oid = pr.objectID
-			let refreshes = self?.refreshesSinceLastStatusCheck[oid]
+			let refreshes = self.refreshesSinceLastStatusCheck[oid]
 			if refreshes == nil || refreshes! >= Settings.statusItemRefreshInterval {
 				DLog("Will check statuses for PR: '%@'", pr.title)
 				return true
 			} else {
 				DLog("No need to get statuses for PR: '%@' (%d refreshes since last check)", pr.title, refreshes)
-				self?.refreshesSinceLastStatusCheck[oid] = (refreshes ?? 0)+1
+				self.refreshesSinceLastStatusCheck[oid] = (refreshes ?? 0)+1
 				return false
 			}
 		}

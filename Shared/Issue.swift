@@ -58,13 +58,41 @@ final class Issue: ListableItem {
 		}
 	}
 
+	class func reasonForEmptyWithFilter(filterValue: String?) -> NSAttributedString {
+		let openIssues = Issue.countOpenInMoc(mainObjectContext)
+
+		var color = COLOR_CLASS.lightGrayColor()
+		var message: String = ""
+
+		if !ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
+			color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
+			message = "There are no configured API servers in your settings, please ensure you have added at least one server with a valid API token."
+		} else if app.isRefreshing {
+			message = "Refreshing issue information, please wait a moment..."
+		} else if !(filterValue ?? "").isEmpty {
+			message = "There are no issues matching this filter."
+		} else if openIssues > 0 {
+			message = "\(openIssues) issues are hidden by your settings."
+		} else if Repo.countVisibleReposInMoc(mainObjectContext)==0 {
+			color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
+			message = "You have no watched repositories, please add some to your watchlist and refresh after a little while."
+		} else if !Repo.interestedInPrs() && !Repo.interestedInIssues() {
+			color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
+			message = "All your watched repositories are marked as hidden, please enable issues or PRs for some of them."
+		} else if openIssues==0 {
+			message = "No open issues in your configured repositories."
+		}
+
+		return emptyMessage(message, color: color)
+	}
+
 	#if os(iOS)
 	override func searchKeywords() -> [String] {
 		return ["Issue","Issues"]+super.searchKeywords()
 	}
 	#endif
 
-	class func countAllIssuesInMoc(moc: NSManagedObjectContext) -> Int {
+	class func countAllInMoc(moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest(entityName: "Issue")
 		f.predicate = NSPredicate(format: "sectionIndex > 0")
 		return moc.countForFetchRequest(f, error: nil)
@@ -97,9 +125,15 @@ final class Issue: ListableItem {
 		return badgeCountFromFetch(f, inMoc: moc)
 	}
 
-	class func countOpenIssuesInMoc(moc: NSManagedObjectContext) -> Int {
+	class func countOpenInMoc(moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest(entityName: "Issue")
 		f.predicate = NSPredicate(format: "condition == %d or condition == nil", PullRequestCondition.Open.rawValue)
+		return moc.countForFetchRequest(f, error: nil)
+	}
+
+	class func countOpenAndVisibleInMoc(moc: NSManagedObjectContext) -> Int {
+		let f = NSFetchRequest(entityName: "Issue")
+		f.predicate = NSPredicate(format: "sectionIndex > 0 and (condition == %d or condition == nil)", PullRequestCondition.Open.rawValue)
 		return moc.countForFetchRequest(f, error: nil)
 	}
 
@@ -145,7 +179,7 @@ final class Issue: ListableItem {
 		return Section.issueMenuTitles[sectionIndex?.integerValue ?? 0]
 	}
 
-	class func allClosedIssuesInMoc(moc: NSManagedObjectContext) -> [Issue] {
+	class func allClosedInMoc(moc: NSManagedObjectContext) -> [Issue] {
 		let f = NSFetchRequest(entityName: "Issue")
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "condition == %d", PullRequestCondition.Closed.rawValue)

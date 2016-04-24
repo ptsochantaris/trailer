@@ -426,7 +426,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				if Settings.dontAskBeforeWipingMerged {
 					removeAllMergedRequests()
 				} else {
-					let mergedRequests = PullRequest.allMergedRequestsInMoc(mainObjectContext)
+					let mergedRequests = PullRequest.allMergedInMoc(mainObjectContext)
 
 					let alert = NSAlert()
 					alert.messageText = "Clear \(mergedRequests.count) merged PRs?"
@@ -446,7 +446,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				if Settings.dontAskBeforeWipingClosed {
 					removeAllClosedRequests()
 				} else {
-					let closedRequests = PullRequest.allClosedRequestsInMoc(mainObjectContext)
+					let closedRequests = PullRequest.allClosedInMoc(mainObjectContext)
 
 					let alert = NSAlert()
 					alert.messageText = "Clear \(closedRequests.count) closed PRs?"
@@ -471,7 +471,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				if Settings.dontAskBeforeWipingClosed {
 					removeAllClosedIssues()
 				} else {
-					let closedIssues = Issue.allClosedIssuesInMoc(mainObjectContext)
+					let closedIssues = Issue.allClosedInMoc(mainObjectContext)
 
 					let alert = NSAlert()
 					alert.messageText = "Clear \(closedIssues.count) closed issues?"
@@ -495,7 +495,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	private func removeAllMergedRequests() {
-		for r in PullRequest.allMergedRequestsInMoc(mainObjectContext) {
+		for r in PullRequest.allMergedInMoc(mainObjectContext) {
 			mainObjectContext.deleteObject(r)
 		}
 		DataManager.saveDB()
@@ -503,7 +503,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	private func removeAllClosedRequests() {
-		for r in PullRequest.allClosedRequestsInMoc(mainObjectContext) {
+		for r in PullRequest.allClosedInMoc(mainObjectContext) {
 			mainObjectContext.deleteObject(r)
 		}
 		DataManager.saveDB()
@@ -511,7 +511,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	private func removeAllClosedIssues() {
-		for i in Issue.allClosedIssuesInMoc(mainObjectContext) {
+		for i in Issue.allClosedInMoc(mainObjectContext) {
 			mainObjectContext.deleteObject(i)
 		}
 		DataManager.saveDB()
@@ -822,7 +822,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				let f = ListableItem.requestForItemsOfType("Issue", withFilter: issuesMenu.filter.stringValue, sectionIndex: -1)
                 countString = String(mainObjectContext.countForFetchRequest(f, error: nil))
             } else {
-                countString = String(Issue.countOpenIssuesInMoc(mainObjectContext))
+                countString = String(Issue.countOpenInMoc(mainObjectContext))
             }
 
 			if Issue.badgeCountInMoc(mainObjectContext) > 0 {
@@ -876,7 +876,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		issuesMenu.messageView?.removeFromSuperview()
 
 		if issuesMenu.table.numberOfRows == 0 {
-			let m = MessageView(frame: CGRectMake(0, 0, MENU_WIDTH, 100), message: DataManager.reasonForEmptyIssuesWithFilter(issuesMenu.filter.stringValue))
+			let m = MessageView(frame: CGRectMake(0, 0, MENU_WIDTH, 100), message: Issue.reasonForEmptyWithFilter(issuesMenu.filter.stringValue))
 			issuesMenu.messageView = m
 			issuesMenu.contentView!.addSubview(m)
 		}
@@ -905,7 +905,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				let f = ListableItem.requestForItemsOfType("PullRequest", withFilter: prMenu.filter.stringValue, sectionIndex: -1)
 				countString = String(mainObjectContext.countForFetchRequest(f, error: nil))
 			} else {
-				countString = String(PullRequest.countOpenRequestsInMoc(mainObjectContext))
+				countString = String(PullRequest.countOpenInMoc(mainObjectContext))
 			}
 
 			if PullRequest.badgeCountInMoc(mainObjectContext) > 0 {
@@ -957,7 +957,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		prMenu.messageView?.removeFromSuperview()
 
 		if prMenu.table.numberOfRows == 0 {
-			let m = MessageView(frame: CGRectMake(0, 0, MENU_WIDTH, 100), message: DataManager.reasonForEmptyPrsWithFilter(prMenu.filter.stringValue))
+			let m = MessageView(frame: CGRectMake(0, 0, MENU_WIDTH, 100), message: PullRequest.reasonForEmptyWithFilter(prMenu.filter.stringValue))
 			prMenu.messageView = m
 			prMenu.contentView!.addSubview(m)
 		}

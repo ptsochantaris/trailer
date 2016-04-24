@@ -81,11 +81,11 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	func removeAllClosedConfirmed() {
 		if viewMode == .PullRequests {
-			for p in PullRequest.allClosedRequestsInMoc(mainObjectContext) {
+			for p in PullRequest.allClosedInMoc(mainObjectContext) {
 				mainObjectContext.deleteObject(p)
 			}
 		} else {
-			for p in Issue.allClosedIssuesInMoc(mainObjectContext) {
+			for p in Issue.allClosedInMoc(mainObjectContext) {
 				mainObjectContext.deleteObject(p)
 			}
 		}
@@ -94,7 +94,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	func removeAllMergedConfirmed() {
 		if viewMode == .PullRequests {
-			for p in PullRequest.allMergedRequestsInMoc(mainObjectContext) {
+			for p in PullRequest.allMergedInMoc(mainObjectContext) {
 				mainObjectContext.deleteObject(p)
 			}
 			DataManager.saveDB()
@@ -661,9 +661,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		if app.isRefreshing {
 			title = "Refreshing..."
 			if viewMode == .PullRequests {
-				tableView.tableFooterView = EmptyView(message: DataManager.reasonForEmptyPrsWithFilter(searchField.text), parentWidth: view.bounds.size.width)
+				tableView.tableFooterView = EmptyView(message: PullRequest.reasonForEmptyWithFilter(searchField.text), parentWidth: view.bounds.size.width)
 			} else {
-				tableView.tableFooterView = EmptyView(message: DataManager.reasonForEmptyIssuesWithFilter(searchField.text), parentWidth: view.bounds.size.width)
+				tableView.tableFooterView = EmptyView(message: Issue.reasonForEmptyWithFilter(searchField.text), parentWidth: view.bounds.size.width)
 			}
 			if let r = refreshControl {
 				r.attributedTitle = NSAttributedString(string: api.lastUpdateDescription(), attributes: nil)
@@ -676,10 +676,10 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			let count = fetchedResultsController.fetchedObjects?.count ?? 0
 			if viewMode == .PullRequests {
 				title = pullRequestsTitle(true)
-				tableView.tableFooterView = (count == 0) ? EmptyView(message: DataManager.reasonForEmptyPrsWithFilter(searchField.text), parentWidth: view.bounds.size.width) : nil
+				tableView.tableFooterView = (count == 0) ? EmptyView(message: PullRequest.reasonForEmptyWithFilter(searchField.text), parentWidth: view.bounds.size.width) : nil
 			} else {
 				title = issuesTitle()
-				tableView.tableFooterView = (count == 0) ? EmptyView(message: DataManager.reasonForEmptyIssuesWithFilter(searchField.text), parentWidth: view.bounds.size.width) : nil
+				tableView.tableFooterView = (count == 0) ? EmptyView(message: Issue.reasonForEmptyWithFilter(searchField.text), parentWidth: view.bounds.size.width) : nil
 			}
 			if let r = refreshControl {
 				r.attributedTitle = NSAttributedString(string: api.lastUpdateDescription(), attributes: nil)
