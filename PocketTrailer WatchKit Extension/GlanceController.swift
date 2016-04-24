@@ -84,7 +84,7 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 
 			let r = result[showIssues ? "issues" : "prs"] as! [String : AnyObject]
 
-			let tc = r["total"] as? Int ?? 0
+			let tc = r["total_open"] as? Int ?? 0
 			totalCount.setText("\(tc)")
 
 			func setCount(s: Section, _ count: WKInterfaceLabel, _ group: WKInterfaceGroup) {

@@ -296,6 +296,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			"other": prCountsForSection(.All),
 			"snoozed": prCountsForSection(.Snoozed),
 			"total": totalPrs,
+			"total_open": PullRequest.countOpenRequestsInMoc(mainObjectContext),
 			"unread": PullRequest.badgeCountInMoc(mainObjectContext)
 		]
 		if totalPrs==0 {
@@ -311,6 +312,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			"other": issueCountsForSection(.All),
 			"snoozed": issueCountsForSection(.Snoozed),
 			"total": totalIssues,
+			"total_open": Issue.countOpenIssuesInMoc(mainObjectContext),
 			"unread": Issue.badgeCountInMoc(mainObjectContext)
 		]
 		if totalIssues==0 {
