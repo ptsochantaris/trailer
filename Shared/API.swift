@@ -578,7 +578,7 @@ final class API {
 		for r in repos {
 
 			for p in r.pullRequests {
-				if (p.condition?.integerValue ?? 0) == PullRequestCondition.Open.rawValue {
+				if (p.condition?.integerValue ?? 0) == ItemCondition.Open.rawValue {
 					p.postSyncAction = PostSyncAction.Delete.rawValue
 				}
 			}
@@ -643,7 +643,7 @@ final class API {
 		for r in repos {
 
 			for i in r.issues {
-				if (i.condition?.integerValue ?? 0) == PullRequestCondition.Open.rawValue {
+				if (i.condition?.integerValue ?? 0) == ItemCondition.Open.rawValue {
 					i.postSyncAction = PostSyncAction.Delete.rawValue
 				}
 			}
@@ -795,7 +795,7 @@ final class API {
 			if !pr.apiServer.syncIsGood {
 				return false
 			}
-			if pr.condition?.integerValue != PullRequestCondition.Open.rawValue {
+			if pr.condition?.integerValue != ItemCondition.Open.rawValue {
 				DLog("Won't check labels for closed/merged PR: %@", pr.title)
 				return false
 			}
@@ -927,7 +927,7 @@ final class API {
 
 	private func checkPrClosuresInMoc(moc: NSManagedObjectContext, callback: Completion) {
 		let f = NSFetchRequest(entityName: "PullRequest")
-		f.predicate = NSPredicate(format: "postSyncAction == %d and condition == %d", PostSyncAction.Delete.rawValue, PullRequestCondition.Open.rawValue)
+		f.predicate = NSPredicate(format: "postSyncAction == %d and condition == %d", PostSyncAction.Delete.rawValue, ItemCondition.Open.rawValue)
 		f.returnsObjectsAsFaults = false
 		let pullRequests = try! moc.executeFetchRequest(f) as! [PullRequest]
 
@@ -957,7 +957,7 @@ final class API {
 
 	private func checkIssueClosuresInMoc(moc: NSManagedObjectContext) {
 		let f = NSFetchRequest(entityName: "Issue")
-		f.predicate = NSPredicate(format: "postSyncAction == %d and condition == %d", PostSyncAction.Delete.rawValue, PullRequestCondition.Open.rawValue)
+		f.predicate = NSPredicate(format: "postSyncAction == %d and condition == %d", PostSyncAction.Delete.rawValue, ItemCondition.Open.rawValue)
 		f.returnsObjectsAsFaults = false
 
 		for i in try! moc.executeFetchRequest(f) as! [Issue] {
@@ -1076,7 +1076,7 @@ final class API {
 			if r.shouldKeepForPolicy(Settings.mergeHandlingPolicy) {
 				DLog("Will keep merged PR")
 				r.postSyncAction = PostSyncAction.DoNothing.rawValue
-				r.condition = PullRequestCondition.Merged.rawValue
+				r.condition = ItemCondition.Merged.rawValue
 				app.postNotificationOfType(.PrMerged, forItem: r)
 				return
 			}
@@ -1098,7 +1098,7 @@ final class API {
 		if r.shouldKeepForPolicy(Settings.closeHandlingPolicy) {
 			DLog("Will keep closed PR")
 			r.postSyncAction = PostSyncAction.DoNothing.rawValue
-			r.condition = PullRequestCondition.Closed.rawValue
+			r.condition = ItemCondition.Closed.rawValue
 			app.postNotificationOfType(.PrClosed, forItem:r)
 		} else {
 			DLog("Will not keep closed PR")
@@ -1119,7 +1119,7 @@ final class API {
 		if i.shouldKeepForPolicy(Settings.closeHandlingPolicy) {
 			DLog("Will keep closed issue")
 			i.postSyncAction = PostSyncAction.DoNothing.rawValue
-			i.condition = PullRequestCondition.Closed.rawValue
+			i.condition = ItemCondition.Closed.rawValue
 			app.postNotificationOfType(.IssueClosed, forItem:i)
 		} else {
 			DLog("Will not keep closed issue")

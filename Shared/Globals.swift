@@ -95,7 +95,7 @@ let syncDateFormatter = { () -> NSDateFormatter in
     return d
 }()
 
-enum PullRequestCondition: Int {
+enum ItemCondition: Int {
 	case Open, Closed, Merged
 }
 
@@ -107,21 +107,21 @@ enum PostSyncAction: Int {
 	case DoNothing, Delete, NoteNew, NoteUpdated
 }
 
-enum PRNotificationType: Int {
+enum NotificationType: Int {
 	case NewComment, NewPr, PrMerged, PrReopened, NewMention, PrClosed, NewRepoSubscribed, NewRepoAnnouncement, NewPrAssigned, NewStatus, NewIssue, IssueClosed, NewIssueAssigned, IssueReopened
 }
 
-enum PRSortingMethod: Int {
+enum SortingMethod: Int {
 	case CreationDate, RecentActivity, Title
 	static let reverseTitles = ["Youngest first", "Most recently active", "Reverse alphabetically"]
 	static let normalTitles = ["Oldest first", "Inactive for longest", "Alphabetically"]
 
 	func normalTitle() -> String {
-		return PRSortingMethod.normalTitles[rawValue]
+		return SortingMethod.normalTitles[rawValue]
 	}
 
 	func reverseTitle() -> String {
-		return PRSortingMethod.reverseTitles[rawValue]
+		return SortingMethod.reverseTitles[rawValue]
 	}
 
 	func field() -> String? {
@@ -133,19 +133,19 @@ enum PRSortingMethod: Int {
 	}
 }
 
-enum PRHandlingPolicy: Int {
+enum HandlingPolicy: Int {
 	case KeepMine, KeepMineAndParticipated, KeepAll, KeepNone
 	static let labels = ["Keep Mine", "Keep Mine & Participated", "Keep All", "Don't Keep"]
 	func name() -> String {
-		return PRHandlingPolicy.labels[rawValue]
+		return HandlingPolicy.labels[rawValue]
 	}
 }
 
-enum PRAssignmentPolicy: Int {
+enum AssignmentPolicy: Int {
 	case MoveToMine, MoveToParticipated, DoNothing
 	static let labels = ["Move To Mine", "Move To Participated", "Do Nothing"]
 	func name() -> String {
-		return PRAssignmentPolicy.labels[rawValue]
+		return AssignmentPolicy.labels[rawValue]
 	}
 }
 
@@ -287,6 +287,7 @@ func colorFromUInt32(c: UInt32) -> COLOR_CLASS {
 }
 
 //////////////////////// From tieferbegabt's post on https://forums.developer.apple.com/message/37935, with thanks!
+
 extension String {
 	var lastPathComponent: String {
 		get {
@@ -295,25 +296,21 @@ extension String {
 	}
 	var pathExtension: String {
 		get {
-
 			return (self as NSString).pathExtension
 		}
 	}
 	var stringByDeletingLastPathComponent: String {
 		get {
-
 			return (self as NSString).stringByDeletingLastPathComponent
 		}
 	}
 	var stringByDeletingPathExtension: String {
 		get {
-
 			return (self as NSString).stringByDeletingPathExtension
 		}
 	}
 	var pathComponents: [String] {
 		get {
-
 			return (self as NSString).pathComponents
 		}
 	}

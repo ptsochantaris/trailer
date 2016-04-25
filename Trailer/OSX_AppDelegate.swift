@@ -185,7 +185,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		NSUserNotificationCenter.defaultUserNotificationCenter().removeDeliveredNotification(notification)
 	}
 
-	func postNotificationOfType(type: PRNotificationType, forItem: DataItem) {
+	func postNotificationOfType(type: NotificationType, forItem: DataItem) {
 		if preferencesDirty {
 			return
 		}

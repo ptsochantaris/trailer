@@ -327,7 +327,7 @@
 		16B3B34E1A34E990000BE6CC /* Trailer.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Trailer.xcdatamodel; sourceTree = "<group>"; };
 		16B3B3531A34E9F7000BE6CC /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reachability.h; path = Shared/Reachability.h; sourceTree = "<group>"; };
 		16B3B3541A34E9F7000BE6CC /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Reachability.m; path = Shared/Reachability.m; sourceTree = "<group>"; };
-		16B3B3591A34EAEE000BE6CC /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = main.swift; path = Shared/main.swift; sourceTree = "<group>"; };
+		16B3B3591A34EAEE000BE6CC /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = main.swift; path = Shared/main.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16B6B7C01BA3B94C006A509F /* ComplicationDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComplicationDataSource.swift; sourceTree = "<group>"; };
 		16B74E471A3B4AC800410EF6 /* PrTable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrTable.swift; sourceTree = "<group>"; };
 		16B94070182D136700F32061 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };

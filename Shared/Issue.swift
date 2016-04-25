@@ -53,8 +53,8 @@ final class Issue: ListableItem {
 					i.isNewAssignment = false
 				}
 			}
-			i.reopened = ((i.condition?.integerValue ?? 0) == PullRequestCondition.Closed.rawValue)
-			i.condition = PullRequestCondition.Open.rawValue
+			i.reopened = ((i.condition?.integerValue ?? 0) == ItemCondition.Closed.rawValue)
+			i.condition = ItemCondition.Open.rawValue
 		}
 	}
 
@@ -127,13 +127,13 @@ final class Issue: ListableItem {
 
 	class func countOpenInMoc(moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest(entityName: "Issue")
-		f.predicate = NSPredicate(format: "condition == %d or condition == nil", PullRequestCondition.Open.rawValue)
+		f.predicate = NSPredicate(format: "condition == %d or condition == nil", ItemCondition.Open.rawValue)
 		return moc.countForFetchRequest(f, error: nil)
 	}
 
 	class func countOpenAndVisibleInMoc(moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest(entityName: "Issue")
-		f.predicate = NSPredicate(format: "sectionIndex > 0 and (condition == %d or condition == nil)", PullRequestCondition.Open.rawValue)
+		f.predicate = NSPredicate(format: "sectionIndex > 0 and (condition == %d or condition == nil)", ItemCondition.Open.rawValue)
 		return moc.countForFetchRequest(f, error: nil)
 	}
 
@@ -182,7 +182,7 @@ final class Issue: ListableItem {
 	class func allClosedInMoc(moc: NSManagedObjectContext) -> [Issue] {
 		let f = NSFetchRequest(entityName: "Issue")
 		f.returnsObjectsAsFaults = false
-		f.predicate = NSPredicate(format: "condition == %d", PullRequestCondition.Closed.rawValue)
+		f.predicate = NSPredicate(format: "condition == %d", ItemCondition.Closed.rawValue)
 		return try! moc.executeFetchRequest(f) as! [Issue]
 	}
 

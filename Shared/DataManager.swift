@@ -238,7 +238,7 @@ final class DataManager : NSObject {
 		return c
 	}
 
-	class func infoForType(type: PRNotificationType, item: DataItem) -> [String : AnyObject] {
+	class func infoForType(type: NotificationType, item: DataItem) -> [String : AnyObject] {
 		switch type {
 		case .NewMention, .NewComment:
 			return [COMMENT_ID_KEY : item.objectID.URIRepresentation().absoluteString]

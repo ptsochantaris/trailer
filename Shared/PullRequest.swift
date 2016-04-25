@@ -45,8 +45,8 @@ final class PullRequest: ListableItem {
 				api.refreshesSinceLastLabelsCheck[p.objectID] = nil
 				api.refreshesSinceLastStatusCheck[p.objectID] = nil
 			}
-			p.reopened = ((p.condition?.integerValue ?? 0) == PullRequestCondition.Closed.rawValue)
-			p.condition = PullRequestCondition.Open.rawValue
+			p.reopened = ((p.condition?.integerValue ?? 0) == ItemCondition.Closed.rawValue)
+			p.condition = ItemCondition.Open.rawValue
 		}
 	}
 
@@ -62,7 +62,7 @@ final class PullRequest: ListableItem {
 		if visibleOnly {
 			f.predicate = NSPredicate(format: "sectionIndex == %d || sectionIndex == %d || sectionIndex == %d", Section.Mine.rawValue, Section.Participated.rawValue, Section.All.rawValue)
 		} else {
-			f.predicate = NSPredicate(format: "condition == %d", PullRequestCondition.Open.rawValue)
+			f.predicate = NSPredicate(format: "condition == %d", ItemCondition.Open.rawValue)
 		}
 		return try! moc.executeFetchRequest(f) as! [PullRequest]
 	}
@@ -70,26 +70,26 @@ final class PullRequest: ListableItem {
 	class func allMergedInMoc(moc: NSManagedObjectContext) -> [PullRequest] {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
-		f.predicate = NSPredicate(format: "condition == %d", PullRequestCondition.Merged.rawValue)
+		f.predicate = NSPredicate(format: "condition == %d", ItemCondition.Merged.rawValue)
 		return try! moc.executeFetchRequest(f) as! [PullRequest]
 	}
 
 	class func allClosedInMoc(moc: NSManagedObjectContext) -> [PullRequest] {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
-		f.predicate = NSPredicate(format: "condition == %d", PullRequestCondition.Closed.rawValue)
+		f.predicate = NSPredicate(format: "condition == %d", ItemCondition.Closed.rawValue)
 		return try! moc.executeFetchRequest(f) as! [PullRequest]
 	}
 
 	class func countOpenInMoc(moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest(entityName: "PullRequest")
-		f.predicate = NSPredicate(format: "condition == %d or condition == nil", PullRequestCondition.Open.rawValue)
+		f.predicate = NSPredicate(format: "condition == %d or condition == nil", ItemCondition.Open.rawValue)
 		return moc.countForFetchRequest(f, error: nil)
 	}
 
 	class func countOpenAndVisibleInMoc(moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest(entityName: "PullRequest")
-		f.predicate = NSPredicate(format: "sectionIndex > 0 and (condition == %d or condition == nil)", PullRequestCondition.Open.rawValue)
+		f.predicate = NSPredicate(format: "sectionIndex > 0 and (condition == %d or condition == nil)", ItemCondition.Open.rawValue)
 		return moc.countForFetchRequest(f, error: nil)
 	}
 
@@ -129,7 +129,7 @@ final class PullRequest: ListableItem {
 	var markUnmergeable: Bool {
 		if let m = mergeable?.boolValue where m == false {
 			if let s = sectionIndex?.integerValue {
-				if s == PullRequestCondition.Merged.rawValue || s == PullRequestCondition.Closed.rawValue {
+				if s == ItemCondition.Merged.rawValue || s == ItemCondition.Closed.rawValue {
 					return false
 				}
 				if s == Section.All.rawValue && Settings.markUnmergeableOnUserSectionsOnly {

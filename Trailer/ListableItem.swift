@@ -81,9 +81,9 @@ class ListableItem: DataItem {
 
 	final func shouldKeepForPolicy(policy: Int) -> Bool {
 		let index = (sectionIndex?.integerValue ?? 0)
-		return policy==PRHandlingPolicy.KeepAll.rawValue
-			|| (policy==PRHandlingPolicy.KeepMineAndParticipated.rawValue && (index==Section.Mine.rawValue || index==Section.Participated.rawValue))
-			|| (policy==PRHandlingPolicy.KeepMine.rawValue && index==Section.Mine.rawValue)
+		return policy==HandlingPolicy.KeepAll.rawValue
+			|| (policy==HandlingPolicy.KeepMineAndParticipated.rawValue && (index==Section.Mine.rawValue || index==Section.Participated.rawValue))
+			|| (policy==HandlingPolicy.KeepMine.rawValue && index==Section.Mine.rawValue)
 	}
 
 	final var shouldSkipNotifications: Bool {
@@ -91,11 +91,11 @@ class ListableItem: DataItem {
 	}
 
 	final var assignedToMySection: Bool {
-		return (assignedToMe?.boolValue ?? false) && Settings.assignedPrHandlingPolicy==PRAssignmentPolicy.MoveToMine.rawValue
+		return (assignedToMe?.boolValue ?? false) && Settings.assignedPrHandlingPolicy==AssignmentPolicy.MoveToMine.rawValue
 	}
 
 	final var assignedToParticipated: Bool {
-		return (assignedToMe?.boolValue ?? false) && Settings.assignedPrHandlingPolicy==PRAssignmentPolicy.MoveToParticipated.rawValue
+		return (assignedToMe?.boolValue ?? false) && Settings.assignedPrHandlingPolicy==AssignmentPolicy.MoveToParticipated.rawValue
 	}
 
 	final var createdByMe: Bool {
@@ -162,16 +162,16 @@ class ListableItem: DataItem {
 			snoozeUntil = nil
 		}
 
-		var targetSection: Section
-		let currentCondition = condition?.integerValue ?? PullRequestCondition.Open.rawValue
 		let isMine = createdByMe
+		var targetSection: Section
+		let currentCondition = condition?.integerValue ?? ItemCondition.Open.rawValue
 
-		if currentCondition == PullRequestCondition.Merged.rawValue			{ targetSection = .Merged }
-		else if currentCondition == PullRequestCondition.Closed.rawValue	{ targetSection = .Closed }
-		else if snoozeUntil != nil											{ targetSection = .Snoozed }
-		else if isMine || assignedToMySection								{ targetSection = .Mine }
-		else if assignedToParticipated || commentedByMe						{ targetSection = .Participated }
-		else																{ targetSection = .All }
+		if currentCondition == ItemCondition.Merged.rawValue		{ targetSection = .Merged }
+		else if currentCondition == ItemCondition.Closed.rawValue	{ targetSection = .Closed }
+		else if snoozeUntil != nil									{ targetSection = .Snoozed }
+		else if isMine || assignedToMySection						{ targetSection = .Mine }
+		else if assignedToParticipated || commentedByMe				{ targetSection = .Participated }
+		else														{ targetSection = .All }
 
 		var needsManualCount = false
 		var moveToMentioned = false
@@ -612,7 +612,7 @@ class ListableItem: DataItem {
 			sortDescriptors.append(NSSortDescriptor(key: "repo.fullName", ascending: true, selector: #selector(NSString.caseInsensitiveCompare(_:))))
 		}
 
-		if let fieldName = PRSortingMethod(rawValue: Settings.sortMethod)?.field() {
+		if let fieldName = SortingMethod(rawValue: Settings.sortMethod)?.field() {
 			if fieldName == "title" {
 				sortDescriptors.append(NSSortDescriptor(key: fieldName, ascending: !Settings.sortDescending, selector: #selector(NSString.caseInsensitiveCompare(_:))))
 			} else {

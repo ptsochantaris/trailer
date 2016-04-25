@@ -77,7 +77,7 @@ final class Settings {
         }
 
 		if let moveAssignedPrs = _settings_shared.objectForKey("MOVE_ASSIGNED_PRS_TO_MY_SECTION") as? Bool {
-			_settings_shared.setObject(moveAssignedPrs ? PRAssignmentPolicy.MoveToMine.rawValue : PRAssignmentPolicy.DoNothing.rawValue, forKey: "ASSIGNED_PR_HANDLING_POLICY")
+			_settings_shared.setObject(moveAssignedPrs ? AssignmentPolicy.MoveToMine.rawValue : AssignmentPolicy.DoNothing.rawValue, forKey: "ASSIGNED_PR_HANDLING_POLICY")
 			_settings_shared.removeObjectForKey("MOVE_ASSIGNED_PRS_TO_MY_SECTION")
 		}
 
@@ -270,13 +270,13 @@ final class Settings {
 
 	static let closeHandlingPolicyHelp = "How to handle an item when it is believed to be closed (or has disappeared)."
 	class var closeHandlingPolicy: Int {
-		get { return get("CLOSE_HANDLING_POLICY_2") as? Int ?? PRHandlingPolicy.KeepMine.rawValue }
+		get { return get("CLOSE_HANDLING_POLICY_2") as? Int ?? HandlingPolicy.KeepMine.rawValue }
 		set { set("CLOSE_HANDLING_POLICY_2", newValue) }
 	}
 
 	static let mergeHandlingPolicyHelp = "How to handle an item when it is detected as merged."
 	class var mergeHandlingPolicy: Int {
-		get { return get("MERGE_HANDLING_POLICY_2") as? Int ?? PRHandlingPolicy.KeepMine.rawValue }
+		get { return get("MERGE_HANDLING_POLICY_2") as? Int ?? HandlingPolicy.KeepMine.rawValue }
 		set { set("MERGE_HANDLING_POLICY_2", newValue) }
 	}
 

@@ -489,7 +489,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	private func updateHistoryOptions() {
-		dontKeepPrsMergedByMe.enabled = Settings.mergeHandlingPolicy != PRHandlingPolicy.KeepNone.rawValue;
+		dontKeepPrsMergedByMe.enabled = Settings.mergeHandlingPolicy != HandlingPolicy.KeepNone.rawValue;
 	}
 
 	@IBAction func grayOutWhenRefreshingSelected(sender: NSButton) {
@@ -645,7 +645,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	private func setupSortMethodMenu() {
 		let m = NSMenu(title: "Sorting")
-		for t in Settings.sortDescending ? PRSortingMethod.reverseTitles : PRSortingMethod.normalTitles {
+		for t in Settings.sortDescending ? SortingMethod.reverseTitles : SortingMethod.normalTitles {
 			m.addItemWithTitle(t, action: #selector(PreferencesWindow.sortMethodChanged(_:)), keyEquivalent: "")
 		}
 		sortModeSelect.menu = m

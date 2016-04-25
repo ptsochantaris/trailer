@@ -116,7 +116,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.descriptionLabel.text = Settings.showCreatedInsteadOfUpdatedHelp
 			case 1:
 				cell.titleLabel.text = "Assigned items"
-				cell.valueLabel.text = PRAssignmentPolicy(rawValue: Settings.assignedPrHandlingPolicy)?.name()
+				cell.valueLabel.text = AssignmentPolicy(rawValue: Settings.assignedPrHandlingPolicy)?.name()
 				cell.descriptionLabel.text = "How to handle items that have been detected as assigned to you."
 			case 2:
 				cell.titleLabel.text = "Mark unmergeable PRs only in 'My' or 'Participated' sections"
@@ -260,11 +260,11 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			switch indexPath.row {
 			case 0:
 				cell.titleLabel.text = "When something is merged"
-				cell.valueLabel.text = PRHandlingPolicy(rawValue: Settings.mergeHandlingPolicy)?.name()
+				cell.valueLabel.text = HandlingPolicy(rawValue: Settings.mergeHandlingPolicy)?.name()
 				cell.descriptionLabel.text = Settings.mergeHandlingPolicyHelp
 			case 1:
 				cell.titleLabel.text = "When something is closed"
-				cell.valueLabel.text = PRHandlingPolicy(rawValue: Settings.closeHandlingPolicy)?.name()
+				cell.valueLabel.text = HandlingPolicy(rawValue: Settings.closeHandlingPolicy)?.name()
 				cell.descriptionLabel.text = Settings.closeHandlingPolicyHelp
 			case 2:
 				cell.titleLabel.text = "Don't keep PRs merged by me"
@@ -292,7 +292,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.descriptionLabel.text = Settings.sortDescendingHelp
 			case 1:
 				cell.titleLabel.text = "Criterion"
-				if let sortMethod = PRSortingMethod(rawValue: Settings.sortMethod) {
+				if let sortMethod = SortingMethod(rawValue: Settings.sortMethod) {
 					cell.valueLabel.text = Settings.sortDescending ? sortMethod.reverseTitle() : sortMethod.normalTitle()
 				}
 				cell.descriptionLabel.text = Settings.sortMethodHelp
@@ -369,7 +369,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			case 1:
 				pickerName = tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text ?? "Unknown Value"
 				selectedIndexPath = indexPath
-				valuesToPush = PRAssignmentPolicy.labels
+				valuesToPush = AssignmentPolicy.labels
 				previousValue = Settings.assignedPrHandlingPolicy
 				performSegueWithIdentifier("showPicker", sender: self)
 			case 2:
@@ -507,13 +507,13 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				selectedIndexPath = indexPath
 				previousValue = Settings.mergeHandlingPolicy
 				pickerName = tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text ?? "Unknown Picker"
-				valuesToPush = PRHandlingPolicy.labels
+				valuesToPush = HandlingPolicy.labels
 				performSegueWithIdentifier("showPicker", sender: self)
 			case 1:
 				selectedIndexPath = indexPath;
 				previousValue = Settings.closeHandlingPolicy
 				pickerName = tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text ?? "Unknown Picker"
-				valuesToPush = PRHandlingPolicy.labels
+				valuesToPush = HandlingPolicy.labels
 				performSegueWithIdentifier("showPicker", sender: self)
 			case 2:
 				Settings.dontKeepPrsMergedByMe = !Settings.dontKeepPrsMergedByMe
@@ -538,7 +538,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				selectedIndexPath = indexPath
 				previousValue = Settings.sortMethod
 				pickerName = tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text ?? "Unknown Picker"
-				valuesToPush = Settings.sortDescending ? PRSortingMethod.reverseTitles : PRSortingMethod.normalTitles
+				valuesToPush = Settings.sortDescending ? SortingMethod.reverseTitles : SortingMethod.normalTitles
 				performSegueWithIdentifier("showPicker", sender: self)
 			case 2:
 				Settings.groupByRepo = !Settings.groupByRepo

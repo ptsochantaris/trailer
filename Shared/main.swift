@@ -18,8 +18,8 @@ let api = API()
 //for s in _prs[0].statuses {
 //	s.state = "failed"
 //}
-//_prs[0].condition = PullRequestCondition.Merged.rawValue
-//_prs[1].condition = PullRequestCondition.Closed.rawValue
+//_prs[0].condition = ItemCondition.Merged.rawValue
+//_prs[1].condition = ItemCondition.Closed.rawValue
 //for p in _prs {
 //	p.latestReadCommentDate = never()
 //	p.postProcess()

@@ -19,7 +19,7 @@ final class IssueCell: TrailerCell {
 
 		var W = MENU_WIDTH-LEFTPADDING-app.scrollBarWidth
 
-		let showUnpin = issue.condition?.integerValue != PullRequestCondition.Open.rawValue
+		let showUnpin = issue.condition?.integerValue != ItemCondition.Open.rawValue
 		if showUnpin { W -= REMOVE_BUTTON_WIDTH } else { W -= 4.0 }
 
 		let showAvatar = !(issue.userAvatarUrl ?? "").isEmpty && !Settings.hideAvatars
@@ -68,7 +68,7 @@ final class IssueCell: TrailerCell {
 		statusRects = replacementRects
 
 		if showUnpin {
-			if (issue.condition?.integerValue ?? 0)==PullRequestCondition.Open.rawValue {
+			if (issue.condition?.integerValue ?? 0)==ItemCondition.Open.rawValue {
 				let unmergeableLabel = CenterTextField(frame: pinRect)
 				unmergeableLabel.textColor = NSColor.redColor()
 				unmergeableLabel.font = NSFont(name: "Monaco", size: 8.0)

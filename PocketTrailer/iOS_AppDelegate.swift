@@ -312,7 +312,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 		UIApplication.sharedApplication().setMinimumBackgroundFetchInterval(NSTimeInterval(interval))
 	}
 
-	func postNotificationOfType(type: PRNotificationType, forItem: DataItem) {
+	func postNotificationOfType(type: NotificationType, forItem: DataItem) {
 		NotificationManager.postNotificationOfType(type, forItem: forItem)
 	}
 
