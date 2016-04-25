@@ -196,39 +196,39 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		switch type {
 		case .NewMention:
 			let c = forItem as! PRComment
-			if c.parentShouldSkipNotifications() { return }
+			if c.parentShouldSkipNotifications { return }
 			notification.title = "@" + (c.userName ?? "NoUserName") + " mentioned you:"
-			notification.subtitle = c.notificationSubtitle()
+			notification.subtitle = c.notificationSubtitle
 			notification.informativeText = c.body
 			addPotentialExtraActions(notification)
 		case .NewComment:
 			let c = forItem as! PRComment
-			if c.parentShouldSkipNotifications() { return }
+			if c.parentShouldSkipNotifications { return }
 			notification.title = "@" + (c.userName ?? "NoUserName") + " commented:"
-			notification.subtitle = c.notificationSubtitle()
+			notification.subtitle = c.notificationSubtitle
 			notification.informativeText = c.body
 			addPotentialExtraActions(notification)
 		case .NewPr:
 			let p = forItem as! PullRequest
-			if p.shouldSkipNotifications() { return }
+			if p.shouldSkipNotifications { return }
 			notification.title = "New PR"
 			notification.subtitle = p.title
 			addPotentialExtraActions(notification)
 		case .PrReopened:
 			let p = forItem as! PullRequest
-			if p.shouldSkipNotifications() { return }
+			if p.shouldSkipNotifications { return }
 			notification.title = "Re-Opened PR"
 			notification.subtitle = p.title
 			addPotentialExtraActions(notification)
 		case .PrMerged:
 			let p = forItem as! PullRequest
-			if p.shouldSkipNotifications() { return }
+			if p.shouldSkipNotifications { return }
 			notification.title = "PR Merged!"
 			notification.subtitle = p.title
 			addPotentialExtraActions(notification)
 		case .PrClosed:
 			let p = forItem as! PullRequest
-			if p.shouldSkipNotifications() { return }
+			if p.shouldSkipNotifications { return }
 			notification.title = "PR Closed"
 			notification.subtitle = p.title
 			addPotentialExtraActions(notification)
@@ -240,38 +240,38 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			notification.subtitle = (forItem as! Repo).fullName
 		case .NewPrAssigned:
 			let p = forItem as! PullRequest
-			if p.shouldSkipNotifications() { return } // unmute on assignment option?
+			if p.shouldSkipNotifications { return } // unmute on assignment option?
 			notification.title = "PR Assigned"
 			notification.subtitle = p.title
 			addPotentialExtraActions(notification)
 		case .NewStatus:
 			let s = forItem as! PRStatus
-			if s.parentShouldSkipNotifications() { return }
+			if s.parentShouldSkipNotifications { return }
 			notification.title = "PR Status Update"
 			notification.subtitle = s.pullRequest.title
 			notification.informativeText = s.descriptionText
 			addPotentialExtraActions(notification)
 		case .NewIssue:
 			let i = forItem as! Issue
-			if i.shouldSkipNotifications() { return }
+			if i.shouldSkipNotifications { return }
 			notification.title = "New Issue"
 			notification.subtitle = i.title
 			addPotentialExtraActions(notification)
 		case .IssueReopened:
 			let i = forItem as! Issue
-			if i.shouldSkipNotifications() { return }
+			if i.shouldSkipNotifications { return }
 			notification.title = "Re-Opened Issue"
 			notification.subtitle = i.title
 			addPotentialExtraActions(notification)
 		case .IssueClosed:
 			let i = forItem as! Issue
-			if i.shouldSkipNotifications() { return }
+			if i.shouldSkipNotifications { return }
 			notification.title = "Issue Closed"
 			notification.subtitle = i.title
 			addPotentialExtraActions(notification)
 		case .NewIssueAssigned:
 			let i = forItem as! Issue
-			if i.shouldSkipNotifications() { return }
+			if i.shouldSkipNotifications { return }
 			notification.title = "Issue Assigned"
 			notification.subtitle = i.title
 			addPotentialExtraActions(notification)

@@ -239,7 +239,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		var labels = [[String : AnyObject]]()
 		for l in item.labels {
 			labels.append([
-				"color": colorToHex(l.colorForDisplay()),
+				"color": colorToHex(l.colorForDisplay),
 				"text": l.name ?? "NOTEXT"
 				])
 		}
@@ -248,9 +248,9 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	private func statusLinesForPr(pr: PullRequest) -> [[String : AnyObject]] {
 		var statusLines = [[String : AnyObject]]()
-		for status in pr.displayedStatuses() {
+		for status in pr.displayedStatuses {
 			statusLines.append([
-				"color": colorToHex(status.colorForDarkDisplay()),
+				"color": colorToHex(status.colorForDarkDisplay),
 				"text": status.descriptionText ?? "NOTEXT"
 				])
 		}
@@ -277,7 +277,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				"user": comment.userName ?? "NOUSER",
 				"date": comment.createdAt ?? never(),
 				"text": comment.body ?? "NOBODY",
-				"mine": comment.isMine()
+				"mine": comment.isMine
 				])
 		}
 		return comments

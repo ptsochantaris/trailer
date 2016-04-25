@@ -95,19 +95,19 @@ final class PRCell: UITableViewCell {
 		let detailFont = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
 		_title.attributedText = pullRequest.titleWithFont(_title.font, labelFont: detailFont.fontWithSize(detailFont.pointSize-2), titleColor: UIColor.darkTextColor())
 		_description.attributedText = pullRequest.subtitleWithFont(detailFont, lightColor: UIColor.lightGrayColor(), darkColor: UIColor.darkGrayColor())
-		setCountsAndImage(pullRequest, muted)
+		setCountsImageAndFade(pullRequest, muted)
 
 		var statusText : NSMutableAttributedString?
 		var statusCount = 0
 		if Settings.showStatusItems {
-			let statusItems = pullRequest.displayedStatuses()
+			let statusItems = pullRequest.displayedStatuses
 			statusCount = statusItems.count
 			while statusCount > 0 {
 				statusText = NSMutableAttributedString()
 				for status in statusItems {
 					var lineAttributes = statusAttributes
-					lineAttributes[NSForegroundColorAttributeName] = status.colorForDisplay()
-					statusText?.appendAttributedString(NSAttributedString(string: status.displayText(), attributes: lineAttributes))
+					lineAttributes[NSForegroundColorAttributeName] = status.colorForDisplay
+					statusText?.appendAttributedString(NSAttributedString(string: status.displayText, attributes: lineAttributes))
 					statusCount -= 1
 					if statusCount > 0 {
 						statusText?.appendAttributedString(NSAttributedString(string: "\n", attributes: lineAttributes))
@@ -125,12 +125,12 @@ final class PRCell: UITableViewCell {
 			if muted {
 				title = "(Muted) - \(title)"
 			}
-			accessibilityLabel = "\(title), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(pullRequest.accessibleSubtitle()). \(statusCount) statuses: \(statusString)"
+			accessibilityLabel = "\(title), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(pullRequest.accessibleSubtitle). \(statusCount) statuses: \(statusString)"
 		} else {
 			statusToAvatarDistance.constant = 0.0
 			statusToDescriptionDistance.constant = 0.0
 			statusToBottomDistance.constant = 4.0
-			accessibilityLabel = "\(pullRequest.accessibleTitle()), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(pullRequest.accessibleSubtitle())"
+			accessibilityLabel = "\(pullRequest.accessibleTitle()), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(pullRequest.accessibleSubtitle)"
 		}
 	}
 
@@ -147,17 +147,18 @@ final class PRCell: UITableViewCell {
 		statusToDescriptionDistance.constant = 0.0
 		statusToBottomDistance.constant = 4.0
 
-		setCountsAndImage(issue, muted)
+		setCountsImageAndFade(issue, muted)
 		var title = issue.accessibleTitle()
 		if muted {
 			title = "(Muted) - \(title)"
 		}
-		accessibilityLabel = "\(title), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(issue.accessibleSubtitle())"
+		accessibilityLabel = "\(title), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(issue.accessibleSubtitle)"
 	}
 
-	private func setCountsAndImage(item: ListableItem, _ muted: Bool) {
+	private func setCountsImageAndFade(item: ListableItem, _ muted: Bool) {
 		let _commentsTotal = item.totalComments?.integerValue ?? 0
-		let _commentsNew = item.showNewComments() ? item.unreadComments?.integerValue ?? 0 : 0
+		let _commentsNew = item.showNewComments ? item.unreadComments?.integerValue ?? 0 : 0
+		let fade = muted || item.isSnoozing
 
 		readCount.text = itemCountFormatter.stringFromNumber(_commentsTotal)
 		readCount.hidden = (_commentsTotal == 0)
@@ -165,7 +166,7 @@ final class PRCell: UITableViewCell {
 		unreadCount.hidden = (_commentsNew == 0)
 		unreadCount.text = itemCountFormatter.stringFromNumber(_commentsNew)
 
-		let a:CGFloat = muted ? DISABLED_FADE : 1.0
+		let a:CGFloat = fade ? DISABLED_FADE : 1.0
 		readCount.alpha = a
 		unreadCount.alpha = a
 		_image.alpha = a
@@ -212,7 +213,7 @@ final class PRCell: UITableViewCell {
 		tone()
 	}
 
-	func tone() {
+	private func tone() {
 		unreadCount.backgroundColor = UIColor.redColor()
 		readCount.backgroundColor = UIColor(white: 0.9, alpha: 1.0)
 	}

@@ -645,14 +645,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	private func setupSortMethodMenu() {
 		let m = NSMenu(title: "Sorting")
-		if Settings.sortDescending {
-			m.addItemWithTitle("Youngest First", action: #selector(PreferencesWindow.sortMethodChanged(_:)), keyEquivalent: "")
-			m.addItemWithTitle("Most Recently Active", action: #selector(PreferencesWindow.sortMethodChanged(_:)), keyEquivalent: "")
-			m.addItemWithTitle("Reverse Alphabetically", action: #selector(PreferencesWindow.sortMethodChanged(_:)), keyEquivalent: "")
-		} else {
-			m.addItemWithTitle("Oldest First", action: #selector(PreferencesWindow.sortMethodChanged(_:)), keyEquivalent: "")
-			m.addItemWithTitle("Inactive For Longest", action: #selector(PreferencesWindow.sortMethodChanged(_:)), keyEquivalent: "")
-			m.addItemWithTitle("Alphabetically", action: #selector(PreferencesWindow.sortMethodChanged(_:)), keyEquivalent: "")
+		for t in Settings.sortDescending ? PRSortingMethod.reverseTitles : PRSortingMethod.normalTitles {
+			m.addItemWithTitle(t, action: #selector(PreferencesWindow.sortMethodChanged(_:)), keyEquivalent: "")
 		}
 		sortModeSelect.menu = m
 		sortModeSelect.selectItemAtIndex(Settings.sortMethod)
@@ -1127,7 +1121,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 					let r = repoForRow(row)
 					let repoName = r.fullName ?? "NoRepoName"
 					let title = (r.inaccessible?.boolValue ?? false) ? repoName + " (inaccessible)" : repoName
-					let textColor = (row == tv.selectedRow) ? NSColor.selectedControlTextColor() : (r.shouldSync() ? NSColor.textColor() : NSColor.textColor().colorWithAlphaComponent(0.4))
+					let textColor = (row == tv.selectedRow) ? NSColor.selectedControlTextColor() : (r.shouldSync ? NSColor.textColor() : NSColor.textColor().colorWithAlphaComponent(0.4))
 					cell.attributedStringValue = NSAttributedString(string: title, attributes: [NSForegroundColorAttributeName: textColor])
 				}
 			} else {
@@ -1194,7 +1188,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		} else if tv == snoozePresetsList {
 			let allPresets = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)
 			let preset = allPresets[row]
-			cell.title = preset.listDescription()
+			cell.title = preset.listDescription
 			let tc = c as! NSTextFieldCell
 			tc.textColor = NSColor.textColor()
 		}

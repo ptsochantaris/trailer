@@ -112,8 +112,8 @@ final class DataManager : NSObject {
 
 		let allPrs = PullRequest.allItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest]
 		for p in allPrs {
-			if p.isVisibleOnMenu() {
-				if !p.createdByMe() {
+			if p.isVisibleOnMenu {
+				if !p.createdByMe {
 					if !(p.isNewAssignment?.boolValue ?? false) && !(p.announced?.boolValue ?? false) {
 						app.postNotificationOfType(.NewPr, forItem: p)
 						p.announced = true
@@ -141,8 +141,8 @@ final class DataManager : NSObject {
 
 		let allIssues = Issue.allItemsOfType("Issue", inMoc: mainObjectContext) as! [Issue]
 		for i in allIssues {
-			if i.isVisibleOnMenu() {
-				if !i.createdByMe() {
+			if i.isVisibleOnMenu {
+				if !i.createdByMe {
 					if !(i.isNewAssignment?.boolValue ?? false) && !(i.announced?.boolValue ?? false) {
 						app.postNotificationOfType(.NewIssue, forItem: i)
 						i.announced = true
@@ -179,13 +179,13 @@ final class DataManager : NSObject {
 			var coveredPrs = Set<NSManagedObjectID>()
 			for s in latestStatuses {
 				let pr = s.pullRequest
-				if pr.isVisibleOnMenu() && (Settings.notifyOnStatusUpdatesForAllPrs || pr.createdByMe() || pr.assignedToParticipated() || pr.assignedToMySection()) {
+				if pr.isVisibleOnMenu && (Settings.notifyOnStatusUpdatesForAllPrs || pr.createdByMe || pr.assignedToParticipated || pr.assignedToMySection) {
 					if !coveredPrs.contains(pr.objectID) {
 						coveredPrs.insert(pr.objectID)
-						if let s = pr.displayedStatuses().first {
+						if let s = pr.displayedStatuses.first {
 							let displayText = s.descriptionText
 							if pr.lastStatusNotified != displayText && pr.postSyncAction?.integerValue != PostSyncAction.NoteNew.rawValue {
-								if pr.snoozeUntil != nil && Settings.snoozeWakeOnStatusUpdate {
+								if pr.isSnoozing && Settings.snoozeWakeOnStatusUpdate {
 									DLog("Waking up snoozed PR ID %@ because of a status update", pr.serverId)
 									pr.wakeUp()
 								}

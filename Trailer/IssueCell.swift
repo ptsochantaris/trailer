@@ -11,7 +11,7 @@ final class IssueCell: TrailerCell {
 
 		unselectedTitleColor = goneDark ? NSColor.controlHighlightColor() : NSColor.controlTextColor()
 
-		let _commentsNew = issue.showNewComments() ? issue.unreadComments?.integerValue ?? 0 : 0
+		let _commentsNew = issue.showNewComments ? issue.unreadComments?.integerValue ?? 0 : 0
 		let _commentsTotal = issue.totalComments?.integerValue ?? 0
 
 		let _title = issue.titleWithFont(titleFont, labelFont: detailFont, titleColor: unselectedTitleColor)
@@ -42,7 +42,7 @@ final class IssueCell: TrailerCell {
 		bottom = ceil(CELL_PADDING * 0.5)
 
 		frame = NSMakeRect(0, 0, MENU_WIDTH, titleHeight+subtitleHeight+CELL_PADDING)
-		let faded = issue.shouldSkipNotifications()
+		let faded = issue.shouldSkipNotifications
 		addCounts(_commentsTotal, _commentsNew, faded)
 
 		var titleRect = NSMakeRect(LEFTPADDING, subtitleHeight+bottom, W, titleHeight)

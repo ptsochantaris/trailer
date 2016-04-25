@@ -11,7 +11,7 @@ final class PullRequestCell: TrailerCell {
 
 		unselectedTitleColor = goneDark ? NSColor.controlHighlightColor() : NSColor.controlTextColor()
 
-		let _commentsNew = pullRequest.showNewComments() ? pullRequest.unreadComments?.integerValue ?? 0 : 0
+		let _commentsNew = pullRequest.showNewComments ? pullRequest.unreadComments?.integerValue ?? 0 : 0
 		let _commentsTotal = pullRequest.totalComments?.integerValue ?? 0
 
 		let _title = pullRequest.titleWithFont(titleFont, labelFont: detailFont, titleColor: unselectedTitleColor)
@@ -19,7 +19,7 @@ final class PullRequestCell: TrailerCell {
 
 		var W = MENU_WIDTH-LEFTPADDING-app.scrollBarWidth
 
-		let showUnpin = (pullRequest.condition?.integerValue != PullRequestCondition.Open.rawValue) || pullRequest.markUnmergeable()
+		let showUnpin = (pullRequest.condition?.integerValue != PullRequestCondition.Open.rawValue) || pullRequest.markUnmergeable
 		if showUnpin { W -= REMOVE_BUTTON_WIDTH } else { W -= 4.0 }
 
 		let showAvatar = !(pullRequest.userAvatarUrl ?? "").isEmpty && !Settings.hideAvatars
@@ -43,9 +43,9 @@ final class PullRequestCell: TrailerCell {
 		if Settings.showStatusItems {
 			CELL_PADDING = 10
 			bottom = ceil(CELL_PADDING * 0.5)
-			statuses = pullRequest.displayedStatuses()
+			statuses = pullRequest.displayedStatuses
 			for s in statuses! {
-				let H = ceil(s.displayText().boundingRectWithSize(CGSizeMake(W, CGFloat.max),
+				let H = ceil(s.displayText.boundingRectWithSize(CGSizeMake(W, CGFloat.max),
 					options: stringDrawingOptions,
 					attributes: statusAttributes).size.height)
 				statusRects.append(NSValue(rect: NSMakeRect(LEFTPADDING, bottom+statusBottom, W, H)))
@@ -57,7 +57,7 @@ final class PullRequestCell: TrailerCell {
 		}
 
 		frame = NSMakeRect(0, 0, MENU_WIDTH, titleHeight+subtitleHeight+statusBottom+CELL_PADDING)
-		let faded = pullRequest.shouldSkipNotifications()
+		let faded = pullRequest.shouldSkipNotifications
 		addCounts(_commentsTotal, _commentsNew, faded)
 
 		var titleRect = NSMakeRect(LEFTPADDING, subtitleHeight+bottom+statusBottom, W, titleHeight)
@@ -127,8 +127,8 @@ final class PullRequestCell: TrailerCell {
 
 				statusLabel.targetUrl = status.targetUrl
 				statusLabel.needsCommand = !Settings.makeStatusItemsSelectable
-				statusLabel.attributedStringValue = NSAttributedString(string: status.displayText(), attributes: statusAttributes)
-				statusLabel.textColor = status.colorForDisplay()
+				statusLabel.attributedStringValue = NSAttributedString(string: status.displayText, attributes: statusAttributes)
+				statusLabel.textColor = status.colorForDisplay
 				if faded {
 					statusLabel.alphaValue = DISABLED_FADE
 				}

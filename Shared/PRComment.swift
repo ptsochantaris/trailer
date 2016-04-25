@@ -46,19 +46,19 @@ final class PRComment: DataItem {
 	}
 
 	func processNotifications() {
-		if let item = pullRequest ?? issue where item.postSyncAction?.integerValue == PostSyncAction.NoteUpdated.rawValue && item.isVisibleOnMenu() {
-			if refersToMe() {
-				if item.snoozeUntil != nil && Settings.snoozeWakeOnMention {
+		if let item = pullRequest ?? issue where item.postSyncAction?.integerValue == PostSyncAction.NoteUpdated.rawValue && item.isVisibleOnMenu {
+			if refersToMe {
+				if item.isSnoozing && Settings.snoozeWakeOnMention {
 					DLog("Waking up snoozed item ID %@ because of mention", item.serverId)
 					item.wakeUp()
 				}
 				app.postNotificationOfType(.NewMention, forItem: self)
-			} else if !isMine() {
-				if item.snoozeUntil != nil && Settings.snoozeWakeOnComment {
+			} else if !isMine {
+				if item.isSnoozing && Settings.snoozeWakeOnComment {
 					DLog("Waking up snoozed item ID %@ because of posted comment", item.serverId)
 					item.wakeUp()
 				}
-				if !Settings.disableAllCommentNotifications && item.showNewComments() && !isMine() {
+				if !Settings.disableAllCommentNotifications && item.showNewComments && !isMine {
 					if let authorName = userName {
 						var blocked = false
 						for blockedAuthor in Settings.commentAuthorBlacklist as [String] {
@@ -98,7 +98,7 @@ final class PRComment: DataItem {
 		}
 	}
 
-	func notificationSubtitle() -> String {
+	var notificationSubtitle: String {
 		if let pr = pullRequest, title = pr.title {
 			return title
 		} else if let i = issue, title = i.title {
@@ -107,18 +107,18 @@ final class PRComment: DataItem {
 		return "(untitled)"
 	}
 
-	func parentShouldSkipNotifications() -> Bool {
+	var parentShouldSkipNotifications: Bool {
 		if let item = pullRequest ?? issue {
-			return item.shouldSkipNotifications()
+			return item.shouldSkipNotifications
 		}
 		return false
 	}
 
-	func isMine() -> Bool {
+	var isMine: Bool {
 		return userId == apiServer.userId
 	}
 
-	func refersToMe() -> Bool {
+	var refersToMe: Bool {
 		if let userForServer = apiServer.userName where userId != apiServer.userId { // Ignore self-references
 			let rangeOfHandle = body?.rangeOfString("@"+userForServer,
 				options: [NSStringCompareOptions.CaseInsensitiveSearch, NSStringCompareOptions.DiacriticInsensitiveSearch])
@@ -127,7 +127,7 @@ final class PRComment: DataItem {
 		return false
 	}
 
-	func refersToMyTeams() -> Bool {
+	var refersToMyTeams: Bool {
 		if let b = body {
 			for t in apiServer.teams {
 				if let r = t.calculatedReferral {

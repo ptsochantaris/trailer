@@ -46,7 +46,7 @@ final class PRStatus: DataItem {
 		}
 	}
 
-	func colorForDarkDisplay() -> COLOR_CLASS {
+	var colorForDarkDisplay: COLOR_CLASS {
 		switch state ?? "" {
 		case "pending":
 			return darkStatusYellow
@@ -57,7 +57,7 @@ final class PRStatus: DataItem {
 		}
 	}
 
-	func colorForDisplay() -> COLOR_CLASS {
+	var colorForDisplay: COLOR_CLASS {
 		switch state ?? "" {
 		case "pending":
 			return lightStatusYellow
@@ -68,7 +68,7 @@ final class PRStatus: DataItem {
 		}
 	}
 
-	func displayText() -> String {
+	var displayText: String {
 		if let desc = descriptionText {
 			let prefix: String
 			switch state ?? "" {
@@ -85,7 +85,7 @@ final class PRStatus: DataItem {
 		}
 	}
 
-	func parentShouldSkipNotifications() -> Bool {
-		return pullRequest.shouldSkipNotifications()
+	var parentShouldSkipNotifications: Bool {
+		return pullRequest.shouldSkipNotifications
 	}
 }

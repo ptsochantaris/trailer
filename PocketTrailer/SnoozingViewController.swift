@@ -66,7 +66,7 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 			}
 		} else {
 			let s = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)[indexPath.row]
-			cell.textLabel?.text = s.listDescription()
+			cell.textLabel?.text = s.listDescription
 			cell.accessoryType = .DisclosureIndicator
 		}
 		return cell

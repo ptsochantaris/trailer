@@ -51,8 +51,8 @@ final class PullRequest: ListableItem {
 	}
 
 	#if os(iOS)
-	override func searchKeywords() -> [String] {
-		return ["PR","Pull Request","PRs","Pull Requests"]+super.searchKeywords()
+	override var searchKeywords: [String] {
+		return ["PR","Pull Request","PRs","Pull Requests"] + super.searchKeywords
 	}
 	#endif
 
@@ -126,7 +126,7 @@ final class PullRequest: ListableItem {
 		return badgeCountFromFetch(f, inMoc: moc)
 	}
 
-	func markUnmergeable() -> Bool {
+	var markUnmergeable: Bool {
 		if let m = mergeable?.boolValue where m == false {
 			if let s = sectionIndex?.integerValue {
 				if s == PullRequestCondition.Merged.rawValue || s == PullRequestCondition.Closed.rawValue {
@@ -216,7 +216,7 @@ final class PullRequest: ListableItem {
 		return _subtitle
 	}
 
-	func accessibleSubtitle() -> String {
+	var accessibleSubtitle: String {
 		var components = [String]()
 
 		if Settings.showReposInName {
@@ -250,7 +250,7 @@ final class PullRequest: ListableItem {
 		return false
 	}
 
-	func displayedStatuses() -> [PRStatus] {
+	var displayedStatuses: [PRStatus] {
 		let f = NSFetchRequest(entityName: "PRStatus")
 		f.returnsObjectsAsFaults = false
 		let mode = Settings.statusFilteringMode
@@ -296,11 +296,11 @@ final class PullRequest: ListableItem {
 		return result
 	}
 
-	func labelsLink() -> String? {
+	var labelsLink: String? {
 		return issueUrl?.stringByAppendingPathComponent("labels")
 	}
 
-	func sectionName() -> String {
+	var sectionName: String {
 		return Section.prMenuTitles[sectionIndex?.integerValue ?? 0]
 	}
 }

@@ -46,22 +46,6 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		static let allNames = ["Auto Refresh", "Display", "Filtering", "Apple Watch", "Comments", "Watchlist", "Statuses & Labels", "History", "Don't confirm when", "Sorting", "Misc"]
 	}
 
-	private enum NormalSorting: Int {
-		case Age, Activity, Name
-		static let allTitles = ["Oldest first", "Inactive for longest", "Alphabetically"]
-		func name() -> String {
-			return NormalSorting.allTitles[rawValue]
-		}
-	}
-
-	private enum ReverseSorting: Int {
-		case Age, Activity, Name
-		static let allTitles = ["Youngest first", "Most recently active", "Reverse alphabetically"]
-		func name() -> String {
-			return ReverseSorting.allTitles[rawValue]
-		}
-	}
-
 	private func check(setting: Bool) -> UITableViewCellAccessoryType {
 		return setting ? UITableViewCellAccessoryType.Checkmark : UITableViewCellAccessoryType.None
 	}
@@ -308,10 +292,8 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.descriptionLabel.text = Settings.sortDescendingHelp
 			case 1:
 				cell.titleLabel.text = "Criterion"
-				if Settings.sortDescending {
-					cell.valueLabel.text = ReverseSorting(rawValue: Settings.sortMethod)?.name()
-				} else {
-					cell.valueLabel.text = NormalSorting(rawValue: Settings.sortMethod)?.name()
+				if let sortMethod = PRSortingMethod(rawValue: Settings.sortMethod) {
+					cell.valueLabel.text = Settings.sortDescending ? sortMethod.reverseTitle() : sortMethod.normalTitle()
 				}
 				cell.descriptionLabel.text = Settings.sortMethodHelp
 			case 2:
@@ -556,7 +538,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				selectedIndexPath = indexPath
 				previousValue = Settings.sortMethod
 				pickerName = tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text ?? "Unknown Picker"
-				valuesToPush = Settings.sortDescending ? ReverseSorting.allTitles : NormalSorting.allTitles
+				valuesToPush = Settings.sortDescending ? PRSortingMethod.reverseTitles : PRSortingMethod.normalTitles
 				performSegueWithIdentifier("showPicker", sender: self)
 			case 2:
 				Settings.groupByRepo = !Settings.groupByRepo

@@ -56,15 +56,6 @@ class ListableItem: DataItem {
 		#endif
 	}
 
-	final class func sortField() -> String? {
-		switch (Settings.sortMethod) {
-		case PRSortingMethod.CreationDate.rawValue: return "createdAt"
-		case PRSortingMethod.RecentActivity.rawValue: return "updatedAt"
-		case PRSortingMethod.Title.rawValue: return "title"
-		default: return nil
-		}
-	}
-
 	final func sortedComments(comparison: NSComparisonResult) -> [PRComment] {
 		return Array(comments).sort({ (c1, c2) -> Bool in
 			let d1 = c1.createdAt ?? never()
@@ -88,11 +79,6 @@ class ListableItem: DataItem {
 		postProcess()
 	}
 
-	final func shouldSkipNotifications() -> Bool {
-		if stillSnoozing() { return true }
-		return muted?.boolValue ?? false
-	}
-
 	final func shouldKeepForPolicy(policy: Int) -> Bool {
 		let index = (sectionIndex?.integerValue ?? 0)
 		return policy==PRHandlingPolicy.KeepAll.rawValue
@@ -100,22 +86,26 @@ class ListableItem: DataItem {
 			|| (policy==PRHandlingPolicy.KeepMine.rawValue && index==Section.Mine.rawValue)
 	}
 
-	final func assignedToMySection() -> Bool {
+	final var shouldSkipNotifications: Bool {
+		return isSnoozing || (muted?.boolValue ?? false)
+	}
+
+	final var assignedToMySection: Bool {
 		return (assignedToMe?.boolValue ?? false) && Settings.assignedPrHandlingPolicy==PRAssignmentPolicy.MoveToMine.rawValue
 	}
 
-	final func assignedToParticipated() -> Bool {
+	final var assignedToParticipated: Bool {
 		return (assignedToMe?.boolValue ?? false) && Settings.assignedPrHandlingPolicy==PRAssignmentPolicy.MoveToParticipated.rawValue
 	}
 
-	final func createdByMe() -> Bool {
+	final var createdByMe: Bool {
 		if let userId = userId, apiId = apiServer.userId {
 			return userId == apiId
 		}
 		return false
 	}
 
-	final func refersToMe() -> Bool {
+	final var refersToMe: Bool {
 		if let apiName = apiServer.userName, b = body {
 			let range = b.rangeOfString("@"+apiName, options: [NSStringCompareOptions.CaseInsensitiveSearch, NSStringCompareOptions.DiacriticInsensitiveSearch])
 			return range != nil
@@ -123,16 +113,16 @@ class ListableItem: DataItem {
 		return false
 	}
 
-	final func commentedByMe() -> Bool {
+	final var commentedByMe: Bool {
 		for c in comments {
-			if c.isMine() {
+			if c.isMine {
 				return true
 			}
 		}
 		return false
 	}
 
-	final func refersToMyTeams() -> Bool {
+	final var refersToMyTeams: Bool {
 		if let b = body {
 			for t in apiServer.teams {
 				if let r = t.calculatedReferral {
@@ -142,18 +132,18 @@ class ListableItem: DataItem {
 			}
 		}
 		for c in comments {
-			if c.refersToMyTeams() {
+			if c.refersToMyTeams {
 				return true
 			}
 		}
 		return false
 	}
 
-	final func isVisibleOnMenu() -> Bool {
+	final var isVisibleOnMenu: Bool {
 		return self.sectionIndex?.integerValue != Section.None.rawValue
 	}
 
-	final func showNewComments() -> Bool {
+	final var showNewComments: Bool {
 		return Settings.showCommentsEverywhere || sectionIndex?.integerValue == Section.Mine.rawValue || sectionIndex?.integerValue == Section.Participated.rawValue || sectionIndex?.integerValue == Section.Mentioned.rawValue
 	}
 
@@ -162,28 +152,25 @@ class ListableItem: DataItem {
 		postProcess()
 	}
 
-	final func stillSnoozing() -> Bool {
-		if let s = snoozeUntil {
-			if s.compare(NSDate()) == .OrderedAscending {
-				snoozeUntil = nil
-				return false
-			} else {
-				return true
-			}
-		}
-		return false
+	final var isSnoozing: Bool {
+		return snoozeUntil != nil
 	}
 
 	final func postProcess() {
+
+		if let s = snoozeUntil where s.compare(NSDate()) == .OrderedAscending {
+			snoozeUntil = nil
+		}
+
 		var targetSection: Section
 		let currentCondition = condition?.integerValue ?? PullRequestCondition.Open.rawValue
-		let isMine = createdByMe()
+		let isMine = createdByMe
 
 		if currentCondition == PullRequestCondition.Merged.rawValue			{ targetSection = .Merged }
 		else if currentCondition == PullRequestCondition.Closed.rawValue	{ targetSection = .Closed }
-		else if stillSnoozing()												{ targetSection = .Snoozed }
-		else if isMine || assignedToMySection()								{ targetSection = .Mine }
-		else if assignedToParticipated() || commentedByMe()					{ targetSection = .Participated }
+		else if snoozeUntil != nil											{ targetSection = .Snoozed }
+		else if isMine || assignedToMySection								{ targetSection = .Mine }
+		else if assignedToParticipated || commentedByMe						{ targetSection = .Participated }
 		else																{ targetSection = .All }
 
 		var needsManualCount = false
@@ -191,7 +178,7 @@ class ListableItem: DataItem {
 		let outsideMySectionsButAwake = (targetSection == .All || targetSection == .None)
 
 		if outsideMySectionsButAwake && Settings.autoMoveOnTeamMentions {
-			if refersToMyTeams() {
+			if refersToMyTeams {
 				moveToMentioned = true
 			} else {
 				needsManualCount = true
@@ -199,7 +186,7 @@ class ListableItem: DataItem {
 		}
 
 		if !moveToMentioned && outsideMySectionsButAwake && Settings.autoMoveOnCommentMentions {
-			if refersToMe() {
+			if refersToMe {
 				moveToMentioned = true
 			} else {
 				needsManualCount = true
@@ -225,7 +212,7 @@ class ListableItem: DataItem {
 			var unreadCommentCount: Int = 0
 			if !isMuted {
 				for c in try! managedObjectContext?.executeFetchRequest(f) as! [PRComment] {
-					if c.refersToMe() {
+					if c.refersToMe {
 						targetSection = .Mentioned
 					}
 					if let l = latestDate {
@@ -299,7 +286,7 @@ class ListableItem: DataItem {
 		}
 
 		if targetSection != .None, let p = self as? PullRequest where p.shouldBeCheckedForRedStatusesInSection(targetSection) {
-			for s in p.displayedStatuses() {
+			for s in p.displayedStatuses {
 				if s.state != "success" {
 					targetSection = .None
 					break
@@ -382,7 +369,7 @@ class ListableItem: DataItem {
 					var count = 0
 					for l in sortedLabels() {
 						var a = labelAttributes
-						let color = l.colorForDisplay()
+						let color = l.colorForDisplay
 						a[NSBackgroundColorAttributeName] = color
 						a[NSForegroundColorAttributeName] = isDarkColor(color) ? COLOR_CLASS.whiteColor() : COLOR_CLASS.blackColor()
 						let name = l.name!.stringByReplacingOccurrencesOfString(" ", withString: "\u{a0}")
@@ -442,7 +429,7 @@ class ListableItem: DataItem {
 	final class func badgeCountFromFetch(f: NSFetchRequest, inMoc: NSManagedObjectContext) -> Int {
 		var badgeCount:Int = 0
 		for i in try! inMoc.executeFetchRequest(f) as! [ListableItem] {
-			if i.showNewComments() {
+			if i.showNewComments {
 				badgeCount += (i.unreadComments?.integerValue ?? 0)
 			}
 		}
@@ -625,10 +612,10 @@ class ListableItem: DataItem {
 			sortDescriptors.append(NSSortDescriptor(key: "repo.fullName", ascending: true, selector: #selector(NSString.caseInsensitiveCompare(_:))))
 		}
 
-		if let fieldName = sortField() {
+		if let fieldName = PRSortingMethod(rawValue: Settings.sortMethod)?.field() {
 			if fieldName == "title" {
 				sortDescriptors.append(NSSortDescriptor(key: fieldName, ascending: !Settings.sortDescending, selector: #selector(NSString.caseInsensitiveCompare(_:))))
-			} else if !fieldName.isEmpty {
+			} else {
 				sortDescriptors.append(NSSortDescriptor(key: fieldName, ascending: !Settings.sortDescending))
 			}
 		}
@@ -681,22 +668,12 @@ class ListableItem: DataItem {
 	}
 
 	#if os(iOS)
-	func searchKeywords() -> [String] {
-		var labelNames = [String]()
-		for l in labels {
-			if let l = l.name {
-				labelNames.append(l)
-			}
-		}
+	var searchKeywords: [String] {
+		let labelNames = labels.flatMap { $0.name }
 		return [(userLogin ?? "NO_USERNAME"), "Trailer", "PocketTrailer", "Pocket Trailer"] + labelNames + (repo.fullName?.componentsSeparatedByString("/") ?? [])
 	}
 	final func searchTitle() -> String {
-		var labelNames = [String]()
-		for l in labels {
-			if let l = l.name {
-				labelNames.append(l)
-			}
-		}
+		let labelNames = labels.flatMap { $0.name }
 		var suffix = ""
 		if labelNames.count > 0 {
 			for l in labelNames {
@@ -710,7 +687,7 @@ class ListableItem: DataItem {
 		s.title = searchTitle()
 		s.contentCreationDate = createdAt
 		s.contentModificationDate = updatedAt
-		s.keywords = searchKeywords()
+		s.keywords = searchKeywords
 		s.creator = userLogin
 
 		s.contentDescription = (repo.fullName ?? "") +

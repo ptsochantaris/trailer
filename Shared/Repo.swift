@@ -49,7 +49,7 @@ final class Repo: DataItem {
 		}
 	}
 
-	func shouldSync() -> Bool {
+	var shouldSync: Bool {
 		return (displayPolicyForPrs?.integerValue ?? 0) > 0 || (displayPolicyForIssues?.integerValue ?? 0) > 0
 	}
 
@@ -117,7 +117,7 @@ final class Repo: DataItem {
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "serverId IN %@", ids)
 		for repo in try! inMoc.executeFetchRequest(f) as! [Repo] {
-			repo.dirty = repo.shouldSync()
+			repo.dirty = repo.shouldSync
 		}
 	}
 

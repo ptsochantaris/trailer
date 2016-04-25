@@ -148,7 +148,7 @@ class TrailerCell: NSTableCellView {
 					if let c = m.addItemWithTitle("Snooze...", action: nil, keyEquivalent: "") {
 						let s = NSMenu(title: "Snooze")
 						for i in snoozeItems {
-							if let smi = s.addItemWithTitle(i.listDescription(), action: #selector(TrailerCell.snoozeSelected(_:)), keyEquivalent: "") {
+							if let smi = s.addItemWithTitle(i.listDescription, action: #selector(TrailerCell.snoozeSelected(_:)), keyEquivalent: "") {
 								smi.representedObject = i.objectID
 							}
 						}
@@ -168,7 +168,7 @@ class TrailerCell: NSTableCellView {
 
 	func snoozeSelected(sender: NSMenuItem) {
 		if let item = associatedDataItem(), oid = sender.representedObject as? NSManagedObjectID, snoozeItem = existingObjectWithID(oid) as? SnoozePreset {
-			item.snoozeUntil = snoozeItem.wakeupDateFromNow()
+			item.snoozeUntil = snoozeItem.wakeupDateFromNow
 			item.postProcess()
 			saveAndRequestMenuUpdate(item)
 		}

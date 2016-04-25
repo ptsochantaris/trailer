@@ -535,7 +535,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			actions.append(d)
 		} else {
 			let s: UITableViewRowAction
-			if item.snoozeUntil != nil {
+			if item.isSnoozing {
 				s = UITableViewRowAction(style: .Normal, title: "Wake") { [weak self] (action, indexPath) in
 					if let i = self?.fetchedResultsController.objectAtIndexPath(indexPath) as? ListableItem {
 						i.wakeUp()
@@ -565,8 +565,8 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		                          message: hasPresets ? t : "You do not currently have any snoozing presets configured. Please add some in the relevant preferences tab.",
 		                          preferredStyle: .ActionSheet)
 		for item in items {
-			a.addAction(UIAlertAction(title: item.listDescription(), style: .Default) { action in
-				i.snoozeUntil = item.wakeupDateFromNow()
+			a.addAction(UIAlertAction(title: item.listDescription, style: .Default) { action in
+				i.snoozeUntil = item.wakeupDateFromNow
 				i.postProcess()
 				DataManager.saveDB()
 			})
@@ -580,20 +580,14 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			return c
 		}
 
-		var fetchRequest: NSFetchRequest
-
-		if viewMode == .PullRequests {
-			fetchRequest = ListableItem.requestForItemsOfType("PullRequest", withFilter: searchField.text, sectionIndex: -1)
-		} else {
-			fetchRequest = ListableItem.requestForItemsOfType("Issue", withFilter: searchField.text, sectionIndex: -1)
-		}
+		let type = viewMode == .PullRequests ? "PullRequest" : "Issue"
+		let fetchRequest = ListableItem.requestForItemsOfType(type, withFilter: searchField.text, sectionIndex: -1)
 
 		let aFetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: mainObjectContext, sectionNameKeyPath: "sectionName", cacheName: nil)
 		aFetchedResultsController.delegate = self
 		_fetchedResultsController = aFetchedResultsController
 
 		try! aFetchedResultsController.performFetch()
-
 		return aFetchedResultsController
 	}
 

@@ -11,7 +11,7 @@ final class SnoozePreset: NSManagedObject {
 
 	@NSManaged var duration: NSNumber
 
-	func listDescription() -> String {
+	var listDescription: String {
 		if duration.boolValue {
 			var resultItems = [String]()
 			if let d = day?.integerValue {
@@ -84,7 +84,7 @@ final class SnoozePreset: NSManagedObject {
 		}
 	}
 
-	func wakeupDateFromNow() -> NSDate {
+	var wakeupDateFromNow: NSDate {
 
 		let now = NSDate()
 		

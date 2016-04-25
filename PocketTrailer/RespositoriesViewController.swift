@@ -210,7 +210,7 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 		let repo = fetchedResultsController.objectAtIndexPath(atIndexPath) as! Repo
 
 		cell.titleLabel.text = repo.fullName
-		cell.titleLabel.textColor = repo.shouldSync() ? UIColor.blackColor() : UIColor.lightGrayColor()
+		cell.titleLabel.textColor = repo.shouldSync ? UIColor.blackColor() : UIColor.lightGrayColor()
 		let prTitle = prTitleForRepo(repo)
 		let issuesTitle = issueTitleForRepo(repo)
 		let hidingTitle = hidingTitleForRepo(repo)
@@ -241,7 +241,7 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 
 		let fullName = repo.fullName ?? "(Untitled Repo)"
 		let text = (repo.inaccessible?.boolValue ?? false) ? (fullName + " (inaccessible)") : fullName
-		let color = repo.shouldSync() ? UIColor.darkTextColor() : UIColor.lightGrayColor()
+		let color = repo.shouldSync ? UIColor.darkTextColor() : UIColor.lightGrayColor()
 		return NSAttributedString(string: text, attributes: [ NSForegroundColorAttributeName: color ])
 	}
 

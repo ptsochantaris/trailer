@@ -540,7 +540,7 @@ final class API {
 					for r in DataItem.newItemsOfType("Repo", inMoc: moc) as! [Repo] {
 						r.displayPolicyForPrs = Settings.displayPolicyForNewPrs
 						r.displayPolicyForIssues = Settings.displayPolicyForNewIssues
-						if r.shouldSync() {
+						if r.shouldSync {
 							app.postNotificationOfType(.NewRepoAnnouncement, forItem:r)
 						}
 					}
@@ -824,7 +824,7 @@ final class API {
 				l.postSyncAction = PostSyncAction.Delete.rawValue
 			}
 
-			if let link = p.labelsLink() {
+			if let link = p.labelsLink {
 
 				getPagedDataInPath(link, fromServer: p.apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
 					perPageCallback: { data, lastPage in
@@ -933,7 +933,7 @@ final class API {
 
 		let prsToCheck = pullRequests.filter { r -> Bool in
 			let parent = r.repo
-			return parent.shouldSync() && ((parent.postSyncAction?.integerValue ?? 0) != PostSyncAction.Delete.rawValue) && r.apiServer.syncIsGood
+			return parent.shouldSync && ((parent.postSyncAction?.integerValue ?? 0) != PostSyncAction.Delete.rawValue) && r.apiServer.syncIsGood
 		}
 
 		let totalOperations = prsToCheck.count
@@ -962,7 +962,7 @@ final class API {
 
 		for i in try! moc.executeFetchRequest(f) as! [Issue] {
 			let r = i.repo
-			if r.shouldSync() && ((r.postSyncAction?.integerValue ?? 0) != PostSyncAction.Delete.rawValue) && r.apiServer.syncIsGood {
+			if r.shouldSync && ((r.postSyncAction?.integerValue ?? 0) != PostSyncAction.Delete.rawValue) && r.apiServer.syncIsGood {
 				issueWasClosed(i)
 			}
 		}
@@ -995,7 +995,7 @@ final class API {
 						if let assigneeInfo = N(data, "assignee") as? [NSObject : AnyObject] {
 							let assignee = N(assigneeInfo, "login") as? String ?? "NoAssignedUserName"
 							let assigned = (assignee == (apiServer.userName ?? "NoApiUser"))
-							p.isNewAssignment = (assigned && !p.createdByMe() && !(p.assignedToMe?.boolValue ?? false))
+							p.isNewAssignment = (assigned && !p.createdByMe && !(p.assignedToMe?.boolValue ?? false))
 							p.assignedToMe = assigned
 						} else if resultCode == 200 || resultCode == 404 || resultCode == 410 {
 							// 200 means PR is not assigned to anyone, there was no asgineee info
@@ -1065,7 +1065,7 @@ final class API {
 			NSNumber(integer: Settings.mergeHandlingPolicy),
 			r.sectionIndex ?? NSNumber(integer: 0))
 
-        if !r.isVisibleOnMenu() {
+        if !r.isVisibleOnMenu {
             DLog("Merged PR was hidden, won't announce")
             return
         }
@@ -1090,7 +1090,7 @@ final class API {
 			NSNumber(integer: Settings.closeHandlingPolicy),
 			r.sectionIndex ?? NSNumber(integer: 0))
 
-        if !r.isVisibleOnMenu() {
+        if !r.isVisibleOnMenu {
             DLog("Closed PR was hidden, won't announce")
             return
         }
@@ -1111,7 +1111,7 @@ final class API {
 			NSNumber(integer: Settings.closeHandlingPolicy),
 			i.sectionIndex ?? NSNumber(integer: 0))
 
-        if !i.isVisibleOnMenu() {
+        if !i.isVisibleOnMenu {
             DLog("Closed issue was hidden, won't announce")
             return
         }

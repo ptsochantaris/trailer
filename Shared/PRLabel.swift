@@ -72,9 +72,9 @@ final class PRLabel: DataItem {
 		}
 	}
 
-	func colorForDisplay() -> COLOR_CLASS {
-		if let c = color?.unsignedIntValue {
-			return colorFromUInt32(c)
+	var colorForDisplay: COLOR_CLASS {
+		if let c = color {
+			return colorFromUInt32(c.unsignedIntValue)
 		} else {
 			return COLOR_CLASS.blackColor()
 		}

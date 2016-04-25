@@ -112,7 +112,25 @@ enum PRNotificationType: Int {
 }
 
 enum PRSortingMethod: Int {
-	case CreationDate, RecentActivity, Title, Repository
+	case CreationDate, RecentActivity, Title
+	static let reverseTitles = ["Youngest first", "Most recently active", "Reverse alphabetically"]
+	static let normalTitles = ["Oldest first", "Inactive for longest", "Alphabetically"]
+
+	func normalTitle() -> String {
+		return PRSortingMethod.normalTitles[rawValue]
+	}
+
+	func reverseTitle() -> String {
+		return PRSortingMethod.reverseTitles[rawValue]
+	}
+
+	func field() -> String? {
+		switch self {
+		case .CreationDate: return "createdAt"
+		case .RecentActivity: return "updatedAt"
+		case .Title: return "title"
+		}
+	}
 }
 
 enum PRHandlingPolicy: Int {
