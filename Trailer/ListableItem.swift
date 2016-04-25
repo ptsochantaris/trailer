@@ -156,6 +156,16 @@ class ListableItem: DataItem {
 		return snoozeUntil != nil
 	}
 
+	final func keepWithCondition(newCondition: ItemCondition, notification: NotificationType) {
+		postSyncAction = PostSyncAction.DoNothing.rawValue
+		condition = newCondition.rawValue
+		if snoozeUntil != nil {
+			snoozeUntil = nil
+		} else {
+			app.postNotificationOfType(notification, forItem: self)
+		}
+	}
+
 	final func postProcess() {
 
 		if let s = snoozeUntil where s.compare(NSDate()) == .OrderedAscending {

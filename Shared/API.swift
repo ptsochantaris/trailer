@@ -280,7 +280,7 @@ final class API {
 			}
 		}
 
-		let mainQueue = NSOperationQueue.mainQueue();
+		let mainQueue = NSOperationQueue.mainQueue()
 
 		mainQueue.addOperationWithBlock {
 			DataItem.nukeDeletedItemsInMoc(moc)
@@ -963,7 +963,7 @@ final class API {
 		for i in try! moc.executeFetchRequest(f) as! [Issue] {
 			let r = i.repo
 			if r.shouldSync && ((r.postSyncAction?.integerValue ?? 0) != PostSyncAction.Delete.rawValue) && r.apiServer.syncIsGood {
-				issueWasClosed(i)
+				itemWasClosed(i)
 			}
 		}
 	}
@@ -1041,11 +1041,11 @@ final class API {
 				if let mergeInfo = N(data, "merged_by") as? [NSObject: AnyObject], mergeUserId = N(mergeInfo, "id") as? NSNumber {
 					self?.prWasMerged(r, byUserId: mergeUserId)
 				} else {
-					self?.prWasClosed(r)
+					self?.itemWasClosed(r)
 				}
 			} else {
 				if let resultCode = response?.statusCode where resultCode == 404 || resultCode==410 { // PR gone for good
-					self?.prWasClosed(r)
+					self?.itemWasClosed(r)
 				} else { // fetch problem
 					r.postSyncAction = PostSyncAction.DoNothing.rawValue // don't delete this, we couldn't check, play it safe
 					r.apiServer.lastSyncSucceeded = false
@@ -1075,54 +1075,29 @@ final class API {
 			DLog("Checking if we want to keep this merged PR")
 			if r.shouldKeepForPolicy(Settings.mergeHandlingPolicy) {
 				DLog("Will keep merged PR")
-				r.postSyncAction = PostSyncAction.DoNothing.rawValue
-				r.condition = ItemCondition.Merged.rawValue
-				app.postNotificationOfType(.PrMerged, forItem: r)
+				r.keepWithCondition(.Merged, notification: .PrMerged)
 				return
 			}
 		}
 		DLog("Will not keep merged PR")
 	}
 
-	private func prWasClosed(r: PullRequest) {
-		DLog("Detected closed PR: %@, handling policy is %@, coming from section %@",
-			r.title,
-			NSNumber(integer: Settings.closeHandlingPolicy),
-			r.sectionIndex ?? NSNumber(integer: 0))
-
-        if !r.isVisibleOnMenu {
-            DLog("Closed PR was hidden, won't announce")
-            return
-        }
-
-		if r.shouldKeepForPolicy(Settings.closeHandlingPolicy) {
-			DLog("Will keep closed PR")
-			r.postSyncAction = PostSyncAction.DoNothing.rawValue
-			r.condition = ItemCondition.Closed.rawValue
-			app.postNotificationOfType(.PrClosed, forItem:r)
-		} else {
-			DLog("Will not keep closed PR")
-		}
-	}
-
-	private func issueWasClosed(i: Issue) {
-		DLog("Detected closed issue: %@, handling policy is %@, coming from section %@",
+	private func itemWasClosed(i: ListableItem) {
+		DLog("Detected closed item: %@, handling policy is %@, coming from section %@",
 			i.title,
 			NSNumber(integer: Settings.closeHandlingPolicy),
 			i.sectionIndex ?? NSNumber(integer: 0))
 
         if !i.isVisibleOnMenu {
-            DLog("Closed issue was hidden, won't announce")
+            DLog("Closed item was hidden, won't announce")
             return
         }
 
 		if i.shouldKeepForPolicy(Settings.closeHandlingPolicy) {
-			DLog("Will keep closed issue")
-			i.postSyncAction = PostSyncAction.DoNothing.rawValue
-			i.condition = ItemCondition.Closed.rawValue
-			app.postNotificationOfType(.IssueClosed, forItem:i)
+			DLog("Will keep closed item")
+			i.keepWithCondition(.Closed, notification: i is Issue ? .IssueClosed : .PrClosed)
 		} else {
-			DLog("Will not keep closed issue")
+			DLog("Will not keep closed item")
 		}
 	}
 
