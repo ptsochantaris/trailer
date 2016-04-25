@@ -484,76 +484,63 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	override func tableView(tableView: UITableView, editActionsForRowAtIndexPath indexPath: NSIndexPath) -> [UITableViewRowAction]? {
 
-		let item = fetchedResultsController.objectAtIndexPath(indexPath) as! ListableItem
+		var actions = [UITableViewRowAction]()
 
-		let r,m: UITableViewRowAction
+		if let i = fetchedResultsController.objectAtIndexPath(indexPath) as? ListableItem, sectionName = fetchedResultsController.sections?[indexPath.section].name {
 
-		if item.unreadComments?.longLongValue ?? 0 > 0 {
-			r = UITableViewRowAction(style: .Normal, title: "Read") { [weak self] (action, indexPath) in
-				if let i = self?.fetchedResultsController.objectAtIndexPath(indexPath) as? ListableItem {
-					app.markItemAsRead(i.objectID.URIRepresentation().absoluteString, reloadView: false)
-					tableView.setEditing(false, animated: true)
-				}
-			}
-		} else {
-			r = UITableViewRowAction(style: .Normal, title: "Unread") { [weak self] (action, indexPath) in
-				if let i = self?.fetchedResultsController.objectAtIndexPath(indexPath) as? ListableItem {
-					app.markItemAsUnRead(i.objectID.URIRepresentation().absoluteString, reloadView: false)
-					tableView.setEditing(false, animated: true)
-				}
-			}
-		}
-
-		if item.muted?.boolValue ?? false {
-			m = UITableViewRowAction(style: .Normal, title: "Unmute") { [weak self] (action, indexPath) in
-				if let i = self?.fetchedResultsController.objectAtIndexPath(indexPath) as? ListableItem {
-					i.setMute(false)
-					DataManager.saveDB()
-					tableView.setEditing(false, animated: true)
-				}
-			}
-		} else {
-			m = UITableViewRowAction(style: .Normal, title: "Mute") { [weak self] (action, indexPath) in
-				if let i = self?.fetchedResultsController.objectAtIndexPath(indexPath) as? ListableItem {
-					i.setMute(true)
-					DataManager.saveDB()
-					tableView.setEditing(false, animated: true)
-				}
-			}
-		}
-
-		r.backgroundColor = self.view.tintColor
-		var actions = [r,m]
-
-		if let sectionName = fetchedResultsController.sections?[indexPath.section].name where sectionName == Section.Merged.prMenuName() || sectionName == Section.Closed.prMenuName() {
-			let d = UITableViewRowAction(style: .Destructive, title: "Delete") { [weak self] (action, indexPath) in
-				if let i = self?.fetchedResultsController.objectAtIndexPath(indexPath) as? ListableItem {
+			if sectionName == Section.Merged.prMenuName() || sectionName == Section.Closed.prMenuName() || sectionName == Section.Closed.issuesMenuName() {
+				let d = UITableViewRowAction(style: .Destructive, title: "Delete") { action, indexPath in
 					mainObjectContext.deleteObject(i)
 					DataManager.saveDB()
 				}
-			}
-			actions.append(d)
-		} else {
-			let s: UITableViewRowAction
-			if item.isSnoozing {
-				s = UITableViewRowAction(style: .Normal, title: "Wake") { [weak self] (action, indexPath) in
-					if let i = self?.fetchedResultsController.objectAtIndexPath(indexPath) as? ListableItem {
-						i.wakeUp()
+				actions.append(d)
+			} else if i.isSnoozing {
+				let w = UITableViewRowAction(style: .Normal, title: "Wake") { action, indexPath in
+					i.wakeUp()
+					DataManager.saveDB()
+				}
+				w.backgroundColor = UIColor.darkGrayColor()
+				actions.append(w)
+			} else {
+
+				let r: UITableViewRowAction
+				if i.unreadComments?.longLongValue ?? 0 > 0 {
+					r = UITableViewRowAction(style: .Normal, title: "Read") { action, indexPath in
+						app.markItemAsRead(i.objectID.URIRepresentation().absoluteString, reloadView: false)
+						tableView.setEditing(false, animated: true)
+					}
+				} else {
+					r = UITableViewRowAction(style: .Normal, title: "Unread") { action, indexPath in
+						app.markItemAsUnRead(i.objectID.URIRepresentation().absoluteString, reloadView: false)
+						tableView.setEditing(false, animated: true)
+					}
+				}
+				r.backgroundColor = view.tintColor
+				actions.append(r)
+
+				let m: UITableViewRowAction
+				if i.muted?.boolValue ?? false {
+					m = UITableViewRowAction(style: .Normal, title: "Unmute") { action, indexPath in
+						i.setMute(false)
+						DataManager.saveDB()
+						tableView.setEditing(false, animated: true)
+					}
+				} else {
+					m = UITableViewRowAction(style: .Normal, title: "Mute") { action, indexPath in
+						i.setMute(true)
 						DataManager.saveDB()
 						tableView.setEditing(false, animated: true)
 					}
 				}
-			} else {
-				s = UITableViewRowAction(style: .Normal, title: "Snooze") { [weak self] (action, indexPath) in
-					if let i = self?.fetchedResultsController.objectAtIndexPath(indexPath) as? ListableItem {
-						self?.showSnoozeMenuFor(i)
-					}
-				}
-			}
-			s.backgroundColor = UIColor.darkGrayColor()
-			actions.append(s)
-		}
+				actions.append(m)
 
+				let s = UITableViewRowAction(style: .Normal, title: "Snooze") { [weak self] action, indexPath in
+					self?.showSnoozeMenuFor(i)
+				}
+				s.backgroundColor = UIColor.darkGrayColor()
+				actions.append(s)
+			}
+		}
 		return actions
 	}
 
@@ -567,6 +554,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		for item in items {
 			a.addAction(UIAlertAction(title: item.listDescription, style: .Default) { action in
 				i.snoozeUntil = item.wakeupDateFromNow
+				i.muted = false
 				i.postProcess()
 				DataManager.saveDB()
 			})

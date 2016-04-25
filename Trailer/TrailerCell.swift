@@ -99,39 +99,22 @@ class TrailerCell: NSTableCellView {
 			title = "PR Options"
 		}
 
+		let cmd = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
+
         let m = NSMenu(title: title)
 		m.addItemWithTitle(title, action: #selector(TrailerCell.copyNumberToClipboard), keyEquivalent: "")
 		m.addItem(NSMenuItem.separatorItem())
 		
 		if let c = m.addItemWithTitle("Copy URL", action: #selector(TrailerCell.copyToClipboard), keyEquivalent: "c") {
-			c.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
+			c.keyEquivalentModifierMask = cmd
 		}
 
 		if let c = m.addItemWithTitle("Open Repo", action: #selector(TrailerCell.openRepo), keyEquivalent: "o") {
-			c.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
-		}
-
-		if muted {
-			if let c = m.addItemWithTitle("Un-Mute", action: #selector(TrailerCell.unMuteSelected), keyEquivalent: "m") {
-				c.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
-			}
-		} else {
-			if let c = m.addItemWithTitle("Mute", action: #selector(TrailerCell.muteSelected), keyEquivalent: "m") {
-				c.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
-			}
-		}
-
-		if item.unreadComments?.integerValue > 0 {
-			if let c = m.addItemWithTitle("Mark as read", action: #selector(TrailerCell.markReadSelected), keyEquivalent: "a") {
-				c.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
-			}
-		} else {
-			if let c = m.addItemWithTitle("Mark as unread", action: #selector(TrailerCell.markUnreadSelected), keyEquivalent: "a") {
-				c.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
-			}
+			c.keyEquivalentModifierMask = cmd
 		}
 
 		if let s = item.sectionIndex?.integerValue, section = Section(rawValue: s) where !(section == .Closed || section == .Merged) {
+
 			if let snooze = item.snoozeUntil {
 				let title: String
 				if snooze == NSDate.distantFuture() {
@@ -140,9 +123,30 @@ class TrailerCell: NSTableCellView {
 					title = String(format: "Wake (auto: %@)", itemDateFormatter.stringFromDate(snooze))
 				}
 				if let c = m.addItemWithTitle(title, action: #selector(TrailerCell.wakeUpSelected), keyEquivalent: "s") {
-					c.keyEquivalentModifierMask = Int(NSEventModifierFlags.CommandKeyMask.rawValue)
+					c.keyEquivalentModifierMask = cmd
 				}
 			} else {
+
+				if item.unreadComments?.integerValue > 0 {
+					if let c = m.addItemWithTitle("Mark as read", action: #selector(TrailerCell.markReadSelected), keyEquivalent: "a") {
+						c.keyEquivalentModifierMask = cmd
+					}
+				} else {
+					if let c = m.addItemWithTitle("Mark as unread", action: #selector(TrailerCell.markUnreadSelected), keyEquivalent: "a") {
+						c.keyEquivalentModifierMask = cmd
+					}
+				}
+				
+				if muted {
+					if let c = m.addItemWithTitle("Un-Mute", action: #selector(TrailerCell.unMuteSelected), keyEquivalent: "m") {
+						c.keyEquivalentModifierMask = cmd
+					}
+				} else {
+					if let c = m.addItemWithTitle("Mute", action: #selector(TrailerCell.muteSelected), keyEquivalent: "m") {
+						c.keyEquivalentModifierMask = cmd
+					}
+				}
+
 				let snoozeItems = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)
 				if snoozeItems.count > 0 {
 					if let c = m.addItemWithTitle("Snooze...", action: nil, keyEquivalent: "") {
@@ -169,6 +173,7 @@ class TrailerCell: NSTableCellView {
 	func snoozeSelected(sender: NSMenuItem) {
 		if let item = associatedDataItem(), oid = sender.representedObject as? NSManagedObjectID, snoozeItem = existingObjectWithID(oid) as? SnoozePreset {
 			item.snoozeUntil = snoozeItem.wakeupDateFromNow
+			item.muted = false
 			item.postProcess()
 			saveAndRequestMenuUpdate(item)
 		}
