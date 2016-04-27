@@ -11,25 +11,27 @@ final class Issue: ListableItem {
 	class func syncIssuesFromInfoArray(data: [[NSObject : AnyObject]]?, inRepo: Repo) {
 		var filteredData = [[NSObject : AnyObject]]()
 		for d in data ?? [] {
-			if N(d, "pull_request") == nil { // don't sync issues which are pull requests, they are already synced
+			if d["pull_request"] == nil { // don't sync issues which are pull requests, they are already synced
 				filteredData.append(d)
 			}
 		}
 		itemsWithInfo(filteredData, type: "Issue", fromServer: inRepo.apiServer) { item, info, isNewOrUpdated in
 			let i = item as! Issue
 			if isNewOrUpdated {
-				i.url = N(info, "url") as? String
-				i.webUrl = N(info, "html_url") as? String
-				i.number = N(info, "number") as? NSNumber
-				i.state = N(info, "state") as? String
-				i.title = N(info, "title") as? String
-				i.body = N(info, "body") as? String
+				i.url = info["url"] as? String
+				i.webUrl = info["html_url"] as? String
+				i.number = info["number"] as? NSNumber
+				i.state = info["state"] as? String
+				i.title = info["title"] as? String
+				i.body = info["body"] as? String
 				i.repo = inRepo
 
-				if let userInfo = N(info, "user") as? [NSObject: AnyObject] {
-					i.userId = N(userInfo, "id") as? NSNumber
-					i.userLogin = N(userInfo, "login") as? String
-					i.userAvatarUrl = N(userInfo, "avatar_url") as? String
+				i.milestone = info["milestone"]?["title"] as? String
+
+				if let userInfo = info["user"] as? [NSObject: AnyObject] {
+					i.userId = userInfo["id"] as? NSNumber
+					i.userLogin = userInfo["login"] as? String
+					i.userAvatarUrl = userInfo["avatar_url"] as? String
 				}
 
 				if let N = i.number, R = inRepo.fullName {
@@ -40,11 +42,11 @@ final class Issue: ListableItem {
 					l.postSyncAction = PostSyncAction.Delete.rawValue
 				}
 
-				let labelList = N(info, "labels") as? [[NSObject: AnyObject]]
+				let labelList = info["labels"] as? [[NSObject: AnyObject]]
 				PRLabel.syncLabelsWithInfo(labelList, withParent: i)
 
-				if let assignee = N(info, "assignee") as? [NSObject: AnyObject] {
-					let assigneeName = N(assignee, "login") as? String ?? "NoAssignedUserName"
+				if let assignee = info["assignee"] as? [NSObject: AnyObject] {
+					let assigneeName = assignee["login"] as? String ?? "NoAssignedUserName"
 					let assigned = (assigneeName == (inRepo.apiServer.userName ?? "NoApiUser"))
 					i.isNewAssignment = (assigned && !i.createdByMe && !(i.assignedToMe?.boolValue ?? false))
 					i.assignedToMe = assigned

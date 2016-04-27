@@ -80,21 +80,21 @@ final class PRComment: DataItem {
 	}
 
 	func fillFromInfo(info:[NSObject : AnyObject]) {
-		body = N(info, "body") as? String
-		position = N(info, "position") as? NSNumber
-		path = N(info, "path") as? String
-		url = N(info, "url") as? String
-		webUrl = N(info, "html_url") as? String
+		body = info["body"] as? String
+		position = info["position"] as? NSNumber
+		path = info["path"] as? String
+		url = info["url"] as? String
+		webUrl = info["html_url"] as? String
 
-		if let userInfo = N(info, "user") as? [NSObject : AnyObject] {
-			userName = N(userInfo, "login") as? String
-			userId = N(userInfo, "id") as? NSNumber
-			avatarUrl = N(userInfo, "avatar_url") as? String
+		if let userInfo = info["user"] as? [NSObject : AnyObject] {
+			userName = userInfo["login"] as? String
+			userId = userInfo["id"] as? NSNumber
+			avatarUrl = userInfo["avatar_url"] as? String
 		}
 
-		if let links = N(info, "links") as? [NSObject : AnyObject] {
-			url = N(N(links, "self"), "href") as? String
-			if webUrl==nil { webUrl = N(N(links, "html"), "href") as? String }
+		if let links = info["links"] as? [NSObject : AnyObject] {
+			url = links["self"]?["href"] as? String
+			if webUrl==nil { webUrl = links["html"]?["href"] as? String }
 		}
 	}
 

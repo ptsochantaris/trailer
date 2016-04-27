@@ -670,7 +670,7 @@ Token</string>
                                                 <action selector="hideAvatarsSelected:" target="vQH-WF-vh2" id="45w-QA-Tcd"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" title="When filtering, always include..." boxType="secondary" borderType="line" id="iei-ab-K9r">
+                                        <box autoresizesSubviews="NO" title="When filtering, always check..." boxType="secondary" borderType="line" id="iei-ab-K9r">
                                             <rect key="frame" x="414" y="131" width="315" height="140"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                             <view key="contentView" id="Gwd-Lx-fke">
@@ -678,7 +678,7 @@ Token</string>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button id="Jr3-YU-DrS">
-                                                        <rect key="frame" x="16" y="39" width="76" height="18"/>
+                                                        <rect key="frame" x="21" y="39" width="76" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Statuses" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="Dds-V9-uRU">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -689,7 +689,7 @@ Token</string>
                                                         </connections>
                                                     </button>
                                                     <button id="eFR-P1-MxA">
-                                                        <rect key="frame" x="105" y="93" width="63" height="18"/>
+                                                        <rect key="frame" x="114" y="93" width="63" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Labels" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="6Za-6G-OIl">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -700,7 +700,7 @@ Token</string>
                                                         </connections>
                                                     </button>
                                                     <button id="dTw-ed-XkE">
-                                                        <rect key="frame" x="30" y="66" width="62" height="18"/>
+                                                        <rect key="frame" x="35" y="66" width="62" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Repos" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="gO1-Ad-AhD">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -711,9 +711,9 @@ Token</string>
                                                         </connections>
                                                     </button>
                                                     <button id="0Tg-YN-sVl">
-                                                        <rect key="frame" x="110" y="39" width="58" height="18"/>
+                                                        <rect key="frame" x="114" y="39" width="63" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Users" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="Z30-Co-sRo">
+                                                        <buttonCell key="cell" type="check" title="Author" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="Z30-Co-sRo">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
@@ -722,9 +722,9 @@ Token</string>
                                                         </connections>
                                                     </button>
                                                     <button id="8bu-9K-ALi">
-                                                        <rect key="frame" x="99" y="66" width="69" height="18"/>
+                                                        <rect key="frame" x="108" y="66" width="69" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Servers" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="3Gg-aQ-pv0">
+                                                        <buttonCell key="cell" type="check" title="Server" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="3Gg-aQ-pv0">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
@@ -733,9 +733,9 @@ Token</string>
                                                         </connections>
                                                     </button>
                                                     <button id="Iwj-YJ-JSd">
-                                                        <rect key="frame" x="37" y="93" width="55" height="18"/>
+                                                        <rect key="frame" x="42" y="93" width="55" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Titles" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="ddT-lB-RJ9">
+                                                        <buttonCell key="cell" type="check" title="Title" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="ddT-lB-RJ9">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
@@ -744,9 +744,9 @@ Token</string>
                                                         </connections>
                                                     </button>
                                                     <button id="xzP-Bb-u07">
-                                                        <rect key="frame" x="16" y="12" width="152" height="18"/>
+                                                        <rect key="frame" x="100" y="12" width="77" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="PR &amp; Issue numbers" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="5z6-1p-c6d">
+                                                        <buttonCell key="cell" type="check" title="Number" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="5z6-1p-c6d">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
@@ -755,15 +755,26 @@ Token</string>
                                                         </connections>
                                                     </button>
                                                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" id="CDe-lj-xrh">
-                                                        <rect key="frame" x="172" y="0.0" width="123" height="109"/>
+                                                        <rect key="frame" x="181" y="0.0" width="123" height="109"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" id="ixu-zC-YfY">
                                                             <font key="font" metaFont="miniSystem"/>
-                                                            <string key="title">You can also use title: server: label: repo: user: number: and status: to filter specific properties, e.g. "label:bug,suggestion". Prefix with '!' to exclude some terms.</string>
+                                                            <string key="title">You can also use title: server: label: repo: user: number: milestone: and status: to filter specific properties, e.g. "label:bug,suggestion". Prefix with '!' to exclude some terms.</string>
                                                             <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
+                                                    <button id="mcG-nC-uWB">
+                                                        <rect key="frame" x="16" y="12" width="81" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Milestone" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="ntc-vT-q5O">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="includeMilestonesInFilteringSelected:" target="vQH-WF-vh2" id="9QK-Oo-Qpz"/>
+                                                        </connections>
+                                                    </button>
                                                 </subviews>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
@@ -1259,7 +1270,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                     </subviews>
                                 </view>
                             </tabViewItem>
-                            <tabViewItem label="Snoozing" identifier="" id="ebR-tY-siH">
+                            <tabViewItem label="Snooze" identifier="" id="ebR-tY-siH">
                                 <view key="view" id="zff-sZ-c5n">
                                     <rect key="frame" x="10" y="33" width="736" height="366"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1373,9 +1384,9 @@ to a higher number in order to keep your API usage reasonable</string>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button id="Cwe-AT-ISF">
-                                                        <rect key="frame" x="19" y="220" width="304" height="18"/>
+                                                        <rect key="frame" x="19" y="220" width="363" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="radio" title="Snooze for a certain amount of time" bezelStyle="regularSquare" imagePosition="left" alignment="left" enabled="NO" inset="2" id="gmO-x6-lxq">
+                                                        <buttonCell key="cell" type="radio" title="For a certain amount of time" bezelStyle="regularSquare" imagePosition="left" alignment="left" enabled="NO" inset="2" id="gmO-x6-lxq">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
@@ -1473,9 +1484,9 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </connections>
                                                     </popUpButton>
                                                     <button id="nPv-hg-fBq">
-                                                        <rect key="frame" x="19" y="141" width="257" height="18"/>
+                                                        <rect key="frame" x="19" y="141" width="363" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="radio" title="Snooze until a specific day and/or time" bezelStyle="regularSquare" imagePosition="left" alignment="left" enabled="NO" inset="2" id="rgO-Bp-SJN">
+                                                        <buttonCell key="cell" type="radio" title="Until a specific day and/or time" bezelStyle="regularSquare" imagePosition="left" alignment="left" enabled="NO" inset="2" id="rgO-Bp-SJN">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
@@ -1858,6 +1869,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="hotkeyOptionModifier" destination="bU3-sU-lpP" id="jbh-IW-ykt"/>
                 <outlet property="hotkeyShiftModifier" destination="lZd-Lq-W4x" id="K49-OF-eZU"/>
                 <outlet property="includeLabelsInFiltering" destination="eFR-P1-MxA" id="saA-nS-bNY"/>
+                <outlet property="includeMilestonesInFiltering" destination="mcG-nC-uWB" id="hqd-98-vtj"/>
                 <outlet property="includeNumbersInFiltering" destination="xzP-Bb-u07" id="EST-ca-DQG"/>
                 <outlet property="includeRepositoriesInFiltering" destination="dTw-ed-XkE" id="auv-go-5jM"/>
                 <outlet property="includeServersInFiltering" destination="8bu-9K-ALi" id="UkT-yD-LPS"/>

@@ -29,18 +29,18 @@ final class PRStatus: DataItem {
 		itemsWithInfo(data, type: "PRStatus", fromServer: pullRequest.apiServer) { item, info, isNewOrUpdated in
 			if isNewOrUpdated {
 				let s = item as! PRStatus
-				s.url = N(info, "url") as? String
-				s.state = N(info, "state") as? String
-				s.targetUrl = N(info, "target_url") as? String
+				s.url = info["url"] as? String
+				s.state = info["state"] as? String
+				s.targetUrl = info["target_url"] as? String
 				s.pullRequest = pullRequest
 
-				if let ds = N(info, "description") as? String {
+				if let ds = info["description"] as? String {
 					s.descriptionText = ds.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
 				}
 
-				if let userInfo = N(info, "creator") as? [NSObject : AnyObject] {
-					s.userName = N(userInfo, "login") as? String
-					s.userId = N(userInfo, "id") as? NSNumber
+				if let userInfo = info["creator"] as? [NSObject : AnyObject] {
+					s.userName = userInfo["login"] as? String
+					s.userId = userInfo["id"] as? NSNumber
 				}
 			}
 		}

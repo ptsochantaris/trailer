@@ -29,6 +29,7 @@ class ListableItem: DataItem {
 	@NSManaged var announced: NSNumber?
 	@NSManaged var muted: NSNumber?
 	@NSManaged var snoozeUntil: NSDate?
+	@NSManaged var milestone: String?
 
 	@NSManaged var comments: Set<PRComment>
 	@NSManaged var labels: Set<PRLabel>
@@ -498,6 +499,10 @@ class ListableItem: DataItem {
 		return buildOrPredicate(string, expectedLength: 6, format: "title contains[cd] %@", numeric: false)
 	}
 
+	final class func milestonePredicateFromFilterString(string: String) -> NSPredicate? {
+		return buildOrPredicate(string, expectedLength: 10, format: "milestone contains[cd] %@", numeric: false)
+	}
+
 	final class func numberPredicateFromFilterString(string: String) -> NSPredicate? {
 		return buildOrPredicate(string, expectedLength: 7, format: "number == %llu", numeric: true)
 	}
@@ -558,6 +563,7 @@ class ListableItem: DataItem {
             checkForPredicates("status", statusPredicateFromFilterString)
             checkForPredicates("user", userPredicateFromFilterString)
 			checkForPredicates("number", numberPredicateFromFilterString)
+			checkForPredicates("milestone", milestonePredicateFromFilterString)
 
 			if !fi.isEmpty {
 				var orPredicates = [NSPredicate]()
@@ -596,6 +602,9 @@ class ListableItem: DataItem {
                 }
 				if Settings.includeNumbersInFilter {
 					checkOr("number == %llu", numeric: true)
+				}
+				if Settings.includeMilestonesInFilter {
+					checkOr("milestone contains[cd] %@", numeric: false)
 				}
 				if Settings.includeLabelsInFilter {
 					checkOr("SUBQUERY(labels, $label, $label.name contains[cd] %@).@count > 0", numeric: false)

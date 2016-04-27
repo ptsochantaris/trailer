@@ -20,26 +20,28 @@ final class PullRequest: ListableItem {
 		itemsWithInfo(data, type: "PullRequest", fromServer: inRepo.apiServer) { item, info, isNewOrUpdated in
 			let p = item as! PullRequest
 			if isNewOrUpdated {
-				p.url = N(info, "url") as? String
-				p.webUrl = N(info, "html_url") as? String
-				p.number = N(info, "number") as? NSNumber
-				p.state = N(info, "state") as? String
-				p.title = N(info, "title") as? String
-				p.body = N(info, "body") as? String
-				p.mergeable = N(info, "mergeable") as? NSNumber ?? true
+				p.url = info["url"] as? String
+				p.webUrl = info["html_url"] as? String
+				p.number = info["number"] as? NSNumber
+				p.state = info["state"] as? String
+				p.title = info["title"] as? String
+				p.body = info["body"] as? String
+				p.mergeable = info["mergeable"] as? NSNumber ?? true
 				p.repo = inRepo
 
-				if let userInfo = N(info, "user") as? [NSObject : AnyObject] {
-					p.userId = N(userInfo, "id") as? NSNumber
-					p.userLogin = N(userInfo, "login") as? String
-					p.userAvatarUrl = N(userInfo, "avatar_url") as? String
+				p.milestone = info["milestone"]?["title"] as? String
+
+				if let userInfo = info["user"] as? [NSObject : AnyObject] {
+					p.userId = userInfo["id"] as? NSNumber
+					p.userLogin = userInfo["login"] as? String
+					p.userAvatarUrl = userInfo["avatar_url"] as? String
 				}
 
-				if let linkInfo = N(info, "_links") as? [NSObject : AnyObject] {
-					p.issueCommentLink = N(N(linkInfo, "comments"), "href") as? String
-					p.reviewCommentLink = N(N(linkInfo, "review_comments"), "href") as? String
-					p.statusesLink = N(N(linkInfo, "statuses"), "href") as? String
-					p.issueUrl = N(N(linkInfo, "issue"), "href") as? String
+				if let linkInfo = info["_links"] as? [NSObject : AnyObject] {
+					p.issueCommentLink = linkInfo["comments"]?["href"] as? String
+					p.reviewCommentLink = linkInfo["review_comments"]?["href"] as? String
+					p.statusesLink = linkInfo["statuses"]?["href"] as? String
+					p.issueUrl = linkInfo["issue"]?["href"] as? String
 				}
 
 				api.refreshesSinceLastLabelsCheck[p.objectID] = nil

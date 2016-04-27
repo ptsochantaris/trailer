@@ -234,13 +234,6 @@ func versionString() -> String {
 	return "Version \(currentAppVersion()) (\(buildNumber))"
 }
 
-func N(data: AnyObject?, _ key: String) -> AnyObject? {
-	if let d = data as? [NSObject : AnyObject], o: AnyObject = d[key] where !(o is NSNull) {
-		return o
-	}
-	return nil
-}
-
 func md5hash(s: String) -> String {
 	let digestLen = Int(CC_MD5_DIGEST_LENGTH)
 	let result = UnsafeMutablePointer<CUnsignedChar>.alloc(digestLen)

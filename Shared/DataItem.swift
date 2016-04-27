@@ -48,7 +48,7 @@ class DataItem: NSManagedObject {
 		var idsOfItems = [NSNumber]()
 		var idsToInfo = [NSNumber : [NSObject : AnyObject]]()
 		for info in data ?? [] {
-			let serverId = N(info, "id") as! NSNumber
+			let serverId = info["id"] as! NSNumber
 			idsOfItems.append(serverId)
 			idsToInfo[serverId] = info
 		}
@@ -63,7 +63,7 @@ class DataItem: NSManagedObject {
 			idsOfItems.removeAtIndex(idsOfItems.indexOf(serverId)!)
 			let info = idsToInfo[serverId]!
 			let updatedDate: NSDate
-			if let dateString = N(info, "updated_at") as? String, uDate = syncDateFormatter.dateFromString(dateString) {
+			if let dateString = info["updated_at"] as? String, uDate = syncDateFormatter.dateFromString(dateString) {
 				updatedDate = uDate
 			} else {
 				updatedDate = NSDate()
@@ -88,13 +88,13 @@ class DataItem: NSManagedObject {
 			i.postSyncAction = PostSyncAction.NoteNew.rawValue
 			i.apiServer = fromServer
 
-			if let dateString = N(info, "created_at") as? String, cDate = syncDateFormatter.dateFromString(dateString) {
+			if let dateString = info["created_at"] as? String, cDate = syncDateFormatter.dateFromString(dateString) {
 				i.createdAt = cDate
 			} else {
 				i.createdAt = NSDate()
 			}
 
-			if let dateString = N(info, "updated_at") as? String, uDate = syncDateFormatter.dateFromString(dateString) {
+			if let dateString = info["updated_at"] as? String, uDate = syncDateFormatter.dateFromString(dateString) {
 				i.updatedAt = uDate
 			} else {
 				i.updatedAt = NSDate()

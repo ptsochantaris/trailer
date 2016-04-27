@@ -62,6 +62,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var useVibrancy: NSButton!
 	@IBOutlet weak var includeLabelsInFiltering: NSButton!
 	@IBOutlet weak var includeTitlesInFiltering: NSButton!
+	@IBOutlet weak var includeMilestonesInFiltering: NSButton!
 	@IBOutlet weak var includeStatusesInFiltering: NSButton!
 	@IBOutlet weak var grayOutWhenRefreshing: NSButton!
 	@IBOutlet weak var assignedPrHandlingPolicy: NSPopUpButton!
@@ -190,6 +191,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		groupByRepo.toolTip = Settings.groupByRepoHelp
 		assignedPrHandlingPolicy.toolTip = Settings.assignedPrHandlingPolicyHelp
 		includeTitlesInFiltering.toolTip = Settings.includeTitlesInFilterHelp
+		includeMilestonesInFiltering.toolTip = Settings.includeMilestonesInFilterHelp
 		includeLabelsInFiltering.toolTip = Settings.includeLabelsInFilterHelp
 		includeRepositoriesInFiltering.toolTip = Settings.includeReposInFilterHelp
 		includeServersInFiltering.toolTip = Settings.includeServersInFilterHelp
@@ -281,6 +283,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		includeRepositoriesInFiltering.integerValue = Settings.includeReposInFilter ? 1 : 0
 		includeLabelsInFiltering.integerValue = Settings.includeLabelsInFilter ? 1 : 0
 		includeTitlesInFiltering.integerValue = Settings.includeTitlesInFilter ? 1 : 0
+		includeMilestonesInFiltering.integerValue = Settings.includeMilestonesInFilter ? 1 : 0
         includeUsersInFiltering.integerValue = Settings.includeUsersInFilter ? 1 : 0
 		includeNumbersInFiltering.integerValue = Settings.includeNumbersInFilter ? 1 : 0
 		includeServersInFiltering.integerValue = Settings.includeServersInFilter ? 1 : 0
@@ -455,6 +458,11 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction func includeTitlesInFilteringSelected(sender: NSButton) {
 		Settings.includeTitlesInFilter = (sender.integerValue==1)
+		app.deferredUpdateTimer.push()
+	}
+
+	@IBAction func includeMilestonesInFilteringSelected(sender: NSButton) {
+		Settings.includeMilestonesInFilter = (sender.integerValue==1)
 		app.deferredUpdateTimer.push()
 	}
 

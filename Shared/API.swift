@@ -438,7 +438,7 @@ final class API {
 			extraHeaders: extraHeaders,
 			perPageCallback: { data, lastPage in
 				for d in data ?? [] {
-					let eventDate = syncDateFormatter.dateFromString(N(d, "created_at") as! String)!
+					let eventDate = syncDateFormatter.dateFromString(d["created_at"] as! String)!
 					if latestDate!.compare(eventDate) == NSComparisonResult.OrderedAscending { // this is where we came in
 						if let repoId = d["repo"]?["id"] as? NSNumber {
 							DLog("New event at %@ from Repo ID %@", eventDate, repoId)
@@ -492,7 +492,7 @@ final class API {
 			extraHeaders: extraHeaders,
 			perPageCallback: { data, lastPage in
 				for d in data ?? [] {
-					let eventDate = syncDateFormatter.dateFromString(N(d, "created_at") as! String)!
+					let eventDate = syncDateFormatter.dateFromString(d["created_at"] as! String)!
 					if latestDate!.compare(eventDate) == NSComparisonResult.OrderedAscending { // this is where we came in
 						if let repoId = d["repo"]?["id"] as? NSNumber {
 							DLog("New event at %@ from Repo ID %@", eventDate, repoId)
@@ -992,20 +992,20 @@ final class API {
 			let apiServer = p.apiServer
 			if let issueLink = p.issueUrl {
 				getDataInPath(issueLink, fromServer: apiServer, parameters: nil, extraHeaders: nil) { data, lastPage, resultCode, etag in
-						if let assigneeInfo = N(data, "assignee") as? [NSObject : AnyObject] {
-							let assignee = N(assigneeInfo, "login") as? String ?? "NoAssignedUserName"
-							let assigned = (assignee == (apiServer.userName ?? "NoApiUser"))
-							p.isNewAssignment = (assigned && !p.createdByMe && !(p.assignedToMe?.boolValue ?? false))
-							p.assignedToMe = assigned
-						} else if resultCode == 200 || resultCode == 404 || resultCode == 410 {
-							// 200 means PR is not assigned to anyone, there was no asgineee info
-							// 404/410 is fine, it means issue entry doesn't exist
-							p.assignedToMe = false
-							p.isNewAssignment = false
-						} else {
-							apiServer.lastSyncSucceeded = false
-						}
-						completionCallback()
+					if let d = data as? [NSObject : AnyObject], assigneeInfo = d["assignee"] as? [NSObject : AnyObject] {
+						let assignee = assigneeInfo["login"] as? String ?? "NoAssignedUserName"
+						let assigned = (assignee == (apiServer.userName ?? "NoApiUser"))
+						p.isNewAssignment = (assigned && !p.createdByMe && !(p.assignedToMe?.boolValue ?? false))
+						p.assignedToMe = assigned
+					} else if resultCode == 200 || resultCode == 404 || resultCode == 410 {
+						// 200 means PR is not assigned to anyone, there was no asgineee info
+						// 404/410 is fine, it means issue entry doesn't exist
+						p.assignedToMe = false
+						p.isNewAssignment = false
+					} else {
+						apiServer.lastSyncSucceeded = false
+					}
+					completionCallback()
 				}
 			} else {
 				completionCallback()
@@ -1038,7 +1038,7 @@ final class API {
 		get("/repos/\(repoFullName)/pulls/\(repoNumber)", fromServer: r.apiServer, ignoreLastSync: false, parameters: nil, extraHeaders: nil) { [weak self] response, data, error in
 
 			if error == nil {
-				if let mergeInfo = N(data, "merged_by") as? [NSObject: AnyObject], mergeUserId = N(mergeInfo, "id") as? NSNumber {
+				if let d = data as? [NSObject : AnyObject], mergeInfo = d["merged_by"] as? [NSObject: AnyObject], mergeUserId = mergeInfo["id"] as? NSNumber {
 					self?.prWasMerged(r, byUserId: mergeUserId)
 				} else {
 					self?.itemWasClosed(r)
@@ -1112,7 +1112,7 @@ final class API {
 				let epochSeconds = (allHeaders["X-RateLimit-Reset"] as! NSString).longLongValue
 				callback(requestsRemaining, requestLimit, epochSeconds)
 			} else {
-				if response?.statusCode == 404 && data != nil && !(N(data, "message") as? String == "Not Found") {
+				if response?.statusCode == 404 && data != nil && !((data as? [NSObject : AnyObject])?["message"] as? String == "Not Found") {
 					callback(10000, 10000, 0)
 				} else {
 					callback(-1, -1, -1)
@@ -1198,8 +1198,8 @@ final class API {
 				getDataInPath("/user", fromServer:apiServer, parameters: nil, extraHeaders:nil) { data, lastPage, resultCode, etag in
 
 					if let d = data as? [NSObject : AnyObject] {
-						apiServer.userName = N(d, "login") as? String
-						apiServer.userId = N(d, "id") as? NSNumber
+						apiServer.userName = d["login"] as? String
+						apiServer.userId = d["id"] as? NSNumber
 					} else {
 						apiServer.lastSyncSucceeded = false
 					}
@@ -1222,7 +1222,7 @@ final class API {
 		clearAllBadLinks()
 		get("/user", fromServer: apiServer, ignoreLastSync: true, parameters: nil, extraHeaders: nil) { [weak self] response, data, error in
 
-			if let d = data as? [NSObject : AnyObject], userName = N(d, "login") as? String, userId = N(d, "id") as? NSNumber where error == nil {
+			if let d = data as? [NSObject : AnyObject], userName = d["login"] as? String, userId = d["id"] as? NSNumber where error == nil {
 				if userName.isEmpty || userId.longLongValue <= 0 {
 					let localError = self?.apiError("Could not read a valid user record from this endpoint")
 					callback(localError)
@@ -1324,7 +1324,7 @@ final class API {
 					}
                     var lastPage = true
                     let allHeaders = response?.allHeaderFields as [NSObject : AnyObject]?
-                    if let linkHeader = N(allHeaders, "Link") as? String {
+                    if let linkHeader = allHeaders?["Link"] as? String {
                         lastPage = linkHeader.rangeOfString("rel=\"next\"") == nil
                     }
 					callback(data: data, lastPage: lastPage, resultCode: code, etag: etag)

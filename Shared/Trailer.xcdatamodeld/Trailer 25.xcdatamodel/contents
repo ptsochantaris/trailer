@@ -34,6 +34,7 @@
         <attribute name="createdAt" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="isNewAssignment" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="latestReadCommentDate" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="milestone" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="muted" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="number" optional="YES" attributeType="Integer 64" defaultValueString="0" indexed="YES" syncable="YES"/>
         <attribute name="postSyncAction" optional="YES" attributeType="Integer 16" indexed="YES" syncable="YES"/>
@@ -117,6 +118,7 @@
         <attribute name="lastStatusNotified" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="latestReadCommentDate" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="mergeable" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="milestone" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="muted" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="number" optional="YES" attributeType="Integer 64" defaultValueString="0" indexed="YES" syncable="YES"/>
         <attribute name="pinned" optional="YES" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
@@ -199,13 +201,13 @@
     </entity>
     <elements>
         <element name="ApiServer" positionX="9" positionY="153" width="128" height="390"/>
-        <element name="Issue" positionX="9" positionY="153" width="128" height="480"/>
+        <element name="Issue" positionX="9" positionY="153" width="128" height="495"/>
         <element name="PRComment" positionX="0" positionY="0" width="128" height="270"/>
         <element name="PRLabel" positionX="9" positionY="153" width="128" height="195"/>
         <element name="PRStatus" positionX="0" positionY="0" width="128" height="225"/>
-        <element name="PullRequest" positionX="0" positionY="0" width="128" height="585"/>
+        <element name="PullRequest" positionX="0" positionY="0" width="128" height="600"/>
         <element name="Repo" positionX="0" positionY="0" width="128" height="300"/>
-        <element name="Team" positionX="9" positionY="153" width="128" height="165"/>
         <element name="SnoozePreset" positionX="9" positionY="153" width="128" height="150"/>
+        <element name="Team" positionX="9" positionY="153" width="128" height="165"/>
     </elements>
 </model>

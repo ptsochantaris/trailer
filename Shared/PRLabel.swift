@@ -20,7 +20,7 @@ final class PRLabel: DataItem {
 		var namesOfItems = [String]()
 		var namesToInfo = [String : [NSObject : AnyObject]]()
 		for info in data ?? [] {
-			let name = N(info, "name") as? String ?? ""
+			let name = info["name"] as? String ?? ""
 			namesOfItems.append(name)
 			namesToInfo[name] = info
 		}
@@ -62,8 +62,8 @@ final class PRLabel: DataItem {
 
 	class func syncLabelsWithInfo(info: [[NSObject : AnyObject]]?, withParent: ListableItem) {
 		labelsWithInfo(info, fromParent: withParent) { label, info in
-			label.url = N(info, "url") as? String
-			if let c = N(info, "color") as? String {
+			label.url = info["url"] as? String
+			if let c = info["color"] as? String {
 				label.color = NSNumber(unsignedInt: parseFromHex(c))
 			} else {
 				label.color = 0
