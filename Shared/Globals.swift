@@ -28,7 +28,7 @@ let AVATAR_PADDING: CGFloat = 8.0
 let REMOVE_BUTTON_WIDTH: CGFloat = 80.0
 let DISABLED_FADE: CGFloat = 0.4
 
-let stringDrawingOptions: NSStringDrawingOptions = [NSStringDrawingOptions.UsesLineFragmentOrigin, NSStringDrawingOptions.UsesFontLeading]
+let stringDrawingOptions: NSStringDrawingOptions = [.UsesLineFragmentOrigin, .UsesFontLeading]
 typealias COLOR_CLASS = NSColor
 typealias FONT_CLASS = NSFont
 typealias IMAGE_CLASS = NSImage
