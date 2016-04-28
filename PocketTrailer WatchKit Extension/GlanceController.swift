@@ -5,8 +5,8 @@ import WatchConnectivity
 
 let shortDateFormatter = { () -> NSDateFormatter in
 	let d = NSDateFormatter()
-	d.dateStyle = NSDateFormatterStyle.ShortStyle
-	d.timeStyle = NSDateFormatterStyle.ShortStyle
+	d.dateStyle = .ShortStyle
+	d.timeStyle = .ShortStyle
 	d.doesRelativeDateFormatting = true
 	return d
 	}()

@@ -672,27 +672,19 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 	private func checkApiUsage() {
 		for apiServer in ApiServer.allApiServersInMoc(mainObjectContext) {
-			if apiServer.requestsLimit?.doubleValue > 0 {
-				if apiServer.requestsRemaining?.doubleValue == 0 {
+			if apiServer.goodToGo && apiServer.hasApiLimit, let resetDate = apiServer.resetDate {
+				if apiServer.shouldReportOverTheApiLimit {
 					let apiLabel = apiServer.label ?? "NoApiServerLabel"
-					let dateFormatter = NSDateFormatter()
-					dateFormatter.doesRelativeDateFormatting = true
-					dateFormatter.dateStyle = NSDateFormatterStyle.MediumStyle
-					dateFormatter.timeStyle = NSDateFormatterStyle.MediumStyle
-					let resetDateString = apiServer.resetDate == nil ? "(unspecified date)" : dateFormatter.stringFromDate(apiServer.resetDate!)
+					let resetDateString = itemDateFormatter.stringFromDate(resetDate)
 
 					let alert = NSAlert()
 					alert.messageText = "Your API request usage for '\(apiLabel)' is over the limit!"
 					alert.informativeText = "Your request cannot be completed until your hourly API allowance is reset \(resetDateString).\n\nIf you get this error often, try to make fewer manual refreshes or reducing the number of repos you are monitoring.\n\nYou can check your API usage at any time from 'Servers' preferences pane at any time."
 					alert.addButtonWithTitle("OK")
 					alert.runModal()
-				} else if ((apiServer.requestsRemaining?.doubleValue ?? 0.0) / (apiServer.requestsLimit?.doubleValue ?? 1.0)) < LOW_API_WARNING {
+				} else if apiServer.shouldReportCloseToApiLimit {
 					let apiLabel = apiServer.label ?? "NoApiServerLabel"
-					let dateFormatter = NSDateFormatter()
-					dateFormatter.doesRelativeDateFormatting = true
-					dateFormatter.dateStyle = NSDateFormatterStyle.MediumStyle
-					dateFormatter.timeStyle = NSDateFormatterStyle.MediumStyle
-					let resetDateString = apiServer.resetDate == nil ? "(unspecified date)" : dateFormatter.stringFromDate(apiServer.resetDate!)
+					let resetDateString = itemDateFormatter.stringFromDate(resetDate)
 
 					let alert = NSAlert()
 					alert.messageText = "Your API request usage for '\(apiLabel)' is close to full"

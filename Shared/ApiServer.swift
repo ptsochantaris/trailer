@@ -28,6 +28,40 @@ final class ApiServer: NSManagedObject {
 	@NSManaged var teams: Set<Team>
     @NSManaged var issues: Set<Issue>
 
+	static var lastReportedOverLimit = Set<NSManagedObjectID>()
+	static var lastReportedNearLimit = Set<NSManagedObjectID>()
+
+	var shouldReportOverTheApiLimit: Bool {
+		let r = requestsRemaining?.doubleValue ?? 0
+		if r == 0 {
+			if !ApiServer.lastReportedOverLimit.contains(objectID) {
+				ApiServer.lastReportedOverLimit.insert(objectID)
+				return true
+			}
+		} else {
+			ApiServer.lastReportedOverLimit.remove(objectID)
+		}
+		return false
+	}
+
+	var shouldReportCloseToApiLimit: Bool {
+		let r = requestsRemaining?.doubleValue ?? 0
+		let l = requestsLimit?.doubleValue ?? 1.0
+		if (r / l) < LOW_API_WARNING {
+			if !ApiServer.lastReportedNearLimit.contains(objectID) {
+				ApiServer.lastReportedNearLimit.insert(objectID)
+				return true
+			}
+		} else {
+			ApiServer.lastReportedNearLimit.remove(objectID)
+		}
+		return false
+	}
+
+	var hasApiLimit: Bool {
+		return (requestsLimit?.doubleValue ?? 0) > 0
+	}
+
 	var syncIsGood: Bool {
 		return lastSyncSucceeded?.boolValue ?? true
 	}

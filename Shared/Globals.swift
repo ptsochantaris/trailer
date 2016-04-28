@@ -38,8 +38,8 @@ typealias IMAGE_CLASS = NSImage
 let itemDateFormatter = { () -> NSDateFormatter in
 	let f = NSDateFormatter()
 	f.doesRelativeDateFormatting = true
-	f.dateStyle = NSDateFormatterStyle.MediumStyle
-	f.timeStyle = NSDateFormatterStyle.ShortStyle
+	f.dateStyle = .MediumStyle
+	f.timeStyle = .ShortStyle
 	return f
 	}()
 
