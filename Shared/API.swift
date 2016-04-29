@@ -439,12 +439,12 @@ final class API {
 			perPageCallback: { data, lastPage in
 				for d in data ?? [] {
 					let eventDate = syncDateFormatter.dateFromString(d["created_at"] as! String)!
-					if latestDate!.compare(eventDate) == NSComparisonResult.OrderedAscending { // this is where we came in
+					if latestDate!.compare(eventDate) == .OrderedAscending { // this is where we came in
 						if let repoId = d["repo"]?["id"] as? NSNumber {
 							DLog("New event at %@ from Repo ID %@", eventDate, repoId)
 							repoIdsToMarkDirty.addObject(repoId)
 						}
-						if latestDate!.compare(eventDate) == NSComparisonResult.OrderedAscending {
+						if latestDate!.compare(eventDate) == .OrderedAscending {
 							usingUserEventsFromServer.latestUserEventDateProcessed = eventDate
 							if latestDate!.isEqualToDate(never()) {
 								DLog("First sync, all repos are dirty so we don't need to read further, we have the latest user event date: %@", eventDate)
@@ -493,12 +493,12 @@ final class API {
 			perPageCallback: { data, lastPage in
 				for d in data ?? [] {
 					let eventDate = syncDateFormatter.dateFromString(d["created_at"] as! String)!
-					if latestDate!.compare(eventDate) == NSComparisonResult.OrderedAscending { // this is where we came in
+					if latestDate!.compare(eventDate) == .OrderedAscending { // this is where we came in
 						if let repoId = d["repo"]?["id"] as? NSNumber {
 							DLog("New event at %@ from Repo ID %@", eventDate, repoId)
 							repoIdsToMarkDirty.addObject(repoId)
 						}
-						if latestDate!.compare(eventDate) == NSComparisonResult.OrderedAscending {
+						if latestDate!.compare(eventDate) == .OrderedAscending {
 							usingReceivedEventsFromServer.latestReceivedEventDateProcessed = eventDate
 							if latestDate!.isEqualToDate(never()) {
 								DLog("First sync, all repos are dirty so we don't need to read further, we have the latest received event date: %@", latestDate)
@@ -1383,7 +1383,7 @@ final class API {
 			let fullUrlPath = r.URL!.absoluteString
 			var existingBackOff = badLinks[fullUrlPath]
 			if existingBackOff != nil {
-				if NSDate().compare(existingBackOff!.nextAttemptAt) == NSComparisonResult.OrderedAscending {
+				if NSDate().compare(existingBackOff!.nextAttemptAt) == .OrderedAscending {
 					// report failure and return
 					DLog("(%@) Preempted fetch to previously broken link %@, won't actually access this URL until %@", apiServerLabel, fullUrlPath, existingBackOff!.nextAttemptAt)
 					atNextEvent(self) { S in

@@ -272,7 +272,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	private func commentsForItem(item: ListableItem) -> [[String : AnyObject]] {
 		var comments = [[String : AnyObject]]()
-		for comment in item.sortedComments(NSComparisonResult.OrderedDescending) {
+		for comment in item.sortedComments(.OrderedDescending) {
 			comments.append([
 				"user": comment.userName ?? "NOUSER",
 				"date": comment.createdAt ?? never(),

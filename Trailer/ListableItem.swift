@@ -69,7 +69,7 @@ class ListableItem: DataItem {
 		for c in comments {
 			if let creation = c.createdAt {
 				if let latestRead = latestReadCommentDate {
-					if latestRead.compare(creation) == NSComparisonResult.OrderedAscending {
+					if latestRead.compare(creation) == .OrderedAscending {
 						latestReadCommentDate = creation
 					}
 				} else {
@@ -108,7 +108,7 @@ class ListableItem: DataItem {
 
 	final var refersToMe: Bool {
 		if let apiName = apiServer.userName, b = body {
-			let range = b.rangeOfString("@"+apiName, options: [NSStringCompareOptions.CaseInsensitiveSearch, NSStringCompareOptions.DiacriticInsensitiveSearch])
+			let range = b.rangeOfString("@"+apiName, options: [.CaseInsensitiveSearch, .DiacriticInsensitiveSearch])
 			return range != nil
 		}
 		return false
@@ -123,18 +123,13 @@ class ListableItem: DataItem {
 		return false
 	}
 
-	final var refersToMyTeams: Bool {
+	final private var refersToMyTeams: Bool {
 		if let b = body {
 			for t in apiServer.teams {
 				if let r = t.calculatedReferral {
-					let range = b.rangeOfString(r, options: [NSStringCompareOptions.CaseInsensitiveSearch, NSStringCompareOptions.DiacriticInsensitiveSearch])
+					let range = b.rangeOfString(r, options: [.CaseInsensitiveSearch, .DiacriticInsensitiveSearch])
 					if range != nil { return true }
 				}
-			}
-		}
-		for c in comments {
-			if c.refersToMyTeams {
-				return true
 			}
 		}
 		return false
@@ -184,23 +179,22 @@ class ListableItem: DataItem {
 		else if assignedToParticipated || commentedByMe				{ targetSection = .Participated }
 		else														{ targetSection = .All }
 
-		var needsManualCount = false
-		var moveToMentioned = false
 		let outsideMySectionsButAwake = (targetSection == .All || targetSection == .None)
+		var moveToMentioned = false
+		var autoMoveOnTeamMentions = false
+		var autoMoveOnCommentMentions = false
+		var doReferralCheckInComments = false
 
-		if outsideMySectionsButAwake && Settings.moveNewItemsInOwnReposToMentioned {
-			if repo.isMine {
-				moveToMentioned = true
-			} else {
-				needsManualCount = true
-			}
+		if outsideMySectionsButAwake && Settings.moveNewItemsInOwnReposToMentioned && repo.isMine {
+			moveToMentioned = true
 		}
 
 		if !moveToMentioned && outsideMySectionsButAwake && Settings.autoMoveOnTeamMentions {
 			if refersToMyTeams {
 				moveToMentioned = true
 			} else {
-				needsManualCount = true
+				doReferralCheckInComments = true
+				autoMoveOnTeamMentions = true
 			}
 		}
 
@@ -208,14 +202,15 @@ class ListableItem: DataItem {
 			if refersToMe {
 				moveToMentioned = true
 			} else {
-				needsManualCount = true
+				doReferralCheckInComments = true
+				autoMoveOnCommentMentions = true
 			}
 		}
 
 		let f = NSFetchRequest(entityName: "PRComment")
 		f.returnsObjectsAsFaults = false
-		let latestDate = latestReadCommentDate
 
+		let latestDate = latestReadCommentDate
 		let isMuted = muted?.boolValue ?? false
 
 		if moveToMentioned {
@@ -226,16 +221,16 @@ class ListableItem: DataItem {
 				f.predicate = predicateForOthersCommentsSinceDate(latestDate)
 				unreadComments = managedObjectContext?.countForFetchRequest(f, error: nil)
 			}
-		} else if needsManualCount {
+		} else if doReferralCheckInComments {
 			f.predicate = predicateForOthersCommentsSinceDate(nil)
 			var unreadCommentCount: Int = 0
-			if !isMuted {
-				for c in try! managedObjectContext?.executeFetchRequest(f) as! [PRComment] {
-					if c.refersToMe {
-						targetSection = .Mentioned
-					}
+			for c in try! managedObjectContext?.executeFetchRequest(f) as! [PRComment] {
+				if (autoMoveOnCommentMentions && c.refersToMe) || (autoMoveOnTeamMentions && c.refersToMyTeams) {
+					targetSection = .Mentioned
+				}
+				if !isMuted {
 					if let l = latestDate {
-						if c.createdAt?.compare(l)==NSComparisonResult.OrderedDescending {
+						if c.createdAt?.compare(l) == .OrderedDescending {
 							unreadCommentCount += 1
 						}
 					} else {
@@ -354,7 +349,7 @@ class ListableItem: DataItem {
 
 	final func sortedLabels() -> [PRLabel] {
 		return Array(labels).sort({ (l1: PRLabel, l2: PRLabel) -> Bool in
-			return l1.name!.compare(l2.name!)==NSComparisonResult.OrderedAscending
+			return l1.name!.compare(l2.name!) == .OrderedAscending
 		})
 	}
 

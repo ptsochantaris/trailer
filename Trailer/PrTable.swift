@@ -54,7 +54,7 @@ final class PrTable: NSTableView, NSPasteboardItemDataProvider {
 
 	private var draggingUrl: String?
 	func pasteboard(pasteboard: NSPasteboard?, item: NSPasteboardItem, provideDataForType type: String) {
-		if let pasteboard = pasteboard where type.compare(NSPasteboardTypeString) == NSComparisonResult.OrderedSame && draggingUrl != nil {
+		if let pasteboard = pasteboard where type.compare(NSPasteboardTypeString) == .OrderedSame && draggingUrl != nil {
 			pasteboard.setData(draggingUrl!.dataUsingEncoding(NSUTF8StringEncoding)!, forType: NSPasteboardTypeString)
 			draggingUrl = nil
 		}

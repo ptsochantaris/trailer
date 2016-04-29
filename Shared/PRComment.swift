@@ -39,7 +39,7 @@ final class PRComment: DataItem {
 	func fastForwardItemIfNeeded(item: ListableItem) {
 		// check if we're assigned to a just created issue, in which case we want to "fast forward" its latest comment dates to our own if we're newer
 		if let commentCreation = createdAt where (item.postSyncAction?.integerValue ?? 0) == PostSyncAction.NoteNew.rawValue {
-			if let latestReadDate = item.latestReadCommentDate where latestReadDate.compare(commentCreation) == NSComparisonResult.OrderedAscending {
+			if let latestReadDate = item.latestReadCommentDate where latestReadDate.compare(commentCreation) == .OrderedAscending {
 				item.latestReadCommentDate = commentCreation
 			}
 		}
@@ -62,7 +62,7 @@ final class PRComment: DataItem {
 					if let authorName = userName {
 						var blocked = false
 						for blockedAuthor in Settings.commentAuthorBlacklist as [String] {
-							if authorName.compare(blockedAuthor, options: [NSStringCompareOptions.CaseInsensitiveSearch, NSStringCompareOptions.DiacriticInsensitiveSearch])==NSComparisonResult.OrderedSame {
+							if authorName.compare(blockedAuthor, options: [.CaseInsensitiveSearch, .DiacriticInsensitiveSearch]) == .OrderedSame {
 								blocked = true
 								break
 							}
@@ -121,7 +121,7 @@ final class PRComment: DataItem {
 	var refersToMe: Bool {
 		if let userForServer = apiServer.userName where userId != apiServer.userId { // Ignore self-references
 			let rangeOfHandle = body?.rangeOfString("@"+userForServer,
-				options: [NSStringCompareOptions.CaseInsensitiveSearch, NSStringCompareOptions.DiacriticInsensitiveSearch])
+				options: [.CaseInsensitiveSearch, .DiacriticInsensitiveSearch])
 			return rangeOfHandle != nil
 		}
 		return false
@@ -131,7 +131,7 @@ final class PRComment: DataItem {
 		if let b = body {
 			for t in apiServer.teams {
 				if let r = t.calculatedReferral {
-					let range = b.rangeOfString(r, options: [NSStringCompareOptions.CaseInsensitiveSearch, NSStringCompareOptions.DiacriticInsensitiveSearch])
+					let range = b.rangeOfString(r, options: [.CaseInsensitiveSearch, .DiacriticInsensitiveSearch])
 					if range != nil { return true }
 				}
 			}
