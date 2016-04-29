@@ -188,7 +188,15 @@ class ListableItem: DataItem {
 		var moveToMentioned = false
 		let outsideMySectionsButAwake = (targetSection == .All || targetSection == .None)
 
-		if outsideMySectionsButAwake && Settings.autoMoveOnTeamMentions {
+		if outsideMySectionsButAwake && Settings.moveNewItemsInOwnReposToMentioned {
+			if repo.isMine {
+				moveToMentioned = true
+			} else {
+				needsManualCount = true
+			}
+		}
+
+		if !moveToMentioned && outsideMySectionsButAwake && Settings.autoMoveOnTeamMentions {
 			if refersToMyTeams {
 				moveToMentioned = true
 			} else {

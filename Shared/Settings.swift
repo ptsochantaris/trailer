@@ -56,7 +56,8 @@ final class Settings {
 			"AUTO_PARTICIPATE_ON_TEAM_MENTIONS", "SHOW_ISSUES_IN_WATCH_GLANCE", "ASSIGNED_PR_HANDLING_POLICY", "HIDE_DESCRIPTION_IN_WATCH_DETAIL_VIEW", "AUTO_REPEAT_SETTINGS_EXPORT", "DONT_CONFIRM_SETTINGS_IMPORT",
 			"LAST_EXPORT_URL", "LAST_EXPORT_TIME", "CLOSE_HANDLING_POLICY_2", "MERGE_HANDLING_POLICY_2", "LAST_PREFS_TAB_SELECTED_OSX", "NEW_PR_DISPLAY_POLICY_INDEX", "NEW_ISSUE_DISPLAY_POLICY_INDEX", "HIDE_PRS_THAT_ARENT_PASSING_ONLY_IN_ALL",
             "INCLUDE_SERVERS_IN_FILTER", "INCLUDE_USERS_IN_FILTER", "INCLUDE_TITLES_IN_FILTER", "INCLUDE_NUMBERS_IN_FILTER", "DUMP_API_RESPONSES_IN_CONSOLE", "OPEN_ITEMS_DIRECTLY_IN_SAFARI", "HIDE_PRS_THAT_ARENT_PASSING",
-            "REMOVE_RELATED_NOTIFICATIONS_ON_ITEM_REMOVE", "HIDE_SNOOZED_ITEMS", "SNOOZE_WAKEUP_ON_COMMENT", "SNOOZE_WAKEUP_ON_MENTION", "SNOOZE_WAKEUP_ON_STATUS_UPDATE", "INCLUDE_MILESTONES_IN_FILTER"]
+            "REMOVE_RELATED_NOTIFICATIONS_ON_ITEM_REMOVE", "HIDE_SNOOZED_ITEMS", "SNOOZE_WAKEUP_ON_COMMENT", "SNOOZE_WAKEUP_ON_MENTION", "SNOOZE_WAKEUP_ON_STATUS_UPDATE", "INCLUDE_MILESTONES_IN_FILTER",
+            "MOVE_NEW_ITEMS_IN_OWN_REPOS_TO_MENTIONED"]
 	}
 
     class func checkMigration() {
@@ -388,7 +389,13 @@ final class Settings {
 		set { set("LAST_EXPORT_URL", newValue?.absoluteString) }
 	}
 
-    /////////////////////////// DEFAULT FALSE
+    /////////////////////////// SWITCHES
+
+	static let moveNewItemsInOwnReposToMentionedHelp = "Automatically move an item to the 'Mentioned' section if it has been created in a repo which you own, even if there is no direct mention to you."
+	class var moveNewItemsInOwnReposToMentioned: Bool {
+		get { return get("MOVE_NEW_ITEMS_IN_OWN_REPOS_TO_MENTIONED") as? Bool ?? false }
+		set { set("MOVE_NEW_ITEMS_IN_OWN_REPOS_TO_MENTIONED", newValue) }
+	}
 
 	static let hideSnoozedItemsHelp = "Hide the snoozed items section"
 	class var hideSnoozedItems: Bool {
@@ -577,8 +584,6 @@ final class Settings {
 		get { return get("HIDE_PRS_THAT_ARENT_PASSING_ONLY_IN_ALL") as? Bool ?? false }
 		set { set("HIDE_PRS_THAT_ARENT_PASSING_ONLY_IN_ALL", newValue) }
 	}
-
-	////////////////////////////// DEFAULT TRUE
 
 	static let autoMoveOnCommentMentionsHelp = "If your username is mentioned in an item's description or a comment posted inside it, move the item to the 'Mentioned' section."
 	class var autoMoveOnCommentMentions: Bool {

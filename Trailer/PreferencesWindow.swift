@@ -57,6 +57,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var disableAllCommentNotifications: NSButton!
 	@IBOutlet weak var autoMoveOnTeamMentions: NSButton!
 	@IBOutlet weak var autoMoveOnCommentMentions: NSButton!
+	@IBOutlet weak var autoMoveIfCreatedInOwnedRepo: NSButton!
 
 	// Display
 	@IBOutlet weak var useVibrancy: NSButton!
@@ -214,6 +215,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		openPrAtFirstUnreadComment.toolTip = Settings.openPrAtFirstUnreadCommentHelp
 		autoMoveOnCommentMentions.toolTip = Settings.autoMoveOnCommentMentionsHelp
 		autoMoveOnTeamMentions.toolTip = Settings.autoMoveOnTeamMentionsHelp
+		autoMoveIfCreatedInOwnedRepo.toolTip = Settings.moveNewItemsInOwnReposToMentionedHelp
 		disableAllCommentNotifications.toolTip = Settings.disableAllCommentNotificationsHelp
 		showLabels.toolTip = Settings.showLabelsHelp
 		showStatusItems.toolTip = Settings.showStatusItemsHelp
@@ -292,6 +294,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		hideUncommentedPrs.integerValue = Settings.hideUncommentedItems ? 1 : 0
 		autoMoveOnCommentMentions.integerValue = Settings.autoMoveOnCommentMentions ? 1 : 0
 		autoMoveOnTeamMentions.integerValue = Settings.autoMoveOnTeamMentions ? 1 : 0
+		autoMoveIfCreatedInOwnedRepo.integerValue = Settings.moveNewItemsInOwnReposToMentioned ? 1 : 0
 		hideAvatars.integerValue = Settings.hideAvatars ? 1 : 0
 		dontKeepPrsMergedByMe.integerValue = Settings.dontKeepPrsMergedByMe ? 1 : 0
 		removeNotificationsWhenItemIsRemoved.integerValue = Settings.removeNotificationsWhenItemIsRemoved ? 1 : 0
@@ -483,6 +486,12 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction func autoMoveOnTeamMentionsSelected(sender: NSButton) {
 		Settings.autoMoveOnTeamMentions = (sender.integerValue==1)
+		DataManager.postProcessAllItems()
+		app.deferredUpdateTimer.push()
+	}
+
+	@IBAction func autoMoveIfCreatedInOwnedRepoSelected(sender: NSButton) {
+		Settings.moveNewItemsInOwnReposToMentioned = (sender.integerValue==1)
 		DataManager.postProcessAllItems()
 		app.deferredUpdateTimer.push()
 	}

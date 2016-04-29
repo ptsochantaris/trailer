@@ -15,6 +15,7 @@ final class Repo: DataItem {
 	@NSManaged var itemHidingPolicy: NSNumber?
 	@NSManaged var pullRequests: Set<PullRequest>
 	@NSManaged var issues: Set<Issue>
+	@NSManaged var ownerId: NSNumber?
 
 	class func syncReposFromInfo(data: [[NSObject : AnyObject]]?, apiServer: ApiServer) {
 		var filteredData = [[NSObject : AnyObject]]()
@@ -44,9 +45,17 @@ final class Repo: DataItem {
 				r.webUrl = info["html_url"] as? String
 				r.dirty = true
 				r.inaccessible = false
+				r.ownerId = info["owner"]?["id"] as? NSNumber
 				r.lastDirtied = NSDate()
 			}
 		}
+	}
+
+	var isMine: Bool {
+		if let o = ownerId {
+			return o == apiServer.userId
+		}
+		return false
 	}
 
 	var shouldSync: Bool {

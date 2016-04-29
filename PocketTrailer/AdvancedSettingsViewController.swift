@@ -42,7 +42,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 	private enum SettingsSection: Int {
 		case Refresh, Display, Filtering, AppleWatch, Comments, Repos, StausesAndLabels, History, Confirm, Sort, Misc
-		static let rowCounts = [3, 5, 8, 2, 7, 2, 8, 3, 2, 3, 2]
+		static let rowCounts = [3, 5, 8, 2, 8, 2, 8, 3, 2, 3, 2]
 		static let allNames = ["Auto Refresh", "Display", "Filtering", "Apple Watch", "Comments", "Watchlist", "Statuses & Labels", "History", "Don't confirm when", "Sorting", "Misc"]
 	}
 
@@ -199,14 +199,18 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.accessoryType = check(Settings.autoMoveOnTeamMentions)
 				cell.descriptionLabel.text = Settings.autoMoveOnTeamMentionsHelp
 			case 4:
+				cell.titleLabel.text = "Move items created in my repos to 'Mentioned'"
+				cell.accessoryType = check(Settings.moveNewItemsInOwnReposToMentioned)
+				cell.descriptionLabel.text = Settings.moveNewItemsInOwnReposToMentionedHelp
+			case 5:
 				cell.titleLabel.text = "Open items at first unread comment"
 				cell.accessoryType = check(Settings.openPrAtFirstUnreadComment)
 				cell.descriptionLabel.text = Settings.openPrAtFirstUnreadCommentHelp
-			case 5:
-				cell.titleLabel.text = "Block comment notifications from usernames..."
-				cell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
-				cell.descriptionLabel.text = "A list of usernames whose comments you don't want to receive notifications for."
 			case 6:
+				cell.titleLabel.text = "Block comment notifications from usernames..."
+				cell.accessoryType = .DisclosureIndicator
+				cell.descriptionLabel.text = "A list of usernames whose comments you don't want to receive notifications for."
+			case 7:
 				cell.titleLabel.text = "Disable all comment notifications"
 				cell.accessoryType = check(Settings.disableAllCommentNotifications)
 				cell.descriptionLabel.text = Settings.disableAllCommentNotificationsHelp
@@ -430,10 +434,13 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				Settings.autoMoveOnTeamMentions = !Settings.autoMoveOnTeamMentions
 				settingsChangedTimer.push()
 			case 4:
-				Settings.openPrAtFirstUnreadComment = !Settings.openPrAtFirstUnreadComment
+				Settings.moveNewItemsInOwnReposToMentioned = !Settings.moveNewItemsInOwnReposToMentioned
+				settingsChangedTimer.push()
 			case 5:
-				performSegueWithIdentifier("showBlacklist", sender: self)
+				Settings.openPrAtFirstUnreadComment = !Settings.openPrAtFirstUnreadComment
 			case 6:
+				performSegueWithIdentifier("showBlacklist", sender: self)
+			case 7:
 				Settings.disableAllCommentNotifications = !Settings.disableAllCommentNotifications
 			default: break
 			}
