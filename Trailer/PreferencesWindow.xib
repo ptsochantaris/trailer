@@ -309,6 +309,7 @@ Token</string>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                     </subviews>
                                 </view>
@@ -456,6 +457,7 @@ Token</string>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                         <button verticalHuggingPriority="750" id="u1W-mu-uId">
                                             <rect key="frame" x="553" y="10" width="176" height="32"/>
@@ -628,6 +630,7 @@ Token</string>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                         <box autoresizesSubviews="NO" title="When something from &quot;all items&quot; is assigned to me..." borderType="line" id="96h-4X-0sU">
                                             <rect key="frame" x="414" y="275" width="316" height="73"/>
@@ -658,6 +661,7 @@ Token</string>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                         <button id="3CV-9S-gLw">
                                             <rect key="frame" x="20" y="153" width="366" height="18"/>
@@ -779,6 +783,7 @@ Token</string>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                         <button id="Efg-Id-lOP">
                                             <rect key="frame" x="20" y="323" width="366" height="18"/>
@@ -842,6 +847,7 @@ Token</string>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                     </subviews>
                                 </view>
@@ -891,6 +897,7 @@ Token</string>
                                                         </view>
                                                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                        <font key="titleFont" metaFont="message" size="11"/>
                                                     </box>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="6Rs-G3-8sn">
                                                         <rect key="frame" x="15" y="242" width="185" height="17"/>
@@ -974,6 +981,7 @@ Token</string>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                     </subviews>
                                 </view>
@@ -1099,11 +1107,13 @@ Token</string>
                                                         </view>
                                                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                        <font key="titleFont" metaFont="message" size="11"/>
                                                     </box>
                                                 </subviews>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                     </subviews>
                                 </view>
@@ -1289,6 +1299,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                     </subviews>
                                 </view>
@@ -1342,6 +1353,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                         <scrollView autohidesScrollers="YES" horizontalLineScroll="22" horizontalPageScroll="10" verticalLineScroll="22" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="Nsu-el-chI">
                                             <rect key="frame" x="9" y="112" width="313" height="251"/>
@@ -1579,6 +1591,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                         <button id="YS0-gj-k5Q">
                                             <rect key="frame" x="564" y="24" width="142" height="18"/>
@@ -1693,6 +1706,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                                         </view>
                                                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                        <font key="titleFont" metaFont="message" size="11"/>
                                                     </box>
                                                     <button id="9o8-NV-RgQ">
                                                         <rect key="frame" x="191" y="109" width="337" height="18"/>
@@ -1723,6 +1737,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                     </subviews>
                                 </view>
@@ -1733,108 +1748,159 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" borderType="none" titlePosition="noTitle" id="YKc-0b-31j">
-                                            <rect key="frame" x="6" y="21" width="724" height="310"/>
+                                            <rect key="frame" x="6" y="26" width="724" height="310"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <view key="contentView" id="J19-q6-ceE">
                                                 <rect key="frame" x="0.0" y="0.0" width="724" height="310"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <button id="vcg-xx-N3A">
-                                                        <rect key="frame" x="212" y="200" width="315" height="18"/>
+                                                    <box title="Logging" borderType="line" id="AS8-n7-ngi">
+                                                        <rect key="frame" x="17" y="194" width="321" height="105"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Check for new Trailer releases automatically" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="a4y-qa-v3Z">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="checkForUpdatesAutomaticallySelected:" target="vQH-WF-vh2" id="1fT-2D-aEs"/>
-                                                        </connections>
-                                                    </button>
-                                                    <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="AT5-aS-AgQ">
-                                                        <rect key="frame" x="493" y="169" width="19" height="27"/>
+                                                        <view key="contentView" id="GhS-Tk-g7Z">
+                                                            <rect key="frame" x="1" y="1" width="319" height="89"/>
+                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                            <subviews>
+                                                                <button id="qos-T0-XKj">
+                                                                    <rect key="frame" x="28" y="23" width="273" height="18"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <buttonCell key="cell" type="check" title="Dump API responses to the console" bezelStyle="regularSquare" imagePosition="left" inset="2" id="Lyr-pU-rjn">
+                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                        <font key="font" metaFont="system"/>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="dumpApiResponsesToConsoleSelected:" target="vQH-WF-vh2" id="gGH-xy-vRV"/>
+                                                                    </connections>
+                                                                </button>
+                                                                <button id="3fA-qA-38f">
+                                                                    <rect key="frame" x="28" y="53" width="273" height="18"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <buttonCell key="cell" type="check" title="Log activity to the console" bezelStyle="regularSquare" imagePosition="left" inset="2" id="MMo-8R-lBl">
+                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                        <font key="font" metaFont="system"/>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="logActivityToConsoleSelected:" target="vQH-WF-vh2" id="Ya2-VW-6pr"/>
+                                                                    </connections>
+                                                                </button>
+                                                            </subviews>
+                                                        </view>
+                                                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                        <font key="titleFont" metaFont="smallSystem"/>
+                                                    </box>
+                                                    <box title="Import / Export" borderType="line" id="ipz-Z0-wEE">
+                                                        <rect key="frame" x="17" y="16" width="690" height="174"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <stepperCell key="cell" continuous="YES" alignment="left" minValue="1" maxValue="1024" doubleValue="1" id="Lkq-hS-bCt"/>
-                                                        <connections>
-                                                            <action selector="checkForUpdatesIntervalChanged:" target="vQH-WF-vh2" id="otw-3K-qgX"/>
-                                                        </connections>
-                                                    </stepper>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="hkX-Jd-o2h">
-                                                        <rect key="frame" x="225" y="175" width="265" height="17"/>
+                                                        <view key="contentView" id="vwB-kq-RKD">
+                                                            <rect key="frame" x="1" y="1" width="688" height="158"/>
+                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                            <subviews>
+                                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" id="zef-fb-l71">
+                                                                    <rect key="frame" x="18" y="20" width="652" height="46"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" alignment="center" title="Settings last exported to 'fileName.trailerSettings' at 11/22/33 11:22:33PM" id="Amb-JA-EhL">
+                                                                        <font key="font" metaFont="system"/>
+                                                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                    </textFieldCell>
+                                                                </textField>
+                                                                <button verticalHuggingPriority="750" id="nki-sn-lQo">
+                                                                    <rect key="frame" x="175" y="110" width="193" height="32"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <buttonCell key="cell" type="push" title="Export current settings..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="7Ff-bF-xyw">
+                                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                        <font key="font" metaFont="system"/>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="exportCurrentSettingsSelected:" target="vQH-WF-vh2" id="cTO-Bv-dZo"/>
+                                                                    </connections>
+                                                                </button>
+                                                                <button verticalHuggingPriority="750" id="Jbm-ZN-x5E">
+                                                                    <rect key="frame" x="368" y="110" width="145" height="32"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <buttonCell key="cell" type="push" title="Import settings..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="GTK-8s-emk">
+                                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                        <font key="font" metaFont="system"/>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="importSettingsSelected:" target="vQH-WF-vh2" id="Y31-ye-fIU"/>
+                                                                    </connections>
+                                                                </button>
+                                                                <button id="pwT-Fi-3FC">
+                                                                    <rect key="frame" x="194" y="73" width="300" height="18"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <buttonCell key="cell" type="check" title="Repeat last export whenever settings change" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="vNH-wV-xlW">
+                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                        <font key="font" metaFont="system"/>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="repeatLastExportSelected:" target="vQH-WF-vh2" id="WZG-AG-LaP"/>
+                                                                    </connections>
+                                                                </button>
+                                                            </subviews>
+                                                        </view>
+                                                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                        <font key="titleFont" metaFont="smallSystem"/>
+                                                    </box>
+                                                    <box title="Updates" borderType="line" id="XQf-tU-A4s">
+                                                        <rect key="frame" x="340" y="193" width="367" height="106"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="...every X hours" id="WVl-6O-rdk">
-                                                            <font key="font" metaFont="system"/>
-                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
-                                                    <button id="qos-T0-XKj">
-                                                        <rect key="frame" x="211" y="230" width="358" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Dump API responses to the console for troubleshooting" bezelStyle="regularSquare" imagePosition="left" inset="2" id="Lyr-pU-rjn">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="dumpApiResponsesToConsoleSelected:" target="vQH-WF-vh2" id="gGH-xy-vRV"/>
-                                                        </connections>
-                                                    </button>
-                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" id="zef-fb-l71">
-                                                        <rect key="frame" x="17" y="15" width="690" height="41"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Settings last exported to 'fileName.trailerSettings' at 11/22/33 11:22:33PM" id="Amb-JA-EhL">
-                                                            <font key="font" metaFont="system"/>
-                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
-                                                    <button verticalHuggingPriority="750" id="nki-sn-lQo">
-                                                        <rect key="frame" x="193" y="97" width="193" height="32"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="push" title="Export current settings..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="7Ff-bF-xyw">
-                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="exportCurrentSettingsSelected:" target="vQH-WF-vh2" id="cTO-Bv-dZo"/>
-                                                        </connections>
-                                                    </button>
-                                                    <button verticalHuggingPriority="750" id="Jbm-ZN-x5E">
-                                                        <rect key="frame" x="386" y="97" width="145" height="32"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="push" title="Import settings..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="GTK-8s-emk">
-                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="importSettingsSelected:" target="vQH-WF-vh2" id="Y31-ye-fIU"/>
-                                                        </connections>
-                                                    </button>
-                                                    <button id="pwT-Fi-3FC">
-                                                        <rect key="frame" x="212" y="70" width="300" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Repeat last export whenever settings change" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="vNH-wV-xlW">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="repeatLastExportSelected:" target="vQH-WF-vh2" id="WZG-AG-LaP"/>
-                                                        </connections>
-                                                    </button>
-                                                    <button id="3fA-qA-38f">
-                                                        <rect key="frame" x="211" y="260" width="315" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Log activity to the console" bezelStyle="regularSquare" imagePosition="left" inset="2" id="MMo-8R-lBl">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="logActivityToConsoleSelected:" target="vQH-WF-vh2" id="Ya2-VW-6pr"/>
-                                                        </connections>
-                                                    </button>
+                                                        <view key="contentView" id="AHg-rp-Lzn">
+                                                            <rect key="frame" x="1" y="1" width="365" height="90"/>
+                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                            <subviews>
+                                                                <button id="vcg-xx-N3A">
+                                                                    <rect key="frame" x="28" y="54" width="315" height="18"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <buttonCell key="cell" type="check" title="Check for new Trailer releases automatically" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="a4y-qa-v3Z">
+                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                        <font key="font" metaFont="system"/>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="checkForUpdatesAutomaticallySelected:" target="vQH-WF-vh2" id="1fT-2D-aEs"/>
+                                                                    </connections>
+                                                                </button>
+                                                                <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="AT5-aS-AgQ">
+                                                                    <rect key="frame" x="309" y="23" width="19" height="27"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <stepperCell key="cell" continuous="YES" alignment="left" minValue="1" maxValue="1024" doubleValue="1" id="Lkq-hS-bCt"/>
+                                                                    <connections>
+                                                                        <action selector="checkForUpdatesIntervalChanged:" target="vQH-WF-vh2" id="otw-3K-qgX"/>
+                                                                    </connections>
+                                                                </stepper>
+                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="hkX-Jd-o2h">
+                                                                    <rect key="frame" x="41" y="29" width="265" height="17"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="...every X hours" id="WVl-6O-rdk">
+                                                                        <font key="font" metaFont="system"/>
+                                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                    </textFieldCell>
+                                                                </textField>
+                                                                <button verticalHuggingPriority="750" id="PiT-m5-30d">
+                                                                    <rect key="frame" x="37" y="19" width="109" height="32"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <buttonCell key="cell" type="push" title="Check Now" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ME3-g3-Yt9">
+                                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                        <font key="font" metaFont="system"/>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="checkForUpdates:" target="cxZ-vL-Iwq" id="oT4-Z9-cGz"/>
+                                                                    </connections>
+                                                                </button>
+                                                            </subviews>
+                                                        </view>
+                                                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                        <font key="titleFont" metaFont="smallSystem"/>
+                                                    </box>
                                                 </subviews>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                            <font key="titleFont" metaFont="message" size="11"/>
                                         </box>
                                     </subviews>
                                 </view>
@@ -1957,5 +2023,6 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
             </connections>
             <point key="canvasLocation" x="179" y="134"/>
         </window>
+        <customObject id="cxZ-vL-Iwq" customClass="SUUpdater"/>
     </objects>
 </document>
