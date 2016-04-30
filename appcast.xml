@@ -7,6 +7,32 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.3.19</title>
+			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>New option to automatically move items that have been created in repos you own to the ‘Mentioned’ section.</li>
+				<li>API usage warnings & errors will no longer repeat on every refresh.</li>
+				<li>Corrections to muted item placing logic.</li>
+				<li>Performance improvements in API parsing.</li>
+				<li>Misc panel in preferences layout cleaned up a bit, added a “Check Now” button there in addition to the one in the About window. Also, the “last exported to” path is now selectable.</li>
+				<li>Also, from the recent 1.3.18:</li>
+				<li>Item Snoozing: Items can now be moved into a new “Snoozing” section, and optionally woken up by updates, manually, on a certain date/time, or after a certain amount of time. Additionally, to keep things tidy, snoozed items can be completely hidden.</li>
+				<li>The “Participated” section now has a sister “Mentioned” section, which holds items that have been moved there automatically because of mentions in comments or mentions to your teams.</li>
+				<li>Include item milestones when filtering, by default, or using the “milestone:” prefix (or, as always, exclude with the “!” syntax)</li>
+				<li>When muting an item, any existing notifications that have been posted from it in the notification center are also removed.</li>
+				<li>New option to remove related notifications in the notification center for an item that is no longer on the list.</li>
+				<li>Various typo and spelling fixes (many thanks to @stephenyeargin, @geoffharcourt, and @sdorunga1)</li>
+				</ul></font>]]></description>
+			<pubDate>Sat, 30 Apr 2016 12:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer1319.zip"
+			sparkle:version="1288"
+			sparkle:shortVersionString="1.3.19"
+			sparkle:dsaSignature="MC0CFH9csKIxbeiJIxniS7k8/ILeGhitAhUAxczNhrTxW/sq5jtHiVC7mWAcAaU="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.3.18</title>
 			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
