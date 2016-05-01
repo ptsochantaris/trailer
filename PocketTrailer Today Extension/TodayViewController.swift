@@ -18,35 +18,35 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 
 	private let paragraph = NSMutableParagraphStyle()
 
-	private var brightAttributes: [String: AnyObject] {
+	private var brightAttributes: [String : AnyObject] {
 		return [
 			NSForegroundColorAttributeName: UIColor.whiteColor(),
 			NSFontAttributeName: UIFont.systemFontOfSize(UIFont.systemFontSize()+2.0),
 			NSParagraphStyleAttributeName: paragraph ]
 	}
 
-	private var normalAttributes: [String: AnyObject] {
+	private var normalAttributes: [String : AnyObject] {
 		return [
 			NSForegroundColorAttributeName: UIColor.lightGrayColor(),
 			NSFontAttributeName: UIFont.systemFontOfSize(UIFont.systemFontSize()+2.0),
 			NSParagraphStyleAttributeName: paragraph ]
 	}
 
-	private var dimAttributes: [String: AnyObject] {
+	private var dimAttributes: [String : AnyObject] {
 		return [
 			NSForegroundColorAttributeName: UIColor.darkGrayColor(),
 			NSFontAttributeName: UIFont.systemFontOfSize(UIFont.systemFontSize()+2.0),
 			NSParagraphStyleAttributeName: paragraph ]
 	}
 
-	private var redAttributes: [String: AnyObject] {
+	private var redAttributes: [String : AnyObject] {
 		return [
 			NSForegroundColorAttributeName: UIColor.redColor(),
 			NSFontAttributeName: UIFont.systemFontOfSize(UIFont.systemFontSize()+2.0),
 			NSParagraphStyleAttributeName: paragraph ]
 	}
 
-	private var smallAttributes: [String: AnyObject] {
+	private var smallAttributes: [String : AnyObject] {
 		return [
 			NSForegroundColorAttributeName: UIColor.lightGrayColor(),
 			NSFontAttributeName: UIFont.systemFontOfSize(UIFont.smallSystemFontSize()),

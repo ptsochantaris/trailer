@@ -48,8 +48,6 @@ final class API {
 		let config = NSURLSessionConfiguration.defaultSessionConfiguration()
 		config.HTTPMaximumConnectionsPerHost = 4
 		config.HTTPShouldUsePipelining = true
-		config.timeoutIntervalForResource = NETWORK_TIMEOUT
-		config.timeoutIntervalForRequest = NETWORK_TIMEOUT
 		config.HTTPAdditionalHeaders = ["User-Agent" : userAgent]
 		urlSession = NSURLSession(configuration: config)
 
@@ -67,7 +65,7 @@ final class API {
 		}
 	}
 
-	func checkNetworkAvailability() {
+	private func checkNetworkAvailability() {
 		let newStatus = reachability.currentReachabilityStatus()
 		if newStatus != currentNetworkStatus {
 			currentNetworkStatus = newStatus
@@ -1035,21 +1033,21 @@ final class API {
 
 		let repoFullName = r.repo.fullName ?? "NoRepoFullName"
 		let repoNumber = r.number?.stringValue ?? "NoRepoNumber"
-		get("/repos/\(repoFullName)/pulls/\(repoNumber)", fromServer: r.apiServer, ignoreLastSync: false, parameters: nil, extraHeaders: nil) { [weak self] response, data, error in
+		let path = "/repos/\(repoFullName)/pulls/\(repoNumber)"
 
-			if error == nil {
-				if let d = data as? [NSObject : AnyObject], mergeInfo = d["merged_by"] as? [NSObject: AnyObject], mergeUserId = mergeInfo["id"] as? NSNumber {
+		getDataInPath(path, fromServer: r.apiServer, parameters: nil, extraHeaders: nil) { [weak self] data, lastPage, resultCode, etag in
+
+			if let d = data as? [NSObject : AnyObject] {
+				if let mergeInfo = d["merged_by"] as? [NSObject : AnyObject], mergeUserId = mergeInfo["id"] as? NSNumber {
 					self?.prWasMerged(r, byUserId: mergeUserId)
 				} else {
 					self?.itemWasClosed(r)
 				}
-			} else {
-				if let resultCode = response?.statusCode where resultCode == 404 || resultCode==410 { // PR gone for good
-					self?.itemWasClosed(r)
-				} else { // fetch problem
-					r.postSyncAction = PostSyncAction.DoNothing.rawValue // don't delete this, we couldn't check, play it safe
-					r.apiServer.lastSyncSucceeded = false
-				}
+			} else if resultCode == 404 || resultCode == 410 { // PR gone for good
+				self?.itemWasClosed(r)
+			} else { // fetch/server problem
+				r.postSyncAction = PostSyncAction.DoNothing.rawValue // don't delete this, we couldn't check, play it safe
+				r.apiServer.lastSyncSucceeded = false
 			}
 			callback()
 		}
@@ -1103,7 +1101,7 @@ final class API {
 
 	private func getRateLimitFromServer(apiServer: ApiServer, callback: (Int64, Int64, Int64)->Void)
 	{
-		get("/rate_limit", fromServer: apiServer, ignoreLastSync: true, parameters: nil, extraHeaders: nil) { response, data, error in
+		get("/rate_limit", fromServer: apiServer, ignoreLastSync: true, parameters: nil, extraHeaders: nil) { response, data, error, timeout in
 
 			if error == nil {
 				let allHeaders = response!.allHeaderFields
@@ -1220,7 +1218,7 @@ final class API {
 
 	func testApiToServer(apiServer: ApiServer, callback: (NSError?) -> ()) {
 		clearAllBadLinks()
-		get("/user", fromServer: apiServer, ignoreLastSync: true, parameters: nil, extraHeaders: nil) { [weak self] response, data, error in
+		get("/user", fromServer: apiServer, ignoreLastSync: true, parameters: nil, extraHeaders: nil) { [weak self] response, data, error, timeout in
 
 			if let d = data as? [NSObject : AnyObject], userName = d["login"] as? String, userId = d["id"] as? NSNumber where error == nil {
 				if userName.isEmpty || userId.longLongValue <= 0 {
@@ -1292,46 +1290,72 @@ final class API {
 		extraHeaders: [String : String]?,
 		callback:(data: AnyObject?, lastPage: Bool, resultCode: Int, etag: String?) -> Void) {
 
-			get(path, fromServer: fromServer, ignoreLastSync: false, parameters: parameters, extraHeaders: extraHeaders) { response, data, error in
+		attemptToGetDataInPath(path, fromServer: fromServer, parameters: parameters, extraHeaders: extraHeaders, callback: callback, attemptCount: 0)
+	}
 
-				let code = response?.statusCode ?? 0
+	private func attemptToGetDataInPath(
+		path: String,
+		fromServer: ApiServer,
+		parameters: [String : String]?,
+		extraHeaders: [String : String]?,
+		callback:(data: AnyObject?, lastPage: Bool, resultCode: Int, etag: String?) -> Void,
+		attemptCount: Int) {
 
-				if error == nil {
-					var etag: String? = nil
-					if let allHeaders = response?.allHeaderFields {
+		var finalHeaders = extraHeaders ?? [String : String]()
+		finalHeaders["Accept"] = "application/vnd.github.v3+json"
+		get(path, fromServer: fromServer, ignoreLastSync: false, parameters: parameters, extraHeaders: finalHeaders) { [weak self] response, data, error, timeout in
 
-                        etag = allHeaders["Etag"] as? String
+			let code = response?.statusCode ?? 0
 
-						if let hv = allHeaders["X-RateLimit-Remaining"] as? NSString {
-							fromServer.requestsRemaining = NSNumber(longLong: hv.longLongValue)
-						} else {
-							fromServer.requestsRemaining = 10000
-						}
+			if error == nil {
+				var etag: String?
+				var lastPage = true
+				if let allHeaders = response?.allHeaderFields {
 
-						if let hv = allHeaders["X-RateLimit-Limit"] as? NSString {
-							fromServer.requestsLimit = NSNumber(longLong: hv.longLongValue)
-						} else {
-							fromServer.requestsLimit = 10000
-						}
+					etag = allHeaders["Etag"] as? String
 
-						if let hv = allHeaders["X-RateLimit-Reset"] as? NSString {
-							fromServer.resetDate = NSDate(timeIntervalSince1970: hv.doubleValue)
-						} else {
-							fromServer.resetDate = nil
-						}
-
-						NSNotificationCenter.defaultCenter().postNotificationName(API_USAGE_UPDATE, object: fromServer, userInfo: nil)
+					if let v = allHeaders["X-RateLimit-Remaining"] as? String {
+						fromServer.requestsRemaining = NSNumber(longLong: Int64(v) ?? 0)
+					} else {
+						fromServer.requestsRemaining = 10000
 					}
-                    var lastPage = true
-                    let allHeaders = response?.allHeaderFields as [NSObject : AnyObject]?
-                    if let linkHeader = allHeaders?["Link"] as? String {
-                        lastPage = linkHeader.rangeOfString("rel=\"next\"") == nil
-                    }
-					callback(data: data, lastPage: lastPage, resultCode: code, etag: etag)
+
+					if let v = allHeaders["X-RateLimit-Limit"] as? String {
+						fromServer.requestsLimit = NSNumber(longLong: Int64(v) ?? 0)
+					} else {
+						fromServer.requestsLimit = 10000
+					}
+
+					if let v = allHeaders["X-RateLimit-Reset"] as? String {
+						fromServer.resetDate = NSDate(timeIntervalSince1970: Double(v) ?? 0)
+					} else {
+						fromServer.resetDate = nil
+					}
+
+					if let linkHeader = allHeaders["Link"] as? String {
+						lastPage = linkHeader.rangeOfString("rel=\"next\"") == nil
+					}
+
+					NSNotificationCenter.defaultCenter().postNotificationName(API_USAGE_UPDATE, object: fromServer, userInfo: nil)
+				}
+				callback(data: data, lastPage: lastPage, resultCode: code, etag: etag)
+			} else {
+				if timeout && attemptCount < 2 { // timeout, connection issue, etc
+					let apiServerLabel = fromServer.label ?? "(untitled server)"
+					let nextAttemptCount = attemptCount+1
+					DLog("(%@) Will retry timed-out API call to %@ (attempt #%d)", apiServerLabel, path, nextAttemptCount)
+					delay(5.0) {
+						self?.attemptToGetDataInPath(path, fromServer: fromServer, parameters: parameters, extraHeaders: extraHeaders, callback: callback, attemptCount: nextAttemptCount)
+					}
 				} else {
+					if timeout {
+						let apiServerLabel = fromServer.label ?? "(untitled server)"
+						DLog("(%@) Giving up on timed-out API call to %@", apiServerLabel, path)
+					}
 					callback(data: nil, lastPage: false, resultCode: code, etag: nil)
 				}
 			}
+		}
 	}
 
 	private func get(
@@ -1340,86 +1364,87 @@ final class API {
 		ignoreLastSync: Bool,
 		parameters: [String : String]?,
 		extraHeaders: [String : String]?,
-		completion: (response: NSHTTPURLResponse?, data: AnyObject?, error: NSError?) -> Void) {
+		completion: (response: NSHTTPURLResponse?, data: AnyObject?, error: NSError?, timeout: Bool) -> Void) {
 
-			let apiServerLabel: String
-			if fromServer.syncIsGood || ignoreLastSync {
-				apiServerLabel = fromServer.label ?? "(untitled server)"
-			} else {
+		let apiServerLabel: String
+		if fromServer.syncIsGood || ignoreLastSync {
+			apiServerLabel = fromServer.label ?? "(untitled server)"
+		} else {
+			atNextEvent(self) { S in
+				let e = S.apiError("Sync has failed, skipping this call")
+				completion(response: nil, data: nil, error: e, timeout: false)
+			}
+			return
+		}
+
+		var expandedPath = path.characters.startsWith("/".characters) ? (fromServer.apiPath ?? "").stringByAppendingPathComponent(path) : path
+
+		if let params = parameters {
+			var pairs = [String]()
+			for (key, value) in params {
+				pairs.append(key + "=" + value)
+			}
+			expandedPath.appendContentsOf("?")
+			expandedPath.appendContentsOf(pairs.joinWithSeparator("&"))
+		}
+
+		let r = NSMutableURLRequest(URL: NSURL(string: expandedPath)!)
+		if let a = fromServer.authToken {
+			r.setValue("token " + a, forHTTPHeaderField: "Authorization")
+		}
+
+		if let headers = extraHeaders {
+			for (key, value) in headers {
+				//DLog("(%@) custom header: %@=%@", apiServerLabel, key, value)
+				r.setValue(value, forHTTPHeaderField:key)
+			}
+		}
+
+		////////////////////////// preempt with error backoff algorithm
+		let fullUrlPath = r.URL!.absoluteString
+		var existingBackOff = badLinks[fullUrlPath]
+		if let eb = existingBackOff {
+			if NSDate().compare(eb.nextAttemptAt) == .OrderedAscending {
+				// report failure and return
+				DLog("(%@) Preempted fetch to previously broken link %@, won't actually access this URL until %@", apiServerLabel, fullUrlPath, eb.nextAttemptAt)
 				atNextEvent(self) { S in
-					let e = S.apiError("Sync has failed, skipping this call")
-					completion(response: nil, data: nil, error: e)
+					let e = S.apiError("Preempted fetch because of throttling")
+					completion(response: nil, data: nil, error: e, timeout: false)
 				}
 				return
 			}
-
-			#if os(iOS)
-				networkIndicationStart()
-			#endif
-
-			var expandedPath = path.characters.startsWith("/".characters) ? (fromServer.apiPath ?? "").stringByAppendingPathComponent(path) : path
-
-			if let params = parameters {
-				var pairs = [String]()
-				for (key, value) in params {
-					pairs.append(key + "=" + value)
-				}
-				expandedPath = expandedPath + "?" + pairs.joinWithSeparator("&")
+			else {
+				badLinks.removeValueForKey(fullUrlPath)
 			}
+		}
 
-			let r = NSMutableURLRequest(URL: NSURL(string: expandedPath)!, cachePolicy: NSURLRequestCachePolicy.UseProtocolCachePolicy, timeoutInterval: NETWORK_TIMEOUT)
-			if let a = fromServer.authToken {
-				r.setValue("token " + a, forHTTPHeaderField: "Authorization")
-			}
+		#if os(iOS)
+			networkIndicationStart()
+		#endif
 
-			if let headers = extraHeaders {
-				for (key,value) in headers {
-					//DLog("(%@) custom header: %@=%@", apiServerLabel, key, value)
-					r.setValue(value, forHTTPHeaderField:key)
-				}
-			}
+		urlSession.dataTaskWithRequest(r) { [weak self] data, res, e in
 
-			////////////////////////// preempt with error backoff algorithm
-			let fullUrlPath = r.URL!.absoluteString
-			var existingBackOff = badLinks[fullUrlPath]
-			if existingBackOff != nil {
-				if NSDate().compare(existingBackOff!.nextAttemptAt) == .OrderedAscending {
-					// report failure and return
-					DLog("(%@) Preempted fetch to previously broken link %@, won't actually access this URL until %@", apiServerLabel, fullUrlPath, existingBackOff!.nextAttemptAt)
-					atNextEvent(self) { S in
-						let e = S.apiError("Preempted fetch because of throttling")
-						completion(response: nil, data: nil, error: e)
-						#if os(iOS)
-							S.networkIndicationEnd()
-						#endif
-					}
-					return
-				}
-				else {
-					badLinks.removeValueForKey(fullUrlPath)
+			let response = res as? NSHTTPURLResponse
+			var parsedData: AnyObject?
+			var error = e
+			var badServerResponse = false
+			let code = response?.statusCode ?? 0
+			var timeout = false
+
+			if code > 399 {
+				error = self?.apiError("Server responded with \(code)")
+				badServerResponse = true
+			} else if code == 0 {
+				timeout = error?.code == -1001
+				error = self?.apiError("Server did not repond")
+			} else {
+				DLog("(%@) GET %@ - RESULT: %d", apiServerLabel, fullUrlPath, code)
+				if let d = data {
+					parsedData = try? NSJSONSerialization.JSONObjectWithData(d, options: NSJSONReadingOptions())
 				}
 			}
 
-			urlSession.dataTaskWithRequest(r) { [weak self] data, res, e in
-
-				let response = res as? NSHTTPURLResponse
-				var parsedData: AnyObject?
-				var error = e
-				var badServerResponse = false
-
-				if let code = response?.statusCode {
-					if code > 399 {
-						error = self?.apiError("Server responded with \(code)")
-						badServerResponse = true
-					} else {
-						DLog("(%@) GET %@ - RESULT: %d", apiServerLabel, fullUrlPath, code)
-						if let d = data {
-							parsedData = try? NSJSONSerialization.JSONObjectWithData(d, options: NSJSONReadingOptions())
-						}
-					}
-				} else {
-					error = self?.apiError("Server did not repond")
-				}
+			atNextEvent(self) { S in
 
 				if error != nil {
 					if badServerResponse {
@@ -1437,19 +1462,19 @@ final class API {
 						}
 						self?.badLinks[fullUrlPath] = existingBackOff
 					}
-					DLog("(%@) GET %@ - FAILED: %@", apiServerLabel, fullUrlPath, error!.localizedDescription)
+					DLog("(%@) GET %@ - FAILED: (code %d) %@", apiServerLabel, fullUrlPath, code, error!.localizedDescription)
 				}
 
-				atNextEvent(self) { S in
-					if Settings.dumpAPIResponsesInConsole, let d = data {
-						DLog("API data from %@: %@", fullUrlPath, NSString(data: d, encoding: NSUTF8StringEncoding))
-					}
-					completion(response: response, data: parsedData, error: error)
-					#if os(iOS)
-						S.networkIndicationEnd()
-					#endif
+				if Settings.dumpAPIResponsesInConsole, let d = data {
+					DLog("API data from %@: %@", fullUrlPath, NSString(data: d, encoding: NSUTF8StringEncoding))
 				}
-			}.resume()
+
+				completion(response: response, data: parsedData, error: error, timeout: timeout)
+				#if os(iOS)
+					S.networkIndicationEnd()
+				#endif
+			}
+		}.resume()
 	}
 
 	#if os(iOS)

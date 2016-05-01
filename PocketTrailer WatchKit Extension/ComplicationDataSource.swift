@@ -37,7 +37,7 @@ final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 		}
 	}
 
-	private func processOverview(complication: CLKComplication, _ overview: [String: AnyObject], _ handler: ([CLKComplicationTimelineEntry]?) -> Void) {
+	private func processOverview(complication: CLKComplication, _ overview: [String : AnyObject], _ handler: ([CLKComplicationTimelineEntry]?) -> Void) {
 		let preferIssues = overview["preferIssues"] as! Bool
 
 		let prs = overview["prs"] as! [String : AnyObject]

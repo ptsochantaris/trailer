@@ -572,7 +572,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 	func application(sender: NSApplication, openFile filename: String) -> Bool {
 		let url = NSURL(fileURLWithPath: filename)
-		let ext = filename.lastPathComponent.pathExtension
+		let ext = ((filename as NSString).lastPathComponent as NSString).pathExtension
 		if ext == "trailerSettings" {
 			DLog("Will open %@", url.absoluteString)
 			tryLoadSettings(url, skipConfirm: Settings.dontConfirmSettingsImport)

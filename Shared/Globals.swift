@@ -196,7 +196,6 @@ let NOTIFICATION_URL_KEY = "urlKey"
 let API_USAGE_UPDATE = "RateUpdateNotification"
 
 let LOW_API_WARNING: Double = 0.20
-let NETWORK_TIMEOUT: NSTimeInterval = 120.0
 let BACKOFF_STEP: NSTimeInterval = 120.0
 
 func currentAppVersion() -> String {
@@ -282,42 +281,11 @@ func colorFromUInt32(c: UInt32) -> COLOR_CLASS {
 //////////////////////// From tieferbegabt's post on https://forums.developer.apple.com/message/37935, with thanks!
 
 extension String {
-	var lastPathComponent: String {
-		get {
-			return (self as NSString).lastPathComponent
-		}
-	}
-	var pathExtension: String {
-		get {
-			return (self as NSString).pathExtension
-		}
-	}
-	var stringByDeletingLastPathComponent: String {
-		get {
-			return (self as NSString).stringByDeletingLastPathComponent
-		}
-	}
-	var stringByDeletingPathExtension: String {
-		get {
-			return (self as NSString).stringByDeletingPathExtension
-		}
-	}
-	var pathComponents: [String] {
-		get {
-			return (self as NSString).pathComponents
-		}
-	}
 	func stringByAppendingPathComponent(path: String) -> String {
 		return (self as NSString).stringByAppendingPathComponent(path)
 	}
-	func stringByAppendingPathExtension(ext: String) -> String? {
-		return (self as NSString).stringByAppendingPathExtension(ext)
-	}
 	func stringByReplacingCharactersInRange(range: NSRange, withString string: String) -> String {
 		return (self as NSString).stringByReplacingCharactersInRange(range, withString: string)
-	}
-	func toInt() -> Int {
-		return (self as NSString).integerValue
 	}
 }
 
