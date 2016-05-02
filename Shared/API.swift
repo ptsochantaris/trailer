@@ -133,17 +133,16 @@ final class API {
 	}
 
 	// Warning: Calls back on thread!!
-	private func getImage(url: NSURL, completion:(response: NSHTTPURLResponse?, data: NSData?, error: NSError?) -> Void) {
+	private func getImage(url: NSURL, completion:(data: NSData?) -> Void) {
 
-		let task = urlSession.dataTaskWithURL(url) { [weak self] data, res, e in
+		let task = urlSession.dataTaskWithURL(url) { [weak self] data, response, error in
 
-			let response = res as? NSHTTPURLResponse
-			var error = e
-			if error == nil && (response == nil || response?.statusCode > 399) {
-				let code = response?.statusCode ?? -1
-				error = self?.apiError("Server responded with \(code)")
+			let r = response as? NSHTTPURLResponse
+			if error != nil || response == nil || r?.statusCode > 299 || (r?.expectedContentLength ?? 0) < Int64(data?.length ?? 0) {
+				completion(data: nil)
+			} else {
+				completion(data: data)
 			}
-			completion(response: response, data: data, error: error)
 			#if os(iOS)
 				atNextEvent(self) { S in
 					S.networkIndicationEnd()
@@ -194,7 +193,7 @@ final class API {
 			}
 		}
 
-		getImage(NSURL(string: absolutePath)!) { response, data, error in
+		getImage(NSURL(string: absolutePath)!) { data in
 
 			var result: IMAGE_CLASS?
             #if os(iOS)
@@ -1088,7 +1087,7 @@ final class API {
 
 	private func getRateLimitFromServer(apiServer: ApiServer, callback: (Int64, Int64, Int64)->Void)
 	{
-		api("/rate_limit", fromServer: apiServer, ignoreLastSync: true) { response, data, error, timeout in
+		api("/rate_limit", fromServer: apiServer, ignoreLastSync: true) { response, data, error, shouldRetry in
 
 			if error == nil {
 				let allHeaders = response!.allHeaderFields
@@ -1205,7 +1204,7 @@ final class API {
 
 	func testApiToServer(apiServer: ApiServer, callback: (NSError?) -> ()) {
 		clearAllBadLinks()
-		api("/user", fromServer: apiServer, ignoreLastSync: true) { [weak self] response, data, error, timeout in
+		api("/user", fromServer: apiServer, ignoreLastSync: true) { [weak self] response, data, error, shouldRetry in
 
 			if let d = data as? [NSObject : AnyObject], userName = d["login"] as? String, userId = d["id"] as? NSNumber where error == nil {
 				if userName.isEmpty || userId.longLongValue <= 0 {
@@ -1274,7 +1273,7 @@ final class API {
 		callback:(data: AnyObject?, lastPage: Bool, resultCode: Int) -> Void,
 		attemptCount: Int) {
 
-		api(path, fromServer: fromServer, ignoreLastSync: false) { [weak self] response, data, error, timeout in
+		api(path, fromServer: fromServer, ignoreLastSync: false) { [weak self] response, data, error, shouldRetry in
 
 			let code = response?.statusCode ?? 0
 
@@ -1308,17 +1307,17 @@ final class API {
 				}
 				callback(data: data, lastPage: lastPage, resultCode: code)
 			} else {
-				if timeout && attemptCount < 2 { // timeout, connection issue, etc
+				if shouldRetry && attemptCount < 2 { // timeout, truncation, connection issue, etc
 					let apiServerLabel = fromServer.label ?? "(untitled server)"
 					let nextAttemptCount = attemptCount+1
-					DLog("(%@) Will retry timed-out API call to %@ (attempt #%d)", apiServerLabel, path, nextAttemptCount)
+					DLog("(%@) Will retry failed API call to %@ (attempt #%d)", apiServerLabel, path, nextAttemptCount)
 					delay(5.0) {
 						self?.attemptToGetDataInPath(path, fromServer: fromServer, callback: callback, attemptCount: nextAttemptCount)
 					}
 				} else {
-					if timeout {
+					if shouldRetry {
 						let apiServerLabel = fromServer.label ?? "(untitled server)"
-						DLog("(%@) Giving up on timed-out API call to %@", apiServerLabel, path)
+						DLog("(%@) Giving up on failed API call to %@", apiServerLabel, path)
 					}
 					callback(data: nil, lastPage: false, resultCode: code)
 				}
@@ -1330,7 +1329,7 @@ final class API {
 		path:String,
 		fromServer: ApiServer,
 		ignoreLastSync: Bool,
-		completion: (response: NSHTTPURLResponse?, data: AnyObject?, error: NSError?, timeout: Bool) -> Void) {
+		completion: (response: NSHTTPURLResponse?, data: AnyObject?, error: NSError?, shouldRetry: Bool) -> Void) {
 
 		let apiServerLabel: String
 		if fromServer.syncIsGood || ignoreLastSync {
@@ -1338,7 +1337,7 @@ final class API {
 		} else {
 			atNextEvent(self) { S in
 				let e = S.apiError("Sync has failed, skipping this call")
-				completion(response: nil, data: nil, error: e, timeout: false)
+				completion(response: nil, data: nil, error: e, shouldRetry: false)
 			}
 			return
 		}
@@ -1360,7 +1359,7 @@ final class API {
 				DLog("(%@) Preempted fetch to previously broken link %@, won't actually access this URL until %@", apiServerLabel, fullUrlPath, eb.nextAttemptAt)
 				atNextEvent(self) { S in
 					let e = S.apiError("Preempted fetch because of throttling")
-					completion(response: nil, data: nil, error: e, timeout: false)
+					completion(response: nil, data: nil, error: e, shouldRetry: false)
 				}
 				return
 			}
@@ -1380,14 +1379,17 @@ final class API {
 			var error = e
 			var badServerResponse = false
 			let code = response?.statusCode ?? 0
-			var timeout = false
+			var shouldRetry = false
 
 			if code > 399 {
 				error = self?.apiError("Server responded with \(code)")
 				badServerResponse = true
 			} else if code == 0 {
-				timeout = error?.code == -1001
+				shouldRetry = error?.code == -1001 // timeout
 				error = self?.apiError("Server did not repond")
+			} else if (response?.expectedContentLength ?? 0) > Int64(data?.length ?? 0) {
+				shouldRetry = true // truncation
+				error = self?.apiError("Server data was truncated")
 			} else {
 				DLog("(%@) GET %@ - RESULT: %d", apiServerLabel, fullUrlPath, code)
 				if let d = data {
@@ -1408,7 +1410,7 @@ final class API {
 						} else {
 							DLog("(%@) Placing URL %@ on the throttled list", apiServerLabel, fullUrlPath)
 							existingBackOff = UrlBackOffEntry(
-								nextAttemptAt: NSDate(timeInterval: BACKOFF_STEP, sinceDate: NSDate()),
+								nextAttemptAt: NSDate().dateByAddingTimeInterval(BACKOFF_STEP),
 								duration: BACKOFF_STEP)
 						}
 						self?.badLinks[fullUrlPath] = existingBackOff
@@ -1420,7 +1422,7 @@ final class API {
 					DLog("API data from %@: %@", fullUrlPath, NSString(data: d, encoding: NSUTF8StringEncoding))
 				}
 
-				completion(response: response, data: parsedData, error: error, timeout: timeout)
+				completion(response: response, data: parsedData, error: error, shouldRetry: shouldRetry)
 				#if os(iOS)
 					S.networkIndicationEnd()
 				#endif
