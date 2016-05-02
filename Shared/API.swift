@@ -1381,7 +1381,7 @@ final class API {
 			let code = response?.statusCode ?? 0
 			var shouldRetry = false
 
-			if code > 399 {
+			if code > 299 {
 				error = self?.apiError("Server responded with \(code)")
 				badServerResponse = true
 			} else if code == 0 {

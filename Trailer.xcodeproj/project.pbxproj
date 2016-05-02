@@ -480,11 +480,11 @@
 			isa = PBXGroup;
 			children = (
 				16CBE1C41A2DFBA500485053 /* Settings.swift */,
+				162A29D81A4085FD008F41A9 /* API.swift */,
 				16B3B3531A34E9F7000BE6CC /* Reachability.h */,
 				16B3B3541A34E9F7000BE6CC /* Reachability.m */,
-				162A29D81A4085FD008F41A9 /* API.swift */,
-				169688491CD7635B00A88902 /* Parse8601.m */,
 				1696884A1CD7635B00A88902 /* Parse8601.h */,
+				169688491CD7635B00A88902 /* Parse8601.m */,
 			);
 			name = Logic;
 			sourceTree = "<group>";

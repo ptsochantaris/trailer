@@ -32,13 +32,8 @@ class DataItem: NSManagedObject {
 		f.returnsObjectsAsFaults = false
 		f.fetchLimit = 1
 		f.predicate = NSPredicate(format:"serverId = %@ and apiServer == %@", serverId, fromServer)
-		let items: [AnyObject]?
-		do {
-			items = try fromServer.managedObjectContext?.executeFetchRequest(f)
-		} catch _ {
-			items = nil
-		}
-		return items?.first as? DataItem
+		let items = try! fromServer.managedObjectContext?.executeFetchRequest(f) as! [DataItem]
+		return items.first
 	}
 
 	final class func itemsWithInfo(data: [[NSObject : AnyObject]]?, type: String, fromServer: ApiServer, postProcessCallback: (DataItem, [NSObject : AnyObject], Bool)->Void) {
