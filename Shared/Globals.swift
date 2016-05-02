@@ -87,14 +87,6 @@ let itemCountFormatter = { () -> NSNumberFormatter in
     return n
 }()
 
-let syncDateFormatter = { () -> NSDateFormatter in
-    let d = NSDateFormatter()
-    d.dateFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'"
-    d.timeZone = NSTimeZone(abbreviation: "UTC")
-    d.locale = NSLocale(localeIdentifier: "en_US")
-    return d
-}()
-
 enum ItemCondition: Int {
 	case Open, Closed, Merged
 }

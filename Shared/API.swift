@@ -430,7 +430,7 @@ final class API {
 			startingFromPage: 1,
 			perPageCallback: { data, lastPage in
 				for d in data ?? [] {
-					let eventDate = syncDateFormatter.dateFromString(d["created_at"] as! String)!
+					let eventDate = parseGH8601(d["created_at"] as? String) ?? never()
 					if latestDate!.compare(eventDate) == .OrderedAscending { // this is where we came in
 						if let repoId = d["repo"]?["id"] as? NSNumber {
 							DLog("(%@) New event at %@ from Repo ID %@", serverLabel, eventDate, repoId)
@@ -478,7 +478,7 @@ final class API {
 			startingFromPage: 1,
 			perPageCallback: { data, lastPage in
 				for d in data ?? [] {
-					let eventDate = syncDateFormatter.dateFromString(d["created_at"] as! String)!
+					let eventDate = parseGH8601(d["created_at"] as? String) ?? never()
 					if latestDate!.compare(eventDate) == .OrderedAscending { // this is where we came in
 						if let repoId = d["repo"]?["id"] as? NSNumber {
 							DLog("(%@) New event at %@ from Repo ID %@", serverLabel, eventDate, repoId)
@@ -781,16 +781,16 @@ final class API {
 				return false
 			}
 			if pr.condition?.integerValue != ItemCondition.Open.rawValue {
-				DLog("Won't check labels for closed/merged PR: %@", pr.title)
+				//DLog("Won't check labels for closed/merged PR: %@", pr.title)
 				return false
 			}
 			let oid = pr.objectID
 			let refreshes = self?.refreshesSinceLastLabelsCheck[oid]
 			if refreshes == nil || refreshes! >= Settings.labelRefreshInterval {
-				DLog("Will check labels for PR: '%@'", pr.title)
+				//DLog("Will check labels for PR: '%@'", pr.title)
 				return true
 			} else {
-				DLog("No need to get labels for PR: '%@' (%d refreshes since last check)", pr.title, refreshes)
+				//DLog("No need to get labels for PR: '%@' (%d refreshes since last check)", pr.title, refreshes)
 				self?.refreshesSinceLastLabelsCheck[oid] = (refreshes ?? 0)+1
 				return false
 			}
@@ -853,10 +853,10 @@ final class API {
 			let oid = pr.objectID
 			let refreshes = self.refreshesSinceLastStatusCheck[oid]
 			if refreshes == nil || refreshes! >= Settings.statusItemRefreshInterval {
-				DLog("Will check statuses for PR: '%@'", pr.title)
+				//DLog("Will check statuses for PR: '%@'", pr.title)
 				return true
 			} else {
-				DLog("No need to get statuses for PR: '%@' (%d refreshes since last check)", pr.title, refreshes)
+				//DLog("No need to get statuses for PR: '%@' (%d refreshes since last check)", pr.title, refreshes)
 				self.refreshesSinceLastStatusCheck[oid] = (refreshes ?? 0)+1
 				return false
 			}

@@ -62,12 +62,7 @@ class DataItem: NSManagedObject {
 			let serverId = i.serverId!
 			idsOfItems.removeAtIndex(idsOfItems.indexOf(serverId)!)
 			let info = idsToInfo[serverId]!
-			let updatedDate: NSDate
-			if let dateString = info["updated_at"] as? String, uDate = syncDateFormatter.dateFromString(dateString) {
-				updatedDate = uDate
-			} else {
-				updatedDate = NSDate()
-			}
+			let updatedDate = parseGH8601(info["updated_at"] as? String) ?? NSDate()
 			if updatedDate != i.updatedAt {
 				DLog("Updating %@: %@",type,serverId)
 				i.postSyncAction = PostSyncAction.NoteUpdated.rawValue
@@ -88,17 +83,8 @@ class DataItem: NSManagedObject {
 			i.postSyncAction = PostSyncAction.NoteNew.rawValue
 			i.apiServer = fromServer
 
-			if let dateString = info["created_at"] as? String, cDate = syncDateFormatter.dateFromString(dateString) {
-				i.createdAt = cDate
-			} else {
-				i.createdAt = NSDate()
-			}
-
-			if let dateString = info["updated_at"] as? String, uDate = syncDateFormatter.dateFromString(dateString) {
-				i.updatedAt = uDate
-			} else {
-				i.updatedAt = NSDate()
-			}
+			i.createdAt = parseGH8601(info["created_at"] as? String) ?? NSDate()
+			i.updatedAt = parseGH8601(info["updated_at"] as? String) ?? NSDate()
 
 			postProcessCallback(i, info, true)
 		}
