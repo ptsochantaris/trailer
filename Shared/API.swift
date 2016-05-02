@@ -237,6 +237,7 @@ final class API {
 	}
 
 	private func syncToMoc(moc: NSManagedObjectContext, callback: Completion) {
+
 		markDirtyReposInMoc(moc) { [weak self] in
 
 			let repos = Repo.syncableReposInMoc(moc)
@@ -397,12 +398,10 @@ final class API {
 		getPagedDataInPath("/user/teams",
 			fromServer: apiServer,
 			startingFromPage: 1,
-			parameters: nil,
-			extraHeaders: nil,
 			perPageCallback: { data, lastPage in
 				Team.syncTeamsWithInfo(data, apiServer: apiServer)
 				return false
-			}, finalCallback: { success, resultCode, etag in
+			}, finalCallback: { success, resultCode in
 				if !success {
 					apiServer.lastSyncSucceeded = false
 				}
@@ -410,109 +409,97 @@ final class API {
 		})
 	}
 
-	private func markDirtyRepoIds(repoIdsToMarkDirty: NSMutableSet, usingUserEventsFromServer: ApiServer, callback: Completion) {
+	private func markDirtyRepoIds(repoIdsToMarkDirty: NSMutableSet, usingUserEventsFromServer s: ApiServer, callback: Completion) {
 
-		if !usingUserEventsFromServer.syncIsGood {
+		if !s.syncIsGood {
 			callback()
 			return
 		}
 
-		var extraHeaders: [String : String]?
-		if let e = usingUserEventsFromServer.latestUserEventEtag {
-			extraHeaders = ["If-None-Match": e]
-		}
-
-		var latestDate = usingUserEventsFromServer.latestUserEventDateProcessed
+		var latestDate = s.latestUserEventDateProcessed
 		if latestDate == nil {
 			latestDate = never()
-			usingUserEventsFromServer.latestUserEventDateProcessed = latestDate
+			s.latestUserEventDateProcessed = latestDate
 		}
 
-		let userName = usingUserEventsFromServer.userName ?? "NoApiUserName"
+		let userName = s.userName ?? "NoApiUserName"
+		let serverLabel = s.label ?? "(no api server label)"
+
 		getPagedDataInPath("/users/\(userName)/events",
-			fromServer: usingUserEventsFromServer,
+			fromServer: s,
 			startingFromPage: 1,
-			parameters: nil,
-			extraHeaders: extraHeaders,
 			perPageCallback: { data, lastPage in
 				for d in data ?? [] {
 					let eventDate = syncDateFormatter.dateFromString(d["created_at"] as! String)!
 					if latestDate!.compare(eventDate) == .OrderedAscending { // this is where we came in
 						if let repoId = d["repo"]?["id"] as? NSNumber {
-							DLog("New event at %@ from Repo ID %@", eventDate, repoId)
+							DLog("(%@) New event at %@ from Repo ID %@", serverLabel, eventDate, repoId)
 							repoIdsToMarkDirty.addObject(repoId)
 						}
-						if latestDate!.compare(eventDate) == .OrderedAscending {
-							usingUserEventsFromServer.latestUserEventDateProcessed = eventDate
+						if s.latestUserEventDateProcessed!.compare(eventDate) == .OrderedAscending {
+							s.latestUserEventDateProcessed = eventDate
 							if latestDate!.isEqualToDate(never()) {
-								DLog("First sync, all repos are dirty so we don't need to read further, we have the latest user event date: %@", eventDate)
+								DLog("(%@) First sync, all repos are dirty so we don't need to read further, we have the latest received event date: %@", serverLabel, eventDate)
 								return true
 							}
 						}
 					} else {
-						DLog("The rest of these user events are processed, stopping event parsing")
+						DLog("(%@) No further user events", serverLabel)
 						return true
 					}
 				}
 				return false
-			}, finalCallback: { success, resultCode, etag in
-				usingUserEventsFromServer.latestUserEventEtag = etag
+			}, finalCallback: { success, resultCode in
 				if !success {
-					usingUserEventsFromServer.lastSyncSucceeded = false
+					s.lastSyncSucceeded = false
 				}
 				callback()
 		})
 	}
 
-	private func markDirtyRepoIds(repoIdsToMarkDirty: NSMutableSet, usingReceivedEventsFromServer: ApiServer, callback: Completion) {
+	private func markDirtyRepoIds(repoIdsToMarkDirty: NSMutableSet, usingReceivedEventsFromServer s: ApiServer, callback: Completion) {
 
-		if !usingReceivedEventsFromServer.syncIsGood {
+		if !s.syncIsGood {
 			callback()
 			return
 		}
 
-		var extraHeaders: [String : String]?
-		if let e = usingReceivedEventsFromServer.latestReceivedEventEtag {
-			extraHeaders = ["If-None-Match": e]
-		}
-
-		var latestDate = usingReceivedEventsFromServer.latestReceivedEventDateProcessed
+		var latestDate = s.latestReceivedEventDateProcessed
 		if latestDate == nil {
 			latestDate = never()
-			usingReceivedEventsFromServer.latestReceivedEventDateProcessed = latestDate
+			s.latestReceivedEventDateProcessed = latestDate
 		}
 
-		let userName = usingReceivedEventsFromServer.userName ?? "NoApiUserName"
+		let userName = s.userName ?? "NoApiUserName"
+		let serverLabel = s.label ?? "(no api server label)"
+
 		getPagedDataInPath("/users/\(userName)/received_events",
-			fromServer: usingReceivedEventsFromServer,
+			fromServer: s,
 			startingFromPage: 1,
-			parameters: nil,
-			extraHeaders: extraHeaders,
 			perPageCallback: { data, lastPage in
 				for d in data ?? [] {
 					let eventDate = syncDateFormatter.dateFromString(d["created_at"] as! String)!
 					if latestDate!.compare(eventDate) == .OrderedAscending { // this is where we came in
 						if let repoId = d["repo"]?["id"] as? NSNumber {
-							DLog("New event at %@ from Repo ID %@", eventDate, repoId)
+							DLog("(%@) New event at %@ from Repo ID %@", serverLabel, eventDate, repoId)
 							repoIdsToMarkDirty.addObject(repoId)
 						}
-						if latestDate!.compare(eventDate) == .OrderedAscending {
-							usingReceivedEventsFromServer.latestReceivedEventDateProcessed = eventDate
+						if s.latestReceivedEventDateProcessed!.compare(eventDate) == .OrderedAscending {
+							s.latestReceivedEventDateProcessed = eventDate
 							if latestDate!.isEqualToDate(never()) {
-								DLog("First sync, all repos are dirty so we don't need to read further, we have the latest received event date: %@", latestDate)
+								DLog("(%@) First sync, all repos are dirty so we don't need to read further, we have the latest received event date: %@", serverLabel, eventDate)
 								return true
 							}
 						}
 					} else {
-						DLog("The rest of these received events are processed, stopping event parsing")
+						DLog("(%@) No further received events", serverLabel)
 						return true
 					}
 				}
 				return false
-			}, finalCallback: { success, resultCode, etag in
-				usingReceivedEventsFromServer.latestReceivedEventEtag = etag
+			}, finalCallback: { success, resultCode in
 				if !success {
-					usingReceivedEventsFromServer.lastSyncSucceeded = false
+					s.lastSyncSucceeded = false
 				}
 				callback()
 		})
@@ -585,11 +572,11 @@ final class API {
 
 			if apiServer.syncIsGood && r.displayPolicyForPrs?.integerValue != RepoDisplayPolicy.Hide.rawValue {
 				let repoFullName = r.fullName ?? "NoRepoFullName"
-				getPagedDataInPath("/repos/\(repoFullName)/pulls", fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
+				getPagedDataInPath("/repos/\(repoFullName)/pulls", fromServer: apiServer, startingFromPage: 1,
 					perPageCallback: { data, lastPage in
 						PullRequest.syncPullRequestsFromInfoArray(data, inRepo: r)
 						return false
-					}, finalCallback: { [weak self] success, resultCode, etag in
+					}, finalCallback: { [weak self] success, resultCode in
 						if !success {
 							self?.handleRepoSyncFailure(r, withResultCode: resultCode)
 						}
@@ -650,11 +637,11 @@ final class API {
 
 			if apiServer.syncIsGood && r.displayPolicyForIssues?.integerValue != RepoDisplayPolicy.Hide.rawValue {
 				let repoFullName = r.fullName ?? "NoRepoFullName"
-				getPagedDataInPath("/repos/\(repoFullName)/issues", fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
+				getPagedDataInPath("/repos/\(repoFullName)/issues", fromServer: apiServer, startingFromPage: 1,
 					perPageCallback: { data, lastPage in
 						Issue.syncIssuesFromInfoArray(data, inRepo: r)
 						return false
-					}, finalCallback: { [weak self] success, resultCode, etag in
+					}, finalCallback: { [weak self] success, resultCode in
 						if !success {
 							self?.handleRepoSyncFailure(r, withResultCode: resultCode)
 						}
@@ -715,11 +702,11 @@ final class API {
 
 				let apiServer = p.apiServer
 
-				getPagedDataInPath(link, fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
+				getPagedDataInPath(link, fromServer: apiServer, startingFromPage: 1,
 					perPageCallback: { data, lastPage in
 						PRComment.syncCommentsFromInfo(data, pullRequest: p)
 						return false
-					}, finalCallback: { success, resultCode, etag in
+					}, finalCallback: { success, resultCode in
 						completionCount += 1
 						if !success {
 							apiServer.lastSyncSucceeded = false
@@ -765,11 +752,11 @@ final class API {
 
 				let apiServer = i.apiServer
 
-				getPagedDataInPath(link, fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
+				getPagedDataInPath(link, fromServer: apiServer, startingFromPage: 1,
 					perPageCallback: { data, lastPage in
 						PRComment.syncCommentsFromInfo(data, issue: i)
 						return false
-					}, finalCallback: { success, resultCode, etag in
+					}, finalCallback: { success, resultCode in
 						completionCount += 1
 						if !success {
 							apiServer.lastSyncSucceeded = false
@@ -824,11 +811,11 @@ final class API {
 
 			if let link = p.labelsLink {
 
-				getPagedDataInPath(link, fromServer: p.apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
+				getPagedDataInPath(link, fromServer: p.apiServer, startingFromPage: 1,
 					perPageCallback: { data, lastPage in
 						PRLabel.syncLabelsWithInfo(data, withParent: p)
 						return false
-					}, finalCallback: { [weak self] success, resultCode, etag in
+					}, finalCallback: { [weak self] success, resultCode in
 						completionCount += 1
 						var allGood = success
 						if !success {
@@ -891,11 +878,11 @@ final class API {
 			let apiServer = p.apiServer
 
 			if let statusLink = p.statusesLink {
-				getPagedDataInPath(statusLink, fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
+				getPagedDataInPath(statusLink, fromServer: apiServer, startingFromPage: 1,
 					perPageCallback: { data, lastPage in
 						PRStatus.syncStatusesFromInfo(data, pullRequest: p)
 						return false
-					}, finalCallback: { [weak self] success, resultCode, etag in
+					}, finalCallback: { [weak self] success, resultCode in
 						completionCount += 1
 						var allGood = success
 						if !success {
@@ -989,7 +976,7 @@ final class API {
 		for p in prs {
 			let apiServer = p.apiServer
 			if let issueLink = p.issueUrl {
-				getDataInPath(issueLink, fromServer: apiServer, parameters: nil, extraHeaders: nil) { data, lastPage, resultCode, etag in
+				getDataInPath(issueLink, fromServer: apiServer) { data, lastPage, resultCode in
 					if let d = data as? [NSObject : AnyObject], assigneeInfo = d["assignee"] as? [NSObject : AnyObject] {
 						let assignee = assigneeInfo["login"] as? String ?? "NoAssignedUserName"
 						let assigned = (assignee == (apiServer.userName ?? "NoApiUser"))
@@ -1035,7 +1022,7 @@ final class API {
 		let repoNumber = r.number?.stringValue ?? "NoRepoNumber"
 		let path = "/repos/\(repoFullName)/pulls/\(repoNumber)"
 
-		getDataInPath(path, fromServer: r.apiServer, parameters: nil, extraHeaders: nil) { [weak self] data, lastPage, resultCode, etag in
+		getDataInPath(path, fromServer: r.apiServer) { [weak self] data, lastPage, resultCode in
 
 			if let d = data as? [NSObject : AnyObject] {
 				if let mergeInfo = d["merged_by"] as? [NSObject : AnyObject], mergeUserId = mergeInfo["id"] as? NSNumber {
@@ -1101,7 +1088,7 @@ final class API {
 
 	private func getRateLimitFromServer(apiServer: ApiServer, callback: (Int64, Int64, Int64)->Void)
 	{
-		get("/rate_limit", fromServer: apiServer, ignoreLastSync: true, parameters: nil, extraHeaders: nil) { response, data, error, timeout in
+		api("/rate_limit", fromServer: apiServer, ignoreLastSync: true) { response, data, error, timeout in
 
 			if error == nil {
 				let allHeaders = response!.allHeaderFields
@@ -1168,12 +1155,12 @@ final class API {
 			return
 		}
 
-		getPagedDataInPath("/user/subscriptions", fromServer: apiServer, startingFromPage: 1, parameters: nil, extraHeaders: nil,
+		getPagedDataInPath("/user/subscriptions", fromServer: apiServer, startingFromPage: 1,
 			perPageCallback: { data, lastPage in
 				Repo.syncReposFromInfo(data, apiServer: apiServer)
 				return false
 
-			}, finalCallback: { success, resultCode, etag in
+			}, finalCallback: { success, resultCode in
 				if !success {
 					apiServer.lastSyncSucceeded = false
 				}
@@ -1193,7 +1180,7 @@ final class API {
 		var completionCount = 0
 		for apiServer in allApiServers {
 			if apiServer.goodToGo {
-				getDataInPath("/user", fromServer:apiServer, parameters: nil, extraHeaders:nil) { data, lastPage, resultCode, etag in
+				getDataInPath("/user", fromServer:apiServer) { data, lastPage, resultCode in
 
 					if let d = data as? [NSObject : AnyObject] {
 						apiServer.userName = d["login"] as? String
@@ -1218,7 +1205,7 @@ final class API {
 
 	func testApiToServer(apiServer: ApiServer, callback: (NSError?) -> ()) {
 		clearAllBadLinks()
-		get("/user", fromServer: apiServer, ignoreLastSync: true, parameters: nil, extraHeaders: nil) { [weak self] response, data, error, timeout in
+		api("/user", fromServer: apiServer, ignoreLastSync: true) { [weak self] response, data, error, timeout in
 
 			if let d = data as? [NSObject : AnyObject], userName = d["login"] as? String, userId = d["id"] as? NSNumber where error == nil {
 				if userName.isEmpty || userId.longLongValue <= 0 {
@@ -1243,76 +1230,57 @@ final class API {
 		path: String,
 		fromServer: ApiServer,
 		startingFromPage: Int,
-		parameters: [String : String]?,
-		extraHeaders: [String : String]?,
 		perPageCallback: (data: [[NSObject: AnyObject]]?, lastPage: Bool) -> Bool,
-		finalCallback: (success: Bool, resultCode: Int, etag: String?) -> Void) {
+		finalCallback: (success: Bool, resultCode: Int) -> Void) {
 
-			if path.isEmpty {
-				// handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
-				atNextEvent {
-					finalCallback(success: true, resultCode: -1, etag: nil)
-					return
-				}
+		if path.isEmpty {
+			// handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
+			atNextEvent {
+				finalCallback(success: true, resultCode: -1)
 				return
 			}
+			return
+		}
 
-			var mutableParams: [String:String]
-			if let p = parameters {
-				mutableParams = p
-			} else {
-				mutableParams = [String:String]()
-			}
-			mutableParams["page"] = String(startingFromPage)
-			mutableParams["per_page"] = "100"
+		let p = startingFromPage > 1 ? "\(path)?page=\(startingFromPage)" : path
+		getDataInPath(p, fromServer: fromServer) {
+			[weak self] data, lastPage, resultCode in
 
-			getDataInPath(path, fromServer: fromServer, parameters: mutableParams, extraHeaders: extraHeaders) {
-				[weak self] data, lastPage, resultCode, etag in
-
-				if let d = data as? [[NSObject: AnyObject]] {
-					var isLastPage = lastPage
-					if perPageCallback(data: d, lastPage: lastPage) { isLastPage = true }
-					if isLastPage {
-						finalCallback(success: true, resultCode: resultCode, etag: etag)
-					} else {
-						self?.getPagedDataInPath(path, fromServer: fromServer, startingFromPage: startingFromPage+1, parameters: parameters, extraHeaders: extraHeaders, perPageCallback: perPageCallback, finalCallback: finalCallback)
-					}
+			if let d = data as? [[NSObject: AnyObject]] {
+				var isLastPage = lastPage
+				if perPageCallback(data: d, lastPage: lastPage) { isLastPage = true }
+				if isLastPage {
+					finalCallback(success: true, resultCode: resultCode)
 				} else {
-					finalCallback(success: resultCode==304, resultCode: resultCode, etag: etag)
+					self?.getPagedDataInPath(path, fromServer: fromServer, startingFromPage: startingFromPage+1, perPageCallback: perPageCallback, finalCallback: finalCallback)
 				}
+			} else {
+				finalCallback(success: false, resultCode: resultCode)
 			}
+		}
 	}
 
 	private func getDataInPath(
 		path: String,
 		fromServer: ApiServer,
-		parameters: [String : String]?,
-		extraHeaders: [String : String]?,
-		callback:(data: AnyObject?, lastPage: Bool, resultCode: Int, etag: String?) -> Void) {
+		callback:(data: AnyObject?, lastPage: Bool, resultCode: Int) -> Void) {
 
-		attemptToGetDataInPath(path, fromServer: fromServer, parameters: parameters, extraHeaders: extraHeaders, callback: callback, attemptCount: 0)
+		attemptToGetDataInPath(path, fromServer: fromServer, callback: callback, attemptCount: 0)
 	}
 
 	private func attemptToGetDataInPath(
 		path: String,
 		fromServer: ApiServer,
-		parameters: [String : String]?,
-		extraHeaders: [String : String]?,
-		callback:(data: AnyObject?, lastPage: Bool, resultCode: Int, etag: String?) -> Void,
+		callback:(data: AnyObject?, lastPage: Bool, resultCode: Int) -> Void,
 		attemptCount: Int) {
 
-		var finalHeaders = extraHeaders ?? [String : String]()
-		finalHeaders["Accept"] = "application/vnd.github.v3+json"
-		get(path, fromServer: fromServer, ignoreLastSync: false, parameters: parameters, extraHeaders: finalHeaders) { [weak self] response, data, error, timeout in
+		api(path, fromServer: fromServer, ignoreLastSync: false) { [weak self] response, data, error, timeout in
 
 			let code = response?.statusCode ?? 0
 
 			if error == nil {
-				var etag: String?
 				var lastPage = true
 				if let allHeaders = response?.allHeaderFields {
-
-					etag = allHeaders["Etag"] as? String
 
 					if let v = allHeaders["X-RateLimit-Remaining"] as? String {
 						fromServer.requestsRemaining = NSNumber(longLong: Int64(v) ?? 0)
@@ -1338,32 +1306,30 @@ final class API {
 
 					NSNotificationCenter.defaultCenter().postNotificationName(API_USAGE_UPDATE, object: fromServer, userInfo: nil)
 				}
-				callback(data: data, lastPage: lastPage, resultCode: code, etag: etag)
+				callback(data: data, lastPage: lastPage, resultCode: code)
 			} else {
 				if timeout && attemptCount < 2 { // timeout, connection issue, etc
 					let apiServerLabel = fromServer.label ?? "(untitled server)"
 					let nextAttemptCount = attemptCount+1
 					DLog("(%@) Will retry timed-out API call to %@ (attempt #%d)", apiServerLabel, path, nextAttemptCount)
 					delay(5.0) {
-						self?.attemptToGetDataInPath(path, fromServer: fromServer, parameters: parameters, extraHeaders: extraHeaders, callback: callback, attemptCount: nextAttemptCount)
+						self?.attemptToGetDataInPath(path, fromServer: fromServer, callback: callback, attemptCount: nextAttemptCount)
 					}
 				} else {
 					if timeout {
 						let apiServerLabel = fromServer.label ?? "(untitled server)"
 						DLog("(%@) Giving up on timed-out API call to %@", apiServerLabel, path)
 					}
-					callback(data: nil, lastPage: false, resultCode: code, etag: nil)
+					callback(data: nil, lastPage: false, resultCode: code)
 				}
 			}
 		}
 	}
 
-	private func get(
+	private func api(
 		path:String,
 		fromServer: ApiServer,
 		ignoreLastSync: Bool,
-		parameters: [String : String]?,
-		extraHeaders: [String : String]?,
 		completion: (response: NSHTTPURLResponse?, data: AnyObject?, error: NSError?, timeout: Bool) -> Void) {
 
 		let apiServerLabel: String
@@ -1377,27 +1343,12 @@ final class API {
 			return
 		}
 
-		var expandedPath = path.characters.startsWith("/".characters) ? (fromServer.apiPath ?? "").stringByAppendingPathComponent(path) : path
-
-		if let params = parameters {
-			var pairs = [String]()
-			for (key, value) in params {
-				pairs.append(key + "=" + value)
-			}
-			expandedPath.appendContentsOf("?")
-			expandedPath.appendContentsOf(pairs.joinWithSeparator("&"))
-		}
-
-		let r = NSMutableURLRequest(URL: NSURL(string: expandedPath)!)
+		let expandedPath = path.characters.startsWith("/".characters) ? (fromServer.apiPath ?? "").stringByAppendingPathComponent(path) : path
+		let url = NSURL(string: expandedPath)!
+		let r = NSMutableURLRequest(URL: url, cachePolicy: .UseProtocolCachePolicy, timeoutInterval: 60.0)
+		r.setValue("application/vnd.github.v3+json", forHTTPHeaderField:"Accept")
 		if let a = fromServer.authToken {
 			r.setValue("token " + a, forHTTPHeaderField: "Authorization")
-		}
-
-		if let headers = extraHeaders {
-			for (key, value) in headers {
-				//DLog("(%@) custom header: %@=%@", apiServerLabel, key, value)
-				r.setValue(value, forHTTPHeaderField:key)
-			}
 		}
 
 		////////////////////////// preempt with error backoff algorithm

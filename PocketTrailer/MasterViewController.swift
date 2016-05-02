@@ -688,7 +688,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		let f = ListableItem.requestForItemsOfType("PullRequest", withFilter: nil, sectionIndex: -1)
 		let count = mainObjectContext.countForFetchRequest(f, error: nil)
-		let unreadCount = pullRequestsItem.badgeValue?.toInt() ?? 0
+		let unreadCount = Int(pullRequestsItem.badgeValue ?? "0")!
 
 		let pr = long ? "Pull Request" : "PR"
 		if count == 0 {
@@ -703,7 +703,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	private func issuesTitle() -> String {
 		let f = ListableItem.requestForItemsOfType("Issue", withFilter: nil, sectionIndex: -1)
 		let count = mainObjectContext.countForFetchRequest(f, error: nil)
-		let unreadCount = issuesItem.badgeValue?.toInt() ?? 0
+		let unreadCount = Int(issuesItem.badgeValue ?? "0")!
 
 		if count == 0 {
 			return "No Issues"

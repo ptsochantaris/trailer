@@ -8,9 +8,7 @@ final class ApiServer: NSManagedObject {
     @NSManaged var label: String?
     @NSManaged var lastSyncSucceeded: NSNumber?
     @NSManaged var latestReceivedEventDateProcessed: NSDate?
-    @NSManaged var latestReceivedEventEtag: String?
     @NSManaged var latestUserEventDateProcessed: NSDate?
-    @NSManaged var latestUserEventEtag: String?
     @NSManaged var reportRefreshFailures: NSNumber
     @NSManaged var requestsLimit: NSNumber?
     @NSManaged var requestsRemaining: NSNumber?
@@ -190,9 +188,7 @@ final class ApiServer: NSManagedObject {
 		}
 		lastSyncSucceeded = true
 		latestReceivedEventDateProcessed = never()
-		latestReceivedEventEtag = nil
 		latestUserEventDateProcessed = never()
-		latestUserEventEtag = nil
 	}
 
 	class func archiveApiServers() -> [String:[String:NSObject]] {

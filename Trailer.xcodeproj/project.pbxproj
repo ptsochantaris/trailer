@@ -219,6 +219,7 @@
 		1615045D1A464656001CF50C /* PRCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PRCell.swift; sourceTree = "<group>"; };
 		1615045F1A4651CB001CF50C /* MasterViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = MasterViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16154E2E19C43E8E00E49139 /* Launch.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Launch.storyboard; sourceTree = "<group>"; };
+		1615C9831CD6BD28006BA71B /* Trailer 27.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 27.xcdatamodel"; sourceTree = "<group>"; };
 		161852761AB25DFB00526D81 /* Trailer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Trailer.entitlements; sourceTree = "<group>"; };
 		1618527B1AB2CB9000526D81 /* PocketTrailer Today Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "PocketTrailer Today Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1618527C1AB2CB9000526D81 /* NotificationCenter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NotificationCenter.framework; path = System/Library/Frameworks/NotificationCenter.framework; sourceTree = SDKROOT; };
@@ -1517,6 +1518,7 @@
 		16B3B33B1A34E990000BE6CC /* Trailer.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				1615C9831CD6BD28006BA71B /* Trailer 27.xcdatamodel */,
 				163E45881CD3EB6000B0E2BE /* Trailer 26.xcdatamodel */,
 				169B92941CC3E5AD002774A8 /* Trailer 25.xcdatamodel */,
 				16AE7CED1C92304300CB304B /* Trailer 24.xcdatamodel */,
@@ -1544,7 +1546,7 @@
 				16B3B34D1A34E990000BE6CC /* Trailer 9.xcdatamodel */,
 				16B3B34E1A34E990000BE6CC /* Trailer.xcdatamodel */,
 			);
-			currentVersion = 163E45881CD3EB6000B0E2BE /* Trailer 26.xcdatamodel */;
+			currentVersion = 1615C9831CD6BD28006BA71B /* Trailer 27.xcdatamodel */;
 			name = Trailer.xcdatamodeld;
 			path = ../Shared/Trailer.xcdatamodeld;
 			sourceTree = "<group>";
