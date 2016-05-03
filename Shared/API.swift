@@ -243,7 +243,7 @@ final class API {
 
 			var completionCount = 0
 			let totalOperations = 2
-			let completionCallback: Completion = { [weak self] in
+			let completionCallback: Completion = {
 				completionCount += 1
 				if completionCount == totalOperations {
 					for r in repos { r.dirty = false }
@@ -251,8 +251,8 @@ final class API {
 				}
 			}
 
-			self?.fetchIssuesForRepos(repos, toMoc: moc) { [weak self] in
-				self?.fetchCommentsForCurrentIssuesToMoc(moc) { [weak self] in
+			self?.fetchIssuesForRepos(repos, toMoc: moc) {
+				self?.fetchCommentsForCurrentIssuesToMoc(moc) {
 					self?.checkIssueClosuresInMoc(moc)
 					completionCallback()
 				}
