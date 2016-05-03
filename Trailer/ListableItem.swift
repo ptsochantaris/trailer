@@ -451,7 +451,7 @@ class ListableItem: DataItem {
 	}
 
 	final class func buildOrPredicate(string: String, expectedLength: Int, format: String, numeric: Bool) -> NSPredicate? {
-		if string.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) > expectedLength {
+		if string.characters.count > expectedLength {
 			let items = string.substringFromIndex(string.startIndex.advancedBy(expectedLength))
 			if !items.characters.isEmpty {
 				var orTerms = [NSPredicate]()

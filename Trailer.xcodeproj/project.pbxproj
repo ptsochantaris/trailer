@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		160129C91CD8A2A300151D6C /* CacheEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160129C81CD8A2A300151D6C /* CacheEntry.swift */; };
+		160129CA1CD8A2A300151D6C /* CacheEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160129C81CD8A2A300151D6C /* CacheEntry.swift */; };
 		1606F1BB1A4703E60088368E /* iOS_AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1606F1BA1A4703E60088368E /* iOS_AppDelegate.swift */; };
 		1606F1BD1A471CDC0088368E /* RespositoriesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1606F1BC1A471CDC0088368E /* RespositoriesViewController.swift */; };
 		160823F51A44997F006F91AD /* UINavigationControllerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160823F31A44982F006F91AD /* UINavigationControllerExtensions.swift */; };
@@ -210,6 +212,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		160129C81CD8A2A300151D6C /* CacheEntry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CacheEntry.swift; sourceTree = "<group>"; };
 		1606F1BA1A4703E60088368E /* iOS_AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = iOS_AppDelegate.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		1606F1BC1A471CDC0088368E /* RespositoriesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = RespositoriesViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		160823F31A44982F006F91AD /* UINavigationControllerExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UINavigationControllerExtensions.swift; sourceTree = "<group>"; };
@@ -745,6 +748,7 @@
 				16B3B3161A34E8E2000BE6CC /* Repo.swift */,
 				161B851B1AB8E12C00AD4C5D /* Team.swift */,
 				169B92951CC52C05002774A8 /* SnoozePreset.swift */,
+				160129C81CD8A2A300151D6C /* CacheEntry.swift */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -1054,6 +1058,7 @@
 				161504601A4651CB001CF50C /* MasterViewController.swift in Sources */,
 				164840FE1AD19837009E6383 /* PopupManager.swift in Sources */,
 				16B3B31A1A34E8E2000BE6CC /* DataItem.swift in Sources */,
+				160129CA1CD8A2A300151D6C /* CacheEntry.swift in Sources */,
 				166A84C01A4582C100A3B292 /* ServerDetailViewController.swift in Sources */,
 				169B92971CC52C05002774A8 /* SnoozePreset.swift in Sources */,
 				164841001AD198A6009E6383 /* WatchManager.swift in Sources */,
@@ -1105,6 +1110,7 @@
 				16A0B0371A48AC7900B3452D /* OSX_AppDelegate.swift in Sources */,
 				161B851C1AB8E12C00AD4C5D /* Team.swift in Sources */,
 				16B3B31D1A34E8E2000BE6CC /* PRLabel.swift in Sources */,
+				160129C91CD8A2A300151D6C /* CacheEntry.swift in Sources */,
 				16B3B3231A34E8E2000BE6CC /* Repo.swift in Sources */,
 				16CBE1CA1A2E13A400485053 /* StatusItemView.swift in Sources */,
 				16B3B35A1A34EAEE000BE6CC /* main.swift in Sources */,

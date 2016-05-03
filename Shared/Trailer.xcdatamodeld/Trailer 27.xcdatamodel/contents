@@ -23,6 +23,14 @@
         <relationship name="statuses" toMany="YES" deletionRule="Cascade" destinationEntity="PRStatus" inverseName="apiServer" inverseEntity="PRStatus" syncable="YES"/>
         <relationship name="teams" toMany="YES" deletionRule="Cascade" destinationEntity="Team" inverseName="apiServer" inverseEntity="Team" syncable="YES"/>
     </entity>
+    <entity name="CacheEntry" representedClassName=".CacheEntry" syncable="YES">
+        <attribute name="code" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="data" attributeType="Binary" allowsExternalBinaryDataStorage="YES" syncable="YES"/>
+        <attribute name="etag" attributeType="String" syncable="YES"/>
+        <attribute name="headers" attributeType="Binary" allowsExternalBinaryDataStorage="YES" syncable="YES"/>
+        <attribute name="key" attributeType="String" indexed="YES" syncable="YES"/>
+        <attribute name="lastTouched" attributeType="Date" indexed="YES" syncable="YES"/>
+    </entity>
     <entity name="Issue" representedClassName="Trailer.Issue" syncable="YES">
         <attribute name="announced" optional="YES" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
         <attribute name="assignedToMe" optional="YES" attributeType="Boolean" syncable="YES"/>
@@ -200,6 +208,7 @@
     </entity>
     <elements>
         <element name="ApiServer" positionX="9" positionY="153" width="128" height="360"/>
+        <element name="CacheEntry" positionX="9" positionY="153" width="128" height="135"/>
         <element name="Issue" positionX="9" positionY="153" width="128" height="495"/>
         <element name="PRComment" positionX="0" positionY="0" width="128" height="270"/>
         <element name="PRLabel" positionX="9" positionY="153" width="128" height="195"/>

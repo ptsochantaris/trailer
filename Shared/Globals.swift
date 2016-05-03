@@ -225,25 +225,6 @@ func versionString() -> String {
 	return "Version \(currentAppVersion()) (\(buildNumber))"
 }
 
-func md5hash(s: String) -> String {
-	let digestLen = Int(CC_MD5_DIGEST_LENGTH)
-	let result = UnsafeMutablePointer<CUnsignedChar>.alloc(digestLen)
-
-	CC_MD5(
-		s.cStringUsingEncoding(NSUTF8StringEncoding)!,
-		CC_LONG(s.lengthOfBytesUsingEncoding(NSUTF8StringEncoding)),
-		result)
-
-	let hash = NSMutableString()
-	for i in 0..<digestLen {
-		hash.appendFormat("%02X", result[i])
-	}
-
-	result.destroy()
-
-	return String(hash)
-}
-
 func isDarkColor(color: COLOR_CLASS) -> Bool {
 	var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0
 	color.getRed(&r, green: &g, blue: &b, alpha: nil)
@@ -278,6 +259,24 @@ extension String {
 	}
 	func stringByReplacingCharactersInRange(range: NSRange, withString string: String) -> String {
 		return (self as NSString).stringByReplacingCharactersInRange(range, withString: string)
+	}
+	var md5hash: String {
+		let digestLen = Int(CC_MD5_DIGEST_LENGTH)
+		let result = UnsafeMutablePointer<CUnsignedChar>.alloc(digestLen)
+
+		CC_MD5(
+			self.cStringUsingEncoding(NSUTF8StringEncoding)!,
+			CC_LONG(self.lengthOfBytesUsingEncoding(NSUTF8StringEncoding)),
+			result)
+
+		let hash = NSMutableString()
+		for i in 0..<digestLen {
+			hash.appendFormat("%02X", result[i])
+		}
+
+		result.destroy()
+
+		return String(hash)
 	}
 }
 

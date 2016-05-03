@@ -169,7 +169,7 @@ final class API {
 		#endif
 
 		let imageKey = absolutePath + " " + currentAppVersion()
-		let cachePath = cacheDirectory.stringByAppendingPathComponent("imgcache-" + md5hash(imageKey))
+		let cachePath = cacheDirectory.stringByAppendingPathComponent("imgcache-" + imageKey.md5hash)
 		
 		let fileManager = NSFileManager.defaultManager()
 		if fileManager.fileExistsAtPath(cachePath) {
@@ -282,6 +282,7 @@ final class API {
 
 		mainQueue.addOperationWithBlock {
 			DataItem.nukeDeletedItemsInMoc(moc)
+			CacheEntry.cleanOldEntries()
 		}
 
 		for r in DataItem.itemsOfType("PullRequest", surviving: true, inMoc: moc) as! [PullRequest] {
@@ -1087,16 +1088,16 @@ final class API {
 
 	private func getRateLimitFromServer(apiServer: ApiServer, callback: (Int64, Int64, Int64)->Void)
 	{
-		api("/rate_limit", fromServer: apiServer, ignoreLastSync: true) { response, data, error, shouldRetry in
+		api("/rate_limit", fromServer: apiServer, ignoreLastSync: true) { code, headers, data, error, shouldRetry in
 
 			if error == nil {
-				let allHeaders = response!.allHeaderFields
+				let allHeaders = headers!
 				let requestsRemaining = (allHeaders["X-RateLimit-Remaining"] as! NSString).longLongValue
 				let requestLimit = (allHeaders["X-RateLimit-Limit"] as! NSString).longLongValue
 				let epochSeconds = (allHeaders["X-RateLimit-Reset"] as! NSString).longLongValue
 				callback(requestsRemaining, requestLimit, epochSeconds)
 			} else {
-				if response?.statusCode == 404 && data != nil && !((data as? [NSObject : AnyObject])?["message"] as? String == "Not Found") {
+				if code == 404 && data != nil && !((data as? [NSObject : AnyObject])?["message"] as? String == "Not Found") {
 					callback(10000, 10000, 0)
 				} else {
 					callback(-1, -1, -1)
@@ -1204,7 +1205,7 @@ final class API {
 
 	func testApiToServer(apiServer: ApiServer, callback: (NSError?) -> ()) {
 		clearAllBadLinks()
-		api("/user", fromServer: apiServer, ignoreLastSync: true) { [weak self] response, data, error, shouldRetry in
+		api("/user", fromServer: apiServer, ignoreLastSync: true) { [weak self] code, headers, data, error, shouldRetry in
 
 			if let d = data as? [NSObject : AnyObject], userName = d["login"] as? String, userId = d["id"] as? NSNumber where error == nil {
 				if userName.isEmpty || userId.longLongValue <= 0 {
@@ -1273,13 +1274,13 @@ final class API {
 		callback:(data: AnyObject?, lastPage: Bool, resultCode: Int) -> Void,
 		attemptCount: Int) {
 
-		api(path, fromServer: fromServer, ignoreLastSync: false) { [weak self] response, data, error, shouldRetry in
+		api(path, fromServer: fromServer, ignoreLastSync: false) { [weak self] c, headers, data, error, shouldRetry in
 
-			let code = response?.statusCode ?? 0
+			let code = c ?? 0
 
 			if error == nil {
 				var lastPage = true
-				if let allHeaders = response?.allHeaderFields {
+				if let allHeaders = headers {
 
 					if let v = allHeaders["X-RateLimit-Remaining"] as? String {
 						fromServer.requestsRemaining = NSNumber(longLong: Int64(v) ?? 0)
@@ -1311,7 +1312,7 @@ final class API {
 					let apiServerLabel = fromServer.label ?? "(untitled server)"
 					let nextAttemptCount = attemptCount+1
 					DLog("(%@) Will retry failed API call to %@ (attempt #%d)", apiServerLabel, path, nextAttemptCount)
-					delay(5.0) {
+					delay(2.0) {
 						self?.attemptToGetDataInPath(path, fromServer: fromServer, callback: callback, attemptCount: nextAttemptCount)
 					}
 				} else {
@@ -1329,7 +1330,7 @@ final class API {
 		path:String,
 		fromServer: ApiServer,
 		ignoreLastSync: Bool,
-		completion: (response: NSHTTPURLResponse?, data: AnyObject?, error: NSError?, shouldRetry: Bool) -> Void) {
+		completion: (code: Int?, headers: [NSObject : AnyObject]?, data: AnyObject?, error: NSError?, shouldRetry: Bool) -> Void) {
 
 		let apiServerLabel: String
 		if fromServer.syncIsGood || ignoreLastSync {
@@ -1337,17 +1338,24 @@ final class API {
 		} else {
 			atNextEvent(self) { S in
 				let e = S.apiError("Sync has failed, skipping this call")
-				completion(response: nil, data: nil, error: e, shouldRetry: false)
+				completion(code: nil, headers: nil, data: nil, error: e, shouldRetry: false)
 			}
 			return
 		}
 
 		let expandedPath = path.characters.startsWith("/".characters) ? (fromServer.apiPath ?? "").stringByAppendingPathComponent(path) : path
 		let url = NSURL(string: expandedPath)!
-		let r = NSMutableURLRequest(URL: url, cachePolicy: .UseProtocolCachePolicy, timeoutInterval: 60.0)
+
+		let r = NSMutableURLRequest(URL: url, cachePolicy: .ReloadIgnoringLocalCacheData, timeoutInterval: 60.0)
 		r.setValue("application/vnd.github.v3+json", forHTTPHeaderField:"Accept")
 		if let a = fromServer.authToken {
 			r.setValue("token " + a, forHTTPHeaderField: "Authorization")
+		}
+
+		let cacheKey = "\(fromServer.objectID.URIRepresentation().absoluteString) \(expandedPath)"
+		let previousCacheEntry = CacheEntry.entryForKey(cacheKey)?.cacheUnit() // move data out of thread-specific context
+		if let p = previousCacheEntry {
+			r.setValue(p.etag, forHTTPHeaderField: "If-None-Match")
 		}
 
 		////////////////////////// preempt with error backoff algorithm
@@ -1359,7 +1367,7 @@ final class API {
 				DLog("(%@) Preempted fetch to previously broken link %@, won't actually access this URL until %@", apiServerLabel, fullUrlPath, eb.nextAttemptAt)
 				atNextEvent(self) { S in
 					let e = S.apiError("Preempted fetch because of throttling")
-					completion(response: nil, data: nil, error: e, shouldRetry: false)
+					completion(code: nil, headers: nil, data: nil, error: e, shouldRetry: false)
 				}
 				return
 			}
@@ -1378,10 +1386,16 @@ final class API {
 			var parsedData: AnyObject?
 			var error = e
 			var badServerResponse = false
-			let code = response?.statusCode ?? 0
+			var code = response?.statusCode ?? 0
 			var shouldRetry = false
+			var headers = response?.allHeaderFields
 
-			if code > 299 {
+			if code == 304, let p = previousCacheEntry {
+				parsedData = try? NSJSONSerialization.JSONObjectWithData(p.data, options: NSJSONReadingOptions())
+				code = p.code
+				headers = p.actualHeaders()
+				DLog("(%@) GET %@ - NO CHANGE (304): %d", apiServerLabel, fullUrlPath, code)
+			} else if code > 299 {
 				error = self?.apiError("Server responded with \(code)")
 				badServerResponse = true
 			} else if code == 0 {
@@ -1394,6 +1408,11 @@ final class API {
 				DLog("(%@) GET %@ - RESULT: %d", apiServerLabel, fullUrlPath, code)
 				if let d = data {
 					parsedData = try? NSJSONSerialization.JSONObjectWithData(d, options: NSJSONReadingOptions())
+					if let h = headers, e = h["Etag"] as? String {
+						atNextEvent {
+							CacheEntry.setEntry(cacheKey, code: code, etag: e, data: d, headers: h)
+						}
+					}
 				}
 			}
 
@@ -1413,7 +1432,7 @@ final class API {
 								nextAttemptAt: NSDate().dateByAddingTimeInterval(BACKOFF_STEP),
 								duration: BACKOFF_STEP)
 						}
-						self?.badLinks[fullUrlPath] = existingBackOff
+						S.badLinks[fullUrlPath] = existingBackOff
 					}
 					DLog("(%@) GET %@ - FAILED: (code %d) %@", apiServerLabel, fullUrlPath, code, error!.localizedDescription)
 				}
@@ -1422,7 +1441,7 @@ final class API {
 					DLog("API data from %@: %@", fullUrlPath, NSString(data: d, encoding: NSUTF8StringEncoding))
 				}
 
-				completion(response: response, data: parsedData, error: error, shouldRetry: shouldRetry)
+				completion(code: code, headers: headers, data: parsedData, error: error, shouldRetry: shouldRetry)
 				#if os(iOS)
 					S.networkIndicationEnd()
 				#endif
