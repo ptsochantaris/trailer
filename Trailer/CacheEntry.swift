@@ -8,7 +8,7 @@ struct CacheUnit {
 	let headers: NSData
 
 	func actualHeaders() -> [NSObject : AnyObject] {
-		return NSUnarchiver.unarchiveObjectWithData(headers) as! [NSObject : AnyObject]
+		return NSKeyedUnarchiver.unarchiveObjectWithData(headers) as! [NSObject : AnyObject]
 	}
 }
 
@@ -35,7 +35,7 @@ final class CacheEntry: NSManagedObject {
 		e!.code = code
 		e!.data = data
 		e!.etag = etag
-		e!.headers = NSArchiver.archivedDataWithRootObject(headers)
+		e!.headers = NSKeyedArchiver.archivedDataWithRootObject(headers)
 	}
 
 	class func entryForKey(key: String) -> CacheEntry? {

@@ -53,7 +53,7 @@ final class DataManager : NSObject {
 		DLog("Marking all repos as dirty")
 		ApiServer.resetSyncOfEverything()
 
-		DLog("Marking all unspecified (nil) anounced flags as announced")
+		DLog("Marking all unspecified (nil) announced flags as announced")
 		for i in DataItem.allItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest] {
 			if i.announced == nil {
 				i.announced = true
