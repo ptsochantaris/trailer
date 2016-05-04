@@ -85,7 +85,7 @@ final class ServersViewController: UITableViewController {
 			allServers.removeAtIndex(indexPath.row)
 			mainObjectContext.deleteObject(a)
 			DataManager.saveDB()
-			tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Fade)
+			tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
 		}
 	}
 

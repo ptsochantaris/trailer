@@ -226,13 +226,13 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 			tableView.beginUpdates()
 			if removedIndexes.count > 0 {
-				tableView.deleteSections(removedIndexes, withRowAnimation:UITableViewRowAnimation.Automatic)
+				tableView.deleteSections(removedIndexes, withRowAnimation:.Automatic)
 			}
 			if untouchedIndexes.count > 0 {
-				tableView.reloadSections(untouchedIndexes, withRowAnimation:UITableViewRowAnimation.Automatic)
+				tableView.reloadSections(untouchedIndexes, withRowAnimation:.Automatic)
 			}
 			if addedIndexes.count > 0 {
-				tableView.insertSections(addedIndexes, withRowAnimation:UITableViewRowAnimation.Automatic)
+				tableView.insertSections(addedIndexes, withRowAnimation:.Automatic)
 			}
 			tableView.endUpdates()
 
@@ -587,11 +587,11 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		switch(type) {
 		case .Insert:
-			tableView.insertSections(NSIndexSet(index: sectionIndex), withRowAnimation: UITableViewRowAnimation.Automatic)
+			tableView.insertSections(NSIndexSet(index: sectionIndex), withRowAnimation: .Automatic)
 		case .Delete:
-			tableView.deleteSections(NSIndexSet(index: sectionIndex), withRowAnimation: UITableViewRowAnimation.Automatic)
+			tableView.deleteSections(NSIndexSet(index: sectionIndex), withRowAnimation: .Automatic)
 		case .Update:
-			tableView.reloadSections(NSIndexSet(index: sectionIndex), withRowAnimation: UITableViewRowAnimation.Automatic)
+			tableView.reloadSections(NSIndexSet(index: sectionIndex), withRowAnimation: .Automatic)
 		default:
 			break
 		}
@@ -601,17 +601,15 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		switch(type) {
 		case .Insert:
-			tableView.insertRowsAtIndexPaths([newIndexPath ?? indexPath!], withRowAnimation: UITableViewRowAnimation.Automatic)
+			tableView.insertRowsAtIndexPaths([newIndexPath ?? indexPath!], withRowAnimation: .Automatic)
 		case .Delete:
-			tableView.deleteRowsAtIndexPaths([indexPath!], withRowAnimation:UITableViewRowAnimation.Automatic)
+			tableView.deleteRowsAtIndexPaths([indexPath!], withRowAnimation:.Automatic)
 		case .Update:
-			if let cell = tableView.cellForRowAtIndexPath(newIndexPath ?? indexPath!) {
-				configureCell(cell, atIndexPath: newIndexPath ?? indexPath!)
-			}
+			tableView.reloadRowsAtIndexPaths([newIndexPath ?? indexPath!], withRowAnimation: .Automatic)
 		case .Move:
-			tableView.deleteRowsAtIndexPaths([indexPath!], withRowAnimation:UITableViewRowAnimation.Automatic)
+			tableView.deleteRowsAtIndexPaths([indexPath!], withRowAnimation:.Automatic)
 			if let n = newIndexPath {
-				tableView.insertRowsAtIndexPaths([n], withRowAnimation:UITableViewRowAnimation.Automatic)
+				tableView.insertRowsAtIndexPaths([n], withRowAnimation:.Automatic)
 			}
 		}
 	}

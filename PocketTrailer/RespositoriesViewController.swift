@@ -187,17 +187,17 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 
 		switch(type) {
 		case .Insert:
-			tableView.insertRowsAtIndexPaths([newIndexPath ?? indexPath!], withRowAnimation: UITableViewRowAnimation.Automatic)
+			tableView.insertRowsAtIndexPaths([newIndexPath ?? indexPath!], withRowAnimation: .Automatic)
 		case .Delete:
-			tableView.deleteRowsAtIndexPaths([indexPath!], withRowAnimation:UITableViewRowAnimation.Automatic)
+			tableView.deleteRowsAtIndexPaths([indexPath!], withRowAnimation:.Automatic)
 		case .Update:
 			if let cell = tableView.cellForRowAtIndexPath(newIndexPath ?? indexPath!) as? RepoCell {
 				configureCell(cell, atIndexPath: newIndexPath ?? indexPath!)
 			}
 		case .Move:
-			tableView.deleteRowsAtIndexPaths([indexPath!], withRowAnimation:UITableViewRowAnimation.Automatic)
+			tableView.deleteRowsAtIndexPaths([indexPath!], withRowAnimation:.Automatic)
 			if let n = newIndexPath {
-				tableView.insertRowsAtIndexPaths([n], withRowAnimation:UITableViewRowAnimation.Automatic)
+				tableView.insertRowsAtIndexPaths([n], withRowAnimation:.Automatic)
 			}
 		}
 	}
@@ -304,13 +304,13 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 
 		tableView.beginUpdates()
 		if removedIndexes.count > 0 {
-			tableView.deleteSections(removedIndexes, withRowAnimation:UITableViewRowAnimation.Automatic)
+			tableView.deleteSections(removedIndexes, withRowAnimation:.Automatic)
 		}
 		if untouchedIndexes.count > 0 {
-			tableView.reloadSections(untouchedIndexes, withRowAnimation:UITableViewRowAnimation.Automatic)
+			tableView.reloadSections(untouchedIndexes, withRowAnimation:.Automatic)
 		}
 		if addedIndexes.count > 0 {
-			tableView.insertSections(addedIndexes, withRowAnimation:UITableViewRowAnimation.Automatic)
+			tableView.insertSections(addedIndexes, withRowAnimation:.Automatic)
 		}
 		tableView.endUpdates()
 	}

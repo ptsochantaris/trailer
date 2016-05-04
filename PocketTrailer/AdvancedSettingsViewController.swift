@@ -575,7 +575,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			heightCache.removeAll()
 			tableView.reloadData()
 		}
-		tableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation:UITableViewRowAnimation.None)
+		tableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation:.None)
 	}
 
 	override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
