@@ -281,13 +281,13 @@ final class Settings {
 		set { set("MERGE_HANDLING_POLICY_2", newValue) }
 	}
 
-	static let statusItemRefreshIntervalHelp = "Because querying statuses can be bandwidth-intensive, if you have alot of items in your lists, you may want to raise this to a higher value. You can always see how much API usage you have left per-hour from the 'Servers' tab."
+	static let statusItemRefreshIntervalHelp = "Because querying statuses can be bandwidth-intensive, if you have a lot of items in your lists, you may want to raise this to a higher value. You can always see how much API usage you have left per-hour from the 'Servers' tab."
 	class var statusItemRefreshInterval: Int {
 		get { if let n = get("STATUS_ITEM_REFRESH_COUNT") as? Int { return n>0 ? n : 10 } else { return 10 } }
 		set { set("STATUS_ITEM_REFRESH_COUNT", newValue) }
 	}
 
-	static let labelRefreshIntervalHelp = "Querying labels can be moderately bandwidth-intensive, but it does involve making some extra API calls. Since labels don't change often, you may want to raise this to a higher value if you have alot of items on your lists. You can always see how much API usage you have left per-hour from the 'Servers' tab."
+	static let labelRefreshIntervalHelp = "Querying labels can be moderately bandwidth-intensive, but it does involve making some extra API calls. Since labels don't change often, you may want to raise this to a higher value if you have a lot of items on your lists. You can always see how much API usage you have left per-hour from the 'Servers' tab."
 	class var labelRefreshInterval: Int {
 		get { if let n = get("LABEL_REFRESH_COUNT") as? Int { return n>0 ? n : 4 } else { return 4 } }
 		set { set("LABEL_REFRESH_COUNT", newValue) }

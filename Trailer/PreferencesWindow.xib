@@ -1205,7 +1205,7 @@ Token</string>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" id="ITh-gE-qyn">
                                                             <font key="font" metaFont="miniSystem"/>
                                                             <string key="title">Status items need to be rescanned fully in order be updated.  If you
-usually manage alot of PRs, then you may want to set this value
+usually manage a lot of PRs, then you may want to set this value
 to a higher number in order to keep your API usage reasonable</string>
                                                             <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1234,7 +1234,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" id="Aaw-4h-ESu">
                                                             <font key="font" metaFont="miniSystem"/>
                                                             <string key="title">Labels need to be rescanned fully in order be updated.  If you
-usually manage alot of items, then you may want to set this value
+usually manage a lot of items, then you may want to set this value
 to a higher number in order to keep your API usage reasonable</string>
                                                             <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
