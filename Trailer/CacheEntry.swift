@@ -6,9 +6,14 @@ struct CacheUnit {
 	let code: Int
 	let etag: String
 	let headers: NSData
+	let lastFetched: NSDate
 
 	func actualHeaders() -> [NSObject : AnyObject] {
 		return NSKeyedUnarchiver.unarchiveObjectWithData(headers) as! [NSObject : AnyObject]
+	}
+
+	func parsedData() -> AnyObject? {
+		return try? NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions())
 	}
 }
 
@@ -18,11 +23,12 @@ final class CacheEntry: NSManagedObject {
 	@NSManaged var code: NSNumber
 	@NSManaged var data: NSData
 	@NSManaged var lastTouched: NSDate
+	@NSManaged var lastFetched: NSDate
 	@NSManaged var key: String
 	@NSManaged var headers: NSData
 
 	func cacheUnit() -> CacheUnit {
-		return CacheUnit(data: data, code: code.integerValue, etag: etag, headers: headers)
+		return CacheUnit(data: data, code: code.integerValue, etag: etag, headers: headers, lastFetched: lastFetched)
 	}
 
 	class func setEntry(key: String, code: Int, etag: String, data: NSData, headers: [NSObject : AnyObject]) {
@@ -30,12 +36,13 @@ final class CacheEntry: NSManagedObject {
 		if e == nil {
 			e = NSEntityDescription.insertNewObjectForEntityForName("CacheEntry", inManagedObjectContext: mainObjectContext) as? CacheEntry
 			e!.key = key
-			e!.lastTouched = NSDate()
 		}
 		e!.code = code
 		e!.data = data
 		e!.etag = etag
 		e!.headers = NSKeyedArchiver.archivedDataWithRootObject(headers)
+		e!.lastFetched = NSDate()
+		e!.lastTouched = NSDate()
 	}
 
 	class func entryForKey(key: String) -> CacheEntry? {
@@ -58,6 +65,12 @@ final class CacheEntry: NSManagedObject {
 		for e in try! mainObjectContext.executeFetchRequest(f) as! [CacheEntry] {
 			DLog("Expiring unused cache entry for key %@", e.key)
 			mainObjectContext.deleteObject(e)
+		}
+	}
+
+	class func markKeyAsFetched(key: String) {
+		if let e = entryForKey(key) {
+			e.lastFetched = NSDate()
 		}
 	}
 }

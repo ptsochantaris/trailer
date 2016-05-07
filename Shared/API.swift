@@ -1326,11 +1326,13 @@ final class API {
 		}
 	}
 
+	typealias ApiCompletion = (code: Int?, headers: [NSObject : AnyObject]?, data: AnyObject?, error: NSError?, shouldRetry: Bool) -> Void
+
 	private func api(
 		path:String,
 		fromServer: ApiServer,
 		ignoreLastSync: Bool,
-		completion: (code: Int?, headers: [NSObject : AnyObject]?, data: AnyObject?, error: NSError?, shouldRetry: Bool) -> Void) {
+		completion: ApiCompletion) {
 
 		let apiServerLabel: String
 		if fromServer.syncIsGood || ignoreLastSync {
@@ -1352,19 +1354,12 @@ final class API {
 			r.setValue("token " + a, forHTTPHeaderField: "Authorization")
 		}
 
-		let cacheKey = "\(fromServer.objectID.URIRepresentation().absoluteString) \(expandedPath)"
-		let previousCacheEntry = CacheEntry.entryForKey(cacheKey)?.cacheUnit() // move data out of thread-specific context
-		if let p = previousCacheEntry {
-			r.setValue(p.etag, forHTTPHeaderField: "If-None-Match")
-		}
-
 		////////////////////////// preempt with error backoff algorithm
-		let fullUrlPath = r.URL!.absoluteString
-		var existingBackOff = badLinks[fullUrlPath]
+		let existingBackOff = badLinks[expandedPath]
 		if let eb = existingBackOff {
-			if NSDate().compare(eb.nextAttemptAt) == .OrderedAscending {
+			if NSDate().timeIntervalSince1970 < eb.nextAttemptAt.timeIntervalSince1970 {
 				// report failure and return
-				DLog("(%@) Preempted fetch to previously broken link %@, won't actually access this URL until %@", apiServerLabel, fullUrlPath, eb.nextAttemptAt)
+				DLog("(%@) Preempted fetch to previously broken link %@, won't actually access this URL until %@", apiServerLabel, expandedPath, eb.nextAttemptAt)
 				atNextEvent(self) { S in
 					let e = S.apiError("Preempted fetch because of throttling")
 					completion(code: nil, headers: nil, data: nil, error: e, shouldRetry: false)
@@ -1372,8 +1367,30 @@ final class API {
 				return
 			}
 			else {
-				badLinks.removeValueForKey(fullUrlPath)
+				badLinks.removeValueForKey(expandedPath)
 			}
+		}
+
+		/////////////////////// 60 second dumb-caching
+		let cacheKey = "\(fromServer.objectID.URIRepresentation().absoluteString) \(expandedPath)"
+		let previousCacheEntry = CacheEntry.entryForKey(cacheKey)?.cacheUnit() // move data out of thread-specific context
+		if let p = previousCacheEntry {
+			if p.lastFetched.timeIntervalSince1970 > NSDate(timeIntervalSinceNow: -60).timeIntervalSince1970, let parsedData = p.parsedData() {
+				DLog("(%@) GET %@ - CACHED", apiServerLabel, expandedPath)
+				handleResponse(p.data,
+				               parsedData: parsedData,
+				               serverLabel: apiServerLabel,
+				               urlPath: expandedPath,
+				               code: p.code,
+				               error: nil,
+				               shouldRetry: false,
+				               badServerResponse: false,
+				               existingBackOff: nil,
+				               headers: p.actualHeaders(),
+				               completion: completion)
+				return
+			}
+			r.setValue(p.etag, forHTTPHeaderField: "If-None-Match")
 		}
 
 		#if os(iOS)
@@ -1391,10 +1408,13 @@ final class API {
 			var headers = response?.allHeaderFields
 
 			if code == 304, let p = previousCacheEntry {
-				parsedData = try? NSJSONSerialization.JSONObjectWithData(p.data, options: NSJSONReadingOptions())
+				parsedData = p.parsedData()
 				code = p.code
 				headers = p.actualHeaders()
-				DLog("(%@) GET %@ - NO CHANGE (304): %d", apiServerLabel, fullUrlPath, code)
+				atNextEvent {
+					CacheEntry.markKeyAsFetched(cacheKey)
+				}
+				DLog("(%@) GET %@ - NO CHANGE (304): %d", apiServerLabel, expandedPath, code)
 			} else if code > 299 {
 				error = self?.apiError("Server responded with \(code)")
 				badServerResponse = true
@@ -1405,7 +1425,7 @@ final class API {
 				shouldRetry = true // truncation
 				error = self?.apiError("Server data was truncated")
 			} else {
-				DLog("(%@) GET %@ - RESULT: %d", apiServerLabel, fullUrlPath, code)
+				DLog("(%@) GET %@ - RESULT: %d", apiServerLabel, expandedPath, code)
 				if let d = data {
 					parsedData = try? NSJSONSerialization.JSONObjectWithData(d, options: NSJSONReadingOptions())
 					if let h = headers, e = h["Etag"] as? String {
@@ -1417,36 +1437,60 @@ final class API {
 			}
 
 			atNextEvent(self) { S in
+				S.handleResponse(data,
+				                 parsedData: parsedData,
+				                 serverLabel: apiServerLabel,
+				                 urlPath: expandedPath,
+				                 code: code,
+				                 error: error,
+				                 shouldRetry: shouldRetry,
+				                 badServerResponse: badServerResponse,
+				                 existingBackOff: existingBackOff,
+				                 headers: headers,
+				                 completion: completion)
 
-				if error != nil {
-					if badServerResponse {
-						if existingBackOff != nil {
-							DLog("(%@) Extending backoff for already throttled URL %@ by %f seconds", apiServerLabel, fullUrlPath, BACKOFF_STEP)
-							if existingBackOff!.duration < 3600.0 {
-								existingBackOff!.duration += BACKOFF_STEP
-							}
-							existingBackOff!.nextAttemptAt = NSDate(timeInterval: existingBackOff!.duration, sinceDate:NSDate())
-						} else {
-							DLog("(%@) Placing URL %@ on the throttled list", apiServerLabel, fullUrlPath)
-							existingBackOff = UrlBackOffEntry(
-								nextAttemptAt: NSDate().dateByAddingTimeInterval(BACKOFF_STEP),
-								duration: BACKOFF_STEP)
-						}
-						S.badLinks[fullUrlPath] = existingBackOff
-					}
-					DLog("(%@) GET %@ - FAILED: (code %d) %@", apiServerLabel, fullUrlPath, code, error!.localizedDescription)
-				}
-
-				if Settings.dumpAPIResponsesInConsole, let d = data {
-					DLog("API data from %@: %@", fullUrlPath, NSString(data: d, encoding: NSUTF8StringEncoding))
-				}
-
-				completion(code: code, headers: headers, data: parsedData, error: error, shouldRetry: shouldRetry)
 				#if os(iOS)
 					S.networkIndicationEnd()
 				#endif
 			}
 		}.resume()
+	}
+
+	private func handleResponse(data: NSData?,
+	                            parsedData: AnyObject?,
+	                            serverLabel: String,
+	                            urlPath: String,
+	                            code: Int,
+	                            error: NSError?,
+	                            shouldRetry: Bool,
+	                            badServerResponse: Bool,
+	                            existingBackOff: UrlBackOffEntry?,
+	                            headers: [NSObject : AnyObject]?,
+	                            completion: ApiCompletion) {
+		if error != nil {
+			if badServerResponse {
+				if var backoff = existingBackOff {
+					DLog("(%@) Extending backoff for already throttled URL %@ by %f seconds", serverLabel, urlPath, BACKOFF_STEP)
+					if backoff.duration < 3600.0 {
+						backoff.duration += BACKOFF_STEP
+					}
+					backoff.nextAttemptAt = NSDate(timeInterval: existingBackOff!.duration, sinceDate:NSDate())
+					badLinks[urlPath] = backoff
+				} else {
+					DLog("(%@) Placing URL %@ on the throttled list", serverLabel, urlPath)
+					badLinks[urlPath] = UrlBackOffEntry(
+						nextAttemptAt: NSDate().dateByAddingTimeInterval(BACKOFF_STEP),
+						duration: BACKOFF_STEP)
+				}
+			}
+			DLog("(%@) GET %@ - FAILED: (code %d) %@", serverLabel, urlPath, code, error!.localizedDescription)
+		}
+
+		if Settings.dumpAPIResponsesInConsole, let d = data {
+			DLog("API data from %@: %@", urlPath, NSString(data: d, encoding: NSUTF8StringEncoding))
+		}
+
+		completion(code: code, headers: headers, data: parsedData, error: error, shouldRetry: shouldRetry)
 	}
 
 	#if os(iOS)

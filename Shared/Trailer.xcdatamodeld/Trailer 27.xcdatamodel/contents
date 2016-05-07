@@ -29,6 +29,7 @@
         <attribute name="etag" attributeType="String" syncable="YES"/>
         <attribute name="headers" attributeType="Binary" allowsExternalBinaryDataStorage="YES" syncable="YES"/>
         <attribute name="key" attributeType="String" indexed="YES" syncable="YES"/>
+        <attribute name="lastFetched" attributeType="Date" indexed="YES" syncable="YES"/>
         <attribute name="lastTouched" attributeType="Date" indexed="YES" syncable="YES"/>
     </entity>
     <entity name="Issue" representedClassName="Trailer.Issue" syncable="YES">
@@ -208,7 +209,7 @@
     </entity>
     <elements>
         <element name="ApiServer" positionX="9" positionY="153" width="128" height="360"/>
-        <element name="CacheEntry" positionX="9" positionY="153" width="128" height="135"/>
+        <element name="CacheEntry" positionX="9" positionY="153" width="128" height="150"/>
         <element name="Issue" positionX="9" positionY="153" width="128" height="495"/>
         <element name="PRComment" positionX="0" positionY="0" width="128" height="270"/>
         <element name="PRLabel" positionX="9" positionY="153" width="128" height="195"/>
