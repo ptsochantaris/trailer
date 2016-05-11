@@ -9,6 +9,7 @@ import CoreData
 class ListableItem: DataItem {
 
 	@NSManaged var assignedToMe: NSNumber?
+	@NSManaged var assigneeName: String?
 	@NSManaged var body: String?
 	@NSManaged var webUrl: String?
 	@NSManaged var condition: NSNumber?
@@ -33,6 +34,38 @@ class ListableItem: DataItem {
 
 	@NSManaged var comments: Set<PRComment>
 	@NSManaged var labels: Set<PRLabel>
+
+	final func baseSyncFromInfo(info: [NSObject: AnyObject], inRepo: Repo) {
+
+		repo = inRepo
+
+		url = info["url"] as? String
+		webUrl = info["html_url"] as? String
+		number = info["number"] as? NSNumber
+		state = info["state"] as? String
+		title = info["title"] as? String
+		body = info["body"] as? String
+		milestone = info["milestone"]?["title"] as? String
+
+		if let userInfo = info["user"] as? [NSObject: AnyObject] {
+			userId = userInfo["id"] as? NSNumber
+			userLogin = userInfo["login"] as? String
+			userAvatarUrl = userInfo["avatar_url"] as? String
+		}
+
+		if let assignee = info["assignee"] as? [NSObject: AnyObject], name = assignee["login"] as? String, id = assignee["id"] as? NSNumber {
+			let currentlyAssigned = (id == inRepo.apiServer.userId)
+			let previouslyAssigned = assignedToMe?.boolValue ?? false
+			isNewAssignment = currentlyAssigned && !previouslyAssigned && !createdByMe
+			assignedToMe = currentlyAssigned
+			assigneeName = name
+		} else {
+			isNewAssignment = false
+			assignedToMe = false
+			assigneeName = nil
+		}
+
+	}
 
 	final override func resetSyncState() {
 		super.resetSyncState()
@@ -506,6 +539,10 @@ class ListableItem: DataItem {
 		return buildOrPredicate(string, expectedLength: 10, format: "milestone contains[cd] %@", numeric: false)
 	}
 
+	final class func assigneePredicateFromFilterString(string: String) -> NSPredicate? {
+		return buildOrPredicate(string, expectedLength: 9, format: "assigneeName contains[cd] %@", numeric: false)
+	}
+
 	final class func numberPredicateFromFilterString(string: String) -> NSPredicate? {
 		return buildOrPredicate(string, expectedLength: 7, format: "number == %llu", numeric: true)
 	}
@@ -567,6 +604,7 @@ class ListableItem: DataItem {
             checkForPredicates("user", userPredicateFromFilterString)
 			checkForPredicates("number", numberPredicateFromFilterString)
 			checkForPredicates("milestone", milestonePredicateFromFilterString)
+			checkForPredicates("assignee", assigneePredicateFromFilterString)
 
 			if !fi.isEmpty {
 				var orPredicates = [NSPredicate]()
@@ -608,6 +646,9 @@ class ListableItem: DataItem {
 				}
 				if Settings.includeMilestonesInFilter {
 					checkOr("milestone contains[cd] %@", numeric: false)
+				}
+				if Settings.includeAssigneeNamesInFilter {
+					checkOr("assigneeName contains[cd] %@", numeric: false)
 				}
 				if Settings.includeLabelsInFilter {
 					checkOr("SUBQUERY(labels, $label, $label.name contains[cd] %@).@count > 0", numeric: false)

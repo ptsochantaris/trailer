@@ -64,6 +64,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var includeLabelsInFiltering: NSButton!
 	@IBOutlet weak var includeTitlesInFiltering: NSButton!
 	@IBOutlet weak var includeMilestonesInFiltering: NSButton!
+	@IBOutlet weak var includeAssigneeNamesInFiltering: NSButton!
 	@IBOutlet weak var includeStatusesInFiltering: NSButton!
 	@IBOutlet weak var grayOutWhenRefreshing: NSButton!
 	@IBOutlet weak var assignedPrHandlingPolicy: NSPopUpButton!
@@ -193,6 +194,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		assignedPrHandlingPolicy.toolTip = Settings.assignedPrHandlingPolicyHelp
 		includeTitlesInFiltering.toolTip = Settings.includeTitlesInFilterHelp
 		includeMilestonesInFiltering.toolTip = Settings.includeMilestonesInFilterHelp
+		includeAssigneeNamesInFiltering.toolTip = Settings.includeAssigneeInFilterHelp
 		includeLabelsInFiltering.toolTip = Settings.includeLabelsInFilterHelp
 		includeRepositoriesInFiltering.toolTip = Settings.includeReposInFilterHelp
 		includeServersInFiltering.toolTip = Settings.includeServersInFilterHelp
@@ -286,7 +288,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		includeLabelsInFiltering.integerValue = Settings.includeLabelsInFilter ? 1 : 0
 		includeTitlesInFiltering.integerValue = Settings.includeTitlesInFilter ? 1 : 0
 		includeMilestonesInFiltering.integerValue = Settings.includeMilestonesInFilter ? 1 : 0
-        includeUsersInFiltering.integerValue = Settings.includeUsersInFilter ? 1 : 0
+		includeAssigneeNamesInFiltering.integerValue = Settings.includeAssigneeNamesInFilter ? 1 : 0
+		includeUsersInFiltering.integerValue = Settings.includeUsersInFilter ? 1 : 0
 		includeNumbersInFiltering.integerValue = Settings.includeNumbersInFilter ? 1 : 0
 		includeServersInFiltering.integerValue = Settings.includeServersInFilter ? 1 : 0
 		includeStatusesInFiltering.integerValue = Settings.includeStatusesInFilter ? 1 : 0
@@ -466,6 +469,11 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction func includeMilestonesInFilteringSelected(sender: NSButton) {
 		Settings.includeMilestonesInFilter = (sender.integerValue==1)
+		app.deferredUpdateTimer.push()
+	}
+
+	@IBAction func includeAssigneeNamesInFilteringSelected(sender: NSButton) {
+		Settings.includeAssigneeNamesInFilter = (sender.integerValue==1)
 		app.deferredUpdateTimer.push()
 	}
 

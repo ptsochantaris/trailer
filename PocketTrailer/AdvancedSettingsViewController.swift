@@ -42,7 +42,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 	private enum SettingsSection: Int {
 		case Refresh, Display, Filtering, AppleWatch, Comments, Repos, StausesAndLabels, History, Confirm, Sort, Misc
-		static let rowCounts = [3, 5, 8, 2, 8, 2, 8, 3, 2, 3, 2]
+		static let rowCounts = [3, 5, 9, 2, 8, 2, 8, 3, 2, 3, 2]
 		static let allNames = ["Auto Refresh", "Display", "Filtering", "Apple Watch", "Comments", "Watchlist", "Statuses & Labels", "History", "Don't confirm when", "Sorting", "Misc"]
 	}
 
@@ -58,7 +58,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 		let l = UILabel()
 		l.attributedText = NSAttributedString(
-			string: "You can also use title: server: label: repo: user: number: milestone: and status: to filter specific properties, e.g. \"label:bug,suggestion\". Prefix with '!' to exclude some terms.",
+			string: "You can also use title: server: label: repo: user: number: milestone: assignee: and status: to filter specific properties, e.g. \"label:bug,suggestion\". Prefix with '!' to exclude some terms.",
 			attributes: [
 				NSFontAttributeName: UIFont.systemFontOfSize(UIFont.smallSystemFontSize()),
 				NSForegroundColorAttributeName: UIColor.lightGrayColor(),
@@ -166,6 +166,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.titleLabel.text = "Include milestone titles"
 				cell.accessoryType = check(Settings.includeMilestonesInFilter)
 				cell.descriptionLabel.text = Settings.includeMilestonesInFilterHelp
+			case 8:
+				cell.titleLabel.text = "Include assignee names"
+				cell.accessoryType = check(Settings.includeAssigneeNamesInFilter)
+				cell.descriptionLabel.text = Settings.includeAssigneeInFilterHelp
 			default: break
 			}
 		} else if indexPath.section == SettingsSection.AppleWatch.rawValue {
@@ -408,6 +412,8 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				Settings.includeNumbersInFilter = !Settings.includeNumbersInFilter
 			case 7:
 				Settings.includeMilestonesInFilter = !Settings.includeMilestonesInFilter
+			case 8:
+				Settings.includeAssigneeNamesInFilter = !Settings.includeAssigneeNamesInFilter
 			default: break
 			}
 			settingsChangedTimer.push()

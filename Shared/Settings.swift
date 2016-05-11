@@ -57,7 +57,7 @@ final class Settings {
 			"LAST_EXPORT_URL", "LAST_EXPORT_TIME", "CLOSE_HANDLING_POLICY_2", "MERGE_HANDLING_POLICY_2", "LAST_PREFS_TAB_SELECTED_OSX", "NEW_PR_DISPLAY_POLICY_INDEX", "NEW_ISSUE_DISPLAY_POLICY_INDEX", "HIDE_PRS_THAT_ARENT_PASSING_ONLY_IN_ALL",
             "INCLUDE_SERVERS_IN_FILTER", "INCLUDE_USERS_IN_FILTER", "INCLUDE_TITLES_IN_FILTER", "INCLUDE_NUMBERS_IN_FILTER", "DUMP_API_RESPONSES_IN_CONSOLE", "OPEN_ITEMS_DIRECTLY_IN_SAFARI", "HIDE_PRS_THAT_ARENT_PASSING",
             "REMOVE_RELATED_NOTIFICATIONS_ON_ITEM_REMOVE", "HIDE_SNOOZED_ITEMS", "SNOOZE_WAKEUP_ON_COMMENT", "SNOOZE_WAKEUP_ON_MENTION", "SNOOZE_WAKEUP_ON_STATUS_UPDATE", "INCLUDE_MILESTONES_IN_FILTER",
-            "MOVE_NEW_ITEMS_IN_OWN_REPOS_TO_MENTIONED"]
+            "MOVE_NEW_ITEMS_IN_OWN_REPOS_TO_MENTIONED", "INCLUDE_ASSIGNEE_NAMES_IN_FILTER"]
 	}
 
     class func checkMigration() {
@@ -649,6 +649,12 @@ final class Settings {
 	class var includeMilestonesInFilter: Bool {
 		get { return get("INCLUDE_MILESTONES_IN_FILTER") as? Bool ?? false }
 		set { set("INCLUDE_MILESTONES_IN_FILTER", newValue) }
+	}
+
+	static let includeAssigneeInFilterHelp = "Check item assignee names for inclusion in filtered results. You can also prefix a search with 'assignee:' to specifically search for this."
+	class var includeAssigneeNamesInFilter: Bool {
+		get { return get("INCLUDE_ASSIGNEE_NAMES_IN_FILTER") as? Bool ?? false }
+		set { set("INCLUDE_ASSIGNEE_NAMES_IN_FILTER", newValue) }
 	}
 
 	static let includeNumbersInFilterHelp = "Check the PR/Issue number of the item when selecting it for inclusion in filtered results. You can also prefix a search with 'number:' to specifically search for this."

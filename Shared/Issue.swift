@@ -18,21 +18,8 @@ final class Issue: ListableItem {
 		itemsWithInfo(filteredData, type: "Issue", fromServer: inRepo.apiServer) { item, info, isNewOrUpdated in
 			let i = item as! Issue
 			if isNewOrUpdated {
-				i.url = info["url"] as? String
-				i.webUrl = info["html_url"] as? String
-				i.number = info["number"] as? NSNumber
-				i.state = info["state"] as? String
-				i.title = info["title"] as? String
-				i.body = info["body"] as? String
-				i.repo = inRepo
 
-				i.milestone = info["milestone"]?["title"] as? String
-
-				if let userInfo = info["user"] as? [NSObject: AnyObject] {
-					i.userId = userInfo["id"] as? NSNumber
-					i.userLogin = userInfo["login"] as? String
-					i.userAvatarUrl = userInfo["avatar_url"] as? String
-				}
+				i.baseSyncFromInfo(info, inRepo: inRepo)
 
 				if let N = i.number, R = inRepo.fullName {
 					i.commentsLink = "/repos/\(R)/issues/\(N)/comments"
@@ -44,16 +31,6 @@ final class Issue: ListableItem {
 
 				let labelList = info["labels"] as? [[NSObject: AnyObject]]
 				PRLabel.syncLabelsWithInfo(labelList, withParent: i)
-
-				if let assignee = info["assignee"] as? [NSObject: AnyObject] {
-					let assigneeName = assignee["login"] as? String ?? "NoAssignedUserName"
-					let assigned = (assigneeName == (inRepo.apiServer.userName ?? "NoApiUser"))
-					i.isNewAssignment = (assigned && !i.createdByMe && !(i.assignedToMe?.boolValue ?? false))
-					i.assignedToMe = assigned
-				} else {
-					i.assignedToMe = false
-					i.isNewAssignment = false
-				}
 			}
 			i.reopened = ((i.condition?.integerValue ?? 0) == ItemCondition.Closed.rawValue)
 			i.condition = ItemCondition.Open.rawValue

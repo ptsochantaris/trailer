@@ -20,22 +20,10 @@ final class PullRequest: ListableItem {
 		itemsWithInfo(data, type: "PullRequest", fromServer: inRepo.apiServer) { item, info, isNewOrUpdated in
 			let p = item as! PullRequest
 			if isNewOrUpdated {
-				p.url = info["url"] as? String
-				p.webUrl = info["html_url"] as? String
-				p.number = info["number"] as? NSNumber
-				p.state = info["state"] as? String
-				p.title = info["title"] as? String
-				p.body = info["body"] as? String
+
+				p.baseSyncFromInfo(info, inRepo: inRepo)
+
 				p.mergeable = info["mergeable"] as? NSNumber ?? true
-				p.repo = inRepo
-
-				p.milestone = info["milestone"]?["title"] as? String
-
-				if let userInfo = info["user"] as? [NSObject : AnyObject] {
-					p.userId = userInfo["id"] as? NSNumber
-					p.userLogin = userInfo["login"] as? String
-					p.userAvatarUrl = userInfo["avatar_url"] as? String
-				}
 
 				if let linkInfo = info["_links"] as? [NSObject : AnyObject] {
 					p.issueCommentLink = linkInfo["comments"]?["href"] as? String
