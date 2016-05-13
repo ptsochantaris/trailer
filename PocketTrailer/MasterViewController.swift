@@ -22,9 +22,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		let a = UIAlertController(title: "Action", message: nil, preferredStyle: UIAlertControllerStyle.Alert)
 
-		a.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: { action in
+		a.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel) { action in
 			a.dismissViewControllerAnimated(true, completion: nil)
-		}))
+		})
 		a.addAction(UIAlertAction(title: "Mark all as read", style: UIAlertActionStyle.Destructive) { [weak self] action in
 			self?.markAllAsRead()
 		})
@@ -548,9 +548,10 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		let items = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)
 		let t = i.title ?? "(no title)"
 		let hasPresets = items.count > 0
+		let singleColumn = splitViewController?.collapsed ?? true
 		let a = UIAlertController(title: hasPresets ? "Snooze" : nil,
 		                          message: hasPresets ? t : "You do not currently have any snoozing presets configured. Please add some in the relevant preferences tab.",
-		                          preferredStyle: .ActionSheet)
+		                          preferredStyle: singleColumn ? .ActionSheet : .Alert)
 		for item in items {
 			a.addAction(UIAlertAction(title: item.listDescription, style: .Default) { action in
 				i.snoozeUntil = item.wakeupDateFromNow
