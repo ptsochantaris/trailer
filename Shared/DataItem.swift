@@ -38,15 +38,18 @@ class DataItem: NSManagedObject {
 
 	final class func itemsWithInfo(data: [[NSObject : AnyObject]]?, type: String, fromServer: ApiServer, postProcessCallback: (DataItem, [NSObject : AnyObject], Bool)->Void) {
 
-		if data==nil { return }
+		guard let infos=data where infos.count > 0 else { return }
 
 		var idsOfItems = [NSNumber]()
 		var idsToInfo = [NSNumber : [NSObject : AnyObject]]()
-		for info in data ?? [] {
-			let serverId = info["id"] as! NSNumber
-			idsOfItems.append(serverId)
-			idsToInfo[serverId] = info
+		for info in infos {
+			if let serverId = info["id"] as? NSNumber {
+				idsOfItems.append(serverId)
+				idsToInfo[serverId] = info
+			}
 		}
+
+		if idsOfItems.count == 0 { return }
 
 		let f = NSFetchRequest(entityName: type)
 		f.returnsObjectsAsFaults = false
@@ -54,34 +57,35 @@ class DataItem: NSManagedObject {
 		let existingItems = try! fromServer.managedObjectContext?.executeFetchRequest(f) as? [DataItem] ?? []
 
 		for i in existingItems {
-			let serverId = i.serverId!
-			idsOfItems.removeAtIndex(idsOfItems.indexOf(serverId)!)
-			let info = idsToInfo[serverId]!
-			let updatedDate = parseGH8601(info["updated_at"] as? String) ?? NSDate()
-			if updatedDate != i.updatedAt {
-				DLog("Updating %@: %@",type,serverId)
-				i.postSyncAction = PostSyncAction.NoteUpdated.rawValue
-				i.updatedAt = updatedDate
-				postProcessCallback(i, info, true)
-			} else {
-				//DLog("Skipping %@: %@",type,serverId)
-				i.postSyncAction = PostSyncAction.DoNothing.rawValue
-				postProcessCallback(i, info, false)
+			if let serverId = i.serverId, idx = idsOfItems.indexOf(serverId), info = idsToInfo[serverId] {
+				idsOfItems.removeAtIndex(idx)
+				let updatedDate = parseGH8601(info["updated_at"] as? String) ?? NSDate()
+				if updatedDate != i.updatedAt {
+					DLog("Updating %@: %@",type,serverId)
+					i.postSyncAction = PostSyncAction.NoteUpdated.rawValue
+					i.updatedAt = updatedDate
+					postProcessCallback(i, info, true)
+				} else {
+					//DLog("Skipping %@: %@",type,serverId)
+					i.postSyncAction = PostSyncAction.DoNothing.rawValue
+					postProcessCallback(i, info, false)
+				}
 			}
 		}
 
 		for serverId in idsOfItems {
-			DLog("Creating %@: %@", type, serverId)
-			let info = idsToInfo[serverId]!
-			let i = NSEntityDescription.insertNewObjectForEntityForName(type, inManagedObjectContext: fromServer.managedObjectContext!) as! DataItem
-			i.serverId = serverId
-			i.postSyncAction = PostSyncAction.NoteNew.rawValue
-			i.apiServer = fromServer
+			if let info = idsToInfo[serverId] {
+				DLog("Creating %@: %@", type, serverId)
+				let i = NSEntityDescription.insertNewObjectForEntityForName(type, inManagedObjectContext: fromServer.managedObjectContext!) as! DataItem
+				i.serverId = serverId
+				i.postSyncAction = PostSyncAction.NoteNew.rawValue
+				i.apiServer = fromServer
 
-			i.createdAt = parseGH8601(info["created_at"] as? String) ?? NSDate()
-			i.updatedAt = parseGH8601(info["updated_at"] as? String) ?? NSDate()
+				i.createdAt = parseGH8601(info["created_at"] as? String) ?? NSDate()
+				i.updatedAt = parseGH8601(info["updated_at"] as? String) ?? NSDate()
 
-			postProcessCallback(i, info, true)
+				postProcessCallback(i, info, true)
+			}
 		}
 	}
 

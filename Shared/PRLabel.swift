@@ -15,15 +15,18 @@ final class PRLabel: DataItem {
 
 	private class func labelsWithInfo(data: [[NSObject : AnyObject]]?, fromParent: ListableItem, postProcessCallback: (PRLabel, [NSObject : AnyObject])->Void) {
 
-		if data==nil { return }
+		guard let infos=data where infos.count > 0 else { return }
 
 		var namesOfItems = [String]()
 		var namesToInfo = [String : [NSObject : AnyObject]]()
-		for info in data ?? [] {
-			let name = info["name"] as? String ?? ""
-			namesOfItems.append(name)
-			namesToInfo[name] = info
+		for info in infos {
+			if let name = info["name"] as? String {
+				namesOfItems.append(name)
+				namesToInfo[name] = info
+			}
 		}
+
+		if namesOfItems.count == 0 { return }
 
 		let f = NSFetchRequest(entityName: "PRLabel")
 		f.returnsObjectsAsFaults = false
@@ -35,28 +38,29 @@ final class PRLabel: DataItem {
 		let existingItems = try! fromParent.managedObjectContext?.executeFetchRequest(f) as? [PRLabel] ?? []
 
 		for i in existingItems {
-			let name = i.name!
-			namesOfItems.removeAtIndex(namesOfItems.indexOf(name)!)
-			let info = namesToInfo[name]!
-			DLog("Updating Label: %@", name)
-			postProcessCallback(i, info)
+			if let name = i.name, idx = namesOfItems.indexOf(name), info = namesToInfo[name] {
+				namesOfItems.removeAtIndex(idx)
+				DLog("Updating Label: %@", name)
+				postProcessCallback(i, info)
+			}
 		}
 
 		for name in namesOfItems {
-			DLog("Creating Label: %@", name)
-			let info = namesToInfo[name]!
-			let i = NSEntityDescription.insertNewObjectForEntityForName("PRLabel", inManagedObjectContext: fromParent.managedObjectContext!) as! PRLabel
-			i.name = name
-			i.serverId = 0
-			i.updatedAt = never()
-			i.createdAt = never()
-			i.apiServer = fromParent.apiServer
-			if let pr = fromParent as? PullRequest {
-				i.pullRequest = pr
-			} else if let issue = fromParent as? Issue {
-				i.issue = issue
+			if let info = namesToInfo[name] {
+				DLog("Creating Label: %@", name)
+				let i = NSEntityDescription.insertNewObjectForEntityForName("PRLabel", inManagedObjectContext: fromParent.managedObjectContext!) as! PRLabel
+				i.name = name
+				i.serverId = 0
+				i.updatedAt = never()
+				i.createdAt = never()
+				i.apiServer = fromParent.apiServer
+				if let pr = fromParent as? PullRequest {
+					i.pullRequest = pr
+				} else if let issue = fromParent as? Issue {
+					i.issue = issue
+				}
+				postProcessCallback(i, info)
 			}
-			postProcessCallback(i, info)
 		}
 	}
 
