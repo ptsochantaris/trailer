@@ -6,7 +6,6 @@
 		<description>Most recent changes with links to updates.</description>
 		<language>en</language>
 
-<!--
 		<item>
 			<title>Version 1.3.21</title>
 			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
@@ -20,15 +19,14 @@
 				<li>Performance improvements.</li>
 				<li>Further typo corrections (with thanks to @NeckBeardPrince).</li>
 				</ul></font>]]></description>
-			<pubDate>Fri, 13 May 2016 16:00:00 +0000</pubDate>
+			<pubDate>Fri, 13 May 2016 23:00:00 +0000</pubDate>
 			<enclosure
 			url="http://ptsochantaris.github.io/trailer/trailer1321.zip"
-			sparkle:version="1296"
+			sparkle:version="1297"
 			sparkle:shortVersionString="1.3.21"
-			sparkle:dsaSignature="MC4CFQDTnXvsgE+aNPsxKaEFdu8xgajILAIVAJ0VBy8DnaWBYNaKpI1hRudYcEOp"
+			sparkle:dsaSignature="MC0CFGZRYQnhOtwn6wY3qLhwLKnkU+mBAhUAgMDB+lIKnNhdEMVTPRq74eoAiUE="
 			type="application/octet-stream"/>
 		</item>
- -->
 
 		<item>
 			<title>Version 1.3.20</title>
