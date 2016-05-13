@@ -7,6 +7,28 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.3.21</title>
+			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>New filter: Search for items assigned to specific users using the “assignee:” prefix, or tick the option in preferences to always check this when filtering.</li>
+				<li>Support for differentiating assigned PRs in the same manner as assigned issues.</li>
+				<li>Also, from the recent 1.3.20:</li>
+				<li>Significantly reduces long-term API quota usage by aggressively using Etags and local cache tailored specifically to the GitHub API requirements.</li>
+				<li>Improves & corrects various issues related to repo and item change detection, making overall notifications more punctual and granular.</li>
+				<li>One failed call will no longer cause an entire sync to fail. Instead, if an API resource times-out, is truncated, or fails to connect, it will be retried automatically a couple of times. Drastically reduces failed syncs, especially ones that access many repos and items.</li>
+				<li>Performance improvements.</li>
+				<li>Further typo corrections (with thanks to @NeckBeardPrince).</li>
+				</ul></font>]]></description>
+			<pubDate>Fri, 13 May 2016 16:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer1321.zip"
+			sparkle:version="1296"
+			sparkle:shortVersionString="1.3.21"
+			sparkle:dsaSignature="MC4CFQDTnXvsgE+aNPsxKaEFdu8xgajILAIVAJ0VBy8DnaWBYNaKpI1hRudYcEOp"
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.3.20</title>
 			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
