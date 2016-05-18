@@ -41,15 +41,15 @@ final class NotificationManager {
 		case .NewMention:
 			if let c = forItem as? PRComment {
 				if c.parentShouldSkipNotifications { return }
-				notification.alertTitle = "Mentioned by \(S(c.userName))"
-				notification.alertBody = "In '\(c.notificationSubtitle)': \(S(c.body))"
+				notification.alertTitle = "Mention by @\(S(c.userName))"
+				notification.alertBody = "\(c.notificationSubtitle): '\(S(c.body))'"
 				notification.category = "mutable"
 			}
 		case .NewComment:
 			if let c = forItem as? PRComment {
 				if c.parentShouldSkipNotifications { return }
-				notification.alertTitle = "Comment From \(S(c.userName))"
-				notification.alertBody = "In '\(c.notificationSubtitle)': \(S(c.body))"
+				notification.alertTitle = "Comment by @\(S(c.userName))"
+				notification.alertBody = "\(c.notificationSubtitle): '\(S(c.body))'"
 				notification.category = "mutable"
 			}
 		case .NewPr:
