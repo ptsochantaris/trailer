@@ -89,7 +89,7 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 				var errorServers = [String]()
 				for apiServer in ApiServer.allApiServersInMoc(tempContext) {
 					if apiServer.goodToGo && !apiServer.syncIsGood {
-						errorServers.append(apiServer.label ?? "Untitled Server")
+						errorServers.append(S(apiServer.label))
 					}
 				}
 				let serverNames = errorServers.joinWithSeparator(", ")
@@ -239,7 +239,7 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 
 	private func titleForRepo(repo: Repo) -> NSAttributedString {
 
-		let fullName = repo.fullName ?? "(Untitled Repo)"
+		let fullName = S(repo.fullName)
 		let text = (repo.inaccessible?.boolValue ?? false) ? (fullName + " (inaccessible)") : fullName
 		let color = repo.shouldSync ? UIColor.darkTextColor() : UIColor.lightGrayColor()
 		return NSAttributedString(string: text, attributes: [ NSForegroundColorAttributeName: color ])

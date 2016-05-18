@@ -44,7 +44,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 			s.startBGTask()
 
-			switch(message["command"] as? String ?? "") {
+			switch(S(message["command"] as? String)) {
 			case "refresh":
 				let lastSuccessfulSync = Settings.lastSuccessfulRefresh ?? NSDate()
 				app.startRefresh()
@@ -135,7 +135,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 		var result = [String : AnyObject]()
 
-		switch(message["list"] as? String ?? "") {
+		switch(S(message["list"] as? String)) {
 
 		case "overview":
 			result["result"] = buildOverview()
@@ -240,7 +240,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		for l in item.labels {
 			labels.append([
 				"color": colorToHex(l.colorForDisplay),
-				"text": l.name ?? "NOTEXT"
+				"text": S(l.name)
 				])
 		}
 		return labels
@@ -251,7 +251,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		for status in pr.displayedStatuses {
 			statusLines.append([
 				"color": colorToHex(status.colorForDarkDisplay),
-				"text": status.descriptionText ?? "NOTEXT"
+				"text": S(status.descriptionText)
 				])
 		}
 		return statusLines
@@ -274,9 +274,9 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		var comments = [[String : AnyObject]]()
 		for comment in item.sortedComments(.OrderedDescending) {
 			comments.append([
-				"user": comment.userName ?? "NOUSER",
+				"user": S(comment.userName),
 				"date": comment.createdAt ?? never(),
-				"text": comment.body ?? "NOBODY",
+				"text": S(comment.body),
 				"mine": comment.isMine
 				])
 		}

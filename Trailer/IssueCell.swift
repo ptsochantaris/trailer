@@ -22,7 +22,7 @@ final class IssueCell: TrailerCell {
 		let showUnpin = issue.condition?.integerValue != ItemCondition.Open.rawValue
 		if showUnpin { W -= REMOVE_BUTTON_WIDTH } else { W -= 4.0 }
 
-		let showAvatar = !(issue.userAvatarUrl ?? "").isEmpty && !Settings.hideAvatars
+		let showAvatar = !S(issue.userAvatarUrl).isEmpty && !Settings.hideAvatars
 		if showAvatar { W -= AVATAR_SIZE+AVATAR_PADDING } else { W += 4.0 }
 
 		let titleHeight = ceil(_title.boundingRectWithSize(CGSizeMake(W-4.0, CGFloat.max), options: stringDrawingOptions).size.height)
@@ -53,7 +53,7 @@ final class IssueCell: TrailerCell {
 		if showAvatar {
 			let userImage = AvatarView(
 				frame: NSMakeRect(LEFTPADDING, bounds.size.height-AVATAR_SIZE-7.0, AVATAR_SIZE, AVATAR_SIZE),
-				url: issue.userAvatarUrl ?? "")
+				url: S(issue.userAvatarUrl))
 			if faded { userImage.alphaValue = DISABLED_FADE }
 			addSubview(userImage)
 			shift = AVATAR_PADDING+AVATAR_SIZE

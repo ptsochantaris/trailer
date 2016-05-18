@@ -47,7 +47,7 @@ final class PRStatus: DataItem {
 	}
 
 	var colorForDarkDisplay: COLOR_CLASS {
-		switch state ?? "" {
+		switch S(state) {
 		case "pending":
 			return darkStatusYellow
 		case "success":
@@ -58,7 +58,7 @@ final class PRStatus: DataItem {
 	}
 
 	var colorForDisplay: COLOR_CLASS {
-		switch state ?? "" {
+		switch S(state) {
 		case "pending":
 			return lightStatusYellow
 		case "success":
@@ -71,7 +71,7 @@ final class PRStatus: DataItem {
 	var displayText: String {
 		if let desc = descriptionText {
 			let prefix: String
-			switch state ?? "" {
+			switch S(state) {
 			case "pending":
 				prefix = "⚡️"
 			case "success":

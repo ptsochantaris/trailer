@@ -25,12 +25,12 @@ final class DataManager : NSObject {
 
 		let d = NSUserDefaults.standardUserDefaults()
 		if let legacyAuthToken = d.objectForKey("GITHUB_AUTH_TOKEN") as? String {
-			var legacyApiHost = d.objectForKey("API_BACKEND_SERVER") as? String ?? ""
+			var legacyApiHost = S(d.objectForKey("API_BACKEND_SERVER") as? String)
 			if legacyApiHost.isEmpty { legacyApiHost = "api.github.com" }
 
-			let legacyApiPath = d.objectForKey("API_SERVER_PATH") as? String ?? ""
+			let legacyApiPath = S(d.objectForKey("API_SERVER_PATH") as? String)
 
-			var legacyWebHost = d.objectForKey("API_FRONTEND_SERVER") as? String ?? ""
+			var legacyWebHost = S(d.objectForKey("API_FRONTEND_SERVER") as? String)
 			if legacyWebHost.isEmpty { legacyWebHost = "github.com" }
 
 			let actualApiPath = (legacyApiHost + "/" + legacyApiPath).stringByReplacingOccurrencesOfString("//", withString:"/")

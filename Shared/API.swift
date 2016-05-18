@@ -422,8 +422,8 @@ final class API {
 			s.latestUserEventDateProcessed = latestDate
 		}
 
-		let userName = s.userName ?? "NoApiUserName"
-		let serverLabel = s.label ?? "(no api server label)"
+		let userName = S(s.userName)
+		let serverLabel = S(s.label)
 
 		getPagedDataInPath("/users/\(userName)/events",
 			fromServer: s,
@@ -470,8 +470,8 @@ final class API {
 			s.latestReceivedEventDateProcessed = latestDate
 		}
 
-		let userName = s.userName ?? "NoApiUserName"
-		let serverLabel = s.label ?? "(no api server label)"
+		let userName = S(s.userName)
+		let serverLabel = S(s.label)
 
 		getPagedDataInPath("/users/\(userName)/received_events",
 			fromServer: s,
@@ -571,7 +571,7 @@ final class API {
 			let apiServer = r.apiServer
 
 			if apiServer.syncIsGood && r.displayPolicyForPrs?.integerValue != RepoDisplayPolicy.Hide.rawValue {
-				let repoFullName = r.fullName ?? "NoRepoFullName"
+				let repoFullName = S(r.fullName)
 				getPagedDataInPath("/repos/\(repoFullName)/pulls", fromServer: apiServer, startingFromPage: 1,
 					perPageCallback: { data, lastPage in
 						PullRequest.syncPullRequestsFromInfoArray(data, inRepo: r)
@@ -636,7 +636,7 @@ final class API {
 			let apiServer = r.apiServer
 
 			if apiServer.syncIsGood && r.displayPolicyForIssues?.integerValue != RepoDisplayPolicy.Hide.rawValue {
-				let repoFullName = r.fullName ?? "NoRepoFullName"
+				let repoFullName = S(r.fullName)
 				getPagedDataInPath("/repos/\(repoFullName)/issues", fromServer: apiServer, startingFromPage: 1,
 					perPageCallback: { data, lastPage in
 						Issue.syncIssuesFromInfoArray(data, inRepo: r)
@@ -977,9 +977,8 @@ final class API {
 			let apiServer = p.apiServer
 			if let issueLink = p.issueUrl {
 				getDataInPath(issueLink, fromServer: apiServer) { data, lastPage, resultCode in
-					if let d = data as? [NSObject : AnyObject], assigneeInfo = d["assignee"] as? [NSObject : AnyObject] {
-						let assignee = assigneeInfo["login"] as? String ?? "NoAssignedUserName"
-						let assigned = (assignee == (apiServer.userName ?? "NoApiUser"))
+					if let d = data as? [NSObject : AnyObject], assigneeInfo = d["assignee"] as? [NSObject : AnyObject], assignee = assigneeInfo["login"] as? String {
+						let assigned = (assignee == S(apiServer.userName))
 						p.isNewAssignment = (assigned && !p.createdByMe && !(p.assignedToMe?.boolValue ?? false))
 						p.assignedToMe = assigned
 					} else if resultCode == 200 || resultCode == 404 || resultCode == 410 {
@@ -1018,8 +1017,8 @@ final class API {
 	private func investigatePrClosureFor(r: PullRequest, callback: Completion) {
 		DLog("Checking closed PR to see if it was merged: %@", r.title)
 
-		let repoFullName = r.repo.fullName ?? "NoRepoFullName"
-		let repoNumber = r.number?.stringValue ?? "NoRepoNumber"
+		let repoFullName = S(r.repo.fullName)
+		let repoNumber = S(r.number?.stringValue)
 		let path = "/repos/\(repoFullName)/pulls/\(repoNumber)"
 
 		getDataInPath(path, fromServer: r.apiServer) { [weak self] data, lastPage, resultCode in
@@ -1309,16 +1308,14 @@ final class API {
 				callback(data: data, lastPage: lastPage, resultCode: code)
 			} else {
 				if shouldRetry && attemptCount < 2 { // timeout, truncation, connection issue, etc
-					let apiServerLabel = fromServer.label ?? "(untitled server)"
 					let nextAttemptCount = attemptCount+1
-					DLog("(%@) Will retry failed API call to %@ (attempt #%d)", apiServerLabel, path, nextAttemptCount)
+					DLog("(%@) Will retry failed API call to %@ (attempt #%d)", S(fromServer.label), path, nextAttemptCount)
 					delay(2.0) {
 						self?.attemptToGetDataInPath(path, fromServer: fromServer, callback: callback, attemptCount: nextAttemptCount)
 					}
 				} else {
 					if shouldRetry {
-						let apiServerLabel = fromServer.label ?? "(untitled server)"
-						DLog("(%@) Giving up on failed API call to %@", apiServerLabel, path)
+						DLog("(%@) Giving up on failed API call to %@", S(fromServer.label), path)
 					}
 					callback(data: nil, lastPage: false, resultCode: code)
 				}
@@ -1336,7 +1333,7 @@ final class API {
 
 		let apiServerLabel: String
 		if fromServer.syncIsGood || ignoreLastSync {
-			apiServerLabel = fromServer.label ?? "(untitled server)"
+			apiServerLabel = S(fromServer.label)
 		} else {
 			atNextEvent(self) { S in
 				let e = S.apiError("Sync has failed, skipping this call")
@@ -1345,7 +1342,7 @@ final class API {
 			return
 		}
 
-		let expandedPath = path.characters.startsWith("/".characters) ? (fromServer.apiPath ?? "").stringByAppendingPathComponent(path) : path
+		let expandedPath = path.characters.startsWith("/".characters) ? S(fromServer.apiPath).stringByAppendingPathComponent(path) : path
 		let url = NSURL(string: expandedPath)!
 
 		let r = NSMutableURLRequest(URL: url, cachePolicy: .ReloadIgnoringLocalCacheData, timeoutInterval: 60.0)

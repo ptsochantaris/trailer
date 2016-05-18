@@ -142,7 +142,7 @@ final class PullRequest: ListableItem {
 			message = "There are no configured API servers in your settings, please ensure you have added at least one server with a valid API token."
 		} else if app.isRefreshing {
 			message = "Refreshing PR information, please wait a moment..."
-		} else if !(filterValue ?? "").isEmpty {
+		} else if !S(filterValue).isEmpty {
 			message = "There are no PRs matching this filter."
 		} else if openRequests > 0 {
 			message = "\(openRequests) PRs are hidden by your settings."
@@ -210,8 +210,7 @@ final class PullRequest: ListableItem {
 		var components = [String]()
 
 		if Settings.showReposInName {
-			let repoFullName = repo.fullName ?? "NoRepoFullName"
-			components.append("Repository: \(repoFullName)")
+			components.append("Repository: \(S(repo.fullName))")
 		}
 
 		if let l = userLogin { components.append("Author: \(l)") }
@@ -272,8 +271,8 @@ final class PullRequest: ListableItem {
 		var targetUrls = Set<String>()
 		var descriptions = Set<String>()
 		for s in try! managedObjectContext?.executeFetchRequest(f) as! [PRStatus] {
-			let targetUrl = s.targetUrl ?? ""
-			let desc = s.descriptionText ?? "(No status description)"
+			let targetUrl = S(s.targetUrl)
+			let desc = S(s.descriptionText)
 
 			if !descriptions.contains(desc) {
 				descriptions.insert(desc)

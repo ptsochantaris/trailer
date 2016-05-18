@@ -197,14 +197,14 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		case .NewMention:
 			let c = forItem as! PRComment
 			if c.parentShouldSkipNotifications { return }
-			notification.title = "@" + (c.userName ?? "NoUserName") + " mentioned you:"
+			notification.title = "@" + S(c.userName) + " mentioned you:"
 			notification.subtitle = c.notificationSubtitle
 			notification.informativeText = c.body
 			addPotentialExtraActions(notification)
 		case .NewComment:
 			let c = forItem as! PRComment
 			if c.parentShouldSkipNotifications { return }
-			notification.title = "@" + (c.userName ?? "NoUserName") + " commented:"
+			notification.title = "@" + S(c.userName) + " commented:"
 			notification.subtitle = c.notificationSubtitle
 			notification.informativeText = c.body
 			addPotentialExtraActions(notification)
@@ -277,9 +277,9 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			addPotentialExtraActions(notification)
 		}
 
-		let t = notification.title ?? "notitle"
-		let s = notification.subtitle ?? "nosub"
-		let i = notification.informativeText ?? "noinfo"
+		let t = S(notification.title)
+		let s = S(notification.subtitle)
+		let i = S(notification.informativeText)
 		notification.identifier = "\(t) - \(s) - \(i)"
 
 		let d = NSUserNotificationCenter.defaultUserNotificationCenter()
@@ -674,7 +674,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		for apiServer in ApiServer.allApiServersInMoc(mainObjectContext) {
 			if apiServer.goodToGo && apiServer.hasApiLimit, let resetDate = apiServer.resetDate {
 				if apiServer.shouldReportOverTheApiLimit {
-					let apiLabel = apiServer.label ?? "NoApiServerLabel"
+					let apiLabel = S(apiServer.label)
 					let resetDateString = itemDateFormatter.stringFromDate(resetDate)
 
 					let alert = NSAlert()
@@ -683,7 +683,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					alert.addButtonWithTitle("OK")
 					alert.runModal()
 				} else if apiServer.shouldReportCloseToApiLimit {
-					let apiLabel = apiServer.label ?? "NoApiServerLabel"
+					let apiLabel = S(apiServer.label)
 					let resetDateString = itemDateFormatter.stringFromDate(resetDate)
 
 					let alert = NSAlert()

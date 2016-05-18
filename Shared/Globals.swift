@@ -191,7 +191,7 @@ let LOW_API_WARNING: Double = 0.20
 let BACKOFF_STEP: NSTimeInterval = 120.0
 
 func currentAppVersion() -> String {
-	return NSBundle.mainBundle().infoDictionary!["CFBundleShortVersionString"] as? String ?? "(unknown version)"
+	return S(NSBundle.mainBundle().infoDictionary?["CFBundleShortVersionString"] as? String)
 }
 
 #if os(iOS)
@@ -221,7 +221,7 @@ import UIKit
 #endif
 
 func versionString() -> String {
-	let buildNumber = NSBundle.mainBundle().infoDictionary!["CFBundleVersion"] as? String ?? "unknown build"
+	let buildNumber = S(NSBundle.mainBundle().infoDictionary?["CFBundleVersion"] as? String)
 	return "Version \(currentAppVersion()) (\(buildNumber))"
 }
 

@@ -37,92 +37,101 @@ final class NotificationManager {
 		let notification = UILocalNotification()
 		notification.userInfo = DataManager.infoForType(type, item: forItem)
 
-		switch (type)
-		{
+		switch (type) {
 		case .NewMention:
 			if let c = forItem as? PRComment {
 				if c.parentShouldSkipNotifications { return }
-				let name = c.userName ?? "(unnamed)"
-				let title = c.notificationSubtitle
-				let body = c.body ?? "(no description)"
-				notification.alertBody = "@\(name) mentioned you in '\(title)': \(body)"
+				notification.alertTitle = "Mentioned by \(S(c.userName))"
+				notification.alertBody = "In '\(c.notificationSubtitle)': \(S(c.body))"
 				notification.category = "mutable"
 			}
 		case .NewComment:
 			if let c = forItem as? PRComment {
 				if c.parentShouldSkipNotifications { return }
-				let name = c.userName ?? "(unnamed)"
-				let title = c.notificationSubtitle
-				let body = c.body ?? "(no description)"
-				notification.alertBody = "@\(name) commented on '\(title)': \(body)"
+				notification.alertTitle = "Comment From \(S(c.userName))"
+				notification.alertBody = "In '\(c.notificationSubtitle)': \(S(c.body))"
 				notification.category = "mutable"
 			}
 		case .NewPr:
 			if let p = forItem as? PullRequest {
 				if p.shouldSkipNotifications { return }
-				notification.alertBody = "New PR: " + (p.title ?? "(untitled)") + " in " + (p.repo.fullName ?? "(untitled)")
+				notification.alertTitle = "New PR in \(S(p.repo.fullName))"
+				notification.alertBody = S(p.title)
 				notification.category = "mutable"
 			}
 		case .PrReopened:
 			if let p = forItem as? PullRequest {
 				if p.shouldSkipNotifications { return }
-				notification.alertBody = "Re-Opened PR: " + (p.title ?? "(untitled)") + " in " + (p.repo.fullName ?? "(untitled)")
+				notification.alertTitle = "Re-Opened PR in \(S(p.repo.fullName))"
+				notification.alertBody = S(p.title)
 				notification.category = "mutable"
 			}
 		case .PrMerged:
 			if let p = forItem as? PullRequest {
 				if p.shouldSkipNotifications { return }
-				notification.alertBody = "PR Merged! " + (p.title ?? "(untitled)") + " in " + (p.repo.fullName ?? "(untitled)")
+				notification.alertTitle = "PR Merged in \(S(p.repo.fullName))"
+				notification.alertBody = S(p.title)
 				notification.category = "mutable"
 			}
 		case .PrClosed:
 			if let p = forItem as? PullRequest {
 				if p.shouldSkipNotifications { return }
-				notification.alertBody = "PR Closed: " + (p.title ?? "(untitled)") + " in " + (p.repo.fullName ?? "(untitled)")
+				notification.alertTitle = "PR Closed in \(S(p.repo.fullName))"
+				notification.alertBody = S(p.title)
 				notification.category = "mutable"
 			}
 		case .NewRepoSubscribed:
 			if let r = forItem as? Repo {
-				notification.alertBody = "New Repository Subscribed: " + (r.fullName ?? "(untitled)")
+				notification.alertTitle = "New Subscription"
+				notification.alertBody = S(r.fullName)
+				notification.category = "repo"
 			}
 		case .NewRepoAnnouncement:
 			if let r = forItem as? Repo {
-				notification.alertBody = "New Repository: " + (r.fullName ?? "(untitled)")
+				notification.alertTitle = "New Repository"
+				notification.alertBody = S(r.fullName)
+				notification.category = "repo"
 			}
 		case .NewPrAssigned:
 			if let p = forItem as? PullRequest {
 				if p.shouldSkipNotifications { return }
-				notification.alertBody = "PR Assigned: " + (p.title ?? "(untitled)") + " in " + (p.repo.fullName ?? "(untitled)")
+				notification.alertTitle = "PR Assigned in \(S(p.repo.fullName))"
+				notification.alertBody = S(p.title)
 				notification.category = "mutable"
 			}
 		case .NewStatus:
 			if let s = forItem as? PRStatus {
 				if s.parentShouldSkipNotifications { return }
-				notification.alertBody = "New Status: " + (s.descriptionText ?? "(untitled)") + " for " + (s.pullRequest.title ?? "(untitled)") + " in " + (s.pullRequest.repo.fullName ?? "(untitled)")
+				notification.alertTitle = S(s.descriptionText)
+				notification.alertBody = "\(S(s.pullRequest.title)) (\(S(s.pullRequest.repo.fullName)))"
 				notification.category = "mutable"
 			}
 		case .NewIssue:
 			if let i = forItem as? Issue {
 				if i.shouldSkipNotifications { return }
-				notification.alertBody = "New Issue: " + (i.title ?? "(untitled)") + " in " + (i.repo.fullName ?? "(untitled)")
+				notification.alertTitle = "New Issue in \(S(i.repo.fullName))"
+				notification.alertBody = S(i.title)
 				notification.category = "mutable"
 			}
 		case .IssueReopened:
 			if let i = forItem as? Issue {
 				if i.shouldSkipNotifications { return }
-				notification.alertBody = "Re-Opened Issue: " + (i.title ?? "(untitled)") + " in " + (i.repo.fullName ?? "(untitled)")
+				notification.alertTitle = "Re-Opened Issue in \(S(i.repo.fullName))"
+				notification.alertBody = S(i.title)
 				notification.category = "mutable"
 			}
 		case .IssueClosed:
 			if let i = forItem as? Issue {
 				if i.shouldSkipNotifications { return }
-				notification.alertBody = "Issue Closed: " + (i.title ?? "(untitled)") + " in " + (i.repo.fullName ?? "(untitled)")
+				notification.alertTitle = "Issue Closed in \(S(i.repo.fullName))"
+				notification.alertBody = S(i.title)
 				notification.category = "mutable"
 			}
 		case .NewIssueAssigned:
 			if let i = forItem as? Issue {
 				if i.shouldSkipNotifications { return }
-				notification.alertBody = "Issue Assigned: " + (i.title ?? "(untitled)") + " in " + (i.repo.fullName ?? "(untitled)")
+				notification.alertTitle = "Issue Assigned in \(S(i.repo.fullName))"
+				notification.alertBody = S(i.title)
 				notification.category = "mutable"
 			}
 		}

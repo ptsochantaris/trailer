@@ -65,7 +65,7 @@ final class ApiServer: NSManagedObject {
 	}
 
 	var goodToGo: Bool {
-		return !(authToken ?? "").isEmpty
+		return !S(authToken).isEmpty
 	}
 
 	class func resetSyncOfEverything() {
@@ -135,7 +135,7 @@ final class ApiServer: NSManagedObject {
 
 	class func someServersHaveAuthTokensInMoc(moc: NSManagedObjectContext) -> Bool {
 		for apiServer in allApiServersInMoc(moc) {
-			if !(apiServer.authToken ?? "").isEmpty {
+			if !S(apiServer.authToken).isEmpty {
 				return true
 			}
 		}

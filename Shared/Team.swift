@@ -11,8 +11,8 @@ final class Team: DataItem {
 
 		itemsWithInfo(data, type: "Team", fromServer: apiServer) { item, info, isNewOrUpdated in
 			let t = item as! Team
-			let slug = info["slug"] as? String ?? ""
-			let org = info["organization"]?["login"] as? String ?? ""
+			let slug = S(info["slug"] as? String)
+			let org = S(info["organization"]?["login"] as? String)
 			t.slug = slug
 			t.organisationLogin = org
 			if slug.isEmpty || org.isEmpty {

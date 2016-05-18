@@ -18,6 +18,10 @@ func never() -> NSDate {
 	return NSDate.distantPast()
 }
 
+func S(s: String?) -> String {
+	return s ?? ""
+}
+
 typealias Completion = ()->Void
 
 ////

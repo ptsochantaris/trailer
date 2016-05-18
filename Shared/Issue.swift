@@ -48,7 +48,7 @@ final class Issue: ListableItem {
 			message = "There are no configured API servers in your settings, please ensure you have added at least one server with a valid API token."
 		} else if app.isRefreshing {
 			message = "Refreshing issue information, please wait a moment..."
-		} else if !(filterValue ?? "").isEmpty {
+		} else if !S(filterValue).isEmpty {
 			message = "There are no issues matching this filter."
 		} else if openIssues > 0 {
 			message = "\(openIssues) issues are hidden by your settings."
@@ -169,8 +169,7 @@ final class Issue: ListableItem {
 		var components = [String]()
 
 		if Settings.showReposInName {
-			let repoFullName = repo.fullName ?? "NoRepoFullName"
-			components.append("Repository: \(repoFullName)")
+			components.append("Repository: \(S(repo.fullName))")
 		}
 
 		if let l = userLogin { components.append("Author: \(l)") }

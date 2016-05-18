@@ -335,7 +335,7 @@ final class Settings {
 	}
 
 	class var lastRunVersion: String {
-		get { return get("LAST_RUN_VERSION_KEY") as? String ?? "" }
+		get { return S(get("LAST_RUN_VERSION_KEY") as? String) }
 		set { set("LAST_RUN_VERSION_KEY", newValue) }
 	}
 

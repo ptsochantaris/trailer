@@ -777,7 +777,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 				var errorServers = [String]()
 				for apiServer in ApiServer.allApiServersInMoc(tempContext) {
 					if apiServer.goodToGo && !apiServer.syncIsGood {
-						errorServers.append(apiServer.label ?? "NoServerName")
+						errorServers.append(S(apiServer.label))
 					}
 				}
 
@@ -971,7 +971,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		api.testApiToServer(apiServer) { error in
 			let alert = NSAlert()
 			if error != nil {
-				alert.messageText = "The test failed for " + (apiServer.apiPath ?? "NoApiPath")
+				alert.messageText = "The test failed for " + S(apiServer.apiPath)
 				alert.informativeText = error!.localizedDescription
 			} else {
 				alert.messageText = "This API server seems OK!"
@@ -993,12 +993,12 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	private func fillServerApiFormFromSelectedServer() {
 		if let apiServer = selectedServer() {
-			apiServerName.stringValue = apiServer.label ?? ""
-			apiServerWebPath.stringValue = apiServer.webPath ?? ""
-			apiServerApiPath.stringValue = apiServer.apiPath ?? ""
-			apiServerAuthToken.stringValue = apiServer.authToken ?? ""
+			apiServerName.stringValue = S(apiServer.label)
+			apiServerWebPath.stringValue = S(apiServer.webPath)
+			apiServerApiPath.stringValue = S(apiServer.apiPath)
+			apiServerAuthToken.stringValue = S(apiServer.authToken)
 			apiServerSelectedBox.title = apiServer.label ?? "New Server"
-			apiServerTestButton.enabled = !(apiServer.authToken ?? "").isEmpty
+			apiServerTestButton.enabled = !S(apiServer.authToken).isEmpty
 			apiServerDeleteButton.enabled = (ApiServer.countApiServersInMoc(mainObjectContext) > 1)
 			apiServerReportError.integerValue = apiServer.reportRefreshFailures.boolValue ? 1 : 0
 		}
@@ -1010,7 +1010,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			apiServer.apiPath = apiServerApiPath.stringValue
 			apiServer.webPath = apiServerWebPath.stringValue
 			apiServer.authToken = apiServerAuthToken.stringValue
-			apiServerTestButton.enabled = !(apiServer.authToken ?? "").isEmpty
+			apiServerTestButton.enabled = !S(apiServer.authToken).isEmpty
 			serverList.reloadData()
 		}
 	}
@@ -1144,7 +1144,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 				} else {
 					cell.enabled = true
 					let r = repoForRow(row)
-					let repoName = r.fullName ?? "NoRepoName"
+					let repoName = S(r.fullName)
 					let title = (r.inaccessible?.boolValue ?? false) ? repoName + " (inaccessible)" : repoName
 					let textColor = (row == tv.selectedRow) ? NSColor.selectedControlTextColor() : (r.shouldSync ? NSColor.textColor() : NSColor.textColor().colorWithAlphaComponent(0.4))
 					cell.attributedStringValue = NSAttributedString(string: title, attributes: [NSForegroundColorAttributeName: textColor])
@@ -1194,7 +1194,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			let allServers = ApiServer.allApiServersInMoc(mainObjectContext)
 			let apiServer = allServers[row]
 			if tableColumn?.identifier == "server" {
-				cell.title = apiServer.label ?? "NoApiServer"
+				cell.title = S(apiServer.label)
 				let tc = c as! NSTextFieldCell
 				if apiServer.lastSyncSucceeded?.boolValue ?? false {
 					tc.textColor = NSColor.textColor()

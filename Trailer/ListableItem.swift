@@ -753,9 +753,9 @@ class ListableItem: DataItem {
 		s.keywords = searchKeywords
 		s.creator = userLogin
 
-		s.contentDescription = (repo.fullName ?? "") +
-			" @" + (userLogin ?? "") +
-			" - " + (body?.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet()) ?? "")
+		s.contentDescription = S(repo.fullName) +
+			" @" + S(userLogin) +
+			" - " + S(body?.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet()))
 
 		func completeIndex(s: CSSearchableItemAttributeSet) {
 			let i = CSSearchableItem(uniqueIdentifier:objectID.URIRepresentation().absoluteString, domainIdentifier: nil, attributeSet: s)

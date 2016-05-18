@@ -342,7 +342,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		previousValue = nil
 
 		if indexPath.section == SettingsSection.Refresh.rawValue {
-			pickerName = tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text ?? "Unknown Value"
+			pickerName = S(tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text)
 			selectedIndexPath = indexPath
 			var values = [String]()
 			var count=0
@@ -356,7 +356,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				}
 			case 1:
 				// minutes
-				for f in 10.stride(to: 10000, by: 10) {
+				for f in 5.stride(to: 10000, by: 5) {
 					if f == Int(Settings.backgroundRefreshPeriod/60.0) { previousValue = count }
 					values.append("\(f) minutes")
 					count += 1
@@ -379,7 +379,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				Settings.showCreatedInsteadOfUpdated = !Settings.showCreatedInsteadOfUpdated
 				settingsChangedTimer.push()
 			case 1:
-				pickerName = tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text ?? "Unknown Value"
+				pickerName = S(tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text)
 				selectedIndexPath = indexPath
 				valuesToPush = AssignmentPolicy.labels
 				previousValue = Settings.assignedPrHandlingPolicy
@@ -451,7 +451,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			default: break
 			}
 		} else if indexPath.section == SettingsSection.Repos.rawValue {
-			pickerName = tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text ?? "Unknown Value"
+			pickerName = S(tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text)
 			valuesToPush = RepoDisplayPolicy.labels
 			selectedIndexPath = indexPath
 			switch indexPath.row {
@@ -474,7 +474,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				app.preferencesDirty = true
 			case 1:
 				selectedIndexPath = indexPath
-				pickerName = tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text ?? "Unknown Picker"
+				pickerName = S(tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text)
 				var values = [String]()
 				var count = 1
 				values.append("Every refresh")
@@ -496,7 +496,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				app.preferencesDirty = true
 			case 3:
 				selectedIndexPath = indexPath
-				pickerName = tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text ?? "Unknown Picker"
+				pickerName = S(tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text)
 				var values = [String]()
 				var count = 1
 				values.append("Every refresh")
@@ -525,13 +525,13 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			case 0:
 				selectedIndexPath = indexPath
 				previousValue = Settings.mergeHandlingPolicy
-				pickerName = tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text ?? "Unknown Picker"
+				pickerName = S(tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text)
 				valuesToPush = HandlingPolicy.labels
 				performSegueWithIdentifier("showPicker", sender: self)
 			case 1:
 				selectedIndexPath = indexPath;
 				previousValue = Settings.closeHandlingPolicy
-				pickerName = tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text ?? "Unknown Picker"
+				pickerName = S(tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text)
 				valuesToPush = HandlingPolicy.labels
 				performSegueWithIdentifier("showPicker", sender: self)
 			case 2:
@@ -556,7 +556,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			case 1:
 				selectedIndexPath = indexPath
 				previousValue = Settings.sortMethod
-				pickerName = tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text ?? "Unknown Picker"
+				pickerName = S(tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text)
 				valuesToPush = Settings.sortDescending ? SortingMethod.reverseTitles : SortingMethod.normalTitles
 				performSegueWithIdentifier("showPicker", sender: self)
 			case 2:
@@ -630,7 +630,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				if sip.row == 0 {
 					Settings.refreshPeriod = Float(didSelectIndexPath.row*10+60)
 				} else if sip.row == 1 {
-					Settings.backgroundRefreshPeriod = Float((didSelectIndexPath.row*10+10)*60)
+					Settings.backgroundRefreshPeriod = Float((didSelectIndexPath.row*5+5)*60)
 				} else if sip.row == 2 {
 					Settings.newRepoCheckPeriod = Float(didSelectIndexPath.row+2)
 				}

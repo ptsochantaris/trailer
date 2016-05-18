@@ -339,7 +339,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			return
 		}
 
-		if urlToOpen != nil && !(searchField.text ?? "").isEmpty {
+		if urlToOpen != nil && !S(searchField.text).isEmpty {
 			searchField.text = nil
 			searchField.resignFirstResponder()
 			reloadDataWithAnimation(false)
@@ -479,7 +479,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-		return fetchedResultsController.sections?[section].name ?? "Unknown Section"
+		return S(fetchedResultsController.sections?[section].name)
 	}
 
 	override func tableView(tableView: UITableView, editActionsForRowAtIndexPath indexPath: NSIndexPath) -> [UITableViewRowAction]? {
@@ -546,11 +546,10 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	private func showSnoozeMenuFor(i: ListableItem) {
 		let items = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)
-		let t = i.title ?? "(no title)"
 		let hasPresets = items.count > 0
 		let singleColumn = splitViewController?.collapsed ?? true
 		let a = UIAlertController(title: hasPresets ? "Snooze" : nil,
-		                          message: hasPresets ? t : "You do not currently have any snoozing presets configured. Please add some in the relevant preferences tab.",
+		                          message: hasPresets ? S(i.title) : "You do not currently have any snoozing presets configured. Please add some in the relevant preferences tab.",
 		                          preferredStyle: singleColumn ? .ActionSheet : .Alert)
 		for item in items {
 			a.addAction(UIAlertAction(title: item.listDescription, style: .Default) { action in
@@ -581,34 +580,45 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	func controllerWillChangeContent(controller: NSFetchedResultsController) {
+		if UIApplication.sharedApplication().applicationState != .Active { return }
 		tableView.beginUpdates()
 	}
 
 	func controller(controller: NSFetchedResultsController, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
+
+		if UIApplication.sharedApplication().applicationState != .Active { return }
 
 		switch(type) {
 		case .Insert:
 			tableView.insertSections(NSIndexSet(index: sectionIndex), withRowAnimation: .Automatic)
 		case .Delete:
 			tableView.deleteSections(NSIndexSet(index: sectionIndex), withRowAnimation: .Automatic)
-		case .Update:
-			tableView.reloadSections(NSIndexSet(index: sectionIndex), withRowAnimation: .Automatic)
-		default:
+		case .Update, .Move:
 			break
 		}
 	}
 
 	func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
 
+		if UIApplication.sharedApplication().applicationState != .Active { return }
+
 		switch(type) {
 		case .Insert:
-			tableView.insertRowsAtIndexPaths([newIndexPath ?? indexPath!], withRowAnimation: .Automatic)
+			if let n = newIndexPath {
+				tableView.insertRowsAtIndexPaths([n], withRowAnimation: .Automatic)
+			}
 		case .Delete:
-			tableView.deleteRowsAtIndexPaths([indexPath!], withRowAnimation:.Automatic)
+			if let i = indexPath {
+				tableView.deleteRowsAtIndexPaths([i], withRowAnimation:.Automatic)
+			}
 		case .Update:
-			tableView.reloadRowsAtIndexPaths([newIndexPath ?? indexPath!], withRowAnimation: .Automatic)
+			if let i = indexPath, cell = tableView.cellForRowAtIndexPath(i) {
+				configureCell(cell, atIndexPath: i)
+			}
 		case .Move:
-			tableView.deleteRowsAtIndexPaths([indexPath!], withRowAnimation:.Automatic)
+			if let i = indexPath {
+				tableView.deleteRowsAtIndexPaths([i], withRowAnimation:.Automatic)
+			}
 			if let n = newIndexPath {
 				tableView.insertRowsAtIndexPaths([n], withRowAnimation:.Automatic)
 			}
@@ -616,18 +626,28 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	func controllerDidChangeContent(controller: NSFetchedResultsController) {
-		tableView.endUpdates()
+		if UIApplication.sharedApplication().applicationState != .Active {
+			tableView.reloadData()
+		} else {
+			tableView.endUpdates()
+		}
 		updateStatus()
 	}
 
 	private func configureCell(cell: UITableViewCell, atIndexPath: NSIndexPath) {
-		let c = cell as! PRCell
 
-		let o = fetchedResultsController.objectAtIndexPath(atIndexPath)
-		if viewMode == .PullRequests {
-			c.setPullRequest(o as! PullRequest)
-		} else {
-			c.setIssue(o as! Issue)
+		if let sections = fetchedResultsController.sections, c = cell as? PRCell {
+			let r = atIndexPath.row
+			let s = atIndexPath.section
+
+			if s >= 0 && s < sections.count && r >= 0 && r < sections[s].numberOfObjects {
+				let o = fetchedResultsController.objectAtIndexPath(atIndexPath)
+				if viewMode == .PullRequests {
+					c.setPullRequest(o as! PullRequest)
+				} else {
+					c.setIssue(o as! Issue)
+				}
+			}
 		}
 	}
 

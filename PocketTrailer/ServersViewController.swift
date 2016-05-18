@@ -50,12 +50,12 @@ final class ServersViewController: UITableViewController {
 	override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
 		let cell = tableView.dequeueReusableCellWithIdentifier("ServerCell", forIndexPath: indexPath) 
 		let a = allServers[indexPath.row]
-		if (a.authToken ?? "").isEmpty {
+		if S(a.authToken).isEmpty {
 			cell.textLabel?.textColor = UIColor.redColor()
-			cell.textLabel?.text = (a.label ?? "") + " (needs token!)"
+			cell.textLabel?.text = S(a.label) + " (needs token!)"
 		} else if !a.syncIsGood {
 			cell.textLabel?.textColor = UIColor.redColor()
-			cell.textLabel?.text = (a.label ?? "") + " (last sync failed)"
+			cell.textLabel?.text = S(a.label) + " (last sync failed)"
 		} else {
 			cell.textLabel?.textColor = UIColor.darkTextColor()
 			cell.textLabel?.text = a.label

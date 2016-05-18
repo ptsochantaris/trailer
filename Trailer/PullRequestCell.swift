@@ -22,7 +22,7 @@ final class PullRequestCell: TrailerCell {
 		let showUnpin = (pullRequest.condition?.integerValue != ItemCondition.Open.rawValue) || pullRequest.markUnmergeable
 		if showUnpin { W -= REMOVE_BUTTON_WIDTH } else { W -= 4.0 }
 
-		let showAvatar = !(pullRequest.userAvatarUrl ?? "").isEmpty && !Settings.hideAvatars
+		let showAvatar = !S(pullRequest.userAvatarUrl).isEmpty && !Settings.hideAvatars
 		if showAvatar { W -= AVATAR_SIZE+AVATAR_PADDING } else { W += 4.0 }
 
 		let titleHeight = ceil(_title.boundingRectWithSize(CGSizeMake(W-4.0, CGFloat.max), options: stringDrawingOptions).size.height)
@@ -68,7 +68,7 @@ final class PullRequestCell: TrailerCell {
 		if showAvatar {
 			let userImage = AvatarView(
 				frame: NSMakeRect(LEFTPADDING, bounds.size.height-AVATAR_SIZE-7.0, AVATAR_SIZE, AVATAR_SIZE),
-				url: pullRequest.userAvatarUrl ?? "")
+				url: S(pullRequest.userAvatarUrl))
 			if faded { userImage.alphaValue = DISABLED_FADE }
 			addSubview(userImage)
 			shift = AVATAR_PADDING+AVATAR_SIZE

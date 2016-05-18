@@ -100,7 +100,10 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 		itemCategory.setActions([readAction, muteAction], forContext: .Default)
 		itemCategory.setActions([readShort, muteShort], forContext: .Minimal)
 
-		let notificationSettings = UIUserNotificationSettings(forTypes: [.Alert, .Badge, .Sound], categories: [itemCategory])
+		let repoCategory = UIMutableUserNotificationCategory()
+		repoCategory.identifier = "repo"
+
+		let notificationSettings = UIUserNotificationSettings(forTypes: [.Alert, .Badge, .Sound], categories: [itemCategory, repoCategory])
 		application.registerUserNotificationSettings(notificationSettings)
 
 		return true
@@ -207,13 +210,13 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 		for apiServer in ApiServer.allApiServersInMoc(mainObjectContext) {
 			if apiServer.goodToGo && apiServer.hasApiLimit, let resetDate = apiServer.resetDate {
 				if apiServer.shouldReportOverTheApiLimit {
-					let apiLabel = apiServer.label ?? "NoApiServerLabel"
+					let apiLabel = S(apiServer.label)
 					let resetDateString = itemDateFormatter.stringFromDate(resetDate)
 
 					showMessage("\(apiLabel) API request usage is over the limit!",
 						"Your request cannot be completed until GitHub resets your hourly API allowance at \(resetDateString).\n\nIf you get this error often, try to make fewer manual refreshes or reducing the number of repos you are monitoring.\n\nYou can check your API usage at any time from the bottom of the preferences pane at any time.")
 				} else if apiServer.shouldReportCloseToApiLimit {
-					let apiLabel = apiServer.label ?? "NoApiServerLabel"
+					let apiLabel = S(apiServer.label)
 					let resetDateString = itemDateFormatter.stringFromDate(resetDate)
 
 					showMessage("\(apiLabel) API request usage is close to full",
