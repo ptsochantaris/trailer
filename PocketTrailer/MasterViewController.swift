@@ -345,26 +345,26 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			reloadDataWithAnimation(false)
 		}
 
+		var oid: NSManagedObjectID?
+
 		if let p = relatedItem as? PullRequest {
 			viewMode = .PullRequests
-			detailViewController.catchupWithDataItemWhenLoaded = p.objectID
+			oid = p.objectID
 			if let ip = fetchedResultsController.indexPathForObject(p) {
 				tableView.selectRowAtIndexPath(ip, animated: false, scrollPosition: UITableViewScrollPosition.Middle)
 			}
 		} else if let i = relatedItem as? Issue {
 			viewMode = .Issues
-			detailViewController.catchupWithDataItemWhenLoaded = i.objectID
+			oid = i.objectID
 			if let ip = fetchedResultsController.indexPathForObject(i) {
 				tableView.selectRowAtIndexPath(ip, animated: false, scrollPosition: UITableViewScrollPosition.Middle)
 			}
 		}
 
-		if let u = urlToOpen {
-			detailViewController.detailItem = NSURL(string: u)
-			if !detailViewController.isVisible {
-				showTabBar(false, animated: true)
-				showDetailViewController(detailViewController.navigationController!, sender: self)
-			}
+		if let u = urlToOpen, url = NSURL(string: u) {
+			showDetail(url, objectId: oid)
+		} else {
+			showDetail(nil, objectId: nil)
 		}
 	}
 
@@ -404,21 +404,15 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 				if let pr = comment.pullRequest {
 					viewMode = .PullRequests
 					ip = fetchedResultsController.indexPathForObject(pr)
-					detailViewController.catchupWithDataItemWhenLoaded = nil
 					pr.catchUpWithComments()
 				} else if let issue = comment.issue {
 					viewMode = .Issues
 					ip = fetchedResultsController.indexPathForObject(issue)
-					detailViewController.catchupWithDataItemWhenLoaded = nil
 					issue.catchUpWithComments()
 				}
 				if let i = ip {
 					tableView.selectRowAtIndexPath(i, animated: false, scrollPosition: UITableViewScrollPosition.Middle)
-					detailViewController.detailItem = NSURL(string: url)
-					if !detailViewController.isVisible {
-						showTabBar(false, animated: true)
-						showDetailViewController(detailViewController.navigationController!, sender: self)
-					}
+					showDetail(NSURL(string: url), objectId: nil)
 				}
 			}
 		}
@@ -468,13 +462,17 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			UIApplication.sharedApplication().openURL(url)
 			return true
 		} else {
-			detailViewController.detailItem = url
-			detailViewController.catchupWithDataItemWhenLoaded = oid
-			if !detailViewController.isVisible {
-				showTabBar(false, animated: true)
-				showDetailViewController(detailViewController.navigationController!, sender: self)
-			}
+			showDetail(url, objectId: oid)
 			return false
+		}
+	}
+
+	private func showDetail(url: NSURL?, objectId: NSManagedObjectID?) {
+		detailViewController.catchupWithDataItemWhenLoaded = objectId
+		detailViewController.detailItem = url
+		if !detailViewController.isVisible, let n = detailViewController.navigationController {
+			showTabBar(false, animated: true)
+			showDetailViewController(n, sender: self)
 		}
 	}
 

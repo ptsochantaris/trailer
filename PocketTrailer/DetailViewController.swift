@@ -6,14 +6,14 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 	@IBOutlet weak var spinner: UIActivityIndicatorView!
 	@IBOutlet weak var statusLabel: UILabel!
 
-	private var _webView: WKWebView?
+	private var webView: WKWebView?
 
 	var isVisible: Bool = false
 	var catchupWithDataItemWhenLoaded : NSManagedObjectID?
 
 	var detailItem: NSURL? {
 		didSet {
-			if detailItem != oldValue && _webView != nil {
+			if detailItem != oldValue {
 				configureView()
 			}
 		}
@@ -25,37 +25,32 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 		title = "Loading..."
 
 		let webConfiguration = WKWebViewConfiguration()
-		_webView = WKWebView(frame: view.bounds, configuration: webConfiguration)
-		_webView!.navigationDelegate = self
-		_webView!.scrollView.contentInset = UIEdgeInsetsMake(64, 0, 0, 0)
-		_webView!.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
-		_webView!.translatesAutoresizingMaskIntoConstraints = true
-		_webView!.hidden = true
-		view.addSubview(_webView!)
+		let w = WKWebView(frame: view.bounds, configuration: webConfiguration)
+		w.navigationDelegate = self
+		w.scrollView.contentInset = UIEdgeInsetsMake(64, 0, 0, 0)
+		w.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+		w.hidden = true
+		view.addSubview(w)
 
-		if detailItem == nil {
-			showEmpty()
-		} else {
-			configureView()
-		}
+		webView = w
+
+		configureView()
 	}
 
 	func configureView() {
-		if let d = detailItem {
-			DLog("Will load: %@", d.absoluteString)
-			_webView!.loadRequest(NSURLRequest(URL: d))
-		} else {
-			showEmpty()
+		if let w = webView {
+			if let d = detailItem {
+				DLog("Will load: %@", d.absoluteString)
+				w.loadRequest(NSURLRequest(URL: d))
+			} else {
+				statusLabel.textColor = UIColor.lightGrayColor()
+				statusLabel.text = "Please select an item from the list, or select 'Settings' to add servers, or show/hide repositories.\n\n(You may have to login to GitHub the first time you visit a private item)"
+				statusLabel.hidden = false
+				navigationItem.rightBarButtonItem?.enabled = false
+				title = nil
+				w.hidden = true
+			}
 		}
-	}
-
-	private func showEmpty() {
-		statusLabel.textColor = UIColor.lightGrayColor()
-		statusLabel.text = "Please select an item from the list on the left, or select 'Settings' to add servers, or show/hide repositories.\n\n(You may have to login to GitHub the first time you visit a private item)"
-		statusLabel.hidden = false
-		navigationItem.rightBarButtonItem?.enabled = false
-		title = nil
-		_webView?.hidden = true
 	}
 
 	override func traitCollectionDidChange(previousTraitCollection: UITraitCollection?) {
@@ -65,9 +60,9 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 
 	override func viewWillAppear(animated: Bool) {
 		super.viewWillAppear(animated)
-		if _webView != nil && _webView!.loading {
+		if let w = webView where w.loading {
 			spinner.startAnimating()
-		} else {
+		} else { // Same item re-selected
 			spinner.stopAnimating()
 			catchupWithComments()
 		}
@@ -83,7 +78,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 		spinner.startAnimating()
 		statusLabel.hidden = true
 		statusLabel.text = ""
-		_webView?.hidden = true
+		webView.hidden = true
 		title = "Loading..."
 		navigationItem.rightBarButtonItem = nil
 		api.networkIndicationStart()
@@ -100,24 +95,23 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 	func webView(webView: WKWebView, didFinishNavigation navigation: WKNavigation!) {
 		spinner.stopAnimating()
 		statusLabel.hidden = true
-		_webView?.hidden = false
+		webView.hidden = false
 		navigationItem.rightBarButtonItem?.enabled = true
-		title = _webView?.title
+		title = webView.title
 		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Action, target: self, action: #selector(DetailViewController.shareSelected))
 		api.networkIndicationEnd()
 
 		catchupWithComments()
 	}
 
-	private func catchupWithComments()
-	{
+	private func catchupWithComments() {
 		if let oid = catchupWithDataItemWhenLoaded, dataItem = existingObjectWithID(oid) as? ListableItem {
-			catchupWithDataItemWhenLoaded = nil
 			if let count = dataItem.unreadComments?.integerValue where count > 0 {
 				dataItem.catchUpWithComments()
 				DataManager.saveDB()
 			}
 		}
+		catchupWithDataItemWhenLoaded = nil
 	}
 
 	func webView(webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: NSError) {
@@ -133,15 +127,14 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 		statusLabel.textColor = UIColor.redColor()
 		statusLabel.text = "Loading Error: " + error.localizedDescription
 		statusLabel.hidden = false
-		_webView?.hidden = true
+		webView?.hidden = true
 		title = "Error"
 		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Refresh, target: self, action: #selector(DetailViewController.configureView))
 		api.networkIndicationEnd()
 	}
 
-
 	func shareSelected() {
-		if let u = _webView?.URL {
+		if let u = webView?.URL {
 			popupManager.shareFromView(self, buttonItem: navigationItem.rightBarButtonItem!, url: u)
 		}
 	}
