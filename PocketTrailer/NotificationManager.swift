@@ -13,18 +13,9 @@ final class NotificationManager {
 
 	class func handleUserActivity(activity: NSUserActivity) -> Bool {
 
-		if let info = activity.userInfo,
-			uid = info["kCSSearchableItemActivityIdentifier"] as? String,
-			oid = DataManager.idForUriPath(uid),
-			item = existingObjectWithID(oid) {
-
-				let m = popupManager.getMasterController()
-				if item is PullRequest {
-					m.openPrWithId(uid)
-				} else {
-					m.openIssueWithId(uid)
-				}
-				return true
+		if let info = activity.userInfo, uid = info["kCSSearchableItemActivityIdentifier"] as? String {
+			popupManager.getMasterController().openItemWithUriPath(uid)
+			return true
 		}
 		return false
 	}

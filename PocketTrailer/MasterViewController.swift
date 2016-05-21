@@ -102,14 +102,8 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	func markAllAsRead() {
-		if viewMode == .PullRequests {
-			for p in fetchedResultsController.fetchedObjects as! [PullRequest] {
-				p.catchUpWithComments()
-			}
-		} else {
-			for p in fetchedResultsController.fetchedObjects as! [Issue] {
-				p.catchUpWithComments()
-			}
+		for i in fetchedResultsController.fetchedObjects as! [ListableItem] {
+			i.catchUpWithComments()
 		}
 		DataManager.saveDB()
 	}
@@ -347,17 +341,11 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		var oid: NSManagedObjectID?
 
-		if let p = relatedItem as? PullRequest {
-			viewMode = .PullRequests
-			oid = p.objectID
-			if let ip = fetchedResultsController.indexPathForObject(p) {
-				tableView.selectRowAtIndexPath(ip, animated: false, scrollPosition: UITableViewScrollPosition.Middle)
-			}
-		} else if let i = relatedItem as? Issue {
-			viewMode = .Issues
+		if let i = relatedItem {
+			viewMode = i is PullRequest ? .PullRequests : .Issues
 			oid = i.objectID
 			if let ip = fetchedResultsController.indexPathForObject(i) {
-				tableView.selectRowAtIndexPath(ip, animated: false, scrollPosition: UITableViewScrollPosition.Middle)
+				tableView.selectRowAtIndexPath(ip, animated: false, scrollPosition: .Middle)
 			}
 		}
 
@@ -368,28 +356,15 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 	}
 
-	func openPrWithId(prId: String) {
-		viewMode = .PullRequests
+	func openItemWithUriPath(uriPath: String) {
 		if let
-			pullRequestId = DataManager.idForUriPath(prId),
-			pr = existingObjectWithID(pullRequestId) as? PullRequest,
-			ip = fetchedResultsController.indexPathForObject(pr)
+			itemId = DataManager.idForUriPath(uriPath),
+			item = existingObjectWithID(itemId) as? ListableItem,
+			ip = fetchedResultsController.indexPathForObject(item)
 		{
-			pr.catchUpWithComments()
-			tableView.selectRowAtIndexPath(ip, animated: false, scrollPosition: UITableViewScrollPosition.Middle)
-			tableView(tableView, didSelectRowAtIndexPath: ip)
-		}
-	}
-
-	func openIssueWithId(iId: String) {
-		viewMode = .Issues
-		if let
-			issueId = DataManager.idForUriPath(iId),
-			issue = existingObjectWithID(issueId) as? Issue,
-			ip = fetchedResultsController.indexPathForObject(issue)
-		{
-			issue.catchUpWithComments()
-			tableView.selectRowAtIndexPath(ip, animated: false, scrollPosition: UITableViewScrollPosition.Middle)
+			viewMode = item is PullRequest ? .PullRequests : .Issues
+			item.catchUpWithComments()
+			tableView.selectRowAtIndexPath(ip, animated: false, scrollPosition: .Middle)
 			tableView(tableView, didSelectRowAtIndexPath: ip)
 		}
 	}
@@ -411,7 +386,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 					issue.catchUpWithComments()
 				}
 				if let i = ip {
-					tableView.selectRowAtIndexPath(i, animated: false, scrollPosition: UITableViewScrollPosition.Middle)
+					tableView.selectRowAtIndexPath(i, animated: false, scrollPosition: .Middle)
 					showDetail(NSURL(string: url), objectId: nil)
 				}
 			}
@@ -437,6 +412,18 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+
+		func openItem(item: ListableItem, url: NSURL, oid: NSManagedObjectID) -> Bool {
+			if Settings.openItemsDirectlyInSafari && !detailViewController.isVisible {
+				item.catchUpWithComments()
+				UIApplication.sharedApplication().openURL(url)
+				return true
+			} else {
+				showDetail(url, objectId: oid)
+				return false
+			}
+		}
+
 		if viewMode == .PullRequests, let
 			p = fetchedResultsController.objectAtIndexPath(indexPath) as? PullRequest,
 			u = p.urlForOpening(),
@@ -453,17 +440,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			if openItem(i, url: url, oid: i.objectID) {
 				tableView.deselectRowAtIndexPath(indexPath, animated: true)
 			}
-		}
-	}
-
-	private func openItem(item: ListableItem, url: NSURL, oid: NSManagedObjectID) -> Bool {
-		if Settings.openItemsDirectlyInSafari && !detailViewController.isVisible {
-			item.catchUpWithComments()
-			UIApplication.sharedApplication().openURL(url)
-			return true
-		} else {
-			showDetail(url, objectId: oid)
-			return false
 		}
 	}
 
@@ -569,12 +545,11 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		let type = viewMode == .PullRequests ? "PullRequest" : "Issue"
 		let fetchRequest = ListableItem.requestForItemsOfType(type, withFilter: searchField.text, sectionIndex: -1)
 
-		let aFetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: mainObjectContext, sectionNameKeyPath: "sectionName", cacheName: nil)
-		aFetchedResultsController.delegate = self
-		_fetchedResultsController = aFetchedResultsController
-
-		try! aFetchedResultsController.performFetch()
-		return aFetchedResultsController
+		let c = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: mainObjectContext, sectionNameKeyPath: "sectionName", cacheName: nil)
+		_fetchedResultsController = c
+		c.delegate = self
+		try! c.performFetch()
+		return c
 	}
 
 	func controllerWillChangeContent(controller: NSFetchedResultsController) {

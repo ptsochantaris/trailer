@@ -18,20 +18,18 @@ final class WatchManager : NSObject, WCSessionDelegate {
 	}
 
 	func updateContext() {
-		do {
-			let overview = buildOverview()
-			try session?.updateApplicationContext(["overview": overview])
-			(overview as NSDictionary).writeToURL(sharedFilesDirectory().URLByAppendingPathComponent("overview.plist"), atomically: true)
-		} catch {}
+		let overview = buildOverview()
+		_ = try? session?.updateApplicationContext(["overview": overview])
+		(overview as NSDictionary).writeToURL(sharedFilesDirectory().URLByAppendingPathComponent("overview.plist"), atomically: true)
 	}
 
-	func startBGTask() {
+	private func startBGTask() {
 		backgroundTask = UIApplication.sharedApplication().beginBackgroundTaskWithName("com.housetrip.Trailer.watchrequest") { [weak self] in
 			self?.endBGTask()
 		}
 	}
 
-	func endBGTask() {
+	private func endBGTask() {
 		if backgroundTask != UIBackgroundTaskInvalid {
 			UIApplication.sharedApplication().endBackgroundTask(backgroundTask)
 			backgroundTask = UIBackgroundTaskInvalid
@@ -59,26 +57,16 @@ final class WatchManager : NSObject, WCSessionDelegate {
 					}
 				}
 
-			case "openpr":
+			case "openpr", "openissue":
 				if let itemId = message["localId"] as? String {
-					let m = popupManager.getMasterController()
-					m.openPrWithId(itemId)
-					DataManager.saveDB()
-				}
-				s.processList(message, replyHandler)
-
-			case "openissue":
-				if let itemId = message["localId"] as? String {
-					let m = popupManager.getMasterController()
-					m.openIssueWithId(itemId)
+					popupManager.getMasterController().openItemWithUriPath(itemId)
 					DataManager.saveDB()
 				}
 				s.processList(message, replyHandler)
 
 			case "opencomment":
 				if let itemId = message["id"] as? String {
-					let m = popupManager.getMasterController()
-					m.openCommentWithId(itemId)
+					popupManager.getMasterController().openCommentWithId(itemId)
 					DataManager.saveDB()
 				}
 				s.processList(message, replyHandler)
@@ -91,11 +79,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				app.clearAllClosed()
 				s.processList(message, replyHandler)
 
-			case "markPrRead":
-				app.markItemAsRead(message["localId"] as? String, reloadView: true)
-				s.processList(message, replyHandler)
-
-			case "markIssueRead":
+			case "markPrRead", "markIssueRead":
 				app.markItemAsRead(message["localId"] as? String, reloadView: true)
 				s.processList(message, replyHandler)
 
@@ -182,31 +166,34 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	private func buildItemList(type: String, sectionIndex: Int, from: Int, count: Int, replyHandler: ([String : AnyObject]) -> Void) {
 
-		var items = [[String : AnyObject]]()
-
-		let sectionIndex = Section(rawValue: sectionIndex)!
-
+		let showLabels = Settings.showLabels
+		let showStatuses: Bool
 		let f: NSFetchRequest
-		var showStatuses = false
+
 		if type == "prs" {
-			f = ListableItem.requestForItemsOfType("PullRequest", withFilter: nil, sectionIndex: sectionIndex.rawValue)
 			showStatuses = Settings.showStatusItems
+			f = ListableItem.requestForItemsOfType("PullRequest", withFilter: nil, sectionIndex: sectionIndex)
 		} else {
-			f = ListableItem.requestForItemsOfType("Issue", withFilter: nil, sectionIndex: sectionIndex.rawValue)
+			showStatuses = false
+			f = ListableItem.requestForItemsOfType("Issue", withFilter: nil, sectionIndex: sectionIndex)
 		}
 		f.fetchOffset = from
 		f.fetchLimit = count
+
 		let tempMoc = NSManagedObjectContext(concurrencyType: .MainQueueConcurrencyType)
 		tempMoc.persistentStoreCoordinator = mainObjectContext.persistentStoreCoordinator
 		tempMoc.undoManager = nil
 		let r = try! tempMoc.executeFetchRequest(f) as! [ListableItem]
+
+		var items = [[String : AnyObject]]()
 		for item in r {
-			items.append(self.baseDataForItem(item, showStatuses: showStatuses))
+			items.append(baseDataForItem(item, showStatuses: showStatuses, showLabels: showLabels))
 		}
 		replyHandler(["result" : items])
 	}
 
-	private func baseDataForItem(item: ListableItem, showStatuses: Bool) -> [String : AnyObject] {
+	private func baseDataForItem(item: ListableItem, showStatuses: Bool, showLabels: Bool) -> [String : AnyObject] {
+
 		var itemData = [
 			"commentCount": item.totalComments ?? 0,
 			"unreadCount": item.unreadComments ?? 0,
@@ -215,24 +202,27 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 		let font = UIFont.systemFontOfSize(UIFont.systemFontSize())
 		let smallFont = UIFont.systemFontOfSize(UIFont.systemFontSize()-4)
-		itemData["title"] = toData(item.titleWithFont(font, labelFont: font, titleColor: UIColor.whiteColor()))
-		if item is PullRequest {
-			itemData["subtitle"] = toData((item as! PullRequest).subtitleWithFont(smallFont, lightColor: UIColor.lightGrayColor(), darkColor: UIColor.grayColor()))
-		} else {
-			itemData["subtitle"] = toData((item as! Issue).subtitleWithFont(smallFont, lightColor: UIColor.lightGrayColor(), darkColor: UIColor.grayColor()))
+		let lightGray = UIColor.lightGrayColor()
+		let gray = UIColor.grayColor()
+
+		let title = item.titleWithFont(font, labelFont: font, titleColor: UIColor.whiteColor())
+		itemData["title"] = NSKeyedArchiver.archivedDataWithRootObject(title)
+
+		if let i = item as? PullRequest {
+			let subtitle = i.subtitleWithFont(smallFont, lightColor: lightGray, darkColor: gray)
+			itemData["subtitle"] = NSKeyedArchiver.archivedDataWithRootObject(subtitle)
+		} else if let i = item as? Issue {
+			let subtitle = i.subtitleWithFont(smallFont, lightColor: lightGray, darkColor: gray)
+			itemData["subtitle"] = NSKeyedArchiver.archivedDataWithRootObject(subtitle)
 		}
 
-		if Settings.showLabels {
+		if showLabels {
 			itemData["labels"] = labelsForItem(item)
 		}
 		if showStatuses {
 			itemData["statuses"] = statusLinesForPr(item as! PullRequest)
 		}
 		return itemData
-	}
-
-	private func toData(s: NSAttributedString) -> NSData {
-		return NSKeyedArchiver.archivedDataWithRootObject(s)
 	}
 
 	private func labelsForItem(item: ListableItem) -> [[String : AnyObject]] {
@@ -262,7 +252,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 	private func buildItemDetail(localId: String) -> [String : AnyObject]? {
 		if let oid = DataManager.idForUriPath(localId), item = existingObjectWithID(oid) as? ListableItem {
 			let showStatuses = (item is PullRequest) ? Settings.showStatusItems : false
-			var result = baseDataForItem(item, showStatuses: showStatuses)
+			var result = baseDataForItem(item, showStatuses: showStatuses, showLabels: Settings.showLabels)
 			result["description"] = item.body
 			result["comments"] = commentsForItem(item)
 			return result

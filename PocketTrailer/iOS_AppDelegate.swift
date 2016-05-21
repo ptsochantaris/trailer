@@ -269,6 +269,16 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 				DataManager.saveDB() // Ensure object IDs are permanent before sending notifications
 				DataManager.sendNotificationsIndexAndSave()
 
+				if !success && UIApplication.sharedApplication().applicationState == .Active {
+					showMessage("Refresh failed", "Loading the latest data from GitHub failed")
+				}
+
+				s.refreshTimer = NSTimer.scheduledTimerWithTimeInterval(NSTimeInterval(Settings.refreshPeriod), target: s, selector: #selector(iOS_AppDelegate.refreshTimerDone), userInfo: nil, repeats:false)
+				DLog("Refresh done")
+
+				s.updateBadge()
+				s.endBGTask()
+
 				if let bc = s.backgroundCallback {
 					if success && mainObjectContext.hasChanges {
 						DLog("Background fetch: Got new data")
@@ -282,16 +292,6 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 					}
 					s.backgroundCallback = nil
 				}
-
-				if !success && UIApplication.sharedApplication().applicationState==UIApplicationState.Active {
-					showMessage("Refresh failed", "Loading the latest data from GitHub failed")
-				}
-
-				s.refreshTimer = NSTimer.scheduledTimerWithTimeInterval(NSTimeInterval(Settings.refreshPeriod), target: s, selector: #selector(iOS_AppDelegate.refreshTimerDone), userInfo: nil, repeats:false)
-				DLog("Refresh done")
-
-				s.updateBadge()
-				s.endBGTask()
 			}
 		}
 
