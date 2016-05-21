@@ -319,10 +319,10 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	private func prCountsForSection(section: Section) -> [String : Int] {
 		return ["total": PullRequest.countRequestsInSection(section, moc: mainObjectContext),
-				"unread": PullRequest.badgeCountInSection(section, moc: mainObjectContext)];
+				"unread": PullRequest.badgeCountInSection(section, moc: mainObjectContext)]
 	}
 	private func issueCountsForSection(section: Section) -> [String : Int] {
 		return ["total": Issue.countIssuesInSection(section, moc: mainObjectContext),
-				"unread": Issue.badgeCountInSection(section, moc: mainObjectContext)];
+				"unread": Issue.badgeCountInSection(section, moc: mainObjectContext)]
 	}
 }

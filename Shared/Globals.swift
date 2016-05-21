@@ -225,6 +225,13 @@ import UIKit
 		b *= 255.0
 		return NSString(format: "%02X%02X%02X", Int(r), Int(g), Int(b)) as String
 	}
+
+#elseif os(OSX)
+
+	func hasModifier(event: NSEvent, _ modifier: NSEventModifierFlags) -> Bool {
+		return (event.modifierFlags.intersect(modifier)) == modifier
+	}
+
 #endif
 
 func versionString() -> String {

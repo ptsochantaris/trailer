@@ -42,11 +42,7 @@ final class StatusItemView: NSView {
 
 	override func drawRect(dirtyRect: NSRect) {
 
-		if app.prMenu.statusItem?.view==self {
-			app.prMenu.statusItem!.drawStatusBarBackgroundInRect(dirtyRect, withHighlight: highlighted)
-		} else {
-			app.issuesMenu.statusItem!.drawStatusBarBackgroundInRect(dirtyRect, withHighlight: highlighted)
-		}
+		app.statusItemWithView(self)?.drawStatusBarBackgroundInRect(dirtyRect, withHighlight: highlighted)
 
 		let imagePoint = NSMakePoint(STATUSITEM_PADDING, 0)
 		let labelRect = CGRectMake(bounds.size.height + labelOffset, -5, bounds.size.width, bounds.size.height)

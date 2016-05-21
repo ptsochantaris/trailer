@@ -267,7 +267,7 @@ class ListableItem: DataItem {
 							unreadCommentCount += 1
 						}
 					} else {
-						unreadCommentCount += 1;
+						unreadCommentCount += 1
 					}
 				}
 			}

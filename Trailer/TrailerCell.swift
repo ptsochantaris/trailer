@@ -36,7 +36,7 @@ class TrailerCell: NSTableCellView {
 	var selected: Bool = false {
 		didSet {
 
-			let table = app.prMenu.visible ? app.prMenu.table : app.issuesMenu.table
+			guard let table = app.visibleWindow()?.table else { return }
 
 			var finalColor: NSColor = unselectedTitleColor
 			if selected {
@@ -307,7 +307,7 @@ class TrailerCell: NSTableCellView {
 			cc.addSubview(alertCount)
 			addSubview(cc)
 
-			newBackground = cc;
+			newBackground = cc
 		}
 
 		highlight(false)

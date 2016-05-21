@@ -406,8 +406,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction func useVibrancySelected(sender: NSButton) {
 		Settings.useVibrancy = (sender.integerValue==1)
-		app.prMenu.updateVibrancy()
-		app.issuesMenu.updateVibrancy()
+		app.updateVibrancies()
 	}
 
 	@IBAction func logActivityToConsoleSelected(sender: NSButton) {
@@ -514,7 +513,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	private func updateHistoryOptions() {
-		dontKeepPrsMergedByMe.enabled = Settings.mergeHandlingPolicy != HandlingPolicy.KeepNone.rawValue;
+		dontKeepPrsMergedByMe.enabled = Settings.mergeHandlingPolicy != HandlingPolicy.KeepNone.rawValue
 	}
 
 	@IBAction func grayOutWhenRefreshingSelected(sender: NSButton) {
@@ -736,7 +735,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	@IBAction func assignedPrHandlingPolicySelected(sender: NSPopUpButton) {
-		Settings.assignedPrHandlingPolicy = sender.indexOfSelectedItem;
+		Settings.assignedPrHandlingPolicy = sender.indexOfSelectedItem
 		DataManager.postProcessAllItems()
 		app.deferredUpdateTimer.push()
 	}

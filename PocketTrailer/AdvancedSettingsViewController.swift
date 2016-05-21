@@ -529,7 +529,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				valuesToPush = HandlingPolicy.labels
 				performSegueWithIdentifier("showPicker", sender: self)
 			case 1:
-				selectedIndexPath = indexPath;
+				selectedIndexPath = indexPath
 				previousValue = Settings.closeHandlingPolicy
 				pickerName = S(tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text)
 				valuesToPush = HandlingPolicy.labels

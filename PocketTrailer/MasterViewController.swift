@@ -266,7 +266,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 							options: .CurveEaseInOut,
 							animations: {
 								t.transform = CGAffineTransformIdentity
-							}, completion: nil);
+							}, completion: nil)
 					}
 				}
 			}

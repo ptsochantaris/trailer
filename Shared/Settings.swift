@@ -240,7 +240,7 @@ final class Settings {
 
 	class func resetAllSettings() {
 		for k in allFields() {
-			_settings_shared.removeObjectForKey(k);
+			_settings_shared.removeObjectForKey(k)
 		}
 		_settings_shared.synchronize()
 		clearCache()
@@ -421,7 +421,7 @@ final class Settings {
 		set { set("SORT_ORDER_KEY", newValue) }
 	}
 
-	static let showCreatedInsteadOfUpdatedHelp = "Trailer will usually display the time of the most recent activity in an item, such as comments. This setting replaces that with the orignal creation time of the item. Together with the sorting options, this is useful for helping prioritise items based on how old, or new, they are.";
+	static let showCreatedInsteadOfUpdatedHelp = "Trailer will usually display the time of the most recent activity in an item, such as comments. This setting replaces that with the orignal creation time of the item. Together with the sorting options, this is useful for helping prioritise items based on how old, or new, they are."
 	class var showCreatedInsteadOfUpdated: Bool {
 		get { return get("SHOW_UPDATED_KEY") as? Bool ?? false }
 		set { set("SHOW_UPDATED_KEY", newValue) }

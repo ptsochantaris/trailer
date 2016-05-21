@@ -3,11 +3,11 @@ var app: OSX_AppDelegate!
 
 final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUserNotificationCenterDelegate, NSOpenSavePanelDelegate {
 
-	// Menu
+	// Menus
 	private static let prMenuController = NSWindowController(windowNibName:"MenuWindow")
+	private let prMenu = prMenuController.window as! MenuWindow
 	private static let issuesMenuController = NSWindowController(windowNibName:"MenuWindow")
-	let prMenu = prMenuController.window as! MenuWindow
-	let issuesMenu = issuesMenuController.window as! MenuWindow
+	private let issuesMenu = issuesMenuController.window as! MenuWindow
 
 	// Globals
 	weak var refreshTimer: NSTimer?
@@ -102,7 +102,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			for notification in nc.deliveredNotifications {
 				if notification.additionalActions != nil && notification.identifier == nil {
 					nc.removeAllDeliveredNotifications()
-					break;
+					break
 				}
 			}
 		}
@@ -110,11 +110,11 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 	func systemWillSleep() {
 		systemSleeping = true
-		DLog("System is going to sleep");
+		DLog("System is going to sleep")
 	}
 
 	func systemDidWake() {
-		DLog("System woke up");
+		DLog("System woke up")
 		systemSleeping = false
 		delay(1, self) { S in
 			S.startRefreshIfItIsDue()
@@ -309,7 +309,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		let urlToOpen = item.urlForOpening()
 		item.catchUpWithComments()
 
-		var window: MenuWindow
+		let window: MenuWindow
 
 		if item is PullRequest {
 			updatePrMenu()
@@ -333,9 +333,9 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 	func showMenu(menu: MenuWindow) {
 		if !menu.visible, let v = menu.statusItem?.view as? StatusItemView {
-			if menu == prMenu && issuesMenu.visible {
+			if menu === prMenu && issuesMenu.visible {
 				closeMenu(issuesMenu)
-			} else if menu == issuesMenu && prMenu.visible {
+			} else if menu === issuesMenu && prMenu.visible {
 				closeMenu(prMenu)
 			}
 			v.highlighted = true
@@ -356,11 +356,11 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			for s in NSScreen.screens() ?? [] {
 				if CGRectContainsRect(s.frame, siv.window!.frame) {
 					screen = s
-					break;
+					break
 				}
 			}
 
-			if(screen==nil) {
+			if screen == nil {
 				return
 			}
 
@@ -374,7 +374,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			var menuHeight = TOP_HEADER_HEIGHT
 			let rowCount = window.table.numberOfRows
 			let screenHeight = screen!.visibleFrame.size.height
-			if rowCount==0 {
+			if rowCount == 0 {
 				menuHeight += 95
 			} else {
 				menuHeight += 10
@@ -417,9 +417,9 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 	func sectionHeaderRemoveSelected(headerTitle: String) {
 
-		let inMenu = prMenu.visible ? prMenu : issuesMenu
+		let inMenu = visibleWindow()
 
-		if inMenu == prMenu {
+		if inMenu === prMenu {
 			if headerTitle == Section.Merged.prMenuName() {
 				if Settings.dontAskBeforeWipingMerged {
 					removeAllMergedRequests()
@@ -433,7 +433,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					alert.addButtonWithTitle("Yes")
 					alert.showsSuppressionButton = true
 
-					if alert.runModal()==NSAlertSecondButtonReturn {
+					if alert.runModal() == NSAlertSecondButtonReturn {
 						removeAllMergedRequests()
 						if alert.suppressionButton!.state == NSOnState {
 							Settings.dontAskBeforeWipingMerged = true
@@ -453,7 +453,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					alert.addButtonWithTitle("Yes")
 					alert.showsSuppressionButton = true
 
-					if alert.runModal()==NSAlertSecondButtonReturn {
+					if alert.runModal() == NSAlertSecondButtonReturn {
 						removeAllClosedRequests()
 						if alert.suppressionButton!.state == NSOnState {
 							Settings.dontAskBeforeWipingClosed = true
@@ -464,7 +464,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			if !prMenu.visible {
 				showMenu(prMenu)
 			}
-		} else if inMenu == issuesMenu {
+		} else if inMenu === issuesMenu {
 			if headerTitle == Section.Closed.issuesMenuName() {
 				if Settings.dontAskBeforeWipingClosed {
 					removeAllClosedIssues()
@@ -478,7 +478,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					alert.addButtonWithTitle("Yes")
 					alert.showsSuppressionButton = true
 
-					if alert.runModal()==NSAlertSecondButtonReturn {
+					if alert.runModal() == NSAlertSecondButtonReturn {
 						removeAllClosedIssues()
 						if alert.suppressionButton!.state == NSOnState {
 							Settings.dontAskBeforeWipingClosed = true
@@ -528,9 +528,9 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 	override func controlTextDidChange(n: NSNotification) {
 		if let obj = n.object as? NSSearchField {
-			if obj===prMenu.filter {
+			if obj === prMenu.filter {
 				prFilterTimer.push()
-			} else if obj===issuesMenu.filter {
+			} else if obj === issuesMenu.filter {
 				issuesFilterTimer.push()
 			}
 		}
@@ -594,7 +594,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			alert.addButtonWithTitle("No")
 			alert.addButtonWithTitle("Yes")
 			alert.showsSuppressionButton = true
-			if alert.runModal()==NSAlertSecondButtonReturn {
+			if alert.runModal() == NSAlertSecondButtonReturn {
 				if alert.suppressionButton!.state == NSOnState {
 					Settings.dontConfirmSettingsImport = true
 				}
@@ -840,7 +840,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 		if updateStatusItem {
 			atNextEvent(self) { S in
-				DLog("Updating issues status item");
+				DLog("Updating issues status item")
 				let im = S.issuesMenu
 				let siv = StatusItemView(frame: CGRectMake(0, 0, length+2, H), label: countString, prefix: "issues", attributes: attributes)
 				siv.labelOffset = 2
@@ -922,7 +922,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
         if updateStatusItem {
 			atNextEvent(self) { S in
-				DLog("Updating PR status item");
+				DLog("Updating PR status item")
 				let pm = S.prMenu
 				let siv = StatusItemView(frame: CGRectMake(0, 0, length, H), label: countString, prefix: "pr", attributes: attributes)
 				siv.highlighted = pm.visible
@@ -993,9 +993,11 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			return
 		}
 
-		localKeyMonitor = NSEvent.addLocalMonitorForEventsMatchingMask(NSEventMask.KeyDownMask) { [weak self] (incomingEvent) -> NSEvent! in
+		localKeyMonitor = NSEvent.addLocalMonitorForEventsMatchingMask(NSEventMask.KeyDownMask) { [weak self] (incomingEvent) -> NSEvent? in
 
-			if self?.checkForHotkey(incomingEvent) ?? false {
+			guard let S = self else { return incomingEvent }
+
+			if S.checkForHotkey(incomingEvent) ?? false {
 				return nil
 			}
 
@@ -1004,43 +1006,40 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 				switch incomingEvent.keyCode {
 				case 123, 124: // left, right
-					if !(
-						(incomingEvent.modifierFlags.intersect(NSEventModifierFlags.CommandKeyMask)) == NSEventModifierFlags.CommandKeyMask
-						&& (incomingEvent.modifierFlags.intersect(NSEventModifierFlags.AlternateKeyMask)) == NSEventModifierFlags.AlternateKeyMask
-						) {
-							return incomingEvent
+					if !(hasModifier(incomingEvent, .CommandKeyMask) && hasModifier(incomingEvent, .AlternateKeyMask)) {
+						return incomingEvent
 					}
 
 					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
 
-					if Repo.interestedInPrs() && Repo.interestedInIssues(), let s = self {
-						if w == s.prMenu {
-							s.showMenu(s.issuesMenu)
-						} else if w == self?.issuesMenu {
-							s.showMenu(s.prMenu)
+					if Repo.interestedInPrs() && Repo.interestedInIssues() {
+						if w === S.prMenu {
+							S.showMenu(S.issuesMenu)
+						} else if w === S.issuesMenu {
+							S.showMenu(S.prMenu)
 						}
 					}
 					return nil
 				case 125: // down
-					if incomingEvent.modifierFlags.intersect(NSEventModifierFlags.ShiftKeyMask) == NSEventModifierFlags.ShiftKeyMask {
+					if hasModifier(incomingEvent, .ShiftKeyMask) {
 						return incomingEvent
 					}
 					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
 					var i = w.table.selectedRow + 1
 					if i < w.table.numberOfRows {
-						while self?.dataItemAtRow(i, inMenu: w) == nil { i += 1 }
-						self?.scrollToIndex(i, inMenu: w)
+						while S.dataItemAtRow(i, inMenu: w) == nil { i += 1 }
+						S.scrollToIndex(i, inMenu: w)
 					}
 					return nil
 				case 126: // up
-					if incomingEvent.modifierFlags.intersect(NSEventModifierFlags.ShiftKeyMask) == NSEventModifierFlags.ShiftKeyMask {
+					if hasModifier(incomingEvent, .ShiftKeyMask) {
 						return incomingEvent
 					}
 					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
 					var i = w.table.selectedRow - 1
 					if i > 0 {
-						while self?.dataItemAtRow(i, inMenu: w) == nil { i -= 1 }
-						self?.scrollToIndex(i, inMenu: w)
+						while S.dataItemAtRow(i, inMenu: w) == nil { i -= 1 }
+						S.scrollToIndex(i, inMenu: w)
 					}
 					return nil
 				case 36: // enter
@@ -1048,13 +1047,13 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 						return incomingEvent
 					}
 					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
-					if let dataItem = self?.dataItemAtRow(w.table.selectedRow, inMenu: w) {
-						let isAlternative = ((incomingEvent.modifierFlags.intersect(NSEventModifierFlags.AlternateKeyMask)) == NSEventModifierFlags.AlternateKeyMask)
-						self?.dataItemSelected(dataItem, alternativeSelect: isAlternative)
+					if let dataItem = S.dataItemAtRow(w.table.selectedRow, inMenu: w) {
+						let isAlternative = hasModifier(incomingEvent, .AlternateKeyMask)
+						S.dataItemSelected(dataItem, alternativeSelect: isAlternative)
 					}
 					return nil
 				case 53: // escape
-					self?.closeMenu(w)
+					S.closeMenu(w)
 					return nil
 				default:
 					break
@@ -1114,34 +1113,22 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	private func checkForHotkey(incomingEvent: NSEvent) -> Bool {
 		var check = 0
 
-		if Settings.hotkeyCommandModifier {
-			check += (incomingEvent.modifierFlags.intersect(NSEventModifierFlags.CommandKeyMask)) == NSEventModifierFlags.CommandKeyMask ? 1 : -1
-		} else {
-			check += (incomingEvent.modifierFlags.intersect(NSEventModifierFlags.CommandKeyMask)) == NSEventModifierFlags.CommandKeyMask ? -1 : 1
-		}
+		let cmdPressed = hasModifier(incomingEvent, .CommandKeyMask)
+		if Settings.hotkeyCommandModifier { check += cmdPressed ? 1 : -1 } else { check += cmdPressed ? -1 : 1 }
 
-		if Settings.hotkeyControlModifier {
-			check += (incomingEvent.modifierFlags.intersect(NSEventModifierFlags.ControlKeyMask)) == NSEventModifierFlags.ControlKeyMask ? 1 : -1
-		} else {
-			check += (incomingEvent.modifierFlags.intersect(NSEventModifierFlags.ControlKeyMask)) == NSEventModifierFlags.ControlKeyMask ? -1 : 1
-		}
+		let ctrlPressed = hasModifier(incomingEvent, .ControlKeyMask)
+		if Settings.hotkeyControlModifier { check += ctrlPressed ? 1 : -1 } else { check += ctrlPressed ? -1 : 1 }
 
-		if Settings.hotkeyOptionModifier {
-			check += (incomingEvent.modifierFlags.intersect(NSEventModifierFlags.AlternateKeyMask)) == NSEventModifierFlags.AlternateKeyMask ? 1 : -1
-		} else {
-			check += (incomingEvent.modifierFlags.intersect(NSEventModifierFlags.AlternateKeyMask)) == NSEventModifierFlags.AlternateKeyMask ? -1 : 1
-		}
+		let altPressed = hasModifier(incomingEvent, .AlternateKeyMask)
+		if Settings.hotkeyOptionModifier { check += altPressed ? 1 : -1 } else { check += altPressed ? -1 : 1 }
 
-		if Settings.hotkeyShiftModifier {
-			check += (incomingEvent.modifierFlags.intersect(NSEventModifierFlags.ShiftKeyMask)) == NSEventModifierFlags.ShiftKeyMask ? 1 : -1
-		} else {
-			check += (incomingEvent.modifierFlags.intersect(NSEventModifierFlags.ShiftKeyMask)) == NSEventModifierFlags.ShiftKeyMask ? -1 : 1
-		}
+		let shiftPressed = hasModifier(incomingEvent, .ShiftKeyMask)
+		if Settings.hotkeyShiftModifier { check += shiftPressed ? 1 : -1 } else { check += shiftPressed ? -1 : 1 }
 
 		let keyMap = [
 			"A": 0, "B": 11, "C": 8, "D": 2, "E": 14, "F": 3, "G": 5, "H": 4, "I": 34, "J": 38,
 			"K": 40, "L": 37, "M": 46, "N": 45, "O": 31, "P": 35, "Q": 12, "R": 15, "S": 1,
-			"T": 17, "U": 32, "V": 9, "W": 13, "X": 7, "Y": 16, "Z": 6 ];
+			"T": 17, "U": 32, "V": 9, "W": 13, "X": 7, "Y": 16, "Z": 6 ]
 
 		if check==4, let n = keyMap[Settings.hotkeyLetter] where incomingEvent.keyCode == UInt16(n) {
 			if Repo.interestedInPrs() {
@@ -1220,6 +1207,27 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	func closedPreferencesWindow() {
 		preferencesWindow = nil
 		preferencesWindowController = nil
+	}
+
+	func statusItemWithView(view: NSView) -> NSStatusItem? {
+		if prMenu.statusItem?.view === view {
+			return prMenu.statusItem
+		}
+		if issuesMenu.statusItem?.view === view {
+			return issuesMenu.statusItem
+		}
+		return nil
+	}
+
+	func visibleWindow() -> MenuWindow? {
+		if prMenu.visible { return prMenu }
+		if issuesMenu.visible { return issuesMenu }
+		return nil
+	}
+
+	func updateVibrancies() {
+		prMenu.updateVibrancy()
+		issuesMenu.updateVibrancy()
 	}
 
 	//////////////////////// Dark mode

@@ -270,14 +270,14 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 		return [
 			NSFontAttributeName: UIFont.systemFontOfSize(UIFont.smallSystemFontSize()-1.0),
 			NSForegroundColorAttributeName: policy.color()
-		];
+		]
 	}
 
 	private func attributesForEntryWithPolicy(policy: RepoHidingPolicy) -> [String : AnyObject] {
 		return [
 			NSFontAttributeName: UIFont.systemFontOfSize(UIFont.smallSystemFontSize()-1.0),
 			NSForegroundColorAttributeName: policy.color()
-		];
+		]
 	}
 
 	///////////////////////////// filtering
