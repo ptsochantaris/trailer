@@ -4,30 +4,28 @@ var app: OSX_AppDelegate!
 final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUserNotificationCenterDelegate, NSOpenSavePanelDelegate {
 
 	// Menu
-	static let prMenuController = NSWindowController(windowNibName:"MenuWindow")
-	static let issuesMenuController = NSWindowController(windowNibName:"MenuWindow")
+	private static let prMenuController = NSWindowController(windowNibName:"MenuWindow")
+	private static let issuesMenuController = NSWindowController(windowNibName:"MenuWindow")
 	let prMenu = prMenuController.window as! MenuWindow
 	let issuesMenu = issuesMenuController.window as! MenuWindow
 
 	// Globals
 	weak var refreshTimer: NSTimer?
-	var lastRepoCheck = never()
-	var preferencesDirty: Bool = false
-	var isRefreshing: Bool = false
-	var isManuallyScrolling: Bool = false
-	var ignoreNextFocusLoss: Bool = false
+	var isManuallyScrolling = false
+	var ignoreNextFocusLoss = false
 	var scrollBarWidth: CGFloat = 0.0
-	var pullRequestDelegate = PullRequestDelegate()
-	var issuesDelegate = IssuesDelegate()
-	var opening: Bool = false
-	var systemSleeping = false
+	var deferredUpdateTimer: PopTimer!
 
+	private var pullRequestDelegate = PullRequestDelegate()
+	private var issuesDelegate = IssuesDelegate()
+
+	private var opening = false
+	private var systemSleeping = false
 	private var globalKeyMonitor: AnyObject?
 	private var localKeyMonitor: AnyObject?
 	private var mouseIgnoreTimer: PopTimer!
 	private var prFilterTimer: PopTimer!
 	private var issuesFilterTimer: PopTimer!
-	var deferredUpdateTimer: PopTimer!
 
 	func applicationDidFinishLaunching(notification: NSNotification) {
 		app = self
@@ -582,7 +580,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	func tryLoadSettings(url: NSURL, skipConfirm: Bool) -> Bool {
-		if isRefreshing {
+		if appIsRefreshing {
 			let alert = NSAlert()
 			alert.messageText = "Trailer is currently refreshing data, please wait until it's done and try importing your settings again"
 			alert.addButtonWithTitle("OK")
@@ -706,7 +704,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		api.expireOldImageCacheEntries()
 		DataManager.postMigrationTasks()
 
-		isRefreshing = true
+		appIsRefreshing = true
 		preferencesWindow?.updateActivity()
 
 		if prMenu.messageView != nil {
@@ -723,7 +721,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	func completeRefresh() {
-		isRefreshing = false
+		appIsRefreshing = false
 		preferencesDirty = false
 		preferencesWindow?.updateActivity()
 		DataManager.saveDB()
@@ -736,7 +734,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	func startRefresh() {
-		if isRefreshing {
+		if appIsRefreshing {
 			DLog("Won't start refresh because refresh is already ongoing")
 			return
 		}
@@ -834,7 +832,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		let H = statusBar.thickness
 		let length = H + width + STATUSITEM_PADDING*3
 		var updateStatusItem = true
-		let shouldGray = Settings.grayOutWhenRefreshing && isRefreshing
+		let shouldGray = Settings.grayOutWhenRefreshing && appIsRefreshing
 
 		if let s = issuesMenu.statusItem?.view as? StatusItemView where compareDict(s.textAttributes, to: attributes) && s.statusLabel == countString && s.grayOut == shouldGray {
 			updateStatusItem = false
@@ -917,7 +915,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		let H = statusBar.thickness
 		let length = H + width + STATUSITEM_PADDING*3
         var updateStatusItem = true
-        let shouldGray = Settings.grayOutWhenRefreshing && isRefreshing
+        let shouldGray = Settings.grayOutWhenRefreshing && appIsRefreshing
 		if let s = prMenu.statusItem?.view as? StatusItemView where compareDict(s.textAttributes, to: attributes) && s.statusLabel == countString && s.grayOut == shouldGray {
 			updateStatusItem = false
 		}

@@ -16,7 +16,7 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 	}
 
 	@IBAction func done(sender: UIBarButtonItem) {
-		if app.preferencesDirty { app.startRefresh() }
+		if preferencesDirty { app.startRefresh() }
 		dismissViewControllerAnimated(true, completion: nil)
 	}
 

@@ -23,7 +23,7 @@ final class AboutTrailerViewController: UIViewController {
 	}
 
 	@IBAction func doneSelected() {
-		if app.preferencesDirty { app.startRefresh() }
+		if preferencesDirty { app.startRefresh() }
 		dismissViewControllerAnimated(true, completion: nil)
 	}
 }

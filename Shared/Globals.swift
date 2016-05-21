@@ -35,6 +35,13 @@ typealias IMAGE_CLASS = NSImage
 
 #endif
 
+////////////////////// Global variables
+var appIsRefreshing = false
+var preferencesDirty = false
+var lastRepoCheck = never()
+
+//////////////////////////
+
 let itemDateFormatter = { () -> NSDateFormatter in
 	let f = NSDateFormatter()
 	f.doesRelativeDateFormatting = true

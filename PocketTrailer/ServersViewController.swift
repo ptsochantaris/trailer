@@ -9,7 +9,7 @@ final class ServersViewController: UITableViewController {
 	private var resetFormatter: NSDateFormatter!
 
 	@IBAction func doneSelected() {
-		if app.preferencesDirty {
+		if preferencesDirty {
 			app.startRefresh()
 		}
 		dismissViewControllerAnimated(true, completion: nil)

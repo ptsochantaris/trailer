@@ -81,7 +81,7 @@ final class MenuWindow: NSWindow {
 	}
 
 	func menuWillOpen(menu: NSMenu) {
-		if !app.isRefreshing {
+		if !appIsRefreshing {
 			refreshMenuItem.title = " Refresh - " + api.lastUpdateDescription()
 		}
 	}

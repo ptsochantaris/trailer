@@ -93,7 +93,7 @@ final class API {
 	/////////////////////////////////////////////////////// Utilities
 
 	func lastUpdateDescription() -> String {
-		if app.isRefreshing {
+		if appIsRefreshing {
 			return "Refreshing..."
 		} else if ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext) {
 			return "Last update failed"
@@ -219,8 +219,8 @@ final class API {
 	func syncItemsForActiveReposAndCallback(callback: Completion) {
 		let syncContext = DataManager.tempContext()
 
-		let shouldRefreshReposToo = app.lastRepoCheck.isEqualToDate(never())
-			|| (NSDate().timeIntervalSinceDate(app.lastRepoCheck) > NSTimeInterval(Settings.newRepoCheckPeriod*3600.0))
+		let shouldRefreshReposToo = lastRepoCheck.isEqualToDate(never())
+			|| (NSDate().timeIntervalSinceDate(lastRepoCheck) > NSTimeInterval(Settings.newRepoCheckPeriod*3600.0))
 			|| (Repo.countVisibleReposInMoc(syncContext)==0)
 
 		if shouldRefreshReposToo {
@@ -529,7 +529,7 @@ final class API {
 							app.postNotificationOfType(.NewRepoAnnouncement, forItem:r)
 						}
 					}
-					app.lastRepoCheck = NSDate()
+					lastRepoCheck = NSDate()
 					callback()
 				}
 			}

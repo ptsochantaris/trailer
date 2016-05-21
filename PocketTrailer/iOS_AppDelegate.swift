@@ -5,17 +5,14 @@ var app: iOS_AppDelegate!
 
 final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 
-	var preferencesDirty: Bool = false
-	var isRefreshing: Bool = false
-	var lastUpdateFailed: Bool = false
-	var enteringForeground: Bool = true
-	var lastRepoCheck = never()
+	var enteringForeground = true
 	var window: UIWindow?
-	var backgroundTask = UIBackgroundTaskInvalid
-	var watchManager: WatchManager?
 
-	var refreshTimer: NSTimer?
-	var backgroundCallback: ((UIBackgroundFetchResult) -> Void)?
+	private var lastUpdateFailed = false
+	private var backgroundTask = UIBackgroundTaskInvalid
+	private var watchManager: WatchManager?
+	private var refreshTimer: NSTimer?
+	private var backgroundCallback: ((UIBackgroundFetchResult) -> Void)?
 
 	func updateBadge() {
 		UIApplication.sharedApplication().applicationIconBadgeNumber = PullRequest.badgeCountInMoc(mainObjectContext) + Issue.badgeCountInMoc(mainObjectContext)
@@ -230,7 +227,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 		refreshTimer?.invalidate()
 		refreshTimer = nil
 
-		isRefreshing = true
+		appIsRefreshing = true
 
 		backgroundTask = UIApplication.sharedApplication().beginBackgroundTaskWithName("com.housetrip.Trailer.refresh") { [weak self] in
 			self?.endBGTask()
@@ -245,7 +242,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 
 	func startRefresh() -> Bool {
 
-		if isRefreshing || api.noNetworkConnection() || !ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
+		if appIsRefreshing || api.noNetworkConnection() || !ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
 			return false
 		}
 
@@ -260,11 +257,11 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 
 				if success {
 					Settings.lastSuccessfulRefresh = NSDate()
-					s.preferencesDirty = false
+					preferencesDirty = false
 				}
 
 				s.checkApiUsage()
-				s.isRefreshing = false
+				appIsRefreshing = false
 				NSNotificationCenter.defaultCenter().postNotificationName(REFRESH_ENDED_NOTIFICATION, object: nil)
 				DataManager.saveDB() // Ensure object IDs are permanent before sending notifications
 				DataManager.sendNotificationsIndexAndSave()

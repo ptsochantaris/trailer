@@ -360,7 +360,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	func updateActivity() {
-		if app.isRefreshing {
+		if appIsRefreshing {
 			refreshButton.enabled = false
 			projectsTable.enabled = false
 			allPrsSetting.enabled = false
@@ -608,7 +608,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	private func updateDisplayIssuesSetting() {
 		DataManager.postProcessAllItems()
-		app.preferencesDirty = true
+		preferencesDirty = true
 		app.deferredUpdateTimer.push()
 		DataManager.saveDB()
 		Settings.possibleExport(nil)
@@ -1036,7 +1036,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	func windowWillClose(notification: NSNotification) {
-		if ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) && app.preferencesDirty {
+		if ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) && preferencesDirty {
 			app.startRefresh()
 		} else {
 			if app.refreshTimer == nil && Settings.refreshPeriod > 0.0 {
@@ -1100,7 +1100,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		if let item = tabViewItem {
 			let newIndex = tabView.indexOfTabViewItem(item)
 			if newIndex == 1 {
-				if (app.lastRepoCheck.isEqualToDate(never()) || Repo.countVisibleReposInMoc(mainObjectContext) == 0) && ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
+				if (lastRepoCheck.isEqualToDate(never()) || Repo.countVisibleReposInMoc(mainObjectContext) == 0) && ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
 					refreshReposSelected(nil)
 				}
 			}

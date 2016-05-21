@@ -13,7 +13,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	private var showHelp = true
 
 	@IBAction func done(sender: UIBarButtonItem) {
-		if app.preferencesDirty { app.startRefresh() }
+		if preferencesDirty { app.startRefresh() }
 		dismissViewControllerAnimated(true, completion: nil)
 	}
 
@@ -471,7 +471,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 					ApiServer.resetSyncOfEverything()
 				}
 				settingsChangedTimer.push()
-				app.preferencesDirty = true
+				preferencesDirty = true
 			case 1:
 				selectedIndexPath = indexPath
 				pickerName = S(tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text)
@@ -493,7 +493,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 					ApiServer.resetSyncOfEverything()
 				}
 				settingsChangedTimer.push()
-				app.preferencesDirty = true
+				preferencesDirty = true
 			case 3:
 				selectedIndexPath = indexPath
 				pickerName = S(tableView.cellForRowAtIndexPath(indexPath)?.textLabel?.text)

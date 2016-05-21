@@ -67,7 +67,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 	}
 
 	func checkRefreshDone(t: NSTimer) {
-		if !app.isRefreshing {
+		if !appIsRefreshing {
 			checkTimer?.invalidate()
 			checkTimer = nil
 			if newServer.lastSyncSucceeded?.boolValue ?? false {

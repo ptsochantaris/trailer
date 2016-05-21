@@ -70,7 +70,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 			a.authToken = authToken.text?.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
 			a.reportRefreshFailures = reportErrors.on
 			a.lastSyncSucceeded = true
-			app.preferencesDirty = true
+			preferencesDirty = true
 
 			processTokenStateFrom(a.authToken)
 			return a

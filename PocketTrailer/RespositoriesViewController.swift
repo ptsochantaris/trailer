@@ -12,7 +12,7 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 	@IBOutlet weak var actionsButton: UIBarButtonItem!
 
 	@IBAction func done(sender: UIBarButtonItem) {
-		if app.preferencesDirty {
+		if preferencesDirty {
 			app.startRefresh()
 		}
 		dismissViewControllerAnimated(true, completion: nil)
@@ -101,7 +101,7 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 			self?.actionsButton.enabled = ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext)
 			self?.tableView.alpha = 1.0
 			self?.tableView.userInteractionEnabled = true
-			app.preferencesDirty = true
+			preferencesDirty = true
 			self?.navigationItem.rightBarButtonItem?.enabled = true
 		}
 	}

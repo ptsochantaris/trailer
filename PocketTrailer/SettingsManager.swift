@@ -12,7 +12,7 @@ final class SettingsManager {
 				let m = popupManager.getMasterController()
 				m.reloadDataWithAnimation(false)
 
-				app.preferencesDirty = true
+				preferencesDirty = true
 				Settings.lastSuccessfulRefresh = nil
 
 				atNextEvent {

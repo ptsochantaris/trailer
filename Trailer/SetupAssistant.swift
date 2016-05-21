@@ -91,7 +91,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 	}
 
 	func checkRefreshDone(t: NSTimer) {
-		if !app.isRefreshing {
+		if !appIsRefreshing {
 
 			checkTimer?.invalidate()
 			checkTimer = nil

@@ -79,7 +79,7 @@ final class ApiServer: NSManagedObject {
 			}
 		}
 		if app != nil {
-			app.preferencesDirty = true
+			preferencesDirty = true
 			api.clearAllBadLinks()
 		}
 	}
@@ -184,7 +184,7 @@ final class ApiServer: NSManagedObject {
 
 	func resetSyncState() {
 		if app != nil {
-			app.lastRepoCheck = never()
+			lastRepoCheck = never()
 		}
 		lastSyncSucceeded = true
 		latestReceivedEventDateProcessed = never()

@@ -130,7 +130,7 @@ final class RepoSettingsViewController: UITableViewController {
 			repo?.itemHidingPolicy = indexPath.row
 		}
 		tableView.reloadData()
-		app.preferencesDirty = true
+		preferencesDirty = true
 		DataManager.saveDB()
 		settingsChangedTimer.push()
 	}

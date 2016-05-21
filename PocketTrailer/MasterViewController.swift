@@ -109,7 +109,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	func refreshControlChanged() {
-		refreshOnRelease = !app.isRefreshing
+		refreshOnRelease = !appIsRefreshing
 	}
 
 	override func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
@@ -632,7 +632,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		let issuesUnreadCount = Issue.badgeCountInMoc(mainObjectContext)
 		issuesItem.badgeValue = issuesUnreadCount > 0 ? "\(issuesUnreadCount)" : nil
 
-		if app.isRefreshing {
+		if appIsRefreshing {
 			title = "Refreshing..."
 			if viewMode == .PullRequests {
 				tableView.tableFooterView = EmptyView(message: PullRequest.reasonForEmptyWithFilter(searchField.text), parentWidth: view.bounds.size.width)
