@@ -11,6 +11,12 @@ final class MenuWindow: NSWindow {
 
 	var statusItem: NSStatusItem?
 	var messageView: MessageView?
+	var itemDelegate: ItemDelegate! {
+		didSet {
+			table.setDataSource(itemDelegate)
+			table.setDelegate(itemDelegate)
+		}
+	}
 
 	private var windowVibrancy: NSView?
 
@@ -112,5 +118,90 @@ final class MenuWindow: NSWindow {
 
 	@IBAction func aboutSelected(sender: AnyObject) {
 		app.showAboutWindow()
+	}
+
+	func sizeAndShow(show: Bool) {
+
+		guard let siv = statusItem?.view as? StatusItemView else { return }
+		guard let windowFrame = siv.window?.frame else { return }
+
+		var S: NSScreen?
+		for s in NSScreen.screens() ?? [] {
+			if CGRectContainsRect(s.frame, windowFrame) {
+				S = s
+				break
+			}
+		}
+
+		guard let screen = S else { return }
+
+		var menuLeft = windowFrame.origin.x
+		let rightSide = screen.visibleFrame.origin.x + screen.visibleFrame.size.width
+		let overflow = (menuLeft+MENU_WIDTH)-rightSide
+		if overflow > 0 {
+			menuLeft -= overflow
+		}
+
+		var menuHeight = TOP_HEADER_HEIGHT
+		let rowCount = table.numberOfRows
+		let screenHeight = screen.visibleFrame.size.height
+		if rowCount == 0 {
+			menuHeight += 95
+		} else {
+			menuHeight += 10
+			for f in 0..<rowCount {
+				let rowView = table.viewAtColumn(0, row: f, makeIfNecessary: true)!
+				menuHeight += rowView.frame.size.height + 2
+				if menuHeight >= screenHeight {
+					break
+				}
+			}
+		}
+
+		var bottom = screen.visibleFrame.origin.y
+		if menuHeight < screenHeight {
+			bottom += screenHeight-menuHeight
+		} else {
+			menuHeight = screenHeight
+		}
+
+		setFrame(CGRectMake(menuLeft, bottom, MENU_WIDTH, menuHeight), display: false, animate: false)
+
+		if show {
+			siv.highlighted = true
+			table.deselectAll(nil)
+			app.openingWindow = true
+			level = Int(CGWindowLevelForKey(CGWindowLevelKey.FloatingWindowLevelKey))
+			makeKeyAndOrderFront(self)
+			NSApp.activateIgnoringOtherApps(true)
+			app.openingWindow = false
+		}
+	}
+
+	func reload() {
+		messageView?.removeFromSuperview()
+		itemDelegate.reloadData(filter.stringValue)
+		table.reloadData()
+	}
+
+	func closeMenu() {
+		if visible, let siv = statusItem?.view as? StatusItemView {
+			siv.highlighted = false
+			orderOut(nil)
+			table.deselectAll(nil)
+		}
+	}
+
+	func focusedItem() -> ListableItem? {
+		let row = table.selectedRow
+		var i: ListableItem?
+		if row >= 0 {
+			table.deselectAll(nil)
+			i = itemDelegate.itemAtRow(row)
+		}
+		atNextEvent(self) { S in
+			S.table.selectRowIndexes(NSIndexSet(index: row), byExtendingSelection: false)
+		}
+		return i
 	}
 }

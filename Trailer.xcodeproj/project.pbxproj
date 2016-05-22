@@ -40,11 +40,11 @@
 		1628A6D618789E73005EDA69 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1628A6D518789E73005EDA69 /* Images.xcassets */; };
 		162A29D91A4085FD008F41A9 /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162A29D81A4085FD008F41A9 /* API.swift */; };
 		162A29DA1A4085FD008F41A9 /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162A29D81A4085FD008F41A9 /* API.swift */; };
-		1633C1901ABCEAA00086C692 /* IssuesDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1633C18F1ABCEAA00086C692 /* IssuesDelegate.swift */; };
 		1633C1921ABCEC4A0086C692 /* Issue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1633C1911ABCEC4A0086C692 /* Issue.swift */; };
 		1633C1931ABCEC4A0086C692 /* Issue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1633C1911ABCEC4A0086C692 /* Issue.swift */; };
 		1633C19D1ABD84180086C692 /* IssueCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1633C19C1ABD84180086C692 /* IssueCell.swift */; };
 		1633C1A21ABD84370086C692 /* PullRequestCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1633C1A11ABD84370086C692 /* PullRequestCell.swift */; };
+		16358F3B1CF138190055F849 /* ItemDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16358F3A1CF138190055F849 /* ItemDelegate.swift */; };
 		164785AA1A2CE7BD00297764 /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785A91A2CE7BD00297764 /* Globals.swift */; };
 		164785AB1A2CE7BD00297764 /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164785A91A2CE7BD00297764 /* Globals.swift */; };
 		164840BF1ACFEA45009E6383 /* AboutWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 164840BE1ACFEA45009E6383 /* AboutWindow.xib */; };
@@ -86,7 +86,6 @@
 		16A0B03C1A49AEC200B3452D /* StartupLaunch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A0B03B1A49AEC200B3452D /* StartupLaunch.swift */; };
 		16A505E01A3888D6005DD3B7 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16A505DF1A3888D6005DD3B7 /* Sparkle.framework */; };
 		16A505E21A3889B9005DD3B7 /* Sparkle.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 16A505DF1A3888D6005DD3B7 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		16A505E41A39B2DD005DD3B7 /* PullRequestDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A505E31A39B2DD005DD3B7 /* PullRequestDelegate.swift */; };
 		16A69EDA1AC83020008231F9 /* ListableItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A69ED91AC83020008231F9 /* ListableItem.swift */; };
 		16A69EDB1AC83020008231F9 /* ListableItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A69ED91AC83020008231F9 /* ListableItem.swift */; };
 		16B3B3171A34E8E2000BE6CC /* ApiServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3101A34E8E2000BE6CC /* ApiServer.swift */; };
@@ -249,10 +248,10 @@
 		1628A6D518789E73005EDA69 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		162A29D81A4085FD008F41A9 /* API.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = API.swift; path = Shared/API.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16301F7D1CE35586007A1E4F /* Trailer 28.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 28.xcdatamodel"; sourceTree = "<group>"; };
-		1633C18F1ABCEAA00086C692 /* IssuesDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = IssuesDelegate.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		1633C1911ABCEC4A0086C692 /* Issue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = Issue.swift; path = Shared/Issue.swift; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		1633C19C1ABD84180086C692 /* IssueCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = IssueCell.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		1633C1A11ABD84370086C692 /* PullRequestCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PullRequestCell.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		16358F3A1CF138190055F849 /* ItemDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ItemDelegate.swift; sourceTree = "<group>"; };
 		163D1F7F1AAFA54800E080D7 /* Trailer 20.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 20.xcdatamodel"; sourceTree = "<group>"; };
 		163E45881CD3EB6000B0E2BE /* Trailer 26.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 26.xcdatamodel"; sourceTree = "<group>"; };
 		164785A91A2CE7BD00297764 /* Globals.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = Globals.swift; path = Shared/Globals.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -306,7 +305,6 @@
 		16A0B0361A48AC7900B3452D /* OSX_AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = OSX_AppDelegate.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16A0B03B1A49AEC200B3452D /* StartupLaunch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StartupLaunch.swift; sourceTree = "<group>"; };
 		16A505DF1A3888D6005DD3B7 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = Trailer/Sparkle.framework; sourceTree = "<group>"; };
-		16A505E31A39B2DD005DD3B7 /* PullRequestDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PullRequestDelegate.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16A69ED91AC83020008231F9 /* ListableItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ListableItem.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16AE7CED1C92304300CB304B /* Trailer 24.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 24.xcdatamodel"; sourceTree = "<group>"; };
 		16B3B3101A34E8E2000BE6CC /* ApiServer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ApiServer.swift; path = Shared/ApiServer.swift; sourceTree = SOURCE_ROOT; };
@@ -426,10 +424,9 @@
 			children = (
 				164785B31A2CE80800297764 /* Trailer-Bridging-Header.h */,
 				162002CF1A2A3E2100FF95F3 /* Application.swift */,
-				16A505E31A39B2DD005DD3B7 /* PullRequestDelegate.swift */,
-				1633C18F1ABCEAA00086C692 /* IssuesDelegate.swift */,
 				16A0B0361A48AC7900B3452D /* OSX_AppDelegate.swift */,
 				16A0B03B1A49AEC200B3452D /* StartupLaunch.swift */,
+				16358F3A1CF138190055F849 /* ItemDelegate.swift */,
 			);
 			name = Core;
 			sourceTree = "<group>";
@@ -1099,7 +1096,6 @@
 				16A0B03C1A49AEC200B3452D /* StartupLaunch.swift in Sources */,
 				16B3B3571A34E9F7000BE6CC /* Reachability.m in Sources */,
 				1696884B1CD7635B00A88902 /* Parse8601.m in Sources */,
-				16A505E41A39B2DD005DD3B7 /* PullRequestDelegate.swift in Sources */,
 				164840C11ACFEA5A009E6383 /* AboutWindow.swift in Sources */,
 				16B3B3211A34E8E2000BE6CC /* PullRequest.swift in Sources */,
 				162002D61A2A49A300FF95F3 /* ViewAllowsVibrancy.swift in Sources */,
@@ -1115,8 +1111,8 @@
 				16B3B3231A34E8E2000BE6CC /* Repo.swift in Sources */,
 				16CBE1CA1A2E13A400485053 /* StatusItemView.swift in Sources */,
 				16B3B35A1A34EAEE000BE6CC /* main.swift in Sources */,
-				1633C1901ABCEAA00086C692 /* IssuesDelegate.swift in Sources */,
 				169FB2361A3DBD7D00E00771 /* SectionHeader.swift in Sources */,
+				16358F3B1CF138190055F849 /* ItemDelegate.swift in Sources */,
 				162002DD1A2A58B900FF95F3 /* CenterTextField.swift in Sources */,
 				162002E71A2A75BD00FF95F3 /* AvatarView.swift in Sources */,
 				1664CBCA1B7796840006BDE7 /* Enums.swift in Sources */,

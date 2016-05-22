@@ -30,13 +30,13 @@ func atNextEvent(completion: Completion) {
 	NSOperationQueue.mainQueue().addOperationWithBlock(completion)
 }
 
-func atNextEvent<T: AnyObject>(owner: T?, completion: (T)->()) {
-	if let O = owner {
-		atNextEvent(O, completion: completion)
+func atNextEvent<T: AnyObject>(owner: T?, completion: (T)->Void) {
+	if let o = owner {
+		atNextEvent(o, completion: completion)
 	}
 }
 
-func atNextEvent<T: AnyObject>(owner: T, completion: (T)->()) {
+func atNextEvent<T: AnyObject>(owner: T, completion: (T)->Void) {
 	NSOperationQueue.mainQueue().addOperationWithBlock { [weak owner] in
 		if let o = owner {
 			completion(o)

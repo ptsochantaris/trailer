@@ -138,8 +138,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 		completeSetup.hidden = true
 		welcomeLabel.hidden = true
 		trackIssues.hidden = true
-		let token = tokenHolder.stringValue.trim()
-		newServer.authToken = token
+		newServer.authToken = tokenHolder.stringValue.trim()
 		newServer.lastSyncSucceeded = true
 	}
 }
