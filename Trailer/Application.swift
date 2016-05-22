@@ -31,11 +31,7 @@ final class Application: NSApplication {
 						if let i = app.focusedItem() {
 							i.setMute(!(i.muted?.boolValue ?? false))
 							DataManager.saveDB()
-							if i is PullRequest {
-								app.updatePrMenu()
-							} else {
-								app.updateIssuesMenu()
-							}
+							app.updateRelatedMenuFor(i)
 							return
 						}
 					case "a":
@@ -47,11 +43,7 @@ final class Application: NSApplication {
 								i.postProcess()
 							}
 							DataManager.saveDB()
-							if i is PullRequest {
-								app.updatePrMenu()
-							} else {
-								app.updateIssuesMenu()
-							}
+							app.updateRelatedMenuFor(i)
 							return
 						} else if sendAction(#selector(NSResponder.selectAll(_:)), to:nil, from:self) {
 							return

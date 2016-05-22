@@ -1,11 +1,13 @@
 
 final class StatusItemView: NSView {
 
-	let statusLabel: String
+	private let icon: NSImage
+
 	let textAttributes: [String : AnyObject]
-    var tappedCallback: Completion?
+	let statusLabel: String
+	var tappedCallback: Completion?
 	var labelOffset: CGFloat = 0
-	let icon: NSImage
+	var serverTitle: String?
 
 	init(frame: NSRect, label: String, prefix: String, attributes: [String : AnyObject]) {
 		statusLabel = label
@@ -42,10 +44,10 @@ final class StatusItemView: NSView {
 
 	override func drawRect(dirtyRect: NSRect) {
 
-		app.statusItemWithView(self)?.drawStatusBarBackgroundInRect(dirtyRect, withHighlight: highlighted)
+		app.statusItemForView(self)?.drawStatusBarBackgroundInRect(dirtyRect, withHighlight: highlighted)
 
 		let imagePoint = NSMakePoint(STATUSITEM_PADDING, 0)
-		let labelRect = CGRectMake(bounds.size.height + labelOffset, -5, bounds.size.width, bounds.size.height)
+		var labelRect = CGRectMake(bounds.size.height + labelOffset, -5, bounds.size.width, bounds.size.height)
 		var displayAttributes = textAttributes
 		var imageColor: NSColor
 
@@ -65,9 +67,27 @@ final class StatusItemView: NSView {
 			displayAttributes[NSForegroundColorAttributeName] = NSColor.disabledControlTextColor()
 		}
 
-		statusLabel.drawInRect(labelRect, withAttributes: displayAttributes)
+		let img = tintedImage(icon, tint: imageColor)
+		if let t = serverTitle {
 
-		tintedImage(icon, tint: imageColor).drawAtPoint(imagePoint, fromRect: NSZeroRect, operation: NSCompositingOperation.CompositeSourceOver, fraction: 1.0)
+			labelRect = CGRectOffset(labelRect, -3, -3)
+
+			let r = NSMakeRect(1, dirtyRect.height-7, dirtyRect.width-2, 7)
+			let p = NSMutableParagraphStyle()
+			p.alignment = .Center
+			p.lineBreakMode = .ByTruncatingMiddle
+			t.drawInRect(r, withAttributes: [
+				NSForegroundColorAttributeName: displayAttributes[NSForegroundColorAttributeName]!,
+				NSFontAttributeName: NSFont.menuFontOfSize(6),
+				NSParagraphStyleAttributeName: p
+				])
+
+			img.drawInRect(CGRectMake(imagePoint.x+3, imagePoint.y, img.size.width-6, img.size.height-6))
+		} else {
+			img.drawAtPoint(imagePoint, fromRect: NSZeroRect, operation: NSCompositingOperation.CompositeSourceOver, fraction: 1.0)
+		}
+
+		statusLabel.drawInRect(labelRect, withAttributes: displayAttributes)
 	}
 
 	// With thanks to http://stackoverflow.com/questions/1413135/tinting-a-grayscale-nsimage-or-ciimage

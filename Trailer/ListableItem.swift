@@ -564,9 +564,14 @@ class ListableItem: DataItem {
 		return buildOrPredicate(string, expectedLength: 5, format: "userLogin contains[cd] %@", numeric: false)
     }
 
-	final class func requestForItemsOfType(itemType: String, withFilter: String?, sectionIndex: Int) -> NSFetchRequest {
+	final class func requestForItemsOfType(itemType: String, withFilter: String?, sectionIndex: Int, apiServerId: NSManagedObjectID? = nil) -> NSFetchRequest {
 
 		var andPredicates = [NSPredicate]()
+
+		if let aid = apiServerId, a = try! mainObjectContext.existingObjectWithID(aid) as? ApiServer {
+			andPredicates.append(NSPredicate(format: "apiServer == %@", a))
+		}
+
 		if sectionIndex<0 {
 			andPredicates.append(NSPredicate(format: "sectionIndex > 0"))
 		} else {

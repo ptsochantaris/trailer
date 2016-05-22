@@ -81,8 +81,14 @@ final class Repo: DataItem {
 		return moc.countForFetchRequest(f, error: nil)
 	}
 
-	class func interestedInIssues() -> Bool {
-		for r in Repo.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
+	class func interestedInIssues(apiServerId: NSManagedObjectID? = nil) -> Bool {
+		let all: [Repo]
+		if let aid = apiServerId, a = try! mainObjectContext.existingObjectWithID(aid) as? ApiServer {
+			all = Repo.allItemsOfType("Repo", fromServer: a) as! [Repo]
+		} else {
+			all = Repo.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo]
+		}
+		for r in all {
 			if r.displayPolicyForIssues?.integerValue > 0 {
 				return true
 			}
@@ -90,8 +96,14 @@ final class Repo: DataItem {
 		return false
 	}
 
-	class func interestedInPrs() -> Bool {
-		for r in Repo.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
+	class func interestedInPrs(apiServerId: NSManagedObjectID? = nil) -> Bool {
+		let all: [Repo]
+		if let aid = apiServerId, a = try! mainObjectContext.existingObjectWithID(aid) as? ApiServer {
+			all = Repo.allItemsOfType("Repo", fromServer: a) as! [Repo]
+		} else {
+			all = Repo.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo]
+		}
+		for r in all {
 			if r.displayPolicyForPrs?.integerValue > 0 {
 				return true
 			}

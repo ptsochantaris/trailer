@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7531" systemVersion="14D136" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7531"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSWindowController">
@@ -77,12 +77,12 @@
                             <popUpButton horizontalHuggingPriority="750" verticalHuggingPriority="750" id="6GZ-ZC-FHj">
                                 <rect key="frame" x="7" y="3" width="22" height="26"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <popUpButtonCell key="cell" type="disclosure" bezelStyle="roundedDisclosure" imagePosition="only" alignment="left" lineBreakMode="truncatingTail" borderStyle="border" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" id="tc8-dD-eIJ">
+                                <popUpButtonCell key="cell" type="disclosure" title=" Refresh" bezelStyle="roundedDisclosure" imagePosition="only" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" arrowPosition="noArrow" selectedItem="Kwu-bD-N83" id="tc8-dD-eIJ">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="menu"/>
                                     <menu key="menu" title="Options" showsStateColumn="NO" id="wx2-Q6-mBb">
                                         <items>
-                                            <menuItem title=" Refresh" keyEquivalent="r" id="Kwu-bD-N83">
+                                            <menuItem title=" Refresh" state="on" keyEquivalent="r" id="Kwu-bD-N83">
                                                 <connections>
                                                     <action selector="refreshSelected:" target="KHN-KI-GyO" id="M3z-0e-wQR"/>
                                                 </connections>

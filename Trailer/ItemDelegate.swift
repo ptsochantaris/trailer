@@ -1,15 +1,33 @@
 
+private let _propertiesToFetch = { ()->[AnyObject] in
+	let iodD = NSExpressionDescription()
+	iodD.name = "objectID"
+	iodD.expression = NSExpression.expressionForEvaluatedObject()
+	iodD.expressionResultType = .ObjectIDAttributeType
+
+	let sectionIndexD = NSExpressionDescription()
+	sectionIndexD.name = "sectionIndex"
+	sectionIndexD.expression = NSExpression(format: "sectionIndex")
+	sectionIndexD.expressionResultType = .Integer16AttributeType
+
+	return [iodD, sectionIndexD]
+}()
+
 final class ItemDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 
 	private var itemIds = [NSObject]()
 	private let type: String
 	private let sections: [String]
 	private let removalSections: [String]
+	private let apiServerId: NSManagedObjectID?
 
-	init(type: String, sections: [String], removeButtonsInSections: [String]) {
+	init(type: String, sections: [String], removeButtonsInSections: [String], apiServer: ApiServer?) {
+
 		self.type = type
 		self.sections = sections
 		self.removalSections = removeButtonsInSections
+		self.apiServerId = apiServer?.objectID
+
 		super.init()
 		reloadData(nil)
 	}
@@ -18,20 +36,25 @@ final class ItemDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 
 		itemIds.removeAll(keepCapacity: false)
 
-		let f = ListableItem.requestForItemsOfType(type, withFilter: filter, sectionIndex: -1)
-		let allItems = try! mainObjectContext.executeFetchRequest(f) as! [ListableItem]
+		let f = ListableItem.requestForItemsOfType(type, withFilter: filter, sectionIndex: -1, apiServerId: apiServerId)
+		f.resultType = .DictionaryResultType
+		f.fetchBatchSize = 0
+		f.propertiesToFetch = _propertiesToFetch
+		let allItems = try! mainObjectContext.executeFetchRequest(f) as! [NSDictionary]
+
+		itemIds.reserveCapacity(allItems.count+sections.count)
 
 		if let firstItem = allItems.first {
-			var lastSection = firstItem.sectionIndex!.integerValue
+			var lastSection = (firstItem["sectionIndex"] as! NSNumber).integerValue
 			itemIds.append(sections[lastSection])
 
 			for item in allItems {
-				let i = item.sectionIndex!.integerValue
+				let i = (item["sectionIndex"] as! NSNumber).integerValue
 				if lastSection < i {
 					itemIds.append(Section.issueMenuTitles[i])
 					lastSection = i
 				}
-				itemIds.append(item.objectID)
+				itemIds.append(item["objectID"] as! NSManagedObjectID)
 			}
 		}
 	}

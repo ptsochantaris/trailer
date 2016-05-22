@@ -57,17 +57,25 @@ final class PullRequest: ListableItem {
 		return try! moc.executeFetchRequest(f) as! [PullRequest]
 	}
 
-	class func allMergedInMoc(moc: NSManagedObjectContext) -> [PullRequest] {
+	class func allMergedInMoc(moc: NSManagedObjectContext, apiServerId: NSManagedObjectID? = nil) -> [PullRequest] {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
-		f.predicate = NSPredicate(format: "condition == %d", ItemCondition.Merged.rawValue)
+		if let aid = apiServerId, a = try! mainObjectContext.existingObjectWithID(aid) as? ApiServer {
+			f.predicate = NSPredicate(format: "condition == %d and apiServer == %@", ItemCondition.Merged.rawValue, a)
+		} else {
+			f.predicate = NSPredicate(format: "condition == %d", ItemCondition.Merged.rawValue)
+		}
 		return try! moc.executeFetchRequest(f) as! [PullRequest]
 	}
 
-	class func allClosedInMoc(moc: NSManagedObjectContext) -> [PullRequest] {
+	class func allClosedInMoc(moc: NSManagedObjectContext, apiServerId: NSManagedObjectID? = nil) -> [PullRequest] {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
-		f.predicate = NSPredicate(format: "condition == %d", ItemCondition.Closed.rawValue)
+		if let aid = apiServerId, a = try! mainObjectContext.existingObjectWithID(aid) as? ApiServer {
+			f.predicate = NSPredicate(format: "condition == %d and apiServer == %@", ItemCondition.Merged.rawValue, a)
+		} else {
+			f.predicate = NSPredicate(format: "condition == %d", ItemCondition.Closed.rawValue)
+		}
 		return try! moc.executeFetchRequest(f) as! [PullRequest]
 	}
 
@@ -111,8 +119,8 @@ final class PullRequest: ListableItem {
 		return badgeCountFromFetch(f, inMoc: moc)
 	}
 
-	class func badgeCountInMoc(moc: NSManagedObjectContext) -> Int {
-		let f = requestForItemsOfType("PullRequest", withFilter: nil, sectionIndex: -1)
+	class func badgeCountInMoc(moc: NSManagedObjectContext, apiServerId: NSManagedObjectID? = nil) -> Int {
+		let f = requestForItemsOfType("PullRequest", withFilter: nil, sectionIndex: -1, apiServerId: apiServerId)
 		return badgeCountFromFetch(f, inMoc: moc)
 	}
 

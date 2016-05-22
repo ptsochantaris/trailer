@@ -93,8 +93,8 @@ final class Issue: ListableItem {
 		}
 	}
 
-	class func badgeCountInMoc(moc: NSManagedObjectContext) -> Int {
-		let f = requestForItemsOfType("Issue", withFilter: nil, sectionIndex: -1)
+	class func badgeCountInMoc(moc: NSManagedObjectContext, apiServerId: NSManagedObjectID? = nil) -> Int {
+		let f = requestForItemsOfType("Issue", withFilter: nil, sectionIndex: -1, apiServerId: apiServerId)
 		return badgeCountFromFetch(f, inMoc: moc)
 	}
 
@@ -158,10 +158,14 @@ final class Issue: ListableItem {
 		return Section.issueMenuTitles[sectionIndex?.integerValue ?? 0]
 	}
 
-	class func allClosedInMoc(moc: NSManagedObjectContext) -> [Issue] {
+	class func allClosedInMoc(moc: NSManagedObjectContext, apiServerId: NSManagedObjectID? = nil) -> [Issue] {
 		let f = NSFetchRequest(entityName: "Issue")
 		f.returnsObjectsAsFaults = false
-		f.predicate = NSPredicate(format: "condition == %d", ItemCondition.Closed.rawValue)
+		if let aid = apiServerId, a = try! mainObjectContext.existingObjectWithID(aid) as? ApiServer {
+			f.predicate = NSPredicate(format: "condition == %d and apiServer == %@", ItemCondition.Closed.rawValue, a)
+		} else {
+			f.predicate = NSPredicate(format: "condition == %d", ItemCondition.Closed.rawValue)
+		}
 		return try! moc.executeFetchRequest(f) as! [Issue]
 	}
 
