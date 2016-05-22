@@ -3,7 +3,7 @@ final class StatusItemView: NSView {
 
 	let statusLabel: String
 	let textAttributes: [String : AnyObject]
-    var tappedCallback: (() -> Void)?
+    var tappedCallback: Completion?
 	var labelOffset: CGFloat = 0
 	let icon: NSImage
 

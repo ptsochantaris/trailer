@@ -123,7 +123,9 @@ final class PRDetailController: CommonController {
 
 	func colourFromHex(s: String) -> UIColor {
 
-		let safe = s.trim().stringByTrimmingCharactersInSet(NSCharacterSet.symbolCharacterSet())
+		let safe = s
+			.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+			.stringByTrimmingCharactersInSet(NSCharacterSet.symbolCharacterSet())
 		let s = NSScanner(string: safe)
 		var c:UInt32 = 0
 		s.scanHexInt(&c)

@@ -48,28 +48,29 @@ final class ServersViewController: UITableViewController {
 	}
 
 	override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCellWithIdentifier("ServerCell", forIndexPath: indexPath) 
-		let a = allServers[indexPath.row]
-		if S(a.authToken).isEmpty {
-			cell.textLabel?.textColor = UIColor.redColor()
-			cell.textLabel?.text = S(a.label) + " (needs token!)"
-		} else if !a.syncIsGood {
-			cell.textLabel?.textColor = UIColor.redColor()
-			cell.textLabel?.text = S(a.label) + " (last sync failed)"
-		} else {
-			cell.textLabel?.textColor = UIColor.darkTextColor()
-			cell.textLabel?.text = a.label
-		}
-		if a.requestsLimit==nil || a.requestsLimit!.doubleValue==0.0 {
-			cell.detailTextLabel?.text = nil
-		} else
-		{
-			let total = a.requestsLimit?.doubleValue ?? 0
-			let used = total - (a.requestsRemaining?.doubleValue ?? 0)
-			if a.resetDate != nil {
-				cell.detailTextLabel?.text = String(format:"%.01f%% API used (%.0f / %.0f requests)\nNext reset: %@", 100*used/total, used, total, resetFormatter.stringFromDate(a.resetDate!))
+		let cell = tableView.dequeueReusableCellWithIdentifier("ServerCell", forIndexPath: indexPath)
+		if let T = cell.textLabel, D = cell.detailTextLabel {
+			let a = allServers[indexPath.row]
+			if S(a.authToken).isEmpty {
+				T.textColor = UIColor.redColor()
+				T.text = S(a.label) + " (needs token!)"
+			} else if !a.syncIsGood {
+				T.textColor = UIColor.redColor()
+				T.text = S(a.label) + " (last sync failed)"
 			} else {
-				cell.detailTextLabel?.text = String(format:"%.01f%% API used (%.0f / %.0f requests)", 100*used/total, used, total)
+				T.textColor = UIColor.darkTextColor()
+				T.text = a.label
+			}
+			if a.requestsLimit==nil || a.requestsLimit!.doubleValue==0.0 {
+				D.text = nil
+			} else {
+				let total = a.requestsLimit?.doubleValue ?? 0
+				let used = total - (a.requestsRemaining?.doubleValue ?? 0)
+				if a.resetDate != nil {
+					D.text = String(format:"%.01f%% API used (%.0f / %.0f requests)\nNext reset: %@", 100*used/total, used, total, resetFormatter.stringFromDate(a.resetDate!))
+				} else {
+					D.text = String(format:"%.01f%% API used (%.0f / %.0f requests)", 100*used/total, used, total)
+				}
 			}
 		}
 		return cell
