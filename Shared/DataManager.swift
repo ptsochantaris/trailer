@@ -33,11 +33,11 @@ final class DataManager : NSObject {
 			var legacyWebHost = S(d.objectForKey("API_FRONTEND_SERVER") as? String)
 			if legacyWebHost.isEmpty { legacyWebHost = "github.com" }
 
-			let actualApiPath = (legacyApiHost + "/" + legacyApiPath).stringByReplacingOccurrencesOfString("//", withString:"/")
+			let actualApiPath = "\(legacyApiHost)/\(legacyApiPath)".stringByReplacingOccurrencesOfString("//", withString:"/")
 
 			let newApiServer = ApiServer.addDefaultGithubInMoc(mainObjectContext)
-			newApiServer.apiPath = "https://" + actualApiPath
-			newApiServer.webPath = "https://" + legacyWebHost
+			newApiServer.apiPath = "https://\(actualApiPath)"
+			newApiServer.webPath = "https://\(legacyWebHost)"
 			newApiServer.authToken = legacyAuthToken
 			newApiServer.lastSyncSucceeded = true
 

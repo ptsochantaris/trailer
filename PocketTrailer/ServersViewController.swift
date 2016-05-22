@@ -53,10 +53,10 @@ final class ServersViewController: UITableViewController {
 			let a = allServers[indexPath.row]
 			if S(a.authToken).isEmpty {
 				T.textColor = UIColor.redColor()
-				T.text = S(a.label) + " (needs token!)"
+				T.text = "\(S(a.label)) (needs token!)"
 			} else if !a.syncIsGood {
 				T.textColor = UIColor.redColor()
-				T.text = S(a.label) + " (last sync failed)"
+				T.text = "\(S(a.label)) (last sync failed)"
 			} else {
 				T.textColor = UIColor.darkTextColor()
 				T.text = a.label

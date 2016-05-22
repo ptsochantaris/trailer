@@ -77,11 +77,6 @@ final class PRDetailController: CommonController {
 			rowCount += 1
 		}
 
-		let dateFormatter = NSDateFormatter()
-		dateFormatter.doesRelativeDateFormatting = true
-		dateFormatter.timeStyle = NSDateFormatterStyle.ShortStyle
-		dateFormatter.dateStyle = NSDateFormatterStyle.ShortStyle
-
 		if let comments = itemInfo["comments"] as? [[String : AnyObject]] {
 			if comments.count == 0 {
 				setTitle("\(comments.count) Comments")
@@ -90,27 +85,10 @@ final class PRDetailController: CommonController {
 			}
 			table.insertRowsAtIndexes(NSIndexSet(indexesInRange: NSMakeRange(rowCount, comments.count)), withRowType: "CommentRow")
 			var unreadIndex = 0
-			let unreadCount = itemInfo["unreadCount"] as? Int
+			let unreadCount = itemInfo["unreadCount"] as? Int ?? 0
 			for comment in comments {
 				if let s = table.rowControllerAtIndex(rowCount) as? CommentRow {
-					s.usernameL.setText("@" + (comment["user"] as! String))
-					s.dateL.setText(dateFormatter.stringFromDate(comment["date"] as! NSDate))
-					s.commentL.setText(comment["text"] as? String)
-					if(comment["mine"] as! Bool) {
-						s.usernameBackground.setBackgroundColor(UIColor.grayColor())
-						s.commentL.setTextColor(UIColor.lightGrayColor())
-						s.margin.setBackgroundColor(UIColor.darkGrayColor())
-					} else {
-						if unreadIndex < unreadCount {
-							s.usernameBackground.setBackgroundColor(UIColor.redColor())
-							s.margin.setBackgroundColor(UIColor.redColor())
-							unreadIndex += 1
-						} else {
-							s.usernameBackground.setBackgroundColor(UIColor.lightGrayColor())
-							s.margin.setBackgroundColor(UIColor.lightGrayColor())
-						}
-						s.commentL.setTextColor(UIColor.whiteColor())
-					}
+					s.setComment(comment, unreadCount: unreadCount, unreadIndex: &unreadIndex)
 				}
 				rowCount += 1
 			}

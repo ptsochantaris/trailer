@@ -120,7 +120,7 @@ final class PRComment: DataItem {
 
 	var refersToMe: Bool {
 		if let userForServer = apiServer.userName where userId != apiServer.userId { // Ignore self-references
-			let rangeOfHandle = body?.rangeOfString("@"+userForServer,
+			let rangeOfHandle = body?.rangeOfString("@\(userForServer)",
 				options: [.CaseInsensitiveSearch, .DiacriticInsensitiveSearch])
 			return rangeOfHandle != nil
 		}

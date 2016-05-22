@@ -686,9 +686,11 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		if count == 0 {
 			return "No \(pr)s"
 		} else if count == 1 {
-			return "1 " + (unreadCount > 0 ? "PR\(unreadCommentCount(unreadCount))" : pr)
+			let suffix = unreadCount > 0 ? "PR\(unreadCommentCount(unreadCount))" : pr
+			return "1 \(suffix)"
 		} else {
-			return "\(count) " + (unreadCount > 0 ? "PRs\(unreadCommentCount(unreadCount))" : pr + "s")
+			let suffix = unreadCount > 0 ? "PRs\(unreadCommentCount(unreadCount))" : "\(pr)s"
+			return "\(count) \(suffix)"
 		}
 	}
 
@@ -700,9 +702,11 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		if count == 0 {
 			return "No Issues"
 		} else if count == 1 {
-			return "1 Issue\(unreadCommentCount(unreadCount))"
+			let commentCount = unreadCommentCount(unreadCount)
+			return "1 Issue\(commentCount)"
 		} else {
-			return "\(count) Issues\(unreadCommentCount(unreadCount))"
+			let commentCount = unreadCommentCount(unreadCount)
+			return "\(count) Issues\(commentCount)"
 		}
 	}
 

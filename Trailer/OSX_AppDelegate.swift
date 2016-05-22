@@ -190,14 +190,14 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		case .NewMention:
 			let c = forItem as! PRComment
 			if c.parentShouldSkipNotifications { return }
-			notification.title = "@" + S(c.userName) + " mentioned you:"
+			notification.title = "@\(S(c.userName)) mentioned you:"
 			notification.subtitle = c.notificationSubtitle
 			notification.informativeText = c.body
 			addPotentialExtraActions(notification)
 		case .NewComment:
 			let c = forItem as! PRComment
 			if c.parentShouldSkipNotifications { return }
-			notification.title = "@" + S(c.userName) + " commented:"
+			notification.title = "@\(S(c.userName)) commented:"
 			notification.subtitle = c.notificationSubtitle
 			notification.informativeText = c.body
 			addPotentialExtraActions(notification)

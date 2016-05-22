@@ -85,7 +85,7 @@ class CommonController: WKInterfaceController {
 	}
 
 	func loadingFailed(error: NSError) {
-		showTemporaryError("Error: "+error.localizedDescription)
+		showTemporaryError("Error: \(error.localizedDescription)")
 		loading = 0
 	}
 }

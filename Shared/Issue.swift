@@ -141,7 +141,7 @@ final class Issue: ListableItem {
 		}
 
 		if let l = userLogin {
-			_subtitle.appendAttributedString(NSAttributedString(string: "@"+l, attributes: lightSubtitle))
+			_subtitle.appendAttributedString(NSAttributedString(string: "@\(l)", attributes: lightSubtitle))
 			_subtitle.appendAttributedString(separator)
 		}
 

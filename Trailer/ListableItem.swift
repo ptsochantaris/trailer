@@ -141,7 +141,7 @@ class ListableItem: DataItem {
 
 	final var refersToMe: Bool {
 		if let apiName = apiServer.userName, b = body {
-			let range = b.rangeOfString("@"+apiName, options: [.CaseInsensitiveSearch, .DiacriticInsensitiveSearch])
+			let range = b.rangeOfString("@\(apiName)", options: [.CaseInsensitiveSearch, .DiacriticInsensitiveSearch])
 			return range != nil
 		}
 		return false
@@ -584,7 +584,7 @@ class ListableItem: DataItem {
 				repeat {
 					foundOne = false
 					for word in fi.componentsSeparatedByString(" ") {
-						if word.characters.startsWith((tagString+":").characters) {
+						if word.characters.startsWith("\(tagString):".characters) {
 							if let p = process(word) {
 								andPredicates.append(p)
 							}
@@ -741,10 +741,12 @@ class ListableItem: DataItem {
 		var suffix = ""
 		if labelNames.count > 0 {
 			for l in labelNames {
-				suffix += " ["+l+"]"
+				suffix += " [\(l)]"
 			}
 		}
-		return "#\(self.number ?? 0) - " + (title ?? "NO TITLE") + suffix
+		let n = number?.integerValue ?? 0
+		let t = S(title)
+		return "#\(n) - \(t)\(suffix)"
 	}
 	final func indexForSpotlight() {
 		let s = CSSearchableItemAttributeSet(itemContentType: kUTTypeText as String)
@@ -754,7 +756,7 @@ class ListableItem: DataItem {
 		s.keywords = searchKeywords
 		s.creator = userLogin
 
-		s.contentDescription = S(repo.fullName) + " @" + S(userLogin) + " - " + S(body?.trim())
+		s.contentDescription = "\(S(repo.fullName)) @\(S(userLogin)) - \(S(body?.trim()))"
 
 		func completeIndex(s: CSSearchableItemAttributeSet) {
 			let i = CSSearchableItem(uniqueIdentifier:objectID.URIRepresentation().absoluteString, domainIdentifier: nil, attributeSet: s)
@@ -763,7 +765,7 @@ class ListableItem: DataItem {
 
 		if let i = self.userAvatarUrl where !Settings.hideAvatars {
 			api.haveCachedAvatar(i) { _, cachePath in
-				s.thumbnailURL = NSURL(string: "file://"+cachePath)
+				s.thumbnailURL = NSURL(string: "file://\(cachePath)")
 				completeIndex(s)
 			}
 		} else {

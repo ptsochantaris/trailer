@@ -163,13 +163,14 @@ final class API {
 	func haveCachedAvatar(path: String, tryLoadAndCallback: (IMAGE_CLASS?, String) -> Void) -> Bool {
 
 		#if os(iOS)
-			let absolutePath = path + (path.characters.contains("?") ? "&" : "?") + "s=\(40.0*GLOBAL_SCREEN_SCALE)"
+			let imgsize = 40.0*GLOBAL_SCREEN_SCALE
 		#else
-			let absolutePath = path + (path.characters.contains("?") ? "&" : "?") + "s=88"
+			let imgsize = 88
 		#endif
-
-		let imageKey = absolutePath + " " + currentAppVersion()
-		let cachePath = cacheDirectory.stringByAppendingPathComponent("imgcache-" + imageKey.md5hash)
+		let connector = path.characters.contains("?") ? "&" : "?"
+		let absolutePath = "\(path)\(connector)s=\(imgsize)"
+		let imageKey = "\(absolutePath) \(currentAppVersion())"
+		let cachePath = cacheDirectory.stringByAppendingPathComponent("imgcache-\(imageKey.md5hash)")
 		
 		let fileManager = NSFileManager.defaultManager()
 		if fileManager.fileExistsAtPath(cachePath) {
@@ -1348,7 +1349,7 @@ final class API {
 		let r = NSMutableURLRequest(URL: url, cachePolicy: .ReloadIgnoringLocalCacheData, timeoutInterval: 60.0)
 		r.setValue("application/vnd.github.v3+json", forHTTPHeaderField:"Accept")
 		if let a = fromServer.authToken {
-			r.setValue("token " + a, forHTTPHeaderField: "Authorization")
+			r.setValue("token \(a)", forHTTPHeaderField: "Authorization")
 		}
 
 		////////////////////////// preempt with error backoff algorithm

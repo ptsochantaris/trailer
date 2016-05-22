@@ -30,7 +30,7 @@ final class SnoozePreset: NSManagedObject {
 					return "Until manual wake"
 				}
 			}
-			return "For " + resultItems.joinWithSeparator(", ")
+			return "For \(resultItems.joinWithSeparator(", "))"
 		} else {
 			var result = "Until "
 			if let d = day?.integerValue {

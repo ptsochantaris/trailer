@@ -240,7 +240,7 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 	private func titleForRepo(repo: Repo) -> NSAttributedString {
 
 		let fullName = S(repo.fullName)
-		let text = (repo.inaccessible?.boolValue ?? false) ? (fullName + " (inaccessible)") : fullName
+		let text = (repo.inaccessible?.boolValue ?? false) ? "\(fullName) (inaccessible)" : fullName
 		let color = repo.shouldSync ? UIColor.darkTextColor() : UIColor.lightGrayColor()
 		return NSAttributedString(string: text, attributes: [ NSForegroundColorAttributeName: color ])
 	}

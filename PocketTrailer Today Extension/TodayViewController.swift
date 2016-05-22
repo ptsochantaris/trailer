@@ -137,7 +137,7 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 				d.dateStyle = NSDateFormatterStyle.ShortStyle
 				d.timeStyle = NSDateFormatterStyle.ShortStyle
 				d.doesRelativeDateFormatting = true
-				updatedLabel.attributedText = NSAttributedString(string: "Updated " + d.stringFromDate(lastRefresh), attributes: smallAttributes)
+				updatedLabel.attributedText = NSAttributedString(string: "Updated \(d.stringFromDate(lastRefresh))", attributes: smallAttributes)
 			}
 		} else {
 			issuesLabel.attributedText = nil

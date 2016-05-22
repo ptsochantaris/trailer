@@ -910,7 +910,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		if apiServerWebPath.stringValue.isEmpty {
 			reportNeedFrontEnd()
 		} else {
-			let address = apiServerWebPath.stringValue + "/settings/tokens/new"
+			let address = "\(apiServerWebPath.stringValue)/settings/tokens/new"
 			NSWorkspace.sharedWorkspace().openURL(NSURL(string: address)!)
 		}
 	}
@@ -919,7 +919,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		if apiServerWebPath.stringValue.isEmpty {
 			reportNeedFrontEnd()
 		} else {
-			let address = apiServerWebPath.stringValue + "/settings/applications"
+			let address = "\(apiServerWebPath.stringValue)/settings/applications"
 			NSWorkspace.sharedWorkspace().openURL(NSURL(string: address)!)
 		}
 	}
@@ -928,7 +928,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		if apiServerWebPath.stringValue.isEmpty {
 			reportNeedFrontEnd()
 		} else {
-			let address = apiServerWebPath.stringValue + "/watching"
+			let address = "\(apiServerWebPath.stringValue)/watching"
 			NSWorkspace.sharedWorkspace().openURL(NSURL(string: address)!)
 		}
 	}
@@ -969,9 +969,9 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		let apiServer = selectedServer()!
 		api.testApiToServer(apiServer) { error in
 			let alert = NSAlert()
-			if error != nil {
-				alert.messageText = "The test failed for " + S(apiServer.apiPath)
-				alert.informativeText = error!.localizedDescription
+			if let e = error {
+				alert.messageText = "The test failed for \(S(apiServer.apiPath))"
+				alert.informativeText = e.localizedDescription
 			} else {
 				alert.messageText = "This API server seems OK!"
 			}
@@ -1144,7 +1144,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 					cell.enabled = true
 					let r = repoForRow(row)
 					let repoName = S(r.fullName)
-					let title = (r.inaccessible?.boolValue ?? false) ? repoName + " (inaccessible)" : repoName
+					let title = (r.inaccessible?.boolValue ?? false) ? "\(repoName) (inaccessible)" : repoName
 					let textColor = (row == tv.selectedRow) ? NSColor.selectedControlTextColor() : (r.shouldSync ? NSColor.textColor() : NSColor.textColor().colorWithAlphaComponent(0.4))
 					cell.attributedStringValue = NSAttributedString(string: title, attributes: [NSForegroundColorAttributeName: textColor])
 				}
