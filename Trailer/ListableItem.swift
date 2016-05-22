@@ -114,10 +114,10 @@ class ListableItem: DataItem {
 	}
 
 	final func shouldKeepForPolicy(policy: Int) -> Bool {
-		let index = (sectionIndex?.integerValue ?? 0)
-		return policy==HandlingPolicy.KeepAll.rawValue
-			|| (policy==HandlingPolicy.KeepMineAndParticipated.rawValue && (index==Section.Mine.rawValue || index==Section.Participated.rawValue))
-			|| (policy==HandlingPolicy.KeepMine.rawValue && index==Section.Mine.rawValue)
+		let s = sectionIndex?.integerValue
+		return policy == HandlingPolicy.KeepAll.rawValue
+			|| (policy == HandlingPolicy.KeepMineAndParticipated.rawValue && (s == Section.Mine.rawValue || s == Section.Participated.rawValue))
+			|| (policy == HandlingPolicy.KeepMine.rawValue && s == Section.Mine.rawValue)
 	}
 
 	final var shouldSkipNotifications: Bool {
@@ -173,7 +173,8 @@ class ListableItem: DataItem {
 	}
 
 	final var showNewComments: Bool {
-		return Settings.showCommentsEverywhere || sectionIndex?.integerValue == Section.Mine.rawValue || sectionIndex?.integerValue == Section.Participated.rawValue || sectionIndex?.integerValue == Section.Mentioned.rawValue
+		let s = sectionIndex?.integerValue
+		return Settings.showCommentsEverywhere || s == Section.Mine.rawValue || s == Section.Participated.rawValue || s == Section.Mentioned.rawValue
 	}
 
 	final func wakeUp() {
@@ -588,7 +589,7 @@ class ListableItem: DataItem {
 								andPredicates.append(p)
 							}
 							fi = fi.stringByReplacingOccurrencesOfString(word, withString: "")
-							fi = fi.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+							fi = fi.trim()
 							foundOne = true
 							break
 						}
@@ -753,9 +754,7 @@ class ListableItem: DataItem {
 		s.keywords = searchKeywords
 		s.creator = userLogin
 
-		s.contentDescription = S(repo.fullName) +
-			" @" + S(userLogin) +
-			" - " + S(body?.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet()))
+		s.contentDescription = S(repo.fullName) + " @" + S(userLogin) + " - " + S(body?.trim())
 
 		func completeIndex(s: CSSearchableItemAttributeSet) {
 			let i = CSSearchableItem(uniqueIdentifier:objectID.URIRepresentation().absoluteString, domainIdentifier: nil, attributeSet: s)

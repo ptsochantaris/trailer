@@ -59,7 +59,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 
 	@IBAction func testAndCompleteSelected(sender: NSButton) {
 
-		let token = tokenHolder.stringValue.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+		let token = tokenHolder.stringValue.trim()
 		if token.isEmpty {
 			let alert = NSAlert()
 			alert.messageText = "Please enter your personal access token first"
@@ -138,7 +138,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 		completeSetup.hidden = true
 		welcomeLabel.hidden = true
 		trackIssues.hidden = true
-		let token = tokenHolder.stringValue.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+		let token = tokenHolder.stringValue.trim()
 		newServer.authToken = token
 		newServer.lastSyncSucceeded = true
 	}

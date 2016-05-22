@@ -46,7 +46,7 @@ final class CommentBlacklistViewController: UITableViewController {
 		a.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil))
 		a.addAction(UIAlertAction(title: "Block", style: UIAlertActionStyle.Default, handler: { action in
 
-			if let tf = a.textFields?.first, n = tf.text?.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet()) {
+			if let tf = a.textFields?.first, n = tf.text?.trim() {
 
 				var name: String = n
 				if name.characters.startsWith("@".characters) {

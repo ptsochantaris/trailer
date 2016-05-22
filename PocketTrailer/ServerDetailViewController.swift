@@ -64,10 +64,10 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 	private func updateServerFromForm() -> ApiServer? {
 		if let sid = serverId {
 			let a = existingObjectWithID(sid) as! ApiServer
-			a.label = name.text?.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
-			a.apiPath = apiPath.text?.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
-			a.webPath = webFrontEnd.text?.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
-			a.authToken = authToken.text?.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+			a.label = name.text?.trim()
+			a.apiPath = apiPath.text?.trim()
+			a.webPath = webFrontEnd.text?.trim()
+			a.authToken = authToken.text?.trim()
 			a.reportRefreshFailures = reportErrors.on
 			a.lastSyncSucceeded = true
 			preferencesDirty = true

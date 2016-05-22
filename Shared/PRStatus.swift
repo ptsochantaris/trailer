@@ -35,7 +35,7 @@ final class PRStatus: DataItem {
 				s.pullRequest = pullRequest
 
 				if let ds = info["description"] as? String {
-					s.descriptionText = ds.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+					s.descriptionText = ds.trim()
 				}
 
 				if let userInfo = info["creator"] as? [NSObject : AnyObject] {

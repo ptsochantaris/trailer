@@ -247,8 +247,7 @@ func isDarkColor(color: COLOR_CLASS) -> Bool {
 }
 
 func parseFromHex(s: String) -> UInt32 {
-	var safe = s.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
-	safe = safe.stringByTrimmingCharactersInSet(NSCharacterSet.symbolCharacterSet())
+	let safe = s.trim().stringByTrimmingCharactersInSet(NSCharacterSet.symbolCharacterSet())
 	let s = NSScanner(string: safe)
 	var result:UInt32 = 0
 	s.scanHexInt(&result)
@@ -273,6 +272,9 @@ extension String {
 	}
 	func stringByReplacingCharactersInRange(range: NSRange, withString string: String) -> String {
 		return (self as NSString).stringByReplacingCharactersInRange(range, withString: string)
+	}
+	func trim() -> String {
+		return self.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
 	}
 	var md5hash: String {
 		let digestLen = Int(CC_MD5_DIGEST_LENGTH)
