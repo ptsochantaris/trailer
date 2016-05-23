@@ -6,7 +6,6 @@ final class ServersViewController: UITableViewController {
 
 	private var selectedServerId: NSManagedObjectID?
 	private var allServers: [ApiServer]!
-	private var resetFormatter: NSDateFormatter!
 
 	@IBAction func doneSelected() {
 		if preferencesDirty {
@@ -17,11 +16,6 @@ final class ServersViewController: UITableViewController {
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		
-		resetFormatter = NSDateFormatter()
-		resetFormatter.doesRelativeDateFormatting = true
-		resetFormatter.timeStyle = NSDateFormatterStyle.ShortStyle
-		resetFormatter.dateStyle = NSDateFormatterStyle.ShortStyle
 
 		clearsSelectionOnViewWillAppear = true
 		NSNotificationCenter.defaultCenter().addObserver(tableView, selector: #selector(UITableView.reloadData), name: REFRESH_ENDED_NOTIFICATION, object: nil)
@@ -67,7 +61,7 @@ final class ServersViewController: UITableViewController {
 				let total = a.requestsLimit?.doubleValue ?? 0
 				let used = total - (a.requestsRemaining?.doubleValue ?? 0)
 				if a.resetDate != nil {
-					D.text = String(format:"%.01f%% API used (%.0f / %.0f requests)\nNext reset: %@", 100*used/total, used, total, resetFormatter.stringFromDate(a.resetDate!))
+					D.text = String(format:"%.01f%% API used (%.0f / %.0f requests)\nNext reset: %@", 100*used/total, used, total, shortDateFormatter.stringFromDate(a.resetDate!))
 				} else {
 					D.text = String(format:"%.01f%% API used (%.0f / %.0f requests)", 100*used/total, used, total)
 				}

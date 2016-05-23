@@ -3,14 +3,6 @@ import WatchKit
 import ClockKit
 import WatchConnectivity
 
-let shortDateFormatter = { () -> NSDateFormatter in
-	let d = NSDateFormatter()
-	d.dateStyle = .ShortStyle
-	d.timeStyle = .ShortStyle
-	d.doesRelativeDateFormatting = true
-	return d
-	}()
-
 final class GlanceController: WKInterfaceController, WCSessionDelegate {
 
     @IBOutlet weak var totalCount: WKInterfaceLabel!

@@ -256,7 +256,7 @@ class TrailerCell: NSTableCellView {
 		}
 
 		let pCenter = NSMutableParagraphStyle()
-		pCenter.alignment = NSTextAlignment.Center
+		pCenter.alignment = .Center
 
 		let countString = NSAttributedString(string: itemCountFormatter.stringFromNumber(totalCount)!, attributes: [
 			NSFontAttributeName: NSFont.menuFontOfSize(11),

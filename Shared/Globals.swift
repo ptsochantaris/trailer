@@ -44,9 +44,9 @@ var lastRepoCheck = never()
 
 let itemDateFormatter = { () -> NSDateFormatter in
 	let f = NSDateFormatter()
-	f.doesRelativeDateFormatting = true
 	f.dateStyle = .MediumStyle
 	f.timeStyle = .ShortStyle
+	f.doesRelativeDateFormatting = true
 	return f
 	}()
 

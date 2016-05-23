@@ -1,6 +1,5 @@
 
 import UIKit
-import CoreData
 import Foundation
 import NotificationCenter
 
@@ -133,11 +132,7 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 			if lastRefresh == NSDate.distantPast() {
 				updatedLabel.attributedText = NSAttributedString(string: "Not updated yet", attributes: smallAttributes)
 			} else {
-				let d = NSDateFormatter()
-				d.dateStyle = NSDateFormatterStyle.ShortStyle
-				d.timeStyle = NSDateFormatterStyle.ShortStyle
-				d.doesRelativeDateFormatting = true
-				updatedLabel.attributedText = NSAttributedString(string: "Updated \(d.stringFromDate(lastRefresh))", attributes: smallAttributes)
+				updatedLabel.attributedText = NSAttributedString(string: "Updated \(shortDateFormatter.stringFromDate(lastRefresh))", attributes: smallAttributes)
 			}
 		} else {
 			issuesLabel.attributedText = nil

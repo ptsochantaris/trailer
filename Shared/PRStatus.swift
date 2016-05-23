@@ -1,19 +1,5 @@
 import Foundation
 
-let darkStatusRed = MAKECOLOR(0.8, 0.5, 0.5, 1.0)
-let darkStatusYellow = MAKECOLOR(0.9, 0.8, 0.3, 1.0)
-let darkStatusGreen = MAKECOLOR(0.6, 0.8, 0.6, 1.0)
-let lightStatusRed = MAKECOLOR(0.5, 0.2, 0.2, 1.0)
-let lightStatusYellow = MAKECOLOR(0.6, 0.5, 0.0, 1.0)
-let lightStatusGreen = MAKECOLOR(0.3, 0.5, 0.3, 1.0)
-
-let dateFormatter = { () -> NSDateFormatter in
-	let dateFormatter = NSDateFormatter()
-	dateFormatter.dateStyle = NSDateFormatterStyle.ShortStyle
-	dateFormatter.timeStyle = NSDateFormatterStyle.ShortStyle
-	return dateFormatter
-}()
-
 final class PRStatus: DataItem {
 
     @NSManaged var descriptionText: String?
@@ -45,6 +31,13 @@ final class PRStatus: DataItem {
 			}
 		}
 	}
+
+	private let darkStatusRed = MAKECOLOR(0.8, 0.5, 0.5, 1.0)
+	private let darkStatusYellow = MAKECOLOR(0.9, 0.8, 0.3, 1.0)
+	private let darkStatusGreen = MAKECOLOR(0.6, 0.8, 0.6, 1.0)
+	private let lightStatusRed = MAKECOLOR(0.5, 0.2, 0.2, 1.0)
+	private let lightStatusYellow = MAKECOLOR(0.6, 0.5, 0.0, 1.0)
+	private let lightStatusGreen = MAKECOLOR(0.3, 0.5, 0.3, 1.0)
 
 	var colorForDarkDisplay: COLOR_CLASS {
 		switch S(state) {
@@ -79,7 +72,7 @@ final class PRStatus: DataItem {
 			default:
 				prefix = "❌"
 			}
-			return String(format: "%@ %@ %@", prefix, dateFormatter.stringFromDate(createdAt!), desc)
+			return String(format: "%@ %@ %@", prefix, shortDateFormatter.stringFromDate(createdAt!), desc)
 		} else {
 			return "(No description)"
 		}

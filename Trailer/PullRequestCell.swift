@@ -89,7 +89,7 @@ final class PullRequestCell: TrailerCell {
 				let unmergeableLabel = CenterTextField(frame: pinRect)
 				unmergeableLabel.textColor = NSColor.redColor()
 				unmergeableLabel.font = NSFont(name: "Menlo-Regular", size: 8.0)
-				unmergeableLabel.alignment = NSTextAlignment.Center
+				unmergeableLabel.alignment = .Center
 				unmergeableLabel.stringValue = "Cannot be merged"
 				addSubview(unmergeableLabel)
 			}

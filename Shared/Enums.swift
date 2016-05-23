@@ -24,6 +24,14 @@ func S(s: String?) -> String {
 
 typealias Completion = ()->Void
 
+let shortDateFormatter = { () -> NSDateFormatter in
+	let d = NSDateFormatter()
+	d.dateStyle = .ShortStyle
+	d.timeStyle = .ShortStyle
+	d.doesRelativeDateFormatting = true
+	return d
+}()
+
 ////
 
 func atNextEvent(completion: Completion) {

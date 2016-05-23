@@ -34,6 +34,9 @@ final class PRCell: UITableViewCell {
 		readCount.textColor = UIColor.darkGrayColor()
 		contentView.addSubview(readCount)
 
+		_image.layer.cornerRadius = 25
+		_image.clipsToBounds = true
+
 		let bg = UIView()
 		bg.backgroundColor = UIColor(red: 0.82, green: 0.88, blue: 0.97, alpha: 1.0)
 		selectedBackgroundView = bg
@@ -41,36 +44,36 @@ final class PRCell: UITableViewCell {
 		contentView.addConstraints([
 
 			NSLayoutConstraint(item: _image,
-				attribute: NSLayoutAttribute.CenterX,
-				relatedBy: NSLayoutRelation.Equal,
+				attribute: .Leading,
+				relatedBy: .Equal,
 				toItem: readCount,
-				attribute: NSLayoutAttribute.CenterX,
+				attribute: .Leading,
 				multiplier: 1,
-				constant: -23),
+				constant: 3),
 
 			NSLayoutConstraint(item: _image,
-				attribute: NSLayoutAttribute.CenterY,
-				relatedBy: NSLayoutRelation.Equal,
+				attribute: .CenterY,
+				relatedBy: .Equal,
 				toItem: readCount,
-				attribute: NSLayoutAttribute.CenterY,
+				attribute: .CenterY,
 				multiplier: 1,
-				constant: -23),
+				constant: -21),
 
 			NSLayoutConstraint(item: _image,
-				attribute: NSLayoutAttribute.CenterX,
-				relatedBy: NSLayoutRelation.Equal,
+				attribute: .Leading,
+				relatedBy: .Equal,
 				toItem: unreadCount,
-				attribute: NSLayoutAttribute.CenterX,
+				attribute: .Leading,
 				multiplier: 1,
-				constant: 23),
+				constant: 3),
 
 			NSLayoutConstraint(item: _image,
-				attribute: NSLayoutAttribute.CenterY,
-				relatedBy: NSLayoutRelation.Equal,
+				attribute: .CenterY,
+				relatedBy: .Equal,
 				toItem: unreadCount,
-				attribute: NSLayoutAttribute.CenterY,
+				attribute: .CenterY,
 				multiplier: 1,
-				constant: 23)
+				constant: 21)
 			])
 
 		NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PRCell.networkStateChanged), name: kReachabilityChangedNotification, object: nil)
@@ -166,7 +169,7 @@ final class PRCell: UITableViewCell {
 		unreadCount.hidden = (_commentsNew == 0)
 		unreadCount.text = itemCountFormatter.stringFromNumber(_commentsNew)
 
-		let a:CGFloat = fade ? DISABLED_FADE : 1.0
+		let a = fade ? DISABLED_FADE : 1.0
 		readCount.alpha = a
 		unreadCount.alpha = a
 		_image.alpha = a
