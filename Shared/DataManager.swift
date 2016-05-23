@@ -1,12 +1,9 @@
 
 import CoreData
-#if os(iOS)
-	import UIKit
-#endif
 
 let mainObjectContext = DataManager.buildMainContext()
 
-final class DataManager : NSObject {
+final class DataManager {
 
 	static var postMigrationRepoPrPolicy: RepoDisplayPolicy?
 	static var postMigrationRepoIssuePolicy: RepoDisplayPolicy?
@@ -273,7 +270,7 @@ final class DataManager : NSObject {
 		return appSupportURL.URLByAppendingPathComponent("com.housetrip.Trailer")
 	}
 
-	private class func sharedFilesDirectory() -> NSURL {
+	class func sharedFilesDirectory() -> NSURL {
 		return NSFileManager.defaultManager().containerURLForSecurityApplicationGroupIdentifier("group.Trailer")!
 	}
 

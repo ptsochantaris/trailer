@@ -203,7 +203,8 @@ func currentAppVersion() -> String {
 
 #if os(iOS)
 
-import UIKit
+	import UIKit
+	import CoreData
 
 	enum MasterViewMode: Int {
 		case PullRequests, Issues

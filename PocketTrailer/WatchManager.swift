@@ -20,7 +20,8 @@ final class WatchManager : NSObject, WCSessionDelegate {
 	func updateContext() {
 		let overview = buildOverview()
 		_ = try? session?.updateApplicationContext(["overview": overview])
-		(overview as NSDictionary).writeToURL(sharedFilesDirectory().URLByAppendingPathComponent("overview.plist"), atomically: true)
+		let overviewPath = DataManager.sharedFilesDirectory().URLByAppendingPathComponent("overview.plist")
+		(overview as NSDictionary).writeToURL(overviewPath, atomically: true)
 	}
 
 	private func startBGTask() {
