@@ -233,6 +233,7 @@ final class DataManager : NSObject {
 
 	class func tempContext() -> NSManagedObjectContext {
 		let c = NSManagedObjectContext(concurrencyType: .MainQueueConcurrencyType)
+		c.mergePolicy = NSMergePolicy(mergeType: NSMergePolicyType.MergeByPropertyObjectTrumpMergePolicyType)
 		c.parentContext = mainObjectContext
 		c.undoManager = nil
 		return c
@@ -284,6 +285,7 @@ let mainObjectContext = { () -> NSManagedObjectContext in
 	let m = NSManagedObjectContext(concurrencyType:NSManagedObjectContextConcurrencyType.MainQueueConcurrencyType)
 	m.undoManager = nil
 	m.persistentStoreCoordinator = persistentStoreCoordinator
+	m.mergePolicy = NSMergePolicy(mergeType: NSMergePolicyType.MergeByPropertyObjectTrumpMergePolicyType)
 	DLog("Database setup complete")
 	return m
 }()

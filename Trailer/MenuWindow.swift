@@ -10,7 +10,18 @@ final class MenuWindow: NSWindow {
 	@IBOutlet weak var refreshMenuItem: NSMenuItem!
 
 	var statusItem: NSStatusItem?
-	var messageView: MessageView?
+
+	var messageView: MessageView? {
+		didSet {
+			if let p = oldValue {
+				p.removeFromSuperview()
+			}
+			if let m = messageView {
+				contentView?.addSubview(m)
+			}
+		}
+	}
+
 	var itemDelegate: ItemDelegate! {
 		didSet {
 			table.setDataSource(itemDelegate)
@@ -179,7 +190,7 @@ final class MenuWindow: NSWindow {
 	}
 
 	func reload() {
-		messageView?.removeFromSuperview()
+		messageView = nil
 		itemDelegate.reloadData(filter.stringValue)
 		table.reloadData()
 	}

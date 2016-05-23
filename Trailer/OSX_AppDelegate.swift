@@ -606,21 +606,8 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		appIsRefreshing = true
 		preferencesWindow?.updateActivity()
 
-		let grayOut = Settings.grayOutWhenRefreshing
 		for d in serverDisplays {
-			let p = d.prMenu
-			if p.messageView != nil {
-				d.updatePrMenu()
-			}
-			p.refreshMenuItem.title = " Refreshing..."
-			(p.statusItem?.view as? StatusItemView)?.grayOut = grayOut
-
-			let i = d.issuesMenu
-			if i.messageView != nil {
-				d.updateIssuesMenu()
-			}
-			i.refreshMenuItem.title = " Refreshing..."
-			(i.statusItem?.view as? StatusItemView)?.grayOut = grayOut
+			d.prepareForRefresh()
 		}
 
 		DLog("Starting refresh")
