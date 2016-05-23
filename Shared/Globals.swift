@@ -239,6 +239,10 @@ func versionString() -> String {
 	return "Version \(currentAppVersion()) (\(buildNumber))"
 }
 
+func existingObjectWithID(id: NSManagedObjectID) -> NSManagedObject? {
+	return try? mainObjectContext.existingObjectWithID(id)
+}
+
 func isDarkColor(color: COLOR_CLASS) -> Bool {
 	var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0
 	color.getRed(&r, green: &g, blue: &b, alpha: nil)

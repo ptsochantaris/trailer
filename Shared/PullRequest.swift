@@ -60,7 +60,7 @@ final class PullRequest: ListableItem {
 	class func allMergedInMoc(moc: NSManagedObjectContext, apiServerId: NSManagedObjectID? = nil) -> [PullRequest] {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
-		if let aid = apiServerId, a = try! mainObjectContext.existingObjectWithID(aid) as? ApiServer {
+		if let aid = apiServerId, a = existingObjectWithID(aid) as? ApiServer {
 			f.predicate = NSPredicate(format: "condition == %d and apiServer == %@", ItemCondition.Merged.rawValue, a)
 		} else {
 			f.predicate = NSPredicate(format: "condition == %d", ItemCondition.Merged.rawValue)
@@ -71,7 +71,7 @@ final class PullRequest: ListableItem {
 	class func allClosedInMoc(moc: NSManagedObjectContext, apiServerId: NSManagedObjectID? = nil) -> [PullRequest] {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
-		if let aid = apiServerId, a = try! mainObjectContext.existingObjectWithID(aid) as? ApiServer {
+		if let aid = apiServerId, a = existingObjectWithID(aid) as? ApiServer {
 			f.predicate = NSPredicate(format: "condition == %d and apiServer == %@", ItemCondition.Merged.rawValue, a)
 		} else {
 			f.predicate = NSPredicate(format: "condition == %d", ItemCondition.Closed.rawValue)

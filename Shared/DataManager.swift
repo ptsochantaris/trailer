@@ -4,6 +4,8 @@ import CoreData
 	import UIKit
 #endif
 
+let mainObjectContext = DataManager.buildMainContext()
+
 final class DataManager : NSObject {
 
 	static var postMigrationRepoPrPolicy: RepoDisplayPolicy?
@@ -15,7 +17,7 @@ final class DataManager : NSObject {
 			#if os(iOS)
 				migrateDatabaseToShared()
 			#endif
-			DataManager.performVersionChangedTasks()
+			performVersionChangedTasks()
 			Settings.lastRunVersion = versionString()
 		}
 		ApiServer.ensureAtLeastGithubInMoc(mainObjectContext)
@@ -104,69 +106,46 @@ final class DataManager : NSObject {
 			}
 			try! fm.removeItemAtPath(oldDocumentsDirectory)
 		} catch {
-			/* No legacy directory */
+			// No legacy directory
 		}
 	}
 
 	class func sendNotificationsIndexAndSave() {
 
-		let allPrs = PullRequest.allItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest]
-		for p in allPrs {
-			if p.isVisibleOnMenu {
-				if !p.createdByMe {
-					if !(p.isNewAssignment?.boolValue ?? false) && !(p.announced?.boolValue ?? false) {
-						app.postNotificationOfType(.NewPr, forItem: p)
-						p.announced = true
+		func processItems(type: String, newNotification: NotificationType, reopenedNotification: NotificationType, assignmentNotification: NotificationType) -> [ListableItem] {
+			let allItems = DataItem.allItemsOfType(type, inMoc: mainObjectContext) as! [ListableItem]
+			for i in allItems {
+				if i.isVisibleOnMenu {
+					if !i.createdByMe {
+						if !(i.isNewAssignment?.boolValue ?? false) && !(i.announced?.boolValue ?? false) {
+							app.postNotificationOfType(newNotification, forItem: i)
+							i.announced = true
+						}
+						if let reopened = i.reopened?.boolValue where reopened == true {
+							app.postNotificationOfType(reopenedNotification, forItem: i)
+							i.reopened = false
+						}
+						if let newAssignment = i.isNewAssignment?.boolValue where newAssignment == true {
+							app.postNotificationOfType(assignmentNotification, forItem: i)
+							i.isNewAssignment = false
+						}
 					}
-					if let reopened = p.reopened?.boolValue where reopened == true {
-						app.postNotificationOfType(.PrReopened, forItem: p)
-						p.reopened = false
-					}
-					if let newAssignment = p.isNewAssignment?.boolValue where newAssignment == true {
-						app.postNotificationOfType(.NewPrAssigned, forItem: p)
-						p.isNewAssignment = false
-					}
-				}
-				#if os(iOS)
+					#if os(iOS)
+						atNextEvent {
+							i.indexForSpotlight()
+						}
+					#endif
+				} else {
 					atNextEvent {
-						p.indexForSpotlight()
+						i.ensureInvisible()
 					}
-				#endif
-			} else {
-				atNextEvent {
-					p.ensureInvisible()
 				}
 			}
+			return allItems
 		}
 
-		let allIssues = Issue.allItemsOfType("Issue", inMoc: mainObjectContext) as! [Issue]
-		for i in allIssues {
-			if i.isVisibleOnMenu {
-				if !i.createdByMe {
-					if !(i.isNewAssignment?.boolValue ?? false) && !(i.announced?.boolValue ?? false) {
-						app.postNotificationOfType(.NewIssue, forItem: i)
-						i.announced = true
-					}
-					if let reopened = i.reopened?.boolValue where reopened == true {
-						app.postNotificationOfType(.IssueReopened, forItem: i)
-						i.reopened = false
-					}
-					if let newAssignment = i.isNewAssignment?.boolValue where newAssignment == true {
-						app.postNotificationOfType(.NewIssueAssigned, forItem: i)
-						i.isNewAssignment = false
-					}
-				}
-				#if os(iOS)
-					atNextEvent {
-						i.indexForSpotlight()
-					}
-				#endif
-			} else {
-				atNextEvent {
-					i.ensureInvisible()
-				}
-			}
-		}
+		let allPrs = processItems("PullRequest", newNotification: .NewPr, reopenedNotification: .PrReopened, assignmentNotification: .NewPrAssigned)
+		let allIssues = processItems("Issue", newNotification: .NewIssue, reopenedNotification: .IssueReopened, assignmentNotification: .NewIssueAssigned)
 
 		let latestComments = PRComment.newItemsOfType("PRComment", inMoc: mainObjectContext) as! [PRComment]
 		for c in latestComments {
@@ -216,7 +195,7 @@ final class DataManager : NSObject {
 			}
 		}
 
-		DataManager.saveDB()
+		saveDB()
 	}
 
 	class func saveDB() -> Bool {
@@ -233,7 +212,7 @@ final class DataManager : NSObject {
 
 	class func tempContext() -> NSManagedObjectContext {
 		let c = NSManagedObjectContext(concurrencyType: .MainQueueConcurrencyType)
-		c.mergePolicy = NSMergePolicy(mergeType: NSMergePolicyType.MergeByPropertyObjectTrumpMergePolicyType)
+		c.mergePolicy = NSMergePolicy(mergeType: .MergeByPropertyObjectTrumpMergePolicyType)
 		c.parentContext = mainObjectContext
 		c.undoManager = nil
 		return c
@@ -272,107 +251,97 @@ final class DataManager : NSObject {
 	}
 
 	class func idForUriPath(uriPath: String?) -> NSManagedObjectID? {
-		if let up = uriPath, u = NSURL(string: up) {
-			return persistentStoreCoordinator.managedObjectIDForURIRepresentation(u)
+		if let up = uriPath, u = NSURL(string: up), p = mainObjectContext.persistentStoreCoordinator {
+			return p.managedObjectIDForURIRepresentation(u)
 		}
 		return nil
 	}
-}
 
-///////////////////////////////////////
-
-let mainObjectContext = { () -> NSManagedObjectContext in
-	let m = NSManagedObjectContext(concurrencyType:NSManagedObjectContextConcurrencyType.MainQueueConcurrencyType)
-	m.undoManager = nil
-	m.persistentStoreCoordinator = persistentStoreCoordinator
-	m.mergePolicy = NSMergePolicy(mergeType: NSMergePolicyType.MergeByPropertyObjectTrumpMergePolicyType)
-	DLog("Database setup complete")
-	return m
-}()
-
-var _justMigrated: Bool = false
-let persistentStoreCoordinator = { ()-> NSPersistentStoreCoordinator in
-
-	let dataDir = dataFilesDirectory()
-	let sqlStorePath = dataDir.URLByAppendingPathComponent("Trailer.sqlite")
-	let mom = NSManagedObjectModel(contentsOfURL: NSBundle.mainBundle().URLForResource("Trailer", withExtension: "momd")!)!
-
-	let fileManager = NSFileManager.defaultManager()
-	if fileManager.fileExistsAtPath(sqlStorePath.path!) {
-		let m = try! NSPersistentStoreCoordinator.metadataForPersistentStoreOfType(NSSQLiteStoreType, URL: sqlStorePath, options: nil)
-		_justMigrated = !mom.isConfiguration(nil, compatibleWithStoreMetadata: m)
-	} else {
-		try! fileManager.createDirectoryAtPath(dataDir.path!, withIntermediateDirectories: true, attributes: nil)
-	}
-
-	var newCoordinator = NSPersistentStoreCoordinator(managedObjectModel:mom)
-	if !addStorePath(sqlStorePath, newCoordinator: newCoordinator) {
-		DLog("Failed to migrate/load DB store - will nuke it and retry")
-		removeDatabaseFiles()
-
-		newCoordinator = NSPersistentStoreCoordinator(managedObjectModel:mom)
-		if !addStorePath(sqlStorePath, newCoordinator: newCoordinator) {
-			DLog("Catastrophic failure, app is probably corrupted and needs reinstall")
-			abort()
-		}
-	}
-	return newCoordinator
-}()
-
-func dataFilesDirectory() -> NSURL {
-	#if os(iOS)
-		let sharedFiles = sharedFilesDirectory()
-		DLog("Shared files in %@", sharedFiles)
+	private class func dataFilesDirectory() -> NSURL {
+		#if os(iOS)
+			let sharedFiles = sharedFilesDirectory()
+		#else
+			let sharedFiles = legacyFilesDirectory()
+		#endif
+		DLog("Files in %@", sharedFiles)
 		return sharedFiles
-	#else
-		return legacyFilesDirectory()
-	#endif
-}
+	}
 
-private func legacyFilesDirectory() -> NSURL {
-	let f = NSFileManager.defaultManager()
-	var appSupportURL = f.URLsForDirectory(NSSearchPathDirectory.ApplicationSupportDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask).last! 
-	appSupportURL = appSupportURL.URLByAppendingPathComponent("com.housetrip.Trailer")
-	DLog("Files in %@", appSupportURL)
-	return appSupportURL
-}
+	private class func legacyFilesDirectory() -> NSURL {
+		let f = NSFileManager.defaultManager()
+		let appSupportURL = f.URLsForDirectory(NSSearchPathDirectory.ApplicationSupportDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask).last!
+		return appSupportURL.URLByAppendingPathComponent("com.housetrip.Trailer")
+	}
 
-func sharedFilesDirectory() -> NSURL {
-	return NSFileManager.defaultManager().containerURLForSecurityApplicationGroupIdentifier("group.Trailer")!
-}
+	private class func sharedFilesDirectory() -> NSURL {
+		return NSFileManager.defaultManager().containerURLForSecurityApplicationGroupIdentifier("group.Trailer")!
+	}
 
-private func addStorePath(sqlStore: NSURL, newCoordinator: NSPersistentStoreCoordinator) -> Bool {
+	private class func removeDatabaseFiles() {
+		let fm = NSFileManager.defaultManager()
+		let documentsDirectory = dataFilesDirectory().path!
+		do {
+			for file in try fm.contentsOfDirectoryAtPath(documentsDirectory) {
+				if file.rangeOfString("Trailer.sqlite") != nil {
+					DLog("Removing old database file: %@",file)
+					try! fm.removeItemAtPath(documentsDirectory.stringByAppendingPathComponent(file))
+				}
+			}
+		} catch { /* no directory */ }
+	}
 
-	do {
+	private static var _justMigrated: Bool = false
+
+	class func buildMainContext() -> NSManagedObjectContext {
+
 		let storeOptions = [
-			NSMigratePersistentStoresAutomaticallyOption: NSNumber(bool: true),
-			NSInferMappingModelAutomaticallyOption: NSNumber(bool: true),
+			NSMigratePersistentStoresAutomaticallyOption: true,
+			NSInferMappingModelAutomaticallyOption: true,
 			NSSQLitePragmasOption: ["synchronous":"OFF", "fullfsync":"0"]]
 
-		try newCoordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: sqlStore, options: storeOptions)
-	} catch {
-		DLog("Error while mounting DB store %@", (error as NSError).localizedDescription)
-		return false
-	}
-
-	return true
-}
-
-func existingObjectWithID(id: NSManagedObjectID) -> NSManagedObject? {
-	return try? mainObjectContext.existingObjectWithID(id)
-}
-
-func removeDatabaseFiles() {
-	let fm = NSFileManager.defaultManager()
-	let documentsDirectory = dataFilesDirectory().path!
-	do {
-		for file in try fm.contentsOfDirectoryAtPath(documentsDirectory) {
-			if file.rangeOfString("Trailer.sqlite") != nil {
-				DLog("Removing old database file: %@",file)
-				try! fm.removeItemAtPath(documentsDirectory.stringByAppendingPathComponent(file))
+		func addStorePath(sqlStore: NSURL, newCoordinator: NSPersistentStoreCoordinator) -> Bool {
+			do {
+				try newCoordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: sqlStore, options: storeOptions)
+				return true
+			} catch let error as NSError {
+				DLog("Error while mounting DB store: %@", error.localizedDescription)
+				return false
+			} catch { // Swift compiler bug, this should never get executed
+				DLog("Error while mounting DB store: Unknown")
+				return false
 			}
 		}
-	} catch { /* no directory */ }
-}
 
-////////////////////////////////
+		let dataDir = dataFilesDirectory()
+		let sqlStorePath = dataDir.URLByAppendingPathComponent("Trailer.sqlite")
+		let modelPath = NSBundle.mainBundle().URLForResource("Trailer", withExtension: "momd")!
+		let mom = NSManagedObjectModel(contentsOfURL: modelPath)!
+
+		let fileManager = NSFileManager.defaultManager()
+		if fileManager.fileExistsAtPath(sqlStorePath.path!) {
+			let m = try! NSPersistentStoreCoordinator.metadataForPersistentStoreOfType(NSSQLiteStoreType, URL: sqlStorePath, options: nil)
+			_justMigrated = !mom.isConfiguration(nil, compatibleWithStoreMetadata: m)
+		} else {
+			try! fileManager.createDirectoryAtPath(dataDir.path!, withIntermediateDirectories: true, attributes: nil)
+		}
+
+		var persistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel:mom)
+		if !addStorePath(sqlStorePath, newCoordinator: persistentStoreCoordinator) {
+			DLog("Failed to migrate/load DB store - will nuke it and retry")
+			removeDatabaseFiles()
+
+			persistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel:mom)
+			if !addStorePath(sqlStorePath, newCoordinator: persistentStoreCoordinator) {
+				DLog("Catastrophic failure, app is probably corrupted and needs reinstall")
+				abort()
+			}
+		}
+
+		let m = NSManagedObjectContext(concurrencyType: .MainQueueConcurrencyType)
+		m.undoManager = nil
+		m.persistentStoreCoordinator = persistentStoreCoordinator
+		m.mergePolicy = NSMergePolicy(mergeType: .MergeByPropertyObjectTrumpMergePolicyType)
+		DLog("Database setup complete")
+		return m
+	}
+}

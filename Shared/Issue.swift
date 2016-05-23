@@ -161,7 +161,7 @@ final class Issue: ListableItem {
 	class func allClosedInMoc(moc: NSManagedObjectContext, apiServerId: NSManagedObjectID? = nil) -> [Issue] {
 		let f = NSFetchRequest(entityName: "Issue")
 		f.returnsObjectsAsFaults = false
-		if let aid = apiServerId, a = try! mainObjectContext.existingObjectWithID(aid) as? ApiServer {
+		if let aid = apiServerId, a = existingObjectWithID(aid) as? ApiServer {
 			f.predicate = NSPredicate(format: "condition == %d and apiServer == %@", ItemCondition.Closed.rawValue, a)
 		} else {
 			f.predicate = NSPredicate(format: "condition == %d", ItemCondition.Closed.rawValue)

@@ -568,7 +568,7 @@ class ListableItem: DataItem {
 
 		var andPredicates = [NSPredicate]()
 
-		if let aid = apiServerId, a = try! mainObjectContext.existingObjectWithID(aid) as? ApiServer {
+		if let aid = apiServerId, a = existingObjectWithID(aid) as? ApiServer {
 			andPredicates.append(NSPredicate(format: "apiServer == %@", a))
 		}
 

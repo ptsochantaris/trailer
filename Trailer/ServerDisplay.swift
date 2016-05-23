@@ -107,7 +107,7 @@ final class ServerDisplay {
 		if somethingFailed && apiServerId == nil {
 			countString = "X"
 			attributes = redText()
-		} else if somethingFailed, let aid = apiServerId, a = try! mainObjectContext.existingObjectWithID(aid) as? ApiServer where !(a.lastSyncSucceeded?.boolValue ?? true) {
+		} else if somethingFailed, let aid = apiServerId, a = existingObjectWithID(aid) as? ApiServer where !(a.lastSyncSucceeded?.boolValue ?? true) {
 			countString = "X"
 			attributes = redText()
 		} else {
@@ -147,7 +147,7 @@ final class ServerDisplay {
 				siv.labelOffset = lengthOffset
 				siv.highlighted = im.visible
 				siv.grayOut = shouldGray
-				if let aid = S.apiServerId, a = try! mainObjectContext.existingObjectWithID(aid) as? ApiServer {
+				if let aid = S.apiServerId, a = existingObjectWithID(aid) as? ApiServer {
 					siv.serverTitle = a.label
 				}
 				siv.tappedCallback = {
