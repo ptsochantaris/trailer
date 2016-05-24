@@ -20,19 +20,11 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	@IBAction func editSelected(sender: UIBarButtonItem ) {
 
-		let a = UIAlertController(title: "Action", message: nil, preferredStyle: UIAlertControllerStyle.Alert)
-
-		a.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel) { action in
-			a.dismissViewControllerAnimated(true, completion: nil)
+		let a = UIAlertController(title: "Mark all \(viewMode.namePlural().lowercaseString) as read?", message: nil, preferredStyle: .Alert)
+		a.addAction(UIAlertAction(title: "No", style: .Cancel) { action in
 		})
-		a.addAction(UIAlertAction(title: "Mark all as read", style: UIAlertActionStyle.Destructive) { [weak self] action in
+		a.addAction(UIAlertAction(title: "Yes", style: .Default) { [weak self] action in
 			self?.markAllAsRead()
-		})
-		a.addAction(UIAlertAction(title: "Remove merged", style:UIAlertActionStyle.Default) { [weak self] action in
-			self?.removeAllMerged()
-		})
-		a.addAction(UIAlertAction(title: "Remove closed", style:UIAlertActionStyle.Default) { [weak self] action in
-			self?.removeAllClosed()
 		})
 		presentViewController(a, animated: true, completion: nil)
 	}
@@ -54,9 +46,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			if Settings.dontAskBeforeWipingMerged {
 				S.removeAllMergedConfirmed()
 			} else {
-				let a = UIAlertController(title: "Sure?", message: "Remove all \(S.viewMode.namePlural()) in the Merged section?", preferredStyle: UIAlertControllerStyle.Alert)
-				a.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil))
-				a.addAction(UIAlertAction(title: "Remove", style: UIAlertActionStyle.Destructive) { [weak S] action in
+				let a = UIAlertController(title: "Sure?", message: "Remove all \(S.viewMode.namePlural().lowercaseString) in the Merged section?", preferredStyle: .Alert)
+				a.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
+				a.addAction(UIAlertAction(title: "Remove", style: .Destructive) { [weak S] action in
 					S?.removeAllMergedConfirmed()
 				})
 				S.presentViewController(a, animated: true, completion: nil)
@@ -69,9 +61,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			if Settings.dontAskBeforeWipingClosed {
 				S.removeAllClosedConfirmed()
 			} else {
-				let a = UIAlertController(title: "Sure?", message: "Remove all \(S.viewMode.namePlural()) in the Closed section?", preferredStyle: UIAlertControllerStyle.Alert)
-				a.addAction(UIAlertAction(title: "Cancel", style:UIAlertActionStyle.Cancel, handler: nil))
-				a.addAction(UIAlertAction(title: "Remove", style:UIAlertActionStyle.Destructive) { [weak S] action in
+				let a = UIAlertController(title: "Sure?", message: "Remove all \(S.viewMode.namePlural().lowercaseString) in the Closed section?", preferredStyle: .Alert)
+				a.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
+				a.addAction(UIAlertAction(title: "Remove", style: .Destructive) { [weak S] action in
 					S?.removeAllClosedConfirmed()
 				})
 				S.presentViewController(a, animated: true, completion: nil)
@@ -156,13 +148,13 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		tableView.tableHeaderView = searchHolder
 		tableView.rowHeight = UITableViewAutomaticDimension
 		tableView.estimatedRowHeight = 240
+		tableView.registerNib(UINib(nibName: "SectionHeaderView", bundle: nil), forHeaderFooterViewReuseIdentifier: "SectionHeaderView")
 
 		if let detailNav = splitViewController?.viewControllers.last as? UINavigationController {
 			detailViewController = detailNav.topViewController as? DetailViewController
 		}
 
 		let n = NSNotificationCenter.defaultCenter()
-
 		n.addObserver(self, selector: #selector(MasterViewController.updateStatus), name:REFRESH_STARTED_NOTIFICATION, object: nil)
 		n.addObserver(self, selector: #selector(MasterViewController.updateStatus), name:REFRESH_ENDED_NOTIFICATION, object: nil)
 
@@ -452,62 +444,111 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 	}
 
-	override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-		return S(fetchedResultsController.sections?[section].name)
+	override func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+		let v = tableView.dequeueReusableHeaderFooterViewWithIdentifier("SectionHeaderView") as! SectionHeaderView
+		let name = S(fetchedResultsController.sections?[section].name)
+		v.title.text = name.uppercaseString
+		if viewMode == .PullRequests {
+			if name == Section.Closed.prMenuName() {
+				v.action.hidden = false
+				v.callback = { [weak self] in
+					self?.removeAllClosed()
+				}
+			} else if name == Section.Merged.prMenuName() {
+				v.action.hidden = false
+				v.callback = { [weak self] in
+					self?.removeAllMerged()
+				}
+			} else {
+				v.action.hidden = true
+			}
+		} else {
+			if name == Section.Closed.issuesMenuName() {
+				v.action.hidden = false
+				v.callback = { [weak self] in
+					self?.removeAllClosed()
+				}
+			} else {
+				v.action.hidden = true
+			}
+		}
+		return v
+	}
+
+	override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+		return 60
+	}
+
+	override func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+		if section==numberOfSectionsInTableView(tableView)-1 {
+			return 20
+		}
+		return 1
 	}
 
 	override func tableView(tableView: UITableView, editActionsForRowAtIndexPath indexPath: NSIndexPath) -> [UITableViewRowAction]? {
 
 		var actions = [UITableViewRowAction]()
 
+		func appendReadUnread(i: ListableItem) {
+			let r: UITableViewRowAction
+			if i.unreadComments?.longLongValue ?? 0 > 0 {
+				r = UITableViewRowAction(style: .Normal, title: "Read") { action, indexPath in
+					app.markItemAsRead(i.objectID.URIRepresentation().absoluteString, reloadView: false)
+					tableView.setEditing(false, animated: true)
+				}
+			} else {
+				r = UITableViewRowAction(style: .Normal, title: "Unread") { action, indexPath in
+					app.markItemAsUnRead(i.objectID.URIRepresentation().absoluteString, reloadView: false)
+					tableView.setEditing(false, animated: true)
+				}
+			}
+			r.backgroundColor = view.tintColor
+			actions.append(r)
+		}
+
+		func appendMuteUnmute(i: ListableItem) {
+			let m: UITableViewRowAction
+			if i.muted?.boolValue ?? false {
+				m = UITableViewRowAction(style: .Normal, title: "Unmute") { action, indexPath in
+					i.setMute(false)
+					DataManager.saveDB()
+					tableView.setEditing(false, animated: true)
+				}
+			} else {
+				m = UITableViewRowAction(style: .Normal, title: "Mute") { action, indexPath in
+					i.setMute(true)
+					DataManager.saveDB()
+					tableView.setEditing(false, animated: true)
+				}
+			}
+			actions.append(m)
+		}
+
 		if let i = fetchedResultsController.objectAtIndexPath(indexPath) as? ListableItem, sectionName = fetchedResultsController.sections?[indexPath.section].name {
 
 			if sectionName == Section.Merged.prMenuName() || sectionName == Section.Closed.prMenuName() || sectionName == Section.Closed.issuesMenuName() {
-				let d = UITableViewRowAction(style: .Destructive, title: "Delete") { action, indexPath in
+
+				appendReadUnread(i)
+				let d = UITableViewRowAction(style: .Destructive, title: "Remove") { action, indexPath in
 					mainObjectContext.deleteObject(i)
 					DataManager.saveDB()
 				}
 				actions.append(d)
+
 			} else if i.isSnoozing {
+
 				let w = UITableViewRowAction(style: .Normal, title: "Wake") { action, indexPath in
 					i.wakeUp()
 					DataManager.saveDB()
 				}
 				w.backgroundColor = UIColor.darkGrayColor()
 				actions.append(w)
+
 			} else {
 
-				let r: UITableViewRowAction
-				if i.unreadComments?.longLongValue ?? 0 > 0 {
-					r = UITableViewRowAction(style: .Normal, title: "Read") { action, indexPath in
-						app.markItemAsRead(i.objectID.URIRepresentation().absoluteString, reloadView: false)
-						tableView.setEditing(false, animated: true)
-					}
-				} else {
-					r = UITableViewRowAction(style: .Normal, title: "Unread") { action, indexPath in
-						app.markItemAsUnRead(i.objectID.URIRepresentation().absoluteString, reloadView: false)
-						tableView.setEditing(false, animated: true)
-					}
-				}
-				r.backgroundColor = view.tintColor
-				actions.append(r)
-
-				let m: UITableViewRowAction
-				if i.muted?.boolValue ?? false {
-					m = UITableViewRowAction(style: .Normal, title: "Unmute") { action, indexPath in
-						i.setMute(false)
-						DataManager.saveDB()
-						tableView.setEditing(false, animated: true)
-					}
-				} else {
-					m = UITableViewRowAction(style: .Normal, title: "Mute") { action, indexPath in
-						i.setMute(true)
-						DataManager.saveDB()
-						tableView.setEditing(false, animated: true)
-					}
-				}
-				actions.append(m)
-
+				appendReadUnread(i)
+				appendMuteUnmute(i)
 				let s = UITableViewRowAction(style: .Normal, title: "Snooze") { [weak self] action, indexPath in
 					self?.showSnoozeMenuFor(i)
 				}

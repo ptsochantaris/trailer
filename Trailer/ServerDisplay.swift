@@ -1,10 +1,3 @@
-//
-//  ServerDisplay.swift
-//  Trailer
-//
-//  Created by Paul Tsochantaris on 22/05/2016.
-//
-//
 
 final class ServerDisplay {
 

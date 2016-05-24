@@ -28,12 +28,12 @@ final class SettingsManager {
 
 	func loadSettingsFrom(url: NSURL, confirmFromView: UIViewController?, withCompletion: ((Bool)->Void)?) {
 		if let v = confirmFromView {
-			let a = UIAlertController(title: "Import these settings?", message: "This will overwrite all your current settings, are you sure?", preferredStyle: UIAlertControllerStyle.Alert)
-			a.addAction(UIAlertAction(title: "Yes", style: UIAlertActionStyle.Destructive) { [weak self] action in
+			let a = UIAlertController(title: "Import these settings?", message: "This will overwrite all your current settings, are you sure?", preferredStyle: .Alert)
+			a.addAction(UIAlertAction(title: "Yes", style: .Destructive) { [weak self] action in
 				self?.loadSettingsFrom(url)
 				withCompletion?(true)
 			})
-			a.addAction(UIAlertAction(title: "No", style: UIAlertActionStyle.Cancel) { action in
+			a.addAction(UIAlertAction(title: "No", style: .Cancel) { action in
 				withCompletion?(false)
 			})
 			atNextEvent {

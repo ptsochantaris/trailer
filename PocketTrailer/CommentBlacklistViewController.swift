@@ -43,8 +43,8 @@ final class CommentBlacklistViewController: UITableViewController {
 		a.addTextFieldWithConfigurationHandler({ textField in
 			textField.placeholder = "Username"
 		})
-		a.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil))
-		a.addAction(UIAlertAction(title: "Block", style: UIAlertActionStyle.Default, handler: { action in
+		a.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
+		a.addAction(UIAlertAction(title: "Block", style: .Default, handler: { action in
 
 			if let tf = a.textFields?.first, n = tf.text?.trim() {
 

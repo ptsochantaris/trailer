@@ -112,6 +112,8 @@
 		16B6B7C11BA3B94C006A509F /* ComplicationDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B6B7C01BA3B94C006A509F /* ComplicationDataSource.swift */; };
 		16B74E481A3B4AC800410EF6 /* PrTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B74E471A3B4AC800410EF6 /* PrTable.swift */; };
 		16B94072182D136700F32061 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 16B94070182D136700F32061 /* dsa_pub.pem */; };
+		16C3048C1CF4EC590017D79F /* SectionHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 16C3048B1CF4EC590017D79F /* SectionHeaderView.xib */; };
+		16C3048E1CF4ECEF0017D79F /* SectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C3048D1CF4ECEF0017D79F /* SectionHeaderView.swift */; };
 		16C90F021B13BC180095E8D5 /* RepoSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C90F011B13BC180095E8D5 /* RepoSettingsViewController.swift */; };
 		16C9A2761A44D12600EE54EC /* AboutTrailerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C9A2751A44D12600EE54EC /* AboutTrailerViewController.swift */; };
 		16C9A27A1A44DD0200EE54EC /* CommentBlacklistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C9A2791A44DD0200EE54EC /* CommentBlacklistViewController.swift */; };
@@ -341,6 +343,8 @@
 		16B6B7C01BA3B94C006A509F /* ComplicationDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComplicationDataSource.swift; sourceTree = "<group>"; };
 		16B74E471A3B4AC800410EF6 /* PrTable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrTable.swift; sourceTree = "<group>"; };
 		16B94070182D136700F32061 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
+		16C3048B1CF4EC590017D79F /* SectionHeaderView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SectionHeaderView.xib; sourceTree = "<group>"; };
+		16C3048D1CF4ECEF0017D79F /* SectionHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SectionHeaderView.swift; sourceTree = "<group>"; };
 		16C90F011B13BC180095E8D5 /* RepoSettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RepoSettingsViewController.swift; sourceTree = "<group>"; };
 		16C9A2751A44D12600EE54EC /* AboutTrailerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AboutTrailerViewController.swift; sourceTree = "<group>"; };
 		16C9A2791A44DD0200EE54EC /* CommentBlacklistViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentBlacklistViewController.swift; sourceTree = "<group>"; };
@@ -440,6 +444,8 @@
 				164785B21A2CE7FB00297764 /* PocketTrailer-Bridging-Header.h */,
 				1606F1BA1A4703E60088368E /* iOS_AppDelegate.swift */,
 				164840FF1AD198A6009E6383 /* WatchManager.swift */,
+				16259BCD1A449400009C5745 /* OpenInSafariActivity.swift */,
+				160823F31A44982F006F91AD /* UINavigationControllerExtensions.swift */,
 			);
 			name = Core;
 			sourceTree = "<group>";
@@ -448,7 +454,6 @@
 			isa = PBXGroup;
 			children = (
 				162002D11A2A409900FF95F3 /* Core */,
-				16B069721882EA530053620E /* Extensions */,
 				16B069711882EA1D0053620E /* UI */,
 				16FD14D11881C82400FDC960 /* Settings */,
 				164840C61AD15452009E6383 /* Resources */,
@@ -660,17 +665,10 @@
 				1615045F1A4651CB001CF50C /* MasterViewController.swift */,
 				16EE6ACF1A9A711C000A8483 /* CountLabel.swift */,
 				164840C41AD04C3C009E6383 /* QuickStartViewController.swift */,
+				16C3048B1CF4EC590017D79F /* SectionHeaderView.xib */,
+				16C3048D1CF4ECEF0017D79F /* SectionHeaderView.swift */,
 			);
 			name = UI;
-			sourceTree = "<group>";
-		};
-		16B069721882EA530053620E /* Extensions */ = {
-			isa = PBXGroup;
-			children = (
-				16259BCD1A449400009C5745 /* OpenInSafariActivity.swift */,
-				160823F31A44982F006F91AD /* UINavigationControllerExtensions.swift */,
-			);
-			name = Extensions;
 			sourceTree = "<group>";
 		};
 		16B3B35C1A34F859000BE6CC /* Globals */ = {
@@ -966,6 +964,7 @@
 				1628A6D618789E73005EDA69 /* Images.xcassets in Resources */,
 				16DD6AB21AE457C300145425 /* trailerDoc320.png in Resources */,
 				16DD6AAF1AE457C300145425 /* trailerDoc22.png in Resources */,
+				16C3048C1CF4EC590017D79F /* SectionHeaderView.xib in Resources */,
 				16DD6AB01AE457C300145425 /* trailerDoc44.png in Resources */,
 				16154E2F19C43E8E00E49139 /* Launch.storyboard in Resources */,
 				16DD6AB11AE457C300145425 /* trailerDoc64.png in Resources */,
@@ -1029,6 +1028,7 @@
 				16C9A2761A44D12600EE54EC /* AboutTrailerViewController.swift in Sources */,
 				16CBE1C61A2DFBA500485053 /* Settings.swift in Sources */,
 				161B851D1AB8E12C00AD4C5D /* Team.swift in Sources */,
+				16C3048E1CF4ECEF0017D79F /* SectionHeaderView.swift in Sources */,
 				16EE6AD01A9A711C000A8483 /* CountLabel.swift in Sources */,
 				166ADEC61CCAFF77001BA61F /* SnoozingViewController.swift in Sources */,
 				16B3B3181A34E8E2000BE6CC /* ApiServer.swift in Sources */,
