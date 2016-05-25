@@ -14,7 +14,11 @@ final class SectionRow: NSObject, PopulatableRow {
 	var type: String?
 	func populateFrom(other: PopulatableRow) {
 		if let other = other as? SectionRow {
-			titleL.setText("\(other.totalCount!) \((other.section?.watchMenuName().uppercaseString)!)")
+			if let sectionName = other.section?.watchMenuName() {
+				titleL.setText("\(other.totalCount!) \(sectionName)")
+			} else {
+				titleL.setText("All Unread")
+			}
 			countL.setText("\(other.unreadCount!)")
 			countHolder.setHidden(other.unreadCount==0)
 		}

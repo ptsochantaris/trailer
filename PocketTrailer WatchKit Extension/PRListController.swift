@@ -7,26 +7,32 @@ final class PRListController: CommonController {
 	@IBOutlet weak var table: WKInterfaceTable!
 	@IBOutlet var statusLabel: WKInterfaceLabel!
 
-	private var section: Section!
+	private var sectionIndex: Int!
 	private var type: String!
 	private var selectedIndex: Int?
 
 	private let PAGE_SIZE = 50
-	private var lastCount: Int = 0
+	private var onlyUnread = false
+	private var lastCount = 0
 	private var loadingBuffer: [[String : AnyObject]]?
 	private var loading = false
 
 	override func awakeWithContext(context: AnyObject?) {
 
 		let c = context as! [NSObject : AnyObject]
-		section = Section(rawValue: c[SECTION_KEY] as! Int)
+		sectionIndex = c[SECTION_KEY] as! Int
 		type = c[TYPE_KEY] as! String
+		onlyUnread = c[UNREAD_KEY] as! Bool
 
 		_table = table
 		_statusLabel = statusLabel
 		super.awakeWithContext(context)
 
-		setTitle(section.watchMenuName())
+		if let s = Section(rawValue: sectionIndex) {
+			setTitle(s.watchMenuName())
+		} else {
+			setTitle("All Unread")
+		}
 	}
 
 	override func requestData(command: String?) {
@@ -38,7 +44,12 @@ final class PRListController: CommonController {
 
 	private func _requestData(command: String?) {
 
-		var params = ["list": "item_list", "type": type, "sectionIndex": NSNumber(integer: section.rawValue), "count": NSNumber(integer: PAGE_SIZE)]
+		var params = ["list": "item_list",
+		              "type": type,
+		              "sectionIndex": NSNumber(integer: sectionIndex),
+		              "onlyUnread": NSNumber(bool: onlyUnread),
+		              "count": NSNumber(integer: PAGE_SIZE)]
+
 		if let command = command {
 			params["command"] = command
 		}

@@ -89,7 +89,8 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				s.processList(message, replyHandler)
 
 			case "markAllPrsRead":
-				if let s = message["sectionIndex"] as? Int {
+				if var s = message["sectionIndex"] as? Int {
+					if s == -1 { s = 0 }
 					PullRequest.markEverythingRead(Section(rawValue: s)!, moc: mainObjectContext)
 					popupManager.getMasterController().reloadDataWithAnimation(false)
 					DataManager.saveDB()
@@ -98,7 +99,8 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				s.processList(message, replyHandler)
 
 			case "markAllIssuesRead":
-				if let s = message["sectionIndex"] as? Int {
+				if var s = message["sectionIndex"] as? Int {
+					if s == -1 { s = 0 }
 					Issue.markEverythingRead(Section(rawValue: s)!, moc: mainObjectContext)
 					popupManager.getMasterController().reloadDataWithAnimation(false)
 					DataManager.saveDB()
@@ -131,7 +133,8 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			let sectionIndex = message["sectionIndex"] as! Int
 			let from = message["from"] as! Int
 			let count = message["count"] as! Int
-			buildItemList(type, sectionIndex: sectionIndex, from: from, count: count, replyHandler: replyHandler)
+			let onlyUnread = message["onlyUnread"] as! Bool
+			buildItemList(type, sectionIndex: sectionIndex, from: from, count: count, onlyUnread: onlyUnread, replyHandler: replyHandler)
 
 		case "item_detail":
 			if let lid = message["localId"] as? String, details = buildItemDetail(lid) {
@@ -165,19 +168,20 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	////////////////////////////
 
-	private func buildItemList(type: String, sectionIndex: Int, from: Int, count: Int, replyHandler: ([String : AnyObject]) -> Void) {
+	private func buildItemList(type: String, sectionIndex: Int, from: Int, count: Int, onlyUnread: Bool, replyHandler: ([String : AnyObject]) -> Void) {
 
 		let showLabels = Settings.showLabels
 		let showStatuses: Bool
-		let f: NSFetchRequest
-
+		let entity: String
 		if type == "prs" {
+			entity = "PullRequest"
 			showStatuses = Settings.showStatusItems
-			f = ListableItem.requestForItemsOfType("PullRequest", withFilter: nil, sectionIndex: sectionIndex)
 		} else {
+			entity = "Issue"
 			showStatuses = false
-			f = ListableItem.requestForItemsOfType("Issue", withFilter: nil, sectionIndex: sectionIndex)
 		}
+
+		let f = ListableItem.requestForItemsOfType(entity, withFilter: nil, sectionIndex: sectionIndex, onlyUnread: onlyUnread)
 		f.fetchOffset = from
 		f.fetchLimit = count
 

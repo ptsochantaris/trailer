@@ -564,12 +564,16 @@ class ListableItem: DataItem {
 		return buildOrPredicate(string, expectedLength: 5, format: "userLogin contains[cd] %@", numeric: false)
     }
 
-	final class func requestForItemsOfType(itemType: String, withFilter: String?, sectionIndex: Int, apiServerId: NSManagedObjectID? = nil) -> NSFetchRequest {
+	final class func requestForItemsOfType(itemType: String, withFilter: String?, sectionIndex: Int, apiServerId: NSManagedObjectID? = nil, onlyUnread: Bool = false) -> NSFetchRequest {
 
 		var andPredicates = [NSPredicate]()
 
 		if let aid = apiServerId, a = existingObjectWithID(aid) as? ApiServer {
 			andPredicates.append(NSPredicate(format: "apiServer == %@", a))
+		}
+
+		if onlyUnread {
+			andPredicates.append(NSPredicate(format: "unreadComments > 0"))
 		}
 
 		if sectionIndex<0 {
