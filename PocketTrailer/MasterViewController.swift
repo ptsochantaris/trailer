@@ -12,7 +12,8 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	private var searchTimer: PopTimer!
 
 	// Refreshing
-	private var refreshOnRelease: Bool = false
+	@IBOutlet var refreshLabel: UILabel!
+	private var refreshOnRelease = false
 
 	private let pullRequestsItem = UITabBarItem()
 	private let issuesItem = UITabBarItem()
@@ -34,6 +35,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		if api.noNetworkConnection() {
 			showMessage("No Network", "There is no network connectivity, please try again later")
+			updateStatus()
 		} else {
 			if !app.startRefresh() {
 				updateStatus()
@@ -105,7 +107,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	override func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-		if refreshOnRelease && !decelerate {
+		if refreshOnRelease {
 			tryRefresh()
 		}
 	}
@@ -116,14 +118,21 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 	}
 
+	override func viewDidLayoutSubviews() {
+		super.viewDidLayoutSubviews()
+		refreshLabel.center = CGPointMake(CGRectGetMidX(view.bounds), refreshControl!.center.y+36)
+	}
+
 	override func viewDidLoad() {
 		super.viewDidLoad()
+
+		view.addSubview(refreshLabel)
 
 		searchTimer = PopTimer(timeInterval: 0.5) { [weak self] in
 			self?.reloadDataWithAnimation(true)
 		}
 
-		refreshControl?.addTarget(self, action: #selector(MasterViewController.refreshControlChanged), forControlEvents: UIControlEvents.ValueChanged)
+		refreshControl?.addTarget(self, action: #selector(MasterViewController.refreshControlChanged), forControlEvents: .ValueChanged)
 
 		tableView.rowHeight = UITableViewAutomaticDimension
 		tableView.estimatedRowHeight = 240
@@ -141,6 +150,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		pullRequestsItem.image = UIImage(named: "prsTab")
 		issuesItem.title = "Issues"
 		issuesItem.image = UIImage(named: "issuesTab")
+
+		updateStatus()
+		updateTabBarVisibility(false)
 	}
 
 	func tabBar(tabBar: UITabBar, didSelectItem item: UITabBarItem) {
@@ -151,15 +163,15 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 	}
 
-	override func viewWillAppear(animated: Bool) {
-		super.viewWillAppear(animated)
-		updateStatus()
-        updateTabBarVisibility(animated)
-		tableView.contentOffset = CGPointMake(0, -20)
+	override func scrollViewDidScroll(scrollView: UIScrollView) {
+		updateRefreshControls()
 	}
 
-	override func scrollViewDidScroll(scrollView: UIScrollView) {
-		searchBar.alpha = min(1.0, max(0, 3.0+(scrollView.contentOffset.y/32.0)))
+	private func updateRefreshControls() {
+		searchBar.alpha = min(1.0, max(0, ((116+tableView.contentOffset.y)/32.0)))
+		let ra = min(1.0, max(0, (-84-tableView.contentOffset.y)/32.0))
+		refreshLabel.alpha = ra
+		refreshControl?.alpha = ra
 	}
 
 	func reloadDataWithAnimation(animated: Bool) {
@@ -222,8 +234,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 			if tabBar == nil {
 
-				tableView.scrollIndicatorInsets = UIEdgeInsetsMake(64, 0, 49, 0)
-
 				if let s = navigationController?.view {
 					let t = UITabBar(frame: CGRectMake(0, s.bounds.size.height-49, s.bounds.size.width, 49))
 					t.autoresizingMask = [.FlexibleTopMargin, .FlexibleBottomMargin, .FlexibleWidth]
@@ -248,7 +258,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		} else {
 
 			if !(Repo.interestedInPrs() && Repo.interestedInIssues()) {
-				tableView.scrollIndicatorInsets = UIEdgeInsetsMake(64, 0, 0, 0)
 				self.viewMode = Repo.interestedInIssues() ? .Issues : .PullRequests
 			}
 
@@ -663,10 +672,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 				tableView.tableFooterView = EmptyView(message: Issue.reasonForEmptyWithFilter(searchBar.text), parentWidth: view.bounds.size.width)
 			}
 			if let r = refreshControl {
-				r.attributedTitle = NSAttributedString(string: api.lastUpdateDescription(), attributes: nil)
-				if !r.refreshing {
-					r.beginRefreshing()
-				}
+				refreshLabel.text = api.lastUpdateDescription()
+				updateRefreshControls()
+				r.beginRefreshing()
 			}
 		} else {
 
@@ -679,10 +687,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 				tableView.tableFooterView = (count == 0) ? EmptyView(message: Issue.reasonForEmptyWithFilter(searchBar.text), parentWidth: view.bounds.size.width) : nil
 			}
 			if let r = refreshControl {
-				r.attributedTitle = NSAttributedString(string: api.lastUpdateDescription(), attributes: nil)
-				if r.refreshing {
-					r.endRefreshing()
-				}
+				refreshLabel.text = api.lastUpdateDescription()
+				updateRefreshControls()
+				r.endRefreshing()
 			}
 		}
 

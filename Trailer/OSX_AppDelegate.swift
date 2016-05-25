@@ -932,7 +932,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 	//////////////////////// Dark mode
 
-	var darkMode: Bool = false {
+	var darkMode = false {
 		didSet {
 			if darkMode != oldValue {
 				for d in serverDisplays {

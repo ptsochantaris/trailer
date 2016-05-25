@@ -32,7 +32,7 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 	@IBOutlet weak var prIcon: WKInterfaceImage!
 	@IBOutlet weak var issueIcon: WKInterfaceImage!
 
-	private var showIssues: Bool = false
+	private var showIssues = false
 
 	override func awakeWithContext(context: AnyObject?) {
 		super.awakeWithContext(context)

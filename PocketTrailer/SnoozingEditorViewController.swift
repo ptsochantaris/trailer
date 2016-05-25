@@ -7,7 +7,7 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 	@IBOutlet weak var descriptionLabel: UILabel!
 
 	var snoozeItem: SnoozePreset?
-	var isNew: Bool = false
+	var isNew = false
 
 	@IBOutlet weak var typeSelector: UISegmentedControl!
 

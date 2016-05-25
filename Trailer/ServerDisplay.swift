@@ -63,7 +63,7 @@ final class ServerDisplay {
 		(issuesMenu.statusItem?.view as? StatusItemView)?.grayOut = grayOut
 	}
 
-	var allowRefresh: Bool = false {
+	var allowRefresh = false {
 		didSet {
 			if allowRefresh {
 				prMenu.refreshMenuItem.target = prMenu

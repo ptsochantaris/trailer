@@ -33,7 +33,7 @@ class TrailerCell: NSTableCellView {
 		selected = false
 	}
 
-	var selected: Bool = false {
+	var selected = false {
 		didSet {
 
 			guard let table = app.visibleWindow()?.table else { return }

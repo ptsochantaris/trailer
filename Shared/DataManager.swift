@@ -287,7 +287,7 @@ final class DataManager {
 		} catch { /* no directory */ }
 	}
 
-	private static var _justMigrated: Bool = false
+	private static var _justMigrated = false
 
 	class func buildMainContext() -> NSManagedObjectContext {
 

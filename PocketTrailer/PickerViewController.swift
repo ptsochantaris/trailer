@@ -41,7 +41,7 @@ final class PickerViewController: UITableViewController {
 		return "Please select an option"
 	}
 
-	private var layoutDone: Bool = false
+	private var layoutDone = false
 
 	override func viewDidLayoutSubviews() {
 		super.viewDidLayoutSubviews()

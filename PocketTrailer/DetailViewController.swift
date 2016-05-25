@@ -8,7 +8,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 
 	private var webView: WKWebView?
 
-	var isVisible: Bool = false
+	var isVisible = false
 	var catchupWithDataItemWhenLoaded : NSManagedObjectID?
 
 	var detailItem: NSURL? {

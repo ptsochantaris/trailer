@@ -2,9 +2,9 @@
 final class LinkField: CenterTextField {
 
 	var targetUrl: String?
-	var needsCommand: Bool = false
+	var needsCommand = false
 
-	var highlight: Bool = false
+	var highlight = false
 	var normalColor: NSColor?
 
 	override func viewDidMoveToWindow() {

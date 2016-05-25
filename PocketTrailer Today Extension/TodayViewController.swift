@@ -61,13 +61,13 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 		paragraph.paragraphSpacing = 4
 
 		prButton = UIButton(type: UIButtonType.Custom)
-		prButton.addTarget(self, action: #selector(TodayViewController.prTapped), forControlEvents: UIControlEvents.TouchUpInside)
-		prButton.setBackgroundImage(imageFromColor(UIColor(white: 1.0, alpha: 0.2)), forState: UIControlState.Highlighted)
+		prButton.addTarget(self, action: #selector(TodayViewController.prTapped), forControlEvents: .TouchUpInside)
+		prButton.setBackgroundImage(imageFromColor(UIColor(white: 1.0, alpha: 0.2)), forState: .Highlighted)
 		view.addSubview(prButton)
 
 		issuesButton = UIButton(type: UIButtonType.Custom)
-		issuesButton.addTarget(self, action: #selector(TodayViewController.issuesTapped), forControlEvents: UIControlEvents.TouchUpInside)
-		issuesButton.setBackgroundImage(imageFromColor(UIColor(white: 1.0, alpha: 0.2)), forState: UIControlState.Highlighted)
+		issuesButton.addTarget(self, action: #selector(TodayViewController.issuesTapped), forControlEvents: .TouchUpInside)
+		issuesButton.setBackgroundImage(imageFromColor(UIColor(white: 1.0, alpha: 0.2)), forState: .Highlighted)
 		view.addSubview(issuesButton)
 
 		update()

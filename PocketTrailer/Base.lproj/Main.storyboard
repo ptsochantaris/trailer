@@ -207,16 +207,23 @@
                             </connections>
                         </barButtonItem>
                     </navigationItem>
-                    <refreshControl key="refreshControl" opaque="NO" multipleTouchEnabled="YES" contentMode="center" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="zHD-Mw-vzt">
+                    <refreshControl key="refreshControl" opaque="NO" multipleTouchEnabled="YES" contentMode="center" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="9Af-Rk-Te8">
                         <autoresizingMask key="autoresizingMask"/>
-                        <attributedString key="attributedTitle"/>
                     </refreshControl>
                     <connections>
+                        <outlet property="refreshLabel" destination="BJz-Bz-xkf" id="ehp-ng-kk3"/>
                         <outlet property="searchBar" destination="z43-n0-hNG" id="jxI-P1-D5l"/>
                         <segue destination="8Eb-eH-MUP" kind="presentation" identifier="showQuickstart" modalPresentationStyle="formSheet" id="noo-V8-yYe"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Rux-fX-hf1" sceneMemberID="firstResponder"/>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Refresh Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="BJz-Bz-xkf">
+                    <rect key="frame" x="0.0" y="0.0" width="300" height="22"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
+                    <color key="textColor" red="0.25490196079999999" green="0.51372549020000002" blue="0.76862745099999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
             </objects>
             <point key="canvasLocation" x="302" y="747"/>
         </scene>
