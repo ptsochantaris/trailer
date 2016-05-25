@@ -498,6 +498,17 @@
 			name = Logic;
 			sourceTree = "<group>";
 		};
+		162FB97E1CF517F200F380E1 /* Document Icons */ = {
+			isa = PBXGroup;
+			children = (
+				16DD6AAB1AE457C300145425 /* trailerDoc22.png */,
+				16DD6AAC1AE457C300145425 /* trailerDoc44.png */,
+				16DD6AAD1AE457C300145425 /* trailerDoc64.png */,
+				16DD6AAE1AE457C300145425 /* trailerDoc320.png */,
+			);
+			name = "Document Icons";
+			sourceTree = "<group>";
+		};
 		1633C19B1ABD83F10086C692 /* Cells */ = {
 			isa = PBXGroup;
 			children = (
@@ -527,12 +538,9 @@
 		164840C61AD15452009E6383 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				162FB97E1CF517F200F380E1 /* Document Icons */,
 				1628A6C918789E73005EDA69 /* Main.storyboard */,
 				16154E2E19C43E8E00E49139 /* Launch.storyboard */,
-				16DD6AAB1AE457C300145425 /* trailerDoc22.png */,
-				16DD6AAC1AE457C300145425 /* trailerDoc44.png */,
-				16DD6AAD1AE457C300145425 /* trailerDoc64.png */,
-				16DD6AAE1AE457C300145425 /* trailerDoc320.png */,
 				1628A6D518789E73005EDA69 /* Images.xcassets */,
 			);
 			name = Resources;

@@ -1,9 +1,14 @@
 
 import UIKit
 
-final class AdvancedSettingsViewController: UITableViewController, PickerViewControllerDelegate, UIDocumentPickerDelegate {
+final class AdvancedSettingsViewController: UITableViewController, PickerViewControllerDelegate, UIDocumentPickerDelegate, UISearchBarDelegate {
 
 	private var settingsChangedTimer: PopTimer!
+	private var searchTimer: PopTimer!
+
+	// Search
+	@IBOutlet weak var searchBar: UISearchBar!
+	private var hideIndexPaths = [NSIndexPath]()
 
 	// for the picker
 	private var valuesToPush: [String]?
@@ -20,7 +25,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	override func viewDidLoad() {
 		super.viewDidLoad()
 
-		tableView.rowHeight = UITableViewAutomaticDimension
+		searchTimer = PopTimer(timeInterval: 0.2) { [weak self] in
+			self?.updateHiddenIndexPaths()
+			self?.tableView.reloadSections(NSIndexSet(indexesInRange: NSMakeRange(0, SettingsSection.allNames.count)), withRowAnimation: .Automatic)
+		}
 
 		settingsChangedTimer = PopTimer(timeInterval: 1.0) {
 			DataManager.postProcessAllItems()
@@ -28,10 +36,51 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		}
 
 		navigationItem.rightBarButtonItems = [
-			UIBarButtonItem(image: UIImage(named: "export"), style: UIBarButtonItemStyle.Plain, target: self, action: #selector(AdvancedSettingsViewController.exportSelected(_:))),
-			UIBarButtonItem(image: UIImage(named: "import"), style: UIBarButtonItemStyle.Plain, target: self, action: #selector(AdvancedSettingsViewController.importSelected(_:))),
-			UIBarButtonItem(image: UIImage(named: "showHelp"), style: UIBarButtonItemStyle.Plain, target: self, action: #selector(AdvancedSettingsViewController.toggleHelp(_:))),
+			UIBarButtonItem(image: UIImage(named: "export"), style: .Plain, target: self, action: #selector(AdvancedSettingsViewController.exportSelected(_:))),
+			UIBarButtonItem(image: UIImage(named: "import"), style: .Plain, target: self, action: #selector(AdvancedSettingsViewController.importSelected(_:))),
+			UIBarButtonItem(image: UIImage(named: "showHelp"), style: .Plain, target: self, action: #selector(AdvancedSettingsViewController.toggleHelp(_:))),
 		]
+	}
+
+	override func scrollViewDidScroll(scrollView: UIScrollView) {
+		view.endEditing(false)
+	}
+
+	private func updateHiddenIndexPaths() {
+		hideIndexPaths.removeAll(keepCapacity: true)
+		if let searchText = searchBar.text where !searchText.isEmpty {
+			if sizer == nil {
+				sizer = tableView.dequeueReusableCellWithIdentifier("Cell") as? AdvancedSettingsCell
+			}
+			for s in 0..<numberOfSectionsInTableView(tableView) {
+				for r in 0..<tableView(tableView, numberOfRowsInSection: s) {
+					let ip = NSIndexPath(forRow: r, inSection: s)
+					configureCell(sizer!, indexPath: ip)
+					if !S(sizer!.titleLabel.text).localizedCaseInsensitiveContainsString(searchText) && !S(sizer!.descriptionLabel.text).localizedCaseInsensitiveContainsString(searchText) {
+						hideIndexPaths.append(ip)
+					}
+				}
+			}
+		}
+	}
+
+	func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
+		searchTimer.push()
+	}
+
+	func searchBarCancelButtonClicked(searchBar: UISearchBar) {
+		searchBar.text = nil
+		searchTimer.push()
+		view.endEditing(false)
+	}
+
+	func searchBar(searchBar: UISearchBar, shouldChangeTextInRange range: NSRange, replacementText text: String) -> Bool {
+		if text == "\n" {
+			view.endEditing(false)
+			return false
+		} else {
+			return true
+		}
 	}
 
 	func toggleHelp(button: UIBarButtonItem) {
@@ -47,7 +96,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	}
 
 	private func check(setting: Bool) -> UITableViewCellAccessoryType {
-		return setting ? UITableViewCellAccessoryType.Checkmark : UITableViewCellAccessoryType.None
+		return setting ? .Checkmark : .None
 	}
 
 	private func filteringSectionFooter() -> UILabel {
@@ -69,28 +118,59 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	}
 
 	override func tableView(tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+		if sectionWillBeEmpty(section) { return nil }
 		if section==SettingsSection.Filtering.rawValue {
 			return filteringSectionFooter()
 		}
 		return nil
 	}
 
+	override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+		return 55
+	}
+
 	override func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-		if section==SettingsSection.Filtering.rawValue {
+		if sectionWillBeEmpty(section) { return 0 }
+		if section == SettingsSection.Filtering.rawValue {
 			return filteringSectionFooter().sizeThatFits(CGSizeMake(tableView.bounds.size.width, 500.0)).height + 15.0
 		}
-		return 0.0
+		return 0
+	}
+
+	private func sectionWillBeEmpty(section: Int) -> Bool {
+		if searchBar.text?.isEmpty ?? true { return false }
+
+		for r in 0..<tableView(tableView, numberOfRowsInSection: section) {
+			let ip = NSIndexPath(forRow: r, inSection: section)
+			if !hideIndexPaths.contains(ip) {
+				return false
+			}
+		}
+		return true
 	}
 
 	override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
 		let cell = tableView.dequeueReusableCellWithIdentifier("Cell") as! AdvancedSettingsCell
-		configureCell(cell, indexPath: indexPath)
+		if hideIndexPaths.contains(indexPath) {
+			flattenCell(cell)
+		} else {
+			configureCell(cell, indexPath: indexPath)
+		}
 		return cell
 	}
 
+	private func flattenCell(cell: AdvancedSettingsCell) {
+		cell.descriptionLabel.text = nil
+		cell.titleLabel.text = nil
+		cell.valueLabel.text = nil
+		cell.accessoryType = .None
+		cell.detailsBottomAnchor.priority = 1
+	}
+
 	private func configureCell(cell: AdvancedSettingsCell, indexPath: NSIndexPath) {
-		cell.accessoryType = UITableViewCellAccessoryType.None
+		cell.accessoryType = .None
 		cell.valueLabel.text = " "
+		cell.detailsBottomAnchor.priority = 750
 
 		if indexPath.section == SettingsSection.Refresh.rawValue {
 			switch indexPath.row {
@@ -599,6 +679,9 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	private var sizer: AdvancedSettingsCell?
 	private var heightCache = [NSIndexPath : CGFloat]()
 	override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+		if hideIndexPaths.contains(indexPath) {
+			return 0
+		}
 		if sizer == nil {
 			sizer = tableView.dequeueReusableCellWithIdentifier("Cell") as? AdvancedSettingsCell
 		} else if let h = heightCache[indexPath] {

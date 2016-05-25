@@ -22,7 +22,7 @@ final class PickerViewController: UITableViewController {
 	override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
 		let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) 
 		cell.textLabel?.text = values[indexPath.row]
-		cell.accessoryType = indexPath.row == previousValue ? UITableViewCellAccessoryType.Checkmark : UITableViewCellAccessoryType.None
+		cell.accessoryType = indexPath.row == previousValue ? .Checkmark : .None
 		return cell
 	}
 
