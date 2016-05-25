@@ -2,13 +2,13 @@
 import UIKit
 import CoreData
 
-final class MasterViewController: UITableViewController, NSFetchedResultsControllerDelegate, UITextFieldDelegate, UITabBarControllerDelegate, UITabBarDelegate {
+final class MasterViewController: UITableViewController, NSFetchedResultsControllerDelegate, UISearchBarDelegate, UITabBarControllerDelegate, UITabBarDelegate {
 
 	private var detailViewController: DetailViewController!
 	private var _fetchedResultsController: NSFetchedResultsController?
 
 	// Filtering
-	private var searchField: UITextField!
+	@IBOutlet weak var searchBar: UISearchBar!
 	private var searchTimer: PopTimer!
 
 	// Refreshing
@@ -125,27 +125,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		refreshControl?.addTarget(self, action: #selector(MasterViewController.refreshControlChanged), forControlEvents: UIControlEvents.ValueChanged)
 
-		searchField = UITextField(frame: CGRectMake(10, 10, 300, 31))
-		searchField.autoresizingMask = UIViewAutoresizing.FlexibleWidth
-		searchField.translatesAutoresizingMaskIntoConstraints = true
-		searchField.placeholder = "Filter..."
-		searchField.returnKeyType = UIReturnKeyType.Done
-		searchField.font = UIFont.systemFontOfSize(17)
-		searchField.borderStyle = UITextBorderStyle.RoundedRect
-		searchField.contentVerticalAlignment = UIControlContentVerticalAlignment.Center
-		searchField.clearButtonMode = UITextFieldViewMode.Always
-		searchField.autocapitalizationType = UITextAutocapitalizationType.None
-		searchField.autocorrectionType = UITextAutocorrectionType.No
-		searchField.delegate = self
-
-		let cover = UIView(frame: CGRectMake(0, 41, 320, 30))
-		cover.backgroundColor = UIColor.groupTableViewBackgroundColor()
-		cover.autoresizingMask = UIViewAutoresizing.FlexibleWidth
-
-		let searchHolder = UIView(frame: CGRectMake(0, 0, 320, 41))
-		searchHolder.addSubview(cover)
-		searchHolder.addSubview(searchField)
-		tableView.tableHeaderView = searchHolder
 		tableView.rowHeight = UITableViewAutomaticDimension
 		tableView.estimatedRowHeight = 240
 		tableView.registerNib(UINib(nibName: "SectionHeaderView", bundle: nil), forHeaderFooterViewReuseIdentifier: "SectionHeaderView")
@@ -176,6 +155,11 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		super.viewWillAppear(animated)
 		updateStatus()
         updateTabBarVisibility(animated)
+		tableView.contentOffset = CGPointMake(0, -20)
+	}
+
+	override func scrollViewDidScroll(scrollView: UIScrollView) {
+		searchBar.alpha = min(1.0, max(0, 3.0+(scrollView.contentOffset.y/32.0)))
 	}
 
 	func reloadDataWithAnimation(animated: Bool) {
@@ -238,8 +222,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 			if tabBar == nil {
 
-				tableView.contentInset = UIEdgeInsetsMake(tableView.contentInset.top, 0, 49, 0)
-				tableView.scrollIndicatorInsets = UIEdgeInsetsMake(tableView.scrollIndicatorInsets.top, 0, 49, 0)
+				tableView.scrollIndicatorInsets = UIEdgeInsetsMake(64, 0, 49, 0)
 
 				if let s = navigationController?.view {
 					let t = UITabBar(frame: CGRectMake(0, s.bounds.size.height-49, s.bounds.size.width, 49))
@@ -265,8 +248,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		} else {
 
 			if !(Repo.interestedInPrs() && Repo.interestedInIssues()) {
-				tableView.contentInset = UIEdgeInsetsMake(tableView.contentInset.top, 0, 0, 0)
-				tableView.scrollIndicatorInsets = UIEdgeInsetsMake(tableView.scrollIndicatorInsets.top, 0, 0, 0)
+				tableView.scrollIndicatorInsets = UIEdgeInsetsMake(64, 0, 0, 0)
 				self.viewMode = Repo.interestedInIssues() ? .Issues : .PullRequests
 			}
 
@@ -325,9 +307,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			return
 		}
 
-		if urlToOpen != nil && !S(searchField.text).isEmpty {
-			searchField.text = nil
-			searchField.resignFirstResponder()
+		if urlToOpen != nil && !S(searchBar.text).isEmpty {
+			searchBar.text = nil
+			searchBar.resignFirstResponder()
 			reloadDataWithAnimation(false)
 		}
 
@@ -476,12 +458,12 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-		return 60
+		return 64
 	}
 
 	override func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
 		if section==numberOfSectionsInTableView(tableView)-1 {
-			return 20
+			return tabBar == nil ? 20 : 20+49
 		}
 		return 1
 	}
@@ -584,7 +566,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 
 		let type = viewMode == .PullRequests ? "PullRequest" : "Issue"
-		let fetchRequest = ListableItem.requestForItemsOfType(type, withFilter: searchField.text, sectionIndex: -1)
+		let fetchRequest = ListableItem.requestForItemsOfType(type, withFilter: searchBar.text, sectionIndex: -1)
 
 		let c = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: mainObjectContext, sectionNameKeyPath: "sectionName", cacheName: nil)
 		_fetchedResultsController = c
@@ -676,9 +658,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		if appIsRefreshing {
 			title = "Refreshing..."
 			if viewMode == .PullRequests {
-				tableView.tableFooterView = EmptyView(message: PullRequest.reasonForEmptyWithFilter(searchField.text), parentWidth: view.bounds.size.width)
+				tableView.tableFooterView = EmptyView(message: PullRequest.reasonForEmptyWithFilter(searchBar.text), parentWidth: view.bounds.size.width)
 			} else {
-				tableView.tableFooterView = EmptyView(message: Issue.reasonForEmptyWithFilter(searchField.text), parentWidth: view.bounds.size.width)
+				tableView.tableFooterView = EmptyView(message: Issue.reasonForEmptyWithFilter(searchBar.text), parentWidth: view.bounds.size.width)
 			}
 			if let r = refreshControl {
 				r.attributedTitle = NSAttributedString(string: api.lastUpdateDescription(), attributes: nil)
@@ -691,10 +673,10 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			let count = fetchedResultsController.fetchedObjects?.count ?? 0
 			if viewMode == .PullRequests {
 				title = pullRequestsTitle(true)
-				tableView.tableFooterView = (count == 0) ? EmptyView(message: PullRequest.reasonForEmptyWithFilter(searchField.text), parentWidth: view.bounds.size.width) : nil
+				tableView.tableFooterView = (count == 0) ? EmptyView(message: PullRequest.reasonForEmptyWithFilter(searchBar.text), parentWidth: view.bounds.size.width) : nil
 			} else {
 				title = issuesTitle()
-				tableView.tableFooterView = (count == 0) ? EmptyView(message: Issue.reasonForEmptyWithFilter(searchField.text), parentWidth: view.bounds.size.width) : nil
+				tableView.tableFooterView = (count == 0) ? EmptyView(message: Issue.reasonForEmptyWithFilter(searchBar.text), parentWidth: view.bounds.size.width) : nil
 			}
 			if let r = refreshControl {
 				r.attributedTitle = NSAttributedString(string: api.lastUpdateDescription(), attributes: nil)
@@ -754,23 +736,36 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	///////////////////////////// filtering
 
 	override func scrollViewWillBeginDragging(scrollView: UIScrollView) {
-		if searchField.isFirstResponder() {
-			searchField.resignFirstResponder()
+		if searchBar.isFirstResponder() {
+			searchBar.resignFirstResponder()
 		}
 	}
 
-	func textFieldShouldClear(textField: UITextField) -> Bool {
+	func searchBarTextDidBeginEditing(searchBar: UISearchBar) {
+		searchBar.setShowsCancelButton(true, animated: true)
+	}
+
+	func searchBarTextDidEndEditing(searchBar: UISearchBar) {
+		searchBar.setShowsCancelButton(false, animated: true)
+	}
+
+	func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
 		searchTimer.push()
-		return true
 	}
 
-	func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
-		if string == "\n" {
-			textField.resignFirstResponder()
+	func searchBarCancelButtonClicked(searchBar: UISearchBar) {
+		searchBar.text = nil
+		searchTimer.push()
+		view.endEditing(false)
+	}
+
+	func searchBar(searchBar: UISearchBar, shouldChangeTextInRange range: NSRange, replacementText text: String) -> Bool {
+		if text == "\n" {
+			view.endEditing(false)
+			return false
 		} else {
-			searchTimer.push()
+			return true
 		}
-		return true
 	}
 
 	////////////////// mode
@@ -792,7 +787,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	func focusFilter() {
-		searchField.becomeFirstResponder()
+		searchBar.becomeFirstResponder()
 	}
 
 	private var _viewMode: MasterViewMode = .PullRequests

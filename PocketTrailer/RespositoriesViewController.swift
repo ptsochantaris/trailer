@@ -2,12 +2,13 @@
 import UIKit
 import CoreData
 
-final class RespositoriesViewController: UITableViewController, UITextFieldDelegate, NSFetchedResultsControllerDelegate {
+final class RespositoriesViewController: UITableViewController, UISearchBarDelegate, NSFetchedResultsControllerDelegate {
 
 	// Filtering
-	private var searchField: UITextField?
-	private var searchTimer: PopTimer?
+	@IBOutlet weak var searchBar: UISearchBar!
+	private var searchTimer: PopTimer!
 	private var _fetchedResultsController: NSFetchedResultsController?
+	private var firstAppear = true
 
 	@IBOutlet weak var actionsButton: UIBarButtonItem!
 
@@ -21,27 +22,9 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 	override func viewDidLoad() {
 		super.viewDidLoad()
 
-		searchField = UITextField(frame: CGRectMake(9, 10, view.bounds.size.width-18, 31))
-		searchField!.placeholder = "Filter..."
-		searchField!.returnKeyType = UIReturnKeyType.Search
-		searchField!.font = UIFont.systemFontOfSize(18)
-		searchField!.borderStyle = UITextBorderStyle.RoundedRect
-		searchField!.contentVerticalAlignment = UIControlContentVerticalAlignment.Center
-		searchField!.clearButtonMode = UITextFieldViewMode.Always
-		searchField!.autocapitalizationType = UITextAutocapitalizationType.None
-		searchField!.autocorrectionType = UITextAutocorrectionType.No
-		searchField!.delegate = self
-		searchField!.autoresizingMask = UIViewAutoresizing.FlexibleWidth
-
 		searchTimer = PopTimer(timeInterval: 0.5) { [weak self] in
 			self?.reloadData()
 		}
-
-		let searchHolder = UIView(frame: CGRectMake(0, 0, view.bounds.size.width, 51))
-		searchHolder.addSubview(searchField!)
-		searchHolder.autoresizesSubviews = true
-		searchHolder.autoresizingMask = UIViewAutoresizing.FlexibleWidth
-		tableView.tableHeaderView = searchHolder
 	}
 
 	override func viewDidAppear(animated: Bool) {
@@ -57,6 +40,10 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 	override func viewWillAppear(animated: Bool) {
 		super.viewWillAppear(animated)
 		self.navigationController?.setToolbarHidden(false, animated: animated)
+		if firstAppear {
+			tableView.contentOffset = CGPointMake(0, 0)
+			firstAppear = false
+		}
 	}
 
 	override func viewWillDisappear(animated: Bool) {
@@ -147,7 +134,7 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 		}
 
 		let fetchRequest = NSFetchRequest(entityName: "Repo")
-		if let text = searchField?.text where !text.isEmpty {
+		if let text = searchBar.text where !text.isEmpty {
 			fetchRequest.predicate = NSPredicate(format: "fullName contains [cd] %@", text)
 		}
 		fetchRequest.fetchBatchSize = 20
@@ -316,22 +303,35 @@ final class RespositoriesViewController: UITableViewController, UITextFieldDeleg
 	}
 
 	override func scrollViewWillBeginDragging(scrollView: UIScrollView) {
-		if searchField!.isFirstResponder() {
-			searchField!.resignFirstResponder()
+		if searchBar!.isFirstResponder() {
+			searchBar!.resignFirstResponder()
 		}
 	}
 
-	func textFieldShouldClear(textField: UITextField) -> Bool {
-		searchTimer?.push()
-		return true
+	func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
+		searchTimer.push()
 	}
 
-	func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
-		if string == "\n" {
-			textField.resignFirstResponder()
+	func searchBarTextDidBeginEditing(searchBar: UISearchBar) {
+		searchBar.setShowsCancelButton(true, animated: true)
+	}
+
+	func searchBarTextDidEndEditing(searchBar: UISearchBar) {
+		searchBar.setShowsCancelButton(false, animated: true)
+	}
+
+	func searchBarCancelButtonClicked(searchBar: UISearchBar) {
+		searchBar.text = nil
+		searchTimer.push()
+		view.endEditing(false)
+	}
+
+	func searchBar(searchBar: UISearchBar, shouldChangeTextInRange range: NSRange, replacementText text: String) -> Bool {
+		if text == "\n" {
+			view.endEditing(false)
+			return false
 		} else {
-			searchTimer?.push()
+			return true
 		}
-		return true
 	}
 }

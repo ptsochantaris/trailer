@@ -5,6 +5,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 	private var settingsChangedTimer: PopTimer!
 	private var searchTimer: PopTimer!
+	private var firstAppear = true
 
 	// Search
 	@IBOutlet weak var searchBar: UISearchBar!
@@ -42,6 +43,14 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		]
 	}
 
+	override func viewWillAppear(animated: Bool) {
+		super.viewWillAppear(animated)
+		if firstAppear {
+			tableView.contentOffset = CGPointMake(0, 44)
+			firstAppear = false
+		}
+	}
+
 	override func scrollViewDidScroll(scrollView: UIScrollView) {
 		view.endEditing(false)
 	}
@@ -68,6 +77,14 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		searchTimer.push()
 	}
 
+	func searchBarTextDidBeginEditing(searchBar: UISearchBar) {
+		searchBar.setShowsCancelButton(true, animated: true)
+	}
+
+	func searchBarTextDidEndEditing(searchBar: UISearchBar) {
+		searchBar.setShowsCancelButton(false, animated: true)
+	}
+	
 	func searchBarCancelButtonClicked(searchBar: UISearchBar) {
 		searchBar.text = nil
 		searchTimer.push()
