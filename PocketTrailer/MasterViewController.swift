@@ -137,6 +137,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		tableView.rowHeight = UITableViewAutomaticDimension
 		tableView.estimatedRowHeight = 240
 		tableView.registerNib(UINib(nibName: "SectionHeaderView", bundle: nil), forHeaderFooterViewReuseIdentifier: "SectionHeaderView")
+		tableView.contentOffset = CGPointMake(0, 44)
 
 		if let detailNav = splitViewController?.viewControllers.last as? UINavigationController {
 			detailViewController = detailNav.topViewController as? DetailViewController
@@ -168,10 +169,13 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	private func updateRefreshControls() {
-		searchBar.alpha = min(1.0, max(0, ((116+tableView.contentOffset.y)/32.0)))
 		let ra = min(1.0, max(0, (-84-tableView.contentOffset.y)/32.0))
+		if ra > 0.0 && refreshLabel.alpha == 0 {
+			refreshLabel.text = api.lastUpdateDescription()
+		}
 		refreshLabel.alpha = ra
 		refreshControl?.alpha = ra
+		searchBar.alpha = min(1.0, max(0, ((116+tableView.contentOffset.y)/32.0)))
 	}
 
 	func reloadDataWithAnimation(animated: Bool) {

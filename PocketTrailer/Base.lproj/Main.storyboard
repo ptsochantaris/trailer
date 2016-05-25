@@ -209,6 +209,7 @@
                     </navigationItem>
                     <refreshControl key="refreshControl" opaque="NO" multipleTouchEnabled="YES" contentMode="center" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="9Af-Rk-Te8">
                         <autoresizingMask key="autoresizingMask"/>
+                        <color key="tintColor" red="0.20784313979999999" green="0.48235294220000002" blue="0.82352942230000004" alpha="1" colorSpace="calibratedRGB"/>
                     </refreshControl>
                     <connections>
                         <outlet property="refreshLabel" destination="BJz-Bz-xkf" id="ehp-ng-kk3"/>
@@ -220,8 +221,8 @@
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Refresh Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="BJz-Bz-xkf">
                     <rect key="frame" x="0.0" y="0.0" width="300" height="22"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
-                    <color key="textColor" red="0.25490196079999999" green="0.51372549020000002" blue="0.76862745099999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
+                    <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                     <nil key="highlightedColor"/>
                 </label>
             </objects>
