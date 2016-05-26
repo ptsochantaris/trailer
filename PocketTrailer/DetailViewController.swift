@@ -102,6 +102,36 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 		api.networkIndicationEnd()
 
 		catchupWithComments()
+		if splitViewController?.collapsed ?? true {
+			becomeFirstResponder()
+		}
+	}
+
+	override var keyCommands: [UIKeyCommand]? {
+		let ff = UIKeyCommand(input: UIKeyInputLeftArrow, modifierFlags: .Command, action: #selector(DetailViewController.focusOnMaster), discoverabilityTitle: "Focus keyboard on item list")
+		let s = UIKeyCommand(input: "o", modifierFlags: .Command, action: #selector(DetailViewController.keyOpenInSafari), discoverabilityTitle: "Open in Safari")
+		return [ff,s]
+	}
+
+	func keyOpenInSafari() {
+		if let u = webView?.URL {
+			UIApplication.sharedApplication().openURL(u)
+		}
+	}
+
+	override func becomeFirstResponder() -> Bool {
+		if detailItem != nil {
+			return webView?.becomeFirstResponder() ?? false
+		} else {
+			return false
+		}
+	}
+
+	func focusOnMaster() {
+		if splitViewController?.collapsed ?? true {
+			popupManager.getMasterController().navigationController?.popViewControllerAnimated(true)
+		}
+		popupManager.getMasterController().becomeFirstResponder()
 	}
 
 	private func catchupWithComments() {

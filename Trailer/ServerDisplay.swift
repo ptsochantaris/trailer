@@ -172,8 +172,8 @@ final class ServerDisplay {
 				return Issue.countOpenInMoc(mainObjectContext)
 			}, hasUnread: { [weak self] () -> Bool in
 				return Issue.badgeCountInMoc(mainObjectContext, apiServerId: self?.apiServerId) > 0
-			}, reasonForEmpty: { filter -> NSAttributedString in
-				return Issue.reasonForEmptyWithFilter(filter)
+			}, reasonForEmpty: { [weak self] filter -> NSAttributedString in
+				return Issue.reasonForEmptyWithFilter(filter, apiServerId: self?.apiServerId)
 			})
 
 		} else {
@@ -189,8 +189,8 @@ final class ServerDisplay {
 				return PullRequest.countOpenInMoc(mainObjectContext)
 			}, hasUnread: { [weak self] () -> Bool in
 				return PullRequest.badgeCountInMoc(mainObjectContext, apiServerId: self?.apiServerId) > 0
-			}, reasonForEmpty: { filter -> NSAttributedString in
-				return PullRequest.reasonForEmptyWithFilter(filter)
+			}, reasonForEmpty: { [weak self] filter -> NSAttributedString in
+				return PullRequest.reasonForEmptyWithFilter(filter, apiServerId: self?.apiServerId)
 			})
 
 		} else {

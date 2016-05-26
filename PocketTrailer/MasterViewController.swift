@@ -18,6 +18,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	private let pullRequestsItem = UITabBarItem()
 	private let issuesItem = UITabBarItem()
 	private var tabBar: UITabBar?
+	private var forceSafari = false
 
 	@IBAction func editSelected(sender: UIBarButtonItem ) {
 
@@ -154,6 +155,171 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		updateStatus()
 		updateTabBarVisibility(false)
+	}
+
+	override func canBecomeFirstResponder() -> Bool {
+		return true
+	}
+
+	override var keyCommands: [UIKeyCommand]? {
+		let f = UIKeyCommand(input: "f", modifierFlags: .Command, action: #selector(MasterViewController.focusFilter), discoverabilityTitle: "Filter items")
+		let o = UIKeyCommand(input: "o", modifierFlags: .Command, action: #selector(MasterViewController.keyOpenInSafari), discoverabilityTitle: "Open in Safari")
+		let a = UIKeyCommand(input: "a", modifierFlags: .Command, action: #selector(MasterViewController.keyToggleRead), discoverabilityTitle: "Mark item read/unread")
+		let m = UIKeyCommand(input: "m", modifierFlags: .Command, action: #selector(MasterViewController.keyToggleMute), discoverabilityTitle: "Set item mute/unmute")
+		let s = UIKeyCommand(input: "s", modifierFlags: .Command, action: #selector(MasterViewController.keyToggleSnooze), discoverabilityTitle: "Snooze/wake item")
+		let r = UIKeyCommand(input: "r", modifierFlags: .Command, action: #selector(MasterViewController.keyForceRefresh), discoverabilityTitle: "Refresh now")
+		let t = UIKeyCommand(input: "\t", modifierFlags: .Alternate, action: #selector(MasterViewController.keyFlipPrsAndIssues), discoverabilityTitle: "Switch between PRs and issues")
+		let sp = UIKeyCommand(input: " ", modifierFlags: [], action: #selector(MasterViewController.keyShowSelectedItem), discoverabilityTitle: "Display current item")
+		let d = UIKeyCommand(input: UIKeyInputDownArrow, modifierFlags: [], action: #selector(MasterViewController.keyMoveToNextItem), discoverabilityTitle: "Next item")
+		let u = UIKeyCommand(input: UIKeyInputUpArrow, modifierFlags: [], action: #selector(MasterViewController.keyMoveToPreviousItem), discoverabilityTitle: "Previous item")
+		let dd = UIKeyCommand(input: UIKeyInputDownArrow, modifierFlags: .Alternate, action: #selector(MasterViewController.keyMoveToNextSection), discoverabilityTitle: "Move to the next section")
+		let uu = UIKeyCommand(input: UIKeyInputUpArrow, modifierFlags: .Alternate, action: #selector(MasterViewController.keyMoveToPreviousSection), discoverabilityTitle: "Move to the previous section")
+		let fd = UIKeyCommand(input: UIKeyInputRightArrow, modifierFlags: .Command, action: #selector(MasterViewController.keyFocusDetailView), discoverabilityTitle: "Focus keyboard on detail view")
+		let fm = UIKeyCommand(input: UIKeyInputLeftArrow, modifierFlags: .Command, action: #selector(MasterViewController.becomeFirstResponder), discoverabilityTitle: "Focus keyboard on list view")
+		return [u,d,uu,dd,t,fd,fm,sp,f,r,a,m,o,s]
+	}
+
+	private func canIssueKeyForIndexPath(actionTitle: String, _ i: NSIndexPath) -> Bool {
+		if let actions = tableView(tableView, editActionsForRowAtIndexPath: i) {
+			for a in actions {
+				if a.title == actionTitle {
+					return true
+				}
+			}
+		}
+		showMessage("\(actionTitle) not available", "This command cannot be used on this item")
+		return false
+	}
+
+	func keyToggleSnooze() {
+		if let ip = tableView.indexPathForSelectedRow, i = fetchedResultsController.objectAtIndexPath(ip) as? ListableItem {
+			if i.isSnoozing {
+				if canIssueKeyForIndexPath("Wake", ip) {
+					i.wakeUp()
+					DataManager.saveDB()
+					updateStatus()
+				}
+			} else {
+				if canIssueKeyForIndexPath("Snooze", ip) {
+					showSnoozeMenuFor(i)
+				}
+			}
+		}
+	}
+
+	func keyToggleRead() {
+		if let ip = tableView.indexPathForSelectedRow, i = fetchedResultsController.objectAtIndexPath(ip) as? ListableItem {
+			if i.unreadComments?.integerValue ?? 0 > 0 {
+				if canIssueKeyForIndexPath("Read", ip) {
+					i.catchUpWithComments()
+					DataManager.saveDB()
+				}
+			} else {
+				if canIssueKeyForIndexPath("Unread", ip) {
+					app.markItemAsUnRead(i.objectID.URIRepresentation().absoluteString, reloadView: false)
+				}
+			}
+			updateStatus()
+		}
+	}
+
+	func keyToggleMute() {
+		if let ip = tableView.indexPathForSelectedRow, i = fetchedResultsController.objectAtIndexPath(ip) as? ListableItem {
+			let isMuted = i.muted?.boolValue ?? false
+			if (!isMuted && canIssueKeyForIndexPath("Mute", ip)) || (isMuted && canIssueKeyForIndexPath("Unmute", ip)) {
+				i.setMute(!isMuted)
+				DataManager.saveDB()
+				updateStatus()
+			}
+		}
+	}
+
+	func keyForceRefresh() {
+		if !appIsRefreshing {
+			tryRefresh()
+		}
+	}
+
+	func keyFocusDetailView() {
+		showDetailViewController(detailViewController.navigationController ?? detailViewController, sender: self)
+		detailViewController.becomeFirstResponder()
+	}
+
+	func keyOpenInSafari() {
+		if let ip = tableView.indexPathForSelectedRow {
+			forceSafari = true
+			tableView(tableView, didSelectRowAtIndexPath: ip)
+		}
+	}
+
+	func keyShowSelectedItem() {
+		if let ip = tableView.indexPathForSelectedRow {
+			tableView(tableView, didSelectRowAtIndexPath: ip)
+		}
+	}
+
+	func keyMoveToNextItem() {
+		if let ip = tableView.indexPathForSelectedRow {
+			var newRow = ip.row+1
+			var newSection = ip.section
+			if newRow >= tableView.numberOfRowsInSection(ip.section) {
+				newSection += 1
+				if newSection >= tableView.numberOfSections {
+					return; // end of the table
+				}
+				newRow = 0
+			}
+			tableView.selectRowAtIndexPath(NSIndexPath(forRow: newRow, inSection: newSection), animated: true, scrollPosition: .Middle)
+		} else if numberOfSectionsInTableView(tableView) > 0 {
+			tableView.selectRowAtIndexPath(NSIndexPath(forRow: 0, inSection: 0), animated: true, scrollPosition: .Top)
+		}
+	}
+
+	func keyMoveToPreviousItem() {
+		if let ip = tableView.indexPathForSelectedRow {
+			var newRow = ip.row-1
+			var newSection = ip.section
+			if newRow < 0 {
+				newSection -= 1
+				if newSection < 0 {
+					return; // start of the table
+				}
+				newRow = tableView.numberOfRowsInSection(newSection)-1
+			}
+			tableView.selectRowAtIndexPath(NSIndexPath(forRow: newRow, inSection: newSection), animated: true, scrollPosition: .Middle)
+		} else if numberOfSectionsInTableView(tableView) > 0 {
+			tableView.selectRowAtIndexPath(NSIndexPath(forRow: 0, inSection: 0), animated: true, scrollPosition: .Top)
+		}
+	}
+
+	func keyMoveToPreviousSection() {
+		if let ip = tableView.indexPathForSelectedRow {
+			let newSection = ip.section-1
+			if newSection < 0 {
+				return; // start of table
+			}
+			tableView.selectRowAtIndexPath(NSIndexPath(forRow: 0, inSection: newSection), animated: true, scrollPosition: .Middle)
+		} else if numberOfSectionsInTableView(tableView) > 0 {
+			tableView.selectRowAtIndexPath(NSIndexPath(forRow: 0, inSection: 0), animated: true, scrollPosition: .Top)
+		}
+	}
+
+	func keyMoveToNextSection() {
+		if let ip = tableView.indexPathForSelectedRow {
+			let newSection = ip.section+1
+			if newSection >= tableView.numberOfSections {
+				return; // end of table
+			}
+			tableView.selectRowAtIndexPath(NSIndexPath(forRow: 0, inSection: newSection), animated: true, scrollPosition: .Middle)
+		} else if numberOfSectionsInTableView(tableView) > 0 {
+			tableView.selectRowAtIndexPath(NSIndexPath(forRow: 0, inSection: 0), animated: true, scrollPosition: .Top)
+		}
+	}
+
+	func keyFlipPrsAndIssues() {
+		if tabBar != nil {
+			viewMode = (viewMode == .PullRequests) ? .Issues : .PullRequests
+		}
 	}
 
 	func tabBar(tabBar: UITabBar, didSelectItem item: UITabBarItem) {
@@ -400,14 +566,19 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
 
-		func openItem(item: ListableItem, url: NSURL, oid: NSManagedObjectID) -> Bool {
-			if Settings.openItemsDirectlyInSafari && !detailViewController.isVisible {
+		if !isFirstResponder() {
+			becomeFirstResponder()
+		}
+
+		let fs = forceSafari
+		forceSafari = false
+
+		func openItem(item: ListableItem, url: NSURL, oid: NSManagedObjectID) {
+			if forceSafari || (Settings.openItemsDirectlyInSafari && !detailViewController.isVisible) {
 				item.catchUpWithComments()
 				UIApplication.sharedApplication().openURL(url)
-				return true
 			} else {
 				showDetail(url, objectId: oid)
-				return false
 			}
 		}
 
@@ -416,26 +587,22 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			u = p.urlForOpening(),
 			url = NSURL(string: u)
 		{
-			if openItem(p, url: url, oid: p.objectID) {
-				tableView.deselectRowAtIndexPath(indexPath, animated: true)
-			}
+			openItem(p, url: url, oid: p.objectID)
 		} else if viewMode == .Issues, let
 			i = fetchedResultsController.objectAtIndexPath(indexPath) as? Issue,
 			u = i.urlForOpening(),
 			url = NSURL(string: u)
 		{
-			if openItem(i, url: url, oid: i.objectID) {
-				tableView.deselectRowAtIndexPath(indexPath, animated: true)
-			}
+			openItem(i, url: url, oid: i.objectID)
 		}
 	}
 
 	private func showDetail(url: NSURL?, objectId: NSManagedObjectID?) {
 		detailViewController.catchupWithDataItemWhenLoaded = objectId
 		detailViewController.detailItem = url
-		if !detailViewController.isVisible, let n = detailViewController.navigationController {
+		if !detailViewController.isVisible {
 			showTabBar(false, animated: true)
-			showDetailViewController(n, sender: self)
+			showDetailViewController(detailViewController.navigationController ?? detailViewController, sender: self)
 		}
 	}
 
@@ -747,12 +914,13 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	///////////////////////////// filtering
 
 	override func scrollViewWillBeginDragging(scrollView: UIScrollView) {
-		if searchBar.isFirstResponder() {
-			searchBar.resignFirstResponder()
-		}
+		becomeFirstResponder()
 	}
 
 	func searchBarTextDidBeginEditing(searchBar: UISearchBar) {
+		if let r = refreshControl where r.refreshing ?? false {
+			r.endRefreshing()
+		}
 		searchBar.setShowsCancelButton(true, animated: true)
 	}
 
@@ -798,6 +966,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	func focusFilter() {
+		safeScrollToTop()
 		searchBar.becomeFirstResponder()
 	}
 
