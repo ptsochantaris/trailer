@@ -178,6 +178,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			if let s = self {
 				if s.serversDirty {
 					s.serversDirty = false
+					DataManager.saveDB()
 					app.setupWindows()
 				} else {
 					app.updateAllMenus()
