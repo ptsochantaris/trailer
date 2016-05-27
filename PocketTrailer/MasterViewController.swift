@@ -124,6 +124,12 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		refreshLabel.center = CGPointMake(CGRectGetMidX(view.bounds), refreshControl!.center.y+36)
 	}
 
+	override func viewWillAppear(animated: Bool) {
+		super.viewWillAppear(animated)
+		updateStatus()
+		updateTabBarVisibility(animated)
+	}
+
 	override func viewDidLoad() {
 		super.viewDidLoad()
 
@@ -152,9 +158,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		pullRequestsItem.image = UIImage(named: "prsTab")
 		issuesItem.title = "Issues"
 		issuesItem.image = UIImage(named: "issuesTab")
-
-		updateStatus()
-		updateTabBarVisibility(false)
 	}
 
 	override func canBecomeFirstResponder() -> Bool {

@@ -17,6 +17,11 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 	func setupWindows() {
 
+		if #available(OSX 10.10, *) {
+			let c = NSAppearance.currentAppearance()
+			darkMode = c.name.rangeOfString(NSAppearanceNameVibrantDark) != nil
+		}
+
 		func addWindow(apiServer: ApiServer?) {
 			let s = ServerDisplay(apiServer: apiServer, delegate: self)
 			s.setTimers()
@@ -54,7 +59,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	func applicationDidFinishLaunching(notification: NSNotification) {
 		app = self
 
-		setupDarkModeMonitoring()
+		NSDistributedNotificationCenter.defaultCenter().addObserver(self, selector: #selector(OSX_AppDelegate.updateDarkMode), name: "AppleInterfaceThemeChangedNotification", object: nil)
 
 		DataManager.postProcessAllItems()
 
@@ -62,12 +67,17 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			app.isManuallyScrolling = false
 		}
 
-		setupWindows()
+		updateDarkMode() // also sets up windows
 
 		api.updateLimitsFromServer()
 
 		let nc = NSUserNotificationCenter.defaultUserNotificationCenter()
 		nc.delegate = self
+		if let launchNotification = notification.userInfo?[NSApplicationLaunchUserNotificationKey] as? NSUserNotification {
+			delay(0.5) { [weak self] in
+				self?.userNotificationCenter(nc, didActivateNotification: launchNotification)
+			}
+		}
 
 		if ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
 			atNextEvent(self) { S in
@@ -932,36 +942,14 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 	//////////////////////// Dark mode
 
-	var darkMode = false {
-		didSet {
-			if darkMode != oldValue {
-				for d in serverDisplays {
-					d.prMenu.statusItem?.view = nil
-					d.prMenu.updateVibrancy()
-					d.issuesMenu.statusItem?.view = nil
-					d.issuesMenu.updateVibrancy()
-				}
-				updateAllMenus()
-			}
-		}
-	}
+	var darkMode = false
+	func updateDarkMode() {
 
-	func checkDarkMode() {
-		atNextEvent(self) { S in
-			if #available(OSX 10.10, *) {
-				let c = NSAppearance.currentAppearance()
-				if c.respondsToSelector(Selector("allowsVibrancy")) {
-					S.darkMode = c.name.rangeOfString(NSAppearanceNameVibrantDark) != nil
-					return
-				}
-			}
-			S.darkMode = false
-		}
-	}
+		// kick the NSAppearance mechanism into action
+		let s = NSStatusBar.systemStatusBar().statusItemWithLength(NSVariableStatusItemLength)
+		s.statusBar.removeStatusItem(s)
 
-	private func setupDarkModeMonitoring() {
-		NSDistributedNotificationCenter.defaultCenter().addObserver(self, selector: #selector(OSX_AppDelegate.checkDarkMode), name: "AppleInterfaceThemeChangedNotification", object: nil)
-		checkDarkMode()
+		setupWindows()
 	}
 
 	// Server display list
