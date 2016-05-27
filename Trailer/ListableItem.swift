@@ -564,13 +564,9 @@ class ListableItem: DataItem {
 		return buildOrPredicate(string, expectedLength: 5, format: "userLogin contains[cd] %@", numeric: false)
     }
 
-	final class func requestForItemsOfType(itemType: String, withFilter: String?, sectionIndex: Int, apiServerId: NSManagedObjectID? = nil, onlyUnread: Bool = false) -> NSFetchRequest {
+	final class func requestForItemsOfType(itemType: String, withFilter: String?, sectionIndex: Int, criterion: GroupingCriterion? = nil, onlyUnread: Bool = false) -> NSFetchRequest {
 
 		var andPredicates = [NSPredicate]()
-
-		if let aid = apiServerId, a = existingObjectWithID(aid) as? ApiServer {
-			andPredicates.append(NSPredicate(format: "apiServer == %@", a))
-		}
 
 		if onlyUnread {
 			andPredicates.append(NSPredicate(format: "unreadComments > 0"))
@@ -697,7 +693,12 @@ class ListableItem: DataItem {
 
 		let f = NSFetchRequest(entityName: itemType)
 		f.fetchBatchSize = 100
-		f.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: andPredicates)
+		let p = NSCompoundPredicate(andPredicateWithSubpredicates: andPredicates)
+		if let c = criterion {
+			f.predicate = c.addCriterionToPredicate(p, inMoc: mainObjectContext)
+		} else {
+			f.predicate = p
+		}
 		f.sortDescriptors = sortDescriptors
 		return f
 	}

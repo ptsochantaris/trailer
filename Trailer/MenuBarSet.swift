@@ -1,26 +1,36 @@
 
-final class ServerDisplay {
+final class MenuBarSet {
 
 	private let prMenuController = NSWindowController(windowNibName:"MenuWindow")
 	private let issuesMenuController = NSWindowController(windowNibName:"MenuWindow")
 
 	let prMenu: MenuWindow
 	let issuesMenu: MenuWindow
-	let apiServerId: NSManagedObjectID?
+	let viewCriterion: GroupingCriterion?
 
 	var prFilterTimer: PopTimer!
 	var issuesFilterTimer: PopTimer!
 
-	init(apiServer: ApiServer?, delegate: NSWindowDelegate) {
-		apiServerId = apiServer?.objectID
+	init(viewCriterion: GroupingCriterion?, delegate: NSWindowDelegate) {
+		self.viewCriterion = viewCriterion
 
 		prMenu = prMenuController.window as! MenuWindow
-		prMenu.itemDelegate = ItemDelegate(type: "PullRequest", sections: Section.prMenuTitles, removeButtonsInSections: [Section.Merged.prMenuName(), Section.Closed.prMenuName()], apiServer: apiServer)
+		prMenu.itemDelegate = ItemDelegate(type: "PullRequest", sections: Section.prMenuTitles, removeButtonsInSections: [Section.Merged.prMenuName(), Section.Closed.prMenuName()], viewCriterion: viewCriterion)
 		prMenu.delegate = delegate
 
 		issuesMenu = issuesMenuController.window as! MenuWindow
-		issuesMenu.itemDelegate = ItemDelegate(type: "Issue", sections: Section.issueMenuTitles, removeButtonsInSections: [Section.Closed.issuesMenuName()], apiServer: apiServer)
+		issuesMenu.itemDelegate = ItemDelegate(type: "Issue", sections: Section.issueMenuTitles, removeButtonsInSections: [Section.Closed.issuesMenuName()], viewCriterion: viewCriterion)
 		issuesMenu.delegate = delegate
+	}
+
+	func updateMenuIfRelatedTo(i: ListableItem) {
+		if viewCriterion?.isRelatedTo(i) ?? true {
+			if i is PullRequest {
+				updatePrMenu()
+			} else {
+				updateIssuesMenu()
+			}
+		}
 	}
 
 	func throwAway() {
@@ -97,16 +107,16 @@ final class ServerDisplay {
 		let attributes: [String : AnyObject]
 		let somethingFailed = ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext)
 
-		if somethingFailed && apiServerId == nil {
+		if somethingFailed && viewCriterion == nil {
 			countString = "X"
 			attributes = redText()
-		} else if somethingFailed, let aid = apiServerId, a = existingObjectWithID(aid) as? ApiServer where !(a.lastSyncSucceeded?.boolValue ?? true) {
+		} else if somethingFailed, let aid = viewCriterion?.apiServerId, a = existingObjectWithID(aid) as? ApiServer where !(a.lastSyncSucceeded?.boolValue ?? true) {
 			countString = "X"
 			attributes = redText()
 		} else {
 
 			if Settings.countOnlyListedItems {
-				let f = ListableItem.requestForItemsOfType(type, withFilter: menu.filter.stringValue, sectionIndex: -1, apiServerId: apiServerId)
+				let f = ListableItem.requestForItemsOfType(type, withFilter: menu.filter.stringValue, sectionIndex: -1, criterion: viewCriterion)
 				countString = String(mainObjectContext.countForFetchRequest(f, error: nil))
 			} else {
 				countString = String(totalCount())
@@ -140,9 +150,7 @@ final class ServerDisplay {
 				siv.labelOffset = lengthOffset
 				siv.highlighted = im.visible
 				siv.grayOut = shouldGray
-				if let aid = S.apiServerId, a = existingObjectWithID(aid) as? ApiServer {
-					siv.serverTitle = a.label
-				}
+				siv.serverTitle = S.viewCriterion?.label
 				siv.tappedCallback = {
 					let m = menu
 					if m.visible {
@@ -166,14 +174,14 @@ final class ServerDisplay {
 
 	func updateIssuesMenu() {
 
-		if Repo.interestedInIssues(apiServerId) {
+		if Repo.interestedInIssues(viewCriterion?.apiServerId) {
 
 			updateMenu("Issue", menu: issuesMenu, lengthOffset: 2, totalCount: { () -> Int in
 				return Issue.countOpenInMoc(mainObjectContext)
 			}, hasUnread: { [weak self] () -> Bool in
-				return Issue.badgeCountInMoc(mainObjectContext, apiServerId: self?.apiServerId) > 0
+				return Issue.badgeCountInMoc(mainObjectContext, criterion: self?.viewCriterion) > 0
 			}, reasonForEmpty: { [weak self] filter -> NSAttributedString in
-				return Issue.reasonForEmptyWithFilter(filter, apiServerId: self?.apiServerId)
+				return Issue.reasonForEmptyWithFilter(filter, criterion: self?.viewCriterion)
 			})
 
 		} else {
@@ -183,14 +191,14 @@ final class ServerDisplay {
 
 	func updatePrMenu() {
 
-		if Repo.interestedInPrs(apiServerId) || !Repo.interestedInIssues(apiServerId) {
+		if Repo.interestedInPrs(viewCriterion?.apiServerId) || !Repo.interestedInIssues(viewCriterion?.apiServerId) {
 
 			updateMenu("PullRequest", menu: prMenu, lengthOffset: 0, totalCount: { () -> Int in
 				return PullRequest.countOpenInMoc(mainObjectContext)
 			}, hasUnread: { [weak self] () -> Bool in
-				return PullRequest.badgeCountInMoc(mainObjectContext, apiServerId: self?.apiServerId) > 0
+				return PullRequest.badgeCountInMoc(mainObjectContext, criterion: self?.viewCriterion) > 0
 			}, reasonForEmpty: { [weak self] filter -> NSAttributedString in
-				return PullRequest.reasonForEmptyWithFilter(filter, apiServerId: self?.apiServerId)
+				return PullRequest.reasonForEmptyWithFilter(filter, criterion: self?.viewCriterion)
 			})
 
 		} else {

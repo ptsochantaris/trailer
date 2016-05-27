@@ -22,32 +22,39 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			darkMode = c.name.rangeOfString(NSAppearanceNameVibrantDark) != nil
 		}
 
-		func addWindow(apiServer: ApiServer?) {
-			let s = ServerDisplay(apiServer: apiServer, delegate: self)
+		func addServerWindow(apiServer: ApiServer) {
+			let c = GroupingCriterion(apiServerId: apiServer.objectID, repoIds: nil)
+			let s = MenuBarSet(viewCriterion: c, delegate: self)
 			s.setTimers()
-			serverDisplays.append(s)
+			menuBarSets.append(s)
 		}
 
-		for d in serverDisplays {
+		func addWholeWindow() {
+			let s = MenuBarSet(viewCriterion: nil, delegate: self)
+			s.setTimers()
+			menuBarSets.append(s)
+		}
+
+		for d in menuBarSets {
 			d.throwAway()
 		}
-		serverDisplays.removeAll()
+		menuBarSets.removeAll()
 
 		if Settings.showSeparateApiServersInMenu {
 			for a in ApiServer.allApiServersInMoc(mainObjectContext) {
 				if a.goodToGo {
-					addWindow(a)
+					addServerWindow(a)
 				}
 			}
 		}
 
-		if serverDisplays.count == 0 {
-			addWindow(nil)
+		if menuBarSets.count == 0 {
+			addWholeWindow()
 		}
 
 		updateScrollBarWidth() // also updates menu
 
-		for d in serverDisplays {
+		for d in menuBarSets {
 			d.prMenu.scrollToTop()
 			d.issuesMenu.scrollToTop()
 
@@ -148,7 +155,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 			func saveAndRefresh(i: ListableItem) {
 				DataManager.saveDB()
-				updateRelatedMenuFor(i)
+				updateRelatedMenusFor(i)
 			}
 
 			switch notification.activationType {
@@ -305,17 +312,17 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 	}
 
-	func dataItemSelected(item: ListableItem, alternativeSelect: Bool) {
+	func dataItemSelected(item: ListableItem, alternativeSelect: Bool, window: NSWindow?) {
 
-		guard let serverDisplay = serverDisplayForApiServer(item.apiServer) else { return }
+		guard let w = window as? MenuWindow, menuBarSet = menuBarSetForWindow(w) else { return }
 
 		ignoreNextFocusLoss = alternativeSelect
 
 		let urlToOpen = item.urlForOpening()
 		item.catchUpWithComments()
-		updateRelatedMenuFor(item)
+		updateRelatedMenusFor(item)
 
-		let window = item is PullRequest ? serverDisplay.prMenu : serverDisplay.issuesMenu
+		let window = item is PullRequest ? menuBarSet.prMenu : menuBarSet.issuesMenu
 		let reSelectIndex = alternativeSelect ? window.table.selectedRow : -1
 		window.filter.becomeFirstResponder()
 
@@ -341,12 +348,12 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 	func sectionHeaderRemoveSelected(headerTitle: String) {
 
-		guard let inMenu = visibleWindow(), serverDisplay = serverDisplayForWindow(inMenu) else { return }
+		guard let inMenu = visibleWindow(), menuBarSet = menuBarSetForWindow(inMenu) else { return }
 
-		if inMenu === serverDisplay.prMenu {
+		if inMenu === menuBarSet.prMenu {
 			if headerTitle == Section.Merged.prMenuName() {
 				if Settings.dontAskBeforeWipingMerged {
-					removeAllMergedRequests(serverDisplay)
+					removeAllMergedRequests(menuBarSet)
 				} else {
 					let mergedRequests = PullRequest.allMergedInMoc(mainObjectContext)
 
@@ -358,7 +365,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					alert.showsSuppressionButton = true
 
 					if alert.runModal() == NSAlertSecondButtonReturn {
-						removeAllMergedRequests(serverDisplay)
+						removeAllMergedRequests(menuBarSet)
 						if alert.suppressionButton!.state == NSOnState {
 							Settings.dontAskBeforeWipingMerged = true
 						}
@@ -366,7 +373,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				}
 			} else if headerTitle == Section.Closed.prMenuName() {
 				if Settings.dontAskBeforeWipingClosed {
-					removeAllClosedRequests(serverDisplay)
+					removeAllClosedRequests(menuBarSet)
 				} else {
 					let closedRequests = PullRequest.allClosedInMoc(mainObjectContext)
 
@@ -378,20 +385,20 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					alert.showsSuppressionButton = true
 
 					if alert.runModal() == NSAlertSecondButtonReturn {
-						removeAllClosedRequests(serverDisplay)
+						removeAllClosedRequests(menuBarSet)
 						if alert.suppressionButton!.state == NSOnState {
 							Settings.dontAskBeforeWipingClosed = true
 						}
 					}
 				}
 			}
-			if !serverDisplay.prMenu.visible {
-				showMenu(serverDisplay.prMenu)
+			if !menuBarSet.prMenu.visible {
+				showMenu(menuBarSet.prMenu)
 			}
-		} else if inMenu === serverDisplay.issuesMenu {
+		} else if inMenu === menuBarSet.issuesMenu {
 			if headerTitle == Section.Closed.issuesMenuName() {
 				if Settings.dontAskBeforeWipingClosed {
-					removeAllClosedIssues(serverDisplay)
+					removeAllClosedIssues(menuBarSet)
 				} else {
 					let closedIssues = Issue.allClosedInMoc(mainObjectContext)
 
@@ -403,79 +410,78 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					alert.showsSuppressionButton = true
 
 					if alert.runModal() == NSAlertSecondButtonReturn {
-						removeAllClosedIssues(serverDisplay)
+						removeAllClosedIssues(menuBarSet)
 						if alert.suppressionButton!.state == NSOnState {
 							Settings.dontAskBeforeWipingClosed = true
 						}
 					}
 				}
 			}
-			if !serverDisplay.issuesMenu.visible {
-				showMenu(serverDisplay.issuesMenu)
+			if !menuBarSet.issuesMenu.visible {
+				showMenu(menuBarSet.issuesMenu)
 			}
 		}
 	}
 
-	private func removeAllMergedRequests(serverDisplay: ServerDisplay) {
-		for r in PullRequest.allMergedInMoc(mainObjectContext, apiServerId: serverDisplay.apiServerId) {
+	private func removeAllMergedRequests(menuBarSet: MenuBarSet) {
+		for r in PullRequest.allMergedInMoc(mainObjectContext, criterion: menuBarSet.viewCriterion) {
 			mainObjectContext.deleteObject(r)
 		}
 		DataManager.saveDB()
-		serverDisplay.updatePrMenu()
+		menuBarSet.updatePrMenu()
 	}
 
-	private func removeAllClosedRequests(serverDisplay: ServerDisplay) {
-		for r in PullRequest.allClosedInMoc(mainObjectContext, apiServerId: serverDisplay.apiServerId) {
+	private func removeAllClosedRequests(menuBarSet: MenuBarSet) {
+		for r in PullRequest.allClosedInMoc(mainObjectContext, criterion: menuBarSet.viewCriterion) {
 			mainObjectContext.deleteObject(r)
 		}
 		DataManager.saveDB()
-		serverDisplay.updatePrMenu()
+		menuBarSet.updatePrMenu()
 	}
 
-	private func removeAllClosedIssues(serverDisplay: ServerDisplay) {
-		for i in Issue.allClosedInMoc(mainObjectContext, apiServerId: serverDisplay.apiServerId) {
+	private func removeAllClosedIssues(menuBarSet: MenuBarSet) {
+		for i in Issue.allClosedInMoc(mainObjectContext, criterion: menuBarSet.viewCriterion) {
 			mainObjectContext.deleteObject(i)
 		}
 		DataManager.saveDB()
-		serverDisplay.updateIssuesMenu()
+		menuBarSet.updateIssuesMenu()
 	}
 
 	func unPinSelectedFor(item: ListableItem) {
 		mainObjectContext.deleteObject(item)
 		DataManager.saveDB()
-		updateRelatedMenuFor(item)
+		updateRelatedMenusFor(item)
 	}
 
 	override func controlTextDidChange(n: NSNotification) {
 		if let obj = n.object as? NSSearchField {
 
-			guard let w = obj.window as? MenuWindow, serverDisplay = serverDisplayForWindow(w) else { return }
+			guard let w = obj.window as? MenuWindow, menuBarSet = menuBarSetForWindow(w) else { return }
 
-			if obj === serverDisplay.prMenu.filter {
-				serverDisplay.prFilterTimer.push()
-			} else if obj === serverDisplay.issuesMenu.filter {
-				serverDisplay.issuesFilterTimer.push()
+			if obj === menuBarSet.prMenu.filter {
+				menuBarSet.prFilterTimer.push()
+			} else if obj === menuBarSet.issuesMenu.filter {
+				menuBarSet.issuesFilterTimer.push()
 			}
 		}
 	}
 
 	func markAllReadSelectedFrom(window: MenuWindow) {
 
-		guard let serverDisplay = serverDisplayForWindow(window) else { return }
+		guard let menuBarSet = menuBarSetForWindow(window) else { return }
 
-		if window === serverDisplay.prMenu {
-			let f = ListableItem.requestForItemsOfType("PullRequest", withFilter: serverDisplay.prMenu.filter.stringValue, sectionIndex: -1)
+		if window === menuBarSet.prMenu {
+			let f = ListableItem.requestForItemsOfType("PullRequest", withFilter: menuBarSet.prMenu.filter.stringValue, sectionIndex: -1)
 			for r in try! mainObjectContext.executeFetchRequest(f) as! [ListableItem] {
 				r.catchUpWithComments()
 			}
-			serverDisplay.updatePrMenu()
-		} else if window === serverDisplay.issuesMenu {
-			let f = ListableItem.requestForItemsOfType("Issue", withFilter: serverDisplay.issuesMenu.filter.stringValue, sectionIndex: -1)
+		} else if window === menuBarSet.issuesMenu {
+			let f = ListableItem.requestForItemsOfType("Issue", withFilter: menuBarSet.issuesMenu.filter.stringValue, sectionIndex: -1)
 			for i in try! mainObjectContext.executeFetchRequest(f) as! [ListableItem] {
 				i.catchUpWithComments()
 			}
-			serverDisplay.updateIssuesMenu()
 		}
+		updateAllMenus()
 	}
 
 	func preferencesSelected() {
@@ -616,7 +622,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		appIsRefreshing = true
 		preferencesWindow?.updateActivity()
 
-		for d in serverDisplays {
+		for d in menuBarSets {
 			d.prepareForRefresh()
 		}
 
@@ -635,18 +641,14 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		updateAllMenus()
 	}
 
-	func updateRelatedMenuFor(i: ListableItem) {
-		if let d = serverDisplayForApiServer(i.apiServer) {
-			if i is PullRequest {
-				d.updatePrMenu()
-			} else {
-				d.updateIssuesMenu()
-			}
+	func updateRelatedMenusFor(i: ListableItem) {
+		for d in menuBarSets {
+			d.updateMenuIfRelatedTo(i)
 		}
 	}
 
 	func updateAllMenus() {
-		for d in serverDisplays {
+		for d in menuBarSets {
 			d.updatePrMenu()
 			d.updateIssuesMenu()
 		}
@@ -675,13 +677,13 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 		prepareForRefresh()
 
-		for d in serverDisplays {
+		for d in menuBarSets {
 			d.allowRefresh = false
 		}
 
 		api.syncItemsForActiveReposAndCallback { [weak self] in
 			if let s = self {
-				for d in s.serverDisplays {
+				for d in s.menuBarSets {
 					d.allowRefresh = true
 				}
 
@@ -695,7 +697,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	func refreshTimerDone() {
-		if ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) && Repo.countVisibleReposInMoc(mainObjectContext) > 0 {
+		if ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) && Repo.anyVisibleReposInMoc(mainObjectContext) {
 			if preferencesWindow != nil {
 				preferencesDirty = true
 			} else {
@@ -749,7 +751,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
 
 					if Repo.interestedInPrs() && Repo.interestedInIssues() { // TODO: move between all servers, not just the current one
-						if let serverDisplay = S.serverDisplayForWindow(w) {
+						if let serverDisplay = S.menuBarSetForWindow(w) {
 							if w === serverDisplay.prMenu {
 								S.showMenu(serverDisplay.issuesMenu)
 							} else if w === serverDisplay.issuesMenu {
@@ -787,7 +789,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
 					if let dataItem = w.itemDelegate.itemAtRow(w.table.selectedRow) {
 						let isAlternative = hasModifier(incomingEvent, .AlternateKeyMask)
-						S.dataItemSelected(dataItem, alternativeSelect: isAlternative)
+						S.dataItemSelected(dataItem, alternativeSelect: isAlternative, window: w)
 					}
 					return nil
 				case 53: // escape
@@ -840,9 +842,9 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 		if check==4, let n = keyMap[Settings.hotkeyLetter] where incomingEvent.keyCode == UInt16(n) {
 			if Repo.interestedInPrs() {
-				showMenu(serverDisplays.first!.prMenu)
+				showMenu(menuBarSets.first!.prMenu)
 			} else if Repo.interestedInIssues() {
-				showMenu(serverDisplays.first!.issuesMenu)
+				showMenu(menuBarSets.first!.issuesMenu)
 			}
 			return true
 		}
@@ -853,7 +855,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	////////////// scrollbars
 	
 	func updateScrollBarWidth() {
-		if let s = serverDisplays.first!.prMenu.scrollView.verticalScroller {
+		if let s = menuBarSets.first!.prMenu.scrollView.verticalScroller {
 			if s.scrollerStyle == NSScrollerStyle.Legacy {
 				scrollBarWidth = s.frame.size.width
 			} else {
@@ -918,7 +920,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	func statusItemForView(view: NSView) -> NSStatusItem? {
-		for d in serverDisplays {
+		for d in menuBarSets {
 			if d.prMenu.statusItem?.view === view { return d.prMenu.statusItem }
 			if d.issuesMenu.statusItem?.view === view { return d.issuesMenu.statusItem }
 		}
@@ -926,7 +928,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	func visibleWindow() -> MenuWindow? {
-		for d in serverDisplays {
+		for d in menuBarSets {
 			if d.prMenu.visible { return d.prMenu }
 			if d.issuesMenu.visible { return d.issuesMenu }
 		}
@@ -934,7 +936,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	func updateVibrancies() {
-		for d in serverDisplays {
+		for d in menuBarSets {
 			d.prMenu.updateVibrancy()
 			d.issuesMenu.updateVibrancy()
 		}
@@ -953,18 +955,10 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	// Server display list
-	private var serverDisplays = [ServerDisplay]()
-	private func serverDisplayForWindow(window: MenuWindow) -> ServerDisplay? {
-		for d in serverDisplays {
+	private var menuBarSets = [MenuBarSet]()
+	private func menuBarSetForWindow(window: MenuWindow) -> MenuBarSet? {
+		for d in menuBarSets {
 			if d.prMenu === window || d.issuesMenu === window {
-				return d
-			}
-		}
-		return nil
-	}
-	private func serverDisplayForApiServer(apiServer: ApiServer) -> ServerDisplay? {
-		for d in serverDisplays {
-			if d.apiServerId == nil || d.apiServerId == apiServer.objectID {
 				return d
 			}
 		}

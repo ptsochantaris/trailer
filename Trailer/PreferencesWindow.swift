@@ -1139,7 +1139,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		if let item = tabViewItem {
 			let newIndex = tabView.indexOfTabViewItem(item)
 			if newIndex == 1 {
-				if (lastRepoCheck.isEqualToDate(never()) || Repo.countVisibleReposInMoc(mainObjectContext) == 0) && ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
+				if (lastRepoCheck.isEqualToDate(never()) || Repo.anyVisibleReposInMoc(mainObjectContext)) && ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
 					refreshReposSelected(nil)
 				}
 			}

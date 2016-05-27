@@ -120,7 +120,7 @@ final class MenuWindow: NSWindow {
 	}
 
 	@IBAction func refreshSelected(sender: NSMenuItem) {
-		if Repo.countVisibleReposInMoc(mainObjectContext) == 0 {
+		if !Repo.anyVisibleReposInMoc(mainObjectContext) {
 			app.preferencesSelected()
 			return
 		}

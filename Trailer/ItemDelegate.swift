@@ -19,14 +19,14 @@ final class ItemDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 	private let type: String
 	private let sections: [String]
 	private let removalSections: [String]
-	private let apiServerId: NSManagedObjectID?
+	private let viewCriterion: GroupingCriterion?
 
-	init(type: String, sections: [String], removeButtonsInSections: [String], apiServer: ApiServer?) {
+	init(type: String, sections: [String], removeButtonsInSections: [String], viewCriterion: GroupingCriterion?) {
 
 		self.type = type
 		self.sections = sections
 		self.removalSections = removeButtonsInSections
-		self.apiServerId = apiServer?.objectID
+		self.viewCriterion = viewCriterion
 
 		super.init()
 		reloadData(nil)
@@ -36,7 +36,7 @@ final class ItemDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 
 		itemIds.removeAll(keepCapacity: false)
 
-		let f = ListableItem.requestForItemsOfType(type, withFilter: filter, sectionIndex: -1, apiServerId: apiServerId)
+		let f = ListableItem.requestForItemsOfType(type, withFilter: filter, sectionIndex: -1, criterion: viewCriterion)
 		f.resultType = .DictionaryResultType
 		f.fetchBatchSize = 0
 		f.propertiesToFetch = _propertiesToFetch

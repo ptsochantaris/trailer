@@ -75,14 +75,22 @@ final class Repo: DataItem {
 		return try! moc.executeFetchRequest(f) as! [Repo]
 	}
 
-	class func countVisibleReposInMoc(moc: NSManagedObjectContext, apiServerId: NSManagedObjectID? = nil) -> Int {
-		let f = NSFetchRequest(entityName: "Repo")
-		if let aid = apiServerId, a = try! moc.existingObjectWithID(aid) as? ApiServer {
-			f.predicate = NSPredicate(format: "(displayPolicyForPrs > 0 or displayPolicyForIssues > 0) and apiServer == %@", a)
-		} else {
-			f.predicate = NSPredicate(format: "displayPolicyForPrs > 0 or displayPolicyForIssues > 0")
+	class func anyVisibleReposInMoc(moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Bool {
+		if let criteriodRepos = criterion?.repoIds {
+			for rid in criteriodRepos {
+				if let r = try! moc.existingObjectWithID(rid) as? Repo where r.shouldSync {
+					return true
+				}
+			}
 		}
-		return moc.countForFetchRequest(f, error: nil)
+		let f = NSFetchRequest(entityName: "Repo")
+		let p = NSPredicate(format: "displayPolicyForPrs > 0 or displayPolicyForIssues > 0")
+		if criterion?.apiServerId != nil {
+			f.predicate = criterion?.addCriterionToPredicate(p, inMoc: moc)
+		} else {
+			f.predicate = p
+		}
+		return moc.countForFetchRequest(f, error: nil) > 0
 	}
 
 	class func interestedInIssues(apiServerId: NSManagedObjectID? = nil) -> Bool {

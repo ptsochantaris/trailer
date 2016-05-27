@@ -12,7 +12,7 @@ final class PrTable: NSTableView, NSPasteboardItemDataProvider {
 	override func mouseUp(theEvent: NSEvent) {
 		if let prView = cellAtEvent(theEvent) as? TrailerCell, item = prView.associatedDataItem() {
 			let isAlternative = ((theEvent.modifierFlags.intersect(NSEventModifierFlags.AlternateKeyMask)) == NSEventModifierFlags.AlternateKeyMask)
-			app.dataItemSelected(item, alternativeSelect: isAlternative)
+			app.dataItemSelected(item, alternativeSelect: isAlternative, window: window)
 		}
 	}
 

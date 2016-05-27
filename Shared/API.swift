@@ -222,7 +222,7 @@ final class API {
 
 		let shouldRefreshReposToo = lastRepoCheck.isEqualToDate(never())
 			|| (NSDate().timeIntervalSinceDate(lastRepoCheck) > NSTimeInterval(Settings.newRepoCheckPeriod*3600.0))
-			|| (Repo.countVisibleReposInMoc(syncContext)==0)
+			|| !Repo.anyVisibleReposInMoc(syncContext)
 
 		if shouldRefreshReposToo {
 			fetchRepositoriesToMoc(syncContext) { [weak self] in

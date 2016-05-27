@@ -37,8 +37,8 @@ final class Issue: ListableItem {
 		}
 	}
 
-	class func reasonForEmptyWithFilter(filterValue: String?, apiServerId: NSManagedObjectID? = nil) -> NSAttributedString {
-		let openIssues = Issue.countOpenInMoc(mainObjectContext, apiServerId: apiServerId)
+	class func reasonForEmptyWithFilter(filterValue: String?, criterion: GroupingCriterion? = nil) -> NSAttributedString {
+		let openIssues = Issue.countOpenInMoc(mainObjectContext, criterion: criterion)
 
 		var color = COLOR_CLASS.lightGrayColor()
 		var message: String = ""
@@ -52,10 +52,10 @@ final class Issue: ListableItem {
 			message = "There are no issues matching this filter."
 		} else if openIssues > 0 {
 			message = "\(openIssues) issues are hidden by your settings."
-		} else if Repo.countVisibleReposInMoc(mainObjectContext, apiServerId: apiServerId)==0 {
+		} else if !Repo.anyVisibleReposInMoc(mainObjectContext, criterion: criterion) {
 			color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
 			message = "You have no watched repositories, please add some to your watchlist and refresh after a little while."
-		} else if !Repo.interestedInPrs(apiServerId) && !Repo.interestedInIssues(apiServerId) {
+		} else if !Repo.interestedInPrs(criterion?.apiServerId) && !Repo.interestedInIssues(criterion?.apiServerId) {
 			color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
 			message = "All your watched repositories are marked as hidden, please enable issues or PRs for some of them."
 		} else if openIssues==0 {
@@ -93,8 +93,8 @@ final class Issue: ListableItem {
 		}
 	}
 
-	class func badgeCountInMoc(moc: NSManagedObjectContext, apiServerId: NSManagedObjectID? = nil) -> Int {
-		let f = requestForItemsOfType("Issue", withFilter: nil, sectionIndex: -1, apiServerId: apiServerId)
+	class func badgeCountInMoc(moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
+		let f = requestForItemsOfType("Issue", withFilter: nil, sectionIndex: -1, criterion: criterion)
 		return badgeCountFromFetch(f, inMoc: moc)
 	}
 
@@ -104,12 +104,13 @@ final class Issue: ListableItem {
 		return badgeCountFromFetch(f, inMoc: moc)
 	}
 
-	class func countOpenInMoc(moc: NSManagedObjectContext, apiServerId: NSManagedObjectID? = nil) -> Int {
+	class func countOpenInMoc(moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
 		let f = NSFetchRequest(entityName: "Issue")
-		if let aid = apiServerId, a = try! moc.existingObjectWithID(aid) as? ApiServer {
-			f.predicate = NSPredicate(format: "(condition == %d or condition == nil) and apiServer == %@", ItemCondition.Open.rawValue, a)
+		let p = NSPredicate(format: "condition == %d or condition == nil", ItemCondition.Open.rawValue)
+		if let c = criterion {
+			f.predicate = c.addCriterionToPredicate(p, inMoc: moc)
 		} else {
-			f.predicate = NSPredicate(format: "condition == %d or condition == nil", ItemCondition.Open.rawValue)
+			f.predicate = p
 		}
 		return moc.countForFetchRequest(f, error: nil)
 	}
@@ -162,13 +163,14 @@ final class Issue: ListableItem {
 		return Section.issueMenuTitles[sectionIndex?.integerValue ?? 0]
 	}
 
-	class func allClosedInMoc(moc: NSManagedObjectContext, apiServerId: NSManagedObjectID? = nil) -> [Issue] {
+	class func allClosedInMoc(moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> [Issue] {
 		let f = NSFetchRequest(entityName: "Issue")
 		f.returnsObjectsAsFaults = false
-		if let aid = apiServerId, a = try! moc.existingObjectWithID(aid) as? ApiServer {
-			f.predicate = NSPredicate(format: "condition == %d and apiServer == %@", ItemCondition.Closed.rawValue, a)
+		let p = NSPredicate(format: "condition == %d", ItemCondition.Closed.rawValue)
+		if let c = criterion {
+			f.predicate = c.addCriterionToPredicate(p, inMoc: moc)
 		} else {
-			f.predicate = NSPredicate(format: "condition == %d", ItemCondition.Closed.rawValue)
+			f.predicate = p
 		}
 		return try! moc.executeFetchRequest(f) as! [Issue]
 	}

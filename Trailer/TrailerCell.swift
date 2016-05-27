@@ -217,7 +217,7 @@ class TrailerCell: NSTableCellView {
 
 	private func saveAndRequestMenuUpdate(item: ListableItem) {
 		DataManager.saveDB()
-		app.updateRelatedMenuFor(item)
+		app.updateRelatedMenusFor(item)
 	}
 
 	func associatedDataItem() -> ListableItem? {

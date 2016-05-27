@@ -57,34 +57,37 @@ final class PullRequest: ListableItem {
 		return try! moc.executeFetchRequest(f) as! [PullRequest]
 	}
 
-	class func allMergedInMoc(moc: NSManagedObjectContext, apiServerId: NSManagedObjectID? = nil) -> [PullRequest] {
+	class func allMergedInMoc(moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> [PullRequest] {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
-		if let aid = apiServerId, a = try! moc.existingObjectWithID(aid) as? ApiServer {
-			f.predicate = NSPredicate(format: "condition == %d and apiServer == %@", ItemCondition.Merged.rawValue, a)
+		let p = NSPredicate(format: "condition == %d", ItemCondition.Merged.rawValue)
+		if let c = criterion {
+			f.predicate = c.addCriterionToPredicate(p, inMoc: moc)
 		} else {
-			f.predicate = NSPredicate(format: "condition == %d", ItemCondition.Merged.rawValue)
+			f.predicate = p
 		}
 		return try! moc.executeFetchRequest(f) as! [PullRequest]
 	}
 
-	class func allClosedInMoc(moc: NSManagedObjectContext, apiServerId: NSManagedObjectID? = nil) -> [PullRequest] {
+	class func allClosedInMoc(moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> [PullRequest] {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
-		if let aid = apiServerId, a = try! moc.existingObjectWithID(aid) as? ApiServer {
-			f.predicate = NSPredicate(format: "condition == %d and apiServer == %@", ItemCondition.Merged.rawValue, a)
+		let p = NSPredicate(format: "condition == %d", ItemCondition.Closed.rawValue)
+		if let c = criterion {
+			f.predicate = c.addCriterionToPredicate(p, inMoc: moc)
 		} else {
-			f.predicate = NSPredicate(format: "condition == %d", ItemCondition.Closed.rawValue)
+			f.predicate = p
 		}
 		return try! moc.executeFetchRequest(f) as! [PullRequest]
 	}
 
-	class func countOpenInMoc(moc: NSManagedObjectContext, apiServerId: NSManagedObjectID? = nil) -> Int {
+	class func countOpenInMoc(moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
 		let f = NSFetchRequest(entityName: "PullRequest")
-		if let aid = apiServerId, a = try! moc.existingObjectWithID(aid) as? ApiServer {
-			f.predicate = NSPredicate(format: "(condition == %d or condition == nil) and apiServer == %@", ItemCondition.Open.rawValue, a)
+		let p = NSPredicate(format: "condition == %d or condition == nil", ItemCondition.Open.rawValue)
+		if let c = criterion {
+			f.predicate = c.addCriterionToPredicate(p, inMoc: moc)
 		} else {
-			f.predicate = NSPredicate(format: "condition == %d or condition == nil", ItemCondition.Open.rawValue)
+			f.predicate = p
 		}
 		return moc.countForFetchRequest(f, error: nil)
 	}
@@ -123,8 +126,8 @@ final class PullRequest: ListableItem {
 		return badgeCountFromFetch(f, inMoc: moc)
 	}
 
-	class func badgeCountInMoc(moc: NSManagedObjectContext, apiServerId: NSManagedObjectID? = nil) -> Int {
-		let f = requestForItemsOfType("PullRequest", withFilter: nil, sectionIndex: -1, apiServerId: apiServerId)
+	class func badgeCountInMoc(moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
+		let f = requestForItemsOfType("PullRequest", withFilter: nil, sectionIndex: -1, criterion: criterion)
 		return badgeCountFromFetch(f, inMoc: moc)
 	}
 
@@ -143,8 +146,8 @@ final class PullRequest: ListableItem {
 		return false
 	}
 
-	class func reasonForEmptyWithFilter(filterValue: String?, apiServerId: NSManagedObjectID? = nil) -> NSAttributedString {
-		let openRequests = PullRequest.countOpenInMoc(mainObjectContext, apiServerId: apiServerId)
+	class func reasonForEmptyWithFilter(filterValue: String?, criterion: GroupingCriterion? = nil) -> NSAttributedString {
+		let openRequests = PullRequest.countOpenInMoc(mainObjectContext, criterion: criterion)
 
 		var color = COLOR_CLASS.lightGrayColor()
 		var message: String = ""
@@ -158,10 +161,10 @@ final class PullRequest: ListableItem {
 			message = "There are no PRs matching this filter."
 		} else if openRequests > 0 {
 			message = "\(openRequests) PRs are hidden by your settings."
-		} else if Repo.countVisibleReposInMoc(mainObjectContext, apiServerId: apiServerId)==0 {
+		} else if !Repo.anyVisibleReposInMoc(mainObjectContext, criterion: criterion) {
 			color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
 			message = "You have no watched repositories, please add some to your watchlist and refresh after a little while."
-		} else if !Repo.interestedInPrs(apiServerId) && !Repo.interestedInIssues(apiServerId) {
+		} else if !Repo.interestedInPrs(criterion?.apiServerId) && !Repo.interestedInIssues(criterion?.apiServerId) {
 			color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
 			message = "All your watched repositories are marked as hidden, please enable issues or PRs for some of them."
 		} else if openRequests==0 {
