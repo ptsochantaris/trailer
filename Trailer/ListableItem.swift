@@ -694,11 +694,7 @@ class ListableItem: DataItem {
 		let f = NSFetchRequest(entityName: itemType)
 		f.fetchBatchSize = 100
 		let p = NSCompoundPredicate(andPredicateWithSubpredicates: andPredicates)
-		if let c = criterion {
-			f.predicate = c.addCriterionToPredicate(p, inMoc: mainObjectContext)
-		} else {
-			f.predicate = p
-		}
+		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, inMoc: mainObjectContext)
 		f.sortDescriptors = sortDescriptors
 		return f
 	}

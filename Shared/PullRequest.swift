@@ -61,11 +61,7 @@ final class PullRequest: ListableItem {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
 		let p = NSPredicate(format: "condition == %d", ItemCondition.Merged.rawValue)
-		if let c = criterion {
-			f.predicate = c.addCriterionToPredicate(p, inMoc: moc)
-		} else {
-			f.predicate = p
-		}
+		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, inMoc: moc)
 		return try! moc.executeFetchRequest(f) as! [PullRequest]
 	}
 
@@ -73,22 +69,14 @@ final class PullRequest: ListableItem {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
 		let p = NSPredicate(format: "condition == %d", ItemCondition.Closed.rawValue)
-		if let c = criterion {
-			f.predicate = c.addCriterionToPredicate(p, inMoc: moc)
-		} else {
-			f.predicate = p
-		}
+		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, inMoc: moc)
 		return try! moc.executeFetchRequest(f) as! [PullRequest]
 	}
 
 	class func countOpenInMoc(moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		let p = NSPredicate(format: "condition == %d or condition == nil", ItemCondition.Open.rawValue)
-		if let c = criterion {
-			f.predicate = c.addCriterionToPredicate(p, inMoc: moc)
-		} else {
-			f.predicate = p
-		}
+		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, inMoc: moc)
 		return moc.countForFetchRequest(f, error: nil)
 	}
 

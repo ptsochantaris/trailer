@@ -22,19 +22,6 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			darkMode = c.name.rangeOfString(NSAppearanceNameVibrantDark) != nil
 		}
 
-		func addServerWindow(apiServer: ApiServer) {
-			let c = GroupingCriterion(apiServerId: apiServer.objectID, repoIds: nil)
-			let s = MenuBarSet(viewCriterion: c, delegate: self)
-			s.setTimers()
-			menuBarSets.append(s)
-		}
-
-		func addWholeWindow() {
-			let s = MenuBarSet(viewCriterion: nil, delegate: self)
-			s.setTimers()
-			menuBarSets.append(s)
-		}
-
 		for d in menuBarSets {
 			d.throwAway()
 		}
@@ -43,13 +30,27 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		if Settings.showSeparateApiServersInMenu {
 			for a in ApiServer.allApiServersInMoc(mainObjectContext) {
 				if a.goodToGo {
-					addServerWindow(a)
+					let c = GroupingCriterion(apiServerId: a.objectID)
+					let s = MenuBarSet(viewCriterion: c, delegate: self)
+					s.setTimers()
+					menuBarSets.append(s)
 				}
 			}
 		}
 
+		// Whatever happens, show SOMETHING
 		if menuBarSets.count == 0 {
-			addWholeWindow()
+			let s = MenuBarSet(viewCriterion: nil, delegate: self)
+			s.setTimers()
+			menuBarSets.append(s)
+		}
+
+		// Extract grouped repos
+		for groupLabel in Repo.allGroupLabels {
+			let c = GroupingCriterion(repoGroup: groupLabel)
+			let s = MenuBarSet(viewCriterion: c, delegate: self)
+			s.setTimers()
+			menuBarSets.append(s)
 		}
 
 		updateScrollBarWidth() // also updates menu
@@ -470,16 +471,10 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 		guard let menuBarSet = menuBarSetForWindow(window) else { return }
 
-		if window === menuBarSet.prMenu {
-			let f = ListableItem.requestForItemsOfType("PullRequest", withFilter: menuBarSet.prMenu.filter.stringValue, sectionIndex: -1)
-			for r in try! mainObjectContext.executeFetchRequest(f) as! [ListableItem] {
-				r.catchUpWithComments()
-			}
-		} else if window === menuBarSet.issuesMenu {
-			let f = ListableItem.requestForItemsOfType("Issue", withFilter: menuBarSet.issuesMenu.filter.stringValue, sectionIndex: -1)
-			for i in try! mainObjectContext.executeFetchRequest(f) as! [ListableItem] {
-				i.catchUpWithComments()
-			}
+		let type = window === menuBarSet.prMenu ? "PullRequest" : "Issue"
+		let f = ListableItem.requestForItemsOfType(type, withFilter: window.filter.stringValue, sectionIndex: -1, criterion: menuBarSet.viewCriterion)
+		for r in try! mainObjectContext.executeFetchRequest(f) as! [ListableItem] {
+			r.catchUpWithComments()
 		}
 		updateAllMenus()
 	}

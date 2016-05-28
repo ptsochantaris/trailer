@@ -107,10 +107,7 @@ final class MenuBarSet {
 		let attributes: [String : AnyObject]
 		let somethingFailed = ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext)
 
-		if somethingFailed && viewCriterion == nil {
-			countString = "X"
-			attributes = redText()
-		} else if somethingFailed, let aid = viewCriterion?.apiServerId, a = existingObjectWithID(aid) as? ApiServer where !(a.lastSyncSucceeded?.boolValue ?? true) {
+		if somethingFailed && (viewCriterion?.relatedServerFailed ?? true) {
 			countString = "X"
 			attributes = redText()
 		} else {
@@ -146,17 +143,18 @@ final class MenuBarSet {
 			atNextEvent(self) { S in
 				DLog("Updating \(type) status item")
 				let im = menu
-				let siv = StatusItemView(frame: CGRectMake(0, 0, length+lengthOffset, H), label: countString, prefix: type, attributes: attributes)
+				let itemLabel = S.viewCriterion?.label
+				let itemWidth = (itemLabel != nil && countString == "0") ? 0 : length+lengthOffset
+				let siv = StatusItemView(frame: CGRectMake(0, 0, itemWidth, H), label: countString, prefix: type, attributes: attributes)
 				siv.labelOffset = lengthOffset
 				siv.highlighted = im.visible
 				siv.grayOut = shouldGray
-				siv.serverTitle = S.viewCriterion?.label
+				siv.serverTitle = itemLabel
 				siv.tappedCallback = {
-					let m = menu
-					if m.visible {
-						m.closeMenu()
+					if menu.visible {
+						menu.closeMenu()
 					} else {
-						app.showMenu(m)
+						app.showMenu(menu)
 					}
 				}
 				im.statusItem?.view = siv

@@ -4,19 +4,40 @@ import CoreData
 final class GroupingCriterion {
 
 	let apiServerId: NSManagedObjectID?
-	let repoIds: [NSManagedObjectID]?
-	let label: String?
+	let repoGroup: String?
 
-	init(apiServerId: NSManagedObjectID?, repoIds: [NSManagedObjectID]?) {
+	init(apiServerId: NSManagedObjectID?) {
 		self.apiServerId = apiServerId
-		self.repoIds = repoIds
-		if let aid = apiServerId, a = existingObjectWithID(aid) as? ApiServer {
-			label = a.label
-		} else if let rid = repoIds?.first, r = existingObjectWithID(rid) as? Repo {
-			label = r.fullName
+		self.repoGroup = nil
+	}
+
+	init(repoGroup: String) {
+		self.apiServerId = nil
+		self.repoGroup = repoGroup
+	}
+
+	var label: String {
+		if let r = repoGroup {
+			return r
+		} else if let aid = apiServerId, a = existingObjectWithID(aid) as? ApiServer {
+			return a.label ?? "<none>"
 		} else {
-			label = nil
+			return "<none>"
 		}
+	}
+
+	var relatedServerFailed: Bool {
+		if let aid = apiServerId, a = existingObjectWithID(aid) as? ApiServer where !(a.lastSyncSucceeded?.boolValue ?? true) {
+			return true
+		}
+		if let r = repoGroup {
+			for repo in Repo.reposForGroup(r, inMoc: mainObjectContext) {
+				if !(repo.apiServer.lastSyncSucceeded?.boolValue ?? true) {
+					return true
+				}
+			}
+		}
+		return false
 	}
 
 	func isRelatedTo(i: ListableItem) -> Bool {
@@ -24,42 +45,26 @@ final class GroupingCriterion {
 			if i.apiServer.objectID != aid {
 				return false
 			}
-		}
-		if let rids = repoIds {
-			var gotIt = false
-			for rid in rids {
-				if i.repo.objectID == rid {
-					gotIt = true
-				}
+		} else if let r = repoGroup {
+			if let l = i.repo.groupLabel {
+				return r == l
+			} else {
+				return false
 			}
-			return gotIt
 		}
 		return true
 	}
 
 	func addCriterionToPredicate(p: NSPredicate, inMoc: NSManagedObjectContext) -> NSPredicate {
 
-		var andPredicates = [p]
-
 		if let a = apiServerId, server = try! inMoc.existingObjectWithID(a) as? ApiServer {
-			let r = NSPredicate(format: "apiServer == %@", server)
-			andPredicates.append(r)
+			let np = NSPredicate(format: "apiServer == %@", server)
+			return NSCompoundPredicate(andPredicateWithSubpredicates: [np, p])
+		} else if let r = repoGroup {
+			let np = NSPredicate(format: "repo.groupLabel == %@", r)
+			return NSCompoundPredicate(andPredicateWithSubpredicates: [np, p])
+		} else {
+			return p
 		}
-
-		if let r = repoIds where r.count > 0 {
-			var orPredicates = [NSPredicate]()
-			for rid in r {
-				if let repo = try! inMoc.existingObjectWithID(rid) as? Repo {
-					let p = NSPredicate(format: "repo == %@", repo)
-					orPredicates.append(p)
-				}
-			}
-			if orPredicates.count > 0 {
-				let orRepoPredicate = NSCompoundPredicate(orPredicateWithSubpredicates: orPredicates)
-				andPredicates.append(orRepoPredicate)
-			}
-		}
-
-		return NSCompoundPredicate(andPredicateWithSubpredicates: andPredicates)
 	}
 }

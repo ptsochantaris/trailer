@@ -1189,16 +1189,29 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 					cell.attributedStringValue = NSAttributedString(string: title, attributes: [NSForegroundColorAttributeName: textColor])
 				}
 			} else {
-				if let menuCell = cell as? NSPopUpButtonCell {
+				if let menuCell = cell as? NSTextFieldCell {
+					if tableColumn?.identifier == "group" {
+						if tableView(tv, isGroupRow:row) {
+							menuCell.stringValue = ""
+							menuCell.placeholderString = nil
+							menuCell.enabled = false
+						} else {
+							let r = repoForRow(row)
+							menuCell.enabled = true
+							menuCell.placeholderString = "None"
+							menuCell.stringValue = S(r.groupLabel)
+						}
+					}
+				} else if let menuCell = cell as? NSPopUpButtonCell {
 					menuCell.removeAllItems()
 					if tableView(tv, isGroupRow:row) {
 						menuCell.selectItemAtIndex(-1)
 						menuCell.enabled = false
-						menuCell.arrowPosition = NSPopUpArrowPosition.NoArrow
+						menuCell.arrowPosition = .NoArrow
 					} else {
 						let r = repoForRow(row)
 						menuCell.enabled = true
-						menuCell.arrowPosition = NSPopUpArrowPosition.ArrowAtBottom
+						menuCell.arrowPosition = .ArrowAtBottom
 
 						var count = 0
 						let fontSize = NSFont.systemFontSizeForControlSize(NSControlSize.SmallControlSize)
@@ -1285,7 +1298,12 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		if tv === projectsTable {
 			if !tableView(tv, isGroupRow: row) {
 				let r = repoForRow(row)
-				if let index = object?.integerValue {
+				if tableColumn?.identifier == "group" {
+					let g = S(object as? String)
+					r.groupLabel = g.isEmpty ? nil : g
+					serversDirty = true
+					deferredUpdateTimer.push()
+				} else if let index = object?.integerValue {
 					if tableColumn?.identifier == "prs" {
 						r.displayPolicyForPrs = index
 					} else if tableColumn?.identifier == "issues" {

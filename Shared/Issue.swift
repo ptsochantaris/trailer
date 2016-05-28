@@ -107,11 +107,7 @@ final class Issue: ListableItem {
 	class func countOpenInMoc(moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
 		let f = NSFetchRequest(entityName: "Issue")
 		let p = NSPredicate(format: "condition == %d or condition == nil", ItemCondition.Open.rawValue)
-		if let c = criterion {
-			f.predicate = c.addCriterionToPredicate(p, inMoc: moc)
-		} else {
-			f.predicate = p
-		}
+		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, inMoc: moc)
 		return moc.countForFetchRequest(f, error: nil)
 	}
 
@@ -167,11 +163,7 @@ final class Issue: ListableItem {
 		let f = NSFetchRequest(entityName: "Issue")
 		f.returnsObjectsAsFaults = false
 		let p = NSPredicate(format: "condition == %d", ItemCondition.Closed.rawValue)
-		if let c = criterion {
-			f.predicate = c.addCriterionToPredicate(p, inMoc: moc)
-		} else {
-			f.predicate = p
-		}
+		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, inMoc: moc)
 		return try! moc.executeFetchRequest(f) as! [Issue]
 	}
 

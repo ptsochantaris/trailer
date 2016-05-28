@@ -6,6 +6,7 @@ final class Repo: DataItem {
     @NSManaged var dirty: NSNumber?
     @NSManaged var fork: NSNumber?
     @NSManaged var fullName: String?
+	@NSManaged var groupLabel: String?
     @NSManaged var hidden: NSNumber?
     @NSManaged var inaccessible: NSNumber?
     @NSManaged var lastDirtied: NSDate?
@@ -68,6 +69,13 @@ final class Repo: DataItem {
 		lastDirtied = never()
 	}
 
+	class func reposForGroup(group: String, inMoc: NSManagedObjectContext) -> [Repo] {
+		let f = NSFetchRequest(entityName: "Repo")
+		f.returnsObjectsAsFaults = false
+		f.predicate = NSPredicate(format: "groupLabel == %@", group)
+		return try! inMoc.executeFetchRequest(f) as! [Repo]
+	}
+
 	class func visibleReposInMoc(moc: NSManagedObjectContext) -> [Repo] {
 		let f = NSFetchRequest(entityName: "Repo")
 		f.returnsObjectsAsFaults = false
@@ -76,21 +84,34 @@ final class Repo: DataItem {
 	}
 
 	class func anyVisibleReposInMoc(moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Bool {
-		if let criteriodRepos = criterion?.repoIds {
-			for rid in criteriodRepos {
-				if let r = try! moc.existingObjectWithID(rid) as? Repo where r.shouldSync {
-					return true
-				}
-			}
-		}
 		let f = NSFetchRequest(entityName: "Repo")
 		let p = NSPredicate(format: "displayPolicyForPrs > 0 or displayPolicyForIssues > 0")
-		if criterion?.apiServerId != nil {
-			f.predicate = criterion?.addCriterionToPredicate(p, inMoc: moc)
+		if let c = criterion {
+			if let g = c.repoGroup {
+				let rp = NSPredicate(format: "groupLabel == %@", g)
+				f.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [rp, p])
+			} else {
+				let ep = c.addCriterionToPredicate(p, inMoc: moc)
+				f.predicate = excludeGroupedRepos(ep, inMoc: moc)
+			}
 		} else {
-			f.predicate = p
+			f.predicate = excludeGroupedRepos(p, inMoc: moc)
 		}
 		return moc.countForFetchRequest(f, error: nil) > 0
+	}
+
+	private class func excludeGroupedRepos(p: NSPredicate, inMoc: NSManagedObjectContext) -> NSPredicate {
+		let groupLabels = allGroupLabels
+		if groupLabels.count > 0 {
+			var andPredicates = [NSPredicate]()
+			for g in allGroupLabels {
+				let rp = NSPredicate(format: "groupLabel != %@", g)
+				andPredicates.append(rp)
+			}
+			return NSCompoundPredicate(andPredicateWithSubpredicates: andPredicates)
+		} else {
+			return p
+		}
 	}
 
 	class func interestedInIssues(apiServerId: NSManagedObjectID? = nil) -> Bool {
@@ -121,6 +142,12 @@ final class Repo: DataItem {
 			}
 		}
 		return false
+	}
+
+	class var allGroupLabels: [String] {
+		let allRepos = allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo]
+		let labels = allRepos.flatMap { $0.shouldSync ? $0.groupLabel : nil }
+		return Set<String>(labels).sort()
 	}
 
 	class func syncableReposInMoc(moc: NSManagedObjectContext) -> [Repo] {

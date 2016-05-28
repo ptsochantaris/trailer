@@ -142,4 +142,20 @@ class DataItem: NSManagedObject {
 		let f = NSFetchRequest(entityName: type)
 		return moc.countForFetchRequest(f, error: nil)
 	}
+
+	class func addCriterion(criterion: GroupingCriterion?, toFetchRequest: NSFetchRequest, originalPredicate: NSPredicate, inMoc: NSManagedObjectContext) {
+		var andPredicates = [NSPredicate]()
+		if let c = criterion {
+			andPredicates.append(c.addCriterionToPredicate(originalPredicate, inMoc: inMoc))
+		} else {
+			andPredicates.append(originalPredicate)
+		}
+		if criterion?.repoGroup == nil {
+			for otherGroup in Repo.allGroupLabels {
+				let p = NSPredicate(format: "repo.groupLabel == nil or repo.groupLabel != %@", otherGroup)
+				andPredicates.append(p)
+			}
+		}
+		toFetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: andPredicates)
+	}
 }
