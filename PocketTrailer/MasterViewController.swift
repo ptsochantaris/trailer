@@ -52,6 +52,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	private var tabs: UITabBar?
 	private var tabScroll: UIScrollView?
+	private var tabBorder: UIView?
 	private var tabBarSets = [TabBarSet]()
 	private var currentTabBarSet: TabBarSet?
 
@@ -172,6 +173,20 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	override func viewDidLayoutSubviews() {
 		super.viewDidLayoutSubviews()
 		refreshLabel.center = CGPointMake(CGRectGetMidX(view.bounds), refreshControl!.center.y+36)
+		layoutTabs()
+	}
+
+	private func layoutTabs() {
+		if let s = navigationController?.view, t = tabs, ts = tabScroll, tb = tabBorder {
+			let b = s.bounds.size
+			let w = b.width
+			let h = b.height
+			let tf = CGRectMake(0, 0, max(w, 64*CGFloat(t.items?.count ?? 1)), 49)
+			t.frame = tf
+			ts.contentSize = tf.size
+			ts.frame = CGRectMake(0, h-49, w, 49)
+			tb.frame = CGRectMake(0, h-49.5, w, 0.5)
+		}
 	}
 
 	override func viewWillAppear(animated: Bool) {
@@ -494,10 +509,8 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			showEmpty = false
 			showTabBar(true, animated: animated)
 
-			let tf = CGRectMake(0, 0, max(view.bounds.width, 64*CGFloat(items.count)), 49)
-			tabs?.frame = tf
 			tabs?.items = items
-			tabScroll?.contentSize = tf.size
+			layoutTabs()
 
 			if let p = previousIndex {
 				if items.count > p {
@@ -552,25 +565,35 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 				tableView.scrollIndicatorInsets = UIEdgeInsets(top: tableView.scrollIndicatorInsets.top, left: 0, bottom: 49, right: 0)
 
-				let t = UITabBar(frame: CGRectMake(0,0,100,49))
+				let t = UITabBar()
 				t.delegate = self
 				t.itemPositioning = .Fill
 				tabs = t
 
-				let ts = UIScrollView(frame: CGRectMake(0, s.bounds.size.height-49, s.bounds.size.width, 49))
+				let ts = UIScrollView()
 				ts.showsHorizontalScrollIndicator = false
-				ts.autoresizingMask = [.FlexibleTopMargin, .FlexibleBottomMargin, .FlexibleWidth]
+				ts.alwaysBounceHorizontal = true
+				ts.scrollsToTop = false
 				ts.addSubview(t)
+
+				let b = UIView()
+				b.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(0.32)
+				b.userInteractionEnabled = false
+				s.addSubview(b)
+				tabBorder = b
+
 				s.addSubview(ts)
 				tabScroll = ts
 
 				if animated {
 					t.transform = CGAffineTransformMakeTranslation(0, 49)
+					b.transform = CGAffineTransformMakeTranslation(0, 49)
 					UIView.animateWithDuration(0.2,
 						delay: 0.0,
 						options: .CurveEaseInOut,
 						animations: {
 							t.transform = CGAffineTransformIdentity
+							b.transform = CGAffineTransformIdentity
 						}, completion: nil)
 				}
 			}
@@ -579,10 +602,11 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 			tableView.scrollIndicatorInsets = UIEdgeInsets(top: tableView.scrollIndicatorInsets.top, left: 0, bottom: 0, right: 0)
 
-			if let t = tabScroll {
+			if let t = tabScroll, b = tabBorder {
 
 				tabs = nil
 				tabScroll = nil
+				tabBorder = nil
 
 				if animated {
 					UIView.animateWithDuration(0.2,
@@ -590,11 +614,14 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 						options: .CurveEaseInOut,
 						animations: {
 							t.transform = CGAffineTransformMakeTranslation(0, 49)
+							b.transform = CGAffineTransformMakeTranslation(0, 49)
 						}, completion: { finished in
 							t.removeFromSuperview()
+							b.removeFromSuperview()
 						})
 				} else {
 					t.removeFromSuperview()
+					b.removeFromSuperview()
 				}
 			}
 		}
@@ -1104,8 +1131,12 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	private func safeScrollToTop() {
-		if self.numberOfSectionsInTableView(self.tableView) > 0 {
-			self.tableView.scrollToRowAtIndexPath(NSIndexPath(forRow: 0, inSection: 0), atScrollPosition: .Top, animated: false)
+		tableView.contentOffset = tableView.contentOffset // halt any inertial scrolling
+		atNextEvent(self) { S in
+			let t = S.tableView
+			if t.numberOfSections > 0 {
+				t.scrollToRowAtIndexPath(NSIndexPath(forRow: 0, inSection: 0), atScrollPosition: .Top, animated: false)
+			}
 		}
 	}
 
@@ -1115,6 +1146,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	func resetView() {
+		safeScrollToTop()
 		_fetchedResultsController = nil
 		updateStatus()
 		tableView.reloadData()
