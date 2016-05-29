@@ -364,30 +364,17 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="0.93725490196078431" green="0.93725490196078431" blue="0.95686274509803926" alpha="1" colorSpace="calibratedRGB"/>
                         <view key="tableHeaderView" contentMode="scaleToFill" id="2RM-hT-lYF">
-                            <rect key="frame" x="0.0" y="44" width="600" height="44"/>
+                            <rect key="frame" x="0.0" y="44" width="600" height="69.5"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Fiy-jI-pC7">
-                                    <rect key="frame" x="18" y="18" width="564" height="33"/>
+                                    <rect key="frame" x="18" y="18" width="564" height="11.5"/>
                                     <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
                                     <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                                     <nil key="highlightedColor"/>
                                 </label>
-                            </subviews>
-                            <color key="backgroundColor" red="0.93725490199999995" green="0.93725490199999995" blue="0.95686274510000002" alpha="1" colorSpace="calibratedRGB"/>
-                            <constraints>
-                                <constraint firstItem="Fiy-jI-pC7" firstAttribute="top" secondItem="2RM-hT-lYF" secondAttribute="topMargin" constant="10" id="7VM-zV-WqV"/>
-                                <constraint firstItem="Fiy-jI-pC7" firstAttribute="leading" secondItem="2RM-hT-lYF" secondAttribute="leadingMargin" constant="10" id="iuc-gx-HaS"/>
-                                <constraint firstItem="Fiy-jI-pC7" firstAttribute="trailing" secondItem="2RM-hT-lYF" secondAttribute="trailingMargin" constant="-10" id="iv7-Kh-6A3"/>
-                                <constraint firstItem="Fiy-jI-pC7" firstAttribute="bottom" secondItem="2RM-hT-lYF" secondAttribute="bottomMargin" constant="15" id="tAe-qd-VSD"/>
-                            </constraints>
-                        </view>
-                        <view key="tableFooterView" contentMode="scaleToFill" id="TJT-vQ-xcm">
-                            <rect key="frame" x="0.0" y="191.5" width="600" height="66"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <subviews>
-                                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Group for items from this repo (blank for default)" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="GRw-1p-Bu5">
-                                    <rect key="frame" x="8" y="8" width="584" height="31"/>
+                                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" verticalCompressionResistancePriority="751" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Group for this repo's items (blank = default)" textAlignment="natural" minimumFontSize="17" clearButtonMode="always" translatesAutoresizingMaskIntoConstraints="NO" id="GRw-1p-Bu5">
+                                    <rect key="frame" x="8" y="39.5" width="584" height="30"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                     <textInputTraits key="textInputTraits"/>
                                     <connections>
@@ -395,16 +382,20 @@
                                     </connections>
                                 </textField>
                             </subviews>
+                            <color key="backgroundColor" red="0.93725490199999995" green="0.93725490199999995" blue="0.95686274510000002" alpha="1" colorSpace="calibratedRGB"/>
                             <constraints>
-                                <constraint firstItem="GRw-1p-Bu5" firstAttribute="leading" secondItem="TJT-vQ-xcm" secondAttribute="leading" constant="8" id="0PW-Qx-KtH"/>
-                                <constraint firstAttribute="trailing" secondItem="GRw-1p-Bu5" secondAttribute="trailing" constant="8" id="1p3-tV-ri1"/>
-                                <constraint firstItem="GRw-1p-Bu5" firstAttribute="top" secondItem="TJT-vQ-xcm" secondAttribute="top" constant="8" id="Lni-io-5nm"/>
-                                <constraint firstAttribute="bottom" secondItem="GRw-1p-Bu5" secondAttribute="bottom" constant="27" id="dIC-QI-g8P"/>
+                                <constraint firstItem="GRw-1p-Bu5" firstAttribute="leading" secondItem="2RM-hT-lYF" secondAttribute="leading" constant="8" id="0mm-wN-61w"/>
+                                <constraint firstAttribute="trailing" secondItem="GRw-1p-Bu5" secondAttribute="trailing" constant="8" id="5qu-jk-GWL"/>
+                                <constraint firstItem="Fiy-jI-pC7" firstAttribute="top" secondItem="2RM-hT-lYF" secondAttribute="topMargin" constant="10" id="7VM-zV-WqV"/>
+                                <constraint firstItem="GRw-1p-Bu5" firstAttribute="top" secondItem="Fiy-jI-pC7" secondAttribute="bottom" constant="10" id="B1J-e9-ddA"/>
+                                <constraint firstItem="Fiy-jI-pC7" firstAttribute="leading" secondItem="2RM-hT-lYF" secondAttribute="leadingMargin" constant="10" id="iuc-gx-HaS"/>
+                                <constraint firstItem="Fiy-jI-pC7" firstAttribute="trailing" secondItem="2RM-hT-lYF" secondAttribute="trailingMargin" constant="-10" id="iv7-Kh-6A3"/>
+                                <constraint firstAttribute="bottom" secondItem="GRw-1p-Bu5" secondAttribute="bottom" id="qhI-2Z-YxQ"/>
                             </constraints>
                         </view>
                         <prototypes>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="Cell" id="nWv-dn-x38">
-                                <rect key="frame" x="0.0" y="137.5" width="600" height="44"/>
+                                <rect key="frame" x="0.0" y="163" width="600" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="nWv-dn-x38" id="YwR-ML-Nxf">
                                     <rect key="frame" x="0.0" y="0.0" width="600" height="43.5"/>

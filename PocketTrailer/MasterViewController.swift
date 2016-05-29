@@ -3,45 +3,36 @@ import UIKit
 import CoreData
 
 final class TabBarSet {
-	let prItem: UITabBarItem
-	let issuesItem: UITabBarItem
+	var prItem: UITabBarItem?
+	var issuesItem: UITabBarItem?
 	let viewCriterion: GroupingCriterion?
 
 	var tabItems: [UITabBarItem] {
-		if let v = viewCriterion {
-			var items = [UITabBarItem]()
-			let prf = ListableItem.requestForItemsOfType("PullRequest", withFilter: nil, sectionIndex: -1, criterion: v)
-			if viewCriterion?.label == nil || mainObjectContext.countForFetchRequest(prf, error: nil) > 0 {
-				items.append(prItem)
-			}
-			let isf = ListableItem.requestForItemsOfType("Issue", withFilter: nil, sectionIndex: -1, criterion: v)
-			if viewCriterion?.label == nil || mainObjectContext.countForFetchRequest(isf, error: nil) > 0 {
-				items.append(issuesItem)
-			}
-			return items
-		} else {
-			if Repo.interestedInPrs() && Repo.interestedInIssues() {
-				return [prItem, issuesItem]
-			} else if Repo.interestedInIssues() {
-				return [issuesItem]
-			} else {
-				return [prItem]
-			}
+
+		let label = viewCriterion?.label
+		var items = [UITabBarItem]()
+
+		let prf = ListableItem.requestForItemsOfType("PullRequest", withFilter: nil, sectionIndex: -1, criterion: viewCriterion)
+		if mainObjectContext.countForFetchRequest(prf, error: nil) > 0 {
+			let i = UITabBarItem(title: label ?? "Pull Requests", image: UIImage(named: "prsTab"), selectedImage: nil)
+			let prUnreadCount = PullRequest.badgeCountInMoc(mainObjectContext, criterion: viewCriterion)
+			i.badgeValue = prUnreadCount > 0 ? "\(prUnreadCount)" : nil
+			items.append(i)
+			prItem = i
 		}
+		let isf = ListableItem.requestForItemsOfType("Issue", withFilter: nil, sectionIndex: -1, criterion: viewCriterion)
+		if mainObjectContext.countForFetchRequest(isf, error: nil) > 0 {
+			let i = UITabBarItem(title: label ?? "Issues", image: UIImage(named: "issuesTab"), selectedImage: nil)
+			let issuesUnreadCount = Issue.badgeCountInMoc(mainObjectContext, criterion: viewCriterion)
+			i.badgeValue = issuesUnreadCount > 0 ? "\(issuesUnreadCount)" : nil
+			items.append(i)
+			issuesItem = i
+		}
+		return items
 	}
 
 	init(viewCriterion: GroupingCriterion?) {
 		self.viewCriterion = viewCriterion
-
-		let label = viewCriterion?.label
-
-		prItem = UITabBarItem(title: label ?? "Pull Requests", image: UIImage(named: "prsTab"), selectedImage: nil)
-		let prUnreadCount = PullRequest.badgeCountInMoc(mainObjectContext, criterion: viewCriterion)
-		prItem.badgeValue = prUnreadCount > 0 ? "\(prUnreadCount)" : nil
-
-		issuesItem = UITabBarItem(title: label ?? "Issues", image: UIImage(named: "issuesTab"), selectedImage: nil)
-		let issuesUnreadCount = Issue.badgeCountInMoc(mainObjectContext, criterion: viewCriterion)
-		issuesItem.badgeValue = issuesUnreadCount > 0 ? "\(issuesUnreadCount)" : nil
 	}
 }
 
@@ -50,7 +41,10 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	private var detailViewController: DetailViewController!
 	private var _fetchedResultsController: NSFetchedResultsController?
 
+	// Tabs
 	private var tabs: UITabBar?
+	private var tabSide1: UIView?
+	private var tabSide2: UIView?
 	private var tabScroll: UIScrollView?
 	private var tabBorder: UIView?
 	private var tabBarSets = [TabBarSet]()
@@ -177,7 +171,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	private func layoutTabs() {
-		if let s = navigationController?.view, t = tabs, ts = tabScroll, tb = tabBorder {
+		if let s = navigationController?.view, t = tabs, ts = tabScroll, tb = tabBorder, ts1 = tabSide1, ts2 = tabSide2 {
 			let b = s.bounds.size
 			let w = b.width
 			let h = b.height
@@ -186,6 +180,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			ts.contentSize = tf.size
 			ts.frame = CGRectMake(0, h-49, w, 49)
 			tb.frame = CGRectMake(0, h-49.5, w, 0.5)
+			let ww = w*0.5
+			ts1.frame = CGRectMake(-ww, 0, ww, 49)
+			ts2.frame = CGRectMake(w, 0, ww, 49)
 		}
 	}
 
@@ -401,9 +398,11 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 	}
 
-	func requestTabFocus(item: UITabBarItem) {
-		tabs?.selectedItem = item
-		resetView()
+	private func requestTabFocus(item: UITabBarItem?) {
+		if let i = item {
+			tabs?.selectedItem = i
+			resetView()
+		}
 	}
 
 	private func tabBarSetForTabItem(i: UITabBarItem?) -> TabBarSet? {
@@ -477,6 +476,12 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		tabBarSets.removeAll()
 
+		for groupLabel in Repo.allGroupLabels {
+			let c = GroupingCriterion(repoGroup: groupLabel)
+			let s = TabBarSet(viewCriterion: c)
+			tabBarSets.append(s)
+		}
+
 		if Settings.showSeparateApiServersInMenu {
 			for a in ApiServer.allApiServersInMoc(mainObjectContext) {
 				if a.goodToGo {
@@ -485,18 +490,8 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 					tabBarSets.append(s)
 				}
 			}
-		}
-
-		// Whatever happens, show SOMETHING
-		if tabBarSets.count == 0 {
+		} else {
 			let s = TabBarSet(viewCriterion: nil)
-			tabBarSets.append(s)
-		}
-
-		// Extract grouped repos
-		for groupLabel in Repo.allGroupLabels {
-			let c = GroupingCriterion(repoGroup: groupLabel)
-			let s = TabBarSet(viewCriterion: c)
 			tabBarSets.append(s)
 		}
 
@@ -576,6 +571,14 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 				ts.scrollsToTop = false
 				ts.addSubview(t)
 
+				let s1 = UIVisualEffectView(effect: UIBlurEffect(style: .ExtraLight))
+				tabSide1 = s1
+				ts.addSubview(s1)
+
+				let s2 = UIVisualEffectView(effect: UIBlurEffect(style: .ExtraLight))
+				tabSide2 = s2
+				ts.addSubview(s2)
+
 				let b = UIView()
 				b.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(0.32)
 				b.userInteractionEnabled = false
@@ -607,6 +610,8 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 				tabs = nil
 				tabScroll = nil
 				tabBorder = nil
+				tabSide1 = nil
+				tabSide2 = nil
 
 				if animated {
 					UIView.animateWithDuration(0.2,
@@ -1063,7 +1068,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		let f = ListableItem.requestForItemsOfType("PullRequest", withFilter: nil, sectionIndex: -1, criterion: currentTabBarSet?.viewCriterion)
 		let count = mainObjectContext.countForFetchRequest(f, error: nil)
-		let unreadCount = Int(currentTabBarSet?.prItem.badgeValue ?? "0")!
+		let unreadCount = Int(currentTabBarSet?.prItem?.badgeValue ?? "0")!
 
 		let pr = long ? "Pull Request" : "PR"
 		if count == 0 {
@@ -1081,7 +1086,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		let f = ListableItem.requestForItemsOfType("Issue", withFilter: nil, sectionIndex: -1, criterion: currentTabBarSet?.viewCriterion)
 		let count = mainObjectContext.countForFetchRequest(f, error: nil)
-		let unreadCount = Int(currentTabBarSet?.issuesItem.badgeValue ?? "0")!
+		let unreadCount = Int(currentTabBarSet?.issuesItem?.badgeValue ?? "0")!
 
 		if count == 0 {
 			return "No Issues"
