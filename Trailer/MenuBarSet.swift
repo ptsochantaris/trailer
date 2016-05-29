@@ -106,17 +106,22 @@ final class MenuBarSet {
 		let countString: String
 		let attributes: [String : AnyObject]
 		let somethingFailed = ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext)
+		let preFilterCount: Int
 
 		if somethingFailed && (viewCriterion?.relatedServerFailed ?? true) {
 			countString = "X"
 			attributes = redText()
+			preFilterCount = 0
 		} else {
 
 			if Settings.countOnlyListedItems {
 				let f = ListableItem.requestForItemsOfType(type, withFilter: menu.filter.stringValue, sectionIndex: -1, criterion: viewCriterion)
 				countString = String(mainObjectContext.countForFetchRequest(f, error: nil))
+				let fc = ListableItem.requestForItemsOfType(type, withFilter: nil, sectionIndex: -1, criterion: viewCriterion)
+				preFilterCount = mainObjectContext.countForFetchRequest(fc, error: nil)
 			} else {
-				countString = String(totalCount())
+				preFilterCount = totalCount()
+				countString = String(preFilterCount)
 			}
 
 			if hasUnread() {
@@ -134,20 +139,21 @@ final class MenuBarSet {
 		let length = H + width + STATUSITEM_PADDING*3
 		var updateStatusItem = true
 		let shouldGray = Settings.grayOutWhenRefreshing && appIsRefreshing
+		let si = menu.statusItem
 
-		if let s = menu.statusItem?.view as? StatusItemView where compareDict(s.textAttributes, to: attributes) && s.statusLabel == countString && s.grayOut == shouldGray {
+		if let s = si?.view as? StatusItemView where compareDict(s.textAttributes, to: attributes) && s.statusLabel == countString && s.grayOut == shouldGray {
 			updateStatusItem = false
 		}
 
 		if updateStatusItem {
 			atNextEvent(self) { S in
 				DLog("Updating \(type) status item")
-				let im = menu
 				let itemLabel = S.viewCriterion?.label
-				let itemWidth = (itemLabel != nil && countString == "0") ? 0 : length+lengthOffset
+				let disable = (itemLabel != nil && preFilterCount == 0)
+				let itemWidth = disable ? 0 : length+lengthOffset
 				let siv = StatusItemView(frame: CGRectMake(0, 0, itemWidth, H), label: countString, prefix: type, attributes: attributes)
 				siv.labelOffset = lengthOffset
-				siv.highlighted = im.visible
+				siv.highlighted = menu.visible
 				siv.grayOut = shouldGray
 				siv.serverTitle = itemLabel
 				siv.tappedCallback = {
@@ -157,7 +163,7 @@ final class MenuBarSet {
 						app.showMenu(menu)
 					}
 				}
-				im.statusItem?.view = siv
+				si?.view = siv
 			}
 		}
 

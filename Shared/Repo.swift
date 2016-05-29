@@ -83,7 +83,7 @@ final class Repo: DataItem {
 		return try! moc.executeFetchRequest(f) as! [Repo]
 	}
 
-	class func anyVisibleReposInMoc(moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Bool {
+	class func anyVisibleReposInMoc(moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, excludeGrouped: Bool = true) -> Bool {
 		let f = NSFetchRequest(entityName: "Repo")
 		let p = NSPredicate(format: "displayPolicyForPrs > 0 or displayPolicyForIssues > 0")
 		if let c = criterion {
@@ -92,10 +92,16 @@ final class Repo: DataItem {
 				f.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [rp, p])
 			} else {
 				let ep = c.addCriterionToPredicate(p, inMoc: moc)
-				f.predicate = excludeGroupedRepos(ep, inMoc: moc)
+				if excludeGrouped {
+					f.predicate = excludeGroupedRepos(ep, inMoc: moc)
+				} else {
+					f.predicate = ep
+				}
 			}
-		} else {
+		} else if excludeGrouped {
 			f.predicate = excludeGroupedRepos(p, inMoc: moc)
+		} else {
+			f.predicate = p
 		}
 		return moc.countForFetchRequest(f, error: nil) > 0
 	}

@@ -11,7 +11,7 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 		super.viewDidLoad()
 		settingsChangedTimer = PopTimer(timeInterval: 1.0) {
 			DataManager.postProcessAllItems()
-			popupManager.getMasterController().reloadDataWithAnimation(true)
+			DataManager.saveDB()
 		}
 	}
 

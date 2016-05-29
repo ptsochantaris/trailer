@@ -5,7 +5,6 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 	private var settingsChangedTimer: PopTimer!
 	private var searchTimer: PopTimer!
-	private var firstAppear = true
 
 	// Search
 	@IBOutlet weak var searchBar: UISearchBar!
@@ -33,7 +32,8 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 		settingsChangedTimer = PopTimer(timeInterval: 1.0) {
 			DataManager.postProcessAllItems()
-			popupManager.getMasterController().reloadDataWithAnimation(true)
+			DataManager.saveDB()
+			popupManager.getMasterController().updateStatus()
 		}
 
 		navigationItem.rightBarButtonItems = [
@@ -41,14 +41,6 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			UIBarButtonItem(image: UIImage(named: "import"), style: .Plain, target: self, action: #selector(AdvancedSettingsViewController.importSelected(_:))),
 			UIBarButtonItem(image: UIImage(named: "showHelp"), style: .Plain, target: self, action: #selector(AdvancedSettingsViewController.toggleHelp(_:))),
 		]
-	}
-
-	override func viewWillAppear(animated: Bool) {
-		super.viewWillAppear(animated)
-		if firstAppear {
-			tableView.contentOffset = CGPointMake(0, 44)
-			firstAppear = false
-		}
 	}
 
 	override func scrollViewDidScroll(scrollView: UIScrollView) {
@@ -108,7 +100,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 	private enum SettingsSection: Int {
 		case Refresh, Display, Filtering, AppleWatch, Comments, Repos, StausesAndLabels, History, Confirm, Sort, Misc
-		static let rowCounts = [3, 5, 9, 2, 8, 2, 8, 3, 2, 3, 2]
+		static let rowCounts = [3, 6, 9, 2, 8, 2, 8, 3, 2, 3, 2]
 		static let allNames = ["Auto Refresh", "Display", "Filtering", "Apple Watch", "Comments", "Watchlist", "Statuses & Labels", "History", "Don't confirm when", "Sorting", "Misc"]
 	}
 
@@ -227,6 +219,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.titleLabel.text = "Open items directly in Safari if internal web view is not already visible."
 				cell.accessoryType = check(Settings.openItemsDirectlyInSafari)
 				cell.descriptionLabel.text = Settings.openItemsDirectlyInSafariHelp
+			case 5:
+				cell.titleLabel.text = "Separate API servers into their own groups"
+				cell.accessoryType = check(Settings.showSeparateApiServersInMenu)
+				cell.descriptionLabel.text = Settings.showSeparateApiServersInMenuHelp
 			default: break
 			}
 		} else if indexPath.section == SettingsSection.Filtering.rawValue {
@@ -489,6 +485,9 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				settingsChangedTimer.push()
 			case 4:
 				Settings.openItemsDirectlyInSafari = !Settings.openItemsDirectlyInSafari
+			case 5:
+				Settings.showSeparateApiServersInMenu = !Settings.showSeparateApiServersInMenu
+				settingsChangedTimer.push()
 			default: break
 			}
 		} else if indexPath.section == SettingsSection.Filtering.rawValue {

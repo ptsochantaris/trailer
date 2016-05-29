@@ -110,15 +110,8 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 
 		switch shortcutItem.type {
 
-		case "view-prs":
+		case "search-items":
 			let m = popupManager.getMasterController()
-			m.showPullRequestsSelected(self)
-			m.focusFilter()
-			completionHandler(true)
-
-		case "view-issues":
-			let m = popupManager.getMasterController()
-			m.showIssuesSelected(self)
 			m.focusFilter()
 			completionHandler(true)
 
@@ -134,18 +127,8 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 	func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject) -> Bool {
 		if let c = NSURLComponents(URL: url, resolvingAgainstBaseURL: false) {
 			if let scheme = c.scheme {
-				if scheme == "pockettrailer", let host = c.host {
-					if host == "pullRequests" {
-						atNextEvent(self) { S in
-							popupManager.getMasterController().showPullRequestsSelected(S)
-						}
-						return true
-					} else if host == "issues" {
-						atNextEvent(self) { S in
-							popupManager.getMasterController().showIssuesSelected(S)
-						}
-						return true
-					}
+				if scheme == "pockettrailer" { // open from today extension - TODO: list each group and open using the host component
+					return true
 				} else {
 					settingsManager.loadSettingsFrom(url, confirmFromView: nil, withCompletion: nil)
 				}
@@ -324,7 +307,6 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 	func markEverythingRead() {
 		PullRequest.markEverythingRead(.None, moc: mainObjectContext)
 		Issue.markEverythingRead(.None, moc: mainObjectContext)
-		popupManager.getMasterController().reloadDataWithAnimation(false)
 		DataManager.saveDB()
 		app.updateBadge()
 	}
@@ -337,9 +319,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 			mainObjectContext.deleteObject(i)
 		}
 		DataManager.saveDB()
-		let m = popupManager.getMasterController()
-		m.reloadDataWithAnimation(false)
-		m.updateStatus()
+		popupManager.getMasterController().updateStatus()
 	}
 
 	func clearAllMerged() {
@@ -347,37 +327,29 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 			mainObjectContext.deleteObject(p)
 		}
 		DataManager.saveDB()
-		let m = popupManager.getMasterController()
-		m.reloadDataWithAnimation(false)
-		m.updateStatus()
+		popupManager.getMasterController().updateStatus()
 	}
 
-	func markItemAsRead(itemUri: String?, reloadView: Bool) {
+	func markItemAsRead(itemUri: String?) {
 		if let
 			i = itemUri,
 			oid = DataManager.idForUriPath(i),
 			o = existingObjectWithID(oid) as? ListableItem {
 				o.catchUpWithComments()
-				if reloadView {
-					popupManager.getMasterController().reloadDataWithAnimation(false)
-				}
 				DataManager.saveDB()
-				app.updateBadge()
+				popupManager.getMasterController().updateStatus()
 		}
 	}
 
-	func markItemAsUnRead(itemUri: String?, reloadView: Bool) {
+	func markItemAsUnRead(itemUri: String?) {
 		if let
 			i = itemUri,
 			oid = DataManager.idForUriPath(i),
 			o = existingObjectWithID(oid) as? ListableItem {
 				o.latestReadCommentDate = never()
 				o.postProcess()
-				if reloadView {
-					popupManager.getMasterController().reloadDataWithAnimation(false)
-				}
 				DataManager.saveDB()
-				app.updateBadge()
+				popupManager.getMasterController().updateStatus()
 		}
 	}
 }

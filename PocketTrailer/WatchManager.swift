@@ -81,7 +81,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				s.processList(message, replyHandler)
 
 			case "markPrRead", "markIssueRead":
-				app.markItemAsRead(message["localId"] as? String, reloadView: true)
+				app.markItemAsRead(message["localId"] as? String)
 				s.processList(message, replyHandler)
 
 			case "markEverythingRead":
@@ -92,7 +92,6 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				if var s = message["sectionIndex"] as? Int {
 					if s == -1 { s = 0 }
 					PullRequest.markEverythingRead(Section(rawValue: s)!, moc: mainObjectContext)
-					popupManager.getMasterController().reloadDataWithAnimation(false)
 					DataManager.saveDB()
 					app.updateBadge()
 				}
@@ -102,7 +101,6 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				if var s = message["sectionIndex"] as? Int {
 					if s == -1 { s = 0 }
 					Issue.markEverythingRead(Section(rawValue: s)!, moc: mainObjectContext)
-					popupManager.getMasterController().reloadDataWithAnimation(false)
 					DataManager.saveDB()
 					app.updateBadge()
 				}

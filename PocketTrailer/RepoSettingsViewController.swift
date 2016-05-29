@@ -1,6 +1,6 @@
 import UIKit
 
-final class RepoSettingsViewController: UITableViewController {
+final class RepoSettingsViewController: UITableViewController, UITextFieldDelegate {
 
 	var repo: Repo?
 
@@ -8,6 +8,7 @@ final class RepoSettingsViewController: UITableViewController {
 	private var allIssuesIndex: Int = -1
 	private var allHidingIndex: Int = -1
 
+	@IBOutlet weak var groupField: UITextField!
 	@IBOutlet weak var repoNameTitle: UILabel!
 
 	private var settingsChangedTimer: PopTimer!
@@ -16,12 +17,14 @@ final class RepoSettingsViewController: UITableViewController {
 		super.viewDidLoad()
 		if repo == nil {
 			repoNameTitle.text = "All Repositories (You don't need to pick values for every group below, you can set only a specific group if you prefer)"
+			tableView.tableFooterView = nil
 		} else {
-			repoNameTitle.text = repo!.fullName
+			repoNameTitle.text = repo?.fullName
+			groupField.text = repo?.groupLabel
 		}
 		settingsChangedTimer = PopTimer(timeInterval: 1.0) {
 			DataManager.postProcessAllItems()
-			popupManager.getMasterController().reloadDataWithAnimation(true)
+			DataManager.saveDB()
 		}
 	}
 
@@ -133,5 +136,25 @@ final class RepoSettingsViewController: UITableViewController {
 		preferencesDirty = true
 		DataManager.saveDB()
 		settingsChangedTimer.push()
+	}
+
+	override func viewWillDisappear(animated: Bool) {
+		super.viewWillDisappear(animated)
+		if groupField == nil { return }
+		let newText = (groupField.text?.isEmpty ?? true) ? nil : groupField.text
+		if let r = repo where r.groupLabel != newText {
+			r.groupLabel = newText
+			preferencesDirty = true
+			DataManager.saveDB()
+			settingsChangedTimer.push()
+		}
+	}
+
+	func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
+		if string == "\n" {
+			textField.resignFirstResponder()
+			return false
+		}
+		return true
 	}
 }

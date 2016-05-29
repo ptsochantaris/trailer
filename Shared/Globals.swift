@@ -206,18 +206,6 @@ func currentAppVersion() -> String {
 	import UIKit
 	import CoreData
 
-	enum MasterViewMode: Int {
-		case PullRequests, Issues
-		static let namesPlural = ["Pull Requests", "Issues"]
-		func namePlural() -> String {
-			return MasterViewMode.namesPlural[rawValue]
-		}
-		static let namesSingular = ["Pull Request", "Issue"]
-		func nameSingular() -> String {
-			return MasterViewMode.namesSingular[rawValue]
-		}
-	}
-
 	func colorToHex(c: COLOR_CLASS) -> String {
 		var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
 		c.getRed(&r, green: &g, blue: &b, alpha: &a)

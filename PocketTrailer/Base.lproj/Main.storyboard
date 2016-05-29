@@ -300,11 +300,11 @@
                                         <constraint firstAttribute="trailingMargin" secondItem="gUI-6X-Umg" secondAttribute="trailing" constant="-5" id="Ddo-Qp-zL0"/>
                                         <constraint firstItem="gUI-6X-Umg" firstAttribute="top" secondItem="8Jg-Ke-drL" secondAttribute="bottom" constant="2" id="NKb-Ae-yH4"/>
                                         <constraint firstAttribute="leadingMargin" secondItem="X5f-oi-V1t" secondAttribute="leading" constant="-8" id="OcK-rV-ify"/>
+                                        <constraint firstItem="gUI-6X-Umg" firstAttribute="centerY" secondItem="bgw-3g-6tl" secondAttribute="centerY" id="SUz-Em-rxw"/>
                                         <constraint firstItem="8Jg-Ke-drL" firstAttribute="leading" secondItem="X5f-oi-V1t" secondAttribute="trailing" constant="12" id="YCf-yl-B4a"/>
-                                        <constraint firstAttribute="bottomMargin" secondItem="X5f-oi-V1t" secondAttribute="bottom" constant="6" id="euA-Ar-HsP"/>
+                                        <constraint firstAttribute="bottomMargin" secondItem="X5f-oi-V1t" secondAttribute="bottom" constant="6" id="bBJ-0F-bPD"/>
                                         <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="hRe-my-dR9" secondAttribute="bottom" constant="15.5" id="fcS-Uw-zx8"/>
                                         <constraint firstAttribute="trailingMargin" secondItem="8Jg-Ke-drL" secondAttribute="trailing" constant="-5" id="jIp-De-mHn"/>
-                                        <constraint firstItem="gUI-6X-Umg" firstAttribute="centerY" secondItem="X5f-oi-V1t" secondAttribute="centerY" id="pPz-lv-pwo"/>
                                         <constraint firstItem="X5f-oi-V1t" firstAttribute="top" secondItem="bgw-3g-6tl" secondAttribute="topMargin" constant="6" id="vNN-Bn-cFN"/>
                                         <constraint firstItem="hRe-my-dR9" firstAttribute="leading" secondItem="X5f-oi-V1t" secondAttribute="trailing" constant="11" id="vnD-SH-7hu"/>
                                     </constraints>
@@ -382,6 +382,26 @@
                                 <constraint firstItem="Fiy-jI-pC7" firstAttribute="bottom" secondItem="2RM-hT-lYF" secondAttribute="bottomMargin" constant="15" id="tAe-qd-VSD"/>
                             </constraints>
                         </view>
+                        <view key="tableFooterView" contentMode="scaleToFill" id="TJT-vQ-xcm">
+                            <rect key="frame" x="0.0" y="191.5" width="600" height="66"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <subviews>
+                                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Group for items from this repo (blank for default)" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="GRw-1p-Bu5">
+                                    <rect key="frame" x="8" y="8" width="584" height="31"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                    <textInputTraits key="textInputTraits"/>
+                                    <connections>
+                                        <outlet property="delegate" destination="PYB-Of-hHO" id="ZUW-Fx-mY4"/>
+                                    </connections>
+                                </textField>
+                            </subviews>
+                            <constraints>
+                                <constraint firstItem="GRw-1p-Bu5" firstAttribute="leading" secondItem="TJT-vQ-xcm" secondAttribute="leading" constant="8" id="0PW-Qx-KtH"/>
+                                <constraint firstAttribute="trailing" secondItem="GRw-1p-Bu5" secondAttribute="trailing" constant="8" id="1p3-tV-ri1"/>
+                                <constraint firstItem="GRw-1p-Bu5" firstAttribute="top" secondItem="TJT-vQ-xcm" secondAttribute="top" constant="8" id="Lni-io-5nm"/>
+                                <constraint firstAttribute="bottom" secondItem="GRw-1p-Bu5" secondAttribute="bottom" constant="27" id="dIC-QI-g8P"/>
+                            </constraints>
+                        </view>
                         <prototypes>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="Cell" id="nWv-dn-x38">
                                 <rect key="frame" x="0.0" y="137.5" width="600" height="44"/>
@@ -399,6 +419,7 @@
                     </tableView>
                     <navigationItem key="navigationItem" title="View Options" id="fc3-fy-icD"/>
                     <connections>
+                        <outlet property="groupField" destination="GRw-1p-Bu5" id="4xg-xD-i0a"/>
                         <outlet property="repoNameTitle" destination="Fiy-jI-pC7" id="nYm-2d-fFN"/>
                     </connections>
                 </tableViewController>

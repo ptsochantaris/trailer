@@ -708,7 +708,7 @@ final class Settings {
 		set { set("GRAY_OUT_WHEN_REFRESHING", newValue) }
     }
 
-	static let showSeparateApiServersInMenuHelp = "Show each API server as a separate menu on the menu bar"
+	static let showSeparateApiServersInMenuHelp = "Show each API server as a separate item on the menu bar"
 	class var showSeparateApiServersInMenu: Bool {
 		get { return get("API_SERVERS_IN_SEPARATE_MENUS") as? Bool ?? false }
 		set { set("API_SERVERS_IN_SEPARATE_MENUS", newValue) }

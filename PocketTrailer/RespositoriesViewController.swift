@@ -8,7 +8,6 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 	@IBOutlet weak var searchBar: UISearchBar!
 	private var searchTimer: PopTimer!
 	private var _fetchedResultsController: NSFetchedResultsController?
-	private var firstAppear = true
 
 	@IBOutlet weak var actionsButton: UIBarButtonItem!
 
@@ -40,10 +39,6 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 	override func viewWillAppear(animated: Bool) {
 		super.viewWillAppear(animated)
 		self.navigationController?.setToolbarHidden(false, animated: animated)
-		if firstAppear {
-			tableView.contentOffset = CGPointMake(0, 0)
-			firstAppear = false
-		}
 	}
 
 	override func viewWillDisappear(animated: Bool) {
@@ -196,15 +191,23 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 	private func configureCell(cell: RepoCell, atIndexPath: NSIndexPath) {
 		let repo = fetchedResultsController.objectAtIndexPath(atIndexPath) as! Repo
 
-		cell.titleLabel.text = repo.fullName
-		cell.titleLabel.textColor = repo.shouldSync ? UIColor.blackColor() : UIColor.lightGrayColor()
+		let titleColor = repo.shouldSync ? UIColor.blackColor() : UIColor.lightGrayColor()
+		let titleAttributes = [ NSForegroundColorAttributeName: titleColor ]
+
+		let title = NSMutableAttributedString(attributedString: NSAttributedString(string: S(repo.fullName), attributes: titleAttributes))
+		title.appendAttributedString(NSAttributedString(string: "\n", attributes: titleAttributes))
+		let groupTitle = groupTitleForRepo(repo)
+		title.appendAttributedString(groupTitle)
+
+		cell.titleLabel.attributedText = title
 		let prTitle = prTitleForRepo(repo)
 		let issuesTitle = issueTitleForRepo(repo)
 		let hidingTitle = hidingTitleForRepo(repo)
-		cell.prLabel!.attributedText = prTitle
-		cell.issuesLabel!.attributedText = issuesTitle
-		cell.hidingLabel!.attributedText = hidingTitle
-		cell.accessibilityLabel = "\(title), \(prTitle.string), \(issuesTitle.string), \(hidingTitle.string)"
+
+		cell.prLabel.attributedText = prTitle
+		cell.issuesLabel.attributedText = issuesTitle
+		cell.hidingLabel.attributedText = hidingTitle
+		cell.accessibilityLabel = "\(title), \(prTitle.string), \(issuesTitle.string), \(hidingTitle.string), \(groupTitle.string)"
 	}
 
 	private var sizer: RepoCell?
@@ -244,6 +247,20 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 		let policy = RepoDisplayPolicy(rawValue: repo.displayPolicyForIssues?.integerValue ?? 0) ?? .Hide
 		let attributes = attributesForEntryWithPolicy(policy)
 		return NSAttributedString(string: "Issue Sections: \(policy.name())", attributes: attributes)
+	}
+
+	private func groupTitleForRepo(repo: Repo) -> NSAttributedString {
+		if let l = repo.groupLabel {
+			return NSAttributedString(string: "Group: \(l)", attributes: [
+				NSForegroundColorAttributeName : UIColor.darkGrayColor(),
+				NSFontAttributeName: UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
+				])
+		} else {
+			return NSAttributedString(string: "Ungrouped", attributes: [
+				NSForegroundColorAttributeName : UIColor.lightGrayColor(),
+				NSFontAttributeName: UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
+				])
+		}
 	}
 
 	private func hidingTitleForRepo(repo: Repo) -> NSAttributedString {

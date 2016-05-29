@@ -2,10 +2,58 @@
 import UIKit
 import CoreData
 
+final class TabBarSet {
+	let prItem: UITabBarItem
+	let issuesItem: UITabBarItem
+	let viewCriterion: GroupingCriterion?
+
+	var tabItems: [UITabBarItem] {
+		if let v = viewCriterion {
+			var items = [UITabBarItem]()
+			let prf = ListableItem.requestForItemsOfType("PullRequest", withFilter: nil, sectionIndex: -1, criterion: v)
+			if viewCriterion?.label == nil || mainObjectContext.countForFetchRequest(prf, error: nil) > 0 {
+				items.append(prItem)
+			}
+			let isf = ListableItem.requestForItemsOfType("Issue", withFilter: nil, sectionIndex: -1, criterion: v)
+			if viewCriterion?.label == nil || mainObjectContext.countForFetchRequest(isf, error: nil) > 0 {
+				items.append(issuesItem)
+			}
+			return items
+		} else {
+			if Repo.interestedInPrs() && Repo.interestedInIssues() {
+				return [prItem, issuesItem]
+			} else if Repo.interestedInIssues() {
+				return [issuesItem]
+			} else {
+				return [prItem]
+			}
+		}
+	}
+
+	init(viewCriterion: GroupingCriterion?) {
+		self.viewCriterion = viewCriterion
+
+		let label = viewCriterion?.label
+
+		prItem = UITabBarItem(title: label ?? "Pull Requests", image: UIImage(named: "prsTab"), selectedImage: nil)
+		let prUnreadCount = PullRequest.badgeCountInMoc(mainObjectContext, criterion: viewCriterion)
+		prItem.badgeValue = prUnreadCount > 0 ? "\(prUnreadCount)" : nil
+
+		issuesItem = UITabBarItem(title: label ?? "Issues", image: UIImage(named: "issuesTab"), selectedImage: nil)
+		let issuesUnreadCount = Issue.badgeCountInMoc(mainObjectContext, criterion: viewCriterion)
+		issuesItem.badgeValue = issuesUnreadCount > 0 ? "\(issuesUnreadCount)" : nil
+	}
+}
+
 final class MasterViewController: UITableViewController, NSFetchedResultsControllerDelegate, UISearchBarDelegate, UITabBarControllerDelegate, UITabBarDelegate {
 
 	private var detailViewController: DetailViewController!
 	private var _fetchedResultsController: NSFetchedResultsController?
+
+	private var tabs: UITabBar?
+	private var tabScroll: UIScrollView?
+	private var tabBarSets = [TabBarSet]()
+	private var currentTabBarSet: TabBarSet?
 
 	// Filtering
 	@IBOutlet weak var searchBar: UISearchBar!
@@ -15,14 +63,15 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	@IBOutlet var refreshLabel: UILabel!
 	private var refreshOnRelease = false
 
-	private let pullRequestsItem = UITabBarItem()
-	private let issuesItem = UITabBarItem()
-	private var tabBar: UITabBar?
 	private var forceSafari = false
+
+	private func pluralNameForItems() -> String {
+		return viewingPrs ? "pull requests" : "issues"
+	}
 
 	@IBAction func editSelected(sender: UIBarButtonItem ) {
 
-		let a = UIAlertController(title: "Mark all \(viewMode.namePlural().lowercaseString) as read?", message: nil, preferredStyle: .Alert)
+		let a = UIAlertController(title: "Mark all \(pluralNameForItems()) as read?", message: nil, preferredStyle: .Alert)
 		a.addAction(UIAlertAction(title: "No", style: .Cancel) { action in
 		})
 		a.addAction(UIAlertAction(title: "Yes", style: .Default) { [weak self] action in
@@ -49,7 +98,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			if Settings.dontAskBeforeWipingMerged {
 				S.removeAllMergedConfirmed()
 			} else {
-				let a = UIAlertController(title: "Sure?", message: "Remove all \(S.viewMode.namePlural().lowercaseString) in the Merged section?", preferredStyle: .Alert)
+				let a = UIAlertController(title: "Sure?", message: "Remove all \(S.pluralNameForItems()) in the Merged section?", preferredStyle: .Alert)
 				a.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
 				a.addAction(UIAlertAction(title: "Remove", style: .Destructive) { [weak S] action in
 					S?.removeAllMergedConfirmed()
@@ -64,7 +113,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			if Settings.dontAskBeforeWipingClosed {
 				S.removeAllClosedConfirmed()
 			} else {
-				let a = UIAlertController(title: "Sure?", message: "Remove all \(S.viewMode.namePlural().lowercaseString) in the Closed section?", preferredStyle: .Alert)
+				let a = UIAlertController(title: "Sure?", message: "Remove all \(S.pluralNameForItems()) in the Closed section?", preferredStyle: .Alert)
 				a.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
 				a.addAction(UIAlertAction(title: "Remove", style: .Destructive) { [weak S] action in
 					S?.removeAllClosedConfirmed()
@@ -75,12 +124,12 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	func removeAllClosedConfirmed() {
-		if viewMode == .PullRequests {
-			for p in PullRequest.allClosedInMoc(mainObjectContext) {
+		if viewingPrs {
+			for p in PullRequest.allClosedInMoc(mainObjectContext, criterion: currentTabBarSet?.viewCriterion) {
 				mainObjectContext.deleteObject(p)
 			}
 		} else {
-			for p in Issue.allClosedInMoc(mainObjectContext) {
+			for p in Issue.allClosedInMoc(mainObjectContext, criterion: currentTabBarSet?.viewCriterion) {
 				mainObjectContext.deleteObject(p)
 			}
 		}
@@ -88,8 +137,8 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	func removeAllMergedConfirmed() {
-		if viewMode == .PullRequests {
-			for p in PullRequest.allMergedInMoc(mainObjectContext) {
+		if viewingPrs {
+			for p in PullRequest.allMergedInMoc(mainObjectContext, criterion: currentTabBarSet?.viewCriterion) {
 				mainObjectContext.deleteObject(p)
 			}
 			DataManager.saveDB()
@@ -101,6 +150,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			i.catchUpWithComments()
 		}
 		DataManager.saveDB()
+		updateStatus()
 	}
 
 	func refreshControlChanged() {
@@ -127,7 +177,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	override func viewWillAppear(animated: Bool) {
 		super.viewWillAppear(animated)
 		updateStatus()
-		updateTabBarVisibility(animated)
 	}
 
 	override func viewDidLoad() {
@@ -136,7 +185,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		view.addSubview(refreshLabel)
 
 		searchTimer = PopTimer(timeInterval: 0.5) { [weak self] in
-			self?.reloadDataWithAnimation(true)
+			self?.applyFilter()
 		}
 
 		refreshControl?.addTarget(self, action: #selector(MasterViewController.refreshControlChanged), forControlEvents: .ValueChanged)
@@ -154,10 +203,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		n.addObserver(self, selector: #selector(MasterViewController.updateStatus), name:REFRESH_STARTED_NOTIFICATION, object: nil)
 		n.addObserver(self, selector: #selector(MasterViewController.updateStatus), name:REFRESH_ENDED_NOTIFICATION, object: nil)
 
-		pullRequestsItem.title = "Pull Requests"
-		pullRequestsItem.image = UIImage(named: "prsTab")
-		issuesItem.title = "Issues"
-		issuesItem.image = UIImage(named: "issuesTab")
+		updateTabItems(false)
 	}
 
 	override func canBecomeFirstResponder() -> Bool {
@@ -171,7 +217,8 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		let m = UIKeyCommand(input: "m", modifierFlags: .Command, action: #selector(MasterViewController.keyToggleMute), discoverabilityTitle: "Set item mute/unmute")
 		let s = UIKeyCommand(input: "s", modifierFlags: .Command, action: #selector(MasterViewController.keyToggleSnooze), discoverabilityTitle: "Snooze/wake item")
 		let r = UIKeyCommand(input: "r", modifierFlags: .Command, action: #selector(MasterViewController.keyForceRefresh), discoverabilityTitle: "Refresh now")
-		let t = UIKeyCommand(input: "\t", modifierFlags: .Alternate, action: #selector(MasterViewController.keyFlipPrsAndIssues), discoverabilityTitle: "Switch between PRs and issues")
+		let nt = UIKeyCommand(input: "\t", modifierFlags: .Alternate, action: #selector(MasterViewController.moveToNextTab), discoverabilityTitle: "Move to next tab")
+		let pt = UIKeyCommand(input: "\t", modifierFlags: [.Alternate, .Shift], action: #selector(MasterViewController.moveToPreviousTab), discoverabilityTitle: "Move to previous tab")
 		let sp = UIKeyCommand(input: " ", modifierFlags: [], action: #selector(MasterViewController.keyShowSelectedItem), discoverabilityTitle: "Display current item")
 		let d = UIKeyCommand(input: UIKeyInputDownArrow, modifierFlags: [], action: #selector(MasterViewController.keyMoveToNextItem), discoverabilityTitle: "Next item")
 		let u = UIKeyCommand(input: UIKeyInputUpArrow, modifierFlags: [], action: #selector(MasterViewController.keyMoveToPreviousItem), discoverabilityTitle: "Previous item")
@@ -179,7 +226,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		let uu = UIKeyCommand(input: UIKeyInputUpArrow, modifierFlags: .Alternate, action: #selector(MasterViewController.keyMoveToPreviousSection), discoverabilityTitle: "Move to the previous section")
 		let fd = UIKeyCommand(input: UIKeyInputRightArrow, modifierFlags: .Command, action: #selector(MasterViewController.keyFocusDetailView), discoverabilityTitle: "Focus keyboard on detail view")
 		let fm = UIKeyCommand(input: UIKeyInputLeftArrow, modifierFlags: .Command, action: #selector(MasterViewController.becomeFirstResponder), discoverabilityTitle: "Focus keyboard on list view")
-		return [u,d,uu,dd,t,fd,fm,sp,f,r,a,m,o,s]
+		return [u,d,uu,dd,nt,pt,fd,fm,sp,f,r,a,m,o,s]
 	}
 
 	private func canIssueKeyForIndexPath(actionTitle: String, _ i: NSIndexPath) -> Bool {
@@ -219,7 +266,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 				}
 			} else {
 				if canIssueKeyForIndexPath("Unread", ip) {
-					app.markItemAsUnRead(i.objectID.URIRepresentation().absoluteString, reloadView: false)
+					app.markItemAsUnRead(i.objectID.URIRepresentation().absoluteString)
 				}
 			}
 			updateStatus()
@@ -319,18 +366,45 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 	}
 
-	func keyFlipPrsAndIssues() {
-		if tabBar != nil {
-			viewMode = (viewMode == .PullRequests) ? .Issues : .PullRequests
+	func moveToNextTab() {
+		if let t = tabs, i = t.selectedItem, items = t.items, ind = items.indexOf(i) where items.count > 1 {
+			var nextIndex = ind+1
+			if nextIndex >= items.count {
+				nextIndex = 0
+			}
+			requestTabFocus(items[nextIndex])
 		}
 	}
 
-	func tabBar(tabBar: UITabBar, didSelectItem item: UITabBarItem) {
-		if tabBar.items?.indexOf(item) == 0 {
-			showPullRequestsSelected(tabBar)
-		} else {
-			showIssuesSelected(tabBar)
+	func moveToPreviousTab() {
+		if let t = tabs, i = t.selectedItem, items = t.items, ind = items.indexOf(i) where items.count > 1 {
+			var nextIndex = ind-1
+			if nextIndex < 0 {
+				nextIndex = items.count-1
+			}
+			requestTabFocus(items[nextIndex])
 		}
+	}
+
+	func requestTabFocus(item: UITabBarItem) {
+		tabs?.selectedItem = item
+		resetView()
+	}
+
+	private func tabBarSetForTabItem(i: UITabBarItem?) -> TabBarSet? {
+
+		guard let i = i else { return tabBarSets.first }
+
+		for s in tabBarSets {
+			if s.prItem === i || s.issuesItem === i {
+				return s
+			}
+		}
+		return nil
+	}
+
+	func tabBar(tabBar: UITabBar, didSelectItem item: UITabBarItem) {
+		resetView()
 	}
 
 	override func scrollViewDidScroll(scrollView: UIScrollView) {
@@ -347,107 +421,171 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		searchBar.alpha = min(1.0, max(0, ((116+tableView.contentOffset.y)/32.0)))
 	}
 
-	func reloadDataWithAnimation(animated: Bool) {
+	private func applyFilter() {
 
-		if !Repo.interestedInIssues() && Repo.interestedInPrs() && viewMode == .Issues {
-			showTabBar(false, animated: animated)
-			viewMode = .PullRequests
-			return
+		let currentIndexes = NSIndexSet(indexesInRange: NSMakeRange(0, fetchedResultsController.sections?.count ?? 0))
+
+		_fetchedResultsController = nil
+
+		let dataIndexes = NSIndexSet(indexesInRange: NSMakeRange(0, fetchedResultsController.sections?.count ?? 0))
+
+		let removedIndexes = currentIndexes.indexesPassingTest { (idx, _) -> Bool in
+			return !dataIndexes.containsIndex(idx)
+		}
+		let addedIndexes = dataIndexes.indexesPassingTest { (idx, _) -> Bool in
+			return !currentIndexes.containsIndex(idx)
+		}
+		let untouchedIndexes = dataIndexes.indexesPassingTest { (idx, _) -> Bool in
+			return !(removedIndexes.containsIndex(idx) || addedIndexes.containsIndex(idx))
 		}
 
-		if !Repo.interestedInPrs() && Repo.interestedInIssues() && viewMode == .PullRequests {
-			showTabBar(false, animated: animated)
-			viewMode = .Issues
-			return
+		tableView.beginUpdates()
+		if removedIndexes.count > 0 {
+			tableView.deleteSections(removedIndexes, withRowAnimation:.Automatic)
+		}
+		if untouchedIndexes.count > 0 {
+			tableView.reloadSections(untouchedIndexes, withRowAnimation:.Automatic)
+		}
+		if addedIndexes.count > 0 {
+			tableView.insertSections(addedIndexes, withRowAnimation:.Automatic)
+		}
+		tableView.endUpdates()
+	}
+
+	func updateTabItems(animated: Bool) {
+
+		var previousIndex: Int?
+		if let i = tabs?.selectedItem, ind = tabs?.items?.indexOf(i) {
+			previousIndex = ind
 		}
 
-		if animated {
-			let currentIndexes = NSIndexSet(indexesInRange: NSMakeRange(0, fetchedResultsController.sections?.count ?? 0))
+		tabBarSets.removeAll()
 
-			_fetchedResultsController = nil
-			updateStatus()
+		if Settings.showSeparateApiServersInMenu {
+			for a in ApiServer.allApiServersInMoc(mainObjectContext) {
+				if a.goodToGo {
+					let c = GroupingCriterion(apiServerId: a.objectID)
+					let s = TabBarSet(viewCriterion: c)
+					tabBarSets.append(s)
+				}
+			}
+		}
 
-			let dataIndexes = NSIndexSet(indexesInRange: NSMakeRange(0, fetchedResultsController.sections?.count ?? 0))
+		// Whatever happens, show SOMETHING
+		if tabBarSets.count == 0 {
+			let s = TabBarSet(viewCriterion: nil)
+			tabBarSets.append(s)
+		}
 
-			let removedIndexes = currentIndexes.indexesPassingTest { (idx, _) -> Bool in
-				return !dataIndexes.containsIndex(idx)
-			}
-			let addedIndexes = dataIndexes.indexesPassingTest { (idx, _) -> Bool in
-				return !currentIndexes.containsIndex(idx)
-			}
-			let untouchedIndexes = dataIndexes.indexesPassingTest { (idx, _) -> Bool in
-				return !(removedIndexes.containsIndex(idx) || addedIndexes.containsIndex(idx))
-			}
+		// Extract grouped repos
+		for groupLabel in Repo.allGroupLabels {
+			let c = GroupingCriterion(repoGroup: groupLabel)
+			let s = TabBarSet(viewCriterion: c)
+			tabBarSets.append(s)
+		}
 
-			tableView.beginUpdates()
-			if removedIndexes.count > 0 {
-				tableView.deleteSections(removedIndexes, withRowAnimation:.Automatic)
-			}
-			if untouchedIndexes.count > 0 {
-				tableView.reloadSections(untouchedIndexes, withRowAnimation:.Automatic)
-			}
-			if addedIndexes.count > 0 {
-				tableView.insertSections(addedIndexes, withRowAnimation:.Automatic)
-			}
-			tableView.endUpdates()
+		var items = [UITabBarItem]()
+		for d in tabBarSets {
+			items.appendContentsOf(d.tabItems)
+		}
 
+		if items.count > 1 {
+			showTabBar(true, animated: animated)
+
+			let tf = CGRectMake(0, 0, max(view.bounds.width, 64*CGFloat(items.count)), 49)
+			tabs?.frame = tf
+			tabs?.items = items
+			tabScroll?.contentSize = tf.size
+
+			if let p = previousIndex {
+				if items.count > p {
+					tabs?.selectedItem = items[p]
+					currentTabBarSet = tabBarSetForTabItem(items[p])
+				} else {
+					tabs?.selectedItem = items.last
+					currentTabBarSet = tabBarSetForTabItem(items.last!)
+				}
+			} else {
+				tabs?.selectedItem = items.first
+				currentTabBarSet = tabBarSets.first
+			}
 		} else {
+			showTabBar(false, animated: animated)
+			currentTabBarSet = tabBarSets.first
+		}
+
+		if let i = tabs?.selectedItem?.image {
+			viewingPrs = i==UIImage(named: "prsTab") // TODO ...
+		} else if let c = currentTabBarSet {
+			viewingPrs = c.tabItems.first?.image == UIImage(named: "prsTab")
+		} else {
+			viewingPrs = Repo.interestedInPrs(currentTabBarSet?.viewCriterion?.apiServerId)
+		}
+
+		if(_fetchedResultsController?.fetchRequest.predicate != createFetchRequest()) {
+			_fetchedResultsController = nil
 			tableView.reloadData()
 		}
 
-        updateTabBarVisibility(animated)
-	}
+		if let ts = tabScroll, t = tabs, i = t.selectedItem, ind = t.items?.indexOf(i) {
+			let w = t.bounds.size.width / CGFloat(t.items?.count ?? 1)
+			let x = w*CGFloat(ind)
+			let f = CGRectMake(x, 0, w, t.bounds.size.height)
+			ts.scrollRectToVisible(f, animated: true)
 
-    func updateTabBarVisibility(animated: Bool) {
-        showTabBar(Repo.interestedInPrs() && Repo.interestedInIssues(), animated: animated)
-    }
+		}
+	}
 
 	private func showTabBar(show: Bool, animated: Bool) {
 		if show {
 
-			if tabBar == nil {
+			if tabScroll == nil, let s = navigationController?.view {
 
-				if let s = navigationController?.view {
-					let t = UITabBar(frame: CGRectMake(0, s.bounds.size.height-49, s.bounds.size.width, 49))
-					t.autoresizingMask = [.FlexibleTopMargin, .FlexibleBottomMargin, .FlexibleWidth]
-					t.items = [pullRequestsItem, issuesItem]
-					t.selectedItem = (viewMode == .PullRequests) ? pullRequestsItem : issuesItem
-					t.delegate = self
-					t.itemPositioning = .Fill
-					s.addSubview(t)
-					tabBar = t
+				tableView.scrollIndicatorInsets = UIEdgeInsets(top: tableView.scrollIndicatorInsets.top, left: 0, bottom: 49, right: 0)
 
-					if animated {
-						t.transform = CGAffineTransformMakeTranslation(0, 49)
-						UIView.animateWithDuration(0.2,
-							delay: 0.0,
-							options: .CurveEaseInOut,
-							animations: {
-								t.transform = CGAffineTransformIdentity
-							}, completion: nil)
-					}
+				let t = UITabBar(frame: CGRectMake(0,0,100,49))
+				t.delegate = self
+				t.itemPositioning = .Fill
+				tabs = t
+
+				let ts = UIScrollView(frame: CGRectMake(0, s.bounds.size.height-49, s.bounds.size.width, 49))
+				ts.showsHorizontalScrollIndicator = false
+				ts.autoresizingMask = [.FlexibleTopMargin, .FlexibleBottomMargin, .FlexibleWidth]
+				ts.addSubview(t)
+				s.addSubview(ts)
+				tabScroll = ts
+
+				if animated {
+					t.transform = CGAffineTransformMakeTranslation(0, 49)
+					UIView.animateWithDuration(0.2,
+						delay: 0.0,
+						options: .CurveEaseInOut,
+						animations: {
+							t.transform = CGAffineTransformIdentity
+						}, completion: nil)
 				}
 			}
+
 		} else {
 
-			if !(Repo.interestedInPrs() && Repo.interestedInIssues()) {
-				self.viewMode = Repo.interestedInIssues() ? .Issues : .PullRequests
-			}
+			tableView.scrollIndicatorInsets = UIEdgeInsets(top: tableView.scrollIndicatorInsets.top, left: 0, bottom: 0, right: 0)
 
-			if let t = tabBar {
+			if let t = tabScroll {
+
+				tabs = nil
+				tabScroll = nil
+
 				if animated {
 					UIView.animateWithDuration(0.2,
 						delay: 0.0,
 						options: .CurveEaseInOut,
 						animations: {
 							t.transform = CGAffineTransformMakeTranslation(0, 49)
-						}, completion: { [weak self] finished in
+						}, completion: { finished in
 							t.removeFromSuperview()
-							self?.tabBar = nil
 						})
 				} else {
 					t.removeFromSuperview()
-					tabBar = nil
 				}
 			}
 		}
@@ -492,13 +630,13 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		if urlToOpen != nil && !S(searchBar.text).isEmpty {
 			searchBar.text = nil
 			searchBar.resignFirstResponder()
-			reloadDataWithAnimation(false)
+			resetView()
 		}
 
 		var oid: NSManagedObjectID?
 
 		if let i = relatedItem {
-			viewMode = i is PullRequest ? .PullRequests : .Issues
+			selectTabFor(i)
 			oid = i.objectID
 			if let ip = fetchedResultsController.indexPathForObject(i) {
 				tableView.selectRowAtIndexPath(ip, animated: false, scrollPosition: .Middle)
@@ -512,13 +650,25 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 	}
 
+	func selectTabFor(i: ListableItem) {
+		for d in tabBarSets {
+			if d.viewCriterion == nil || d.viewCriterion?.isRelatedTo(i) ?? false {
+				if i is PullRequest {
+					requestTabFocus(d.prItem)
+				} else {
+					requestTabFocus(d.issuesItem)
+				}
+			}
+		}
+	}
+
 	func openItemWithUriPath(uriPath: String) {
 		if let
 			itemId = DataManager.idForUriPath(uriPath),
 			item = existingObjectWithID(itemId) as? ListableItem,
 			ip = fetchedResultsController.indexPathForObject(item)
 		{
-			viewMode = item is PullRequest ? .PullRequests : .Issues
+			selectTabFor(item)
 			item.catchUpWithComments()
 			tableView.selectRowAtIndexPath(ip, animated: false, scrollPosition: .Middle)
 			tableView(tableView, didSelectRowAtIndexPath: ip)
@@ -532,14 +682,10 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		{
 			if let url = comment.webUrl {
 				var ip: NSIndexPath?
-				if let pr = comment.pullRequest {
-					viewMode = .PullRequests
-					ip = fetchedResultsController.indexPathForObject(pr)
-					pr.catchUpWithComments()
-				} else if let issue = comment.issue {
-					viewMode = .Issues
-					ip = fetchedResultsController.indexPathForObject(issue)
-					issue.catchUpWithComments()
+				if let item = comment.pullRequest ?? comment.issue {
+					selectTabFor(item)
+					ip = fetchedResultsController.indexPathForObject(item)
+					item.catchUpWithComments()
 				}
 				if let i = ip {
 					tableView.selectRowAtIndexPath(i, animated: false, scrollPosition: .Middle)
@@ -573,31 +719,20 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			becomeFirstResponder()
 		}
 
-		let fs = forceSafari
-		forceSafari = false
-
-		func openItem(item: ListableItem, url: NSURL, oid: NSManagedObjectID) {
-			if forceSafari || (Settings.openItemsDirectlyInSafari && !detailViewController.isVisible) {
-				item.catchUpWithComments()
-				UIApplication.sharedApplication().openURL(url)
-			} else {
-				showDetail(url, objectId: oid)
-			}
-		}
-
-		if viewMode == .PullRequests, let
-			p = fetchedResultsController.objectAtIndexPath(indexPath) as? PullRequest,
+		if let
+			p = fetchedResultsController.objectAtIndexPath(indexPath) as? ListableItem,
 			u = p.urlForOpening(),
 			url = NSURL(string: u)
 		{
-			openItem(p, url: url, oid: p.objectID)
-		} else if viewMode == .Issues, let
-			i = fetchedResultsController.objectAtIndexPath(indexPath) as? Issue,
-			u = i.urlForOpening(),
-			url = NSURL(string: u)
-		{
-			openItem(i, url: url, oid: i.objectID)
+			if forceSafari || (Settings.openItemsDirectlyInSafari && !detailViewController.isVisible) {
+				p.catchUpWithComments()
+				UIApplication.sharedApplication().openURL(url)
+			} else {
+				showDetail(url, objectId: p.objectID)
+			}
 		}
+
+		forceSafari = false
 	}
 
 	private func showDetail(url: NSURL?, objectId: NSManagedObjectID?) {
@@ -613,7 +748,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		let v = tableView.dequeueReusableHeaderFooterViewWithIdentifier("SectionHeaderView") as! SectionHeaderView
 		let name = S(fetchedResultsController.sections?[section].name)
 		v.title.text = name.uppercaseString
-		if viewMode == .PullRequests {
+		if viewingPrs {
 			if name == Section.Closed.prMenuName() {
 				v.action.hidden = false
 				v.callback = { [weak self] in
@@ -646,7 +781,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	override func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
 		if section==numberOfSectionsInTableView(tableView)-1 {
-			return tabBar == nil ? 20 : 20+49
+			return tabs == nil ? 20 : 20+49
 		}
 		return 1
 	}
@@ -659,12 +794,12 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			let r: UITableViewRowAction
 			if i.unreadComments?.longLongValue ?? 0 > 0 {
 				r = UITableViewRowAction(style: .Normal, title: "Read") { action, indexPath in
-					app.markItemAsRead(i.objectID.URIRepresentation().absoluteString, reloadView: false)
+					app.markItemAsRead(i.objectID.URIRepresentation().absoluteString)
 					tableView.setEditing(false, animated: true)
 				}
 			} else {
 				r = UITableViewRowAction(style: .Normal, title: "Unread") { action, indexPath in
-					app.markItemAsUnRead(i.objectID.URIRepresentation().absoluteString, reloadView: false)
+					app.markItemAsUnRead(i.objectID.URIRepresentation().absoluteString)
 					tableView.setEditing(false, animated: true)
 				}
 			}
@@ -712,7 +847,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 			} else {
 
-				appendReadUnread(i)
+				if Settings.showCommentsEverywhere || (sectionName != Section.All.prMenuName() && sectionName != Section.All.issuesMenuName()) {
+					appendReadUnread(i)
+				}
 				appendMuteUnmute(i)
 				let s = UITableViewRowAction(style: .Normal, title: "Snooze") { [weak self] action, indexPath in
 					self?.showSnoozeMenuFor(i)
@@ -748,14 +885,16 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			return c
 		}
 
-		let type = viewMode == .PullRequests ? "PullRequest" : "Issue"
-		let fetchRequest = ListableItem.requestForItemsOfType(type, withFilter: searchBar.text, sectionIndex: -1)
-
-		let c = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: mainObjectContext, sectionNameKeyPath: "sectionName", cacheName: nil)
+		let c = NSFetchedResultsController(fetchRequest: createFetchRequest(), managedObjectContext: mainObjectContext, sectionNameKeyPath: "sectionName", cacheName: nil)
 		_fetchedResultsController = c
 		c.delegate = self
 		try! c.performFetch()
 		return c
+	}
+
+	private func createFetchRequest() -> NSFetchRequest {
+		let type = viewingPrs ? "PullRequest" : "Issue"
+		return ListableItem.requestForItemsOfType(type, withFilter: searchBar.text, sectionIndex: -1, criterion: currentTabBarSet?.viewCriterion)
 	}
 
 	func controllerWillChangeContent(controller: NSFetchedResultsController) {
@@ -821,7 +960,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 			if s >= 0 && s < sections.count && r >= 0 && r < sections[s].numberOfObjects {
 				let o = fetchedResultsController.objectAtIndexPath(atIndexPath)
-				if viewMode == .PullRequests {
+				if o is PullRequest {
 					c.setPullRequest(o as! PullRequest)
 				} else {
 					c.setIssue(o as! Issue)
@@ -830,17 +969,15 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 	}
 
+	private var viewingPrs = true
+
 	func updateStatus() {
 
-		let prUnreadCount = PullRequest.badgeCountInMoc(mainObjectContext)
-		pullRequestsItem.badgeValue = prUnreadCount > 0 ? "\(prUnreadCount)" : nil
-
-		let issuesUnreadCount = Issue.badgeCountInMoc(mainObjectContext)
-		issuesItem.badgeValue = issuesUnreadCount > 0 ? "\(issuesUnreadCount)" : nil
+		updateTabItems(true)
 
 		if appIsRefreshing {
 			title = "Refreshing..."
-			if viewMode == .PullRequests {
+			if viewingPrs {
 				tableView.tableFooterView = EmptyView(message: PullRequest.reasonForEmptyWithFilter(searchBar.text), parentWidth: view.bounds.size.width)
 			} else {
 				tableView.tableFooterView = EmptyView(message: Issue.reasonForEmptyWithFilter(searchBar.text), parentWidth: view.bounds.size.width)
@@ -852,13 +989,13 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			}
 		} else {
 
-			let count = fetchedResultsController.fetchedObjects?.count ?? 0
-			if viewMode == .PullRequests {
+			let empty = (fetchedResultsController.fetchedObjects?.count ?? 0) == 0
+			if viewingPrs {
 				title = pullRequestsTitle(true)
-				tableView.tableFooterView = (count == 0) ? EmptyView(message: PullRequest.reasonForEmptyWithFilter(searchBar.text), parentWidth: view.bounds.size.width) : nil
+				tableView.tableFooterView = empty ? EmptyView(message: PullRequest.reasonForEmptyWithFilter(searchBar.text), parentWidth: view.bounds.size.width) : nil
 			} else {
 				title = issuesTitle()
-				tableView.tableFooterView = (count == 0) ? EmptyView(message: Issue.reasonForEmptyWithFilter(searchBar.text), parentWidth: view.bounds.size.width) : nil
+				tableView.tableFooterView = empty ? EmptyView(message: Issue.reasonForEmptyWithFilter(searchBar.text), parentWidth: view.bounds.size.width) : nil
 			}
 			if let r = refreshControl {
 				refreshLabel.text = api.lastUpdateDescription()
@@ -869,11 +1006,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		app.updateBadge()
 
-		if splitViewController?.displayMode != UISplitViewControllerDisplayMode.AllVisible {
+		if splitViewController?.displayMode != .AllVisible {
 			detailViewController.navigationItem.leftBarButtonItem?.title = title
 		}
-
-		tabBar?.selectedItem = (viewMode == .PullRequests) ? pullRequestsItem : issuesItem
 	}
 
 	private func unreadCommentCount(count: Int) -> String {
@@ -882,9 +1017,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	private func pullRequestsTitle(long: Bool) -> String {
 
-		let f = ListableItem.requestForItemsOfType("PullRequest", withFilter: nil, sectionIndex: -1)
+		let f = ListableItem.requestForItemsOfType("PullRequest", withFilter: nil, sectionIndex: -1, criterion: currentTabBarSet?.viewCriterion)
 		let count = mainObjectContext.countForFetchRequest(f, error: nil)
-		let unreadCount = Int(pullRequestsItem.badgeValue ?? "0")!
+		let unreadCount = Int(currentTabBarSet?.prItem.badgeValue ?? "0")!
 
 		let pr = long ? "Pull Request" : "PR"
 		if count == 0 {
@@ -899,9 +1034,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	private func issuesTitle() -> String {
-		let f = ListableItem.requestForItemsOfType("Issue", withFilter: nil, sectionIndex: -1)
+		let f = ListableItem.requestForItemsOfType("Issue", withFilter: nil, sectionIndex: -1, criterion: currentTabBarSet?.viewCriterion)
 		let count = mainObjectContext.countForFetchRequest(f, error: nil)
-		let unreadCount = Int(issuesItem.badgeValue ?? "0")!
+		let unreadCount = Int(currentTabBarSet?.issuesItem.badgeValue ?? "0")!
 
 		if count == 0 {
 			return "No Issues"
@@ -950,18 +1085,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 	}
 
-	////////////////// mode
-
-	func showPullRequestsSelected(sender: AnyObject) {
-		viewMode = .PullRequests
-		safeScrollToTop()
-	}
-
-	func showIssuesSelected(sender: AnyObject) {
-		viewMode = .Issues
-		safeScrollToTop()
-	}
-
 	private func safeScrollToTop() {
 		if self.numberOfSectionsInTableView(self.tableView) > 0 {
 			self.tableView.scrollToRowAtIndexPath(NSIndexPath(forRow: 0, inSection: 0), atScrollPosition: .Top, animated: false)
@@ -973,19 +1096,10 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		searchBar.becomeFirstResponder()
 	}
 
-	private var _viewMode: MasterViewMode = .PullRequests
-	var viewMode: MasterViewMode {
-		set {
-			if newValue != _viewMode {
-				_viewMode = newValue
-				_fetchedResultsController = nil
-				tableView.reloadData()
-				updateStatus()
-			}
-		}
-		get {
-			return _viewMode
-		}
+	func resetView() {
+		_fetchedResultsController = nil
+		updateStatus()
+		tableView.reloadData()
 	}
 
 	////////////////// opening prefs

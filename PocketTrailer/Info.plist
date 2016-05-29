@@ -39,7 +39,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.3.24</string>
+	<string>1.4.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -90,17 +90,9 @@
 			<key>UIApplicationShortcutItemIconType</key>
 			<string>UIApplicationShortcutIconTypeSearch</string>
 			<key>UIApplicationShortcutItemTitle</key>
-			<string>Search PRs</string>
+			<string>Search</string>
 			<key>UIApplicationShortcutItemType</key>
-			<string>view-prs</string>
-		</dict>
-		<dict>
-			<key>UIApplicationShortcutItemIconType</key>
-			<string>UIApplicationShortcutIconTypeSearch</string>
-			<key>UIApplicationShortcutItemTitle</key>
-			<string>Search Issues</string>
-			<key>UIApplicationShortcutItemType</key>
-			<string>view-issues</string>
+			<string>search-items</string>
 		</dict>
 	</array>
 	<key>UIBackgroundModes</key>

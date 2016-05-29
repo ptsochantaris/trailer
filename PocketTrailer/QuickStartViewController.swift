@@ -72,7 +72,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 			checkTimer = nil
 			if newServer.lastSyncSucceeded?.boolValue ?? false {
                 dismissViewControllerAnimated(true, completion: {
-                    popupManager.getMasterController().updateTabBarVisibility(true)
+					popupManager.getMasterController().resetView()
 					showMessage("Setup complete!", "You can tweak options & behaviour from the settings.\n\nTrailer has read-only access to your GitHub data, so feel free to experiment, you can't damage your data or settings on GitHub.")
                 })
 			} else {

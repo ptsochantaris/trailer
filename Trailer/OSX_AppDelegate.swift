@@ -703,6 +703,19 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 	/////////////////////// keyboard shortcuts
 
+	func statusItemList() -> [NSStatusItem] {
+		var list = [NSStatusItem]()
+		for s in menuBarSets {
+			if let i = s.prMenu.statusItem, v = i.view where v.frame.size.width > 0 {
+				list.append(i)
+			}
+			if let i = s.issuesMenu.statusItem, v = i.view where v.frame.size.width > 0 {
+				list.append(i)
+			}
+		}
+		return list
+	}
+
 	func addHotKeySupport() {
 		if Settings.hotkeyEnable {
 			if globalKeyMonitor == nil {
@@ -745,12 +758,22 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
 
-					if Repo.interestedInPrs() && Repo.interestedInIssues() { // TODO: move between all servers, not just the current one
-						if let serverDisplay = S.menuBarSetForWindow(w) {
-							if w === serverDisplay.prMenu {
-								S.showMenu(serverDisplay.issuesMenu)
-							} else if w === serverDisplay.issuesMenu {
-								S.showMenu(serverDisplay.prMenu)
+					let statusItems = S.statusItemList()
+					if let s = w.statusItem, ind = statusItems.indexOf(s) {
+						var nextIndex = incomingEvent.keyCode==123 ? ind+1 : ind-1
+						if nextIndex < 0 {
+							nextIndex = statusItems.count-1
+						} else if nextIndex >= statusItems.count {
+							nextIndex = 0
+						}
+						let newStatusItem = statusItems[nextIndex]
+						for s in S.menuBarSets {
+							if s.prMenu.statusItem === newStatusItem {
+								S.showMenu(s.prMenu)
+								break
+							} else if s.issuesMenu.statusItem === newStatusItem {
+								S.showMenu(s.issuesMenu)
+								break
 							}
 						}
 					}

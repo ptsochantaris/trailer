@@ -9,8 +9,7 @@ final class SettingsManager {
 		if Settings.readFromURL(url) {
 			atNextEvent {
 
-				let m = popupManager.getMasterController()
-				m.reloadDataWithAnimation(false)
+				popupManager.getMasterController().resetView()
 
 				preferencesDirty = true
 				Settings.lastSuccessfulRefresh = nil

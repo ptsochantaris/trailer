@@ -150,8 +150,12 @@ final class PullRequest: ListableItem {
 		} else if openRequests > 0 {
 			message = "\(openRequests) PRs are hidden by your settings."
 		} else if !Repo.anyVisibleReposInMoc(mainObjectContext, criterion: criterion) {
-			color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
-			message = "You have no watched repositories, please add some to your watchlist and refresh after a little while."
+			if Repo.anyVisibleReposInMoc(mainObjectContext, excludeGrouped: false) {
+				message = "There are no repositories that are currently visible in this category."
+			} else {
+				color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
+				message = "You have no watched repositories, please add some to your watchlist and refresh after a little while."
+			}
 		} else if !Repo.interestedInPrs(criterion?.apiServerId) && !Repo.interestedInIssues(criterion?.apiServerId) {
 			color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
 			message = "All your watched repositories are marked as hidden, please enable issues or PRs for some of them."
