@@ -148,7 +148,7 @@ final class PullRequest: ListableItem {
 		} else if !S(filterValue).isEmpty {
 			message = "There are no PRs matching this filter."
 		} else if openRequests > 0 {
-			message = "\(openRequests) PRs are hidden by your settings."
+			message = "Some items are hidden by your settings."
 		} else if !Repo.anyVisibleReposInMoc(mainObjectContext, criterion: criterion) {
 			if Repo.anyVisibleReposInMoc(mainObjectContext, excludeGrouped: false) {
 				message = "There are no repositories that are currently visible in this category."

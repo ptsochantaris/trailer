@@ -51,7 +51,7 @@ final class Issue: ListableItem {
 		} else if !S(filterValue).isEmpty {
 			message = "There are no issues matching this filter."
 		} else if openIssues > 0 {
-			message = "\(openIssues) issues are hidden by your settings."
+			message = "Some items are hidden by your settings."
 		} else if !Repo.anyVisibleReposInMoc(mainObjectContext, criterion: criterion) {
 			if Repo.anyVisibleReposInMoc(mainObjectContext, excludeGrouped: false) {
 				message = "There are no repositories that are currently visible in this category."

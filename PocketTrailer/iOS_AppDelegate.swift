@@ -127,7 +127,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 	func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject) -> Bool {
 		if let c = NSURLComponents(URL: url, resolvingAgainstBaseURL: false) {
 			if let scheme = c.scheme {
-				if scheme == "pockettrailer" { // open from today extension - TODO: list each group and open using the host component
+				if scheme == "pockettrailer" {
 					return true
 				} else {
 					settingsManager.loadSettingsFrom(url, confirmFromView: nil, withCompletion: nil)

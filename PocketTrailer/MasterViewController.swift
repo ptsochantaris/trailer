@@ -452,12 +452,13 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		tableView.endUpdates()
 	}
 
-	func updateTabItems(animated: Bool) {
+	private func updateTabItems(animated: Bool) {
 
 		var previousIndex: Int?
 		if let i = tabs?.selectedItem, ind = tabs?.items?.indexOf(i) {
 			previousIndex = ind
 		}
+		let previousCount = tabs?.items?.count ?? 0
 
 		tabBarSets.removeAll()
 
@@ -490,6 +491,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 
 		if items.count > 1 {
+			showEmpty = false
 			showTabBar(true, animated: animated)
 
 			let tf = CGRectMake(0, 0, max(view.bounds.width, 64*CGFloat(items.count)), 49)
@@ -507,22 +509,30 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 				}
 			} else {
 				tabs?.selectedItem = items.first
-				currentTabBarSet = tabBarSets.first
+				currentTabBarSet = tabBarSetForTabItem(items.first)
 			}
 		} else {
+			showEmpty = items.count == 0
+			currentTabBarSet = tabBarSetForTabItem(items.first)
 			showTabBar(false, animated: animated)
-			currentTabBarSet = tabBarSets.first
 		}
 
 		if let i = tabs?.selectedItem?.image {
-			viewingPrs = i==UIImage(named: "prsTab") // TODO ...
+			viewingPrs = i == UIImage(named: "prsTab")
 		} else if let c = currentTabBarSet {
 			viewingPrs = c.tabItems.first?.image == UIImage(named: "prsTab")
-		} else {
+		} else if Repo.anyVisibleReposInMoc(mainObjectContext, criterion: currentTabBarSet?.viewCriterion) {
 			viewingPrs = Repo.interestedInPrs(currentTabBarSet?.viewCriterion?.apiServerId)
+		} else {
+			viewingPrs = true
 		}
 
-		if(_fetchedResultsController?.fetchRequest.predicate != createFetchRequest()) {
+		let newCount = tabs?.items?.count ?? 0
+
+		let latestFetchRequest = _fetchedResultsController?.fetchRequest
+		let newFetchRequest = createFetchRequest()
+
+		if newCount != previousCount || latestFetchRequest != newFetchRequest {
 			_fetchedResultsController = nil
 			tableView.reloadData()
 		}
@@ -532,7 +542,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			let x = w*CGFloat(ind)
 			let f = CGRectMake(x, 0, w, t.bounds.size.height)
 			ts.scrollRectToVisible(f, animated: true)
-
 		}
 	}
 
@@ -970,6 +979,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	private var viewingPrs = true
+	private var showEmpty = true
 
 	func updateStatus() {
 
@@ -990,7 +1000,14 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		} else {
 
 			let empty = (fetchedResultsController.fetchedObjects?.count ?? 0) == 0
-			if viewingPrs {
+			if showEmpty {
+				title = "No Items"
+				if viewingPrs {
+					tableView.tableFooterView = empty ? EmptyView(message: PullRequest.reasonForEmptyWithFilter(searchBar.text), parentWidth: view.bounds.size.width) : nil
+				} else {
+					tableView.tableFooterView = empty ? EmptyView(message: Issue.reasonForEmptyWithFilter(searchBar.text), parentWidth: view.bounds.size.width) : nil
+				}
+			} else if viewingPrs {
 				title = pullRequestsTitle(true)
 				tableView.tableFooterView = empty ? EmptyView(message: PullRequest.reasonForEmptyWithFilter(searchBar.text), parentWidth: view.bounds.size.width) : nil
 			} else {
@@ -1034,6 +1051,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	private func issuesTitle() -> String {
+
 		let f = ListableItem.requestForItemsOfType("Issue", withFilter: nil, sectionIndex: -1, criterion: currentTabBarSet?.viewCriterion)
 		let count = mainObjectContext.countForFetchRequest(f, error: nil)
 		let unreadCount = Int(currentTabBarSet?.issuesItem.badgeValue ?? "0")!
