@@ -8,7 +8,6 @@ final class NotificationManager {
 			DLog("Received local notification: %@", userInfo)
 			popupManager.getMasterController().localNotification(userInfo, action: action)
 		}
-		UIApplication.sharedApplication().cancelLocalNotification(notification)
 	}
 
 	class func handleUserActivity(activity: NSUserActivity) -> Bool {

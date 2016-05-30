@@ -213,6 +213,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		tableView.estimatedRowHeight = 240
 		tableView.registerNib(UINib(nibName: "SectionHeaderView", bundle: nil), forHeaderFooterViewReuseIdentifier: "SectionHeaderView")
 		tableView.contentOffset = CGPointMake(0, 44)
+		clearsSelectionOnViewWillAppear = false
 
 		if let detailNav = splitViewController?.viewControllers.last as? UINavigationController {
 			detailViewController = detailNav.topViewController as? DetailViewController
@@ -407,7 +408,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	private func requestTabFocus(item: UITabBarItem?) {
 		if let i = item {
-			tabs?.selectedItem = i
+			lastTabIndex = tabs?.items?.indexOf(i) ?? 0
 			resetView()
 		}
 	}
@@ -425,6 +426,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	func tabBar(tabBar: UITabBar, didSelectItem item: UITabBarItem) {
+		lastTabIndex = tabs?.items?.indexOf(item) ?? 0
 		resetView()
 	}
 
@@ -475,12 +477,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	private func updateTabItems(animated: Bool) {
 
-		var previousIndex: Int?
-		if let i = tabs?.selectedItem, ind = tabs?.items?.indexOf(i) {
-			previousIndex = ind
-		}
-		let previousCount = tabs?.items?.count ?? 0
-
 		tabBarSets.removeAll()
 
 		for groupLabel in Repo.allGroupLabels {
@@ -512,19 +508,14 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			showTabBar(true, animated: animated)
 
 			tabs?.items = items
-			layoutTabs()
+			tabs?.superview?.setNeedsLayout()
 
-			if let p = previousIndex {
-				if items.count > p {
-					tabs?.selectedItem = items[p]
-					currentTabBarSet = tabBarSetForTabItem(items[p])
-				} else {
-					tabs?.selectedItem = items.last
-					currentTabBarSet = tabBarSetForTabItem(items.last!)
-				}
+			if items.count > lastTabIndex {
+				tabs?.selectedItem = items[lastTabIndex]
+				currentTabBarSet = tabBarSetForTabItem(items[lastTabIndex])
 			} else {
-				tabs?.selectedItem = items.first
-				currentTabBarSet = tabBarSetForTabItem(items.first)
+				tabs?.selectedItem = items.last
+				currentTabBarSet = tabBarSetForTabItem(items.last!)
 			}
 		} else {
 			showEmpty = items.count == 0
@@ -547,7 +538,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		let latestFetchRequest = _fetchedResultsController?.fetchRequest
 		let newFetchRequest = createFetchRequest()
 
-		if newCount != previousCount || latestFetchRequest != newFetchRequest {
+		if newCount != lastTabCount || latestFetchRequest != newFetchRequest {
 			_fetchedResultsController = nil
 			tableView.reloadData()
 		}
@@ -558,8 +549,17 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			let f = CGRectMake(x, 0, w, t.bounds.size.height)
 			ts.scrollRectToVisible(f, animated: true)
 		}
+
+		lastTabCount = tabs?.items?.count ?? 0
+		if let i = tabs?.selectedItem, ind = tabs?.items?.indexOf(i) {
+			lastTabIndex = ind
+		} else {
+			lastTabIndex = 0
+		}
 	}
 
+	private var lastTabIndex = 0
+	private var lastTabCount = 0
 	private func showTabBar(show: Bool, animated: Bool) {
 		if show {
 
@@ -596,13 +596,13 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 				tabScroll = ts
 
 				if animated {
-					t.transform = CGAffineTransformMakeTranslation(0, 49)
+					ts.transform = CGAffineTransformMakeTranslation(0, 49)
 					b.transform = CGAffineTransformMakeTranslation(0, 49)
 					UIView.animateWithDuration(0.2,
 						delay: 0.0,
 						options: .CurveEaseInOut,
 						animations: {
-							t.transform = CGAffineTransformIdentity
+							ts.transform = CGAffineTransformIdentity
 							b.transform = CGAffineTransformIdentity
 						}, completion: nil)
 				}
@@ -648,17 +648,10 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			if urlToOpen == nil {
 				urlToOpen = c.webUrl
 			}
-		} else if let pullRequestId = DataManager.idForUriPath(userInfo[PULL_REQUEST_ID_KEY] as? String) {
-			relatedItem = existingObjectWithID(pullRequestId) as? ListableItem
+		} else if let uri = (userInfo[PULL_REQUEST_ID_KEY] ?? userInfo[ISSUE_ID_KEY]) as? String, itemId = DataManager.idForUriPath(uri) {
+			relatedItem = existingObjectWithID(itemId) as? ListableItem
 			if relatedItem == nil {
-				showMessage("PR not found", "Could not locate the PR related to this notification")
-			} else if urlToOpen == nil {
-				urlToOpen = relatedItem!.webUrl
-			}
-		} else if let issueId = DataManager.idForUriPath(userInfo[ISSUE_ID_KEY] as? String) {
-			relatedItem = existingObjectWithID(issueId) as? ListableItem
-			if relatedItem == nil {
-				showMessage("Issue not found", "Could not locate the issue related to this notification")
+				showMessage("Item not found", "Could not locate the item related to this notification")
 			} else if urlToOpen == nil {
 				urlToOpen = relatedItem!.webUrl
 			}
@@ -686,8 +679,10 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		if let i = relatedItem {
 			selectTabFor(i)
 			oid = i.objectID
-			if let ip = fetchedResultsController.indexPathForObject(i) {
-				tableView.selectRowAtIndexPath(ip, animated: false, scrollPosition: .Middle)
+			atNextEvent(self) { S in
+				if let ip = S.fetchedResultsController.indexPathForObject(i) {
+					S.tableView.selectRowAtIndexPath(ip, animated: false, scrollPosition: .Middle)
+				}
 			}
 		}
 
@@ -698,7 +693,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 	}
 
-	func selectTabFor(i: ListableItem) {
+	private func selectTabFor(i: ListableItem) {
 		for d in tabBarSets {
 			if d.viewCriterion == nil || d.viewCriterion?.isRelatedTo(i) ?? false {
 				if i is PullRequest {
@@ -1153,7 +1148,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	func focusFilter() {
-		safeScrollToTop()
+		tableView.contentOffset = CGPointMake(0, -tableView.contentInset.top)
 		searchBar.becomeFirstResponder()
 	}
 

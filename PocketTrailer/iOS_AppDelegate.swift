@@ -40,9 +40,6 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 		splitViewController.maximumPrimaryColumnWidth = 320
 		splitViewController.delegate = popupManager
 
-		let m = popupManager.getMasterController()
-		m.clearsSelectionOnViewWillAppear = false // for iPad
-
 		application.setMinimumBackgroundFetchInterval(NSTimeInterval(Settings.backgroundRefreshPeriod))
 
 		atNextEvent(self) { S in
@@ -53,6 +50,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 			} else {
 
 				if !ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
+					let m = popupManager.getMasterController()
 					if ApiServer.countApiServersInMoc(mainObjectContext) == 1, let a = ApiServer.allApiServersInMoc(mainObjectContext).first where a.authToken == nil || a.authToken!.isEmpty {
 						m.performSegueWithIdentifier("showQuickstart", sender: self)
 					} else {
