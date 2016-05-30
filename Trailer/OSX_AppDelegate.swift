@@ -27,31 +27,32 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 		menuBarSets.removeAll()
 
+		var newSets = [MenuBarSet]()
+		for groupLabel in Repo.allGroupLabels {
+			let c = GroupingCriterion(repoGroup: groupLabel)
+			let s = MenuBarSet(viewCriterion: c, delegate: self)
+			s.setTimers()
+			newSets.append(s)
+		}
+
 		if Settings.showSeparateApiServersInMenu {
 			for a in ApiServer.allApiServersInMoc(mainObjectContext) {
 				if a.goodToGo {
 					let c = GroupingCriterion(apiServerId: a.objectID)
 					let s = MenuBarSet(viewCriterion: c, delegate: self)
 					s.setTimers()
-					menuBarSets.append(s)
+					newSets.append(s)
 				}
 			}
 		}
 
-		// Whatever happens, show SOMETHING
-		if menuBarSets.count == 0 {
+		if newSets.count == 0 || Repo.anyVisibleReposInMoc(mainObjectContext, excludeGrouped: true) {
 			let s = MenuBarSet(viewCriterion: nil, delegate: self)
 			s.setTimers()
-			menuBarSets.append(s)
+			newSets.append(s)
 		}
 
-		// Extract grouped repos
-		for groupLabel in Repo.allGroupLabels {
-			let c = GroupingCriterion(repoGroup: groupLabel)
-			let s = MenuBarSet(viewCriterion: c, delegate: self)
-			s.setTimers()
-			menuBarSets.append(s)
-		}
+		menuBarSets.appendContentsOf(newSets.reverse())
 
 		updateScrollBarWidth() // also updates menu
 
@@ -692,7 +693,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	func refreshTimerDone() {
-		if ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) && Repo.anyVisibleReposInMoc(mainObjectContext) {
+		if DataManager.appIsConfigured {
 			if preferencesWindow != nil {
 				preferencesDirty = true
 			} else {

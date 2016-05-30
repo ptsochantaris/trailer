@@ -52,8 +52,8 @@ final class Issue: ListableItem {
 			message = "There are no issues matching this filter."
 		} else if openIssues > 0 {
 			message = "Some items are hidden by your settings."
-		} else if !Repo.anyVisibleReposInMoc(mainObjectContext, criterion: criterion) {
-			if Repo.anyVisibleReposInMoc(mainObjectContext, excludeGrouped: false) {
+		} else if !Repo.anyVisibleReposInMoc(mainObjectContext, criterion: criterion, excludeGrouped: true) {
+			if Repo.anyVisibleReposInMoc(mainObjectContext) {
 				message = "There are no repositories that are currently visible in this category."
 			} else {
 				color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)

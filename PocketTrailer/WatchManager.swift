@@ -50,7 +50,8 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)) {
 					while appIsRefreshing { NSThread.sleepForTimeInterval(0.1) }
 					atNextEvent {
-						if Settings.lastSuccessfulRefresh == nil || lastSuccessfulSync.isEqualToDate(Settings.lastSuccessfulRefresh!) {
+						let l = Settings.lastSuccessfulRefresh
+						if l == nil || lastSuccessfulSync == l! {
 							s.reportFailure("Refresh Failed", message, replyHandler)
 						} else {
 							s.processList(message, replyHandler)

@@ -76,48 +76,35 @@ final class Repo: DataItem {
 		return try! inMoc.executeFetchRequest(f) as! [Repo]
 	}
 
-	class func visibleReposInMoc(moc: NSManagedObjectContext) -> [Repo] {
-		let f = NSFetchRequest(entityName: "Repo")
-		f.returnsObjectsAsFaults = false
-		f.predicate = NSPredicate(format: "displayPolicyForPrs > 0 or displayPolicyForIssues > 0")
-		return try! moc.executeFetchRequest(f) as! [Repo]
-	}
+	class func anyVisibleReposInMoc(moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, excludeGrouped: Bool = false) -> Bool {
 
-	class func anyVisibleReposInMoc(moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, excludeGrouped: Bool = true) -> Bool {
+		func excludeGroupedRepos(p: NSPredicate) -> NSPredicate {
+			let nilCheck = NSPredicate(format: "groupLabel == nil")
+			return NSCompoundPredicate(andPredicateWithSubpredicates: [nilCheck, p])
+		}
+
 		let f = NSFetchRequest(entityName: "Repo")
+		f.fetchLimit = 1
 		let p = NSPredicate(format: "displayPolicyForPrs > 0 or displayPolicyForIssues > 0")
 		if let c = criterion {
-			if let g = c.repoGroup {
+			if let g = c.repoGroup { // special case will never need exclusion
 				let rp = NSPredicate(format: "groupLabel == %@", g)
 				f.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [rp, p])
 			} else {
 				let ep = c.addCriterionToPredicate(p, inMoc: moc)
 				if excludeGrouped {
-					f.predicate = excludeGroupedRepos(ep, inMoc: moc)
+					f.predicate = excludeGroupedRepos(ep)
 				} else {
 					f.predicate = ep
 				}
 			}
 		} else if excludeGrouped {
-			f.predicate = excludeGroupedRepos(p, inMoc: moc)
+			f.predicate = excludeGroupedRepos(p)
 		} else {
 			f.predicate = p
 		}
-		return moc.countForFetchRequest(f, error: nil) > 0
-	}
-
-	private class func excludeGroupedRepos(p: NSPredicate, inMoc: NSManagedObjectContext) -> NSPredicate {
-		let groupLabels = allGroupLabels
-		if groupLabels.count > 0 {
-			var andPredicates = [NSPredicate]()
-			for g in allGroupLabels {
-				let rp = NSPredicate(format: "groupLabel != %@", g)
-				andPredicates.append(rp)
-			}
-			return NSCompoundPredicate(andPredicateWithSubpredicates: andPredicates)
-		} else {
-			return p
-		}
+		let c = moc.countForFetchRequest(f, error: nil)
+		return c > 0
 	}
 
 	class func interestedInIssues(apiServerId: NSManagedObjectID? = nil) -> Bool {

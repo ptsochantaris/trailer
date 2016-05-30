@@ -46,7 +46,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 		application.setMinimumBackgroundFetchInterval(NSTimeInterval(Settings.backgroundRefreshPeriod))
 
 		atNextEvent(self) { S in
-			if Repo.visibleReposInMoc(mainObjectContext).count > 0 && ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
+			if DataManager.appIsConfigured {
 				if let localNotification = launchOptions?[UIApplicationLaunchOptionsLocalNotificationKey] as? UILocalNotification {
 					NotificationManager.handleLocalNotification(localNotification, action: nil)
 				}
@@ -286,7 +286,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 	}
 
 	func refreshTimerDone() {
-		if ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) && Repo.anyVisibleReposInMoc(mainObjectContext) {
+		if DataManager.appIsConfigured {
 			startRefresh()
 		}
 	}

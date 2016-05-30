@@ -287,6 +287,10 @@ final class DataManager {
 		} catch { /* no directory */ }
 	}
 
+	class var appIsConfigured: Bool {
+		return ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) && Repo.anyVisibleReposInMoc(mainObjectContext)
+	}
+
 	private static var _justMigrated = false
 
 	class func buildMainContext() -> NSManagedObjectContext {

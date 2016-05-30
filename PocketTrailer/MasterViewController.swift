@@ -66,7 +66,14 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	@IBAction func editSelected(sender: UIBarButtonItem ) {
 
-		let a = UIAlertController(title: "Mark all \(pluralNameForItems()) as read?", message: nil, preferredStyle: .Alert)
+		let promptTitle: String
+		if let l = currentTabBarSet?.viewCriterion?.label {
+			promptTitle = "\(pluralNameForItems().capitalizedString) in '\(l)'"
+		} else {
+			promptTitle = pluralNameForItems().capitalizedString
+		}
+
+		let a = UIAlertController(title: promptTitle, message: "Mark all as read?", preferredStyle: .Alert)
 		a.addAction(UIAlertAction(title: "No", style: .Cancel) { action in
 		})
 		a.addAction(UIAlertAction(title: "Yes", style: .Default) { [weak self] action in
@@ -526,10 +533,10 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 
 		if let i = tabs?.selectedItem?.image {
-			viewingPrs = i == UIImage(named: "prsTab")
+			viewingPrs = i == UIImage(named: "prsTab") // not proud of this :(
 		} else if let c = currentTabBarSet {
-			viewingPrs = c.tabItems.first?.image == UIImage(named: "prsTab")
-		} else if Repo.anyVisibleReposInMoc(mainObjectContext, criterion: currentTabBarSet?.viewCriterion) {
+			viewingPrs = c.tabItems.first?.image == UIImage(named: "prsTab") // or this :(
+		} else if Repo.anyVisibleReposInMoc(mainObjectContext, criterion: currentTabBarSet?.viewCriterion, excludeGrouped: true) {
 			viewingPrs = Repo.interestedInPrs(currentTabBarSet?.viewCriterion?.apiServerId)
 		} else {
 			viewingPrs = true

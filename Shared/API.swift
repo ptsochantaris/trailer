@@ -220,7 +220,7 @@ final class API {
 	func syncItemsForActiveReposAndCallback(callback: Completion) {
 		let syncContext = DataManager.tempContext()
 
-		let shouldRefreshReposToo = lastRepoCheck.isEqualToDate(never())
+		let shouldRefreshReposToo = lastRepoCheck == never()
 			|| (NSDate().timeIntervalSinceDate(lastRepoCheck) > NSTimeInterval(Settings.newRepoCheckPeriod*3600.0))
 			|| !Repo.anyVisibleReposInMoc(syncContext)
 
@@ -439,7 +439,7 @@ final class API {
 						}
 						if s.latestUserEventDateProcessed!.compare(eventDate) == .OrderedAscending {
 							s.latestUserEventDateProcessed = eventDate
-							if latestDate!.isEqualToDate(never()) {
+							if latestDate! == never() {
 								DLog("(%@) First sync, all repos are dirty so we don't need to read further, we have the latest received event date: %@", serverLabel, eventDate)
 								return true
 							}
@@ -487,7 +487,7 @@ final class API {
 						}
 						if s.latestReceivedEventDateProcessed!.compare(eventDate) == .OrderedAscending {
 							s.latestReceivedEventDateProcessed = eventDate
-							if latestDate!.isEqualToDate(never()) {
+							if latestDate! == never() {
 								DLog("(%@) First sync, all repos are dirty so we don't need to read further, we have the latest received event date: %@", serverLabel, eventDate)
 								return true
 							}

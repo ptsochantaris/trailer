@@ -102,7 +102,7 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 				unreadGroup.setAlpha(1.0)
 			}
 
-			if let lastRefresh = result["lastUpdated"] as? NSDate where !lastRefresh.isEqualToDate(never()) {
+			if let lastRefresh = result["lastUpdated"] as? NSDate where lastRefresh != never() {
 				lastUpdate.setText(shortDateFormatter.stringFromDate(lastRefresh))
 			} else {
 				lastUpdate.setText("Not refreshed yet")
