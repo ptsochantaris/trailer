@@ -450,9 +450,14 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	func unPinSelectedFor(item: ListableItem) {
+		let relatedMenus = relatedMenusFor(item)
 		mainObjectContext.deleteObject(item)
 		DataManager.saveDB()
-		updateRelatedMenusFor(item)
+		if item is PullRequest {
+			relatedMenus.forEach { $0.updatePrMenu() }
+		} else if item is Issue {
+			relatedMenus.forEach { $0.updateIssuesMenu() }
+		}
 	}
 
 	override func controlTextDidChange(n: NSNotification) {
@@ -638,9 +643,16 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	func updateRelatedMenusFor(i: ListableItem) {
-		for d in menuBarSets {
-			d.updateMenuIfRelatedTo(i)
+		let relatedMenus = relatedMenusFor(i)
+		if i is PullRequest {
+			relatedMenus.forEach { $0.updatePrMenu() }
+		} else if i is Issue {
+			relatedMenus.forEach { $0.updateIssuesMenu() }
 		}
+	}
+
+	private func relatedMenusFor(i: ListableItem) -> [MenuBarSet] {
+		return menuBarSets.flatMap{ ($0.viewCriterion?.isRelatedTo(i) ?? true) ? $0 : nil }
 	}
 
 	func updateAllMenus() {

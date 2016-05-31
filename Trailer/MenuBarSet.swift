@@ -23,16 +23,6 @@ final class MenuBarSet {
 		issuesMenu.delegate = delegate
 	}
 
-	func updateMenuIfRelatedTo(i: ListableItem) {
-		if viewCriterion?.isRelatedTo(i) ?? true {
-			if i is PullRequest {
-				updatePrMenu()
-			} else {
-				updateIssuesMenu()
-			}
-		}
-	}
-
 	func throwAway() {
 		prMenu.hideStatusItem()
 		prMenu.close()
