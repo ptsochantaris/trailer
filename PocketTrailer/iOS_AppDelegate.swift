@@ -5,7 +5,6 @@ var app: iOS_AppDelegate!
 
 final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 
-	var enteringForeground = true
 	var window: UIWindow?
 
 	private var lastUpdateFailed = false
@@ -14,6 +13,19 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 	private var refreshTimer: NSTimer?
 	private var backgroundCallback: ((UIBackgroundFetchResult) -> Void)?
 
+	private var justPostedNotificationTimer: PopTimer!
+	var justPostedNotifications = false {
+		didSet {
+			if justPostedNotifications {
+				if UIApplication.sharedApplication().applicationState != .Background {
+					justPostedNotificationTimer.push()
+				} else {
+					justPostedNotifications = false
+				}
+			}
+		}
+	}
+
 	func updateBadge() {
 		UIApplication.sharedApplication().applicationIconBadgeNumber = PullRequest.badgeCountInMoc(mainObjectContext) + Issue.badgeCountInMoc(mainObjectContext)
 		watchManager?.updateContext()
@@ -21,6 +33,9 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 
 	func application(application: UIApplication, willFinishLaunchingWithOptions launchOptions: [NSObject : AnyObject]?) -> Bool {
 		app = self
+		justPostedNotificationTimer = PopTimer(timeInterval: 2) { [weak self] in
+			self?.justPostedNotifications = false
+		}
 		return true
 	}
 
@@ -143,12 +158,8 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 		NSNotificationCenter.defaultCenter().removeObserver(self)
 	}
 
-	func applicationWillResignActive(application: UIApplication) {
-		enteringForeground = true
-	}
-
 	func application(application: UIApplication, didReceiveLocalNotification notification: UILocalNotification) {
-		if enteringForeground {
+		if !justPostedNotifications {
 			NotificationManager.handleLocalNotification(notification, action: nil)
 		}
 	}
@@ -290,7 +301,6 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 	}
 
 	func applicationDidBecomeActive(application: UIApplication) {
-		enteringForeground = false
 		startRefreshIfItIsDue()
 	}
 

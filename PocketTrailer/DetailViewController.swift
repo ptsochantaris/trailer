@@ -9,7 +9,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 	private var webView: WKWebView?
 
 	var isVisible = false
-	var catchupWithDataItemWhenLoaded : NSManagedObjectID?
+	var catchupWithDataItemWhenLoaded: NSManagedObjectID?
 
 	var detailItem: NSURL? {
 		didSet {
@@ -55,7 +55,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 
 	override func traitCollectionDidChange(previousTraitCollection: UITraitCollection?) {
 		super.traitCollectionDidChange(previousTraitCollection)
-		navigationItem.leftBarButtonItem = (traitCollection.horizontalSizeClass==UIUserInterfaceSizeClass.Compact) ? nil : splitViewController?.displayModeButtonItem()
+		navigationItem.leftBarButtonItem = (traitCollection.horizontalSizeClass == .Compact) ? nil : splitViewController?.displayModeButtonItem()
 	}
 
 	override func viewWillAppear(animated: Bool) {
@@ -77,7 +77,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 	func webView(webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
 		spinner.startAnimating()
 		statusLabel.hidden = true
-		statusLabel.text = ""
+		statusLabel.text = nil
 		webView.hidden = true
 		title = "Loading..."
 		navigationItem.rightBarButtonItem = nil
@@ -85,11 +85,10 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 	}
 
 	func webView(webView: WKWebView, decidePolicyForNavigationResponse navigationResponse: WKNavigationResponse, decisionHandler: (WKNavigationResponsePolicy) -> Void) {
-		let res = navigationResponse.response as! NSHTTPURLResponse
-		if res.statusCode == 404 {
+		if let res = navigationResponse.response as? NSHTTPURLResponse where res.statusCode == 404 {
 			showMessage("Not Found", "\nPlease ensure you are logged in with the correct account on GitHub\n\nIf you are using two-factor auth: There is a bug between GitHub and iOS which may cause your login to fail.  If it happens, temporarily disable two-factor auth and log in from here, then re-enable it afterwards.  You will only need to do this once.")
 		}
-		decisionHandler(WKNavigationResponsePolicy.Allow)
+		decisionHandler(.Allow)
 	}
 
 	func webView(webView: WKWebView, didFinishNavigation navigation: WKNavigation!) {
@@ -98,7 +97,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 		webView.hidden = false
 		navigationItem.rightBarButtonItem?.enabled = true
 		title = webView.title
-		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Action, target: self, action: #selector(DetailViewController.shareSelected))
+		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Action, target: self, action: #selector(DetailViewController.shareSelected))
 		api.networkIndicationEnd()
 
 		catchupWithComments()
@@ -128,10 +127,11 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 	}
 
 	func focusOnMaster() {
+		let m = popupManager.getMasterController()
 		if splitViewController?.collapsed ?? true {
-			popupManager.getMasterController().navigationController?.popViewControllerAnimated(true)
+			m.navigationController?.popViewControllerAnimated(true)
 		}
-		popupManager.getMasterController().becomeFirstResponder()
+		m.becomeFirstResponder()
 	}
 
 	private func catchupWithComments() {
@@ -159,7 +159,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 		statusLabel.hidden = false
 		webView?.hidden = true
 		title = "Error"
-		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Refresh, target: self, action: #selector(DetailViewController.configureView))
+		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Refresh, target: self, action: #selector(DetailViewController.configureView))
 		api.networkIndicationEnd()
 	}
 
