@@ -99,12 +99,7 @@ final class PRComment: DataItem {
 	}
 
 	var notificationSubtitle: String {
-		if let pr = pullRequest, title = pr.title {
-			return title
-		} else if let i = issue, title = i.title {
-			return title
-		}
-		return "(untitled)"
+		return pullRequest?.title ?? issue?.title ?? "(untitled)"
 	}
 
 	var parentShouldSkipNotifications: Bool {

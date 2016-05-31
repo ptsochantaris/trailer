@@ -203,6 +203,15 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		let notification = NSUserNotification()
 		notification.userInfo = DataManager.infoForType(type, item: forItem)
 
+		func addPotentialExtraActions() {
+			if #available(OSX 10.10, *) {
+				notification.additionalActions = [
+					NSUserNotificationAction(identifier: "mute", title: "Mute this item"),
+					NSUserNotificationAction(identifier: "read", title: "Mark this item as read")
+				]
+			}
+		}
+
 		switch type {
 		case .NewMention:
 			let c = forItem as! PRComment
@@ -210,38 +219,42 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			notification.title = "@\(S(c.userName)) mentioned you:"
 			notification.subtitle = c.notificationSubtitle
 			notification.informativeText = c.body
-			addPotentialExtraActions(notification)
+			addPotentialExtraActions()
 		case .NewComment:
 			let c = forItem as! PRComment
 			if c.parentShouldSkipNotifications { return }
 			notification.title = "@\(S(c.userName)) commented:"
 			notification.subtitle = c.notificationSubtitle
 			notification.informativeText = c.body
-			addPotentialExtraActions(notification)
+			addPotentialExtraActions()
 		case .NewPr:
 			let p = forItem as! PullRequest
 			if p.shouldSkipNotifications { return }
 			notification.title = "New PR"
-			notification.subtitle = p.title
-			addPotentialExtraActions(notification)
+			notification.subtitle = p.repo.fullName
+			notification.informativeText = p.title
+			addPotentialExtraActions()
 		case .PrReopened:
 			let p = forItem as! PullRequest
 			if p.shouldSkipNotifications { return }
 			notification.title = "Re-Opened PR"
-			notification.subtitle = p.title
-			addPotentialExtraActions(notification)
+			notification.subtitle = p.repo.fullName
+			notification.informativeText = p.title
+			addPotentialExtraActions()
 		case .PrMerged:
 			let p = forItem as! PullRequest
 			if p.shouldSkipNotifications { return }
 			notification.title = "PR Merged!"
-			notification.subtitle = p.title
-			addPotentialExtraActions(notification)
+			notification.subtitle = p.repo.fullName
+			notification.informativeText = p.title
+			addPotentialExtraActions()
 		case .PrClosed:
 			let p = forItem as! PullRequest
 			if p.shouldSkipNotifications { return }
 			notification.title = "PR Closed"
-			notification.subtitle = p.title
-			addPotentialExtraActions(notification)
+			notification.subtitle = p.repo.fullName
+			notification.informativeText = p.title
+			addPotentialExtraActions()
 		case .NewRepoSubscribed:
 			notification.title = "New Repository Subscribed"
 			notification.subtitle = (forItem as! Repo).fullName
@@ -252,39 +265,44 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			let p = forItem as! PullRequest
 			if p.shouldSkipNotifications { return } // unmute on assignment option?
 			notification.title = "PR Assigned"
-			notification.subtitle = p.title
-			addPotentialExtraActions(notification)
+			notification.subtitle = p.repo.fullName
+			notification.informativeText = p.title
+			addPotentialExtraActions()
 		case .NewStatus:
 			let s = forItem as! PRStatus
 			if s.parentShouldSkipNotifications { return }
 			notification.title = "PR Status Update"
-			notification.subtitle = s.pullRequest.title
-			notification.informativeText = s.descriptionText
-			addPotentialExtraActions(notification)
+			notification.subtitle = s.descriptionText
+			notification.informativeText = s.pullRequest.title
+			addPotentialExtraActions()
 		case .NewIssue:
 			let i = forItem as! Issue
 			if i.shouldSkipNotifications { return }
 			notification.title = "New Issue"
-			notification.subtitle = i.title
-			addPotentialExtraActions(notification)
+			notification.subtitle = i.repo.fullName
+			notification.informativeText = i.title
+			addPotentialExtraActions()
 		case .IssueReopened:
 			let i = forItem as! Issue
 			if i.shouldSkipNotifications { return }
 			notification.title = "Re-Opened Issue"
-			notification.subtitle = i.title
-			addPotentialExtraActions(notification)
+			notification.subtitle = i.repo.fullName
+			notification.informativeText = i.title
+			addPotentialExtraActions()
 		case .IssueClosed:
 			let i = forItem as! Issue
 			if i.shouldSkipNotifications { return }
 			notification.title = "Issue Closed"
-			notification.subtitle = i.title
-			addPotentialExtraActions(notification)
+			notification.subtitle = i.repo.fullName
+			notification.informativeText = i.title
+			addPotentialExtraActions()
 		case .NewIssueAssigned:
 			let i = forItem as! Issue
 			if i.shouldSkipNotifications { return }
 			notification.title = "Issue Assigned"
-			notification.subtitle = i.title
-			addPotentialExtraActions(notification)
+			notification.subtitle = i.repo.fullName
+			notification.informativeText = i.title
+			addPotentialExtraActions()
 		}
 
 		let t = S(notification.title)
@@ -293,24 +311,13 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		notification.identifier = "\(t) - \(s) - \(i)"
 
 		let d = NSUserNotificationCenter.defaultUserNotificationCenter()
-		if (type == .NewComment || type == .NewMention) && !Settings.hideAvatars {
-			if let c = forItem as? PRComment, url = c.avatarUrl {
-				api.haveCachedAvatar(url) { image, _ in
-					notification.contentImage = image
-					d.deliverNotification(notification)
-				}
+		if let c = forItem as? PRComment, url = c.avatarUrl where !Settings.hideAvatars {
+			api.haveCachedAvatar(url) { image, _ in
+				notification.contentImage = image
+				d.deliverNotification(notification)
 			}
-		} else { // proceed as normal
+		} else {
 			d.deliverNotification(notification)
-		}
-	}
-
-	private func addPotentialExtraActions(n: NSUserNotification) {
-		if #available(OSX 10.10, *) {
-			n.additionalActions = [
-				NSUserNotificationAction(identifier: "mute", title: "Mute this item"),
-				NSUserNotificationAction(identifier: "read", title: "Mark this item as read")
-			]
 		}
 	}
 
