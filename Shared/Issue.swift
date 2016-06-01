@@ -97,14 +97,20 @@ final class Issue: ListableItem {
 		}
 	}
 
-	class func badgeCountInMoc(moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
+	class func badgeCountInMoc(moc: NSManagedObjectContext) -> Int {
+		let f = NSFetchRequest(entityName: "Issue")
+		f.predicate = NSPredicate(format: "sectionIndex > 0 and unreadComments > 0")
+		return badgeCountFromFetch(f, inMoc: moc)
+	}
+
+	class func badgeCountInMoc(moc: NSManagedObjectContext, criterion: GroupingCriterion?) -> Int {
 		let f = requestForItemsOfType("Issue", withFilter: nil, sectionIndex: -1, criterion: criterion)
 		return badgeCountFromFetch(f, inMoc: moc)
 	}
 
 	class func badgeCountInSection(section: Section, moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest(entityName: "Issue")
-		f.predicate = NSPredicate(format: "sectionIndex == %d", section.rawValue)
+		f.predicate = NSPredicate(format: "sectionIndex == %d and unreadComments > 0", section.rawValue)
 		return badgeCountFromFetch(f, inMoc: moc)
 	}
 

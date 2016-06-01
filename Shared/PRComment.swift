@@ -58,7 +58,8 @@ final class PRComment: DataItem {
 					DLog("Waking up snoozed item ID %@ because of posted comment", item.serverId)
 					item.wakeUp()
 				}
-				if !Settings.disableAllCommentNotifications && item.showNewComments && !isMine {
+				let notifyForNewComments = (item.sectionIndex?.integerValue != Section.All.rawValue) || Settings.showCommentsEverywhere
+				if notifyForNewComments && !Settings.disableAllCommentNotifications && !isMine {
 					if let authorName = userName {
 						var blocked = false
 						for blockedAuthor in Settings.commentAuthorBlacklist as [String] {

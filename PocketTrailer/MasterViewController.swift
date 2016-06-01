@@ -224,6 +224,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		n.addObserver(self, selector: #selector(MasterViewController.updateStatus), name:REFRESH_ENDED_NOTIFICATION, object: nil)
 
 		updateTabItems(false)
+		tableView.reloadData() // ensure footers are correct
 	}
 
 	override func canBecomeFirstResponder() -> Bool {

@@ -11,7 +11,7 @@ final class PullRequestCell: TrailerCell {
 
 		unselectedTitleColor = goneDark ? NSColor.controlHighlightColor() : NSColor.controlTextColor()
 
-		let _commentsNew = pullRequest.showNewComments ? pullRequest.unreadComments?.integerValue ?? 0 : 0
+		let _commentsNew = pullRequest.unreadComments?.integerValue ?? 0
 		let _commentsTotal = pullRequest.totalComments?.integerValue ?? 0
 
 		let _title = pullRequest.titleWithFont(titleFont, labelFont: detailFont, titleColor: unselectedTitleColor)

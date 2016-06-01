@@ -160,7 +160,7 @@ final class PRCell: UITableViewCell {
 
 	private func setCountsImageAndFade(item: ListableItem, _ muted: Bool) {
 		let _commentsTotal = item.totalComments?.integerValue ?? 0
-		let _commentsNew = item.showNewComments ? item.unreadComments?.integerValue ?? 0 : 0
+		let _commentsNew = item.unreadComments?.integerValue ?? 0
 		let fade = muted || item.isSnoozing
 
 		readCount.text = itemCountFormatter.stringFromNumber(_commentsTotal)

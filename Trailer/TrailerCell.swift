@@ -113,6 +113,18 @@ class TrailerCell: NSTableCellView {
 			c.keyEquivalentModifierMask = cmd
 		}
 
+		if item.snoozeUntil == nil {
+			if item.unreadComments?.integerValue > 0 {
+				if let c = m.addItemWithTitle("Mark as read", action: #selector(TrailerCell.markReadSelected), keyEquivalent: "a") {
+					c.keyEquivalentModifierMask = cmd
+				}
+			} else {
+				if let c = m.addItemWithTitle("Mark as unread", action: #selector(TrailerCell.markUnreadSelected), keyEquivalent: "a") {
+					c.keyEquivalentModifierMask = cmd
+				}
+			}
+		}
+
 		if let s = item.sectionIndex?.integerValue, section = Section(rawValue: s) where !(section == .Closed || section == .Merged) {
 
 			if let snooze = item.snoozeUntil {
@@ -127,16 +139,6 @@ class TrailerCell: NSTableCellView {
 				}
 			} else {
 
-				if item.unreadComments?.integerValue > 0 {
-					if let c = m.addItemWithTitle("Mark as read", action: #selector(TrailerCell.markReadSelected), keyEquivalent: "a") {
-						c.keyEquivalentModifierMask = cmd
-					}
-				} else {
-					if let c = m.addItemWithTitle("Mark as unread", action: #selector(TrailerCell.markUnreadSelected), keyEquivalent: "a") {
-						c.keyEquivalentModifierMask = cmd
-					}
-				}
-				
 				if muted {
 					if let c = m.addItemWithTitle("Un-Mute", action: #selector(TrailerCell.unMuteSelected), keyEquivalent: "m") {
 						c.keyEquivalentModifierMask = cmd

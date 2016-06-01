@@ -133,6 +133,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		DLog("System woke up")
 		systemSleeping = false
 		delay(1, self) { S in
+			S.updateDarkMode()
 			S.startRefreshIfItIsDue()
 		}
 	}
@@ -984,12 +985,13 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 	var darkMode = false
 	func updateDarkMode() {
+		if !systemSleeping {
+			// kick the NSAppearance mechanism into action
+			let s = NSStatusBar.systemStatusBar().statusItemWithLength(NSVariableStatusItemLength)
+			s.statusBar.removeStatusItem(s)
 
-		// kick the NSAppearance mechanism into action
-		let s = NSStatusBar.systemStatusBar().statusItemWithLength(NSVariableStatusItemLength)
-		s.statusBar.removeStatusItem(s)
-
-		setupWindows()
+			setupWindows()
+		}
 	}
 
 	// Server display list

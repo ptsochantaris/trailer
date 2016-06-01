@@ -11,7 +11,7 @@ final class IssueCell: TrailerCell {
 
 		unselectedTitleColor = goneDark ? NSColor.controlHighlightColor() : NSColor.controlTextColor()
 
-		let _commentsNew = issue.showNewComments ? issue.unreadComments?.integerValue ?? 0 : 0
+		let _commentsNew = issue.unreadComments?.integerValue ?? 0
 		let _commentsTotal = issue.totalComments?.integerValue ?? 0
 
 		let _title = issue.titleWithFont(titleFont, labelFont: detailFont, titleColor: unselectedTitleColor)

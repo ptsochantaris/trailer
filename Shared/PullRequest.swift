@@ -110,7 +110,13 @@ final class PullRequest: ListableItem {
 
 	class func badgeCountInSection(section: Section, moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest(entityName: "PullRequest")
-		f.predicate = NSPredicate(format: "sectionIndex == %d", section.rawValue)
+		f.predicate = NSPredicate(format: "sectionIndex == %d and unreadComments > 0", section.rawValue)
+		return badgeCountFromFetch(f, inMoc: moc)
+	}
+
+	class func badgeCountInMoc(moc: NSManagedObjectContext) -> Int {
+		let f = NSFetchRequest(entityName: "PullRequest")
+		f.predicate = NSPredicate(format: "sectionIndex > 0 and unreadComments > 0")
 		return badgeCountFromFetch(f, inMoc: moc)
 	}
 

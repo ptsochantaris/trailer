@@ -98,18 +98,22 @@ class ListableItem: DataItem {
 		})
 	}
 
-	final func catchUpWithComments() {
+	final private func catchUpCommentDate() {
 		for c in comments {
-			if let creation = c.createdAt {
+			if let commentCreation = c.createdAt {
 				if let latestRead = latestReadCommentDate {
-					if latestRead.compare(creation) == .OrderedAscending {
-						latestReadCommentDate = creation
+					if latestRead.compare(commentCreation) == .OrderedAscending {
+						latestReadCommentDate = commentCreation
 					}
 				} else {
-					latestReadCommentDate = creation
+					latestReadCommentDate = commentCreation
 				}
 			}
 		}
+	}
+
+	final func catchUpWithComments() {
+		catchUpCommentDate()
 		postProcess()
 	}
 
@@ -172,11 +176,6 @@ class ListableItem: DataItem {
 		return self.sectionIndex?.integerValue != Section.None.rawValue
 	}
 
-	final var showNewComments: Bool {
-		let s = sectionIndex?.integerValue
-		return Settings.showCommentsEverywhere || s == Section.Mine.rawValue || s == Section.Participated.rawValue || s == Section.Mentioned.rawValue
-	}
-
 	final func wakeUp() {
 		snoozeUntil = nil
 		postProcess()
@@ -187,6 +186,9 @@ class ListableItem: DataItem {
 	}
 
 	final func keepWithCondition(newCondition: ItemCondition, notification: NotificationType) {
+		if sectionIndex?.integerValue == Section.All.rawValue && !Settings.showCommentsEverywhere {
+			catchUpCommentDate()
+		}
 		postSyncAction = PostSyncAction.DoNothing.rawValue
 		condition = newCondition.rawValue
 		if snoozeUntil != nil {
@@ -241,9 +243,6 @@ class ListableItem: DataItem {
 			}
 		}
 
-		let f = NSFetchRequest(entityName: "PRComment")
-		f.returnsObjectsAsFaults = false
-
 		let latestDate = latestReadCommentDate
 		let isMuted = muted?.boolValue ?? false
 
@@ -252,10 +251,13 @@ class ListableItem: DataItem {
 			if isMuted {
 				unreadComments = 0
 			} else {
+				let f = NSFetchRequest(entityName: "PRComment")
 				f.predicate = predicateForOthersCommentsSinceDate(latestDate)
 				unreadComments = managedObjectContext?.countForFetchRequest(f, error: nil)
 			}
 		} else if doReferralCheckInComments {
+			let f = NSFetchRequest(entityName: "PRComment")
+			f.returnsObjectsAsFaults = false
 			f.predicate = predicateForOthersCommentsSinceDate(nil)
 			var unreadCommentCount: Int = 0
 			for c in try! managedObjectContext?.executeFetchRequest(f) as! [PRComment] {
@@ -272,11 +274,12 @@ class ListableItem: DataItem {
 					}
 				}
 			}
-			unreadComments = unreadCommentCount
+			unreadComments = (targetSection == .All && !Settings.showCommentsEverywhere) ? 0 : unreadCommentCount
 		} else {
-			if isMuted {
+			if isMuted || (targetSection == .All && !Settings.showCommentsEverywhere) {
 				unreadComments = 0
 			} else {
+				let f = NSFetchRequest(entityName: "PRComment")
 				f.predicate = predicateForOthersCommentsSinceDate(latestDate)
 				unreadComments = managedObjectContext?.countForFetchRequest(f, error: nil)
 			}
@@ -476,10 +479,9 @@ class ListableItem: DataItem {
 
 	final class func badgeCountFromFetch(f: NSFetchRequest, inMoc: NSManagedObjectContext) -> Int {
 		var badgeCount:Int = 0
+		f.returnsObjectsAsFaults = false
 		for i in try! inMoc.executeFetchRequest(f) as! [ListableItem] {
-			if i.showNewComments {
-				badgeCount += (i.unreadComments?.integerValue ?? 0)
-			}
+			badgeCount += (i.unreadComments?.integerValue ?? 0)
 		}
 		return badgeCount
 	}
