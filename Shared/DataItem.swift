@@ -156,6 +156,10 @@ class DataItem: NSManagedObject {
 				andPredicates.append(p)
 			}
 		}
-		toFetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: andPredicates)
+		if andPredicates.count == 1 {
+			toFetchRequest.predicate = andPredicates.first
+		} else {
+			toFetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: andPredicates)
+		}
 	}
 }

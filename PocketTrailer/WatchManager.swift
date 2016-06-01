@@ -44,6 +44,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			s.startBGTask()
 
 			switch(S(message["command"] as? String)) {
+
 			case "refresh":
 				let lastSuccessfulSync = Settings.lastSuccessfulRefresh ?? NSDate()
 				app.startRefresh()
@@ -180,17 +181,12 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			showStatuses = false
 		}
 
-		let f = ListableItem.requestForItemsOfType(entity, withFilter: nil, sectionIndex: sectionIndex, onlyUnread: onlyUnread)
+		let f = ListableItem.requestForItemsOfType(entity, withFilter: nil, sectionIndex: sectionIndex, onlyUnread: onlyUnread, legacyMode: true)
 		f.fetchOffset = from
 		f.fetchLimit = count
 
-		let tempMoc = NSManagedObjectContext(concurrencyType: .MainQueueConcurrencyType)
-		tempMoc.persistentStoreCoordinator = mainObjectContext.persistentStoreCoordinator
-		tempMoc.undoManager = nil
-		let r = try! tempMoc.executeFetchRequest(f) as! [ListableItem]
-
 		var items = [[String : AnyObject]]()
-		for item in r {
+		for item in try! mainObjectContext.executeFetchRequest(f) as! [ListableItem] {
 			items.append(baseDataForItem(item, showStatuses: showStatuses, showLabels: showLabels))
 		}
 		replyHandler(["result" : items])
