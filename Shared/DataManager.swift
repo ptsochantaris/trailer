@@ -91,7 +91,7 @@ final class DataManager {
 			let files = try fm.contentsOfDirectoryAtPath(oldDocumentsDirectory)
 			DLog("Migrating DB files into group container from %@ to %@", oldDocumentsDirectory, newDocumentsDirectory)
 			for file in files {
-				if file.rangeOfString("Trailer.sqlite") != nil {
+				if file.containsString("Trailer.sqlite") {
 					DLog("Moving database file: %@",file)
 					let oldPath = oldDocumentsDirectory.stringByAppendingPathComponent(file)
 					let newPath = newDocumentsDirectory.stringByAppendingPathComponent(file)
@@ -279,7 +279,7 @@ final class DataManager {
 		let documentsDirectory = dataFilesDirectory().path!
 		do {
 			for file in try fm.contentsOfDirectoryAtPath(documentsDirectory) {
-				if file.rangeOfString("Trailer.sqlite") != nil {
+				if file.containsString("Trailer.sqlite") {
 					DLog("Removing old database file: %@",file)
 					try! fm.removeItemAtPath(documentsDirectory.stringByAppendingPathComponent(file))
 				}

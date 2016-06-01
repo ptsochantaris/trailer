@@ -58,13 +58,13 @@ final class CacheEntry: NSManagedObject {
 		}
 	}
 
-	class func cleanOldEntries() {
+	class func cleanOldEntriesInMoc(moc: NSManagedObjectContext) {
 		let f = NSFetchRequest(entityName: "CacheEntry")
 		f.returnsObjectsAsFaults = true
 		f.predicate = NSPredicate(format: "lastTouched < %@", NSDate().dateByAddingTimeInterval(-3600.0*24.0*7.0)) // week-old
-		for e in try! mainObjectContext.executeFetchRequest(f) as! [CacheEntry] {
+		for e in try! moc.executeFetchRequest(f) as! [CacheEntry] {
 			DLog("Expiring unused cache entry for key %@", e.key)
-			mainObjectContext.deleteObject(e)
+			moc.deleteObject(e)
 		}
 	}
 

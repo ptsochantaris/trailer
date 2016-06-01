@@ -217,7 +217,7 @@ final class API {
 
 	////////////////////////////////////// API interface
 
-	func syncItemsForActiveReposAndCallback(callback: Completion) {
+	func syncItemsForActiveReposAndCallback(processingCallback: Completion?, callback: Completion) {
 		let syncContext = DataManager.tempContext()
 
 		let shouldRefreshReposToo = lastRepoCheck == never()
@@ -226,19 +226,20 @@ final class API {
 
 		if shouldRefreshReposToo {
 			fetchRepositoriesToMoc(syncContext) { [weak self] in
-				self?.syncToMoc(syncContext, callback: callback)
+				self?.syncToMoc(syncContext, processingCallback: processingCallback, callback: callback)
 			}
 		} else {
 			ApiServer.resetSyncSuccessInMoc(syncContext)
 			ensureApiServersHaveUserIdsInMoc(syncContext) { [weak self] in
-				self?.syncToMoc(syncContext, callback: callback)
+				self?.syncToMoc(syncContext, processingCallback: processingCallback, callback: callback)
 			}
 		}
 	}
 
-	private func syncToMoc(moc: NSManagedObjectContext, callback: Completion) {
+	private func syncToMoc(moc: NSManagedObjectContext, processingCallback: Completion?, callback: Completion) {
 
 		markDirtyReposInMoc(moc) { [weak self] in
+			guard let S = self else { return }
 
 			let repos = Repo.syncableReposInMoc(moc)
 
@@ -247,20 +248,21 @@ final class API {
 			let completionCallback: Completion = {
 				completionCount += 1
 				if completionCount == totalOperations {
+					processingCallback?()
 					for r in repos { r.dirty = false }
-					self?.completeSyncInMoc(moc, andCallback: callback)
+					S.completeSyncInMoc(moc, andCallback: callback)
 				}
 			}
 
-			self?.fetchIssuesForRepos(repos, toMoc: moc) {
-				self?.fetchCommentsForCurrentIssuesToMoc(moc) {
-					self?.checkIssueClosuresInMoc(moc)
+			S.fetchIssuesForRepos(repos, toMoc: moc) {
+				S.fetchCommentsForCurrentIssuesToMoc(moc) {
+					S.checkIssueClosuresInMoc(moc)
 					completionCallback()
 				}
 			}
 
-			self?.fetchPullRequestsForRepos(repos, toMoc: moc) {
-				self?.updatePullRequestsInMoc(moc) {
+			S.fetchPullRequestsForRepos(repos, toMoc: moc) {
+				S.updatePullRequestsInMoc(moc) {
 					completionCallback()
 				}
 			}
@@ -283,7 +285,7 @@ final class API {
 
 		mainQueue.addOperationWithBlock {
 			DataItem.nukeDeletedItemsInMoc(moc)
-			CacheEntry.cleanOldEntries()
+			CacheEntry.cleanOldEntriesInMoc(moc)
 		}
 
 		for r in DataItem.itemsOfType("PullRequest", surviving: true, inMoc: moc) as! [PullRequest] {
@@ -1301,7 +1303,7 @@ final class API {
 					}
 
 					if let linkHeader = allHeaders["Link"] as? String {
-						lastPage = linkHeader.rangeOfString("rel=\"next\"") == nil
+						lastPage = !linkHeader.containsString("rel=\"next\"")
 					}
 
 					NSNotificationCenter.defaultCenter().postNotificationName(API_USAGE_UPDATE, object: fromServer, userInfo: nil)
@@ -1327,7 +1329,7 @@ final class API {
 	typealias ApiCompletion = (code: Int?, headers: [NSObject : AnyObject]?, data: AnyObject?, error: NSError?, shouldRetry: Bool) -> Void
 
 	private func api(
-		path:String,
+		path: String,
 		fromServer: ApiServer,
 		ignoreLastSync: Bool,
 		completion: ApiCompletion) {

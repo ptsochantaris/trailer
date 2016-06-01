@@ -115,10 +115,8 @@ final class PRComment: DataItem {
 	}
 
 	var refersToMe: Bool {
-		if let userForServer = apiServer.userName where userId != apiServer.userId { // Ignore self-references
-			let rangeOfHandle = body?.rangeOfString("@\(userForServer)",
-				options: [.CaseInsensitiveSearch, .DiacriticInsensitiveSearch])
-			return rangeOfHandle != nil
+		if let userForServer = apiServer.userName, b = body where userId != apiServer.userId { // Ignore self-references
+			return b.localizedCaseInsensitiveContainsString("@\(userForServer)")
 		}
 		return false
 	}
@@ -127,8 +125,9 @@ final class PRComment: DataItem {
 		if let b = body {
 			for t in apiServer.teams {
 				if let r = t.calculatedReferral {
-					let range = b.rangeOfString(r, options: [.CaseInsensitiveSearch, .DiacriticInsensitiveSearch])
-					if range != nil { return true }
+					if b.localizedCaseInsensitiveContainsString(r) {
+						return true
+					}
 				}
 			}
 		}

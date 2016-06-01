@@ -16,8 +16,8 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		if repo == nil {
-			repoNameTitle.text = "All Repositories (You don't need to pick values for every group below, you can set only a specific group if you prefer)"
-			tableView.tableFooterView = nil
+			repoNameTitle.text = "All Repositories (You don't need to pick values for each setting below, you can set only a specific setting if you prefer)"
+			groupField.hidden = true
 		} else {
 			repoNameTitle.text = repo?.fullName
 			groupField.text = repo?.groupLabel
@@ -140,7 +140,6 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
 
 	override func viewWillDisappear(animated: Bool) {
 		super.viewWillDisappear(animated)
-		if groupField == nil { return }
 		let newText = (groupField.text?.isEmpty ?? true) ? nil : groupField.text
 		if let r = repo where r.groupLabel != newText {
 			r.groupLabel = newText

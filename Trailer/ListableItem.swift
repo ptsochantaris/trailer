@@ -145,8 +145,7 @@ class ListableItem: DataItem {
 
 	final var refersToMe: Bool {
 		if let apiName = apiServer.userName, b = body {
-			let range = b.rangeOfString("@\(apiName)", options: [.CaseInsensitiveSearch, .DiacriticInsensitiveSearch])
-			return range != nil
+			return b.localizedCaseInsensitiveContainsString("@\(apiName)")
 		}
 		return false
 	}
@@ -164,8 +163,7 @@ class ListableItem: DataItem {
 		if let b = body {
 			for t in apiServer.teams {
 				if let r = t.calculatedReferral {
-					let range = b.rangeOfString(r, options: [.CaseInsensitiveSearch, .DiacriticInsensitiveSearch])
-					if range != nil { return true }
+					if b.localizedCaseInsensitiveContainsString(r) { return true }
 				}
 			}
 		}

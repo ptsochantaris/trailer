@@ -19,7 +19,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 		if #available(OSX 10.10, *) {
 			let c = NSAppearance.currentAppearance()
-			darkMode = c.name.rangeOfString(NSAppearanceNameVibrantDark) != nil
+			darkMode = c.name.containsString(NSAppearanceNameVibrantDark)
 		}
 
 		for d in menuBarSets {
@@ -697,18 +697,19 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			d.allowRefresh = false
 		}
 
-		api.syncItemsForActiveReposAndCallback { [weak self] in
-			if let s = self {
-				for d in s.menuBarSets {
-					d.allowRefresh = true
-				}
+		api.syncItemsForActiveReposAndCallback(nil) { [weak self] in
 
-				if !ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext) {
-					Settings.lastSuccessfulRefresh = NSDate()
-				}
-				s.completeRefresh()
-				s.refreshTimer = NSTimer.scheduledTimerWithTimeInterval(NSTimeInterval(Settings.refreshPeriod), target: s, selector: #selector(OSX_AppDelegate.refreshTimerDone), userInfo: nil, repeats: false)
+			guard let s = self else { return }
+
+			for d in s.menuBarSets {
+				d.allowRefresh = true
 			}
+
+			if !ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext) {
+				Settings.lastSuccessfulRefresh = NSDate()
+			}
+			s.completeRefresh()
+			s.refreshTimer = NSTimer.scheduledTimerWithTimeInterval(NSTimeInterval(Settings.refreshPeriod), target: s, selector: #selector(OSX_AppDelegate.refreshTimerDone), userInfo: nil, repeats: false)
 		}
 	}
 

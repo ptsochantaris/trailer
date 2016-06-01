@@ -33,7 +33,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 
 	func application(application: UIApplication, willFinishLaunchingWithOptions launchOptions: [NSObject : AnyObject]?) -> Bool {
 		app = self
-		justPostedNotificationTimer = PopTimer(timeInterval: 2) { [weak self] in
+		justPostedNotificationTimer = PopTimer(timeInterval: 4) { [weak self] in
 			self?.justPostedNotifications = false
 		}
 		return true
@@ -240,47 +240,51 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 
 		prepareForRefresh()
 
-		api.syncItemsForActiveReposAndCallback { [weak self] in
+		api.syncItemsForActiveReposAndCallback({
 
-			if let s = self {
-				let success = !ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext)
+			popupManager.getMasterController().title = "Processing..."
 
-				s.lastUpdateFailed = !success
+		}) { [weak self] in
 
-				if success {
-					Settings.lastSuccessfulRefresh = NSDate()
-					preferencesDirty = false
+			guard let s = self else { return }
+
+			let success = !ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext)
+
+			s.lastUpdateFailed = !success
+
+			if success {
+				Settings.lastSuccessfulRefresh = NSDate()
+				preferencesDirty = false
+			}
+
+			s.checkApiUsage()
+			appIsRefreshing = false
+			NSNotificationCenter.defaultCenter().postNotificationName(REFRESH_ENDED_NOTIFICATION, object: nil)
+			DataManager.saveDB() // Ensure object IDs are permanent before sending notifications
+			DataManager.sendNotificationsIndexAndSave()
+
+			if !success && UIApplication.sharedApplication().applicationState == .Active {
+				showMessage("Refresh failed", "Loading the latest data from GitHub failed")
+			}
+
+			s.refreshTimer = NSTimer.scheduledTimerWithTimeInterval(NSTimeInterval(Settings.refreshPeriod), target: s, selector: #selector(iOS_AppDelegate.refreshTimerDone), userInfo: nil, repeats:false)
+			DLog("Refresh done")
+
+			s.updateBadge()
+			s.endBGTask()
+
+			if let bc = s.backgroundCallback {
+				if success && mainObjectContext.hasChanges {
+					DLog("Background fetch: Got new data")
+					bc(UIBackgroundFetchResult.NewData)
+				} else if success {
+					DLog("Background fetch: No new data")
+					bc(UIBackgroundFetchResult.NoData)
+				} else {
+					DLog("Background fetch: FAILED")
+					bc(UIBackgroundFetchResult.Failed)
 				}
-
-				s.checkApiUsage()
-				appIsRefreshing = false
-				NSNotificationCenter.defaultCenter().postNotificationName(REFRESH_ENDED_NOTIFICATION, object: nil)
-				DataManager.saveDB() // Ensure object IDs are permanent before sending notifications
-				DataManager.sendNotificationsIndexAndSave()
-
-				if !success && UIApplication.sharedApplication().applicationState == .Active {
-					showMessage("Refresh failed", "Loading the latest data from GitHub failed")
-				}
-
-				s.refreshTimer = NSTimer.scheduledTimerWithTimeInterval(NSTimeInterval(Settings.refreshPeriod), target: s, selector: #selector(iOS_AppDelegate.refreshTimerDone), userInfo: nil, repeats:false)
-				DLog("Refresh done")
-
-				s.updateBadge()
-				s.endBGTask()
-
-				if let bc = s.backgroundCallback {
-					if success && mainObjectContext.hasChanges {
-						DLog("Background fetch: Got new data")
-						bc(UIBackgroundFetchResult.NewData)
-					} else if success {
-						DLog("Background fetch: No new data")
-						bc(UIBackgroundFetchResult.NoData)
-					} else {
-						DLog("Background fetch: FAILED")
-						bc(UIBackgroundFetchResult.Failed)
-					}
-					s.backgroundCallback = nil
-				}
+				s.backgroundCallback = nil
 			}
 		}
 
