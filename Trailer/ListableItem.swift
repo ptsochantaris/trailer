@@ -241,46 +241,50 @@ class ListableItem: DataItem {
 			}
 		}
 
-		let latestDate = latestReadCommentDate
+		var latestDate = latestReadCommentDate ?? never()
 		let isMuted = muted?.boolValue ?? false
+
+		if Settings.assumeReadItemIfUserHasNewerComments {
+			let f = NSFetchRequest(entityName: "PRComment")
+			f.returnsObjectsAsFaults = false
+			f.predicate = predicateForMyCommentsSinceDate(latestDate)
+			for c in try! managedObjectContext?.executeFetchRequest(f) as! [PRComment] {
+				if let createdDate = c.createdAt where createdDate.compare(latestDate) == .OrderedDescending {
+					latestDate = createdDate
+				}
+			}
+			latestReadCommentDate = latestDate
+		}
+
+		func unreadFromOtherCommentsSinceLatestDate() -> Int {
+			let f = NSFetchRequest(entityName: "PRComment")
+			f.predicate = predicateForOthersCommentsSinceDate(latestDate)
+			return managedObjectContext?.countForFetchRequest(f, error: nil) ?? 0
+		}
+
+		let dontCountComments = isMuted || (targetSection == .All && !Settings.showCommentsEverywhere)
 
 		if moveToMentioned {
 			targetSection = .Mentioned
-			if isMuted {
-				unreadComments = 0
-			} else {
-				let f = NSFetchRequest(entityName: "PRComment")
-				f.predicate = predicateForOthersCommentsSinceDate(latestDate)
-				unreadComments = managedObjectContext?.countForFetchRequest(f, error: nil)
-			}
+			unreadComments = dontCountComments ? 0 : unreadFromOtherCommentsSinceLatestDate()
 		} else if doReferralCheckInComments {
 			let f = NSFetchRequest(entityName: "PRComment")
 			f.returnsObjectsAsFaults = false
 			f.predicate = predicateForOthersCommentsSinceDate(nil)
-			var unreadCommentCount: Int = 0
+			var unreadCommentCount = 0
 			for c in try! managedObjectContext?.executeFetchRequest(f) as! [PRComment] {
 				if (autoMoveOnCommentMentions && c.refersToMe) || (autoMoveOnTeamMentions && c.refersToMyTeams) {
 					targetSection = .Mentioned
 				}
-				if !isMuted {
-					if let l = latestDate {
-						if c.createdAt?.compare(l) == .OrderedDescending {
-							unreadCommentCount += 1
-						}
-					} else {
+				if !dontCountComments {
+					if c.createdAt?.compare(latestDate) == .OrderedDescending {
 						unreadCommentCount += 1
 					}
 				}
 			}
-			unreadComments = (targetSection == .All && !Settings.showCommentsEverywhere) ? 0 : unreadCommentCount
+			unreadComments = unreadCommentCount
 		} else {
-			if isMuted || (targetSection == .All && !Settings.showCommentsEverywhere) {
-				unreadComments = 0
-			} else {
-				let f = NSFetchRequest(entityName: "PRComment")
-				f.predicate = predicateForOthersCommentsSinceDate(latestDate)
-				unreadComments = managedObjectContext?.countForFetchRequest(f, error: nil)
-			}
+			unreadComments = dontCountComments ? 0 : unreadFromOtherCommentsSinceLatestDate()
 		}
 
 		totalComments = comments.count
@@ -454,29 +458,46 @@ class ListableItem: DataItem {
 		#endif
 	}
 
-	final func predicateForOthersCommentsSinceDate(optionalDate: NSDate?) -> NSPredicate {
+	final private func predicateForMyCommentsSinceDate(optionalDate: NSDate?) -> NSPredicate {
 
 		let userNumber = apiServer.userId?.longLongValue ?? 0
 
-		if self is Issue {
+		if self is PullRequest {
 			if let date = optionalDate {
-				return NSPredicate(format: "userId != %lld and issue == %@ and createdAt > %@", userNumber, self, date)
+				return NSPredicate(format: "userId == %lld and pullRequest == %@ and createdAt > %@", userNumber, self, date)
 			} else {
-				return NSPredicate(format: "userId != %lld and issue == %@", userNumber, self)
+				return NSPredicate(format: "userId == %lld and pullRequest == %@", userNumber, self)
 			}
-		} else if self is PullRequest {
+		} else {
+			if let date = optionalDate {
+				return NSPredicate(format: "userId == %lld and issue == %@ and createdAt > %@", userNumber, self, date)
+			} else {
+				return NSPredicate(format: "userId == %lld and issue == %@", userNumber, self)
+			}
+		}
+	}
+
+	final private func predicateForOthersCommentsSinceDate(optionalDate: NSDate?) -> NSPredicate {
+
+		let userNumber = apiServer.userId?.longLongValue ?? 0
+
+		if self is PullRequest {
 			if let date = optionalDate {
 				return NSPredicate(format: "userId != %lld and pullRequest == %@ and createdAt > %@", userNumber, self, date)
 			} else {
 				return NSPredicate(format: "userId != %lld and pullRequest == %@", userNumber, self)
 			}
 		} else {
-			abort()
+			if let date = optionalDate {
+				return NSPredicate(format: "userId != %lld and issue == %@ and createdAt > %@", userNumber, self, date)
+			} else {
+				return NSPredicate(format: "userId != %lld and issue == %@", userNumber, self)
+			}
 		}
 	}
 
 	final class func badgeCountFromFetch(f: NSFetchRequest, inMoc: NSManagedObjectContext) -> Int {
-		var badgeCount:Int = 0
+		var badgeCount = 0
 		f.returnsObjectsAsFaults = false
 		for i in try! inMoc.executeFetchRequest(f) as! [ListableItem] {
 			badgeCount += (i.unreadComments?.integerValue ?? 0)

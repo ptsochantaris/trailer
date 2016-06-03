@@ -193,6 +193,7 @@ let STATUS_ID_KEY = "statusIdKey"
 let COMMENT_ID_KEY = "commentIdKey"
 let NOTIFICATION_URL_KEY = "urlKey"
 let API_USAGE_UPDATE = "RateUpdateNotification"
+let kSyncProgressUpdate = "kSyncProgressUpdate"
 
 let LOW_API_WARNING: Double = 0.20
 let BACKOFF_STEP: NSTimeInterval = 120.0

@@ -46,7 +46,6 @@ final class API {
         #endif
 
 		let config = NSURLSessionConfiguration.defaultSessionConfiguration()
-		config.HTTPMaximumConnectionsPerHost = 4
 		config.HTTPShouldUsePipelining = true
 		config.HTTPAdditionalHeaders = ["User-Agent" : userAgent]
 		urlSession = NSURLSession(configuration: config)
@@ -94,7 +93,12 @@ final class API {
 
 	func lastUpdateDescription() -> String {
 		if appIsRefreshing {
-			return "Refreshing..."
+			let operations = apiRunningCount+apiCallQueue.count
+			if operations < 2 {
+				return "Refreshing..."
+			} else {
+				return "Refreshing... (\(operations) operations left)"
+			}
 		} else if ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext) {
 			return "Last update failed"
 		} else {
@@ -218,7 +222,7 @@ final class API {
 	////////////////////////////////////// API interface
 
 	func syncItemsForActiveReposAndCallback(processingCallback: Completion?, callback: Completion) {
-		let syncContext = DataManager.tempContext()
+		let syncContext = DataManager.childContext()
 
 		let shouldRefreshReposToo = lastRepoCheck == never()
 			|| (NSDate().timeIntervalSinceDate(lastRepoCheck) > NSTimeInterval(Settings.newRepoCheckPeriod*3600.0))
@@ -1328,11 +1332,42 @@ final class API {
 
 	typealias ApiCompletion = (code: Int?, headers: [NSObject : AnyObject]?, data: AnyObject?, error: NSError?, shouldRetry: Bool) -> Void
 
+	private var apiRunningCount = 0
+	private var apiCallQueue = [Completion]()
 	private func api(
 		path: String,
 		fromServer: ApiServer,
 		ignoreLastSync: Bool,
 		completion: ApiCompletion) {
+
+		if apiRunningCount < 4 {
+			_api(path, fromServer: fromServer, ignoreLastSync: ignoreLastSync, completion: completion)
+		} else {
+			apiCallQueue.append { [weak self] in
+				self?._api(path, fromServer: fromServer, ignoreLastSync: ignoreLastSync, completion: completion)
+			}
+		}
+	}
+	private func updateApiProgress() {
+		NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: kSyncProgressUpdate, object: nil, userInfo: nil))
+	}
+	private func dequeueApi() {
+		apiRunningCount -= 1
+		if apiCallQueue.count > 0 {
+			apiCallQueue.removeFirst()()
+		} else {
+			updateApiProgress()
+		}
+	}
+
+	private func _api(
+		path: String,
+		fromServer: ApiServer,
+		ignoreLastSync: Bool,
+		completion: ApiCompletion) {
+
+		apiRunningCount += 1
+		updateApiProgress()
 
 		let apiServerLabel: String
 		if fromServer.syncIsGood || ignoreLastSync {
@@ -1341,6 +1376,7 @@ final class API {
 			atNextEvent(self) { S in
 				let e = S.apiError("Sync has failed, skipping this call")
 				completion(code: nil, headers: nil, data: nil, error: e, shouldRetry: false)
+				S.dequeueApi()
 			}
 			return
 		}
@@ -1363,6 +1399,7 @@ final class API {
 				atNextEvent(self) { S in
 					let e = S.apiError("Preempted fetch because of throttling")
 					completion(code: nil, headers: nil, data: nil, error: e, shouldRetry: false)
+					S.dequeueApi()
 				}
 				return
 			}
@@ -1491,13 +1528,15 @@ final class API {
 		}
 
 		completion(code: code, headers: headers, data: parsedData, error: error, shouldRetry: shouldRetry)
+
+		dequeueApi()
 	}
 
 	#if os(iOS)
 
 	private var networkBGTask = UIBackgroundTaskInvalid
 	private var networkBGEndPopTimer: PopTimer?
-	private var networkIndicationCount: Int = 0
+	private var networkIndicationCount = 0
 
 	func networkIndicationStart() {
 		networkIndicationCount += 1

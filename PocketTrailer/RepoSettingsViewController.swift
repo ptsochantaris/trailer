@@ -4,9 +4,9 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
 
 	var repo: Repo?
 
-	private var allPrsIndex: Int = -1
-	private var allIssuesIndex: Int = -1
-	private var allHidingIndex: Int = -1
+	private var allPrsIndex = -1
+	private var allIssuesIndex = -1
+	private var allHidingIndex = -1
 
 	@IBOutlet weak var groupField: UITextField!
 	@IBOutlet weak var repoNameTitle: UILabel!

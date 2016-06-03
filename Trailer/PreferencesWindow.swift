@@ -68,6 +68,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var autoMoveOnTeamMentions: NSButton!
 	@IBOutlet weak var autoMoveOnCommentMentions: NSButton!
 	@IBOutlet weak var autoMoveIfCreatedInOwnedRepo: NSButton!
+	@IBOutlet weak var assumeCommentsBeforeMineAreRead: NSButton!
 
 	// Display
 	@IBOutlet weak var useVibrancy: NSButton!
@@ -247,6 +248,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		autoMoveOnCommentMentions.toolTip = Settings.autoMoveOnCommentMentionsHelp
 		autoMoveOnTeamMentions.toolTip = Settings.autoMoveOnTeamMentionsHelp
 		autoMoveIfCreatedInOwnedRepo.toolTip = Settings.moveNewItemsInOwnReposToMentionedHelp
+		assumeCommentsBeforeMineAreRead.toolTip = Settings.assumeReadItemIfUserHasNewerCommentsHelp
 		disableAllCommentNotifications.toolTip = Settings.disableAllCommentNotificationsHelp
 		showLabels.toolTip = Settings.showLabelsHelp
 		showStatusItems.toolTip = Settings.showStatusItemsHelp
@@ -327,6 +329,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		autoMoveOnCommentMentions.integerValue = Settings.autoMoveOnCommentMentions ? 1 : 0
 		autoMoveOnTeamMentions.integerValue = Settings.autoMoveOnTeamMentions ? 1 : 0
 		autoMoveIfCreatedInOwnedRepo.integerValue = Settings.moveNewItemsInOwnReposToMentioned ? 1 : 0
+		assumeCommentsBeforeMineAreRead.integerValue = Settings.assumeReadItemIfUserHasNewerComments ? 1 : 0
 		hideAvatars.integerValue = Settings.hideAvatars ? 1 : 0
 		showSeparateApiServersInMenu.integerValue = Settings.showSeparateApiServersInMenu ? 1 : 0
 		dontKeepPrsMergedByMe.integerValue = Settings.dontKeepPrsMergedByMe ? 1 : 0
@@ -529,6 +532,12 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction func autoMoveIfCreatedInOwnedRepoSelected(sender: NSButton) {
 		Settings.moveNewItemsInOwnReposToMentioned = (sender.integerValue==1)
+		DataManager.postProcessAllItems()
+		deferredUpdateTimer.push()
+	}
+
+	@IBAction func assumeAllCommentsBeforeMineAreReadSelected(sender: NSButton) {
+		Settings.assumeReadItemIfUserHasNewerComments = (sender.integerValue==1)
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
@@ -805,7 +814,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBAction func refreshReposSelected(sender: NSButton?) {
 		app.prepareForRefresh()
 
-		let tempContext = DataManager.tempContext()
+		let tempContext = DataManager.childContext()
 		api.fetchRepositoriesToMoc(tempContext) {
 
 			if ApiServer.shouldReportRefreshFailureInMoc(tempContext) {

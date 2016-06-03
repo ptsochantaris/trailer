@@ -91,8 +91,6 @@ final class MenuBarSet {
 			         NSForegroundColorAttributeName: NSColor.controlTextColor() ]
 		}
 
-		menu.showStatusItem()
-
 		let countString: String
 		let attributes: [String : AnyObject]
 		let somethingFailed = ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext)
@@ -123,29 +121,29 @@ final class MenuBarSet {
 
 		DLog("Updating \(type) menu, \(countString) total items")
 
-		let width = countString.sizeWithAttributes(attributes).width
+		let itemLabel = viewCriterion?.label
+		let disable = (itemLabel != nil && preFilterCount == 0)
 
-		let H = NSStatusBar.systemStatusBar().thickness
-		let length = H + width + STATUSITEM_PADDING*3
-		var updateStatusItem = true
-		let shouldGray = Settings.grayOutWhenRefreshing && appIsRefreshing
-		let si = menu.statusItem
+		if disable {
+			menu.hideStatusItem()
+		} else {
 
-		if let s = si?.view as? StatusItemView where compareDict(s.textAttributes, to: attributes) && s.statusLabel == countString && s.grayOut == shouldGray {
-			updateStatusItem = false
-		}
+			let shouldGray = Settings.grayOutWhenRefreshing && appIsRefreshing
 
-		if updateStatusItem {
-			atNextEvent(self) { S in
+			let si = menu.showStatusItem()
+
+			if let s = si.view as? StatusItemView where compareDict(s.textAttributes, to: attributes) && s.statusLabel == countString && s.grayOut == shouldGray {
+				// Skip update, icon is identical
+			} else {
 				DLog("Updating \(type) status item")
-				let itemLabel = S.viewCriterion?.label
-				let disable = (itemLabel != nil && preFilterCount == 0)
-				let itemWidth = disable ? 0 : length+lengthOffset
+				let width = countString.sizeWithAttributes(attributes).width
+				let H = NSStatusBar.systemStatusBar().thickness
+				let itemWidth = (H + width + STATUSITEM_PADDING*3) + lengthOffset
 				let siv = StatusItemView(frame: CGRectMake(0, 0, itemWidth, H), label: countString, prefix: type, attributes: attributes)
 				siv.labelOffset = lengthOffset
 				siv.highlighted = menu.visible
 				siv.grayOut = shouldGray
-				siv.serverTitle = itemLabel
+				siv.title = itemLabel
 				siv.tappedCallback = {
 					if menu.visible {
 						menu.closeMenu()
@@ -153,7 +151,7 @@ final class MenuBarSet {
 						app.showMenu(menu)
 					}
 				}
-				si?.view = siv
+				si.view = siv
 			}
 		}
 

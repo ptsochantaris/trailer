@@ -100,7 +100,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 	private enum SettingsSection: Int {
 		case Refresh, Display, Filtering, AppleWatch, Comments, Repos, StausesAndLabels, History, Confirm, Sort, Misc
-		static let rowCounts = [3, 6, 9, 2, 8, 2, 8, 3, 2, 3, 2]
+		static let rowCounts = [3, 6, 9, 2, 9, 2, 8, 3, 2, 3, 2]
 		static let allNames = ["Auto Refresh", "Display", "Filtering", "Apple Watch", "Comments", "Watchlist", "Statuses & Labels", "History", "Don't confirm when", "Sorting", "Misc"]
 	}
 
@@ -311,6 +311,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.titleLabel.text = "Disable all comment notifications"
 				cell.accessoryType = check(Settings.disableAllCommentNotifications)
 				cell.descriptionLabel.text = Settings.disableAllCommentNotificationsHelp
+			case 8:
+				cell.titleLabel.text = "Assume all comments before mine are read"
+				cell.accessoryType = check(Settings.assumeReadItemIfUserHasNewerComments)
+				cell.descriptionLabel.text = Settings.assumeReadItemIfUserHasNewerCommentsHelp
 			default: break
 			}
 		} else if indexPath.section == SettingsSection.Repos.rawValue {
@@ -544,6 +548,8 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				performSegueWithIdentifier("showBlacklist", sender: self)
 			case 7:
 				Settings.disableAllCommentNotifications = !Settings.disableAllCommentNotifications
+			case 8:
+				Settings.assumeReadItemIfUserHasNewerComments = !Settings.assumeReadItemIfUserHasNewerComments
 			default: break
 			}
 		} else if indexPath.section == SettingsSection.Repos.rawValue {

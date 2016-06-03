@@ -65,7 +65,7 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 		tableView.userInteractionEnabled = false
 		tableView.alpha = 0.5
 
-		let tempContext = DataManager.tempContext()
+		let tempContext = DataManager.childContext()
 		api.fetchRepositoriesToMoc(tempContext) { [weak self] in
 			if ApiServer.shouldReportRefreshFailureInMoc(tempContext) {
 				var errorServers = [String]()

@@ -33,7 +33,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 
 	func application(application: UIApplication, willFinishLaunchingWithOptions launchOptions: [NSObject : AnyObject]?) -> Bool {
 		app = self
-		justPostedNotificationTimer = PopTimer(timeInterval: 4) { [weak self] in
+		justPostedNotificationTimer = PopTimer(timeInterval: 3) { [weak self] in
 			self?.justPostedNotifications = false
 		}
 		return true

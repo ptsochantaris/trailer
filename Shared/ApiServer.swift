@@ -226,7 +226,7 @@ final class ApiServer: NSManagedObject {
 
 	class func configureFromArchive(archive: [String : [String : NSObject]]) -> Bool {
 
-		let tempMoc = DataManager.tempContext()
+		let tempMoc = DataManager.childContext()
 
 		for apiServer in allApiServersInMoc(tempMoc)
 		{

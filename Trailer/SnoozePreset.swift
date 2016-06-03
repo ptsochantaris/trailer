@@ -127,7 +127,7 @@ final class SnoozePreset: NSManagedObject {
 
 	class func configureFromArchive(archive: [[String : NSObject]]) -> Bool {
 
-		let tempMoc = DataManager.tempContext()
+		let tempMoc = DataManager.childContext()
 
 		for apiServer in allSnoozePresetsInMoc(tempMoc) {
 			tempMoc.deleteObject(apiServer)

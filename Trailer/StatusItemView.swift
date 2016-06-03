@@ -7,7 +7,7 @@ final class StatusItemView: NSView {
 	let statusLabel: String
 	var tappedCallback: Completion?
 	var labelOffset: CGFloat = 0
-	var serverTitle: String?
+	var title: String?
 
 	init(frame: NSRect, label: String, prefix: String, attributes: [String : AnyObject]) {
 		statusLabel = label
@@ -68,7 +68,7 @@ final class StatusItemView: NSView {
 		}
 
 		let img = tintedImage(icon, tint: imageColor)
-		if let t = serverTitle {
+		if let t = title {
 
 			labelRect = CGRectOffset(labelRect, -3, -3)
 
@@ -77,7 +77,7 @@ final class StatusItemView: NSView {
 			p.alignment = .Center
 			p.lineBreakMode = .ByTruncatingMiddle
 			t.drawInRect(r, withAttributes: [
-				NSForegroundColorAttributeName: displayAttributes[NSForegroundColorAttributeName]!,
+				NSForegroundColorAttributeName: imageColor,
 				NSFontAttributeName: NSFont.menuFontOfSize(6),
 				NSParagraphStyleAttributeName: p
 				])

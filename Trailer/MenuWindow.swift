@@ -40,6 +40,8 @@ final class MenuWindow: NSWindow {
         if newSystem {
             scrollView.contentView.wantsLayer = true
         }
+
+		NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(MenuWindow.refreshUpdate), name: kSyncProgressUpdate, object: nil)
 	}
 
 	class func usingVibrancy() -> Bool {
@@ -80,10 +82,11 @@ final class MenuWindow: NSWindow {
 		}
 	}
 
-	func showStatusItem() {
+	func showStatusItem() -> NSStatusItem {
 		if statusItem == nil {
 			statusItem = NSStatusBar.systemStatusBar().statusItemWithLength(NSVariableStatusItemLength)
 		}
+		return statusItem!
 	}
 
 	func hideStatusItem() {
@@ -98,9 +101,15 @@ final class MenuWindow: NSWindow {
 	}
 
 	func menuWillOpen(menu: NSMenu) {
-		if !appIsRefreshing {
+		if appIsRefreshing {
+			refreshUpdate()
+		} else {
 			refreshMenuItem.title = " Refresh - \(api.lastUpdateDescription())"
 		}
+	}
+
+	func refreshUpdate() {
+		refreshMenuItem.title = " \(api.lastUpdateDescription())"
 	}
 
 	func scrollToTop() {

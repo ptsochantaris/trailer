@@ -222,9 +222,16 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		let n = NSNotificationCenter.defaultCenter()
 		n.addObserver(self, selector: #selector(MasterViewController.updateStatus), name:REFRESH_STARTED_NOTIFICATION, object: nil)
 		n.addObserver(self, selector: #selector(MasterViewController.updateStatus), name:REFRESH_ENDED_NOTIFICATION, object: nil)
+		n.addObserver(self, selector: #selector(MasterViewController.updateRefresh), name: kSyncProgressUpdate, object: nil)
 
 		updateTabItems(false)
-		tableView.reloadData() // ensure footers are correct
+		atNextEvent {
+			self.tableView.reloadData() // ensure footers are correct
+		}
+	}
+
+	func updateRefresh() {
+		refreshLabel.text = api.lastUpdateDescription()
 	}
 
 	override func canBecomeFirstResponder() -> Bool {
@@ -1019,13 +1026,14 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	func updateStatus() {
 
 		updateTabItems(true)
+		let empty = (fetchedResultsController.fetchedObjects?.count ?? 0) == 0
 
 		if appIsRefreshing {
 			title = "Refreshing..."
 			if viewingPrs {
-				tableView.tableFooterView = EmptyView(message: PullRequest.reasonForEmptyWithFilter(searchBar.text), parentWidth: view.bounds.size.width)
+				tableView.tableFooterView = empty ? EmptyView(message: PullRequest.reasonForEmptyWithFilter(searchBar.text), parentWidth: view.bounds.size.width) : nil
 			} else {
-				tableView.tableFooterView = EmptyView(message: Issue.reasonForEmptyWithFilter(searchBar.text), parentWidth: view.bounds.size.width)
+				tableView.tableFooterView = empty ? EmptyView(message: Issue.reasonForEmptyWithFilter(searchBar.text), parentWidth: view.bounds.size.width) : nil
 			}
 			if let r = refreshControl {
 				refreshLabel.text = api.lastUpdateDescription()
@@ -1034,7 +1042,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			}
 		} else {
 
-			let empty = (fetchedResultsController.fetchedObjects?.count ?? 0) == 0
 			if showEmpty {
 				title = "No Items"
 				if viewingPrs {

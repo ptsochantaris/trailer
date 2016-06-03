@@ -13,7 +13,7 @@ final class EmptyView: UIView {
 		super.init(frame: CGRectMake(0, 0, parentWidth, idealSize.height+10.0))
 
 		let text = UILabel(frame: CGRectMake((parentWidth-idealSize.width)*0.5, 5.0, idealSize.width, idealSize.height+4.0))
-		text.autoresizingMask = UIViewAutoresizing.FlexibleWidth
+		text.autoresizingMask = .FlexibleWidth
 		text.numberOfLines = 0
 		text.attributedText = message
 		addSubview(text)

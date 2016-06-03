@@ -207,7 +207,7 @@ final class DataManager {
 		return true
 	}
 
-	class func tempContext() -> NSManagedObjectContext {
+	class func childContext() -> NSManagedObjectContext {
 		let c = NSManagedObjectContext(concurrencyType: .MainQueueConcurrencyType)
 		c.mergePolicy = NSMergePolicy(mergeType: .MergeByPropertyObjectTrumpMergePolicyType)
 		c.parentContext = mainObjectContext
@@ -298,11 +298,15 @@ final class DataManager {
 		let storeOptions = [
 			NSMigratePersistentStoresAutomaticallyOption: true,
 			NSInferMappingModelAutomaticallyOption: true,
-			NSSQLitePragmasOption: ["synchronous":"OFF", "fullfsync":"0"]]
+			NSSQLitePragmasOption: ["synchronous":"OFF", "fullfsync":"0"]
+		]
 
-		func addStorePath(sqlStore: NSURL, newCoordinator: NSPersistentStoreCoordinator) -> Bool {
+		let dataDir = dataFilesDirectory()
+		let sqlStorePath = dataDir.URLByAppendingPathComponent("Trailer.sqlite")
+
+		func addStorePath(newCoordinator: NSPersistentStoreCoordinator) -> Bool {
 			do {
-				try newCoordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: sqlStore, options: storeOptions)
+				try newCoordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: sqlStorePath, options: storeOptions)
 				return true
 			} catch let error as NSError {
 				DLog("Error while mounting DB store: %@", error.localizedDescription)
@@ -313,8 +317,6 @@ final class DataManager {
 			}
 		}
 
-		let dataDir = dataFilesDirectory()
-		let sqlStorePath = dataDir.URLByAppendingPathComponent("Trailer.sqlite")
 		let modelPath = NSBundle.mainBundle().URLForResource("Trailer", withExtension: "momd")!
 		let mom = NSManagedObjectModel(contentsOfURL: modelPath)!
 
@@ -327,12 +329,12 @@ final class DataManager {
 		}
 
 		var persistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel:mom)
-		if !addStorePath(sqlStorePath, newCoordinator: persistentStoreCoordinator) {
+		if !addStorePath(persistentStoreCoordinator) {
 			DLog("Failed to migrate/load DB store - will nuke it and retry")
 			removeDatabaseFiles()
 
 			persistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel:mom)
-			if !addStorePath(sqlStorePath, newCoordinator: persistentStoreCoordinator) {
+			if !addStorePath(persistentStoreCoordinator) {
 				DLog("Catastrophic failure, app is probably corrupted and needs reinstall")
 				abort()
 			}

@@ -326,7 +326,7 @@ Token</string>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" rowHeight="20" headerView="qia-ub-v1J" id="6pK-a1-URw">
-                                                        <rect key="frame" x="0.0" y="0.0" width="707" height="237"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="707" height="28"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <size key="intercellSpacing" width="8" height="8"/>
                                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1025,7 +1025,7 @@ Token</string>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button id="gjf-cd-s24">
-                                                        <rect key="frame" x="9" y="246" width="296" height="18"/>
+                                                        <rect key="frame" x="9" y="261" width="296" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Only display items with unread comments" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="MxE-lL-IWo">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1036,7 +1036,7 @@ Token</string>
                                                         </connections>
                                                     </button>
                                                     <button id="UGp-d4-lNW">
-                                                        <rect key="frame" x="9" y="279" width="296" height="18"/>
+                                                        <rect key="frame" x="9" y="294" width="296" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Badge &amp; send alerts for items in &quot;all&quot; too" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="z6Z-nh-Y6O">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1047,7 +1047,7 @@ Token</string>
                                                         </connections>
                                                     </button>
                                                     <button id="ZXi-oc-EhW">
-                                                        <rect key="frame" x="9" y="213" width="296" height="18"/>
+                                                        <rect key="frame" x="9" y="229" width="296" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Open items at first unread comment" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="DWF-3M-url">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1134,6 +1134,17 @@ Token</string>
                                                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                     </box>
+                                                    <button id="gWR-4e-ufK">
+                                                        <rect key="frame" x="9" y="199" width="309" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Assume all comments before mine are read" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="i4o-dH-lEy">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="assumeAllCommentsBeforeMineAreReadSelected:" target="vQH-WF-vh2" id="ZGd-tY-c6Z"/>
+                                                        </connections>
+                                                    </button>
                                                 </subviews>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
@@ -1944,6 +1955,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="apiServerTestButton" destination="Tu3-cb-beM" id="tmV-b8-rij"/>
                 <outlet property="apiServerWebPath" destination="CT9-ev-oP0" id="Cr5-z4-MfR"/>
                 <outlet property="assignedPrHandlingPolicy" destination="lB5-eS-YSK" id="CV3-XC-bVk"/>
+                <outlet property="assumeCommentsBeforeMineAreRead" destination="gWR-4e-ufK" id="uF3-ZN-vmp"/>
                 <outlet property="autoMoveIfCreatedInOwnedRepo" destination="uGu-0B-q7h" id="4fp-xk-loW"/>
                 <outlet property="autoMoveOnCommentMentions" destination="Afp-0h-LBr" id="lCM-y3-0L3"/>
                 <outlet property="autoMoveOnTeamMentions" destination="Hmq-ch-Jqa" id="ycL-P6-Un3"/>
