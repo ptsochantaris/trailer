@@ -97,7 +97,7 @@ final class API {
 			if operations < 2 {
 				return "Refreshing..."
 			} else {
-				return "Refreshing... (\(operations) operations left)"
+				return "Refreshing... (\(operations) calls remaining)"
 			}
 		} else if ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext) {
 			return "Last update failed"
@@ -1340,7 +1340,13 @@ final class API {
 		ignoreLastSync: Bool,
 		completion: ApiCompletion) {
 
-		if apiRunningCount < 4 {
+		#if os(iOS)
+			let maxOperations = 4
+		#else
+			let maxOperations = 8
+		#endif
+
+		if apiRunningCount < maxOperations {
 			_api(path, fromServer: fromServer, ignoreLastSync: ignoreLastSync, completion: completion)
 		} else {
 			apiCallQueue.append { [weak self] in

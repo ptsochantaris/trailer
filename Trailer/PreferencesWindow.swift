@@ -180,6 +180,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 				if s.serversDirty {
 					s.serversDirty = false
 					DataManager.saveDB()
+					Settings.possibleExport(nil)
 					app.setupWindows()
 				} else {
 					app.updateAllMenus()
@@ -191,8 +192,9 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	deinit {
-		NSNotificationCenter.defaultCenter().removeObserver(serverList)
-		NSNotificationCenter.defaultCenter().removeObserver(self)
+		let n = NSNotificationCenter.defaultCenter()
+		n.removeObserver(serverList)
+		n.removeObserver(self)
 	}
 
 	private func addTooltips() {
@@ -653,9 +655,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	private func updateDisplayIssuesSetting() {
 		DataManager.postProcessAllItems()
 		preferencesDirty = true
+		serversDirty = true
 		deferredUpdateTimer.push()
-		DataManager.saveDB()
-		Settings.possibleExport(nil)
 	}
 
 	@IBAction func allNewPrsPolicySelected(sender: NSPopUpButton) {
