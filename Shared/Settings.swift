@@ -714,7 +714,7 @@ final class Settings {
 		set { set("API_SERVERS_IN_SEPARATE_MENUS", newValue) }
 	}
 
-	static let assumeReadItemIfUserHasNewerCommentsHelp = "Assume that other's comments posted before ANY of your comments in an item have been read. Warning: Only turn this on if you are sure you can catch any comments that others may add while you are adding yours! (This is a very useful setting for *secondary* Trailer displays)"
+	static let assumeReadItemIfUserHasNewerCommentsHelp = "Mark any comments posted by others before your own as read. Warning: Only turn this on if you are sure you can catch any comments that others may add while you are adding yours! (This is a very useful setting for *secondary* Trailer displays)"
 	class var assumeReadItemIfUserHasNewerComments: Bool {
 		get { return get("ASSUME_READ_ITEM_IF_USER_HAS_NEWER_COMMENTS") as? Bool ?? false }
 		set { set("ASSUME_READ_ITEM_IF_USER_HAS_NEWER_COMMENTS", newValue) }

@@ -312,7 +312,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.accessoryType = check(Settings.disableAllCommentNotifications)
 				cell.descriptionLabel.text = Settings.disableAllCommentNotificationsHelp
 			case 8:
-				cell.titleLabel.text = "Assume all comments before mine are read"
+				cell.titleLabel.text = "Mark any comments before my own as read"
 				cell.accessoryType = check(Settings.assumeReadItemIfUserHasNewerComments)
 				cell.descriptionLabel.text = Settings.assumeReadItemIfUserHasNewerCommentsHelp
 			default: break

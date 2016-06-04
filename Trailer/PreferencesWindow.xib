@@ -1135,9 +1135,9 @@ Token</string>
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                     </box>
                                                     <button id="gWR-4e-ufK">
-                                                        <rect key="frame" x="9" y="199" width="309" height="18"/>
+                                                        <rect key="frame" x="9" y="198" width="309" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Assume all comments before mine are read" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="i4o-dH-lEy">
+                                                        <buttonCell key="cell" type="check" title="Mark any comments before my own as read" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="i4o-dH-lEy">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
