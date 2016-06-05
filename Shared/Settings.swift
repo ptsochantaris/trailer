@@ -714,6 +714,12 @@ final class Settings {
 		set { set("API_SERVERS_IN_SEPARATE_MENUS", newValue) }
 	}
 
+	static let alwaysRequestDesktopSiteHelp = "Try to request the desktop version of GitHub pages from iPhone by pretending to be iPad"
+	class var alwaysRequestDesktopSite: Bool {
+		get { return get("FORCE_LOADING_IOS_DESKTOP_SITE") as? Bool ?? false }
+		set { set("FORCE_LOADING_IOS_DESKTOP_SITE", newValue) }
+	}
+
 	static let assumeReadItemIfUserHasNewerCommentsHelp = "Mark any comments posted by others before your own as read. Warning: Only turn this on if you are sure you can catch any comments that others may add while you are adding yours! (This is a very useful setting for *secondary* Trailer displays)"
 	class var assumeReadItemIfUserHasNewerComments: Bool {
 		get { return get("ASSUME_READ_ITEM_IF_USER_HAS_NEWER_COMMENTS") as? Bool ?? false }

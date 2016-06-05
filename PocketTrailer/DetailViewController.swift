@@ -7,6 +7,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 	@IBOutlet weak var statusLabel: UILabel!
 
 	private var webView: WKWebView?
+	private var alwaysRequestDesktopSite = false
 
 	var isVisible = false
 	var catchupWithDataItemWhenLoaded: NSManagedObjectID?
@@ -40,6 +41,19 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 	func configureView() {
 		if let w = webView {
 			if let d = detailItem {
+				if !alwaysRequestDesktopSite && Settings.alwaysRequestDesktopSite {
+					DLog("Activating iPad webview user-agent")
+					alwaysRequestDesktopSite = true
+					w.evaluateJavaScript("navigator.userAgent") { result, error in
+						w.customUserAgent = result?.stringByReplacingOccurrencesOfString("iPhone", withString: "iPad")
+						self.configureView()
+					}
+					return
+				} else if alwaysRequestDesktopSite && !Settings.alwaysRequestDesktopSite {
+					DLog("Deactivating iPad webview user-agent")
+					w.customUserAgent = nil
+					alwaysRequestDesktopSite = false
+				}
 				DLog("Will load: %@", d.absoluteString)
 				w.loadRequest(NSURLRequest(URL: d))
 			} else {

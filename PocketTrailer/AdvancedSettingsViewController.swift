@@ -100,7 +100,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 	private enum SettingsSection: Int {
 		case Refresh, Display, Filtering, AppleWatch, Comments, Repos, StausesAndLabels, History, Confirm, Sort, Misc
-		static let rowCounts = [3, 6, 9, 2, 9, 2, 8, 3, 2, 3, 2]
+		static let rowCounts = [3, 7, 9, 2, 9, 2, 8, 3, 2, 3, 2]
 		static let allNames = ["Auto Refresh", "Display", "Filtering", "Apple Watch", "Comments", "Watchlist", "Statuses & Labels", "History", "Don't confirm when", "Sorting", "Misc"]
 	}
 
@@ -223,6 +223,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				cell.titleLabel.text = "Separate API servers into their own groups"
 				cell.accessoryType = check(Settings.showSeparateApiServersInMenu)
 				cell.descriptionLabel.text = Settings.showSeparateApiServersInMenuHelp
+			case 6:
+				cell.titleLabel.text = "Try requesting desktop GitHub pages"
+				cell.accessoryType = check(Settings.alwaysRequestDesktopSite)
+				cell.descriptionLabel.text = Settings.alwaysRequestDesktopSiteHelp
 			default: break
 			}
 		} else if indexPath.section == SettingsSection.Filtering.rawValue {
@@ -492,6 +496,8 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			case 5:
 				Settings.showSeparateApiServersInMenu = !Settings.showSeparateApiServersInMenu
 				settingsChangedTimer.push()
+			case 6:
+				Settings.alwaysRequestDesktopSite = !Settings.alwaysRequestDesktopSite
 			default: break
 			}
 		} else if indexPath.section == SettingsSection.Filtering.rawValue {
