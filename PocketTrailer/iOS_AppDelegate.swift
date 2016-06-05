@@ -324,10 +324,10 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 	}
 
 	func clearAllClosed() {
-		for p in PullRequest.allClosedInMoc(mainObjectContext) {
+		for p in PullRequest.allClosedInMoc(mainObjectContext, includeAllGroups: true) {
 			mainObjectContext.deleteObject(p)
 		}
-		for i in Issue.allClosedInMoc(mainObjectContext) {
+		for i in Issue.allClosedInMoc(mainObjectContext, includeAllGroups: true) {
 			mainObjectContext.deleteObject(i)
 		}
 		DataManager.saveDB()
@@ -335,7 +335,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 	}
 
 	func clearAllMerged() {
-		for p in PullRequest.allMergedInMoc(mainObjectContext) {
+		for p in PullRequest.allMergedInMoc(mainObjectContext, includeAllGroups: true) {
 			mainObjectContext.deleteObject(p)
 		}
 		DataManager.saveDB()

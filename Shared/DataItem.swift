@@ -143,14 +143,14 @@ class DataItem: NSManagedObject {
 		return moc.countForFetchRequest(f, error: nil)
 	}
 
-	class func addCriterion(criterion: GroupingCriterion?, toFetchRequest: NSFetchRequest, originalPredicate: NSPredicate, inMoc: NSManagedObjectContext) {
+	class func addCriterion(criterion: GroupingCriterion?, toFetchRequest: NSFetchRequest, originalPredicate: NSPredicate, inMoc: NSManagedObjectContext, includeAllGroups: Bool = false) {
 		var andPredicates = [NSPredicate]()
 		if let c = criterion {
 			andPredicates.append(c.addCriterionToPredicate(originalPredicate, inMoc: inMoc))
 		} else {
 			andPredicates.append(originalPredicate)
 		}
-		if criterion?.repoGroup == nil {
+		if !includeAllGroups && criterion?.repoGroup == nil {
 			for otherGroup in Repo.allGroupLabels {
 				let p = NSPredicate(format: "repo.groupLabel == nil or repo.groupLabel != %@", otherGroup)
 				andPredicates.append(p)

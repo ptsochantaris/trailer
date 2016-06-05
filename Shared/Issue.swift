@@ -169,11 +169,11 @@ final class Issue: ListableItem {
 		return Section.issueMenuTitles[sectionIndex?.integerValue ?? 0]
 	}
 
-	class func allClosedInMoc(moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> [Issue] {
+	class func allClosedInMoc(moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, includeAllGroups: Bool = false) -> [Issue] {
 		let f = NSFetchRequest(entityName: "Issue")
 		f.returnsObjectsAsFaults = false
 		let p = NSPredicate(format: "condition == %d", ItemCondition.Closed.rawValue)
-		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, inMoc: moc)
+		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, inMoc: moc, includeAllGroups: includeAllGroups)
 		return try! moc.executeFetchRequest(f) as! [Issue]
 	}
 
