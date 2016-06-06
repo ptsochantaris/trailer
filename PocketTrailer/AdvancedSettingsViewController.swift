@@ -527,6 +527,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			switch indexPath.row {
 			case 0:
 				Settings.preferIssuesInWatch = !Settings.preferIssuesInWatch
+				settingsChangedTimer.push()
 			case 1:
 				Settings.hideDescriptionInWatchDetail = !Settings.hideDescriptionInWatchDetail
 			default: break

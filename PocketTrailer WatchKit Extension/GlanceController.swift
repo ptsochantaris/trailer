@@ -74,31 +74,45 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 			prIcon.setHidden(showIssues)
 			issueIcon.setHidden(!showIssues)
 
-			let r = result[showIssues ? "issues" : "prs"] as! [String : AnyObject]
+			var totalOpen = 0
+			var totalUnread = 0
+			var totalMine = 0
+			var totalParticipated = 0
+			var totalMentioned = 0
+			var totalSnoozed = 0
+			var totalOther = 0
+			for r in result["views"] as! [[String : AnyObject]] {
+				if let v = r[showIssues ? "issues" : "prs"] as? [String : AnyObject] {
+					totalMine += v[Section.Mine.apiName()]?["total"] as? Int ?? 0
+					totalParticipated += v[Section.Participated.apiName()]?["total"] as? Int ?? 0
+					totalMentioned += v[Section.Mentioned.apiName()]?["total"] as? Int ?? 0
+					totalSnoozed += v[Section.Snoozed.apiName()]?["total"] as? Int ?? 0
+					totalOther += v[Section.All.apiName()]?["total"] as? Int ?? 0
+					totalUnread += v["unread"] as? Int ?? 0
+					totalOpen += v["total_open"] as? Int ?? 0
+				}
+			}
 
-			let tc = r["total_open"] as? Int ?? 0
-			totalCount.setText("\(tc)")
+			totalCount.setText("\(totalOpen)")
 
-			func setCount(s: Section, _ count: WKInterfaceLabel, _ group: WKInterfaceGroup) {
-				let c = r[s.apiName()]?["total"] as? Int ?? 0
-				count.setText("\(c) \(s.watchMenuName().uppercaseString)")
+			func setCount(c: Int, section: Section, _ count: WKInterfaceLabel, _ group: WKInterfaceGroup) {
+				count.setText("\(c) \(section.watchMenuName().uppercaseString)")
 				group.setAlpha(c==0 ? 0.4 : 1.0)
 			}
-			setCount(.Mine, myCount, myGroup)
-			setCount(.Participated, participatedCount, participatedGroup)
-			setCount(.Mentioned, mentionedCount, mentionedGroup)
-			setCount(.All, otherCount, otherGroup)
-			setCount(.Snoozed, snoozingCount, snoozingGroup)
+			setCount(totalMine, section: .Mine, myCount, myGroup)
+			setCount(totalParticipated, section: .Participated, participatedCount, participatedGroup)
+			setCount(totalMentioned, section: .Mentioned, mentionedCount, mentionedGroup)
+			setCount(totalOther, section: .All, otherCount, otherGroup)
+			setCount(totalSnoozed, section: .Snoozed, snoozingCount, snoozingGroup)
 
-			let uc = r["unread"] as! Int
-			if uc==0 {
+			if totalUnread==0 {
 				unreadCount.setText("NONE UNREAD")
 				unreadGroup.setAlpha(0.3)
-			} else if uc==1 {
+			} else if totalUnread==1 {
 				unreadCount.setText("1 COMMENT")
 				unreadGroup.setAlpha(1.0)
 			} else {
-				unreadCount.setText("\(uc) COMMENTS")
+				unreadCount.setText("\(totalUnread) COMMENTS")
 				unreadGroup.setAlpha(1.0)
 			}
 

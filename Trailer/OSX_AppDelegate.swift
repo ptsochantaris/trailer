@@ -369,7 +369,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 					let alert = NSAlert()
 					alert.messageText = "Clear \(mergedRequests.count) merged PRs?"
-					alert.informativeText = "This will clear \(mergedRequests.count) merged PRs from your list.  This action cannot be undone, are you sure?"
+					alert.informativeText = "This will clear \(mergedRequests.count) merged PRs from this list.  This action cannot be undone, are you sure?"
 					alert.addButtonWithTitle("No")
 					alert.addButtonWithTitle("Yes")
 					alert.showsSuppressionButton = true
@@ -389,7 +389,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 					let alert = NSAlert()
 					alert.messageText = "Clear \(closedRequests.count) closed PRs?"
-					alert.informativeText = "This will remove \(closedRequests.count) closed PRs from your list.  This action cannot be undone, are you sure?"
+					alert.informativeText = "This will remove \(closedRequests.count) closed PRs from this list.  This action cannot be undone, are you sure?"
 					alert.addButtonWithTitle("No")
 					alert.addButtonWithTitle("Yes")
 					alert.showsSuppressionButton = true
@@ -414,7 +414,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 					let alert = NSAlert()
 					alert.messageText = "Clear \(closedIssues.count) closed issues?"
-					alert.informativeText = "This will remove \(closedIssues.count) closed issues from your list.  This action cannot be undone, are you sure?"
+					alert.informativeText = "This will remove \(closedIssues.count) closed issues from this list.  This action cannot be undone, are you sure?"
 					alert.addButtonWithTitle("No")
 					alert.addButtonWithTitle("Yes")
 					alert.showsSuppressionButton = true
