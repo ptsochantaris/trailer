@@ -197,8 +197,13 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		f.fetchOffset = from
 		f.fetchLimit = count
 
+		// This is needed to avoid a Core Data bug with fetchOffset
+		let tempMoc = NSManagedObjectContext(concurrencyType: .MainQueueConcurrencyType)
+		tempMoc.persistentStoreCoordinator = mainObjectContext.persistentStoreCoordinator
+		tempMoc.undoManager = nil
+
 		var items = [[String : AnyObject]]()
-		for item in try! mainObjectContext.executeFetchRequest(f) as! [ListableItem] {
+		for item in try! tempMoc.executeFetchRequest(f) as! [ListableItem] {
 			items.append(baseDataForItem(item, showStatuses: showStatuses, showLabels: showLabels))
 		}
 		replyHandler(["result" : items])
