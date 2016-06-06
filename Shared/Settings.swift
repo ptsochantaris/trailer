@@ -353,7 +353,7 @@ final class Settings {
 		set {
 			set("IOS_BACKGROUND_REFRESH_PERIOD_KEY", newValue)
 			#if os(iOS)
-            app.setMinimumBackgroundFetchInterval(NSTimeInterval(newValue))
+				UIApplication.sharedApplication().setMinimumBackgroundFetchInterval(NSTimeInterval(newValue))
 			#endif
 		}
 	}

@@ -38,16 +38,24 @@ final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 	}
 
 	private func processOverview(complication: CLKComplication, _ overview: [String : AnyObject], _ handler: ([CLKComplicationTimelineEntry]?) -> Void) {
-		let preferIssues = overview["preferIssues"] as! Bool
 
-		let prs = overview["prs"] as! [String : AnyObject]
-		let prCount = prs["total"] as! Int
+		let showIssues = overview["preferIssues"] as! Bool
 
-		let issues = overview["issues"] as! [String : AnyObject]
-		let issueCount = issues["total"] as! Int
+		var prCount = 0
+		var issueCount = 0
+		var commentCount = 0
+		for r in overview["views"] as! [[String : AnyObject]] {
+			if let v = r["prs"] as? [String : AnyObject] {
+				prCount += v["total_open"] as? Int ?? 0
+				commentCount += v["unread"] as? Int ?? 0
+			}
+			if let v = r["issues"] as? [String : AnyObject] {
+				issueCount += v["total_open"] as? Int ?? 0
+				commentCount += v["unread"] as? Int ?? 0
+			}
+		}
 
-		let commentCount = (prs["unread"] as? Int ?? 0) + (issues["unread"] as? Int ?? 0)
-		let entry = CLKComplicationTimelineEntry(date: NSDate(), complicationTemplate: constructTemplateFor(complication, issues: preferIssues, prCount: prCount, issueCount: issueCount, commentCount: commentCount))
+		let entry = CLKComplicationTimelineEntry(date: NSDate(), complicationTemplate: constructTemplateFor(complication, issues: showIssues, prCount: prCount, issueCount: issueCount, commentCount: commentCount))
 		handler([entry])
 	}
 

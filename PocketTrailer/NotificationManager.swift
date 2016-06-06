@@ -126,7 +126,6 @@ final class NotificationManager {
 			}
 		}
 
-		app.justPostedNotifications = true
 		UIApplication.sharedApplication().presentLocalNotificationNow(notification)
 	}
 }

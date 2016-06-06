@@ -12,19 +12,10 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 	private var watchManager: WatchManager?
 	private var refreshTimer: NSTimer?
 	private var backgroundCallback: ((UIBackgroundFetchResult) -> Void)?
+	private var actOnLocalNotification = true
 
 	private var justPostedNotificationTimer: PopTimer!
-	var justPostedNotifications = false {
-		didSet {
-			if justPostedNotifications {
-				if UIApplication.sharedApplication().applicationState != .Background {
-					justPostedNotificationTimer.push()
-				} else {
-					justPostedNotifications = false
-				}
-			}
-		}
-	}
+	private var justPostedNotifications = false
 
 	func updateBadge() {
 		UIApplication.sharedApplication().applicationIconBadgeNumber = PullRequest.badgeCountInMoc(mainObjectContext) + Issue.badgeCountInMoc(mainObjectContext)
@@ -33,7 +24,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 
 	func application(application: UIApplication, willFinishLaunchingWithOptions launchOptions: [NSObject : AnyObject]?) -> Bool {
 		app = self
-		justPostedNotificationTimer = PopTimer(timeInterval: 3) { [weak self] in
+		justPostedNotificationTimer = PopTimer(timeInterval: 2) { [weak self] in
 			self?.justPostedNotifications = false
 		}
 		return true
@@ -159,7 +150,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 	}
 
 	func application(application: UIApplication, didReceiveLocalNotification notification: UILocalNotification) {
-		if !justPostedNotifications {
+		if !justPostedNotifications && actOnLocalNotification {
 			NotificationManager.handleLocalNotification(notification, action: nil)
 		}
 	}
@@ -306,14 +297,29 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 
 	func applicationDidBecomeActive(application: UIApplication) {
 		startRefreshIfItIsDue()
+		actOnLocalNotification = false
 	}
 
-	func setMinimumBackgroundFetchInterval(interval: NSTimeInterval) -> Void {
-		UIApplication.sharedApplication().setMinimumBackgroundFetchInterval(NSTimeInterval(interval))
+	func applicationWillEnterForeground(application: UIApplication) {
+		actOnLocalNotification = true
+	}
+
+	func applicationDidEnterBackground(application: UIApplication) {
+		actOnLocalNotification = false
+	}
+
+	func applicationWillResignActive(application: UIApplication) {
+		actOnLocalNotification = true
 	}
 
 	func postNotificationOfType(type: NotificationType, forItem: DataItem) {
+		justPostedNotifications = true
 		NotificationManager.postNotificationOfType(type, forItem: forItem)
+		if UIApplication.sharedApplication().applicationState == .Background {
+			justPostedNotifications = false
+		} else {
+			justPostedNotificationTimer.push()
+		}
 	}
 
 	func markEverythingRead() {
