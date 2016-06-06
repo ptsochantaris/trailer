@@ -365,7 +365,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				if Settings.dontAskBeforeWipingMerged {
 					removeAllMergedRequests(menuBarSet)
 				} else {
-					let mergedRequests = PullRequest.allMergedInMoc(mainObjectContext, viewCriterion: menuBarSet.viewCriterion)
+					let mergedRequests = PullRequest.allMergedInMoc(mainObjectContext, criterion: menuBarSet.viewCriterion)
 
 					let alert = NSAlert()
 					alert.messageText = "Clear \(mergedRequests.count) merged PRs?"
@@ -385,7 +385,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				if Settings.dontAskBeforeWipingClosed {
 					removeAllClosedRequests(menuBarSet)
 				} else {
-					let closedRequests = PullRequest.allClosedInMoc(mainObjectContext, viewCriterion: menuBarSet.viewCriterion)
+					let closedRequests = PullRequest.allClosedInMoc(mainObjectContext, criterion: menuBarSet.viewCriterion)
 
 					let alert = NSAlert()
 					alert.messageText = "Clear \(closedRequests.count) closed PRs?"
@@ -410,7 +410,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				if Settings.dontAskBeforeWipingClosed {
 					removeAllClosedIssues(menuBarSet)
 				} else {
-					let closedIssues = Issue.allClosedInMoc(mainObjectContext, viewCriterion: menuBarSet.viewCriterion)
+					let closedIssues = Issue.allClosedInMoc(mainObjectContext, criterion: menuBarSet.viewCriterion)
 
 					let alert = NSAlert()
 					alert.messageText = "Clear \(closedIssues.count) closed issues?"

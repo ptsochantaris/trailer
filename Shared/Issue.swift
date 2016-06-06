@@ -37,7 +37,7 @@ final class Issue: ListableItem {
 		}
 	}
 
-	class func reasonForEmptyWithFilter(filterValue: String?, criterion: GroupingCriterion? = nil) -> NSAttributedString {
+	class func reasonForEmptyWithFilter(filterValue: String?, criterion: GroupingCriterion?) -> NSAttributedString {
 		let openIssues = Issue.countOpenInMoc(mainObjectContext, criterion: criterion)
 
 		var color = COLOR_CLASS.lightGrayColor()
@@ -75,18 +75,6 @@ final class Issue: ListableItem {
 	}
 	#endif
 
-	class func countAllInMoc(moc: NSManagedObjectContext) -> Int {
-		let f = NSFetchRequest(entityName: "Issue")
-		f.predicate = NSPredicate(format: "sectionIndex > 0")
-		return moc.countForFetchRequest(f, error: nil)
-	}
-
-	class func countIssuesInSection(section: Section, moc: NSManagedObjectContext) -> Int {
-		let f = NSFetchRequest(entityName: "Issue")
-		f.predicate = NSPredicate(format: "sectionIndex == %d", section.rawValue)
-		return moc.countForFetchRequest(f, error: nil)
-	}
-
 	class func markEverythingRead(section: Section, moc: NSManagedObjectContext) {
 		let f = NSFetchRequest(entityName: "Issue")
 		if section != .None {
@@ -108,22 +96,10 @@ final class Issue: ListableItem {
 		return badgeCountFromFetch(f, inMoc: moc)
 	}
 
-	class func badgeCountInSection(section: Section, moc: NSManagedObjectContext) -> Int {
-		let f = NSFetchRequest(entityName: "Issue")
-		f.predicate = NSPredicate(format: "sectionIndex == %d and unreadComments > 0", section.rawValue)
-		return badgeCountFromFetch(f, inMoc: moc)
-	}
-
 	class func countOpenInMoc(moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
 		let f = NSFetchRequest(entityName: "Issue")
 		let p = NSPredicate(format: "condition == %d or condition == nil", ItemCondition.Open.rawValue)
 		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, inMoc: moc)
-		return moc.countForFetchRequest(f, error: nil)
-	}
-
-	class func countOpenAndVisibleInMoc(moc: NSManagedObjectContext) -> Int {
-		let f = NSFetchRequest(entityName: "Issue")
-		f.predicate = NSPredicate(format: "sectionIndex > 0 and (condition == %d or condition == nil)", ItemCondition.Open.rawValue)
 		return moc.countForFetchRequest(f, error: nil)
 	}
 

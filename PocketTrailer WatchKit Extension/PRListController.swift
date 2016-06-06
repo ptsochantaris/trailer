@@ -12,6 +12,11 @@ final class PRListController: CommonController {
 	private var selectedIndex: Int?
 
 	private let PAGE_SIZE = 50
+
+	// View criterion
+	private var groupLabel: String?
+	private var apiServerUri: String?
+
 	private var onlyUnread = false
 	private var lastCount = 0
 	private var loadingBuffer: [[String : AnyObject]]?
@@ -23,6 +28,12 @@ final class PRListController: CommonController {
 		sectionIndex = c[SECTION_KEY] as! Int
 		type = c[TYPE_KEY] as! String
 		onlyUnread = c[UNREAD_KEY] as! Bool
+
+		let g = c[GROUP_KEY] as! String
+		groupLabel = g
+
+		let a = c[API_URI_KEY] as! String
+		apiServerUri = a
 
 		_table = table
 		_statusLabel = statusLabel
@@ -46,12 +57,14 @@ final class PRListController: CommonController {
 
 		var params = ["list": "item_list",
 		              "type": type,
+		              "group": groupLabel!,
+		              "apiUri": apiServerUri!,
 		              "sectionIndex": NSNumber(integer: sectionIndex),
 		              "onlyUnread": NSNumber(bool: onlyUnread),
 		              "count": NSNumber(integer: PAGE_SIZE)]
 
-		if let command = command {
-			params["command"] = command
+		if let c = command {
+			params["command"] = c
 		}
 		if let l = loadingBuffer {
 			params["from"] = NSNumber(integer: l.count)

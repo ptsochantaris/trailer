@@ -12,6 +12,9 @@ final class SectionRow: NSObject, PopulatableRow {
 	var totalCount: Int?
 	var unreadCount: Int?
 	var type: String?
+	var groupLabel: String?
+	var apiServerUri: String?
+
 	func populateFrom(other: PopulatableRow) {
 		if let other = other as? SectionRow {
 			if let sectionName = other.section?.watchMenuName() {
@@ -19,6 +22,8 @@ final class SectionRow: NSObject, PopulatableRow {
 			} else {
 				titleL.setText("All Unread")
 			}
+			groupLabel = other.groupLabel
+			apiServerUri = other.apiServerUri
 			countL.setText("\(other.unreadCount!)")
 			countHolder.setHidden(other.unreadCount==0)
 		}

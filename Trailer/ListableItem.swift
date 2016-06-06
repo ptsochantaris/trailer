@@ -585,7 +585,7 @@ class ListableItem: DataItem {
 		return buildOrPredicate(string, expectedLength: 5, format: "userLogin contains[cd] %@", numeric: false)
     }
 
-	final class func requestForItemsOfType(itemType: String, withFilter: String?, sectionIndex: Int, criterion: GroupingCriterion? = nil, onlyUnread: Bool = false, legacyMode: Bool = false) -> NSFetchRequest {
+	final class func requestForItemsOfType(itemType: String, withFilter: String?, sectionIndex: Int, criterion: GroupingCriterion? = nil, onlyUnread: Bool = false) -> NSFetchRequest {
 
 		var andPredicates = [NSPredicate]()
 
@@ -715,11 +715,7 @@ class ListableItem: DataItem {
 		let f = NSFetchRequest(entityName: itemType)
 		f.fetchBatchSize = 100
 		let p = NSCompoundPredicate(andPredicateWithSubpredicates: andPredicates)
-		if legacyMode {
-			f.predicate = p
-		} else {
-			addCriterion(criterion, toFetchRequest: f, originalPredicate: p, inMoc: mainObjectContext)
-		}
+		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, inMoc: mainObjectContext)
 		f.sortDescriptors = sortDescriptors
 		return f
 	}

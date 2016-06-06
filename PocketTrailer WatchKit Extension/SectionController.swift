@@ -50,7 +50,12 @@ final class SectionController: CommonController {
 	override func table(table: WKInterfaceTable, didSelectRowAtIndex rowIndex: Int) {
 		let r = rowControllers[rowIndex] as! SectionRow
 		let section = r.section?.rawValue ?? -1
-		pushControllerWithName("ListController", context: [ SECTION_KEY: section, TYPE_KEY: r.type!, UNREAD_KEY: section == -1 ] )
+		pushControllerWithName("ListController", context: [
+			SECTION_KEY: section,
+			TYPE_KEY: r.type!,
+			UNREAD_KEY: section == -1,
+			GROUP_KEY: r.groupLabel!,
+			API_URI_KEY: r.apiServerUri! ] )
 	}
 
 	override func updateFromData(response: [NSString : AnyObject]) {
@@ -65,47 +70,61 @@ final class SectionController: CommonController {
 	private func updateUI() {
 
 		rowControllers.removeAll(keepCapacity: false)
-		let session = WCSession.defaultSession()
-		if let result = session.receivedApplicationContext["overview"] as? [String : AnyObject] {
 
-			func addSectionsFor(itemType: String, header: String) {
-				let items = result[itemType] as! [String : AnyObject]
-				let totalItems = items["total"] as! Int
+		func addSectionsFor(entry: [String : AnyObject], itemType: String, label: String, apiServerUri: String, header: String, showEmptyDescriptions: Bool) {
+			let items = entry[itemType] as! [String : AnyObject]
+			let totalItems = items["total"] as! Int
+			let prefix = label.isEmpty ? "" : "\(label): "
+			if totalItems > 0 {
 				let pt = TitleRow()
+				pt.title = "\(prefix)\(totalItems) \(header)"
 				rowControllers.append(pt)
-				if totalItems > 0 {
-					pt.title = "\(totalItems) \(header)"
-					var totalUnread = 0
-					for itemSection in Section.apiTitles {
-						if itemSection == Section.None.apiName() { continue }
+				var totalUnread = 0
+				for itemSection in Section.apiTitles {
+					if itemSection == Section.None.apiName() { continue }
 
-						if let section = items[itemSection], count = section["total"] as? Int, unread = section["unread"] as? Int where count > 0 {
-							let s = SectionRow()
-							s.section = sectionFromApi(itemSection)
-							s.totalCount = count
-							s.unreadCount = unread
-							s.type = itemType
-							rowControllers.append(s)
-
-							totalUnread += unread
-						}
-					}
-					if totalUnread > 0 {
+					if let section = items[itemSection], count = section["total"] as? Int, unread = section["unread"] as? Int where count > 0 {
 						let s = SectionRow()
-						s.section = nil
-						s.totalCount = 0
-						s.unreadCount = totalUnread
+						s.section = sectionFromApi(itemSection)
+						s.totalCount = count
+						s.unreadCount = unread
 						s.type = itemType
+						s.groupLabel = label
+						s.apiServerUri = apiServerUri
 						rowControllers.append(s)
+
+						totalUnread += unread
 					}
-
-				} else {
-					pt.title = items["error"] as? String
 				}
-			}
+				if totalUnread > 0 {
+					let s = SectionRow()
+					s.section = nil
+					s.totalCount = 0
+					s.unreadCount = totalUnread
+					s.type = itemType
+					s.groupLabel = label
+					s.apiServerUri = apiServerUri
+					rowControllers.append(s)
+				}
 
-			addSectionsFor("prs", header: "Pull Requests")
-			addSectionsFor("issues", header: "Issues")
+			} else if showEmptyDescriptions {
+				let error = (items["error"] as? String) ?? ""
+				let pt = TitleRow()
+				pt.title = "\(prefix)\(header): \(error)"
+				rowControllers.append(pt)
+			}
+		}
+
+		if let result = WCSession.defaultSession().receivedApplicationContext["overview"] as? [String : AnyObject] {
+
+			let views = result["views"]
+			let showEmptyDescriptions = views?.count == 1
+			for v in views as! [[String : AnyObject]] {
+				let label = v["title"] as! String
+				let apiServerUri = v["apiUri"] as! String
+				addSectionsFor(v, itemType: "prs", label: label, apiServerUri: apiServerUri, header: "Pull Requests", showEmptyDescriptions: showEmptyDescriptions)
+				addSectionsFor(v, itemType: "issues", label: label, apiServerUri: apiServerUri, header: "Issues", showEmptyDescriptions: showEmptyDescriptions)
+			}
 
 			table.setRowTypes(rowControllers.map({ $0.rowType() }))
 

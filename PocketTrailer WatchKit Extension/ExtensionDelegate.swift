@@ -4,6 +4,8 @@ let PULL_REQUEST_KEY = "PULL_REQUEST_KEY"
 let ISSUE_KEY = "ISSUE_KEY"
 let TYPE_KEY = "TYPE_KEY"
 let UNREAD_KEY = "UNREAD_KEY"
+let GROUP_KEY = "GROUP_KEY"
+let API_URI_KEY = "API_URI_KEY"
 
 import WatchKit
 import WatchConnectivity

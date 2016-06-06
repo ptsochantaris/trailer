@@ -80,24 +80,6 @@ final class PullRequest: ListableItem {
 		return moc.countForFetchRequest(f, error: nil)
 	}
 
-	class func countOpenAndVisibleInMoc(moc: NSManagedObjectContext) -> Int {
-		let f = NSFetchRequest(entityName: "PullRequest")
-		f.predicate = NSPredicate(format: "sectionIndex > 0 and (condition == %d or condition == nil)", ItemCondition.Open.rawValue)
-		return moc.countForFetchRequest(f, error: nil)
-	}
-
-	class func countAllInMoc(moc: NSManagedObjectContext) -> Int {
-		let f = NSFetchRequest(entityName: "PullRequest")
-		f.predicate = NSPredicate(format: "sectionIndex > 0")
-		return moc.countForFetchRequest(f, error: nil)
-	}
-
-	class func countRequestsInSection(section: Section, moc: NSManagedObjectContext) -> Int {
-		let f = NSFetchRequest(entityName: "PullRequest")
-		f.predicate = NSPredicate(format: "sectionIndex == %d", section.rawValue)
-		return moc.countForFetchRequest(f, error: nil)
-	}
-
 	class func markEverythingRead(section: Section, moc: NSManagedObjectContext) {
 		let f = NSFetchRequest(entityName: "PullRequest")
 		if section != .None {
