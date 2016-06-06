@@ -7,6 +7,29 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.4.1</title>
+			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>This update corrects counts shown during the confirmation of removing all merged or closed items from a list</li>
+				<li>Additionally from the recent 1.4.0:</li>
+				<li>New “group” field in the watchlist allows grouping or extracting one or more repositories into their own menu item(s).</li>
+				<li>New option to split API servers into separate menu-bar items.</li>
+				<li>New option to mark an item’s comments as read if you have just posted a new comment.</li>
+				<li>Refresh indicator will now give a rough estimate of how many API calls are left for a refresh to complete.</li>
+				<li>More info on notifications, including the repository name that a notification refers to.</li>
+				<li>Various dark mode detection issues corrected.</li>
+				<li>Significant internal cleanups and optimisations, as well as improved tracking of read/unread comments.</li>
+				</ul></font>]]></description>
+			<pubDate>Mon, 6 Jun 2016 21:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer141.zip"
+			sparkle:version="1335"
+			sparkle:shortVersionString="1.4.1"
+			sparkle:dsaSignature="MC0CFEhYFoeFUAuAg1wBjtk+5f82vKIaAhUAsse+5mgb30G/vgUTkaPeRDvD40Q="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.4.0</title>
 			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
