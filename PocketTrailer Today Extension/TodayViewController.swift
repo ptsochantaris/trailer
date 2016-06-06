@@ -55,30 +55,37 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 
+		func imageFromColor(color: UIColor) -> UIImage {
+			let rect = CGRectMake(0, 0, 1, 1)
+			UIGraphicsBeginImageContext(rect.size)
+			let context = UIGraphicsGetCurrentContext()
+			CGContextSetFillColorWithColor(context, color.CGColor)
+			CGContextFillRect(context, rect)
+			let img = UIGraphicsGetImageFromCurrentImageContext()
+			UIGraphicsEndImageContext()
+			return img
+		}
+
 		prImage.image = UIImage(named: "prsTab")?.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate)
 		issueImage.image = UIImage(named: "issuesTab")?.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate)
 
 		paragraph.paragraphSpacing = 4
 
 		prButton = UIButton(type: UIButtonType.Custom)
-		prButton.addTarget(self, action: #selector(TodayViewController.prTapped), forControlEvents: .TouchUpInside)
+		prButton.addTarget(self, action: #selector(TodayViewController.widgetTapped), forControlEvents: .TouchUpInside)
 		prButton.setBackgroundImage(imageFromColor(UIColor(white: 1.0, alpha: 0.2)), forState: .Highlighted)
 		view.addSubview(prButton)
 
 		issuesButton = UIButton(type: UIButtonType.Custom)
-		issuesButton.addTarget(self, action: #selector(TodayViewController.issuesTapped), forControlEvents: .TouchUpInside)
+		issuesButton.addTarget(self, action: #selector(TodayViewController.widgetTapped), forControlEvents: .TouchUpInside)
 		issuesButton.setBackgroundImage(imageFromColor(UIColor(white: 1.0, alpha: 0.2)), forState: .Highlighted)
 		view.addSubview(issuesButton)
 
 		update()
 	}
 
-	func prTapped() {
-		extensionContext?.openURL(NSURL(string: "pockettrailer://pullRequests")!, completionHandler: nil)
-	}
-
-	func issuesTapped() {
-		extensionContext?.openURL(NSURL(string: "pockettrailer://issues")!, completionHandler: nil)
+	func widgetTapped() {
+		extensionContext?.openURL(NSURL(string: "pockettrailer://")!, completionHandler: nil)
 	}
 
 	override func viewDidLayoutSubviews() {
@@ -93,42 +100,71 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 
 	private func update() {
 
-		if let overview = NSDictionary(contentsOfURL: (NSFileManager.defaultManager().containerURLForSecurityApplicationGroupIdentifier("group.Trailer")!).URLByAppendingPathComponent("overview.plist")) {
-
-			let prs = overview["prs"] as! [String:AnyObject]
-			var totalCount = prs["total"] as! Int
-			var a = NSMutableAttributedString(string: "\(totalCount): ", attributes: brightAttributes)
-			if totalCount>0 {
-				append(a, from: prs, section: .Mine)
-				append(a, from: prs, section: .Participated)
-				append(a, from: prs, section: .Mentioned)
-				append(a, from: prs, section: .Merged)
-				append(a, from: prs, section: .Closed)
-				append(a, from: prs, section: .All)
-				append(a, from: prs, section: .Snoozed)
-				appendCommentCount(a, number: prs["unread"] as! Int)
-			} else {
-				a.appendAttributedString(NSAttributedString(string: prs["error"] as! String, attributes: [NSParagraphStyleAttributeName: paragraph]))
+		func append(a: NSMutableAttributedString, count: Int, section: Section) {
+			if count > 0 {
+				let text = "\(count)\u{a0}\(section.watchMenuName()), "
+				a.appendAttributedString(NSAttributedString(string: text, attributes: normalAttributes))
 			}
-			prLabel.attributedText = a
+		}
 
-			let issues = overview["issues"] as! [String:AnyObject]
-			totalCount = issues["total"] as! Int
-			a = NSMutableAttributedString(string: "\(totalCount): ", attributes: brightAttributes)
-			if totalCount>0 {
-				append(a, from: issues, section: .Mine)
-				append(a, from: issues, section: .Participated)
-				append(a, from: issues, section: .Mentioned)
-				append(a, from: issues, section: .Closed)
-				append(a, from: issues, section: .All)
-				append(a, from: issues, section: .Snoozed)
-				appendCommentCount(a, number: issues["unread"] as! Int)
+		func appendCommentCount(a: NSMutableAttributedString, number: Int) {
+			if number > 1 {
+				a.appendAttributedString(NSAttributedString(string: "\(number)\u{a0}unread\u{a0}comments", attributes: redAttributes))
+			} else if number == 1 {
+				a.appendAttributedString(NSAttributedString(string: "1\u{a0}unread\u{a0}comment", attributes: redAttributes))
 			} else {
-				a.appendAttributedString(NSAttributedString(string: issues["error"] as! String, attributes: [NSParagraphStyleAttributeName: paragraph]))
+				a.appendAttributedString(NSAttributedString(string: "No\u{a0}unread\u{a0}comments", attributes: dimAttributes))
 			}
-			issuesLabel.attributedText = a
+		}
 
-			let lastRefresh = overview["lastUpdated"] as! NSDate
+		if let result = NSDictionary(contentsOfURL: (NSFileManager.defaultManager().containerURLForSecurityApplicationGroupIdentifier("group.Trailer")!).URLByAppendingPathComponent("overview.plist")) {
+
+			func writeOutSection(type: String) -> NSAttributedString {
+				var totalOpen = 0
+				var totalUnread = 0
+				var totalMine = 0
+				var totalParticipated = 0
+				var totalMentioned = 0
+				var totalSnoozed = 0
+				var totalMerged = 0
+				var totalClosed = 0
+				var totalOther = 0
+
+				for r in result["views"] as! [[String : AnyObject]] {
+					if let v = r[type] as? [String : AnyObject] {
+						totalMine += v[Section.Mine.apiName()]?["total"] as? Int ?? 0
+						totalParticipated += v[Section.Participated.apiName()]?["total"] as? Int ?? 0
+						totalMentioned += v[Section.Mentioned.apiName()]?["total"] as? Int ?? 0
+						totalSnoozed += v[Section.Snoozed.apiName()]?["total"] as? Int ?? 0
+						totalOther += v[Section.All.apiName()]?["total"] as? Int ?? 0
+						totalMerged += v[Section.Merged.apiName()]?["total"] as? Int ?? 0
+						totalClosed += v[Section.Closed.apiName()]?["total"] as? Int ?? 0
+						totalUnread += v["unread"] as? Int ?? 0
+						totalOpen += v["total_open"] as? Int ?? 0
+					}
+				}
+
+				let totalCount = totalMerged+totalMine+totalParticipated+totalClosed+totalMentioned+totalSnoozed+totalOther
+				let a = NSMutableAttributedString(string: "\(totalCount): ", attributes: brightAttributes)
+				if totalCount>0 {
+					append(a, count: totalMine, section: .Mine)
+					append(a, count: totalParticipated, section: .Participated)
+					append(a, count: totalMentioned, section: .Mentioned)
+					append(a, count: totalMerged, section: .Merged)
+					append(a, count: totalClosed, section: .Closed)
+					append(a, count: totalOther, section: .All)
+					append(a, count: totalSnoozed, section: .Snoozed)
+					appendCommentCount(a, number: totalUnread)
+				} else {
+					a.appendAttributedString(NSAttributedString(string: result["error"] as! String, attributes: [NSParagraphStyleAttributeName: paragraph]))
+				}
+				return a.copy() as! NSAttributedString
+			}
+
+			prLabel.attributedText = writeOutSection("prs")
+			issuesLabel.attributedText = writeOutSection("issues")
+
+			let lastRefresh = result["lastUpdated"] as! NSDate
 			if lastRefresh == NSDate.distantPast() {
 				updatedLabel.attributedText = NSAttributedString(string: "Not updated yet", attributes: smallAttributes)
 			} else {
@@ -150,38 +186,6 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 		update()
 
 		completionHandler(NCUpdateResult.NewData)
-	}
-
-	private func appendCommentCount(a: NSMutableAttributedString, number: Int) {
-		if number > 1 {
-			a.appendAttributedString(NSAttributedString(string: "\(number)\u{a0}unread\u{a0}comments", attributes: redAttributes))
-		} else if number == 1 {
-			a.appendAttributedString(NSAttributedString(string: "1\u{a0}unread\u{a0}comment", attributes: redAttributes))
-		} else {
-			a.appendAttributedString(NSAttributedString(string: "No\u{a0}unread\u{a0}comments", attributes: dimAttributes))
-		}
-	}
-
-	func append(a: NSMutableAttributedString, from: [String:AnyObject], section: Section) {
-		let count = (from[section.apiName()] as! [String:AnyObject])["total"] as! Int
-		if count > 0 {
-			let text = "\(count)\u{a0}\(section.watchMenuName()), "
-			a.appendAttributedString(NSAttributedString(string: text, attributes: normalAttributes))
-		} else {
-			let text = "0\u{a0}\(section.watchMenuName()), "
-			a.appendAttributedString(NSAttributedString(string: text, attributes: dimAttributes))
-		}
-	}
-
-	private func imageFromColor(color: UIColor) -> UIImage {
-		let rect = CGRectMake(0, 0, 1, 1)
-		UIGraphicsBeginImageContext(rect.size)
-		let context = UIGraphicsGetCurrentContext()
-		CGContextSetFillColorWithColor(context, color.CGColor)
-		CGContextFillRect(context, rect)
-		let img = UIGraphicsGetImageFromCurrentImageContext()
-		UIGraphicsEndImageContext()
-		return img
 	}
 
 	func widgetMarginInsetsForProposedMarginInsets(defaultMarginInsets: UIEdgeInsets) -> UIEdgeInsets {
