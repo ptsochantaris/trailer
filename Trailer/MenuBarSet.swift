@@ -130,28 +130,19 @@ final class MenuBarSet {
 
 			let shouldGray = Settings.grayOutWhenRefreshing && appIsRefreshing
 
-			let si = menu.showStatusItem()
+			let siv = menu.showStatusItem()
 
-			if let s = si.view as? StatusItemView where compareDict(s.textAttributes, to: attributes) && s.statusLabel == countString && s.grayOut == shouldGray {
-				// Skip update, icon is identical
-			} else {
+			if !(compareDict(siv.textAttributes, to: attributes) && siv.statusLabel == countString && siv.grayOut == shouldGray) {
+				// Info has changed, update
 				DLog("Updating \(type) status item")
-				let width = countString.sizeWithAttributes(attributes).width
-				let H = NSStatusBar.systemStatusBar().thickness
-				let itemWidth = (H + width + STATUSITEM_PADDING*3) + lengthOffset
-				let siv = StatusItemView(frame: CGRectMake(0, 0, itemWidth, H), label: countString, prefix: type, attributes: attributes)
+				siv.icon = NSImage(named: "\(type)Icon")!
+				siv.textAttributes = attributes
 				siv.labelOffset = lengthOffset
 				siv.highlighted = menu.visible
 				siv.grayOut = shouldGray
+				siv.statusLabel = countString
 				siv.title = itemLabel
-				siv.tappedCallback = {
-					if menu.visible {
-						menu.closeMenu()
-					} else {
-						app.showMenu(menu)
-					}
-				}
-				si.view = siv
+				siv.sizeToFit()
 			}
 		}
 

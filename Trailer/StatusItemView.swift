@@ -1,36 +1,16 @@
 
 final class StatusItemView: NSView {
 
-	private let icon: NSImage
+	private let tappedCallback: Completion
 
-	let textAttributes: [String : AnyObject]
-	let statusLabel: String
-	var tappedCallback: Completion?
-	var labelOffset: CGFloat = 0
+	var icon: NSImage!
+	var textAttributes = [String : AnyObject]()
+	var statusLabel = ""
+	var labelOffset:CGFloat = 0
 	var title: String?
+	var grayOut = false
 
-	init(frame: NSRect, label: String, prefix: String, attributes: [String : AnyObject]) {
-		statusLabel = label
-		textAttributes = attributes
-		highlighted = false
-		grayOut = false
-		icon = NSImage(named: "\(prefix)Icon")!
-		super.init(frame: frame)
-	}
-
-	required init?(coder: NSCoder) {
-	    fatalError("init(coder:) has not been implemented")
-	}
-
-	var grayOut: Bool {
-		didSet {
-			if grayOut != oldValue {
-				needsDisplay = true
-			}
-		}
-	}
-
-	var highlighted: Bool {
+	var highlighted = false {
 		didSet {
 			if highlighted != oldValue {
 				needsDisplay = true
@@ -38,8 +18,27 @@ final class StatusItemView: NSView {
 		}
 	}
 
+	init(callback: Completion) {
+		tappedCallback = callback
+		super.init(frame: NSZeroRect)
+	}
+
+	required init?(coder: NSCoder) {
+	    fatalError("init(coder:) has not been implemented")
+	}
+
 	override func mouseDown(theEvent: NSEvent) {
-		tappedCallback?()
+		tappedCallback()
+	}
+
+	private let STATUSITEM_PADDING: CGFloat = 1.0
+
+	func sizeToFit() {
+		let width = statusLabel.sizeWithAttributes(textAttributes).width
+		let H = NSStatusBar.systemStatusBar().thickness
+		let itemWidth = (H + width + STATUSITEM_PADDING*3) + labelOffset
+		frame = NSMakeRect(0, 0, itemWidth, H)
+		needsDisplay = true
 	}
 
 	override func drawRect(dirtyRect: NSRect) {

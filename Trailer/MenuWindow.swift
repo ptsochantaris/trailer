@@ -82,11 +82,16 @@ final class MenuWindow: NSWindow {
 		}
 	}
 
-	func showStatusItem() -> NSStatusItem {
+	func showStatusItem() -> StatusItemView {
 		if statusItem == nil {
 			statusItem = NSStatusBar.systemStatusBar().statusItemWithLength(NSVariableStatusItemLength)
+			statusItem!.view = StatusItemView { [weak self] in
+				if let S = self {
+					if S.visible { S.closeMenu() } else { app.showMenu(S) }
+				}
+			}
 		}
-		return statusItem!
+		return statusItem!.view as! StatusItemView
 	}
 
 	func hideStatusItem() {

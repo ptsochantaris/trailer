@@ -16,7 +16,6 @@ typealias IMAGE_CLASS = UIImage
 
 #elseif os(OSX)
 
-let STATUSITEM_PADDING: CGFloat = 1.0
 let TOP_HEADER_HEIGHT: CGFloat = 28.0
 let AVATAR_SIZE: CGFloat = 26.0
 let LEFTPADDING: CGFloat = 44.0
