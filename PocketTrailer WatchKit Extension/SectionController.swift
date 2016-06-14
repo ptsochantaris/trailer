@@ -15,6 +15,11 @@ final class SectionController: CommonController {
 		super.awakeWithContext(context)
 	}
 
+	override func willActivate() {
+		super.willActivate()
+		updateUI()
+	}
+
 	override func showLoadingFeedback() -> Bool {
 		return false
 	}
@@ -42,8 +47,10 @@ final class SectionController: CommonController {
 	override func requestData(command: String?) {
 		if let c = command {
 			sendRequest(["command": c])
-		} else {
+		} else if WCSession.defaultSession().receivedApplicationContext["overview"] != nil {
 			updateUI()
+		} else {
+			requestData("needsOverview")
 		}
 	}
 

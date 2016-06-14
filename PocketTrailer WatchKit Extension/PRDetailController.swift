@@ -8,20 +8,14 @@ final class PRDetailController: CommonController {
 	@IBOutlet var statusLabel: WKInterfaceLabel!
 
 	private var rowControllers = [PopulatableRow]()
-	private var itemId: String?
-	private var isIssue = false
+	private var itemId: String!
 
 	override func awakeWithContext(context: AnyObject?) {
 		_statusLabel = statusLabel
 		_table = table
 
 		let c = context as! [NSObject : AnyObject]
-		if let i = c[PULL_REQUEST_KEY] as? String {
-			itemId = i
-		} else if let i = c[ISSUE_KEY] as? String {
-			itemId = i
-			isIssue = true
-		}
+		itemId = c[ITEM_KEY] as! String
 
 		super.awakeWithContext(context)
 	}
@@ -40,11 +34,11 @@ final class PRDetailController: CommonController {
 	}
 
 	@IBAction func markAllReadSelected() {
-		requestData(isIssue ? "markIssueRead" : "markPrRead")
+		requestData("markItemsRead")
 	}
 
 	@IBAction func openOnDeviceSelected() {
-		requestData(isIssue ? "openissue" : "openpr")
+		requestData("openItem")
 	}
 
 	override func updateFromData(response: [NSString : AnyObject]) {

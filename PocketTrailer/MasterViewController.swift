@@ -298,7 +298,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 				}
 			} else {
 				if canIssueKeyForIndexPath("Unread", ip) {
-					app.markItemAsUnRead(i.objectID.URIRepresentation().absoluteString)
+					markItemAsUnRead(i.objectID.URIRepresentation().absoluteString)
 				}
 			}
 			updateStatus()
@@ -841,20 +841,43 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		return 1
 	}
 
+	private func markItemAsUnRead(itemUri: String?) {
+		if let
+			i = itemUri,
+			oid = DataManager.idForUriPath(i),
+			o = existingObjectWithID(oid) as? ListableItem {
+			o.latestReadCommentDate = never()
+			o.postProcess()
+			DataManager.saveDB()
+			popupManager.getMasterController().updateStatus()
+		}
+	}
+
 	override func tableView(tableView: UITableView, editActionsForRowAtIndexPath indexPath: NSIndexPath) -> [UITableViewRowAction]? {
 
 		var actions = [UITableViewRowAction]()
+
+		func markItemAsRead(itemUri: String?) {
+			if let
+				i = itemUri,
+				oid = DataManager.idForUriPath(i),
+				o = existingObjectWithID(oid) as? ListableItem {
+				o.catchUpWithComments()
+				DataManager.saveDB()
+				popupManager.getMasterController().updateStatus()
+			}
+		}
 
 		func appendReadUnread(i: ListableItem) {
 			let r: UITableViewRowAction
 			if i.unreadComments?.longLongValue ?? 0 > 0 {
 				r = UITableViewRowAction(style: .Normal, title: "Read") { action, indexPath in
-					app.markItemAsRead(i.objectID.URIRepresentation().absoluteString)
+					markItemAsRead(i.objectID.URIRepresentation().absoluteString)
 					tableView.setEditing(false, animated: true)
 				}
 			} else {
-				r = UITableViewRowAction(style: .Normal, title: "Unread") { action, indexPath in
-					app.markItemAsUnRead(i.objectID.URIRepresentation().absoluteString)
+				r = UITableViewRowAction(style: .Normal, title: "Unread") { [weak self] action, indexPath in
+					self?.markItemAsUnRead(i.objectID.URIRepresentation().absoluteString)
 					tableView.setEditing(false, animated: true)
 				}
 			}

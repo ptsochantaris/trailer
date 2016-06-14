@@ -347,27 +347,4 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 		DataManager.saveDB()
 		popupManager.getMasterController().updateStatus()
 	}
-
-	func markItemAsRead(itemUri: String?) {
-		if let
-			i = itemUri,
-			oid = DataManager.idForUriPath(i),
-			o = existingObjectWithID(oid) as? ListableItem {
-				o.catchUpWithComments()
-				DataManager.saveDB()
-				popupManager.getMasterController().updateStatus()
-		}
-	}
-
-	func markItemAsUnRead(itemUri: String?) {
-		if let
-			i = itemUri,
-			oid = DataManager.idForUriPath(i),
-			o = existingObjectWithID(oid) as? ListableItem {
-				o.latestReadCommentDate = never()
-				o.postProcess()
-				DataManager.saveDB()
-				popupManager.getMasterController().updateStatus()
-		}
-	}
 }

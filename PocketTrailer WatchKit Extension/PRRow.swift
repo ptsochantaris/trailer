@@ -15,6 +15,7 @@ final class PRRow: NSObject {
     @IBOutlet weak var counterGroup: WKInterfaceGroup!
 
 	var itemId: String?
+	var hasUnread: Bool!
 
 	func populateFrom(itemData: [String : AnyObject]) {
 
@@ -34,7 +35,8 @@ final class PRRow: NSObject {
 
 		let u = itemData["unreadCount"] as? Int ?? 0
 		unreadCommentsL.setText("\(u)")
-		unreadCommentsGroup.setHidden(u==0)
+		hasUnread = u>0
+		unreadCommentsGroup.setHidden(!hasUnread)
 
 		counterGroup.setHidden(c+u==0)
 	}

@@ -60,7 +60,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 					}
 				}
 
-			case "openpr", "openissue":
+			case "openItem":
 				if let itemId = message["localId"] as? String {
 					popupManager.getMasterController().openItemWithUriPath(itemId)
 					DataManager.saveDB()
@@ -82,30 +82,31 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				app.clearAllClosed()
 				s.processList(message, replyHandler)
 
-			case "markPrRead", "markIssueRead":
-				app.markItemAsRead(message["localId"] as? String)
-				s.processList(message, replyHandler)
-
 			case "markEverythingRead":
 				app.markEverythingRead()
 				s.processList(message, replyHandler)
 
-			case "markAllPrsRead":
-				if var s = message["sectionIndex"] as? Int {
-					if s == -1 { s = 0 }
-					PullRequest.markEverythingRead(Section(rawValue: s)!, moc: mainObjectContext)
-					DataManager.saveDB()
-					app.updateBadge()
-				}
-				s.processList(message, replyHandler)
+			case "markItemsRead":
+				if let
+					uri = message["localId"] as? String,
+					oid = DataManager.idForUriPath(uri),
+					dataItem = existingObjectWithID(oid) as? ListableItem,
+					count = dataItem.unreadComments?.integerValue where count > 0 {
 
-			case "markAllIssuesRead":
-				if var s = message["sectionIndex"] as? Int {
-					if s == -1 { s = 0 }
-					Issue.markEverythingRead(Section(rawValue: s)!, moc: mainObjectContext)
-					DataManager.saveDB()
-					app.updateBadge()
+					dataItem.catchUpWithComments()
+				} else if let uris = message["itemUris"] as? [String] {
+					for uri in uris {
+						if let
+							oid = DataManager.idForUriPath(uri),
+							dataItem = existingObjectWithID(oid) as? ListableItem,
+							count = dataItem.unreadComments?.integerValue where count > 0 {
+
+							dataItem.catchUpWithComments()
+						}
+					}
 				}
+				DataManager.saveDB()
+				app.updateBadge()
 				s.processList(message, replyHandler)
 
 			case "needsOverview":

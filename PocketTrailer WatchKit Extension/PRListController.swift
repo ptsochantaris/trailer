@@ -65,6 +65,16 @@ final class PRListController: CommonController {
 
 		if let c = command {
 			params["command"] = c
+			if c == "markItemsRead" {
+				var itemIds = [String]()
+				for i in 0..<table.numberOfRows {
+					let controller = table.rowControllerAtIndex(i) as! PRRow
+					if controller.hasUnread! {
+						itemIds.append(controller.itemId!)
+					}
+				}
+				params["itemUris"] = itemIds
+			}
 		}
 		if let l = loadingBuffer {
 			params["from"] = NSNumber(integer: l.count)
@@ -150,11 +160,7 @@ final class PRListController: CommonController {
 	@IBAction func markAllReadSelected() {
 		loading = false
 		showStatus("Marking items as read", hideTable: true)
-		if type=="prs" {
-			requestData("markAllPrsRead")
-		} else {
-			requestData("markAllIssuesRead")
-		}
+		requestData("markItemsRead")
 	}
 
 	@IBAction func refreshSelected() {
@@ -167,8 +173,7 @@ final class PRListController: CommonController {
 		loading = false
 		selectedIndex = rowIndex
 		let row = table.rowControllerAtIndex(rowIndex) as! PRRow
-		let key = (type=="prs" ? PULL_REQUEST_KEY : ISSUE_KEY)
-		pushControllerWithName("DetailController", context: [ key: row.itemId! ])
+		pushControllerWithName("DetailController", context: [ ITEM_KEY: row.itemId! ])
 		if lastCount >= PAGE_SIZE {
 			self.showStatus("Loading...", hideTable: true)
 		}
