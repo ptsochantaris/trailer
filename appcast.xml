@@ -7,6 +7,30 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.4.2</title>
+			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>This update corrects an issue on OS X 10.9 and 10.10 which could lead to a crash when updating menus, and improves menu update performance.</li>
+				<li>Additionally from the recent 1.4.1:</li>
+				<li>Corrects counts shown during the confirmation of removing all merged or closed items from a list</li>
+				<li>New “group” field in the watchlist allows grouping or extracting one or more repositories into their own menu item(s).</li>
+				<li>New option to split API servers into separate menu-bar items.</li>
+				<li>New option to mark an item’s comments as read if you have just posted a new comment.</li>
+				<li>Refresh indicator will now give a rough estimate of how many API calls are left for a refresh to complete.</li>
+				<li>More info on notifications, including the repository name that a notification refers to.</li>
+				<li>Various dark mode detection issues corrected.</li>
+				<li>Significant internal cleanups and optimisations, as well as improved tracking of read/unread comments.</li>
+				</ul></font>]]></description>
+			<pubDate>Thu, 16 Jun 2016 20:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer142.zip"
+			sparkle:version="1338"
+			sparkle:shortVersionString="1.4.2"
+			sparkle:dsaSignature="MC4CFQCQFsnOAq7Zl4aTYkdzEho/WsMfBwIVAOFKHqqv4tH0nF9vmEUDU5gKb1DF"
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.4.1</title>
 			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
