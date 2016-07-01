@@ -544,6 +544,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		DataManager.postProcessAllItems()
 		DataManager.saveDB()
 		preferencesWindow?.reloadSettings()
+		setupWindows()
 		preferencesDirty = true
 		startRefresh()
 
@@ -664,9 +665,20 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	func updateAllMenus() {
+		var visibleMenuCount = 0
 		for d in menuBarSets {
+			d.forceVisible = false
 			d.updatePrMenu()
 			d.updateIssuesMenu()
+			if d.prMenu.statusItem != nil { visibleMenuCount += 1 }
+			if d.issuesMenu.statusItem != nil { visibleMenuCount += 1 }
+		}
+		if visibleMenuCount == 0 && menuBarSets.count > 0 {
+			// Safety net: Ensure that at the very least (usually while importing
+			// from an empty DB, with all repos in groups) *some* menu stays visible
+			let m = menuBarSets.first!
+			m.forceVisible = true
+			m.updatePrMenu()
 		}
 	}
 

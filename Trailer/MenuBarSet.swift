@@ -11,6 +11,8 @@ final class MenuBarSet {
 	var prFilterTimer: PopTimer!
 	var issuesFilterTimer: PopTimer!
 
+	var forceVisible = false
+
 	init(viewCriterion: GroupingCriterion?, delegate: NSWindowDelegate) {
 		self.viewCriterion = viewCriterion
 
@@ -79,7 +81,12 @@ final class MenuBarSet {
 		}
 	}
 
-	private func updateMenu(type: String, menu: MenuWindow, lengthOffset: CGFloat, totalCount: ()->Int, hasUnread: ()->Bool, reasonForEmpty: (String)->NSAttributedString) {
+	private func updateMenu(type: String,
+	                        menu: MenuWindow,
+	                        lengthOffset: CGFloat,
+	                        totalCount: ()->Int,
+	                        hasUnread: ()->Bool,
+	                        reasonForEmpty: (String)->NSAttributedString) {
 
 		func redText() -> [String : AnyObject] {
 			return [ NSFontAttributeName: NSFont.boldSystemFontOfSize(10),
@@ -122,7 +129,7 @@ final class MenuBarSet {
 		DLog("Updating \(type) menu, \(countString) total items")
 
 		let itemLabel = viewCriterion?.label
-		let disable = (itemLabel != nil && preFilterCount == 0)
+		let disable = (itemLabel != nil && preFilterCount == 0) && !(forceVisible && type == "PullRequest")
 
 		if disable {
 			menu.hideStatusItem()
@@ -174,7 +181,7 @@ final class MenuBarSet {
 
 	func updatePrMenu() {
 
-		if Repo.interestedInPrs(viewCriterion?.apiServerId) || !Repo.interestedInIssues(viewCriterion?.apiServerId) {
+		if forceVisible || Repo.interestedInPrs(viewCriterion?.apiServerId) || !Repo.interestedInIssues(viewCriterion?.apiServerId) {
 
 			updateMenu("PullRequest", menu: prMenu, lengthOffset: 0, totalCount: { () -> Int in
 				return PullRequest.countOpenInMoc(mainObjectContext)
