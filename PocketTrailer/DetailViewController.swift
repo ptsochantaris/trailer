@@ -38,6 +38,11 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 		configureView()
 	}
 
+	override func viewDidLayoutSubviews() {
+		super.viewDidLayoutSubviews()
+		popupManager.getMasterController().layoutTabs()
+	}
+
 	func configureView() {
 		if let w = webView {
 			if let d = detailItem {

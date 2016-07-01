@@ -181,19 +181,35 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		layoutTabs()
 	}
 
-	private func layoutTabs() {
-		if let s = navigationController?.view, t = tabs, ts = tabScroll, tb = tabBorder, ts1 = tabSide1, ts2 = tabSide2 {
-			let b = s.bounds.size
+	func layoutTabs() {
+		if let v = navigationController?.view, t = tabs, ts = tabScroll, tb = tabBorder, ts1 = tabSide1, ts2 = tabSide2 {
+			let b = v.bounds.size
 			let w = b.width
 			let h = b.height
+			let tabScrollTransform = ts.transform
+			let tabBorderTransform = tb.transform
+
 			let tf = CGRectMake(0, 0, max(w, 64*CGFloat(t.items?.count ?? 1)), 49)
 			t.frame = tf
 			ts.contentSize = tf.size
+
 			ts.frame = CGRectMake(0, h-49, w, 49)
+			ts.transform = tabScrollTransform
+
 			tb.frame = CGRectMake(0, h-49.5, w, 0.5)
+			tb.transform = tabBorderTransform
+
 			let ww = w*0.5
 			ts1.frame = CGRectMake(-ww, 0, ww, 49)
 			ts2.frame = CGRectMake(w, 0, ww, 49)
+
+			if navigationController?.visibleViewController == self || navigationController?.visibleViewController?.presentingViewController != nil {
+				v.bringSubviewToFront(tb)
+				v.bringSubviewToFront(ts)
+			} else {
+				v.sendSubviewToBack(tb)
+				v.sendSubviewToBack(ts)
+			}
 		}
 	}
 
