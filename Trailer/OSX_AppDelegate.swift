@@ -17,10 +17,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 	func setupWindows() {
 
-		if #available(OSX 10.10, *) {
-			let c = NSAppearance.currentAppearance()
-			darkMode = c.name.containsString(NSAppearanceNameVibrantDark)
-		}
+		darkMode = currentSystemDarkMode()
 
 		for d in menuBarSets {
 			d.throwAway()
@@ -1003,8 +1000,18 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			let s = NSStatusBar.systemStatusBar().statusItemWithLength(NSVariableStatusItemLength)
 			s.statusBar.removeStatusItem(s)
 
-			setupWindows()
+			if menuBarSets.count == 0 || (darkMode != currentSystemDarkMode()) {
+				setupWindows()
+			}
 		}
+	}
+
+	private func currentSystemDarkMode() -> Bool {
+		if #available(OSX 10.10, *) {
+			let c = NSAppearance.currentAppearance()
+			return c.name.containsString(NSAppearanceNameVibrantDark)
+		}
+		return false
 	}
 
 	// Server display list
