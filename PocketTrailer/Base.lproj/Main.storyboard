@@ -1334,6 +1334,7 @@ You need at least the 'repo', 'repo:status', 'repo_deployment', 'public_repo' an
                     <connections>
                         <outlet property="table" destination="ybt-jX-dKb" id="wqn-A9-BIY"/>
                         <segue destination="hkd-74-v5I" kind="show" identifier="showSnoozeEditor" id="22I-im-au7"/>
+                        <segue destination="UM1-Tl-R50" kind="show" identifier="showPicker" id="T4S-uD-LHq"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="2tc-WO-fgl" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -1430,5 +1431,8 @@ You need at least the 'repo', 'repo:status', 'repo_deployment', 'public_repo' an
         <image name="settings" width="28" height="28"/>
         <image name="snoozing" width="28" height="28"/>
     </resources>
+    <inferredMetricsTieBreakers>
+        <segue reference="T4S-uD-LHq"/>
+    </inferredMetricsTieBreakers>
     <color key="tintColor" red="0.25490196078431371" green="0.51372549019607838" blue="0.7686274509803922" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
 </document>

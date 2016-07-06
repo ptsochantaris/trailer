@@ -124,6 +124,9 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var snoozeWakeOnStatusUpdate: NSButton!
 	@IBOutlet weak var hideSnoozedItems: NSButton!
 
+	@IBOutlet weak var autoSnoozeSelector: NSStepper!
+	@IBOutlet weak var autoSnoozeLabel: NSTextField!
+
 	// Misc
 	@IBOutlet weak var repeatLastExportAutomatically: NSButton!
 	@IBOutlet weak var lastExportReport: NSTextField!
@@ -176,16 +179,13 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		n.addObserver(self, selector: #selector(PreferencesWindow.updateImportExportSettings), name: SETTINGS_EXPORTED, object: nil)
 
 		deferredUpdateTimer = PopTimer(timeInterval: 0.5) { [weak self] in
-			if let s = self {
-				if s.serversDirty {
-					s.serversDirty = false
-					DataManager.saveDB()
-					Settings.possibleExport(nil)
-					app.setupWindows()
-				} else {
-					app.updateAllMenus()
-				}
+			if let s = self where s.serversDirty {
+				s.serversDirty = false
+				DataManager.saveDB()
+				Settings.possibleExport(nil)
+				app.setupWindows()
 			} else {
+				DataManager.saveDB()
 				app.updateAllMenus()
 			}
 		}
@@ -1382,6 +1382,30 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			titles.append(String(format: "%02d", f))
 		}
 		snoozeDateTimeMinute.addItemsWithTitles(titles)
+
+		if Settings.autoSnoozeDuration == 0 {
+			autoSnoozeLabel.stringValue = "Do not auto-snooze items"
+			autoSnoozeLabel.textColor = NSColor.disabledControlTextColor()
+		} else if Settings.autoSnoozeDuration == 1 {
+			autoSnoozeLabel.stringValue = "Automatically snooze any item that has been idle for longer than a day"
+			autoSnoozeLabel.textColor = NSColor.controlTextColor()
+		} else {
+			autoSnoozeLabel.stringValue = "Automatically snooze any item that has been idle for longer than \(Settings.autoSnoozeDuration) days"
+			autoSnoozeLabel.textColor = NSColor.controlTextColor()
+		}
+	}
+
+	@IBAction func autoSnoozeDurationChanged(sender: NSStepper) {
+		Settings.autoSnoozeDuration = sender.integerValue
+		fillSnoozingDropdowns()
+		for p in DataItem.allItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest] {
+			p.wakeIfAutoSnoozed()
+		}
+		for i in DataItem.allItemsOfType("Issue", inMoc: mainObjectContext) as! [Issue] {
+			i.wakeIfAutoSnoozed()
+		}
+		DataManager.postProcessAllItems()
+		deferredUpdateTimer.push()
 	}
 
 	func selectedSnoozePreset() -> SnoozePreset? {
@@ -1447,7 +1471,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	private func commitSnoozeSettings() {
 		snoozePresetsList.reloadData()
-		DataManager.saveDB()
 		deferredUpdateTimer.push()
 		Settings.possibleExport(nil)
 	}

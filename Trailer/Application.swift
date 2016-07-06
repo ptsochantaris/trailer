@@ -27,6 +27,13 @@ final class Application: NSApplication {
 						} else {
 							if sendAction(#selector(NSText.copy(_:)), to:nil, from:self) { return }
 						}
+					case "s":
+						if let i = app.focusedItem() where i.isSnoozing {
+							i.wakeUp()
+							DataManager.saveDB()
+							app.updateRelatedMenusFor(i)
+							return
+						}
 					case "m":
 						if let i = app.focusedItem() {
 							i.setMute(!(i.muted?.boolValue ?? false))

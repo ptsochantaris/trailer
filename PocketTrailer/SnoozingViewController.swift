@@ -1,7 +1,7 @@
 
 import UIKit
 
-final class SnoozingViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+final class SnoozingViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, PickerViewControllerDelegate {
 
 	@IBOutlet weak var table: UITableView!
 
@@ -31,16 +31,16 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 
 	func numberOfSectionsInTableView(tableView: UITableView) -> Int {
 		if SnoozePreset.allSnoozePresetsInMoc(mainObjectContext).count > 0 {
-			return 3
+			return 4
 		} else {
-			return 2
+			return 3
 		}
 	}
 
 	func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		if section == 0 {
+		if section == 0 || section == 1 {
 			return 1
-		} else if section == 1 {
+		} else if section == 2 {
 			return 3
 		} else {
 			return SnoozePreset.allSnoozePresetsInMoc(mainObjectContext).count
@@ -53,6 +53,14 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 			cell.textLabel?.text = "Hide snoozed items"
 			cell.accessoryType = Settings.hideSnoozedItems ? .Checkmark : .None
 		} else if indexPath.section == 1 {
+			let d = Settings.autoSnoozeDuration
+			if d > 0 {
+				cell.textLabel?.text = "Auto-snooze items after \(d) days"
+			} else {
+				cell.textLabel?.text = "Do not auto-snooze items"
+			}
+			cell.accessoryType = .DisclosureIndicator
+		} else if indexPath.section == 2 {
 			switch indexPath.row {
 			case 0:
 				cell.textLabel?.text = "New comment"
@@ -74,8 +82,10 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 
 	func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
 		if section == 0 {
-			return nil
+			return "You can create presets here that can be used to 'snooze' items for a specific time duration, until a date, or if a specific event occurs."
 		} else if section == 1 {
+			return "Automatically snooze items after a specific amount of time..."
+		} else if section == 2 {
 			return "Wake up a snoozing item immediately if any of these occur..."
 		} else {
 			return "Existing presets:"
@@ -86,8 +96,10 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 		if indexPath.section == 0 {
 			Settings.hideSnoozedItems = !Settings.hideSnoozedItems
 			tableView.reloadData()
-			settingsChangedTimer.push()			
+			settingsChangedTimer.push()
 		} else if indexPath.section == 1 {
+			performSegueWithIdentifier("showPicker", sender: self)
+		} else if indexPath.section == 2 {
 			switch indexPath.row {
 			case 0:
 				Settings.snoozeWakeOnComment = !Settings.snoozeWakeOnComment
@@ -104,7 +116,13 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 	}
 
 	override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-		if let d = segue.destinationViewController as? SnoozingEditorViewController {
+		if let d = segue.destinationViewController as? PickerViewController {
+			d.delegate = self
+			d.title = "Auto Snooze Items After"
+			let count = 2.stride(to: 9000, by: 1).map { "\($0) days" }
+			d.values = ["Never", "1 day"] + count
+			d.previousValue = Settings.autoSnoozeDuration
+		} else if let d = segue.destinationViewController as? SnoozingEditorViewController {
 			if let s = sender as? SnoozePreset {
 				d.isNew = false
 				d.snoozeItem = s
@@ -113,6 +131,18 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 				d.snoozeItem = SnoozePreset.newSnoozePresetInMoc(mainObjectContext)
 			}
 		}
+	}
+
+	func pickerViewController(picker: PickerViewController, didSelectIndexPath: NSIndexPath) {
+		Settings.autoSnoozeDuration = didSelectIndexPath.row
+		table.reloadData()
+		for p in DataItem.allItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest] {
+			p.wakeIfAutoSnoozed()
+		}
+		for i in DataItem.allItemsOfType("Issue", inMoc: mainObjectContext) as! [Issue] {
+			i.wakeIfAutoSnoozed()
+		}
+		DataManager.postProcessAllItems()
 	}
 
 	override func viewDidAppear(animated: Bool) {

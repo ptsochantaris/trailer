@@ -30,6 +30,7 @@ class ListableItem: DataItem {
 	@NSManaged var announced: NSNumber?
 	@NSManaged var muted: NSNumber?
 	@NSManaged var snoozeUntil: NSDate?
+	@NSManaged var wasAwokenFromSnooze: Bool
 	@NSManaged var milestone: String?
 
 	@NSManaged var comments: Set<PRComment>
@@ -176,6 +177,7 @@ class ListableItem: DataItem {
 
 	final func wakeUp() {
 		snoozeUntil = nil
+		wasAwokenFromSnooze = true
 		postProcess()
 	}
 
@@ -196,10 +198,34 @@ class ListableItem: DataItem {
 		}
 	}
 
+	private final func shouldMoveToSnoozing() -> Bool {
+		if snoozeUntil == nil {
+			let d = Settings.autoSnoozeDuration
+			if d > 0, let u = updatedAt where !wasAwokenFromSnooze {
+				let autoSnoozeBoundary = NSDate().dateByAddingTimeInterval(-86400.0*NSTimeInterval(d))
+				if autoSnoozeBoundary.compare(u) == .OrderedDescending {
+					snoozeUntil = NSDate.distantFuture()
+					return true
+				}
+			}
+			return false
+		} else {
+			return true
+		}
+	}
+
+	final func wakeIfAutoSnoozed() {
+		if snoozeUntil == NSDate.distantFuture() && !wasAwokenFromSnooze {
+			snoozeUntil = nil
+			wasAwokenFromSnooze = false
+		}
+	}
+
 	final func postProcess() {
 
 		if let s = snoozeUntil where s.compare(NSDate()) == .OrderedAscending {
 			snoozeUntil = nil
+			wasAwokenFromSnooze = true
 		}
 
 		let isMine = createdByMe
@@ -208,7 +234,7 @@ class ListableItem: DataItem {
 
 		if currentCondition == ItemCondition.Merged.rawValue		{ targetSection = .Merged }
 		else if currentCondition == ItemCondition.Closed.rawValue	{ targetSection = .Closed }
-		else if snoozeUntil != nil									{ targetSection = .Snoozed }
+		else if shouldMoveToSnoozing()								{ targetSection = .Snoozed }
 		else if isMine || assignedToMySection						{ targetSection = .Mine }
 		else if assignedToParticipated || commentedByMe				{ targetSection = .Participated }
 		else														{ targetSection = .All }
@@ -262,7 +288,7 @@ class ListableItem: DataItem {
 			return managedObjectContext?.countForFetchRequest(f, error: nil) ?? 0
 		}
 
-		let dontCountComments = isMuted || (targetSection == .All && !Settings.showCommentsEverywhere)
+		let dontCountComments = isMuted || ((targetSection == .All || targetSection == .Snoozed) && !Settings.showCommentsEverywhere)
 
 		if moveToMentioned {
 			targetSection = .Mentioned

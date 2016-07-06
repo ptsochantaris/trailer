@@ -965,6 +965,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		for item in items {
 			a.addAction(UIAlertAction(title: item.listDescription, style: .Default) { action in
 				i.snoozeUntil = item.wakeupDateFromNow
+				i.wasAwokenFromSnooze = false
 				i.muted = false
 				i.postProcess()
 				DataManager.saveDB()

@@ -175,6 +175,7 @@ class TrailerCell: NSTableCellView {
 	func snoozeSelected(sender: NSMenuItem) {
 		if let item = associatedDataItem(), oid = sender.representedObject as? NSManagedObjectID, snoozeItem = existingObjectWithID(oid) as? SnoozePreset {
 			item.snoozeUntil = snoozeItem.wakeupDateFromNow
+			item.wasAwokenFromSnooze = false
 			item.muted = false
 			item.postProcess()
 			saveAndRequestMenuUpdate(item)
