@@ -13,7 +13,6 @@
 				<li>New option to automatically snooze items after a specific number of days of inactivity.</li>
 				<li>Fix: Avoiding menu window recreation after system wake, if dark mode hasn’t changed.</li>
 				<li>Fix: If all menu bar items are groups, and there are no items to display on any of them, will ensure at least one stays visible to allow access to preferences.</li>
-				<li>Significant internal cleanups and optimisations, as well as improved tracking of read/unread comments.</li>
 				</ul></font>]]></description>
 			<pubDate>Thu, 7 Jul 2016 16:00:00 +0000</pubDate>
 			<enclosure
