@@ -3,8 +3,26 @@
 	<channel>
 		<title>Trailer Changelog</title>
 		<link>http://ptsochantaris.github.io/trailer/appcast.xml</link>
-		<description>Managing Pull Requests and Issues For GitHub and GitHub Enterprise.</description>
+		<description>Managing Pull Requests and Issues, For GitHub and GitHub Enterprise.</description>
 		<language>en</language>
+
+		<item>
+			<title>Version 1.4.3</title>
+			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>New option to automatically snooze items after a specific number of days of inactivity.</li>
+				<li>Fix: Avoiding menu window recreation after system wake, if dark mode hasn’t changed.</li>
+				<li>Fix: If all menu bar items are groups, and there are no items to display on any of them, will ensure at least one stays visible to allow access to preferences.</li>
+				<li>Significant internal cleanups and optimisations, as well as improved tracking of read/unread comments.</li>
+				</ul></font>]]></description>
+			<pubDate>Thu, 7 Jul 2016 16:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer143.zip"
+			sparkle:version="1341"
+			sparkle:shortVersionString="1.4.3"
+			sparkle:dsaSignature="MC0CFQC63pzs402Yc75xmEokZFwdT6f0NwIUcL1QijbTkt1wb7f6NXf41XamB/0="
+			type="application/octet-stream"/>
+		</item>
 
 		<item>
 			<title>Version 1.4.2</title>
@@ -212,41 +230,5 @@
 			type="application/octet-stream"/>
 		</item>
 
-		<item>
-			<title>Version 1.3.11</title>
-			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
-			<description><![CDATA[<font face="sans-serif" size="3"><ul>
-				<li>Added options to hide items based on authorship. Hide all your own items or items of others per-repository.</li>
-				<li>Added success/in-progress/failed icons in front of PR status items to help make them easier to distinguish.</li>
-				<li>Disambiguations and clearer option names in preferences, as well as tooltips with help text for almost every option.</li>
-				<li>Fix for a nasty crash when enter was pressed with no item selected.</li>
-				<li>Corrections for IME character input in the filters field.</li>
-				</ul></font>]]></description>
-			<pubDate>Sun, 29 Nov 2015 22:00:00 +0000</pubDate>
-			<enclosure
-			url="http://ptsochantaris.github.io/trailer/trailer1311.zip"
-			sparkle:version="1258"
-			sparkle:shortVersionString="1.3.11"
-			sparkle:dsaSignature="MC4CFQCsxZ54vEQIELLvLyqi54RKi+rYHAIVAOH24sDso5i1e94eZzoVia/l3h3W"
-			type="application/octet-stream"/>
-		</item>
-
-		<item>
-			<title>Version 1.3.10</title>
-			<sparkle:minimumSystemVersion>10.9.0</sparkle:minimumSystemVersion>
-			<description><![CDATA[<font face="sans-serif" size="3"><ul>
-				<li>Search for items directly via their number. Type “number:X” into the filter field, or have Trailer always check for item numbers via the new filtering preference</li>
-				<li>Large speedup in sync performance for repos with long lists of PRs and/or issues</li>
-				<li>Fix for feedback shown in the menubar during the first sync after launch</li>
-				</ul></font>]]></description>
-			<pubDate>Thu, 5 Nov 2015 19:00:00 +0000</pubDate>
-			<enclosure
-			url="http://ptsochantaris.github.io/trailer/trailer1310.zip"
-			sparkle:version="1252"
-			sparkle:shortVersionString="1.3.10"
-			sparkle:dsaSignature="MC0CFGH4BmUl8LcfdXZGyTWFfkPhYm79AhUA3X4J1y4pViiYPqcQ7a/84AsprhU="
-			type="application/octet-stream"/>
-		</item>
-		
 	</channel>
 </rss>
