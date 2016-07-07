@@ -780,7 +780,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
 		let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath)
-		configureCell(cell, atIndexPath: indexPath)
+		if let o = fetchedResultsController.objectAtIndexPath(indexPath) as? ListableItem {
+			configureCell(cell, withObject: o)
+		}
 		return cell
 	}
 
@@ -1025,8 +1027,8 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 				tableView.deleteRowsAtIndexPaths([i], withRowAnimation:.Automatic)
 			}
 		case .Update:
-			if let i = indexPath, cell = tableView.cellForRowAtIndexPath(i) {
-				configureCell(cell, atIndexPath: i)
+			if let i = indexPath, object = anObject as? ListableItem, cell = tableView.cellForRowAtIndexPath(i) {
+				configureCell(cell, withObject: object)
 			}
 		case .Move:
 			if let i = indexPath {
@@ -1047,20 +1049,12 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		updateStatus()
 	}
 
-	private func configureCell(cell: UITableViewCell, atIndexPath: NSIndexPath) {
-
-		if let sections = fetchedResultsController.sections, c = cell as? PRCell {
-			let r = atIndexPath.row
-			let s = atIndexPath.section
-
-			if s >= 0 && s < sections.count && r >= 0 && r < sections[s].numberOfObjects {
-				let o = fetchedResultsController.objectAtIndexPath(atIndexPath)
-				if o is PullRequest {
-					c.setPullRequest(o as! PullRequest)
-				} else {
-					c.setIssue(o as! Issue)
-				}
-			}
+	private func configureCell(cell: UITableViewCell, withObject: ListableItem) {
+		guard let c = cell as? PRCell else { return }
+		if let o = withObject as? PullRequest {
+			c.setPullRequest(o)
+		} else if let o = withObject as? Issue {
+			c.setIssue(o)
 		}
 	}
 

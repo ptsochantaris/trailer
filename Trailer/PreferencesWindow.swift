@@ -271,6 +271,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		snoozeWakeOnMention.toolTip = Settings.snoozeWakeOnMentionHelp
 		snoozeWakeOnComment.toolTip = Settings.snoozeWakeOnCommentHelp
 		hideSnoozedItems.toolTip = Settings.hideSnoozedItemsHelp
+		autoSnoozeSelector.toolTip = Settings.autoSnoozeDurationHelp
+		autoSnoozeLabel.toolTip = Settings.autoSnoozeDurationHelp
 	}
 
 	private func updateAllItemSettingButtons() {
@@ -1393,6 +1395,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			autoSnoozeLabel.stringValue = "Automatically snooze any item that has been idle for longer than \(Settings.autoSnoozeDuration) days"
 			autoSnoozeLabel.textColor = NSColor.controlTextColor()
 		}
+		autoSnoozeSelector.integerValue = Settings.autoSnoozeDuration
 	}
 
 	@IBAction func autoSnoozeDurationChanged(sender: NSStepper) {

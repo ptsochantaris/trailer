@@ -200,10 +200,9 @@ class ListableItem: DataItem {
 
 	private final func shouldMoveToSnoozing() -> Bool {
 		if snoozeUntil == nil {
-			let d = Settings.autoSnoozeDuration
-			if d > 0, let u = updatedAt where !wasAwokenFromSnooze {
-				let autoSnoozeBoundary = NSDate().dateByAddingTimeInterval(-86400.0*NSTimeInterval(d))
-				if autoSnoozeBoundary.compare(u) == .OrderedDescending {
+			let d = NSTimeInterval(Settings.autoSnoozeDuration)
+			if d > 0 && !wasAwokenFromSnooze, let autoSnoozeDate = updatedAt?.dateByAddingTimeInterval(86400.0*d) {
+				if autoSnoozeDate.compare(NSDate()) == .OrderedAscending {
 					snoozeUntil = NSDate.distantFuture()
 					return true
 				}
