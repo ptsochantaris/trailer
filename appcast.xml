@@ -14,12 +14,12 @@
 				<li>Fix: Avoiding menu window recreation after system wake, if dark mode hasn’t changed.</li>
 				<li>Fix: If all menu bar items are groups, and there are no items to display on any of them, will ensure at least one stays visible to allow access to preferences.</li>
 				</ul></font>]]></description>
-			<pubDate>Thu, 7 Jul 2016 16:00:00 +0000</pubDate>
+			<pubDate>Thu, 8 Jul 2016 10:00:00 +0000</pubDate>
 			<enclosure
 			url="http://ptsochantaris.github.io/trailer/trailer143.zip"
-			sparkle:version="1341"
+			sparkle:version="1342"
 			sparkle:shortVersionString="1.4.3"
-			sparkle:dsaSignature="MC0CFQC63pzs402Yc75xmEokZFwdT6f0NwIUcL1QijbTkt1wb7f6NXf41XamB/0="
+			sparkle:dsaSignature="MC4CFQDQjX8be/miNWEUhfzteIc4UtveDwIVANjJ+zq5bD2SWLSIzZVow6kn6tXW"
 			type="application/octet-stream"/>
 		</item>
 
