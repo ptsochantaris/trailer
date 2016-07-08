@@ -38,6 +38,7 @@ typealias IMAGE_CLASS = NSImage
 var appIsRefreshing = false
 var preferencesDirty = false
 var lastRepoCheck = never()
+let autoSnoozeDate = NSDate.distantFuture().dateByAddingTimeInterval(-1)
 
 //////////////////////////
 

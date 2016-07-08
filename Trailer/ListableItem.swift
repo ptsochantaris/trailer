@@ -203,7 +203,7 @@ class ListableItem: DataItem {
 			let d = NSTimeInterval(Settings.autoSnoozeDuration)
 			if d > 0 && !wasAwokenFromSnooze, let autoSnoozeDate = updatedAt?.dateByAddingTimeInterval(86400.0*d) {
 				if autoSnoozeDate.compare(NSDate()) == .OrderedAscending {
-					snoozeUntil = NSDate.distantFuture()
+					snoozeUntil = autoSnoozeDate
 					return true
 				}
 			}
@@ -214,7 +214,7 @@ class ListableItem: DataItem {
 	}
 
 	final func wakeIfAutoSnoozed() {
-		if snoozeUntil == NSDate.distantFuture() && !wasAwokenFromSnooze {
+		if snoozeUntil == autoSnoozeDate && !wasAwokenFromSnooze {
 			snoozeUntil = nil
 			wasAwokenFromSnooze = false
 		}
