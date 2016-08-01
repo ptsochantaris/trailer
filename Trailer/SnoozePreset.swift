@@ -14,13 +14,13 @@ final class SnoozePreset: NSManagedObject {
 	var listDescription: String {
 		if duration.boolValue {
 			var resultItems = [String]()
-			if let d = day?.integerValue {
+			if let d = day?.intValue {
 				resultItems.append(d > 1 ? "\(d) days" : "1 day")
 			}
-			if let h = hour?.integerValue {
+			if let h = hour?.intValue {
 				resultItems.append(h > 1 ? "\(h) hours" : "1 hour")
 			}
-			if let m = minute?.integerValue {
+			if let m = minute?.intValue {
 				resultItems.append(m > 1 ? "\(m) minutes" : "1 minute")
 			}
 			if resultItems.count == 0 {
@@ -30,84 +30,84 @@ final class SnoozePreset: NSManagedObject {
 					return "Until manual wake"
 				}
 			}
-			return "For \(resultItems.joinWithSeparator(", "))"
+			return "For \(resultItems.joined(separator: ", "))"
 		} else {
 			var result = "Until "
-			if let d = day?.integerValue {
+			if let d = day?.intValue {
 				switch d {
 				case 1:
-					result.appendContentsOf("Sunday ")
+					result.append("Sunday ")
 				case 2:
-					result.appendContentsOf("Monday ")
+					result.append("Monday ")
 				case 3:
-					result.appendContentsOf("Tuesday ")
+					result.append("Tuesday ")
 				case 4:
-					result.appendContentsOf("Wednesday ")
+					result.append("Wednesday ")
 				case 5:
-					result.appendContentsOf("Thursday ")
+					result.append("Thursday ")
 				case 6:
-					result.appendContentsOf("Friday ")
+					result.append("Friday ")
 				case 7:
-					result.appendContentsOf("Saturday ")
+					result.append("Saturday ")
 				default:
 					break
 				}
 			}
-			result.appendContentsOf(String(format: "%02d", hour?.integerValue ?? 0))
-			result.appendContentsOf(":")
-			result.appendContentsOf(String(format: "%02d", minute?.integerValue ?? 0))
+			result.append(String(format: "%02d", hour?.intValue ?? 0))
+			result.append(":")
+			result.append(String(format: "%02d", minute?.intValue ?? 0))
 			return result
 		}
 	}
 
-	class func allSnoozePresetsInMoc(moc: NSManagedObjectContext) -> [SnoozePreset] {
-		let f = NSFetchRequest(entityName: "SnoozePreset")
+	class func allSnoozePresetsInMoc(_ moc: NSManagedObjectContext) -> [SnoozePreset] {
+		let f = NSFetchRequest<SnoozePreset>(entityName: "SnoozePreset")
 		f.returnsObjectsAsFaults = false
 		f.sortDescriptors = [NSSortDescriptor(key: "sortOrder", ascending: true)]
-		return try! moc.executeFetchRequest(f) as! [SnoozePreset]
+		return try! moc.fetch(f)
 	}
 
-	class func newSnoozePresetInMoc(moc: NSManagedObjectContext) -> SnoozePreset {
-		let s = NSEntityDescription.insertNewObjectForEntityForName("SnoozePreset", inManagedObjectContext: moc) as! SnoozePreset
+	class func newSnoozePresetInMoc(_ moc: NSManagedObjectContext) -> SnoozePreset {
+		let s = NSEntityDescription.insertNewObject(forEntityName: "SnoozePreset", into: moc) as! SnoozePreset
 		s.duration = true
-		s.sortOrder = NSNumber(integer: Int(Int16.max))
+		s.sortOrder = NSNumber(value: Int(Int16.max))
 		setSortOrdersInMoc(moc)
 		return s
 	}
 
-	class func setSortOrdersInMoc(moc: NSManagedObjectContext) {
+	class func setSortOrdersInMoc(_ moc: NSManagedObjectContext) {
 		// Sanity to prevent sorting confusion later
 		var c = 0
 		for i in allSnoozePresetsInMoc(moc) {
-			i.sortOrder = NSNumber(integer: c)
+			i.sortOrder = NSNumber(value: c)
 			c += 1
 		}
 	}
 
-	var wakeupDateFromNow: NSDate {
+	var wakeupDateFromNow: Date {
 
-		let now = NSDate()
+		let now = Date()
 		
 		if duration.boolValue {
 
 			if day==nil && hour==nil && minute==nil {
-				return NSDate.distantFuture()
+				return Date.distantFuture
 			}
 			var now = now.timeIntervalSinceReferenceDate
 			now += (minute?.doubleValue ?? 0.0)*60.0
 			now += (hour?.doubleValue ?? 0.0)*60.0*60.0
 			now += (day?.doubleValue ?? 0.0)*60.0*60.0*24.0
-			return NSDate(timeIntervalSinceReferenceDate: now)
+			return Date(timeIntervalSinceReferenceDate: now)
 
 		} else {
 
-			let c = NSDateComponents()
-			c.minute = minute?.integerValue ?? 0
-			c.hour = hour?.integerValue ?? 0
-			if let d = day?.integerValue {
+			var c = DateComponents()
+			c.minute = minute?.intValue ?? 0
+			c.hour = hour?.intValue ?? 0
+			if let d = day?.intValue {
 				c.weekday = d
 			}
-			return NSCalendar.currentCalendar().nextDateAfterDate(now, matchingComponents: c, options: .MatchNextTimePreservingSmallerUnits)!
+			return Calendar.current.nextDate(after: now, matching: c, matchingPolicy: .nextTimePreservingSmallerComponents)!
 		}
 	}
 
@@ -116,7 +116,7 @@ final class SnoozePreset: NSManagedObject {
 		for a in SnoozePreset.allSnoozePresetsInMoc(mainObjectContext) {
 			var presetData = [String:NSObject]()
 			for (k , _) in a.entity.attributesByName {
-				if let v = a.valueForKey(k) as? NSObject {
+				if let v = a.value(forKey: k) as? NSObject {
 					presetData[k] = v
 				}
 			}
@@ -125,12 +125,12 @@ final class SnoozePreset: NSManagedObject {
 		return archivedData
 	}
 
-	class func configureFromArchive(archive: [[String : NSObject]]) -> Bool {
+	class func configureFromArchive(_ archive: [[String : NSObject]]) -> Bool {
 
 		let tempMoc = DataManager.childContext()
 
 		for apiServer in allSnoozePresetsInMoc(tempMoc) {
-			tempMoc.deleteObject(apiServer)
+			tempMoc.delete(apiServer)
 		}
 
 		for presetData in archive {

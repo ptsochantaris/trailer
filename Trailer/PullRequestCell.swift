@@ -6,27 +6,27 @@ final class PullRequestCell: TrailerCell {
 		super.init(frame: NSZeroRect)
 
 		dataItemId = pullRequest.objectID
-		detailFont = NSFont.menuFontOfSize(10.0)
-		titleFont = NSFont.menuFontOfSize(13.0)
+		detailFont = NSFont.menuFont(ofSize: 10.0)
+		titleFont = NSFont.menuFont(ofSize: 13.0)
 
-		unselectedTitleColor = goneDark ? NSColor.controlHighlightColor() : NSColor.controlTextColor()
+		unselectedTitleColor = goneDark ? NSColor.controlHighlightColor : NSColor.controlTextColor
 
-		let _commentsNew = pullRequest.unreadComments?.integerValue ?? 0
-		let _commentsTotal = pullRequest.totalComments?.integerValue ?? 0
+		let _commentsNew = pullRequest.unreadComments?.intValue ?? 0
+		let _commentsTotal = pullRequest.totalComments?.intValue ?? 0
 
 		let _title = pullRequest.titleWithFont(titleFont, labelFont: detailFont, titleColor: unselectedTitleColor)
-		let _subtitle = pullRequest.subtitleWithFont(detailFont, lightColor: NSColor.grayColor(), darkColor: NSColor.darkGrayColor())
+		let _subtitle = pullRequest.subtitleWithFont(detailFont, lightColor: NSColor.gray, darkColor: NSColor.darkGray)
 
 		var W = MENU_WIDTH-LEFTPADDING-app.scrollBarWidth
 
-		let showUnpin = (pullRequest.condition?.integerValue != ItemCondition.Open.rawValue) || pullRequest.markUnmergeable
+		let showUnpin = (pullRequest.condition?.intValue != ItemCondition.open.rawValue) || pullRequest.markUnmergeable
 		if showUnpin { W -= REMOVE_BUTTON_WIDTH } else { W -= 4.0 }
 
 		let showAvatar = !S(pullRequest.userAvatarUrl).isEmpty && !Settings.hideAvatars
 		if showAvatar { W -= AVATAR_SIZE+AVATAR_PADDING } else { W += 4.0 }
 
-		let titleHeight = ceil(_title.boundingRectWithSize(CGSizeMake(W-4.0, CGFloat.max), options: stringDrawingOptions).size.height)
-		let subtitleHeight = ceil(_subtitle.boundingRectWithSize(CGSizeMake(W-4.0, CGFloat.max), options: stringDrawingOptions).size.height+4.0)
+		let titleHeight = ceil(_title.boundingRect(with: CGSize(width: W-4.0, height: CGFloat.greatestFiniteMagnitude), options: stringDrawingOptions).size.height)
+		let subtitleHeight = ceil(_subtitle.boundingRect(with: CGSize(width: W-4.0, height: CGFloat.greatestFiniteMagnitude), options: stringDrawingOptions).size.height+4.0)
 
 		var statusRects = [NSValue]()
 		var statuses: [PRStatus]? = nil
@@ -45,7 +45,7 @@ final class PullRequestCell: TrailerCell {
 			bottom = ceil(CELL_PADDING * 0.5)
 			statuses = pullRequest.displayedStatuses
 			for s in statuses! {
-				let H = ceil(s.displayText.boundingRectWithSize(CGSizeMake(W, CGFloat.max),
+				let H = ceil(s.displayText.boundingRect(with: CGSize(width: W, height: CGFloat.greatestFiniteMagnitude),
 					options: stringDrawingOptions,
 					attributes: statusAttributes).size.height)
 				statusRects.append(NSValue(rect: NSMakeRect(LEFTPADDING, bottom+statusBottom, W, H)))
@@ -80,16 +80,16 @@ final class PullRequestCell: TrailerCell {
 		titleRect = NSOffsetRect(titleRect, shift, 0)
 		var replacementRects = [NSValue]()
 		for rv in statusRects {
-			replacementRects.append(NSValue(rect: CGRectOffset(rv.rectValue, shift, 0)))
+			replacementRects.append(NSValue(rect: rv.rectValue.offsetBy(dx: shift, dy: 0)))
 		}
 		statusRects = replacementRects
 
 		if showUnpin {
-			if (pullRequest.condition?.integerValue ?? 0)==ItemCondition.Open.rawValue {
+			if (pullRequest.condition?.intValue ?? 0)==ItemCondition.open.rawValue {
 				let unmergeableLabel = CenterTextField(frame: pinRect)
-				unmergeableLabel.textColor = NSColor.redColor()
+				unmergeableLabel.textColor = NSColor.red
 				unmergeableLabel.font = NSFont(name: "Menlo-Regular", size: 8.0)
-				unmergeableLabel.alignment = .Center
+				unmergeableLabel.alignment = .center
 				unmergeableLabel.stringValue = "Cannot be merged"
 				addSubview(unmergeableLabel)
 			}
@@ -99,9 +99,9 @@ final class PullRequestCell: TrailerCell {
 				unpin.title = "Remove"
 				unpin.target = self
 				unpin.action = #selector(TrailerCell.unPinSelected)
-				unpin.setButtonType(NSButtonType.MomentaryLightButton)
-				unpin.bezelStyle = NSBezelStyle.RoundRectBezelStyle
-				unpin.font = NSFont.systemFontOfSize(10.0)
+				unpin.setButtonType(.momentaryLight)
+				unpin.bezelStyle = .roundRect
+				unpin.font = NSFont.systemFont(ofSize: 10.0)
 				addSubview(unpin)
 			}
 		}

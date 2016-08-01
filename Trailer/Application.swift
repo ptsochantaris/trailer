@@ -9,18 +9,18 @@ extension NSTextField {
 }
 
 final class Application: NSApplication {
-	override func sendEvent(theEvent: NSEvent) {
-		if theEvent.type == NSEventType.KeyDown {
-			let modifiers = theEvent.modifierFlags.intersect(NSEventModifierFlags.DeviceIndependentModifierFlagsMask)
-			if modifiers == NSEventModifierFlags.CommandKeyMask {
-				if let char = theEvent.charactersIgnoringModifiers {
+	override func sendEvent(_ event: NSEvent) {
+		if event.type == .keyDown {
+			let modifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+			if modifiers == .command {
+				if let char = event.charactersIgnoringModifiers {
 					switch char {
 					case "x": if sendAction(#selector(NSText.cut(_:)), to:nil, from:self) { return }
 					case "v": if sendAction(#selector(NSText.paste(_:)), to:nil, from:self) { return }
 					case "z": if sendAction(#selector(NSTextField.trailerUndo), to:nil, from:self) { return }
 					case "c":
 						if let url = app.focusedItem()?.webUrl {
-							let p = NSPasteboard.generalPasteboard()
+							let p = NSPasteboard.general()
 							p.clearContents()
 							p.setString(url, forType:NSStringPboardType)
 							return
@@ -28,7 +28,7 @@ final class Application: NSApplication {
 							if sendAction(#selector(NSText.copy(_:)), to:nil, from:self) { return }
 						}
 					case "s":
-						if let i = app.focusedItem() where i.isSnoozing {
+						if let i = app.focusedItem(), i.isSnoozing {
 							i.wakeUp()
 							DataManager.saveDB()
 							app.updateRelatedMenusFor(i)
@@ -43,10 +43,10 @@ final class Application: NSApplication {
 						}
 					case "a":
 						if let i = app.focusedItem() {
-							if i.unreadComments?.integerValue > 0 {
+							if i.unreadComments?.intValue > 0 {
 								i.catchUpWithComments()
 							} else {
-								i.latestReadCommentDate = never()
+								i.latestReadCommentDate = Date.distantPast
 								i.postProcess()
 							}
 							DataManager.saveDB()
@@ -56,19 +56,19 @@ final class Application: NSApplication {
 							return
 						}
 					case "o":
-						if let i = app.focusedItem(), w = i.repo.webUrl, u = NSURL(string: w) {
-							NSWorkspace.sharedWorkspace().openURL(u)
+						if let i = app.focusedItem(), let w = i.repo.webUrl, let u = URL(string: w) {
+							NSWorkspace.shared().open(u)
 							return
 						}
 					default: break
 					}
 				}
-			} else if modifiers == [.CommandKeyMask, .ShiftKeyMask] {
-				if let char = theEvent.charactersIgnoringModifiers {
+			} else if modifiers == [.command, .shift] {
+				if let char = event.charactersIgnoringModifiers {
 					if char == "Z" && sendAction(#selector(NSTextField.trailerRedo), to:nil, from:self) { return }
 				}
 			}
 		}
-		super.sendEvent(theEvent)
+		super.sendEvent(event)
 	}
 }

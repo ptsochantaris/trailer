@@ -11,33 +11,44 @@ final class WatchManager : NSObject, WCSessionDelegate {
 	override init() {
 		super.init()
 		if WCSession.isSupported() {
-			session = WCSession.defaultSession()
+			session = WCSession.default()
 			session?.delegate = self
-			session?.activateSession()
+			session?.activate()
 		}
 	}
+
+	@available(iOS 9.3, *)
+	func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+		atNextEvent(self) { S in
+			S.updateContext()
+		}
+	}
+
+	func sessionDidDeactivate(_ session: WCSession) { }
+
+	func sessionDidBecomeInactive(_ session: WCSession) { }
 
 	func updateContext() {
 		let overview = buildOverview()
 		_ = try? session?.updateApplicationContext(["overview": overview])
-		let overviewPath = DataManager.sharedFilesDirectory().URLByAppendingPathComponent("overview.plist")
-		(overview as NSDictionary).writeToURL(overviewPath, atomically: true)
+		let overviewPath = DataManager.sharedFilesDirectory().appendingPathComponent("overview.plist")
+		(overview as NSDictionary).write(to: overviewPath, atomically: true)
 	}
 
 	private func startBGTask() {
-		backgroundTask = UIApplication.sharedApplication().beginBackgroundTaskWithName("com.housetrip.Trailer.watchrequest") { [weak self] in
+		backgroundTask = UIApplication.shared.beginBackgroundTask(withName: "com.housetrip.Trailer.watchrequest") { [weak self] in
 			self?.endBGTask()
 		}
 	}
 
 	private func endBGTask() {
 		if backgroundTask != UIBackgroundTaskInvalid {
-			UIApplication.sharedApplication().endBackgroundTask(backgroundTask)
+			UIApplication.shared.endBackgroundTask(backgroundTask)
 			backgroundTask = UIBackgroundTaskInvalid
 		}
 	}
 
-	func session(session: WCSession, didReceiveMessage message: [String : AnyObject], replyHandler: ([String : AnyObject]) -> Void) {
+	func session(_ session: WCSession, didReceiveMessage message: [String : AnyObject], replyHandler: ([String : AnyObject]) -> Void) {
 
 		atNextEvent(self) { s in
 
@@ -46,60 +57,60 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			switch(S(message["command"] as? String)) {
 
 			case "refresh":
-				let lastSuccessfulSync = Settings.lastSuccessfulRefresh ?? NSDate()
-				app.startRefresh()
-				dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)) {
-					while appIsRefreshing { NSThread.sleepForTimeInterval(0.1) }
+				let lastSuccessfulSync = Settings.lastSuccessfulRefresh ?? Date()
+				_ = app.startRefresh()
+				DispatchQueue.global().async {
+					while appIsRefreshing { Thread.sleep(forTimeInterval: 0.1) }
 					atNextEvent {
 						let l = Settings.lastSuccessfulRefresh
 						if l == nil || lastSuccessfulSync == l! {
-							s.reportFailure("Refresh Failed", message, replyHandler)
+							s.reportFailure(reason: "Refresh Failed", result: message, replyHandler: replyHandler)
 						} else {
-							s.processList(message, replyHandler)
+							s.processList(message: message, replyHandler: replyHandler)
 						}
 					}
 				}
 
 			case "openItem":
 				if let itemId = message["localId"] as? String {
-					popupManager.getMasterController().openItemWithUriPath(itemId)
+					popupManager.getMasterController().openItemWithUriPath(uriPath: itemId)
 					DataManager.saveDB()
 				}
-				s.processList(message, replyHandler)
+				s.processList(message: message, replyHandler: replyHandler)
 
 			case "opencomment":
 				if let itemId = message["id"] as? String {
-					popupManager.getMasterController().openCommentWithId(itemId)
+					popupManager.getMasterController().openCommentWithId(cId: itemId)
 					DataManager.saveDB()
 				}
-				s.processList(message, replyHandler)
+				s.processList(message: message, replyHandler: replyHandler)
 
 			case "clearAllMerged":
 				app.clearAllMerged()
-				s.processList(message, replyHandler)
+				s.processList(message: message, replyHandler: replyHandler)
 
 			case "clearAllClosed":
 				app.clearAllClosed()
-				s.processList(message, replyHandler)
+				s.processList(message: message, replyHandler: replyHandler)
 
 			case "markEverythingRead":
 				app.markEverythingRead()
-				s.processList(message, replyHandler)
+				s.processList(message: message, replyHandler: replyHandler)
 
 			case "markItemsRead":
 				if let
 					uri = message["localId"] as? String,
-					oid = DataManager.idForUriPath(uri),
-					dataItem = existingObjectWithID(oid) as? ListableItem,
-					count = dataItem.unreadComments?.integerValue where count > 0 {
+					let oid = DataManager.idForUriPath(uri),
+					let dataItem = existingObjectWithID(oid) as? ListableItem,
+					let count = dataItem.unreadComments?.intValue, count > 0 {
 
 					dataItem.catchUpWithComments()
 				} else if let uris = message["itemUris"] as? [String] {
 					for uri in uris {
 						if let
 							oid = DataManager.idForUriPath(uri),
-							dataItem = existingObjectWithID(oid) as? ListableItem,
-							count = dataItem.unreadComments?.integerValue where count > 0 {
+							let dataItem = existingObjectWithID(oid) as? ListableItem,
+							let count = dataItem.unreadComments?.intValue, count > 0 {
 
 							dataItem.catchUpWithComments()
 						}
@@ -107,19 +118,19 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				}
 				DataManager.saveDB()
 				app.updateBadge()
-				s.processList(message, replyHandler)
+				s.processList(message: message, replyHandler: replyHandler)
 
 			case "needsOverview":
 				s.updateContext()
-				s.reportSuccess([:], replyHandler)
+				s.reportSuccess(result: [:], replyHandler: replyHandler)
 
 			default:
-				s.processList(message, replyHandler)
+				s.processList(message: message, replyHandler: replyHandler)
 			}
 		}
 	}
 
-	private func processList(message: [String : AnyObject], _ replyHandler: ([String : AnyObject]) -> Void) {
+	private func processList(message: [String : AnyObject], replyHandler: ([String : AnyObject]) -> Void) {
 
 		var result = [String : AnyObject]()
 
@@ -127,10 +138,10 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 		case "overview":
 			result["result"] = buildOverview()
-			reportSuccess(result, replyHandler)
+			reportSuccess(result: result, replyHandler: replyHandler)
 
 		case "item_list":
-			buildItemList(message["type"] as! String,
+			buildItemList(type: message["type"] as! String,
 			              sectionIndex: message["sectionIndex"] as! Int,
 			              from: message["from"] as! Int,
 			              apiServerUri: message["apiUri"] as! String,
@@ -140,19 +151,19 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			              replyHandler: replyHandler)
 
 		case "item_detail":
-			if let lid = message["localId"] as? String, details = buildItemDetail(lid) {
+			if let lid = message["localId"] as? String, let details = buildItemDetail(localId: lid) {
 				result["result"] = details
-				reportSuccess(result, replyHandler)
+				reportSuccess(result: result, replyHandler: replyHandler)
 			} else {
-				reportFailure("Item Not Found", result, replyHandler)
+				reportFailure(reason: "Item Not Found", result: result, replyHandler: replyHandler)
 			}
 
 		default:
-			reportSuccess(result, replyHandler)
+			reportSuccess(result: result, replyHandler: replyHandler)
 		}
 	}
 
-	private func reportFailure(reason: String, _ result: [String : AnyObject], _ replyHandler: ([String : AnyObject]) -> Void) {
+	private func reportFailure(reason: String, result: [String : AnyObject], replyHandler: ([String : AnyObject]) -> Void) {
 		var r = result
 		r["error"] = true
 		r["status"] = reason
@@ -161,7 +172,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		endBGTask()
 	}
 
-	private func reportSuccess(result: [String : AnyObject], _ replyHandler: ([String : AnyObject]) -> Void) {
+	private func reportSuccess(result: [String : AnyObject], replyHandler: ([String : AnyObject]) -> Void) {
 		var r = result
 		r["status"] = "Success"
 		r["color"] = "00FF00"
@@ -184,7 +195,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			showStatuses = false
 		}
 
-		let f: NSFetchRequest
+		let f: NSFetchRequest<ListableItem>
 		if !apiServerUri.isEmpty, let aid = DataManager.idForUriPath(apiServerUri) {
 			let criterion = GroupingCriterion(apiServerId: aid)
 			f = ListableItem.requestForItemsOfType(entity, withFilter: nil, sectionIndex: sectionIndex, criterion: criterion, onlyUnread: onlyUnread)
@@ -199,13 +210,13 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		f.fetchLimit = count
 
 		// This is needed to avoid a Core Data bug with fetchOffset
-		let tempMoc = NSManagedObjectContext(concurrencyType: .MainQueueConcurrencyType)
+		let tempMoc = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
 		tempMoc.persistentStoreCoordinator = mainObjectContext.persistentStoreCoordinator
 		tempMoc.undoManager = nil
 
 		var items = [[String : AnyObject]]()
-		for item in try! tempMoc.executeFetchRequest(f) as! [ListableItem] {
-			items.append(baseDataForItem(item, showStatuses: showStatuses, showLabels: showLabels))
+		for item in try! tempMoc.fetch(f) {
+			items.append(baseDataForItem(item: item, showStatuses: showStatuses, showLabels: showLabels))
 		}
 		replyHandler(["result" : items])
 	}
@@ -215,30 +226,30 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		var itemData = [
 			"commentCount": item.totalComments ?? 0,
 			"unreadCount": item.unreadComments ?? 0,
-			"localId": item.objectID.URIRepresentation().absoluteString,
+			"localId": item.objectID.uriRepresentation().absoluteString,
 		]
 
-		let font = UIFont.systemFontOfSize(UIFont.systemFontSize())
-		let smallFont = UIFont.systemFontOfSize(UIFont.systemFontSize()-4)
-		let lightGray = UIColor.lightGrayColor()
-		let gray = UIColor.grayColor()
+		let font = UIFont.systemFont(ofSize: UIFont.systemFontSize)
+		let smallFont = UIFont.systemFont(ofSize: UIFont.systemFontSize-4)
+		let lightGray = UIColor.lightGray
+		let gray = UIColor.gray
 
-		let title = item.titleWithFont(font, labelFont: font, titleColor: UIColor.whiteColor())
-		itemData["title"] = NSKeyedArchiver.archivedDataWithRootObject(title)
+		let title = item.titleWithFont(font, labelFont: font, titleColor: UIColor.white)
+		itemData["title"] = NSKeyedArchiver.archivedData(withRootObject: title)
 
 		if let i = item as? PullRequest {
 			let subtitle = i.subtitleWithFont(smallFont, lightColor: lightGray, darkColor: gray)
-			itemData["subtitle"] = NSKeyedArchiver.archivedDataWithRootObject(subtitle)
+			itemData["subtitle"] = NSKeyedArchiver.archivedData(withRootObject: subtitle)
 		} else if let i = item as? Issue {
 			let subtitle = i.subtitleWithFont(smallFont, lightColor: lightGray, darkColor: gray)
-			itemData["subtitle"] = NSKeyedArchiver.archivedDataWithRootObject(subtitle)
+			itemData["subtitle"] = NSKeyedArchiver.archivedData(withRootObject: subtitle)
 		}
 
 		if showLabels {
-			itemData["labels"] = labelsForItem(item)
+			itemData["labels"] = labelsForItem(item: item)
 		}
 		if showStatuses {
-			itemData["statuses"] = statusLinesForPr(item as! PullRequest)
+			itemData["statuses"] = statusLinesForPr(pr: item as! PullRequest)
 		}
 		return itemData
 	}
@@ -247,7 +258,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		var labels = [[String : AnyObject]]()
 		for l in item.labels {
 			labels.append([
-				"color": colorToHex(l.colorForDisplay),
+				"color": colorToHex(c: l.colorForDisplay),
 				"text": S(l.name)
 				])
 		}
@@ -258,7 +269,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		var statusLines = [[String : AnyObject]]()
 		for status in pr.displayedStatuses {
 			statusLines.append([
-				"color": colorToHex(status.colorForDarkDisplay),
+				"color": colorToHex(c: status.colorForDarkDisplay),
 				"text": S(status.descriptionText)
 				])
 		}
@@ -268,11 +279,11 @@ final class WatchManager : NSObject, WCSessionDelegate {
 	/////////////////////////////
 
 	private func buildItemDetail(localId: String) -> [String : AnyObject]? {
-		if let oid = DataManager.idForUriPath(localId), item = existingObjectWithID(oid) as? ListableItem {
+		if let oid = DataManager.idForUriPath(localId), let item = existingObjectWithID(oid) as? ListableItem {
 			let showStatuses = (item is PullRequest) ? Settings.showStatusItems : false
-			var result = baseDataForItem(item, showStatuses: showStatuses, showLabels: Settings.showLabels)
+			var result = baseDataForItem(item: item, showStatuses: showStatuses, showLabels: Settings.showLabels)
 			result["description"] = item.body
-			result["comments"] = commentsForItem(item)
+			result["comments"] = commentsForItem(item: item)
 			return result
 		}
 		return nil
@@ -280,10 +291,10 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	private func commentsForItem(item: ListableItem) -> [[String : AnyObject]] {
 		var comments = [[String : AnyObject]]()
-		for comment in item.sortedComments(.OrderedDescending) {
+		for comment in item.sortedComments(.orderedDescending) {
 			comments.append([
 				"user": S(comment.userName),
-				"date": comment.createdAt ?? never(),
+				"date": comment.createdAt ?? Date.distantPast,
 				"text": S(comment.body),
 				"mine": comment.isMine
 				])
@@ -301,30 +312,30 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 			let c = tabSet.viewCriterion
 
-			let myPrs = countsForType("PullRequest", inSection: .Mine, criterion: c)
-			let participatedPrs = countsForType("PullRequest", inSection: .Participated, criterion: c)
-			let mentionedPrs = countsForType("PullRequest", inSection: .Mentioned, criterion: c)
-			let mergedPrs = countsForType("PullRequest", inSection: .Merged, criterion: c)
-			let closedPrs = countsForType("PullRequest", inSection: .Closed, criterion: c)
-			let otherPrs = countsForType("PullRequest", inSection: .All, criterion: c)
-			let snoozedPrs = countsForType("PullRequest", inSection: .Snoozed, criterion: c)
-			let totalPrs = [ myPrs, participatedPrs, mentionedPrs, mergedPrs, closedPrs, otherPrs, snoozedPrs ].reduce(0, combine: { $0 + $1["total"]! })
-			let totalOpenPrs = countOpenAndVisibleForType("PullRequest", criterion: c)
+			let myPrs = countsForType(type: "PullRequest", inSection: .mine, criterion: c)
+			let participatedPrs = countsForType(type: "PullRequest", inSection: .participated, criterion: c)
+			let mentionedPrs = countsForType(type: "PullRequest", inSection: .mentioned, criterion: c)
+			let mergedPrs = countsForType(type: "PullRequest", inSection: .merged, criterion: c)
+			let closedPrs = countsForType(type: "PullRequest", inSection: .closed, criterion: c)
+			let otherPrs = countsForType(type: "PullRequest", inSection: .all, criterion: c)
+			let snoozedPrs = countsForType(type: "PullRequest", inSection: .snoozed, criterion: c)
+			let totalPrs = [ myPrs, participatedPrs, mentionedPrs, mergedPrs, closedPrs, otherPrs, snoozedPrs ].reduce(0, { $0 + $1["total"]! })
+			let totalOpenPrs = countOpenAndVisibleForType(type: "PullRequest", criterion: c)
 			let unreadPrCount = PullRequest.badgeCountInMoc(mainObjectContext, criterion: c)
 
-			let myIssues = countsForType("Issue", inSection: .Mine, criterion: c)
-			let participatedIssues = countsForType("Issue", inSection: .Participated, criterion: c)
-			let mentionedIssues = countsForType("Issue", inSection: .Mentioned, criterion: c)
-			let closedIssues = countsForType("Issue", inSection: .Closed, criterion: c)
-			let otherIssues = countsForType("Issue", inSection: .All, criterion: c)
-			let snoozedIssues = countsForType("Issue", inSection: .Snoozed, criterion: c)
-			let totalIssues = [ myIssues, participatedIssues, mentionedIssues, closedIssues, otherIssues, snoozedIssues ].reduce(0, combine: { $0 + $1["total"]! })
-			let totalOpenIssues = countOpenAndVisibleForType("Issue", criterion: c)
+			let myIssues = countsForType(type: "Issue", inSection: .mine, criterion: c)
+			let participatedIssues = countsForType(type: "Issue", inSection: .participated, criterion: c)
+			let mentionedIssues = countsForType(type: "Issue", inSection: .mentioned, criterion: c)
+			let closedIssues = countsForType(type: "Issue", inSection: .closed, criterion: c)
+			let otherIssues = countsForType(type: "Issue", inSection: .all, criterion: c)
+			let snoozedIssues = countsForType(type: "Issue", inSection: .snoozed, criterion: c)
+			let totalIssues = [ myIssues, participatedIssues, mentionedIssues, closedIssues, otherIssues, snoozedIssues ].reduce(0, { $0 + $1["total"]! })
+			let totalOpenIssues = countOpenAndVisibleForType(type: "Issue", criterion: c)
 			let unreadIssueCount = Issue.badgeCountInMoc(mainObjectContext, criterion: c)
 
 			views.append([
 				"title": S(c?.label),
-				"apiUri": S(c?.apiServerId?.URIRepresentation().absoluteString),
+				"apiUri": S(c?.apiServerId?.uriRepresentation().absoluteString),
 				"prs": [
 					"mine": myPrs, "participated": participatedPrs, "mentioned": mentionedPrs,
 					"merged": mergedPrs, "closed": closedPrs, "other": otherPrs, "snoozed": snoozedPrs,
@@ -342,41 +353,41 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		return [
 			"views": views,
 			"preferIssues": Settings.preferIssuesInWatch,
-			"lastUpdated": Settings.lastSuccessfulRefresh ?? never()
+			"lastUpdated": Settings.lastSuccessfulRefresh ?? Date.distantPast
 		]
 	}
 
 	private func countsForType(type: String, inSection: Section, criterion: GroupingCriterion?) -> [String : Int] {
-		return ["total": countItemsForType(type, inSection: inSection, criterion: criterion),
-		        "unread": badgeCountForType(type, inSection: inSection, criterion: criterion)]
+		return ["total": countItemsForType(type: type, inSection: inSection, criterion: criterion),
+		        "unread": badgeCountForType(type: type, inSection: inSection, criterion: criterion)]
 	}
 
 	private func countAllItemsOfType(type: String, criterion: GroupingCriterion?) -> Int {
-		let f = NSFetchRequest(entityName: type)
+		let f = NSFetchRequest<ListableItem>(entityName: type)
 		let p = Settings.hideUncommentedItems ? NSPredicate(format: "sectionIndex > 0 and unreadComments > 0") : NSPredicate(format: "sectionIndex > 0")
 		DataItem.addCriterion(criterion, toFetchRequest: f, originalPredicate: p, inMoc: mainObjectContext)
-		return mainObjectContext.countForFetchRequest(f, error: nil)
+		return try! mainObjectContext.count(for: f)
 	}
 
 	private func countItemsForType(type: String, inSection: Section, criterion: GroupingCriterion?) -> Int {
-		let f = NSFetchRequest(entityName: type)
+		let f = NSFetchRequest<ListableItem>(entityName: type)
 		let p = Settings.hideUncommentedItems ? NSPredicate(format: "sectionIndex == %d and unreadComments > 0", inSection.rawValue) : NSPredicate(format: "sectionIndex == %d", inSection.rawValue)
 		DataItem.addCriterion(criterion, toFetchRequest: f, originalPredicate: p, inMoc: mainObjectContext)
-		return mainObjectContext.countForFetchRequest(f, error: nil)
+		return try! mainObjectContext.count(for: f)
 	}
 
 	private func badgeCountForType(type: String, inSection: Section, criterion: GroupingCriterion?) -> Int {
-		let f = NSFetchRequest(entityName: type)
+		let f = NSFetchRequest<ListableItem>(entityName: type)
 		let p = NSPredicate(format: "sectionIndex == %d and unreadComments > 0", inSection.rawValue)
 		DataItem.addCriterion(criterion, toFetchRequest: f, originalPredicate: p, inMoc: mainObjectContext)
 		return ListableItem.badgeCountFromFetch(f, inMoc: mainObjectContext)
 	}
 
 	private func countOpenAndVisibleForType(type: String, criterion: GroupingCriterion?) -> Int {
-		let f = NSFetchRequest(entityName: type)
-		let p = Settings.hideUncommentedItems ? NSPredicate(format: "sectionIndex > 0 and (condition == %d or condition == nil) and unreadComments > 0", ItemCondition.Open.rawValue) : NSPredicate(format: "sectionIndex > 0 and (condition == %d or condition == nil)", ItemCondition.Open.rawValue)
+		let f = NSFetchRequest<ListableItem>(entityName: type)
+		let p = Settings.hideUncommentedItems ? NSPredicate(format: "sectionIndex > 0 and (condition == %d or condition == nil) and unreadComments > 0", ItemCondition.open.rawValue) : NSPredicate(format: "sectionIndex > 0 and (condition == %d or condition == nil)", ItemCondition.open.rawValue)
 		DataItem.addCriterion(criterion, toFetchRequest: f, originalPredicate: p, inMoc: mainObjectContext)
-		return mainObjectContext.countForFetchRequest(f, error: nil)
+		return try! mainObjectContext.count(for: f)
 	}
 
 }

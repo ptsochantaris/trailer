@@ -7,7 +7,7 @@ final class Team: DataItem {
     @NSManaged var organisationLogin: String?
 	@NSManaged var calculatedReferral: String?
 
-	class func syncTeamsWithInfo(data: [[NSObject : AnyObject]]?, apiServer: ApiServer) {
+	class func syncTeamsWithInfo(_ data: [[NSObject : AnyObject]]?, apiServer: ApiServer) {
 
 		itemsWithInfo(data, type: "Team", fromServer: apiServer) { item, info, isNewOrUpdated in
 			let t = item as! Team
@@ -20,7 +20,7 @@ final class Team: DataItem {
 			} else {
 				t.calculatedReferral = "@\(org)/\(slug)"
 			}
-			t.postSyncAction = PostSyncAction.DoNothing.rawValue
+			t.postSyncAction = PostSyncAction.doNothing.rawValue
 		}
 	}
 }

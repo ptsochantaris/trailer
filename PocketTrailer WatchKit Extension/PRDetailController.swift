@@ -10,17 +10,17 @@ final class PRDetailController: CommonController {
 	private var rowControllers = [PopulatableRow]()
 	private var itemId: String!
 
-	override func awakeWithContext(context: AnyObject?) {
+	override func awake(withContext context: AnyObject?) {
 		_statusLabel = statusLabel
 		_table = table
 
 		let c = context as! [NSObject : AnyObject]
 		itemId = c[ITEM_KEY] as! String
 
-		super.awakeWithContext(context)
+		super.awake(withContext: context)
 	}
 
-	override func requestData(command: String?) {
+	override func requestData(_ command: String?) {
 		var params = ["list": "item_detail", "localId": itemId!]
 		if let command = command {
 			params["command"] = command
@@ -41,19 +41,19 @@ final class PRDetailController: CommonController {
 		requestData("openItem")
 	}
 
-	override func updateFromData(response: [NSString : AnyObject]) {
+	override func updateFromData(_ response: [NSString : AnyObject]) {
 
-		table.removeRowsAtIndexes(NSIndexSet(indexesInRange: NSMakeRange(0, table.numberOfRows)))
+		table.removeRows(at: IndexSet(integersIn: NSMakeRange(0, table.numberOfRows).toRange()!))
 
-		rowControllers.removeAll(keepCapacity: false)
+		rowControllers.removeAll(keepingCapacity: false)
 		let itemInfo = response["result"] as! [String : AnyObject]
 
 		var rowCount = 0
 
 		if let statuses = itemInfo["statuses"] as? [[NSString : AnyObject]] {
-			table.insertRowsAtIndexes(NSIndexSet(indexesInRange: NSMakeRange(rowCount, statuses.count)), withRowType: "StatusRow")
+			table.insertRows(at: IndexSet(integersIn: NSMakeRange(rowCount, statuses.count).toRange() ?? 0..<0), withRowType: "StatusRow")
 			for status in statuses {
-				if let s = table.rowControllerAtIndex(rowCount) as? StatusRow {
+				if let s = table.rowController(at: rowCount) as? StatusRow {
 					s.labelL.setText(status["text"] as? String)
 					let c = colourFromHex(status["color"] as! String)
 					s.labelL.setTextColor(c)
@@ -64,8 +64,8 @@ final class PRDetailController: CommonController {
 		}
 
 		if let description = itemInfo["description"] as? String {
-			table.insertRowsAtIndexes(NSIndexSet(index: rowCount), withRowType: "LabelRow")
-			if let r = table.rowControllerAtIndex(rowCount) as? LabelRow {
+			table.insertRows(at: IndexSet(integer: rowCount), withRowType: "LabelRow")
+			if let r = table.rowController(at: rowCount) as? LabelRow {
 				r.labelL.setText(description)
 			}
 			rowCount += 1
@@ -77,11 +77,11 @@ final class PRDetailController: CommonController {
 			} else {
 				setTitle("Details")
 			}
-			table.insertRowsAtIndexes(NSIndexSet(indexesInRange: NSMakeRange(rowCount, comments.count)), withRowType: "CommentRow")
+			table.insertRows(at: IndexSet(integersIn: NSMakeRange(rowCount, comments.count).toRange() ?? 0..<0), withRowType: "CommentRow")
 			var unreadIndex = 0
 			let unreadCount = itemInfo["unreadCount"] as? Int ?? 0
 			for comment in comments {
-				if let s = table.rowControllerAtIndex(rowCount) as? CommentRow {
+				if let s = table.rowController(at: rowCount) as? CommentRow {
 					s.setComment(comment, unreadCount: unreadCount, unreadIndex: &unreadIndex)
 				}
 				rowCount += 1
@@ -93,14 +93,14 @@ final class PRDetailController: CommonController {
 		showStatus("", hideTable: false)
 	}
 
-	func colourFromHex(s: String) -> UIColor {
+	func colourFromHex(_ s: String) -> UIColor {
 
 		let safe = s
-			.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
-			.stringByTrimmingCharactersInSet(NSCharacterSet.symbolCharacterSet())
-		let s = NSScanner(string: safe)
+			.trimmingCharacters(in: .whitespacesAndNewlines)
+			.trimmingCharacters(in: .symbols)
+		let s = Scanner(string: safe)
 		var c:UInt32 = 0
-		s.scanHexInt(&c)
+		s.scanHexInt32(&c)
 
 		let red: UInt32 = (c & 0xFF0000)>>16
 		let green: UInt32 = (c & 0x00FF00)>>8

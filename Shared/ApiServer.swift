@@ -7,16 +7,16 @@ final class ApiServer: NSManagedObject {
     @NSManaged var authToken: String?
     @NSManaged var label: String?
     @NSManaged var lastSyncSucceeded: NSNumber?
-    @NSManaged var latestReceivedEventDateProcessed: NSDate?
-    @NSManaged var latestUserEventDateProcessed: NSDate?
+    @NSManaged var latestReceivedEventDateProcessed: Date?
+    @NSManaged var latestUserEventDateProcessed: Date?
     @NSManaged var reportRefreshFailures: NSNumber
     @NSManaged var requestsLimit: NSNumber?
     @NSManaged var requestsRemaining: NSNumber?
-    @NSManaged var resetDate: NSDate?
+    @NSManaged var resetDate: Date?
     @NSManaged var userId: NSNumber?
     @NSManaged var userName: String?
     @NSManaged var webPath: String?
-	@NSManaged var createdAt: NSDate?
+	@NSManaged var createdAt: Date?
 
     @NSManaged var comments: Set<PRComment>
     @NSManaged var labels: Set<PRLabel>
@@ -84,13 +84,13 @@ final class ApiServer: NSManagedObject {
 		}
 	}
 
-	class func insertNewServerInMoc(moc: NSManagedObjectContext) -> ApiServer {
-		let githubServer: ApiServer = NSEntityDescription.insertNewObjectForEntityForName("ApiServer", inManagedObjectContext: moc) as! ApiServer
-		githubServer.createdAt = NSDate()
+	class func insertNewServerInMoc(_ moc: NSManagedObjectContext) -> ApiServer {
+		let githubServer: ApiServer = NSEntityDescription.insertNewObject(forEntityName: "ApiServer", into: moc) as! ApiServer
+		githubServer.createdAt = Date()
 		return githubServer
 	}
 
-	class func resetSyncSuccessInMoc(moc: NSManagedObjectContext) {
+	class func resetSyncSuccessInMoc(_ moc: NSManagedObjectContext) {
 		for apiServer in allApiServersInMoc(moc) {
 			if apiServer.goodToGo {
 				apiServer.lastSyncSucceeded = true
@@ -98,7 +98,7 @@ final class ApiServer: NSManagedObject {
 		}
 	}
 
-	class func shouldReportRefreshFailureInMoc(moc: NSManagedObjectContext) -> Bool {
+	class func shouldReportRefreshFailureInMoc(_ moc: NSManagedObjectContext) -> Bool {
 		for apiServer in allApiServersInMoc(moc) {
 
 			var lastSyncSucceeded = apiServer.lastSyncSucceeded?.boolValue
@@ -111,29 +111,29 @@ final class ApiServer: NSManagedObject {
 		return false
 	}
 
-	class func ensureAtLeastGithubInMoc(moc: NSManagedObjectContext) {
-		let f = NSFetchRequest(entityName: "ApiServer")
+	class func ensureAtLeastGithubInMoc(_ moc: NSManagedObjectContext) {
+		let f = NSFetchRequest<ApiServer>(entityName: "ApiServer")
 		f.fetchLimit = 1
-		let numberOfExistingApiServers = moc.countForFetchRequest(f, error: nil)
+		let numberOfExistingApiServers = try! moc.count(for: f)
 		if numberOfExistingApiServers==0 {
-			addDefaultGithubInMoc(moc)
+			_ = addDefaultGithubInMoc(moc)
 		}
 	}
 
-	class func addDefaultGithubInMoc(moc: NSManagedObjectContext) -> ApiServer {
+	class func addDefaultGithubInMoc(_ moc: NSManagedObjectContext) -> ApiServer {
 		let githubServer = insertNewServerInMoc(moc)
 		githubServer.resetToGithub()
 		return githubServer
 	}
 
-	class func allApiServersInMoc(moc: NSManagedObjectContext) -> [ApiServer] {
-		let f = NSFetchRequest(entityName: "ApiServer")
+	class func allApiServersInMoc(_ moc: NSManagedObjectContext) -> [ApiServer] {
+		let f = NSFetchRequest<ApiServer>(entityName: "ApiServer")
 		f.returnsObjectsAsFaults = false
 		f.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: true)]
-		return try! moc.executeFetchRequest(f) as! [ApiServer]
+		return try! moc.fetch(f)
 	}
 
-	class func someServersHaveAuthTokensInMoc(moc: NSManagedObjectContext) -> Bool {
+	class func someServersHaveAuthTokensInMoc(_ moc: NSManagedObjectContext) -> Bool {
 		for apiServer in allApiServersInMoc(moc) {
 			if !S(apiServer.authToken).isEmpty {
 				return true
@@ -142,35 +142,35 @@ final class ApiServer: NSManagedObject {
 		return false
 	}
 
-	class func countApiServersInMoc(moc: NSManagedObjectContext) -> Int {
-		let f = NSFetchRequest(entityName: "ApiServer")
-		return moc.countForFetchRequest(f, error: nil)
+	class func countApiServersInMoc(_ moc: NSManagedObjectContext) -> Int {
+		let f = NSFetchRequest<ApiServer>(entityName: "ApiServer")
+		return try! moc.count(for: f)
 	}
 
-	func rollBackAllUpdatesInMoc(moc: NSManagedObjectContext) {
+	func rollBackAllUpdatesInMoc(_ moc: NSManagedObjectContext) {
 		DLog("Rolling back changes for failed sync on API server '%@'",label)
 		for set in [repos, pullRequests, comments, statuses, labels, issues, teams] {
 			for dataItem: DataItem in set.allObjects as! [DataItem] {
-				if let action = dataItem.postSyncAction?.integerValue {
+				if let action = dataItem.postSyncAction?.intValue {
 					switch action {
-					case PostSyncAction.Delete.rawValue:
-						dataItem.postSyncAction = PostSyncAction.DoNothing.rawValue
-					case PostSyncAction.NoteNew.rawValue:
-						moc.deleteObject(dataItem)
-					case PostSyncAction.NoteUpdated.rawValue:
-						moc.refreshObject(dataItem, mergeChanges: false)
+					case PostSyncAction.delete.rawValue:
+						dataItem.postSyncAction = PostSyncAction.doNothing.rawValue
+					case PostSyncAction.noteNew.rawValue:
+						moc.delete(dataItem)
+					case PostSyncAction.noteUpdated.rawValue:
+						moc.refresh(dataItem, mergeChanges: false)
 					default: break
 					}
 				}
 			}
 		}
-		moc.refreshObject(self, mergeChanges: false)
+		moc.refresh(self, mergeChanges: false)
 	}
 
 	func clearAllRelatedInfo() {
 		if let moc = managedObjectContext {
 			for r in repos {
-				moc.deleteObject(r)
+				moc.delete(r)
 			}
 		}
 	}
@@ -184,20 +184,20 @@ final class ApiServer: NSManagedObject {
 
 	func resetSyncState() {
 		if app != nil {
-			lastRepoCheck = never()
+			lastRepoCheck = Date.distantPast
 		}
 		lastSyncSucceeded = true
-		latestReceivedEventDateProcessed = never()
-		latestUserEventDateProcessed = never()
+		latestReceivedEventDateProcessed = Date.distantPast
+		latestUserEventDateProcessed = Date.distantPast
 	}
 
 	class func archiveApiServers() -> [String:[String:NSObject]] {
 		var archivedData = [String:[String:NSObject]]()
 		for a in ApiServer.allApiServersInMoc(mainObjectContext) {
-			if let authToken = a.authToken where !authToken.isEmpty {
+			if let authToken = a.authToken, !authToken.isEmpty {
 				var apiServerData = [String:NSObject]()
 				for (k , _) in a.entity.attributesByName {
-					if let v = a.valueForKey(k) as? NSObject {
+					if let v = a.value(forKey: k) as? NSObject {
 						apiServerData[k] = v
 					}
 				}
@@ -214,7 +214,7 @@ final class ApiServer: NSManagedObject {
 			if let sid = r.serverId {
 				var repoData = [String : NSObject]()
 				for (k , _) in r.entity.attributesByName {
-					if let v = r.valueForKey(k) as? NSObject {
+					if let v = r.value(forKey: k) as? NSObject {
 						repoData[k] = v
 					}
 				}
@@ -224,13 +224,13 @@ final class ApiServer: NSManagedObject {
 		return archivedData
 	}
 
-	class func configureFromArchive(archive: [String : [String : NSObject]]) -> Bool {
+	class func configureFromArchive(_ archive: [String : [String : NSObject]]) -> Bool {
 
 		let tempMoc = DataManager.childContext()
 
 		for apiServer in allApiServersInMoc(tempMoc)
 		{
-			tempMoc.deleteObject(apiServer)
+			tempMoc.delete(apiServer)
 		}
 
 		for (_, apiServerData) in archive {
@@ -256,9 +256,9 @@ final class ApiServer: NSManagedObject {
 		}
 	}
 
-	func configureReposFromArchive(archive: [String : [String : NSObject]]) {
+	func configureReposFromArchive(_ archive: [String : [String : NSObject]]) {
 		for (_, repoData) in archive {
-			let r = NSEntityDescription.insertNewObjectForEntityForName("Repo", inManagedObjectContext: managedObjectContext!) as! Repo
+			let r = NSEntityDescription.insertNewObject(forEntityName: "Repo", into: managedObjectContext!) as! Repo
 			for (k,v) in repoData {
 				let attributes = Array(r.entity.attributesByName.keys)
 				if attributes.contains(k) {

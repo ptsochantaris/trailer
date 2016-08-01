@@ -17,11 +17,11 @@ final class MenuBarSet {
 		self.viewCriterion = viewCriterion
 
 		prMenu = prMenuController.window as! MenuWindow
-		prMenu.itemDelegate = ItemDelegate(type: "PullRequest", sections: Section.prMenuTitles, removeButtonsInSections: [Section.Merged.prMenuName(), Section.Closed.prMenuName()], viewCriterion: viewCriterion)
+		prMenu.itemDelegate = ItemDelegate(type: "PullRequest", sections: Section.prMenuTitles, removeButtonsInSections: [Section.merged.prMenuName(), Section.closed.prMenuName()], viewCriterion: viewCriterion)
 		prMenu.delegate = delegate
 
 		issuesMenu = issuesMenuController.window as! MenuWindow
-		issuesMenu.itemDelegate = ItemDelegate(type: "Issue", sections: Section.issueMenuTitles, removeButtonsInSections: [Section.Closed.issuesMenuName()], viewCriterion: viewCriterion)
+		issuesMenu.itemDelegate = ItemDelegate(type: "Issue", sections: Section.issueMenuTitles, removeButtonsInSections: [Section.closed.issuesMenuName()], viewCriterion: viewCriterion)
 		issuesMenu.delegate = delegate
 	}
 
@@ -81,7 +81,7 @@ final class MenuBarSet {
 		}
 	}
 
-	private func updateMenu(type: String,
+	private func updateMenu(_ type: String,
 	                        menu: MenuWindow,
 	                        lengthOffset: CGFloat,
 	                        totalCount: ()->Int,
@@ -89,13 +89,13 @@ final class MenuBarSet {
 	                        reasonForEmpty: (String)->NSAttributedString) {
 
 		func redText() -> [String : AnyObject] {
-			return [ NSFontAttributeName: NSFont.boldSystemFontOfSize(10),
+			return [ NSFontAttributeName: NSFont.boldSystemFont(ofSize: 10),
 			         NSForegroundColorAttributeName: MAKECOLOR(0.8, 0.0, 0.0, 1.0) ]
 		}
 
 		func normalText() -> [String : AnyObject] {
-			return [ NSFontAttributeName: NSFont.menuBarFontOfSize(10),
-			         NSForegroundColorAttributeName: NSColor.controlTextColor() ]
+			return [ NSFontAttributeName: NSFont.menuBarFont(ofSize: 10),
+			         NSForegroundColorAttributeName: NSColor.controlTextColor ]
 		}
 
 		let countString: String
@@ -111,9 +111,9 @@ final class MenuBarSet {
 
 			if Settings.countOnlyListedItems {
 				let f = ListableItem.requestForItemsOfType(type, withFilter: menu.filter.stringValue, sectionIndex: -1, criterion: viewCriterion)
-				countString = String(mainObjectContext.countForFetchRequest(f, error: nil))
+				countString = String(try! mainObjectContext.count(for: f))
 				let fc = ListableItem.requestForItemsOfType(type, withFilter: nil, sectionIndex: -1, criterion: viewCriterion)
-				preFilterCount = mainObjectContext.countForFetchRequest(fc, error: nil)
+				preFilterCount = try! mainObjectContext.count(for: fc)
 			} else {
 				preFilterCount = totalCount()
 				countString = String(preFilterCount)
@@ -145,7 +145,7 @@ final class MenuBarSet {
 				siv.icon = NSImage(named: "\(type)Icon")!
 				siv.textAttributes = attributes
 				siv.labelOffset = lengthOffset
-				siv.highlighted = menu.visible
+				siv.highlighted = menu.isVisible
 				siv.grayOut = shouldGray
 				siv.statusLabel = countString
 				siv.title = itemLabel
@@ -156,7 +156,7 @@ final class MenuBarSet {
 		menu.reload()
 
 		if menu.table.numberOfRows == 0 {
-			menu.messageView = MessageView(frame: CGRectMake(0, 0, MENU_WIDTH, 100), message: reasonForEmpty(menu.filter.stringValue))
+			menu.messageView = MessageView(frame: CGRect(x: 0, y: 0, width: MENU_WIDTH, height: 100), message: reasonForEmpty(menu.filter.stringValue))
 		}
 
 		menu.sizeAndShow(false)
@@ -197,7 +197,7 @@ final class MenuBarSet {
 
 	}
 
-	private func compareDict(from: [String : AnyObject], to: [String : AnyObject]) -> Bool {
+	private func compareDict(_ from: [String : AnyObject], to: [String : AnyObject]) -> Bool {
 		for (key, value) in from {
 			if let v = to[key] {
 				if !v.isEqual(value) {

@@ -3,33 +3,33 @@ import UIKit
 
 final class CommentBlacklistViewController: UITableViewController {
 
-	override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+	override func numberOfSections(in tableView: UITableView) -> Int {
 		return Settings.commentAuthorBlacklist.count == 0 ? 0 : 1
 	}
 
-	override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+	override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
 		return true
 	}
 
-	override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		return Settings.commentAuthorBlacklist.count
 	}
 
-	override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCellWithIdentifier("UsernameCell", forIndexPath: indexPath) 
+	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+		let cell = tableView.dequeueReusableCell(withIdentifier: "UsernameCell", for: indexPath)
 		cell.textLabel?.text = Settings.commentAuthorBlacklist[indexPath.row]
 		return cell
 	}
 
-	override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-		if editingStyle == UITableViewCellEditingStyle.Delete {
+	override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+		if editingStyle == .delete {
 			var blackList = Settings.commentAuthorBlacklist
-			blackList.removeAtIndex(indexPath.row)
+			blackList.remove(at: indexPath.row)
 			Settings.commentAuthorBlacklist = blackList
 			if blackList.count==0 { // last delete
-				tableView.deleteSections(NSIndexSet(index: 0), withRowAnimation: .Automatic)
+				tableView.deleteSections(IndexSet(integer: 0) as IndexSet, with: .automatic)
 			} else {
-				tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
+				tableView.deleteRows(at: [indexPath], with: .automatic)
 			}
 		}
 	}
@@ -38,19 +38,19 @@ final class CommentBlacklistViewController: UITableViewController {
 
 		let a = UIAlertController(title: "Block commenter",
 			message: "Enter the username of the poster whose comments you don't want to be notified about",
-			preferredStyle: UIAlertControllerStyle.Alert)
+			preferredStyle: .alert)
 
-		a.addTextFieldWithConfigurationHandler({ textField in
+		a.addTextField { textField in
 			textField.placeholder = "Username"
-		})
-		a.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
-		a.addAction(UIAlertAction(title: "Block", style: .Default, handler: { action in
+		}
+		a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+		a.addAction(UIAlertAction(title: "Block", style: .default, handler: { action in
 
-			if let tf = a.textFields?.first, n = tf.text?.trim() {
+			if let tf = a.textFields?.first, let n = tf.text?.trim() {
 
 				var name: String = n
-				if name.characters.startsWith("@".characters) {
-					name = name.substringFromIndex(name.startIndex.advancedBy(1))
+				if name.hasPrefix("@") {
+					name = name.substring(from: name.index(name.startIndex, offsetBy: 1))
 				}
 
 				atNextEvent(self) { S in
@@ -58,17 +58,17 @@ final class CommentBlacklistViewController: UITableViewController {
 						var blackList = Settings.commentAuthorBlacklist
 						blackList.append(name)
 						Settings.commentAuthorBlacklist = blackList
-						let ip = NSIndexPath(forRow: blackList.count-1, inSection: 0)
+						let ip = IndexPath(row: blackList.count-1, section: 0)
 						if blackList.count == 1 { // first insert
-							S.tableView.insertSections(NSIndexSet(index: 0), withRowAnimation:.Automatic)
+							S.tableView.insertSections(IndexSet(integer: 0), with: .automatic)
 						} else {
-							S.tableView.insertRowsAtIndexPaths([ip], withRowAnimation:.Automatic)
+							S.tableView.insertRows(at: [ip], with: .automatic)
 						}
 					}
 				}
 			}
 		}))
 
-		presentViewController(a, animated: true, completion: nil)
+		present(a, animated: true, completion: nil)
 	}
 }

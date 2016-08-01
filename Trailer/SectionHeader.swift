@@ -14,17 +14,17 @@ final class SectionHeader: NSTableRowView {
 			unpin.title = "Remove All"
 			unpin.target = self
 			unpin.action = #selector(SectionHeader.unPinSelected)
-			unpin.setButtonType(NSButtonType.MomentaryLightButton)
-			unpin.bezelStyle = NSBezelStyle.RoundRectBezelStyle
-			unpin.font = NSFont.systemFontOfSize(10)
+			unpin.setButtonType(.momentaryLight)
+			unpin.bezelStyle = .roundRect
+			unpin.font = NSFont.systemFont(ofSize: 10)
 			addSubview(unpin)
 		}
 
 		let x = W-120-AVATAR_SIZE-LEFTPADDING
 		titleView = CenterTextField(frame: NSMakeRect(12, 4, x, TITLE_HEIGHT))
 		titleView.attributedStringValue = NSAttributedString(string: title, attributes: [
-				NSFontAttributeName: NSFont.boldSystemFontOfSize(14),
-				NSForegroundColorAttributeName: NSColor.controlShadowColor().colorWithAlphaComponent(0.7)])
+				NSFontAttributeName: NSFont.boldSystemFont(ofSize: 14),
+				NSForegroundColorAttributeName: NSColor.controlShadowColor.withAlphaComponent(0.7)])
 		addSubview(titleView)
 	}
 

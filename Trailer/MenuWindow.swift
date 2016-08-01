@@ -24,8 +24,8 @@ final class MenuWindow: NSWindow {
 
 	var itemDelegate: ItemDelegate! {
 		didSet {
-			table.setDataSource(itemDelegate)
-			table.setDelegate(itemDelegate)
+			table.dataSource = itemDelegate
+			table.delegate = itemDelegate
 		}
 	}
 
@@ -35,20 +35,20 @@ final class MenuWindow: NSWindow {
 
 		super.awakeFromNib()
 
-		backgroundColor = NSColor.whiteColor()
+		backgroundColor = NSColor.white
 
         if newSystem {
             scrollView.contentView.wantsLayer = true
         }
 
-		NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(MenuWindow.refreshUpdate), name: kSyncProgressUpdate, object: nil)
+		NotificationCenter.default.addObserver(self, selector: #selector(MenuWindow.refreshUpdate), name: NSNotification.Name(rawValue: kSyncProgressUpdate), object: nil)
 	}
 
 	class func usingVibrancy() -> Bool {
 		return newSystem && Settings.useVibrancy
 	}
 
-	override func controlTextDidChange(obj: NSNotification) {
+	override func controlTextDidChange(_ obj: Notification) {
 		app.controlTextDidChange(obj)
 	}
 
@@ -60,13 +60,13 @@ final class MenuWindow: NSWindow {
 			    appearance = NSAppearance(named: app.darkMode ? NSAppearanceNameVibrantDark : NSAppearanceNameVibrantLight)
 				if windowVibrancy == nil {
 					let w = NSVisualEffectView(frame: header.bounds)
-					w.autoresizingMask = [NSAutoresizingMaskOptions.ViewHeightSizable, NSAutoresizingMaskOptions.ViewWidthSizable]
-					w.blendingMode = NSVisualEffectBlendingMode.BehindWindow
-					w.state = NSVisualEffectState.Active
-					header.addSubview(w, positioned:NSWindowOrderingMode.Below, relativeTo:filter)
+					w.autoresizingMask = [NSAutoresizingMaskOptions.viewHeightSizable, NSAutoresizingMaskOptions.viewWidthSizable]
+					w.blendingMode = NSVisualEffectBlendingMode.behindWindow
+					w.state = NSVisualEffectState.active
+					header.addSubview(w, positioned:NSWindowOrderingMode.below, relativeTo:filter)
 					windowVibrancy = w
 
-					table.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.SourceList
+					table.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.sourceList
 				}
 			}
 
@@ -77,17 +77,17 @@ final class MenuWindow: NSWindow {
                 appearance = NSAppearance(named: NSAppearanceNameAqua)
                 w.removeFromSuperview()
                 windowVibrancy = nil
-                table.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.Regular
+                table.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.regular
             }
 		}
 	}
 
 	func showStatusItem() -> StatusItemView {
 		if statusItem == nil {
-			statusItem = NSStatusBar.systemStatusBar().statusItemWithLength(NSVariableStatusItemLength)
+			statusItem = NSStatusBar.system().statusItem(withLength: NSVariableStatusItemLength)
 			statusItem!.view = StatusItemView { [weak self] in
 				if let S = self {
-					if S.visible { S.closeMenu() } else { app.showMenu(S) }
+					if S.isVisible { S.closeMenu() } else { app.showMenu(S) }
 				}
 			}
 		}
@@ -101,11 +101,11 @@ final class MenuWindow: NSWindow {
 		}
 	}
 
-    override var canBecomeKeyWindow: Bool {
+    override var canBecomeKey: Bool {
 		return true
 	}
 
-	func menuWillOpen(menu: NSMenu) {
+	func menuWillOpen(_ menu: NSMenu) {
 		if appIsRefreshing {
 			refreshUpdate()
 		} else {
@@ -122,18 +122,18 @@ final class MenuWindow: NSWindow {
 	}
 
 	deinit {
-		NSNotificationCenter.defaultCenter().removeObserver(self)
+		NotificationCenter.default.removeObserver(self)
 	}
 
-	@IBAction func markAllReadSelected(sender: NSMenuItem) {
+	@IBAction func markAllReadSelected(_ sender: NSMenuItem) {
 		app.markAllReadSelectedFrom(self)
 	}
 
-	@IBAction func preferencesSelected(sender: NSMenuItem) {
+	@IBAction func preferencesSelected(_ sender: NSMenuItem) {
 		app.preferencesSelected()
 	}
 
-	@IBAction func refreshSelected(sender: NSMenuItem) {
+	@IBAction func refreshSelected(_ sender: NSMenuItem) {
 		if Repo.countItemsOfType("Repo", moc: mainObjectContext) == 0 {
 			app.preferencesSelected()
 			return
@@ -141,18 +141,18 @@ final class MenuWindow: NSWindow {
 		app.startRefresh()
 	}
 
-	@IBAction func aboutSelected(sender: AnyObject) {
+	@IBAction func aboutSelected(_ sender: AnyObject) {
 		app.showAboutWindow()
 	}
 
-	func sizeAndShow(show: Bool) {
+	func sizeAndShow(_ show: Bool) {
 
 		guard let siv = statusItem?.view as? StatusItemView else { return }
 		guard let windowFrame = siv.window?.frame else { return }
 
 		var S: NSScreen?
 		for s in NSScreen.screens() ?? [] {
-			if CGRectContainsRect(s.frame, windowFrame) {
+			if s.frame.contains(windowFrame) {
 				S = s
 				break
 			}
@@ -175,7 +175,7 @@ final class MenuWindow: NSWindow {
 		} else {
 			menuHeight += 10
 			for f in 0..<rowCount {
-				let rowView = table.viewAtColumn(0, row: f, makeIfNecessary: true)!
+				let rowView = table.view(atColumn: 0, row: f, makeIfNecessary: true)!
 				menuHeight += rowView.frame.size.height + 2
 				if menuHeight >= screenHeight {
 					break
@@ -190,13 +190,13 @@ final class MenuWindow: NSWindow {
 			menuHeight = screenHeight
 		}
 
-		setFrame(CGRectMake(menuLeft, bottom, MENU_WIDTH, menuHeight), display: false, animate: false)
+		setFrame(CGRect(x: menuLeft, y: bottom, width: MENU_WIDTH, height: menuHeight), display: false, animate: false)
 
 		if show {
 			siv.highlighted = true
 			table.deselectAll(nil)
 			app.openingWindow = true
-			level = Int(CGWindowLevelForKey(CGWindowLevelKey.FloatingWindowLevelKey))
+			level = Int(CGWindowLevelForKey(CGWindowLevelKey.floatingWindow))
 			makeKeyAndOrderFront(self)
 			NSApp.activateIgnoringOtherApps(true)
 			app.openingWindow = false
@@ -210,7 +210,7 @@ final class MenuWindow: NSWindow {
 	}
 
 	func closeMenu() {
-		if visible, let siv = statusItem?.view as? StatusItemView {
+		if isVisible, let siv = statusItem?.view as? StatusItemView {
 			siv.highlighted = false
 			orderOut(nil)
 			table.deselectAll(nil)
@@ -225,7 +225,7 @@ final class MenuWindow: NSWindow {
 			i = itemDelegate.itemAtRow(row)
 		}
 		atNextEvent(self) { S in
-			S.table.selectRowIndexes(NSIndexSet(index: row), byExtendingSelection: false)
+			S.table.selectRowIndexes(IndexSet(integer: row), byExtendingSelection: false)
 		}
 		return i
 	}

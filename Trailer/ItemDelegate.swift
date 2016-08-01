@@ -3,12 +3,12 @@ private let _propertiesToFetch = { ()->[AnyObject] in
 	let iodD = NSExpressionDescription()
 	iodD.name = "objectID"
 	iodD.expression = NSExpression.expressionForEvaluatedObject()
-	iodD.expressionResultType = .ObjectIDAttributeType
+	iodD.expressionResultType = .objectIDAttributeType
 
 	let sectionIndexD = NSExpressionDescription()
 	sectionIndexD.name = "sectionIndex"
 	sectionIndexD.expression = NSExpression(format: "sectionIndex")
-	sectionIndexD.expressionResultType = .Integer16AttributeType
+	sectionIndexD.expressionResultType = .integer16AttributeType
 
 	return [iodD, sectionIndexD]
 }()
@@ -32,24 +32,24 @@ final class ItemDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 		reloadData(nil)
 	}
 
-	func reloadData(filter: String?) {
+	func reloadData(_ filter: String?) {
 
-		itemIds.removeAll(keepCapacity: false)
+		itemIds.removeAll(keepingCapacity: false)
 
 		let f = ListableItem.requestForItemsOfType(type, withFilter: filter, sectionIndex: -1, criterion: viewCriterion)
-		f.resultType = .DictionaryResultType
+		f.resultType = .dictionaryResultType
 		f.fetchBatchSize = 0
 		f.propertiesToFetch = _propertiesToFetch
-		let allItems = try! mainObjectContext.executeFetchRequest(f) as! [NSDictionary]
+		let allItems = try! mainObjectContext.fetch(f as! NSFetchRequest<NSDictionary>)
 
 		itemIds.reserveCapacity(allItems.count+sections.count)
 
 		if let firstItem = allItems.first {
-			var lastSection = (firstItem["sectionIndex"] as! NSNumber).integerValue
+			var lastSection = (firstItem["sectionIndex"] as! NSNumber).intValue
 			itemIds.append(sections[lastSection])
 
 			for item in allItems {
-				let i = (item["sectionIndex"] as! NSNumber).integerValue
+				let i = (item["sectionIndex"] as! NSNumber).intValue
 				if lastSection < i {
 					itemIds.append(Section.issueMenuTitles[i])
 					lastSection = i
@@ -59,7 +59,7 @@ final class ItemDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 		}
 	}
 
-	func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
+	func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
 		let object = itemIds[row]
 		if let o = object as? NSManagedObjectID {
 			if let i = existingObjectWithID(o) {
@@ -75,16 +75,16 @@ final class ItemDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 		return nil
 	}
 
-	func tableView(tv: NSTableView, heightOfRow row: Int) -> CGFloat {
-		let v = tableView(tv, viewForTableColumn: nil, row: row)
+	func tableView(_ tv: NSTableView, heightOfRow row: Int) -> CGFloat {
+		let v = tableView(tv, viewFor: nil, row: row)
 		return v!.frame.size.height
 	}
 
-	func numberOfRowsInTableView(tableView: NSTableView) -> Int {
+	func numberOfRows(in tableView: NSTableView) -> Int {
 		return itemIds.count
 	}
 
-	func itemAtRow(row: Int) -> ListableItem? {
+	func itemAtRow(_ row: Int) -> ListableItem? {
 		if row >= 0 && row < itemIds.count, let object = itemIds[row] as? NSManagedObjectID {
 			return existingObjectWithID(object) as? ListableItem
 		} else {

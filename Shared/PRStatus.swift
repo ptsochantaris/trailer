@@ -11,7 +11,7 @@ final class PRStatus: DataItem {
 
 	@NSManaged var pullRequest: PullRequest
 
-	class func syncStatusesFromInfo(data: [[NSObject : AnyObject]]?, pullRequest: PullRequest) {
+	class func syncStatusesFromInfo(_ data: [[NSObject : AnyObject]]?, pullRequest: PullRequest) {
 		itemsWithInfo(data, type: "PRStatus", fromServer: pullRequest.apiServer) { item, info, isNewOrUpdated in
 			if isNewOrUpdated {
 				let s = item as! PRStatus
@@ -72,7 +72,7 @@ final class PRStatus: DataItem {
 			default:
 				prefix = "❌"
 			}
-			return String(format: "%@ %@ %@", prefix, shortDateFormatter.stringFromDate(createdAt!), desc)
+			return String(format: "%@ %@ %@", prefix, shortDateFormatter.string(from: createdAt!), desc)
 		} else {
 			return "(No description)"
 		}

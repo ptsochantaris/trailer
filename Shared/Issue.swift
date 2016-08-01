@@ -8,7 +8,7 @@ final class Issue: ListableItem {
 
 	@NSManaged var commentsLink: String?
 
-	class func syncIssuesFromInfoArray(data: [[NSObject : AnyObject]]?, inRepo: Repo) {
+	class func syncIssuesFromInfoArray(_ data: [[NSObject : AnyObject]]?, inRepo: Repo) {
 		var filteredData = [[NSObject : AnyObject]]()
 		for d in data ?? [] {
 			if d["pull_request"] == nil { // don't sync issues which are pull requests, they are already synced
@@ -21,26 +21,26 @@ final class Issue: ListableItem {
 
 				i.baseSyncFromInfo(info, inRepo: inRepo)
 
-				if let N = i.number, R = inRepo.fullName {
+				if let N = i.number, let R = inRepo.fullName {
 					i.commentsLink = "/repos/\(R)/issues/\(N)/comments"
 				}
 
 				for l in i.labels {
-					l.postSyncAction = PostSyncAction.Delete.rawValue
+					l.postSyncAction = PostSyncAction.delete.rawValue
 				}
 
 				let labelList = info["labels"] as? [[NSObject: AnyObject]]
 				PRLabel.syncLabelsWithInfo(labelList, withParent: i)
 			}
-			i.reopened = ((i.condition?.integerValue ?? 0) == ItemCondition.Closed.rawValue)
-			i.condition = ItemCondition.Open.rawValue
+			i.reopened = ((i.condition?.intValue ?? 0) == ItemCondition.closed.rawValue)
+			i.condition = ItemCondition.open.rawValue
 		}
 	}
 
-	class func reasonForEmptyWithFilter(filterValue: String?, criterion: GroupingCriterion?) -> NSAttributedString {
+	class func reasonForEmptyWithFilter(_ filterValue: String?, criterion: GroupingCriterion?) -> NSAttributedString {
 		let openIssues = Issue.countOpenInMoc(mainObjectContext, criterion: criterion)
 
-		var color = COLOR_CLASS.lightGrayColor()
+		var color = COLOR_CLASS.lightGray
 		var message: String = ""
 
 		if !ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
@@ -75,35 +75,35 @@ final class Issue: ListableItem {
 	}
 	#endif
 
-	class func markEverythingRead(section: Section, moc: NSManagedObjectContext) {
-		let f = NSFetchRequest(entityName: "Issue")
-		if section != .None {
+	class func markEverythingRead(_ section: Section, moc: NSManagedObjectContext) {
+		let f = NSFetchRequest<Issue>(entityName: "Issue")
+		if section != .none {
 			f.predicate = NSPredicate(format: "sectionIndex == %d", section.rawValue)
 		}
-		for pr in try! moc.executeFetchRequest(f) as! [Issue] {
+		for pr in try! moc.fetch(f) {
 			pr.catchUpWithComments()
 		}
 	}
 
-	class func badgeCountInMoc(moc: NSManagedObjectContext) -> Int {
-		let f = NSFetchRequest(entityName: "Issue")
+	class func badgeCountInMoc(_ moc: NSManagedObjectContext) -> Int {
+		let f = NSFetchRequest<Issue>(entityName: "Issue")
 		f.predicate = NSPredicate(format: "sectionIndex > 0 and unreadComments > 0")
 		return badgeCountFromFetch(f, inMoc: moc)
 	}
 
-	class func badgeCountInMoc(moc: NSManagedObjectContext, criterion: GroupingCriterion?) -> Int {
+	class func badgeCountInMoc(_ moc: NSManagedObjectContext, criterion: GroupingCriterion?) -> Int {
 		let f = requestForItemsOfType("Issue", withFilter: nil, sectionIndex: -1, criterion: criterion)
 		return badgeCountFromFetch(f, inMoc: moc)
 	}
 
-	class func countOpenInMoc(moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
-		let f = NSFetchRequest(entityName: "Issue")
-		let p = NSPredicate(format: "condition == %d or condition == nil", ItemCondition.Open.rawValue)
+	class func countOpenInMoc(_ moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
+		let f = NSFetchRequest<Issue>(entityName: "Issue")
+		let p = NSPredicate(format: "condition == %d or condition == nil", ItemCondition.open.rawValue)
 		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, inMoc: moc)
-		return moc.countForFetchRequest(f, error: nil)
+		return try! moc.count(for: f)
 	}
 
-	func subtitleWithFont(font: FONT_CLASS, lightColor: COLOR_CLASS, darkColor: COLOR_CLASS) -> NSMutableAttributedString {
+	func subtitleWithFont(_ font: FONT_CLASS, lightColor: COLOR_CLASS, darkColor: COLOR_CLASS) -> NSMutableAttributedString {
 		let _subtitle = NSMutableAttributedString()
 		let p = NSMutableParagraphStyle()
 		#if os(iOS)
@@ -122,35 +122,35 @@ final class Issue: ListableItem {
 			if let n = repo.fullName {
 				var darkSubtitle = lightSubtitle
 				darkSubtitle[NSForegroundColorAttributeName] = darkColor
-				_subtitle.appendAttributedString(NSAttributedString(string: n, attributes: darkSubtitle))
-				_subtitle.appendAttributedString(separator)
+				_subtitle.append(NSAttributedString(string: n, attributes: darkSubtitle))
+				_subtitle.append(separator)
 			}
 		}
 
 		if let l = userLogin {
-			_subtitle.appendAttributedString(NSAttributedString(string: "@\(l)", attributes: lightSubtitle))
-			_subtitle.appendAttributedString(separator)
+			_subtitle.append(NSAttributedString(string: "@\(l)", attributes: lightSubtitle))
+			_subtitle.append(separator)
 		}
 
 		if Settings.showCreatedInsteadOfUpdated {
-			_subtitle.appendAttributedString(NSAttributedString(string: itemDateFormatter.stringFromDate(createdAt!), attributes: lightSubtitle))
+			_subtitle.append(NSAttributedString(string: itemDateFormatter.string(from: createdAt!), attributes: lightSubtitle))
 		} else {
-			_subtitle.appendAttributedString(NSAttributedString(string: itemDateFormatter.stringFromDate(updatedAt!), attributes: lightSubtitle))
+			_subtitle.append(NSAttributedString(string: itemDateFormatter.string(from: updatedAt!), attributes: lightSubtitle))
 		}
 		
 		return _subtitle
 	}
 
 	var sectionName: String {
-		return Section.issueMenuTitles[sectionIndex?.integerValue ?? 0]
+		return Section.issueMenuTitles[sectionIndex?.intValue ?? 0]
 	}
 
-	class func allClosedInMoc(moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, includeAllGroups: Bool = false) -> [Issue] {
-		let f = NSFetchRequest(entityName: "Issue")
+	class func allClosedInMoc(_ moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, includeAllGroups: Bool = false) -> [Issue] {
+		let f = NSFetchRequest<Issue>(entityName: "Issue")
 		f.returnsObjectsAsFaults = false
-		let p = NSPredicate(format: "condition == %d", ItemCondition.Closed.rawValue)
+		let p = NSPredicate(format: "condition == %d", ItemCondition.closed.rawValue)
 		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, inMoc: moc, includeAllGroups: includeAllGroups)
-		return try! moc.executeFetchRequest(f) as! [Issue]
+		return try! moc.fetch(f)
 	}
 
 	var accessibleSubtitle: String {
@@ -163,11 +163,11 @@ final class Issue: ListableItem {
 		if let l = userLogin { components.append("Author: \(l)") }
 
 		if Settings.showCreatedInsteadOfUpdated {
-			components.append("Created \(itemDateFormatter.stringFromDate(createdAt!))")
+			components.append("Created \(itemDateFormatter.string(from: createdAt!))")
 		} else {
-			components.append("Updated \(itemDateFormatter.stringFromDate(updatedAt!))")
+			components.append("Updated \(itemDateFormatter.string(from: updatedAt!))")
 		}
 
-		return components.joinWithSeparator(",")
+		return components.joined(separator: ",")
 	}
 }

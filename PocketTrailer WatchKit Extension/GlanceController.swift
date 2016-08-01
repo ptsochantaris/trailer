@@ -34,8 +34,8 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 
 	private var showIssues = false
 
-	override func awakeWithContext(context: AnyObject?) {
-		super.awakeWithContext(context)
+	override func awake(withContext context: AnyObject?) {
+		super.awake(withContext: context)
 		errorText.setText("Loading...")
 		setErrorMode(true)
 	}
@@ -43,9 +43,9 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 	override func willActivate() {
 		super.willActivate()
 
-		let session = WCSession.defaultSession()
+		let session = WCSession.default()
 		session.delegate = self
-		session.activateSession()
+		session.activate()
 
 		if session.iOSDeviceNeedsUnlockAfterRebootForReachability {
 			errorText.setText("Please unlock your iPhone first")
@@ -55,19 +55,23 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 		}
 	}
 
-	func session(session: WCSession, didReceiveApplicationContext applicationContext: [String : AnyObject]) {
-		dispatch_async(dispatch_get_main_queue()) {
+	func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : AnyObject]) {
+		DispatchQueue.main.async {
 			self.updateFromContext(applicationContext)
 		}
 	}
 
-	func sessionReachabilityDidChange(session: WCSession) {
-		dispatch_async(dispatch_get_main_queue()) {
+	func sessionReachabilityDidChange(_ session: WCSession) {
+		DispatchQueue.main.async {
 			self.updateFromContext(session.receivedApplicationContext)
 		}
 	}
 
-	private func updateFromContext(applicationContext: [String : AnyObject]) {
+	func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+		// TODO?
+	}
+
+	private func updateFromContext(_ applicationContext: [String : AnyObject]) {
 		if let result = applicationContext["overview"] as? [String : AnyObject] {
 
 			showIssues = result["preferIssues"] as! Bool
@@ -83,11 +87,11 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 			var totalOther = 0
 			for r in result["views"] as! [[String : AnyObject]] {
 				if let v = r[showIssues ? "issues" : "prs"] as? [String : AnyObject] {
-					totalMine += v[Section.Mine.apiName()]?["total"] as? Int ?? 0
-					totalParticipated += v[Section.Participated.apiName()]?["total"] as? Int ?? 0
-					totalMentioned += v[Section.Mentioned.apiName()]?["total"] as? Int ?? 0
-					totalSnoozed += v[Section.Snoozed.apiName()]?["total"] as? Int ?? 0
-					totalOther += v[Section.All.apiName()]?["total"] as? Int ?? 0
+					totalMine += v[Section.mine.apiName()]?["total"] as? Int ?? 0
+					totalParticipated += v[Section.participated.apiName()]?["total"] as? Int ?? 0
+					totalMentioned += v[Section.mentioned.apiName()]?["total"] as? Int ?? 0
+					totalSnoozed += v[Section.snoozed.apiName()]?["total"] as? Int ?? 0
+					totalOther += v[Section.all.apiName()]?["total"] as? Int ?? 0
 					totalUnread += v["unread"] as? Int ?? 0
 					totalOpen += v["total_open"] as? Int ?? 0
 				}
@@ -95,15 +99,15 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 
 			totalCount.setText("\(totalOpen)")
 
-			func setCount(c: Int, section: Section, _ count: WKInterfaceLabel, _ group: WKInterfaceGroup) {
-				count.setText("\(c) \(section.watchMenuName().uppercaseString)")
+			func setCount(_ c: Int, section: Section, _ count: WKInterfaceLabel, _ group: WKInterfaceGroup) {
+				count.setText("\(c) \(section.watchMenuName().uppercased())")
 				group.setAlpha(c==0 ? 0.4 : 1.0)
 			}
-			setCount(totalMine, section: .Mine, myCount, myGroup)
-			setCount(totalParticipated, section: .Participated, participatedCount, participatedGroup)
-			setCount(totalMentioned, section: .Mentioned, mentionedCount, mentionedGroup)
-			setCount(totalOther, section: .All, otherCount, otherGroup)
-			setCount(totalSnoozed, section: .Snoozed, snoozingCount, snoozingGroup)
+			setCount(totalMine, section: .mine, myCount, myGroup)
+			setCount(totalParticipated, section: .participated, participatedCount, participatedGroup)
+			setCount(totalMentioned, section: .mentioned, mentionedCount, mentionedGroup)
+			setCount(totalOther, section: .all, otherCount, otherGroup)
+			setCount(totalSnoozed, section: .snoozed, snoozingCount, snoozingGroup)
 
 			if totalUnread==0 {
 				unreadCount.setText("NONE UNREAD")
@@ -116,8 +120,8 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 				unreadGroup.setAlpha(1.0)
 			}
 
-			if let lastRefresh = result["lastUpdated"] as? NSDate where lastRefresh != never() {
-				lastUpdate.setText(shortDateFormatter.stringFromDate(lastRefresh))
+			if let lastRefresh = result["lastUpdated"] as? Date, lastRefresh != Date.distantPast {
+				lastUpdate.setText(shortDateFormatter.string(from: lastRefresh))
 			} else {
 				lastUpdate.setText("Not refreshed yet")
 			}
@@ -129,7 +133,7 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 		}
 	}
 
-	private func setErrorMode(mode: Bool) {
+	private func setErrorMode(_ mode: Bool) {
 		for g in [myGroup, participatedGroup, mentionedGroup, otherGroup, unreadGroup, totalGroup, lastUpdate, errorText] {
 			g.setHidden(mode)
 		}
@@ -139,7 +143,7 @@ final class GlanceController: WKInterfaceController, WCSessionDelegate {
 		let complicationServer = CLKComplicationServer.sharedInstance()
 		if let activeComplications = complicationServer.activeComplications {
 			for complication in activeComplications {
-				complicationServer.reloadTimelineForComplication(complication)
+				complicationServer.reloadTimeline(for: complication)
 			}
 		}
 	}

@@ -13,9 +13,9 @@ final class PRLabel: DataItem {
     @NSManaged var pullRequest: PullRequest?
 	@NSManaged var issue: Issue?
 
-	private class func labelsWithInfo(data: [[NSObject : AnyObject]]?, fromParent: ListableItem, postProcessCallback: (PRLabel, [NSObject : AnyObject])->Void) {
+	private class func labelsWithInfo(_ data: [[NSObject : AnyObject]]?, fromParent: ListableItem, postProcessCallback: (PRLabel, [NSObject : AnyObject])->Void) {
 
-		guard let infos=data where infos.count > 0 else { return }
+		guard let infos=data, infos.count > 0 else { return }
 
 		var namesOfItems = [String]()
 		var namesToInfo = [String : [NSObject : AnyObject]]()
@@ -28,18 +28,18 @@ final class PRLabel: DataItem {
 
 		if namesOfItems.count == 0 { return }
 
-		let f = NSFetchRequest(entityName: "PRLabel")
+		let f = NSFetchRequest<PRLabel>(entityName: "PRLabel")
 		f.returnsObjectsAsFaults = false
 		if fromParent is PullRequest {
 			f.predicate = NSPredicate(format:"name in %@ and pullRequest == %@", namesOfItems, fromParent)
 		} else {
 			f.predicate = NSPredicate(format:"name in %@ and issue == %@", namesOfItems, fromParent)
 		}
-		let existingItems = try! fromParent.managedObjectContext?.executeFetchRequest(f) as? [PRLabel] ?? []
+		let existingItems = try! fromParent.managedObjectContext?.fetch(f) ?? []
 
 		for i in existingItems {
-			if let name = i.name, idx = namesOfItems.indexOf(name), info = namesToInfo[name] {
-				namesOfItems.removeAtIndex(idx)
+			if let name = i.name, let idx = namesOfItems.index(of: name), let info = namesToInfo[name] {
+				namesOfItems.remove(at: idx)
 				DLog("Updating Label: %@", name)
 				postProcessCallback(i, info)
 			}
@@ -48,11 +48,11 @@ final class PRLabel: DataItem {
 		for name in namesOfItems {
 			if let info = namesToInfo[name] {
 				DLog("Creating Label: %@", name)
-				let i = NSEntityDescription.insertNewObjectForEntityForName("PRLabel", inManagedObjectContext: fromParent.managedObjectContext!) as! PRLabel
+				let i = NSEntityDescription.insertNewObject(forEntityName: "PRLabel", into: fromParent.managedObjectContext!) as! PRLabel
 				i.name = name
 				i.serverId = 0
-				i.updatedAt = never()
-				i.createdAt = never()
+				i.updatedAt = Date.distantPast
+				i.createdAt = Date.distantPast
 				i.apiServer = fromParent.apiServer
 				if let pr = fromParent as? PullRequest {
 					i.pullRequest = pr
@@ -64,23 +64,23 @@ final class PRLabel: DataItem {
 		}
 	}
 
-	class func syncLabelsWithInfo(info: [[NSObject : AnyObject]]?, withParent: ListableItem) {
+	class func syncLabelsWithInfo(_ info: [[NSObject : AnyObject]]?, withParent: ListableItem) {
 		labelsWithInfo(info, fromParent: withParent) { label, info in
 			label.url = info["url"] as? String
 			if let c = info["color"] as? String {
-				label.color = NSNumber(unsignedInt: parseFromHex(c))
+				label.color = NSNumber(value: parseFromHex(c))
 			} else {
 				label.color = 0
 			}
-			label.postSyncAction = PostSyncAction.DoNothing.rawValue
+			label.postSyncAction = PostSyncAction.doNothing.rawValue
 		}
 	}
 
 	var colorForDisplay: COLOR_CLASS {
 		if let c = color {
-			return colorFromUInt32(c.unsignedIntValue)
+			return colorFromUInt32(c.uint32Value)
 		} else {
-			return COLOR_CLASS.blackColor()
+			return COLOR_CLASS.black
 		}
 	}
 }

@@ -14,7 +14,7 @@ final class PRComment: DataItem {
     @NSManaged var pullRequest: PullRequest?
 	@NSManaged var issue: Issue?
 
-	class func syncCommentsFromInfo(data: [[NSObject : AnyObject]]?, pullRequest: PullRequest) {
+	class func syncCommentsFromInfo(_ data: [[NSObject : AnyObject]]?, pullRequest: PullRequest) {
 		itemsWithInfo(data, type: "PRComment", fromServer: pullRequest.apiServer) { item, info, newOrUpdated in
 			if newOrUpdated {
 				let c = item as! PRComment
@@ -25,7 +25,7 @@ final class PRComment: DataItem {
 		}
 	}
 
-	class func syncCommentsFromInfo(data: [[NSObject : AnyObject]]?, issue: Issue) {
+	class func syncCommentsFromInfo(_ data: [[NSObject : AnyObject]]?, issue: Issue) {
 		itemsWithInfo(data, type: "PRComment", fromServer: issue.apiServer) { item, info, newOrUpdated in
 			if newOrUpdated {
 				let c = item as! PRComment
@@ -36,34 +36,34 @@ final class PRComment: DataItem {
 		}
 	}
 
-	func fastForwardItemIfNeeded(item: ListableItem) {
+	func fastForwardItemIfNeeded(_ item: ListableItem) {
 		// check if we're assigned to a just created issue, in which case we want to "fast forward" its latest comment dates to our own if we're newer
-		if let commentCreation = createdAt where (item.postSyncAction?.integerValue ?? 0) == PostSyncAction.NoteNew.rawValue {
-			if let latestReadDate = item.latestReadCommentDate where latestReadDate.compare(commentCreation) == .OrderedAscending {
+		if let commentCreation = createdAt, (item.postSyncAction?.intValue ?? 0) == PostSyncAction.noteNew.rawValue {
+			if let latestReadDate = item.latestReadCommentDate, latestReadDate.compare(commentCreation) == .orderedAscending {
 				item.latestReadCommentDate = commentCreation
 			}
 		}
 	}
 
 	func processNotifications() {
-		if let item = pullRequest ?? issue where item.postSyncAction?.integerValue == PostSyncAction.NoteUpdated.rawValue && item.isVisibleOnMenu {
+		if let item = pullRequest ?? issue, item.postSyncAction?.intValue == PostSyncAction.noteUpdated.rawValue && item.isVisibleOnMenu {
 			if refersToMe {
 				if item.isSnoozing && Settings.snoozeWakeOnMention {
 					DLog("Waking up snoozed item ID %@ because of mention", item.serverId)
 					item.wakeUp()
 				}
-				app.postNotificationOfType(.NewMention, forItem: self)
+				app.postNotificationOfType(type: .newMention, forItem: self)
 			} else if !isMine {
 				if item.isSnoozing && Settings.snoozeWakeOnComment {
 					DLog("Waking up snoozed item ID %@ because of posted comment", item.serverId)
 					item.wakeUp()
 				}
-				let notifyForNewComments = (item.sectionIndex?.integerValue != Section.All.rawValue) || Settings.showCommentsEverywhere
+				let notifyForNewComments = (item.sectionIndex?.intValue != Section.all.rawValue) || Settings.showCommentsEverywhere
 				if notifyForNewComments && !Settings.disableAllCommentNotifications && !isMine {
 					if let authorName = userName {
 						var blocked = false
 						for blockedAuthor in Settings.commentAuthorBlacklist as [String] {
-							if authorName.compare(blockedAuthor, options: [.CaseInsensitiveSearch, .DiacriticInsensitiveSearch]) == .OrderedSame {
+							if authorName.compare(blockedAuthor, options: [.caseInsensitive, .diacriticInsensitive]) == .orderedSame {
 								blocked = true
 								break
 							}
@@ -72,7 +72,7 @@ final class PRComment: DataItem {
 							DLog("Blocked notification for user '%@' as their name is on the blacklist",authorName)
 						} else {
 							DLog("User '%@' not on blacklist, can post notification",authorName)
-							app.postNotificationOfType(.NewComment, forItem:self)
+							app.postNotificationOfType(type: .newComment, forItem:self)
 						}
 					}
 				}
@@ -80,7 +80,7 @@ final class PRComment: DataItem {
 		}
 	}
 
-	func fillFromInfo(info:[NSObject : AnyObject]) {
+	func fillFromInfo(_ info:[NSObject : AnyObject]) {
 		body = info["body"] as? String
 		position = info["position"] as? NSNumber
 		path = info["path"] as? String
@@ -115,8 +115,8 @@ final class PRComment: DataItem {
 	}
 
 	var refersToMe: Bool {
-		if let userForServer = apiServer.userName, b = body where userId != apiServer.userId { // Ignore self-references
-			return b.localizedCaseInsensitiveContainsString("@\(userForServer)")
+		if let userForServer = apiServer.userName, let b = body, userId != apiServer.userId { // Ignore self-references
+			return b.localizedCaseInsensitiveContains("@\(userForServer)")
 		}
 		return false
 	}
@@ -125,7 +125,7 @@ final class PRComment: DataItem {
 		if let b = body {
 			for t in apiServer.teams {
 				if let r = t.calculatedReferral {
-					if b.localizedCaseInsensitiveContainsString(r) {
+					if b.localizedCaseInsensitiveContains(r) {
 						return true
 					}
 				}

@@ -7,15 +7,15 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 	// Filtering
 	@IBOutlet weak var searchBar: UISearchBar!
 	private var searchTimer: PopTimer!
-	private var _fetchedResultsController: NSFetchedResultsController?
+	private var _fetchedResultsController: NSFetchedResultsController<Repo>?
 
 	@IBOutlet weak var actionsButton: UIBarButtonItem!
 
-	@IBAction func done(sender: UIBarButtonItem) {
+	@IBAction func done(_ sender: UIBarButtonItem) {
 		if preferencesDirty {
-			app.startRefresh()
+			_ = app.startRefresh()
 		}
-		dismissViewControllerAnimated(true, completion: nil)
+		dismiss(animated: true, completion: nil)
 	}
 
 	override func viewDidLoad() {
@@ -26,43 +26,43 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 		}
 	}
 
-	override func viewDidAppear(animated: Bool) {
-		actionsButton.enabled = ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext)
-		if actionsButton.enabled && fetchedResultsController.fetchedObjects?.count==0 {
+	override func viewDidAppear(_ animated: Bool) {
+		actionsButton.isEnabled = ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext)
+		if actionsButton.isEnabled && fetchedResultsController.fetchedObjects?.count==0 {
 			refreshList()
 		} else if let selectedIndex = tableView.indexPathForSelectedRow {
-			tableView.deselectRowAtIndexPath(selectedIndex, animated: true)
+			tableView.deselectRow(at: selectedIndex, animated: true)
 		}
 		super.viewDidAppear(animated)
 	}
 
-	override func viewWillAppear(animated: Bool) {
+	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
 		self.navigationController?.setToolbarHidden(false, animated: animated)
 	}
 
-	override func viewWillDisappear(animated: Bool) {
+	override func viewWillDisappear(_ animated: Bool) {
 		super.viewWillDisappear(animated)
 		self.navigationController?.setToolbarHidden(true, animated: animated)
 	}
 
-	@IBAction func actionSelected(sender: UIBarButtonItem) {
+	@IBAction func actionSelected(_ sender: UIBarButtonItem) {
 		refreshList()
 	}
 
-	@IBAction func setAllPrsSelected(sender: UIBarButtonItem) {
+	@IBAction func setAllPrsSelected(_ sender: UIBarButtonItem) {
 		if let ip = tableView.indexPathForSelectedRow {
-			tableView.deselectRowAtIndexPath(ip, animated: false)
+			tableView.deselectRow(at: ip, animated: false)
 		}
-		performSegueWithIdentifier("showRepoSelection", sender: self)
+		performSegue(withIdentifier: "showRepoSelection", sender: self)
 	}
 
 	private func refreshList() {
-		self.navigationItem.rightBarButtonItem?.enabled = false
+		self.navigationItem.rightBarButtonItem?.isEnabled = false
 		let originalName = navigationItem.title
 		navigationItem.title = "Loading..."
-		actionsButton.enabled = false
-		tableView.userInteractionEnabled = false
+		actionsButton.isEnabled = false
+		tableView.isUserInteractionEnabled = false
 		tableView.alpha = 0.5
 
 		let tempContext = DataManager.childContext()
@@ -74,47 +74,47 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 						errorServers.append(S(apiServer.label))
 					}
 				}
-				let serverNames = errorServers.joinWithSeparator(", ")
+				let serverNames = errorServers.joined(separator: ", ")
 				showMessage("Error", "Could not refresh repository list from \(serverNames), please ensure that the tokens you are using are valid")
 			} else {
 				try! tempContext.save()
 			}
 			self?.navigationItem.title = originalName
-			self?.actionsButton.enabled = ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext)
+			self?.actionsButton.isEnabled = ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext)
 			self?.tableView.alpha = 1.0
-			self?.tableView.userInteractionEnabled = true
+			self?.tableView.isUserInteractionEnabled = true
 			preferencesDirty = true
-			self?.navigationItem.rightBarButtonItem?.enabled = true
+			self?.navigationItem.rightBarButtonItem?.isEnabled = true
 		}
 	}
 
-	override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+	override func numberOfSections(in tableView: UITableView) -> Int {
 		return fetchedResultsController.sections?.count ?? 0
 	}
 
-	override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		return fetchedResultsController.sections?[section].numberOfObjects ?? 0
 	}
 
-	override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! RepoCell
+	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+		let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! RepoCell
 		configureCell(cell, atIndexPath: indexPath)
 		return cell
 	}
 
-	override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+	override func prepare(for segue: UIStoryboardSegue, sender: AnyObject?) {
 		if let indexPath = tableView.indexPathForSelectedRow,
-			repo = fetchedResultsController.objectAtIndexPath(indexPath) as? Repo,
-			vc = segue.destinationViewController as? RepoSettingsViewController {
-			vc.repo = repo
+			let vc = segue.destination as? RepoSettingsViewController {
+
+			vc.repo = fetchedResultsController.object(at: indexPath)
 		}
 	}
 
-	override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+	override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
 		if section==1 {
 			return "Forked Repos"
 		} else {
-			let repo = fetchedResultsController.objectAtIndexPath(NSIndexPath(forRow: 0, inSection: section)) as! Repo
+			let repo = fetchedResultsController.object(at: IndexPath(row: 0, section: section))
 			if (repo.fork?.boolValue ?? false) {
 				return "Forked Repos"
 			} else {
@@ -123,13 +123,13 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 		}
 	}
 
-	private var fetchedResultsController: NSFetchedResultsController {
+	private var fetchedResultsController: NSFetchedResultsController<Repo> {
 		if let f = _fetchedResultsController {
 			return f
 		}
 
-		let fetchRequest = NSFetchRequest(entityName: "Repo")
-		if let text = searchBar.text where !text.isEmpty {
+		let fetchRequest = NSFetchRequest<Repo>(entityName: "Repo")
+		if let text = searchBar.text, !text.isEmpty {
 			fetchRequest.predicate = NSPredicate(format: "fullName contains [cd] %@", text)
 		}
 		fetchRequest.fetchBatchSize = 20
@@ -143,66 +143,66 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 		return fc
 	}
 
-	func controllerWillChangeContent(controller: NSFetchedResultsController) {
+	func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
 		tableView.beginUpdates()
 	}
 
-	func controller(controller: NSFetchedResultsController, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
+	func controller(controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
 
 		heightCache.removeAll()
 
 		switch(type) {
-		case .Insert:
-			tableView.insertSections(NSIndexSet(index: sectionIndex), withRowAnimation: .Automatic)
-		case .Delete:
-			tableView.deleteSections(NSIndexSet(index: sectionIndex), withRowAnimation: .Automatic)
-		case .Update:
-			tableView.reloadSections(NSIndexSet(index: sectionIndex), withRowAnimation: .Automatic)
+		case .insert:
+			tableView.insertSections(IndexSet(integer: sectionIndex), with: .automatic)
+		case .delete:
+			tableView.deleteSections(IndexSet(integer: sectionIndex), with: .automatic)
+		case .update:
+			tableView.reloadSections(IndexSet(integer: sectionIndex), with: .automatic)
 		default:
 			break
 		}
 	}
 
-	func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
+	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: AnyObject, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
 
 		heightCache.removeAll()
 
 		switch(type) {
-		case .Insert:
-			tableView.insertRowsAtIndexPaths([newIndexPath ?? indexPath!], withRowAnimation: .Automatic)
-		case .Delete:
-			tableView.deleteRowsAtIndexPaths([indexPath!], withRowAnimation:.Automatic)
-		case .Update:
-			if let cell = tableView.cellForRowAtIndexPath(newIndexPath ?? indexPath!) as? RepoCell {
+		case .insert:
+			tableView.insertRows(at: [(newIndexPath ?? indexPath!)], with: .automatic)
+		case .delete:
+			tableView.deleteRows(at: [indexPath!], with:.automatic)
+		case .update:
+			if let cell = tableView.cellForRow(at: (newIndexPath ?? indexPath!)) as? RepoCell {
 				configureCell(cell, atIndexPath: newIndexPath ?? indexPath!)
 			}
-		case .Move:
-			tableView.deleteRowsAtIndexPaths([indexPath!], withRowAnimation:.Automatic)
+		case .move:
+			tableView.deleteRows(at: [indexPath!], with:.automatic)
 			if let n = newIndexPath {
-				tableView.insertRowsAtIndexPaths([n], withRowAnimation:.Automatic)
+				tableView.insertRows(at: [n], with:.automatic)
 			}
 		}
 	}
 
-	func controllerDidChangeContent(controller: NSFetchedResultsController) {
+	func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
 		tableView.endUpdates()
 	}
 
-	private func configureCell(cell: RepoCell, atIndexPath: NSIndexPath) {
-		let repo = fetchedResultsController.objectAtIndexPath(atIndexPath) as! Repo
+	private func configureCell(_ cell: RepoCell, atIndexPath: IndexPath) {
+		let repo = fetchedResultsController.object(at: atIndexPath)
 
-		let titleColor = repo.shouldSync ? UIColor.blackColor() : UIColor.lightGrayColor()
+		let titleColor = repo.shouldSync ? UIColor.black : UIColor.lightGray
 		let titleAttributes = [ NSForegroundColorAttributeName: titleColor ]
 
 		let title = NSMutableAttributedString(attributedString: NSAttributedString(string: S(repo.fullName), attributes: titleAttributes))
-		title.appendAttributedString(NSAttributedString(string: "\n", attributes: titleAttributes))
-		let groupTitle = groupTitleForRepo(repo)
-		title.appendAttributedString(groupTitle)
+		title.append(NSAttributedString(string: "\n", attributes: titleAttributes))
+		let groupTitle = groupTitleForRepo(repo: repo)
+		title.append(groupTitle)
 
 		cell.titleLabel.attributedText = title
-		let prTitle = prTitleForRepo(repo)
-		let issuesTitle = issueTitleForRepo(repo)
-		let hidingTitle = hidingTitleForRepo(repo)
+		let prTitle = prTitleForRepo(repo: repo)
+		let issuesTitle = issueTitleForRepo(repo: repo)
+		let hidingTitle = hidingTitleForRepo(repo: repo)
 
 		cell.prLabel.attributedText = prTitle
 		cell.issuesLabel.attributedText = issuesTitle
@@ -211,16 +211,16 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 	}
 
 	private var sizer: RepoCell?
-	private var heightCache = [NSIndexPath : CGFloat]()
-	override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+	private var heightCache = [IndexPath : CGFloat]()
+	override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
 		if sizer == nil {
-			sizer = tableView.dequeueReusableCellWithIdentifier("Cell") as? RepoCell
+			sizer = tableView.dequeueReusableCell(withIdentifier: "Cell") as? RepoCell
 		} else if let h = heightCache[indexPath] {
 			//DLog("using cached height for %d - %d", indexPath.section, indexPath.row)
 			return h
 		}
 		configureCell(sizer!, atIndexPath: indexPath)
-		let h = sizer!.systemLayoutSizeFittingSize(CGSizeMake(tableView.bounds.width, UILayoutFittingCompressedSize.height),
+		let h = sizer!.systemLayoutSizeFitting(CGSize(width: tableView.bounds.width, height: UILayoutFittingCompressedSize.height),
 			withHorizontalFittingPriority: UILayoutPriorityRequired,
 			verticalFittingPriority: UILayoutPriorityFittingSizeLevel).height
 		heightCache[indexPath] = h
@@ -231,20 +231,20 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 
 		let fullName = S(repo.fullName)
 		let text = (repo.inaccessible?.boolValue ?? false) ? "\(fullName) (inaccessible)" : fullName
-		let color = repo.shouldSync ? UIColor.darkTextColor() : UIColor.lightGrayColor()
+		let color = repo.shouldSync ? UIColor.darkText : UIColor.lightGray
 		return NSAttributedString(string: text, attributes: [ NSForegroundColorAttributeName: color ])
 	}
 
 	private func prTitleForRepo(repo: Repo) -> NSAttributedString {
 
-		let policy = RepoDisplayPolicy(rawValue: repo.displayPolicyForPrs?.integerValue ?? 0) ?? .Hide
+		let policy = RepoDisplayPolicy(rawValue: repo.displayPolicyForPrs?.intValue ?? 0) ?? .hide
 		let attributes = attributesForEntryWithPolicy(policy)
 		return NSAttributedString(string: "PR Sections: \(policy.name())", attributes: attributes)
 	}
 
 	private func issueTitleForRepo(repo: Repo) -> NSAttributedString {
 
-		let policy = RepoDisplayPolicy(rawValue: repo.displayPolicyForIssues?.integerValue ?? 0) ?? .Hide
+		let policy = RepoDisplayPolicy(rawValue: repo.displayPolicyForIssues?.intValue ?? 0) ?? .hide
 		let attributes = attributesForEntryWithPolicy(policy)
 		return NSAttributedString(string: "Issue Sections: \(policy.name())", attributes: attributes)
 	}
@@ -252,34 +252,34 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 	private func groupTitleForRepo(repo: Repo) -> NSAttributedString {
 		if let l = repo.groupLabel {
 			return NSAttributedString(string: "Group: \(l)", attributes: [
-				NSForegroundColorAttributeName : UIColor.darkGrayColor(),
-				NSFontAttributeName: UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
+				NSForegroundColorAttributeName : UIColor.darkGray,
+				NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)
 				])
 		} else {
 			return NSAttributedString(string: "Ungrouped", attributes: [
-				NSForegroundColorAttributeName : UIColor.lightGrayColor(),
-				NSFontAttributeName: UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
+				NSForegroundColorAttributeName : UIColor.lightGray,
+				NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)
 				])
 		}
 	}
 
 	private func hidingTitleForRepo(repo: Repo) -> NSAttributedString {
 
-		let policy = RepoHidingPolicy(rawValue: repo.itemHidingPolicy?.integerValue ?? 0) ?? .NoHiding
+		let policy = RepoHidingPolicy(rawValue: repo.itemHidingPolicy?.intValue ?? 0) ?? .noHiding
 		let attributes = attributesForEntryWithPolicy(policy)
 		return NSAttributedString(string: policy.name(), attributes: attributes)
 	}
 
-	private func attributesForEntryWithPolicy(policy: RepoDisplayPolicy) -> [String : AnyObject] {
+	private func attributesForEntryWithPolicy(_ policy: RepoDisplayPolicy) -> [String : AnyObject] {
 		return [
-			NSFontAttributeName: UIFont.systemFontOfSize(UIFont.smallSystemFontSize()-1.0),
+			NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize-1.0),
 			NSForegroundColorAttributeName: policy.color()
 		]
 	}
 
-	private func attributesForEntryWithPolicy(policy: RepoHidingPolicy) -> [String : AnyObject] {
+	private func attributesForEntryWithPolicy(_ policy: RepoHidingPolicy) -> [String : AnyObject] {
 		return [
-			NSFontAttributeName: UIFont.systemFontOfSize(UIFont.smallSystemFontSize()-1.0),
+			NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize-1.0),
 			NSForegroundColorAttributeName: policy.color()
 		]
 	}
@@ -290,60 +290,54 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 
 		heightCache.removeAll()
 
-		let currentIndexes = NSIndexSet(indexesInRange: NSMakeRange(0, fetchedResultsController.sections?.count ?? 0))
+		let currentIndexes = IndexSet(integersIn: NSMakeRange(0, fetchedResultsController.sections?.count ?? 0).toRange()!)
 
 		_fetchedResultsController = nil
 
-		let dataIndexes = NSIndexSet(indexesInRange: NSMakeRange(0, fetchedResultsController.sections?.count ?? 0))
+		let dataIndexes = IndexSet(integersIn: NSMakeRange(0, fetchedResultsController.sections?.count ?? 0).toRange()!)
 
-		let removedIndexes = currentIndexes.indexesPassingTest { (idx, _) -> Bool in
-			return !dataIndexes.containsIndex(idx)
-		}
-		let addedIndexes = dataIndexes.indexesPassingTest { (idx, _) -> Bool in
-			return !currentIndexes.containsIndex(idx)
-		}
-		let untouchedIndexes = dataIndexes.indexesPassingTest { (idx, _) -> Bool in
-			return !(removedIndexes.containsIndex(idx) || addedIndexes.containsIndex(idx))
-		}
+		let removedIndexes = currentIndexes.filter { !dataIndexes.contains($0) }
+		let addedIndexes = dataIndexes.filter { !currentIndexes.contains($0) }
+		let untouchedIndexes = dataIndexes.filter { !(removedIndexes.contains($0) || addedIndexes.contains($0)) }
 
 		tableView.beginUpdates()
 		if removedIndexes.count > 0 {
-			tableView.deleteSections(removedIndexes, withRowAnimation:.Automatic)
+			tableView.deleteSections(IndexSet(removedIndexes), with: .automatic)
 		}
 		if untouchedIndexes.count > 0 {
-			tableView.reloadSections(untouchedIndexes, withRowAnimation:.Automatic)
+			tableView.reloadSections(IndexSet(untouchedIndexes), with:.automatic)
 		}
 		if addedIndexes.count > 0 {
-			tableView.insertSections(addedIndexes, withRowAnimation:.Automatic)
+			tableView.insertSections(IndexSet(addedIndexes), with: .automatic)
 		}
 		tableView.endUpdates()
 	}
 
-	override func scrollViewWillBeginDragging(scrollView: UIScrollView) {
-		if searchBar!.isFirstResponder() {
+	override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+		if searchBar!.isFirstResponder {
 			searchBar!.resignFirstResponder()
 		}
 	}
 
-	func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
+	func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
 		searchTimer.push()
 	}
 
-	func searchBarTextDidBeginEditing(searchBar: UISearchBar) {
+	func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
 		searchBar.setShowsCancelButton(true, animated: true)
 	}
 
-	func searchBarTextDidEndEditing(searchBar: UISearchBar) {
+	func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
 		searchBar.setShowsCancelButton(false, animated: true)
 	}
 
-	func searchBarCancelButtonClicked(searchBar: UISearchBar) {
+	func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
 		searchBar.text = nil
 		searchTimer.push()
 		view.endEditing(false)
 	}
 
-	func searchBar(searchBar: UISearchBar, shouldChangeTextInRange range: NSRange, replacementText text: String) -> Bool {
+	func searchBar(_ searchBar: UISearchBar, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
 		if text == "\n" {
 			view.endEditing(false)
 			return false

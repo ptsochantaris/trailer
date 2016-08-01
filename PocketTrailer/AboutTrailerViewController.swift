@@ -10,20 +10,20 @@ final class AboutTrailerViewController: UIViewController {
 		versionNumber.text = versionString()
 	}
 
-	override func viewDidAppear(animated: Bool) {
+	override func viewDidAppear(_ animated: Bool) {
 		super.viewDidAppear(animated)
-		licenseText.contentOffset = CGPointZero
+		licenseText.contentOffset = CGPoint.zero
 		licenseText.textContainerInset = UIEdgeInsetsMake(0, 10, 10, 10)
 	}
 
 	@IBAction func linkSelected() {
-		let s = SFSafariViewController(URL: NSURL(string: "https://github.com/ptsochantaris/trailer")!)
+		let s = SFSafariViewController(url: URL(string: "https://github.com/ptsochantaris/trailer")!)
 		s.view.tintColor = self.view.tintColor
-		self.presentViewController(s, animated: true, completion: nil)
+		present(s, animated: true, completion: nil)
 	}
 
 	@IBAction func doneSelected() {
-		if preferencesDirty { app.startRefresh() }
-		dismissViewControllerAnimated(true, completion: nil)
+		if preferencesDirty { _ = app.startRefresh() }
+		dismiss(animated: true, completion: nil)
 	}
 }

@@ -15,21 +15,21 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 		}
 	}
 
-	@IBAction func done(sender: UIBarButtonItem) {
-		if preferencesDirty { app.startRefresh() }
-		dismissViewControllerAnimated(true, completion: nil)
+	@IBAction func done(_ sender: UIBarButtonItem) {
+		if preferencesDirty { _ = app.startRefresh() }
+		dismiss(animated: true, completion: nil)
 	}
 
-	@IBAction func addNew(sender: UIBarButtonItem) {
-		performSegueWithIdentifier("showSnoozeEditor", sender: nil)
+	@IBAction func addNew(_ sender: UIBarButtonItem) {
+		performSegue(withIdentifier: "showSnoozeEditor", sender: nil)
 	}
 
-	override func viewWillAppear(animated: Bool) {
+	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
 		table.reloadData()
 	}
 
-	func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+	func numberOfSections(in tableView: UITableView) -> Int {
 		if SnoozePreset.allSnoozePresetsInMoc(mainObjectContext).count > 0 {
 			return 4
 		} else {
@@ -37,7 +37,7 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 		}
 	}
 
-	func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		if section == 0 || section == 1 {
 			return 1
 		} else if section == 2 {
@@ -47,11 +47,11 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 		}
 	}
 
-	func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCellWithIdentifier("SnoozeOptionCell", forIndexPath: indexPath)
+	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+		let cell = tableView.dequeueReusableCell(withIdentifier: "SnoozeOptionCell", for: indexPath)
 		if indexPath.section == 0 {
 			cell.textLabel?.text = "Hide snoozed items"
-			cell.accessoryType = Settings.hideSnoozedItems ? .Checkmark : .None
+			cell.accessoryType = Settings.hideSnoozedItems ? .checkmark : .none
 		} else if indexPath.section == 1 {
 			let d = Settings.autoSnoozeDuration
 			if d > 0 {
@@ -59,28 +59,28 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 			} else {
 				cell.textLabel?.text = "Do not auto-snooze items"
 			}
-			cell.accessoryType = .DisclosureIndicator
+			cell.accessoryType = .disclosureIndicator
 		} else if indexPath.section == 2 {
 			switch indexPath.row {
 			case 0:
 				cell.textLabel?.text = "New comment"
-				cell.accessoryType = Settings.snoozeWakeOnComment ? .Checkmark : .None
+				cell.accessoryType = Settings.snoozeWakeOnComment ? .checkmark : .none
 			case 1:
 				cell.textLabel?.text = "Mentioned in a new comment"
-				cell.accessoryType = Settings.snoozeWakeOnMention ? .Checkmark : .None
+				cell.accessoryType = Settings.snoozeWakeOnMention ? .checkmark : .none
 			default:
 				cell.textLabel?.text = "Status item update"
-				cell.accessoryType = Settings.snoozeWakeOnStatusUpdate ? .Checkmark : .None
+				cell.accessoryType = Settings.snoozeWakeOnStatusUpdate ? .checkmark : .none
 			}
 		} else {
 			let s = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)[indexPath.row]
 			cell.textLabel?.text = s.listDescription
-			cell.accessoryType = .DisclosureIndicator
+			cell.accessoryType = .disclosureIndicator
 		}
 		return cell
 	}
 
-	func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+	func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
 		if section == 0 {
 			return "You can create presets here that can be used to 'snooze' items for a specific time duration, until a date, or if a specific event occurs."
 		} else if section == 1 {
@@ -92,13 +92,13 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 		}
 	}
 
-	func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		if indexPath.section == 0 {
 			Settings.hideSnoozedItems = !Settings.hideSnoozedItems
 			tableView.reloadData()
 			settingsChangedTimer.push()
 		} else if indexPath.section == 1 {
-			performSegueWithIdentifier("showPicker", sender: self)
+			performSegue(withIdentifier: "showPicker", sender: self)
 		} else if indexPath.section == 2 {
 			switch indexPath.row {
 			case 0:
@@ -111,18 +111,18 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 			tableView.reloadData()
 		} else {
 			let s = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)[indexPath.row]
-			performSegueWithIdentifier("showSnoozeEditor", sender: s)
+			performSegue(withIdentifier: "showSnoozeEditor", sender: s)
 		}
 	}
 
-	override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-		if let d = segue.destinationViewController as? PickerViewController {
+	override func prepare(for segue: UIStoryboardSegue, sender: AnyObject?) {
+		if let d = segue.destination as? PickerViewController {
 			d.delegate = self
 			d.title = "Auto Snooze Items After"
-			let count = 2.stride(to: 9000, by: 1).map { "\($0) days" }
+			let count = stride(from: 2, to: 9000, by: 1).map { "\($0) days" }
 			d.values = ["Never", "1 day"] + count
 			d.previousValue = Settings.autoSnoozeDuration
-		} else if let d = segue.destinationViewController as? SnoozingEditorViewController {
+		} else if let d = segue.destination as? SnoozingEditorViewController {
 			if let s = sender as? SnoozePreset {
 				d.isNew = false
 				d.snoozeItem = s
@@ -133,7 +133,7 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 		}
 	}
 
-	func pickerViewController(picker: PickerViewController, didSelectIndexPath: NSIndexPath) {
+	func pickerViewController(picker: PickerViewController, didSelectIndexPath: IndexPath) {
 		Settings.autoSnoozeDuration = didSelectIndexPath.row
 		table.reloadData()
 		for p in DataItem.allItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest] {
@@ -147,10 +147,10 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 		popupManager.getMasterController().updateStatus()
 	}
 
-	override func viewDidAppear(animated: Bool) {
+	override func viewDidAppear(_ animated: Bool) {
 		super.viewDidAppear(animated)
 		if let i = table.indexPathForSelectedRow {
-			table.deselectRowAtIndexPath(i, animated: true)
+			table.deselectRow(at: i, animated: true)
 		}
 	}
 }

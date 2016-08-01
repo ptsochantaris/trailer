@@ -2,7 +2,7 @@
 import UIKit
 
 protocol PickerViewControllerDelegate: class {
-	func pickerViewController(picker: PickerViewController, didSelectIndexPath: NSIndexPath)
+	func pickerViewController(picker: PickerViewController, didSelectIndexPath: IndexPath)
 }
 
 final class PickerViewController: UITableViewController {
@@ -11,33 +11,33 @@ final class PickerViewController: UITableViewController {
 	weak var delegate: PickerViewControllerDelegate!
 	var previousValue: Int?
 
-	override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+	override func numberOfSections(in tableView: UITableView) -> Int {
 		return 1
 	}
 
-	override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		return values.count
 	}
 
-	override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) 
+	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+		let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) 
 		cell.textLabel?.text = values[indexPath.row]
-		cell.accessoryType = indexPath.row == previousValue ? .Checkmark : .None
+		cell.accessoryType = indexPath.row == previousValue ? .checkmark : .none
 		return cell
 	}
 
-	override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-		view.userInteractionEnabled = false
+	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+		view.isUserInteractionEnabled = false
 		previousValue = indexPath.row
 		tableView.reloadData()
 
 		atNextEvent(self) { S in
-			S.navigationController?.popViewControllerAnimated(true)
-			S.delegate.pickerViewController(S, didSelectIndexPath: indexPath)
+			_ = S.navigationController?.popViewController(animated: true)
+			S.delegate.pickerViewController(picker: S, didSelectIndexPath: indexPath)
 		}
 	}
 
-	override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+	override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
 		return "Please select an option"
 	}
 
@@ -47,7 +47,7 @@ final class PickerViewController: UITableViewController {
 		super.viewDidLayoutSubviews()
 		if !layoutDone {
 			if let p = previousValue {
-				tableView.scrollToRowAtIndexPath(NSIndexPath(forRow: p, inSection:0), atScrollPosition: .Middle, animated: false)
+				tableView.scrollToRow(at: IndexPath(row: p, section:0), at: .middle, animated: false)
 			}
 			layoutDone = true
 		}

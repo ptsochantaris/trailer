@@ -4,39 +4,39 @@ import UIKit
 
 final class OpenInSafariActivity: UIActivity {
 
-	private var _URL: NSURL?
+	private var _URL: URL?
 
-	override func activityType() -> String? {
+	override var activityType: String? {
 		return "OpenInSafariActivity"
 	}
 
-	override func activityTitle() -> String? {
+	override var activityTitle: String? {
 		return "Open in Safari"
 	}
 
-	override func activityImage() -> UIImage? {
+	override var activityImage: UIImage? {
 		return UIImage(named: "safariShare")
 	}
 
-	override func prepareWithActivityItems(activityItems: [AnyObject]) {
+	override func prepare(withActivityItems activityItems: [AnyObject]) {
 		for activityItem in activityItems {
-			if let u = activityItem as? NSURL {
+			if let u = activityItem as? URL {
 				_URL = u
 				break
 			}
 		}
 	}
 
-	override func performActivity() {
+	override func perform() {
 		if let u = _URL {
-			activityDidFinish(UIApplication.sharedApplication().openURL(u))
+			activityDidFinish(UIApplication.shared.openURL(u))
 		}
 	}
 
-	override func canPerformWithActivityItems(activityItems: [AnyObject]) -> Bool {
+	override func canPerform(withActivityItems activityItems: [AnyObject]) -> Bool {
 		for activityItem in activityItems {
-			if let u = activityItem as? NSURL {
-				if UIApplication.sharedApplication().canOpenURL(u) {
+			if let u = activityItem as? URL {
+				if UIApplication.shared.canOpenURL(u) {
 					return true
 				}
 			}

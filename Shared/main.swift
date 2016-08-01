@@ -9,7 +9,7 @@ let api = API()
 //debugging
 //let _items = PullRequest.allItemsOfType("PullRequest", inMoc: mainObjectContext) as! [ListableItem]
 //for i in _items {
-//	i.latestReadCommentDate = never()
+//	i.latestReadCommentDate = Date.distantPast
 //	for c in i.comments {
 //		mainObjectContext.deleteObject(c)
 //	}
@@ -21,7 +21,7 @@ let api = API()
 //_prs[0].condition = ItemCondition.Merged.rawValue
 //_prs[1].condition = ItemCondition.Closed.rawValue
 //for p in _prs {
-//	p.latestReadCommentDate = never()
+//	p.latestReadCommentDate = Date.distantPast
 //	p.postProcess()
 //}
 
@@ -32,23 +32,27 @@ let d1 = syncDateFormatter.dateFromString(testDate)
 let d2 = parseGH8601(testDate)
 assert(d1==d2)
 
-let s1 = NSDate()
+let s1 = Date()
 for _ in 0...100000 {
 	let dd1 = syncDateFormatter.dateFromString(testDate)
 }
-DLog("%f", NSDate().timeIntervalSinceDate(s1))
+DLog("%f", Date().timeIntervalSinceDate(s1))
 
-let s2 = NSDate()
+let s2 = Date()
 for _ in 0...100000 {
 	let dd1 = parseGH8601(testDate)
 }
-DLog("%f", NSDate().timeIntervalSinceDate(s2))
+DLog("%f", Date().timeIntervalSinceDate(s2))
 */
 
 
 #if os(iOS)
 	import UIKit
-	UIApplicationMain(Process.argc, Process.unsafeArgv, nil, NSStringFromClass(iOS_AppDelegate))
+	UIApplicationMain(
+		Process.argc,
+		UnsafeMutablePointer<UnsafeMutablePointer<CChar>>(Process.unsafeArgv),
+		nil,
+		NSStringFromClass(iOS_AppDelegate.self))
 #else
-	NSApplicationMain(Process.argc, Process.unsafeArgv)
+	_ = NSApplicationMain(Process.argc, Process.unsafeArgv)
 #endif

@@ -12,7 +12,7 @@ import ClockKit
 
 class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 
-	private let session = WCSession.defaultSession()
+	private let session = WCSession.default()
 	private var requestedUpdate = false
 
 	weak var lastView: CommonController? {
@@ -25,23 +25,29 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 		session.delegate = self
 	}
 
-	func sessionReachabilityDidChange(session: WCSession) {
+	func sessionReachabilityDidChange(_ session: WCSession) {
 		potentialUpdate()
 	}
 
-	func session(session: WCSession, didReceiveApplicationContext applicationContext: [String : AnyObject]) {
+	func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : AnyObject]) {
 		potentialUpdate()
 	}
 
 	func applicationDidBecomeActive() {
-		session.activateSession()
+		session.activate()
 		updateComplications()
+	}
+
+	func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+		if activationState == .activated {
+			potentialUpdate()
+		}
 	}
 
 	private func potentialUpdate() {
 		// Possibly in thread!
 		atNextEvent(self) { S in
-			if let l = S.lastView where S.session.reachable && !S.requestedUpdate {
+			if let l = S.lastView, S.session.isReachable && !S.requestedUpdate {
 				S.requestedUpdate = true
 				l.requestData(nil)
 				delay(0.5, S) { S in
@@ -59,7 +65,7 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 		let complicationServer = CLKComplicationServer.sharedInstance()
 		if let activeComplications = complicationServer.activeComplications {
 			for complication in activeComplications {
-				complicationServer.reloadTimelineForComplication(complication)
+				complicationServer.reloadTimeline(for: complication)
 			}
 		}
 	}

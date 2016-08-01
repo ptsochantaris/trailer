@@ -9,10 +9,10 @@ final class SectionController: CommonController {
 
 	private var rowControllers = [PopulatableRow]()
 
-	override func awakeWithContext(context: AnyObject?) {
+	override func awake(withContext context: AnyObject?) {
 		_statusLabel = statusLabel
 		_table = table
-		super.awakeWithContext(context)
+		super.awake(withContext: context)
 	}
 
 	override func willActivate() {
@@ -44,20 +44,20 @@ final class SectionController: CommonController {
 		requestData("refresh")
 	}
 
-	override func requestData(command: String?) {
+	override func requestData(_ command: String?) {
 		if let c = command {
 			sendRequest(["command": c])
-		} else if WCSession.defaultSession().receivedApplicationContext["overview"] != nil {
+		} else if WCSession.default().receivedApplicationContext["overview"] != nil {
 			updateUI()
 		} else {
 			requestData("needsOverview")
 		}
 	}
 
-	override func table(table: WKInterfaceTable, didSelectRowAtIndex rowIndex: Int) {
+	override func table(_ table: WKInterfaceTable, didSelectRowAt rowIndex: Int) {
 		let r = rowControllers[rowIndex] as! SectionRow
 		let section = r.section?.rawValue ?? -1
-		pushControllerWithName("ListController", context: [
+		pushController(withName: "ListController", context: [
 			SECTION_KEY: section,
 			TYPE_KEY: r.type!,
 			UNREAD_KEY: section == -1,
@@ -65,20 +65,20 @@ final class SectionController: CommonController {
 			API_URI_KEY: r.apiServerUri! ] )
 	}
 
-	override func updateFromData(response: [NSString : AnyObject]) {
+	override func updateFromData(_ response: [NSString : AnyObject]) {
 		super.updateFromData(response)
 		updateUI()
 	}
 
-	private func sectionFromApi(apiName: String) -> Section {
-		return Section(rawValue: Section.apiTitles.indexOf(apiName)!)!
+	private func sectionFromApi(_ apiName: String) -> Section {
+		return Section(rawValue: Section.apiTitles.index(of: apiName)!)!
 	}
 
 	private func updateUI() {
 
-		rowControllers.removeAll(keepCapacity: false)
+		rowControllers.removeAll(keepingCapacity: false)
 
-		func addSectionsFor(entry: [String : AnyObject], itemType: String, label: String, apiServerUri: String, header: String, showEmptyDescriptions: Bool) {
+		func addSectionsFor(_ entry: [String : AnyObject], itemType: String, label: String, apiServerUri: String, header: String, showEmptyDescriptions: Bool) {
 			let items = entry[itemType] as! [String : AnyObject]
 			let totalItems = items["total"] as! Int
 			let prefix = label.isEmpty ? "" : "\(label): "
@@ -88,9 +88,9 @@ final class SectionController: CommonController {
 				rowControllers.append(pt)
 				var totalUnread = 0
 				for itemSection in Section.apiTitles {
-					if itemSection == Section.None.apiName() { continue }
+					if itemSection == Section.none.apiName() { continue }
 
-					if let section = items[itemSection], count = section["total"] as? Int, unread = section["unread"] as? Int where count > 0 {
+					if let section = items[itemSection], let count = section["total"] as? Int, let unread = section["unread"] as? Int, count > 0 {
 						let s = SectionRow()
 						s.section = sectionFromApi(itemSection)
 						s.totalCount = count
@@ -122,7 +122,7 @@ final class SectionController: CommonController {
 			}
 		}
 
-		if let result = WCSession.defaultSession().receivedApplicationContext["overview"] as? [String : AnyObject] {
+		if let result = WCSession.default().receivedApplicationContext["overview"] as? [String : AnyObject] {
 
 			let views = result["views"]
 			let showEmptyDescriptions = views?.count == 1
@@ -137,14 +137,14 @@ final class SectionController: CommonController {
 
 			var index = 0
 			for rc in rowControllers {
-				if let c = table.rowControllerAtIndex(index) as? PopulatableRow {
+				if let c = table.rowController(at: index) as? PopulatableRow {
 					c.populateFrom(rc)
 				}
 				index += 1
 			}
 
 			showStatus("", hideTable: false)
-			(WKExtension.sharedExtension().delegate as! ExtensionDelegate).updateComplications()
+			(WKExtension.shared().delegate as! ExtensionDelegate).updateComplications()
 		} else {
 			showStatus("There is no data from Trailer yet, please run it once on your iOS device", hideTable: true)
 		}

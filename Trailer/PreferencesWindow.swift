@@ -11,7 +11,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		api.resetAllStatusChecks()
 		api.resetAllLabelChecks()
 		Settings.lastSuccessfulRefresh = nil
-		lastRepoCheck = never()
+		lastRepoCheck = Date.distantPast
 		projectsTable.reloadData()
 		deferredUpdateTimer.push()
 	}
@@ -152,10 +152,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	// Tabs
 	@IBOutlet weak var tabs: NSTabView!
 
-	override init(contentRect: NSRect, styleMask aStyle: Int, backing bufferingType: NSBackingStoreType, `defer` flag: Bool) {
-		super.init(contentRect: contentRect, styleMask: aStyle, backing: bufferingType, defer: flag)
-	}
-
 	override func awakeFromNib() {
 		super.awakeFromNib()
 		delegate = self
@@ -163,8 +159,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		updateAllItemSettingButtons()
 		fillSnoozingDropdowns()
 
-		allNewPrsSetting.addItemsWithTitles(RepoDisplayPolicy.labels)
-		allNewIssuesSetting.addItemsWithTitles(RepoDisplayPolicy.labels)
+		allNewPrsSetting.addItems(withTitles: RepoDisplayPolicy.labels)
+		allNewIssuesSetting.addItems(withTitles: RepoDisplayPolicy.labels)
 
 		addTooltips()
 		reloadSettings()
@@ -172,14 +168,14 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		versionNumber.stringValue = versionString()
 
 		let selectedIndex = min(tabs.numberOfTabViewItems-1, Settings.lastPreferencesTabSelectedOSX)
-		tabs.selectTabViewItem(tabs.tabViewItemAtIndex(selectedIndex))
+		tabs.selectTabViewItem(tabs.tabViewItem(at: selectedIndex))
 
-		let n = NSNotificationCenter.defaultCenter()
-		n.addObserver(serverList, selector: #selector(NSTableView.reloadData), name: API_USAGE_UPDATE, object: nil)
-		n.addObserver(self, selector: #selector(PreferencesWindow.updateImportExportSettings), name: SETTINGS_EXPORTED, object: nil)
+		let n = NotificationCenter.default
+		n.addObserver(self, selector: #selector(PreferencesWindow.updateApiTable), name: NSNotification.Name(rawValue: API_USAGE_UPDATE), object: nil)
+		n.addObserver(self, selector: #selector(PreferencesWindow.updateImportExportSettings), name: NSNotification.Name(rawValue: SETTINGS_EXPORTED), object: nil)
 
 		deferredUpdateTimer = PopTimer(timeInterval: 0.5) { [weak self] in
-			if let s = self where s.serversDirty {
+			if let s = self, s.serversDirty {
 				s.serversDirty = false
 				DataManager.saveDB()
 				Settings.possibleExport(nil)
@@ -191,8 +187,12 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
+	func updateApiTable() {
+		serverList.reloadData()
+	}
+
 	deinit {
-		let n = NSNotificationCenter.defaultCenter()
+		let n = NotificationCenter.default
 		n.removeObserver(serverList)
 		n.removeObserver(self)
 	}
@@ -282,26 +282,26 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		allHidingSetting.removeAllItems()
 
 		if projectsTable.selectedRowIndexes.count > 1 {
-			allPrsSetting.addItemWithTitle("Set selected PRs...")
-			allIssuesSetting.addItemWithTitle("Set selected issues...")
-			allHidingSetting.addItemWithTitle("Set selected hiding...")
+			allPrsSetting.addItem(withTitle: "Set selected PRs...")
+			allIssuesSetting.addItem(withTitle: "Set selected issues...")
+			allHidingSetting.addItem(withTitle: "Set selected hiding...")
 		} else if !repoFilter.stringValue.isEmpty {
-			allPrsSetting.addItemWithTitle("Set filtered PRs...")
-			allIssuesSetting.addItemWithTitle("Set filtered issues...")
-			allHidingSetting.addItemWithTitle("Set filtered hiding...")
+			allPrsSetting.addItem(withTitle: "Set filtered PRs...")
+			allIssuesSetting.addItem(withTitle: "Set filtered issues...")
+			allHidingSetting.addItem(withTitle: "Set filtered hiding...")
 		} else {
-			allPrsSetting.addItemWithTitle("Set all PRs...")
-			allIssuesSetting.addItemWithTitle("Set all issues...")
-			allHidingSetting.addItemWithTitle("Set all hiding...")
+			allPrsSetting.addItem(withTitle: "Set all PRs...")
+			allIssuesSetting.addItem(withTitle: "Set all issues...")
+			allHidingSetting.addItem(withTitle: "Set all hiding...")
 		}
 
-		allPrsSetting.addItemsWithTitles(RepoDisplayPolicy.labels)
-		allIssuesSetting.addItemsWithTitles(RepoDisplayPolicy.labels)
-		allHidingSetting.addItemsWithTitles(RepoHidingPolicy.labels)
+		allPrsSetting.addItems(withTitles: RepoDisplayPolicy.labels)
+		allIssuesSetting.addItems(withTitles: RepoDisplayPolicy.labels)
+		allHidingSetting.addItems(withTitles: RepoHidingPolicy.labels)
 	}
 
 	func reloadSettings() {
-		let firstRow = NSIndexSet(index: 0)
+		let firstRow = IndexSet(integer: 0)
 		serverList.selectRowIndexes(firstRow, byExtendingSelection: false)
 		fillServerApiFormFromSelectedServer()
 		fillSnoozeFormFromSelectedPreset()
@@ -311,10 +311,10 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		commentAuthorBlacklist.objectValue = Settings.commentAuthorBlacklist
 
 		setupSortMethodMenu()
-		sortModeSelect.selectItemAtIndex(Settings.sortMethod)
+		sortModeSelect.selectItem(at: Settings.sortMethod)
 
-		prMergedPolicy.selectItemAtIndex(Settings.mergeHandlingPolicy)
-		prClosedPolicy.selectItemAtIndex(Settings.closeHandlingPolicy)
+		prMergedPolicy.selectItem(at: Settings.mergeHandlingPolicy)
+		prClosedPolicy.selectItem(at: Settings.closeHandlingPolicy)
 
 		launchAtStartup.integerValue = StartupLaunch.isAppLoginItem() ? 1 : 0
 		dontConfirmRemoveAllClosed.integerValue = Settings.dontAskBeforeWipingClosed ? 1 : 0
@@ -346,7 +346,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		sortingOrder.integerValue = Settings.sortDescending ? 1 : 0
 		showCreationDates.integerValue = Settings.showCreatedInsteadOfUpdated ? 1 : 0
 		groupByRepo.integerValue = Settings.groupByRepo ? 1 : 0
-		assignedPrHandlingPolicy.selectItemAtIndex(Settings.assignedPrHandlingPolicy)
+		assignedPrHandlingPolicy.selectItem(at: Settings.assignedPrHandlingPolicy)
 		showStatusItems.integerValue = Settings.showStatusItems ? 1 : 0
 		makeStatusItemsSelectable.integerValue = Settings.makeStatusItemsSelectable ? 1 : 0
 		markUnmergeableOnUserSectionsOnly.integerValue = Settings.markUnmergeableOnUserSectionsOnly ? 1 : 0
@@ -364,8 +364,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		snoozeWakeOnStatusUpdate.integerValue = Settings.snoozeWakeOnStatusUpdate ? 1 : 0
 		hideSnoozedItems.integerValue = Settings.hideSnoozedItems ? 1 : 0
 
-		allNewPrsSetting.selectItemAtIndex(Settings.displayPolicyForNewPrs)
-		allNewIssuesSetting.selectItemAtIndex(Settings.displayPolicyForNewIssues)
+		allNewPrsSetting.selectItem(at: Settings.displayPolicyForNewPrs)
+		allNewIssuesSetting.selectItem(at: Settings.displayPolicyForNewIssues)
 
 		hotkeyEnable.integerValue = Settings.hotkeyEnable ? 1 : 0
 		hotkeyControlModifier.integerValue = Settings.hotkeyControlModifier ? 1 : 0
@@ -375,15 +375,15 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 		enableHotkeySegments()
 
-		hotkeyLetter.addItemsWithTitles(["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"])
-		hotkeyLetter.selectItemWithTitle(Settings.hotkeyLetter)
+		hotkeyLetter.addItems(withTitles: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"])
+		hotkeyLetter.selectItem(withTitle: Settings.hotkeyLetter)
 
 		refreshUpdatePreferences()
 		updateStatusItemsOptions()
 		updateLabelOptions()
 		updateHistoryOptions()
 
-		hotkeyEnable.enabled = true
+		hotkeyEnable.isEnabled = true
 
 		repoCheckStepper.floatValue = Settings.newRepoCheckPeriod
 		newRepoCheckChanged(nil)
@@ -398,25 +398,21 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	func updateActivity() {
 		if appIsRefreshing {
-			refreshButton.enabled = false
-			projectsTable.enabled = false
-			allPrsSetting.enabled = false
-			allIssuesSetting.enabled = false
+			refreshButton.isEnabled = false
+			projectsTable.isEnabled = false
+			allPrsSetting.isEnabled = false
+			allIssuesSetting.isEnabled = false
 			activityDisplay.startAnimation(nil)
 		} else {
-			refreshButton.enabled = ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext)
-			projectsTable.enabled = true
-			allPrsSetting.enabled = true
-			allIssuesSetting.enabled = true
+			refreshButton.isEnabled = ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext)
+			projectsTable.isEnabled = true
+			allPrsSetting.isEnabled = true
+			allIssuesSetting.isEnabled = true
 			activityDisplay.stopAnimation(nil)
 		}
 	}
 
-	required init?(coder: NSCoder) {
-	    fatalError("init(coder:) has not been implemented")
-	}
-
-	@IBAction func showLabelsSelected(sender: NSButton) {
+	@IBAction func showLabelsSelected(_ sender: NSButton) {
 		Settings.showLabels = (sender.integerValue==1)
 		deferredUpdateTimer.push()
 		updateLabelOptions()
@@ -427,26 +423,26 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
-	@IBAction func dontConfirmRemoveAllMergedSelected(sender: NSButton) {
+	@IBAction func dontConfirmRemoveAllMergedSelected(_ sender: NSButton) {
 		Settings.dontAskBeforeWipingMerged = (sender.integerValue==1)
 	}
 
-	@IBAction func markUnmergeableOnUserSectionsOnlySelected(sender: NSButton) {
+	@IBAction func markUnmergeableOnUserSectionsOnlySelected(_ sender: NSButton) {
 		Settings.markUnmergeableOnUserSectionsOnly = (sender.integerValue==1)
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func displayRepositoryNameSelected(sender: NSButton) {
+	@IBAction func displayRepositoryNameSelected(_ sender: NSButton) {
 		Settings.showReposInName = (sender.integerValue==1)
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func useVibrancySelected(sender: NSButton) {
+	@IBAction func useVibrancySelected(_ sender: NSButton) {
 		Settings.useVibrancy = (sender.integerValue==1)
 		app.updateVibrancies()
 	}
 
-	@IBAction func logActivityToConsoleSelected(sender: NSButton) {
+	@IBAction func logActivityToConsoleSelected(_ sender: NSButton) {
 		Settings.logActivityToConsole = (sender.integerValue==1)
 		logActivityToConsole.integerValue = Settings.logActivityToConsole ? 1 : 0
 		if Settings.logActivityToConsole {
@@ -457,145 +453,145 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 				#else
 				alert.informativeText = "Logging is a feature meant for error reporting, having it constantly enabled will cause this app to be less responsive, use more power, and constitute a security risk"
 			#endif
-			alert.addButtonWithTitle("OK")
-			alert.beginSheetModalForWindow(self, completionHandler: nil)
+			alert.addButton(withTitle: "OK")
+			alert.beginSheetModal(for: self, completionHandler: nil)
 		}
 	}
 
-	@IBAction func dumpApiResponsesToConsoleSelected(sender: NSButton) {
+	@IBAction func dumpApiResponsesToConsoleSelected(_ sender: NSButton) {
 		Settings.dumpAPIResponsesInConsole = (sender.integerValue==1)
 		if Settings.dumpAPIResponsesInConsole {
 			let alert = NSAlert()
 			alert.messageText = "Warning"
 			alert.informativeText = "This is a feature meant for error reporting, having it constantly enabled will cause this app to be less responsive, use more power, and constitute a security risk"
-			alert.addButtonWithTitle("OK")
-			alert.beginSheetModalForWindow(self, completionHandler: nil)
+			alert.addButton(withTitle: "OK")
+			alert.beginSheetModal(for: self, completionHandler: nil)
 		}
 	}
 
-    @IBAction func includeServersInFilteringSelected(sender: NSButton) {
+    @IBAction func includeServersInFilteringSelected(_ sender: NSButton) {
         Settings.includeServersInFilter = (sender.integerValue==1)
 		deferredUpdateTimer.push()
     }
 
-	@IBAction func includeNumbersInFilteringSelected(sender: NSButton) {
+	@IBAction func includeNumbersInFilteringSelected(_ sender: NSButton) {
 		Settings.includeNumbersInFilter = (sender.integerValue==1)
 		deferredUpdateTimer.push()
 	}
 
-    @IBAction func includeUsersInFilteringSelected(sender: NSButton) {
+    @IBAction func includeUsersInFilteringSelected(_ sender: NSButton) {
         Settings.includeUsersInFilter = (sender.integerValue==1)
 		deferredUpdateTimer.push()
     }
 
-	@IBAction func includeLabelsInFilteringSelected(sender: NSButton) {
+	@IBAction func includeLabelsInFilteringSelected(_ sender: NSButton) {
 		Settings.includeLabelsInFilter = (sender.integerValue==1)
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func includeStatusesInFilteringSelected(sender: NSButton) {
+	@IBAction func includeStatusesInFilteringSelected(_ sender: NSButton) {
 		Settings.includeStatusesInFilter = (sender.integerValue==1)
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func includeTitlesInFilteringSelected(sender: NSButton) {
+	@IBAction func includeTitlesInFilteringSelected(_ sender: NSButton) {
 		Settings.includeTitlesInFilter = (sender.integerValue==1)
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func includeMilestonesInFilteringSelected(sender: NSButton) {
+	@IBAction func includeMilestonesInFilteringSelected(_ sender: NSButton) {
 		Settings.includeMilestonesInFilter = (sender.integerValue==1)
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func includeAssigneeNamesInFilteringSelected(sender: NSButton) {
+	@IBAction func includeAssigneeNamesInFilteringSelected(_ sender: NSButton) {
 		Settings.includeAssigneeNamesInFilter = (sender.integerValue==1)
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func includeRepositoriesInfilterSelected(sender: NSButton) {
+	@IBAction func includeRepositoriesInfilterSelected(_ sender: NSButton) {
 		Settings.includeReposInFilter = (sender.integerValue==1)
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func dontConfirmRemoveAllClosedSelected(sender: NSButton) {
+	@IBAction func dontConfirmRemoveAllClosedSelected(_ sender: NSButton) {
 		Settings.dontAskBeforeWipingClosed = (sender.integerValue==1)
 	}
 
-	@IBAction func autoMoveOnCommentMentionsSelected(sender: NSButton) {
+	@IBAction func autoMoveOnCommentMentionsSelected(_ sender: NSButton) {
 		Settings.autoMoveOnCommentMentions = (sender.integerValue==1)
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func autoMoveOnTeamMentionsSelected(sender: NSButton) {
+	@IBAction func autoMoveOnTeamMentionsSelected(_ sender: NSButton) {
 		Settings.autoMoveOnTeamMentions = (sender.integerValue==1)
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func autoMoveIfCreatedInOwnedRepoSelected(sender: NSButton) {
+	@IBAction func autoMoveIfCreatedInOwnedRepoSelected(_ sender: NSButton) {
 		Settings.moveNewItemsInOwnReposToMentioned = (sender.integerValue==1)
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func assumeAllCommentsBeforeMineAreReadSelected(sender: NSButton) {
+	@IBAction func assumeAllCommentsBeforeMineAreReadSelected(_ sender: NSButton) {
 		Settings.assumeReadItemIfUserHasNewerComments = (sender.integerValue==1)
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func removeNotificationsWhenItemIsRemovedSelected(sender: NSButton) {
+	@IBAction func removeNotificationsWhenItemIsRemovedSelected(_ sender: NSButton) {
 		Settings.removeNotificationsWhenItemIsRemoved = (sender.integerValue==1)
 	}
 
-	@IBAction func dontKeepMyPrsSelected(sender: NSButton) {
+	@IBAction func dontKeepMyPrsSelected(_ sender: NSButton) {
 		Settings.dontKeepPrsMergedByMe = (sender.integerValue==1)
 		updateHistoryOptions()
 	}
 
 	private func updateHistoryOptions() {
-		dontKeepPrsMergedByMe.enabled = Settings.mergeHandlingPolicy != HandlingPolicy.KeepNone.rawValue
+		dontKeepPrsMergedByMe.isEnabled = Settings.mergeHandlingPolicy != HandlingPolicy.keepNone.rawValue
 	}
 
-	@IBAction func grayOutWhenRefreshingSelected(sender: NSButton) {
+	@IBAction func grayOutWhenRefreshingSelected(_ sender: NSButton) {
 		Settings.grayOutWhenRefreshing = (sender.integerValue==1)
 	}
 
-	@IBAction func disableAllCommentNotificationsSelected(sender: NSButton) {
+	@IBAction func disableAllCommentNotificationsSelected(_ sender: NSButton) {
 		Settings.disableAllCommentNotifications = (sender.integerValue==1)
 	}
 
-	@IBAction func notifyOnStatusUpdatesSelected(sender: NSButton) {
+	@IBAction func notifyOnStatusUpdatesSelected(_ sender: NSButton) {
 		Settings.notifyOnStatusUpdates = (sender.integerValue==1)
 		updateStatusItemsOptions()
 	}
 
-	@IBAction func notifyOnStatusUpdatesOnAllPrsSelected(sender: NSButton) {
+	@IBAction func notifyOnStatusUpdatesOnAllPrsSelected(_ sender: NSButton) {
 		Settings.notifyOnStatusUpdatesForAllPrs = (sender.integerValue==1)
 	}
 
-	@IBAction func hidePrsThatDontPassOnlyInAllSelected(sender: NSButton) {
+	@IBAction func hidePrsThatDontPassOnlyInAllSelected(_ sender: NSButton) {
 		Settings.hidePrsThatDontPassOnlyInAll = (sender.integerValue==1)
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func hidePrsThatDontPassSelected(sender: NSButton) {
+	@IBAction func hidePrsThatDontPassSelected(_ sender: NSButton) {
 		Settings.hidePrsThatArentPassing = (sender.integerValue==1)
 		updateStatusItemsOptions()
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func hideAvatarsSelected(sender: NSButton) {
+	@IBAction func hideAvatarsSelected(_ sender: NSButton) {
 		Settings.hideAvatars = (sender.integerValue==1)
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func showSeparateApiServersInMenuSelected(sender: NSButton) {
+	@IBAction func showSeparateApiServersInMenuSelected(_ sender: NSButton) {
 		Settings.showSeparateApiServersInMenu = (sender.integerValue==1)
 		serversDirty = true
 		deferredUpdateTimer.push()
@@ -616,33 +612,33 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		return affectedRepos
 	}
 
-	@IBAction func allPrsPolicySelected(sender: NSPopUpButton) {
+	@IBAction func allPrsPolicySelected(_ sender: NSPopUpButton) {
 		let index = sender.indexOfSelectedItem - 1
 		if index < 0 { return }
 
 		for r in affectedReposFromSelection() {
 			r.displayPolicyForPrs = index
-			if index != RepoDisplayPolicy.Hide.rawValue { r.resetSyncState() }
+			if index != RepoDisplayPolicy.hide.rawValue { r.resetSyncState() }
 		}
 		projectsTable.reloadData()
-		sender.selectItemAtIndex(0)
+		sender.selectItem(at: 0)
 		updateDisplayIssuesSetting()
 	}
 
-	@IBAction func allIssuesPolicySelected(sender: NSPopUpButton) {
+	@IBAction func allIssuesPolicySelected(_ sender: NSPopUpButton) {
 		let index = sender.indexOfSelectedItem - 1
 		if index < 0 { return }
 
 		for r in affectedReposFromSelection() {
 			r.displayPolicyForIssues = index
-			if index != RepoDisplayPolicy.Hide.rawValue { r.resetSyncState() }
+			if index != RepoDisplayPolicy.hide.rawValue { r.resetSyncState() }
 		}
 		projectsTable.reloadData()
-		sender.selectItemAtIndex(0)
+		sender.selectItem(at: 0)
 		updateDisplayIssuesSetting()
 	}
 
-	@IBAction func allHidingPolicySelected(sender: NSPopUpButton) {
+	@IBAction func allHidingPolicySelected(_ sender: NSPopUpButton) {
 		let index = sender.indexOfSelectedItem - 1
 		if index < 0 { return }
 
@@ -650,7 +646,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			r.itemHidingPolicy = index
 		}
 		projectsTable.reloadData()
-		sender.selectItemAtIndex(0)
+		sender.selectItem(at: 0)
 		updateDisplayIssuesSetting()
 	}
 
@@ -661,50 +657,50 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func allNewPrsPolicySelected(sender: NSPopUpButton) {
+	@IBAction func allNewPrsPolicySelected(_ sender: NSPopUpButton) {
 		Settings.displayPolicyForNewPrs = sender.indexOfSelectedItem
 	}
 
-	@IBAction func allNewIssuesPolicySelected(sender: NSPopUpButton) {
+	@IBAction func allNewIssuesPolicySelected(_ sender: NSPopUpButton) {
 		Settings.displayPolicyForNewIssues = sender.indexOfSelectedItem
 	}
 
-	@IBAction func hideUncommentedRequestsSelected(sender: NSButton) {
+	@IBAction func hideUncommentedRequestsSelected(_ sender: NSButton) {
 		Settings.hideUncommentedItems = (sender.integerValue==1)
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func showAllCommentsSelected(sender: NSButton) {
+	@IBAction func showAllCommentsSelected(_ sender: NSButton) {
 		Settings.showCommentsEverywhere = (sender.integerValue==1)
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func sortOrderSelected(sender: NSButton) {
+	@IBAction func sortOrderSelected(_ sender: NSButton) {
 		Settings.sortDescending = (sender.integerValue==1)
 		setupSortMethodMenu()
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func countOnlyListedItemsSelected(sender: NSButton) {
+	@IBAction func countOnlyListedItemsSelected(_ sender: NSButton) {
 		Settings.countOnlyListedItems = (sender.integerValue==0)
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func openPrAtFirstUnreadCommentSelected(sender: NSButton) {
+	@IBAction func openPrAtFirstUnreadCommentSelected(_ sender: NSButton) {
 		Settings.openPrAtFirstUnreadComment = (sender.integerValue==1)
 	}
 
-	@IBAction func sortMethodChanged(sender: AnyObject) {
+	@IBAction func sortMethodChanged(_ sender: AnyObject) {
 		Settings.sortMethod = sortModeSelect.indexOfSelectedItem
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func showStatusItemsSelected(sender: NSButton) {
+	@IBAction func showStatusItemsSelected(_ sender: NSButton) {
 		Settings.showStatusItems = (sender.integerValue==1)
 		deferredUpdateTimer.push()
 		updateStatusItemsOptions()
@@ -718,25 +714,25 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	private func setupSortMethodMenu() {
 		let m = NSMenu(title: "Sorting")
 		for t in Settings.sortDescending ? SortingMethod.reverseTitles : SortingMethod.normalTitles {
-			m.addItemWithTitle(t, action: #selector(PreferencesWindow.sortMethodChanged(_:)), keyEquivalent: "")
+			m.addItem(withTitle: t, action: #selector(PreferencesWindow.sortMethodChanged(_:)), keyEquivalent: "")
 		}
 		sortModeSelect.menu = m
-		sortModeSelect.selectItemAtIndex(Settings.sortMethod)
+		sortModeSelect.selectItem(at: Settings.sortMethod)
 	}
 
 	private func updateStatusItemsOptions() {
 		let enable = Settings.showStatusItems
-		makeStatusItemsSelectable.enabled = enable
-		notifyOnStatusUpdates.enabled = enable
-		notifyOnStatusUpdatesForAllPrs.enabled = enable
-		statusTermMenu.enabled = enable
-		statusItemRefreshCounter.enabled = enable
+		makeStatusItemsSelectable.isEnabled = enable
+		notifyOnStatusUpdates.isEnabled = enable
+		notifyOnStatusUpdatesForAllPrs.isEnabled = enable
+		statusTermMenu.isEnabled = enable
+		statusItemRefreshCounter.isEnabled = enable
 		statusItemRescanLabel.alphaValue = enable ? 1.0 : 0.5
 		statusItemsRefreshNote.alphaValue = enable ? 1.0 : 0.5
 		hidePrsThatDontPass.alphaValue = enable ? 1.0 : 0.5
-		hidePrsThatDontPass.enabled = enable
-		hidePrsThatDontPassOnlyInAll.enabled = enable && Settings.hidePrsThatArentPassing
-		notifyOnStatusUpdatesForAllPrs.enabled = enable && Settings.notifyOnStatusUpdates
+		hidePrsThatDontPass.isEnabled = enable
+		hidePrsThatDontPassOnlyInAll.isEnabled = enable && Settings.hidePrsThatArentPassing
+		notifyOnStatusUpdatesForAllPrs.isEnabled = enable && Settings.notifyOnStatusUpdates
 
 		let count = Settings.statusItemRefreshInterval
 		statusItemRefreshCounter.integerValue = count
@@ -747,7 +743,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	private func updateLabelOptions() {
 		let enable = Settings.showLabels
-		labelRefreshCounter.enabled = enable
+		labelRefreshCounter.isEnabled = enable
 		labelRescanLabel.alphaValue = enable ? 1.0 : 0.5
 		labelRefreshNote.alphaValue = enable ? 1.0 : 0.5
 
@@ -756,39 +752,39 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		labelRescanLabel.stringValue = count>1 ? "...and re-scan once every \(count) refreshes" : "...and re-scan on every refresh"
 	}
 
-	@IBAction func labelRefreshCounterChanged(sender: NSStepper) {
+	@IBAction func labelRefreshCounterChanged(_ sender: NSStepper) {
 		Settings.labelRefreshInterval = labelRefreshCounter.integerValue
 		updateLabelOptions()
 	}
 
-	@IBAction func statusItemRefreshCountChanged(sender: NSStepper) {
+	@IBAction func statusItemRefreshCountChanged(_ sender: NSStepper) {
 		Settings.statusItemRefreshInterval = statusItemRefreshCounter.integerValue
 		updateStatusItemsOptions()
 	}
 
-	@IBAction func makeStatusItemsSelectableSelected(sender: NSButton) {
+	@IBAction func makeStatusItemsSelectableSelected(_ sender: NSButton) {
 		Settings.makeStatusItemsSelectable = (sender.integerValue==1)
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func showCreationSelected(sender: NSButton) {
+	@IBAction func showCreationSelected(_ sender: NSButton) {
 		Settings.showCreatedInsteadOfUpdated = (sender.integerValue==1)
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func groupbyRepoSelected(sender: NSButton) {
+	@IBAction func groupbyRepoSelected(_ sender: NSButton) {
 		Settings.groupByRepo = (sender.integerValue==1)
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func assignedPrHandlingPolicySelected(sender: NSPopUpButton) {
+	@IBAction func assignedPrHandlingPolicySelected(_ sender: NSPopUpButton) {
 		Settings.assignedPrHandlingPolicy = sender.indexOfSelectedItem
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func checkForUpdatesAutomaticallySelected(sender: NSButton) {
+	@IBAction func checkForUpdatesAutomaticallySelected(_ sender: NSButton) {
 		Settings.checkForUpdatesAutomatically = (sender.integerValue==1)
 		refreshUpdatePreferences()
 	}
@@ -797,24 +793,24 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		let setting = Settings.checkForUpdatesAutomatically
 		let interval = Settings.checkForUpdatesInterval
 
-		checkForUpdatesLabel.hidden = !setting
-		checkForUpdatesSelector.hidden = !setting
+		checkForUpdatesLabel.isHidden = !setting
+		checkForUpdatesSelector.isHidden = !setting
 
 		checkForUpdatesSelector.integerValue = interval
 		checkForUpdatesAutomatically.integerValue = setting ? 1 : 0
 		checkForUpdatesLabel.stringValue = interval<2 ? "Check every hour" : "Check every \(interval) hours"
 	}
 
-	@IBAction func checkForUpdatesIntervalChanged(sender: NSStepper) {
+	@IBAction func checkForUpdatesIntervalChanged(_ sender: NSStepper) {
 		Settings.checkForUpdatesInterval = sender.integerValue
 		refreshUpdatePreferences()
 	}
 
-	@IBAction func launchAtStartSelected(sender: NSButton) {
+	@IBAction func launchAtStartSelected(_ sender: NSButton) {
 		StartupLaunch.setLaunchOnLogin(sender.integerValue==1)
 	}
 
-	@IBAction func refreshReposSelected(sender: NSButton?) {
+	@IBAction func refreshReposSelected(_ sender: NSButton?) {
 		app.prepareForRefresh()
 
 		let tempContext = DataManager.childContext()
@@ -828,12 +824,12 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 					}
 				}
 
-				let serverNames = errorServers.joinWithSeparator(", ")
+				let serverNames = errorServers.joined(separator: ", ")
 
 				let alert = NSAlert()
 				alert.messageText = "Error"
 				alert.informativeText = "Could not refresh repository list from \(serverNames), please ensure that the tokens you are using are valid"
-				alert.addButtonWithTitle("OK")
+				alert.addButton(withTitle: "OK")
 				alert.runModal()
 			} else {
 				do {
@@ -853,18 +849,18 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		return nil
 	}
 
-	@IBAction func deleteSelectedServerSelected(sender: NSButton) {
-		if let selectedServer = selectedServer(), index = ApiServer.allApiServersInMoc(mainObjectContext).indexOf(selectedServer) {
-			mainObjectContext.deleteObject(selectedServer)
+	@IBAction func deleteSelectedServerSelected(_ sender: NSButton) {
+		if let selectedServer = selectedServer(), let index = ApiServer.allApiServersInMoc(mainObjectContext).index(of: selectedServer) {
+			mainObjectContext.delete(selectedServer)
 			serverList.reloadData()
-			serverList.selectRowIndexes(NSIndexSet(index: min(index, serverList.numberOfRows-1)), byExtendingSelection: false)
+			serverList.selectRowIndexes(IndexSet(integer: min(index, serverList.numberOfRows-1)), byExtendingSelection: false)
 			fillServerApiFormFromSelectedServer()
 			serversDirty = true
 			deferredUpdateTimer.push()
 		}
 	}
 
-	@IBAction func apiServerReportErrorSelected(sender: NSButton) {
+	@IBAction func apiServerReportErrorSelected(_ sender: NSButton) {
 		if let apiServer = selectedServer() {
 			apiServer.reportRefreshFailures = (sender.integerValue != 0)
 			storeApiFormToSelectedServer()
@@ -873,53 +869,53 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	func updateImportExportSettings() {
 		repeatLastExportAutomatically.integerValue = Settings.autoRepeatSettingsExport ? 1 : 0
-		if let lastExportDate = Settings.lastExportDate, fileName = Settings.lastExportUrl?.absoluteString, unescapedName = fileName.stringByRemovingPercentEncoding {
-			let time = itemDateFormatter.stringFromDate(lastExportDate)
+		if let lastExportDate = Settings.lastExportDate, let fileName = Settings.lastExportUrl?.absoluteString, let unescapedName = fileName.removingPercentEncoding {
+			let time = itemDateFormatter.string(from: lastExportDate)
 			lastExportReport.stringValue = "Last exported \(time) to \(unescapedName)"
 		} else {
 			lastExportReport.stringValue = ""
 		}
 	}
 
-	@IBAction func repeatLastExportSelected(sender: AnyObject) {
+	@IBAction func repeatLastExportSelected(_ sender: AnyObject) {
 		Settings.autoRepeatSettingsExport = (repeatLastExportAutomatically.integerValue==1)
 	}
 
-	@IBAction func exportCurrentSettingsSelected(sender: NSButton) {
+	@IBAction func exportCurrentSettingsSelected(_ sender: NSButton) {
 		let s = NSSavePanel()
 		s.title = "Export Current Settings..."
 		s.prompt = "Export"
 		s.nameFieldLabel = "Settings File"
 		s.message = "Export Current Settings..."
-		s.extensionHidden = false
+		s.isExtensionHidden = false
 		s.nameFieldStringValue = "Trailer Settings"
 		s.allowedFileTypes = ["trailerSettings"]
-		s.beginSheetModalForWindow(self) { response in
-			if response == NSFileHandlingPanelOKButton, let url = s.URL {
-				Settings.writeToURL(url)
+		s.beginSheetModal(for: self) { response in
+			if response == NSFileHandlingPanelOKButton, let url = s.url {
+				_ = Settings.writeToURL(url)
 				DLog("Exported settings to %@", url.absoluteString)
 			}
 		}
 	}
 
-	@IBAction func importSettingsSelected(sender: NSButton) {
+	@IBAction func importSettingsSelected(_ sender: NSButton) {
 		let o = NSOpenPanel()
 		o.title = "Import Settings From File..."
 		o.prompt = "Import"
 		o.nameFieldLabel = "Settings File"
 		o.message = "Import Settings From File..."
-		o.extensionHidden = false
+		o.isExtensionHidden = false
 		o.allowedFileTypes = ["trailerSettings"]
-		o.beginSheetModalForWindow(self) { response in
-			if response == NSFileHandlingPanelOKButton, let url = o.URL {
+		o.beginSheetModal(for: self) { response in
+			if response == NSFileHandlingPanelOKButton, let url = o.url {
 				atNextEvent {
-					app.tryLoadSettings(url, skipConfirm: Settings.dontConfirmSettingsImport)
+					_ = app.tryLoadSettings(url, skipConfirm: Settings.dontConfirmSettingsImport)
 				}
 			}
 		}
 	}
 
-	private func colorButton(button: NSButton, withColor: NSColor) {
+	private func colorButton(_ button: NSButton, withColor: NSColor) {
 		let title = button.attributedTitle.mutableCopy() as! NSMutableAttributedString
 		title.addAttribute(NSForegroundColorAttributeName, value: withColor, range: NSMakeRange(0, title.length))
 		button.attributedTitle = title
@@ -927,16 +923,16 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	private func enableHotkeySegments() {
 		if Settings.hotkeyEnable {
-			colorButton(hotkeyCommandModifier, withColor: Settings.hotkeyCommandModifier ? NSColor.controlTextColor() : NSColor.disabledControlTextColor())
-			colorButton(hotkeyControlModifier, withColor: Settings.hotkeyControlModifier ? NSColor.controlTextColor() : NSColor.disabledControlTextColor())
-			colorButton(hotkeyOptionModifier, withColor: Settings.hotkeyOptionModifier ? NSColor.controlTextColor() : NSColor.disabledControlTextColor())
-			colorButton(hotkeyShiftModifier, withColor: Settings.hotkeyShiftModifier ? NSColor.controlTextColor() : NSColor.disabledControlTextColor())
+			colorButton(hotkeyCommandModifier, withColor: Settings.hotkeyCommandModifier ? NSColor.controlTextColor : NSColor.disabledControlTextColor)
+			colorButton(hotkeyControlModifier, withColor: Settings.hotkeyControlModifier ? NSColor.controlTextColor : NSColor.disabledControlTextColor)
+			colorButton(hotkeyOptionModifier, withColor: Settings.hotkeyOptionModifier ? NSColor.controlTextColor : NSColor.disabledControlTextColor)
+			colorButton(hotkeyShiftModifier, withColor: Settings.hotkeyShiftModifier ? NSColor.controlTextColor : NSColor.disabledControlTextColor)
 		}
-		hotKeyContainer.hidden = !Settings.hotkeyEnable
-		hotKeyHelp.hidden = Settings.hotkeyEnable
+		hotKeyContainer.isHidden = !Settings.hotkeyEnable
+		hotKeyHelp.isHidden = Settings.hotkeyEnable
 	}
 
-	@IBAction func enableHotkeySelected(sender: AnyObject) {
+	@IBAction func enableHotkeySelected(_ sender: AnyObject) {
 		Settings.hotkeyEnable = hotkeyEnable.integerValue != 0
 		Settings.hotkeyLetter = hotkeyLetter.titleOfSelectedItem ?? "T"
 		Settings.hotkeyControlModifier = hotkeyControlModifier.integerValue != 0
@@ -950,70 +946,70 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	private func reportNeedFrontEnd() {
 		let alert = NSAlert()
 		alert.messageText = "Please provide a full URL for the web front end of this server first"
-		alert.addButtonWithTitle("OK")
+		alert.addButton(withTitle: "OK")
 		alert.runModal()
 	}
 
-	@IBAction func createTokenSelected(sender: NSButton) {
+	@IBAction func createTokenSelected(_ sender: NSButton) {
 		if apiServerWebPath.stringValue.isEmpty {
 			reportNeedFrontEnd()
 		} else {
 			let address = "\(apiServerWebPath.stringValue)/settings/tokens/new"
-			NSWorkspace.sharedWorkspace().openURL(NSURL(string: address)!)
+			NSWorkspace.shared().open(URL(string: address)!)
 		}
 	}
 
-	@IBAction func viewExistingTokensSelected(sender: NSButton) {
+	@IBAction func viewExistingTokensSelected(_ sender: NSButton) {
 		if apiServerWebPath.stringValue.isEmpty {
 			reportNeedFrontEnd()
 		} else {
 			let address = "\(apiServerWebPath.stringValue)/settings/applications"
-			NSWorkspace.sharedWorkspace().openURL(NSURL(string: address)!)
+			NSWorkspace.shared().open(URL(string: address)!)
 		}
 	}
 
-	@IBAction func viewWatchlistSelected(sender: NSButton) {
+	@IBAction func viewWatchlistSelected(_ sender: NSButton) {
 		if apiServerWebPath.stringValue.isEmpty {
 			reportNeedFrontEnd()
 		} else {
 			let address = "\(apiServerWebPath.stringValue)/watching"
-			NSWorkspace.sharedWorkspace().openURL(NSURL(string: address)!)
+			NSWorkspace.shared().open(URL(string: address)!)
 		}
 	}
 
-	@IBAction func prMergePolicySelected(sender: NSPopUpButton) {
+	@IBAction func prMergePolicySelected(_ sender: NSPopUpButton) {
 		Settings.mergeHandlingPolicy = sender.indexOfSelectedItem
 		updateHistoryOptions()
 	}
 
-	@IBAction func prClosePolicySelected(sender: NSPopUpButton) {
+	@IBAction func prClosePolicySelected(_ sender: NSPopUpButton) {
 		Settings.closeHandlingPolicy = sender.indexOfSelectedItem
 	}
 
 	private func updateStatusTermPreferenceControls() {
 		let mode = Settings.statusFilteringMode
-		statusTermMenu.selectItemAtIndex(mode)
+		statusTermMenu.selectItem(at: mode)
 		if mode != 0 {
-			statusTermsField.enabled = true
+			statusTermsField.isEnabled = true
 			statusTermsField.alphaValue = 1.0
 		}
 		else
 		{
-			statusTermsField.enabled = false
+			statusTermsField.isEnabled = false
 			statusTermsField.alphaValue = 0.5
 		}
 		statusTermsField.objectValue = Settings.statusFilteringTerms
 	}
 
-	@IBAction func statusFilterMenuChanged(sender: NSPopUpButton) {
+	@IBAction func statusFilterMenuChanged(_ sender: NSPopUpButton) {
 		Settings.statusFilteringMode = sender.indexOfSelectedItem
 		Settings.statusFilteringTerms = statusTermsField.objectValue as! [String]
 		updateStatusTermPreferenceControls()
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func testApiServerSelected(sender: NSButton) {
-		sender.enabled = false
+	@IBAction func testApiServerSelected(_ sender: NSButton) {
+		sender.isEnabled = false
 		let apiServer = selectedServer()!
 		api.testApiToServer(apiServer) { error in
 			let alert = NSAlert()
@@ -1023,13 +1019,13 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			} else {
 				alert.messageText = "This API server seems OK!"
 			}
-			alert.addButtonWithTitle("OK")
+			alert.addButton(withTitle: "OK")
 			alert.runModal()
-			sender.enabled = true
+			sender.isEnabled = true
 		}
 	}
 
-	@IBAction func apiRestoreDefaultsSelected(sender: NSButton)
+	@IBAction func apiRestoreDefaultsSelected(_ sender: NSButton)
 	{
 		if let apiServer = selectedServer() {
 			apiServer.resetToGithub()
@@ -1045,8 +1041,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			apiServerApiPath.stringValue = S(apiServer.apiPath)
 			apiServerAuthToken.stringValue = S(apiServer.authToken)
 			apiServerSelectedBox.title = apiServer.label ?? "New Server"
-			apiServerTestButton.enabled = !S(apiServer.authToken).isEmpty
-			apiServerDeleteButton.enabled = (ApiServer.countApiServersInMoc(mainObjectContext) > 1)
+			apiServerTestButton.isEnabled = !S(apiServer.authToken).isEmpty
+			apiServerDeleteButton.isEnabled = (ApiServer.countApiServersInMoc(mainObjectContext) > 1)
 			apiServerReportError.integerValue = apiServer.reportRefreshFailures.boolValue ? 1 : 0
 		}
 	}
@@ -1057,36 +1053,36 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			apiServer.apiPath = apiServerApiPath.stringValue
 			apiServer.webPath = apiServerWebPath.stringValue
 			apiServer.authToken = apiServerAuthToken.stringValue
-			apiServerTestButton.enabled = !S(apiServer.authToken).isEmpty
+			apiServerTestButton.isEnabled = !S(apiServer.authToken).isEmpty
 			serverList.reloadData()
 			serversDirty = true
 			deferredUpdateTimer.push()
 		}
 	}
 
-	@IBAction func addNewApiServerSelected(sender: NSButton) {
+	@IBAction func addNewApiServerSelected(_ sender: NSButton) {
 		let a = ApiServer.insertNewServerInMoc(mainObjectContext)
 		a.label = "New API Server"
 		serverList.reloadData()
-		if let index = ApiServer.allApiServersInMoc(mainObjectContext).indexOf(a) {
-			serverList.selectRowIndexes(NSIndexSet(index: index), byExtendingSelection: false)
+		if let index = ApiServer.allApiServersInMoc(mainObjectContext).index(of: a) {
+			serverList.selectRowIndexes(IndexSet(integer: index), byExtendingSelection: false)
 			fillServerApiFormFromSelectedServer()
 		}
 		serversDirty = true
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func refreshDurationChanged(sender: NSStepper?) {
+	@IBAction func refreshDurationChanged(_ sender: NSStepper?) {
 		Settings.refreshPeriod = refreshDurationStepper.floatValue
 		refreshDurationLabel.stringValue = "Refresh items every \(refreshDurationStepper.integerValue) seconds"
 	}
 
-	@IBAction func newRepoCheckChanged(sender: NSStepper?) {
+	@IBAction func newRepoCheckChanged(_ sender: NSStepper?) {
 		Settings.newRepoCheckPeriod = repoCheckStepper.floatValue
 		repoCheckLabel.stringValue = "Refresh repos & teams every \(repoCheckStepper.integerValue) hours"
 	}
 
-	func windowWillClose(notification: NSNotification) {
+	func windowWillClose(_ notification: Notification) {
 		if ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) && preferencesDirty {
 			app.startRefresh()
 		} else {
@@ -1098,8 +1094,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		app.closedPreferencesWindow()
 	}
 
-	override func controlTextDidChange(n: NSNotification?) {
-		if let obj: AnyObject = n?.object {
+	override func controlTextDidChange(_ n: Notification) {
+		if let obj: AnyObject = n.object {
 
 			if obj===apiServerName {
 				if let apiServer = selectedServer() {
@@ -1147,11 +1143,11 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	///////////// Tabs
 
-	func tabView(tabView: NSTabView, willSelectTabViewItem tabViewItem: NSTabViewItem?) {
+	func tabView(_ tabView: NSTabView, willSelect tabViewItem: NSTabViewItem?) {
 		if let item = tabViewItem {
 			let newIndex = tabView.indexOfTabViewItem(item)
 			if newIndex == 1 {
-				if lastRepoCheck == never() && DataManager.appIsConfigured {
+				if lastRepoCheck == Date.distantPast && DataManager.appIsConfigured {
 					refreshReposSelected(nil)
 				}
 			}
@@ -1161,7 +1157,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	///////////// Repo table
 
-	func tableViewSelectionDidChange(notification: NSNotification) {
+	func tableViewSelectionDidChange(_ notification: Notification) {
 		if serverList === notification.object {
 			fillServerApiFormFromSelectedServer()
 		} else if projectsTable === notification.object {
@@ -1171,7 +1167,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
-	private func repoForRow(row: Int) -> Repo {
+	private func repoForRow(_ row: Int) -> Repo {
 		let parentCount = Repo.countParentRepos(repoFilter.stringValue)
 		var r = row
 		if r > parentCount {
@@ -1181,23 +1177,23 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		return filteredRepos[r-1]
 	}
 
-	func tableView(tv: NSTableView, shouldSelectRow row: Int) -> Bool {
+	func tableView(_ tv: NSTableView, shouldSelectRow row: Int) -> Bool {
 		return !tableView(tv, isGroupRow:row)
 	}
 
-	func tableView(tv: NSTableView, willDisplayCell c: AnyObject, forTableColumn tableColumn: NSTableColumn?, row: Int) {
+	func tableView(_ tv: NSTableView, willDisplayCell c: AnyObject, for tableColumn: NSTableColumn?, row: Int) {
 		let cell = c as! NSCell
 		if tv === projectsTable {
 			if tableColumn?.identifier == "repos" {
 				if tableView(tv, isGroupRow:row) {
 					cell.title = row==0 ? "Parent Repositories" : "Forked Repositories"
-					cell.enabled = false
+					cell.isEnabled = false
 				} else {
-					cell.enabled = true
+					cell.isEnabled = true
 					let r = repoForRow(row)
 					let repoName = S(r.fullName)
 					let title = (r.inaccessible?.boolValue ?? false) ? "\(repoName) (inaccessible)" : repoName
-					let textColor = (row == tv.selectedRow) ? NSColor.selectedControlTextColor() : (r.shouldSync ? NSColor.textColor() : NSColor.textColor().colorWithAlphaComponent(0.4))
+					let textColor = (row == tv.selectedRow) ? NSColor.selectedControlTextColor : (r.shouldSync ? NSColor.textColor : NSColor.textColor.withAlphaComponent(0.4))
 					cell.attributedStringValue = NSAttributedString(string: title, attributes: [NSForegroundColorAttributeName: textColor])
 				}
 			} else {
@@ -1206,10 +1202,10 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 						if tableView(tv, isGroupRow:row) {
 							menuCell.stringValue = ""
 							menuCell.placeholderString = nil
-							menuCell.enabled = false
+							menuCell.isEnabled = false
 						} else {
 							let r = repoForRow(row)
-							menuCell.enabled = true
+							menuCell.isEnabled = true
 							menuCell.placeholderString = "None"
 							menuCell.stringValue = S(r.groupLabel)
 						}
@@ -1217,39 +1213,39 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 				} else if let menuCell = cell as? NSPopUpButtonCell {
 					menuCell.removeAllItems()
 					if tableView(tv, isGroupRow:row) {
-						menuCell.selectItemAtIndex(-1)
-						menuCell.enabled = false
-						menuCell.arrowPosition = .NoArrow
+						menuCell.selectItem(at: -1)
+						menuCell.isEnabled = false
+						menuCell.arrowPosition = .noArrow
 					} else {
 						let r = repoForRow(row)
-						menuCell.enabled = true
-						menuCell.arrowPosition = .ArrowAtBottom
+						menuCell.isEnabled = true
+						menuCell.arrowPosition = .arrowAtBottom
 
 						var count = 0
-						let fontSize = NSFont.systemFontSizeForControlSize(NSControlSize.SmallControlSize)
+						let fontSize = NSFont.systemFontSize(for: .small)
 						if tableColumn?.identifier == "hide" {
 							for policy in RepoHidingPolicy.policies {
 								let m = NSMenuItem()
 								m.attributedTitle = NSAttributedString(string: policy.name(), attributes: [
-									NSFontAttributeName: count==0 ? NSFont.systemFontOfSize(fontSize) : NSFont.boldSystemFontOfSize(fontSize),
+									NSFontAttributeName: count==0 ? NSFont.systemFont(ofSize: fontSize) : NSFont.boldSystemFont(ofSize: fontSize),
 									NSForegroundColorAttributeName: policy.color(),
 									])
 								menuCell.menu?.addItem(m)
 								count += 1
 							}
-							menuCell.selectItemAtIndex(r.itemHidingPolicy?.integerValue ?? 0)
+							menuCell.selectItem(at: r.itemHidingPolicy?.intValue ?? 0)
 						} else {
 							for policy in RepoDisplayPolicy.policies {
 								let m = NSMenuItem()
 								m.attributedTitle = NSAttributedString(string: policy.name(), attributes: [
-									NSFontAttributeName: count==0 ? NSFont.systemFontOfSize(fontSize) : NSFont.boldSystemFontOfSize(fontSize),
+									NSFontAttributeName: count==0 ? NSFont.systemFont(ofSize: fontSize) : NSFont.boldSystemFont(ofSize: fontSize),
 									NSForegroundColorAttributeName: policy.color(),
 									])
 								menuCell.menu?.addItem(m)
 								count += 1
 							}
-							let selectedIndex = (tableColumn?.identifier == "prs" ? r.displayPolicyForPrs : r.displayPolicyForIssues)?.integerValue ?? 0
-							menuCell.selectItemAtIndex(selectedIndex)
+							let selectedIndex = (tableColumn?.identifier == "prs" ? r.displayPolicyForPrs : r.displayPolicyForIssues)?.intValue ?? 0
+							menuCell.selectItem(at: selectedIndex)
 						}
 					}
 				}
@@ -1261,9 +1257,9 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 				cell.title = S(apiServer.label)
 				let tc = c as! NSTextFieldCell
 				if apiServer.lastSyncSucceeded?.boolValue ?? false {
-					tc.textColor = NSColor.textColor()
+					tc.textColor = NSColor.textColor
 				} else {
-					tc.textColor = NSColor.redColor()
+					tc.textColor = NSColor.red
 				}
 			} else { // api usage
 				let c = cell as! NSLevelIndicatorCell
@@ -1279,11 +1275,11 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			let preset = allPresets[row]
 			cell.title = preset.listDescription
 			let tc = c as! NSTextFieldCell
-			tc.textColor = NSColor.textColor()
+			tc.textColor = NSColor.textColor
 		}
 	}
 
-	func tableView(tableView: NSTableView, isGroupRow row: Int) -> Bool {
+	func tableView(_ tableView: NSTableView, isGroupRow row: Int) -> Bool {
 		if tableView === projectsTable {
 			return (row == 0 || row == Repo.countParentRepos(repoFilter.stringValue) + 1)
 		} else {
@@ -1291,7 +1287,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
-	func numberOfRowsInTableView(tableView: NSTableView) -> Int {
+	func numberOfRows(in tableView: NSTableView) -> Int {
 		if tableView === projectsTable {
 			return Repo.reposForFilter(repoFilter.stringValue).count + 2
 		} else if tableView === serverList {
@@ -1302,11 +1298,11 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		return 0
 	}
 
-	func tableView(tableView: NSTableView, objectValueForTableColumn tableColumn: NSTableColumn?, row: Int) -> AnyObject? {
+	func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> AnyObject? {
 		return nil
 	}
 
-	func tableView(tv: NSTableView, setObjectValue object: AnyObject?, forTableColumn tableColumn: NSTableColumn?, row: Int) {
+	func tableView(_ tv: NSTableView, setObjectValue object: AnyObject?, for tableColumn: NSTableColumn?, row: Int) {
 		if tv === projectsTable {
 			if !tableView(tv, isGroupRow: row) {
 				let r = repoForRow(row)
@@ -1315,7 +1311,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 					r.groupLabel = g.isEmpty ? nil : g
 					serversDirty = true
 					deferredUpdateTimer.push()
-				} else if let index = object?.integerValue {
+				} else if let index = (object as? NSNumber)?.intValue {
 					if tableColumn?.identifier == "prs" {
 						r.displayPolicyForPrs = index
 					} else if tableColumn?.identifier == "issues" {
@@ -1323,7 +1319,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 					} else if tableColumn?.identifier == "hide" {
 						r.itemHidingPolicy = index
 					}
-					if index != RepoDisplayPolicy.Hide.rawValue {
+					if index != RepoDisplayPolicy.hide.rawValue {
 						r.resetSyncState()
 					}
 					updateDisplayIssuesSetting()
@@ -1334,7 +1330,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	/////////////////////////////// snoozing
 
-	@IBAction func snoozeWakeChanged(sender: NSButton) {
+	@IBAction func snoozeWakeChanged(_ sender: NSButton) {
 		Settings.snoozeWakeOnComment = snoozeWakeOnComment.integerValue == 1
 		Settings.snoozeWakeOnMention = snoozeWakeOnMention.integerValue == 1
 		Settings.snoozeWakeOnStatusUpdate = snoozeWakeOnStatusUpdate.integerValue == 1
@@ -1342,63 +1338,63 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		deferredUpdateTimer.push()
 	}
 
-	@IBAction func hideSnoozedItemsChanged(sender: NSButton) {
+	@IBAction func hideSnoozedItemsChanged(_ sender: NSButton) {
 		Settings.hideSnoozedItems = hideSnoozedItems.integerValue == 1
 		deferredUpdateTimer.push()
 	}
 
 	private func fillSnoozingDropdowns() {
-		snoozeDurationDays.addItemWithTitle("No Days")
-		snoozeDurationHours.addItemWithTitle("No Hours")
-		snoozeDurationMinutes.addItemWithTitle("No Minutes")
+		snoozeDurationDays.addItem(withTitle: "No Days")
+		snoozeDurationHours.addItem(withTitle: "No Hours")
+		snoozeDurationMinutes.addItem(withTitle: "No Minutes")
 
-		snoozeDurationDays.addItemWithTitle("1 Day")
-		snoozeDurationHours.addItemWithTitle("1 Hour")
-		snoozeDurationMinutes.addItemWithTitle("1 Minute")
+		snoozeDurationDays.addItem(withTitle: "1 Day")
+		snoozeDurationHours.addItem(withTitle: "1 Hour")
+		snoozeDurationMinutes.addItem(withTitle: "1 Minute")
 
 		var titles = [String]()
 
 		for f in 2..<400 {
 			titles.append("\(f) Days")
 		}
-		snoozeDurationDays.addItemsWithTitles(titles)
+		snoozeDurationDays.addItems(withTitles: titles)
 		titles.removeAll()
 		for f in 2..<24 {
 			titles.append("\(f) Hours")
 		}
-		snoozeDurationHours.addItemsWithTitles(titles)
+		snoozeDurationHours.addItems(withTitles: titles)
 		titles.removeAll()
 		for f in 2..<60 {
 			titles.append("\(f) Minutes")
 		}
-		snoozeDurationMinutes.addItemsWithTitles(titles)
+		snoozeDurationMinutes.addItems(withTitles: titles)
 		titles.removeAll()
 
-		snoozeDateTimeDay.addItemsWithTitles(["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"])
+		snoozeDateTimeDay.addItems(withTitles: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"])
 		for f in 0..<24 {
 			titles.append(String(format: "%02d", f))
 		}
-		snoozeDateTimeHour.addItemsWithTitles(titles)
+		snoozeDateTimeHour.addItems(withTitles: titles)
 		titles.removeAll()
 		for f in 0..<60 {
 			titles.append(String(format: "%02d", f))
 		}
-		snoozeDateTimeMinute.addItemsWithTitles(titles)
+		snoozeDateTimeMinute.addItems(withTitles: titles)
 
 		if Settings.autoSnoozeDuration == 0 {
 			autoSnoozeLabel.stringValue = "Do not auto-snooze items"
-			autoSnoozeLabel.textColor = NSColor.disabledControlTextColor()
+			autoSnoozeLabel.textColor = NSColor.disabledControlTextColor
 		} else if Settings.autoSnoozeDuration == 1 {
 			autoSnoozeLabel.stringValue = "Automatically snooze any item that has been idle for longer than a day"
-			autoSnoozeLabel.textColor = NSColor.controlTextColor()
+			autoSnoozeLabel.textColor = NSColor.controlTextColor
 		} else {
 			autoSnoozeLabel.stringValue = "Automatically snooze any item that has been idle for longer than \(Settings.autoSnoozeDuration) days"
-			autoSnoozeLabel.textColor = NSColor.controlTextColor()
+			autoSnoozeLabel.textColor = NSColor.controlTextColor
 		}
 		autoSnoozeSelector.integerValue = Settings.autoSnoozeDuration
 	}
 
-	@IBAction func autoSnoozeDurationChanged(sender: NSStepper) {
+	@IBAction func autoSnoozeDurationChanged(_ sender: NSStepper) {
 		Settings.autoSnoozeDuration = sender.integerValue
 		fillSnoozingDropdowns()
 		for p in DataItem.allItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest] {
@@ -1424,51 +1420,51 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			if s.duration.boolValue {
 				snoozeTypeDuration.integerValue = 1
 				snoozeTypeDateTime.integerValue = 0
-				snoozeDurationMinutes.enabled = true
-				snoozeDurationHours.enabled = true
-				snoozeDurationDays.enabled = true
-				snoozeDurationMinutes.selectItemAtIndex(s.minute?.integerValue ?? 0)
-				snoozeDurationHours.selectItemAtIndex(s.hour?.integerValue ?? 0)
-				snoozeDurationDays.selectItemAtIndex(s.day?.integerValue ?? 0)
-				snoozeDateTimeMinute.enabled = false
-				snoozeDateTimeMinute.selectItemAtIndex(0)
-				snoozeDateTimeHour.enabled = false
-				snoozeDateTimeHour.selectItemAtIndex(0)
-				snoozeDateTimeDay.enabled = false
-				snoozeDateTimeDay.selectItemAtIndex(0)
+				snoozeDurationMinutes.isEnabled = true
+				snoozeDurationHours.isEnabled = true
+				snoozeDurationDays.isEnabled = true
+				snoozeDurationMinutes.selectItem(at: s.minute?.intValue ?? 0)
+				snoozeDurationHours.selectItem(at: s.hour?.intValue ?? 0)
+				snoozeDurationDays.selectItem(at: s.day?.intValue ?? 0)
+				snoozeDateTimeMinute.isEnabled = false
+				snoozeDateTimeMinute.selectItem(at: 0)
+				snoozeDateTimeHour.isEnabled = false
+				snoozeDateTimeHour.selectItem(at: 0)
+				snoozeDateTimeDay.isEnabled = false
+				snoozeDateTimeDay.selectItem(at: 0)
 			} else {
 				snoozeTypeDuration.integerValue = 0
 				snoozeTypeDateTime.integerValue = 1
-				snoozeDurationMinutes.enabled = false
-				snoozeDurationMinutes.selectItemAtIndex(0)
-				snoozeDurationHours.enabled = false
-				snoozeDurationHours.selectItemAtIndex(0)
-				snoozeDurationDays.enabled = false
-				snoozeDurationDays.selectItemAtIndex(0)
-				snoozeDateTimeMinute.enabled = true
-				snoozeDateTimeHour.enabled = true
-				snoozeDateTimeDay.enabled = true
-				snoozeDateTimeMinute.selectItemAtIndex(s.minute?.integerValue ?? 0)
-				snoozeDateTimeHour.selectItemAtIndex(s.hour?.integerValue ?? 0)
-				snoozeDateTimeDay.selectItemAtIndex(s.day?.integerValue ?? 0)
+				snoozeDurationMinutes.isEnabled = false
+				snoozeDurationMinutes.selectItem(at: 0)
+				snoozeDurationHours.isEnabled = false
+				snoozeDurationHours.selectItem(at: 0)
+				snoozeDurationDays.isEnabled = false
+				snoozeDurationDays.selectItem(at: 0)
+				snoozeDateTimeMinute.isEnabled = true
+				snoozeDateTimeHour.isEnabled = true
+				snoozeDateTimeDay.isEnabled = true
+				snoozeDateTimeMinute.selectItem(at: s.minute?.intValue ?? 0)
+				snoozeDateTimeHour.selectItem(at: s.hour?.intValue ?? 0)
+				snoozeDateTimeDay.selectItem(at: s.day?.intValue ?? 0)
 			}
-			snoozeTypeDuration.enabled = true
-			snoozeTypeDateTime.enabled = true
-			snoozeDeletePreset.enabled = true
-			snoozeUp.enabled = true
-			snoozeDown.enabled = true
+			snoozeTypeDuration.isEnabled = true
+			snoozeTypeDateTime.isEnabled = true
+			snoozeDeletePreset.isEnabled = true
+			snoozeUp.isEnabled = true
+			snoozeDown.isEnabled = true
 		} else {
-			snoozeTypeDuration.enabled = false
-			snoozeTypeDateTime.enabled = false
-			snoozeDateTimeMinute.enabled = false
-			snoozeDateTimeHour.enabled = false
-			snoozeDateTimeDay.enabled = false
-			snoozeDurationMinutes.enabled = false
-			snoozeDurationHours.enabled = false
-			snoozeDurationDays.enabled = false
-			snoozeDeletePreset.enabled = false
-			snoozeUp.enabled = false
-			snoozeDown.enabled = false
+			snoozeTypeDuration.isEnabled = false
+			snoozeTypeDateTime.isEnabled = false
+			snoozeDateTimeMinute.isEnabled = false
+			snoozeDateTimeHour.isEnabled = false
+			snoozeDateTimeDay.isEnabled = false
+			snoozeDurationMinutes.isEnabled = false
+			snoozeDurationHours.isEnabled = false
+			snoozeDurationDays.isEnabled = false
+			snoozeDeletePreset.isEnabled = false
+			snoozeUp.isEnabled = false
+			snoozeDown.isEnabled = false
 		}
 	}
 
@@ -1478,33 +1474,33 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		Settings.possibleExport(nil)
 	}
 
-	@IBAction func createNewSnoozePresetSelected(sender: NSButton) {
+	@IBAction func createNewSnoozePresetSelected(_ sender: NSButton) {
 		let s = SnoozePreset.newSnoozePresetInMoc(mainObjectContext)
 		commitSnoozeSettings()
-		if let index = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext).indexOf(s) {
-			snoozePresetsList.selectRowIndexes(NSIndexSet(index: index), byExtendingSelection: false)
+		if let index = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext).index(of: s) {
+			snoozePresetsList.selectRowIndexes(IndexSet(integer: index), byExtendingSelection: false)
 			fillSnoozeFormFromSelectedPreset()
 		}
 	}
 
-	@IBAction func deleteSnoozePresetSelected(sender: NSButton) {
-		if let selectedPreset = selectedSnoozePreset(), index = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext).indexOf(selectedPreset) {
-			mainObjectContext.deleteObject(selectedPreset)
+	@IBAction func deleteSnoozePresetSelected(_ sender: NSButton) {
+		if let selectedPreset = selectedSnoozePreset(), let index = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext).index(of: selectedPreset) {
+			mainObjectContext.delete(selectedPreset)
 			commitSnoozeSettings()
-			snoozePresetsList.selectRowIndexes(NSIndexSet(index: min(index, snoozePresetsList.numberOfRows-1)), byExtendingSelection: false)
+			snoozePresetsList.selectRowIndexes(IndexSet(integer: min(index, snoozePresetsList.numberOfRows-1)), byExtendingSelection: false)
 			fillSnoozeFormFromSelectedPreset()
 		}
 	}
 
-	@IBAction func snoozeTypeChanged(sender: NSButton) {
+	@IBAction func snoozeTypeChanged(_ sender: NSButton) {
 		if let s = selectedSnoozePreset() {
-			s.duration = NSNumber(bool: (sender == snoozeTypeDuration))
+			s.duration = NSNumber(value: (sender == snoozeTypeDuration))
 			fillSnoozeFormFromSelectedPreset()
 			commitSnoozeSettings()
 		}
 	}
 
-	@IBAction func snoozeOptionsChanged(sender: NSPopUpButton) {
+	@IBAction func snoozeOptionsChanged(_ sender: NSPopUpButton) {
 		if let s = selectedSnoozePreset() {
 			if s.duration.boolValue {
 				s.day = numberOrNil(snoozeDurationDays.indexOfSelectedItem)
@@ -1519,33 +1515,33 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
-	@IBAction func snoozeUpSelected(sender: AnyObject) {
+	@IBAction func snoozeUpSelected(_ sender: AnyObject) {
 		if let this = selectedSnoozePreset() {
 			let all = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)
-			if let index = all.indexOf(this) where index > 0 {
+			if let index = all.index(of: this), index > 0 {
 				let other = all[index-1]
-				other.sortOrder = NSNumber(integer: index)
-				this.sortOrder = NSNumber(integer: index-1)
-				snoozePresetsList.selectRowIndexes(NSIndexSet(index: index-1), byExtendingSelection: false)
+				other.sortOrder = NSNumber(value: index)
+				this.sortOrder = NSNumber(value: index-1)
+				snoozePresetsList.selectRowIndexes(IndexSet(integer: index-1), byExtendingSelection: false)
 				commitSnoozeSettings()
 			}
 		}
 	}
 
-	@IBAction func snoozeDownSelected(sender: AnyObject) {
+	@IBAction func snoozeDownSelected(_ sender: AnyObject) {
 		if let this = selectedSnoozePreset() {
 			let all = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)
-			if let index = all.indexOf(this) where index < all.count-1 {
+			if let index = all.index(of: this), index < all.count-1 {
 				let other = all[index+1]
-				other.sortOrder = NSNumber(integer: index)
-				this.sortOrder = NSNumber(integer: index+1)
-				snoozePresetsList.selectRowIndexes(NSIndexSet(index: index+1), byExtendingSelection: false)
+				other.sortOrder = NSNumber(value: index)
+				this.sortOrder = NSNumber(value: index+1)
+				snoozePresetsList.selectRowIndexes(IndexSet(integer: index+1), byExtendingSelection: false)
 				commitSnoozeSettings()
 			}
 		}
 	}
 
-	private func numberOrNil(i: Int) -> NSNumber? {
-		return i > 0 ? NSNumber(integer: i) : nil
+	private func numberOrNil(_ i: Int) -> NSNumber? {
+		return i > 0 ? NSNumber(value: i) : nil
 	}
 }

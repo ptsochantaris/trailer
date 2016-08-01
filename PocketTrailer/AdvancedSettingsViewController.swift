@@ -16,8 +16,8 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		var valueDisplayed: ()->String?
 
 		func isRelevantTo(s: String?, showingHelp: Bool) -> Bool {
-			if let s = s?.trim() where !s.isEmpty {
-				return title.localizedCaseInsensitiveContainsString(s) || (showingHelp && description.localizedCaseInsensitiveContainsString(s))
+			if let s = s?.trim(), !s.isEmpty {
+				return title.localizedCaseInsensitiveContains(s) || (showingHelp && description.localizedCaseInsensitiveContains(s))
 			} else {
 				return true
 			}
@@ -252,13 +252,13 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	// for the picker
 	private var valuesToPush: [String]?
 	private var pickerName: String?
-	private var selectedIndexPath: NSIndexPath?
+	private var selectedIndexPath: IndexPath?
 	private var previousValue: Int?
 	private var showHelp = true
 
-	@IBAction func done(sender: UIBarButtonItem) {
-		if preferencesDirty { app.startRefresh() }
-		dismissViewControllerAnimated(true, completion: nil)
+	@IBAction func done(_ sender: UIBarButtonItem) {
+		if preferencesDirty { _ = app.startRefresh() }
+		dismiss(animated: true, completion: nil)
 	}
 
 	private func reload() {
@@ -280,35 +280,35 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		}
 
 		navigationItem.rightBarButtonItems = [
-			UIBarButtonItem(image: UIImage(named: "export"), style: .Plain, target: self, action: #selector(AdvancedSettingsViewController.exportSelected(_:))),
-			UIBarButtonItem(image: UIImage(named: "import"), style: .Plain, target: self, action: #selector(AdvancedSettingsViewController.importSelected(_:))),
-			UIBarButtonItem(image: UIImage(named: "showHelp"), style: .Plain, target: self, action: #selector(AdvancedSettingsViewController.toggleHelp(_:))),
+			UIBarButtonItem(image: UIImage(named: "export"), style: .plain, target: self, action: #selector(AdvancedSettingsViewController.exportSelected)),
+			UIBarButtonItem(image: UIImage(named: "import"), style: .plain, target: self, action: #selector(AdvancedSettingsViewController.importSelected)),
+			UIBarButtonItem(image: UIImage(named: "showHelp"), style: .plain, target: self, action: #selector(AdvancedSettingsViewController.toggleHelp)),
 		]
 	}
 
-	override func scrollViewDidScroll(scrollView: UIScrollView) {
+	override func scrollViewDidScroll(_ scrollView: UIScrollView) {
 		view.endEditing(false)
 	}
 
-	func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
+	func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
 		searchTimer.push()
 	}
 
-	func searchBarTextDidBeginEditing(searchBar: UISearchBar) {
+	func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
 		searchBar.setShowsCancelButton(true, animated: true)
 	}
 
-	func searchBarTextDidEndEditing(searchBar: UISearchBar) {
+	func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
 		searchBar.setShowsCancelButton(false, animated: true)
 	}
 	
-	func searchBarCancelButtonClicked(searchBar: UISearchBar) {
+	func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
 		searchBar.text = nil
 		searchTimer.push()
 		view.endEditing(false)
 	}
 
-	func searchBar(searchBar: UISearchBar, shouldChangeTextInRange range: NSRange, replacementText text: String) -> Bool {
+	func searchBar(_ searchBar: UISearchBar, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
 		if text == "\n" {
 			view.endEditing(false)
 			return false
@@ -319,11 +319,12 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 	func toggleHelp(button: UIBarButtonItem) {
 		showHelp = !showHelp
-		if let s = searchBar.text where !s.isEmpty {
+		if let s = searchBar.text, !s.isEmpty {
 			reload()
 		} else {
 			heightCache.removeAll()
-			tableView.reloadSections(NSIndexSet(indexesInRange: NSMakeRange(0, tableView.numberOfSections)), withRowAnimation: .Automatic)
+			let r = Range(uncheckedBounds: (lower: 0, upper: tableView.numberOfSections))
+			tableView.reloadSections(IndexSet(integersIn: r), with: .automatic)
 		}
 	}
 
@@ -337,15 +338,15 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		l.attributedText = NSAttributedString(
 			string: "You can also use title: server: label: repo: user: number: milestone: assignee: and status: to filter specific properties, e.g. \"label:bug,suggestion\". Prefix with '!' to exclude some terms.",
 			attributes: [
-				NSFontAttributeName: UIFont.systemFontOfSize(UIFont.smallSystemFontSize()),
-				NSForegroundColorAttributeName: UIColor.lightGrayColor(),
+				NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize),
+				NSForegroundColorAttributeName: UIColor.lightGray,
 				NSParagraphStyleAttributeName: p,
 			])
 		l.numberOfLines = 0
 		return l
 	}
 
-	override func tableView(tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+	override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
 		let isFilterFooter = filteredSections()[section].title() == SettingsSection.Filtering.title()
 		if isFilterFooter {
 			return filteringSectionFooter()
@@ -353,40 +354,40 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		return nil
 	}
 
-	override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+	override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
 		return 55
 	}
 
-	override func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+	override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
 		let isFilterFooter = filteredSections()[section].title() == SettingsSection.Filtering.title()
 		if isFilterFooter {
-			return filteringSectionFooter().sizeThatFits(CGSizeMake(tableView.bounds.size.width, 500.0)).height + 15.0
+			return filteringSectionFooter().sizeThatFits(CGSize(width: tableView.bounds.size.width, height: 500.0)).height + 15.0
 		}
 		return 0
 	}
 
-	override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCellWithIdentifier("Cell") as! AdvancedSettingsCell
-		configureCell(cell, indexPath: indexPath)
+	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+		let cell = tableView.dequeueReusableCell(withIdentifier: "Cell") as! AdvancedSettingsCell
+		configureCell(cell: cell, indexPath: indexPath)
 		return cell
 	}
 
-	private func configureCell(cell: AdvancedSettingsCell, indexPath: NSIndexPath) {
+	private func configureCell(cell: AdvancedSettingsCell, indexPath: IndexPath) {
 
-		let settingsForSection = filteredItemsForTableSection(indexPath.section)
+		let settingsForSection = filteredItemsForTableSection(section: indexPath.section)
 		let setting = settingsForSection[indexPath.row]
 		cell.titleLabel.text = setting.title
 		cell.descriptionLabel.text = setting.description
 
 		let v = setting.valueDisplayed()
 		if v == "✓" {
-			cell.accessoryType = .Checkmark
+			cell.accessoryType = .checkmark
 			cell.valueLabel.text = " "
 		} else if v == ">" {
-			cell.accessoryType = .DisclosureIndicator
+			cell.accessoryType = .disclosureIndicator
 			cell.valueLabel.text = " "
 		} else {
-			cell.accessoryType = .None
+			cell.accessoryType = .none
 			cell.valueLabel.text = v ?? " "
 		}
 
@@ -401,9 +402,9 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		}
 	}
 
-	override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 
-		let setting = filteredItemsForTableSection(indexPath.section)[indexPath.row]
+		let setting = filteredItemsForTableSection(section: indexPath.section)[indexPath.row]
 		let section = filteredSections()[indexPath.section]
 		let unFilteredItemsForSection = settings.filter { $0.section == section }
 
@@ -425,14 +426,14 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			switch originalIndex {
 			case 0:
 				// seconds
-				for f in 60.stride(to: 3600, by: 10) {
+				for f in stride(from:60, to: 3600, by: 10) {
 					if f == Int(Settings.refreshPeriod) { previousValue = count }
 					values.append("\(f) seconds")
 					count += 1
 				}
 			case 1:
 				// minutes
-				for f in 5.stride(to: 10000, by: 5) {
+				for f in stride(from:5, to: 10000, by: 5) {
 					if f == Int(Settings.backgroundRefreshPeriod/60.0) { previousValue = count }
 					values.append("\(f) minutes")
 					count += 1
@@ -447,7 +448,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			default: break
 			}
 			valuesToPush = values
-			performSegueWithIdentifier("showPicker", sender: self)
+			performSegue(withIdentifier: "showPicker", sender: self)
 
 		} else if section == SettingsSection.Display {
 			switch originalIndex {
@@ -459,7 +460,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				selectedIndexPath = indexPath
 				valuesToPush = AssignmentPolicy.labels
 				previousValue = Settings.assignedPrHandlingPolicy
-				performSegueWithIdentifier("showPicker", sender: self)
+				performSegue(withIdentifier: "showPicker", sender: self)
 			case 2:
 				Settings.markUnmergeableOnUserSectionsOnly = !Settings.markUnmergeableOnUserSectionsOnly
 				settingsChangedTimer.push()
@@ -527,7 +528,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			case 5:
 				Settings.openPrAtFirstUnreadComment = !Settings.openPrAtFirstUnreadComment
 			case 6:
-				performSegueWithIdentifier("showBlacklist", sender: self)
+				performSegue(withIdentifier: "showBlacklist", sender: self)
 			case 7:
 				Settings.disableAllCommentNotifications = !Settings.disableAllCommentNotifications
 			case 8:
@@ -545,7 +546,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				previousValue = Settings.displayPolicyForNewIssues
 			default: break
 			}
-			performSegueWithIdentifier("showPicker", sender: self)
+			performSegue(withIdentifier: "showPicker", sender: self)
 		} else if section == SettingsSection.StausesAndLabels {
 			switch originalIndex {
 			case 0:
@@ -569,7 +570,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 					count += 1
 				}
 				valuesToPush = values
-				performSegueWithIdentifier("showPicker", sender: self)
+				performSegue(withIdentifier: "showPicker", sender: self)
 			case 2:
 				Settings.showLabels = !Settings.showLabels
 				api.resetAllLabelChecks()
@@ -591,7 +592,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 					count += 1
 				}
 				valuesToPush = values
-				performSegueWithIdentifier("showPicker", sender: self)
+				performSegue(withIdentifier: "showPicker", sender: self)
 			case 4:
 				Settings.notifyOnStatusUpdates = !Settings.notifyOnStatusUpdates
 			case 5:
@@ -611,13 +612,13 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				previousValue = Settings.mergeHandlingPolicy
 				pickerName = setting.title
 				valuesToPush = HandlingPolicy.labels
-				performSegueWithIdentifier("showPicker", sender: self)
+				performSegue(withIdentifier: "showPicker", sender: self)
 			case 1:
 				selectedIndexPath = indexPath
 				previousValue = Settings.closeHandlingPolicy
 				pickerName = setting.title
 				valuesToPush = HandlingPolicy.labels
-				performSegueWithIdentifier("showPicker", sender: self)
+				performSegue(withIdentifier: "showPicker", sender: self)
 			case 2:
 				Settings.dontKeepPrsMergedByMe = !Settings.dontKeepPrsMergedByMe
 			default: break
@@ -640,7 +641,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				previousValue = Settings.sortMethod
 				pickerName = setting.title
 				valuesToPush = Settings.sortDescending ? SortingMethod.reverseTitles : SortingMethod.normalTitles
-				performSegueWithIdentifier("showPicker", sender: self)
+				performSegue(withIdentifier: "showPicker", sender: self)
 			case 2:
 				Settings.groupByRepo = !Settings.groupByRepo
 				settingsChangedTimer.push()
@@ -664,27 +665,28 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		reload()
 	}
 
-	override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		return filteredItemsForTableSection(section).count
+	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+		return filteredItemsForTableSection(section: section).count
 	}
 
-	override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+	override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
 		return filteredSections()[section].title()
 	}
 
-	override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+
+	override func numberOfSections(in tableView: UITableView) -> Int {
 		return filteredSections().count
 	}
 
 	private func filteredItemsForTableSection(section: Int) -> [Setting] {
 		let sec = filteredSections()[section]
 		let searchText = searchBar.text?.trim()
-		return settings.filter{ $0.section == sec && $0.isRelevantTo(searchText, showingHelp: showHelp) }
+		return settings.filter{ $0.section == sec && $0.isRelevantTo(s: searchText, showingHelp: showHelp) }
 	}
 
 	private func filteredSections() -> [SettingsSection] {
 		let searchText = searchBar.text?.trim()
-		let matchingSettings = settings.filter{ $0.isRelevantTo(searchText, showingHelp: showHelp) }
+		let matchingSettings = settings.filter{ $0.isRelevantTo(s: searchText, showingHelp: showHelp) }
 		var matchingSections = [SettingsSection]()
 		matchingSettings.forEach {
 			let s = $0.section
@@ -696,24 +698,24 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	}
 
 	private var sizer: AdvancedSettingsCell?
-	private var heightCache = [NSIndexPath : CGFloat]()
-	override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+	private var heightCache = [IndexPath : CGFloat]()
+	override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
 		if sizer == nil {
-			sizer = tableView.dequeueReusableCellWithIdentifier("Cell") as? AdvancedSettingsCell
+			sizer = tableView.dequeueReusableCell(withIdentifier: "Cell") as? AdvancedSettingsCell
 		} else if let h = heightCache[indexPath] {
 			//DLog("using cached height for %d - %d", indexPath.section, indexPath.row)
 			return h
 		}
-		configureCell(sizer!, indexPath: indexPath)
-		let h = sizer!.systemLayoutSizeFittingSize(CGSizeMake(tableView.bounds.width, UILayoutFittingCompressedSize.height),
+		configureCell(cell: sizer!, indexPath: indexPath)
+		let h = sizer!.systemLayoutSizeFitting(CGSize(width: tableView.bounds.width, height: UILayoutFittingCompressedSize.height),
 			withHorizontalFittingPriority: UILayoutPriorityRequired,
 			verticalFittingPriority: UILayoutPriorityFittingSizeLevel).height
 		heightCache[indexPath] = h
 		return h
 	}
 
-	override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-		if let p = segue.destinationViewController as? PickerViewController {
+	override func prepare(for segue: UIStoryboardSegue, sender: AnyObject?) {
+		if let p = segue.destination as? PickerViewController {
 			p.delegate = self
 			p.title = pickerName
 			p.values = valuesToPush
@@ -723,7 +725,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		}
 	}
 
-	func pickerViewController(picker: PickerViewController, didSelectIndexPath: NSIndexPath) {
+	func pickerViewController(picker: PickerViewController, didSelectIndexPath: IndexPath) {
 		if let sip = selectedIndexPath {
 			if sip.section == SettingsSection.Refresh.rawValue {
 				if sip.row == 0 {
@@ -765,32 +767,32 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 	/////////////////// Import / Export
 
-	private var tempUrl: NSURL?
+	private var tempUrl: URL?
 
 	func importSelected(sender: UIBarButtonItem) {
 		tempUrl = nil
 
-		let menu = UIDocumentPickerViewController(documentTypes: ["com.housetrip.mobile.trailer.ios.settings"], inMode: UIDocumentPickerMode.Import)
+		let menu = UIDocumentPickerViewController(documentTypes: ["com.housetrip.mobile.trailer.ios.settings"], in: .import)
 		menu.delegate = self
-		popupManager.showPopoverFromViewController(self, fromItem: sender, viewController: menu)
+		popupManager.showPopoverFromViewController(parentViewController: self, fromItem: sender, viewController: menu)
 	}
 
 	func exportSelected(sender: UIBarButtonItem) {
 		let tempFilePath = NSTemporaryDirectory().stringByAppendingPathComponent("Trailer Settings (iOS).trailerSettings")
-		tempUrl = NSURL(fileURLWithPath: tempFilePath)
-		Settings.writeToURL(tempUrl!)
+		tempUrl = URL(fileURLWithPath: tempFilePath)
+		_ = Settings.writeToURL(tempUrl!)
 
-		let menu = UIDocumentPickerViewController(URL: tempUrl!, inMode: UIDocumentPickerMode.ExportToService)
+		let menu = UIDocumentPickerViewController(url: tempUrl!, in: .exportToService)
 		menu.delegate = self
-		popupManager.showPopoverFromViewController(self, fromItem: sender, viewController: menu)
+		popupManager.showPopoverFromViewController(parentViewController: self, fromItem: sender, viewController: menu)
 	}
 
-	func documentPicker(controller: UIDocumentPickerViewController, didPickDocumentAtURL url: NSURL) {
+	func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentAt url: URL) {
 		if tempUrl == nil {
 			DLog("Will import settings from %@", url.absoluteString)
-			settingsManager.loadSettingsFrom(url, confirmFromView: self) { [weak self] confirmed in
+			settingsManager.loadSettingsFrom(url: url, confirmFromView: self) { [weak self] confirmed in
 				if confirmed {
-					self?.dismissViewControllerAnimated(false, completion: nil)
+					self?.dismiss(animated: false, completion: nil)
 				}
 				self?.documentInteractionCleanup()
 			}
@@ -800,7 +802,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		}
 	}
 
-	func documentPickerWasCancelled(controller: UIDocumentPickerViewController) {
+	func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
 		DLog("Document picker cancelled")
 		documentInteractionCleanup()
 	}
@@ -808,7 +810,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	func documentInteractionCleanup() {
 		if let t = tempUrl {
 			do {
-				try NSFileManager.defaultManager().removeItemAtURL(t)
+				try FileManager.default.removeItem(at: t)
 			} catch {
 				DLog("Temporary file cleanup error: %@", (error as NSError).localizedDescription)
 			}

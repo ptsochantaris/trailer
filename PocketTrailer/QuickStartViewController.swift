@@ -13,7 +13,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 
 	private let newServer = ApiServer.allApiServersInMoc(mainObjectContext).first!
 	private var token = ""
-	private var checkTimer: NSTimer?
+	private var checkTimer: Timer?
 	private var showIssues = true
 
     override func viewDidLoad() {
@@ -26,30 +26,30 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 		if showIssues {
 			trackIssues.title = "Should track issues as well: Yes"
 			trackIssues.tintColor = GLOBAL_TINT
-			Settings.displayPolicyForNewIssues = RepoDisplayPolicy.All.rawValue
+			Settings.displayPolicyForNewIssues = RepoDisplayPolicy.all.rawValue
 		} else {
 			trackIssues.title = "Should track issues as well: No"
-			trackIssues.tintColor = UIColor.lightGrayColor()
-			Settings.displayPolicyForNewIssues = RepoDisplayPolicy.Hide.rawValue
+			trackIssues.tintColor = UIColor.lightGray
+			Settings.displayPolicyForNewIssues = RepoDisplayPolicy.hide.rawValue
 		}
 	}
 
-	@IBAction func willAlsoTrackSelected(sender: UIBarButtonItem) {
+	@IBAction func willAlsoTrackSelected(_ sender: UIBarButtonItem) {
 		showIssues = !showIssues
 		updateSettings()
 	}
 
-	@IBAction func skipSelected(sender: UIBarButtonItem) {
-		dismissViewControllerAnimated(true, completion: nil)
+	@IBAction func skipSelected(_ sender: UIBarButtonItem) {
+		dismiss(animated: true, completion: nil)
 	}
 
-	@IBAction func openGitHubSelected(sender: AnyObject) {
-		let s = SFSafariViewController(URL: NSURL(string: "https://github.com/settings/tokens/new")!)
+	@IBAction func openGitHubSelected(_ sender: AnyObject) {
+		let s = SFSafariViewController(url: URL(string: "https://github.com/settings/tokens/new")!)
 		s.view.tintColor = self.view.tintColor
-		self.presentViewController(s, animated: true, completion: nil)
+		self.present(s, animated: true, completion: nil)
 	}
 
-	@IBAction func testSelected(sender: UIButton) {
+	@IBAction func testSelected(_ sender: UIButton) {
 		testMode()
 		api.testApiToServer(newServer) { [weak self] error in
 			if let s = self {
@@ -60,18 +60,18 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 					s.feedback.text = "Syncing GitHub data for the first time.\n\nThis could take a little while, please wait..."
 					Settings.lastSuccessfulRefresh = nil
 					app.startRefreshIfItIsDue()
-					s.checkTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: s, selector: #selector(QuickStartViewController.checkRefreshDone(_:)), userInfo: nil, repeats: true)
+					s.checkTimer = Timer.scheduledTimer(timeInterval: 1.0, target: s, selector: #selector(QuickStartViewController.checkRefreshDone), userInfo: nil, repeats: true)
 				}
 			}
 		}
 	}
 
-	func checkRefreshDone(t: NSTimer) {
+	func checkRefreshDone(t: Timer) {
 		if !appIsRefreshing {
 			checkTimer?.invalidate()
 			checkTimer = nil
 			if newServer.lastSyncSucceeded?.boolValue ?? false {
-                dismissViewControllerAnimated(true, completion: {
+                dismiss(animated: true, completion: {
 					popupManager.getMasterController().resetView()
 					showMessage("Setup complete!", "You can tweak options & behaviour from the settings.\n\nTrailer has read-only access to your GitHub data, so feel free to experiment, you can't damage your data or settings on GitHub.")
                 })
@@ -82,15 +82,15 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 		}
 	}
 
-	func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
+	func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
 		if string == "\n" {
 			view.endEditing(false)
 			return false
 		}
 		token = S(textField.text).stringByReplacingCharactersInRange(range, withString: string)
 		token = token.trim()
-		testButton.enabled = !token.isEmpty
-		link.alpha = testButton.enabled ? 0.5 : 1.0
+		testButton.isEnabled = !token.isEmpty
+		link.alpha = testButton.isEnabled ? 0.5 : 1.0
 		return true
 	}
 
@@ -98,9 +98,9 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 		view.endEditing(true)
 
 		for v in otherViews {
-			v.hidden = true
+			v.isHidden = true
 		}
-		skip.enabled = false
+		skip.isEnabled = false
 		spinner.startAnimating()
 		feedback.text = "\nTesting the token..."
 
@@ -112,9 +112,9 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 
 	private func normalMode() {
 		feedback.text = "Quick Start"
-		skip.enabled = true
+		skip.isEnabled = true
 		for v in otherViews {
-			v.hidden = false
+			v.isHidden = false
 		}
 		spinner.stopAnimating()
 

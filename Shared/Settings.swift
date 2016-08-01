@@ -5,8 +5,8 @@
 
 final class PopTimer : NSObject {
 
-	var _popTimer: NSTimer?
-	let _timeInterval: NSTimeInterval
+	var _popTimer: Timer?
+	let _timeInterval: TimeInterval
 	let _callback: ()->()
 
 	var isRunning: Bool {
@@ -15,7 +15,7 @@ final class PopTimer : NSObject {
 
 	func push() {
 		_popTimer?.invalidate()
-		_popTimer = NSTimer.scheduledTimerWithTimeInterval(_timeInterval, target: self, selector: #selector(PopTimer.popped), userInfo: nil, repeats: false)
+		_popTimer = Timer.scheduledTimer(timeInterval: _timeInterval, target: self, selector: #selector(PopTimer.popped), userInfo: nil, repeats: false)
 	}
 
 	func popped() {
@@ -28,7 +28,7 @@ final class PopTimer : NSObject {
 		_popTimer = nil
 	}
 
-	init(timeInterval: NSTimeInterval, callback: Completion) {
+	init(timeInterval: TimeInterval, callback: Completion) {
 		_timeInterval = timeInterval
 		_callback = callback
 		super.init()
@@ -40,7 +40,7 @@ final class PopTimer : NSObject {
 let SETTINGS_EXPORTED = "SETTINGS_EXPORTED"
 
 var _settings_valuesCache = [String : AnyObject]()
-let _settings_shared = NSUserDefaults(suiteName: "group.Trailer")!
+let _settings_shared = UserDefaults(suiteName: "group.Trailer")!
 
 final class Settings {
 
@@ -62,13 +62,13 @@ final class Settings {
 
     class func checkMigration() {
 
-        let d = NSUserDefaults.standardUserDefaults()
-        if d.objectForKey("LAST_RUN_VERSION_KEY") != nil {
+        let d = UserDefaults.standard
+        if d.object(forKey: "LAST_RUN_VERSION_KEY") != nil {
             for k in allFields() {
-                if let v: AnyObject = d.objectForKey(k) {
-                    _settings_shared.setObject(v, forKey: k)
+                if let v: AnyObject = d.object(forKey: k) {
+                    _settings_shared.set(v, forKey: k)
                     DLog("Migrating setting '%@'", k)
-                    d.removeObjectForKey(k)
+                    d.removeObject(forKey: k)
                 }
             }
             _settings_shared.synchronize()
@@ -77,55 +77,55 @@ final class Settings {
             DLog("No need to migrate settings into shared container")
         }
 
-		if let moveAssignedPrs = _settings_shared.objectForKey("MOVE_ASSIGNED_PRS_TO_MY_SECTION") as? Bool {
-			_settings_shared.setObject(moveAssignedPrs ? AssignmentPolicy.MoveToMine.rawValue : AssignmentPolicy.DoNothing.rawValue, forKey: "ASSIGNED_PR_HANDLING_POLICY")
-			_settings_shared.removeObjectForKey("MOVE_ASSIGNED_PRS_TO_MY_SECTION")
+		if let moveAssignedPrs = _settings_shared.object(forKey: "MOVE_ASSIGNED_PRS_TO_MY_SECTION") as? Bool {
+			_settings_shared.set(moveAssignedPrs ? AssignmentPolicy.moveToMine.rawValue : AssignmentPolicy.doNothing.rawValue, forKey: "ASSIGNED_PR_HANDLING_POLICY")
+			_settings_shared.removeObject(forKey: "MOVE_ASSIGNED_PRS_TO_MY_SECTION")
 		}
 
-		if let mergeHandlingPolicyLegacy = _settings_shared.objectForKey("MERGE_HANDLING_POLICY") as? Int {
-			_settings_shared.setObject(mergeHandlingPolicyLegacy + (mergeHandlingPolicyLegacy > 0 ? 1 : 0), forKey: "MERGE_HANDLING_POLICY_2")
-			_settings_shared.removeObjectForKey("MERGE_HANDLING_POLICY")
+		if let mergeHandlingPolicyLegacy = _settings_shared.object(forKey: "MERGE_HANDLING_POLICY") as? Int {
+			_settings_shared.set(mergeHandlingPolicyLegacy + (mergeHandlingPolicyLegacy > 0 ? 1 : 0), forKey: "MERGE_HANDLING_POLICY_2")
+			_settings_shared.removeObject(forKey: "MERGE_HANDLING_POLICY")
 		}
 
-		if let closeHandlingPolicyLegacy = _settings_shared.objectForKey("CLOSE_HANDLING_POLICY") as? Int {
-			_settings_shared.setObject(closeHandlingPolicyLegacy + (closeHandlingPolicyLegacy > 0 ? 1 : 0), forKey: "CLOSE_HANDLING_POLICY_2")
-			_settings_shared.removeObjectForKey("CLOSE_HANDLING_POLICY")
+		if let closeHandlingPolicyLegacy = _settings_shared.object(forKey: "CLOSE_HANDLING_POLICY") as? Int {
+			_settings_shared.set(closeHandlingPolicyLegacy + (closeHandlingPolicyLegacy > 0 ? 1 : 0), forKey: "CLOSE_HANDLING_POLICY_2")
+			_settings_shared.removeObject(forKey: "CLOSE_HANDLING_POLICY")
 		}
 
-		DataManager.postMigrationRepoPrPolicy = RepoDisplayPolicy.All
-		DataManager.postMigrationRepoIssuePolicy = RepoDisplayPolicy.Hide
+		DataManager.postMigrationRepoPrPolicy = RepoDisplayPolicy.all
+		DataManager.postMigrationRepoIssuePolicy = RepoDisplayPolicy.hide
 
-		if let showIssues = _settings_shared.objectForKey("SHOW_ISSUES_MENU") as? Bool {
-			_settings_shared.setObject(showIssues ? RepoDisplayPolicy.All.rawValue : RepoDisplayPolicy.Hide.rawValue, forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX")
-			DataManager.postMigrationRepoIssuePolicy = showIssues ? RepoDisplayPolicy.All : RepoDisplayPolicy.Hide
-			_settings_shared.removeObjectForKey("SHOW_ISSUES_MENU")
+		if let showIssues = _settings_shared.object(forKey: "SHOW_ISSUES_MENU") as? Bool {
+			_settings_shared.set(showIssues ? RepoDisplayPolicy.all.rawValue : RepoDisplayPolicy.hide.rawValue, forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX")
+			DataManager.postMigrationRepoIssuePolicy = showIssues ? RepoDisplayPolicy.all : RepoDisplayPolicy.hide
+			_settings_shared.removeObject(forKey: "SHOW_ISSUES_MENU")
 		}
 
-		if let hideNewRepositories = _settings_shared.objectForKey("HIDE_NEW_REPOS_KEY") as? Bool {
-			_settings_shared.setObject(hideNewRepositories ? RepoDisplayPolicy.Hide.rawValue : RepoDisplayPolicy.All.rawValue, forKey: "NEW_PR_DISPLAY_POLICY_INDEX")
-			_settings_shared.setObject(hideNewRepositories ? RepoDisplayPolicy.Hide.rawValue : RepoDisplayPolicy.All.rawValue, forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX")
-			_settings_shared.removeObjectForKey("HIDE_NEW_REPOS_KEY")
+		if let hideNewRepositories = _settings_shared.object(forKey: "HIDE_NEW_REPOS_KEY") as? Bool {
+			_settings_shared.set(hideNewRepositories ? RepoDisplayPolicy.hide.rawValue : RepoDisplayPolicy.all.rawValue, forKey: "NEW_PR_DISPLAY_POLICY_INDEX")
+			_settings_shared.set(hideNewRepositories ? RepoDisplayPolicy.hide.rawValue : RepoDisplayPolicy.all.rawValue, forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX")
+			_settings_shared.removeObject(forKey: "HIDE_NEW_REPOS_KEY")
 		}
 
-		if let hideAllSection = _settings_shared.objectForKey("HIDE_ALL_SECTION") as? Bool {
+		if let hideAllSection = _settings_shared.object(forKey: "HIDE_ALL_SECTION") as? Bool {
 			if hideAllSection {
-				if DataManager.postMigrationRepoPrPolicy == RepoDisplayPolicy.All {
-					DataManager.postMigrationRepoPrPolicy = RepoDisplayPolicy.MineAndPaticipated
+				if DataManager.postMigrationRepoPrPolicy == RepoDisplayPolicy.all {
+					DataManager.postMigrationRepoPrPolicy = RepoDisplayPolicy.mineAndPaticipated
 				}
-				if DataManager.postMigrationRepoIssuePolicy == RepoDisplayPolicy.All {
-					DataManager.postMigrationRepoIssuePolicy = RepoDisplayPolicy.MineAndPaticipated
+				if DataManager.postMigrationRepoIssuePolicy == RepoDisplayPolicy.all {
+					DataManager.postMigrationRepoIssuePolicy = RepoDisplayPolicy.mineAndPaticipated
 				}
 
-				let newPrPolicy = _settings_shared.objectForKey("NEW_PR_DISPLAY_POLICY_INDEX") as? Int ?? RepoDisplayPolicy.All.rawValue
-				if newPrPolicy == RepoDisplayPolicy.All.rawValue {
-					_settings_shared.setObject(RepoDisplayPolicy.MineAndPaticipated.rawValue, forKey: "NEW_PR_DISPLAY_POLICY_INDEX")
+				let newPrPolicy = _settings_shared.object(forKey: "NEW_PR_DISPLAY_POLICY_INDEX") as? Int ?? RepoDisplayPolicy.all.rawValue
+				if newPrPolicy == RepoDisplayPolicy.all.rawValue {
+					_settings_shared.set(RepoDisplayPolicy.mineAndPaticipated.rawValue, forKey: "NEW_PR_DISPLAY_POLICY_INDEX")
 				}
-				let newIssuePolicy = _settings_shared.objectForKey("NEW_ISSUE_DISPLAY_POLICY_INDEX") as? Int ?? RepoDisplayPolicy.All.rawValue
-				if newIssuePolicy == RepoDisplayPolicy.All.rawValue {
-					_settings_shared.setObject(RepoDisplayPolicy.MineAndPaticipated.rawValue, forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX")
+				let newIssuePolicy = _settings_shared.object(forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX") as? Int ?? RepoDisplayPolicy.all.rawValue
+				if newIssuePolicy == RepoDisplayPolicy.all.rawValue {
+					_settings_shared.set(RepoDisplayPolicy.mineAndPaticipated.rawValue, forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX")
 				}
 			}
-			_settings_shared.removeObjectForKey("HIDE_ALL_SECTION")
+			_settings_shared.removeObject(forKey: "HIDE_ALL_SECTION")
 		}
 
 		_settings_shared.synchronize()
@@ -133,23 +133,23 @@ final class Settings {
 
 	static var saveTimer: PopTimer?
 
-	private class func set(key: String, _ value: NSObject?) {
+	private class func set(_ key: String, _ value: NSObject?) {
 
-		let previousValue = _settings_shared.objectForKey(key) as? NSObject
+		let previousValue = _settings_shared.object(forKey: key) as? NSObject
 
 		if let v = value {
-			if let p = previousValue where p.isEqual(v) {
+			if let p = previousValue, p.isEqual(v) {
 				DLog("Setting %@ to identical value (%@), skipping", key, value)
 				return
 			} else {
-				_settings_shared.setObject(v, forKey: key)
+				_settings_shared.set(v, forKey: key)
 			}
 		} else {
 			if previousValue == nil {
 				DLog("Setting %@ to identical value (nil), skipping", key)
 				return
 			} else {
-				_settings_shared.removeObjectForKey(key)
+				_settings_shared.removeObject(forKey: key)
 			}
 		}
 		_settings_valuesCache[key] = value
@@ -160,7 +160,7 @@ final class Settings {
 		possibleExport(key)
 	}
 
-	class func possibleExport(key: String?) {
+	class func possibleExport(_ key: String?) {
 		#if os(OSX)
 		let keyIsGood: Bool
 		if let k = key {
@@ -171,7 +171,7 @@ final class Settings {
 		if Settings.autoRepeatSettingsExport && keyIsGood && Settings.lastExportUrl != nil {
 			if saveTimer == nil {
 				saveTimer = PopTimer(timeInterval: 2.0) {
-					Settings.writeToURL(Settings.lastExportUrl!)
+					_ = Settings.writeToURL(Settings.lastExportUrl!)
 				}
 			}
 			saveTimer?.push()
@@ -179,10 +179,10 @@ final class Settings {
 		#endif
 	}
 
-	private class func get(key: String) -> AnyObject? {
+	private class func get(_ key: String) -> AnyObject? {
 		if let v: AnyObject = _settings_valuesCache[key] {
 			return v
-		} else if let v: AnyObject = _settings_shared.objectForKey(key) {
+		} else if let v: AnyObject = _settings_shared.object(forKey: key) {
 			_settings_valuesCache[key] = v
 			return v
 		} else {
@@ -193,41 +193,41 @@ final class Settings {
 	/////////////////////////////////
 
 	class func clearCache() {
-		_settings_valuesCache.removeAll(keepCapacity: false)
+		_settings_valuesCache.removeAll(keepingCapacity: false)
 	}
 
-	class func writeToURL(url: NSURL) -> Bool {
+	class func writeToURL(_ url: URL) -> Bool {
 
 		if let s = saveTimer {
 			s.invalidate()
 		}
 
 		Settings.lastExportUrl = url
-		Settings.lastExportDate = NSDate()
+		Settings.lastExportDate = Date()
 		let settings = NSMutableDictionary()
 		for k in allFields() {
-			if let v: AnyObject = _settings_shared.objectForKey(k) where k != "AUTO_REPEAT_SETTINGS_EXPORT" {
+			if let v: AnyObject = _settings_shared.object(forKey: k), k != "AUTO_REPEAT_SETTINGS_EXPORT" {
 				settings[k] = v
 			}
 		}
 		settings["DB_CONFIG_OBJECTS"] = ApiServer.archiveApiServers()
 		settings["DB_SNOOZE_OBJECTS"] = SnoozePreset.archivePresets()
-		if !settings.writeToURL(url, atomically: true) {
+		if !settings.write(to: url, atomically: true) {
 			DLog("Warning, exporting settings failed")
 			return false
 		}
-		NSNotificationCenter.defaultCenter().postNotificationName(SETTINGS_EXPORTED, object: nil)
+		NotificationCenter.default.post(name: Notification.Name(rawValue: SETTINGS_EXPORTED), object: nil)
 		DLog("Written settings to %@", url.absoluteString)
 		return true
 	}
 
-	class func readFromURL(url: NSURL) -> Bool {
-		if let settings = NSDictionary(contentsOfURL: url) {
+	class func readFromURL(_ url: URL) -> Bool {
+		if let settings = NSDictionary(contentsOf: url) {
 			DLog("Reading settings from %@", url.absoluteString)
 			resetAllSettings()
 			for k in allFields() {
 				if let v: AnyObject = settings[k] {
-					_settings_shared.setObject(v, forKey: k)
+					_settings_shared.set(v, forKey: k)
 				}
 			}
 			_settings_shared.synchronize()
@@ -240,7 +240,7 @@ final class Settings {
 
 	class func resetAllSettings() {
 		for k in allFields() {
-			_settings_shared.removeObjectForKey(k)
+			_settings_shared.removeObject(forKey: k)
 		}
 		_settings_shared.synchronize()
 		clearCache()
@@ -277,13 +277,13 @@ final class Settings {
 
 	static let closeHandlingPolicyHelp = "How to handle an item when it is believed to be closed (or has disappeared)."
 	class var closeHandlingPolicy: Int {
-		get { return get("CLOSE_HANDLING_POLICY_2") as? Int ?? HandlingPolicy.KeepMine.rawValue }
+		get { return get("CLOSE_HANDLING_POLICY_2") as? Int ?? HandlingPolicy.keepMine.rawValue }
 		set { set("CLOSE_HANDLING_POLICY_2", newValue) }
 	}
 
 	static let mergeHandlingPolicyHelp = "How to handle an item when it is detected as merged."
 	class var mergeHandlingPolicy: Int {
-		get { return get("MERGE_HANDLING_POLICY_2") as? Int ?? HandlingPolicy.KeepMine.rawValue }
+		get { return get("MERGE_HANDLING_POLICY_2") as? Int ?? HandlingPolicy.keepMine.rawValue }
 		set { set("MERGE_HANDLING_POLICY_2", newValue) }
 	}
 
@@ -312,13 +312,13 @@ final class Settings {
 
 	static let displayPolicyForNewPrsHelp = "When a new repository is detected in your watchlist, this display policy will be applied by default to pull requests that come from it. You can further customize the display policy for any individual repository from the 'Repositories' tab."
 	class var displayPolicyForNewPrs: Int {
-		get { return get("NEW_PR_DISPLAY_POLICY_INDEX") as? Int ?? RepoDisplayPolicy.All.rawValue }
+		get { return get("NEW_PR_DISPLAY_POLICY_INDEX") as? Int ?? RepoDisplayPolicy.all.rawValue }
 		set { set("NEW_PR_DISPLAY_POLICY_INDEX", newValue) }
 	}
 
 	static let displayPolicyForNewIssuesHelp = "When a new repository is detected in your watchlist, this display policy will be applied by default to issues that come from it. You can further customize the display policy for any individual repository from the 'Repositories' tab."
 	class var displayPolicyForNewIssues: Int {
-		get { return get("NEW_ISSUE_DISPLAY_POLICY_INDEX") as? Int ?? RepoDisplayPolicy.Hide.rawValue }
+		get { return get("NEW_ISSUE_DISPLAY_POLICY_INDEX") as? Int ?? RepoDisplayPolicy.hide.rawValue }
 		set { set("NEW_ISSUE_DISPLAY_POLICY_INDEX", newValue) }
 	}
 
@@ -359,7 +359,7 @@ final class Settings {
 		set {
 			set("IOS_BACKGROUND_REFRESH_PERIOD_KEY", newValue)
 			#if os(iOS)
-				UIApplication.sharedApplication().setMinimumBackgroundFetchInterval(NSTimeInterval(newValue))
+				UIApplication.shared.setMinimumBackgroundFetchInterval(TimeInterval(newValue))
 			#endif
 		}
 	}
@@ -372,22 +372,22 @@ final class Settings {
 
 	/////////////////////////// DATES
 
-    class var lastSuccessfulRefresh: NSDate? {
-        get { return get("LAST_SUCCESSFUL_REFRESH") as? NSDate }
+    class var lastSuccessfulRefresh: Date? {
+        get { return get("LAST_SUCCESSFUL_REFRESH") as? Date }
         set { set("LAST_SUCCESSFUL_REFRESH", newValue) }
     }
 
-	class var lastExportDate: NSDate? {
-		get { return get("LAST_EXPORT_TIME") as? NSDate }
+	class var lastExportDate: Date? {
+		get { return get("LAST_EXPORT_TIME") as? Date }
 		set { set("LAST_EXPORT_TIME", newValue) }
 	}
 
 	/////////////////////////// URLs
 
-	class var lastExportUrl: NSURL? {
+	class var lastExportUrl: URL? {
 		get {
 			if let s = get("LAST_EXPORT_URL") as? String {
-				return NSURL(string: s)
+				return URL(string: s)
 			} else {
 				return nil
 			}
@@ -573,7 +573,7 @@ final class Settings {
 		set { set("DUMP_API_RESPONSES_IN_CONSOLE", newValue) }
 	}
 
-	static let openItemsDirectlyInSafariHelp = "Directly open items in the Safari browser rather than the internal web view. Especially useful on iPad when using split-screen view, where you can pull in Trailer from the side but stay in Safari, or on iPhone where you can use the status-bar button as a back button. If the detail view is already visible (for instance when runing in full-screen mode on iPad) the internal view will still get used, even if this option is turned on."
+	static let openItemsDirectlyInSafariHelp = "Directly open items in the Safari browser rather than the internal web view. Especially useful on iPad when using split-screen view,, you can pull in Trailer from the side but stay in Safari, or on iPhone, you can use the status-bar button as a back button. If the detail view is already visible (for instance when runing in full-screen mode on iPad) the internal view will still get used, even if this option is turned on."
 	class var openItemsDirectlyInSafari: Bool {
 		get { return get("OPEN_ITEMS_DIRECTLY_IN_SAFARI") as? Bool ?? false }
 		set { set("OPEN_ITEMS_DIRECTLY_IN_SAFARI", newValue) }

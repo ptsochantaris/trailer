@@ -9,7 +9,7 @@ final class Repo: DataItem {
 	@NSManaged var groupLabel: String?
     @NSManaged var hidden: NSNumber?
     @NSManaged var inaccessible: NSNumber?
-    @NSManaged var lastDirtied: NSDate?
+    @NSManaged var lastDirtied: Date?
     @NSManaged var webUrl: String?
 	@NSManaged var displayPolicyForPrs: NSNumber?
 	@NSManaged var displayPolicyForIssues: NSNumber?
@@ -18,7 +18,7 @@ final class Repo: DataItem {
 	@NSManaged var issues: Set<Issue>
 	@NSManaged var ownerId: NSNumber?
 
-	class func syncReposFromInfo(data: [[NSObject : AnyObject]]?, apiServer: ApiServer) {
+	class func syncReposFromInfo(_ data: [[NSObject : AnyObject]]?, apiServer: ApiServer) {
 		var filteredData = [[NSObject : AnyObject]]()
 		for info in data ?? [] {
 			if (info["private"] as? NSNumber)?.boolValue ?? false {
@@ -47,7 +47,7 @@ final class Repo: DataItem {
 				r.dirty = true
 				r.inaccessible = false
 				r.ownerId = info["owner"]?["id"] as? NSNumber
-				r.lastDirtied = NSDate()
+				r.lastDirtied = Date()
 			}
 		}
 	}
@@ -60,30 +60,30 @@ final class Repo: DataItem {
 	}
 
 	var shouldSync: Bool {
-		return (displayPolicyForPrs?.integerValue ?? 0) > 0 || (displayPolicyForIssues?.integerValue ?? 0) > 0
+		return (displayPolicyForPrs?.intValue ?? 0) > 0 || (displayPolicyForIssues?.intValue ?? 0) > 0
 	}
 
 	override func resetSyncState() {
 		super.resetSyncState()
 		dirty = true
-		lastDirtied = never()
+		lastDirtied = Date.distantPast
 	}
 
-	class func reposForGroup(group: String, inMoc: NSManagedObjectContext) -> [Repo] {
-		let f = NSFetchRequest(entityName: "Repo")
+	class func reposForGroup(_ group: String, inMoc: NSManagedObjectContext) -> [Repo] {
+		let f = NSFetchRequest<Repo>(entityName: "Repo")
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "groupLabel == %@", group)
-		return try! inMoc.executeFetchRequest(f) as! [Repo]
+		return try! inMoc.fetch(f)
 	}
 
-	class func anyVisibleReposInMoc(moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, excludeGrouped: Bool = false) -> Bool {
+	class func anyVisibleReposInMoc(_ moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, excludeGrouped: Bool = false) -> Bool {
 
-		func excludeGroupedRepos(p: NSPredicate) -> NSPredicate {
+		func excludeGroupedRepos(_ p: NSPredicate) -> NSPredicate {
 			let nilCheck = NSPredicate(format: "groupLabel == nil")
 			return NSCompoundPredicate(andPredicateWithSubpredicates: [nilCheck, p])
 		}
 
-		let f = NSFetchRequest(entityName: "Repo")
+		let f = NSFetchRequest<Repo>(entityName: "Repo")
 		f.fetchLimit = 1
 		let p = NSPredicate(format: "displayPolicyForPrs > 0 or displayPolicyForIssues > 0")
 		if let c = criterion {
@@ -103,34 +103,34 @@ final class Repo: DataItem {
 		} else {
 			f.predicate = p
 		}
-		let c = moc.countForFetchRequest(f, error: nil)
+		let c = try! moc.count(for: f)
 		return c > 0
 	}
 
-	class func interestedInIssues(apiServerId: NSManagedObjectID? = nil) -> Bool {
+	class func interestedInIssues(_ apiServerId: NSManagedObjectID? = nil) -> Bool {
 		let all: [Repo]
-		if let aid = apiServerId, a = existingObjectWithID(aid) as? ApiServer {
+		if let aid = apiServerId, let a = existingObjectWithID(aid) as? ApiServer {
 			all = Repo.allItemsOfType("Repo", fromServer: a) as! [Repo]
 		} else {
 			all = Repo.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo]
 		}
 		for r in all {
-			if r.displayPolicyForIssues?.integerValue > 0 {
+			if r.displayPolicyForIssues?.intValue > 0 {
 				return true
 			}
 		}
 		return false
 	}
 
-	class func interestedInPrs(apiServerId: NSManagedObjectID? = nil) -> Bool {
+	class func interestedInPrs(_ apiServerId: NSManagedObjectID? = nil) -> Bool {
 		let all: [Repo]
-		if let aid = apiServerId, a = existingObjectWithID(aid) as? ApiServer {
+		if let aid = apiServerId, let a = existingObjectWithID(aid) as? ApiServer {
 			all = Repo.allItemsOfType("Repo", fromServer: a) as! [Repo]
 		} else {
 			all = Repo.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo]
 		}
 		for r in all {
-			if r.displayPolicyForPrs?.integerValue > 0 {
+			if r.displayPolicyForPrs?.intValue > 0 {
 				return true
 			}
 		}
@@ -140,61 +140,61 @@ final class Repo: DataItem {
 	class var allGroupLabels: [String] {
 		let allRepos = allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo]
 		let labels = allRepos.flatMap { $0.shouldSync ? $0.groupLabel : nil }
-		return Set<String>(labels).sort()
+		return Set<String>(labels).sorted()
 	}
 
-	class func syncableReposInMoc(moc: NSManagedObjectContext) -> [Repo] {
-		let f = NSFetchRequest(entityName: "Repo")
+	class func syncableReposInMoc(_ moc: NSManagedObjectContext) -> [Repo] {
+		let f = NSFetchRequest<Repo>(entityName: "Repo")
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "dirty = YES and (displayPolicyForPrs > 0 or displayPolicyForIssues > 0) and inaccessible != YES")
-		return try! moc.executeFetchRequest(f) as! [Repo]
+		return try! moc.fetch(f)
 	}
 
-	class func reposNotRecentlyDirtied(moc: NSManagedObjectContext) -> [Repo] {
-		let f = NSFetchRequest(entityName: "Repo")
-		f.predicate = NSPredicate(format: "dirty != YES and lastDirtied < %@ and postSyncAction != %d and (displayPolicyForPrs > 0 or displayPolicyForIssues > 0)", NSDate(timeInterval: -3600, sinceDate: NSDate()), PostSyncAction.Delete.rawValue)
+	class func reposNotRecentlyDirtied(_ moc: NSManagedObjectContext) -> [Repo] {
+		let f = NSFetchRequest<Repo>(entityName: "Repo")
+		f.predicate = NSPredicate(format: "dirty != YES and lastDirtied < %@ and postSyncAction != %d and (displayPolicyForPrs > 0 or displayPolicyForIssues > 0)", Date(timeInterval: -3600, since: Date()), PostSyncAction.delete.rawValue)
 		f.includesPropertyValues = false
 		f.returnsObjectsAsFaults = false
-		return try! moc.executeFetchRequest(f) as! [Repo]
+		return try! moc.fetch(f)
 	}
 
-	class func unsyncableReposInMoc(moc: NSManagedObjectContext) -> [Repo] {
-		let f = NSFetchRequest(entityName: "Repo")
+	class func unsyncableReposInMoc(_ moc: NSManagedObjectContext) -> [Repo] {
+		let f = NSFetchRequest<Repo>(entityName: "Repo")
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "(not (displayPolicyForPrs > 0 or displayPolicyForIssues > 0)) or inaccessible = YES")
-		return try! moc.executeFetchRequest(f) as! [Repo]
+		return try! moc.fetch(f)
 	}
 
-	class func markDirtyReposWithIds(ids: NSSet, inMoc: NSManagedObjectContext) {
-		let f = NSFetchRequest(entityName: "Repo")
+	class func markDirtyReposWithIds(_ ids: NSSet, inMoc: NSManagedObjectContext) {
+		let f = NSFetchRequest<Repo>(entityName: "Repo")
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "serverId IN %@", ids)
-		for repo in try! inMoc.executeFetchRequest(f) as! [Repo] {
+		for repo in try! inMoc.fetch(f) {
 			repo.dirty = repo.shouldSync
 		}
 	}
 
-	class func reposForFilter(filter: String?) -> [Repo] {
-		let f = NSFetchRequest(entityName: "Repo")
+	class func reposForFilter(_ filter: String?) -> [Repo] {
+		let f = NSFetchRequest<Repo>(entityName: "Repo")
 		f.returnsObjectsAsFaults = false
-		if let filterText = filter where !filterText.isEmpty {
+		if let filterText = filter, !filterText.isEmpty {
 			f.predicate = NSPredicate(format: "fullName contains [cd] %@", filterText)
 		}
 		f.sortDescriptors = [
 			NSSortDescriptor(key: "fork", ascending: true),
 			NSSortDescriptor(key: "fullName", ascending: true)
 		]
-		return try! mainObjectContext.executeFetchRequest(f) as! [Repo]
+		return try! mainObjectContext.fetch(f)
 	}
 
-	class func countParentRepos(filter: String?) -> Int {
-		let f = NSFetchRequest(entityName: "Repo")
+	class func countParentRepos(_ filter: String?) -> Int {
+		let f = NSFetchRequest<Repo>(entityName: "Repo")
 
-		if let fi = filter where !fi.isEmpty {
+		if let fi = filter, !fi.isEmpty {
 			f.predicate = NSPredicate(format: "fork == NO and fullName contains [cd] %@", fi)
 		} else {
 			f.predicate = NSPredicate(format: "fork == NO")
 		}
-		return mainObjectContext.countForFetchRequest(f, error:nil)
+		return try! mainObjectContext.count(for: f)
 	}
 }

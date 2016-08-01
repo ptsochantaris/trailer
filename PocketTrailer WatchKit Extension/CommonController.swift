@@ -8,7 +8,7 @@ class CommonController: WKInterfaceController {
 
 	override func willActivate() {
 		super.willActivate()
-		if let app = WKExtension.sharedExtension().delegate as? ExtensionDelegate where app.lastView != self {
+		if let app = WKExtension.shared().delegate as? ExtensionDelegate, app.lastView != self {
 			if showLoadingFeedback() {
 				showStatus("Connecting...", hideTable: false)
 			}
@@ -20,7 +20,7 @@ class CommonController: WKInterfaceController {
 		return _table.numberOfRows == 0
 	}
 
-	func showStatus(status: String, hideTable: Bool) {
+	func showStatus(_ status: String, hideTable: Bool) {
 		_statusLabel.setText(status)
 		if hideTable {
 			_table.setHidden(hideTable)
@@ -31,12 +31,12 @@ class CommonController: WKInterfaceController {
 		_statusLabel.setHidden(status.isEmpty)
 	}
 
-	func requestData(command: String?) {
+	func requestData(_ command: String?) {
 		// for subclassing
 	}
 
 	private var loading = 0
-	func sendRequest(request: [String : AnyObject]) {
+	func sendRequest(_ request: [String : AnyObject]) {
 		if loading == 0 {
 			if showLoadingFeedback() {
 				showStatus("Loading...", hideTable: false)
@@ -45,13 +45,13 @@ class CommonController: WKInterfaceController {
 		}
 	}
 
-	private func attemptRequest(request: [String : AnyObject]) {
+	private func attemptRequest(_ request: [String : AnyObject]) {
 
 		loading += 1
 
-		WCSession.defaultSession().sendMessage(request, replyHandler: { response in
+		WCSession.default().sendMessage(request, replyHandler: { response in
 			atNextEvent(self) { S in
-				if let errorIndicator = response["error"] as? Bool where errorIndicator == true {
+				if let errorIndicator = response["error"] as? Bool, errorIndicator == true {
 					S.showTemporaryError(response["status"] as! String)
 				} else {
 					S.updateFromData(response)
@@ -71,20 +71,20 @@ class CommonController: WKInterfaceController {
 		}
 	}
 
-	private func showTemporaryError(error: String) {
-		_statusLabel.setTextColor(UIColor.redColor())
+	private func showTemporaryError(_ error: String) {
+		_statusLabel.setTextColor(UIColor.red)
 		showStatus(error, hideTable: true)
 		delay(3, self) { S in
-			S._statusLabel.setTextColor(UIColor.whiteColor())
+			S._statusLabel.setTextColor(UIColor.white)
 			S.showStatus("", hideTable: false)
 		}
 	}
 
-	func updateFromData(response: [NSString : AnyObject]) {
+	func updateFromData(_ response: [NSString : AnyObject]) {
 		// for subclassing
 	}
 
-	func loadingFailed(error: NSError) {
+	func loadingFailed(_ error: NSError) {
 		showTemporaryError("Error: \(error.localizedDescription)")
 		loading = 0
 	}

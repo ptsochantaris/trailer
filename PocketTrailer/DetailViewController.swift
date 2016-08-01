@@ -12,7 +12,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 	var isVisible = false
 	var catchupWithDataItemWhenLoaded: NSManagedObjectID?
 
-	var detailItem: NSURL? {
+	var detailItem: URL? {
 		didSet {
 			if detailItem != oldValue {
 				configureView()
@@ -29,8 +29,8 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 		let w = WKWebView(frame: view.bounds, configuration: webConfiguration)
 		w.navigationDelegate = self
 		w.scrollView.contentInset = UIEdgeInsetsMake(64, 0, 0, 0)
-		w.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
-		w.hidden = true
+		w.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+		w.isHidden = true
 		view.addSubview(w)
 
 		webView = w
@@ -50,7 +50,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 					DLog("Activating iPad webview user-agent")
 					alwaysRequestDesktopSite = true
 					w.evaluateJavaScript("navigator.userAgent") { result, error in
-						w.customUserAgent = result?.stringByReplacingOccurrencesOfString("iPhone", withString: "iPad")
+						w.customUserAgent = result?.replacingOccurrences(of: "iPhone", with: "iPad")
 						self.configureView()
 					}
 					return
@@ -60,26 +60,26 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 					alwaysRequestDesktopSite = false
 				}
 				DLog("Will load: %@", d.absoluteString)
-				w.loadRequest(NSURLRequest(URL: d))
+				w.load(URLRequest(url: d))
 			} else {
-				statusLabel.textColor = UIColor.lightGrayColor()
+				statusLabel.textColor = UIColor.lightGray
 				statusLabel.text = "Please select an item from the list, or select 'Settings' to add servers, or show/hide repositories.\n\n(You may have to login to GitHub the first time you visit a private item)"
-				statusLabel.hidden = false
-				navigationItem.rightBarButtonItem?.enabled = false
+				statusLabel.isHidden = false
+				navigationItem.rightBarButtonItem?.isEnabled = false
 				title = nil
-				w.hidden = true
+				w.isHidden = true
 			}
 		}
 	}
 
-	override func traitCollectionDidChange(previousTraitCollection: UITraitCollection?) {
+	override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
 		super.traitCollectionDidChange(previousTraitCollection)
-		navigationItem.leftBarButtonItem = (traitCollection.horizontalSizeClass == .Compact) ? nil : splitViewController?.displayModeButtonItem()
+		navigationItem.leftBarButtonItem = (traitCollection.horizontalSizeClass == .compact) ? nil : splitViewController?.displayModeButtonItem
 	}
 
-	override func viewWillAppear(animated: Bool) {
+	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
-		if let w = webView where w.loading {
+		if let w = webView, w.isLoading {
 			spinner.startAnimating()
 		} else { // Same item re-selected
 			spinner.stopAnimating()
@@ -88,52 +88,52 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 		isVisible = true
 	}
 
-	override func viewDidDisappear(animated: Bool) {
+	override func viewDidDisappear(_ animated: Bool) {
 		isVisible = false
 		super.viewDidDisappear(animated)
 	}
 
-	func webView(webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+	func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
 		spinner.startAnimating()
-		statusLabel.hidden = true
+		statusLabel.isHidden = true
 		statusLabel.text = nil
-		webView.hidden = true
+		webView.isHidden = true
 		title = "Loading..."
 		navigationItem.rightBarButtonItem = nil
 		api.networkIndicationStart()
 	}
 
-	func webView(webView: WKWebView, decidePolicyForNavigationResponse navigationResponse: WKNavigationResponse, decisionHandler: (WKNavigationResponsePolicy) -> Void) {
-		if let res = navigationResponse.response as? NSHTTPURLResponse where res.statusCode == 404 {
+	func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: (WKNavigationResponsePolicy) -> Void) {
+		if let res = navigationResponse.response as? HTTPURLResponse, res.statusCode == 404 {
 			showMessage("Not Found", "\nPlease ensure you are logged in with the correct account on GitHub\n\nIf you are using two-factor auth: There is a bug between GitHub and iOS which may cause your login to fail.  If it happens, temporarily disable two-factor auth and log in from here, then re-enable it afterwards.  You will only need to do this once.")
 		}
-		decisionHandler(.Allow)
+		decisionHandler(.allow)
 	}
 
-	func webView(webView: WKWebView, didFinishNavigation navigation: WKNavigation!) {
+	func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
 		spinner.stopAnimating()
-		statusLabel.hidden = true
-		webView.hidden = false
-		navigationItem.rightBarButtonItem?.enabled = true
+		statusLabel.isHidden = true
+		webView.isHidden = false
+		navigationItem.rightBarButtonItem?.isEnabled = true
 		title = webView.title
-		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Action, target: self, action: #selector(DetailViewController.shareSelected))
+		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(DetailViewController.shareSelected))
 		api.networkIndicationEnd()
 
 		catchupWithComments()
-		if splitViewController?.collapsed ?? true {
-			becomeFirstResponder()
+		if splitViewController?.isCollapsed ?? true {
+			_ = becomeFirstResponder()
 		}
 	}
 
 	override var keyCommands: [UIKeyCommand]? {
-		let ff = UIKeyCommand(input: UIKeyInputLeftArrow, modifierFlags: .Command, action: #selector(DetailViewController.focusOnMaster), discoverabilityTitle: "Focus keyboard on item list")
-		let s = UIKeyCommand(input: "o", modifierFlags: .Command, action: #selector(DetailViewController.keyOpenInSafari), discoverabilityTitle: "Open in Safari")
+		let ff = UIKeyCommand(input: UIKeyInputLeftArrow, modifierFlags: .command, action: #selector(DetailViewController.focusOnMaster), discoverabilityTitle: "Focus keyboard on item list")
+		let s = UIKeyCommand(input: "o", modifierFlags: .command, action: #selector(DetailViewController.keyOpenInSafari), discoverabilityTitle: "Open in Safari")
 		return [ff,s]
 	}
 
 	func keyOpenInSafari() {
-		if let u = webView?.URL {
-			UIApplication.sharedApplication().openURL(u)
+		if let u = webView?.url {
+			UIApplication.shared.openURL(u)
 		}
 	}
 
@@ -147,15 +147,15 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 
 	func focusOnMaster() {
 		let m = popupManager.getMasterController()
-		if splitViewController?.collapsed ?? true {
-			m.navigationController?.popViewControllerAnimated(true)
+		if splitViewController?.isCollapsed ?? true {
+			_ = m.navigationController?.popViewController(animated: true)
 		}
 		m.becomeFirstResponder()
 	}
 
 	private func catchupWithComments() {
-		if let oid = catchupWithDataItemWhenLoaded, dataItem = existingObjectWithID(oid) as? ListableItem {
-			if let count = dataItem.unreadComments?.integerValue where count > 0 {
+		if let oid = catchupWithDataItemWhenLoaded, let dataItem = existingObjectWithID(oid) as? ListableItem {
+			if let count = dataItem.unreadComments?.intValue, count > 0 {
 				dataItem.catchUpWithComments()
 				DataManager.saveDB()
 			}
@@ -163,28 +163,28 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 		catchupWithDataItemWhenLoaded = nil
 	}
 
-	func webView(webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: NSError) {
-		loadFailed(error)
+	func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+		loadFailed(error: error)
 	}
 
-	func webView(webView: WKWebView, didFailNavigation navigation: WKNavigation!, withError error: NSError) {
-		loadFailed(error)
+	func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+		loadFailed(error: error)
 	}
 
 	private func loadFailed(error: NSError) {
 		spinner.stopAnimating()
-		statusLabel.textColor = UIColor.redColor()
+		statusLabel.textColor = UIColor.red
 		statusLabel.text = "Loading Error: \(error.localizedDescription)"
-		statusLabel.hidden = false
-		webView?.hidden = true
+		statusLabel.isHidden = false
+		webView?.isHidden = true
 		title = "Error"
-		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Refresh, target: self, action: #selector(DetailViewController.configureView))
+		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(DetailViewController.configureView))
 		api.networkIndicationEnd()
 	}
 
 	func shareSelected() {
-		if let u = webView?.URL {
-			popupManager.shareFromView(self, buttonItem: navigationItem.rightBarButtonItem!, url: u)
+		if let u = webView?.url {
+			popupManager.shareFromView(view: self, buttonItem: navigationItem.rightBarButtonItem!, url: u)
 		}
 	}
 }

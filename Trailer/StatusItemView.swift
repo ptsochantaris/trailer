@@ -27,77 +27,77 @@ final class StatusItemView: NSView {
 	    fatalError("init(coder:) has not been implemented")
 	}
 
-	override func mouseDown(theEvent: NSEvent) {
+	override func mouseDown(with theEvent: NSEvent) {
 		tappedCallback()
 	}
 
 	private let STATUSITEM_PADDING: CGFloat = 1.0
 
 	func sizeToFit() {
-		let width = statusLabel.sizeWithAttributes(textAttributes).width
-		let H = NSStatusBar.systemStatusBar().thickness
+		let width = statusLabel.size(withAttributes: textAttributes).width
+		let H = NSStatusBar.system().thickness
 		let itemWidth = (H + width + STATUSITEM_PADDING*3) + labelOffset
 		frame = NSMakeRect(0, 0, itemWidth, H)
 		needsDisplay = true
 	}
 
-	override func drawRect(dirtyRect: NSRect) {
+	override func draw(_ dirtyRect: NSRect) {
 
-		app.statusItemForView(self)?.drawStatusBarBackgroundInRect(dirtyRect, withHighlight: highlighted)
+		app.statusItemForView(self)?.drawStatusBarBackground(in: dirtyRect, withHighlight: highlighted)
 
 		let imagePoint = NSMakePoint(STATUSITEM_PADDING, 0)
-		var labelRect = CGRectMake(bounds.size.height + labelOffset, -5, bounds.size.width, bounds.size.height)
+		var labelRect = CGRect(x: bounds.size.height + labelOffset, y: -5, width: bounds.size.width, height: bounds.size.height)
 		var displayAttributes = textAttributes
 		var imageColor: NSColor
 
 		if highlighted {
-			imageColor = NSColor.selectedMenuItemTextColor()
+			imageColor = NSColor.selectedMenuItemTextColor
 			displayAttributes[NSForegroundColorAttributeName] = imageColor
 		} else if app.darkMode {
-			imageColor = NSColor.selectedMenuItemTextColor()
-			if displayAttributes[NSForegroundColorAttributeName] as! NSColor == NSColor.controlTextColor() {
+			imageColor = NSColor.selectedMenuItemTextColor
+			if displayAttributes[NSForegroundColorAttributeName] as! NSColor == NSColor.controlTextColor {
 				displayAttributes[NSForegroundColorAttributeName] = imageColor
 			}
 		} else {
-			imageColor = NSColor.controlTextColor()
+			imageColor = NSColor.controlTextColor
 		}
 
 		if grayOut {
-			displayAttributes[NSForegroundColorAttributeName] = NSColor.disabledControlTextColor()
+			displayAttributes[NSForegroundColorAttributeName] = NSColor.disabledControlTextColor
 		}
 
 		let img = tintedImage(icon, tint: imageColor)
 		if let t = title {
 
-			labelRect = CGRectOffset(labelRect, -3, -3)
+			labelRect = labelRect.offsetBy(dx: -3, dy: -3)
 
 			let r = NSMakeRect(1, dirtyRect.height-7, dirtyRect.width-2, 7)
 			let p = NSMutableParagraphStyle()
-			p.alignment = .Center
-			p.lineBreakMode = .ByTruncatingMiddle
-			t.drawInRect(r, withAttributes: [
+			p.alignment = .center
+			p.lineBreakMode = .byTruncatingMiddle
+			t.draw(in: r, withAttributes: [
 				NSForegroundColorAttributeName: imageColor,
-				NSFontAttributeName: NSFont.menuFontOfSize(6),
+				NSFontAttributeName: NSFont.menuFont(ofSize: 6),
 				NSParagraphStyleAttributeName: p
 				])
 
-			img.drawInRect(CGRectMake(imagePoint.x+3, imagePoint.y, img.size.width-6, img.size.height-6))
+			img.draw(in: CGRect(x: imagePoint.x+3, y: imagePoint.y, width: img.size.width-6, height: img.size.height-6))
 		} else {
-			img.drawAtPoint(imagePoint, fromRect: NSZeroRect, operation: NSCompositingOperation.CompositeSourceOver, fraction: 1.0)
+			img.draw(at: imagePoint, from: NSZeroRect, operation: .sourceOver, fraction: 1.0)
 		}
 
-		statusLabel.drawInRect(labelRect, withAttributes: displayAttributes)
+		statusLabel.draw(in: labelRect, withAttributes: displayAttributes)
 	}
 
 	// With thanks to http://stackoverflow.com/questions/1413135/tinting-a-grayscale-nsimage-or-ciimage
-	private func tintedImage(image: NSImage, tint: NSColor) -> NSImage {
+	private func tintedImage(_ image: NSImage, tint: NSColor) -> NSImage {
 
 		let tinted = image.copy() as! NSImage
 		tinted.lockFocus()
 		tint.set()
 
 		let imageRect = NSRect(origin: NSZeroPoint, size: image.size)
-		NSRectFillUsingOperation(imageRect, NSCompositingOperation.CompositeSourceAtop)
+		NSRectFillUsingOperation(imageRect, .sourceAtop)
 
 		tinted.unlockFocus()
 		return tinted

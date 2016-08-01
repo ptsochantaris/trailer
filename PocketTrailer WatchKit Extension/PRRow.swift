@@ -17,14 +17,14 @@ final class PRRow: NSObject {
 	var itemId: String?
 	var hasUnread: Bool!
 
-	func populateFrom(itemData: [String : AnyObject]) {
+	func populateFrom(_ itemData: [String : AnyObject]) {
 
-		let titleData = itemData["title"] as! NSData
-		let title = NSKeyedUnarchiver.unarchiveObjectWithData(titleData) as! NSAttributedString
+		let titleData = itemData["title"] as! Data
+		let title = NSKeyedUnarchiver.unarchiveObject(with: titleData) as! NSAttributedString
 		titleL.setAttributedText(title)
 
-		let subtitleData = itemData["subtitle"] as! NSData
-		let subtitle = NSKeyedUnarchiver.unarchiveObjectWithData(subtitleData) as! NSAttributedString
+		let subtitleData = itemData["subtitle"] as! Data
+		let subtitle = NSKeyedUnarchiver.unarchiveObject(with: subtitleData) as! NSAttributedString
 		detailsL.setAttributedText(subtitle)
 
 		itemId = itemData["localId"] as? String
