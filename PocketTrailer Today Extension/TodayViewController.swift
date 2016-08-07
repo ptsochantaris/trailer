@@ -8,14 +8,13 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 	@IBOutlet weak var prLabel: UILabel!
 	@IBOutlet weak var issuesLabel: UILabel!
 	@IBOutlet weak var updatedLabel: UILabel!
-
-	var linkButton: UIButton!
-
 	@IBOutlet weak var prImage: UIImageView!
 	@IBOutlet weak var issueImage: UIImageView!
 
+	private var linkButton = UIButton(type: UIButtonType.custom)
 	private let paragraph = NSMutableParagraphStyle()
 	private let newOS = ProcessInfo().isOperatingSystemAtLeast(OperatingSystemVersion(majorVersion: 10, minorVersion: 0, patchVersion: 0))
+
 	private var titleAttributes: [String : AnyObject] {
 		return [
 			NSForegroundColorAttributeName: newOS ? UIColor.black : UIColor.white,
@@ -75,7 +74,6 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 
 		paragraph.paragraphSpacing = 4
 
-		linkButton = UIButton(type: UIButtonType.custom)
 		linkButton.addTarget(self, action: #selector(TodayViewController.widgetTapped), for: .touchUpInside)
 		linkButton.setBackgroundImage(imageFromColor(UIColor(white: 1.0, alpha: 0.2)), for: .highlighted)
 		view.addSubview(linkButton)
