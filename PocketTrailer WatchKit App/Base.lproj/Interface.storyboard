@@ -1,38 +1,182 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="AgC-eL-Hgc">
+<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="11185.3" systemVersion="15G31" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="AgC-eL-Hgc">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="10032"/>
+        <deployment identifier="watchOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11151.4"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="11074"/>
     </dependencies>
     <scenes>
-        <!--Sections-->
+        <!--Summary-->
         <scene sceneID="aou-V4-d1y">
             <objects>
-                <controller identifier="SectionController" title="Sections" hidesWhenLoading="NO" id="AgC-eL-Hgc" customClass="SectionController" customModule="Trailer">
+                <controller identifier="SectionController" title="Summary" hidesWhenLoading="NO" id="AgC-eL-Hgc" customClass="SectionController" customModule="Trailer">
                     <items>
                         <label alignment="center" verticalAlignment="center" text="Connecting" textAlignment="center" numberOfLines="0" id="tZx-Xo-NwI">
                             <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
                         </label>
-                        <group width="1" alignment="center" verticalAlignment="center" radius="0.0" id="AJn-j1-vO3">
+                        <group width="1" alignment="left" spacing="0.0" id="7zW-K7-f5C">
                             <items>
-                                <table alignment="left" verticalAlignment="center" id="be2-ie-h5R">
+                                <table alignment="center" verticalAlignment="center" id="be2-ie-h5R">
                                     <items>
+                                        <tableRow identifier="SummaryRow" selectable="NO" id="fCa-r2-hfH" customClass="SummaryRow" customModule="Trailer">
+                                            <group key="rootItem" width="1" height="0.0" alignment="left" layout="vertical" spacing="3" id="iie-Cd-7sI">
+                                                <items>
+                                                    <group alignment="center" layout="vertical" spacing="2" id="PyO-Jg-DTM">
+                                                        <items>
+                                                            <group alignment="center" verticalAlignment="center" radius="10" spacing="4" id="l9u-DS-QJY">
+                                                                <items>
+                                                                    <imageView width="20" height="20" alignment="left" verticalAlignment="center" image="GlancePrs" contentMode="scaleAspectFit" id="Uee-FL-QuG">
+                                                                        <variation key="device=watch42mm" height="24" width="24"/>
+                                                                    </imageView>
+                                                                    <imageView width="20" height="20" alignment="left" verticalAlignment="center" image="GlanceIssues" contentMode="scaleAspectFit" id="Okg-ub-Tjz">
+                                                                        <variation key="device=watch42mm" height="24" width="24"/>
+                                                                    </imageView>
+                                                                    <label alignment="right" verticalAlignment="center" text="43" textAlignment="center" id="fct-uu-Pbf">
+                                                                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                        <fontDescription key="font" type="system" weight="medium" pointSize="28"/>
+                                                                        <variation key="device=watch42mm">
+                                                                            <fontDescription key="font" type="system" weight="medium" pointSize="30"/>
+                                                                        </variation>
+                                                                    </label>
+                                                                </items>
+                                                                <color key="backgroundColor" red="0.20784313730000001" green="0.4823529412" blue="0.82352941180000006" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                <edgeInsets key="margins" left="6" right="6" top="0.0" bottom="0.0"/>
+                                                            </group>
+                                                            <label alignment="center" verticalAlignment="center" alpha="0.89999999999999991" text="Refreshed" numberOfLines="0" id="ahH-0N-rUo">
+                                                                <color key="textColor" red="0.24918844709999999" green="0.58109372510000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                <fontDescription key="font" type="system" weight="thin" pointSize="7"/>
+                                                                <variation key="device=watch42mm">
+                                                                    <fontDescription key="font" type="system" weight="thin" pointSize="8"/>
+                                                                </variation>
+                                                            </label>
+                                                        </items>
+                                                        <edgeInsets key="margins" left="0.0" right="0.0" top="0.0" bottom="0.0"/>
+                                                        <variation key="device=watch42mm" spacing="4">
+                                                            <edgeInsets key="margins" left="0.0" right="0.0" top="2" bottom="2"/>
+                                                        </variation>
+                                                    </group>
+                                                    <group alignment="center" layout="vertical" spacing="1" id="eeF-H8-AN4">
+                                                        <items>
+                                                            <group width="130" alignment="center" verticalAlignment="center" radius="3" id="WYv-5f-gHj">
+                                                                <items>
+                                                                    <label alignment="center" text="XX MINE" textAlignment="center" numberOfLines="0" id="0up-k8-8T6">
+                                                                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                        <fontDescription key="font" type="system" pointSize="11"/>
+                                                                        <variation key="device=watch42mm">
+                                                                            <fontDescription key="font" type="system" pointSize="12"/>
+                                                                        </variation>
+                                                                    </label>
+                                                                </items>
+                                                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                <edgeInsets key="margins" left="0.0" right="0.0" top="1" bottom="1"/>
+                                                            </group>
+                                                            <group width="130" alignment="center" verticalAlignment="center" radius="3" id="HOY-eh-yT6">
+                                                                <items>
+                                                                    <label alignment="center" text="XX PARTICIPATED" textAlignment="center" numberOfLines="0" id="rbB-FR-3bb">
+                                                                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                        <fontDescription key="font" type="system" pointSize="11"/>
+                                                                        <variation key="device=watch42mm">
+                                                                            <fontDescription key="font" type="system" pointSize="12"/>
+                                                                        </variation>
+                                                                    </label>
+                                                                </items>
+                                                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                <edgeInsets key="margins" left="0.0" right="0.0" top="1" bottom="1"/>
+                                                            </group>
+                                                            <group width="130" alignment="center" verticalAlignment="center" radius="3" id="mqA-m7-GOR" userLabel="Mentioned Group">
+                                                                <items>
+                                                                    <label alignment="center" text="XX MENTIONED" textAlignment="center" numberOfLines="0" id="D9m-jy-AiK" userLabel="XX MENTIONED">
+                                                                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                        <fontDescription key="font" type="system" pointSize="11"/>
+                                                                        <variation key="device=watch42mm">
+                                                                            <fontDescription key="font" type="system" pointSize="12"/>
+                                                                        </variation>
+                                                                    </label>
+                                                                </items>
+                                                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                <edgeInsets key="margins" left="0.0" right="0.0" top="1" bottom="1"/>
+                                                            </group>
+                                                            <group width="130" alignment="center" verticalAlignment="center" radius="3" id="gHg-rR-9mv">
+                                                                <items>
+                                                                    <label alignment="center" text="XX OTHER" textAlignment="center" numberOfLines="0" id="ood-e3-T5V">
+                                                                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                        <fontDescription key="font" type="system" pointSize="11"/>
+                                                                        <variation key="device=watch42mm">
+                                                                            <fontDescription key="font" type="system" pointSize="12"/>
+                                                                        </variation>
+                                                                    </label>
+                                                                </items>
+                                                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                <edgeInsets key="margins" left="0.0" right="0.0" top="1" bottom="1"/>
+                                                            </group>
+                                                            <group width="130" alignment="center" verticalAlignment="center" radius="3" id="PuH-Ui-32Z" userLabel="Snoozing Group">
+                                                                <items>
+                                                                    <label alignment="center" text="XX SNOOZING" textAlignment="center" numberOfLines="0" id="ibr-eq-eQB" userLabel="XX SNOOZING">
+                                                                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                        <fontDescription key="font" type="system" pointSize="11"/>
+                                                                        <variation key="device=watch42mm">
+                                                                            <fontDescription key="font" type="system" pointSize="12"/>
+                                                                        </variation>
+                                                                    </label>
+                                                                </items>
+                                                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                <edgeInsets key="margins" left="0.0" right="0.0" top="1" bottom="1"/>
+                                                            </group>
+                                                            <group width="130" alignment="center" verticalAlignment="center" radius="3" id="S87-7f-wLK">
+                                                                <items>
+                                                                    <label alignment="center" text="XX UNREAD" textAlignment="center" numberOfLines="0" id="IL1-jN-Coq">
+                                                                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                        <fontDescription key="font" type="system" pointSize="11"/>
+                                                                        <variation key="device=watch42mm">
+                                                                            <fontDescription key="font" type="system" pointSize="12"/>
+                                                                        </variation>
+                                                                    </label>
+                                                                </items>
+                                                                <color key="backgroundColor" red="1" green="0.0" blue="0.070606581870000004" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                <edgeInsets key="margins" left="0.0" right="0.0" top="1" bottom="1"/>
+                                                            </group>
+                                                        </items>
+                                                        <variation key="device=watch42mm" spacing="2"/>
+                                                    </group>
+                                                </items>
+                                                <edgeInsets key="margins" left="0.0" right="0.0" top="4" bottom="6"/>
+                                            </group>
+                                            <connections>
+                                                <outlet property="issueIcon" destination="Okg-ub-Tjz" id="tx7-F7-jKc"/>
+                                                <outlet property="lastUpdate" destination="ahH-0N-rUo" id="Ssp-6b-l5t"/>
+                                                <outlet property="mentionedCount" destination="D9m-jy-AiK" id="bA3-E6-F38"/>
+                                                <outlet property="mentionedGroup" destination="mqA-m7-GOR" id="WvS-Pc-bq8"/>
+                                                <outlet property="myCount" destination="0up-k8-8T6" id="ACM-gd-ojQ"/>
+                                                <outlet property="myGroup" destination="WYv-5f-gHj" id="P9W-vd-xgH"/>
+                                                <outlet property="otherCount" destination="ood-e3-T5V" id="6OW-a1-c2a"/>
+                                                <outlet property="otherGroup" destination="gHg-rR-9mv" id="dc6-B0-3KQ"/>
+                                                <outlet property="participatedCount" destination="rbB-FR-3bb" id="EOD-7w-4po"/>
+                                                <outlet property="participatedGroup" destination="HOY-eh-yT6" id="EB2-iC-8Os"/>
+                                                <outlet property="prIcon" destination="Uee-FL-QuG" id="dEw-1m-BQ8"/>
+                                                <outlet property="snoozingCount" destination="ibr-eq-eQB" id="XBX-na-5Zq"/>
+                                                <outlet property="snoozingGroup" destination="PuH-Ui-32Z" id="vZL-y7-TzT"/>
+                                                <outlet property="totalCount" destination="fct-uu-Pbf" id="eev-nb-wQJ"/>
+                                                <outlet property="totalGroup" destination="l9u-DS-QJY" id="Eeh-Td-KXt"/>
+                                                <outlet property="unreadCount" destination="IL1-jN-Coq" id="9oR-vP-81i"/>
+                                                <outlet property="unreadGroup" destination="S87-7f-wLK" id="ywP-Fe-7FR"/>
+                                            </connections>
+                                        </tableRow>
                                         <tableRow identifier="TitleRow" selectable="NO" id="tHv-Jj-a9y" customClass="TitleRow" customModule="Trailer">
                                             <group key="rootItem" width="1" height="0.0" alignment="left" id="mWo-dt-dzr">
                                                 <items>
-                                                    <group alignment="left" radius="2" id="Kau-36-YJy">
+                                                    <group alignment="center" radius="2" id="Kau-36-YJy">
                                                         <items>
                                                             <label alignment="left" verticalAlignment="bottom" text="PULL REQUESTS" textAlignment="left" numberOfLines="0" id="dy2-9S-MJp">
-                                                                <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                 <fontDescription key="font" type="system" weight="black" pointSize="11"/>
                                                             </label>
                                                         </items>
-                                                        <color key="backgroundColor" red="0.20784313730000001" green="0.4823529412" blue="0.82352941180000006" alpha="1" colorSpace="calibratedRGB"/>
-                                                        <edgeInsets key="margins" left="3" right="3" top="1" bottom="1"/>
+                                                        <color key="backgroundColor" red="0.20784313730000001" green="0.4823529412" blue="0.82352941180000006" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <edgeInsets key="margins" left="3" right="3" top="2" bottom="2"/>
                                                     </group>
                                                 </items>
-                                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
-                                                <edgeInsets key="margins" left="2" right="2" top="8" bottom="0.0"/>
+                                                <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <edgeInsets key="margins" left="2" right="2" top="8" bottom="4"/>
                                             </group>
                                             <connections>
                                                 <outlet property="titleL" destination="dy2-9S-MJp" id="mX0-PC-TAL"/>
@@ -50,14 +194,14 @@
                                                     <group height="1" alignment="right" verticalAlignment="center" radius="8" id="VK1-qB-Emf">
                                                         <items>
                                                             <label alignment="center" verticalAlignment="center" text=" " id="YSb-rO-7SF">
-                                                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                                <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                 <fontDescription key="font" style="UICTFontTextStyleTitle1"/>
                                                                 <variation key="device=watch38mm">
                                                                     <fontDescription key="font" style="UICTFontTextStyleTitle3"/>
                                                                 </variation>
                                                             </label>
                                                         </items>
-                                                        <color key="backgroundColor" red="1" green="0.0" blue="0.070606581870000004" alpha="1" colorSpace="calibratedRGB"/>
+                                                        <color key="backgroundColor" red="1" green="0.0" blue="0.070606581870000004" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                         <edgeInsets key="margins" left="6" right="6" top="0.0" bottom="0.0"/>
                                                     </group>
                                                 </items>
@@ -73,6 +217,7 @@
                                     </items>
                                 </table>
                             </items>
+                            <edgeInsets key="margins" left="0.0" right="0.0" top="0.0" bottom="4"/>
                         </group>
                     </items>
                     <menu key="menu" id="FvI-zq-Wrb">
@@ -105,7 +250,7 @@
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="-114" y="64.75"/>
+            <point key="canvasLocation" x="-122" y="427"/>
         </scene>
         <!--ListController-->
         <scene sceneID="ox7-bJ-gA7">
@@ -120,42 +265,50 @@
                                 <tableRow identifier="PRRow" id="qcu-Df-oql" customClass="PRRow" customModule="Trailer">
                                     <group key="rootItem" width="1" height="0.0" alignment="left" layout="vertical" radius="2" id="Uwj-Y1-PON">
                                         <items>
-                                            <label alignment="left" text="Title" numberOfLines="0" id="18g-kn-5Ie">
-                                                <fontDescription key="font" style="UICTFontTextStyleCaption1"/>
-                                            </label>
+                                            <group width="1" alignment="left" id="M7T-K5-ngQ">
+                                                <items>
+                                                    <label alignment="left" text="Title" numberOfLines="0" id="18g-kn-5Ie">
+                                                        <fontDescription key="font" style="UICTFontTextStyleCaption1"/>
+                                                    </label>
+                                                </items>
+                                            </group>
                                             <group alignment="left" spacing="4" id="lLA-39-zIL">
                                                 <items>
                                                     <group alignment="left" verticalAlignment="center" radius="7" id="1NN-Z1-C8E">
                                                         <items>
                                                             <label alignment="center" verticalAlignment="center" text="2" id="zum-4e-Nxi">
-                                                                <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                 <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
                                                             </label>
                                                         </items>
-                                                        <color key="backgroundColor" red="0.93725490199999995" green="0.93725490199999995" blue="0.95686274510000002" alpha="1" colorSpace="calibratedRGB"/>
-                                                        <edgeInsets key="margins" left="5" right="5" top="0.0" bottom="0.0"/>
+                                                        <color key="backgroundColor" red="0.93725490199999995" green="0.93725490199999995" blue="0.95686274510000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <edgeInsets key="margins" left="4" right="4" top="0.0" bottom="0.0"/>
                                                     </group>
                                                     <group alignment="left" verticalAlignment="center" radius="7" id="FFB-8c-hj1">
                                                         <items>
                                                             <label alignment="center" verticalAlignment="center" text="2" id="bd9-NV-xBM">
-                                                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                                <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                 <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
                                                             </label>
                                                         </items>
-                                                        <color key="backgroundColor" red="1" green="0.0" blue="0.070606581870000004" alpha="1" colorSpace="calibratedRGB"/>
-                                                        <edgeInsets key="margins" left="5" right="5" top="0.0" bottom="0.0"/>
+                                                        <color key="backgroundColor" red="1" green="0.0" blue="0.070606581870000004" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <edgeInsets key="margins" left="4" right="4" top="0.0" bottom="0.0"/>
                                                     </group>
                                                 </items>
                                             </group>
                                             <label alignment="left" text="Details" numberOfLines="0" id="jYX-bA-AMh">
                                                 <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
                                             </label>
-                                            <separator width="1" alignment="left" id="7Wr-VC-T3H">
-                                                <color key="color" white="0.18509615384615388" alpha="1" colorSpace="calibratedWhite"/>
-                                            </separator>
+                                            <group width="1" height="6" alignment="left" layout="vertical" id="5ld-tP-hjR">
+                                                <items>
+                                                    <separator width="1" height="1" alignment="center" verticalAlignment="bottom" id="7Wr-VC-T3H">
+                                                        <color key="color" red="0.18509615957736969" green="0.18509615957736969" blue="0.18509615957736969" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    </separator>
+                                                </items>
+                                            </group>
                                         </items>
-                                        <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                                        <edgeInsets key="margins" left="1" right="1" top="1" bottom="1"/>
+                                        <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <edgeInsets key="margins" left="0.0" right="0.0" top="4" bottom="0.0"/>
                                     </group>
                                     <connections>
                                         <outlet property="counterGroup" destination="lLA-39-zIL" id="c8q-hf-RoI"/>
@@ -190,7 +343,7 @@
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="332" y="41"/>
+            <point key="canvasLocation" x="110" y="9"/>
         </scene>
         <!--DetailController-->
         <scene sceneID="Y5a-NZ-okm">
@@ -206,7 +359,7 @@
                                     <group key="rootItem" width="1" height="0.0" alignment="left" spacing="3" id="gDg-ep-B9d">
                                         <items>
                                             <group width="2" height="1" heightAdjustment="-4" alignment="left" verticalAlignment="center" radius="1" id="K7J-4q-5nn">
-                                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             </group>
                                             <label alignment="left" text="Status" numberOfLines="0" id="EuO-JH-OaC">
                                                 <fontDescription key="font" type="system" pointSize="11"/>
@@ -226,7 +379,7 @@
                                                 <fontDescription key="font" type="system" pointSize="11"/>
                                             </label>
                                         </items>
-                                        <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                        <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <edgeInsets key="margins" left="0.0" right="0.0" top="0.0" bottom="0.0"/>
                                     </group>
                                     <connections>
@@ -237,22 +390,22 @@
                                     <group key="rootItem" width="1" height="0.0" alignment="left" spacing="3" id="WCb-Rn-fOj">
                                         <items>
                                             <group width="2" height="1" heightAdjustment="-4" alignment="left" verticalAlignment="center" radius="1" id="qDh-AS-kOq">
-                                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             </group>
                                             <group width="1" alignment="left" verticalAlignment="center" layout="vertical" id="taf-1t-g2x">
                                                 <items>
                                                     <group alignment="left" layout="vertical" radius="2" spacing="0.0" id="X19-Q9-hsv">
                                                         <items>
                                                             <label alignment="left" verticalAlignment="center" text="Username" numberOfLines="0" id="YGw-DU-AAO">
-                                                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                 <fontDescription key="font" type="system" weight="semibold" pointSize="10"/>
                                                             </label>
                                                             <label alignment="left" verticalAlignment="center" text="Date" numberOfLines="0" id="F8u-hY-oVq">
-                                                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                                 <fontDescription key="font" type="system" pointSize="10"/>
                                                             </label>
                                                         </items>
-                                                        <color key="backgroundColor" red="0.85520006613756616" green="0.85520006613756616" blue="0.85520006613756616" alpha="1" colorSpace="calibratedRGB"/>
+                                                        <color key="backgroundColor" red="0.85520006613756616" green="0.85520006613756616" blue="0.85520006613756616" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                         <edgeInsets key="margins" left="2" right="3" top="0.0" bottom="1"/>
                                                     </group>
                                                     <label width="0.0" alignment="left" text="Comment" textAlignment="justified" numberOfLines="0" id="wh3-Fx-D4A">
@@ -300,166 +453,8 @@
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="107" y="41"/>
-        </scene>
-        <!--Glance-->
-        <scene sceneID="rjY-Ar-IMT">
-            <objects>
-                <glanceController identifier="Glance" spacing="0.0" id="Sv0-Ai-Zie" customClass="GlanceController" customModule="Trailer">
-                    <items>
-                        <group alignment="left" layout="vertical" spacing="3" id="gv7-I2-MZq">
-                            <items>
-                                <group alignment="center" verticalAlignment="center" id="qSU-4X-8av">
-                                    <items>
-                                        <group alignment="center" verticalAlignment="center" radius="10" spacing="4" id="aEt-R2-txt">
-                                            <items>
-                                                <imageView width="20" height="20" alignment="left" verticalAlignment="center" image="GlancePrs" contentMode="scaleAspectFit" id="xYb-hC-O7D">
-                                                    <variation key="device=watch42mm" height="24" width="24"/>
-                                                </imageView>
-                                                <imageView width="20" height="20" alignment="left" verticalAlignment="center" image="GlanceIssues" contentMode="scaleAspectFit" id="J0s-24-eqf">
-                                                    <variation key="device=watch42mm" height="24" width="24"/>
-                                                </imageView>
-                                                <label alignment="right" verticalAlignment="center" text="43" textAlignment="center" id="3wl-rh-8m0">
-                                                    <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
-                                                    <fontDescription key="font" type="system" weight="medium" pointSize="28"/>
-                                                    <variation key="device=watch42mm">
-                                                        <fontDescription key="font" type="system" weight="medium" pointSize="30"/>
-                                                    </variation>
-                                                </label>
-                                            </items>
-                                            <color key="backgroundColor" red="0.20784313730000001" green="0.4823529412" blue="0.82352941180000006" alpha="1" colorSpace="calibratedRGB"/>
-                                            <edgeInsets key="margins" left="6" right="6" top="0.0" bottom="0.0"/>
-                                        </group>
-                                    </items>
-                                    <edgeInsets key="margins" left="17" right="0.0" top="0.0" bottom="0.0"/>
-                                </group>
-                                <group width="1" alignment="center" verticalAlignment="bottom" id="7EC-U2-2Hw">
-                                    <items>
-                                        <label alignment="center" verticalAlignment="center" alpha="0.89999999999999991" text="Refreshed" numberOfLines="0" id="Qer-7L-pJ7">
-                                            <color key="textColor" red="0.24918844710512633" green="0.58109372512270352" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                            <fontDescription key="font" type="system" weight="thin" pointSize="7"/>
-                                            <variation key="device=watch42mm">
-                                                <fontDescription key="font" type="system" weight="thin" pointSize="8"/>
-                                            </variation>
-                                        </label>
-                                    </items>
-                                    <edgeInsets key="margins" left="17" right="0.0" top="0.0" bottom="0.0"/>
-                                </group>
-                            </items>
-                            <edgeInsets key="margins" left="0.0" right="0.0" top="0.0" bottom="0.0"/>
-                        </group>
-                        <group alignment="left" layout="vertical" spacing="1" id="eew-Gs-W6Y">
-                            <items>
-                                <label alignment="center" verticalAlignment="center" text="Error Text" textAlignment="center" numberOfLines="0" id="UEh-Kg-DUS">
-                                    <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
-                                </label>
-                                <group width="130" alignment="center" verticalAlignment="center" radius="3" id="uLm-0J-NPT">
-                                    <items>
-                                        <label alignment="center" text="XX MINE" textAlignment="center" numberOfLines="0" id="fJB-oa-687">
-                                            <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
-                                            <fontDescription key="font" type="system" pointSize="11"/>
-                                            <variation key="device=watch42mm">
-                                                <fontDescription key="font" type="system" pointSize="12"/>
-                                            </variation>
-                                        </label>
-                                    </items>
-                                    <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    <edgeInsets key="margins" left="0.0" right="0.0" top="1" bottom="1"/>
-                                </group>
-                                <group width="130" alignment="center" verticalAlignment="center" radius="3" id="pi7-1E-Nwe">
-                                    <items>
-                                        <label alignment="center" text="XX PARTICIPATED" textAlignment="center" numberOfLines="0" id="E1B-vS-NEB">
-                                            <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
-                                            <fontDescription key="font" type="system" pointSize="11"/>
-                                            <variation key="device=watch42mm">
-                                                <fontDescription key="font" type="system" pointSize="12"/>
-                                            </variation>
-                                        </label>
-                                    </items>
-                                    <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    <edgeInsets key="margins" left="0.0" right="0.0" top="1" bottom="1"/>
-                                </group>
-                                <group width="130" alignment="center" verticalAlignment="center" radius="3" id="5Xx-J5-83g" userLabel="Mentioned Group">
-                                    <items>
-                                        <label alignment="center" text="XX MENTIONED" textAlignment="center" numberOfLines="0" id="ATT-Jm-sxQ" userLabel="XX MENTIONED">
-                                            <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
-                                            <fontDescription key="font" type="system" pointSize="11"/>
-                                            <variation key="device=watch42mm">
-                                                <fontDescription key="font" type="system" pointSize="12"/>
-                                            </variation>
-                                        </label>
-                                    </items>
-                                    <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    <edgeInsets key="margins" left="0.0" right="0.0" top="1" bottom="1"/>
-                                </group>
-                                <group width="130" alignment="center" verticalAlignment="center" radius="3" id="DRK-15-McU">
-                                    <items>
-                                        <label alignment="center" text="XX OTHER" textAlignment="center" numberOfLines="0" id="UFt-fx-TSE">
-                                            <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
-                                            <fontDescription key="font" type="system" pointSize="11"/>
-                                            <variation key="device=watch42mm">
-                                                <fontDescription key="font" type="system" pointSize="12"/>
-                                            </variation>
-                                        </label>
-                                    </items>
-                                    <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    <edgeInsets key="margins" left="0.0" right="0.0" top="1" bottom="1"/>
-                                </group>
-                                <group width="130" alignment="center" verticalAlignment="center" radius="3" id="W0L-Xq-nYX" userLabel="Snoozing Group">
-                                    <items>
-                                        <label alignment="center" text="XX SNOOZING" textAlignment="center" numberOfLines="0" id="ZOm-Vl-WvK" userLabel="XX SNOOZING">
-                                            <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
-                                            <fontDescription key="font" type="system" pointSize="11"/>
-                                            <variation key="device=watch42mm">
-                                                <fontDescription key="font" type="system" pointSize="12"/>
-                                            </variation>
-                                        </label>
-                                    </items>
-                                    <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    <edgeInsets key="margins" left="0.0" right="0.0" top="1" bottom="1"/>
-                                </group>
-                                <group width="130" alignment="center" verticalAlignment="center" radius="3" id="0Cl-jo-zPe">
-                                    <items>
-                                        <label alignment="center" text="XX UNREAD" textAlignment="center" numberOfLines="0" id="haI-qm-CXj">
-                                            <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
-                                            <fontDescription key="font" type="system" pointSize="11"/>
-                                            <variation key="device=watch42mm">
-                                                <fontDescription key="font" type="system" pointSize="12"/>
-                                            </variation>
-                                        </label>
-                                    </items>
-                                    <color key="backgroundColor" red="1" green="0.0" blue="0.070606581870000004" alpha="1" colorSpace="calibratedRGB"/>
-                                    <edgeInsets key="margins" left="0.0" right="0.0" top="1" bottom="1"/>
-                                </group>
-                            </items>
-                            <variation key="device=watch42mm" spacing="2"/>
-                        </group>
-                    </items>
-                    <edgeInsets key="margins" left="0.0" right="0.0" top="0.0" bottom="14"/>
-                    <connections>
-                        <outlet property="errorText" destination="UEh-Kg-DUS" id="EXo-cp-gZp"/>
-                        <outlet property="issueIcon" destination="J0s-24-eqf" id="m9V-84-tH5"/>
-                        <outlet property="lastUpdate" destination="Qer-7L-pJ7" id="LK4-aR-MUG"/>
-                        <outlet property="mentionedCount" destination="ATT-Jm-sxQ" id="nes-UQ-FFF"/>
-                        <outlet property="mentionedGroup" destination="5Xx-J5-83g" id="AKY-Vq-hfT"/>
-                        <outlet property="myCount" destination="fJB-oa-687" id="s3p-Ev-MQm"/>
-                        <outlet property="myGroup" destination="uLm-0J-NPT" id="TAR-rU-4Ux"/>
-                        <outlet property="otherCount" destination="UFt-fx-TSE" id="aiy-S8-LLd"/>
-                        <outlet property="otherGroup" destination="DRK-15-McU" id="ke6-3P-tzo"/>
-                        <outlet property="participatedCount" destination="E1B-vS-NEB" id="gwl-jI-qUt"/>
-                        <outlet property="participatedGroup" destination="pi7-1E-Nwe" id="xaG-ec-KND"/>
-                        <outlet property="prIcon" destination="xYb-hC-O7D" id="xyq-S7-npK"/>
-                        <outlet property="snoozingCount" destination="ZOm-Vl-WvK" id="ESV-BE-X3L"/>
-                        <outlet property="snoozingGroup" destination="W0L-Xq-nYX" id="hbj-zh-fiP"/>
-                        <outlet property="totalCount" destination="3wl-rh-8m0" id="BgR-8y-n1Z"/>
-                        <outlet property="totalGroup" destination="aEt-R2-txt" id="csy-mJ-Tf1"/>
-                        <outlet property="unreadCount" destination="haI-qm-CXj" id="djY-l5-Twe"/>
-                        <outlet property="unreadGroup" destination="0Cl-jo-zPe" id="Mpv-kh-MHE"/>
-                    </connections>
-                </glanceController>
-            </objects>
-            <point key="canvasLocation" x="332" y="339"/>
+            <point key="canvasLocation" x="331" y="-43"/>
         </scene>
     </scenes>
-    <color key="tintColor" red="0.20784313730000001" green="0.4823529412" blue="0.82352941180000006" alpha="1" colorSpace="calibratedRGB"/>
+    <color key="tintColor" red="0.20784313730000001" green="0.4823529412" blue="0.82352941180000006" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
 </document>

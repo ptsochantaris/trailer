@@ -4,6 +4,8 @@ import WatchConnectivity
 
 final class SectionController: CommonController {
 
+	////////////////////// List
+
 	@IBOutlet weak var table: WKInterfaceTable!
 	@IBOutlet weak var statusLabel: WKInterfaceLabel!
 
@@ -74,6 +76,12 @@ final class SectionController: CommonController {
 		return Section(rawValue: Section.apiTitles.index(of: apiName)!)!
 	}
 
+	func resetUI() {
+		if table.numberOfRows > 0 {
+			table.scrollToRow(at: 0)
+		}
+	}
+
 	private func updateUI() {
 
 		rowControllers.removeAll(keepingCapacity: false)
@@ -122,18 +130,25 @@ final class SectionController: CommonController {
 			}
 		}
 
-		if let result = WCSession.default().receivedApplicationContext["overview"] as? [String : AnyObject] {
+		if let result = WCSession.default().receivedApplicationContext["overview"] as? [String : AnyObject],
+			let views = result["views"] as? [[String : AnyObject]] {
 
-			let views = result["views"]
-			let showEmptyDescriptions = views?.count == 1
-			for v in views as! [[String : AnyObject]] {
+			let showEmptyDescriptions = views.count == 1
+
+			let s = SummaryRow()
+			if s.setSummary(result) {
+				rowControllers.append(s)
+			}
+
+			for v in views {
 				let label = v["title"] as! String
 				let apiServerUri = v["apiUri"] as! String
 				addSectionsFor(v, itemType: "prs", label: label, apiServerUri: apiServerUri, header: "Pull Requests", showEmptyDescriptions: showEmptyDescriptions)
 				addSectionsFor(v, itemType: "issues", label: label, apiServerUri: apiServerUri, header: "Issues", showEmptyDescriptions: showEmptyDescriptions)
 			}
 
-			table.setRowTypes(rowControllers.map({ $0.rowType() }))
+			let rowTypes = rowControllers.map { $0.rowType() }
+			table.setRowTypes(rowTypes)
 
 			var index = 0
 			for rc in rowControllers {

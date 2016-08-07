@@ -31,13 +31,11 @@ final class PRRow: NSObject {
 
 		let c = itemData["commentCount"] as? Int ?? 0
 		totalCommentsL.setText("\(c)")
-		totalCommentsGroup.setHidden(c==0)
+		totalCommentsGroup.setAlpha(c > 0 ? 1.0 : 0.4)
 
 		let u = itemData["unreadCount"] as? Int ?? 0
 		unreadCommentsL.setText("\(u)")
+		unreadCommentsGroup.setAlpha(u > 0 ? 1.0 : 0.4)
 		hasUnread = u>0
-		unreadCommentsGroup.setHidden(!hasUnread)
-
-		counterGroup.setHidden(c+u==0)
 	}
 }

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="9532" systemVersion="15D21" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="M4Y-Lb-cyx">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11185.3" systemVersion="15G31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" colorMatched="YES" initialViewController="M4Y-Lb-cyx">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9530"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11151.4"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
         <!--Today View Controller-->
@@ -13,31 +15,28 @@
                         <viewControllerLayoutGuide type="bottom" id="FKl-LY-JtV"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" verticalHuggingPriority="251" simulatedAppContext="notificationCenter" id="S3S-Oj-5AN">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="95"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="dX5-UL-dra">
-                                <rect key="frame" x="4" y="40" width="15" height="15"/>
-                                <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="15" id="a1w-E6-1Cj"/>
                                     <constraint firstAttribute="height" constant="15" id="zR0-Fa-Hjp"/>
                                 </constraints>
                             </imageView>
                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="oQw-hA-EBD">
-                                <rect key="frame" x="2" y="11" width="17" height="17"/>
-                                <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="17" id="YWE-Aj-drj"/>
                                     <constraint firstAttribute="width" constant="17" id="izW-WB-Q51"/>
                                 </constraints>
                             </imageView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="1000" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="quz-Tb-Fw0" userLabel="Prs">
-                                <rect key="frame" x="24" y="10" width="292" height="20"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalCompressionResistancePriority="1000" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="quz-Tb-Fw0" userLabel="Prs">
                                 <attributedString key="attributedText">
                                     <fragment content="Loading...">
                                         <attributes>
-                                            <color key="NSColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                            <color key="NSColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             <font key="NSFont" size="17" name="HelveticaNeue"/>
                                             <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
                                         </attributes>
@@ -45,12 +44,11 @@
                                 </attributedString>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="1000" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LSV-z6-vQv" userLabel="Issues">
-                                <rect key="frame" x="24" y="38" width="292" height="20"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalCompressionResistancePriority="1000" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LSV-z6-vQv" userLabel="Issues">
                                 <attributedString key="attributedText">
                                     <fragment content="Loading...">
                                         <attributes>
-                                            <color key="NSColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                            <color key="NSColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             <font key="NSFont" size="17" name="HelveticaNeue"/>
                                             <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
                                         </attributes>
@@ -58,12 +56,11 @@
                                 </attributedString>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="1000" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Yh8-Pg-XrK" userLabel="Lastupdated">
-                                <rect key="frame" x="24" y="65" width="292" height="20"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalCompressionResistancePriority="1000" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Yh8-Pg-XrK" userLabel="Lastupdated">
                                 <attributedString key="attributedText">
                                     <fragment content="Loading...">
                                         <attributes>
-                                            <color key="NSColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                            <color key="NSColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             <font key="NSFont" size="17" name="HelveticaNeue"/>
                                             <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
                                         </attributes>
@@ -76,8 +73,7 @@
                             <constraint firstItem="Yh8-Pg-XrK" firstAttribute="width" secondItem="LSV-z6-vQv" secondAttribute="width" id="1uX-4t-yh3"/>
                             <constraint firstItem="Yh8-Pg-XrK" firstAttribute="top" secondItem="LSV-z6-vQv" secondAttribute="bottom" constant="7" id="2cn-xu-RoM"/>
                             <constraint firstItem="quz-Tb-Fw0" firstAttribute="top" secondItem="Ft6-oW-KC0" secondAttribute="bottom" constant="10" id="AQO-Kn-cf8"/>
-                            <constraint firstItem="oQw-hA-EBD" firstAttribute="leading" secondItem="S3S-Oj-5AN" secondAttribute="leading" constant="2" id="DtG-HF-I5p"/>
-                            <constraint firstItem="FKl-LY-JtV" firstAttribute="top" secondItem="Yh8-Pg-XrK" secondAttribute="bottom" priority="750" id="HL8-wC-9QW"/>
+                            <constraint firstItem="oQw-hA-EBD" firstAttribute="leading" secondItem="S3S-Oj-5AN" secondAttribute="leadingMargin" id="DtG-HF-I5p"/>
                             <constraint firstItem="quz-Tb-Fw0" firstAttribute="leading" secondItem="oQw-hA-EBD" secondAttribute="trailing" constant="5" id="J6F-3W-GKR"/>
                             <constraint firstItem="LSV-z6-vQv" firstAttribute="width" secondItem="quz-Tb-Fw0" secondAttribute="width" id="KpW-De-G8i"/>
                             <constraint firstItem="dX5-UL-dra" firstAttribute="top" secondItem="LSV-z6-vQv" secondAttribute="top" constant="2" id="MgU-ma-ExW"/>
@@ -85,7 +81,7 @@
                             <constraint firstItem="Yh8-Pg-XrK" firstAttribute="leading" secondItem="LSV-z6-vQv" secondAttribute="leading" id="Xov-hs-D1j"/>
                             <constraint firstItem="LSV-z6-vQv" firstAttribute="leading" secondItem="dX5-UL-dra" secondAttribute="trailing" constant="5" id="ZUe-Y7-MjJ"/>
                             <constraint firstItem="LSV-z6-vQv" firstAttribute="top" secondItem="quz-Tb-Fw0" secondAttribute="bottom" constant="8" id="ZsH-fK-61x"/>
-                            <constraint firstAttribute="trailing" secondItem="quz-Tb-Fw0" secondAttribute="trailing" constant="4" id="bQE-on-uHE"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="quz-Tb-Fw0" secondAttribute="trailing" id="bQE-on-uHE"/>
                             <constraint firstItem="LSV-z6-vQv" firstAttribute="leading" secondItem="quz-Tb-Fw0" secondAttribute="leading" id="oON-JI-UTm"/>
                         </constraints>
                     </view>
@@ -93,7 +89,8 @@
                     <nil key="simulatedStatusBarMetrics"/>
                     <nil key="simulatedTopBarMetrics"/>
                     <nil key="simulatedBottomBarMetrics"/>
-                    <simulatedScreenMetrics key="simulatedDestinationMetrics"/>
+                    <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+                    <size key="freeformSize" width="375" height="95"/>
                     <connections>
                         <outlet property="issueImage" destination="dX5-UL-dra" id="V7N-R4-BDr"/>
                         <outlet property="issuesLabel" destination="LSV-z6-vQv" id="T9t-kT-XQf"/>
@@ -104,7 +101,12 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vXp-U4-Rya" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="357" y="296"/>
+            <point key="canvasLocation" x="356.5" y="296"/>
         </scene>
     </scenes>
+    <simulatedMetricsContainer key="defaultSimulatedMetrics">
+        <simulatedStatusBarMetrics key="statusBar"/>
+        <simulatedOrientationMetrics key="orientation"/>
+        <simulatedScreenMetrics key="destination" type="retina4_7.fullscreen"/>
+    </simulatedMetricsContainer>
 </document>

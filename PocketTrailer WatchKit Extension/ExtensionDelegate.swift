@@ -61,6 +61,21 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 		lastView = nil
 	}
 
+	@available(watchOSApplicationExtension 3.0, *)
+	func handle(_ backgroundTasks: Set<WKRefreshBackgroundTask>) {
+		for task in backgroundTasks {
+			if let t = task as? WKSnapshotRefreshBackgroundTask {
+				if t.returnToDefaultState {
+					lastView?.popToRootController()
+					(lastView as? SectionController)?.resetUI()
+				}
+				t.setTaskCompleted(restoredDefaultState: t.returnToDefaultState, estimatedSnapshotExpiration: Date.distantFuture, userInfo: nil)
+			} else {
+				task.setTaskCompleted()
+			}
+		}
+	}
+
 	func updateComplications() {
 		let complicationServer = CLKComplicationServer.sharedInstance()
 		if let activeComplications = complicationServer.activeComplications {

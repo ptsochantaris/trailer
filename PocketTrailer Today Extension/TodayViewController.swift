@@ -16,24 +16,24 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 	@IBOutlet weak var issueImage: UIImageView!
 
 	private let paragraph = NSMutableParagraphStyle()
-
-	private var brightAttributes: [String : AnyObject] {
+	private let newOS = ProcessInfo().isOperatingSystemAtLeast(OperatingSystemVersion(majorVersion: 10, minorVersion: 0, patchVersion: 0))
+	private var titleAttributes: [String : AnyObject] {
 		return [
-			NSForegroundColorAttributeName: UIColor.white,
+			NSForegroundColorAttributeName: newOS ? UIColor.black : UIColor.white,
 			NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.systemFontSize+2.0),
 			NSParagraphStyleAttributeName: paragraph ]
 	}
 
 	private var normalAttributes: [String : AnyObject] {
 		return [
-			NSForegroundColorAttributeName: UIColor.lightGray,
+			NSForegroundColorAttributeName: UIColor.darkGray,
 			NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.systemFontSize+2.0),
 			NSParagraphStyleAttributeName: paragraph ]
 	}
 
 	private var dimAttributes: [String : AnyObject] {
 		return [
-			NSForegroundColorAttributeName: UIColor.darkGray,
+			NSForegroundColorAttributeName: UIColor.lightGray,
 			NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.systemFontSize+2.0),
 			NSParagraphStyleAttributeName: paragraph ]
 	}
@@ -69,6 +69,11 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 		prImage.image = UIImage(named: "prsTab")?.withRenderingMode(.alwaysTemplate)
 		issueImage.image = UIImage(named: "issuesTab")?.withRenderingMode(.alwaysTemplate)
 
+		if newOS {
+			prImage.tintColor = UIColor.black
+			issueImage.tintColor = UIColor.black
+		}
+
 		paragraph.paragraphSpacing = 4
 
 		prButton = UIButton(type: UIButtonType.custom)
@@ -89,13 +94,22 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 	}
 
 	override func viewDidLayoutSubviews() {
-		prLabel.preferredMaxLayoutWidth = prLabel.frame.size.width
 		prButton.frame = prLabel.frame
-
-		issuesLabel.preferredMaxLayoutWidth = issuesLabel.frame.size.width
 		issuesButton.frame = issuesLabel.frame
+		let H = updatedLabel.frame.origin.y + updatedLabel.frame.size.height
+		let offset: CGFloat = newOS ? 10 : 0
+		preferredContentSize = CGSize(width: view.frame.size.width, height: H + offset)
+		super.viewDidLayoutSubviews()
+	}
 
-		updatedLabel.preferredMaxLayoutWidth = updatedLabel.frame.size.width
+	func widgetMarginInsets(forProposedMarginInsets defaultMarginInsets: UIEdgeInsets) -> UIEdgeInsets {
+		if newOS {
+			return defaultMarginInsets
+		} else {
+			var i = defaultMarginInsets
+			i.bottom -= 15
+			return i
+		}
 	}
 
 	private func update() {
@@ -145,8 +159,8 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 				}
 
 				let totalCount = totalMerged+totalMine+totalParticipated+totalClosed+totalMentioned+totalSnoozed+totalOther
-				let a = NSMutableAttributedString(string: "\(totalCount): ", attributes: brightAttributes)
-				if totalCount>0 {
+				let a = NSMutableAttributedString(string: "\(totalCount): ", attributes: titleAttributes)
+				if totalCount > 0 {
 					append(a, count: totalMine, section: .mine)
 					append(a, count: totalParticipated, section: .participated)
 					append(a, count: totalMentioned, section: .mentioned)
@@ -179,18 +193,7 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 	}
 
 	func widgetPerformUpdate(completionHandler: ((NCUpdateResult) -> Void)) {
-		// If an error is encountered, use NCUpdateResult.Failed
-		// If there's no update required, use NCUpdateResult.NoData
-		// If there's an update, use NCUpdateResult.NewData
-
 		update()
-
-		completionHandler(NCUpdateResult.newData)
-	}
-
-	func widgetMarginInsets(forProposedMarginInsets defaultMarginInsets: UIEdgeInsets) -> UIEdgeInsets {
-		var insets = defaultMarginInsets
-		insets.bottom -= 15.0
-		return insets
+		completionHandler(.newData)
 	}
 }

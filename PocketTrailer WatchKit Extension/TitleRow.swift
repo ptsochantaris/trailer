@@ -3,9 +3,9 @@ import WatchKit
 
 final class TitleRow: NSObject, PopulatableRow {
 	var title: String?
-	func populateFrom(_ other: PopulatableRow) {
-		if let other = other as? TitleRow {
-			titleL.setText(other.title)
+	func populateFrom(_ other: AnyObject) {
+		if let o = other as? TitleRow {
+			titleL.setText(o.title)
 		}
 	}
 	func rowType() -> String {
