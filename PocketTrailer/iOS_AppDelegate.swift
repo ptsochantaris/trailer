@@ -23,6 +23,13 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 	}
 
 	func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [NSObject : AnyObject]?) -> Bool {
+
+		if mainObjectContext.persistentStoreCoordinator == nil {
+			DLog("Database was corrupted on startup, removing DB files and resetting")
+			DataManager.removeDatabaseFiles()
+			abort()
+		}
+
 		app = self
 		justPostedNotificationTimer = PopTimer(timeInterval: 2) { [weak self] in
 			self?.justPostedNotifications = false
@@ -313,9 +320,9 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 		actOnLocalNotification = true
 	}
 
-	func postNotificationOfType(type: NotificationType, forItem: DataItem) {
+	func postNotification(type: NotificationType, forItem: DataItem) {
 		justPostedNotifications = true
-		NotificationManager.postNotificationOfType(type: type, forItem: forItem)
+		NotificationManager.postNotification(type: type, forItem: forItem)
 		if UIApplication.shared.applicationState == .background {
 			justPostedNotifications = false
 		} else {

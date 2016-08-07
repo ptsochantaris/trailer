@@ -52,7 +52,7 @@ final class PRComment: DataItem {
 					DLog("Waking up snoozed item ID %@ because of mention", item.serverId)
 					item.wakeUp()
 				}
-				app.postNotificationOfType(type: .newMention, forItem: self)
+				app.postNotification(type: .newMention, forItem: self)
 			} else if !isMine {
 				if item.isSnoozing && Settings.snoozeWakeOnComment {
 					DLog("Waking up snoozed item ID %@ because of posted comment", item.serverId)
@@ -72,7 +72,7 @@ final class PRComment: DataItem {
 							DLog("Blocked notification for user '%@' as their name is on the blacklist",authorName)
 						} else {
 							DLog("User '%@' not on blacklist, can post notification",authorName)
-							app.postNotificationOfType(type: .newComment, forItem:self)
+							app.postNotification(type: .newComment, forItem:self)
 						}
 					}
 				}

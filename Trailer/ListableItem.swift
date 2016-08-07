@@ -195,7 +195,7 @@ class ListableItem: DataItem {
 		if snoozeUntil != nil {
 			snoozeUntil = nil
 		} else {
-			app.postNotificationOfType(type: notification, forItem: self)
+			app.postNotification(type: notification, forItem: self)
 		}
 	}
 

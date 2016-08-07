@@ -63,6 +63,12 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	func applicationDidFinishLaunching(_ notification: Notification) {
+
+		if mainObjectContext.persistentStoreCoordinator == nil {
+			databaseErrorOnStartup()
+			return
+		}
+
 		app = self
 
 		DistributedNotificationCenter.default().addObserver(self, selector: #selector(OSX_AppDelegate.updateDarkMode), name: "AppleInterfaceThemeChangedNotification" as NSNotification.Name, object: nil)
@@ -194,7 +200,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		NSUserNotificationCenter.default.removeDeliveredNotification(notification)
 	}
 
-	func postNotificationOfType(_ type: NotificationType, forItem: DataItem) {
+	func postNotification(type: NotificationType, forItem: DataItem) {
 		if preferencesDirty {
 			return
 		}
@@ -989,6 +995,30 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			d.prMenu.updateVibrancy()
 			d.issuesMenu.updateVibrancy()
 		}
+	}
+
+	//////////////////////// Database error on startup
+
+	private func databaseErrorOnStartup() {
+		let alert = NSAlert()
+		alert.messageText = "Database error"
+		alert.informativeText = "Trailer encountered an error when trying to load the database.\n\nThis could be because of a failed upgrade or a software bug.\n\nPlease either quit and downgrade to the previous version, or reset the Trailer's state and setup from a fresh state."
+		alert.addButton(withTitle: "Quit")
+		alert.addButton(withTitle: "Reset Trailer")
+
+		if alert.runModal() == NSAlertSecondButtonReturn {
+			DataManager.removeDatabaseFiles()
+			restartApp()
+		}
+		NSApp.terminate(self)
+	}
+
+	// With many thanks to http://vgable.com/blog/2008/10/05/restarting-your-cocoa-application/
+	private func restartApp() {
+		let ourPID = "\(ProcessInfo.processInfo.processIdentifier)"
+		let shArgs = ["-c", "kill -9 $1 \n sleep 1 \n open \"$2\"", "", ourPID, Bundle.main.bundlePath]
+		let restartTask = Task.launchedTask(withLaunchPath: "/bin/sh", arguments:shArgs)
+		restartTask.waitUntilExit()
 	}
 
 	//////////////////////// Dark mode

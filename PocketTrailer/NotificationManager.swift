@@ -19,7 +19,7 @@ final class NotificationManager {
 		return false
 	}
 
-	class func postNotificationOfType(type: NotificationType, forItem: DataItem) {
+	class func postNotification(type: NotificationType, forItem: DataItem) {
 		if preferencesDirty {
 			return
 		}

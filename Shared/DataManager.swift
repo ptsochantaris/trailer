@@ -9,6 +9,9 @@ final class DataManager {
 	static var postMigrationRepoIssuePolicy: RepoDisplayPolicy?
 
 	class func checkMigration() {
+
+		guard mainObjectContext.persistentStoreCoordinator?.persistentStores.count > 0 else { return }
+
 		if Settings.lastRunVersion != versionString() {
 			DLog("VERSION UPDATE MAINTENANCE NEEDED")
 			#if os(iOS)
@@ -115,15 +118,15 @@ final class DataManager {
 				if i.isVisibleOnMenu {
 					if !i.createdByMe {
 						if !(i.isNewAssignment?.boolValue ?? false) && !(i.announced?.boolValue ?? false) {
-							app.postNotificationOfType(type: newNotification, forItem: i)
+							app.postNotification(type: newNotification, forItem: i)
 							i.announced = true
 						}
 						if let reopened = i.reopened?.boolValue, reopened == true {
-							app.postNotificationOfType(type: reopenedNotification, forItem: i)
+							app.postNotification(type: reopenedNotification, forItem: i)
 							i.reopened = false
 						}
 						if let newAssignment = i.isNewAssignment?.boolValue, newAssignment == true {
-							app.postNotificationOfType(type: assignmentNotification, forItem: i)
+							app.postNotification(type: assignmentNotification, forItem: i)
 							i.isNewAssignment = false
 						}
 					}
@@ -165,7 +168,7 @@ final class DataManager {
 									DLog("Waking up snoozed PR ID %@ because of a status update", pr.serverId)
 									pr.wakeUp()
 								}
-								app.postNotificationOfType(type: .newStatus, forItem: s)
+								app.postNotification(type: .newStatus, forItem: s)
 								pr.lastStatusNotified = displayText
 							}
 						} else {
@@ -273,7 +276,7 @@ final class DataManager {
 		return FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.Trailer")!
 	}
 
-	private class func removeDatabaseFiles() {
+	class func removeDatabaseFiles() {
 		let fm = FileManager.default
 		let documentsDirectory = dataFilesDirectory().path
 		do {
@@ -303,47 +306,31 @@ final class DataManager {
 		let dataDir = dataFilesDirectory()
 		let sqlStorePath = dataDir.appendingPathComponent("Trailer.sqlite")
 
-		func addStorePath(_ newCoordinator: NSPersistentStoreCoordinator) -> Bool {
-			do {
-				try newCoordinator.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: sqlStorePath, options: storeOptions)
-				return true
-			} catch let error as NSError {
-				DLog("Error while mounting DB store: %@", error.localizedDescription)
-				return false
-			} catch { // Swift compiler bug, this should never get executed
-				DLog("Error while mounting DB store: Unknown")
-				return false
-			}
-		}
-
 		let modelPath = Bundle.main.url(forResource: "Trailer", withExtension: "momd")!
 		let mom = NSManagedObjectModel(contentsOf: modelPath)!
 
 		let fileManager = FileManager.default
 		if fileManager.fileExists(atPath: sqlStorePath.path) {
-			let m = try! NSPersistentStoreCoordinator.metadataForPersistentStore(ofType: NSSQLiteStoreType, at: sqlStorePath, options: nil)
-			_justMigrated = !mom.isConfiguration(withName: nil, compatibleWithStoreMetadata: m)
+			if let m = try? NSPersistentStoreCoordinator.metadataForPersistentStore(ofType: NSSQLiteStoreType, at: sqlStorePath, options: nil) {
+				_justMigrated = !mom.isConfiguration(withName: nil, compatibleWithStoreMetadata: m)
+			}
 		} else {
 			try! fileManager.createDirectory(atPath: dataDir.path, withIntermediateDirectories: true, attributes: nil)
 		}
 
-		var persistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel:mom)
-		if !addStorePath(persistentStoreCoordinator) {
-			DLog("Failed to migrate/load DB store - will nuke it and retry")
-			removeDatabaseFiles()
-
-			persistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel:mom)
-			if !addStorePath(persistentStoreCoordinator) {
-				DLog("Catastrophic failure, app is probably corrupted and needs reinstall")
-				abort()
-			}
-		}
-
 		let m = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
 		m.undoManager = nil
-		m.persistentStoreCoordinator = persistentStoreCoordinator
 		m.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
-		DLog("Database setup complete")
+
+		do {
+			let persistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel: mom)
+			try persistentStoreCoordinator.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: sqlStorePath, options: storeOptions)
+			m.persistentStoreCoordinator = persistentStoreCoordinator
+			DLog("Database setup complete")
+		} catch {
+			DLog("Database setup error: %@", (error as NSError).localizedDescription)
+		}
+
 		return m
 	}
 }

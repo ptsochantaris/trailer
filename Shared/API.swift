@@ -535,7 +535,7 @@ final class API {
 						r.displayPolicyForPrs = Settings.displayPolicyForNewPrs
 						r.displayPolicyForIssues = Settings.displayPolicyForNewIssues
 						if r.shouldSync {
-							app.postNotificationOfType(type: .newRepoAnnouncement, forItem:r)
+							app.postNotification(type: .newRepoAnnouncement, forItem:r)
 						}
 					}
 					lastRepoCheck = Date()
