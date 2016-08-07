@@ -9,8 +9,7 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 	@IBOutlet weak var issuesLabel: UILabel!
 	@IBOutlet weak var updatedLabel: UILabel!
 
-	var prButton: UIButton!
-	var issuesButton: UIButton!
+	var linkButton: UIButton!
 
 	@IBOutlet weak var prImage: UIImageView!
 	@IBOutlet weak var issueImage: UIImageView!
@@ -76,15 +75,10 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 
 		paragraph.paragraphSpacing = 4
 
-		prButton = UIButton(type: UIButtonType.custom)
-		prButton.addTarget(self, action: #selector(TodayViewController.widgetTapped), for: .touchUpInside)
-		prButton.setBackgroundImage(imageFromColor(UIColor(white: 1.0, alpha: 0.2)), for: .highlighted)
-		view.addSubview(prButton)
-
-		issuesButton = UIButton(type: UIButtonType.custom)
-		issuesButton.addTarget(self, action: #selector(TodayViewController.widgetTapped), for: .touchUpInside)
-		issuesButton.setBackgroundImage(imageFromColor(UIColor(white: 1.0, alpha: 0.2)), for: .highlighted)
-		view.addSubview(issuesButton)
+		linkButton = UIButton(type: UIButtonType.custom)
+		linkButton.addTarget(self, action: #selector(TodayViewController.widgetTapped), for: .touchUpInside)
+		linkButton.setBackgroundImage(imageFromColor(UIColor(white: 1.0, alpha: 0.2)), for: .highlighted)
+		view.addSubview(linkButton)
 
 		update()
 	}
@@ -94,9 +88,8 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 	}
 
 	override func viewDidLayoutSubviews() {
-		prButton.frame = prLabel.frame
-		issuesButton.frame = issuesLabel.frame
-		let H = updatedLabel.frame.origin.y + updatedLabel.frame.size.height
+		linkButton.frame = prLabel.frame.union(updatedLabel.frame)
+		let H = linkButton.frame.origin.y + linkButton.frame.size.height
 		let offset: CGFloat = newOS ? 10 : 0
 		preferredContentSize = CGSize(width: view.frame.size.width, height: H + offset)
 		super.viewDidLayoutSubviews()
