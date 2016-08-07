@@ -81,6 +81,12 @@ final class MenuBarSet {
 		}
 	}
 
+	private static let redText = [ NSFontAttributeName: NSFont.boldSystemFont(ofSize: 10),
+	                               NSForegroundColorAttributeName: MAKECOLOR(0.8, 0.0, 0.0, 1.0) ]
+
+	private static let normalText = [ NSFontAttributeName: NSFont.menuBarFont(ofSize: 10),
+	                                  NSForegroundColorAttributeName: NSColor.controlTextColor ]
+
 	private func updateMenu(_ type: String,
 	                        menu: MenuWindow,
 	                        lengthOffset: CGFloat,
@@ -88,48 +94,25 @@ final class MenuBarSet {
 	                        hasUnread: ()->Bool,
 	                        reasonForEmpty: (String)->NSAttributedString) {
 
-		func redText() -> [String : AnyObject] {
-			return [ NSFontAttributeName: NSFont.boldSystemFont(ofSize: 10),
-			         NSForegroundColorAttributeName: MAKECOLOR(0.8, 0.0, 0.0, 1.0) ]
-		}
-
-		func normalText() -> [String : AnyObject] {
-			return [ NSFontAttributeName: NSFont.menuBarFont(ofSize: 10),
-			         NSForegroundColorAttributeName: NSColor.controlTextColor ]
-		}
-
 		let countString: String
-		let attributes: [String : AnyObject]
-		let somethingFailed = ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext)
+		let somethingFailed = ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext) && (viewCriterion?.relatedServerFailed ?? true)
+		let attributes = somethingFailed || hasUnread() ? MenuBarSet.redText : MenuBarSet.normalText
 		let preFilterCount: Int
 
-		if somethingFailed && (viewCriterion?.relatedServerFailed ?? true) {
-			countString = "X"
-			attributes = redText()
-			preFilterCount = 0
+		if Settings.countOnlyListedItems {
+			let f = ListableItem.requestForItemsOfType(type, withFilter: menu.filter.stringValue, sectionIndex: -1, criterion: viewCriterion)
+			countString = somethingFailed ? "X" : String(try! mainObjectContext.count(for: f))
+			let fc = ListableItem.requestForItemsOfType(type, withFilter: nil, sectionIndex: -1, criterion: viewCriterion)
+			preFilterCount = try! mainObjectContext.count(for: fc)
 		} else {
-
-			if Settings.countOnlyListedItems {
-				let f = ListableItem.requestForItemsOfType(type, withFilter: menu.filter.stringValue, sectionIndex: -1, criterion: viewCriterion)
-				countString = String(try! mainObjectContext.count(for: f))
-				let fc = ListableItem.requestForItemsOfType(type, withFilter: nil, sectionIndex: -1, criterion: viewCriterion)
-				preFilterCount = try! mainObjectContext.count(for: fc)
-			} else {
-				preFilterCount = totalCount()
-				countString = String(preFilterCount)
-			}
-
-			if hasUnread() {
-				attributes = redText()
-			} else {
-				attributes = normalText()
-			}
+			preFilterCount = totalCount()
+			countString = somethingFailed ? "X" : String(preFilterCount)
 		}
 
 		DLog("Updating \(type) menu, \(countString) total items")
 
 		let itemLabel = viewCriterion?.label
-		let disable = (itemLabel != nil && preFilterCount == 0) && !(forceVisible && type == "PullRequest")
+		let disable = itemLabel != nil && preFilterCount == 0 && !(forceVisible && type == "PullRequest")
 
 		if disable {
 			menu.hideStatusItem()
