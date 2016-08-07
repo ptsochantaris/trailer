@@ -4,7 +4,18 @@ import WatchConnectivity
 final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 
 	func getNextRequestedUpdateDate(handler: (Date?) -> Void) {
-		handler(Date().addingTimeInterval(60))
+		if ProcessInfo().isOperatingSystemAtLeast(OperatingSystemVersion(majorVersion: 3, minorVersion: 0, patchVersion: 0)) {
+			handler(nil)
+		} else {
+			handler(Date().addingTimeInterval(60))
+		}
+	}
+
+	func requestedUpdateDidBegin() {
+		let s = CLKComplicationServer.sharedInstance()
+		for c in s.activeComplications ?? [] {
+			s.reloadTimeline(for: c)
+		}
 	}
 
 	func getPlaceholderTemplate(for complication: CLKComplication, withHandler handler: (CLKComplicationTemplate?) -> Void) {
@@ -101,12 +112,21 @@ final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 			t.line1ImageProvider = CLKImageProvider(onePieceImage: UIImage(named: issues ? "ComplicationIssues" : "ComplicationPrs")!)
 			t.line2TextProvider = CLKSimpleTextProvider(text: count(issues ? issueCount : prCount, unit: nil))
 			return t
-		case .modularLarge, .extraLarge:
+		case .modularLarge:
 			let t = CLKComplicationTemplateModularLargeStandardBody()
 			t.headerImageProvider = CLKImageProvider(onePieceImage: UIImage(named: "ComplicationPrs")!)
-			t.headerTextProvider = CLKSimpleTextProvider(text: count(commentCount, unit: "New Comment"))
+			t.headerTextProvider = CLKSimpleTextProvider(text: count(commentCount, unit: "Comment"))
 			t.body1TextProvider = CLKSimpleTextProvider(text: count(prCount, unit: "Pull Request"))
 			t.body2TextProvider = CLKSimpleTextProvider(text: count(issueCount, unit: "Issue"))
+			return t
+		case .extraLarge:
+			let t = CLKComplicationTemplateExtraLargeColumnsText()
+			t.row1Column2TextProvider = CLKSimpleTextProvider(text: "\(issues ? (issueCount ?? 0) : (prCount ?? 0))")
+			t.row1Column1TextProvider = CLKSimpleTextProvider(text: issues ? "Iss" : "PRs")
+			t.row2Column2TextProvider = CLKSimpleTextProvider(text: commentCount == 0 ? "-" : "\(commentCount)")
+			t.row2Column1TextProvider = CLKSimpleTextProvider(text: "Com")
+			t.column2Alignment = .trailing
+			t.highlightColumn2 = commentCount > 0
 			return t
  		case .utilitarianSmallFlat, .utilitarianSmall:
 			let t = CLKComplicationTemplateUtilitarianSmallFlat()
