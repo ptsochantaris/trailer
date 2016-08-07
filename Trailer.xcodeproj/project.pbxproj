@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 47;
+	objectVersion = 48;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -894,8 +894,8 @@
 				TargetAttributes = {
 					1618527A1AB2CB9000526D81 = {
 						CreatedOnToolsVersion = 6.2;
-						DevelopmentTeam = X727JSJUGJ;
 						LastSwiftMigration = 0800;
+						ProvisioningStyle = Manual;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
 								enabled = 1;
@@ -903,8 +903,8 @@
 						};
 					};
 					1628A6B018789E73005EDA69 = {
-						DevelopmentTeam = X727JSJUGJ;
 						LastSwiftMigration = 0800;
+						ProvisioningStyle = Manual;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
 								enabled = 1;
@@ -919,8 +919,8 @@
 					};
 					16522D6F1AB03AE500B1C3FB = {
 						CreatedOnToolsVersion = 6.2;
-						DevelopmentTeam = X727JSJUGJ;
 						LastSwiftMigration = 0800;
+						ProvisioningStyle = Manual;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
 								enabled = 0;
@@ -929,12 +929,12 @@
 					};
 					16522D7B1AB03AE500B1C3FB = {
 						CreatedOnToolsVersion = 6.2;
-						DevelopmentTeam = X727JSJUGJ;
 						LastSwiftMigration = 0800;
+						ProvisioningStyle = Manual;
 					};
 					168BC6A917EC2DF000BC4584 = {
-						DevelopmentTeam = X727JSJUGJ;
 						LastSwiftMigration = 0800;
+						ProvisioningStyle = Manual;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.Mac = {
 								enabled = 1;
@@ -944,7 +944,7 @@
 				};
 			};
 			buildConfigurationList = 168BC6A517EC2DF000BC4584 /* Build configuration list for PBXProject "Trailer" */;
-			compatibilityVersion = "Xcode 6.3";
+			compatibilityVersion = "Xcode 8.0";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -1216,6 +1216,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CODE_SIGN_ENTITLEMENTS = "PocketTrailer Today Extension/PocketTrailer Today Extension.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = X727JSJUGJ;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
@@ -1224,6 +1225,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.housetrip.mobile.trailer.ios.PocketTrailer.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "PocketTrailer Today Dev";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "PocketTrailer/PocketTrailer-Bridging-Header.h";
@@ -1238,6 +1240,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CODE_SIGN_ENTITLEMENTS = "PocketTrailer Today Extension/PocketTrailer Today Extension.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				DEVELOPMENT_TEAM = X727JSJUGJ;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = "PocketTrailer Today Extension/Info.plist";
@@ -1245,6 +1248,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.housetrip.mobile.trailer.ios.PocketTrailer.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "Pocket Trailer Today App Store";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "PocketTrailer/PocketTrailer-Bridging-Header.h";
@@ -1259,9 +1263,12 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = PocketTrailer/PocketTrailer.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = X727JSJUGJ;
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = PocketTrailer/Info.plist;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.housetrip.mobile.trailer.ios.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "PocketTrailer Dev";
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "PocketTrailer/PocketTrailer-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
@@ -1276,9 +1283,12 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = PocketTrailer/PocketTrailer.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				DEVELOPMENT_TEAM = X727JSJUGJ;
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = PocketTrailer/Info.plist;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.housetrip.mobile.trailer.ios.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "Pocket Trailer App Store";
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "PocketTrailer/PocketTrailer-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
@@ -1295,6 +1305,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = X727JSJUGJ;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
@@ -1304,6 +1315,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.housetrip.mobile.trailer.ios.PocketTrailer.watchkitapp.watchkitextension;
 				PRODUCT_NAME = "${TARGET_NAME}";
+				PROVISIONING_PROFILE_SPECIFIER = "PocketTrailer WatchKit Ext Dev";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "PocketTrailer/PocketTrailer-Bridging-Header.h";
@@ -1320,6 +1332,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				DEVELOPMENT_TEAM = X727JSJUGJ;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = "PocketTrailer WatchKit Extension/Info.plist";
@@ -1328,6 +1341,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.housetrip.mobile.trailer.ios.PocketTrailer.watchkitapp.watchkitextension;
 				PRODUCT_NAME = "${TARGET_NAME}";
+				PROVISIONING_PROFILE_SPECIFIER = "Pocket Trailer Watch Extension App Store";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "PocketTrailer/PocketTrailer-Bridging-Header.h";
@@ -1345,6 +1359,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = X727JSJUGJ;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
@@ -1353,6 +1368,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.housetrip.mobile.trailer.ios.PocketTrailer.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "PocketTrailer WatchKit App Dev";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 3.0;
@@ -1368,6 +1384,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				DEVELOPMENT_TEAM = X727JSJUGJ;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				IBSC_MODULE = PocketTrailer_WatchKit_Extension;
@@ -1375,6 +1392,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.housetrip.mobile.trailer.ios.PocketTrailer.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "Pocket Trailer Watch App App Store";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 3.0;
@@ -1387,6 +1405,7 @@
 		168BC6DC17EC2DF000BC4584 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_OPTIMIZATION = time;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -1428,6 +1447,7 @@
 		168BC6DD17EC2DF000BC4584 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_OPTIMIZATION = time;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -1472,6 +1492,7 @@
 				CODE_SIGN_ENTITLEMENTS = Trailer/Trailer.entitlements;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = X727JSJUGJ;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Trailer",
@@ -1493,6 +1514,7 @@
 				CODE_SIGN_ENTITLEMENTS = Trailer/Trailer.entitlements;
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = X727JSJUGJ;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Trailer",
