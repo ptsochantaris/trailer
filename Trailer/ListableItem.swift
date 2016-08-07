@@ -104,7 +104,7 @@ class ListableItem: DataItem {
 		for c in comments {
 			if let commentCreation = c.createdAt {
 				if let latestRead = latestReadCommentDate {
-					if latestRead.compare(commentCreation) == .orderedAscending {
+					if latestRead < commentCreation {
 						latestReadCommentDate = commentCreation
 					}
 				} else {
@@ -203,7 +203,7 @@ class ListableItem: DataItem {
 		if snoozeUntil == nil {
 			let d = TimeInterval(Settings.autoSnoozeDuration)
 			if d > 0 && !wasAwokenFromSnooze, let autoSnoozeDate = updatedAt?.addingTimeInterval(86400.0*d) {
-				if autoSnoozeDate.compare(Date()) == .orderedAscending {
+				if autoSnoozeDate < Date() {
 					snoozeUntil = autoSnoozeDate
 					return true
 				}
@@ -223,7 +223,7 @@ class ListableItem: DataItem {
 
 	final func postProcess() {
 
-		if let s = snoozeUntil, s.compare(Date()) == .orderedAscending {
+		if let s = snoozeUntil, s < Date() {
 			snoozeUntil = nil
 			wasAwokenFromSnooze = true
 		}
@@ -275,7 +275,7 @@ class ListableItem: DataItem {
 			f.returnsObjectsAsFaults = false
 			f.predicate = predicateForMyCommentsSinceDate(latestDate)
 			for c in try! managedObjectContext?.fetch(f) ?? [] {
-				if let createdDate = c.createdAt, createdDate.compare(latestDate) == .orderedDescending {
+				if let createdDate = c.createdAt, latestDate < createdDate {
 					latestDate = createdDate
 				}
 			}
@@ -288,28 +288,29 @@ class ListableItem: DataItem {
 			return try! managedObjectContext?.count(for: f) ?? 0
 		}
 
-		let dontCountComments = isMuted || ((targetSection == .all || targetSection == .snoozed) && !Settings.showCommentsEverywhere)
-
 		if moveToMentioned {
 			targetSection = .mentioned
-			unreadComments = dontCountComments ? 0 : unreadFromOtherCommentsSinceLatestDate()
+			unreadComments = unreadFromOtherCommentsSinceLatestDate()
 		} else if doReferralCheckInComments {
 			let f = NSFetchRequest<PRComment>(entityName: "PRComment")
 			f.returnsObjectsAsFaults = false
 			f.predicate = predicateForOthersCommentsSinceDate(nil)
 			var unreadCommentCount = 0
+			let showCommentsEverywhere = Settings.showCommentsEverywhere
 			for c in try! managedObjectContext?.fetch(f) ?? [] {
 				if (autoMoveOnCommentMentions && c.refersToMe) || (autoMoveOnTeamMentions && c.refersToMyTeams) {
 					targetSection = .mentioned
 				}
+				let dontCountComments = isMuted || ((targetSection == .all || targetSection == .snoozed) && !showCommentsEverywhere)
 				if !dontCountComments {
-					if c.createdAt?.compare(latestDate) == .orderedDescending {
+					if let created = c.createdAt, latestDate < created {
 						unreadCommentCount += 1
 					}
 				}
 			}
 			unreadComments = unreadCommentCount
 		} else {
+			let dontCountComments = isMuted || ((targetSection == .all || targetSection == .snoozed) && !Settings.showCommentsEverywhere)
 			unreadComments = dontCountComments ? 0 : unreadFromOtherCommentsSinceLatestDate()
 		}
 

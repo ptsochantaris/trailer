@@ -117,28 +117,22 @@ final class DataManager {
 			for i in allItems {
 				if i.isVisibleOnMenu {
 					if !i.createdByMe {
-						if !(i.isNewAssignment?.boolValue ?? false) && !(i.announced?.boolValue ?? false) {
+						if i.isNewAssignment?.boolValue ?? false {
+							app.postNotification(type: assignmentNotification, forItem: i)
+							i.isNewAssignment = false
+						} else if !(i.announced?.boolValue ?? false) {
 							app.postNotification(type: newNotification, forItem: i)
 							i.announced = true
-						}
-						if let reopened = i.reopened?.boolValue, reopened == true {
+						} else if let reopened = i.reopened?.boolValue, reopened == true {
 							app.postNotification(type: reopenedNotification, forItem: i)
 							i.reopened = false
 						}
-						if let newAssignment = i.isNewAssignment?.boolValue, newAssignment == true {
-							app.postNotification(type: assignmentNotification, forItem: i)
-							i.isNewAssignment = false
-						}
 					}
 					#if os(iOS)
-						atNextEvent {
-							i.indexForSpotlight()
-						}
+						i.indexForSpotlight()
 					#endif
 				} else {
-					atNextEvent {
-						i.ensureInvisible()
-					}
+					i.ensureInvisible()
 				}
 			}
 			return allItems

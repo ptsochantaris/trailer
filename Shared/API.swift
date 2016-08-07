@@ -440,12 +440,12 @@ final class API {
 			perPageCallback: { data, lastPage in
 				for d in data ?? [] {
 					let eventDate = parseGH8601(d["created_at"] as? String) ?? Date.distantPast
-					if latestDate!.compare(eventDate) == .orderedAscending { // this is where we came in
+					if latestDate! < eventDate {
 						if let repoId = d["repo"]?["id"] as? NSNumber {
 							DLog("(%@) New event at %@ from Repo ID %@", serverLabel, eventDate, repoId)
 							repoIdsToMarkDirty.add(repoId)
 						}
-						if s.latestUserEventDateProcessed!.compare(eventDate) == .orderedAscending {
+						if s.latestUserEventDateProcessed! < eventDate {
 							s.latestUserEventDateProcessed = eventDate
 							if latestDate! == Date.distantPast {
 								DLog("(%@) First sync, all repos are dirty so we don't need to read further, we have the latest received event date: %@", serverLabel, eventDate)
@@ -488,12 +488,12 @@ final class API {
 			perPageCallback: { data, lastPage in
 				for d in data ?? [] {
 					let eventDate = parseGH8601(d["created_at"] as? String) ?? Date.distantPast
-					if latestDate!.compare(eventDate) == .orderedAscending { // this is where we came in
+					if latestDate! < eventDate {
 						if let repoId = d["repo"]?["id"] as? NSNumber {
 							DLog("(%@) New event at %@ from Repo ID %@", serverLabel, eventDate, repoId)
 							repoIdsToMarkDirty.add(repoId)
 						}
-						if s.latestReceivedEventDateProcessed!.compare(eventDate) == .orderedAscending {
+						if s.latestReceivedEventDateProcessed! < eventDate {
 							s.latestReceivedEventDateProcessed = eventDate
 							if latestDate! == Date.distantPast {
 								DLog("(%@) First sync, all repos are dirty so we don't need to read further, we have the latest received event date: %@", serverLabel, eventDate)
@@ -1336,19 +1336,19 @@ final class API {
 
 	private var apiRunningCount = 0
 	private var apiCallQueue = [Completion]()
+	#if os(iOS)
+	let maxApiOperations = (sizeof(Int.self) == sizeof(Int64.self)) ? 8 : 2
+	#else
+	let maxApiOperations = 8
+	#endif
+
 	private func api(
 		_ path: String,
 		fromServer: ApiServer,
 		ignoreLastSync: Bool,
 		completion: ApiCompletion) {
 
-		#if os(iOS)
-			let maxOperations = 4
-		#else
-			let maxOperations = 8
-		#endif
-
-		if apiRunningCount < maxOperations {
+		if apiRunningCount < maxApiOperations {
 			_api(path, fromServer: fromServer, ignoreLastSync: ignoreLastSync, completion: completion)
 		} else {
 			apiCallQueue.append { [weak self] in

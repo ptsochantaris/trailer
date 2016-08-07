@@ -47,7 +47,7 @@ final class Issue: ListableItem {
 			color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
 			message = "There are no configured API servers in your settings, please ensure you have added at least one server with a valid API token."
 		} else if appIsRefreshing {
-			message = "Refreshing issue information, please wait a moment..."
+			message = "Refreshing information, please wait a moment..."
 		} else if !S(filterValue).isEmpty {
 			message = "There are no issues matching this filter."
 		} else if openIssues > 0 {

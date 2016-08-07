@@ -39,7 +39,7 @@ final class PRComment: DataItem {
 	func fastForwardItemIfNeeded(_ item: ListableItem) {
 		// check if we're assigned to a just created issue, in which case we want to "fast forward" its latest comment dates to our own if we're newer
 		if let commentCreation = createdAt, (item.postSyncAction?.intValue ?? 0) == PostSyncAction.noteNew.rawValue {
-			if let latestReadDate = item.latestReadCommentDate, latestReadDate.compare(commentCreation) == .orderedAscending {
+			if let latestReadDate = item.latestReadCommentDate, latestReadDate < commentCreation {
 				item.latestReadCommentDate = commentCreation
 			}
 		}
