@@ -9,12 +9,7 @@ final class Issue: ListableItem {
 	@NSManaged var commentsLink: String?
 
 	class func syncIssuesFromInfoArray(_ data: [[NSObject : AnyObject]]?, inRepo: Repo) {
-		var filteredData = [[NSObject : AnyObject]]()
-		for d in data ?? [] {
-			if d["pull_request"] == nil { // don't sync issues which are pull requests, they are already synced
-				filteredData.append(d)
-			}
-		}
+		let filteredData = data?.filter { $0["pull_request"] == nil } // don't sync issues which are pull requests, they are already synced
 		itemsWithInfo(filteredData, type: "Issue", fromServer: inRepo.apiServer) { item, info, isNewOrUpdated in
 			let i = item as! Issue
 			if isNewOrUpdated {
