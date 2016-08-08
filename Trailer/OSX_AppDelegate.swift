@@ -992,7 +992,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	private func databaseErrorOnStartup() {
 		let alert = NSAlert()
 		alert.messageText = "Database error"
-		alert.informativeText = "Trailer encountered an error when trying to load the database.\n\nThis could be because of a failed upgrade or a software bug.\n\nPlease either quit and downgrade to the previous version, or reset the Trailer's state and setup from a fresh state."
+		alert.informativeText = "Trailer encountered an error while trying to load the database.\n\nThis could be because of a failed upgrade or a software bug.\n\nPlease either quit and downgrade to the previous version, or reset the Trailer's state and setup from a fresh state."
 		alert.addButton(withTitle: "Quit")
 		alert.addButton(withTitle: "Reset Trailer")
 
