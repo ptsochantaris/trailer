@@ -122,17 +122,17 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		        description: Settings.hideUncommentedItemsHelp,
 		        valueDisplayed: { Settings.hideUncommentedItems ? "✓" : " "  }),
 		Setting(section: .Comments,
-		        title: "Move items mentioning me to 'Mentioned'",
-		        description: Settings.autoMoveOnCommentMentionsHelp,
-		        valueDisplayed: { Settings.autoMoveOnCommentMentions ? "✓" : " "  }),
+		        title: "Move items mentioning me to...",
+		        description: Settings.newMentionMovePolicyHelp,
+		        valueDisplayed: { Section(rawValue: Settings.newMentionMovePolicy)!.movePolicyName() }),
 		Setting(section: .Comments,
-		        title: "Move items mentioning my teams to 'Mentioned'",
-		        description: Settings.autoMoveOnTeamMentionsHelp,
-		        valueDisplayed: { Settings.autoMoveOnTeamMentions ? "✓" : " "  }),
+		        title: "Move items mentioning my teams to...",
+		        description: Settings.teamMentionMovePolicyHelp,
+		        valueDisplayed: { Section(rawValue: Settings.teamMentionMovePolicy)!.movePolicyName() }),
 		Setting(section: .Comments,
-		        title: "Move items created in my repos to 'Mentioned'",
-		        description: Settings.moveNewItemsInOwnReposToMentionedHelp,
-		        valueDisplayed: { Settings.moveNewItemsInOwnReposToMentioned ? "✓" : " "  }),
+		        title: "Move items created in my repos to...",
+		        description: Settings.newItemInOwnedRepoMovePolicyHelp,
+		        valueDisplayed: { Section(rawValue: Settings.newItemInOwnedRepoMovePolicy)!.movePolicyName() }),
 		Setting(section: .Comments,
 		        title: "Open items at first unread comment",
 		        description: Settings.openPrAtFirstUnreadCommentHelp,
@@ -520,15 +520,14 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			case 1:
 				Settings.hideUncommentedItems = !Settings.hideUncommentedItems
 				settingsChangedTimer.push()
-			case 2:
-				Settings.autoMoveOnCommentMentions = !Settings.autoMoveOnCommentMentions
-				settingsChangedTimer.push()
-			case 3:
-				Settings.autoMoveOnTeamMentions = !Settings.autoMoveOnTeamMentions
-				settingsChangedTimer.push()
-			case 4:
-				Settings.moveNewItemsInOwnReposToMentioned = !Settings.moveNewItemsInOwnReposToMentioned
-				settingsChangedTimer.push()
+			case 2, 3, 4:
+				pickerName = setting.title
+				valuesToPush = Section.movePolicyNames
+				selectedIndexPath = indexPath
+				previousValue = originalIndex == 2 ? Settings.newMentionMovePolicy :
+								originalIndex == 3 ? Settings.teamMentionMovePolicy :
+													 Settings.newItemInOwnedRepoMovePolicy
+				performSegue(withIdentifier: "showPicker", sender: self)
 			case 5:
 				Settings.openPrAtFirstUnreadComment = !Settings.openPrAtFirstUnreadComment
 			case 6:
@@ -765,6 +764,15 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				} else  if sip.row == 3 {
 					Settings.labelRefreshInterval = Int(didSelectIndexPath.row+1)
 				}
+			} else if sip.section == SettingsSection.Comments.rawValue {
+				if sip.row == 2 {
+					Settings.newMentionMovePolicy = didSelectIndexPath.row
+				} else if sip.row == 3 {
+					Settings.teamMentionMovePolicy = didSelectIndexPath.row
+				} else if sip.row == 4 {
+					Settings.newItemInOwnedRepoMovePolicy = didSelectIndexPath.row
+				}
+				settingsChangedTimer.push()
 			}
 			reload()
 			selectedIndexPath = nil

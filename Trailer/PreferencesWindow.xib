@@ -1000,7 +1000,7 @@ Token</string>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" borderType="none" titlePosition="noTitle" id="9l1-g0-3Pv">
-                                            <rect key="frame" x="32" y="15" width="673" height="330"/>
+                                            <rect key="frame" x="32" y="10" width="673" height="330"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                             <view key="contentView" id="j25-JP-OCJ">
                                                 <rect key="frame" x="0.0" y="0.0" width="673" height="330"/>
@@ -1071,46 +1071,61 @@ Token</string>
                                                             <action selector="disableAllCommentNotificationsSelected:" target="vQH-WF-vh2" id="G2t-lg-bKn"/>
                                                         </connections>
                                                     </button>
-                                                    <box borderType="line" title="Move an item to &quot;Mentioned&quot; automatically if..." id="7lb-Oe-dqF">
-                                                        <rect key="frame" x="329" y="194" width="336" height="136"/>
+                                                    <box misplaced="YES" borderType="none" title="If I am mentioned, move an item to..." id="7lb-Oe-dqF">
+                                                        <rect key="frame" x="435" y="278" width="230" height="51"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="CDr-sW-N4t">
-                                                            <rect key="frame" x="1" y="1" width="334" height="120"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="230" height="36"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
-                                                                <button id="Afp-0h-LBr">
-                                                                    <rect key="frame" x="14" y="86" width="317" height="18"/>
+                                                                <popUpButton verticalHuggingPriority="750" misplaced="YES" id="dTC-mN-8dT">
+                                                                    <rect key="frame" x="-2" y="11" width="224" height="26"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                    <buttonCell key="cell" type="check" title="I'm mentioned in the description or a comment" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="28l-3y-WDO">
-                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                        <font key="font" metaFont="system"/>
-                                                                    </buttonCell>
+                                                                    <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="Orl-5l-pm6">
+                                                                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                                        <font key="font" metaFont="menu"/>
+                                                                        <menu key="menu" id="QGE-L1-zkd">
+                                                                            <items>
+                                                                                <menuItem title="Don't Move" id="gE6-b6-rX9"/>
+                                                                                <menuItem title="Mine" id="FsJ-et-Mxu"/>
+                                                                                <menuItem title="Participated" id="Yuq-X4-GOm"/>
+                                                                                <menuItem title="Mentioned" id="bJo-sS-1PN"/>
+                                                                            </items>
+                                                                        </menu>
+                                                                    </popUpButtonCell>
                                                                     <connections>
-                                                                        <action selector="autoMoveOnCommentMentionsSelected:" target="vQH-WF-vh2" id="j9z-NN-339"/>
+                                                                        <action selector="newMentionMovePolicySelected:" target="vQH-WF-vh2" id="cnH-cR-05x"/>
                                                                     </connections>
-                                                                </button>
-                                                                <button id="Hmq-ch-Jqa">
-                                                                    <rect key="frame" x="14" y="53" width="156" height="18"/>
+                                                                </popUpButton>
+                                                            </subviews>
+                                                        </view>
+                                                    </box>
+                                                    <box misplaced="YES" borderType="none" title="If my team is mentioned, move to..." id="vq6-6w-ave">
+                                                        <rect key="frame" x="435" y="229" width="230" height="51"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <view key="contentView" id="5aL-sj-f6p">
+                                                            <rect key="frame" x="0.0" y="0.0" width="230" height="36"/>
+                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                            <subviews>
+                                                                <popUpButton verticalHuggingPriority="750" id="gM2-vc-gT5">
+                                                                    <rect key="frame" x="-2" y="11" width="224" height="26"/>
                                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                    <buttonCell key="cell" type="check" title="My team is mentioned" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="RD7-9b-mMf">
-                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                        <font key="font" metaFont="system"/>
-                                                                    </buttonCell>
+                                                                    <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="48k-UQ-iYR">
+                                                                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                                        <font key="font" metaFont="menu"/>
+                                                                        <menu key="menu" id="WjG-dX-Dkn">
+                                                                            <items>
+                                                                                <menuItem title="Don't Move" id="MZy-19-R9z"/>
+                                                                                <menuItem title="Mine" id="sFn-xI-5Nl"/>
+                                                                                <menuItem title="Participated" id="5sH-uO-5t2"/>
+                                                                                <menuItem title="Mentioned" id="glf-qu-xJM"/>
+                                                                            </items>
+                                                                        </menu>
+                                                                    </popUpButtonCell>
                                                                     <connections>
-                                                                        <action selector="autoMoveOnTeamMentionsSelected:" target="vQH-WF-vh2" id="SIT-OQ-fsI"/>
+                                                                        <action selector="teamMentionMovePolicySelected:" target="vQH-WF-vh2" id="bxp-e9-2EN"/>
                                                                     </connections>
-                                                                </button>
-                                                                <button id="uGu-0B-q7h">
-                                                                    <rect key="frame" x="14" y="20" width="199" height="18"/>
-                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                    <buttonCell key="cell" type="check" title="It was created in a repo I own" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="nH8-an-Z5e">
-                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                        <font key="font" metaFont="system"/>
-                                                                    </buttonCell>
-                                                                    <connections>
-                                                                        <action selector="autoMoveIfCreatedInOwnedRepoSelected:" target="vQH-WF-vh2" id="z45-Jk-Rho"/>
-                                                                    </connections>
-                                                                </button>
+                                                                </popUpButton>
                                                             </subviews>
                                                         </view>
                                                     </box>
@@ -1125,6 +1140,35 @@ Token</string>
                                                             <action selector="assumeAllCommentsBeforeMineAreReadSelected:" target="vQH-WF-vh2" id="ZGd-tY-c6Z"/>
                                                         </connections>
                                                     </button>
+                                                    <box misplaced="YES" borderType="none" title="New items in owned repos, move to..." id="WXP-sZ-GiR">
+                                                        <rect key="frame" x="435" y="182" width="230" height="51"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <view key="contentView" id="8jk-qP-cR3">
+                                                            <rect key="frame" x="0.0" y="0.0" width="230" height="36"/>
+                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                            <subviews>
+                                                                <popUpButton verticalHuggingPriority="750" id="tH9-aj-JJe">
+                                                                    <rect key="frame" x="-2" y="11" width="224" height="26"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="udd-YY-bnD">
+                                                                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                                        <font key="font" metaFont="menu"/>
+                                                                        <menu key="menu" id="igQ-kd-abp">
+                                                                            <items>
+                                                                                <menuItem title="Don't Move" id="Dn4-XE-ELX"/>
+                                                                                <menuItem title="Mine" id="1nO-ot-C2c"/>
+                                                                                <menuItem title="Participated" id="b9w-MM-jHG"/>
+                                                                                <menuItem title="Mentioned" id="3ek-kC-a3c"/>
+                                                                            </items>
+                                                                        </menu>
+                                                                    </popUpButtonCell>
+                                                                    <connections>
+                                                                        <action selector="newItemInOwnedRepoMovePolicySelected:" target="vQH-WF-vh2" id="5cN-n0-2Tt"/>
+                                                                    </connections>
+                                                                </popUpButton>
+                                                            </subviews>
+                                                        </view>
+                                                    </box>
                                                 </subviews>
                                             </view>
                                         </box>
@@ -1932,9 +1976,6 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="apiServerWebPath" destination="CT9-ev-oP0" id="Cr5-z4-MfR"/>
                 <outlet property="assignedPrHandlingPolicy" destination="lB5-eS-YSK" id="CV3-XC-bVk"/>
                 <outlet property="assumeCommentsBeforeMineAreRead" destination="gWR-4e-ufK" id="uF3-ZN-vmp"/>
-                <outlet property="autoMoveIfCreatedInOwnedRepo" destination="uGu-0B-q7h" id="4fp-xk-loW"/>
-                <outlet property="autoMoveOnCommentMentions" destination="Afp-0h-LBr" id="lCM-y3-0L3"/>
-                <outlet property="autoMoveOnTeamMentions" destination="Hmq-ch-Jqa" id="ycL-P6-Un3"/>
                 <outlet property="autoSnoozeLabel" destination="4MH-0X-KEO" id="bAY-Ka-oDM"/>
                 <outlet property="autoSnoozeSelector" destination="hgg-d7-xNz" id="4mr-e9-oiH"/>
                 <outlet property="checkForUpdatesAutomatically" destination="vcg-xx-N3A" id="G9B-Yw-7hB"/>
@@ -1980,6 +2021,8 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="logActivityToConsole" destination="3fA-qA-38f" id="Vph-lO-Ng2"/>
                 <outlet property="makeStatusItemsSelectable" destination="KjN-FO-XTd" id="qFV-nW-SWA"/>
                 <outlet property="markUnmergeableOnUserSectionsOnly" destination="Y5g-gh-uLn" id="ka6-Ll-b9Q"/>
+                <outlet property="newItemInOwnedRepoMovePolicy" destination="tH9-aj-JJe" id="dWN-Fr-u7n"/>
+                <outlet property="newMentionMovePolicy" destination="dTC-mN-8dT" id="EPV-dK-9nd"/>
                 <outlet property="notifyOnStatusUpdates" destination="lAL-hp-XJt" id="Amv-PJ-TtL"/>
                 <outlet property="notifyOnStatusUpdatesForAllPrs" destination="UVq-TH-zaK" id="0WQ-3a-2C6"/>
                 <outlet property="openPrAtFirstUnreadComment" destination="ZXi-oc-EhW" id="KHQ-wg-7VG"/>
@@ -2025,6 +2068,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="statusTermMenu" destination="irr-Zv-gfS" id="Aoi-h9-I2e"/>
                 <outlet property="statusTermsField" destination="oW9-uY-e0m" id="xZo-19-rE2"/>
                 <outlet property="tabs" destination="RGK-bv-JXB" id="B5b-gW-VDa"/>
+                <outlet property="teamMentionMovePolicy" destination="gM2-vc-gT5" id="ZPB-jw-m7v"/>
                 <outlet property="useVibrancy" destination="onl-1T-RTg" id="7Tr-3j-g1y"/>
                 <outlet property="versionNumber" destination="iqF-Fz-LyV" id="3wx-Ff-ShS"/>
             </connections>

@@ -46,18 +46,18 @@ final class Settings {
 
 	class func allFields() -> [String] {
 		return [
-			"SORT_METHOD_KEY", "STATUS_FILTERING_METHOD_KEY", "LAST_PREFS_TAB_SELECTED", "CLOSE_HANDLING_POLICY", "MERGE_HANDLING_POLICY", "STATUS_ITEM_REFRESH_COUNT", "LABEL_REFRESH_COUNT", "UPDATE_CHECK_INTERVAL_KEY",
+			"SORT_METHOD_KEY", "STATUS_FILTERING_METHOD_KEY", "LAST_PREFS_TAB_SELECTED", "STATUS_ITEM_REFRESH_COUNT", "LABEL_REFRESH_COUNT", "UPDATE_CHECK_INTERVAL_KEY",
 			"STATUS_FILTERING_TERMS_KEY", "COMMENT_AUTHOR_BLACKLIST", "HOTKEY_LETTER", "REFRESH_PERIOD_KEY", "IOS_BACKGROUND_REFRESH_PERIOD_KEY", "NEW_REPO_CHECK_PERIOD", "LAST_SUCCESSFUL_REFRESH",
 			"LAST_RUN_VERSION_KEY", "UPDATE_CHECK_AUTO_KEY", "HIDE_UNCOMMENTED_PRS_KEY", "SHOW_COMMENTS_EVERYWHERE_KEY", "SORT_ORDER_KEY", "SHOW_UPDATED_KEY", "DONT_KEEP_MY_PRS_KEY", "HIDE_AVATARS_KEY",
-			"AUTO_PARTICIPATE_IN_MENTIONS_KEY", "DONT_ASK_BEFORE_WIPING_MERGED", "DONT_ASK_BEFORE_WIPING_CLOSED", "HIDE_NEW_REPOS_KEY", "GROUP_BY_REPO", "HIDE_ALL_SECTION", "SHOW_LABELS", "SHOW_STATUS_ITEMS",
-			"MAKE_STATUS_ITEMS_SELECTABLE", "MOVE_ASSIGNED_PRS_TO_MY_SECTION", "MARK_UNMERGEABLE_ON_USER_SECTIONS_ONLY", "COUNT_ONLY_LISTED_PRS", "OPEN_PR_AT_FIRST_UNREAD_COMMENT_KEY", "LOG_ACTIVITY_TO_CONSOLE_KEY",
+			"DONT_ASK_BEFORE_WIPING_MERGED", "DONT_ASK_BEFORE_WIPING_CLOSED", "HIDE_NEW_REPOS_KEY", "GROUP_BY_REPO", "HIDE_ALL_SECTION", "SHOW_LABELS", "SHOW_STATUS_ITEMS",
+			"MAKE_STATUS_ITEMS_SELECTABLE", "MARK_UNMERGEABLE_ON_USER_SECTIONS_ONLY", "COUNT_ONLY_LISTED_PRS", "OPEN_PR_AT_FIRST_UNREAD_COMMENT_KEY", "LOG_ACTIVITY_TO_CONSOLE_KEY",
 			"HOTKEY_ENABLE", "HOTKEY_CONTROL_MODIFIER", "USE_VIBRANCY_UI", "DISABLE_ALL_COMMENT_NOTIFICATIONS", "NOTIFY_ON_STATUS_UPDATES", "NOTIFY_ON_STATUS_UPDATES_ALL", "SHOW_REPOS_IN_NAME", "INCLUDE_REPOS_IN_FILTER",
 			"INCLUDE_LABELS_IN_FILTER", "INCLUDE_STATUSES_IN_FILTER", "HOTKEY_COMMAND_MODIFIER", "HOTKEY_OPTION_MODIFIER", "HOTKEY_SHIFT_MODIFIER", "GRAY_OUT_WHEN_REFRESHING", "SHOW_ISSUES_MENU",
-			"AUTO_PARTICIPATE_ON_TEAM_MENTIONS", "SHOW_ISSUES_IN_WATCH_GLANCE", "ASSIGNED_PR_HANDLING_POLICY", "HIDE_DESCRIPTION_IN_WATCH_DETAIL_VIEW", "AUTO_REPEAT_SETTINGS_EXPORT", "DONT_CONFIRM_SETTINGS_IMPORT",
+			"SHOW_ISSUES_IN_WATCH_GLANCE", "ASSIGNED_PR_HANDLING_POLICY", "HIDE_DESCRIPTION_IN_WATCH_DETAIL_VIEW", "AUTO_REPEAT_SETTINGS_EXPORT", "DONT_CONFIRM_SETTINGS_IMPORT",
 			"LAST_EXPORT_URL", "LAST_EXPORT_TIME", "CLOSE_HANDLING_POLICY_2", "MERGE_HANDLING_POLICY_2", "LAST_PREFS_TAB_SELECTED_OSX", "NEW_PR_DISPLAY_POLICY_INDEX", "NEW_ISSUE_DISPLAY_POLICY_INDEX", "HIDE_PRS_THAT_ARENT_PASSING_ONLY_IN_ALL",
             "INCLUDE_SERVERS_IN_FILTER", "INCLUDE_USERS_IN_FILTER", "INCLUDE_TITLES_IN_FILTER", "INCLUDE_NUMBERS_IN_FILTER", "DUMP_API_RESPONSES_IN_CONSOLE", "OPEN_ITEMS_DIRECTLY_IN_SAFARI", "HIDE_PRS_THAT_ARENT_PASSING",
             "REMOVE_RELATED_NOTIFICATIONS_ON_ITEM_REMOVE", "HIDE_SNOOZED_ITEMS", "SNOOZE_WAKEUP_ON_COMMENT", "SNOOZE_WAKEUP_ON_MENTION", "SNOOZE_WAKEUP_ON_STATUS_UPDATE", "INCLUDE_MILESTONES_IN_FILTER",
-            "MOVE_NEW_ITEMS_IN_OWN_REPOS_TO_MENTIONED", "INCLUDE_ASSIGNEE_NAMES_IN_FILTER", "API_SERVERS_IN_SEPARATE_MENUS", "ASSUME_READ_ITEM_IF_USER_HAS_NEWER_COMMENTS", "AUTO_SNOOZE_DAYS"]
+            "INCLUDE_ASSIGNEE_NAMES_IN_FILTER", "API_SERVERS_IN_SEPARATE_MENUS", "ASSUME_READ_ITEM_IF_USER_HAS_NEWER_COMMENTS", "AUTO_SNOOZE_DAYS"]
 	}
 
     class func checkMigration() {
@@ -90,6 +90,21 @@ final class Settings {
 		if let closeHandlingPolicyLegacy = _settings_shared.object(forKey: "CLOSE_HANDLING_POLICY") as? Int {
 			_settings_shared.set(closeHandlingPolicyLegacy + (closeHandlingPolicyLegacy > 0 ? 1 : 0), forKey: "CLOSE_HANDLING_POLICY_2")
 			_settings_shared.removeObject(forKey: "CLOSE_HANDLING_POLICY")
+		}
+
+		if let mentionedUserMoveLegacy = _settings_shared.object(forKey: "AUTO_PARTICIPATE_IN_MENTIONS_KEY") as? Bool {
+			_settings_shared.set(mentionedUserMoveLegacy ? Section.mentioned.rawValue : Section.none.rawValue, forKey: "NEW_MENTION_MOVE_POLICY")
+			_settings_shared.removeObject(forKey: "AUTO_PARTICIPATE_IN_MENTIONS_KEY")
+		}
+
+		if let mentionedTeamMoveLegacy = _settings_shared.object(forKey: "AUTO_PARTICIPATE_ON_TEAM_MENTIONS") as? Bool {
+			_settings_shared.set(mentionedTeamMoveLegacy ? Section.mentioned.rawValue : Section.none.rawValue, forKey: "TEAM_MENTION_MOVE_POLICY")
+			_settings_shared.removeObject(forKey: "AUTO_PARTICIPATE_ON_TEAM_MENTIONS")
+		}
+
+		if let mentionedRepoMoveLegacy = _settings_shared.object(forKey: "MOVE_NEW_ITEMS_IN_OWN_REPOS_TO_MENTIONED") as? Bool {
+			_settings_shared.set(mentionedRepoMoveLegacy ? Section.mentioned.rawValue : Section.none.rawValue, forKey: "NEW_ITEM_IN_OWNED_REPO_MOVE_POLICY")
+			_settings_shared.removeObject(forKey: "MOVE_NEW_ITEMS_IN_OWN_REPOS_TO_MENTIONED")
 		}
 
 		DataManager.postMigrationRepoPrPolicy = RepoDisplayPolicy.all
@@ -322,6 +337,24 @@ final class Settings {
 		set { set("NEW_ISSUE_DISPLAY_POLICY_INDEX", newValue) }
 	}
 
+	static let newMentionMovePolicyHelp = "If your username is mentioned in an item's description or a comment posted inside it, move the item to the specified section."
+	class var newMentionMovePolicy: Int {
+		get { return get("NEW_MENTION_MOVE_POLICY") as? Int ?? Section.mentioned.rawValue }
+		set { set("NEW_MENTION_MOVE_POLICY", newValue) }
+	}
+
+	static let teamMentionMovePolicyHelp = "If the name of one of the teams you belong to is mentioned in an item's description or a comment posted inside it, move the item to the specified section."
+	class var teamMentionMovePolicy: Int {
+		get { return get("TEAM_MENTION_MOVE_POLICY") as? Int ?? Section.mentioned.rawValue }
+		set { set("TEAM_MENTION_MOVE_POLICY", newValue) }
+	}
+
+	static let newItemInOwnedRepoMovePolicyHelp = "Automatically move an item to the specified section if it has been created in a repo which you own, even if there is no direct mention of you."
+	class var newItemInOwnedRepoMovePolicy: Int {
+		get { return get("NEW_ITEM_IN_OWNED_REPO_MOVE_POLICY") as? Int ?? Section.none.rawValue }
+		set { set("NEW_ITEM_IN_OWNED_REPO_MOVE_POLICY", newValue) }
+	}
+
 	/////////////////////////// STRINGS
 
 	static let statusFilteringTermsHelp = "You can specify specific terms which can then be matched against status items, in order to hide or show them."
@@ -396,12 +429,6 @@ final class Settings {
 	}
 
     /////////////////////////// SWITCHES
-
-	static let moveNewItemsInOwnReposToMentionedHelp = "Automatically move an item to the 'Mentioned' section if it has been created in a repo which you own, even if there is no direct mention to you."
-	class var moveNewItemsInOwnReposToMentioned: Bool {
-		get { return get("MOVE_NEW_ITEMS_IN_OWN_REPOS_TO_MENTIONED") as? Bool ?? false }
-		set { set("MOVE_NEW_ITEMS_IN_OWN_REPOS_TO_MENTIONED", newValue) }
-	}
 
 	static let hideSnoozedItemsHelp = "Hide the snoozed items section"
 	class var hideSnoozedItems: Bool {
@@ -591,18 +618,6 @@ final class Settings {
 		set { set("HIDE_PRS_THAT_ARENT_PASSING_ONLY_IN_ALL", newValue) }
 	}
 
-	static let autoMoveOnCommentMentionsHelp = "If your username is mentioned in an item's description or a comment posted inside it, move the item to the 'Mentioned' section."
-	class var autoMoveOnCommentMentions: Bool {
-		get { return get("AUTO_PARTICIPATE_IN_MENTIONS_KEY") as? Bool ?? true }
-		set { set("AUTO_PARTICIPATE_IN_MENTIONS_KEY", newValue) }
-	}
-
-	static let autoMoveOnTeamMentionsHelp = "If the name of one of the teams you belong to is mentioned in an item's description or a comment posted inside it, move the item to the 'Mentioned' section."
-	class var autoMoveOnTeamMentions: Bool {
-		get { return get("AUTO_PARTICIPATE_ON_TEAM_MENTIONS") as? Bool ?? true }
-		set { set("AUTO_PARTICIPATE_ON_TEAM_MENTIONS", newValue) }
-	}
-	
 	static let useVibrancyHelp = "Use Mac OS X Vibrancy to display the Trailer drop-down menu, if available on the current OS version. If the OS doesn't support this, this setting has no effect."
 	class var useVibrancy: Bool {
 		get { return get("USE_VIBRANCY_UI") as? Bool ?? true }

@@ -47,7 +47,7 @@ final class PRComment: DataItem {
 
 	func processNotifications() {
 		if let item = pullRequest ?? issue, item.postSyncAction?.intValue == PostSyncAction.noteUpdated.rawValue && item.isVisibleOnMenu {
-			if refersToMe {
+			if containsTerms(terms: ["@\(apiServer.userName!)"]) {
 				if item.isSnoozing && Settings.snoozeWakeOnMention {
 					DLog("Waking up snoozed item ID %@ because of mention", item.serverId)
 					item.wakeUp()
@@ -114,20 +114,11 @@ final class PRComment: DataItem {
 		return userId == apiServer.userId
 	}
 
-	var refersToMe: Bool {
-		if let userForServer = apiServer.userName, let b = body, userId != apiServer.userId { // Ignore self-references
-			return b.localizedCaseInsensitiveContains("@\(userForServer)")
-		}
-		return false
-	}
-
-	var refersToMyTeams: Bool {
+	final func containsTerms(terms: [String]) -> Bool {
 		if let b = body {
-			for t in apiServer.teams {
-				if let r = t.calculatedReferral {
-					if b.localizedCaseInsensitiveContains(r) {
-						return true
-					}
+			for t in terms {
+				if b.localizedCaseInsensitiveContains(t) {
+					return true
 				}
 			}
 		}

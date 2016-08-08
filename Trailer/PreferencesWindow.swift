@@ -65,10 +65,10 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	// Comments
 	@IBOutlet weak var disableAllCommentNotifications: NSButton!
-	@IBOutlet weak var autoMoveOnTeamMentions: NSButton!
-	@IBOutlet weak var autoMoveOnCommentMentions: NSButton!
-	@IBOutlet weak var autoMoveIfCreatedInOwnedRepo: NSButton!
 	@IBOutlet weak var assumeCommentsBeforeMineAreRead: NSButton!
+	@IBOutlet weak var newMentionMovePolicy: NSPopUpButton!
+	@IBOutlet weak var teamMentionMovePolicy: NSPopUpButton!
+	@IBOutlet weak var newItemInOwnedRepoMovePolicy: NSPopUpButton!
 
 	// Display
 	@IBOutlet weak var useVibrancy: NSButton!
@@ -247,9 +247,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		showAllComments.toolTip = Settings.showCommentsEverywhereHelp
 		hideUncommentedPrs.toolTip = Settings.hideUncommentedItemsHelp
 		openPrAtFirstUnreadComment.toolTip = Settings.openPrAtFirstUnreadCommentHelp
-		autoMoveOnCommentMentions.toolTip = Settings.autoMoveOnCommentMentionsHelp
-		autoMoveOnTeamMentions.toolTip = Settings.autoMoveOnTeamMentionsHelp
-		autoMoveIfCreatedInOwnedRepo.toolTip = Settings.moveNewItemsInOwnReposToMentionedHelp
 		assumeCommentsBeforeMineAreRead.toolTip = Settings.assumeReadItemIfUserHasNewerCommentsHelp
 		disableAllCommentNotifications.toolTip = Settings.disableAllCommentNotificationsHelp
 		showLabels.toolTip = Settings.showLabelsHelp
@@ -273,6 +270,9 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		hideSnoozedItems.toolTip = Settings.hideSnoozedItemsHelp
 		autoSnoozeSelector.toolTip = Settings.autoSnoozeDurationHelp
 		autoSnoozeLabel.toolTip = Settings.autoSnoozeDurationHelp
+		newMentionMovePolicy.toolTip = Settings.newMentionMovePolicyHelp
+		teamMentionMovePolicy.toolTip = Settings.teamMentionMovePolicyHelp
+		newItemInOwnedRepoMovePolicy.toolTip = Settings.newItemInOwnedRepoMovePolicyHelp
 	}
 
 	private func updateAllItemSettingButtons() {
@@ -330,9 +330,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		includeStatusesInFiltering.integerValue = Settings.includeStatusesInFilter ? 1 : 0
 		dontConfirmRemoveAllMerged.integerValue = Settings.dontAskBeforeWipingMerged ? 1 : 0
 		hideUncommentedPrs.integerValue = Settings.hideUncommentedItems ? 1 : 0
-		autoMoveOnCommentMentions.integerValue = Settings.autoMoveOnCommentMentions ? 1 : 0
-		autoMoveOnTeamMentions.integerValue = Settings.autoMoveOnTeamMentions ? 1 : 0
-		autoMoveIfCreatedInOwnedRepo.integerValue = Settings.moveNewItemsInOwnReposToMentioned ? 1 : 0
 		assumeCommentsBeforeMineAreRead.integerValue = Settings.assumeReadItemIfUserHasNewerComments ? 1 : 0
 		hideAvatars.integerValue = Settings.hideAvatars ? 1 : 0
 		showSeparateApiServersInMenu.integerValue = Settings.showSeparateApiServersInMenu ? 1 : 0
@@ -366,6 +363,10 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 		allNewPrsSetting.selectItem(at: Settings.displayPolicyForNewPrs)
 		allNewIssuesSetting.selectItem(at: Settings.displayPolicyForNewIssues)
+
+		newMentionMovePolicy.selectItem(at: Settings.newMentionMovePolicy)
+		teamMentionMovePolicy.selectItem(at: Settings.teamMentionMovePolicy)
+		newItemInOwnedRepoMovePolicy.selectItem(at: Settings.newItemInOwnedRepoMovePolicy)
 
 		hotkeyEnable.integerValue = Settings.hotkeyEnable ? 1 : 0
 		hotkeyControlModifier.integerValue = Settings.hotkeyControlModifier ? 1 : 0
@@ -421,6 +422,22 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		if Settings.showLabels {
 			ApiServer.resetSyncOfEverything()
 		}
+	}
+
+	@IBAction func newMentionMovePolicySelected(_ sender: NSPopUpButton) {
+		Settings.newMentionMovePolicy = sender.indexOfSelectedItem
+		DataManager.postProcessAllItems()
+		deferredUpdateTimer.push()
+	}
+	@IBAction func teamMentionMovePolicySelected(_ sender: NSPopUpButton) {
+		Settings.teamMentionMovePolicy = sender.indexOfSelectedItem
+		DataManager.postProcessAllItems()
+		deferredUpdateTimer.push()
+	}
+	@IBAction func newItemInOwnedRepoMovePolicySelected(_ sender: NSPopUpButton) {
+		Settings.newItemInOwnedRepoMovePolicy = sender.indexOfSelectedItem
+		DataManager.postProcessAllItems()
+		deferredUpdateTimer.push()
 	}
 
 	@IBAction func dontConfirmRemoveAllMergedSelected(_ sender: NSButton) {
@@ -516,24 +533,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction func dontConfirmRemoveAllClosedSelected(_ sender: NSButton) {
 		Settings.dontAskBeforeWipingClosed = (sender.integerValue==1)
-	}
-
-	@IBAction func autoMoveOnCommentMentionsSelected(_ sender: NSButton) {
-		Settings.autoMoveOnCommentMentions = (sender.integerValue==1)
-		DataManager.postProcessAllItems()
-		deferredUpdateTimer.push()
-	}
-
-	@IBAction func autoMoveOnTeamMentionsSelected(_ sender: NSButton) {
-		Settings.autoMoveOnTeamMentions = (sender.integerValue==1)
-		DataManager.postProcessAllItems()
-		deferredUpdateTimer.push()
-	}
-
-	@IBAction func autoMoveIfCreatedInOwnedRepoSelected(_ sender: NSButton) {
-		Settings.moveNewItemsInOwnReposToMentioned = (sender.integerValue==1)
-		DataManager.postProcessAllItems()
-		deferredUpdateTimer.push()
 	}
 
 	@IBAction func assumeAllCommentsBeforeMineAreReadSelected(_ sender: NSButton) {

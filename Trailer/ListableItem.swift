@@ -144,28 +144,26 @@ class ListableItem: DataItem {
 		return false
 	}
 
-	final var refersToMe: Bool {
-		if let apiName = apiServer.userName, let b = body {
-			return b.localizedCaseInsensitiveContains("@\(apiName)")
+	final private func containsTerms(terms: [String]) -> Bool {
+		if let b = body {
+			for t in terms {
+				if b.localizedCaseInsensitiveContains(t) {
+					return true
+				}
+			}
 		}
-		return false
-	}
-
-	final var commentedByMe: Bool {
 		for c in comments {
-			if c.isMine {
+			if c.containsTerms(terms: terms) {
 				return true
 			}
 		}
 		return false
 	}
 
-	final private var refersToMyTeams: Bool {
-		if let b = body {
-			for t in apiServer.teams {
-				if let r = t.calculatedReferral {
-					if b.localizedCaseInsensitiveContains(r) { return true }
-				}
+	final private var commentedByMe: Bool {
+		for c in comments {
+			if c.isMine {
+				return true
 			}
 		}
 		return false
@@ -238,82 +236,28 @@ class ListableItem: DataItem {
 		else if assignedToParticipated || commentedByMe				{ targetSection = .participated }
 		else														{ targetSection = .all }
 
-		let outsideMySectionsButAwake = (targetSection == .all || targetSection == .none)
-		var moveToMentioned = false
-		var autoMoveOnTeamMentions = false
-		var autoMoveOnCommentMentions = false
-		var doReferralCheckInComments = false
+		var outsideMySectionsButAwake = (targetSection == .all || targetSection == .none)
 
-		if outsideMySectionsButAwake && Settings.moveNewItemsInOwnReposToMentioned && repo.isMine {
-			moveToMentioned = true
+		if outsideMySectionsButAwake && Settings.newMentionMovePolicy > Section.none.rawValue
+			&& containsTerms(terms: ["@\(apiServer.userName!)"]) {
+
+			targetSection = Section(rawValue: Settings.newMentionMovePolicy)!
+			outsideMySectionsButAwake = false
 		}
 
-		if !moveToMentioned && outsideMySectionsButAwake && Settings.autoMoveOnTeamMentions {
-			if refersToMyTeams {
-				moveToMentioned = true
-			} else {
-				doReferralCheckInComments = true
-				autoMoveOnTeamMentions = true
-			}
+		if outsideMySectionsButAwake && Settings.teamMentionMovePolicy > Section.none.rawValue
+			&& containsTerms(terms: apiServer.teams.flatMap { $0.calculatedReferral }) {
+
+			targetSection = Section(rawValue: Settings.teamMentionMovePolicy)!
+			outsideMySectionsButAwake = false
 		}
 
-		if !moveToMentioned && outsideMySectionsButAwake && Settings.autoMoveOnCommentMentions {
-			if refersToMe {
-				moveToMentioned = true
-			} else {
-				doReferralCheckInComments = true
-				autoMoveOnCommentMentions = true
-			}
+		if outsideMySectionsButAwake && Settings.newItemInOwnedRepoMovePolicy > Section.none.rawValue && repo.isMine {
+			targetSection = Section(rawValue: Settings.newItemInOwnedRepoMovePolicy)!
+			outsideMySectionsButAwake = false
 		}
 
-		var latestDate = latestReadCommentDate ?? Date.distantPast
-		let isMuted = muted?.boolValue ?? false
-
-		if Settings.assumeReadItemIfUserHasNewerComments {
-			let f = NSFetchRequest<PRComment>(entityName: "PRComment")
-			f.returnsObjectsAsFaults = false
-			f.predicate = predicateForMyCommentsSinceDate(latestDate)
-			for c in try! managedObjectContext?.fetch(f) ?? [] {
-				if let createdDate = c.createdAt, latestDate < createdDate {
-					latestDate = createdDate
-				}
-			}
-			latestReadCommentDate = latestDate
-		}
-
-		func unreadFromOtherCommentsSinceLatestDate() -> Int {
-			let f = NSFetchRequest<PRComment>(entityName: "PRComment")
-			f.predicate = predicateForOthersCommentsSinceDate(latestDate)
-			return try! managedObjectContext?.count(for: f) ?? 0
-		}
-
-		if moveToMentioned {
-			targetSection = .mentioned
-			unreadComments = unreadFromOtherCommentsSinceLatestDate()
-		} else if doReferralCheckInComments {
-			let f = NSFetchRequest<PRComment>(entityName: "PRComment")
-			f.returnsObjectsAsFaults = false
-			f.predicate = predicateForOthersCommentsSinceDate(nil)
-			var unreadCommentCount = 0
-			let showCommentsEverywhere = Settings.showCommentsEverywhere
-			for c in try! managedObjectContext?.fetch(f) ?? [] {
-				if (autoMoveOnCommentMentions && c.refersToMe) || (autoMoveOnTeamMentions && c.refersToMyTeams) {
-					targetSection = .mentioned
-				}
-				let dontCountComments = isMuted || ((targetSection == .all || targetSection == .snoozed) && !showCommentsEverywhere)
-				if !dontCountComments {
-					if let created = c.createdAt, latestDate < created {
-						unreadCommentCount += 1
-					}
-				}
-			}
-			unreadComments = unreadCommentCount
-		} else {
-			let dontCountComments = isMuted || ((targetSection == .all || targetSection == .snoozed) && !Settings.showCommentsEverywhere)
-			unreadComments = dontCountComments ? 0 : unreadFromOtherCommentsSinceLatestDate()
-		}
-
-		totalComments = comments.count
+		////////// Apply viewing policies
 
 		let policy = (self is Issue ? repo.displayPolicyForIssues : repo.displayPolicyForPrs)?.intValue ?? 0
 		if let displayPolicy = RepoDisplayPolicy(rawValue: policy) {
@@ -373,8 +317,37 @@ class ListableItem: DataItem {
 			}
 		}
 
-		sectionIndex = targetSection.rawValue
+		/////////// Comment counting
 
+		let isMuted = muted?.boolValue ?? false
+		let inLoudSection = targetSection != .all && targetSection != .snoozed && targetSection != .none
+		let showComments = !isMuted && (inLoudSection || Settings.showCommentsEverywhere)
+		if showComments {
+
+			var latestDate = latestReadCommentDate ?? Date.distantPast
+
+			if Settings.assumeReadItemIfUserHasNewerComments {
+				let f = NSFetchRequest<PRComment>(entityName: "PRComment")
+				f.returnsObjectsAsFaults = false
+				f.predicate = predicateForMyCommentsSinceDate(latestDate)
+				for c in try! managedObjectContext?.fetch(f) ?? [] {
+					if let createdDate = c.createdAt, latestDate < createdDate {
+						latestDate = createdDate
+					}
+				}
+				latestReadCommentDate = latestDate
+			}
+
+			let f = NSFetchRequest<PRComment>(entityName: "PRComment")
+			f.predicate = predicateForOthersCommentsSinceDate(latestDate)
+			unreadComments = try! managedObjectContext?.count(for: f) ?? 0
+
+		} else {
+			unreadComments = 0
+		}
+
+		totalComments = comments.count
+		sectionIndex = targetSection.rawValue
 		if title==nil { title = "(No title)" }
 	}
 

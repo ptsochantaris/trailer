@@ -12,6 +12,9 @@ enum Section: Int {
 
 	static let apiTitles = ["", "mine", "participated", "mentioned", "merged", "closed", "other", "snoozed"]
 	func apiName() -> String { return Section.apiTitles[rawValue] }
+
+	static let movePolicyNames = ["Don't Move", "Mine", "Participated", "Mentioned"]
+	func movePolicyName() -> String { return Section.movePolicyNames[rawValue] }
 }
 
 func S(_ s: String?) -> String {
