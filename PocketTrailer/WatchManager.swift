@@ -102,15 +102,16 @@ final class WatchManager : NSObject, WCSessionDelegate {
 					uri = message["localId"] as? String,
 					let oid = DataManager.idForUriPath(uri),
 					let dataItem = existingObjectWithID(oid) as? ListableItem,
-					let count = dataItem.unreadComments?.intValue, count > 0 {
+					dataItem.unreadComments > 0 {
 
 					dataItem.catchUpWithComments()
+					
 				} else if let uris = message["itemUris"] as? [String] {
 					for uri in uris {
 						if let
 							oid = DataManager.idForUriPath(uri),
 							let dataItem = existingObjectWithID(oid) as? ListableItem,
-							let count = dataItem.unreadComments?.intValue, count > 0 {
+							dataItem.unreadComments > 0 {
 
 							dataItem.catchUpWithComments()
 						}
@@ -142,7 +143,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 		case "item_list":
 			buildItemList(type: message["type"] as! String,
-			              sectionIndex: message["sectionIndex"] as! Int,
+			              sectionIndex: message["sectionIndex"] as! Int64,
 			              from: message["from"] as! Int,
 			              apiServerUri: message["apiUri"] as! String,
 			              group: message["group"] as! String,
@@ -182,7 +183,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	////////////////////////////
 
-	private func buildItemList(type: String, sectionIndex: Int, from: Int, apiServerUri: String, group: String, count: Int, onlyUnread: Bool, replyHandler: ([String : AnyObject]) -> Void) {
+	private func buildItemList(type: String, sectionIndex: Int64, from: Int, apiServerUri: String, group: String, count: Int, onlyUnread: Bool, replyHandler: ([String : AnyObject]) -> Void) {
 
 		let showLabels = Settings.showLabels
 		let showStatuses: Bool
@@ -224,8 +225,8 @@ final class WatchManager : NSObject, WCSessionDelegate {
 	private func baseDataForItem(item: ListableItem, showStatuses: Bool, showLabels: Bool) -> [String : AnyObject] {
 
 		var itemData = [
-			"commentCount": item.totalComments ?? 0,
-			"unreadCount": item.unreadComments ?? 0,
+			"commentCount": NSNumber(value: item.totalComments),
+			"unreadCount": NSNumber(value: item.unreadComments),
 			"localId": item.objectID.uriRepresentation().absoluteString,
 		]
 
@@ -371,21 +372,21 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	private func countItemsForType(type: String, inSection: Section, criterion: GroupingCriterion?) -> Int {
 		let f = NSFetchRequest<ListableItem>(entityName: type)
-		let p = Settings.hideUncommentedItems ? NSPredicate(format: "sectionIndex == %d and unreadComments > 0", inSection.rawValue) : NSPredicate(format: "sectionIndex == %d", inSection.rawValue)
+		let p = Settings.hideUncommentedItems ? NSPredicate(format: "sectionIndex == %lld and unreadComments > 0", inSection.rawValue) : NSPredicate(format: "sectionIndex == %d", inSection.rawValue)
 		DataItem.addCriterion(criterion, toFetchRequest: f, originalPredicate: p, inMoc: mainObjectContext)
 		return try! mainObjectContext.count(for: f)
 	}
 
 	private func badgeCountForType(type: String, inSection: Section, criterion: GroupingCriterion?) -> Int {
 		let f = NSFetchRequest<ListableItem>(entityName: type)
-		let p = NSPredicate(format: "sectionIndex == %d and unreadComments > 0", inSection.rawValue)
+		let p = NSPredicate(format: "sectionIndex == %lld and unreadComments > 0", inSection.rawValue)
 		DataItem.addCriterion(criterion, toFetchRequest: f, originalPredicate: p, inMoc: mainObjectContext)
 		return ListableItem.badgeCountFromFetch(f, inMoc: mainObjectContext)
 	}
 
 	private func countOpenAndVisibleForType(type: String, criterion: GroupingCriterion?) -> Int {
 		let f = NSFetchRequest<ListableItem>(entityName: type)
-		let p = Settings.hideUncommentedItems ? NSPredicate(format: "sectionIndex > 0 and (condition == %d or condition == nil) and unreadComments > 0", ItemCondition.open.rawValue) : NSPredicate(format: "sectionIndex > 0 and (condition == %d or condition == nil)", ItemCondition.open.rawValue)
+		let p = Settings.hideUncommentedItems ? NSPredicate(format: "sectionIndex > 0 and (condition == %lld or condition == nil) and unreadComments > 0", ItemCondition.open.rawValue) : NSPredicate(format: "sectionIndex > 0 and (condition == %lld or condition == nil)", ItemCondition.open.rawValue)
 		DataItem.addCriterion(criterion, toFetchRequest: f, originalPredicate: p, inMoc: mainObjectContext)
 		return try! mainObjectContext.count(for: f)
 	}

@@ -16,8 +16,8 @@ final class Issue: ListableItem {
 
 				i.baseSyncFromInfo(info, inRepo: inRepo)
 
-				if let N = i.number, let R = inRepo.fullName {
-					i.commentsLink = "/repos/\(R)/issues/\(N)/comments"
+				if let R = inRepo.fullName {
+					i.commentsLink = "/repos/\(R)/issues/\(i.number)/comments"
 				}
 
 				for l in i.labels {
@@ -27,7 +27,7 @@ final class Issue: ListableItem {
 				let labelList = info["labels"] as? [[NSObject: AnyObject]]
 				PRLabel.syncLabelsWithInfo(labelList, withParent: i)
 			}
-			i.reopened = ((i.condition?.intValue ?? 0) == ItemCondition.closed.rawValue)
+			i.reopened = (i.condition == ItemCondition.closed.rawValue)
 			i.condition = ItemCondition.open.rawValue
 		}
 	}
@@ -73,7 +73,7 @@ final class Issue: ListableItem {
 	class func markEverythingRead(_ section: Section, moc: NSManagedObjectContext) {
 		let f = NSFetchRequest<Issue>(entityName: "Issue")
 		if section != .none {
-			f.predicate = NSPredicate(format: "sectionIndex == %d", section.rawValue)
+			f.predicate = NSPredicate(format: "sectionIndex == %lld", section.rawValue)
 		}
 		for pr in try! moc.fetch(f) {
 			pr.catchUpWithComments()
@@ -93,7 +93,7 @@ final class Issue: ListableItem {
 
 	class func countOpenInMoc(_ moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
 		let f = NSFetchRequest<Issue>(entityName: "Issue")
-		let p = NSPredicate(format: "condition == %d or condition == nil", ItemCondition.open.rawValue)
+		let p = NSPredicate(format: "condition == %lld or condition == nil", ItemCondition.open.rawValue)
 		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, inMoc: moc)
 		return try! moc.count(for: f)
 	}
@@ -137,13 +137,13 @@ final class Issue: ListableItem {
 	}
 
 	var sectionName: String {
-		return Section.issueMenuTitles[sectionIndex?.intValue ?? 0]
+		return Section.issueMenuTitles[Int(sectionIndex)]
 	}
 
 	class func allClosedInMoc(_ moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, includeAllGroups: Bool = false) -> [Issue] {
 		let f = NSFetchRequest<Issue>(entityName: "Issue")
 		f.returnsObjectsAsFaults = false
-		let p = NSPredicate(format: "condition == %d", ItemCondition.closed.rawValue)
+		let p = NSPredicate(format: "condition == %lld", ItemCondition.closed.rawValue)
 		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, inMoc: moc, includeAllGroups: includeAllGroups)
 		return try! moc.fetch(f)
 	}

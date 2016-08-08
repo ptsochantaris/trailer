@@ -5,9 +5,6 @@ final class PRStatus: DataItem {
     @NSManaged var descriptionText: String?
     @NSManaged var state: String?
     @NSManaged var targetUrl: String?
-    @NSManaged var url: String?
-    @NSManaged var userId: NSNumber?
-    @NSManaged var userName: String?
 
 	@NSManaged var pullRequest: PullRequest
 
@@ -15,18 +12,12 @@ final class PRStatus: DataItem {
 		itemsWithInfo(data, type: "PRStatus", fromServer: pullRequest.apiServer) { item, info, isNewOrUpdated in
 			if isNewOrUpdated {
 				let s = item as! PRStatus
-				s.url = info["url"] as? String
 				s.state = info["state"] as? String
 				s.targetUrl = info["target_url"] as? String
 				s.pullRequest = pullRequest
 
 				if let ds = info["description"] as? String {
 					s.descriptionText = ds.trim()
-				}
-
-				if let userInfo = info["creator"] as? [NSObject : AnyObject] {
-					s.userName = userInfo["login"] as? String
-					s.userId = userInfo["id"] as? NSNumber
 				}
 			}
 		}

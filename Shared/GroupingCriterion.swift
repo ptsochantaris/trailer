@@ -27,12 +27,12 @@ final class GroupingCriterion {
 	}
 
 	var relatedServerFailed: Bool {
-		if let aid = apiServerId, let a = existingObjectWithID(aid) as? ApiServer, !(a.lastSyncSucceeded?.boolValue ?? true) {
+		if let aid = apiServerId, let a = existingObjectWithID(aid) as? ApiServer, !a.lastSyncSucceeded {
 			return true
 		}
 		if let r = repoGroup {
 			for repo in Repo.reposForGroup(r, inMoc: mainObjectContext) {
-				if !(repo.apiServer.lastSyncSucceeded?.boolValue ?? true) {
+				if !repo.apiServer.lastSyncSucceeded {
 					return true
 				}
 			}

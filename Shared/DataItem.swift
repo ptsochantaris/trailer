@@ -3,8 +3,8 @@ import CoreData
 
 class DataItem: NSManagedObject {
 
-	@NSManaged var serverId: NSNumber?
-	@NSManaged var postSyncAction: NSNumber?
+	@NSManaged var serverId: Int64
+	@NSManaged var postSyncAction: Int64
 	@NSManaged var createdAt: Date?
 	@NSManaged var updatedAt: Date?
 	@NSManaged var apiServer: ApiServer
@@ -27,25 +27,17 @@ class DataItem: NSManagedObject {
 		return try! fromServer.managedObjectContext!.fetch(f)
 	}
 
-	final class func itemOfType(_ type: String, serverId: NSNumber, fromServer: ApiServer) -> DataItem? {
-		let f = NSFetchRequest<DataItem>(entityName: type)
-		f.returnsObjectsAsFaults = false
-		f.fetchLimit = 1
-		f.predicate = NSPredicate(format:"serverId = %@ and apiServer == %@", serverId, fromServer)
-		let items = try! fromServer.managedObjectContext!.fetch(f)
-		return items.first
-	}
-
 	final class func itemsWithInfo(_ data: [[NSObject : AnyObject]]?, type: String, fromServer: ApiServer, postProcessCallback: (DataItem, [NSObject : AnyObject], Bool)->Void) {
 
 		guard let infos=data, infos.count > 0 else { return }
 
-		var idsOfItems = [NSNumber]()
-		var idsToInfo = [NSNumber : [NSObject : AnyObject]]()
+		var idsOfItems = [Int64]()
+		var idsToInfo = [Int64 : [NSObject : AnyObject]]()
 		for info in infos {
 			if let serverId = info["id"] as? NSNumber {
-				idsOfItems.append(serverId)
-				idsToInfo[serverId] = info
+				let sid = serverId.int64Value
+				idsOfItems.append(sid)
+				idsToInfo[sid] = info
 			}
 		}
 
@@ -53,20 +45,21 @@ class DataItem: NSManagedObject {
 
 		let f = NSFetchRequest<DataItem>(entityName: type)
 		f.returnsObjectsAsFaults = false
-		f.predicate = NSPredicate(format:"serverId in %@ and apiServer == %@", idsOfItems, fromServer)
+		f.predicate = NSPredicate(format:"serverId in %@ and apiServer == %@", idsOfItems.map { NSNumber(value: $0) }, fromServer)
 		let existingItems = try! fromServer.managedObjectContext?.fetch(f) ?? []
 
 		for i in existingItems {
-			if let serverId = i.serverId, let idx = idsOfItems.index(of: serverId), let info = idsToInfo[serverId] {
+			let serverId = i.serverId
+			if let idx = idsOfItems.index(of: serverId), let info = idsToInfo[serverId] {
 				idsOfItems.remove(at: idx)
 				let updatedDate = parseGH8601(info["updated_at"] as? String) ?? Date()
 				if updatedDate != i.updatedAt {
-					DLog("Updating %@: %@",type,serverId)
+					DLog("Updating %@: %lld", type, serverId)
 					i.postSyncAction = PostSyncAction.noteUpdated.rawValue
 					i.updatedAt = updatedDate
 					postProcessCallback(i, info, true)
 				} else {
-					//DLog("Skipping %@: %@",type,serverId)
+					//DLog("Skipping %@: %lld",type,serverId)
 					i.postSyncAction = PostSyncAction.doNothing.rawValue
 					postProcessCallback(i, info, false)
 				}
@@ -75,7 +68,7 @@ class DataItem: NSManagedObject {
 
 		for serverId in idsOfItems {
 			if let info = idsToInfo[serverId] {
-				DLog("Creating %@: %@", type, serverId)
+				DLog("Creating %@: %lld", type, serverId)
 				let i = NSEntityDescription.insertNewObject(forEntityName: type, into: fromServer.managedObjectContext!) as! DataItem
 				i.serverId = serverId
 				i.postSyncAction = PostSyncAction.noteNew.rawValue
@@ -93,10 +86,10 @@ class DataItem: NSManagedObject {
 		let f = NSFetchRequest<DataItem>(entityName: type)
 		if surviving {
 			f.returnsObjectsAsFaults = false
-			f.predicate = NSPredicate(format: "postSyncAction != %d", PostSyncAction.delete.rawValue)
+			f.predicate = NSPredicate(format: "postSyncAction != %lld", PostSyncAction.delete.rawValue)
 		} else {
 			f.returnsObjectsAsFaults = true
-			f.predicate = NSPredicate(format: "postSyncAction = %d", PostSyncAction.delete.rawValue)
+			f.predicate = NSPredicate(format: "postSyncAction = %lld", PostSyncAction.delete.rawValue)
 		}
 		return try! inMoc.fetch(f)
 	}
@@ -104,21 +97,21 @@ class DataItem: NSManagedObject {
 	final class func newOrUpdatedItemsOfType(_ type: String, inMoc: NSManagedObjectContext) -> [DataItem] {
 		let f = NSFetchRequest<DataItem>(entityName: type)
 		f.returnsObjectsAsFaults = false
-		f.predicate = NSPredicate(format: "postSyncAction = %d or postSyncAction = %d", PostSyncAction.noteNew.rawValue, PostSyncAction.noteUpdated.rawValue)
+		f.predicate = NSPredicate(format: "postSyncAction = %lld or postSyncAction = %lld", PostSyncAction.noteNew.rawValue, PostSyncAction.noteUpdated.rawValue)
 		return try! inMoc.fetch(f)
 	}
 
 	final class func updatedItemsOfType(_ type: String, inMoc: NSManagedObjectContext) -> [DataItem] {
 		let f = NSFetchRequest<DataItem>(entityName: type)
 		f.returnsObjectsAsFaults = false
-		f.predicate = NSPredicate(format: "postSyncAction = %d", PostSyncAction.noteUpdated.rawValue)
+		f.predicate = NSPredicate(format: "postSyncAction = %lld", PostSyncAction.noteUpdated.rawValue)
 		return try! inMoc.fetch(f)
 	}
 
 	final class func newItemsOfType(_ type: String, inMoc: NSManagedObjectContext) -> [DataItem] {
 		let f = NSFetchRequest<DataItem>(entityName: type)
 		f.returnsObjectsAsFaults = false
-		f.predicate = NSPredicate(format: "postSyncAction = %d", PostSyncAction.noteNew.rawValue)
+		f.predicate = NSPredicate(format: "postSyncAction = %lld", PostSyncAction.noteNew.rawValue)
 		return try! inMoc.fetch(f)
 	}
 

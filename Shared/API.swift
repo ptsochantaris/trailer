@@ -19,6 +19,7 @@ final class API {
 	private let urlSession: URLSession
 	private var badLinks = [String:UrlBackOffEntry]()
 	private let reachability = Reachability.forInternetConnection()!
+	private let BACKOFF_STEP: TimeInterval = 120.0
 
 	init() {
 
@@ -281,7 +282,7 @@ final class API {
 
 		// discard any changes related to any failed API server
 		for apiServer in ApiServer.allApiServersInMoc(moc) {
-			if !apiServer.syncIsGood {
+			if !apiServer.lastSyncSucceeded {
 				apiServer.rollBackAllUpdatesInMoc(moc)
 				apiServer.lastSyncSucceeded = false // we just wiped all changes, but want to keep this one
 			}
@@ -388,7 +389,7 @@ final class API {
 		}
 
 		for apiServer in allApiServers {
-			if apiServer.goodToGo && apiServer.syncIsGood {
+			if apiServer.goodToGo && apiServer.lastSyncSucceeded {
 				markDirtyRepoIds(repoIdsToMarkDirty, usingUserEventsFromServer: apiServer, callback: completionCallback)
 				markDirtyRepoIds(repoIdsToMarkDirty, usingReceivedEventsFromServer: apiServer, callback: completionCallback)
 			} else {
@@ -420,7 +421,7 @@ final class API {
 
 	private func markDirtyRepoIds(_ repoIdsToMarkDirty: NSMutableSet, usingUserEventsFromServer s: ApiServer, callback: Completion) {
 
-		if !s.syncIsGood {
+		if !s.lastSyncSucceeded {
 			callback()
 			return
 		}
@@ -468,7 +469,7 @@ final class API {
 
 	private func markDirtyRepoIds(_ repoIdsToMarkDirty: NSMutableSet, usingReceivedEventsFromServer s: ApiServer, callback: Completion) {
 
-		if !s.syncIsGood {
+		if !s.lastSyncSucceeded {
 			callback()
 			return
 		}
@@ -532,8 +533,8 @@ final class API {
 				completionCount += 1
 				if completionCount == totalOperations {
 					for r in DataItem.newItemsOfType("Repo", inMoc: moc) as! [Repo] {
-						r.displayPolicyForPrs = Settings.displayPolicyForNewPrs
-						r.displayPolicyForIssues = Settings.displayPolicyForNewIssues
+						r.displayPolicyForPrs = Int64(Settings.displayPolicyForNewPrs)
+						r.displayPolicyForIssues = Int64(Settings.displayPolicyForNewIssues)
 						if r.shouldSync {
 							app.postNotification(type: .newRepoAnnouncement, forItem:r)
 						}
@@ -572,14 +573,14 @@ final class API {
 		for r in repos {
 
 			for p in r.pullRequests {
-				if (p.condition?.intValue ?? 0) == ItemCondition.open.rawValue {
+				if p.condition == ItemCondition.open.rawValue {
 					p.postSyncAction = PostSyncAction.delete.rawValue
 				}
 			}
 
 			let apiServer = r.apiServer
 
-			if apiServer.syncIsGood && r.displayPolicyForPrs?.intValue != RepoDisplayPolicy.hide.rawValue {
+			if apiServer.lastSyncSucceeded && r.displayPolicyForPrs != RepoDisplayPolicy.hide.rawValue {
 				let repoFullName = S(r.fullName)
 				getPagedDataInPath("/repos/\(repoFullName)/pulls", fromServer: apiServer, startingFromPage: 1,
 					perPageCallback: { data, lastPage in
@@ -637,14 +638,14 @@ final class API {
 		for r in repos {
 
 			for i in r.issues {
-				if (i.condition?.intValue ?? 0) == ItemCondition.open.rawValue {
+				if i.condition == ItemCondition.open.rawValue {
 					i.postSyncAction = PostSyncAction.delete.rawValue
 				}
 			}
 
 			let apiServer = r.apiServer
 
-			if apiServer.syncIsGood && r.displayPolicyForIssues?.intValue != RepoDisplayPolicy.hide.rawValue {
+			if apiServer.lastSyncSucceeded && r.displayPolicyForIssues != RepoDisplayPolicy.hide.rawValue {
 				let repoFullName = S(r.fullName)
 				getPagedDataInPath("/repos/\(repoFullName)/issues", fromServer: apiServer, startingFromPage: 1,
 					perPageCallback: { data, lastPage in
@@ -671,7 +672,7 @@ final class API {
 	private func fetchCommentsForCurrentPullRequestsToMoc(_ moc: NSManagedObjectContext, callback: Completion) {
 
 		let prs = (DataItem.newOrUpdatedItemsOfType("PullRequest", inMoc:moc) as! [PullRequest]).filter({ pr in
-			return pr.apiServer.syncIsGood
+			return pr.apiServer.lastSyncSucceeded
 		})
 		if prs.count==0 {
 			callback()
@@ -744,7 +745,7 @@ final class API {
 		}
 
 		let issues = allIssues.filter({ i in
-			return i.apiServer.syncIsGood
+			return i.apiServer.lastSyncSucceeded
 		})
 
 		let total = issues.count
@@ -786,10 +787,10 @@ final class API {
 	private func fetchLabelsForForCurrentPullRequestsToMoc(_ moc: NSManagedObjectContext, callback: Completion) {
 
 		let prs = PullRequest.activeInMoc(moc, visibleOnly: true).filter { [weak self] pr in
-			if !pr.apiServer.syncIsGood {
+			if !pr.apiServer.lastSyncSucceeded {
 				return false
 			}
-			if pr.condition?.intValue != ItemCondition.open.rawValue {
+			if pr.condition != ItemCondition.open.rawValue {
 				//DLog("Won't check labels for closed/merged PR: %@", pr.title)
 				return false
 			}
@@ -856,7 +857,7 @@ final class API {
 	private func fetchStatusesForCurrentPullRequestsToMoc(_ moc: NSManagedObjectContext, callback: Completion) {
 
 		let prs = PullRequest.activeInMoc(moc, visibleOnly: !Settings.hidePrsThatArentPassing).filter { [unowned self] pr in
-			if !pr.apiServer.syncIsGood {
+			if !pr.apiServer.lastSyncSucceeded {
 				return false
 			}
 			let oid = pr.objectID
@@ -921,13 +922,13 @@ final class API {
 
 	private func checkPrClosuresInMoc(_ moc: NSManagedObjectContext, callback: Completion) {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
-		f.predicate = NSPredicate(format: "postSyncAction == %d and condition == %d", PostSyncAction.delete.rawValue, ItemCondition.open.rawValue)
+		f.predicate = NSPredicate(format: "postSyncAction == %lld and condition == %lld", PostSyncAction.delete.rawValue, ItemCondition.open.rawValue)
 		f.returnsObjectsAsFaults = false
 		let pullRequests = try! moc.fetch(f)
 
 		let prsToCheck = pullRequests.filter { r -> Bool in
 			let parent = r.repo
-			return parent.shouldSync && ((parent.postSyncAction?.intValue ?? 0) != PostSyncAction.delete.rawValue) && r.apiServer.syncIsGood
+			return parent.shouldSync && parent.postSyncAction != PostSyncAction.delete.rawValue && r.apiServer.lastSyncSucceeded
 		}
 
 		let totalOperations = prsToCheck.count
@@ -951,12 +952,12 @@ final class API {
 
 	private func checkIssueClosuresInMoc(_ moc: NSManagedObjectContext) {
 		let f = NSFetchRequest<Issue>(entityName: "Issue")
-		f.predicate = NSPredicate(format: "postSyncAction == %d and condition == %d", PostSyncAction.delete.rawValue, ItemCondition.open.rawValue)
+		f.predicate = NSPredicate(format: "postSyncAction == %lld and condition == %lld", PostSyncAction.delete.rawValue, ItemCondition.open.rawValue)
 		f.returnsObjectsAsFaults = false
 
 		for i in try! moc.fetch(f) {
 			let r = i.repo
-			if r.shouldSync && ((r.postSyncAction?.intValue ?? 0) != PostSyncAction.delete.rawValue) && r.apiServer.syncIsGood {
+			if r.shouldSync && r.postSyncAction != PostSyncAction.delete.rawValue && r.apiServer.lastSyncSucceeded {
 				itemWasClosed(i)
 			}
 		}
@@ -965,7 +966,7 @@ final class API {
 	private func detectAssignedPullRequestsInMoc(_ moc: NSManagedObjectContext, callback: Completion) {
 
 		let prs = (DataItem.newOrUpdatedItemsOfType("PullRequest", inMoc:moc) as! [PullRequest]).filter({ pr in
-			return pr.apiServer.syncIsGood
+			return pr.apiServer.lastSyncSucceeded
 		})
 		if prs.count==0 {
 			callback()
@@ -988,7 +989,7 @@ final class API {
 				getDataInPath(issueLink, fromServer: apiServer) { data, lastPage, resultCode in
 					if let d = data as? [NSObject : AnyObject], let assigneeInfo = d["assignee"] as? [NSObject : AnyObject], let assignee = assigneeInfo["login"] as? String {
 						let assigned = (assignee == S(apiServer.userName))
-						p.isNewAssignment = (assigned && !p.createdByMe && !(p.assignedToMe?.boolValue ?? false))
+						p.isNewAssignment = (assigned && !p.createdByMe && !p.assignedToMe)
 						p.assignedToMe = assigned
 					} else if resultCode == 200 || resultCode == 404 || resultCode == 410 {
 						// 200 means PR is not assigned to anyone, there was no asgineee info
@@ -1009,7 +1010,7 @@ final class API {
 	private func ensureApiServersHaveUserIdsInMoc(_ moc: NSManagedObjectContext, callback: Completion) {
 		var needToCheck = false
 		for apiServer in ApiServer.allApiServersInMoc(moc) {
-			if (apiServer.userId?.intValue ?? 0) == 0 {
+			if apiServer.userId == 0 {
 				needToCheck = true
 				break
 			}
@@ -1027,14 +1028,13 @@ final class API {
 		DLog("Checking closed PR to see if it was merged: %@", r.title)
 
 		let repoFullName = S(r.repo.fullName)
-		let repoNumber = S(r.number?.stringValue)
-		let path = "/repos/\(repoFullName)/pulls/\(repoNumber)"
+		let path = "/repos/\(repoFullName)/pulls/\(r.number)"
 
 		getDataInPath(path, fromServer: r.apiServer) { [weak self] data, lastPage, resultCode in
 
 			if let d = data as? [NSObject : AnyObject] {
 				if let mergeInfo = d["merged_by"] as? [NSObject : AnyObject], let mergeUserId = mergeInfo["id"] as? NSNumber {
-					self?.prWasMerged(r, byUserId: mergeUserId)
+					self?.prWasMerged(r, byUserId: mergeUserId.int64Value)
 				} else {
 					self?.itemWasClosed(r)
 				}
@@ -1048,22 +1048,22 @@ final class API {
 		}
 	}
 
-	private func prWasMerged(_ r: PullRequest, byUserId: NSNumber) {
+	private func prWasMerged(_ r: PullRequest, byUserId: Int64) {
 
-		let myUserId = r.apiServer.userId ?? NSNumber(value: -1)
-		DLog("Detected merged PR: %@ by user %@, local user id is: %@, handling policy is %@, coming from section %@",
+		let myUserId = r.apiServer.userId
+		DLog("Detected merged PR: %@ by user %lld, local user id is: %lld, handling policy is %d, coming from section %lld",
 			r.title,
 			byUserId,
 			myUserId,
-			NSNumber(value: Settings.mergeHandlingPolicy),
-			r.sectionIndex ?? NSNumber(value: 0))
+			Settings.mergeHandlingPolicy,
+			r.sectionIndex)
 
         if !r.isVisibleOnMenu {
             DLog("Merged PR was hidden, won't announce")
             return
         }
 
-		let mergedByMe = byUserId.isEqual(to: myUserId)
+		let mergedByMe = byUserId == myUserId
 		if !(mergedByMe && Settings.dontKeepPrsMergedByMe) {
 			DLog("Checking if we want to keep this merged PR")
 			if r.shouldKeepForPolicy(Settings.mergeHandlingPolicy) {
@@ -1076,10 +1076,10 @@ final class API {
 	}
 
 	private func itemWasClosed(_ i: ListableItem) {
-		DLog("Detected closed item: %@, handling policy is %@, coming from section %@",
+		DLog("Detected closed item: %@, handling policy is %d, coming from section %lld",
 			i.title,
-			NSNumber(value: Settings.closeHandlingPolicy),
-			i.sectionIndex ?? NSNumber(value: 0))
+			Settings.closeHandlingPolicy,
+			i.sectionIndex)
 
         if !i.isVisibleOnMenu {
             DLog("Closed item was hidden, won't announce")
@@ -1100,9 +1100,9 @@ final class API {
 
 			if error == nil {
 				let allHeaders = headers!
-				let requestsRemaining = (allHeaders["X-RateLimit-Remaining"] as! NSString).longLongValue
-				let requestLimit = (allHeaders["X-RateLimit-Limit"] as! NSString).longLongValue
-				let epochSeconds = (allHeaders["X-RateLimit-Reset"] as! NSString).longLongValue
+				let requestsRemaining = Int64(S(allHeaders["X-RateLimit-Remaining"] as? String)) ?? 0
+				let requestLimit = Int64(S(allHeaders["X-RateLimit-Limit"] as? String)) ?? 0
+				let epochSeconds = Int64(S(allHeaders["X-RateLimit-Reset"] as? String)) ?? 0
 				callback(requestsRemaining, requestLimit, epochSeconds)
 			} else {
 				if code == 404 && data != nil && !((data as? [NSObject : AnyObject])?["message"] as? String == "Not Found") {
@@ -1121,8 +1121,8 @@ final class API {
 		for apiServer in allApiServers {
 			if apiServer.goodToGo {
 				getRateLimitFromServer(apiServer) { remaining, limit, reset in
-					apiServer.requestsRemaining = NSNumber(value: remaining)
-					apiServer.requestsLimit = NSNumber(value: limit)
+					apiServer.requestsRemaining = remaining
+					apiServer.requestsLimit = limit
 					count += 1
 					if count==total {
 						NotificationCenter.default.post(name: Notification.Name(rawValue: API_USAGE_UPDATE), object: apiServer, userInfo: nil)
@@ -1158,7 +1158,7 @@ final class API {
 
 	private func syncWatchedReposFromServer(_ apiServer: ApiServer, callback: Completion) {
 
-		if !apiServer.syncIsGood {
+		if !apiServer.lastSyncSucceeded {
 			callback()
 			return
 		}
@@ -1192,7 +1192,7 @@ final class API {
 
 					if let d = data as? [NSObject : AnyObject] {
 						apiServer.userName = d["login"] as? String
-						apiServer.userId = d["id"] as? NSNumber
+						apiServer.userId = (d["id"] as? NSNumber)?.int64Value ?? 0
 					} else {
 						apiServer.lastSyncSucceeded = false
 					}
@@ -1291,13 +1291,13 @@ final class API {
 				if let allHeaders = headers {
 
 					if let v = allHeaders["X-RateLimit-Remaining"] as? String {
-						fromServer.requestsRemaining = NSNumber(value: Int64(v) ?? 0)
+						fromServer.requestsRemaining = Int64(v) ?? 0
 					} else {
 						fromServer.requestsRemaining = 10000
 					}
 
 					if let v = allHeaders["X-RateLimit-Limit"] as? String {
-						fromServer.requestsLimit = NSNumber(value: Int64(v) ?? 0)
+						fromServer.requestsLimit = Int64(v) ?? 0
 					} else {
 						fromServer.requestsLimit = 10000
 					}
@@ -1378,7 +1378,7 @@ final class API {
 		updateApiProgress()
 
 		let apiServerLabel: String
-		if fromServer.syncIsGood || ignoreLastSync {
+		if fromServer.lastSyncSucceeded || ignoreLastSync {
 			apiServerLabel = S(fromServer.label)
 		} else {
 			atNextEvent(self) { S in
@@ -1426,7 +1426,7 @@ final class API {
 				               parsedData: parsedData,
 				               serverLabel: apiServerLabel,
 				               urlPath: expandedPath,
-				               code: p.code,
+				               code: Int(p.code),
 				               error: nil,
 				               shouldRetry: false,
 				               badServerResponse: false,
@@ -1454,7 +1454,7 @@ final class API {
 
 			if code == 304, let p = previousCacheEntry {
 				parsedData = p.parsedData()
-				code = p.code
+				code = Int(p.code)
 				headers = p.actualHeaders()
 				atNextEvent {
 					CacheEntry.markKeyAsFetched(cacheKey)
@@ -1475,7 +1475,7 @@ final class API {
 					parsedData = try? JSONSerialization.jsonObject(with: d, options: JSONSerialization.ReadingOptions())
 					if let h = headers, let e = h["Etag"] as? String {
 						atNextEvent {
-							CacheEntry.setEntry(cacheKey, code: code, etag: e, data: d, headers: h)
+							CacheEntry.setEntry(cacheKey, code: Int64(code), etag: e, data: d, headers: h)
 						}
 					}
 				}

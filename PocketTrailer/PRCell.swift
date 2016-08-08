@@ -93,11 +93,12 @@ final class PRCell: UITableViewCell {
 
 	func setPullRequest(pullRequest: PullRequest) {
 
-		let muted = pullRequest.muted?.boolValue ?? false
 
 		let detailFont = UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)
 		_title.attributedText = pullRequest.titleWithFont(_title.font, labelFont: detailFont.withSize(detailFont.pointSize-2), titleColor: UIColor.darkText)
 		_description.attributedText = pullRequest.subtitleWithFont(detailFont, lightColor: UIColor.lightGray, darkColor: UIColor.darkGray)
+
+		let muted = pullRequest.muted
 		setCountsImageAndFade(item: pullRequest, muted: muted)
 
 		var statusText : NSMutableAttributedString?
@@ -139,8 +140,6 @@ final class PRCell: UITableViewCell {
 
 	func setIssue(issue: Issue) {
 
-		let muted = issue.muted?.boolValue ?? false
-
 		let detailFont = UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)
 		_title.attributedText = issue.titleWithFont(_title.font, labelFont: detailFont.withSize(detailFont.pointSize-2), titleColor: UIColor.darkText)
 		_description.attributedText = issue.subtitleWithFont(detailFont, lightColor: UIColor.lightGray, darkColor: UIColor.darkGray)
@@ -150,6 +149,7 @@ final class PRCell: UITableViewCell {
 		statusToDescriptionDistance.constant = 0.0
 		statusToBottomDistance.constant = 4.0
 
+		let muted = issue.muted
 		setCountsImageAndFade(item: issue, muted: muted)
 		var title = issue.accessibleTitle()
 		if muted {
@@ -159,8 +159,8 @@ final class PRCell: UITableViewCell {
 	}
 
 	private func setCountsImageAndFade(item: ListableItem, muted: Bool) {
-		let _commentsTotal = item.totalComments?.intValue ?? 0
-		let _commentsNew = item.unreadComments?.intValue ?? 0
+		let _commentsTotal = Int(item.totalComments)
+		let _commentsNew = Int(item.unreadComments)
 		let fade = muted || item.isSnoozing
 
 		readCount.text = itemCountFormatter.string(from: _commentsTotal)

@@ -612,7 +612,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	@IBAction func allPrsPolicySelected(_ sender: NSPopUpButton) {
-		let index = sender.indexOfSelectedItem - 1
+		let index = Int64(sender.indexOfSelectedItem - 1)
 		if index < 0 { return }
 
 		for r in affectedReposFromSelection() {
@@ -625,7 +625,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	@IBAction func allIssuesPolicySelected(_ sender: NSPopUpButton) {
-		let index = sender.indexOfSelectedItem - 1
+		let index = Int64(sender.indexOfSelectedItem - 1)
 		if index < 0 { return }
 
 		for r in affectedReposFromSelection() {
@@ -638,7 +638,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	@IBAction func allHidingPolicySelected(_ sender: NSPopUpButton) {
-		let index = sender.indexOfSelectedItem - 1
+		let index = Int64(sender.indexOfSelectedItem - 1)
 		if index < 0 { return }
 
 		for r in affectedReposFromSelection() {
@@ -818,7 +818,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			if ApiServer.shouldReportRefreshFailureInMoc(tempContext) {
 				var errorServers = [String]()
 				for apiServer in ApiServer.allApiServersInMoc(tempContext) {
-					if apiServer.goodToGo && !apiServer.syncIsGood {
+					if apiServer.goodToGo && !apiServer.lastSyncSucceeded {
 						errorServers.append(S(apiServer.label))
 					}
 				}
@@ -1042,7 +1042,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			apiServerSelectedBox.title = apiServer.label ?? "New Server"
 			apiServerTestButton.isEnabled = !S(apiServer.authToken).isEmpty
 			apiServerDeleteButton.isEnabled = (ApiServer.countApiServersInMoc(mainObjectContext) > 1)
-			apiServerReportError.integerValue = apiServer.reportRefreshFailures.boolValue ? 1 : 0
+			apiServerReportError.integerValue = apiServer.reportRefreshFailures ? 1 : 0
 		}
 	}
 
@@ -1191,7 +1191,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 					cell.isEnabled = true
 					let r = repoForRow(row)
 					let repoName = S(r.fullName)
-					let title = (r.inaccessible?.boolValue ?? false) ? "\(repoName) (inaccessible)" : repoName
+					let title = r.inaccessible ? "\(repoName) (inaccessible)" : repoName
 					let textColor = (row == tv.selectedRow) ? NSColor.selectedControlTextColor : (r.shouldSync ? NSColor.textColor : NSColor.textColor.withAlphaComponent(0.4))
 					cell.attributedStringValue = NSAttributedString(string: title, attributes: [NSForegroundColorAttributeName: textColor])
 				}
@@ -1232,7 +1232,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 								menuCell.menu?.addItem(m)
 								count += 1
 							}
-							menuCell.selectItem(at: r.itemHidingPolicy?.intValue ?? 0)
+							menuCell.selectItem(at: Int(r.itemHidingPolicy))
 						} else {
 							for policy in RepoDisplayPolicy.policies {
 								let m = NSMenuItem()
@@ -1243,7 +1243,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 								menuCell.menu?.addItem(m)
 								count += 1
 							}
-							let selectedIndex = (tableColumn?.identifier == "prs" ? r.displayPolicyForPrs : r.displayPolicyForIssues)?.intValue ?? 0
+							let selectedIndex = Int(tableColumn?.identifier == "prs" ? r.displayPolicyForPrs : r.displayPolicyForIssues)
 							menuCell.selectItem(at: selectedIndex)
 						}
 					}
@@ -1255,7 +1255,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			if tableColumn?.identifier == "server" {
 				cell.title = S(apiServer.label)
 				let tc = c as! NSTextFieldCell
-				if apiServer.lastSyncSucceeded?.boolValue ?? false {
+				if apiServer.lastSyncSucceeded {
 					tc.textColor = NSColor.textColor
 				} else {
 					tc.textColor = NSColor.red
@@ -1263,11 +1263,11 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			} else { // api usage
 				let c = cell as! NSLevelIndicatorCell
 				c.minValue = 0
-				let rl = apiServer.requestsLimit?.doubleValue ?? 0.0
+				let rl = Double(apiServer.requestsLimit)
 				c.maxValue = rl
 				c.warningValue = rl*0.5
 				c.criticalValue = rl*0.8
-				c.doubleValue = rl - (apiServer.requestsRemaining?.doubleValue ?? 0)
+				c.doubleValue = rl - Double(apiServer.requestsRemaining)
 			}
 		} else if tv == snoozePresetsList {
 			let allPresets = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)
@@ -1310,7 +1310,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 					r.groupLabel = g.isEmpty ? nil : g
 					serversDirty = true
 					deferredUpdateTimer.push()
-				} else if let index = (object as? NSNumber)?.intValue {
+				} else if let index = (object as? NSNumber)?.int64Value {
 					if tableColumn?.identifier == "prs" {
 						r.displayPolicyForPrs = index
 					} else if tableColumn?.identifier == "issues" {
@@ -1416,15 +1416,15 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	func fillSnoozeFormFromSelectedPreset() {
 		if let s = selectedSnoozePreset() {
-			if s.duration.boolValue {
+			if s.duration {
 				snoozeTypeDuration.integerValue = 1
 				snoozeTypeDateTime.integerValue = 0
 				snoozeDurationMinutes.isEnabled = true
 				snoozeDurationHours.isEnabled = true
 				snoozeDurationDays.isEnabled = true
-				snoozeDurationMinutes.selectItem(at: s.minute?.intValue ?? 0)
-				snoozeDurationHours.selectItem(at: s.hour?.intValue ?? 0)
-				snoozeDurationDays.selectItem(at: s.day?.intValue ?? 0)
+				snoozeDurationMinutes.selectItem(at: Int(s.minute))
+				snoozeDurationHours.selectItem(at: Int(s.hour))
+				snoozeDurationDays.selectItem(at: Int(s.day))
 				snoozeDateTimeMinute.isEnabled = false
 				snoozeDateTimeMinute.selectItem(at: 0)
 				snoozeDateTimeHour.isEnabled = false
@@ -1443,9 +1443,9 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 				snoozeDateTimeMinute.isEnabled = true
 				snoozeDateTimeHour.isEnabled = true
 				snoozeDateTimeDay.isEnabled = true
-				snoozeDateTimeMinute.selectItem(at: s.minute?.intValue ?? 0)
-				snoozeDateTimeHour.selectItem(at: s.hour?.intValue ?? 0)
-				snoozeDateTimeDay.selectItem(at: s.day?.intValue ?? 0)
+				snoozeDateTimeMinute.selectItem(at: Int(s.minute))
+				snoozeDateTimeHour.selectItem(at: Int(s.hour))
+				snoozeDateTimeDay.selectItem(at: Int(s.day))
 			}
 			snoozeTypeDuration.isEnabled = true
 			snoozeTypeDateTime.isEnabled = true
@@ -1493,7 +1493,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction func snoozeTypeChanged(_ sender: NSButton) {
 		if let s = selectedSnoozePreset() {
-			s.duration = NSNumber(value: (sender == snoozeTypeDuration))
+			s.duration = sender == snoozeTypeDuration
 			fillSnoozeFormFromSelectedPreset()
 			commitSnoozeSettings()
 		}
@@ -1501,14 +1501,14 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction func snoozeOptionsChanged(_ sender: NSPopUpButton) {
 		if let s = selectedSnoozePreset() {
-			if s.duration.boolValue {
-				s.day = numberOrNil(snoozeDurationDays.indexOfSelectedItem)
-				s.hour = numberOrNil(snoozeDurationHours.indexOfSelectedItem)
-				s.minute = numberOrNil(snoozeDurationMinutes.indexOfSelectedItem)
+			if s.duration {
+				s.day = Int64(snoozeDurationDays.indexOfSelectedItem)
+				s.hour = Int64(snoozeDurationHours.indexOfSelectedItem)
+				s.minute = Int64(snoozeDurationMinutes.indexOfSelectedItem)
 			} else {
-				s.day = numberOrNil(snoozeDateTimeDay.indexOfSelectedItem)
-				s.hour = numberOrNil(snoozeDateTimeHour.indexOfSelectedItem)
-				s.minute = numberOrNil(snoozeDateTimeMinute.indexOfSelectedItem)
+				s.day = Int64(snoozeDateTimeDay.indexOfSelectedItem)
+				s.hour = Int64(snoozeDateTimeHour.indexOfSelectedItem)
+				s.minute = Int64(snoozeDateTimeMinute.indexOfSelectedItem)
 			}
 			commitSnoozeSettings()
 		}
@@ -1519,8 +1519,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			let all = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)
 			if let index = all.index(of: this), index > 0 {
 				let other = all[index-1]
-				other.sortOrder = NSNumber(value: index)
-				this.sortOrder = NSNumber(value: index-1)
+				other.sortOrder = Int64(index)
+				this.sortOrder = Int64(index-1)
 				snoozePresetsList.selectRowIndexes(IndexSet(integer: index-1), byExtendingSelection: false)
 				commitSnoozeSettings()
 			}
@@ -1532,15 +1532,11 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			let all = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)
 			if let index = all.index(of: this), index < all.count-1 {
 				let other = all[index+1]
-				other.sortOrder = NSNumber(value: index)
-				this.sortOrder = NSNumber(value: index+1)
+				other.sortOrder = Int64(index)
+				this.sortOrder = Int64(index+1)
 				snoozePresetsList.selectRowIndexes(IndexSet(integer: index+1), byExtendingSelection: false)
 				commitSnoozeSettings()
 			}
 		}
-	}
-
-	private func numberOrNil(_ i: Int) -> NSNumber? {
-		return i > 0 ? NSNumber(value: i) : nil
 	}
 }

@@ -9,27 +9,27 @@ import CoreData
 
 class ListableItem: DataItem {
 
-	@NSManaged var assignedToMe: NSNumber?
+	@NSManaged var assignedToMe: Bool
 	@NSManaged var assigneeName: String?
 	@NSManaged var body: String?
 	@NSManaged var webUrl: String?
-	@NSManaged var condition: NSNumber?
-	@NSManaged var isNewAssignment: NSNumber?
+	@NSManaged var condition: Int64
+	@NSManaged var isNewAssignment: Bool
 	@NSManaged var repo: Repo
 	@NSManaged var title: String?
-	@NSManaged var totalComments: NSNumber?
-	@NSManaged var unreadComments: NSNumber?
+	@NSManaged var totalComments: Int64
+	@NSManaged var unreadComments: Int64
 	@NSManaged var url: String?
 	@NSManaged var userAvatarUrl: String?
-	@NSManaged var userId: NSNumber?
+	@NSManaged var userId: Int64
 	@NSManaged var userLogin: String?
-	@NSManaged var sectionIndex: NSNumber?
+	@NSManaged var sectionIndex: Int64
 	@NSManaged var latestReadCommentDate: Date?
 	@NSManaged var state: String?
-	@NSManaged var reopened: NSNumber?
-	@NSManaged var number: NSNumber?
-	@NSManaged var announced: NSNumber?
-	@NSManaged var muted: NSNumber?
+	@NSManaged var reopened: Bool
+	@NSManaged var number: Int64
+	@NSManaged var announced: Bool
+	@NSManaged var muted: Bool
 	@NSManaged var snoozeUntil: Date?
 	@NSManaged var wasAwokenFromSnooze: Bool
 	@NSManaged var milestone: String?
@@ -43,22 +43,21 @@ class ListableItem: DataItem {
 
 		url = info["url"] as? String
 		webUrl = info["html_url"] as? String
-		number = info["number"] as? NSNumber
+		number = (info["number"] as? NSNumber)?.int64Value ?? 0
 		state = info["state"] as? String
 		title = info["title"] as? String
 		body = info["body"] as? String
 		milestone = info["milestone"]?["title"] as? String
 
 		if let userInfo = info["user"] as? [NSObject: AnyObject] {
-			userId = userInfo["id"] as? NSNumber
+			userId = (userInfo["id"] as? NSNumber)?.int64Value ?? 0
 			userLogin = userInfo["login"] as? String
 			userAvatarUrl = userInfo["avatar_url"] as? String
 		}
 
 		if let assignee = info["assignee"] as? [NSObject: AnyObject], let name = assignee["login"] as? String, let id = assignee["id"] as? NSNumber {
-			let currentlyAssigned = (id == inRepo.apiServer.userId)
-			let previouslyAssigned = assignedToMe?.boolValue ?? false
-			isNewAssignment = currentlyAssigned && !previouslyAssigned && !createdByMe
+			let currentlyAssigned = id.int64Value == inRepo.apiServer.userId
+			isNewAssignment = currentlyAssigned && !assignedToMe && !createdByMe
 			assignedToMe = currentlyAssigned
 			assigneeName = name
 		} else {
@@ -119,29 +118,26 @@ class ListableItem: DataItem {
 	}
 
 	final func shouldKeepForPolicy(_ policy: Int) -> Bool {
-		let s = sectionIndex?.intValue
+		let s = sectionIndex
 		return policy == HandlingPolicy.keepAll.rawValue
 			|| (policy == HandlingPolicy.keepMineAndParticipated.rawValue && (s == Section.mine.rawValue || s == Section.participated.rawValue))
 			|| (policy == HandlingPolicy.keepMine.rawValue && s == Section.mine.rawValue)
 	}
 
 	final var shouldSkipNotifications: Bool {
-		return isSnoozing || (muted?.boolValue ?? false)
+		return isSnoozing || muted
 	}
 
 	final var assignedToMySection: Bool {
-		return (assignedToMe?.boolValue ?? false) && Settings.assignedPrHandlingPolicy==AssignmentPolicy.moveToMine.rawValue
+		return assignedToMe && Settings.assignedPrHandlingPolicy == AssignmentPolicy.moveToMine.rawValue
 	}
 
 	final var assignedToParticipated: Bool {
-		return (assignedToMe?.boolValue ?? false) && Settings.assignedPrHandlingPolicy==AssignmentPolicy.moveToParticipated.rawValue
+		return assignedToMe && Settings.assignedPrHandlingPolicy == AssignmentPolicy.moveToParticipated.rawValue
 	}
 
 	final var createdByMe: Bool {
-		if let userId = userId, let apiId = apiServer.userId {
-			return userId == apiId
-		}
-		return false
+		return userId == apiServer.userId
 	}
 
 	final private func containsTerms(terms: [String]) -> Bool {
@@ -170,7 +166,7 @@ class ListableItem: DataItem {
 	}
 
 	final var isVisibleOnMenu: Bool {
-		return self.sectionIndex?.intValue != Section.none.rawValue
+		return sectionIndex != Section.none.rawValue
 	}
 
 	final func wakeUp() {
@@ -184,7 +180,7 @@ class ListableItem: DataItem {
 	}
 
 	final func keepWithCondition(_ newCondition: ItemCondition, notification: NotificationType) {
-		if sectionIndex?.intValue == Section.all.rawValue && !Settings.showCommentsEverywhere {
+		if sectionIndex == Section.all.rawValue && !Settings.showCommentsEverywhere {
 			catchUpCommentDate()
 		}
 		postSyncAction = PostSyncAction.doNothing.rawValue
@@ -227,7 +223,7 @@ class ListableItem: DataItem {
 
 		let isMine = createdByMe
 		var targetSection: Section
-		let currentCondition = condition?.intValue ?? ItemCondition.open.rawValue
+		let currentCondition = condition
 
 		if currentCondition == ItemCondition.merged.rawValue		{ targetSection = .merged }
 		else if currentCondition == ItemCondition.closed.rawValue	{ targetSection = .closed }
@@ -238,28 +234,28 @@ class ListableItem: DataItem {
 
 		var outsideMySectionsButAwake = (targetSection == .all || targetSection == .none)
 
-		if outsideMySectionsButAwake && Settings.newMentionMovePolicy > Section.none.rawValue
+		if outsideMySectionsButAwake && Int64(Settings.newMentionMovePolicy) > Section.none.rawValue
 			&& containsTerms(terms: ["@\(apiServer.userName!)"]) {
 
-			targetSection = Section(rawValue: Settings.newMentionMovePolicy)!
+			targetSection = Section(rawValue: Int64(Settings.newMentionMovePolicy))!
 			outsideMySectionsButAwake = false
 		}
 
-		if outsideMySectionsButAwake && Settings.teamMentionMovePolicy > Section.none.rawValue
+		if outsideMySectionsButAwake && Int64(Settings.teamMentionMovePolicy) > Section.none.rawValue
 			&& containsTerms(terms: apiServer.teams.flatMap { $0.calculatedReferral }) {
 
-			targetSection = Section(rawValue: Settings.teamMentionMovePolicy)!
+			targetSection = Section(rawValue: Int64(Settings.teamMentionMovePolicy))!
 			outsideMySectionsButAwake = false
 		}
 
-		if outsideMySectionsButAwake && Settings.newItemInOwnedRepoMovePolicy > Section.none.rawValue && repo.isMine {
-			targetSection = Section(rawValue: Settings.newItemInOwnedRepoMovePolicy)!
+		if outsideMySectionsButAwake && Int64(Settings.newItemInOwnedRepoMovePolicy) > Section.none.rawValue && repo.isMine {
+			targetSection = Section(rawValue: Int64(Settings.newItemInOwnedRepoMovePolicy))!
 			outsideMySectionsButAwake = false
 		}
 
 		////////// Apply viewing policies
 
-		let policy = (self is Issue ? repo.displayPolicyForIssues : repo.displayPolicyForPrs)?.intValue ?? 0
+		let policy = self is Issue ? repo.displayPolicyForIssues : repo.displayPolicyForPrs
 		if let displayPolicy = RepoDisplayPolicy(rawValue: policy) {
 			switch displayPolicy {
 			case .hide:
@@ -277,7 +273,7 @@ class ListableItem: DataItem {
 			}
 		}
 
-		if let hidePolicy = RepoHidingPolicy(rawValue: repo.itemHidingPolicy?.intValue ?? 0) {
+		if let hidePolicy = RepoHidingPolicy(rawValue: Int(repo.itemHidingPolicy)) {
 			switch hidePolicy {
 			case .noHiding:
 				break
@@ -319,9 +315,8 @@ class ListableItem: DataItem {
 
 		/////////// Comment counting
 
-		let isMuted = muted?.boolValue ?? false
 		let inLoudSection = targetSection != .all && targetSection != .snoozed && targetSection != .none
-		let showComments = !isMuted && (inLoudSection || Settings.showCommentsEverywhere)
+		let showComments = !muted && (inLoudSection || Settings.showCommentsEverywhere)
 		if showComments {
 
 			var latestDate = latestReadCommentDate ?? Date.distantPast
@@ -340,21 +335,20 @@ class ListableItem: DataItem {
 
 			let f = NSFetchRequest<PRComment>(entityName: "PRComment")
 			f.predicate = predicateForOthersCommentsSinceDate(latestDate)
-			unreadComments = try! managedObjectContext?.count(for: f) ?? 0
+			unreadComments = Int64(try! managedObjectContext?.count(for: f) ?? 0)
 
 		} else {
 			unreadComments = 0
 		}
 
-		totalComments = comments.count
+		totalComments = Int64(comments.count)
 		sectionIndex = targetSection.rawValue
 		if title==nil { title = "(No title)" }
 	}
 
 	final func urlForOpening() -> String? {
-		let unreadCount = unreadComments?.intValue ?? 0
 
-		if unreadCount > 0 && Settings.openPrAtFirstUnreadComment {
+		if unreadComments > 0 && Settings.openPrAtFirstUnreadComment {
 			let f = NSFetchRequest<PRComment>(entityName: "PRComment")
 			f.returnsObjectsAsFaults = false
 			f.fetchLimit = 1
@@ -458,38 +452,34 @@ class ListableItem: DataItem {
 
 	final private func predicateForMyCommentsSinceDate(_ optionalDate: Date?) -> NSPredicate {
 
-		let userNumber = apiServer.userId?.int64Value ?? 0
-
 		if self is PullRequest {
 			if let date = optionalDate {
-				return NSPredicate(format: "userId == %lld and pullRequest == %@ and createdAt > %@", userNumber, self, date)
+				return NSPredicate(format: "userId == %lld and pullRequest == %@ and createdAt > %@", apiServer.userId, self, date)
 			} else {
-				return NSPredicate(format: "userId == %lld and pullRequest == %@", userNumber, self)
+				return NSPredicate(format: "userId == %lld and pullRequest == %@", apiServer.userId, self)
 			}
 		} else {
 			if let date = optionalDate {
-				return NSPredicate(format: "userId == %lld and issue == %@ and createdAt > %@", userNumber, self, date)
+				return NSPredicate(format: "userId == %lld and issue == %@ and createdAt > %@", apiServer.userId, self, date)
 			} else {
-				return NSPredicate(format: "userId == %lld and issue == %@", userNumber, self)
+				return NSPredicate(format: "userId == %lld and issue == %@", apiServer.userId, self)
 			}
 		}
 	}
 
 	final private func predicateForOthersCommentsSinceDate(_ optionalDate: Date?) -> NSPredicate {
 
-		let userNumber = apiServer.userId?.int64Value ?? 0
-
 		if self is PullRequest {
 			if let date = optionalDate {
-				return NSPredicate(format: "userId != %lld and pullRequest == %@ and createdAt > %@", userNumber, self, date)
+				return NSPredicate(format: "userId != %lld and pullRequest == %@ and createdAt > %@", apiServer.userId, self, date)
 			} else {
-				return NSPredicate(format: "userId != %lld and pullRequest == %@", userNumber, self)
+				return NSPredicate(format: "userId != %lld and pullRequest == %@", apiServer.userId, self)
 			}
 		} else {
 			if let date = optionalDate {
-				return NSPredicate(format: "userId != %lld and issue == %@ and createdAt > %@", userNumber, self, date)
+				return NSPredicate(format: "userId != %lld and issue == %@ and createdAt > %@", apiServer.userId, self, date)
 			} else {
-				return NSPredicate(format: "userId != %lld and issue == %@", userNumber, self)
+				return NSPredicate(format: "userId != %lld and issue == %@", apiServer.userId, self)
 			}
 		}
 	}
@@ -498,7 +488,7 @@ class ListableItem: DataItem {
 		var badgeCount = 0
 		f.returnsObjectsAsFaults = false
 		for i in try! inMoc.fetch(f) {
-			badgeCount += (i.unreadComments?.intValue ?? 0)
+			badgeCount += Int(i.unreadComments)
 		}
 		return badgeCount
 	}
@@ -583,7 +573,7 @@ class ListableItem: DataItem {
 		return buildOrPredicate(string, expectedLength: 5, format: "userLogin contains[cd] %@", numeric: false)
     }
 
-	final class func requestForItemsOfType(_ itemType: String, withFilter: String?, sectionIndex: Int, criterion: GroupingCriterion? = nil, onlyUnread: Bool = false) -> NSFetchRequest<ListableItem> {
+	final class func requestForItemsOfType(_ itemType: String, withFilter: String?, sectionIndex: Int64, criterion: GroupingCriterion? = nil, onlyUnread: Bool = false) -> NSFetchRequest<ListableItem> {
 
 		var andPredicates = [NSPredicate]()
 
@@ -594,11 +584,11 @@ class ListableItem: DataItem {
 		if sectionIndex<0 {
 			andPredicates.append(NSPredicate(format: "sectionIndex > 0"))
 		} else {
-			andPredicates.append(NSPredicate(format: "sectionIndex == %d", sectionIndex))
+			andPredicates.append(NSPredicate(format: "sectionIndex == %lld", sectionIndex))
 		}
 
 		if Settings.hideSnoozedItems {
-			andPredicates.append(NSPredicate(format: "sectionIndex != %d", Section.snoozed.rawValue))
+			andPredicates.append(NSPredicate(format: "sectionIndex != %lld", Section.snoozed.rawValue))
 		}
 
 		if var fi = withFilter, !fi.isEmpty {
@@ -780,9 +770,8 @@ class ListableItem: DataItem {
 				suffix += " [\(l)]"
 			}
 		}
-		let n = number?.intValue ?? 0
 		let t = S(title)
-		return "#\(n) - \(t)\(suffix)"
+		return "#\(number) - \(t)\(suffix)"
 	}
 	final func indexForSpotlight() {
 

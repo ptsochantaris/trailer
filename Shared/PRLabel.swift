@@ -6,7 +6,7 @@ import CoreData
 
 final class PRLabel: DataItem {
 
-    @NSManaged var color: NSNumber?
+    @NSManaged var color: Int64
     @NSManaged var name: String?
     @NSManaged var url: String?
 
@@ -68,7 +68,7 @@ final class PRLabel: DataItem {
 		labelsWithInfo(info, fromParent: withParent) { label, info in
 			label.url = info["url"] as? String
 			if let c = info["color"] as? String {
-				label.color = NSNumber(value: parseFromHex(c))
+				label.color = Int64(parseFromHex(c))
 			} else {
 				label.color = 0
 			}
@@ -77,10 +77,6 @@ final class PRLabel: DataItem {
 	}
 
 	var colorForDisplay: COLOR_CLASS {
-		if let c = color {
-			return colorFromUInt32(c.uint32Value)
-		} else {
-			return COLOR_CLASS.black
-		}
+		return colorFromUInt32(UInt32(color))
 	}
 }

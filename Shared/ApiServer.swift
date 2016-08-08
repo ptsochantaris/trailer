@@ -6,14 +6,14 @@ final class ApiServer: NSManagedObject {
     @NSManaged var apiPath: String?
     @NSManaged var authToken: String?
     @NSManaged var label: String?
-    @NSManaged var lastSyncSucceeded: NSNumber?
+    @NSManaged var lastSyncSucceeded: Bool
     @NSManaged var latestReceivedEventDateProcessed: Date?
     @NSManaged var latestUserEventDateProcessed: Date?
-    @NSManaged var reportRefreshFailures: NSNumber
-    @NSManaged var requestsLimit: NSNumber?
-    @NSManaged var requestsRemaining: NSNumber?
+    @NSManaged var reportRefreshFailures: Bool
+    @NSManaged var requestsLimit: Int64
+    @NSManaged var requestsRemaining: Int64
     @NSManaged var resetDate: Date?
-    @NSManaged var userId: NSNumber?
+    @NSManaged var userId: Int64
     @NSManaged var userName: String?
     @NSManaged var webPath: String?
 	@NSManaged var createdAt: Date?
@@ -30,8 +30,7 @@ final class ApiServer: NSManagedObject {
 	static var lastReportedNearLimit = Set<NSManagedObjectID>()
 
 	var shouldReportOverTheApiLimit: Bool {
-		let r = requestsRemaining?.doubleValue ?? 0
-		if r == 0 {
+		if requestsRemaining == 0 {
 			if !ApiServer.lastReportedOverLimit.contains(objectID) {
 				ApiServer.lastReportedOverLimit.insert(objectID)
 				return true
@@ -43,9 +42,7 @@ final class ApiServer: NSManagedObject {
 	}
 
 	var shouldReportCloseToApiLimit: Bool {
-		let r = requestsRemaining?.doubleValue ?? 0
-		let l = requestsLimit?.doubleValue ?? 1.0
-		if (r / l) < LOW_API_WARNING {
+		if (100 * requestsRemaining / requestsLimit) < 20 {
 			if !ApiServer.lastReportedNearLimit.contains(objectID) {
 				ApiServer.lastReportedNearLimit.insert(objectID)
 				return true
@@ -57,11 +54,7 @@ final class ApiServer: NSManagedObject {
 	}
 
 	var hasApiLimit: Bool {
-		return (requestsLimit?.doubleValue ?? 0) > 0
-	}
-
-	var syncIsGood: Bool {
-		return lastSyncSucceeded?.boolValue ?? true
+		return requestsLimit > 0
 	}
 
 	var goodToGo: Bool {
@@ -100,11 +93,7 @@ final class ApiServer: NSManagedObject {
 
 	class func shouldReportRefreshFailureInMoc(_ moc: NSManagedObjectContext) -> Bool {
 		for apiServer in allApiServersInMoc(moc) {
-
-			var lastSyncSucceeded = apiServer.lastSyncSucceeded?.boolValue
-			if lastSyncSucceeded==nil { lastSyncSucceeded = false }
-
-			if apiServer.goodToGo && !(lastSyncSucceeded!) && (apiServer.reportRefreshFailures.boolValue) {
+			if apiServer.goodToGo && !apiServer.lastSyncSucceeded && apiServer.reportRefreshFailures {
 				return true
 			}
 		}
@@ -151,16 +140,14 @@ final class ApiServer: NSManagedObject {
 		DLog("Rolling back changes for failed sync on API server '%@'",label)
 		for set in [repos, pullRequests, comments, statuses, labels, issues, teams] {
 			for dataItem: DataItem in set.allObjects as! [DataItem] {
-				if let action = dataItem.postSyncAction?.intValue {
-					switch action {
-					case PostSyncAction.delete.rawValue:
-						dataItem.postSyncAction = PostSyncAction.doNothing.rawValue
-					case PostSyncAction.noteNew.rawValue:
-						moc.delete(dataItem)
-					case PostSyncAction.noteUpdated.rawValue:
-						moc.refresh(dataItem, mergeChanges: false)
-					default: break
-					}
+				switch dataItem.postSyncAction {
+				case PostSyncAction.delete.rawValue:
+					dataItem.postSyncAction = PostSyncAction.doNothing.rawValue
+				case PostSyncAction.noteNew.rawValue:
+					moc.delete(dataItem)
+				case PostSyncAction.noteUpdated.rawValue:
+					moc.refresh(dataItem, mergeChanges: false)
+				default: break
 				}
 			}
 		}
@@ -211,15 +198,13 @@ final class ApiServer: NSManagedObject {
 	func archiveRepos() -> [String : [String : NSObject]] {
 		var archivedData = [String : [String : NSObject]]()
 		for r in repos {
-			if let sid = r.serverId {
-				var repoData = [String : NSObject]()
-				for (k , _) in r.entity.attributesByName {
-					if let v = r.value(forKey: k) as? NSObject {
-						repoData[k] = v
-					}
+			var repoData = [String : NSObject]()
+			for (k , _) in r.entity.attributesByName {
+				if let v = r.value(forKey: k) as? NSObject {
+					repoData[k] = v
 				}
-				archivedData[sid.stringValue] = repoData
 			}
+			archivedData["\(r.serverId)"] = repoData
 		}
 		return archivedData
 	}

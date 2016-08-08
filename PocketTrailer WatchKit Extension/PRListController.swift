@@ -7,7 +7,7 @@ final class PRListController: CommonController {
 	@IBOutlet weak var table: WKInterfaceTable!
 	@IBOutlet var statusLabel: WKInterfaceLabel!
 
-	private var sectionIndex: Int!
+	private var sectionIndex: Int64!
 	private var type: String!
 	private var selectedIndex: Int?
 
@@ -25,7 +25,7 @@ final class PRListController: CommonController {
 	override func awake(withContext context: AnyObject?) {
 
 		let c = context as! [NSObject : AnyObject]
-		sectionIndex = c[SECTION_KEY] as! Int
+		sectionIndex = (c[SECTION_KEY] as! NSNumber).int64Value
 		type = c[TYPE_KEY] as! String
 		onlyUnread = c[UNREAD_KEY] as! Bool
 

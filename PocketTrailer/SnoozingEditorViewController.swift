@@ -36,8 +36,8 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 			let all = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)
 			if let index = all.index(of: this), index > 0 {
 				let other = all[index-1]
-				other.sortOrder = NSNumber(value: index)
-				this.sortOrder = NSNumber(value: index-1)
+				other.sortOrder = Int64(index)
+				this.sortOrder = Int64(index-1)
 				updateView()
 			}
 		}
@@ -53,8 +53,8 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 			let all = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)
 			if let index = all.index(of: this), index < all.count-1 {
 				let other = all[index+1]
-				other.sortOrder = NSNumber(value: index)
-				this.sortOrder = NSNumber(value: index+1)
+				other.sortOrder = Int64(index)
+				this.sortOrder = Int64(index+1)
 				updateView()
 			}
 		}
@@ -67,18 +67,18 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		title = isNew ? "New" : "Edit"
-		typeSelector.selectedSegmentIndex = (snoozeItem?.duration.boolValue ?? false) ? 0 : 1
+		typeSelector.selectedSegmentIndex = (snoozeItem?.duration ?? false) ? 0 : 1
 		updateView()
 		hidePickerAnimated(animate: false)
 	}
 
 	private func updateView() {
 		table.reloadData()
-		snoozeItem?.duration = NSNumber(value: typeSelector.selectedSegmentIndex==0)
+		snoozeItem?.duration = typeSelector.selectedSegmentIndex == 0
 		let total = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext).count
 		let desc = S(snoozeItem?.listDescription)
 		if total > 1 {
-			let pos = (snoozeItem?.sortOrder.intValue ?? 0)+1
+			let pos = (snoozeItem?.sortOrder ?? 0)+1
 			descriptionLabel.text = "\"\(desc)\"\n\(pos) of \(total) on the snooze menu"
 		} else {
 			descriptionLabel.text = "\"\(desc)\""
@@ -113,24 +113,24 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 			switch indexPath.row {
 			case 0:
 				cell.textLabel?.text = dayLabel()
-				cell.detailTextLabel?.text = dayValues()[s.day?.intValue ?? 0]
+				cell.detailTextLabel?.text = dayValues()[Int(s.day)]
 				cell.detailTextLabel?.textColor = detailColor(s.day)
 			case 1:
 				cell.textLabel?.text = hourLabel()
-				cell.detailTextLabel?.text = hourValues()[s.hour?.intValue ?? 0]
+				cell.detailTextLabel?.text = hourValues()[Int(s.hour)]
 				cell.detailTextLabel?.textColor = detailColor(s.hour)
 			default:
 				cell.textLabel?.text = minuteLabel()
-				cell.detailTextLabel?.text = minuteValues()[s.minute?.intValue ?? 0]
+				cell.detailTextLabel?.text = minuteValues()[Int(s.minute)]
 				cell.detailTextLabel?.textColor = detailColor(s.minute)
 			}
 		}
 		return cell
 	}
 
-	private func detailColor(_ n: NSNumber?) -> UIColor {
+	private func detailColor(_ n: Int64) -> UIColor {
 		if typeSelector.selectedSegmentIndex==0 {
-			if n?.intValue ?? 0 == 0 {
+			if n == 0 {
 				return UIColor.lightGray
 			} else {
 				return view.tintColor
@@ -142,7 +142,7 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 
 	private func hourLabel() -> String {
 		if typeSelector.selectedSegmentIndex == 0 {
-			return snoozeItem?.hour?.intValue ?? 0 > 1 ? "Hours" : "Hour"
+			return snoozeItem?.hour ?? 0 > 1 ? "Hours" : "Hour"
 		} else {
 			return "Hour"
 		}
@@ -150,7 +150,7 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 
 	private func dayLabel() -> String {
 		if typeSelector.selectedSegmentIndex == 0 {
-			return snoozeItem?.day?.intValue ?? 0 > 1 ? "Days" : "Day"
+			return snoozeItem?.day ?? 0 > 1 ? "Days" : "Day"
 		} else {
 			return "Day"
 		}
@@ -158,7 +158,7 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 
 	private func minuteLabel() -> String {
 		if typeSelector.selectedSegmentIndex == 0 {
-			return snoozeItem?.minute?.intValue ?? 0 > 1 ? "Minutes" : "Minute"
+			return snoozeItem?.minute ?? 0 > 1 ? "Minutes" : "Minute"
 		} else {
 			return "Minute"
 		}
@@ -248,11 +248,11 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 			let s = picker.selectedRow(inComponent: 0)
 			switch p {
 			case .Day:
-				snoozeItem?.day = (s>0) ? NSNumber(value: s) : nil
+				snoozeItem?.day = Int64(s)
 			case .Hour:
-				snoozeItem?.hour = (s>0) ? NSNumber(value: s) : nil
+				snoozeItem?.hour = Int64(s)
 			case .Minute:
-				snoozeItem?.minute = (s>0) ? NSNumber(value: s) : nil
+				snoozeItem?.minute = Int64(s)
 			}
 			updateView()
 		}
@@ -275,11 +275,11 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 		if let p = pickerMode {
 			switch p {
 			case .Day:
-				return snoozeItem?.day?.intValue ?? 0
+				return Int(snoozeItem?.day ?? 0)
 			case .Hour:
-				return snoozeItem?.hour?.intValue ?? 0
+				return Int(snoozeItem?.hour ?? 0)
 			case .Minute:
-				return snoozeItem?.minute?.intValue ?? 0
+				return Int(snoozeItem?.minute ?? 0)
 			}
 		} else {
 			return 0

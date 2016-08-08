@@ -82,31 +82,28 @@ final class DataManager {
 
 		DLog("Marking all unspecified (nil) announced flags as announced")
 		for i in DataItem.allItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest] {
-			if i.announced == nil {
+			if i.value(forKey: "announced") == nil {
 				i.announced = true
 			}
 		}
 		for i in DataItem.allItemsOfType("Issue", inMoc: mainObjectContext) as! [Issue] {
-			if i.announced == nil {
+			if i.value(forKey: "announced") == nil {
 				i.announced = true
 			}
 		}
 
 		DLog("Migrating display policies")
 		for r in DataItem.allItemsOfType("Repo", inMoc:mainObjectContext) as! [Repo] {
-			if let markedAsHidden = r.hidden?.boolValue, markedAsHidden == true {
+			if let markedAsHidden = r.value(forKey: "hidden")?.boolValue, markedAsHidden == true {
 				r.displayPolicyForPrs = RepoDisplayPolicy.hide.rawValue
 				r.displayPolicyForIssues = RepoDisplayPolicy.hide.rawValue
 			} else {
-				if let prDisplayPolicy = postMigrationRepoPrPolicy, r.displayPolicyForPrs == nil {
+				if let prDisplayPolicy = postMigrationRepoPrPolicy, r.value(forKey: "displayPolicyForPrs") == nil {
 					r.displayPolicyForPrs = prDisplayPolicy.rawValue
 				}
-				if let issueDisplayPolicy = postMigrationRepoIssuePolicy, r.displayPolicyForIssues == nil {
+				if let issueDisplayPolicy = postMigrationRepoIssuePolicy, r.value(forKey: "displayPolicyForIssues") == nil {
 					r.displayPolicyForIssues = issueDisplayPolicy.rawValue
 				}
-			}
-			if r.hidden != nil {
-				r.hidden = nil
 			}
 		}
 	}
@@ -142,13 +139,13 @@ final class DataManager {
 			for i in allItems {
 				if i.isVisibleOnMenu {
 					if !i.createdByMe {
-						if i.isNewAssignment?.boolValue ?? false {
+						if i.isNewAssignment {
 							app.postNotification(type: assignmentNotification, forItem: i)
 							i.isNewAssignment = false
-						} else if !(i.announced?.boolValue ?? false) {
+						} else if !i.announced {
 							app.postNotification(type: newNotification, forItem: i)
 							i.announced = true
-						} else if let reopened = i.reopened?.boolValue, reopened == true {
+						} else if i.reopened {
 							app.postNotification(type: reopenedNotification, forItem: i)
 							i.reopened = false
 						}
@@ -186,9 +183,9 @@ final class DataManager {
 						coveredPrs.insert(pr.objectID)
 						if let s = pr.displayedStatuses.first {
 							let displayText = s.descriptionText
-							if pr.lastStatusNotified != displayText && pr.postSyncAction?.intValue != PostSyncAction.noteNew.rawValue {
+							if pr.lastStatusNotified != displayText && pr.postSyncAction != PostSyncAction.noteNew.rawValue {
 								if pr.isSnoozing && Settings.snoozeWakeOnStatusUpdate {
-									DLog("Waking up snoozed PR ID %@ because of a status update", pr.serverId)
+									DLog("Waking up snoozed PR ID %lld because of a status update", pr.serverId)
 									pr.wakeUp()
 								}
 								app.postNotification(type: .newStatus, forItem: s)
@@ -207,15 +204,11 @@ final class DataManager {
 		}
 
 		for p in allPrs {
-			if p.postSyncAction?.intValue != PostSyncAction.doNothing.rawValue {
-				p.postSyncAction = PostSyncAction.doNothing.rawValue
-			}
+			p.postSyncAction = PostSyncAction.doNothing.rawValue
 		}
 
 		for i in allIssues {
-			if i.postSyncAction?.intValue != PostSyncAction.doNothing.rawValue {
-				i.postSyncAction = PostSyncAction.doNothing.rawValue
-			}
+			i.postSyncAction = PostSyncAction.doNothing.rawValue
 		}
 
 		_ = saveDB()

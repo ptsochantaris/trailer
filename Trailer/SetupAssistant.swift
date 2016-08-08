@@ -18,7 +18,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 		StartupLaunch.setLaunchOnLogin(true)
 		startAtLogin.integerValue = 1
 		trackIssues.integerValue = 1
-		Settings.displayPolicyForNewIssues = RepoDisplayPolicy.all.rawValue
+		Settings.displayPolicyForNewIssues = Int(RepoDisplayPolicy.all.rawValue)
 	}
 
 	override init(contentRect: NSRect, styleMask style: NSWindowStyleMask, backing bufferingType: NSBackingStoreType, defer flag: Bool) {
@@ -50,7 +50,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 	}
 
 	@IBAction func trackIssuesSelected(_ sender: NSButton) {
-		Settings.displayPolicyForNewIssues = sender.integerValue==1 ? RepoDisplayPolicy.all.rawValue : RepoDisplayPolicy.hide.rawValue
+		Settings.displayPolicyForNewIssues = Int(sender.integerValue==1 ? RepoDisplayPolicy.all.rawValue : RepoDisplayPolicy.hide.rawValue)
 	}
 
 	@IBAction func testAndCompleteSelected(_ sender: NSButton) {
@@ -92,7 +92,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 			checkTimer?.invalidate()
 			checkTimer = nil
 
-			if newServer.lastSyncSucceeded?.boolValue ?? false {
+			if newServer.lastSyncSucceeded {
 				close()
 				let alert = NSAlert()
 				alert.messageText = "Setup complete!"

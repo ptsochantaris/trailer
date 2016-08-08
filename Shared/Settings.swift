@@ -93,17 +93,17 @@ final class Settings {
 		}
 
 		if let mentionedUserMoveLegacy = _settings_shared.object(forKey: "AUTO_PARTICIPATE_IN_MENTIONS_KEY") as? Bool {
-			_settings_shared.set(mentionedUserMoveLegacy ? Section.mentioned.rawValue : Section.none.rawValue, forKey: "NEW_MENTION_MOVE_POLICY")
+			_settings_shared.set(mentionedUserMoveLegacy ? Section.mentioned.intValue : Section.none.intValue, forKey: "NEW_MENTION_MOVE_POLICY")
 			_settings_shared.removeObject(forKey: "AUTO_PARTICIPATE_IN_MENTIONS_KEY")
 		}
 
 		if let mentionedTeamMoveLegacy = _settings_shared.object(forKey: "AUTO_PARTICIPATE_ON_TEAM_MENTIONS") as? Bool {
-			_settings_shared.set(mentionedTeamMoveLegacy ? Section.mentioned.rawValue : Section.none.rawValue, forKey: "TEAM_MENTION_MOVE_POLICY")
+			_settings_shared.set(mentionedTeamMoveLegacy ? Section.mentioned.intValue : Section.none.intValue, forKey: "TEAM_MENTION_MOVE_POLICY")
 			_settings_shared.removeObject(forKey: "AUTO_PARTICIPATE_ON_TEAM_MENTIONS")
 		}
 
 		if let mentionedRepoMoveLegacy = _settings_shared.object(forKey: "MOVE_NEW_ITEMS_IN_OWN_REPOS_TO_MENTIONED") as? Bool {
-			_settings_shared.set(mentionedRepoMoveLegacy ? Section.mentioned.rawValue : Section.none.rawValue, forKey: "NEW_ITEM_IN_OWNED_REPO_MOVE_POLICY")
+			_settings_shared.set(mentionedRepoMoveLegacy ? Section.mentioned.intValue : Section.none.intValue, forKey: "NEW_ITEM_IN_OWNED_REPO_MOVE_POLICY")
 			_settings_shared.removeObject(forKey: "MOVE_NEW_ITEMS_IN_OWN_REPOS_TO_MENTIONED")
 		}
 
@@ -111,14 +111,14 @@ final class Settings {
 		DataManager.postMigrationRepoIssuePolicy = RepoDisplayPolicy.hide
 
 		if let showIssues = _settings_shared.object(forKey: "SHOW_ISSUES_MENU") as? Bool {
-			_settings_shared.set(showIssues ? RepoDisplayPolicy.all.rawValue : RepoDisplayPolicy.hide.rawValue, forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX")
+			_settings_shared.set(showIssues ? RepoDisplayPolicy.all.intValue : RepoDisplayPolicy.hide.intValue, forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX")
 			DataManager.postMigrationRepoIssuePolicy = showIssues ? RepoDisplayPolicy.all : RepoDisplayPolicy.hide
 			_settings_shared.removeObject(forKey: "SHOW_ISSUES_MENU")
 		}
 
 		if let hideNewRepositories = _settings_shared.object(forKey: "HIDE_NEW_REPOS_KEY") as? Bool {
-			_settings_shared.set(hideNewRepositories ? RepoDisplayPolicy.hide.rawValue : RepoDisplayPolicy.all.rawValue, forKey: "NEW_PR_DISPLAY_POLICY_INDEX")
-			_settings_shared.set(hideNewRepositories ? RepoDisplayPolicy.hide.rawValue : RepoDisplayPolicy.all.rawValue, forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX")
+			_settings_shared.set(hideNewRepositories ? RepoDisplayPolicy.hide.intValue : RepoDisplayPolicy.all.intValue, forKey: "NEW_PR_DISPLAY_POLICY_INDEX")
+			_settings_shared.set(hideNewRepositories ? RepoDisplayPolicy.hide.intValue : RepoDisplayPolicy.all.intValue, forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX")
 			_settings_shared.removeObject(forKey: "HIDE_NEW_REPOS_KEY")
 		}
 
@@ -131,13 +131,13 @@ final class Settings {
 					DataManager.postMigrationRepoIssuePolicy = RepoDisplayPolicy.mineAndPaticipated
 				}
 
-				let newPrPolicy = _settings_shared.object(forKey: "NEW_PR_DISPLAY_POLICY_INDEX") as? Int ?? RepoDisplayPolicy.all.rawValue
+				let newPrPolicy = _settings_shared.object(forKey: "NEW_PR_DISPLAY_POLICY_INDEX") as? Int64 ?? RepoDisplayPolicy.all.rawValue
 				if newPrPolicy == RepoDisplayPolicy.all.rawValue {
-					_settings_shared.set(RepoDisplayPolicy.mineAndPaticipated.rawValue, forKey: "NEW_PR_DISPLAY_POLICY_INDEX")
+					_settings_shared.set(RepoDisplayPolicy.mineAndPaticipated.intValue, forKey: "NEW_PR_DISPLAY_POLICY_INDEX")
 				}
-				let newIssuePolicy = _settings_shared.object(forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX") as? Int ?? RepoDisplayPolicy.all.rawValue
+				let newIssuePolicy = _settings_shared.object(forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX") as? Int64 ?? RepoDisplayPolicy.all.rawValue
 				if newIssuePolicy == RepoDisplayPolicy.all.rawValue {
-					_settings_shared.set(RepoDisplayPolicy.mineAndPaticipated.rawValue, forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX")
+					_settings_shared.set(RepoDisplayPolicy.mineAndPaticipated.intValue, forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX")
 				}
 			}
 			_settings_shared.removeObject(forKey: "HIDE_ALL_SECTION")
@@ -327,31 +327,31 @@ final class Settings {
 
 	static let displayPolicyForNewPrsHelp = "When a new repository is detected in your watchlist, this display policy will be applied by default to pull requests that come from it. You can further customize the display policy for any individual repository from the 'Repositories' tab."
 	class var displayPolicyForNewPrs: Int {
-		get { return get("NEW_PR_DISPLAY_POLICY_INDEX") as? Int ?? RepoDisplayPolicy.all.rawValue }
+		get { return get("NEW_PR_DISPLAY_POLICY_INDEX") as? Int ?? RepoDisplayPolicy.all.intValue }
 		set { set("NEW_PR_DISPLAY_POLICY_INDEX", newValue) }
 	}
 
 	static let displayPolicyForNewIssuesHelp = "When a new repository is detected in your watchlist, this display policy will be applied by default to issues that come from it. You can further customize the display policy for any individual repository from the 'Repositories' tab."
 	class var displayPolicyForNewIssues: Int {
-		get { return get("NEW_ISSUE_DISPLAY_POLICY_INDEX") as? Int ?? RepoDisplayPolicy.hide.rawValue }
+		get { return get("NEW_ISSUE_DISPLAY_POLICY_INDEX") as? Int ?? RepoDisplayPolicy.hide.intValue }
 		set { set("NEW_ISSUE_DISPLAY_POLICY_INDEX", newValue) }
 	}
 
 	static let newMentionMovePolicyHelp = "If your username is mentioned in an item's description or a comment posted inside it, move the item to the specified section."
 	class var newMentionMovePolicy: Int {
-		get { return get("NEW_MENTION_MOVE_POLICY") as? Int ?? Section.mentioned.rawValue }
+		get { return get("NEW_MENTION_MOVE_POLICY") as? Int ?? Section.mentioned.intValue }
 		set { set("NEW_MENTION_MOVE_POLICY", newValue) }
 	}
 
 	static let teamMentionMovePolicyHelp = "If the name of one of the teams you belong to is mentioned in an item's description or a comment posted inside it, move the item to the specified section."
 	class var teamMentionMovePolicy: Int {
-		get { return get("TEAM_MENTION_MOVE_POLICY") as? Int ?? Section.mentioned.rawValue }
+		get { return get("TEAM_MENTION_MOVE_POLICY") as? Int ?? Section.mentioned.intValue }
 		set { set("TEAM_MENTION_MOVE_POLICY", newValue) }
 	}
 
 	static let newItemInOwnedRepoMovePolicyHelp = "Automatically move an item to the specified section if it has been created in a repo which you own, even if there is no direct mention of you."
 	class var newItemInOwnedRepoMovePolicy: Int {
-		get { return get("NEW_ITEM_IN_OWNED_REPO_MOVE_POLICY") as? Int ?? Section.none.rawValue }
+		get { return get("NEW_ITEM_IN_OWNED_REPO_MOVE_POLICY") as? Int ?? Section.none.intValue }
 		set { set("NEW_ITEM_IN_OWNED_REPO_MOVE_POLICY", newValue) }
 	}
 

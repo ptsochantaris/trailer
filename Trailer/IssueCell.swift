@@ -11,15 +11,15 @@ final class IssueCell: TrailerCell {
 
 		unselectedTitleColor = goneDark ? NSColor.controlHighlightColor : NSColor.controlTextColor
 
-		let _commentsNew = issue.unreadComments?.intValue ?? 0
-		let _commentsTotal = issue.totalComments?.intValue ?? 0
+		let _commentsNew = issue.unreadComments
+		let _commentsTotal = issue.totalComments
 
 		let _title = issue.titleWithFont(titleFont, labelFont: detailFont, titleColor: unselectedTitleColor)
 		let _subtitle = issue.subtitleWithFont(detailFont, lightColor: NSColor.gray, darkColor: NSColor.darkGray)
 
 		var W = MENU_WIDTH-LEFTPADDING-app.scrollBarWidth
 
-		let showUnpin = issue.condition?.intValue != ItemCondition.open.rawValue
+		let showUnpin = issue.condition != ItemCondition.open.rawValue
 		if showUnpin { W -= REMOVE_BUTTON_WIDTH } else { W -= 4.0 }
 
 		let showAvatar = !S(issue.userAvatarUrl).isEmpty && !Settings.hideAvatars
@@ -68,16 +68,14 @@ final class IssueCell: TrailerCell {
 		statusRects = replacementRects
 
 		if showUnpin {
-			if (issue.condition?.intValue ?? 0)==ItemCondition.open.rawValue {
+			if issue.condition == ItemCondition.open.rawValue {
 				let unmergeableLabel = CenterTextField(frame: pinRect)
 				unmergeableLabel.textColor = NSColor.red
 				unmergeableLabel.font = NSFont(name: "Monaco", size: 8.0)
 				unmergeableLabel.alignment = .center
 				unmergeableLabel.stringValue = "Cannot be merged"
 				addSubview(unmergeableLabel)
-			}
-			else
-			{
+			} else {
 				let unpin = NSButton(frame: pinRect)
 				unpin.title = "Remove"
 				unpin.target = self

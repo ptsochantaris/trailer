@@ -8,8 +8,7 @@ final class PullRequest: ListableItem {
 
 	@NSManaged var issueCommentLink: String?
 	@NSManaged var issueUrl: String?
-	@NSManaged var mergeable: NSNumber?
-	@NSManaged var pinned: NSNumber?
+	@NSManaged var mergeable: Bool
 	@NSManaged var reviewCommentLink: String?
 	@NSManaged var statusesLink: String?
 	@NSManaged var lastStatusNotified: String?
@@ -23,7 +22,7 @@ final class PullRequest: ListableItem {
 
 				p.baseSyncFromInfo(info, inRepo: inRepo)
 
-				p.mergeable = info["mergeable"] as? NSNumber ?? true
+				p.mergeable = (info["mergeable"] as? NSNumber)?.boolValue ?? true
 
 				if let linkInfo = info["_links"] as? [NSObject : AnyObject] {
 					p.issueCommentLink = linkInfo["comments"]?["href"] as? String
@@ -35,7 +34,7 @@ final class PullRequest: ListableItem {
 				api.refreshesSinceLastLabelsCheck[p.objectID] = nil
 				api.refreshesSinceLastStatusCheck[p.objectID] = nil
 			}
-			p.reopened = ((p.condition?.intValue ?? 0) == ItemCondition.closed.rawValue)
+			p.reopened = p.condition == ItemCondition.closed.rawValue
 			p.condition = ItemCondition.open.rawValue
 		}
 	}
@@ -50,9 +49,9 @@ final class PullRequest: ListableItem {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
 		if visibleOnly {
-			f.predicate = NSPredicate(format: "sectionIndex == %d || sectionIndex == %d || sectionIndex == %d", Section.mine.rawValue, Section.participated.rawValue, Section.all.rawValue)
+			f.predicate = NSPredicate(format: "sectionIndex == %lld || sectionIndex == %lld || sectionIndex == %lld", Section.mine.rawValue, Section.participated.rawValue, Section.all.rawValue)
 		} else {
-			f.predicate = NSPredicate(format: "condition == %d", ItemCondition.open.rawValue)
+			f.predicate = NSPredicate(format: "condition == %lld", ItemCondition.open.rawValue)
 		}
 		return try! moc.fetch(f)
 	}
@@ -60,7 +59,7 @@ final class PullRequest: ListableItem {
 	class func allMergedInMoc(_ moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, includeAllGroups: Bool = false) -> [PullRequest] {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
-		let p = NSPredicate(format: "condition == %d", ItemCondition.merged.rawValue)
+		let p = NSPredicate(format: "condition == %lld", ItemCondition.merged.rawValue)
 		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, inMoc: moc, includeAllGroups: includeAllGroups)
 		return try! moc.fetch(f)
 	}
@@ -68,14 +67,14 @@ final class PullRequest: ListableItem {
 	class func allClosedInMoc(_ moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, includeAllGroups: Bool = false) -> [PullRequest] {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
-		let p = NSPredicate(format: "condition == %d", ItemCondition.closed.rawValue)
+		let p = NSPredicate(format: "condition == %lld", ItemCondition.closed.rawValue)
 		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, inMoc: moc, includeAllGroups: includeAllGroups)
 		return try! moc.fetch(f)
 	}
 
 	class func countOpenInMoc(_ moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
-		let p = NSPredicate(format: "condition == %d or condition == nil", ItemCondition.open.rawValue)
+		let p = NSPredicate(format: "condition == %lld or condition == nil", ItemCondition.open.rawValue)
 		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, inMoc: moc)
 		return try! moc.count(for: f)
 	}
@@ -83,7 +82,7 @@ final class PullRequest: ListableItem {
 	class func markEverythingRead(_ section: Section, moc: NSManagedObjectContext) {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		if section != .none {
-			f.predicate = NSPredicate(format: "sectionIndex == %d", section.rawValue)
+			f.predicate = NSPredicate(format: "sectionIndex == %lld", section.rawValue)
 		}
 		for pr in try! moc.fetch(f) {
 			pr.catchUpWithComments()
@@ -92,7 +91,7 @@ final class PullRequest: ListableItem {
 
 	class func badgeCountInSection(_ section: Section, moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
-		f.predicate = NSPredicate(format: "sectionIndex == %d and unreadComments > 0", section.rawValue)
+		f.predicate = NSPredicate(format: "sectionIndex == %lld and unreadComments > 0", section.rawValue)
 		return badgeCountFromFetch(f, inMoc: moc)
 	}
 
@@ -108,16 +107,15 @@ final class PullRequest: ListableItem {
 	}
 
 	var markUnmergeable: Bool {
-		if let m = mergeable?.boolValue, m == false {
-			if let s = sectionIndex?.intValue {
-				if s == ItemCondition.merged.rawValue || s == ItemCondition.closed.rawValue {
-					return false
-				}
-				if s == Section.all.rawValue && Settings.markUnmergeableOnUserSectionsOnly {
-					return false
-				}
-				return true
+		if !mergeable {
+			let s = sectionIndex
+			if s == ItemCondition.merged.rawValue || s == ItemCondition.closed.rawValue {
+				return false
 			}
+			if s == Section.all.rawValue && Settings.markUnmergeableOnUserSectionsOnly {
+				return false
+			}
+			return true
 		}
 		return false
 	}
@@ -190,7 +188,7 @@ final class PullRequest: ListableItem {
 		}
 
 		#if os(iOS)
-			if let m = mergeable?.boolValue, m == false {
+			if !mergeable {
 				_subtitle.append(separator)
 				var redSubtitle = lightSubtitle
 				redSubtitle[NSForegroundColorAttributeName] = UIColor.red
@@ -216,7 +214,7 @@ final class PullRequest: ListableItem {
 			components.append("Updated \(itemDateFormatter.string(from: updatedAt!))")
 		}
 
-		if let m = mergeable?.boolValue, m == false {
+		if !mergeable {
 			components.append("Cannot be merged!")
 		}
 
@@ -285,6 +283,6 @@ final class PullRequest: ListableItem {
 	}
 
 	var sectionName: String {
-		return Section.prMenuTitles[sectionIndex?.intValue ?? 0]
+		return Section.prMenuTitles[Int(sectionIndex)]
 	}
 }

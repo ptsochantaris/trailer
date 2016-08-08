@@ -311,7 +311,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	func keyToggleRead() {
 		if let ip = tableView.indexPathForSelectedRow {
 			let i = fetchedResultsController.object(at: ip)
-			if i.unreadComments?.intValue ?? 0 > 0 {
+			if i.unreadComments > 0 {
 				if canIssueKeyForIndexPath(actionTitle: "Read", indexPath: ip) {
 					i.catchUpWithComments()
 					DataManager.saveDB()
@@ -328,7 +328,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	func keyToggleMute() {
 		if let ip = tableView.indexPathForSelectedRow {
 			let i = fetchedResultsController.object(at: ip)
-			let isMuted = i.muted?.boolValue ?? false
+			let isMuted = i.muted
 			if (!isMuted && canIssueKeyForIndexPath(actionTitle: "Mute", indexPath: ip)) || (isMuted && canIssueKeyForIndexPath(actionTitle: "Unmute", indexPath: ip)) {
 				i.setMute(!isMuted)
 				DataManager.saveDB()
@@ -889,7 +889,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		func appendReadUnread(i: ListableItem) {
 			let r: UITableViewRowAction
-			if i.unreadComments?.int64Value ?? 0 > 0 {
+			if i.unreadComments > 0 {
 				r = UITableViewRowAction(style: .normal, title: "Read") { action, indexPath in
 					markItemAsRead(itemUri: i.objectID.uriRepresentation().absoluteString)
 					tableView.setEditing(false, animated: true)
@@ -906,7 +906,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		func appendMuteUnmute(i: ListableItem) {
 			let m: UITableViewRowAction
-			if i.muted?.boolValue ?? false {
+			if i.muted {
 				m = UITableViewRowAction(style: .normal, title: "Unmute") { action, indexPath in
 					i.setMute(false)
 					DataManager.saveDB()

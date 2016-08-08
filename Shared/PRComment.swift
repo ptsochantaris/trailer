@@ -4,10 +4,7 @@ final class PRComment: DataItem {
 
     @NSManaged var avatarUrl: String?
     @NSManaged var body: String?
-    @NSManaged var path: String?
-    @NSManaged var position: NSNumber?
-    @NSManaged var url: String?
-    @NSManaged var userId: NSNumber?
+    @NSManaged var userId: Int64
     @NSManaged var userName: String?
     @NSManaged var webUrl: String?
 
@@ -38,7 +35,7 @@ final class PRComment: DataItem {
 
 	func fastForwardItemIfNeeded(_ item: ListableItem) {
 		// check if we're assigned to a just created issue, in which case we want to "fast forward" its latest comment dates to our own if we're newer
-		if let commentCreation = createdAt, (item.postSyncAction?.intValue ?? 0) == PostSyncAction.noteNew.rawValue {
+		if let commentCreation = createdAt, item.postSyncAction == PostSyncAction.noteNew.rawValue {
 			if let latestReadDate = item.latestReadCommentDate, latestReadDate < commentCreation {
 				item.latestReadCommentDate = commentCreation
 			}
@@ -46,19 +43,19 @@ final class PRComment: DataItem {
 	}
 
 	func processNotifications() {
-		if let item = pullRequest ?? issue, item.postSyncAction?.intValue == PostSyncAction.noteUpdated.rawValue && item.isVisibleOnMenu {
+		if let item = pullRequest ?? issue, item.postSyncAction == PostSyncAction.noteUpdated.rawValue && item.isVisibleOnMenu {
 			if containsTerms(terms: ["@\(apiServer.userName!)"]) {
 				if item.isSnoozing && Settings.snoozeWakeOnMention {
-					DLog("Waking up snoozed item ID %@ because of mention", item.serverId)
+					DLog("Waking up snoozed item ID %lld because of mention", item.serverId)
 					item.wakeUp()
 				}
 				app.postNotification(type: .newMention, forItem: self)
 			} else if !isMine {
 				if item.isSnoozing && Settings.snoozeWakeOnComment {
-					DLog("Waking up snoozed item ID %@ because of posted comment", item.serverId)
+					DLog("Waking up snoozed item ID %lld because of posted comment", item.serverId)
 					item.wakeUp()
 				}
-				let notifyForNewComments = (item.sectionIndex?.intValue != Section.all.rawValue) || Settings.showCommentsEverywhere
+				let notifyForNewComments = item.sectionIndex != Section.all.rawValue || Settings.showCommentsEverywhere
 				if notifyForNewComments && !Settings.disableAllCommentNotifications && !isMine {
 					if let authorName = userName {
 						var blocked = false
@@ -69,9 +66,9 @@ final class PRComment: DataItem {
 							}
 						}
 						if blocked {
-							DLog("Blocked notification for user '%@' as their name is on the blacklist",authorName)
+							DLog("Blocked notification for user '%@' as their name is on the blacklist", authorName)
 						} else {
-							DLog("User '%@' not on blacklist, can post notification",authorName)
+							DLog("User '%@' not on blacklist, can post notification", authorName)
 							app.postNotification(type: .newComment, forItem:self)
 						}
 					}
@@ -82,20 +79,16 @@ final class PRComment: DataItem {
 
 	func fillFromInfo(_ info:[NSObject : AnyObject]) {
 		body = info["body"] as? String
-		position = info["position"] as? NSNumber
-		path = info["path"] as? String
-		url = info["url"] as? String
 		webUrl = info["html_url"] as? String
 
 		if let userInfo = info["user"] as? [NSObject : AnyObject] {
 			userName = userInfo["login"] as? String
-			userId = userInfo["id"] as? NSNumber
+			userId = (userInfo["id"] as? NSNumber)?.int64Value ?? 0
 			avatarUrl = userInfo["avatar_url"] as? String
 		}
 
-		if let links = info["links"] as? [NSObject : AnyObject] {
-			url = links["self"]?["href"] as? String
-			if webUrl==nil { webUrl = links["html"]?["href"] as? String }
+		if webUrl==nil, let links = info["links"] as? [NSObject : AnyObject] {
+			webUrl = links["html"]?["href"] as? String
 		}
 	}
 

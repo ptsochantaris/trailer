@@ -88,15 +88,12 @@ class TrailerCell: NSTableCellView {
 		}
 
 		let title: String
-		let muted = item.muted?.boolValue ?? false
-		if let n = item.number {
-			if item is PullRequest {
-				title = muted ? "PR #\(n) (muted)" : "PR #\(n)"
-			} else {
-				title = muted ? "Issue #\(n) (muted)" : "Issue #\(n)"
-			}
+		let muted = item.muted
+		let n = item.number
+		if item is PullRequest {
+			title = muted ? "PR #\(n) (muted)" : "PR #\(n)"
 		} else {
-			title = "PR Options"
+			title = muted ? "Issue #\(n) (muted)" : "Issue #\(n)"
 		}
 
 		let cmd = NSEventModifierFlags.command
@@ -112,7 +109,7 @@ class TrailerCell: NSTableCellView {
 		c2.keyEquivalentModifierMask = cmd
 
 		if item.snoozeUntil == nil {
-			if item.unreadComments?.intValue > 0 {
+			if item.unreadComments > 0 {
 				let c = m.addItem(withTitle: "Mark as read", action: #selector(TrailerCell.markReadSelected), keyEquivalent: "a")
 				c.keyEquivalentModifierMask = cmd
 			} else {
@@ -121,7 +118,7 @@ class TrailerCell: NSTableCellView {
 			}
 		}
 
-		if let s = item.sectionIndex?.intValue, let section = Section(rawValue: s), !(section == .closed || section == .merged) {
+		if let section = Section(rawValue: item.sectionIndex), !(section == .closed || section == .merged) {
 
 			if let snooze = item.snoozeUntil {
 				let title: String
@@ -243,7 +240,7 @@ class TrailerCell: NSTableCellView {
 	private var newBackground: FilledView?
 	private var countView: CenterTextField?
 
-	func addCounts(_ totalCount: Int, _ unreadCount: Int, _ faded: Bool) {
+	func addCounts(_ totalCount: Int64, _ unreadCount: Int64, _ faded: Bool) {
 
 		if totalCount == 0 {
 			return
@@ -252,7 +249,7 @@ class TrailerCell: NSTableCellView {
 		let pCenter = NSMutableParagraphStyle()
 		pCenter.alignment = .center
 
-		let countString = NSAttributedString(string: itemCountFormatter.string(from: totalCount)!, attributes: [
+		let countString = NSAttributedString(string: itemCountFormatter.string(from: Int(totalCount))!, attributes: [
 			NSFontAttributeName: NSFont.menuFont(ofSize: 11),
 			NSForegroundColorAttributeName: goneDark ? NSColor.controlLightHighlightColor : NSColor.controlTextColor,
 			NSParagraphStyleAttributeName: pCenter])
@@ -276,7 +273,7 @@ class TrailerCell: NSTableCellView {
 
 		if unreadCount > 0 {
 
-			let alertString = NSAttributedString(string: itemCountFormatter.string(from: unreadCount)!, attributes: [
+			let alertString = NSAttributedString(string: itemCountFormatter.string(from: Int(unreadCount))!, attributes: [
 				NSFontAttributeName: NSFont.menuFont(ofSize: 8),
 				NSForegroundColorAttributeName: NSColor.white,
 				NSParagraphStyleAttributeName: pCenter])

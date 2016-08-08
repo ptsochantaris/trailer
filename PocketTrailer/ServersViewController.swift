@@ -48,18 +48,18 @@ final class ServersViewController: UITableViewController {
 			if S(a.authToken).isEmpty {
 				T.textColor = UIColor.red
 				T.text = "\(S(a.label)) (needs token!)"
-			} else if !a.syncIsGood {
+			} else if !a.lastSyncSucceeded {
 				T.textColor = UIColor.red
 				T.text = "\(S(a.label)) (last sync failed)"
 			} else {
 				T.textColor = UIColor.darkText
 				T.text = a.label
 			}
-			if a.requestsLimit==nil || a.requestsLimit!.doubleValue==0.0 {
+			if a.requestsLimit == 0 {
 				D.text = nil
 			} else {
-				let total = a.requestsLimit?.doubleValue ?? 0
-				let used = total - (a.requestsRemaining?.doubleValue ?? 0)
+				let total = Double(a.requestsLimit)
+				let used = Double(total - Double(a.requestsRemaining))
 				if a.resetDate != nil {
 					D.text = String(format:"%.01f%% API used (%.0f / %.0f requests)\nNext reset: %@", 100*used/total, used, total, shortDateFormatter.string(from: a.resetDate!))
 				} else {

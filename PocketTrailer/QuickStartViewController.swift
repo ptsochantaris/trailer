@@ -26,11 +26,11 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 		if showIssues {
 			trackIssues.title = "Should track issues as well: Yes"
 			trackIssues.tintColor = GLOBAL_TINT
-			Settings.displayPolicyForNewIssues = RepoDisplayPolicy.all.rawValue
+			Settings.displayPolicyForNewIssues = RepoDisplayPolicy.all.intValue
 		} else {
 			trackIssues.title = "Should track issues as well: No"
 			trackIssues.tintColor = UIColor.lightGray
-			Settings.displayPolicyForNewIssues = RepoDisplayPolicy.hide.rawValue
+			Settings.displayPolicyForNewIssues = RepoDisplayPolicy.hide.intValue
 		}
 	}
 
@@ -70,7 +70,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 		if !appIsRefreshing {
 			checkTimer?.invalidate()
 			checkTimer = nil
-			if newServer.lastSyncSucceeded?.boolValue ?? false {
+			if newServer.lastSyncSucceeded {
                 dismiss(animated: true, completion: {
 					popupManager.getMasterController().resetView()
 					showMessage("Setup complete!", "You can tweak options & behaviour from the settings.\n\nTrailer has read-only access to your GitHub data, so feel free to experiment, you can't damage your data or settings on GitHub.")

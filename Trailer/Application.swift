@@ -36,14 +36,14 @@ final class Application: NSApplication {
 						}
 					case "m":
 						if let i = app.focusedItem() {
-							i.setMute(!(i.muted?.boolValue ?? false))
+							i.setMute(!i.muted)
 							DataManager.saveDB()
 							app.updateRelatedMenusFor(i)
 							return
 						}
 					case "a":
 						if let i = app.focusedItem() {
-							if i.unreadComments?.intValue > 0 {
+							if i.unreadComments > 0 {
 								i.catchUpWithComments()
 							} else {
 								i.latestReadCommentDate = Date.distantPast

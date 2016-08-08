@@ -70,7 +70,7 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 			if ApiServer.shouldReportRefreshFailureInMoc(tempContext) {
 				var errorServers = [String]()
 				for apiServer in ApiServer.allApiServersInMoc(tempContext) {
-					if apiServer.goodToGo && !apiServer.syncIsGood {
+					if apiServer.goodToGo && !apiServer.lastSyncSucceeded {
 						errorServers.append(S(apiServer.label))
 					}
 				}
@@ -115,11 +115,7 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 			return "Forked Repos"
 		} else {
 			let repo = fetchedResultsController.object(at: IndexPath(row: 0, section: section))
-			if (repo.fork?.boolValue ?? false) {
-				return "Forked Repos"
-			} else {
-				return "Parent Repos"
-			}
+			return repo.fork ? "Forked Repos" : "Parent Repos"
 		}
 	}
 
@@ -230,21 +226,21 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 	private func titleForRepo(repo: Repo) -> NSAttributedString {
 
 		let fullName = S(repo.fullName)
-		let text = (repo.inaccessible?.boolValue ?? false) ? "\(fullName) (inaccessible)" : fullName
+		let text = repo.inaccessible ? "\(fullName) (inaccessible)" : fullName
 		let color = repo.shouldSync ? UIColor.darkText : UIColor.lightGray
 		return NSAttributedString(string: text, attributes: [ NSForegroundColorAttributeName: color ])
 	}
 
 	private func prTitleForRepo(repo: Repo) -> NSAttributedString {
 
-		let policy = RepoDisplayPolicy(rawValue: repo.displayPolicyForPrs?.intValue ?? 0) ?? .hide
+		let policy = RepoDisplayPolicy(rawValue: repo.displayPolicyForPrs) ?? .hide
 		let attributes = attributesForEntryWithPolicy(policy)
 		return NSAttributedString(string: "PR Sections: \(policy.name())", attributes: attributes)
 	}
 
 	private func issueTitleForRepo(repo: Repo) -> NSAttributedString {
 
-		let policy = RepoDisplayPolicy(rawValue: repo.displayPolicyForIssues?.intValue ?? 0) ?? .hide
+		let policy = RepoDisplayPolicy(rawValue: repo.displayPolicyForIssues) ?? .hide
 		let attributes = attributesForEntryWithPolicy(policy)
 		return NSAttributedString(string: "Issue Sections: \(policy.name())", attributes: attributes)
 	}
@@ -265,7 +261,7 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 
 	private func hidingTitleForRepo(repo: Repo) -> NSAttributedString {
 
-		let policy = RepoHidingPolicy(rawValue: repo.itemHidingPolicy?.intValue ?? 0) ?? .noHiding
+		let policy = RepoHidingPolicy(rawValue: Int(repo.itemHidingPolicy)) ?? .noHiding
 		let attributes = attributesForEntryWithPolicy(policy)
 		return NSAttributedString(string: policy.name(), attributes: attributes)
 	}

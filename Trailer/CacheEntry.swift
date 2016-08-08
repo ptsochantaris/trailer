@@ -3,7 +3,7 @@ import CoreData
 
 struct CacheUnit {
 	let data: Data
-	let code: Int
+	let code: Int64
 	let etag: String
 	let headers: Data
 	let lastFetched: Date
@@ -20,7 +20,7 @@ struct CacheUnit {
 final class CacheEntry: NSManagedObject {
 
 	@NSManaged var etag: String
-	@NSManaged var code: NSNumber
+	@NSManaged var code: Int64
 	@NSManaged var data: Data
 	@NSManaged var lastTouched: Date
 	@NSManaged var lastFetched: Date
@@ -28,10 +28,10 @@ final class CacheEntry: NSManagedObject {
 	@NSManaged var headers: Data
 
 	func cacheUnit() -> CacheUnit {
-		return CacheUnit(data: data, code: code.intValue, etag: etag, headers: headers, lastFetched: lastFetched)
+		return CacheUnit(data: data, code: code, etag: etag, headers: headers, lastFetched: lastFetched)
 	}
 
-	class func setEntry(_ key: String, code: Int, etag: String, data: Data, headers: [NSObject : AnyObject]) {
+	class func setEntry(_ key: String, code: Int64, etag: String, data: Data, headers: [NSObject : AnyObject]) {
 		var e = entryForKey(key)
 		if e == nil {
 			e = NSEntityDescription.insertNewObject(forEntityName: "CacheEntry", into: mainObjectContext) as? CacheEntry

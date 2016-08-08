@@ -31,7 +31,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 		apiPath.text = a.apiPath
 		webFrontEnd.text = a.webPath
 		authToken.text = a.authToken
-		reportErrors.isOn = a.reportRefreshFailures.boolValue
+		reportErrors.isOn = a.reportRefreshFailures
 
 		if UIDevice.current.userInterfaceIdiom != UIUserInterfaceIdiom.pad {
 			let n = NotificationCenter.default

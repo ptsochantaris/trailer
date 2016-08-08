@@ -94,7 +94,7 @@ let itemCountFormatter = { () -> NumberFormatter in
     return n
 }()
 
-enum ItemCondition: Int {
+enum ItemCondition: Int64 {
 	case open, closed, merged
 }
 
@@ -102,7 +102,7 @@ enum StatusFilter: Int {
 	case all, include, exclude
 }
 
-enum PostSyncAction: Int {
+enum PostSyncAction: Int64 {
 	case doNothing, delete, noteNew, noteUpdated
 }
 
@@ -148,7 +148,7 @@ enum AssignmentPolicy: Int {
 	}
 }
 
-enum RepoDisplayPolicy: Int {
+enum RepoDisplayPolicy: Int64 {
 	case hide, mine, mineAndPaticipated, all
 	static let labels = ["Hide", "Mine", "Participated", "All"]
 	static let policies = [hide, mine, mineAndPaticipated, all]
@@ -157,11 +157,12 @@ enum RepoDisplayPolicy: Int {
 							COLOR_CLASS(red: 0.8, green: 0.4, blue: 0.0, alpha: 1.0),
 							COLOR_CLASS(red: 0.0, green: 0.5, blue: 0.0, alpha: 1.0)]
 	func name() -> String {
-		return RepoDisplayPolicy.labels[rawValue]
+		return RepoDisplayPolicy.labels[Int(rawValue)]
 	}
 	func color() -> COLOR_CLASS {
-		return RepoDisplayPolicy.colors[rawValue]
+		return RepoDisplayPolicy.colors[Int(rawValue)]
 	}
+	var intValue: Int { return Int(rawValue) }
 }
 
 enum RepoHidingPolicy: Int {
@@ -192,9 +193,6 @@ let COMMENT_ID_KEY = "commentIdKey"
 let NOTIFICATION_URL_KEY = "urlKey"
 let API_USAGE_UPDATE = "RateUpdateNotification"
 let kSyncProgressUpdate = "kSyncProgressUpdate"
-
-let LOW_API_WARNING: Double = 0.20
-let BACKOFF_STEP: TimeInterval = 120.0
 
 func currentAppVersion() -> String {
 	return S(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String)
@@ -241,7 +239,7 @@ func isDarkColor(_ color: COLOR_CLASS) -> Bool {
 func parseFromHex(_ s: String) -> UInt32 {
 	let safe = s.trim().trimmingCharacters(in: CharacterSet.symbols)
 	let s = Scanner(string: safe)
-	var result:UInt32 = 0
+	var result: UInt32 = 0
 	s.scanHexInt32(&result)
 	return result
 }
