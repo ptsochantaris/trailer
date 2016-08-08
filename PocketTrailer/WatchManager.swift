@@ -143,11 +143,11 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 		case "item_list":
 			buildItemList(type: message["type"] as! String,
-			              sectionIndex: message["sectionIndex"] as! Int64,
-			              from: message["from"] as! Int,
+			              sectionIndex: (message["sectionIndex"] as! NSNumber).int64Value,
+			              from: (message["from"] as! NSNumber).intValue,
 			              apiServerUri: message["apiUri"] as! String,
 			              group: message["group"] as! String,
-			              count: message["count"] as! Int,
+			              count: (message["count"] as! NSNumber).intValue,
 			              onlyUnread: message["onlyUnread"] as! Bool,
 			              replyHandler: replyHandler)
 
