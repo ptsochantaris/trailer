@@ -4,6 +4,7 @@ import CoreData
 	import UIKit
 	import CoreSpotlight
 	import MobileCoreServices
+	import UserNotifications
 #endif
 
 class ListableItem: DataItem {
@@ -85,11 +86,9 @@ class ListableItem: DataItem {
 				CSSearchableIndex.default().deleteSearchableItems(withIdentifiers: [objectID.uriRepresentation().absoluteString], completionHandler: nil)
 			}
 		#endif
-		#if os(OSX)
-			if Settings.removeNotificationsWhenItemIsRemoved {
-				removeRelatedNotifications()
-			}
-		#endif
+		if Settings.removeNotificationsWhenItemIsRemoved {
+			ListableItem.removeRelatedNotifications(uri: objectID.uriRepresentation().absoluteString)
+		}
 	}
 
 	final func sortedComments(_ comparison: ComparisonResult) -> [PRComment] {
@@ -746,15 +745,13 @@ class ListableItem: DataItem {
 		return f
 	}
 
-	final class func relatedItemsFromNotificationInfo(_ userInfo: [String : AnyObject?]) -> (PRComment?, ListableItem)? {
+	final class func relatedItemsFromNotificationInfo(_ userInfo: [NSObject : AnyObject]) -> (PRComment?, ListableItem)? {
 		var item: ListableItem?
 		var comment: PRComment?
-		if let itemId = DataManager.idForUriPath(userInfo[COMMENT_ID_KEY] as? String), let c = existingObjectWithID(itemId) as? PRComment {
+		if let cid = userInfo[COMMENT_ID_KEY] as? String, let itemId = DataManager.idForUriPath(cid), let c = existingObjectWithID(itemId) as? PRComment {
 			comment = c
 			item = c.pullRequest ?? c.issue
-		} else if let itemId = DataManager.idForUriPath(userInfo[PULL_REQUEST_ID_KEY] as? String) {
-			item = existingObjectWithID(itemId) as? ListableItem
-		} else if let itemId = DataManager.idForUriPath(userInfo[ISSUE_ID_KEY] as? String) {
+		} else if let pid = userInfo[LISTABLE_URI_KEY] as? String, let itemId = DataManager.idForUriPath(pid) {
 			item = existingObjectWithID(itemId) as? ListableItem
 		}
 		if let i = item {
@@ -768,20 +765,33 @@ class ListableItem: DataItem {
 		muted = mute
 		postProcess()
 		if mute {
-			removeRelatedNotifications()
+			ListableItem.removeRelatedNotifications(uri: objectID.uriRepresentation().absoluteString)
 		}
 	}
 
-	final func removeRelatedNotifications() {
+	final class func removeRelatedNotifications(uri: String) {
 		#if os(OSX)
-		let nc = NSUserNotificationCenter.default
-		for n in nc.deliveredNotifications {
-			if let u = n.userInfo, let (_, item) = ListableItem.relatedItemsFromNotificationInfo(u), item.serverId == serverId {
-				nc.removeDeliveredNotification(n)
+			let nc = NSUserNotificationCenter.default
+			for n in nc.deliveredNotifications {
+				if let u = n.userInfo, let notificationUri = u[LISTABLE_URI_KEY] as? String, notificationUri == uri {
+					nc.removeDeliveredNotification(n)
+				}
 			}
-		}
+		#elseif os(iOS)
+			let nc = UNUserNotificationCenter.current()
+			nc.getDeliveredNotifications { notifications in
+				atNextEvent {
+					for n in notifications {
+						let r = n.request.identifier
+						let u = n.request.content.userInfo
+						if let notificationUri = u[LISTABLE_URI_KEY] as? String, notificationUri == uri {
+							DLog("Removing related notification: %@", r)
+							nc.removeDeliveredNotifications(withIdentifiers: [r])
+						}
+					}
+				}
+			}
 		#endif
-		// iOS won't allow access notifications after presenting if the app gets restarted, so behaviour of this would be inconsistent.
 	}
 
 	#if os(iOS)

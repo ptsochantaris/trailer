@@ -1,9 +1,10 @@
 
 import UIKit
+import UserNotifications
 
 var app: iOS_AppDelegate!
 
-final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
+final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
 
 	var window: UIWindow?
 
@@ -13,9 +14,6 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 	private var refreshTimer: Timer?
 	private var backgroundCallback: ((UIBackgroundFetchResult) -> Void)?
 	private var actOnLocalNotification = true
-
-	private var justPostedNotificationTimer: PopTimer!
-	private var justPostedNotifications = false
 
 	func updateBadge() {
 		UIApplication.shared.applicationIconBadgeNumber = PullRequest.badgeCountInMoc(mainObjectContext) + Issue.badgeCountInMoc(mainObjectContext)
@@ -31,10 +29,16 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 		}
 
 		app = self
-		justPostedNotificationTimer = PopTimer(timeInterval: 2) { [weak self] in
-			self?.justPostedNotifications = false
-		}
 		return true
+	}
+
+	func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: (UNNotificationPresentationOptions) -> Void) {
+		completionHandler([.alert, .badge, .sound])
+	}
+
+	func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: () -> Void) {
+		NotificationManager.handleLocalNotification(notification: response.notification.request.content, action: response.actionIdentifier)
+		completionHandler()
 	}
 
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject : AnyObject]?) -> Bool {
@@ -55,64 +59,20 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 
 		application.setMinimumBackgroundFetchInterval(TimeInterval(Settings.backgroundRefreshPeriod))
 
-		atNextEvent(self) { S in
-			if DataManager.appIsConfigured {
-				if let localNotification = launchOptions?[UIApplicationLaunchOptionsLocalNotificationKey] as? UILocalNotification {
-					NotificationManager.handleLocalNotification(notification: localNotification, action: nil)
-				}
-			} else {
+		NotificationManager.setup(delegate: self)
 
-				if !ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
-					let m = popupManager.getMasterController()
-					if ApiServer.countApiServersInMoc(mainObjectContext) == 1, let a = ApiServer.allApiServersInMoc(mainObjectContext).first, a.authToken == nil || a.authToken!.isEmpty {
-						m.performSegue(withIdentifier: "showQuickstart", sender: self)
-					} else {
-						m.performSegue(withIdentifier: "showPreferences", sender: self)
-					}
+		atNextEvent(self) { S in
+			if !ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
+				let m = popupManager.getMasterController()
+				if ApiServer.countApiServersInMoc(mainObjectContext) == 1, let a = ApiServer.allApiServersInMoc(mainObjectContext).first, a.authToken == nil || a.authToken!.isEmpty {
+					m.performSegue(withIdentifier: "showQuickstart", sender: self)
+				} else {
+					m.performSegue(withIdentifier: "showPreferences", sender: self)
 				}
 			}
 
 			S.watchManager = WatchManager()
 		}
-
-		let readAction = UIMutableUserNotificationAction()
-		readAction.identifier = "read"
-		readAction.title = "Mark as read"
-		readAction.isDestructive = false
-		readAction.isAuthenticationRequired = false
-		readAction.activationMode = .background
-
-		let readShort = UIMutableUserNotificationAction()
-		readShort.identifier = "read"
-		readShort.title = "Read"
-		readShort.isDestructive = false
-		readShort.isAuthenticationRequired = false
-		readShort.activationMode = .background
-
-		let muteAction = UIMutableUserNotificationAction()
-		muteAction.identifier = "mute"
-		muteAction.title = "Mute this item"
-		muteAction.isDestructive = true
-		muteAction.isAuthenticationRequired = false
-		muteAction.activationMode = .background
-
-		let muteShort = UIMutableUserNotificationAction()
-		muteShort.identifier = "mute"
-		muteShort.title = "Mute"
-		muteShort.isDestructive = true
-		muteShort.isAuthenticationRequired = false
-		muteShort.activationMode = .background
-
-		let itemCategory = UIMutableUserNotificationCategory()
-		itemCategory.identifier = "mutable"
-		itemCategory.setActions([readAction, muteAction], for: .default)
-		itemCategory.setActions([readShort, muteShort], for: .minimal)
-
-		let repoCategory = UIMutableUserNotificationCategory()
-		repoCategory.identifier = "repo"
-
-		let notificationSettings = UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: [itemCategory, repoCategory])
-		application.registerUserNotificationSettings(notificationSettings)
 
 		return true
 	}
@@ -154,19 +114,6 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 
 	deinit {
 		NotificationCenter.default.removeObserver(self)
-	}
-
-	func application(_ application: UIApplication, didReceive notification: UILocalNotification) {
-		if !justPostedNotifications && actOnLocalNotification {
-			NotificationManager.handleLocalNotification(notification: notification, action: nil)
-		}
-	}
-
-	func application(_ application: UIApplication, handleActionWithIdentifier identifier: String?, for notification: UILocalNotification, completionHandler: () -> Void) {
-		atNextEvent {
-			NotificationManager.handleLocalNotification(notification: notification, action: identifier)
-			completionHandler()
-		}
 	}
 
 	func startRefreshIfItIsDue() {
@@ -321,13 +268,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 	}
 
 	func postNotification(type: NotificationType, forItem: DataItem) {
-		justPostedNotifications = true
 		NotificationManager.postNotification(type: type, forItem: forItem)
-		if UIApplication.shared.applicationState == .background {
-			justPostedNotifications = false
-		} else {
-			justPostedNotificationTimer.push()
-		}
 	}
 
 	func markEverythingRead() {

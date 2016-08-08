@@ -13,11 +13,10 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 
 	private var linkButton = UIButton(type: UIButtonType.custom)
 	private let paragraph = NSMutableParagraphStyle()
-	private let newOS = ProcessInfo().isOperatingSystemAtLeast(OperatingSystemVersion(majorVersion: 10, minorVersion: 0, patchVersion: 0))
 
 	private var titleAttributes: [String : AnyObject] {
 		return [
-			NSForegroundColorAttributeName: newOS ? UIColor.black : UIColor.white,
+			NSForegroundColorAttributeName: UIColor.black,
 			NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.systemFontSize+2.0),
 			NSParagraphStyleAttributeName: paragraph ]
 	}
@@ -67,11 +66,6 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 		prImage.image = UIImage(named: "prsTab")?.withRenderingMode(.alwaysTemplate)
 		issueImage.image = UIImage(named: "issuesTab")?.withRenderingMode(.alwaysTemplate)
 
-		if newOS {
-			prImage.tintColor = UIColor.black
-			issueImage.tintColor = UIColor.black
-		}
-
 		paragraph.paragraphSpacing = 4
 
 		linkButton.addTarget(self, action: #selector(TodayViewController.widgetTapped), for: .touchUpInside)
@@ -88,19 +82,8 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 	override func viewDidLayoutSubviews() {
 		linkButton.frame = prLabel.frame.union(updatedLabel.frame)
 		let H = linkButton.frame.origin.y + linkButton.frame.size.height
-		let offset: CGFloat = newOS ? 10 : 0
-		preferredContentSize = CGSize(width: view.frame.size.width, height: H + offset)
+		preferredContentSize = CGSize(width: view.frame.size.width, height: H + 10)
 		super.viewDidLayoutSubviews()
-	}
-
-	func widgetMarginInsets(forProposedMarginInsets defaultMarginInsets: UIEdgeInsets) -> UIEdgeInsets {
-		if newOS {
-			return defaultMarginInsets
-		} else {
-			var i = defaultMarginInsets
-			i.bottom -= 15
-			return i
-		}
 	}
 
 	private func update() {

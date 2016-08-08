@@ -533,7 +533,7 @@ final class Settings {
         set { set("NOTIFY_ON_STATUS_UPDATES_ALL", newValue) }
     }
 
-	static let preferIssuesInWatchHelp = "In the Apple Watch glance, or when there is only enough space to display one count or set of statistics in complications, prefer the ones for issues rather than the ones for PRs."
+	static let preferIssuesInWatchHelp = "If there is only enough space to display one count or set of statistics on the Apple Watch, prefer the ones for issues rather than the ones for PRs."
 	class var preferIssuesInWatch: Bool {
 		get { return get("SHOW_ISSUES_IN_WATCH_GLANCE") as? Bool ?? false }
 		set { set("SHOW_ISSUES_IN_WATCH_GLANCE", newValue) }
@@ -557,7 +557,7 @@ final class Settings {
 
 	static let removeNotificationsWhenItemIsRemovedHelp = "When an item is removed, whether through user action or automatically due to settings, also remove any notifications in the Notification Center that are related to this item."
 	class var removeNotificationsWhenItemIsRemoved: Bool {
-		get { return get("REMOVE_RELATED_NOTIFICATIONS_ON_ITEM_REMOVE") as? Bool ?? false }
+		get { return get("REMOVE_RELATED_NOTIFICATIONS_ON_ITEM_REMOVE") as? Bool ?? true }
 		set { set("REMOVE_RELATED_NOTIFICATIONS_ON_ITEM_REMOVE", newValue) }
 	}
 

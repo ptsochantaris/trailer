@@ -7,6 +7,11 @@ let api = API()
 
 
 //debugging
+
+//delay(2) {
+//	let _items = PullRequest.allItemsOfType("PullRequest", inMoc: mainObjectContext) as! [ListableItem]
+//	app.postNotification(type: .newComment, forItem: _items[0].comments.first!)
+//}
 //let _items = PullRequest.allItemsOfType("PullRequest", inMoc: mainObjectContext) as! [ListableItem]
 //for i in _items {
 //	i.latestReadCommentDate = Date.distantPast

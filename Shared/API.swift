@@ -174,7 +174,7 @@ final class API {
 		let connector = path.characters.contains("?") ? "&" : "?"
 		let absolutePath = "\(path)\(connector)s=\(imgsize)"
 		let imageKey = "\(absolutePath) \(currentAppVersion())"
-		let cachePath = cacheDirectory.stringByAppendingPathComponent("imgcache-\(imageKey.md5hash)")
+		let cachePath = cacheDirectory.stringByAppendingPathComponent("imgcache-\(imageKey.md5hash).jpg")
 		
 		let fileManager = FileManager.default
 		if fileManager.fileExists(atPath: cachePath) {

@@ -25,6 +25,31 @@ final class DataManager {
 
 	private class func performVersionChangedTasks() {
 
+		#if os(OSX)
+		let nc = NSUserNotificationCenter.default
+
+		// Unstick OS X notifications with custom actions but without an identifier, causes OS X to keep them forever
+		if #available(OSX 10.10, *) {
+			for notification in nc.deliveredNotifications {
+				if notification.additionalActions != nil && notification.identifier == nil {
+					nc.removeAllDeliveredNotifications()
+					break
+				}
+			}
+		}
+
+		// Migrate delivered notifications from old keys
+		for notification in nc.deliveredNotifications {
+			if let userInfo = notification.userInfo, let u = (userInfo["pullRequestIdKey"] ?? userInfo["issueIdKey"] ?? userInfo["statusIdKey"]) as? String {
+				notification.userInfo![LISTABLE_URI_KEY] = u
+				notification.userInfo!["pullRequestIdKey"] = nil
+				notification.userInfo!["issueIdKey"] = nil
+				notification.userInfo!["statusIdKey"] = nil
+				nc.deliver(notification)
+			}
+		}
+		#endif
+
 		let d = UserDefaults.standard
 		if let legacyAuthToken = d.object(forKey: "GITHUB_AUTH_TOKEN") as? String {
 			var legacyApiHost = S(d.object(forKey: "API_BACKEND_SERVER") as? String)
@@ -129,10 +154,14 @@ final class DataManager {
 						}
 					}
 					#if os(iOS)
-						i.indexForSpotlight()
+						atNextEvent {
+							i.indexForSpotlight()
+						}
 					#endif
 				} else {
-					i.ensureInvisible()
+					atNextEvent {
+						i.ensureInvisible()
+					}
 				}
 			}
 			return allItems
@@ -214,16 +243,22 @@ final class DataManager {
 	class func infoForType(_ type: NotificationType, item: DataItem) -> [String : AnyObject] {
 		switch type {
 		case .newMention, .newComment:
-			return [COMMENT_ID_KEY : item.objectID.uriRepresentation().absoluteString]
+			let uri = item.objectID.uriRepresentation().absoluteString
+			let parent = (item as! PRComment).pullRequest ?? (item as! PRComment).issue
+			let parentUri = parent?.objectID.uriRepresentation().absoluteString ?? ""
+			return [COMMENT_ID_KEY: uri, LISTABLE_URI_KEY: parentUri]
 		case .newPr, .prReopened, .newPrAssigned, .prClosed, .prMerged:
-			return [NOTIFICATION_URL_KEY : (item as! PullRequest).webUrl!, PULL_REQUEST_ID_KEY: item.objectID.uriRepresentation().absoluteString]
+			let uri = item.objectID.uriRepresentation().absoluteString
+			return [NOTIFICATION_URL_KEY: (item as! PullRequest).webUrl!, LISTABLE_URI_KEY: uri]
 		case .newRepoSubscribed, .newRepoAnnouncement:
-			return [NOTIFICATION_URL_KEY : (item as! Repo).webUrl!]
+			return [NOTIFICATION_URL_KEY: (item as! Repo).webUrl!]
 		case .newStatus:
 			let pr = (item as! PRStatus).pullRequest
-			return [NOTIFICATION_URL_KEY : pr.webUrl!, STATUS_ID_KEY: pr.objectID.uriRepresentation().absoluteString]
+			let uri = pr.objectID.uriRepresentation().absoluteString
+			return [NOTIFICATION_URL_KEY: pr.webUrl!, LISTABLE_URI_KEY: uri]
 		case .newIssue, .issueReopened, .newIssueAssigned, .issueClosed:
-			return [NOTIFICATION_URL_KEY : (item as! Issue).webUrl!, ISSUE_ID_KEY: item.objectID.uriRepresentation().absoluteString]
+			let uri = item.objectID.uriRepresentation().absoluteString
+			return [NOTIFICATION_URL_KEY: (item as! Issue).webUrl!, LISTABLE_URI_KEY: uri]
 		}
 	}
 

@@ -677,7 +677,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			if urlToOpen == nil {
 				urlToOpen = c.webUrl
 			}
-		} else if let uri = (userInfo[PULL_REQUEST_ID_KEY] ?? userInfo[ISSUE_ID_KEY]) as? String, let itemId = DataManager.idForUriPath(uri) {
+		} else if let uri = userInfo[LISTABLE_URI_KEY] as? String, let itemId = DataManager.idForUriPath(uri) {
 			relatedItem = existingObjectWithID(itemId) as? ListableItem
 			if relatedItem == nil {
 				showMessage("Item not found", "Could not locate the item related to this notification")
@@ -689,12 +689,15 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		if let a = action, let i = relatedItem {
 			if a == "mute" {
 				i.setMute(true)
+				DataManager.saveDB()
+				updateStatus()
+				return
 			} else if a == "read" {
 				i.catchUpWithComments()
+				DataManager.saveDB()
+				updateStatus()
+				return
 			}
-			DataManager.saveDB()
-			updateStatus()
-			return
 		}
 
 		if urlToOpen != nil && !S(searchBar.text).isEmpty {
@@ -795,8 +798,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		if let u = p.urlForOpening(), let url = URL(string: u)
 		{
 			if forceSafari || (Settings.openItemsDirectlyInSafari && !detailViewController.isVisible) {
-				p.catchUpWithComments()
-				UIApplication.shared.openURL(url)
+				UIApplication.shared.open(url, options: [:]) { success in
+					p.catchUpWithComments()
+				}
 			} else {
 				showDetail(url: url, objectId: p.objectID)
 			}

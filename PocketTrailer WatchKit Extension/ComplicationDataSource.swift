@@ -4,18 +4,7 @@ import WatchConnectivity
 final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 
 	func getNextRequestedUpdateDate(handler: (Date?) -> Void) {
-		if ProcessInfo().isOperatingSystemAtLeast(OperatingSystemVersion(majorVersion: 3, minorVersion: 0, patchVersion: 0)) {
-			handler(nil)
-		} else {
-			handler(Date().addingTimeInterval(60))
-		}
-	}
-
-	func requestedUpdateDidBegin() {
-		let s = CLKComplicationServer.sharedInstance()
-		for c in s.activeComplications ?? [] {
-			s.reloadTimeline(for: c)
-		}
+		handler(nil)
 	}
 
 	func getPlaceholderTemplate(for complication: CLKComplication, withHandler handler: (CLKComplicationTemplate?) -> Void) {

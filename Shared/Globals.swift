@@ -187,9 +187,7 @@ func MAKECOLOR(_ red: CGFloat, _ green: CGFloat, _ blue: CGFloat, _ alpha: CGFlo
 	return COLOR_CLASS(red: red, green: green, blue: blue, alpha: alpha)
 }
 
-let PULL_REQUEST_ID_KEY = "pullRequestIdKey"
-let ISSUE_ID_KEY = "issueIdKey"
-let STATUS_ID_KEY = "statusIdKey"
+let LISTABLE_URI_KEY = "listableUriKey"
 let COMMENT_ID_KEY = "commentIdKey"
 let NOTIFICATION_URL_KEY = "urlKey"
 let API_USAGE_UPDATE = "RateUpdateNotification"

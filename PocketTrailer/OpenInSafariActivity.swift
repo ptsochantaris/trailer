@@ -29,7 +29,9 @@ final class OpenInSafariActivity: UIActivity {
 
 	override func perform() {
 		if let u = _URL {
-			activityDidFinish(UIApplication.shared.openURL(u))
+			UIApplication.shared.open(u, options: [:]) { [weak self] success in
+				self?.activityDidFinish(success)
+			}
 		}
 	}
 

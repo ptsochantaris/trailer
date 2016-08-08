@@ -115,16 +115,6 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		let wn = NSWorkspace.shared().notificationCenter
 		wn.addObserver(self, selector: #selector(OSX_AppDelegate.systemWillSleep), name: NSNotification.Name.NSWorkspaceWillSleep, object: nil)
 		wn.addObserver(self, selector: #selector(OSX_AppDelegate.systemDidWake), name: NSNotification.Name.NSWorkspaceDidWake, object: nil)
-
-		// Unstick OS X notifications with custom actions but without an identifier, causes OS X to keep them forever
-		if #available(OSX 10.10, *) {
-			for notification in nc.deliveredNotifications {
-				if notification.additionalActions != nil && notification.identifier == nil {
-					nc.removeAllDeliveredNotifications()
-					break
-				}
-			}
-		}
 	}
 
 	func systemWillSleep() {

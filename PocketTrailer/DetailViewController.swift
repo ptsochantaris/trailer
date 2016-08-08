@@ -134,7 +134,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 
 	func keyOpenInSafari() {
 		if let u = webView?.url {
-			UIApplication.shared.openURL(u)
+			UIApplication.shared.open(u, options: [:], completionHandler: nil)
 		}
 	}
 
