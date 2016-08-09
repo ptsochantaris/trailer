@@ -871,13 +871,11 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 						}
 						if let snoozeIndex = Int(incomingEvent.charactersIgnoringModifiers ?? "") {
 							if snoozeIndex > 0 && !selectedItem.isSnoozing {
-								if S.snooze(item: selectedItem, snoozeIndex: snoozeIndex-1) {
+								if S.snooze(item: selectedItem, snoozeIndex: snoozeIndex-1, window: w) {
 									return nil
 								}
 							} else if snoozeIndex == 0 && selectedItem.isSnoozing {
-								selectedItem.wakeUp()
-								DataManager.saveDB()
-								app.updateRelatedMenusFor(selectedItem)
+								S.wake(item: selectedItem, window: w)
 								return nil
 							}
 						}
@@ -888,22 +886,46 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 	}
 
-	private func snooze(item: ListableItem, snoozeIndex: Int) -> Bool {
+	private func wake(item: ListableItem, window: MenuWindow) {
+		let oldIndex = window.table.selectedRow
+		item.wakeUp()
+		DataManager.saveDB()
+		app.updateRelatedMenusFor(item)
+		scrollToNearest(index: oldIndex, window: window, preferDown : false)
+	}
+
+	private func snooze(item: ListableItem, snoozeIndex: Int, window: MenuWindow) -> Bool {
 		let s = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)
 		if s.count > snoozeIndex  {
+			let oldIndex = window.table.selectedRow
 			item.snoozeFromPreset(s[snoozeIndex])
 			DataManager.saveDB()
 			updateRelatedMenusFor(item)
+			scrollToNearest(index: oldIndex, window: window, preferDown: true)
 			return true
 		}
 		return false
+	}
+
+	private func scrollToNearest(index: Int, window: MenuWindow, preferDown: Bool) {
+		let table = window.table!
+		let maxRowIndex = table.numberOfRows-1
+		if maxRowIndex >= 0 {
+			var i = index + (preferDown ? 0 : 1)
+			i = min(maxRowIndex, max(0, i))
+			if window.itemDelegate.itemAtRow(i) == nil {
+				i += preferDown ? -1 : 1
+				i = min(maxRowIndex, max(0, i))
+			}
+			scrollToIndex(i, inMenu: window)
+		}
 	}
 
 	private func scrollToIndex(_ i: Int, inMenu: MenuWindow) {
 		app.isManuallyScrolling = true
 		mouseIgnoreTimer.push()
 		inMenu.table.scrollRowToVisible(i)
-		atNextEvent {
+		delay(0.01) {
 			inMenu.table.selectRowIndexes(IndexSet(integer: i), byExtendingSelection: false)
 		}
 	}
