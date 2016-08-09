@@ -961,18 +961,15 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	private func showSnoozeMenuFor(i: ListableItem) {
-		let items = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)
-		let hasPresets = items.count > 0
+		let snoozePresets = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)
+		let hasPresets = snoozePresets.count > 0
 		let singleColumn = splitViewController?.isCollapsed ?? true
 		let a = UIAlertController(title: hasPresets ? "Snooze" : nil,
 		                          message: hasPresets ? S(i.title) : "You do not currently have any snoozing presets configured. Please add some in the relevant preferences tab.",
 		                          preferredStyle: singleColumn ? .actionSheet : .alert)
-		for item in items {
-			a.addAction(UIAlertAction(title: item.listDescription, style: .default) { action in
-				i.snoozeUntil = item.wakeupDateFromNow
-				i.wasAwokenFromSnooze = false
-				i.muted = false
-				i.postProcess()
+		for preset in snoozePresets {
+			a.addAction(UIAlertAction(title: preset.listDescription, style: .default) { action in
+				i.snoozeFromPreset(preset)
 				DataManager.saveDB()
 			})
 		}

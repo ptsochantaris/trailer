@@ -56,8 +56,7 @@ final class Settings {
 			"SHOW_ISSUES_IN_WATCH_GLANCE", "ASSIGNED_PR_HANDLING_POLICY", "HIDE_DESCRIPTION_IN_WATCH_DETAIL_VIEW", "AUTO_REPEAT_SETTINGS_EXPORT", "DONT_CONFIRM_SETTINGS_IMPORT",
 			"LAST_EXPORT_URL", "LAST_EXPORT_TIME", "CLOSE_HANDLING_POLICY_2", "MERGE_HANDLING_POLICY_2", "LAST_PREFS_TAB_SELECTED_OSX", "NEW_PR_DISPLAY_POLICY_INDEX", "NEW_ISSUE_DISPLAY_POLICY_INDEX", "HIDE_PRS_THAT_ARENT_PASSING_ONLY_IN_ALL",
             "INCLUDE_SERVERS_IN_FILTER", "INCLUDE_USERS_IN_FILTER", "INCLUDE_TITLES_IN_FILTER", "INCLUDE_NUMBERS_IN_FILTER", "DUMP_API_RESPONSES_IN_CONSOLE", "OPEN_ITEMS_DIRECTLY_IN_SAFARI", "HIDE_PRS_THAT_ARENT_PASSING",
-            "REMOVE_RELATED_NOTIFICATIONS_ON_ITEM_REMOVE", "HIDE_SNOOZED_ITEMS", "SNOOZE_WAKEUP_ON_COMMENT", "SNOOZE_WAKEUP_ON_MENTION", "SNOOZE_WAKEUP_ON_STATUS_UPDATE", "INCLUDE_MILESTONES_IN_FILTER",
-            "INCLUDE_ASSIGNEE_NAMES_IN_FILTER", "API_SERVERS_IN_SEPARATE_MENUS", "ASSUME_READ_ITEM_IF_USER_HAS_NEWER_COMMENTS", "AUTO_SNOOZE_DAYS"]
+            "REMOVE_RELATED_NOTIFICATIONS_ON_ITEM_REMOVE", "HIDE_SNOOZED_ITEMS", "INCLUDE_MILESTONES_IN_FILTER", "INCLUDE_ASSIGNEE_NAMES_IN_FILTER", "API_SERVERS_IN_SEPARATE_MENUS", "ASSUME_READ_ITEM_IF_USER_HAS_NEWER_COMMENTS", "AUTO_SNOOZE_DAYS"]
 	}
 
     class func checkMigration() {
@@ -76,6 +75,19 @@ final class Settings {
         } else {
             DLog("No need to migrate settings into shared container")
         }
+
+		if let snoozeWakeOnComment = _settings_shared.object(forKey: "SNOOZE_WAKEUP_ON_COMMENT") as? Bool {
+			DataManager.postMigrationSnoozeWakeOnComment = snoozeWakeOnComment
+			_settings_shared.removeObject(forKey: "SNOOZE_WAKEUP_ON_COMMENT")
+		}
+		if let snoozeWakeOnMention = _settings_shared.object(forKey: "SNOOZE_WAKEUP_ON_MENTION") as? Bool {
+			DataManager.postMigrationSnoozeWakeOnMention = snoozeWakeOnMention
+			_settings_shared.removeObject(forKey: "SNOOZE_WAKEUP_ON_MENTION")
+		}
+		if let snoozeWakeOnStatusUpdate = _settings_shared.object(forKey: "SNOOZE_WAKEUP_ON_STATUS_UPDATE") as? Bool {
+			DataManager.postMigrationSnoozeWakeOnStatusUpdate = snoozeWakeOnStatusUpdate
+			_settings_shared.removeObject(forKey: "SNOOZE_WAKEUP_ON_STATUS_UPDATE")
+		}
 
 		if let moveAssignedPrs = _settings_shared.object(forKey: "MOVE_ASSIGNED_PRS_TO_MY_SECTION") as? Bool {
 			_settings_shared.set(moveAssignedPrs ? AssignmentPolicy.moveToMine.rawValue : AssignmentPolicy.doNothing.rawValue, forKey: "ASSIGNED_PR_HANDLING_POLICY")
@@ -263,7 +275,7 @@ final class Settings {
 
 	///////////////////////////////// NUMBERS
 
-	static let autoSnoozeDurationHelp = "How many days before an item is automatically snoozed using the first (top) preset."
+	static let autoSnoozeDurationHelp = "How many days before an item is automatically snoozed. An item is auto-snoozed forever but will wake up on any comment, mention, or status update."
 	class var autoSnoozeDuration: Int {
 		get { return get("AUTO_SNOOZE_DAYS") as? Int ?? 0 }
 		set { set("AUTO_SNOOZE_DAYS", newValue) }
@@ -625,22 +637,8 @@ final class Settings {
 	}
 
 	static let snoozeWakeOnCommentHelp = "Wake up snoozing items if a new comment is made"
-	class var snoozeWakeOnComment: Bool {
-		get { return get("SNOOZE_WAKEUP_ON_COMMENT") as? Bool ?? true }
-		set { set("SNOOZE_WAKEUP_ON_COMMENT", newValue) }
-	}
-
 	static let snoozeWakeOnMentionHelp = "Wake up snoozing items in you are mentioned in a new comment"
-	class var snoozeWakeOnMention: Bool {
-		get { return get("SNOOZE_WAKEUP_ON_MENTION") as? Bool ?? true }
-		set { set("SNOOZE_WAKEUP_ON_MENTION", newValue) }
-	}
-
 	static let snoozeWakeOnStatusUpdateHelp = "Wake up snoozing items if there is a status or CI update"
-	class var snoozeWakeOnStatusUpdate: Bool {
-		get { return get("SNOOZE_WAKEUP_ON_STATUS_UPDATE") as? Bool ?? true }
-		set { set("SNOOZE_WAKEUP_ON_STATUS_UPDATE", newValue) }
-	}
 
 	static let countOnlyListedItemsHelp = "Show the number of items currently visible in Trailer in the menu bar. If this is unselected, the menubar will display the count of all open items in the current watchlist, irrespective of filters or visibility settings. It's recommended you keep this on."
     class var countOnlyListedItems: Bool {

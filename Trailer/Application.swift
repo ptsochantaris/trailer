@@ -19,30 +19,17 @@ final class Application: NSApplication {
 					case "v": if sendAction(#selector(NSText.paste(_:)), to:nil, from:self) { return }
 					case "z": if sendAction(#selector(NSTextField.trailerUndo), to:nil, from:self) { return }
 					case "c":
-						if let url = app.focusedItem()?.webUrl {
+						if let url = app.focusedItem(blink: true)?.webUrl {
 							let p = NSPasteboard.general()
 							p.clearContents()
 							p.setString(url, forType:NSStringPboardType)
 							return
+
 						} else {
 							if sendAction(#selector(NSText.copy(_:)), to:nil, from:self) { return }
 						}
-					case "s":
-						if let i = app.focusedItem(), i.isSnoozing {
-							i.wakeUp()
-							DataManager.saveDB()
-							app.updateRelatedMenusFor(i)
-							return
-						}
-					case "m":
-						if let i = app.focusedItem() {
-							i.setMute(!i.muted)
-							DataManager.saveDB()
-							app.updateRelatedMenusFor(i)
-							return
-						}
 					case "a":
-						if let i = app.focusedItem() {
+						if let i = app.focusedItem(blink: true) {
 							if i.unreadComments > 0 {
 								i.catchUpWithComments()
 							} else {
@@ -53,11 +40,6 @@ final class Application: NSApplication {
 							app.updateRelatedMenusFor(i)
 							return
 						} else if sendAction(#selector(NSResponder.selectAll(_:)), to:nil, from:self) {
-							return
-						}
-					case "o":
-						if let i = app.focusedItem(), let w = i.repo.webUrl, let u = URL(string: w) {
-							NSWorkspace.shared().open(u)
 							return
 						}
 					default: break

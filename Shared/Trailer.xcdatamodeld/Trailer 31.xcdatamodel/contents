@@ -65,6 +65,7 @@
         <relationship name="comments" toMany="YES" deletionRule="Cascade" destinationEntity="PRComment" inverseName="issue" inverseEntity="PRComment" syncable="YES"/>
         <relationship name="labels" toMany="YES" deletionRule="Cascade" destinationEntity="PRLabel" inverseName="issue" inverseEntity="PRLabel" syncable="YES"/>
         <relationship name="repo" maxCount="1" deletionRule="Nullify" destinationEntity="Repo" inverseName="issues" inverseEntity="Repo" syncable="YES"/>
+        <relationship name="snoozingPreset" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SnoozePreset" inverseName="appliedToIssues" inverseEntity="SnoozePreset" syncable="YES"/>
         <compoundIndexes>
             <compoundIndex>
                 <index value="postSyncAction"/>
@@ -147,6 +148,7 @@
         <relationship name="comments" toMany="YES" deletionRule="Cascade" destinationEntity="PRComment" inverseName="pullRequest" inverseEntity="PRComment" syncable="YES"/>
         <relationship name="labels" toMany="YES" deletionRule="Cascade" destinationEntity="PRLabel" inverseName="pullRequest" inverseEntity="PRLabel" syncable="YES"/>
         <relationship name="repo" maxCount="1" deletionRule="Nullify" destinationEntity="Repo" inverseName="pullRequests" inverseEntity="Repo" syncable="YES"/>
+        <relationship name="snoozingPreset" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SnoozePreset" inverseName="appliedToPullRequests" inverseEntity="SnoozePreset" syncable="YES"/>
         <relationship name="statuses" toMany="YES" deletionRule="Cascade" destinationEntity="PRStatus" inverseName="pullRequest" inverseEntity="PRStatus" syncable="YES"/>
         <compoundIndexes>
             <compoundIndex>
@@ -189,7 +191,12 @@
         <attribute name="minute" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="month" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="sortOrder" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="wakeOnComment" optional="YES" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="wakeOnMention" optional="YES" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="wakeOnStatusChange" optional="YES" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="year" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
+        <relationship name="appliedToIssues" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Issue" inverseName="snoozingPreset" inverseEntity="Issue" syncable="YES"/>
+        <relationship name="appliedToPullRequests" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="PullRequest" inverseName="snoozingPreset" inverseEntity="PullRequest" syncable="YES"/>
     </entity>
     <entity name="Team" representedClassName="Trailer.Team" syncable="YES">
         <attribute name="calculatedReferral" optional="YES" attributeType="String" syncable="YES"/>
@@ -204,13 +211,13 @@
     <elements>
         <element name="ApiServer" positionX="9" positionY="153" width="128" height="360"/>
         <element name="CacheEntry" positionX="9" positionY="153" width="128" height="150"/>
-        <element name="Issue" positionX="9" positionY="153" width="128" height="525"/>
+        <element name="Issue" positionX="9" positionY="153" width="128" height="540"/>
         <element name="PRComment" positionX="0" positionY="0" width="128" height="225"/>
         <element name="PRLabel" positionX="9" positionY="153" width="128" height="195"/>
         <element name="PRStatus" positionX="0" positionY="0" width="128" height="180"/>
-        <element name="PullRequest" positionX="0" positionY="0" width="128" height="615"/>
+        <element name="PullRequest" positionX="0" positionY="0" width="128" height="630"/>
         <element name="Repo" positionX="0" positionY="0" width="128" height="330"/>
-        <element name="SnoozePreset" positionX="9" positionY="153" width="128" height="150"/>
+        <element name="SnoozePreset" positionX="9" positionY="153" width="128" height="225"/>
         <element name="Team" positionX="9" positionY="153" width="128" height="165"/>
     </elements>
 </model>

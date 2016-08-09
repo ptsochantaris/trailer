@@ -10,6 +10,13 @@ final class SnoozePreset: NSManagedObject {
 	@NSManaged var sortOrder: Int64
 	@NSManaged var duration: Bool
 
+	@NSManaged var wakeOnComment: Bool
+	@NSManaged var wakeOnMention: Bool
+	@NSManaged var wakeOnStatusChange: Bool
+
+	@NSManaged var appliedToPullRequests: Set<PullRequest>
+	@NSManaged var appliedToIssues: Set<Issue>
+
 	var listDescription: String {
 		if duration {
 			var resultItems = [String]()
@@ -23,7 +30,7 @@ final class SnoozePreset: NSManagedObject {
 				resultItems.append(minute > 1 ? "\(minute) minutes" : "1 minute")
 			}
 			if resultItems.count == 0 {
-				if Settings.snoozeWakeOnComment || Settings.snoozeWakeOnMention || Settings.snoozeWakeOnStatusUpdate {
+				if wakeOnComment || wakeOnMention || wakeOnStatusChange {
 					return "Until event or manual wake"
 				} else {
 					return "Until manual wake"
@@ -54,6 +61,15 @@ final class SnoozePreset: NSManagedObject {
 			result.append(":")
 			result.append(String(format: "%02d", minute))
 			return result
+		}
+	}
+
+	func wakeUpAllAssociatedItems() {
+		for p in appliedToPullRequests {
+			p.wakeUp()
+		}
+		for i in appliedToIssues {
+			i.wakeUp()
 		}
 	}
 

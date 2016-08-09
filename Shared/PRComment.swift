@@ -45,13 +45,13 @@ final class PRComment: DataItem {
 	func processNotifications() {
 		if let item = pullRequest ?? issue, item.postSyncAction == PostSyncAction.noteUpdated.rawValue && item.isVisibleOnMenu {
 			if containsTerms(terms: ["@\(apiServer.userName!)"]) {
-				if item.isSnoozing && Settings.snoozeWakeOnMention {
+				if item.isSnoozing && item.shouldWakeOnMention {
 					DLog("Waking up snoozed item ID %lld because of mention", item.serverId)
 					item.wakeUp()
 				}
 				app.postNotification(type: .newMention, forItem: self)
 			} else if !isMine {
-				if item.isSnoozing && Settings.snoozeWakeOnComment {
+				if item.isSnoozing && item.shouldWakeOnComment {
 					DLog("Waking up snoozed item ID %lld because of posted comment", item.serverId)
 					item.wakeUp()
 				}

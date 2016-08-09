@@ -7,6 +7,9 @@ final class DataManager {
 
 	static var postMigrationRepoPrPolicy: RepoDisplayPolicy?
 	static var postMigrationRepoIssuePolicy: RepoDisplayPolicy?
+	static var postMigrationSnoozeWakeOnComment: Bool?
+	static var postMigrationSnoozeWakeOnMention: Bool?
+	static var postMigrationSnoozeWakeOnStatusUpdate: Bool?
 
 	class func checkMigration() {
 
@@ -93,7 +96,7 @@ final class DataManager {
 		}
 
 		DLog("Migrating display policies")
-		for r in DataItem.allItemsOfType("Repo", inMoc:mainObjectContext) as! [Repo] {
+		for r in DataItem.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo] {
 			if let markedAsHidden = r.value(forKey: "hidden")?.boolValue, markedAsHidden == true {
 				r.displayPolicyForPrs = RepoDisplayPolicy.hide.rawValue
 				r.displayPolicyForIssues = RepoDisplayPolicy.hide.rawValue
@@ -104,6 +107,19 @@ final class DataManager {
 				if let issueDisplayPolicy = postMigrationRepoIssuePolicy, r.value(forKey: "displayPolicyForIssues") == nil {
 					r.displayPolicyForIssues = issueDisplayPolicy.rawValue
 				}
+			}
+		}
+
+		DLog("Migrating snooze presets")
+		for s in SnoozePreset.allSnoozePresetsInMoc(mainObjectContext) {
+			if let m = postMigrationSnoozeWakeOnComment {
+				s.wakeOnComment = m
+			}
+			if let m = postMigrationSnoozeWakeOnMention {
+				s.wakeOnMention = m
+			}
+			if let m = postMigrationSnoozeWakeOnStatusUpdate {
+				s.wakeOnStatusChange = m
 			}
 		}
 	}
@@ -184,7 +200,7 @@ final class DataManager {
 						if let s = pr.displayedStatuses.first {
 							let displayText = s.descriptionText
 							if pr.lastStatusNotified != displayText && pr.postSyncAction != PostSyncAction.noteNew.rawValue {
-								if pr.isSnoozing && Settings.snoozeWakeOnStatusUpdate {
+								if pr.isSnoozing && pr.shouldWakeOnStatusChange {
 									DLog("Waking up snoozed PR ID %lld because of a status update", pr.serverId)
 									pr.wakeUp()
 								}

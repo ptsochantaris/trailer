@@ -31,17 +31,15 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 
 	func numberOfSections(in tableView: UITableView) -> Int {
 		if SnoozePreset.allSnoozePresetsInMoc(mainObjectContext).count > 0 {
-			return 4
-		} else {
 			return 3
+		} else {
+			return 2
 		}
 	}
 
 	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		if section == 0 || section == 1 {
 			return 1
-		} else if section == 2 {
-			return 3
 		} else {
 			return SnoozePreset.allSnoozePresetsInMoc(mainObjectContext).count
 		}
@@ -60,18 +58,6 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 				cell.textLabel?.text = "Do not auto-snooze items"
 			}
 			cell.accessoryType = .disclosureIndicator
-		} else if indexPath.section == 2 {
-			switch indexPath.row {
-			case 0:
-				cell.textLabel?.text = "New comment"
-				cell.accessoryType = Settings.snoozeWakeOnComment ? .checkmark : .none
-			case 1:
-				cell.textLabel?.text = "Mentioned in a new comment"
-				cell.accessoryType = Settings.snoozeWakeOnMention ? .checkmark : .none
-			default:
-				cell.textLabel?.text = "Status item update"
-				cell.accessoryType = Settings.snoozeWakeOnStatusUpdate ? .checkmark : .none
-			}
 		} else {
 			let s = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)[indexPath.row]
 			cell.textLabel?.text = s.listDescription
@@ -85,8 +71,6 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 			return "You can create presets here that can be used to 'snooze' items for a specific time duration, until a date, or if a specific event occurs."
 		} else if section == 1 {
 			return "Automatically snooze items after a specific amount of time..."
-		} else if section == 2 {
-			return "Wake up a snoozing item immediately if any of these occur..."
 		} else {
 			return "Existing presets:"
 		}
@@ -99,16 +83,6 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 			settingsChangedTimer.push()
 		} else if indexPath.section == 1 {
 			performSegue(withIdentifier: "showPicker", sender: self)
-		} else if indexPath.section == 2 {
-			switch indexPath.row {
-			case 0:
-				Settings.snoozeWakeOnComment = !Settings.snoozeWakeOnComment
-			case 1:
-				Settings.snoozeWakeOnMention = !Settings.snoozeWakeOnMention
-			default:
-				Settings.snoozeWakeOnStatusUpdate = !Settings.snoozeWakeOnStatusUpdate
-			}
-			tableView.reloadData()
 		} else {
 			let s = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)[indexPath.row]
 			performSegue(withIdentifier: "showSnoozeEditor", sender: s)

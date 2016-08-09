@@ -123,6 +123,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var snoozeWakeOnMention: NSButton!
 	@IBOutlet weak var snoozeWakeOnStatusUpdate: NSButton!
 	@IBOutlet weak var hideSnoozedItems: NSButton!
+	@IBOutlet weak var snoozeWakeLabel: NSTextField!
 
 	@IBOutlet weak var autoSnoozeSelector: NSStepper!
 	@IBOutlet weak var autoSnoozeLabel: NSTextField!
@@ -356,9 +357,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		hidePrsThatDontPass.integerValue = Settings.hidePrsThatArentPassing ? 1 : 0
 		hidePrsThatDontPassOnlyInAll.integerValue = Settings.hidePrsThatDontPassOnlyInAll ? 1 : 0
 
-		snoozeWakeOnComment.integerValue = Settings.snoozeWakeOnComment ? 1 : 0
-		snoozeWakeOnMention.integerValue = Settings.snoozeWakeOnMention ? 1 : 0
-		snoozeWakeOnStatusUpdate.integerValue = Settings.snoozeWakeOnStatusUpdate ? 1 : 0
 		hideSnoozedItems.integerValue = Settings.hideSnoozedItems ? 1 : 0
 
 		allNewPrsSetting.selectItem(at: Settings.displayPolicyForNewPrs)
@@ -1330,11 +1328,13 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	/////////////////////////////// snoozing
 
 	@IBAction func snoozeWakeChanged(_ sender: NSButton) {
-		Settings.snoozeWakeOnComment = snoozeWakeOnComment.integerValue == 1
-		Settings.snoozeWakeOnMention = snoozeWakeOnMention.integerValue == 1
-		Settings.snoozeWakeOnStatusUpdate = snoozeWakeOnStatusUpdate.integerValue == 1
-		snoozePresetsList.reloadData()
-		deferredUpdateTimer.push()
+		if let preset = selectedSnoozePreset() {
+			preset.wakeOnComment = snoozeWakeOnComment.integerValue == 1
+			preset.wakeOnMention = snoozeWakeOnMention.integerValue == 1
+			preset.wakeOnStatusChange = snoozeWakeOnStatusUpdate.integerValue == 1
+			snoozePresetsList.reloadData()
+			deferredUpdateTimer.push()
+		}
 	}
 
 	@IBAction func hideSnoozedItemsChanged(_ sender: NSButton) {
@@ -1447,6 +1447,13 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 				snoozeDateTimeHour.selectItem(at: Int(s.hour))
 				snoozeDateTimeDay.selectItem(at: Int(s.day))
 			}
+			snoozeWakeOnComment.isEnabled = true
+			snoozeWakeOnComment.integerValue = s.wakeOnComment ? 1 : 0
+			snoozeWakeOnMention.isEnabled = true
+			snoozeWakeOnMention.integerValue = s.wakeOnMention ? 1 : 0
+			snoozeWakeOnStatusUpdate.isEnabled = true
+			snoozeWakeOnStatusUpdate.integerValue = s.wakeOnStatusChange ? 1 : 0
+			snoozeWakeLabel.textColor = NSColor.controlTextColor
 			snoozeTypeDuration.isEnabled = true
 			snoozeTypeDateTime.isEnabled = true
 			snoozeDeletePreset.isEnabled = true
@@ -1464,6 +1471,13 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			snoozeDeletePreset.isEnabled = false
 			snoozeUp.isEnabled = false
 			snoozeDown.isEnabled = false
+			snoozeWakeOnComment.isEnabled = false
+			snoozeWakeOnComment.integerValue = 0
+			snoozeWakeOnMention.isEnabled = false
+			snoozeWakeOnMention.integerValue = 0
+			snoozeWakeOnStatusUpdate.isEnabled = false
+			snoozeWakeOnStatusUpdate.integerValue = 0
+			snoozeWakeLabel.textColor = NSColor.disabledControlTextColor
 		}
 	}
 
@@ -1484,11 +1498,38 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction func deleteSnoozePresetSelected(_ sender: NSButton) {
 		if let selectedPreset = selectedSnoozePreset(), let index = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext).index(of: selectedPreset) {
-			mainObjectContext.delete(selectedPreset)
-			commitSnoozeSettings()
-			snoozePresetsList.selectRowIndexes(IndexSet(integer: min(index, snoozePresetsList.numberOfRows-1)), byExtendingSelection: false)
-			fillSnoozeFormFromSelectedPreset()
+
+			let appliedCount = selectedPreset.appliedToIssues.count + selectedPreset.appliedToPullRequests.count
+			if appliedCount > 0 {
+				let alert = NSAlert()
+				alert.messageText = "Warning"
+				alert.informativeText = "You have \(appliedCount) items that have been snoozed using this preset. What would you like to do with them?"
+				alert.addButton(withTitle: "Cancel")
+				alert.addButton(withTitle: "Wake Them Up")
+				alert.addButton(withTitle: "Keep Them Snoozed")
+				alert.beginSheetModal(for: self) { [weak self] response in
+					switch response {
+					case 1000:
+						break
+					case 1001:
+						selectedPreset.wakeUpAllAssociatedItems()
+						fallthrough
+					case 1002:
+						self?.completeSnoozeDelete(selectedPreset, index)
+					default: break
+					}
+				}
+			} else {
+				completeSnoozeDelete(selectedPreset, index)
+			}
 		}
+	}
+
+	private func completeSnoozeDelete(_ selectedPreset: SnoozePreset, _ index: Int) {
+		mainObjectContext.delete(selectedPreset)
+		commitSnoozeSettings()
+		snoozePresetsList.selectRowIndexes(IndexSet(integer: min(index, snoozePresetsList.numberOfRows-1)), byExtendingSelection: false)
+		fillSnoozeFormFromSelectedPreset()
 	}
 
 	@IBAction func snoozeTypeChanged(_ sender: NSButton) {

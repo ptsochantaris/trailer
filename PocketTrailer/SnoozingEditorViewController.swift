@@ -12,16 +12,41 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 	@IBOutlet weak var typeSelector: UISegmentedControl!
 
 	@IBAction func deleteSelected(_ sender: UIBarButtonItem) {
-		let a = UIAlertController(title: "Delete Snooze Preset",
-		                          message: "Are you sure you want to remove this preset from your list?",
-		                          preferredStyle: .alert)
 
-		a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-		a.addAction(UIAlertAction(title: "Delete", style: .destructive) { [weak self] action in
-			self?.deletePreset()
-		})
+		if let s = snoozeItem {
+			let appliedCount = s.appliedToIssues.count + s.appliedToPullRequests.count
+			if appliedCount > 0 {
 
-		present(a, animated: true, completion: nil)
+				let a = UIAlertController(title: "Delete Snooze Preset",
+				                          message: "You have \(appliedCount) items that have been snoozed using this preset. What would you like to do with them after deleting this preset?",
+				                          preferredStyle: .alert)
+
+				a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+				a.addAction(UIAlertAction(title: "Wake Them Up", style: .destructive) { [weak self] action in
+					s.wakeUpAllAssociatedItems()
+					self?.deletePreset()
+				})
+				a.addAction(UIAlertAction(title: "Keep Them Snoozed", style: .destructive) { [weak self] action in
+					self?.deletePreset()
+				})
+
+				present(a, animated: true, completion: nil)
+
+			} else {
+
+				let a = UIAlertController(title: "Delete Snooze Preset",
+				                          message: "Are you sure you want to remove this preset from your list?",
+				                          preferredStyle: .alert)
+
+				a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+				a.addAction(UIAlertAction(title: "Delete", style: .destructive) { [weak self] action in
+					self?.deletePreset()
+				})
+				
+				present(a, animated: true, completion: nil)
+				
+			}
+		}
 	}
 
 	private func deletePreset() {
@@ -88,19 +113,34 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 	//////////////////////// Table
 
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-		switch indexPath.row {
-		case 0:
-			showPicker(mode: .Day)
-		case 1:
-			showPicker(mode: .Hour)
-		default:
-			showPicker(mode: .Minute)
+		if indexPath.section == 0 {
+
+			switch indexPath.row {
+			case 0:
+				showPicker(mode: .Day)
+			case 1:
+				showPicker(mode: .Hour)
+			default:
+				showPicker(mode: .Minute)
+			}
+			tableView.deselectRow(at: indexPath, animated: false)
+
+		} else {
+
+			switch indexPath.row {
+			case 0:
+				snoozeItem?.wakeOnComment = !(snoozeItem?.wakeOnComment ?? false)
+			case 1:
+				snoozeItem?.wakeOnMention = !(snoozeItem?.wakeOnMention ?? false)
+			default:
+				snoozeItem?.wakeOnStatusChange = !(snoozeItem?.wakeOnStatusChange ?? false)
+			}
+			tableView.reloadData()
 		}
-		tableView.deselectRow(at: indexPath, animated: false)
 	}
 
 	func numberOfSections(in tableView: UITableView) -> Int {
-		return 1
+		return 2
 	}
 
 	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -108,24 +148,42 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 	}
 
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCell(withIdentifier: "SnoozePresetElementCell", for: indexPath)
-		if let s = snoozeItem {
+		if indexPath.section == 0 {
+			let cell = tableView.dequeueReusableCell(withIdentifier: "SnoozePresetElementCell", for: indexPath)
+			if let s = snoozeItem {
+				switch indexPath.row {
+				case 0:
+					cell.textLabel?.text = dayLabel()
+					cell.detailTextLabel?.text = dayValues()[Int(s.day)]
+					cell.detailTextLabel?.textColor = detailColor(s.day)
+				case 1:
+					cell.textLabel?.text = hourLabel()
+					cell.detailTextLabel?.text = hourValues()[Int(s.hour)]
+					cell.detailTextLabel?.textColor = detailColor(s.hour)
+				default:
+					cell.textLabel?.text = minuteLabel()
+					cell.detailTextLabel?.text = minuteValues()[Int(s.minute)]
+					cell.detailTextLabel?.textColor = detailColor(s.minute)
+				}
+			}
+			return cell
+
+		} else {
+
+			let cell = tableView.dequeueReusableCell(withIdentifier: "SnoozePresetWakeupCell", for: indexPath)
 			switch indexPath.row {
 			case 0:
-				cell.textLabel?.text = dayLabel()
-				cell.detailTextLabel?.text = dayValues()[Int(s.day)]
-				cell.detailTextLabel?.textColor = detailColor(s.day)
+				cell.textLabel?.text = "New comment"
+				cell.accessoryType = snoozeItem?.wakeOnComment ?? false ? .checkmark : .none
 			case 1:
-				cell.textLabel?.text = hourLabel()
-				cell.detailTextLabel?.text = hourValues()[Int(s.hour)]
-				cell.detailTextLabel?.textColor = detailColor(s.hour)
+				cell.textLabel?.text = "Mentioned in a new comment"
+				cell.accessoryType = snoozeItem?.wakeOnMention ?? false ? .checkmark : .none
 			default:
-				cell.textLabel?.text = minuteLabel()
-				cell.detailTextLabel?.text = minuteValues()[Int(s.minute)]
-				cell.detailTextLabel?.textColor = detailColor(s.minute)
+				cell.textLabel?.text = "Status item update"
+				cell.accessoryType = snoozeItem?.wakeOnStatusChange ?? false ? .checkmark : .none
 			}
+			return cell
 		}
-		return cell
 	}
 
 	private func detailColor(_ n: Int64) -> UIColor {
@@ -269,6 +327,14 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 
 	func numberOfComponents(in pickerView: UIPickerView) -> Int {
 		return 1
+	}
+
+	func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+		if section == 0 {
+			return typeSelector.selectedSegmentIndex == 0 ? "Snooze an item for a specific duration of time" : "Snooze an item until a specific time or day"
+		} else {
+			return "Wake up an item snoozed by this preset if any of these occur..."
+		}
 	}
 
 	private func indexForPicker() -> Int {

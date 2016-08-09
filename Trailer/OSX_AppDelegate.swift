@@ -12,7 +12,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 	private var systemSleeping = false
 	private var globalKeyMonitor: AnyObject?
-	private var localKeyMonitor: AnyObject?
+	private var keyDownMonitor: AnyObject?
 	private var mouseIgnoreTimer: PopTimer!
 
 	func setupWindows() {
@@ -762,11 +762,11 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			}
 		}
 
-		if localKeyMonitor != nil {
+		if keyDownMonitor != nil {
 			return
 		}
 
-		localKeyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] (incomingEvent) -> NSEvent? in
+		keyDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] incomingEvent -> NSEvent? in
 
 			guard let S = self else { return incomingEvent }
 
@@ -782,8 +782,6 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					if !(hasModifier(incomingEvent, .command) && hasModifier(incomingEvent, .option)) {
 						return incomingEvent
 					}
-
-					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
 
 					let statusItems = S.statusItemList()
 					if let s = w.statusItem, let ind = statusItems.index(of: s) {
@@ -805,6 +803,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 						}
 					}
 					return nil
+
 				case 125: // down
 					if hasModifier(incomingEvent, .shift) {
 						return incomingEvent
@@ -813,39 +812,91 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					var i = w.table.selectedRow + 1
 					if i < w.table.numberOfRows {
 						while w.itemDelegate.itemAtRow(i) == nil { i += 1 }
-						S.scrollToIndex(i, inMenu: w)
+					} else if w.table.numberOfRows > 0 {
+						i = 0
+						while w.itemDelegate.itemAtRow(i) == nil { i += 1 }
 					}
+					S.scrollToIndex(i, inMenu: w)
 					return nil
+
 				case 126: // up
 					if hasModifier(incomingEvent, .shift) {
 						return incomingEvent
 					}
 					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
 					var i = w.table.selectedRow - 1
-					if i > 0 {
+					if i > 0 && w.table.numberOfRows > 0 {
 						while w.itemDelegate.itemAtRow(i) == nil { i -= 1 }
-						S.scrollToIndex(i, inMenu: w)
+					} else {
+						i = w.table.numberOfRows - 1
 					}
+					S.scrollToIndex(i, inMenu: w)
 					return nil
+
 				case 36: // enter
 					if let c = NSTextInputContext.current(), c.client.hasMarkedText() {
 						return incomingEvent
 					}
-					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
-					if let dataItem = w.itemDelegate.itemAtRow(w.table.selectedRow) {
+					if let dataItem = S.focusedItem(blink: true) {
 						let isAlternative = hasModifier(incomingEvent, .option)
 						S.dataItemSelected(dataItem, alternativeSelect: isAlternative, window: w)
 					}
 					return nil
+
 				case 53: // escape
 					w.closeMenu()
 					return nil
+
 				default:
-					break
+					if !hasModifier(incomingEvent, .command) {
+						return incomingEvent
+					}
+
+					guard let selectedItem = S.focusedItem(blink: false) else { return incomingEvent }
+
+					switch incomingEvent.charactersIgnoringModifiers ?? "" {
+					case "m":
+						selectedItem.setMute(!selectedItem.muted)
+						DataManager.saveDB()
+						app.updateRelatedMenusFor(selectedItem)
+						return nil
+					case "o":
+						if let w = selectedItem.repo.webUrl, let u = URL(string: w) {
+							NSWorkspace.shared().open(u)
+							return nil
+						}
+					default:
+						if !hasModifier(incomingEvent, .option) {
+							return incomingEvent
+						}
+						if let snoozeIndex = Int(incomingEvent.charactersIgnoringModifiers ?? "") {
+							if snoozeIndex > 0 && !selectedItem.isSnoozing {
+								if S.snooze(item: selectedItem, snoozeIndex: snoozeIndex-1) {
+									return nil
+								}
+							} else if snoozeIndex == 0 && selectedItem.isSnoozing {
+								selectedItem.wakeUp()
+								DataManager.saveDB()
+								app.updateRelatedMenusFor(selectedItem)
+								return nil
+							}
+						}
+					}
 				}
 			}
 			return incomingEvent
 		}
+	}
+
+	private func snooze(item: ListableItem, snoozeIndex: Int) -> Bool {
+		let s = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)
+		if s.count > snoozeIndex  {
+			item.snoozeFromPreset(s[snoozeIndex])
+			DataManager.saveDB()
+			updateRelatedMenusFor(item)
+			return true
+		}
+		return false
 	}
 
 	private func scrollToIndex(_ i: Int, inMenu: MenuWindow) {
@@ -857,12 +908,11 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 	}
 
-	func focusedItem() -> ListableItem? {
-		if let w = visibleWindow() {
-			return w.focusedItem()
-		} else {
-			return nil
+	func focusedItem(blink: Bool) -> ListableItem? {
+		if !isManuallyScrolling, let w = visibleWindow() {
+			return w.focusedItem(blink: blink)
 		}
+		return nil
 	}
 
 	private func checkForHotkey(_ incomingEvent: NSEvent) -> Bool {

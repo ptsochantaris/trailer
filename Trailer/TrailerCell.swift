@@ -96,25 +96,23 @@ class TrailerCell: NSTableCellView {
 			title = muted ? "Issue #\(n) (muted)" : "Issue #\(n)"
 		}
 
-		let cmd = NSEventModifierFlags.command
-
         let m = NSMenu(title: title)
 		m.addItem(withTitle: title, action: #selector(TrailerCell.copyNumberToClipboard), keyEquivalent: "")
 		m.addItem(NSMenuItem.separator())
 		
 		let c1 = m.addItem(withTitle: "Copy URL", action: #selector(TrailerCell.copyToClipboard), keyEquivalent: "c")
-		c1.keyEquivalentModifierMask = cmd
+		c1.keyEquivalentModifierMask = [.command]
 
 		let c2 = m.addItem(withTitle: "Open Repo", action: #selector(TrailerCell.openRepo), keyEquivalent: "o")
-		c2.keyEquivalentModifierMask = cmd
+		c2.keyEquivalentModifierMask = [.command]
 
 		if item.snoozeUntil == nil {
 			if item.unreadComments > 0 {
 				let c = m.addItem(withTitle: "Mark as read", action: #selector(TrailerCell.markReadSelected), keyEquivalent: "a")
-				c.keyEquivalentModifierMask = cmd
+				c.keyEquivalentModifierMask = [.command]
 			} else {
 				let c = m.addItem(withTitle: "Mark as unread", action: #selector(TrailerCell.markUnreadSelected), keyEquivalent: "a")
-				c.keyEquivalentModifierMask = cmd
+				c.keyEquivalentModifierMask = [.command]
 			}
 		}
 
@@ -127,25 +125,31 @@ class TrailerCell: NSTableCellView {
 				} else {
 					title = String(format: "Wake (auto: %@)", itemDateFormatter.string(from: snooze))
 				}
-				let c = m.addItem(withTitle: title, action: #selector(TrailerCell.wakeUpSelected), keyEquivalent: "s")
-				c.keyEquivalentModifierMask = cmd
+				let c = m.addItem(withTitle: title, action: #selector(TrailerCell.wakeUpSelected), keyEquivalent: "0")
+				c.keyEquivalentModifierMask = [.command, .shift]
 			} else {
 
 				if muted {
 					let c = m.addItem(withTitle: "Un-Mute", action: #selector(TrailerCell.unMuteSelected), keyEquivalent: "m")
-					c.keyEquivalentModifierMask = cmd
+					c.keyEquivalentModifierMask = [.command]
 				} else {
 					let c = m.addItem(withTitle: "Mute", action: #selector(TrailerCell.muteSelected), keyEquivalent: "m")
-					c.keyEquivalentModifierMask = cmd
+					c.keyEquivalentModifierMask = [.command]
 				}
 
 				let snoozeItems = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)
 				if snoozeItems.count > 0 {
+					var count = 1
 					let c = m.addItem(withTitle: "Snooze...", action: nil, keyEquivalent: "")
 					let s = NSMenu(title: "Snooze")
 					for i in snoozeItems {
-						let smi = s.addItem(withTitle: i.listDescription, action: #selector(TrailerCell.snoozeSelected(_:)), keyEquivalent: "")
+						let keyEquivalent = count < 10 ? "\(count)" : ""
+						let smi = s.addItem(withTitle: i.listDescription, action: #selector(TrailerCell.snoozeSelected(_:)), keyEquivalent: keyEquivalent)
 						smi.representedObject = i.objectID
+						if !keyEquivalent.isEmpty {
+							smi.keyEquivalentModifierMask = [.command, .option]
+							count += 1
+						}
 					}
 					s.addItem(withTitle: "Configure...", action: #selector(TrailerCell.snoozeConfigSelected), keyEquivalent: "")
 					c.submenu = s
@@ -162,10 +166,7 @@ class TrailerCell: NSTableCellView {
 
 	func snoozeSelected(_ sender: NSMenuItem) {
 		if let item = associatedDataItem(), let oid = sender.representedObject as? NSManagedObjectID, let snoozeItem = existingObjectWithID(oid) as? SnoozePreset {
-			item.snoozeUntil = snoozeItem.wakeupDateFromNow
-			item.wasAwokenFromSnooze = false
-			item.muted = false
-			item.postProcess()
+			item.snoozeFromPreset(snoozeItem)
 			saveAndRequestMenuUpdate(item)
 		}
 	}

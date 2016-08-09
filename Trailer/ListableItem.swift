@@ -30,9 +30,11 @@ class ListableItem: DataItem {
 	@NSManaged var number: Int64
 	@NSManaged var announced: Bool
 	@NSManaged var muted: Bool
-	@NSManaged var snoozeUntil: Date?
 	@NSManaged var wasAwokenFromSnooze: Bool
 	@NSManaged var milestone: String?
+
+	@NSManaged var snoozeUntil: Date?
+	@NSManaged var snoozingPreset: SnoozePreset?
 
 	@NSManaged var comments: Set<PRComment>
 	@NSManaged var labels: Set<PRLabel>
@@ -171,6 +173,7 @@ class ListableItem: DataItem {
 
 	final func wakeUp() {
 		snoozeUntil = nil
+		snoozingPreset = nil
 		wasAwokenFromSnooze = true
 		postProcess()
 	}
@@ -187,6 +190,7 @@ class ListableItem: DataItem {
 		condition = newCondition.rawValue
 		if snoozeUntil != nil {
 			snoozeUntil = nil
+			snoozingPreset = nil
 		} else {
 			app.postNotification(type: notification, forItem: self)
 		}
@@ -195,8 +199,8 @@ class ListableItem: DataItem {
 	private final func shouldMoveToSnoozing() -> Bool {
 		if snoozeUntil == nil {
 			let d = TimeInterval(Settings.autoSnoozeDuration)
-			if d > 0 && !wasAwokenFromSnooze, let autoSnoozeDate = updatedAt?.addingTimeInterval(86400.0*d) {
-				if autoSnoozeDate < Date() {
+			if d > 0 && !wasAwokenFromSnooze, let snoozeByDate = updatedAt?.addingTimeInterval(86400.0*d) {
+				if snoozeByDate < Date() {
 					snoozeUntil = autoSnoozeDate
 					return true
 				}
@@ -207,17 +211,39 @@ class ListableItem: DataItem {
 		}
 	}
 
+	final var shouldWakeOnComment: Bool {
+		return snoozingPreset?.wakeOnComment ?? true
+	}
+
+	final var shouldWakeOnMention: Bool {
+		return snoozingPreset?.wakeOnMention ?? true
+	}
+
+	final var shouldWakeOnStatusChange: Bool {
+		return snoozingPreset?.wakeOnStatusChange ?? true
+	}
+
 	final func wakeIfAutoSnoozed() {
-		if snoozeUntil == autoSnoozeDate && !wasAwokenFromSnooze {
+		if snoozeUntil == autoSnoozeDate {
 			snoozeUntil = nil
 			wasAwokenFromSnooze = false
+			snoozingPreset = nil
 		}
+	}
+
+	final func snoozeFromPreset(_ preset: SnoozePreset) {
+		snoozeUntil = preset.wakeupDateFromNow
+		snoozingPreset = preset
+		wasAwokenFromSnooze = false
+		muted = false
+		postProcess()
 	}
 
 	final func postProcess() {
 
 		if let s = snoozeUntil, s < Date() {
 			snoozeUntil = nil
+			snoozingPreset = nil
 			wasAwokenFromSnooze = true
 		}
 

@@ -217,15 +217,17 @@ final class MenuWindow: NSWindow {
 		}
 	}
 
-	func focusedItem() -> ListableItem? {
+	func focusedItem(blink: Bool) -> ListableItem? {
 		let row = table.selectedRow
 		var i: ListableItem?
 		if row >= 0 {
-			table.deselectAll(nil)
+			if blink { table.deselectAll(nil) }
 			i = itemDelegate.itemAtRow(row)
 		}
-		atNextEvent(self) { S in
-			S.table.selectRowIndexes(IndexSet(integer: row), byExtendingSelection: false)
+		if blink {
+			atNextEvent(self) { S in
+				S.table.selectRowIndexes(IndexSet(integer: row), byExtendingSelection: false)
+			}
 		}
 		return i
 	}

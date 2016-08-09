@@ -1072,7 +1072,7 @@ Token</string>
                                                         </connections>
                                                     </button>
                                                     <box misplaced="YES" borderType="none" title="If I am mentioned, move an item to..." id="7lb-Oe-dqF">
-                                                        <rect key="frame" x="435" y="278" width="230" height="51"/>
+                                                        <rect key="frame" x="435" y="268" width="230" height="51"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="CDr-sW-N4t">
                                                             <rect key="frame" x="0.0" y="0.0" width="230" height="36"/>
@@ -1101,7 +1101,7 @@ Token</string>
                                                         </view>
                                                     </box>
                                                     <box misplaced="YES" borderType="none" title="If my team is mentioned, move to..." id="vq6-6w-ave">
-                                                        <rect key="frame" x="435" y="229" width="230" height="51"/>
+                                                        <rect key="frame" x="435" y="223" width="230" height="51"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="5aL-sj-f6p">
                                                             <rect key="frame" x="0.0" y="0.0" width="230" height="36"/>
@@ -1141,7 +1141,7 @@ Token</string>
                                                         </connections>
                                                     </button>
                                                     <box misplaced="YES" borderType="none" title="New items in owned repos, move to..." id="WXP-sZ-GiR">
-                                                        <rect key="frame" x="435" y="182" width="230" height="51"/>
+                                                        <rect key="frame" x="435" y="178" width="230" height="51"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="8jk-qP-cR3">
                                                             <rect key="frame" x="0.0" y="0.0" width="230" height="36"/>
@@ -1363,58 +1363,15 @@ to a higher number in order to keep your API usage reasonable</string>
                                     <rect key="frame" x="10" y="33" width="736" height="366"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <box borderType="line" title="Wake up a snoozing item immediately if any of these occur..." id="wpu-gw-oUh">
-                                            <rect key="frame" x="6" y="5" width="724" height="71"/>
-                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
-                                            <view key="contentView" id="yav-bI-2zD">
-                                                <rect key="frame" x="1" y="1" width="722" height="55"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                <subviews>
-                                                    <button misplaced="YES" id="NE3-PR-Phy">
-                                                        <rect key="frame" x="41" y="18" width="229" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="A new comment was added" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Dfl-A9-ds3">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="snoozeWakeChanged:" target="vQH-WF-vh2" id="zl1-Mg-Jmt"/>
-                                                        </connections>
-                                                    </button>
-                                                    <button misplaced="YES" id="4Ur-l6-h07">
-                                                        <rect key="frame" x="274" y="18" width="266" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="You or your team were mentioned" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="5Yo-0V-ewK">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="snoozeWakeChanged:" target="vQH-WF-vh2" id="Q6a-fi-Ruz"/>
-                                                        </connections>
-                                                    </button>
-                                                    <button misplaced="YES" id="Dx8-7R-3BT">
-                                                        <rect key="frame" x="544" y="18" width="160" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Status item update" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="IG5-pU-aH6">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="snoozeWakeChanged:" target="vQH-WF-vh2" id="LO5-hP-J7S"/>
-                                                        </connections>
-                                                    </button>
-                                                </subviews>
-                                            </view>
-                                        </box>
-                                        <scrollView autohidesScrollers="YES" horizontalLineScroll="22" horizontalPageScroll="10" verticalLineScroll="22" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="Nsu-el-chI">
-                                            <rect key="frame" x="9" y="154" width="313" height="209"/>
+                                        <scrollView misplaced="YES" autohidesScrollers="YES" horizontalLineScroll="22" horizontalPageScroll="10" verticalLineScroll="22" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="Nsu-el-chI">
+                                            <rect key="frame" x="9" y="62" width="313" height="301"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" heightSizable="YES"/>
                                             <clipView key="contentView" id="Fou-QI-zfT">
-                                                <rect key="frame" x="1" y="1" width="311" height="207"/>
+                                                <rect key="frame" x="1" y="1" width="311" height="299"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="20" id="EjH-yo-GqO">
-                                                        <rect key="frame" x="0.0" y="0.0" width="311" height="207"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="311" height="299"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1450,15 +1407,15 @@ to a higher number in order to keep your API usage reasonable</string>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
                                         </scrollView>
-                                        <box borderType="line" title="Selected preset" id="L7P-yY-kJu">
-                                            <rect key="frame" x="327" y="122" width="403" height="241"/>
+                                        <box misplaced="YES" borderType="line" title="Selected preset" id="L7P-yY-kJu">
+                                            <rect key="frame" x="327" y="29" width="403" height="334"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <view key="contentView" id="brd-Ee-rdq">
-                                                <rect key="frame" x="1" y="1" width="401" height="225"/>
+                                                <rect key="frame" x="1" y="1" width="401" height="318"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button id="Cwe-AT-ISF">
-                                                        <rect key="frame" x="19" y="188" width="363" height="18"/>
+                                                        <rect key="frame" x="19" y="281" width="363" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="radio" title="For a certain amount of time" bezelStyle="regularSquare" imagePosition="left" alignment="left" enabled="NO" inset="2" id="gmO-x6-lxq">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1469,7 +1426,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </connections>
                                                     </button>
                                                     <popUpButton verticalHuggingPriority="750" id="vch-ax-HsD">
-                                                        <rect key="frame" x="18" y="152" width="115" height="26"/>
+                                                        <rect key="frame" x="18" y="245" width="115" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="dH8-z8-RVI">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1481,7 +1438,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </connections>
                                                     </popUpButton>
                                                     <popUpButton verticalHuggingPriority="750" id="c3Y-1q-UD3">
-                                                        <rect key="frame" x="143" y="152" width="115" height="26"/>
+                                                        <rect key="frame" x="143" y="245" width="115" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="gau-PU-aUA">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1493,7 +1450,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </connections>
                                                     </popUpButton>
                                                     <popUpButton verticalHuggingPriority="750" id="Yq0-Of-I1d">
-                                                        <rect key="frame" x="268" y="152" width="115" height="26"/>
+                                                        <rect key="frame" x="268" y="245" width="115" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="1Ge-1e-b8J">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1505,7 +1462,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </connections>
                                                     </popUpButton>
                                                     <popUpButton verticalHuggingPriority="750" id="PLV-LI-rNE">
-                                                        <rect key="frame" x="143" y="73" width="115" height="26"/>
+                                                        <rect key="frame" x="143" y="166" width="115" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="H86-ef-er1">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1517,7 +1474,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </connections>
                                                     </popUpButton>
                                                     <button verticalHuggingPriority="750" id="aL1-em-nvV">
-                                                        <rect key="frame" x="14" y="23" width="58" height="32"/>
+                                                        <rect key="frame" x="14" y="13" width="58" height="32"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                                         <buttonCell key="cell" type="push" title="Up" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="dPh-wQ-DCm">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1528,7 +1485,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </connections>
                                                     </button>
                                                     <popUpButton verticalHuggingPriority="750" id="51F-wD-jRc">
-                                                        <rect key="frame" x="18" y="73" width="115" height="26"/>
+                                                        <rect key="frame" x="18" y="166" width="115" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="gl7-xO-9dz">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1546,7 +1503,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </connections>
                                                     </popUpButton>
                                                     <popUpButton verticalHuggingPriority="750" id="xLn-A0-wrg">
-                                                        <rect key="frame" x="268" y="73" width="115" height="26"/>
+                                                        <rect key="frame" x="268" y="166" width="115" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" enabled="NO" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="vus-t5-ks8">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1558,7 +1515,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </connections>
                                                     </popUpButton>
                                                     <button id="nPv-hg-fBq">
-                                                        <rect key="frame" x="19" y="109" width="363" height="18"/>
+                                                        <rect key="frame" x="19" y="202" width="363" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="radio" title="Until a specific day and/or time" bezelStyle="regularSquare" imagePosition="left" alignment="left" enabled="NO" inset="2" id="rgO-Bp-SJN">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1569,7 +1526,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" id="U4e-5n-5hk">
-                                                        <rect key="frame" x="66" y="23" width="75" height="32"/>
+                                                        <rect key="frame" x="66" y="13" width="75" height="32"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                                         <buttonCell key="cell" type="push" title="Down" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="9wL-dI-xto">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1580,7 +1537,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </connections>
                                                     </button>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="If1-BU-NTa">
-                                                        <rect key="frame" x="256" y="158" width="13" height="17"/>
+                                                        <rect key="frame" x="256" y="251" width="13" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="+" id="59O-bO-PLd">
                                                             <font key="font" metaFont="systemBold"/>
@@ -1589,7 +1546,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="fvg-Jr-yj9">
-                                                        <rect key="frame" x="133" y="80" width="8" height="17"/>
+                                                        <rect key="frame" x="133" y="173" width="8" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title=":" id="kRd-Z6-wfs">
                                                             <font key="font" metaFont="systemBold"/>
@@ -1598,7 +1555,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="izk-el-koB">
-                                                        <rect key="frame" x="258" y="80" width="8" height="17"/>
+                                                        <rect key="frame" x="258" y="173" width="8" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title=":" id="PHm-t1-ITC">
                                                             <font key="font" metaFont="systemBold"/>
@@ -1607,7 +1564,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Erq-u5-k78">
-                                                        <rect key="frame" x="131" y="158" width="13" height="17"/>
+                                                        <rect key="frame" x="131" y="251" width="13" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="+" id="z33-tA-HN2">
                                                             <font key="font" metaFont="systemBold"/>
@@ -1616,7 +1573,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <button verticalHuggingPriority="750" id="RcV-Yx-VNJ">
-                                                        <rect key="frame" x="251" y="23" width="135" height="32"/>
+                                                        <rect key="frame" x="251" y="13" width="135" height="32"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                                         <buttonCell key="cell" type="push" title="Delete Preset" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="od7-iX-GEb">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1626,11 +1583,63 @@ to a higher number in order to keep your API usage reasonable</string>
                                                             <action selector="deleteSnoozePresetSelected:" target="vQH-WF-vh2" id="fkL-Gk-JYI"/>
                                                         </connections>
                                                     </button>
+                                                    <box misplaced="YES" titlePosition="noTitle" id="pbf-db-SIs">
+                                                        <rect key="frame" x="31" y="57" width="338" height="93"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <view key="contentView" id="K6S-4l-zny">
+                                                            <rect key="frame" x="2" y="2" width="334" height="89"/>
+                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                            <subviews>
+                                                                <button misplaced="YES" id="NE3-PR-Phy">
+                                                                    <rect key="frame" x="195" y="62" width="141" height="18"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <buttonCell key="cell" type="check" title="New Comment" bezelStyle="regularSquare" imagePosition="left" enabled="NO" state="on" inset="2" id="Dfl-A9-ds3">
+                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                        <font key="font" metaFont="system"/>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="snoozeWakeChanged:" target="vQH-WF-vh2" id="zl1-Mg-Jmt"/>
+                                                                    </connections>
+                                                                </button>
+                                                                <button misplaced="YES" id="4Ur-l6-h07">
+                                                                    <rect key="frame" x="195" y="37" width="141" height="18"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <buttonCell key="cell" type="check" title="New Mention" bezelStyle="regularSquare" imagePosition="left" enabled="NO" state="on" inset="2" id="5Yo-0V-ewK">
+                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                        <font key="font" metaFont="system"/>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="snoozeWakeChanged:" target="vQH-WF-vh2" id="Q6a-fi-Ruz"/>
+                                                                    </connections>
+                                                                </button>
+                                                                <button misplaced="YES" id="Dx8-7R-3BT">
+                                                                    <rect key="frame" x="195" y="12" width="141" height="18"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <buttonCell key="cell" type="check" title="Status Update" bezelStyle="regularSquare" imagePosition="left" enabled="NO" state="on" inset="2" id="IG5-pU-aH6">
+                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                        <font key="font" metaFont="system"/>
+                                                                    </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="snoozeWakeChanged:" target="vQH-WF-vh2" id="LO5-hP-J7S"/>
+                                                                    </connections>
+                                                                </button>
+                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" id="VAS-24-rnN">
+                                                                    <rect key="frame" x="13" y="61" width="178" height="17"/>
+                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" enabled="NO" sendsActionOnEndEditing="YES" title="Wake up immediately on..." id="1Hr-HN-RQ9">
+                                                                        <font key="font" metaFont="system"/>
+                                                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                    </textFieldCell>
+                                                                </textField>
+                                                            </subviews>
+                                                        </view>
+                                                    </box>
                                                 </subviews>
                                             </view>
                                         </box>
                                         <button misplaced="YES" id="YS0-gj-k5Q">
-                                            <rect key="frame" x="551" y="92" width="178" height="18"/>
+                                            <rect key="frame" x="551" y="7" width="178" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                             <buttonCell key="cell" type="check" title="Hide snoozed section" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="faa-p8-d9y">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1640,8 +1649,25 @@ to a higher number in order to keep your API usage reasonable</string>
                                                 <action selector="hideSnoozedItemsChanged:" target="vQH-WF-vh2" id="LaH-Fe-ctb"/>
                                             </connections>
                                         </button>
-                                        <button verticalHuggingPriority="750" id="7bw-sd-JeN">
-                                            <rect key="frame" x="9" y="125" width="313" height="32"/>
+                                        <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="hgg-d7-xNz">
+                                            <rect key="frame" x="14" y="2" width="19" height="27"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <stepperCell key="cell" continuous="YES" alignment="left" maxValue="100" id="p2m-a9-1oC"/>
+                                            <connections>
+                                                <action selector="autoSnoozeDurationChanged:" target="vQH-WF-vh2" id="yHl-g7-u0A"/>
+                                            </connections>
+                                        </stepper>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="4MH-0X-KEO">
+                                            <rect key="frame" x="36" y="8" width="511" height="17"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Automatically snooze any item that has been idle for longer than X days" id="tEP-gK-nnN">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <button verticalHuggingPriority="750" misplaced="YES" id="7bw-sd-JeN">
+                                            <rect key="frame" x="9" y="32" width="313" height="32"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <buttonCell key="cell" type="smallSquare" title="+ Add a new preset" bezelStyle="smallSquare" imagePosition="overlaps" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="6h7-fr-KAl">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1651,23 +1677,6 @@ to a higher number in order to keep your API usage reasonable</string>
                                                 <action selector="createNewSnoozePresetSelected:" target="vQH-WF-vh2" id="sah-RH-LQv"/>
                                             </connections>
                                         </button>
-                                        <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="hgg-d7-xNz">
-                                            <rect key="frame" x="14" y="87" width="19" height="27"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                            <stepperCell key="cell" continuous="YES" alignment="left" maxValue="100" id="p2m-a9-1oC"/>
-                                            <connections>
-                                                <action selector="autoSnoozeDurationChanged:" target="vQH-WF-vh2" id="yHl-g7-u0A"/>
-                                            </connections>
-                                        </stepper>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="4MH-0X-KEO">
-                                            <rect key="frame" x="36" y="93" width="511" height="17"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Automatically snooze any item that has been idle for longer than X days" id="tEP-gK-nnN">
-                                                <font key="font" metaFont="system"/>
-                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
                                     </subviews>
                                 </view>
                             </tabViewItem>
@@ -2057,6 +2066,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="snoozeTypeDateTime" destination="nPv-hg-fBq" id="hqE-pL-e7V"/>
                 <outlet property="snoozeTypeDuration" destination="Cwe-AT-ISF" id="OCC-HS-L4c"/>
                 <outlet property="snoozeUp" destination="aL1-em-nvV" id="fuD-nq-sb8"/>
+                <outlet property="snoozeWakeLabel" destination="VAS-24-rnN" id="S3t-u9-7cu"/>
                 <outlet property="snoozeWakeOnComment" destination="NE3-PR-Phy" id="fnT-IT-FV5"/>
                 <outlet property="snoozeWakeOnMention" destination="4Ur-l6-h07" id="zB8-kY-RXo"/>
                 <outlet property="snoozeWakeOnStatusUpdate" destination="Dx8-7R-3BT" id="Pet-Kf-LTG"/>
