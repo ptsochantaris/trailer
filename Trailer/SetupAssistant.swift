@@ -65,7 +65,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 			}
 		} else {
 			testingState()
-			api.testApiToServer(newServer) { [weak self] error in
+			api.testApi(to: newServer) { [weak self] error in
 				if let s = self {
 					if let e = error {
 						let alert = NSAlert()

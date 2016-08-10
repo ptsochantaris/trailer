@@ -51,7 +51,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 
 	@IBAction func testSelected(_ sender: UIButton) {
 		testMode()
-		api.testApiToServer(newServer) { [weak self] error in
+		api.testApi(to: newServer) { [weak self] error in
 			if let s = self {
 				if let e = error {
 					showMessage("Testing the token failed - please check that you have pasted your token correctly", e.localizedDescription)

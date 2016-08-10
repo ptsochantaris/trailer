@@ -154,7 +154,7 @@ final class MenuBarSet {
 			}, hasUnread: { [weak self] () -> Bool in
 				return Issue.badgeCount(in: mainObjectContext, criterion: self?.viewCriterion) > 0
 			}, reasonForEmpty: { [weak self] filter -> NSAttributedString in
-				return Issue.reasonForEmptyWithFilter(filter, criterion: self?.viewCriterion)
+				return Issue.reasonForEmpty(with: filter, criterion: self?.viewCriterion)
 			})
 
 		} else {
@@ -171,7 +171,7 @@ final class MenuBarSet {
 			}, hasUnread: { [weak self] () -> Bool in
 				return PullRequest.badgeCount(in: mainObjectContext, criterion: self?.viewCriterion) > 0
 			}, reasonForEmpty: { [weak self] filter -> NSAttributedString in
-				return PullRequest.reasonForEmptyWithFilter(filter, criterion: self?.viewCriterion)
+				return PullRequest.reasonForEmpty(with: filter, criterion: self?.viewCriterion)
 			})
 
 		} else {

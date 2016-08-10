@@ -330,7 +330,7 @@ class ListableItem: DataItem {
 			}
 		}
 
-		if targetSection != .none, let p = self as? PullRequest, p.shouldBeCheckedForRedStatusesInSection(targetSection) {
+		if targetSection != .none, let p = self as? PullRequest, p.shouldBeCheckedForRedStatuses(in: targetSection) {
 			for s in p.displayedStatuses {
 				if s.state != "success" {
 					targetSection = .none

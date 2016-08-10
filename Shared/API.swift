@@ -584,7 +584,7 @@ final class API {
 				let repoFullName = S(r.fullName)
 				getPagedDataInPath("/repos/\(repoFullName)/pulls", server: apiServer, startingFromPage: 1,
 					perPageCallback: { data, lastPage in
-						PullRequest.syncPullRequestsFromInfoArray(data, in: r)
+						PullRequest.syncPullRequests(from: data, in: r)
 						return false
 					}, finalCallback: { [weak self] success, resultCode in
 						if !success {
@@ -649,7 +649,7 @@ final class API {
 				let repoFullName = S(r.fullName)
 				getPagedDataInPath("/repos/\(repoFullName)/issues", server: apiServer, startingFromPage: 1,
 					perPageCallback: { data, lastPage in
-						Issue.syncIssuesFromInfoArray(data, in: r)
+						Issue.syncIssues(from: data, in: r)
 						return false
 					}, finalCallback: { [weak self] success, resultCode in
 						if !success {
@@ -986,7 +986,7 @@ final class API {
 		for p in prs {
 			let apiServer = p.apiServer
 			if let issueLink = p.issueUrl {
-				getDataInPath(issueLink, server: apiServer) { data, lastPage, resultCode in
+				getData(in: issueLink, from: apiServer) { data, lastPage, resultCode in
 					if let d = data as? [NSObject : AnyObject], let assigneeInfo = d["assignee"] as? [NSObject : AnyObject], let assignee = assigneeInfo["login"] as? String {
 						let assigned = (assignee == S(apiServer.userName))
 						p.isNewAssignment = (assigned && !p.createdByMe && !p.assignedToMe)
@@ -1030,7 +1030,7 @@ final class API {
 		let repoFullName = S(r.repo.fullName)
 		let path = "/repos/\(repoFullName)/pulls/\(r.number)"
 
-		getDataInPath(path, server: r.apiServer) { [weak self] data, lastPage, resultCode in
+		getData(in: path, from: r.apiServer) { [weak self] data, lastPage, resultCode in
 
 			if let d = data as? [NSObject : AnyObject] {
 				if let mergeInfo = d["merged_by"] as? [NSObject : AnyObject], let mergeUserId = mergeInfo["id"] as? NSNumber {
@@ -1096,7 +1096,7 @@ final class API {
 
 	private func getRateLimit(from server: ApiServer, callback: (Int64, Int64, Int64)->Void)
 	{
-		api("/rate_limit", server: server, ignoreLastSync: true) { code, headers, data, error, shouldRetry in
+		api(call: "/rate_limit", on: server, ignoreLastSync: true) { code, headers, data, error, shouldRetry in
 
 			if error == nil {
 				let allHeaders = headers!
@@ -1188,7 +1188,7 @@ final class API {
 		var completionCount = 0
 		for apiServer in allApiServers {
 			if apiServer.goodToGo {
-				getDataInPath("/user", server: apiServer) { data, lastPage, resultCode in
+				getData(in: "/user", from: apiServer) { data, lastPage, resultCode in
 
 					if let d = data as? [NSObject : AnyObject] {
 						apiServer.userName = d["login"] as? String
@@ -1211,9 +1211,9 @@ final class API {
 		badLinks.removeAll(keepingCapacity: false)
 	}
 
-	func testApiToServer(_ apiServer: ApiServer, callback: (NSError?) -> ()) {
+	func testApi(to apiServer: ApiServer, callback: (NSError?) -> ()) {
 		clearAllBadLinks()
-		api("/user", server: apiServer, ignoreLastSync: true) { [weak self] code, headers, data, error, shouldRetry in
+		api(call: "/user", on: apiServer, ignoreLastSync: true) { [weak self] code, headers, data, error, shouldRetry in
 
 			if let d = data as? [NSObject : AnyObject], let userName = d["login"] as? String, let userId = d["id"] as? NSNumber, error == nil {
 				if userName.isEmpty || userId.int64Value <= 0 {
@@ -1251,7 +1251,7 @@ final class API {
 		}
 
 		let p = startingFromPage > 1 ? "\(path)?page=\(startingFromPage)" : path
-		getDataInPath(p, server: server) {
+		getData(in: p, from: server) {
 			[weak self] data, lastPage, resultCode in
 
 			if let d = data as? [[NSObject: AnyObject]] {
@@ -1268,21 +1268,21 @@ final class API {
 		}
 	}
 
-	private func getDataInPath(
-		_ path: String,
-		server: ApiServer,
+	private func getData(
+		in path: String,
+		from server: ApiServer,
 		callback:(data: AnyObject?, lastPage: Bool, resultCode: Int) -> Void) {
 
-		attemptToGetDataInPath(path, server: server, callback: callback, attemptCount: 0)
+		attemptToGetData(in: path, from: server, callback: callback, attemptCount: 0)
 	}
 
-	private func attemptToGetDataInPath(
-		_ path: String,
-		server: ApiServer,
+	private func attemptToGetData(
+		in path: String,
+		from server: ApiServer,
 		callback:(data: AnyObject?, lastPage: Bool, resultCode: Int) -> Void,
 		attemptCount: Int) {
 
-		api(path, server: server, ignoreLastSync: false) { [weak self] c, headers, data, error, shouldRetry in
+		api(call: path, on: server, ignoreLastSync: false) { [weak self] c, headers, data, error, shouldRetry in
 
 			let code = c ?? 0
 
@@ -1320,7 +1320,7 @@ final class API {
 					let nextAttemptCount = attemptCount+1
 					DLog("(%@) Will retry failed API call to %@ (attempt #%d)", S(server.label), path, nextAttemptCount)
 					delay(2.0) {
-						self?.attemptToGetDataInPath(path, server: server, callback: callback, attemptCount: nextAttemptCount)
+						self?.attemptToGetData(in: path, from: server, callback: callback, attemptCount: nextAttemptCount)
 					}
 				} else {
 					if shouldRetry {
@@ -1343,16 +1343,16 @@ final class API {
 	#endif
 
 	private func api(
-		_ path: String,
-		server: ApiServer,
+		call path: String,
+		on server: ApiServer,
 		ignoreLastSync: Bool,
 		completion: ApiCompletion) {
 
 		if apiRunningCount < maxApiOperations {
-			_api(path, server: server, ignoreLastSync: ignoreLastSync, completion: completion)
+			_api(call: path, on: server, ignoreLastSync: ignoreLastSync, completion: completion)
 		} else {
 			apiCallQueue.append { [weak self] in
-				self?._api(path, server: server, ignoreLastSync: ignoreLastSync, completion: completion)
+				self?._api(call: path, on: server, ignoreLastSync: ignoreLastSync, completion: completion)
 			}
 		}
 	}
@@ -1369,8 +1369,8 @@ final class API {
 	}
 
 	private func _api(
-		_ path: String,
-		server: ApiServer,
+		call path: String,
+		on server: ApiServer,
 		ignoreLastSync: Bool,
 		completion: ApiCompletion) {
 

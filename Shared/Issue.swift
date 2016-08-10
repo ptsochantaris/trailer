@@ -8,7 +8,7 @@ final class Issue: ListableItem {
 
 	@NSManaged var commentsLink: String?
 
-	class func syncIssuesFromInfoArray(_ data: [[NSObject : AnyObject]]?, in repo: Repo) {
+	class func syncIssues(from data: [[NSObject : AnyObject]]?, in repo: Repo) {
 		let filteredData = data?.filter { $0["pull_request"] == nil } // don't sync issues which are pull requests, they are already synced
 		itemsWithInfo(filteredData, type: "Issue", server: repo.apiServer) { item, info, isNewOrUpdated in
 			let i = item as! Issue
@@ -32,7 +32,7 @@ final class Issue: ListableItem {
 		}
 	}
 
-	class func reasonForEmptyWithFilter(_ filterValue: String?, criterion: GroupingCriterion?) -> NSAttributedString {
+	class func reasonForEmpty(with filterValue: String?, criterion: GroupingCriterion?) -> NSAttributedString {
 		let openIssues = Issue.countOpen(in: mainObjectContext, criterion: criterion)
 
 		var color = COLOR_CLASS.lightGray
@@ -70,7 +70,7 @@ final class Issue: ListableItem {
 	}
 	#endif
 
-	class func markEverythingRead(_ section: Section, in moc: NSManagedObjectContext) {
+	class func markEverythingRead(in section: Section, in moc: NSManagedObjectContext) {
 		let f = NSFetchRequest<Issue>(entityName: "Issue")
 		if section != .none {
 			f.predicate = NSPredicate(format: "sectionIndex == %lld", section.rawValue)

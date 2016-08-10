@@ -15,7 +15,7 @@ final class PullRequest: ListableItem {
 
 	@NSManaged var statuses: Set<PRStatus>
 
-	class func syncPullRequestsFromInfoArray(_ data: [[NSObject : AnyObject]]?, in repo: Repo) {
+	class func syncPullRequests(from data: [[NSObject : AnyObject]]?, in repo: Repo) {
 		itemsWithInfo(data, type: "PullRequest", server: repo.apiServer) { item, info, isNewOrUpdated in
 			let p = item as! PullRequest
 			if isNewOrUpdated {
@@ -79,7 +79,7 @@ final class PullRequest: ListableItem {
 		return try! moc.count(for: f)
 	}
 
-	class func markEverythingRead(_ section: Section, in moc: NSManagedObjectContext) {
+	class func markEverythingRead(in section: Section, in moc: NSManagedObjectContext) {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		if section != .none {
 			f.predicate = NSPredicate(format: "sectionIndex == %lld", section.rawValue)
@@ -89,7 +89,7 @@ final class PullRequest: ListableItem {
 		}
 	}
 
-	class func badgeCountInSection(_ section: Section, in moc: NSManagedObjectContext) -> Int {
+	class func badgeCount(in section: Section, in moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.predicate = NSPredicate(format: "sectionIndex == %lld and unreadComments > 0", section.rawValue)
 		return badgeCount(from: f, in: moc)
@@ -120,7 +120,7 @@ final class PullRequest: ListableItem {
 		return false
 	}
 
-	class func reasonForEmptyWithFilter(_ filterValue: String?, criterion: GroupingCriterion? = nil) -> NSAttributedString {
+	class func reasonForEmpty(with filterValue: String?, criterion: GroupingCriterion? = nil) -> NSAttributedString {
 		let openRequests = PullRequest.countOpen(in: mainObjectContext, criterion: criterion)
 
 		var color = COLOR_CLASS.lightGray
@@ -221,12 +221,12 @@ final class PullRequest: ListableItem {
 		return components.joined(separator: ",")
 	}
 
-	func shouldBeCheckedForRedStatusesInSection(_ targetSection: Section) -> Bool {
+	func shouldBeCheckedForRedStatuses(in section: Section) -> Bool {
 		if Settings.hidePrsThatArentPassing {
 			if Settings.hidePrsThatDontPassOnlyInAll {
-				return targetSection == .all
+				return section == .all
 			} else {
-				return targetSection == .mine || targetSection == .participated || targetSection == .all
+				return section == .mine || section == .participated || section == .all
 			}
 		}
 		return false

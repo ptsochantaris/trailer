@@ -1008,7 +1008,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBAction func testApiServerSelected(_ sender: NSButton) {
 		sender.isEnabled = false
 		let apiServer = selectedServer()!
-		api.testApiToServer(apiServer) { error in
+		api.testApi(to: apiServer) { error in
 			let alert = NSAlert()
 			if let e = error {
 				alert.messageText = "The test failed for \(S(apiServer.apiPath))"

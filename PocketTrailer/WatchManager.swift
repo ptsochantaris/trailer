@@ -341,13 +341,13 @@ final class WatchManager : NSObject, WCSessionDelegate {
 					"mine": myPrs, "participated": participatedPrs, "mentioned": mentionedPrs,
 					"merged": mergedPrs, "closed": closedPrs, "other": otherPrs, "snoozed": snoozedPrs,
 					"total": totalPrs, "total_open": totalOpenPrs, "unread": unreadPrCount,
-					"error": totalPrs == 0 ? PullRequest.reasonForEmptyWithFilter(nil, criterion: c).string : ""
+					"error": totalPrs == 0 ? PullRequest.reasonForEmpty(with: nil, criterion: c).string : ""
 				],
 				"issues": [
 					"mine": myIssues, "participated": participatedIssues, "mentioned": mentionedIssues,
 					"closed": closedIssues, "other": otherIssues, "snoozed": snoozedIssues,
 					"total": totalIssues, "total_open": totalOpenIssues, "unread": unreadIssueCount,
-					"error": totalIssues == 0 ? Issue.reasonForEmptyWithFilter(nil, criterion: c).string : ""
+					"error": totalIssues == 0 ? Issue.reasonForEmpty(with: nil, criterion: c).string : ""
 				]])
 		}
 

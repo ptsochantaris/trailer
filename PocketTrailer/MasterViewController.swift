@@ -1069,9 +1069,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		if appIsRefreshing {
 			title = "Refreshing..."
 			if viewingPrs {
-				tableView.tableFooterView = empty ? EmptyView(message: PullRequest.reasonForEmptyWithFilter(searchBar.text, criterion: currentTabBarSet?.viewCriterion), parentWidth: view.bounds.size.width) : nil
+				tableView.tableFooterView = empty ? EmptyView(message: PullRequest.reasonForEmpty(with: searchBar.text, criterion: currentTabBarSet?.viewCriterion), parentWidth: view.bounds.size.width) : nil
 			} else {
-				tableView.tableFooterView = empty ? EmptyView(message: Issue.reasonForEmptyWithFilter(searchBar.text, criterion: currentTabBarSet?.viewCriterion), parentWidth: view.bounds.size.width) : nil
+				tableView.tableFooterView = empty ? EmptyView(message: Issue.reasonForEmpty(with: searchBar.text, criterion: currentTabBarSet?.viewCriterion), parentWidth: view.bounds.size.width) : nil
 			}
 			if let r = refreshControl {
 				refreshLabel.text = api.lastUpdateDescription()
@@ -1083,16 +1083,16 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			if showEmpty {
 				title = "No Items"
 				if viewingPrs {
-					tableView.tableFooterView = empty ? EmptyView(message: PullRequest.reasonForEmptyWithFilter(searchBar.text, criterion: currentTabBarSet?.viewCriterion), parentWidth: view.bounds.size.width) : nil
+					tableView.tableFooterView = empty ? EmptyView(message: PullRequest.reasonForEmpty(with: searchBar.text, criterion: currentTabBarSet?.viewCriterion), parentWidth: view.bounds.size.width) : nil
 				} else {
-					tableView.tableFooterView = empty ? EmptyView(message: Issue.reasonForEmptyWithFilter(searchBar.text, criterion: currentTabBarSet?.viewCriterion), parentWidth: view.bounds.size.width) : nil
+					tableView.tableFooterView = empty ? EmptyView(message: Issue.reasonForEmpty(with: searchBar.text, criterion: currentTabBarSet?.viewCriterion), parentWidth: view.bounds.size.width) : nil
 				}
 			} else if viewingPrs {
 				title = pullRequestsTitle(long: true)
-				tableView.tableFooterView = empty ? EmptyView(message: PullRequest.reasonForEmptyWithFilter(searchBar.text, criterion: currentTabBarSet?.viewCriterion), parentWidth: view.bounds.size.width) : nil
+				tableView.tableFooterView = empty ? EmptyView(message: PullRequest.reasonForEmpty(with: searchBar.text, criterion: currentTabBarSet?.viewCriterion), parentWidth: view.bounds.size.width) : nil
 			} else {
 				title = issuesTitle()
-				tableView.tableFooterView = empty ? EmptyView(message: Issue.reasonForEmptyWithFilter(searchBar.text, criterion: currentTabBarSet?.viewCriterion), parentWidth: view.bounds.size.width) : nil
+				tableView.tableFooterView = empty ? EmptyView(message: Issue.reasonForEmpty(with: searchBar.text, criterion: currentTabBarSet?.viewCriterion), parentWidth: view.bounds.size.width) : nil
 			}
 			if let r = refreshControl {
 				refreshLabel.text = api.lastUpdateDescription()

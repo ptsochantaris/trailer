@@ -272,8 +272,8 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 	}
 
 	func markEverythingRead() {
-		PullRequest.markEverythingRead(.none, in: mainObjectContext)
-		Issue.markEverythingRead(.none, in: mainObjectContext)
+		PullRequest.markEverythingRead(in: .none, in: mainObjectContext)
+		Issue.markEverythingRead(in: .none, in: mainObjectContext)
 		DataManager.saveDB()
 		app.updateBadge()
 	}
