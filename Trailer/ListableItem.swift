@@ -510,10 +510,10 @@ class ListableItem: DataItem {
 		}
 	}
 
-	final class func badgeCountFromFetch<T: ListableItem>(_ f: NSFetchRequest<T>, inMoc: NSManagedObjectContext) -> Int {
+	final class func badgeCountFromFetch<T: ListableItem>(_ f: NSFetchRequest<T>, moc: NSManagedObjectContext) -> Int {
 		var badgeCount = 0
 		f.returnsObjectsAsFaults = false
-		for i in try! inMoc.fetch(f) {
+		for i in try! moc.fetch(f) {
 			badgeCount += Int(i.unreadComments)
 		}
 		return badgeCount
@@ -729,7 +729,7 @@ class ListableItem: DataItem {
 		let f = NSFetchRequest<ListableItem>(entityName: itemType)
 		f.fetchBatchSize = 100
 		let p = NSCompoundPredicate(andPredicateWithSubpredicates: andPredicates)
-		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, inMoc: mainObjectContext)
+		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, moc: mainObjectContext)
 		f.sortDescriptors = sortDescriptors
 		return f
 	}

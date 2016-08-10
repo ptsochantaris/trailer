@@ -403,7 +403,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			allIssuesSetting.isEnabled = false
 			activityDisplay.startAnimation(nil)
 		} else {
-			refreshButton.isEnabled = ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext)
+			refreshButton.isEnabled = ApiServer.someServersHaveAuthTokens(moc: mainObjectContext)
 			projectsTable.isEnabled = true
 			allPrsSetting.isEnabled = true
 			allIssuesSetting.isEnabled = true
@@ -811,11 +811,11 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		app.prepareForRefresh()
 
 		let tempContext = DataManager.childContext()
-		api.fetchRepositoriesToMoc(tempContext) {
+		api.fetchRepositories(moc: tempContext) {
 
-			if ApiServer.shouldReportRefreshFailureInMoc(tempContext) {
+			if ApiServer.shouldReportRefreshFailure(moc: tempContext) {
 				var errorServers = [String]()
-				for apiServer in ApiServer.allApiServersInMoc(tempContext) {
+				for apiServer in ApiServer.allApiServers(moc: tempContext) {
 					if apiServer.goodToGo && !apiServer.lastSyncSucceeded {
 						errorServers.append(S(apiServer.label))
 					}
@@ -841,13 +841,13 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	private func selectedServer() -> ApiServer? {
 		let selected = serverList.selectedRow
 		if selected >= 0 {
-			return ApiServer.allApiServersInMoc(mainObjectContext)[selected]
+			return ApiServer.allApiServers(moc: mainObjectContext)[selected]
 		}
 		return nil
 	}
 
 	@IBAction func deleteSelectedServerSelected(_ sender: NSButton) {
-		if let selectedServer = selectedServer(), let index = ApiServer.allApiServersInMoc(mainObjectContext).index(of: selectedServer) {
+		if let selectedServer = selectedServer(), let index = ApiServer.allApiServers(moc: mainObjectContext).index(of: selectedServer) {
 			mainObjectContext.delete(selectedServer)
 			serverList.reloadData()
 			serverList.selectRowIndexes(IndexSet(integer: min(index, serverList.numberOfRows-1)), byExtendingSelection: false)
@@ -1039,7 +1039,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			apiServerAuthToken.stringValue = S(apiServer.authToken)
 			apiServerSelectedBox.title = apiServer.label ?? "New Server"
 			apiServerTestButton.isEnabled = !S(apiServer.authToken).isEmpty
-			apiServerDeleteButton.isEnabled = (ApiServer.countApiServersInMoc(mainObjectContext) > 1)
+			apiServerDeleteButton.isEnabled = (ApiServer.countApiServers(moc: mainObjectContext) > 1)
 			apiServerReportError.integerValue = apiServer.reportRefreshFailures ? 1 : 0
 		}
 	}
@@ -1058,10 +1058,10 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	@IBAction func addNewApiServerSelected(_ sender: NSButton) {
-		let a = ApiServer.insertNewServerInMoc(mainObjectContext)
+		let a = ApiServer.insertNewServer(moc: mainObjectContext)
 		a.label = "New API Server"
 		serverList.reloadData()
-		if let index = ApiServer.allApiServersInMoc(mainObjectContext).index(of: a) {
+		if let index = ApiServer.allApiServers(moc: mainObjectContext).index(of: a) {
 			serverList.selectRowIndexes(IndexSet(integer: index), byExtendingSelection: false)
 			fillServerApiFormFromSelectedServer()
 		}
@@ -1080,7 +1080,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	func windowWillClose(_ notification: Notification) {
-		if ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) && preferencesDirty {
+		if ApiServer.someServersHaveAuthTokens(moc: mainObjectContext) && preferencesDirty {
 			app.startRefresh()
 		} else {
 			if app.refreshTimer == nil && Settings.refreshPeriod > 0.0 {
@@ -1248,7 +1248,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 				}
 			}
 		} else if tv == serverList {
-			let allServers = ApiServer.allApiServersInMoc(mainObjectContext)
+			let allServers = ApiServer.allApiServers(moc: mainObjectContext)
 			let apiServer = allServers[row]
 			if tableColumn?.identifier == "server" {
 				cell.title = S(apiServer.label)
@@ -1268,7 +1268,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 				c.doubleValue = rl - Double(apiServer.requestsRemaining)
 			}
 		} else if tv == snoozePresetsList {
-			let allPresets = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)
+			let allPresets = SnoozePreset.allSnoozePresets(moc: mainObjectContext)
 			let preset = allPresets[row]
 			cell.title = preset.listDescription
 			let tc = c as! NSTextFieldCell
@@ -1288,9 +1288,9 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		if tableView === projectsTable {
 			return Repo.reposForFilter(repoFilter.stringValue).count + 2
 		} else if tableView === serverList {
-			return ApiServer.countApiServersInMoc(mainObjectContext)
+			return ApiServer.countApiServers(moc: mainObjectContext)
 		} else if tableView === snoozePresetsList {
-			return SnoozePreset.allSnoozePresetsInMoc(mainObjectContext).count
+			return SnoozePreset.allSnoozePresets(moc: mainObjectContext).count
 		}
 		return 0
 	}
@@ -1396,10 +1396,10 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBAction func autoSnoozeDurationChanged(_ sender: NSStepper) {
 		Settings.autoSnoozeDuration = sender.integerValue
 		fillSnoozingDropdowns()
-		for p in DataItem.allItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest] {
+		for p in DataItem.allItemsOfType("PullRequest", moc: mainObjectContext) as! [PullRequest] {
 			p.wakeIfAutoSnoozed()
 		}
-		for i in DataItem.allItemsOfType("Issue", inMoc: mainObjectContext) as! [Issue] {
+		for i in DataItem.allItemsOfType("Issue", moc: mainObjectContext) as! [Issue] {
 			i.wakeIfAutoSnoozed()
 		}
 		DataManager.postProcessAllItems()
@@ -1409,7 +1409,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	func selectedSnoozePreset() -> SnoozePreset? {
 		let selected = snoozePresetsList.selectedRow
 		if selected >= 0 {
-			return SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)[selected]
+			return SnoozePreset.allSnoozePresets(moc: mainObjectContext)[selected]
 		}
 		return nil
 	}
@@ -1488,16 +1488,16 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	@IBAction func createNewSnoozePresetSelected(_ sender: NSButton) {
-		let s = SnoozePreset.newSnoozePresetInMoc(mainObjectContext)
+		let s = SnoozePreset.newSnoozePreset(moc: mainObjectContext)
 		commitSnoozeSettings()
-		if let index = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext).index(of: s) {
+		if let index = SnoozePreset.allSnoozePresets(moc: mainObjectContext).index(of: s) {
 			snoozePresetsList.selectRowIndexes(IndexSet(integer: index), byExtendingSelection: false)
 			fillSnoozeFormFromSelectedPreset()
 		}
 	}
 
 	@IBAction func deleteSnoozePresetSelected(_ sender: NSButton) {
-		if let selectedPreset = selectedSnoozePreset(), let index = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext).index(of: selectedPreset) {
+		if let selectedPreset = selectedSnoozePreset(), let index = SnoozePreset.allSnoozePresets(moc: mainObjectContext).index(of: selectedPreset) {
 
 			let appliedCount = selectedPreset.appliedToIssues.count + selectedPreset.appliedToPullRequests.count
 			if appliedCount > 0 {
@@ -1557,7 +1557,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction func snoozeUpSelected(_ sender: AnyObject) {
 		if let this = selectedSnoozePreset() {
-			let all = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)
+			let all = SnoozePreset.allSnoozePresets(moc: mainObjectContext)
 			if let index = all.index(of: this), index > 0 {
 				let other = all[index-1]
 				other.sortOrder = Int64(index)
@@ -1570,7 +1570,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction func snoozeDownSelected(_ sender: AnyObject) {
 		if let this = selectedSnoozePreset() {
-			let all = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)
+			let all = SnoozePreset.allSnoozePresets(moc: mainObjectContext)
 			if let index = all.index(of: this), index < all.count-1 {
 				let other = all[index+1]
 				other.sortOrder = Int64(index)

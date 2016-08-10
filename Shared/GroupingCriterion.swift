@@ -31,7 +31,7 @@ final class GroupingCriterion {
 			return true
 		}
 		if let r = repoGroup {
-			for repo in Repo.reposForGroup(r, inMoc: mainObjectContext) {
+			for repo in Repo.reposForGroup(r, moc: mainObjectContext) {
 				if !repo.apiServer.lastSyncSucceeded {
 					return true
 				}
@@ -55,9 +55,9 @@ final class GroupingCriterion {
 		return true
 	}
 
-	func addCriterionToPredicate(_ p: NSPredicate, inMoc: NSManagedObjectContext) -> NSPredicate {
+	func addCriterionToPredicate(_ p: NSPredicate, moc: NSManagedObjectContext) -> NSPredicate {
 
-		if let a = apiServerId, let server = try! inMoc.existingObject(with: a) as? ApiServer {
+		if let a = apiServerId, let server = try! moc.existingObject(with: a) as? ApiServer {
 			let np = NSPredicate(format: "apiServer == %@", server)
 			return NSCompoundPredicate(andPredicateWithSubpredicates: [np, p])
 		} else if let r = repoGroup {

@@ -73,25 +73,25 @@ final class SnoozePreset: NSManagedObject {
 		}
 	}
 
-	class func allSnoozePresetsInMoc(_ moc: NSManagedObjectContext) -> [SnoozePreset] {
+	class func allSnoozePresets(moc: NSManagedObjectContext) -> [SnoozePreset] {
 		let f = NSFetchRequest<SnoozePreset>(entityName: "SnoozePreset")
 		f.returnsObjectsAsFaults = false
 		f.sortDescriptors = [NSSortDescriptor(key: "sortOrder", ascending: true)]
 		return try! moc.fetch(f)
 	}
 
-	class func newSnoozePresetInMoc(_ moc: NSManagedObjectContext) -> SnoozePreset {
+	class func newSnoozePreset(moc: NSManagedObjectContext) -> SnoozePreset {
 		let s = NSEntityDescription.insertNewObject(forEntityName: "SnoozePreset", into: moc) as! SnoozePreset
 		s.duration = true
 		s.sortOrder = Int64.max
-		setSortOrdersInMoc(moc)
+		setSortOrders(moc: moc)
 		return s
 	}
 
-	class func setSortOrdersInMoc(_ moc: NSManagedObjectContext) {
+	class func setSortOrders(moc: NSManagedObjectContext) {
 		// Sanity to prevent sorting confusion later
 		var c: Int64 = 0
-		for i in allSnoozePresetsInMoc(moc) {
+		for i in allSnoozePresets(moc: moc) {
 			i.sortOrder = c
 			c += 1
 		}
@@ -126,7 +126,7 @@ final class SnoozePreset: NSManagedObject {
 
 	class func archivePresets() -> [[String:NSObject]] {
 		var archivedData = [[String:NSObject]]()
-		for a in SnoozePreset.allSnoozePresetsInMoc(mainObjectContext) {
+		for a in SnoozePreset.allSnoozePresets(moc: mainObjectContext) {
 			var presetData = [String:NSObject]()
 			for (k , _) in a.entity.attributesByName {
 				if let v = a.value(forKey: k) as? NSObject {
@@ -142,12 +142,12 @@ final class SnoozePreset: NSManagedObject {
 
 		let tempMoc = DataManager.childContext()
 
-		for apiServer in allSnoozePresetsInMoc(tempMoc) {
+		for apiServer in allSnoozePresets(moc: tempMoc) {
 			tempMoc.delete(apiServer)
 		}
 
 		for presetData in archive {
-			let a = newSnoozePresetInMoc(tempMoc)
+			let a = newSnoozePreset(moc: tempMoc)
 			let attributes = Array(a.entity.attributesByName.keys)
 			for (k,v) in presetData {
 				if attributes.contains(k) {

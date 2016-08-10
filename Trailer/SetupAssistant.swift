@@ -11,7 +11,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 	@IBOutlet weak var welcomeLabel: NSTextField!
 	@IBOutlet weak var trackIssues: NSButton!
 
-	private let newServer = ApiServer.allApiServersInMoc(mainObjectContext).first!
+	private let newServer = ApiServer.allApiServers(moc: mainObjectContext).first!
 	private var checkTimer: Timer?
 
 	override func awakeFromNib() {

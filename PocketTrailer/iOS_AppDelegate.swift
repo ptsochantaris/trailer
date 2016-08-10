@@ -16,7 +16,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 	private var actOnLocalNotification = true
 
 	func updateBadge() {
-		UIApplication.shared.applicationIconBadgeNumber = PullRequest.badgeCountInMoc(mainObjectContext) + Issue.badgeCountInMoc(mainObjectContext)
+		UIApplication.shared.applicationIconBadgeNumber = PullRequest.badgeCount(moc: mainObjectContext) + Issue.badgeCount(moc: mainObjectContext)
 		watchManager?.updateContext()
 	}
 
@@ -45,7 +45,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 
 		DataManager.postProcessAllItems()
 
-		if ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
+		if ApiServer.someServersHaveAuthTokens(moc: mainObjectContext) {
 			api.updateLimitsFromServer()
 		}
 
@@ -62,9 +62,9 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 		NotificationManager.setup(delegate: self)
 
 		atNextEvent(self) { S in
-			if !ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
+			if !ApiServer.someServersHaveAuthTokens(moc: mainObjectContext) {
 				let m = popupManager.getMasterController()
-				if ApiServer.countApiServersInMoc(mainObjectContext) == 1, let a = ApiServer.allApiServersInMoc(mainObjectContext).first, a.authToken == nil || a.authToken!.isEmpty {
+				if ApiServer.countApiServers(moc: mainObjectContext) == 1, let a = ApiServer.allApiServers(moc: mainObjectContext).first, a.authToken == nil || a.authToken!.isEmpty {
 					m.performSegue(withIdentifier: "showQuickstart", sender: self)
 				} else {
 					m.performSegue(withIdentifier: "showPreferences", sender: self)
@@ -141,7 +141,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 	}
 
 	private func checkApiUsage() {
-		for apiServer in ApiServer.allApiServersInMoc(mainObjectContext) {
+		for apiServer in ApiServer.allApiServers(moc: mainObjectContext) {
 			if apiServer.goodToGo && apiServer.hasApiLimit, let resetDate = apiServer.resetDate {
 				if apiServer.shouldReportOverTheApiLimit {
 					let apiLabel = S(apiServer.label)
@@ -179,7 +179,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 
 	func startRefresh() -> Bool {
 
-		if appIsRefreshing || api.noNetworkConnection() || !ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
+		if appIsRefreshing || api.noNetworkConnection() || !ApiServer.someServersHaveAuthTokens(moc: mainObjectContext) {
 			return false
 		}
 
@@ -193,7 +193,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 
 			guard let s = self else { return }
 
-			let success = !ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext)
+			let success = !ApiServer.shouldReportRefreshFailure(moc: mainObjectContext)
 
 			s.lastUpdateFailed = !success
 
@@ -279,10 +279,10 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 	}
 
 	func clearAllClosed() {
-		for p in PullRequest.allClosedInMoc(mainObjectContext, includeAllGroups: true) {
+		for p in PullRequest.allClosed(moc: mainObjectContext, includeAllGroups: true) {
 			mainObjectContext.delete(p)
 		}
-		for i in Issue.allClosedInMoc(mainObjectContext, includeAllGroups: true) {
+		for i in Issue.allClosed(moc: mainObjectContext, includeAllGroups: true) {
 			mainObjectContext.delete(i)
 		}
 		DataManager.saveDB()
@@ -290,7 +290,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 	}
 
 	func clearAllMerged() {
-		for p in PullRequest.allMergedInMoc(mainObjectContext, includeAllGroups: true) {
+		for p in PullRequest.allMerged(moc: mainObjectContext, includeAllGroups: true) {
 			mainObjectContext.delete(p)
 		}
 		DataManager.saveDB()

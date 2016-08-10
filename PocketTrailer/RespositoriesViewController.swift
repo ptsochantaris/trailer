@@ -27,7 +27,7 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 	}
 
 	override func viewDidAppear(_ animated: Bool) {
-		actionsButton.isEnabled = ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext)
+		actionsButton.isEnabled = ApiServer.someServersHaveAuthTokens(moc: mainObjectContext)
 		if actionsButton.isEnabled && fetchedResultsController.fetchedObjects?.count==0 {
 			refreshList()
 		} else if let selectedIndex = tableView.indexPathForSelectedRow {
@@ -66,10 +66,10 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 		tableView.alpha = 0.5
 
 		let tempContext = DataManager.childContext()
-		api.fetchRepositoriesToMoc(tempContext) { [weak self] in
-			if ApiServer.shouldReportRefreshFailureInMoc(tempContext) {
+		api.fetchRepositories(moc: tempContext) { [weak self] in
+			if ApiServer.shouldReportRefreshFailure(moc: tempContext) {
 				var errorServers = [String]()
-				for apiServer in ApiServer.allApiServersInMoc(tempContext) {
+				for apiServer in ApiServer.allApiServers(moc: tempContext) {
 					if apiServer.goodToGo && !apiServer.lastSyncSucceeded {
 						errorServers.append(S(apiServer.label))
 					}
@@ -80,7 +80,7 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 				try! tempContext.save()
 			}
 			self?.navigationItem.title = originalName
-			self?.actionsButton.isEnabled = ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext)
+			self?.actionsButton.isEnabled = ApiServer.someServersHaveAuthTokens(moc: mainObjectContext)
 			self?.tableView.alpha = 1.0
 			self?.tableView.isUserInteractionEnabled = true
 			preferencesDirty = true

@@ -17,7 +17,7 @@ final class Repo: DataItem {
 	@NSManaged var issues: Set<Issue>
 	@NSManaged var ownerId: Int64
 
-	class func syncReposFromInfo(_ data: [[NSObject : AnyObject]]?, apiServer: ApiServer) {
+	class func syncReposFromInfo(_ data: [[NSObject : AnyObject]]?, server: ApiServer) {
 		var filteredData = [[NSObject : AnyObject]]()
 		for info in data ?? [] {
 			if (info["private"] as? NSNumber)?.boolValue ?? false {
@@ -37,7 +37,7 @@ final class Repo: DataItem {
 				filteredData.append(info)
 			}
 		}
-		itemsWithInfo(filteredData, type: "Repo", fromServer: apiServer) { item, info, newOrUpdated in
+		itemsWithInfo(filteredData, type: "Repo", server: server) { item, info, newOrUpdated in
 			if newOrUpdated {
 				let r = item as! Repo
 				r.fullName = info["full_name"] as? String
@@ -65,14 +65,14 @@ final class Repo: DataItem {
 		lastDirtied = Date.distantPast
 	}
 
-	class func reposForGroup(_ group: String, inMoc: NSManagedObjectContext) -> [Repo] {
+	class func reposForGroup(_ group: String, moc: NSManagedObjectContext) -> [Repo] {
 		let f = NSFetchRequest<Repo>(entityName: "Repo")
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "groupLabel == %@", group)
-		return try! inMoc.fetch(f)
+		return try! moc.fetch(f)
 	}
 
-	class func anyVisibleReposInMoc(_ moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, excludeGrouped: Bool = false) -> Bool {
+	class func anyVisibleRepos(moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, excludeGrouped: Bool = false) -> Bool {
 
 		func excludeGroupedRepos(_ p: NSPredicate) -> NSPredicate {
 			let nilCheck = NSPredicate(format: "groupLabel == nil")
@@ -87,7 +87,7 @@ final class Repo: DataItem {
 				let rp = NSPredicate(format: "groupLabel == %@", g)
 				f.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [rp, p])
 			} else {
-				let ep = c.addCriterionToPredicate(p, inMoc: moc)
+				let ep = c.addCriterionToPredicate(p, moc: moc)
 				if excludeGrouped {
 					f.predicate = excludeGroupedRepos(ep)
 				} else {
@@ -106,9 +106,9 @@ final class Repo: DataItem {
 	class func interestedInIssues(_ apiServerId: NSManagedObjectID? = nil) -> Bool {
 		let all: [Repo]
 		if let aid = apiServerId, let a = existingObjectWithID(aid) as? ApiServer {
-			all = Repo.allItemsOfType("Repo", fromServer: a) as! [Repo]
+			all = Repo.allItemsOfType("Repo", server: a) as! [Repo]
 		} else {
-			all = Repo.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo]
+			all = Repo.allItemsOfType("Repo", moc: mainObjectContext) as! [Repo]
 		}
 		for r in all {
 			if r.displayPolicyForIssues > 0 {
@@ -121,9 +121,9 @@ final class Repo: DataItem {
 	class func interestedInPrs(_ apiServerId: NSManagedObjectID? = nil) -> Bool {
 		let all: [Repo]
 		if let aid = apiServerId, let a = existingObjectWithID(aid) as? ApiServer {
-			all = Repo.allItemsOfType("Repo", fromServer: a) as! [Repo]
+			all = Repo.allItemsOfType("Repo", server: a) as! [Repo]
 		} else {
-			all = Repo.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo]
+			all = Repo.allItemsOfType("Repo", moc: mainObjectContext) as! [Repo]
 		}
 		for r in all {
 			if r.displayPolicyForPrs > 0 {
@@ -134,12 +134,12 @@ final class Repo: DataItem {
 	}
 
 	class var allGroupLabels: [String] {
-		let allRepos = allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo]
+		let allRepos = allItemsOfType("Repo", moc: mainObjectContext) as! [Repo]
 		let labels = allRepos.flatMap { $0.shouldSync ? $0.groupLabel : nil }
 		return Set<String>(labels).sorted()
 	}
 
-	class func syncableReposInMoc(_ moc: NSManagedObjectContext) -> [Repo] {
+	class func syncableRepos(moc: NSManagedObjectContext) -> [Repo] {
 		let f = NSFetchRequest<Repo>(entityName: "Repo")
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "dirty = YES and (displayPolicyForPrs > 0 or displayPolicyForIssues > 0) and inaccessible != YES")
@@ -154,18 +154,18 @@ final class Repo: DataItem {
 		return try! moc.fetch(f)
 	}
 
-	class func unsyncableReposInMoc(_ moc: NSManagedObjectContext) -> [Repo] {
+	class func unsyncableRepos(moc: NSManagedObjectContext) -> [Repo] {
 		let f = NSFetchRequest<Repo>(entityName: "Repo")
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "(not (displayPolicyForPrs > 0 or displayPolicyForIssues > 0)) or inaccessible = YES")
 		return try! moc.fetch(f)
 	}
 
-	class func markDirtyReposWithIds(_ ids: NSSet, inMoc: NSManagedObjectContext) {
+	class func markDirtyReposWithIds(_ ids: NSSet, moc: NSManagedObjectContext) {
 		let f = NSFetchRequest<Repo>(entityName: "Repo")
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "serverId IN %@", ids)
-		for repo in try! inMoc.fetch(f) {
+		for repo in try! moc.fetch(f) {
 			repo.dirty = repo.shouldSync
 		}
 	}

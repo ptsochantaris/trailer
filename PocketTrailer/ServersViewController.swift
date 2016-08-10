@@ -29,7 +29,7 @@ final class ServersViewController: UITableViewController {
 
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
-		allServers = ApiServer.allApiServersInMoc(mainObjectContext)
+		allServers = ApiServer.allApiServers(moc: mainObjectContext)
 		tableView.reloadData()
 	}
 
