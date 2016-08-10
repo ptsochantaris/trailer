@@ -20,7 +20,7 @@ final class PullRequest: ListableItem {
 			let p = item as! PullRequest
 			if isNewOrUpdated {
 
-				p.baseSyncFromInfo(info, in: repo)
+				p.baseSync(from: info, in: repo)
 
 				p.mergeable = (info["mergeable"] as? NSNumber)?.boolValue ?? true
 
@@ -60,7 +60,7 @@ final class PullRequest: ListableItem {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
 		let p = NSPredicate(format: "condition == %lld", ItemCondition.merged.rawValue)
-		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, in: moc, includeAllGroups: includeAllGroups)
+		add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc, includeAllGroups: includeAllGroups)
 		return try! moc.fetch(f)
 	}
 
@@ -68,14 +68,14 @@ final class PullRequest: ListableItem {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
 		let p = NSPredicate(format: "condition == %lld", ItemCondition.closed.rawValue)
-		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, in: moc, includeAllGroups: includeAllGroups)
+		add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc, includeAllGroups: includeAllGroups)
 		return try! moc.fetch(f)
 	}
 
 	class func countOpen(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		let p = NSPredicate(format: "condition == %lld or condition == nil", ItemCondition.open.rawValue)
-		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, in: moc)
+		add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc)
 		return try! moc.count(for: f)
 	}
 
@@ -92,18 +92,18 @@ final class PullRequest: ListableItem {
 	class func badgeCountInSection(_ section: Section, in moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.predicate = NSPredicate(format: "sectionIndex == %lld and unreadComments > 0", section.rawValue)
-		return badgeCountFromFetch(f, in: moc)
+		return badgeCount(from: f, in: moc)
 	}
 
 	class func badgeCount(in moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.predicate = NSPredicate(format: "sectionIndex > 0 and unreadComments > 0")
-		return badgeCountFromFetch(f, in: moc)
+		return badgeCount(from: f, in: moc)
 	}
 
 	class func badgeCount(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
-		let f = requestForItemsOfType("PullRequest", withFilter: nil, sectionIndex: -1, criterion: criterion)
-		return badgeCountFromFetch(f, in: moc)
+		let f = requestForItems(ofType: "PullRequest", withFilter: nil, sectionIndex: -1, criterion: criterion)
+		return badgeCount(from: f, in: moc)
 	}
 
 	var markUnmergeable: Bool {
@@ -149,10 +149,10 @@ final class PullRequest: ListableItem {
 			message = "No open PRs in your configured repositories."
 		}
 
-		return emptyMessage(message, color: color)
+		return styleForEmpty(message: message, color: color)
 	}
 
-	func subtitleWithFont(_ font: FONT_CLASS, lightColor: COLOR_CLASS, darkColor: COLOR_CLASS) -> NSMutableAttributedString {
+	func subtitle(with font: FONT_CLASS, lightColor: COLOR_CLASS, darkColor: COLOR_CLASS) -> NSMutableAttributedString {
 		let _subtitle = NSMutableAttributedString()
 		let p = NSMutableParagraphStyle()
 		#if os(iOS)

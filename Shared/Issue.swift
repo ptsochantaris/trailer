@@ -14,7 +14,7 @@ final class Issue: ListableItem {
 			let i = item as! Issue
 			if isNewOrUpdated {
 
-				i.baseSyncFromInfo(info, in: repo)
+				i.baseSync(from: info, in: repo)
 
 				if let R = repo.fullName {
 					i.commentsLink = "/repos/\(R)/issues/\(i.number)/comments"
@@ -61,7 +61,7 @@ final class Issue: ListableItem {
 			message = "No open issues in your configured repositories."
 		}
 
-		return emptyMessage(message, color: color)
+		return styleForEmpty(message: message, color: color)
 	}
 
 	#if os(iOS)
@@ -83,22 +83,22 @@ final class Issue: ListableItem {
 	class func badgeCount(in moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest<Issue>(entityName: "Issue")
 		f.predicate = NSPredicate(format: "sectionIndex > 0 and unreadComments > 0")
-		return badgeCountFromFetch(f, in: moc)
+		return badgeCount(from: f, in: moc)
 	}
 
 	class func badgeCount(in moc: NSManagedObjectContext, criterion: GroupingCriterion?) -> Int {
-		let f = requestForItemsOfType("Issue", withFilter: nil, sectionIndex: -1, criterion: criterion)
-		return badgeCountFromFetch(f, in: moc)
+		let f = requestForItems(ofType: "Issue", withFilter: nil, sectionIndex: -1, criterion: criterion)
+		return badgeCount(from: f, in: moc)
 	}
 
 	class func countOpen(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
 		let f = NSFetchRequest<Issue>(entityName: "Issue")
 		let p = NSPredicate(format: "condition == %lld or condition == nil", ItemCondition.open.rawValue)
-		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, in: moc)
+		add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc)
 		return try! moc.count(for: f)
 	}
 
-	func subtitleWithFont(_ font: FONT_CLASS, lightColor: COLOR_CLASS, darkColor: COLOR_CLASS) -> NSMutableAttributedString {
+	func subtitle(with font: FONT_CLASS, lightColor: COLOR_CLASS, darkColor: COLOR_CLASS) -> NSMutableAttributedString {
 		let _subtitle = NSMutableAttributedString()
 		let p = NSMutableParagraphStyle()
 		#if os(iOS)
@@ -144,7 +144,7 @@ final class Issue: ListableItem {
 		let f = NSFetchRequest<Issue>(entityName: "Issue")
 		f.returnsObjectsAsFaults = false
 		let p = NSPredicate(format: "condition == %lld", ItemCondition.closed.rawValue)
-		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, in: moc, includeAllGroups: includeAllGroups)
+		add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc, includeAllGroups: includeAllGroups)
 		return try! moc.fetch(f)
 	}
 

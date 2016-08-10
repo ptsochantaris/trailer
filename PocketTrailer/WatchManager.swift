@@ -199,12 +199,12 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		let f: NSFetchRequest<ListableItem>
 		if !apiServerUri.isEmpty, let aid = DataManager.idForUriPath(apiServerUri) {
 			let criterion = GroupingCriterion(apiServerId: aid)
-			f = ListableItem.requestForItemsOfType(entity, withFilter: nil, sectionIndex: sectionIndex, criterion: criterion, onlyUnread: onlyUnread)
+			f = ListableItem.requestForItems(ofType: entity, withFilter: nil, sectionIndex: sectionIndex, criterion: criterion, onlyUnread: onlyUnread)
 		} else if !group.isEmpty {
 			let criterion = GroupingCriterion(repoGroup: group)
-			f = ListableItem.requestForItemsOfType(entity, withFilter: nil, sectionIndex: sectionIndex, criterion: criterion, onlyUnread: onlyUnread)
+			f = ListableItem.requestForItems(ofType: entity, withFilter: nil, sectionIndex: sectionIndex, criterion: criterion, onlyUnread: onlyUnread)
 		} else {
-			f = ListableItem.requestForItemsOfType(entity, withFilter: nil, sectionIndex: sectionIndex, onlyUnread: onlyUnread)
+			f = ListableItem.requestForItems(ofType: entity, withFilter: nil, sectionIndex: sectionIndex, onlyUnread: onlyUnread)
 		}
 
 		f.fetchOffset = from
@@ -235,14 +235,14 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		let lightGray = UIColor.lightGray
 		let gray = UIColor.gray
 
-		let title = item.titleWithFont(font, labelFont: font, titleColor: UIColor.white)
+		let title = item.title(with: font, labelFont: font, titleColor: UIColor.white)
 		itemData["title"] = NSKeyedArchiver.archivedData(withRootObject: title)
 
 		if let i = item as? PullRequest {
-			let subtitle = i.subtitleWithFont(smallFont, lightColor: lightGray, darkColor: gray)
+			let subtitle = i.subtitle(with: smallFont, lightColor: lightGray, darkColor: gray)
 			itemData["subtitle"] = NSKeyedArchiver.archivedData(withRootObject: subtitle)
 		} else if let i = item as? Issue {
-			let subtitle = i.subtitleWithFont(smallFont, lightColor: lightGray, darkColor: gray)
+			let subtitle = i.subtitle(with: smallFont, lightColor: lightGray, darkColor: gray)
 			itemData["subtitle"] = NSKeyedArchiver.archivedData(withRootObject: subtitle)
 		}
 
@@ -366,28 +366,28 @@ final class WatchManager : NSObject, WCSessionDelegate {
 	private func countallItems(ofType type: String, criterion: GroupingCriterion?) -> Int {
 		let f = NSFetchRequest<ListableItem>(entityName: type)
 		let p = Settings.hideUncommentedItems ? NSPredicate(format: "sectionIndex > 0 and unreadComments > 0") : NSPredicate(format: "sectionIndex > 0")
-		DataItem.addCriterion(criterion, toFetchRequest: f, originalPredicate: p, in: mainObjectContext)
+		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: mainObjectContext)
 		return try! mainObjectContext.count(for: f)
 	}
 
 	private func countItems(ofType type: String, inSection: Section, criterion: GroupingCriterion?) -> Int {
 		let f = NSFetchRequest<ListableItem>(entityName: type)
 		let p = Settings.hideUncommentedItems ? NSPredicate(format: "sectionIndex == %lld and unreadComments > 0", inSection.rawValue) : NSPredicate(format: "sectionIndex == %d", inSection.rawValue)
-		DataItem.addCriterion(criterion, toFetchRequest: f, originalPredicate: p, in: mainObjectContext)
+		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: mainObjectContext)
 		return try! mainObjectContext.count(for: f)
 	}
 
 	private func badgeCount(forType type: String, inSection: Section, criterion: GroupingCriterion?) -> Int {
 		let f = NSFetchRequest<ListableItem>(entityName: type)
 		let p = NSPredicate(format: "sectionIndex == %lld and unreadComments > 0", inSection.rawValue)
-		DataItem.addCriterion(criterion, toFetchRequest: f, originalPredicate: p, in: mainObjectContext)
-		return ListableItem.badgeCountFromFetch(f, in: mainObjectContext)
+		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: mainObjectContext)
+		return ListableItem.badgeCount(from: f, in: mainObjectContext)
 	}
 
 	private func countOpenAndVisible(ofType type: String, criterion: GroupingCriterion?) -> Int {
 		let f = NSFetchRequest<ListableItem>(entityName: type)
 		let p = Settings.hideUncommentedItems ? NSPredicate(format: "sectionIndex > 0 and (condition == %lld or condition == nil) and unreadComments > 0", ItemCondition.open.rawValue) : NSPredicate(format: "sectionIndex > 0 and (condition == %lld or condition == nil)", ItemCondition.open.rawValue)
-		DataItem.addCriterion(criterion, toFetchRequest: f, originalPredicate: p, in: mainObjectContext)
+		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: mainObjectContext)
 		return try! mainObjectContext.count(for: f)
 	}
 

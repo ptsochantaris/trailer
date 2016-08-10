@@ -39,7 +39,7 @@ class ListableItem: DataItem {
 	@NSManaged var comments: Set<PRComment>
 	@NSManaged var labels: Set<PRLabel>
 
-	final func baseSyncFromInfo(_ info: [NSObject: AnyObject], in repo: Repo) {
+	final func baseSync(from info: [NSObject: AnyObject], in repo: Repo) {
 
 		self.repo = repo
 
@@ -119,7 +119,7 @@ class ListableItem: DataItem {
 		postProcess()
 	}
 
-	final func shouldKeepForPolicy(_ policy: Int) -> Bool {
+	final func shouldKeep(accordingTo policy: Int) -> Bool {
 		let s = sectionIndex
 		return policy == HandlingPolicy.keepAll.rawValue
 			|| (policy == HandlingPolicy.keepMineAndParticipated.rawValue && (s == Section.mine.rawValue || s == Section.participated.rawValue))
@@ -142,7 +142,7 @@ class ListableItem: DataItem {
 		return userId == apiServer.userId
 	}
 
-	final private func containsTerms(terms: [String]) -> Bool {
+	final private func contains(terms: [String]) -> Bool {
 		if let b = body {
 			for t in terms {
 				if b.localizedCaseInsensitiveContains(t) {
@@ -151,7 +151,7 @@ class ListableItem: DataItem {
 			}
 		}
 		for c in comments {
-			if c.containsTerms(terms: terms) {
+			if c.contains(terms: terms) {
 				return true
 			}
 		}
@@ -182,7 +182,7 @@ class ListableItem: DataItem {
 		return snoozeUntil != nil
 	}
 
-	final func keepWithCondition(_ newCondition: ItemCondition, notification: NotificationType) {
+	final func keep(as newCondition: ItemCondition, notification: NotificationType) {
 		if sectionIndex == Section.all.rawValue && !Settings.showCommentsEverywhere {
 			catchUpCommentDate()
 		}
@@ -231,7 +231,7 @@ class ListableItem: DataItem {
 		}
 	}
 
-	final func snoozeFromPreset(_ preset: SnoozePreset) {
+	final func snooze(using preset: SnoozePreset) {
 		snoozeUntil = preset.wakeupDateFromNow
 		snoozingPreset = preset
 		wasAwokenFromSnooze = false
@@ -261,14 +261,14 @@ class ListableItem: DataItem {
 		var outsideMySectionsButAwake = (targetSection == .all || targetSection == .none)
 
 		if outsideMySectionsButAwake && Int64(Settings.newMentionMovePolicy) > Section.none.rawValue
-			&& containsTerms(terms: ["@\(apiServer.userName!)"]) {
+			&& contains(terms: ["@\(apiServer.userName!)"]) {
 
 			targetSection = Section(rawValue: Int64(Settings.newMentionMovePolicy))!
 			outsideMySectionsButAwake = false
 		}
 
 		if outsideMySectionsButAwake && Int64(Settings.teamMentionMovePolicy) > Section.none.rawValue
-			&& containsTerms(terms: apiServer.teams.flatMap { $0.calculatedReferral }) {
+			&& contains(terms: apiServer.teams.flatMap { $0.calculatedReferral }) {
 
 			targetSection = Section(rawValue: Int64(Settings.teamMentionMovePolicy))!
 			outsideMySectionsButAwake = false
@@ -350,7 +350,7 @@ class ListableItem: DataItem {
 			if Settings.assumeReadItemIfUserHasNewerComments {
 				let f = NSFetchRequest<PRComment>(entityName: "PRComment")
 				f.returnsObjectsAsFaults = false
-				f.predicate = predicateForMyCommentsSinceDate(latestDate)
+				f.predicate = predicateForMyComments(since: latestDate)
 				for c in try! managedObjectContext?.fetch(f) ?? [] {
 					if let createdDate = c.createdAt, latestDate < createdDate {
 						latestDate = createdDate
@@ -360,7 +360,7 @@ class ListableItem: DataItem {
 			}
 
 			let f = NSFetchRequest<PRComment>(entityName: "PRComment")
-			f.predicate = predicateForOthersCommentsSinceDate(latestDate)
+			f.predicate = predicateForOthersComments(since: latestDate)
 			unreadComments = Int64(try! managedObjectContext?.count(for: f) ?? 0)
 
 		} else {
@@ -378,7 +378,7 @@ class ListableItem: DataItem {
 			let f = NSFetchRequest<PRComment>(entityName: "PRComment")
 			f.returnsObjectsAsFaults = false
 			f.fetchLimit = 1
-			f.predicate = predicateForOthersCommentsSinceDate(latestReadCommentDate)
+			f.predicate = predicateForOthersComments(since: latestReadCommentDate)
 			f.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: true)]
 			let ret = try! managedObjectContext?.fetch(f) ?? []
 			if let firstComment = ret.first, let url = firstComment.webUrl {
@@ -411,7 +411,7 @@ class ListableItem: DataItem {
 		})
 	}
 
-	final func titleWithFont(_ font: FONT_CLASS, labelFont: FONT_CLASS, titleColor: COLOR_CLASS) -> NSMutableAttributedString {
+	final func title(with font: FONT_CLASS, labelFont: FONT_CLASS, titleColor: COLOR_CLASS) -> NSMutableAttributedString {
 		let p = NSMutableParagraphStyle()
 		p.paragraphSpacing = 1.0
 
@@ -459,7 +459,7 @@ class ListableItem: DataItem {
 		return _title
 	}
 
-	class final func emptyMessage(_ message: String, color: COLOR_CLASS) -> NSAttributedString {
+	class final func styleForEmpty(message: String, color: COLOR_CLASS) -> NSAttributedString {
 		let p = NSMutableParagraphStyle()
 		p.lineBreakMode = .byWordWrapping
 		p.alignment = .center
@@ -476,7 +476,7 @@ class ListableItem: DataItem {
 		#endif
 	}
 
-	final private func predicateForMyCommentsSinceDate(_ optionalDate: Date?) -> NSPredicate {
+	final private func predicateForMyComments(since optionalDate: Date?) -> NSPredicate {
 
 		if self is PullRequest {
 			if let date = optionalDate {
@@ -493,7 +493,7 @@ class ListableItem: DataItem {
 		}
 	}
 
-	final private func predicateForOthersCommentsSinceDate(_ optionalDate: Date?) -> NSPredicate {
+	final private func predicateForOthersComments(since optionalDate: Date?) -> NSPredicate {
 
 		if self is PullRequest {
 			if let date = optionalDate {
@@ -510,16 +510,16 @@ class ListableItem: DataItem {
 		}
 	}
 
-	final class func badgeCountFromFetch<T: ListableItem>(_ f: NSFetchRequest<T>, in moc: NSManagedObjectContext) -> Int {
+	final class func badgeCount<T: ListableItem>(from fetch: NSFetchRequest<T>, in moc: NSManagedObjectContext) -> Int {
 		var badgeCount = 0
-		f.returnsObjectsAsFaults = false
-		for i in try! moc.fetch(f) {
+		fetch.returnsObjectsAsFaults = false
+		for i in try! moc.fetch(fetch) {
 			badgeCount += Int(i.unreadComments)
 		}
 		return badgeCount
 	}
 
-	final class func buildOrPredicate(_ string: String, expectedLength: Int, format: String, numeric: Bool) -> NSPredicate? {
+	final class func buildOrPredicate(fromFilter string: String, expectedLength: Int, format: String, numeric: Bool) -> NSPredicate? {
 		if string.characters.count > expectedLength {
 			let items = string.substring(from: string.characters.index(string.startIndex, offsetBy: expectedLength))
 			if !items.characters.isEmpty {
@@ -563,43 +563,43 @@ class ListableItem: DataItem {
 		return nil
 	}
 
-	final class func serverPredicateFromFilterString(_ string: String) -> NSPredicate? {
-		return buildOrPredicate(string, expectedLength: 7, format: "apiServer.label contains[cd] %@", numeric: false)
+	final class func serverPredicate(fromFilter string: String) -> NSPredicate? {
+		return buildOrPredicate(fromFilter: string, expectedLength: 7, format: "apiServer.label contains[cd] %@", numeric: false)
 	}
 
-	final class func titlePredicateFromFilterString(_ string: String) -> NSPredicate? {
-		return buildOrPredicate(string, expectedLength: 6, format: "title contains[cd] %@", numeric: false)
+	final class func titlePredicate(fromFilter string: String) -> NSPredicate? {
+		return buildOrPredicate(fromFilter: string, expectedLength: 6, format: "title contains[cd] %@", numeric: false)
 	}
 
-	final class func milestonePredicateFromFilterString(_ string: String) -> NSPredicate? {
-		return buildOrPredicate(string, expectedLength: 10, format: "milestone contains[cd] %@", numeric: false)
+	final class func milestonePredicate(fromFilter string: String) -> NSPredicate? {
+		return buildOrPredicate(fromFilter: string, expectedLength: 10, format: "milestone contains[cd] %@", numeric: false)
 	}
 
-	final class func assigneePredicateFromFilterString(_ string: String) -> NSPredicate? {
-		return buildOrPredicate(string, expectedLength: 9, format: "assigneeName contains[cd] %@", numeric: false)
+	final class func assigneePredicate(fromFilter string: String) -> NSPredicate? {
+		return buildOrPredicate(fromFilter: string, expectedLength: 9, format: "assigneeName contains[cd] %@", numeric: false)
 	}
 
-	final class func numberPredicateFromFilterString(_ string: String) -> NSPredicate? {
-		return buildOrPredicate(string, expectedLength: 7, format: "number == %llu", numeric: true)
+	final class func numberPredicate(fromFilter string: String) -> NSPredicate? {
+		return buildOrPredicate(fromFilter: string, expectedLength: 7, format: "number == %llu", numeric: true)
 	}
 
-    final class func repoPredicateFromFilterString(_ string: String) -> NSPredicate? {
-		return buildOrPredicate(string, expectedLength: 5, format: "repo.fullName contains[cd] %@", numeric: false)
+    final class func repoPredicate(fromFilter string: String) -> NSPredicate? {
+		return buildOrPredicate(fromFilter: string, expectedLength: 5, format: "repo.fullName contains[cd] %@", numeric: false)
     }
 
-    final class func labelPredicateFromFilterString(_ string: String) -> NSPredicate? {
-		return buildOrPredicate(string, expectedLength: 6, format: "SUBQUERY(labels, $label, $label.name contains[cd] %@).@count > 0", numeric: false)
+    final class func labelPredicate(fromFilter string: String) -> NSPredicate? {
+		return buildOrPredicate(fromFilter: string, expectedLength: 6, format: "SUBQUERY(labels, $label, $label.name contains[cd] %@).@count > 0", numeric: false)
     }
 
-    final class func statusPredicateFromFilterString(_ string: String) -> NSPredicate? {
-		return buildOrPredicate(string, expectedLength: 7, format: "SUBQUERY(statuses, $status, $status.descriptionText contains[cd] %@).@count > 0", numeric: false)
+    final class func statusPredicate(fromFilter string: String) -> NSPredicate? {
+		return buildOrPredicate(fromFilter: string, expectedLength: 7, format: "SUBQUERY(statuses, $status, $status.descriptionText contains[cd] %@).@count > 0", numeric: false)
     }
 
-    final class func userPredicateFromFilterString(_ string: String) -> NSPredicate? {
-		return buildOrPredicate(string, expectedLength: 5, format: "userLogin contains[cd] %@", numeric: false)
+    final class func userPredicate(fromFilter string: String) -> NSPredicate? {
+		return buildOrPredicate(fromFilter: string, expectedLength: 5, format: "userLogin contains[cd] %@", numeric: false)
     }
 
-	final class func requestForItemsOfType(_ itemType: String, withFilter: String?, sectionIndex: Int64, criterion: GroupingCriterion? = nil, onlyUnread: Bool = false) -> NSFetchRequest<ListableItem> {
+	final class func requestForItems(ofType itemType: String, withFilter: String?, sectionIndex: Int64, criterion: GroupingCriterion? = nil, onlyUnread: Bool = false) -> NSFetchRequest<ListableItem> {
 
 		var andPredicates = [NSPredicate]()
 
@@ -637,15 +637,15 @@ class ListableItem: DataItem {
 				} while(foundOne)
             }
 
-			checkForPredicates("title", titlePredicateFromFilterString)
-            checkForPredicates("server", serverPredicateFromFilterString)
-            checkForPredicates("repo", repoPredicateFromFilterString)
-            checkForPredicates("label", labelPredicateFromFilterString)
-            checkForPredicates("status", statusPredicateFromFilterString)
-            checkForPredicates("user", userPredicateFromFilterString)
-			checkForPredicates("number", numberPredicateFromFilterString)
-			checkForPredicates("milestone", milestonePredicateFromFilterString)
-			checkForPredicates("assignee", assigneePredicateFromFilterString)
+			checkForPredicates("title", titlePredicate)
+            checkForPredicates("server", serverPredicate)
+            checkForPredicates("repo", repoPredicate)
+            checkForPredicates("label", labelPredicate)
+            checkForPredicates("status", statusPredicate)
+            checkForPredicates("user", userPredicate)
+			checkForPredicates("number", numberPredicate)
+			checkForPredicates("milestone", milestonePredicate)
+			checkForPredicates("assignee", assigneePredicate)
 
 			if !fi.isEmpty {
 				var orPredicates = [NSPredicate]()
@@ -729,18 +729,18 @@ class ListableItem: DataItem {
 		let f = NSFetchRequest<ListableItem>(entityName: itemType)
 		f.fetchBatchSize = 100
 		let p = NSCompoundPredicate(andPredicateWithSubpredicates: andPredicates)
-		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, in: mainObjectContext)
+		add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: mainObjectContext)
 		f.sortDescriptors = sortDescriptors
 		return f
 	}
 
-	final class func relatedItemsFromNotificationInfo(_ userInfo: [NSObject : AnyObject]) -> (PRComment?, ListableItem)? {
+	final class func relatedItems(from notificationUserInfo: [NSObject : AnyObject]) -> (PRComment?, ListableItem)? {
 		var item: ListableItem?
 		var comment: PRComment?
-		if let cid = userInfo[COMMENT_ID_KEY] as? String, let itemId = DataManager.idForUriPath(cid), let c = existingObjectWithID(itemId) as? PRComment {
+		if let cid = notificationUserInfo[COMMENT_ID_KEY] as? String, let itemId = DataManager.idForUriPath(cid), let c = existingObjectWithID(itemId) as? PRComment {
 			comment = c
 			item = c.pullRequest ?? c.issue
-		} else if let pid = userInfo[LISTABLE_URI_KEY] as? String, let itemId = DataManager.idForUriPath(pid) {
+		} else if let pid = notificationUserInfo[LISTABLE_URI_KEY] as? String, let itemId = DataManager.idForUriPath(pid) {
 			item = existingObjectWithID(itemId) as? ListableItem
 		}
 		if let i = item {
@@ -750,10 +750,10 @@ class ListableItem: DataItem {
 		}
 	}
 
-	final func setMute(_ mute: Bool) {
-		muted = mute
+	final func setMute(_ newValue: Bool) {
+		muted = newValue
 		postProcess()
-		if mute {
+		if newValue {
 			ListableItem.removeRelatedNotifications(uri: objectID.uriRepresentation().absoluteString)
 		}
 	}

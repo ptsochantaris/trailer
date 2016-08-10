@@ -159,13 +159,13 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			case .additionalActionClicked:
 				if #available(OSX 10.10, *) {
 					if notification.additionalActivationAction?.identifier == "mute" {
-						if let (_,i) = ListableItem.relatedItemsFromNotificationInfo(userInfo) {
+						if let (_,i) = ListableItem.relatedItems(from: userInfo) {
 							i.setMute(true)
 							saveAndRefresh(i)
 						}
 						break
 					} else if notification.additionalActivationAction?.identifier == "read" {
-						if let (_,i) = ListableItem.relatedItemsFromNotificationInfo(userInfo) {
+						if let (_,i) = ListableItem.relatedItems(from: userInfo) {
 							i.catchUpWithComments()
 							saveAndRefresh(i)
 						}
@@ -175,7 +175,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			case .actionButtonClicked, .contentsClicked:
 				var urlToOpen = userInfo[NOTIFICATION_URL_KEY] as? String
 				if urlToOpen == nil {
-					if let (c,i) = ListableItem.relatedItemsFromNotificationInfo(userInfo) {
+					if let (c,i) = ListableItem.relatedItems(from: userInfo) {
 						urlToOpen = c?.webUrl ?? i.webUrl
 						i.catchUpWithComments()
 						saveAndRefresh(i)
@@ -480,7 +480,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		guard let menuBarSet = menuBarSetForWindow(window) else { return }
 
 		let type = window === menuBarSet.prMenu ? "PullRequest" : "Issue"
-		let f = ListableItem.requestForItemsOfType(type, withFilter: window.filter.stringValue, sectionIndex: -1, criterion: menuBarSet.viewCriterion)
+		let f = ListableItem.requestForItems(ofType: type, withFilter: window.filter.stringValue, sectionIndex: -1, criterion: menuBarSet.viewCriterion)
 		for r in try! mainObjectContext.fetch(f) {
 			r.catchUpWithComments()
 		}
@@ -898,7 +898,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		let s = SnoozePreset.allSnoozePresets(in: mainObjectContext)
 		if s.count > snoozeIndex  {
 			let oldIndex = window.table.selectedRow
-			item.snoozeFromPreset(s[snoozeIndex])
+			item.snooze(using: s[snoozeIndex])
 			DataManager.saveDB()
 			updateRelatedMenusFor(item)
 			scrollToNearest(index: oldIndex, window: window, preferDown: true)

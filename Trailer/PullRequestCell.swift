@@ -14,8 +14,8 @@ final class PullRequestCell: TrailerCell {
 		let _commentsNew = pullRequest.unreadComments
 		let _commentsTotal = pullRequest.totalComments
 
-		let _title = pullRequest.titleWithFont(titleFont, labelFont: detailFont, titleColor: unselectedTitleColor)
-		let _subtitle = pullRequest.subtitleWithFont(detailFont, lightColor: NSColor.gray, darkColor: NSColor.darkGray)
+		let _title = pullRequest.title(with: titleFont, labelFont: detailFont, titleColor: unselectedTitleColor)
+		let _subtitle = pullRequest.subtitle(with: detailFont, lightColor: NSColor.gray, darkColor: NSColor.darkGray)
 
 		var W = MENU_WIDTH-LEFTPADDING-app.scrollBarWidth
 

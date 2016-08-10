@@ -12,7 +12,7 @@ final class TabBarSet {
 		let label = viewCriterion?.label
 		var items = [UITabBarItem]()
 
-		let prf = ListableItem.requestForItemsOfType("PullRequest", withFilter: nil, sectionIndex: -1, criterion: viewCriterion)
+		let prf = ListableItem.requestForItems(ofType: "PullRequest", withFilter: nil, sectionIndex: -1, criterion: viewCriterion)
 		if try! mainObjectContext.count(for: prf) > 0 {
 			let i = UITabBarItem(title: label ?? "Pull Requests", image: UIImage(named: "prsTab"), selectedImage: nil)
 			let prUnreadCount = PullRequest.badgeCount(in: mainObjectContext, criterion: viewCriterion)
@@ -20,7 +20,7 @@ final class TabBarSet {
 			items.append(i)
 			prItem = i
 		}
-		let isf = ListableItem.requestForItemsOfType("Issue", withFilter: nil, sectionIndex: -1, criterion: viewCriterion)
+		let isf = ListableItem.requestForItems(ofType: "Issue", withFilter: nil, sectionIndex: -1, criterion: viewCriterion)
 		if try! mainObjectContext.count(for: isf) > 0 {
 			let i = UITabBarItem(title: label ?? "Issues", image: UIImage(named: "issuesTab"), selectedImage: nil)
 			let issuesUnreadCount = Issue.badgeCount(in: mainObjectContext, criterion: viewCriterion)
@@ -969,7 +969,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		                          preferredStyle: singleColumn ? .actionSheet : .alert)
 		for preset in snoozePresets {
 			a.addAction(UIAlertAction(title: preset.listDescription, style: .default) { action in
-				i.snoozeFromPreset(preset)
+				i.snooze(using: preset)
 				DataManager.saveDB()
 			})
 		}
@@ -991,7 +991,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	private func createFetchRequest() -> NSFetchRequest<ListableItem> {
 		let type = viewingPrs ? "PullRequest" : "Issue"
-		return ListableItem.requestForItemsOfType(type, withFilter: searchBar.text, sectionIndex: -1, criterion: currentTabBarSet?.viewCriterion)
+		return ListableItem.requestForItems(ofType: type, withFilter: searchBar.text, sectionIndex: -1, criterion: currentTabBarSet?.viewCriterion)
 	}
 
 	func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
@@ -1114,7 +1114,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	private func pullRequestsTitle(long: Bool) -> String {
 
-		let f = ListableItem.requestForItemsOfType("PullRequest", withFilter: nil, sectionIndex: -1, criterion: currentTabBarSet?.viewCriterion)
+		let f = ListableItem.requestForItems(ofType: "PullRequest", withFilter: nil, sectionIndex: -1, criterion: currentTabBarSet?.viewCriterion)
 		let count = try! mainObjectContext.count(for: f)
 		let unreadCount = Int(currentTabBarSet?.prItem?.badgeValue ?? "0")!
 
@@ -1132,7 +1132,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	private func issuesTitle() -> String {
 
-		let f = ListableItem.requestForItemsOfType("Issue", withFilter: nil, sectionIndex: -1, criterion: currentTabBarSet?.viewCriterion)
+		let f = ListableItem.requestForItems(ofType: "Issue", withFilter: nil, sectionIndex: -1, criterion: currentTabBarSet?.viewCriterion)
 		let count = try! mainObjectContext.count(for: f)
 		let unreadCount = Int(currentTabBarSet?.issuesItem?.badgeValue ?? "0")!
 

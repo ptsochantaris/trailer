@@ -95,8 +95,8 @@ final class PRCell: UITableViewCell {
 
 
 		let detailFont = UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)
-		_title.attributedText = pullRequest.titleWithFont(_title.font, labelFont: detailFont.withSize(detailFont.pointSize-2), titleColor: UIColor.darkText)
-		_description.attributedText = pullRequest.subtitleWithFont(detailFont, lightColor: UIColor.lightGray, darkColor: UIColor.darkGray)
+		_title.attributedText = pullRequest.title(with: _title.font, labelFont: detailFont.withSize(detailFont.pointSize-2), titleColor: UIColor.darkText)
+		_description.attributedText = pullRequest.subtitle(with: detailFont, lightColor: UIColor.lightGray, darkColor: UIColor.darkGray)
 
 		let muted = pullRequest.muted
 		setCountsImageAndFade(item: pullRequest, muted: muted)
@@ -141,8 +141,8 @@ final class PRCell: UITableViewCell {
 	func setIssue(issue: Issue) {
 
 		let detailFont = UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)
-		_title.attributedText = issue.titleWithFont(_title.font, labelFont: detailFont.withSize(detailFont.pointSize-2), titleColor: UIColor.darkText)
-		_description.attributedText = issue.subtitleWithFont(detailFont, lightColor: UIColor.lightGray, darkColor: UIColor.darkGray)
+		_title.attributedText = issue.title(with: _title.font, labelFont: detailFont.withSize(detailFont.pointSize-2), titleColor: UIColor.darkText)
+		_description.attributedText = issue.subtitle(with: detailFont, lightColor: UIColor.lightGray, darkColor: UIColor.darkGray)
 		_statuses.attributedText = nil
 
 		statusToAvatarDistance.constant = 0.0

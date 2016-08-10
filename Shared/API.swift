@@ -261,14 +261,14 @@ final class API {
 				}
 			}
 
-			S.fetchIssuesForRepos(repos, in: moc) {
-				S.fetchCommentsForCurrentIssues(in: moc) {
+			S.fetchIssues(for: repos, to: moc) {
+				S.fetchCommentsForCurrentIssues(to: moc) {
 					S.checkIssueClosures(in: moc)
 					completionCallback()
 				}
 			}
 
-			S.fetchPullRequestsForRepos(repos, in: moc) {
+			S.fetchPullRequests(for: repos, to: moc) {
 				S.updatePullRequests(in: moc) {
 					completionCallback()
 				}
@@ -345,12 +345,12 @@ final class API {
 		}
 
 		if willScanForStatuses {
-			fetchStatusesForCurrentPullRequests(in: moc, callback: completionCallback)
+			fetchStatusesForCurrentPullRequests(to: moc, callback: completionCallback)
 		}
 		if willScanForLabels {
-			fetchLabelsForForCurrentPullRequests(in: moc, callback: completionCallback)
+			fetchLabelsForForCurrentPullRequests(to: moc, callback: completionCallback)
 		}
-		fetchCommentsForCurrentPullRequests(in: moc, callback: completionCallback)
+		fetchCommentsForCurrentPullRequests(to: moc, callback: completionCallback)
 		checkPrClosures(in: moc, callback: completionCallback)
 		detectAssignedPullRequests(in: moc, callback: completionCallback)
 	}
@@ -390,8 +390,8 @@ final class API {
 
 		for apiServer in allApiServers {
 			if apiServer.goodToGo && apiServer.lastSyncSucceeded {
-				markDirtyRepoIds(repoIdsToMarkDirty, usingUserEventsFromServer: apiServer, callback: completionCallback)
-				markDirtyRepoIds(repoIdsToMarkDirty, usingReceivedEventsFromServer: apiServer, callback: completionCallback)
+				markDirty(repoIds: repoIdsToMarkDirty, usingUserEventsFrom: apiServer, callback: completionCallback)
+				markDirty(repoIds: repoIdsToMarkDirty, usingReceivedEventsFrom: apiServer, callback: completionCallback)
 			} else {
 				completionCallback()
 				completionCallback()
@@ -399,7 +399,7 @@ final class API {
 		}
 	}
 
-	private func fetchUserTeams(server: ApiServer, callback: Completion) {
+	private func fetchUserTeams(from server: ApiServer, callback: Completion) {
 
 		for t in server.teams {
 			t.postSyncAction = PostSyncAction.delete.rawValue
@@ -419,24 +419,24 @@ final class API {
 		})
 	}
 
-	private func markDirtyRepoIds(_ repoIdsToMarkDirty: NSMutableSet, usingUserEventsFromServer s: ApiServer, callback: Completion) {
+	private func markDirty(repoIds toMarkDirty: NSMutableSet, usingUserEventsFrom server: ApiServer, callback: Completion) {
 
-		if !s.lastSyncSucceeded {
+		if !server.lastSyncSucceeded {
 			callback()
 			return
 		}
 
-		var latestDate = s.latestUserEventDateProcessed
+		var latestDate = server.latestUserEventDateProcessed
 		if latestDate == nil {
 			latestDate = Date.distantPast
-			s.latestUserEventDateProcessed = latestDate
+			server.latestUserEventDateProcessed = latestDate
 		}
 
-		let userName = S(s.userName)
-		let serverLabel = S(s.label)
+		let userName = S(server.userName)
+		let serverLabel = S(server.label)
 
 		getPagedDataInPath("/users/\(userName)/events",
-			server: s,
+			server: server,
 			startingFromPage: 1,
 			perPageCallback: { data, lastPage in
 				for d in data ?? [] {
@@ -444,10 +444,10 @@ final class API {
 					if latestDate! < eventDate {
 						if let repoId = d["repo"]?["id"] as? NSNumber {
 							DLog("(%@) New event at %@ from Repo ID %@", serverLabel, eventDate, repoId)
-							repoIdsToMarkDirty.add(repoId)
+							toMarkDirty.add(repoId)
 						}
-						if s.latestUserEventDateProcessed! < eventDate {
-							s.latestUserEventDateProcessed = eventDate
+						if server.latestUserEventDateProcessed! < eventDate {
+							server.latestUserEventDateProcessed = eventDate
 							if latestDate! == Date.distantPast {
 								DLog("(%@) First sync, all repos are dirty so we don't need to read further, we have the latest received event date: %@", serverLabel, eventDate)
 								return true
@@ -461,30 +461,30 @@ final class API {
 				return false
 			}, finalCallback: { success, resultCode in
 				if !success {
-					s.lastSyncSucceeded = false
+					server.lastSyncSucceeded = false
 				}
 				callback()
 		})
 	}
 
-	private func markDirtyRepoIds(_ repoIdsToMarkDirty: NSMutableSet, usingReceivedEventsFromServer s: ApiServer, callback: Completion) {
+	private func markDirty(repoIds toMarkDirty: NSMutableSet, usingReceivedEventsFrom server: ApiServer, callback: Completion) {
 
-		if !s.lastSyncSucceeded {
+		if !server.lastSyncSucceeded {
 			callback()
 			return
 		}
 
-		var latestDate = s.latestReceivedEventDateProcessed
+		var latestDate = server.latestReceivedEventDateProcessed
 		if latestDate == nil {
 			latestDate = Date.distantPast
-			s.latestReceivedEventDateProcessed = latestDate
+			server.latestReceivedEventDateProcessed = latestDate
 		}
 
-		let userName = S(s.userName)
-		let serverLabel = S(s.label)
+		let userName = S(server.userName)
+		let serverLabel = S(server.label)
 
 		getPagedDataInPath("/users/\(userName)/received_events",
-			server: s,
+			server: server,
 			startingFromPage: 1,
 			perPageCallback: { data, lastPage in
 				for d in data ?? [] {
@@ -492,10 +492,10 @@ final class API {
 					if latestDate! < eventDate {
 						if let repoId = d["repo"]?["id"] as? NSNumber {
 							DLog("(%@) New event at %@ from Repo ID %@", serverLabel, eventDate, repoId)
-							repoIdsToMarkDirty.add(repoId)
+							toMarkDirty.add(repoId)
 						}
-						if s.latestReceivedEventDateProcessed! < eventDate {
-							s.latestReceivedEventDateProcessed = eventDate
+						if server.latestReceivedEventDateProcessed! < eventDate {
+							server.latestReceivedEventDateProcessed = eventDate
 							if latestDate! == Date.distantPast {
 								DLog("(%@) First sync, all repos are dirty so we don't need to read further, we have the latest received event date: %@", serverLabel, eventDate)
 								return true
@@ -509,7 +509,7 @@ final class API {
 				return false
 			}, finalCallback: { success, resultCode in
 				if !success {
-					s.lastSyncSucceeded = false
+					server.lastSyncSucceeded = false
 				}
 				callback()
 		})
@@ -546,8 +546,8 @@ final class API {
 
 			for apiServer in allApiServers {
 				if apiServer.goodToGo {
-					self?.syncWatchedRepos(server: apiServer, callback: completionCallback)
-					self?.fetchUserTeams(server: apiServer, callback: completionCallback)
+					self?.syncWatchedRepos(from: apiServer, callback: completionCallback)
+					self?.fetchUserTeams(from: apiServer, callback: completionCallback)
 				} else {
 					completionCallback()
 					completionCallback()
@@ -556,7 +556,7 @@ final class API {
 		}
 	}
 
-	private func fetchPullRequestsForRepos(_ repos: [Repo], in moc: NSManagedObjectContext, callback: Completion) {
+	private func fetchPullRequests(for repos: [Repo], to moc: NSManagedObjectContext, callback: Completion) {
 
 		for r in Repo.unsyncableRepos(in: moc) {
 			for p in r.pullRequests {
@@ -588,7 +588,7 @@ final class API {
 						return false
 					}, finalCallback: { [weak self] success, resultCode in
 						if !success {
-							self?.handleRepoSyncFailure(r, withResultCode: resultCode)
+							self?.handleRepoSyncFailure(repo: r, resultCode: resultCode)
 						}
 						completionCount += 1
 						if completionCount==total {
@@ -604,24 +604,24 @@ final class API {
 		}
 	}
 
-	private func handleRepoSyncFailure(_ r: Repo, withResultCode: Int) {
-		if withResultCode == 404 { // repo disabled
-			r.inaccessible = true
-			r.postSyncAction = PostSyncAction.doNothing.rawValue
-			for p in r.pullRequests {
+	private func handleRepoSyncFailure(repo: Repo, resultCode: Int) {
+		if resultCode == 404 { // repo disabled
+			repo.inaccessible = true
+			repo.postSyncAction = PostSyncAction.doNothing.rawValue
+			for p in repo.pullRequests {
 				p.postSyncAction = PostSyncAction.delete.rawValue
 			}
-			for i in r.issues {
+			for i in repo.issues {
 				i.postSyncAction = PostSyncAction.delete.rawValue
 			}
-		} else if withResultCode==410 { // repo gone for good
-			r.postSyncAction = PostSyncAction.delete.rawValue
+		} else if resultCode==410 { // repo gone for good
+			repo.postSyncAction = PostSyncAction.delete.rawValue
 		} else { // fetch problem
-			r.apiServer.lastSyncSucceeded = false
+			repo.apiServer.lastSyncSucceeded = false
 		}
 	}
 
-	private func fetchIssuesForRepos(_ repos: [Repo], in moc: NSManagedObjectContext, callback: Completion) {
+	private func fetchIssues(for repos: [Repo], to moc: NSManagedObjectContext, callback: Completion) {
 
 		for r in Repo.unsyncableRepos(in: moc) {
 			for i in r.issues {
@@ -653,7 +653,7 @@ final class API {
 						return false
 					}, finalCallback: { [weak self] success, resultCode in
 						if !success {
-							self?.handleRepoSyncFailure(r, withResultCode: resultCode)
+							self?.handleRepoSyncFailure(repo: r, resultCode: resultCode)
 						}
 						completionCount += 1
 						if completionCount==total {
@@ -669,7 +669,7 @@ final class API {
 		}
 	}
 
-	private func fetchCommentsForCurrentPullRequests(in moc: NSManagedObjectContext, callback: Completion) {
+	private func fetchCommentsForCurrentPullRequests(to moc: NSManagedObjectContext, callback: Completion) {
 
 		let prs = (DataItem.newOrUpdatedItems(ofType: "PullRequest", in: moc) as! [PullRequest]).filter({ pr in
 			return pr.apiServer.lastSyncSucceeded
@@ -734,7 +734,7 @@ final class API {
 		}
 	}
 
-	private func fetchCommentsForCurrentIssues(in moc: NSManagedObjectContext, callback: Completion) {
+	private func fetchCommentsForCurrentIssues(to moc: NSManagedObjectContext, callback: Completion) {
 
 		let allIssues = DataItem.newOrUpdatedItems(ofType: "Issue", in: moc) as! [Issue]
 
@@ -784,7 +784,7 @@ final class API {
 		}
 	}
 
-	private func fetchLabelsForForCurrentPullRequests(in moc: NSManagedObjectContext, callback: Completion) {
+	private func fetchLabelsForForCurrentPullRequests(to moc: NSManagedObjectContext, callback: Completion) {
 
 		let prs = PullRequest.active(in: moc, visibleOnly: true).filter { [weak self] pr in
 			if !pr.apiServer.lastSyncSucceeded {
@@ -854,7 +854,7 @@ final class API {
 		}
 	}
 
-	private func fetchStatusesForCurrentPullRequests(in moc: NSManagedObjectContext, callback: Completion) {
+	private func fetchStatusesForCurrentPullRequests(to moc: NSManagedObjectContext, callback: Completion) {
 
 		let prs = PullRequest.active(in: moc, visibleOnly: !Settings.hidePrsThatArentPassing).filter { [unowned self] pr in
 			if !pr.apiServer.lastSyncSucceeded {
@@ -1066,9 +1066,9 @@ final class API {
 		let mergedByMe = byUserId == myUserId
 		if !(mergedByMe && Settings.dontKeepPrsMergedByMe) {
 			DLog("Checking if we want to keep this merged PR")
-			if r.shouldKeepForPolicy(Settings.mergeHandlingPolicy) {
+			if r.shouldKeep(accordingTo: Settings.mergeHandlingPolicy) {
 				DLog("Will keep merged PR")
-				r.keepWithCondition(.merged, notification: .prMerged)
+				r.keep(as: .merged, notification: .prMerged)
 				return
 			}
 		}
@@ -1086,15 +1086,15 @@ final class API {
             return
         }
 
-		if i.shouldKeepForPolicy(Settings.closeHandlingPolicy) {
+		if i.shouldKeep(accordingTo: Settings.closeHandlingPolicy) {
 			DLog("Will keep closed item")
-			i.keepWithCondition(.closed, notification: i is Issue ? .issueClosed : .prClosed)
+			i.keep(as: .closed, notification: i is Issue ? .issueClosed : .prClosed)
 		} else {
 			DLog("Will not keep closed item")
 		}
 	}
 
-	private func getRateLimit(server: ApiServer, callback: (Int64, Int64, Int64)->Void)
+	private func getRateLimit(from server: ApiServer, callback: (Int64, Int64, Int64)->Void)
 	{
 		api("/rate_limit", server: server, ignoreLastSync: true) { code, headers, data, error, shouldRetry in
 
@@ -1120,7 +1120,7 @@ final class API {
 		var count = 0
 		for apiServer in allApiServers {
 			if apiServer.goodToGo {
-				getRateLimit(server: apiServer) { remaining, limit, reset in
+				getRateLimit(from: apiServer) { remaining, limit, reset in
 					apiServer.requestsRemaining = remaining
 					apiServer.requestsLimit = limit
 					count += 1
@@ -1156,7 +1156,7 @@ final class API {
 		}
 	}
 
-	private func syncWatchedRepos(server: ApiServer, callback: Completion) {
+	private func syncWatchedRepos(from server: ApiServer, callback: Completion) {
 
 		if !server.lastSyncSucceeded {
 			callback()
@@ -1165,7 +1165,7 @@ final class API {
 
 		getPagedDataInPath("/user/subscriptions", server: server, startingFromPage: 1,
 			perPageCallback: { data, lastPage in
-				Repo.syncReposFromInfo(data, server: server)
+				Repo.syncRepos(from: data, server: server)
 				return false
 
 			}, finalCallback: { success, resultCode in

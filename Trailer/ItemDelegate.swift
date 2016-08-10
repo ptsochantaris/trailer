@@ -36,7 +36,7 @@ final class ItemDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 
 		itemIds.removeAll(keepingCapacity: false)
 
-		let f = ListableItem.requestForItemsOfType(type, withFilter: filter, sectionIndex: -1, criterion: viewCriterion)
+		let f = ListableItem.requestForItems(ofType: type, withFilter: filter, sectionIndex: -1, criterion: viewCriterion)
 		f.resultType = .dictionaryResultType
 		f.fetchBatchSize = 0
 		f.propertiesToFetch = _propertiesToFetch

@@ -100,9 +100,9 @@ final class MenuBarSet {
 		let preFilterCount: Int
 
 		if Settings.countOnlyListedItems {
-			let f = ListableItem.requestForItemsOfType(type, withFilter: menu.filter.stringValue, sectionIndex: -1, criterion: viewCriterion)
+			let f = ListableItem.requestForItems(ofType: type, withFilter: menu.filter.stringValue, sectionIndex: -1, criterion: viewCriterion)
 			countString = somethingFailed ? "X" : String(try! mainObjectContext.count(for: f))
-			let fc = ListableItem.requestForItemsOfType(type, withFilter: nil, sectionIndex: -1, criterion: viewCriterion)
+			let fc = ListableItem.requestForItems(ofType: type, withFilter: nil, sectionIndex: -1, criterion: viewCriterion)
 			preFilterCount = try! mainObjectContext.count(for: fc)
 		} else {
 			preFilterCount = totalCount()

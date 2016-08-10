@@ -17,7 +17,7 @@ final class Repo: DataItem {
 	@NSManaged var issues: Set<Issue>
 	@NSManaged var ownerId: Int64
 
-	class func syncReposFromInfo(_ data: [[NSObject : AnyObject]]?, server: ApiServer) {
+	class func syncRepos(from data: [[NSObject : AnyObject]]?, server: ApiServer) {
 		var filteredData = [[NSObject : AnyObject]]()
 		for info in data ?? [] {
 			if (info["private"] as? NSNumber)?.boolValue ?? false {
@@ -65,7 +65,7 @@ final class Repo: DataItem {
 		lastDirtied = Date.distantPast
 	}
 
-	class func reposForGroup(_ group: String, in moc: NSManagedObjectContext) -> [Repo] {
+	class func repos(for group: String, in moc: NSManagedObjectContext) -> [Repo] {
 		let f = NSFetchRequest<Repo>(entityName: "Repo")
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "groupLabel == %@", group)
@@ -87,7 +87,7 @@ final class Repo: DataItem {
 				let rp = NSPredicate(format: "groupLabel == %@", g)
 				f.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [rp, p])
 			} else {
-				let ep = c.addCriterionToPredicate(p, in: moc)
+				let ep = c.addCriterion(to: p, in: moc)
 				if excludeGrouped {
 					f.predicate = excludeGroupedRepos(ep)
 				} else {

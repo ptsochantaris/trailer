@@ -14,8 +14,8 @@ final class IssueCell: TrailerCell {
 		let _commentsNew = issue.unreadComments
 		let _commentsTotal = issue.totalComments
 
-		let _title = issue.titleWithFont(titleFont, labelFont: detailFont, titleColor: unselectedTitleColor)
-		let _subtitle = issue.subtitleWithFont(detailFont, lightColor: NSColor.gray, darkColor: NSColor.darkGray)
+		let _title = issue.title(with: titleFont, labelFont: detailFont, titleColor: unselectedTitleColor)
+		let _subtitle = issue.subtitle(with: detailFont, lightColor: NSColor.gray, darkColor: NSColor.darkGray)
 
 		var W = MENU_WIDTH-LEFTPADDING-app.scrollBarWidth
 

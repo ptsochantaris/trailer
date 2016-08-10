@@ -44,7 +44,7 @@ final class PRComment: DataItem {
 
 	func processNotifications() {
 		if let item = pullRequest ?? issue, item.postSyncAction == PostSyncAction.noteUpdated.rawValue && item.isVisibleOnMenu {
-			if containsTerms(terms: ["@\(apiServer.userName!)"]) {
+			if contains(terms: ["@\(apiServer.userName!)"]) {
 				if item.isSnoozing && item.shouldWakeOnMention {
 					DLog("Waking up snoozed item ID %lld because of mention", item.serverId)
 					item.wakeUp()
@@ -107,7 +107,7 @@ final class PRComment: DataItem {
 		return userId == apiServer.userId
 	}
 
-	final func containsTerms(terms: [String]) -> Bool {
+	final func contains(terms: [String]) -> Bool {
 		if let b = body {
 			for t in terms {
 				if b.localizedCaseInsensitiveContains(t) {

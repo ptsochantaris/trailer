@@ -48,9 +48,9 @@ class TrailerCell: NSTableCellView {
 
 			let item = associatedDataItem()
 			if let pr = item as? PullRequest {
-				title.attributedStringValue = pr.titleWithFont(titleFont, labelFont: detailFont, titleColor: finalColor)
+				title.attributedStringValue = pr.title(with: titleFont, labelFont: detailFont, titleColor: finalColor)
 			} else if let issue = item as? Issue {
-				title.attributedStringValue = issue.titleWithFont(titleFont, labelFont: detailFont, titleColor: finalColor)
+				title.attributedStringValue = issue.title(with: titleFont, labelFont: detailFont, titleColor: finalColor)
 			}
 			highlight(selected)
 		}
@@ -166,7 +166,7 @@ class TrailerCell: NSTableCellView {
 
 	func snoozeSelected(_ sender: NSMenuItem) {
 		if let item = associatedDataItem(), let oid = sender.representedObject as? NSManagedObjectID, let snoozeItem = existingObjectWithID(oid) as? SnoozePreset {
-			item.snoozeFromPreset(snoozeItem)
+			item.snooze(using: snoozeItem)
 			saveAndRequestMenuUpdate(item)
 		}
 	}

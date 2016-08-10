@@ -136,10 +136,10 @@ class DataItem: NSManagedObject {
 		return try! moc.count(for: f)
 	}
 
-	class func addCriterion<T: ListableItem>(_ criterion: GroupingCriterion?, toFetchRequest: NSFetchRequest<T>, originalPredicate: NSPredicate, in moc: NSManagedObjectContext, includeAllGroups: Bool = false) {
+	class func add<T: ListableItem>(criterion: GroupingCriterion?, toFetchRequest: NSFetchRequest<T>, originalPredicate: NSPredicate, in moc: NSManagedObjectContext, includeAllGroups: Bool = false) {
 		var andPredicates = [NSPredicate]()
 		if let c = criterion {
-			andPredicates.append(c.addCriterionToPredicate(originalPredicate, in: moc))
+			andPredicates.append(c.addCriterion(to: originalPredicate, in: moc))
 		} else {
 			andPredicates.append(originalPredicate)
 		}
