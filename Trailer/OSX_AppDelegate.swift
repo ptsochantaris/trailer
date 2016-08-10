@@ -339,14 +339,14 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 	}
 
-	func showMenu(_ menu: MenuWindow) {
+	func show(menu: MenuWindow) {
 		if !menu.isVisible {
 
 			if let w = visibleWindow() {
 				w.closeMenu()
 			}
 
-			menu.sizeAndShow(true)
+			menu.size(andShow: true)
 		}
 	}
 
@@ -397,7 +397,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				}
 			}
 			if !menuBarSet.prMenu.isVisible {
-				showMenu(menuBarSet.prMenu)
+				show(menu: menuBarSet.prMenu)
 			}
 		} else if inMenu === menuBarSet.issuesMenu {
 			if headerTitle == Section.closed.issuesMenuName() {
@@ -422,7 +422,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				}
 			}
 			if !menuBarSet.issuesMenu.isVisible {
-				showMenu(menuBarSet.issuesMenu)
+				show(menu: menuBarSet.issuesMenu)
 			}
 		}
 	}
@@ -794,10 +794,10 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 						let newStatusItem = statusItems[nextIndex]
 						for s in S.menuBarSets {
 							if s.prMenu.statusItem === newStatusItem {
-								S.showMenu(s.prMenu)
+								S.show(menu: s.prMenu)
 								break
 							} else if s.issuesMenu.statusItem === newStatusItem {
-								S.showMenu(s.issuesMenu)
+								S.show(menu: s.issuesMenu)
 								break
 							}
 						}
@@ -959,9 +959,9 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 		if check==4, let n = keyMap[Settings.hotkeyLetter], incomingEvent.keyCode == UInt16(n) {
 			if Repo.interestedInPrs() {
-				showMenu(menuBarSets.first!.prMenu)
+				show(menu: menuBarSets.first!.prMenu)
 			} else if Repo.interestedInIssues() {
-				showMenu(menuBarSets.first!.issuesMenu)
+				show(menu: menuBarSets.first!.issuesMenu)
 			}
 			return true
 		}

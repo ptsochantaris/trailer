@@ -97,7 +97,7 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
 
 	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		if repo == nil {
-			let repos = Repo.allItemsOfType("Repo", in: mainObjectContext) as! [Repo]
+			let repos = Repo.allItems(ofType: "Repo", in: mainObjectContext) as! [Repo]
 			if indexPath.section == 0 {
 				allPrsIndex = indexPath.row
 				for r in repos {

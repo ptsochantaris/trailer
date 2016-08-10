@@ -87,7 +87,7 @@ final class MenuWindow: NSWindow {
 			statusItem = NSStatusBar.system().statusItem(withLength: NSVariableStatusItemLength)
 			statusItem!.view = StatusItemView { [weak self] in
 				if let S = self {
-					if S.isVisible { S.closeMenu() } else { app.showMenu(S) }
+					if S.isVisible { S.closeMenu() } else { app.show(menu: S) }
 				}
 			}
 		}
@@ -134,7 +134,7 @@ final class MenuWindow: NSWindow {
 	}
 
 	@IBAction func refreshSelected(_ sender: NSMenuItem) {
-		if Repo.countItemsOfType("Repo", in: mainObjectContext) == 0 {
+		if Repo.countItems(ofType: "Repo", in: mainObjectContext) == 0 {
 			app.preferencesSelected()
 			return
 		}
@@ -145,7 +145,7 @@ final class MenuWindow: NSWindow {
 		app.showAboutWindow()
 	}
 
-	func sizeAndShow(_ show: Bool) {
+	func size(andShow makeVisible: Bool) {
 
 		guard let siv = statusItem?.view as? StatusItemView else { return }
 		guard let windowFrame = siv.window?.frame else { return }
@@ -192,7 +192,7 @@ final class MenuWindow: NSWindow {
 
 		setFrame(CGRect(x: menuLeft, y: bottom, width: MENU_WIDTH, height: menuHeight), display: false, animate: false)
 
-		if show {
+		if makeVisible {
 			siv.highlighted = true
 			table.deselectAll(nil)
 			app.openingWindow = true

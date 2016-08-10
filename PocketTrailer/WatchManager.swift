@@ -313,25 +313,25 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 			let c = tabSet.viewCriterion
 
-			let myPrs = countsForType(type: "PullRequest", inSection: .mine, criterion: c)
-			let participatedPrs = countsForType(type: "PullRequest", inSection: .participated, criterion: c)
-			let mentionedPrs = countsForType(type: "PullRequest", inSection: .mentioned, criterion: c)
-			let mergedPrs = countsForType(type: "PullRequest", inSection: .merged, criterion: c)
-			let closedPrs = countsForType(type: "PullRequest", inSection: .closed, criterion: c)
-			let otherPrs = countsForType(type: "PullRequest", inSection: .all, criterion: c)
-			let snoozedPrs = countsForType(type: "PullRequest", inSection: .snoozed, criterion: c)
+			let myPrs = counts(forType: "PullRequest", inSection: .mine, criterion: c)
+			let participatedPrs = counts(forType: "PullRequest", inSection: .participated, criterion: c)
+			let mentionedPrs = counts(forType: "PullRequest", inSection: .mentioned, criterion: c)
+			let mergedPrs = counts(forType: "PullRequest", inSection: .merged, criterion: c)
+			let closedPrs = counts(forType: "PullRequest", inSection: .closed, criterion: c)
+			let otherPrs = counts(forType: "PullRequest", inSection: .all, criterion: c)
+			let snoozedPrs = counts(forType: "PullRequest", inSection: .snoozed, criterion: c)
 			let totalPrs = [ myPrs, participatedPrs, mentionedPrs, mergedPrs, closedPrs, otherPrs, snoozedPrs ].reduce(0, { $0 + $1["total"]! })
-			let totalOpenPrs = countOpenAndVisibleForType(type: "PullRequest", criterion: c)
+			let totalOpenPrs = countOpenAndVisible(ofType: "PullRequest", criterion: c)
 			let unreadPrCount = PullRequest.badgeCount(in: mainObjectContext, criterion: c)
 
-			let myIssues = countsForType(type: "Issue", inSection: .mine, criterion: c)
-			let participatedIssues = countsForType(type: "Issue", inSection: .participated, criterion: c)
-			let mentionedIssues = countsForType(type: "Issue", inSection: .mentioned, criterion: c)
-			let closedIssues = countsForType(type: "Issue", inSection: .closed, criterion: c)
-			let otherIssues = countsForType(type: "Issue", inSection: .all, criterion: c)
-			let snoozedIssues = countsForType(type: "Issue", inSection: .snoozed, criterion: c)
+			let myIssues = counts(forType: "Issue", inSection: .mine, criterion: c)
+			let participatedIssues = counts(forType: "Issue", inSection: .participated, criterion: c)
+			let mentionedIssues = counts(forType: "Issue", inSection: .mentioned, criterion: c)
+			let closedIssues = counts(forType: "Issue", inSection: .closed, criterion: c)
+			let otherIssues = counts(forType: "Issue", inSection: .all, criterion: c)
+			let snoozedIssues = counts(forType: "Issue", inSection: .snoozed, criterion: c)
 			let totalIssues = [ myIssues, participatedIssues, mentionedIssues, closedIssues, otherIssues, snoozedIssues ].reduce(0, { $0 + $1["total"]! })
-			let totalOpenIssues = countOpenAndVisibleForType(type: "Issue", criterion: c)
+			let totalOpenIssues = countOpenAndVisible(ofType: "Issue", criterion: c)
 			let unreadIssueCount = Issue.badgeCount(in: mainObjectContext, criterion: c)
 
 			views.append([
@@ -358,33 +358,33 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		]
 	}
 
-	private func countsForType(type: String, inSection: Section, criterion: GroupingCriterion?) -> [String : Int] {
-		return ["total": countItemsForType(type: type, inSection: inSection, criterion: criterion),
-		        "unread": badgeCountForType(type: type, inSection: inSection, criterion: criterion)]
+	private func counts(forType type: String, inSection: Section, criterion: GroupingCriterion?) -> [String : Int] {
+		return ["total": countItems(ofType: type, inSection: inSection, criterion: criterion),
+		        "unread": badgeCount(forType: type, inSection: inSection, criterion: criterion)]
 	}
 
-	private func countAllItemsOfType(type: String, criterion: GroupingCriterion?) -> Int {
+	private func countallItems(ofType type: String, criterion: GroupingCriterion?) -> Int {
 		let f = NSFetchRequest<ListableItem>(entityName: type)
 		let p = Settings.hideUncommentedItems ? NSPredicate(format: "sectionIndex > 0 and unreadComments > 0") : NSPredicate(format: "sectionIndex > 0")
 		DataItem.addCriterion(criterion, toFetchRequest: f, originalPredicate: p, in: mainObjectContext)
 		return try! mainObjectContext.count(for: f)
 	}
 
-	private func countItemsForType(type: String, inSection: Section, criterion: GroupingCriterion?) -> Int {
+	private func countItems(ofType type: String, inSection: Section, criterion: GroupingCriterion?) -> Int {
 		let f = NSFetchRequest<ListableItem>(entityName: type)
 		let p = Settings.hideUncommentedItems ? NSPredicate(format: "sectionIndex == %lld and unreadComments > 0", inSection.rawValue) : NSPredicate(format: "sectionIndex == %d", inSection.rawValue)
 		DataItem.addCriterion(criterion, toFetchRequest: f, originalPredicate: p, in: mainObjectContext)
 		return try! mainObjectContext.count(for: f)
 	}
 
-	private func badgeCountForType(type: String, inSection: Section, criterion: GroupingCriterion?) -> Int {
+	private func badgeCount(forType type: String, inSection: Section, criterion: GroupingCriterion?) -> Int {
 		let f = NSFetchRequest<ListableItem>(entityName: type)
 		let p = NSPredicate(format: "sectionIndex == %lld and unreadComments > 0", inSection.rawValue)
 		DataItem.addCriterion(criterion, toFetchRequest: f, originalPredicate: p, in: mainObjectContext)
 		return ListableItem.badgeCountFromFetch(f, in: mainObjectContext)
 	}
 
-	private func countOpenAndVisibleForType(type: String, criterion: GroupingCriterion?) -> Int {
+	private func countOpenAndVisible(ofType type: String, criterion: GroupingCriterion?) -> Int {
 		let f = NSFetchRequest<ListableItem>(entityName: type)
 		let p = Settings.hideUncommentedItems ? NSPredicate(format: "sectionIndex > 0 and (condition == %lld or condition == nil) and unreadComments > 0", ItemCondition.open.rawValue) : NSPredicate(format: "sectionIndex > 0 and (condition == %lld or condition == nil)", ItemCondition.open.rawValue)
 		DataItem.addCriterion(criterion, toFetchRequest: f, originalPredicate: p, in: mainObjectContext)

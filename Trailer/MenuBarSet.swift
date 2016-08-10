@@ -142,7 +142,7 @@ final class MenuBarSet {
 			menu.messageView = MessageView(frame: CGRect(x: 0, y: 0, width: MENU_WIDTH, height: 100), message: reasonForEmpty(menu.filter.stringValue))
 		}
 
-		menu.sizeAndShow(false)
+		menu.size(andShow: false)
 	}
 
 	func updateIssuesMenu() {

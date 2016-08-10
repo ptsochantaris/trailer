@@ -63,7 +63,7 @@ final class ApiServer: NSManagedObject {
 
 	class func resetSyncOfEverything() {
 		DLog("RESETTING SYNC STATE OF ALL ITEMS")
-		for r in DataItem.allItemsOfType("Repo", in: mainObjectContext) as! [Repo] {
+		for r in DataItem.allItems(ofType: "Repo", in: mainObjectContext) as! [Repo] {
 			for p in r.pullRequests {
 				p.resetSyncState()
 			}

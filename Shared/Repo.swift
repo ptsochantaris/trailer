@@ -106,9 +106,9 @@ final class Repo: DataItem {
 	class func interestedInIssues(_ apiServerId: NSManagedObjectID? = nil) -> Bool {
 		let all: [Repo]
 		if let aid = apiServerId, let a = existingObjectWithID(aid) as? ApiServer {
-			all = Repo.allItemsOfType("Repo", server: a) as! [Repo]
+			all = Repo.allItems(ofType: "Repo", server: a) as! [Repo]
 		} else {
-			all = Repo.allItemsOfType("Repo", in: mainObjectContext) as! [Repo]
+			all = Repo.allItems(ofType: "Repo", in: mainObjectContext) as! [Repo]
 		}
 		for r in all {
 			if r.displayPolicyForIssues > 0 {
@@ -121,9 +121,9 @@ final class Repo: DataItem {
 	class func interestedInPrs(_ apiServerId: NSManagedObjectID? = nil) -> Bool {
 		let all: [Repo]
 		if let aid = apiServerId, let a = existingObjectWithID(aid) as? ApiServer {
-			all = Repo.allItemsOfType("Repo", server: a) as! [Repo]
+			all = Repo.allItems(ofType: "Repo", server: a) as! [Repo]
 		} else {
-			all = Repo.allItemsOfType("Repo", in: mainObjectContext) as! [Repo]
+			all = Repo.allItems(ofType: "Repo", in: mainObjectContext) as! [Repo]
 		}
 		for r in all {
 			if r.displayPolicyForPrs > 0 {
@@ -134,7 +134,7 @@ final class Repo: DataItem {
 	}
 
 	class var allGroupLabels: [String] {
-		let allRepos = allItemsOfType("Repo", in: mainObjectContext) as! [Repo]
+		let allRepos = allItems(ofType: "Repo", in: mainObjectContext) as! [Repo]
 		let labels = allRepos.flatMap { $0.shouldSync ? $0.groupLabel : nil }
 		return Set<String>(labels).sorted()
 	}

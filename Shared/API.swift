@@ -295,13 +295,13 @@ final class API {
 			CacheEntry.cleanOldEntries(in: moc)
 		}
 
-		for r in DataItem.itemsOfType("PullRequest", surviving: true, in: moc) as! [PullRequest] {
+		for r in DataItem.items(ofType: "PullRequest", surviving: true, in: moc) as! [PullRequest] {
 			mainQueue.addOperation {
 				r.postProcess()
 			}
 		}
 
-		for i in DataItem.itemsOfType("Issue", surviving: true, in: moc) as! [Issue] {
+		for i in DataItem.items(ofType: "Issue", surviving: true, in: moc) as! [Issue] {
 			mainQueue.addOperation {
 				i.postProcess()
 			}
@@ -521,7 +521,7 @@ final class API {
 		clearAllBadLinks() // otherwise inaccessible repos may get a cached error response, even if they have become available
 
 		syncUserDetails(in: moc) { [weak self] in
-			for r in DataItem.itemsOfType("Repo", surviving: true, in: moc) as! [Repo] {
+			for r in DataItem.items(ofType: "Repo", surviving: true, in: moc) as! [Repo] {
 				r.postSyncAction = PostSyncAction.delete.rawValue
 			}
 
@@ -532,7 +532,7 @@ final class API {
 			let completionCallback: Completion = {
 				completionCount += 1
 				if completionCount == totalOperations {
-					for r in DataItem.newItemsOfType("Repo", in: moc) as! [Repo] {
+					for r in DataItem.newItems(ofType: "Repo", in: moc) as! [Repo] {
 						r.displayPolicyForPrs = Int64(Settings.displayPolicyForNewPrs)
 						r.displayPolicyForIssues = Int64(Settings.displayPolicyForNewIssues)
 						if r.shouldSync {
@@ -671,7 +671,7 @@ final class API {
 
 	private func fetchCommentsForCurrentPullRequests(in moc: NSManagedObjectContext, callback: Completion) {
 
-		let prs = (DataItem.newOrUpdatedItemsOfType("PullRequest", in: moc) as! [PullRequest]).filter({ pr in
+		let prs = (DataItem.newOrUpdatedItems(ofType: "PullRequest", in: moc) as! [PullRequest]).filter({ pr in
 			return pr.apiServer.lastSyncSucceeded
 		})
 		if prs.count==0 {
@@ -736,7 +736,7 @@ final class API {
 
 	private func fetchCommentsForCurrentIssues(in moc: NSManagedObjectContext, callback: Completion) {
 
-		let allIssues = DataItem.newOrUpdatedItemsOfType("Issue", in: moc) as! [Issue]
+		let allIssues = DataItem.newOrUpdatedItems(ofType: "Issue", in: moc) as! [Issue]
 
 		for i in allIssues {
 			for c in i.comments {
@@ -965,7 +965,7 @@ final class API {
 
 	private func detectAssignedPullRequests(in moc: NSManagedObjectContext, callback: Completion) {
 
-		let prs = (DataItem.newOrUpdatedItemsOfType("PullRequest", in: moc) as! [PullRequest]).filter({ pr in
+		let prs = (DataItem.newOrUpdatedItems(ofType: "PullRequest", in: moc) as! [PullRequest]).filter({ pr in
 			return pr.apiServer.lastSyncSucceeded
 		})
 		if prs.count==0 {
@@ -1137,7 +1137,7 @@ final class API {
 			return true
 		} else {
 			refreshesSinceLastStatusCheck.removeAll()
-			for s in DataItem.allItemsOfType("PRStatus", in: moc) {
+			for s in DataItem.allItems(ofType: "PRStatus", in: moc) {
 				s.postSyncAction = PostSyncAction.delete.rawValue
 			}
 			return false
@@ -1149,7 +1149,7 @@ final class API {
 			return true
 		} else {
 			refreshesSinceLastLabelsCheck.removeAll()
-			for l in DataItem.allItemsOfType("PRLabel", in: moc) {
+			for l in DataItem.allItems(ofType: "PRLabel", in: moc) {
 				l.postSyncAction = PostSyncAction.delete.rawValue
 			}
 			return false

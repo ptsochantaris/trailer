@@ -1396,10 +1396,10 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBAction func autoSnoozeDurationChanged(_ sender: NSStepper) {
 		Settings.autoSnoozeDuration = sender.integerValue
 		fillSnoozingDropdowns()
-		for p in DataItem.allItemsOfType("PullRequest", in: mainObjectContext) as! [PullRequest] {
+		for p in DataItem.allItems(ofType: "PullRequest", in: mainObjectContext) as! [PullRequest] {
 			p.wakeIfAutoSnoozed()
 		}
-		for i in DataItem.allItemsOfType("Issue", in: mainObjectContext) as! [Issue] {
+		for i in DataItem.allItems(ofType: "Issue", in: mainObjectContext) as! [Issue] {
 			i.wakeIfAutoSnoozed()
 		}
 		DataManager.postProcessAllItems()
