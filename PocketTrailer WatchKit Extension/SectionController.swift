@@ -15,10 +15,6 @@ final class SectionController: CommonController {
 		_statusLabel = statusLabel
 		_table = table
 		super.awake(withContext: context)
-	}
-
-	override func willActivate() {
-		super.willActivate()
 		updateUI()
 	}
 
@@ -130,38 +126,53 @@ final class SectionController: CommonController {
 			}
 		}
 
-		if let result = WCSession.default().receivedApplicationContext["overview"] as? [String : AnyObject],
-			let views = result["views"] as? [[String : AnyObject]] {
-
-			let showEmptyDescriptions = views.count == 1
-
-			let s = SummaryRow()
-			if s.setSummary(result) {
-				rowControllers.append(s)
-			}
-
-			for v in views {
-				let label = v["title"] as! String
-				let apiServerUri = v["apiUri"] as! String
-				addSectionsFor(v, itemType: "prs", label: label, apiServerUri: apiServerUri, header: "Pull Requests", showEmptyDescriptions: showEmptyDescriptions)
-				addSectionsFor(v, itemType: "issues", label: label, apiServerUri: apiServerUri, header: "Issues", showEmptyDescriptions: showEmptyDescriptions)
-			}
-
-			let rowTypes = rowControllers.map { $0.rowType() }
-			table.setRowTypes(rowTypes)
-
-			var index = 0
-			for rc in rowControllers {
-				if let c = table.rowController(at: index) as? PopulatableRow {
-					c.populateFrom(rc)
+		let session = WCSession.default()
+		guard let result = session.receivedApplicationContext["overview"] as? [String : AnyObject] else {
+			if session.iOSDeviceNeedsUnlockAfterRebootForReachability {
+				showStatus("Can't connect: To re-establish your secure connection, please unlock your iOS device.", hideTable: true)
+			} else {
+				switch session.activationState {
+				case .activated:
+					showStatus("Loading...", hideTable: true)
+				case .inactive:
+					showStatus("Connecting...", hideTable: true)
+				case .notActivated:
+					showStatus("Can't connect to Trailer on your iOS device.", hideTable: true)
 				}
-				index += 1
 			}
-
-			showStatus("", hideTable: false)
-			(WKExtension.shared().delegate as! ExtensionDelegate).updateComplications()
-		} else {
-			showStatus("There is no data from Trailer yet, please run it once on your iOS device", hideTable: true)
+			return
 		}
+
+		guard let views = result["views"] as? [[String : AnyObject]] else {
+			showStatus("There is no data from Trailer on your iOS device yet. Please launch it once and configure your settings.", hideTable: true)
+			return
+		}
+
+		let showEmptyDescriptions = views.count == 1
+
+		let s = SummaryRow()
+		if s.setSummary(result) {
+			rowControllers.append(s)
+		}
+
+		for v in views {
+			let label = v["title"] as! String
+			let apiServerUri = v["apiUri"] as! String
+			addSectionsFor(v, itemType: "prs", label: label, apiServerUri: apiServerUri, header: "Pull Requests", showEmptyDescriptions: showEmptyDescriptions)
+			addSectionsFor(v, itemType: "issues", label: label, apiServerUri: apiServerUri, header: "Issues", showEmptyDescriptions: showEmptyDescriptions)
+		}
+
+		let rowTypes = rowControllers.map { $0.rowType() }
+		table.setRowTypes(rowTypes)
+
+		var index = 0
+		for rc in rowControllers {
+			if let c = table.rowController(at: index) as? PopulatableRow {
+				c.populateFrom(rc)
+			}
+			index += 1
+		}
+
+		showStatus("", hideTable: false)
 	}
 }

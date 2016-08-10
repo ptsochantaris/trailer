@@ -35,7 +35,6 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 
 	func applicationDidBecomeActive() {
 		session.activate()
-		updateComplications()
 	}
 
 	func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
@@ -69,6 +68,7 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 					lastView?.popToRootController()
 					(lastView as? SectionController)?.resetUI()
 				}
+				updateComplications()
 				t.setTaskCompleted(restoredDefaultState: t.returnToDefaultState, estimatedSnapshotExpiration: Date.distantFuture, userInfo: nil)
 			} else {
 				task.setTaskCompleted()
@@ -76,7 +76,7 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 		}
 	}
 
-	func updateComplications() {
+	private func updateComplications() {
 		let complicationServer = CLKComplicationServer.sharedInstance()
 		if let activeComplications = complicationServer.activeComplications {
 			for complication in activeComplications {

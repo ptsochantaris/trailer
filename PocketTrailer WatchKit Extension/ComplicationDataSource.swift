@@ -44,7 +44,7 @@ final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 		var prCount = 0
 		var issueCount = 0
 		var commentCount = 0
-		for r in overview["views"] as! [[String : AnyObject]] {
+		for r in overview["views"] as? [[String : AnyObject]] ?? [] {
 			if let v = r["prs"] as? [String : AnyObject] {
 				prCount += v["total_open"] as? Int ?? 0
 				commentCount += v["unread"] as? Int ?? 0
@@ -60,7 +60,7 @@ final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 	}
 
 	func getSupportedTimeTravelDirections(for complication: CLKComplication, withHandler handler: (CLKComplicationTimeTravelDirections) -> Void) {
-		handler(CLKComplicationTimeTravelDirections())
+		handler([])
 	}
 
 	func getTimelineStartDate(for complication: CLKComplication, withHandler handler: (Date?) -> Void) {

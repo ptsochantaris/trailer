@@ -34,12 +34,12 @@ final class PopupManager: NSObject, UISplitViewControllerDelegate {
 		return (s.viewControllers.first as! UINavigationController).viewControllers.first as! MasterViewController
 	}
 
-	func splitViewController(splitViewController: UISplitViewController, collapseSecondaryViewController secondaryViewController: UIViewController, ontoPrimaryViewController primaryViewController: UIViewController) -> Bool {
+	func splitViewController(_ splitViewController: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {
 		let d = (secondaryViewController as! UINavigationController).viewControllers.first as! DetailViewController
 		return d.detailItem==nil
 	}
 
-	func splitViewController(splitViewController: UISplitViewController, separateSecondaryViewControllerFromPrimaryViewController primaryViewController: UIViewController) -> UIViewController? {
+	func splitViewController(_ splitViewController: UISplitViewController, separateSecondaryFrom primaryViewController: UIViewController) -> UIViewController? {
 		return nil
 	}
 }
