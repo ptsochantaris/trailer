@@ -23,7 +23,7 @@ final class DataManager {
 			performVersionChangedTasks()
 			Settings.lastRunVersion = versionString()
 		}
-		ApiServer.ensureAtLeastGithub(moc: mainObjectContext)
+		ApiServer.ensureAtLeastGithub(in: mainObjectContext)
 	}
 
 	private class func performVersionChangedTasks() {
@@ -65,7 +65,7 @@ final class DataManager {
 
 			let actualApiPath = "\(legacyApiHost)/\(legacyApiPath)".replacingOccurrences(of: "//", with:"/")
 
-			let newApiServer = ApiServer.addDefaultGithub(moc: mainObjectContext)
+			let newApiServer = ApiServer.addDefaultGithub(in: mainObjectContext)
 			newApiServer.apiPath = "https://\(actualApiPath)"
 			newApiServer.webPath = "https://\(legacyWebHost)"
 			newApiServer.authToken = legacyAuthToken
@@ -77,26 +77,26 @@ final class DataManager {
 			d.removeObject(forKey: "GITHUB_AUTH_TOKEN")
 			d.synchronize()
 		} else {
-			ApiServer.ensureAtLeastGithub(moc: mainObjectContext)
+			ApiServer.ensureAtLeastGithub(in: mainObjectContext)
 		}
 
 		DLog("Marking all repos as dirty")
 		ApiServer.resetSyncOfEverything()
 
 		DLog("Marking all unspecified (nil) announced flags as announced")
-		for i in DataItem.allItemsOfType("PullRequest", moc: mainObjectContext) as! [PullRequest] {
+		for i in DataItem.allItemsOfType("PullRequest", in: mainObjectContext) as! [PullRequest] {
 			if i.value(forKey: "announced") == nil {
 				i.announced = true
 			}
 		}
-		for i in DataItem.allItemsOfType("Issue", moc: mainObjectContext) as! [Issue] {
+		for i in DataItem.allItemsOfType("Issue", in: mainObjectContext) as! [Issue] {
 			if i.value(forKey: "announced") == nil {
 				i.announced = true
 			}
 		}
 
 		DLog("Migrating display policies")
-		for r in DataItem.allItemsOfType("Repo", moc: mainObjectContext) as! [Repo] {
+		for r in DataItem.allItemsOfType("Repo", in: mainObjectContext) as! [Repo] {
 			if let markedAsHidden = r.value(forKey: "hidden")?.boolValue, markedAsHidden == true {
 				r.displayPolicyForPrs = RepoDisplayPolicy.hide.rawValue
 				r.displayPolicyForIssues = RepoDisplayPolicy.hide.rawValue
@@ -111,7 +111,7 @@ final class DataManager {
 		}
 
 		DLog("Migrating snooze presets")
-		for s in SnoozePreset.allSnoozePresets(moc: mainObjectContext) {
+		for s in SnoozePreset.allSnoozePresets(in: mainObjectContext) {
 			if let m = postMigrationSnoozeWakeOnComment {
 				s.wakeOnComment = m
 			}
@@ -151,7 +151,7 @@ final class DataManager {
 	class func sendNotificationsIndexAndSave() {
 
 		func processItems(_ type: String, newNotification: NotificationType, reopenedNotification: NotificationType, assignmentNotification: NotificationType) -> [ListableItem] {
-			let allItems = DataItem.allItemsOfType(type, moc: mainObjectContext) as! [ListableItem]
+			let allItems = DataItem.allItemsOfType(type, in: mainObjectContext) as! [ListableItem]
 			for i in allItems {
 				if i.isVisibleOnMenu {
 					if !i.createdByMe {
@@ -183,13 +183,13 @@ final class DataManager {
 		let allPrs = processItems("PullRequest", newNotification: .newPr, reopenedNotification: .prReopened, assignmentNotification: .newPrAssigned)
 		let allIssues = processItems("Issue", newNotification: .newIssue, reopenedNotification: .issueReopened, assignmentNotification: .newIssueAssigned)
 
-		let latestComments = PRComment.newItemsOfType("PRComment", moc: mainObjectContext) as! [PRComment]
+		let latestComments = PRComment.newItemsOfType("PRComment", in: mainObjectContext) as! [PRComment]
 		for c in latestComments {
 			c.processNotifications()
 			c.postSyncAction = PostSyncAction.doNothing.rawValue
 		}
 
-		let latestStatuses = PRStatus.newItemsOfType("PRStatus", moc: mainObjectContext) as! [PRStatus]
+		let latestStatuses = PRStatus.newItemsOfType("PRStatus", in: mainObjectContext) as! [PRStatus]
 		if Settings.notifyOnStatusUpdates {
 			var coveredPrs = Set<NSManagedObjectID>()
 			for s in latestStatuses {
@@ -279,10 +279,10 @@ final class DataManager {
 	}
 
 	class func postProcessAllItems() {
-		for p in DataItem.allItemsOfType("PullRequest", moc: mainObjectContext) as! [PullRequest] {
+		for p in DataItem.allItemsOfType("PullRequest", in: mainObjectContext) as! [PullRequest] {
 			p.postProcess()
 		}
-		for i in DataItem.allItemsOfType("Issue", moc: mainObjectContext) as! [Issue] {
+		for i in DataItem.allItemsOfType("Issue", in: mainObjectContext) as! [Issue] {
 			i.postProcess()
 		}
 	}
@@ -328,7 +328,7 @@ final class DataManager {
 	}
 
 	class var appIsConfigured: Bool {
-		return ApiServer.someServersHaveAuthTokens(moc: mainObjectContext) && Repo.anyVisibleRepos(moc: mainObjectContext)
+		return ApiServer.someServersHaveAuthTokens(in: mainObjectContext) && Repo.anyVisibleRepos(in: mainObjectContext)
 	}
 
 	private static var _justMigrated = false

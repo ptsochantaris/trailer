@@ -322,7 +322,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			let snoozedPrs = countsForType(type: "PullRequest", inSection: .snoozed, criterion: c)
 			let totalPrs = [ myPrs, participatedPrs, mentionedPrs, mergedPrs, closedPrs, otherPrs, snoozedPrs ].reduce(0, { $0 + $1["total"]! })
 			let totalOpenPrs = countOpenAndVisibleForType(type: "PullRequest", criterion: c)
-			let unreadPrCount = PullRequest.badgeCount(moc: mainObjectContext, criterion: c)
+			let unreadPrCount = PullRequest.badgeCount(in: mainObjectContext, criterion: c)
 
 			let myIssues = countsForType(type: "Issue", inSection: .mine, criterion: c)
 			let participatedIssues = countsForType(type: "Issue", inSection: .participated, criterion: c)
@@ -332,7 +332,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			let snoozedIssues = countsForType(type: "Issue", inSection: .snoozed, criterion: c)
 			let totalIssues = [ myIssues, participatedIssues, mentionedIssues, closedIssues, otherIssues, snoozedIssues ].reduce(0, { $0 + $1["total"]! })
 			let totalOpenIssues = countOpenAndVisibleForType(type: "Issue", criterion: c)
-			let unreadIssueCount = Issue.badgeCount(moc: mainObjectContext, criterion: c)
+			let unreadIssueCount = Issue.badgeCount(in: mainObjectContext, criterion: c)
 
 			views.append([
 				"title": S(c?.label),
@@ -366,28 +366,28 @@ final class WatchManager : NSObject, WCSessionDelegate {
 	private func countAllItemsOfType(type: String, criterion: GroupingCriterion?) -> Int {
 		let f = NSFetchRequest<ListableItem>(entityName: type)
 		let p = Settings.hideUncommentedItems ? NSPredicate(format: "sectionIndex > 0 and unreadComments > 0") : NSPredicate(format: "sectionIndex > 0")
-		DataItem.addCriterion(criterion, toFetchRequest: f, originalPredicate: p, moc: mainObjectContext)
+		DataItem.addCriterion(criterion, toFetchRequest: f, originalPredicate: p, in: mainObjectContext)
 		return try! mainObjectContext.count(for: f)
 	}
 
 	private func countItemsForType(type: String, inSection: Section, criterion: GroupingCriterion?) -> Int {
 		let f = NSFetchRequest<ListableItem>(entityName: type)
 		let p = Settings.hideUncommentedItems ? NSPredicate(format: "sectionIndex == %lld and unreadComments > 0", inSection.rawValue) : NSPredicate(format: "sectionIndex == %d", inSection.rawValue)
-		DataItem.addCriterion(criterion, toFetchRequest: f, originalPredicate: p, moc: mainObjectContext)
+		DataItem.addCriterion(criterion, toFetchRequest: f, originalPredicate: p, in: mainObjectContext)
 		return try! mainObjectContext.count(for: f)
 	}
 
 	private func badgeCountForType(type: String, inSection: Section, criterion: GroupingCriterion?) -> Int {
 		let f = NSFetchRequest<ListableItem>(entityName: type)
 		let p = NSPredicate(format: "sectionIndex == %lld and unreadComments > 0", inSection.rawValue)
-		DataItem.addCriterion(criterion, toFetchRequest: f, originalPredicate: p, moc: mainObjectContext)
-		return ListableItem.badgeCountFromFetch(f, moc: mainObjectContext)
+		DataItem.addCriterion(criterion, toFetchRequest: f, originalPredicate: p, in: mainObjectContext)
+		return ListableItem.badgeCountFromFetch(f, in: mainObjectContext)
 	}
 
 	private func countOpenAndVisibleForType(type: String, criterion: GroupingCriterion?) -> Int {
 		let f = NSFetchRequest<ListableItem>(entityName: type)
 		let p = Settings.hideUncommentedItems ? NSPredicate(format: "sectionIndex > 0 and (condition == %lld or condition == nil) and unreadComments > 0", ItemCondition.open.rawValue) : NSPredicate(format: "sectionIndex > 0 and (condition == %lld or condition == nil)", ItemCondition.open.rawValue)
-		DataItem.addCriterion(criterion, toFetchRequest: f, originalPredicate: p, moc: mainObjectContext)
+		DataItem.addCriterion(criterion, toFetchRequest: f, originalPredicate: p, in: mainObjectContext)
 		return try! mainObjectContext.count(for: f)
 	}
 

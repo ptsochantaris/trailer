@@ -15,7 +15,7 @@ final class TabBarSet {
 		let prf = ListableItem.requestForItemsOfType("PullRequest", withFilter: nil, sectionIndex: -1, criterion: viewCriterion)
 		if try! mainObjectContext.count(for: prf) > 0 {
 			let i = UITabBarItem(title: label ?? "Pull Requests", image: UIImage(named: "prsTab"), selectedImage: nil)
-			let prUnreadCount = PullRequest.badgeCount(moc: mainObjectContext, criterion: viewCriterion)
+			let prUnreadCount = PullRequest.badgeCount(in: mainObjectContext, criterion: viewCriterion)
 			i.badgeValue = prUnreadCount > 0 ? "\(prUnreadCount)" : nil
 			items.append(i)
 			prItem = i
@@ -23,7 +23,7 @@ final class TabBarSet {
 		let isf = ListableItem.requestForItemsOfType("Issue", withFilter: nil, sectionIndex: -1, criterion: viewCriterion)
 		if try! mainObjectContext.count(for: isf) > 0 {
 			let i = UITabBarItem(title: label ?? "Issues", image: UIImage(named: "issuesTab"), selectedImage: nil)
-			let issuesUnreadCount = Issue.badgeCount(moc: mainObjectContext, criterion: viewCriterion)
+			let issuesUnreadCount = Issue.badgeCount(in: mainObjectContext, criterion: viewCriterion)
 			i.badgeValue = issuesUnreadCount > 0 ? "\(issuesUnreadCount)" : nil
 			items.append(i)
 			issuesItem = i
@@ -131,11 +131,11 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	func removeAllClosedConfirmed() {
 		if viewingPrs {
-			for p in PullRequest.allClosed(moc: mainObjectContext, criterion: currentTabBarSet?.viewCriterion) {
+			for p in PullRequest.allClosed(in: mainObjectContext, criterion: currentTabBarSet?.viewCriterion) {
 				mainObjectContext.delete(p)
 			}
 		} else {
-			for p in Issue.allClosed(moc: mainObjectContext, criterion: currentTabBarSet?.viewCriterion) {
+			for p in Issue.allClosed(in: mainObjectContext, criterion: currentTabBarSet?.viewCriterion) {
 				mainObjectContext.delete(p)
 			}
 		}
@@ -144,7 +144,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	func removeAllMergedConfirmed() {
 		if viewingPrs {
-			for p in PullRequest.allMerged(moc: mainObjectContext, criterion: currentTabBarSet?.viewCriterion) {
+			for p in PullRequest.allMerged(in: mainObjectContext, criterion: currentTabBarSet?.viewCriterion) {
 				mainObjectContext.delete(p)
 			}
 			DataManager.saveDB()
@@ -515,7 +515,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 
 		if Settings.showSeparateApiServersInMenu {
-			for a in ApiServer.allApiServers(moc: mainObjectContext) {
+			for a in ApiServer.allApiServers(in: mainObjectContext) {
 				if a.goodToGo {
 					let c = GroupingCriterion(apiServerId: a.objectID)
 					let s = TabBarSet(viewCriterion: c)
@@ -556,7 +556,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			viewingPrs = i == UIImage(named: "prsTab") // not proud of this :(
 		} else if let c = currentTabBarSet {
 			viewingPrs = c.tabItems.first?.image == UIImage(named: "prsTab") // or this :(
-		} else if Repo.anyVisibleRepos(moc: mainObjectContext, criterion: currentTabBarSet?.viewCriterion, excludeGrouped: true) {
+		} else if Repo.anyVisibleRepos(in: mainObjectContext, criterion: currentTabBarSet?.viewCriterion, excludeGrouped: true) {
 			viewingPrs = Repo.interestedInPrs(currentTabBarSet?.viewCriterion?.apiServerId)
 		} else {
 			viewingPrs = true
@@ -961,7 +961,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	private func showSnoozeMenuFor(i: ListableItem) {
-		let snoozePresets = SnoozePreset.allSnoozePresets(moc: mainObjectContext)
+		let snoozePresets = SnoozePreset.allSnoozePresets(in: mainObjectContext)
 		let hasPresets = snoozePresets.count > 0
 		let singleColumn = splitViewController?.isCollapsed ?? true
 		let a = UIAlertController(title: hasPresets ? "Snooze" : nil,
@@ -1209,7 +1209,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	override func prepare(for segue: UIStoryboardSegue, sender: AnyObject?) {
 		var allServersHaveTokens = true
-		for a in ApiServer.allApiServers(moc: mainObjectContext) {
+		for a in ApiServer.allApiServers(in: mainObjectContext) {
 			if !a.goodToGo {
 				allServersHaveTokens = false
 				break

@@ -39,9 +39,9 @@ class ListableItem: DataItem {
 	@NSManaged var comments: Set<PRComment>
 	@NSManaged var labels: Set<PRLabel>
 
-	final func baseSyncFromInfo(_ info: [NSObject: AnyObject], inRepo: Repo) {
+	final func baseSyncFromInfo(_ info: [NSObject: AnyObject], in repo: Repo) {
 
-		repo = inRepo
+		self.repo = repo
 
 		url = info["url"] as? String
 		webUrl = info["html_url"] as? String
@@ -58,7 +58,7 @@ class ListableItem: DataItem {
 		}
 
 		if let assignee = info["assignee"] as? [NSObject: AnyObject], let name = assignee["login"] as? String, let id = assignee["id"] as? NSNumber {
-			let currentlyAssigned = id.int64Value == inRepo.apiServer.userId
+			let currentlyAssigned = id.int64Value == repo.apiServer.userId
 			isNewAssignment = currentlyAssigned && !assignedToMe && !createdByMe
 			assignedToMe = currentlyAssigned
 			assigneeName = name
@@ -510,7 +510,7 @@ class ListableItem: DataItem {
 		}
 	}
 
-	final class func badgeCountFromFetch<T: ListableItem>(_ f: NSFetchRequest<T>, moc: NSManagedObjectContext) -> Int {
+	final class func badgeCountFromFetch<T: ListableItem>(_ f: NSFetchRequest<T>, in moc: NSManagedObjectContext) -> Int {
 		var badgeCount = 0
 		f.returnsObjectsAsFaults = false
 		for i in try! moc.fetch(f) {
@@ -729,7 +729,7 @@ class ListableItem: DataItem {
 		let f = NSFetchRequest<ListableItem>(entityName: itemType)
 		f.fetchBatchSize = 100
 		let p = NSCompoundPredicate(andPredicateWithSubpredicates: andPredicates)
-		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, moc: mainObjectContext)
+		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, in: mainObjectContext)
 		f.sortDescriptors = sortDescriptors
 		return f
 	}

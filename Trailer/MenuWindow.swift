@@ -134,7 +134,7 @@ final class MenuWindow: NSWindow {
 	}
 
 	@IBAction func refreshSelected(_ sender: NSMenuItem) {
-		if Repo.countItemsOfType("Repo", moc: mainObjectContext) == 0 {
+		if Repo.countItemsOfType("Repo", in: mainObjectContext) == 0 {
 			app.preferencesSelected()
 			return
 		}

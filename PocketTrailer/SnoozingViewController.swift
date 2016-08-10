@@ -30,7 +30,7 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 	}
 
 	func numberOfSections(in tableView: UITableView) -> Int {
-		if SnoozePreset.allSnoozePresets(moc: mainObjectContext).count > 0 {
+		if SnoozePreset.allSnoozePresets(in: mainObjectContext).count > 0 {
 			return 3
 		} else {
 			return 2
@@ -41,7 +41,7 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 		if section == 0 || section == 1 {
 			return 1
 		} else {
-			return SnoozePreset.allSnoozePresets(moc: mainObjectContext).count
+			return SnoozePreset.allSnoozePresets(in: mainObjectContext).count
 		}
 	}
 
@@ -59,7 +59,7 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 			}
 			cell.accessoryType = .disclosureIndicator
 		} else {
-			let s = SnoozePreset.allSnoozePresets(moc: mainObjectContext)[indexPath.row]
+			let s = SnoozePreset.allSnoozePresets(in: mainObjectContext)[indexPath.row]
 			cell.textLabel?.text = s.listDescription
 			cell.accessoryType = .disclosureIndicator
 		}
@@ -84,7 +84,7 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 		} else if indexPath.section == 1 {
 			performSegue(withIdentifier: "showPicker", sender: self)
 		} else {
-			let s = SnoozePreset.allSnoozePresets(moc: mainObjectContext)[indexPath.row]
+			let s = SnoozePreset.allSnoozePresets(in: mainObjectContext)[indexPath.row]
 			performSegue(withIdentifier: "showSnoozeEditor", sender: s)
 		}
 	}
@@ -102,7 +102,7 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 				d.snoozeItem = s
 			} else {
 				d.isNew = true
-				d.snoozeItem = SnoozePreset.newSnoozePreset(moc: mainObjectContext)
+				d.snoozeItem = SnoozePreset.newSnoozePreset(in: mainObjectContext)
 			}
 		}
 	}
@@ -110,10 +110,10 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 	func pickerViewController(picker: PickerViewController, didSelectIndexPath: IndexPath) {
 		Settings.autoSnoozeDuration = didSelectIndexPath.row
 		table.reloadData()
-		for p in DataItem.allItemsOfType("PullRequest", moc: mainObjectContext) as! [PullRequest] {
+		for p in DataItem.allItemsOfType("PullRequest", in: mainObjectContext) as! [PullRequest] {
 			p.wakeIfAutoSnoozed()
 		}
-		for i in DataItem.allItemsOfType("Issue", moc: mainObjectContext) as! [Issue] {
+		for i in DataItem.allItemsOfType("Issue", in: mainObjectContext) as! [Issue] {
 			i.wakeIfAutoSnoozed()
 		}
 		DataManager.postProcessAllItems()

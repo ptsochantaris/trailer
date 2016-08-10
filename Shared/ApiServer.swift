@@ -63,7 +63,7 @@ final class ApiServer: NSManagedObject {
 
 	class func resetSyncOfEverything() {
 		DLog("RESETTING SYNC STATE OF ALL ITEMS")
-		for r in DataItem.allItemsOfType("Repo", moc: mainObjectContext) as! [Repo] {
+		for r in DataItem.allItemsOfType("Repo", in: mainObjectContext) as! [Repo] {
 			for p in r.pullRequests {
 				p.resetSyncState()
 			}
@@ -77,22 +77,22 @@ final class ApiServer: NSManagedObject {
 		}
 	}
 
-	class func insertNewServer(moc: NSManagedObjectContext) -> ApiServer {
+	class func insertNewServer(in moc: NSManagedObjectContext) -> ApiServer {
 		let githubServer: ApiServer = NSEntityDescription.insertNewObject(forEntityName: "ApiServer", into: moc) as! ApiServer
 		githubServer.createdAt = Date()
 		return githubServer
 	}
 
-	class func resetSyncSuccess(moc: NSManagedObjectContext) {
-		for apiServer in allApiServers(moc: moc) {
+	class func resetSyncSuccess(in moc: NSManagedObjectContext) {
+		for apiServer in allApiServers(in: moc) {
 			if apiServer.goodToGo {
 				apiServer.lastSyncSucceeded = true
 			}
 		}
 	}
 
-	class func shouldReportRefreshFailure(moc: NSManagedObjectContext) -> Bool {
-		for apiServer in allApiServers(moc: moc) {
+	class func shouldReportRefreshFailure(in moc: NSManagedObjectContext) -> Bool {
+		for apiServer in allApiServers(in: moc) {
 			if apiServer.goodToGo && !apiServer.lastSyncSucceeded && apiServer.reportRefreshFailures {
 				return true
 			}
@@ -100,30 +100,30 @@ final class ApiServer: NSManagedObject {
 		return false
 	}
 
-	class func ensureAtLeastGithub(moc: NSManagedObjectContext) {
+	class func ensureAtLeastGithub(in moc: NSManagedObjectContext) {
 		let f = NSFetchRequest<ApiServer>(entityName: "ApiServer")
 		f.fetchLimit = 1
 		let numberOfExistingApiServers = try! moc.count(for: f)
 		if numberOfExistingApiServers==0 {
-			_ = addDefaultGithub(moc: moc)
+			_ = addDefaultGithub(in: moc)
 		}
 	}
 
-	class func addDefaultGithub(moc: NSManagedObjectContext) -> ApiServer {
-		let githubServer = insertNewServer(moc: moc)
+	class func addDefaultGithub(in moc: NSManagedObjectContext) -> ApiServer {
+		let githubServer = insertNewServer(in: moc)
 		githubServer.resetToGithub()
 		return githubServer
 	}
 
-	class func allApiServers(moc: NSManagedObjectContext) -> [ApiServer] {
+	class func allApiServers(in moc: NSManagedObjectContext) -> [ApiServer] {
 		let f = NSFetchRequest<ApiServer>(entityName: "ApiServer")
 		f.returnsObjectsAsFaults = false
 		f.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: true)]
 		return try! moc.fetch(f)
 	}
 
-	class func someServersHaveAuthTokens(moc: NSManagedObjectContext) -> Bool {
-		for apiServer in allApiServers(moc: moc) {
+	class func someServersHaveAuthTokens(in moc: NSManagedObjectContext) -> Bool {
+		for apiServer in allApiServers(in: moc) {
 			if !S(apiServer.authToken).isEmpty {
 				return true
 			}
@@ -131,12 +131,12 @@ final class ApiServer: NSManagedObject {
 		return false
 	}
 
-	class func countApiServers(moc: NSManagedObjectContext) -> Int {
+	class func countApiServers(in moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest<ApiServer>(entityName: "ApiServer")
 		return try! moc.count(for: f)
 	}
 
-	func rollBackAllUpdates(moc: NSManagedObjectContext) {
+	func rollBackAllUpdates(in moc: NSManagedObjectContext) {
 		DLog("Rolling back changes for failed sync on API server '%@'",label)
 		for set in [repos, pullRequests, comments, statuses, labels, issues, teams] {
 			for dataItem: DataItem in set.allObjects as! [DataItem] {
@@ -180,7 +180,7 @@ final class ApiServer: NSManagedObject {
 
 	class func archiveApiServers() -> [String:[String:NSObject]] {
 		var archivedData = [String:[String:NSObject]]()
-		for a in ApiServer.allApiServers(moc: mainObjectContext) {
+		for a in ApiServer.allApiServers(in: mainObjectContext) {
 			if let authToken = a.authToken, !authToken.isEmpty {
 				var apiServerData = [String:NSObject]()
 				for (k , _) in a.entity.attributesByName {
@@ -213,13 +213,13 @@ final class ApiServer: NSManagedObject {
 
 		let tempMoc = DataManager.childContext()
 
-		for apiServer in allApiServers(moc: tempMoc)
+		for apiServer in allApiServers(in: tempMoc)
 		{
 			tempMoc.delete(apiServer)
 		}
 
 		for (_, apiServerData) in archive {
-			let a = insertNewServer(moc: tempMoc)
+			let a = insertNewServer(in: tempMoc)
 			for (k,v) in apiServerData {
 				if k=="repos" {
 					a.configureReposFromArchive(v as! [String : [String : NSObject]])

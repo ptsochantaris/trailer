@@ -14,7 +14,7 @@ class DataItem: NSManagedObject {
 		apiServer.resetSyncState()
 	}
 
-	final class func allItemsOfType(_ type: String, moc: NSManagedObjectContext) -> [DataItem] {
+	final class func allItemsOfType(_ type: String, in moc: NSManagedObjectContext) -> [DataItem] {
 		let f = NSFetchRequest<DataItem>(entityName: type)
 		f.returnsObjectsAsFaults = false
 		return try! moc.fetch(f)
@@ -82,7 +82,7 @@ class DataItem: NSManagedObject {
 		}
 	}
 
-	final class func itemsOfType(_ type: String, surviving: Bool, moc: NSManagedObjectContext) -> [DataItem] {
+	final class func itemsOfType(_ type: String, surviving: Bool, in moc: NSManagedObjectContext) -> [DataItem] {
 		let f = NSFetchRequest<DataItem>(entityName: type)
 		if surviving {
 			f.returnsObjectsAsFaults = false
@@ -94,32 +94,32 @@ class DataItem: NSManagedObject {
 		return try! moc.fetch(f)
 	}
 
-	final class func newOrUpdatedItemsOfType(_ type: String, moc: NSManagedObjectContext) -> [DataItem] {
+	final class func newOrUpdatedItemsOfType(_ type: String, in moc: NSManagedObjectContext) -> [DataItem] {
 		let f = NSFetchRequest<DataItem>(entityName: type)
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "postSyncAction = %lld or postSyncAction = %lld", PostSyncAction.noteNew.rawValue, PostSyncAction.noteUpdated.rawValue)
 		return try! moc.fetch(f)
 	}
 
-	final class func updatedItemsOfType(_ type: String, moc: NSManagedObjectContext) -> [DataItem] {
+	final class func updatedItemsOfType(_ type: String, in moc: NSManagedObjectContext) -> [DataItem] {
 		let f = NSFetchRequest<DataItem>(entityName: type)
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "postSyncAction = %lld", PostSyncAction.noteUpdated.rawValue)
 		return try! moc.fetch(f)
 	}
 
-	final class func newItemsOfType(_ type: String, moc: NSManagedObjectContext) -> [DataItem] {
+	final class func newItemsOfType(_ type: String, in moc: NSManagedObjectContext) -> [DataItem] {
 		let f = NSFetchRequest<DataItem>(entityName: type)
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "postSyncAction = %lld", PostSyncAction.noteNew.rawValue)
 		return try! moc.fetch(f)
 	}
 
-	final class func nukeDeletedItems(moc: NSManagedObjectContext) {
+	final class func nukeDeletedItems(in moc: NSManagedObjectContext) {
 		let types = ["Repo", "PullRequest", "PRStatus", "PRComment", "PRLabel", "Issue", "Team"]
 		var count = 0
 		for type in types {
-			let discarded = itemsOfType(type, surviving: false, moc: moc)
+			let discarded = itemsOfType(type, surviving: false, in: moc)
 			if discarded.count > 0 {
 				count += discarded.count
 				DLog("Nuking %d %@ items marked for deletion", discarded.count, type)
@@ -131,15 +131,15 @@ class DataItem: NSManagedObject {
 		DLog("Nuked total %d items marked for deletion", count)
 	}
 
-	final class func countItemsOfType(_ type: String, moc: NSManagedObjectContext) -> Int {
+	final class func countItemsOfType(_ type: String, in moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest<DataItem>(entityName: type)
 		return try! moc.count(for: f)
 	}
 
-	class func addCriterion<T: ListableItem>(_ criterion: GroupingCriterion?, toFetchRequest: NSFetchRequest<T>, originalPredicate: NSPredicate, moc: NSManagedObjectContext, includeAllGroups: Bool = false) {
+	class func addCriterion<T: ListableItem>(_ criterion: GroupingCriterion?, toFetchRequest: NSFetchRequest<T>, originalPredicate: NSPredicate, in moc: NSManagedObjectContext, includeAllGroups: Bool = false) {
 		var andPredicates = [NSPredicate]()
 		if let c = criterion {
-			andPredicates.append(c.addCriterionToPredicate(originalPredicate, moc: moc))
+			andPredicates.append(c.addCriterionToPredicate(originalPredicate, in: moc))
 		} else {
 			andPredicates.append(originalPredicate)
 		}

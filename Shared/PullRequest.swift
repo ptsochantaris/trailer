@@ -15,12 +15,12 @@ final class PullRequest: ListableItem {
 
 	@NSManaged var statuses: Set<PRStatus>
 
-	class func syncPullRequestsFromInfoArray(_ data: [[NSObject : AnyObject]]?, inRepo: Repo) {
-		itemsWithInfo(data, type: "PullRequest", server: inRepo.apiServer) { item, info, isNewOrUpdated in
+	class func syncPullRequestsFromInfoArray(_ data: [[NSObject : AnyObject]]?, in repo: Repo) {
+		itemsWithInfo(data, type: "PullRequest", server: repo.apiServer) { item, info, isNewOrUpdated in
 			let p = item as! PullRequest
 			if isNewOrUpdated {
 
-				p.baseSyncFromInfo(info, inRepo: inRepo)
+				p.baseSyncFromInfo(info, in: repo)
 
 				p.mergeable = (info["mergeable"] as? NSNumber)?.boolValue ?? true
 
@@ -45,7 +45,7 @@ final class PullRequest: ListableItem {
 	}
 	#endif
 
-	class func active(moc: NSManagedObjectContext, visibleOnly: Bool) -> [PullRequest] {
+	class func active(in moc: NSManagedObjectContext, visibleOnly: Bool) -> [PullRequest] {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
 		if visibleOnly {
@@ -56,30 +56,30 @@ final class PullRequest: ListableItem {
 		return try! moc.fetch(f)
 	}
 
-	class func allMerged(moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, includeAllGroups: Bool = false) -> [PullRequest] {
+	class func allMerged(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, includeAllGroups: Bool = false) -> [PullRequest] {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
 		let p = NSPredicate(format: "condition == %lld", ItemCondition.merged.rawValue)
-		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, moc: moc, includeAllGroups: includeAllGroups)
+		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, in: moc, includeAllGroups: includeAllGroups)
 		return try! moc.fetch(f)
 	}
 
-	class func allClosed(moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, includeAllGroups: Bool = false) -> [PullRequest] {
+	class func allClosed(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, includeAllGroups: Bool = false) -> [PullRequest] {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
 		let p = NSPredicate(format: "condition == %lld", ItemCondition.closed.rawValue)
-		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, moc: moc, includeAllGroups: includeAllGroups)
+		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, in: moc, includeAllGroups: includeAllGroups)
 		return try! moc.fetch(f)
 	}
 
-	class func countOpen(moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
+	class func countOpen(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		let p = NSPredicate(format: "condition == %lld or condition == nil", ItemCondition.open.rawValue)
-		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, moc: moc)
+		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, in: moc)
 		return try! moc.count(for: f)
 	}
 
-	class func markEverythingRead(_ section: Section, moc: NSManagedObjectContext) {
+	class func markEverythingRead(_ section: Section, in moc: NSManagedObjectContext) {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		if section != .none {
 			f.predicate = NSPredicate(format: "sectionIndex == %lld", section.rawValue)
@@ -89,21 +89,21 @@ final class PullRequest: ListableItem {
 		}
 	}
 
-	class func badgeCountInSection(_ section: Section, moc: NSManagedObjectContext) -> Int {
+	class func badgeCountInSection(_ section: Section, in moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.predicate = NSPredicate(format: "sectionIndex == %lld and unreadComments > 0", section.rawValue)
-		return badgeCountFromFetch(f, moc: moc)
+		return badgeCountFromFetch(f, in: moc)
 	}
 
-	class func badgeCount(moc: NSManagedObjectContext) -> Int {
+	class func badgeCount(in moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.predicate = NSPredicate(format: "sectionIndex > 0 and unreadComments > 0")
-		return badgeCountFromFetch(f, moc: moc)
+		return badgeCountFromFetch(f, in: moc)
 	}
 
-	class func badgeCount(moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
+	class func badgeCount(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
 		let f = requestForItemsOfType("PullRequest", withFilter: nil, sectionIndex: -1, criterion: criterion)
-		return badgeCountFromFetch(f, moc: moc)
+		return badgeCountFromFetch(f, in: moc)
 	}
 
 	var markUnmergeable: Bool {
@@ -121,12 +121,12 @@ final class PullRequest: ListableItem {
 	}
 
 	class func reasonForEmptyWithFilter(_ filterValue: String?, criterion: GroupingCriterion? = nil) -> NSAttributedString {
-		let openRequests = PullRequest.countOpen(moc: mainObjectContext, criterion: criterion)
+		let openRequests = PullRequest.countOpen(in: mainObjectContext, criterion: criterion)
 
 		var color = COLOR_CLASS.lightGray
 		var message: String = ""
 
-		if !ApiServer.someServersHaveAuthTokens(moc: mainObjectContext) {
+		if !ApiServer.someServersHaveAuthTokens(in: mainObjectContext) {
 			color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
 			message = "There are no configured API servers in your settings, please ensure you have added at least one server with a valid API token."
 		} else if appIsRefreshing {
@@ -135,8 +135,8 @@ final class PullRequest: ListableItem {
 			message = "There are no PRs matching this filter."
 		} else if openRequests > 0 {
 			message = "Some items are hidden by your settings."
-		} else if !Repo.anyVisibleRepos(moc: mainObjectContext, criterion: criterion, excludeGrouped: true) {
-			if Repo.anyVisibleRepos(moc: mainObjectContext) {
+		} else if !Repo.anyVisibleRepos(in: mainObjectContext, criterion: criterion, excludeGrouped: true) {
+			if Repo.anyVisibleRepos(in: mainObjectContext) {
 				message = "There are no repositories that are currently visible in this category."
 			} else {
 				color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)

@@ -95,7 +95,7 @@ final class MenuBarSet {
 	                        reasonForEmpty: (String)->NSAttributedString) {
 
 		let countString: String
-		let somethingFailed = ApiServer.shouldReportRefreshFailure(moc: mainObjectContext) && (viewCriterion?.relatedServerFailed ?? true)
+		let somethingFailed = ApiServer.shouldReportRefreshFailure(in: mainObjectContext) && (viewCriterion?.relatedServerFailed ?? true)
 		let attributes = somethingFailed || hasUnread() ? MenuBarSet.redText : MenuBarSet.normalText
 		let preFilterCount: Int
 
@@ -150,9 +150,9 @@ final class MenuBarSet {
 		if Repo.interestedInIssues(viewCriterion?.apiServerId) {
 
 			updateMenu("Issue", menu: issuesMenu, lengthOffset: 2, totalCount: { () -> Int in
-				return Issue.countOpen(moc: mainObjectContext)
+				return Issue.countOpen(in: mainObjectContext)
 			}, hasUnread: { [weak self] () -> Bool in
-				return Issue.badgeCount(moc: mainObjectContext, criterion: self?.viewCriterion) > 0
+				return Issue.badgeCount(in: mainObjectContext, criterion: self?.viewCriterion) > 0
 			}, reasonForEmpty: { [weak self] filter -> NSAttributedString in
 				return Issue.reasonForEmptyWithFilter(filter, criterion: self?.viewCriterion)
 			})
@@ -167,9 +167,9 @@ final class MenuBarSet {
 		if forceVisible || Repo.interestedInPrs(viewCriterion?.apiServerId) || !Repo.interestedInIssues(viewCriterion?.apiServerId) {
 
 			updateMenu("PullRequest", menu: prMenu, lengthOffset: 0, totalCount: { () -> Int in
-				return PullRequest.countOpen(moc: mainObjectContext)
+				return PullRequest.countOpen(in: mainObjectContext)
 			}, hasUnread: { [weak self] () -> Bool in
-				return PullRequest.badgeCount(moc: mainObjectContext, criterion: self?.viewCriterion) > 0
+				return PullRequest.badgeCount(in: mainObjectContext, criterion: self?.viewCriterion) > 0
 			}, reasonForEmpty: { [weak self] filter -> NSAttributedString in
 				return PullRequest.reasonForEmptyWithFilter(filter, criterion: self?.viewCriterion)
 			})

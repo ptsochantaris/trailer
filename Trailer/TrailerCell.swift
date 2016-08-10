@@ -137,7 +137,7 @@ class TrailerCell: NSTableCellView {
 					c.keyEquivalentModifierMask = [.command]
 				}
 
-				let snoozeItems = SnoozePreset.allSnoozePresets(moc: mainObjectContext)
+				let snoozeItems = SnoozePreset.allSnoozePresets(in: mainObjectContext)
 				if snoozeItems.count > 0 {
 					var count = 1
 					let c = m.addItem(withTitle: "Snooze...", action: nil, keyEquivalent: "")

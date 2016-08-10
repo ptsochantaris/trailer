@@ -11,7 +11,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 	@IBOutlet weak var link: UIButton!
 	@IBOutlet weak var trackIssues: UIBarButtonItem!
 
-	private let newServer = ApiServer.allApiServers(moc: mainObjectContext).first!
+	private let newServer = ApiServer.allApiServers(in: mainObjectContext).first!
 	private var token = ""
 	private var checkTimer: Timer?
 	private var showIssues = true

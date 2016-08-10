@@ -58,7 +58,7 @@ final class CacheEntry: NSManagedObject {
 		}
 	}
 
-	class func cleanOldEntries(moc: NSManagedObjectContext) {
+	class func cleanOldEntries(in moc: NSManagedObjectContext) {
 		let f = NSFetchRequest<CacheEntry>(entityName: "CacheEntry")
 		f.returnsObjectsAsFaults = true
 		f.predicate = NSPredicate(format: "lastTouched < %@", Date().addingTimeInterval(-3600.0*24.0*7.0)) // week-old

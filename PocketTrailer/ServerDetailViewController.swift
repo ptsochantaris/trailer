@@ -23,7 +23,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 		if let sid = serverId {
 			a = existingObjectWithID(sid) as! ApiServer
 		} else {
-			a = ApiServer.addDefaultGithub(moc: mainObjectContext)
+			a = ApiServer.addDefaultGithub(in: mainObjectContext)
 			try! mainObjectContext.save()
 			serverId = a.objectID
 		}

@@ -33,7 +33,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 
 		if Settings.showSeparateApiServersInMenu {
-			for a in ApiServer.allApiServers(moc: mainObjectContext) {
+			for a in ApiServer.allApiServers(in: mainObjectContext) {
 				if a.goodToGo {
 					let c = GroupingCriterion(apiServerId: a.objectID)
 					let s = MenuBarSet(viewCriterion: c, delegate: self)
@@ -43,7 +43,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			}
 		}
 
-		if newSets.count == 0 || Repo.anyVisibleRepos(moc: mainObjectContext, excludeGrouped: true) {
+		if newSets.count == 0 || Repo.anyVisibleRepos(in: mainObjectContext, excludeGrouped: true) {
 			let s = MenuBarSet(viewCriterion: nil, delegate: self)
 			s.setTimers()
 			newSets.append(s)
@@ -91,11 +91,11 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			}
 		}
 
-		if ApiServer.someServersHaveAuthTokens(moc: mainObjectContext) {
+		if ApiServer.someServersHaveAuthTokens(in: mainObjectContext) {
 			atNextEvent(self) { S in
 				S.startRefresh()
 			}
-		} else if ApiServer.countApiServers(moc: mainObjectContext) == 1, let a = ApiServer.allApiServers(moc: mainObjectContext).first, a.authToken == nil || a.authToken!.isEmpty {
+		} else if ApiServer.countApiServers(in: mainObjectContext) == 1, let a = ApiServer.allApiServers(in: mainObjectContext).first, a.authToken == nil || a.authToken!.isEmpty {
 			startupAssistant()
 		} else {
 			preferencesSelected()
@@ -359,7 +359,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				if Settings.dontAskBeforeWipingMerged {
 					removeAllMergedRequests(menuBarSet)
 				} else {
-					let mergedRequests = PullRequest.allMerged(moc: mainObjectContext, criterion: menuBarSet.viewCriterion)
+					let mergedRequests = PullRequest.allMerged(in: mainObjectContext, criterion: menuBarSet.viewCriterion)
 
 					let alert = NSAlert()
 					alert.messageText = "Clear \(mergedRequests.count) merged PRs?"
@@ -379,7 +379,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				if Settings.dontAskBeforeWipingClosed {
 					removeAllClosedRequests(menuBarSet)
 				} else {
-					let closedRequests = PullRequest.allClosed(moc: mainObjectContext, criterion: menuBarSet.viewCriterion)
+					let closedRequests = PullRequest.allClosed(in: mainObjectContext, criterion: menuBarSet.viewCriterion)
 
 					let alert = NSAlert()
 					alert.messageText = "Clear \(closedRequests.count) closed PRs?"
@@ -404,7 +404,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				if Settings.dontAskBeforeWipingClosed {
 					removeAllClosedIssues(menuBarSet)
 				} else {
-					let closedIssues = Issue.allClosed(moc: mainObjectContext, criterion: menuBarSet.viewCriterion)
+					let closedIssues = Issue.allClosed(in: mainObjectContext, criterion: menuBarSet.viewCriterion)
 
 					let alert = NSAlert()
 					alert.messageText = "Clear \(closedIssues.count) closed issues?"
@@ -428,7 +428,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	private func removeAllMergedRequests(_ menuBarSet: MenuBarSet) {
-		for r in PullRequest.allMerged(moc: mainObjectContext, criterion: menuBarSet.viewCriterion) {
+		for r in PullRequest.allMerged(in: mainObjectContext, criterion: menuBarSet.viewCriterion) {
 			mainObjectContext.delete(r)
 		}
 		DataManager.saveDB()
@@ -436,7 +436,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	private func removeAllClosedRequests(_ menuBarSet: MenuBarSet) {
-		for r in PullRequest.allClosed(moc: mainObjectContext, criterion: menuBarSet.viewCriterion) {
+		for r in PullRequest.allClosed(in: mainObjectContext, criterion: menuBarSet.viewCriterion) {
 			mainObjectContext.delete(r)
 		}
 		DataManager.saveDB()
@@ -444,7 +444,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	private func removeAllClosedIssues(_ menuBarSet: MenuBarSet) {
-		for i in Issue.allClosed(moc: mainObjectContext, criterion: menuBarSet.viewCriterion) {
+		for i in Issue.allClosed(in: mainObjectContext, criterion: menuBarSet.viewCriterion) {
 			mainObjectContext.delete(i)
 		}
 		DataManager.saveDB()
@@ -591,7 +591,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	private func checkApiUsage() {
-		for apiServer in ApiServer.allApiServers(moc: mainObjectContext) {
+		for apiServer in ApiServer.allApiServers(in: mainObjectContext) {
 			if apiServer.goodToGo && apiServer.hasApiLimit, let resetDate = apiServer.resetDate {
 				if apiServer.shouldReportOverTheApiLimit {
 					let apiLabel = S(apiServer.label)
@@ -692,7 +692,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			return
 		}
 
-		if !ApiServer.someServersHaveAuthTokens(moc: mainObjectContext) {
+		if !ApiServer.someServersHaveAuthTokens(in: mainObjectContext) {
 			DLog("Won't start refresh because there are no configured API servers")
 			return
 		}
@@ -711,7 +711,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				d.allowRefresh = true
 			}
 
-			if !ApiServer.shouldReportRefreshFailure(moc: mainObjectContext) {
+			if !ApiServer.shouldReportRefreshFailure(in: mainObjectContext) {
 				Settings.lastSuccessfulRefresh = Date()
 			}
 			s.completeRefresh()
@@ -895,7 +895,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	private func snooze(item: ListableItem, snoozeIndex: Int, window: MenuWindow) -> Bool {
-		let s = SnoozePreset.allSnoozePresets(moc: mainObjectContext)
+		let s = SnoozePreset.allSnoozePresets(in: mainObjectContext)
 		if s.count > snoozeIndex  {
 			let oldIndex = window.table.selectedRow
 			item.snoozeFromPreset(s[snoozeIndex])

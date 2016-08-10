@@ -8,15 +8,15 @@ final class Issue: ListableItem {
 
 	@NSManaged var commentsLink: String?
 
-	class func syncIssuesFromInfoArray(_ data: [[NSObject : AnyObject]]?, inRepo: Repo) {
+	class func syncIssuesFromInfoArray(_ data: [[NSObject : AnyObject]]?, in repo: Repo) {
 		let filteredData = data?.filter { $0["pull_request"] == nil } // don't sync issues which are pull requests, they are already synced
-		itemsWithInfo(filteredData, type: "Issue", server: inRepo.apiServer) { item, info, isNewOrUpdated in
+		itemsWithInfo(filteredData, type: "Issue", server: repo.apiServer) { item, info, isNewOrUpdated in
 			let i = item as! Issue
 			if isNewOrUpdated {
 
-				i.baseSyncFromInfo(info, inRepo: inRepo)
+				i.baseSyncFromInfo(info, in: repo)
 
-				if let R = inRepo.fullName {
+				if let R = repo.fullName {
 					i.commentsLink = "/repos/\(R)/issues/\(i.number)/comments"
 				}
 
@@ -33,12 +33,12 @@ final class Issue: ListableItem {
 	}
 
 	class func reasonForEmptyWithFilter(_ filterValue: String?, criterion: GroupingCriterion?) -> NSAttributedString {
-		let openIssues = Issue.countOpen(moc: mainObjectContext, criterion: criterion)
+		let openIssues = Issue.countOpen(in: mainObjectContext, criterion: criterion)
 
 		var color = COLOR_CLASS.lightGray
 		var message: String = ""
 
-		if !ApiServer.someServersHaveAuthTokens(moc: mainObjectContext) {
+		if !ApiServer.someServersHaveAuthTokens(in: mainObjectContext) {
 			color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
 			message = "There are no configured API servers in your settings, please ensure you have added at least one server with a valid API token."
 		} else if appIsRefreshing {
@@ -47,8 +47,8 @@ final class Issue: ListableItem {
 			message = "There are no issues matching this filter."
 		} else if openIssues > 0 {
 			message = "Some items are hidden by your settings."
-		} else if !Repo.anyVisibleRepos(moc: mainObjectContext, criterion: criterion, excludeGrouped: true) {
-			if Repo.anyVisibleRepos(moc: mainObjectContext) {
+		} else if !Repo.anyVisibleRepos(in: mainObjectContext, criterion: criterion, excludeGrouped: true) {
+			if Repo.anyVisibleRepos(in: mainObjectContext) {
 				message = "There are no repositories that are currently visible in this category."
 			} else {
 				color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
@@ -70,7 +70,7 @@ final class Issue: ListableItem {
 	}
 	#endif
 
-	class func markEverythingRead(_ section: Section, moc: NSManagedObjectContext) {
+	class func markEverythingRead(_ section: Section, in moc: NSManagedObjectContext) {
 		let f = NSFetchRequest<Issue>(entityName: "Issue")
 		if section != .none {
 			f.predicate = NSPredicate(format: "sectionIndex == %lld", section.rawValue)
@@ -80,21 +80,21 @@ final class Issue: ListableItem {
 		}
 	}
 
-	class func badgeCount(moc: NSManagedObjectContext) -> Int {
+	class func badgeCount(in moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest<Issue>(entityName: "Issue")
 		f.predicate = NSPredicate(format: "sectionIndex > 0 and unreadComments > 0")
-		return badgeCountFromFetch(f, moc: moc)
+		return badgeCountFromFetch(f, in: moc)
 	}
 
-	class func badgeCount(moc: NSManagedObjectContext, criterion: GroupingCriterion?) -> Int {
+	class func badgeCount(in moc: NSManagedObjectContext, criterion: GroupingCriterion?) -> Int {
 		let f = requestForItemsOfType("Issue", withFilter: nil, sectionIndex: -1, criterion: criterion)
-		return badgeCountFromFetch(f, moc: moc)
+		return badgeCountFromFetch(f, in: moc)
 	}
 
-	class func countOpen(moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
+	class func countOpen(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
 		let f = NSFetchRequest<Issue>(entityName: "Issue")
 		let p = NSPredicate(format: "condition == %lld or condition == nil", ItemCondition.open.rawValue)
-		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, moc: moc)
+		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, in: moc)
 		return try! moc.count(for: f)
 	}
 
@@ -140,11 +140,11 @@ final class Issue: ListableItem {
 		return Section.issueMenuTitles[Int(sectionIndex)]
 	}
 
-	class func allClosed(moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, includeAllGroups: Bool = false) -> [Issue] {
+	class func allClosed(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, includeAllGroups: Bool = false) -> [Issue] {
 		let f = NSFetchRequest<Issue>(entityName: "Issue")
 		f.returnsObjectsAsFaults = false
 		let p = NSPredicate(format: "condition == %lld", ItemCondition.closed.rawValue)
-		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, moc: moc, includeAllGroups: includeAllGroups)
+		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, in: moc, includeAllGroups: includeAllGroups)
 		return try! moc.fetch(f)
 	}
 
