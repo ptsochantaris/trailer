@@ -58,6 +58,7 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 
 	func applicationWillResignActive() {
 		lastView = nil
+		updateComplications()
 	}
 
 	@available(watchOSApplicationExtension 3.0, *)
