@@ -338,7 +338,7 @@ final class DataManager {
 		let storeOptions = [
 			NSMigratePersistentStoresAutomaticallyOption: true,
 			NSInferMappingModelAutomaticallyOption: true,
-			NSSQLitePragmasOption: ["synchronous":"OFF", "fullfsync":"0"]
+			NSSQLitePragmasOption: ["synchronous":"NORMAL"]
 		]
 
 		let dataDir = dataFilesDirectory
