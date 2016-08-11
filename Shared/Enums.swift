@@ -17,6 +17,13 @@ enum Section: Int64 {
 	func movePolicyName() -> String { return Section.movePolicyNames[Int(rawValue)] }
 
 	var intValue: Int { return Int(rawValue) }
+
+	init?(_ rawValue: Int) {
+		self.init(rawValue: Int64(rawValue))
+	}
+	init?(_ rawValue: Int64) {
+		self.init(rawValue: rawValue)
+	}
 }
 
 func S(_ s: String?) -> String {

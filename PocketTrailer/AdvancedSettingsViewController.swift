@@ -124,15 +124,15 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		Setting(section: .Comments,
 		        title: "Move items mentioning me to...",
 		        description: Settings.newMentionMovePolicyHelp,
-		        valueDisplayed: { Section(rawValue: Int64(Settings.newMentionMovePolicy))!.movePolicyName() }),
+		        valueDisplayed: { Section(Settings.newMentionMovePolicy)!.movePolicyName() }),
 		Setting(section: .Comments,
 		        title: "Move items mentioning my teams to...",
 		        description: Settings.teamMentionMovePolicyHelp,
-		        valueDisplayed: { Section(rawValue: Int64(Settings.teamMentionMovePolicy))!.movePolicyName() }),
+		        valueDisplayed: { Section(Settings.teamMentionMovePolicy)!.movePolicyName() }),
 		Setting(section: .Comments,
 		        title: "Move items created in my repos to...",
 		        description: Settings.newItemInOwnedRepoMovePolicyHelp,
-		        valueDisplayed: { Section(rawValue: Int64(Settings.newItemInOwnedRepoMovePolicy))!.movePolicyName() }),
+		        valueDisplayed: { Section(Settings.newItemInOwnedRepoMovePolicy)!.movePolicyName() }),
 		Setting(section: .Comments,
 		        title: "Open items at first unread comment",
 		        description: Settings.openPrAtFirstUnreadCommentHelp,
@@ -153,11 +153,11 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		Setting(section: .Repos,
 		        title: "PR visibility for new repos",
 		        description: Settings.displayPolicyForNewPrsHelp,
-		        valueDisplayed: { RepoDisplayPolicy(rawValue: Int64(Settings.displayPolicyForNewPrs))?.name() }),
+		        valueDisplayed: { RepoDisplayPolicy(Settings.displayPolicyForNewPrs)?.name() }),
 		Setting(section: .Repos,
 		        title: "Issue visibility for new repos",
 		        description: Settings.displayPolicyForNewIssuesHelp,
-		        valueDisplayed: { RepoDisplayPolicy(rawValue: Int64(Settings.displayPolicyForNewIssues))?.name() }),
+		        valueDisplayed: { RepoDisplayPolicy(Settings.displayPolicyForNewIssues)?.name() }),
 
 		Setting(section: .StausesAndLabels,
 		        title: "Show statuses",
@@ -195,11 +195,11 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		Setting(section: .History,
 		        title: "When something is merged",
 		        description: Settings.mergeHandlingPolicyHelp,
-		        valueDisplayed: { HandlingPolicy(rawValue: Settings.mergeHandlingPolicy)?.name() }),
+		        valueDisplayed: { HandlingPolicy(Settings.mergeHandlingPolicy)?.name() }),
 		Setting(section: .History,
 		        title: "When something is closed",
 		        description: Settings.closeHandlingPolicyHelp,
-		        valueDisplayed: { HandlingPolicy(rawValue: Settings.closeHandlingPolicy)?.name() }),
+		        valueDisplayed: { HandlingPolicy(Settings.closeHandlingPolicy)?.name() }),
 		Setting(section: .History,
 		        title: "Don't keep PRs merged by me",
 		        description: Settings.dontKeepPrsMergedByMeHelp,
@@ -226,7 +226,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		        title: "Criterion",
 		        description: Settings.sortMethodHelp,
 		        valueDisplayed: {
-					if let m = SortingMethod(rawValue: Settings.sortMethod) {
+					if let m = SortingMethod(Settings.sortMethod) {
 						return Settings.sortDescending ? m.reverseTitle() : m.normalTitle()
 					} else {
 						return nil

@@ -69,7 +69,7 @@ final class SectionController: CommonController {
 	}
 
 	private func sectionFromApi(_ apiName: String) -> Section {
-		return Section(rawValue: Int64(Section.apiTitles.index(of: apiName)!))!
+		return Section(Section.apiTitles.index(of: apiName)!)!
 	}
 
 	func resetUI() {

@@ -115,6 +115,10 @@ enum SortingMethod: Int {
 	static let reverseTitles = ["Youngest first", "Most recently active", "Reverse alphabetically"]
 	static let normalTitles = ["Oldest first", "Inactive for longest", "Alphabetically"]
 
+	init?(_ rawValue: Int) {
+		self.init(rawValue: rawValue)
+	}
+
 	func normalTitle() -> String {
 		return SortingMethod.normalTitles[rawValue]
 	}
@@ -138,6 +142,9 @@ enum HandlingPolicy: Int {
 	func name() -> String {
 		return HandlingPolicy.labels[rawValue]
 	}
+	init?(_ rawValue: Int) {
+		self.init(rawValue: rawValue)
+	}
 }
 
 enum AssignmentPolicy: Int {
@@ -145,6 +152,9 @@ enum AssignmentPolicy: Int {
 	static let labels = ["Move To Mine", "Move To Participated", "Do Nothing"]
 	func name() -> String {
 		return AssignmentPolicy.labels[rawValue]
+	}
+	init?(_ rawValue: Int) {
+		self.init(rawValue: rawValue)
 	}
 }
 
@@ -163,9 +173,16 @@ enum RepoDisplayPolicy: Int64 {
 		return RepoDisplayPolicy.colors[Int(rawValue)]
 	}
 	var intValue: Int { return Int(rawValue) }
+
+	init?(_ rawValue: Int64) {
+		self.init(rawValue: rawValue)
+	}
+	init?(_ rawValue: Int) {
+		self.init(rawValue: Int64(rawValue))
+	}
 }
 
-enum RepoHidingPolicy: Int {
+enum RepoHidingPolicy: Int64 {
 	case noHiding, hideMyAuthoredPrs, hideMyAuthoredIssues, hideAllMyAuthoredItems, hideOthersPrs, hideOthersIssues, hideAllOthersItems
 	static let labels = ["No Filter", "Hide My PRs", "Hide My Issues", "Hide All Mine", "Hide Others PRs", "Hide Others Issues", "Hide All Others"]
 	static let policies = [noHiding, hideMyAuthoredPrs, hideMyAuthoredIssues, hideAllMyAuthoredItems, hideOthersPrs, hideOthersIssues, hideAllOthersItems]
@@ -177,10 +194,16 @@ enum RepoHidingPolicy: Int {
 							COLOR_CLASS(red: 0.5, green: 0.1, blue: 0.1, alpha: 1.0),
 							COLOR_CLASS(red: 0.5, green: 0.1, blue: 0.1, alpha: 1.0)]
 	func name() -> String {
-		return RepoHidingPolicy.labels[rawValue]
+		return RepoHidingPolicy.labels[Int(rawValue)]
 	}
 	func color() -> COLOR_CLASS {
-		return RepoHidingPolicy.colors[rawValue]
+		return RepoHidingPolicy.colors[Int(rawValue)]
+	}
+	init?(_ rawValue: Int64) {
+		self.init(rawValue: rawValue)
+	}
+	init?(_ rawValue: Int) {
+		self.init(rawValue: Int64(rawValue))
 	}
 }
 

@@ -263,26 +263,26 @@ class ListableItem: DataItem {
 		if outsideMySectionsButAwake && Int64(Settings.newMentionMovePolicy) > Section.none.rawValue
 			&& contains(terms: ["@\(apiServer.userName!)"]) {
 
-			targetSection = Section(rawValue: Int64(Settings.newMentionMovePolicy))!
+			targetSection = Section(Settings.newMentionMovePolicy)!
 			outsideMySectionsButAwake = false
 		}
 
 		if outsideMySectionsButAwake && Int64(Settings.teamMentionMovePolicy) > Section.none.rawValue
 			&& contains(terms: apiServer.teams.flatMap { $0.calculatedReferral }) {
 
-			targetSection = Section(rawValue: Int64(Settings.teamMentionMovePolicy))!
+			targetSection = Section(Settings.teamMentionMovePolicy)!
 			outsideMySectionsButAwake = false
 		}
 
 		if outsideMySectionsButAwake && Int64(Settings.newItemInOwnedRepoMovePolicy) > Section.none.rawValue && repo.isMine {
-			targetSection = Section(rawValue: Int64(Settings.newItemInOwnedRepoMovePolicy))!
+			targetSection = Section(Settings.newItemInOwnedRepoMovePolicy)!
 			outsideMySectionsButAwake = false
 		}
 
 		////////// Apply viewing policies
 
 		let policy = self is Issue ? repo.displayPolicyForIssues : repo.displayPolicyForPrs
-		if let displayPolicy = RepoDisplayPolicy(rawValue: policy) {
+		if let displayPolicy = RepoDisplayPolicy(policy) {
 			switch displayPolicy {
 			case .hide:
 				targetSection = .none
@@ -299,7 +299,7 @@ class ListableItem: DataItem {
 			}
 		}
 
-		if let hidePolicy = RepoHidingPolicy(rawValue: Int(repo.itemHidingPolicy)) {
+		if let hidePolicy = RepoHidingPolicy(repo.itemHidingPolicy) {
 			switch hidePolicy {
 			case .noHiding:
 				break
@@ -723,7 +723,7 @@ class ListableItem: DataItem {
 			sortDescriptors.append(NSSortDescriptor(key: "repo.fullName", ascending: true, selector: #selector(NSString.caseInsensitiveCompare(_:))))
 		}
 
-		if let fieldName = SortingMethod(rawValue: Settings.sortMethod)?.field() {
+		if let fieldName = SortingMethod(Settings.sortMethod)?.field() {
 			if fieldName == "title" {
 				sortDescriptors.append(NSSortDescriptor(key: fieldName, ascending: !Settings.sortDescending, selector: #selector(NSString.caseInsensitiveCompare(_:))))
 			} else {

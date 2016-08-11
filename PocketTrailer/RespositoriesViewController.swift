@@ -233,14 +233,14 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 
 	private func prTitleForRepo(repo: Repo) -> NSAttributedString {
 
-		let policy = RepoDisplayPolicy(rawValue: repo.displayPolicyForPrs) ?? .hide
+		let policy = RepoDisplayPolicy(repo.displayPolicyForPrs) ?? .hide
 		let attributes = attributesForEntryWithPolicy(policy)
 		return NSAttributedString(string: "PR Sections: \(policy.name())", attributes: attributes)
 	}
 
 	private func issueTitleForRepo(repo: Repo) -> NSAttributedString {
 
-		let policy = RepoDisplayPolicy(rawValue: repo.displayPolicyForIssues) ?? .hide
+		let policy = RepoDisplayPolicy(repo.displayPolicyForIssues) ?? .hide
 		let attributes = attributesForEntryWithPolicy(policy)
 		return NSAttributedString(string: "Issue Sections: \(policy.name())", attributes: attributes)
 	}
@@ -261,7 +261,7 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 
 	private func hidingTitleForRepo(repo: Repo) -> NSAttributedString {
 
-		let policy = RepoHidingPolicy(rawValue: Int(repo.itemHidingPolicy)) ?? .noHiding
+		let policy = RepoHidingPolicy(repo.itemHidingPolicy) ?? .noHiding
 		let attributes = attributesForEntryWithPolicy(policy)
 		return NSAttributedString(string: policy.name(), attributes: attributes)
 	}

@@ -39,7 +39,7 @@ final class PRListController: CommonController {
 		_statusLabel = statusLabel
 		super.awake(withContext: context)
 
-		if let s = Section(rawValue: sectionIndex) {
+		if let s = Section(sectionIndex) {
 			setTitle(s.watchMenuName())
 		} else {
 			setTitle("All Unread")

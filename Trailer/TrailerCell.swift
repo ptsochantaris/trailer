@@ -116,7 +116,7 @@ class TrailerCell: NSTableCellView {
 			}
 		}
 
-		if let section = Section(rawValue: item.sectionIndex), !(section == .closed || section == .merged) {
+		if let section = Section(item.sectionIndex), !(section == .closed || section == .merged) {
 
 			if let snooze = item.snoozeUntil {
 				let title: String
