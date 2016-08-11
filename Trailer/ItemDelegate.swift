@@ -62,7 +62,7 @@ final class ItemDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 	func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
 		let object = itemIds[row]
 		if let o = object as? NSManagedObjectID {
-			if let i = existingObjectWithID(o) {
+			if let i = existingObject(with: o) {
 				if let pr = i as? PullRequest {
 					return PullRequestCell(pullRequest: pr)
 				} else if let issue = i as? Issue {
@@ -86,7 +86,7 @@ final class ItemDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 
 	func itemAtRow(_ row: Int) -> ListableItem? {
 		if row >= 0 && row < itemIds.count, let object = itemIds[row] as? NSManagedObjectID {
-			return existingObjectWithID(object) as? ListableItem
+			return existingObject(with: object) as? ListableItem
 		} else {
 			return nil
 		}

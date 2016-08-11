@@ -8,7 +8,7 @@ class TrailerCell: NSTableCellView {
 	var detailFont: NSFont!, titleFont: NSFont!
 
 	var goneDark: Bool {
-		return MenuWindow.usingVibrancy() && app.darkMode
+		return MenuWindow.isUsingVibrancy && app.darkMode
 	}
 
 	override init(frame frameRect: NSRect) {
@@ -20,7 +20,7 @@ class TrailerCell: NSTableCellView {
 	}
 
 	func unPinSelected() {
-		if let i = associatedDataItem() {
+		if let i = associatedDataItem {
 			app.unPinSelectedFor(i)
 		}
 	}
@@ -36,7 +36,7 @@ class TrailerCell: NSTableCellView {
 	var selected = false {
 		didSet {
 
-			guard let table = app.visibleWindow()?.table else { return }
+			guard let table = app.visibleWindow?.table else { return }
 
 			var finalColor: NSColor = unselectedTitleColor
 			if selected {
@@ -46,7 +46,7 @@ class TrailerCell: NSTableCellView {
 				table.deselectRow(table.row(for: self))
 			}
 
-			let item = associatedDataItem()
+			let item = associatedDataItem
 			if let pr = item as? PullRequest {
 				title.attributedStringValue = pr.title(with: titleFont, labelFont: detailFont, titleColor: finalColor)
 			} else if let issue = item as? Issue {
@@ -57,13 +57,13 @@ class TrailerCell: NSTableCellView {
 	}
 
     func openRepo() {
-        if let u = associatedDataItem()?.repo.webUrl, let url = URL(string: u) {
+        if let u = associatedDataItem?.repo.webUrl, let url = URL(string: u) {
             NSWorkspace.shared().open(url)
         }
     }
 
 	func copyToClipboard() {
-		if let s = associatedDataItem()?.webUrl {
+		if let s = associatedDataItem?.webUrl {
 			let p = NSPasteboard.general()
 			p.clearContents()
 			p.declareTypes([NSStringPboardType], owner: self)
@@ -72,7 +72,7 @@ class TrailerCell: NSTableCellView {
 	}
 
 	func copyNumberToClipboard() {
-		if let s = associatedDataItem()?.number {
+		if let s = associatedDataItem?.number {
 			let p = NSPasteboard.general()
 			p.clearContents()
 			p.declareTypes([NSStringPboardType], owner: self)
@@ -82,7 +82,7 @@ class TrailerCell: NSTableCellView {
 
 	func updateMenu() {
 
-		guard let item = associatedDataItem() else {
+		guard let item = associatedDataItem else {
 			menu = nil
 			return
 		}
@@ -165,28 +165,28 @@ class TrailerCell: NSTableCellView {
 	}
 
 	func snoozeSelected(_ sender: NSMenuItem) {
-		if let item = associatedDataItem(), let oid = sender.representedObject as? NSManagedObjectID, let snoozeItem = existingObjectWithID(oid) as? SnoozePreset {
+		if let item = associatedDataItem, let oid = sender.representedObject as? NSManagedObjectID, let snoozeItem = existingObject(with: oid) as? SnoozePreset {
 			item.snooze(using: snoozeItem)
 			saveAndRequestMenuUpdate(item)
 		}
 	}
 
 	func wakeUpSelected() {
-		if let item = associatedDataItem() {
+		if let item = associatedDataItem {
 			item.wakeUp()
 			saveAndRequestMenuUpdate(item)
 		}
 	}
 
 	func markReadSelected() {
-		if let item = associatedDataItem() {
+		if let item = associatedDataItem {
 			item.catchUpWithComments()
 			saveAndRequestMenuUpdate(item)
 		}
 	}
 
 	func markUnreadSelected() {
-		if let item = associatedDataItem() {
+		if let item = associatedDataItem {
 			item.latestReadCommentDate = Date.distantPast
 			item.postProcess()
 			saveAndRequestMenuUpdate(item)
@@ -194,14 +194,14 @@ class TrailerCell: NSTableCellView {
 	}
 
 	func muteSelected() {
-		if let item = associatedDataItem() {
+		if let item = associatedDataItem {
 			item.setMute(true)
 			saveAndRequestMenuUpdate(item)
 		}
 	}
 
 	func unMuteSelected() {
-		if let item = associatedDataItem() {
+		if let item = associatedDataItem {
 			item.setMute(false)
 			saveAndRequestMenuUpdate(item)
 		}
@@ -212,8 +212,8 @@ class TrailerCell: NSTableCellView {
 		app.updateRelatedMenusFor(item)
 	}
 
-	func associatedDataItem() -> ListableItem? {
-		return existingObjectWithID(dataItemId) as? ListableItem
+	var associatedDataItem: ListableItem? {
+		return existingObject(with: dataItemId) as? ListableItem
 	}
 
 	override func updateTrackingAreas() {

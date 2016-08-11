@@ -44,7 +44,7 @@ final class MenuWindow: NSWindow {
 		NotificationCenter.default.addObserver(self, selector: #selector(MenuWindow.refreshUpdate), name: SyncProgressUpdateNotification, object: nil)
 	}
 
-	class func usingVibrancy() -> Bool {
+	class var isUsingVibrancy: Bool {
 		return newSystem && Settings.useVibrancy
 	}
 
@@ -54,7 +54,7 @@ final class MenuWindow: NSWindow {
 
 	func updateVibrancy() {
 
-		if MenuWindow.usingVibrancy() {
+		if MenuWindow.isUsingVibrancy {
 
 			if #available(OSX 10.10, *) {
 			    appearance = NSAppearance(named: app.darkMode ? NSAppearanceNameVibrantDark : NSAppearanceNameVibrantLight)
@@ -82,7 +82,7 @@ final class MenuWindow: NSWindow {
 		}
 	}
 
-	func showStatusItem() -> StatusItemView {
+	var showStatusItem: StatusItemView {
 		if statusItem == nil {
 			statusItem = NSStatusBar.system().statusItem(withLength: NSVariableStatusItemLength)
 			statusItem!.view = StatusItemView { [weak self] in
@@ -109,12 +109,12 @@ final class MenuWindow: NSWindow {
 		if appIsRefreshing {
 			refreshUpdate()
 		} else {
-			refreshMenuItem.title = " Refresh - \(api.lastUpdateDescription())"
+			refreshMenuItem.title = " Refresh - \(api.lastUpdateDescription)"
 		}
 	}
 
 	func refreshUpdate() {
-		refreshMenuItem.title = " \(api.lastUpdateDescription())"
+		refreshMenuItem.title = " \(api.lastUpdateDescription)"
 	}
 
 	func scrollToTop() {

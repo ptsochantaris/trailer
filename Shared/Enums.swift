@@ -2,19 +2,19 @@
 enum Section: Int64 {
 	case none, mine, participated, mentioned, merged, closed, all, snoozed
 	static let prMenuTitles = ["", "Mine", "Participated", "Mentioned", "Recently Merged", "Recently Closed", "All Pull Requests", "Snoozed"]
-	func prMenuName() -> String { return Section.prMenuTitles[Int(rawValue)] }
+	var prMenuName: String { return Section.prMenuTitles[Int(rawValue)] }
 
 	static let issueMenuTitles = ["", "Mine", "Participated", "Mentioned", "Recently Merged", "Recently Closed", "All Issues", "Snoozed"]
-	func issuesMenuName() -> String { return Section.issueMenuTitles[Int(rawValue)] }
+	var issuesMenuName: String { return Section.issueMenuTitles[Int(rawValue)] }
 
 	static let watchMenuTitles = ["", "Mine", "Participated", "Mentioned", "Merged", "Closed", "Other", "Snoozed"]
-	func watchMenuName() -> String { return Section.watchMenuTitles[Int(rawValue)] }
+	var watchMenuName: String { return Section.watchMenuTitles[Int(rawValue)] }
 
 	static let apiTitles = ["", "mine", "participated", "mentioned", "merged", "closed", "other", "snoozed"]
-	func apiName() -> String { return Section.apiTitles[Int(rawValue)] }
+	var apiName: String { return Section.apiTitles[Int(rawValue)] }
 
 	static let movePolicyNames = ["Don't Move", "Mine", "Participated", "Mentioned"]
-	func movePolicyName() -> String { return Section.movePolicyNames[Int(rawValue)] }
+	var movePolicyName: String { return Section.movePolicyNames[Int(rawValue)] }
 
 	var intValue: Int { return Int(rawValue) }
 

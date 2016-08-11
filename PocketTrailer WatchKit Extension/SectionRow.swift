@@ -3,7 +3,7 @@ import WatchKit
 
 protocol PopulatableRow : AnyObject {
 	func populateFrom(_ other: AnyObject)
-	func rowType() -> String
+	var rowType: String { get }
 }
 
 final class SectionRow: NSObject, PopulatableRow {
@@ -17,7 +17,7 @@ final class SectionRow: NSObject, PopulatableRow {
 
 	func populateFrom(_ other: AnyObject) {
 		if let other = other as? SectionRow {
-			if let sectionName = other.section?.watchMenuName() {
+			if let sectionName = other.section?.watchMenuName {
 				titleL.setText("\(other.totalCount!) \(sectionName)")
 			} else {
 				titleL.setText("All Unread")
@@ -28,7 +28,7 @@ final class SectionRow: NSObject, PopulatableRow {
 			countHolder.setHidden(other.unreadCount==0)
 		}
 	}
-	func rowType() -> String {
+	var rowType: String {
 		return NSStringFromClass(self.dynamicType).components(separatedBy: ".").last!
 	}
 

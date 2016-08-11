@@ -93,7 +93,7 @@ final class LinkField: CenterTextField {
 	}
 
     private func selectParentPr(_ theEvent: NSEvent) {
-        if let parentView = nextResponder as? TrailerCell, let pr = parentView.associatedDataItem() {
+        if let parentView = nextResponder as? TrailerCell, let pr = parentView.associatedDataItem {
             let isAlternative = ((theEvent.modifierFlags.intersection(.option)) == .option)
 			app.dataItemSelected(pr, alternativeSelect: isAlternative, window: window)
         }

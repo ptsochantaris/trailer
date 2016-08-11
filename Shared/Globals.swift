@@ -8,7 +8,6 @@ let THUMBNAIL_SIDE = 40.0*GLOBAL_SCREEN_SCALE
 let GLOBAL_TINT = UIColor(red: 52.0/255.0, green: 110.0/255.0, blue: 183.0/255.0, alpha: 1.0)
 let DISABLED_FADE: CGFloat = 0.3
 
-let stringDrawingOptions: NSStringDrawingOptions = [.usesLineFragmentOrigin, .usesFontLeading]
 typealias COLOR_CLASS = UIColor
 typealias FONT_CLASS = UIFont
 typealias IMAGE_CLASS = UIImage
@@ -27,7 +26,6 @@ let AVATAR_PADDING: CGFloat = 8
 let REMOVE_BUTTON_WIDTH: CGFloat = 80
 let DISABLED_FADE: CGFloat = 0.4
 
-let stringDrawingOptions: NSStringDrawingOptions = [.usesLineFragmentOrigin, .usesFontLeading]
 typealias COLOR_CLASS = NSColor
 typealias FONT_CLASS = NSFont
 typealias IMAGE_CLASS = NSImage
@@ -35,10 +33,15 @@ typealias IMAGE_CLASS = NSImage
 #endif
 
 ////////////////////// Global variables
+
 var appIsRefreshing = false
 var preferencesDirty = false
 var lastRepoCheck = Date.distantPast
 let autoSnoozeDate = Date.distantFuture.addingTimeInterval(-1)
+let stringDrawingOptions: NSStringDrawingOptions = [.usesLineFragmentOrigin, .usesFontLeading]
+let LISTABLE_URI_KEY = "listableUriKey"
+let COMMENT_ID_KEY = "commentIdKey"
+let NOTIFICATION_URL_KEY = "urlKey"
 
 //////////////////////////
 
@@ -119,15 +122,15 @@ enum SortingMethod: Int {
 		self.init(rawValue: rawValue)
 	}
 
-	func normalTitle() -> String {
+	var normalTitle: String {
 		return SortingMethod.normalTitles[rawValue]
 	}
 
-	func reverseTitle() -> String {
+	var reverseTitle: String {
 		return SortingMethod.reverseTitles[rawValue]
 	}
 
-	func field() -> String? {
+	var field: String? {
 		switch self {
 		case .creationDate: return "createdAt"
 		case .recentActivity: return "updatedAt"
@@ -139,7 +142,7 @@ enum SortingMethod: Int {
 enum HandlingPolicy: Int {
 	case keepMine, keepMineAndParticipated, keepAll, keepNone
 	static let labels = ["Keep Mine", "Keep Mine & Participated", "Keep All", "Don't Keep"]
-	func name() -> String {
+	var name: String {
 		return HandlingPolicy.labels[rawValue]
 	}
 	init?(_ rawValue: Int) {
@@ -150,7 +153,7 @@ enum HandlingPolicy: Int {
 enum AssignmentPolicy: Int {
 	case moveToMine, moveToParticipated, doNothing
 	static let labels = ["Move To Mine", "Move To Participated", "Do Nothing"]
-	func name() -> String {
+	var name: String {
 		return AssignmentPolicy.labels[rawValue]
 	}
 	init?(_ rawValue: Int) {
@@ -166,10 +169,10 @@ enum RepoDisplayPolicy: Int64 {
 							COLOR_CLASS(red: 0.7, green: 0.0, blue: 0.0, alpha: 1.0),
 							COLOR_CLASS(red: 0.8, green: 0.4, blue: 0.0, alpha: 1.0),
 							COLOR_CLASS(red: 0.0, green: 0.5, blue: 0.0, alpha: 1.0)]
-	func name() -> String {
+	var name: String {
 		return RepoDisplayPolicy.labels[Int(rawValue)]
 	}
-	func color() -> COLOR_CLASS {
+	var color: COLOR_CLASS {
 		return RepoDisplayPolicy.colors[Int(rawValue)]
 	}
 	var intValue: Int { return Int(rawValue) }
@@ -193,10 +196,10 @@ enum RepoHidingPolicy: Int64 {
 							COLOR_CLASS(red: 0.5, green: 0.1, blue: 0.1, alpha: 1.0),
 							COLOR_CLASS(red: 0.5, green: 0.1, blue: 0.1, alpha: 1.0),
 							COLOR_CLASS(red: 0.5, green: 0.1, blue: 0.1, alpha: 1.0)]
-	func name() -> String {
+	var name: String {
 		return RepoHidingPolicy.labels[Int(rawValue)]
 	}
-	func color() -> COLOR_CLASS {
+	var color: COLOR_CLASS {
 		return RepoHidingPolicy.colors[Int(rawValue)]
 	}
 	init?(_ rawValue: Int64) {
@@ -211,11 +214,7 @@ func MAKECOLOR(_ red: CGFloat, _ green: CGFloat, _ blue: CGFloat, _ alpha: CGFlo
 	return COLOR_CLASS(red: red, green: green, blue: blue, alpha: alpha)
 }
 
-let LISTABLE_URI_KEY = "listableUriKey"
-let COMMENT_ID_KEY = "commentIdKey"
-let NOTIFICATION_URL_KEY = "urlKey"
-
-func currentAppVersion() -> String {
+var currentAppVersion: String {
 	return S(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String)
 }
 
@@ -241,12 +240,12 @@ func currentAppVersion() -> String {
 
 #endif
 
-func versionString() -> String {
+var versionString: String {
 	let buildNumber = S(Bundle.main.infoDictionary?["CFBundleVersion"] as? String)
-	return "Version \(currentAppVersion()) (\(buildNumber))"
+	return "Version \(currentAppVersion) (\(buildNumber))"
 }
 
-func existingObjectWithID(_ id: NSManagedObjectID) -> NSManagedObject? {
+func existingObject(with id: NSManagedObjectID) -> NSManagedObject? {
 	return try? mainObjectContext.existingObject(with: id)
 }
 
@@ -271,10 +270,10 @@ extension String {
 		let r = Range(uncheckedBounds: (lower: l, upper: u))
 		return replacingCharacters(in: r, with: string)
 	}
-	func trim() -> String {
+	var trim: String {
 		return trimmingCharacters(in: .whitespacesAndNewlines)
 	}
-	var md5hash: String {
+	var md5hashed: String {
 		let digestLen = Int(CC_MD5_DIGEST_LENGTH)
 		let result = UnsafeMutablePointer<CUnsignedChar>.allocate(capacity: digestLen)
 

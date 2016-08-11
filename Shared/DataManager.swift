@@ -15,13 +15,13 @@ final class DataManager {
 
 		guard mainObjectContext.persistentStoreCoordinator?.persistentStores.count > 0 else { return }
 
-		if Settings.lastRunVersion != versionString() {
+		if Settings.lastRunVersion != versionString {
 			DLog("VERSION UPDATE MAINTENANCE NEEDED")
 			#if os(iOS)
 				migrateDatabaseToShared()
 			#endif
 			performVersionChangedTasks()
-			Settings.lastRunVersion = versionString()
+			Settings.lastRunVersion = versionString
 		}
 		ApiServer.ensureAtLeastGithub(in: mainObjectContext)
 	}
@@ -126,8 +126,8 @@ final class DataManager {
 
 	private class func migrateDatabaseToShared() {
 		do {
-			let oldDocumentsDirectory = legacyFilesDirectory().path
-			let newDocumentsDirectory = sharedFilesDirectory().path
+			let oldDocumentsDirectory = legacyFilesDirectory.path
+			let newDocumentsDirectory = sharedFilesDirectory.path
 			let fm = FileManager.default
 			let files = try fm.contentsOfDirectory(atPath: oldDocumentsDirectory)
 			DLog("Migrating DB files into group container from %@ to %@", oldDocumentsDirectory, newDocumentsDirectory)
@@ -241,7 +241,7 @@ final class DataManager {
 		}
 	}
 
-	class func childContext() -> NSManagedObjectContext {
+	class func buildChildContext() -> NSManagedObjectContext {
 		let c = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
 		c.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
 		c.parent = mainObjectContext
@@ -294,29 +294,29 @@ final class DataManager {
 		return nil
 	}
 
-	private class func dataFilesDirectory() -> URL {
+	private class var dataFilesDirectory: URL {
 		#if os(iOS)
-			let sharedFiles = sharedFilesDirectory()
+			let sharedFiles = sharedFilesDirectory
 		#else
-			let sharedFiles = legacyFilesDirectory()
+			let sharedFiles = legacyFilesDirectory
 		#endif
 		DLog("Files in %@", sharedFiles)
 		return sharedFiles
 	}
 
-	private class func legacyFilesDirectory() -> URL {
+	private class var legacyFilesDirectory: URL {
 		let f = FileManager.default
 		let appSupportURL = f.urls(for: FileManager.SearchPathDirectory.applicationSupportDirectory, in: FileManager.SearchPathDomainMask.userDomainMask).last!
 		return appSupportURL.appendingPathComponent("com.housetrip.Trailer")
 	}
 
-	class func sharedFilesDirectory() -> URL {
+	class var sharedFilesDirectory: URL {
 		return FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.Trailer")!
 	}
 
 	class func removeDatabaseFiles() {
 		let fm = FileManager.default
-		let documentsDirectory = dataFilesDirectory().path
+		let documentsDirectory = dataFilesDirectory.path
 		do {
 			for file in try fm.contentsOfDirectory(atPath: documentsDirectory) {
 				if file.contains("Trailer.sqlite") {
@@ -341,7 +341,7 @@ final class DataManager {
 			NSSQLitePragmasOption: ["synchronous":"OFF", "fullfsync":"0"]
 		]
 
-		let dataDir = dataFilesDirectory()
+		let dataDir = dataFilesDirectory
 		let sqlStorePath = dataDir.appendingPathComponent("Trailer.sqlite")
 
 		let modelPath = Bundle.main.url(forResource: "Trailer", withExtension: "momd")!

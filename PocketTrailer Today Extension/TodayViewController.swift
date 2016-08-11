@@ -90,7 +90,7 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 
 		func append(_ a: NSMutableAttributedString, count: Int, section: Section) {
 			if count > 0 {
-				let text = "\(count)\u{a0}\(section.watchMenuName()), "
+				let text = "\(count)\u{a0}\(section.watchMenuName), "
 				a.append(NSAttributedString(string: text, attributes: normalAttributes))
 			}
 		}
@@ -120,13 +120,13 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 
 				for r in result["views"] as! [[String : AnyObject]] {
 					if let v = r[type] as? [String : AnyObject] {
-						totalMine += v[Section.mine.apiName()]?["total"] as? Int ?? 0
-						totalParticipated += v[Section.participated.apiName()]?["total"] as? Int ?? 0
-						totalMentioned += v[Section.mentioned.apiName()]?["total"] as? Int ?? 0
-						totalSnoozed += v[Section.snoozed.apiName()]?["total"] as? Int ?? 0
-						totalOther += v[Section.all.apiName()]?["total"] as? Int ?? 0
-						totalMerged += v[Section.merged.apiName()]?["total"] as? Int ?? 0
-						totalClosed += v[Section.closed.apiName()]?["total"] as? Int ?? 0
+						totalMine += v[Section.mine.apiName]?["total"] as? Int ?? 0
+						totalParticipated += v[Section.participated.apiName]?["total"] as? Int ?? 0
+						totalMentioned += v[Section.mentioned.apiName]?["total"] as? Int ?? 0
+						totalSnoozed += v[Section.snoozed.apiName]?["total"] as? Int ?? 0
+						totalOther += v[Section.all.apiName]?["total"] as? Int ?? 0
+						totalMerged += v[Section.merged.apiName]?["total"] as? Int ?? 0
+						totalClosed += v[Section.closed.apiName]?["total"] as? Int ?? 0
 						totalUnread += v["unread"] as? Int ?? 0
 						totalOpen += v["total_open"] as? Int ?? 0
 					}

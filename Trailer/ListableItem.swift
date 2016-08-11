@@ -196,7 +196,7 @@ class ListableItem: DataItem {
 		}
 	}
 
-	private final func shouldMoveToSnoozing() -> Bool {
+	private final var shouldMoveToSnoozing: Bool {
 		if snoozeUntil == nil {
 			let d = TimeInterval(Settings.autoSnoozeDuration)
 			if d > 0 && !wasAwokenFromSnooze && updatedAt != NSDate.distantPast, let snoozeByDate = updatedAt?.addingTimeInterval(86400.0*d) {
@@ -253,7 +253,7 @@ class ListableItem: DataItem {
 
 		if currentCondition == ItemCondition.merged.rawValue		{ targetSection = .merged }
 		else if currentCondition == ItemCondition.closed.rawValue	{ targetSection = .closed }
-		else if shouldMoveToSnoozing()								{ targetSection = .snoozed }
+		else if shouldMoveToSnoozing								{ targetSection = .snoozed }
 		else if isMine || assignedToMySection						{ targetSection = .mine }
 		else if assignedToParticipated || commentedByMe				{ targetSection = .participated }
 		else														{ targetSection = .all }
@@ -372,7 +372,7 @@ class ListableItem: DataItem {
 		if title==nil { title = "(No title)" }
 	}
 
-	final func urlForOpening() -> String? {
+	final var urlForOpening: String? {
 
 		if unreadComments > 0 && Settings.openPrAtFirstUnreadComment {
 			let f = NSFetchRequest<PRComment>(entityName: "PRComment")
@@ -389,14 +389,14 @@ class ListableItem: DataItem {
 		return webUrl
 	}
 
-	final func accessibleTitle() -> String {
+	final var accessibleTitle: String {
 		var components = [String]()
 		if let t = title {
 			components.append(t)
 		}
 		if Settings.showLabels {
 			components.append("\(labels.count) labels:")
-			for l in sortedLabels() {
+			for l in sortedLabels {
 				if let n = l.name {
 					components.append(n)
 				}
@@ -405,7 +405,7 @@ class ListableItem: DataItem {
 		return components.joined(separator: ",")
 	}
 
-	final func sortedLabels() -> [PRLabel] {
+	final var sortedLabels: [PRLabel] {
 		return Array(labels).sorted(by: { (l1: PRLabel, l2: PRLabel) -> Bool in
 			return l1.name!.compare(l2.name!) == .orderedAscending
 		})
@@ -446,7 +446,7 @@ class ListableItem: DataItem {
 					}
 
 					var count = 0
-					for l in sortedLabels() {
+					for l in sortedLabels {
 						var a = labelAttributes
 						let color = l.colorForDisplay
 						a[NSBackgroundColorAttributeName] = color
@@ -636,7 +636,7 @@ class ListableItem: DataItem {
 								andPredicates.append(p)
 							}
 							fi = fi.replacingOccurrences(of: word, with: "")
-							fi = fi.trim()
+							fi = fi.trim
 							foundOne = true
 							break
 						}
@@ -723,7 +723,7 @@ class ListableItem: DataItem {
 			sortDescriptors.append(NSSortDescriptor(key: "repo.fullName", ascending: true, selector: #selector(NSString.caseInsensitiveCompare(_:))))
 		}
 
-		if let fieldName = SortingMethod(Settings.sortMethod)?.field() {
+		if let fieldName = SortingMethod(Settings.sortMethod)?.field {
 			if fieldName == "title" {
 				sortDescriptors.append(NSSortDescriptor(key: fieldName, ascending: !Settings.sortDescending, selector: #selector(NSString.caseInsensitiveCompare(_:))))
 			} else {
@@ -744,11 +744,11 @@ class ListableItem: DataItem {
 	final class func relatedItems(from notificationUserInfo: [NSObject : AnyObject]) -> (PRComment?, ListableItem)? {
 		var item: ListableItem?
 		var comment: PRComment?
-		if let cid = notificationUserInfo[COMMENT_ID_KEY] as? String, let itemId = DataManager.idForUriPath(cid), let c = existingObjectWithID(itemId) as? PRComment {
+		if let cid = notificationUserInfo[COMMENT_ID_KEY] as? String, let itemId = DataManager.idForUriPath(cid), let c = existingObject(with: itemId) as? PRComment {
 			comment = c
 			item = c.pullRequest ?? c.issue
 		} else if let pid = notificationUserInfo[LISTABLE_URI_KEY] as? String, let itemId = DataManager.idForUriPath(pid) {
-			item = existingObjectWithID(itemId) as? ListableItem
+			item = existingObject(with: itemId) as? ListableItem
 		}
 		if let i = item {
 			return (comment, i)
@@ -795,7 +795,7 @@ class ListableItem: DataItem {
 		let labelNames = labels.flatMap { $0.name }
 		return [(userLogin ?? "NO_USERNAME"), "Trailer", "PocketTrailer", "Pocket Trailer"] + labelNames + (repo.fullName?.components(separatedBy: "/") ?? [])
 	}
-	final func searchTitle() -> String {
+	final var searchTitle: String {
 		let labelNames = labels.flatMap { $0.name }
 		var suffix = ""
 		if labelNames.count > 0 {
@@ -811,13 +811,13 @@ class ListableItem: DataItem {
 		guard CSSearchableIndex.isIndexingAvailable() else { return }
 
 		let s = CSSearchableItemAttributeSet(itemContentType: kUTTypeText as String)
-		s.title = searchTitle()
+		s.title = searchTitle
 		s.contentCreationDate = createdAt
 		s.contentModificationDate = updatedAt
 		s.keywords = searchKeywords
 		s.creator = userLogin
 
-		s.contentDescription = "\(S(repo.fullName)) @\(S(userLogin)) - \(S(body?.trim()))"
+		s.contentDescription = "\(S(repo.fullName)) @\(S(userLogin)) - \(S(body?.trim))"
 
 		func completeIndex(_ s: CSSearchableItemAttributeSet) {
 			let i = CSSearchableItem(uniqueIdentifier:objectID.uriRepresentation().absoluteString, domainIdentifier: nil, attributeSet: s)

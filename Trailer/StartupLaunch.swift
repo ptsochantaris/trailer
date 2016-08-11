@@ -2,11 +2,11 @@
 
 final class StartupLaunch: NSObject {
 
-	class func isAppLoginItem() -> Bool {
-		return (itemReferencesInLoginItems().existingReference != nil)
+	class var isAppLoginItem: Bool {
+		return itemReferencesInLoginItems.existingReference != nil
 	}
 
-	private class func itemReferencesInLoginItems() -> (existingReference: LSSharedFileListItem?, lastReference: LSSharedFileListItem?) {
+	private class var itemReferencesInLoginItems: (existingReference: LSSharedFileListItem?, lastReference: LSSharedFileListItem?) {
 
 		if let loginItemsRef = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems.takeRetainedValue(), nil).takeRetainedValue() as LSSharedFileList? {
 			let loginItems = LSSharedFileListCopySnapshot(loginItemsRef, nil).takeRetainedValue() as NSArray as! [LSSharedFileListItem]
@@ -31,8 +31,8 @@ final class StartupLaunch: NSObject {
 
 	class func setLaunchOnLogin(_ launch: Bool) {
 
-		let itemReferences = itemReferencesInLoginItems()
-		let isSet = (itemReferences.existingReference != nil)
+		let itemReferences = itemReferencesInLoginItems
+		let isSet = itemReferences.existingReference != nil
 		if let loginItemsRef = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems.takeRetainedValue(), nil).takeRetainedValue() as LSSharedFileList? {
 			if launch && !isSet {
 				if let appUrl : CFURL = URL(fileURLWithPath: Bundle.main.bundlePath) {

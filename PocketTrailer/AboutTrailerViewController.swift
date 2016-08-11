@@ -7,7 +7,7 @@ final class AboutTrailerViewController: UIViewController {
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		versionNumber.text = versionString()
+		versionNumber.text = versionString
 	}
 
 	override func viewDidAppear(_ animated: Bool) {

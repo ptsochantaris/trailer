@@ -153,16 +153,16 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 			if let s = snoozeItem {
 				switch indexPath.row {
 				case 0:
-					cell.textLabel?.text = dayLabel()
-					cell.detailTextLabel?.text = dayValues()[Int(s.day)]
+					cell.textLabel?.text = dayLabel
+					cell.detailTextLabel?.text = dayValues[Int(s.day)]
 					cell.detailTextLabel?.textColor = detailColor(s.day)
 				case 1:
-					cell.textLabel?.text = hourLabel()
-					cell.detailTextLabel?.text = hourValues()[Int(s.hour)]
+					cell.textLabel?.text = hourLabel
+					cell.detailTextLabel?.text = hourValues[Int(s.hour)]
 					cell.detailTextLabel?.textColor = detailColor(s.hour)
 				default:
-					cell.textLabel?.text = minuteLabel()
-					cell.detailTextLabel?.text = minuteValues()[Int(s.minute)]
+					cell.textLabel?.text = minuteLabel
+					cell.detailTextLabel?.text = minuteValues[Int(s.minute)]
 					cell.detailTextLabel?.textColor = detailColor(s.minute)
 				}
 			}
@@ -198,7 +198,7 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 		}
 	}
 
-	private func hourLabel() -> String {
+	private var hourLabel: String {
 		if typeSelector.selectedSegmentIndex == 0 {
 			return snoozeItem?.hour ?? 0 > 1 ? "Hours" : "Hour"
 		} else {
@@ -206,7 +206,7 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 		}
 	}
 
-	private func dayLabel() -> String {
+	private var dayLabel: String {
 		if typeSelector.selectedSegmentIndex == 0 {
 			return snoozeItem?.day ?? 0 > 1 ? "Days" : "Day"
 		} else {
@@ -214,7 +214,7 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 		}
 	}
 
-	private func minuteLabel() -> String {
+	private var minuteLabel: String {
 		if typeSelector.selectedSegmentIndex == 0 {
 			return snoozeItem?.minute ?? 0 > 1 ? "Minutes" : "Minute"
 		} else {
@@ -222,7 +222,7 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 		}
 	}
 
-	private func dayValues() -> [String] {
+	private var dayValues: [String] {
 		var res = [String]()
 		if typeSelector.selectedSegmentIndex==0 {
 			res.append("No days")
@@ -236,7 +236,7 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 		return res
 	}
 
-	private func hourValues() -> [String] {
+	private var hourValues: [String] {
 		var res = [String]()
 		if typeSelector.selectedSegmentIndex==0 {
 			res.append("No hours")
@@ -252,7 +252,7 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 		return res
 	}
 
-	private func minuteValues() -> [String] {
+	private var minuteValues: [String] {
 		var res = [String]()
 		if typeSelector.selectedSegmentIndex==0 {
 			res.append("No minutes")
@@ -288,11 +288,11 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 		pickerMode = mode
 		switch mode {
 		case .Day:
-			pickerValues = dayValues()
+			pickerValues = dayValues
 		case .Hour:
-			pickerValues = hourValues()
+			pickerValues = hourValues
 		case .Minute:
-			pickerValues = minuteValues()
+			pickerValues = minuteValues
 		}
 		showPicker()
 	}
@@ -337,7 +337,7 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 		}
 	}
 
-	private func indexForPicker() -> Int {
+	private var indexForPicker: Int {
 		if let p = pickerMode {
 			switch p {
 			case .Day:
@@ -354,7 +354,7 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 
 	private func showPicker() {
 		picker.reloadAllComponents()
-		picker.selectRow(indexForPicker(), inComponent: 0, animated: false)
+		picker.selectRow(indexForPicker, inComponent: 0, animated: false)
 		pickerBottom.constant = tabBarController?.tabBar.frame.size.height ?? 0
 		UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: { [weak self] in
 			self?.pickerShield.alpha = 1.0

@@ -34,15 +34,15 @@ final class API {
 
         #if DEBUG
             #if os(iOS)
-                let userAgent = "HouseTrip-Trailer-v\(currentAppVersion())-iOS-Development"
+                let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-iOS-Development"
             #else
-                let userAgent = "HouseTrip-Trailer-v\(currentAppVersion())-OSX-Development"
+                let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-OSX-Development"
             #endif
         #else
             #if os(iOS)
-                let userAgent = "HouseTrip-Trailer-v\(currentAppVersion())-iOS-Release"
+                let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-iOS-Release"
             #else
-                let userAgent = "HouseTrip-Trailer-v\(currentAppVersion())-OSX-Release"
+                let userAgent = "HouseTrip-Trailer-v\(currentAppVersion)-OSX-Release"
             #endif
         #endif
 
@@ -79,7 +79,7 @@ final class API {
 		}
 	}
 
-	func noNetworkConnection() -> Bool {
+	var hasNetworkConnection: Bool {
 		DLog("Actively verifying reported network availability state...")
 		let previousNetworkStatus = currentNetworkStatus
 		checkNetworkAvailability()
@@ -88,12 +88,12 @@ final class API {
 		} else {
 			DLog("No change to network state")
 		}
-		return currentNetworkStatus == NetworkStatus.NotReachable
+		return currentNetworkStatus != .NotReachable
 	}
 
 	/////////////////////////////////////////////////////// Utilities
 
-	func lastUpdateDescription() -> String {
+	var lastUpdateDescription: String {
 		if appIsRefreshing {
 			let operations = apiRunningCount+apiCallQueue.count
 			if operations < 2 {
@@ -168,8 +168,8 @@ final class API {
 
 		let connector = path.contains("?") ? "&" : "?"
 		let absolutePath = "\(path)\(connector)s=\(THUMBNAIL_SIDE)"
-		let imageKey = "\(absolutePath) \(currentAppVersion())"
-		let cachePath = cacheDirectory.appending(pathComponent: "imgcache-\(imageKey.md5hash).jpg")
+		let imageKey = "\(absolutePath) \(currentAppVersion)"
+		let cachePath = cacheDirectory.appending(pathComponent: "imgcache-\(imageKey.md5hashed).jpg")
 		
 		let fileManager = FileManager.default
 		if fileManager.fileExists(atPath: cachePath) {
@@ -219,7 +219,7 @@ final class API {
 	////////////////////////////////////// API interface
 
 	func syncItemsForActiveReposAndCallback(_ processingCallback: Completion?, callback: Completion) {
-		let syncContext = DataManager.childContext()
+		let syncContext = DataManager.buildChildContext()
 
 		let shouldRefreshReposToo = lastRepoCheck == Date.distantPast
 			|| (Date().timeIntervalSince(lastRepoCheck) > TimeInterval(Settings.newRepoCheckPeriod*3600.0))
@@ -1393,9 +1393,9 @@ final class API {
 
 		/////////////////////// 60 second dumb-caching
 		let cacheKey = "\(server.objectID.uriRepresentation().absoluteString) \(expandedPath)"
-		let previousCacheEntry = CacheEntry.entryForKey(cacheKey)?.cacheUnit() // move data out of thread-specific context
+		let previousCacheEntry = CacheEntry.entryForKey(cacheKey)?.cacheUnit // move data out of thread-specific context
 		if let p = previousCacheEntry {
-			if p.lastFetched.timeIntervalSince1970 > Date(timeIntervalSinceNow: -60).timeIntervalSince1970, let parsedData = p.parsedData() {
+			if p.lastFetched.timeIntervalSince1970 > Date(timeIntervalSinceNow: -60).timeIntervalSince1970, let parsedData = p.parsedData {
 				DLog("(%@) GET %@ - CACHED", apiServerLabel, expandedPath)
 				handleResponse(with: p.data,
 				               parsedData: parsedData,
@@ -1406,7 +1406,7 @@ final class API {
 				               shouldRetry: false,
 				               badServerResponse: false,
 				               existingBackOff: nil,
-				               headers: p.actualHeaders(),
+				               headers: p.actualHeaders,
 				               completion: completion)
 				return
 			}
@@ -1428,9 +1428,9 @@ final class API {
 			var headers = response?.allHeaderFields
 
 			if code == 304, let p = previousCacheEntry {
-				parsedData = p.parsedData()
+				parsedData = p.parsedData
 				code = Int(p.code)
-				headers = p.actualHeaders()
+				headers = p.actualHeaders
 				atNextEvent {
 					CacheEntry.markKeyAsFetched(cacheKey)
 				}

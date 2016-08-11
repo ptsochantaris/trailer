@@ -9,14 +9,14 @@ class CommonController: WKInterfaceController {
 	override func willActivate() {
 		super.willActivate()
 		if let app = WKExtension.shared().delegate as? ExtensionDelegate, app.lastView != self {
-			if showLoadingFeedback() {
+			if showLoadingFeedback {
 				showStatus("Connecting...", hideTable: false)
 			}
 			app.lastView = self
 		}
 	}
 
-	func showLoadingFeedback() -> Bool {
+	var showLoadingFeedback: Bool {
 		return _table.numberOfRows == 0
 	}
 
@@ -38,7 +38,7 @@ class CommonController: WKInterfaceController {
 	private var loading = 0
 	func sendRequest(_ request: [String : AnyObject]) {
 		if loading == 0 {
-			if showLoadingFeedback() {
+			if showLoadingFeedback {
 				showStatus("Loading...", hideTable: false)
 			}
 			attemptRequest(request)

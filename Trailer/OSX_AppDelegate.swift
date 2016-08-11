@@ -17,7 +17,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 	func setupWindows() {
 
-		darkMode = currentSystemDarkMode()
+		darkMode = currentSystemDarkMode
 
 		for d in menuBarSets {
 			d.throwAway()
@@ -322,7 +322,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 		ignoreNextFocusLoss = alternativeSelect
 
-		let urlToOpen = item.urlForOpening()
+		let urlToOpen = item.urlForOpening
 		item.catchUpWithComments()
 		updateRelatedMenusFor(item)
 
@@ -342,7 +342,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	func show(menu: MenuWindow) {
 		if !menu.isVisible {
 
-			if let w = visibleWindow() {
+			if let w = visibleWindow {
 				w.closeMenu()
 			}
 
@@ -352,10 +352,10 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 	func sectionHeaderRemoveSelected(_ headerTitle: String) {
 
-		guard let inMenu = visibleWindow(), let menuBarSet = menuBarSetForWindow(inMenu) else { return }
+		guard let inMenu = visibleWindow, let menuBarSet = menuBarSetForWindow(inMenu) else { return }
 
 		if inMenu === menuBarSet.prMenu {
-			if headerTitle == Section.merged.prMenuName() {
+			if headerTitle == Section.merged.prMenuName {
 				if Settings.dontAskBeforeWipingMerged {
 					removeAllMergedRequests(menuBarSet)
 				} else {
@@ -375,7 +375,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 						}
 					}
 				}
-			} else if headerTitle == Section.closed.prMenuName() {
+			} else if headerTitle == Section.closed.prMenuName {
 				if Settings.dontAskBeforeWipingClosed {
 					removeAllClosedRequests(menuBarSet)
 				} else {
@@ -400,7 +400,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				show(menu: menuBarSet.prMenu)
 			}
 		} else if inMenu === menuBarSet.issuesMenu {
-			if headerTitle == Section.closed.issuesMenuName() {
+			if headerTitle == Section.closed.issuesMenuName {
 				if Settings.dontAskBeforeWipingClosed {
 					removeAllClosedIssues(menuBarSet)
 				} else {
@@ -686,7 +686,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			return
 		}
 
-		if api.noNetworkConnection() {
+		if !api.hasNetworkConnection {
 			DLog("Won't start refresh because internet connectivity is down")
 			return
 		}
@@ -730,7 +730,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 	/////////////////////// keyboard shortcuts
 
-	func statusItemList() -> [NSStatusItem] {
+	var statusItemList: [NSStatusItem] {
 		var list = [NSStatusItem]()
 		for s in menuBarSets {
 			if let i = s.prMenu.statusItem, let v = i.view, v.frame.size.width > 0 {
@@ -782,7 +782,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 						return incomingEvent
 					}
 
-					let statusItems = S.statusItemList()
+					let statusItems = S.statusItemList
 					if let s = w.statusItem, let ind = statusItems.index(of: s) {
 						var nextIndex = incomingEvent.keyCode==123 ? ind+1 : ind-1
 						if nextIndex < 0 {
@@ -930,7 +930,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	func focusedItem(blink: Bool) -> ListableItem? {
-		if !isManuallyScrolling, let w = visibleWindow() {
+		if !isManuallyScrolling, let w = visibleWindow {
 			return w.focusedItem(blink: blink)
 		}
 		return nil
@@ -1005,7 +1005,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 		if let w = aboutWindowController!.window as? AboutWindow {
 			w.level = Int(CGWindowLevelForKey(CGWindowLevelKey.floatingWindow))
-			w.version.stringValue = versionString()
+			w.version.stringValue = versionString
 			w.center()
 			w.makeKeyAndOrderFront(self)
 		}
@@ -1043,7 +1043,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		return nil
 	}
 
-	func visibleWindow() -> MenuWindow? {
+	var visibleWindow: MenuWindow? {
 		for d in menuBarSets {
 			if d.prMenu.isVisible { return d.prMenu }
 			if d.issuesMenu.isVisible { return d.issuesMenu }
@@ -1091,13 +1091,13 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			let s = NSStatusBar.system().statusItem(withLength: NSVariableStatusItemLength)
 			s.statusBar.removeStatusItem(s)
 
-			if menuBarSets.count == 0 || (darkMode != currentSystemDarkMode()) {
+			if menuBarSets.count == 0 || darkMode != currentSystemDarkMode {
 				setupWindows()
 			}
 		}
 	}
 
-	private func currentSystemDarkMode() -> Bool {
+	private var currentSystemDarkMode: Bool {
 		if #available(OSX 10.10, *) {
 			let c = NSAppearance.current()
 			return c.name.contains(NSAppearanceNameVibrantDark)

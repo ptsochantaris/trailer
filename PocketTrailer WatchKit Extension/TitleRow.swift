@@ -8,7 +8,7 @@ final class TitleRow: NSObject, PopulatableRow {
 			titleL.setText(o.title)
 		}
 	}
-	func rowType() -> String {
+	var rowType: String {
 		return NSStringFromClass(self.dynamicType).components(separatedBy: ".").last!
 	}
 	

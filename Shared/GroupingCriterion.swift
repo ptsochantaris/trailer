@@ -19,7 +19,7 @@ final class GroupingCriterion {
 	var label: String {
 		if let r = repoGroup {
 			return r
-		} else if let aid = apiServerId, let a = existingObjectWithID(aid) as? ApiServer {
+		} else if let aid = apiServerId, let a = existingObject(with: aid) as? ApiServer {
 			return a.label ?? "<none>"
 		} else {
 			return "<none>"
@@ -27,7 +27,7 @@ final class GroupingCriterion {
 	}
 
 	var relatedServerFailed: Bool {
-		if let aid = apiServerId, let a = existingObjectWithID(aid) as? ApiServer, !a.lastSyncSucceeded {
+		if let aid = apiServerId, let a = existingObject(with: aid) as? ApiServer, !a.lastSyncSucceeded {
 			return true
 		}
 		if let group = repoGroup {

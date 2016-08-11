@@ -72,7 +72,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 			checkTimer = nil
 			if newServer.lastSyncSucceeded {
                 dismiss(animated: true, completion: {
-					popupManager.getMasterController().resetView()
+					popupManager.masterController.resetView()
 					showMessage("Setup complete!", "You can tweak options & behaviour from the settings.\n\nTrailer has read-only access to your GitHub data, so feel free to experiment, you can't damage your data or settings on GitHub.")
                 })
 			} else {
@@ -88,7 +88,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 			return false
 		}
 		token = S(textField.text).replacingCharacters(in: range, with: string)
-		token = token.trim()
+		token = token.trim
 		testButton.isEnabled = !token.isEmpty
 		link.alpha = testButton.isEnabled ? 0.5 : 1.0
 		return true

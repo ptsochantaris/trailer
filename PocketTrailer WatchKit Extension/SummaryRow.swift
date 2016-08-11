@@ -29,7 +29,7 @@ class SummaryRow: NSObject, PopulatableRow {
 	@IBOutlet weak var prIcon: WKInterfaceImage!
 	@IBOutlet weak var issueIcon: WKInterfaceImage!
 
-	func rowType() -> String {
+	var rowType: String {
 		return NSStringFromClass(self.dynamicType).components(separatedBy: ".").last!
 	}
 	
@@ -64,11 +64,11 @@ class SummaryRow: NSObject, PopulatableRow {
 		var totalOther = 0
 		for r in result["views"] as! [[String : AnyObject]] {
 			if let v = r[showIssues ? "issues" : "prs"] as? [String : AnyObject] {
-				totalMine += v[Section.mine.apiName()]?["total"] as? Int ?? 0
-				totalParticipated += v[Section.participated.apiName()]?["total"] as? Int ?? 0
-				totalMentioned += v[Section.mentioned.apiName()]?["total"] as? Int ?? 0
-				totalSnoozed += v[Section.snoozed.apiName()]?["total"] as? Int ?? 0
-				totalOther += v[Section.all.apiName()]?["total"] as? Int ?? 0
+				totalMine += v[Section.mine.apiName]?["total"] as? Int ?? 0
+				totalParticipated += v[Section.participated.apiName]?["total"] as? Int ?? 0
+				totalMentioned += v[Section.mentioned.apiName]?["total"] as? Int ?? 0
+				totalSnoozed += v[Section.snoozed.apiName]?["total"] as? Int ?? 0
+				totalOther += v[Section.all.apiName]?["total"] as? Int ?? 0
 				totalUnread += v["unread"] as? Int ?? 0
 				totalOpen += v["total_open"] as? Int ?? 0
 			}
@@ -77,7 +77,7 @@ class SummaryRow: NSObject, PopulatableRow {
 		totalCount.setText("\(totalOpen)")
 
 		func setCount(_ c: Int, section: Section, _ count: WKInterfaceLabel, _ group: WKInterfaceGroup) {
-			count.setText("\(c) \(section.watchMenuName().uppercased())")
+			count.setText("\(c) \(section.watchMenuName.uppercased())")
 			group.setAlpha(c==0 ? 0.4 : 1.0)
 		}
 		setCount(totalMine, section: .mine, myCount, myGroup)

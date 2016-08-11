@@ -8,11 +8,11 @@ struct CacheUnit {
 	let headers: Data
 	let lastFetched: Date
 
-	func actualHeaders() -> [NSObject : AnyObject] {
+	var actualHeaders: [NSObject : AnyObject] {
 		return NSKeyedUnarchiver.unarchiveObject(with: headers) as! [NSObject : AnyObject]
 	}
 
-	func parsedData() -> AnyObject? {
+	var parsedData: AnyObject? {
 		return try? JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions())
 	}
 }
@@ -27,7 +27,7 @@ final class CacheEntry: NSManagedObject {
 	@NSManaged var key: String
 	@NSManaged var headers: Data
 
-	func cacheUnit() -> CacheUnit {
+	var cacheUnit: CacheUnit {
 		return CacheUnit(data: data, code: code, etag: etag, headers: headers, lastFetched: lastFetched)
 	}
 

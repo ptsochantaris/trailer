@@ -63,7 +63,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 
 		atNextEvent(self) { S in
 			if !ApiServer.someServersHaveAuthTokens(in: mainObjectContext) {
-				let m = popupManager.getMasterController()
+				let m = popupManager.masterController
 				if ApiServer.countApiServers(in: mainObjectContext) == 1, let a = ApiServer.allApiServers(in: mainObjectContext).first, a.authToken == nil || a.authToken!.isEmpty {
 					m.performSegue(withIdentifier: "showQuickstart", sender: self)
 				} else {
@@ -82,7 +82,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 		switch shortcutItem.type {
 
 		case "search-items":
-			let m = popupManager.getMasterController()
+			let m = popupManager.masterController
 			m.focusFilter()
 			completionHandler(true)
 
@@ -178,7 +178,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 
 	func startRefresh() -> Bool {
 
-		if appIsRefreshing || api.noNetworkConnection() || !ApiServer.someServersHaveAuthTokens(in: mainObjectContext) {
+		if appIsRefreshing || !api.hasNetworkConnection || !ApiServer.someServersHaveAuthTokens(in: mainObjectContext) {
 			return false
 		}
 
@@ -186,7 +186,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 
 		api.syncItemsForActiveReposAndCallback({
 
-			popupManager.getMasterController().title = "Processing..."
+			popupManager.masterController.title = "Processing..."
 
 		}) { [weak self] in
 
@@ -285,7 +285,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 			mainObjectContext.delete(i)
 		}
 		DataManager.saveDB()
-		popupManager.getMasterController().updateStatus()
+		popupManager.masterController.updateStatus()
 	}
 
 	func clearAllMerged() {
@@ -293,6 +293,6 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 			mainObjectContext.delete(p)
 		}
 		DataManager.saveDB()
-		popupManager.getMasterController().updateStatus()
+		popupManager.masterController.updateStatus()
 	}
 }

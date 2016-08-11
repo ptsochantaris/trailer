@@ -234,8 +234,8 @@ final class Settings {
 				settings[k] = v
 			}
 		}
-		settings["DB_CONFIG_OBJECTS"] = ApiServer.archiveApiServers()
-		settings["DB_SNOOZE_OBJECTS"] = SnoozePreset.archivePresets()
+		settings["DB_CONFIG_OBJECTS"] = ApiServer.archivedApiServers
+		settings["DB_SNOOZE_OBJECTS"] = SnoozePreset.archivedPresets
 		if !settings.write(to: url, atomically: true) {
 			DLog("Warning, exporting settings failed")
 			return false

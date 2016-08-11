@@ -166,7 +166,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		addTooltips()
 		reloadSettings()
 
-		versionNumber.stringValue = versionString()
+		versionNumber.stringValue = versionString
 
 		let selectedIndex = min(tabs.numberOfTabViewItems-1, Settings.lastPreferencesTabSelectedOSX)
 		tabs.selectTabViewItem(tabs.tabViewItem(at: selectedIndex))
@@ -317,7 +317,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		prMergedPolicy.selectItem(at: Settings.mergeHandlingPolicy)
 		prClosedPolicy.selectItem(at: Settings.closeHandlingPolicy)
 
-		launchAtStartup.integerValue = StartupLaunch.isAppLoginItem() ? 1 : 0
+		launchAtStartup.integerValue = StartupLaunch.isAppLoginItem ? 1 : 0
 		dontConfirmRemoveAllClosed.integerValue = Settings.dontAskBeforeWipingClosed ? 1 : 0
 		displayRepositoryNames.integerValue = Settings.showReposInName ? 1 : 0
 		includeRepositoriesInFiltering.integerValue = Settings.includeReposInFilter ? 1 : 0
@@ -594,7 +594,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		deferredUpdateTimer.push()
 	}
 
-	private func affectedReposFromSelection() -> [Repo] {
+	private var affectedReposFromSelection: [Repo] {
 		let selectedRows = projectsTable.selectedRowIndexes
 		var affectedRepos = [Repo]()
 		if selectedRows.count > 1 {
@@ -613,7 +613,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		let index = Int64(sender.indexOfSelectedItem - 1)
 		if index < 0 { return }
 
-		for r in affectedReposFromSelection() {
+		for r in affectedReposFromSelection {
 			r.displayPolicyForPrs = index
 			if index != RepoDisplayPolicy.hide.rawValue { r.resetSyncState() }
 		}
@@ -626,7 +626,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		let index = Int64(sender.indexOfSelectedItem - 1)
 		if index < 0 { return }
 
-		for r in affectedReposFromSelection() {
+		for r in affectedReposFromSelection {
 			r.displayPolicyForIssues = index
 			if index != RepoDisplayPolicy.hide.rawValue { r.resetSyncState() }
 		}
@@ -639,7 +639,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		let index = Int64(sender.indexOfSelectedItem - 1)
 		if index < 0 { return }
 
-		for r in affectedReposFromSelection() {
+		for r in affectedReposFromSelection {
 			r.itemHidingPolicy = index
 		}
 		projectsTable.reloadData()
@@ -810,7 +810,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBAction func refreshReposSelected(_ sender: NSButton?) {
 		app.prepareForRefresh()
 
-		let tempContext = DataManager.childContext()
+		let tempContext = DataManager.buildChildContext()
 		api.fetchRepositories(to: tempContext) {
 
 			if ApiServer.shouldReportRefreshFailure(in: tempContext) {
@@ -838,7 +838,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
-	private func selectedServer() -> ApiServer? {
+	private var selectedServer: ApiServer? {
 		let selected = serverList.selectedRow
 		if selected >= 0 {
 			return ApiServer.allApiServers(in: mainObjectContext)[selected]
@@ -847,7 +847,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	@IBAction func deleteSelectedServerSelected(_ sender: NSButton) {
-		if let selectedServer = selectedServer(), let index = ApiServer.allApiServers(in: mainObjectContext).index(of: selectedServer) {
+		if let selectedServer = selectedServer, let index = ApiServer.allApiServers(in: mainObjectContext).index(of: selectedServer) {
 			mainObjectContext.delete(selectedServer)
 			serverList.reloadData()
 			serverList.selectRowIndexes(IndexSet(integer: min(index, serverList.numberOfRows-1)), byExtendingSelection: false)
@@ -858,7 +858,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	@IBAction func apiServerReportErrorSelected(_ sender: NSButton) {
-		if let apiServer = selectedServer() {
+		if let apiServer = selectedServer {
 			apiServer.reportRefreshFailures = (sender.integerValue != 0)
 			storeApiFormToSelectedServer()
 		}
@@ -1007,7 +1007,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction func testApiServerSelected(_ sender: NSButton) {
 		sender.isEnabled = false
-		let apiServer = selectedServer()!
+		let apiServer = selectedServer!
 		api.testApi(to: apiServer) { error in
 			let alert = NSAlert()
 			if let e = error {
@@ -1024,7 +1024,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction func apiRestoreDefaultsSelected(_ sender: NSButton)
 	{
-		if let apiServer = selectedServer() {
+		if let apiServer = selectedServer {
 			apiServer.resetToGithub()
 			fillServerApiFormFromSelectedServer()
 			storeApiFormToSelectedServer()
@@ -1032,7 +1032,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	private func fillServerApiFormFromSelectedServer() {
-		if let apiServer = selectedServer() {
+		if let apiServer = selectedServer {
 			apiServerName.stringValue = S(apiServer.label)
 			apiServerWebPath.stringValue = S(apiServer.webPath)
 			apiServerApiPath.stringValue = S(apiServer.apiPath)
@@ -1045,7 +1045,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	private func storeApiFormToSelectedServer() {
-		if let apiServer = selectedServer() {
+		if let apiServer = selectedServer {
 			apiServer.label = apiServerName.stringValue
 			apiServer.apiPath = apiServerApiPath.stringValue
 			apiServer.webPath = apiServerWebPath.stringValue
@@ -1095,24 +1095,24 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		if let obj: AnyObject = n.object {
 
 			if obj===apiServerName {
-				if let apiServer = selectedServer() {
+				if let apiServer = selectedServer {
 					apiServer.label = apiServerName.stringValue
 					storeApiFormToSelectedServer()
 				}
 			} else if obj===apiServerApiPath {
-				if let apiServer = selectedServer() {
+				if let apiServer = selectedServer {
 					apiServer.apiPath = apiServerApiPath.stringValue
 					storeApiFormToSelectedServer()
 					apiServer.clearAllRelatedInfo()
 					reset()
 				}
 			} else if obj===apiServerWebPath {
-				if let apiServer = selectedServer() {
+				if let apiServer = selectedServer {
 					apiServer.webPath = apiServerWebPath.stringValue
 					storeApiFormToSelectedServer()
 				}
 			} else if obj===apiServerAuthToken {
-				if let apiServer = selectedServer() {
+				if let apiServer = selectedServer {
 					apiServer.authToken = apiServerAuthToken.stringValue
 					storeApiFormToSelectedServer()
 					apiServer.clearAllRelatedInfo()
@@ -1223,9 +1223,9 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 						if tableColumn?.identifier == "hide" {
 							for policy in RepoHidingPolicy.policies {
 								let m = NSMenuItem()
-								m.attributedTitle = NSAttributedString(string: policy.name(), attributes: [
+								m.attributedTitle = NSAttributedString(string: policy.name, attributes: [
 									NSFontAttributeName: count==0 ? NSFont.systemFont(ofSize: fontSize) : NSFont.boldSystemFont(ofSize: fontSize),
-									NSForegroundColorAttributeName: policy.color(),
+									NSForegroundColorAttributeName: policy.color,
 									])
 								menuCell.menu?.addItem(m)
 								count += 1
@@ -1234,9 +1234,9 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 						} else {
 							for policy in RepoDisplayPolicy.policies {
 								let m = NSMenuItem()
-								m.attributedTitle = NSAttributedString(string: policy.name(), attributes: [
+								m.attributedTitle = NSAttributedString(string: policy.name, attributes: [
 									NSFontAttributeName: count==0 ? NSFont.systemFont(ofSize: fontSize) : NSFont.boldSystemFont(ofSize: fontSize),
-									NSForegroundColorAttributeName: policy.color(),
+									NSForegroundColorAttributeName: policy.color,
 									])
 								menuCell.menu?.addItem(m)
 								count += 1
@@ -1328,7 +1328,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	/////////////////////////////// snoozing
 
 	@IBAction func snoozeWakeChanged(_ sender: NSButton) {
-		if let preset = selectedSnoozePreset() {
+		if let preset = selectedSnoozePreset {
 			preset.wakeOnComment = snoozeWakeOnComment.integerValue == 1
 			preset.wakeOnMention = snoozeWakeOnMention.integerValue == 1
 			preset.wakeOnStatusChange = snoozeWakeOnStatusUpdate.integerValue == 1
@@ -1406,7 +1406,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		deferredUpdateTimer.push()
 	}
 
-	func selectedSnoozePreset() -> SnoozePreset? {
+	var selectedSnoozePreset: SnoozePreset? {
 		let selected = snoozePresetsList.selectedRow
 		if selected >= 0 {
 			return SnoozePreset.allSnoozePresets(in: mainObjectContext)[selected]
@@ -1415,7 +1415,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	func fillSnoozeFormFromSelectedPreset() {
-		if let s = selectedSnoozePreset() {
+		if let s = selectedSnoozePreset {
 			if s.duration {
 				snoozeTypeDuration.integerValue = 1
 				snoozeTypeDateTime.integerValue = 0
@@ -1497,7 +1497,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	@IBAction func deleteSnoozePresetSelected(_ sender: NSButton) {
-		if let selectedPreset = selectedSnoozePreset(), let index = SnoozePreset.allSnoozePresets(in: mainObjectContext).index(of: selectedPreset) {
+		if let selectedPreset = selectedSnoozePreset, let index = SnoozePreset.allSnoozePresets(in: mainObjectContext).index(of: selectedPreset) {
 
 			let appliedCount = selectedPreset.appliedToIssues.count + selectedPreset.appliedToPullRequests.count
 			if appliedCount > 0 {
@@ -1533,7 +1533,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	@IBAction func snoozeTypeChanged(_ sender: NSButton) {
-		if let s = selectedSnoozePreset() {
+		if let s = selectedSnoozePreset {
 			s.duration = sender == snoozeTypeDuration
 			fillSnoozeFormFromSelectedPreset()
 			commitSnoozeSettings()
@@ -1541,7 +1541,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	@IBAction func snoozeOptionsChanged(_ sender: NSPopUpButton) {
-		if let s = selectedSnoozePreset() {
+		if let s = selectedSnoozePreset {
 			if s.duration {
 				s.day = Int64(snoozeDurationDays.indexOfSelectedItem)
 				s.hour = Int64(snoozeDurationHours.indexOfSelectedItem)
@@ -1556,7 +1556,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	@IBAction func snoozeUpSelected(_ sender: AnyObject) {
-		if let this = selectedSnoozePreset() {
+		if let this = selectedSnoozePreset {
 			let all = SnoozePreset.allSnoozePresets(in: mainObjectContext)
 			if let index = all.index(of: this), index > 0 {
 				let other = all[index-1]
@@ -1569,7 +1569,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	@IBAction func snoozeDownSelected(_ sender: AnyObject) {
-		if let this = selectedSnoozePreset() {
+		if let this = selectedSnoozePreset {
 			let all = SnoozePreset.allSnoozePresets(in: mainObjectContext)
 			if let index = all.index(of: this), index < all.count-1 {
 				let other = all[index+1]

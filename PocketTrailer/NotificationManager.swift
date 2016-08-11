@@ -7,14 +7,14 @@ final class NotificationManager {
 	class func handleLocalNotification(notification: UNNotificationContent, action: String?) {
 		if notification.userInfo.count > 0 {
 			DLog("Received local notification: %@", notification.userInfo)
-			popupManager.getMasterController().localNotification(userInfo: notification.userInfo, action: action)
+			popupManager.masterController.localNotification(userInfo: notification.userInfo, action: action)
 		}
 	}
 
 	class func handleUserActivity(activity: NSUserActivity) -> Bool {
 
 		if let info = activity.userInfo, let uid = info["kCSSearchableItemActivityIdentifier"] as? String {
-			popupManager.getMasterController().openItemWithUriPath(uriPath: uid)
+			popupManager.masterController.openItemWithUriPath(uriPath: uid)
 			return true
 		}
 		return false

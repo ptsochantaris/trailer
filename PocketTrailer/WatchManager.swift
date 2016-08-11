@@ -31,7 +31,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 	func updateContext() {
 		let overview = buildOverview()
 		_ = try? session?.updateApplicationContext(["overview": overview])
-		let overviewPath = DataManager.sharedFilesDirectory().appendingPathComponent("overview.plist")
+		let overviewPath = DataManager.sharedFilesDirectory.appendingPathComponent("overview.plist")
 		(overview as NSDictionary).write(to: overviewPath, atomically: true)
 	}
 
@@ -73,14 +73,14 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 			case "openItem":
 				if let itemId = message["localId"] as? String {
-					popupManager.getMasterController().openItemWithUriPath(uriPath: itemId)
+					popupManager.masterController.openItemWithUriPath(uriPath: itemId)
 					DataManager.saveDB()
 				}
 				s.processList(message: message, replyHandler: replyHandler)
 
 			case "opencomment":
 				if let itemId = message["id"] as? String {
-					popupManager.getMasterController().openCommentWithId(cId: itemId)
+					popupManager.masterController.openCommentWithId(cId: itemId)
 					DataManager.saveDB()
 				}
 				s.processList(message: message, replyHandler: replyHandler)
@@ -101,7 +101,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				if let
 					uri = message["localId"] as? String,
 					let oid = DataManager.idForUriPath(uri),
-					let dataItem = existingObjectWithID(oid) as? ListableItem,
+					let dataItem = existingObject(with: oid) as? ListableItem,
 					dataItem.unreadComments > 0 {
 
 					dataItem.catchUpWithComments()
@@ -110,7 +110,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 					for uri in uris {
 						if let
 							oid = DataManager.idForUriPath(uri),
-							let dataItem = existingObjectWithID(oid) as? ListableItem,
+							let dataItem = existingObject(with: oid) as? ListableItem,
 							dataItem.unreadComments > 0 {
 
 							dataItem.catchUpWithComments()
@@ -280,7 +280,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 	/////////////////////////////
 
 	private func buildItemDetail(localId: String) -> [String : AnyObject]? {
-		if let oid = DataManager.idForUriPath(localId), let item = existingObjectWithID(oid) as? ListableItem {
+		if let oid = DataManager.idForUriPath(localId), let item = existingObject(with: oid) as? ListableItem {
 			let showStatuses = (item is PullRequest) ? Settings.showStatusItems : false
 			var result = baseDataForItem(item: item, showStatuses: showStatuses, showLabels: Settings.showLabels)
 			result["description"] = item.body
@@ -309,7 +309,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 		var views = [[String:AnyObject]]()
 
-		for tabSet in popupManager.getMasterController().allTabSets() {
+		for tabSet in popupManager.masterController.allTabSets {
 
 			let c = tabSet.viewCriterion
 

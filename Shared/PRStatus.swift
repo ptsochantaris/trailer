@@ -17,7 +17,7 @@ final class PRStatus: DataItem {
 				s.pullRequest = pullRequest
 
 				if let ds = info["description"] as? String {
-					s.descriptionText = ds.trim()
+					s.descriptionText = ds.trim
 				}
 			}
 		}

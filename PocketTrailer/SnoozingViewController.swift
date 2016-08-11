@@ -118,7 +118,7 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 		}
 		DataManager.postProcessAllItems()
 		DataManager.saveDB()
-		popupManager.getMasterController().updateStatus()
+		popupManager.masterController.updateStatus()
 	}
 
 	override func viewDidAppear(_ animated: Bool) {

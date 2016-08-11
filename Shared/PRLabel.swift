@@ -77,7 +77,7 @@ final class PRLabel: DataItem {
 	}
 
 	private class func parse(from hex: String) -> Int64 {
-		let safe = hex.trim().trimmingCharacters(in: CharacterSet.symbols)
+		let safe = hex.trim.trimmingCharacters(in: CharacterSet.symbols)
 		let s = Scanner(string: safe)
 		var result: UInt32 = 0
 		s.scanHexInt32(&result)

@@ -105,7 +105,7 @@ final class Repo: DataItem {
 
 	class func interestedInIssues(_ apiServerId: NSManagedObjectID? = nil) -> Bool {
 		let all: [Repo]
-		if let aid = apiServerId, let a = existingObjectWithID(aid) as? ApiServer {
+		if let aid = apiServerId, let a = existingObject(with: aid) as? ApiServer {
 			all = Repo.allItems(ofType: "Repo", server: a) as! [Repo]
 		} else {
 			all = Repo.allItems(ofType: "Repo", in: mainObjectContext) as! [Repo]
@@ -120,7 +120,7 @@ final class Repo: DataItem {
 
 	class func interestedInPrs(_ apiServerId: NSManagedObjectID? = nil) -> Bool {
 		let all: [Repo]
-		if let aid = apiServerId, let a = existingObjectWithID(aid) as? ApiServer {
+		if let aid = apiServerId, let a = existingObject(with: aid) as? ApiServer {
 			all = Repo.allItems(ofType: "Repo", server: a) as! [Repo]
 		} else {
 			all = Repo.allItems(ofType: "Repo", in: mainObjectContext) as! [Repo]

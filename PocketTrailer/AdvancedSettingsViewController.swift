@@ -6,7 +6,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	private enum SettingsSection: Int {
 		case Refresh, Display, Filtering, AppleWatch, Comments, Repos, StausesAndLabels, History, Confirm, Sort, Misc
 		static let allNames = ["Auto Refresh", "Display", "Filtering", "Apple Watch", "Comments", "Watchlist", "Statuses & Labels", "History", "Don't confirm when", "Sorting", "Misc"]
-		func title() -> String { return SettingsSection.allNames[rawValue] }
+		var title: String { return SettingsSection.allNames[rawValue] }
 	}
 
 	private struct Setting {
@@ -16,7 +16,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		var valueDisplayed: ()->String?
 
 		func isRelevantTo(s: String?, showingHelp: Bool) -> Bool {
-			if let s = s?.trim(), !s.isEmpty {
+			if let s = s?.trim, !s.isEmpty {
 				return title.localizedCaseInsensitiveContains(s) || (showingHelp && description.localizedCaseInsensitiveContains(s))
 			} else {
 				return true
@@ -45,7 +45,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		Setting(section: .Display,
 		        title: "Assigned items",
 		        description: "How to handle items that have been detected as assigned to you.",
-		        valueDisplayed: { AssignmentPolicy(Settings.assignedPrHandlingPolicy)?.name() }),
+		        valueDisplayed: { AssignmentPolicy(Settings.assignedPrHandlingPolicy)?.name }),
 		Setting(section: .Display,
 		        title: "Mark unmergeable PRs only in 'My' or 'Participated' sections",
 		        description: Settings.markUnmergeableOnUserSectionsOnlyHelp,
@@ -124,15 +124,15 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		Setting(section: .Comments,
 		        title: "Move items mentioning me to...",
 		        description: Settings.newMentionMovePolicyHelp,
-		        valueDisplayed: { Section(Settings.newMentionMovePolicy)!.movePolicyName() }),
+		        valueDisplayed: { Section(Settings.newMentionMovePolicy)!.movePolicyName }),
 		Setting(section: .Comments,
 		        title: "Move items mentioning my teams to...",
 		        description: Settings.teamMentionMovePolicyHelp,
-		        valueDisplayed: { Section(Settings.teamMentionMovePolicy)!.movePolicyName() }),
+		        valueDisplayed: { Section(Settings.teamMentionMovePolicy)!.movePolicyName }),
 		Setting(section: .Comments,
 		        title: "Move items created in my repos to...",
 		        description: Settings.newItemInOwnedRepoMovePolicyHelp,
-		        valueDisplayed: { Section(Settings.newItemInOwnedRepoMovePolicy)!.movePolicyName() }),
+		        valueDisplayed: { Section(Settings.newItemInOwnedRepoMovePolicy)!.movePolicyName }),
 		Setting(section: .Comments,
 		        title: "Open items at first unread comment",
 		        description: Settings.openPrAtFirstUnreadCommentHelp,
@@ -153,11 +153,11 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		Setting(section: .Repos,
 		        title: "PR visibility for new repos",
 		        description: Settings.displayPolicyForNewPrsHelp,
-		        valueDisplayed: { RepoDisplayPolicy(Settings.displayPolicyForNewPrs)?.name() }),
+		        valueDisplayed: { RepoDisplayPolicy(Settings.displayPolicyForNewPrs)?.name }),
 		Setting(section: .Repos,
 		        title: "Issue visibility for new repos",
 		        description: Settings.displayPolicyForNewIssuesHelp,
-		        valueDisplayed: { RepoDisplayPolicy(Settings.displayPolicyForNewIssues)?.name() }),
+		        valueDisplayed: { RepoDisplayPolicy(Settings.displayPolicyForNewIssues)?.name }),
 
 		Setting(section: .StausesAndLabels,
 		        title: "Show statuses",
@@ -195,11 +195,11 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		Setting(section: .History,
 		        title: "When something is merged",
 		        description: Settings.mergeHandlingPolicyHelp,
-		        valueDisplayed: { HandlingPolicy(Settings.mergeHandlingPolicy)?.name() }),
+		        valueDisplayed: { HandlingPolicy(Settings.mergeHandlingPolicy)?.name }),
 		Setting(section: .History,
 		        title: "When something is closed",
 		        description: Settings.closeHandlingPolicyHelp,
-		        valueDisplayed: { HandlingPolicy(Settings.closeHandlingPolicy)?.name() }),
+		        valueDisplayed: { HandlingPolicy(Settings.closeHandlingPolicy)?.name }),
 		Setting(section: .History,
 		        title: "Don't keep PRs merged by me",
 		        description: Settings.dontKeepPrsMergedByMeHelp,
@@ -227,7 +227,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		        description: Settings.sortMethodHelp,
 		        valueDisplayed: {
 					if let m = SortingMethod(Settings.sortMethod) {
-						return Settings.sortDescending ? m.reverseTitle() : m.normalTitle()
+						return Settings.sortDescending ? m.reverseTitle : m.normalTitle
 					} else {
 						return nil
 					}
@@ -280,7 +280,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		settingsChangedTimer = PopTimer(timeInterval: 1.0) {
 			DataManager.postProcessAllItems()
 			DataManager.saveDB()
-			popupManager.getMasterController().updateStatus()
+			popupManager.masterController.updateStatus()
 		}
 
 		navigationItem.rightBarButtonItems = [
@@ -332,7 +332,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		}
 	}
 
-	private func filteringSectionFooter() -> UILabel {
+	private var filteringSectionFooter: UILabel {
 		let p = NSMutableParagraphStyle()
 		p.headIndent = 15.0
 		p.firstLineHeadIndent = 15.0
@@ -351,9 +351,9 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	}
 
 	override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-		let isFilterFooter = filteredSections()[section].title() == SettingsSection.Filtering.title()
+		let isFilterFooter = filteredSections[section].title == SettingsSection.Filtering.title
 		if isFilterFooter {
-			return filteringSectionFooter()
+			return filteringSectionFooter
 		}
 		return nil
 	}
@@ -363,9 +363,9 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	}
 
 	override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-		let isFilterFooter = filteredSections()[section].title() == SettingsSection.Filtering.title()
+		let isFilterFooter = filteredSections[section].title == SettingsSection.Filtering.title
 		if isFilterFooter {
-			return filteringSectionFooter().sizeThatFits(CGSize(width: tableView.bounds.size.width, height: 500.0)).height + 15.0
+			return filteringSectionFooter.sizeThatFits(CGSize(width: tableView.bounds.size.width, height: 500.0)).height + 15.0
 		}
 		return 0
 	}
@@ -409,7 +409,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 
 		let setting = filteredItemsForTableSection(section: indexPath.section)[indexPath.row]
-		let section = filteredSections()[indexPath.section]
+		let section = filteredSections[indexPath.section]
 		let unFilteredItemsForSection = settings.filter { $0.section == section }
 
 		var originalIndex = 0
@@ -675,22 +675,22 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	}
 
 	override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-		return filteredSections()[section].title()
+		return filteredSections[section].title
 	}
 
 
 	override func numberOfSections(in tableView: UITableView) -> Int {
-		return filteredSections().count
+		return filteredSections.count
 	}
 
 	private func filteredItemsForTableSection(section: Int) -> [Setting] {
-		let sec = filteredSections()[section]
-		let searchText = searchBar.text?.trim()
+		let sec = filteredSections[section]
+		let searchText = searchBar.text?.trim
 		return settings.filter{ $0.section == sec && $0.isRelevantTo(s: searchText, showingHelp: showHelp) }
 	}
 
-	private func filteredSections() -> [SettingsSection] {
-		let searchText = searchBar.text?.trim()
+	private var filteredSections: [SettingsSection] {
+		let searchText = searchBar.text?.trim
 		let matchingSettings = settings.filter{ $0.isRelevantTo(s: searchText, showingHelp: showHelp) }
 		var matchingSections = [SettingsSection]()
 		matchingSettings.forEach {

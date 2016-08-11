@@ -41,7 +41,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 
 	override func viewDidLayoutSubviews() {
 		super.viewDidLayoutSubviews()
-		popupManager.getMasterController().layoutTabs()
+		popupManager.masterController.layoutTabs()
 	}
 
 	func configureView() {
@@ -145,7 +145,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 	}
 
 	func focusOnMaster() {
-		let m = popupManager.getMasterController()
+		let m = popupManager.masterController
 		if splitViewController?.isCollapsed ?? true {
 			_ = m.navigationController?.popViewController(animated: true)
 		}
@@ -153,7 +153,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 	}
 
 	private func catchupWithComments() {
-		if let oid = catchupWithDataItemWhenLoaded, let dataItem = existingObjectWithID(oid) as? ListableItem {
+		if let oid = catchupWithDataItemWhenLoaded, let dataItem = existingObject(with: oid) as? ListableItem {
 			if dataItem.unreadComments > 0 {
 				dataItem.catchUpWithComments()
 				DataManager.saveDB()

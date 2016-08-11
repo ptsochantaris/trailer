@@ -178,7 +178,7 @@ final class ApiServer: NSManagedObject {
 		latestUserEventDateProcessed = Date.distantPast
 	}
 
-	class func archiveApiServers() -> [String:[String:NSObject]] {
+	class var archivedApiServers: [String:[String:NSObject]] {
 		var archivedData = [String:[String:NSObject]]()
 		for a in ApiServer.allApiServers(in: mainObjectContext) {
 			if let authToken = a.authToken, !authToken.isEmpty {
@@ -188,14 +188,14 @@ final class ApiServer: NSManagedObject {
 						apiServerData[k] = v
 					}
 				}
-				apiServerData["repos"] = a.archiveRepos()
+				apiServerData["repos"] = a.archivedRepos
 				archivedData[authToken] = apiServerData
 			}
 		}
 		return archivedData
 	}
 
-	func archiveRepos() -> [String : [String : NSObject]] {
+	var archivedRepos: [String : [String : NSObject]] {
 		var archivedData = [String : [String : NSObject]]()
 		for r in repos {
 			var repoData = [String : NSObject]()
@@ -211,7 +211,7 @@ final class ApiServer: NSManagedObject {
 
 	class func configure(from archive: [String : [String : NSObject]]) -> Bool {
 
-		let tempMoc = DataManager.childContext()
+		let tempMoc = DataManager.buildChildContext()
 
 		for apiServer in allApiServers(in: tempMoc)
 		{

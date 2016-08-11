@@ -21,7 +21,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 		super.viewDidLoad()
 		var a: ApiServer
 		if let sid = serverId {
-			a = existingObjectWithID(sid) as! ApiServer
+			a = existingObject(with: sid) as! ApiServer
 		} else {
 			a = ApiServer.addDefaultGithub(in: mainObjectContext)
 			try! mainObjectContext.save()
@@ -63,11 +63,11 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 
 	private func updateServerFromForm() -> ApiServer? {
 		if let sid = serverId {
-			let a = existingObjectWithID(sid) as! ApiServer
-			a.label = name.text?.trim()
-			a.apiPath = apiPath.text?.trim()
-			a.webPath = webFrontEnd.text?.trim()
-			a.authToken = authToken.text?.trim()
+			let a = existingObject(with: sid) as! ApiServer
+			a.label = name.text?.trim
+			a.apiPath = apiPath.text?.trim
+			a.webPath = webFrontEnd.text?.trim
+			a.authToken = authToken.text?.trim
 			a.reportRefreshFailures = reportErrors.isOn
 			a.lastSyncSucceeded = true
 			preferencesDirty = true
@@ -129,7 +129,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 		openGitHub(url: "/settings/applications")
 	}
 
-	private func checkForValidPath() -> URL? {
+	private var validatedPath: URL? {
 		if let text = webFrontEnd.text, let u = URL(string: text) {
 			return u
 		} else {
@@ -139,7 +139,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 	}
 
 	private func openGitHub(url: String) {
-		if let u = checkForValidPath()?.absoluteString {
+		if let u = validatedPath?.absoluteString {
 			let s = SFSafariViewController(url: URL(string: u + url)!)
 			s.view.tintColor = self.view.tintColor
 			self.present(s, animated: true, completion: nil)
@@ -160,7 +160,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 	}
 
 	private func deleteServer() {
-		if let a = existingObjectWithID(serverId!) {
+		if let a = existingObject(with: serverId!) {
 			mainObjectContext.delete(a)
 			DataManager.saveDB()
 		}

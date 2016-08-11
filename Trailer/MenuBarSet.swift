@@ -17,11 +17,11 @@ final class MenuBarSet {
 		self.viewCriterion = viewCriterion
 
 		prMenu = prMenuController.window as! MenuWindow
-		prMenu.itemDelegate = ItemDelegate(type: "PullRequest", sections: Section.prMenuTitles, removeButtonsInSections: [Section.merged.prMenuName(), Section.closed.prMenuName()], viewCriterion: viewCriterion)
+		prMenu.itemDelegate = ItemDelegate(type: "PullRequest", sections: Section.prMenuTitles, removeButtonsInSections: [Section.merged.prMenuName, Section.closed.prMenuName], viewCriterion: viewCriterion)
 		prMenu.delegate = delegate
 
 		issuesMenu = issuesMenuController.window as! MenuWindow
-		issuesMenu.itemDelegate = ItemDelegate(type: "Issue", sections: Section.issueMenuTitles, removeButtonsInSections: [Section.closed.issuesMenuName()], viewCriterion: viewCriterion)
+		issuesMenu.itemDelegate = ItemDelegate(type: "Issue", sections: Section.issueMenuTitles, removeButtonsInSections: [Section.closed.issuesMenuName], viewCriterion: viewCriterion)
 		issuesMenu.delegate = delegate
 	}
 
@@ -120,7 +120,7 @@ final class MenuBarSet {
 
 			let shouldGray = Settings.grayOutWhenRefreshing && appIsRefreshing
 
-			let siv = menu.showStatusItem()
+			let siv = menu.showStatusItem
 
 			if !(compareDict(siv.textAttributes, to: attributes) && siv.statusLabel == countString && siv.grayOut == shouldGray) {
 				// Info has changed, update

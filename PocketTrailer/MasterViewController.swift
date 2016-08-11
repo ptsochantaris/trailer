@@ -60,11 +60,11 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	private var forceSafari = false
 
-	private func pluralNameForItems() -> String {
+	private var pluralNameForItems: String {
 		return viewingPrs ? "pull requests" : "issues"
 	}
 
-	func allTabSets() -> [TabBarSet] {
+	var allTabSets: [TabBarSet] {
 		return tabBarSets
 	}
 
@@ -72,9 +72,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		let promptTitle: String
 		if let l = currentTabBarSet?.viewCriterion?.label {
-			promptTitle = "\(pluralNameForItems().capitalized) in '\(l)'"
+			promptTitle = "\(pluralNameForItems.capitalized) in '\(l)'"
 		} else {
-			promptTitle = pluralNameForItems().capitalized
+			promptTitle = pluralNameForItems.capitalized
 		}
 
 		let a = UIAlertController(title: promptTitle, message: "Mark all as read?", preferredStyle: .alert)
@@ -89,13 +89,13 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	private func tryRefresh() {
 		refreshOnRelease = false
 
-		if api.noNetworkConnection() {
-			showMessage("No Network", "There is no network connectivity, please try again later")
-			updateStatus()
-		} else {
+		if api.hasNetworkConnection {
 			if !app.startRefresh() {
 				updateStatus()
 			}
+		} else {
+			showMessage("No Network", "There is no network connectivity, please try again later")
+			updateStatus()
 		}
 	}
 
@@ -104,7 +104,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			if Settings.dontAskBeforeWipingMerged {
 				S.removeAllMergedConfirmed()
 			} else {
-				let a = UIAlertController(title: "Sure?", message: "Remove all \(S.pluralNameForItems()) in the Merged section?", preferredStyle: .alert)
+				let a = UIAlertController(title: "Sure?", message: "Remove all \(S.pluralNameForItems) in the Merged section?", preferredStyle: .alert)
 				a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
 				a.addAction(UIAlertAction(title: "Remove", style: .destructive) { [weak S] action in
 					S?.removeAllMergedConfirmed()
@@ -119,7 +119,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			if Settings.dontAskBeforeWipingClosed {
 				S.removeAllClosedConfirmed()
 			} else {
-				let a = UIAlertController(title: "Sure?", message: "Remove all \(S.pluralNameForItems()) in the Closed section?", preferredStyle: .alert)
+				let a = UIAlertController(title: "Sure?", message: "Remove all \(S.pluralNameForItems) in the Closed section?", preferredStyle: .alert)
 				a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
 				a.addAction(UIAlertAction(title: "Remove", style: .destructive) { [weak S] action in
 					S?.removeAllClosedConfirmed()
@@ -251,7 +251,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	func updateRefresh() {
-		refreshLabel.text = api.lastUpdateDescription()
+		refreshLabel.text = api.lastUpdateDescription
 	}
 
 	override var canBecomeFirstResponder: Bool {
@@ -470,7 +470,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	private func updateRefreshControls() {
 		let ra = min(1.0, max(0, (-84-tableView.contentOffset.y)/32.0))
 		if ra > 0.0 && refreshLabel.alpha == 0 {
-			refreshLabel.text = api.lastUpdateDescription()
+			refreshLabel.text = api.lastUpdateDescription
 		}
 		refreshLabel.alpha = ra
 		refreshControl?.alpha = ra
@@ -565,7 +565,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		let newCount = tabs?.items?.count ?? 0
 
 		let latestFetchRequest = _fetchedResultsController?.fetchRequest
-		let newFetchRequest = createFetchRequest()
+		let newFetchRequest = itemFetchRequest
 
 		if newCount != lastTabCount || latestFetchRequest != newFetchRequest {
 			_fetchedResultsController = nil
@@ -672,13 +672,13 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		var urlToOpen = userInfo[NOTIFICATION_URL_KEY] as? String
 		var relatedItem: ListableItem?
 
-		if let commentId = DataManager.idForUriPath(userInfo[COMMENT_ID_KEY] as? String), let c = existingObjectWithID(commentId) as? PRComment {
+		if let commentId = DataManager.idForUriPath(userInfo[COMMENT_ID_KEY] as? String), let c = existingObject(with: commentId) as? PRComment {
 			relatedItem = c.pullRequest ?? c.issue
 			if urlToOpen == nil {
 				urlToOpen = c.webUrl
 			}
 		} else if let uri = userInfo[LISTABLE_URI_KEY] as? String, let itemId = DataManager.idForUriPath(uri) {
-			relatedItem = existingObjectWithID(itemId) as? ListableItem
+			relatedItem = existingObject(with: itemId) as? ListableItem
 			if relatedItem == nil {
 				showMessage("Item not found", "Could not locate the item related to this notification")
 			} else if urlToOpen == nil {
@@ -739,7 +739,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	func openItemWithUriPath(uriPath: String) {
 		if let itemId = DataManager.idForUriPath(uriPath),
-			let item = existingObjectWithID(itemId) as? ListableItem,
+			let item = existingObject(with: itemId) as? ListableItem,
 			let ip = fetchedResultsController.indexPath(forObject: item) {
 
 			selectTabFor(i: item)
@@ -752,7 +752,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	func openCommentWithId(cId: String) {
 		if let
 			itemId = DataManager.idForUriPath(cId),
-			let comment = existingObjectWithID(itemId) as? PRComment
+			let comment = existingObject(with: itemId) as? PRComment
 		{
 			if let url = comment.webUrl {
 				var ip: IndexPath?
@@ -795,7 +795,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 
 		let p = fetchedResultsController.object(at: indexPath)
-		if let u = p.urlForOpening(), let url = URL(string: u)
+		if let u = p.urlForOpening, let url = URL(string: u)
 		{
 			if forceSafari || (Settings.openItemsDirectlyInSafari && !detailViewController.isVisible) {
 				UIApplication.shared.open(url, options: [:]) { success in
@@ -823,12 +823,12 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		let name = S(fetchedResultsController.sections?[section].name)
 		v.title.text = name.uppercased()
 		if viewingPrs {
-			if name == Section.closed.prMenuName() {
+			if name == Section.closed.prMenuName {
 				v.action.isHidden = false
 				v.callback = { [weak self] in
 					self?.removeAllClosed()
 				}
-			} else if name == Section.merged.prMenuName() {
+			} else if name == Section.merged.prMenuName {
 				v.action.isHidden = false
 				v.callback = { [weak self] in
 					self?.removeAllMerged()
@@ -837,7 +837,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 				v.action.isHidden = true
 			}
 		} else {
-			if name == Section.closed.issuesMenuName() {
+			if name == Section.closed.issuesMenuName {
 				v.action.isHidden = false
 				v.callback = { [weak self] in
 					self?.removeAllClosed()
@@ -864,11 +864,11 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		if let
 			i = itemUri,
 			let oid = DataManager.idForUriPath(i),
-			let o = existingObjectWithID(oid) as? ListableItem {
+			let o = existingObject(with: oid) as? ListableItem {
 			o.latestReadCommentDate = Date.distantPast
 			o.postProcess()
 			DataManager.saveDB()
-			popupManager.getMasterController().updateStatus()
+			popupManager.masterController.updateStatus()
 		}
 	}
 
@@ -880,10 +880,10 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			if let
 				i = itemUri,
 				let oid = DataManager.idForUriPath(i),
-				let o = existingObjectWithID(oid) as? ListableItem {
+				let o = existingObject(with: oid) as? ListableItem {
 				o.catchUpWithComments()
 				DataManager.saveDB()
-				popupManager.getMasterController().updateStatus()
+				popupManager.masterController.updateStatus()
 			}
 		}
 
@@ -926,7 +926,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			indexPath)
 		if let sectionName = fetchedResultsController.sections?[indexPath.section].name {
 
-			if sectionName == Section.merged.prMenuName() || sectionName == Section.closed.prMenuName() || sectionName == Section.closed.issuesMenuName() {
+			if sectionName == Section.merged.prMenuName || sectionName == Section.closed.prMenuName || sectionName == Section.closed.issuesMenuName {
 
 				appendReadUnread(i: i)
 				let d = UITableViewRowAction(style: .destructive, title: "Remove") { action, indexPath in
@@ -946,7 +946,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 			} else {
 
-				if Settings.showCommentsEverywhere || (sectionName != Section.all.prMenuName() && sectionName != Section.all.issuesMenuName()) {
+				if Settings.showCommentsEverywhere || (sectionName != Section.all.prMenuName && sectionName != Section.all.issuesMenuName) {
 					appendReadUnread(i: i)
 				}
 				appendMuteUnmute(i: i)
@@ -982,14 +982,14 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			return c
 		}
 
-		let c = NSFetchedResultsController(fetchRequest: createFetchRequest(), managedObjectContext: mainObjectContext, sectionNameKeyPath: "sectionName", cacheName: nil)
+		let c = NSFetchedResultsController(fetchRequest: itemFetchRequest, managedObjectContext: mainObjectContext, sectionNameKeyPath: "sectionName", cacheName: nil)
 		_fetchedResultsController = c
 		c.delegate = self
 		try! c.performFetch()
 		return c
 	}
 
-	private func createFetchRequest() -> NSFetchRequest<ListableItem> {
+	private var itemFetchRequest: NSFetchRequest<ListableItem> {
 		let type = viewingPrs ? "PullRequest" : "Issue"
 		return ListableItem.requestForItems(ofType: type, withFilter: searchBar.text, sectionIndex: -1, criterion: currentTabBarSet?.viewCriterion)
 	}
@@ -1074,7 +1074,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 				tableView.tableFooterView = empty ? EmptyView(message: Issue.reasonForEmpty(with: searchBar.text, criterion: currentTabBarSet?.viewCriterion), parentWidth: view.bounds.size.width) : nil
 			}
 			if let r = refreshControl {
-				refreshLabel.text = api.lastUpdateDescription()
+				refreshLabel.text = api.lastUpdateDescription
 				updateRefreshControls()
 				r.beginRefreshing()
 			}
@@ -1091,11 +1091,11 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 				title = pullRequestsTitle(long: true)
 				tableView.tableFooterView = empty ? EmptyView(message: PullRequest.reasonForEmpty(with: searchBar.text, criterion: currentTabBarSet?.viewCriterion), parentWidth: view.bounds.size.width) : nil
 			} else {
-				title = issuesTitle()
+				title = issuesTitle
 				tableView.tableFooterView = empty ? EmptyView(message: Issue.reasonForEmpty(with: searchBar.text, criterion: currentTabBarSet?.viewCriterion), parentWidth: view.bounds.size.width) : nil
 			}
 			if let r = refreshControl {
-				refreshLabel.text = api.lastUpdateDescription()
+				refreshLabel.text = api.lastUpdateDescription
 				updateRefreshControls()
 				r.endRefreshing()
 			}
@@ -1130,7 +1130,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 	}
 
-	private func issuesTitle() -> String {
+	private var issuesTitle: String {
 
 		let f = ListableItem.requestForItems(ofType: "Issue", withFilter: nil, sectionIndex: -1, criterion: currentTabBarSet?.viewCriterion)
 		let count = try! mainObjectContext.count(for: f)

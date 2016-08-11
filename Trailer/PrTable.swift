@@ -10,7 +10,7 @@ final class PrTable: NSTableView, NSPasteboardItemDataProvider {
 	override func mouseDown(with theEvent: NSEvent) { }
 
 	override func mouseUp(with theEvent: NSEvent) {
-		if let prView = cellAtEvent(theEvent) as? TrailerCell, let item = prView.associatedDataItem() {
+		if let prView = cellAtEvent(theEvent) as? TrailerCell, let item = prView.associatedDataItem {
 			let isAlternative = ((theEvent.modifierFlags.intersection(.option)) == .option)
 			app.dataItemSelected(item, alternativeSelect: isAlternative, window: window)
 		}
@@ -30,7 +30,7 @@ final class PrTable: NSTableView, NSPasteboardItemDataProvider {
 
 		draggingUrl = nil
 
-		if let prView = cellAtEvent(theEvent) as? TrailerCell, let url = prView.associatedDataItem()?.webUrl {
+		if let prView = cellAtEvent(theEvent) as? TrailerCell, let url = prView.associatedDataItem?.webUrl {
 
 			draggingUrl = url
 

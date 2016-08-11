@@ -18,7 +18,7 @@ final class SectionController: CommonController {
 		updateUI()
 	}
 
-	override func showLoadingFeedback() -> Bool {
+	override var showLoadingFeedback: Bool {
 		return false
 	}
 
@@ -92,7 +92,7 @@ final class SectionController: CommonController {
 				rowControllers.append(pt)
 				var totalUnread = 0
 				for itemSection in Section.apiTitles {
-					if itemSection == Section.none.apiName() { continue }
+					if itemSection == Section.none.apiName { continue }
 
 					if let section = items[itemSection], let count = section["total"] as? Int, let unread = section["unread"] as? Int, count > 0 {
 						let s = SectionRow()
@@ -162,7 +162,7 @@ final class SectionController: CommonController {
 			addSectionsFor(v, itemType: "issues", label: label, apiServerUri: apiServerUri, header: "Issues", showEmptyDescriptions: showEmptyDescriptions)
 		}
 
-		let rowTypes = rowControllers.map { $0.rowType() }
+		let rowTypes = rowControllers.map { $0.rowType }
 		table.setRowTypes(rowTypes)
 
 		var index = 0

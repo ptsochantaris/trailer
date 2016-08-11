@@ -125,7 +125,7 @@ final class PRCell: UITableViewCell {
 			statusToAvatarDistance.constant = 9.0
 			statusToDescriptionDistance.constant = 9.0
 			statusToBottomDistance.constant = 3.0
-			var title = pullRequest.accessibleTitle()
+			var title = pullRequest.accessibleTitle
 			if muted {
 				title = "(Muted) - \(title)"
 			}
@@ -134,7 +134,7 @@ final class PRCell: UITableViewCell {
 			statusToAvatarDistance.constant = 0.0
 			statusToDescriptionDistance.constant = 0.0
 			statusToBottomDistance.constant = 4.0
-			accessibilityLabel = "\(pullRequest.accessibleTitle()), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(pullRequest.accessibleSubtitle)"
+			accessibilityLabel = "\(pullRequest.accessibleTitle), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(pullRequest.accessibleSubtitle)"
 		}
 	}
 
@@ -151,7 +151,7 @@ final class PRCell: UITableViewCell {
 
 		let muted = issue.muted
 		setCountsImageAndFade(item: issue, muted: muted)
-		var title = issue.accessibleTitle()
+		var title = issue.accessibleTitle
 		if muted {
 			title = "(Muted) - \(title)"
 		}

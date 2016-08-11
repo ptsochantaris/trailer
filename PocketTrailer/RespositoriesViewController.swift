@@ -65,7 +65,7 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 		tableView.isUserInteractionEnabled = false
 		tableView.alpha = 0.5
 
-		let tempContext = DataManager.childContext()
+		let tempContext = DataManager.buildChildContext()
 		api.fetchRepositories(to: tempContext) { [weak self] in
 			if ApiServer.shouldReportRefreshFailure(in: tempContext) {
 				var errorServers = [String]()
@@ -235,14 +235,14 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 
 		let policy = RepoDisplayPolicy(repo.displayPolicyForPrs) ?? .hide
 		let attributes = attributesForEntryWithPolicy(policy)
-		return NSAttributedString(string: "PR Sections: \(policy.name())", attributes: attributes)
+		return NSAttributedString(string: "PR Sections: \(policy.name)", attributes: attributes)
 	}
 
 	private func issueTitleForRepo(repo: Repo) -> NSAttributedString {
 
 		let policy = RepoDisplayPolicy(repo.displayPolicyForIssues) ?? .hide
 		let attributes = attributesForEntryWithPolicy(policy)
-		return NSAttributedString(string: "Issue Sections: \(policy.name())", attributes: attributes)
+		return NSAttributedString(string: "Issue Sections: \(policy.name)", attributes: attributes)
 	}
 
 	private func groupTitleForRepo(repo: Repo) -> NSAttributedString {
@@ -263,20 +263,20 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 
 		let policy = RepoHidingPolicy(repo.itemHidingPolicy) ?? .noHiding
 		let attributes = attributesForEntryWithPolicy(policy)
-		return NSAttributedString(string: policy.name(), attributes: attributes)
+		return NSAttributedString(string: policy.name, attributes: attributes)
 	}
 
 	private func attributesForEntryWithPolicy(_ policy: RepoDisplayPolicy) -> [String : AnyObject] {
 		return [
 			NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize-1.0),
-			NSForegroundColorAttributeName: policy.color()
+			NSForegroundColorAttributeName: policy.color
 		]
 	}
 
 	private func attributesForEntryWithPolicy(_ policy: RepoHidingPolicy) -> [String : AnyObject] {
 		return [
 			NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize-1.0),
-			NSForegroundColorAttributeName: policy.color()
+			NSForegroundColorAttributeName: policy.color
 		]
 	}
 

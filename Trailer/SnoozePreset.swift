@@ -124,7 +124,7 @@ final class SnoozePreset: NSManagedObject {
 		}
 	}
 
-	class func archivePresets() -> [[String:NSObject]] {
+	class var archivedPresets: [[String:NSObject]] {
 		var archivedData = [[String:NSObject]]()
 		for a in SnoozePreset.allSnoozePresets(in: mainObjectContext) {
 			var presetData = [String:NSObject]()
@@ -140,7 +140,7 @@ final class SnoozePreset: NSManagedObject {
 
 	class func configure(from archive: [[String : NSObject]]) -> Bool {
 
-		let tempMoc = DataManager.childContext()
+		let tempMoc = DataManager.buildChildContext()
 
 		for apiServer in allSnoozePresets(in: tempMoc) {
 			tempMoc.delete(apiServer)
