@@ -43,7 +43,15 @@ let LISTABLE_URI_KEY = "listableUriKey"
 let COMMENT_ID_KEY = "commentIdKey"
 let NOTIFICATION_URL_KEY = "urlKey"
 
-//////////////////////////
+////////////////////////// Utilities
+
+#if os(iOS)
+	import CoreData
+#endif
+
+func existingObject(with id: NSManagedObjectID) -> NSManagedObject? {
+	return try? mainObjectContext.existingObject(with: id)
+}
 
 let itemDateFormatter = { () -> DateFormatter in
 	let f = DateFormatter()
@@ -53,39 +61,7 @@ let itemDateFormatter = { () -> DateFormatter in
 	return f
 }()
 
-//////////////////////// Logging: Ugly as hell but works and is fast
-
-func DLog(_ message: String) {
-    if Settings.logActivityToConsole {
-        NSLog(message)
-    }
-}
-
-func DLog(_ message: String, _ arg1: @autoclosure ()->CVarArg?) {
-    if Settings.logActivityToConsole {
-        NSLog(message, arg1() ?? "(nil)")
-    }
-}
-
-func DLog(_ message: String, _ arg1: @autoclosure ()->CVarArg?, _ arg2: @autoclosure ()->CVarArg?) {
-    if Settings.logActivityToConsole {
-        NSLog(message, arg1() ?? "(nil)", arg2() ?? "(nil)")
-    }
-}
-
-func DLog(_ message: String, _ arg1: @autoclosure ()->CVarArg?, _ arg2: @autoclosure ()->CVarArg?, _ arg3: @autoclosure ()->CVarArg?) {
-    if Settings.logActivityToConsole {
-        NSLog(message, arg1() ?? "(nil)", arg2() ?? "(nil)", arg3() ?? "(nil)")
-    }
-}
-
-func DLog(_ message: String, _ arg1: @autoclosure ()->CVarArg?, _ arg2: @autoclosure ()->CVarArg?, _ arg3: @autoclosure ()->CVarArg?, _ arg4: @autoclosure ()->CVarArg?) {
-	if Settings.logActivityToConsole {
-		NSLog(message, arg1() ?? "(nil)", arg2() ?? "(nil)", arg3() ?? "(nil)", arg4() ?? "(nil)")
-	}
-}
-
-func DLog(_ message: String, _ arg1: @autoclosure ()->CVarArg?, _ arg2: @autoclosure ()->CVarArg?, _ arg3: @autoclosure ()->CVarArg?, _ arg4: @autoclosure ()->CVarArg?, _ arg5: @autoclosure ()->CVarArg?) {
+func DLog(_ message: String, _ arg1: @autoclosure ()->CVarArg? = nil, _ arg2: @autoclosure ()->CVarArg? = nil, _ arg3: @autoclosure ()->CVarArg? = nil, _ arg4: @autoclosure ()->CVarArg? = nil, _ arg5: @autoclosure ()->CVarArg? = nil) {
 	if Settings.logActivityToConsole {
 		NSLog(message, arg1() ?? "(nil)", arg2() ?? "(nil)", arg3() ?? "(nil)", arg4() ?? "(nil)", arg5() ?? "(nil)")
 	}
@@ -93,9 +69,28 @@ func DLog(_ message: String, _ arg1: @autoclosure ()->CVarArg?, _ arg2: @autoclo
 
 let itemCountFormatter = { () -> NumberFormatter in
     let n = NumberFormatter()
-    n.numberStyle = NumberFormatter.Style.decimal
+    n.numberStyle = .decimal
     return n
 }()
+
+// Single-purpose derivation from the excellent SAMAdditions:
+// https://github.com/soffes/SAMCategories/blob/master/SAMCategories/NSDate%2BSAMAdditions.m
+let dateParserHolder = "                   +0000".cString(using: String.Encoding.ascii)!
+func parseGH8601(_ iso8601: String?) -> Date? {
+
+	guard let i = iso8601, i.characters.count >= 19 else { return nil }
+
+	var fullString = dateParserHolder
+	memcpy(&fullString, i, 19)
+
+	var tt = tm()
+	strptime(fullString, "%FT%T%z", &tt)
+
+	let t = mktime(&tt)
+	return Date(timeIntervalSince1970: TimeInterval(t))
+}
+
+//////////////////////// Enums
 
 enum ItemCondition: Int64 {
 	case open, closed, merged
@@ -217,14 +212,6 @@ var currentAppVersion: String {
 var versionString: String {
 	let buildNumber = S(Bundle.main.infoDictionary?["CFBundleVersion"] as? String)
 	return "Version \(currentAppVersion) (\(buildNumber))"
-}
-
-#if os(iOS)
-	import CoreData
-#endif
-
-func existingObject(with id: NSManagedObjectID) -> NSManagedObject? {
-	return try? mainObjectContext.existingObject(with: id)
 }
 
 //////////////////////// From tieferbegabt's post on https://forums.developer.apple.com/message/37935, with thanks!
