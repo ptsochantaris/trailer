@@ -41,7 +41,7 @@ final class MenuWindow: NSWindow {
             scrollView.contentView.wantsLayer = true
         }
 
-		NotificationCenter.default.addObserver(self, selector: #selector(MenuWindow.refreshUpdate), name: NSNotification.Name(rawValue: kSyncProgressUpdate), object: nil)
+		NotificationCenter.default.addObserver(self, selector: #selector(MenuWindow.refreshUpdate), name: SyncProgressUpdateNotification, object: nil)
 	}
 
 	class func usingVibrancy() -> Bool {

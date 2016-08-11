@@ -71,7 +71,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 		app = self
 
-		DistributedNotificationCenter.default().addObserver(self, selector: #selector(OSX_AppDelegate.updateDarkMode), name: "AppleInterfaceThemeChangedNotification" as NSNotification.Name, object: nil)
+		DistributedNotificationCenter.default().addObserver(self, selector: #selector(OSX_AppDelegate.updateDarkMode), name: AppleInterfaceThemeChangedNotification, object: nil)
 
 		DataManager.postProcessAllItems()
 
@@ -102,7 +102,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 
 		let n = NotificationCenter.default
-		n.addObserver(self, selector: #selector(OSX_AppDelegate.updateScrollBarWidth), name: NSNotification.Name.NSPreferredScrollerStyleDidChange, object: nil)
+		n.addObserver(self, selector: #selector(OSX_AppDelegate.updateScrollBarWidth), name: .NSPreferredScrollerStyleDidChange, object: nil)
 
 		addHotKeySupport()
 
@@ -113,8 +113,8 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 
 		let wn = NSWorkspace.shared().notificationCenter
-		wn.addObserver(self, selector: #selector(OSX_AppDelegate.systemWillSleep), name: NSNotification.Name.NSWorkspaceWillSleep, object: nil)
-		wn.addObserver(self, selector: #selector(OSX_AppDelegate.systemDidWake), name: NSNotification.Name.NSWorkspaceDidWake, object: nil)
+		wn.addObserver(self, selector: #selector(OSX_AppDelegate.systemWillSleep), name: .NSWorkspaceWillSleep, object: nil)
+		wn.addObserver(self, selector: #selector(OSX_AppDelegate.systemDidWake), name: .NSWorkspaceDidWake, object: nil)
 	}
 
 	func systemWillSleep() {
@@ -307,7 +307,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 		let d = NSUserNotificationCenter.default
 		if let c = forItem as? PRComment, let url = c.avatarUrl, !Settings.hideAvatars {
-			_ = api.haveCachedAvatar(url) { image, _ in
+			_ = api.haveCachedAvatar(from: url) { image, _ in
 				notification.contentImage = image
 				d.deliver(notification)
 			}
@@ -620,7 +620,6 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		refreshTimer?.invalidate()
 		refreshTimer = nil
 
-		api.expireOldImageCacheEntries()
 		DataManager.postMigrationTasks()
 
 		appIsRefreshing = true

@@ -240,9 +240,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 
 		let n = NotificationCenter.default
-		n.addObserver(self, selector: #selector(MasterViewController.updateStatus), name:NSNotification.Name(rawValue: REFRESH_STARTED_NOTIFICATION), object: nil)
-		n.addObserver(self, selector: #selector(MasterViewController.updateStatus), name:NSNotification.Name(rawValue: REFRESH_ENDED_NOTIFICATION), object: nil)
-		n.addObserver(self, selector: #selector(MasterViewController.updateRefresh), name: NSNotification.Name(rawValue: kSyncProgressUpdate), object: nil)
+		n.addObserver(self, selector: #selector(MasterViewController.updateStatus), name: RefreshStartedNotification, object: nil)
+		n.addObserver(self, selector: #selector(MasterViewController.updateStatus), name: RefreshEndedNotification, object: nil)
+		n.addObserver(self, selector: #selector(MasterViewController.updateRefresh), name: SyncProgressUpdateNotification, object: nil)
 
 		updateTabItems(animated: false)
 		atNextEvent {
@@ -616,7 +616,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 				ts.addSubview(s2)
 
 				let b = UIView()
-				b.backgroundColor = UIColor.black.withAlphaComponent(0.32)
+				b.backgroundColor = UIColor.black.withAlphaComponent(DISABLED_FADE)
 				b.isUserInteractionEnabled = false
 				s.addSubview(b)
 				tabBorder = b

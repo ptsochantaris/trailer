@@ -209,7 +209,7 @@ final class ApiServer: NSManagedObject {
 		return archivedData
 	}
 
-	class func configureFromArchive(_ archive: [String : [String : NSObject]]) -> Bool {
+	class func configure(from archive: [String : [String : NSObject]]) -> Bool {
 
 		let tempMoc = DataManager.childContext()
 
@@ -236,7 +236,7 @@ final class ApiServer: NSManagedObject {
 		do {
 			try tempMoc.save()
 			return true
-		} catch _ {
+		} catch {
 			return false
 		}
 	}

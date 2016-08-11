@@ -279,7 +279,7 @@ final class PullRequest: ListableItem {
 	}
 
 	var labelsLink: String? {
-		return issueUrl?.stringByAppendingPathComponent("labels")
+		return issueUrl?.appending(pathComponent: "labels")
 	}
 
 	var sectionName: String {

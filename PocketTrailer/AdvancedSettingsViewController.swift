@@ -45,7 +45,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		Setting(section: .Display,
 		        title: "Assigned items",
 		        description: "How to handle items that have been detected as assigned to you.",
-		        valueDisplayed: { AssignmentPolicy(rawValue: Settings.assignedPrHandlingPolicy)?.name() }),
+		        valueDisplayed: { AssignmentPolicy(Settings.assignedPrHandlingPolicy)?.name() }),
 		Setting(section: .Display,
 		        title: "Mark unmergeable PRs only in 'My' or 'Participated' sections",
 		        description: Settings.markUnmergeableOnUserSectionsOnlyHelp,
@@ -792,7 +792,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	}
 
 	func exportSelected(sender: UIBarButtonItem) {
-		let tempFilePath = NSTemporaryDirectory().stringByAppendingPathComponent("Trailer Settings (iOS).trailerSettings")
+		let tempFilePath = NSTemporaryDirectory().appending(pathComponent: "Trailer Settings (iOS).trailerSettings")
 		tempUrl = URL(fileURLWithPath: tempFilePath)
 		_ = Settings.writeToURL(tempUrl!)
 

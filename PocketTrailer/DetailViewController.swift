@@ -101,7 +101,6 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 		webView.isHidden = true
 		title = "Loading..."
 		navigationItem.rightBarButtonItem = nil
-		api.networkIndicationStart()
 	}
 
 	func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: (WKNavigationResponsePolicy) -> Void) {
@@ -118,7 +117,6 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 		navigationItem.rightBarButtonItem?.isEnabled = true
 		title = webView.title
 		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(DetailViewController.shareSelected))
-		api.networkIndicationEnd()
 
 		catchupWithComments()
 		if splitViewController?.isCollapsed ?? true {
@@ -180,7 +178,6 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 		webView?.isHidden = true
 		title = "Error"
 		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(DetailViewController.configureView))
-		api.networkIndicationEnd()
 	}
 
 	func shareSelected() {

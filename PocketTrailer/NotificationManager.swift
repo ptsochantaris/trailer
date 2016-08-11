@@ -165,7 +165,7 @@ final class NotificationManager {
 
 
 		if let c = forItem as? PRComment, let url = c.avatarUrl, !Settings.hideAvatars {
-			_ = api.haveCachedAvatar(url) { image, cachePath in
+			_ = api.haveCachedAvatar(from: url) { image, cachePath in
 				if image != nil, let attachment = try? UNNotificationAttachment(identifier: cachePath, url: URL(fileURLWithPath: cachePath), options: [:]) {
 					notification.attachments = [attachment]
 				}

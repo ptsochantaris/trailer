@@ -3,9 +3,8 @@
 
 import UIKit
 
-let REFRESH_STARTED_NOTIFICATION = "RefreshStartedNotification"
-let REFRESH_ENDED_NOTIFICATION = "RefreshEndedNotification"
 let GLOBAL_SCREEN_SCALE = UIScreen.main.scale
+let THUMBNAIL_SIDE = 40.0*GLOBAL_SCREEN_SCALE
 let GLOBAL_TINT = UIColor(red: 52.0/255.0, green: 110.0/255.0, blue: 183.0/255.0, alpha: 1.0)
 let DISABLED_FADE: CGFloat = 0.3
 
@@ -16,15 +15,16 @@ typealias IMAGE_CLASS = UIImage
 
 #elseif os(OSX)
 
-let TOP_HEADER_HEIGHT: CGFloat = 28.0
-let AVATAR_SIZE: CGFloat = 26.0
-let LEFTPADDING: CGFloat = 44.0
-let TITLE_HEIGHT: CGFloat = 42.0
-let BASE_BADGE_SIZE: CGFloat = 20.0
-let SMALL_BADGE_SIZE: CGFloat = 14.0
-let MENU_WIDTH: CGFloat = 500.0
-let AVATAR_PADDING: CGFloat = 8.0
-let REMOVE_BUTTON_WIDTH: CGFloat = 80.0
+let THUMBNAIL_SIDE: CGFloat = 88
+let TOP_HEADER_HEIGHT: CGFloat = 28
+let AVATAR_SIZE: CGFloat = 26
+let LEFTPADDING: CGFloat = 44
+let TITLE_HEIGHT: CGFloat = 42
+let BASE_BADGE_SIZE: CGFloat = 20
+let SMALL_BADGE_SIZE: CGFloat = 14
+let MENU_WIDTH: CGFloat = 500
+let AVATAR_PADDING: CGFloat = 8
+let REMOVE_BUTTON_WIDTH: CGFloat = 80
 let DISABLED_FADE: CGFloat = 0.4
 
 let stringDrawingOptions: NSStringDrawingOptions = [.usesLineFragmentOrigin, .usesFontLeading]
@@ -191,8 +191,6 @@ func MAKECOLOR(_ red: CGFloat, _ green: CGFloat, _ blue: CGFloat, _ alpha: CGFlo
 let LISTABLE_URI_KEY = "listableUriKey"
 let COMMENT_ID_KEY = "commentIdKey"
 let NOTIFICATION_URL_KEY = "urlKey"
-let API_USAGE_UPDATE = "RateUpdateNotification"
-let kSyncProgressUpdate = "kSyncProgressUpdate"
 
 func currentAppVersion() -> String {
 	return S(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String)
@@ -229,42 +227,29 @@ func existingObjectWithID(_ id: NSManagedObjectID) -> NSManagedObject? {
 	return try? mainObjectContext.existingObject(with: id)
 }
 
-func isDarkColor(_ color: COLOR_CLASS) -> Bool {
-	var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0
-	color.getRed(&r, green: &g, blue: &b, alpha: nil)
-	let lum = 0.2126 * r + 0.7152 * g + 0.0722 * b
-	return (lum < 0.5)
-}
-
-func parseFromHex(_ s: String) -> UInt32 {
-	let safe = s.trim().trimmingCharacters(in: CharacterSet.symbols)
-	let s = Scanner(string: safe)
-	var result: UInt32 = 0
-	s.scanHexInt32(&result)
-	return result
-}
-
-func colorFromUInt32(_ c: UInt32) -> COLOR_CLASS {
-	let red: UInt32 = (c & 0xFF0000)>>16
-	let green: UInt32 = (c & 0x00FF00)>>8
-	let blue: UInt32 = c & 0x0000FF
-	let r = CGFloat(red)/255.0
-	let g = CGFloat(green)/255.0
-	let b = CGFloat(blue)/255.0
-	return COLOR_CLASS(red: r, green: g, blue: b, alpha: 1.0)
-}
-
 //////////////////////// From tieferbegabt's post on https://forums.developer.apple.com/message/37935, with thanks!
 
 extension String {
-	func stringByAppendingPathComponent(_ path: String) -> String {
-		return (self as NSString).appendingPathComponent(path)
+	func appending(pathComponent: String) -> String {
+		let endSlash = hasSuffix("/")
+		let firstSlash = pathComponent.hasPrefix("/")
+		if endSlash && firstSlash {
+			let firstChar = pathComponent.index(pathComponent.startIndex, offsetBy: 1)
+			return appending(pathComponent.substring(from: firstChar))
+		} else if (!endSlash && !firstSlash) {
+			return appending("/\(pathComponent)")
+		} else {
+			return appending(pathComponent)
+		}
 	}
-	func stringByReplacingCharactersInRange(_ range: NSRange, withString string: String) -> String {
-		return (self as NSString).replacingCharacters(in: range, with: string)
+	func replacingCharacters(in range: NSRange, with string: String) -> String {
+		let l = index(startIndex, offsetBy: range.location)
+		let u = index(l, offsetBy: range.length)
+		let r = Range(uncheckedBounds: (lower: l, upper: u))
+		return replacingCharacters(in: r, with: string)
 	}
 	func trim() -> String {
-		return self.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+		return trimmingCharacters(in: .whitespacesAndNewlines)
 	}
 	var md5hash: String {
 		let digestLen = Int(CC_MD5_DIGEST_LENGTH)
@@ -285,4 +270,13 @@ extension String {
 		return hash
 	}
 }
+
+////////////////////// Notifications
+
+let RefreshStartedNotification = Notification.Name("RefreshStartedNotification")
+let RefreshEndedNotification = Notification.Name("RefreshEndedNotification")
+let SyncProgressUpdateNotification = Notification.Name("SyncProgressUpdateNotification")
+let ApiUsageUpdateNotification = Notification.Name("ApiUsageUpdateNotification")
+let AppleInterfaceThemeChangedNotification = Notification.Name("AppleInterfaceThemeChangedNotification")
+let SettingsExportedNotification = Notification.Name("SettingsExportedNotification")
 

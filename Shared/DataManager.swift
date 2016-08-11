@@ -134,8 +134,8 @@ final class DataManager {
 			for file in files {
 				if file.contains("Trailer.sqlite") {
 					DLog("Moving database file: %@",file)
-					let oldPath = oldDocumentsDirectory.stringByAppendingPathComponent(file)
-					let newPath = newDocumentsDirectory.stringByAppendingPathComponent(file)
+					let oldPath = oldDocumentsDirectory.appending(pathComponent: file)
+					let newPath = newDocumentsDirectory.appending(pathComponent: file)
 					if fm.fileExists(atPath: newPath) {
 						try! fm.removeItem(atPath: newPath)
 					}
@@ -321,7 +321,7 @@ final class DataManager {
 			for file in try fm.contentsOfDirectory(atPath: documentsDirectory) {
 				if file.contains("Trailer.sqlite") {
 					DLog("Removing old database file: %@",file)
-					try! fm.removeItem(atPath: documentsDirectory.stringByAppendingPathComponent(file))
+					try! fm.removeItem(atPath: documentsDirectory.appending(pathComponent: file))
 				}
 			}
 		} catch { /* no directory */ }

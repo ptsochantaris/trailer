@@ -35,15 +35,15 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 
 		if UIDevice.current.userInterfaceIdiom != UIUserInterfaceIdiom.pad {
 			let n = NotificationCenter.default
-			n.addObserver(self, selector: #selector(ServerDetailViewController.keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
-			n.addObserver(self, selector: #selector(ServerDetailViewController.keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+			n.addObserver(self, selector: #selector(ServerDetailViewController.keyboardWillShow), name: .UIKeyboardWillShow, object: nil)
+			n.addObserver(self, selector: #selector(ServerDetailViewController.keyboardWillHide), name: .UIKeyboardWillHide, object: nil)
 		}
 	}
 
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
 		navigationController?.setToolbarHidden(false, animated: true)
-		processTokenStateFrom(tokenText: authToken.text)
+		processTokenState(from: authToken.text)
 	}
 
 	override func viewWillDisappear(_ animated: Bool) {
@@ -72,14 +72,14 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 			a.lastSyncSucceeded = true
 			preferencesDirty = true
 
-			processTokenStateFrom(tokenText: a.authToken)
+			processTokenState(from: a.authToken)
 			return a
 		} else {
 			return nil
 		}
 	}
 
-	private func processTokenStateFrom(tokenText: String?) {
+	private func processTokenState(from tokenText: String?) {
 		if S(tokenText).isEmpty {
 			authTokenLabel.textColor =  UIColor.red
 			testButton.isEnabled = false
@@ -111,8 +111,8 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 			return false
 		}
 		if textField == authToken {
-			let newToken = textField.text?.stringByReplacingCharactersInRange(range, withString: string)
-			processTokenStateFrom(tokenText: newToken)
+			let newToken = textField.text?.replacingCharacters(in: range, with: string)
+			processTokenState(from: newToken)
 		}
 		return true
 	}

@@ -37,14 +37,12 @@ final class PopTimer : NSObject {
 
 /////////////////////////////
 
-let SETTINGS_EXPORTED = "SETTINGS_EXPORTED"
-
 var _settings_valuesCache = [String : AnyObject]()
 let _settings_shared = UserDefaults(suiteName: "group.Trailer")!
 
 final class Settings {
 
-	class func allFields() -> [String] {
+	private class var allFields: [String] {
 		return [
 			"SORT_METHOD_KEY", "STATUS_FILTERING_METHOD_KEY", "LAST_PREFS_TAB_SELECTED", "STATUS_ITEM_REFRESH_COUNT", "LABEL_REFRESH_COUNT", "UPDATE_CHECK_INTERVAL_KEY",
 			"STATUS_FILTERING_TERMS_KEY", "COMMENT_AUTHOR_BLACKLIST", "HOTKEY_LETTER", "REFRESH_PERIOD_KEY", "IOS_BACKGROUND_REFRESH_PERIOD_KEY", "NEW_REPO_CHECK_PERIOD", "LAST_SUCCESSFUL_REFRESH",
@@ -63,7 +61,7 @@ final class Settings {
 
         let d = UserDefaults.standard
         if d.object(forKey: "LAST_RUN_VERSION_KEY") != nil {
-            for k in allFields() {
+            for k in allFields {
                 if let v: AnyObject = d.object(forKey: k) {
                     _settings_shared.set(v, forKey: k)
                     DLog("Migrating setting '%@'", k)
@@ -158,8 +156,6 @@ final class Settings {
 		_settings_shared.synchronize()
 	}
 
-	static var saveTimer: PopTimer?
-
 	private class func set(_ key: String, _ value: NSObject?) {
 
 		let previousValue = _settings_shared.object(forKey: key) as? NSObject
@@ -187,6 +183,14 @@ final class Settings {
 		possibleExport(key)
 	}
 
+	static let saveTimer = { () -> PopTimer in
+		return PopTimer(timeInterval: 2.0) {
+			if let e = Settings.lastExportUrl {
+				_ = Settings.writeToURL(e)
+			}
+		}
+	}()
+
 	class func possibleExport(_ key: String?) {
 		#if os(OSX)
 		let keyIsGood: Bool
@@ -196,12 +200,7 @@ final class Settings {
 			keyIsGood = true
 		}
 		if Settings.autoRepeatSettingsExport && keyIsGood && Settings.lastExportUrl != nil {
-			if saveTimer == nil {
-				saveTimer = PopTimer(timeInterval: 2.0) {
-					_ = Settings.writeToURL(Settings.lastExportUrl!)
-				}
-			}
-			saveTimer?.push()
+			saveTimer.push()
 		}
 		#endif
 	}
@@ -209,7 +208,7 @@ final class Settings {
 	private class func get(_ key: String) -> AnyObject? {
 		if let v: AnyObject = _settings_valuesCache[key] {
 			return v
-		} else if let v: AnyObject = _settings_shared.object(forKey: key) {
+		} else if let v = _settings_shared.object(forKey: key) {
 			_settings_valuesCache[key] = v
 			return v
 		} else {
@@ -219,20 +218,18 @@ final class Settings {
 
 	/////////////////////////////////
 
-	class func clearCache() {
+	private class func clearCache() {
 		_settings_valuesCache.removeAll(keepingCapacity: false)
 	}
 
 	class func writeToURL(_ url: URL) -> Bool {
 
-		if let s = saveTimer {
-			s.invalidate()
-		}
+		saveTimer.invalidate()
 
 		Settings.lastExportUrl = url
 		Settings.lastExportDate = Date()
 		let settings = NSMutableDictionary()
-		for k in allFields() {
+		for k in allFields {
 			if let v: AnyObject = _settings_shared.object(forKey: k), k != "AUTO_REPEAT_SETTINGS_EXPORT" {
 				settings[k] = v
 			}
@@ -243,7 +240,7 @@ final class Settings {
 			DLog("Warning, exporting settings failed")
 			return false
 		}
-		NotificationCenter.default.post(name: Notification.Name(rawValue: SETTINGS_EXPORTED), object: nil)
+		NotificationCenter.default.post(name: SettingsExportedNotification, object: nil)
 		DLog("Written settings to %@", url.absoluteString)
 		return true
 	}
@@ -252,21 +249,21 @@ final class Settings {
 		if let settings = NSDictionary(contentsOf: url) {
 			DLog("Reading settings from %@", url.absoluteString)
 			resetAllSettings()
-			for k in allFields() {
+			for k in allFields {
 				if let v: AnyObject = settings[k] {
 					_settings_shared.set(v, forKey: k)
 				}
 			}
 			_settings_shared.synchronize()
 			clearCache()
-			return ApiServer.configureFromArchive(settings["DB_CONFIG_OBJECTS"] as! [String : [String : NSObject]])
-			&& SnoozePreset.configureFromArchive(settings["DB_SNOOZE_OBJECTS"] as! [[String : NSObject]])
+			return ApiServer.configure(from: settings["DB_CONFIG_OBJECTS"] as! [String : [String : NSObject]])
+			&& SnoozePreset.configure(from: settings["DB_SNOOZE_OBJECTS"] as! [[String : NSObject]])
 		}
 		return false
 	}
 
 	class func resetAllSettings() {
-		for k in allFields() {
+		for k in allFields {
 			_settings_shared.removeObject(forKey: k)
 		}
 		_settings_shared.synchronize()

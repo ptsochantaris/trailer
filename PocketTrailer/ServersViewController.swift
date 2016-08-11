@@ -18,7 +18,7 @@ final class ServersViewController: UITableViewController {
 		super.viewDidLoad()
 
 		clearsSelectionOnViewWillAppear = true
-		NotificationCenter.default.addObserver(tableView, selector: #selector(UITableView.reloadData), name: NSNotification.Name(rawValue: REFRESH_ENDED_NOTIFICATION), object: nil)
+		NotificationCenter.default.addObserver(tableView, selector: #selector(UITableView.reloadData), name: RefreshEndedNotification, object: nil)
 	}
 
 	deinit {

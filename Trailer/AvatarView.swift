@@ -6,7 +6,7 @@ final class AvatarView: NSImageView {
 	init(frame frameRect: NSRect, url: String) {
 		super.init(frame: frameRect)
 		imageAlignment = .alignCenter
-		if (!api.haveCachedAvatar(url) { [weak self] img, _ in
+		if (!api.haveCachedAvatar(from: url) { [weak self] img, _ in
 			if let weakSelf = self {
 				weakSelf.image = img
 				weakSelf.done()

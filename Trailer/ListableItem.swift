@@ -438,12 +438,19 @@ class ListableItem: DataItem {
 							NSParagraphStyleAttributeName: lp]
 					#endif
 
+					func isDark(color: COLOR_CLASS) -> Bool {
+						var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0
+						color.getRed(&r, green: &g, blue: &b, alpha: nil)
+						let lum = 0.2126 * r + 0.7152 * g + 0.0722 * b
+						return (lum < 0.5)
+					}
+
 					var count = 0
 					for l in sortedLabels() {
 						var a = labelAttributes
 						let color = l.colorForDisplay
 						a[NSBackgroundColorAttributeName] = color
-						a[NSForegroundColorAttributeName] = isDarkColor(color) ? COLOR_CLASS.white : COLOR_CLASS.black
+						a[NSForegroundColorAttributeName] = isDark(color: color) ? COLOR_CLASS.white : COLOR_CLASS.black
 						let name = l.name!.replacingOccurrences(of: " ", with: "\u{a0}")
 						_title.append(NSAttributedString(string: "\u{a0}", attributes: a))
 						_title.append(NSAttributedString(string: name, attributes: a))
@@ -521,15 +528,15 @@ class ListableItem: DataItem {
 
 	final class func buildOrPredicate(fromFilter string: String, expectedLength: Int, format: String, numeric: Bool) -> NSPredicate? {
 		if string.characters.count > expectedLength {
-			let items = string.substring(from: string.characters.index(string.startIndex, offsetBy: expectedLength))
-			if !items.characters.isEmpty {
+			let items = string.substring(from: string.index(string.startIndex, offsetBy: expectedLength))
+			if !items.isEmpty {
 				var orTerms = [NSPredicate]()
 				var notTerms = [NSPredicate]()
 				for term in items.components(separatedBy: ",") {
 					let T: String
 					let negative: Bool
-					if term.characters.first == "!" {
-						T = term.substring(from: term.characters.index(term.startIndex, offsetBy: 1))
+					if term.hasPrefix("!") {
+						T = term.substring(from: term.index(term.startIndex, offsetBy: 1))
 						negative = true
 					} else {
 						T = term
@@ -624,7 +631,7 @@ class ListableItem: DataItem {
 				repeat {
 					foundOne = false
 					for word in fi.components(separatedBy: " ") {
-						if word.characters.starts(with: "\(tagString):".characters) {
+						if word.hasPrefix("\(tagString):") {
 							if let p = process(word) {
 								andPredicates.append(p)
 							}
@@ -649,7 +656,7 @@ class ListableItem: DataItem {
 
 			if !fi.isEmpty {
 				var orPredicates = [NSPredicate]()
-				let negative = (fi.characters.first == "!")
+				let negative = fi.hasPrefix("!")
 
 				func checkOr(_ format: String, numeric: Bool) {
 					let predicate: NSPredicate
@@ -817,8 +824,8 @@ class ListableItem: DataItem {
 			CSSearchableIndex.default().indexSearchableItems([i], completionHandler: nil)
 		}
 
-		if let i = self.userAvatarUrl, !Settings.hideAvatars {
-			_ = api.haveCachedAvatar(i) { _, cachePath in
+		if let i = userAvatarUrl, !Settings.hideAvatars {
+			_ = api.haveCachedAvatar(from: i) { _, cachePath in
 				s.thumbnailURL = URL(string: "file://\(cachePath)")
 				completeIndex(s)
 			}

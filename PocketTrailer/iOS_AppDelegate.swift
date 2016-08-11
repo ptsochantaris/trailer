@@ -170,10 +170,9 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 			self?.endBGTask()
 		}
 
-		NotificationCenter.default.post(name: NSNotification.Name(rawValue: REFRESH_STARTED_NOTIFICATION), object: nil)
+		NotificationCenter.default.post(name: RefreshStartedNotification, object: nil)
 		DLog("Starting refresh")
 
-		api.expireOldImageCacheEntries()
 		DataManager.postMigrationTasks()
 	}
 
@@ -204,7 +203,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 
 			s.checkApiUsage()
 			appIsRefreshing = false
-			NotificationCenter.default.post(name: NSNotification.Name(rawValue: REFRESH_ENDED_NOTIFICATION), object: nil)
+			NotificationCenter.default.post(name: RefreshEndedNotification, object: nil)
 			DataManager.saveDB() // Ensure object IDs are permanent before sending notifications
 			DataManager.sendNotificationsIndexAndSave()
 

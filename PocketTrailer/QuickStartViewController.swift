@@ -87,7 +87,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 			view.endEditing(false)
 			return false
 		}
-		token = S(textField.text).stringByReplacingCharactersInRange(range, withString: string)
+		token = S(textField.text).replacingCharacters(in: range, with: string)
 		token = token.trim()
 		testButton.isEnabled = !token.isEmpty
 		link.alpha = testButton.isEnabled ? 0.5 : 1.0

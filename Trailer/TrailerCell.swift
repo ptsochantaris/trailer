@@ -306,7 +306,7 @@ class TrailerCell: NSTableCellView {
 			var color: NSColor
 			if goneDark {
 				color = on ? NSColor.black : MAKECOLOR(0.94, 0.94, 0.94, 1.0)
-				c.backgroundColor = on ? NSColor.white.withAlphaComponent(0.3) : NSColor.black.withAlphaComponent(0.2)
+				c.backgroundColor = on ? NSColor.white.withAlphaComponent(DISABLED_FADE) : NSColor.black.withAlphaComponent(0.2)
 				newBackground?.backgroundColor = MAKECOLOR(1.0, 0.1, 0.1, 1.0)
 			} else {
 				color = goneDark ? NSColor.controlLightHighlightColor : NSColor.controlTextColor

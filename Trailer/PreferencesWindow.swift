@@ -172,8 +172,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		tabs.selectTabViewItem(tabs.tabViewItem(at: selectedIndex))
 
 		let n = NotificationCenter.default
-		n.addObserver(self, selector: #selector(PreferencesWindow.updateApiTable), name: NSNotification.Name(rawValue: API_USAGE_UPDATE), object: nil)
-		n.addObserver(self, selector: #selector(PreferencesWindow.updateImportExportSettings), name: NSNotification.Name(rawValue: SETTINGS_EXPORTED), object: nil)
+		n.addObserver(self, selector: #selector(PreferencesWindow.updateApiTable), name: ApiUsageUpdateNotification, object: nil)
+		n.addObserver(self, selector: #selector(PreferencesWindow.updateImportExportSettings), name: SettingsExportedNotification, object: nil)
 
 		deferredUpdateTimer = PopTimer(timeInterval: 0.5) { [weak self] in
 			if let s = self, s.serversDirty {
@@ -831,7 +831,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			} else {
 				do {
 					try tempContext.save()
-				} catch _ {
+				} catch {
 				}
 			}
 			app.completeRefresh()

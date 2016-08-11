@@ -138,7 +138,7 @@ final class SnoozePreset: NSManagedObject {
 		return archivedData
 	}
 
-	class func configureFromArchive(_ archive: [[String : NSObject]]) -> Bool {
+	class func configure(from archive: [[String : NSObject]]) -> Bool {
 
 		let tempMoc = DataManager.childContext()
 
@@ -159,7 +159,7 @@ final class SnoozePreset: NSManagedObject {
 		do {
 			try tempMoc.save()
 			return true
-		} catch _ {
+		} catch {
 			return false
 		}
 	}

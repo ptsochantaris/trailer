@@ -68,7 +68,7 @@ final class PRLabel: DataItem {
 		labelsWithInfo(info, fromParent: withParent) { label, info in
 			label.url = info["url"] as? String
 			if let c = info["color"] as? String {
-				label.color = Int64(parseFromHex(c))
+				label.color = parse(from: c)
 			} else {
 				label.color = 0
 			}
@@ -76,7 +76,22 @@ final class PRLabel: DataItem {
 		}
 	}
 
+	private class func parse(from hex: String) -> Int64 {
+		let safe = hex.trim().trimmingCharacters(in: CharacterSet.symbols)
+		let s = Scanner(string: safe)
+		var result: UInt32 = 0
+		s.scanHexInt32(&result)
+		return Int64(result)
+	}
+
 	var colorForDisplay: COLOR_CLASS {
-		return colorFromUInt32(UInt32(color))
+		let c = UInt32(color)
+		let red: UInt32 = (c & 0xFF0000)>>16
+		let green: UInt32 = (c & 0x00FF00)>>8
+		let blue: UInt32 = c & 0x0000FF
+		let r = CGFloat(red)/255.0
+		let g = CGFloat(green)/255.0
+		let b = CGFloat(blue)/255.0
+		return COLOR_CLASS(red: r, green: g, blue: b, alpha: 1.0)
 	}
 }

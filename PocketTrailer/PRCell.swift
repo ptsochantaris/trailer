@@ -76,7 +76,7 @@ final class PRCell: UITableViewCell {
 				constant: 21)
 			])
 
-		NotificationCenter.default.addObserver(self, selector: #selector(PRCell.networkStateChanged), name: NSNotification.Name.reachabilityChanged, object: nil)
+		NotificationCenter.default.addObserver(self, selector: #selector(PRCell.networkStateChanged), name: .reachabilityChanged, object: nil)
 	}
 
 	func networkStateChanged() {
@@ -183,7 +183,7 @@ final class PRCell: UITableViewCell {
 	private func loadImageAtPath(imagePath: String?) {
 		waitingForImageInPath = imagePath
 		if let path = imagePath {
-			if (!api.haveCachedAvatar(path) { [weak self] image, _ in
+			if (!api.haveCachedAvatar(from: path) { [weak self] image, _ in
 				if self?.waitingForImageInPath == path {
 					if image != nil {
 						// image loaded
