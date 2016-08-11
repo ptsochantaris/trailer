@@ -305,13 +305,13 @@ class TrailerCell: NSTableCellView {
 		if let c = countBackground {
 			var color: NSColor
 			if goneDark {
-				color = on ? NSColor.black : MAKECOLOR(0.94, 0.94, 0.94, 1.0)
+				color = on ? NSColor.black : NSColor(red: 0.94, green: 0.94, blue: 0.94, alpha: 1.0)
 				c.backgroundColor = on ? NSColor.white.withAlphaComponent(DISABLED_FADE) : NSColor.black.withAlphaComponent(0.2)
-				newBackground?.backgroundColor = MAKECOLOR(1.0, 0.1, 0.1, 1.0)
+				newBackground?.backgroundColor = NSColor(red: 1.0, green: 0.1, blue: 0.1, alpha: 1.0)
 			} else {
 				color = goneDark ? NSColor.controlLightHighlightColor : NSColor.controlTextColor
-				c.backgroundColor = MAKECOLOR(0.92, 0.92, 0.92, 1.0)
-				newBackground?.backgroundColor = MAKECOLOR(1.0, 0.4, 0.4, 1.0)
+				c.backgroundColor = NSColor(red: 0.92, green: 0.92, blue: 0.92, alpha: 1.0)
+				newBackground?.backgroundColor = NSColor(red: 1.0, green: 0.4, blue: 0.4, alpha: 1.0)
 			}
 			if let a = countView?.attributedStringValue.mutableCopy() as? NSMutableAttributedString {
 				a.addAttribute(NSForegroundColorAttributeName, value: color, range: NSMakeRange(0, a.length))

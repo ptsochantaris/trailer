@@ -277,6 +277,15 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		return statusLines
 	}
 
+	private func colorToHex(c: UIColor) -> String {
+		var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+		c.getRed(&r, green: &g, blue: &b, alpha: &a)
+		r *= 255.0
+		g *= 255.0
+		b *= 255.0
+		return NSString(format: "%02X%02X%02X", Int(r), Int(g), Int(b)) as String
+	}
+
 	/////////////////////////////
 
 	private func buildItemDetail(localId: String) -> [String : AnyObject]? {

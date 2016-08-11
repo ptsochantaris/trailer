@@ -27,41 +27,14 @@ final class Issue: ListableItem {
 				let labelList = info["labels"] as? [[NSObject: AnyObject]]
 				PRLabel.syncLabelsWithInfo(labelList, withParent: i)
 			}
-			i.reopened = (i.condition == ItemCondition.closed.rawValue)
+			i.reopened = i.condition == ItemCondition.closed.rawValue
 			i.condition = ItemCondition.open.rawValue
 		}
 	}
 
 	class func reasonForEmpty(with filterValue: String?, criterion: GroupingCriterion?) -> NSAttributedString {
-		let openIssues = Issue.countOpen(in: mainObjectContext, criterion: criterion)
-
-		var color = COLOR_CLASS.lightGray
-		var message: String = ""
-
-		if !ApiServer.someServersHaveAuthTokens(in: mainObjectContext) {
-			color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
-			message = "There are no configured API servers in your settings, please ensure you have added at least one server with a valid API token."
-		} else if appIsRefreshing {
-			message = "Refreshing information, please wait a moment..."
-		} else if !S(filterValue).isEmpty {
-			message = "There are no issues matching this filter."
-		} else if openIssues > 0 {
-			message = "Some items are hidden by your settings."
-		} else if !Repo.anyVisibleRepos(in: mainObjectContext, criterion: criterion, excludeGrouped: true) {
-			if Repo.anyVisibleRepos(in: mainObjectContext) {
-				message = "There are no repositories that are currently visible in this category."
-			} else {
-				color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
-				message = "You have no watched repositories, please add some to your watchlist and refresh after a little while."
-			}
-		} else if !Repo.interestedInPrs(criterion?.apiServerId) && !Repo.interestedInIssues(criterion?.apiServerId) {
-			color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
-			message = "All your watched repositories are marked as hidden, please enable issues or PRs for some of them."
-		} else if openIssues==0 {
-			message = "No open issues in your configured repositories."
-		}
-
-		return styleForEmpty(message: message, color: color)
+		let openIssueCount = Issue.countOpen(in: mainObjectContext, criterion: criterion)
+		return reasonForEmpty(with: filterValue, criterion: criterion, openItemCount: openIssueCount)
 	}
 
 	#if os(iOS)

@@ -82,7 +82,7 @@ final class MenuBarSet {
 	}
 
 	private static let redText = [ NSFontAttributeName: NSFont.boldSystemFont(ofSize: 10),
-	                               NSForegroundColorAttributeName: MAKECOLOR(0.8, 0.0, 0.0, 1.0) ]
+	                               NSForegroundColorAttributeName: NSColor(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0) ]
 
 	private static let normalText = [ NSFontAttributeName: NSFont.menuBarFont(ofSize: 10),
 	                                  NSForegroundColorAttributeName: NSColor.controlTextColor ]

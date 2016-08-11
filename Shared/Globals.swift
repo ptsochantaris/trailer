@@ -51,7 +51,7 @@ let itemDateFormatter = { () -> DateFormatter in
 	f.timeStyle = .short
 	f.doesRelativeDateFormatting = true
 	return f
-	}()
+}()
 
 //////////////////////// Logging: Ugly as hell but works and is fast
 
@@ -210,40 +210,18 @@ enum RepoHidingPolicy: Int64 {
 	}
 }
 
-func MAKECOLOR(_ red: CGFloat, _ green: CGFloat, _ blue: CGFloat, _ alpha: CGFloat) -> COLOR_CLASS {
-	return COLOR_CLASS(red: red, green: green, blue: blue, alpha: alpha)
-}
-
 var currentAppVersion: String {
 	return S(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String)
 }
-
-#if os(iOS)
-
-	import UIKit
-	import CoreData
-
-	func colorToHex(c: COLOR_CLASS) -> String {
-		var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
-		c.getRed(&r, green: &g, blue: &b, alpha: &a)
-		r *= 255.0
-		g *= 255.0
-		b *= 255.0
-		return NSString(format: "%02X%02X%02X", Int(r), Int(g), Int(b)) as String
-	}
-
-#elseif os(OSX)
-
-	func hasModifier(_ event: NSEvent, _ modifier: NSEventModifierFlags) -> Bool {
-		return (event.modifierFlags.intersection(modifier)) == modifier
-	}
-
-#endif
 
 var versionString: String {
 	let buildNumber = S(Bundle.main.infoDictionary?["CFBundleVersion"] as? String)
 	return "Version \(currentAppVersion) (\(buildNumber))"
 }
+
+#if os(iOS)
+	import CoreData
+#endif
 
 func existingObject(with id: NSManagedObjectID) -> NSManagedObject? {
 	return try? mainObjectContext.existingObject(with: id)

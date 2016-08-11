@@ -502,6 +502,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			tableView.insertSections(IndexSet(addedIndexes), with:.automatic)
 		}
 		tableView.endUpdates()
+		updateFooter()
 	}
 
 	private func updateTabItems(animated: Bool) {
@@ -1064,15 +1065,10 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	func updateStatus() {
 
 		updateTabItems(animated: true)
-		let empty = (fetchedResultsController.fetchedObjects?.count ?? 0) == 0
+		updateFooter()
 
 		if appIsRefreshing {
 			title = "Refreshing..."
-			if viewingPrs {
-				tableView.tableFooterView = empty ? EmptyView(message: PullRequest.reasonForEmpty(with: searchBar.text, criterion: currentTabBarSet?.viewCriterion), parentWidth: view.bounds.size.width) : nil
-			} else {
-				tableView.tableFooterView = empty ? EmptyView(message: Issue.reasonForEmpty(with: searchBar.text, criterion: currentTabBarSet?.viewCriterion), parentWidth: view.bounds.size.width) : nil
-			}
 			if let r = refreshControl {
 				refreshLabel.text = api.lastUpdateDescription
 				updateRefreshControls()
@@ -1080,20 +1076,10 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			}
 		} else {
 
-			if showEmpty {
-				title = "No Items"
-				if viewingPrs {
-					tableView.tableFooterView = empty ? EmptyView(message: PullRequest.reasonForEmpty(with: searchBar.text, criterion: currentTabBarSet?.viewCriterion), parentWidth: view.bounds.size.width) : nil
-				} else {
-					tableView.tableFooterView = empty ? EmptyView(message: Issue.reasonForEmpty(with: searchBar.text, criterion: currentTabBarSet?.viewCriterion), parentWidth: view.bounds.size.width) : nil
-				}
-			} else if viewingPrs {
-				title = pullRequestsTitle(long: true)
-				tableView.tableFooterView = empty ? EmptyView(message: PullRequest.reasonForEmpty(with: searchBar.text, criterion: currentTabBarSet?.viewCriterion), parentWidth: view.bounds.size.width) : nil
-			} else {
-				title = issuesTitle
-				tableView.tableFooterView = empty ? EmptyView(message: Issue.reasonForEmpty(with: searchBar.text, criterion: currentTabBarSet?.viewCriterion), parentWidth: view.bounds.size.width) : nil
-			}
+			title = showEmpty ? "No Items"
+				: viewingPrs ? pullRequestsTitle(long: true)
+				: issuesTitle
+
 			if let r = refreshControl {
 				refreshLabel.text = api.lastUpdateDescription
 				updateRefreshControls()
@@ -1105,6 +1091,20 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		if splitViewController?.displayMode != .allVisible {
 			detailViewController.navigationItem.leftBarButtonItem?.title = title
+		}
+	}
+
+	private func updateFooter() {
+		if fetchedResultsController.fetchedObjects?.count ?? 0 == 0 {
+			let reasonForEmpty: NSAttributedString
+			if viewingPrs {
+				reasonForEmpty = PullRequest.reasonForEmpty(with: searchBar.text, criterion: currentTabBarSet?.viewCriterion)
+			} else {
+				reasonForEmpty = Issue.reasonForEmpty(with: searchBar.text, criterion: currentTabBarSet?.viewCriterion)
+			}
+			tableView.tableFooterView = EmptyView(message: reasonForEmpty, parentWidth: view.bounds.size.width)
+		} else {
+			tableView.tableFooterView = nil
 		}
 	}
 

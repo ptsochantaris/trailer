@@ -778,7 +778,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 				switch incomingEvent.keyCode {
 				case 123, 124: // left, right
-					if !(hasModifier(incomingEvent, .command) && hasModifier(incomingEvent, .option)) {
+					if !incomingEvent.modifierFlags.contains([.command, .option]) {
 						return incomingEvent
 					}
 
@@ -804,7 +804,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					return nil
 
 				case 125: // down
-					if hasModifier(incomingEvent, .shift) {
+					if incomingEvent.modifierFlags.contains(.shift) {
 						return incomingEvent
 					}
 					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
@@ -819,7 +819,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					return nil
 
 				case 126: // up
-					if hasModifier(incomingEvent, .shift) {
+					if incomingEvent.modifierFlags.contains(.shift) {
 						return incomingEvent
 					}
 					if app.isManuallyScrolling && w.table.selectedRow == -1 { return nil }
@@ -837,7 +837,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 						return incomingEvent
 					}
 					if let dataItem = S.focusedItem(blink: true) {
-						let isAlternative = hasModifier(incomingEvent, .option)
+						let isAlternative = incomingEvent.modifierFlags.contains(.option)
 						S.dataItemSelected(dataItem, alternativeSelect: isAlternative, window: w)
 					}
 					return nil
@@ -847,7 +847,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 					return nil
 
 				default:
-					if !hasModifier(incomingEvent, .command) {
+					if !incomingEvent.modifierFlags.contains(.command) {
 						return incomingEvent
 					}
 
@@ -865,7 +865,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 							return nil
 						}
 					default:
-						if !hasModifier(incomingEvent, .option) {
+						if !incomingEvent.modifierFlags.contains(.option) {
 							return incomingEvent
 						}
 						if let snoozeIndex = Int(incomingEvent.charactersIgnoringModifiers ?? "") {
@@ -939,16 +939,16 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	private func checkForHotkey(_ incomingEvent: NSEvent) -> Bool {
 		var check = 0
 
-		let cmdPressed = hasModifier(incomingEvent, .command)
+		let cmdPressed = incomingEvent.modifierFlags.contains(.command)
 		if Settings.hotkeyCommandModifier { check += cmdPressed ? 1 : -1 } else { check += cmdPressed ? -1 : 1 }
 
-		let ctrlPressed = hasModifier(incomingEvent, .control)
+		let ctrlPressed = incomingEvent.modifierFlags.contains(.control)
 		if Settings.hotkeyControlModifier { check += ctrlPressed ? 1 : -1 } else { check += ctrlPressed ? -1 : 1 }
 
-		let altPressed = hasModifier(incomingEvent, .option)
+		let altPressed = incomingEvent.modifierFlags.contains(.option)
 		if Settings.hotkeyOptionModifier { check += altPressed ? 1 : -1 } else { check += altPressed ? -1 : 1 }
 
-		let shiftPressed = hasModifier(incomingEvent, .shift)
+		let shiftPressed = incomingEvent.modifierFlags.contains(.shift)
 		if Settings.hotkeyShiftModifier { check += shiftPressed ? 1 : -1 } else { check += shiftPressed ? -1 : 1 }
 
 		let keyMap = [
