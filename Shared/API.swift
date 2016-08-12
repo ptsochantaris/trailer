@@ -24,8 +24,9 @@ final class API {
 	init() {
 
 		reachability.startNotifier()
+
 		let n = reachability.status
-		DLog("Network is %@", n == .NotReachable ? "down" : "up")
+		DLog("Network is %@", n.name)
 		currentNetworkStatus = n
 
 		let fileManager = FileManager.default
@@ -70,11 +71,7 @@ final class API {
 		let newStatus = reachability.status
 		if newStatus != currentNetworkStatus {
 			currentNetworkStatus = newStatus
-			if newStatus == .NotReachable {
-				DLog("Network went down (%d)", newStatus.rawValue)
-			} else {
-				DLog("Network came up (%d)", newStatus.rawValue)
-			}
+			DLog("Network changed to %@", newStatus.name)
 			clearAllBadLinks()
 		}
 	}

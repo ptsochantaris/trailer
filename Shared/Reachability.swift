@@ -4,6 +4,8 @@ import SystemConfiguration
 
 enum NetworkStatus: Int {
 	case NotReachable, ReachableViaWiFi, ReachableViaWWAN
+	static let descriptions = ["Down", "Local", "Cellular"]
+	var name: String { return NetworkStatus.descriptions[rawValue] }
 }
 
 let ReachabilityChangedNotification = Notification.Name("ReachabilityChangedNotification")
