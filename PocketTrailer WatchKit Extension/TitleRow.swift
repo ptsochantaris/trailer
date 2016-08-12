@@ -3,7 +3,7 @@ import WatchKit
 
 final class TitleRow: NSObject, PopulatableRow {
 	var title: String?
-	func populateFrom(_ other: AnyObject) {
+	func populate(from other: AnyObject) {
 		if let o = other as? TitleRow {
 			titleL.setText(o.title)
 		}

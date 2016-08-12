@@ -87,7 +87,7 @@ final class MenuBarSet {
 	private static let normalText = [ NSFontAttributeName: NSFont.menuBarFont(ofSize: 10),
 	                                  NSForegroundColorAttributeName: NSColor.controlTextColor ]
 
-	private func updateMenu(_ type: String,
+	private func updateMenu(of type: String,
 	                        menu: MenuWindow,
 	                        lengthOffset: CGFloat,
 	                        totalCount: ()->Int,
@@ -122,7 +122,7 @@ final class MenuBarSet {
 
 			let siv = menu.showStatusItem
 
-			if !(compareDict(siv.textAttributes, to: attributes) && siv.statusLabel == countString && siv.grayOut == shouldGray) {
+			if !(compare(dictionary: siv.textAttributes, to: attributes) && siv.statusLabel == countString && siv.grayOut == shouldGray) {
 				// Info has changed, update
 				DLog("Updating \(type) status item")
 				siv.icon = NSImage(named: "\(type)Icon")!
@@ -147,9 +147,9 @@ final class MenuBarSet {
 
 	func updateIssuesMenu() {
 
-		if Repo.interestedInIssues(viewCriterion?.apiServerId) {
+		if Repo.interestedInIssues(fromServerWithId: viewCriterion?.apiServerId) {
 
-			updateMenu("Issue", menu: issuesMenu, lengthOffset: 2, totalCount: { () -> Int in
+			updateMenu(of: "Issue", menu: issuesMenu, lengthOffset: 2, totalCount: { () -> Int in
 				return Issue.countOpen(in: mainObjectContext)
 			}, hasUnread: { [weak self] () -> Bool in
 				return Issue.badgeCount(in: mainObjectContext, criterion: self?.viewCriterion) > 0
@@ -164,9 +164,10 @@ final class MenuBarSet {
 
 	func updatePrMenu() {
 
-		if forceVisible || Repo.interestedInPrs(viewCriterion?.apiServerId) || !Repo.interestedInIssues(viewCriterion?.apiServerId) {
+		let sid = viewCriterion?.apiServerId
+		if forceVisible || Repo.interestedInPrs(fromServerWithId: sid) || !Repo.interestedInIssues(fromServerWithId: sid) {
 
-			updateMenu("PullRequest", menu: prMenu, lengthOffset: 0, totalCount: { () -> Int in
+			updateMenu(of: "PullRequest", menu: prMenu, lengthOffset: 0, totalCount: { () -> Int in
 				return PullRequest.countOpen(in: mainObjectContext)
 			}, hasUnread: { [weak self] () -> Bool in
 				return PullRequest.badgeCount(in: mainObjectContext, criterion: self?.viewCriterion) > 0
@@ -180,7 +181,7 @@ final class MenuBarSet {
 
 	}
 
-	private func compareDict(_ from: [String : AnyObject], to: [String : AnyObject]) -> Bool {
+	private func compare(dictionary from: [String : AnyObject], to: [String : AnyObject]) -> Bool {
 		for (key, value) in from {
 			if let v = to[key] {
 				if !v.isEqual(value) {

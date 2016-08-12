@@ -266,8 +266,8 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 		actOnLocalNotification = true
 	}
 
-	func postNotification(type: NotificationType, forItem: DataItem) {
-		NotificationManager.postNotification(type: type, forItem: forItem)
+	func postNotification(type: NotificationType, for item: DataItem) {
+		NotificationManager.postNotification(type: type, for: item)
 	}
 
 	func markEverythingRead() {

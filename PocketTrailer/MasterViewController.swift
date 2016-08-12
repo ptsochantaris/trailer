@@ -330,7 +330,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			let i = fetchedResultsController.object(at: ip)
 			let isMuted = i.muted
 			if (!isMuted && canIssueKeyForIndexPath(actionTitle: "Mute", indexPath: ip)) || (isMuted && canIssueKeyForIndexPath(actionTitle: "Unmute", indexPath: ip)) {
-				i.setMute(!isMuted)
+				i.setMute(to: !isMuted)
 				DataManager.saveDB()
 				updateStatus()
 			}
@@ -558,7 +558,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		} else if let c = currentTabBarSet {
 			viewingPrs = c.tabItems.first?.image == UIImage(named: "prsTab") // or this :(
 		} else if Repo.anyVisibleRepos(in: mainObjectContext, criterion: currentTabBarSet?.viewCriterion, excludeGrouped: true) {
-			viewingPrs = Repo.interestedInPrs(currentTabBarSet?.viewCriterion?.apiServerId)
+			viewingPrs = Repo.interestedInPrs(fromServerWithId: currentTabBarSet?.viewCriterion?.apiServerId)
 		} else {
 			viewingPrs = true
 		}
@@ -673,12 +673,12 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		var urlToOpen = userInfo[NOTIFICATION_URL_KEY] as? String
 		var relatedItem: ListableItem?
 
-		if let commentId = DataManager.idForUriPath(userInfo[COMMENT_ID_KEY] as? String), let c = existingObject(with: commentId) as? PRComment {
+		if let commentId = DataManager.id(for: userInfo[COMMENT_ID_KEY] as? String), let c = existingObject(with: commentId) as? PRComment {
 			relatedItem = c.pullRequest ?? c.issue
 			if urlToOpen == nil {
 				urlToOpen = c.webUrl
 			}
-		} else if let uri = userInfo[LISTABLE_URI_KEY] as? String, let itemId = DataManager.idForUriPath(uri) {
+		} else if let uri = userInfo[LISTABLE_URI_KEY] as? String, let itemId = DataManager.id(for: uri) {
 			relatedItem = existingObject(with: itemId) as? ListableItem
 			if relatedItem == nil {
 				showMessage("Item not found", "Could not locate the item related to this notification")
@@ -689,7 +689,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		if let a = action, let i = relatedItem {
 			if a == "mute" {
-				i.setMute(true)
+				i.setMute(to: true)
 				DataManager.saveDB()
 				updateStatus()
 				return
@@ -728,7 +728,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	private func selectTabFor(i: ListableItem) {
 		for d in tabBarSets {
-			if d.viewCriterion == nil || d.viewCriterion?.isRelatedTo(i) ?? false {
+			if d.viewCriterion == nil || d.viewCriterion?.isRelated(to: i) ?? false {
 				if i is PullRequest {
 					requestTabFocus(item: d.prItem)
 				} else {
@@ -739,7 +739,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	func openItemWithUriPath(uriPath: String) {
-		if let itemId = DataManager.idForUriPath(uriPath),
+		if let itemId = DataManager.id(for: uriPath),
 			let item = existingObject(with: itemId) as? ListableItem,
 			let ip = fetchedResultsController.indexPath(forObject: item) {
 
@@ -752,7 +752,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	func openCommentWithId(cId: String) {
 		if let
-			itemId = DataManager.idForUriPath(cId),
+			itemId = DataManager.id(for: cId),
 			let comment = existingObject(with: itemId) as? PRComment
 		{
 			if let url = comment.webUrl {
@@ -864,7 +864,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	private func markItemAsUnRead(itemUri: String?) {
 		if let
 			i = itemUri,
-			let oid = DataManager.idForUriPath(i),
+			let oid = DataManager.id(for: i),
 			let o = existingObject(with: oid) as? ListableItem {
 			o.latestReadCommentDate = Date.distantPast
 			o.postProcess()
@@ -880,7 +880,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		func markItemAsRead(itemUri: String?) {
 			if let
 				i = itemUri,
-				let oid = DataManager.idForUriPath(i),
+				let oid = DataManager.id(for: i),
 				let o = existingObject(with: oid) as? ListableItem {
 				o.catchUpWithComments()
 				DataManager.saveDB()
@@ -909,13 +909,13 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			let m: UITableViewRowAction
 			if i.muted {
 				m = UITableViewRowAction(style: .normal, title: "Unmute") { action, indexPath in
-					i.setMute(false)
+					i.setMute(to: false)
 					DataManager.saveDB()
 					tableView.setEditing(false, animated: true)
 				}
 			} else {
 				m = UITableViewRowAction(style: .normal, title: "Mute") { action, indexPath in
-					i.setMute(true)
+					i.setMute(to: true)
 					DataManager.saveDB()
 					tableView.setEditing(false, animated: true)
 				}

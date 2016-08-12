@@ -31,8 +31,8 @@ final class CacheEntry: NSManagedObject {
 		return CacheUnit(data: data, code: code, etag: etag, headers: headers, lastFetched: lastFetched)
 	}
 
-	class func setEntry(_ key: String, code: Int64, etag: String, data: Data, headers: [NSObject : AnyObject]) {
-		var e = entryForKey(key)
+	class func setEntry(key: String, code: Int64, etag: String, data: Data, headers: [NSObject : AnyObject]) {
+		var e = entry(for: key)
 		if e == nil {
 			e = NSEntityDescription.insertNewObject(forEntityName: "CacheEntry", into: mainObjectContext) as? CacheEntry
 			e!.key = key
@@ -45,7 +45,7 @@ final class CacheEntry: NSManagedObject {
 		e!.lastTouched = Date()
 	}
 
-	class func entryForKey(_ key: String) -> CacheEntry? {
+	class func entry(for key: String) -> CacheEntry? {
 		let f = NSFetchRequest<CacheEntry>(entityName: "CacheEntry")
 		f.fetchLimit = 1
 		f.predicate = NSPredicate(format: "key == %@", key)
@@ -68,8 +68,8 @@ final class CacheEntry: NSManagedObject {
 		}
 	}
 
-	class func markKeyAsFetched(_ key: String) {
-		if let e = entryForKey(key) {
+	class func markFetched(for key: String) {
+		if let e = entry(for: key) {
 			e.lastFetched = Date()
 		}
 	}

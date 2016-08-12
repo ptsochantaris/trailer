@@ -92,7 +92,7 @@ class ListableItem: DataItem {
 		}
 	}
 
-	final func sortedComments(_ comparison: ComparisonResult) -> [PRComment] {
+	final func sortedComments(using comparison: ComparisonResult) -> [PRComment] {
 		return Array(comments).sorted(by: { (c1, c2) -> Bool in
 			let d1 = c1.createdAt ?? Date.distantPast
 			let d2 = c2.createdAt ?? Date.distantPast
@@ -192,7 +192,7 @@ class ListableItem: DataItem {
 			snoozeUntil = nil
 			snoozingPreset = nil
 		} else {
-			app.postNotification(type: notification, forItem: self)
+			app.postNotification(type: notification, for: self)
 		}
 	}
 
@@ -626,7 +626,7 @@ class ListableItem: DataItem {
 
 		if var fi = withFilter, !fi.isEmpty {
 
-            func checkForPredicates(_ tagString: String, _ process: (String)->NSPredicate?) {
+            func check(forPredicate tagString: String, _ process: (String)->NSPredicate?) {
 				var foundOne: Bool
 				repeat {
 					foundOne = false
@@ -644,15 +644,15 @@ class ListableItem: DataItem {
 				} while(foundOne)
             }
 
-			checkForPredicates("title", titlePredicate)
-            checkForPredicates("server", serverPredicate)
-            checkForPredicates("repo", repoPredicate)
-            checkForPredicates("label", labelPredicate)
-            checkForPredicates("status", statusPredicate)
-            checkForPredicates("user", userPredicate)
-			checkForPredicates("number", numberPredicate)
-			checkForPredicates("milestone", milestonePredicate)
-			checkForPredicates("assignee", assigneePredicate)
+			check(forPredicate: "title", titlePredicate)
+            check(forPredicate: "server", serverPredicate)
+            check(forPredicate: "repo", repoPredicate)
+            check(forPredicate: "label", labelPredicate)
+            check(forPredicate: "status", statusPredicate)
+            check(forPredicate: "user", userPredicate)
+			check(forPredicate: "number", numberPredicate)
+			check(forPredicate: "milestone", milestonePredicate)
+			check(forPredicate: "assignee", assigneePredicate)
 
 			if !fi.isEmpty {
 				var orPredicates = [NSPredicate]()
@@ -744,10 +744,10 @@ class ListableItem: DataItem {
 	final class func relatedItems(from notificationUserInfo: [NSObject : AnyObject]) -> (PRComment?, ListableItem)? {
 		var item: ListableItem?
 		var comment: PRComment?
-		if let cid = notificationUserInfo[COMMENT_ID_KEY] as? String, let itemId = DataManager.idForUriPath(cid), let c = existingObject(with: itemId) as? PRComment {
+		if let cid = notificationUserInfo[COMMENT_ID_KEY] as? String, let itemId = DataManager.id(for: cid), let c = existingObject(with: itemId) as? PRComment {
 			comment = c
 			item = c.pullRequest ?? c.issue
-		} else if let pid = notificationUserInfo[LISTABLE_URI_KEY] as? String, let itemId = DataManager.idForUriPath(pid) {
+		} else if let pid = notificationUserInfo[LISTABLE_URI_KEY] as? String, let itemId = DataManager.id(for: pid) {
 			item = existingObject(with: itemId) as? ListableItem
 		}
 		if let i = item {
@@ -757,7 +757,7 @@ class ListableItem: DataItem {
 		}
 	}
 
-	final func setMute(_ newValue: Bool) {
+	final func setMute(to newValue: Bool) {
 		muted = newValue
 		postProcess()
 		if newValue {
@@ -819,7 +819,7 @@ class ListableItem: DataItem {
 
 		s.contentDescription = "\(S(repo.fullName)) @\(S(userLogin)) - \(S(body?.trim))"
 
-		func completeIndex(_ s: CSSearchableItemAttributeSet) {
+		func completeIndex(withSet s: CSSearchableItemAttributeSet) {
 			let i = CSSearchableItem(uniqueIdentifier:objectID.uriRepresentation().absoluteString, domainIdentifier: nil, attributeSet: s)
 			CSSearchableIndex.default().indexSearchableItems([i], completionHandler: nil)
 		}
@@ -827,11 +827,11 @@ class ListableItem: DataItem {
 		if let i = userAvatarUrl, !Settings.hideAvatars {
 			_ = api.haveCachedAvatar(from: i) { _, cachePath in
 				s.thumbnailURL = URL(string: "file://\(cachePath)")
-				completeIndex(s)
+				completeIndex(withSet: s)
 			}
 		} else {
 			s.thumbnailURL = nil
-			completeIndex(s)
+			completeIndex(withSet: s)
 		}
 	}
 	#endif
@@ -857,7 +857,7 @@ class ListableItem: DataItem {
 				color = COLOR_CLASS(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)
 				message = "You have no watched repositories, please add some to your watchlist and refresh after a little while."
 			}
-		} else if !Repo.interestedInPrs(criterion?.apiServerId) && !Repo.interestedInIssues(criterion?.apiServerId) {
+		} else if !Repo.interestedInPrs(fromServerWithId: criterion?.apiServerId) && !Repo.interestedInIssues(fromServerWithId: criterion?.apiServerId) {
 			color = COLOR_CLASS(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)
 			message = "All your watched repositories are marked as hidden, please enable issues or PRs on at least one."
 		} else if openItemCount==0 {

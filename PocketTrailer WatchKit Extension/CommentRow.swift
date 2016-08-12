@@ -9,7 +9,7 @@ final class CommentRow: NSObject {
 	@IBOutlet weak var margin: WKInterfaceGroup!
 	var commentId: String?
 
-	func setComment(_ comment: [String : AnyObject], unreadCount: Int, unreadIndex: inout Int) {
+	func set(comment: [String : AnyObject], unreadCount: Int, unreadIndex: inout Int) {
 
 		let username = S(comment["user"] as? String)
 		usernameL.setText("@\(username)")

@@ -20,28 +20,28 @@ final class PRDetailController: CommonController {
 		super.awake(withContext: context)
 	}
 
-	override func requestData(_ command: String?) {
+	override func requestData(command: String?) {
 		var params = ["list": "item_detail", "localId": itemId!]
 		if let command = command {
 			params["command"] = command
 		}
-		sendRequest(params)
+		send(request: params)
 	}
 
 	@IBAction func refreshSelected() {
-		showStatus("Refreshing...", hideTable: true)
-		requestData("refresh")
+		show(status: "Refreshing...", hideTable: true)
+		requestData(command: "refresh")
 	}
 
 	@IBAction func markAllReadSelected() {
-		requestData("markItemsRead")
+		requestData(command: "markItemsRead")
 	}
 
 	@IBAction func openOnDeviceSelected() {
-		requestData("openItem")
+		requestData(command: "openItem")
 	}
 
-	override func updateFromData(_ response: [NSString : AnyObject]) {
+	override func update(from response: [NSString : AnyObject]) {
 
 		table.removeRows(at: IndexSet(integersIn: NSMakeRange(0, table.numberOfRows).toRange()!))
 
@@ -55,7 +55,7 @@ final class PRDetailController: CommonController {
 			for status in statuses {
 				if let s = table.rowController(at: rowCount) as? StatusRow {
 					s.labelL.setText(status["text"] as? String)
-					let c = colourFromHex(status["color"] as! String)
+					let c = colour(from: status["color"] as! String)
 					s.labelL.setTextColor(c)
 					s.margin.setBackgroundColor(c)
 				}
@@ -82,7 +82,7 @@ final class PRDetailController: CommonController {
 			let unreadCount = itemInfo["unreadCount"] as? Int ?? 0
 			for comment in comments {
 				if let s = table.rowController(at: rowCount) as? CommentRow {
-					s.setComment(comment, unreadCount: unreadCount, unreadIndex: &unreadIndex)
+					s.set(comment: comment, unreadCount: unreadCount, unreadIndex: &unreadIndex)
 				}
 				rowCount += 1
 			}
@@ -90,12 +90,12 @@ final class PRDetailController: CommonController {
 			setTitle("Details")
 		}
 
-		showStatus("", hideTable: false)
+		show(status: "", hideTable: false)
 	}
 
-	func colourFromHex(_ s: String) -> UIColor {
+	func colour(from hex: String) -> UIColor {
 
-		let safe = s
+		let safe = hex
 			.trimmingCharacters(in: .whitespacesAndNewlines)
 			.trimmingCharacters(in: .symbols)
 		let s = Scanner(string: safe)

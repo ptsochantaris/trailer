@@ -1,7 +1,7 @@
 
 final class PrTable: NSTableView, NSPasteboardItemDataProvider {
 
-	func cellAtEvent(_ theEvent: NSEvent) -> NSView? {
+	func cell(at theEvent: NSEvent) -> NSView? {
 		let globalLocation = theEvent.locationInWindow
 		let localLocation = convert(globalLocation, from:nil)
 		return view(atColumn: column(at: localLocation), row: row(at: localLocation), makeIfNecessary: false)
@@ -10,13 +10,13 @@ final class PrTable: NSTableView, NSPasteboardItemDataProvider {
 	override func mouseDown(with theEvent: NSEvent) { }
 
 	override func mouseUp(with theEvent: NSEvent) {
-		if let prView = cellAtEvent(theEvent) as? TrailerCell, let item = prView.associatedDataItem {
+		if let prView = cell(at: theEvent) as? TrailerCell, let item = prView.associatedDataItem {
 			let isAlternative = ((theEvent.modifierFlags.intersection(.option)) == .option)
-			app.dataItemSelected(item, alternativeSelect: isAlternative, window: window)
+			app.selected(item, alternativeSelect: isAlternative, window: window)
 		}
 	}
 
-	func scaleImage(_ image: NSImage, toFillSize:CGSize) -> NSImage {
+	func scale(image: NSImage, toFillSize:CGSize) -> NSImage {
 		let targetFrame = NSMakeRect(0, 0, toFillSize.width, toFillSize.height)
 		let sourceImageRep = image.bestRepresentation(for: targetFrame, context: nil, hints: nil)
 		let targetImage = NSImage(size:toFillSize)
@@ -30,11 +30,11 @@ final class PrTable: NSTableView, NSPasteboardItemDataProvider {
 
 		draggingUrl = nil
 
-		if let prView = cellAtEvent(theEvent) as? TrailerCell, let url = prView.associatedDataItem?.webUrl {
+		if let prView = cell(at: theEvent) as? TrailerCell, let url = prView.associatedDataItem?.webUrl {
 
 			draggingUrl = url
 
-			let dragIcon = scaleImage(NSApp.applicationIconImage, toFillSize: CGSize(width: 32, height: 32))
+			let dragIcon = scale(image: NSApp.applicationIconImage, toFillSize: CGSize(width: 32, height: 32))
 			let pbItem = NSPasteboardItem()
 			pbItem.setDataProvider(self, forTypes: [NSPasteboardTypeString])
 			let dragItem = NSDraggingItem(pasteboardWriter: pbItem)

@@ -29,10 +29,10 @@ final class ItemDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 		self.viewCriterion = viewCriterion
 
 		super.init()
-		reloadData(nil)
+		reloadData(filter: nil)
 	}
 
-	func reloadData(_ filter: String?) {
+	func reloadData(filter: String?) {
 
 		itemIds.removeAll(keepingCapacity: false)
 

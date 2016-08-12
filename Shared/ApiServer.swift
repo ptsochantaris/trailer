@@ -222,7 +222,8 @@ final class ApiServer: NSManagedObject {
 			let a = insertNewServer(in: tempMoc)
 			for (k,v) in apiServerData {
 				if k=="repos" {
-					a.configureReposFromArchive(v as! [String : [String : NSObject]])
+					let archive = v as! [String : [String : NSObject]]
+					a.configureRepos(from: archive)
 				} else {
 					let attributes = Array(a.entity.attributesByName.keys)
 					if attributes.contains(k) {
@@ -241,7 +242,7 @@ final class ApiServer: NSManagedObject {
 		}
 	}
 
-	func configureReposFromArchive(_ archive: [String : [String : NSObject]]) {
+	func configureRepos(from archive: [String : [String : NSObject]]) {
 		for (_, repoData) in archive {
 			let r = NSEntityDescription.insertNewObject(forEntityName: "Repo", into: managedObjectContext!) as! Repo
 			for (k,v) in repoData {

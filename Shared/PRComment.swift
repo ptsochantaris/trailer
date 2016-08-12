@@ -11,29 +11,29 @@ final class PRComment: DataItem {
     @NSManaged var pullRequest: PullRequest?
 	@NSManaged var issue: Issue?
 
-	class func syncCommentsFromInfo(_ data: [[NSObject : AnyObject]]?, pullRequest: PullRequest) {
-		itemsWithInfo(data, type: "PRComment", server: pullRequest.apiServer) { item, info, newOrUpdated in
+	class func syncComments(from data: [[NSObject : AnyObject]]?, pullRequest: PullRequest) {
+		items(with: data, type: "PRComment", server: pullRequest.apiServer) { item, info, newOrUpdated in
 			if newOrUpdated {
 				let c = item as! PRComment
 				c.pullRequest = pullRequest
-				c.fillFromInfo(info)
-				c.fastForwardItemIfNeeded(pullRequest)
+				c.fill(from: info)
+				c.fastForwardIfNeeded(parent: pullRequest)
 			}
 		}
 	}
 
-	class func syncCommentsFromInfo(_ data: [[NSObject : AnyObject]]?, issue: Issue) {
-		itemsWithInfo(data, type: "PRComment", server: issue.apiServer) { item, info, newOrUpdated in
+	class func syncComments(from data: [[NSObject : AnyObject]]?, issue: Issue) {
+		items(with: data, type: "PRComment", server: issue.apiServer) { item, info, newOrUpdated in
 			if newOrUpdated {
 				let c = item as! PRComment
 				c.issue = issue
-				c.fillFromInfo(info)
-				c.fastForwardItemIfNeeded(issue)
+				c.fill(from: info)
+				c.fastForwardIfNeeded(parent: issue)
 			}
 		}
 	}
 
-	func fastForwardItemIfNeeded(_ item: ListableItem) {
+	func fastForwardIfNeeded(parent item: ListableItem) {
 		// check if we're assigned to a just created issue, in which case we want to "fast forward" its latest comment dates to our own if we're newer
 		if let commentCreation = createdAt, item.postSyncAction == PostSyncAction.noteNew.rawValue {
 			if let latestReadDate = item.latestReadCommentDate, latestReadDate < commentCreation {
@@ -49,7 +49,7 @@ final class PRComment: DataItem {
 					DLog("Waking up snoozed item ID %lld because of mention", item.serverId)
 					item.wakeUp()
 				}
-				app.postNotification(type: .newMention, forItem: self)
+				app.postNotification(type: .newMention, for: self)
 			} else if !isMine {
 				if item.isSnoozing && item.shouldWakeOnComment {
 					DLog("Waking up snoozed item ID %lld because of posted comment", item.serverId)
@@ -69,7 +69,7 @@ final class PRComment: DataItem {
 							DLog("Blocked notification for user '%@' as their name is on the blacklist", authorName)
 						} else {
 							DLog("User '%@' not on blacklist, can post notification", authorName)
-							app.postNotification(type: .newComment, forItem:self)
+							app.postNotification(type: .newComment, for: self)
 						}
 					}
 				}
@@ -77,7 +77,7 @@ final class PRComment: DataItem {
 		}
 	}
 
-	func fillFromInfo(_ info:[NSObject : AnyObject]) {
+	func fill(from info:[NSObject : AnyObject]) {
 		body = info["body"] as? String
 		webUrl = info["html_url"] as? String
 

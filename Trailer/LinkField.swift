@@ -44,23 +44,23 @@ final class LinkField: CenterTextField {
 
 	override func mouseEntered(with theEvent: NSEvent) {
 		normalColor = textColor
-		checkMove(theEvent)
+		checkMove(from: theEvent)
 	}
 
 	override func mouseMoved(with theEvent: NSEvent) {
-		checkMove(theEvent)
+		checkMove(from: theEvent)
 	}
 
-	private func checkMove(_ theEvent: NSEvent) {
+	private func checkMove(from theEvent: NSEvent) {
 		if targetUrl != nil {
 			if highlight {
-				if needsCommand && (theEvent.modifierFlags.intersection(.command) != .command) {
+				if needsCommand && !theEvent.modifierFlags.contains(.command) {
 					highlight = false
 					textColor = normalColor
 					window?.invalidateCursorRects(for: self)
 				}
 			} else {
-				if !needsCommand || (theEvent.modifierFlags.intersection(.command) == .command) {
+				if !needsCommand || theEvent.modifierFlags.contains(.command) {
 					highlight = true
 					textColor = NSColor.blue
 					window?.invalidateCursorRects(for: self)
@@ -73,17 +73,17 @@ final class LinkField: CenterTextField {
 
 	override func mouseUp(with theEvent: NSEvent) {
 		if targetUrl == nil {
-            selectParentPr(theEvent)
+            selectParentPr(from: theEvent)
 		} else {
 			if needsCommand {
-				if theEvent.modifierFlags.intersection(.command) == .command {
-					if theEvent.modifierFlags.intersection(.option) == .option {
+				if theEvent.modifierFlags.contains(.command) {
+					if theEvent.modifierFlags.contains(.option) {
 						app.ignoreNextFocusLoss = true
 					}
 					mouseExited(with: theEvent)
 					NSWorkspace.shared().open(URL(string:targetUrl!)!)
 				} else {
-                    selectParentPr(theEvent)
+                    selectParentPr(from: theEvent)
 				}
 			} else {
 				mouseExited(with: theEvent)
@@ -92,10 +92,10 @@ final class LinkField: CenterTextField {
 		}
 	}
 
-    private func selectParentPr(_ theEvent: NSEvent) {
+    private func selectParentPr(from theEvent: NSEvent) {
         if let parentView = nextResponder as? TrailerCell, let pr = parentView.associatedDataItem {
-            let isAlternative = ((theEvent.modifierFlags.intersection(.option)) == .option)
-			app.dataItemSelected(pr, alternativeSelect: isAlternative, window: window)
+            let isAlternative = theEvent.modifierFlags.contains(.option)
+			app.selected(pr, alternativeSelect: isAlternative, window: window)
         }
     }
 

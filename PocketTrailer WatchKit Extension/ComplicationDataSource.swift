@@ -8,7 +8,7 @@ final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 	}
 
 	func getPlaceholderTemplate(for complication: CLKComplication, withHandler handler: (CLKComplicationTemplate?) -> Void) {
-		handler(constructTemplateFor(complication, issues: false, prCount: nil, issueCount: nil, commentCount: 0))
+		handler(constructTemplate(for: complication, issues: false, prCount: nil, issueCount: nil, commentCount: 0))
 	}
 
 	func getPrivacyBehavior(for complication: CLKComplication, withHandler handler: (CLKComplicationPrivacyBehavior) -> Void) {
@@ -31,13 +31,13 @@ final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 
 	private func entriesFor(_ complication: CLKComplication, _ handler: ([CLKComplicationTimelineEntry]?) -> Void) {
 		if let overview = WCSession.default().receivedApplicationContext["overview"] as? [String : AnyObject] {
-			processOverview(complication, overview, handler)
+			processOverview(for: complication, overview, handler)
 		} else {
 			handler(nil)
 		}
 	}
 
-	private func processOverview(_ complication: CLKComplication, _ overview: [String : AnyObject], _ handler: ([CLKComplicationTimelineEntry]?) -> Void) {
+	private func processOverview(for complication: CLKComplication, _ overview: [String : AnyObject], _ handler: ([CLKComplicationTimelineEntry]?) -> Void) {
 
 		let showIssues = overview["preferIssues"] as! Bool
 
@@ -55,7 +55,7 @@ final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 			}
 		}
 
-		let entry = CLKComplicationTimelineEntry(date: Date(), complicationTemplate: constructTemplateFor(complication, issues: showIssues, prCount: prCount, issueCount: issueCount, commentCount: commentCount))
+		let entry = CLKComplicationTimelineEntry(date: Date(), complicationTemplate: constructTemplate(for: complication, issues: showIssues, prCount: prCount, issueCount: issueCount, commentCount: commentCount))
 		handler([entry])
 	}
 
@@ -93,7 +93,7 @@ final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 		}
 	}
 
-	private func constructTemplateFor(_ complication: CLKComplication, issues: Bool, prCount: Int?, issueCount: Int?, commentCount: Int) -> CLKComplicationTemplate {
+	private func constructTemplate(for complication: CLKComplication, issues: Bool, prCount: Int?, issueCount: Int?, commentCount: Int) -> CLKComplicationTemplate {
 
 		switch complication.family {
 		case .modularSmall:

@@ -600,11 +600,11 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		if selectedRows.count > 1 {
 			for row in selectedRows {
 				if !tableView(projectsTable, isGroupRow: row) {
-					affectedRepos.append(repoForRow(row))
+					affectedRepos.append(repo(at: row))
 				}
 			}
 		} else {
-			affectedRepos = Repo.reposForFilter(repoFilter.stringValue)
+			affectedRepos = Repo.reposFiltered(by: repoFilter.stringValue)
 		}
 		return affectedRepos
 	}
@@ -906,13 +906,13 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		o.beginSheetModal(for: self) { response in
 			if response == NSFileHandlingPanelOKButton, let url = o.url {
 				atNextEvent {
-					_ = app.tryLoadSettings(url, skipConfirm: Settings.dontConfirmSettingsImport)
+					_ = app.tryLoadSettings(from: url, skipConfirm: Settings.dontConfirmSettingsImport)
 				}
 			}
 		}
 	}
 
-	private func colorButton(_ button: NSButton, withColor: NSColor) {
+	private func color(button: NSButton, withColor: NSColor) {
 		let title = button.attributedTitle.mutableCopy() as! NSMutableAttributedString
 		title.addAttribute(NSForegroundColorAttributeName, value: withColor, range: NSMakeRange(0, title.length))
 		button.attributedTitle = title
@@ -920,10 +920,10 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	private func enableHotkeySegments() {
 		if Settings.hotkeyEnable {
-			colorButton(hotkeyCommandModifier, withColor: Settings.hotkeyCommandModifier ? NSColor.controlTextColor : NSColor.disabledControlTextColor)
-			colorButton(hotkeyControlModifier, withColor: Settings.hotkeyControlModifier ? NSColor.controlTextColor : NSColor.disabledControlTextColor)
-			colorButton(hotkeyOptionModifier, withColor: Settings.hotkeyOptionModifier ? NSColor.controlTextColor : NSColor.disabledControlTextColor)
-			colorButton(hotkeyShiftModifier, withColor: Settings.hotkeyShiftModifier ? NSColor.controlTextColor : NSColor.disabledControlTextColor)
+			color(button: hotkeyCommandModifier, withColor: Settings.hotkeyCommandModifier ? NSColor.controlTextColor : NSColor.disabledControlTextColor)
+			color(button: hotkeyControlModifier, withColor: Settings.hotkeyControlModifier ? NSColor.controlTextColor : NSColor.disabledControlTextColor)
+			color(button: hotkeyOptionModifier, withColor: Settings.hotkeyOptionModifier ? NSColor.controlTextColor : NSColor.disabledControlTextColor)
+			color(button: hotkeyShiftModifier, withColor: Settings.hotkeyShiftModifier ? NSColor.controlTextColor : NSColor.disabledControlTextColor)
 		}
 		hotKeyContainer.isHidden = !Settings.hotkeyEnable
 		hotKeyHelp.isHidden = Settings.hotkeyEnable
@@ -1164,13 +1164,13 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
-	private func repoForRow(_ row: Int) -> Repo {
-		let parentCount = Repo.countParentRepos(repoFilter.stringValue)
+	private func repo(at row: Int) -> Repo {
+		let parentCount = Repo.countParentRepos(filter: repoFilter.stringValue)
 		var r = row
 		if r > parentCount {
 			r -= 1
 		}
-		let filteredRepos = Repo.reposForFilter(repoFilter.stringValue)
+		let filteredRepos = Repo.reposFiltered(by: repoFilter.stringValue)
 		return filteredRepos[r-1]
 	}
 
@@ -1187,7 +1187,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 					cell.isEnabled = false
 				} else {
 					cell.isEnabled = true
-					let r = repoForRow(row)
+					let r = repo(at: row)
 					let repoName = S(r.fullName)
 					let title = r.inaccessible ? "\(repoName) (inaccessible)" : repoName
 					let textColor = (row == tv.selectedRow) ? NSColor.selectedControlTextColor : (r.shouldSync ? NSColor.textColor : NSColor.textColor.withAlphaComponent(0.4))
@@ -1201,7 +1201,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 							menuCell.placeholderString = nil
 							menuCell.isEnabled = false
 						} else {
-							let r = repoForRow(row)
+							let r = repo(at: row)
 							menuCell.isEnabled = true
 							menuCell.placeholderString = "None"
 							menuCell.stringValue = S(r.groupLabel)
@@ -1214,7 +1214,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 						menuCell.isEnabled = false
 						menuCell.arrowPosition = .noArrow
 					} else {
-						let r = repoForRow(row)
+						let r = repo(at: row)
 						menuCell.isEnabled = true
 						menuCell.arrowPosition = .arrowAtBottom
 
@@ -1278,7 +1278,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	func tableView(_ tableView: NSTableView, isGroupRow row: Int) -> Bool {
 		if tableView === projectsTable {
-			return (row == 0 || row == Repo.countParentRepos(repoFilter.stringValue) + 1)
+			return (row == 0 || row == Repo.countParentRepos(filter: repoFilter.stringValue) + 1)
 		} else {
 			return false
 		}
@@ -1286,7 +1286,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	func numberOfRows(in tableView: NSTableView) -> Int {
 		if tableView === projectsTable {
-			return Repo.reposForFilter(repoFilter.stringValue).count + 2
+			return Repo.reposFiltered(by: repoFilter.stringValue).count + 2
 		} else if tableView === serverList {
 			return ApiServer.countApiServers(in: mainObjectContext)
 		} else if tableView === snoozePresetsList {
@@ -1302,7 +1302,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	func tableView(_ tv: NSTableView, setObjectValue object: AnyObject?, for tableColumn: NSTableColumn?, row: Int) {
 		if tv === projectsTable {
 			if !tableView(tv, isGroupRow: row) {
-				let r = repoForRow(row)
+				let r = repo(at: row)
 				if tableColumn?.identifier == "group" {
 					let g = S(object as? String)
 					r.groupLabel = g.isEmpty ? nil : g
@@ -1515,17 +1515,17 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 						selectedPreset.wakeUpAllAssociatedItems()
 						fallthrough
 					case 1002:
-						self?.completeSnoozeDelete(selectedPreset, index)
+						self?.completeSnoozeDelete(for: selectedPreset, index)
 					default: break
 					}
 				}
 			} else {
-				completeSnoozeDelete(selectedPreset, index)
+				completeSnoozeDelete(for: selectedPreset, index)
 			}
 		}
 	}
 
-	private func completeSnoozeDelete(_ selectedPreset: SnoozePreset, _ index: Int) {
+	private func completeSnoozeDelete(for selectedPreset: SnoozePreset, _ index: Int) {
 		mainObjectContext.delete(selectedPreset)
 		commitSnoozeSettings()
 		snoozePresetsList.selectRowIndexes(IndexSet(integer: min(index, snoozePresetsList.numberOfRows-1)), byExtendingSelection: false)

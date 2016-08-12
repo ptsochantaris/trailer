@@ -126,7 +126,7 @@ final class MenuWindow: NSWindow {
 	}
 
 	@IBAction func markAllReadSelected(_ sender: NSMenuItem) {
-		app.markAllReadSelectedFrom(self)
+		app.markAllReadSelected(from: self)
 	}
 
 	@IBAction func preferencesSelected(_ sender: NSMenuItem) {
@@ -205,7 +205,7 @@ final class MenuWindow: NSWindow {
 
 	func reload() {
 		messageView = nil
-		itemDelegate.reloadData(filter.stringValue)
+		itemDelegate.reloadData(filter: filter.stringValue)
 		table.reloadData()
 	}
 

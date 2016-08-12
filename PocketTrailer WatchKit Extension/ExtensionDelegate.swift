@@ -48,7 +48,7 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 		atNextEvent(self) { S in
 			if let l = S.lastView, S.session.isReachable && !S.requestedUpdate {
 				S.requestedUpdate = true
-				l.requestData(nil)
+				l.requestData(command: nil)
 				delay(0.5, S) { S in
 					S.requestedUpdate = false
 				}
@@ -61,7 +61,6 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 		updateComplications()
 	}
 
-	@available(watchOSApplicationExtension 3.0, *)
 	func handle(_ backgroundTasks: Set<WKRefreshBackgroundTask>) {
 		for task in backgroundTasks {
 			if let t = task as? WKSnapshotRefreshBackgroundTask {

@@ -43,7 +43,7 @@ final class StatusItemView: NSView {
 
 	override func draw(_ dirtyRect: NSRect) {
 
-		app.statusItemForView(self)?.drawStatusBarBackground(in: dirtyRect, withHighlight: highlighted)
+		app.statusItem(for: self)?.drawStatusBarBackground(in: dirtyRect, withHighlight: highlighted)
 
 		let imagePoint = NSMakePoint(STATUSITEM_PADDING, 0)
 		var labelRect = CGRect(x: bounds.size.height + labelOffset, y: -5, width: bounds.size.width, height: bounds.size.height)
@@ -66,7 +66,7 @@ final class StatusItemView: NSView {
 			displayAttributes[NSForegroundColorAttributeName] = NSColor.disabledControlTextColor
 		}
 
-		let img = tintedImage(icon, tint: imageColor)
+		let img = tintedImage(from: icon, tint: imageColor)
 		if let t = title {
 
 			labelRect = labelRect.offsetBy(dx: -3, dy: -3)
@@ -90,7 +90,7 @@ final class StatusItemView: NSView {
 	}
 
 	// With thanks to http://stackoverflow.com/questions/1413135/tinting-a-grayscale-nsimage-or-ciimage
-	private func tintedImage(_ image: NSImage, tint: NSColor) -> NSImage {
+	private func tintedImage(from image: NSImage, tint: NSColor) -> NSImage {
 
 		let tinted = image.copy() as! NSImage
 		tinted.lockFocus()

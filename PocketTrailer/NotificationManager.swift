@@ -38,7 +38,7 @@ final class NotificationManager {
 		n.delegate = delegate
 	}
 
-	class func postNotification(type: NotificationType, forItem: DataItem) {
+	class func postNotification(type: NotificationType, for item: DataItem) {
 		if preferencesDirty {
 			return
 		}
@@ -47,7 +47,7 @@ final class NotificationManager {
 
 		switch (type) {
 		case .newMention:
-			if let c = forItem as? PRComment {
+			if let c = item as? PRComment {
 				if c.parentShouldSkipNotifications { return }
 				notification.title = "@\(S(c.userName)) mentioned you:"
 				notification.subtitle = c.notificationSubtitle
@@ -55,7 +55,7 @@ final class NotificationManager {
 				notification.categoryIdentifier = "mutable"
 			}
 		case .newComment:
-			if let c = forItem as? PRComment {
+			if let c = item as? PRComment {
 				if c.parentShouldSkipNotifications { return }
 				notification.title = "@\(S(c.userName)) commented:"
 				notification.subtitle = c.notificationSubtitle
@@ -63,7 +63,7 @@ final class NotificationManager {
 				notification.categoryIdentifier = "mutable"
 			}
 		case .newPr:
-			if let p = forItem as? PullRequest {
+			if let p = item as? PullRequest {
 				if p.shouldSkipNotifications { return }
 				notification.title = "New PR"
 				if let r = p.repo.fullName { notification.subtitle = r }
@@ -71,7 +71,7 @@ final class NotificationManager {
 				notification.categoryIdentifier = "mutable"
 			}
 		case .prReopened:
-			if let p = forItem as? PullRequest {
+			if let p = item as? PullRequest {
 				if p.shouldSkipNotifications { return }
 				notification.title = "Re-Opened PR"
 				if let r = p.repo.fullName { notification.subtitle = r }
@@ -79,7 +79,7 @@ final class NotificationManager {
 				notification.categoryIdentifier = "mutable"
 			}
 		case .prMerged:
-			if let p = forItem as? PullRequest {
+			if let p = item as? PullRequest {
 				if p.shouldSkipNotifications { return }
 				notification.title = "PR Merged!"
 				if let r = p.repo.fullName { notification.subtitle = r }
@@ -87,7 +87,7 @@ final class NotificationManager {
 				notification.categoryIdentifier = "mutable"
 			}
 		case .prClosed:
-			if let p = forItem as? PullRequest {
+			if let p = item as? PullRequest {
 				if p.shouldSkipNotifications { return }
 				notification.title = "PR Closed"
 				if let r = p.repo.fullName { notification.subtitle = r }
@@ -95,19 +95,19 @@ final class NotificationManager {
 				notification.categoryIdentifier = "mutable"
 			}
 		case .newRepoSubscribed:
-			if let r = forItem as? Repo {
+			if let r = item as? Repo {
 				notification.title = "New Repository Subscribed"
 				notification.body = S(r.fullName)
 				notification.categoryIdentifier = "repo"
 			}
 		case .newRepoAnnouncement:
-			if let r = forItem as? Repo {
+			if let r = item as? Repo {
 				notification.title = "New Repository"
 				notification.body = S(r.fullName)
 				notification.categoryIdentifier = "repo"
 			}
 		case .newPrAssigned:
-			if let p = forItem as? PullRequest {
+			if let p = item as? PullRequest {
 				if p.shouldSkipNotifications { return }
 				notification.title = "PR Assigned"
 				if let r = p.repo.fullName { notification.subtitle = r }
@@ -115,7 +115,7 @@ final class NotificationManager {
 				notification.categoryIdentifier = "mutable"
 			}
 		case .newStatus:
-			if let s = forItem as? PRStatus {
+			if let s = item as? PRStatus {
 				if s.parentShouldSkipNotifications { return }
 				notification.title = "PR Status Update"
 				if let d = s.descriptionText { notification.subtitle = d }
@@ -123,7 +123,7 @@ final class NotificationManager {
 				notification.categoryIdentifier = "mutable"
 			}
 		case .newIssue:
-			if let i = forItem as? Issue {
+			if let i = item as? Issue {
 				if i.shouldSkipNotifications { return }
 				notification.title = "New Issue"
 				if let n = i.repo.fullName { notification.subtitle = n }
@@ -131,7 +131,7 @@ final class NotificationManager {
 				notification.categoryIdentifier = "mutable"
 			}
 		case .issueReopened:
-			if let i = forItem as? Issue {
+			if let i = item as? Issue {
 				if i.shouldSkipNotifications { return }
 				notification.title = "Re-Opened Issue"
 				if let n =  i.repo.fullName { notification.subtitle = n }
@@ -139,7 +139,7 @@ final class NotificationManager {
 				notification.categoryIdentifier = "mutable"
 			}
 		case .issueClosed:
-			if let i = forItem as? Issue {
+			if let i = item as? Issue {
 				if i.shouldSkipNotifications { return }
 				notification.title = "Issue Closed"
 				if let n =  i.repo.fullName { notification.subtitle = n }
@@ -147,7 +147,7 @@ final class NotificationManager {
 				notification.categoryIdentifier = "mutable"
 			}
 		case .newIssueAssigned:
-			if let i = forItem as? Issue {
+			if let i = item as? Issue {
 				if i.shouldSkipNotifications { return }
 				notification.title = "Issue Assigned"
 				if let n =  i.repo.fullName { notification.subtitle = n }
@@ -156,7 +156,7 @@ final class NotificationManager {
 			}
 		}
 
-		notification.userInfo = DataManager.infoForType(type, item: forItem)
+		notification.userInfo = DataManager.info(for: type, item: item)
 
 		let t = S(notification.title)
 		let s = S(notification.subtitle)
@@ -164,7 +164,7 @@ final class NotificationManager {
 		let identifier = "\(t) - \(s) - \(b)"
 
 
-		if let c = forItem as? PRComment, let url = c.avatarUrl, !Settings.hideAvatars {
+		if let c = item as? PRComment, let url = c.avatarUrl, !Settings.hideAvatars {
 			_ = api.haveCachedAvatar(from: url) { image, cachePath in
 				if image != nil, let attachment = try? UNNotificationAttachment(identifier: cachePath, url: URL(fileURLWithPath: cachePath), options: [:]) {
 					notification.attachments = [attachment]

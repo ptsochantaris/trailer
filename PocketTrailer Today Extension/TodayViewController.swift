@@ -52,7 +52,7 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 
-		func imageFromColor(_ color: UIColor) -> UIImage {
+		func image(from color: UIColor) -> UIImage {
 			let rect = CGRect(x: 0, y: 0, width: 1, height: 1)
 			UIGraphicsBeginImageContext(rect.size)
 			let context = UIGraphicsGetCurrentContext()
@@ -69,7 +69,7 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 		paragraph.paragraphSpacing = 4
 
 		linkButton.addTarget(self, action: #selector(TodayViewController.widgetTapped), for: .touchUpInside)
-		linkButton.setBackgroundImage(imageFromColor(UIColor(white: 1.0, alpha: 0.2)), for: .highlighted)
+		linkButton.setBackgroundImage(image(from: UIColor(white: 1.0, alpha: 0.2)), for: .highlighted)
 		view.addSubview(linkButton)
 
 		update()

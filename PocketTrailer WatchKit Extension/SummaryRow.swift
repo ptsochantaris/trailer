@@ -35,13 +35,13 @@ class SummaryRow: NSObject, PopulatableRow {
 	
 	var data: [String : AnyObject]?
 
-	func populateFrom(_ other: AnyObject) {
+	func populate(from other: AnyObject) {
 		if let d = other as? SummaryRow {
-			updateUI(d.data!)
+			updateUI(from: d.data!)
 		}
 	}
 
-	func setSummary(_ result: [String : AnyObject]) -> Bool {
+	func setSummary(from result: [String : AnyObject]) -> Bool {
 		data = result
 		if let lastRefresh = result["lastUpdated"] as? Date, lastRefresh != Date.distantPast {
 			return true
@@ -50,7 +50,7 @@ class SummaryRow: NSObject, PopulatableRow {
 		}
 	}
 
-	func updateUI(_ result: [String : AnyObject]) {
+	func updateUI(from result: [String : AnyObject]) {
 		let showIssues = result["preferIssues"] as! Bool
 		prIcon.setHidden(showIssues)
 		issueIcon.setHidden(!showIssues)

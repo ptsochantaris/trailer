@@ -150,19 +150,19 @@ final class DataManager {
 
 	class func sendNotificationsIndexAndSave() {
 
-		func processItems(_ type: String, newNotification: NotificationType, reopenedNotification: NotificationType, assignmentNotification: NotificationType) -> [ListableItem] {
+		func processItems(ofType type: String, newNotification: NotificationType, reopenedNotification: NotificationType, assignmentNotification: NotificationType) -> [ListableItem] {
 			let allItems = DataItem.allItems(ofType: type, in: mainObjectContext) as! [ListableItem]
 			for i in allItems {
 				if i.isVisibleOnMenu {
 					if !i.createdByMe {
 						if i.isNewAssignment {
-							app.postNotification(type: assignmentNotification, forItem: i)
+							app.postNotification(type: assignmentNotification, for: i)
 							i.isNewAssignment = false
 						} else if !i.announced {
-							app.postNotification(type: newNotification, forItem: i)
+							app.postNotification(type: newNotification, for: i)
 							i.announced = true
 						} else if i.reopened {
-							app.postNotification(type: reopenedNotification, forItem: i)
+							app.postNotification(type: reopenedNotification, for: i)
 							i.reopened = false
 						}
 					}
@@ -180,8 +180,8 @@ final class DataManager {
 			return allItems
 		}
 
-		let allPrs = processItems("PullRequest", newNotification: .newPr, reopenedNotification: .prReopened, assignmentNotification: .newPrAssigned)
-		let allIssues = processItems("Issue", newNotification: .newIssue, reopenedNotification: .issueReopened, assignmentNotification: .newIssueAssigned)
+		let allPrs = processItems(ofType: "PullRequest", newNotification: .newPr, reopenedNotification: .prReopened, assignmentNotification: .newPrAssigned)
+		let allIssues = processItems(ofType: "Issue", newNotification: .newIssue, reopenedNotification: .issueReopened, assignmentNotification: .newIssueAssigned)
 
 		let latestComments = PRComment.newItems(ofType: "PRComment", in: mainObjectContext) as! [PRComment]
 		for c in latestComments {
@@ -204,7 +204,7 @@ final class DataManager {
 									DLog("Waking up snoozed PR ID %lld because of a status update", pr.serverId)
 									pr.wakeUp()
 								}
-								app.postNotification(type: .newStatus, forItem: s)
+								app.postNotification(type: .newStatus, for: s)
 								pr.lastStatusNotified = displayText
 							}
 						} else {
@@ -249,7 +249,7 @@ final class DataManager {
 		return c
 	}
 
-	class func infoForType(_ type: NotificationType, item: DataItem) -> [String : AnyObject] {
+	class func info(for type: NotificationType, item: DataItem) -> [String : AnyObject] {
 		switch type {
 		case .newMention, .newComment:
 			let uri = item.objectID.uriRepresentation().absoluteString
@@ -287,7 +287,7 @@ final class DataManager {
 		}
 	}
 
-	class func idForUriPath(_ uriPath: String?) -> NSManagedObjectID? {
+	class func id(for uriPath: String?) -> NSManagedObjectID? {
 		if let up = uriPath, let u = URL(string: up), let p = mainObjectContext.persistentStoreCoordinator {
 			return p.managedObjectID(forURIRepresentation: u)
 		}

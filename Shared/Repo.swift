@@ -37,7 +37,7 @@ final class Repo: DataItem {
 				filteredData.append(info)
 			}
 		}
-		itemsWithInfo(filteredData, type: "Repo", server: server) { item, info, newOrUpdated in
+		items(with: filteredData, type: "Repo", server: server) { item, info, newOrUpdated in
 			if newOrUpdated {
 				let r = item as! Repo
 				r.fullName = info["full_name"] as? String
@@ -103,9 +103,9 @@ final class Repo: DataItem {
 		return c > 0
 	}
 
-	class func interestedInIssues(_ apiServerId: NSManagedObjectID? = nil) -> Bool {
+	class func interestedInIssues(fromServerWithId id: NSManagedObjectID? = nil) -> Bool {
 		let all: [Repo]
-		if let aid = apiServerId, let a = existingObject(with: aid) as? ApiServer {
+		if let aid = id, let a = existingObject(with: aid) as? ApiServer {
 			all = Repo.allItems(ofType: "Repo", server: a) as! [Repo]
 		} else {
 			all = Repo.allItems(ofType: "Repo", in: mainObjectContext) as! [Repo]
@@ -118,9 +118,9 @@ final class Repo: DataItem {
 		return false
 	}
 
-	class func interestedInPrs(_ apiServerId: NSManagedObjectID? = nil) -> Bool {
+	class func interestedInPrs(fromServerWithId id: NSManagedObjectID? = nil) -> Bool {
 		let all: [Repo]
-		if let aid = apiServerId, let a = existingObject(with: aid) as? ApiServer {
+		if let aid = id, let a = existingObject(with: aid) as? ApiServer {
 			all = Repo.allItems(ofType: "Repo", server: a) as! [Repo]
 		} else {
 			all = Repo.allItems(ofType: "Repo", in: mainObjectContext) as! [Repo]
@@ -170,7 +170,7 @@ final class Repo: DataItem {
 		}
 	}
 
-	class func reposForFilter(_ filter: String?) -> [Repo] {
+	class func reposFiltered(by filter: String?) -> [Repo] {
 		let f = NSFetchRequest<Repo>(entityName: "Repo")
 		f.returnsObjectsAsFaults = false
 		if let filterText = filter, !filterText.isEmpty {
@@ -183,7 +183,7 @@ final class Repo: DataItem {
 		return try! mainObjectContext.fetch(f)
 	}
 
-	class func countParentRepos(_ filter: String?) -> Int {
+	class func countParentRepos(filter: String?) -> Int {
 		let f = NSFetchRequest<Repo>(entityName: "Repo")
 
 		if let fi = filter, !fi.isEmpty {

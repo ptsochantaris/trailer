@@ -40,7 +40,7 @@ final class GroupingCriterion {
 		return false
 	}
 
-	func isRelatedTo(_ i: ListableItem) -> Bool {
+	func isRelated(to i: ListableItem) -> Bool {
 		if let aid = apiServerId {
 			if i.apiServer.objectID != aid {
 				return false

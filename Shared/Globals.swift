@@ -47,6 +47,17 @@ let NOTIFICATION_URL_KEY = "urlKey"
 
 #if os(iOS)
 	import CoreData
+
+func showMessage(_ title: String, _ message: String?) {
+	var viewController = app.window?.rootViewController
+	while viewController?.presentedViewController != nil {
+		viewController = viewController?.presentedViewController
+	}
+
+	let a = UIAlertController(title: title, message: message, preferredStyle: .alert)
+	a.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+	viewController?.present(a, animated: true, completion: nil)
+}
 #endif
 
 func existingObject(with id: NSManagedObjectID) -> NSManagedObject? {

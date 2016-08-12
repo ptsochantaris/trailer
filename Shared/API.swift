@@ -400,7 +400,7 @@ final class API {
 		}
 
 		getPagedData(at: "/user/teams", from: server, startingFromPage: 1, perPageCallback: { data, lastPage in
-			Team.syncTeamsWithInfo(data, server: server)
+			Team.syncTeams(from: data, server: server)
 			return false
 		}) { success, resultCode in
 			if !success {
@@ -521,7 +521,7 @@ final class API {
 						r.displayPolicyForPrs = Int64(Settings.displayPolicyForNewPrs)
 						r.displayPolicyForIssues = Int64(Settings.displayPolicyForNewIssues)
 						if r.shouldSync {
-							app.postNotification(type: .newRepoAnnouncement, forItem:r)
+							app.postNotification(type: .newRepoAnnouncement, for: r)
 						}
 					}
 					lastRepoCheck = Date()
@@ -692,7 +692,7 @@ final class API {
 					let apiServer = p.apiServer
 
 					getPagedData(at: link, from: apiServer, startingFromPage: 1, perPageCallback: { data, lastPage in
-						PRComment.syncCommentsFromInfo(data, pullRequest: p)
+						PRComment.syncComments(from: data, pullRequest: p)
 						return false
 					}) { success, resultCode in
 						completionCount += 1
@@ -743,7 +743,7 @@ final class API {
 				let apiServer = i.apiServer
 
 				getPagedData(at: link, from: apiServer, startingFromPage: 1, perPageCallback: { data, lastPage in
-					PRComment.syncCommentsFromInfo(data, issue: i)
+					PRComment.syncComments(from: data, issue: i)
 					return false
 				}) { success, resultCode in
 					completionCount += 1
@@ -801,7 +801,7 @@ final class API {
 			if let link = p.labelsLink {
 
 				getPagedData(at: link, from: p.apiServer, startingFromPage: 1, perPageCallback: { data, lastPage in
-					PRLabel.syncLabelsWithInfo(data, withParent: p)
+					PRLabel.syncLabels(from: data, withParent: p)
 					return false
 				}) { [weak self] success, resultCode in
 					completionCount += 1
@@ -867,7 +867,7 @@ final class API {
 
 			if let statusLink = p.statusesLink {
 				getPagedData(at: statusLink, from: apiServer, startingFromPage: 1, perPageCallback: { data, lastPage in
-					PRStatus.syncStatusesFromInfo(data, pullRequest: p)
+					PRStatus.syncStatuses(from: data, pullRequest: p)
 					return false
 				}) { [weak self] success, resultCode in
 					completionCount += 1
@@ -923,7 +923,7 @@ final class API {
 		}
 
 		for r in prsToCheck {
-			investigatePrClosureFor(r, callback: completionCallback)
+			investigatePrClosure(for: r, callback: completionCallback)
 		}
 	}
 
@@ -935,7 +935,7 @@ final class API {
 		for i in try! moc.fetch(f) {
 			let r = i.repo
 			if r.shouldSync && r.postSyncAction != PostSyncAction.delete.rawValue && r.apiServer.lastSyncSucceeded {
-				itemWasClosed(i)
+				handleClosing(of: i)
 			}
 		}
 	}
@@ -1001,41 +1001,41 @@ final class API {
 		}
 	}
 
-	private func investigatePrClosureFor(_ r: PullRequest, callback: Completion) {
-		DLog("Checking closed PR to see if it was merged: %@", r.title)
+	private func investigatePrClosure(for pullRequest: PullRequest, callback: Completion) {
+		DLog("Checking closed PR to see if it was merged: %@", pullRequest.title)
 
-		let repoFullName = S(r.repo.fullName)
-		let path = "/repos/\(repoFullName)/pulls/\(r.number)"
+		let repoFullName = S(pullRequest.repo.fullName)
+		let path = "/repos/\(repoFullName)/pulls/\(pullRequest.number)"
 
-		getData(in: path, from: r.apiServer) { [weak self] data, lastPage, resultCode in
+		getData(in: path, from: pullRequest.apiServer) { [weak self] data, lastPage, resultCode in
 
 			if let d = data as? [NSObject : AnyObject] {
 				if let mergeInfo = d["merged_by"] as? [NSObject : AnyObject], let mergeUserId = mergeInfo["id"] as? NSNumber {
-					self?.prWasMerged(r, byUserId: mergeUserId.int64Value)
+					self?.handleMerging(of: pullRequest, byUserId: mergeUserId.int64Value)
 				} else {
-					self?.itemWasClosed(r)
+					self?.handleClosing(of: pullRequest)
 				}
 			} else if resultCode == 404 || resultCode == 410 { // PR gone for good
-				self?.itemWasClosed(r)
+				self?.handleClosing(of: pullRequest)
 			} else { // fetch/server problem
-				r.postSyncAction = PostSyncAction.doNothing.rawValue // don't delete this, we couldn't check, play it safe
-				r.apiServer.lastSyncSucceeded = false
+				pullRequest.postSyncAction = PostSyncAction.doNothing.rawValue // don't delete this, we couldn't check, play it safe
+				pullRequest.apiServer.lastSyncSucceeded = false
 			}
 			callback()
 		}
 	}
 
-	private func prWasMerged(_ r: PullRequest, byUserId: Int64) {
+	private func handleMerging(of pullRequest: PullRequest, byUserId: Int64) {
 
-		let myUserId = r.apiServer.userId
+		let myUserId = pullRequest.apiServer.userId
 		DLog("Detected merged PR: %@ by user %lld, local user id is: %lld, handling policy is %d, coming from section %lld",
-			r.title,
+			pullRequest.title,
 			byUserId,
 			myUserId,
 			Settings.mergeHandlingPolicy,
-			r.sectionIndex)
+			pullRequest.sectionIndex)
 
-        if !r.isVisibleOnMenu {
+        if !pullRequest.isVisibleOnMenu {
             DLog("Merged PR was hidden, won't announce")
             return
         }
@@ -1043,29 +1043,29 @@ final class API {
 		let mergedByMe = byUserId == myUserId
 		if !(mergedByMe && Settings.dontKeepPrsMergedByMe) {
 			DLog("Checking if we want to keep this merged PR")
-			if r.shouldKeep(accordingTo: Settings.mergeHandlingPolicy) {
+			if pullRequest.shouldKeep(accordingTo: Settings.mergeHandlingPolicy) {
 				DLog("Will keep merged PR")
-				r.keep(as: .merged, notification: .prMerged)
+				pullRequest.keep(as: .merged, notification: .prMerged)
 				return
 			}
 		}
 		DLog("Will not keep merged PR")
 	}
 
-	private func itemWasClosed(_ i: ListableItem) {
+	private func handleClosing(of item: ListableItem) {
 		DLog("Detected closed item: %@, handling policy is %d, coming from section %lld",
-			i.title,
+			item.title,
 			Settings.closeHandlingPolicy,
-			i.sectionIndex)
+			item.sectionIndex)
 
-        if !i.isVisibleOnMenu {
+        if !item.isVisibleOnMenu {
             DLog("Closed item was hidden, won't announce")
             return
         }
 
-		if i.shouldKeep(accordingTo: Settings.closeHandlingPolicy) {
+		if item.shouldKeep(accordingTo: Settings.closeHandlingPolicy) {
 			DLog("Will keep closed item")
-			i.keep(as: .closed, notification: i is Issue ? .issueClosed : .prClosed)
+			item.keep(as: .closed, notification: item is Issue ? .issueClosed : .prClosed)
 		} else {
 			DLog("Will not keep closed item")
 		}
@@ -1393,7 +1393,7 @@ final class API {
 
 		/////////////////////// 60 second dumb-caching
 		let cacheKey = "\(server.objectID.uriRepresentation().absoluteString) \(expandedPath)"
-		let previousCacheEntry = CacheEntry.entryForKey(cacheKey)?.cacheUnit // move data out of thread-specific context
+		let previousCacheEntry = CacheEntry.entry(for: cacheKey)?.cacheUnit // move data out of thread-specific context
 		if let p = previousCacheEntry {
 			if p.lastFetched.timeIntervalSince1970 > Date(timeIntervalSinceNow: -60).timeIntervalSince1970, let parsedData = p.parsedData {
 				DLog("(%@) GET %@ - CACHED", apiServerLabel, expandedPath)
@@ -1432,7 +1432,7 @@ final class API {
 				code = Int(p.code)
 				headers = p.actualHeaders
 				atNextEvent {
-					CacheEntry.markKeyAsFetched(cacheKey)
+					CacheEntry.markFetched(for: cacheKey)
 				}
 				DLog("(%@) GET %@ - NO CHANGE (304): %d", apiServerLabel, expandedPath, code)
 			} else if code > 299 {
@@ -1450,7 +1450,7 @@ final class API {
 					parsedData = try? JSONSerialization.jsonObject(with: d, options: JSONSerialization.ReadingOptions())
 					if let h = headers, let e = h["Etag"] as? String {
 						atNextEvent {
-							CacheEntry.setEntry(cacheKey, code: Int64(code), etag: e, data: d, headers: h)
+							CacheEntry.setEntry(key: cacheKey, code: Int64(code), etag: e, data: d, headers: h)
 						}
 					}
 				}

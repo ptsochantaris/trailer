@@ -46,7 +46,7 @@ final class PRListController: CommonController {
 		}
 	}
 
-	override func requestData(_ command: String?) {
+	override func requestData(command: String?) {
 		if !loading {
 			_requestData(command)
 			loading = true
@@ -83,17 +83,17 @@ final class PRListController: CommonController {
 			params["from"] = NSNumber(value: 0)
 		}
 
-		sendRequest(params)
+		send(request: params)
 	}
 
-	override func loadingFailed(_ error: NSError) {
-		super.loadingFailed(error)
+	override func loadingFailed(with error: NSError) {
+		super.loadingFailed(with: error)
 		loadingBuffer = nil
 	}
 
 	private var progressiveLoading = false
 
-	override func updateFromData(_ response: [NSString : AnyObject]) {
+	override func update(from response: [NSString : AnyObject]) {
 
 		let page = response["result"] as! [[String : AnyObject]]
 
@@ -101,7 +101,7 @@ final class PRListController: CommonController {
 		if page.count == PAGE_SIZE {
 			atNextEvent(self) { S in
 				S._requestData(nil)
-				S.showStatus("Loaded \(S.loadingBuffer?.count ?? 0) items...", hideTable: true)
+				S.show(status: "Loaded \(S.loadingBuffer?.count ?? 0) items...", hideTable: true)
 				S.progressiveLoading = true
 			}
 			return
@@ -109,7 +109,7 @@ final class PRListController: CommonController {
 
 		if let l = loadingBuffer {
 			if progressiveLoading {
-				showStatus("Loaded \(l.count) items.\n\nDisplaying...", hideTable: true)
+				show(status: "Loaded \(l.count) items.\n\nDisplaying...", hideTable: true)
 				atNextEvent(self) { S in
 					S.completeLoadingBuffer()
 				}
@@ -137,15 +137,15 @@ final class PRListController: CommonController {
 			var index = 0
 			for itemData in l {
 				if let c = table.rowController(at: index) as? PRRow {
-					c.populateFrom(itemData)
+					c.populate(from: itemData)
 				}
 				index += 1
 			}
 
 			if l.count == 0 {
-				showStatus("There are no items in this section", hideTable: true)
+				show(status: "There are no items in this section", hideTable: true)
 			} else {
-				showStatus("", hideTable: false)
+				show(status: "", hideTable: false)
 			}
 
 			if let s = selectedIndex {
@@ -159,14 +159,14 @@ final class PRListController: CommonController {
 
 	@IBAction func markAllReadSelected() {
 		loading = false
-		showStatus("Marking items as read", hideTable: true)
-		requestData("markItemsRead")
+		show(status: "Marking items as read", hideTable: true)
+		requestData(command: "markItemsRead")
 	}
 
 	@IBAction func refreshSelected() {
 		loading = false
-		showStatus("Refreshing...", hideTable: true)
-		requestData("refresh")
+		show(status: "Refreshing...", hideTable: true)
+		requestData(command: "refresh")
 	}
 
 	override func table(_ table: WKInterfaceTable, didSelectRowAt rowIndex: Int) {
@@ -175,7 +175,7 @@ final class PRListController: CommonController {
 		let row = table.rowController(at: rowIndex) as! PRRow
 		pushController(withName: "DetailController", context: [ ITEM_KEY: row.itemId! ])
 		if lastCount >= PAGE_SIZE {
-			self.showStatus("Loading...", hideTable: true)
+			self.show(status: "Loading...", hideTable: true)
 		}
 	}
 }

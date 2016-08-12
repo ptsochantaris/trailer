@@ -27,7 +27,7 @@ class DataItem: NSManagedObject {
 		return try! server.managedObjectContext!.fetch(f)
 	}
 
-	final class func itemsWithInfo(_ data: [[NSObject : AnyObject]]?, type: String, server: ApiServer, postProcessCallback: (DataItem, [NSObject : AnyObject], Bool)->Void) {
+	final class func items(with data: [[NSObject : AnyObject]]?, type: String, server: ApiServer, postProcessCallback: (DataItem, [NSObject : AnyObject], Bool)->Void) {
 
 		guard let infos=data, infos.count > 0 else { return }
 

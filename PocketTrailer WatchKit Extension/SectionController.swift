@@ -23,32 +23,32 @@ final class SectionController: CommonController {
 	}
 
 	@IBAction func clearMergedSelected() {
-		showStatus("Clearing merged", hideTable: true)
-		requestData("clearAllMerged")
+		show(status: "Clearing merged", hideTable: true)
+		requestData(command: "clearAllMerged")
 	}
 
 	@IBAction func clearClosedSelected() {
-		showStatus("Clearing closed", hideTable: true)
-		requestData("clearAllClosed")
+		show(status: "Clearing closed", hideTable: true)
+		requestData(command: "clearAllClosed")
 	}
 
 	@IBAction func markAllReadSelected() {
-		showStatus("Marking all as read", hideTable: true)
-		requestData("markEverythingRead")
+		show(status: "Marking all as read", hideTable: true)
+		requestData(command: "markEverythingRead")
 	}
 
 	@IBAction func refreshSelected() {
-		showStatus("Refreshing", hideTable: true)
-		requestData("refresh")
+		show(status: "Refreshing", hideTable: true)
+		requestData(command: "refresh")
 	}
 
-	override func requestData(_ command: String?) {
+	override func requestData(command: String?) {
 		if let c = command {
-			sendRequest(["command": c])
+			send(request: ["command": c])
 		} else if WCSession.default().receivedApplicationContext["overview"] != nil {
 			updateUI()
 		} else {
-			requestData("needsOverview")
+			requestData(command: "needsOverview")
 		}
 	}
 
@@ -63,12 +63,12 @@ final class SectionController: CommonController {
 			API_URI_KEY: r.apiServerUri! ] )
 	}
 
-	override func updateFromData(_ response: [NSString : AnyObject]) {
-		super.updateFromData(response)
+	override func update(from response: [NSString : AnyObject]) {
+		super.update(from: response)
 		updateUI()
 	}
 
-	private func sectionFromApi(_ apiName: String) -> Section {
+	private func sectionFrom(apiName: String) -> Section {
 		return Section(Section.apiTitles.index(of: apiName)!)!
 	}
 
@@ -96,7 +96,7 @@ final class SectionController: CommonController {
 
 					if let section = items[itemSection], let count = section["total"] as? Int, let unread = section["unread"] as? Int, count > 0 {
 						let s = SectionRow()
-						s.section = sectionFromApi(itemSection)
+						s.section = sectionFrom(apiName: itemSection)
 						s.totalCount = count
 						s.unreadCount = unread
 						s.type = itemType
@@ -129,29 +129,29 @@ final class SectionController: CommonController {
 		let session = WCSession.default()
 		guard let result = session.receivedApplicationContext["overview"] as? [String : AnyObject] else {
 			if session.iOSDeviceNeedsUnlockAfterRebootForReachability {
-				showStatus("Can't connect: To re-establish your secure connection, please unlock your iOS device.", hideTable: true)
+				show(status: "Can't connect: To re-establish your secure connection, please unlock your iOS device.", hideTable: true)
 			} else {
 				switch session.activationState {
 				case .activated:
-					showStatus("Loading...", hideTable: true)
+					show(status: "Loading...", hideTable: true)
 				case .inactive:
-					showStatus("Connecting...", hideTable: true)
+					show(status: "Connecting...", hideTable: true)
 				case .notActivated:
-					showStatus("Not connected to Trailer on your iOS device.", hideTable: true)
+					show(status: "Not connected to Trailer on your iOS device.", hideTable: true)
 				}
 			}
 			return
 		}
 
 		guard let views = result["views"] as? [[String : AnyObject]] else {
-			showStatus("There is no data from Trailer on your iOS device yet. Please launch it once and configure your settings.", hideTable: true)
+			show(status: "There is no data from Trailer on your iOS device yet. Please launch it once and configure your settings.", hideTable: true)
 			return
 		}
 
 		let showEmptyDescriptions = views.count == 1
 
 		let s = SummaryRow()
-		if s.setSummary(result) {
+		if s.setSummary(from: result) {
 			rowControllers.append(s)
 		}
 
@@ -168,11 +168,11 @@ final class SectionController: CommonController {
 		var index = 0
 		for rc in rowControllers {
 			if let c = table.rowController(at: index) as? PopulatableRow {
-				c.populateFrom(rc)
+				c.populate(from: rc)
 			}
 			index += 1
 		}
 
-		showStatus("", hideTable: false)
+		show(status: "", hideTable: false)
 	}
 }

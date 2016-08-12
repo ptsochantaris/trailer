@@ -17,7 +17,7 @@ final class PRRow: NSObject {
 	var itemId: String?
 	var hasUnread: Bool!
 
-	func populateFrom(_ itemData: [String : AnyObject]) {
+	func populate(from itemData: [String : AnyObject]) {
 
 		let titleData = itemData["title"] as! Data
 		let title = NSKeyedUnarchiver.unarchiveObject(with: titleData) as! NSAttributedString

@@ -10,7 +10,7 @@ final class Issue: ListableItem {
 
 	class func syncIssues(from data: [[NSObject : AnyObject]]?, in repo: Repo) {
 		let filteredData = data?.filter { $0["pull_request"] == nil } // don't sync issues which are pull requests, they are already synced
-		itemsWithInfo(filteredData, type: "Issue", server: repo.apiServer) { item, info, isNewOrUpdated in
+		items(with: filteredData, type: "Issue", server: repo.apiServer) { item, info, isNewOrUpdated in
 			let i = item as! Issue
 			if isNewOrUpdated {
 
@@ -25,7 +25,7 @@ final class Issue: ListableItem {
 				}
 
 				let labelList = info["labels"] as? [[NSObject: AnyObject]]
-				PRLabel.syncLabelsWithInfo(labelList, withParent: i)
+				PRLabel.syncLabels(from: labelList, withParent: i)
 			}
 			i.reopened = i.condition == ItemCondition.closed.rawValue
 			i.condition = ItemCondition.open.rawValue

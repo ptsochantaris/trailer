@@ -21,7 +21,7 @@ class TrailerCell: NSTableCellView {
 
 	func unPinSelected() {
 		if let i = associatedDataItem {
-			app.unPinSelectedFor(i)
+			app.unPinSelected(for: i)
 		}
 	}
 
@@ -161,7 +161,7 @@ class TrailerCell: NSTableCellView {
     }
 
 	func snoozeConfigSelected() {
-		app.showPreferencesWindow(6)
+		app.showPreferencesWindow(andSelect: 6)
 	}
 
 	func snoozeSelected(_ sender: NSMenuItem) {
@@ -195,21 +195,21 @@ class TrailerCell: NSTableCellView {
 
 	func muteSelected() {
 		if let item = associatedDataItem {
-			item.setMute(true)
+			item.setMute(to: true)
 			saveAndRequestMenuUpdate(item)
 		}
 	}
 
 	func unMuteSelected() {
 		if let item = associatedDataItem {
-			item.setMute(false)
+			item.setMute(to: false)
 			saveAndRequestMenuUpdate(item)
 		}
 	}
 
 	private func saveAndRequestMenuUpdate(_ item: ListableItem) {
 		DataManager.saveDB()
-		app.updateRelatedMenusFor(item)
+		app.updateRelatedMenus(for: item)
 	}
 
 	var associatedDataItem: ListableItem? {

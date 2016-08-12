@@ -37,7 +37,7 @@ final class Application: NSApplication {
 								i.postProcess()
 							}
 							DataManager.saveDB()
-							app.updateRelatedMenusFor(i)
+							app.updateRelatedMenus(for: i)
 							return
 						} else if sendAction(#selector(NSResponder.selectAll(_:)), to:nil, from:self) {
 							return

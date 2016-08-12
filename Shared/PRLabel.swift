@@ -13,7 +13,7 @@ final class PRLabel: DataItem {
     @NSManaged var pullRequest: PullRequest?
 	@NSManaged var issue: Issue?
 
-	private class func labelsWithInfo(_ data: [[NSObject : AnyObject]]?, fromParent: ListableItem, postProcessCallback: (PRLabel, [NSObject : AnyObject])->Void) {
+	private class func labels(from data: [[NSObject : AnyObject]]?, fromParent: ListableItem, postProcessCallback: (PRLabel, [NSObject : AnyObject])->Void) {
 
 		guard let infos=data, infos.count > 0 else { return }
 
@@ -64,8 +64,8 @@ final class PRLabel: DataItem {
 		}
 	}
 
-	class func syncLabelsWithInfo(_ info: [[NSObject : AnyObject]]?, withParent: ListableItem) {
-		labelsWithInfo(info, fromParent: withParent) { label, info in
+	class func syncLabels(from info: [[NSObject : AnyObject]]?, withParent: ListableItem) {
+		labels(from: info, fromParent: withParent) { label, info in
 			label.url = info["url"] as? String
 			if let c = info["color"] as? String {
 				label.color = parse(from: c)

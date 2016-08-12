@@ -155,15 +155,15 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 				case 0:
 					cell.textLabel?.text = dayLabel
 					cell.detailTextLabel?.text = dayValues[Int(s.day)]
-					cell.detailTextLabel?.textColor = detailColor(s.day)
+					cell.detailTextLabel?.textColor = detailColor(for: s.day)
 				case 1:
 					cell.textLabel?.text = hourLabel
 					cell.detailTextLabel?.text = hourValues[Int(s.hour)]
-					cell.detailTextLabel?.textColor = detailColor(s.hour)
+					cell.detailTextLabel?.textColor = detailColor(for: s.hour)
 				default:
 					cell.textLabel?.text = minuteLabel
 					cell.detailTextLabel?.text = minuteValues[Int(s.minute)]
-					cell.detailTextLabel?.textColor = detailColor(s.minute)
+					cell.detailTextLabel?.textColor = detailColor(for: s.minute)
 				}
 			}
 			return cell
@@ -186,9 +186,9 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 		}
 	}
 
-	private func detailColor(_ n: Int64) -> UIColor {
+	private func detailColor(for number: Int64) -> UIColor {
 		if typeSelector.selectedSegmentIndex==0 {
-			if n == 0 {
+			if number == 0 {
 				return UIColor.lightGray
 			} else {
 				return view.tintColor

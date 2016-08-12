@@ -100,7 +100,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			case "markItemsRead":
 				if let
 					uri = message["localId"] as? String,
-					let oid = DataManager.idForUriPath(uri),
+					let oid = DataManager.id(for: uri),
 					let dataItem = existingObject(with: oid) as? ListableItem,
 					dataItem.unreadComments > 0 {
 
@@ -109,7 +109,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 				} else if let uris = message["itemUris"] as? [String] {
 					for uri in uris {
 						if let
-							oid = DataManager.idForUriPath(uri),
+							oid = DataManager.id(for: uri),
 							let dataItem = existingObject(with: oid) as? ListableItem,
 							dataItem.unreadComments > 0 {
 
@@ -197,7 +197,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		}
 
 		let f: NSFetchRequest<ListableItem>
-		if !apiServerUri.isEmpty, let aid = DataManager.idForUriPath(apiServerUri) {
+		if !apiServerUri.isEmpty, let aid = DataManager.id(for: apiServerUri) {
 			let criterion = GroupingCriterion(apiServerId: aid)
 			f = ListableItem.requestForItems(ofType: entity, withFilter: nil, sectionIndex: sectionIndex, criterion: criterion, onlyUnread: onlyUnread)
 		} else if !group.isEmpty {
@@ -289,7 +289,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 	/////////////////////////////
 
 	private func buildItemDetail(localId: String) -> [String : AnyObject]? {
-		if let oid = DataManager.idForUriPath(localId), let item = existingObject(with: oid) as? ListableItem {
+		if let oid = DataManager.id(for: localId), let item = existingObject(with: oid) as? ListableItem {
 			let showStatuses = (item is PullRequest) ? Settings.showStatusItems : false
 			var result = baseDataForItem(item: item, showStatuses: showStatuses, showLabels: Settings.showLabels)
 			result["description"] = item.body
@@ -301,7 +301,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	private func commentsForItem(item: ListableItem) -> [[String : AnyObject]] {
 		var comments = [[String : AnyObject]]()
-		for comment in item.sortedComments(.orderedDescending) {
+		for comment in item.sortedComments(using: .orderedDescending) {
 			comments.append([
 				"user": S(comment.userName),
 				"date": comment.createdAt ?? Date.distantPast,

@@ -2,7 +2,7 @@
 import WatchKit
 
 protocol PopulatableRow : AnyObject {
-	func populateFrom(_ other: AnyObject)
+	func populate(from other: AnyObject)
 	var rowType: String { get }
 }
 
@@ -15,7 +15,7 @@ final class SectionRow: NSObject, PopulatableRow {
 	var groupLabel: String?
 	var apiServerUri: String?
 
-	func populateFrom(_ other: AnyObject) {
+	func populate(from other: AnyObject) {
 		if let other = other as? SectionRow {
 			if let sectionName = other.section?.watchMenuName {
 				titleL.setText("\(other.totalCount!) \(sectionName)")

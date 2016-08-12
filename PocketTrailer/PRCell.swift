@@ -164,9 +164,9 @@ final class PRCell: UITableViewCell {
 		let fade = muted || item.isSnoozing
 
 		readCount.text = itemCountFormatter.string(from: _commentsTotal)
-		readCount.isHidden = (_commentsTotal == 0)
+		readCount.isHidden = _commentsTotal == 0
 
-		unreadCount.isHidden = (_commentsNew == 0)
+		unreadCount.isHidden = _commentsNew == 0
 		unreadCount.text = itemCountFormatter.string(from: _commentsNew)
 
 		let a = fade ? DISABLED_FADE : 1.0

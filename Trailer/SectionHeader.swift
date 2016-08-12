@@ -29,7 +29,7 @@ final class SectionHeader: NSTableRowView {
 	}
 
 	func unPinSelected() {
-		app.sectionHeaderRemoveSelected(titleView.attributedStringValue.string)
+		app.removeSelected(on: titleView.attributedStringValue.string)
 	}
 
 	required init?(coder: NSCoder) {
