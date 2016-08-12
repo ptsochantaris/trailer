@@ -69,9 +69,9 @@ final class MenuBarSet {
 		didSet {
 			if allowRefresh {
 				prMenu.refreshMenuItem.target = prMenu
-				prMenu.refreshMenuItem.action = #selector(MenuWindow.refreshSelected(_:))
+				prMenu.refreshMenuItem.action = #selector(prMenu.refreshSelected)
 				issuesMenu.refreshMenuItem.target = issuesMenu
-				issuesMenu.refreshMenuItem.action = #selector(MenuWindow.refreshSelected(_:))
+				issuesMenu.refreshMenuItem.action = #selector(issuesMenu.refreshSelected)
 			} else {
 				prMenu.refreshMenuItem.action = nil
 				prMenu.refreshMenuItem.target = nil

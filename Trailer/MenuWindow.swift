@@ -41,7 +41,7 @@ final class MenuWindow: NSWindow {
             scrollView.contentView.wantsLayer = true
         }
 
-		NotificationCenter.default.addObserver(self, selector: #selector(MenuWindow.refreshUpdate), name: SyncProgressUpdateNotification, object: nil)
+		NotificationCenter.default.addObserver(self, selector: #selector(refreshUpdate), name: SyncProgressUpdateNotification, object: nil)
 	}
 
 	class var isUsingVibrancy: Bool {
@@ -60,10 +60,10 @@ final class MenuWindow: NSWindow {
 			    appearance = NSAppearance(named: app.darkMode ? NSAppearanceNameVibrantDark : NSAppearanceNameVibrantLight)
 				if windowVibrancy == nil {
 					let w = NSVisualEffectView(frame: header.bounds)
-					w.autoresizingMask = [NSAutoresizingMaskOptions.viewHeightSizable, NSAutoresizingMaskOptions.viewWidthSizable]
+					w.autoresizingMask = [.viewHeightSizable, .viewWidthSizable]
 					w.blendingMode = NSVisualEffectBlendingMode.behindWindow
 					w.state = NSVisualEffectState.active
-					header.addSubview(w, positioned:NSWindowOrderingMode.below, relativeTo:filter)
+					header.addSubview(w, positioned: NSWindowOrderingMode.below, relativeTo: filter)
 					windowVibrancy = w
 
 					table.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.sourceList

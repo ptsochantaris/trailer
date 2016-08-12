@@ -15,7 +15,7 @@ final class PopTimer : NSObject {
 
 	func push() {
 		_popTimer?.invalidate()
-		_popTimer = Timer.scheduledTimer(timeInterval: _timeInterval, target: self, selector: #selector(PopTimer.popped), userInfo: nil, repeats: false)
+		_popTimer = Timer.scheduledTimer(timeInterval: _timeInterval, target: self, selector: #selector(popped), userInfo: nil, repeats: false)
 	}
 
 	func popped() {

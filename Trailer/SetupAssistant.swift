@@ -79,7 +79,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 						s.quickstart.stringValue = "\nSyncing GitHub data for the first time.\n\nThis could take a little while, please wait..."
 						Settings.lastSuccessfulRefresh = nil
 						app.startRefreshIfItIsDue()
-						s.checkTimer = Timer.scheduledTimer(timeInterval: 1.0, target: s, selector: #selector(SetupAssistant.checkRefreshDone(_:)), userInfo: nil, repeats: true)
+						s.checkTimer = Timer.scheduledTimer(timeInterval: 0.5, target: s, selector: #selector(s.checkRefreshDone), userInfo: nil, repeats: true)
 					}
 				}
 			}

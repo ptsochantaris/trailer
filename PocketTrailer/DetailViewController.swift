@@ -116,7 +116,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 		webView.isHidden = false
 		navigationItem.rightBarButtonItem?.isEnabled = true
 		title = webView.title
-		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(DetailViewController.shareSelected))
+		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(shareSelected))
 
 		catchupWithComments()
 		if splitViewController?.isCollapsed ?? true {
@@ -125,8 +125,8 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 	}
 
 	override var keyCommands: [UIKeyCommand]? {
-		let ff = UIKeyCommand(input: UIKeyInputLeftArrow, modifierFlags: .command, action: #selector(DetailViewController.focusOnMaster), discoverabilityTitle: "Focus keyboard on item list")
-		let s = UIKeyCommand(input: "o", modifierFlags: .command, action: #selector(DetailViewController.keyOpenInSafari), discoverabilityTitle: "Open in Safari")
+		let ff = UIKeyCommand(input: UIKeyInputLeftArrow, modifierFlags: .command, action: #selector(focusOnMaster), discoverabilityTitle: "Focus keyboard on item list")
+		let s = UIKeyCommand(input: "o", modifierFlags: .command, action: #selector(keyOpenInSafari), discoverabilityTitle: "Open in Safari")
 		return [ff,s]
 	}
 
@@ -177,7 +177,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 		statusLabel.isHidden = false
 		webView?.isHidden = true
 		title = "Error"
-		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(DetailViewController.configureView))
+		navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(configureView))
 	}
 
 	func shareSelected() {

@@ -227,7 +227,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			self?.applyFilter()
 		}
 
-		refreshControl?.addTarget(self, action: #selector(MasterViewController.refreshControlChanged), for: .valueChanged)
+		refreshControl?.addTarget(self, action: #selector(refreshControlChanged), for: .valueChanged)
 
 		tableView.rowHeight = UITableViewAutomaticDimension
 		tableView.estimatedRowHeight = 240
@@ -240,9 +240,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 
 		let n = NotificationCenter.default
-		n.addObserver(self, selector: #selector(MasterViewController.updateStatus), name: RefreshStartedNotification, object: nil)
-		n.addObserver(self, selector: #selector(MasterViewController.updateStatus), name: RefreshEndedNotification, object: nil)
-		n.addObserver(self, selector: #selector(MasterViewController.updateRefresh), name: SyncProgressUpdateNotification, object: nil)
+		n.addObserver(self, selector: #selector(updateStatus), name: RefreshStartedNotification, object: nil)
+		n.addObserver(self, selector: #selector(updateStatus), name: RefreshEndedNotification, object: nil)
+		n.addObserver(self, selector: #selector(updateRefresh), name: SyncProgressUpdateNotification, object: nil)
 
 		updateTabItems(animated: false)
 		atNextEvent {
@@ -259,21 +259,21 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	override var keyCommands: [UIKeyCommand]? {
-		let f = UIKeyCommand(input: "f", modifierFlags: .command, action: #selector(MasterViewController.focusFilter), discoverabilityTitle: "Filter items")
-		let o = UIKeyCommand(input: "o", modifierFlags: .command, action: #selector(MasterViewController.keyOpenInSafari), discoverabilityTitle: "Open in Safari")
-		let a = UIKeyCommand(input: "a", modifierFlags: .command, action: #selector(MasterViewController.keyToggleRead), discoverabilityTitle: "Mark item read/unread")
-		let m = UIKeyCommand(input: "m", modifierFlags: .command, action: #selector(MasterViewController.keyToggleMute), discoverabilityTitle: "Set item mute/unmute")
-		let s = UIKeyCommand(input: "s", modifierFlags: .command, action: #selector(MasterViewController.keyToggleSnooze), discoverabilityTitle: "Snooze/wake item")
-		let r = UIKeyCommand(input: "r", modifierFlags: .command, action: #selector(MasterViewController.keyForceRefresh), discoverabilityTitle: "Refresh now")
-		let nt = UIKeyCommand(input: "\t", modifierFlags: .alternate, action: #selector(MasterViewController.moveToNextTab), discoverabilityTitle: "Move to next tab")
-		let pt = UIKeyCommand(input: "\t", modifierFlags: [.alternate, .shift], action: #selector(MasterViewController.moveToPreviousTab), discoverabilityTitle: "Move to previous tab")
-		let sp = UIKeyCommand(input: " ", modifierFlags: [], action: #selector(MasterViewController.keyShowSelectedItem), discoverabilityTitle: "Display current item")
-		let d = UIKeyCommand(input: UIKeyInputDownArrow, modifierFlags: [], action: #selector(MasterViewController.keyMoveToNextItem), discoverabilityTitle: "Next item")
-		let u = UIKeyCommand(input: UIKeyInputUpArrow, modifierFlags: [], action: #selector(MasterViewController.keyMoveToPreviousItem), discoverabilityTitle: "Previous item")
-		let dd = UIKeyCommand(input: UIKeyInputDownArrow, modifierFlags: .alternate, action: #selector(MasterViewController.keyMoveToNextSection), discoverabilityTitle: "Move to the next section")
-		let uu = UIKeyCommand(input: UIKeyInputUpArrow, modifierFlags: .alternate, action: #selector(MasterViewController.keyMoveToPreviousSection), discoverabilityTitle: "Move to the previous section")
-		let fd = UIKeyCommand(input: UIKeyInputRightArrow, modifierFlags: .command, action: #selector(MasterViewController.keyFocusDetailView), discoverabilityTitle: "Focus keyboard on detail view")
-		let fm = UIKeyCommand(input: UIKeyInputLeftArrow, modifierFlags: .command, action: #selector(MasterViewController.becomeFirstResponder), discoverabilityTitle: "Focus keyboard on list view")
+		let f = UIKeyCommand(input: "f", modifierFlags: .command, action: #selector(focusFilter), discoverabilityTitle: "Filter items")
+		let o = UIKeyCommand(input: "o", modifierFlags: .command, action: #selector(keyOpenInSafari), discoverabilityTitle: "Open in Safari")
+		let a = UIKeyCommand(input: "a", modifierFlags: .command, action: #selector(keyToggleRead), discoverabilityTitle: "Mark item read/unread")
+		let m = UIKeyCommand(input: "m", modifierFlags: .command, action: #selector(keyToggleMute), discoverabilityTitle: "Set item mute/unmute")
+		let s = UIKeyCommand(input: "s", modifierFlags: .command, action: #selector(keyToggleSnooze), discoverabilityTitle: "Snooze/wake item")
+		let r = UIKeyCommand(input: "r", modifierFlags: .command, action: #selector(keyForceRefresh), discoverabilityTitle: "Refresh now")
+		let nt = UIKeyCommand(input: "\t", modifierFlags: .alternate, action: #selector(moveToNextTab), discoverabilityTitle: "Move to next tab")
+		let pt = UIKeyCommand(input: "\t", modifierFlags: [.alternate, .shift], action: #selector(moveToPreviousTab), discoverabilityTitle: "Move to previous tab")
+		let sp = UIKeyCommand(input: " ", modifierFlags: [], action: #selector(keyShowSelectedItem), discoverabilityTitle: "Display current item")
+		let d = UIKeyCommand(input: UIKeyInputDownArrow, modifierFlags: [], action: #selector(keyMoveToNextItem), discoverabilityTitle: "Next item")
+		let u = UIKeyCommand(input: UIKeyInputUpArrow, modifierFlags: [], action: #selector(keyMoveToPreviousItem), discoverabilityTitle: "Previous item")
+		let dd = UIKeyCommand(input: UIKeyInputDownArrow, modifierFlags: .alternate, action: #selector(keyMoveToNextSection), discoverabilityTitle: "Move to the next section")
+		let uu = UIKeyCommand(input: UIKeyInputUpArrow, modifierFlags: .alternate, action: #selector(keyMoveToPreviousSection), discoverabilityTitle: "Move to the previous section")
+		let fd = UIKeyCommand(input: UIKeyInputRightArrow, modifierFlags: .command, action: #selector(keyFocusDetailView), discoverabilityTitle: "Focus keyboard on detail view")
+		let fm = UIKeyCommand(input: UIKeyInputLeftArrow, modifierFlags: .command, action: #selector(becomeFirstResponder), discoverabilityTitle: "Focus keyboard on list view")
 		return [u,d,uu,dd,nt,pt,fd,fm,sp,f,r,a,m,o,s]
 	}
 

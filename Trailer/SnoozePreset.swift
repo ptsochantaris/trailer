@@ -124,10 +124,10 @@ final class SnoozePreset: NSManagedObject {
 		}
 	}
 
-	class var archivedPresets: [[String:NSObject]] {
-		var archivedData = [[String:NSObject]]()
+	class var archivedPresets: [[String : NSObject]] {
+		var archivedData = [[String : NSObject]]()
 		for a in SnoozePreset.allSnoozePresets(in: mainObjectContext) {
-			var presetData = [String:NSObject]()
+			var presetData = [String : NSObject]()
 			for (k , _) in a.entity.attributesByName {
 				if let v = a.value(forKey: k) as? NSObject {
 					presetData[k] = v

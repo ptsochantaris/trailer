@@ -132,12 +132,12 @@ final class PullRequest: ListableItem {
 			p.lineHeightMultiple = 1.3
 		#endif
 
-		let lightSubtitle = [NSForegroundColorAttributeName: lightColor, NSFontAttributeName:font, NSParagraphStyleAttributeName: p]
+		let lightSubtitle = [NSForegroundColorAttributeName: lightColor, NSFontAttributeName: font, NSParagraphStyleAttributeName: p]
 
 		#if os(iOS)
-			let separator = NSAttributedString(string:"\n", attributes:lightSubtitle)
+			let separator = NSAttributedString(string:"\n", attributes: lightSubtitle)
 		#elseif os(OSX)
-			let separator = NSAttributedString(string:"   ", attributes:lightSubtitle)
+			let separator = NSAttributedString(string:"   ", attributes: lightSubtitle)
 		#endif
 
 		if Settings.showReposInName {
@@ -165,7 +165,7 @@ final class PullRequest: ListableItem {
 				_subtitle.append(separator)
 				var redSubtitle = lightSubtitle
 				redSubtitle[NSForegroundColorAttributeName] = UIColor.red
-				_subtitle.append(NSAttributedString(string: "Cannot be merged!", attributes:redSubtitle))
+				_subtitle.append(NSAttributedString(string: "Cannot be merged!", attributes: redSubtitle))
 			}
 		#endif
 

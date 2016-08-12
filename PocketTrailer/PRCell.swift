@@ -76,7 +76,7 @@ final class PRCell: UITableViewCell {
 				constant: 21)
 			])
 
-		NotificationCenter.default.addObserver(self, selector: #selector(PRCell.networkStateChanged), name: .reachabilityChanged, object: nil)
+		NotificationCenter.default.addObserver(self, selector: #selector(networkStateChanged), name: .reachabilityChanged, object: nil)
 	}
 
 	func networkStateChanged() {
@@ -207,12 +207,12 @@ final class PRCell: UITableViewCell {
 	}
 
 	override func setSelected(_ selected: Bool, animated: Bool) {
-		super.setSelected(selected, animated:animated)
+		super.setSelected(selected, animated: animated)
 		tone()
 	}
 
 	override func setHighlighted(_ highlighted: Bool, animated: Bool) {
-		super.setHighlighted(highlighted, animated:animated)
+		super.setHighlighted(highlighted, animated: animated)
 		tone()
 	}
 

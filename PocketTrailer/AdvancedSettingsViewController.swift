@@ -284,9 +284,9 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		}
 
 		navigationItem.rightBarButtonItems = [
-			UIBarButtonItem(image: UIImage(named: "export"), style: .plain, target: self, action: #selector(AdvancedSettingsViewController.exportSelected)),
-			UIBarButtonItem(image: UIImage(named: "import"), style: .plain, target: self, action: #selector(AdvancedSettingsViewController.importSelected)),
-			UIBarButtonItem(image: UIImage(named: "showHelp"), style: .plain, target: self, action: #selector(AdvancedSettingsViewController.toggleHelp)),
+			UIBarButtonItem(image: UIImage(named: "export"), style: .plain, target: self, action: #selector(exportSelected)),
+			UIBarButtonItem(image: UIImage(named: "import"), style: .plain, target: self, action: #selector(importSelected)),
+			UIBarButtonItem(image: UIImage(named: "showHelp"), style: .plain, target: self, action: #selector(toggleHelp)),
 		]
 	}
 
@@ -430,14 +430,14 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			switch originalIndex {
 			case 0:
 				// seconds
-				for f in stride(from:60, to: 3600, by: 10) {
+				for f in stride(from: 60, to: 3600, by: 10) {
 					if f == Int(Settings.refreshPeriod) { previousValue = count }
 					values.append("\(f) seconds")
 					count += 1
 				}
 			case 1:
 				// minutes
-				for f in stride(from:5, to: 10000, by: 5) {
+				for f in stride(from: 5, to: 10000, by: 5) {
 					if f == Int(Settings.backgroundRefreshPeriod/60.0) { previousValue = count }
 					values.append("\(f) minutes")
 					count += 1

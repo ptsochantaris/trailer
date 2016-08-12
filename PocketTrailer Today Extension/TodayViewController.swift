@@ -68,7 +68,7 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 
 		paragraph.paragraphSpacing = 4
 
-		linkButton.addTarget(self, action: #selector(TodayViewController.widgetTapped), for: .touchUpInside)
+		linkButton.addTarget(self, action: #selector(widgetTapped), for: .touchUpInside)
 		linkButton.setBackgroundImage(image(from: UIColor(white: 1.0, alpha: 0.2)), for: .highlighted)
 		view.addSubview(linkButton)
 

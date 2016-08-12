@@ -15,18 +15,18 @@ final class Application: NSApplication {
 			if modifiers == .command {
 				if let char = event.charactersIgnoringModifiers {
 					switch char {
-					case "x": if sendAction(#selector(NSText.cut(_:)), to:nil, from:self) { return }
-					case "v": if sendAction(#selector(NSText.paste(_:)), to:nil, from:self) { return }
-					case "z": if sendAction(#selector(NSTextField.trailerUndo), to:nil, from:self) { return }
+					case "x": if sendAction(#selector(NSText.cut), to: nil, from: self) { return }
+					case "v": if sendAction(#selector(NSText.paste), to: nil, from: self) { return }
+					case "z": if sendAction(#selector(NSTextField.trailerUndo), to: nil, from: self) { return }
 					case "c":
 						if let url = app.focusedItem(blink: true)?.webUrl {
 							let p = NSPasteboard.general()
 							p.clearContents()
-							p.setString(url, forType:NSStringPboardType)
+							p.setString(url, forType: NSStringPboardType)
 							return
 
 						} else {
-							if sendAction(#selector(NSText.copy(_:)), to:nil, from:self) { return }
+							if sendAction(#selector(NSText.copy), to: nil, from: self) { return }
 						}
 					case "a":
 						if let i = app.focusedItem(blink: true) {
@@ -39,7 +39,7 @@ final class Application: NSApplication {
 							DataManager.saveDB()
 							app.updateRelatedMenus(for: i)
 							return
-						} else if sendAction(#selector(NSResponder.selectAll(_:)), to:nil, from:self) {
+						} else if sendAction(#selector(NSResponder.selectAll), to: nil, from: self) {
 							return
 						}
 					default: break
@@ -47,7 +47,7 @@ final class Application: NSApplication {
 				}
 			} else if modifiers == [.command, .shift] {
 				if let char = event.charactersIgnoringModifiers {
-					if char == "Z" && sendAction(#selector(NSTextField.trailerRedo), to:nil, from:self) { return }
+					if char == "Z" && sendAction(#selector(NSTextField.trailerRedo), to: nil, from: self) { return }
 				}
 			}
 		}

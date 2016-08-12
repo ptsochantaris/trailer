@@ -71,7 +71,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 		app = self
 
-		DistributedNotificationCenter.default().addObserver(self, selector: #selector(OSX_AppDelegate.updateDarkMode), name: AppleInterfaceThemeChangedNotification, object: nil)
+		DistributedNotificationCenter.default().addObserver(self, selector: #selector(updateDarkMode), name: AppleInterfaceThemeChangedNotification, object: nil)
 
 		DataManager.postProcessAllItems()
 
@@ -102,7 +102,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 
 		let n = NotificationCenter.default
-		n.addObserver(self, selector: #selector(OSX_AppDelegate.updateScrollBarWidth), name: .NSPreferredScrollerStyleDidChange, object: nil)
+		n.addObserver(self, selector: #selector(updateScrollBarWidth), name: .NSPreferredScrollerStyleDidChange, object: nil)
 
 		addHotKeySupport()
 
@@ -113,8 +113,8 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 
 		let wn = NSWorkspace.shared().notificationCenter
-		wn.addObserver(self, selector: #selector(OSX_AppDelegate.systemWillSleep), name: .NSWorkspaceWillSleep, object: nil)
-		wn.addObserver(self, selector: #selector(OSX_AppDelegate.systemDidWake), name: .NSWorkspaceDidWake, object: nil)
+		wn.addObserver(self, selector: #selector(systemWillSleep), name: .NSWorkspaceWillSleep, object: nil)
+		wn.addObserver(self, selector: #selector(systemDidWake), name: .NSWorkspaceDidWake, object: nil)
 	}
 
 	func systemWillSleep() {
@@ -581,7 +581,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			} else {
 				let howLongUntilNextSync = TimeInterval(Settings.refreshPeriod) - howLongAgo
 				DLog("No need to refresh yet, will refresh in %f", howLongUntilNextSync)
-				refreshTimer = Timer.scheduledTimer(timeInterval: howLongUntilNextSync, target: self, selector: #selector(OSX_AppDelegate.refreshTimerDone), userInfo: nil, repeats: false)
+				refreshTimer = Timer.scheduledTimer(timeInterval: howLongUntilNextSync, target: self, selector: #selector(refreshTimerDone), userInfo: nil, repeats: false)
 			}
 		}
 		else
@@ -714,7 +714,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				Settings.lastSuccessfulRefresh = Date()
 			}
 			s.completeRefresh()
-			s.refreshTimer = Timer.scheduledTimer(timeInterval: TimeInterval(Settings.refreshPeriod), target: s, selector: #selector(OSX_AppDelegate.refreshTimerDone), userInfo: nil, repeats: false)
+			s.refreshTimer = Timer.scheduledTimer(timeInterval: TimeInterval(Settings.refreshPeriod), target: s, selector: #selector(s.refreshTimerDone), userInfo: nil, repeats: false)
 		}
 	}
 
@@ -1078,7 +1078,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	private func restartApp() {
 		let ourPID = "\(ProcessInfo.processInfo.processIdentifier)"
 		let shArgs = ["-c", "kill -9 $1 \n sleep 1 \n open \"$2\"", "", ourPID, Bundle.main.bundlePath]
-		let restartTask = Task.launchedTask(withLaunchPath: "/bin/sh", arguments:shArgs)
+		let restartTask = Task.launchedTask(withLaunchPath: "/bin/sh", arguments: shArgs)
 		restartTask.waitUntilExit()
 	}
 

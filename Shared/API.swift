@@ -11,13 +11,13 @@ final class API {
 		var nextIncrement: TimeInterval
 	}
 
-	var refreshesSinceLastStatusCheck = [NSManagedObjectID:Int]()
-	var refreshesSinceLastLabelsCheck = [NSManagedObjectID:Int]()
+	var refreshesSinceLastStatusCheck = [NSManagedObjectID : Int]()
+	var refreshesSinceLastLabelsCheck = [NSManagedObjectID : Int]()
 	var currentNetworkStatus: NetworkStatus
 
 	private let cacheDirectory: String
 	private let urlSession: URLSession
-	private var badLinks = [String:UrlBackOffEntry]()
+	private var badLinks = [String : UrlBackOffEntry]()
 	private let reachability = Reachability.forInternetConnection()!
 	private let backOffIncrement: TimeInterval = 120.0
 
@@ -197,7 +197,7 @@ final class API {
 
 			var result: IMAGE_CLASS?
             #if os(iOS)
-                if let d = data, let i = IMAGE_CLASS(data: d, scale:GLOBAL_SCREEN_SCALE) {
+                if let d = data, let i = IMAGE_CLASS(data: d, scale: GLOBAL_SCREEN_SCALE) {
 					result = i
 					if let imageData = UIImageJPEGRepresentation(i, 1.0) {
 						try! imageData.write(to: URL(fileURLWithPath: cachePath), options: .atomic)

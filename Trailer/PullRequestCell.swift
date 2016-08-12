@@ -98,7 +98,7 @@ final class PullRequestCell: TrailerCell {
 				let unpin = NSButton(frame: pinRect)
 				unpin.title = "Remove"
 				unpin.target = self
-				unpin.action = #selector(TrailerCell.unPinSelected)
+				unpin.action = #selector(unPinSelected)
 				unpin.setButtonType(.momentaryLight)
 				unpin.bezelStyle = .roundRect
 				unpin.font = NSFont.systemFont(ofSize: 10.0)

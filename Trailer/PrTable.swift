@@ -3,7 +3,7 @@ final class PrTable: NSTableView, NSPasteboardItemDataProvider {
 
 	func cell(at theEvent: NSEvent) -> NSView? {
 		let globalLocation = theEvent.locationInWindow
-		let localLocation = convert(globalLocation, from:nil)
+		let localLocation = convert(globalLocation, from: nil)
 		return view(atColumn: column(at: localLocation), row: row(at: localLocation), makeIfNecessary: false)
 	}
 
@@ -16,10 +16,10 @@ final class PrTable: NSTableView, NSPasteboardItemDataProvider {
 		}
 	}
 
-	func scale(image: NSImage, toFillSize:CGSize) -> NSImage {
+	func scale(image: NSImage, toFillSize: CGSize) -> NSImage {
 		let targetFrame = NSMakeRect(0, 0, toFillSize.width, toFillSize.height)
 		let sourceImageRep = image.bestRepresentation(for: targetFrame, context: nil, hints: nil)
-		let targetImage = NSImage(size:toFillSize)
+		let targetImage = NSImage(size: toFillSize)
 		targetImage.lockFocus()
 		sourceImageRep!.draw(in: targetFrame)
 		targetImage.unlockFocus()

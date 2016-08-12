@@ -316,7 +316,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	private func buildOverview() -> [String : AnyObject] {
 
-		var views = [[String:AnyObject]]()
+		var views = [[String : AnyObject]]()
 
 		for tabSet in popupManager.masterController.allTabSets {
 

@@ -60,7 +60,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 					s.feedback.text = "Syncing GitHub data for the first time.\n\nThis could take a little while, please wait..."
 					Settings.lastSuccessfulRefresh = nil
 					app.startRefreshIfItIsDue()
-					s.checkTimer = Timer.scheduledTimer(timeInterval: 1.0, target: s, selector: #selector(QuickStartViewController.checkRefreshDone), userInfo: nil, repeats: true)
+					s.checkTimer = Timer.scheduledTimer(timeInterval: 1.0, target: s, selector: #selector(s.checkRefreshDone), userInfo: nil, repeats: true)
 				}
 			}
 		}

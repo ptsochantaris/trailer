@@ -6,7 +6,7 @@ final class StatusItemView: NSView {
 	var icon: NSImage!
 	var textAttributes = [String : AnyObject]()
 	var statusLabel = ""
-	var labelOffset:CGFloat = 0
+	var labelOffset: CGFloat = 0
 	var title: String?
 	var grayOut = false
 

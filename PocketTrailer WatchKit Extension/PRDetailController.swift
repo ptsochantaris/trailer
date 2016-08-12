@@ -99,7 +99,7 @@ final class PRDetailController: CommonController {
 			.trimmingCharacters(in: .whitespacesAndNewlines)
 			.trimmingCharacters(in: .symbols)
 		let s = Scanner(string: safe)
-		var c:UInt32 = 0
+		var c: UInt32 = 0
 		s.scanHexInt32(&c)
 
 		let red: UInt32 = (c & 0xFF0000)>>16

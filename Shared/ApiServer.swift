@@ -178,11 +178,11 @@ final class ApiServer: NSManagedObject {
 		latestUserEventDateProcessed = Date.distantPast
 	}
 
-	class var archivedApiServers: [String:[String:NSObject]] {
-		var archivedData = [String:[String:NSObject]]()
+	class var archivedApiServers: [String : [String : NSObject]] {
+		var archivedData = [String:[String : NSObject]]()
 		for a in ApiServer.allApiServers(in: mainObjectContext) {
 			if let authToken = a.authToken, !authToken.isEmpty {
-				var apiServerData = [String:NSObject]()
+				var apiServerData = [String : NSObject]()
 				for (k , _) in a.entity.attributesByName {
 					if let v = a.value(forKey: k) as? NSObject {
 						apiServerData[k] = v

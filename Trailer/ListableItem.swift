@@ -720,12 +720,12 @@ class ListableItem: DataItem {
 		var sortDescriptors = [NSSortDescriptor]()
 		sortDescriptors.append(NSSortDescriptor(key: "sectionIndex", ascending: true))
 		if Settings.groupByRepo {
-			sortDescriptors.append(NSSortDescriptor(key: "repo.fullName", ascending: true, selector: #selector(NSString.caseInsensitiveCompare(_:))))
+			sortDescriptors.append(NSSortDescriptor(key: "repo.fullName", ascending: true, selector: #selector(NSString.localizedCaseInsensitiveCompare)))
 		}
 
 		if let fieldName = SortingMethod(Settings.sortMethod)?.field {
 			if fieldName == "title" {
-				sortDescriptors.append(NSSortDescriptor(key: fieldName, ascending: !Settings.sortDescending, selector: #selector(NSString.caseInsensitiveCompare(_:))))
+				sortDescriptors.append(NSSortDescriptor(key: fieldName, ascending: !Settings.sortDescending, selector: #selector(NSString.localizedCaseInsensitiveCompare)))
 			} else {
 				sortDescriptors.append(NSSortDescriptor(key: fieldName, ascending: !Settings.sortDescending))
 			}
@@ -820,7 +820,7 @@ class ListableItem: DataItem {
 		s.contentDescription = "\(S(repo.fullName)) @\(S(userLogin)) - \(S(body?.trim))"
 
 		func completeIndex(withSet s: CSSearchableItemAttributeSet) {
-			let i = CSSearchableItem(uniqueIdentifier:objectID.uriRepresentation().absoluteString, domainIdentifier: nil, attributeSet: s)
+			let i = CSSearchableItem(uniqueIdentifier: objectID.uriRepresentation().absoluteString, domainIdentifier: nil, attributeSet: s)
 			CSSearchableIndex.default().indexSearchableItems([i], completionHandler: nil)
 		}
 

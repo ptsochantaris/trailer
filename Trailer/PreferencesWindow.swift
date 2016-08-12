@@ -172,8 +172,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		tabs.selectTabViewItem(tabs.tabViewItem(at: selectedIndex))
 
 		let n = NotificationCenter.default
-		n.addObserver(self, selector: #selector(PreferencesWindow.updateApiTable), name: ApiUsageUpdateNotification, object: nil)
-		n.addObserver(self, selector: #selector(PreferencesWindow.updateImportExportSettings), name: SettingsExportedNotification, object: nil)
+		n.addObserver(self, selector: #selector(updateApiTable), name: ApiUsageUpdateNotification, object: nil)
+		n.addObserver(self, selector: #selector(updateImportExportSettings), name: SettingsExportedNotification, object: nil)
 
 		deferredUpdateTimer = PopTimer(timeInterval: 0.5) { [weak self] in
 			if let s = self, s.serversDirty {
@@ -711,7 +711,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	private func setupSortMethodMenu() {
 		let m = NSMenu(title: "Sorting")
 		for t in Settings.sortDescending ? SortingMethod.reverseTitles : SortingMethod.normalTitles {
-			m.addItem(withTitle: t, action: #selector(PreferencesWindow.sortMethodChanged(_:)), keyEquivalent: "")
+			m.addItem(withTitle: t, action: #selector(sortMethodChanged), keyEquivalent: "")
 		}
 		sortModeSelect.menu = m
 		sortModeSelect.selectItem(at: Settings.sortMethod)
@@ -1175,14 +1175,14 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	func tableView(_ tv: NSTableView, shouldSelectRow row: Int) -> Bool {
-		return !tableView(tv, isGroupRow:row)
+		return !tableView(tv, isGroupRow: row)
 	}
 
 	func tableView(_ tv: NSTableView, willDisplayCell c: AnyObject, for tableColumn: NSTableColumn?, row: Int) {
 		let cell = c as! NSCell
 		if tv === projectsTable {
 			if tableColumn?.identifier == "repos" {
-				if tableView(tv, isGroupRow:row) {
+				if tableView(tv, isGroupRow: row) {
 					cell.title = row==0 ? "Parent Repositories" : "Forked Repositories"
 					cell.isEnabled = false
 				} else {
@@ -1196,7 +1196,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			} else {
 				if let menuCell = cell as? NSTextFieldCell {
 					if tableColumn?.identifier == "group" {
-						if tableView(tv, isGroupRow:row) {
+						if tableView(tv, isGroupRow: row) {
 							menuCell.stringValue = ""
 							menuCell.placeholderString = nil
 							menuCell.isEnabled = false
@@ -1209,7 +1209,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 					}
 				} else if let menuCell = cell as? NSPopUpButtonCell {
 					menuCell.removeAllItems()
-					if tableView(tv, isGroupRow:row) {
+					if tableView(tv, isGroupRow: row) {
 						menuCell.selectItem(at: -1)
 						menuCell.isEnabled = false
 						menuCell.arrowPosition = .noArrow
