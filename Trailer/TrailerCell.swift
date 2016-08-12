@@ -41,7 +41,7 @@ class TrailerCell: NSTableCellView {
 			var finalColor: NSColor = unselectedTitleColor
 			if selected {
 				table.selectRowIndexes(IndexSet(integer: table.row(for: self)), byExtendingSelection: false)
-				if goneDark { finalColor = NSColor.darkGray }
+				if goneDark { finalColor = .darkGray }
 			} else {
 				table.deselectRow(table.row(for: self))
 			}
@@ -305,11 +305,11 @@ class TrailerCell: NSTableCellView {
 		if let c = countBackground {
 			var color: NSColor
 			if goneDark {
-				color = on ? NSColor.black : NSColor(red: 0.94, green: 0.94, blue: 0.94, alpha: 1.0)
+				color = on ? .black : NSColor(red: 0.94, green: 0.94, blue: 0.94, alpha: 1.0)
 				c.backgroundColor = on ? NSColor.white.withAlphaComponent(DISABLED_FADE) : NSColor.black.withAlphaComponent(0.2)
 				newBackground?.backgroundColor = NSColor(red: 1.0, green: 0.1, blue: 0.1, alpha: 1.0)
 			} else {
-				color = goneDark ? NSColor.controlLightHighlightColor : NSColor.controlTextColor
+				color = goneDark ? .controlLightHighlightColor : .controlTextColor
 				c.backgroundColor = NSColor(red: 0.92, green: 0.92, blue: 0.92, alpha: 1.0)
 				newBackground?.backgroundColor = NSColor(red: 1.0, green: 0.4, blue: 0.4, alpha: 1.0)
 			}

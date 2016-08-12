@@ -16,19 +16,19 @@ final class CommentRow: NSObject {
 		dateL.setText(shortDateFormatter.string(from: comment["date"] as! Date))
 		commentL.setText(comment["text"] as? String)
 		if(comment["mine"] as! Bool) {
-			usernameBackground.setBackgroundColor(UIColor.gray)
-			commentL.setTextColor(UIColor.lightGray)
-			margin.setBackgroundColor(UIColor.darkGray)
+			usernameBackground.setBackgroundColor(.gray)
+			commentL.setTextColor(.lightGray)
+			margin.setBackgroundColor(.darkGray)
 		} else {
 			if unreadIndex < unreadCount {
-				usernameBackground.setBackgroundColor(UIColor.red)
-				margin.setBackgroundColor(UIColor.red)
+				usernameBackground.setBackgroundColor(.red)
+				margin.setBackgroundColor(.red)
 				unreadIndex += 1
 			} else {
-				usernameBackground.setBackgroundColor(UIColor.lightGray)
-				margin.setBackgroundColor(UIColor.lightGray)
+				usernameBackground.setBackgroundColor(.lightGray)
+				margin.setBackgroundColor(.lightGray)
 			}
-			commentL.setTextColor(UIColor.white)
+			commentL.setTextColor(.white)
 		}
 	}
 }

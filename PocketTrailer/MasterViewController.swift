@@ -942,7 +942,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 					i.wakeUp()
 					DataManager.saveDB()
 				}
-				w.backgroundColor = UIColor.darkGray
+				w.backgroundColor = .darkGray
 				actions.append(w)
 
 			} else {
@@ -954,7 +954,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 				let s = UITableViewRowAction(style: .normal, title: "Snooze") { [weak self] action, indexPath in
 					self?.showSnoozeMenuFor(i: i)
 				}
-				s.backgroundColor = UIColor.darkGray
+				s.backgroundColor = .darkGray
 				actions.append(s)
 			}
 		}

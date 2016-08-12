@@ -920,10 +920,10 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	private func enableHotkeySegments() {
 		if Settings.hotkeyEnable {
-			color(button: hotkeyCommandModifier, withColor: Settings.hotkeyCommandModifier ? NSColor.controlTextColor : NSColor.disabledControlTextColor)
-			color(button: hotkeyControlModifier, withColor: Settings.hotkeyControlModifier ? NSColor.controlTextColor : NSColor.disabledControlTextColor)
-			color(button: hotkeyOptionModifier, withColor: Settings.hotkeyOptionModifier ? NSColor.controlTextColor : NSColor.disabledControlTextColor)
-			color(button: hotkeyShiftModifier, withColor: Settings.hotkeyShiftModifier ? NSColor.controlTextColor : NSColor.disabledControlTextColor)
+			color(button: hotkeyCommandModifier, withColor: Settings.hotkeyCommandModifier ? .controlTextColor : .disabledControlTextColor)
+			color(button: hotkeyControlModifier, withColor: Settings.hotkeyControlModifier ? .controlTextColor : .disabledControlTextColor)
+			color(button: hotkeyOptionModifier, withColor: Settings.hotkeyOptionModifier ? .controlTextColor : .disabledControlTextColor)
+			color(button: hotkeyShiftModifier, withColor: Settings.hotkeyShiftModifier ? .controlTextColor : .disabledControlTextColor)
 		}
 		hotKeyContainer.isHidden = !Settings.hotkeyEnable
 		hotKeyHelp.isHidden = Settings.hotkeyEnable
@@ -1190,7 +1190,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 					let r = repo(at: row)
 					let repoName = S(r.fullName)
 					let title = r.inaccessible ? "\(repoName) (inaccessible)" : repoName
-					let textColor = (row == tv.selectedRow) ? NSColor.selectedControlTextColor : (r.shouldSync ? NSColor.textColor : NSColor.textColor.withAlphaComponent(0.4))
+					let textColor = (row == tv.selectedRow) ? .selectedControlTextColor : (r.shouldSync ? .textColor : NSColor.textColor.withAlphaComponent(0.4))
 					cell.attributedStringValue = NSAttributedString(string: title, attributes: [NSForegroundColorAttributeName: textColor])
 				}
 			} else {
@@ -1254,9 +1254,9 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 				cell.title = S(apiServer.label)
 				let tc = c as! NSTextFieldCell
 				if apiServer.lastSyncSucceeded {
-					tc.textColor = NSColor.textColor
+					tc.textColor = .textColor
 				} else {
-					tc.textColor = NSColor.red
+					tc.textColor = .red
 				}
 			} else { // api usage
 				let c = cell as! NSLevelIndicatorCell
@@ -1272,7 +1272,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			let preset = allPresets[row]
 			cell.title = preset.listDescription
 			let tc = c as! NSTextFieldCell
-			tc.textColor = NSColor.textColor
+			tc.textColor = .textColor
 		}
 	}
 
@@ -1382,13 +1382,13 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 		if Settings.autoSnoozeDuration == 0 {
 			autoSnoozeLabel.stringValue = "Do not auto-snooze items"
-			autoSnoozeLabel.textColor = NSColor.disabledControlTextColor
+			autoSnoozeLabel.textColor = .disabledControlTextColor
 		} else if Settings.autoSnoozeDuration == 1 {
 			autoSnoozeLabel.stringValue = "Automatically snooze any item that has been idle for longer than a day"
-			autoSnoozeLabel.textColor = NSColor.controlTextColor
+			autoSnoozeLabel.textColor = .controlTextColor
 		} else {
 			autoSnoozeLabel.stringValue = "Automatically snooze any item that has been idle for longer than \(Settings.autoSnoozeDuration) days"
-			autoSnoozeLabel.textColor = NSColor.controlTextColor
+			autoSnoozeLabel.textColor = .controlTextColor
 		}
 		autoSnoozeSelector.integerValue = Settings.autoSnoozeDuration
 	}
@@ -1453,7 +1453,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			snoozeWakeOnMention.integerValue = s.wakeOnMention ? 1 : 0
 			snoozeWakeOnStatusUpdate.isEnabled = true
 			snoozeWakeOnStatusUpdate.integerValue = s.wakeOnStatusChange ? 1 : 0
-			snoozeWakeLabel.textColor = NSColor.controlTextColor
+			snoozeWakeLabel.textColor = .controlTextColor
 			snoozeTypeDuration.isEnabled = true
 			snoozeTypeDateTime.isEnabled = true
 			snoozeDeletePreset.isEnabled = true
@@ -1477,7 +1477,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			snoozeWakeOnMention.integerValue = 0
 			snoozeWakeOnStatusUpdate.isEnabled = false
 			snoozeWakeOnStatusUpdate.integerValue = 0
-			snoozeWakeLabel.textColor = NSColor.disabledControlTextColor
+			snoozeWakeLabel.textColor = .disabledControlTextColor
 		}
 	}
 

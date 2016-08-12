@@ -35,7 +35,7 @@ final class MenuWindow: NSWindow {
 
 		super.awakeFromNib()
 
-		backgroundColor = NSColor.white
+		backgroundColor = .white
 
         if newSystem {
             scrollView.contentView.wantsLayer = true

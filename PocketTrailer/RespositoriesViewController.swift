@@ -187,7 +187,7 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 	private func configureCell(_ cell: RepoCell, atIndexPath: IndexPath) {
 		let repo = fetchedResultsController.object(at: atIndexPath)
 
-		let titleColor = repo.shouldSync ? UIColor.black : UIColor.lightGray
+		let titleColor: UIColor = repo.shouldSync ? .black : .lightGray
 		let titleAttributes = [ NSForegroundColorAttributeName: titleColor ]
 
 		let title = NSMutableAttributedString(attributedString: NSAttributedString(string: S(repo.fullName), attributes: titleAttributes))
@@ -227,7 +227,7 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 
 		let fullName = S(repo.fullName)
 		let text = repo.inaccessible ? "\(fullName) (inaccessible)" : fullName
-		let color = repo.shouldSync ? UIColor.darkText : UIColor.lightGray
+		let color: UIColor = repo.shouldSync ? .darkText : .lightGray
 		return NSAttributedString(string: text, attributes: [ NSForegroundColorAttributeName: color ])
 	}
 

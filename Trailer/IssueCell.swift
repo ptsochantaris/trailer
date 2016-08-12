@@ -9,13 +9,13 @@ final class IssueCell: TrailerCell {
 		detailFont = NSFont.menuFont(ofSize: 10.0)
 		titleFont = NSFont.menuFont(ofSize: 13.0)
 
-		unselectedTitleColor = goneDark ? NSColor.controlHighlightColor : NSColor.controlTextColor
+		unselectedTitleColor = goneDark ? .controlHighlightColor : .controlTextColor
 
 		let _commentsNew = issue.unreadComments
 		let _commentsTotal = issue.totalComments
 
 		let _title = issue.title(with: titleFont, labelFont: detailFont, titleColor: unselectedTitleColor)
-		let _subtitle = issue.subtitle(with: detailFont, lightColor: NSColor.gray, darkColor: NSColor.darkGray)
+		let _subtitle = issue.subtitle(with: detailFont, lightColor: .gray, darkColor: .darkGray)
 
 		var W = MENU_WIDTH-LEFTPADDING-app.scrollBarWidth
 
@@ -70,7 +70,7 @@ final class IssueCell: TrailerCell {
 		if showUnpin {
 			if issue.condition == ItemCondition.open.rawValue {
 				let unmergeableLabel = CenterTextField(frame: pinRect)
-				unmergeableLabel.textColor = NSColor.red
+				unmergeableLabel.textColor = .red
 				unmergeableLabel.font = NSFont(name: "Monaco", size: 8.0)
 				unmergeableLabel.alignment = .center
 				unmergeableLabel.stringValue = "Cannot be merged"

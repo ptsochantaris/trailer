@@ -51,15 +51,15 @@ final class StatusItemView: NSView {
 		var imageColor: NSColor
 
 		if highlighted {
-			imageColor = NSColor.selectedMenuItemTextColor
+			imageColor = .selectedMenuItemTextColor
 			displayAttributes[NSForegroundColorAttributeName] = imageColor
 		} else if app.darkMode {
-			imageColor = NSColor.selectedMenuItemTextColor
+			imageColor = .selectedMenuItemTextColor
 			if displayAttributes[NSForegroundColorAttributeName] as! NSColor == NSColor.controlTextColor {
 				displayAttributes[NSForegroundColorAttributeName] = imageColor
 			}
 		} else {
-			imageColor = NSColor.controlTextColor
+			imageColor = .controlTextColor
 		}
 
 		if grayOut {

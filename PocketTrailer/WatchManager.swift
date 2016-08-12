@@ -232,17 +232,15 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 		let font = UIFont.systemFont(ofSize: UIFont.systemFontSize)
 		let smallFont = UIFont.systemFont(ofSize: UIFont.systemFontSize-4)
-		let lightGray = UIColor.lightGray
-		let gray = UIColor.gray
 
-		let title = item.title(with: font, labelFont: font, titleColor: UIColor.white)
+		let title = item.title(with: font, labelFont: font, titleColor: .white)
 		itemData["title"] = NSKeyedArchiver.archivedData(withRootObject: title)
 
 		if let i = item as? PullRequest {
-			let subtitle = i.subtitle(with: smallFont, lightColor: lightGray, darkColor: gray)
+			let subtitle = i.subtitle(with: smallFont, lightColor: .lightGray, darkColor: .gray)
 			itemData["subtitle"] = NSKeyedArchiver.archivedData(withRootObject: subtitle)
 		} else if let i = item as? Issue {
-			let subtitle = i.subtitle(with: smallFont, lightColor: lightGray, darkColor: gray)
+			let subtitle = i.subtitle(with: smallFont, lightColor: .lightGray, darkColor: .gray)
 			itemData["subtitle"] = NSKeyedArchiver.archivedData(withRootObject: subtitle)
 		}
 

@@ -63,7 +63,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 				DLog("Will load: %@", d.absoluteString)
 				w.load(URLRequest(url: d))
 			} else {
-				statusLabel.textColor = UIColor.lightGray
+				statusLabel.textColor = .lightGray
 				statusLabel.text = "Please select an item from the list, or select 'Settings' to add servers, or show/hide repositories.\n\n(You may have to login to GitHub the first time you visit a private item)"
 				statusLabel.isHidden = false
 				navigationItem.rightBarButtonItem?.isEnabled = false
@@ -172,7 +172,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 
 	private func loadFailed(error: NSError) {
 		spinner.stopAnimating()
-		statusLabel.textColor = UIColor.red
+		statusLabel.textColor = .red
 		statusLabel.text = "Loading Error: \(error.localizedDescription)"
 		statusLabel.isHidden = false
 		webView?.isHidden = true

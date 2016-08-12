@@ -81,11 +81,11 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 
 	private func processTokenState(from tokenText: String?) {
 		if S(tokenText).isEmpty {
-			authTokenLabel.textColor =  UIColor.red
+			authTokenLabel.textColor =  .red
 			testButton.isEnabled = false
 			testButton.alpha = 0.6
 		} else {
-			authTokenLabel.textColor =  UIColor.black
+			authTokenLabel.textColor =  .black
 			testButton.isEnabled = true
 			testButton.alpha = 1.0
 		}

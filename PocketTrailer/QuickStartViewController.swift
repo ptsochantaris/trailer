@@ -29,7 +29,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 			Settings.displayPolicyForNewIssues = RepoDisplayPolicy.all.intValue
 		} else {
 			trackIssues.title = "Should track issues as well: No"
-			trackIssues.tintColor = UIColor.lightGray
+			trackIssues.tintColor = .lightGray
 			Settings.displayPolicyForNewIssues = RepoDisplayPolicy.hide.intValue
 		}
 	}

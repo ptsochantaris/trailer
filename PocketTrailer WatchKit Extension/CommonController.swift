@@ -72,10 +72,10 @@ class CommonController: WKInterfaceController {
 	}
 
 	private func showTemporaryError(_ mesage: String) {
-		_statusLabel.setTextColor(UIColor.red)
+		_statusLabel.setTextColor(.red)
 		show(status: mesage, hideTable: true)
 		delay(3, self) { S in
-			S._statusLabel.setTextColor(UIColor.white)
+			S._statusLabel.setTextColor(.white)
 			S.show(status: "", hideTable: false)
 		}
 	}

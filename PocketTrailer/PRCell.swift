@@ -28,10 +28,10 @@ final class PRCell: UITableViewCell {
 
 	override func awakeFromNib() {
 
-		unreadCount.textColor = UIColor.white
+		unreadCount.textColor = .white
 		contentView.addSubview(unreadCount)
 
-		readCount.textColor = UIColor.darkGray
+		readCount.textColor = .darkGray
 		contentView.addSubview(readCount)
 
 		_image.layer.cornerRadius = 25
@@ -95,8 +95,8 @@ final class PRCell: UITableViewCell {
 
 
 		let detailFont = UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)
-		_title.attributedText = pullRequest.title(with: _title.font, labelFont: detailFont.withSize(detailFont.pointSize-2), titleColor: UIColor.darkText)
-		_description.attributedText = pullRequest.subtitle(with: detailFont, lightColor: UIColor.lightGray, darkColor: UIColor.darkGray)
+		_title.attributedText = pullRequest.title(with: _title.font, labelFont: detailFont.withSize(detailFont.pointSize-2), titleColor: .darkText)
+		_description.attributedText = pullRequest.subtitle(with: detailFont, lightColor: .lightGray, darkColor: .darkGray)
 
 		let muted = pullRequest.muted
 		setCountsImageAndFade(item: pullRequest, muted: muted)
@@ -141,8 +141,8 @@ final class PRCell: UITableViewCell {
 	func setIssue(issue: Issue) {
 
 		let detailFont = UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)
-		_title.attributedText = issue.title(with: _title.font, labelFont: detailFont.withSize(detailFont.pointSize-2), titleColor: UIColor.darkText)
-		_description.attributedText = issue.subtitle(with: detailFont, lightColor: UIColor.lightGray, darkColor: UIColor.darkGray)
+		_title.attributedText = issue.title(with: _title.font, labelFont: detailFont.withSize(detailFont.pointSize-2), titleColor: .darkText)
+		_description.attributedText = issue.subtitle(with: detailFont, lightColor: .lightGray, darkColor: .darkGray)
 		_statuses.attributedText = nil
 
 		statusToAvatarDistance.constant = 0.0
@@ -217,7 +217,7 @@ final class PRCell: UITableViewCell {
 	}
 
 	private func tone() {
-		unreadCount.backgroundColor = UIColor.red
+		unreadCount.backgroundColor = .red
 		readCount.backgroundColor = UIColor(white: 0.9, alpha: 1.0)
 	}
 }

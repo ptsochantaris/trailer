@@ -62,7 +62,7 @@ final class LinkField: CenterTextField {
 			} else {
 				if !needsCommand || theEvent.modifierFlags.contains(.command) {
 					highlight = true
-					textColor = NSColor.blue
+					textColor = .blue
 					window?.invalidateCursorRects(for: self)
 				}
 			}
