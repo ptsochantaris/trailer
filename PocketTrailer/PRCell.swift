@@ -76,7 +76,7 @@ final class PRCell: UITableViewCell {
 				constant: 21)
 			])
 
-		NotificationCenter.default.addObserver(self, selector: #selector(networkStateChanged), name: .reachabilityChanged, object: nil)
+		NotificationCenter.default.addObserver(self, selector: #selector(networkStateChanged), name: ReachabilityChangedNotification, object: nil)
 	}
 
 	func networkStateChanged() {

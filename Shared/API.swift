@@ -18,13 +18,13 @@ final class API {
 	private let cacheDirectory: String
 	private let urlSession: URLSession
 	private var badLinks = [String : UrlBackOffEntry]()
-	private let reachability = Reachability.forInternetConnection()!
+	private let reachability = Reachability()
 	private let backOffIncrement: TimeInterval = 120.0
 
 	init() {
 
 		reachability.startNotifier()
-		let n = reachability.currentReachabilityStatus()
+		let n = reachability.status
 		DLog("Network is %@", n == .NotReachable ? "down" : "up")
 		currentNetworkStatus = n
 
@@ -57,7 +57,7 @@ final class API {
 			try! fileManager.createDirectory(atPath: cacheDirectory, withIntermediateDirectories: true, attributes: nil)
 		}
 
-		NotificationCenter.default.addObserver(forName: .reachabilityChanged, object: nil, queue: .main) { [weak self] n in
+		NotificationCenter.default.addObserver(forName: ReachabilityChangedNotification, object: nil, queue: .main) { [weak self] n in
 			guard let s = self else { return }
 			s.checkNetworkAvailability()
 			if s.currentNetworkStatus != .NotReachable {
@@ -67,13 +67,13 @@ final class API {
 	}
 
 	private func checkNetworkAvailability() {
-		let newStatus = reachability.currentReachabilityStatus()
+		let newStatus = reachability.status
 		if newStatus != currentNetworkStatus {
 			currentNetworkStatus = newStatus
-			if newStatus == NetworkStatus.NotReachable {
-				DLog("Network went down: %d", newStatus.rawValue)
+			if newStatus == .NotReachable {
+				DLog("Network went down (%d)", newStatus.rawValue)
 			} else {
-				DLog("Network came up: %d", newStatus.rawValue)
+				DLog("Network came up (%d)", newStatus.rawValue)
 			}
 			clearAllBadLinks()
 		}

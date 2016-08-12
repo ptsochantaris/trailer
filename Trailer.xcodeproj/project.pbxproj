@@ -68,6 +68,8 @@
 		1664CBCB1B7796840006BDE7 /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1664CBC91B7796840006BDE7 /* Enums.swift */; };
 		1664CBCC1B7796840006BDE7 /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1664CBC91B7796840006BDE7 /* Enums.swift */; };
 		1664CBCD1B7796840006BDE7 /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1664CBC91B7796840006BDE7 /* Enums.swift */; };
+		1668CFE81D5E16B70021CDC5 /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1668CFE71D5E16B70021CDC5 /* Reachability.swift */; };
+		1668CFE91D5E16B70021CDC5 /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1668CFE71D5E16B70021CDC5 /* Reachability.swift */; };
 		166A84BE1A457CA700A3B292 /* ServersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166A84BD1A457CA700A3B292 /* ServersViewController.swift */; };
 		166A84C01A4582C100A3B292 /* ServerDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166A84BF1A4582C100A3B292 /* ServerDetailViewController.swift */; };
 		166A84C21A45A37700A3B292 /* AdvancedSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166A84C11A45A37700A3B292 /* AdvancedSettingsViewController.swift */; };
@@ -105,8 +107,6 @@
 		16B3B3241A34E8E2000BE6CC /* Repo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3161A34E8E2000BE6CC /* Repo.swift */; };
 		16B3B34F1A34E990000BE6CC /* Trailer.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B33B1A34E990000BE6CC /* Trailer.xcdatamodeld */; };
 		16B3B3501A34E990000BE6CC /* Trailer.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B33B1A34E990000BE6CC /* Trailer.xcdatamodeld */; };
-		16B3B3571A34E9F7000BE6CC /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3541A34E9F7000BE6CC /* Reachability.m */; };
-		16B3B3581A34E9F7000BE6CC /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3541A34E9F7000BE6CC /* Reachability.m */; };
 		16B3B35A1A34EAEE000BE6CC /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3591A34EAEE000BE6CC /* main.swift */; };
 		16B3B35B1A34EAEE000BE6CC /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B3B3591A34EAEE000BE6CC /* main.swift */; };
 		16B6B7C11BA3B94C006A509F /* ComplicationDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B6B7C01BA3B94C006A509F /* ComplicationDataSource.swift */; };
@@ -284,6 +284,7 @@
 		16561EC81BDA8E90008DBAF3 /* Trailer 22.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 22.xcdatamodel"; sourceTree = "<group>"; };
 		165C490F1BA63B45006BBCF5 /* AdvancedSettingsCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdvancedSettingsCell.swift; sourceTree = "<group>"; };
 		1664CBC91B7796840006BDE7 /* Enums.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = Enums.swift; path = Shared/Enums.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		1668CFE71D5E16B70021CDC5 /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Reachability.swift; path = Shared/Reachability.swift; sourceTree = "<group>"; };
 		166A84BD1A457CA700A3B292 /* ServersViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServersViewController.swift; sourceTree = "<group>"; };
 		166A84BF1A4582C100A3B292 /* ServerDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ServerDetailViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		166A84C11A45A37700A3B292 /* AdvancedSettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = AdvancedSettingsViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -338,8 +339,6 @@
 		16B3B34C1A34E990000BE6CC /* Trailer 8.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 8.xcdatamodel"; sourceTree = "<group>"; };
 		16B3B34D1A34E990000BE6CC /* Trailer 9.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 9.xcdatamodel"; sourceTree = "<group>"; };
 		16B3B34E1A34E990000BE6CC /* Trailer.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Trailer.xcdatamodel; sourceTree = "<group>"; };
-		16B3B3531A34E9F7000BE6CC /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reachability.h; path = Shared/Reachability.h; sourceTree = "<group>"; };
-		16B3B3541A34E9F7000BE6CC /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Reachability.m; path = Shared/Reachability.m; sourceTree = "<group>"; };
 		16B3B3591A34EAEE000BE6CC /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = main.swift; path = Shared/main.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16B6B7C01BA3B94C006A509F /* ComplicationDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComplicationDataSource.swift; sourceTree = "<group>"; };
 		16B74E471A3B4AC800410EF6 /* PrTable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PrTable.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -493,8 +492,7 @@
 				16CBE1C41A2DFBA500485053 /* Settings.swift */,
 				16275DF41CF8944100EEBF48 /* API.swift */,
 				162A29D81A4085FD008F41A9 /* GroupingCriterion.swift */,
-				16B3B3531A34E9F7000BE6CC /* Reachability.h */,
-				16B3B3541A34E9F7000BE6CC /* Reachability.m */,
+				1668CFE71D5E16B70021CDC5 /* Reachability.swift */,
 			);
 			name = Logic;
 			sourceTree = "<group>";
@@ -1047,6 +1045,7 @@
 				166ADEC61CCAFF77001BA61F /* SnoozingViewController.swift in Sources */,
 				16B3B3181A34E8E2000BE6CC /* ApiServer.swift in Sources */,
 				16259BCE1A449400009C5745 /* OpenInSafariActivity.swift in Sources */,
+				1668CFE91D5E16B70021CDC5 /* Reachability.swift in Sources */,
 				16C9A27A1A44DD0200EE54EC /* CommentBlacklistViewController.swift in Sources */,
 				166ADEC81CCB009A001BA61F /* SnoozingEditorViewController.swift in Sources */,
 				165C49101BA63B45006BBCF5 /* AdvancedSettingsCell.swift in Sources */,
@@ -1065,7 +1064,6 @@
 				16B3B31E1A34E8E2000BE6CC /* PRLabel.swift in Sources */,
 				16EE871B1A446BFE00A1D16F /* EmptyView.swift in Sources */,
 				1615045E1A464656001CF50C /* PRCell.swift in Sources */,
-				16B3B3581A34E9F7000BE6CC /* Reachability.m in Sources */,
 				164840C51AD04C3C009E6383 /* QuickStartViewController.swift in Sources */,
 				16B3B35B1A34EAEE000BE6CC /* main.swift in Sources */,
 				166A84BE1A457CA700A3B292 /* ServersViewController.swift in Sources */,
@@ -1111,7 +1109,6 @@
 				1633C1A21ABD84370086C692 /* PullRequestCell.swift in Sources */,
 				16B3B31F1A34E8E2000BE6CC /* PRStatus.swift in Sources */,
 				16A0B03C1A49AEC200B3452D /* StartupLaunch.swift in Sources */,
-				16B3B3571A34E9F7000BE6CC /* Reachability.m in Sources */,
 				164840C11ACFEA5A009E6383 /* AboutWindow.swift in Sources */,
 				16B3B3211A34E8E2000BE6CC /* PullRequest.swift in Sources */,
 				162002D61A2A49A300FF95F3 /* ViewAllowsVibrancy.swift in Sources */,
@@ -1126,6 +1123,7 @@
 				160129C91CD8A2A300151D6C /* CacheEntry.swift in Sources */,
 				16B3B3231A34E8E2000BE6CC /* Repo.swift in Sources */,
 				16CBE1CA1A2E13A400485053 /* StatusItemView.swift in Sources */,
+				1668CFE81D5E16B70021CDC5 /* Reachability.swift in Sources */,
 				16B3B35A1A34EAEE000BE6CC /* main.swift in Sources */,
 				169FB2361A3DBD7D00E00771 /* SectionHeader.swift in Sources */,
 				16358F3B1CF138190055F849 /* ItemDelegate.swift in Sources */,
