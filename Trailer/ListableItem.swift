@@ -39,7 +39,7 @@ class ListableItem: DataItem {
 	@NSManaged var comments: Set<PRComment>
 	@NSManaged var labels: Set<PRLabel>
 
-	final func baseSync(from info: [NSObject: AnyObject], in repo: Repo) {
+	final func baseSync(from info: [NSObject : AnyObject], in repo: Repo) {
 
 		self.repo = repo
 
@@ -51,7 +51,7 @@ class ListableItem: DataItem {
 		body = info["body"] as? String
 		milestone = info["milestone"]?["title"] as? String
 
-		if let userInfo = info["user"] as? [NSObject: AnyObject] {
+		if let userInfo = info["user"] as? [NSObject : AnyObject] {
 			userId = (userInfo["id"] as? NSNumber)?.int64Value ?? 0
 			userLogin = userInfo["login"] as? String
 			userAvatarUrl = userInfo["avatar_url"] as? String
@@ -78,7 +78,7 @@ class ListableItem: DataItem {
 
 		var foundAssignmentToMe = false
 
-		if let assignees = info?["assignees"] as? [[NSObject: AnyObject]], assignees.count > 0 {
+		if let assignees = info?["assignees"] as? [[NSObject : AnyObject]], assignees.count > 0 {
 			for assignee in assignees {
 				if checkAndStoreAssigneeName(from: assignee) {
 					foundAssignmentToMe = true

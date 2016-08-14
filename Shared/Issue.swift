@@ -24,7 +24,7 @@ final class Issue: ListableItem {
 					l.postSyncAction = PostSyncAction.delete.rawValue
 				}
 
-				let labelList = info["labels"] as? [[NSObject: AnyObject]]
+				let labelList = info["labels"] as? [[NSObject : AnyObject]]
 				PRLabel.syncLabels(from: labelList, withParent: i)
 			}
 			i.reopened = i.condition == ItemCondition.closed.rawValue

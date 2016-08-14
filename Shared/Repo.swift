@@ -21,7 +21,7 @@ final class Repo: DataItem {
 		var filteredData = [[NSObject : AnyObject]]()
 		for info in data ?? [] {
 			if (info["private"] as? NSNumber)?.boolValue ?? false {
-				if let permissions = info["permissions"] as? [NSObject: AnyObject] {
+				if let permissions = info["permissions"] as? [NSObject : AnyObject] {
 
 					let pull = (permissions["pull"] as? NSNumber)?.boolValue ?? false
 					let push = (permissions["push"] as? NSNumber)?.boolValue ?? false

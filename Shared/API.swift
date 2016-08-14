@@ -585,7 +585,7 @@ final class API {
 		}
 	}
 
-	private func handleRepoSyncFailure(repo: Repo, resultCode: Int) {
+	private func handleRepoSyncFailure(repo: Repo, resultCode: Int64) {
 		if resultCode == 404 { // repo disabled
 			repo.inaccessible = true
 			repo.postSyncAction = PostSyncAction.doNothing.rawValue
@@ -1203,8 +1203,8 @@ final class API {
 		at path: String,
 		from server: ApiServer,
 		startingFromPage: Int,
-		perPageCallback: (data: [[NSObject: AnyObject]]?, lastPage: Bool) -> Bool,
-		finalCallback: (success: Bool, resultCode: Int) -> Void) {
+		perPageCallback: (data: [[NSObject : AnyObject]]?, lastPage: Bool) -> Bool,
+		finalCallback: (success: Bool, resultCode: Int64) -> Void) {
 
 		if path.isEmpty {
 			// handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
@@ -1219,7 +1219,7 @@ final class API {
 		getData(in: p, from: server) {
 			[weak self] data, lastPage, resultCode in
 
-			if let d = data as? [[NSObject: AnyObject]] {
+			if let d = data as? [[NSObject : AnyObject]] {
 				var isLastPage = lastPage
 				if perPageCallback(data: d, lastPage: lastPage) { isLastPage = true }
 				if isLastPage {
@@ -1236,7 +1236,7 @@ final class API {
 	private func getData(
 		in path: String,
 		from server: ApiServer,
-		callback:(data: AnyObject?, lastPage: Bool, resultCode: Int) -> Void) {
+		callback:(data: AnyObject?, lastPage: Bool, resultCode: Int64) -> Void) {
 
 		attemptToGetData(in: path, from: server, callback: callback, attemptCount: 0)
 	}
@@ -1244,7 +1244,7 @@ final class API {
 	private func attemptToGetData(
 		in path: String,
 		from server: ApiServer,
-		callback:(data: AnyObject?, lastPage: Bool, resultCode: Int) -> Void,
+		callback:(data: AnyObject?, lastPage: Bool, resultCode: Int64) -> Void,
 		attemptCount: Int) {
 
 		api(call: path, on: server, ignoreLastSync: false) { [weak self] c, headers, data, error, shouldRetry in
@@ -1297,7 +1297,7 @@ final class API {
 		}
 	}
 
-	typealias ApiCompletion = (code: Int?, headers: [NSObject : AnyObject]?, data: AnyObject?, error: NSError?, shouldRetry: Bool) -> Void
+	typealias ApiCompletion = (code: Int64?, headers: [NSObject : AnyObject]?, data: AnyObject?, error: NSError?, shouldRetry: Bool) -> Void
 
 	private var apiRunningCount = 0
 	private var apiCallQueue = [Completion]()
@@ -1391,7 +1391,7 @@ final class API {
 				               parsedData: parsedData,
 				               serverLabel: apiServerLabel,
 				               urlPath: expandedPath,
-				               code: Int(p.code),
+				               code: p.code,
 				               error: nil,
 				               shouldRetry: false,
 				               badServerResponse: false,
@@ -1413,18 +1413,18 @@ final class API {
 			var parsedData: AnyObject?
 			var error = e as? NSError
 			var badServerResponse = false
-			var code = response?.statusCode ?? 0
+			var code = Int64(response?.statusCode ?? 0)
 			var shouldRetry = false
 			var headers = response?.allHeaderFields
 
 			if code == 304, let p = previousCacheEntry {
 				parsedData = p.parsedData
-				code = Int(p.code)
+				code = p.code
 				headers = p.actualHeaders
 				atNextEvent {
 					CacheEntry.markFetched(for: cacheKey)
 				}
-				DLog("(%@) GET %@ - NO CHANGE (304): %d", apiServerLabel, expandedPath, code)
+				DLog("(%@) GET %@ - NO CHANGE (304): %lld", apiServerLabel, expandedPath, code)
 			} else if code > 299 {
 				error = self?.apiError("Server responded with \(code)")
 				badServerResponse = true
@@ -1435,12 +1435,12 @@ final class API {
 				shouldRetry = true // truncation
 				error = self?.apiError("Server data was truncated")
 			} else {
-				DLog("(%@) GET %@ - RESULT: %d", apiServerLabel, expandedPath, code)
+				DLog("(%@) GET %@ - RESULT: %lld", apiServerLabel, expandedPath, code)
 				if let d = data {
-					parsedData = try? JSONSerialization.jsonObject(with: d, options: JSONSerialization.ReadingOptions())
+					parsedData = try? JSONSerialization.jsonObject(with: d, options: [])
 					if let h = headers, let e = h["Etag"] as? String {
 						atNextEvent {
-							CacheEntry.setEntry(key: cacheKey, code: Int64(code), etag: e, data: d, headers: h)
+							CacheEntry.setEntry(key: cacheKey, code: code, etag: e, data: d, headers: h)
 						}
 					}
 				}
@@ -1471,7 +1471,7 @@ final class API {
 	                            parsedData: AnyObject?,
 	                            serverLabel: String,
 	                            urlPath: String,
-	                            code: Int,
+	                            code: Int64,
 	                            error: NSError?,
 	                            shouldRetry: Bool,
 	                            badServerResponse: Bool,
@@ -1494,7 +1494,7 @@ final class API {
 						nextIncrement: backOffIncrement)
 				}
 			}
-			DLog("(%@) GET %@ - FAILED: (code %d) %@", serverLabel, urlPath, code, error!.localizedDescription)
+			DLog("(%@) GET %@ - FAILED: (code %lld) %@", serverLabel, urlPath, code, error!.localizedDescription)
 		}
 
 		if Settings.dumpAPIResponsesInConsole, let d = data {

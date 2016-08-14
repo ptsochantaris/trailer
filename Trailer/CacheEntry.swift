@@ -13,7 +13,7 @@ struct CacheUnit {
 	}
 
 	var parsedData: AnyObject? {
-		return try? JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions())
+		return try? JSONSerialization.jsonObject(with: data, options: [])
 	}
 }
 
