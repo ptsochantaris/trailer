@@ -10,7 +10,7 @@ import CoreData
 class ListableItem: DataItem {
 
 	@NSManaged var assignedToMe: Bool
-	@NSManaged var assigneeName: String?
+	@NSManaged var assigneeName: String? // note: This now could be a list of names, delimited with a ","
 	@NSManaged var body: String?
 	@NSManaged var webUrl: String?
 	@NSManaged var condition: Int64
@@ -57,14 +57,43 @@ class ListableItem: DataItem {
 			userAvatarUrl = userInfo["avatar_url"] as? String
 		}
 
-		if let assignee = info["assignee"] as? [NSObject: AnyObject], let name = assignee["login"] as? String, let id = assignee["id"] as? NSNumber {
-			let currentlyAssigned = id.int64Value == repo.apiServer.userId
-			isNewAssignment = currentlyAssigned && !assignedToMe && !createdByMe
-			assignedToMe = currentlyAssigned
-			assigneeName = name
+		processAssignmentStatus(from: info)
+	}
+
+	final func processAssignmentStatus(from info: [NSObject : AnyObject]?) {
+
+		let myIdOnThisRepo = repo.apiServer.userId
+		var assigneeNames = [String]()
+
+		func checkAndStoreAssigneeName(from assignee: [NSObject : AnyObject]) -> Bool {
+
+			if let name = assignee["login"] as? String, let assigneeId = assignee["id"] as? NSNumber {
+				let shouldBeAssignedToMe = assigneeId.int64Value == myIdOnThisRepo
+				assigneeNames.append(name)
+				return shouldBeAssignedToMe
+			} else {
+				return false
+			}
+		}
+
+		var foundAssignmentToMe = false
+
+		if let assignees = info?["assignees"] as? [[NSObject: AnyObject]], assignees.count > 0 {
+			for assignee in assignees {
+				if checkAndStoreAssigneeName(from: assignee) {
+					foundAssignmentToMe = true
+				}
+			}
+		} else if let assignee = info?["assignee"] as? [NSObject : AnyObject] {
+			foundAssignmentToMe = checkAndStoreAssigneeName(from: assignee)
+		}
+
+		isNewAssignment = foundAssignmentToMe && !assignedToMe && !createdByMe
+		assignedToMe = foundAssignmentToMe
+
+		if assigneeNames.count > 0 {
+			assigneeName = assigneeNames.joined(separator: ",")
 		} else {
-			isNewAssignment = false
-			assignedToMe = false
 			assigneeName = nil
 		}
 	}

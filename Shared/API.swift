@@ -19,7 +19,7 @@ final class API {
 	private let urlSession: URLSession
 	private var badLinks = [String : UrlBackOffEntry]()
 	private let reachability = Reachability()
-	private let backOffIncrement: TimeInterval = 120.0
+	private let backOffIncrement: TimeInterval = 120
 
 	init() {
 
@@ -961,15 +961,8 @@ final class API {
 			let apiServer = p.apiServer
 			if let issueLink = p.issueUrl {
 				getData(in: issueLink, from: apiServer) { data, lastPage, resultCode in
-					if let d = data as? [NSObject : AnyObject], let assigneeInfo = d["assignee"] as? [NSObject : AnyObject], let assignee = assigneeInfo["login"] as? String {
-						let assigned = (assignee == S(apiServer.userName))
-						p.isNewAssignment = (assigned && !p.createdByMe && !p.assignedToMe)
-						p.assignedToMe = assigned
-					} else if resultCode == 200 || resultCode == 404 || resultCode == 410 {
-						// 200 means PR is not assigned to anyone, there was no asgineee info
-						// 404/410 is fine, it means issue entry doesn't exist
-						p.assignedToMe = false
-						p.isNewAssignment = false
+					if resultCode == 200 || resultCode == 404 || resultCode == 410 {
+						p.processAssignmentStatus(from: data as? [NSObject : AnyObject])
 					} else {
 						apiServer.lastSyncSucceeded = false
 					}
