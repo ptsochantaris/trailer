@@ -187,24 +187,24 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 		let showLabels = Settings.showLabels
 		let showStatuses: Bool
-		let entity: String
+		let entity: ListableItem.Type
 		if type == "prs" {
-			entity = "PullRequest"
+			entity = PullRequest.self
 			showStatuses = Settings.showStatusItems
 		} else {
-			entity = "Issue"
+			entity = Issue.self
 			showStatuses = false
 		}
 
 		let f: NSFetchRequest<ListableItem>
 		if !apiServerUri.isEmpty, let aid = DataManager.id(for: apiServerUri) {
 			let criterion = GroupingCriterion(apiServerId: aid)
-			f = ListableItem.requestForItems(ofType: entity, withFilter: nil, sectionIndex: sectionIndex, criterion: criterion, onlyUnread: onlyUnread)
+			f = ListableItem.requestForItems(of: entity, withFilter: nil, sectionIndex: sectionIndex, criterion: criterion, onlyUnread: onlyUnread)
 		} else if !group.isEmpty {
 			let criterion = GroupingCriterion(repoGroup: group)
-			f = ListableItem.requestForItems(ofType: entity, withFilter: nil, sectionIndex: sectionIndex, criterion: criterion, onlyUnread: onlyUnread)
+			f = ListableItem.requestForItems(of: entity, withFilter: nil, sectionIndex: sectionIndex, criterion: criterion, onlyUnread: onlyUnread)
 		} else {
-			f = ListableItem.requestForItems(ofType: entity, withFilter: nil, sectionIndex: sectionIndex, onlyUnread: onlyUnread)
+			f = ListableItem.requestForItems(of: entity, withFilter: nil, sectionIndex: sectionIndex, onlyUnread: onlyUnread)
 		}
 
 		f.fetchOffset = from
@@ -320,25 +320,27 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 			let c = tabSet.viewCriterion
 
-			let myPrs = counts(forType: "PullRequest", in: .mine, criterion: c)
-			let participatedPrs = counts(forType: "PullRequest", in: .participated, criterion: c)
-			let mentionedPrs = counts(forType: "PullRequest", in: .mentioned, criterion: c)
-			let mergedPrs = counts(forType: "PullRequest", in: .merged, criterion: c)
-			let closedPrs = counts(forType: "PullRequest", in: .closed, criterion: c)
-			let otherPrs = counts(forType: "PullRequest", in: .all, criterion: c)
-			let snoozedPrs = counts(forType: "PullRequest", in: .snoozed, criterion: c)
+			let myPrs = counts(for: PullRequest.self, in: .mine, criterion: c)
+			let participatedPrs = counts(for: PullRequest.self, in: .participated, criterion: c)
+			let mentionedPrs = counts(for: PullRequest.self, in: .mentioned, criterion: c)
+			let mergedPrs = counts(for: PullRequest.self, in: .merged, criterion: c)
+			let closedPrs = counts(for: PullRequest.self, in: .closed, criterion: c)
+			let otherPrs = counts(for: PullRequest.self, in: .all, criterion: c)
+			let snoozedPrs = counts(for: PullRequest.self, in: .snoozed, criterion: c)
 			let totalPrs = [ myPrs, participatedPrs, mentionedPrs, mergedPrs, closedPrs, otherPrs, snoozedPrs ].reduce(0, { $0 + $1["total"]! })
-			let totalOpenPrs = countOpenAndVisible(ofType: "PullRequest", criterion: c)
+
+			let totalOpenPrs = countOpenAndVisible(of: PullRequest.self, criterion: c)
 			let unreadPrCount = PullRequest.badgeCount(in: mainObjectContext, criterion: c)
 
-			let myIssues = counts(forType: "Issue", in: .mine, criterion: c)
-			let participatedIssues = counts(forType: "Issue", in: .participated, criterion: c)
-			let mentionedIssues = counts(forType: "Issue", in: .mentioned, criterion: c)
-			let closedIssues = counts(forType: "Issue", in: .closed, criterion: c)
-			let otherIssues = counts(forType: "Issue", in: .all, criterion: c)
-			let snoozedIssues = counts(forType: "Issue", in: .snoozed, criterion: c)
+			let myIssues = counts(for: Issue.self, in: .mine, criterion: c)
+			let participatedIssues = counts(for: Issue.self, in: .participated, criterion: c)
+			let mentionedIssues = counts(for: Issue.self, in: .mentioned, criterion: c)
+			let closedIssues = counts(for: Issue.self, in: .closed, criterion: c)
+			let otherIssues = counts(for: Issue.self, in: .all, criterion: c)
+			let snoozedIssues = counts(for: Issue.self, in: .snoozed, criterion: c)
 			let totalIssues = [ myIssues, participatedIssues, mentionedIssues, closedIssues, otherIssues, snoozedIssues ].reduce(0, { $0 + $1["total"]! })
-			let totalOpenIssues = countOpenAndVisible(ofType: "Issue", criterion: c)
+
+			let totalOpenIssues = countOpenAndVisible(of: Issue.self, criterion: c)
 			let unreadIssueCount = Issue.badgeCount(in: mainObjectContext, criterion: c)
 
 			views.append([
@@ -365,34 +367,34 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		]
 	}
 
-	private func counts(forType type: String, in section: Section, criterion: GroupingCriterion?) -> [String : Int] {
-		return ["total": countItems(ofType: type, in: section, criterion: criterion),
-		        "unread": badgeCount(forType: type, in: section, criterion: criterion)]
+	private func counts<T: ListableItem>(for type: T.Type, in section: Section, criterion: GroupingCriterion?) -> [String : Int] {
+		return ["total": countItems(of: type, in: section, criterion: criterion),
+		        "unread": badgeCount(for: type, in: section, criterion: criterion)]
 	}
 
-	private func countallItems(ofType type: String, criterion: GroupingCriterion?) -> Int {
-		let f = NSFetchRequest<ListableItem>(entityName: type)
+	private func countallItems<T: ListableItem>(of type: T.Type, criterion: GroupingCriterion?) -> Int {
+		let f = NSFetchRequest<T>(entityName: typeName(type))
 		let p = Settings.hideUncommentedItems ? NSPredicate(format: "sectionIndex > 0 and unreadComments > 0") : NSPredicate(format: "sectionIndex > 0")
 		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: mainObjectContext)
 		return try! mainObjectContext.count(for: f)
 	}
 
-	private func countItems(ofType type: String, in section: Section, criterion: GroupingCriterion?) -> Int {
-		let f = NSFetchRequest<ListableItem>(entityName: type)
+	private func countItems<T: ListableItem>(of type: T.Type, in section: Section, criterion: GroupingCriterion?) -> Int {
+		let f = NSFetchRequest<T>(entityName: typeName(type))
 		let p = Settings.hideUncommentedItems ? NSPredicate(format: "sectionIndex == %lld and unreadComments > 0", section.rawValue) : NSPredicate(format: "sectionIndex == %d", section.rawValue)
 		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: mainObjectContext)
 		return try! mainObjectContext.count(for: f)
 	}
 
-	private func badgeCount(forType type: String, in section: Section, criterion: GroupingCriterion?) -> Int {
-		let f = NSFetchRequest<ListableItem>(entityName: type)
+	private func badgeCount<T: ListableItem>(for type: T.Type, in section: Section, criterion: GroupingCriterion?) -> Int {
+		let f = NSFetchRequest<T>(entityName: typeName(type))
 		let p = NSPredicate(format: "sectionIndex == %lld and unreadComments > 0", section.rawValue)
 		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: mainObjectContext)
 		return ListableItem.badgeCount(from: f, in: mainObjectContext)
 	}
 
-	private func countOpenAndVisible(ofType type: String, criterion: GroupingCriterion?) -> Int {
-		let f = NSFetchRequest<ListableItem>(entityName: type)
+	private func countOpenAndVisible<T: ListableItem>(of type: T.Type, criterion: GroupingCriterion?) -> Int {
+		let f = NSFetchRequest<T>(entityName: typeName(type))
 		let p = Settings.hideUncommentedItems ? NSPredicate(format: "sectionIndex > 0 and (condition == %lld or condition == nil) and unreadComments > 0", ItemCondition.open.rawValue) : NSPredicate(format: "sectionIndex > 0 and (condition == %lld or condition == nil)", ItemCondition.open.rawValue)
 		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: mainObjectContext)
 		return try! mainObjectContext.count(for: f)

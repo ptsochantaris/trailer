@@ -9,15 +9,14 @@ final class PRStatus: DataItem {
 	@NSManaged var pullRequest: PullRequest
 
 	class func syncStatuses(from data: [[String : AnyObject]]?, pullRequest: PullRequest) {
-		items(with: data, type: "PRStatus", server: pullRequest.apiServer) { item, info, isNewOrUpdated in
+		items(with: data, type: PRStatus.self, server: pullRequest.apiServer) { item, info, isNewOrUpdated in
 			if isNewOrUpdated {
-				let s = item as! PRStatus
-				s.state = info["state"] as? String
-				s.targetUrl = info["target_url"] as? String
-				s.pullRequest = pullRequest
+				item.state = info["state"] as? String
+				item.targetUrl = info["target_url"] as? String
+				item.pullRequest = pullRequest
 
 				if let ds = info["description"] as? String {
-					s.descriptionText = ds.trim
+					item.descriptionText = ds.trim
 				}
 			}
 		}

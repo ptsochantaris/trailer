@@ -32,6 +32,10 @@ func S(_ s: String?) -> String {
 	return s ?? ""
 }
 
+func typeName(_ c: AnyClass) -> String {
+	return NSStringFromClass(c).components(separatedBy: ".").last!
+}
+
 typealias Completion = ()->Void
 
 let shortDateFormatter = { () -> DateFormatter in

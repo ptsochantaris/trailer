@@ -17,11 +17,11 @@ final class MenuBarSet {
 		self.viewCriterion = viewCriterion
 
 		prMenu = prMenuController.window as! MenuWindow
-		prMenu.itemDelegate = ItemDelegate(type: "PullRequest", sections: Section.prMenuTitles, removeButtonsInSections: [Section.merged.prMenuName, Section.closed.prMenuName], viewCriterion: viewCriterion)
+		prMenu.itemDelegate = ItemDelegate(type: PullRequest.self, sections: Section.prMenuTitles, removeButtonsInSections: [Section.merged.prMenuName, Section.closed.prMenuName], viewCriterion: viewCriterion)
 		prMenu.delegate = delegate
 
 		issuesMenu = issuesMenuController.window as! MenuWindow
-		issuesMenu.itemDelegate = ItemDelegate(type: "Issue", sections: Section.issueMenuTitles, removeButtonsInSections: [Section.closed.issuesMenuName], viewCriterion: viewCriterion)
+		issuesMenu.itemDelegate = ItemDelegate(type: Issue.self, sections: Section.issueMenuTitles, removeButtonsInSections: [Section.closed.issuesMenuName], viewCriterion: viewCriterion)
 		issuesMenu.delegate = delegate
 	}
 
@@ -87,7 +87,7 @@ final class MenuBarSet {
 	private static let normalText = [ NSFontAttributeName: NSFont.menuBarFont(ofSize: 10),
 	                                  NSForegroundColorAttributeName: NSColor.controlTextColor ]
 
-	private func updateMenu(of type: String,
+	private func updateMenu(of type: ListableItem.Type,
 	                        menu: MenuWindow,
 	                        lengthOffset: CGFloat,
 	                        totalCount: ()->Int,
@@ -100,9 +100,9 @@ final class MenuBarSet {
 		let preFilterCount: Int
 
 		if Settings.countOnlyListedItems {
-			let f = ListableItem.requestForItems(ofType: type, withFilter: menu.filter.stringValue, sectionIndex: -1, criterion: viewCriterion)
+			let f = ListableItem.requestForItems(of: type, withFilter: menu.filter.stringValue, sectionIndex: -1, criterion: viewCriterion)
 			countString = somethingFailed ? "X" : String(try! mainObjectContext.count(for: f))
-			let fc = ListableItem.requestForItems(ofType: type, withFilter: nil, sectionIndex: -1, criterion: viewCriterion)
+			let fc = ListableItem.requestForItems(of: type, withFilter: nil, sectionIndex: -1, criterion: viewCriterion)
 			preFilterCount = try! mainObjectContext.count(for: fc)
 		} else {
 			preFilterCount = totalCount()
@@ -112,7 +112,7 @@ final class MenuBarSet {
 		DLog("Updating \(type) menu, \(countString) total items")
 
 		let itemLabel = viewCriterion?.label
-		let disable = itemLabel != nil && preFilterCount == 0 && !(forceVisible && type == "PullRequest")
+		let disable = itemLabel != nil && preFilterCount == 0 && !(forceVisible && type == PullRequest.self)
 
 		if disable {
 			menu.hideStatusItem()
@@ -149,7 +149,7 @@ final class MenuBarSet {
 
 		if Repo.interestedInIssues(fromServerWithId: viewCriterion?.apiServerId) {
 
-			updateMenu(of: "Issue", menu: issuesMenu, lengthOffset: 2, totalCount: { () -> Int in
+			updateMenu(of: Issue.self, menu: issuesMenu, lengthOffset: 2, totalCount: { () -> Int in
 				return Issue.countOpen(in: mainObjectContext)
 			}, hasUnread: { [weak self] () -> Bool in
 				return Issue.badgeCount(in: mainObjectContext, criterion: self?.viewCriterion) > 0
@@ -167,7 +167,7 @@ final class MenuBarSet {
 		let sid = viewCriterion?.apiServerId
 		if forceVisible || Repo.interestedInPrs(fromServerWithId: sid) || !Repo.interestedInIssues(fromServerWithId: sid) {
 
-			updateMenu(of: "PullRequest", menu: prMenu, lengthOffset: 0, totalCount: { () -> Int in
+			updateMenu(of: PullRequest.self, menu: prMenu, lengthOffset: 0, totalCount: { () -> Int in
 				return PullRequest.countOpen(in: mainObjectContext)
 			}, hasUnread: { [weak self] () -> Bool in
 				return PullRequest.badgeCount(in: mainObjectContext, criterion: self?.viewCriterion) > 0

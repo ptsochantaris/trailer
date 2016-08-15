@@ -16,32 +16,31 @@ final class PullRequest: ListableItem {
 	@NSManaged var statuses: Set<PRStatus>
 
 	class func syncPullRequests(from data: [[String : AnyObject]]?, in repo: Repo) {
-		items(with: data, type: "PullRequest", server: repo.apiServer) { item, info, isNewOrUpdated in
-			let p = item as! PullRequest
+		items(with: data, type: PullRequest.self, server: repo.apiServer) { item, info, isNewOrUpdated in
 			if isNewOrUpdated {
 
-				p.baseSync(from: info, in: repo)
+				item.baseSync(from: info, in: repo)
 
-				p.mergeable = (info["mergeable"] as? NSNumber)?.boolValue ?? true
+				item.mergeable = (info["mergeable"] as? NSNumber)?.boolValue ?? true
 
 				if let linkInfo = info["_links"] as? [String : AnyObject] {
-					p.issueCommentLink = linkInfo["comments"]?["href"] as? String
-					p.reviewCommentLink = linkInfo["review_comments"]?["href"] as? String
-					p.statusesLink = linkInfo["statuses"]?["href"] as? String
-					p.issueUrl = linkInfo["issue"]?["href"] as? String
+					item.issueCommentLink = linkInfo["comments"]?["href"] as? String
+					item.reviewCommentLink = linkInfo["review_comments"]?["href"] as? String
+					item.statusesLink = linkInfo["statuses"]?["href"] as? String
+					item.issueUrl = linkInfo["issue"]?["href"] as? String
 				}
 
-				api.refreshesSinceLastLabelsCheck[p.objectID] = nil
-				api.refreshesSinceLastStatusCheck[p.objectID] = nil
+				api.refreshesSinceLastLabelsCheck[item.objectID] = nil
+				api.refreshesSinceLastStatusCheck[item.objectID] = nil
 			}
-			p.reopened = p.condition == ItemCondition.closed.rawValue
-			p.condition = ItemCondition.open.rawValue
+			item.reopened = item.condition == ItemCondition.closed.rawValue
+			item.condition = ItemCondition.open.rawValue
 		}
 	}
 
 	#if os(iOS)
 	override var searchKeywords: [String] {
-		return ["PR","Pull Request","PRs","Pull Requests"] + super.searchKeywords
+		return ["PR", "Pull Request", "PRs", "Pull Requests"] + super.searchKeywords
 	}
 	#endif
 
@@ -102,7 +101,7 @@ final class PullRequest: ListableItem {
 	}
 
 	class func badgeCount(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
-		let f = requestForItems(ofType: "PullRequest", withFilter: nil, sectionIndex: -1, criterion: criterion)
+		let f = requestForItems(of: PullRequest.self, withFilter: nil, sectionIndex: -1, criterion: criterion)
 		return badgeCount(from: f, in: moc)
 	}
 

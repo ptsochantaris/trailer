@@ -482,8 +482,8 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 		guard let menuBarSet = menuBarSet(for: window) else { return }
 
-		let type = window === menuBarSet.prMenu ? "PullRequest" : "Issue"
-		let f = ListableItem.requestForItems(ofType: type, withFilter: window.filter.stringValue, sectionIndex: -1, criterion: menuBarSet.viewCriterion)
+		let type: ListableItem.Type = (window === menuBarSet.prMenu) ? PullRequest.self : Issue.self
+		let f = ListableItem.requestForItems(of: type, withFilter: window.filter.stringValue, sectionIndex: -1, criterion: menuBarSet.viewCriterion)
 		for r in try! mainObjectContext.fetch(f) {
 			r.catchUpWithComments()
 		}

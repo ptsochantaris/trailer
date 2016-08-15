@@ -30,7 +30,7 @@ class SummaryRow: NSObject, PopulatableRow {
 	@IBOutlet weak var issueIcon: WKInterfaceImage!
 
 	var rowType: String {
-		return NSStringFromClass(self.dynamicType).components(separatedBy: ".").last!
+		return typeName(self.dynamicType)
 	}
 	
 	var data: [String : AnyObject]?

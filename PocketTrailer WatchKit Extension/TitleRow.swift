@@ -9,7 +9,7 @@ final class TitleRow: NSObject, PopulatableRow {
 		}
 	}
 	var rowType: String {
-		return NSStringFromClass(self.dynamicType).components(separatedBy: ".").last!
+		return typeName(self.dynamicType)
 	}
 	
 	@IBOutlet weak var titleL: WKInterfaceLabel!

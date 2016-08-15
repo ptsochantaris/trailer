@@ -84,19 +84,19 @@ final class DataManager {
 		ApiServer.resetSyncOfEverything()
 
 		DLog("Marking all unspecified (nil) announced flags as announced")
-		for i in DataItem.allItems(ofType: "PullRequest", in: mainObjectContext) as! [PullRequest] {
+		for i in DataItem.allItems(of: PullRequest.self, in: mainObjectContext) {
 			if i.value(forKey: "announced") == nil {
 				i.announced = true
 			}
 		}
-		for i in DataItem.allItems(ofType: "Issue", in: mainObjectContext) as! [Issue] {
+		for i in DataItem.allItems(of: Issue.self, in: mainObjectContext) {
 			if i.value(forKey: "announced") == nil {
 				i.announced = true
 			}
 		}
 
 		DLog("Migrating display policies")
-		for r in DataItem.allItems(ofType: "Repo", in: mainObjectContext) as! [Repo] {
+		for r in DataItem.allItems(of: Repo.self, in: mainObjectContext) {
 			if let markedAsHidden = r.value(forKey: "hidden")?.boolValue, markedAsHidden == true {
 				r.displayPolicyForPrs = RepoDisplayPolicy.hide.rawValue
 				r.displayPolicyForIssues = RepoDisplayPolicy.hide.rawValue
@@ -150,8 +150,8 @@ final class DataManager {
 
 	class func sendNotificationsIndexAndSave() {
 
-		func processItems(ofType type: String, newNotification: NotificationType, reopenedNotification: NotificationType, assignmentNotification: NotificationType) -> [ListableItem] {
-			let allItems = DataItem.allItems(ofType: type, in: mainObjectContext) as! [ListableItem]
+		func processItems<T: ListableItem>(of type: T.Type, newNotification: NotificationType, reopenedNotification: NotificationType, assignmentNotification: NotificationType) -> [T] {
+			let allItems = DataItem.allItems(of: type, in: mainObjectContext)
 			for i in allItems {
 				if i.isVisibleOnMenu {
 					if !i.createdByMe {
@@ -180,16 +180,16 @@ final class DataManager {
 			return allItems
 		}
 
-		let allPrs = processItems(ofType: "PullRequest", newNotification: .newPr, reopenedNotification: .prReopened, assignmentNotification: .newPrAssigned)
-		let allIssues = processItems(ofType: "Issue", newNotification: .newIssue, reopenedNotification: .issueReopened, assignmentNotification: .newIssueAssigned)
+		let allPrs = processItems(of: PullRequest.self, newNotification: .newPr, reopenedNotification: .prReopened, assignmentNotification: .newPrAssigned)
+		let allIssues = processItems(of: Issue.self, newNotification: .newIssue, reopenedNotification: .issueReopened, assignmentNotification: .newIssueAssigned)
 
-		let latestComments = PRComment.newItems(ofType: "PRComment", in: mainObjectContext) as! [PRComment]
+		let latestComments = PRComment.newItems(of: PRComment.self, in: mainObjectContext)
 		for c in latestComments {
 			c.processNotifications()
 			c.postSyncAction = PostSyncAction.doNothing.rawValue
 		}
 
-		let latestStatuses = PRStatus.newItems(ofType: "PRStatus", in: mainObjectContext) as! [PRStatus]
+		let latestStatuses = PRStatus.newItems(of: PRStatus.self, in: mainObjectContext)
 		if Settings.notifyOnStatusUpdates {
 			var coveredPrs = Set<NSManagedObjectID>()
 			for s in latestStatuses {
@@ -276,10 +276,10 @@ final class DataManager {
 	}
 
 	class func postProcessAllItems() {
-		for p in DataItem.allItems(ofType: "PullRequest", in: mainObjectContext) as! [PullRequest] {
+		for p in DataItem.allItems(of: PullRequest.self, in: mainObjectContext) {
 			p.postProcess()
 		}
-		for i in DataItem.allItems(ofType: "Issue", in: mainObjectContext) as! [Issue] {
+		for i in DataItem.allItems(of: Issue.self, in: mainObjectContext) {
 			i.postProcess()
 		}
 	}

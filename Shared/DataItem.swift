@@ -14,20 +14,20 @@ class DataItem: NSManagedObject {
 		apiServer.resetSyncState()
 	}
 
-	final class func allItems(ofType type: String, in moc: NSManagedObjectContext) -> [DataItem] {
-		let f = NSFetchRequest<DataItem>(entityName: type)
+	final class func allItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext) -> [T] {
+		let f = NSFetchRequest<T>(entityName: typeName(type))
 		f.returnsObjectsAsFaults = false
 		return try! moc.fetch(f)
 	}
 
-	final class func allItems(ofType type: String, server: ApiServer) -> [DataItem] {
-		let f = NSFetchRequest<DataItem>(entityName: type)
+	final class func allItems<T: DataItem>(of type: T.Type, in server: ApiServer) -> [T] {
+		let f = NSFetchRequest<T>(entityName: typeName(type))
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "apiServer == %@", server)
 		return try! server.managedObjectContext!.fetch(f)
 	}
 
-	final class func items(with data: [[String : AnyObject]]?, type: String, server: ApiServer, postProcessCallback: (DataItem, [String : AnyObject], Bool)->Void) {
+	final class func items<T: DataItem>(with data: [[String : AnyObject]]?, type: T.Type, server: ApiServer, postProcessCallback: (T, [String : AnyObject], Bool)->Void) {
 
 		guard let infos = data, infos.count > 0 else { return }
 
@@ -43,7 +43,8 @@ class DataItem: NSManagedObject {
 
 		if idsOfItems.count == 0 { return }
 
-		let f = NSFetchRequest<DataItem>(entityName: type)
+		let entityName = typeName(type)
+		let f = NSFetchRequest<T>(entityName: entityName)
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format:"serverId in %@ and apiServer == %@", idsOfItems.map { NSNumber(value: $0) }, server)
 		let existingItems = try! server.managedObjectContext?.fetch(f) ?? []
@@ -54,7 +55,7 @@ class DataItem: NSManagedObject {
 				idsOfItems.remove(at: idx)
 				let updatedDate = parseGH8601(info["updated_at"] as? String) ?? Date()
 				if updatedDate != i.updatedAt {
-					DLog("Updating %@: %lld", type, serverId)
+					DLog("Updating %@: %lld", entityName, serverId)
 					i.postSyncAction = PostSyncAction.noteUpdated.rawValue
 					i.updatedAt = updatedDate
 					postProcessCallback(i, info, true)
@@ -68,8 +69,8 @@ class DataItem: NSManagedObject {
 
 		for serverId in idsOfItems {
 			if let info = idsToInfo[serverId] {
-				DLog("Creating %@: %lld", type, serverId)
-				let i = NSEntityDescription.insertNewObject(forEntityName: type, into: server.managedObjectContext!) as! DataItem
+				DLog("Creating %@: %lld", entityName, serverId)
+				let i = NSEntityDescription.insertNewObject(forEntityName: entityName, into: server.managedObjectContext!) as! T
 				i.serverId = serverId
 				i.postSyncAction = PostSyncAction.noteNew.rawValue
 				i.apiServer = server
@@ -82,8 +83,8 @@ class DataItem: NSManagedObject {
 		}
 	}
 
-	final class func items(ofType type: String, surviving: Bool, in moc: NSManagedObjectContext) -> [DataItem] {
-		let f = NSFetchRequest<DataItem>(entityName: type)
+	final class func items<T: DataItem>(of type: T.Type, surviving: Bool, in moc: NSManagedObjectContext) -> [T] {
+		let f = NSFetchRequest<T>(entityName: typeName(type))
 		if surviving {
 			f.returnsObjectsAsFaults = false
 			f.predicate = NSPredicate(format: "postSyncAction != %lld", PostSyncAction.delete.rawValue)
@@ -94,45 +95,53 @@ class DataItem: NSManagedObject {
 		return try! moc.fetch(f)
 	}
 
-	final class func newOrUpdatedItems(ofType type: String, in moc: NSManagedObjectContext) -> [DataItem] {
-		let f = NSFetchRequest<DataItem>(entityName: type)
+	final class func newOrUpdatedItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext) -> [T] {
+		let f = NSFetchRequest<T>(entityName: typeName(type))
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "postSyncAction = %lld or postSyncAction = %lld", PostSyncAction.noteNew.rawValue, PostSyncAction.noteUpdated.rawValue)
 		return try! moc.fetch(f)
 	}
 
-	final class func updatedItems(ofType type: String, in moc: NSManagedObjectContext) -> [DataItem] {
-		let f = NSFetchRequest<DataItem>(entityName: type)
+	final class func updatedItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext) -> [T] {
+		let f = NSFetchRequest<T>(entityName: typeName(type))
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "postSyncAction = %lld", PostSyncAction.noteUpdated.rawValue)
 		return try! moc.fetch(f)
 	}
 
-	final class func newItems(ofType type: String, in moc: NSManagedObjectContext) -> [DataItem] {
-		let f = NSFetchRequest<DataItem>(entityName: type)
+	final class func newItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext) -> [T] {
+		let f = NSFetchRequest<T>(entityName: typeName(type))
 		f.returnsObjectsAsFaults = false
 		f.predicate = NSPredicate(format: "postSyncAction = %lld", PostSyncAction.noteNew.rawValue)
 		return try! moc.fetch(f)
 	}
 
 	final class func nukeDeletedItems(in moc: NSManagedObjectContext) {
-		let types = ["Repo", "PullRequest", "PRStatus", "PRComment", "PRLabel", "Issue", "Team"]
-		var count = 0
-		for type in types {
-			let discarded = items(ofType: type, surviving: false, in: moc)
+
+		func nukeDeletedItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext) -> Int {
+			let discarded = items(of: type, surviving: false, in: moc)
 			if discarded.count > 0 {
-				count += discarded.count
-				DLog("Nuking %d %@ items marked for deletion", discarded.count, type)
+				DLog("Nuking %d %@ items marked for deletion", discarded.count, typeName(type))
 				for i in discarded {
 					moc.delete(i)
 				}
 			}
+			return discarded.count
 		}
+
+		var count = 0
+		count += nukeDeletedItems(of: Repo.self, in: moc)
+		count += nukeDeletedItems(of: PullRequest.self, in: moc)
+		count += nukeDeletedItems(of: PRStatus.self, in: moc)
+		count += nukeDeletedItems(of: PRComment.self, in: moc)
+		count += nukeDeletedItems(of: PRLabel.self, in: moc)
+		count += nukeDeletedItems(of: Issue.self, in: moc)
+		count += nukeDeletedItems(of: Team.self, in: moc)
 		DLog("Nuked total %d items marked for deletion", count)
 	}
 
-	final class func countItems(ofType type: String, in moc: NSManagedObjectContext) -> Int {
-		let f = NSFetchRequest<DataItem>(entityName: type)
+	final class func countItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext) -> Int {
+		let f = NSFetchRequest<T>(entityName: typeName(type))
 		return try! moc.count(for: f)
 	}
 

@@ -110,10 +110,10 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 	func pickerViewController(picker: PickerViewController, didSelectIndexPath: IndexPath) {
 		Settings.autoSnoozeDuration = didSelectIndexPath.row
 		table.reloadData()
-		for p in DataItem.allItems(ofType: "PullRequest", in: mainObjectContext) as! [PullRequest] {
+		for p in DataItem.allItems(of: PullRequest.self, in: mainObjectContext) {
 			p.wakeIfAutoSnoozed()
 		}
-		for i in DataItem.allItems(ofType: "Issue", in: mainObjectContext) as! [Issue] {
+		for i in DataItem.allItems(of: Issue.self, in: mainObjectContext) {
 			i.wakeIfAutoSnoozed()
 		}
 		DataManager.postProcessAllItems()

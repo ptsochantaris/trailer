@@ -37,16 +37,15 @@ final class Repo: DataItem {
 				return true
 			}
 		}
-		items(with: filteredData, type: "Repo", server: server) { item, info, newOrUpdated in
+		items(with: filteredData, type: Repo.self, server: server) { item, info, newOrUpdated in
 			if newOrUpdated {
-				let r = item as! Repo
-				r.fullName = info["full_name"] as? String
-				r.fork = (info["fork"] as? NSNumber)?.boolValue ?? false
-				r.webUrl = info["html_url"] as? String
-				r.dirty = true
-				r.inaccessible = false
-				r.ownerId = (info["owner"]?["id"] as? NSNumber)?.int64Value ?? 0
-				r.lastDirtied = Date()
+				item.fullName = info["full_name"] as? String
+				item.fork = (info["fork"] as? NSNumber)?.boolValue ?? false
+				item.webUrl = info["html_url"] as? String
+				item.dirty = true
+				item.inaccessible = false
+				item.ownerId = (info["owner"]?["id"] as? NSNumber)?.int64Value ?? 0
+				item.lastDirtied = Date()
 			}
 		}
 	}
@@ -105,10 +104,10 @@ final class Repo: DataItem {
 
 	class func interestedInIssues(fromServerWithId id: NSManagedObjectID? = nil) -> Bool {
 		let all: [Repo]
-		if let aid = id, let a = existingObject(with: aid) as? ApiServer {
-			all = Repo.allItems(ofType: "Repo", server: a) as! [Repo]
+		if let aid = id, let apiServer = existingObject(with: aid) as? ApiServer {
+			all = Repo.allItems(of: Repo.self, in: apiServer)
 		} else {
-			all = Repo.allItems(ofType: "Repo", in: mainObjectContext) as! [Repo]
+			all = Repo.allItems(of: Repo.self, in: mainObjectContext)
 		}
 		for r in all {
 			if r.displayPolicyForIssues > 0 {
@@ -120,10 +119,10 @@ final class Repo: DataItem {
 
 	class func interestedInPrs(fromServerWithId id: NSManagedObjectID? = nil) -> Bool {
 		let all: [Repo]
-		if let aid = id, let a = existingObject(with: aid) as? ApiServer {
-			all = Repo.allItems(ofType: "Repo", server: a) as! [Repo]
+		if let aid = id, let apiServer = existingObject(with: aid) as? ApiServer {
+			all = Repo.allItems(of: Repo.self, in: apiServer)
 		} else {
-			all = Repo.allItems(ofType: "Repo", in: mainObjectContext) as! [Repo]
+			all = Repo.allItems(of: Repo.self, in: mainObjectContext)
 		}
 		for r in all {
 			if r.displayPolicyForPrs > 0 {
@@ -134,7 +133,7 @@ final class Repo: DataItem {
 	}
 
 	class var allGroupLabels: [String] {
-		let allRepos = allItems(ofType: "Repo", in: mainObjectContext) as! [Repo]
+		let allRepos = allItems(of: Repo.self, in: mainObjectContext)
 		let labels = allRepos.flatMap { $0.shouldSync ? $0.groupLabel : nil }
 		return Set<String>(labels).sorted()
 	}

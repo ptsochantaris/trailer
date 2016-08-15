@@ -9,18 +9,17 @@ final class Team: DataItem {
 
 	class func syncTeams(from data: [[String : AnyObject]]?, server: ApiServer) {
 
-		items(with: data, type: "Team", server: server) { item, info, isNewOrUpdated in
-			let t = item as! Team
+		items(with: data, type: Team.self, server: server) { item, info, isNewOrUpdated in
 			let slug = S(info["slug"] as? String)
 			let org = S(info["organization"]?["login"] as? String)
-			t.slug = slug
-			t.organisationLogin = org
+			item.slug = slug
+			item.organisationLogin = org
 			if slug.isEmpty || org.isEmpty {
-				t.calculatedReferral = nil
+				item.calculatedReferral = nil
 			} else {
-				t.calculatedReferral = "@\(org)/\(slug)"
+				item.calculatedReferral = "@\(org)/\(slug)"
 			}
-			t.postSyncAction = PostSyncAction.doNothing.rawValue
+			item.postSyncAction = PostSyncAction.doNothing.rawValue
 		}
 	}
 }

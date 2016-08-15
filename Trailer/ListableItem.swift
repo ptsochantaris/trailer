@@ -599,43 +599,7 @@ class ListableItem: DataItem {
 		return nil
 	}
 
-	final class func serverPredicate(fromFilter string: String) -> NSPredicate? {
-		return buildOrPredicate(fromFilter: string, expectedLength: 7, format: "apiServer.label contains[cd] %@", numeric: false)
-	}
-
-	final class func titlePredicate(fromFilter string: String) -> NSPredicate? {
-		return buildOrPredicate(fromFilter: string, expectedLength: 6, format: "title contains[cd] %@", numeric: false)
-	}
-
-	final class func milestonePredicate(fromFilter string: String) -> NSPredicate? {
-		return buildOrPredicate(fromFilter: string, expectedLength: 10, format: "milestone contains[cd] %@", numeric: false)
-	}
-
-	final class func assigneePredicate(fromFilter string: String) -> NSPredicate? {
-		return buildOrPredicate(fromFilter: string, expectedLength: 9, format: "assigneeName contains[cd] %@", numeric: false)
-	}
-
-	final class func numberPredicate(fromFilter string: String) -> NSPredicate? {
-		return buildOrPredicate(fromFilter: string, expectedLength: 7, format: "number == %llu", numeric: true)
-	}
-
-    final class func repoPredicate(fromFilter string: String) -> NSPredicate? {
-		return buildOrPredicate(fromFilter: string, expectedLength: 5, format: "repo.fullName contains[cd] %@", numeric: false)
-    }
-
-    final class func labelPredicate(fromFilter string: String) -> NSPredicate? {
-		return buildOrPredicate(fromFilter: string, expectedLength: 6, format: "SUBQUERY(labels, $label, $label.name contains[cd] %@).@count > 0", numeric: false)
-    }
-
-    final class func statusPredicate(fromFilter string: String) -> NSPredicate? {
-		return buildOrPredicate(fromFilter: string, expectedLength: 7, format: "SUBQUERY(statuses, $status, $status.descriptionText contains[cd] %@).@count > 0", numeric: false)
-    }
-
-    final class func userPredicate(fromFilter string: String) -> NSPredicate? {
-		return buildOrPredicate(fromFilter: string, expectedLength: 5, format: "userLogin contains[cd] %@", numeric: false)
-    }
-
-	final class func requestForItems(ofType itemType: String, withFilter: String?, sectionIndex: Int64, criterion: GroupingCriterion? = nil, onlyUnread: Bool = false) -> NSFetchRequest<ListableItem> {
+	final class func requestForItems<T: ListableItem>(of itemType: T.Type, withFilter: String?, sectionIndex: Int64, criterion: GroupingCriterion? = nil, onlyUnread: Bool = false) -> NSFetchRequest<T> {
 
 		var andPredicates = [NSPredicate]()
 
@@ -672,6 +636,42 @@ class ListableItem: DataItem {
 					}
 				} while(foundOne)
             }
+
+			func serverPredicate(fromFilter string: String) -> NSPredicate? {
+				return buildOrPredicate(fromFilter: string, expectedLength: 7, format: "apiServer.label contains[cd] %@", numeric: false)
+			}
+
+			func titlePredicate(fromFilter string: String) -> NSPredicate? {
+				return buildOrPredicate(fromFilter: string, expectedLength: 6, format: "title contains[cd] %@", numeric: false)
+			}
+
+			func milestonePredicate(fromFilter string: String) -> NSPredicate? {
+				return buildOrPredicate(fromFilter: string, expectedLength: 10, format: "milestone contains[cd] %@", numeric: false)
+			}
+
+			func assigneePredicate(fromFilter string: String) -> NSPredicate? {
+				return buildOrPredicate(fromFilter: string, expectedLength: 9, format: "assigneeName contains[cd] %@", numeric: false)
+			}
+
+			func numberPredicate(fromFilter string: String) -> NSPredicate? {
+				return buildOrPredicate(fromFilter: string, expectedLength: 7, format: "number == %llu", numeric: true)
+			}
+
+			func repoPredicate(fromFilter string: String) -> NSPredicate? {
+				return buildOrPredicate(fromFilter: string, expectedLength: 5, format: "repo.fullName contains[cd] %@", numeric: false)
+			}
+
+			func labelPredicate(fromFilter string: String) -> NSPredicate? {
+				return buildOrPredicate(fromFilter: string, expectedLength: 6, format: "SUBQUERY(labels, $label, $label.name contains[cd] %@).@count > 0", numeric: false)
+			}
+
+			func statusPredicate(fromFilter string: String) -> NSPredicate? {
+				return buildOrPredicate(fromFilter: string, expectedLength: 7, format: "SUBQUERY(statuses, $status, $status.descriptionText contains[cd] %@).@count > 0", numeric: false)
+			}
+
+			func userPredicate(fromFilter string: String) -> NSPredicate? {
+				return buildOrPredicate(fromFilter: string, expectedLength: 5, format: "userLogin contains[cd] %@", numeric: false)
+			}
 
 			check(forPredicate: "title", titlePredicate)
             check(forPredicate: "server", serverPredicate)
@@ -730,7 +730,7 @@ class ListableItem: DataItem {
 				if Settings.includeLabelsInFilter {
 					checkOr("SUBQUERY(labels, $label, $label.name contains[cd] %@).@count > 0", numeric: false)
 				}
-				if itemType == "PullRequest" && Settings.includeStatusesInFilter {
+				if itemType == PullRequest.self && Settings.includeStatusesInFilter {
 					checkOr("SUBQUERY(statuses, $status, $status.descriptionText contains[cd] %@).@count > 0", numeric: false)
 				}
 
@@ -762,7 +762,7 @@ class ListableItem: DataItem {
 
 		//DLog("%@", andPredicates)
 
-		let f = NSFetchRequest<ListableItem>(entityName: itemType)
+		let f = NSFetchRequest<T>(entityName: typeName(itemType))
 		f.fetchBatchSize = 100
 		let p = NSCompoundPredicate(andPredicateWithSubpredicates: andPredicates)
 		add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: mainObjectContext)

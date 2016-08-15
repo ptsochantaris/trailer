@@ -10,25 +10,25 @@ final class Issue: ListableItem {
 
 	class func syncIssues(from data: [[String : AnyObject]]?, in repo: Repo) {
 		let filteredData = data?.filter { $0["pull_request"] == nil } // don't sync issues which are pull requests, they are already synced
-		items(with: filteredData, type: "Issue", server: repo.apiServer) { item, info, isNewOrUpdated in
-			let i = item as! Issue
+		items(with: filteredData, type: Issue.self, server: repo.apiServer) { item, info, isNewOrUpdated in
+
 			if isNewOrUpdated {
 
-				i.baseSync(from: info, in: repo)
+				item.baseSync(from: info, in: repo)
 
 				if let R = repo.fullName {
-					i.commentsLink = "/repos/\(R)/issues/\(i.number)/comments"
+					item.commentsLink = "/repos/\(R)/issues/\(item.number)/comments"
 				}
 
-				for l in i.labels {
+				for l in item.labels {
 					l.postSyncAction = PostSyncAction.delete.rawValue
 				}
 
 				let labelList = info["labels"] as? [[String : AnyObject]]
-				PRLabel.syncLabels(from: labelList, withParent: i)
+				PRLabel.syncLabels(from: labelList, withParent: item)
 			}
-			i.reopened = i.condition == ItemCondition.closed.rawValue
-			i.condition = ItemCondition.open.rawValue
+			item.reopened = item.condition == ItemCondition.closed.rawValue
+			item.condition = ItemCondition.open.rawValue
 		}
 	}
 
@@ -39,7 +39,7 @@ final class Issue: ListableItem {
 
 	#if os(iOS)
 	override var searchKeywords: [String] {
-		return ["Issue","Issues"] + super.searchKeywords
+		return ["Issue", "Issues"] + super.searchKeywords
 	}
 	#endif
 
@@ -60,7 +60,7 @@ final class Issue: ListableItem {
 	}
 
 	class func badgeCount(in moc: NSManagedObjectContext, criterion: GroupingCriterion?) -> Int {
-		let f = requestForItems(ofType: "Issue", withFilter: nil, sectionIndex: -1, criterion: criterion)
+		let f = requestForItems(of: Issue.self, withFilter: nil, sectionIndex: -1, criterion: criterion)
 		return badgeCount(from: f, in: moc)
 	}
 

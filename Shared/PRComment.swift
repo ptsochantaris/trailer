@@ -12,29 +12,27 @@ final class PRComment: DataItem {
 	@NSManaged var issue: Issue?
 
 	class func syncComments(from data: [[String : AnyObject]]?, pullRequest: PullRequest) {
-		items(with: data, type: "PRComment", server: pullRequest.apiServer) { item, info, newOrUpdated in
+		items(with: data, type: PRComment.self, server: pullRequest.apiServer) { item, info, newOrUpdated in
 			if newOrUpdated {
-				let c = item as! PRComment
-				c.pullRequest = pullRequest
-				c.fill(from: info)
-				c.fastForwardIfNeeded(parent: pullRequest)
+				item.pullRequest = pullRequest
+				item.fill(from: info)
+				item.fastForwardIfNeeded(parent: pullRequest)
 			}
 		}
 	}
 
 	class func syncComments(from data: [[String : AnyObject]]?, issue: Issue) {
-		items(with: data, type: "PRComment", server: issue.apiServer) { item, info, newOrUpdated in
+		items(with: data, type: PRComment.self, server: issue.apiServer) { item, info, newOrUpdated in
 			if newOrUpdated {
-				let c = item as! PRComment
-				c.issue = issue
-				c.fill(from: info)
-				c.fastForwardIfNeeded(parent: issue)
+				item.issue = issue
+				item.fill(from: info)
+				item.fastForwardIfNeeded(parent: issue)
 			}
 		}
 	}
 
 	func fastForwardIfNeeded(parent item: ListableItem) {
-		// check if we're assigned to a just created issue, in which case we want to "fast forward" its latest comment dates to our own if we're newer
+		// Check if we're assigned to a newly created issue, in which case we want to "fast forward" its latest comment date to our own, if ours is newer
 		if let commentCreation = createdAt, item.postSyncAction == PostSyncAction.noteNew.rawValue {
 			if let latestReadDate = item.latestReadCommentDate, latestReadDate < commentCreation {
 				item.latestReadCommentDate = commentCreation

@@ -16,12 +16,12 @@ private let _propertiesToFetch = { ()->[AnyObject] in
 final class ItemDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 
 	private var itemIds = [NSObject]()
-	private let type: String
+	private let type: ListableItem.Type
 	private let sections: [String]
 	private let removalSections: [String]
 	private let viewCriterion: GroupingCriterion?
 
-	init(type: String, sections: [String], removeButtonsInSections: [String], viewCriterion: GroupingCriterion?) {
+	init(type: ListableItem.Type, sections: [String], removeButtonsInSections: [String], viewCriterion: GroupingCriterion?) {
 
 		self.type = type
 		self.sections = sections
@@ -36,7 +36,7 @@ final class ItemDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 
 		itemIds.removeAll(keepingCapacity: false)
 
-		let f = ListableItem.requestForItems(ofType: type, withFilter: filter, sectionIndex: -1, criterion: viewCriterion)
+		let f = ListableItem.requestForItems(of: type, withFilter: filter, sectionIndex: -1, criterion: viewCriterion)
 		f.resultType = .dictionaryResultType
 		f.fetchBatchSize = 0
 		f.propertiesToFetch = _propertiesToFetch
