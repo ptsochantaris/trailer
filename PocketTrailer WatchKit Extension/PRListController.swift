@@ -24,7 +24,7 @@ final class PRListController: CommonController {
 
 	override func awake(withContext context: AnyObject?) {
 
-		let c = context as! [NSObject : AnyObject]
+		let c = context as! [String : AnyObject]
 		sectionIndex = (c[SECTION_KEY] as! NSNumber).int64Value
 		type = c[TYPE_KEY] as! String
 		onlyUnread = c[UNREAD_KEY] as! Bool
@@ -93,7 +93,7 @@ final class PRListController: CommonController {
 
 	private var progressiveLoading = false
 
-	override func update(from response: [NSString : AnyObject]) {
+	override func update(from response: [String : AnyObject]) {
 
 		let page = response["result"] as! [[String : AnyObject]]
 

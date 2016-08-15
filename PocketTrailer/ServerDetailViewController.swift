@@ -173,7 +173,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 	func keyboardWillShow(notification: NSNotification) {
 		if focusedField?.superview == nil { return }
 
-		if let info = notification.userInfo as [NSObject : AnyObject]?, let keyboardFrameValue = info[UIKeyboardFrameEndUserInfoKey] as? NSValue {
+		if let info = notification.userInfo, let keyboardFrameValue = info[UIKeyboardFrameEndUserInfoKey] as? NSValue {
 			let keyboardFrame = keyboardFrameValue.cgRectValue
 			let keyboardHeight = max(0, view.bounds.size.height-keyboardFrame.origin.y)
 			let firstResponderFrame = view.convert(focusedField!.frame, from: focusedField!.superview)

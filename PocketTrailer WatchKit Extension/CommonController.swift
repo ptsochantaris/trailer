@@ -80,7 +80,7 @@ class CommonController: WKInterfaceController {
 		}
 	}
 
-	func update(from response: [NSString : AnyObject]) {
+	func update(from response: [String : AnyObject]) {
 		// for subclassing
 	}
 

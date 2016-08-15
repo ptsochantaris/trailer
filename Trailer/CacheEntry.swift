@@ -8,8 +8,8 @@ struct CacheUnit {
 	let headers: Data
 	let lastFetched: Date
 
-	var actualHeaders: [NSObject : AnyObject] {
-		return NSKeyedUnarchiver.unarchiveObject(with: headers) as! [NSObject : AnyObject]
+	var actualHeaders: [String : AnyObject] {
+		return NSKeyedUnarchiver.unarchiveObject(with: headers) as! [String : AnyObject]
 	}
 
 	var parsedData: AnyObject? {

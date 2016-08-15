@@ -14,7 +14,7 @@ final class PRDetailController: CommonController {
 		_statusLabel = statusLabel
 		_table = table
 
-		let c = context as! [NSObject : AnyObject]
+		let c = context as! [String : AnyObject]
 		itemId = c[ITEM_KEY] as! String
 
 		super.awake(withContext: context)
@@ -41,7 +41,7 @@ final class PRDetailController: CommonController {
 		requestData(command: "openItem")
 	}
 
-	override func update(from response: [NSString : AnyObject]) {
+	override func update(from response: [String : AnyObject]) {
 
 		table.removeRows(at: IndexSet(integersIn: NSMakeRange(0, table.numberOfRows).toRange()!))
 
@@ -50,7 +50,7 @@ final class PRDetailController: CommonController {
 
 		var rowCount = 0
 
-		if let statuses = itemInfo["statuses"] as? [[NSString : AnyObject]] {
+		if let statuses = itemInfo["statuses"] as? [[String : AnyObject]] {
 			table.insertRows(at: IndexSet(integersIn: NSMakeRange(rowCount, statuses.count).toRange() ?? 0..<0), withRowType: "StatusRow")
 			for status in statuses {
 				if let s = table.rowController(at: rowCount) as? StatusRow {

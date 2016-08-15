@@ -27,12 +27,12 @@ class DataItem: NSManagedObject {
 		return try! server.managedObjectContext!.fetch(f)
 	}
 
-	final class func items(with data: [[NSObject : AnyObject]]?, type: String, server: ApiServer, postProcessCallback: (DataItem, [NSObject : AnyObject], Bool)->Void) {
+	final class func items(with data: [[String : AnyObject]]?, type: String, server: ApiServer, postProcessCallback: (DataItem, [String : AnyObject], Bool)->Void) {
 
-		guard let infos=data, infos.count > 0 else { return }
+		guard let infos = data, infos.count > 0 else { return }
 
 		var idsOfItems = [Int64]()
-		var idsToInfo = [Int64 : [NSObject : AnyObject]]()
+		var idsToInfo = [Int64 : [String : AnyObject]]()
 		for info in infos {
 			if let serverId = info["id"] as? NSNumber {
 				let sid = serverId.int64Value

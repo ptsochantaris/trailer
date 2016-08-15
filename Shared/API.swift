@@ -962,7 +962,7 @@ final class API {
 			if let issueLink = p.issueUrl {
 				getData(in: issueLink, from: apiServer) { data, lastPage, resultCode in
 					if resultCode == 200 || resultCode == 404 || resultCode == 410 {
-						p.processAssignmentStatus(from: data as? [NSObject : AnyObject])
+						p.processAssignmentStatus(from: data as? [String : AnyObject])
 					} else {
 						apiServer.lastSyncSucceeded = false
 					}
@@ -999,8 +999,8 @@ final class API {
 
 		getData(in: path, from: pullRequest.apiServer) { [weak self] data, lastPage, resultCode in
 
-			if let d = data as? [NSObject : AnyObject] {
-				if let mergeInfo = d["merged_by"] as? [NSObject : AnyObject], let mergeUserId = mergeInfo["id"] as? NSNumber {
+			if let d = data as? [String : AnyObject] {
+				if let mergeInfo = d["merged_by"] as? [String : AnyObject], let mergeUserId = mergeInfo["id"] as? NSNumber {
 					self?.handleMerging(of: pullRequest, byUserId: mergeUserId.int64Value)
 				} else {
 					self?.handleClosing(of: pullRequest)
@@ -1072,7 +1072,7 @@ final class API {
 				let epochSeconds = Int64(S(allHeaders["X-RateLimit-Reset"] as? String)) ?? 0
 				callback(requestsRemaining, requestLimit, epochSeconds)
 			} else {
-				if code == 404 && data != nil && !((data as? [NSObject : AnyObject])?["message"] as? String == "Not Found") {
+				if code == 404 && data != nil && !((data as? [String : AnyObject])?["message"] as? String == "Not Found") {
 					callback(10000, 10000, 0)
 				} else {
 					callback(-1, -1, -1)
@@ -1155,7 +1155,7 @@ final class API {
 			if apiServer.goodToGo {
 				getData(in: "/user", from: apiServer) { data, lastPage, resultCode in
 
-					if let d = data as? [NSObject : AnyObject] {
+					if let d = data as? [String : AnyObject] {
 						apiServer.userName = d["login"] as? String
 						apiServer.userId = (d["id"] as? NSNumber)?.int64Value ?? 0
 					} else {
@@ -1180,7 +1180,7 @@ final class API {
 		clearAllBadLinks()
 		api(call: "/user", on: apiServer, ignoreLastSync: true) { [weak self] code, headers, data, error, shouldRetry in
 
-			if let d = data as? [NSObject : AnyObject], let userName = d["login"] as? String, let userId = d["id"] as? NSNumber, error == nil {
+			if let d = data as? [String : AnyObject], let userName = d["login"] as? String, let userId = d["id"] as? NSNumber, error == nil {
 				if userName.isEmpty || userId.int64Value <= 0 {
 					let localError = self?.apiError("Could not read a valid user record from this endpoint")
 					callback(localError)
@@ -1203,7 +1203,7 @@ final class API {
 		at path: String,
 		from server: ApiServer,
 		startingFrom page: Int = 1,
-		perPageCallback: (data: [[NSObject : AnyObject]]?, lastPage: Bool) -> Bool,
+		perPageCallback: (data: [[String : AnyObject]]?, lastPage: Bool) -> Bool,
 		finalCallback: (success: Bool, resultCode: Int64) -> Void) {
 
 		if path.isEmpty {
@@ -1219,7 +1219,7 @@ final class API {
 		getData(in: p, from: server) {
 			[weak self] data, lastPage, resultCode in
 
-			if let d = data as? [[NSObject : AnyObject]] {
+			if let d = data as? [[String : AnyObject]] {
 				var isLastPage = lastPage
 				if perPageCallback(data: d, lastPage: lastPage) { isLastPage = true }
 				if isLastPage {
@@ -1497,7 +1497,7 @@ final class API {
 		}
 
 		if Settings.dumpAPIResponsesInConsole, let d = data {
-			DLog("API data from %@: %@", urlPath, NSString(data: d, encoding: String.Encoding.utf8.rawValue))
+			DLog("API data from %@: %@", urlPath, String(bytes: d, encoding: .utf8))
 		}
 
 		completion(code: code, headers: headers, data: parsedData, error: error, shouldRetry: shouldRetry)

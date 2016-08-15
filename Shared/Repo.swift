@@ -17,24 +17,24 @@ final class Repo: DataItem {
 	@NSManaged var issues: Set<Issue>
 	@NSManaged var ownerId: Int64
 
-	class func syncRepos(from data: [[NSObject : AnyObject]]?, server: ApiServer) {
-		var filteredData = [[NSObject : AnyObject]]()
-		for info in data ?? [] {
+	class func syncRepos(from data: [[String : AnyObject]]?, server: ApiServer) {
+		let filteredData = data?.filter { info -> Bool in
 			if (info["private"] as? NSNumber)?.boolValue ?? false {
-				if let permissions = info["permissions"] as? [NSObject : AnyObject] {
+				if let permissions = info["permissions"] as? [String : AnyObject] {
 
 					let pull = (permissions["pull"] as? NSNumber)?.boolValue ?? false
 					let push = (permissions["push"] as? NSNumber)?.boolValue ?? false
 					let admin = (permissions["admin"] as? NSNumber)?.boolValue ?? false
 
 					if	pull || push || admin {
-						filteredData.append(info)
+						return true
 					} else {
 						DLog("Watched private repository '%@' seems to be inaccessible, skipping", info["full_name"] as? String)
 					}
 				}
+				return false
 			} else {
-				filteredData.append(info)
+				return true
 			}
 		}
 		items(with: filteredData, type: "Repo", server: server) { item, info, newOrUpdated in

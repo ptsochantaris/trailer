@@ -63,7 +63,7 @@ final class SectionController: CommonController {
 			API_URI_KEY: r.apiServerUri! ] )
 	}
 
-	override func update(from response: [NSString : AnyObject]) {
+	override func update(from response: [String : AnyObject]) {
 		super.update(from: response)
 		updateUI()
 	}

@@ -281,7 +281,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		r *= 255.0
 		g *= 255.0
 		b *= 255.0
-		return NSString(format: "%02X%02X%02X", Int(r), Int(g), Int(b)) as String
+		return String(format: "%02X%02X%02X", Int(r), Int(g), Int(b))
 	}
 
 	/////////////////////////////
