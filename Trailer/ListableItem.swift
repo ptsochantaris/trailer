@@ -767,7 +767,8 @@ class ListableItem: DataItem {
 	#if os(iOS)
 	var searchKeywords: [String] {
 		let labelNames = labels.flatMap { $0.name }
-		return [(userLogin ?? "NO_USERNAME"), "Trailer", "PocketTrailer", "Pocket Trailer"] + labelNames + (repo.fullName?.components(separatedBy: "/") ?? [])
+		let orgAndRepo = repo.fullName?.components(separatedBy: "/") ?? []
+		return [(userLogin ?? "NO_USERNAME"), "Trailer", "PocketTrailer", "Pocket Trailer"] + labelNames + orgAndRepo
 	}
 	final var searchTitle: String {
 		let labelNames = labels.flatMap { $0.name }
@@ -812,20 +813,24 @@ class ListableItem: DataItem {
 
 	class func reasonForEmpty(with filterValue: String?, criterion: GroupingCriterion?, openItemCount: Int) -> NSAttributedString {
 
-		var color = COLOR_CLASS.lightGray
-		var message: String = ""
+		let color: COLOR_CLASS
+		let message: String
 
 		if !ApiServer.someServersHaveAuthTokens(in: mainObjectContext) {
 			color = COLOR_CLASS(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)
 			message = "There are no configured API servers in your settings, please ensure you have added at least one server with a valid API token."
 		} else if appIsRefreshing {
+			color = COLOR_CLASS.lightGray
 			message = "Refreshing information, please wait a moment..."
 		} else if !S(filterValue).isEmpty {
+			color = COLOR_CLASS.lightGray
 			message = "There are no items matching this filter."
 		} else if openItemCount > 0 {
+			color = COLOR_CLASS.lightGray
 			message = "Some items are hidden by your settings."
 		} else if !Repo.anyVisibleRepos(in: mainObjectContext, criterion: criterion, excludeGrouped: true) {
 			if Repo.anyVisibleRepos(in: mainObjectContext) {
+				color = COLOR_CLASS.lightGray
 				message = "There are no repositories that are currently visible in this category."
 			} else {
 				color = COLOR_CLASS(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)
@@ -835,7 +840,11 @@ class ListableItem: DataItem {
 			color = COLOR_CLASS(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)
 			message = "All your watched repositories are marked as hidden, please enable issues or PRs on at least one."
 		} else if openItemCount==0 {
+			color = COLOR_CLASS.lightGray
 			message = "No open items in your configured repositories."
+		} else {
+			color = COLOR_CLASS.lightGray
+			message = ""
 		}
 
 		return styleForEmpty(message: message, color: color)

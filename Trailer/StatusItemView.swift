@@ -8,7 +8,14 @@ final class StatusItemView: NSView {
 	var statusLabel = ""
 	var labelOffset: CGFloat = 0
 	var title: String?
-	var grayOut = false
+
+	var grayOut = false {
+		didSet {
+			if grayOut != oldValue {
+				needsDisplay = true
+			}
+		}
+	}
 
 	var highlighted = false {
 		didSet {
