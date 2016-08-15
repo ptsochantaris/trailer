@@ -674,7 +674,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		var relatedItem: ListableItem?
 
 		if let commentId = DataManager.id(for: userInfo[COMMENT_ID_KEY] as? String), let c = existingObject(with: commentId) as? PRComment {
-			relatedItem = c.pullRequest ?? c.issue
+			relatedItem = c.parent
 			if urlToOpen == nil {
 				urlToOpen = c.webUrl
 			}
@@ -757,7 +757,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		{
 			if let url = comment.webUrl {
 				var ip: IndexPath?
-				if let item = comment.pullRequest ?? comment.issue {
+				if let item = comment.parent {
 					selectTabFor(i: item)
 					ip = fetchedResultsController.indexPath(forObject: item)
 					item.catchUpWithComments()

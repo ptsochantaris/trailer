@@ -253,21 +253,18 @@ final class DataManager {
 		switch type {
 		case .newMention, .newComment:
 			let uri = item.objectID.uriRepresentation().absoluteString
-			let parent = (item as! PRComment).pullRequest ?? (item as! PRComment).issue
+			let parent = (item as! PRComment).parent
 			let parentUri = parent?.objectID.uriRepresentation().absoluteString ?? ""
 			return [COMMENT_ID_KEY: uri, LISTABLE_URI_KEY: parentUri]
-		case .newPr, .prReopened, .newPrAssigned, .prClosed, .prMerged:
+		case .newPr, .prReopened, .newPrAssigned, .prClosed, .prMerged, .newIssue, .issueReopened, .newIssueAssigned, .issueClosed:
 			let uri = item.objectID.uriRepresentation().absoluteString
-			return [NOTIFICATION_URL_KEY: (item as! PullRequest).webUrl!, LISTABLE_URI_KEY: uri]
+			return [NOTIFICATION_URL_KEY: (item as! ListableItem).webUrl!, LISTABLE_URI_KEY: uri]
 		case .newRepoSubscribed, .newRepoAnnouncement:
 			return [NOTIFICATION_URL_KEY: (item as! Repo).webUrl!]
 		case .newStatus:
 			let pr = (item as! PRStatus).pullRequest
 			let uri = pr.objectID.uriRepresentation().absoluteString
 			return [NOTIFICATION_URL_KEY: pr.webUrl!, LISTABLE_URI_KEY: uri]
-		case .newIssue, .issueReopened, .newIssueAssigned, .issueClosed:
-			let uri = item.objectID.uriRepresentation().absoluteString
-			return [NOTIFICATION_URL_KEY: (item as! Issue).webUrl!, LISTABLE_URI_KEY: uri]
 		}
 	}
 

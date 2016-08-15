@@ -396,7 +396,7 @@ final class API {
 			t.postSyncAction = PostSyncAction.delete.rawValue
 		}
 
-		getPagedData(at: "/user/teams", from: server, startingFromPage: 1, perPageCallback: { data, lastPage in
+		getPagedData(at: "/user/teams", from: server, perPageCallback: { data, lastPage in
 			Team.syncTeams(from: data, server: server)
 			return false
 		}) { success, resultCode in
@@ -423,7 +423,7 @@ final class API {
 		let userName = S(server.userName)
 		let serverLabel = S(server.label)
 
-		getPagedData(at: "/users/\(userName)/events", from: server, startingFromPage: 1, perPageCallback: { data, lastPage in
+		getPagedData(at: "/users/\(userName)/events", from: server, perPageCallback: { data, lastPage in
 			for d in data ?? [] {
 				let eventDate = parseGH8601(d["created_at"] as? String) ?? Date.distantPast
 				if latestDate! < eventDate {
@@ -468,7 +468,7 @@ final class API {
 		let userName = S(server.userName)
 		let serverLabel = S(server.label)
 
-		getPagedData(at: "/users/\(userName)/received_events", from: server, startingFromPage: 1, perPageCallback: { data, lastPage in
+		getPagedData(at: "/users/\(userName)/received_events", from: server, perPageCallback: { data, lastPage in
 			for d in data ?? [] {
 				let eventDate = parseGH8601(d["created_at"] as? String) ?? Date.distantPast
 				if latestDate! < eventDate {
@@ -564,7 +564,7 @@ final class API {
 
 			if apiServer.lastSyncSucceeded && r.displayPolicyForPrs != RepoDisplayPolicy.hide.rawValue {
 				let repoFullName = S(r.fullName)
-				getPagedData(at: "/repos/\(repoFullName)/pulls", from: apiServer, startingFromPage: 1, perPageCallback: { data, lastPage in
+				getPagedData(at: "/repos/\(repoFullName)/pulls", from: apiServer, perPageCallback: { data, lastPage in
 					PullRequest.syncPullRequests(from: data, in: r)
 					return false
 				}) { [weak self] success, resultCode in
@@ -628,7 +628,7 @@ final class API {
 
 			if apiServer.lastSyncSucceeded && r.displayPolicyForIssues != RepoDisplayPolicy.hide.rawValue {
 				let repoFullName = S(r.fullName)
-				getPagedData(at: "/repos/\(repoFullName)/issues", from: apiServer, startingFromPage: 1, perPageCallback: { data, lastPage in
+				getPagedData(at: "/repos/\(repoFullName)/issues", from: apiServer, perPageCallback: { data, lastPage in
 					Issue.syncIssues(from: data, in: r)
 					return false
 				}) { [weak self] success, resultCode in
@@ -688,7 +688,7 @@ final class API {
 
 					let apiServer = p.apiServer
 
-					getPagedData(at: link, from: apiServer, startingFromPage: 1, perPageCallback: { data, lastPage in
+					getPagedData(at: link, from: apiServer, perPageCallback: { data, lastPage in
 						PRComment.syncComments(from: data, pullRequest: p)
 						return false
 					}) { success, resultCode in
@@ -739,7 +739,7 @@ final class API {
 
 				let apiServer = i.apiServer
 
-				getPagedData(at: link, from: apiServer, startingFromPage: 1, perPageCallback: { data, lastPage in
+				getPagedData(at: link, from: apiServer, perPageCallback: { data, lastPage in
 					PRComment.syncComments(from: data, issue: i)
 					return false
 				}) { success, resultCode in
@@ -797,7 +797,7 @@ final class API {
 
 			if let link = p.labelsLink {
 
-				getPagedData(at: link, from: p.apiServer, startingFromPage: 1, perPageCallback: { data, lastPage in
+				getPagedData(at: link, from: p.apiServer, perPageCallback: { data, lastPage in
 					PRLabel.syncLabels(from: data, withParent: p)
 					return false
 				}) { [weak self] success, resultCode in
@@ -863,7 +863,7 @@ final class API {
 			let apiServer = p.apiServer
 
 			if let statusLink = p.statusesLink {
-				getPagedData(at: statusLink, from: apiServer, startingFromPage: 1, perPageCallback: { data, lastPage in
+				getPagedData(at: statusLink, from: apiServer, perPageCallback: { data, lastPage in
 					PRStatus.syncStatuses(from: data, pullRequest: p)
 					return false
 				}) { [weak self] success, resultCode in
@@ -1130,7 +1130,7 @@ final class API {
 			return
 		}
 
-		getPagedData(at: "/user/subscriptions", from: server, startingFromPage: 1, perPageCallback: { data, lastPage in
+		getPagedData(at: "/user/subscriptions", from: server, perPageCallback: { data, lastPage in
 			Repo.syncRepos(from: data, server: server)
 			return false
 		}) { success, resultCode in
@@ -1202,7 +1202,7 @@ final class API {
 	private func getPagedData(
 		at path: String,
 		from server: ApiServer,
-		startingFromPage: Int,
+		startingFrom page: Int = 1,
 		perPageCallback: (data: [[NSObject : AnyObject]]?, lastPage: Bool) -> Bool,
 		finalCallback: (success: Bool, resultCode: Int64) -> Void) {
 
@@ -1215,7 +1215,7 @@ final class API {
 			return
 		}
 
-		let p = startingFromPage > 1 ? "\(path)?page=\(startingFromPage)" : path
+		let p = page > 1 ? "\(path)?page=\(page)" : path
 		getData(in: p, from: server) {
 			[weak self] data, lastPage, resultCode in
 
@@ -1225,7 +1225,7 @@ final class API {
 				if isLastPage {
 					finalCallback(success: true, resultCode: resultCode)
 				} else {
-					self?.getPagedData(at: path, from: server, startingFromPage: startingFromPage+1, perPageCallback: perPageCallback, finalCallback: finalCallback)
+					self?.getPagedData(at: path, from: server, startingFrom: page+1, perPageCallback: perPageCallback, finalCallback: finalCallback)
 				}
 			} else {
 				finalCallback(success: false, resultCode: resultCode)
@@ -1236,16 +1236,8 @@ final class API {
 	private func getData(
 		in path: String,
 		from server: ApiServer,
-		callback:(data: AnyObject?, lastPage: Bool, resultCode: Int64) -> Void) {
-
-		attemptToGetData(in: path, from: server, callback: callback, attemptCount: 0)
-	}
-
-	private func attemptToGetData(
-		in path: String,
-		from server: ApiServer,
-		callback:(data: AnyObject?, lastPage: Bool, resultCode: Int64) -> Void,
-		attemptCount: Int) {
+		attemptCount: Int = 0,
+		callback: (data: AnyObject?, lastPage: Bool, resultCode: Int64) -> Void) {
 
 		api(call: path, on: server, ignoreLastSync: false) { [weak self] c, headers, data, error, shouldRetry in
 
@@ -1285,7 +1277,7 @@ final class API {
 					let nextAttemptCount = attemptCount+1
 					DLog("(%@) Will retry failed API call to %@ (attempt #%d)", S(server.label), path, nextAttemptCount)
 					delay(2.0) {
-						self?.attemptToGetData(in: path, from: server, callback: callback, attemptCount: nextAttemptCount)
+						self?.getData(in: path, from: server, attemptCount: nextAttemptCount, callback: callback)
 					}
 				} else {
 					if shouldRetry {
@@ -1302,9 +1294,9 @@ final class API {
 	private var apiRunningCount = 0
 	private var apiCallQueue = [Completion]()
 	#if os(iOS)
-	let maxApiOperations = (sizeof(Int.self) == sizeof(Int64.self)) ? 8 : 2
+	private let maxApiOperations = (sizeof(Int.self) == sizeof(Int64.self)) ? 8 : 2
 	#else
-	let maxApiOperations = 8
+	private let maxApiOperations = 8
 	#endif
 
 	private func api(
@@ -1381,10 +1373,10 @@ final class API {
 			}
 		}
 
-		/////////////////////// 60 second dumb-caching
 		let cacheKey = "\(server.objectID.uriRepresentation().absoluteString) \(expandedPath)"
 		let previousCacheEntry = CacheEntry.entry(for: cacheKey)?.cacheUnit // move data out of thread-specific context
 		if let p = previousCacheEntry {
+			/////////////////////// 60 second dumb-caching
 			if p.lastFetched.timeIntervalSince1970 > Date(timeIntervalSinceNow: -60).timeIntervalSince1970, let parsedData = p.parsedData {
 				DLog("(%@) GET %@ - CACHED", apiServerLabel, expandedPath)
 				handleResponse(with: p.data,
@@ -1394,7 +1386,6 @@ final class API {
 				               code: p.code,
 				               error: nil,
 				               shouldRetry: false,
-				               badServerResponse: false,
 				               existingBackOff: nil,
 				               headers: p.actualHeaders,
 				               completion: completion)
@@ -1409,16 +1400,19 @@ final class API {
 
 		let task = urlSession.dataTask(with: r) { [weak self] data, res, e in
 
+			guard let S = self else { return }
+
 			let response = res as? HTTPURLResponse
-			var parsedData: AnyObject?
-			var error = e as? NSError
-			var badServerResponse = false
+			let parsedData: AnyObject?
+			let error: NSError?
+			let shouldRetry: Bool
 			var code = Int64(response?.statusCode ?? 0)
-			var shouldRetry = false
 			var headers = response?.allHeaderFields
 
 			if code == 304, let p = previousCacheEntry {
+				error = nil
 				parsedData = p.parsedData
+				shouldRetry = false
 				code = p.code
 				headers = p.actualHeaders
 				atNextEvent {
@@ -1426,27 +1420,34 @@ final class API {
 				}
 				DLog("(%@) GET %@ - NO CHANGE (304): %lld", apiServerLabel, expandedPath, code)
 			} else if code > 299 {
-				error = self?.apiError("Server responded with \(code)")
-				badServerResponse = true
+				error = S.apiError("Server responded with error \(code)")
+				parsedData = nil
+				shouldRetry = false
 			} else if code == 0 {
-				shouldRetry = error?.code == -1001 // timeout
-				error = self?.apiError("Server did not repond")
+				error = S.apiError("Server did not repond")
+				parsedData = nil
+				shouldRetry = (e as? NSError)?.code == -1001 // retry if it was a timeout
 			} else if (response?.expectedContentLength ?? 0) > Int64(data?.count ?? 0) {
+				error = S.apiError("Server data was truncated")
+				parsedData = nil
 				shouldRetry = true // truncation
-				error = self?.apiError("Server data was truncated")
 			} else {
 				DLog("(%@) GET %@ - RESULT: %lld", apiServerLabel, expandedPath, code)
-				if let d = data {
-					parsedData = try? JSONSerialization.jsonObject(with: d, options: [])
-					if let h = headers, let e = h["Etag"] as? String {
+				error = e as? NSError
+				shouldRetry = false
+				if let data = data {
+					parsedData = try? JSONSerialization.jsonObject(with: data, options: [])
+					if let headers = headers, let etag = headers["Etag"] as? String {
 						atNextEvent {
-							CacheEntry.setEntry(key: cacheKey, code: code, etag: e, data: d, headers: h)
+							CacheEntry.setEntry(key: cacheKey, code: code, etag: etag, data: data, headers: headers)
 						}
 					}
+				} else {
+					parsedData = nil
 				}
 			}
 
-			atNextEvent(self) { S in
+			atNextEvent {
 				S.handleResponse(with: data,
 				                 parsedData: parsedData,
 				                 serverLabel: apiServerLabel,
@@ -1454,7 +1455,6 @@ final class API {
 				                 code: code,
 				                 error: error,
 				                 shouldRetry: shouldRetry,
-				                 badServerResponse: badServerResponse,
 				                 existingBackOff: existingBackOff,
 				                 headers: headers,
 				                 completion: completion)
@@ -1474,12 +1474,11 @@ final class API {
 	                            code: Int64,
 	                            error: NSError?,
 	                            shouldRetry: Bool,
-	                            badServerResponse: Bool,
 	                            existingBackOff: UrlBackOffEntry?,
 	                            headers: [NSObject : AnyObject]?,
 	                            completion: ApiCompletion) {
 		if error != nil {
-			if badServerResponse {
+			if code > 399 {
 				if var backoff = existingBackOff {
 					DLog("(%@) Extending backoff for already throttled URL %@ by %f seconds", serverLabel, urlPath, backOffIncrement)
 					if backoff.nextIncrement < 3600.0 {

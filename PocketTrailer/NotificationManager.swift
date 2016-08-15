@@ -48,7 +48,8 @@ final class NotificationManager {
 		switch (type) {
 		case .newMention:
 			if let c = item as? PRComment {
-				if c.parentShouldSkipNotifications { return }
+				guard let parent = c.parent else { return }
+				if parent.shouldSkipNotifications { return }
 				notification.title = "@\(S(c.userName)) mentioned you:"
 				notification.subtitle = c.notificationSubtitle
 				if let b = c.body { notification.body = b }
@@ -56,7 +57,8 @@ final class NotificationManager {
 			}
 		case .newComment:
 			if let c = item as? PRComment {
-				if c.parentShouldSkipNotifications { return }
+				guard let parent = c.parent else { return }
+				if parent.shouldSkipNotifications { return }
 				notification.title = "@\(S(c.userName)) commented:"
 				notification.subtitle = c.notificationSubtitle
 				if let b = c.body { notification.body = b }
@@ -156,13 +158,12 @@ final class NotificationManager {
 			}
 		}
 
-		notification.userInfo = DataManager.info(for: type, item: item)
-
 		let t = S(notification.title)
 		let s = S(notification.subtitle)
 		let b = S(notification.body)
 		let identifier = "\(t) - \(s) - \(b)"
 
+		notification.userInfo = DataManager.info(for: type, item: item)
 
 		if let c = item as? PRComment, let url = c.avatarUrl, !Settings.hideAvatars {
 			_ = api.haveCachedAvatar(from: url) { image, cachePath in

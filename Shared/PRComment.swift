@@ -43,7 +43,7 @@ final class PRComment: DataItem {
 	}
 
 	func processNotifications() {
-		if let item = pullRequest ?? issue, item.postSyncAction == PostSyncAction.noteUpdated.rawValue && item.isVisibleOnMenu {
+		if let item = parent, item.postSyncAction == PostSyncAction.noteUpdated.rawValue && item.isVisibleOnMenu {
 			if contains(terms: ["@\(apiServer.userName!)"]) {
 				if item.isSnoozing && item.shouldWakeOnMention {
 					DLog("Waking up snoozed item ID %lld because of mention", item.serverId)
@@ -96,11 +96,8 @@ final class PRComment: DataItem {
 		return pullRequest?.title ?? issue?.title ?? "(untitled)"
 	}
 
-	var parentShouldSkipNotifications: Bool {
-		if let item = pullRequest ?? issue {
-			return item.shouldSkipNotifications
-		}
-		return false
+	var parent: ListableItem? {
+		return pullRequest ?? issue
 	}
 
 	var isMine: Bool {

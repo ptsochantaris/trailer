@@ -196,7 +196,6 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 
 		let notification = NSUserNotification()
-		notification.userInfo = DataManager.info(for: type, item: item)
 
 		func addPotentialExtraActions() {
 			if #available(OSX 10.10, *) {
@@ -210,14 +209,16 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		switch type {
 		case .newMention:
 			let c = item as! PRComment
-			if c.parentShouldSkipNotifications { return }
+			guard let parent = c.parent else { return }
+			if parent.shouldSkipNotifications { return }
 			notification.title = "@\(S(c.userName)) mentioned you:"
 			notification.subtitle = c.notificationSubtitle
 			notification.informativeText = c.body
 			addPotentialExtraActions()
 		case .newComment:
 			let c = item as! PRComment
-			if c.parentShouldSkipNotifications { return }
+			guard let parent = c.parent else { return }
+			if parent.shouldSkipNotifications { return }
 			notification.title = "@\(S(c.userName)) commented:"
 			notification.subtitle = c.notificationSubtitle
 			notification.informativeText = c.body
@@ -304,6 +305,8 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		let s = S(notification.subtitle)
 		let i = S(notification.informativeText)
 		notification.identifier = "\(t) - \(s) - \(i)"
+
+		notification.userInfo = DataManager.info(for: type, item: item)
 
 		let d = NSUserNotificationCenter.default
 		if let c = item as? PRComment, let url = c.avatarUrl, !Settings.hideAvatars {

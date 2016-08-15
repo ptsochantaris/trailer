@@ -775,7 +775,7 @@ class ListableItem: DataItem {
 		var comment: PRComment?
 		if let cid = notificationUserInfo[COMMENT_ID_KEY] as? String, let itemId = DataManager.id(for: cid), let c = existingObject(with: itemId) as? PRComment {
 			comment = c
-			item = c.pullRequest ?? c.issue
+			item = c.parent
 		} else if let pid = notificationUserInfo[LISTABLE_URI_KEY] as? String, let itemId = DataManager.id(for: pid) {
 			item = existingObject(with: itemId) as? ListableItem
 		}
