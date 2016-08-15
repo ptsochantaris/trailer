@@ -555,9 +555,9 @@ class ListableItem: DataItem {
 		return badgeCount
 	}
 
-	private final class func orPredicate(fromFilter string: String, expectedLength: Int, format: String, numeric: Bool) -> NSPredicate? {
-		if string.characters.count > expectedLength {
-			let items = string.substring(from: string.index(string.startIndex, offsetBy: expectedLength))
+	private final class func predicate(from token: String, termAt: Int, format: String, numeric: Bool) -> NSPredicate? {
+		if token.characters.count > termAt {
+			let items = token.substring(from: token.index(token.startIndex, offsetBy: termAt))
 			if !items.isEmpty {
 				var orTerms = [NSPredicate]()
 				var notTerms = [NSPredicate]()
@@ -599,6 +599,16 @@ class ListableItem: DataItem {
 		return nil
 	}
 
+	private static let filterTitlePredicate = "title contains[cd] %@"
+	private static let filterRepoPredicate = "repo.fullName contains[cd] %@"
+	private static let filterServerPredicate = "apiServer.label contains[cd] %@"
+	private static let filterUserPredicate = "userLogin contains[cd] %@"
+	private static let filterNumberPredicate = "number == %lld"
+	private static let filterMilestonePredicate = "milestone contains[cd] %@"
+	private static let filterAssigneePredicate = "assigneeName contains[cd] %@"
+	private static let filterLabelPredicate = "SUBQUERY(labels, $label, $label.name contains[cd] %@).@count > 0"
+	private static let filterStatusPredicate = "SUBQUERY(statuses, $status, $status.descriptionText contains[cd] %@).@count > 0"
+
 	final class func requestForItems<T: ListableItem>(of itemType: T.Type, withFilter: String?, sectionIndex: Int64, criterion: GroupingCriterion? = nil, onlyUnread: Bool = false) -> NSFetchRequest<T> {
 
 		var andPredicates = [NSPredicate]()
@@ -619,16 +629,17 @@ class ListableItem: DataItem {
 
 		if var fi = withFilter, !fi.isEmpty {
 
-            func check(forPredicate tagString: String, process: (String) -> NSPredicate?) {
+            func check(forTag tag: String, process: (String, Int) -> NSPredicate?) {
 				var foundOne: Bool
 				repeat {
 					foundOne = false
-					for word in fi.components(separatedBy: " ") {
-						if word.hasPrefix("\(tagString):") {
-							if let p = process(word) {
+					for token in fi.components(separatedBy: " ") {
+						let prefix = "\(tag):"
+						if token.hasPrefix(prefix) {
+							if let p = process(token, prefix.characters.count) {
 								andPredicates.append(p)
 							}
-							fi = fi.replacingOccurrences(of: word, with: "")
+							fi = fi.replacingOccurrences(of: token, with: "")
 							fi = fi.trim
 							foundOne = true
 							break
@@ -637,71 +648,41 @@ class ListableItem: DataItem {
 				} while(foundOne)
             }
 
-			check(forPredicate: "title")	{ orPredicate(fromFilter: $0, expectedLength:  6, format: "title contains[cd] %@", numeric: false) }
-			check(forPredicate: "server")	{ orPredicate(fromFilter: $0, expectedLength:  7, format: "apiServer.label contains[cd] %@", numeric: false) }
-			check(forPredicate: "repo")		{ orPredicate(fromFilter: $0, expectedLength:  5, format: "repo.fullName contains[cd] %@", numeric: false) }
-			check(forPredicate: "label")	{ orPredicate(fromFilter: $0, expectedLength:  6, format: "SUBQUERY(labels, $label, $label.name contains[cd] %@).@count > 0", numeric: false) }
-			check(forPredicate: "status")	{ orPredicate(fromFilter: $0, expectedLength:  7, format: "SUBQUERY(statuses, $status, $status.descriptionText contains[cd] %@).@count > 0", numeric: false) }
-			check(forPredicate: "user")		{ orPredicate(fromFilter: $0, expectedLength:  5, format: "userLogin contains[cd] %@", numeric: false) }
-			check(forPredicate: "number")	{ orPredicate(fromFilter: $0, expectedLength:  7, format: "number == %llu", numeric: true) }
-			check(forPredicate: "milestone"){ orPredicate(fromFilter: $0, expectedLength: 10, format: "milestone contains[cd] %@", numeric: false) }
-			check(forPredicate: "assignee")	{ orPredicate(fromFilter: $0, expectedLength:  9, format: "assigneeName contains[cd] %@", numeric: false) }
+			check(forTag: "title")		{ predicate(from: $0, termAt: $1, format: filterTitlePredicate, numeric: false) }
+			check(forTag: "repo")		{ predicate(from: $0, termAt: $1, format: filterRepoPredicate, numeric: false) }
+			check(forTag: "server")		{ predicate(from: $0, termAt: $1, format: filterServerPredicate, numeric: false) }
+			check(forTag: "user")		{ predicate(from: $0, termAt: $1, format: filterUserPredicate, numeric: false) }
+			check(forTag: "number")		{ predicate(from: $0, termAt: $1, format: filterNumberPredicate, numeric: true) }
+			check(forTag: "milestone")	{ predicate(from: $0, termAt: $1, format: filterMilestonePredicate, numeric: false) }
+			check(forTag: "assignee")	{ predicate(from: $0, termAt: $1, format: filterAssigneePredicate, numeric: false) }
+			check(forTag: "label")		{ predicate(from: $0, termAt: $1, format: filterLabelPredicate, numeric: false) }
+			check(forTag: "status")		{ predicate(from: $0, termAt: $1, format: filterStatusPredicate, numeric: false) }
 
 			if !fi.isEmpty {
-				var orPredicates = [NSPredicate]()
+				var predicates = [NSPredicate]()
 				let negative = fi.hasPrefix("!")
 
-				func checkOr(_ format: String, numeric: Bool) {
-					let predicate: NSPredicate
-					let string = negative ? fi.substring(from: fi.index(fi.startIndex, offsetBy: 1)) : fi
-					if numeric {
-						if let number = Int64(fi) {
-							predicate = NSPredicate(format: format, number)
-						} else {
-							return
-						}
-					} else {
-						predicate = NSPredicate(format: format, string)
-					}
-					if negative {
-						orPredicates.append(NSCompoundPredicate(notPredicateWithSubpredicate: predicate))
-					} else {
-						orPredicates.append(predicate)
+				func appendPredicate(format: String, numeric: Bool) {
+					if let p = predicate(from: fi, termAt: 0, format: format, numeric: numeric) {
+						predicates.append(p)
 					}
 				}
 
-				if Settings.includeTitlesInFilter {
-					checkOr("title contains[cd] %@", numeric: false)
-				}
-				if Settings.includeReposInFilter {
-					checkOr("repo.fullName contains[cd] %@", numeric: false)
-				}
-                if Settings.includeServersInFilter {
-					checkOr("apiServer.label contains [cd] %@", numeric: false)
-                }
-                if Settings.includeUsersInFilter {
-					checkOr("userLogin contains[cd] %@", numeric: false)
-                }
-				if Settings.includeNumbersInFilter {
-					checkOr("number == %llu", numeric: true)
-				}
-				if Settings.includeMilestonesInFilter {
-					checkOr("milestone contains[cd] %@", numeric: false)
-				}
-				if Settings.includeAssigneeNamesInFilter {
-					checkOr("assigneeName contains[cd] %@", numeric: false)
-				}
-				if Settings.includeLabelsInFilter {
-					checkOr("SUBQUERY(labels, $label, $label.name contains[cd] %@).@count > 0", numeric: false)
-				}
-				if itemType == PullRequest.self && Settings.includeStatusesInFilter {
-					checkOr("SUBQUERY(statuses, $status, $status.descriptionText contains[cd] %@).@count > 0", numeric: false)
-				}
+				if Settings.includeTitlesInFilter {			appendPredicate(format: filterTitlePredicate, numeric: false) }
+				if Settings.includeReposInFilter {			appendPredicate(format: filterRepoPredicate, numeric: false) }
+                if Settings.includeServersInFilter {		appendPredicate(format: filterServerPredicate, numeric: false) }
+                if Settings.includeUsersInFilter {			appendPredicate(format: filterUserPredicate, numeric: false) }
+				if Settings.includeNumbersInFilter {		appendPredicate(format: filterNumberPredicate, numeric: true) }
+				if Settings.includeMilestonesInFilter {		appendPredicate(format: filterMilestonePredicate, numeric: false) }
+				if Settings.includeAssigneeNamesInFilter {	appendPredicate(format: filterAssigneePredicate, numeric: false) }
+				if Settings.includeLabelsInFilter {			appendPredicate(format: filterLabelPredicate, numeric: false) }
+				if itemType == PullRequest.self
+					&& Settings.includeStatusesInFilter {	appendPredicate(format: filterStatusPredicate, numeric: false) }
 
 				if negative {
-					andPredicates.append(NSCompoundPredicate(andPredicateWithSubpredicates: orPredicates))
+					andPredicates.append(NSCompoundPredicate(andPredicateWithSubpredicates: predicates))
 				} else {
-					andPredicates.append(NSCompoundPredicate(orPredicateWithSubpredicates: orPredicates))
+					andPredicates.append(NSCompoundPredicate(orPredicateWithSubpredicates: predicates))
 				}
 			}
 		}
