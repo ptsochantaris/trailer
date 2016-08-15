@@ -243,7 +243,7 @@ final class API {
 
 			var completionCount = 0
 			let totalOperations = 2
-			let completionCallback: Completion = {
+			let completionCallback = {
 				completionCount += 1
 				if completionCount == totalOperations {
 					processingCallback?()
@@ -546,11 +546,12 @@ final class API {
 			}
 		}
 
-		if repos.count==0 {
+		let totalOperations = repos.count
+		if totalOperations == 0 {
 			callback()
 			return
 		}
-		let total = repos.count
+
 		var completionCount = 0
 		for r in repos {
 
@@ -572,13 +573,13 @@ final class API {
 						self?.handleRepoSyncFailure(repo: r, resultCode: resultCode)
 					}
 					completionCount += 1
-					if completionCount==total {
+					if completionCount == totalOperations {
 						callback()
 					}
 				}
 			} else {
 				completionCount += 1
-				if completionCount==total {
+				if completionCount == totalOperations {
 					callback()
 				}
 			}
@@ -610,11 +611,12 @@ final class API {
 			}
 		}
 
-		if repos.count==0 {
+		let totalOperations = repos.count
+		if totalOperations == 0 {
 			callback()
 			return
 		}
-		let total = repos.count
+
 		var completionCount = 0
 		for r in repos {
 
@@ -636,13 +638,13 @@ final class API {
 						self?.handleRepoSyncFailure(repo: r, resultCode: resultCode)
 					}
 					completionCount += 1
-					if completionCount==total {
+					if completionCount == totalOperations {
 						callback()
 					}
 				}
 			} else {
 				completionCount += 1
-				if completionCount==total {
+				if completionCount == totalOperations {
 					callback()
 				}
 			}
@@ -652,7 +654,7 @@ final class API {
 	private func fetchCommentsForCurrentPullRequests(to moc: NSManagedObjectContext, callback: Completion) {
 
 		let prs = DataItem.newOrUpdatedItems(of: PullRequest.self, in: moc).filter { $0.apiServer.lastSyncSucceeded }
-		if prs.count==0 {
+		if prs.count == 0 {
 			callback()
 			return
 		}
@@ -673,8 +675,8 @@ final class API {
 
 		func _fetchComments(for pullRequests: [PullRequest], issues: Bool, in moc: NSManagedObjectContext, callback: Completion) {
 
-			let total = pullRequests.count
-			if total==0 {
+			let totalOperations = pullRequests.count
+			if totalOperations == 0 {
 				callback()
 				return
 			}
@@ -694,13 +696,13 @@ final class API {
 						if !success {
 							apiServer.lastSyncSucceeded = false
 						}
-						if completionCount == total {
+						if completionCount == totalOperations {
 							callback()
 						}
 					}
 				} else {
 					completionCount += 1
-					if completionCount == total {
+					if completionCount == totalOperations {
 						callback()
 					}
 				}
@@ -723,8 +725,8 @@ final class API {
 
 		let issues = allIssues.filter { $0.apiServer.lastSyncSucceeded }
 
-		let total = issues.count
-		if total==0 {
+		let totalOperations = issues.count
+		if totalOperations == 0 {
 			callback()
 			return
 		}
@@ -745,13 +747,13 @@ final class API {
 					if !success {
 						apiServer.lastSyncSucceeded = false
 					}
-					if completionCount == total {
+					if completionCount == totalOperations {
 						callback()
 					}
 				}
 			} else {
 				completionCount += 1
-				if completionCount == total {
+				if completionCount == totalOperations {
 					callback()
 				}
 			}
@@ -780,8 +782,8 @@ final class API {
 			}
 		}
 
-		let total = prs.count
-		if total==0 {
+		let totalOperations = prs.count
+		if totalOperations == 0 {
 			callback()
 			return
 		}
@@ -812,7 +814,7 @@ final class API {
 					if allGood {
 						self?.refreshesSinceLastLabelsCheck[p.objectID] = 1
 					}
-					if completionCount == total {
+					if completionCount == totalOperations {
 						callback()
 					}
 				}
@@ -820,7 +822,7 @@ final class API {
 				// no labels link, so presumably no labels
 				refreshesSinceLastLabelsCheck[p.objectID] = 1
 				completionCount += 1
-				if completionCount == total {
+				if completionCount == totalOperations {
 					callback()
 				}
 			}
@@ -845,8 +847,8 @@ final class API {
 			}
 		}
 
-		let total = prs.count
-		if total==0 {
+		let totalOperations = prs.count
+		if totalOperations == 0 {
 			callback()
 			return
 		}
@@ -878,14 +880,14 @@ final class API {
 					if allGood {
 						self?.refreshesSinceLastStatusCheck[p.objectID] = 1
 					}
-					if completionCount==total {
+					if completionCount == totalOperations {
 						callback()
 					}
 				}
 			} else {
 				refreshesSinceLastStatusCheck[p.objectID] = 1
 				completionCount += 1
-				if completionCount==total {
+				if completionCount == totalOperations {
 					callback()
 				}
 			}
@@ -938,12 +940,13 @@ final class API {
 	private func detectAssignedPullRequests(in moc: NSManagedObjectContext, callback: Completion) {
 
 		let prs = DataItem.newOrUpdatedItems(of: PullRequest.self, in: moc).filter { $0.apiServer.lastSyncSucceeded }
-		if prs.count==0 {
+
+		let totalOperations = prs.count
+		if totalOperations == 0 {
 			callback()
 			return
 		}
 
-		let totalOperations = prs.count
 		var completionCount = 0
 
 		let completionCallback: Completion = {
@@ -1079,15 +1082,15 @@ final class API {
 
 	func updateLimitsFromServer() {
 		let allApiServers = ApiServer.allApiServers(in: mainObjectContext)
-		let total = allApiServers.count
-		var count = 0
+		let totalOperations = allApiServers.count
+		var completionCount = 0
 		for apiServer in allApiServers {
 			if apiServer.goodToGo {
 				getRateLimit(from: apiServer) { remaining, limit, reset in
 					apiServer.requestsRemaining = remaining
 					apiServer.requestsLimit = limit
-					count += 1
-					if count==total {
+					completionCount += 1
+					if completionCount == totalOperations {
 						NotificationCenter.default.post(name: ApiUsageUpdateNotification, object: apiServer, userInfo: nil)
 					}
 				}
@@ -1140,13 +1143,14 @@ final class API {
 	private func syncUserDetails(in moc: NSManagedObjectContext, callback: Completion) {
 
 		let allApiServers = ApiServer.allApiServers(in: moc)
-		let operationCount = allApiServers.count
-		if operationCount==0 {
+		let totalOperations = allApiServers.count
+		if totalOperations==0 {
 			callback()
 			return
 		}
 
 		var completionCount = 0
+
 		for apiServer in allApiServers {
 			if apiServer.goodToGo {
 				getData(in: "/user", from: apiServer) { data, lastPage, resultCode in
@@ -1158,11 +1162,11 @@ final class API {
 						apiServer.lastSyncSucceeded = false
 					}
 					completionCount += 1
-					if completionCount==operationCount { callback() }
+					if completionCount == totalOperations { callback() }
 				}
 			} else {
 				completionCount += 1
-				if completionCount==operationCount { callback() }
+				if completionCount == totalOperations { callback() }
 			}
 		}
 

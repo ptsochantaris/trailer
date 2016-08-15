@@ -36,7 +36,7 @@ func typeName(_ c: AnyClass) -> String {
 	return NSStringFromClass(c).components(separatedBy: ".").last!
 }
 
-typealias Completion = ()->Void
+typealias Completion = () -> Void
 
 let shortDateFormatter = { () -> DateFormatter in
 	let d = DateFormatter()
