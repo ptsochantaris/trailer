@@ -14,7 +14,7 @@ let api = API()
 //}
 //let _items = PullRequest.allItems(ofType: "PullRequest", in: mainObjectContext) as! [ListableItem]
 //for i in _items {
-//	i.latestReadCommentDate = Date.distantPast
+//	i.latestReadCommentDate = .distantPast
 //	for c in i.comments {
 //		mainObjectContext.deleteObject(c)
 //	}
@@ -26,7 +26,7 @@ let api = API()
 //_prs[0].condition = ItemCondition.Merged.rawValue
 //_prs[1].condition = ItemCondition.Closed.rawValue
 //for p in _prs {
-//	p.latestReadCommentDate = Date.distantPast
+//	p.latestReadCommentDate = .distantPast
 //	p.postProcess()
 //}
 

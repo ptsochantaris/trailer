@@ -303,7 +303,7 @@ final class DataManager {
 
 	private class var legacyFilesDirectory: URL {
 		let f = FileManager.default
-		let appSupportURL = f.urls(for: FileManager.SearchPathDirectory.applicationSupportDirectory, in: FileManager.SearchPathDomainMask.userDomainMask).last!
+		let appSupportURL = f.urls(for: .applicationSupportDirectory, in: .userDomainMask).last!
 		return appSupportURL.appendingPathComponent("com.housetrip.Trailer")
 	}
 

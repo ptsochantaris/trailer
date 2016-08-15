@@ -69,7 +69,7 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 					(lastView as? SectionController)?.resetUI()
 				}
 				updateComplications()
-				t.setTaskCompleted(restoredDefaultState: t.returnToDefaultState, estimatedSnapshotExpiration: Date.distantFuture, userInfo: nil)
+				t.setTaskCompleted(restoredDefaultState: t.returnToDefaultState, estimatedSnapshotExpiration: .distantFuture, userInfo: nil)
 			} else {
 				task.setTaskCompleted()
 			}

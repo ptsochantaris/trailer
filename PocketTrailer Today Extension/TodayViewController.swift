@@ -153,7 +153,7 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 			issuesLabel.attributedText = writeOutSection("issues")
 
 			let lastRefresh = result["lastUpdated"] as! Date
-			if lastRefresh == Date.distantPast {
+			if lastRefresh == .distantPast {
 				updatedLabel.attributedText = NSAttributedString(string: "Not updated yet", attributes: smallAttributes)
 			} else {
 				updatedLabel.attributedText = NSAttributedString(string: "Updated \(shortDateFormatter.string(from: lastRefresh))", attributes: smallAttributes)

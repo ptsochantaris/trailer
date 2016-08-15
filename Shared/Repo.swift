@@ -62,7 +62,7 @@ final class Repo: DataItem {
 	override func resetSyncState() {
 		super.resetSyncState()
 		dirty = true
-		lastDirtied = Date.distantPast
+		lastDirtied = .distantPast
 	}
 
 	class func repos(for group: String, in moc: NSManagedObjectContext) -> [Repo] {

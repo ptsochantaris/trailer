@@ -120,7 +120,7 @@ class TrailerCell: NSTableCellView {
 
 			if let snooze = item.snoozeUntil {
 				let title: String
-				if snooze == Date.distantFuture {
+				if snooze == .distantFuture {
 					title = String(format: "Wake")
 				} else {
 					title = String(format: "Wake (auto: %@)", itemDateFormatter.string(from: snooze))
@@ -187,7 +187,7 @@ class TrailerCell: NSTableCellView {
 
 	func markUnreadSelected() {
 		if let item = associatedDataItem {
-			item.latestReadCommentDate = Date.distantPast
+			item.latestReadCommentDate = .distantPast
 			item.postProcess()
 			saveAndRequestMenuUpdate(item)
 		}

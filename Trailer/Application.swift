@@ -33,7 +33,7 @@ final class Application: NSApplication {
 							if i.unreadComments > 0 {
 								i.catchUpWithComments()
 							} else {
-								i.latestReadCommentDate = Date.distantPast
+								i.latestReadCommentDate = .distantPast
 								i.postProcess()
 							}
 							DataManager.saveDB()

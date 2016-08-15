@@ -51,8 +51,8 @@ final class PRLabel: DataItem {
 				let i = NSEntityDescription.insertNewObject(forEntityName: "PRLabel", into: fromParent.managedObjectContext!) as! PRLabel
 				i.name = name
 				i.serverId = 0
-				i.updatedAt = Date.distantPast
-				i.createdAt = Date.distantPast
+				i.updatedAt = .distantPast
+				i.createdAt = .distantPast
 				i.apiServer = fromParent.apiServer
 				if let pr = fromParent as? PullRequest {
 					i.pullRequest = pr

@@ -171,11 +171,11 @@ final class ApiServer: NSManagedObject {
 
 	func resetSyncState() {
 		if app != nil {
-			lastRepoCheck = Date.distantPast
+			lastRepoCheck = .distantPast
 		}
 		lastSyncSucceeded = true
-		latestReceivedEventDateProcessed = Date.distantPast
-		latestUserEventDateProcessed = Date.distantPast
+		latestReceivedEventDateProcessed = .distantPast
+		latestUserEventDateProcessed = .distantPast
 	}
 
 	class var archivedApiServers: [String : [String : NSObject]] {

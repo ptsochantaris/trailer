@@ -43,7 +43,7 @@ class SummaryRow: NSObject, PopulatableRow {
 
 	func setSummary(from result: [String : AnyObject]) -> Bool {
 		data = result
-		if let lastRefresh = result["lastUpdated"] as? Date, lastRefresh != Date.distantPast {
+		if let lastRefresh = result["lastUpdated"] as? Date, lastRefresh != .distantPast {
 			return true
 		} else {
 			return false
@@ -97,7 +97,7 @@ class SummaryRow: NSObject, PopulatableRow {
 			unreadGroup.setAlpha(1.0)
 		}
 
-		if let lastRefresh = result["lastUpdated"] as? Date, lastRefresh != Date.distantPast {
+		if let lastRefresh = result["lastUpdated"] as? Date, lastRefresh != .distantPast {
 			lastUpdate.setText(shortDateFormatter.string(from: lastRefresh))
 		} else {
 			lastUpdate.setText("Not refreshed yet")

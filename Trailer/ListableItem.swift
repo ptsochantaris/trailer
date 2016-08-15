@@ -123,8 +123,8 @@ class ListableItem: DataItem {
 
 	final func sortedComments(using comparison: ComparisonResult) -> [PRComment] {
 		return Array(comments).sorted(by: { (c1, c2) -> Bool in
-			let d1 = c1.createdAt ?? Date.distantPast
-			let d2 = c2.createdAt ?? Date.distantPast
+			let d1 = c1.createdAt ?? .distantPast
+			let d2 = c2.createdAt ?? .distantPast
 			return d1.compare(d2) == comparison
 		})
 	}
@@ -228,7 +228,7 @@ class ListableItem: DataItem {
 	private final var shouldMoveToSnoozing: Bool {
 		if snoozeUntil == nil {
 			let d = TimeInterval(Settings.autoSnoozeDuration)
-			if d > 0 && !wasAwokenFromSnooze && updatedAt != NSDate.distantPast, let snoozeByDate = updatedAt?.addingTimeInterval(86400.0*d) {
+			if d > 0 && !wasAwokenFromSnooze && updatedAt != .distantPast, let snoozeByDate = updatedAt?.addingTimeInterval(86400.0*d) {
 				if snoozeByDate < Date() {
 					snoozeUntil = autoSnoozeDate
 					return true
@@ -374,7 +374,7 @@ class ListableItem: DataItem {
 		let showComments = !muted && (inLoudSection || Settings.showCommentsEverywhere)
 		if showComments {
 
-			var latestDate = latestReadCommentDate ?? Date.distantPast
+			var latestDate = latestReadCommentDate ?? .distantPast
 
 			if Settings.assumeReadItemIfUserHasNewerComments {
 				let f = NSFetchRequest<PRComment>(entityName: "PRComment")

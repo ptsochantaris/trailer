@@ -30,7 +30,7 @@ final class API {
 		currentNetworkStatus = n
 
 		let fileManager = FileManager.default
-		let appSupportURL = fileManager.urls(for: FileManager.SearchPathDirectory.cachesDirectory, in: FileManager.SearchPathDomainMask.userDomainMask).first!
+		let appSupportURL = fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
 		cacheDirectory = appSupportURL.appendingPathComponent("com.housetrip.Trailer").path
 
         #if DEBUG
@@ -122,7 +122,7 @@ final class API {
 				do {
 					let path = cacheDirectory.appending(pathComponent: f)
 					let attributes = try fileManager.attributesOfItem(atPath: path)
-					let date = attributes[FileAttributeKey.creationDate] as! Date
+					let date = attributes[.creationDate] as! Date
 					if now.timeIntervalSince(date) > (3600.0*24.0) {
 						try! fileManager.removeItem(atPath: path)
 					}
@@ -218,7 +218,7 @@ final class API {
 	func syncItemsForActiveReposAndCallback(_ processingCallback: Completion?, callback: Completion) {
 		let syncContext = DataManager.buildChildContext()
 
-		let shouldRefreshReposToo = lastRepoCheck == Date.distantPast
+		let shouldRefreshReposToo = lastRepoCheck == .distantPast
 			|| (Date().timeIntervalSince(lastRepoCheck) > TimeInterval(Settings.newRepoCheckPeriod*3600.0))
 			|| !Repo.anyVisibleRepos(in: syncContext)
 
@@ -416,7 +416,7 @@ final class API {
 
 		var latestDate = server.latestUserEventDateProcessed
 		if latestDate == nil {
-			latestDate = Date.distantPast
+			latestDate = .distantPast
 			server.latestUserEventDateProcessed = latestDate
 		}
 
@@ -425,7 +425,7 @@ final class API {
 
 		getPagedData(at: "/users/\(userName)/events", from: server, perPageCallback: { data, lastPage in
 			for d in data ?? [] {
-				let eventDate = parseGH8601(d["created_at"] as? String) ?? Date.distantPast
+				let eventDate = parseGH8601(d["created_at"] as? String) ?? .distantPast
 				if latestDate! < eventDate {
 					if let repoId = d["repo"]?["id"] as? NSNumber {
 						DLog("(%@) New event at %@ from Repo ID %@", serverLabel, eventDate, repoId)
@@ -433,7 +433,7 @@ final class API {
 					}
 					if server.latestUserEventDateProcessed! < eventDate {
 						server.latestUserEventDateProcessed = eventDate
-						if latestDate! == Date.distantPast {
+						if latestDate! == .distantPast {
 							DLog("(%@) First sync, all repos are dirty so we don't need to read further, we have the latest received event date: %@", serverLabel, eventDate)
 							return true
 						}
@@ -461,7 +461,7 @@ final class API {
 
 		var latestDate = server.latestReceivedEventDateProcessed
 		if latestDate == nil {
-			latestDate = Date.distantPast
+			latestDate = .distantPast
 			server.latestReceivedEventDateProcessed = latestDate
 		}
 
@@ -470,7 +470,7 @@ final class API {
 
 		getPagedData(at: "/users/\(userName)/received_events", from: server, perPageCallback: { data, lastPage in
 			for d in data ?? [] {
-				let eventDate = parseGH8601(d["created_at"] as? String) ?? Date.distantPast
+				let eventDate = parseGH8601(d["created_at"] as? String) ?? .distantPast
 				if latestDate! < eventDate {
 					if let repoId = d["repo"]?["id"] as? NSNumber {
 						DLog("(%@) New event at %@ from Repo ID %@", serverLabel, eventDate, repoId)
@@ -478,7 +478,7 @@ final class API {
 					}
 					if server.latestReceivedEventDateProcessed! < eventDate {
 						server.latestReceivedEventDateProcessed = eventDate
-						if latestDate! == Date.distantPast {
+						if latestDate! == .distantPast {
 							DLog("(%@) First sync, all repos are dirty so we don't need to read further, we have the latest received event date: %@", serverLabel, eventDate)
 							return true
 						}

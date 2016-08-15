@@ -11,7 +11,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		api.resetAllStatusChecks()
 		api.resetAllLabelChecks()
 		Settings.lastSuccessfulRefresh = nil
-		lastRepoCheck = Date.distantPast
+		lastRepoCheck = .distantPast
 		projectsTable.reloadData()
 		deferredUpdateTimer.push()
 	}
@@ -1144,7 +1144,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		if let item = tabViewItem {
 			let newIndex = tabView.indexOfTabViewItem(item)
 			if newIndex == 1 {
-				if lastRepoCheck == Date.distantPast && DataManager.appIsConfigured {
+				if lastRepoCheck == .distantPast && DataManager.appIsConfigured {
 					refreshReposSelected(nil)
 				}
 			}

@@ -866,7 +866,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			i = itemUri,
 			let oid = DataManager.id(for: i),
 			let o = existingObject(with: oid) as? ListableItem {
-			o.latestReadCommentDate = Date.distantPast
+			o.latestReadCommentDate = .distantPast
 			o.postProcess()
 			DataManager.saveDB()
 			popupManager.masterController.updateStatus()

@@ -104,7 +104,7 @@ final class SnoozePreset: NSManagedObject {
 		if duration {
 
 			if day == 0 && hour == 0 && minute == 0 {
-				return Date.distantFuture
+				return .distantFuture
 			}
 			var now = now.timeIntervalSinceReferenceDate
 			now += Double(minute)*60.0
