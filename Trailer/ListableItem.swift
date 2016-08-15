@@ -555,7 +555,7 @@ class ListableItem: DataItem {
 		return badgeCount
 	}
 
-	final class func buildOrPredicate(fromFilter string: String, expectedLength: Int, format: String, numeric: Bool) -> NSPredicate? {
+	private final class func orPredicate(fromFilter string: String, expectedLength: Int, format: String, numeric: Bool) -> NSPredicate? {
 		if string.characters.count > expectedLength {
 			let items = string.substring(from: string.index(string.startIndex, offsetBy: expectedLength))
 			if !items.isEmpty {
@@ -619,7 +619,7 @@ class ListableItem: DataItem {
 
 		if var fi = withFilter, !fi.isEmpty {
 
-            func check(forPredicate tagString: String, _ process: (String)->NSPredicate?) {
+            func check(forPredicate tagString: String, process: (String) -> NSPredicate?) {
 				var foundOne: Bool
 				repeat {
 					foundOne = false
@@ -637,51 +637,15 @@ class ListableItem: DataItem {
 				} while(foundOne)
             }
 
-			func serverPredicate(fromFilter string: String) -> NSPredicate? {
-				return buildOrPredicate(fromFilter: string, expectedLength: 7, format: "apiServer.label contains[cd] %@", numeric: false)
-			}
-
-			func titlePredicate(fromFilter string: String) -> NSPredicate? {
-				return buildOrPredicate(fromFilter: string, expectedLength: 6, format: "title contains[cd] %@", numeric: false)
-			}
-
-			func milestonePredicate(fromFilter string: String) -> NSPredicate? {
-				return buildOrPredicate(fromFilter: string, expectedLength: 10, format: "milestone contains[cd] %@", numeric: false)
-			}
-
-			func assigneePredicate(fromFilter string: String) -> NSPredicate? {
-				return buildOrPredicate(fromFilter: string, expectedLength: 9, format: "assigneeName contains[cd] %@", numeric: false)
-			}
-
-			func numberPredicate(fromFilter string: String) -> NSPredicate? {
-				return buildOrPredicate(fromFilter: string, expectedLength: 7, format: "number == %llu", numeric: true)
-			}
-
-			func repoPredicate(fromFilter string: String) -> NSPredicate? {
-				return buildOrPredicate(fromFilter: string, expectedLength: 5, format: "repo.fullName contains[cd] %@", numeric: false)
-			}
-
-			func labelPredicate(fromFilter string: String) -> NSPredicate? {
-				return buildOrPredicate(fromFilter: string, expectedLength: 6, format: "SUBQUERY(labels, $label, $label.name contains[cd] %@).@count > 0", numeric: false)
-			}
-
-			func statusPredicate(fromFilter string: String) -> NSPredicate? {
-				return buildOrPredicate(fromFilter: string, expectedLength: 7, format: "SUBQUERY(statuses, $status, $status.descriptionText contains[cd] %@).@count > 0", numeric: false)
-			}
-
-			func userPredicate(fromFilter string: String) -> NSPredicate? {
-				return buildOrPredicate(fromFilter: string, expectedLength: 5, format: "userLogin contains[cd] %@", numeric: false)
-			}
-
-			check(forPredicate: "title", titlePredicate)
-            check(forPredicate: "server", serverPredicate)
-            check(forPredicate: "repo", repoPredicate)
-            check(forPredicate: "label", labelPredicate)
-            check(forPredicate: "status", statusPredicate)
-            check(forPredicate: "user", userPredicate)
-			check(forPredicate: "number", numberPredicate)
-			check(forPredicate: "milestone", milestonePredicate)
-			check(forPredicate: "assignee", assigneePredicate)
+			check(forPredicate: "title")	{ orPredicate(fromFilter: $0, expectedLength:  6, format: "title contains[cd] %@", numeric: false) }
+			check(forPredicate: "server")	{ orPredicate(fromFilter: $0, expectedLength:  7, format: "apiServer.label contains[cd] %@", numeric: false) }
+			check(forPredicate: "repo")		{ orPredicate(fromFilter: $0, expectedLength:  5, format: "repo.fullName contains[cd] %@", numeric: false) }
+			check(forPredicate: "label")	{ orPredicate(fromFilter: $0, expectedLength:  6, format: "SUBQUERY(labels, $label, $label.name contains[cd] %@).@count > 0", numeric: false) }
+			check(forPredicate: "status")	{ orPredicate(fromFilter: $0, expectedLength:  7, format: "SUBQUERY(statuses, $status, $status.descriptionText contains[cd] %@).@count > 0", numeric: false) }
+			check(forPredicate: "user")		{ orPredicate(fromFilter: $0, expectedLength:  5, format: "userLogin contains[cd] %@", numeric: false) }
+			check(forPredicate: "number")	{ orPredicate(fromFilter: $0, expectedLength:  7, format: "number == %llu", numeric: true) }
+			check(forPredicate: "milestone"){ orPredicate(fromFilter: $0, expectedLength: 10, format: "milestone contains[cd] %@", numeric: false) }
+			check(forPredicate: "assignee")	{ orPredicate(fromFilter: $0, expectedLength:  9, format: "assigneeName contains[cd] %@", numeric: false) }
 
 			if !fi.isEmpty {
 				var orPredicates = [NSPredicate]()
