@@ -34,7 +34,7 @@ final class IssueCell: TrailerCell {
 		let paragraphStyle = NSMutableParagraphStyle()
 		paragraphStyle.headIndent = 92.0
 
-		var statusAttributes = [String : AnyObject]()
+		var statusAttributes = [String : Any]()
 		statusAttributes[NSFontAttributeName] = NSFont(name: "Monaco", size: 9)
 		statusAttributes[NSParagraphStyleAttributeName] = paragraphStyle
 

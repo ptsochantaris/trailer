@@ -10,11 +10,11 @@ final class PRDetailController: CommonController {
 	private var rowControllers = [PopulatableRow]()
 	private var itemId: String!
 
-	override func awake(withContext context: AnyObject?) {
+	override func awake(withContext context: Any?) {
 		_statusLabel = statusLabel
 		_table = table
 
-		let c = context as! [String : AnyObject]
+		let c = context as! [String : Any]
 		itemId = c[ITEM_KEY] as! String
 
 		super.awake(withContext: context)
@@ -41,16 +41,16 @@ final class PRDetailController: CommonController {
 		requestData(command: "openItem")
 	}
 
-	override func update(from response: [String : AnyObject]) {
+	override func update(from response: [String : Any]) {
 
 		table.removeRows(at: IndexSet(integersIn: NSMakeRange(0, table.numberOfRows).toRange()!))
 
 		rowControllers.removeAll(keepingCapacity: false)
-		let itemInfo = response["result"] as! [String : AnyObject]
+		let itemInfo = response["result"] as! [String : Any]
 
 		var rowCount = 0
 
-		if let statuses = itemInfo["statuses"] as? [[String : AnyObject]] {
+		if let statuses = itemInfo["statuses"] as? [[String : Any]] {
 			table.insertRows(at: IndexSet(integersIn: NSMakeRange(rowCount, statuses.count).toRange() ?? 0..<0), withRowType: "StatusRow")
 			for status in statuses {
 				if let s = table.rowController(at: rowCount) as? StatusRow {
@@ -71,7 +71,7 @@ final class PRDetailController: CommonController {
 			rowCount += 1
 		}
 
-		if let comments = itemInfo["comments"] as? [[String : AnyObject]] {
+		if let comments = itemInfo["comments"] as? [[String : Any]] {
 			if comments.count == 0 {
 				setTitle("\(comments.count) Comments")
 			} else {

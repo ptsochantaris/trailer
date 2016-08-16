@@ -8,7 +8,7 @@ final class Issue: ListableItem {
 
 	@NSManaged var commentsLink: String?
 
-	class func syncIssues(from data: [[String : AnyObject]]?, in repo: Repo) {
+	class func syncIssues(from data: [[String : Any]]?, in repo: Repo) {
 		let filteredData = data?.filter { $0["pull_request"] == nil } // don't sync issues which are pull requests, they are already synced
 		items(with: filteredData, type: Issue.self, server: repo.apiServer) { item, info, isNewOrUpdated in
 
@@ -24,7 +24,7 @@ final class Issue: ListableItem {
 					l.postSyncAction = PostSyncAction.delete.rawValue
 				}
 
-				let labelList = info["labels"] as? [[String : AnyObject]]
+				let labelList = info["labels"] as? [[String : Any]]
 				PRLabel.syncLabels(from: labelList, withParent: item)
 			}
 			item.reopened = item.condition == ItemCondition.closed.rawValue

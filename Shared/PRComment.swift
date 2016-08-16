@@ -11,7 +11,7 @@ final class PRComment: DataItem {
     @NSManaged var pullRequest: PullRequest?
 	@NSManaged var issue: Issue?
 
-	class func syncComments(from data: [[String : AnyObject]]?, pullRequest: PullRequest) {
+	class func syncComments(from data: [[String : Any]]?, pullRequest: PullRequest) {
 		items(with: data, type: PRComment.self, server: pullRequest.apiServer) { item, info, newOrUpdated in
 			if newOrUpdated {
 				item.pullRequest = pullRequest
@@ -21,7 +21,7 @@ final class PRComment: DataItem {
 		}
 	}
 
-	class func syncComments(from data: [[String : AnyObject]]?, issue: Issue) {
+	class func syncComments(from data: [[String : Any]]?, issue: Issue) {
 		items(with: data, type: PRComment.self, server: issue.apiServer) { item, info, newOrUpdated in
 			if newOrUpdated {
 				item.issue = issue
@@ -75,18 +75,18 @@ final class PRComment: DataItem {
 		}
 	}
 
-	func fill(from info: [String : AnyObject]) {
+	func fill(from info: [String : Any]) {
 		body = info["body"] as? String
 		webUrl = info["html_url"] as? String
 
-		if let userInfo = info["user"] as? [String : AnyObject] {
+		if let userInfo = info["user"] as? [String : Any] {
 			userName = userInfo["login"] as? String
 			userId = (userInfo["id"] as? NSNumber)?.int64Value ?? 0
 			avatarUrl = userInfo["avatar_url"] as? String
 		}
 
-		if webUrl==nil, let links = info["links"] as? [String : AnyObject] {
-			webUrl = links["html"]?["href"] as? String
+		if webUrl==nil, let links = info["links"] as? [String : Any] {
+			webUrl = (links["html"] as? [String : Any])?["href"] as? String
 		}
 	}
 

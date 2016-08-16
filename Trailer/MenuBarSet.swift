@@ -178,13 +178,12 @@ final class MenuBarSet {
 		} else {
 			prMenu.hideStatusItem()
 		}
-
 	}
 
-	private func compare(dictionary from: [String : AnyObject], to: [String : AnyObject]) -> Bool {
+	private func compare(dictionary from: [String : Any], to: [String : Any]) -> Bool {
 		for (key, value) in from {
 			if let v = to[key] {
-				if !v.isEqual(value) {
+				if String(describing: v) != String(describing: value) {
 					return false
 				}
 			} else {

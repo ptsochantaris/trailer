@@ -36,7 +36,7 @@ class CommonController: WKInterfaceController {
 	}
 
 	private var loading = 0
-	func send(request: [String : AnyObject]) {
+	func send(request: [String : Any]) {
 		if loading == 0 {
 			if showLoadingFeedback {
 				show(status: "Loading...", hideTable: false)
@@ -45,7 +45,7 @@ class CommonController: WKInterfaceController {
 		}
 	}
 
-	private func attempt(request: [String : AnyObject]) {
+	private func attempt(request: [String : Any]) {
 
 		loading += 1
 
@@ -80,11 +80,11 @@ class CommonController: WKInterfaceController {
 		}
 	}
 
-	func update(from response: [String : AnyObject]) {
+	func update(from response: [String : Any]) {
 		// for subclassing
 	}
 
-	func loadingFailed(with error: NSError) {
+	func loadingFailed(with error: Error) {
 		showTemporaryError("Error: \(error.localizedDescription)")
 		loading = 0
 	}

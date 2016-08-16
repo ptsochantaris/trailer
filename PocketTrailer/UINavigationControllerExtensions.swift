@@ -3,7 +3,7 @@ import UIKit
 
 extension UINavigationController {
 
-	public override var disablesAutomaticKeyboardDismissal: Bool {
+	open override var disablesAutomaticKeyboardDismissal: Bool {
 		get {
 			return topViewController!.disablesAutomaticKeyboardDismissal
 		}

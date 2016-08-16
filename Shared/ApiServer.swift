@@ -138,8 +138,9 @@ final class ApiServer: NSManagedObject {
 
 	func rollBackAllUpdates(in moc: NSManagedObjectContext) {
 		DLog("Rolling back changes for failed sync on API server '%@'",label)
-		for set in [repos, pullRequests, comments, statuses, labels, issues, teams] {
-			for dataItem: DataItem in set.allObjects as! [DataItem] {
+		for set in [repos, pullRequests, comments, statuses, labels, issues, teams] as [Set<DataItem>] {
+			var i = set.makeIterator()
+			while let dataItem = i.next() {
 				switch dataItem.postSyncAction {
 				case PostSyncAction.delete.rawValue:
 					dataItem.postSyncAction = PostSyncAction.doNothing.rawValue
@@ -178,11 +179,11 @@ final class ApiServer: NSManagedObject {
 		latestUserEventDateProcessed = .distantPast
 	}
 
-	class var archivedApiServers: [String : [String : NSObject]] {
-		var archivedData = [String:[String : NSObject]]()
+	class var archivedApiServers: [AnyHashable : [AnyHashable : Any]] {
+		var archivedData = [AnyHashable : [AnyHashable : Any]]()
 		for a in ApiServer.allApiServers(in: mainObjectContext) {
 			if let authToken = a.authToken, !authToken.isEmpty {
-				var apiServerData = [String : NSObject]()
+				var apiServerData = [AnyHashable : Any]()
 				for (k , _) in a.entity.attributesByName {
 					if let v = a.value(forKey: k) as? NSObject {
 						apiServerData[k] = v
@@ -195,10 +196,10 @@ final class ApiServer: NSManagedObject {
 		return archivedData
 	}
 
-	var archivedRepos: [String : [String : NSObject]] {
-		var archivedData = [String : [String : NSObject]]()
+	var archivedRepos: [AnyHashable : [AnyHashable : Any]] {
+		var archivedData = [AnyHashable : [AnyHashable : Any]]()
 		for r in repos {
-			var repoData = [String : NSObject]()
+			var repoData = [AnyHashable : Any]()
 			for (k , _) in r.entity.attributesByName {
 				if let v = r.value(forKey: k) as? NSObject {
 					repoData[k] = v

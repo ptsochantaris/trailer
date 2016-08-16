@@ -669,7 +669,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 	}
 
-	func localNotification(userInfo: [NSObject : AnyObject], action: String?) {
+	func localNotification(userInfo: [AnyHashable : Any], action: String?) {
 		var urlToOpen = userInfo[NOTIFICATION_URL_KEY] as? String
 		var relatedItem: ListableItem?
 
@@ -1014,7 +1014,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 	}
 
-	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: AnyObject, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
 
 		if UIApplication.shared.applicationState != .active { return }
 
@@ -1025,7 +1025,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			}
 		case .delete:
 			if let i = indexPath {
-				tableView.deleteRows(at: [i], with:.automatic)
+				tableView.deleteRows(at: [i], with: .automatic)
 			}
 		case .update:
 			if let i = indexPath, let object = anObject as? ListableItem, let cell = tableView.cellForRow(at: i) {
@@ -1033,10 +1033,10 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			}
 		case .move:
 			if let i = indexPath {
-				tableView.deleteRows(at: [i], with:.automatic)
+				tableView.deleteRows(at: [i], with: .automatic)
 			}
 			if let n = newIndexPath {
-				tableView.insertRows(at: [n], with:.automatic)
+				tableView.insertRows(at: [n], with: .automatic)
 			}
 		}
 	}
@@ -1154,7 +1154,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
-		if let r = refreshControl, r.isRefreshing ?? false {
+		if let r = refreshControl, r.isRefreshing {
 			r.endRefreshing()
 		}
 		searchBar.setShowsCancelButton(true, animated: true)
@@ -1187,7 +1187,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		tableView.contentOffset = tableView.contentOffset // halt any inertial scrolling
 		atNextEvent(self) { S in
 			let t = S.tableView
-			if t?.numberOfSections > 0 {
+			if let n = t?.numberOfSections, n > 0 {
 				t?.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
 			}
 		}
@@ -1207,7 +1207,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	////////////////// opening prefs
 
-	override func prepare(for segue: UIStoryboardSegue, sender: AnyObject?) {
+	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
 		var allServersHaveTokens = true
 		for a in ApiServer.allApiServers(in: mainObjectContext) {
 			if !a.goodToGo {

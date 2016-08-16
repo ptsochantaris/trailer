@@ -102,7 +102,7 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 		return cell
 	}
 
-	override func prepare(for segue: UIStoryboardSegue, sender: AnyObject?) {
+	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
 		if let indexPath = tableView.indexPathForSelectedRow,
 			let vc = segue.destination as? RepoSettingsViewController {
 
@@ -159,7 +159,7 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 		}
 	}
 
-	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: AnyObject, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
 
 		heightCache.removeAll()
 
@@ -263,14 +263,14 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 		return NSAttributedString(string: policy.name, attributes: attributes(for: policy))
 	}
 
-	private func attributes(for policy: RepoDisplayPolicy) -> [String : AnyObject] {
+	private func attributes(for policy: RepoDisplayPolicy) -> [String : Any] {
 		return [
 			NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize-1.0),
 			NSForegroundColorAttributeName: policy.color
 		]
 	}
 
-	private func attributes(for policy: RepoHidingPolicy) -> [String : AnyObject] {
+	private func attributes(for policy: RepoHidingPolicy) -> [String : Any] {
 		return [
 			NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize-1.0),
 			NSForegroundColorAttributeName: policy.color

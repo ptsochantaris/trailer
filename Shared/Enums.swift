@@ -52,13 +52,13 @@ func atNextEvent(_ completion: Completion) {
 	OperationQueue.main.addOperation(completion)
 }
 
-func atNextEvent<T: AnyObject>(_ owner: T?, completion: (T)->Void) {
+func atNextEvent<T: AnyObject>(_ owner: T?, completion: @escaping (T)->Void) {
 	if let o = owner {
 		atNextEvent(o, completion: completion)
 	}
 }
 
-func atNextEvent<T: AnyObject>(_ owner: T, completion: (T)->Void) {
+func atNextEvent<T: AnyObject>(_ owner: T, completion: @escaping (T)->Void) {
 	OperationQueue.main.addOperation { [weak owner] in
 		if let o = owner {
 			completion(o)
@@ -73,7 +73,7 @@ func delay(_ delay: TimeInterval, closure: Completion) {
 	DispatchQueue.main.asyncAfter(deadline: time, execute: closure)
 }
 
-func delay<T: AnyObject>(_ time: TimeInterval, _ owner: T, completion: (T)->()) {
+func delay<T: AnyObject>(_ time: TimeInterval, _ owner: T, completion: @escaping (T)->()) {
 	let time = DispatchTime.now() + Double(Int64(time * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
 	DispatchQueue.main.asyncAfter(deadline: time) { [weak owner] in
 		atNextEvent { [weak owner] in

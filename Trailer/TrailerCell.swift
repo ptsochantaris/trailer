@@ -250,7 +250,7 @@ class TrailerCell: NSTableCellView {
 		let pCenter = NSMutableParagraphStyle()
 		pCenter.alignment = .center
 
-		let countString = NSAttributedString(string: itemCountFormatter.string(from: Int(totalCount))!, attributes: [
+		let countString = NSAttributedString(string: itemCountFormatter.string(from: NSNumber(value: totalCount))!, attributes: [
 			NSFontAttributeName: NSFont.menuFont(ofSize: 11),
 			NSForegroundColorAttributeName: goneDark ? NSColor.controlLightHighlightColor : NSColor.controlTextColor,
 			NSParagraphStyleAttributeName: pCenter])
@@ -274,7 +274,7 @@ class TrailerCell: NSTableCellView {
 
 		if unreadCount > 0 {
 
-			let alertString = NSAttributedString(string: itemCountFormatter.string(from: Int(unreadCount))!, attributes: [
+			let alertString = NSAttributedString(string: itemCountFormatter.string(from: NSNumber(value: unreadCount))!, attributes: [
 				NSFontAttributeName: NSFont.menuFont(ofSize: 8),
 				NSForegroundColorAttributeName: NSColor.white,
 				NSParagraphStyleAttributeName: pCenter])

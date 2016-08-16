@@ -29,7 +29,7 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, WCSessionDelegate {
 		potentialUpdate()
 	}
 
-	func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : AnyObject]) {
+	func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
 		potentialUpdate()
 	}
 

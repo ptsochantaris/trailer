@@ -35,10 +35,9 @@ final class StartupLaunch: NSObject {
 		let isSet = itemReferences.existingReference != nil
 		if let loginItemsRef = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems.takeRetainedValue(), nil).takeRetainedValue() as LSSharedFileList? {
 			if launch && !isSet {
-				if let appUrl : CFURL = URL(fileURLWithPath: Bundle.main.bundlePath) {
-					LSSharedFileListInsertItemURL(loginItemsRef, itemReferences.lastReference, nil, nil, appUrl, nil, nil)
-					DLog("Trailer was added to login items")
-				}
+				let appUrl = URL(fileURLWithPath: Bundle.main.bundlePath) as CFURL
+				LSSharedFileListInsertItemURL(loginItemsRef, itemReferences.lastReference, nil, nil, appUrl, nil, nil)
+				DLog("Trailer was added to login items")
 			} else if !launch && isSet {
 				if let itemRef = itemReferences.existingReference {
 					LSSharedFileListItemRemove(loginItemsRef,itemRef)

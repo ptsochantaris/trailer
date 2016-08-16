@@ -51,7 +51,9 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 					DLog("Activating iPad webview user-agent")
 					alwaysRequestDesktopSite = true
 					w.evaluateJavaScript("navigator.userAgent") { result, error in
-						w.customUserAgent = result?.replacingOccurrences(of: "iPhone", with: "iPad")
+						if let r = result as? String {
+							w.customUserAgent = r.replacingOccurrences(of: "iPhone", with: "iPad")
+						}
 						self.configureView()
 					}
 					return
@@ -103,7 +105,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 		navigationItem.rightBarButtonItem = nil
 	}
 
-	func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: (WKNavigationResponsePolicy) -> Void) {
+	func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
 		if let res = navigationResponse.response as? HTTPURLResponse, res.statusCode == 404 {
 			showMessage("Not Found", "\nPlease ensure you are logged in with the correct account on GitHub\n\nIf you are using two-factor auth: There is a bug between GitHub and iOS which may cause your login to fail.  If it happens, temporarily disable two-factor auth and log in from here, then re-enable it afterwards.  You will only need to do this once.")
 		}
@@ -170,7 +172,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 		loadFailed(error: error)
 	}
 
-	private func loadFailed(error: NSError) {
+	private func loadFailed(error: Error) {
 		spinner.stopAnimating()
 		statusLabel.textColor = .red
 		statusLabel.text = "Loading Error: \(error.localizedDescription)"

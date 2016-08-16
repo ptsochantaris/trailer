@@ -13,12 +13,12 @@ final class PRLabel: DataItem {
     @NSManaged var pullRequest: PullRequest?
 	@NSManaged var issue: Issue?
 
-	private class func labels(from data: [[String : AnyObject]]?, fromParent: ListableItem, postProcessCallback: (PRLabel, [String : AnyObject])->Void) {
+	private class func labels(from data: [[String : Any]]?, fromParent: ListableItem, postProcessCallback: (PRLabel, [String : Any])->Void) {
 
 		guard let infos=data, infos.count > 0 else { return }
 
 		var namesOfItems = [String]()
-		var namesToInfo = [String : [String : AnyObject]]()
+		var namesToInfo = [String : [String : Any]]()
 		for info in infos {
 			if let name = info["name"] as? String {
 				namesOfItems.append(name)
@@ -64,7 +64,7 @@ final class PRLabel: DataItem {
 		}
 	}
 
-	class func syncLabels(from info: [[String : AnyObject]]?, withParent: ListableItem) {
+	class func syncLabels(from info: [[String : Any]]?, withParent: ListableItem) {
 		labels(from: info, fromParent: withParent) { label, info in
 			label.url = info["url"] as? String
 			if let c = info["color"] as? String {

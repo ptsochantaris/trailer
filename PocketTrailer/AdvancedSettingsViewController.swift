@@ -719,7 +719,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		return h
 	}
 
-	override func prepare(for segue: UIStoryboardSegue, sender: AnyObject?) {
+	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
 		if let p = segue.destination as? PickerViewController {
 			p.delegate = self
 			p.title = pickerName
@@ -826,7 +826,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			do {
 				try FileManager.default.removeItem(at: t)
 			} catch {
-				DLog("Temporary file cleanup error: %@", (error as NSError).localizedDescription)
+				DLog("Temporary file cleanup error: %@", error.localizedDescription)
 			}
 			tempUrl = nil
 		}

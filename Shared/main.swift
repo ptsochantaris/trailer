@@ -54,10 +54,10 @@ DLog("%f", Date().timeIntervalSinceDate(s2))
 #if os(iOS)
 	import UIKit
 	UIApplicationMain(
-		Process.argc,
-		UnsafeMutablePointer<UnsafeMutablePointer<CChar>>(Process.unsafeArgv),
+		CommandLine.argc,
+		UnsafeMutablePointer<UnsafeMutablePointer<Int8>>(OpaquePointer(CommandLine.unsafeArgv)),
 		nil,
 		NSStringFromClass(iOS_AppDelegate.self))
 #else
-	_ = NSApplicationMain(Process.argc, Process.unsafeArgv)
+	_ = NSApplicationMain(CommandLine.argc, CommandLine.unsafeArgv)
 #endif

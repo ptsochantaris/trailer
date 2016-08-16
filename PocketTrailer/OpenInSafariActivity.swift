@@ -6,8 +6,8 @@ final class OpenInSafariActivity: UIActivity {
 
 	private var _URL: URL?
 
-	override var activityType: String? {
-		return "OpenInSafariActivity"
+	override var activityType: UIActivityType {
+		return UIActivityType("OpenInSafariActivity")
 	}
 
 	override var activityTitle: String? {
@@ -18,7 +18,7 @@ final class OpenInSafariActivity: UIActivity {
 		return UIImage(named: "safariShare")
 	}
 
-	override func prepare(withActivityItems activityItems: [AnyObject]) {
+	override func prepare(withActivityItems activityItems: [Any]) {
 		for activityItem in activityItems {
 			if let u = activityItem as? URL {
 				_URL = u
@@ -35,7 +35,7 @@ final class OpenInSafariActivity: UIActivity {
 		}
 	}
 
-	override func canPerform(withActivityItems activityItems: [AnyObject]) -> Bool {
+	override func canPerform(withActivityItems activityItems: [Any]) -> Bool {
 		for activityItem in activityItems {
 			if let u = activityItem as? URL {
 				if UIApplication.shared.canOpenURL(u) {

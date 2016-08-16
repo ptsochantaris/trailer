@@ -4,7 +4,7 @@ final class StatusItemView: NSView {
 	private let tappedCallback: Completion
 
 	var icon: NSImage!
-	var textAttributes = [String : AnyObject]()
+	var textAttributes = [String : Any]()
 	var statusLabel = ""
 	var labelOffset: CGFloat = 0
 	var title: String?

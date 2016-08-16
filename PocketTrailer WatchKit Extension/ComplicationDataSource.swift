@@ -3,53 +3,53 @@ import WatchConnectivity
 
 final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 
-	func getNextRequestedUpdateDate(handler: (Date?) -> Void) {
+	func getNextRequestedUpdateDate(handler: @escaping (Date?) -> Void) {
 		handler(nil)
 	}
 
-	func getPlaceholderTemplate(for complication: CLKComplication, withHandler handler: (CLKComplicationTemplate?) -> Void) {
+	func getPlaceholderTemplate(for complication: CLKComplication, withHandler handler: @escaping (CLKComplicationTemplate?) -> Void) {
 		handler(constructTemplate(for: complication, issues: false, prCount: nil, issueCount: nil, commentCount: 0))
 	}
 
-	func getPrivacyBehavior(for complication: CLKComplication, withHandler handler: (CLKComplicationPrivacyBehavior) -> Void) {
+	func getPrivacyBehavior(for complication: CLKComplication, withHandler handler: @escaping (CLKComplicationPrivacyBehavior) -> Void) {
 		handler(CLKComplicationPrivacyBehavior.showOnLockScreen)
 	}
 
-	func getCurrentTimelineEntry(for complication: CLKComplication, withHandler handler: (CLKComplicationTimelineEntry?) -> Void) {
+	func getCurrentTimelineEntry(for complication: CLKComplication, withHandler handler: @escaping (CLKComplicationTimelineEntry?) -> Void) {
 		getTimelineEntries(for: complication, before: Date(), limit: 1) { entries in
 			handler(entries?.first)
 		}
 	}
 
-	func getTimelineEntries(for complication: CLKComplication, before date: Date, limit: Int, withHandler handler: ([CLKComplicationTimelineEntry]?) -> Void) {
+	func getTimelineEntries(for complication: CLKComplication, before date: Date, limit: Int, withHandler handler: @escaping ([CLKComplicationTimelineEntry]?) -> Void) {
 		entriesFor(complication, handler)
 	}
 
-	func getTimelineEntries(for complication: CLKComplication, after date: Date, limit: Int, withHandler handler: ([CLKComplicationTimelineEntry]?) -> Void) {
+	func getTimelineEntries(for complication: CLKComplication, after date: Date, limit: Int, withHandler handler: @escaping ([CLKComplicationTimelineEntry]?) -> Void) {
 		entriesFor(complication, handler)
 	}
 
-	private func entriesFor(_ complication: CLKComplication, _ handler: ([CLKComplicationTimelineEntry]?) -> Void) {
-		if let overview = WCSession.default().receivedApplicationContext["overview"] as? [String : AnyObject] {
+	private func entriesFor(_ complication: CLKComplication, _ handler: @escaping ([CLKComplicationTimelineEntry]?) -> Void) {
+		if let overview = WCSession.default().receivedApplicationContext["overview"] as? [String : Any] {
 			processOverview(for: complication, overview, handler)
 		} else {
 			handler(nil)
 		}
 	}
 
-	private func processOverview(for complication: CLKComplication, _ overview: [String : AnyObject], _ handler: ([CLKComplicationTimelineEntry]?) -> Void) {
+	private func processOverview(for complication: CLKComplication, _ overview: [String : Any], _ handler: @escaping ([CLKComplicationTimelineEntry]?) -> Void) {
 
 		let showIssues = overview["preferIssues"] as! Bool
 
 		var prCount = 0
 		var issueCount = 0
 		var commentCount = 0
-		for r in overview["views"] as? [[String : AnyObject]] ?? [] {
-			if let v = r["prs"] as? [String : AnyObject] {
+		for r in overview["views"] as? [[String : Any]] ?? [] {
+			if let v = r["prs"] as? [String : Any] {
 				prCount += v["total_open"] as? Int ?? 0
 				commentCount += v["unread"] as? Int ?? 0
 			}
-			if let v = r["issues"] as? [String : AnyObject] {
+			if let v = r["issues"] as? [String : Any] {
 				issueCount += v["total_open"] as? Int ?? 0
 				commentCount += v["unread"] as? Int ?? 0
 			}
@@ -59,15 +59,15 @@ final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 		handler([entry])
 	}
 
-	func getSupportedTimeTravelDirections(for complication: CLKComplication, withHandler handler: (CLKComplicationTimeTravelDirections) -> Void) {
+	func getSupportedTimeTravelDirections(for complication: CLKComplication, withHandler handler: @escaping (CLKComplicationTimeTravelDirections) -> Void) {
 		handler([])
 	}
 
-	func getTimelineStartDate(for complication: CLKComplication, withHandler handler: (Date?) -> Void) {
+	func getTimelineStartDate(for complication: CLKComplication, withHandler handler: @escaping (Date?) -> Void) {
 		handler(Date())
 	}
 
-	func getTimelineEndDate(for complication: CLKComplication, withHandler handler: (Date?) -> Void) {
+	func getTimelineEndDate(for complication: CLKComplication, withHandler handler: @escaping (Date?) -> Void) {
 		handler(Date())
 	}
 

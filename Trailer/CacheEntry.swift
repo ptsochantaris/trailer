@@ -8,11 +8,11 @@ struct CacheUnit {
 	let headers: Data
 	let lastFetched: Date
 
-	var actualHeaders: [String : AnyObject] {
-		return NSKeyedUnarchiver.unarchiveObject(with: headers) as! [String : AnyObject]
+	var actualHeaders: [AnyHashable : Any] {
+		return NSKeyedUnarchiver.unarchiveObject(with: headers) as! [String : Any]
 	}
 
-	var parsedData: AnyObject? {
+	var parsedData: Any? {
 		return try? JSONSerialization.jsonObject(with: data, options: [])
 	}
 }
@@ -31,7 +31,7 @@ final class CacheEntry: NSManagedObject {
 		return CacheUnit(data: data, code: code, etag: etag, headers: headers, lastFetched: lastFetched)
 	}
 
-	class func setEntry(key: String, code: Int64, etag: String, data: Data, headers: [NSObject : AnyObject]) {
+	class func setEntry(key: String, code: Int64, etag: String, data: Data, headers: [AnyHashable : Any]) {
 		var e = entry(for: key)
 		if e == nil {
 			e = NSEntityDescription.insertNewObject(forEntityName: "CacheEntry", into: mainObjectContext) as? CacheEntry
@@ -61,7 +61,8 @@ final class CacheEntry: NSManagedObject {
 	class func cleanOldEntries(in moc: NSManagedObjectContext) {
 		let f = NSFetchRequest<CacheEntry>(entityName: "CacheEntry")
 		f.returnsObjectsAsFaults = true
-		f.predicate = NSPredicate(format: "lastTouched < %@", Date().addingTimeInterval(-3600.0*24.0*7.0)) // week-old
+		let date = Date().addingTimeInterval(-3600.0*24.0*7.0) as CVarArg // week-old
+		f.predicate = NSPredicate(format: "lastTouched < %@", date)
 		for e in try! moc.fetch(f) {
 			DLog("Expiring unused cache entry for key %@", e.key)
 			moc.delete(e)

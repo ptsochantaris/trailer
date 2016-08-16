@@ -141,7 +141,7 @@ final class MenuWindow: NSWindow {
 		app.startRefresh()
 	}
 
-	@IBAction func aboutSelected(_ sender: AnyObject) {
+	@IBAction func aboutSelected(_ sender: NSMenuItem) {
 		app.showAboutWindow()
 	}
 
@@ -198,7 +198,7 @@ final class MenuWindow: NSWindow {
 			app.openingWindow = true
 			level = Int(CGWindowLevelForKey(CGWindowLevelKey.floatingWindow))
 			makeKeyAndOrderFront(self)
-			NSApp.activateIgnoringOtherApps(true)
+			NSApp.activate(ignoringOtherApps: true)
 			app.openingWindow = false
 		}
 	}

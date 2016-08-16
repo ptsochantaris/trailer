@@ -19,12 +19,12 @@ final class PRListController: CommonController {
 
 	private var onlyUnread = false
 	private var lastCount = 0
-	private var loadingBuffer: [[String : AnyObject]]?
+	private var loadingBuffer: [[String : Any]]?
 	private var loading = false
 
-	override func awake(withContext context: AnyObject?) {
+	override func awake(withContext context: Any?) {
 
-		let c = context as! [String : AnyObject]
+		let c = context as! [String : Any]
 		sectionIndex = (c[SECTION_KEY] as! NSNumber).int64Value
 		type = c[TYPE_KEY] as! String
 		onlyUnread = c[UNREAD_KEY] as! Bool
@@ -55,13 +55,13 @@ final class PRListController: CommonController {
 
 	private func _requestData(_ command: String?) {
 
-		var params = ["list": "item_list",
-		              "type": type,
-		              "group": groupLabel!,
-		              "apiUri": apiServerUri!,
-		              "sectionIndex": NSNumber(value: sectionIndex),
-		              "onlyUnread": NSNumber(value: onlyUnread),
-		              "count": NSNumber(value: PAGE_SIZE)]
+		var params: [String: Any] = [ "list": "item_list",
+									  "type": type,
+									  "group": groupLabel!,
+									  "apiUri": apiServerUri!,
+									  "sectionIndex": NSNumber(value: sectionIndex),
+									  "onlyUnread": NSNumber(value: onlyUnread),
+									  "count": NSNumber(value: PAGE_SIZE) ]
 
 		if let c = command {
 			params["command"] = c
@@ -79,23 +79,23 @@ final class PRListController: CommonController {
 		if let l = loadingBuffer {
 			params["from"] = NSNumber(value: l.count)
 		} else {
-			loadingBuffer = [[String : AnyObject]]()
+			loadingBuffer = [[String : Any]]()
 			params["from"] = NSNumber(value: 0)
 		}
 
 		send(request: params)
 	}
 
-	override func loadingFailed(with error: NSError) {
+	override func loadingFailed(with error: Error) {
 		super.loadingFailed(with: error)
 		loadingBuffer = nil
 	}
 
 	private var progressiveLoading = false
 
-	override func update(from response: [String : AnyObject]) {
+	override func update(from response: [String : Any]) {
 
-		let page = response["result"] as! [[String : AnyObject]]
+		let page = response["result"] as! [[String : Any]]
 
 		loadingBuffer?.append(contentsOf: page)
 		if page.count == PAGE_SIZE {

@@ -48,7 +48,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		}
 	}
 
-	func session(_ session: WCSession, didReceiveMessage message: [String : AnyObject], replyHandler: ([String : AnyObject]) -> Void) {
+	func session(_ session: WCSession, didReceiveMessage message: [String : Any], replyHandler: @escaping ([String : Any]) -> Void) {
 
 		atNextEvent(self) { s in
 
@@ -131,9 +131,9 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		}
 	}
 
-	private func processList(message: [String : AnyObject], replyHandler: ([String : AnyObject]) -> Void) {
+	private func processList(message: [String : Any], replyHandler: @escaping ([String : Any]) -> Void) {
 
-		var result = [String : AnyObject]()
+		var result = [String : Any]()
 
 		switch(S(message["list"] as? String)) {
 
@@ -164,7 +164,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		}
 	}
 
-	private func reportFailure(reason: String, result: [String : AnyObject], replyHandler: ([String : AnyObject]) -> Void) {
+	private func reportFailure(reason: String, result: [String : Any], replyHandler: ([String : Any]) -> Void) {
 		var r = result
 		r["error"] = true
 		r["status"] = reason
@@ -173,7 +173,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		endBGTask()
 	}
 
-	private func reportSuccess(result: [String : AnyObject], replyHandler: ([String : AnyObject]) -> Void) {
+	private func reportSuccess(result: [String : Any], replyHandler: ([String : Any]) -> Void) {
 		var r = result
 		r["status"] = "Success"
 		r["color"] = "00FF00"
@@ -183,7 +183,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	////////////////////////////
 
-	private func buildItemList(type: String, sectionIndex: Int64, from: Int, apiServerUri: String, group: String, count: Int, onlyUnread: Bool, replyHandler: ([String : AnyObject]) -> Void) {
+	private func buildItemList(type: String, sectionIndex: Int64, from: Int, apiServerUri: String, group: String, count: Int, onlyUnread: Bool, replyHandler: @escaping ([String : Any]) -> Void) {
 
 		let showLabels = Settings.showLabels
 		let showStatuses: Bool
@@ -215,16 +215,16 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		tempMoc.persistentStoreCoordinator = mainObjectContext.persistentStoreCoordinator
 		tempMoc.undoManager = nil
 
-		var items = [[String : AnyObject]]()
+		var items = [[String : Any]]()
 		for item in try! tempMoc.fetch(f) {
 			items.append(baseDataForItem(item: item, showStatuses: showStatuses, showLabels: showLabels))
 		}
 		replyHandler(["result" : items])
 	}
 
-	private func baseDataForItem(item: ListableItem, showStatuses: Bool, showLabels: Bool) -> [String : AnyObject] {
+	private func baseDataForItem(item: ListableItem, showStatuses: Bool, showLabels: Bool) -> [String : Any] {
 
-		var itemData = [
+		var itemData: [String : Any] = [
 			"commentCount": NSNumber(value: item.totalComments),
 			"unreadCount": NSNumber(value: item.unreadComments),
 			"localId": item.objectID.uriRepresentation().absoluteString,
@@ -253,8 +253,8 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		return itemData
 	}
 
-	private func labelsForItem(item: ListableItem) -> [[String : AnyObject]] {
-		var labels = [[String : AnyObject]]()
+	private func labelsForItem(item: ListableItem) -> [[String : Any]] {
+		var labels = [[String : Any]]()
 		for l in item.labels {
 			labels.append([
 				"color": colorToHex(c: l.colorForDisplay),
@@ -264,8 +264,8 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		return labels
 	}
 
-	private func statusLinesForPr(pr: PullRequest) -> [[String : AnyObject]] {
-		var statusLines = [[String : AnyObject]]()
+	private func statusLinesForPr(pr: PullRequest) -> [[String : Any]] {
+		var statusLines = [[String : Any]]()
 		for status in pr.displayedStatuses {
 			statusLines.append([
 				"color": colorToHex(c: status.colorForDarkDisplay),
@@ -286,7 +286,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	/////////////////////////////
 
-	private func buildItemDetail(localId: String) -> [String : AnyObject]? {
+	private func buildItemDetail(localId: String) -> [String : Any]? {
 		if let oid = DataManager.id(for: localId), let item = existingObject(with: oid) as? ListableItem {
 			let showStatuses = (item is PullRequest) ? Settings.showStatusItems : false
 			var result = baseDataForItem(item: item, showStatuses: showStatuses, showLabels: Settings.showLabels)
@@ -297,8 +297,8 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		return nil
 	}
 
-	private func commentsForItem(item: ListableItem) -> [[String : AnyObject]] {
-		var comments = [[String : AnyObject]]()
+	private func commentsForItem(item: ListableItem) -> [[String : Any]] {
+		var comments = [[String : Any]]()
 		for comment in item.sortedComments(using: .orderedDescending) {
 			comments.append([
 				"user": S(comment.userName),
@@ -312,9 +312,9 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	//////////////////////////////
 
-	private func buildOverview() -> [String : AnyObject] {
+	private func buildOverview() -> [String : Any] {
 
-		var views = [[String : AnyObject]]()
+		var views = [[String : Any]]()
 
 		for tabSet in popupManager.masterController.allTabSets {
 

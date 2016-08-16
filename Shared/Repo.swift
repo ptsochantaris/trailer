@@ -17,10 +17,10 @@ final class Repo: DataItem {
 	@NSManaged var issues: Set<Issue>
 	@NSManaged var ownerId: Int64
 
-	class func syncRepos(from data: [[String : AnyObject]]?, server: ApiServer) {
+	class func syncRepos(from data: [[String : Any]]?, server: ApiServer) {
 		let filteredData = data?.filter { info -> Bool in
 			if (info["private"] as? NSNumber)?.boolValue ?? false {
-				if let permissions = info["permissions"] as? [String : AnyObject] {
+				if let permissions = info["permissions"] as? [String : Any] {
 
 					let pull = (permissions["pull"] as? NSNumber)?.boolValue ?? false
 					let push = (permissions["push"] as? NSNumber)?.boolValue ?? false
@@ -44,7 +44,7 @@ final class Repo: DataItem {
 				item.webUrl = info["html_url"] as? String
 				item.dirty = true
 				item.inaccessible = false
-				item.ownerId = (info["owner"]?["id"] as? NSNumber)?.int64Value ?? 0
+				item.ownerId = ((info["owner"] as? [String : Any])?["id"] as? NSNumber)?.int64Value ?? 0
 				item.lastDirtied = Date()
 			}
 		}
@@ -147,7 +147,8 @@ final class Repo: DataItem {
 
 	class func reposNotRecentlyDirtied(in moc: NSManagedObjectContext) -> [Repo] {
 		let f = NSFetchRequest<Repo>(entityName: "Repo")
-		f.predicate = NSPredicate(format: "dirty != YES and lastDirtied < %@ and postSyncAction != %lld and (displayPolicyForPrs > 0 or displayPolicyForIssues > 0)", Date(timeInterval: -3600, since: Date()), PostSyncAction.delete.rawValue)
+		let date = Date().addingTimeInterval(-3600) as CVarArg
+		f.predicate = NSPredicate(format: "dirty != YES and lastDirtied < %@ and postSyncAction != %lld and (displayPolicyForPrs > 0 or displayPolicyForIssues > 0)", date, PostSyncAction.delete.rawValue)
 		f.includesPropertyValues = false
 		f.returnsObjectsAsFaults = false
 		return try! moc.fetch(f)

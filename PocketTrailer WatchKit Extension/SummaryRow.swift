@@ -30,18 +30,18 @@ class SummaryRow: NSObject, PopulatableRow {
 	@IBOutlet weak var issueIcon: WKInterfaceImage!
 
 	var rowType: String {
-		return typeName(self.dynamicType)
+		return typeName(type(of: self))
 	}
 	
-	var data: [String : AnyObject]?
+	var data: [String : Any]?
 
-	func populate(from other: AnyObject) {
+	func populate(from other: Any) {
 		if let d = other as? SummaryRow {
 			updateUI(from: d.data!)
 		}
 	}
 
-	func setSummary(from result: [String : AnyObject]) -> Bool {
+	func setSummary(from result: [String : Any]) -> Bool {
 		data = result
 		if let lastRefresh = result["lastUpdated"] as? Date, lastRefresh != .distantPast {
 			return true
@@ -50,7 +50,7 @@ class SummaryRow: NSObject, PopulatableRow {
 		}
 	}
 
-	func updateUI(from result: [String : AnyObject]) {
+	func updateUI(from result: [String : Any]) {
 		let showIssues = result["preferIssues"] as! Bool
 		prIcon.setHidden(showIssues)
 		issueIcon.setHidden(!showIssues)
@@ -62,13 +62,13 @@ class SummaryRow: NSObject, PopulatableRow {
 		var totalMentioned = 0
 		var totalSnoozed = 0
 		var totalOther = 0
-		for r in result["views"] as! [[String : AnyObject]] {
-			if let v = r[showIssues ? "issues" : "prs"] as? [String : AnyObject] {
-				totalMine += v[Section.mine.apiName]?["total"] as? Int ?? 0
-				totalParticipated += v[Section.participated.apiName]?["total"] as? Int ?? 0
-				totalMentioned += v[Section.mentioned.apiName]?["total"] as? Int ?? 0
-				totalSnoozed += v[Section.snoozed.apiName]?["total"] as? Int ?? 0
-				totalOther += v[Section.all.apiName]?["total"] as? Int ?? 0
+		for r in result["views"] as! [[String : Any]] {
+			if let v = r[showIssues ? "issues" : "prs"] as? [String : Any] {
+				totalMine += (v[Section.mine.apiName] as? [String : Any])?["total"] as? Int ?? 0
+				totalParticipated += (v[Section.participated.apiName] as? [String : Any])?["total"] as? Int ?? 0
+				totalMentioned += (v[Section.mentioned.apiName] as? [String : Any])?["total"] as? Int ?? 0
+				totalSnoozed += (v[Section.snoozed.apiName] as? [String : Any])?["total"] as? Int ?? 0
+				totalOther += (v[Section.all.apiName] as? [String : Any])?["total"] as? Int ?? 0
 				totalUnread += v["unread"] as? Int ?? 0
 				totalOpen += v["total_open"] as? Int ?? 0
 			}

@@ -94,7 +94,7 @@ final class ServersViewController: UITableViewController {
 		performSegue(withIdentifier: "editServer", sender: self)
 	}
 
-	override func prepare(for segue: UIStoryboardSegue, sender: AnyObject?) {
+	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
 		if let sd = segue.destination as? ServerDetailViewController {
 			sd.serverId = selectedServerId
 			selectedServerId = nil

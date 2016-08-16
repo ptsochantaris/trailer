@@ -11,8 +11,8 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	var scrollBarWidth: CGFloat = 0.0
 
 	private var systemSleeping = false
-	private var globalKeyMonitor: AnyObject?
-	private var keyDownMonitor: AnyObject?
+	private var globalKeyMonitor: Any?
+	private var keyDownMonitor: Any?
 	private var mouseIgnoreTimer: PopTimer!
 
 	func setupWindows() {
@@ -567,7 +567,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 	func windowDidResignKey(_ notification: Notification) {
 		if ignoreNextFocusLoss {
-			NSApp.activateIgnoringOtherApps(true)
+			NSApp.activate(ignoringOtherApps: true)
 		} else if !openingWindow {
 			if let w = notification.object as? MenuWindow {
 				w.closeMenu()
@@ -750,7 +750,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		if Settings.hotkeyEnable {
 			if globalKeyMonitor == nil {
 				let key = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String
-				let options = [key: NSNumber(value: (AXIsProcessTrusted() == false))]
+				let options = [key: NSNumber(value: (AXIsProcessTrusted() == false))] as CFDictionary
 				if AXIsProcessTrustedWithOptions(options) == true {
 					globalKeyMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { [weak self] incomingEvent in
 						_ = self?.checkForHotkey(in: incomingEvent)
@@ -772,7 +772,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 			guard let S = self else { return incomingEvent }
 
-			if S.checkForHotkey(in: incomingEvent) ?? false {
+			if S.checkForHotkey(in: incomingEvent) {
 				return nil
 			}
 
@@ -1081,7 +1081,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	private func restartApp() {
 		let ourPID = "\(ProcessInfo.processInfo.processIdentifier)"
 		let shArgs = ["-c", "kill -9 $1 \n sleep 1 \n open \"$2\"", "", ourPID, Bundle.main.bundlePath]
-		let restartTask = Task.launchedTask(withLaunchPath: "/bin/sh", arguments: shArgs)
+		let restartTask = Process.launchedProcess(launchPath: "/bin/sh", arguments: shArgs)
 		restartTask.waitUntilExit()
 	}
 

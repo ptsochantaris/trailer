@@ -127,24 +127,23 @@ final class API {
 						try! fileManager.removeItem(atPath: path)
 					}
 				} catch {
-					DLog("File error when cleaning old cached image: %@", (error as NSError).localizedDescription)
+					DLog("File error when cleaning old cached image: %@", error.localizedDescription)
 				}
 			}
 		}
 	}
 
-	func haveCachedAvatar(from path: String, tryLoadAndCallback: (IMAGE_CLASS?, String) -> Void) -> Bool {
+	func haveCachedAvatar(from path: String, tryLoadAndCallback: @escaping (IMAGE_CLASS?, String) -> Void) -> Bool {
 
-		func getImage(at path: String, completion:(data: Data?) -> Void) {
+		func getImage(at path: String, completion:@escaping (_ data: Data?) -> Void) {
 
 			let url = URL(string: path)!
 			let task = urlSession.dataTask(with: url) { [weak self] data, response, error in
 
-				let r = response as? HTTPURLResponse
-				if error != nil || response == nil || r?.statusCode > 299 || (r?.expectedContentLength ?? 0) < Int64(data?.count ?? 0) {
-					completion(data: nil)
+				if error == nil, let r = response as? HTTPURLResponse, r.statusCode < 300, r.expectedContentLength == Int64(data?.count ?? 0) {
+					completion(data)
 				} else {
-					completion(data: data)
+					completion(nil)
 				}
 				#if os(iOS)
 					atNextEvent(self) { S in
@@ -171,7 +170,7 @@ final class API {
 		let fileManager = FileManager.default
 		if fileManager.fileExists(atPath: cachePath) {
 			#if os(iOS)
-				let imgData = try? Data(contentsOf: URL(fileURLWithPath: cachePath))
+				let imgData = try? Data(contentsOf: URL(fileURLWithPath: cachePath)) as CFData
 				let imgDataProvider = CGDataProvider(data: imgData!)
 				var ret: UIImage?
 				if let cfImage = CGImage(jpegDataProviderSource: imgDataProvider!, decode: nil, shouldInterpolate: false, intent: .defaultIntent) {
@@ -304,7 +303,7 @@ final class API {
 				try moc.save()
 				DLog("Synced data committed")
 			} catch {
-				DLog("Committing sync failed: %@", (error as NSError).localizedDescription)
+				DLog("Committing sync failed: %@", error.localizedDescription)
 			}
 			andCallback()
 		}
@@ -427,7 +426,7 @@ final class API {
 			for d in data ?? [] {
 				let eventDate = parseGH8601(d["created_at"] as? String) ?? .distantPast
 				if latestDate! < eventDate {
-					if let repoId = d["repo"]?["id"] as? NSNumber {
+					if let repoId = (d["repo"] as? [String : Any])?["id"] as? NSNumber {
 						DLog("(%@) New event at %@ from Repo ID %@", serverLabel, eventDate, repoId)
 						toMarkDirty.add(repoId)
 					}
@@ -472,7 +471,7 @@ final class API {
 			for d in data ?? [] {
 				let eventDate = parseGH8601(d["created_at"] as? String) ?? .distantPast
 				if latestDate! < eventDate {
-					if let repoId = d["repo"]?["id"] as? NSNumber {
+					if let repoId = (d["repo"] as? [String : Any])?["id"] as? NSNumber {
 						DLog("(%@) New event at %@ from Repo ID %@", serverLabel, eventDate, repoId)
 						toMarkDirty.add(repoId)
 					}
@@ -961,7 +960,7 @@ final class API {
 			if let issueLink = p.issueUrl {
 				getData(in: issueLink, from: apiServer) { data, lastPage, resultCode in
 					if resultCode == 200 || resultCode == 404 || resultCode == 410 {
-						p.processAssignmentStatus(from: data as? [String : AnyObject])
+						p.processAssignmentStatus(from: data as? [String : Any])
 					} else {
 						apiServer.lastSyncSucceeded = false
 					}
@@ -998,8 +997,8 @@ final class API {
 
 		getData(in: path, from: pullRequest.apiServer) { [weak self] data, lastPage, resultCode in
 
-			if let d = data as? [String : AnyObject] {
-				if let mergeInfo = d["merged_by"] as? [String : AnyObject], let mergeUserId = mergeInfo["id"] as? NSNumber {
+			if let d = data as? [String : Any] {
+				if let mergeInfo = d["merged_by"] as? [String : Any], let mergeUserId = mergeInfo["id"] as? NSNumber {
 					self?.handleMerging(of: pullRequest, byUserId: mergeUserId.int64Value)
 				} else {
 					self?.handleClosing(of: pullRequest)
@@ -1060,7 +1059,7 @@ final class API {
 		}
 	}
 
-	private func getRateLimit(from server: ApiServer, callback: (Int64, Int64, Int64)->Void)
+	private func getRateLimit(from server: ApiServer, callback: @escaping (_ requestsRemaining: Int64, _ requestLimit: Int64, _ nextReset: Int64)->Void)
 	{
 		api(call: "/rate_limit", on: server, ignoreLastSync: true) { code, headers, data, error, shouldRetry in
 
@@ -1071,7 +1070,7 @@ final class API {
 				let epochSeconds = Int64(S(allHeaders["X-RateLimit-Reset"] as? String)) ?? 0
 				callback(requestsRemaining, requestLimit, epochSeconds)
 			} else {
-				if code == 404 && data != nil && !((data as? [String : AnyObject])?["message"] as? String == "Not Found") {
+				if code == 404 && data != nil && !((data as? [String : Any])?["message"] as? String == "Not Found") {
 					callback(10000, 10000, 0)
 				} else {
 					callback(-1, -1, -1)
@@ -1155,7 +1154,7 @@ final class API {
 			if apiServer.goodToGo {
 				getData(in: "/user", from: apiServer) { data, lastPage, resultCode in
 
-					if let d = data as? [String : AnyObject] {
+					if let d = data as? [String : Any] {
 						apiServer.userName = d["login"] as? String
 						apiServer.userId = (d["id"] as? NSNumber)?.int64Value ?? 0
 					} else {
@@ -1176,11 +1175,11 @@ final class API {
 		badLinks.removeAll(keepingCapacity: false)
 	}
 
-	func testApi(to apiServer: ApiServer, callback: (NSError?) -> ()) {
+	func testApi(to apiServer: ApiServer, callback: @escaping (Error?) -> ()) {
 		clearAllBadLinks()
 		api(call: "/user", on: apiServer, ignoreLastSync: true) { [weak self] code, headers, data, error, shouldRetry in
 
-			if let d = data as? [String : AnyObject], let userName = d["login"] as? String, let userId = d["id"] as? NSNumber, error == nil {
+			if let d = data as? [String : Any], let userName = d["login"] as? String, let userId = d["id"] as? NSNumber, error == nil {
 				if userName.isEmpty || userId.int64Value <= 0 {
 					let localError = self?.apiError("Could not read a valid user record from this endpoint")
 					callback(localError)
@@ -1193,7 +1192,7 @@ final class API {
 		}
 	}
 
-	private func apiError(_ message: String) -> NSError {
+	private func apiError(_ message: String) -> Error {
 		return NSError(domain: "API Error", code: -1, userInfo: [NSLocalizedDescriptionKey: message])
 	}
 
@@ -1203,13 +1202,13 @@ final class API {
 		at path: String,
 		from server: ApiServer,
 		startingFrom page: Int = 1,
-		perPageCallback: (data: [[String : AnyObject]]?, lastPage: Bool) -> Bool,
-		finalCallback: (success: Bool, resultCode: Int64) -> Void) {
+		perPageCallback: @escaping (_ data: [[String : Any]]?, _ lastPage: Bool) -> Bool,
+		finalCallback: @escaping (_ success: Bool, _ resultCode: Int64) -> Void) {
 
 		if path.isEmpty {
 			// handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
 			atNextEvent {
-				finalCallback(success: true, resultCode: -1)
+				finalCallback(true, -1)
 				return
 			}
 			return
@@ -1219,16 +1218,16 @@ final class API {
 		getData(in: p, from: server) {
 			[weak self] data, lastPage, resultCode in
 
-			if let d = data as? [[String : AnyObject]] {
+			if let d = data as? [[String : Any]] {
 				var isLastPage = lastPage
-				if perPageCallback(data: d, lastPage: lastPage) { isLastPage = true }
+				if perPageCallback(d, lastPage) { isLastPage = true }
 				if isLastPage {
-					finalCallback(success: true, resultCode: resultCode)
+					finalCallback(true, resultCode)
 				} else {
 					self?.getPagedData(at: path, from: server, startingFrom: page+1, perPageCallback: perPageCallback, finalCallback: finalCallback)
 				}
 			} else {
-				finalCallback(success: false, resultCode: resultCode)
+				finalCallback(false, resultCode)
 			}
 		}
 	}
@@ -1237,7 +1236,7 @@ final class API {
 		in path: String,
 		from server: ApiServer,
 		attemptCount: Int = 0,
-		callback: (data: AnyObject?, lastPage: Bool, resultCode: Int64) -> Void) {
+		callback: @escaping (_ data: Any?, _ lastPage: Bool, _ resultCode: Int64) -> Void) {
 
 		api(call: path, on: server, ignoreLastSync: false) { [weak self] c, headers, data, error, shouldRetry in
 
@@ -1271,7 +1270,7 @@ final class API {
 
 					NotificationCenter.default.post(name: ApiUsageUpdateNotification, object: server, userInfo: nil)
 				}
-				callback(data: data, lastPage: lastPage, resultCode: code)
+				callback(data, lastPage, code)
 			} else {
 				if shouldRetry && attemptCount < 2 { // timeout, truncation, connection issue, etc
 					let nextAttemptCount = attemptCount+1
@@ -1283,18 +1282,18 @@ final class API {
 					if shouldRetry {
 						DLog("(%@) Giving up on failed API call to %@", S(server.label), path)
 					}
-					callback(data: nil, lastPage: false, resultCode: code)
+					callback(nil, false, code)
 				}
 			}
 		}
 	}
 
-	typealias ApiCompletion = (code: Int64?, headers: [NSObject : AnyObject]?, data: AnyObject?, error: NSError?, shouldRetry: Bool) -> Void
+	typealias ApiCompletion = (_ code: Int64?, _ headers: [AnyHashable : Any]?, _ data: Any?, _ error: Error?, _ shouldRetry: Bool) -> Void
 
 	private var apiRunningCount = 0
 	private var apiCallQueue = [Completion]()
 	#if os(iOS)
-	private let maxApiOperations = (sizeof(Int.self) == sizeof(Int64.self)) ? 8 : 2
+	private let maxApiOperations = (MemoryLayout<Int>.size == MemoryLayout<Int64>.size) ? 8 : 2
 	#else
 	private let maxApiOperations = 8
 	#endif
@@ -1340,7 +1339,7 @@ final class API {
 		} else {
 			atNextEvent(self) { S in
 				let e = S.apiError("Sync has failed, skipping this call")
-				completion(code: nil, headers: nil, data: nil, error: e, shouldRetry: false)
+				completion(nil, nil, nil, e, false)
 				S.dequeueApi()
 			}
 			return
@@ -1363,7 +1362,7 @@ final class API {
 				DLog("(%@) Preempted fetch to previously broken link %@, won't actually access this URL until %@", apiServerLabel, expandedPath, eb.nextAttemptAt)
 				atNextEvent(self) { S in
 					let e = S.apiError("Preempted fetch because of throttling")
-					completion(code: nil, headers: nil, data: nil, error: e, shouldRetry: false)
+					completion(nil, nil, nil, e, false)
 					S.dequeueApi()
 				}
 				return
@@ -1403,8 +1402,8 @@ final class API {
 			guard let S = self else { return }
 
 			let response = res as? HTTPURLResponse
-			let parsedData: AnyObject?
-			let error: NSError?
+			let parsedData: Any?
+			let error: Error?
 			let shouldRetry: Bool
 			var code = Int64(response?.statusCode ?? 0)
 			var headers = response?.allHeaderFields
@@ -1468,14 +1467,14 @@ final class API {
 	}
 
 	private func handleResponse(with data: Data?,
-	                            parsedData: AnyObject?,
+	                            parsedData: Any?,
 	                            serverLabel: String,
 	                            urlPath: String,
 	                            code: Int64,
-	                            error: NSError?,
+	                            error: Error?,
 	                            shouldRetry: Bool,
 	                            existingBackOff: UrlBackOffEntry?,
-	                            headers: [NSObject : AnyObject]?,
+	                            headers: [AnyHashable : Any]?,
 	                            completion: ApiCompletion) {
 		if error != nil {
 			if code > 399 {
@@ -1500,7 +1499,7 @@ final class API {
 			DLog("API data from %@: %@", urlPath, String(bytes: d, encoding: .utf8))
 		}
 
-		completion(code: code, headers: headers, data: parsedData, error: error, shouldRetry: shouldRetry)
+		completion(code, headers, parsedData, error, shouldRetry)
 
 		dequeueApi()
 	}

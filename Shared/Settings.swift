@@ -37,7 +37,7 @@ final class PopTimer : NSObject {
 
 /////////////////////////////
 
-var _settings_valuesCache = [String : AnyObject]()
+var _settings_valuesCache = [String : Any]()
 let _settings_shared = UserDefaults(suiteName: "group.Trailer")!
 
 final class Settings {
@@ -62,7 +62,7 @@ final class Settings {
         let d = UserDefaults.standard
         if d.object(forKey: "LAST_RUN_VERSION_KEY") != nil {
             for k in allFields {
-                if let v: AnyObject = d.object(forKey: k) {
+                if let v = d.object(forKey: k) {
                     _settings_shared.set(v, forKey: k)
                     DLog("Migrating setting '%@'", k)
                     d.removeObject(forKey: k)
@@ -156,13 +156,14 @@ final class Settings {
 		_settings_shared.synchronize()
 	}
 
-	private class func set(_ key: String, _ value: NSObject?) {
+	private class func set(_ key: String, _ value: Any?) {
 
-		let previousValue = _settings_shared.object(forKey: key) as? NSObject
+		let previousValue = _settings_shared.object(forKey: key)
 
 		if let v = value {
-			if let p = previousValue, p.isEqual(v) {
-				DLog("Setting %@ to identical value (%@), skipping", key, value)
+			let vString = String(describing: v)
+			if let p = previousValue, String(describing : p) == vString {
+				DLog("Setting %@ to identical value (%@), skipping", key, vString)
 				return
 			} else {
 				_settings_shared.set(v, forKey: key)
@@ -178,7 +179,11 @@ final class Settings {
 		_settings_valuesCache[key] = value
 		_settings_shared.synchronize()
 
-		DLog("Setting %@ to %@", key, value)
+		if let v = value {
+			DLog("Setting %@ to %@", key, String(describing: v))
+		} else {
+			DLog("Clearing option %@", key)
+		}
 
 		possibleExport(key)
 	}
@@ -205,8 +210,8 @@ final class Settings {
 		#endif
 	}
 
-	private class func get(_ key: String) -> AnyObject? {
-		if let v: AnyObject = _settings_valuesCache[key] {
+	private class func get(_ key: String) -> Any? {
+		if let v = _settings_valuesCache[key] {
 			return v
 		} else if let v = _settings_shared.object(forKey: key) {
 			_settings_valuesCache[key] = v
@@ -230,7 +235,7 @@ final class Settings {
 		Settings.lastExportDate = Date()
 		let settings = NSMutableDictionary()
 		for k in allFields {
-			if let v: AnyObject = _settings_shared.object(forKey: k), k != "AUTO_REPEAT_SETTINGS_EXPORT" {
+			if let v = _settings_shared.object(forKey: k), k != "AUTO_REPEAT_SETTINGS_EXPORT" {
 				settings[k] = v
 			}
 		}
@@ -250,7 +255,7 @@ final class Settings {
 			DLog("Reading settings from %@", url.absoluteString)
 			resetAllSettings()
 			for k in allFields {
-				if let v: AnyObject = settings[k] {
+				if let v = settings[k] {
 					_settings_shared.set(v, forKey: k)
 				}
 			}

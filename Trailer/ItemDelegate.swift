@@ -1,5 +1,5 @@
 
-private let _propertiesToFetch = { ()->[AnyObject] in
+private let _propertiesToFetch = { ()->[Any] in
 	let iodD = NSExpressionDescription()
 	iodD.name = "objectID"
 	iodD.expression = NSExpression.expressionForEvaluatedObject()
@@ -15,7 +15,7 @@ private let _propertiesToFetch = { ()->[AnyObject] in
 
 final class ItemDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 
-	private var itemIds = [NSObject]()
+	private var itemIds = [Any]()
 	private let type: ListableItem.Type
 	private let sections: [String]
 	private let removalSections: [String]

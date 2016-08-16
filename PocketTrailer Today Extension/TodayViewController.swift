@@ -14,37 +14,37 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 	private var linkButton = UIButton(type: UIButtonType.custom)
 	private let paragraph = NSMutableParagraphStyle()
 
-	private var titleAttributes: [String : AnyObject] {
+	private var titleAttributes: [String : Any] {
 		return [
 			NSForegroundColorAttributeName: UIColor.black,
 			NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.systemFontSize+2.0),
 			NSParagraphStyleAttributeName: paragraph ]
 	}
 
-	private var normalAttributes: [String : AnyObject] {
+	private var normalAttributes: [String : Any] {
 		return [
 			NSForegroundColorAttributeName: UIColor.darkGray,
 			NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.systemFontSize+2.0),
 			NSParagraphStyleAttributeName: paragraph ]
 	}
 
-	private var dimAttributes: [String : AnyObject] {
+	private var dimAttributes: [String : Any] {
 		return [
-			NSForegroundColorAttributeName: UIColor.lightGray,
+			NSForegroundColorAttributeName: UIColor.gray,
 			NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.systemFontSize+2.0),
 			NSParagraphStyleAttributeName: paragraph ]
 	}
 
-	private var redAttributes: [String : AnyObject] {
+	private var redAttributes: [String : Any] {
 		return [
 			NSForegroundColorAttributeName: UIColor.red,
 			NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.systemFontSize+2.0),
 			NSParagraphStyleAttributeName: paragraph ]
 	}
 
-	private var smallAttributes: [String : AnyObject] {
+	private var smallAttributes: [String : Any] {
 		return [
-			NSForegroundColorAttributeName: UIColor.lightGray,
+			NSForegroundColorAttributeName: UIColor.gray,
 			NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize),
 			NSParagraphStyleAttributeName: paragraph ]
 	}
@@ -118,15 +118,15 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 				var totalClosed = 0
 				var totalOther = 0
 
-				for r in result["views"] as! [[String : AnyObject]] {
-					if let v = r[type] as? [String : AnyObject] {
-						totalMine += v[Section.mine.apiName]?["total"] as? Int ?? 0
-						totalParticipated += v[Section.participated.apiName]?["total"] as? Int ?? 0
-						totalMentioned += v[Section.mentioned.apiName]?["total"] as? Int ?? 0
-						totalSnoozed += v[Section.snoozed.apiName]?["total"] as? Int ?? 0
-						totalOther += v[Section.all.apiName]?["total"] as? Int ?? 0
-						totalMerged += v[Section.merged.apiName]?["total"] as? Int ?? 0
-						totalClosed += v[Section.closed.apiName]?["total"] as? Int ?? 0
+				for r in result["views"] as! [[String : Any]] {
+					if let v = r[type] as? [String : Any] {
+						totalMine += (v[Section.mine.apiName] as? [String : Any])?["total"] as? Int ?? 0
+						totalParticipated += (v[Section.participated.apiName] as? [String : Any])?["total"] as? Int ?? 0
+						totalMentioned += (v[Section.mentioned.apiName] as? [String : Any])?["total"] as? Int ?? 0
+						totalSnoozed += (v[Section.snoozed.apiName] as? [String : Any])?["total"] as? Int ?? 0
+						totalOther += (v[Section.all.apiName] as? [String : Any])?["total"] as? Int ?? 0
+						totalMerged += (v[Section.merged.apiName] as? [String : Any])?["total"] as? Int ?? 0
+						totalClosed += (v[Section.closed.apiName] as? [String : Any])?["total"] as? Int ?? 0
 						totalUnread += v["unread"] as? Int ?? 0
 						totalOpen += v["total_open"] as? Int ?? 0
 					}

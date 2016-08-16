@@ -1,7 +1,7 @@
 
 import UIKit
 
-let statusAttributes: [String : AnyObject] = {
+let statusAttributes: [String : Any] = {
 	let paragraphStyle = NSMutableParagraphStyle()
 	paragraphStyle.paragraphSpacing = 6.0
 
@@ -163,11 +163,11 @@ final class PRCell: UITableViewCell {
 		let _commentsNew = Int(item.unreadComments)
 		let fade = muted || item.isSnoozing
 
-		readCount.text = itemCountFormatter.string(from: _commentsTotal)
+		readCount.text = itemCountFormatter.string(from: NSNumber(value: _commentsTotal))
 		readCount.isHidden = _commentsTotal == 0
 
 		unreadCount.isHidden = _commentsNew == 0
-		unreadCount.text = itemCountFormatter.string(from: _commentsNew)
+		unreadCount.text = itemCountFormatter.string(from: NSNumber(value: _commentsNew))
 
 		let a = fade ? DISABLED_FADE : 1.0
 		readCount.alpha = a

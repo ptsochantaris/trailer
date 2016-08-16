@@ -43,7 +43,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 		dismiss(animated: true, completion: nil)
 	}
 
-	@IBAction func openGitHubSelected(_ sender: AnyObject) {
+	@IBAction func openGitHubSelected(_ sender: UIButton) {
 		let s = SFSafariViewController(url: URL(string: "https://github.com/settings/tokens/new")!)
 		s.view.tintColor = self.view.tintColor
 		self.present(s, animated: true, completion: nil)

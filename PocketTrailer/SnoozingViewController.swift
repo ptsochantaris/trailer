@@ -89,7 +89,7 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 		}
 	}
 
-	override func prepare(for segue: UIStoryboardSegue, sender: AnyObject?) {
+	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
 		if let d = segue.destination as? PickerViewController {
 			d.delegate = self
 			d.title = "Auto Snooze Items After"

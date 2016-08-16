@@ -691,7 +691,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		Settings.openPrAtFirstUnreadComment = (sender.integerValue==1)
 	}
 
-	@IBAction func sortMethodChanged(_ sender: AnyObject) {
+	@IBAction func sortMethodChanged(_ sender: NSMenuItem) {
 		Settings.sortMethod = sortModeSelect.indexOfSelectedItem
 		DataManager.postProcessAllItems()
 		deferredUpdateTimer.push()
@@ -874,7 +874,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
-	@IBAction func repeatLastExportSelected(_ sender: AnyObject) {
+	@IBAction func repeatLastExportSelected(_ sender: NSButton) {
 		Settings.autoRepeatSettingsExport = (repeatLastExportAutomatically.integerValue==1)
 	}
 
@@ -929,7 +929,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		hotKeyHelp.isHidden = Settings.hotkeyEnable
 	}
 
-	@IBAction func enableHotkeySelected(_ sender: AnyObject) {
+	@IBAction func enableHotkeySelected(_ sender: NSButton) {
 		Settings.hotkeyEnable = hotkeyEnable.integerValue != 0
 		Settings.hotkeyLetter = hotkeyLetter.titleOfSelectedItem ?? "T"
 		Settings.hotkeyControlModifier = hotkeyControlModifier.integerValue != 0
@@ -1092,7 +1092,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	override func controlTextDidChange(_ n: Notification) {
-		if let obj: AnyObject = n.object {
+		if let obj = n.object as? NSTextField {
 
 			if obj===apiServerName {
 				if let apiServer = selectedServer {
@@ -1155,12 +1155,14 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	///////////// Repo table
 
 	func tableViewSelectionDidChange(_ notification: Notification) {
-		if serverList === notification.object {
-			fillServerApiFormFromSelectedServer()
-		} else if projectsTable === notification.object {
-			updateAllItemSettingButtons()
-		} else if snoozePresetsList === notification.object {
-			fillSnoozeFormFromSelectedPreset()
+		if let o = notification.object as? NSTableView {
+			if serverList === o {
+				fillServerApiFormFromSelectedServer()
+			} else if projectsTable === o {
+				updateAllItemSettingButtons()
+			} else if snoozePresetsList === o {
+				fillSnoozeFormFromSelectedPreset()
+			}
 		}
 	}
 
@@ -1178,7 +1180,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		return !tableView(tv, isGroupRow: row)
 	}
 
-	func tableView(_ tv: NSTableView, willDisplayCell c: AnyObject, for tableColumn: NSTableColumn?, row: Int) {
+	func tableView(_ tv: NSTableView, willDisplayCell c: Any, for tableColumn: NSTableColumn?, row: Int) {
 		let cell = c as! NSCell
 		if tv === projectsTable {
 			if tableColumn?.identifier == "repos" {
@@ -1295,11 +1297,11 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		return 0
 	}
 
-	func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> AnyObject? {
+	func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any? {
 		return nil
 	}
 
-	func tableView(_ tv: NSTableView, setObjectValue object: AnyObject?, for tableColumn: NSTableColumn?, row: Int) {
+	func tableView(_ tv: NSTableView, setObjectValue object: Any?, for tableColumn: NSTableColumn?, row: Int) {
 		if tv === projectsTable {
 			if !tableView(tv, isGroupRow: row) {
 				let r = repo(at: row)
@@ -1555,7 +1557,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
-	@IBAction func snoozeUpSelected(_ sender: AnyObject) {
+	@IBAction func snoozeUpSelected(_ sender: NSButton) {
 		if let this = selectedSnoozePreset {
 			let all = SnoozePreset.allSnoozePresets(in: mainObjectContext)
 			if let index = all.index(of: this), index > 0 {
@@ -1568,7 +1570,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		}
 	}
 
-	@IBAction func snoozeDownSelected(_ sender: AnyObject) {
+	@IBAction func snoozeDownSelected(_ sender: NSButton) {
 		if let this = selectedSnoozePreset {
 			let all = SnoozePreset.allSnoozePresets(in: mainObjectContext)
 			if let index = all.index(of: this), index < all.count-1 {

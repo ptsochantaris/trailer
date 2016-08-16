@@ -72,9 +72,14 @@ let itemDateFormatter = { () -> DateFormatter in
 	return f
 }()
 
-func DLog(_ message: String, _ arg1: @autoclosure ()->CVarArg? = nil, _ arg2: @autoclosure ()->CVarArg? = nil, _ arg3: @autoclosure ()->CVarArg? = nil, _ arg4: @autoclosure ()->CVarArg? = nil, _ arg5: @autoclosure ()->CVarArg? = nil) {
+func DLog(_ message: String, _ arg1: @autoclosure ()->Any? = nil, _ arg2: @autoclosure ()->Any? = nil, _ arg3: @autoclosure ()->Any? = nil, _ arg4: @autoclosure ()->Any? = nil, _ arg5: @autoclosure ()->Any? = nil) {
 	if Settings.logActivityToConsole {
-		NSLog(message, arg1() ?? "(nil)", arg2() ?? "(nil)", arg3() ?? "(nil)", arg4() ?? "(nil)", arg5() ?? "(nil)")
+		NSLog(message,
+		      String(describing: arg1() ?? "(nil)"),
+		      String(describing: arg2() ?? "(nil)"),
+		      String(describing: arg3() ?? "(nil)"),
+		      String(describing: arg4() ?? "(nil)"),
+		      String(describing: arg5() ?? "(nil)"))
 	}
 }
 

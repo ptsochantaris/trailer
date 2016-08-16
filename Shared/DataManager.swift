@@ -13,7 +13,7 @@ final class DataManager {
 
 	class func checkMigration() {
 
-		guard mainObjectContext.persistentStoreCoordinator?.persistentStores.count > 0 else { return }
+		guard let count = mainObjectContext.persistentStoreCoordinator?.persistentStores.count, count > 0 else { return }
 
 		if Settings.lastRunVersion != versionString {
 			DLog("VERSION UPDATE MAINTENANCE NEEDED")
@@ -97,7 +97,7 @@ final class DataManager {
 
 		DLog("Migrating display policies")
 		for r in DataItem.allItems(of: Repo.self, in: mainObjectContext) {
-			if let markedAsHidden = r.value(forKey: "hidden")?.boolValue, markedAsHidden == true {
+			if let markedAsHidden = (r.value(forKey: "hidden") as AnyObject?)?.boolValue, markedAsHidden == true {
 				r.displayPolicyForPrs = RepoDisplayPolicy.hide.rawValue
 				r.displayPolicyForIssues = RepoDisplayPolicy.hide.rawValue
 			} else {
@@ -236,7 +236,7 @@ final class DataManager {
 			do {
 				try mainObjectContext.save()
 			} catch {
-				DLog("Error while saving DB: %@", (error as NSError).localizedDescription)
+				DLog("Error while saving DB: %@", error.localizedDescription)
 			}
 		}
 	}
@@ -249,7 +249,7 @@ final class DataManager {
 		return c
 	}
 
-	class func info(for type: NotificationType, item: DataItem) -> [String : AnyObject] {
+	class func info(for type: NotificationType, item: DataItem) -> [String : Any] {
 		switch type {
 		case .newMention, .newComment:
 			let uri = item.objectID.uriRepresentation().absoluteString
@@ -297,7 +297,7 @@ final class DataManager {
 		#else
 			let sharedFiles = legacyFilesDirectory
 		#endif
-		DLog("Files in %@", sharedFiles)
+		DLog("Files in %@", sharedFiles.absoluteString)
 		return sharedFiles
 	}
 
@@ -332,7 +332,7 @@ final class DataManager {
 
 	class func buildMainContext() -> NSManagedObjectContext {
 
-		let storeOptions = [
+		let storeOptions: [AnyHashable : Any] = [
 			NSMigratePersistentStoresAutomaticallyOption: true,
 			NSInferMappingModelAutomaticallyOption: true,
 			NSSQLitePragmasOption: ["synchronous":"NORMAL"]
@@ -363,7 +363,7 @@ final class DataManager {
 			m.persistentStoreCoordinator = persistentStoreCoordinator
 			DLog("Database setup complete")
 		} catch {
-			DLog("Database setup error: %@", (error as NSError).localizedDescription)
+			DLog("Database setup error: %@", error.localizedDescription)
 		}
 
 		return m

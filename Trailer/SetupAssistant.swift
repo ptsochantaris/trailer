@@ -30,7 +30,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 		app.closedSetupAssistant()
 	}
 
-	func windowShouldClose(_ sender: AnyObject) -> Bool {
+	func windowShouldClose(_ sender: Any) -> Bool {
 		return spinner.isHidden
 	}
 

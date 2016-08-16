@@ -39,7 +39,7 @@ class ListableItem: DataItem {
 	@NSManaged var comments: Set<PRComment>
 	@NSManaged var labels: Set<PRLabel>
 
-	final func baseSync(from info: [String : AnyObject], in repo: Repo) {
+	final func baseSync(from info: [String : Any], in repo: Repo) {
 
 		self.repo = repo
 
@@ -49,9 +49,9 @@ class ListableItem: DataItem {
 		state = info["state"] as? String
 		title = info["title"] as? String
 		body = info["body"] as? String
-		milestone = info["milestone"]?["title"] as? String
+		milestone = (info["milestone"] as? [String : Any])?["title"] as? String
 
-		if let userInfo = info["user"] as? [String : AnyObject] {
+		if let userInfo = info["user"] as? [String : Any] {
 			userId = (userInfo["id"] as? NSNumber)?.int64Value ?? 0
 			userLogin = userInfo["login"] as? String
 			userAvatarUrl = userInfo["avatar_url"] as? String
@@ -60,12 +60,12 @@ class ListableItem: DataItem {
 		processAssignmentStatus(from: info)
 	}
 
-	final func processAssignmentStatus(from info: [String : AnyObject]?) {
+	final func processAssignmentStatus(from info: [String : Any]?) {
 
 		let myIdOnThisRepo = repo.apiServer.userId
 		var assigneeNames = [String]()
 
-		func checkAndStoreAssigneeName(from assignee: [String : AnyObject]) -> Bool {
+		func checkAndStoreAssigneeName(from assignee: [String : Any]) -> Bool {
 
 			if let name = assignee["login"] as? String, let assigneeId = assignee["id"] as? NSNumber {
 				let shouldBeAssignedToMe = assigneeId.int64Value == myIdOnThisRepo
@@ -78,13 +78,13 @@ class ListableItem: DataItem {
 
 		var foundAssignmentToMe = false
 
-		if let assignees = info?["assignees"] as? [[String : AnyObject]], assignees.count > 0 {
+		if let assignees = info?["assignees"] as? [[String : Any]], assignees.count > 0 {
 			for assignee in assignees {
 				if checkAndStoreAssigneeName(from: assignee) {
 					foundAssignmentToMe = true
 				}
 			}
-		} else if let assignee = info?["assignee"] as? [String : AnyObject] {
+		} else if let assignee = info?["assignee"] as? [String : Any] {
 			foundAssignmentToMe = checkAndStoreAssigneeName(from: assignee)
 		}
 
@@ -407,7 +407,7 @@ class ListableItem: DataItem {
 			let f = NSFetchRequest<PRComment>(entityName: "PRComment")
 			f.returnsObjectsAsFaults = false
 			f.fetchLimit = 1
-			f.predicate = predicateForOthersComments(since: latestReadCommentDate)
+			f.predicate = predicateForOthersComments(since: latestReadCommentDate ?? .distantPast)
 			f.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: true)]
 			let ret = try! managedObjectContext?.fetch(f) ?? []
 			if let firstComment = ret.first, let url = firstComment.webUrl {
@@ -458,13 +458,13 @@ class ListableItem: DataItem {
 					#if os(iOS)
 						lp.lineHeightMultiple = 1.15
 						let labelAttributes = [NSFontAttributeName: labelFont,
-						NSBaselineOffsetAttributeName: 2.0,
-						NSParagraphStyleAttributeName: lp]
+						                       NSBaselineOffsetAttributeName: 2.0,
+						                       NSParagraphStyleAttributeName: lp] as [String : Any]
 					#elseif os(OSX)
 						lp.minimumLineHeight = labelFont.pointSize+6.0
 						let labelAttributes = [NSFontAttributeName: labelFont,
-							NSBaselineOffsetAttributeName: 1.0,
-							NSParagraphStyleAttributeName: lp]
+						                       NSBaselineOffsetAttributeName: 1.0,
+						                       NSParagraphStyleAttributeName: lp] as [String : Any]
 					#endif
 
 					func isDark(color: COLOR_CLASS) -> Bool {
@@ -512,37 +512,21 @@ class ListableItem: DataItem {
 		#endif
 	}
 
-	final private func predicateForMyComments(since optionalDate: Date?) -> NSPredicate {
+	final private func predicateForMyComments(since date: Date) -> NSPredicate {
 
 		if self is PullRequest {
-			if let date = optionalDate {
-				return NSPredicate(format: "userId == %lld and pullRequest == %@ and createdAt > %@", apiServer.userId, self, date)
-			} else {
-				return NSPredicate(format: "userId == %lld and pullRequest == %@", apiServer.userId, self)
-			}
+			return NSPredicate(format: "userId == %lld and pullRequest == %@ and createdAt > %@", apiServer.userId, self, date as CVarArg)
 		} else {
-			if let date = optionalDate {
-				return NSPredicate(format: "userId == %lld and issue == %@ and createdAt > %@", apiServer.userId, self, date)
-			} else {
-				return NSPredicate(format: "userId == %lld and issue == %@", apiServer.userId, self)
-			}
+			return NSPredicate(format: "userId == %lld and issue == %@ and createdAt > %@", apiServer.userId, self, date as CVarArg)
 		}
 	}
 
-	final private func predicateForOthersComments(since optionalDate: Date?) -> NSPredicate {
+	final private func predicateForOthersComments(since date: Date) -> NSPredicate {
 
 		if self is PullRequest {
-			if let date = optionalDate {
-				return NSPredicate(format: "userId != %lld and pullRequest == %@ and createdAt > %@", apiServer.userId, self, date)
-			} else {
-				return NSPredicate(format: "userId != %lld and pullRequest == %@", apiServer.userId, self)
-			}
+			return NSPredicate(format: "userId != %lld and pullRequest == %@ and createdAt > %@", apiServer.userId, self, date as CVarArg)
 		} else {
-			if let date = optionalDate {
-				return NSPredicate(format: "userId != %lld and issue == %@ and createdAt > %@", apiServer.userId, self, date)
-			} else {
-				return NSPredicate(format: "userId != %lld and issue == %@", apiServer.userId, self)
-			}
+			return NSPredicate(format: "userId != %lld and issue == %@ and createdAt > %@", apiServer.userId, self, date as CVarArg)
 		}
 	}
 
@@ -715,7 +699,7 @@ class ListableItem: DataItem {
 		return f
 	}
 
-	final class func relatedItems(from notificationUserInfo: [String : AnyObject]) -> (PRComment?, ListableItem)? {
+	final class func relatedItems(from notificationUserInfo: [String : Any]) -> (PRComment?, ListableItem)? {
 		var item: ListableItem?
 		var comment: PRComment?
 		if let cid = notificationUserInfo[COMMENT_ID_KEY] as? String, let itemId = DataManager.id(for: cid), let c = existingObject(with: itemId) as? PRComment {
