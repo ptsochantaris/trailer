@@ -200,6 +200,8 @@ final class MenuWindow: NSWindow {
 			makeKeyAndOrderFront(self)
 			NSApp.activate(ignoringOtherApps: true)
 			app.openingWindow = false
+		} else if statusItem == nil {
+			closeMenu()
 		}
 	}
 
@@ -210,10 +212,12 @@ final class MenuWindow: NSWindow {
 	}
 
 	func closeMenu() {
-		if isVisible, let siv = statusItem?.view as? StatusItemView {
-			siv.highlighted = false
-			orderOut(nil)
+		if isVisible {
+			if let siv = statusItem?.view as? StatusItemView {
+				siv.highlighted = false
+			}
 			table.deselectAll(nil)
+			orderOut(nil)
 		}
 	}
 

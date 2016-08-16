@@ -90,9 +90,9 @@ final class MenuBarSet {
 	private func updateMenu(of type: ListableItem.Type,
 	                        menu: MenuWindow,
 	                        lengthOffset: CGFloat,
-	                        totalCount: ()->Int,
-	                        hasUnread: ()->Bool,
-	                        reasonForEmpty: (String)->NSAttributedString) {
+	                        totalCount: () -> Int,
+	                        hasUnread: () -> Bool,
+	                        reasonForEmpty: (String) -> NSAttributedString) {
 
 		let countString: String
 		let somethingFailed = ApiServer.shouldReportRefreshFailure(in: mainObjectContext) && (viewCriterion?.relatedServerFailed ?? true)

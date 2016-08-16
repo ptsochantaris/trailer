@@ -120,7 +120,7 @@ class TrailerCell: NSTableCellView {
 
 			if let snooze = item.snoozeUntil {
 				let title: String
-				if snooze == .distantFuture {
+				if snooze == .distantFuture || snooze == autoSnoozeDate {
 					title = String(format: "Wake")
 				} else {
 					title = String(format: "Wake (auto: %@)", itemDateFormatter.string(from: snooze))
