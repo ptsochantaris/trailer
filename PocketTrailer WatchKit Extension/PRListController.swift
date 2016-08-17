@@ -19,12 +19,12 @@ final class PRListController: CommonController {
 
 	private var onlyUnread = false
 	private var lastCount = 0
-	private var loadingBuffer: [[String : Any]]?
+	private var loadingBuffer: [[AnyHashable : Any]]?
 	private var loading = false
 
 	override func awake(withContext context: Any?) {
 
-		let c = context as! [String : Any]
+		let c = context as! [AnyHashable : Any]
 		sectionIndex = (c[SECTION_KEY] as! NSNumber).int64Value
 		type = c[TYPE_KEY] as! String
 		onlyUnread = c[UNREAD_KEY] as! Bool
@@ -79,7 +79,7 @@ final class PRListController: CommonController {
 		if let l = loadingBuffer {
 			params["from"] = NSNumber(value: l.count)
 		} else {
-			loadingBuffer = [[String : Any]]()
+			loadingBuffer = [[AnyHashable : Any]]()
 			params["from"] = NSNumber(value: 0)
 		}
 
@@ -93,9 +93,9 @@ final class PRListController: CommonController {
 
 	private var progressiveLoading = false
 
-	override func update(from response: [String : Any]) {
+	override func update(from response: [AnyHashable : Any]) {
 
-		let page = response["result"] as! [[String : Any]]
+		let page = response["result"] as! [[AnyHashable : Any]]
 
 		loadingBuffer?.append(contentsOf: page)
 		if page.count == PAGE_SIZE {

@@ -27,12 +27,12 @@ class DataItem: NSManagedObject {
 		return try! server.managedObjectContext!.fetch(f)
 	}
 
-	final class func items<T: DataItem>(with data: [[String : Any]]?, type: T.Type, server: ApiServer, postProcessCallback: (T, [String : Any], Bool)->Void) {
+	final class func items<T: DataItem>(with data: [[AnyHashable : Any]]?, type: T.Type, server: ApiServer, postProcessCallback: (T, [AnyHashable : Any], Bool) -> Void) {
 
 		guard let infos = data, infos.count > 0 else { return }
 
 		var idsOfItems = [Int64]()
-		var idsToInfo = [Int64 : [String : Any]]()
+		var idsToInfo = [Int64 : [AnyHashable : Any]]()
 		for info in infos {
 			if let serverId = info["id"] as? NSNumber {
 				let sid = serverId.int64Value
@@ -55,12 +55,12 @@ class DataItem: NSManagedObject {
 				idsOfItems.remove(at: idx)
 				let updatedDate = parseGH8601(info["updated_at"] as? String) ?? Date()
 				if updatedDate != i.updatedAt {
-					DLog("Updating %@: %lld", entityName, serverId)
+					DLog("Updating %@: %@", entityName, serverId)
 					i.postSyncAction = PostSyncAction.noteUpdated.rawValue
 					i.updatedAt = updatedDate
 					postProcessCallback(i, info, true)
 				} else {
-					//DLog("Skipping %@: %lld",type,serverId)
+					//DLog("Skipping %@: %@",type,serverId)
 					i.postSyncAction = PostSyncAction.doNothing.rawValue
 					postProcessCallback(i, info, false)
 				}
@@ -69,7 +69,7 @@ class DataItem: NSManagedObject {
 
 		for serverId in idsOfItems {
 			if let info = idsToInfo[serverId] {
-				DLog("Creating %@: %lld", entityName, serverId)
+				DLog("Creating %@: %@", entityName, serverId)
 				let i = NSEntityDescription.insertNewObject(forEntityName: entityName, into: server.managedObjectContext!) as! T
 				i.serverId = serverId
 				i.postSyncAction = PostSyncAction.noteNew.rawValue
@@ -121,7 +121,7 @@ class DataItem: NSManagedObject {
 		func nukeDeletedItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext) -> Int {
 			let discarded = items(of: type, surviving: false, in: moc)
 			if discarded.count > 0 {
-				DLog("Nuking %d %@ items marked for deletion", discarded.count, typeName(type))
+				DLog("Nuking %@ %@ items marked for deletion", discarded.count, typeName(type))
 				for i in discarded {
 					moc.delete(i)
 				}
@@ -137,7 +137,7 @@ class DataItem: NSManagedObject {
 		count += nukeDeletedItems(of: PRLabel.self, in: moc)
 		count += nukeDeletedItems(of: Issue.self, in: moc)
 		count += nukeDeletedItems(of: Team.self, in: moc)
-		DLog("Nuked total %d items marked for deletion", count)
+		DLog("Nuked total %@ items marked for deletion", count)
 	}
 
 	final class func countItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext) -> Int {

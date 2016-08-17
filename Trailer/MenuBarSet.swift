@@ -180,7 +180,7 @@ final class MenuBarSet {
 		}
 	}
 
-	private func compare(dictionary from: [String : Any], to: [String : Any]) -> Bool {
+	private func compare(dictionary from: [AnyHashable : Any], to: [AnyHashable : Any]) -> Bool {
 		for (key, value) in from {
 			if let v = to[key] {
 				if String(describing: v) != String(describing: value) {

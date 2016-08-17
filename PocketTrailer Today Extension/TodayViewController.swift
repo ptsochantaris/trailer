@@ -118,15 +118,15 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 				var totalClosed = 0
 				var totalOther = 0
 
-				for r in result["views"] as! [[String : Any]] {
-					if let v = r[type] as? [String : Any] {
-						totalMine += (v[Section.mine.apiName] as? [String : Any])?["total"] as? Int ?? 0
-						totalParticipated += (v[Section.participated.apiName] as? [String : Any])?["total"] as? Int ?? 0
-						totalMentioned += (v[Section.mentioned.apiName] as? [String : Any])?["total"] as? Int ?? 0
-						totalSnoozed += (v[Section.snoozed.apiName] as? [String : Any])?["total"] as? Int ?? 0
-						totalOther += (v[Section.all.apiName] as? [String : Any])?["total"] as? Int ?? 0
-						totalMerged += (v[Section.merged.apiName] as? [String : Any])?["total"] as? Int ?? 0
-						totalClosed += (v[Section.closed.apiName] as? [String : Any])?["total"] as? Int ?? 0
+				for r in result["views"] as! [[AnyHashable : Any]] {
+					if let v = r[type] as? [AnyHashable : Any] {
+						totalMine += (v[Section.mine.apiName] as? [AnyHashable : Any])?["total"] as? Int ?? 0
+						totalParticipated += (v[Section.participated.apiName] as? [AnyHashable : Any])?["total"] as? Int ?? 0
+						totalMentioned += (v[Section.mentioned.apiName] as? [AnyHashable : Any])?["total"] as? Int ?? 0
+						totalSnoozed += (v[Section.snoozed.apiName] as? [AnyHashable : Any])?["total"] as? Int ?? 0
+						totalOther += (v[Section.all.apiName] as? [AnyHashable : Any])?["total"] as? Int ?? 0
+						totalMerged += (v[Section.merged.apiName] as? [AnyHashable : Any])?["total"] as? Int ?? 0
+						totalClosed += (v[Section.closed.apiName] as? [AnyHashable : Any])?["total"] as? Int ?? 0
 						totalUnread += v["unread"] as? Int ?? 0
 						totalOpen += v["total_open"] as? Int ?? 0
 					}

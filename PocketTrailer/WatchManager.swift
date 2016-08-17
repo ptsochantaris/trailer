@@ -381,7 +381,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	private func countItems<T: ListableItem>(of type: T.Type, in section: Section, criterion: GroupingCriterion?) -> Int {
 		let f = NSFetchRequest<T>(entityName: typeName(type))
-		let p = Settings.hideUncommentedItems ? NSPredicate(format: "sectionIndex == %lld and unreadComments > 0", section.rawValue) : NSPredicate(format: "sectionIndex == %d", section.rawValue)
+		let p = Settings.hideUncommentedItems ? NSPredicate(format: "sectionIndex == %lld and unreadComments > 0", section.rawValue) : NSPredicate(format: "sectionIndex == %lld", section.rawValue)
 		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: mainObjectContext)
 		return try! mainObjectContext.count(for: f)
 	}

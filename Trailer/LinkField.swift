@@ -13,7 +13,7 @@ final class LinkField: CenterTextField {
 			options: stringDrawingOptions)
 
 		let newArea = NSTrackingArea(rect: check,
-			options: [NSTrackingAreaOptions.mouseEnteredAndExited, NSTrackingAreaOptions.mouseMoved, NSTrackingAreaOptions.activeInKeyWindow],
+			options: [.mouseEnteredAndExited, .mouseMoved, .activeInKeyWindow],
 			owner: self,
 			userInfo: nil)
 

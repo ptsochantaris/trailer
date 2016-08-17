@@ -9,7 +9,7 @@ struct CacheUnit {
 	let lastFetched: Date
 
 	var actualHeaders: [AnyHashable : Any] {
-		return NSKeyedUnarchiver.unarchiveObject(with: headers) as! [String : Any]
+		return NSKeyedUnarchiver.unarchiveObject(with: headers) as! [AnyHashable : Any]
 	}
 
 	var parsedData: Any? {

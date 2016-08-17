@@ -1,17 +1,24 @@
 
 class TrailerCell: NSTableCellView {
 
-	var trackingArea: NSTrackingArea!
-	var dataItemId: NSManagedObjectID!
 	var title: CenterTextField!
-	var unselectedTitleColor: NSColor!
-	var detailFont: NSFont!, titleFont: NSFont!
+	let unselectedTitleColor: NSColor
+	let detailFont: NSFont!, titleFont: NSFont!
 
-	var goneDark: Bool {
-		return MenuWindow.isUsingVibrancy && app.darkMode
-	}
+	private let dataItemId: NSManagedObjectID!
+	private let isDark: Bool
+	private var trackingArea: NSTrackingArea!
 
-	override init(frame frameRect: NSRect) {
+	init(frame frameRect: NSRect, item: ListableItem) {
+
+		dataItemId = item.objectID
+		detailFont = NSFont.menuFont(ofSize: 10.0)
+		titleFont = NSFont.menuFont(ofSize: 13.0)
+
+		isDark = MenuWindow.isUsingVibrancy && app.darkMode
+
+		unselectedTitleColor = isDark ? .controlHighlightColor : .controlTextColor
+
 		super.init(frame: frameRect)
 	}
 
@@ -35,23 +42,19 @@ class TrailerCell: NSTableCellView {
 
 	var selected = false {
 		didSet {
-
 			guard let table = app.visibleWindow?.table else { return }
 
-			var finalColor: NSColor = unselectedTitleColor
+			if let item = associatedDataItem {
+				let titleColor = (selected && isDark) ? .darkGray : unselectedTitleColor
+				title.attributedStringValue = item.title(with: titleFont, labelFont: detailFont, titleColor: titleColor)
+			}
+
 			if selected {
 				table.selectRowIndexes(IndexSet(integer: table.row(for: self)), byExtendingSelection: false)
-				if goneDark { finalColor = .darkGray }
 			} else {
 				table.deselectRow(table.row(for: self))
 			}
 
-			let item = associatedDataItem
-			if let pr = item as? PullRequest {
-				title.attributedStringValue = pr.title(with: titleFont, labelFont: detailFont, titleColor: finalColor)
-			} else if let issue = item as? Issue {
-				title.attributedStringValue = issue.title(with: titleFont, labelFont: detailFont, titleColor: finalColor)
-			}
 			highlight(selected)
 		}
 	}
@@ -220,7 +223,7 @@ class TrailerCell: NSTableCellView {
 		if trackingArea != nil { removeTrackingArea(trackingArea) }
 
 		trackingArea = NSTrackingArea(rect: bounds,
-			options: [NSTrackingAreaOptions.mouseEnteredAndExited, NSTrackingAreaOptions.activeInKeyWindow],
+			options: [.mouseEnteredAndExited, .activeInKeyWindow],
 			owner: self,
 			userInfo: nil)
 
@@ -252,7 +255,7 @@ class TrailerCell: NSTableCellView {
 
 		let countString = NSAttributedString(string: itemCountFormatter.string(from: NSNumber(value: totalCount))!, attributes: [
 			NSFontAttributeName: NSFont.menuFont(ofSize: 11),
-			NSForegroundColorAttributeName: goneDark ? NSColor.controlLightHighlightColor : NSColor.controlTextColor,
+			NSForegroundColorAttributeName: isDark ? NSColor.controlLightHighlightColor : NSColor.controlTextColor,
 			NSParagraphStyleAttributeName: pCenter])
 
 		var width = max(BASE_BADGE_SIZE, countString.size().width+10)
@@ -304,12 +307,12 @@ class TrailerCell: NSTableCellView {
 	private func highlight(_ on: Bool) {
 		if let c = countBackground {
 			var color: NSColor
-			if goneDark {
+			if isDark {
 				color = on ? .black : NSColor(red: 0.94, green: 0.94, blue: 0.94, alpha: 1.0)
 				c.backgroundColor = on ? NSColor.white.withAlphaComponent(DISABLED_FADE) : NSColor.black.withAlphaComponent(0.2)
 				newBackground?.backgroundColor = NSColor(red: 1.0, green: 0.1, blue: 0.1, alpha: 1.0)
 			} else {
-				color = goneDark ? .controlLightHighlightColor : .controlTextColor
+				color = .controlTextColor
 				c.backgroundColor = NSColor(red: 0.92, green: 0.92, blue: 0.92, alpha: 1.0)
 				newBackground?.backgroundColor = NSColor(red: 1.0, green: 0.4, blue: 0.4, alpha: 1.0)
 			}

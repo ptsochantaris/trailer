@@ -363,7 +363,7 @@ final class API {
 
 				if repoIdsToMarkDirty.count>0 {
 					Repo.markDirtyReposWithIds(repoIdsToMarkDirty, in: moc)
-					DLog("Marked %d dirty repos that have new events in their event stream", repoIdsToMarkDirty.count)
+					DLog("Marked %@ dirty repos that have new events in their event stream", repoIdsToMarkDirty.count)
 				}
 
 				let reposNotRecentlyDirtied = Repo.reposNotRecentlyDirtied(in: moc)
@@ -371,7 +371,7 @@ final class API {
 					for r in reposNotRecentlyDirtied {
 						r.resetSyncState()
 					}
-					DLog("Marked dirty %d repos which haven't been refreshed in over an hour", reposNotRecentlyDirtied.count)
+					DLog("Marked dirty %@ repos which haven't been refreshed in over an hour", reposNotRecentlyDirtied.count)
 				}
 
 				callback()
@@ -426,7 +426,7 @@ final class API {
 			for d in data ?? [] {
 				let eventDate = parseGH8601(d["created_at"] as? String) ?? .distantPast
 				if latestDate! < eventDate {
-					if let repoId = (d["repo"] as? [String : Any])?["id"] as? NSNumber {
+					if let repoId = (d["repo"] as? [AnyHashable : Any])?["id"] as? NSNumber {
 						DLog("(%@) New event at %@ from Repo ID %@", serverLabel, eventDate, repoId)
 						toMarkDirty.add(repoId)
 					}
@@ -471,7 +471,7 @@ final class API {
 			for d in data ?? [] {
 				let eventDate = parseGH8601(d["created_at"] as? String) ?? .distantPast
 				if latestDate! < eventDate {
-					if let repoId = (d["repo"] as? [String : Any])?["id"] as? NSNumber {
+					if let repoId = (d["repo"] as? [AnyHashable : Any])?["id"] as? NSNumber {
 						DLog("(%@) New event at %@ from Repo ID %@", serverLabel, eventDate, repoId)
 						toMarkDirty.add(repoId)
 					}
@@ -775,7 +775,7 @@ final class API {
 				//DLog("Will check labels for PR: '%@'", pr.title)
 				return true
 			} else {
-				//DLog("No need to get labels for PR: '%@' (%d refreshes since last check)", pr.title, refreshes)
+				//DLog("No need to get labels for PR: '%@' (%@ refreshes since last check)", pr.title, refreshes)
 				self?.refreshesSinceLastLabelsCheck[oid] = (refreshes ?? 0)+1
 				return false
 			}
@@ -840,7 +840,7 @@ final class API {
 				//DLog("Will check statuses for PR: '%@'", pr.title)
 				return true
 			} else {
-				//DLog("No need to get statuses for PR: '%@' (%d refreshes since last check)", pr.title, refreshes)
+				//DLog("No need to get statuses for PR: '%@' (%@ refreshes since last check)", pr.title, refreshes)
 				self.refreshesSinceLastStatusCheck[oid] = (refreshes ?? 0)+1
 				return false
 			}
@@ -960,7 +960,7 @@ final class API {
 			if let issueLink = p.issueUrl {
 				getData(in: issueLink, from: apiServer) { data, lastPage, resultCode in
 					if resultCode == 200 || resultCode == 404 || resultCode == 410 {
-						p.processAssignmentStatus(from: data as? [String : Any])
+						p.processAssignmentStatus(from: data as? [AnyHashable : Any])
 					} else {
 						apiServer.lastSyncSucceeded = false
 					}
@@ -997,8 +997,8 @@ final class API {
 
 		getData(in: path, from: pullRequest.apiServer) { [weak self] data, lastPage, resultCode in
 
-			if let d = data as? [String : Any] {
-				if let mergeInfo = d["merged_by"] as? [String : Any], let mergeUserId = mergeInfo["id"] as? NSNumber {
+			if let d = data as? [AnyHashable : Any] {
+				if let mergeInfo = d["merged_by"] as? [AnyHashable : Any], let mergeUserId = mergeInfo["id"] as? NSNumber {
 					self?.handleMerging(of: pullRequest, byUserId: mergeUserId.int64Value)
 				} else {
 					self?.handleClosing(of: pullRequest)
@@ -1016,7 +1016,7 @@ final class API {
 	private func handleMerging(of pullRequest: PullRequest, byUserId: Int64) {
 
 		let myUserId = pullRequest.apiServer.userId
-		DLog("Detected merged PR: %@ by user %lld, local user id is: %lld, handling policy is %d, coming from section %lld",
+		DLog("Detected merged PR: %@ by user %@, local user id is: %@, handling policy is %@, coming from section %@",
 			pullRequest.title,
 			byUserId,
 			myUserId,
@@ -1041,7 +1041,7 @@ final class API {
 	}
 
 	private func handleClosing(of item: ListableItem) {
-		DLog("Detected closed item: %@, handling policy is %d, coming from section %lld",
+		DLog("Detected closed item: %@, handling policy is %@, coming from section %@",
 			item.title,
 			Settings.closeHandlingPolicy,
 			item.sectionIndex)
@@ -1070,7 +1070,7 @@ final class API {
 				let epochSeconds = Int64(S(allHeaders["X-RateLimit-Reset"] as? String)) ?? 0
 				callback(requestsRemaining, requestLimit, epochSeconds)
 			} else {
-				if code == 404 && data != nil && !((data as? [String : Any])?["message"] as? String == "Not Found") {
+				if code == 404 && data != nil && !((data as? [AnyHashable : Any])?["message"] as? String == "Not Found") {
 					callback(10000, 10000, 0)
 				} else {
 					callback(-1, -1, -1)
@@ -1154,7 +1154,7 @@ final class API {
 			if apiServer.goodToGo {
 				getData(in: "/user", from: apiServer) { data, lastPage, resultCode in
 
-					if let d = data as? [String : Any] {
+					if let d = data as? [AnyHashable : Any] {
 						apiServer.userName = d["login"] as? String
 						apiServer.userId = (d["id"] as? NSNumber)?.int64Value ?? 0
 					} else {
@@ -1179,7 +1179,7 @@ final class API {
 		clearAllBadLinks()
 		api(call: "/user", on: apiServer, ignoreLastSync: true) { [weak self] code, headers, data, error, shouldRetry in
 
-			if let d = data as? [String : Any], let userName = d["login"] as? String, let userId = d["id"] as? NSNumber, error == nil {
+			if let d = data as? [AnyHashable : Any], let userName = d["login"] as? String, let userId = d["id"] as? NSNumber, error == nil {
 				if userName.isEmpty || userId.int64Value <= 0 {
 					let localError = self?.apiError("Could not read a valid user record from this endpoint")
 					callback(localError)
@@ -1202,7 +1202,7 @@ final class API {
 		at path: String,
 		from server: ApiServer,
 		startingFrom page: Int = 1,
-		perPageCallback: @escaping (_ data: [[String : Any]]?, _ lastPage: Bool) -> Bool,
+		perPageCallback: @escaping (_ data: [[AnyHashable : Any]]?, _ lastPage: Bool) -> Bool,
 		finalCallback: @escaping (_ success: Bool, _ resultCode: Int64) -> Void) {
 
 		if path.isEmpty {
@@ -1218,7 +1218,7 @@ final class API {
 		getData(in: p, from: server) {
 			[weak self] data, lastPage, resultCode in
 
-			if let d = data as? [[String : Any]] {
+			if let d = data as? [[AnyHashable : Any]] {
 				var isLastPage = lastPage
 				if perPageCallback(d, lastPage) { isLastPage = true }
 				if isLastPage {
@@ -1274,7 +1274,7 @@ final class API {
 			} else {
 				if shouldRetry && attemptCount < 2 { // timeout, truncation, connection issue, etc
 					let nextAttemptCount = attemptCount+1
-					DLog("(%@) Will retry failed API call to %@ (attempt #%d)", S(server.label), path, nextAttemptCount)
+					DLog("(%@) Will retry failed API call to %@ (attempt #%@)", S(server.label), path, nextAttemptCount)
 					delay(2.0) {
 						self?.getData(in: path, from: server, attemptCount: nextAttemptCount, callback: callback)
 					}
@@ -1417,7 +1417,7 @@ final class API {
 				atNextEvent {
 					CacheEntry.markFetched(for: cacheKey)
 				}
-				DLog("(%@) GET %@ - NO CHANGE (304): %lld", apiServerLabel, expandedPath, code)
+				DLog("(%@) GET %@ - NO CHANGE (304): %@", apiServerLabel, expandedPath, code)
 			} else if code > 299 {
 				error = S.apiError("Server responded with error \(code)")
 				parsedData = nil
@@ -1431,7 +1431,7 @@ final class API {
 				parsedData = nil
 				shouldRetry = true // truncation
 			} else {
-				DLog("(%@) GET %@ - RESULT: %lld", apiServerLabel, expandedPath, code)
+				DLog("(%@) GET %@ - RESULT: %@", apiServerLabel, expandedPath, code)
 				error = e as? NSError
 				shouldRetry = false
 				if let data = data {
@@ -1492,7 +1492,7 @@ final class API {
 						nextIncrement: backOffIncrement)
 				}
 			}
-			DLog("(%@) GET %@ - FAILED: (code %lld) %@", serverLabel, urlPath, code, error!.localizedDescription)
+			DLog("(%@) GET %@ - FAILED: (code %@) %@", serverLabel, urlPath, code, error!.localizedDescription)
 		}
 
 		if Settings.dumpAPIResponsesInConsole, let d = data {

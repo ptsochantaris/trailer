@@ -37,7 +37,7 @@ final class PopTimer : NSObject {
 
 /////////////////////////////
 
-var _settings_valuesCache = [String : Any]()
+var _settings_valuesCache = [AnyHashable : Any]()
 let _settings_shared = UserDefaults(suiteName: "group.Trailer")!
 
 final class Settings {
@@ -632,7 +632,7 @@ final class Settings {
 		set { set("HIDE_PRS_THAT_ARENT_PASSING_ONLY_IN_ALL", newValue) }
 	}
 
-	static let useVibrancyHelp = "Use Mac OS X Vibrancy to display the Trailer drop-down menu, if available on the current OS version. If the OS doesn't support this, this setting has no effect."
+	static let useVibrancyHelp = "Use macOS Vibrancy to display the Trailer drop-down menu, if available on the current OS version. If the OS doesn't support this, this setting has no effect."
 	class var useVibrancy: Bool {
 		get { return get("USE_VIBRANCY_UI") as? Bool ?? true }
 		set { set("USE_VIBRANCY_UI", newValue) }

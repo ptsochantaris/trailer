@@ -31,7 +31,7 @@ final class DataManager {
 		#if os(OSX)
 		let nc = NSUserNotificationCenter.default
 
-		// Unstick OS X notifications with custom actions but without an identifier, causes OS X to keep them forever
+		// Unstick macOS notifications with custom actions but without an identifier, causes macOS to keep them forever
 		if #available(OSX 10.10, *) {
 			for notification in nc.deliveredNotifications {
 				if notification.additionalActions != nil && notification.identifier == nil {
@@ -201,7 +201,7 @@ final class DataManager {
 							let displayText = s.descriptionText
 							if pr.lastStatusNotified != displayText && pr.postSyncAction != PostSyncAction.noteNew.rawValue {
 								if pr.isSnoozing && pr.shouldWakeOnStatusChange {
-									DLog("Waking up snoozed PR ID %lld because of a status update", pr.serverId)
+									DLog("Waking up snoozed PR ID %@ because of a status update", pr.serverId)
 									pr.wakeUp()
 								}
 								app.postNotification(type: .newStatus, for: s)

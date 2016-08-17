@@ -30,26 +30,26 @@ final class ComplicationDataSource: NSObject, CLKComplicationDataSource {
 	}
 
 	private func entriesFor(_ complication: CLKComplication, _ handler: @escaping ([CLKComplicationTimelineEntry]?) -> Void) {
-		if let overview = WCSession.default().receivedApplicationContext["overview"] as? [String : Any] {
+		if let overview = WCSession.default().receivedApplicationContext["overview"] as? [AnyHashable : Any] {
 			processOverview(for: complication, overview, handler)
 		} else {
 			handler(nil)
 		}
 	}
 
-	private func processOverview(for complication: CLKComplication, _ overview: [String : Any], _ handler: @escaping ([CLKComplicationTimelineEntry]?) -> Void) {
+	private func processOverview(for complication: CLKComplication, _ overview: [AnyHashable : Any], _ handler: @escaping ([CLKComplicationTimelineEntry]?) -> Void) {
 
 		let showIssues = overview["preferIssues"] as! Bool
 
 		var prCount = 0
 		var issueCount = 0
 		var commentCount = 0
-		for r in overview["views"] as? [[String : Any]] ?? [] {
-			if let v = r["prs"] as? [String : Any] {
+		for r in overview["views"] as? [[AnyHashable : Any]] ?? [] {
+			if let v = r["prs"] as? [AnyHashable : Any] {
 				prCount += v["total_open"] as? Int ?? 0
 				commentCount += v["unread"] as? Int ?? 0
 			}
-			if let v = r["issues"] as? [String : Any] {
+			if let v = r["issues"] as? [AnyHashable : Any] {
 				issueCount += v["total_open"] as? Int ?? 0
 				commentCount += v["unread"] as? Int ?? 0
 			}

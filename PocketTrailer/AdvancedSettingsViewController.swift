@@ -708,7 +708,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		if sizer == nil {
 			sizer = tableView.dequeueReusableCell(withIdentifier: "Cell") as? AdvancedSettingsCell
 		} else if let h = heightCache[indexPath] {
-			//DLog("using cached height for %d - %d", indexPath.section, indexPath.row)
+			//DLog("using cached height for %@ - %@", indexPath.section, indexPath.row)
 			return h
 		}
 		configureCell(cell: sizer!, indexPath: indexPath)

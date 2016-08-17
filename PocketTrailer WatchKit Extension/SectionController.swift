@@ -63,7 +63,7 @@ final class SectionController: CommonController {
 			API_URI_KEY: r.apiServerUri! ] )
 	}
 
-	override func update(from response: [String : Any]) {
+	override func update(from response: [AnyHashable : Any]) {
 		super.update(from: response)
 		updateUI()
 	}
@@ -82,8 +82,8 @@ final class SectionController: CommonController {
 
 		rowControllers.removeAll(keepingCapacity: false)
 
-		func addSectionsFor(_ entry: [String : Any], itemType: String, label: String, apiServerUri: String, header: String, showEmptyDescriptions: Bool) {
-			let items = entry[itemType] as! [String : Any]
+		func addSectionsFor(_ entry: [AnyHashable : Any], itemType: String, label: String, apiServerUri: String, header: String, showEmptyDescriptions: Bool) {
+			let items = entry[itemType] as! [AnyHashable : Any]
 			let totalItems = items["total"] as! Int
 			let prefix = label.isEmpty ? "" : "\(label): "
 			if totalItems > 0 {
@@ -94,7 +94,7 @@ final class SectionController: CommonController {
 				for itemSection in Section.apiTitles {
 					if itemSection == Section.none.apiName { continue }
 
-					if let section = items[itemSection] as? [String : Any], let count = section["total"] as? Int, let unread = section["unread"] as? Int, count > 0 {
+					if let section = items[itemSection] as? [AnyHashable : Any], let count = section["total"] as? Int, let unread = section["unread"] as? Int, count > 0 {
 						let s = SectionRow()
 						s.section = sectionFrom(apiName: itemSection)
 						s.totalCount = count
@@ -127,7 +127,7 @@ final class SectionController: CommonController {
 		}
 
 		let session = WCSession.default()
-		guard let result = session.receivedApplicationContext["overview"] as? [String : Any] else {
+		guard let result = session.receivedApplicationContext["overview"] as? [AnyHashable : Any] else {
 			if session.iOSDeviceNeedsUnlockAfterRebootForReachability {
 				show(status: "Can't connect: To re-establish your secure connection, please unlock your iOS device.", hideTable: true)
 			} else {
@@ -143,7 +143,7 @@ final class SectionController: CommonController {
 			return
 		}
 
-		guard let views = result["views"] as? [[String : Any]] else {
+		guard let views = result["views"] as? [[AnyHashable : Any]] else {
 			show(status: "There is no data from Trailer on your iOS device yet. Please launch it once and configure your settings.", hideTable: true)
 			return
 		}

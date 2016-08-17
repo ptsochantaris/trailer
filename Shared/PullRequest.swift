@@ -15,7 +15,7 @@ final class PullRequest: ListableItem {
 
 	@NSManaged var statuses: Set<PRStatus>
 
-	class func syncPullRequests(from data: [[String : Any]]?, in repo: Repo) {
+	class func syncPullRequests(from data: [[AnyHashable : Any]]?, in repo: Repo) {
 		items(with: data, type: PullRequest.self, server: repo.apiServer) { item, info, isNewOrUpdated in
 			if isNewOrUpdated {
 
@@ -23,11 +23,11 @@ final class PullRequest: ListableItem {
 
 				item.mergeable = (info["mergeable"] as? NSNumber)?.boolValue ?? true
 
-				if let linkInfo = info["_links"] as? [String : Any] {
-					item.issueCommentLink = (linkInfo["comments"] as? [String : Any])?["href"] as? String
-					item.reviewCommentLink = (linkInfo["review_comments"] as? [String : Any])?["href"] as? String
-					item.statusesLink = (linkInfo["statuses"] as? [String : Any])?["href"] as? String
-					item.issueUrl = (linkInfo["issue"] as? [String : Any])?["href"] as? String
+				if let linkInfo = info["_links"] as? [AnyHashable : Any] {
+					item.issueCommentLink = (linkInfo["comments"] as? [AnyHashable : Any])?["href"] as? String
+					item.reviewCommentLink = (linkInfo["review_comments"] as? [AnyHashable : Any])?["href"] as? String
+					item.statusesLink = (linkInfo["statuses"] as? [AnyHashable : Any])?["href"] as? String
+					item.issueUrl = (linkInfo["issue"] as? [AnyHashable : Any])?["href"] as? String
 				}
 
 				api.refreshesSinceLastLabelsCheck[item.objectID] = nil

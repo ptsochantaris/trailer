@@ -1,15 +1,20 @@
 
+let statusAttributes: [String : Any] = {
+
+	let paragraphStyle = NSMutableParagraphStyle()
+	paragraphStyle.headIndent = 92.0
+
+	var a = [String : Any]() // swift bug will crash the app if this is declared as a literal
+	a[NSFontAttributeName] = NSFont(name: "Monaco", size: 9)
+	a[NSParagraphStyleAttributeName] = paragraphStyle
+	return a
+}()
+
 final class PullRequestCell: TrailerCell {
 
 	init(pullRequest: PullRequest) {
 
-		super.init(frame: NSZeroRect)
-
-		dataItemId = pullRequest.objectID
-		detailFont = NSFont.menuFont(ofSize: 10.0)
-		titleFont = NSFont.menuFont(ofSize: 13.0)
-
-		unselectedTitleColor = goneDark ? .controlHighlightColor : .controlTextColor
+		super.init(frame: NSZeroRect, item: pullRequest)
 
 		let _commentsNew = pullRequest.unreadComments
 		let _commentsTotal = pullRequest.totalComments
@@ -30,19 +35,12 @@ final class PullRequestCell: TrailerCell {
 
 		var statusRects = [NSValue]()
 		var statuses: [PRStatus]? = nil
-		var bottom: CGFloat, CELL_PADDING: CGFloat
+		var bottom: CGFloat, cellPadding: CGFloat
 		var statusBottom = CGFloat(0)
 
-		let paragraphStyle = NSMutableParagraphStyle()
-		paragraphStyle.headIndent = 92.0
-
-		var statusAttributes = [String : Any]()
-		statusAttributes[NSFontAttributeName] = NSFont(name: "Monaco", size: 9)
-		statusAttributes[NSParagraphStyleAttributeName] = paragraphStyle
-
 		if Settings.showStatusItems {
-			CELL_PADDING = 10
-			bottom = ceil(CELL_PADDING * 0.5)
+			cellPadding = 10
+			bottom = ceil(cellPadding * 0.5)
 			statuses = pullRequest.displayedStatuses
 			for s in statuses! {
 				let H = ceil(s.displayText.boundingRect(with: CGSize(width: W, height: CGFloat.greatestFiniteMagnitude),
@@ -52,17 +50,17 @@ final class PullRequestCell: TrailerCell {
 				statusBottom += H
 			}
 		} else {
-			CELL_PADDING = 6.0
-			bottom = ceil(CELL_PADDING * 0.5)
+			cellPadding = 6.0
+			bottom = ceil(cellPadding * 0.5)
 		}
 
-		frame = NSMakeRect(0, 0, MENU_WIDTH, titleHeight+subtitleHeight+statusBottom+CELL_PADDING)
+		frame = NSMakeRect(0, 0, MENU_WIDTH, titleHeight + subtitleHeight + statusBottom + cellPadding)
 		let faded = pullRequest.shouldSkipNotifications
 		addCounts(_commentsTotal, _commentsNew, faded)
 
-		var titleRect = NSMakeRect(LEFTPADDING, subtitleHeight+bottom+statusBottom, W, titleHeight)
-		var dateRect = NSMakeRect(LEFTPADDING, statusBottom+bottom, W, subtitleHeight)
-		var pinRect = NSMakeRect(LEFTPADDING+W, floor((bounds.size.height-24)*0.5), REMOVE_BUTTON_WIDTH-10, 24)
+		var titleRect = NSMakeRect(LEFTPADDING, subtitleHeight + bottom + statusBottom, W, titleHeight)
+		var dateRect = NSMakeRect(LEFTPADDING, statusBottom + bottom, W, subtitleHeight)
+		var pinRect = NSMakeRect(LEFTPADDING + W, floor((bounds.size.height-24)*0.5), REMOVE_BUTTON_WIDTH-10, 24)
 
 		let shift: CGFloat
 		if showAvatar {

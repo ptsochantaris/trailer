@@ -777,7 +777,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			}
 
 			if let w = incomingEvent.window as? MenuWindow {
-				//DLog("Keycode: %d", incomingEvent.keyCode)
+				//DLog("Keycode: %@", incomingEvent.keyCode)
 
 				switch incomingEvent.keyCode {
 				case 123, 124: // left, right
@@ -928,7 +928,9 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		mouseIgnoreTimer.push()
 		inMenu.table.scrollRowToVisible(i)
 		delay(0.01) {
-			inMenu.table.selectRowIndexes(IndexSet(integer: i), byExtendingSelection: false)
+			if let cell = inMenu.table.view(atColumn: 0, row: i, makeIfNecessary: false) as? TrailerCell {
+				cell.selected = true
+			}
 		}
 	}
 
@@ -959,7 +961,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			"K": 40, "L": 37, "M": 46, "N": 45, "O": 31, "P": 35, "Q": 12, "R": 15, "S": 1,
 			"T": 17, "U": 32, "V": 9, "W": 13, "X": 7, "Y": 16, "Z": 6 ]
 
-		if check==4, let n = keyMap[Settings.hotkeyLetter], incomingEvent.keyCode == UInt16(n) {
+		if check == 4, let n = keyMap[Settings.hotkeyLetter], incomingEvent.keyCode == UInt16(n) {
 			if Repo.interestedInPrs() {
 				show(menu: menuBarSets.first!.prMenu)
 			} else if Repo.interestedInIssues() {

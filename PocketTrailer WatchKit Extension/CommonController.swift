@@ -80,7 +80,7 @@ class CommonController: WKInterfaceController {
 		}
 	}
 
-	func update(from response: [String : Any]) {
+	func update(from response: [AnyHashable : Any]) {
 		// for subclassing
 	}
 

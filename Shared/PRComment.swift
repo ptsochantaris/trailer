@@ -11,7 +11,7 @@ final class PRComment: DataItem {
     @NSManaged var pullRequest: PullRequest?
 	@NSManaged var issue: Issue?
 
-	class func syncComments(from data: [[String : Any]]?, pullRequest: PullRequest) {
+	class func syncComments(from data: [[AnyHashable : Any]]?, pullRequest: PullRequest) {
 		items(with: data, type: PRComment.self, server: pullRequest.apiServer) { item, info, newOrUpdated in
 			if newOrUpdated {
 				item.pullRequest = pullRequest
@@ -21,7 +21,7 @@ final class PRComment: DataItem {
 		}
 	}
 
-	class func syncComments(from data: [[String : Any]]?, issue: Issue) {
+	class func syncComments(from data: [[AnyHashable : Any]]?, issue: Issue) {
 		items(with: data, type: PRComment.self, server: issue.apiServer) { item, info, newOrUpdated in
 			if newOrUpdated {
 				item.issue = issue
@@ -44,13 +44,13 @@ final class PRComment: DataItem {
 		if let item = parent, item.postSyncAction == PostSyncAction.noteUpdated.rawValue && item.isVisibleOnMenu {
 			if contains(terms: ["@\(apiServer.userName!)"]) {
 				if item.isSnoozing && item.shouldWakeOnMention {
-					DLog("Waking up snoozed item ID %lld because of mention", item.serverId)
+					DLog("Waking up snoozed item ID %@ because of mention", item.serverId)
 					item.wakeUp()
 				}
 				app.postNotification(type: .newMention, for: self)
 			} else if !isMine {
 				if item.isSnoozing && item.shouldWakeOnComment {
-					DLog("Waking up snoozed item ID %lld because of posted comment", item.serverId)
+					DLog("Waking up snoozed item ID %@ because of posted comment", item.serverId)
 					item.wakeUp()
 				}
 				let notifyForNewComments = item.sectionIndex != Section.all.rawValue || Settings.showCommentsEverywhere
@@ -75,18 +75,18 @@ final class PRComment: DataItem {
 		}
 	}
 
-	func fill(from info: [String : Any]) {
+	func fill(from info: [AnyHashable : Any]) {
 		body = info["body"] as? String
 		webUrl = info["html_url"] as? String
 
-		if let userInfo = info["user"] as? [String : Any] {
+		if let userInfo = info["user"] as? [AnyHashable : Any] {
 			userName = userInfo["login"] as? String
 			userId = (userInfo["id"] as? NSNumber)?.int64Value ?? 0
 			avatarUrl = userInfo["avatar_url"] as? String
 		}
 
-		if webUrl==nil, let links = info["links"] as? [String : Any] {
-			webUrl = (links["html"] as? [String : Any])?["href"] as? String
+		if webUrl==nil, let links = info["links"] as? [AnyHashable : Any] {
+			webUrl = (links["html"] as? [AnyHashable : Any])?["href"] as? String
 		}
 	}
 

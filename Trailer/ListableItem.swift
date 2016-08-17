@@ -39,7 +39,7 @@ class ListableItem: DataItem {
 	@NSManaged var comments: Set<PRComment>
 	@NSManaged var labels: Set<PRLabel>
 
-	final func baseSync(from info: [String : Any], in repo: Repo) {
+	final func baseSync(from info: [AnyHashable : Any], in repo: Repo) {
 
 		self.repo = repo
 
@@ -49,9 +49,9 @@ class ListableItem: DataItem {
 		state = info["state"] as? String
 		title = info["title"] as? String
 		body = info["body"] as? String
-		milestone = (info["milestone"] as? [String : Any])?["title"] as? String
+		milestone = (info["milestone"] as? [AnyHashable : Any])?["title"] as? String
 
-		if let userInfo = info["user"] as? [String : Any] {
+		if let userInfo = info["user"] as? [AnyHashable : Any] {
 			userId = (userInfo["id"] as? NSNumber)?.int64Value ?? 0
 			userLogin = userInfo["login"] as? String
 			userAvatarUrl = userInfo["avatar_url"] as? String
@@ -60,12 +60,12 @@ class ListableItem: DataItem {
 		processAssignmentStatus(from: info)
 	}
 
-	final func processAssignmentStatus(from info: [String : Any]?) {
+	final func processAssignmentStatus(from info: [AnyHashable : Any]?) {
 
 		let myIdOnThisRepo = repo.apiServer.userId
 		var assigneeNames = [String]()
 
-		func checkAndStoreAssigneeName(from assignee: [String : Any]) -> Bool {
+		func checkAndStoreAssigneeName(from assignee: [AnyHashable : Any]) -> Bool {
 
 			if let name = assignee["login"] as? String, let assigneeId = assignee["id"] as? NSNumber {
 				let shouldBeAssignedToMe = assigneeId.int64Value == myIdOnThisRepo
@@ -78,13 +78,13 @@ class ListableItem: DataItem {
 
 		var foundAssignmentToMe = false
 
-		if let assignees = info?["assignees"] as? [[String : Any]], assignees.count > 0 {
+		if let assignees = info?["assignees"] as? [[AnyHashable : Any]], assignees.count > 0 {
 			for assignee in assignees {
 				if checkAndStoreAssigneeName(from: assignee) {
 					foundAssignmentToMe = true
 				}
 			}
-		} else if let assignee = info?["assignee"] as? [String : Any] {
+		} else if let assignee = info?["assignee"] as? [AnyHashable : Any] {
 			foundAssignmentToMe = checkAndStoreAssigneeName(from: assignee)
 		}
 
@@ -699,7 +699,7 @@ class ListableItem: DataItem {
 		return f
 	}
 
-	final class func relatedItems(from notificationUserInfo: [String : Any]) -> (PRComment?, ListableItem)? {
+	final class func relatedItems(from notificationUserInfo: [AnyHashable : Any]) -> (PRComment?, ListableItem)? {
 		var item: ListableItem?
 		var comment: PRComment?
 		if let cid = notificationUserInfo[COMMENT_ID_KEY] as? String, let itemId = DataManager.id(for: cid), let c = existingObject(with: itemId) as? PRComment {

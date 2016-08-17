@@ -3,13 +3,7 @@ final class IssueCell: TrailerCell {
 
 	init(issue: Issue) {
 
-		super.init(frame: NSZeroRect)
-
-		dataItemId = issue.objectID
-		detailFont = NSFont.menuFont(ofSize: 10.0)
-		titleFont = NSFont.menuFont(ofSize: 13.0)
-
-		unselectedTitleColor = goneDark ? .controlHighlightColor : .controlTextColor
+		super.init(frame: NSZeroRect, item: issue)
 
 		let _commentsNew = issue.unreadComments
 		let _commentsTotal = issue.totalComments
@@ -29,19 +23,12 @@ final class IssueCell: TrailerCell {
 		let subtitleHeight = ceil(_subtitle.boundingRect(with: CGSize(width: W-4.0, height: CGFloat.greatestFiniteMagnitude), options: stringDrawingOptions).size.height+4.0)
 
 		var statusRects = [NSValue]()
-		var bottom: CGFloat, CELL_PADDING: CGFloat
+		var bottom: CGFloat
+		let cellPadding: CGFloat = 6.0
 
-		let paragraphStyle = NSMutableParagraphStyle()
-		paragraphStyle.headIndent = 92.0
+		bottom = ceil(cellPadding * 0.5)
 
-		var statusAttributes = [String : Any]()
-		statusAttributes[NSFontAttributeName] = NSFont(name: "Monaco", size: 9)
-		statusAttributes[NSParagraphStyleAttributeName] = paragraphStyle
-
-		CELL_PADDING = 6.0
-		bottom = ceil(CELL_PADDING * 0.5)
-
-		frame = NSMakeRect(0, 0, MENU_WIDTH, titleHeight+subtitleHeight+CELL_PADDING)
+		frame = NSMakeRect(0, 0, MENU_WIDTH, titleHeight+subtitleHeight + cellPadding)
 		let faded = issue.shouldSkipNotifications
 		addCounts(_commentsTotal, _commentsNew, faded)
 

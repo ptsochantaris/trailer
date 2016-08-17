@@ -17,10 +17,10 @@ final class Repo: DataItem {
 	@NSManaged var issues: Set<Issue>
 	@NSManaged var ownerId: Int64
 
-	class func syncRepos(from data: [[String : Any]]?, server: ApiServer) {
+	class func syncRepos(from data: [[AnyHashable : Any]]?, server: ApiServer) {
 		let filteredData = data?.filter { info -> Bool in
 			if (info["private"] as? NSNumber)?.boolValue ?? false {
-				if let permissions = info["permissions"] as? [String : Any] {
+				if let permissions = info["permissions"] as? [AnyHashable : Any] {
 
 					let pull = (permissions["pull"] as? NSNumber)?.boolValue ?? false
 					let push = (permissions["push"] as? NSNumber)?.boolValue ?? false
@@ -44,7 +44,7 @@ final class Repo: DataItem {
 				item.webUrl = info["html_url"] as? String
 				item.dirty = true
 				item.inaccessible = false
-				item.ownerId = ((info["owner"] as? [String : Any])?["id"] as? NSNumber)?.int64Value ?? 0
+				item.ownerId = ((info["owner"] as? [AnyHashable : Any])?["id"] as? NSNumber)?.int64Value ?? 0
 				item.lastDirtied = Date()
 			}
 		}
