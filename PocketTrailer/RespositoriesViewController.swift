@@ -65,6 +65,8 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 		tableView.isUserInteractionEnabled = false
 		tableView.alpha = 0.5
 
+		NotificationQueue.clear()
+
 		let tempContext = DataManager.buildChildContext()
 		api.fetchRepositories(to: tempContext) { [weak self] in
 			if ApiServer.shouldReportRefreshFailure(in: tempContext) {
@@ -76,15 +78,18 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 				}
 				let serverNames = errorServers.joined(separator: ", ")
 				showMessage("Error", "Could not refresh repository list from \(serverNames), please ensure that the tokens you are using are valid")
+				NotificationQueue.clear()
 			} else {
 				try! tempContext.save()
+				NotificationQueue.commit()
 			}
-			self?.navigationItem.title = originalName
-			self?.actionsButton.isEnabled = ApiServer.someServersHaveAuthTokens(in: mainObjectContext)
-			self?.tableView.alpha = 1.0
-			self?.tableView.isUserInteractionEnabled = true
 			preferencesDirty = true
-			self?.navigationItem.rightBarButtonItem?.isEnabled = true
+			guard let s = self  else { return }
+			s.navigationItem.title = originalName
+			s.actionsButton.isEnabled = ApiServer.someServersHaveAuthTokens(in: mainObjectContext)
+			s.tableView.alpha = 1.0
+			s.tableView.isUserInteractionEnabled = true
+			s.navigationItem.rightBarButtonItem?.isEnabled = true
 		}
 	}
 

@@ -221,7 +221,7 @@ class ListableItem: DataItem {
 			snoozeUntil = nil
 			snoozingPreset = nil
 		} else {
-			app.postNotification(type: notification, for: self)
+			NotificationQueue.add(type: notification, for: self)
 		}
 	}
 

@@ -156,13 +156,13 @@ final class DataManager {
 				if i.isVisibleOnMenu {
 					if !i.createdByMe {
 						if i.isNewAssignment {
-							app.postNotification(type: assignmentNotification, for: i)
+							NotificationQueue.add(type: assignmentNotification, for: i)
 							i.isNewAssignment = false
 						} else if !i.announced {
-							app.postNotification(type: newNotification, for: i)
+							NotificationQueue.add(type: newNotification, for: i)
 							i.announced = true
 						} else if i.reopened {
-							app.postNotification(type: reopenedNotification, for: i)
+							NotificationQueue.add(type: reopenedNotification, for: i)
 							i.reopened = false
 						}
 					}
@@ -204,7 +204,7 @@ final class DataManager {
 									DLog("Waking up snoozed PR ID %@ because of a status update", pr.serverId)
 									pr.wakeUp()
 								}
-								app.postNotification(type: .newStatus, for: s)
+								NotificationQueue.add(type: .newStatus, for: s)
 								pr.lastStatusNotified = displayText
 							}
 						} else {
@@ -228,6 +228,8 @@ final class DataManager {
 		}
 
 		_ = saveDB()
+
+		NotificationQueue.commit()
 	}
 
 	class func saveDB() {

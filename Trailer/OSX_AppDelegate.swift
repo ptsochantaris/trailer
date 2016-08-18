@@ -626,11 +626,14 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		DataManager.postMigrationTasks()
 
 		appIsRefreshing = true
+		
 		preferencesWindow?.updateActivity()
 
 		for d in menuBarSets {
 			d.prepareForRefresh()
 		}
+
+		NotificationQueue.clear()
 
 		DLog("Starting refresh")
 	}

@@ -517,7 +517,7 @@ final class API {
 						r.displayPolicyForPrs = Int64(Settings.displayPolicyForNewPrs)
 						r.displayPolicyForIssues = Int64(Settings.displayPolicyForNewIssues)
 						if r.shouldSync {
-							app.postNotification(type: .newRepoAnnouncement, for: r)
+							NotificationQueue.add(type: .newRepoAnnouncement, for: r)
 						}
 					}
 					lastRepoCheck = Date()
@@ -1421,15 +1421,15 @@ final class API {
 			} else if code > 299 {
 				error = S.apiError("Server responded with error \(code)")
 				parsedData = nil
-				shouldRetry = false
+				shouldRetry = (code == 502 || code == 503) // retry in case GH is deploying
 			} else if code == 0 {
 				error = S.apiError("Server did not repond")
 				parsedData = nil
 				shouldRetry = (e as? NSError)?.code == -1001 // retry if it was a timeout
-			} else if (response?.expectedContentLength ?? 0) > Int64(data?.count ?? 0) {
+			} else if Int64(data?.count ?? 0) < (response?.expectedContentLength ?? 0) {
 				error = S.apiError("Server data was truncated")
 				parsedData = nil
-				shouldRetry = true // truncation
+				shouldRetry = true // transfer truncation, try again
 			} else {
 				DLog("(%@) GET %@ - RESULT: %@", apiServerLabel, expandedPath, code)
 				error = e as? NSError

@@ -10,7 +10,7 @@ let api = API()
 
 //delay(2) {
 //	let _items = PullRequest.allItems(ofType: "PullRequest", in: mainObjectContext) as! [ListableItem]
-//	app.postNotification(type: .newComment, forItem: _items[0].comments.first!)
+//	NotificationQueue.add(type: .newComment, forItem: _items[0].comments.first!)
 //}
 //let _items = PullRequest.allItems(ofType: "PullRequest", in: mainObjectContext) as! [ListableItem]
 //for i in _items {

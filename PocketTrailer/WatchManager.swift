@@ -17,10 +17,11 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		}
 	}
 
-	@available(iOS 9.3, *)
 	func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
-		atNextEvent(self) { S in
-			S.updateContext()
+		if activationState == .activated {
+			atNextEvent(self) { S in
+				S.updateContext()
+			}
 		}
 	}
 

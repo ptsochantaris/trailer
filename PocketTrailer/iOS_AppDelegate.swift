@@ -164,6 +164,8 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 		refreshTimer?.invalidate()
 		refreshTimer = nil
 
+		DataManager.postMigrationTasks()
+
 		appIsRefreshing = true
 
 		backgroundTask = UIApplication.shared.beginBackgroundTask(withName: "com.housetrip.Trailer.refresh") { [weak self] in
@@ -171,9 +173,10 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 		}
 
 		NotificationCenter.default.post(name: RefreshStartedNotification, object: nil)
-		DLog("Starting refresh")
 
-		DataManager.postMigrationTasks()
+		NotificationQueue.clear()
+
+		DLog("Starting refresh")
 	}
 
 	func startRefresh() -> Bool {
@@ -264,10 +267,6 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 
 	func applicationWillResignActive(_ application: UIApplication) {
 		actOnLocalNotification = true
-	}
-
-	func postNotification(type: NotificationType, for item: DataItem) {
-		NotificationManager.postNotification(type: type, for: item)
 	}
 
 	func markEverythingRead() {
