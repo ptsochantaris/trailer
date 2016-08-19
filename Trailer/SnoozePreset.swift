@@ -106,11 +106,10 @@ final class SnoozePreset: NSManagedObject {
 			if day == 0 && hour == 0 && minute == 0 {
 				return .distantFuture
 			}
-			var now = now.timeIntervalSinceReferenceDate
-			now += Double(minute)*60.0
-			now += Double(hour)*60.0*60.0
-			now += Double(day)*60.0*60.0*24.0
-			return Date(timeIntervalSinceReferenceDate: now)
+			var wakeupTimeFromNow = TimeInterval(minute)*60.0
+			wakeupTimeFromNow += TimeInterval(hour)*60.0*60.0
+			wakeupTimeFromNow += TimeInterval(day)*60.0*60.0*24.0
+			return Date(timeIntervalSinceNow: wakeupTimeFromNow)
 
 		} else {
 

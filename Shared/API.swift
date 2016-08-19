@@ -1259,7 +1259,7 @@ final class API {
 					}
 
 					if let v = allHeaders["X-RateLimit-Reset"] as? String {
-						server.resetDate = Date(timeIntervalSince1970: Double(v) ?? 0)
+						server.resetDate = Date(timeIntervalSince1970: TimeInterval(v) ?? 0)
 					} else {
 						server.resetDate = nil
 					}
@@ -1357,7 +1357,7 @@ final class API {
 		////////////////////////// preempt with error backoff algorithm
 		let existingBackOff = badLinks[expandedPath]
 		if let eb = existingBackOff {
-			if Date().timeIntervalSince1970 < eb.nextAttemptAt.timeIntervalSince1970 {
+			if eb.nextAttemptAt.timeIntervalSinceNow > 0 {
 				// report failure and return
 				DLog("(%@) Preempted fetch to previously broken link %@, won't actually access this URL until %@", apiServerLabel, expandedPath, eb.nextAttemptAt)
 				atNextEvent(self) { S in
@@ -1376,7 +1376,7 @@ final class API {
 		let previousCacheEntry = CacheEntry.entry(for: cacheKey)?.cacheUnit // move data out of thread-specific context
 		if let p = previousCacheEntry {
 			/////////////////////// 60 second dumb-caching
-			if p.lastFetched.timeIntervalSince1970 > Date(timeIntervalSinceNow: -60).timeIntervalSince1970, let parsedData = p.parsedData {
+			if p.lastFetched > Date(timeIntervalSinceNow: -60), let parsedData = p.parsedData {
 				DLog("(%@) GET %@ - CACHED", apiServerLabel, expandedPath)
 				handleResponse(with: p.data,
 				               parsedData: parsedData,
@@ -1483,12 +1483,12 @@ final class API {
 					if backoff.nextIncrement < 3600.0 {
 						backoff.nextIncrement += backOffIncrement
 					}
-					backoff.nextAttemptAt = Date().addingTimeInterval(backoff.nextIncrement)
+					backoff.nextAttemptAt = Date(timeIntervalSinceNow: backoff.nextIncrement)
 					badLinks[urlPath] = backoff
 				} else {
 					DLog("(%@) Placing URL %@ on the throttled list", serverLabel, urlPath)
 					badLinks[urlPath] = UrlBackOffEntry(
-						nextAttemptAt: Date().addingTimeInterval(backOffIncrement),
+						nextAttemptAt: Date(timeIntervalSinceNow: backOffIncrement),
 						nextIncrement: backOffIncrement)
 				}
 			}

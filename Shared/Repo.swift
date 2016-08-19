@@ -147,7 +147,7 @@ final class Repo: DataItem {
 
 	class func reposNotRecentlyDirtied(in moc: NSManagedObjectContext) -> [Repo] {
 		let f = NSFetchRequest<Repo>(entityName: "Repo")
-		let date = Date().addingTimeInterval(-3600) as CVarArg
+		let date = Date(timeIntervalSinceNow: -3600) as CVarArg
 		f.predicate = NSPredicate(format: "dirty != YES and lastDirtied < %@ and postSyncAction != %lld and (displayPolicyForPrs > 0 or displayPolicyForIssues > 0)", date, PostSyncAction.delete.rawValue)
 		f.includesPropertyValues = false
 		f.returnsObjectsAsFaults = false
