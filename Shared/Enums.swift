@@ -73,7 +73,7 @@ func delay(_ delay: TimeInterval, closure: Completion) {
 	DispatchQueue.main.asyncAfter(deadline: time, execute: closure)
 }
 
-func delay<T: AnyObject>(_ time: TimeInterval, _ owner: T, completion: @escaping (T)->()) {
+func delay<T: AnyObject>(_ time: TimeInterval, _ owner: T, completion: @escaping (T) -> Void) {
 	let time = DispatchTime.now() + Double(Int64(time * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
 	DispatchQueue.main.asyncAfter(deadline: time) { [weak owner] in
 		atNextEvent { [weak owner] in

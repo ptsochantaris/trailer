@@ -157,20 +157,18 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 			switch notification.activationType {
 			case .additionalActionClicked:
-				if #available(OSX 10.10, *) {
-					if notification.additionalActivationAction?.identifier == "mute" {
-						if let (_,i) = ListableItem.relatedItems(from: userInfo) {
-							i.setMute(to: true)
-							saveAndRefresh(i)
-						}
-						break
-					} else if notification.additionalActivationAction?.identifier == "read" {
-						if let (_,i) = ListableItem.relatedItems(from: userInfo) {
-							i.catchUpWithComments()
-							saveAndRefresh(i)
-						}
-						break
+				if notification.additionalActivationAction?.identifier == "mute" {
+					if let (_,i) = ListableItem.relatedItems(from: userInfo) {
+						i.setMute(to: true)
+						saveAndRefresh(i)
 					}
+					break
+				} else if notification.additionalActivationAction?.identifier == "read" {
+					if let (_,i) = ListableItem.relatedItems(from: userInfo) {
+						i.catchUpWithComments()
+						saveAndRefresh(i)
+					}
+					break
 				}
 			case .actionButtonClicked, .contentsClicked:
 				var urlToOpen = userInfo[NOTIFICATION_URL_KEY] as? String
@@ -198,12 +196,10 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		let notification = NSUserNotification()
 
 		func addPotentialExtraActions() {
-			if #available(OSX 10.10, *) {
-				notification.additionalActions = [
-					NSUserNotificationAction(identifier: "mute", title: "Mute this item"),
-					NSUserNotificationAction(identifier: "read", title: "Mark this item as read")
-				]
-			}
+			notification.additionalActions = [
+				NSUserNotificationAction(identifier: "mute", title: "Mute this item"),
+				NSUserNotificationAction(identifier: "read", title: "Mark this item as read")
+			]
 		}
 
 		switch type {
@@ -1071,7 +1067,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	private func databaseErrorOnStartup() {
 		let alert = NSAlert()
 		alert.messageText = "Database error"
-		alert.informativeText = "Trailer encountered an error while trying to load the database.\n\nThis could be because of a failed upgrade or a software bug.\n\nPlease either quit and downgrade to the previous version, or reset the Trailer's state and setup from a fresh state."
+		alert.informativeText = "Trailer encountered an error while trying to load the database.\n\nThis could be because of a failed upgrade or a software bug.\n\nPlease either quit and downgrade to the previous version, or reset Trailer's state and setup from a fresh state."
 		alert.addButton(withTitle: "Quit")
 		alert.addButton(withTitle: "Reset Trailer")
 
@@ -1106,11 +1102,8 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	private var currentSystemDarkMode: Bool {
-		if #available(OSX 10.10, *) {
-			let c = NSAppearance.current()
-			return c.name.contains(NSAppearanceNameVibrantDark)
-		}
-		return false
+		let c = NSAppearance.current()
+		return c.name.contains(NSAppearanceNameVibrantDark)
 	}
 
 	// Server display list

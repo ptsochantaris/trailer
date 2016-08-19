@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11198.2" systemVersion="15G31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" customObjectInstantitationMethod="direct">
     <dependencies>
-        <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11198.2"/>
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
@@ -756,7 +755,7 @@ Token</string>
                                                             <action selector="includeNumbersInFilteringSelected:" target="vQH-WF-vh2" id="HOz-7T-URJ"/>
                                                         </connections>
                                                     </button>
-                                                    <button id="dox-eD-j7t">
+                                                    <button misplaced="YES" id="dox-eD-j7t">
                                                         <rect key="frame" x="99" y="9" width="78" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Assignee" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="BZz-Yp-SYO">

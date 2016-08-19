@@ -1,6 +1,4 @@
 
-let newSystem = (floor(NSAppKitVersionNumber) > Double(NSAppKitVersionNumber10_9))
-
 final class MenuWindow: NSWindow {
 
 	@IBOutlet weak var scrollView: NSScrollView!
@@ -37,15 +35,9 @@ final class MenuWindow: NSWindow {
 
 		backgroundColor = .white
 
-        if newSystem {
-            scrollView.contentView.wantsLayer = true
-        }
+		scrollView.contentView.wantsLayer = true
 
 		NotificationCenter.default.addObserver(self, selector: #selector(refreshUpdate), name: SyncProgressUpdateNotification, object: nil)
-	}
-
-	class var isUsingVibrancy: Bool {
-		return newSystem && Settings.useVibrancy
 	}
 
 	override func controlTextDidChange(_ obj: Notification) {
@@ -54,31 +46,27 @@ final class MenuWindow: NSWindow {
 
 	func updateVibrancy() {
 
-		if MenuWindow.isUsingVibrancy {
+		if Settings.useVibrancy {
 
-			if #available(OSX 10.10, *) {
-			    appearance = NSAppearance(named: app.darkMode ? NSAppearanceNameVibrantDark : NSAppearanceNameVibrantLight)
-				if windowVibrancy == nil {
-					let w = NSVisualEffectView(frame: header.bounds)
-					w.autoresizingMask = [.viewHeightSizable, .viewWidthSizable]
-					w.blendingMode = NSVisualEffectBlendingMode.behindWindow
-					w.state = NSVisualEffectState.active
-					header.addSubview(w, positioned: NSWindowOrderingMode.below, relativeTo: filter)
-					windowVibrancy = w
+			appearance = NSAppearance(named: app.darkMode ? NSAppearanceNameVibrantDark : NSAppearanceNameVibrantLight)
+			if windowVibrancy == nil {
+				let w = NSVisualEffectView(frame: header.bounds)
+				w.autoresizingMask = [.viewHeightSizable, .viewWidthSizable]
+				w.blendingMode = .behindWindow
+				w.state = .active
+				header.addSubview(w, positioned: .below, relativeTo: filter)
+				windowVibrancy = w
 
-					table.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.sourceList
-				}
+				table.selectionHighlightStyle = .sourceList
 			}
 
-		} else {
+		} else if let w = windowVibrancy {
 
-            if let w = windowVibrancy {
+			appearance = NSAppearance(named: NSAppearanceNameAqua)
+			w.removeFromSuperview()
+			windowVibrancy = nil
 
-                appearance = NSAppearance(named: NSAppearanceNameAqua)
-                w.removeFromSuperview()
-                windowVibrancy = nil
-                table.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.regular
-            }
+			table.selectionHighlightStyle = .regular
 		}
 	}
 

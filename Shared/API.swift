@@ -1175,7 +1175,7 @@ final class API {
 		badLinks.removeAll(keepingCapacity: false)
 	}
 
-	func testApi(to apiServer: ApiServer, callback: @escaping (Error?) -> ()) {
+	func testApi(to apiServer: ApiServer, callback: @escaping (Error?) -> Void) {
 		clearAllBadLinks()
 		api(call: "/user", on: apiServer, ignoreLastSync: true) { [weak self] code, headers, data, error, shouldRetry in
 

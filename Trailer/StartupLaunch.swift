@@ -17,7 +17,7 @@ final class StartupLaunch: NSObject {
 				defer { itemUrl.deinitialize() }
 
 				for i in loginItems {
-					if LSSharedFileListItemResolve(i, 0, itemUrl, nil) == noErr, let urlRef = itemUrl.pointee?.takeRetainedValue() as? URL, (urlRef == appUrl) {
+					if let itemUrl = LSSharedFileListItemCopyResolvedURL(i, 0, nil), itemUrl.takeRetainedValue() as URL == appUrl {
 						return (i, loginItems.last)
 					}
 				}
@@ -33,16 +33,15 @@ final class StartupLaunch: NSObject {
 
 		let itemReferences = itemReferencesInLoginItems
 		let isSet = itemReferences.existingReference != nil
-		if let loginItemsRef = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems.takeRetainedValue(), nil).takeRetainedValue() as LSSharedFileList? {
+		let type = kLSSharedFileListSessionLoginItems.takeUnretainedValue()
+		if let loginItemsRef = LSSharedFileListCreate(nil, type, nil).takeRetainedValue() as LSSharedFileList? {
 			if launch && !isSet {
 				let appUrl = URL(fileURLWithPath: Bundle.main.bundlePath) as CFURL
 				LSSharedFileListInsertItemURL(loginItemsRef, itemReferences.lastReference, nil, nil, appUrl, nil, nil)
 				DLog("Trailer was added to login items")
-			} else if !launch && isSet {
-				if let itemRef = itemReferences.existingReference {
-					LSSharedFileListItemRemove(loginItemsRef,itemRef)
-					DLog("Trailer was removed from login items")
-				}
+			} else if !launch && isSet, let itemRef = itemReferences.existingReference {
+				LSSharedFileListItemRemove(loginItemsRef, itemRef)
+				DLog("Trailer was removed from login items")
 			}
 		}
 	}

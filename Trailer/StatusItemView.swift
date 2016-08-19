@@ -38,12 +38,12 @@ final class StatusItemView: NSView {
 		tappedCallback()
 	}
 
-	private let STATUSITEM_PADDING: CGFloat = 1.0
+	static private let padding: CGFloat = 1.0
 
 	func sizeToFit() {
 		let width = statusLabel.size(withAttributes: textAttributes).width
 		let H = NSStatusBar.system().thickness
-		let itemWidth = (H + width + STATUSITEM_PADDING*3) + labelOffset
+		let itemWidth = (H + width + StatusItemView.padding*3) + labelOffset
 		frame = NSMakeRect(0, 0, itemWidth, H)
 		needsDisplay = true
 	}
@@ -52,7 +52,7 @@ final class StatusItemView: NSView {
 
 		app.statusItem(for: self)?.drawStatusBarBackground(in: dirtyRect, withHighlight: highlighted)
 
-		let imagePoint = NSMakePoint(STATUSITEM_PADDING, 0)
+		let imagePoint = NSMakePoint(StatusItemView.padding, 0)
 		var labelRect = CGRect(x: bounds.size.height + labelOffset, y: -5, width: bounds.size.width, height: bounds.size.height)
 		var displayAttributes = textAttributes
 		var imageColor: NSColor

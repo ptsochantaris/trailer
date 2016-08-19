@@ -3,44 +3,10 @@
 	import UIKit
 #endif
 
-final class PopTimer : NSObject {
-
-	var _popTimer: Timer?
-	let _timeInterval: TimeInterval
-	let _callback: ()->()
-
-	var isRunning: Bool {
-		return _popTimer != nil
-	}
-
-	func push() {
-		_popTimer?.invalidate()
-		_popTimer = Timer.scheduledTimer(timeInterval: _timeInterval, target: self, selector: #selector(popped), userInfo: nil, repeats: false)
-	}
-
-	func popped() {
-		invalidate()
-		_callback()
-	}
-
-	func invalidate() {
-		_popTimer?.invalidate()
-		_popTimer = nil
-	}
-
-	init(timeInterval: TimeInterval, callback: Completion) {
-		_timeInterval = timeInterval
-		_callback = callback
-		super.init()
-	}
-}
-
-/////////////////////////////
-
-var _settings_valuesCache = [AnyHashable : Any]()
-let _settings_shared = UserDefaults(suiteName: "group.Trailer")!
-
 final class Settings {
+
+	private static var valuesCache = [AnyHashable : Any]()
+	private static let sharedDefaults = UserDefaults(suiteName: "group.Trailer")!
 
 	private class var allFields: [String] {
 		return [
@@ -63,76 +29,76 @@ final class Settings {
         if d.object(forKey: "LAST_RUN_VERSION_KEY") != nil {
             for k in allFields {
                 if let v = d.object(forKey: k) {
-                    _settings_shared.set(v, forKey: k)
+                    sharedDefaults.set(v, forKey: k)
                     DLog("Migrating setting '%@'", k)
                     d.removeObject(forKey: k)
                 }
             }
-            _settings_shared.synchronize()
+            sharedDefaults.synchronize()
             DLog("Settings migrated to shared container")
         } else {
             DLog("No need to migrate settings into shared container")
         }
 
-		if let snoozeWakeOnComment = _settings_shared.object(forKey: "SNOOZE_WAKEUP_ON_COMMENT") as? Bool {
+		if let snoozeWakeOnComment = sharedDefaults.object(forKey: "SNOOZE_WAKEUP_ON_COMMENT") as? Bool {
 			DataManager.postMigrationSnoozeWakeOnComment = snoozeWakeOnComment
-			_settings_shared.removeObject(forKey: "SNOOZE_WAKEUP_ON_COMMENT")
+			sharedDefaults.removeObject(forKey: "SNOOZE_WAKEUP_ON_COMMENT")
 		}
-		if let snoozeWakeOnMention = _settings_shared.object(forKey: "SNOOZE_WAKEUP_ON_MENTION") as? Bool {
+		if let snoozeWakeOnMention = sharedDefaults.object(forKey: "SNOOZE_WAKEUP_ON_MENTION") as? Bool {
 			DataManager.postMigrationSnoozeWakeOnMention = snoozeWakeOnMention
-			_settings_shared.removeObject(forKey: "SNOOZE_WAKEUP_ON_MENTION")
+			sharedDefaults.removeObject(forKey: "SNOOZE_WAKEUP_ON_MENTION")
 		}
-		if let snoozeWakeOnStatusUpdate = _settings_shared.object(forKey: "SNOOZE_WAKEUP_ON_STATUS_UPDATE") as? Bool {
+		if let snoozeWakeOnStatusUpdate = sharedDefaults.object(forKey: "SNOOZE_WAKEUP_ON_STATUS_UPDATE") as? Bool {
 			DataManager.postMigrationSnoozeWakeOnStatusUpdate = snoozeWakeOnStatusUpdate
-			_settings_shared.removeObject(forKey: "SNOOZE_WAKEUP_ON_STATUS_UPDATE")
+			sharedDefaults.removeObject(forKey: "SNOOZE_WAKEUP_ON_STATUS_UPDATE")
 		}
 
-		if let moveAssignedPrs = _settings_shared.object(forKey: "MOVE_ASSIGNED_PRS_TO_MY_SECTION") as? Bool {
-			_settings_shared.set(moveAssignedPrs ? AssignmentPolicy.moveToMine.rawValue : AssignmentPolicy.doNothing.rawValue, forKey: "ASSIGNED_PR_HANDLING_POLICY")
-			_settings_shared.removeObject(forKey: "MOVE_ASSIGNED_PRS_TO_MY_SECTION")
+		if let moveAssignedPrs = sharedDefaults.object(forKey: "MOVE_ASSIGNED_PRS_TO_MY_SECTION") as? Bool {
+			sharedDefaults.set(moveAssignedPrs ? AssignmentPolicy.moveToMine.rawValue : AssignmentPolicy.doNothing.rawValue, forKey: "ASSIGNED_PR_HANDLING_POLICY")
+			sharedDefaults.removeObject(forKey: "MOVE_ASSIGNED_PRS_TO_MY_SECTION")
 		}
 
-		if let mergeHandlingPolicyLegacy = _settings_shared.object(forKey: "MERGE_HANDLING_POLICY") as? Int {
-			_settings_shared.set(mergeHandlingPolicyLegacy + (mergeHandlingPolicyLegacy > 0 ? 1 : 0), forKey: "MERGE_HANDLING_POLICY_2")
-			_settings_shared.removeObject(forKey: "MERGE_HANDLING_POLICY")
+		if let mergeHandlingPolicyLegacy = sharedDefaults.object(forKey: "MERGE_HANDLING_POLICY") as? Int {
+			sharedDefaults.set(mergeHandlingPolicyLegacy + (mergeHandlingPolicyLegacy > 0 ? 1 : 0), forKey: "MERGE_HANDLING_POLICY_2")
+			sharedDefaults.removeObject(forKey: "MERGE_HANDLING_POLICY")
 		}
 
-		if let closeHandlingPolicyLegacy = _settings_shared.object(forKey: "CLOSE_HANDLING_POLICY") as? Int {
-			_settings_shared.set(closeHandlingPolicyLegacy + (closeHandlingPolicyLegacy > 0 ? 1 : 0), forKey: "CLOSE_HANDLING_POLICY_2")
-			_settings_shared.removeObject(forKey: "CLOSE_HANDLING_POLICY")
+		if let closeHandlingPolicyLegacy = sharedDefaults.object(forKey: "CLOSE_HANDLING_POLICY") as? Int {
+			sharedDefaults.set(closeHandlingPolicyLegacy + (closeHandlingPolicyLegacy > 0 ? 1 : 0), forKey: "CLOSE_HANDLING_POLICY_2")
+			sharedDefaults.removeObject(forKey: "CLOSE_HANDLING_POLICY")
 		}
 
-		if let mentionedUserMoveLegacy = _settings_shared.object(forKey: "AUTO_PARTICIPATE_IN_MENTIONS_KEY") as? Bool {
-			_settings_shared.set(mentionedUserMoveLegacy ? Section.mentioned.intValue : Section.none.intValue, forKey: "NEW_MENTION_MOVE_POLICY")
-			_settings_shared.removeObject(forKey: "AUTO_PARTICIPATE_IN_MENTIONS_KEY")
+		if let mentionedUserMoveLegacy = sharedDefaults.object(forKey: "AUTO_PARTICIPATE_IN_MENTIONS_KEY") as? Bool {
+			sharedDefaults.set(mentionedUserMoveLegacy ? Section.mentioned.intValue : Section.none.intValue, forKey: "NEW_MENTION_MOVE_POLICY")
+			sharedDefaults.removeObject(forKey: "AUTO_PARTICIPATE_IN_MENTIONS_KEY")
 		}
 
-		if let mentionedTeamMoveLegacy = _settings_shared.object(forKey: "AUTO_PARTICIPATE_ON_TEAM_MENTIONS") as? Bool {
-			_settings_shared.set(mentionedTeamMoveLegacy ? Section.mentioned.intValue : Section.none.intValue, forKey: "TEAM_MENTION_MOVE_POLICY")
-			_settings_shared.removeObject(forKey: "AUTO_PARTICIPATE_ON_TEAM_MENTIONS")
+		if let mentionedTeamMoveLegacy = sharedDefaults.object(forKey: "AUTO_PARTICIPATE_ON_TEAM_MENTIONS") as? Bool {
+			sharedDefaults.set(mentionedTeamMoveLegacy ? Section.mentioned.intValue : Section.none.intValue, forKey: "TEAM_MENTION_MOVE_POLICY")
+			sharedDefaults.removeObject(forKey: "AUTO_PARTICIPATE_ON_TEAM_MENTIONS")
 		}
 
-		if let mentionedRepoMoveLegacy = _settings_shared.object(forKey: "MOVE_NEW_ITEMS_IN_OWN_REPOS_TO_MENTIONED") as? Bool {
-			_settings_shared.set(mentionedRepoMoveLegacy ? Section.mentioned.intValue : Section.none.intValue, forKey: "NEW_ITEM_IN_OWNED_REPO_MOVE_POLICY")
-			_settings_shared.removeObject(forKey: "MOVE_NEW_ITEMS_IN_OWN_REPOS_TO_MENTIONED")
+		if let mentionedRepoMoveLegacy = sharedDefaults.object(forKey: "MOVE_NEW_ITEMS_IN_OWN_REPOS_TO_MENTIONED") as? Bool {
+			sharedDefaults.set(mentionedRepoMoveLegacy ? Section.mentioned.intValue : Section.none.intValue, forKey: "NEW_ITEM_IN_OWNED_REPO_MOVE_POLICY")
+			sharedDefaults.removeObject(forKey: "MOVE_NEW_ITEMS_IN_OWN_REPOS_TO_MENTIONED")
 		}
 
 		DataManager.postMigrationRepoPrPolicy = RepoDisplayPolicy.all
 		DataManager.postMigrationRepoIssuePolicy = RepoDisplayPolicy.hide
 
-		if let showIssues = _settings_shared.object(forKey: "SHOW_ISSUES_MENU") as? Bool {
-			_settings_shared.set(showIssues ? RepoDisplayPolicy.all.intValue : RepoDisplayPolicy.hide.intValue, forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX")
+		if let showIssues = sharedDefaults.object(forKey: "SHOW_ISSUES_MENU") as? Bool {
+			sharedDefaults.set(showIssues ? RepoDisplayPolicy.all.intValue : RepoDisplayPolicy.hide.intValue, forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX")
 			DataManager.postMigrationRepoIssuePolicy = showIssues ? RepoDisplayPolicy.all : RepoDisplayPolicy.hide
-			_settings_shared.removeObject(forKey: "SHOW_ISSUES_MENU")
+			sharedDefaults.removeObject(forKey: "SHOW_ISSUES_MENU")
 		}
 
-		if let hideNewRepositories = _settings_shared.object(forKey: "HIDE_NEW_REPOS_KEY") as? Bool {
-			_settings_shared.set(hideNewRepositories ? RepoDisplayPolicy.hide.intValue : RepoDisplayPolicy.all.intValue, forKey: "NEW_PR_DISPLAY_POLICY_INDEX")
-			_settings_shared.set(hideNewRepositories ? RepoDisplayPolicy.hide.intValue : RepoDisplayPolicy.all.intValue, forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX")
-			_settings_shared.removeObject(forKey: "HIDE_NEW_REPOS_KEY")
+		if let hideNewRepositories = sharedDefaults.object(forKey: "HIDE_NEW_REPOS_KEY") as? Bool {
+			sharedDefaults.set(hideNewRepositories ? RepoDisplayPolicy.hide.intValue : RepoDisplayPolicy.all.intValue, forKey: "NEW_PR_DISPLAY_POLICY_INDEX")
+			sharedDefaults.set(hideNewRepositories ? RepoDisplayPolicy.hide.intValue : RepoDisplayPolicy.all.intValue, forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX")
+			sharedDefaults.removeObject(forKey: "HIDE_NEW_REPOS_KEY")
 		}
 
-		if let hideAllSection = _settings_shared.object(forKey: "HIDE_ALL_SECTION") as? Bool {
+		if let hideAllSection = sharedDefaults.object(forKey: "HIDE_ALL_SECTION") as? Bool {
 			if hideAllSection {
 				if DataManager.postMigrationRepoPrPolicy == RepoDisplayPolicy.all {
 					DataManager.postMigrationRepoPrPolicy = RepoDisplayPolicy.mineAndPaticipated
@@ -141,24 +107,24 @@ final class Settings {
 					DataManager.postMigrationRepoIssuePolicy = RepoDisplayPolicy.mineAndPaticipated
 				}
 
-				let newPrPolicy = _settings_shared.object(forKey: "NEW_PR_DISPLAY_POLICY_INDEX") as? Int64 ?? RepoDisplayPolicy.all.rawValue
+				let newPrPolicy = sharedDefaults.object(forKey: "NEW_PR_DISPLAY_POLICY_INDEX") as? Int64 ?? RepoDisplayPolicy.all.rawValue
 				if newPrPolicy == RepoDisplayPolicy.all.rawValue {
-					_settings_shared.set(RepoDisplayPolicy.mineAndPaticipated.intValue, forKey: "NEW_PR_DISPLAY_POLICY_INDEX")
+					sharedDefaults.set(RepoDisplayPolicy.mineAndPaticipated.intValue, forKey: "NEW_PR_DISPLAY_POLICY_INDEX")
 				}
-				let newIssuePolicy = _settings_shared.object(forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX") as? Int64 ?? RepoDisplayPolicy.all.rawValue
+				let newIssuePolicy = sharedDefaults.object(forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX") as? Int64 ?? RepoDisplayPolicy.all.rawValue
 				if newIssuePolicy == RepoDisplayPolicy.all.rawValue {
-					_settings_shared.set(RepoDisplayPolicy.mineAndPaticipated.intValue, forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX")
+					sharedDefaults.set(RepoDisplayPolicy.mineAndPaticipated.intValue, forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX")
 				}
 			}
-			_settings_shared.removeObject(forKey: "HIDE_ALL_SECTION")
+			sharedDefaults.removeObject(forKey: "HIDE_ALL_SECTION")
 		}
 
-		_settings_shared.synchronize()
+		sharedDefaults.synchronize()
 	}
 
 	private class func set(_ key: String, _ value: Any?) {
 
-		let previousValue = _settings_shared.object(forKey: key)
+		let previousValue = sharedDefaults.object(forKey: key)
 
 		if let v = value {
 			let vString = String(describing: v)
@@ -166,18 +132,18 @@ final class Settings {
 				DLog("Setting %@ to identical value (%@), skipping", key, vString)
 				return
 			} else {
-				_settings_shared.set(v, forKey: key)
+				sharedDefaults.set(v, forKey: key)
 			}
 		} else {
 			if previousValue == nil {
 				DLog("Setting %@ to identical value (nil), skipping", key)
 				return
 			} else {
-				_settings_shared.removeObject(forKey: key)
+				sharedDefaults.removeObject(forKey: key)
 			}
 		}
-		_settings_valuesCache[key] = value
-		_settings_shared.synchronize()
+		valuesCache[key] = value
+		sharedDefaults.synchronize()
 
 		if let v = value {
 			DLog("Setting %@ to %@", key, String(describing: v))
@@ -188,7 +154,7 @@ final class Settings {
 		possibleExport(key)
 	}
 
-	static let saveTimer = { () -> PopTimer in
+	private static let saveTimer = { () -> PopTimer in
 		return PopTimer(timeInterval: 2.0) {
 			if let e = Settings.lastExportUrl {
 				_ = Settings.writeToURL(e)
@@ -211,21 +177,17 @@ final class Settings {
 	}
 
 	private class func get(_ key: String) -> Any? {
-		if let v = _settings_valuesCache[key] {
+		if let v = valuesCache[key] {
 			return v
-		} else if let v = _settings_shared.object(forKey: key) {
-			_settings_valuesCache[key] = v
+		} else if let v = sharedDefaults.object(forKey: key) {
+			valuesCache[key] = v
 			return v
 		} else {
 			return nil
 		}
 	}
 
-	/////////////////////////////////
-
-	private class func clearCache() {
-		_settings_valuesCache.removeAll(keepingCapacity: false)
-	}
+	///////////////////////////////// IMPORT / EXPORT
 
 	class func writeToURL(_ url: URL) -> Bool {
 
@@ -235,7 +197,7 @@ final class Settings {
 		Settings.lastExportDate = Date()
 		let settings = NSMutableDictionary()
 		for k in allFields {
-			if let v = _settings_shared.object(forKey: k), k != "AUTO_REPEAT_SETTINGS_EXPORT" {
+			if let v = sharedDefaults.object(forKey: k), k != "AUTO_REPEAT_SETTINGS_EXPORT" {
 				settings[k] = v
 			}
 		}
@@ -256,11 +218,11 @@ final class Settings {
 			resetAllSettings()
 			for k in allFields {
 				if let v = settings[k] {
-					_settings_shared.set(v, forKey: k)
+					sharedDefaults.set(v, forKey: k)
 				}
 			}
-			_settings_shared.synchronize()
-			clearCache()
+			sharedDefaults.synchronize()
+			valuesCache.removeAll(keepingCapacity: false)
 			return ApiServer.configure(from: settings["DB_CONFIG_OBJECTS"] as! [String : [String : NSObject]])
 			&& SnoozePreset.configure(from: settings["DB_SNOOZE_OBJECTS"] as! [[String : NSObject]])
 		}
@@ -269,10 +231,10 @@ final class Settings {
 
 	class func resetAllSettings() {
 		for k in allFields {
-			_settings_shared.removeObject(forKey: k)
+			sharedDefaults.removeObject(forKey: k)
 		}
-		_settings_shared.synchronize()
-		clearCache()
+		sharedDefaults.synchronize()
+		valuesCache.removeAll(keepingCapacity: false)
 	}
 
 	///////////////////////////////// NUMBERS

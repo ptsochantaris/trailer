@@ -15,7 +15,7 @@ class TrailerCell: NSTableCellView {
 		detailFont = NSFont.menuFont(ofSize: 10.0)
 		titleFont = NSFont.menuFont(ofSize: 13.0)
 
-		isDark = MenuWindow.isUsingVibrancy && app.darkMode
+		isDark = Settings.useVibrancy && app.darkMode
 
 		unselectedTitleColor = isDark ? .controlHighlightColor : .controlTextColor
 

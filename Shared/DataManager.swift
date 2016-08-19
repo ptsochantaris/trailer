@@ -32,12 +32,10 @@ final class DataManager {
 		let nc = NSUserNotificationCenter.default
 
 		// Unstick macOS notifications with custom actions but without an identifier, causes macOS to keep them forever
-		if #available(OSX 10.10, *) {
-			for notification in nc.deliveredNotifications {
-				if notification.additionalActions != nil && notification.identifier == nil {
-					nc.removeAllDeliveredNotifications()
-					break
-				}
+		for notification in nc.deliveredNotifications {
+			if notification.additionalActions != nil && notification.identifier == nil {
+				nc.removeAllDeliveredNotifications()
+				break
 			}
 		}
 
