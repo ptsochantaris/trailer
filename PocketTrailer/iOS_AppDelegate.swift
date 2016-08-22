@@ -95,7 +95,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 		}
 	}
 
-	func application(_ application: UIApplication, open url: URL, sourceApplication: String?, annotation: Any) -> Bool {
+	func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
 		if let c = URLComponents(url: url, resolvingAgainstBaseURL: false) {
 			if let scheme = c.scheme {
 				if scheme == "pockettrailer" {
