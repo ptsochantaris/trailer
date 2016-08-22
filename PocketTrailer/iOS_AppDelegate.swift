@@ -127,7 +127,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 				_ = startRefresh()
 			} else {
 				let howLongUntilNextSync = TimeInterval(Settings.refreshPeriod) - howLongAgo
-				DLog("No need to refresh yet, will refresh in %f", howLongUntilNextSync)
+				DLog("No need to refresh yet, will refresh in %@", howLongUntilNextSync)
 				refreshTimer = Timer.scheduledTimer(timeInterval: howLongUntilNextSync, target: self, selector: #selector(refreshTimerDone), userInfo: nil, repeats: false)
 			}
 		} else {

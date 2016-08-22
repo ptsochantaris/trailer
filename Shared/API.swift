@@ -1479,7 +1479,7 @@ final class API {
 		if error != nil {
 			if code > 399 {
 				if var backoff = existingBackOff {
-					DLog("(%@) Extending backoff for already throttled URL %@ by %f seconds", serverLabel, urlPath, backOffIncrement)
+					DLog("(%@) Extending backoff for already throttled URL %@ by %@ seconds", serverLabel, urlPath, backOffIncrement)
 					if backoff.nextIncrement < 3600.0 {
 						backoff.nextIncrement += backOffIncrement
 					}

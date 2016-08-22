@@ -138,7 +138,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			if autoCheck {
 				s.updateCheckInterval = TimeInterval(3600)*TimeInterval(Settings.checkForUpdatesInterval)
 			}
-			DLog("Check for updates set to %@, every %f seconds", autoCheck ? "true" : "false", s.updateCheckInterval)
+			DLog("Check for updates set to %@, every %@ seconds", autoCheck, s.updateCheckInterval)
 		}
 	}
 
@@ -579,7 +579,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				startRefresh()
 			} else {
 				let howLongUntilNextSync = TimeInterval(Settings.refreshPeriod) - howLongAgo
-				DLog("No need to refresh yet, will refresh in %f", howLongUntilNextSync)
+				DLog("No need to refresh yet, will refresh in %@", howLongUntilNextSync)
 				refreshTimer = Timer.scheduledTimer(timeInterval: howLongUntilNextSync, target: self, selector: #selector(refreshTimerDone), userInfo: nil, repeats: false)
 			}
 		}

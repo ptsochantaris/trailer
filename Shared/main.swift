@@ -41,13 +41,13 @@ let s1 = Date()
 for _ in 0...100000 {
 	let dd1 = syncDateFormatter.dateFromString(testDate)
 }
-DLog("%f", Date().timeIntervalSinceDate(s1))
+DLog("%@", Date().timeIntervalSinceDate(s1))
 
 let s2 = Date()
 for _ in 0...100000 {
 	let dd1 = parseGH8601(testDate)
 }
-DLog("%f", Date().timeIntervalSinceDate(s2))
+DLog("%@", Date().timeIntervalSinceDate(s2))
 */
 
 
