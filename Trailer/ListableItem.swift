@@ -174,7 +174,7 @@ class ListableItem: DataItem {
 	final private func contains(terms: [String]) -> Bool {
 		if let b = body {
 			for t in terms {
-				if b.localizedCaseInsensitiveContains(t) {
+				if !t.isEmpty && b.localizedCaseInsensitiveContains(t) {
 					return true
 				}
 			}
@@ -290,7 +290,7 @@ class ListableItem: DataItem {
 		var outsideMySectionsButAwake = (targetSection == .all || targetSection == .none)
 
 		if outsideMySectionsButAwake && Int64(Settings.newMentionMovePolicy) > Section.none.rawValue
-			&& contains(terms: ["@\(apiServer.userName!)"]) {
+			&& contains(terms: ["@\(S(apiServer.userName))"]) {
 
 			targetSection = Section(Settings.newMentionMovePolicy)!
 			outsideMySectionsButAwake = false

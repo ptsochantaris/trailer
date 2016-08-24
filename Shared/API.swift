@@ -975,7 +975,7 @@ final class API {
 	private func ensureApiServersHaveUserIds(in moc: NSManagedObjectContext, callback: Completion) {
 		var needToCheck = false
 		for apiServer in ApiServer.allApiServers(in: moc) {
-			if apiServer.userId == 0 {
+			if apiServer.userId == 0 || (apiServer.userName?.isEmpty ?? true) {
 				needToCheck = true
 				break
 			}
