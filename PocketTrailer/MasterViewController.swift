@@ -1047,7 +1047,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		} else {
 			tableView.endUpdates()
 		}
-		updateStatus()
+		atNextEvent { [weak self] in
+			self?.updateStatus()
+		}
 	}
 
 	private func configureCell(cell: UITableViewCell, withObject: ListableItem) {

@@ -6,6 +6,57 @@ import UIKit
 
 final class API {
 
+	typealias ApiCompletion = (_ code: Int64?, _ headers: [AnyHashable : Any]?, _ data: Any?, _ error: Error?, _ shouldRetry: Bool) -> Void
+
+	final class ApiOperation: Operation {
+		private let path: String
+		private let server: ApiServer
+		private let ignoreLastSync: Bool
+		private let completion: ApiCompletion
+		private var _isFinished = false
+		private var _isExecuting = false
+
+		init(call path: String,
+		     on server: ApiServer,
+		     ignoreLastSync: Bool,
+		     completion: ApiCompletion) {
+
+			self.server = server
+			self.path = path
+			self.ignoreLastSync = ignoreLastSync
+			self.completion = completion
+			super.init()
+		}
+		override func start() {
+
+			willChangeValue(forKey: "isExecuting")
+			_isExecuting = true
+			didChangeValue(forKey: "isExecuting")
+
+			NotificationCenter.default.post(Notification(name: SyncProgressUpdateNotification, object: nil, userInfo: nil))
+
+			api.start(call: path, on: server, ignoreLastSync: ignoreLastSync) { [weak self] code, headers, data, error, shouldRetry in
+				guard let s = self else { return }
+
+				s.completion(code, headers, data, error, shouldRetry)
+				NotificationCenter.default.post(Notification(name: SyncProgressUpdateNotification, object: nil, userInfo: nil))
+
+				s.willChangeValue(forKey: "isFinished")
+				s._isFinished = true
+				s.didChangeValue(forKey: "isFinished")
+			}
+		}
+		override var isFinished: Bool {
+			return _isFinished
+		}
+		override var isExecuting: Bool {
+			return _isExecuting
+		}
+		override var isAsynchronous: Bool {
+			return true
+		}
+	}
+
 	private struct UrlBackOffEntry {
 		var nextAttemptAt: Date
 		var nextIncrement: TimeInterval
@@ -92,7 +143,7 @@ final class API {
 
 	var lastUpdateDescription: String {
 		if appIsRefreshing {
-			let operations = apiRunningCount+apiCallQueue.count
+			let operations = apiQueue.operationCount
 			if operations < 2 {
 				return "Refreshing..."
 			} else {
@@ -1059,9 +1110,9 @@ final class API {
 		}
 	}
 
-	private func getRateLimit(from server: ApiServer, callback: @escaping (_ requestsRemaining: Int64, _ requestLimit: Int64, _ nextReset: Int64)->Void)
-	{
-		api(call: "/rate_limit", on: server, ignoreLastSync: true) { code, headers, data, error, shouldRetry in
+	private func getRateLimit(from server: ApiServer, callback: @escaping (_ requestsRemaining: Int64, _ requestLimit: Int64, _ nextReset: Int64)->Void) {
+
+		apiQueue.addOperation(ApiOperation(call: "/rate_limit", on: server, ignoreLastSync: true) { code, headers, data, error, shouldRetry in
 
 			if error == nil {
 				let allHeaders = headers!
@@ -1076,7 +1127,7 @@ final class API {
 					callback(-1, -1, -1)
 				}
 			}
-		}
+		})
 	}
 
 	func updateLimitsFromServer() {
@@ -1176,8 +1227,10 @@ final class API {
 	}
 
 	func testApi(to apiServer: ApiServer, callback: @escaping (Error?) -> Void) {
+
 		clearAllBadLinks()
-		api(call: "/user", on: apiServer, ignoreLastSync: true) { [weak self] code, headers, data, error, shouldRetry in
+
+		apiQueue.addOperation(ApiOperation(call: "/user", on: apiServer, ignoreLastSync: true) { [weak self] code, headers, data, error, shouldRetry in
 
 			if let d = data as? [AnyHashable : Any], let userName = d["login"] as? String, let userId = d["id"] as? NSNumber, error == nil {
 				if userName.isEmpty || userId.int64Value <= 0 {
@@ -1189,7 +1242,7 @@ final class API {
 			} else {
 				callback(error)
 			}
-		}
+		})
 	}
 
 	private func apiError(_ message: String) -> Error {
@@ -1215,8 +1268,7 @@ final class API {
 		}
 
 		let p = page > 1 ? "\(path)?page=\(page)" : path
-		getData(in: p, from: server) {
-			[weak self] data, lastPage, resultCode in
+		getData(in: p, from: server) { [weak self] data, lastPage, resultCode in
 
 			if let d = data as? [[AnyHashable : Any]] {
 				var isLastPage = lastPage
@@ -1238,7 +1290,7 @@ final class API {
 		attemptCount: Int = 0,
 		callback: @escaping (_ data: Any?, _ lastPage: Bool, _ resultCode: Int64) -> Void) {
 
-		api(call: path, on: server, ignoreLastSync: false) { [weak self] c, headers, data, error, shouldRetry in
+		apiQueue.addOperation(ApiOperation(call: path, on: server, ignoreLastSync: false) { [weak self] c, headers, data, error, shouldRetry in
 
 			let code = c ?? 0
 
@@ -1285,53 +1337,25 @@ final class API {
 					callback(nil, false, code)
 				}
 			}
-		}
+		})
 	}
 
-	typealias ApiCompletion = (_ code: Int64?, _ headers: [AnyHashable : Any]?, _ data: Any?, _ error: Error?, _ shouldRetry: Bool) -> Void
+	private let apiQueue = { () -> OperationQueue in
+		let n = OperationQueue()
+		n.underlyingQueue = DispatchQueue.main
+		#if os(iOS)
+			n.maxConcurrentOperationCount = (MemoryLayout<Int>.size == MemoryLayout<Int64>.size) ? 8 : 2
+		#else
+			n.maxConcurrentOperationCount = 8
+		#endif
+		return n
+	}()
 
-	private var apiRunningCount = 0
-	private var apiCallQueue = [Completion]()
-	#if os(iOS)
-	private let maxApiOperations = (MemoryLayout<Int>.size == MemoryLayout<Int64>.size) ? 8 : 2
-	#else
-	private let maxApiOperations = 8
-	#endif
-
-	private func api(
+	private func start(
 		call path: String,
 		on server: ApiServer,
 		ignoreLastSync: Bool,
 		completion: ApiCompletion) {
-
-		if apiRunningCount < maxApiOperations {
-			_api(call: path, on: server, ignoreLastSync: ignoreLastSync, completion: completion)
-		} else {
-			apiCallQueue.append { [weak self] in
-				self?._api(call: path, on: server, ignoreLastSync: ignoreLastSync, completion: completion)
-			}
-		}
-	}
-	private func updateApiProgress() {
-		NotificationCenter.default.post(Notification(name: SyncProgressUpdateNotification, object: nil, userInfo: nil))
-	}
-	private func dequeueApi() {
-		apiRunningCount -= 1
-		if apiCallQueue.count > 0 {
-			apiCallQueue.removeFirst()()
-		} else {
-			updateApiProgress()
-		}
-	}
-
-	private func _api(
-		call path: String,
-		on server: ApiServer,
-		ignoreLastSync: Bool,
-		completion: ApiCompletion) {
-
-		apiRunningCount += 1
-		updateApiProgress()
 
 		let apiServerLabel: String
 		if server.lastSyncSucceeded || ignoreLastSync {
@@ -1340,7 +1364,6 @@ final class API {
 			atNextEvent(self) { S in
 				let e = S.apiError("Sync has failed, skipping this call")
 				completion(nil, nil, nil, e, false)
-				S.dequeueApi()
 			}
 			return
 		}
@@ -1363,7 +1386,6 @@ final class API {
 				atNextEvent(self) { S in
 					let e = S.apiError("Preempted fetch because of throttling")
 					completion(nil, nil, nil, e, false)
-					S.dequeueApi()
 				}
 				return
 			}
@@ -1437,7 +1459,7 @@ final class API {
 				if let data = data {
 					parsedData = try? JSONSerialization.jsonObject(with: data, options: [])
 					if let headers = headers, let etag = headers["Etag"] as? String {
-						atNextEvent {
+						DispatchQueue.main.sync {
 							CacheEntry.setEntry(key: cacheKey, code: code, etag: etag, data: data, headers: headers)
 						}
 					}
@@ -1446,7 +1468,7 @@ final class API {
 				}
 			}
 
-			atNextEvent {
+			DispatchQueue.main.sync {
 				S.handleResponse(with: data,
 				                 parsedData: parsedData,
 				                 serverLabel: apiServerLabel,
@@ -1500,8 +1522,6 @@ final class API {
 		}
 
 		completion(code, headers, parsedData, error, shouldRetry)
-
-		dequeueApi()
 	}
 
 	#if os(iOS)
