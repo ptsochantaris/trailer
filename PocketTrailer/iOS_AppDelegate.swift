@@ -207,9 +207,9 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 
 			s.checkApiUsage()
 			appIsRefreshing = false
-			NotificationCenter.default.post(name: RefreshEndedNotification, object: nil)
 			DataManager.saveDB() // Ensure object IDs are permanent before sending notifications
 			DataManager.sendNotificationsIndexAndSave()
+			NotificationCenter.default.post(name: RefreshEndedNotification, object: nil)
 
 			if !success && UIApplication.shared.applicationState == .active {
 				showMessage("Refresh failed", "Loading the latest data from GitHub failed")

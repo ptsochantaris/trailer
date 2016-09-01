@@ -923,8 +923,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			actions.append(m)
 		}
 
-		let i = fetchedResultsController.object(at:
-			indexPath)
+		let i = fetchedResultsController.object(at: indexPath)
 		if let sectionName = fetchedResultsController.sections?[indexPath.section].name {
 
 			if sectionName == Section.merged.prMenuName || sectionName == Section.closed.prMenuName || sectionName == Section.closed.issuesMenuName {
@@ -1006,9 +1005,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		switch(type) {
 		case .insert:
-			tableView.insertSections(IndexSet(integer: sectionIndex) as IndexSet, with: .automatic)
+			tableView.insertSections(IndexSet(integer: sectionIndex), with: .automatic)
 		case .delete:
-			tableView.deleteSections(IndexSet(integer: sectionIndex) as IndexSet, with: .automatic)
+			tableView.deleteSections(IndexSet(integer: sectionIndex), with: .automatic)
 		case .update, .move:
 			break
 		}

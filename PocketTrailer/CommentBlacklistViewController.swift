@@ -27,7 +27,7 @@ final class CommentBlacklistViewController: UITableViewController {
 			blackList.remove(at: indexPath.row)
 			Settings.commentAuthorBlacklist = blackList
 			if blackList.count==0 { // last delete
-				tableView.deleteSections(IndexSet(integer: 0) as IndexSet, with: .automatic)
+				tableView.deleteSections(IndexSet(integer: 0), with: .automatic)
 			} else {
 				tableView.deleteRows(at: [indexPath], with: .automatic)
 			}
