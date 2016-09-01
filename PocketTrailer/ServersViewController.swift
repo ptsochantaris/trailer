@@ -29,7 +29,7 @@ final class ServersViewController: UITableViewController {
 
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
-		allServers = ApiServer.allApiServers(in: mainObjectContext)
+		allServers = ApiServer.allApiServers(in: DataManager.main)
 		tableView.reloadData()
 	}
 
@@ -78,7 +78,7 @@ final class ServersViewController: UITableViewController {
 		if editingStyle == UITableViewCellEditingStyle.delete {
 			let a = allServers[indexPath.row]
 			allServers.remove(at: indexPath.row)
-			mainObjectContext.delete(a)
+			DataManager.main.delete(a)
 			DataManager.saveDB()
 			tableView.deleteRows(at: [indexPath], with: .fade)
 		}

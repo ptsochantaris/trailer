@@ -30,8 +30,8 @@ final class PullRequest: ListableItem {
 					item.issueUrl = (linkInfo["issue"] as? [AnyHashable : Any])?["href"] as? String
 				}
 
-				api.refreshesSinceLastLabelsCheck[item.objectID] = nil
-				api.refreshesSinceLastStatusCheck[item.objectID] = nil
+				API.refreshesSinceLastLabelsCheck[item.objectID] = nil
+				API.refreshesSinceLastStatusCheck[item.objectID] = nil
 			}
 			item.reopened = item.condition == ItemCondition.closed.rawValue
 			item.condition = ItemCondition.open.rawValue
@@ -120,7 +120,7 @@ final class PullRequest: ListableItem {
 	}
 
 	class func reasonForEmpty(with filterValue: String?, criterion: GroupingCriterion? = nil) -> NSAttributedString {
-		let openRequestCount = PullRequest.countOpen(in: mainObjectContext, criterion: criterion)
+		let openRequestCount = PullRequest.countOpen(in: DataManager.main, criterion: criterion)
 		return reasonForEmpty(with: filterValue, criterion: criterion, openItemCount: openRequestCount)
 	}
 

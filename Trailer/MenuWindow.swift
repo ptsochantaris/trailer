@@ -97,12 +97,12 @@ final class MenuWindow: NSWindow {
 		if appIsRefreshing {
 			refreshUpdate()
 		} else {
-			refreshMenuItem.title = " Refresh - \(api.lastUpdateDescription)"
+			refreshMenuItem.title = " Refresh - \(API.lastUpdateDescription)"
 		}
 	}
 
 	func refreshUpdate() {
-		refreshMenuItem.title = " \(api.lastUpdateDescription)"
+		refreshMenuItem.title = " \(API.lastUpdateDescription)"
 	}
 
 	func scrollToTop() {
@@ -122,7 +122,7 @@ final class MenuWindow: NSWindow {
 	}
 
 	@IBAction func refreshSelected(_ sender: NSMenuItem) {
-		if Repo.countItems(of: Repo.self, in: mainObjectContext) == 0 {
+		if Repo.countItems(of: Repo.self, in: DataManager.main) == 0 {
 			app.preferencesSelected()
 			return
 		}
@@ -155,7 +155,7 @@ final class MenuWindow: NSWindow {
 			menuLeft -= overflow
 		}
 
-		var menuHeight = TOP_HEADER_HEIGHT
+		var menuHeight: CGFloat = 28
 		let rowCount = table.numberOfRows
 		let screenHeight = screen.visibleFrame.size.height
 		if rowCount == 0 {

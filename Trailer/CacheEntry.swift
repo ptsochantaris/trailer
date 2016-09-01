@@ -34,7 +34,7 @@ final class CacheEntry: NSManagedObject {
 	class func setEntry(key: String, code: Int64, etag: String, data: Data, headers: [AnyHashable : Any]) {
 		var e = entry(for: key)
 		if e == nil {
-			e = NSEntityDescription.insertNewObject(forEntityName: "CacheEntry", into: mainObjectContext) as? CacheEntry
+			e = NSEntityDescription.insertNewObject(forEntityName: "CacheEntry", into: DataManager.main) as? CacheEntry
 			e!.key = key
 		}
 		e!.code = code
@@ -50,7 +50,7 @@ final class CacheEntry: NSManagedObject {
 		f.fetchLimit = 1
 		f.predicate = NSPredicate(format: "key == %@", key)
 		f.returnsObjectsAsFaults = false
-		if let e = try! mainObjectContext.fetch(f).first {
+		if let e = try! DataManager.main.fetch(f).first {
 			e.lastTouched = Date()
 			return e
 		} else {

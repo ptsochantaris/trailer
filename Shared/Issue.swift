@@ -33,7 +33,7 @@ final class Issue: ListableItem {
 	}
 
 	class func reasonForEmpty(with filterValue: String?, criterion: GroupingCriterion?) -> NSAttributedString {
-		let openIssueCount = Issue.countOpen(in: mainObjectContext, criterion: criterion)
+		let openIssueCount = Issue.countOpen(in: DataManager.main, criterion: criterion)
 		return reasonForEmpty(with: filterValue, criterion: criterion, openItemCount: openIssueCount)
 	}
 

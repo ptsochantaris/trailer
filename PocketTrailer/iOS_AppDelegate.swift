@@ -2,8 +2,7 @@
 import UIKit
 import UserNotifications
 
-var app: iOS_AppDelegate!
-
+@UIApplicationMain
 final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
 
 	var window: UIWindow?
@@ -16,13 +15,15 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 	private var actOnLocalNotification = true
 
 	func updateBadge() {
-		UIApplication.shared.applicationIconBadgeNumber = PullRequest.badgeCount(in: mainObjectContext) + Issue.badgeCount(in: mainObjectContext)
+		UIApplication.shared.applicationIconBadgeNumber = PullRequest.badgeCount(in: DataManager.main) + Issue.badgeCount(in: DataManager.main)
 		watchManager?.updateContext()
 	}
 
 	func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
 
-		if mainObjectContext.persistentStoreCoordinator == nil {
+		bootUp()
+
+		if DataManager.main.persistentStoreCoordinator == nil {
 			DLog("Database was corrupted on startup, removing DB files and resetting")
 			DataManager.removeDatabaseFiles()
 			abort()
@@ -45,8 +46,8 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 
 		DataManager.postProcessAllItems()
 
-		if ApiServer.someServersHaveAuthTokens(in: mainObjectContext) {
-			api.updateLimitsFromServer()
+		if ApiServer.someServersHaveAuthTokens(in: DataManager.main) {
+			API.updateLimitsFromServer()
 		}
 
 		UITabBar.appearance().tintColor = GLOBAL_TINT
@@ -62,9 +63,9 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 		NotificationManager.setup(delegate: self)
 
 		atNextEvent(self) { S in
-			if !ApiServer.someServersHaveAuthTokens(in: mainObjectContext) {
+			if !ApiServer.someServersHaveAuthTokens(in: DataManager.main) {
 				let m = popupManager.masterController
-				if ApiServer.countApiServers(in: mainObjectContext) == 1, let a = ApiServer.allApiServers(in: mainObjectContext).first, a.authToken == nil || a.authToken!.isEmpty {
+				if ApiServer.countApiServers(in: DataManager.main) == 1, let a = ApiServer.allApiServers(in: DataManager.main).first, a.authToken == nil || a.authToken!.isEmpty {
 					m.performSegue(withIdentifier: "showQuickstart", sender: self)
 				} else {
 					m.performSegue(withIdentifier: "showPreferences", sender: self)
@@ -141,7 +142,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 	}
 
 	private func checkApiUsage() {
-		for apiServer in ApiServer.allApiServers(in: mainObjectContext) {
+		for apiServer in ApiServer.allApiServers(in: DataManager.main) {
 			if apiServer.goodToGo && apiServer.hasApiLimit, let resetDate = apiServer.resetDate {
 				if apiServer.shouldReportOverTheApiLimit {
 					let apiLabel = S(apiServer.label)
@@ -181,13 +182,13 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 
 	func startRefresh() -> Bool {
 
-		if appIsRefreshing || !api.hasNetworkConnection || !ApiServer.someServersHaveAuthTokens(in: mainObjectContext) {
+		if appIsRefreshing || !API.hasNetworkConnection || !ApiServer.someServersHaveAuthTokens(in: DataManager.main) {
 			return false
 		}
 
 		prepareForRefresh()
 
-		api.syncItemsForActiveReposAndCallback({
+		API.syncItemsForActiveReposAndCallback({
 
 			popupManager.masterController.title = "Processing..."
 
@@ -195,7 +196,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 
 			guard let s = self else { return }
 
-			let success = !ApiServer.shouldReportRefreshFailure(in: mainObjectContext)
+			let success = !ApiServer.shouldReportRefreshFailure(in: DataManager.main)
 
 			s.lastUpdateFailed = !success
 
@@ -221,7 +222,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 			s.endBGTask()
 
 			if let bc = s.backgroundCallback {
-				if success && mainObjectContext.hasChanges {
+				if success && DataManager.main.hasChanges {
 					DLog("Background fetch: Got new data")
 					bc(.newData)
 				} else if success {
@@ -270,26 +271,26 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 	}
 
 	func markEverythingRead() {
-		PullRequest.markEverythingRead(in: .none, in: mainObjectContext)
-		Issue.markEverythingRead(in: .none, in: mainObjectContext)
+		PullRequest.markEverythingRead(in: .none, in: DataManager.main)
+		Issue.markEverythingRead(in: .none, in: DataManager.main)
 		DataManager.saveDB()
 		app.updateBadge()
 	}
 
 	func clearAllClosed() {
-		for p in PullRequest.allClosed(in: mainObjectContext, includeAllGroups: true) {
-			mainObjectContext.delete(p)
+		for p in PullRequest.allClosed(in: DataManager.main, includeAllGroups: true) {
+			DataManager.main.delete(p)
 		}
-		for i in Issue.allClosed(in: mainObjectContext, includeAllGroups: true) {
-			mainObjectContext.delete(i)
+		for i in Issue.allClosed(in: DataManager.main, includeAllGroups: true) {
+			DataManager.main.delete(i)
 		}
 		DataManager.saveDB()
 		popupManager.masterController.updateStatus()
 	}
 
 	func clearAllMerged() {
-		for p in PullRequest.allMerged(in: mainObjectContext, includeAllGroups: true) {
-			mainObjectContext.delete(p)
+		for p in PullRequest.allMerged(in: DataManager.main, includeAllGroups: true) {
+			DataManager.main.delete(p)
 		}
 		DataManager.saveDB()
 		popupManager.masterController.updateStatus()

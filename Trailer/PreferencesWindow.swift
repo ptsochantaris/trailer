@@ -8,8 +8,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	func reset() {
 		preferencesDirty = true
-		api.resetAllStatusChecks()
-		api.resetAllLabelChecks()
+		API.resetAllStatusChecks()
+		API.resetAllLabelChecks()
 		Settings.lastSuccessfulRefresh = nil
 		lastRepoCheck = .distantPast
 		projectsTable.reloadData()
@@ -307,7 +307,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		fillServerApiFormFromSelectedServer()
 		fillSnoozeFormFromSelectedPreset()
 
-		api.updateLimitsFromServer()
+		API.updateLimitsFromServer()
 		updateStatusTermPreferenceControls()
 		commentAuthorBlacklist.objectValue = Settings.commentAuthorBlacklist
 
@@ -403,7 +403,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			allIssuesSetting.isEnabled = false
 			activityDisplay.startAnimation(nil)
 		} else {
-			refreshButton.isEnabled = ApiServer.someServersHaveAuthTokens(in: mainObjectContext)
+			refreshButton.isEnabled = ApiServer.someServersHaveAuthTokens(in: DataManager.main)
 			projectsTable.isEnabled = true
 			allPrsSetting.isEnabled = true
 			allIssuesSetting.isEnabled = true
@@ -416,7 +416,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		deferredUpdateTimer.push()
 		updateLabelOptions()
 
-		api.resetAllLabelChecks()
+		API.resetAllLabelChecks()
 		if Settings.showLabels {
 			ApiServer.resetSyncOfEverything()
 		}
@@ -702,7 +702,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		deferredUpdateTimer.push()
 		updateStatusItemsOptions()
 
-		api.resetAllStatusChecks()
+		API.resetAllStatusChecks()
 		if Settings.showStatusItems {
 			ApiServer.resetSyncOfEverything()
 		}
@@ -811,7 +811,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		app.prepareForRefresh()
 
 		let tempContext = DataManager.buildChildContext()
-		api.fetchRepositories(to: tempContext) {
+		API.fetchRepositories(to: tempContext) {
 
 			if ApiServer.shouldReportRefreshFailure(in: tempContext) {
 				var errorServers = [String]()
@@ -841,14 +841,14 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	private var selectedServer: ApiServer? {
 		let selected = serverList.selectedRow
 		if selected >= 0 {
-			return ApiServer.allApiServers(in: mainObjectContext)[selected]
+			return ApiServer.allApiServers(in: DataManager.main)[selected]
 		}
 		return nil
 	}
 
 	@IBAction func deleteSelectedServerSelected(_ sender: NSButton) {
-		if let selectedServer = selectedServer, let index = ApiServer.allApiServers(in: mainObjectContext).index(of: selectedServer) {
-			mainObjectContext.delete(selectedServer)
+		if let selectedServer = selectedServer, let index = ApiServer.allApiServers(in: DataManager.main).index(of: selectedServer) {
+			DataManager.main.delete(selectedServer)
 			serverList.reloadData()
 			serverList.selectRowIndexes(IndexSet(integer: min(index, serverList.numberOfRows-1)), byExtendingSelection: false)
 			fillServerApiFormFromSelectedServer()
@@ -1008,7 +1008,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBAction func testApiServerSelected(_ sender: NSButton) {
 		sender.isEnabled = false
 		let apiServer = selectedServer!
-		api.testApi(to: apiServer) { error in
+		API.testApi(to: apiServer) { error in
 			let alert = NSAlert()
 			if let e = error {
 				alert.messageText = "The test failed for \(S(apiServer.apiPath))"
@@ -1039,7 +1039,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			apiServerAuthToken.stringValue = S(apiServer.authToken)
 			apiServerSelectedBox.title = apiServer.label ?? "New Server"
 			apiServerTestButton.isEnabled = !S(apiServer.authToken).isEmpty
-			apiServerDeleteButton.isEnabled = (ApiServer.countApiServers(in: mainObjectContext) > 1)
+			apiServerDeleteButton.isEnabled = (ApiServer.countApiServers(in: DataManager.main) > 1)
 			apiServerReportError.integerValue = apiServer.reportRefreshFailures ? 1 : 0
 		}
 	}
@@ -1058,10 +1058,10 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	@IBAction func addNewApiServerSelected(_ sender: NSButton) {
-		let a = ApiServer.insertNewServer(in: mainObjectContext)
+		let a = ApiServer.insertNewServer(in: DataManager.main)
 		a.label = "New API Server"
 		serverList.reloadData()
-		if let index = ApiServer.allApiServers(in: mainObjectContext).index(of: a) {
+		if let index = ApiServer.allApiServers(in: DataManager.main).index(of: a) {
 			serverList.selectRowIndexes(IndexSet(integer: index), byExtendingSelection: false)
 			fillServerApiFormFromSelectedServer()
 		}
@@ -1080,7 +1080,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	func windowWillClose(_ notification: Notification) {
-		if ApiServer.someServersHaveAuthTokens(in: mainObjectContext) && preferencesDirty {
+		if ApiServer.someServersHaveAuthTokens(in: DataManager.main) && preferencesDirty {
 			app.startRefresh()
 		} else {
 			if app.refreshTimer == nil && Settings.refreshPeriod > 0.0 {
@@ -1250,7 +1250,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 				}
 			}
 		} else if tv == serverList {
-			let allServers = ApiServer.allApiServers(in: mainObjectContext)
+			let allServers = ApiServer.allApiServers(in: DataManager.main)
 			let apiServer = allServers[row]
 			if tableColumn?.identifier == "server" {
 				cell.title = S(apiServer.label)
@@ -1270,7 +1270,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 				c.doubleValue = rl - Double(apiServer.requestsRemaining)
 			}
 		} else if tv == snoozePresetsList {
-			let allPresets = SnoozePreset.allSnoozePresets(in: mainObjectContext)
+			let allPresets = SnoozePreset.allSnoozePresets(in: DataManager.main)
 			let preset = allPresets[row]
 			cell.title = preset.listDescription
 			let tc = c as! NSTextFieldCell
@@ -1290,9 +1290,9 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		if tableView === projectsTable {
 			return Repo.reposFiltered(by: repoFilter.stringValue).count + 2
 		} else if tableView === serverList {
-			return ApiServer.countApiServers(in: mainObjectContext)
+			return ApiServer.countApiServers(in: DataManager.main)
 		} else if tableView === snoozePresetsList {
-			return SnoozePreset.allSnoozePresets(in: mainObjectContext).count
+			return SnoozePreset.allSnoozePresets(in: DataManager.main).count
 		}
 		return 0
 	}
@@ -1398,10 +1398,10 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBAction func autoSnoozeDurationChanged(_ sender: NSStepper) {
 		Settings.autoSnoozeDuration = sender.integerValue
 		fillSnoozingDropdowns()
-		for p in DataItem.allItems(of: PullRequest.self, in: mainObjectContext) {
+		for p in DataItem.allItems(of: PullRequest.self, in: DataManager.main) {
 			p.wakeIfAutoSnoozed()
 		}
-		for i in DataItem.allItems(of: Issue.self, in: mainObjectContext) {
+		for i in DataItem.allItems(of: Issue.self, in: DataManager.main) {
 			i.wakeIfAutoSnoozed()
 		}
 		DataManager.postProcessAllItems()
@@ -1411,7 +1411,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	var selectedSnoozePreset: SnoozePreset? {
 		let selected = snoozePresetsList.selectedRow
 		if selected >= 0 {
-			return SnoozePreset.allSnoozePresets(in: mainObjectContext)[selected]
+			return SnoozePreset.allSnoozePresets(in: DataManager.main)[selected]
 		}
 		return nil
 	}
@@ -1490,16 +1490,16 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	@IBAction func createNewSnoozePresetSelected(_ sender: NSButton) {
-		let s = SnoozePreset.newSnoozePreset(in: mainObjectContext)
+		let s = SnoozePreset.newSnoozePreset(in: DataManager.main)
 		commitSnoozeSettings()
-		if let index = SnoozePreset.allSnoozePresets(in: mainObjectContext).index(of: s) {
+		if let index = SnoozePreset.allSnoozePresets(in: DataManager.main).index(of: s) {
 			snoozePresetsList.selectRowIndexes(IndexSet(integer: index), byExtendingSelection: false)
 			fillSnoozeFormFromSelectedPreset()
 		}
 	}
 
 	@IBAction func deleteSnoozePresetSelected(_ sender: NSButton) {
-		if let selectedPreset = selectedSnoozePreset, let index = SnoozePreset.allSnoozePresets(in: mainObjectContext).index(of: selectedPreset) {
+		if let selectedPreset = selectedSnoozePreset, let index = SnoozePreset.allSnoozePresets(in: DataManager.main).index(of: selectedPreset) {
 
 			let appliedCount = selectedPreset.appliedToIssues.count + selectedPreset.appliedToPullRequests.count
 			if appliedCount > 0 {
@@ -1528,7 +1528,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	private func completeSnoozeDelete(for selectedPreset: SnoozePreset, _ index: Int) {
-		mainObjectContext.delete(selectedPreset)
+		DataManager.main.delete(selectedPreset)
 		commitSnoozeSettings()
 		snoozePresetsList.selectRowIndexes(IndexSet(integer: min(index, snoozePresetsList.numberOfRows-1)), byExtendingSelection: false)
 		fillSnoozeFormFromSelectedPreset()
@@ -1559,7 +1559,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction func snoozeUpSelected(_ sender: NSButton) {
 		if let this = selectedSnoozePreset {
-			let all = SnoozePreset.allSnoozePresets(in: mainObjectContext)
+			let all = SnoozePreset.allSnoozePresets(in: DataManager.main)
 			if let index = all.index(of: this), index > 0 {
 				let other = all[index-1]
 				other.sortOrder = Int64(index)
@@ -1572,7 +1572,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction func snoozeDownSelected(_ sender: NSButton) {
 		if let this = selectedSnoozePreset {
-			let all = SnoozePreset.allSnoozePresets(in: mainObjectContext)
+			let all = SnoozePreset.allSnoozePresets(in: DataManager.main)
 			if let index = all.index(of: this), index < all.count-1 {
 				let other = all[index+1]
 				other.sortOrder = Int64(index)

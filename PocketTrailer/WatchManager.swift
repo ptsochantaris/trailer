@@ -213,7 +213,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 		// This is needed to avoid a Core Data bug with fetchOffset
 		let tempMoc = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
-		tempMoc.persistentStoreCoordinator = mainObjectContext.persistentStoreCoordinator
+		tempMoc.persistentStoreCoordinator = DataManager.main.persistentStoreCoordinator
 		tempMoc.undoManager = nil
 
 		var items = [[String : Any]]()
@@ -331,7 +331,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			let totalPrs = [ myPrs, participatedPrs, mentionedPrs, mergedPrs, closedPrs, otherPrs, snoozedPrs ].reduce(0, { $0 + $1["total"]! })
 
 			let totalOpenPrs = countOpenAndVisible(of: PullRequest.self, criterion: c)
-			let unreadPrCount = PullRequest.badgeCount(in: mainObjectContext, criterion: c)
+			let unreadPrCount = PullRequest.badgeCount(in: DataManager.main, criterion: c)
 
 			let myIssues = counts(for: Issue.self, in: .mine, criterion: c)
 			let participatedIssues = counts(for: Issue.self, in: .participated, criterion: c)
@@ -342,7 +342,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 			let totalIssues = [ myIssues, participatedIssues, mentionedIssues, closedIssues, otherIssues, snoozedIssues ].reduce(0, { $0 + $1["total"]! })
 
 			let totalOpenIssues = countOpenAndVisible(of: Issue.self, criterion: c)
-			let unreadIssueCount = Issue.badgeCount(in: mainObjectContext, criterion: c)
+			let unreadIssueCount = Issue.badgeCount(in: DataManager.main, criterion: c)
 
 			views.append([
 				"title": S(c?.label),
@@ -376,29 +376,29 @@ final class WatchManager : NSObject, WCSessionDelegate {
 	private func countallItems<T: ListableItem>(of type: T.Type, criterion: GroupingCriterion?) -> Int {
 		let f = NSFetchRequest<T>(entityName: typeName(type))
 		let p = Settings.hideUncommentedItems ? NSPredicate(format: "sectionIndex > 0 and unreadComments > 0") : NSPredicate(format: "sectionIndex > 0")
-		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: mainObjectContext)
-		return try! mainObjectContext.count(for: f)
+		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: DataManager.main)
+		return try! DataManager.main.count(for: f)
 	}
 
 	private func countItems<T: ListableItem>(of type: T.Type, in section: Section, criterion: GroupingCriterion?) -> Int {
 		let f = NSFetchRequest<T>(entityName: typeName(type))
 		let p = Settings.hideUncommentedItems ? NSPredicate(format: "sectionIndex == %lld and unreadComments > 0", section.rawValue) : NSPredicate(format: "sectionIndex == %lld", section.rawValue)
-		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: mainObjectContext)
-		return try! mainObjectContext.count(for: f)
+		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: DataManager.main)
+		return try! DataManager.main.count(for: f)
 	}
 
 	private func badgeCount<T: ListableItem>(for type: T.Type, in section: Section, criterion: GroupingCriterion?) -> Int {
 		let f = NSFetchRequest<T>(entityName: typeName(type))
 		let p = NSPredicate(format: "sectionIndex == %lld and unreadComments > 0", section.rawValue)
-		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: mainObjectContext)
-		return ListableItem.badgeCount(from: f, in: mainObjectContext)
+		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: DataManager.main)
+		return ListableItem.badgeCount(from: f, in: DataManager.main)
 	}
 
 	private func countOpenAndVisible<T: ListableItem>(of type: T.Type, criterion: GroupingCriterion?) -> Int {
 		let f = NSFetchRequest<T>(entityName: typeName(type))
 		let p = Settings.hideUncommentedItems ? NSPredicate(format: "sectionIndex > 0 and (condition == %lld or condition == nil) and unreadComments > 0", ItemCondition.open.rawValue) : NSPredicate(format: "sectionIndex > 0 and (condition == %lld or condition == nil)", ItemCondition.open.rawValue)
-		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: mainObjectContext)
-		return try! mainObjectContext.count(for: f)
+		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: DataManager.main)
+		return try! DataManager.main.count(for: f)
 	}
 
 }

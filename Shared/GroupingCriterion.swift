@@ -31,7 +31,7 @@ final class GroupingCriterion {
 			return true
 		}
 		if let group = repoGroup {
-			for repo in Repo.repos(for: group, in: mainObjectContext) {
+			for repo in Repo.repos(for: group, in: DataManager.main) {
 				if !repo.apiServer.lastSyncSucceeded {
 					return true
 				}

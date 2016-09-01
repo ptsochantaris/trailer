@@ -81,7 +81,7 @@ final class PRCell: UITableViewCell {
 
 	func networkStateChanged() {
 		atNextEvent(self) { S in
-			if let f = S.failedToLoadImage, api.currentNetworkStatus != .NotReachable {
+			if let f = S.failedToLoadImage, API.currentNetworkStatus != .NotReachable {
 				S.loadImageAtPath(imagePath: f)
 			}
 		}
@@ -183,7 +183,7 @@ final class PRCell: UITableViewCell {
 	private func loadImageAtPath(imagePath: String?) {
 		waitingForImageInPath = imagePath
 		if let path = imagePath {
-			if (!api.haveCachedAvatar(from: path) { [weak self] image, _ in
+			if (!API.haveCachedAvatar(from: path) { [weak self] image, _ in
 				if self?.waitingForImageInPath == path {
 					if image != nil {
 						// image loaded

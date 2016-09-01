@@ -30,7 +30,7 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 	}
 
 	func numberOfSections(in tableView: UITableView) -> Int {
-		if SnoozePreset.allSnoozePresets(in: mainObjectContext).count > 0 {
+		if SnoozePreset.allSnoozePresets(in: DataManager.main).count > 0 {
 			return 3
 		} else {
 			return 2
@@ -41,7 +41,7 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 		if section == 0 || section == 1 {
 			return 1
 		} else {
-			return SnoozePreset.allSnoozePresets(in: mainObjectContext).count
+			return SnoozePreset.allSnoozePresets(in: DataManager.main).count
 		}
 	}
 
@@ -59,7 +59,7 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 			}
 			cell.accessoryType = .disclosureIndicator
 		} else {
-			let s = SnoozePreset.allSnoozePresets(in: mainObjectContext)[indexPath.row]
+			let s = SnoozePreset.allSnoozePresets(in: DataManager.main)[indexPath.row]
 			cell.textLabel?.text = s.listDescription
 			cell.accessoryType = .disclosureIndicator
 		}
@@ -84,7 +84,7 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 		} else if indexPath.section == 1 {
 			performSegue(withIdentifier: "showPicker", sender: self)
 		} else {
-			let s = SnoozePreset.allSnoozePresets(in: mainObjectContext)[indexPath.row]
+			let s = SnoozePreset.allSnoozePresets(in: DataManager.main)[indexPath.row]
 			performSegue(withIdentifier: "showSnoozeEditor", sender: s)
 		}
 	}
@@ -102,7 +102,7 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 				d.snoozeItem = s
 			} else {
 				d.isNew = true
-				d.snoozeItem = SnoozePreset.newSnoozePreset(in: mainObjectContext)
+				d.snoozeItem = SnoozePreset.newSnoozePreset(in: DataManager.main)
 			}
 		}
 	}
@@ -110,10 +110,10 @@ final class SnoozingViewController: UIViewController, UITableViewDelegate, UITab
 	func pickerViewController(picker: PickerViewController, didSelectIndexPath: IndexPath) {
 		Settings.autoSnoozeDuration = didSelectIndexPath.row
 		table.reloadData()
-		for p in DataItem.allItems(of: PullRequest.self, in: mainObjectContext) {
+		for p in DataItem.allItems(of: PullRequest.self, in: DataManager.main) {
 			p.wakeIfAutoSnoozed()
 		}
-		for i in DataItem.allItems(of: Issue.self, in: mainObjectContext) {
+		for i in DataItem.allItems(of: Issue.self, in: DataManager.main) {
 			i.wakeIfAutoSnoozed()
 		}
 		DataManager.postProcessAllItems()

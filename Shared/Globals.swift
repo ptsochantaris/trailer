@@ -3,8 +3,9 @@
 
 import UIKit
 
+weak var app: iOS_AppDelegate!
+
 let GLOBAL_SCREEN_SCALE = UIScreen.main.scale
-let THUMBNAIL_SIDE = 40.0*GLOBAL_SCREEN_SCALE
 let GLOBAL_TINT = UIColor(red: 52.0/255.0, green: 110.0/255.0, blue: 183.0/255.0, alpha: 1.0)
 let DISABLED_FADE: CGFloat = 0.3
 
@@ -14,15 +15,12 @@ typealias IMAGE_CLASS = UIImage
 
 #elseif os(OSX)
 
-let THUMBNAIL_SIDE: CGFloat = 88
-let TOP_HEADER_HEIGHT: CGFloat = 28
+weak var app: OSX_AppDelegate!
+
 let AVATAR_SIZE: CGFloat = 26
-let LEFTPADDING: CGFloat = 44
-let TITLE_HEIGHT: CGFloat = 42
-let BASE_BADGE_SIZE: CGFloat = 20
-let SMALL_BADGE_SIZE: CGFloat = 14
-let MENU_WIDTH: CGFloat = 500
 let AVATAR_PADDING: CGFloat = 8
+let LEFTPADDING: CGFloat = 44
+let MENU_WIDTH: CGFloat = 500
 let REMOVE_BUTTON_WIDTH: CGFloat = 80
 let DISABLED_FADE: CGFloat = 0.4
 
@@ -61,7 +59,7 @@ func showMessage(_ title: String, _ message: String?) {
 #endif
 
 func existingObject(with id: NSManagedObjectID) -> NSManagedObject? {
-	return try? mainObjectContext.existingObject(with: id)
+	return try? DataManager.main.existingObject(with: id)
 }
 
 let itemDateFormatter = { () -> DateFormatter in
@@ -91,7 +89,7 @@ let itemCountFormatter = { () -> NumberFormatter in
 
 // Single-purpose derivation from the excellent SAMAdditions:
 // https://github.com/soffes/SAMCategories/blob/master/SAMCategories/NSDate%2BSAMAdditions.m
-let dateParserHolder = "                   +0000".cString(using: String.Encoding.ascii)!
+private let dateParserHolder = "                   +0000".cString(using: String.Encoding.ascii)!
 func parseGH8601(_ iso8601: String?) -> Date? {
 
 	guard let i = iso8601, i.characters.count >= 19 else { return nil }
@@ -104,6 +102,12 @@ func parseGH8601(_ iso8601: String?) -> Date? {
 
 	let t = mktime(&tt)
 	return Date(timeIntervalSince1970: TimeInterval(t))
+}
+
+func bootUp() {
+	Settings.checkMigration()
+	DataManager.checkMigration()
+	API.setup()
 }
 
 //////////////////////// Enums
@@ -230,7 +234,7 @@ var versionString: String {
 	return "Version \(currentAppVersion) (\(buildNumber))"
 }
 
-//////////////////////// From tieferbegabt's post on https://forums.developer.apple.com/message/37935, with thanks!
+//////////////////////// Originally from tieferbegabt's post on https://forums.developer.apple.com/message/37935, with thanks!
 
 extension String {
 	func appending(pathComponent: String) -> String {

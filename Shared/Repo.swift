@@ -107,7 +107,7 @@ final class Repo: DataItem {
 		if let aid = id, let apiServer = existingObject(with: aid) as? ApiServer {
 			all = Repo.allItems(of: Repo.self, in: apiServer)
 		} else {
-			all = Repo.allItems(of: Repo.self, in: mainObjectContext)
+			all = Repo.allItems(of: Repo.self, in: DataManager.main)
 		}
 		for r in all {
 			if r.displayPolicyForIssues > 0 {
@@ -122,7 +122,7 @@ final class Repo: DataItem {
 		if let aid = id, let apiServer = existingObject(with: aid) as? ApiServer {
 			all = Repo.allItems(of: Repo.self, in: apiServer)
 		} else {
-			all = Repo.allItems(of: Repo.self, in: mainObjectContext)
+			all = Repo.allItems(of: Repo.self, in: DataManager.main)
 		}
 		for r in all {
 			if r.displayPolicyForPrs > 0 {
@@ -133,7 +133,7 @@ final class Repo: DataItem {
 	}
 
 	class var allGroupLabels: [String] {
-		let allRepos = allItems(of: Repo.self, in: mainObjectContext)
+		let allRepos = allItems(of: Repo.self, in: DataManager.main)
 		let labels = allRepos.flatMap { $0.shouldSync ? $0.groupLabel : nil }
 		return Set<String>(labels).sorted()
 	}
@@ -180,7 +180,7 @@ final class Repo: DataItem {
 			NSSortDescriptor(key: "fork", ascending: true),
 			NSSortDescriptor(key: "fullName", ascending: true)
 		]
-		return try! mainObjectContext.fetch(f)
+		return try! DataManager.main.fetch(f)
 	}
 
 	class func countParentRepos(filter: String?) -> Int {
@@ -191,6 +191,6 @@ final class Repo: DataItem {
 		} else {
 			f.predicate = NSPredicate(format: "fork == NO")
 		}
-		return try! mainObjectContext.count(for: f)
+		return try! DataManager.main.count(for: f)
 	}
 }

@@ -11,7 +11,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 	@IBOutlet weak var link: UIButton!
 	@IBOutlet weak var trackIssues: UIBarButtonItem!
 
-	private let newServer = ApiServer.allApiServers(in: mainObjectContext).first!
+	private let newServer = ApiServer.allApiServers(in: DataManager.main).first!
 	private var token = ""
 	private var checkTimer: Timer?
 	private var showIssues = true
@@ -51,7 +51,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 
 	@IBAction func testSelected(_ sender: UIButton) {
 		testMode()
-		api.testApi(to: newServer) { [weak self] error in
+		API.testApi(to: newServer) { [weak self] error in
 			if let s = self {
 				if let e = error {
 					showMessage("Testing the token failed - please check that you have pasted your token correctly", e.localizedDescription)

@@ -95,15 +95,15 @@ final class MenuBarSet {
 	                        reasonForEmpty: (String) -> NSAttributedString) {
 
 		let countString: String
-		let somethingFailed = ApiServer.shouldReportRefreshFailure(in: mainObjectContext) && (viewCriterion?.relatedServerFailed ?? true)
+		let somethingFailed = ApiServer.shouldReportRefreshFailure(in: DataManager.main) && (viewCriterion?.relatedServerFailed ?? true)
 		let attributes = somethingFailed || hasUnread() ? MenuBarSet.redText : MenuBarSet.normalText
 		let preFilterCount: Int
 
 		if Settings.countOnlyListedItems {
 			let f = ListableItem.requestForItems(of: type, withFilter: menu.filter.stringValue, sectionIndex: -1, criterion: viewCriterion)
-			countString = somethingFailed ? "X" : String(try! mainObjectContext.count(for: f))
+			countString = somethingFailed ? "X" : String(try! DataManager.main.count(for: f))
 			let fc = ListableItem.requestForItems(of: type, withFilter: nil, sectionIndex: -1, criterion: viewCriterion)
-			preFilterCount = try! mainObjectContext.count(for: fc)
+			preFilterCount = try! DataManager.main.count(for: fc)
 		} else {
 			preFilterCount = totalCount()
 			countString = somethingFailed ? "X" : String(preFilterCount)
@@ -150,9 +150,9 @@ final class MenuBarSet {
 		if Repo.interestedInIssues(fromServerWithId: viewCriterion?.apiServerId) {
 
 			updateMenu(of: Issue.self, menu: issuesMenu, lengthOffset: 2, totalCount: { () -> Int in
-				return Issue.countOpen(in: mainObjectContext)
+				return Issue.countOpen(in: DataManager.main)
 			}, hasUnread: { [weak self] () -> Bool in
-				return Issue.badgeCount(in: mainObjectContext, criterion: self?.viewCriterion) > 0
+				return Issue.badgeCount(in: DataManager.main, criterion: self?.viewCriterion) > 0
 			}, reasonForEmpty: { [weak self] filter -> NSAttributedString in
 				return Issue.reasonForEmpty(with: filter, criterion: self?.viewCriterion)
 			})
@@ -168,9 +168,9 @@ final class MenuBarSet {
 		if forceVisible || Repo.interestedInPrs(fromServerWithId: sid) || !Repo.interestedInIssues(fromServerWithId: sid) {
 
 			updateMenu(of: PullRequest.self, menu: prMenu, lengthOffset: 0, totalCount: { () -> Int in
-				return PullRequest.countOpen(in: mainObjectContext)
+				return PullRequest.countOpen(in: DataManager.main)
 			}, hasUnread: { [weak self] () -> Bool in
-				return PullRequest.badgeCount(in: mainObjectContext, criterion: self?.viewCriterion) > 0
+				return PullRequest.badgeCount(in: DataManager.main, criterion: self?.viewCriterion) > 0
 			}, reasonForEmpty: { [weak self] filter -> NSAttributedString in
 				return PullRequest.reasonForEmpty(with: filter, criterion: self?.viewCriterion)
 			})

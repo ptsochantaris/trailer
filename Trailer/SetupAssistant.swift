@@ -11,7 +11,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 	@IBOutlet weak var welcomeLabel: NSTextField!
 	@IBOutlet weak var trackIssues: NSButton!
 
-	private let newServer = ApiServer.allApiServers(in: mainObjectContext).first!
+	private let newServer = ApiServer.allApiServers(in: DataManager.main).first!
 	private var checkTimer: Timer?
 
 	override func awakeFromNib() {
@@ -65,7 +65,7 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 			}
 		} else {
 			testingState()
-			api.testApi(to: newServer) { [weak self] error in
+			API.testApi(to: newServer) { [weak self] error in
 				if let s = self {
 					if let e = error {
 						let alert = NSAlert()

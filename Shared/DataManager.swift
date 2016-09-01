@@ -1,8 +1,6 @@
 
 import CoreData
 
-let mainObjectContext = DataManager.buildMainContext()
-
 final class DataManager {
 
 	static var postMigrationRepoPrPolicy: RepoDisplayPolicy?
@@ -11,19 +9,18 @@ final class DataManager {
 	static var postMigrationSnoozeWakeOnMention: Bool?
 	static var postMigrationSnoozeWakeOnStatusUpdate: Bool?
 
+	static let main = DataManager.buildMainContext()
+
 	class func checkMigration() {
 
-		guard let count = mainObjectContext.persistentStoreCoordinator?.persistentStores.count, count > 0 else { return }
+		guard let count = main.persistentStoreCoordinator?.persistentStores.count, count > 0 else { return }
 
 		if Settings.lastRunVersion != versionString {
 			DLog("VERSION UPDATE MAINTENANCE NEEDED")
-			#if os(iOS)
-				migrateDatabaseToShared()
-			#endif
 			performVersionChangedTasks()
 			Settings.lastRunVersion = versionString
 		}
-		ApiServer.ensureAtLeastGithub(in: mainObjectContext)
+		ApiServer.ensureAtLeastGithub(in: main)
 	}
 
 	private class func performVersionChangedTasks() {
@@ -63,7 +60,7 @@ final class DataManager {
 
 			let actualApiPath = "\(legacyApiHost)/\(legacyApiPath)".replacingOccurrences(of: "//", with:"/")
 
-			let newApiServer = ApiServer.addDefaultGithub(in: mainObjectContext)
+			let newApiServer = ApiServer.addDefaultGithub(in: main)
 			newApiServer.apiPath = "https://\(actualApiPath)"
 			newApiServer.webPath = "https://\(legacyWebHost)"
 			newApiServer.authToken = legacyAuthToken
@@ -75,26 +72,26 @@ final class DataManager {
 			d.removeObject(forKey: "GITHUB_AUTH_TOKEN")
 			d.synchronize()
 		} else {
-			ApiServer.ensureAtLeastGithub(in: mainObjectContext)
+			ApiServer.ensureAtLeastGithub(in: main)
 		}
 
 		DLog("Marking all repos as dirty")
 		ApiServer.resetSyncOfEverything()
 
 		DLog("Marking all unspecified (nil) announced flags as announced")
-		for i in DataItem.allItems(of: PullRequest.self, in: mainObjectContext) {
+		for i in DataItem.allItems(of: PullRequest.self, in: main) {
 			if i.value(forKey: "announced") == nil {
 				i.announced = true
 			}
 		}
-		for i in DataItem.allItems(of: Issue.self, in: mainObjectContext) {
+		for i in DataItem.allItems(of: Issue.self, in: main) {
 			if i.value(forKey: "announced") == nil {
 				i.announced = true
 			}
 		}
 
 		DLog("Migrating display policies")
-		for r in DataItem.allItems(of: Repo.self, in: mainObjectContext) {
+		for r in DataItem.allItems(of: Repo.self, in: main) {
 			if let markedAsHidden = (r.value(forKey: "hidden") as AnyObject?)?.boolValue, markedAsHidden == true {
 				r.displayPolicyForPrs = RepoDisplayPolicy.hide.rawValue
 				r.displayPolicyForIssues = RepoDisplayPolicy.hide.rawValue
@@ -109,7 +106,7 @@ final class DataManager {
 		}
 
 		DLog("Migrating snooze presets")
-		for s in SnoozePreset.allSnoozePresets(in: mainObjectContext) {
+		for s in SnoozePreset.allSnoozePresets(in: main) {
 			if let m = postMigrationSnoozeWakeOnComment {
 				s.wakeOnComment = m
 			}
@@ -122,34 +119,10 @@ final class DataManager {
 		}
 	}
 
-	private class func migrateDatabaseToShared() {
-		do {
-			let oldDocumentsDirectory = legacyFilesDirectory.path
-			let newDocumentsDirectory = sharedFilesDirectory.path
-			let fm = FileManager.default
-			let files = try fm.contentsOfDirectory(atPath: oldDocumentsDirectory)
-			DLog("Migrating DB files into group container from %@ to %@", oldDocumentsDirectory, newDocumentsDirectory)
-			for file in files {
-				if file.contains("Trailer.sqlite") {
-					DLog("Moving database file: %@",file)
-					let oldPath = oldDocumentsDirectory.appending(pathComponent: file)
-					let newPath = newDocumentsDirectory.appending(pathComponent: file)
-					if fm.fileExists(atPath: newPath) {
-						try! fm.removeItem(atPath: newPath)
-					}
-					try! fm.moveItem(atPath: oldPath, toPath: newPath)
-				}
-			}
-			try! fm.removeItem(atPath: oldDocumentsDirectory)
-		} catch {
-			// No legacy directory
-		}
-	}
-
 	class func sendNotificationsIndexAndSave() {
 
 		func processItems<T: ListableItem>(of type: T.Type, newNotification: NotificationType, reopenedNotification: NotificationType, assignmentNotification: NotificationType) -> [T] {
-			let allItems = DataItem.allItems(of: type, in: mainObjectContext)
+			let allItems = DataItem.allItems(of: type, in: main)
 			for i in allItems {
 				if i.isVisibleOnMenu {
 					if !i.createdByMe {
@@ -181,13 +154,13 @@ final class DataManager {
 		let allPrs = processItems(of: PullRequest.self, newNotification: .newPr, reopenedNotification: .prReopened, assignmentNotification: .newPrAssigned)
 		let allIssues = processItems(of: Issue.self, newNotification: .newIssue, reopenedNotification: .issueReopened, assignmentNotification: .newIssueAssigned)
 
-		let latestComments = PRComment.newItems(of: PRComment.self, in: mainObjectContext)
+		let latestComments = PRComment.newItems(of: PRComment.self, in: main)
 		for c in latestComments {
 			c.processNotifications()
 			c.postSyncAction = PostSyncAction.doNothing.rawValue
 		}
 
-		let latestStatuses = PRStatus.newItems(of: PRStatus.self, in: mainObjectContext)
+		let latestStatuses = PRStatus.newItems(of: PRStatus.self, in: main)
 		if Settings.notifyOnStatusUpdates {
 			var coveredPrs = Set<NSManagedObjectID>()
 			for s in latestStatuses {
@@ -231,10 +204,10 @@ final class DataManager {
 	}
 
 	class func saveDB() {
-		if mainObjectContext.hasChanges {
+		if main.hasChanges {
 			DLog("Saving DB")
 			do {
-				try mainObjectContext.save()
+				try main.save()
 			} catch {
 				DLog("Error while saving DB: %@", error.localizedDescription)
 			}
@@ -244,7 +217,7 @@ final class DataManager {
 	class func buildChildContext() -> NSManagedObjectContext {
 		let c = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
 		c.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
-		c.parent = mainObjectContext
+		c.parent = main
 		c.undoManager = nil
 		return c
 	}
@@ -276,16 +249,16 @@ final class DataManager {
 	}
 
 	class func postProcessAllItems() {
-		for p in DataItem.allItems(of: PullRequest.self, in: mainObjectContext) {
+		for p in DataItem.allItems(of: PullRequest.self, in: main) {
 			p.postProcess()
 		}
-		for i in DataItem.allItems(of: Issue.self, in: mainObjectContext) {
+		for i in DataItem.allItems(of: Issue.self, in: main) {
 			i.postProcess()
 		}
 	}
 
 	class func id(for uriPath: String?) -> NSManagedObjectID? {
-		if let up = uriPath, let u = URL(string: up), let p = mainObjectContext.persistentStoreCoordinator {
+		if let up = uriPath, let u = URL(string: up), let p = main.persistentStoreCoordinator {
 			return p.managedObjectID(forURIRepresentation: u)
 		}
 		return nil
@@ -325,7 +298,7 @@ final class DataManager {
 	}
 
 	class var appIsConfigured: Bool {
-		return ApiServer.someServersHaveAuthTokens(in: mainObjectContext) && Repo.anyVisibleRepos(in: mainObjectContext)
+		return ApiServer.someServersHaveAuthTokens(in: main) && Repo.anyVisibleRepos(in: main)
 	}
 
 	private static var _justMigrated = false

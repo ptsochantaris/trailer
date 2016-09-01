@@ -1,10 +1,19 @@
 
 extension NSTextField {
 	final func trailerUndo() {
-		self.currentEditor()?.undoManager?.undo()
+		currentEditor()?.undoManager?.undo()
 	}
 	final func trailerRedo() {
-		self.currentEditor()?.undoManager?.redo()
+		currentEditor()?.undoManager?.redo()
+	}
+	final func trailerCopy() {
+		currentEditor()?.copy(nil)
+	}
+	final func trailerPaste() {
+		currentEditor()?.paste(nil)
+	}
+	final func trailerCut() {
+		currentEditor()?.cut(nil)
 	}
 }
 
@@ -15,8 +24,8 @@ final class Application: NSApplication {
 			if modifiers == .command {
 				if let char = event.charactersIgnoringModifiers {
 					switch char {
-					case "x": if sendAction(#selector(NSText.cut), to: nil, from: self) { return }
-					case "v": if sendAction(#selector(NSText.paste), to: nil, from: self) { return }
+					case "x": if sendAction(#selector(NSTextField.trailerCut), to: nil, from: self) { return }
+					case "v": if sendAction(#selector(NSTextField.trailerPaste), to: nil, from: self) { return }
 					case "z": if sendAction(#selector(NSTextField.trailerUndo), to: nil, from: self) { return }
 					case "c":
 						if let url = app.focusedItem(blink: true)?.webUrl {
@@ -26,7 +35,7 @@ final class Application: NSApplication {
 							return
 
 						} else {
-							if sendAction(#selector(NSText.copy), to: nil, from: self) { return }
+							if sendAction(#selector(NSTextField.trailerCopy), to: nil, from: self) { return }
 						}
 					case "a":
 						if let i = app.focusedItem(blink: true) {

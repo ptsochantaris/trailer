@@ -13,17 +13,17 @@ final class TabBarSet {
 		var items = [UITabBarItem]()
 
 		let prf = ListableItem.requestForItems(of: PullRequest.self, withFilter: nil, sectionIndex: -1, criterion: viewCriterion)
-		if try! mainObjectContext.count(for: prf) > 0 {
+		if try! DataManager.main.count(for: prf) > 0 {
 			let i = UITabBarItem(title: label ?? "Pull Requests", image: UIImage(named: "prsTab"), selectedImage: nil)
-			let prUnreadCount = PullRequest.badgeCount(in: mainObjectContext, criterion: viewCriterion)
+			let prUnreadCount = PullRequest.badgeCount(in: DataManager.main, criterion: viewCriterion)
 			i.badgeValue = prUnreadCount > 0 ? "\(prUnreadCount)" : nil
 			items.append(i)
 			prItem = i
 		}
 		let isf = ListableItem.requestForItems(of: Issue.self, withFilter: nil, sectionIndex: -1, criterion: viewCriterion)
-		if try! mainObjectContext.count(for: isf) > 0 {
+		if try! DataManager.main.count(for: isf) > 0 {
 			let i = UITabBarItem(title: label ?? "Issues", image: UIImage(named: "issuesTab"), selectedImage: nil)
-			let issuesUnreadCount = Issue.badgeCount(in: mainObjectContext, criterion: viewCriterion)
+			let issuesUnreadCount = Issue.badgeCount(in: DataManager.main, criterion: viewCriterion)
 			i.badgeValue = issuesUnreadCount > 0 ? "\(issuesUnreadCount)" : nil
 			items.append(i)
 			issuesItem = i
@@ -89,7 +89,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	private func tryRefresh() {
 		refreshOnRelease = false
 
-		if api.hasNetworkConnection {
+		if API.hasNetworkConnection {
 			if !app.startRefresh() {
 				updateStatus()
 			}
@@ -131,12 +131,12 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	func removeAllClosedConfirmed() {
 		if viewingPrs {
-			for p in PullRequest.allClosed(in: mainObjectContext, criterion: currentTabBarSet?.viewCriterion) {
-				mainObjectContext.delete(p)
+			for p in PullRequest.allClosed(in: DataManager.main, criterion: currentTabBarSet?.viewCriterion) {
+				DataManager.main.delete(p)
 			}
 		} else {
-			for p in Issue.allClosed(in: mainObjectContext, criterion: currentTabBarSet?.viewCriterion) {
-				mainObjectContext.delete(p)
+			for p in Issue.allClosed(in: DataManager.main, criterion: currentTabBarSet?.viewCriterion) {
+				DataManager.main.delete(p)
 			}
 		}
 		DataManager.saveDB()
@@ -144,8 +144,8 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	func removeAllMergedConfirmed() {
 		if viewingPrs {
-			for p in PullRequest.allMerged(in: mainObjectContext, criterion: currentTabBarSet?.viewCriterion) {
-				mainObjectContext.delete(p)
+			for p in PullRequest.allMerged(in: DataManager.main, criterion: currentTabBarSet?.viewCriterion) {
+				DataManager.main.delete(p)
 			}
 			DataManager.saveDB()
 		}
@@ -251,7 +251,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	func updateRefresh() {
-		refreshLabel.text = api.lastUpdateDescription
+		refreshLabel.text = API.lastUpdateDescription
 	}
 
 	override var canBecomeFirstResponder: Bool {
@@ -470,7 +470,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	private func updateRefreshControls() {
 		let ra = min(1.0, max(0, (-84-tableView.contentOffset.y)/32.0))
 		if ra > 0.0 && refreshLabel.alpha == 0 {
-			refreshLabel.text = api.lastUpdateDescription
+			refreshLabel.text = API.lastUpdateDescription
 		}
 		refreshLabel.alpha = ra
 		refreshControl?.alpha = ra
@@ -516,7 +516,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 
 		if Settings.showSeparateApiServersInMenu {
-			for a in ApiServer.allApiServers(in: mainObjectContext) {
+			for a in ApiServer.allApiServers(in: DataManager.main) {
 				if a.goodToGo {
 					let c = GroupingCriterion(apiServerId: a.objectID)
 					let s = TabBarSet(viewCriterion: c)
@@ -557,7 +557,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			viewingPrs = i == UIImage(named: "prsTab") // not proud of this :(
 		} else if let c = currentTabBarSet {
 			viewingPrs = c.tabItems.first?.image == UIImage(named: "prsTab") // or this :(
-		} else if Repo.anyVisibleRepos(in: mainObjectContext, criterion: currentTabBarSet?.viewCriterion, excludeGrouped: true) {
+		} else if Repo.anyVisibleRepos(in: DataManager.main, criterion: currentTabBarSet?.viewCriterion, excludeGrouped: true) {
 			viewingPrs = Repo.interestedInPrs(fromServerWithId: currentTabBarSet?.viewCriterion?.apiServerId)
 		} else {
 			viewingPrs = true
@@ -931,7 +931,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 				appendReadUnread(i: i)
 				let d = UITableViewRowAction(style: .destructive, title: "Remove") { action, indexPath in
-					mainObjectContext.delete(i)
+					DataManager.main.delete(i)
 					DataManager.saveDB()
 				}
 				actions.append(d)
@@ -962,7 +962,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	private func showSnoozeMenuFor(i: ListableItem) {
-		let snoozePresets = SnoozePreset.allSnoozePresets(in: mainObjectContext)
+		let snoozePresets = SnoozePreset.allSnoozePresets(in: DataManager.main)
 		let hasPresets = snoozePresets.count > 0
 		let singleColumn = splitViewController?.isCollapsed ?? true
 		let a = UIAlertController(title: hasPresets ? "Snooze" : nil,
@@ -983,7 +983,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			return c
 		}
 
-		let c = NSFetchedResultsController(fetchRequest: itemFetchRequest, managedObjectContext: mainObjectContext, sectionNameKeyPath: "sectionName", cacheName: nil)
+		let c = NSFetchedResultsController(fetchRequest: itemFetchRequest, managedObjectContext: DataManager.main, sectionNameKeyPath: "sectionName", cacheName: nil)
 		_fetchedResultsController = c
 		c.delegate = self
 		try! c.performFetch()
@@ -1072,7 +1072,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		if appIsRefreshing {
 			title = "Refreshing..."
 			if let r = refreshControl {
-				refreshLabel.text = api.lastUpdateDescription
+				refreshLabel.text = API.lastUpdateDescription
 				updateRefreshControls()
 				r.beginRefreshing()
 			}
@@ -1083,7 +1083,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 				: issuesTitle
 
 			if let r = refreshControl {
-				refreshLabel.text = api.lastUpdateDescription
+				refreshLabel.text = API.lastUpdateDescription
 				updateRefreshControls()
 				r.endRefreshing()
 			}
@@ -1117,7 +1117,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	private func pullRequestsTitle(long: Bool) -> String {
 
 		let f = ListableItem.requestForItems(of: PullRequest.self, withFilter: nil, sectionIndex: -1, criterion: currentTabBarSet?.viewCriterion)
-		let count = try! mainObjectContext.count(for: f)
+		let count = try! DataManager.main.count(for: f)
 		let unreadCount = Int(currentTabBarSet?.prItem?.badgeValue ?? "0")!
 
 		let pr = long ? "Pull Request" : "PR"
@@ -1135,7 +1135,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	private var issuesTitle: String {
 
 		let f = ListableItem.requestForItems(of: Issue.self, withFilter: nil, sectionIndex: -1, criterion: currentTabBarSet?.viewCriterion)
-		let count = try! mainObjectContext.count(for: f)
+		let count = try! DataManager.main.count(for: f)
 		let unreadCount = Int(currentTabBarSet?.issuesItem?.badgeValue ?? "0")!
 
 		if count == 0 {
@@ -1211,7 +1211,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
 		var allServersHaveTokens = true
-		for a in ApiServer.allApiServers(in: mainObjectContext) {
+		for a in ApiServer.allApiServers(in: DataManager.main) {
 			if !a.goodToGo {
 				allServersHaveTokens = false
 				break

@@ -140,7 +140,7 @@ class TrailerCell: NSTableCellView {
 					c.keyEquivalentModifierMask = [.command]
 				}
 
-				let snoozeItems = SnoozePreset.allSnoozePresets(in: mainObjectContext)
+				let snoozeItems = SnoozePreset.allSnoozePresets(in: DataManager.main)
 				if snoozeItems.count > 0 {
 					var count = 1
 					let c = m.addItem(withTitle: "Snooze...", action: nil, keyEquivalent: "")
@@ -258,8 +258,8 @@ class TrailerCell: NSTableCellView {
 			NSForegroundColorAttributeName: isDark ? NSColor.controlLightHighlightColor : NSColor.controlTextColor,
 			NSParagraphStyleAttributeName: pCenter])
 
-		var width = max(BASE_BADGE_SIZE, countString.size().width+10)
-		var height = BASE_BADGE_SIZE
+		var height: CGFloat = 20
+		var width = max(height, countString.size().width+10)
 		var bottom = bounds.size.height-height-10.0
 		var left = (LEFTPADDING-width)*0.5
 
@@ -283,13 +283,13 @@ class TrailerCell: NSTableCellView {
 				NSParagraphStyleAttributeName: pCenter])
 
 			bottom += height
-			width = max(SMALL_BADGE_SIZE, alertString.size().width+8.0)
-			height = SMALL_BADGE_SIZE
+			height = 14
+			width = max(height, alertString.size().width+8.0)
 			bottom -= height * 0.5 + 1
 			left -= width * 0.5
 
 			let cc = FilledView(frame: NSIntegralRect(NSMakeRect(left, bottom, width, height)))
-			cc.cornerRadius = floor(SMALL_BADGE_SIZE*0.5)
+			cc.cornerRadius = floor(height*0.5)
 
 			let alertCount = CenterTextField(frame: cc.bounds)
             alertCount.vibrant = false

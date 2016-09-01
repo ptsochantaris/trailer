@@ -63,7 +63,7 @@ final class ApiServer: NSManagedObject {
 
 	class func resetSyncOfEverything() {
 		DLog("RESETTING SYNC STATE OF ALL ITEMS")
-		for r in DataItem.allItems(of: Repo.self, in: mainObjectContext) {
+		for r in DataItem.allItems(of: Repo.self, in: DataManager.main) {
 			for p in r.pullRequests {
 				p.resetSyncState()
 			}
@@ -73,7 +73,7 @@ final class ApiServer: NSManagedObject {
 		}
 		if app != nil {
 			preferencesDirty = true
-			api.clearAllBadLinks()
+			API.clearAllBadLinks()
 		}
 	}
 
@@ -181,7 +181,7 @@ final class ApiServer: NSManagedObject {
 
 	class var archivedApiServers: [AnyHashable : [AnyHashable : Any]] {
 		var archivedData = [AnyHashable : [AnyHashable : Any]]()
-		for a in ApiServer.allApiServers(in: mainObjectContext) {
+		for a in ApiServer.allApiServers(in: DataManager.main) {
 			if let authToken = a.authToken, !authToken.isEmpty {
 				var apiServerData = [AnyHashable : Any]()
 				for (k , _) in a.entity.attributesByName {

@@ -27,7 +27,7 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 	}
 
 	override func viewDidAppear(_ animated: Bool) {
-		actionsButton.isEnabled = ApiServer.someServersHaveAuthTokens(in: mainObjectContext)
+		actionsButton.isEnabled = ApiServer.someServersHaveAuthTokens(in: DataManager.main)
 		if actionsButton.isEnabled && fetchedResultsController.fetchedObjects?.count==0 {
 			refreshList()
 		} else if let selectedIndex = tableView.indexPathForSelectedRow {
@@ -68,7 +68,7 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 		NotificationQueue.clear()
 
 		let tempContext = DataManager.buildChildContext()
-		api.fetchRepositories(to: tempContext) { [weak self] in
+		API.fetchRepositories(to: tempContext) { [weak self] in
 			if ApiServer.shouldReportRefreshFailure(in: tempContext) {
 				var errorServers = [String]()
 				for apiServer in ApiServer.allApiServers(in: tempContext) {
@@ -86,7 +86,7 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 			preferencesDirty = true
 			guard let s = self  else { return }
 			s.navigationItem.title = originalName
-			s.actionsButton.isEnabled = ApiServer.someServersHaveAuthTokens(in: mainObjectContext)
+			s.actionsButton.isEnabled = ApiServer.someServersHaveAuthTokens(in: DataManager.main)
 			s.tableView.alpha = 1.0
 			s.tableView.isUserInteractionEnabled = true
 			s.navigationItem.rightBarButtonItem?.isEnabled = true
@@ -136,7 +136,7 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 		fetchRequest.fetchBatchSize = 20
 		fetchRequest.sortDescriptors = [NSSortDescriptor(key: "fork", ascending: true), NSSortDescriptor(key: "fullName", ascending: true)]
 
-		let fc = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: mainObjectContext, sectionNameKeyPath: "fork", cacheName: nil)
+		let fc = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: DataManager.main, sectionNameKeyPath: "fork", cacheName: nil)
 		fc.delegate = self
 		_fetchedResultsController = fc
 

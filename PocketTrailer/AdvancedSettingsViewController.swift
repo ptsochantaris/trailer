@@ -554,7 +554,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			switch originalIndex {
 			case 0:
 				Settings.showStatusItems = !Settings.showStatusItems
-				api.resetAllStatusChecks()
+				API.resetAllStatusChecks()
 				if Settings.showStatusItems {
 					ApiServer.resetSyncOfEverything()
 				}
@@ -576,7 +576,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				performSegue(withIdentifier: "showPicker", sender: self)
 			case 2:
 				Settings.showLabels = !Settings.showLabels
-				api.resetAllLabelChecks()
+				API.resetAllLabelChecks()
 				if Settings.showLabels {
 					ApiServer.resetSyncOfEverything()
 				}

@@ -104,8 +104,8 @@ class ListableItem: DataItem {
 	}
 
 	final override func prepareForDeletion() {
-		api.refreshesSinceLastLabelsCheck[objectID] = nil
-		api.refreshesSinceLastStatusCheck[objectID] = nil
+		API.refreshesSinceLastLabelsCheck[objectID] = nil
+		API.refreshesSinceLastStatusCheck[objectID] = nil
 		ensureInvisible()
 		super.prepareForDeletion()
 	}
@@ -694,7 +694,7 @@ class ListableItem: DataItem {
 		let f = NSFetchRequest<T>(entityName: typeName(itemType))
 		f.fetchBatchSize = 100
 		let p = NSCompoundPredicate(andPredicateWithSubpredicates: andPredicates)
-		add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: mainObjectContext)
+		add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: DataManager.main)
 		f.sortDescriptors = sortDescriptors
 		return f
 	}
@@ -784,7 +784,7 @@ class ListableItem: DataItem {
 		}
 
 		if let i = userAvatarUrl, !Settings.hideAvatars {
-			_ = api.haveCachedAvatar(from: i) { _, cachePath in
+			_ = API.haveCachedAvatar(from: i) { _, cachePath in
 				s.thumbnailURL = URL(string: "file://\(cachePath)")
 				completeIndex(withSet: s)
 			}
@@ -800,7 +800,7 @@ class ListableItem: DataItem {
 		let color: COLOR_CLASS
 		let message: String
 
-		if !ApiServer.someServersHaveAuthTokens(in: mainObjectContext) {
+		if !ApiServer.someServersHaveAuthTokens(in: DataManager.main) {
 			color = COLOR_CLASS(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)
 			message = "There are no configured API servers in your settings, please ensure you have added at least one server with a valid API token."
 		} else if appIsRefreshing {
@@ -812,8 +812,8 @@ class ListableItem: DataItem {
 		} else if openItemCount > 0 {
 			color = COLOR_CLASS.lightGray
 			message = "Some items are hidden by your settings."
-		} else if !Repo.anyVisibleRepos(in: mainObjectContext, criterion: criterion, excludeGrouped: true) {
-			if Repo.anyVisibleRepos(in: mainObjectContext) {
+		} else if !Repo.anyVisibleRepos(in: DataManager.main, criterion: criterion, excludeGrouped: true) {
+			if Repo.anyVisibleRepos(in: DataManager.main) {
 				color = COLOR_CLASS.lightGray
 				message = "There are no repositories that are currently visible in this category."
 			} else {

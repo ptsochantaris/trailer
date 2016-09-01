@@ -23,8 +23,8 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 		if let sid = serverId {
 			a = existingObject(with: sid) as! ApiServer
 		} else {
-			a = ApiServer.addDefaultGithub(in: mainObjectContext)
-			try! mainObjectContext.save()
+			a = ApiServer.addDefaultGithub(in: DataManager.main)
+			try! DataManager.main.save()
 			serverId = a.objectID
 		}
 		name.text = a.label
@@ -54,7 +54,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 	@IBAction func testConnectionSelected(_ sender: UIButton) {
 		if let a = updateServerFromForm() {
 			sender.isEnabled = false
-			api.testApi(to: a) { error in
+			API.testApi(to: a) { error in
 				sender.isEnabled = true
 				showMessage(error != nil ? "Failed" : "Success", error?.localizedDescription)
 			}
@@ -161,7 +161,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 
 	private func deleteServer() {
 		if let a = existingObject(with: serverId!) {
-			mainObjectContext.delete(a)
+			DataManager.main.delete(a)
 			DataManager.saveDB()
 		}
 		serverId = nil

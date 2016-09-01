@@ -1,5 +1,5 @@
 
-private let _propertiesToFetch = { ()->[Any] in
+private let _propertiesToFetch = { ()->[NSExpressionDescription] in
 	let iodD = NSExpressionDescription()
 	iodD.name = "objectID"
 	iodD.expression = NSExpression.expressionForEvaluatedObject()
@@ -40,7 +40,7 @@ final class ItemDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 		f.resultType = .dictionaryResultType
 		f.fetchBatchSize = 0
 		f.propertiesToFetch = _propertiesToFetch
-		let allItems = try! mainObjectContext.fetch(f as! NSFetchRequest<NSDictionary>)
+		let allItems = try! DataManager.main.fetch(f as! NSFetchRequest<NSDictionary>)
 
 		itemIds.reserveCapacity(allItems.count+sections.count)
 

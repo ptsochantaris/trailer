@@ -51,14 +51,14 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 
 	private func deletePreset() {
 		if let s = snoozeItem {
-			mainObjectContext.delete(s)
+			DataManager.main.delete(s)
 		}
 		_ = navigationController?.popViewController(animated: true)
 	}
 
 	@IBAction func upSelected(_ sender: UIBarButtonItem) {
 		if let this = snoozeItem {
-			let all = SnoozePreset.allSnoozePresets(in: mainObjectContext)
+			let all = SnoozePreset.allSnoozePresets(in: DataManager.main)
 			if let index = all.index(of: this), index > 0 {
 				let other = all[index-1]
 				other.sortOrder = Int64(index)
@@ -75,7 +75,7 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 
 	@IBAction func downSelected(_ sender: UIBarButtonItem) {
 		if let this = snoozeItem {
-			let all = SnoozePreset.allSnoozePresets(in: mainObjectContext)
+			let all = SnoozePreset.allSnoozePresets(in: DataManager.main)
 			if let index = all.index(of: this), index < all.count-1 {
 				let other = all[index+1]
 				other.sortOrder = Int64(index)
@@ -100,7 +100,7 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 	private func updateView() {
 		table.reloadData()
 		snoozeItem?.duration = typeSelector.selectedSegmentIndex == 0
-		let total = SnoozePreset.allSnoozePresets(in: mainObjectContext).count
+		let total = SnoozePreset.allSnoozePresets(in: DataManager.main).count
 		let desc = S(snoozeItem?.listDescription)
 		if total > 1 {
 			let pos = (snoozeItem?.sortOrder ?? 0)+1
