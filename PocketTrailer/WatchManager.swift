@@ -216,10 +216,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 		tempMoc.persistentStoreCoordinator = DataManager.main.persistentStoreCoordinator
 		tempMoc.undoManager = nil
 
-		var items = [[String : Any]]()
-		for item in try! tempMoc.fetch(f) {
-			items.append(baseDataForItem(item: item, showStatuses: showStatuses, showLabels: showLabels))
-		}
+		let items = try! tempMoc.fetch(f).map { baseDataForItem(item: $0, showStatuses: showStatuses, showLabels: showLabels) }
 		replyHandler(["result" : items])
 	}
 

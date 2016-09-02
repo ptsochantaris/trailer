@@ -239,7 +239,7 @@ final class PullRequest: ListableItem {
 			let targetUrl = S(s.targetUrl)
 			let desc = S(s.descriptionText)
 
-			if !descriptions.contains(desc) {
+			if !desc.isEmpty && !descriptions.contains(desc) {
 				descriptions.insert(desc)
 				if !targetUrls.contains(targetUrl) {
 					targetUrls.insert(targetUrl)

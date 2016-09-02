@@ -461,7 +461,7 @@ class ListableItem: DataItem {
 						                       NSBaselineOffsetAttributeName: 2.0,
 						                       NSParagraphStyleAttributeName: lp] as [String : Any]
 					#elseif os(OSX)
-						lp.minimumLineHeight = labelFont.pointSize+6.0
+						lp.minimumLineHeight = labelFont.pointSize+5.0
 						let labelAttributes = [NSFontAttributeName: labelFont,
 						                       NSBaselineOffsetAttributeName: 1.0,
 						                       NSParagraphStyleAttributeName: lp] as [String : Any]
@@ -481,9 +481,7 @@ class ListableItem: DataItem {
 						a[NSBackgroundColorAttributeName] = color
 						a[NSForegroundColorAttributeName] = isDark(color: color) ? COLOR_CLASS.white : COLOR_CLASS.black
 						let name = l.name!.replacingOccurrences(of: " ", with: "\u{a0}")
-						_title.append(NSAttributedString(string: "\u{a0}", attributes: a))
-						_title.append(NSAttributedString(string: name, attributes: a))
-						_title.append(NSAttributedString(string: "\u{a0}", attributes: a))
+						_title.append(NSAttributedString(string: "\u{a0}\(name)\u{a0}", attributes: a))
 						if count < labelCount-1 {
 							_title.append(NSAttributedString(string: " ", attributes: labelAttributes))
                         }

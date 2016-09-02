@@ -19,10 +19,9 @@ final class IssueCell: TrailerCell {
 		let showAvatar = !S(issue.userAvatarUrl).isEmpty && !Settings.hideAvatars
 		if showAvatar { W -= AVATAR_SIZE+AVATAR_PADDING } else { W += 4.0 }
 
-		let titleHeight = ceil(_title.boundingRect(with: CGSize(width: W-4.0, height: CGFloat.greatestFiniteMagnitude), options: stringDrawingOptions).size.height)
-		let subtitleHeight = ceil(_subtitle.boundingRect(with: CGSize(width: W-4.0, height: CGFloat.greatestFiniteMagnitude), options: stringDrawingOptions).size.height+4.0)
+		let titleHeight = ceil(_title.boundingRect(with: CGSize(width: W-4.0, height: .greatestFiniteMagnitude), options: stringDrawingOptions).size.height)
+		let subtitleHeight = ceil(_subtitle.boundingRect(with: CGSize(width: W-4.0, height: .greatestFiniteMagnitude), options: stringDrawingOptions).size.height+4.0)
 
-		var statusRects = [NSValue]()
 		var bottom: CGFloat
 		let cellPadding: CGFloat = 6.0
 
@@ -48,11 +47,6 @@ final class IssueCell: TrailerCell {
 		pinRect = NSOffsetRect(pinRect, shift, 0)
 		dateRect = NSOffsetRect(dateRect, shift, 0)
 		titleRect = NSOffsetRect(titleRect, shift, 0)
-		var replacementRects = [NSValue]()
-		for rv in statusRects {
-			replacementRects.append(NSValue(rect: rv.rectValue.offsetBy(dx: shift, dy: 0)))
-		}
-		statusRects = replacementRects
 
 		if showUnpin {
 			if issue.condition == ItemCondition.open.rawValue {

@@ -32,6 +32,7 @@ class DataItem: NSManagedObject {
 		guard let infos = data, infos.count > 0 else { return }
 
 		var idsOfItems = [Int64]()
+		idsOfItems.reserveCapacity(infos.count)
 		var idsToInfo = [Int64 : [AnyHashable : Any]]()
 		for info in infos {
 			if let serverId = info["id"] as? NSNumber {

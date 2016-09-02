@@ -30,23 +30,30 @@ final class PullRequestCell: TrailerCell {
 		let showAvatar = !S(pullRequest.userAvatarUrl).isEmpty && !Settings.hideAvatars
 		if showAvatar { W -= AVATAR_SIZE+AVATAR_PADDING } else { W += 4.0 }
 
-		let titleHeight = ceil(_title.boundingRect(with: CGSize(width: W-4.0, height: CGFloat.greatestFiniteMagnitude), options: stringDrawingOptions).size.height)
-		let subtitleHeight = ceil(_subtitle.boundingRect(with: CGSize(width: W-4.0, height: CGFloat.greatestFiniteMagnitude), options: stringDrawingOptions).size.height+4.0)
+		let titleHeight = ceil(_title.boundingRect(with: CGSize(width: W - 4.0, height: .greatestFiniteMagnitude), options: stringDrawingOptions).size.height)
+		let subtitleHeight = ceil(_subtitle.boundingRect(with: CGSize(width: W - 4.0, height: .greatestFiniteMagnitude), options: stringDrawingOptions).size.height+4.0)
 
-		var statusRects = [NSValue]()
-		var statuses: [PRStatus]? = nil
+		var statusRects = [NSRect]()
+		var statuses: [PRStatus]?
+		var statusLines: [String]?
 		var bottom: CGFloat, cellPadding: CGFloat
 		var statusBottom = CGFloat(0)
 
 		if Settings.showStatusItems {
 			cellPadding = 10
 			bottom = ceil(cellPadding * 0.5)
-			statuses = pullRequest.displayedStatuses
-			for s in statuses! {
-				let H = ceil(s.displayText.boundingRect(with: CGSize(width: W, height: CGFloat.greatestFiniteMagnitude),
-					options: stringDrawingOptions,
-					attributes: statusAttributes).size.height)
-				statusRects.append(NSValue(rect: NSMakeRect(LEFTPADDING, bottom+statusBottom, W, H)))
+			let S = pullRequest.displayedStatuses
+			statusLines = [String]()
+			statusLines?.reserveCapacity(S.count)
+			statusRects.reserveCapacity(S.count)
+			statuses = S
+			for s in S.reversed() {
+				let text = s.displayText
+				let H = ceil(text.boundingRect(with: CGSize(width: W, height: .greatestFiniteMagnitude),
+				                               options: stringDrawingOptions,
+				                               attributes: statusAttributes).size.height)
+				statusRects.append(NSMakeRect(LEFTPADDING, bottom+statusBottom, W, H))
+				statusLines?.append(text)
 				statusBottom += H
 			}
 		} else {
@@ -73,14 +80,10 @@ final class PullRequestCell: TrailerCell {
 		} else {
 			shift = -4
 		}
-		pinRect = NSOffsetRect(pinRect, shift, 0)
-		dateRect = NSOffsetRect(dateRect, shift, 0)
-		titleRect = NSOffsetRect(titleRect, shift, 0)
-		var replacementRects = [NSValue]()
-		for rv in statusRects {
-			replacementRects.append(NSValue(rect: rv.rectValue.offsetBy(dx: shift, dy: 0)))
-		}
-		statusRects = replacementRects
+		pinRect = pinRect.offsetBy(dx: shift, dy: 0)
+		dateRect = dateRect.offsetBy(dx: shift, dy: 0)
+		titleRect = titleRect.offsetBy(dx: shift, dy: 0)
+		statusRects = statusRects.map { $0.offsetBy(dx: shift, dy: 0) }
 
 		if showUnpin {
 			if pullRequest.condition == ItemCondition.open.rawValue {
@@ -117,20 +120,21 @@ final class PullRequestCell: TrailerCell {
 			subtitle.alphaValue = DISABLED_FADE
 		}
 
-		if let s = statuses {
-			for count in 0 ..< statusRects.count {
-				let frame = statusRects[statusRects.count-count-1].rectValue
-				let statusLabel = LinkField(frame: frame)
-				let status = s[count]
+		if let s = statuses, let lines = statusLines {
+			var rectIndex = statusRects.count-1
+			for status in s {
+				let frame = statusRects[rectIndex]
 
+				let statusLabel = LinkField(frame: frame)
 				statusLabel.targetUrl = status.targetUrl
 				statusLabel.needsCommand = !Settings.makeStatusItemsSelectable
-				statusLabel.attributedStringValue = NSAttributedString(string: status.displayText, attributes: statusAttributes)
+				statusLabel.attributedStringValue = NSAttributedString(string: lines[rectIndex], attributes: statusAttributes)
 				statusLabel.textColor = status.colorForDisplay
 				if faded {
 					statusLabel.alphaValue = DISABLED_FADE
 				}
 				addSubview(statusLabel)
+				rectIndex -= 1
 			}
 		}
 
