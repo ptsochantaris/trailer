@@ -219,12 +219,12 @@ final class API {
 			}
 
 			#if os(iOS)
-				task.priority = URLSessionTask.highPriority
 				delay(0.1) {
 					networkIndicationStart()
 				}
 			#endif
 
+			task.priority = URLSessionTask.highPriority
 			task.resume()
 		}
 
@@ -1122,21 +1122,16 @@ final class API {
 		}
 	}
 
-	private class func getRateLimit(from server: ApiServer, callback: @escaping (_ requestsRemaining: Int64, _ requestLimit: Int64, _ nextReset: Int64)->Void) {
+	private class func getRateLimit(from server: ApiServer, callback: @escaping (_ limits: ApiRateLimits?)->Void) {
 
 		apiQueue.addOperation(ApiOperation(call: "/rate_limit", on: server, ignoreLastSync: true) { code, headers, data, error, shouldRetry in
 
-			if error == nil {
-				let requestsRemaining = Int64(S(headers?["X-RateLimit-Remaining"] as? String)) ?? 0
-				let requestLimit = Int64(S(headers?["X-RateLimit-Limit"] as? String)) ?? 0
-				let epochSeconds = Int64(S(headers?["X-RateLimit-Reset"] as? String)) ?? 0
-				callback(requestsRemaining, requestLimit, epochSeconds)
+			if error == nil, let h = headers {
+				callback(ApiRateLimits.from(headers: h))
+			} else if code == 404, let d = data as? [AnyHashable : Any], let m = d["message"] as? String, m != "Not Found" { // is GE account
+				callback(ApiRateLimits.noLimits)
 			} else {
-				if code == 404 && data != nil && !((data as? [AnyHashable : Any])?["message"] as? String == "Not Found") {
-					callback(10000, 10000, 0)
-				} else {
-					callback(-1, -1, -1)
-				}
+				callback(nil)
 			}
 		})
 	}
@@ -1147,9 +1142,10 @@ final class API {
 		var completionCount = 0
 		for apiServer in allApiServers {
 			if apiServer.goodToGo {
-				getRateLimit(from: apiServer) { remaining, limit, reset in
-					apiServer.requestsRemaining = remaining
-					apiServer.requestsLimit = limit
+				getRateLimit(from: apiServer) { limits in
+					if let l = limits {
+						apiServer.updateApiLimits(l)
+					}
 					completionCount += 1
 					if completionCount == totalOperations {
 						NotificationCenter.default.post(name: ApiUsageUpdateNotification, object: apiServer, userInfo: nil)
@@ -1302,23 +1298,8 @@ final class API {
 				var lastPage = true
 				if let allHeaders = headers {
 
-					if let v = allHeaders["X-RateLimit-Remaining"] as? String {
-						server.requestsRemaining = Int64(v) ?? 0
-					} else {
-						server.requestsRemaining = 10000
-					}
-
-					if let v = allHeaders["X-RateLimit-Limit"] as? String {
-						server.requestsLimit = Int64(v) ?? 0
-					} else {
-						server.requestsLimit = 10000
-					}
-
-					if let v = allHeaders["X-RateLimit-Reset"] as? String {
-						server.resetDate = Date(timeIntervalSince1970: TimeInterval(v) ?? 0)
-					} else {
-						server.resetDate = nil
-					}
+					let latestLimits = ApiRateLimits.from(headers: allHeaders)
+					server.updateApiLimits(latestLimits)
 
 					if let linkHeader = allHeaders["Link"] as? String {
 						lastPage = !linkHeader.contains("rel=\"next\"")
@@ -1435,7 +1416,7 @@ final class API {
 				shouldRetry = false
 				code = p.code
 				headers = p.actualHeaders
-				atNextEvent {
+				DispatchQueue.main.sync {
 					CacheEntry.markFetched(for: cacheKey)
 				}
 				DLog("(%@) GET %@ - NO CHANGE (304): %@", apiServerLabel, expandedPath, code)
@@ -1480,6 +1461,7 @@ final class API {
 				               completion: completion)
 			}
 		}
+		task.priority = URLSessionTask.lowPriority
 		task.resume()
 	}
 

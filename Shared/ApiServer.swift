@@ -163,6 +163,12 @@ final class ApiServer: NSManagedObject {
 		}
 	}
 
+	func updateApiLimits(_ limits: ApiRateLimits) {
+		requestsRemaining = limits.requestsRemaining
+		requestsLimit = limits.requestLimit
+		resetDate = limits.resetDate
+	}
+
 	func resetToGithub() {
 		webPath = "https://github.com"
 		apiPath = "https://api.github.com"

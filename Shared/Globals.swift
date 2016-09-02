@@ -225,6 +225,29 @@ enum RepoHidingPolicy: Int64 {
 	}
 }
 
+struct ApiRateLimits {
+	let requestsRemaining, requestLimit: Int64
+	let resetDate: Date?
+
+	static func from(headers: [AnyHashable : Any]) -> ApiRateLimits {
+		let date: Date?
+		if let epochSeconds = headers["X-RateLimit-Reset"] as? String, let t = TimeInterval(epochSeconds) {
+			date = Date(timeIntervalSince1970: t)
+		} else {
+			date = nil
+		}
+		return ApiRateLimits(requestsRemaining: Int64(S(headers["X-RateLimit-Remaining"] as? String)) ?? 10000,
+							 requestLimit: Int64(S(headers["X-RateLimit-Limit"] as? String)) ?? 10000,
+							 resetDate: date)
+	}
+	static var noLimits: ApiRateLimits {
+		return ApiRateLimits(requestsRemaining: 10000, requestLimit: 10000, resetDate: nil)
+	}
+	var areValid: Bool {
+		return requestsRemaining >= 0
+	}
+}
+
 var currentAppVersion: String {
 	return S(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String)
 }
