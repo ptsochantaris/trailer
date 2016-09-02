@@ -25,21 +25,6 @@ final class Settings {
 
     class func checkMigration() {
 
-        let d = UserDefaults.standard
-        if d.object(forKey: "LAST_RUN_VERSION_KEY") != nil {
-            for k in allFields {
-                if let v = d.object(forKey: k) {
-                    sharedDefaults.set(v, forKey: k)
-                    DLog("Migrating setting '%@'", k)
-                    d.removeObject(forKey: k)
-                }
-            }
-            sharedDefaults.synchronize()
-            DLog("Settings migrated to shared container")
-        } else {
-            DLog("No need to migrate settings into shared container")
-        }
-
 		if let snoozeWakeOnComment = sharedDefaults.object(forKey: "SNOOZE_WAKEUP_ON_COMMENT") as? Bool {
 			DataManager.postMigrationSnoozeWakeOnComment = snoozeWakeOnComment
 			sharedDefaults.removeObject(forKey: "SNOOZE_WAKEUP_ON_COMMENT")
@@ -83,8 +68,8 @@ final class Settings {
 			sharedDefaults.removeObject(forKey: "MOVE_NEW_ITEMS_IN_OWN_REPOS_TO_MENTIONED")
 		}
 
-		DataManager.postMigrationRepoPrPolicy = RepoDisplayPolicy.all
-		DataManager.postMigrationRepoIssuePolicy = RepoDisplayPolicy.hide
+		DataManager.postMigrationRepoPrPolicy = .all
+		DataManager.postMigrationRepoIssuePolicy = .hide
 
 		if let showIssues = sharedDefaults.object(forKey: "SHOW_ISSUES_MENU") as? Bool {
 			sharedDefaults.set(showIssues ? RepoDisplayPolicy.all.intValue : RepoDisplayPolicy.hide.intValue, forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX")
@@ -100,11 +85,11 @@ final class Settings {
 
 		if let hideAllSection = sharedDefaults.object(forKey: "HIDE_ALL_SECTION") as? Bool {
 			if hideAllSection {
-				if DataManager.postMigrationRepoPrPolicy == RepoDisplayPolicy.all {
-					DataManager.postMigrationRepoPrPolicy = RepoDisplayPolicy.mineAndPaticipated
+				if DataManager.postMigrationRepoPrPolicy == .all {
+					DataManager.postMigrationRepoPrPolicy = .mineAndPaticipated
 				}
-				if DataManager.postMigrationRepoIssuePolicy == RepoDisplayPolicy.all {
-					DataManager.postMigrationRepoIssuePolicy = RepoDisplayPolicy.mineAndPaticipated
+				if DataManager.postMigrationRepoIssuePolicy == .all {
+					DataManager.postMigrationRepoIssuePolicy = .mineAndPaticipated
 				}
 
 				let newPrPolicy = sharedDefaults.object(forKey: "NEW_PR_DISPLAY_POLICY_INDEX") as? Int64 ?? RepoDisplayPolicy.all.rawValue

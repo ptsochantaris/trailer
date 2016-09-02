@@ -61,14 +61,17 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		}
 	}
 
+	func applicationWillFinishLaunching(_ notification: Notification) {
+		app = self
+		bootUp()
+	}
+
 	func applicationDidFinishLaunching(_ notification: Notification) {
 
 		if DataManager.main.persistentStoreCoordinator == nil {
 			databaseErrorOnStartup()
 			return
 		}
-
-		app = self
 
 		DistributedNotificationCenter.default().addObserver(self, selector: #selector(updateDarkMode), name: AppleInterfaceThemeChangedNotification, object: nil)
 

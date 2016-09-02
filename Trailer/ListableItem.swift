@@ -689,7 +689,7 @@ class ListableItem: DataItem {
 
 		//DLog("%@", andPredicates)
 
-		let f = NSFetchRequest<T>(entityName: typeName(itemType))
+		let f = NSFetchRequest<T>(entityName: String(describing: itemType))
 		f.fetchBatchSize = 100
 		let p = NSCompoundPredicate(andPredicateWithSubpredicates: andPredicates)
 		add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: DataManager.main)

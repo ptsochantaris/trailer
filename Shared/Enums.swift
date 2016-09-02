@@ -32,10 +32,6 @@ func S(_ s: String?) -> String {
 	return s ?? ""
 }
 
-func typeName(_ c: AnyClass) -> String {
-	return NSStringFromClass(c).components(separatedBy: ".").last!
-}
-
 typealias Completion = () -> Void
 
 let shortDateFormatter = { () -> DateFormatter in
@@ -59,7 +55,7 @@ func atNextEvent<T: AnyObject>(_ owner: T?, completion: @escaping (T)->Void) {
 }
 
 func atNextEvent<T: AnyObject>(_ owner: T, completion: @escaping (T)->Void) {
-	OperationQueue.main.addOperation { [weak owner] in
+	atNextEvent { [weak owner] in
 		if let o = owner {
 			completion(o)
 		}

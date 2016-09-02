@@ -29,7 +29,7 @@ final class SectionRow: NSObject, PopulatableRow {
 		}
 	}
 	var rowType: String {
-		return typeName(type(of: self))
+		return String(describing: type(of: self))
 	}
 
     @IBOutlet weak var titleL: WKInterfaceLabel!

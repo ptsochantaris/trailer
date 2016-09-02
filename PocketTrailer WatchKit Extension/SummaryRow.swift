@@ -30,7 +30,7 @@ class SummaryRow: NSObject, PopulatableRow {
 	@IBOutlet weak var issueIcon: WKInterfaceImage!
 
 	var rowType: String {
-		return typeName(type(of: self))
+		return String(describing: type(of: self))
 	}
 	
 	var data: [AnyHashable : Any]?

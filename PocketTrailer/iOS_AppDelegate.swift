@@ -21,6 +21,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 
 	func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
 
+		app = self
 		bootUp()
 
 		if DataManager.main.persistentStoreCoordinator == nil {
@@ -29,7 +30,6 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 			abort()
 		}
 
-		app = self
 		return true
 	}
 
