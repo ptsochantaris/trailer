@@ -241,8 +241,9 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		let n = NotificationCenter.default
 		n.addObserver(self, selector: #selector(updateStatus), name: RefreshStartedNotification, object: nil)
-		n.addObserver(self, selector: #selector(updateStatus), name: RefreshEndedNotification, object: nil)
 		n.addObserver(self, selector: #selector(updateRefresh), name: SyncProgressUpdateNotification, object: nil)
+		n.addObserver(self, selector: #selector(showProcessing), name: RefreshProcessingNotification, object: nil)
+		n.addObserver(self, selector: #selector(updateStatus), name: RefreshEndedNotification, object: nil)
 
 		updateTabItems(animated: false)
 		atNextEvent {
@@ -252,6 +253,12 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	func updateRefresh() {
 		refreshLabel.text = API.lastUpdateDescription
+	}
+
+	func showProcessing() {
+		let m = popupManager.masterController
+		m.title = "Processing..."
+		m.refreshLabel.text = "Processing..."
 	}
 
 	override var canBecomeFirstResponder: Bool {
@@ -470,7 +477,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	private func updateRefreshControls() {
 		let ra = min(1.0, max(0, (-84-tableView.contentOffset.y)/32.0))
 		if ra > 0.0 && refreshLabel.alpha == 0 {
-			refreshLabel.text = API.lastUpdateDescription
+			updateRefresh()
 		}
 		refreshLabel.alpha = ra
 		refreshControl?.alpha = ra
@@ -1071,7 +1078,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		if appIsRefreshing {
 			title = "Refreshing..."
 			if let r = refreshControl {
-				refreshLabel.text = API.lastUpdateDescription
+				updateRefresh()
 				updateRefreshControls()
 				r.beginRefreshing()
 			}
@@ -1082,7 +1089,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 				: issuesTitle
 
 			if let r = refreshControl {
-				refreshLabel.text = API.lastUpdateDescription
+				updateRefresh()
 				updateRefreshControls()
 				r.endRefreshing()
 			}

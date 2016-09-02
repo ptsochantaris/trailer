@@ -188,11 +188,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 
 		prepareForRefresh()
 
-		API.syncItemsForActiveReposAndCallback({
-
-			popupManager.masterController.title = "Processing..."
-
-		}) { [weak self] in
+		API.syncItemsForActiveReposAndCallback { [weak self] in
 
 			guard let s = self else { return }
 

@@ -281,6 +281,7 @@ extension String {
 ////////////////////// Notifications
 
 let RefreshStartedNotification = Notification.Name("RefreshStartedNotification")
+let RefreshProcessingNotification = Notification.Name("RefreshProcessingNotification")
 let RefreshEndedNotification = Notification.Name("RefreshEndedNotification")
 let SyncProgressUpdateNotification = Notification.Name("SyncProgressUpdateNotification")
 let ApiUsageUpdateNotification = Notification.Name("ApiUsageUpdateNotification")

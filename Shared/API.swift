@@ -40,13 +40,11 @@ final class API {
 				API.networkIndicationStart()
 			#endif
 
-			NotificationCenter.default.post(Notification(name: SyncProgressUpdateNotification, object: nil, userInfo: nil))
-
 			API.start(call: path, on: server, ignoreLastSync: ignoreLastSync) { [weak self] code, headers, data, error, shouldRetry in
 				guard let s = self else { return }
 
 				s.completion(code, headers, data, error, shouldRetry)
-				NotificationCenter.default.post(Notification(name: SyncProgressUpdateNotification, object: nil, userInfo: nil))
+				NotificationCenter.default.post(name: SyncProgressUpdateNotification, object: nil)
 
 				#if os(iOS)
 					API.networkIndicationEnd()
@@ -201,9 +199,9 @@ final class API {
 		}
 	}
 
-	class func haveCachedAvatar(from path: String, tryLoadAndCallback: @escaping (IMAGE_CLASS?, String) -> Void) -> Bool {
+	class func haveCachedAvatar(from path: String, callback: @escaping (IMAGE_CLASS?, String) -> Void) -> Bool {
 
-		func getImage(at path: String, completion:@escaping (_ data: Data?) -> Void) {
+		func getImage(at path: String, completion: @escaping (_ data: Data?) -> Void) {
 
 			let url = URL(string: path)!
 			let task = urlSession.dataTask(with: url) { data, response, error in
@@ -215,7 +213,7 @@ final class API {
 				}
 				#if os(iOS)
 					atNextEvent {
-						API.networkIndicationEnd()
+						networkIndicationEnd()
 					}
 				#endif
 			}
@@ -223,7 +221,7 @@ final class API {
 			#if os(iOS)
 				task.priority = URLSessionTask.highPriority
 				delay(0.1) {
-					API.networkIndicationStart()
+					networkIndicationStart()
 				}
 			#endif
 
@@ -254,7 +252,7 @@ final class API {
 			#endif
 			if let r = ret {
 				atNextEvent {
-					tryLoadAndCallback(r, cachePath)
+					callback(r, cachePath)
 				}
 				return true
 			} else {
@@ -279,7 +277,7 @@ final class API {
 				}
 			#endif
 			atNextEvent {
-				tryLoadAndCallback(result, cachePath)
+				callback(result, cachePath)
 			}
 		}
 		return false
@@ -287,7 +285,7 @@ final class API {
 
 	////////////////////////////////////// API interface
 
-	class func syncItemsForActiveReposAndCallback(_ processingCallback: Completion?, callback: Completion) {
+	class func syncItemsForActiveReposAndCallback(callback: Completion) {
 		let syncContext = DataManager.buildChildContext()
 
 		let shouldRefreshReposToo = lastRepoCheck == .distantPast
@@ -296,17 +294,17 @@ final class API {
 
 		if shouldRefreshReposToo {
 			fetchRepositories(to: syncContext) {
-				sync(to: syncContext, processingCallback: processingCallback, callback: callback)
+				sync(to: syncContext, callback: callback)
 			}
 		} else {
 			ApiServer.resetSyncSuccess(in: syncContext)
 			ensureApiServersHaveUserIds(in: syncContext) {
-				sync(to: syncContext, processingCallback: processingCallback, callback: callback)
+				sync(to: syncContext, callback: callback)
 			}
 		}
 	}
 
-	private class func sync(to moc: NSManagedObjectContext, processingCallback: Completion?, callback: Completion) {
+	private class func sync(to moc: NSManagedObjectContext, callback: Completion) {
 
 		markDirtyRepos(in: moc) {
 
@@ -317,7 +315,7 @@ final class API {
 			let completionCallback = {
 				completionCount += 1
 				if completionCount == totalOperations {
-					processingCallback?()
+					NotificationCenter.default.post(name: RefreshProcessingNotification, object: nil)
 					for r in repos { r.dirty = false }
 					completeSync(in: moc, andCallback: callback)
 				}
@@ -399,7 +397,7 @@ final class API {
 		if willScanForLabels { totalOperations += 1 }
 
 		var completionCount = 0
-		let completionCallback: Completion = {
+		let completionCallback = {
 			completionCount += 1
 			if completionCount == totalOperations {
 				callback()
@@ -429,7 +427,7 @@ final class API {
 		var completionCount = 0
 		let repoIdsToMarkDirty = NSMutableSet()
 
-		let completionCallback: Completion = {
+		let completionCallback = {
 			completionCount += 1
 			if completionCount==totalOperations {
 
@@ -582,7 +580,7 @@ final class API {
 			let totalOperations = allApiServers.count*2
 			var completionCount = 0
 
-			let completionCallback: Completion = {
+			let completionCallback = {
 				completionCount += 1
 				if completionCount == totalOperations {
 					for r in DataItem.newItems(of: Repo.self, in: moc) {
@@ -739,7 +737,7 @@ final class API {
 		let totalOperations = 2
 		var completionCount = 0
 
-		let completionCallback: Completion = {
+		let completionCallback = {
 			completionCount += 1
 			if completionCount == totalOperations { callback() }
 		}
@@ -969,12 +967,8 @@ final class API {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.predicate = NSPredicate(format: "postSyncAction == %lld and condition == %lld", PostSyncAction.delete.rawValue, ItemCondition.open.rawValue)
 		f.returnsObjectsAsFaults = false
-		let pullRequests = try! moc.fetch(f)
 
-		let prsToCheck = pullRequests.filter { r -> Bool in
-			let parent = r.repo
-			return parent.shouldSync && parent.postSyncAction != PostSyncAction.delete.rawValue && r.apiServer.lastSyncSucceeded
-		}
+		let prsToCheck = try! moc.fetch(f).filter { $0.shouldCheckForClosing }
 
 		let totalOperations = prsToCheck.count
 		if totalOperations==0 {
@@ -983,7 +977,7 @@ final class API {
 		}
 
 		var completionCount = 0
-		let completionCallback: Completion = {
+		let completionCallback = {
 			completionCount += 1
 			if completionCount == totalOperations {
 				callback()
@@ -1000,11 +994,8 @@ final class API {
 		f.predicate = NSPredicate(format: "postSyncAction == %lld and condition == %lld", PostSyncAction.delete.rawValue, ItemCondition.open.rawValue)
 		f.returnsObjectsAsFaults = false
 
-		for i in try! moc.fetch(f) {
-			let r = i.repo
-			if r.shouldSync && r.postSyncAction != PostSyncAction.delete.rawValue && r.apiServer.lastSyncSucceeded {
-				handleClosing(of: i)
-			}
+		for i in try! moc.fetch(f).filter { $0.shouldCheckForClosing } {
+			handleClosing(of: i)
 		}
 	}
 
@@ -1020,7 +1011,7 @@ final class API {
 
 		var completionCount = 0
 
-		let completionCallback: Completion = {
+		let completionCallback = {
 			completionCount += 1
 			if completionCount == totalOperations {
 				callback()
@@ -1136,10 +1127,9 @@ final class API {
 		apiQueue.addOperation(ApiOperation(call: "/rate_limit", on: server, ignoreLastSync: true) { code, headers, data, error, shouldRetry in
 
 			if error == nil {
-				let allHeaders = headers!
-				let requestsRemaining = Int64(S(allHeaders["X-RateLimit-Remaining"] as? String)) ?? 0
-				let requestLimit = Int64(S(allHeaders["X-RateLimit-Limit"] as? String)) ?? 0
-				let epochSeconds = Int64(S(allHeaders["X-RateLimit-Reset"] as? String)) ?? 0
+				let requestsRemaining = Int64(S(headers?["X-RateLimit-Remaining"] as? String)) ?? 0
+				let requestLimit = Int64(S(headers?["X-RateLimit-Limit"] as? String)) ?? 0
+				let epochSeconds = Int64(S(headers?["X-RateLimit-Reset"] as? String)) ?? 0
 				callback(requestsRemaining, requestLimit, epochSeconds)
 			} else {
 				if code == 404 && data != nil && !((data as? [AnyHashable : Any])?["message"] as? String == "Not Found") {
@@ -1281,10 +1271,7 @@ final class API {
 
 		if path.isEmpty {
 			// handling empty or nil fields as success, since we don't want syncs to fail, we simply have nothing to process
-			atNextEvent {
-				finalCallback(true, -1)
-				return
-			}
+			finalCallback(true, -1)
 			return
 		}
 
@@ -1292,9 +1279,7 @@ final class API {
 		getData(in: p, from: server) { data, lastPage, resultCode in
 
 			if let d = data as? [[AnyHashable : Any]] {
-				var isLastPage = lastPage
-				if perPageCallback(d, lastPage) { isLastPage = true }
-				if isLastPage {
+				if perPageCallback(d, lastPage) || lastPage {
 					finalCallback(true, resultCode)
 				} else {
 					getPagedData(at: path, from: server, startingFrom: page+1, perPageCallback: perPageCallback, finalCallback: finalCallback)
@@ -1311,9 +1296,7 @@ final class API {
 		attemptCount: Int = 0,
 		callback: @escaping (_ data: Any?, _ lastPage: Bool, _ resultCode: Int64) -> Void) {
 
-		apiQueue.addOperation(ApiOperation(call: path, on: server, ignoreLastSync: false) { c, headers, data, error, shouldRetry in
-
-			let code = c ?? 0
+		apiQueue.addOperation(ApiOperation(call: path, on: server, ignoreLastSync: false) { code, headers, data, error, shouldRetry in
 
 			if error == nil {
 				var lastPage = true
@@ -1343,7 +1326,7 @@ final class API {
 
 					NotificationCenter.default.post(name: ApiUsageUpdateNotification, object: server, userInfo: nil)
 				}
-				callback(data, lastPage, code)
+				callback(data, lastPage, code ?? 0)
 			} else {
 				if shouldRetry && attemptCount < 2 { // timeout, truncation, connection issue, etc
 					let nextAttemptCount = attemptCount+1
@@ -1355,7 +1338,7 @@ final class API {
 					if shouldRetry {
 						DLog("(%@) Giving up on failed API call to %@", S(server.label), path)
 					}
-					callback(nil, false, code)
+					callback(nil, false, code ?? 0)
 				}
 			}
 		})
@@ -1365,7 +1348,8 @@ final class API {
 		let n = OperationQueue()
 		n.underlyingQueue = DispatchQueue.main
 		#if os(iOS)
-			n.maxConcurrentOperationCount = (MemoryLayout<Int>.size == MemoryLayout<Int64>.size) ? 8 : 2
+			let archIs64Bit = (MemoryLayout<Int>.size == MemoryLayout<Int64>.size)
+			n.maxConcurrentOperationCount = archIs64Bit ? 8 : 2
 		#else
 			n.maxConcurrentOperationCount = 8
 		#endif
@@ -1509,7 +1493,7 @@ final class API {
 	                                  existingBackOff: UrlBackOffEntry?,
 	                                  headers: [AnyHashable : Any]?,
 	                                  completion: ApiCompletion) {
-		if error != nil {
+		if let e = error {
 			if code > 399 {
 				if var backoff = existingBackOff {
 					DLog("(%@) Extending backoff for already throttled URL %@ by %@ seconds", serverLabel, urlPath, backOffIncrement)
@@ -1525,7 +1509,7 @@ final class API {
 						nextIncrement: backOffIncrement)
 				}
 			}
-			DLog("(%@) GET %@ - FAILED: (code %@) %@", serverLabel, urlPath, code, error!.localizedDescription)
+			DLog("(%@) GET %@ - FAILED: (code %@) %@", serverLabel, urlPath, code, e.localizedDescription)
 		}
 
 		if Settings.dumpAPIResponsesInConsole, let d = data {
@@ -1550,7 +1534,7 @@ final class API {
 		if networkIndicationCount == 1 {
 			let a = UIApplication.shared
 			a.isNetworkActivityIndicatorVisible = true
-			networkBGTask = a.beginBackgroundTask(withName: "com.housetrip.Trailer.imageload") {
+			networkBGTask = a.beginBackgroundTask(withName: "com.housetrip.Trailer.network") {
 				endNetworkBGTask()
 			}
 		}

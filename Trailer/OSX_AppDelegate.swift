@@ -702,7 +702,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			d.allowRefresh = false
 		}
 
-		API.syncItemsForActiveReposAndCallback(nil) { [weak self] in
+		API.syncItemsForActiveReposAndCallback { [weak self] in
 
 			guard let s = self else { return }
 

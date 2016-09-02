@@ -795,6 +795,10 @@ class ListableItem: DataItem {
 	}
 	#endif
 
+	final var shouldCheckForClosing: Bool {
+		return repo.shouldSync && repo.postSyncAction != PostSyncAction.delete.rawValue && apiServer.lastSyncSucceeded
+	}
+
 	class func reasonForEmpty(with filterValue: String?, criterion: GroupingCriterion?, openItemCount: Int) -> NSAttributedString {
 
 		let color: COLOR_CLASS
