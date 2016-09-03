@@ -967,6 +967,7 @@ final class API {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.predicate = NSPredicate(format: "postSyncAction == %lld and condition == %lld", PostSyncAction.delete.rawValue, ItemCondition.open.rawValue)
 		f.returnsObjectsAsFaults = false
+		f.includesSubentities = false
 
 		let prsToCheck = try! moc.fetch(f).filter { $0.shouldCheckForClosing }
 
@@ -993,7 +994,8 @@ final class API {
 		let f = NSFetchRequest<Issue>(entityName: "Issue")
 		f.predicate = NSPredicate(format: "postSyncAction == %lld and condition == %lld", PostSyncAction.delete.rawValue, ItemCondition.open.rawValue)
 		f.returnsObjectsAsFaults = false
-
+		f.includesSubentities = false
+		
 		for i in try! moc.fetch(f).filter { $0.shouldCheckForClosing } {
 			handleClosing(of: i)
 		}

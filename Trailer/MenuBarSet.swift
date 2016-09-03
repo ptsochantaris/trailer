@@ -34,17 +34,15 @@ final class MenuBarSet {
 
 	func setTimers() {
 		prFilterTimer = PopTimer(timeInterval: 0.2) { [weak self] in
-			if let s = self {
-				s.updatePrMenu()
-				s.prMenu.scrollToTop()
-			}
+			guard let s = self else { return }
+			s.updatePrMenu()
+			s.prMenu.scrollToTop()
 		}
 
 		issuesFilterTimer = PopTimer(timeInterval: 0.2) { [weak self] in
-			if let s = self {
-				s.updateIssuesMenu()
-				s.issuesMenu.scrollToTop()
-			}
+			guard let s = self else { return }
+			s.updateIssuesMenu()
+			s.issuesMenu.scrollToTop()
 		}
 	}
 

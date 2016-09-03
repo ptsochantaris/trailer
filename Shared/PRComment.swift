@@ -33,7 +33,7 @@ final class PRComment: DataItem {
 
 	func fastForwardIfNeeded(parent item: ListableItem) {
 		// Check if we're assigned to a newly created issue, in which case we want to "fast forward" its latest comment date to our own, if ours is newer
-		if let commentCreation = createdAt, item.postSyncAction == PostSyncAction.noteNew.rawValue {
+		if let commentCreation = createdAt, item.postSyncAction == PostSyncAction.isNew.rawValue {
 			if let latestReadDate = item.latestReadCommentDate, latestReadDate < commentCreation {
 				item.latestReadCommentDate = commentCreation
 			}
@@ -41,7 +41,7 @@ final class PRComment: DataItem {
 	}
 
 	func processNotifications() {
-		if let item = parent, item.postSyncAction == PostSyncAction.noteUpdated.rawValue && item.isVisibleOnMenu {
+		if let item = parent, item.postSyncAction == PostSyncAction.isUpdated.rawValue && item.isVisibleOnMenu {
 			if contains(terms: ["@\(apiServer.userName!)"]) {
 				if item.isSnoozing && item.shouldWakeOnMention {
 					DLog("Waking up snoozed item ID %@ because of mention", item.serverId)

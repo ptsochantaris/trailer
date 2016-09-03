@@ -121,7 +121,7 @@ enum StatusFilter: Int {
 }
 
 enum PostSyncAction: Int64 {
-	case doNothing, delete, noteNew, noteUpdated
+	case doNothing, delete, isNew, isUpdated
 }
 
 enum NotificationType: Int {

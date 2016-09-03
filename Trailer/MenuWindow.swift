@@ -74,9 +74,8 @@ final class MenuWindow: NSWindow {
 		if statusItem == nil {
 			statusItem = NSStatusBar.system().statusItem(withLength: NSVariableStatusItemLength)
 			statusItem!.view = StatusItemView { [weak self] in
-				if let S = self {
-					if S.isVisible { S.closeMenu() } else { app.show(menu: S) }
-				}
+				guard let s = self else { return }
+				if s.isVisible { s.closeMenu() } else { app.show(menu: s) }
 			}
 		}
 		return statusItem!.view as! StatusItemView

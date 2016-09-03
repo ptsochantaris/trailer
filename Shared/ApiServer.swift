@@ -118,6 +118,7 @@ final class ApiServer: NSManagedObject {
 	class func allApiServers(in moc: NSManagedObjectContext) -> [ApiServer] {
 		let f = NSFetchRequest<ApiServer>(entityName: "ApiServer")
 		f.returnsObjectsAsFaults = false
+		f.includesSubentities = false
 		f.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: true)]
 		return try! moc.fetch(f)
 	}
@@ -133,6 +134,7 @@ final class ApiServer: NSManagedObject {
 
 	class func countApiServers(in moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest<ApiServer>(entityName: "ApiServer")
+		f.includesSubentities = false
 		return try! moc.count(for: f)
 	}
 
@@ -144,9 +146,9 @@ final class ApiServer: NSManagedObject {
 				switch dataItem.postSyncAction {
 				case PostSyncAction.delete.rawValue:
 					dataItem.postSyncAction = PostSyncAction.doNothing.rawValue
-				case PostSyncAction.noteNew.rawValue:
+				case PostSyncAction.isNew.rawValue:
 					moc.delete(dataItem)
-				case PostSyncAction.noteUpdated.rawValue:
+				case PostSyncAction.isUpdated.rawValue:
 					moc.refresh(dataItem, mergeChanges: false)
 				default: break
 				}

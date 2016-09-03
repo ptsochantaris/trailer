@@ -287,75 +287,44 @@ class ListableItem: DataItem {
 		else if assignedToParticipated || commentedByMe				{ targetSection = .participated }
 		else														{ targetSection = .all }
 
-		var outsideMySectionsButAwake = (targetSection == .all || targetSection == .none)
+		/////////// Pick out any items that need to move to "mentioned"
 
-		if outsideMySectionsButAwake && Int64(Settings.newMentionMovePolicy) > Section.none.rawValue
-			&& contains(terms: ["@\(S(apiServer.userName))"]) {
+		if targetSection == .all || targetSection == .none {
 
-			targetSection = Section(Settings.newMentionMovePolicy)!
-			outsideMySectionsButAwake = false
-		}
+			if Int64(Settings.newMentionMovePolicy) > Section.none.rawValue && contains(terms: ["@\(S(apiServer.userName))"]) {
+				targetSection = Section(Settings.newMentionMovePolicy)!
 
-		if outsideMySectionsButAwake && Int64(Settings.teamMentionMovePolicy) > Section.none.rawValue
-			&& contains(terms: apiServer.teams.flatMap { $0.calculatedReferral }) {
+			} else if Int64(Settings.teamMentionMovePolicy) > Section.none.rawValue && contains(terms: apiServer.teams.flatMap { $0.calculatedReferral }) {
+				targetSection = Section(Settings.teamMentionMovePolicy)!
 
-			targetSection = Section(Settings.teamMentionMovePolicy)!
-			outsideMySectionsButAwake = false
-		}
-
-		if outsideMySectionsButAwake && Int64(Settings.newItemInOwnedRepoMovePolicy) > Section.none.rawValue && repo.isMine {
-			targetSection = Section(Settings.newItemInOwnedRepoMovePolicy)!
-			outsideMySectionsButAwake = false
-		}
-
-		////////// Apply viewing policies
-
-		let policy = self is Issue ? repo.displayPolicyForIssues : repo.displayPolicyForPrs
-		if let displayPolicy = RepoDisplayPolicy(policy) {
-			switch displayPolicy {
-			case .hide:
-				targetSection = .none
-			case .mine:
-				if targetSection == .all || targetSection == .participated || targetSection == .mentioned {
-					targetSection = .none
-				}
-			case .mineAndPaticipated:
-				if targetSection == .all {
-					targetSection = .none
-				}
-			case .all:
-				break
+			} else if Int64(Settings.newItemInOwnedRepoMovePolicy) > Section.none.rawValue && repo.isMine {
+				targetSection = Section(Settings.newItemInOwnedRepoMovePolicy)!
 			}
 		}
 
-		if let hidePolicy = RepoHidingPolicy(repo.itemHidingPolicy) {
-			switch hidePolicy {
-			case .noHiding:
-				break
-			case .hideMyAuthoredPrs:
-				if isMine && self is PullRequest {
-					targetSection = .none
-				}
-			case .hideMyAuthoredIssues:
-				if isMine && self is Issue {
-					targetSection = .none
-				}
-			case .hideAllMyAuthoredItems:
-				if isMine {
-					targetSection = .none
-				}
-			case .hideOthersPrs:
-				if !isMine && self is PullRequest {
-					targetSection = .none
-				}
-			case .hideOthersIssues:
-				if !isMine && self is Issue {
-					targetSection = .none
-				}
-			case .hideAllOthersItems:
-				if !isMine {
-					targetSection = .none
-				}
+		////////// Apply visibility policies
+
+		if targetSection != .none {
+			switch self is Issue ? repo.displayPolicyForIssues : repo.displayPolicyForPrs {
+			case RepoDisplayPolicy.hide.rawValue,
+				 RepoDisplayPolicy.mine.rawValue where targetSection == .all || targetSection == .participated || targetSection == .mentioned,
+				 RepoDisplayPolicy.mineAndPaticipated.rawValue where targetSection == .all:
+				targetSection = .none
+			default: break
+			}
+		}
+
+		if targetSection != .none {
+			switch repo.itemHidingPolicy {
+			case RepoHidingPolicy.hideMyAuthoredPrs.rawValue		where isMine && self is PullRequest,
+				 RepoHidingPolicy.hideMyAuthoredIssues.rawValue		where isMine && self is Issue,
+				 RepoHidingPolicy.hideAllMyAuthoredItems.rawValue	where isMine,
+				 RepoHidingPolicy.hideOthersPrs.rawValue			where !isMine && self is PullRequest,
+				 RepoHidingPolicy.hideOthersIssues.rawValue			where !isMine && self is Issue,
+				 RepoHidingPolicy.hideAllOthersItems.rawValue		where !isMine:
+
+				targetSection = .none
+			default: break
 			}
 		}
 
@@ -379,6 +348,7 @@ class ListableItem: DataItem {
 			if Settings.assumeReadItemIfUserHasNewerComments {
 				let f = NSFetchRequest<PRComment>(entityName: "PRComment")
 				f.returnsObjectsAsFaults = false
+				f.includesSubentities = false
 				f.predicate = predicateForMyComments(since: latestDate)
 				for c in try! managedObjectContext?.fetch(f) ?? [] {
 					if let createdDate = c.createdAt, latestDate < createdDate {
@@ -389,6 +359,7 @@ class ListableItem: DataItem {
 			}
 
 			let f = NSFetchRequest<PRComment>(entityName: "PRComment")
+			f.includesSubentities = false
 			f.predicate = predicateForOthersComments(since: latestDate)
 			unreadComments = Int64(try! managedObjectContext?.count(for: f) ?? 0)
 
@@ -406,6 +377,7 @@ class ListableItem: DataItem {
 		if unreadComments > 0 && Settings.openPrAtFirstUnreadComment {
 			let f = NSFetchRequest<PRComment>(entityName: "PRComment")
 			f.returnsObjectsAsFaults = false
+			f.includesSubentities = false
 			f.fetchLimit = 1
 			f.predicate = predicateForOthersComments(since: latestReadCommentDate ?? .distantPast)
 			f.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: true)]
@@ -691,6 +663,8 @@ class ListableItem: DataItem {
 
 		let f = NSFetchRequest<T>(entityName: String(describing: itemType))
 		f.fetchBatchSize = 100
+		f.returnsObjectsAsFaults = false
+		f.includesSubentities = false
 		let p = NSCompoundPredicate(andPredicateWithSubpredicates: andPredicates)
 		add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: DataManager.main)
 		f.sortDescriptors = sortDescriptors

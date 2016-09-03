@@ -30,6 +30,7 @@ final class PRLabel: DataItem {
 
 		let f = NSFetchRequest<PRLabel>(entityName: "PRLabel")
 		f.returnsObjectsAsFaults = false
+		f.includesSubentities = false
 		if fromParent is PullRequest {
 			f.predicate = NSPredicate(format:"name in %@ and pullRequest == %@", namesOfItems, fromParent)
 		} else {

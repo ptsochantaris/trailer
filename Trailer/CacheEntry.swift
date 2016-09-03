@@ -50,6 +50,7 @@ final class CacheEntry: NSManagedObject {
 		f.fetchLimit = 1
 		f.predicate = NSPredicate(format: "key == %@", key)
 		f.returnsObjectsAsFaults = false
+		f.includesSubentities = false
 		if let e = try! DataManager.main.fetch(f).first {
 			e.lastTouched = Date()
 			return e
@@ -61,6 +62,7 @@ final class CacheEntry: NSManagedObject {
 	class func cleanOldEntries(in moc: NSManagedObjectContext) {
 		let f = NSFetchRequest<CacheEntry>(entityName: "CacheEntry")
 		f.returnsObjectsAsFaults = true
+		f.includesSubentities = false
 		let date = Date(timeIntervalSinceNow: -3600.0*24.0*7.0) as CVarArg // week-old
 		f.predicate = NSPredicate(format: "lastTouched < %@", date)
 		for e in try! moc.fetch(f) {

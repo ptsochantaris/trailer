@@ -170,7 +170,7 @@ final class DataManager {
 						coveredPrs.insert(pr.objectID)
 						if let s = pr.displayedStatuses.first {
 							let displayText = s.descriptionText
-							if pr.lastStatusNotified != displayText && pr.postSyncAction != PostSyncAction.noteNew.rawValue {
+							if pr.lastStatusNotified != displayText && pr.postSyncAction != PostSyncAction.isNew.rawValue {
 								if pr.isSnoozing && pr.shouldWakeOnStatusChange {
 									DLog("Waking up snoozed PR ID %@ because of a status update", pr.serverId)
 									pr.wakeUp()

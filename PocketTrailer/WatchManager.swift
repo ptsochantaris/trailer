@@ -372,6 +372,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	private func countallItems<T: ListableItem>(of type: T.Type, criterion: GroupingCriterion?) -> Int {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
+		f.includesSubentities = false
 		let p = Settings.hideUncommentedItems ? NSPredicate(format: "sectionIndex > 0 and unreadComments > 0") : NSPredicate(format: "sectionIndex > 0")
 		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: DataManager.main)
 		return try! DataManager.main.count(for: f)
@@ -379,6 +380,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	private func countItems<T: ListableItem>(of type: T.Type, in section: Section, criterion: GroupingCriterion?) -> Int {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
+		f.includesSubentities = false
 		let p = Settings.hideUncommentedItems ? NSPredicate(format: "sectionIndex == %lld and unreadComments > 0", section.rawValue) : NSPredicate(format: "sectionIndex == %lld", section.rawValue)
 		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: DataManager.main)
 		return try! DataManager.main.count(for: f)
@@ -386,6 +388,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	private func badgeCount<T: ListableItem>(for type: T.Type, in section: Section, criterion: GroupingCriterion?) -> Int {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
+		f.includesSubentities = false
 		let p = NSPredicate(format: "sectionIndex == %lld and unreadComments > 0", section.rawValue)
 		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: DataManager.main)
 		return ListableItem.badgeCount(from: f, in: DataManager.main)
@@ -393,6 +396,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 	private func countOpenAndVisible<T: ListableItem>(of type: T.Type, criterion: GroupingCriterion?) -> Int {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
+		f.includesSubentities = false
 		let p = Settings.hideUncommentedItems ? NSPredicate(format: "sectionIndex > 0 and (condition == %lld or condition == nil) and unreadComments > 0", ItemCondition.open.rawValue) : NSPredicate(format: "sectionIndex > 0 and (condition == %lld or condition == nil)", ItemCondition.open.rawValue)
 		DataItem.add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: DataManager.main)
 		return try! DataManager.main.count(for: f)

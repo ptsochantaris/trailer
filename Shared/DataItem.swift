@@ -17,6 +17,7 @@ class DataItem: NSManagedObject {
 	final class func allItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext) -> [T] {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
 		f.returnsObjectsAsFaults = false
+		f.includesSubentities = false
 		return try! moc.fetch(f)
 	}
 
@@ -47,6 +48,7 @@ class DataItem: NSManagedObject {
 		let entityName = String(describing: type)
 		let f = NSFetchRequest<T>(entityName: entityName)
 		f.returnsObjectsAsFaults = false
+		f.includesSubentities = false
 		f.predicate = NSPredicate(format:"serverId in %@ and apiServer == %@", idsOfItems.map { NSNumber(value: $0) }, server)
 		let existingItems = try! server.managedObjectContext?.fetch(f) ?? []
 
@@ -57,7 +59,7 @@ class DataItem: NSManagedObject {
 				let updatedDate = parseGH8601(info["updated_at"] as? String) ?? Date()
 				if updatedDate != i.updatedAt {
 					DLog("Updating %@: %@", entityName, serverId)
-					i.postSyncAction = PostSyncAction.noteUpdated.rawValue
+					i.postSyncAction = PostSyncAction.isUpdated.rawValue
 					i.updatedAt = updatedDate
 					postProcessCallback(i, info, true)
 				} else {
@@ -73,7 +75,7 @@ class DataItem: NSManagedObject {
 				DLog("Creating %@: %@", entityName, serverId)
 				let i = NSEntityDescription.insertNewObject(forEntityName: entityName, into: server.managedObjectContext!) as! T
 				i.serverId = serverId
-				i.postSyncAction = PostSyncAction.noteNew.rawValue
+				i.postSyncAction = PostSyncAction.isNew.rawValue
 				i.apiServer = server
 
 				i.createdAt = parseGH8601(info["created_at"] as? String) ?? Date()
@@ -86,6 +88,7 @@ class DataItem: NSManagedObject {
 
 	final class func items<T: DataItem>(of type: T.Type, surviving: Bool, in moc: NSManagedObjectContext) -> [T] {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
+		f.includesSubentities = false
 		if surviving {
 			f.returnsObjectsAsFaults = false
 			f.predicate = NSPredicate(format: "postSyncAction != %lld", PostSyncAction.delete.rawValue)
@@ -99,21 +102,24 @@ class DataItem: NSManagedObject {
 	final class func newOrUpdatedItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext) -> [T] {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
 		f.returnsObjectsAsFaults = false
-		f.predicate = NSPredicate(format: "postSyncAction = %lld or postSyncAction = %lld", PostSyncAction.noteNew.rawValue, PostSyncAction.noteUpdated.rawValue)
+		f.includesSubentities = false
+		f.predicate = NSPredicate(format: "postSyncAction = %lld or postSyncAction = %lld", PostSyncAction.isNew.rawValue, PostSyncAction.isUpdated.rawValue)
 		return try! moc.fetch(f)
 	}
 
 	final class func updatedItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext) -> [T] {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
 		f.returnsObjectsAsFaults = false
-		f.predicate = NSPredicate(format: "postSyncAction = %lld", PostSyncAction.noteUpdated.rawValue)
+		f.includesSubentities = false
+		f.predicate = NSPredicate(format: "postSyncAction = %lld", PostSyncAction.isUpdated.rawValue)
 		return try! moc.fetch(f)
 	}
 
 	final class func newItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext) -> [T] {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
 		f.returnsObjectsAsFaults = false
-		f.predicate = NSPredicate(format: "postSyncAction = %lld", PostSyncAction.noteNew.rawValue)
+		f.includesSubentities = false
+		f.predicate = NSPredicate(format: "postSyncAction = %lld", PostSyncAction.isNew.rawValue)
 		return try! moc.fetch(f)
 	}
 
@@ -143,6 +149,7 @@ class DataItem: NSManagedObject {
 
 	final class func countItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
+		f.includesSubentities = false
 		return try! moc.count(for: f)
 	}
 

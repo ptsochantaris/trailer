@@ -67,6 +67,7 @@ final class Repo: DataItem {
 	class func repos(for group: String, in moc: NSManagedObjectContext) -> [Repo] {
 		let f = NSFetchRequest<Repo>(entityName: "Repo")
 		f.returnsObjectsAsFaults = false
+		f.includesSubentities = false
 		f.predicate = NSPredicate(format: "groupLabel == %@", group)
 		return try! moc.fetch(f)
 	}
@@ -79,6 +80,7 @@ final class Repo: DataItem {
 		}
 
 		let f = NSFetchRequest<Repo>(entityName: "Repo")
+		f.includesSubentities = false
 		f.fetchLimit = 1
 		let p = NSPredicate(format: "displayPolicyForPrs > 0 or displayPolicyForIssues > 0")
 		if let c = criterion {
@@ -141,6 +143,7 @@ final class Repo: DataItem {
 	class func syncableRepos(in moc: NSManagedObjectContext) -> [Repo] {
 		let f = NSFetchRequest<Repo>(entityName: "Repo")
 		f.returnsObjectsAsFaults = false
+		f.includesSubentities = false
 		f.predicate = NSPredicate(format: "dirty = YES and (displayPolicyForPrs > 0 or displayPolicyForIssues > 0) and inaccessible != YES")
 		return try! moc.fetch(f)
 	}
@@ -151,12 +154,14 @@ final class Repo: DataItem {
 		f.predicate = NSPredicate(format: "dirty != YES and lastDirtied < %@ and postSyncAction != %lld and (displayPolicyForPrs > 0 or displayPolicyForIssues > 0)", date, PostSyncAction.delete.rawValue)
 		f.includesPropertyValues = false
 		f.returnsObjectsAsFaults = false
+		f.includesSubentities = false
 		return try! moc.fetch(f)
 	}
 
 	class func unsyncableRepos(in moc: NSManagedObjectContext) -> [Repo] {
 		let f = NSFetchRequest<Repo>(entityName: "Repo")
 		f.returnsObjectsAsFaults = false
+		f.includesSubentities = false
 		f.predicate = NSPredicate(format: "(not (displayPolicyForPrs > 0 or displayPolicyForIssues > 0)) or inaccessible = YES")
 		return try! moc.fetch(f)
 	}
@@ -164,6 +169,7 @@ final class Repo: DataItem {
 	class func markDirtyReposWithIds(_ ids: NSSet, in moc: NSManagedObjectContext) {
 		let f = NSFetchRequest<Repo>(entityName: "Repo")
 		f.returnsObjectsAsFaults = false
+		f.includesSubentities = false
 		f.predicate = NSPredicate(format: "serverId IN %@", ids)
 		for repo in try! moc.fetch(f) {
 			repo.dirty = repo.shouldSync
@@ -173,6 +179,7 @@ final class Repo: DataItem {
 	class func reposFiltered(by filter: String?) -> [Repo] {
 		let f = NSFetchRequest<Repo>(entityName: "Repo")
 		f.returnsObjectsAsFaults = false
+		f.includesSubentities = false
 		if let filterText = filter, !filterText.isEmpty {
 			f.predicate = NSPredicate(format: "fullName contains [cd] %@", filterText)
 		}
@@ -185,7 +192,8 @@ final class Repo: DataItem {
 
 	class func countParentRepos(filter: String?) -> Int {
 		let f = NSFetchRequest<Repo>(entityName: "Repo")
-
+		f.includesSubentities = false
+		
 		if let fi = filter, !fi.isEmpty {
 			f.predicate = NSPredicate(format: "fork == NO and fullName contains [cd] %@", fi)
 		} else {

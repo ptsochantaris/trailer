@@ -133,6 +133,8 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 		if let text = searchBar.text, !text.isEmpty {
 			fetchRequest.predicate = NSPredicate(format: "fullName contains [cd] %@", text)
 		}
+		fetchRequest.returnsObjectsAsFaults = false
+		fetchRequest.includesSubentities = false
 		fetchRequest.fetchBatchSize = 20
 		fetchRequest.sortDescriptors = [NSSortDescriptor(key: "fork", ascending: true), NSSortDescriptor(key: "fullName", ascending: true)]
 

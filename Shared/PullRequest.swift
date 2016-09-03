@@ -47,6 +47,7 @@ final class PullRequest: ListableItem {
 	class func active(in moc: NSManagedObjectContext, visibleOnly: Bool) -> [PullRequest] {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
+		f.includesSubentities = false
 		if visibleOnly {
 			f.predicate = NSPredicate(format: "sectionIndex == %lld || sectionIndex == %lld || sectionIndex == %lld", Section.mine.rawValue, Section.participated.rawValue, Section.all.rawValue)
 		} else {
@@ -58,6 +59,7 @@ final class PullRequest: ListableItem {
 	class func allMerged(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, includeAllGroups: Bool = false) -> [PullRequest] {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
+		f.includesSubentities = false
 		let p = NSPredicate(format: "condition == %lld", ItemCondition.merged.rawValue)
 		add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc, includeAllGroups: includeAllGroups)
 		return try! moc.fetch(f)
@@ -66,6 +68,7 @@ final class PullRequest: ListableItem {
 	class func allClosed(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, includeAllGroups: Bool = false) -> [PullRequest] {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
+		f.includesSubentities = false
 		let p = NSPredicate(format: "condition == %lld", ItemCondition.closed.rawValue)
 		add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc, includeAllGroups: includeAllGroups)
 		return try! moc.fetch(f)
@@ -73,6 +76,7 @@ final class PullRequest: ListableItem {
 
 	class func countOpen(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
+		f.includesSubentities = false
 		let p = NSPredicate(format: "condition == %lld or condition == nil", ItemCondition.open.rawValue)
 		add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc)
 		return try! moc.count(for: f)
@@ -80,6 +84,8 @@ final class PullRequest: ListableItem {
 
 	class func markEverythingRead(in section: Section, in moc: NSManagedObjectContext) {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
+		f.returnsObjectsAsFaults = false
+		f.includesSubentities = false
 		if section != .none {
 			f.predicate = NSPredicate(format: "sectionIndex == %lld", section.rawValue)
 		}
@@ -90,12 +96,14 @@ final class PullRequest: ListableItem {
 
 	class func badgeCount(in section: Section, in moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
+		f.includesSubentities = false
 		f.predicate = NSPredicate(format: "sectionIndex == %lld and unreadComments > 0", section.rawValue)
 		return badgeCount(from: f, in: moc)
 	}
 
 	class func badgeCount(in moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
+		f.includesSubentities = false
 		f.predicate = NSPredicate(format: "sectionIndex > 0 and unreadComments > 0")
 		return badgeCount(from: f, in: moc)
 	}
@@ -207,6 +215,7 @@ final class PullRequest: ListableItem {
 	var displayedStatuses: [PRStatus] {
 		let f = NSFetchRequest<PRStatus>(entityName: "PRStatus")
 		f.returnsObjectsAsFaults = false
+		f.includesSubentities = false
 		let mode = Settings.statusFilteringMode
 		if mode==StatusFilter.all.rawValue {
 			f.predicate = NSPredicate(format: "pullRequest == %@", self)
