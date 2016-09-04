@@ -14,8 +14,9 @@ class DataItem: NSManagedObject {
 		apiServer.resetSyncState()
 	}
 
-	final class func allItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext) -> [T] {
+	final class func allItems<T: DataItem>(of type: T.Type, in moc: NSManagedObjectContext, prefetchRelationships: [String]? = nil) -> [T] {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
+		f.relationshipKeyPathsForPrefetching = prefetchRelationships
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false
 		return try! moc.fetch(f)
@@ -28,7 +29,7 @@ class DataItem: NSManagedObject {
 		return try! server.managedObjectContext!.fetch(f)
 	}
 
-	final class func items<T: DataItem>(with data: [[AnyHashable : Any]]?, type: T.Type, server: ApiServer, postProcessCallback: (T, [AnyHashable : Any], Bool) -> Void) {
+	final class func items<T: DataItem>(with data: [[AnyHashable : Any]]?, type: T.Type, server: ApiServer, prefetchRelationships: [String]? = nil, postProcessCallback: (T, [AnyHashable : Any], Bool) -> Void) {
 
 		guard let infos = data, infos.count > 0 else { return }
 
@@ -47,6 +48,7 @@ class DataItem: NSManagedObject {
 
 		let entityName = String(describing: type)
 		let f = NSFetchRequest<T>(entityName: entityName)
+		f.relationshipKeyPathsForPrefetching = prefetchRelationships
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false
 		f.predicate = NSPredicate(format:"serverId in %@ and apiServer == %@", idsOfItems.map { NSNumber(value: $0) }, server)
@@ -86,8 +88,9 @@ class DataItem: NSManagedObject {
 		}
 	}
 
-	final class func items<T: DataItem>(of type: T.Type, surviving: Bool, in moc: NSManagedObjectContext) -> [T] {
+	final class func items<T: DataItem>(of type: T.Type, surviving: Bool, in moc: NSManagedObjectContext, prefetchRelationships: [String]? = nil) -> [T] {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
+		f.relationshipKeyPathsForPrefetching = prefetchRelationships
 		f.includesSubentities = false
 		if surviving {
 			f.returnsObjectsAsFaults = false

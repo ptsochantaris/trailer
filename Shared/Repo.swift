@@ -142,6 +142,7 @@ final class Repo: DataItem {
 
 	class func syncableRepos(in moc: NSManagedObjectContext) -> [Repo] {
 		let f = NSFetchRequest<Repo>(entityName: "Repo")
+		f.relationshipKeyPathsForPrefetching = ["issues", "pullRequests"]
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false
 		f.predicate = NSPredicate(format: "dirty = YES and (displayPolicyForPrs > 0 or displayPolicyForIssues > 0) and inaccessible != YES")
@@ -160,6 +161,7 @@ final class Repo: DataItem {
 
 	class func unsyncableRepos(in moc: NSManagedObjectContext) -> [Repo] {
 		let f = NSFetchRequest<Repo>(entityName: "Repo")
+		f.relationshipKeyPathsForPrefetching = ["issues", "pullRequests"]
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false
 		f.predicate = NSPredicate(format: "(not (displayPolicyForPrs > 0 or displayPolicyForIssues > 0)) or inaccessible = YES")

@@ -249,10 +249,11 @@ final class DataManager {
 	}
 
 	class func postProcessAllItems() {
-		for p in DataItem.allItems(of: PullRequest.self, in: main) {
+
+		for p in DataItem.allItems(of: PullRequest.self, in: main, prefetchRelationships: ["comments"]) {
 			p.postProcess()
 		}
-		for i in DataItem.allItems(of: Issue.self, in: main) {
+		for i in DataItem.allItems(of: Issue.self, in: main, prefetchRelationships: ["comments"]) {
 			i.postProcess()
 		}
 	}

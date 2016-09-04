@@ -355,13 +355,13 @@ final class API {
 			CacheEntry.cleanOldEntries(in: moc)
 		}
 
-		for r in DataItem.items(of: PullRequest.self, surviving: true, in: moc) {
+		for r in DataItem.items(of: PullRequest.self, surviving: true, in: moc, prefetchRelationships: ["comments"]) {
 			mainQueue.addOperation {
 				r.postProcess()
 			}
 		}
 
-		for i in DataItem.items(of: Issue.self, surviving: true, in: moc) {
+		for i in DataItem.items(of: Issue.self, surviving: true, in: moc, prefetchRelationships: ["comments"]) {
 			mainQueue.addOperation {
 				i.postProcess()
 			}

@@ -10,7 +10,7 @@ final class Issue: ListableItem {
 
 	class func syncIssues(from data: [[AnyHashable : Any]]?, in repo: Repo) {
 		let filteredData = data?.filter { $0["pull_request"] == nil } // don't sync issues which are pull requests, they are already synced
-		items(with: filteredData, type: Issue.self, server: repo.apiServer) { item, info, isNewOrUpdated in
+		items(with: filteredData, type: Issue.self, server: repo.apiServer, prefetchRelationships: ["labels"]) { item, info, isNewOrUpdated in
 
 			if isNewOrUpdated {
 
