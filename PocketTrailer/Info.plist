@@ -54,7 +54,9 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>1378</string>
+	<string>1379</string>
+	<key>CoreSpotlightContinuation</key>
+	<true/>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
@@ -133,8 +135,6 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>CoreSpotlightContinuation</key>
-	<true/>
 	<key>UTExportedTypeDeclarations</key>
 	<array>
 		<dict>
