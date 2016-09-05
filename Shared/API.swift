@@ -352,6 +352,9 @@ final class API {
 
 		mainQueue.addOperation {
 			DataItem.nukeDeletedItems(in: moc)
+		}
+
+		mainQueue.addOperation {
 			CacheEntry.cleanOldEntries(in: moc)
 		}
 

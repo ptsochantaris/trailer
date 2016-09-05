@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11185.3" systemVersion="15G31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" colorMatched="YES" initialViewController="M4Y-Lb-cyx">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11198.2" systemVersion="15G1004" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" colorMatched="YES" initialViewController="M4Y-Lb-cyx">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11151.4"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11161"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -16,7 +16,7 @@
                         <viewControllerLayoutGuide type="bottom" id="FKl-LY-JtV"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" verticalHuggingPriority="251" simulatedAppContext="notificationCenter" id="S3S-Oj-5AN">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="95"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="110"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="dX5-UL-dra">
@@ -73,7 +73,7 @@
                         <constraints>
                             <constraint firstItem="Yh8-Pg-XrK" firstAttribute="width" secondItem="LSV-z6-vQv" secondAttribute="width" id="1uX-4t-yh3"/>
                             <constraint firstItem="Yh8-Pg-XrK" firstAttribute="top" secondItem="LSV-z6-vQv" secondAttribute="bottom" constant="7" id="2cn-xu-RoM"/>
-                            <constraint firstItem="quz-Tb-Fw0" firstAttribute="top" secondItem="Ft6-oW-KC0" secondAttribute="bottom" constant="10" id="AQO-Kn-cf8"/>
+                            <constraint firstItem="quz-Tb-Fw0" firstAttribute="top" secondItem="Ft6-oW-KC0" secondAttribute="bottom" constant="18" id="AQO-Kn-cf8"/>
                             <constraint firstItem="oQw-hA-EBD" firstAttribute="leading" secondItem="S3S-Oj-5AN" secondAttribute="leadingMargin" id="DtG-HF-I5p"/>
                             <constraint firstItem="quz-Tb-Fw0" firstAttribute="leading" secondItem="oQw-hA-EBD" secondAttribute="trailing" constant="5" id="J6F-3W-GKR"/>
                             <constraint firstItem="LSV-z6-vQv" firstAttribute="width" secondItem="quz-Tb-Fw0" secondAttribute="width" id="KpW-De-G8i"/>
@@ -91,7 +91,7 @@
                     <nil key="simulatedTopBarMetrics"/>
                     <nil key="simulatedBottomBarMetrics"/>
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
-                    <size key="freeformSize" width="375" height="95"/>
+                    <size key="freeformSize" width="375" height="110"/>
                     <connections>
                         <outlet property="issueImage" destination="dX5-UL-dra" id="V7N-R4-BDr"/>
                         <outlet property="issuesLabel" destination="LSV-z6-vQv" id="T9t-kT-XQf"/>

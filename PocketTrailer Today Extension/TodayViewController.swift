@@ -79,11 +79,8 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 		extensionContext?.open(URL(string: "pockettrailer://")!, completionHandler: nil)
 	}
 
-	override func viewDidLayoutSubviews() {
-		linkButton.frame = prLabel.frame.union(updatedLabel.frame)
-		let H = linkButton.frame.origin.y + linkButton.frame.size.height
-		preferredContentSize = CGSize(width: view.frame.size.width, height: H + 10)
-		super.viewDidLayoutSubviews()
+	func widgetActiveDisplayModeDidChange(_ activeDisplayMode: NCWidgetDisplayMode, withMaximumSize maxSize: CGSize) {
+		update()
 	}
 
 	private func update() {
@@ -135,14 +132,18 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 				let totalCount = totalMerged+totalMine+totalParticipated+totalClosed+totalMentioned+totalSnoozed+totalOther
 				let a = NSMutableAttributedString(string: "\(totalCount): ", attributes: titleAttributes)
 				if totalCount > 0 {
-					append(a, count: totalMine, section: .mine)
-					append(a, count: totalParticipated, section: .participated)
-					append(a, count: totalMentioned, section: .mentioned)
-					append(a, count: totalMerged, section: .merged)
-					append(a, count: totalClosed, section: .closed)
-					append(a, count: totalOther, section: .all)
-					append(a, count: totalSnoozed, section: .snoozed)
-					appendCommentCount(a, number: totalUnread)
+					if extensionContext?.widgetActiveDisplayMode == .compact {
+						appendCommentCount(a, number: totalUnread)
+					} else {
+						append(a, count: totalMine, section: .mine)
+						append(a, count: totalParticipated, section: .participated)
+						append(a, count: totalMentioned, section: .mentioned)
+						append(a, count: totalMerged, section: .merged)
+						append(a, count: totalClosed, section: .closed)
+						append(a, count: totalOther, section: .all)
+						append(a, count: totalSnoozed, section: .snoozed)
+						appendCommentCount(a, number: totalUnread)
+					}
 				} else {
 					a.append(NSAttributedString(string: result["error"] as! String, attributes: [NSParagraphStyleAttributeName: paragraph]))
 				}
@@ -164,6 +165,12 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 			issuesLabel.attributedText = NSAttributedString(string: "--", attributes: dimAttributes)
 			updatedLabel.attributedText = NSAttributedString(string: "Not updated yet", attributes: smallAttributes)
 		}
+	}
+
+	override func viewDidLayoutSubviews() {
+		linkButton.frame = prLabel.frame.union(updatedLabel.frame)
+		let H = linkButton.frame.origin.y + linkButton.frame.size.height
+		preferredContentSize = CGSize(width: view.frame.size.width, height: H + 23)
 	}
 
 	func widgetPerformUpdate(completionHandler: ((NCUpdateResult) -> Void)) {
