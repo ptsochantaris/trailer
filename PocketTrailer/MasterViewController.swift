@@ -1194,16 +1194,22 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	private func safeScrollToTop() {
 		tableView.contentOffset = tableView.contentOffset // halt any inertial scrolling
 		atNextEvent(self) { S in
-			let t = S.tableView
-			if let n = t?.numberOfSections, n > 0 {
-				t?.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+			if S.tableView.numberOfSections > 0 {
+				S.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+				if !(S.searchBar.text?.isEmpty ?? true) {
+					atNextEvent {
+						S.tableView.contentOffset = CGPoint(x: 0, y: -S.tableView.contentInset.top)
+					}
+				}
 			}
 		}
 	}
 
-	func focusFilter() {
+	func focusFilter(terms: String?) {
 		tableView.contentOffset = CGPoint(x: 0, y: -tableView.contentInset.top)
 		searchBar.becomeFirstResponder()
+		searchBar.text = terms
+		searchTimer.push()
 	}
 
 	func resetView() {

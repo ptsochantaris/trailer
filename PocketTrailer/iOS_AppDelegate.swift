@@ -84,7 +84,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 
 		case "search-items":
 			let m = popupManager.masterController
-			m.focusFilter()
+			m.focusFilter(terms: nil)
 			completionHandler(true)
 
 		case "mark-all-read":

@@ -1,6 +1,7 @@
 
 import UIKit
 import UserNotifications
+import CoreSpotlight
 
 final class NotificationManager {
 
@@ -13,9 +14,15 @@ final class NotificationManager {
 
 	class func handleUserActivity(activity: NSUserActivity) -> Bool {
 
-		if let info = activity.userInfo, let uid = info["kCSSearchableItemActivityIdentifier"] as? String {
-			popupManager.masterController.openItemWithUriPath(uriPath: uid)
-			return true
+		if let info = activity.userInfo {
+			if activity.activityType == CSSearchableItemActionType, let uid = info[CSSearchableItemActivityIdentifier] as? String {
+				popupManager.masterController.openItemWithUriPath(uriPath: uid)
+				return true
+
+			} else if activity.activityType == CSQueryContinuationActionType, let searchString = info[CSSearchQueryString] as? String {
+				popupManager.masterController.focusFilter(terms: searchString)
+				return true
+			}
 		}
 		return false
 	}
