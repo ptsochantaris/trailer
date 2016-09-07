@@ -962,17 +962,31 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			"T": 17, "U": 32, "V": 9, "W": 13, "X": 7, "Y": 16, "Z": 6 ]
 
 		if check == 4, let n = keyMap[Settings.hotkeyLetter], incomingEvent.keyCode == UInt16(n) {
-			if Repo.interestedInPrs() {
-				show(menu: menuBarSets.first!.prMenu)
-			} else if Repo.interestedInIssues() {
-				show(menu: menuBarSets.first!.issuesMenu)
-			}
+			handleOpeningHotkey(from: incomingEvent)
 			return true
 		}
 
 		return false
 	}
-	
+
+	private func handleOpeningHotkey(from incomingEvent: NSEvent) {
+
+		if let w = incomingEvent.window as? MenuWindow {
+			w.closeMenu()
+		} else {
+			for s in menuBarSets.reversed() {
+				if s.prMenu.statusItem != nil {
+					show(menu: s.prMenu)
+					break
+				}
+				if s.issuesMenu.statusItem != nil {
+					show(menu: s.issuesMenu)
+					break
+				}
+			}
+		}
+	}
+
 	////////////// scrollbars
 	
 	func updateScrollBarWidth() {
