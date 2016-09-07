@@ -25,7 +25,7 @@ final class PopTimer {
 		_popTimer = nil
 	}
 
-	init(timeInterval: TimeInterval, callback: Completion) {
+	init(timeInterval: TimeInterval, callback: @escaping Completion) {
 		_timeInterval = timeInterval
 		_callback = callback
 	}

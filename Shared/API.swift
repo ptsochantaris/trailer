@@ -20,7 +20,7 @@ final class API {
 		init(call path: String,
 		     on server: ApiServer,
 		     ignoreLastSync: Bool,
-		     completion: ApiCompletion) {
+		     completion: @escaping ApiCompletion) {
 
 			self.server = server
 			self.path = path
@@ -285,7 +285,7 @@ final class API {
 
 	////////////////////////////////////// API interface
 
-	class func syncItemsForActiveReposAndCallback(callback: Completion) {
+	class func syncItemsForActiveReposAndCallback(callback: @escaping Completion) {
 		let syncContext = DataManager.buildChildContext()
 
 		let shouldRefreshReposToo = lastRepoCheck == .distantPast
@@ -304,7 +304,7 @@ final class API {
 		}
 	}
 
-	private class func sync(to moc: NSManagedObjectContext, callback: Completion) {
+	private class func sync(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		markDirtyRepos(in: moc) {
 
@@ -336,7 +336,7 @@ final class API {
 		}
 	}
 
-	private class func completeSync(in moc: NSManagedObjectContext, andCallback: Completion) {
+	private class func completeSync(in moc: NSManagedObjectContext, andCallback: @escaping Completion) {
 
 		DLog("Wrapping up sync")
 
@@ -390,7 +390,7 @@ final class API {
 		refreshesSinceLastStatusCheck.removeAll()
 	}
 
-	private class func updatePullRequests(in moc: NSManagedObjectContext, callback: Completion) {
+	private class func updatePullRequests(in moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		let willScanForStatuses = shouldScanForStatuses(in: moc)
 		let willScanForLabels = shouldScanForLabels(in: moc)
@@ -418,7 +418,7 @@ final class API {
 		detectAssignedPullRequests(in: moc, callback: completionCallback)
 	}
 
-	private class func markDirtyRepos(in moc: NSManagedObjectContext, callback: Completion) {
+	private class func markDirtyRepos(in moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		let allApiServers = ApiServer.allApiServers(in: moc)
 		let totalOperations = 2*allApiServers.count
@@ -462,7 +462,7 @@ final class API {
 		}
 	}
 
-	private class func fetchUserTeams(from server: ApiServer, callback: Completion) {
+	private class func fetchUserTeams(from server: ApiServer, callback: @escaping Completion) {
 
 		for t in server.teams {
 			t.postSyncAction = PostSyncAction.delete.rawValue
@@ -479,7 +479,7 @@ final class API {
 		}
 	}
 
-	private class func markDirty(repoIds toMarkDirty: NSMutableSet, usingUserEventsFrom server: ApiServer, callback: Completion) {
+	private class func markDirty(repoIds toMarkDirty: NSMutableSet, usingUserEventsFrom server: ApiServer, callback: @escaping Completion) {
 
 		if !server.lastSyncSucceeded {
 			callback()
@@ -524,7 +524,7 @@ final class API {
 		}
 	}
 
-	private class func markDirty(repoIds toMarkDirty: NSMutableSet, usingReceivedEventsFrom server: ApiServer, callback: Completion) {
+	private class func markDirty(repoIds toMarkDirty: NSMutableSet, usingReceivedEventsFrom server: ApiServer, callback: @escaping Completion) {
 
 		if !server.lastSyncSucceeded {
 			callback()
@@ -569,7 +569,7 @@ final class API {
 		}
 	}
 
-	class func fetchRepositories(to moc: NSManagedObjectContext, callback: Completion) {
+	class func fetchRepositories(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		ApiServer.resetSyncSuccess(in: moc)
 		clearAllBadLinks() // otherwise inaccessible repos may get a cached error response, even if they have become available
@@ -610,7 +610,7 @@ final class API {
 		}
 	}
 
-	private class func fetchPullRequests(for repos: [Repo], to moc: NSManagedObjectContext, callback: Completion) {
+	private class func fetchPullRequests(for repos: [Repo], to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		for r in Repo.unsyncableRepos(in: moc) {
 			for p in r.pullRequests {
@@ -675,7 +675,7 @@ final class API {
 		}
 	}
 
-	private class func fetchIssues(for repos: [Repo], to moc: NSManagedObjectContext, callback: Completion) {
+	private class func fetchIssues(for repos: [Repo], to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		for r in Repo.unsyncableRepos(in: moc) {
 			for i in r.issues {
@@ -723,7 +723,7 @@ final class API {
 		}
 	}
 
-	private class func fetchCommentsForCurrentPullRequests(to moc: NSManagedObjectContext, callback: Completion) {
+	private class func fetchCommentsForCurrentPullRequests(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		let prs = DataItem.newOrUpdatedItems(of: PullRequest.self, in: moc).filter { $0.apiServer.lastSyncSucceeded }
 		if prs.count == 0 {
@@ -745,7 +745,7 @@ final class API {
 			if completionCount == totalOperations { callback() }
 		}
 
-		func _fetchComments(for pullRequests: [PullRequest], issues: Bool, in moc: NSManagedObjectContext, callback: Completion) {
+		func _fetchComments(for pullRequests: [PullRequest], issues: Bool, in moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 			let totalOperations = pullRequests.count
 			if totalOperations == 0 {
@@ -785,7 +785,7 @@ final class API {
 		_fetchComments(for: prs, issues: false, in: moc, callback: completionCallback)
 	}
 
-	private class func fetchCommentsForCurrentIssues(to moc: NSManagedObjectContext, callback: Completion) {
+	private class func fetchCommentsForCurrentIssues(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		let allIssues = DataItem.newOrUpdatedItems(of: Issue.self, in: moc)
 
@@ -832,7 +832,7 @@ final class API {
 		}
 	}
 
-	private class func fetchLabelsForForCurrentPullRequests(to moc: NSManagedObjectContext, callback: Completion) {
+	private class func fetchLabelsForForCurrentPullRequests(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		let prs = PullRequest.active(in: moc, visibleOnly: true).filter { pr in
 			if !pr.apiServer.lastSyncSucceeded {
@@ -901,7 +901,7 @@ final class API {
 		}
 	}
 
-	private class func fetchStatusesForCurrentPullRequests(to moc: NSManagedObjectContext, callback: Completion) {
+	private class func fetchStatusesForCurrentPullRequests(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		let prs = PullRequest.active(in: moc, visibleOnly: !Settings.hidePrsThatArentPassing).filter { pr in
 			if !pr.apiServer.lastSyncSucceeded {
@@ -966,7 +966,7 @@ final class API {
 		}
 	}
 
-	private class func checkPrClosures(in moc: NSManagedObjectContext, callback: Completion) {
+	private class func checkPrClosures(in moc: NSManagedObjectContext, callback: @escaping Completion) {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.predicate = NSPredicate(format: "postSyncAction == %lld and condition == %lld", PostSyncAction.delete.rawValue, ItemCondition.open.rawValue)
 		f.returnsObjectsAsFaults = false
@@ -1004,7 +1004,7 @@ final class API {
 		}
 	}
 
-	private class func detectAssignedPullRequests(in moc: NSManagedObjectContext, callback: Completion) {
+	private class func detectAssignedPullRequests(in moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		let prs = DataItem.newOrUpdatedItems(of: PullRequest.self, in: moc).filter { $0.apiServer.lastSyncSucceeded }
 
@@ -1040,7 +1040,7 @@ final class API {
 		}
 	}
 
-	private class func ensureApiServersHaveUserIds(in moc: NSManagedObjectContext, callback: Completion) {
+	private class func ensureApiServersHaveUserIds(in moc: NSManagedObjectContext, callback: @escaping Completion) {
 		var needToCheck = false
 		for apiServer in ApiServer.allApiServers(in: moc) {
 			if apiServer.userId == 0 || (apiServer.userName?.isEmpty ?? true) {
@@ -1057,7 +1057,7 @@ final class API {
 		}
 	}
 
-	private class func investigatePrClosure(for pullRequest: PullRequest, callback: Completion) {
+	private class func investigatePrClosure(for pullRequest: PullRequest, callback: @escaping Completion) {
 		DLog("Checking closed PR to see if it was merged: %@", pullRequest.title)
 
 		let repoFullName = S(pullRequest.repo.fullName)
@@ -1184,7 +1184,7 @@ final class API {
 		}
 	}
 
-	private class func syncWatchedRepos(from server: ApiServer, callback: Completion) {
+	private class func syncWatchedRepos(from server: ApiServer, callback: @escaping Completion) {
 
 		if !server.lastSyncSucceeded {
 			callback()
@@ -1202,7 +1202,7 @@ final class API {
 		}
 	}
 
-	private class func syncUserDetails(in moc: NSManagedObjectContext, callback: Completion) {
+	private class func syncUserDetails(in moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		let allApiServers = ApiServer.allApiServers(in: moc)
 		let totalOperations = allApiServers.count
@@ -1346,7 +1346,7 @@ final class API {
 		call path: String,
 		on server: ApiServer,
 		ignoreLastSync: Bool,
-		completion: ApiCompletion) {
+		completion: @escaping ApiCompletion) {
 
 		let apiServerLabel: String
 		if server.lastSyncSucceeded || ignoreLastSync {

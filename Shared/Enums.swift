@@ -44,7 +44,7 @@ let shortDateFormatter = { () -> DateFormatter in
 
 ////
 
-func atNextEvent(_ completion: Completion) {
+func atNextEvent(_ completion: @escaping Completion) {
 	OperationQueue.main.addOperation(completion)
 }
 
@@ -64,7 +64,7 @@ func atNextEvent<T: AnyObject>(_ owner: T, completion: @escaping (T)->Void) {
 
 ////
 
-func delay(_ delay: TimeInterval, closure: Completion) {
+func delay(_ delay: TimeInterval, closure: @escaping Completion) {
 	let time = DispatchTime.now() + Double(Int64(delay * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)
 	DispatchQueue.main.asyncAfter(deadline: time, execute: closure)
 }

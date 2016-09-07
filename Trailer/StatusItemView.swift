@@ -25,7 +25,7 @@ final class StatusItemView: NSView {
 		}
 	}
 
-	init(callback: Completion) {
+	init(callback: @escaping Completion) {
 		tappedCallback = callback
 		super.init(frame: NSZeroRect)
 	}

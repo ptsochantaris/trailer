@@ -173,7 +173,7 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 		preferredContentSize = CGSize(width: view.frame.size.width, height: H + 23)
 	}
 
-	func widgetPerformUpdate(completionHandler: ((NCUpdateResult) -> Void)) {
+	func widgetPerformUpdate(completionHandler: @escaping (NCUpdateResult) -> Void) {
 		update()
 		completionHandler(.newData)
 	}
