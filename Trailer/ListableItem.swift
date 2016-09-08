@@ -4,68 +4,98 @@ import CoreData
 	import UIKit
 	import CoreSpotlight
 	import MobileCoreServices
+	import UserNotifications
 #endif
 
 class ListableItem: DataItem {
 
-	@NSManaged var assignedToMe: NSNumber?
-	@NSManaged var assigneeName: String?
+	@NSManaged var assignedToMe: Bool
+	@NSManaged var assigneeName: String? // note: This now could be a list of names, delimited with a ","
 	@NSManaged var body: String?
 	@NSManaged var webUrl: String?
-	@NSManaged var condition: NSNumber?
-	@NSManaged var isNewAssignment: NSNumber?
+	@NSManaged var condition: Int64
+	@NSManaged var isNewAssignment: Bool
 	@NSManaged var repo: Repo
 	@NSManaged var title: String?
-	@NSManaged var totalComments: NSNumber?
-	@NSManaged var unreadComments: NSNumber?
+	@NSManaged var totalComments: Int64
+	@NSManaged var unreadComments: Int64
 	@NSManaged var url: String?
 	@NSManaged var userAvatarUrl: String?
-	@NSManaged var userId: NSNumber?
+	@NSManaged var userId: Int64
 	@NSManaged var userLogin: String?
-	@NSManaged var sectionIndex: NSNumber?
-	@NSManaged var latestReadCommentDate: NSDate?
+	@NSManaged var sectionIndex: Int64
+	@NSManaged var latestReadCommentDate: Date?
 	@NSManaged var state: String?
-	@NSManaged var reopened: NSNumber?
-	@NSManaged var number: NSNumber?
-	@NSManaged var announced: NSNumber?
-	@NSManaged var muted: NSNumber?
-	@NSManaged var snoozeUntil: NSDate?
+	@NSManaged var reopened: Bool
+	@NSManaged var number: Int64
+	@NSManaged var announced: Bool
+	@NSManaged var muted: Bool
 	@NSManaged var wasAwokenFromSnooze: Bool
 	@NSManaged var milestone: String?
+
+	@NSManaged var snoozeUntil: Date?
+	@NSManaged var snoozingPreset: SnoozePreset?
 
 	@NSManaged var comments: Set<PRComment>
 	@NSManaged var labels: Set<PRLabel>
 
-	final func baseSyncFromInfo(info: [NSObject: AnyObject], inRepo: Repo) {
+	final func baseSync(from info: [AnyHashable : Any], in repo: Repo) {
 
-		repo = inRepo
+		self.repo = repo
 
 		url = info["url"] as? String
 		webUrl = info["html_url"] as? String
-		number = info["number"] as? NSNumber
+		number = (info["number"] as? NSNumber)?.int64Value ?? 0
 		state = info["state"] as? String
 		title = info["title"] as? String
 		body = info["body"] as? String
-		milestone = info["milestone"]?["title"] as? String
+		milestone = (info["milestone"] as? [AnyHashable : Any])?["title"] as? String
 
-		if let userInfo = info["user"] as? [NSObject: AnyObject] {
-			userId = userInfo["id"] as? NSNumber
+		if let userInfo = info["user"] as? [AnyHashable : Any] {
+			userId = (userInfo["id"] as? NSNumber)?.int64Value ?? 0
 			userLogin = userInfo["login"] as? String
 			userAvatarUrl = userInfo["avatar_url"] as? String
 		}
 
-		if let assignee = info["assignee"] as? [NSObject: AnyObject], name = assignee["login"] as? String, id = assignee["id"] as? NSNumber {
-			let currentlyAssigned = (id == inRepo.apiServer.userId)
-			let previouslyAssigned = assignedToMe?.boolValue ?? false
-			isNewAssignment = currentlyAssigned && !previouslyAssigned && !createdByMe
-			assignedToMe = currentlyAssigned
-			assigneeName = name
-		} else {
-			isNewAssignment = false
-			assignedToMe = false
-			assigneeName = nil
+		processAssignmentStatus(from: info)
+	}
+
+	final func processAssignmentStatus(from info: [AnyHashable : Any]?) {
+
+		let myIdOnThisRepo = repo.apiServer.userId
+		var assigneeNames = [String]()
+
+		func checkAndStoreAssigneeName(from assignee: [AnyHashable : Any]) -> Bool {
+
+			if let name = assignee["login"] as? String, let assigneeId = assignee["id"] as? NSNumber {
+				let shouldBeAssignedToMe = assigneeId.int64Value == myIdOnThisRepo
+				assigneeNames.append(name)
+				return shouldBeAssignedToMe
+			} else {
+				return false
+			}
 		}
 
+		var foundAssignmentToMe = false
+
+		if let assignees = info?["assignees"] as? [[AnyHashable : Any]], assignees.count > 0 {
+			for assignee in assignees {
+				if checkAndStoreAssigneeName(from: assignee) {
+					foundAssignmentToMe = true
+				}
+			}
+		} else if let assignee = info?["assignee"] as? [AnyHashable : Any] {
+			foundAssignmentToMe = checkAndStoreAssigneeName(from: assignee)
+		}
+
+		isNewAssignment = foundAssignmentToMe && !assignedToMe && !createdByMe
+		assignedToMe = foundAssignmentToMe
+
+		if assigneeNames.count > 0 {
+			assigneeName = assigneeNames.joined(separator: ",")
+		} else {
+			assigneeName = nil
+		}
 	}
 
 	final override func resetSyncState() {
@@ -74,27 +104,27 @@ class ListableItem: DataItem {
 	}
 
 	final override func prepareForDeletion() {
-		api.refreshesSinceLastLabelsCheck[objectID] = nil
-		api.refreshesSinceLastStatusCheck[objectID] = nil
+		API.refreshesSinceLastLabelsCheck[objectID] = nil
+		API.refreshesSinceLastStatusCheck[objectID] = nil
 		ensureInvisible()
 		super.prepareForDeletion()
 	}
 
 	final func ensureInvisible() {
 		#if os(iOS)
-			CSSearchableIndex.defaultSearchableIndex().deleteSearchableItemsWithIdentifiers([objectID.URIRepresentation().absoluteString], completionHandler: nil)
-		#endif
-		#if os(OSX)
-			if Settings.removeNotificationsWhenItemIsRemoved {
-				removeRelatedNotifications()
+			if CSSearchableIndex.isIndexingAvailable() {
+				CSSearchableIndex.default().deleteSearchableItems(withIdentifiers: [objectID.uriRepresentation().absoluteString], completionHandler: nil)
 			}
 		#endif
+		if Settings.removeNotificationsWhenItemIsRemoved {
+			ListableItem.removeRelatedNotifications(uri: objectID.uriRepresentation().absoluteString)
+		}
 	}
 
-	final func sortedComments(comparison: NSComparisonResult) -> [PRComment] {
-		return Array(comments).sort({ (c1, c2) -> Bool in
-			let d1 = c1.createdAt ?? never()
-			let d2 = c2.createdAt ?? never()
+	final func sortedComments(using comparison: ComparisonResult) -> [PRComment] {
+		return Array(comments).sorted(by: { (c1, c2) -> Bool in
+			let d1 = c1.createdAt ?? .distantPast
+			let d2 = c2.createdAt ?? .distantPast
 			return d1.compare(d2) == comparison
 		})
 	}
@@ -103,7 +133,7 @@ class ListableItem: DataItem {
 		for c in comments {
 			if let commentCreation = c.createdAt {
 				if let latestRead = latestReadCommentDate {
-					if latestRead.compare(commentCreation) == .OrderedAscending {
+					if latestRead < commentCreation {
 						latestReadCommentDate = commentCreation
 					}
 				} else {
@@ -118,40 +148,46 @@ class ListableItem: DataItem {
 		postProcess()
 	}
 
-	final func shouldKeepForPolicy(policy: Int) -> Bool {
-		let s = sectionIndex?.integerValue
-		return policy == HandlingPolicy.KeepAll.rawValue
-			|| (policy == HandlingPolicy.KeepMineAndParticipated.rawValue && (s == Section.Mine.rawValue || s == Section.Participated.rawValue))
-			|| (policy == HandlingPolicy.KeepMine.rawValue && s == Section.Mine.rawValue)
+	final func shouldKeep(accordingTo policy: Int) -> Bool {
+		let s = sectionIndex
+		return policy == HandlingPolicy.keepAll.rawValue
+			|| (policy == HandlingPolicy.keepMineAndParticipated.rawValue && (s == Section.mine.rawValue || s == Section.participated.rawValue))
+			|| (policy == HandlingPolicy.keepMine.rawValue && s == Section.mine.rawValue)
 	}
 
 	final var shouldSkipNotifications: Bool {
-		return isSnoozing || (muted?.boolValue ?? false)
+		return isSnoozing || muted
 	}
 
 	final var assignedToMySection: Bool {
-		return (assignedToMe?.boolValue ?? false) && Settings.assignedPrHandlingPolicy==AssignmentPolicy.MoveToMine.rawValue
+		return assignedToMe && Settings.assignedPrHandlingPolicy == AssignmentPolicy.moveToMine.rawValue
 	}
 
 	final var assignedToParticipated: Bool {
-		return (assignedToMe?.boolValue ?? false) && Settings.assignedPrHandlingPolicy==AssignmentPolicy.MoveToParticipated.rawValue
+		return assignedToMe && Settings.assignedPrHandlingPolicy == AssignmentPolicy.moveToParticipated.rawValue
 	}
 
 	final var createdByMe: Bool {
-		if let userId = userId, apiId = apiServer.userId {
-			return userId == apiId
+		return userId == apiServer.userId
+	}
+
+	final private func contains(terms: [String]) -> Bool {
+		if let b = body {
+			for t in terms {
+				if !t.isEmpty && b.localizedCaseInsensitiveContains(t) {
+					return true
+				}
+			}
+		}
+		for c in comments {
+			if c.contains(terms: terms) {
+				return true
+			}
 		}
 		return false
 	}
 
-	final var refersToMe: Bool {
-		if let apiName = apiServer.userName, b = body {
-			return b.localizedCaseInsensitiveContainsString("@\(apiName)")
-		}
-		return false
-	}
-
-	final var commentedByMe: Bool {
+	final private var commentedByMe: Bool {
 		for c in comments {
 			if c.isMine {
 				return true
@@ -160,23 +196,13 @@ class ListableItem: DataItem {
 		return false
 	}
 
-	final private var refersToMyTeams: Bool {
-		if let b = body {
-			for t in apiServer.teams {
-				if let r = t.calculatedReferral {
-					if b.localizedCaseInsensitiveContainsString(r) { return true }
-				}
-			}
-		}
-		return false
-	}
-
 	final var isVisibleOnMenu: Bool {
-		return self.sectionIndex?.integerValue != Section.None.rawValue
+		return sectionIndex != Section.none.rawValue
 	}
 
 	final func wakeUp() {
 		snoozeUntil = nil
+		snoozingPreset = nil
 		wasAwokenFromSnooze = true
 		postProcess()
 	}
@@ -185,24 +211,25 @@ class ListableItem: DataItem {
 		return snoozeUntil != nil
 	}
 
-	final func keepWithCondition(newCondition: ItemCondition, notification: NotificationType) {
-		if sectionIndex?.integerValue == Section.All.rawValue && !Settings.showCommentsEverywhere {
+	final func keep(as newCondition: ItemCondition, notification: NotificationType) {
+		if sectionIndex == Section.all.rawValue && !Settings.showCommentsEverywhere {
 			catchUpCommentDate()
 		}
-		postSyncAction = PostSyncAction.DoNothing.rawValue
+		postSyncAction = PostSyncAction.doNothing.rawValue
 		condition = newCondition.rawValue
 		if snoozeUntil != nil {
 			snoozeUntil = nil
+			snoozingPreset = nil
 		} else {
-			app.postNotificationOfType(notification, forItem: self)
+			NotificationQueue.add(type: notification, for: self)
 		}
 	}
 
-	private final func shouldMoveToSnoozing() -> Bool {
+	private final var shouldMoveToSnoozing: Bool {
 		if snoozeUntil == nil {
-			let d = NSTimeInterval(Settings.autoSnoozeDuration)
-			if d > 0 && !wasAwokenFromSnooze, let autoSnoozeDate = updatedAt?.dateByAddingTimeInterval(86400.0*d) {
-				if autoSnoozeDate.compare(NSDate()) == .OrderedAscending {
+			let d = TimeInterval(Settings.autoSnoozeDuration)
+			if d > 0 && !wasAwokenFromSnooze && updatedAt != .distantPast, let snoozeByDate = updatedAt?.addingTimeInterval(86400.0*d) {
+				if snoozeByDate < Date() {
 					snoozeUntil = autoSnoozeDate
 					return true
 				}
@@ -213,181 +240,149 @@ class ListableItem: DataItem {
 		}
 	}
 
+	final var shouldWakeOnComment: Bool {
+		return snoozingPreset?.wakeOnComment ?? true
+	}
+
+	final var shouldWakeOnMention: Bool {
+		return snoozingPreset?.wakeOnMention ?? true
+	}
+
+	final var shouldWakeOnStatusChange: Bool {
+		return snoozingPreset?.wakeOnStatusChange ?? true
+	}
+
 	final func wakeIfAutoSnoozed() {
-		if snoozeUntil == autoSnoozeDate && !wasAwokenFromSnooze {
+		if snoozeUntil == autoSnoozeDate {
 			snoozeUntil = nil
 			wasAwokenFromSnooze = false
+			snoozingPreset = nil
 		}
+	}
+
+	final func snooze(using preset: SnoozePreset) {
+		snoozeUntil = preset.wakeupDateFromNow
+		snoozingPreset = preset
+		wasAwokenFromSnooze = false
+		muted = false
+		postProcess()
 	}
 
 	final func postProcess() {
 
-		if let s = snoozeUntil where s.compare(NSDate()) == .OrderedAscending {
+		if let s = snoozeUntil, s < Date() {
 			snoozeUntil = nil
+			snoozingPreset = nil
 			wasAwokenFromSnooze = true
 		}
 
 		let isMine = createdByMe
 		var targetSection: Section
-		let currentCondition = condition?.integerValue ?? ItemCondition.Open.rawValue
+		let currentCondition = condition
 
-		if currentCondition == ItemCondition.Merged.rawValue		{ targetSection = .Merged }
-		else if currentCondition == ItemCondition.Closed.rawValue	{ targetSection = .Closed }
-		else if shouldMoveToSnoozing()								{ targetSection = .Snoozed }
-		else if isMine || assignedToMySection						{ targetSection = .Mine }
-		else if assignedToParticipated || commentedByMe				{ targetSection = .Participated }
-		else														{ targetSection = .All }
+		if currentCondition == ItemCondition.merged.rawValue		{ targetSection = .merged }
+		else if currentCondition == ItemCondition.closed.rawValue	{ targetSection = .closed }
+		else if shouldMoveToSnoozing								{ targetSection = .snoozed }
+		else if isMine || assignedToMySection						{ targetSection = .mine }
+		else if assignedToParticipated || commentedByMe				{ targetSection = .participated }
+		else														{ targetSection = .all }
 
-		let outsideMySectionsButAwake = (targetSection == .All || targetSection == .None)
-		var moveToMentioned = false
-		var autoMoveOnTeamMentions = false
-		var autoMoveOnCommentMentions = false
-		var doReferralCheckInComments = false
+		/////////// Pick out any items that need to move to "mentioned"
 
-		if outsideMySectionsButAwake && Settings.moveNewItemsInOwnReposToMentioned && repo.isMine {
-			moveToMentioned = true
-		}
+		if targetSection == .all || targetSection == .none {
 
-		if !moveToMentioned && outsideMySectionsButAwake && Settings.autoMoveOnTeamMentions {
-			if refersToMyTeams {
-				moveToMentioned = true
-			} else {
-				doReferralCheckInComments = true
-				autoMoveOnTeamMentions = true
+			if Int64(Settings.newMentionMovePolicy) > Section.none.rawValue && contains(terms: ["@\(S(apiServer.userName))"]) {
+				targetSection = Section(Settings.newMentionMovePolicy)!
+
+			} else if Int64(Settings.teamMentionMovePolicy) > Section.none.rawValue && contains(terms: apiServer.teams.flatMap { $0.calculatedReferral }) {
+				targetSection = Section(Settings.teamMentionMovePolicy)!
+
+			} else if Int64(Settings.newItemInOwnedRepoMovePolicy) > Section.none.rawValue && repo.isMine {
+				targetSection = Section(Settings.newItemInOwnedRepoMovePolicy)!
 			}
 		}
 
-		if !moveToMentioned && outsideMySectionsButAwake && Settings.autoMoveOnCommentMentions {
-			if refersToMe {
-				moveToMentioned = true
-			} else {
-				doReferralCheckInComments = true
-				autoMoveOnCommentMentions = true
+		////////// Apply visibility policies
+
+		if targetSection != .none {
+			switch self is Issue ? repo.displayPolicyForIssues : repo.displayPolicyForPrs {
+			case RepoDisplayPolicy.hide.rawValue,
+				 RepoDisplayPolicy.mine.rawValue where targetSection == .all || targetSection == .participated || targetSection == .mentioned,
+				 RepoDisplayPolicy.mineAndPaticipated.rawValue where targetSection == .all:
+				targetSection = .none
+			default: break
 			}
 		}
 
-		var latestDate = latestReadCommentDate ?? never()
-		let isMuted = muted?.boolValue ?? false
+		if targetSection != .none {
+			switch repo.itemHidingPolicy {
+			case RepoHidingPolicy.hideMyAuthoredPrs.rawValue		where isMine && self is PullRequest,
+				 RepoHidingPolicy.hideMyAuthoredIssues.rawValue		where isMine && self is Issue,
+				 RepoHidingPolicy.hideAllMyAuthoredItems.rawValue	where isMine,
+				 RepoHidingPolicy.hideOthersPrs.rawValue			where !isMine && self is PullRequest,
+				 RepoHidingPolicy.hideOthersIssues.rawValue			where !isMine && self is Issue,
+				 RepoHidingPolicy.hideAllOthersItems.rawValue		where !isMine:
 
-		if Settings.assumeReadItemIfUserHasNewerComments {
-			let f = NSFetchRequest(entityName: "PRComment")
-			f.returnsObjectsAsFaults = false
-			f.predicate = predicateForMyCommentsSinceDate(latestDate)
-			for c in try! managedObjectContext?.executeFetchRequest(f) as! [PRComment] {
-				if let createdDate = c.createdAt where createdDate.compare(latestDate) == .OrderedDescending {
-					latestDate = createdDate
-				}
-			}
-			latestReadCommentDate = latestDate
-		}
-
-		func unreadFromOtherCommentsSinceLatestDate() -> Int {
-			let f = NSFetchRequest(entityName: "PRComment")
-			f.predicate = predicateForOthersCommentsSinceDate(latestDate)
-			return managedObjectContext?.countForFetchRequest(f, error: nil) ?? 0
-		}
-
-		let dontCountComments = isMuted || ((targetSection == .All || targetSection == .Snoozed) && !Settings.showCommentsEverywhere)
-
-		if moveToMentioned {
-			targetSection = .Mentioned
-			unreadComments = dontCountComments ? 0 : unreadFromOtherCommentsSinceLatestDate()
-		} else if doReferralCheckInComments {
-			let f = NSFetchRequest(entityName: "PRComment")
-			f.returnsObjectsAsFaults = false
-			f.predicate = predicateForOthersCommentsSinceDate(nil)
-			var unreadCommentCount = 0
-			for c in try! managedObjectContext?.executeFetchRequest(f) as! [PRComment] {
-				if (autoMoveOnCommentMentions && c.refersToMe) || (autoMoveOnTeamMentions && c.refersToMyTeams) {
-					targetSection = .Mentioned
-				}
-				if !dontCountComments {
-					if c.createdAt?.compare(latestDate) == .OrderedDescending {
-						unreadCommentCount += 1
-					}
-				}
-			}
-			unreadComments = unreadCommentCount
-		} else {
-			unreadComments = dontCountComments ? 0 : unreadFromOtherCommentsSinceLatestDate()
-		}
-
-		totalComments = comments.count
-
-		let policy = (self is Issue ? repo.displayPolicyForIssues : repo.displayPolicyForPrs)?.integerValue ?? 0
-		if let displayPolicy = RepoDisplayPolicy(rawValue: policy) {
-			switch displayPolicy {
-			case .Hide:
-				targetSection = .None
-			case .Mine:
-				if targetSection == .All || targetSection == .Participated || targetSection == .Mentioned {
-					targetSection = .None
-				}
-			case .MineAndPaticipated:
-				if targetSection == .All {
-					targetSection = .None
-				}
-			case .All:
-				break
+				targetSection = .none
+			default: break
 			}
 		}
 
-		if let hidePolicy = RepoHidingPolicy(rawValue: repo.itemHidingPolicy?.integerValue ?? 0) {
-			switch hidePolicy {
-			case .NoHiding:
-				break
-			case .HideMyAuthoredPrs:
-				if isMine && self is PullRequest {
-					targetSection = .None
-				}
-			case .HideMyAuthoredIssues:
-				if isMine && self is Issue {
-					targetSection = .None
-				}
-			case .HideAllMyAuthoredItems:
-				if isMine {
-					targetSection = .None
-				}
-			case .HideOthersPrs:
-				if !isMine && self is PullRequest {
-					targetSection = .None
-				}
-			case .HideOthersIssues:
-				if !isMine && self is Issue {
-					targetSection = .None
-				}
-			case .HideAllOthersItems:
-				if !isMine {
-					targetSection = .None
-				}
-			}
-		}
-
-		if targetSection != .None, let p = self as? PullRequest where p.shouldBeCheckedForRedStatusesInSection(targetSection) {
+		if targetSection != .none, let p = self as? PullRequest, p.shouldBeCheckedForRedStatuses(in: targetSection) {
 			for s in p.displayedStatuses {
 				if s.state != "success" {
-					targetSection = .None
+					targetSection = .none
 					break
 				}
 			}
 		}
 
-		sectionIndex = targetSection.rawValue
+		/////////// Comment counting
 
+		let inLoudSection = targetSection != .all && targetSection != .snoozed && targetSection != .none
+		let showComments = !muted && (inLoudSection || Settings.showCommentsEverywhere)
+		if showComments {
+
+			var latestDate = latestReadCommentDate ?? .distantPast
+
+			if Settings.assumeReadItemIfUserHasNewerComments {
+				let f = NSFetchRequest<PRComment>(entityName: "PRComment")
+				f.returnsObjectsAsFaults = false
+				f.includesSubentities = false
+				f.predicate = predicateForMyComments(since: latestDate)
+				for c in try! managedObjectContext?.fetch(f) ?? [] {
+					if let createdDate = c.createdAt, latestDate < createdDate {
+						latestDate = createdDate
+					}
+				}
+				latestReadCommentDate = latestDate
+			}
+
+			let f = NSFetchRequest<PRComment>(entityName: "PRComment")
+			f.includesSubentities = false
+			f.predicate = predicateForOthersComments(since: latestDate)
+			unreadComments = Int64(try! managedObjectContext?.count(for: f) ?? 0)
+
+		} else {
+			unreadComments = 0
+		}
+
+		totalComments = Int64(comments.count)
+		sectionIndex = targetSection.rawValue
 		if title==nil { title = "(No title)" }
 	}
 
-	final func urlForOpening() -> String? {
-		let unreadCount = unreadComments?.integerValue ?? 0
+	final var urlForOpening: String? {
 
-		if unreadCount > 0 && Settings.openPrAtFirstUnreadComment {
-			let f = NSFetchRequest(entityName: "PRComment")
+		if unreadComments > 0 && Settings.openPrAtFirstUnreadComment {
+			let f = NSFetchRequest<PRComment>(entityName: "PRComment")
 			f.returnsObjectsAsFaults = false
+			f.includesSubentities = false
 			f.fetchLimit = 1
-			f.predicate = predicateForOthersCommentsSinceDate(latestReadCommentDate)
+			f.predicate = predicateForOthersComments(since: latestReadCommentDate ?? .distantPast)
 			f.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: true)]
-			let ret = try! managedObjectContext?.executeFetchRequest(f) as! [PRComment]
-			if let firstComment = ret.first, url = firstComment.webUrl {
+			let ret = try! managedObjectContext?.fetch(f) ?? []
+			if let firstComment = ret.first, let url = firstComment.webUrl {
 				return url
 			}
 		}
@@ -395,67 +390,72 @@ class ListableItem: DataItem {
 		return webUrl
 	}
 
-	final func accessibleTitle() -> String {
+	final var accessibleTitle: String {
 		var components = [String]()
 		if let t = title {
 			components.append(t)
 		}
 		if Settings.showLabels {
 			components.append("\(labels.count) labels:")
-			for l in sortedLabels() {
+			for l in sortedLabels {
 				if let n = l.name {
 					components.append(n)
 				}
 			}
 		}
-		return components.joinWithSeparator(",")
+		return components.joined(separator: ",")
 	}
 
-	final func sortedLabels() -> [PRLabel] {
-		return Array(labels).sort({ (l1: PRLabel, l2: PRLabel) -> Bool in
-			return l1.name!.compare(l2.name!) == .OrderedAscending
+	final var sortedLabels: [PRLabel] {
+		return Array(labels).sorted(by: { (l1: PRLabel, l2: PRLabel) -> Bool in
+			return l1.name!.compare(l2.name!) == .orderedAscending
 		})
 	}
 
-	final func titleWithFont(font: FONT_CLASS, labelFont: FONT_CLASS, titleColor: COLOR_CLASS) -> NSMutableAttributedString {
+	final func title(with font: FONT_CLASS, labelFont: FONT_CLASS, titleColor: COLOR_CLASS) -> NSMutableAttributedString {
 		let p = NSMutableParagraphStyle()
 		p.paragraphSpacing = 1.0
 
 		let titleAttributes = [NSFontAttributeName: font, NSForegroundColorAttributeName: titleColor, NSParagraphStyleAttributeName: p]
 		let _title = NSMutableAttributedString()
 		if let t = title {
-			_title.appendAttributedString(NSAttributedString(string: t, attributes: titleAttributes))
+			_title.append(NSAttributedString(string: t, attributes: titleAttributes))
 			if Settings.showLabels {
 				let labelCount = labels.count
 				if labelCount > 0 {
 
-					_title.appendAttributedString(NSAttributedString(string: "\n", attributes: titleAttributes))
+					_title.append(NSAttributedString(string: "\n", attributes: titleAttributes))
 
 					let lp = NSMutableParagraphStyle()
 					#if os(iOS)
 						lp.lineHeightMultiple = 1.15
 						let labelAttributes = [NSFontAttributeName: labelFont,
-						NSBaselineOffsetAttributeName: 2.0,
-						NSParagraphStyleAttributeName: lp]
+						                       NSBaselineOffsetAttributeName: 2.0,
+						                       NSParagraphStyleAttributeName: lp] as [String : Any]
 					#elseif os(OSX)
-						lp.minimumLineHeight = labelFont.pointSize+6.0
+						lp.minimumLineHeight = labelFont.pointSize+5.0
 						let labelAttributes = [NSFontAttributeName: labelFont,
-							NSBaselineOffsetAttributeName: 1.0,
-							NSParagraphStyleAttributeName: lp]
+						                       NSBaselineOffsetAttributeName: 1.0,
+						                       NSParagraphStyleAttributeName: lp] as [String : Any]
 					#endif
 
+					func isDark(color: COLOR_CLASS) -> Bool {
+						var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0
+						color.getRed(&r, green: &g, blue: &b, alpha: nil)
+						let lum = 0.2126 * r + 0.7152 * g + 0.0722 * b
+						return (lum < 0.5)
+					}
+
 					var count = 0
-					for l in sortedLabels() {
+					for l in sortedLabels {
 						var a = labelAttributes
 						let color = l.colorForDisplay
 						a[NSBackgroundColorAttributeName] = color
-						a[NSForegroundColorAttributeName] = isDarkColor(color) ? COLOR_CLASS.whiteColor() : COLOR_CLASS.blackColor()
-						let name = l.name!.stringByReplacingOccurrencesOfString(" ", withString: "\u{a0}")
-						_title.appendAttributedString(NSAttributedString(string: "\u{a0}", attributes: a))
-						_title.appendAttributedString(NSAttributedString(string: name, attributes: a))
-						_title.appendAttributedString(NSAttributedString(string: "\u{a0}", attributes: a))
+						a[NSForegroundColorAttributeName] = isDark(color: color) ? COLOR_CLASS.white : COLOR_CLASS.black
+						let name = l.name!.replacingOccurrences(of: " ", with: "\u{a0}")
+						_title.append(NSAttributedString(string: "\u{a0}\(name)\u{a0}", attributes: a))
 						if count < labelCount-1 {
-							_title.appendAttributedString(NSAttributedString(string: " ", attributes: labelAttributes))
+							_title.append(NSAttributedString(string: " ", attributes: labelAttributes))
                         }
                         count += 1
 					}
@@ -465,10 +465,10 @@ class ListableItem: DataItem {
 		return _title
 	}
 
-	class final func emptyMessage(message: String, color: COLOR_CLASS) -> NSAttributedString {
+	class final func styleForEmpty(message: String, color: COLOR_CLASS) -> NSAttributedString {
 		let p = NSMutableParagraphStyle()
-		p.lineBreakMode = .ByWordWrapping
-		p.alignment = .Center
+		p.lineBreakMode = .byWordWrapping
+		p.alignment = .center
 		#if os(OSX)
 			return NSAttributedString(string: message, attributes: [
 				NSForegroundColorAttributeName: color,
@@ -478,69 +478,48 @@ class ListableItem: DataItem {
 			return NSAttributedString(string: message, attributes: [
 				NSForegroundColorAttributeName: color,
 				NSParagraphStyleAttributeName: p,
-				NSFontAttributeName: FONT_CLASS.systemFontOfSize(FONT_CLASS.smallSystemFontSize())
-			])
+				NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)])
 		#endif
 	}
 
-	final private func predicateForMyCommentsSinceDate(optionalDate: NSDate?) -> NSPredicate {
-
-		let userNumber = apiServer.userId?.longLongValue ?? 0
+	final private func predicateForMyComments(since date: Date) -> NSPredicate {
 
 		if self is PullRequest {
-			if let date = optionalDate {
-				return NSPredicate(format: "userId == %lld and pullRequest == %@ and createdAt > %@", userNumber, self, date)
-			} else {
-				return NSPredicate(format: "userId == %lld and pullRequest == %@", userNumber, self)
-			}
+			return NSPredicate(format: "userId == %lld and pullRequest == %@ and createdAt > %@", apiServer.userId, self, date as CVarArg)
 		} else {
-			if let date = optionalDate {
-				return NSPredicate(format: "userId == %lld and issue == %@ and createdAt > %@", userNumber, self, date)
-			} else {
-				return NSPredicate(format: "userId == %lld and issue == %@", userNumber, self)
-			}
+			return NSPredicate(format: "userId == %lld and issue == %@ and createdAt > %@", apiServer.userId, self, date as CVarArg)
 		}
 	}
 
-	final private func predicateForOthersCommentsSinceDate(optionalDate: NSDate?) -> NSPredicate {
-
-		let userNumber = apiServer.userId?.longLongValue ?? 0
+	final private func predicateForOthersComments(since date: Date) -> NSPredicate {
 
 		if self is PullRequest {
-			if let date = optionalDate {
-				return NSPredicate(format: "userId != %lld and pullRequest == %@ and createdAt > %@", userNumber, self, date)
-			} else {
-				return NSPredicate(format: "userId != %lld and pullRequest == %@", userNumber, self)
-			}
+			return NSPredicate(format: "userId != %lld and pullRequest == %@ and createdAt > %@", apiServer.userId, self, date as CVarArg)
 		} else {
-			if let date = optionalDate {
-				return NSPredicate(format: "userId != %lld and issue == %@ and createdAt > %@", userNumber, self, date)
-			} else {
-				return NSPredicate(format: "userId != %lld and issue == %@", userNumber, self)
-			}
+			return NSPredicate(format: "userId != %lld and issue == %@ and createdAt > %@", apiServer.userId, self, date as CVarArg)
 		}
 	}
 
-	final class func badgeCountFromFetch(f: NSFetchRequest, inMoc: NSManagedObjectContext) -> Int {
+	final class func badgeCount<T: ListableItem>(from fetch: NSFetchRequest<T>, in moc: NSManagedObjectContext) -> Int {
 		var badgeCount = 0
-		f.returnsObjectsAsFaults = false
-		for i in try! inMoc.executeFetchRequest(f) as! [ListableItem] {
-			badgeCount += (i.unreadComments?.integerValue ?? 0)
+		fetch.returnsObjectsAsFaults = false
+		for i in try! moc.fetch(fetch) {
+			badgeCount += Int(i.unreadComments)
 		}
 		return badgeCount
 	}
 
-	final class func buildOrPredicate(string: String, expectedLength: Int, format: String, numeric: Bool) -> NSPredicate? {
-		if string.characters.count > expectedLength {
-			let items = string.substringFromIndex(string.startIndex.advancedBy(expectedLength))
-			if !items.characters.isEmpty {
+	private final class func predicate(from token: String, termAt: Int, format: String, numeric: Bool) -> NSPredicate? {
+		if token.characters.count > termAt {
+			let items = token.substring(from: token.index(token.startIndex, offsetBy: termAt))
+			if !items.isEmpty {
 				var orTerms = [NSPredicate]()
 				var notTerms = [NSPredicate]()
-				for term in items.componentsSeparatedByString(",") {
+				for term in items.components(separatedBy: ",") {
 					let T: String
 					let negative: Bool
-					if term.characters.first == "!" {
-						T = term.substringFromIndex(term.startIndex.advancedBy(1))
+					if term.hasPrefix("!") {
+						T = term.substring(from: term.index(term.startIndex, offsetBy: 1))
 						negative = true
 					} else {
 						T = term
@@ -574,43 +553,17 @@ class ListableItem: DataItem {
 		return nil
 	}
 
-	final class func serverPredicateFromFilterString(string: String) -> NSPredicate? {
-		return buildOrPredicate(string, expectedLength: 7, format: "apiServer.label contains[cd] %@", numeric: false)
-	}
+	private static let filterTitlePredicate = "title contains[cd] %@"
+	private static let filterRepoPredicate = "repo.fullName contains[cd] %@"
+	private static let filterServerPredicate = "apiServer.label contains[cd] %@"
+	private static let filterUserPredicate = "userLogin contains[cd] %@"
+	private static let filterNumberPredicate = "number == %lld"
+	private static let filterMilestonePredicate = "milestone contains[cd] %@"
+	private static let filterAssigneePredicate = "assigneeName contains[cd] %@"
+	private static let filterLabelPredicate = "SUBQUERY(labels, $label, $label.name contains[cd] %@).@count > 0"
+	private static let filterStatusPredicate = "SUBQUERY(statuses, $status, $status.descriptionText contains[cd] %@).@count > 0"
 
-	final class func titlePredicateFromFilterString(string: String) -> NSPredicate? {
-		return buildOrPredicate(string, expectedLength: 6, format: "title contains[cd] %@", numeric: false)
-	}
-
-	final class func milestonePredicateFromFilterString(string: String) -> NSPredicate? {
-		return buildOrPredicate(string, expectedLength: 10, format: "milestone contains[cd] %@", numeric: false)
-	}
-
-	final class func assigneePredicateFromFilterString(string: String) -> NSPredicate? {
-		return buildOrPredicate(string, expectedLength: 9, format: "assigneeName contains[cd] %@", numeric: false)
-	}
-
-	final class func numberPredicateFromFilterString(string: String) -> NSPredicate? {
-		return buildOrPredicate(string, expectedLength: 7, format: "number == %llu", numeric: true)
-	}
-
-    final class func repoPredicateFromFilterString(string: String) -> NSPredicate? {
-		return buildOrPredicate(string, expectedLength: 5, format: "repo.fullName contains[cd] %@", numeric: false)
-    }
-
-    final class func labelPredicateFromFilterString(string: String) -> NSPredicate? {
-		return buildOrPredicate(string, expectedLength: 6, format: "SUBQUERY(labels, $label, $label.name contains[cd] %@).@count > 0", numeric: false)
-    }
-
-    final class func statusPredicateFromFilterString(string: String) -> NSPredicate? {
-		return buildOrPredicate(string, expectedLength: 7, format: "SUBQUERY(statuses, $status, $status.descriptionText contains[cd] %@).@count > 0", numeric: false)
-    }
-
-    final class func userPredicateFromFilterString(string: String) -> NSPredicate? {
-		return buildOrPredicate(string, expectedLength: 5, format: "userLogin contains[cd] %@", numeric: false)
-    }
-
-	final class func requestForItemsOfType(itemType: String, withFilter: String?, sectionIndex: Int, criterion: GroupingCriterion? = nil, onlyUnread: Bool = false) -> NSFetchRequest {
+	final class func requestForItems<T: ListableItem>(of itemType: T.Type, withFilter: String?, sectionIndex: Int64, criterion: GroupingCriterion? = nil, onlyUnread: Bool = false) -> NSFetchRequest<T> {
 
 		var andPredicates = [NSPredicate]()
 
@@ -621,26 +574,27 @@ class ListableItem: DataItem {
 		if sectionIndex<0 {
 			andPredicates.append(NSPredicate(format: "sectionIndex > 0"))
 		} else {
-			andPredicates.append(NSPredicate(format: "sectionIndex == %d", sectionIndex))
+			andPredicates.append(NSPredicate(format: "sectionIndex == %lld", sectionIndex))
 		}
 
 		if Settings.hideSnoozedItems {
-			andPredicates.append(NSPredicate(format: "sectionIndex != %d", Section.Snoozed.rawValue))
+			andPredicates.append(NSPredicate(format: "sectionIndex != %lld", Section.snoozed.rawValue))
 		}
 
-		if var fi = withFilter where !fi.isEmpty {
+		if var fi = withFilter, !fi.isEmpty {
 
-            func checkForPredicates(tagString: String, _ process: String->NSPredicate?) {
+            func check(forTag tag: String, process: (String, Int) -> NSPredicate?) {
 				var foundOne: Bool
 				repeat {
 					foundOne = false
-					for word in fi.componentsSeparatedByString(" ") {
-						if word.characters.startsWith("\(tagString):".characters) {
-							if let p = process(word) {
+					for token in fi.components(separatedBy: " ") {
+						let prefix = "\(tag):"
+						if token.hasPrefix(prefix) {
+							if let p = process(token, prefix.characters.count) {
 								andPredicates.append(p)
 							}
-							fi = fi.stringByReplacingOccurrencesOfString(word, withString: "")
-							fi = fi.trim()
+							fi = fi.replacingOccurrences(of: token, with: "")
+							fi = fi.trim
 							foundOne = true
 							break
 						}
@@ -648,71 +602,41 @@ class ListableItem: DataItem {
 				} while(foundOne)
             }
 
-			checkForPredicates("title", titlePredicateFromFilterString)
-            checkForPredicates("server", serverPredicateFromFilterString)
-            checkForPredicates("repo", repoPredicateFromFilterString)
-            checkForPredicates("label", labelPredicateFromFilterString)
-            checkForPredicates("status", statusPredicateFromFilterString)
-            checkForPredicates("user", userPredicateFromFilterString)
-			checkForPredicates("number", numberPredicateFromFilterString)
-			checkForPredicates("milestone", milestonePredicateFromFilterString)
-			checkForPredicates("assignee", assigneePredicateFromFilterString)
+			check(forTag: "title")		{ predicate(from: $0, termAt: $1, format: filterTitlePredicate, numeric: false) }
+			check(forTag: "repo")		{ predicate(from: $0, termAt: $1, format: filterRepoPredicate, numeric: false) }
+			check(forTag: "server")		{ predicate(from: $0, termAt: $1, format: filterServerPredicate, numeric: false) }
+			check(forTag: "user")		{ predicate(from: $0, termAt: $1, format: filterUserPredicate, numeric: false) }
+			check(forTag: "number")		{ predicate(from: $0, termAt: $1, format: filterNumberPredicate, numeric: true) }
+			check(forTag: "milestone")	{ predicate(from: $0, termAt: $1, format: filterMilestonePredicate, numeric: false) }
+			check(forTag: "assignee")	{ predicate(from: $0, termAt: $1, format: filterAssigneePredicate, numeric: false) }
+			check(forTag: "label")		{ predicate(from: $0, termAt: $1, format: filterLabelPredicate, numeric: false) }
+			check(forTag: "status")		{ predicate(from: $0, termAt: $1, format: filterStatusPredicate, numeric: false) }
 
 			if !fi.isEmpty {
-				var orPredicates = [NSPredicate]()
-				let negative = (fi.characters.first == "!")
+				var predicates = [NSPredicate]()
+				let negative = fi.hasPrefix("!")
 
-				func checkOr(format: String, numeric: Bool) {
-					let predicate: NSPredicate
-					let string = negative ? fi.substringFromIndex(fi.startIndex.advancedBy(1)) : fi
-					if numeric {
-						if let number = Int64(fi) {
-							predicate = NSPredicate(format: format, number)
-						} else {
-							return
-						}
-					} else {
-						predicate = NSPredicate(format: format, string)
-					}
-					if negative {
-						orPredicates.append(NSCompoundPredicate(notPredicateWithSubpredicate: predicate))
-					} else {
-						orPredicates.append(predicate)
+				func appendPredicate(format: String, numeric: Bool) {
+					if let p = predicate(from: fi, termAt: 0, format: format, numeric: numeric) {
+						predicates.append(p)
 					}
 				}
 
-				if Settings.includeTitlesInFilter {
-					checkOr("title contains[cd] %@", numeric: false)
-				}
-				if Settings.includeReposInFilter {
-					checkOr("repo.fullName contains[cd] %@", numeric: false)
-				}
-                if Settings.includeServersInFilter {
-					checkOr("apiServer.label contains [cd] %@", numeric: false)
-                }
-                if Settings.includeUsersInFilter {
-					checkOr("userLogin contains[cd] %@", numeric: false)
-                }
-				if Settings.includeNumbersInFilter {
-					checkOr("number == %llu", numeric: true)
-				}
-				if Settings.includeMilestonesInFilter {
-					checkOr("milestone contains[cd] %@", numeric: false)
-				}
-				if Settings.includeAssigneeNamesInFilter {
-					checkOr("assigneeName contains[cd] %@", numeric: false)
-				}
-				if Settings.includeLabelsInFilter {
-					checkOr("SUBQUERY(labels, $label, $label.name contains[cd] %@).@count > 0", numeric: false)
-				}
-				if itemType == "PullRequest" && Settings.includeStatusesInFilter {
-					checkOr("SUBQUERY(statuses, $status, $status.descriptionText contains[cd] %@).@count > 0", numeric: false)
-				}
+				if Settings.includeTitlesInFilter {			appendPredicate(format: filterTitlePredicate, numeric: false) }
+				if Settings.includeReposInFilter {			appendPredicate(format: filterRepoPredicate, numeric: false) }
+                if Settings.includeServersInFilter {		appendPredicate(format: filterServerPredicate, numeric: false) }
+                if Settings.includeUsersInFilter {			appendPredicate(format: filterUserPredicate, numeric: false) }
+				if Settings.includeNumbersInFilter {		appendPredicate(format: filterNumberPredicate, numeric: true) }
+				if Settings.includeMilestonesInFilter {		appendPredicate(format: filterMilestonePredicate, numeric: false) }
+				if Settings.includeAssigneeNamesInFilter {	appendPredicate(format: filterAssigneePredicate, numeric: false) }
+				if Settings.includeLabelsInFilter {			appendPredicate(format: filterLabelPredicate, numeric: false) }
+				if itemType == PullRequest.self
+					&& Settings.includeStatusesInFilter {	appendPredicate(format: filterStatusPredicate, numeric: false) }
 
 				if negative {
-					andPredicates.append(NSCompoundPredicate(andPredicateWithSubpredicates: orPredicates))
+					andPredicates.append(NSCompoundPredicate(andPredicateWithSubpredicates: predicates))
 				} else {
-					andPredicates.append(NSCompoundPredicate(orPredicateWithSubpredicates: orPredicates))
+					andPredicates.append(NSCompoundPredicate(orPredicateWithSubpredicates: predicates))
 				}
 			}
 		}
@@ -724,12 +648,12 @@ class ListableItem: DataItem {
 		var sortDescriptors = [NSSortDescriptor]()
 		sortDescriptors.append(NSSortDescriptor(key: "sectionIndex", ascending: true))
 		if Settings.groupByRepo {
-			sortDescriptors.append(NSSortDescriptor(key: "repo.fullName", ascending: true, selector: #selector(NSString.caseInsensitiveCompare(_:))))
+			sortDescriptors.append(NSSortDescriptor(key: "repo.fullName", ascending: true, selector: #selector(NSString.localizedCaseInsensitiveCompare)))
 		}
 
-		if let fieldName = SortingMethod(rawValue: Settings.sortMethod)?.field() {
+		if let fieldName = SortingMethod(Settings.sortMethod)?.field {
 			if fieldName == "title" {
-				sortDescriptors.append(NSSortDescriptor(key: fieldName, ascending: !Settings.sortDescending, selector: #selector(NSString.caseInsensitiveCompare(_:))))
+				sortDescriptors.append(NSSortDescriptor(key: fieldName, ascending: !Settings.sortDescending, selector: #selector(NSString.localizedCaseInsensitiveCompare)))
 			} else {
 				sortDescriptors.append(NSSortDescriptor(key: fieldName, ascending: !Settings.sortDescending))
 			}
@@ -737,24 +661,25 @@ class ListableItem: DataItem {
 
 		//DLog("%@", andPredicates)
 
-		let f = NSFetchRequest(entityName: itemType)
-		f.fetchBatchSize = 100
+		let f = NSFetchRequest<T>(entityName: String(describing: itemType))
+		f.fetchBatchSize = 50
+		f.relationshipKeyPathsForPrefetching = (itemType == PullRequest.self) ? ["labels", "statuses"] : ["labels"]
+		f.returnsObjectsAsFaults = false
+		f.includesSubentities = false
 		let p = NSCompoundPredicate(andPredicateWithSubpredicates: andPredicates)
-		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, inMoc: mainObjectContext)
+		add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: DataManager.main)
 		f.sortDescriptors = sortDescriptors
 		return f
 	}
 
-	final class func relatedItemsFromNotificationInfo(userInfo: [String : AnyObject?]) -> (PRComment?, ListableItem)? {
+	final class func relatedItems(from notificationUserInfo: [AnyHashable : Any]) -> (PRComment?, ListableItem)? {
 		var item: ListableItem?
 		var comment: PRComment?
-		if let itemId = DataManager.idForUriPath(userInfo[COMMENT_ID_KEY] as? String), c = existingObjectWithID(itemId) as? PRComment {
+		if let cid = notificationUserInfo[COMMENT_ID_KEY] as? String, let itemId = DataManager.id(for: cid), let c = existingObject(with: itemId) as? PRComment {
 			comment = c
-			item = c.pullRequest ?? c.issue
-		} else if let itemId = DataManager.idForUriPath(userInfo[PULL_REQUEST_ID_KEY] as? String) {
-			item = existingObjectWithID(itemId) as? ListableItem
-		} else if let itemId = DataManager.idForUriPath(userInfo[ISSUE_ID_KEY] as? String) {
-			item = existingObjectWithID(itemId) as? ListableItem
+			item = c.parent
+		} else if let pid = notificationUserInfo[LISTABLE_URI_KEY] as? String, let itemId = DataManager.id(for: pid) {
+			item = existingObject(with: itemId) as? ListableItem
 		}
 		if let i = item {
 			return (comment, i)
@@ -763,32 +688,46 @@ class ListableItem: DataItem {
 		}
 	}
 
-	final func setMute(mute: Bool) {
-		muted = mute
+	final func setMute(to newValue: Bool) {
+		muted = newValue
 		postProcess()
-		if mute {
-			removeRelatedNotifications()
+		if newValue {
+			ListableItem.removeRelatedNotifications(uri: objectID.uriRepresentation().absoluteString)
 		}
 	}
 
-	final func removeRelatedNotifications() {
+	final class func removeRelatedNotifications(uri: String) {
 		#if os(OSX)
-		let nc = NSUserNotificationCenter.defaultUserNotificationCenter()
-		for n in nc.deliveredNotifications {
-			if let u = n.userInfo, (_, item) = ListableItem.relatedItemsFromNotificationInfo(u) where item.serverId == serverId {
-				nc.removeDeliveredNotification(n)
+			let nc = NSUserNotificationCenter.default
+			for n in nc.deliveredNotifications {
+				if let u = n.userInfo, let notificationUri = u[LISTABLE_URI_KEY] as? String, notificationUri == uri {
+					nc.removeDeliveredNotification(n)
+				}
 			}
-		}
+		#elseif os(iOS)
+			let nc = UNUserNotificationCenter.current()
+			nc.getDeliveredNotifications { notifications in
+				atNextEvent {
+					for n in notifications {
+						let r = n.request.identifier
+						let u = n.request.content.userInfo
+						if let notificationUri = u[LISTABLE_URI_KEY] as? String, notificationUri == uri {
+							DLog("Removing related notification: %@", r)
+							nc.removeDeliveredNotifications(withIdentifiers: [r])
+						}
+					}
+				}
+			}
 		#endif
-		// iOS won't allow access notifications after presenting if the app gets restarted, so behaviour of this would be inconsistent.
 	}
 
 	#if os(iOS)
 	var searchKeywords: [String] {
 		let labelNames = labels.flatMap { $0.name }
-		return [(userLogin ?? "NO_USERNAME"), "Trailer", "PocketTrailer", "Pocket Trailer"] + labelNames + (repo.fullName?.componentsSeparatedByString("/") ?? [])
+		let orgAndRepo = repo.fullName?.components(separatedBy: "/") ?? []
+		return [(userLogin ?? "NO_USERNAME"), "Trailer", "PocketTrailer", "Pocket Trailer"] + labelNames + orgAndRepo
 	}
-	final func searchTitle() -> String {
+	final var searchTitle: String {
 		let labelNames = labels.flatMap { $0.name }
 		var suffix = ""
 		if labelNames.count > 0 {
@@ -796,34 +735,79 @@ class ListableItem: DataItem {
 				suffix += " [\(l)]"
 			}
 		}
-		let n = number?.integerValue ?? 0
 		let t = S(title)
-		return "#\(n) - \(t)\(suffix)"
+		return "#\(number) - \(t)\(suffix)"
 	}
 	final func indexForSpotlight() {
+
+		guard CSSearchableIndex.isIndexingAvailable() else { return }
+
 		let s = CSSearchableItemAttributeSet(itemContentType: kUTTypeText as String)
-		s.title = searchTitle()
+		s.title = searchTitle
 		s.contentCreationDate = createdAt
 		s.contentModificationDate = updatedAt
 		s.keywords = searchKeywords
 		s.creator = userLogin
 
-		s.contentDescription = "\(S(repo.fullName)) @\(S(userLogin)) - \(S(body?.trim()))"
+		s.contentDescription = "\(S(repo.fullName)) @\(S(userLogin)) - \(S(body?.trim))"
 
-		func completeIndex(s: CSSearchableItemAttributeSet) {
-			let i = CSSearchableItem(uniqueIdentifier:objectID.URIRepresentation().absoluteString, domainIdentifier: nil, attributeSet: s)
-			CSSearchableIndex.defaultSearchableIndex().indexSearchableItems([i], completionHandler: nil)
+		func completeIndex(withSet s: CSSearchableItemAttributeSet) {
+			let i = CSSearchableItem(uniqueIdentifier: objectID.uriRepresentation().absoluteString, domainIdentifier: nil, attributeSet: s)
+			CSSearchableIndex.default().indexSearchableItems([i], completionHandler: nil)
 		}
 
-		if let i = self.userAvatarUrl where !Settings.hideAvatars {
-			api.haveCachedAvatar(i) { _, cachePath in
-				s.thumbnailURL = NSURL(string: "file://\(cachePath)")
-				completeIndex(s)
+		if let i = userAvatarUrl, !Settings.hideAvatars {
+			_ = API.haveCachedAvatar(from: i) { _, cachePath in
+				s.thumbnailURL = URL(string: "file://\(cachePath)")
+				completeIndex(withSet: s)
 			}
 		} else {
 			s.thumbnailURL = nil
-			completeIndex(s)
+			completeIndex(withSet: s)
 		}
 	}
 	#endif
+
+	final var shouldCheckForClosing: Bool {
+		return repo.shouldSync && repo.postSyncAction != PostSyncAction.delete.rawValue && apiServer.lastSyncSucceeded
+	}
+
+	class func reasonForEmpty(with filterValue: String?, criterion: GroupingCriterion?, openItemCount: Int) -> NSAttributedString {
+
+		let color: COLOR_CLASS
+		let message: String
+
+		if !ApiServer.someServersHaveAuthTokens(in: DataManager.main) {
+			color = COLOR_CLASS(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)
+			message = "There are no configured API servers in your settings, please ensure you have added at least one server with a valid API token."
+		} else if appIsRefreshing {
+			color = COLOR_CLASS.lightGray
+			message = "Refreshing information, please wait a moment..."
+		} else if !S(filterValue).isEmpty {
+			color = COLOR_CLASS.lightGray
+			message = "There are no items matching this filter."
+		} else if openItemCount > 0 {
+			color = COLOR_CLASS.lightGray
+			message = "Some items are hidden by your settings."
+		} else if !Repo.anyVisibleRepos(in: DataManager.main, criterion: criterion, excludeGrouped: true) {
+			if Repo.anyVisibleRepos(in: DataManager.main) {
+				color = COLOR_CLASS.lightGray
+				message = "There are no repositories that are currently visible in this category."
+			} else {
+				color = COLOR_CLASS(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)
+				message = "You have no watched repositories, please add some to your watchlist and refresh after a little while."
+			}
+		} else if !Repo.interestedInPrs(fromServerWithId: criterion?.apiServerId) && !Repo.interestedInIssues(fromServerWithId: criterion?.apiServerId) {
+			color = COLOR_CLASS(red: 0.8, green: 0.0, blue: 0.0, alpha: 1.0)
+			message = "All your watched repositories are marked as hidden, please enable issues or PRs on at least one."
+		} else if openItemCount==0 {
+			color = COLOR_CLASS.lightGray
+			message = "No open items in your configured repositories."
+		} else {
+			color = COLOR_CLASS.lightGray
+			message = ""
+		}
+
+		return styleForEmpty(message: message, color: color)
+	}
 }

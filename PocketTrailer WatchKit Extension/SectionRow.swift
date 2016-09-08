@@ -1,9 +1,9 @@
 
 import WatchKit
 
-protocol PopulatableRow {
-	func populateFrom(other: PopulatableRow)
-	func rowType() -> String
+protocol PopulatableRow : Any {
+	func populate(from other: Any)
+	var rowType: String { get }
 }
 
 final class SectionRow: NSObject, PopulatableRow {
@@ -15,9 +15,9 @@ final class SectionRow: NSObject, PopulatableRow {
 	var groupLabel: String?
 	var apiServerUri: String?
 
-	func populateFrom(other: PopulatableRow) {
+	func populate(from other: Any) {
 		if let other = other as? SectionRow {
-			if let sectionName = other.section?.watchMenuName() {
+			if let sectionName = other.section?.watchMenuName {
 				titleL.setText("\(other.totalCount!) \(sectionName)")
 			} else {
 				titleL.setText("All Unread")
@@ -28,8 +28,8 @@ final class SectionRow: NSObject, PopulatableRow {
 			countHolder.setHidden(other.unreadCount==0)
 		}
 	}
-	func rowType() -> String {
-		return NSStringFromClass(self.dynamicType).componentsSeparatedByString(".").last!
+	var rowType: String {
+		return String(describing: type(of: self))
 	}
 
     @IBOutlet weak var titleL: WKInterfaceLabel!

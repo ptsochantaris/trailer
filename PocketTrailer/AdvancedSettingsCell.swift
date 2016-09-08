@@ -12,7 +12,7 @@ final class AdvancedSettingsCell: UITableViewCell {
 		super.layoutSubviews()
 		for v in self.subviews {
 			if let b = v as? UIButton {
-				b.center = CGPointMake(b.center.x, valueLabel.center.y)
+				b.center = CGPoint(x: b.center.x, y: valueLabel.center.y)
 			}
 		}
 	}

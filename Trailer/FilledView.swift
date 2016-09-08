@@ -3,18 +3,18 @@ final class FilledView: NSView {
 
 	var backgroundColor: NSColor? {
 		didSet {
-			setNeedsDisplayInRect(bounds)
+			setNeedsDisplay(bounds)
 		}
 	}
 
 	var cornerRadius: CGFloat? {
 		didSet {
-			setNeedsDisplayInRect(bounds)
+			setNeedsDisplay(bounds)
 		}
 	}
 
-    override func drawRect(dirtyRect: NSRect) {
-        super.drawRect(dirtyRect)
+    override func draw(_ dirtyRect: NSRect) {
+        super.draw(dirtyRect)
 
 		if let b = backgroundColor {
 			b.set()

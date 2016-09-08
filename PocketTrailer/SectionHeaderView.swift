@@ -8,13 +8,13 @@ class SectionHeaderView: UITableViewHeaderFooterView {
 
 	var callback: Completion?
 
-	@IBAction func buttonSelected(sender: UIButton) {
+	@IBAction func buttonSelected(_ sender: UIButton) {
 		callback?()
 	}
 
 	override func awakeFromNib() {
 		super.awakeFromNib()
-		action.setTitleColor(GLOBAL_TINT, forState: .Normal)
+		action.setTitleColor(GLOBAL_TINT, for: .normal)
 	}
 
 }

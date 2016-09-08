@@ -8,193 +8,171 @@ final class PullRequest: ListableItem {
 
 	@NSManaged var issueCommentLink: String?
 	@NSManaged var issueUrl: String?
-	@NSManaged var mergeable: NSNumber?
-	@NSManaged var pinned: NSNumber?
+	@NSManaged var mergeable: Bool
 	@NSManaged var reviewCommentLink: String?
 	@NSManaged var statusesLink: String?
 	@NSManaged var lastStatusNotified: String?
 
 	@NSManaged var statuses: Set<PRStatus>
 
-	class func syncPullRequestsFromInfoArray(data: [[NSObject : AnyObject]]?, inRepo: Repo) {
-		itemsWithInfo(data, type: "PullRequest", fromServer: inRepo.apiServer) { item, info, isNewOrUpdated in
-			let p = item as! PullRequest
+	class func syncPullRequests(from data: [[AnyHashable : Any]]?, in repo: Repo) {
+		items(with: data, type: PullRequest.self, server: repo.apiServer) { item, info, isNewOrUpdated in
 			if isNewOrUpdated {
 
-				p.baseSyncFromInfo(info, inRepo: inRepo)
+				item.baseSync(from: info, in: repo)
 
-				p.mergeable = info["mergeable"] as? NSNumber ?? true
+				item.mergeable = (info["mergeable"] as? NSNumber)?.boolValue ?? true
 
-				if let linkInfo = info["_links"] as? [NSObject : AnyObject] {
-					p.issueCommentLink = linkInfo["comments"]?["href"] as? String
-					p.reviewCommentLink = linkInfo["review_comments"]?["href"] as? String
-					p.statusesLink = linkInfo["statuses"]?["href"] as? String
-					p.issueUrl = linkInfo["issue"]?["href"] as? String
+				if let linkInfo = info["_links"] as? [AnyHashable : Any] {
+					item.issueCommentLink = (linkInfo["comments"] as? [AnyHashable : Any])?["href"] as? String
+					item.reviewCommentLink = (linkInfo["review_comments"] as? [AnyHashable : Any])?["href"] as? String
+					item.statusesLink = (linkInfo["statuses"] as? [AnyHashable : Any])?["href"] as? String
+					item.issueUrl = (linkInfo["issue"] as? [AnyHashable : Any])?["href"] as? String
 				}
 
-				api.refreshesSinceLastLabelsCheck[p.objectID] = nil
-				api.refreshesSinceLastStatusCheck[p.objectID] = nil
+				API.refreshesSinceLastLabelsCheck[item.objectID] = nil
+				API.refreshesSinceLastStatusCheck[item.objectID] = nil
 			}
-			p.reopened = ((p.condition?.integerValue ?? 0) == ItemCondition.Closed.rawValue)
-			p.condition = ItemCondition.Open.rawValue
+			item.reopened = item.condition == ItemCondition.closed.rawValue
+			item.condition = ItemCondition.open.rawValue
 		}
 	}
 
 	#if os(iOS)
 	override var searchKeywords: [String] {
-		return ["PR","Pull Request","PRs","Pull Requests"] + super.searchKeywords
+		return ["PR", "Pull Request", "PRs", "Pull Requests"] + super.searchKeywords
 	}
 	#endif
 
-	class func activeInMoc(moc: NSManagedObjectContext, visibleOnly: Bool) -> [PullRequest] {
-		let f = NSFetchRequest(entityName: "PullRequest")
+	class func active(in moc: NSManagedObjectContext, visibleOnly: Bool) -> [PullRequest] {
+		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
+		f.includesSubentities = false
 		if visibleOnly {
-			f.predicate = NSPredicate(format: "sectionIndex == %d || sectionIndex == %d || sectionIndex == %d", Section.Mine.rawValue, Section.Participated.rawValue, Section.All.rawValue)
+			f.predicate = NSPredicate(format: "sectionIndex == %lld || sectionIndex == %lld || sectionIndex == %lld", Section.mine.rawValue, Section.participated.rawValue, Section.all.rawValue)
 		} else {
-			f.predicate = NSPredicate(format: "condition == %d", ItemCondition.Open.rawValue)
+			f.predicate = NSPredicate(format: "condition == %lld", ItemCondition.open.rawValue)
 		}
-		return try! moc.executeFetchRequest(f) as! [PullRequest]
+		return try! moc.fetch(f)
 	}
 
-	class func allMergedInMoc(moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, includeAllGroups: Bool = false) -> [PullRequest] {
-		let f = NSFetchRequest(entityName: "PullRequest")
+	class func allMerged(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, includeAllGroups: Bool = false) -> [PullRequest] {
+		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
-		let p = NSPredicate(format: "condition == %d", ItemCondition.Merged.rawValue)
-		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, inMoc: moc, includeAllGroups: includeAllGroups)
-		return try! moc.executeFetchRequest(f) as! [PullRequest]
+		f.includesSubentities = false
+		let p = NSPredicate(format: "condition == %lld", ItemCondition.merged.rawValue)
+		add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc, includeAllGroups: includeAllGroups)
+		return try! moc.fetch(f)
 	}
 
-	class func allClosedInMoc(moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, includeAllGroups: Bool = false) -> [PullRequest] {
-		let f = NSFetchRequest(entityName: "PullRequest")
+	class func allClosed(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil, includeAllGroups: Bool = false) -> [PullRequest] {
+		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
-		let p = NSPredicate(format: "condition == %d", ItemCondition.Closed.rawValue)
-		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, inMoc: moc, includeAllGroups: includeAllGroups)
-		return try! moc.executeFetchRequest(f) as! [PullRequest]
+		f.includesSubentities = false
+		let p = NSPredicate(format: "condition == %lld", ItemCondition.closed.rawValue)
+		add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc, includeAllGroups: includeAllGroups)
+		return try! moc.fetch(f)
 	}
 
-	class func countOpenInMoc(moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
-		let f = NSFetchRequest(entityName: "PullRequest")
-		let p = NSPredicate(format: "condition == %d or condition == nil", ItemCondition.Open.rawValue)
-		addCriterion(criterion, toFetchRequest: f, originalPredicate: p, inMoc: moc)
-		return moc.countForFetchRequest(f, error: nil)
+	class func countOpen(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
+		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
+		f.includesSubentities = false
+		let p = NSPredicate(format: "condition == %lld or condition == nil", ItemCondition.open.rawValue)
+		add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc)
+		return try! moc.count(for: f)
 	}
 
-	class func markEverythingRead(section: Section, moc: NSManagedObjectContext) {
-		let f = NSFetchRequest(entityName: "PullRequest")
-		if section != .None {
-			f.predicate = NSPredicate(format: "sectionIndex == %d", section.rawValue)
+	class func markEverythingRead(in section: Section, in moc: NSManagedObjectContext) {
+		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
+		f.returnsObjectsAsFaults = false
+		f.includesSubentities = false
+		if section != .none {
+			f.predicate = NSPredicate(format: "sectionIndex == %lld", section.rawValue)
 		}
-		for pr in try! moc.executeFetchRequest(f) as! [PullRequest] {
+		for pr in try! moc.fetch(f) {
 			pr.catchUpWithComments()
 		}
 	}
 
-	class func badgeCountInSection(section: Section, moc: NSManagedObjectContext) -> Int {
-		let f = NSFetchRequest(entityName: "PullRequest")
-		f.predicate = NSPredicate(format: "sectionIndex == %d and unreadComments > 0", section.rawValue)
-		return badgeCountFromFetch(f, inMoc: moc)
+	class func badgeCount(in section: Section, in moc: NSManagedObjectContext) -> Int {
+		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
+		f.includesSubentities = false
+		f.predicate = NSPredicate(format: "sectionIndex == %lld and unreadComments > 0", section.rawValue)
+		return badgeCount(from: f, in: moc)
 	}
 
-	class func badgeCountInMoc(moc: NSManagedObjectContext) -> Int {
-		let f = NSFetchRequest(entityName: "PullRequest")
+	class func badgeCount(in moc: NSManagedObjectContext) -> Int {
+		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
+		f.includesSubentities = false
 		f.predicate = NSPredicate(format: "sectionIndex > 0 and unreadComments > 0")
-		return badgeCountFromFetch(f, inMoc: moc)
+		return badgeCount(from: f, in: moc)
 	}
 
-	class func badgeCountInMoc(moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
-		let f = requestForItemsOfType("PullRequest", withFilter: nil, sectionIndex: -1, criterion: criterion)
-		return badgeCountFromFetch(f, inMoc: moc)
+	class func badgeCount(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
+		let f = requestForItems(of: PullRequest.self, withFilter: nil, sectionIndex: -1, criterion: criterion)
+		return badgeCount(from: f, in: moc)
 	}
 
 	var markUnmergeable: Bool {
-		if let m = mergeable?.boolValue where m == false {
-			if let s = sectionIndex?.integerValue {
-				if s == ItemCondition.Merged.rawValue || s == ItemCondition.Closed.rawValue {
-					return false
-				}
-				if s == Section.All.rawValue && Settings.markUnmergeableOnUserSectionsOnly {
-					return false
-				}
-				return true
+		if !mergeable {
+			let s = sectionIndex
+			if s == ItemCondition.merged.rawValue || s == ItemCondition.closed.rawValue {
+				return false
 			}
+			if s == Section.all.rawValue && Settings.markUnmergeableOnUserSectionsOnly {
+				return false
+			}
+			return true
 		}
 		return false
 	}
 
-	class func reasonForEmptyWithFilter(filterValue: String?, criterion: GroupingCriterion? = nil) -> NSAttributedString {
-		let openRequests = PullRequest.countOpenInMoc(mainObjectContext, criterion: criterion)
-
-		var color = COLOR_CLASS.lightGrayColor()
-		var message: String = ""
-
-		if !ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
-			color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
-			message = "There are no configured API servers in your settings, please ensure you have added at least one server with a valid API token."
-		} else if appIsRefreshing {
-			message = "Refreshing PR information, please wait a moment..."
-		} else if !S(filterValue).isEmpty {
-			message = "There are no PRs matching this filter."
-		} else if openRequests > 0 {
-			message = "Some items are hidden by your settings."
-		} else if !Repo.anyVisibleReposInMoc(mainObjectContext, criterion: criterion, excludeGrouped: true) {
-			if Repo.anyVisibleReposInMoc(mainObjectContext) {
-				message = "There are no repositories that are currently visible in this category."
-			} else {
-				color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
-				message = "You have no watched repositories, please add some to your watchlist and refresh after a little while."
-			}
-		} else if !Repo.interestedInPrs(criterion?.apiServerId) && !Repo.interestedInIssues(criterion?.apiServerId) {
-			color = MAKECOLOR(0.8, 0.0, 0.0, 1.0)
-			message = "All your watched repositories are marked as hidden, please enable issues or PRs for some of them."
-		} else if openRequests==0 {
-			message = "No open PRs in your configured repositories."
-		}
-
-		return emptyMessage(message, color: color)
+	class func reasonForEmpty(with filterValue: String?, criterion: GroupingCriterion? = nil) -> NSAttributedString {
+		let openRequestCount = PullRequest.countOpen(in: DataManager.main, criterion: criterion)
+		return reasonForEmpty(with: filterValue, criterion: criterion, openItemCount: openRequestCount)
 	}
 
-	func subtitleWithFont(font: FONT_CLASS, lightColor: COLOR_CLASS, darkColor: COLOR_CLASS) -> NSMutableAttributedString {
+	func subtitle(with font: FONT_CLASS, lightColor: COLOR_CLASS, darkColor: COLOR_CLASS) -> NSMutableAttributedString {
 		let _subtitle = NSMutableAttributedString()
 		let p = NSMutableParagraphStyle()
 		#if os(iOS)
 			p.lineHeightMultiple = 1.3
 		#endif
 
-		let lightSubtitle = [NSForegroundColorAttributeName: lightColor, NSFontAttributeName:font, NSParagraphStyleAttributeName: p]
+		let lightSubtitle = [NSForegroundColorAttributeName: lightColor, NSFontAttributeName: font, NSParagraphStyleAttributeName: p]
 
 		#if os(iOS)
-			let separator = NSAttributedString(string:"\n", attributes:lightSubtitle)
+			let separator = NSAttributedString(string:"\n", attributes: lightSubtitle)
 		#elseif os(OSX)
-			let separator = NSAttributedString(string:"   ", attributes:lightSubtitle)
+			let separator = NSAttributedString(string:"   ", attributes: lightSubtitle)
 		#endif
 
 		if Settings.showReposInName {
 			if let n = repo.fullName {
 				var darkSubtitle = lightSubtitle
 				darkSubtitle[NSForegroundColorAttributeName] = darkColor
-				_subtitle.appendAttributedString(NSAttributedString(string: n, attributes: darkSubtitle))
-				_subtitle.appendAttributedString(separator)
+				_subtitle.append(NSAttributedString(string: n, attributes: darkSubtitle))
+				_subtitle.append(separator)
 			}
 		}
 
 		if let l = userLogin {
-			_subtitle.appendAttributedString(NSAttributedString(string: "@\(l)", attributes: lightSubtitle))
-			_subtitle.appendAttributedString(separator)
+			_subtitle.append(NSAttributedString(string: "@\(l)", attributes: lightSubtitle))
+			_subtitle.append(separator)
 		}
 
 		if Settings.showCreatedInsteadOfUpdated {
-			_subtitle.appendAttributedString(NSAttributedString(string: itemDateFormatter.stringFromDate(createdAt!), attributes: lightSubtitle))
+			_subtitle.append(NSAttributedString(string: itemDateFormatter.string(from: createdAt!), attributes: lightSubtitle))
 		} else {
-			_subtitle.appendAttributedString(NSAttributedString(string: itemDateFormatter.stringFromDate(updatedAt!), attributes: lightSubtitle))
+			_subtitle.append(NSAttributedString(string: itemDateFormatter.string(from: updatedAt!), attributes: lightSubtitle))
 		}
 
 		#if os(iOS)
-			if let m = mergeable?.boolValue where m == false {
-				_subtitle.appendAttributedString(separator)
+			if !mergeable {
+				_subtitle.append(separator)
 				var redSubtitle = lightSubtitle
-				redSubtitle[NSForegroundColorAttributeName] = COLOR_CLASS.redColor()
-				_subtitle.appendAttributedString(NSAttributedString(string: "Cannot be merged!", attributes:redSubtitle))
+				redSubtitle[NSForegroundColorAttributeName] = UIColor.red
+				_subtitle.append(NSAttributedString(string: "Cannot be merged!", attributes: redSubtitle))
 			}
 		#endif
 
@@ -211,34 +189,35 @@ final class PullRequest: ListableItem {
 		if let l = userLogin { components.append("Author: \(l)") }
 
 		if Settings.showCreatedInsteadOfUpdated {
-			components.append("Created \(itemDateFormatter.stringFromDate(createdAt!))")
+			components.append("Created \(itemDateFormatter.string(from: createdAt!))")
 		} else {
-			components.append("Updated \(itemDateFormatter.stringFromDate(updatedAt!))")
+			components.append("Updated \(itemDateFormatter.string(from: updatedAt!))")
 		}
 
-		if let m = mergeable?.boolValue where m == false {
+		if !mergeable {
 			components.append("Cannot be merged!")
 		}
 
-		return components.joinWithSeparator(",")
+		return components.joined(separator: ",")
 	}
 
-	func shouldBeCheckedForRedStatusesInSection(targetSection: Section) -> Bool {
+	func shouldBeCheckedForRedStatuses(in section: Section) -> Bool {
 		if Settings.hidePrsThatArentPassing {
 			if Settings.hidePrsThatDontPassOnlyInAll {
-				return targetSection == .All
+				return section == .all
 			} else {
-				return targetSection == .Mine || targetSection == .Participated || targetSection == .All
+				return section == .mine || section == .participated || section == .all
 			}
 		}
 		return false
 	}
 
 	var displayedStatuses: [PRStatus] {
-		let f = NSFetchRequest(entityName: "PRStatus")
+		let f = NSFetchRequest<PRStatus>(entityName: "PRStatus")
 		f.returnsObjectsAsFaults = false
+		f.includesSubentities = false
 		let mode = Settings.statusFilteringMode
-		if mode==StatusFilter.All.rawValue {
+		if mode==StatusFilter.all.rawValue {
 			f.predicate = NSPredicate(format: "pullRequest == %@", self)
 		} else {
 			let terms = Settings.statusFilteringTerms
@@ -250,7 +229,7 @@ final class PullRequest: ListableItem {
 				let orPredicate = NSCompoundPredicate(orPredicateWithSubpredicates: subPredicates)
 				let selfPredicate = NSPredicate(format: "pullRequest == %@", self)
 
-				if mode==StatusFilter.Include.rawValue {
+				if mode==StatusFilter.include.rawValue {
 					f.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [selfPredicate, orPredicate])
 				} else {
 					let notOrPredicate = NSCompoundPredicate(notPredicateWithSubpredicate: orPredicate)
@@ -265,11 +244,11 @@ final class PullRequest: ListableItem {
 		var result = [PRStatus]()
 		var targetUrls = Set<String>()
 		var descriptions = Set<String>()
-		for s in try! managedObjectContext?.executeFetchRequest(f) as! [PRStatus] {
+		for s in try! managedObjectContext?.fetch(f) ?? [] {
 			let targetUrl = S(s.targetUrl)
 			let desc = S(s.descriptionText)
 
-			if !descriptions.contains(desc) {
+			if !desc.isEmpty && !descriptions.contains(desc) {
 				descriptions.insert(desc)
 				if !targetUrls.contains(targetUrl) {
 					targetUrls.insert(targetUrl)
@@ -281,10 +260,10 @@ final class PullRequest: ListableItem {
 	}
 
 	var labelsLink: String? {
-		return issueUrl?.stringByAppendingPathComponent("labels")
+		return issueUrl?.appending(pathComponent: "labels")
 	}
 
 	var sectionName: String {
-		return Section.prMenuTitles[sectionIndex?.integerValue ?? 0]
+		return Section.prMenuTitles[Int(sectionIndex)]
 	}
 }

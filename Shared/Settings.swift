@@ -3,164 +3,151 @@
 	import UIKit
 #endif
 
-final class PopTimer : NSObject {
-
-	var _popTimer: NSTimer?
-	let _timeInterval: NSTimeInterval
-	let _callback: ()->()
-
-	var isRunning: Bool {
-		return _popTimer != nil
-	}
-
-	func push() {
-		_popTimer?.invalidate()
-		_popTimer = NSTimer.scheduledTimerWithTimeInterval(_timeInterval, target: self, selector: #selector(PopTimer.popped), userInfo: nil, repeats: false)
-	}
-
-	func popped() {
-		invalidate()
-		_callback()
-	}
-
-	func invalidate() {
-		_popTimer?.invalidate()
-		_popTimer = nil
-	}
-
-	init(timeInterval: NSTimeInterval, callback: Completion) {
-		_timeInterval = timeInterval
-		_callback = callback
-		super.init()
-	}
-}
-
-/////////////////////////////
-
-let SETTINGS_EXPORTED = "SETTINGS_EXPORTED"
-
-var _settings_valuesCache = [String : AnyObject]()
-let _settings_shared = NSUserDefaults(suiteName: "group.Trailer")!
-
 final class Settings {
 
-	class func allFields() -> [String] {
+	private static var valuesCache = [AnyHashable : Any]()
+	private static let sharedDefaults = UserDefaults(suiteName: "group.Trailer")!
+
+	private class var allFields: [String] {
 		return [
-			"SORT_METHOD_KEY", "STATUS_FILTERING_METHOD_KEY", "LAST_PREFS_TAB_SELECTED", "CLOSE_HANDLING_POLICY", "MERGE_HANDLING_POLICY", "STATUS_ITEM_REFRESH_COUNT", "LABEL_REFRESH_COUNT", "UPDATE_CHECK_INTERVAL_KEY",
+			"SORT_METHOD_KEY", "STATUS_FILTERING_METHOD_KEY", "LAST_PREFS_TAB_SELECTED", "STATUS_ITEM_REFRESH_COUNT", "LABEL_REFRESH_COUNT", "UPDATE_CHECK_INTERVAL_KEY",
 			"STATUS_FILTERING_TERMS_KEY", "COMMENT_AUTHOR_BLACKLIST", "HOTKEY_LETTER", "REFRESH_PERIOD_KEY", "IOS_BACKGROUND_REFRESH_PERIOD_KEY", "NEW_REPO_CHECK_PERIOD", "LAST_SUCCESSFUL_REFRESH",
 			"LAST_RUN_VERSION_KEY", "UPDATE_CHECK_AUTO_KEY", "HIDE_UNCOMMENTED_PRS_KEY", "SHOW_COMMENTS_EVERYWHERE_KEY", "SORT_ORDER_KEY", "SHOW_UPDATED_KEY", "DONT_KEEP_MY_PRS_KEY", "HIDE_AVATARS_KEY",
-			"AUTO_PARTICIPATE_IN_MENTIONS_KEY", "DONT_ASK_BEFORE_WIPING_MERGED", "DONT_ASK_BEFORE_WIPING_CLOSED", "HIDE_NEW_REPOS_KEY", "GROUP_BY_REPO", "HIDE_ALL_SECTION", "SHOW_LABELS", "SHOW_STATUS_ITEMS",
-			"MAKE_STATUS_ITEMS_SELECTABLE", "MOVE_ASSIGNED_PRS_TO_MY_SECTION", "MARK_UNMERGEABLE_ON_USER_SECTIONS_ONLY", "COUNT_ONLY_LISTED_PRS", "OPEN_PR_AT_FIRST_UNREAD_COMMENT_KEY", "LOG_ACTIVITY_TO_CONSOLE_KEY",
+			"DONT_ASK_BEFORE_WIPING_MERGED", "DONT_ASK_BEFORE_WIPING_CLOSED", "HIDE_NEW_REPOS_KEY", "GROUP_BY_REPO", "HIDE_ALL_SECTION", "SHOW_LABELS", "SHOW_STATUS_ITEMS",
+			"MAKE_STATUS_ITEMS_SELECTABLE", "MARK_UNMERGEABLE_ON_USER_SECTIONS_ONLY", "COUNT_ONLY_LISTED_PRS", "OPEN_PR_AT_FIRST_UNREAD_COMMENT_KEY", "LOG_ACTIVITY_TO_CONSOLE_KEY",
 			"HOTKEY_ENABLE", "HOTKEY_CONTROL_MODIFIER", "USE_VIBRANCY_UI", "DISABLE_ALL_COMMENT_NOTIFICATIONS", "NOTIFY_ON_STATUS_UPDATES", "NOTIFY_ON_STATUS_UPDATES_ALL", "SHOW_REPOS_IN_NAME", "INCLUDE_REPOS_IN_FILTER",
 			"INCLUDE_LABELS_IN_FILTER", "INCLUDE_STATUSES_IN_FILTER", "HOTKEY_COMMAND_MODIFIER", "HOTKEY_OPTION_MODIFIER", "HOTKEY_SHIFT_MODIFIER", "GRAY_OUT_WHEN_REFRESHING", "SHOW_ISSUES_MENU",
-			"AUTO_PARTICIPATE_ON_TEAM_MENTIONS", "SHOW_ISSUES_IN_WATCH_GLANCE", "ASSIGNED_PR_HANDLING_POLICY", "HIDE_DESCRIPTION_IN_WATCH_DETAIL_VIEW", "AUTO_REPEAT_SETTINGS_EXPORT", "DONT_CONFIRM_SETTINGS_IMPORT",
+			"SHOW_ISSUES_IN_WATCH_GLANCE", "ASSIGNED_PR_HANDLING_POLICY", "HIDE_DESCRIPTION_IN_WATCH_DETAIL_VIEW", "AUTO_REPEAT_SETTINGS_EXPORT", "DONT_CONFIRM_SETTINGS_IMPORT",
 			"LAST_EXPORT_URL", "LAST_EXPORT_TIME", "CLOSE_HANDLING_POLICY_2", "MERGE_HANDLING_POLICY_2", "LAST_PREFS_TAB_SELECTED_OSX", "NEW_PR_DISPLAY_POLICY_INDEX", "NEW_ISSUE_DISPLAY_POLICY_INDEX", "HIDE_PRS_THAT_ARENT_PASSING_ONLY_IN_ALL",
             "INCLUDE_SERVERS_IN_FILTER", "INCLUDE_USERS_IN_FILTER", "INCLUDE_TITLES_IN_FILTER", "INCLUDE_NUMBERS_IN_FILTER", "DUMP_API_RESPONSES_IN_CONSOLE", "OPEN_ITEMS_DIRECTLY_IN_SAFARI", "HIDE_PRS_THAT_ARENT_PASSING",
-            "REMOVE_RELATED_NOTIFICATIONS_ON_ITEM_REMOVE", "HIDE_SNOOZED_ITEMS", "SNOOZE_WAKEUP_ON_COMMENT", "SNOOZE_WAKEUP_ON_MENTION", "SNOOZE_WAKEUP_ON_STATUS_UPDATE", "INCLUDE_MILESTONES_IN_FILTER",
-            "MOVE_NEW_ITEMS_IN_OWN_REPOS_TO_MENTIONED", "INCLUDE_ASSIGNEE_NAMES_IN_FILTER", "API_SERVERS_IN_SEPARATE_MENUS", "ASSUME_READ_ITEM_IF_USER_HAS_NEWER_COMMENTS", "AUTO_SNOOZE_DAYS"]
+            "REMOVE_RELATED_NOTIFICATIONS_ON_ITEM_REMOVE", "HIDE_SNOOZED_ITEMS", "INCLUDE_MILESTONES_IN_FILTER", "INCLUDE_ASSIGNEE_NAMES_IN_FILTER", "API_SERVERS_IN_SEPARATE_MENUS", "ASSUME_READ_ITEM_IF_USER_HAS_NEWER_COMMENTS", "AUTO_SNOOZE_DAYS"]
 	}
 
     class func checkMigration() {
 
-        let d = NSUserDefaults.standardUserDefaults()
-        if d.objectForKey("LAST_RUN_VERSION_KEY") != nil {
-            for k in allFields() {
-                if let v: AnyObject = d.objectForKey(k) {
-                    _settings_shared.setObject(v, forKey: k)
-                    DLog("Migrating setting '%@'", k)
-                    d.removeObjectForKey(k)
-                }
-            }
-            _settings_shared.synchronize()
-            DLog("Settings migrated to shared container")
-        } else {
-            DLog("No need to migrate settings into shared container")
-        }
-
-		if let moveAssignedPrs = _settings_shared.objectForKey("MOVE_ASSIGNED_PRS_TO_MY_SECTION") as? Bool {
-			_settings_shared.setObject(moveAssignedPrs ? AssignmentPolicy.MoveToMine.rawValue : AssignmentPolicy.DoNothing.rawValue, forKey: "ASSIGNED_PR_HANDLING_POLICY")
-			_settings_shared.removeObjectForKey("MOVE_ASSIGNED_PRS_TO_MY_SECTION")
+		if let snoozeWakeOnComment = sharedDefaults.object(forKey: "SNOOZE_WAKEUP_ON_COMMENT") as? Bool {
+			DataManager.postMigrationSnoozeWakeOnComment = snoozeWakeOnComment
+			sharedDefaults.removeObject(forKey: "SNOOZE_WAKEUP_ON_COMMENT")
+		}
+		if let snoozeWakeOnMention = sharedDefaults.object(forKey: "SNOOZE_WAKEUP_ON_MENTION") as? Bool {
+			DataManager.postMigrationSnoozeWakeOnMention = snoozeWakeOnMention
+			sharedDefaults.removeObject(forKey: "SNOOZE_WAKEUP_ON_MENTION")
+		}
+		if let snoozeWakeOnStatusUpdate = sharedDefaults.object(forKey: "SNOOZE_WAKEUP_ON_STATUS_UPDATE") as? Bool {
+			DataManager.postMigrationSnoozeWakeOnStatusUpdate = snoozeWakeOnStatusUpdate
+			sharedDefaults.removeObject(forKey: "SNOOZE_WAKEUP_ON_STATUS_UPDATE")
 		}
 
-		if let mergeHandlingPolicyLegacy = _settings_shared.objectForKey("MERGE_HANDLING_POLICY") as? Int {
-			_settings_shared.setObject(mergeHandlingPolicyLegacy + (mergeHandlingPolicyLegacy > 0 ? 1 : 0), forKey: "MERGE_HANDLING_POLICY_2")
-			_settings_shared.removeObjectForKey("MERGE_HANDLING_POLICY")
+		if let moveAssignedPrs = sharedDefaults.object(forKey: "MOVE_ASSIGNED_PRS_TO_MY_SECTION") as? Bool {
+			sharedDefaults.set(moveAssignedPrs ? AssignmentPolicy.moveToMine.rawValue : AssignmentPolicy.doNothing.rawValue, forKey: "ASSIGNED_PR_HANDLING_POLICY")
+			sharedDefaults.removeObject(forKey: "MOVE_ASSIGNED_PRS_TO_MY_SECTION")
 		}
 
-		if let closeHandlingPolicyLegacy = _settings_shared.objectForKey("CLOSE_HANDLING_POLICY") as? Int {
-			_settings_shared.setObject(closeHandlingPolicyLegacy + (closeHandlingPolicyLegacy > 0 ? 1 : 0), forKey: "CLOSE_HANDLING_POLICY_2")
-			_settings_shared.removeObjectForKey("CLOSE_HANDLING_POLICY")
+		if let mergeHandlingPolicyLegacy = sharedDefaults.object(forKey: "MERGE_HANDLING_POLICY") as? Int {
+			sharedDefaults.set(mergeHandlingPolicyLegacy + (mergeHandlingPolicyLegacy > 0 ? 1 : 0), forKey: "MERGE_HANDLING_POLICY_2")
+			sharedDefaults.removeObject(forKey: "MERGE_HANDLING_POLICY")
 		}
 
-		DataManager.postMigrationRepoPrPolicy = RepoDisplayPolicy.All
-		DataManager.postMigrationRepoIssuePolicy = RepoDisplayPolicy.Hide
-
-		if let showIssues = _settings_shared.objectForKey("SHOW_ISSUES_MENU") as? Bool {
-			_settings_shared.setObject(showIssues ? RepoDisplayPolicy.All.rawValue : RepoDisplayPolicy.Hide.rawValue, forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX")
-			DataManager.postMigrationRepoIssuePolicy = showIssues ? RepoDisplayPolicy.All : RepoDisplayPolicy.Hide
-			_settings_shared.removeObjectForKey("SHOW_ISSUES_MENU")
+		if let closeHandlingPolicyLegacy = sharedDefaults.object(forKey: "CLOSE_HANDLING_POLICY") as? Int {
+			sharedDefaults.set(closeHandlingPolicyLegacy + (closeHandlingPolicyLegacy > 0 ? 1 : 0), forKey: "CLOSE_HANDLING_POLICY_2")
+			sharedDefaults.removeObject(forKey: "CLOSE_HANDLING_POLICY")
 		}
 
-		if let hideNewRepositories = _settings_shared.objectForKey("HIDE_NEW_REPOS_KEY") as? Bool {
-			_settings_shared.setObject(hideNewRepositories ? RepoDisplayPolicy.Hide.rawValue : RepoDisplayPolicy.All.rawValue, forKey: "NEW_PR_DISPLAY_POLICY_INDEX")
-			_settings_shared.setObject(hideNewRepositories ? RepoDisplayPolicy.Hide.rawValue : RepoDisplayPolicy.All.rawValue, forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX")
-			_settings_shared.removeObjectForKey("HIDE_NEW_REPOS_KEY")
+		if let mentionedUserMoveLegacy = sharedDefaults.object(forKey: "AUTO_PARTICIPATE_IN_MENTIONS_KEY") as? Bool {
+			sharedDefaults.set(mentionedUserMoveLegacy ? Section.mentioned.intValue : Section.none.intValue, forKey: "NEW_MENTION_MOVE_POLICY")
+			sharedDefaults.removeObject(forKey: "AUTO_PARTICIPATE_IN_MENTIONS_KEY")
 		}
 
-		if let hideAllSection = _settings_shared.objectForKey("HIDE_ALL_SECTION") as? Bool {
+		if let mentionedTeamMoveLegacy = sharedDefaults.object(forKey: "AUTO_PARTICIPATE_ON_TEAM_MENTIONS") as? Bool {
+			sharedDefaults.set(mentionedTeamMoveLegacy ? Section.mentioned.intValue : Section.none.intValue, forKey: "TEAM_MENTION_MOVE_POLICY")
+			sharedDefaults.removeObject(forKey: "AUTO_PARTICIPATE_ON_TEAM_MENTIONS")
+		}
+
+		if let mentionedRepoMoveLegacy = sharedDefaults.object(forKey: "MOVE_NEW_ITEMS_IN_OWN_REPOS_TO_MENTIONED") as? Bool {
+			sharedDefaults.set(mentionedRepoMoveLegacy ? Section.mentioned.intValue : Section.none.intValue, forKey: "NEW_ITEM_IN_OWNED_REPO_MOVE_POLICY")
+			sharedDefaults.removeObject(forKey: "MOVE_NEW_ITEMS_IN_OWN_REPOS_TO_MENTIONED")
+		}
+
+		DataManager.postMigrationRepoPrPolicy = .all
+		DataManager.postMigrationRepoIssuePolicy = .hide
+
+		if let showIssues = sharedDefaults.object(forKey: "SHOW_ISSUES_MENU") as? Bool {
+			sharedDefaults.set(showIssues ? RepoDisplayPolicy.all.intValue : RepoDisplayPolicy.hide.intValue, forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX")
+			DataManager.postMigrationRepoIssuePolicy = showIssues ? RepoDisplayPolicy.all : RepoDisplayPolicy.hide
+			sharedDefaults.removeObject(forKey: "SHOW_ISSUES_MENU")
+		}
+
+		if let hideNewRepositories = sharedDefaults.object(forKey: "HIDE_NEW_REPOS_KEY") as? Bool {
+			sharedDefaults.set(hideNewRepositories ? RepoDisplayPolicy.hide.intValue : RepoDisplayPolicy.all.intValue, forKey: "NEW_PR_DISPLAY_POLICY_INDEX")
+			sharedDefaults.set(hideNewRepositories ? RepoDisplayPolicy.hide.intValue : RepoDisplayPolicy.all.intValue, forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX")
+			sharedDefaults.removeObject(forKey: "HIDE_NEW_REPOS_KEY")
+		}
+
+		if let hideAllSection = sharedDefaults.object(forKey: "HIDE_ALL_SECTION") as? Bool {
 			if hideAllSection {
-				if DataManager.postMigrationRepoPrPolicy == RepoDisplayPolicy.All {
-					DataManager.postMigrationRepoPrPolicy = RepoDisplayPolicy.MineAndPaticipated
+				if DataManager.postMigrationRepoPrPolicy == .all {
+					DataManager.postMigrationRepoPrPolicy = .mineAndPaticipated
 				}
-				if DataManager.postMigrationRepoIssuePolicy == RepoDisplayPolicy.All {
-					DataManager.postMigrationRepoIssuePolicy = RepoDisplayPolicy.MineAndPaticipated
+				if DataManager.postMigrationRepoIssuePolicy == .all {
+					DataManager.postMigrationRepoIssuePolicy = .mineAndPaticipated
 				}
 
-				let newPrPolicy = _settings_shared.objectForKey("NEW_PR_DISPLAY_POLICY_INDEX") as? Int ?? RepoDisplayPolicy.All.rawValue
-				if newPrPolicy == RepoDisplayPolicy.All.rawValue {
-					_settings_shared.setObject(RepoDisplayPolicy.MineAndPaticipated.rawValue, forKey: "NEW_PR_DISPLAY_POLICY_INDEX")
+				let newPrPolicy = sharedDefaults.object(forKey: "NEW_PR_DISPLAY_POLICY_INDEX") as? Int64 ?? RepoDisplayPolicy.all.rawValue
+				if newPrPolicy == RepoDisplayPolicy.all.rawValue {
+					sharedDefaults.set(RepoDisplayPolicy.mineAndPaticipated.intValue, forKey: "NEW_PR_DISPLAY_POLICY_INDEX")
 				}
-				let newIssuePolicy = _settings_shared.objectForKey("NEW_ISSUE_DISPLAY_POLICY_INDEX") as? Int ?? RepoDisplayPolicy.All.rawValue
-				if newIssuePolicy == RepoDisplayPolicy.All.rawValue {
-					_settings_shared.setObject(RepoDisplayPolicy.MineAndPaticipated.rawValue, forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX")
+				let newIssuePolicy = sharedDefaults.object(forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX") as? Int64 ?? RepoDisplayPolicy.all.rawValue
+				if newIssuePolicy == RepoDisplayPolicy.all.rawValue {
+					sharedDefaults.set(RepoDisplayPolicy.mineAndPaticipated.intValue, forKey: "NEW_ISSUE_DISPLAY_POLICY_INDEX")
 				}
 			}
-			_settings_shared.removeObjectForKey("HIDE_ALL_SECTION")
+			sharedDefaults.removeObject(forKey: "HIDE_ALL_SECTION")
 		}
 
-		_settings_shared.synchronize()
+		sharedDefaults.synchronize()
 	}
 
-	static var saveTimer: PopTimer?
+	private class func set(_ key: String, _ value: Any?) {
 
-	private class func set(key: String, _ value: NSObject?) {
-
-		let previousValue = _settings_shared.objectForKey(key) as? NSObject
+		let previousValue = sharedDefaults.object(forKey: key)
 
 		if let v = value {
-			if let p = previousValue where p.isEqual(v) {
-				DLog("Setting %@ to identical value (%@), skipping", key, value)
+			let vString = String(describing: v)
+			if let p = previousValue, String(describing : p) == vString {
+				DLog("Setting %@ to identical value (%@), skipping", key, vString)
 				return
 			} else {
-				_settings_shared.setObject(v, forKey: key)
+				sharedDefaults.set(v, forKey: key)
 			}
 		} else {
 			if previousValue == nil {
 				DLog("Setting %@ to identical value (nil), skipping", key)
 				return
 			} else {
-				_settings_shared.removeObjectForKey(key)
+				sharedDefaults.removeObject(forKey: key)
 			}
 		}
-		_settings_valuesCache[key] = value
-		_settings_shared.synchronize()
+		valuesCache[key] = value
+		sharedDefaults.synchronize()
 
-		DLog("Setting %@ to %@", key, value)
+		if let v = value {
+			DLog("Setting %@ to %@", key, String(describing: v))
+		} else {
+			DLog("Clearing option %@", key)
+		}
 
 		possibleExport(key)
 	}
 
-	class func possibleExport(key: String?) {
+	private static let saveTimer = { () -> PopTimer in
+		return PopTimer(timeInterval: 2.0) {
+			if let e = Settings.lastExportUrl {
+				_ = Settings.writeToURL(e)
+			}
+		}
+	}()
+
+	class func possibleExport(_ key: String?) {
 		#if os(OSX)
 		let keyIsGood: Bool
 		if let k = key {
@@ -169,86 +156,75 @@ final class Settings {
 			keyIsGood = true
 		}
 		if Settings.autoRepeatSettingsExport && keyIsGood && Settings.lastExportUrl != nil {
-			if saveTimer == nil {
-				saveTimer = PopTimer(timeInterval: 2.0) {
-					Settings.writeToURL(Settings.lastExportUrl!)
-				}
-			}
-			saveTimer?.push()
+			saveTimer.push()
 		}
 		#endif
 	}
 
-	private class func get(key: String) -> AnyObject? {
-		if let v: AnyObject = _settings_valuesCache[key] {
+	private class func get(_ key: String) -> Any? {
+		if let v = valuesCache[key] {
 			return v
-		} else if let v: AnyObject = _settings_shared.objectForKey(key) {
-			_settings_valuesCache[key] = v
+		} else if let v = sharedDefaults.object(forKey: key) {
+			valuesCache[key] = v
 			return v
 		} else {
 			return nil
 		}
 	}
 
-	/////////////////////////////////
+	///////////////////////////////// IMPORT / EXPORT
 
-	class func clearCache() {
-		_settings_valuesCache.removeAll(keepCapacity: false)
-	}
+	class func writeToURL(_ url: URL) -> Bool {
 
-	class func writeToURL(url: NSURL) -> Bool {
-
-		if let s = saveTimer {
-			s.invalidate()
-		}
+		saveTimer.invalidate()
 
 		Settings.lastExportUrl = url
-		Settings.lastExportDate = NSDate()
+		Settings.lastExportDate = Date()
 		let settings = NSMutableDictionary()
-		for k in allFields() {
-			if let v: AnyObject = _settings_shared.objectForKey(k) where k != "AUTO_REPEAT_SETTINGS_EXPORT" {
+		for k in allFields {
+			if let v = sharedDefaults.object(forKey: k), k != "AUTO_REPEAT_SETTINGS_EXPORT" {
 				settings[k] = v
 			}
 		}
-		settings["DB_CONFIG_OBJECTS"] = ApiServer.archiveApiServers()
-		settings["DB_SNOOZE_OBJECTS"] = SnoozePreset.archivePresets()
-		if !settings.writeToURL(url, atomically: true) {
+		settings["DB_CONFIG_OBJECTS"] = ApiServer.archivedApiServers
+		settings["DB_SNOOZE_OBJECTS"] = SnoozePreset.archivedPresets
+		if !settings.write(to: url, atomically: true) {
 			DLog("Warning, exporting settings failed")
 			return false
 		}
-		NSNotificationCenter.defaultCenter().postNotificationName(SETTINGS_EXPORTED, object: nil)
+		NotificationCenter.default.post(name: SettingsExportedNotification, object: nil)
 		DLog("Written settings to %@", url.absoluteString)
 		return true
 	}
 
-	class func readFromURL(url: NSURL) -> Bool {
-		if let settings = NSDictionary(contentsOfURL: url) {
+	class func readFromURL(_ url: URL) -> Bool {
+		if let settings = NSDictionary(contentsOf: url) {
 			DLog("Reading settings from %@", url.absoluteString)
 			resetAllSettings()
-			for k in allFields() {
-				if let v: AnyObject = settings[k] {
-					_settings_shared.setObject(v, forKey: k)
+			for k in allFields {
+				if let v = settings[k] {
+					sharedDefaults.set(v, forKey: k)
 				}
 			}
-			_settings_shared.synchronize()
-			clearCache()
-			return ApiServer.configureFromArchive(settings["DB_CONFIG_OBJECTS"] as! [String : [String : NSObject]])
-			&& SnoozePreset.configureFromArchive(settings["DB_SNOOZE_OBJECTS"] as! [[String : NSObject]])
+			sharedDefaults.synchronize()
+			valuesCache.removeAll(keepingCapacity: false)
+			return ApiServer.configure(from: settings["DB_CONFIG_OBJECTS"] as! [String : [String : NSObject]])
+			&& SnoozePreset.configure(from: settings["DB_SNOOZE_OBJECTS"] as! [[String : NSObject]])
 		}
 		return false
 	}
 
 	class func resetAllSettings() {
-		for k in allFields() {
-			_settings_shared.removeObjectForKey(k)
+		for k in allFields {
+			sharedDefaults.removeObject(forKey: k)
 		}
-		_settings_shared.synchronize()
-		clearCache()
+		sharedDefaults.synchronize()
+		valuesCache.removeAll(keepingCapacity: false)
 	}
 
 	///////////////////////////////// NUMBERS
 
-	static let autoSnoozeDurationHelp = "How many days before an item is automatically snoozed using the first (top) preset."
+	static let autoSnoozeDurationHelp = "How many days before an item is automatically snoozed. An item is auto-snoozed forever but will wake up on any comment, mention, or status update."
 	class var autoSnoozeDuration: Int {
 		get { return get("AUTO_SNOOZE_DAYS") as? Int ?? 0 }
 		set { set("AUTO_SNOOZE_DAYS", newValue) }
@@ -277,13 +253,13 @@ final class Settings {
 
 	static let closeHandlingPolicyHelp = "How to handle an item when it is believed to be closed (or has disappeared)."
 	class var closeHandlingPolicy: Int {
-		get { return get("CLOSE_HANDLING_POLICY_2") as? Int ?? HandlingPolicy.KeepMine.rawValue }
+		get { return get("CLOSE_HANDLING_POLICY_2") as? Int ?? HandlingPolicy.keepMine.rawValue }
 		set { set("CLOSE_HANDLING_POLICY_2", newValue) }
 	}
 
 	static let mergeHandlingPolicyHelp = "How to handle an item when it is detected as merged."
 	class var mergeHandlingPolicy: Int {
-		get { return get("MERGE_HANDLING_POLICY_2") as? Int ?? HandlingPolicy.KeepMine.rawValue }
+		get { return get("MERGE_HANDLING_POLICY_2") as? Int ?? HandlingPolicy.keepMine.rawValue }
 		set { set("MERGE_HANDLING_POLICY_2", newValue) }
 	}
 
@@ -312,14 +288,32 @@ final class Settings {
 
 	static let displayPolicyForNewPrsHelp = "When a new repository is detected in your watchlist, this display policy will be applied by default to pull requests that come from it. You can further customize the display policy for any individual repository from the 'Repositories' tab."
 	class var displayPolicyForNewPrs: Int {
-		get { return get("NEW_PR_DISPLAY_POLICY_INDEX") as? Int ?? RepoDisplayPolicy.All.rawValue }
+		get { return get("NEW_PR_DISPLAY_POLICY_INDEX") as? Int ?? RepoDisplayPolicy.all.intValue }
 		set { set("NEW_PR_DISPLAY_POLICY_INDEX", newValue) }
 	}
 
 	static let displayPolicyForNewIssuesHelp = "When a new repository is detected in your watchlist, this display policy will be applied by default to issues that come from it. You can further customize the display policy for any individual repository from the 'Repositories' tab."
 	class var displayPolicyForNewIssues: Int {
-		get { return get("NEW_ISSUE_DISPLAY_POLICY_INDEX") as? Int ?? RepoDisplayPolicy.Hide.rawValue }
+		get { return get("NEW_ISSUE_DISPLAY_POLICY_INDEX") as? Int ?? RepoDisplayPolicy.hide.intValue }
 		set { set("NEW_ISSUE_DISPLAY_POLICY_INDEX", newValue) }
+	}
+
+	static let newMentionMovePolicyHelp = "If your username is mentioned in an item's description or a comment posted inside it, move the item to the specified section."
+	class var newMentionMovePolicy: Int {
+		get { return get("NEW_MENTION_MOVE_POLICY") as? Int ?? Section.mentioned.intValue }
+		set { set("NEW_MENTION_MOVE_POLICY", newValue) }
+	}
+
+	static let teamMentionMovePolicyHelp = "If the name of one of the teams you belong to is mentioned in an item's description or a comment posted inside it, move the item to the specified section."
+	class var teamMentionMovePolicy: Int {
+		get { return get("TEAM_MENTION_MOVE_POLICY") as? Int ?? Section.mentioned.intValue }
+		set { set("TEAM_MENTION_MOVE_POLICY", newValue) }
+	}
+
+	static let newItemInOwnedRepoMovePolicyHelp = "Automatically move an item to the specified section if it has been created in a repo which you own, even if there is no direct mention of you."
+	class var newItemInOwnedRepoMovePolicy: Int {
+		get { return get("NEW_ITEM_IN_OWNED_REPO_MOVE_POLICY") as? Int ?? Section.none.intValue }
+		set { set("NEW_ITEM_IN_OWNED_REPO_MOVE_POLICY", newValue) }
 	}
 
 	/////////////////////////// STRINGS
@@ -359,7 +353,7 @@ final class Settings {
 		set {
 			set("IOS_BACKGROUND_REFRESH_PERIOD_KEY", newValue)
 			#if os(iOS)
-				UIApplication.sharedApplication().setMinimumBackgroundFetchInterval(NSTimeInterval(newValue))
+				UIApplication.shared.setMinimumBackgroundFetchInterval(TimeInterval(newValue))
 			#endif
 		}
 	}
@@ -372,22 +366,22 @@ final class Settings {
 
 	/////////////////////////// DATES
 
-    class var lastSuccessfulRefresh: NSDate? {
-        get { return get("LAST_SUCCESSFUL_REFRESH") as? NSDate }
+    class var lastSuccessfulRefresh: Date? {
+        get { return get("LAST_SUCCESSFUL_REFRESH") as? Date }
         set { set("LAST_SUCCESSFUL_REFRESH", newValue) }
     }
 
-	class var lastExportDate: NSDate? {
-		get { return get("LAST_EXPORT_TIME") as? NSDate }
+	class var lastExportDate: Date? {
+		get { return get("LAST_EXPORT_TIME") as? Date }
 		set { set("LAST_EXPORT_TIME", newValue) }
 	}
 
 	/////////////////////////// URLs
 
-	class var lastExportUrl: NSURL? {
+	class var lastExportUrl: URL? {
 		get {
 			if let s = get("LAST_EXPORT_URL") as? String {
-				return NSURL(string: s)
+				return URL(string: s)
 			} else {
 				return nil
 			}
@@ -396,12 +390,6 @@ final class Settings {
 	}
 
     /////////////////////////// SWITCHES
-
-	static let moveNewItemsInOwnReposToMentionedHelp = "Automatically move an item to the 'Mentioned' section if it has been created in a repo which you own, even if there is no direct mention to you."
-	class var moveNewItemsInOwnReposToMentioned: Bool {
-		get { return get("MOVE_NEW_ITEMS_IN_OWN_REPOS_TO_MENTIONED") as? Bool ?? false }
-		set { set("MOVE_NEW_ITEMS_IN_OWN_REPOS_TO_MENTIONED", newValue) }
-	}
 
 	static let hideSnoozedItemsHelp = "Hide the snoozed items section"
 	class var hideSnoozedItems: Bool {
@@ -533,7 +521,7 @@ final class Settings {
         set { set("NOTIFY_ON_STATUS_UPDATES_ALL", newValue) }
     }
 
-	static let preferIssuesInWatchHelp = "In the Apple Watch glance, or when there is only enough space to display one count or set of statistics in complications, prefer the ones for issues rather than the ones for PRs."
+	static let preferIssuesInWatchHelp = "If there is only enough space to display one count or set of statistics on the Apple Watch, prefer the ones for issues rather than the ones for PRs."
 	class var preferIssuesInWatch: Bool {
 		get { return get("SHOW_ISSUES_IN_WATCH_GLANCE") as? Bool ?? false }
 		set { set("SHOW_ISSUES_IN_WATCH_GLANCE", newValue) }
@@ -557,7 +545,7 @@ final class Settings {
 
 	static let removeNotificationsWhenItemIsRemovedHelp = "When an item is removed, whether through user action or automatically due to settings, also remove any notifications in the Notification Center that are related to this item."
 	class var removeNotificationsWhenItemIsRemoved: Bool {
-		get { return get("REMOVE_RELATED_NOTIFICATIONS_ON_ITEM_REMOVE") as? Bool ?? false }
+		get { return get("REMOVE_RELATED_NOTIFICATIONS_ON_ITEM_REMOVE") as? Bool ?? true }
 		set { set("REMOVE_RELATED_NOTIFICATIONS_ON_ITEM_REMOVE", newValue) }
 	}
 
@@ -573,7 +561,7 @@ final class Settings {
 		set { set("DUMP_API_RESPONSES_IN_CONSOLE", newValue) }
 	}
 
-	static let openItemsDirectlyInSafariHelp = "Directly open items in the Safari browser rather than the internal web view. Especially useful on iPad when using split-screen view, where you can pull in Trailer from the side but stay in Safari, or on iPhone where you can use the status-bar button as a back button. If the detail view is already visible (for instance when runing in full-screen mode on iPad) the internal view will still get used, even if this option is turned on."
+	static let openItemsDirectlyInSafariHelp = "Directly open items in the Safari browser rather than the internal web view. Especially useful on iPad when using split-screen view,, you can pull in Trailer from the side but stay in Safari, or on iPhone, you can use the status-bar button as a back button. If the detail view is already visible (for instance when runing in full-screen mode on iPad) the internal view will still get used, even if this option is turned on."
 	class var openItemsDirectlyInSafari: Bool {
 		get { return get("OPEN_ITEMS_DIRECTLY_IN_SAFARI") as? Bool ?? false }
 		set { set("OPEN_ITEMS_DIRECTLY_IN_SAFARI", newValue) }
@@ -591,41 +579,15 @@ final class Settings {
 		set { set("HIDE_PRS_THAT_ARENT_PASSING_ONLY_IN_ALL", newValue) }
 	}
 
-	static let autoMoveOnCommentMentionsHelp = "If your username is mentioned in an item's description or a comment posted inside it, move the item to the 'Mentioned' section."
-	class var autoMoveOnCommentMentions: Bool {
-		get { return get("AUTO_PARTICIPATE_IN_MENTIONS_KEY") as? Bool ?? true }
-		set { set("AUTO_PARTICIPATE_IN_MENTIONS_KEY", newValue) }
-	}
-
-	static let autoMoveOnTeamMentionsHelp = "If the name of one of the teams you belong to is mentioned in an item's description or a comment posted inside it, move the item to the 'Mentioned' section."
-	class var autoMoveOnTeamMentions: Bool {
-		get { return get("AUTO_PARTICIPATE_ON_TEAM_MENTIONS") as? Bool ?? true }
-		set { set("AUTO_PARTICIPATE_ON_TEAM_MENTIONS", newValue) }
-	}
-	
-	static let useVibrancyHelp = "Use Mac OS X Vibrancy to display the Trailer drop-down menu, if available on the current OS version. If the OS doesn't support this, this setting has no effect."
+	static let useVibrancyHelp = "Use macOS Vibrancy to display the Trailer drop-down menu, if available on the current OS version. If the OS doesn't support this, this setting has no effect."
 	class var useVibrancy: Bool {
 		get { return get("USE_VIBRANCY_UI") as? Bool ?? true }
 		set { set("USE_VIBRANCY_UI", newValue) }
 	}
 
 	static let snoozeWakeOnCommentHelp = "Wake up snoozing items if a new comment is made"
-	class var snoozeWakeOnComment: Bool {
-		get { return get("SNOOZE_WAKEUP_ON_COMMENT") as? Bool ?? true }
-		set { set("SNOOZE_WAKEUP_ON_COMMENT", newValue) }
-	}
-
 	static let snoozeWakeOnMentionHelp = "Wake up snoozing items in you are mentioned in a new comment"
-	class var snoozeWakeOnMention: Bool {
-		get { return get("SNOOZE_WAKEUP_ON_MENTION") as? Bool ?? true }
-		set { set("SNOOZE_WAKEUP_ON_MENTION", newValue) }
-	}
-
 	static let snoozeWakeOnStatusUpdateHelp = "Wake up snoozing items if there is a status or CI update"
-	class var snoozeWakeOnStatusUpdate: Bool {
-		get { return get("SNOOZE_WAKEUP_ON_STATUS_UPDATE") as? Bool ?? true }
-		set { set("SNOOZE_WAKEUP_ON_STATUS_UPDATE", newValue) }
-	}
 
 	static let countOnlyListedItemsHelp = "Show the number of items currently visible in Trailer in the menu bar. If this is unselected, the menubar will display the count of all open items in the current watchlist, irrespective of filters or visibility settings. It's recommended you keep this on."
     class var countOnlyListedItems: Bool {

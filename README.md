@@ -1,4 +1,4 @@
-*Important: Due to security changes under OS X, if you are running v1.3.9 or earlier under OS X El Capitan, please upgrade to the latest version manually from [the latest releases page](https://github.com/ptsochantaris/trailer/releases)*
+*Important: Due to security changes under macOS, if you are running v1.3.9 or earlier under El Capitan, please upgrade to the latest version manually from [the latest releases page](https://github.com/ptsochantaris/trailer/releases)*
 
 Trailer
 =======
@@ -11,7 +11,7 @@ Released under the terms of the MIT licence, see the file LICENCE for details.
 
 For maintained binaries and/or more info:
 
-- [Latest OS X version](http://ptsochantaris.github.io/trailer/)
+- [Latest macOS version](http://ptsochantaris.github.io/trailer/)
 
 - [Latest iOS version](https://itunes.apple.com/US/app/id806104975?mt=8)
 

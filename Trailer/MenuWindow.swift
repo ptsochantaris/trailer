@@ -1,6 +1,4 @@
 
-let newSystem = (floor(NSAppKitVersionNumber) > Double(NSAppKitVersionNumber10_9))
-
 final class MenuWindow: NSWindow {
 
 	@IBOutlet weak var scrollView: NSScrollView!
@@ -24,8 +22,8 @@ final class MenuWindow: NSWindow {
 
 	var itemDelegate: ItemDelegate! {
 		didSet {
-			table.setDataSource(itemDelegate)
-			table.setDelegate(itemDelegate)
+			table.dataSource = itemDelegate
+			table.delegate = itemDelegate
 		}
 	}
 
@@ -35,60 +33,49 @@ final class MenuWindow: NSWindow {
 
 		super.awakeFromNib()
 
-		backgroundColor = NSColor.whiteColor()
+		backgroundColor = .white
 
-        if newSystem {
-            scrollView.contentView.wantsLayer = true
-        }
+		scrollView.contentView.wantsLayer = true
 
-		NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(MenuWindow.refreshUpdate), name: kSyncProgressUpdate, object: nil)
+		NotificationCenter.default.addObserver(self, selector: #selector(refreshUpdate), name: SyncProgressUpdateNotification, object: nil)
 	}
 
-	class func usingVibrancy() -> Bool {
-		return newSystem && Settings.useVibrancy
-	}
-
-	override func controlTextDidChange(obj: NSNotification) {
+	override func controlTextDidChange(_ obj: Notification) {
 		app.controlTextDidChange(obj)
 	}
 
 	func updateVibrancy() {
 
-		if MenuWindow.usingVibrancy() {
+		if Settings.useVibrancy {
 
-			if #available(OSX 10.10, *) {
-			    appearance = NSAppearance(named: app.darkMode ? NSAppearanceNameVibrantDark : NSAppearanceNameVibrantLight)
-				if windowVibrancy == nil {
-					let w = NSVisualEffectView(frame: header.bounds)
-					w.autoresizingMask = [NSAutoresizingMaskOptions.ViewHeightSizable, NSAutoresizingMaskOptions.ViewWidthSizable]
-					w.blendingMode = NSVisualEffectBlendingMode.BehindWindow
-					w.state = NSVisualEffectState.Active
-					header.addSubview(w, positioned:NSWindowOrderingMode.Below, relativeTo:filter)
-					windowVibrancy = w
+			appearance = NSAppearance(named: app.darkMode ? NSAppearanceNameVibrantDark : NSAppearanceNameVibrantLight)
+			if windowVibrancy == nil {
+				let w = NSVisualEffectView(frame: header.bounds)
+				w.autoresizingMask = [.viewHeightSizable, .viewWidthSizable]
+				w.blendingMode = .behindWindow
+				w.state = .active
+				header.addSubview(w, positioned: .below, relativeTo: filter)
+				windowVibrancy = w
 
-					table.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.SourceList
-				}
+				table.selectionHighlightStyle = .sourceList
 			}
 
-		} else {
+		} else if let w = windowVibrancy {
 
-            if let w = windowVibrancy {
+			appearance = NSAppearance(named: NSAppearanceNameAqua)
+			w.removeFromSuperview()
+			windowVibrancy = nil
 
-                appearance = NSAppearance(named: NSAppearanceNameAqua)
-                w.removeFromSuperview()
-                windowVibrancy = nil
-                table.selectionHighlightStyle = NSTableViewSelectionHighlightStyle.Regular
-            }
+			table.selectionHighlightStyle = .regular
 		}
 	}
 
-	func showStatusItem() -> StatusItemView {
+	var showStatusItem: StatusItemView {
 		if statusItem == nil {
-			statusItem = NSStatusBar.systemStatusBar().statusItemWithLength(NSVariableStatusItemLength)
+			statusItem = NSStatusBar.system().statusItem(withLength: NSVariableStatusItemLength)
 			statusItem!.view = StatusItemView { [weak self] in
-				if let S = self {
-					if S.visible { S.closeMenu() } else { app.showMenu(S) }
-				}
+				guard let s = self else { return }
+				if s.isVisible { s.closeMenu() } else { app.show(menu: s) }
 			}
 		}
 		return statusItem!.view as! StatusItemView
@@ -101,20 +88,20 @@ final class MenuWindow: NSWindow {
 		}
 	}
 
-    override var canBecomeKeyWindow: Bool {
+    override var canBecomeKey: Bool {
 		return true
 	}
 
-	func menuWillOpen(menu: NSMenu) {
+	func menuWillOpen(_ menu: NSMenu) {
 		if appIsRefreshing {
 			refreshUpdate()
 		} else {
-			refreshMenuItem.title = " Refresh - \(api.lastUpdateDescription())"
+			refreshMenuItem.title = " Refresh - \(API.lastUpdateDescription)"
 		}
 	}
 
 	func refreshUpdate() {
-		refreshMenuItem.title = " \(api.lastUpdateDescription())"
+		refreshMenuItem.title = " \(API.lastUpdateDescription)"
 	}
 
 	func scrollToTop() {
@@ -122,37 +109,37 @@ final class MenuWindow: NSWindow {
 	}
 
 	deinit {
-		NSNotificationCenter.defaultCenter().removeObserver(self)
+		NotificationCenter.default.removeObserver(self)
 	}
 
-	@IBAction func markAllReadSelected(sender: NSMenuItem) {
-		app.markAllReadSelectedFrom(self)
+	@IBAction func markAllReadSelected(_ sender: NSMenuItem) {
+		app.markAllReadSelected(from: self)
 	}
 
-	@IBAction func preferencesSelected(sender: NSMenuItem) {
+	@IBAction func preferencesSelected(_ sender: NSMenuItem) {
 		app.preferencesSelected()
 	}
 
-	@IBAction func refreshSelected(sender: NSMenuItem) {
-		if Repo.countItemsOfType("Repo", moc: mainObjectContext) == 0 {
+	@IBAction func refreshSelected(_ sender: NSMenuItem) {
+		if Repo.countItems(of: Repo.self, in: DataManager.main) == 0 {
 			app.preferencesSelected()
 			return
 		}
 		app.startRefresh()
 	}
 
-	@IBAction func aboutSelected(sender: AnyObject) {
+	@IBAction func aboutSelected(_ sender: NSMenuItem) {
 		app.showAboutWindow()
 	}
 
-	func sizeAndShow(show: Bool) {
+	func size(andShow makeVisible: Bool) {
 
 		guard let siv = statusItem?.view as? StatusItemView else { return }
 		guard let windowFrame = siv.window?.frame else { return }
 
 		var S: NSScreen?
 		for s in NSScreen.screens() ?? [] {
-			if CGRectContainsRect(s.frame, windowFrame) {
+			if s.frame.contains(windowFrame) {
 				S = s
 				break
 			}
@@ -167,7 +154,7 @@ final class MenuWindow: NSWindow {
 			menuLeft -= overflow
 		}
 
-		var menuHeight = TOP_HEADER_HEIGHT
+		var menuHeight: CGFloat = 28
 		let rowCount = table.numberOfRows
 		let screenHeight = screen.visibleFrame.size.height
 		if rowCount == 0 {
@@ -175,7 +162,7 @@ final class MenuWindow: NSWindow {
 		} else {
 			menuHeight += 10
 			for f in 0..<rowCount {
-				let rowView = table.viewAtColumn(0, row: f, makeIfNecessary: true)!
+				let rowView = table.view(atColumn: 0, row: f, makeIfNecessary: true)!
 				menuHeight += rowView.frame.size.height + 2
 				if menuHeight >= screenHeight {
 					break
@@ -190,42 +177,48 @@ final class MenuWindow: NSWindow {
 			menuHeight = screenHeight
 		}
 
-		setFrame(CGRectMake(menuLeft, bottom, MENU_WIDTH, menuHeight), display: false, animate: false)
+		setFrame(CGRect(x: menuLeft, y: bottom, width: MENU_WIDTH, height: menuHeight), display: false, animate: false)
 
-		if show {
+		if makeVisible {
 			siv.highlighted = true
 			table.deselectAll(nil)
 			app.openingWindow = true
-			level = Int(CGWindowLevelForKey(CGWindowLevelKey.FloatingWindowLevelKey))
+			level = Int(CGWindowLevelForKey(CGWindowLevelKey.floatingWindow))
 			makeKeyAndOrderFront(self)
-			NSApp.activateIgnoringOtherApps(true)
+			NSApp.activate(ignoringOtherApps: true)
 			app.openingWindow = false
+		} else if statusItem == nil {
+			closeMenu()
 		}
 	}
 
 	func reload() {
 		messageView = nil
-		itemDelegate.reloadData(filter.stringValue)
+		itemDelegate.reloadData(filter: filter.stringValue)
 		table.reloadData()
 	}
 
 	func closeMenu() {
-		if visible, let siv = statusItem?.view as? StatusItemView {
-			siv.highlighted = false
-			orderOut(nil)
+		if isVisible {
+			if let siv = statusItem?.view as? StatusItemView {
+				siv.highlighted = false
+			}
 			table.deselectAll(nil)
+			orderOut(nil)
 		}
 	}
 
-	func focusedItem() -> ListableItem? {
+	func focusedItem(blink: Bool) -> ListableItem? {
 		let row = table.selectedRow
 		var i: ListableItem?
 		if row >= 0 {
-			table.deselectAll(nil)
+			if blink { table.deselectAll(nil) }
 			i = itemDelegate.itemAtRow(row)
 		}
-		atNextEvent(self) { S in
-			S.table.selectRowIndexes(NSIndexSet(index: row), byExtendingSelection: false)
+		if blink {
+			atNextEvent(self) { S in
+				S.table.selectRowIndexes(IndexSet(integer: row), byExtendingSelection: false)
+			}
 		}
 		return i
 	}

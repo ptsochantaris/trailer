@@ -3,31 +3,27 @@
 
 import UIKit
 
-let REFRESH_STARTED_NOTIFICATION = "RefreshStartedNotification"
-let REFRESH_ENDED_NOTIFICATION = "RefreshEndedNotification"
-let GLOBAL_SCREEN_SCALE = UIScreen.mainScreen().scale
+weak var app: iOS_AppDelegate!
+
+let GLOBAL_SCREEN_SCALE = UIScreen.main.scale
 let GLOBAL_TINT = UIColor(red: 52.0/255.0, green: 110.0/255.0, blue: 183.0/255.0, alpha: 1.0)
 let DISABLED_FADE: CGFloat = 0.3
 
-let stringDrawingOptions: NSStringDrawingOptions = [.UsesLineFragmentOrigin, .UsesFontLeading]
 typealias COLOR_CLASS = UIColor
 typealias FONT_CLASS = UIFont
 typealias IMAGE_CLASS = UIImage
 
 #elseif os(OSX)
 
-let TOP_HEADER_HEIGHT: CGFloat = 28.0
-let AVATAR_SIZE: CGFloat = 26.0
-let LEFTPADDING: CGFloat = 44.0
-let TITLE_HEIGHT: CGFloat = 42.0
-let BASE_BADGE_SIZE: CGFloat = 20.0
-let SMALL_BADGE_SIZE: CGFloat = 14.0
-let MENU_WIDTH: CGFloat = 500.0
-let AVATAR_PADDING: CGFloat = 8.0
-let REMOVE_BUTTON_WIDTH: CGFloat = 80.0
+weak var app: OSX_AppDelegate!
+
+let AVATAR_SIZE: CGFloat = 26
+let AVATAR_PADDING: CGFloat = 8
+let LEFTPADDING: CGFloat = 44
+let MENU_WIDTH: CGFloat = 500
+let REMOVE_BUTTON_WIDTH: CGFloat = 80
 let DISABLED_FADE: CGFloat = 0.4
 
-let stringDrawingOptions: NSStringDrawingOptions = [.UsesLineFragmentOrigin, .UsesFontLeading]
 typealias COLOR_CLASS = NSColor
 typealias FONT_CLASS = NSFont
 typealias IMAGE_CLASS = NSImage
@@ -35,258 +31,283 @@ typealias IMAGE_CLASS = NSImage
 #endif
 
 ////////////////////// Global variables
+
 var appIsRefreshing = false
 var preferencesDirty = false
-var lastRepoCheck = never()
-let autoSnoozeDate = NSDate.distantFuture().dateByAddingTimeInterval(-1)
+var lastRepoCheck = Date.distantPast
+let autoSnoozeDate = Date.distantFuture.addingTimeInterval(-1)
+let stringDrawingOptions: NSStringDrawingOptions = [.usesLineFragmentOrigin, .usesFontLeading]
+let LISTABLE_URI_KEY = "listableUriKey"
+let COMMENT_ID_KEY = "commentIdKey"
+let NOTIFICATION_URL_KEY = "urlKey"
 
-//////////////////////////
+////////////////////////// Utilities
 
-let itemDateFormatter = { () -> NSDateFormatter in
-	let f = NSDateFormatter()
-	f.dateStyle = .MediumStyle
-	f.timeStyle = .ShortStyle
+#if os(iOS)
+	import CoreData
+
+func showMessage(_ title: String, _ message: String?) {
+	var viewController = app.window?.rootViewController
+	while viewController?.presentedViewController != nil {
+		viewController = viewController?.presentedViewController
+	}
+
+	let a = UIAlertController(title: title, message: message, preferredStyle: .alert)
+	a.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+	viewController?.present(a, animated: true, completion: nil)
+}
+#endif
+
+func existingObject(with id: NSManagedObjectID) -> NSManagedObject? {
+	return try? DataManager.main.existingObject(with: id)
+}
+
+let itemDateFormatter = { () -> DateFormatter in
+	let f = DateFormatter()
+	f.dateStyle = .medium
+	f.timeStyle = .short
 	f.doesRelativeDateFormatting = true
 	return f
-	}()
+}()
 
-//////////////////////// Logging: Ugly as hell but works and is fast
-
-func DLog(message: String) {
-    if Settings.logActivityToConsole {
-        NSLog(message)
-    }
-}
-
-func DLog(message: String, @autoclosure _ arg1: ()->CVarArgType?) {
-    if Settings.logActivityToConsole {
-        NSLog(message, arg1() ?? "(nil)")
-    }
-}
-
-func DLog(message: String, @autoclosure _ arg1: ()->CVarArgType?, @autoclosure _ arg2: ()->CVarArgType?) {
-    if Settings.logActivityToConsole {
-        NSLog(message, arg1() ?? "(nil)", arg2() ?? "(nil)")
-    }
-}
-
-func DLog(message: String, @autoclosure _ arg1: ()->CVarArgType?, @autoclosure _ arg2: ()->CVarArgType?, @autoclosure _ arg3: ()->CVarArgType?) {
-    if Settings.logActivityToConsole {
-        NSLog(message, arg1() ?? "(nil)", arg2() ?? "(nil)", arg3() ?? "(nil)")
-    }
-}
-
-func DLog(message: String, @autoclosure _ arg1: ()->CVarArgType?, @autoclosure _ arg2: ()->CVarArgType?, @autoclosure _ arg3: ()->CVarArgType?, @autoclosure _ arg4: ()->CVarArgType?) {
+func DLog(_ message: String, _ arg1: @autoclosure ()->Any? = nil, _ arg2: @autoclosure ()->Any? = nil, _ arg3: @autoclosure ()->Any? = nil, _ arg4: @autoclosure ()->Any? = nil, _ arg5: @autoclosure ()->Any? = nil) {
 	if Settings.logActivityToConsole {
-		NSLog(message, arg1() ?? "(nil)", arg2() ?? "(nil)", arg3() ?? "(nil)", arg4() ?? "(nil)")
+		NSLog(message,
+		      String(describing: arg1() ?? "(nil)"),
+		      String(describing: arg2() ?? "(nil)"),
+		      String(describing: arg3() ?? "(nil)"),
+		      String(describing: arg4() ?? "(nil)"),
+		      String(describing: arg5() ?? "(nil)"))
 	}
 }
 
-func DLog(message: String, @autoclosure _ arg1: ()->CVarArgType?, @autoclosure _ arg2: ()->CVarArgType?, @autoclosure _ arg3: ()->CVarArgType?, @autoclosure _ arg4: ()->CVarArgType?, @autoclosure _ arg5: ()->CVarArgType?) {
-	if Settings.logActivityToConsole {
-		NSLog(message, arg1() ?? "(nil)", arg2() ?? "(nil)", arg3() ?? "(nil)", arg4() ?? "(nil)", arg5() ?? "(nil)")
-	}
-}
-
-let itemCountFormatter = { () -> NSNumberFormatter in
-    let n = NSNumberFormatter()
-    n.numberStyle = NSNumberFormatterStyle.DecimalStyle
+let itemCountFormatter = { () -> NumberFormatter in
+    let n = NumberFormatter()
+    n.numberStyle = .decimal
     return n
 }()
 
-enum ItemCondition: Int {
-	case Open, Closed, Merged
+// Single-purpose derivation from the excellent SAMAdditions:
+// https://github.com/soffes/SAMCategories/blob/master/SAMCategories/NSDate%2BSAMAdditions.m
+private let dateParserHolder = "                   +0000".cString(using: String.Encoding.ascii)!
+func parseGH8601(_ iso8601: String?) -> Date? {
+
+	guard let i = iso8601, i.characters.count >= 19 else { return nil }
+
+	var fullString = dateParserHolder
+	memcpy(&fullString, i, 19)
+
+	var tt = tm()
+	strptime(fullString, "%FT%T%z", &tt)
+
+	let t = mktime(&tt)
+	return Date(timeIntervalSince1970: TimeInterval(t))
+}
+
+func bootUp() {
+	Settings.checkMigration()
+	DataManager.checkMigration()
+	API.setup()
+}
+
+//////////////////////// Enums
+
+enum ItemCondition: Int64 {
+	case open, closed, merged
 }
 
 enum StatusFilter: Int {
-	case All, Include, Exclude
+	case all, include, exclude
 }
 
-enum PostSyncAction: Int {
-	case DoNothing, Delete, NoteNew, NoteUpdated
+enum PostSyncAction: Int64 {
+	case doNothing, delete, isNew, isUpdated
 }
 
 enum NotificationType: Int {
-	case NewComment, NewPr, PrMerged, PrReopened, NewMention, PrClosed, NewRepoSubscribed, NewRepoAnnouncement, NewPrAssigned, NewStatus, NewIssue, IssueClosed, NewIssueAssigned, IssueReopened
+	case newComment, newPr, prMerged, prReopened, newMention, prClosed, newRepoSubscribed, newRepoAnnouncement, newPrAssigned, newStatus, newIssue, issueClosed, newIssueAssigned, issueReopened
 }
 
 enum SortingMethod: Int {
-	case CreationDate, RecentActivity, Title
+	case creationDate, recentActivity, title
 	static let reverseTitles = ["Youngest first", "Most recently active", "Reverse alphabetically"]
 	static let normalTitles = ["Oldest first", "Inactive for longest", "Alphabetically"]
 
-	func normalTitle() -> String {
+	init?(_ rawValue: Int) {
+		self.init(rawValue: rawValue)
+	}
+
+	var normalTitle: String {
 		return SortingMethod.normalTitles[rawValue]
 	}
 
-	func reverseTitle() -> String {
+	var reverseTitle: String {
 		return SortingMethod.reverseTitles[rawValue]
 	}
 
-	func field() -> String? {
+	var field: String? {
 		switch self {
-		case .CreationDate: return "createdAt"
-		case .RecentActivity: return "updatedAt"
-		case .Title: return "title"
+		case .creationDate: return "createdAt"
+		case .recentActivity: return "updatedAt"
+		case .title: return "title"
 		}
 	}
 }
 
 enum HandlingPolicy: Int {
-	case KeepMine, KeepMineAndParticipated, KeepAll, KeepNone
+	case keepMine, keepMineAndParticipated, keepAll, keepNone
 	static let labels = ["Keep Mine", "Keep Mine & Participated", "Keep All", "Don't Keep"]
-	func name() -> String {
+	var name: String {
 		return HandlingPolicy.labels[rawValue]
+	}
+	init?(_ rawValue: Int) {
+		self.init(rawValue: rawValue)
 	}
 }
 
 enum AssignmentPolicy: Int {
-	case MoveToMine, MoveToParticipated, DoNothing
+	case moveToMine, moveToParticipated, doNothing
 	static let labels = ["Move To Mine", "Move To Participated", "Do Nothing"]
-	func name() -> String {
+	var name: String {
 		return AssignmentPolicy.labels[rawValue]
+	}
+	init?(_ rawValue: Int) {
+		self.init(rawValue: rawValue)
 	}
 }
 
-enum RepoDisplayPolicy: Int {
-	case Hide, Mine, MineAndPaticipated, All
+enum RepoDisplayPolicy: Int64 {
+	case hide, mine, mineAndPaticipated, all
 	static let labels = ["Hide", "Mine", "Participated", "All"]
-	static let policies = [Hide, Mine, MineAndPaticipated, All]
+	static let policies = [hide, mine, mineAndPaticipated, all]
 	static let colors = [	COLOR_CLASS(red: 0.8, green: 0.8, blue: 0.8, alpha: 1.0),
 							COLOR_CLASS(red: 0.7, green: 0.0, blue: 0.0, alpha: 1.0),
 							COLOR_CLASS(red: 0.8, green: 0.4, blue: 0.0, alpha: 1.0),
 							COLOR_CLASS(red: 0.0, green: 0.5, blue: 0.0, alpha: 1.0)]
-	func name() -> String {
-		return RepoDisplayPolicy.labels[rawValue]
+	var name: String {
+		return RepoDisplayPolicy.labels[Int(rawValue)]
 	}
-	func color() -> COLOR_CLASS {
-		return RepoDisplayPolicy.colors[rawValue]
+	var color: COLOR_CLASS {
+		return RepoDisplayPolicy.colors[Int(rawValue)]
+	}
+	var intValue: Int { return Int(rawValue) }
+
+	init?(_ rawValue: Int64) {
+		self.init(rawValue: rawValue)
+	}
+	init?(_ rawValue: Int) {
+		self.init(rawValue: Int64(rawValue))
 	}
 }
 
-enum RepoHidingPolicy: Int {
-	case NoHiding, HideMyAuthoredPrs, HideMyAuthoredIssues, HideAllMyAuthoredItems, HideOthersPrs, HideOthersIssues, HideAllOthersItems
+enum RepoHidingPolicy: Int64 {
+	case noHiding, hideMyAuthoredPrs, hideMyAuthoredIssues, hideAllMyAuthoredItems, hideOthersPrs, hideOthersIssues, hideAllOthersItems
 	static let labels = ["No Filter", "Hide My PRs", "Hide My Issues", "Hide All Mine", "Hide Others PRs", "Hide Others Issues", "Hide All Others"]
-	static let policies = [NoHiding, HideMyAuthoredPrs, HideMyAuthoredIssues, HideAllMyAuthoredItems, HideOthersPrs, HideOthersIssues, HideAllOthersItems]
-	static let colors = [	COLOR_CLASS.lightGrayColor(),
+	static let policies = [noHiding, hideMyAuthoredPrs, hideMyAuthoredIssues, hideAllMyAuthoredItems, hideOthersPrs, hideOthersIssues, hideAllOthersItems]
+	static let colors = [	COLOR_CLASS.lightGray,
 							COLOR_CLASS(red: 0.1, green: 0.1, blue: 0.5, alpha: 1.0),
 							COLOR_CLASS(red: 0.1, green: 0.1, blue: 0.5, alpha: 1.0),
 							COLOR_CLASS(red: 0.1, green: 0.1, blue: 0.5, alpha: 1.0),
 							COLOR_CLASS(red: 0.5, green: 0.1, blue: 0.1, alpha: 1.0),
 							COLOR_CLASS(red: 0.5, green: 0.1, blue: 0.1, alpha: 1.0),
 							COLOR_CLASS(red: 0.5, green: 0.1, blue: 0.1, alpha: 1.0)]
-	func name() -> String {
-		return RepoHidingPolicy.labels[rawValue]
+	var name: String {
+		return RepoHidingPolicy.labels[Int(rawValue)]
 	}
-	func color() -> COLOR_CLASS {
-		return RepoHidingPolicy.colors[rawValue]
+	var color: COLOR_CLASS {
+		return RepoHidingPolicy.colors[Int(rawValue)]
+	}
+	init?(_ rawValue: Int64) {
+		self.init(rawValue: rawValue)
+	}
+	init?(_ rawValue: Int) {
+		self.init(rawValue: Int64(rawValue))
 	}
 }
 
-func MAKECOLOR(red: CGFloat, _ green: CGFloat, _ blue: CGFloat, _ alpha: CGFloat) -> COLOR_CLASS {
-	return COLOR_CLASS(red: red, green: green, blue: blue, alpha: alpha)
-}
+struct ApiRateLimits {
+	let requestsRemaining, requestLimit: Int64
+	let resetDate: Date?
 
-let PULL_REQUEST_ID_KEY = "pullRequestIdKey"
-let ISSUE_ID_KEY = "issueIdKey"
-let STATUS_ID_KEY = "statusIdKey"
-let COMMENT_ID_KEY = "commentIdKey"
-let NOTIFICATION_URL_KEY = "urlKey"
-let API_USAGE_UPDATE = "RateUpdateNotification"
-let kSyncProgressUpdate = "kSyncProgressUpdate"
-
-let LOW_API_WARNING: Double = 0.20
-let BACKOFF_STEP: NSTimeInterval = 120.0
-
-func currentAppVersion() -> String {
-	return S(NSBundle.mainBundle().infoDictionary?["CFBundleShortVersionString"] as? String)
-}
-
-#if os(iOS)
-
-	import UIKit
-	import CoreData
-
-	func colorToHex(c: COLOR_CLASS) -> String {
-		var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
-		c.getRed(&r, green: &g, blue: &b, alpha: &a)
-		r *= 255.0
-		g *= 255.0
-		b *= 255.0
-		return NSString(format: "%02X%02X%02X", Int(r), Int(g), Int(b)) as String
+	static func from(headers: [AnyHashable : Any]) -> ApiRateLimits {
+		let date: Date?
+		if let epochSeconds = headers["X-RateLimit-Reset"] as? String, let t = TimeInterval(epochSeconds) {
+			date = Date(timeIntervalSince1970: t)
+		} else {
+			date = nil
+		}
+		return ApiRateLimits(requestsRemaining: Int64(S(headers["X-RateLimit-Remaining"] as? String)) ?? 10000,
+							 requestLimit: Int64(S(headers["X-RateLimit-Limit"] as? String)) ?? 10000,
+							 resetDate: date)
 	}
-
-#elseif os(OSX)
-
-	func hasModifier(event: NSEvent, _ modifier: NSEventModifierFlags) -> Bool {
-		return (event.modifierFlags.intersect(modifier)) == modifier
+	static var noLimits: ApiRateLimits {
+		return ApiRateLimits(requestsRemaining: 10000, requestLimit: 10000, resetDate: nil)
 	}
-
-#endif
-
-func versionString() -> String {
-	let buildNumber = S(NSBundle.mainBundle().infoDictionary?["CFBundleVersion"] as? String)
-	return "Version \(currentAppVersion()) (\(buildNumber))"
+	var areValid: Bool {
+		return requestsRemaining >= 0
+	}
 }
 
-func existingObjectWithID(id: NSManagedObjectID) -> NSManagedObject? {
-	return try? mainObjectContext.existingObjectWithID(id)
+var currentAppVersion: String {
+	return S(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String)
 }
 
-func isDarkColor(color: COLOR_CLASS) -> Bool {
-	var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0
-	color.getRed(&r, green: &g, blue: &b, alpha: nil)
-	let lum = 0.2126 * r + 0.7152 * g + 0.0722 * b
-	return (lum < 0.5)
+var versionString: String {
+	let buildNumber = S(Bundle.main.infoDictionary?["CFBundleVersion"] as? String)
+	return "Version \(currentAppVersion) (\(buildNumber))"
 }
 
-func parseFromHex(s: String) -> UInt32 {
-	let safe = s.trim().stringByTrimmingCharactersInSet(NSCharacterSet.symbolCharacterSet())
-	let s = NSScanner(string: safe)
-	var result:UInt32 = 0
-	s.scanHexInt(&result)
-	return result
-}
-
-func colorFromUInt32(c: UInt32) -> COLOR_CLASS {
-	let red: UInt32 = (c & 0xFF0000)>>16
-	let green: UInt32 = (c & 0x00FF00)>>8
-	let blue: UInt32 = c & 0x0000FF
-	let r = CGFloat(red)/255.0
-	let g = CGFloat(green)/255.0
-	let b = CGFloat(blue)/255.0
-	return COLOR_CLASS(red: r, green: g, blue: b, alpha: 1.0)
-}
-
-//////////////////////// From tieferbegabt's post on https://forums.developer.apple.com/message/37935, with thanks!
+//////////////////////// Originally from tieferbegabt's post on https://forums.developer.apple.com/message/37935, with thanks!
 
 extension String {
-	func stringByAppendingPathComponent(path: String) -> String {
-		return (self as NSString).stringByAppendingPathComponent(path)
+	func appending(pathComponent: String) -> String {
+		let endSlash = hasSuffix("/")
+		let firstSlash = pathComponent.hasPrefix("/")
+		if endSlash && firstSlash {
+			let firstChar = pathComponent.index(pathComponent.startIndex, offsetBy: 1)
+			return appending(pathComponent.substring(from: firstChar))
+		} else if (!endSlash && !firstSlash) {
+			return appending("/\(pathComponent)")
+		} else {
+			return appending(pathComponent)
+		}
 	}
-	func stringByReplacingCharactersInRange(range: NSRange, withString string: String) -> String {
-		return (self as NSString).stringByReplacingCharactersInRange(range, withString: string)
+	func replacingCharacters(in range: NSRange, with string: String) -> String {
+		let l = index(startIndex, offsetBy: range.location)
+		let u = index(l, offsetBy: range.length)
+		let r = Range(uncheckedBounds: (lower: l, upper: u))
+		return replacingCharacters(in: r, with: string)
 	}
-	func trim() -> String {
-		return self.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+	var trim: String {
+		return trimmingCharacters(in: .whitespacesAndNewlines)
 	}
-	var md5hash: String {
+	var md5hashed: String {
 		let digestLen = Int(CC_MD5_DIGEST_LENGTH)
-		let result = UnsafeMutablePointer<CUnsignedChar>.alloc(digestLen)
+		let result = UnsafeMutablePointer<CUnsignedChar>.allocate(capacity: digestLen)
 
 		CC_MD5(
-			self.cStringUsingEncoding(NSUTF8StringEncoding)!,
-			CC_LONG(self.lengthOfBytesUsingEncoding(NSUTF8StringEncoding)),
+			self.cString(using: String.Encoding.utf8)!,
+			CC_LONG(self.lengthOfBytes(using: String.Encoding.utf8)),
 			result)
 
-		let hash = NSMutableString()
+		var hash = String()
 		for i in 0..<digestLen {
-			hash.appendFormat("%02X", result[i])
+			let digit = String(format: "%02X", result[i])
+			hash.append(digit)
 		}
 
-		result.destroy()
-
-		return String(hash)
+		result.deinitialize()
+		return hash
 	}
 }
+
+////////////////////// Notifications
+
+let RefreshStartedNotification = Notification.Name("RefreshStartedNotification")
+let RefreshProcessingNotification = Notification.Name("RefreshProcessingNotification")
+let RefreshEndedNotification = Notification.Name("RefreshEndedNotification")
+let SyncProgressUpdateNotification = Notification.Name("SyncProgressUpdateNotification")
+let ApiUsageUpdateNotification = Notification.Name("ApiUsageUpdateNotification")
+let AppleInterfaceThemeChangedNotification = Notification.Name("AppleInterfaceThemeChangedNotification")
+let SettingsExportedNotification = Notification.Name("SettingsExportedNotification")
 

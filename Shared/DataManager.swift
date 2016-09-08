@@ -1,130 +1,140 @@
 
 import CoreData
 
-let mainObjectContext = DataManager.buildMainContext()
-
 final class DataManager {
 
 	static var postMigrationRepoPrPolicy: RepoDisplayPolicy?
 	static var postMigrationRepoIssuePolicy: RepoDisplayPolicy?
+	static var postMigrationSnoozeWakeOnComment: Bool?
+	static var postMigrationSnoozeWakeOnMention: Bool?
+	static var postMigrationSnoozeWakeOnStatusUpdate: Bool?
+
+	static let main = DataManager.buildMainContext()
 
 	class func checkMigration() {
-		if Settings.lastRunVersion != versionString() {
+
+		guard let count = main.persistentStoreCoordinator?.persistentStores.count, count > 0 else { return }
+
+		if Settings.lastRunVersion != versionString {
 			DLog("VERSION UPDATE MAINTENANCE NEEDED")
-			#if os(iOS)
-				migrateDatabaseToShared()
-			#endif
 			performVersionChangedTasks()
-			Settings.lastRunVersion = versionString()
+			Settings.lastRunVersion = versionString
 		}
-		ApiServer.ensureAtLeastGithubInMoc(mainObjectContext)
+		ApiServer.ensureAtLeastGithub(in: main)
 	}
 
 	private class func performVersionChangedTasks() {
 
-		let d = NSUserDefaults.standardUserDefaults()
-		if let legacyAuthToken = d.objectForKey("GITHUB_AUTH_TOKEN") as? String {
-			var legacyApiHost = S(d.objectForKey("API_BACKEND_SERVER") as? String)
+		#if os(OSX)
+		let nc = NSUserNotificationCenter.default
+
+		// Unstick macOS notifications with custom actions but without an identifier, causes macOS to keep them forever
+		for notification in nc.deliveredNotifications {
+			if notification.additionalActions != nil && notification.identifier == nil {
+				nc.removeAllDeliveredNotifications()
+				break
+			}
+		}
+
+		// Migrate delivered notifications from old keys
+		for notification in nc.deliveredNotifications {
+			if let userInfo = notification.userInfo, let u = (userInfo["pullRequestIdKey"] ?? userInfo["issueIdKey"] ?? userInfo["statusIdKey"]) as? String {
+				notification.userInfo![LISTABLE_URI_KEY] = u
+				notification.userInfo!["pullRequestIdKey"] = nil
+				notification.userInfo!["issueIdKey"] = nil
+				notification.userInfo!["statusIdKey"] = nil
+				nc.deliver(notification)
+			}
+		}
+		#endif
+
+		let d = UserDefaults.standard
+		if let legacyAuthToken = d.object(forKey: "GITHUB_AUTH_TOKEN") as? String {
+			var legacyApiHost = S(d.object(forKey: "API_BACKEND_SERVER") as? String)
 			if legacyApiHost.isEmpty { legacyApiHost = "api.github.com" }
 
-			let legacyApiPath = S(d.objectForKey("API_SERVER_PATH") as? String)
+			let legacyApiPath = S(d.object(forKey: "API_SERVER_PATH") as? String)
 
-			var legacyWebHost = S(d.objectForKey("API_FRONTEND_SERVER") as? String)
+			var legacyWebHost = S(d.object(forKey: "API_FRONTEND_SERVER") as? String)
 			if legacyWebHost.isEmpty { legacyWebHost = "github.com" }
 
-			let actualApiPath = "\(legacyApiHost)/\(legacyApiPath)".stringByReplacingOccurrencesOfString("//", withString:"/")
+			let actualApiPath = "\(legacyApiHost)/\(legacyApiPath)".replacingOccurrences(of: "//", with:"/")
 
-			let newApiServer = ApiServer.addDefaultGithubInMoc(mainObjectContext)
+			let newApiServer = ApiServer.addDefaultGithub(in: main)
 			newApiServer.apiPath = "https://\(actualApiPath)"
 			newApiServer.webPath = "https://\(legacyWebHost)"
 			newApiServer.authToken = legacyAuthToken
 			newApiServer.lastSyncSucceeded = true
 
-			d.removeObjectForKey("API_BACKEND_SERVER")
-			d.removeObjectForKey("API_SERVER_PATH")
-			d.removeObjectForKey("API_FRONTEND_SERVER")
-			d.removeObjectForKey("GITHUB_AUTH_TOKEN")
+			d.removeObject(forKey: "API_BACKEND_SERVER")
+			d.removeObject(forKey: "API_SERVER_PATH")
+			d.removeObject(forKey: "API_FRONTEND_SERVER")
+			d.removeObject(forKey: "GITHUB_AUTH_TOKEN")
 			d.synchronize()
 		} else {
-			ApiServer.ensureAtLeastGithubInMoc(mainObjectContext)
+			ApiServer.ensureAtLeastGithub(in: main)
 		}
 
 		DLog("Marking all repos as dirty")
 		ApiServer.resetSyncOfEverything()
 
 		DLog("Marking all unspecified (nil) announced flags as announced")
-		for i in DataItem.allItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest] {
-			if i.announced == nil {
+		for i in DataItem.allItems(of: PullRequest.self, in: main) {
+			if i.value(forKey: "announced") == nil {
 				i.announced = true
 			}
 		}
-		for i in DataItem.allItemsOfType("Issue", inMoc: mainObjectContext) as! [Issue] {
-			if i.announced == nil {
+		for i in DataItem.allItems(of: Issue.self, in: main) {
+			if i.value(forKey: "announced") == nil {
 				i.announced = true
 			}
 		}
 
 		DLog("Migrating display policies")
-		for r in DataItem.allItemsOfType("Repo", inMoc:mainObjectContext) as! [Repo] {
-			if let markedAsHidden = r.hidden?.boolValue where markedAsHidden == true {
-				r.displayPolicyForPrs = RepoDisplayPolicy.Hide.rawValue
-				r.displayPolicyForIssues = RepoDisplayPolicy.Hide.rawValue
+		for r in DataItem.allItems(of: Repo.self, in: main) {
+			if let markedAsHidden = (r.value(forKey: "hidden") as AnyObject?)?.boolValue, markedAsHidden == true {
+				r.displayPolicyForPrs = RepoDisplayPolicy.hide.rawValue
+				r.displayPolicyForIssues = RepoDisplayPolicy.hide.rawValue
 			} else {
-				if let prDisplayPolicy = postMigrationRepoPrPolicy where r.displayPolicyForPrs == nil {
+				if let prDisplayPolicy = postMigrationRepoPrPolicy, r.value(forKey: "displayPolicyForPrs") == nil {
 					r.displayPolicyForPrs = prDisplayPolicy.rawValue
 				}
-				if let issueDisplayPolicy = postMigrationRepoIssuePolicy where r.displayPolicyForIssues == nil {
+				if let issueDisplayPolicy = postMigrationRepoIssuePolicy, r.value(forKey: "displayPolicyForIssues") == nil {
 					r.displayPolicyForIssues = issueDisplayPolicy.rawValue
 				}
 			}
-			if r.hidden != nil {
-				r.hidden = nil
-			}
 		}
-	}
 
-	private class func migrateDatabaseToShared() {
-		do {
-			let oldDocumentsDirectory = legacyFilesDirectory().path!
-			let newDocumentsDirectory = sharedFilesDirectory().path!
-			let fm = NSFileManager.defaultManager()
-			let files = try fm.contentsOfDirectoryAtPath(oldDocumentsDirectory)
-			DLog("Migrating DB files into group container from %@ to %@", oldDocumentsDirectory, newDocumentsDirectory)
-			for file in files {
-				if file.containsString("Trailer.sqlite") {
-					DLog("Moving database file: %@",file)
-					let oldPath = oldDocumentsDirectory.stringByAppendingPathComponent(file)
-					let newPath = newDocumentsDirectory.stringByAppendingPathComponent(file)
-					if fm.fileExistsAtPath(newPath) {
-						try! fm.removeItemAtPath(newPath)
-					}
-					try! fm.moveItemAtPath(oldPath, toPath: newPath)
-				}
+		DLog("Migrating snooze presets")
+		for s in SnoozePreset.allSnoozePresets(in: main) {
+			if let m = postMigrationSnoozeWakeOnComment {
+				s.wakeOnComment = m
 			}
-			try! fm.removeItemAtPath(oldDocumentsDirectory)
-		} catch {
-			// No legacy directory
+			if let m = postMigrationSnoozeWakeOnMention {
+				s.wakeOnMention = m
+			}
+			if let m = postMigrationSnoozeWakeOnStatusUpdate {
+				s.wakeOnStatusChange = m
+			}
 		}
 	}
 
 	class func sendNotificationsIndexAndSave() {
 
-		func processItems(type: String, newNotification: NotificationType, reopenedNotification: NotificationType, assignmentNotification: NotificationType) -> [ListableItem] {
-			let allItems = DataItem.allItemsOfType(type, inMoc: mainObjectContext) as! [ListableItem]
+		func processItems<T: ListableItem>(of type: T.Type, newNotification: NotificationType, reopenedNotification: NotificationType, assignmentNotification: NotificationType) -> [T] {
+			let allItems = DataItem.allItems(of: type, in: main)
 			for i in allItems {
 				if i.isVisibleOnMenu {
 					if !i.createdByMe {
-						if !(i.isNewAssignment?.boolValue ?? false) && !(i.announced?.boolValue ?? false) {
-							app.postNotificationOfType(newNotification, forItem: i)
-							i.announced = true
-						}
-						if let reopened = i.reopened?.boolValue where reopened == true {
-							app.postNotificationOfType(reopenedNotification, forItem: i)
-							i.reopened = false
-						}
-						if let newAssignment = i.isNewAssignment?.boolValue where newAssignment == true {
-							app.postNotificationOfType(assignmentNotification, forItem: i)
+						if i.isNewAssignment {
+							NotificationQueue.add(type: assignmentNotification, for: i)
 							i.isNewAssignment = false
+						} else if !i.announced {
+							NotificationQueue.add(type: newNotification, for: i)
+							i.announced = true
+						} else if i.reopened {
+							NotificationQueue.add(type: reopenedNotification, for: i)
+							i.reopened = false
 						}
 					}
 					#if os(iOS)
@@ -141,16 +151,16 @@ final class DataManager {
 			return allItems
 		}
 
-		let allPrs = processItems("PullRequest", newNotification: .NewPr, reopenedNotification: .PrReopened, assignmentNotification: .NewPrAssigned)
-		let allIssues = processItems("Issue", newNotification: .NewIssue, reopenedNotification: .IssueReopened, assignmentNotification: .NewIssueAssigned)
+		let allPrs = processItems(of: PullRequest.self, newNotification: .newPr, reopenedNotification: .prReopened, assignmentNotification: .newPrAssigned)
+		let allIssues = processItems(of: Issue.self, newNotification: .newIssue, reopenedNotification: .issueReopened, assignmentNotification: .newIssueAssigned)
 
-		let latestComments = PRComment.newItemsOfType("PRComment", inMoc: mainObjectContext) as! [PRComment]
+		let latestComments = PRComment.newItems(of: PRComment.self, in: main)
 		for c in latestComments {
 			c.processNotifications()
-			c.postSyncAction = PostSyncAction.DoNothing.rawValue
+			c.postSyncAction = PostSyncAction.doNothing.rawValue
 		}
 
-		let latestStatuses = PRStatus.newItemsOfType("PRStatus", inMoc: mainObjectContext) as! [PRStatus]
+		let latestStatuses = PRStatus.newItems(of: PRStatus.self, in: main)
 		if Settings.notifyOnStatusUpdates {
 			var coveredPrs = Set<NSManagedObjectID>()
 			for s in latestStatuses {
@@ -160,12 +170,12 @@ final class DataManager {
 						coveredPrs.insert(pr.objectID)
 						if let s = pr.displayedStatuses.first {
 							let displayText = s.descriptionText
-							if pr.lastStatusNotified != displayText && pr.postSyncAction?.integerValue != PostSyncAction.NoteNew.rawValue {
-								if pr.isSnoozing && Settings.snoozeWakeOnStatusUpdate {
+							if pr.lastStatusNotified != displayText && pr.postSyncAction != PostSyncAction.isNew.rawValue {
+								if pr.isSnoozing && pr.shouldWakeOnStatusChange {
 									DLog("Waking up snoozed PR ID %@ because of a status update", pr.serverId)
 									pr.wakeUp()
 								}
-								app.postNotificationOfType(.NewStatus, forItem: s)
+								NotificationQueue.add(type: .newStatus, for: s)
 								pr.lastStatusNotified = displayText
 							}
 						} else {
@@ -177,57 +187,57 @@ final class DataManager {
 		}
 
 		for s in latestStatuses {
-			s.postSyncAction = PostSyncAction.DoNothing.rawValue
+			s.postSyncAction = PostSyncAction.doNothing.rawValue
 		}
 
 		for p in allPrs {
-			if p.postSyncAction?.integerValue != PostSyncAction.DoNothing.rawValue {
-				p.postSyncAction = PostSyncAction.DoNothing.rawValue
-			}
+			p.postSyncAction = PostSyncAction.doNothing.rawValue
 		}
 
 		for i in allIssues {
-			if i.postSyncAction?.integerValue != PostSyncAction.DoNothing.rawValue {
-				i.postSyncAction = PostSyncAction.DoNothing.rawValue
-			}
+			i.postSyncAction = PostSyncAction.doNothing.rawValue
 		}
 
-		saveDB()
+		_ = saveDB()
+
+		NotificationQueue.commit()
 	}
 
-	class func saveDB() -> Bool {
-		if mainObjectContext.hasChanges {
+	class func saveDB() {
+		if main.hasChanges {
 			DLog("Saving DB")
 			do {
-				try mainObjectContext.save()
+				try main.save()
 			} catch {
-				DLog("Error while saving DB: %@", (error as NSError).localizedDescription)
+				DLog("Error while saving DB: %@", error.localizedDescription)
 			}
 		}
-		return true
 	}
 
-	class func childContext() -> NSManagedObjectContext {
-		let c = NSManagedObjectContext(concurrencyType: .MainQueueConcurrencyType)
-		c.mergePolicy = NSMergePolicy(mergeType: .MergeByPropertyObjectTrumpMergePolicyType)
-		c.parentContext = mainObjectContext
+	class func buildChildContext() -> NSManagedObjectContext {
+		let c = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
+		c.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
+		c.parent = main
 		c.undoManager = nil
 		return c
 	}
 
-	class func infoForType(type: NotificationType, item: DataItem) -> [String : AnyObject] {
+	class func info(for type: NotificationType, item: DataItem) -> [String : Any] {
 		switch type {
-		case .NewMention, .NewComment:
-			return [COMMENT_ID_KEY : item.objectID.URIRepresentation().absoluteString]
-		case .NewPr, .PrReopened, .NewPrAssigned, .PrClosed, .PrMerged:
-			return [NOTIFICATION_URL_KEY : (item as! PullRequest).webUrl!, PULL_REQUEST_ID_KEY: item.objectID.URIRepresentation().absoluteString]
-		case .NewRepoSubscribed, .NewRepoAnnouncement:
-			return [NOTIFICATION_URL_KEY : (item as! Repo).webUrl!]
-		case .NewStatus:
+		case .newMention, .newComment:
+			let uri = item.objectID.uriRepresentation().absoluteString
+			let parent = (item as! PRComment).parent
+			let parentUri = parent?.objectID.uriRepresentation().absoluteString ?? ""
+			return [COMMENT_ID_KEY: uri, LISTABLE_URI_KEY: parentUri]
+		case .newPr, .prReopened, .newPrAssigned, .prClosed, .prMerged, .newIssue, .issueReopened, .newIssueAssigned, .issueClosed:
+			let uri = item.objectID.uriRepresentation().absoluteString
+			return [NOTIFICATION_URL_KEY: (item as! ListableItem).webUrl!, LISTABLE_URI_KEY: uri]
+		case .newRepoSubscribed, .newRepoAnnouncement:
+			return [NOTIFICATION_URL_KEY: (item as! Repo).webUrl!]
+		case .newStatus:
 			let pr = (item as! PRStatus).pullRequest
-			return [NOTIFICATION_URL_KEY : pr.webUrl!, STATUS_ID_KEY: pr.objectID.URIRepresentation().absoluteString]
-		case .NewIssue, .IssueReopened, .NewIssueAssigned, .IssueClosed:
-			return [NOTIFICATION_URL_KEY : (item as! Issue).webUrl!, ISSUE_ID_KEY: item.objectID.URIRepresentation().absoluteString]
+			let uri = pr.objectID.uriRepresentation().absoluteString
+			return [NOTIFICATION_URL_KEY: pr.webUrl!, LISTABLE_URI_KEY: uri]
 		}
 	}
 
@@ -239,112 +249,97 @@ final class DataManager {
 	}
 
 	class func postProcessAllItems() {
-		for p in DataItem.allItemsOfType("PullRequest", inMoc: mainObjectContext) as! [PullRequest] {
+
+		for p in DataItem.allItems(of: PullRequest.self, in: main, prefetchRelationships: ["comments"]) {
 			p.postProcess()
 		}
-		for i in DataItem.allItemsOfType("Issue", inMoc: mainObjectContext) as! [Issue] {
+		for i in DataItem.allItems(of: Issue.self, in: main, prefetchRelationships: ["comments"]) {
 			i.postProcess()
 		}
 	}
 
-	class func idForUriPath(uriPath: String?) -> NSManagedObjectID? {
-		if let up = uriPath, u = NSURL(string: up), p = mainObjectContext.persistentStoreCoordinator {
-			return p.managedObjectIDForURIRepresentation(u)
+	class func id(for uriPath: String?) -> NSManagedObjectID? {
+		if let up = uriPath, let u = URL(string: up), let p = main.persistentStoreCoordinator {
+			return p.managedObjectID(forURIRepresentation: u)
 		}
 		return nil
 	}
 
-	private class func dataFilesDirectory() -> NSURL {
+	private class var dataFilesDirectory: URL {
 		#if os(iOS)
-			let sharedFiles = sharedFilesDirectory()
+			let sharedFiles = sharedFilesDirectory
 		#else
-			let sharedFiles = legacyFilesDirectory()
+			let sharedFiles = legacyFilesDirectory
 		#endif
-		DLog("Files in %@", sharedFiles)
+		DLog("Files in %@", sharedFiles.absoluteString)
 		return sharedFiles
 	}
 
-	private class func legacyFilesDirectory() -> NSURL {
-		let f = NSFileManager.defaultManager()
-		let appSupportURL = f.URLsForDirectory(NSSearchPathDirectory.ApplicationSupportDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask).last!
-		return appSupportURL.URLByAppendingPathComponent("com.housetrip.Trailer")
+	private class var legacyFilesDirectory: URL {
+		let f = FileManager.default
+		let appSupportURL = f.urls(for: .applicationSupportDirectory, in: .userDomainMask).last!
+		return appSupportURL.appendingPathComponent("com.housetrip.Trailer")
 	}
 
-	class func sharedFilesDirectory() -> NSURL {
-		return NSFileManager.defaultManager().containerURLForSecurityApplicationGroupIdentifier("group.Trailer")!
+	class var sharedFilesDirectory: URL {
+		return FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.Trailer")!
 	}
 
-	private class func removeDatabaseFiles() {
-		let fm = NSFileManager.defaultManager()
-		let documentsDirectory = dataFilesDirectory().path!
+	class func removeDatabaseFiles() {
+		let fm = FileManager.default
+		let documentsDirectory = dataFilesDirectory.path
 		do {
-			for file in try fm.contentsOfDirectoryAtPath(documentsDirectory) {
-				if file.containsString("Trailer.sqlite") {
+			for file in try fm.contentsOfDirectory(atPath: documentsDirectory) {
+				if file.contains("Trailer.sqlite") {
 					DLog("Removing old database file: %@",file)
-					try! fm.removeItemAtPath(documentsDirectory.stringByAppendingPathComponent(file))
+					try! fm.removeItem(atPath: documentsDirectory.appending(pathComponent: file))
 				}
 			}
 		} catch { /* no directory */ }
 	}
 
 	class var appIsConfigured: Bool {
-		return ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) && Repo.anyVisibleReposInMoc(mainObjectContext)
+		return ApiServer.someServersHaveAuthTokens(in: main) && Repo.anyVisibleRepos(in: main)
 	}
 
 	private static var _justMigrated = false
 
 	class func buildMainContext() -> NSManagedObjectContext {
 
-		let storeOptions = [
+		let storeOptions: [AnyHashable : Any] = [
 			NSMigratePersistentStoresAutomaticallyOption: true,
 			NSInferMappingModelAutomaticallyOption: true,
-			NSSQLitePragmasOption: ["synchronous":"OFF", "fullfsync":"0"]
+			NSSQLitePragmasOption: ["synchronous":"NORMAL"]
 		]
 
-		let dataDir = dataFilesDirectory()
-		let sqlStorePath = dataDir.URLByAppendingPathComponent("Trailer.sqlite")
+		let dataDir = dataFilesDirectory
+		let sqlStorePath = dataDir.appendingPathComponent("Trailer.sqlite")
 
-		func addStorePath(newCoordinator: NSPersistentStoreCoordinator) -> Bool {
-			do {
-				try newCoordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: sqlStorePath, options: storeOptions)
-				return true
-			} catch let error as NSError {
-				DLog("Error while mounting DB store: %@", error.localizedDescription)
-				return false
-			} catch { // Swift compiler bug, this should never get executed
-				DLog("Error while mounting DB store: Unknown")
-				return false
+		let modelPath = Bundle.main.url(forResource: "Trailer", withExtension: "momd")!
+		let mom = NSManagedObjectModel(contentsOf: modelPath)!
+
+		let fileManager = FileManager.default
+		if fileManager.fileExists(atPath: sqlStorePath.path) {
+			if let m = try? NSPersistentStoreCoordinator.metadataForPersistentStore(ofType: NSSQLiteStoreType, at: sqlStorePath, options: nil) {
+				_justMigrated = !mom.isConfiguration(withName: nil, compatibleWithStoreMetadata: m)
 			}
-		}
-
-		let modelPath = NSBundle.mainBundle().URLForResource("Trailer", withExtension: "momd")!
-		let mom = NSManagedObjectModel(contentsOfURL: modelPath)!
-
-		let fileManager = NSFileManager.defaultManager()
-		if fileManager.fileExistsAtPath(sqlStorePath.path!) {
-			let m = try! NSPersistentStoreCoordinator.metadataForPersistentStoreOfType(NSSQLiteStoreType, URL: sqlStorePath, options: nil)
-			_justMigrated = !mom.isConfiguration(nil, compatibleWithStoreMetadata: m)
 		} else {
-			try! fileManager.createDirectoryAtPath(dataDir.path!, withIntermediateDirectories: true, attributes: nil)
+			try! fileManager.createDirectory(atPath: dataDir.path, withIntermediateDirectories: true, attributes: nil)
 		}
 
-		var persistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel:mom)
-		if !addStorePath(persistentStoreCoordinator) {
-			DLog("Failed to migrate/load DB store - will nuke it and retry")
-			removeDatabaseFiles()
-
-			persistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel:mom)
-			if !addStorePath(persistentStoreCoordinator) {
-				DLog("Catastrophic failure, app is probably corrupted and needs reinstall")
-				abort()
-			}
-		}
-
-		let m = NSManagedObjectContext(concurrencyType: .MainQueueConcurrencyType)
+		let m = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
 		m.undoManager = nil
-		m.persistentStoreCoordinator = persistentStoreCoordinator
-		m.mergePolicy = NSMergePolicy(mergeType: .MergeByPropertyObjectTrumpMergePolicyType)
-		DLog("Database setup complete")
+		m.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
+
+		do {
+			let persistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel: mom)
+			try persistentStoreCoordinator.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: sqlStorePath, options: storeOptions)
+			m.persistentStoreCoordinator = persistentStoreCoordinator
+			DLog("Database setup complete")
+		} catch {
+			DLog("Database setup error: %@", error.localizedDescription)
+		}
+
 		return m
 	}
 }

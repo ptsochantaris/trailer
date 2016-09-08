@@ -17,7 +17,7 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
 		super.viewDidLoad()
 		if repo == nil {
 			repoNameTitle.text = "All Repositories (You don't need to pick values for each setting below, you can set only a specific setting if you prefer)"
-			groupField.hidden = true
+			groupField.isHidden = true
 		} else {
 			repoNameTitle.text = repo?.fullName
 			groupField.text = repo?.groupLabel
@@ -29,37 +29,38 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
 	}
 
 	override func viewDidLayoutSubviews() {
-		if let s = tableView.tableHeaderView?.systemLayoutSizeFittingSize(CGSizeMake(tableView.bounds.size.width, 500)) {
-			tableView.tableHeaderView?.frame = CGRectMake(0, 0, tableView.bounds.size.width, s.height)
+		if let s = tableView.tableHeaderView?.systemLayoutSizeFitting(CGSize(width: tableView.bounds.size.width, height: 500)) {
+			tableView.tableHeaderView?.frame = CGRect(x: 0, y: 0, width: tableView.bounds.size.width, height: s.height)
 		}
 		super.viewDidLayoutSubviews()
 	}
 
-	override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+
+	override func numberOfSections(in tableView: UITableView) -> Int {
 		return 3
 	}
 
-	override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		if section == 2 {
 			return RepoHidingPolicy.labels.count
 		}
 		return RepoDisplayPolicy.labels.count
 	}
 
-	override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCellWithIdentifier("Cell")!
+	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+		let cell = tableView.dequeueReusableCell(withIdentifier: "Cell")!
 		if repo == nil {
 			switch indexPath.section {
 			case 0:
-				cell.accessoryType = (allPrsIndex==indexPath.row) ? .Checkmark : .None
+				cell.accessoryType = (allPrsIndex==indexPath.row) ? .checkmark : .none
 				cell.textLabel?.text = RepoDisplayPolicy.labels[indexPath.row]
 				cell.textLabel?.textColor = RepoDisplayPolicy.colors[indexPath.row]
 			case 1:
-				cell.accessoryType = (allIssuesIndex==indexPath.row) ? .Checkmark : .None
+				cell.accessoryType = (allIssuesIndex==indexPath.row) ? .checkmark : .none
 				cell.textLabel?.text = RepoDisplayPolicy.labels[indexPath.row]
 				cell.textLabel?.textColor = RepoDisplayPolicy.colors[indexPath.row]
 			case 2:
-				cell.accessoryType = (allHidingIndex==indexPath.row) ? .Checkmark : .None
+				cell.accessoryType = (allHidingIndex==indexPath.row) ? .checkmark : .none
 				cell.textLabel?.text = RepoHidingPolicy.labels[indexPath.row]
 				cell.textLabel?.textColor = RepoHidingPolicy.colors[indexPath.row]
 			default: break
@@ -67,25 +68,25 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
 		} else {
 			switch indexPath.section {
 			case 0:
-				cell.accessoryType = ((repo?.displayPolicyForPrs?.integerValue ?? 0)==indexPath.row) ? .Checkmark : .None
+				cell.accessoryType = (Int(repo?.displayPolicyForPrs ?? 0)==indexPath.row) ? .checkmark : .none
 				cell.textLabel?.text = RepoDisplayPolicy.labels[indexPath.row]
 				cell.textLabel?.textColor = RepoDisplayPolicy.colors[indexPath.row]
 			case 1:
-				cell.accessoryType = ((repo?.displayPolicyForIssues?.integerValue ?? 0)==indexPath.row) ? .Checkmark : .None
+				cell.accessoryType = (Int(repo?.displayPolicyForIssues ?? 0)==indexPath.row) ? .checkmark : .none
 				cell.textLabel?.text = RepoDisplayPolicy.labels[indexPath.row]
 				cell.textLabel?.textColor = RepoDisplayPolicy.colors[indexPath.row]
 			case 2:
-				cell.accessoryType = ((repo?.itemHidingPolicy?.integerValue ?? 0)==indexPath.row) ? .Checkmark : .None
+				cell.accessoryType = (Int(repo?.itemHidingPolicy ?? 0)==indexPath.row) ? .checkmark : .none
 				cell.textLabel?.text = RepoHidingPolicy.labels[indexPath.row]
 				cell.textLabel?.textColor = RepoHidingPolicy.colors[indexPath.row]
 			default: break
 			}
 		}
-		cell.selectionStyle = cell.accessoryType == .Checkmark ? .None : .Default
+		cell.selectionStyle = cell.accessoryType == .checkmark ? .none : .default
 		return cell
 	}
 
-	override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+	override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
 		switch section {
 		case 0: return "Pull Request Sections"
 		case 1: return "Issue Sections"
@@ -94,43 +95,43 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
 		}
 	}
 
-	override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		if repo == nil {
-			let repos = Repo.allItemsOfType("Repo", inMoc: mainObjectContext) as! [Repo]
+			let repos = Repo.allItems(of: Repo.self, in: DataManager.main)
 			if indexPath.section == 0 {
 				allPrsIndex = indexPath.row
 				for r in repos {
-					r.displayPolicyForPrs = allPrsIndex
-					if allPrsIndex != RepoDisplayPolicy.Hide.rawValue {
+					r.displayPolicyForPrs = Int64(allPrsIndex)
+					if allPrsIndex != RepoDisplayPolicy.hide.intValue {
 						r.resetSyncState()
 					}
 				}
 			} else if indexPath.section == 1 {
 				allIssuesIndex = indexPath.row
 				for r in repos {
-					r.displayPolicyForIssues = allIssuesIndex
-					if allIssuesIndex != RepoDisplayPolicy.Hide.rawValue {
+					r.displayPolicyForIssues = Int64(allIssuesIndex)
+					if allIssuesIndex != RepoDisplayPolicy.hide.intValue {
 						r.resetSyncState()
 					}
 				}
 			} else {
 				allHidingIndex = indexPath.row
 				for r in repos {
-					r.itemHidingPolicy = allHidingIndex
+					r.itemHidingPolicy = Int64(allHidingIndex)
 				}
 			}
 		} else if indexPath.section == 0 {
-			repo?.displayPolicyForPrs = indexPath.row
-			if indexPath.row != RepoDisplayPolicy.Hide.rawValue {
+			repo?.displayPolicyForPrs = Int64(indexPath.row)
+			if indexPath.row != RepoDisplayPolicy.hide.intValue {
 				repo?.resetSyncState()
 			}
 		} else if indexPath.section == 1 {
-			repo?.displayPolicyForIssues = indexPath.row
-			if indexPath.row != RepoDisplayPolicy.Hide.rawValue {
+			repo?.displayPolicyForIssues = Int64(indexPath.row)
+			if indexPath.row != RepoDisplayPolicy.hide.intValue {
 				repo?.resetSyncState()
 			}
 		} else {
-			repo?.itemHidingPolicy = indexPath.row
+			repo?.itemHidingPolicy = Int64(indexPath.row)
 		}
 		tableView.reloadData()
 		preferencesDirty = true
@@ -138,10 +139,10 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
 		settingsChangedTimer.push()
 	}
 
-	override func viewWillDisappear(animated: Bool) {
+	override func viewWillDisappear(_ animated: Bool) {
 		super.viewWillDisappear(animated)
 		let newText = (groupField.text?.isEmpty ?? true) ? nil : groupField.text
-		if let r = repo where r.groupLabel != newText {
+		if let r = repo, r.groupLabel != newText {
 			r.groupLabel = newText
 			preferencesDirty = true
 			DataManager.saveDB()
@@ -149,7 +150,7 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
 		}
 	}
 
-	func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
+	func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
 		if string == "\n" {
 			textField.resignFirstResponder()
 			return false

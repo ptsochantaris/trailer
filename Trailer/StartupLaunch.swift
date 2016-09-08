@@ -2,22 +2,22 @@
 
 final class StartupLaunch: NSObject {
 
-	class func isAppLoginItem() -> Bool {
-		return (itemReferencesInLoginItems().existingReference != nil)
+	class var isAppLoginItem: Bool {
+		return itemReferencesInLoginItems.existingReference != nil
 	}
 
-	private class func itemReferencesInLoginItems() -> (existingReference: LSSharedFileListItemRef?, lastReference: LSSharedFileListItemRef?) {
+	private class var itemReferencesInLoginItems: (existingReference: LSSharedFileListItem?, lastReference: LSSharedFileListItem?) {
 
-		if let loginItemsRef = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems.takeRetainedValue(), nil).takeRetainedValue() as LSSharedFileListRef? {
-			let loginItems = LSSharedFileListCopySnapshot(loginItemsRef, nil).takeRetainedValue() as NSArray as! [LSSharedFileListItemRef]
+		if let loginItemsRef = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems.takeRetainedValue(), nil).takeRetainedValue() as LSSharedFileList? {
+			let loginItems = LSSharedFileListCopySnapshot(loginItemsRef, nil).takeRetainedValue() as NSArray as! [LSSharedFileListItem]
 			if loginItems.count > 0 {
 
-				let appUrl = NSURL.fileURLWithPath(NSBundle.mainBundle().bundlePath)
-				let itemUrl = UnsafeMutablePointer<Unmanaged<CFURL>?>.alloc(1)
-				defer { itemUrl.destroy() }
+				let appUrl = URL(fileURLWithPath: Bundle.main.bundlePath)
+				let itemUrl = UnsafeMutablePointer<Unmanaged<CFURL>?>.allocate(capacity: 1)
+				defer { itemUrl.deinitialize() }
 
 				for i in loginItems {
-					if LSSharedFileListItemResolve(i, 0, itemUrl, nil) == noErr, let urlRef: NSURL = itemUrl.memory?.takeRetainedValue() where urlRef.isEqual(appUrl) {
+					if let itemUrl = LSSharedFileListItemCopyResolvedURL(i, 0, nil), itemUrl.takeRetainedValue() as URL == appUrl {
 						return (i, loginItems.last)
 					}
 				}
@@ -29,21 +29,19 @@ final class StartupLaunch: NSObject {
 		return (nil, nil)
 	}
 
-	class func setLaunchOnLogin(launch: Bool) {
+	class func setLaunchOnLogin(_ launch: Bool) {
 
-		let itemReferences = itemReferencesInLoginItems()
-		let isSet = (itemReferences.existingReference != nil)
-		if let loginItemsRef = LSSharedFileListCreate(nil, kLSSharedFileListSessionLoginItems.takeRetainedValue(), nil).takeRetainedValue() as LSSharedFileListRef? {
+		let itemReferences = itemReferencesInLoginItems
+		let isSet = itemReferences.existingReference != nil
+		let type = kLSSharedFileListSessionLoginItems.takeUnretainedValue()
+		if let loginItemsRef = LSSharedFileListCreate(nil, type, nil).takeRetainedValue() as LSSharedFileList? {
 			if launch && !isSet {
-				if let appUrl : CFURLRef = NSURL.fileURLWithPath(NSBundle.mainBundle().bundlePath) {
-					LSSharedFileListInsertItemURL(loginItemsRef, itemReferences.lastReference, nil, nil, appUrl, nil, nil)
-					DLog("Trailer was added to login items")
-				}
-			} else if !launch && isSet {
-				if let itemRef = itemReferences.existingReference {
-					LSSharedFileListItemRemove(loginItemsRef,itemRef)
-					DLog("Trailer was removed from login items")
-				}
+				let appUrl = URL(fileURLWithPath: Bundle.main.bundlePath) as CFURL
+				LSSharedFileListInsertItemURL(loginItemsRef, itemReferences.lastReference, nil, nil, appUrl, nil, nil)
+				DLog("Trailer was added to login items")
+			} else if !launch && isSet, let itemRef = itemReferences.existingReference {
+				LSSharedFileListItemRemove(loginItemsRef, itemRef)
+				DLog("Trailer was removed from login items")
 			}
 		}
 	}

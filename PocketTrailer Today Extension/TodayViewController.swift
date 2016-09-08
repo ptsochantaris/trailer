@@ -8,118 +8,103 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 	@IBOutlet weak var prLabel: UILabel!
 	@IBOutlet weak var issuesLabel: UILabel!
 	@IBOutlet weak var updatedLabel: UILabel!
-
-	var prButton: UIButton!
-	var issuesButton: UIButton!
-
 	@IBOutlet weak var prImage: UIImageView!
 	@IBOutlet weak var issueImage: UIImageView!
 
+	private var linkButton = UIButton(type: UIButtonType.custom)
 	private let paragraph = NSMutableParagraphStyle()
 
-	private var brightAttributes: [String : AnyObject] {
+	private var titleAttributes: [String : Any] {
 		return [
-			NSForegroundColorAttributeName: UIColor.whiteColor(),
-			NSFontAttributeName: UIFont.systemFontOfSize(UIFont.systemFontSize()+2.0),
+			NSForegroundColorAttributeName: UIColor.black,
+			NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.systemFontSize+2.0),
 			NSParagraphStyleAttributeName: paragraph ]
 	}
 
-	private var normalAttributes: [String : AnyObject] {
+	private var normalAttributes: [String : Any] {
 		return [
-			NSForegroundColorAttributeName: UIColor.lightGrayColor(),
-			NSFontAttributeName: UIFont.systemFontOfSize(UIFont.systemFontSize()+2.0),
+			NSForegroundColorAttributeName: UIColor.darkGray,
+			NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.systemFontSize+2.0),
 			NSParagraphStyleAttributeName: paragraph ]
 	}
 
-	private var dimAttributes: [String : AnyObject] {
+	private var dimAttributes: [String : Any] {
 		return [
-			NSForegroundColorAttributeName: UIColor.darkGrayColor(),
-			NSFontAttributeName: UIFont.systemFontOfSize(UIFont.systemFontSize()+2.0),
+			NSForegroundColorAttributeName: UIColor.gray,
+			NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.systemFontSize+2.0),
 			NSParagraphStyleAttributeName: paragraph ]
 	}
 
-	private var redAttributes: [String : AnyObject] {
+	private var redAttributes: [String : Any] {
 		return [
-			NSForegroundColorAttributeName: UIColor.redColor(),
-			NSFontAttributeName: UIFont.systemFontOfSize(UIFont.systemFontSize()+2.0),
+			NSForegroundColorAttributeName: UIColor.red,
+			NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.systemFontSize+2.0),
 			NSParagraphStyleAttributeName: paragraph ]
 	}
 
-	private var smallAttributes: [String : AnyObject] {
+	private var smallAttributes: [String : Any] {
 		return [
-			NSForegroundColorAttributeName: UIColor.lightGrayColor(),
-			NSFontAttributeName: UIFont.systemFontOfSize(UIFont.smallSystemFontSize()),
+			NSForegroundColorAttributeName: UIColor.gray,
+			NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize),
 			NSParagraphStyleAttributeName: paragraph ]
 	}
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
 
-		func imageFromColor(color: UIColor) -> UIImage {
-			let rect = CGRectMake(0, 0, 1, 1)
+		func image(from color: UIColor) -> UIImage {
+			let rect = CGRect(x: 0, y: 0, width: 1, height: 1)
 			UIGraphicsBeginImageContext(rect.size)
 			let context = UIGraphicsGetCurrentContext()
-			CGContextSetFillColorWithColor(context, color.CGColor)
-			CGContextFillRect(context, rect)
+			context?.setFillColor(color.cgColor)
+			context?.fill(rect)
 			let img = UIGraphicsGetImageFromCurrentImageContext()
 			UIGraphicsEndImageContext()
-			return img
+			return img!
 		}
 
-		prImage.image = UIImage(named: "prsTab")?.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate)
-		issueImage.image = UIImage(named: "issuesTab")?.imageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate)
+		prImage.image = UIImage(named: "prsTab")?.withRenderingMode(.alwaysTemplate)
+		issueImage.image = UIImage(named: "issuesTab")?.withRenderingMode(.alwaysTemplate)
 
 		paragraph.paragraphSpacing = 4
 
-		prButton = UIButton(type: UIButtonType.Custom)
-		prButton.addTarget(self, action: #selector(TodayViewController.widgetTapped), forControlEvents: .TouchUpInside)
-		prButton.setBackgroundImage(imageFromColor(UIColor(white: 1.0, alpha: 0.2)), forState: .Highlighted)
-		view.addSubview(prButton)
-
-		issuesButton = UIButton(type: UIButtonType.Custom)
-		issuesButton.addTarget(self, action: #selector(TodayViewController.widgetTapped), forControlEvents: .TouchUpInside)
-		issuesButton.setBackgroundImage(imageFromColor(UIColor(white: 1.0, alpha: 0.2)), forState: .Highlighted)
-		view.addSubview(issuesButton)
+		linkButton.addTarget(self, action: #selector(widgetTapped), for: .touchUpInside)
+		linkButton.setBackgroundImage(image(from: UIColor(white: 1.0, alpha: 0.2)), for: .highlighted)
+		view.addSubview(linkButton)
 
 		update()
 	}
 
 	func widgetTapped() {
-		extensionContext?.openURL(NSURL(string: "pockettrailer://")!, completionHandler: nil)
+		extensionContext?.open(URL(string: "pockettrailer://")!, completionHandler: nil)
 	}
 
-	override func viewDidLayoutSubviews() {
-		prLabel.preferredMaxLayoutWidth = prLabel.frame.size.width
-		prButton.frame = prLabel.frame
-
-		issuesLabel.preferredMaxLayoutWidth = issuesLabel.frame.size.width
-		issuesButton.frame = issuesLabel.frame
-
-		updatedLabel.preferredMaxLayoutWidth = updatedLabel.frame.size.width
+	func widgetActiveDisplayModeDidChange(_ activeDisplayMode: NCWidgetDisplayMode, withMaximumSize maxSize: CGSize) {
+		update()
 	}
 
 	private func update() {
 
-		func append(a: NSMutableAttributedString, count: Int, section: Section) {
+		func append(_ a: NSMutableAttributedString, count: Int, section: Section) {
 			if count > 0 {
-				let text = "\(count)\u{a0}\(section.watchMenuName()), "
-				a.appendAttributedString(NSAttributedString(string: text, attributes: normalAttributes))
+				let text = "\(count)\u{a0}\(section.watchMenuName), "
+				a.append(NSAttributedString(string: text, attributes: normalAttributes))
 			}
 		}
 
-		func appendCommentCount(a: NSMutableAttributedString, number: Int) {
+		func appendCommentCount(_ a: NSMutableAttributedString, number: Int) {
 			if number > 1 {
-				a.appendAttributedString(NSAttributedString(string: "\(number)\u{a0}unread\u{a0}comments", attributes: redAttributes))
+				a.append(NSAttributedString(string: "\(number)\u{a0}unread\u{a0}comments", attributes: redAttributes))
 			} else if number == 1 {
-				a.appendAttributedString(NSAttributedString(string: "1\u{a0}unread\u{a0}comment", attributes: redAttributes))
+				a.append(NSAttributedString(string: "1\u{a0}unread\u{a0}comment", attributes: redAttributes))
 			} else {
-				a.appendAttributedString(NSAttributedString(string: "No\u{a0}unread\u{a0}comments", attributes: dimAttributes))
+				a.append(NSAttributedString(string: "No\u{a0}unread\u{a0}comments", attributes: dimAttributes))
 			}
 		}
 
-		if let result = NSDictionary(contentsOfURL: (NSFileManager.defaultManager().containerURLForSecurityApplicationGroupIdentifier("group.Trailer")!).URLByAppendingPathComponent("overview.plist")) {
+		if let result = NSDictionary(contentsOf: FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.Trailer")!.appendingPathComponent("overview.plist")) {
 
-			func writeOutSection(type: String) -> NSAttributedString {
+			func writeOutSection(_ type: String) -> NSAttributedString {
 				var totalOpen = 0
 				var totalUnread = 0
 				var totalMine = 0
@@ -130,33 +115,37 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 				var totalClosed = 0
 				var totalOther = 0
 
-				for r in result["views"] as! [[String : AnyObject]] {
-					if let v = r[type] as? [String : AnyObject] {
-						totalMine += v[Section.Mine.apiName()]?["total"] as? Int ?? 0
-						totalParticipated += v[Section.Participated.apiName()]?["total"] as? Int ?? 0
-						totalMentioned += v[Section.Mentioned.apiName()]?["total"] as? Int ?? 0
-						totalSnoozed += v[Section.Snoozed.apiName()]?["total"] as? Int ?? 0
-						totalOther += v[Section.All.apiName()]?["total"] as? Int ?? 0
-						totalMerged += v[Section.Merged.apiName()]?["total"] as? Int ?? 0
-						totalClosed += v[Section.Closed.apiName()]?["total"] as? Int ?? 0
+				for r in result["views"] as! [[AnyHashable : Any]] {
+					if let v = r[type] as? [AnyHashable : Any] {
+						totalMine += (v[Section.mine.apiName] as? [AnyHashable : Any])?["total"] as? Int ?? 0
+						totalParticipated += (v[Section.participated.apiName] as? [AnyHashable : Any])?["total"] as? Int ?? 0
+						totalMentioned += (v[Section.mentioned.apiName] as? [AnyHashable : Any])?["total"] as? Int ?? 0
+						totalSnoozed += (v[Section.snoozed.apiName] as? [AnyHashable : Any])?["total"] as? Int ?? 0
+						totalOther += (v[Section.all.apiName] as? [AnyHashable : Any])?["total"] as? Int ?? 0
+						totalMerged += (v[Section.merged.apiName] as? [AnyHashable : Any])?["total"] as? Int ?? 0
+						totalClosed += (v[Section.closed.apiName] as? [AnyHashable : Any])?["total"] as? Int ?? 0
 						totalUnread += v["unread"] as? Int ?? 0
 						totalOpen += v["total_open"] as? Int ?? 0
 					}
 				}
 
 				let totalCount = totalMerged+totalMine+totalParticipated+totalClosed+totalMentioned+totalSnoozed+totalOther
-				let a = NSMutableAttributedString(string: "\(totalCount): ", attributes: brightAttributes)
-				if totalCount>0 {
-					append(a, count: totalMine, section: .Mine)
-					append(a, count: totalParticipated, section: .Participated)
-					append(a, count: totalMentioned, section: .Mentioned)
-					append(a, count: totalMerged, section: .Merged)
-					append(a, count: totalClosed, section: .Closed)
-					append(a, count: totalOther, section: .All)
-					append(a, count: totalSnoozed, section: .Snoozed)
-					appendCommentCount(a, number: totalUnread)
+				let a = NSMutableAttributedString(string: "\(totalCount): ", attributes: titleAttributes)
+				if totalCount > 0 {
+					if extensionContext?.widgetActiveDisplayMode == .compact {
+						appendCommentCount(a, number: totalUnread)
+					} else {
+						append(a, count: totalMine, section: .mine)
+						append(a, count: totalParticipated, section: .participated)
+						append(a, count: totalMentioned, section: .mentioned)
+						append(a, count: totalMerged, section: .merged)
+						append(a, count: totalClosed, section: .closed)
+						append(a, count: totalOther, section: .all)
+						append(a, count: totalSnoozed, section: .snoozed)
+						appendCommentCount(a, number: totalUnread)
+					}
 				} else {
-					a.appendAttributedString(NSAttributedString(string: result["error"] as! String, attributes: [NSParagraphStyleAttributeName: paragraph]))
+					a.append(NSAttributedString(string: result["error"] as! String, attributes: [NSParagraphStyleAttributeName: paragraph]))
 				}
 				return a.copy() as! NSAttributedString
 			}
@@ -164,11 +153,11 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 			prLabel.attributedText = writeOutSection("prs")
 			issuesLabel.attributedText = writeOutSection("issues")
 
-			let lastRefresh = result["lastUpdated"] as! NSDate
-			if lastRefresh == NSDate.distantPast() {
+			let lastRefresh = result["lastUpdated"] as! Date
+			if lastRefresh == .distantPast {
 				updatedLabel.attributedText = NSAttributedString(string: "Not updated yet", attributes: smallAttributes)
 			} else {
-				updatedLabel.attributedText = NSAttributedString(string: "Updated \(shortDateFormatter.stringFromDate(lastRefresh))", attributes: smallAttributes)
+				updatedLabel.attributedText = NSAttributedString(string: "Updated \(shortDateFormatter.string(from: lastRefresh))", attributes: smallAttributes)
 			}
 		} else {
 			issuesLabel.attributedText = nil
@@ -178,19 +167,14 @@ final class TodayViewController: UIViewController, NCWidgetProviding {
 		}
 	}
 
-	func widgetPerformUpdateWithCompletionHandler(completionHandler: ((NCUpdateResult) -> Void)) {
-		// If an error is encountered, use NCUpdateResult.Failed
-		// If there's no update required, use NCUpdateResult.NoData
-		// If there's an update, use NCUpdateResult.NewData
-
-		update()
-
-		completionHandler(NCUpdateResult.NewData)
+	override func viewDidLayoutSubviews() {
+		linkButton.frame = prLabel.frame.union(updatedLabel.frame)
+		let H = linkButton.frame.origin.y + linkButton.frame.size.height
+		preferredContentSize = CGSize(width: view.frame.size.width, height: H + 23)
 	}
 
-	func widgetMarginInsetsForProposedMarginInsets(defaultMarginInsets: UIEdgeInsets) -> UIEdgeInsets {
-		var insets = defaultMarginInsets
-		insets.bottom -= 15.0
-		return insets
+	func widgetPerformUpdate(completionHandler: @escaping (NCUpdateResult) -> Void) {
+		update()
+		completionHandler(.newData)
 	}
 }

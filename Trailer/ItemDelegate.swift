@@ -1,27 +1,27 @@
 
-private let _propertiesToFetch = { ()->[AnyObject] in
+private let _propertiesToFetch = { ()->[NSExpressionDescription] in
 	let iodD = NSExpressionDescription()
 	iodD.name = "objectID"
 	iodD.expression = NSExpression.expressionForEvaluatedObject()
-	iodD.expressionResultType = .ObjectIDAttributeType
+	iodD.expressionResultType = .objectIDAttributeType
 
 	let sectionIndexD = NSExpressionDescription()
 	sectionIndexD.name = "sectionIndex"
 	sectionIndexD.expression = NSExpression(format: "sectionIndex")
-	sectionIndexD.expressionResultType = .Integer16AttributeType
+	sectionIndexD.expressionResultType = .integer16AttributeType
 
 	return [iodD, sectionIndexD]
 }()
 
 final class ItemDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 
-	private var itemIds = [NSObject]()
-	private let type: String
+	private var itemIds = [Any]()
+	private let type: ListableItem.Type
 	private let sections: [String]
 	private let removalSections: [String]
 	private let viewCriterion: GroupingCriterion?
 
-	init(type: String, sections: [String], removeButtonsInSections: [String], viewCriterion: GroupingCriterion?) {
+	init(type: ListableItem.Type, sections: [String], removeButtonsInSections: [String], viewCriterion: GroupingCriterion?) {
 
 		self.type = type
 		self.sections = sections
@@ -29,27 +29,27 @@ final class ItemDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 		self.viewCriterion = viewCriterion
 
 		super.init()
-		reloadData(nil)
+		reloadData(filter: nil)
 	}
 
 	func reloadData(filter: String?) {
 
-		itemIds.removeAll(keepCapacity: false)
+		itemIds.removeAll(keepingCapacity: false)
 
-		let f = ListableItem.requestForItemsOfType(type, withFilter: filter, sectionIndex: -1, criterion: viewCriterion)
-		f.resultType = .DictionaryResultType
+		let f = ListableItem.requestForItems(of: type, withFilter: filter, sectionIndex: -1, criterion: viewCriterion)
+		f.resultType = .dictionaryResultType
 		f.fetchBatchSize = 0
 		f.propertiesToFetch = _propertiesToFetch
-		let allItems = try! mainObjectContext.executeFetchRequest(f) as! [NSDictionary]
+		let allItems = try! DataManager.main.fetch(f as! NSFetchRequest<NSDictionary>)
 
 		itemIds.reserveCapacity(allItems.count+sections.count)
 
 		if let firstItem = allItems.first {
-			var lastSection = (firstItem["sectionIndex"] as! NSNumber).integerValue
+			var lastSection = (firstItem["sectionIndex"] as! NSNumber).intValue
 			itemIds.append(sections[lastSection])
 
 			for item in allItems {
-				let i = (item["sectionIndex"] as! NSNumber).integerValue
+				let i = (item["sectionIndex"] as! NSNumber).intValue
 				if lastSection < i {
 					itemIds.append(Section.issueMenuTitles[i])
 					lastSection = i
@@ -59,10 +59,10 @@ final class ItemDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 		}
 	}
 
-	func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
+	func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
 		let object = itemIds[row]
 		if let o = object as? NSManagedObjectID {
-			if let i = existingObjectWithID(o) {
+			if let i = existingObject(with: o) {
 				if let pr = i as? PullRequest {
 					return PullRequestCell(pullRequest: pr)
 				} else if let issue = i as? Issue {
@@ -75,18 +75,18 @@ final class ItemDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 		return nil
 	}
 
-	func tableView(tv: NSTableView, heightOfRow row: Int) -> CGFloat {
-		let v = tableView(tv, viewForTableColumn: nil, row: row)
+	func tableView(_ tv: NSTableView, heightOfRow row: Int) -> CGFloat {
+		let v = tableView(tv, viewFor: nil, row: row)
 		return v!.frame.size.height
 	}
 
-	func numberOfRowsInTableView(tableView: NSTableView) -> Int {
+	func numberOfRows(in tableView: NSTableView) -> Int {
 		return itemIds.count
 	}
 
-	func itemAtRow(row: Int) -> ListableItem? {
+	func itemAtRow(_ row: Int) -> ListableItem? {
 		if row >= 0 && row < itemIds.count, let object = itemIds[row] as? NSManagedObjectID {
-			return existingObjectWithID(object) as? ListableItem
+			return existingObject(with: object) as? ListableItem
 		} else {
 			return nil
 		}

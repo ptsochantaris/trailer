@@ -17,27 +17,25 @@ final class PRRow: NSObject {
 	var itemId: String?
 	var hasUnread: Bool!
 
-	func populateFrom(itemData: [String : AnyObject]) {
+	func populate(from itemData: [AnyHashable : Any]) {
 
-		let titleData = itemData["title"] as! NSData
-		let title = NSKeyedUnarchiver.unarchiveObjectWithData(titleData) as! NSAttributedString
+		let titleData = itemData["title"] as! Data
+		let title = NSKeyedUnarchiver.unarchiveObject(with: titleData) as! NSAttributedString
 		titleL.setAttributedText(title)
 
-		let subtitleData = itemData["subtitle"] as! NSData
-		let subtitle = NSKeyedUnarchiver.unarchiveObjectWithData(subtitleData) as! NSAttributedString
+		let subtitleData = itemData["subtitle"] as! Data
+		let subtitle = NSKeyedUnarchiver.unarchiveObject(with: subtitleData) as! NSAttributedString
 		detailsL.setAttributedText(subtitle)
 
 		itemId = itemData["localId"] as? String
 
 		let c = itemData["commentCount"] as? Int ?? 0
 		totalCommentsL.setText("\(c)")
-		totalCommentsGroup.setHidden(c==0)
+		totalCommentsGroup.setAlpha(c > 0 ? 1.0 : 0.4)
 
 		let u = itemData["unreadCount"] as? Int ?? 0
 		unreadCommentsL.setText("\(u)")
+		unreadCommentsGroup.setAlpha(u > 0 ? 1.0 : 0.4)
 		hasUnread = u>0
-		unreadCommentsGroup.setHidden(!hasUnread)
-
-		counterGroup.setHidden(c+u==0)
 	}
 }

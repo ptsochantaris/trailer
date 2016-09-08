@@ -3,45 +3,31 @@ final class IssueCell: TrailerCell {
 
 	init(issue: Issue) {
 
-		super.init(frame: NSZeroRect)
+		super.init(frame: NSZeroRect, item: issue)
 
-		dataItemId = issue.objectID
-		detailFont = NSFont.menuFontOfSize(10.0)
-		titleFont = NSFont.menuFontOfSize(13.0)
+		let _commentsNew = issue.unreadComments
+		let _commentsTotal = issue.totalComments
 
-		unselectedTitleColor = goneDark ? NSColor.controlHighlightColor() : NSColor.controlTextColor()
-
-		let _commentsNew = issue.unreadComments?.integerValue ?? 0
-		let _commentsTotal = issue.totalComments?.integerValue ?? 0
-
-		let _title = issue.titleWithFont(titleFont, labelFont: detailFont, titleColor: unselectedTitleColor)
-		let _subtitle = issue.subtitleWithFont(detailFont, lightColor: NSColor.grayColor(), darkColor: NSColor.darkGrayColor())
+		let _title = issue.title(with: titleFont, labelFont: detailFont, titleColor: unselectedTitleColor)
+		let _subtitle = issue.subtitle(with: detailFont, lightColor: .gray, darkColor: .darkGray)
 
 		var W = MENU_WIDTH-LEFTPADDING-app.scrollBarWidth
 
-		let showUnpin = issue.condition?.integerValue != ItemCondition.Open.rawValue
+		let showUnpin = issue.condition != ItemCondition.open.rawValue
 		if showUnpin { W -= REMOVE_BUTTON_WIDTH } else { W -= 4.0 }
 
 		let showAvatar = !S(issue.userAvatarUrl).isEmpty && !Settings.hideAvatars
 		if showAvatar { W -= AVATAR_SIZE+AVATAR_PADDING } else { W += 4.0 }
 
-		let titleHeight = ceil(_title.boundingRectWithSize(CGSizeMake(W-4.0, CGFloat.max), options: stringDrawingOptions).size.height)
-		let subtitleHeight = ceil(_subtitle.boundingRectWithSize(CGSizeMake(W-4.0, CGFloat.max), options: stringDrawingOptions).size.height+4.0)
+		let titleHeight = ceil(_title.boundingRect(with: CGSize(width: W-4.0, height: .greatestFiniteMagnitude), options: stringDrawingOptions).size.height)
+		let subtitleHeight = ceil(_subtitle.boundingRect(with: CGSize(width: W-4.0, height: .greatestFiniteMagnitude), options: stringDrawingOptions).size.height+4.0)
 
-		var statusRects = [NSValue]()
-		var bottom: CGFloat, CELL_PADDING: CGFloat
+		var bottom: CGFloat
+		let cellPadding: CGFloat = 6.0
 
-		let paragraphStyle = NSMutableParagraphStyle()
-		paragraphStyle.headIndent = 92.0
+		bottom = ceil(cellPadding * 0.5)
 
-		var statusAttributes = [String : AnyObject]()
-		statusAttributes[NSFontAttributeName] = NSFont(name: "Monaco", size: 9)
-		statusAttributes[NSParagraphStyleAttributeName] = paragraphStyle
-
-		CELL_PADDING = 6.0
-		bottom = ceil(CELL_PADDING * 0.5)
-
-		frame = NSMakeRect(0, 0, MENU_WIDTH, titleHeight+subtitleHeight+CELL_PADDING)
+		frame = NSMakeRect(0, 0, MENU_WIDTH, titleHeight+subtitleHeight + cellPadding)
 		let faded = issue.shouldSkipNotifications
 		addCounts(_commentsTotal, _commentsNew, faded)
 
@@ -61,30 +47,23 @@ final class IssueCell: TrailerCell {
 		pinRect = NSOffsetRect(pinRect, shift, 0)
 		dateRect = NSOffsetRect(dateRect, shift, 0)
 		titleRect = NSOffsetRect(titleRect, shift, 0)
-		var replacementRects = [NSValue]()
-		for rv in statusRects {
-			replacementRects.append(NSValue(rect: CGRectOffset(rv.rectValue, shift, 0)))
-		}
-		statusRects = replacementRects
 
 		if showUnpin {
-			if (issue.condition?.integerValue ?? 0)==ItemCondition.Open.rawValue {
+			if issue.condition == ItemCondition.open.rawValue {
 				let unmergeableLabel = CenterTextField(frame: pinRect)
-				unmergeableLabel.textColor = NSColor.redColor()
+				unmergeableLabel.textColor = .red
 				unmergeableLabel.font = NSFont(name: "Monaco", size: 8.0)
-				unmergeableLabel.alignment = .Center
+				unmergeableLabel.alignment = .center
 				unmergeableLabel.stringValue = "Cannot be merged"
 				addSubview(unmergeableLabel)
-			}
-			else
-			{
+			} else {
 				let unpin = NSButton(frame: pinRect)
 				unpin.title = "Remove"
 				unpin.target = self
-				unpin.action = #selector(TrailerCell.unPinSelected)
-				unpin.setButtonType(NSButtonType.MomentaryLightButton)
-				unpin.bezelStyle = NSBezelStyle.RoundRectBezelStyle
-				unpin.font = NSFont.systemFontOfSize(10.0)
+				unpin.action = #selector(unPinSelected)
+				unpin.setButtonType(.momentaryLight)
+				unpin.bezelStyle = .roundRect
+				unpin.font = NSFont.systemFont(ofSize: 10.0)
 				addSubview(unpin)
 			}
 		}

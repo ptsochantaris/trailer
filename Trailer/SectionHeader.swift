@@ -5,31 +5,33 @@ final class SectionHeader: NSTableRowView {
 
 	init(title: String, showRemoveAllButton: Bool) {
 
-		super.init(frame: NSMakeRect(0, 0, MENU_WIDTH, TITLE_HEIGHT))
+		let titleHeight: CGFloat = 42
+
+		super.init(frame: NSMakeRect(0, 0, MENU_WIDTH, titleHeight))
 
 		let W = MENU_WIDTH - app.scrollBarWidth
 		if showRemoveAllButton {
-			let buttonRect = NSMakeRect(W-100, 5, 90, TITLE_HEIGHT)
+			let buttonRect = NSMakeRect(W-100, 5, 90, titleHeight)
 			let unpin = NSButton(frame: buttonRect)
 			unpin.title = "Remove All"
 			unpin.target = self
-			unpin.action = #selector(SectionHeader.unPinSelected)
-			unpin.setButtonType(NSButtonType.MomentaryLightButton)
-			unpin.bezelStyle = NSBezelStyle.RoundRectBezelStyle
-			unpin.font = NSFont.systemFontOfSize(10)
+			unpin.action = #selector(unPinSelected)
+			unpin.setButtonType(.momentaryLight)
+			unpin.bezelStyle = .roundRect
+			unpin.font = NSFont.systemFont(ofSize: 10)
 			addSubview(unpin)
 		}
 
 		let x = W-120-AVATAR_SIZE-LEFTPADDING
-		titleView = CenterTextField(frame: NSMakeRect(12, 4, x, TITLE_HEIGHT))
+		titleView = CenterTextField(frame: NSMakeRect(12, 4, x, titleHeight))
 		titleView.attributedStringValue = NSAttributedString(string: title, attributes: [
-				NSFontAttributeName: NSFont.boldSystemFontOfSize(14),
-				NSForegroundColorAttributeName: NSColor.controlShadowColor().colorWithAlphaComponent(0.7)])
+				NSFontAttributeName: NSFont.boldSystemFont(ofSize: 14),
+				NSForegroundColorAttributeName: NSColor.controlShadowColor.withAlphaComponent(0.7)])
 		addSubview(titleView)
 	}
 
 	func unPinSelected() {
-		app.sectionHeaderRemoveSelected(titleView.attributedStringValue.string)
+		app.removeSelected(on: titleView.attributedStringValue.string)
 	}
 
 	required init?(coder: NSCoder) {

@@ -1,68 +1,73 @@
 
+let statusAttributes: [String : Any] = {
+
+	let paragraphStyle = NSMutableParagraphStyle()
+	paragraphStyle.headIndent = 92.0
+
+	var a = [String : Any]() // swift bug will crash the app if this is declared as a literal
+	a[NSFontAttributeName] = NSFont(name: "Monaco", size: 9)
+	a[NSParagraphStyleAttributeName] = paragraphStyle
+	return a
+}()
+
 final class PullRequestCell: TrailerCell {
 
 	init(pullRequest: PullRequest) {
 
-		super.init(frame: NSZeroRect)
+		super.init(frame: NSZeroRect, item: pullRequest)
 
-		dataItemId = pullRequest.objectID
-		detailFont = NSFont.menuFontOfSize(10.0)
-		titleFont = NSFont.menuFontOfSize(13.0)
+		let _commentsNew = pullRequest.unreadComments
+		let _commentsTotal = pullRequest.totalComments
 
-		unselectedTitleColor = goneDark ? NSColor.controlHighlightColor() : NSColor.controlTextColor()
-
-		let _commentsNew = pullRequest.unreadComments?.integerValue ?? 0
-		let _commentsTotal = pullRequest.totalComments?.integerValue ?? 0
-
-		let _title = pullRequest.titleWithFont(titleFont, labelFont: detailFont, titleColor: unselectedTitleColor)
-		let _subtitle = pullRequest.subtitleWithFont(detailFont, lightColor: NSColor.grayColor(), darkColor: NSColor.darkGrayColor())
+		let _title = pullRequest.title(with: titleFont, labelFont: detailFont, titleColor: unselectedTitleColor)
+		let _subtitle = pullRequest.subtitle(with: detailFont, lightColor: .gray, darkColor: .darkGray)
 
 		var W = MENU_WIDTH-LEFTPADDING-app.scrollBarWidth
 
-		let showUnpin = (pullRequest.condition?.integerValue != ItemCondition.Open.rawValue) || pullRequest.markUnmergeable
+		let showUnpin = (pullRequest.condition != ItemCondition.open.rawValue) || pullRequest.markUnmergeable
 		if showUnpin { W -= REMOVE_BUTTON_WIDTH } else { W -= 4.0 }
 
 		let showAvatar = !S(pullRequest.userAvatarUrl).isEmpty && !Settings.hideAvatars
 		if showAvatar { W -= AVATAR_SIZE+AVATAR_PADDING } else { W += 4.0 }
 
-		let titleHeight = ceil(_title.boundingRectWithSize(CGSizeMake(W-4.0, CGFloat.max), options: stringDrawingOptions).size.height)
-		let subtitleHeight = ceil(_subtitle.boundingRectWithSize(CGSizeMake(W-4.0, CGFloat.max), options: stringDrawingOptions).size.height+4.0)
+		let titleHeight = ceil(_title.boundingRect(with: CGSize(width: W - 4.0, height: .greatestFiniteMagnitude), options: stringDrawingOptions).size.height)
+		let subtitleHeight = ceil(_subtitle.boundingRect(with: CGSize(width: W - 4.0, height: .greatestFiniteMagnitude), options: stringDrawingOptions).size.height+4.0)
 
-		var statusRects = [NSValue]()
-		var statuses: [PRStatus]? = nil
-		var bottom: CGFloat, CELL_PADDING: CGFloat
+		var statusRects = [NSRect]()
+		var statuses: [PRStatus]?
+		var statusLines: [String]?
+		var bottom: CGFloat, cellPadding: CGFloat
 		var statusBottom = CGFloat(0)
 
-		let paragraphStyle = NSMutableParagraphStyle()
-		paragraphStyle.headIndent = 92.0
-
-		var statusAttributes = [String : AnyObject]()
-		statusAttributes[NSFontAttributeName] = NSFont(name: "Monaco", size: 9)
-		statusAttributes[NSParagraphStyleAttributeName] = paragraphStyle
-
 		if Settings.showStatusItems {
-			CELL_PADDING = 10
-			bottom = ceil(CELL_PADDING * 0.5)
-			statuses = pullRequest.displayedStatuses
-			for s in statuses! {
-				let H = ceil(s.displayText.boundingRectWithSize(CGSizeMake(W, CGFloat.max),
-					options: stringDrawingOptions,
-					attributes: statusAttributes).size.height)
-				statusRects.append(NSValue(rect: NSMakeRect(LEFTPADDING, bottom+statusBottom, W, H)))
+			cellPadding = 10
+			bottom = ceil(cellPadding * 0.5)
+			let S = pullRequest.displayedStatuses
+			statusLines = [String]()
+			statusLines?.reserveCapacity(S.count)
+			statusRects.reserveCapacity(S.count)
+			statuses = S
+			for s in S.reversed() {
+				let text = s.displayText
+				let H = ceil(text.boundingRect(with: CGSize(width: W, height: .greatestFiniteMagnitude),
+				                               options: stringDrawingOptions,
+				                               attributes: statusAttributes).size.height)
+				statusRects.append(NSMakeRect(LEFTPADDING, bottom+statusBottom, W, H))
+				statusLines?.append(text)
 				statusBottom += H
 			}
 		} else {
-			CELL_PADDING = 6.0
-			bottom = ceil(CELL_PADDING * 0.5)
+			cellPadding = 6.0
+			bottom = ceil(cellPadding * 0.5)
 		}
 
-		frame = NSMakeRect(0, 0, MENU_WIDTH, titleHeight+subtitleHeight+statusBottom+CELL_PADDING)
+		frame = NSMakeRect(0, 0, MENU_WIDTH, titleHeight + subtitleHeight + statusBottom + cellPadding)
 		let faded = pullRequest.shouldSkipNotifications
 		addCounts(_commentsTotal, _commentsNew, faded)
 
-		var titleRect = NSMakeRect(LEFTPADDING, subtitleHeight+bottom+statusBottom, W, titleHeight)
-		var dateRect = NSMakeRect(LEFTPADDING, statusBottom+bottom, W, subtitleHeight)
-		var pinRect = NSMakeRect(LEFTPADDING+W, floor((bounds.size.height-24)*0.5), REMOVE_BUTTON_WIDTH-10, 24)
+		var titleRect = NSMakeRect(LEFTPADDING, subtitleHeight + bottom + statusBottom, W, titleHeight)
+		var dateRect = NSMakeRect(LEFTPADDING, statusBottom + bottom, W, subtitleHeight)
+		var pinRect = NSMakeRect(LEFTPADDING + W, floor((bounds.size.height-24)*0.5), REMOVE_BUTTON_WIDTH-10, 24)
 
 		let shift: CGFloat
 		if showAvatar {
@@ -75,21 +80,17 @@ final class PullRequestCell: TrailerCell {
 		} else {
 			shift = -4
 		}
-		pinRect = NSOffsetRect(pinRect, shift, 0)
-		dateRect = NSOffsetRect(dateRect, shift, 0)
-		titleRect = NSOffsetRect(titleRect, shift, 0)
-		var replacementRects = [NSValue]()
-		for rv in statusRects {
-			replacementRects.append(NSValue(rect: CGRectOffset(rv.rectValue, shift, 0)))
-		}
-		statusRects = replacementRects
+		pinRect = pinRect.offsetBy(dx: shift, dy: 0)
+		dateRect = dateRect.offsetBy(dx: shift, dy: 0)
+		titleRect = titleRect.offsetBy(dx: shift, dy: 0)
+		statusRects = statusRects.map { $0.offsetBy(dx: shift, dy: 0) }
 
 		if showUnpin {
-			if (pullRequest.condition?.integerValue ?? 0)==ItemCondition.Open.rawValue {
+			if pullRequest.condition == ItemCondition.open.rawValue {
 				let unmergeableLabel = CenterTextField(frame: pinRect)
-				unmergeableLabel.textColor = NSColor.redColor()
+				unmergeableLabel.textColor = .red
 				unmergeableLabel.font = NSFont(name: "Menlo-Regular", size: 8.0)
-				unmergeableLabel.alignment = .Center
+				unmergeableLabel.alignment = .center
 				unmergeableLabel.stringValue = "Cannot be merged"
 				addSubview(unmergeableLabel)
 			}
@@ -98,10 +99,10 @@ final class PullRequestCell: TrailerCell {
 				let unpin = NSButton(frame: pinRect)
 				unpin.title = "Remove"
 				unpin.target = self
-				unpin.action = #selector(TrailerCell.unPinSelected)
-				unpin.setButtonType(NSButtonType.MomentaryLightButton)
-				unpin.bezelStyle = NSBezelStyle.RoundRectBezelStyle
-				unpin.font = NSFont.systemFontOfSize(10.0)
+				unpin.action = #selector(unPinSelected)
+				unpin.setButtonType(.momentaryLight)
+				unpin.bezelStyle = .roundRect
+				unpin.font = NSFont.systemFont(ofSize: 10.0)
 				addSubview(unpin)
 			}
 		}
@@ -119,20 +120,21 @@ final class PullRequestCell: TrailerCell {
 			subtitle.alphaValue = DISABLED_FADE
 		}
 
-		if let s = statuses {
-			for count in 0 ..< statusRects.count {
-				let frame = statusRects[statusRects.count-count-1].rectValue
-				let statusLabel = LinkField(frame: frame)
-				let status = s[count]
+		if let s = statuses, let lines = statusLines {
+			var rectIndex = statusRects.count-1
+			for status in s {
+				let frame = statusRects[rectIndex]
 
+				let statusLabel = LinkField(frame: frame)
 				statusLabel.targetUrl = status.targetUrl
 				statusLabel.needsCommand = !Settings.makeStatusItemsSelectable
-				statusLabel.attributedStringValue = NSAttributedString(string: status.displayText, attributes: statusAttributes)
+				statusLabel.attributedStringValue = NSAttributedString(string: lines[rectIndex], attributes: statusAttributes)
 				statusLabel.textColor = status.colorForDisplay
 				if faded {
 					statusLabel.alphaValue = DISABLED_FADE
 				}
 				addSubview(statusLabel)
+				rectIndex -= 1
 			}
 		}
 

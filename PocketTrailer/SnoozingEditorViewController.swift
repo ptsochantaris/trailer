@@ -11,74 +11,99 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 
 	@IBOutlet weak var typeSelector: UISegmentedControl!
 
-	@IBAction func deleteSelected(sender: UIBarButtonItem) {
-		let a = UIAlertController(title: "Delete Snooze Preset",
-		                          message: "Are you sure you want to remove this preset from your list?",
-		                          preferredStyle: .Alert)
+	@IBAction func deleteSelected(_ sender: UIBarButtonItem) {
 
-		a.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
-		a.addAction(UIAlertAction(title: "Delete", style: .Destructive) { [weak self] action in
-			self?.deletePreset()
-		})
+		if let s = snoozeItem {
+			let appliedCount = s.appliedToIssues.count + s.appliedToPullRequests.count
+			if appliedCount > 0 {
 
-		presentViewController(a, animated: true, completion: nil)
+				let a = UIAlertController(title: "Delete Snooze Preset",
+				                          message: "You have \(appliedCount) items that have been snoozed using this preset. What would you like to do with them after deleting this preset?",
+				                          preferredStyle: .alert)
+
+				a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+				a.addAction(UIAlertAction(title: "Wake Them Up", style: .destructive) { [weak self] action in
+					s.wakeUpAllAssociatedItems()
+					self?.deletePreset()
+				})
+				a.addAction(UIAlertAction(title: "Keep Them Snoozed", style: .destructive) { [weak self] action in
+					self?.deletePreset()
+				})
+
+				present(a, animated: true, completion: nil)
+
+			} else {
+
+				let a = UIAlertController(title: "Delete Snooze Preset",
+				                          message: "Are you sure you want to remove this preset from your list?",
+				                          preferredStyle: .alert)
+
+				a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+				a.addAction(UIAlertAction(title: "Delete", style: .destructive) { [weak self] action in
+					self?.deletePreset()
+				})
+				
+				present(a, animated: true, completion: nil)
+				
+			}
+		}
 	}
 
 	private func deletePreset() {
 		if let s = snoozeItem {
-			mainObjectContext.deleteObject(s)
+			DataManager.main.delete(s)
 		}
-		navigationController?.popViewControllerAnimated(true)
+		_ = navigationController?.popViewController(animated: true)
 	}
 
-	@IBAction func upSelected(sender: UIBarButtonItem) {
+	@IBAction func upSelected(_ sender: UIBarButtonItem) {
 		if let this = snoozeItem {
-			let all = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)
-			if let index = all.indexOf(this) where index > 0 {
+			let all = SnoozePreset.allSnoozePresets(in: DataManager.main)
+			if let index = all.index(of: this), index > 0 {
 				let other = all[index-1]
-				other.sortOrder = NSNumber(integer: index)
-				this.sortOrder = NSNumber(integer: index-1)
+				other.sortOrder = Int64(index)
+				this.sortOrder = Int64(index-1)
 				updateView()
 			}
 		}
 	}
 
-	override func viewDidDisappear(animated: Bool) {
+	override func viewDidDisappear(_ animated: Bool) {
 		super.viewDidDisappear(animated)
 		DataManager.saveDB()
 	}
 
-	@IBAction func downSelected(sender: UIBarButtonItem) {
+	@IBAction func downSelected(_ sender: UIBarButtonItem) {
 		if let this = snoozeItem {
-			let all = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext)
-			if let index = all.indexOf(this) where index < all.count-1 {
+			let all = SnoozePreset.allSnoozePresets(in: DataManager.main)
+			if let index = all.index(of: this), index < all.count-1 {
 				let other = all[index+1]
-				other.sortOrder = NSNumber(integer: index)
-				this.sortOrder = NSNumber(integer: index+1)
+				other.sortOrder = Int64(index)
+				this.sortOrder = Int64(index+1)
 				updateView()
 			}
 		}
 	}
 
-	@IBAction func typeSelectorChanged(sender: UISegmentedControl) {
+	@IBAction func typeSelectorChanged(_ sender: UISegmentedControl) {
 		updateView()
 	}
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		title = isNew ? "New" : "Edit"
-		typeSelector.selectedSegmentIndex = (snoozeItem?.duration.boolValue ?? false) ? 0 : 1
+		typeSelector.selectedSegmentIndex = (snoozeItem?.duration ?? false) ? 0 : 1
 		updateView()
-		hidePickerAnimated(false)
+		hidePickerAnimated(animate: false)
 	}
 
 	private func updateView() {
 		table.reloadData()
-		snoozeItem?.duration = NSNumber(bool: typeSelector.selectedSegmentIndex==0)
-		let total = SnoozePreset.allSnoozePresetsInMoc(mainObjectContext).count
+		snoozeItem?.duration = typeSelector.selectedSegmentIndex == 0
+		let total = SnoozePreset.allSnoozePresets(in: DataManager.main).count
 		let desc = S(snoozeItem?.listDescription)
 		if total > 1 {
-			let pos = (snoozeItem?.sortOrder.integerValue ?? 0)+1
+			let pos = (snoozeItem?.sortOrder ?? 0)+1
 			descriptionLabel.text = "\"\(desc)\"\n\(pos) of \(total) on the snooze menu"
 		} else {
 			descriptionLabel.text = "\"\(desc)\""
@@ -87,51 +112,84 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 
 	//////////////////////// Table
 
-	func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-		switch indexPath.row {
-		case 0:
-			showPicker(.Day)
-		case 1:
-			showPicker(.Hour)
-		default:
-			showPicker(.Minute)
+	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+		if indexPath.section == 0 {
+
+			switch indexPath.row {
+			case 0:
+				showPicker(mode: .Day)
+			case 1:
+				showPicker(mode: .Hour)
+			default:
+				showPicker(mode: .Minute)
+			}
+			tableView.deselectRow(at: indexPath, animated: false)
+
+		} else {
+
+			switch indexPath.row {
+			case 0:
+				snoozeItem?.wakeOnComment = !(snoozeItem?.wakeOnComment ?? false)
+			case 1:
+				snoozeItem?.wakeOnMention = !(snoozeItem?.wakeOnMention ?? false)
+			default:
+				snoozeItem?.wakeOnStatusChange = !(snoozeItem?.wakeOnStatusChange ?? false)
+			}
+			tableView.reloadData()
 		}
-		tableView.deselectRowAtIndexPath(indexPath, animated: false)
 	}
 
-	func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-		return 1
+	func numberOfSections(in tableView: UITableView) -> Int {
+		return 2
 	}
 
-	func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		return 3
 	}
 
-	func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCellWithIdentifier("SnoozePresetElementCell", forIndexPath: indexPath)
-		if let s = snoozeItem {
+	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+		if indexPath.section == 0 {
+			let cell = tableView.dequeueReusableCell(withIdentifier: "SnoozePresetElementCell", for: indexPath)
+			if let s = snoozeItem {
+				switch indexPath.row {
+				case 0:
+					cell.textLabel?.text = dayLabel
+					cell.detailTextLabel?.text = dayValues[Int(s.day)]
+					cell.detailTextLabel?.textColor = detailColor(for: s.day)
+				case 1:
+					cell.textLabel?.text = hourLabel
+					cell.detailTextLabel?.text = hourValues[Int(s.hour)]
+					cell.detailTextLabel?.textColor = detailColor(for: s.hour)
+				default:
+					cell.textLabel?.text = minuteLabel
+					cell.detailTextLabel?.text = minuteValues[Int(s.minute)]
+					cell.detailTextLabel?.textColor = detailColor(for: s.minute)
+				}
+			}
+			return cell
+
+		} else {
+
+			let cell = tableView.dequeueReusableCell(withIdentifier: "SnoozePresetWakeupCell", for: indexPath)
 			switch indexPath.row {
 			case 0:
-				cell.textLabel?.text = dayLabel()
-				cell.detailTextLabel?.text = dayValues()[s.day?.integerValue ?? 0]
-				cell.detailTextLabel?.textColor = detailColor(s.day)
+				cell.textLabel?.text = "New comment"
+				cell.accessoryType = snoozeItem?.wakeOnComment ?? false ? .checkmark : .none
 			case 1:
-				cell.textLabel?.text = hourLabel()
-				cell.detailTextLabel?.text = hourValues()[s.hour?.integerValue ?? 0]
-				cell.detailTextLabel?.textColor = detailColor(s.hour)
+				cell.textLabel?.text = "Mentioned in a new comment"
+				cell.accessoryType = snoozeItem?.wakeOnMention ?? false ? .checkmark : .none
 			default:
-				cell.textLabel?.text = minuteLabel()
-				cell.detailTextLabel?.text = minuteValues()[s.minute?.integerValue ?? 0]
-				cell.detailTextLabel?.textColor = detailColor(s.minute)
+				cell.textLabel?.text = "Status item update"
+				cell.accessoryType = snoozeItem?.wakeOnStatusChange ?? false ? .checkmark : .none
 			}
+			return cell
 		}
-		return cell
 	}
 
-	private func detailColor(n: NSNumber?) -> UIColor {
+	private func detailColor(for number: Int64) -> UIColor {
 		if typeSelector.selectedSegmentIndex==0 {
-			if n?.integerValue ?? 0 == 0 {
-				return UIColor.lightGrayColor()
+			if number == 0 {
+				return .lightGray
 			} else {
 				return view.tintColor
 			}
@@ -140,31 +198,31 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 		}
 	}
 
-	private func hourLabel() -> String {
+	private var hourLabel: String {
 		if typeSelector.selectedSegmentIndex == 0 {
-			return snoozeItem?.hour?.integerValue ?? 0 > 1 ? "Hours" : "Hour"
+			return snoozeItem?.hour ?? 0 > 1 ? "Hours" : "Hour"
 		} else {
 			return "Hour"
 		}
 	}
 
-	private func dayLabel() -> String {
+	private var dayLabel: String {
 		if typeSelector.selectedSegmentIndex == 0 {
-			return snoozeItem?.day?.integerValue ?? 0 > 1 ? "Days" : "Day"
+			return snoozeItem?.day ?? 0 > 1 ? "Days" : "Day"
 		} else {
 			return "Day"
 		}
 	}
 
-	private func minuteLabel() -> String {
+	private var minuteLabel: String {
 		if typeSelector.selectedSegmentIndex == 0 {
-			return snoozeItem?.minute?.integerValue ?? 0 > 1 ? "Minutes" : "Minute"
+			return snoozeItem?.minute ?? 0 > 1 ? "Minutes" : "Minute"
 		} else {
 			return "Minute"
 		}
 	}
 
-	private func dayValues() -> [String] {
+	private var dayValues: [String] {
 		var res = [String]()
 		if typeSelector.selectedSegmentIndex==0 {
 			res.append("No days")
@@ -173,12 +231,12 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 				res.append("\(f) days")
 			}
 		} else {
-			res.appendContentsOf(["Any day", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"])
+			res.append(contentsOf: ["Any day", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"])
 		}
 		return res
 	}
 
-	private func hourValues() -> [String] {
+	private var hourValues: [String] {
 		var res = [String]()
 		if typeSelector.selectedSegmentIndex==0 {
 			res.append("No hours")
@@ -194,7 +252,7 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 		return res
 	}
 
-	private func minuteValues() -> [String] {
+	private var minuteValues: [String] {
 		var res = [String]()
 		if typeSelector.selectedSegmentIndex==0 {
 			res.append("No minutes")
@@ -230,56 +288,64 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 		pickerMode = mode
 		switch mode {
 		case .Day:
-			pickerValues = dayValues()
+			pickerValues = dayValues
 		case .Hour:
-			pickerValues = hourValues()
+			pickerValues = hourValues
 		case .Minute:
-			pickerValues = minuteValues()
+			pickerValues = minuteValues
 		}
 		showPicker()
 	}
 
-	@IBAction func pickerCancelSelected(sender: UIBarButtonItem) {
-		hidePickerAnimated(true)
+	@IBAction func pickerCancelSelected(_ sender: UIBarButtonItem) {
+		hidePickerAnimated(animate: true)
 	}
 
-	@IBAction func pickerDoneSelected(sender: UIBarButtonItem) {
+	@IBAction func pickerDoneSelected(_ sender: UIBarButtonItem) {
 		if let p = pickerMode {
-			let s = picker.selectedRowInComponent(0)
+			let s = picker.selectedRow(inComponent: 0)
 			switch p {
 			case .Day:
-				snoozeItem?.day = (s>0) ? NSNumber(integer: s) : nil
+				snoozeItem?.day = Int64(s)
 			case .Hour:
-				snoozeItem?.hour = (s>0) ? NSNumber(integer: s) : nil
+				snoozeItem?.hour = Int64(s)
 			case .Minute:
-				snoozeItem?.minute = (s>0) ? NSNumber(integer: s) : nil
+				snoozeItem?.minute = Int64(s)
 			}
 			updateView()
 		}
-		hidePickerAnimated(true)
+		hidePickerAnimated(animate: true)
 	}
 
-	func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+	func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
 		return pickerValues[row]
 	}
 
-	func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+	func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
 		return pickerValues.count
 	}
 
-	func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int {
+	func numberOfComponents(in pickerView: UIPickerView) -> Int {
 		return 1
 	}
 
-	private func indexForPicker() -> Int {
+	func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+		if section == 0 {
+			return typeSelector.selectedSegmentIndex == 0 ? "Snooze an item for a specific duration of time" : "Snooze an item until a specific time or day"
+		} else {
+			return "Wake up an item snoozed by this preset if any of these occur..."
+		}
+	}
+
+	private var indexForPicker: Int {
 		if let p = pickerMode {
 			switch p {
 			case .Day:
-				return snoozeItem?.day?.integerValue ?? 0
+				return Int(snoozeItem?.day ?? 0)
 			case .Hour:
-				return snoozeItem?.hour?.integerValue ?? 0
+				return Int(snoozeItem?.hour ?? 0)
 			case .Minute:
-				return snoozeItem?.minute?.integerValue ?? 0
+				return Int(snoozeItem?.minute ?? 0)
 			}
 		} else {
 			return 0
@@ -288,13 +354,13 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 
 	private func showPicker() {
 		picker.reloadAllComponents()
-		picker.selectRow(indexForPicker(), inComponent: 0, animated: false)
+		picker.selectRow(indexForPicker, inComponent: 0, animated: false)
 		pickerBottom.constant = tabBarController?.tabBar.frame.size.height ?? 0
-		UIView.animateWithDuration(0.3, delay: 0.0, options: .CurveEaseInOut, animations: { [weak self] in
+		UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: { [weak self] in
 			self?.pickerShield.alpha = 1.0
 			self?.view.layoutIfNeeded()
 		}) { [weak self] finished in
-			self?.pickerShield.userInteractionEnabled = true
+			self?.pickerShield.isUserInteractionEnabled = true
 		}
 	}
 
@@ -302,15 +368,15 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 		pickerBottom.constant = -(picker.frame.size.height+pickerNavBar.frame.size.height)
 
 		if animate {
-			UIView.animateWithDuration(0.3, delay: 0.0, options: .CurveEaseInOut, animations: { [weak self] in
+			UIView.animate(withDuration: 0.3, delay: 0.0, options: .curveEaseInOut, animations: { [weak self] in
 				self?.pickerShield.alpha = 0.0
 				self?.view.layoutIfNeeded()
 			}) { [weak self] finished in
-				self?.pickerShield.userInteractionEnabled = false
+				self?.pickerShield.isUserInteractionEnabled = false
 			}
 		} else {
 			pickerShield.alpha = 0.0
-			pickerShield.userInteractionEnabled = false
+			pickerShield.isUserInteractionEnabled = false
 		}
 	}
 

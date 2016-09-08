@@ -5,22 +5,21 @@ final class AvatarView: NSImageView {
 
 	init(frame frameRect: NSRect, url: String) {
 		super.init(frame: frameRect)
-		imageAlignment = NSImageAlignment.AlignCenter
-		if (!api.haveCachedAvatar(url) { [weak self] img, _ in
-			if let weakSelf = self {
-				weakSelf.image = img
-				weakSelf.done()
-			}
+		imageAlignment = .alignCenter
+		if (!API.haveCachedAvatar(from: url) { [weak self] img, _ in
+			guard let s = self else { return }
+			s.image = img
+			s.done()
 		}) {
 			startSpinner()
 		}
 	}
 
-	override func drawRect(dirtyRect: NSRect) {
+	override func draw(_ dirtyRect: NSRect) {
 		let radius = floor(AVATAR_SIZE/2.0)
 		let path = NSBezierPath(roundedRect: dirtyRect, xRadius: radius, yRadius: radius)
 		path.addClip()
-		super.drawRect(dirtyRect)
+		super.draw(dirtyRect)
 	}
 
 	required init?(coder: NSCoder) {
@@ -28,8 +27,8 @@ final class AvatarView: NSImageView {
 	}
 
 	func startSpinner() {
-		let s = NSProgressIndicator(frame: CGRectInset(bounds, 6.0, 6.0))
-		s.style = NSProgressIndicatorStyle.SpinningStyle
+		let s = NSProgressIndicator(frame: bounds.insetBy(dx: 6.0, dy: 6.0))
+		s.style = .spinningStyle
 		addSubview(s)
 		s.startAnimation(self)
 		spinner = s

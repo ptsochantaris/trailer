@@ -1,7 +1,7 @@
 
 import UIKit
 
-let statusAttributes: [String : AnyObject] = {
+let statusAttributes: [String : Any] = {
 	let paragraphStyle = NSMutableParagraphStyle()
 	paragraphStyle.paragraphSpacing = 6.0
 
@@ -13,8 +13,8 @@ let statusAttributes: [String : AnyObject] = {
 
 final class PRCell: UITableViewCell {
 
-	private let unreadCount = CountLabel(frame: CGRectZero)
-	private let readCount = CountLabel(frame: CGRectZero)
+	private let unreadCount = CountLabel(frame: CGRect())
+	private let readCount = CountLabel(frame: CGRect())
 	private var failedToLoadImage: String?
 	private var waitingForImageInPath: String?
 
@@ -28,10 +28,10 @@ final class PRCell: UITableViewCell {
 
 	override func awakeFromNib() {
 
-		unreadCount.textColor = UIColor.whiteColor()
+		unreadCount.textColor = .white
 		contentView.addSubview(unreadCount)
 
-		readCount.textColor = UIColor.darkGrayColor()
+		readCount.textColor = .darkGray
 		contentView.addSubview(readCount)
 
 		_image.layer.cornerRadius = 25
@@ -44,61 +44,62 @@ final class PRCell: UITableViewCell {
 		contentView.addConstraints([
 
 			NSLayoutConstraint(item: _image,
-				attribute: .Leading,
-				relatedBy: .Equal,
+				attribute: .leading,
+				relatedBy: .equal,
 				toItem: readCount,
-				attribute: .Leading,
+				attribute: .leading,
 				multiplier: 1,
 				constant: 3),
 
 			NSLayoutConstraint(item: _image,
-				attribute: .CenterY,
-				relatedBy: .Equal,
+				attribute: .centerY,
+				relatedBy: .equal,
 				toItem: readCount,
-				attribute: .CenterY,
+				attribute: .centerY,
 				multiplier: 1,
 				constant: -21),
 
 			NSLayoutConstraint(item: _image,
-				attribute: .Leading,
-				relatedBy: .Equal,
+				attribute: .leading,
+				relatedBy: .equal,
 				toItem: unreadCount,
-				attribute: .Leading,
+				attribute: .leading,
 				multiplier: 1,
 				constant: 3),
 
 			NSLayoutConstraint(item: _image,
-				attribute: .CenterY,
-				relatedBy: .Equal,
+				attribute: .centerY,
+				relatedBy: .equal,
 				toItem: unreadCount,
-				attribute: .CenterY,
+				attribute: .centerY,
 				multiplier: 1,
 				constant: 21)
 			])
 
-		NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PRCell.networkStateChanged), name: kReachabilityChangedNotification, object: nil)
+		NotificationCenter.default.addObserver(self, selector: #selector(networkStateChanged), name: ReachabilityChangedNotification, object: nil)
 	}
 
 	func networkStateChanged() {
 		atNextEvent(self) { S in
-			if let f = S.failedToLoadImage where api.currentNetworkStatus != .NotReachable {
-				S.loadImageAtPath(f)
+			if let f = S.failedToLoadImage, API.currentNetworkStatus != .NotReachable {
+				S.loadImageAtPath(imagePath: f)
 			}
 		}
 	}
 
 	deinit {
-		NSNotificationCenter.defaultCenter().removeObserver(self)
+		NotificationCenter.default.removeObserver(self)
 	}
 
 	func setPullRequest(pullRequest: PullRequest) {
 
-		let muted = pullRequest.muted?.boolValue ?? false
 
-		let detailFont = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
-		_title.attributedText = pullRequest.titleWithFont(_title.font, labelFont: detailFont.fontWithSize(detailFont.pointSize-2), titleColor: UIColor.darkTextColor())
-		_description.attributedText = pullRequest.subtitleWithFont(detailFont, lightColor: UIColor.lightGrayColor(), darkColor: UIColor.darkGrayColor())
-		setCountsImageAndFade(pullRequest, muted)
+		let detailFont = UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)
+		_title.attributedText = pullRequest.title(with: _title.font, labelFont: detailFont.withSize(detailFont.pointSize-2), titleColor: .darkText)
+		_description.attributedText = pullRequest.subtitle(with: detailFont, lightColor: .lightGray, darkColor: .darkGray)
+
+		let muted = pullRequest.muted
+		setCountsImageAndFade(item: pullRequest, muted: muted)
 
 		var statusText : NSMutableAttributedString?
 		var statusCount = 0
@@ -110,10 +111,10 @@ final class PRCell: UITableViewCell {
 				for status in statusItems {
 					var lineAttributes = statusAttributes
 					lineAttributes[NSForegroundColorAttributeName] = status.colorForDisplay
-					statusText?.appendAttributedString(NSAttributedString(string: status.displayText, attributes: lineAttributes))
+					statusText?.append(NSAttributedString(string: status.displayText, attributes: lineAttributes))
 					statusCount -= 1
 					if statusCount > 0 {
-						statusText?.appendAttributedString(NSAttributedString(string: "\n", attributes: lineAttributes))
+						statusText?.append(NSAttributedString(string: "\n", attributes: lineAttributes))
 					}
 				}
 			}
@@ -124,7 +125,7 @@ final class PRCell: UITableViewCell {
 			statusToAvatarDistance.constant = 9.0
 			statusToDescriptionDistance.constant = 9.0
 			statusToBottomDistance.constant = 3.0
-			var title = pullRequest.accessibleTitle()
+			var title = pullRequest.accessibleTitle
 			if muted {
 				title = "(Muted) - \(title)"
 			}
@@ -133,41 +134,40 @@ final class PRCell: UITableViewCell {
 			statusToAvatarDistance.constant = 0.0
 			statusToDescriptionDistance.constant = 0.0
 			statusToBottomDistance.constant = 4.0
-			accessibilityLabel = "\(pullRequest.accessibleTitle()), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(pullRequest.accessibleSubtitle)"
+			accessibilityLabel = "\(pullRequest.accessibleTitle), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(pullRequest.accessibleSubtitle)"
 		}
 	}
 
 	func setIssue(issue: Issue) {
 
-		let muted = issue.muted?.boolValue ?? false
-
-		let detailFont = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
-		_title.attributedText = issue.titleWithFont(_title.font, labelFont: detailFont.fontWithSize(detailFont.pointSize-2), titleColor: UIColor.darkTextColor())
-		_description.attributedText = issue.subtitleWithFont(detailFont, lightColor: UIColor.lightGrayColor(), darkColor: UIColor.darkGrayColor())
+		let detailFont = UIFont.systemFont(ofSize: UIFont.smallSystemFontSize)
+		_title.attributedText = issue.title(with: _title.font, labelFont: detailFont.withSize(detailFont.pointSize-2), titleColor: .darkText)
+		_description.attributedText = issue.subtitle(with: detailFont, lightColor: .lightGray, darkColor: .darkGray)
 		_statuses.attributedText = nil
 
 		statusToAvatarDistance.constant = 0.0
 		statusToDescriptionDistance.constant = 0.0
 		statusToBottomDistance.constant = 4.0
 
-		setCountsImageAndFade(issue, muted)
-		var title = issue.accessibleTitle()
+		let muted = issue.muted
+		setCountsImageAndFade(item: issue, muted: muted)
+		var title = issue.accessibleTitle
 		if muted {
 			title = "(Muted) - \(title)"
 		}
 		accessibilityLabel = "\(title), \(unreadCount.text) unread comments, \(readCount.text) total comments, \(issue.accessibleSubtitle)"
 	}
 
-	private func setCountsImageAndFade(item: ListableItem, _ muted: Bool) {
-		let _commentsTotal = item.totalComments?.integerValue ?? 0
-		let _commentsNew = item.unreadComments?.integerValue ?? 0
+	private func setCountsImageAndFade(item: ListableItem, muted: Bool) {
+		let _commentsTotal = Int(item.totalComments)
+		let _commentsNew = Int(item.unreadComments)
 		let fade = muted || item.isSnoozing
 
-		readCount.text = itemCountFormatter.stringFromNumber(_commentsTotal)
-		readCount.hidden = (_commentsTotal == 0)
+		readCount.text = itemCountFormatter.string(from: NSNumber(value: _commentsTotal))
+		readCount.isHidden = _commentsTotal == 0
 
-		unreadCount.hidden = (_commentsNew == 0)
-		unreadCount.text = itemCountFormatter.stringFromNumber(_commentsNew)
+		unreadCount.isHidden = _commentsNew == 0
+		unreadCount.text = itemCountFormatter.string(from: NSNumber(value: _commentsNew))
 
 		let a = fade ? DISABLED_FADE : 1.0
 		readCount.alpha = a
@@ -177,13 +177,13 @@ final class PRCell: UITableViewCell {
 		_statuses.alpha = a
 		_description.alpha = a
 
-		loadImageAtPath(item.userAvatarUrl)
+		loadImageAtPath(imagePath: item.userAvatarUrl)
 	}
 
 	private func loadImageAtPath(imagePath: String?) {
 		waitingForImageInPath = imagePath
 		if let path = imagePath {
-			if (!api.haveCachedAvatar(path) { [weak self] image, _ in
+			if (!API.haveCachedAvatar(from: path) { [weak self] image, _ in
 				if self?.waitingForImageInPath == path {
 					if image != nil {
 						// image loaded
@@ -206,18 +206,18 @@ final class PRCell: UITableViewCell {
 		}
 	}
 
-	override func setSelected(selected: Bool, animated: Bool) {
-		super.setSelected(selected, animated:animated)
+	override func setSelected(_ selected: Bool, animated: Bool) {
+		super.setSelected(selected, animated: animated)
 		tone()
 	}
 
-	override func setHighlighted(highlighted: Bool, animated: Bool) {
-		super.setHighlighted(highlighted, animated:animated)
+	override func setHighlighted(_ highlighted: Bool, animated: Bool) {
+		super.setHighlighted(highlighted, animated: animated)
 		tone()
 	}
 
 	private func tone() {
-		unreadCount.backgroundColor = UIColor.redColor()
+		unreadCount.backgroundColor = .red
 		readCount.backgroundColor = UIColor(white: 0.9, alpha: 1.0)
 	}
 }

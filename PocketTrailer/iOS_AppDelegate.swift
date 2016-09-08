@@ -1,41 +1,53 @@
 
 import UIKit
+import UserNotifications
 
-var app: iOS_AppDelegate!
-
-final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
+@UIApplicationMain
+final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
 
 	var window: UIWindow?
 
 	private var lastUpdateFailed = false
 	private var backgroundTask = UIBackgroundTaskInvalid
 	private var watchManager: WatchManager?
-	private var refreshTimer: NSTimer?
+	private var refreshTimer: Timer?
 	private var backgroundCallback: ((UIBackgroundFetchResult) -> Void)?
 	private var actOnLocalNotification = true
 
-	private var justPostedNotificationTimer: PopTimer!
-	private var justPostedNotifications = false
-
 	func updateBadge() {
-		UIApplication.sharedApplication().applicationIconBadgeNumber = PullRequest.badgeCountInMoc(mainObjectContext) + Issue.badgeCountInMoc(mainObjectContext)
+		UIApplication.shared.applicationIconBadgeNumber = PullRequest.badgeCount(in: DataManager.main) + Issue.badgeCount(in: DataManager.main)
 		watchManager?.updateContext()
 	}
 
-	func application(application: UIApplication, willFinishLaunchingWithOptions launchOptions: [NSObject : AnyObject]?) -> Bool {
+	func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
+
 		app = self
-		justPostedNotificationTimer = PopTimer(timeInterval: 2) { [weak self] in
-			self?.justPostedNotifications = false
+		bootUp()
+
+		if DataManager.main.persistentStoreCoordinator == nil {
+			DLog("Database was corrupted on startup, removing DB files and resetting")
+			DataManager.removeDatabaseFiles()
+			abort()
 		}
+
 		return true
 	}
 
-	func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject : AnyObject]?) -> Bool {
+	func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+		completionHandler([.alert, .badge, .sound])
+	}
+
+	func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+		NotificationManager.handleLocalNotification(notification: response.notification.request.content, action: response.actionIdentifier)
+		completionHandler()
+	}
+
+	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
 
 		DataManager.postProcessAllItems()
 
-		if ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
-			api.updateLimitsFromServer()
+		if ApiServer.someServersHaveAuthTokens(in: DataManager.main) {
+			API.updateLimitsFromServer()
 		}
 
 		UITabBar.appearance().tintColor = GLOBAL_TINT
@@ -46,77 +58,33 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 		splitViewController.maximumPrimaryColumnWidth = 320
 		splitViewController.delegate = popupManager
 
-		application.setMinimumBackgroundFetchInterval(NSTimeInterval(Settings.backgroundRefreshPeriod))
+		application.setMinimumBackgroundFetchInterval(TimeInterval(Settings.backgroundRefreshPeriod))
+
+		NotificationManager.setup(delegate: self)
 
 		atNextEvent(self) { S in
-			if DataManager.appIsConfigured {
-				if let localNotification = launchOptions?[UIApplicationLaunchOptionsLocalNotificationKey] as? UILocalNotification {
-					NotificationManager.handleLocalNotification(localNotification, action: nil)
-				}
-			} else {
-
-				if !ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
-					let m = popupManager.getMasterController()
-					if ApiServer.countApiServersInMoc(mainObjectContext) == 1, let a = ApiServer.allApiServersInMoc(mainObjectContext).first where a.authToken == nil || a.authToken!.isEmpty {
-						m.performSegueWithIdentifier("showQuickstart", sender: self)
-					} else {
-						m.performSegueWithIdentifier("showPreferences", sender: self)
-					}
+			if !ApiServer.someServersHaveAuthTokens(in: DataManager.main) {
+				let m = popupManager.masterController
+				if ApiServer.countApiServers(in: DataManager.main) == 1, let a = ApiServer.allApiServers(in: DataManager.main).first, a.authToken == nil || a.authToken!.isEmpty {
+					m.performSegue(withIdentifier: "showQuickstart", sender: self)
+				} else {
+					m.performSegue(withIdentifier: "showPreferences", sender: self)
 				}
 			}
 
 			S.watchManager = WatchManager()
 		}
 
-		let readAction = UIMutableUserNotificationAction()
-		readAction.identifier = "read"
-		readAction.title = "Mark as read"
-		readAction.destructive = false
-		readAction.authenticationRequired = false
-		readAction.activationMode = .Background
-
-		let readShort = UIMutableUserNotificationAction()
-		readShort.identifier = "read"
-		readShort.title = "Read"
-		readShort.destructive = false
-		readShort.authenticationRequired = false
-		readShort.activationMode = .Background
-
-		let muteAction = UIMutableUserNotificationAction()
-		muteAction.identifier = "mute"
-		muteAction.title = "Mute this item"
-		muteAction.destructive = true
-		muteAction.authenticationRequired = false
-		muteAction.activationMode = .Background
-
-		let muteShort = UIMutableUserNotificationAction()
-		muteShort.identifier = "mute"
-		muteShort.title = "Mute"
-		muteShort.destructive = true
-		muteShort.authenticationRequired = false
-		muteShort.activationMode = .Background
-
-		let itemCategory = UIMutableUserNotificationCategory()
-		itemCategory.identifier = "mutable"
-		itemCategory.setActions([readAction, muteAction], forContext: .Default)
-		itemCategory.setActions([readShort, muteShort], forContext: .Minimal)
-
-		let repoCategory = UIMutableUserNotificationCategory()
-		repoCategory.identifier = "repo"
-
-		let notificationSettings = UIUserNotificationSettings(forTypes: [.Alert, .Badge, .Sound], categories: [itemCategory, repoCategory])
-		application.registerUserNotificationSettings(notificationSettings)
-
 		return true
 	}
 
-	func application(application: UIApplication, performActionForShortcutItem shortcutItem: UIApplicationShortcutItem, completionHandler: (Bool) -> Void) {
+	func application(_ application: UIApplication, performActionFor shortcutItem: UIApplicationShortcutItem, completionHandler: @escaping (Bool) -> Void) {
 
 		switch shortcutItem.type {
 
 		case "search-items":
-			let m = popupManager.getMasterController()
-			m.focusFilter()
+			let m = popupManager.masterController
+			m.focusFilter(terms: nil)
 			completionHandler(true)
 
 		case "mark-all-read":
@@ -128,38 +96,25 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 		}
 	}
 
-	func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject) -> Bool {
-		if let c = NSURLComponents(URL: url, resolvingAgainstBaseURL: false) {
+	func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+		if let c = URLComponents(url: url, resolvingAgainstBaseURL: false) {
 			if let scheme = c.scheme {
 				if scheme == "pockettrailer" {
 					return true
 				} else {
-					settingsManager.loadSettingsFrom(url, confirmFromView: nil, withCompletion: nil)
+					settingsManager.loadSettingsFrom(url: url, confirmFromView: nil, withCompletion: nil)
 				}
 			}
 		}
 		return false
 	}
 
-	func application(application: UIApplication, continueUserActivity userActivity: NSUserActivity, restorationHandler: ([AnyObject]?) -> Void) -> Bool {
-		return NotificationManager.handleUserActivity(userActivity)
+	func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([Any]?) -> Void) -> Bool {
+		return NotificationManager.handleUserActivity(activity: userActivity)
 	}
 
 	deinit {
-		NSNotificationCenter.defaultCenter().removeObserver(self)
-	}
-
-	func application(application: UIApplication, didReceiveLocalNotification notification: UILocalNotification) {
-		if !justPostedNotifications && actOnLocalNotification {
-			NotificationManager.handleLocalNotification(notification, action: nil)
-		}
-	}
-
-	func application(application: UIApplication, handleActionWithIdentifier identifier: String?, forLocalNotification notification: UILocalNotification, completionHandler: () -> Void) {
-		dispatch_async(dispatch_get_main_queue()) {
-			NotificationManager.handleLocalNotification(notification, action: identifier)
-			completionHandler()
-		}
+		NotificationCenter.default.removeObserver(self)
 	}
 
 	func startRefreshIfItIsDue() {
@@ -168,36 +123,36 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 		refreshTimer = nil
 
 		if let l = Settings.lastSuccessfulRefresh {
-			let howLongAgo = NSDate().timeIntervalSinceDate(l)
-			if fabs(howLongAgo) > NSTimeInterval(Settings.refreshPeriod) {
-				startRefresh()
+			let howLongAgo = Date().timeIntervalSince(l)
+			if fabs(howLongAgo) > TimeInterval(Settings.refreshPeriod) {
+				_ = startRefresh()
 			} else {
-				let howLongUntilNextSync = NSTimeInterval(Settings.refreshPeriod) - howLongAgo
-				DLog("No need to refresh yet, will refresh in %f", howLongUntilNextSync)
-				refreshTimer = NSTimer.scheduledTimerWithTimeInterval(howLongUntilNextSync, target: self, selector: #selector(iOS_AppDelegate.refreshTimerDone), userInfo: nil, repeats: false)
+				let howLongUntilNextSync = TimeInterval(Settings.refreshPeriod) - howLongAgo
+				DLog("No need to refresh yet, will refresh in %@", howLongUntilNextSync)
+				refreshTimer = Timer.scheduledTimer(timeInterval: howLongUntilNextSync, target: self, selector: #selector(refreshTimerDone), userInfo: nil, repeats: false)
 			}
 		} else {
-			startRefresh()
+			_ = startRefresh()
 		}
 	}
 
-	func application(application: UIApplication, performFetchWithCompletionHandler completionHandler: (UIBackgroundFetchResult) -> Void) {
+	func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
 		backgroundCallback = completionHandler
-		startRefresh()
+		_ = startRefresh()
 	}
 
 	private func checkApiUsage() {
-		for apiServer in ApiServer.allApiServersInMoc(mainObjectContext) {
+		for apiServer in ApiServer.allApiServers(in: DataManager.main) {
 			if apiServer.goodToGo && apiServer.hasApiLimit, let resetDate = apiServer.resetDate {
 				if apiServer.shouldReportOverTheApiLimit {
 					let apiLabel = S(apiServer.label)
-					let resetDateString = itemDateFormatter.stringFromDate(resetDate)
+					let resetDateString = itemDateFormatter.string(from: resetDate)
 
 					showMessage("\(apiLabel) API request usage is over the limit!",
 						"Your request cannot be completed until GitHub resets your hourly API allowance at \(resetDateString).\n\nIf you get this error often, try to make fewer manual refreshes or reducing the number of repos you are monitoring.\n\nYou can check your API usage at any time from the bottom of the preferences pane at any time.")
 				} else if apiServer.shouldReportCloseToApiLimit {
 					let apiLabel = S(apiServer.label)
-					let resetDateString = itemDateFormatter.stringFromDate(resetDate)
+					let resetDateString = itemDateFormatter.string(from: resetDate)
 
 					showMessage("\(apiLabel) API request usage is close to full",
 						"Try to make fewer manual refreshes, increasing the automatic refresh time, or reducing the number of repos you are monitoring.\n\nYour allowance will be reset by GitHub on \(resetDateString).\n\nYou can check your API usage from the bottom of the preferences pane.")
@@ -210,70 +165,68 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 		refreshTimer?.invalidate()
 		refreshTimer = nil
 
+		DataManager.postMigrationTasks()
+
 		appIsRefreshing = true
 
-		backgroundTask = UIApplication.sharedApplication().beginBackgroundTaskWithName("com.housetrip.Trailer.refresh") { [weak self] in
+		backgroundTask = UIApplication.shared.beginBackgroundTask(withName: "com.housetrip.Trailer.refresh") { [weak self] in
 			self?.endBGTask()
 		}
 
-		NSNotificationCenter.defaultCenter().postNotificationName(REFRESH_STARTED_NOTIFICATION, object: nil)
-		DLog("Starting refresh")
+		NotificationCenter.default.post(name: RefreshStartedNotification, object: nil)
 
-		api.expireOldImageCacheEntries()
-		DataManager.postMigrationTasks()
+		NotificationQueue.clear()
+
+		DLog("Starting refresh")
 	}
 
 	func startRefresh() -> Bool {
 
-		if appIsRefreshing || api.noNetworkConnection() || !ApiServer.someServersHaveAuthTokensInMoc(mainObjectContext) {
+		if appIsRefreshing || !API.hasNetworkConnection || !ApiServer.someServersHaveAuthTokens(in: DataManager.main) {
 			return false
 		}
 
 		prepareForRefresh()
 
-		api.syncItemsForActiveReposAndCallback({
-
-			popupManager.getMasterController().title = "Processing..."
-
-		}) { [weak self] in
+		API.syncItemsForActiveReposAndCallback { [weak self] in
 
 			guard let s = self else { return }
 
-			let success = !ApiServer.shouldReportRefreshFailureInMoc(mainObjectContext)
+			let success = !ApiServer.shouldReportRefreshFailure(in: DataManager.main)
 
 			s.lastUpdateFailed = !success
 
 			if success {
-				Settings.lastSuccessfulRefresh = NSDate()
+				Settings.lastSuccessfulRefresh = Date()
 				preferencesDirty = false
 			}
 
 			s.checkApiUsage()
 			appIsRefreshing = false
-			NSNotificationCenter.defaultCenter().postNotificationName(REFRESH_ENDED_NOTIFICATION, object: nil)
 			DataManager.saveDB() // Ensure object IDs are permanent before sending notifications
 			DataManager.sendNotificationsIndexAndSave()
+			NotificationCenter.default.post(name: RefreshEndedNotification, object: nil)
 
-			if !success && UIApplication.sharedApplication().applicationState == .Active {
+			if !success && UIApplication.shared.applicationState == .active {
 				showMessage("Refresh failed", "Loading the latest data from GitHub failed")
 			}
 
-			s.refreshTimer = NSTimer.scheduledTimerWithTimeInterval(NSTimeInterval(Settings.refreshPeriod), target: s, selector: #selector(iOS_AppDelegate.refreshTimerDone), userInfo: nil, repeats:false)
+			s.refreshTimer = Timer.scheduledTimer(timeInterval: TimeInterval(Settings.refreshPeriod), target: s, selector: #selector(s.refreshTimerDone), userInfo: nil, repeats: false)
 			DLog("Refresh done")
 
 			s.updateBadge()
 			s.endBGTask()
 
 			if let bc = s.backgroundCallback {
-				if success && mainObjectContext.hasChanges {
+				if success && DataManager.main.hasChanges {
 					DLog("Background fetch: Got new data")
-					bc(UIBackgroundFetchResult.NewData)
+					bc(.newData)
 				} else if success {
 					DLog("Background fetch: No new data")
-					bc(UIBackgroundFetchResult.NoData)
+					bc(.noData)
 				} else {
 					DLog("Background fetch: FAILED")
-					bc(UIBackgroundFetchResult.Failed)
+					bc(.failed)
 				}
 				s.backgroundCallback = nil
 			}
@@ -284,67 +237,58 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate {
 
 	private func endBGTask() {
 		if backgroundTask != UIBackgroundTaskInvalid {
-			UIApplication.sharedApplication().endBackgroundTask(backgroundTask)
+			UIApplication.shared.endBackgroundTask(backgroundTask)
 			backgroundTask = UIBackgroundTaskInvalid
 		}
 	}
 
 	func refreshTimerDone() {
 		if DataManager.appIsConfigured {
-			startRefresh()
+			_ =
+				startRefresh()
 		}
 	}
 
-	func applicationDidBecomeActive(application: UIApplication) {
+	func applicationDidBecomeActive(_ application: UIApplication) {
 		startRefreshIfItIsDue()
 		actOnLocalNotification = false
 	}
 
-	func applicationWillEnterForeground(application: UIApplication) {
+	func applicationWillEnterForeground(_ application: UIApplication) {
 		actOnLocalNotification = true
 	}
 
-	func applicationDidEnterBackground(application: UIApplication) {
+	func applicationDidEnterBackground(_ application: UIApplication) {
 		actOnLocalNotification = false
 	}
 
-	func applicationWillResignActive(application: UIApplication) {
+	func applicationWillResignActive(_ application: UIApplication) {
 		actOnLocalNotification = true
 	}
 
-	func postNotificationOfType(type: NotificationType, forItem: DataItem) {
-		justPostedNotifications = true
-		NotificationManager.postNotificationOfType(type, forItem: forItem)
-		if UIApplication.sharedApplication().applicationState == .Background {
-			justPostedNotifications = false
-		} else {
-			justPostedNotificationTimer.push()
-		}
-	}
-
 	func markEverythingRead() {
-		PullRequest.markEverythingRead(.None, moc: mainObjectContext)
-		Issue.markEverythingRead(.None, moc: mainObjectContext)
+		PullRequest.markEverythingRead(in: .none, in: DataManager.main)
+		Issue.markEverythingRead(in: .none, in: DataManager.main)
 		DataManager.saveDB()
 		app.updateBadge()
 	}
 
 	func clearAllClosed() {
-		for p in PullRequest.allClosedInMoc(mainObjectContext, includeAllGroups: true) {
-			mainObjectContext.deleteObject(p)
+		for p in PullRequest.allClosed(in: DataManager.main, includeAllGroups: true) {
+			DataManager.main.delete(p)
 		}
-		for i in Issue.allClosedInMoc(mainObjectContext, includeAllGroups: true) {
-			mainObjectContext.deleteObject(i)
+		for i in Issue.allClosed(in: DataManager.main, includeAllGroups: true) {
+			DataManager.main.delete(i)
 		}
 		DataManager.saveDB()
-		popupManager.getMasterController().updateStatus()
+		popupManager.masterController.updateStatus()
 	}
 
 	func clearAllMerged() {
-		for p in PullRequest.allMergedInMoc(mainObjectContext, includeAllGroups: true) {
-			mainObjectContext.deleteObject(p)
+		for p in PullRequest.allMerged(in: DataManager.main, includeAllGroups: true) {
+			DataManager.main.delete(p)
 		}
 		DataManager.saveDB()
-		popupManager.getMasterController().updateStatus()
+		popupManager.masterController.updateStatus()
 	}
 }

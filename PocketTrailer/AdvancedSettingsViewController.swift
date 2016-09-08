@@ -6,7 +6,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	private enum SettingsSection: Int {
 		case Refresh, Display, Filtering, AppleWatch, Comments, Repos, StausesAndLabels, History, Confirm, Sort, Misc
 		static let allNames = ["Auto Refresh", "Display", "Filtering", "Apple Watch", "Comments", "Watchlist", "Statuses & Labels", "History", "Don't confirm when", "Sorting", "Misc"]
-		func title() -> String { return SettingsSection.allNames[rawValue] }
+		var title: String { return SettingsSection.allNames[rawValue] }
 	}
 
 	private struct Setting {
@@ -16,8 +16,8 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		var valueDisplayed: ()->String?
 
 		func isRelevantTo(s: String?, showingHelp: Bool) -> Bool {
-			if let s = s?.trim() where !s.isEmpty {
-				return title.localizedCaseInsensitiveContainsString(s) || (showingHelp && description.localizedCaseInsensitiveContainsString(s))
+			if let s = s?.trim, !s.isEmpty {
+				return title.localizedCaseInsensitiveContains(s) || (showingHelp && description.localizedCaseInsensitiveContains(s))
 			} else {
 				return true
 			}
@@ -26,221 +26,225 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 	private let settings = [
 		Setting(section: .Refresh,
-			title: "Foreground refresh interval",
-			description: Settings.refreshPeriodHelp,
-			valueDisplayed: { String(format: "%.0f seconds", Settings.refreshPeriod) }),
+		        title: "Foreground refresh interval",
+		        description: Settings.refreshPeriodHelp,
+		        valueDisplayed: { String(format: "%.0f seconds", Settings.refreshPeriod) }),
 		Setting(section: .Refresh,
-			title: "Background refresh interval (minimum)",
-			description: Settings.backgroundRefreshPeriodHelp,
-			valueDisplayed: { String(format: "%.0f minutes", Settings.backgroundRefreshPeriod/60.0) }),
+		        title: "Background refresh interval (minimum)",
+		        description: Settings.backgroundRefreshPeriodHelp,
+		        valueDisplayed: { String(format: "%.0f minutes", Settings.backgroundRefreshPeriod/60.0) }),
 		Setting(section: .Refresh,
-			title: "Watchlist & team list refresh interval",
-			description: Settings.newRepoCheckPeriodHelp,
-			valueDisplayed: { String(format: "%.0f hours", Settings.newRepoCheckPeriod) }),
+		        title: "Watchlist & team list refresh interval",
+		        description: Settings.newRepoCheckPeriodHelp,
+		        valueDisplayed: { String(format: "%.0f hours", Settings.newRepoCheckPeriod) }),
 
 		Setting(section: .Display,
-			title: "Display item creation times instead of update times",
-			description: Settings.showCreatedInsteadOfUpdatedHelp,
-			valueDisplayed: { Settings.showCreatedInsteadOfUpdated ? "✓" : " " }),
+		        title: "Display item creation times instead of update times",
+		        description: Settings.showCreatedInsteadOfUpdatedHelp,
+		        valueDisplayed: { Settings.showCreatedInsteadOfUpdated ? "✓" : " " }),
 		Setting(section: .Display,
-			title: "Assigned items",
-			description: "How to handle items that have been detected as assigned to you.",
-			valueDisplayed: { AssignmentPolicy(rawValue: Settings.assignedPrHandlingPolicy)?.name() }),
+		        title: "Assigned items",
+		        description: "How to handle items that have been detected as assigned to you.",
+		        valueDisplayed: { AssignmentPolicy(Settings.assignedPrHandlingPolicy)?.name }),
 		Setting(section: .Display,
-			title: "Mark unmergeable PRs only in 'My' or 'Participated' sections",
-			description: Settings.markUnmergeableOnUserSectionsOnlyHelp,
-			valueDisplayed: { Settings.markUnmergeableOnUserSectionsOnly ? "✓" : " " }),
+		        title: "Mark unmergeable PRs only in 'My' or 'Participated' sections",
+		        description: Settings.markUnmergeableOnUserSectionsOnlyHelp,
+		        valueDisplayed: { Settings.markUnmergeableOnUserSectionsOnly ? "✓" : " " }),
 		Setting(section: .Display,
-			title: "Display repository names",
-			description: Settings.showReposInNameHelp,
-			valueDisplayed: { Settings.showReposInName ? "✓" : " " }),
+		        title: "Display repository names",
+		        description: Settings.showReposInNameHelp,
+		        valueDisplayed: { Settings.showReposInName ? "✓" : " " }),
 		Setting(section: .Display,
-			title: "Open items directly in Safari if internal web view is not already visible.",
-			description: Settings.openItemsDirectlyInSafariHelp,
-			valueDisplayed: { Settings.openItemsDirectlyInSafari ? "✓" : " " }),
+		        title: "Open items directly in Safari if internal web view is not already visible.",
+		        description: Settings.openItemsDirectlyInSafariHelp,
+		        valueDisplayed: { Settings.openItemsDirectlyInSafari ? "✓" : " " }),
 		Setting(section: .Display,
-			title: "Separate API servers into their own groups",
-			description: Settings.showSeparateApiServersInMenuHelp,
-			valueDisplayed: { Settings.showSeparateApiServersInMenu ? "✓" : " " }),
+		        title: "Separate API servers into their own groups",
+		        description: Settings.showSeparateApiServersInMenuHelp,
+		        valueDisplayed: { Settings.showSeparateApiServersInMenu ? "✓" : " " }),
 		Setting(section: .Display,
-			title: "Try requesting desktop GitHub pages",
-			description: Settings.alwaysRequestDesktopSiteHelp,
-			valueDisplayed: { Settings.alwaysRequestDesktopSite ? "✓" : " " }),
+		        title: "Try requesting desktop GitHub pages",
+		        description: Settings.alwaysRequestDesktopSiteHelp,
+		        valueDisplayed: { Settings.alwaysRequestDesktopSite ? "✓" : " " }),
 
 		Setting(section: .Filtering,
-			title: "Include item titles",
-			description: Settings.includeTitlesInFilterHelp,
-			valueDisplayed: { Settings.includeTitlesInFilter ? "✓" : " " }),
+		        title: "Include item titles",
+		        description: Settings.includeTitlesInFilterHelp,
+		        valueDisplayed: { Settings.includeTitlesInFilter ? "✓" : " " }),
 		Setting(section: .Filtering,
-			title: "Include repository names",
-			description: Settings.includeReposInFilterHelp,
-			valueDisplayed: { Settings.includeReposInFilter ? "✓" : " " }),
+		        title: "Include repository names",
+		        description: Settings.includeReposInFilterHelp,
+		        valueDisplayed: { Settings.includeReposInFilter ? "✓" : " " }),
 		Setting(section: .Filtering,
-			title: "Include labels",
-			description: Settings.includeLabelsInFilterHelp,
-			valueDisplayed: { Settings.includeLabelsInFilter ? "✓" : " " }),
+		        title: "Include labels",
+		        description: Settings.includeLabelsInFilterHelp,
+		        valueDisplayed: { Settings.includeLabelsInFilter ? "✓" : " " }),
 		Setting(section: .Filtering,
-			title: "Include statuses",
-			description: Settings.includeStatusesInFilterHelp,
-			valueDisplayed: { Settings.includeStatusesInFilter ? "✓" : " " }),
+		        title: "Include statuses",
+		        description: Settings.includeStatusesInFilterHelp,
+		        valueDisplayed: { Settings.includeStatusesInFilter ? "✓" : " " }),
 		Setting(section: .Filtering,
-			title: "Include servers",
-			description: Settings.includeServersInFilterHelp,
-			valueDisplayed: { Settings.includeServersInFilter ? "✓" : " " }),
+		        title: "Include servers",
+		        description: Settings.includeServersInFilterHelp,
+		        valueDisplayed: { Settings.includeServersInFilter ? "✓" : " " }),
 		Setting(section: .Filtering,
-			title: "Include usernames",
-			description: Settings.includeUsersInFilterHelp,
-			valueDisplayed: { Settings.includeUsersInFilter ? "✓" : " " }),
+		        title: "Include usernames",
+		        description: Settings.includeUsersInFilterHelp,
+		        valueDisplayed: { Settings.includeUsersInFilter ? "✓" : " " }),
 		Setting(section: .Filtering,
-			title: "Include PR or issue numbers",
-			description: Settings.includeNumbersInFilterHelp,
-			valueDisplayed: { Settings.includeNumbersInFilter ? "✓" : " " }),
+		        title: "Include PR or issue numbers",
+		        description: Settings.includeNumbersInFilterHelp,
+		        valueDisplayed: { Settings.includeNumbersInFilter ? "✓" : " " }),
 		Setting(section: .Filtering,
-			title: "Include milestone titles",
-			description: Settings.includeMilestonesInFilterHelp,
-			valueDisplayed: { Settings.includeMilestonesInFilter ? "✓" : " " }),
+		        title: "Include milestone titles",
+		        description: Settings.includeMilestonesInFilterHelp,
+		        valueDisplayed: { Settings.includeMilestonesInFilter ? "✓" : " " }),
 		Setting(section: .Filtering,
-			title: "Include assignee names",
-			description: Settings.includeAssigneeInFilterHelp,
-			valueDisplayed: { Settings.includeAssigneeNamesInFilter ? "✓" : " " }),
+		        title: "Include assignee names",
+		        description: Settings.includeAssigneeInFilterHelp,
+		        valueDisplayed: { Settings.includeAssigneeNamesInFilter ? "✓" : " " }),
 
 		Setting(section: .AppleWatch,
-			title: "Prefer issues instead of PRs in Apple Watch glances & complications",
-			description: Settings.preferIssuesInWatchHelp,
-			valueDisplayed: { Settings.preferIssuesInWatch ? "✓" : " " }),
+		        title: "Prefer issues instead of PRs in Apple Watch complications",
+		        description: Settings.preferIssuesInWatchHelp,
+		        valueDisplayed: { Settings.preferIssuesInWatch ? "✓" : " " }),
 		Setting(section: .AppleWatch,
-			title: "Hide descriptions in Apple Watch detail views",
-			description: Settings.hideDescriptionInWatchDetailHelp,
-			valueDisplayed: { Settings.hideDescriptionInWatchDetail ? "✓" : " " }),
+		        title: "Hide descriptions in Apple Watch detail views",
+		        description: Settings.hideDescriptionInWatchDetailHelp,
+		        valueDisplayed: { Settings.hideDescriptionInWatchDetail ? "✓" : " " }),
 
 		Setting(section: .Comments,
-			title: "Badge & send alerts for the 'all' section too",
-			description: Settings.showCommentsEverywhereHelp,
-			valueDisplayed: { Settings.showCommentsEverywhere ? "✓" : " "  }),
+		        title: "Badge & send alerts for the 'all' section too",
+		        description: Settings.showCommentsEverywhereHelp,
+		        valueDisplayed: { Settings.showCommentsEverywhere ? "✓" : " "  }),
 		Setting(section: .Comments,
-			title: "Only display items with unread comments",
-			description: Settings.hideUncommentedItemsHelp,
-			valueDisplayed: { Settings.hideUncommentedItems ? "✓" : " "  }),
+		        title: "Only display items with unread comments",
+		        description: Settings.hideUncommentedItemsHelp,
+		        valueDisplayed: { Settings.hideUncommentedItems ? "✓" : " "  }),
 		Setting(section: .Comments,
-			title: "Move items mentioning me to 'Mentioned'",
-			description: Settings.autoMoveOnCommentMentionsHelp,
-			valueDisplayed: { Settings.autoMoveOnCommentMentions ? "✓" : " "  }),
+		        title: "Move items mentioning me to...",
+		        description: Settings.newMentionMovePolicyHelp,
+		        valueDisplayed: { Section(Settings.newMentionMovePolicy)!.movePolicyName }),
 		Setting(section: .Comments,
-			title: "Move items mentioning my teams to 'Mentioned'",
-			description: Settings.autoMoveOnTeamMentionsHelp,
-			valueDisplayed: { Settings.autoMoveOnTeamMentions ? "✓" : " "  }),
+		        title: "Move items mentioning my teams to...",
+		        description: Settings.teamMentionMovePolicyHelp,
+		        valueDisplayed: { Section(Settings.teamMentionMovePolicy)!.movePolicyName }),
 		Setting(section: .Comments,
-			title: "Move items created in my repos to 'Mentioned'",
-			description: Settings.moveNewItemsInOwnReposToMentionedHelp,
-			valueDisplayed: { Settings.moveNewItemsInOwnReposToMentioned ? "✓" : " "  }),
+		        title: "Move items created in my repos to...",
+		        description: Settings.newItemInOwnedRepoMovePolicyHelp,
+		        valueDisplayed: { Section(Settings.newItemInOwnedRepoMovePolicy)!.movePolicyName }),
 		Setting(section: .Comments,
-			title: "Open items at first unread comment",
-			description: Settings.openPrAtFirstUnreadCommentHelp,
-			valueDisplayed: { Settings.openPrAtFirstUnreadComment ? "✓" : " "  }),
+		        title: "Open items at first unread comment",
+		        description: Settings.openPrAtFirstUnreadCommentHelp,
+		        valueDisplayed: { Settings.openPrAtFirstUnreadComment ? "✓" : " "  }),
 		Setting(section: .Comments,
-			title: "Block comment notifications from usernames...",
-			description: "A list of usernames whose comments you don't want to receive notifications for.",
-			valueDisplayed: { ">" }),
+		        title: "Block comment notifications from usernames...",
+		        description: "A list of usernames whose comments you don't want to receive notifications for.",
+		        valueDisplayed: { ">" }),
 		Setting(section: .Comments,
-			title: "Disable all comment notifications",
-			description: Settings.disableAllCommentNotificationsHelp,
-			valueDisplayed: { Settings.disableAllCommentNotifications ? "✓" : " "  }),
+		        title: "Disable all comment notifications",
+		        description: Settings.disableAllCommentNotificationsHelp,
+		        valueDisplayed: { Settings.disableAllCommentNotifications ? "✓" : " "  }),
 		Setting(section: .Comments,
-			title: "Mark any comments before my own as read",
-			description: Settings.assumeReadItemIfUserHasNewerCommentsHelp,
-			valueDisplayed: { Settings.assumeReadItemIfUserHasNewerComments ? "✓" : " " }),
+		        title: "Mark any comments before my own as read",
+		        description: Settings.assumeReadItemIfUserHasNewerCommentsHelp,
+		        valueDisplayed: { Settings.assumeReadItemIfUserHasNewerComments ? "✓" : " " }),
 
 		Setting(section: .Repos,
-			title: "PR visibility for new repos",
-			description: Settings.displayPolicyForNewPrsHelp,
-			valueDisplayed: { RepoDisplayPolicy(rawValue: Settings.displayPolicyForNewPrs)?.name() }),
+		        title: "PR visibility for new repos",
+		        description: Settings.displayPolicyForNewPrsHelp,
+		        valueDisplayed: { RepoDisplayPolicy(Settings.displayPolicyForNewPrs)?.name }),
 		Setting(section: .Repos,
-			title: "Issue visibility for new repos",
-			description: Settings.displayPolicyForNewIssuesHelp,
-			valueDisplayed: { RepoDisplayPolicy(rawValue: Settings.displayPolicyForNewIssues)?.name() }),
+		        title: "Issue visibility for new repos",
+		        description: Settings.displayPolicyForNewIssuesHelp,
+		        valueDisplayed: { RepoDisplayPolicy(Settings.displayPolicyForNewIssues)?.name }),
 
 		Setting(section: .StausesAndLabels,
-			title: "Show statuses",
-			description: Settings.showStatusItemsHelp,
-			valueDisplayed: { Settings.showStatusItems ? "✓" : " " }),
+		        title: "Show statuses",
+		        description: Settings.showStatusItemsHelp,
+		        valueDisplayed: { Settings.showStatusItems ? "✓" : " " }),
 		Setting(section: .StausesAndLabels,
-			title: "Re-query statuses",
-			description: Settings.statusItemRefreshIntervalHelp,
-			valueDisplayed: { Settings.statusItemRefreshInterval == 1 ? "Every refresh" : "Every \(Settings.statusItemRefreshInterval) refreshes" }),
+		        title: "Re-query statuses",
+		        description: Settings.statusItemRefreshIntervalHelp,
+		        valueDisplayed: { Settings.statusItemRefreshInterval == 1 ? "Every refresh" : "Every \(Settings.statusItemRefreshInterval) refreshes" }),
 		Setting(section: .StausesAndLabels,
-			title: "Show labels",
-			description: Settings.showLabelsHelp,
-			valueDisplayed: { Settings.showLabels ? "✓" : " " }),
+		        title: "Show labels",
+		        description: Settings.showLabelsHelp,
+		        valueDisplayed: { Settings.showLabels ? "✓" : " " }),
 		Setting(section: .StausesAndLabels,
-			title: "Re-query labels",
-			description: Settings.labelRefreshIntervalHelp,
-			valueDisplayed: { Settings.labelRefreshInterval == 1 ? "Every refresh" : "Every \(Settings.labelRefreshInterval) refreshes" }),
+		        title: "Re-query labels",
+		        description: Settings.labelRefreshIntervalHelp,
+		        valueDisplayed: { Settings.labelRefreshInterval == 1 ? "Every refresh" : "Every \(Settings.labelRefreshInterval) refreshes" }),
 		Setting(section: .StausesAndLabels,
-			title: "Notify status changes for my & participated PRs",
-			description: Settings.notifyOnStatusUpdatesHelp,
-			valueDisplayed: { Settings.notifyOnStatusUpdates ? "✓" : " " }),
+		        title: "Notify status changes for my & participated PRs",
+		        description: Settings.notifyOnStatusUpdatesHelp,
+		        valueDisplayed: { Settings.notifyOnStatusUpdates ? "✓" : " " }),
 		Setting(section: .StausesAndLabels,
-			title: "...in the 'All' section too",
-			description: Settings.notifyOnStatusUpdatesForAllPrsHelp,
-			valueDisplayed: { Settings.notifyOnStatusUpdatesForAllPrs ? "✓" : " " }),
+		        title: "...in the 'All' section too",
+		        description: Settings.notifyOnStatusUpdatesForAllPrsHelp,
+		        valueDisplayed: { Settings.notifyOnStatusUpdatesForAllPrs ? "✓" : " " }),
 		Setting(section: .StausesAndLabels,
-			title: "Hide PRs whose status items are not all green",
-			description: Settings.hidePrsThatArentPassingHelp,
-			valueDisplayed: { Settings.hidePrsThatArentPassing ? "✓" : " " }),
+		        title: "Hide PRs whose status items are not all green",
+		        description: Settings.hidePrsThatArentPassingHelp,
+		        valueDisplayed: { Settings.hidePrsThatArentPassing ? "✓" : " " }),
 		Setting(section: .StausesAndLabels,
-			title: "...only in the 'All' section",
-			description: Settings.hidePrsThatDontPassOnlyInAllHelp,
-			valueDisplayed: { Settings.hidePrsThatDontPassOnlyInAll ? "✓" : " " }),
+		        title: "...only in the 'All' section",
+		        description: Settings.hidePrsThatDontPassOnlyInAllHelp,
+		        valueDisplayed: { Settings.hidePrsThatDontPassOnlyInAll ? "✓" : " " }),
 
 		Setting(section: .History,
-			title: "When something is merged",
-			description: Settings.mergeHandlingPolicyHelp,
-			valueDisplayed: { HandlingPolicy(rawValue: Settings.mergeHandlingPolicy)?.name() }),
+		        title: "When something is merged",
+		        description: Settings.mergeHandlingPolicyHelp,
+		        valueDisplayed: { HandlingPolicy(Settings.mergeHandlingPolicy)?.name }),
 		Setting(section: .History,
-			title: "When something is closed",
-			description: Settings.closeHandlingPolicyHelp,
-			valueDisplayed: { HandlingPolicy(rawValue: Settings.closeHandlingPolicy)?.name() }),
+		        title: "When something is closed",
+		        description: Settings.closeHandlingPolicyHelp,
+		        valueDisplayed: { HandlingPolicy(Settings.closeHandlingPolicy)?.name }),
 		Setting(section: .History,
-			title: "Don't keep PRs merged by me",
-			description: Settings.dontKeepPrsMergedByMeHelp,
-			valueDisplayed: { Settings.dontKeepPrsMergedByMe ? "✓" : " " }),
+		        title: "Don't keep PRs merged by me",
+		        description: Settings.dontKeepPrsMergedByMeHelp,
+		        valueDisplayed: { Settings.dontKeepPrsMergedByMe ? "✓" : " " }),
+		Setting(section: .History,
+		        title: "Clear notifications of removed items",
+		        description: Settings.removeNotificationsWhenItemIsRemovedHelp,
+		        valueDisplayed: { Settings.removeNotificationsWhenItemIsRemoved ? "✓" : " " }),
 
 		Setting(section: .Confirm,
-			title: "Removing all merged items",
-			description: Settings.dontAskBeforeWipingMergedHelp,
-			valueDisplayed: { Settings.dontAskBeforeWipingMerged ? "✓" : " " }),
+		        title: "Removing all merged items",
+		        description: Settings.dontAskBeforeWipingMergedHelp,
+		        valueDisplayed: { Settings.dontAskBeforeWipingMerged ? "✓" : " " }),
 		Setting(section: .Confirm,
-			title: "Removing all closed items",
-			description: Settings.dontAskBeforeWipingClosedHelp,
-			valueDisplayed: { Settings.dontAskBeforeWipingClosed ? "✓" : " " }),
+		        title: "Removing all closed items",
+		        description: Settings.dontAskBeforeWipingClosedHelp,
+		        valueDisplayed: { Settings.dontAskBeforeWipingClosed ? "✓" : " " }),
 
 		Setting(section: .Sort,
-			title: "Direction",
-			description: Settings.sortDescendingHelp,
-			valueDisplayed: { Settings.sortDescending ? "Reverse" : "Normal" }),
+		        title: "Direction",
+		        description: Settings.sortDescendingHelp,
+		        valueDisplayed: { Settings.sortDescending ? "Reverse" : "Normal" }),
 		Setting(section: .Sort,
-			title: "Criterion",
-			description: Settings.sortMethodHelp,
-			valueDisplayed: {
-				if let m = SortingMethod(rawValue: Settings.sortMethod) {
-					return Settings.sortDescending ? m.reverseTitle() : m.normalTitle()
-				} else {
-					return nil
-				}
-			}),
+		        title: "Criterion",
+		        description: Settings.sortMethodHelp,
+		        valueDisplayed: {
+					if let m = SortingMethod(Settings.sortMethod) {
+						return Settings.sortDescending ? m.reverseTitle : m.normalTitle
+					} else {
+						return nil
+					}
+		}),
 		Setting(section: .Sort,
-			title: "Group by repository",
-			description: Settings.groupByRepoHelp,
-			valueDisplayed: { Settings.groupByRepo ? "✓" : " " }),
-
+		        title: "Group by repository",
+		        description: Settings.groupByRepoHelp,
+		        valueDisplayed: { Settings.groupByRepo ? "✓" : " " }),
+		
 		Setting(section: .Misc,
-			title: "Log activity to console",
-			description: Settings.logActivityToConsoleHelp,
-			valueDisplayed: { Settings.logActivityToConsole ? "✓" : " " }),
+		        title: "Log activity to console",
+		        description: Settings.logActivityToConsoleHelp,
+		        valueDisplayed: { Settings.logActivityToConsole ? "✓" : " " }),
 		Setting(section: .Misc,
-			title: "Log API calls to console",
-			description: Settings.dumpAPIResponsesInConsoleHelp,
-			valueDisplayed: { Settings.dumpAPIResponsesInConsole ? "✓" : " " })
+		        title: "Log API calls to console",
+		        description: Settings.dumpAPIResponsesInConsoleHelp,
+		        valueDisplayed: { Settings.dumpAPIResponsesInConsole ? "✓" : " " })
 	]
 
 	private var settingsChangedTimer: PopTimer!
@@ -252,13 +256,13 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	// for the picker
 	private var valuesToPush: [String]?
 	private var pickerName: String?
-	private var selectedIndexPath: NSIndexPath?
+	private var selectedIndexPath: IndexPath?
 	private var previousValue: Int?
 	private var showHelp = true
 
-	@IBAction func done(sender: UIBarButtonItem) {
-		if preferencesDirty { app.startRefresh() }
-		dismissViewControllerAnimated(true, completion: nil)
+	@IBAction func done(_ sender: UIBarButtonItem) {
+		if preferencesDirty { _ = app.startRefresh() }
+		dismiss(animated: true, completion: nil)
 	}
 
 	private func reload() {
@@ -276,39 +280,39 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		settingsChangedTimer = PopTimer(timeInterval: 1.0) {
 			DataManager.postProcessAllItems()
 			DataManager.saveDB()
-			popupManager.getMasterController().updateStatus()
+			popupManager.masterController.updateStatus()
 		}
 
 		navigationItem.rightBarButtonItems = [
-			UIBarButtonItem(image: UIImage(named: "export"), style: .Plain, target: self, action: #selector(AdvancedSettingsViewController.exportSelected(_:))),
-			UIBarButtonItem(image: UIImage(named: "import"), style: .Plain, target: self, action: #selector(AdvancedSettingsViewController.importSelected(_:))),
-			UIBarButtonItem(image: UIImage(named: "showHelp"), style: .Plain, target: self, action: #selector(AdvancedSettingsViewController.toggleHelp(_:))),
+			UIBarButtonItem(image: UIImage(named: "export"), style: .plain, target: self, action: #selector(exportSelected)),
+			UIBarButtonItem(image: UIImage(named: "import"), style: .plain, target: self, action: #selector(importSelected)),
+			UIBarButtonItem(image: UIImage(named: "showHelp"), style: .plain, target: self, action: #selector(toggleHelp)),
 		]
 	}
 
-	override func scrollViewDidScroll(scrollView: UIScrollView) {
+	override func scrollViewDidScroll(_ scrollView: UIScrollView) {
 		view.endEditing(false)
 	}
 
-	func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
+	func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
 		searchTimer.push()
 	}
 
-	func searchBarTextDidBeginEditing(searchBar: UISearchBar) {
+	func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
 		searchBar.setShowsCancelButton(true, animated: true)
 	}
 
-	func searchBarTextDidEndEditing(searchBar: UISearchBar) {
+	func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
 		searchBar.setShowsCancelButton(false, animated: true)
 	}
 	
-	func searchBarCancelButtonClicked(searchBar: UISearchBar) {
+	func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
 		searchBar.text = nil
 		searchTimer.push()
 		view.endEditing(false)
 	}
 
-	func searchBar(searchBar: UISearchBar, shouldChangeTextInRange range: NSRange, replacementText text: String) -> Bool {
+	func searchBar(_ searchBar: UISearchBar, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
 		if text == "\n" {
 			view.endEditing(false)
 			return false
@@ -319,15 +323,16 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 	func toggleHelp(button: UIBarButtonItem) {
 		showHelp = !showHelp
-		if let s = searchBar.text where !s.isEmpty {
+		if let s = searchBar.text, !s.isEmpty {
 			reload()
 		} else {
 			heightCache.removeAll()
-			tableView.reloadSections(NSIndexSet(indexesInRange: NSMakeRange(0, tableView.numberOfSections)), withRowAnimation: .Automatic)
+			let r = Range(uncheckedBounds: (lower: 0, upper: tableView.numberOfSections))
+			tableView.reloadSections(IndexSet(integersIn: r), with: .automatic)
 		}
 	}
 
-	private func filteringSectionFooter() -> UILabel {
+	private var filteringSectionFooter: UILabel {
 		let p = NSMutableParagraphStyle()
 		p.headIndent = 15.0
 		p.firstLineHeadIndent = 15.0
@@ -337,56 +342,56 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		l.attributedText = NSAttributedString(
 			string: "You can also use title: server: label: repo: user: number: milestone: assignee: and status: to filter specific properties, e.g. \"label:bug,suggestion\". Prefix with '!' to exclude some terms.",
 			attributes: [
-				NSFontAttributeName: UIFont.systemFontOfSize(UIFont.smallSystemFontSize()),
-				NSForegroundColorAttributeName: UIColor.lightGrayColor(),
+				NSFontAttributeName: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize),
+				NSForegroundColorAttributeName: UIColor.lightGray,
 				NSParagraphStyleAttributeName: p,
 			])
 		l.numberOfLines = 0
 		return l
 	}
 
-	override func tableView(tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-		let isFilterFooter = filteredSections()[section].title() == SettingsSection.Filtering.title()
+	override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+		let isFilterFooter = filteredSections[section].title == SettingsSection.Filtering.title
 		if isFilterFooter {
-			return filteringSectionFooter()
+			return filteringSectionFooter
 		}
 		return nil
 	}
 
-	override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+	override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
 		return 55
 	}
 
-	override func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-		let isFilterFooter = filteredSections()[section].title() == SettingsSection.Filtering.title()
+	override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+		let isFilterFooter = filteredSections[section].title == SettingsSection.Filtering.title
 		if isFilterFooter {
-			return filteringSectionFooter().sizeThatFits(CGSizeMake(tableView.bounds.size.width, 500.0)).height + 15.0
+			return filteringSectionFooter.sizeThatFits(CGSize(width: tableView.bounds.size.width, height: 500.0)).height + 15.0
 		}
 		return 0
 	}
 
-	override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCellWithIdentifier("Cell") as! AdvancedSettingsCell
-		configureCell(cell, indexPath: indexPath)
+	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+		let cell = tableView.dequeueReusableCell(withIdentifier: "Cell") as! AdvancedSettingsCell
+		configureCell(cell: cell, indexPath: indexPath)
 		return cell
 	}
 
-	private func configureCell(cell: AdvancedSettingsCell, indexPath: NSIndexPath) {
+	private func configureCell(cell: AdvancedSettingsCell, indexPath: IndexPath) {
 
-		let settingsForSection = filteredItemsForTableSection(indexPath.section)
+		let settingsForSection = filteredItemsForTableSection(section: indexPath.section)
 		let setting = settingsForSection[indexPath.row]
 		cell.titleLabel.text = setting.title
 		cell.descriptionLabel.text = setting.description
 
 		let v = setting.valueDisplayed()
 		if v == "✓" {
-			cell.accessoryType = .Checkmark
+			cell.accessoryType = .checkmark
 			cell.valueLabel.text = " "
 		} else if v == ">" {
-			cell.accessoryType = .DisclosureIndicator
+			cell.accessoryType = .disclosureIndicator
 			cell.valueLabel.text = " "
 		} else {
-			cell.accessoryType = .None
+			cell.accessoryType = .none
 			cell.valueLabel.text = v ?? " "
 		}
 
@@ -401,10 +406,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		}
 	}
 
-	override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 
-		let setting = filteredItemsForTableSection(indexPath.section)[indexPath.row]
-		let section = filteredSections()[indexPath.section]
+		let setting = filteredItemsForTableSection(section: indexPath.section)[indexPath.row]
+		let section = filteredSections[indexPath.section]
 		let unFilteredItemsForSection = settings.filter { $0.section == section }
 
 		var originalIndex = 0
@@ -425,14 +430,14 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			switch originalIndex {
 			case 0:
 				// seconds
-				for f in 60.stride(to: 3600, by: 10) {
+				for f in stride(from: 60, to: 3600, by: 10) {
 					if f == Int(Settings.refreshPeriod) { previousValue = count }
 					values.append("\(f) seconds")
 					count += 1
 				}
 			case 1:
 				// minutes
-				for f in 5.stride(to: 10000, by: 5) {
+				for f in stride(from: 5, to: 10000, by: 5) {
 					if f == Int(Settings.backgroundRefreshPeriod/60.0) { previousValue = count }
 					values.append("\(f) minutes")
 					count += 1
@@ -447,7 +452,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			default: break
 			}
 			valuesToPush = values
-			performSegueWithIdentifier("showPicker", sender: self)
+			performSegue(withIdentifier: "showPicker", sender: self)
 
 		} else if section == SettingsSection.Display {
 			switch originalIndex {
@@ -459,7 +464,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				selectedIndexPath = indexPath
 				valuesToPush = AssignmentPolicy.labels
 				previousValue = Settings.assignedPrHandlingPolicy
-				performSegueWithIdentifier("showPicker", sender: self)
+				performSegue(withIdentifier: "showPicker", sender: self)
 			case 2:
 				Settings.markUnmergeableOnUserSectionsOnly = !Settings.markUnmergeableOnUserSectionsOnly
 				settingsChangedTimer.push()
@@ -515,19 +520,18 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			case 1:
 				Settings.hideUncommentedItems = !Settings.hideUncommentedItems
 				settingsChangedTimer.push()
-			case 2:
-				Settings.autoMoveOnCommentMentions = !Settings.autoMoveOnCommentMentions
-				settingsChangedTimer.push()
-			case 3:
-				Settings.autoMoveOnTeamMentions = !Settings.autoMoveOnTeamMentions
-				settingsChangedTimer.push()
-			case 4:
-				Settings.moveNewItemsInOwnReposToMentioned = !Settings.moveNewItemsInOwnReposToMentioned
-				settingsChangedTimer.push()
+			case 2, 3, 4:
+				pickerName = setting.title
+				valuesToPush = Section.movePolicyNames
+				selectedIndexPath = indexPath
+				previousValue = originalIndex == 2 ? Settings.newMentionMovePolicy :
+								originalIndex == 3 ? Settings.teamMentionMovePolicy :
+													 Settings.newItemInOwnedRepoMovePolicy
+				performSegue(withIdentifier: "showPicker", sender: self)
 			case 5:
 				Settings.openPrAtFirstUnreadComment = !Settings.openPrAtFirstUnreadComment
 			case 6:
-				performSegueWithIdentifier("showBlacklist", sender: self)
+				performSegue(withIdentifier: "showBlacklist", sender: self)
 			case 7:
 				Settings.disableAllCommentNotifications = !Settings.disableAllCommentNotifications
 			case 8:
@@ -545,12 +549,12 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				previousValue = Settings.displayPolicyForNewIssues
 			default: break
 			}
-			performSegueWithIdentifier("showPicker", sender: self)
+			performSegue(withIdentifier: "showPicker", sender: self)
 		} else if section == SettingsSection.StausesAndLabels {
 			switch originalIndex {
 			case 0:
 				Settings.showStatusItems = !Settings.showStatusItems
-				api.resetAllStatusChecks()
+				API.resetAllStatusChecks()
 				if Settings.showStatusItems {
 					ApiServer.resetSyncOfEverything()
 				}
@@ -569,10 +573,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 					count += 1
 				}
 				valuesToPush = values
-				performSegueWithIdentifier("showPicker", sender: self)
+				performSegue(withIdentifier: "showPicker", sender: self)
 			case 2:
 				Settings.showLabels = !Settings.showLabels
-				api.resetAllLabelChecks()
+				API.resetAllLabelChecks()
 				if Settings.showLabels {
 					ApiServer.resetSyncOfEverything()
 				}
@@ -591,7 +595,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 					count += 1
 				}
 				valuesToPush = values
-				performSegueWithIdentifier("showPicker", sender: self)
+				performSegue(withIdentifier: "showPicker", sender: self)
 			case 4:
 				Settings.notifyOnStatusUpdates = !Settings.notifyOnStatusUpdates
 			case 5:
@@ -611,15 +615,17 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				previousValue = Settings.mergeHandlingPolicy
 				pickerName = setting.title
 				valuesToPush = HandlingPolicy.labels
-				performSegueWithIdentifier("showPicker", sender: self)
+				performSegue(withIdentifier: "showPicker", sender: self)
 			case 1:
 				selectedIndexPath = indexPath
 				previousValue = Settings.closeHandlingPolicy
 				pickerName = setting.title
 				valuesToPush = HandlingPolicy.labels
-				performSegueWithIdentifier("showPicker", sender: self)
+				performSegue(withIdentifier: "showPicker", sender: self)
 			case 2:
 				Settings.dontKeepPrsMergedByMe = !Settings.dontKeepPrsMergedByMe
+			case 3:
+				Settings.removeNotificationsWhenItemIsRemoved = !Settings.removeNotificationsWhenItemIsRemoved
 			default: break
 			}
 		} else if section == SettingsSection.Confirm {
@@ -640,7 +646,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				previousValue = Settings.sortMethod
 				pickerName = setting.title
 				valuesToPush = Settings.sortDescending ? SortingMethod.reverseTitles : SortingMethod.normalTitles
-				performSegueWithIdentifier("showPicker", sender: self)
+				performSegue(withIdentifier: "showPicker", sender: self)
 			case 2:
 				Settings.groupByRepo = !Settings.groupByRepo
 				settingsChangedTimer.push()
@@ -664,27 +670,28 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		reload()
 	}
 
-	override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		return filteredItemsForTableSection(section).count
+	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+		return filteredItemsForTableSection(section: section).count
 	}
 
-	override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-		return filteredSections()[section].title()
+	override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+		return filteredSections[section].title
 	}
 
-	override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-		return filteredSections().count
+
+	override func numberOfSections(in tableView: UITableView) -> Int {
+		return filteredSections.count
 	}
 
 	private func filteredItemsForTableSection(section: Int) -> [Setting] {
-		let sec = filteredSections()[section]
-		let searchText = searchBar.text?.trim()
-		return settings.filter{ $0.section == sec && $0.isRelevantTo(searchText, showingHelp: showHelp) }
+		let sec = filteredSections[section]
+		let searchText = searchBar.text?.trim
+		return settings.filter{ $0.section == sec && $0.isRelevantTo(s: searchText, showingHelp: showHelp) }
 	}
 
-	private func filteredSections() -> [SettingsSection] {
-		let searchText = searchBar.text?.trim()
-		let matchingSettings = settings.filter{ $0.isRelevantTo(searchText, showingHelp: showHelp) }
+	private var filteredSections: [SettingsSection] {
+		let searchText = searchBar.text?.trim
+		let matchingSettings = settings.filter{ $0.isRelevantTo(s: searchText, showingHelp: showHelp) }
 		var matchingSections = [SettingsSection]()
 		matchingSettings.forEach {
 			let s = $0.section
@@ -696,24 +703,24 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	}
 
 	private var sizer: AdvancedSettingsCell?
-	private var heightCache = [NSIndexPath : CGFloat]()
-	override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+	private var heightCache = [IndexPath : CGFloat]()
+	override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
 		if sizer == nil {
-			sizer = tableView.dequeueReusableCellWithIdentifier("Cell") as? AdvancedSettingsCell
+			sizer = tableView.dequeueReusableCell(withIdentifier: "Cell") as? AdvancedSettingsCell
 		} else if let h = heightCache[indexPath] {
-			//DLog("using cached height for %d - %d", indexPath.section, indexPath.row)
+			//DLog("using cached height for %@ - %@", indexPath.section, indexPath.row)
 			return h
 		}
-		configureCell(sizer!, indexPath: indexPath)
-		let h = sizer!.systemLayoutSizeFittingSize(CGSizeMake(tableView.bounds.width, UILayoutFittingCompressedSize.height),
+		configureCell(cell: sizer!, indexPath: indexPath)
+		let h = sizer!.systemLayoutSizeFitting(CGSize(width: tableView.bounds.width, height: UILayoutFittingCompressedSize.height),
 			withHorizontalFittingPriority: UILayoutPriorityRequired,
 			verticalFittingPriority: UILayoutPriorityFittingSizeLevel).height
 		heightCache[indexPath] = h
 		return h
 	}
 
-	override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-		if let p = segue.destinationViewController as? PickerViewController {
+	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+		if let p = segue.destination as? PickerViewController {
 			p.delegate = self
 			p.title = pickerName
 			p.values = valuesToPush
@@ -723,7 +730,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		}
 	}
 
-	func pickerViewController(picker: PickerViewController, didSelectIndexPath: NSIndexPath) {
+	func pickerViewController(picker: PickerViewController, didSelectIndexPath: IndexPath) {
 		if let sip = selectedIndexPath {
 			if sip.section == SettingsSection.Refresh.rawValue {
 				if sip.row == 0 {
@@ -757,6 +764,15 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				} else  if sip.row == 3 {
 					Settings.labelRefreshInterval = Int(didSelectIndexPath.row+1)
 				}
+			} else if sip.section == SettingsSection.Comments.rawValue {
+				if sip.row == 2 {
+					Settings.newMentionMovePolicy = didSelectIndexPath.row
+				} else if sip.row == 3 {
+					Settings.teamMentionMovePolicy = didSelectIndexPath.row
+				} else if sip.row == 4 {
+					Settings.newItemInOwnedRepoMovePolicy = didSelectIndexPath.row
+				}
+				settingsChangedTimer.push()
 			}
 			reload()
 			selectedIndexPath = nil
@@ -765,32 +781,32 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 
 	/////////////////// Import / Export
 
-	private var tempUrl: NSURL?
+	private var tempUrl: URL?
 
 	func importSelected(sender: UIBarButtonItem) {
 		tempUrl = nil
 
-		let menu = UIDocumentPickerViewController(documentTypes: ["com.housetrip.mobile.trailer.ios.settings"], inMode: UIDocumentPickerMode.Import)
+		let menu = UIDocumentPickerViewController(documentTypes: ["com.housetrip.mobile.trailer.ios.settings"], in: .import)
 		menu.delegate = self
-		popupManager.showPopoverFromViewController(self, fromItem: sender, viewController: menu)
+		popupManager.showPopoverFromViewController(parentViewController: self, fromItem: sender, viewController: menu)
 	}
 
 	func exportSelected(sender: UIBarButtonItem) {
-		let tempFilePath = NSTemporaryDirectory().stringByAppendingPathComponent("Trailer Settings (iOS).trailerSettings")
-		tempUrl = NSURL(fileURLWithPath: tempFilePath)
-		Settings.writeToURL(tempUrl!)
+		let tempFilePath = NSTemporaryDirectory().appending(pathComponent: "Trailer Settings (iOS).trailerSettings")
+		tempUrl = URL(fileURLWithPath: tempFilePath)
+		_ = Settings.writeToURL(tempUrl!)
 
-		let menu = UIDocumentPickerViewController(URL: tempUrl!, inMode: UIDocumentPickerMode.ExportToService)
+		let menu = UIDocumentPickerViewController(url: tempUrl!, in: .exportToService)
 		menu.delegate = self
-		popupManager.showPopoverFromViewController(self, fromItem: sender, viewController: menu)
+		popupManager.showPopoverFromViewController(parentViewController: self, fromItem: sender, viewController: menu)
 	}
 
-	func documentPicker(controller: UIDocumentPickerViewController, didPickDocumentAtURL url: NSURL) {
+	func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentAt url: URL) {
 		if tempUrl == nil {
 			DLog("Will import settings from %@", url.absoluteString)
-			settingsManager.loadSettingsFrom(url, confirmFromView: self) { [weak self] confirmed in
+			settingsManager.loadSettingsFrom(url: url, confirmFromView: self) { [weak self] confirmed in
 				if confirmed {
-					self?.dismissViewControllerAnimated(false, completion: nil)
+					self?.dismiss(animated: false, completion: nil)
 				}
 				self?.documentInteractionCleanup()
 			}
@@ -800,7 +816,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		}
 	}
 
-	func documentPickerWasCancelled(controller: UIDocumentPickerViewController) {
+	func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
 		DLog("Document picker cancelled")
 		documentInteractionCleanup()
 	}
@@ -808,9 +824,9 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	func documentInteractionCleanup() {
 		if let t = tempUrl {
 			do {
-				try NSFileManager.defaultManager().removeItemAtURL(t)
+				try FileManager.default.removeItem(at: t)
 			} catch {
-				DLog("Temporary file cleanup error: %@", (error as NSError).localizedDescription)
+				DLog("Temporary file cleanup error: %@", error.localizedDescription)
 			}
 			tempUrl = nil
 		}

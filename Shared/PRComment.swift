@@ -4,75 +4,70 @@ final class PRComment: DataItem {
 
     @NSManaged var avatarUrl: String?
     @NSManaged var body: String?
-    @NSManaged var path: String?
-    @NSManaged var position: NSNumber?
-    @NSManaged var url: String?
-    @NSManaged var userId: NSNumber?
+    @NSManaged var userId: Int64
     @NSManaged var userName: String?
     @NSManaged var webUrl: String?
 
     @NSManaged var pullRequest: PullRequest?
 	@NSManaged var issue: Issue?
 
-	class func syncCommentsFromInfo(data: [[NSObject : AnyObject]]?, pullRequest: PullRequest) {
-		itemsWithInfo(data, type: "PRComment", fromServer: pullRequest.apiServer) { item, info, newOrUpdated in
+	class func syncComments(from data: [[AnyHashable : Any]]?, pullRequest: PullRequest) {
+		items(with: data, type: PRComment.self, server: pullRequest.apiServer) { item, info, newOrUpdated in
 			if newOrUpdated {
-				let c = item as! PRComment
-				c.pullRequest = pullRequest
-				c.fillFromInfo(info)
-				c.fastForwardItemIfNeeded(pullRequest)
+				item.pullRequest = pullRequest
+				item.fill(from: info)
+				item.fastForwardIfNeeded(parent: pullRequest)
 			}
 		}
 	}
 
-	class func syncCommentsFromInfo(data: [[NSObject : AnyObject]]?, issue: Issue) {
-		itemsWithInfo(data, type: "PRComment", fromServer: issue.apiServer) { item, info, newOrUpdated in
+	class func syncComments(from data: [[AnyHashable : Any]]?, issue: Issue) {
+		items(with: data, type: PRComment.self, server: issue.apiServer) { item, info, newOrUpdated in
 			if newOrUpdated {
-				let c = item as! PRComment
-				c.issue = issue
-				c.fillFromInfo(info)
-				c.fastForwardItemIfNeeded(issue)
+				item.issue = issue
+				item.fill(from: info)
+				item.fastForwardIfNeeded(parent: issue)
 			}
 		}
 	}
 
-	func fastForwardItemIfNeeded(item: ListableItem) {
-		// check if we're assigned to a just created issue, in which case we want to "fast forward" its latest comment dates to our own if we're newer
-		if let commentCreation = createdAt where (item.postSyncAction?.integerValue ?? 0) == PostSyncAction.NoteNew.rawValue {
-			if let latestReadDate = item.latestReadCommentDate where latestReadDate.compare(commentCreation) == .OrderedAscending {
+	func fastForwardIfNeeded(parent item: ListableItem) {
+		// Check if we're assigned to a newly created issue, in which case we want to "fast forward" its latest comment date to our own, if ours is newer
+		if let commentCreation = createdAt, item.postSyncAction == PostSyncAction.isNew.rawValue {
+			if let latestReadDate = item.latestReadCommentDate, latestReadDate < commentCreation {
 				item.latestReadCommentDate = commentCreation
 			}
 		}
 	}
 
 	func processNotifications() {
-		if let item = pullRequest ?? issue where item.postSyncAction?.integerValue == PostSyncAction.NoteUpdated.rawValue && item.isVisibleOnMenu {
-			if refersToMe {
-				if item.isSnoozing && Settings.snoozeWakeOnMention {
+		if let item = parent, item.postSyncAction == PostSyncAction.isUpdated.rawValue && item.isVisibleOnMenu {
+			if contains(terms: ["@\(apiServer.userName!)"]) {
+				if item.isSnoozing && item.shouldWakeOnMention {
 					DLog("Waking up snoozed item ID %@ because of mention", item.serverId)
 					item.wakeUp()
 				}
-				app.postNotificationOfType(.NewMention, forItem: self)
+				NotificationQueue.add(type: .newMention, for: self)
 			} else if !isMine {
-				if item.isSnoozing && Settings.snoozeWakeOnComment {
+				if item.isSnoozing && item.shouldWakeOnComment {
 					DLog("Waking up snoozed item ID %@ because of posted comment", item.serverId)
 					item.wakeUp()
 				}
-				let notifyForNewComments = (item.sectionIndex?.integerValue != Section.All.rawValue) || Settings.showCommentsEverywhere
+				let notifyForNewComments = item.sectionIndex != Section.all.rawValue || Settings.showCommentsEverywhere
 				if notifyForNewComments && !Settings.disableAllCommentNotifications && !isMine {
 					if let authorName = userName {
 						var blocked = false
 						for blockedAuthor in Settings.commentAuthorBlacklist as [String] {
-							if authorName.compare(blockedAuthor, options: [.CaseInsensitiveSearch, .DiacriticInsensitiveSearch]) == .OrderedSame {
+							if authorName.compare(blockedAuthor, options: [.caseInsensitive, .diacriticInsensitive]) == .orderedSame {
 								blocked = true
 								break
 							}
 						}
 						if blocked {
-							DLog("Blocked notification for user '%@' as their name is on the blacklist",authorName)
+							DLog("Blocked notification for user '%@' as their name is on the blacklist", authorName)
 						} else {
-							DLog("User '%@' not on blacklist, can post notification",authorName)
-							app.postNotificationOfType(.NewComment, forItem:self)
+							DLog("User '%@' not on blacklist, can post notification", authorName)
+							NotificationQueue.add(type: .newComment, for: self)
 						}
 					}
 				}
@@ -80,22 +75,18 @@ final class PRComment: DataItem {
 		}
 	}
 
-	func fillFromInfo(info:[NSObject : AnyObject]) {
+	func fill(from info: [AnyHashable : Any]) {
 		body = info["body"] as? String
-		position = info["position"] as? NSNumber
-		path = info["path"] as? String
-		url = info["url"] as? String
 		webUrl = info["html_url"] as? String
 
-		if let userInfo = info["user"] as? [NSObject : AnyObject] {
+		if let userInfo = info["user"] as? [AnyHashable : Any] {
 			userName = userInfo["login"] as? String
-			userId = userInfo["id"] as? NSNumber
+			userId = (userInfo["id"] as? NSNumber)?.int64Value ?? 0
 			avatarUrl = userInfo["avatar_url"] as? String
 		}
 
-		if let links = info["links"] as? [NSObject : AnyObject] {
-			url = links["self"]?["href"] as? String
-			if webUrl==nil { webUrl = links["html"]?["href"] as? String }
+		if webUrl==nil, let links = info["links"] as? [AnyHashable : Any] {
+			webUrl = (links["html"] as? [AnyHashable : Any])?["href"] as? String
 		}
 	}
 
@@ -103,31 +94,19 @@ final class PRComment: DataItem {
 		return pullRequest?.title ?? issue?.title ?? "(untitled)"
 	}
 
-	var parentShouldSkipNotifications: Bool {
-		if let item = pullRequest ?? issue {
-			return item.shouldSkipNotifications
-		}
-		return false
+	var parent: ListableItem? {
+		return pullRequest ?? issue
 	}
 
 	var isMine: Bool {
 		return userId == apiServer.userId
 	}
 
-	var refersToMe: Bool {
-		if let userForServer = apiServer.userName, b = body where userId != apiServer.userId { // Ignore self-references
-			return b.localizedCaseInsensitiveContainsString("@\(userForServer)")
-		}
-		return false
-	}
-
-	var refersToMyTeams: Bool {
+	final func contains(terms: [String]) -> Bool {
 		if let b = body {
-			for t in apiServer.teams {
-				if let r = t.calculatedReferral {
-					if b.localizedCaseInsensitiveContainsString(r) {
-						return true
-					}
+			for t in terms {
+				if !t.isEmpty && b.localizedCaseInsensitiveContains(t) {
+					return true
 				}
 			}
 		}

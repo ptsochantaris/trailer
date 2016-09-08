@@ -5,39 +5,29 @@ final class PRStatus: DataItem {
     @NSManaged var descriptionText: String?
     @NSManaged var state: String?
     @NSManaged var targetUrl: String?
-    @NSManaged var url: String?
-    @NSManaged var userId: NSNumber?
-    @NSManaged var userName: String?
 
 	@NSManaged var pullRequest: PullRequest
 
-	class func syncStatusesFromInfo(data: [[NSObject : AnyObject]]?, pullRequest: PullRequest) {
-		itemsWithInfo(data, type: "PRStatus", fromServer: pullRequest.apiServer) { item, info, isNewOrUpdated in
+	class func syncStatuses(from data: [[AnyHashable : Any]]?, pullRequest: PullRequest) {
+		items(with: data, type: PRStatus.self, server: pullRequest.apiServer) { item, info, isNewOrUpdated in
 			if isNewOrUpdated {
-				let s = item as! PRStatus
-				s.url = info["url"] as? String
-				s.state = info["state"] as? String
-				s.targetUrl = info["target_url"] as? String
-				s.pullRequest = pullRequest
+				item.state = info["state"] as? String
+				item.targetUrl = info["target_url"] as? String
+				item.pullRequest = pullRequest
 
 				if let ds = info["description"] as? String {
-					s.descriptionText = ds.trim()
-				}
-
-				if let userInfo = info["creator"] as? [NSObject : AnyObject] {
-					s.userName = userInfo["login"] as? String
-					s.userId = userInfo["id"] as? NSNumber
+					item.descriptionText = ds.trim
 				}
 			}
 		}
 	}
 
-	private let darkStatusRed = MAKECOLOR(0.8, 0.5, 0.5, 1.0)
-	private let darkStatusYellow = MAKECOLOR(0.9, 0.8, 0.3, 1.0)
-	private let darkStatusGreen = MAKECOLOR(0.6, 0.8, 0.6, 1.0)
-	private let lightStatusRed = MAKECOLOR(0.5, 0.2, 0.2, 1.0)
-	private let lightStatusYellow = MAKECOLOR(0.6, 0.5, 0.0, 1.0)
-	private let lightStatusGreen = MAKECOLOR(0.3, 0.5, 0.3, 1.0)
+	private let darkStatusRed = COLOR_CLASS(red: 0.8, green: 0.5, blue: 0.5, alpha: 1.0)
+	private let darkStatusYellow = COLOR_CLASS(red: 0.9, green: 0.8, blue: 0.3, alpha: 1.0)
+	private let darkStatusGreen = COLOR_CLASS(red: 0.6, green: 0.8, blue: 0.6, alpha: 1.0)
+	private let lightStatusRed = COLOR_CLASS(red: 0.5, green: 0.2, blue: 0.2, alpha: 1.0)
+	private let lightStatusYellow = COLOR_CLASS(red: 0.6, green: 0.5, blue: 0.0, alpha: 1.0)
+	private let lightStatusGreen = COLOR_CLASS(red: 0.3, green: 0.5, blue: 0.3, alpha: 1.0)
 
 	var colorForDarkDisplay: COLOR_CLASS {
 		switch S(state) {
@@ -72,7 +62,7 @@ final class PRStatus: DataItem {
 			default:
 				prefix = "❌"
 			}
-			return String(format: "%@ %@ %@", prefix, shortDateFormatter.stringFromDate(createdAt!), desc)
+			return String(format: "%@ %@ %@", prefix, shortDateFormatter.string(from: createdAt!), desc)
 		} else {
 			return "(No description)"
 		}

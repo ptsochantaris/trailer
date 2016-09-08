@@ -1,74 +1,65 @@
 
 extension NSTextField {
 	final func trailerUndo() {
-		self.currentEditor()?.undoManager?.undo()
+		currentEditor()?.undoManager?.undo()
 	}
 	final func trailerRedo() {
-		self.currentEditor()?.undoManager?.redo()
+		currentEditor()?.undoManager?.redo()
+	}
+	final func trailerCopy() {
+		currentEditor()?.copy(nil)
+	}
+	final func trailerPaste() {
+		currentEditor()?.paste(nil)
+	}
+	final func trailerCut() {
+		currentEditor()?.cut(nil)
 	}
 }
 
 final class Application: NSApplication {
-	override func sendEvent(theEvent: NSEvent) {
-		if theEvent.type == NSEventType.KeyDown {
-			let modifiers = theEvent.modifierFlags.intersect(NSEventModifierFlags.DeviceIndependentModifierFlagsMask)
-			if modifiers == NSEventModifierFlags.CommandKeyMask {
-				if let char = theEvent.charactersIgnoringModifiers {
+	override func sendEvent(_ event: NSEvent) {
+		if event.type == .keyDown {
+			let modifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+			if modifiers == .command {
+				if let char = event.charactersIgnoringModifiers {
 					switch char {
-					case "x": if sendAction(#selector(NSText.cut(_:)), to:nil, from:self) { return }
-					case "v": if sendAction(#selector(NSText.paste(_:)), to:nil, from:self) { return }
-					case "z": if sendAction(#selector(NSTextField.trailerUndo), to:nil, from:self) { return }
+					case "x": if sendAction(#selector(NSTextField.trailerCut), to: nil, from: self) { return }
+					case "v": if sendAction(#selector(NSTextField.trailerPaste), to: nil, from: self) { return }
+					case "z": if sendAction(#selector(NSTextField.trailerUndo), to: nil, from: self) { return }
 					case "c":
-						if let url = app.focusedItem()?.webUrl {
-							let p = NSPasteboard.generalPasteboard()
+						if let url = app.focusedItem(blink: true)?.webUrl {
+							let p = NSPasteboard.general()
 							p.clearContents()
-							p.setString(url, forType:NSStringPboardType)
+							p.setString(url, forType: NSStringPboardType)
 							return
+
 						} else {
-							if sendAction(#selector(NSText.copy(_:)), to:nil, from:self) { return }
-						}
-					case "s":
-						if let i = app.focusedItem() where i.isSnoozing {
-							i.wakeUp()
-							DataManager.saveDB()
-							app.updateRelatedMenusFor(i)
-							return
-						}
-					case "m":
-						if let i = app.focusedItem() {
-							i.setMute(!(i.muted?.boolValue ?? false))
-							DataManager.saveDB()
-							app.updateRelatedMenusFor(i)
-							return
+							if sendAction(#selector(NSTextField.trailerCopy), to: nil, from: self) { return }
 						}
 					case "a":
-						if let i = app.focusedItem() {
-							if i.unreadComments?.integerValue > 0 {
+						if let i = app.focusedItem(blink: true) {
+							if i.unreadComments > 0 {
 								i.catchUpWithComments()
 							} else {
-								i.latestReadCommentDate = never()
+								i.latestReadCommentDate = .distantPast
 								i.postProcess()
 							}
 							DataManager.saveDB()
-							app.updateRelatedMenusFor(i)
+							app.updateRelatedMenus(for: i)
 							return
-						} else if sendAction(#selector(NSResponder.selectAll(_:)), to:nil, from:self) {
-							return
-						}
-					case "o":
-						if let i = app.focusedItem(), w = i.repo.webUrl, u = NSURL(string: w) {
-							NSWorkspace.sharedWorkspace().openURL(u)
+						} else if sendAction(#selector(NSResponder.selectAll), to: nil, from: self) {
 							return
 						}
 					default: break
 					}
 				}
-			} else if modifiers == [.CommandKeyMask, .ShiftKeyMask] {
-				if let char = theEvent.charactersIgnoringModifiers {
-					if char == "Z" && sendAction(#selector(NSTextField.trailerRedo), to:nil, from:self) { return }
+			} else if modifiers == [.command, .shift] {
+				if let char = event.charactersIgnoringModifiers {
+					if char == "Z" && sendAction(#selector(NSTextField.trailerRedo), to: nil, from: self) { return }
 				}
 			}
 		}
-		super.sendEvent(theEvent)
+		super.sendEvent(event)
 	}
 }

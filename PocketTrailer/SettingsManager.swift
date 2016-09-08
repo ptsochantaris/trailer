@@ -5,11 +5,11 @@ let settingsManager = SettingsManager()
 
 final class SettingsManager {
 
-	private func loadSettingsFrom(url: NSURL) {
+	private func loadSettingsFrom(url: URL) {
 		if Settings.readFromURL(url) {
 			atNextEvent {
 
-				popupManager.getMasterController().resetView()
+				popupManager.masterController.resetView()
 
 				preferencesDirty = true
 				Settings.lastSuccessfulRefresh = nil
@@ -25,21 +25,21 @@ final class SettingsManager {
 		}
 	}
 
-	func loadSettingsFrom(url: NSURL, confirmFromView: UIViewController?, withCompletion: ((Bool)->Void)?) {
+	func loadSettingsFrom(url: URL, confirmFromView: UIViewController?, withCompletion: ((Bool)->Void)?) {
 		if let v = confirmFromView {
-			let a = UIAlertController(title: "Import these settings?", message: "This will overwrite all your current settings, are you sure?", preferredStyle: .Alert)
-			a.addAction(UIAlertAction(title: "Yes", style: .Destructive) { [weak self] action in
-				self?.loadSettingsFrom(url)
+			let a = UIAlertController(title: "Import these settings?", message: "This will overwrite all your current settings, are you sure?", preferredStyle: .alert)
+			a.addAction(UIAlertAction(title: "Yes", style: .destructive) { [weak self] action in
+				self?.loadSettingsFrom(url: url)
 				withCompletion?(true)
 			})
-			a.addAction(UIAlertAction(title: "No", style: .Cancel) { action in
+			a.addAction(UIAlertAction(title: "No", style: .cancel) { action in
 				withCompletion?(false)
 			})
 			atNextEvent {
-				v.presentViewController(a, animated: true, completion: nil)
+				v.present(a, animated: true, completion: nil)
 			}
 		} else {
-			loadSettingsFrom(url)
+			loadSettingsFrom(url: url)
 			withCompletion?(true)
 		}
 	}

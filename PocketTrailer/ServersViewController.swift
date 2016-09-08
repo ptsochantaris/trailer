@@ -9,59 +9,59 @@ final class ServersViewController: UITableViewController {
 
 	@IBAction func doneSelected() {
 		if preferencesDirty {
-			app.startRefresh()
+			_ = app.startRefresh()
 		}
-		dismissViewControllerAnimated(true, completion: nil)
+		dismiss(animated: true, completion: nil)
 	}
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
 
 		clearsSelectionOnViewWillAppear = true
-		NSNotificationCenter.defaultCenter().addObserver(tableView, selector: #selector(UITableView.reloadData), name: REFRESH_ENDED_NOTIFICATION, object: nil)
+		NotificationCenter.default.addObserver(tableView, selector: #selector(UITableView.reloadData), name: RefreshEndedNotification, object: nil)
 	}
 
 	deinit {
 		if tableView != nil {
-			NSNotificationCenter.defaultCenter().removeObserver(tableView)
+			NotificationCenter.default.removeObserver(tableView)
 		}
 	}
 
-	override func viewWillAppear(animated: Bool) {
+	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
-		allServers = ApiServer.allApiServersInMoc(mainObjectContext)
+		allServers = ApiServer.allApiServers(in: DataManager.main)
 		tableView.reloadData()
 	}
 
-	override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+	override func numberOfSections(in tableView: UITableView) -> Int {
 		return 1
 	}
 
-	override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		return allServers.count
 	}
 
-	override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCellWithIdentifier("ServerCell", forIndexPath: indexPath)
-		if let T = cell.textLabel, D = cell.detailTextLabel {
+	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+		let cell = tableView.dequeueReusableCell(withIdentifier: "ServerCell", for: indexPath)
+		if let T = cell.textLabel, let D = cell.detailTextLabel {
 			let a = allServers[indexPath.row]
 			if S(a.authToken).isEmpty {
-				T.textColor = UIColor.redColor()
+				T.textColor = .red
 				T.text = "\(S(a.label)) (needs token!)"
-			} else if !a.syncIsGood {
-				T.textColor = UIColor.redColor()
+			} else if !a.lastSyncSucceeded {
+				T.textColor = .red
 				T.text = "\(S(a.label)) (last sync failed)"
 			} else {
-				T.textColor = UIColor.darkTextColor()
+				T.textColor = .darkText
 				T.text = a.label
 			}
-			if a.requestsLimit==nil || a.requestsLimit!.doubleValue==0.0 {
+			if a.requestsLimit == 0 {
 				D.text = nil
 			} else {
-				let total = a.requestsLimit?.doubleValue ?? 0
-				let used = total - (a.requestsRemaining?.doubleValue ?? 0)
+				let total = Double(a.requestsLimit)
+				let used = Double(total - Double(a.requestsRemaining))
 				if a.resetDate != nil {
-					D.text = String(format:"%.01f%% API used (%.0f / %.0f requests)\nNext reset: %@", 100*used/total, used, total, shortDateFormatter.stringFromDate(a.resetDate!))
+					D.text = String(format:"%.01f%% API used (%.0f / %.0f requests)\nNext reset: %@", 100*used/total, used, total, shortDateFormatter.string(from: a.resetDate!))
 				} else {
 					D.text = String(format:"%.01f%% API used (%.0f / %.0f requests)", 100*used/total, used, total)
 				}
@@ -70,32 +70,32 @@ final class ServersViewController: UITableViewController {
 		return cell
 	}
 
-	override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+	override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
 		return true
 	}
 
-	override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-		if editingStyle == UITableViewCellEditingStyle.Delete {
+	override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+		if editingStyle == UITableViewCellEditingStyle.delete {
 			let a = allServers[indexPath.row]
-			allServers.removeAtIndex(indexPath.row)
-			mainObjectContext.deleteObject(a)
+			allServers.remove(at: indexPath.row)
+			DataManager.main.delete(a)
 			DataManager.saveDB()
-			tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+			tableView.deleteRows(at: [indexPath], with: .fade)
 		}
 	}
 
-	override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		let a = allServers[indexPath.row]
 		selectedServerId = a.objectID
-		performSegueWithIdentifier("editServer", sender: self)
+		performSegue(withIdentifier: "editServer", sender: self)
 	}
 
 	@IBAction func newServer() {
-		performSegueWithIdentifier("editServer", sender: self)
+		performSegue(withIdentifier: "editServer", sender: self)
 	}
 
-	override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-		if let sd = segue.destinationViewController as? ServerDetailViewController {
+	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+		if let sd = segue.destination as? ServerDetailViewController {
 			sd.serverId = selectedServerId
 			selectedServerId = nil
 		}
