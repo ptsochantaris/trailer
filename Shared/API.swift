@@ -219,12 +219,12 @@ final class API {
 			}
 
 			#if os(iOS)
+				task.priority = URLSessionTask.highPriority // this blows up in OSX for some reason
 				delay(0.1) {
 					networkIndicationStart()
 				}
 			#endif
 
-			task.priority = URLSessionTask.highPriority
 			task.resume()
 		}
 
@@ -1466,7 +1466,9 @@ final class API {
 				               completion: completion)
 			}
 		}
-		task.priority = URLSessionTask.lowPriority
+		#if os(iOS)
+			task.priority = URLSessionTask.lowPriority
+		#endif
 		task.resume()
 	}
 

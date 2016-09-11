@@ -73,7 +73,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			return
 		}
 
-		DistributedNotificationCenter.default().addObserver(self, selector: #selector(updateDarkMode), name: AppleInterfaceThemeChangedNotification, object: nil)
+		DistributedNotificationCenter.default().addObserver(self, selector: #selector(updateDarkModeDelayed), name: AppleInterfaceThemeChangedNotification, object: nil)
 
 		DataManager.postProcessAllItems()
 
@@ -1104,7 +1104,12 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	//////////////////////// Dark mode
 
 	var darkMode = false
-	func updateDarkMode() {
+	func updateDarkModeDelayed() {
+		delay(0.1, self) { S in
+			S.updateDarkMode()
+		}
+	}
+	private func updateDarkMode() {
 		if !systemSleeping {
 			// kick the NSAppearance mechanism into action
 			let s = NSStatusBar.system().statusItem(withLength: NSVariableStatusItemLength)
