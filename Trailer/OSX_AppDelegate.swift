@@ -1111,10 +1111,6 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 	private func updateDarkMode() {
 		if !systemSleeping {
-			// kick the NSAppearance mechanism into action
-			let s = NSStatusBar.system().statusItem(withLength: NSVariableStatusItemLength)
-			s.statusBar.removeStatusItem(s)
-
 			if menuBarSets.count == 0 || darkMode != currentSystemDarkMode {
 				setupWindows()
 			}
@@ -1122,8 +1118,11 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	private var currentSystemDarkMode: Bool {
-		let c = NSAppearance.current()
-		return c.name.contains(NSAppearanceNameVibrantDark)
+		if let appearance = UserDefaults.standard.string(forKey: "AppleInterfaceStyle") {
+			return appearance == "Dark"
+		} else {
+			return false
+		}
 	}
 
 	// Server display list
