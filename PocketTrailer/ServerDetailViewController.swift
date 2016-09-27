@@ -126,7 +126,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 	}
 
 	@IBAction func existingTokensSelected(_ sender: UIBarButtonItem) {
-		openGitHub(url: "/settings/applications")
+		openGitHub(url: "/settings/tokens")
 	}
 
 	private var validatedPath: URL? {
