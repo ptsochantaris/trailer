@@ -960,7 +960,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		if apiServerWebPath.stringValue.isEmpty {
 			reportNeedFrontEnd()
 		} else {
-			let address = "\(apiServerWebPath.stringValue)/settings/applications"
+			let address = "\(apiServerWebPath.stringValue)/settings/tokens"
 			NSWorkspace.shared().open(URL(string: address)!)
 		}
 	}
