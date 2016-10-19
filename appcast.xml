@@ -7,6 +7,32 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.5.1</title>
+			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>This is a bugfix release that corrects a scrolling issue on macOS Sierra</li>
+				<li>From 1.5.0:</li>
+				<li>Support for multiple assignees when searching or detecting if an item has been assigned.</li>
+				<li>Mentions, team mentions, and new items in owned repos can now be routed to any section.</li>
+				<li>Snoozing logic and options improvements.</li>
+				<li>Improved keyboard support for navigating.</li>
+				<li>In case launch fails because of a database incompatibility (or corruption), Trailer will no longer auto-wipe the database but will display a warning, offering the options to wipe the database or quit.</li>
+				<li>Preferences layout fixes for Yosemite.</li>
+				<li>"X" mode will no longer cause group status bar items to disappear.</li>
+				<li>Under the hood: Updated for the latest Swift 3 / Xcode 8 toolchain, Sparkle updater now at v14.</li>
+				<li>Database access settings updated to improve store robustness.</li>
+				<li>Important performance, syncing logic, and stability improvements.</li>
+				</ul></font>]]></description>
+			<pubDate>Wed, 19 Oct 2016 16:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer151.zip"
+			sparkle:version="1386"
+			sparkle:shortVersionString="1.5.1"
+			sparkle:dsaSignature="MC4CFQCFq6FLg6wU3uqTRAfsfEl1+Y6ycAIVAJvgx4MOEy4aomQA5aMAl6u67Dcb"
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.5.0</title>
 			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
@@ -218,6 +244,6 @@
 			sparkle:dsaSignature="MCwCFH2MNJ22CQqqlGK6auUrHk7RPGQOAhQKyyxK+/t4W0tSJA7BehKrM61PIA=="
 			type="application/octet-stream"/>
 		</item>
-
+		
 	</channel>
 </rss>
