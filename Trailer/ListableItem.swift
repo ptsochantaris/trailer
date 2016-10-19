@@ -230,7 +230,7 @@ class ListableItem: DataItem {
 			let d = TimeInterval(Settings.autoSnoozeDuration)
 			if d > 0 && !wasAwokenFromSnooze && updatedAt != .distantPast, let snoozeByDate = updatedAt?.addingTimeInterval(86400.0*d) {
 				if snoozeByDate < Date() {
-					snoozeUntil = autoSnoozeDate
+					snoozeUntil = autoSnoozeSentinelDate
 					return true
 				}
 			}
@@ -253,7 +253,7 @@ class ListableItem: DataItem {
 	}
 
 	final func wakeIfAutoSnoozed() {
-		if snoozeUntil == autoSnoozeDate {
+		if snoozeUntil == autoSnoozeSentinelDate {
 			snoozeUntil = nil
 			wasAwokenFromSnooze = false
 			snoozingPreset = nil

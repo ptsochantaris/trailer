@@ -7,7 +7,7 @@ class TrailerCell: NSTableCellView {
 
 	private let dataItemId: NSManagedObjectID!
 	private let isDark: Bool
-	private var trackingArea: NSTrackingArea!
+	private var trackingArea: NSTrackingArea?
 
 	init(frame frameRect: NSRect, item: ListableItem) {
 
@@ -123,7 +123,7 @@ class TrailerCell: NSTableCellView {
 
 			if let snooze = item.snoozeUntil {
 				let title: String
-				if snooze == .distantFuture || snooze == autoSnoozeDate {
+				if snooze == .distantFuture || snooze == autoSnoozeSentinelDate {
 					title = String(format: "Wake")
 				} else {
 					title = String(format: "Wake (auto: %@)", itemDateFormatter.string(from: snooze))
@@ -220,21 +220,21 @@ class TrailerCell: NSTableCellView {
 	}
 
 	override func updateTrackingAreas() {
-		if trackingArea != nil { removeTrackingArea(trackingArea) }
+		if let t = trackingArea {
+			removeTrackingArea(t)
+		}
 
-		trackingArea = NSTrackingArea(rect: bounds,
-			options: [.mouseEnteredAndExited, .activeInKeyWindow],
-			owner: self,
-			userInfo: nil)
+		let t = NSTrackingArea(rect: bounds, options: [.mouseEnteredAndExited, .activeInKeyWindow], owner: self, userInfo: nil)
+		addTrackingArea(t)
+		trackingArea = t
 
-		addTrackingArea(trackingArea)
-
-		let mouseLocation = convert(window?.mouseLocationOutsideOfEventStream ?? NSZeroPoint, from: nil)
-
-		if NSPointInRect(mouseLocation, bounds) {
-			mouseEntered(with: nil)
-		} else if !selected {
-			mouseExited(with: nil)
+		if let mouseLocation = window?.mouseLocationOutsideOfEventStream {
+			let localLocation = convert(mouseLocation, to: self)
+			if NSPointInRect(localLocation, bounds) && !selected {
+				mouseEntered(with: nil)
+			} else if selected {
+				mouseExited(with: nil)
+			}
 		}
 	}
 

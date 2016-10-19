@@ -1,7 +1,10 @@
 
+////////////////////// Global variables
+
 #if os(iOS)
 
 import UIKit
+import CoreData
 
 weak var app: iOS_AppDelegate!
 
@@ -30,12 +33,10 @@ typealias IMAGE_CLASS = NSImage
 
 #endif
 
-////////////////////// Global variables
-
 var appIsRefreshing = false
 var preferencesDirty = false
 var lastRepoCheck = Date.distantPast
-let autoSnoozeDate = Date.distantFuture.addingTimeInterval(-1)
+let autoSnoozeSentinelDate = Date.distantFuture.addingTimeInterval(-1)
 let stringDrawingOptions: NSStringDrawingOptions = [.usesLineFragmentOrigin, .usesFontLeading]
 let LISTABLE_URI_KEY = "listableUriKey"
 let COMMENT_ID_KEY = "commentIdKey"
@@ -44,7 +45,6 @@ let NOTIFICATION_URL_KEY = "urlKey"
 ////////////////////////// Utilities
 
 #if os(iOS)
-	import CoreData
 
 func showMessage(_ title: String, _ message: String?) {
 	var viewController = app.window?.rootViewController
@@ -56,6 +56,7 @@ func showMessage(_ title: String, _ message: String?) {
 	a.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
 	viewController?.present(a, animated: true, completion: nil)
 }
+
 #endif
 
 func existingObject(with id: NSManagedObjectID) -> NSManagedObject? {
