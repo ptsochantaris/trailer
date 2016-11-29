@@ -38,7 +38,7 @@ final class DataManager {
 
 		// Migrate delivered notifications from old keys
 		for notification in nc.deliveredNotifications {
-			if let userInfo = notification.userInfo, let u = (userInfo["pullRequestIdKey"] ?? userInfo["issueIdKey"] ?? userInfo["statusIdKey"]) as? String {
+			if let userInfo = notification.userInfo, let u = (userInfo["pullRequestIdKey"] as? String) ?? (userInfo["issueIdKey"] as? String) ?? (userInfo["statusIdKey"] as? String) {
 				notification.userInfo![LISTABLE_URI_KEY] = u
 				notification.userInfo!["pullRequestIdKey"] = nil
 				notification.userInfo!["issueIdKey"] = nil

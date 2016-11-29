@@ -51,7 +51,7 @@ final class ItemDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 			for item in allItems {
 				let i = (item["sectionIndex"] as! NSNumber).intValue
 				if lastSection < i {
-					itemIds.append(Section.issueMenuTitles[i])
+					itemIds.append(sections[i])
 					lastSection = i
 				}
 				itemIds.append(item["objectID"] as! NSManagedObjectID)
