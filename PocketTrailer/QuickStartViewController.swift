@@ -15,12 +15,18 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 	private var token = ""
 	private var checkTimer: Timer?
 	private var showIssues = true
+	private var importExport: ImportExport!
 
     override func viewDidLoad() {
         super.viewDidLoad()
+		importExport = ImportExport(parent: self)
 		normalMode()
 		updateSettings()
     }
+
+	@IBAction func importSelected(_ sender: UIBarButtonItem) {
+		importExport.importSelected(sender: sender)
+	}
 
 	private func updateSettings() {
 		if showIssues {

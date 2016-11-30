@@ -1,7 +1,7 @@
 
 import UIKit
 
-final class AdvancedSettingsViewController: UITableViewController, PickerViewControllerDelegate, UIDocumentPickerDelegate, UISearchBarDelegate {
+final class AdvancedSettingsViewController: UITableViewController, PickerViewControllerDelegate, UISearchBarDelegate {
 
 	private enum SettingsSection: Int {
 		case Refresh, Display, Filtering, AppleWatch, Comments, Repos, StausesAndLabels, History, Confirm, Sort, Misc
@@ -259,6 +259,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	private var selectedIndexPath: IndexPath?
 	private var previousValue: Int?
 	private var showHelp = true
+	private var importExport: ImportExport!
 
 	@IBAction func done(_ sender: UIBarButtonItem) {
 		if preferencesDirty { _ = app.startRefresh() }
@@ -283,9 +284,11 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			popupManager.masterController.updateStatus()
 		}
 
+		importExport = ImportExport(parent: self)
+
 		navigationItem.rightBarButtonItems = [
-			UIBarButtonItem(image: UIImage(named: "export"), style: .plain, target: self, action: #selector(exportSelected)),
-			UIBarButtonItem(image: UIImage(named: "import"), style: .plain, target: self, action: #selector(importSelected)),
+			UIBarButtonItem(image: UIImage(named: "export"), style: .plain, target: importExport, action: #selector(ImportExport.exportSelected)),
+			UIBarButtonItem(image: UIImage(named: "import"), style: .plain, target: importExport, action: #selector(ImportExport.importSelected)),
 			UIBarButtonItem(image: UIImage(named: "showHelp"), style: .plain, target: self, action: #selector(toggleHelp)),
 		]
 	}
@@ -776,59 +779,6 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 			}
 			reload()
 			selectedIndexPath = nil
-		}
-	}
-
-	/////////////////// Import / Export
-
-	private var tempUrl: URL?
-
-	func importSelected(sender: UIBarButtonItem) {
-		tempUrl = nil
-
-		let menu = UIDocumentPickerViewController(documentTypes: ["com.housetrip.mobile.trailer.ios.settings"], in: .import)
-		menu.delegate = self
-		popupManager.showPopoverFromViewController(parentViewController: self, fromItem: sender, viewController: menu)
-	}
-
-	func exportSelected(sender: UIBarButtonItem) {
-		let tempFilePath = NSTemporaryDirectory().appending(pathComponent: "Trailer Settings (iOS).trailerSettings")
-		tempUrl = URL(fileURLWithPath: tempFilePath)
-		_ = Settings.writeToURL(tempUrl!)
-
-		let menu = UIDocumentPickerViewController(url: tempUrl!, in: .exportToService)
-		menu.delegate = self
-		popupManager.showPopoverFromViewController(parentViewController: self, fromItem: sender, viewController: menu)
-	}
-
-	func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentAt url: URL) {
-		if tempUrl == nil {
-			DLog("Will import settings from %@", url.absoluteString)
-			settingsManager.loadSettingsFrom(url: url, confirmFromView: self) { [weak self] confirmed in
-				if confirmed {
-					self?.dismiss(animated: false, completion: nil)
-				}
-				self?.documentInteractionCleanup()
-			}
-		} else {
-			DLog("Saved settings to %@", url.absoluteString)
-			documentInteractionCleanup()
-		}
-	}
-
-	func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
-		DLog("Document picker cancelled")
-		documentInteractionCleanup()
-	}
-
-	func documentInteractionCleanup() {
-		if let t = tempUrl {
-			do {
-				try FileManager.default.removeItem(at: t)
-			} catch {
-				DLog("Temporary file cleanup error: %@", error.localizedDescription)
-			}
-			tempUrl = nil
 		}
 	}
 }

@@ -136,4 +136,23 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 		newServer.authToken = tokenHolder.stringValue.trim
 		newServer.lastSyncSucceeded = true
 	}
+
+	@IBAction func importSettingsSelected(_ sender: NSButton) {
+		let o = NSOpenPanel()
+		o.title = "Import Settings From File..."
+		o.prompt = "Import"
+		o.nameFieldLabel = "Settings File"
+		o.message = "Import Settings From File..."
+		o.isExtensionHidden = false
+		o.allowedFileTypes = ["trailerSettings"]
+		o.beginSheetModal(for: self) { response in
+			if response == NSFileHandlingPanelOKButton, let url = o.url {
+				atNextEvent { [weak self] in
+					if app.tryLoadSettings(from: url, skipConfirm: Settings.dontConfirmSettingsImport) {
+						self?.close()
+					}
+				}
+			}
+		}
+	}
 }

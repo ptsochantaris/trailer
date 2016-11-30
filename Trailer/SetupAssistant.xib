@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" customObjectInstantitationMethod="direct">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11542" systemVersion="16B2555" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" customObjectInstantitationMethod="direct">
     <dependencies>
-        <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10116"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11542"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSWindowController">
@@ -49,8 +49,8 @@
                             <action selector="createTokenSelected:" target="T32-8h-vwO" id="XZ4-El-YCb"/>
                         </connections>
                     </button>
-                    <button id="0TI-Qw-Fgk">
-                        <rect key="frame" x="18" y="18" width="164" height="18"/>
+                    <button misplaced="YES" id="0TI-Qw-Fgk">
+                        <rect key="frame" x="18" y="18" width="162" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <buttonCell key="cell" type="check" title="Start Trailer at Login" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Nkh-nH-EQJ">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -76,8 +76,8 @@
                         <rect key="frame" x="232" y="282" width="16" height="16"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                     </progressIndicator>
-                    <button id="gVR-Cj-NL0">
-                        <rect key="frame" x="318" y="18" width="144" height="18"/>
+                    <button misplaced="YES" id="gVR-Cj-NL0">
+                        <rect key="frame" x="184" y="18" width="158" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                         <buttonCell key="cell" type="check" title="Track issues as well" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="prl-WF-01U">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -107,6 +107,17 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
+                    <button verticalHuggingPriority="750" misplaced="YES" id="nd0-7x-BCE">
+                        <rect key="frame" x="347" y="17" width="113" height="19"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="roundRect" title="Import Settings..." bezelStyle="roundedRect" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ClA-nV-Qxw">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system" size="11"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="importSettingsSelected:" target="T32-8h-vwO" id="oTj-Mc-kfg"/>
+                        </connections>
+                    </button>
                 </subviews>
             </view>
             <connections>
