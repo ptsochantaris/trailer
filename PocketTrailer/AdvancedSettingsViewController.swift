@@ -328,7 +328,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		} else {
 			heightCache.removeAll()
 			let r = Range(uncheckedBounds: (lower: 0, upper: tableView.numberOfSections))
-			tableView.reloadSections(IndexSet(integersIn: r), with: .automatic)
+			tableView.reloadSections(IndexSet(integersIn: r), with: .fade)
 		}
 	}
 

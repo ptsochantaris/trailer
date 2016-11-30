@@ -27,9 +27,9 @@ final class CommentBlacklistViewController: UITableViewController {
 			blackList.remove(at: indexPath.row)
 			Settings.commentAuthorBlacklist = blackList
 			if blackList.count==0 { // last delete
-				tableView.deleteSections(IndexSet(integer: 0), with: .automatic)
+				tableView.deleteSections(IndexSet(integer: 0), with: .fade)
 			} else {
-				tableView.deleteRows(at: [indexPath], with: .automatic)
+				tableView.deleteRows(at: [indexPath], with: .fade)
 			}
 		}
 	}
@@ -60,9 +60,9 @@ final class CommentBlacklistViewController: UITableViewController {
 						Settings.commentAuthorBlacklist = blackList
 						let ip = IndexPath(row: blackList.count-1, section: 0)
 						if blackList.count == 1 { // first insert
-							S.tableView.insertSections(IndexSet(integer: 0), with: .automatic)
+							S.tableView.insertSections(IndexSet(integer: 0), with: .fade)
 						} else {
-							S.tableView.insertRows(at: [ip], with: .automatic)
+							S.tableView.insertRows(at: [ip], with: .fade)
 						}
 					}
 				}

@@ -39,7 +39,7 @@ final class TabBarSet {
 final class MasterViewController: UITableViewController, NSFetchedResultsControllerDelegate, UISearchBarDelegate, UITabBarControllerDelegate, UITabBarDelegate {
 
 	private var detailViewController: DetailViewController!
-	private var _fetchedResultsController: NSFetchedResultsController<ListableItem>?
+	private var fetchedResultsController: NSFetchedResultsController<ListableItem>!
 
 	// Tabs
 	private var tabs: UITabBar?
@@ -502,7 +502,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		let r = Range(uncheckedBounds: (lower: 0, upper: fetchedResultsController.sections?.count ?? 0))
 		let currentIndexes = IndexSet(integersIn: r)
 
-		_fetchedResultsController = nil
+		updateQuery(newFetchRequest: itemFetchRequest)
 
 		let r2 = Range(uncheckedBounds: (lower: 0, upper: fetchedResultsController.sections?.count ?? 0))
 		let dataIndexes = IndexSet(integersIn: r2)
@@ -513,16 +513,33 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		tableView.beginUpdates()
 		if removedIndexes.count > 0 {
-			tableView.deleteSections(IndexSet(removedIndexes), with:.automatic)
+			tableView.deleteSections(IndexSet(removedIndexes), with:.fade)
 		}
 		if untouchedIndexes.count > 0 {
-			tableView.reloadSections(IndexSet(untouchedIndexes), with:.automatic)
+			tableView.reloadSections(IndexSet(untouchedIndexes), with:.fade)
 		}
 		if addedIndexes.count > 0 {
-			tableView.insertSections(IndexSet(addedIndexes), with:.automatic)
+			tableView.insertSections(IndexSet(addedIndexes), with:.fade)
 		}
 		tableView.endUpdates()
+
 		updateFooter()
+	}
+
+	private func updateQuery(newFetchRequest: NSFetchRequest<ListableItem>) {
+
+		if fetchedResultsController == nil || fetchedResultsController.fetchRequest.entityName != newFetchRequest.entityName {
+			let c = NSFetchedResultsController(fetchRequest: newFetchRequest, managedObjectContext: DataManager.main, sectionNameKeyPath: "sectionName", cacheName: nil)
+			fetchedResultsController = c
+			try! c.performFetch()
+			c.delegate = self
+		} else {
+			let fr = fetchedResultsController.fetchRequest
+			fr.relationshipKeyPathsForPrefetching = newFetchRequest.relationshipKeyPathsForPrefetching
+			fr.sortDescriptors = newFetchRequest.sortDescriptors
+			fr.predicate = newFetchRequest.predicate
+			try! fetchedResultsController.performFetch()
+		}
 	}
 
 	private func updateTabItems(animated: Bool) {
@@ -583,14 +600,17 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			viewingPrs = true
 		}
 
-		let newCount = tabs?.items?.count ?? 0
-
-		let latestFetchRequest = _fetchedResultsController?.fetchRequest
-		let newFetchRequest = itemFetchRequest
-
-		if newCount != lastTabCount || latestFetchRequest != newFetchRequest {
-			_fetchedResultsController = nil
+		if fetchedResultsController == nil {
+			updateQuery(newFetchRequest: itemFetchRequest)
 			tableView.reloadData()
+		} else {
+			let latestFetchRequest = fetchedResultsController.fetchRequest
+			let newFetchRequest = itemFetchRequest
+			let newCount = tabs?.items?.count ?? 0
+			if newCount != lastTabCount || latestFetchRequest != newFetchRequest {
+				updateQuery(newFetchRequest: newFetchRequest)
+				tableView.reloadData()
+			}
 		}
 
 		if let ts = tabScroll, let t = tabs, let i = t.selectedItem, let ind = t.items?.index(of: i) {
@@ -997,18 +1017,6 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		present(a, animated: true, completion: nil)
 	}
 
-	private var fetchedResultsController: NSFetchedResultsController<ListableItem> {
-		if let c = _fetchedResultsController {
-			return c
-		}
-
-		let c = NSFetchedResultsController(fetchRequest: itemFetchRequest, managedObjectContext: DataManager.main, sectionNameKeyPath: "sectionName", cacheName: nil)
-		_fetchedResultsController = c
-		c.delegate = self
-		try! c.performFetch()
-		return c
-	}
-
 	private var itemFetchRequest: NSFetchRequest<ListableItem> {
 		let type: ListableItem.Type = viewingPrs ? PullRequest.self : Issue.self
 		return ListableItem.requestForItems(of: type, withFilter: searchBar.text, sectionIndex: -1, criterion: currentTabBarSet?.viewCriterion)
@@ -1018,10 +1026,13 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
 		animatedUpdates = UIApplication.shared.applicationState != .background
+		sectionsChanged = false
 		if animatedUpdates {
 			tableView.beginUpdates()
 		}
 	}
+
+	private var sectionsChanged = false
 
 	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
 
@@ -1029,12 +1040,14 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		switch(type) {
 		case .insert:
-			tableView.insertSections(IndexSet(integer: sectionIndex), with: .automatic)
+			tableView.insertSections(IndexSet(integer: sectionIndex), with: .fade)
 		case .delete:
-			tableView.deleteSections(IndexSet(integer: sectionIndex), with: .automatic)
+			tableView.deleteSections(IndexSet(integer: sectionIndex), with: .fade)
 		case .update, .move:
 			break
 		}
+
+		sectionsChanged = true
 	}
 
 	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
@@ -1044,11 +1057,11 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		switch(type) {
 		case .insert:
 			if let n = newIndexPath {
-				tableView.insertRows(at: [n], with: .automatic)
+				tableView.insertRows(at: [n], with: .fade)
 			}
 		case .delete:
 			if let i = indexPath {
-				tableView.deleteRows(at: [i], with: .automatic)
+				tableView.deleteRows(at: [i], with: .fade)
 			}
 		case .update:
 			if let i = indexPath, let object = anObject as? ListableItem, let cell = tableView.cellForRow(at: i) {
@@ -1056,7 +1069,12 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			}
 		case .move:
 			if let i = indexPath, let n = newIndexPath {
-				tableView.moveRow(at: i, to: n)
+				if sectionsChanged {
+					tableView.deleteRows(at: [i], with: .fade)
+					tableView.insertRows(at: [n], with: .fade)
+				} else {
+					tableView.moveRow(at: i, to: n)
+				}
 			}
 		}
 	}
@@ -1229,7 +1247,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	func resetView() {
 		safeScrollToTop()
-		_fetchedResultsController = nil
+		updateQuery(newFetchRequest: itemFetchRequest)
 		updateStatus()
 		tableView.reloadData()
 	}

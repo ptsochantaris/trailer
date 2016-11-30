@@ -156,11 +156,11 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 
 		switch(type) {
 		case .insert:
-			tableView.insertSections(IndexSet(integer: sectionIndex), with: .automatic)
+			tableView.insertSections(IndexSet(integer: sectionIndex), with: .fade)
 		case .delete:
-			tableView.deleteSections(IndexSet(integer: sectionIndex), with: .automatic)
+			tableView.deleteSections(IndexSet(integer: sectionIndex), with: .fade)
 		case .update:
-			tableView.reloadSections(IndexSet(integer: sectionIndex), with: .automatic)
+			tableView.reloadSections(IndexSet(integer: sectionIndex), with: .fade)
 		default:
 			break
 		}
@@ -172,17 +172,17 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 
 		switch(type) {
 		case .insert:
-			tableView.insertRows(at: [(newIndexPath ?? indexPath!)], with: .automatic)
+			tableView.insertRows(at: [(newIndexPath ?? indexPath!)], with: .fade)
 		case .delete:
-			tableView.deleteRows(at: [indexPath!], with:.automatic)
+			tableView.deleteRows(at: [indexPath!], with: .fade)
 		case .update:
 			if let cell = tableView.cellForRow(at: (newIndexPath ?? indexPath!)) as? RepoCell {
 				configureCell(cell, atIndexPath: newIndexPath ?? indexPath!)
 			}
 		case .move:
-			tableView.deleteRows(at: [indexPath!], with:.automatic)
+			tableView.deleteRows(at: [indexPath!], with: .fade)
 			if let n = newIndexPath {
-				tableView.insertRows(at: [n], with:.automatic)
+				tableView.insertRows(at: [n], with: .fade)
 			}
 		}
 	}
@@ -302,13 +302,13 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 
 		tableView.beginUpdates()
 		if removedIndexes.count > 0 {
-			tableView.deleteSections(IndexSet(removedIndexes), with: .automatic)
+			tableView.deleteSections(IndexSet(removedIndexes), with: .fade)
 		}
 		if untouchedIndexes.count > 0 {
-			tableView.reloadSections(IndexSet(untouchedIndexes), with:.automatic)
+			tableView.reloadSections(IndexSet(untouchedIndexes), with:.fade)
 		}
 		if addedIndexes.count > 0 {
-			tableView.insertSections(IndexSet(addedIndexes), with: .automatic)
+			tableView.insertSections(IndexSet(addedIndexes), with: .fade)
 		}
 		tableView.endUpdates()
 	}
