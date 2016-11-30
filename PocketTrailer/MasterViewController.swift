@@ -240,10 +240,10 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 
 		let n = NotificationCenter.default
-		n.addObserver(self, selector: #selector(updateStatus), name: RefreshStartedNotification, object: nil)
-		n.addObserver(self, selector: #selector(updateRefresh), name: SyncProgressUpdateNotification, object: nil)
-		n.addObserver(self, selector: #selector(showProcessing), name: RefreshProcessingNotification, object: nil)
-		n.addObserver(self, selector: #selector(updateStatus), name: RefreshEndedNotification, object: nil)
+		n.addObserver(self, selector: #selector(refreshStarting), name: RefreshStartedNotification, object: nil)
+		n.addObserver(self, selector: #selector(refreshUpdated), name: SyncProgressUpdateNotification, object: nil)
+		n.addObserver(self, selector: #selector(refreshProcessing), name: RefreshProcessingNotification, object: nil)
+		n.addObserver(self, selector: #selector(refreshEnded), name: RefreshEndedNotification, object: nil)
 
 		updateTabItems(animated: false)
 		atNextEvent {
@@ -251,14 +251,27 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		}
 	}
 
-	func updateRefresh() {
+	private var needsUpdateStatus = false
+
+	func refreshStarting() {
+		updateStatus()
+		needsUpdateStatus = true
+	}
+
+	func refreshEnded() {
+		if needsUpdateStatus {
+			updateStatus()
+			needsUpdateStatus = false
+		}
+	}
+
+	func refreshUpdated() {
 		refreshLabel.text = API.lastUpdateDescription
 	}
 
-	func showProcessing() {
-		let m = popupManager.masterController
-		m.title = "Processing..."
-		m.refreshLabel.text = "Processing..."
+	func refreshProcessing() {
+		title = "Processing..."
+		refreshLabel.text = "Processing..."
 	}
 
 	override var canBecomeFirstResponder: Bool {
@@ -477,7 +490,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	private func updateRefreshControls() {
 		let ra = min(1.0, max(0, (-84-tableView.contentOffset.y)/32.0))
 		if ra > 0.0 && refreshLabel.alpha == 0 {
-			updateRefresh()
+			refreshUpdated()
 		}
 		refreshLabel.alpha = ra
 		refreshControl?.alpha = ra
@@ -639,8 +652,8 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 						delay: 0.0,
 						options: .curveEaseInOut,
 						animations: {
-							ts.transform = CGAffineTransform.identity
-							b.transform = CGAffineTransform.identity
+							ts.transform = .identity
+							b.transform = .identity
 						}, completion: nil)
 				}
 			}
@@ -1001,14 +1014,18 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		return ListableItem.requestForItems(of: type, withFilter: searchBar.text, sectionIndex: -1, criterion: currentTabBarSet?.viewCriterion)
 	}
 
+	private var animatedUpdates = false
+
 	func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-		if UIApplication.shared.applicationState != .active { return }
-		tableView.beginUpdates()
+		animatedUpdates = UIApplication.shared.applicationState != .background
+		if animatedUpdates {
+			tableView.beginUpdates()
+		}
 	}
 
 	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
 
-		if UIApplication.shared.applicationState != .active { return }
+		guard animatedUpdates else { return }
 
 		switch(type) {
 		case .insert:
@@ -1022,7 +1039,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
 
-		if UIApplication.shared.applicationState != .active { return }
+		guard animatedUpdates else { return }
 
 		switch(type) {
 		case .insert:
@@ -1038,21 +1055,19 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 				configureCell(cell: cell, withObject: object)
 			}
 		case .move:
-			if let i = indexPath {
-				tableView.deleteRows(at: [i], with: .automatic)
-			}
-			if let n = newIndexPath {
-				tableView.insertRows(at: [n], with: .automatic)
+			if let i = indexPath, let n = newIndexPath {
+				tableView.moveRow(at: i, to: n)
 			}
 		}
 	}
 
 	func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-		if UIApplication.shared.applicationState != .active {
-			tableView.reloadData()
-		} else {
+		if animatedUpdates {
 			tableView.endUpdates()
+		} else {
+			tableView.reloadData()
 		}
+		needsUpdateStatus = false
 		atNextEvent { [weak self] in
 			self?.updateStatus()
 		}
@@ -1078,7 +1093,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		if appIsRefreshing {
 			title = "Refreshing..."
 			if let r = refreshControl {
-				updateRefresh()
+				refreshUpdated()
 				updateRefreshControls()
 				r.beginRefreshing()
 			}
@@ -1089,7 +1104,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 				: issuesTitle
 
 			if let r = refreshControl {
-				updateRefresh()
+				refreshUpdated()
 				updateRefreshControls()
 				r.endRefreshing()
 			}
