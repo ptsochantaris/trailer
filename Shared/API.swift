@@ -84,6 +84,8 @@ final class API {
 		return appSupportURL.appendingPathComponent("com.housetrip.Trailer").path
 	}()
 
+	private static let cacheMoc = DataManager.buildThreadParallelContext()
+
 	private static let urlSession = { ()->URLSession in
 
 		#if DEBUG
@@ -354,8 +356,9 @@ final class API {
 			DataItem.nukeDeletedItems(in: moc)
 		}
 
-		mainQueue.addOperation {
-			CacheEntry.cleanOldEntries(in: moc)
+		cacheMoc.performAndWait {
+			CacheEntry.cleanOldEntries(in: cacheMoc)
+			try! cacheMoc.save()
 		}
 
 		for r in DataItem.items(of: PullRequest.self, surviving: true, in: moc, prefetchRelationships: ["comments"]) {
@@ -1386,7 +1389,10 @@ final class API {
 		}
 
 		let cacheKey = "\(server.objectID.uriRepresentation().absoluteString) \(expandedPath)"
-		let previousCacheEntry = CacheEntry.entry(for: cacheKey)?.cacheUnit // move data out of thread-specific context
+		var previousCacheEntry: CacheUnit?
+		cacheMoc.performAndWait {
+			previousCacheEntry = CacheEntry.entry(for: cacheKey, in: cacheMoc)?.cacheUnit // move data out of thread-specific context
+		}
 		if let p = previousCacheEntry {
 			/////////////////////// 60 second dumb-caching
 			if p.lastFetched > Date(timeIntervalSinceNow: -60), let parsedData = p.parsedData {
@@ -1421,8 +1427,8 @@ final class API {
 				shouldRetry = false
 				code = p.code
 				headers = p.actualHeaders
-				DispatchQueue.main.sync {
-					CacheEntry.markFetched(for: cacheKey)
+				cacheMoc.perform {
+					CacheEntry.markFetched(for: cacheKey, in: cacheMoc)
 				}
 				DLog("(%@) GET %@ - NO CHANGE (304): %@", apiServerLabel, expandedPath, code)
 			} else if code > 299 {
@@ -1441,11 +1447,11 @@ final class API {
 				DLog("(%@) GET %@ - RESULT: %@", apiServerLabel, expandedPath, code)
 				error = e as? NSError
 				shouldRetry = false
-				if let data = data {
-					parsedData = try? JSONSerialization.jsonObject(with: data, options: [])
+				if let d = data {
+					parsedData = try? JSONSerialization.jsonObject(with: d, options: [])
 					if let headers = headers, let etag = headers["Etag"] as? String {
-						DispatchQueue.main.sync {
-							CacheEntry.setEntry(key: cacheKey, code: code, etag: etag, data: data, headers: headers)
+						cacheMoc.perform {
+							CacheEntry.setEntry(key: cacheKey, code: code, etag: etag, data: d, headers: headers, in: cacheMoc)
 						}
 					}
 				} else {

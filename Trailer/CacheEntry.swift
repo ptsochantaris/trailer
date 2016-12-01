@@ -31,27 +31,32 @@ final class CacheEntry: NSManagedObject {
 		return CacheUnit(data: data, code: code, etag: etag, headers: headers, lastFetched: lastFetched)
 	}
 
-	class func setEntry(key: String, code: Int64, etag: String, data: Data, headers: [AnyHashable : Any]) {
-		var e = entry(for: key)
+	class func setEntry(key: String, code: Int64, etag: String, data: Data, headers: [AnyHashable : Any], in moc: NSManagedObjectContext) {
+		var e = entry(for: key, in: moc)
 		if e == nil {
-			e = NSEntityDescription.insertNewObject(forEntityName: "CacheEntry", into: DataManager.main) as? CacheEntry
+			e = NSEntityDescription.insertNewObject(forEntityName: "CacheEntry", into: moc) as? CacheEntry
 			e!.key = key
 		}
-		e!.code = code
-		e!.data = data
-		e!.etag = etag
-		e!.headers = NSKeyedArchiver.archivedData(withRootObject: headers)
-		e!.lastFetched = Date()
-		e!.lastTouched = Date()
+		let E = e!
+		E.code = code
+		E.data = data
+		E.etag = etag
+		E.headers = NSKeyedArchiver.archivedData(withRootObject: headers)
+		E.lastFetched = Date()
+		E.lastTouched = Date()
 	}
 
-	class func entry(for key: String) -> CacheEntry? {
+	static let entryFetch = { () -> NSFetchRequest<CacheEntry> in
 		let f = NSFetchRequest<CacheEntry>(entityName: "CacheEntry")
-		f.fetchLimit = 1
-		f.predicate = NSPredicate(format: "key == %@", key)
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false
-		if let e = try! DataManager.main.fetch(f).first {
+		f.fetchLimit = 1
+		return f
+	}()
+
+	class func entry(for key: String, in moc: NSManagedObjectContext) -> CacheEntry? {
+		entryFetch.predicate = NSPredicate(format: "key == %@", key)
+		if let e = try! moc.fetch(entryFetch).first {
 			e.lastTouched = Date()
 			return e
 		} else {
@@ -71,8 +76,8 @@ final class CacheEntry: NSManagedObject {
 		}
 	}
 
-	class func markFetched(for key: String) {
-		if let e = entry(for: key) {
+	class func markFetched(for key: String, in moc: NSManagedObjectContext) {
+		if let e = entry(for: key, in: moc) {
 			e.lastFetched = Date()
 		}
 	}
