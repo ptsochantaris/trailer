@@ -88,6 +88,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var hideAvatars: NSButton!
 	@IBOutlet weak var showSeparateApiServersInMenu: NSButton!
 	@IBOutlet weak var displayRepositoryNames: NSButton!
+	@IBOutlet weak var hideCountsOnMenubar: NSButton!
 
 	// Labels
 	@IBOutlet weak var labelRescanLabel: NSTextField!
@@ -221,6 +222,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		useVibrancy.toolTip = Settings.useVibrancyHelp
 		hideAvatars.toolTip = Settings.hideAvatarsHelp
 		showSeparateApiServersInMenu.toolTip = Settings.showSeparateApiServersInMenuHelp
+		hideCountsOnMenubar.toolTip = Settings.hideMenubarCountsHelp
 		sortModeSelect.toolTip = Settings.sortMethodHelp
 		sortingOrder.toolTip = Settings.sortDescendingHelp
 		groupByRepo.toolTip = Settings.groupByRepoHelp
@@ -333,6 +335,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		hideUncommentedPrs.integerValue = Settings.hideUncommentedItems ? 1 : 0
 		assumeCommentsBeforeMineAreRead.integerValue = Settings.assumeReadItemIfUserHasNewerComments ? 1 : 0
 		hideAvatars.integerValue = Settings.hideAvatars ? 1 : 0
+		hideCountsOnMenubar.integerValue = Settings.hideMenubarCounts ? 1 : 0
 		showSeparateApiServersInMenu.integerValue = Settings.showSeparateApiServersInMenu ? 1 : 0
 		dontKeepPrsMergedByMe.integerValue = Settings.dontKeepPrsMergedByMe ? 1 : 0
 		removeNotificationsWhenItemIsRemoved.integerValue = Settings.removeNotificationsWhenItemIsRemoved ? 1 : 0
@@ -761,6 +764,12 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	@IBAction func makeStatusItemsSelectableSelected(_ sender: NSButton) {
 		Settings.makeStatusItemsSelectable = (sender.integerValue==1)
+		deferredUpdateTimer.push()
+	}
+
+	@IBAction func hideCountsOnMenubarSelected(_ sender: NSButton) {
+		Settings.hideMenubarCounts = (sender.integerValue==1)
+		serversDirty = true
 		deferredUpdateTimer.push()
 	}
 

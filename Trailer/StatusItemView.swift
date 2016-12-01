@@ -41,7 +41,7 @@ final class StatusItemView: NSView {
 	static private let padding: CGFloat = 1.0
 
 	func sizeToFit() {
-		let width = statusLabel.size(withAttributes: textAttributes).width
+		let width = Settings.hideMenubarCounts ? (title == nil ? 0 : 4) : statusLabel.size(withAttributes: textAttributes).width
 		let H = NSStatusBar.system().thickness
 		let itemWidth = (H + width + StatusItemView.padding*3) + labelOffset
 		frame = NSMakeRect(0, 0, itemWidth, H)
@@ -52,38 +52,48 @@ final class StatusItemView: NSView {
 
 		app.statusItem(for: self)?.drawStatusBarBackground(in: dirtyRect, withHighlight: highlighted)
 
-		let imagePoint = NSMakePoint(StatusItemView.padding, 0)
-		var labelRect = CGRect(x: bounds.size.height + labelOffset, y: -5, width: bounds.size.width, height: bounds.size.height)
-		var displayAttributes = textAttributes
-		var imageColor: NSColor
+		var countAttributes = textAttributes
+		var foreground: NSColor
 
 		if highlighted {
-			imageColor = .selectedMenuItemTextColor
-			displayAttributes[NSForegroundColorAttributeName] = imageColor
+			foreground = .selectedMenuItemTextColor
+			countAttributes[NSForegroundColorAttributeName] = foreground
 		} else if app.darkMode {
-			imageColor = .selectedMenuItemTextColor
-			if displayAttributes[NSForegroundColorAttributeName] as! NSColor == NSColor.controlTextColor {
-				displayAttributes[NSForegroundColorAttributeName] = imageColor
+			foreground = .selectedMenuItemTextColor
+			if countAttributes[NSForegroundColorAttributeName] as! NSColor == NSColor.controlTextColor {
+				countAttributes[NSForegroundColorAttributeName] = foreground
 			}
 		} else {
-			imageColor = .controlTextColor
+			foreground = .controlTextColor
 		}
 
 		if grayOut {
-			displayAttributes[NSForegroundColorAttributeName] = NSColor.disabledControlTextColor
+			countAttributes[NSForegroundColorAttributeName] = NSColor.disabledControlTextColor
 		}
 
-		let img = tintedImage(from: icon, tint: imageColor)
+		if(Settings.hideMenubarCounts) {
+			drawIconOnly(titleColor: foreground, countAttributes: countAttributes, inRect: dirtyRect)
+		} else {
+			drawStandard(titleColor: foreground, countAttributes: countAttributes, inRect: dirtyRect)
+		}
+	}
+
+	private func drawStandard(titleColor: NSColor, countAttributes: [String : Any], inRect: NSRect) {
+
+		let imagePoint = NSMakePoint(StatusItemView.padding, 0)
+		var labelRect = CGRect(x: bounds.size.height + labelOffset, y: -5, width: bounds.size.width, height: bounds.size.height)
+		let img = tintedImage(from: icon, tint: titleColor)
+
 		if let t = title {
 
 			labelRect = labelRect.offsetBy(dx: -3, dy: -3)
 
-			let r = NSMakeRect(1, dirtyRect.height-7, dirtyRect.width-2, 7)
+			let r = NSMakeRect(1, inRect.height-7, inRect.width-2, 7)
 			let p = NSMutableParagraphStyle()
 			p.alignment = .center
 			p.lineBreakMode = .byTruncatingMiddle
 			t.draw(in: r, withAttributes: [
-				NSForegroundColorAttributeName: imageColor,
+				NSForegroundColorAttributeName: titleColor,
 				NSFontAttributeName: NSFont.menuFont(ofSize: 6),
 				NSParagraphStyleAttributeName: p
 				])
@@ -93,7 +103,46 @@ final class StatusItemView: NSView {
 			img.draw(at: imagePoint, from: NSZeroRect, operation: .sourceOver, fraction: 1.0)
 		}
 
-		statusLabel.draw(in: labelRect, withAttributes: displayAttributes)
+		statusLabel.draw(in: labelRect, withAttributes: countAttributes)
+	}
+
+	private func drawIconOnly(titleColor: NSColor, countAttributes: [String : Any], inRect: NSRect) {
+
+		let foreground = countAttributes[NSForegroundColorAttributeName] as! NSColor
+
+		if let t = title {
+
+			let r = NSMakeRect(1, inRect.height-7, inRect.width-2, 7)
+			let p = NSMutableParagraphStyle()
+			p.alignment = .center
+			p.lineBreakMode = .byTruncatingMiddle
+			t.draw(in: r, withAttributes: [
+				NSForegroundColorAttributeName: titleColor,
+				NSFontAttributeName: NSFont.menuFont(ofSize: 6),
+				NSParagraphStyleAttributeName: p
+				])
+
+			if statusLabel == "X" {
+				let w = statusLabel.size(withAttributes: countAttributes).width
+				let rect = CGRect(x: (inRect.width - w)*0.5, y: -4, width: w, height: inRect.size.height - 4)
+				statusLabel.draw(in: rect, withAttributes: countAttributes)
+			} else {
+				let img = tintedImage(from: icon, tint: foreground)
+				let w = img.size.width - 6
+				let rect = CGRect(x: (inRect.width - w)*0.5, y: 0, width: w, height: img.size.height - 6)
+				img.draw(in: rect)
+			}
+		} else {
+
+			if statusLabel == "X" {
+				let s = statusLabel.size(withAttributes: countAttributes)
+				let rect = CGRect(x: (inRect.width - s.width)*0.5, y: (inRect.height - s.height)*0.5, width: s.width, height: s.height)
+				statusLabel.draw(in: rect, withAttributes: countAttributes)
+			} else {
+				let img = tintedImage(from: icon, tint: foreground)
+				img.draw(at: CGPoint(x: (inRect.width - img.size.width)*0.5, y: 0), from: NSZeroRect, operation: .sourceOver, fraction: 1.0)
+			}
+		}
 	}
 
 	// With thanks to http://stackoverflow.com/questions/1413135/tinting-a-grayscale-nsimage-or-ciimage

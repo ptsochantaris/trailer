@@ -42,7 +42,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			}
 		}
 
-		if newSets.count == 0 || Repo.anyVisibleRepos(in: DataManager.main, excludeGrouped: true) {
+		if newSets.count == 0 || (!Settings.showSeparateApiServersInMenu && Repo.anyVisibleRepos(in: DataManager.main, excludeGrouped: true)) {
 			let s = MenuBarSet(viewCriterion: nil, delegate: self)
 			s.setTimers()
 			newSets.append(s)
