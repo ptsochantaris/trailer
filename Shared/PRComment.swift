@@ -81,7 +81,7 @@ final class PRComment: DataItem {
 
 		if let userInfo = info["user"] as? [AnyHashable : Any] {
 			userName = userInfo["login"] as? String
-			userId = (userInfo["id"] as? NSNumber)?.int64Value ?? 0
+			userId = userInfo["id"] as? Int64 ?? 0
 			avatarUrl = userInfo["avatar_url"] as? String
 		}
 

@@ -45,14 +45,14 @@ class ListableItem: DataItem {
 
 		url = info["url"] as? String
 		webUrl = info["html_url"] as? String
-		number = (info["number"] as? NSNumber)?.int64Value ?? 0
+		number = info["number"] as? Int64 ?? 0
 		state = info["state"] as? String
 		title = info["title"] as? String
 		body = info["body"] as? String
 		milestone = (info["milestone"] as? [AnyHashable : Any])?["title"] as? String
 
 		if let userInfo = info["user"] as? [AnyHashable : Any] {
-			userId = (userInfo["id"] as? NSNumber)?.int64Value ?? 0
+			userId = userInfo["id"] as? Int64 ?? 0
 			userLogin = userInfo["login"] as? String
 			userAvatarUrl = userInfo["avatar_url"] as? String
 		}
@@ -67,8 +67,8 @@ class ListableItem: DataItem {
 
 		func checkAndStoreAssigneeName(from assignee: [AnyHashable : Any]) -> Bool {
 
-			if let name = assignee["login"] as? String, let assigneeId = assignee["id"] as? NSNumber {
-				let shouldBeAssignedToMe = assigneeId.int64Value == myIdOnThisRepo
+			if let name = assignee["login"] as? String, let assigneeId = assignee["id"] as? Int64 {
+				let shouldBeAssignedToMe = assigneeId == myIdOnThisRepo
 				assigneeNames.append(name)
 				return shouldBeAssignedToMe
 			} else {

@@ -45,11 +45,11 @@ final class ItemDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 		itemIds.reserveCapacity(allItems.count+sections.count)
 
 		if let firstItem = allItems.first {
-			var lastSection = (firstItem["sectionIndex"] as! NSNumber).intValue
+			var lastSection = firstItem["sectionIndex"] as! Int
 			itemIds.append(sections[lastSection])
 
 			for item in allItems {
-				let i = (item["sectionIndex"] as! NSNumber).intValue
+				let i = item["sectionIndex"] as! Int
 				if lastSection < i {
 					itemIds.append(sections[i])
 					lastSection = i

@@ -56,7 +56,7 @@ final class SectionController: CommonController {
 		let r = rowControllers[rowIndex] as! SectionRow
 		let section = r.section?.rawValue ?? -1
 		pushController(withName: "ListController", context: [
-			SECTION_KEY: NSNumber(value: section),
+			SECTION_KEY: section,
 			TYPE_KEY: r.type!,
 			UNREAD_KEY: section == -1,
 			GROUP_KEY: r.groupLabel!,

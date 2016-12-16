@@ -144,11 +144,11 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 		case "item_list":
 			buildItemList(type: message["type"] as! String,
-			              sectionIndex: (message["sectionIndex"] as! NSNumber).int64Value,
-			              from: (message["from"] as! NSNumber).intValue,
+			              sectionIndex: message["sectionIndex"] as! Int64,
+			              from: message["from"] as! Int,
 			              apiServerUri: message["apiUri"] as! String,
 			              group: message["group"] as! String,
-			              count: (message["count"] as! NSNumber).intValue,
+			              count: message["count"] as! Int,
 			              onlyUnread: message["onlyUnread"] as! Bool,
 			              replyHandler: replyHandler)
 
@@ -223,8 +223,8 @@ final class WatchManager : NSObject, WCSessionDelegate {
 	private func baseDataForItem(item: ListableItem, showStatuses: Bool, showLabels: Bool) -> [String : Any] {
 
 		var itemData: [String : Any] = [
-			"commentCount": NSNumber(value: item.totalComments),
-			"unreadCount": NSNumber(value: item.unreadComments),
+			"commentCount": item.totalComments,
+			"unreadCount": item.unreadComments,
 			"localId": item.objectID.uriRepresentation().absoluteString,
 		]
 

@@ -1069,8 +1069,8 @@ final class API {
 		getData(in: path, from: pullRequest.apiServer) { data, lastPage, resultCode in
 
 			if let d = data as? [AnyHashable : Any] {
-				if let mergeInfo = d["merged_by"] as? [AnyHashable : Any], let mergeUserId = mergeInfo["id"] as? NSNumber {
-					handleMerging(of: pullRequest, byUserId: mergeUserId.int64Value)
+				if let mergeInfo = d["merged_by"] as? [AnyHashable : Any], let mergeUserId = mergeInfo["id"] as? Int64 {
+					handleMerging(of: pullRequest, byUserId: mergeUserId)
 				} else {
 					handleClosing(of: pullRequest)
 				}
@@ -1222,7 +1222,7 @@ final class API {
 
 					if let d = data as? [AnyHashable : Any] {
 						apiServer.userName = d["login"] as? String
-						apiServer.userId = (d["id"] as? NSNumber)?.int64Value ?? 0
+						apiServer.userId = d["id"] as? Int64 ?? 0
 					} else {
 						apiServer.lastSyncSucceeded = false
 					}
@@ -1247,8 +1247,8 @@ final class API {
 
 		apiQueue.addOperation(ApiOperation(call: "/user", on: apiServer, ignoreLastSync: true) { code, headers, data, error, shouldRetry in
 
-			if let d = data as? [AnyHashable : Any], let userName = d["login"] as? String, let userId = d["id"] as? NSNumber, error == nil {
-				if userName.isEmpty || userId.int64Value <= 0 {
+			if let d = data as? [AnyHashable : Any], let userName = d["login"] as? String, let userId = d["id"] as? Int64, error == nil {
+				if userName.isEmpty || userId <= 0 {
 					let localError = apiError("Could not read a valid user record from this endpoint")
 					callback(localError)
 				} else {

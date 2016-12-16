@@ -1319,7 +1319,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 					r.groupLabel = g.isEmpty ? nil : g
 					serversDirty = true
 					deferredUpdateTimer.push()
-				} else if let index = (object as? NSNumber)?.int64Value {
+				} else if let index = object as? Int64 {
 					if tableColumn?.identifier == "prs" {
 						r.displayPolicyForPrs = index
 					} else if tableColumn?.identifier == "issues" {

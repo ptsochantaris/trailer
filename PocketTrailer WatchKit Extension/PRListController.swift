@@ -25,7 +25,7 @@ final class PRListController: CommonController {
 	override func awake(withContext context: Any?) {
 
 		let c = context as! [AnyHashable : Any]
-		sectionIndex = (c[SECTION_KEY] as! NSNumber).int64Value
+		sectionIndex = c[SECTION_KEY] as! Int64
 		type = c[TYPE_KEY] as! String
 		onlyUnread = c[UNREAD_KEY] as! Bool
 
@@ -59,9 +59,9 @@ final class PRListController: CommonController {
 									  "type": type,
 									  "group": groupLabel!,
 									  "apiUri": apiServerUri!,
-									  "sectionIndex": NSNumber(value: sectionIndex),
-									  "onlyUnread": NSNumber(value: onlyUnread),
-									  "count": NSNumber(value: PAGE_SIZE) ]
+									  "sectionIndex": sectionIndex,
+									  "onlyUnread": onlyUnread,
+									  "count": PAGE_SIZE ]
 
 		if let c = command {
 			params["command"] = c
@@ -77,10 +77,10 @@ final class PRListController: CommonController {
 			}
 		}
 		if let l = loadingBuffer {
-			params["from"] = NSNumber(value: l.count)
+			params["from"] = l.count
 		} else {
 			loadingBuffer = [[AnyHashable : Any]]()
-			params["from"] = NSNumber(value: 0)
+			params["from"] = 0
 		}
 
 		send(request: params)

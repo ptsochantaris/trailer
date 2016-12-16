@@ -19,17 +19,17 @@ final class Repo: DataItem {
 
 	class func syncRepos(from data: [[AnyHashable : Any]]?, server: ApiServer) {
 		let filteredData = data?.filter { info -> Bool in
-			if (info["private"] as? NSNumber)?.boolValue ?? false {
+			if info["private"] as? Bool ?? false {
 				if let permissions = info["permissions"] as? [AnyHashable : Any] {
 
-					let pull = (permissions["pull"] as? NSNumber)?.boolValue ?? false
-					let push = (permissions["push"] as? NSNumber)?.boolValue ?? false
-					let admin = (permissions["admin"] as? NSNumber)?.boolValue ?? false
+					let pull = permissions["pull"] as? Bool ?? false
+					let push = permissions["push"] as? Bool ?? false
+					let admin = permissions["admin"] as? Bool ?? false
 
-					if	pull || push || admin {
+					if pull || push || admin {
 						return true
-					} else {
-						DLog("Watched private repository '%@' seems to be inaccessible, skipping", info["full_name"] as? String)
+					} else if let fullName = info["full_name"] as? String {
+						DLog("Watched private repository '%@' seems to be inaccessible, skipping", fullName)
 					}
 				}
 				return false
@@ -40,11 +40,11 @@ final class Repo: DataItem {
 		items(with: filteredData, type: Repo.self, server: server) { item, info, newOrUpdated in
 			if newOrUpdated {
 				item.fullName = info["full_name"] as? String
-				item.fork = (info["fork"] as? NSNumber)?.boolValue ?? false
+				item.fork = info["fork"] as? Bool ?? false
 				item.webUrl = info["html_url"] as? String
 				item.dirty = true
 				item.inaccessible = false
-				item.ownerId = ((info["owner"] as? [AnyHashable : Any])?["id"] as? NSNumber)?.int64Value ?? 0
+				item.ownerId = (info["owner"] as? [AnyHashable : Any])?["id"] as? Int64 ?? 0
 				item.lastDirtied = Date()
 			}
 		}

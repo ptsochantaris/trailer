@@ -21,7 +21,7 @@ final class PullRequest: ListableItem {
 
 				item.baseSync(from: info, in: repo)
 
-				item.mergeable = (info["mergeable"] as? NSNumber)?.boolValue ?? true
+				item.mergeable = info["mergeable"] as? Bool ?? true
 
 				if let linkInfo = info["_links"] as? [AnyHashable : Any] {
 					item.issueCommentLink = (linkInfo["comments"] as? [AnyHashable : Any])?["href"] as? String
