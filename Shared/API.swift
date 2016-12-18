@@ -235,10 +235,10 @@ final class API {
 			let side = 40.0*GLOBAL_SCREEN_SCALE
 			let absolutePath = "\(path)\(connector)s=\(side)"
 		#else
-			let absolutePath = "\(path)\(connector)s=88"
+			let absolutePath = "\(path)\(connector)s=104"
 		#endif
 		let imageKey = "\(absolutePath) \(currentAppVersion)"
-		let cachePath = cacheDirectory.appending(pathComponent: "imgcache-\(imageKey.md5hashed).jpg")
+		let cachePath = cacheDirectory.appending(pathComponent: "imgcache-\(imageKey.md5hashed)")
 
 		let fileManager = FileManager.default
 		if fileManager.fileExists(atPath: cachePath) {

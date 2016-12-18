@@ -1,17 +1,24 @@
 
 final class AvatarView: NSImageView {
 
-	var spinner: NSProgressIndicator?
-
 	init(frame frameRect: NSRect, url: String) {
 		super.init(frame: frameRect)
 		imageAlignment = .alignCenter
+		imageScaling = .scaleProportionallyUpOrDown
+
+		var spinner: NSProgressIndicator?
+
 		if (!API.haveCachedAvatar(from: url) { [weak self] img, _ in
 			guard let s = self else { return }
 			s.image = img
-			s.done()
+			spinner?.stopAnimation(nil)
+			spinner?.removeFromSuperview()
 		}) {
-			startSpinner()
+			let s = NSProgressIndicator(frame: bounds.insetBy(dx: 6.0, dy: 6.0))
+			s.style = .spinningStyle
+			addSubview(s)
+			s.startAnimation(self)
+			spinner = s
 		}
 	}
 
@@ -24,20 +31,6 @@ final class AvatarView: NSImageView {
 
 	required init?(coder: NSCoder) {
 	    fatalError("init(coder:) has not been implemented")
-	}
-
-	func startSpinner() {
-		let s = NSProgressIndicator(frame: bounds.insetBy(dx: 6.0, dy: 6.0))
-		s.style = .spinningStyle
-		addSubview(s)
-		s.startAnimation(self)
-		spinner = s
-	}
-
-	func done() {
-		spinner?.stopAnimation(nil)
-		spinner?.removeFromSuperview()
-		spinner = nil
 	}
 
     override var allowsVibrancy: Bool {
