@@ -308,7 +308,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 		let d = NSUserNotificationCenter.default
 		if let c = item as? PRComment, let url = c.avatarUrl, !Settings.hideAvatars {
-			_ = API.haveCachedAvatar(from: url) { image, _ in
+			API.haveCachedAvatar(from: url) { image, _ in
 				notification.contentImage = image
 				d.deliver(notification)
 			}
@@ -499,12 +499,13 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		let ext = url.pathExtension
 		if ext == "trailerSettings" {
 			DLog("Will open %@", url.absoluteString)
-			_ = tryLoadSettings(from: url, skipConfirm: Settings.dontConfirmSettingsImport)
+			tryLoadSettings(from: url, skipConfirm: Settings.dontConfirmSettingsImport)
 			return true
 		}
 		return false
 	}
 
+	@discardableResult
 	func tryLoadSettings(from url: URL, skipConfirm: Bool) -> Bool {
 		if appIsRefreshing {
 			let alert = NSAlert()
@@ -753,7 +754,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				let options = [key: NSNumber(value: (AXIsProcessTrusted() == false))] as CFDictionary
 				if AXIsProcessTrustedWithOptions(options) == true {
 					globalKeyMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { [weak self] incomingEvent in
-						_ = self?.checkForHotkey(in: incomingEvent)
+						self?.checkForHotkey(in: incomingEvent)
 					}
 				}
 			}
@@ -941,6 +942,7 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 		return nil
 	}
 
+	@discardableResult
 	private func checkForHotkey(in incomingEvent: NSEvent) -> Bool {
 		var check = 0
 

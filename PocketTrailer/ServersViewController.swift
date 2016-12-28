@@ -9,7 +9,7 @@ final class ServersViewController: UITableViewController {
 
 	@IBAction func doneSelected() {
 		if preferencesDirty {
-			_ = app.startRefresh()
+			app.startRefresh()
 		}
 		dismiss(animated: true, completion: nil)
 	}

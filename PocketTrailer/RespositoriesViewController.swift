@@ -13,7 +13,7 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 
 	@IBAction func done(_ sender: UIBarButtonItem) {
 		if preferencesDirty {
-			_ = app.startRefresh()
+			app.startRefresh()
 		}
 		dismiss(animated: true, completion: nil)
 	}

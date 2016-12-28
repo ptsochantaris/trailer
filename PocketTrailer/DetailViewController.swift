@@ -122,7 +122,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 
 		catchupWithComments()
 		if splitViewController?.isCollapsed ?? true {
-			_ = becomeFirstResponder()
+			becomeFirstResponder()
 		}
 	}
 
@@ -138,6 +138,7 @@ final class DetailViewController: UIViewController, WKNavigationDelegate {
 		}
 	}
 
+	@discardableResult
 	override func becomeFirstResponder() -> Bool {
 		if detailItem != nil {
 			return webView?.becomeFirstResponder() ?? false

@@ -125,20 +125,20 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 		if let l = Settings.lastSuccessfulRefresh {
 			let howLongAgo = Date().timeIntervalSince(l)
 			if fabs(howLongAgo) > TimeInterval(Settings.refreshPeriod) {
-				_ = startRefresh()
+				startRefresh()
 			} else {
 				let howLongUntilNextSync = TimeInterval(Settings.refreshPeriod) - howLongAgo
 				DLog("No need to refresh yet, will refresh in %@", howLongUntilNextSync)
 				refreshTimer = Timer.scheduledTimer(timeInterval: howLongUntilNextSync, target: self, selector: #selector(refreshTimerDone), userInfo: nil, repeats: false)
 			}
 		} else {
-			_ = startRefresh()
+			startRefresh()
 		}
 	}
 
 	func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
 		backgroundCallback = completionHandler
-		_ = startRefresh()
+		startRefresh()
 	}
 
 	private func checkApiUsage() {
@@ -180,6 +180,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 		DLog("Starting refresh")
 	}
 
+	@discardableResult
 	func startRefresh() -> Bool {
 
 		if appIsRefreshing || !API.hasNetworkConnection || !ApiServer.someServersHaveAuthTokens(in: DataManager.main) {
@@ -244,8 +245,7 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 
 	func refreshTimerDone() {
 		if DataManager.appIsConfigured {
-			_ =
-				startRefresh()
+			startRefresh()
 		}
 	}
 

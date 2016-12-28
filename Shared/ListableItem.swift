@@ -757,7 +757,7 @@ class ListableItem: DataItem {
 		}
 
 		if let i = userAvatarUrl, !Settings.hideAvatars {
-			_ = API.haveCachedAvatar(from: i) { _, cachePath in
+			API.haveCachedAvatar(from: i) { _, cachePath in
 				s.thumbnailURL = URL(string: "file://\(cachePath)")
 				completeIndex(withSet: s)
 			}

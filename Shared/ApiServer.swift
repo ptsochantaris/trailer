@@ -105,10 +105,11 @@ final class ApiServer: NSManagedObject {
 		f.fetchLimit = 1
 		let numberOfExistingApiServers = try! moc.count(for: f)
 		if numberOfExistingApiServers==0 {
-			_ = addDefaultGithub(in: moc)
+			addDefaultGithub(in: moc)
 		}
 	}
 
+	@discardableResult
 	class func addDefaultGithub(in moc: NSManagedObjectContext) -> ApiServer {
 		let githubServer = insertNewServer(in: moc)
 		githubServer.resetToGithub()

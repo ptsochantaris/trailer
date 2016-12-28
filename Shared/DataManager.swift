@@ -198,7 +198,7 @@ final class DataManager {
 			i.postSyncAction = PostSyncAction.doNothing.rawValue
 		}
 
-		_ = saveDB()
+		saveDB()
 
 		NotificationQueue.commit()
 	}

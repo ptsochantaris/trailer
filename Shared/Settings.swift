@@ -143,7 +143,7 @@ final class Settings {
 	private static let saveTimer = { () -> PopTimer in
 		return PopTimer(timeInterval: 2.0) {
 			if let e = Settings.lastExportUrl {
-				_ = Settings.writeToURL(e)
+				Settings.writeToURL(e)
 			}
 		}
 	}()
@@ -175,6 +175,7 @@ final class Settings {
 
 	///////////////////////////////// IMPORT / EXPORT
 
+	@discardableResult
 	class func writeToURL(_ url: URL) -> Bool {
 
 		saveTimer.invalidate()

@@ -59,7 +59,7 @@ final class WatchManager : NSObject, WCSessionDelegate {
 
 			case "refresh":
 				let lastSuccessfulSync = Settings.lastSuccessfulRefresh ?? Date()
-				_ = app.startRefresh()
+				app.startRefresh()
 				DispatchQueue.global().async {
 					while appIsRefreshing { Thread.sleep(forTimeInterval: 0.1) }
 					atNextEvent {

@@ -898,7 +898,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		s.allowedFileTypes = ["trailerSettings"]
 		s.beginSheetModal(for: self) { response in
 			if response == NSFileHandlingPanelOKButton, let url = s.url {
-				_ = Settings.writeToURL(url)
+				Settings.writeToURL(url)
 				DLog("Exported settings to %@", url.absoluteString)
 			}
 		}
@@ -915,7 +915,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		o.beginSheetModal(for: self) { response in
 			if response == NSFileHandlingPanelOKButton, let url = o.url {
 				atNextEvent {
-					_ = app.tryLoadSettings(from: url, skipConfirm: Settings.dontConfirmSettingsImport)
+					app.tryLoadSettings(from: url, skipConfirm: Settings.dontConfirmSettingsImport)
 				}
 			}
 		}

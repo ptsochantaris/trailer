@@ -365,7 +365,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	func keyFocusDetailView() {
 		showDetailViewController(detailViewController.navigationController ?? detailViewController, sender: self)
-		_ = detailViewController.becomeFirstResponder()
+		detailViewController.becomeFirstResponder()
 	}
 
 	func keyOpenInSafari() {

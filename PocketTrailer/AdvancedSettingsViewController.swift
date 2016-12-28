@@ -262,7 +262,7 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 	private var importExport: ImportExport!
 
 	@IBAction func done(_ sender: UIBarButtonItem) {
-		if preferencesDirty { _ = app.startRefresh() }
+		if preferencesDirty { app.startRefresh() }
 		dismiss(animated: true, completion: nil)
 	}
 

@@ -61,6 +61,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 		}
 	}
 
+	@discardableResult
 	private func updateServerFromForm() -> ApiServer? {
 		if let sid = serverId {
 			let a = existingObject(with: sid) as! ApiServer
@@ -92,11 +93,11 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 	}
 
 	@IBAction func reportChanged(_ sender: UISwitch) {
-		_ = updateServerFromForm()
+		updateServerFromForm()
 	}
 
 	func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
-		_ = updateServerFromForm()
+		updateServerFromForm()
 		return true
 	}
 

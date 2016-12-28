@@ -201,6 +201,7 @@ final class API {
 		}
 	}
 
+	@discardableResult
 	class func haveCachedAvatar(from path: String, callback: @escaping (IMAGE_CLASS?, String) -> Void) -> Bool {
 
 		func getImage(at path: String, completion: @escaping (_ data: Data?) -> Void) {
