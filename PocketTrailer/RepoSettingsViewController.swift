@@ -35,7 +35,6 @@ final class RepoSettingsViewController: UITableViewController, UITextFieldDelega
 		super.viewDidLayoutSubviews()
 	}
 
-
 	override func numberOfSections(in tableView: UITableView) -> Int {
 		return 3
 	}
