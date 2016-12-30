@@ -283,13 +283,12 @@ extension String {
 		return trimmingCharacters(in: .whitespacesAndNewlines)
 	}
 	var md5hashed: String {
-		let digestLen = Int(CC_MD5_DIGEST_LENGTH)
-		let result = UnsafeMutablePointer<CUnsignedChar>.allocate(capacity: digestLen)
 
-		CC_MD5(
-			self.cString(using: String.Encoding.utf8)!,
-			CC_LONG(self.lengthOfBytes(using: String.Encoding.utf8)),
-			result)
+		let digestLen = Int(CC_MD5_DIGEST_LENGTH)
+		let result = UnsafeMutablePointer<UInt8>.allocate(capacity: digestLen)
+
+		let chars = cString(using: .utf8)!
+		CC_MD5(chars, CC_LONG(strlen(chars)), result)
 
 		var hash = String()
 		for i in 0..<digestLen {
@@ -297,7 +296,7 @@ extension String {
 			hash.append(digit)
 		}
 
-		result.deinitialize()
+		result.deallocate(capacity: digestLen)
 		return hash
 	}
 }

@@ -204,13 +204,16 @@ final class API {
 	@discardableResult
 	class func haveCachedAvatar(from path: String, callback: @escaping (IMAGE_CLASS?, String) -> Void) -> Bool {
 
-		func getImage(at path: String, completion: @escaping (_ data: Data?) -> Void) {
+		func getImage(at imagePath: String, completion: @escaping (Data?) -> Void) {
 
-			let url = URL(string: path)!
+			guard let url = URL(string: imagePath) else {
+				completion(nil)
+				return
+			}
 			let task = urlSession.dataTask(with: url) { data, response, error in
 
-				if error == nil, let r = response as? HTTPURLResponse, r.statusCode < 300, r.expectedContentLength == Int64(data?.count ?? 0) {
-					completion(data)
+				if error == nil, let d = data, let r = response as? HTTPURLResponse, r.statusCode < 300, r.expectedContentLength == Int64(d.count) {
+					completion(d)
 				} else {
 					completion(nil)
 				}
@@ -263,11 +266,12 @@ final class API {
 			}
 		}
 
+
 		getImage(at: absolutePath) { data in
 
 			var result: IMAGE_CLASS?
 			#if os(iOS)
-				if let d = data, let i = IMAGE_CLASS(data: d, scale: GLOBAL_SCREEN_SCALE) {
+				if let d = data, let i = UIImage(data: d, scale: GLOBAL_SCREEN_SCALE) {
 					result = i
 					if let imageData = UIImageJPEGRepresentation(i, 1.0) {
 						try! imageData.write(to: URL(fileURLWithPath: cachePath), options: .atomic)
