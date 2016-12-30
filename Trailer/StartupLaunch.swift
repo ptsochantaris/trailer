@@ -14,7 +14,7 @@ final class StartupLaunch: NSObject {
 
 				let appUrl = URL(fileURLWithPath: Bundle.main.bundlePath)
 				let itemUrl = UnsafeMutablePointer<Unmanaged<CFURL>?>.allocate(capacity: 1)
-				defer { itemUrl.deinitialize() }
+				defer { itemUrl.deallocate(capacity: 1) }
 
 				for i in loginItems {
 					if let itemUrl = LSSharedFileListItemCopyResolvedURL(i, 0, nil), itemUrl.takeRetainedValue() as URL == appUrl {
