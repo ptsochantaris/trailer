@@ -7,6 +7,22 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.5.3</title>
+			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Have a happy 2017!</li>
+				<li>Various optimisations and fixes, including a slow but consistent memory leak.</li>
+				</ul></font>]]></description>
+			<pubDate>Sun, 1 Jan 2017 13:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer153.zip"
+			sparkle:version="1398"
+			sparkle:shortVersionString="1.5.3"
+			sparkle:dsaSignature="MC0CFC1eb3y7Rr/0UUpvIpwnXRMD5yDtAhUAgIb7MF1zxLLiFpvT5MAmRUFi+50="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.5.2</title>
 			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
@@ -158,6 +174,6 @@
 			sparkle:dsaSignature="MC0CFQDbfcTA6JD+gsHEAh1ApKS5i9q4owIUIbQdLa3OTr3/nzaR5/9UWlGWI8U="
 			type="application/octet-stream"/>
 		</item>
-
+		
 	</channel>
 </rss>
