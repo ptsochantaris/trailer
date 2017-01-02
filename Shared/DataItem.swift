@@ -50,7 +50,7 @@ class DataItem: NSManagedObject {
 		f.relationshipKeyPathsForPrefetching = prefetchRelationships
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false
-		f.predicate = NSPredicate(format:"serverId in %@ and apiServer == %@", idsOfItems.map { NSNumber(value: $0) }, server)
+		f.predicate = NSPredicate(format:"serverId in %@ and apiServer == %@", idsOfItems, server)
 		let existingItems = try! server.managedObjectContext?.fetch(f) ?? []
 
 		for i in existingItems {
