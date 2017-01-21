@@ -80,6 +80,7 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 				showMessage("Error", "Could not refresh repository list from \(serverNames), please ensure that the tokens you are using are valid")
 				NotificationQueue.clear()
 			} else {
+				DataItem.nukeDeletedItems(in: tempContext)
 				try! tempContext.save()
 				NotificationQueue.commit()
 			}

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11542" systemVersion="16B2555" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16C67" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11542"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
         <capability name="box content view" minToolsVersion="7.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -310,7 +310,7 @@ Token</string>
                                     </subviews>
                                 </view>
                             </tabViewItem>
-                            <tabViewItem label="Watchlist" identifier="1" id="8ZQ-7Z-tCc">
+                            <tabViewItem label="Repositories" identifier="1" id="8ZQ-7Z-tCc">
                                 <view key="view" id="SdJ-82-U77">
                                     <rect key="frame" x="10" y="33" width="736" height="366"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -320,7 +320,7 @@ Token</string>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <clipView key="contentView" id="hCD-zR-3bF">
                                                 <rect key="frame" x="1" y="0.0" width="707" height="254"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" rowHeight="20" headerView="qia-ub-v1J" id="6pK-a1-URw">
                                                         <rect key="frame" x="0.0" y="0.0" width="707" height="237"/>
@@ -463,21 +463,6 @@ Token</string>
                                                 </subviews>
                                             </view>
                                         </box>
-                                        <button verticalHuggingPriority="750" id="u1W-mu-uId">
-                                            <rect key="frame" x="553" y="10" width="176" height="32"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                                            <buttonCell key="cell" type="push" title="Reload Watchlist Now" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="rFG-sc-WB2">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="refreshReposSelected:" target="vQH-WF-vh2" id="PE1-3B-9jc"/>
-                                            </connections>
-                                        </button>
-                                        <progressIndicator horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" id="5Hk-e1-cSC">
-                                            <rect key="frame" x="535" y="19" width="16" height="16"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                                        </progressIndicator>
                                         <popUpButton id="mZx-Vy-AUF">
                                             <rect key="frame" x="481" y="71" width="120" height="26"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
@@ -526,6 +511,17 @@ Token</string>
                                                 <action selector="allHidingPolicySelected:" target="vQH-WF-vh2" id="Ntp-YN-OWp"/>
                                             </connections>
                                         </popUpButton>
+                                        <button verticalHuggingPriority="750" misplaced="YES" id="job-mY-WCa">
+                                            <rect key="frame" x="613" y="10" width="112" height="32"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                                            <buttonCell key="cell" type="push" title="Advanced..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="tYw-dG-RhG">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="advancedSelected:" target="vQH-WF-vh2" id="oUW-kJ-sxc"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                 </view>
                             </tabViewItem>
@@ -597,23 +593,6 @@ Token</string>
                                                         <rect key="frame" x="16" y="16" width="263" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Refresh items every 3600 seconds" id="tcS-Fj-NKu">
-                                                            <font key="font" metaFont="system"/>
-                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
-                                                    <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="ThS-Id-Gqm">
-                                                        <rect key="frame" x="279" y="39" width="19" height="27"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <stepperCell key="cell" continuous="YES" alignment="left" minValue="2" maxValue="99999" doubleValue="2" id="hrN-wT-iMM"/>
-                                                        <connections>
-                                                            <action selector="newRepoCheckChanged:" target="vQH-WF-vh2" id="bLc-qI-O36"/>
-                                                        </connections>
-                                                    </stepper>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="XcM-W3-Ec0">
-                                                        <rect key="frame" x="16" y="45" width="263" height="17"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Refresh repos &amp; teams every 2 hours" id="0Sb-5H-BRV">
                                                             <font key="font" metaFont="system"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1379,7 +1358,7 @@ to a higher number in order to keep your API usage reasonable</string>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" heightSizable="YES"/>
                                             <clipView key="contentView" id="Fou-QI-zfT">
                                                 <rect key="frame" x="1" y="1" width="311" height="299"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnSelection="YES" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" rowHeight="20" id="EjH-yo-GqO">
                                                         <rect key="frame" x="0.0" y="0.0" width="311" height="299"/>
@@ -1980,7 +1959,6 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
             </view>
             <contentBorderThickness minY="32"/>
             <connections>
-                <outlet property="activityDisplay" destination="5Hk-e1-cSC" id="0LR-Kz-dDV"/>
                 <outlet property="allHidingSetting" destination="8qH-xP-gTK" id="0Hn-P8-5So"/>
                 <outlet property="allIssuesSetting" destination="gC3-is-WyN" id="z1A-Ml-Vr8"/>
                 <outlet property="allNewIssuesSetting" destination="ZgQ-VU-aMD" id="I7H-lJ-aUx"/>
@@ -2050,15 +2028,11 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="prClosedPolicy" destination="MUp-kA-DZp" id="DGy-L6-M2g"/>
                 <outlet property="prMergedPolicy" destination="DVS-bf-HmU" id="Gwx-ca-3c7"/>
                 <outlet property="projectsTable" destination="6pK-a1-URw" id="QBD-3b-mDC"/>
-                <outlet property="refreshButton" destination="u1W-mu-uId" id="hOr-8y-HxK"/>
                 <outlet property="refreshDurationLabel" destination="Zu0-k7-csJ" id="5yQ-AM-EsR"/>
                 <outlet property="refreshDurationStepper" destination="INA-l0-fZh" id="35s-aN-LXk"/>
                 <outlet property="refreshItemsLabel" destination="Zu0-k7-csJ" id="AO0-BB-6OZ"/>
-                <outlet property="refreshReposLabel" destination="XcM-W3-Ec0" id="JeY-7D-ssA"/>
                 <outlet property="removeNotificationsWhenItemIsRemoved" destination="KUQ-Bv-dT9" id="RsE-CS-OgZ"/>
                 <outlet property="repeatLastExportAutomatically" destination="pwT-Fi-3FC" id="KcG-kA-cIo"/>
-                <outlet property="repoCheckLabel" destination="XcM-W3-Ec0" id="xdn-MT-IXs"/>
-                <outlet property="repoCheckStepper" destination="ThS-Id-Gqm" id="Cfs-Fa-4ac"/>
                 <outlet property="repoFilter" destination="Qfh-lH-HFg" id="Ezf-Zw-jxe"/>
                 <outlet property="serverList" destination="wPh-gi-N9t" id="B6u-Jh-imO"/>
                 <outlet property="showAllComments" destination="UGp-d4-lNW" id="nt3-bL-T3b"/>

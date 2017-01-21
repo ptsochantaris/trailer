@@ -16,8 +16,9 @@ final class Repo: DataItem {
 	@NSManaged var pullRequests: Set<PullRequest>
 	@NSManaged var issues: Set<Issue>
 	@NSManaged var ownerId: Int64
+	@NSManaged var manuallyAdded: Bool
 
-	class func syncRepos(from data: [[AnyHashable : Any]]?, server: ApiServer) {
+	class func syncRepos(from data: [[AnyHashable : Any]]?, server: ApiServer, addNewRepos: Bool, deleteGoneRepos: Bool, manuallyAdded: Bool) {
 		let filteredData = data?.filter { info -> Bool in
 			if info["private"] as? Bool ?? false {
 				if let permissions = info["permissions"] as? [AnyHashable : Any] {
@@ -37,7 +38,8 @@ final class Repo: DataItem {
 				return true
 			}
 		}
-		items(with: filteredData, type: Repo.self, server: server) { item, info, newOrUpdated in
+
+		items(with: filteredData, type: Repo.self, server: server, createNewItems: addNewRepos) { item, info, newOrUpdated in
 			if newOrUpdated {
 				item.fullName = info["full_name"] as? String
 				item.fork = info["fork"] as? Bool ?? false
@@ -46,6 +48,20 @@ final class Repo: DataItem {
 				item.inaccessible = false
 				item.ownerId = (info["owner"] as? [AnyHashable : Any])?["id"] as? Int64 ?? 0
 				item.lastDirtied = Date()
+				item.manuallyAdded = manuallyAdded
+			}
+		}
+
+		let reposThatWouldBeDeleted = Repo.items(of: Repo.self, surviving: false, in: server.managedObjectContext!)
+		if deleteGoneRepos { // never auto-delete manually added repos
+			for r in reposThatWouldBeDeleted {
+				if r.manuallyAdded {
+					r.postSyncAction = PostSyncAction.doNothing.rawValue
+				}
+			}
+		} else { // Ignore any missing repos in all cases if deleteGoneRepos is false
+			for r in reposThatWouldBeDeleted {
+				r.postSyncAction = PostSyncAction.doNothing.rawValue
 			}
 		}
 	}

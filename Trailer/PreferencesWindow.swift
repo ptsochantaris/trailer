@@ -17,8 +17,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	}
 
 	// Preferences window
-	@IBOutlet weak var refreshButton: NSButton!
-	@IBOutlet weak var activityDisplay: NSProgressIndicator!
 	@IBOutlet weak var projectsTable: NSTableView!
 	@IBOutlet weak var versionNumber: NSTextField!
 	@IBOutlet weak var launchAtStartup: NSButton!
@@ -32,8 +30,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var includeRepositoriesInFiltering: NSButton!
 	@IBOutlet weak var groupByRepo: NSButton!
 	@IBOutlet weak var markUnmergeableOnUserSectionsOnly: NSButton!
-	@IBOutlet weak var repoCheckLabel: NSTextField!
-	@IBOutlet weak var repoCheckStepper: NSStepper!
 	@IBOutlet weak var countOnlyListedItems: NSButton!
 	@IBOutlet weak var checkForUpdatesAutomatically: NSButton!
 	@IBOutlet weak var checkForUpdatesLabel: NSTextField!
@@ -82,7 +78,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
     @IBOutlet weak var includeServersInFiltering: NSButton!
     @IBOutlet weak var includeUsersInFiltering: NSButton!
 	@IBOutlet weak var includeNumbersInFiltering: NSButton!
-	@IBOutlet weak var refreshReposLabel: NSTextField!
 	@IBOutlet weak var refreshItemsLabel: NSTextField!
 	@IBOutlet weak var showCreationDates: NSButton!
 	@IBOutlet weak var hideAvatars: NSButton!
@@ -210,7 +205,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		repoFilter.toolTip = "Quickly find a repository you are looking for by typing some text in there. Productivity tip: If you use the buttons on the right to set visibility of 'all' items, those settings will apply to only the visible filtered items."
 		allNewPrsSetting.toolTip = "The visibility settings you would like to apply by default for Pull Requests if a new repository is added in your watchlist."
 		allNewIssuesSetting.toolTip = "The visibility settings you would like to apply by default for Pull Requests if a new repository is added in your watchlist."
-		refreshButton.toolTip = "Reload all watchlists now. Normally Trailer does this by itself every few hours. You can control how often from the 'Display' tab."
 		launchAtStartup.toolTip = "Automatically launch Trailer when you log in."
 		allPrsSetting.toolTip = "Set the PR visibility of all (or the currently selected/filtered) repositories"
 		allIssuesSetting.toolTip = "Set the issue visibility of all (or the currently selected/filtered) repositories"
@@ -237,8 +231,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		includeUsersInFiltering.toolTip = Settings.includeUsersInFilterHelp
 		includeNumbersInFiltering.toolTip = Settings.includeNumbersInFilterHelp
 		grayOutWhenRefreshing.toolTip = Settings.grayOutWhenRefreshingHelp
-		refreshReposLabel.toolTip = Settings.newRepoCheckPeriodHelp
-		repoCheckStepper.toolTip = Settings.newRepoCheckPeriodHelp
 		refreshItemsLabel.toolTip = Settings.refreshPeriodHelp
 		refreshDurationStepper.toolTip = Settings.refreshPeriodHelp
 		prMergedPolicy.toolTip = Settings.mergeHandlingPolicyHelp
@@ -387,9 +379,6 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 		hotkeyEnable.isEnabled = true
 
-		repoCheckStepper.floatValue = Settings.newRepoCheckPeriod
-		newRepoCheckChanged(nil)
-
 		refreshDurationStepper.floatValue = min(Settings.refreshPeriod, 3600)
 		refreshDurationChanged(nil)
 
@@ -400,18 +389,16 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	func updateActivity() {
 		if appIsRefreshing {
-			refreshButton.isEnabled = false
 			projectsTable.isEnabled = false
 			allPrsSetting.isEnabled = false
 			allIssuesSetting.isEnabled = false
-			activityDisplay.startAnimation(nil)
 		} else {
-			refreshButton.isEnabled = ApiServer.someServersHaveAuthTokens(in: DataManager.main)
 			projectsTable.isEnabled = true
 			allPrsSetting.isEnabled = true
 			allIssuesSetting.isEnabled = true
-			activityDisplay.stopAnimation(nil)
+			projectsTable.reloadData()
 		}
+		advancedReposWindow?.updateActivity()
 	}
 
 	@IBAction func showLabelsSelected(_ sender: NSButton) {
@@ -816,7 +803,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		StartupLaunch.setLaunchOnLogin(sender.integerValue==1)
 	}
 
-	@IBAction func refreshReposSelected(_ sender: NSButton?) {
+	func refreshRepos() {
 		app.prepareForRefresh()
 
 		let tempContext = DataManager.buildChildContext()
@@ -843,6 +830,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 				} catch {
 				}
 			}
+			DataItem.nukeDeletedItems(in: DataManager.main)
 			app.completeRefresh()
 		}
 	}
@@ -1083,12 +1071,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		refreshDurationLabel.stringValue = "Refresh items every \(refreshDurationStepper.integerValue) seconds"
 	}
 
-	@IBAction func newRepoCheckChanged(_ sender: NSStepper?) {
-		Settings.newRepoCheckPeriod = repoCheckStepper.floatValue
-		repoCheckLabel.stringValue = "Refresh repos & teams every \(repoCheckStepper.integerValue) hours"
-	}
-
 	func windowWillClose(_ notification: Notification) {
+		advancedReposWindow?.close()
 		if ApiServer.someServersHaveAuthTokens(in: DataManager.main) && preferencesDirty {
 			app.startRefresh()
 		} else {
@@ -1154,7 +1138,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			let newIndex = tabView.indexOfTabViewItem(item)
 			if newIndex == 1 {
 				if lastRepoCheck == .distantPast && DataManager.appIsConfigured {
-					refreshReposSelected(nil)
+					refreshRepos()
 				}
 			}
 			Settings.lastPreferencesTabSelectedOSX = newIndex
@@ -1591,4 +1575,24 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 			}
 		}
 	}
+
+	private var advancedReposWindowController: NSWindowController?
+	private var advancedReposWindow: AdvancedReposWindow?
+	@IBAction func advancedSelected(_ sender: NSButton) {
+		if advancedReposWindowController == nil {
+			advancedReposWindowController = NSWindowController(windowNibName:"AdvancedReposWindow")
+		}
+		if let w = advancedReposWindowController?.window as? AdvancedReposWindow {
+			w.prefs = self
+			w.level = Int(CGWindowLevelForKey(CGWindowLevelKey.floatingWindow))
+			w.center()
+			w.makeKeyAndOrderFront(self)
+			advancedReposWindow = w
+		}
+	}
+	func closedAdvancedWindow() {
+		advancedReposWindow = nil
+		advancedReposWindowController = nil
+	}
+
 }

@@ -1199,14 +1199,29 @@ final class API {
 			return
 		}
 
+		let createNewRepos = Settings.automaticallyRemoveDeletedReposFromWatchlist
+		let dropGoneRepos = Settings.automaticallyRemoveDeletedReposFromWatchlist
 		getPagedData(at: "/user/subscriptions", from: server, perPageCallback: { data, lastPage in
-			Repo.syncRepos(from: data, server: server)
+			Repo.syncRepos(from: data, server: server, addNewRepos: createNewRepos, deleteGoneRepos: dropGoneRepos, manuallyAdded: false)
 			return false
 		}) { success, resultCode in
 			if !success {
 				server.lastSyncSucceeded = false
 			}
 			callback()
+		}
+	}
+
+	class func fetchRepo(named: String, owner: String, from server: ApiServer, completion: @escaping (Error?) -> Void) {
+		let path = "\(server.apiPath ?? "")/repos/\(owner)/\(named)"
+		getData(in: path, from: server) { data, lastPage, resultCode in
+			if let repoData = data as? [AnyHashable : Any] {
+				Repo.syncRepos(from: [repoData], server: server, addNewRepos: true, deleteGoneRepos: false, manuallyAdded: true)
+				completion(nil)
+			} else {
+				let error = apiError("Operation failed with code \(resultCode)")
+				completion(error)
+			}
 		}
 	}
 

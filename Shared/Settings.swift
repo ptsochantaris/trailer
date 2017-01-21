@@ -21,7 +21,7 @@ final class Settings {
 			"LAST_EXPORT_URL", "LAST_EXPORT_TIME", "CLOSE_HANDLING_POLICY_2", "MERGE_HANDLING_POLICY_2", "LAST_PREFS_TAB_SELECTED_OSX", "NEW_PR_DISPLAY_POLICY_INDEX", "NEW_ISSUE_DISPLAY_POLICY_INDEX", "HIDE_PRS_THAT_ARENT_PASSING_ONLY_IN_ALL",
             "INCLUDE_SERVERS_IN_FILTER", "INCLUDE_USERS_IN_FILTER", "INCLUDE_TITLES_IN_FILTER", "INCLUDE_NUMBERS_IN_FILTER", "DUMP_API_RESPONSES_IN_CONSOLE", "OPEN_ITEMS_DIRECTLY_IN_SAFARI", "HIDE_PRS_THAT_ARENT_PASSING",
             "REMOVE_RELATED_NOTIFICATIONS_ON_ITEM_REMOVE", "HIDE_SNOOZED_ITEMS", "INCLUDE_MILESTONES_IN_FILTER", "INCLUDE_ASSIGNEE_NAMES_IN_FILTER", "API_SERVERS_IN_SEPARATE_MENUS", "ASSUME_READ_ITEM_IF_USER_HAS_NEWER_COMMENTS",
-            "AUTO_SNOOZE_DAYS", "HIDE_MENUBAR_COUNTS"]
+            "AUTO_SNOOZE_DAYS", "HIDE_MENUBAR_COUNTS", "AUTO_ADD_NEW_REPOS", "AUTO_REMOVE_DELETED_REPOS"]
 	}
 
     class func checkMigration() {
@@ -649,6 +649,18 @@ final class Settings {
 	class var includeLabelsInFilter: Bool {
 		get { return get("INCLUDE_LABELS_IN_FILTER") as? Bool ?? true }
 		set { set("INCLUDE_LABELS_IN_FILTER", newValue) }
+	}
+
+	static let automaticallyAddNewReposFromWatchlistHelp = "Automatically add to Trailer any repos are added to your remote watchlist"
+	class var automaticallyAddNewReposFromWatchlist: Bool {
+		get { return get("AUTO_ADD_NEW_REPOS") as? Bool ?? true }
+		set { set("AUTO_ADD_NEW_REPOS", newValue) }
+	}
+
+	static let automaticallyRemoveDeletedReposFromWatchlistHelp = "Automatically remove from Trailer any (previously automatically added) repos if they are no longer on your remote watchlist"
+	class var automaticallyRemoveDeletedReposFromWatchlist: Bool {
+		get { return get("AUTO_REMOVE_DELETED_REPOS") as? Bool ?? true }
+		set { set("AUTO_REMOVE_DELETED_REPOS", newValue) }
 	}
 
 	static let includeUsersInFilterHelp = "Check the name of the author of an item when selecting it for inclusion in filtered results. You can also prefix a search with 'user:' to specifically search for this."

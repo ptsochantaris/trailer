@@ -29,7 +29,12 @@ class DataItem: NSManagedObject {
 		return try! server.managedObjectContext!.fetch(f)
 	}
 
-	final class func items<T: DataItem>(with data: [[AnyHashable : Any]]?, type: T.Type, server: ApiServer, prefetchRelationships: [String]? = nil, postProcessCallback: (T, [AnyHashable : Any], Bool) -> Void) {
+	final class func items<T: DataItem>(with data: [[AnyHashable : Any]]?,
+	                       type: T.Type,
+	                       server: ApiServer,
+	                       prefetchRelationships: [String]? = nil,
+	                       createNewItems: Bool = true,
+	                       postProcessCallback: (T, [AnyHashable : Any], Bool) -> Void) {
 
 		guard let infos = data, infos.count > 0 else { return }
 
@@ -70,6 +75,8 @@ class DataItem: NSManagedObject {
 				}
 			}
 		}
+
+		if !createNewItems { return }
 
 		for serverId in idsOfItems {
 			if let info = idsToInfo[serverId] {

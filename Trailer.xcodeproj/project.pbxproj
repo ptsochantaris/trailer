@@ -128,6 +128,8 @@
 		16CBE1CA1A2E13A400485053 /* StatusItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CBE1C91A2E13A400485053 /* StatusItemView.swift */; };
 		16CE47851B7755E00086F4DC /* PocketTrailer WatchKit Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 16522D701AB03AE500B1C3FB /* PocketTrailer WatchKit Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		16CE47881B7755E00086F4DC /* PocketTrailer WatchKit App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 16522D7C1AB03AE500B1C3FB /* PocketTrailer WatchKit App.app */; };
+		16DB793C1E326C950076A36D /* AdvancedReposWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16DB793B1E326C950076A36D /* AdvancedReposWindow.swift */; };
+		16DB793E1E326CD90076A36D /* AdvancedReposWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 16DB793D1E326CD90076A36D /* AdvancedReposWindow.xib */; };
 		16DC40FC1A3F591200BB361A /* TrailerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16DC40FB1A3F591200BB361A /* TrailerCell.swift */; };
 		16DD6AAF1AE457C300145425 /* trailerDoc22.png in Resources */ = {isa = PBXBuildFile; fileRef = 16DD6AAB1AE457C300145425 /* trailerDoc22.png */; };
 		16DD6AB01AE457C300145425 /* trailerDoc44.png in Resources */ = {isa = PBXBuildFile; fileRef = 16DD6AAC1AE457C300145425 /* trailerDoc44.png */; };
@@ -357,6 +359,9 @@
 		16CBE1C01A2DBB2700485053 /* DataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = DataManager.swift; path = Shared/DataManager.swift; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16CBE1C41A2DFBA500485053 /* Settings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = Settings.swift; path = Shared/Settings.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16CBE1C91A2E13A400485053 /* StatusItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatusItemView.swift; sourceTree = "<group>"; };
+		16DB793B1E326C950076A36D /* AdvancedReposWindow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdvancedReposWindow.swift; sourceTree = "<group>"; };
+		16DB793D1E326CD90076A36D /* AdvancedReposWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AdvancedReposWindow.xib; sourceTree = "<group>"; };
+		16DB793F1E32D6460076A36D /* Trailer 32.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 32.xcdatamodel"; sourceTree = "<group>"; };
 		16DC40FB1A3F591200BB361A /* TrailerCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = TrailerCell.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16DD6AAB1AE457C300145425 /* trailerDoc22.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = trailerDoc22.png; sourceTree = "<group>"; };
 		16DD6AAC1AE457C300145425 /* trailerDoc44.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = trailerDoc44.png; sourceTree = "<group>"; };
@@ -538,6 +543,8 @@
 				168BC6C217EC2DF000BC4584 /* MainMenu.xib */,
 				160FB13F1AE3F78E00EB5C8E /* PreferencesWindow.swift */,
 				160FB1411AE3F7C700EB5C8E /* PreferencesWindow.xib */,
+				16DB793B1E326C950076A36D /* AdvancedReposWindow.swift */,
+				16DB793D1E326CD90076A36D /* AdvancedReposWindow.xib */,
 			);
 			name = Windows;
 			sourceTree = "<group>";
@@ -1016,6 +1023,7 @@
 				16B94072182D136700F32061 /* dsa_pub.pem in Resources */,
 				160FB1421AE3F7C700EB5C8E /* PreferencesWindow.xib in Resources */,
 				164840C31ACFEFA9009E6383 /* MenuWindow.xib in Resources */,
+				16DB793E1E326CD90076A36D /* AdvancedReposWindow.xib in Resources */,
 				168BC6C917EC2DF000BC4584 /* Images.xcassets in Resources */,
 				16519EB41ACF0E91002171D0 /* Trailer.icns in Resources */,
 				168BC6C417EC2DF000BC4584 /* MainMenu.xib in Resources */,
@@ -1156,6 +1164,7 @@
 				164785AA1A2CE7BD00297764 /* Globals.swift in Sources */,
 				16B3B31B1A34E8E2000BE6CC /* PRComment.swift in Sources */,
 				160D312C1A9619CE006B74BC /* FilledView.swift in Sources */,
+				16DB793C1E326C950076A36D /* AdvancedReposWindow.swift in Sources */,
 				162A29D91A4085FD008F41A9 /* GroupingCriterion.swift in Sources */,
 				16B3B34F1A34E990000BE6CC /* Trailer.xcdatamodeld in Sources */,
 				1633C1921ABCEC4A0086C692 /* Issue.swift in Sources */,
@@ -1590,6 +1599,7 @@
 		16B3B33B1A34E990000BE6CC /* Trailer.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				16DB793F1E32D6460076A36D /* Trailer 32.xcdatamodel */,
 				1605EDCB1D58B71900D91F50 /* Trailer 31.xcdatamodel */,
 				16E07C831D2DC31300B0525C /* Trailer 30.xcdatamodel */,
 				167E399B1CF981D900593204 /* Trailer 29.xcdatamodel */,
@@ -1622,7 +1632,7 @@
 				16B3B34D1A34E990000BE6CC /* Trailer 9.xcdatamodel */,
 				16B3B34E1A34E990000BE6CC /* Trailer.xcdatamodel */,
 			);
-			currentVersion = 1605EDCB1D58B71900D91F50 /* Trailer 31.xcdatamodel */;
+			currentVersion = 16DB793F1E32D6460076A36D /* Trailer 32.xcdatamodel */;
 			name = Trailer.xcdatamodeld;
 			path = ../Shared/Trailer.xcdatamodeld;
 			sourceTree = "<group>";
