@@ -13,6 +13,7 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
+		sizer = table.dequeueReusableCell(withIdentifier: "CustomRepoCellId") as! CustomRepoCell
 		NotificationCenter.default.addObserver(self, selector: #selector(updateRepos), name: RefreshEndedNotification, object: nil)
 	}
 
@@ -44,6 +45,14 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
 		DataManager.main.delete(r)
 		DataManager.saveDB()
 		updateRepos()
+	}
+
+	private var sizer: CustomRepoCell!
+	func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+		sizer.repoLabel.text = repos[indexPath.row].fullName
+		return sizer.systemLayoutSizeFitting(CGSize(width: tableView.bounds.size.width, height: 0),
+		                                     withHorizontalFittingPriority: UILayoutPriorityRequired,
+		                                     verticalFittingPriority: UILayoutPriorityFittingSizeLevel).height
 	}
 
 	@IBOutlet weak var addButton: UIBarButtonItem!
