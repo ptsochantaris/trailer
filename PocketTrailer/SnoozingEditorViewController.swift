@@ -30,7 +30,7 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 					self?.deletePreset()
 				})
 
-				present(a, animated: true, completion: nil)
+				present(a, animated: true)
 
 			} else {
 
@@ -43,7 +43,7 @@ final class SnoozingEditorViewController: UIViewController, UITableViewDelegate,
 					self?.deletePreset()
 				})
 				
-				present(a, animated: true, completion: nil)
+				present(a, animated: true)
 				
 			}
 		}

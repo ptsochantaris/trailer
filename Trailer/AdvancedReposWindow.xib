@@ -22,7 +22,7 @@
                 <rect key="frame" x="0.0" y="0.0" width="638" height="341"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <box fixedFrame="YES" title="Watchlist" translatesAutoresizingMaskIntoConstraints="NO" id="5Cb-9o-n6I">
+                    <box fixedFrame="YES" title="Watchlists and teams memberships" translatesAutoresizingMaskIntoConstraints="NO" id="5Cb-9o-n6I">
                         <rect key="frame" x="17" y="180" width="604" height="146"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <view key="contentView" id="VxC-k3-DWi">
@@ -49,9 +49,9 @@
                                     </connections>
                                 </stepper>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BAK-gw-nC7">
-                                    <rect key="frame" x="224" y="89" width="337" height="17"/>
+                                    <rect key="frame" x="354" y="89" width="207" height="17"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
-                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Re-scan watchlists &amp; team memberships every 2 hours" id="QBp-Kd-qzu">
+                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Re-scan every 2 hours" id="QBp-Kd-qzu">
                                         <font key="font" metaFont="system"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -62,9 +62,9 @@
                                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                 </progressIndicator>
                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KtQ-HN-5dD">
-                                    <rect key="frame" x="18" y="50" width="491" height="18"/>
+                                    <rect key="frame" x="18" y="50" width="543" height="18"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    <buttonCell key="cell" type="check" title="Automatically add any new repos which were added to my watchlist" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Exf-EV-5GR">
+                                    <buttonCell key="cell" type="check" title="Automatically add any new repos which were added to a remote watchlist" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Exf-EV-5GR">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="system"/>
                                     </buttonCell>
@@ -73,9 +73,9 @@
                                     </connections>
                                 </button>
                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jfq-yy-XJ6">
-                                    <rect key="frame" x="18" y="22" width="491" height="18"/>
+                                    <rect key="frame" x="18" y="22" width="543" height="18"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    <buttonCell key="cell" type="check" title="Automatically remove any repos that were removed from my watchlist" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="APA-D6-Apr">
+                                    <buttonCell key="cell" type="check" title="Automatically remove any repos which were removed from a remote watchlist" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="APA-D6-Apr">
                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                         <font key="font" metaFont="system"/>
                                     </buttonCell>

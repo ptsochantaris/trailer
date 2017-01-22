@@ -69,6 +69,6 @@ final class CommentBlacklistViewController: UITableViewController {
 			}
 		}))
 
-		present(a, animated: true, completion: nil)
+		present(a, animated: true)
 	}
 }

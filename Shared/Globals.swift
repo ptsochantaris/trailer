@@ -54,7 +54,7 @@ func showMessage(_ title: String, _ message: String?) {
 
 	let a = UIAlertController(title: title, message: message, preferredStyle: .alert)
 	a.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-	viewController?.present(a, animated: true, completion: nil)
+	viewController?.present(a, animated: true)
 }
 
 #endif

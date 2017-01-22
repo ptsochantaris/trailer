@@ -143,7 +143,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 		if let u = validatedPath?.absoluteString {
 			let s = SFSafariViewController(url: URL(string: u + url)!)
 			s.view.tintColor = self.view.tintColor
-			self.present(s, animated: true, completion: nil)
+			self.present(s, animated: true)
 		}
 	}
 
@@ -157,7 +157,7 @@ final class ServerDetailViewController: UIViewController, UITextFieldDelegate {
 			self?.deleteServer()
 		})
 
-		present(a, animated: true, completion: nil)
+		present(a, animated: true)
 	}
 
 	private func deleteServer() {

@@ -11,7 +11,7 @@ final class ServersViewController: UITableViewController {
 		if preferencesDirty {
 			app.startRefresh()
 		}
-		dismiss(animated: true, completion: nil)
+		dismiss(animated: true)
 	}
 
 	override func viewDidLoad() {

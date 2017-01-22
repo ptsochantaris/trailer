@@ -35,7 +35,7 @@ final class ImportExport: NSObject, UIDocumentPickerDelegate {
 			DLog("Will import settings from %@", url.absoluteString)
 			settingsManager.loadSettingsFrom(url: url, confirmFromView: parentVC) { [weak self] confirmed in
 				if confirmed {
-					self?.parentVC.dismiss(animated: false, completion: nil)
+					self?.parentVC.dismiss(animated: false)
 				}
 				self?.documentInteractionCleanup()
 			}

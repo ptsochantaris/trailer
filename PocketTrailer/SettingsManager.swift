@@ -36,7 +36,7 @@ final class SettingsManager {
 				withCompletion?(false)
 			})
 			atNextEvent {
-				v.present(a, animated: true, completion: nil)
+				v.present(a, animated: true)
 			}
 		} else {
 			loadSettingsFrom(url: url)

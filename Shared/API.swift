@@ -584,7 +584,7 @@ final class API {
 
 		syncUserDetails(in: moc) {
 			for r in DataItem.items(of: Repo.self, surviving: true, in: moc) {
-				r.postSyncAction = PostSyncAction.delete.rawValue
+				r.postSyncAction = r.manuallyAdded ? PostSyncAction.doNothing.rawValue : PostSyncAction.delete.rawValue
 			}
 
 			let allApiServers = ApiServer.allApiServers(in: moc)
@@ -1200,13 +1200,17 @@ final class API {
 		}
 
 		let createNewRepos = Settings.automaticallyRemoveDeletedReposFromWatchlist
-		let dropGoneRepos = Settings.automaticallyRemoveDeletedReposFromWatchlist
 		getPagedData(at: "/user/subscriptions", from: server, perPageCallback: { data, lastPage in
-			Repo.syncRepos(from: data, server: server, addNewRepos: createNewRepos, deleteGoneRepos: dropGoneRepos, manuallyAdded: false)
+			Repo.syncRepos(from: data, server: server, addNewRepos: createNewRepos, manuallyAdded: false)
 			return false
 		}) { success, resultCode in
 			if !success {
 				server.lastSyncSucceeded = false
+			} else if !Settings.automaticallyRemoveDeletedReposFromWatchlist { // Ignore any missing repos in all cases if deleteGoneRepos is false
+				let reposThatWouldBeDeleted = Repo.items(of: Repo.self, surviving: false, in: server.managedObjectContext!)
+				for r in reposThatWouldBeDeleted {
+					r.postSyncAction = PostSyncAction.doNothing.rawValue
+				}
 			}
 			callback()
 		}
@@ -1216,7 +1220,7 @@ final class API {
 		let path = "\(server.apiPath ?? "")/repos/\(owner)/\(named)"
 		getData(in: path, from: server) { data, lastPage, resultCode in
 			if let repoData = data as? [AnyHashable : Any] {
-				Repo.syncRepos(from: [repoData], server: server, addNewRepos: true, deleteGoneRepos: false, manuallyAdded: true)
+				Repo.syncRepos(from: [repoData], server: server, addNewRepos: true, manuallyAdded: true)
 				completion(nil)
 			} else {
 				let error = apiError("Operation failed with code \(resultCode)")

@@ -63,12 +63,12 @@ final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 		let manuallyAddedRepos = Repo.allItems(of: Repo.self, in: DataManager.main).filter { $0.manuallyAdded }
 		if manuallyAddedRepos.count == 0 {
 			let m = NSMenuItem()
-			m.title = "You have not added any repositories manually"
+			m.title = "You have not added any custom repositories"
 			removeRepoList.menu?.addItem(m)
 			removeRepoList.isEnabled = false
 		} else if manuallyAddedRepos.count > 1 {
 			let m = NSMenuItem()
-			m.title = "Select a manually added repository to remove..."
+			m.title = "Select a custom repository to remove..."
 			removeRepoList.menu?.addItem(m)
 			removeRepoList.isEnabled = true
 		}
@@ -83,7 +83,7 @@ final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 
 	@IBAction func newRepoCheckChanged(_ sender: NSStepper?) {
 		Settings.newRepoCheckPeriod = repoCheckStepper.floatValue
-		refreshReposLabel.stringValue = "Re-scan watchlists & team memberships every \(repoCheckStepper.integerValue) hours"
+		refreshReposLabel.stringValue = "Re-scan every \(repoCheckStepper.integerValue) hours"
 	}
 
 	@IBAction func refreshReposSelected(_ sender: NSButton?) {

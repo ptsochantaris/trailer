@@ -83,7 +83,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 		a.addAction(UIAlertAction(title: "Yes", style: .default) { [weak self] action in
 			self?.markAllAsRead()
 		})
-		present(a, animated: true, completion: nil)
+		present(a, animated: true)
 	}
 
 	private func tryRefresh() {
@@ -109,7 +109,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 				a.addAction(UIAlertAction(title: "Remove", style: .destructive) { [weak S] action in
 					S?.removeAllMergedConfirmed()
 				})
-				S.present(a, animated: true, completion: nil)
+				S.present(a, animated: true)
 			}
 		}
 	}
@@ -124,7 +124,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 				a.addAction(UIAlertAction(title: "Remove", style: .destructive) { [weak S] action in
 					S?.removeAllClosedConfirmed()
 				})
-				S.present(a, animated: true, completion: nil)
+				S.present(a, animated: true)
 			}
 		}
 	}
@@ -1014,7 +1014,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 			})
 		}
 		a.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-		present(a, animated: true, completion: nil)
+		present(a, animated: true)
 	}
 
 	private var itemFetchRequest: NSFetchRequest<ListableItem> {

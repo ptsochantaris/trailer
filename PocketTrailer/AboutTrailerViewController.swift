@@ -19,11 +19,11 @@ final class AboutTrailerViewController: UIViewController {
 	@IBAction func linkSelected() {
 		let s = SFSafariViewController(url: URL(string: "https://github.com/ptsochantaris/trailer")!)
 		s.view.tintColor = self.view.tintColor
-		present(s, animated: true, completion: nil)
+		present(s, animated: true)
 	}
 
 	@IBAction func doneSelected() {
 		if preferencesDirty { app.startRefresh() }
-		dismiss(animated: true, completion: nil)
+		dismiss(animated: true)
 	}
 }

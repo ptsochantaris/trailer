@@ -15,7 +15,7 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 		if preferencesDirty {
 			app.startRefresh()
 		}
-		dismiss(animated: true, completion: nil)
+		dismiss(animated: true)
 	}
 
 	override func viewDidLoad() {
@@ -47,7 +47,23 @@ final class RespositoriesViewController: UITableViewController, UISearchBarDeleg
 	}
 
 	@IBAction func actionSelected(_ sender: UIBarButtonItem) {
-		refreshList()
+		let r = UIAlertAction(title: "Refresh teams & watchlists", style: .destructive) { [weak self] a in
+			self?.refreshList()
+		}
+		let w = UIAlertAction(title: "Watchlist & team options...", style: .default) { [weak self] a in
+			self?.performSegue(withIdentifier: "showWatchlistSettings", sender: self)
+		}
+		let c = UIAlertAction(title: "Custom repos...", style: .default) { [weak self] a in
+			self?.performSegue(withIdentifier: "showCustomRepos", sender: self)
+		}
+		let cancel = UIAlertAction(title: "Cancel", style: .cancel)
+
+		let v = UIAlertController(title: "Options", message: nil, preferredStyle: .actionSheet)
+		v.addAction(r)
+		v.addAction(w)
+		v.addAction(c)
+		v.addAction(cancel)
+		present(v, animated: true)
 	}
 
 	@IBAction func setAllPrsSelected(_ sender: UIBarButtonItem) {

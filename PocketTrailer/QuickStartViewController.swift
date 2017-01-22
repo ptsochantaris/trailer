@@ -46,13 +46,13 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 	}
 
 	@IBAction func skipSelected(_ sender: UIBarButtonItem) {
-		dismiss(animated: true, completion: nil)
+		dismiss(animated: true)
 	}
 
 	@IBAction func openGitHubSelected(_ sender: UIButton) {
 		let s = SFSafariViewController(url: URL(string: "https://github.com/settings/tokens/new")!)
 		s.view.tintColor = self.view.tintColor
-		self.present(s, animated: true, completion: nil)
+		self.present(s, animated: true)
 	}
 
 	@IBAction func testSelected(_ sender: UIButton) {

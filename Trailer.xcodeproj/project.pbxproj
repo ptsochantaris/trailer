@@ -87,6 +87,9 @@
 		168FD00E1A2A7AD1005929CB /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 168FD00D1A2A7AD1005929CB /* MessageView.swift */; };
 		16901A451D659E9500141595 /* NotificationQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16901A441D659E9500141595 /* NotificationQueue.swift */; };
 		16901A461D659E9500141595 /* NotificationQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16901A441D659E9500141595 /* NotificationQueue.swift */; };
+		169205641E34DA9F00FB9547 /* CustomReposViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169205631E34DA9F00FB9547 /* CustomReposViewController.swift */; };
+		169205661E34DACA00FB9547 /* WatchlistSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169205651E34DACA00FB9547 /* WatchlistSettingsViewController.swift */; };
+		169205681E34EB4D00FB9547 /* CustomRepoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169205671E34EB4D00FB9547 /* CustomRepoCell.swift */; };
 		169B92961CC52C05002774A8 /* SnoozePreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169B92951CC52C05002774A8 /* SnoozePreset.swift */; };
 		169B92971CC52C05002774A8 /* SnoozePreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169B92951CC52C05002774A8 /* SnoozePreset.swift */; };
 		169FB2361A3DBD7D00E00771 /* SectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169FB2351A3DBD7D00E00771 /* SectionHeader.swift */; };
@@ -313,6 +316,9 @@
 		168C6ECD18B2104100E41D85 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
 		168FD00D1A2A7AD1005929CB /* MessageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageView.swift; sourceTree = "<group>"; };
 		16901A441D659E9500141595 /* NotificationQueue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NotificationQueue.swift; path = Shared/NotificationQueue.swift; sourceTree = "<group>"; };
+		169205631E34DA9F00FB9547 /* CustomReposViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomReposViewController.swift; sourceTree = "<group>"; };
+		169205651E34DACA00FB9547 /* WatchlistSettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WatchlistSettingsViewController.swift; sourceTree = "<group>"; };
+		169205671E34EB4D00FB9547 /* CustomRepoCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomRepoCell.swift; sourceTree = "<group>"; };
 		169B92941CC3E5AD002774A8 /* Trailer 25.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 25.xcdatamodel"; sourceTree = "<group>"; };
 		169B92951CC52C05002774A8 /* SnoozePreset.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = SnoozePreset.swift; path = ../Shared/SnoozePreset.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		169FB2351A3DBD7D00E00771 /* SectionHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SectionHeader.swift; sourceTree = "<group>"; };
@@ -791,6 +797,9 @@
 				165C490F1BA63B45006BBCF5 /* AdvancedSettingsCell.swift */,
 				166ADEC51CCAFF77001BA61F /* SnoozingViewController.swift */,
 				166ADEC71CCB009A001BA61F /* SnoozingEditorViewController.swift */,
+				169205631E34DA9F00FB9547 /* CustomReposViewController.swift */,
+				169205671E34EB4D00FB9547 /* CustomRepoCell.swift */,
+				169205651E34DACA00FB9547 /* WatchlistSettingsViewController.swift */,
 			);
 			name = Settings;
 			sourceTree = "<group>";
@@ -1062,9 +1071,11 @@
 				16B3B3181A34E8E2000BE6CC /* ApiServer.swift in Sources */,
 				16259BCE1A449400009C5745 /* OpenInSafariActivity.swift in Sources */,
 				1668CFE91D5E16B70021CDC5 /* Reachability.swift in Sources */,
+				169205661E34DACA00FB9547 /* WatchlistSettingsViewController.swift in Sources */,
 				16C9A27A1A44DD0200EE54EC /* CommentBlacklistViewController.swift in Sources */,
 				166ADEC81CCB009A001BA61F /* SnoozingEditorViewController.swift in Sources */,
 				165C49101BA63B45006BBCF5 /* AdvancedSettingsCell.swift in Sources */,
+				169205641E34DA9F00FB9547 /* CustomReposViewController.swift in Sources */,
 				164840FC1AD196D6009E6383 /* SettingsManager.swift in Sources */,
 				1633C1931ABCEC4A0086C692 /* Issue.swift in Sources */,
 				16F413701BA5850A006B0195 /* RepoCell.swift in Sources */,
@@ -1080,6 +1091,7 @@
 				16C90F021B13BC180095E8D5 /* RepoSettingsViewController.swift in Sources */,
 				16B3B31E1A34E8E2000BE6CC /* PRLabel.swift in Sources */,
 				16EE871B1A446BFE00A1D16F /* EmptyView.swift in Sources */,
+				169205681E34EB4D00FB9547 /* CustomRepoCell.swift in Sources */,
 				1615045E1A464656001CF50C /* PRCell.swift in Sources */,
 				164840C51AD04C3C009E6383 /* QuickStartViewController.swift in Sources */,
 				166A84BE1A457CA700A3B292 /* ServersViewController.swift in Sources */,

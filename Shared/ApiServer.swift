@@ -188,6 +188,28 @@ final class ApiServer: NSManagedObject {
 		latestUserEventDateProcessed = .distantPast
 	}
 
+	class func server(host: String, moc: NSManagedObjectContext) -> ApiServer? {
+		for s in ApiServer.allApiServers(in: moc) {
+			if let apiBase = s.apiPath,
+				let c = URLComponents(string: apiBase),
+				let serverHost = c.host {
+
+				if serverHost == host {
+					return s
+				}
+			}
+			if let webBase = s.webPath,
+				let c = URLComponents(string: webBase),
+				let serverHost = c.host {
+
+				if serverHost == host {
+					return s
+				}
+			}
+		}
+		return nil
+	}
+
 	class var archivedApiServers: [AnyHashable : [AnyHashable : Any]] {
 		var archivedData = [AnyHashable : [AnyHashable : Any]]()
 		for a in ApiServer.allApiServers(in: DataManager.main) {

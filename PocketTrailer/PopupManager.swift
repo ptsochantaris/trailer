@@ -10,12 +10,12 @@ final class PopupManager: NSObject, UISplitViewControllerDelegate {
 	func showPopoverFromViewController(parentViewController: UIViewController, fromItem: UIBarButtonItem, viewController: UIViewController) {
 		if UIDevice.current.userInterfaceIdiom == .pad {
 			viewController.modalPresentationStyle = .popover
-			parentViewController.present(viewController, animated: true, completion: nil)
+			parentViewController.present(viewController, animated: true)
 			viewController.popoverPresentationController?.barButtonItem = fromItem
 		} else {
 			viewController.modalPresentationStyle = .currentContext
 			let v = (parentViewController.tabBarController ?? parentViewController.navigationController) ?? parentViewController
-			v.present(viewController, animated: true, completion: nil)
+			v.present(viewController, animated: true)
 		}
 	}
 
