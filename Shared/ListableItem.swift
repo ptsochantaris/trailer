@@ -13,6 +13,7 @@ class ListableItem: DataItem {
 	@NSManaged var assigneeName: String? // note: This now could be a list of names, delimited with a ","
 	@NSManaged var body: String?
 	@NSManaged var webUrl: String?
+    @NSManaged var shorthandReference: String?
 	@NSManaged var condition: Int64
 	@NSManaged var isNewAssignment: Bool
 	@NSManaged var repo: Repo
@@ -44,6 +45,10 @@ class ListableItem: DataItem {
 		self.repo = repo
 
 		url = info["url"] as? String
+        
+        shorthandReference = (repo.fullName ?? "") + "#" + String(info["number"] as? Int64 ?? 0)
+        
+        
 		webUrl = info["html_url"] as? String
 		number = info["number"] as? Int64 ?? 0
 		state = info["state"] as? String
