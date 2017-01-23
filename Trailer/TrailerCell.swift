@@ -115,7 +115,7 @@ class TrailerCell: NSTableCellView {
 		let c1 = m.addItem(withTitle: "Copy URL", action: #selector(copyToClipboard), keyEquivalent: "c")
 		c1.keyEquivalentModifierMask = [.command]
         
-        let c2 = m.addItem(withTitle: "Copy Shorthand Reference", action: #selector(copyshorthandReferenceToClipboard), keyEquivalent: "s")
+        let c2 = m.addItem(withTitle: "Copy Issue Reference", action: #selector(copyshorthandReferenceToClipboard), keyEquivalent: "s")
         c2.keyEquivalentModifierMask = [.command]
 
 
