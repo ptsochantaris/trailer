@@ -7,6 +7,23 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.5.4</title>
+			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>Expanded watchlist handing: Options to turn off auto-adding and auto-removing of repositories</li>
+				<li>Manage a list of additional custom repositories outside of your server-side watchlist</li>
+				<li>Performance improvements for syncing large numbers of items</li>
+				</ul></font>]]></description>
+			<pubDate>Thu, 26 Jan 2017 19:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer154.zip"
+			sparkle:version="1402"
+			sparkle:shortVersionString="1.5.4"
+			sparkle:dsaSignature="MC0CFQDSVE8NQgXsdY/fuQ6J6sXQaB7NtQIUZQXKvn/zwSwPWJzFsRBASJn68jY="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.5.3</title>
 			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
