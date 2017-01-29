@@ -245,40 +245,36 @@ final class PullRequest: ListableItem {
 		return false
 	}
 
-	private static let _createdAtDescendingSort = [NSSortDescriptor(key: "createdAt", ascending: false)]
 	var displayedStatuses: [PRStatus] {
-		let f = NSFetchRequest<PRStatus>(entityName: "PRStatus")
-		f.returnsObjectsAsFaults = false
-		f.includesSubentities = false
-		f.sortDescriptors = PullRequest._createdAtDescendingSort
+
+		let rawStatuses: [PRStatus]
+
 		let mode = Settings.statusFilteringMode
-		let selfPredicate = NSPredicate(format: "pullRequest == %@", self)
 		if mode == StatusFilter.all.rawValue {
-			f.predicate = selfPredicate
+			rawStatuses = statuses.sorted { ($0.createdAt ?? .distantPast) > ($1.createdAt ?? .distantPast) }
 		} else {
 			let terms = Settings.statusFilteringTerms
 			if terms.count > 0 {
-				var subPredicates = [NSPredicate]()
-				for t in terms {
-					subPredicates.append(NSPredicate(format: "descriptionText contains[cd] %@", t))
-				}
-				let orPredicate = NSCompoundPredicate(orPredicateWithSubpredicates: subPredicates)
 
-				if mode == StatusFilter.include.rawValue {
-					f.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [selfPredicate, orPredicate])
-				} else {
-					let notOrPredicate = NSCompoundPredicate(notPredicateWithSubpredicate: orPredicate)
-					f.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [selfPredicate, notOrPredicate])
-				}
+				let inclusive = mode == StatusFilter.include.rawValue
+				// contains(a) or contains(b) or contains(c)  -vs-  not(contains(a) or contains(b) or contains(c))
+				rawStatuses = statuses.filter { s in
+					for t in terms {
+						if let d = s.descriptionText, d.localizedCaseInsensitiveContains(t) {
+							return inclusive
+						}
+					}
+					return !inclusive
+				}.sorted { ($0.createdAt ?? .distantPast) > ($1.createdAt ?? .distantPast) }
+
 			} else {
-				f.predicate = selfPredicate
+				rawStatuses = statuses.sorted { ($0.createdAt ?? .distantPast) > ($1.createdAt ?? .distantPast) }
 			}
 		}
 
-		var result = [PRStatus]()
 		var targetUrls = Set<String>()
 		var descriptions = Set<String>()
-		for s in try! managedObjectContext?.fetch(f) ?? [] {
+		return rawStatuses.filter { s in
 			let targetUrl = S(s.targetUrl)
 			let desc = S(s.descriptionText)
 
@@ -286,11 +282,11 @@ final class PullRequest: ListableItem {
 				descriptions.insert(desc)
 				if !targetUrls.contains(targetUrl) {
 					targetUrls.insert(targetUrl)
-					result.append(s)
+					return true
 				}
 			}
+			return false
 		}
-		return result
 	}
 
 	var labelsLink: String? {
