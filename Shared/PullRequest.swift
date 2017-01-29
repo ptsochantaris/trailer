@@ -12,6 +12,8 @@ final class PullRequest: ListableItem {
 	@NSManaged var reviewCommentLink: String?
 	@NSManaged var statusesLink: String?
 	@NSManaged var lastStatusNotified: String?
+	@NSManaged var mergeCommitSha: String?
+	@NSManaged var hasNewCommits: Bool
 
 	@NSManaged var statuses: Set<PRStatus>
 
@@ -22,6 +24,12 @@ final class PullRequest: ListableItem {
 				item.baseSync(from: info, in: repo)
 
 				item.mergeable = info["mergeable"] as? Bool ?? true
+				let newMergeCommitSha = info["merge_commit_sha"] as? String
+				if item.mergeCommitSha != newMergeCommitSha {
+					item.mergeCommitSha = newMergeCommitSha
+					let markWithAlert = Settings.markPrsAsUnreadOnNewCommits && !(item.postSyncAction == PostSyncAction.isNew.rawValue)
+					item.hasNewCommits = markWithAlert
+				}
 
 				if let linkInfo = info["_links"] as? [AnyHashable : Any] {
 					item.issueCommentLink = (linkInfo["comments"] as? [AnyHashable : Any])?["href"] as? String
@@ -44,14 +52,18 @@ final class PullRequest: ListableItem {
 	}
 	#endif
 
+	override var hasUnreadCommentsOrAlert: Bool {
+		return super.hasUnreadCommentsOrAlert || hasNewCommits
+	}
+
 	class func active(in moc: NSManagedObjectContext, visibleOnly: Bool) -> [PullRequest] {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false
 		if visibleOnly {
-			f.predicate = NSPredicate(format: "sectionIndex == %lld || sectionIndex == %lld || sectionIndex == %lld", Section.mine.rawValue, Section.participated.rawValue, Section.all.rawValue)
+			f.predicate = NSCompoundPredicate(type: .or, subpredicates: [Section.mine.matchingPredicate, Section.participated.matchingPredicate, Section.all.matchingPredicate])
 		} else {
-			f.predicate = NSPredicate(format: "condition == %lld", ItemCondition.open.rawValue)
+			f.predicate = ItemCondition.open.matchingPredicate
 		}
 		return try! moc.fetch(f)
 	}
@@ -60,7 +72,7 @@ final class PullRequest: ListableItem {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false
-		let p = NSPredicate(format: "condition == %lld", ItemCondition.merged.rawValue)
+		let p = ItemCondition.merged.matchingPredicate
 		add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc, includeAllGroups: includeAllGroups)
 		return try! moc.fetch(f)
 	}
@@ -69,7 +81,7 @@ final class PullRequest: ListableItem {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false
-		let p = NSPredicate(format: "condition == %lld", ItemCondition.closed.rawValue)
+		let p = ItemCondition.closed.matchingPredicate
 		add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc, includeAllGroups: includeAllGroups)
 		return try! moc.fetch(f)
 	}
@@ -77,8 +89,7 @@ final class PullRequest: ListableItem {
 	class func countOpen(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.includesSubentities = false
-		let p = NSPredicate(format: "condition == %lld or condition == nil", ItemCondition.open.rawValue)
-		add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc)
+		add(criterion: criterion, toFetchRequest: f, originalPredicate: ItemCondition.isOpenPredicate, in: moc)
 		return try! moc.count(for: f)
 	}
 
@@ -87,30 +98,52 @@ final class PullRequest: ListableItem {
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false
 		if section != .none {
-			f.predicate = NSPredicate(format: "sectionIndex == %lld", section.rawValue)
+			f.predicate = section.matchingPredicate
 		}
 		for pr in try! moc.fetch(f) {
 			pr.catchUpWithComments()
 		}
 	}
 
+	override func catchUpWithComments() {
+		hasNewCommits = false
+		super.catchUpWithComments()
+	}
+
+	override class func badgeCount<T: PullRequest>(from fetch: NSFetchRequest<T>, in moc: NSManagedObjectContext) -> Int {
+		var badgeCount = super.badgeCount(from: fetch as! NSFetchRequest<ListableItem>, in: moc)
+		if Settings.markPrsAsUnreadOnNewCommits {
+			for i in try! moc.fetch(fetch) {
+				if i.hasNewCommits {
+					badgeCount += 1
+				}
+			}
+		}
+		return badgeCount
+	}
+
 	class func badgeCount(in section: Section, in moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.includesSubentities = false
-		f.predicate = NSPredicate(format: "sectionIndex == %lld and unreadComments > 0", section.rawValue)
+		f.predicate = NSCompoundPredicate(type: .and, subpredicates: [section.matchingPredicate, includeInUnreadPredicate])
 		return badgeCount(from: f, in: moc)
 	}
 
 	class func badgeCount(in moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
 		f.includesSubentities = false
-		f.predicate = NSPredicate(format: "sectionIndex > 0 and unreadComments > 0")
+		f.predicate = NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, includeInUnreadPredicate])
 		return badgeCount(from: f, in: moc)
 	}
 
 	class func badgeCount(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
 		let f = requestForItems(of: PullRequest.self, withFilter: nil, sectionIndex: -1, criterion: criterion)
 		return badgeCount(from: f, in: moc)
+	}
+
+	private static let _unreadOrNewCommitsPredicate = NSPredicate(format: "unreadComments > 0 or hasNewCommits == YES")
+	override class var includeInUnreadPredicate: NSPredicate {
+		return Settings.markPrsAsUnreadOnNewCommits ? _unreadOrNewCommitsPredicate : super.includeInUnreadPredicate
 	}
 
 	var markUnmergeable: Bool {
@@ -212,13 +245,16 @@ final class PullRequest: ListableItem {
 		return false
 	}
 
+	private static let _createdAtDescendingSort = [NSSortDescriptor(key: "createdAt", ascending: false)]
 	var displayedStatuses: [PRStatus] {
 		let f = NSFetchRequest<PRStatus>(entityName: "PRStatus")
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false
+		f.sortDescriptors = PullRequest._createdAtDescendingSort
 		let mode = Settings.statusFilteringMode
-		if mode==StatusFilter.all.rawValue {
-			f.predicate = NSPredicate(format: "pullRequest == %@", self)
+		let selfPredicate = NSPredicate(format: "pullRequest == %@", self)
+		if mode == StatusFilter.all.rawValue {
+			f.predicate = selfPredicate
 		} else {
 			let terms = Settings.statusFilteringTerms
 			if terms.count > 0 {
@@ -227,19 +263,17 @@ final class PullRequest: ListableItem {
 					subPredicates.append(NSPredicate(format: "descriptionText contains[cd] %@", t))
 				}
 				let orPredicate = NSCompoundPredicate(orPredicateWithSubpredicates: subPredicates)
-				let selfPredicate = NSPredicate(format: "pullRequest == %@", self)
 
-				if mode==StatusFilter.include.rawValue {
+				if mode == StatusFilter.include.rawValue {
 					f.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [selfPredicate, orPredicate])
 				} else {
 					let notOrPredicate = NSCompoundPredicate(notPredicateWithSubpredicate: orPredicate)
 					f.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [selfPredicate, notOrPredicate])
 				}
 			} else {
-				f.predicate = NSPredicate(format: "pullRequest == %@", self)
+				f.predicate = selfPredicate
 			}
 		}
-		f.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: false)]
 
 		var result = [PRStatus]()
 		var targetUrls = Set<String>()

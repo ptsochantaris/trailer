@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16C67" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" customObjectInstantitationMethod="direct">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
         <capability name="box content view" minToolsVersion="7.0"/>
@@ -320,7 +320,7 @@ Token</string>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <clipView key="contentView" id="hCD-zR-3bF">
                                                 <rect key="frame" x="1" y="0.0" width="707" height="254"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" rowHeight="20" headerView="qia-ub-v1J" id="6pK-a1-URw">
                                                         <rect key="frame" x="0.0" y="0.0" width="707" height="237"/>
@@ -996,8 +996,8 @@ Token</string>
                                                 <rect key="frame" x="0.0" y="0.0" width="673" height="330"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <button id="gjf-cd-s24">
-                                                        <rect key="frame" x="9" y="261" width="296" height="18"/>
+                                                    <button misplaced="YES" id="gjf-cd-s24">
+                                                        <rect key="frame" x="9" y="273" width="296" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Only display items with unread comments" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="MxE-lL-IWo">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1007,8 +1007,8 @@ Token</string>
                                                             <action selector="hideUncommentedRequestsSelected:" target="vQH-WF-vh2" id="lWs-IO-dif"/>
                                                         </connections>
                                                     </button>
-                                                    <button id="UGp-d4-lNW">
-                                                        <rect key="frame" x="9" y="294" width="296" height="18"/>
+                                                    <button misplaced="YES" id="UGp-d4-lNW">
+                                                        <rect key="frame" x="9" y="304" width="296" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Badge &amp; send alerts for items in &quot;all&quot; too" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="z6Z-nh-Y6O">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1018,8 +1018,8 @@ Token</string>
                                                             <action selector="showAllCommentsSelected:" target="vQH-WF-vh2" id="Hsq-qd-D3i"/>
                                                         </connections>
                                                     </button>
-                                                    <button id="ZXi-oc-EhW">
-                                                        <rect key="frame" x="9" y="229" width="296" height="18"/>
+                                                    <button misplaced="YES" id="ZXi-oc-EhW">
+                                                        <rect key="frame" x="9" y="243" width="272" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Open items at first unread comment" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="DWF-3M-url">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1029,8 +1029,8 @@ Token</string>
                                                             <action selector="openPrAtFirstUnreadCommentSelected:" target="vQH-WF-vh2" id="c6Q-Pd-dqe"/>
                                                         </connections>
                                                     </button>
-                                                    <tokenField verticalHuggingPriority="750" id="DTL-cq-VaA">
-                                                        <rect key="frame" x="11" y="52" width="651" height="96"/>
+                                                    <tokenField verticalHuggingPriority="750" misplaced="YES" id="DTL-cq-VaA">
+                                                        <rect key="frame" x="11" y="52" width="651" height="84"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <tokenFieldCell key="cell" selectable="YES" editable="YES" borderStyle="bezel" alignment="left" placeholderString="Comma separated list of usernames (case/accent insensitive, without the '@' prefix)" drawsBackground="YES" allowsEditingTextAttributes="YES" id="i7v-35-449">
                                                             <font key="font" metaFont="cellTitle"/>
@@ -1041,15 +1041,6 @@ Token</string>
                                                             <outlet property="delegate" destination="vQH-WF-vh2" id="Muu-MZ-9WO"/>
                                                         </connections>
                                                     </tokenField>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="4pT-UE-7Vr">
-                                                        <rect key="frame" x="16" y="156" width="525" height="17"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Do not present notifications for comments from the following usernames:" id="mJo-ih-vPO">
-                                                            <font key="font" metaFont="system"/>
-                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
                                                     <button id="xXn-f2-021">
                                                         <rect key="frame" x="9" y="18" width="317" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -1119,8 +1110,8 @@ Token</string>
                                                             </subviews>
                                                         </view>
                                                     </box>
-                                                    <button id="gWR-4e-ufK">
-                                                        <rect key="frame" x="9" y="198" width="309" height="18"/>
+                                                    <button misplaced="YES" id="gWR-4e-ufK">
+                                                        <rect key="frame" x="9" y="183" width="309" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <buttonCell key="cell" type="check" title="Mark any comments before my own as read" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="i4o-dH-lEy">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1159,6 +1150,26 @@ Token</string>
                                                             </subviews>
                                                         </view>
                                                     </box>
+                                                    <button misplaced="YES" id="fsA-E5-SRy">
+                                                        <rect key="frame" x="9" y="213" width="290" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Highlight PRs that have new commits" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="T2C-n7-dIU">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="highlightItemsWithNewCommitsSelected:" target="vQH-WF-vh2" id="ccI-te-cRo"/>
+                                                        </connections>
+                                                    </button>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" id="4pT-UE-7Vr">
+                                                        <rect key="frame" x="18" y="144" width="525" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Do not present notifications for comments from the following usernames:" id="mJo-ih-vPO">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
                                                 </subviews>
                                             </view>
                                         </box>
@@ -1995,6 +2006,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="hidePrsThatDontPassOnlyInAll" destination="ByB-sN-fU6" id="3fP-Sd-ouM"/>
                 <outlet property="hideSnoozedItems" destination="YS0-gj-k5Q" id="qsP-sl-Cce"/>
                 <outlet property="hideUncommentedPrs" destination="gjf-cd-s24" id="fkW-dA-W8L"/>
+                <outlet property="highlightItemsWithNewCommits" destination="fsA-E5-SRy" id="kQA-jA-Pz6"/>
                 <outlet property="hotKeyContainer" destination="wtA-9k-J8p" id="O04-dn-Ilm"/>
                 <outlet property="hotKeyHelp" destination="DCt-xr-FhG" id="x3V-6H-BO0"/>
                 <outlet property="hotkeyCommandModifier" destination="OTk-Ox-H64" id="tc7-zs-NCE"/>

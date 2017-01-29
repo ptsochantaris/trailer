@@ -331,7 +331,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	func keyToggleRead() {
 		if let ip = tableView.indexPathForSelectedRow {
 			let i = fetchedResultsController.object(at: ip)
-			if i.unreadComments > 0 {
+			if i.hasUnreadCommentsOrAlert {
 				if canIssueKeyForIndexPath(actionTitle: "Read", indexPath: ip) {
 					i.catchUpWithComments()
 					DataManager.saveDB()
@@ -930,7 +930,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 		func appendReadUnread(i: ListableItem) {
 			let r: UITableViewRowAction
-			if i.unreadComments > 0 {
+			if i.hasUnreadCommentsOrAlert {
 				r = UITableViewRowAction(style: .normal, title: "Read") { action, indexPath in
 					markItemAsRead(itemUri: i.objectID.uriRepresentation().absoluteString)
 					tableView.setEditing(false, animated: true)
@@ -1150,7 +1150,7 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 	}
 
 	private func unreadCommentCount(count: Int) -> String {
-		return count == 0 ? "" : count == 1 ? " (1 new comment)" : " (\(count) new comments)"
+		return count == 0 ? "" : count == 1 ? " (1 update)" : " (\(count) updates)"
 	}
 
 	private func pullRequestsTitle(long: Bool) -> String {

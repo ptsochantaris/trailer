@@ -143,7 +143,7 @@ class ListableItem: DataItem {
 		}
 	}
 
-	final func catchUpWithComments() {
+	func catchUpWithComments() {
 		catchUpCommentDate()
 		postProcess()
 	}
@@ -201,9 +201,7 @@ class ListableItem: DataItem {
 	}
 
 	final func wakeUp() {
-		snoozeUntil = nil
-		snoozingPreset = nil
-		wasAwokenFromSnooze = true
+		disableSnoozing(explicityAwoke: true)
 		postProcess()
 	}
 
@@ -254,9 +252,7 @@ class ListableItem: DataItem {
 
 	final func wakeIfAutoSnoozed() {
 		if snoozeUntil == autoSnoozeSentinelDate {
-			snoozeUntil = nil
-			wasAwokenFromSnooze = false
-			snoozingPreset = nil
+			disableSnoozing(explicityAwoke: false)
 		}
 	}
 
@@ -268,12 +264,22 @@ class ListableItem: DataItem {
 		postProcess()
 	}
 
+	var hasUnreadCommentsOrAlert: Bool {
+		return unreadComments > 0
+	}
+
+	private final func disableSnoozing(explicityAwoke: Bool) {
+		snoozeUntil = nil
+		snoozingPreset = nil
+		wasAwokenFromSnooze = explicityAwoke
+	}
+
 	final func postProcess() {
 
-		if let s = snoozeUntil, s < Date() {
-			snoozeUntil = nil
-			snoozingPreset = nil
-			wasAwokenFromSnooze = true
+		//let D = Date()
+
+		if let s = snoozeUntil, s < Date() { // our snooze-by date is past
+			disableSnoozing(explicityAwoke: true)
 		}
 
 		let isMine = createdByMe
@@ -346,43 +352,67 @@ class ListableItem: DataItem {
 			var latestDate = latestReadCommentDate ?? .distantPast
 
 			if Settings.assumeReadItemIfUserHasNewerComments {
-				let f = NSFetchRequest<PRComment>(entityName: "PRComment")
-				f.returnsObjectsAsFaults = false
-				f.includesSubentities = false
-				f.predicate = predicateForMyComments(since: latestDate)
-				for c in try! managedObjectContext?.fetch(f) ?? [] {
+				for c in myComments(since: latestDate) {
 					if let createdDate = c.createdAt, latestDate < createdDate {
 						latestDate = createdDate
 					}
 				}
 				latestReadCommentDate = latestDate
 			}
-
-			let f = NSFetchRequest<PRComment>(entityName: "PRComment")
-			f.includesSubentities = false
-			f.predicate = predicateForOthersComments(since: latestDate)
-			unreadComments = Int64(try! managedObjectContext?.count(for: f) ?? 0)
+			unreadComments = countOthersComments(since: latestDate)
 
 		} else {
 			unreadComments = 0
+			if let p = self as? PullRequest {
+				p.hasNewCommits = false
+			}
+		}
+
+		if snoozeUntil != nil, let p = self as? PullRequest, shouldWakeOnComment, p.hasNewCommits { // we wake on comments and have a new commit alarm
+			wakeUp() // re-process as awake item
+			return
 		}
 
 		totalComments = Int64(comments.count)
 		sectionIndex = targetSection.rawValue
 		if title==nil { title = "(No title)" }
+
+		//let T = D.timeIntervalSinceNow
+		//print("postprocess: \(T * -1000)")
+	}
+
+	private final func myComments(since: Date) -> [PRComment] {
+		return comments.filter { $0.isMine && ($0.createdAt ?? .distantPast) > since }
+	}
+	
+	private final func othersComments(since: Date) -> [PRComment] {
+		return comments.filter { !$0.isMine && ($0.createdAt ?? .distantPast) > since }
+	}
+
+	private final func countOthersComments(since: Date) -> Int64 {
+		var count: Int64 = 0
+		for c in comments {
+			if !c.isMine && (c.createdAt ?? .distantPast) > since {
+				count += 1
+			}
+		}
+		return count
 	}
 
 	final var urlForOpening: String? {
 
 		if unreadComments > 0 && Settings.openPrAtFirstUnreadComment {
-			let f = NSFetchRequest<PRComment>(entityName: "PRComment")
-			f.returnsObjectsAsFaults = false
-			f.includesSubentities = false
-			f.fetchLimit = 1
-			f.predicate = predicateForOthersComments(since: latestReadCommentDate ?? .distantPast)
-			f.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: true)]
-			let ret = try! managedObjectContext?.fetch(f) ?? []
-			if let firstComment = ret.first, let url = firstComment.webUrl {
+			var oldestComment: PRComment?
+			for c in othersComments(since: latestReadCommentDate ?? .distantPast) {
+				if let o = oldestComment {
+					if (c.createdAt ?? .distantPast) < (o.createdAt ?? .distantPast) {
+						oldestComment = c
+					}
+				} else {
+					oldestComment = c
+				}
+			}
+			if let c = oldestComment, let url = c.webUrl {
 				return url
 			}
 		}
@@ -482,31 +512,13 @@ class ListableItem: DataItem {
 		#endif
 	}
 
-	final private func predicateForMyComments(since date: Date) -> NSPredicate {
-
-		if self is PullRequest {
-			return NSPredicate(format: "userId == %lld and pullRequest == %@ and createdAt > %@", apiServer.userId, self, date as CVarArg)
-		} else {
-			return NSPredicate(format: "userId == %lld and issue == %@ and createdAt > %@", apiServer.userId, self, date as CVarArg)
-		}
-	}
-
-	final private func predicateForOthersComments(since date: Date) -> NSPredicate {
-
-		if self is PullRequest {
-			return NSPredicate(format: "userId != %lld and pullRequest == %@ and createdAt > %@", apiServer.userId, self, date as CVarArg)
-		} else {
-			return NSPredicate(format: "userId != %lld and issue == %@ and createdAt > %@", apiServer.userId, self, date as CVarArg)
-		}
-	}
-
-	final class func badgeCount<T: ListableItem>(from fetch: NSFetchRequest<T>, in moc: NSManagedObjectContext) -> Int {
-		var badgeCount = 0
+	class func badgeCount<T: ListableItem>(from fetch: NSFetchRequest<T>, in moc: NSManagedObjectContext) -> Int {
+		var badgeCount: Int64 = 0
 		fetch.returnsObjectsAsFaults = false
 		for i in try! moc.fetch(fetch) {
-			badgeCount += Int(i.unreadComments)
+			badgeCount += i.unreadComments
 		}
-		return badgeCount
+		return Int(badgeCount)
 	}
 
 	private final class func predicate(from token: String, termAt: Int, format: String, numeric: Bool) -> NSPredicate? {
@@ -568,17 +580,17 @@ class ListableItem: DataItem {
 		var andPredicates = [NSPredicate]()
 
 		if onlyUnread {
-			andPredicates.append(NSPredicate(format: "unreadComments > 0"))
+			andPredicates.append(itemType.includeInUnreadPredicate)
 		}
 
-		if sectionIndex<0 {
-			andPredicates.append(NSPredicate(format: "sectionIndex > 0"))
-		} else {
-			andPredicates.append(NSPredicate(format: "sectionIndex == %lld", sectionIndex))
+		if sectionIndex < 0 {
+			andPredicates.append(Section.nonZeroPredicate)
+		} else if let s = Section(rawValue: sectionIndex) {
+			andPredicates.append(s.matchingPredicate)
 		}
 
 		if Settings.hideSnoozedItems {
-			andPredicates.append(NSPredicate(format: "sectionIndex != %lld", Section.snoozed.rawValue))
+			andPredicates.append(Section.snoozed.excludingPredicate)
 		}
 
 		if var fi = withFilter, !fi.isEmpty {
@@ -642,7 +654,7 @@ class ListableItem: DataItem {
 		}
 
 		if Settings.hideUncommentedItems {
-			andPredicates.append(NSPredicate(format: "unreadComments > 0"))
+			andPredicates.append(itemType.includeInUnreadPredicate)
 		}
 
 		var sortDescriptors = [NSSortDescriptor]()
@@ -670,6 +682,11 @@ class ListableItem: DataItem {
 		add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: DataManager.main)
 		f.sortDescriptors = sortDescriptors
 		return f
+	}
+
+	private static let _unreadPredicate = NSPredicate(format: "unreadComments > 0")
+	class var includeInUnreadPredicate: NSPredicate {
+		return _unreadPredicate
 	}
 
 	final class func relatedItems(from notificationUserInfo: [AnyHashable : Any]) -> (PRComment?, ListableItem)? {

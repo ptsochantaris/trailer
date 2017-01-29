@@ -26,6 +26,27 @@ enum Section: Int64 {
 	init?(_ rawValue: Int64) {
 		self.init(rawValue: rawValue)
 	}
+
+	static let nonZeroPredicate = NSPredicate(format: "sectionIndex > 0")
+
+	static private var predicateMatchCache = [Section : NSPredicate]()
+	var matchingPredicate: NSPredicate {
+		if let predicate = Section.predicateMatchCache[self] {
+			return predicate
+		}
+		let predicate = NSPredicate(format: "sectionIndex == %lld", rawValue)
+		Section.predicateMatchCache[self] = predicate
+		return predicate
+	}
+	static private var predicateExcludeCache = [Section : NSPredicate]()
+	var excludingPredicate: NSPredicate {
+		if let predicate = Section.predicateExcludeCache[self] {
+			return predicate
+		}
+		let predicate = NSPredicate(format: "sectionIndex != %lld", rawValue)
+		Section.predicateExcludeCache[self] = predicate
+		return predicate
+	}
 }
 
 func S(_ s: String?) -> String {

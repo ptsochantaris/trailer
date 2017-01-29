@@ -63,7 +63,7 @@ final class PullRequestCell: TrailerCell {
 
 		frame = NSMakeRect(0, 0, MENU_WIDTH, titleHeight + subtitleHeight + statusBottom + cellPadding)
 		let faded = pullRequest.shouldSkipNotifications
-		addCounts(_commentsTotal, _commentsNew, faded)
+		addCounts(total: _commentsTotal, unread: _commentsNew, alert: pullRequest.hasNewCommits, faded: faded)
 
 		var titleRect = NSMakeRect(LEFTPADDING, subtitleHeight + bottom + statusBottom, W, titleHeight)
 		var dateRect = NSMakeRect(LEFTPADDING, statusBottom + bottom, W, subtitleHeight)

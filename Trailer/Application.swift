@@ -39,7 +39,7 @@ final class Application: NSApplication {
 						}
 					case "a":
 						if let i = app.focusedItem(blink: true) {
-							if i.unreadComments > 0 {
+							if i.hasUnreadCommentsOrAlert {
 								i.catchUpWithComments()
 							} else {
 								i.latestReadCommentDate = .distantPast

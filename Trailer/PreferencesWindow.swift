@@ -65,6 +65,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 	@IBOutlet weak var newMentionMovePolicy: NSPopUpButton!
 	@IBOutlet weak var teamMentionMovePolicy: NSPopUpButton!
 	@IBOutlet weak var newItemInOwnedRepoMovePolicy: NSPopUpButton!
+	@IBOutlet weak var highlightItemsWithNewCommits: NSButton!
 
 	// Display
 	@IBOutlet weak var useVibrancy: NSButton!
@@ -210,6 +211,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		allIssuesSetting.toolTip = "Set the issue visibility of all (or the currently selected/filtered) repositories"
 		allHidingSetting.toolTip = "Set the any special hiding settings of all (or the currently selected/filtered) repositories"
 		showCreationDates.toolTip = Settings.showCreatedInsteadOfUpdatedHelp
+		highlightItemsWithNewCommits.toolTip = Settings.markPrsAsUnreadOnNewCommitsHelp
 		markUnmergeableOnUserSectionsOnly.toolTip = Settings.markUnmergeableOnUserSectionsOnlyHelp
 		countOnlyListedItems.toolTip = Settings.countOnlyListedItemsHelp
 		displayRepositoryNames.toolTip = Settings.showReposInNameHelp
@@ -351,7 +353,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		useVibrancy.integerValue = Settings.useVibrancy ? 1 : 0
 		hidePrsThatDontPass.integerValue = Settings.hidePrsThatArentPassing ? 1 : 0
 		hidePrsThatDontPassOnlyInAll.integerValue = Settings.hidePrsThatDontPassOnlyInAll ? 1 : 0
-
+		highlightItemsWithNewCommits.integerValue = Settings.markPrsAsUnreadOnNewCommits ? 1 : 0
 		hideSnoozedItems.integerValue = Settings.hideSnoozedItems ? 1 : 0
 
 		allNewPrsSetting.selectItem(at: Settings.displayPolicyForNewPrs)
@@ -540,6 +542,10 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	private func updateHistoryOptions() {
 		dontKeepPrsMergedByMe.isEnabled = Settings.mergeHandlingPolicy != HandlingPolicy.keepNone.rawValue
+	}
+
+	@IBAction func highlightItemsWithNewCommitsSelected(_ sender: NSButton) {
+		Settings.markPrsAsUnreadOnNewCommits = (sender.integerValue==1)
 	}
 
 	@IBAction func grayOutWhenRefreshingSelected(_ sender: NSButton) {

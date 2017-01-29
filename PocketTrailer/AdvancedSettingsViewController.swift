@@ -149,6 +149,10 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 		        title: "Mark any comments before my own as read",
 		        description: Settings.assumeReadItemIfUserHasNewerCommentsHelp,
 		        valueDisplayed: { Settings.assumeReadItemIfUserHasNewerComments ? "✓" : " " }),
+		Setting(section: .Comments,
+		        title: "Highlight PRs with new commits",
+		        description: Settings.markPrsAsUnreadOnNewCommitsHelp,
+		        valueDisplayed: { Settings.markPrsAsUnreadOnNewCommits ? "✓" : " " }),
 
 		Setting(section: .Repos,
 		        title: "PR visibility for new repos",
@@ -539,6 +543,9 @@ final class AdvancedSettingsViewController: UITableViewController, PickerViewCon
 				Settings.disableAllCommentNotifications = !Settings.disableAllCommentNotifications
 			case 8:
 				Settings.assumeReadItemIfUserHasNewerComments = !Settings.assumeReadItemIfUserHasNewerComments
+			case 9:
+				Settings.markPrsAsUnreadOnNewCommits = !Settings.markPrsAsUnreadOnNewCommits
+				settingsChangedTimer.push()
 			default: break
 			}
 		} else if section == SettingsSection.Repos {

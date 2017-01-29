@@ -166,8 +166,13 @@ final class PRCell: UITableViewCell {
 		readCount.text = itemCountFormatter.string(for: _commentsTotal)
 		readCount.isHidden = _commentsTotal == 0
 
-		unreadCount.isHidden = _commentsNew == 0
-		unreadCount.text = itemCountFormatter.string(for: _commentsNew)
+		if let p = item as? PullRequest, Settings.markPrsAsUnreadOnNewCommits, p.hasNewCommits {
+			unreadCount.isHidden = false
+			unreadCount.text = _commentsNew == 0 ? "!" : itemCountFormatter.string(for: _commentsNew)
+		} else {
+			unreadCount.isHidden = _commentsNew == 0
+			unreadCount.text = itemCountFormatter.string(for: _commentsNew)
+		}
 
 		let a = fade ? DISABLED_FADE : 1.0
 		readCount.alpha = a

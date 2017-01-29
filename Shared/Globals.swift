@@ -115,6 +115,27 @@ func bootUp() {
 
 enum ItemCondition: Int64 {
 	case open, closed, merged
+
+	static let isOpenPredicate = NSPredicate(format: "condition == %lld or condition == nil", ItemCondition.open.rawValue)
+
+	static private var predicateMatchCache = [ItemCondition : NSPredicate]()
+	var matchingPredicate: NSPredicate {
+		if let predicate = ItemCondition.predicateMatchCache[self] {
+			return predicate
+		}
+		let predicate = NSPredicate(format: "condition == %lld", rawValue)
+		ItemCondition.predicateMatchCache[self] = predicate
+		return predicate
+	}
+	static private var predicateExcludeCache = [ItemCondition : NSPredicate]()
+	var excludingPredicate: NSPredicate {
+		if let predicate = ItemCondition.predicateExcludeCache[self] {
+			return predicate
+		}
+		let predicate = NSPredicate(format: "condition != %lld", rawValue)
+		ItemCondition.predicateExcludeCache[self] = predicate
+		return predicate
+	}
 }
 
 enum StatusFilter: Int {
@@ -123,6 +144,25 @@ enum StatusFilter: Int {
 
 enum PostSyncAction: Int64 {
 	case doNothing, delete, isNew, isUpdated
+
+	static private var predicateMatchCache = [PostSyncAction : NSPredicate]()
+	var matchingPredicate: NSPredicate {
+		if let predicate = PostSyncAction.predicateMatchCache[self] {
+			return predicate
+		}
+		let predicate = NSPredicate(format: "postSyncAction == %lld", rawValue)
+		PostSyncAction.predicateMatchCache[self] = predicate
+		return predicate
+	}
+	static private var predicateExcludeCache = [PostSyncAction : NSPredicate]()
+	var excludingPredicate: NSPredicate {
+		if let predicate = PostSyncAction.predicateExcludeCache[self] {
+			return predicate
+		}
+		let predicate = NSPredicate(format: "postSyncAction != %lld", rawValue)
+		PostSyncAction.predicateExcludeCache[self] = predicate
+		return predicate
+	}
 }
 
 enum NotificationType: Int {

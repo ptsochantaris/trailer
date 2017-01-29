@@ -48,7 +48,7 @@ final class Issue: ListableItem {
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false
 		if section != .none {
-			f.predicate = NSPredicate(format: "sectionIndex == %lld", section.rawValue)
+			f.predicate = section.matchingPredicate
 		}
 		for pr in try! moc.fetch(f) {
 			pr.catchUpWithComments()
@@ -58,7 +58,7 @@ final class Issue: ListableItem {
 	class func badgeCount(in moc: NSManagedObjectContext) -> Int {
 		let f = NSFetchRequest<Issue>(entityName: "Issue")
 		f.includesSubentities = false
-		f.predicate = NSPredicate(format: "sectionIndex > 0 and unreadComments > 0")
+		f.predicate = NSCompoundPredicate(type: .and, subpredicates: [Section.nonZeroPredicate, includeInUnreadPredicate])
 		return badgeCount(from: f, in: moc)
 	}
 
@@ -70,8 +70,7 @@ final class Issue: ListableItem {
 	class func countOpen(in moc: NSManagedObjectContext, criterion: GroupingCriterion? = nil) -> Int {
 		let f = NSFetchRequest<Issue>(entityName: "Issue")
 		f.includesSubentities = false
-		let p = NSPredicate(format: "condition == %lld or condition == nil", ItemCondition.open.rawValue)
-		add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc)
+		add(criterion: criterion, toFetchRequest: f, originalPredicate: ItemCondition.isOpenPredicate, in: moc)
 		return try! moc.count(for: f)
 	}
 
@@ -121,7 +120,7 @@ final class Issue: ListableItem {
 		let f = NSFetchRequest<Issue>(entityName: "Issue")
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false
-		let p = NSPredicate(format: "condition == %lld", ItemCondition.closed.rawValue)
+		let p = ItemCondition.closed.matchingPredicate
 		add(criterion: criterion, toFetchRequest: f, originalPredicate: p, in: moc, includeAllGroups: includeAllGroups)
 		return try! moc.fetch(f)
 	}

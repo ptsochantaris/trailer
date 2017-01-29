@@ -29,7 +29,7 @@ final class IssueCell: TrailerCell {
 
 		frame = NSMakeRect(0, 0, MENU_WIDTH, titleHeight+subtitleHeight + cellPadding)
 		let faded = issue.shouldSkipNotifications
-		addCounts(_commentsTotal, _commentsNew, faded)
+		addCounts(total: _commentsTotal, unread: _commentsNew, alert: false, faded: faded)
 
 		var titleRect = NSMakeRect(LEFTPADDING, subtitleHeight+bottom, W, titleHeight)
 		var dateRect = NSMakeRect(LEFTPADDING, bottom, W, subtitleHeight)

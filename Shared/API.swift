@@ -976,7 +976,7 @@ final class API {
 
 	private class func checkPrClosures(in moc: NSManagedObjectContext, callback: @escaping Completion) {
 		let f = NSFetchRequest<PullRequest>(entityName: "PullRequest")
-		f.predicate = NSPredicate(format: "postSyncAction == %lld and condition == %lld", PostSyncAction.delete.rawValue, ItemCondition.open.rawValue)
+		f.predicate = NSCompoundPredicate(type: .and, subpredicates: [PostSyncAction.delete.matchingPredicate, ItemCondition.open.matchingPredicate])
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false
 
@@ -1003,7 +1003,7 @@ final class API {
 
 	private class func checkIssueClosures(in moc: NSManagedObjectContext) {
 		let f = NSFetchRequest<Issue>(entityName: "Issue")
-		f.predicate = NSPredicate(format: "postSyncAction == %lld and condition == %lld", PostSyncAction.delete.rawValue, ItemCondition.open.rawValue)
+		f.predicate = NSCompoundPredicate(type: .and, subpredicates: [PostSyncAction.delete.matchingPredicate, ItemCondition.open.matchingPredicate])
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false
 		

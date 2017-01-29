@@ -353,6 +353,7 @@
 		16B3B34C1A34E990000BE6CC /* Trailer 8.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 8.xcdatamodel"; sourceTree = "<group>"; };
 		16B3B34D1A34E990000BE6CC /* Trailer 9.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 9.xcdatamodel"; sourceTree = "<group>"; };
 		16B3B34E1A34E990000BE6CC /* Trailer.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Trailer.xcdatamodel; sourceTree = "<group>"; };
+		16B415611E3D054500741E6F /* Trailer 33.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 33.xcdatamodel"; sourceTree = "<group>"; };
 		16B6B7C01BA3B94C006A509F /* ComplicationDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ComplicationDataSource.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16B74E471A3B4AC800410EF6 /* PrTable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PrTable.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		16B94070182D136700F32061 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
@@ -1611,6 +1612,7 @@
 		16B3B33B1A34E990000BE6CC /* Trailer.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				16B415611E3D054500741E6F /* Trailer 33.xcdatamodel */,
 				16DB793F1E32D6460076A36D /* Trailer 32.xcdatamodel */,
 				1605EDCB1D58B71900D91F50 /* Trailer 31.xcdatamodel */,
 				16E07C831D2DC31300B0525C /* Trailer 30.xcdatamodel */,
@@ -1644,7 +1646,7 @@
 				16B3B34D1A34E990000BE6CC /* Trailer 9.xcdatamodel */,
 				16B3B34E1A34E990000BE6CC /* Trailer.xcdatamodel */,
 			);
-			currentVersion = 16DB793F1E32D6460076A36D /* Trailer 32.xcdatamodel */;
+			currentVersion = 16B415611E3D054500741E6F /* Trailer 33.xcdatamodel */;
 			name = Trailer.xcdatamodeld;
 			path = ../Shared/Trailer.xcdatamodeld;
 			sourceTree = "<group>";

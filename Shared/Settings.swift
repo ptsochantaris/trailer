@@ -21,7 +21,7 @@ final class Settings {
 			"LAST_EXPORT_URL", "LAST_EXPORT_TIME", "CLOSE_HANDLING_POLICY_2", "MERGE_HANDLING_POLICY_2", "LAST_PREFS_TAB_SELECTED_OSX", "NEW_PR_DISPLAY_POLICY_INDEX", "NEW_ISSUE_DISPLAY_POLICY_INDEX", "HIDE_PRS_THAT_ARENT_PASSING_ONLY_IN_ALL",
             "INCLUDE_SERVERS_IN_FILTER", "INCLUDE_USERS_IN_FILTER", "INCLUDE_TITLES_IN_FILTER", "INCLUDE_NUMBERS_IN_FILTER", "DUMP_API_RESPONSES_IN_CONSOLE", "OPEN_ITEMS_DIRECTLY_IN_SAFARI", "HIDE_PRS_THAT_ARENT_PASSING",
             "REMOVE_RELATED_NOTIFICATIONS_ON_ITEM_REMOVE", "HIDE_SNOOZED_ITEMS", "INCLUDE_MILESTONES_IN_FILTER", "INCLUDE_ASSIGNEE_NAMES_IN_FILTER", "API_SERVERS_IN_SEPARATE_MENUS", "ASSUME_READ_ITEM_IF_USER_HAS_NEWER_COMMENTS",
-            "AUTO_SNOOZE_DAYS", "HIDE_MENUBAR_COUNTS", "AUTO_ADD_NEW_REPOS", "AUTO_REMOVE_DELETED_REPOS"]
+            "AUTO_SNOOZE_DAYS", "HIDE_MENUBAR_COUNTS", "AUTO_ADD_NEW_REPOS", "AUTO_REMOVE_DELETED_REPOS", "MARK_PRS_AS_UNREAD_ON_NEW_COMMITS"]
 	}
 
     class func checkMigration() {
@@ -619,6 +619,12 @@ final class Settings {
 	class var includeTitlesInFilter: Bool {
 		get { return get("INCLUDE_TITLES_IN_FILTER") as? Bool ?? true }
 		set { set("INCLUDE_TITLES_IN_FILTER", newValue) }
+	}
+
+	static let markPrsAsUnreadOnNewCommitsHelp = "Mark a PR with an exclamation mark even if they it may not have unread comments, in case there have been new commits."
+	class var markPrsAsUnreadOnNewCommits: Bool {
+		get { return get("MARK_PRS_AS_UNREAD_ON_NEW_COMMITS") as? Bool ?? false }
+		set { set("MARK_PRS_AS_UNREAD_ON_NEW_COMMITS", newValue) }
 	}
 
 	static let includeMilestonesInFilterHelp = "Check item milestone names for inclusion in filtered results. You can also prefix a search with 'milestone:' to specifically search for this."

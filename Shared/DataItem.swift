@@ -100,10 +100,10 @@ class DataItem: NSManagedObject {
 		f.includesSubentities = false
 		if surviving {
 			f.returnsObjectsAsFaults = false
-			f.predicate = NSPredicate(format: "postSyncAction != %lld", PostSyncAction.delete.rawValue)
+			f.predicate = PostSyncAction.delete.excludingPredicate
 		} else {
 			f.returnsObjectsAsFaults = true
-			f.predicate = NSPredicate(format: "postSyncAction = %lld", PostSyncAction.delete.rawValue)
+			f.predicate = PostSyncAction.delete.matchingPredicate
 		}
 		return try! moc.fetch(f)
 	}
@@ -112,7 +112,7 @@ class DataItem: NSManagedObject {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false
-		f.predicate = NSPredicate(format: "postSyncAction = %lld or postSyncAction = %lld", PostSyncAction.isNew.rawValue, PostSyncAction.isUpdated.rawValue)
+		f.predicate = NSCompoundPredicate(type: .or, subpredicates: [PostSyncAction.isNew.matchingPredicate, PostSyncAction.isUpdated.matchingPredicate])
 		return try! moc.fetch(f)
 	}
 
@@ -120,7 +120,7 @@ class DataItem: NSManagedObject {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false
-		f.predicate = NSPredicate(format: "postSyncAction = %lld", PostSyncAction.isUpdated.rawValue)
+		f.predicate = PostSyncAction.isUpdated.matchingPredicate
 		return try! moc.fetch(f)
 	}
 
@@ -128,7 +128,7 @@ class DataItem: NSManagedObject {
 		let f = NSFetchRequest<T>(entityName: String(describing: type))
 		f.returnsObjectsAsFaults = false
 		f.includesSubentities = false
-		f.predicate = NSPredicate(format: "postSyncAction = %lld", PostSyncAction.isNew.rawValue)
+		f.predicate = PostSyncAction.isNew.matchingPredicate
 		return try! moc.fetch(f)
 	}
 
