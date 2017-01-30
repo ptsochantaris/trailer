@@ -49,6 +49,10 @@ final class Repo: DataItem {
 				item.ownerId = (info["owner"] as? [AnyHashable : Any])?["id"] as? Int64 ?? 0
 				item.lastDirtied = Date()
 				item.manuallyAdded = manuallyAdded
+				if item.postSyncAction == PostSyncAction.isNew.rawValue {
+					item.displayPolicyForPrs = Int64(Settings.displayPolicyForNewPrs)
+					item.displayPolicyForIssues = Int64(Settings.displayPolicyForNewIssues)
+				}
 			}
 		}
 	}

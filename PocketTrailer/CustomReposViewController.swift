@@ -112,7 +112,11 @@ final class CustomReposViewController: UIViewController, UITableViewDelegate, UI
 			if let e = error {
 				showMessage("Fetching Repository Information Failed", e.localizedDescription)
 			} else {
-				showMessage("Repository added", "The new repository has been added to your local list. Trailer will refresh after you close preferences to fetch any items from it.")
+				if Settings.displayPolicyForNewPrs == Int(RepoDisplayPolicy.hide.rawValue) && Settings.displayPolicyForNewIssues == Int(RepoDisplayPolicy.hide.rawValue) {
+					showMessage("Repository added", "WARNING: While the repository has been added successfully to your list, your default settings specify that it should be hidden. You probably want to change its visibility in the main repositories list.")
+				} else {
+					showMessage("Repository added", "The new repository has been added to your local list. Trailer will refresh after you close preferences to fetch any items from it.")
+				}
 				DataManager.saveDB()
 				self?.updateRepos()
 			}

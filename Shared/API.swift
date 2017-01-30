@@ -595,8 +595,6 @@ final class API {
 				completionCount += 1
 				if completionCount == totalOperations {
 					for r in DataItem.newItems(of: Repo.self, in: moc) {
-						r.displayPolicyForPrs = Int64(Settings.displayPolicyForNewPrs)
-						r.displayPolicyForIssues = Int64(Settings.displayPolicyForNewIssues)
 						if r.shouldSync {
 							NotificationQueue.add(type: .newRepoAnnouncement, for: r)
 						}

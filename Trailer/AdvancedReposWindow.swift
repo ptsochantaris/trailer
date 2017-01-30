@@ -139,12 +139,14 @@ final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 		}
 
 		newRepoSpinner.startAnimation(nil)
+		addButton.isEnabled = false
 
 		API.fetchRepo(named: name, owner: owner, from: server) { [weak self] error in
 
 			guard let s = self else { return }
 
 			s.newRepoSpinner.stopAnimation(nil)
+			s.addButton.isEnabled = true
 			preferencesDirty = true
 
 			let alert = NSAlert()
@@ -153,7 +155,11 @@ final class AdvancedReposWindow : NSWindow, NSWindowDelegate {
 				alert.informativeText = e.localizedDescription
 			} else {
 				alert.messageText = "Repository added"
-				alert.informativeText = "The new repository has been added to your local list. Trailer will refresh after you close preferences to fetch any items from it."
+				if Settings.displayPolicyForNewPrs == Int(RepoDisplayPolicy.hide.rawValue) && Settings.displayPolicyForNewIssues == Int(RepoDisplayPolicy.hide.rawValue) {
+					alert.informativeText = "WARNING: While the repository has been added successfully to your list, your default settings specify that it should be hidden. You probably want to change its visibility in the main repositories list."
+				} else {
+					alert.informativeText = "The new repository has been added to your local list. Trailer will refresh after you close preferences to fetch any items from it."
+				}
 				DataManager.saveDB()
 				s.prefs?.projectsTable.reloadData()
 				self?.updateRemovableRepos()
