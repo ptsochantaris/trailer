@@ -29,7 +29,6 @@ final class ItemDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 		self.viewCriterion = viewCriterion
 
 		super.init()
-		reloadData(filter: nil)
 	}
 
 	func reloadData(filter: String?) {
@@ -61,13 +60,11 @@ final class ItemDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 
 	func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
 		let object = itemIds[row]
-		if let o = object as? NSManagedObjectID {
-			if let i = existingObject(with: o) {
-				if let pr = i as? PullRequest {
-					return PullRequestCell(pullRequest: pr)
-				} else if let issue = i as? Issue {
-					return IssueCell(issue: issue)
-				}
+		if let id = object as? NSManagedObjectID, let i = existingObject(with: id) {
+			if let pr = i as? PullRequest {
+				return PullRequestCell(pullRequest: pr)
+			} else if let issue = i as? Issue {
+				return IssueCell(issue: issue)
 			}
 		} else if let title = object as? String {
 			return SectionHeader(title: title, showRemoveAllButton: removalSections.contains(title))
@@ -85,8 +82,8 @@ final class ItemDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 	}
 
 	func itemAtRow(_ row: Int) -> ListableItem? {
-		if row >= 0 && row < itemIds.count, let object = itemIds[row] as? NSManagedObjectID {
-			return existingObject(with: object) as? ListableItem
+		if row >= 0 && row < itemIds.count, let id = itemIds[row] as? NSManagedObjectID {
+			return existingObject(with: id) as? ListableItem
 		} else {
 			return nil
 		}
