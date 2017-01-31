@@ -3,7 +3,7 @@
 final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSUserNotificationCenterDelegate, NSOpenSavePanelDelegate {
 
 	// Globals
-	weak var refreshTimer: Timer?
+	var refreshTimer: Timer?
 	var openingWindow = false
 	var isManuallyScrolling = false
 	var ignoreNextFocusLoss = false
@@ -582,7 +582,9 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			} else {
 				let howLongUntilNextSync = TimeInterval(Settings.refreshPeriod) - howLongAgo
 				DLog("No need to refresh yet, will refresh in %@", howLongUntilNextSync)
-				refreshTimer = Timer.scheduledTimer(timeInterval: howLongUntilNextSync, target: self, selector: #selector(refreshTimerDone), userInfo: nil, repeats: false)
+				refreshTimer = Timer(repeats: false, interval: howLongUntilNextSync) { [weak self] in
+					self?.refreshTimerDone()
+				}
 			}
 		}
 		else
@@ -718,11 +720,14 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 				Settings.lastSuccessfulRefresh = Date()
 			}
 			s.completeRefresh()
-			s.refreshTimer = Timer.scheduledTimer(timeInterval: TimeInterval(Settings.refreshPeriod), target: s, selector: #selector(s.refreshTimerDone), userInfo: nil, repeats: false)
+			s.refreshTimer = Timer(repeats: false, interval: TimeInterval(Settings.refreshPeriod)) {
+				s.refreshTimerDone()
+			}
 		}
 	}
 
-	func refreshTimerDone() {
+	private func refreshTimerDone() {
+		refreshTimer = nil
 		if DataManager.appIsConfigured {
 			if preferencesWindow != nil {
 				preferencesDirty = true

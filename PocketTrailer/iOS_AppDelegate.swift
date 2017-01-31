@@ -129,7 +129,9 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 			} else {
 				let howLongUntilNextSync = TimeInterval(Settings.refreshPeriod) - howLongAgo
 				DLog("No need to refresh yet, will refresh in %@", howLongUntilNextSync)
-				refreshTimer = Timer.scheduledTimer(timeInterval: howLongUntilNextSync, target: self, selector: #selector(refreshTimerDone), userInfo: nil, repeats: false)
+				refreshTimer = Timer(repeats: false, interval: howLongUntilNextSync) { [weak self] in
+					self?.refreshTimerDone()
+				}
 			}
 		} else {
 			startRefresh()
@@ -212,7 +214,9 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 				showMessage("Refresh failed", "Loading the latest data from GitHub failed")
 			}
 
-			s.refreshTimer = Timer.scheduledTimer(timeInterval: TimeInterval(Settings.refreshPeriod), target: s, selector: #selector(s.refreshTimerDone), userInfo: nil, repeats: false)
+			s.refreshTimer = Timer(repeats: false, interval: TimeInterval(Settings.refreshPeriod)) {
+				s.refreshTimerDone()
+			}
 			DLog("Refresh done")
 
 			s.updateBadge()
@@ -243,7 +247,8 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 		}
 	}
 
-	func refreshTimerDone() {
+	private func refreshTimerDone() {
+		refreshTimer = nil
 		if DataManager.appIsConfigured {
 			startRefresh()
 		}

@@ -1,32 +1,27 @@
 
-#if os(iOS)
-	import UIKit
-#endif
+import Foundation
 
 final class PopTimer {
 
-	private var _popTimer: Timer?
-	private let _timeInterval: TimeInterval
-	private let _callback: () -> Void
+	private var popTimer: Timer?
+	private let timeInterval: TimeInterval
+	private let callback: Completion
 
 	func push() {
-		_popTimer?.invalidate()
-		_popTimer = Timer.scheduledTimer(timeInterval: _timeInterval, target: self, selector: #selector(popped), userInfo: nil, repeats: false)
-	}
-
-	@objc
-	func popped() {
-		invalidate()
-		_callback()
+		popTimer?.invalidate()
+		popTimer = Timer(repeats: false, interval: timeInterval) { [weak self] in
+			self?.invalidate()
+			self?.callback()
+		}
 	}
 
 	func invalidate() {
-		_popTimer?.invalidate()
-		_popTimer = nil
+		popTimer?.invalidate()
+		popTimer = nil
 	}
 
 	init(timeInterval: TimeInterval, callback: @escaping Completion) {
-		_timeInterval = timeInterval
-		_callback = callback
+		self.timeInterval = timeInterval
+		self.callback = callback
 	}
 }

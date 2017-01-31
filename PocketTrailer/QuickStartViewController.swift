@@ -66,20 +66,22 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 				s.feedback.text = "Syncing GitHub data for the first time.\n\nThis could take a little while, please wait..."
 				Settings.lastSuccessfulRefresh = nil
 				app.startRefreshIfItIsDue()
-				s.checkTimer = Timer.scheduledTimer(timeInterval: 1.0, target: s, selector: #selector(s.checkRefreshDone), userInfo: nil, repeats: true)
+				s.checkTimer = Timer(repeats: true, interval: 1) {
+					s.checkRefreshDone()
+				}
 			}
 		}
 	}
 
-	func checkRefreshDone(t: Timer) {
+	private func checkRefreshDone() {
 		if !appIsRefreshing {
 			checkTimer?.invalidate()
 			checkTimer = nil
 			if newServer.lastSyncSucceeded {
-                dismiss(animated: true, completion: {
+				dismiss(animated: true) {
 					popupManager.masterController.resetView()
 					showMessage("Setup complete!", "You can tweak options & behaviour from the settings.\n\nTrailer has read-only access to your GitHub data, so feel free to experiment, you can't damage your data or settings on GitHub.")
-                })
+				}
 			} else {
 				showMessage("Syncing with this server failed - please check that your network connection is working and that you have pasted your token correctly", nil)
 				normalMode()
