@@ -7,6 +7,23 @@
 		<language>en</language>
 
 		<item>
+			<title>Version 1.5.5</title>
+			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
+			<description><![CDATA[<font face="sans-serif" size="3"><ul>
+				<li>New option to mark PRs with a badge (and even wake snoozing items up) if new commits have occurred.</li>
+				<li>Correction to default visibility settings applied when a custom repository is added.</li>
+				<li>Further performance and stability improvements under the hood.</li>
+				</ul></font>]]></description>
+			<pubDate>Wed, 1 Feb 2017 20:00:00 +0000</pubDate>
+			<enclosure
+			url="http://ptsochantaris.github.io/trailer/trailer155.zip"
+			sparkle:version="1406"
+			sparkle:shortVersionString="1.5.5"
+			sparkle:dsaSignature="MCwCFH3xqbBnnYwnt5SzFYGRrtiVZTcwAhRa0TxngE2Vz3TpK+vmQY4/f5ZJjA=="
+			type="application/octet-stream"/>
+		</item>
+
+		<item>
 			<title>Version 1.5.4</title>
 			<sparkle:minimumSystemVersion>10.10.0</sparkle:minimumSystemVersion>
 			<description><![CDATA[<font face="sans-serif" size="3"><ul>
