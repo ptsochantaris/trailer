@@ -183,25 +183,26 @@ final class MasterViewController: UITableViewController, NSFetchedResultsControl
 
 	func layoutTabs() {
 		if let v = navigationController?.view, let t = tabs, let ts = tabScroll, let tb = tabBorder, let ts1 = tabSide1, let ts2 = tabSide2 {
-			let b = v.bounds.size
-			let w = b.width
-			let h = b.height
+			let boundsSize = v.bounds.size
+			let viewWidth = boundsSize.width
+			let viewHeight = boundsSize.height
 			let tabScrollTransform = ts.transform
 			let tabBorderTransform = tb.transform
 
-			let tf = CGRect(x: 0, y: 0, width: max(w, 64*CGFloat(t.items?.count ?? 1)), height: 49)
-			t.frame = tf
-			ts.contentSize = tf.size
+			let preferredTabWidth = 64*CGFloat(t.items?.count ?? 1)
+			let tabFrame = CGRect(x: 0, y: 0, width: max(viewWidth, preferredTabWidth), height: 49)
+			t.frame = tabFrame
+			ts.contentSize = tabFrame.size
 
-			ts.frame = CGRect(x: 0, y: h-49, width: w, height: 49)
+			ts.frame = CGRect(x: 0, y: viewHeight-49, width: viewWidth, height: 49)
 			ts.transform = tabScrollTransform
 
-			tb.frame = CGRect(x: 0, y: h-49.5, width: w, height: 0.5)
+			tb.frame = CGRect(x: 0, y: viewHeight-49.5, width: viewWidth, height: 0.5)
 			tb.transform = tabBorderTransform
 
-			let ww = w*0.5
-			ts1.frame = CGRect(x: -ww, y: 0, width: ww, height: 49)
-			ts2.frame = CGRect(x: w, y: 0, width: ww, height: 49)
+			let halfWidth = viewWidth*0.5
+			ts1.frame = CGRect(x: -halfWidth, y: 0, width: halfWidth, height: 49)
+			ts2.frame = CGRect(x: tabFrame.size.width, y: 0, width: halfWidth, height: 49)
 
 			if navigationController?.visibleViewController == self || navigationController?.visibleViewController?.presentingViewController != nil {
 				v.bringSubview(toFront: tb)
