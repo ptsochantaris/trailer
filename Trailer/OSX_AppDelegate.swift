@@ -489,7 +489,6 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	func preferencesSelected() {
-		refreshTimer?.invalidate()
 		refreshTimer = nil
 		showPreferencesWindow(andSelect: nil)
 	}
@@ -620,7 +619,6 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 	}
 
 	func prepareForRefresh() {
-		refreshTimer?.invalidate()
 		refreshTimer = nil
 
 		DataManager.postMigrationTasks()

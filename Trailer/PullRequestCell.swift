@@ -1,16 +1,16 @@
 
-let statusAttributes: [String : Any] = {
-
-	let paragraphStyle = NSMutableParagraphStyle()
-	paragraphStyle.headIndent = 92.0
-
-	var a = [String : Any]() // swift bug will crash the app if this is declared as a literal
-	a[NSFontAttributeName] = NSFont(name: "Monaco", size: 9)
-	a[NSParagraphStyleAttributeName] = paragraphStyle
-	return a
-}()
-
 final class PullRequestCell: TrailerCell {
+
+	static let statusAttributes: [String : Any] = {
+
+		let paragraphStyle = NSMutableParagraphStyle()
+		paragraphStyle.headIndent = 92.0
+
+		return [
+			NSFontAttributeName: NSFont(name: "Monaco", size: 9)!,
+			NSParagraphStyleAttributeName: paragraphStyle
+		] as [String:Any]
+	}()
 
 	init(pullRequest: PullRequest) {
 
@@ -51,7 +51,7 @@ final class PullRequestCell: TrailerCell {
 				let text = s.displayText
 				let H = ceil(text.boundingRect(with: CGSize(width: W, height: .greatestFiniteMagnitude),
 				                               options: stringDrawingOptions,
-				                               attributes: statusAttributes).size.height)
+				                               attributes: PullRequestCell.statusAttributes).size.height)
 				statusRects.append(NSMakeRect(LEFTPADDING, bottom+statusBottom, W, H))
 				statusLines?.append(text)
 				statusBottom += H
@@ -128,7 +128,7 @@ final class PullRequestCell: TrailerCell {
 				let statusLabel = LinkField(frame: frame)
 				statusLabel.targetUrl = status.targetUrl
 				statusLabel.needsCommand = !Settings.makeStatusItemsSelectable
-				statusLabel.attributedStringValue = NSAttributedString(string: lines[rectIndex], attributes: statusAttributes)
+				statusLabel.attributedStringValue = NSAttributedString(string: lines[rectIndex], attributes: PullRequestCell.statusAttributes)
 				statusLabel.textColor = status.colorForDisplay
 				if faded {
 					statusLabel.alphaValue = DISABLED_FADE

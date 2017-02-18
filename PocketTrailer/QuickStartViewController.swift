@@ -8,6 +8,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 	@IBOutlet weak var spinner: UIActivityIndicatorView!
 	@IBOutlet weak var feedback: UILabel!
 	@IBOutlet weak var skip: UIBarButtonItem!
+	@IBOutlet weak var importer: UIBarButtonItem!
 	@IBOutlet weak var link: UIButton!
 	@IBOutlet weak var trackIssues: UIBarButtonItem!
 
@@ -75,7 +76,6 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 
 	private func checkRefreshDone() {
 		if !appIsRefreshing {
-			checkTimer?.invalidate()
 			checkTimer = nil
 			if newServer.lastSyncSucceeded {
 				dismiss(animated: true) {
@@ -108,6 +108,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 			v.isHidden = true
 		}
 		skip.isEnabled = false
+		importer.isEnabled = false
 		spinner.startAnimating()
 		feedback.text = "\nTesting the token..."
 
@@ -120,6 +121,7 @@ final class QuickStartViewController: UIViewController, UITextFieldDelegate {
 	private func normalMode() {
 		feedback.text = "Quick Start"
 		skip.isEnabled = true
+		importer.isEnabled = true
 		for v in otherViews {
 			v.isHidden = false
 		}

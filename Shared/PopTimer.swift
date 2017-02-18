@@ -8,15 +8,13 @@ final class PopTimer {
 	private let callback: Completion
 
 	func push() {
-		popTimer?.invalidate()
 		popTimer = Timer(repeats: false, interval: timeInterval) { [weak self] in
-			self?.invalidate()
+			self?.abort()
 			self?.callback()
 		}
 	}
 
-	func invalidate() {
-		popTimer?.invalidate()
+	func abort() {
 		popTimer = nil
 	}
 

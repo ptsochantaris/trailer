@@ -119,7 +119,6 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 
 	func startRefreshIfItIsDue() {
 
-		refreshTimer?.invalidate()
 		refreshTimer = nil
 
 		if let l = Settings.lastSuccessfulRefresh {
@@ -164,7 +163,6 @@ final class iOS_AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificat
 	}
 
 	private func prepareForRefresh() {
-		refreshTimer?.invalidate()
 		refreshTimer = nil
 
 		DataManager.postMigrationTasks()

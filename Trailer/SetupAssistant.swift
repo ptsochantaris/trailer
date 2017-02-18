@@ -90,7 +90,6 @@ final class SetupAssistant: NSWindow, NSWindowDelegate {
 	private func checkRefreshDone() {
 		if !appIsRefreshing {
 
-			checkTimer?.invalidate()
 			checkTimer = nil
 
 			if newServer.lastSyncSucceeded {

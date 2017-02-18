@@ -178,7 +178,7 @@ final class Settings {
 	@discardableResult
 	class func writeToURL(_ url: URL) -> Bool {
 
-		saveTimer.invalidate()
+		saveTimer.abort()
 
 		Settings.lastExportUrl = url
 		Settings.lastExportDate = Date()

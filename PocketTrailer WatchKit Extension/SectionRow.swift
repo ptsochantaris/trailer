@@ -1,7 +1,7 @@
 
 import WatchKit
 
-protocol PopulatableRow : Any {
+protocol PopulatableRow {
 	func populate(from other: Any)
 	var rowType: String { get }
 }
