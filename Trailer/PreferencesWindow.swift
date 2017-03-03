@@ -8,8 +8,8 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 
 	func reset() {
 		preferencesDirty = true
-		API.resetAllStatusChecks()
-		API.resetAllLabelChecks()
+		API.refreshesSinceLastStatusCheck.removeAll()
+		API.refreshesSinceLastLabelsCheck.removeAll()
 		Settings.lastSuccessfulRefresh = nil
 		lastRepoCheck = .distantPast
 		projectsTable.reloadData()
@@ -408,7 +408,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		deferredUpdateTimer.push()
 		updateLabelOptions()
 
-		API.resetAllLabelChecks()
+		API.refreshesSinceLastLabelsCheck.removeAll()
 		if Settings.showLabels {
 			ApiServer.resetSyncOfEverything()
 		}
@@ -698,7 +698,7 @@ final class PreferencesWindow : NSWindow, NSWindowDelegate, NSTableViewDelegate,
 		deferredUpdateTimer.push()
 		updateStatusItemsOptions()
 
-		API.resetAllStatusChecks()
+		API.refreshesSinceLastStatusCheck.removeAll()
 		if Settings.showStatusItems {
 			ApiServer.resetSyncOfEverything()
 		}

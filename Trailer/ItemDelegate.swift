@@ -1,31 +1,31 @@
 
-private let _propertiesToFetch = { ()->[NSExpressionDescription] in
-	let iodD = NSExpressionDescription()
-	iodD.name = "objectID"
-	iodD.expression = NSExpression.expressionForEvaluatedObject()
-	iodD.expressionResultType = .objectIDAttributeType
-
-	let sectionIndexD = NSExpressionDescription()
-	sectionIndexD.name = "sectionIndex"
-	sectionIndexD.expression = NSExpression(format: "sectionIndex")
-	sectionIndexD.expressionResultType = .integer16AttributeType
-
-	return [iodD, sectionIndexD]
-}()
-
 final class ItemDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 
-	private var itemIds = [Any]()
+	private var itemIds = ContiguousArray<Any>()
 	private let type: ListableItem.Type
 	private let sections: [String]
-	private let removalSections: [String]
+	private let removalSections: Set<String>
 	private let viewCriterion: GroupingCriterion?
+
+	private static let propertiesToFetch = { ()->[NSExpressionDescription] in
+		let iodD = NSExpressionDescription()
+		iodD.name = "objectID"
+		iodD.expression = NSExpression.expressionForEvaluatedObject()
+		iodD.expressionResultType = .objectIDAttributeType
+
+		let sectionIndexD = NSExpressionDescription()
+		sectionIndexD.name = "sectionIndex"
+		sectionIndexD.expression = NSExpression(format: "sectionIndex")
+		sectionIndexD.expressionResultType = .integer16AttributeType
+
+		return [iodD, sectionIndexD]
+	}()
 
 	init(type: ListableItem.Type, sections: [String], removeButtonsInSections: [String], viewCriterion: GroupingCriterion?) {
 
 		self.type = type
 		self.sections = sections
-		self.removalSections = removeButtonsInSections
+		self.removalSections = Set(removeButtonsInSections)
 		self.viewCriterion = viewCriterion
 
 		super.init()
@@ -38,10 +38,10 @@ final class ItemDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 		let f = ListableItem.requestForItems(of: type, withFilter: filter, sectionIndex: -1, criterion: viewCriterion)
 		f.resultType = .dictionaryResultType
 		f.fetchBatchSize = 0
-		f.propertiesToFetch = _propertiesToFetch
+		f.propertiesToFetch = ItemDelegate.propertiesToFetch
 		let allItems = try! DataManager.main.fetch(f as! NSFetchRequest<NSDictionary>)
 
-		itemIds.reserveCapacity(allItems.count+sections.count)
+		itemIds.reserveCapacity(allItems.count + sections.count)
 
 		if let firstItem = allItems.first {
 			var lastSection = firstItem["sectionIndex"] as! Int
@@ -73,8 +73,11 @@ final class ItemDelegate: NSObject, NSTableViewDelegate, NSTableViewDataSource {
 	}
 
 	func tableView(_ tv: NSTableView, heightOfRow row: Int) -> CGFloat {
-		let v = tableView(tv, viewFor: nil, row: row)
-		return v!.frame.size.height
+		if let v = tableView(tv, viewFor: nil, row: row) {
+			return v.frame.size.height
+		} else {
+			return 0
+		}
 	}
 
 	func numberOfRows(in tableView: NSTableView) -> Int {

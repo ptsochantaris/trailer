@@ -390,14 +390,6 @@ final class API {
 		}
 	}
 
-	class func resetAllLabelChecks() {
-		refreshesSinceLastLabelsCheck.removeAll()
-	}
-
-	class func resetAllStatusChecks() {
-		refreshesSinceLastStatusCheck.removeAll()
-	}
-
 	private class func updatePullRequests(in moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		let willScanForStatuses = shouldScanForStatuses(in: moc)
@@ -429,7 +421,7 @@ final class API {
 	private class func markDirtyRepos(in moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		let allApiServers = ApiServer.allApiServers(in: moc)
-		let totalOperations = 2*allApiServers.count
+		let totalOperations = 2 * allApiServers.count
 		if totalOperations==0 {
 			callback()
 			return
@@ -910,17 +902,16 @@ final class API {
 	private class func fetchStatusesForCurrentPullRequests(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		let prs = PullRequest.active(in: moc, visibleOnly: !Settings.hidePrsThatArentPassing).filter { pr in
-			if !pr.apiServer.lastSyncSucceeded {
-				return false
-			}
+			guard pr.apiServer.lastSyncSucceeded else { return false }
+
 			let oid = pr.objectID
-			let refreshes = self.refreshesSinceLastStatusCheck[oid]
+			let refreshes = refreshesSinceLastStatusCheck[oid]
 			if refreshes == nil || refreshes! >= Settings.statusItemRefreshInterval {
 				//DLog("Will check statuses for PR: '%@'", pr.title)
 				return true
 			} else {
 				//DLog("No need to get statuses for PR: '%@' (%@ refreshes since last check)", pr.title, refreshes)
-				self.refreshesSinceLastStatusCheck[oid] = (refreshes ?? 0)+1
+				refreshesSinceLastStatusCheck[oid] = (refreshes ?? 0)+1
 				return false
 			}
 		}

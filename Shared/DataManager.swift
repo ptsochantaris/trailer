@@ -208,9 +208,6 @@ final class DataManager {
 			DLog("Saving DB")
 			do {
 				try main.save()
-				for o in main.registeredObjects {
-					main.refresh(o, mergeChanges: false)
-				}
 			} catch {
 				DLog("Error while saving DB: %@", error.localizedDescription)
 			}
