@@ -719,4 +719,16 @@ final class Settings {
 		get { return get("ASSUME_READ_ITEM_IF_USER_HAS_NEWER_COMMENTS") as? Bool ?? false }
 		set { set("ASSUME_READ_ITEM_IF_USER_HAS_NEWER_COMMENTS", newValue) }
 	}
+
+	static let supportReactionsHelp = "Count reactions as comments. Count a reaction to a comment of yours as unread."
+	class var supportReactions: Bool {
+		get { return get("SUPPORT_REACTIONS") as? Bool ?? false }
+		set { set("SUPPORT_REACTIONS", newValue) }
+	}
+
+	static let supportReviewsHelp = "List any pending reviews alongside a PR's title, as well as the name of the reviewer."
+	class var supportReviews: Bool {
+		get { return get("SUPPORT_REVIEWS") as? Bool ?? false }
+		set { set("SUPPORT_REVIEWS", newValue) }
+	}
 }

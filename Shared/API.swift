@@ -394,10 +394,12 @@ final class API {
 
 		let willScanForStatuses = shouldScanForStatuses(in: moc)
 		let willScanForLabels = shouldScanForLabels(in: moc)
+		let willScanReviews = Settings.supportReviews
 
 		var totalOperations = 3
 		if willScanForStatuses { totalOperations += 1 }
 		if willScanForLabels { totalOperations += 1 }
+		if willScanReviews { totalOperations += 1 }
 
 		var completionCount = 0
 		let completionCallback = {
@@ -412,6 +414,11 @@ final class API {
 		}
 		if willScanForLabels {
 			fetchLabelsForForCurrentPullRequests(to: moc, callback: completionCallback)
+		}
+		if willScanReviews {
+			fetchReviewsForForCurrentPullRequests(to: moc) {
+				fetchCommentsForCurrentReviews(to: moc, callback: completionCallback)
+			}
 		}
 		fetchCommentsForCurrentPullRequests(to: moc, callback: completionCallback)
 		checkPrClosures(in: moc, callback: completionCallback)
@@ -830,16 +837,85 @@ final class API {
 		}
 	}
 
+	private class func fetchReviewsForForCurrentPullRequests(to moc: NSManagedObjectContext, callback: @escaping Completion) {
+
+		let prs = PullRequest.active(in: moc, visibleOnly: true).filter { pr in
+			return pr.apiServer.lastSyncSucceeded && pr.condition == ItemCondition.open.rawValue
+		}
+
+		let totalOperations = prs.count
+		if totalOperations == 0 {
+			callback()
+			return
+		}
+
+		var completionCount = 0
+
+		for p in prs {
+			for l in p.reviews {
+				l.postSyncAction = PostSyncAction.delete.rawValue
+			}
+
+			let repoFullName = S(p.repo.fullName)
+			getPagedData(at: "/repos/\(repoFullName)/pulls/\(p.number)/reviews", from: p.apiServer, perPageCallback: { data, lastPage in
+				Review.syncReviews(from: data, withParent: p)
+				return false
+			}) { success, resultCode in
+				completionCount += 1
+				if !success {
+					p.apiServer.lastSyncSucceeded = false
+				}
+				if completionCount == totalOperations {
+					callback()
+				}
+			}
+		}
+	}
+
+	private class func fetchCommentsForCurrentReviews(to moc: NSManagedObjectContext, callback: @escaping Completion) {
+
+		let allReviews = DataItem.newOrUpdatedItems(of: Review.self, in: moc)
+
+		for r in allReviews {
+			for c in r.comments {
+				c.postSyncAction = PostSyncAction.delete.rawValue
+			}
+		}
+
+		let reviews = allReviews.filter { $0.apiServer.lastSyncSucceeded }
+
+		let totalOperations = reviews.count
+		if totalOperations == 0 {
+			callback()
+			return
+		}
+
+		var completionCount = 0
+
+		for r in reviews {
+
+			let apiServer = r.apiServer
+			let p = r.pullRequest
+			let repoFullName = S(p.repo.fullName)
+			getPagedData(at: "/repos/\(repoFullName)/pulls/\(p.number)/reviews/\(r.serverId)/comments", from: apiServer, perPageCallback: { data, lastPage in
+				PRComment.syncComments(from: data, review: r)
+				return false
+			}) { success, resultCode in
+				completionCount += 1
+				if !success {
+					apiServer.lastSyncSucceeded = false
+				}
+				if completionCount == totalOperations {
+					callback()
+				}
+			}
+		}
+	}
+
 	private class func fetchLabelsForForCurrentPullRequests(to moc: NSManagedObjectContext, callback: @escaping Completion) {
 
 		let prs = PullRequest.active(in: moc, visibleOnly: true).filter { pr in
-			if !pr.apiServer.lastSyncSucceeded {
-				return false
-			}
-			if pr.condition != ItemCondition.open.rawValue {
-				//DLog("Won't check labels for closed/merged PR: %@", pr.title)
-				return false
-			}
+			guard pr.apiServer.lastSyncSucceeded && pr.condition == ItemCondition.open.rawValue else { return false }
 			let oid = pr.objectID
 			let refreshes = refreshesSinceLastLabelsCheck[oid]
 			if refreshes == nil || refreshes! >= Settings.labelRefreshInterval {
@@ -1330,10 +1406,10 @@ final class API {
 				}
 				callback(data, lastPage, code ?? 0)
 			} else {
-				if shouldRetry && attemptCount < 2 { // timeout, truncation, connection issue, etc
+				if shouldRetry && attemptCount < 3 { // timeout, truncation, connection issue, etc
 					let nextAttemptCount = attemptCount+1
 					DLog("(%@) Will retry failed API call to %@ (attempt #%@)", S(server.label), path, nextAttemptCount)
-					delay(2.0) {
+					delay(3.0) {
 						getData(in: path, from: server, attemptCount: nextAttemptCount, callback: callback)
 					}
 				} else {
@@ -1349,12 +1425,7 @@ final class API {
 	private static let apiQueue = { () -> OperationQueue in
 		let n = OperationQueue()
 		n.underlyingQueue = DispatchQueue.main
-		#if os(iOS)
-			let archIs64Bit = (MemoryLayout<Int>.size == MemoryLayout<Int64>.size)
-			n.maxConcurrentOperationCount = archIs64Bit ? 8 : 2
-		#else
-			n.maxConcurrentOperationCount = 8
-		#endif
+		n.maxConcurrentOperationCount = 2
 		return n
 	}()
 
@@ -1379,7 +1450,15 @@ final class API {
 		let url = URL(string: expandedPath)!
 
 		var r = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 60.0)
-		r.setValue("application/vnd.github.v3+json", forHTTPHeaderField:"Accept")
+		var acceptTypes = [String]()
+		if Settings.supportReactions {
+			acceptTypes.append("application/vnd.github.squirrel-girl-preview")
+		}
+		if Settings.supportReviews {
+			acceptTypes.append("application/vnd.github.black-cat-preview+json")
+		}
+		acceptTypes.append("application/vnd.github.v3+json")
+		r.setValue(acceptTypes.joined(separator: ", "), forHTTPHeaderField:"Accept")
 		if let a = server.authToken {
 			r.setValue("token \(a)", forHTTPHeaderField: "Authorization")
 		}
@@ -1502,7 +1581,7 @@ final class API {
 	                                  headers: [AnyHashable : Any]?,
 	                                  completion: ApiCompletion) {
 		if let e = error {
-			if code > 399 {
+			if code > 399 && !shouldRetry {
 				if var backoff = existingBackOff {
 					DLog("(%@) Extending backoff for already throttled URL %@ by %@ seconds", serverLabel, urlPath, backOffIncrement)
 					if backoff.nextIncrement < 3600.0 {

@@ -16,6 +16,7 @@ final class PullRequest: ListableItem {
 	@NSManaged var hasNewCommits: Bool
 
 	@NSManaged var statuses: Set<PRStatus>
+	@NSManaged var reviews: Set<Review>
 
 	class func syncPullRequests(from data: [[AnyHashable : Any]]?, in repo: Repo) {
 		items(with: data, type: PullRequest.self, server: repo.apiServer) { item, info, isNewOrUpdated in

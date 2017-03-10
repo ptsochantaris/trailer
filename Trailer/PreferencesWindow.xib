@@ -1052,8 +1052,39 @@ Token</string>
                                                             <action selector="disableAllCommentNotificationsSelected:" target="vQH-WF-vh2" id="G2t-lg-bKn"/>
                                                         </connections>
                                                     </button>
+                                                    <button misplaced="YES" id="gWR-4e-ufK">
+                                                        <rect key="frame" x="9" y="183" width="309" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Mark any comments before my own as read" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="i4o-dH-lEy">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="assumeAllCommentsBeforeMineAreReadSelected:" target="vQH-WF-vh2" id="ZGd-tY-c6Z"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button misplaced="YES" id="fsA-E5-SRy">
+                                                        <rect key="frame" x="9" y="213" width="290" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Highlight PRs that have new commits" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="T2C-n7-dIU">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="highlightItemsWithNewCommitsSelected:" target="vQH-WF-vh2" id="ccI-te-cRo"/>
+                                                        </connections>
+                                                    </button>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" id="4pT-UE-7Vr">
+                                                        <rect key="frame" x="18" y="144" width="525" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Do not present notifications for comments from the following usernames:" id="mJo-ih-vPO">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
                                                     <box misplaced="YES" borderType="none" title="If I am mentioned, move an item to..." id="7lb-Oe-dqF">
-                                                        <rect key="frame" x="435" y="268" width="230" height="51"/>
+                                                        <rect key="frame" x="443" y="268" width="230" height="51"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="CDr-sW-N4t">
                                                             <rect key="frame" x="0.0" y="0.0" width="230" height="36"/>
@@ -1082,7 +1113,7 @@ Token</string>
                                                         </view>
                                                     </box>
                                                     <box misplaced="YES" borderType="none" title="If my team is mentioned, move to..." id="vq6-6w-ave">
-                                                        <rect key="frame" x="435" y="223" width="230" height="51"/>
+                                                        <rect key="frame" x="443" y="223" width="230" height="51"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="5aL-sj-f6p">
                                                             <rect key="frame" x="0.0" y="0.0" width="230" height="36"/>
@@ -1110,19 +1141,8 @@ Token</string>
                                                             </subviews>
                                                         </view>
                                                     </box>
-                                                    <button misplaced="YES" id="gWR-4e-ufK">
-                                                        <rect key="frame" x="9" y="183" width="309" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Mark any comments before my own as read" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="i4o-dH-lEy">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="assumeAllCommentsBeforeMineAreReadSelected:" target="vQH-WF-vh2" id="ZGd-tY-c6Z"/>
-                                                        </connections>
-                                                    </button>
                                                     <box misplaced="YES" borderType="none" title="New items in owned repos, move to..." id="WXP-sZ-GiR">
-                                                        <rect key="frame" x="435" y="178" width="230" height="51"/>
+                                                        <rect key="frame" x="443" y="178" width="230" height="51"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <view key="contentView" id="8jk-qP-cR3">
                                                             <rect key="frame" x="0.0" y="0.0" width="230" height="36"/>
@@ -1150,26 +1170,17 @@ Token</string>
                                                             </subviews>
                                                         </view>
                                                     </box>
-                                                    <button misplaced="YES" id="fsA-E5-SRy">
-                                                        <rect key="frame" x="9" y="213" width="290" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Highlight PRs that have new commits" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="T2C-n7-dIU">
+                                                    <button misplaced="YES" id="tRk-sr-Xbo">
+                                                        <rect key="frame" x="362" y="18" width="301" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Enable support for Reviews (BETA)" bezelStyle="regularSquare" imagePosition="right" alignment="right" state="on" inset="2" id="qKe-te-fMd">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
                                                         <connections>
-                                                            <action selector="highlightItemsWithNewCommitsSelected:" target="vQH-WF-vh2" id="ccI-te-cRo"/>
+                                                            <action selector="supportReviewsSelected:" target="vQH-WF-vh2" id="rRS-zA-25z"/>
                                                         </connections>
                                                     </button>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" id="4pT-UE-7Vr">
-                                                        <rect key="frame" x="18" y="144" width="525" height="17"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Do not present notifications for comments from the following usernames:" id="mJo-ih-vPO">
-                                                            <font key="font" metaFont="system"/>
-                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
                                                 </subviews>
                                             </view>
                                         </box>
@@ -2075,6 +2086,7 @@ in System Preferences -&gt; Security -&gt; Privacy.  Restart Trailer for the per
                 <outlet property="statusItemsRefreshNote" destination="4P5-8J-j5N" id="5Kj-d9-gHG"/>
                 <outlet property="statusTermMenu" destination="irr-Zv-gfS" id="Aoi-h9-I2e"/>
                 <outlet property="statusTermsField" destination="oW9-uY-e0m" id="xZo-19-rE2"/>
+                <outlet property="supportReviews" destination="tRk-sr-Xbo" id="ale-UZ-Z8K"/>
                 <outlet property="tabs" destination="RGK-bv-JXB" id="B5b-gW-VDa"/>
                 <outlet property="teamMentionMovePolicy" destination="gM2-vc-gT5" id="ZPB-jw-m7v"/>
                 <outlet property="useVibrancy" destination="onl-1T-RTg" id="7Tr-3j-g1y"/>

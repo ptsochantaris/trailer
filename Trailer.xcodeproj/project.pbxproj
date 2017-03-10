@@ -82,6 +82,8 @@
 		166ADEC81CCB009A001BA61F /* SnoozingEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 166ADEC71CCB009A001BA61F /* SnoozingEditorViewController.swift */; };
 		1671A11F1AC73CCB0047440A /* SetupAssistant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1671A11E1AC73CCB0047440A /* SetupAssistant.swift */; };
 		1671A1231AC74BC30047440A /* SetupAssistant.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1671A1221AC74BC30047440A /* SetupAssistant.xib */; };
+		167B10571E6A86A300B0E1AE /* Review.swift in Sources */ = {isa = PBXBuildFile; fileRef = 167B10561E6A86A300B0E1AE /* Review.swift */; };
+		167B10581E6A86A300B0E1AE /* Review.swift in Sources */ = {isa = PBXBuildFile; fileRef = 167B10561E6A86A300B0E1AE /* Review.swift */; };
 		16813CBF1BA16D660020F8EB /* CommonController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16813CBE1BA16D660020F8EB /* CommonController.swift */; };
 		168839C71DEF8C3B002D9448 /* ImportExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 168839C61DEF8C3B002D9448 /* ImportExport.swift */; };
 		168BC6C417EC2DF000BC4584 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 168BC6C217EC2DF000BC4584 /* MainMenu.xib */; };
@@ -307,6 +309,8 @@
 		1671A1221AC74BC30047440A /* SetupAssistant.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SetupAssistant.xib; sourceTree = "<group>"; };
 		1672DF2D1AB0D7CC00381AEB /* PocketTrailer WatchKit Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "PocketTrailer WatchKit Extension.entitlements"; sourceTree = "<group>"; };
 		16791B161C0A1B0D003A527F /* Trailer 23.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 23.xcdatamodel"; sourceTree = "<group>"; };
+		167B10551E6A856A00B0E1AE /* Trailer 34.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 34.xcdatamodel"; sourceTree = "<group>"; };
+		167B10561E6A86A300B0E1AE /* Review.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Review.swift; path = Shared/Review.swift; sourceTree = SOURCE_ROOT; };
 		167E399B1CF981D900593204 /* Trailer 29.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Trailer 29.xcdatamodel"; sourceTree = "<group>"; };
 		16813CBE1BA16D660020F8EB /* CommonController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = CommonController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		1686B1D41AE59AED009118C5 /* PocketTrailer.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PocketTrailer.entitlements; sourceTree = "<group>"; };
@@ -780,6 +784,7 @@
 				161B851B1AB8E12C00AD4C5D /* Team.swift */,
 				169B92951CC52C05002774A8 /* SnoozePreset.swift */,
 				160129C81CD8A2A300151D6C /* CacheEntry.swift */,
+				167B10561E6A86A300B0E1AE /* Review.swift */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -1107,6 +1112,7 @@
 				166A84C01A4582C100A3B292 /* ServerDetailViewController.swift in Sources */,
 				169B92971CC52C05002774A8 /* SnoozePreset.swift in Sources */,
 				164841001AD198A6009E6383 /* WatchManager.swift in Sources */,
+				167B10581E6A86A300B0E1AE /* Review.swift in Sources */,
 				162A29DA1A4085FD008F41A9 /* GroupingCriterion.swift in Sources */,
 				160823F51A44997F006F91AD /* UINavigationControllerExtensions.swift in Sources */,
 				16275DF61CF8944100EEBF48 /* API.swift in Sources */,
@@ -1184,6 +1190,7 @@
 				160D312C1A9619CE006B74BC /* FilledView.swift in Sources */,
 				16DB793C1E326C950076A36D /* AdvancedReposWindow.swift in Sources */,
 				162A29D91A4085FD008F41A9 /* GroupingCriterion.swift in Sources */,
+				167B10571E6A86A300B0E1AE /* Review.swift in Sources */,
 				16B3B34F1A34E990000BE6CC /* Trailer.xcdatamodeld in Sources */,
 				1633C1921ABCEC4A0086C692 /* Issue.swift in Sources */,
 				1639E2C11E4007B900C561E1 /* Timer.swift in Sources */,
@@ -1618,6 +1625,7 @@
 		16B3B33B1A34E990000BE6CC /* Trailer.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				167B10551E6A856A00B0E1AE /* Trailer 34.xcdatamodel */,
 				16B415611E3D054500741E6F /* Trailer 33.xcdatamodel */,
 				16DB793F1E32D6460076A36D /* Trailer 32.xcdatamodel */,
 				1605EDCB1D58B71900D91F50 /* Trailer 31.xcdatamodel */,
@@ -1652,7 +1660,7 @@
 				16B3B34D1A34E990000BE6CC /* Trailer 9.xcdatamodel */,
 				16B3B34E1A34E990000BE6CC /* Trailer.xcdatamodel */,
 			);
-			currentVersion = 16B415611E3D054500741E6F /* Trailer 33.xcdatamodel */;
+			currentVersion = 167B10551E6A856A00B0E1AE /* Trailer 34.xcdatamodel */;
 			name = Trailer.xcdatamodeld;
 			path = ../Shared/Trailer.xcdatamodeld;
 			sourceTree = "<group>";

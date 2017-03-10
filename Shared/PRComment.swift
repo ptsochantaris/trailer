@@ -10,6 +10,7 @@ final class PRComment: DataItem {
 
     @NSManaged var pullRequest: PullRequest?
 	@NSManaged var issue: Issue?
+	@NSManaged var review: Review?
 
 	class func syncComments(from data: [[AnyHashable : Any]]?, pullRequest: PullRequest) {
 		items(with: data, type: PRComment.self, server: pullRequest.apiServer) { item, info, newOrUpdated in
@@ -27,6 +28,18 @@ final class PRComment: DataItem {
 				item.issue = issue
 				item.fill(from: info)
 				item.fastForwardIfNeeded(parent: issue)
+			}
+		}
+	}
+
+	class func syncComments(from data: [[AnyHashable : Any]]?, review: Review) {
+		items(with: data, type: PRComment.self, server: review.apiServer) { item, info, newOrUpdated in
+			if newOrUpdated {
+				let pr = review.pullRequest
+				item.review = review
+				item.pullRequest = pr
+				item.fill(from: info)
+				item.fastForwardIfNeeded(parent: pr)
 			}
 		}
 	}
@@ -77,7 +90,6 @@ final class PRComment: DataItem {
 
 	func fill(from info: [AnyHashable : Any]) {
 		body = info["body"] as? String
-		webUrl = info["html_url"] as? String
 
 		if let userInfo = info["user"] as? [AnyHashable : Any] {
 			userName = userInfo["login"] as? String
@@ -85,8 +97,14 @@ final class PRComment: DataItem {
 			avatarUrl = userInfo["avatar_url"] as? String
 		}
 
-		if webUrl==nil, let links = info["links"] as? [AnyHashable : Any] {
-			webUrl = (links["html"] as? [AnyHashable : Any])?["href"] as? String
+		if let href = info["html_url"] as? String {
+			webUrl = href
+
+		} else if let links = info["_links"] as? [AnyHashable : Any],
+			let html = links["html"] as? [AnyHashable : Any],
+			let href = html["href"] as? String {
+
+			webUrl = href
 		}
 	}
 
