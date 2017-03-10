@@ -16,7 +16,22 @@ final class Review: DataItem {
 			if isNewOrUpdated {
 				item.pullRequest = withParent
 				item.body = info["body"] as? String
-				item.state = info["state"] as? String
+				let previousState = item.state
+				let newState = info["state"] as? String
+				if previousState != newState {
+					if let n = newState {
+						switch n {
+						case "CHANGES_REQUESTED":
+							NotificationQueue.add(type: .changesRequested, for: withParent)
+						case "APPROVED":
+							NotificationQueue.add(type: .changesApproved, for: withParent)
+						case "DISMISSED":
+							NotificationQueue.add(type: .changesDismissed, for: withParent)
+						default: break
+						}
+					}
+				}
+				item.state = newState
 				item.username = (info["user"] as? [AnyHashable : Any])?["login"] as? String
 			}
 		}

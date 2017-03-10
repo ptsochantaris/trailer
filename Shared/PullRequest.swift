@@ -14,6 +14,7 @@ final class PullRequest: ListableItem {
 	@NSManaged var lastStatusNotified: String?
 	@NSManaged var mergeCommitSha: String?
 	@NSManaged var hasNewCommits: Bool
+	@NSManaged var assignedForReview: Bool
 
 	@NSManaged var statuses: Set<PRStatus>
 	@NSManaged var reviews: Set<Review>

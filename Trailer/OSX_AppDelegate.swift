@@ -206,45 +206,37 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 
 		switch type {
 		case .newMention:
-			let c = item as! PRComment
-			guard let parent = c.parent else { return }
-			if parent.shouldSkipNotifications { return }
+			guard let c = item as? PRComment, let parent = c.parent, !parent.shouldSkipNotifications else { return }
 			notification.title = "@\(S(c.userName)) mentioned you:"
 			notification.subtitle = c.notificationSubtitle
 			notification.informativeText = c.body
 			addPotentialExtraActions()
 		case .newComment:
-			let c = item as! PRComment
-			guard let parent = c.parent else { return }
-			if parent.shouldSkipNotifications { return }
+			guard let c = item as? PRComment, let parent = c.parent, !parent.shouldSkipNotifications else { return }
 			notification.title = "@\(S(c.userName)) commented:"
 			notification.subtitle = c.notificationSubtitle
 			notification.informativeText = c.body
 			addPotentialExtraActions()
 		case .newPr:
-			let p = item as! PullRequest
-			if p.shouldSkipNotifications { return }
+			guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
 			notification.title = "New PR"
 			notification.subtitle = p.repo.fullName
 			notification.informativeText = p.title
 			addPotentialExtraActions()
 		case .prReopened:
-			let p = item as! PullRequest
-			if p.shouldSkipNotifications { return }
+			guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
 			notification.title = "Re-Opened PR"
 			notification.subtitle = p.repo.fullName
 			notification.informativeText = p.title
 			addPotentialExtraActions()
 		case .prMerged:
-			let p = item as! PullRequest
-			if p.shouldSkipNotifications { return }
+			guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
 			notification.title = "PR Merged!"
 			notification.subtitle = p.repo.fullName
 			notification.informativeText = p.title
 			addPotentialExtraActions()
 		case .prClosed:
-			let p = item as! PullRequest
-			if p.shouldSkipNotifications { return }
+			guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
 			notification.title = "PR Closed"
 			notification.subtitle = p.repo.fullName
 			notification.informativeText = p.title
@@ -256,46 +248,64 @@ final class OSX_AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, 
 			notification.title = "New Repository"
 			notification.subtitle = (item as! Repo).fullName
 		case .newPrAssigned:
-			let p = item as! PullRequest
-			if p.shouldSkipNotifications { return } // unmute on assignment option?
+			guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
 			notification.title = "PR Assigned"
 			notification.subtitle = p.repo.fullName
 			notification.informativeText = p.title
 			addPotentialExtraActions()
 		case .newStatus:
-			let s = item as! PRStatus
-			if s.parentShouldSkipNotifications { return }
+			guard let s = item as? PRStatus, !s.parentShouldSkipNotifications else { return }
 			notification.title = "PR Status Update"
 			notification.subtitle = s.descriptionText
 			notification.informativeText = s.pullRequest.title
 			addPotentialExtraActions()
 		case .newIssue:
-			let i = item as! Issue
-			if i.shouldSkipNotifications { return }
+			guard let i = item as? Issue, !i.shouldSkipNotifications else { return }
 			notification.title = "New Issue"
 			notification.subtitle = i.repo.fullName
 			notification.informativeText = i.title
 			addPotentialExtraActions()
 		case .issueReopened:
-			let i = item as! Issue
-			if i.shouldSkipNotifications { return }
+			guard let i = item as? Issue, !i.shouldSkipNotifications else { return }
 			notification.title = "Re-Opened Issue"
 			notification.subtitle = i.repo.fullName
 			notification.informativeText = i.title
 			addPotentialExtraActions()
 		case .issueClosed:
-			let i = item as! Issue
-			if i.shouldSkipNotifications { return }
+			guard let i = item as? Issue, !i.shouldSkipNotifications else { return }
 			notification.title = "Issue Closed"
 			notification.subtitle = i.repo.fullName
 			notification.informativeText = i.title
 			addPotentialExtraActions()
 		case .newIssueAssigned:
-			let i = item as! Issue
-			if i.shouldSkipNotifications { return }
+			guard let i = item as? Issue, !i.shouldSkipNotifications else { return }
 			notification.title = "Issue Assigned"
 			notification.subtitle = i.repo.fullName
 			notification.informativeText = i.title
+			addPotentialExtraActions()
+		case .changesApproved:
+			guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
+			notification.title = "Review: Changes Approved"
+			notification.subtitle = p.repo.fullName
+			notification.informativeText = p.title
+			addPotentialExtraActions()
+		case .changesRequested:
+			guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
+			notification.title = "Review: Changes Requested"
+			notification.subtitle = p.repo.fullName
+			notification.informativeText = p.title
+			addPotentialExtraActions()
+		case .assignedForReview:
+			guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
+			notification.title = "PR Assigned For Review"
+			notification.subtitle = p.repo.fullName
+			notification.informativeText = p.title
+			addPotentialExtraActions()
+		case .changesDismissed:
+			guard let p = item as? PullRequest, !p.shouldSkipNotifications else { return }
+			notification.title = "Review: Changes Dismissed"
+			notification.subtitle = p.repo.fullName
+			notification.informativeText = p.title
 			addPotentialExtraActions()
 		}
 

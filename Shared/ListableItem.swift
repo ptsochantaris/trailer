@@ -527,10 +527,8 @@ class ListableItem: DataItem {
 						for r in reviews {
 							let name = "@" + r.username!.replacingOccurrences(of: " ", with: "\u{a0}")
 							_title.append(NSAttributedString(string: "\u{a0}\(name)\u{a0}", attributes: reviewAttributes))
-							if count < reviews.count - 1 {
-								_title.append(NSAttributedString(string: " ", attributes: reviewAttributes))
-							} else {
-								_title.append(NSAttributedString(string: " requesting changes", attributes: reviewAttributes))
+							if count == reviews.count - 1 {
+								_title.append(NSAttributedString(string: reviews.count > 1 ? "request changes" : " requests changes", attributes: reviewAttributes))
 							}
 							count += 1
 						}

@@ -364,39 +364,46 @@ final class API {
 		}
 
 		for r in repos {
-			getPagedData(at: "/repos/\(r.fullName ?? "UNKNOWN")/issues/events", from: r.apiServer, perPageCallback: { data, lastPage in
-				guard let data = data else { return false }
+			let repoFullName = S(r.fullName)
+			let lastLocalEvent = r.lastScannedIssueEventId
+			let isFirstEventSync = lastLocalEvent == 0
+			r.lastScannedIssueEventId = 0
+			getPagedData(at: "/repos/\(repoFullName)/issues/events", from: r.apiServer, perPageCallback: { data, lastPage in
+				guard let data = data, data.count > 0 else { return true }
 
-				let lastLocalEvent = r.lastScannedIssueEventId
-				if lastLocalEvent != 0 {
+				if isFirstEventSync {
+
+					DLog("First event check for this repo. Let's ensure all items are marked as updated")
+					for i in r.pullRequests { i.setToUpdatedIfIdle() }
+					for i in r.issues { i.setToUpdatedIfIdle() }
+					r.lastScannedIssueEventId = data.first!["id"] as? Int64 ?? 0
+					return true
+
+				} else {
 
 					var numbers = Set<Int64>()
 					var foundLastEvent = false
 					for event in data {
 						if let eventId = event["id"] as? Int64, let issue = event["issue"] as? [AnyHashable:Any], let issueNumber = issue["number"] as? Int64 {
+							if r.lastScannedIssueEventId == 0 {
+								r.lastScannedIssueEventId = eventId
+							}
 							if eventId == lastLocalEvent {
 								foundLastEvent = true
+								DLog("Parsed all repo issue events up to the one we already have");
 								break // we're done
 							}
 							numbers.insert(issueNumber)
-							if eventId > r.lastScannedIssueEventId {
-								r.lastScannedIssueEventId = eventId
-							}
 						}
+					}
+					if r.lastScannedIssueEventId == 0 {
+						r.lastScannedIssueEventId = lastLocalEvent
 					}
 					if numbers.count > 0 {
 						ListableItem.markItemsAsUpdatedWithNumbers(numbers, in: moc)
 					}
 					return foundLastEvent
 
-				} else if let latestEvent = data.first {
-					DLog("First event check for this repo. Let's ensure all items are marked as updated")
-					for i in r.pullRequests { i.setToUpdatedIfIdle() }
-					for i in r.issues { i.setToUpdatedIfIdle() }
-					r.lastScannedIssueEventId = latestEvent["id"] as? Int64 ?? 0
-					return true
-				} else {
-					return false
 				}
 
 			}) { success, resultCode in
@@ -460,7 +467,7 @@ final class API {
 
 		let willScanForStatuses = shouldScanForStatuses(in: moc)
 
-		let totalOperations = 5 + (willScanForStatuses ? 1 : 0)
+		let totalOperations = 6 + (willScanForStatuses ? 1 : 0)
 
 		var completionCount = 0
 		let completionCallback = {
@@ -477,6 +484,7 @@ final class API {
 		fetchReviewsForForCurrentPullRequests(to: moc) {
 			fetchCommentsForCurrentReviews(to: moc, callback: completionCallback)
 		}
+		fetchReviewAssignmentsForCurrentPullRequests(to: moc, callback: completionCallback)
 		fetchCommentsForCurrentPullRequests(to: moc, callback: completionCallback)
 		checkPrClosures(in: moc, callback: completionCallback)
 		detectAssignedPullRequests(in: moc, callback: completionCallback)
@@ -780,6 +788,49 @@ final class API {
 			}) { success, resultCode in
 				completionCount += 1
 				if !success {
+					p.apiServer.lastSyncSucceeded = false
+				}
+				if completionCount == totalOperations {
+					callback()
+				}
+			}
+		}
+	}
+
+	private class func fetchReviewAssignmentsForCurrentPullRequests(to moc: NSManagedObjectContext, callback: @escaping Completion) {
+
+		let prs = DataItem.newOrUpdatedItems(of: PullRequest.self, in: moc).filter { $0.apiServer.lastSyncSucceeded }
+
+		let totalOperations = prs.count
+		if totalOperations == 0 {
+			callback()
+			return
+		}
+
+		var completionCount = 0
+
+		for p in prs {
+
+			let myId = p.apiServer.userId
+			var assignedForReview = false
+			let repoFullName = S(p.repo.fullName)
+			getPagedData(at: "/repos/\(repoFullName)/pulls/\(p.number)/requested_reviewers", from: p.apiServer, perPageCallback: { data, lastPage in
+				guard let data = data else { return true }
+				for userInfo in data {
+					if let userId = userInfo["id"] as? Int64, userId == myId {
+						assignedForReview = true
+						return true
+					}
+				}
+				return false
+			}) { success, resultCode in
+				completionCount += 1
+				if success {
+					if assignedForReview && !p.assignedForReview {
+						NotificationQueue.add(type: .assignedForReview, for: p)
+					}
+					p.assignedForReview = assignedForReview
+				} else {
 					p.apiServer.lastSyncSucceeded = false
 				}
 				if completionCount == totalOperations {
@@ -1311,7 +1362,7 @@ final class API {
 	private static let apiQueue = { () -> OperationQueue in
 		let n = OperationQueue()
 		n.underlyingQueue = DispatchQueue.main
-		n.maxConcurrentOperationCount = 4
+		n.maxConcurrentOperationCount = 3
 		return n
 	}()
 

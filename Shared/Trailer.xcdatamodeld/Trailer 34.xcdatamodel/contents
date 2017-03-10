@@ -112,6 +112,7 @@
     </entity>
     <entity name="PullRequest" representedClassName=".PullRequest" syncable="YES">
         <attribute name="announced" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="assignedForReview" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="assignedToMe" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="assigneeName" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="body" optional="YES" attributeType="String" syncable="YES"/>
@@ -225,7 +226,7 @@
         <element name="PRComment" positionX="0" positionY="0" width="128" height="240"/>
         <element name="PRLabel" positionX="9" positionY="153" width="128" height="195"/>
         <element name="PRStatus" positionX="0" positionY="0" width="128" height="180"/>
-        <element name="PullRequest" positionX="0" positionY="0" width="128" height="675"/>
+        <element name="PullRequest" positionX="0" positionY="0" width="128" height="690"/>
         <element name="Repo" positionX="0" positionY="0" width="128" height="345"/>
         <element name="Review" positionX="9" positionY="153" width="128" height="195"/>
         <element name="SnoozePreset" positionX="9" positionY="153" width="128" height="225"/>

@@ -245,7 +245,7 @@ final class DataManager {
 			let parent = (item as! PRComment).parent
 			let parentUri = parent?.objectID.uriRepresentation().absoluteString ?? ""
 			return [COMMENT_ID_KEY: uri, LISTABLE_URI_KEY: parentUri]
-		case .newPr, .prReopened, .newPrAssigned, .prClosed, .prMerged, .newIssue, .issueReopened, .newIssueAssigned, .issueClosed:
+		case .newPr, .prReopened, .newPrAssigned, .prClosed, .prMerged, .newIssue, .issueReopened, .newIssueAssigned, .issueClosed, .changesRequested, .changesApproved, .assignedForReview, .changesDismissed:
 			let uri = item.objectID.uriRepresentation().absoluteString
 			return [NOTIFICATION_URL_KEY: (item as! ListableItem).webUrl!, LISTABLE_URI_KEY: uri]
 		case .newRepoSubscribed, .newRepoAnnouncement:
